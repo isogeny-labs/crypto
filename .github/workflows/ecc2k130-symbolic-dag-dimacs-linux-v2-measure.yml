@@ -26,6 +26,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+          filter: blob:none
       - id: setup
         uses: actions/setup-python@v5
         with:

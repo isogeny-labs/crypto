@@ -29,10 +29,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::cryptanalysis::ecbench::canonical::sha256_hex;
 use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
-use crate::cryptanalysis::ecbench::methods::MethodSpec;
+use crate::cryptanalysis::ecbench::methods::{MethodSpec, PhaseRecord, SolveReport};
 use crate::cryptanalysis::ecbench::record::{
-    check_line_seal, child_main, floor_s, grade, json_roundtrip, ChildInput, GradeInput, Record,
-    CHILD_INPUT_SCHEMA, GRADING_VERSION,
+    check_line_seal, child_main, floor_s, grade_for_version, grading_version_supported,
+    json_roundtrip, ChildInput, GradeInput, Record, CHILD_INPUT_SCHEMA,
 };
 use crate::cryptanalysis::ecbench::runner::{read_record_lines, read_session, PlanDoc};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Spec};
@@ -119,6 +119,47 @@ pub fn legacy_solver_rounding(
     Some((phases, before - w))
 }
 
+/// Replay detail for a record written before an accounting correction,
+/// reproduced from the replay with the correction undone.
+pub const LEGACY_ACCOUNTING_IDENTICAL: &str =
+    "identical (pre-2026-10-18 phase accounting, reproduced from the replay)";
+
+/// The figures a `rho.quartic` / `rho.cubic` record written before
+/// 2026-10-18 carries.  Those binaries merged the class set-up into the
+/// ledger the phases are read from, but not into the total, so the total
+/// fell short of the phase sum by exactly the set-up.  The replay reports
+/// its own set-up (`detail.class_setup`, computed by the replay, never read
+/// from the record), so the record cannot choose the amount.
+pub fn legacy_class_setup(rep: &SolveReport) -> Option<(Vec<PhaseRecord>, f64)> {
+    let d = rep.detail.pointer("/class_setup/gae")?.as_f64()?;
+    (d > 0.0).then(|| (rep.phases.clone(), rep.total_gae - d))
+}
+
+/// The phases a `kangaroo.vow` record written before 2026-10-18 carries.
+/// Those binaries charged a kangaroo's re-placement after a same-kind
+/// collision to `setup`; it is search.  The total is unchanged.  The
+/// replay reports the re-placement work it moved (`detail.
+/// restarts_in_search`, computed by the replay), and this moves it back.
+pub fn legacy_restart_phase(rep: &SolveReport) -> Option<(Vec<PhaseRecord>, f64)> {
+    let moved = rep.detail.get("restarts_in_search")?;
+    let field = |k: &str| moved.get(k).and_then(serde_json::Value::as_u64);
+    let (adds, doubles, sm) = (field("adds")?, field("doubles")?, field("scalar_mults")?);
+    let mut phases = rep.phases.clone();
+    let si = phases.iter().position(|p| p.name == "setup")?;
+    let wi = phases.iter().position(|p| p.name == "search")?;
+    let w = &mut phases[wi];
+    w.adds = w.adds.checked_sub(adds)?;
+    w.doubles = w.doubles.checked_sub(doubles)?;
+    w.scalar_mults = w.scalar_mults.checked_sub(sm)?;
+    w.gae = (w.adds + w.doubles) as f64;
+    let s = &mut phases[si];
+    s.adds += adds;
+    s.doubles += doubles;
+    s.scalar_mults += sm;
+    s.gae = (s.adds + s.doubles) as f64;
+    Some((phases, rep.total_gae))
+}
+
 pub const AUDIT_SCHEMA: &str = "ecbench.audit/v1";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -196,22 +237,23 @@ pub fn audit(dir: &Path, replay: usize) -> Result<AuditReport, String> {
 /// finalised.
 pub const NEVER_FINALISED: &str = "never_finalised";
 
-/// A session whose `session.json` is still exactly in the state the runner
-/// writes before its first execution: status `running`, no finish time, no
-/// record count, no records hash, no status counts.  The runner rewrites
-/// `session.json` only when the session ends (`complete`, or `interrupted`
-/// on a signal or an error), so a session left in this state was killed
-/// outright (SIGKILL, host loss) or is still being written by a live
-/// runner; the files cannot tell those apart, and a committed session has
-/// no live runner.  Its records are still sealed line by line as they are
-/// written, so every per-record check applies; only the whole-file hash,
-/// which the runner never got to write, does not.
+/// A session whose `session.json` is still in a state the runner writes
+/// before the session ends: status `running`, no finish time, no records
+/// hash.  The runner writes the final `session.json` (`complete`, or
+/// `interrupted` on a signal or an error) only when the session ends, so a
+/// session left in this state was killed outright (SIGKILL, host loss) or
+/// is still being written by a live runner; the files cannot tell those
+/// apart, and a committed session has no live runner.  Since the runner
+/// rewrites `session.json` atomically after every record, a killed session
+/// may carry progress counters (`records_written`, `last_seq`,
+/// `status_counts`); sessions killed before that was done carry zeros.
+/// Records are sealed line by line as they are written, so every
+/// per-record check applies; only the whole-file hash, which the runner
+/// never got to write, does not.
 pub fn never_finalised(session: &crate::cryptanalysis::ecbench::runner::Session) -> bool {
     session.status == "running"
         && session.finished_unix_ms.is_none()
-        && session.records_written == 0
         && session.records_sha256.is_none()
-        && session.status_counts.is_empty()
 }
 
 /// [`audit`], optionally accepting an `interrupted` session: it is held
@@ -280,7 +322,8 @@ pub fn audit_with(
 
     // The host class.
     let host: HostCapsule = serde_json::from_str(
-        &std::fs::read_to_string(dir.join("host.json")).map_err(|e| e.to_string())?,
+        &std::fs::read_to_string(dir.join("host.json"))
+            .map_err(|e| format!("{}: {e}", dir.join("host.json").display()))?,
     )
     .map_err(|e| format!("host.json: {e}"))?;
     let class = recompute_class(&host)?;
@@ -295,10 +338,12 @@ pub fn audit_with(
     );
 
     // The spec re-expands to the plan.
-    let spec_text = std::fs::read_to_string(dir.join("spec.json")).map_err(|e| e.to_string())?;
+    let spec_text = std::fs::read_to_string(dir.join("spec.json"))
+        .map_err(|e| format!("{}: {e}", dir.join("spec.json").display()))?;
     let p = plan(Spec::from_json(&spec_text)?)?;
     let doc: PlanDoc = serde_json::from_str(
-        &std::fs::read_to_string(dir.join("plan.json")).map_err(|e| e.to_string())?,
+        &std::fs::read_to_string(dir.join("plan.json"))
+            .map_err(|e| format!("{}: {e}", dir.join("plan.json").display()))?,
     )
     .map_err(|e| format!("plan.json: {e}"))?;
     check(
@@ -346,7 +391,9 @@ pub fn audit_with(
         if complete {
             records.len() as u64 == session.records_written && records.len() == p.executions.len()
         } else if killed {
-            records.len() <= p.executions.len()
+            // The progress counter was written after the record it counts,
+            // so no fewer records than it says may be on disk.
+            records.len() <= p.executions.len() && records.len() as u64 >= session.records_written
         } else {
             records.len() as u64 == session.records_written && records.len() <= p.executions.len()
         },
@@ -443,24 +490,30 @@ pub fn audit_with(
             }
         }
     }
-    // Regrade every run from its own observations, when the session was
-    // graded under the rules this binary applies.
-    let regraded = session.grading_version == GRADING_VERSION;
+    // Regrade every run from its own observations under the rules the
+    // session was graded with (`grade_for_version`), when this binary
+    // implements that version.
+    let regraded = grading_version_supported(session.grading_version);
     if regraded {
         for r in &records {
-            let g = grade(&GradeInput {
-                plan: session.cpu_plan.as_ref(),
-                preflight: session.preflight.as_ref(),
-                eviction: session.eviction.as_ref(),
-                runner_on_run_cpu: session.runner_on_run_cpu,
-                capsule: &host,
-                thresholds: &session.options.thresholds,
-                placement: &r.isolation.placement,
-                before: &r.isolation.before,
-                after: &r.isolation.after,
-                timing: &r.time,
-                hz: session.ticks_per_second as f64,
-            });
+            let Some(g) = grade_for_version(
+                session.grading_version,
+                &GradeInput {
+                    plan: session.cpu_plan.as_ref(),
+                    preflight: session.preflight.as_ref(),
+                    eviction: session.eviction.as_ref(),
+                    runner_on_run_cpu: session.runner_on_run_cpu,
+                    capsule: &host,
+                    thresholds: &session.options.thresholds,
+                    placement: &r.isolation.placement,
+                    before: &r.isolation.before,
+                    after: &r.isolation.after,
+                    timing: &r.time,
+                    hz: session.ticks_per_second as f64,
+                },
+            ) else {
+                continue;
+            };
             if g.level != r.isolation.level || g.blockers != r.isolation.blockers {
                 record_problems.push(format!(
                     "record seq {}: graded {} with {} blockers, its observations give {} with {}",
@@ -546,9 +599,6 @@ pub fn audit_with(
                             }
                         }
                     }
-                    if !total_ok {
-                        diffs.push("total_gae");
-                    }
                     let ints = |ps: &[crate::cryptanalysis::ecbench::methods::PhaseRecord]| {
                         ps.iter()
                             .map(|p| {
@@ -562,7 +612,25 @@ pub fn audit_with(
                             })
                             .collect::<Vec<_>>()
                     };
-                    if ints(&rep.phases) != ints(&r.phases) {
+                    let mut counts_ok = ints(&rep.phases) == ints(&r.phases);
+                    let mut accounting = false;
+                    if !(total_ok && phases_ok && counts_ok) {
+                        for undo in [legacy_class_setup, legacy_restart_phase] {
+                            let Some((ph, tot)) = undo(&rep) else {
+                                continue;
+                            };
+                            let g: Vec<f64> = ph.iter().map(|p| p.gae).collect();
+                            if same_gae(&g, tot) == (true, true) && ints(&ph) == ints(&r.phases) {
+                                (total_ok, phases_ok, counts_ok, accounting) =
+                                    (true, true, true, true);
+                                break;
+                            }
+                        }
+                    }
+                    if !total_ok {
+                        diffs.push("total_gae");
+                    }
+                    if !counts_ok {
                         diffs.push("phase counts");
                     }
                     if !phases_ok {
@@ -590,7 +658,9 @@ pub fn audit_with(
                     }
                     (
                         diffs.is_empty(),
-                        if diffs.is_empty() && legacy {
+                        if diffs.is_empty() && accounting {
+                            LEGACY_ACCOUNTING_IDENTICAL.into()
+                        } else if diffs.is_empty() && legacy {
                             LEGACY_IDENTICAL.into()
                         } else if diffs.is_empty() {
                             "identical".into()
@@ -654,6 +724,67 @@ pub fn audit_with(
 
 #[cfg(test)]
 mod tests {
+    use crate::cryptanalysis::ecbench::methods::{PhaseRecord, SolveReport};
+
+    fn phase(name: &str, adds: u64, doubles: u64, sm: u64) -> PhaseRecord {
+        PhaseRecord {
+            name: name.into(),
+            adds,
+            doubles,
+            scalar_mults: sm,
+            gae: (adds + doubles) as f64,
+            ..Default::default()
+        }
+    }
+
+    /// A replay that moved `m` re-placement operations into `search`
+    /// reconstructs the old split exactly: the same total, `m` more in
+    /// `setup`, `m` fewer in `search`, scalar multiplications with them.
+    #[test]
+    fn legacy_restart_phase_moves_the_restart_back_to_setup() {
+        let rep = SolveReport {
+            phases: vec![phase("setup", 10, 40, 2), phase("search", 900, 3, 1)],
+            total_gae: 953.0,
+            detail: serde_json::json!({"restarts_in_search":
+                {"adds": 7, "doubles": 2, "scalar_mults": 1}}),
+            ..Default::default()
+        };
+        let (old, total) = legacy_restart_phase(&rep).unwrap();
+        assert_eq!(total, 953.0);
+        assert_eq!(old[0], phase("setup", 17, 42, 3));
+        assert_eq!(old[1], phase("search", 893, 1, 0));
+        // Nothing to undo without the replay's own report of it.
+        let plain = SolveReport {
+            detail: serde_json::Value::Null,
+            ..rep.clone()
+        };
+        assert!(legacy_restart_phase(&plain).is_none());
+        // More moved than the phase holds cannot be a reconstruction.
+        let bad = SolveReport {
+            detail: serde_json::json!({"restarts_in_search":
+                {"adds": 901, "doubles": 0, "scalar_mults": 0}}),
+            ..rep
+        };
+        assert!(legacy_restart_phase(&bad).is_none());
+    }
+
+    /// A `rho.quartic` / `rho.cubic` replay's class set-up is subtracted
+    /// from the total only; the phases stay as they are.
+    #[test]
+    fn legacy_class_setup_lowers_only_the_total() {
+        let rep = SolveReport {
+            phases: vec![phase("setup", 5, 16, 1), phase("search", 541, 0, 0)],
+            total_gae: 562.0,
+            detail: serde_json::json!({"class_setup":
+                {"adds": 5, "doubles": 16, "scalar_mults": 1, "gae": 21.0}}),
+            ..Default::default()
+        };
+        let (phases, total) = legacy_class_setup(&rep).unwrap();
+        assert_eq!(phases, rep.phases);
+        assert_eq!(total, 541.0);
+        assert!(legacy_class_setup(&SolveReport::default()).is_none());
+    }
+
     use super::*;
     use serde_json::json;
 
@@ -752,6 +883,39 @@ mod tests {
         assert!(text.contains("\"records_bound\":false"), "{text}");
         assert_eq!(lenient.records, 4);
         assert_eq!(lenient.checks.get("records"), Some(&true));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// The runner now rewrites `session.json` after every record, so a
+    /// runner killed outright leaves `running` with progress counters.
+    #[test]
+    fn a_killed_session_with_progress_counters_is_still_never_finalised() {
+        let dir = killed_copy("progress");
+        let text = std::fs::read_to_string(dir.join("session.json")).unwrap();
+        let mut v: serde_json::Value = serde_json::from_str(&text).unwrap();
+        v["records_written"] = json!(4);
+        v["last_seq"] = json!(3);
+        v["status_counts"] = json!({"verified": 2, "error": 2});
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        assert!(never_finalised(&read_session(&dir).unwrap()));
+        let strict = audit_with(&dir, 0, false).unwrap();
+        assert!(!strict.ok);
+        let lenient = audit_with(&dir, 0, true).unwrap();
+        assert!(lenient.ok, "{:?}", lenient.problems);
+        assert_eq!(lenient.interruption.as_deref(), Some(NEVER_FINALISED));
+        assert_eq!(lenient.records_bound, Some(false));
+        // A record count above what is on disk is truncation, caught even
+        // though no whole-file hash exists.
+        v["records_written"] = json!(5);
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        let rep = audit_with(&dir, 0, true).unwrap();
+        assert!(!rep.ok);
+        assert_eq!(rep.checks.get("record_count"), Some(&false));
+        // A finish time still takes it out of the relaxation.
+        v["records_written"] = json!(4);
+        v["finished_unix_ms"] = json!(1791170600000u64);
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        assert!(!never_finalised(&read_session(&dir).unwrap()));
         let _ = std::fs::remove_dir_all(&dir);
     }
 

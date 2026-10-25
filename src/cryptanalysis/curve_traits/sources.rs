@@ -251,10 +251,28 @@ fn block(
                 .ok_or(format!("line {line}: expected `- ` in a sequence"))?
                 .trim();
             let quoted = item.starts_with(['\'', '"']);
-            if item.is_empty() || (!quoted && (item.contains(": ") || item.ends_with(':'))) {
+            if item.is_empty() {
                 return Err(format!(
                     "line {line}: nested sequence items are not supported"
                 ));
+            }
+            if !quoted && (item.contains(": ") || item.ends_with(':')) {
+                // A mapping item: `- key: value`, with the item's other keys at the
+                // column of its first key.  Items are not otherwise nested.
+                let key_col = ind + (c.len() - c.trim_start_matches('-').trim_start().len());
+                let mut map = serde_json::Map::new();
+                let item_path = format!("{path}{}.", seq.len());
+                *pos += 1;
+                entry(lines, pos, key_col, &item_path, dups, &mut map, line, item)?;
+                while let Some(&(l, i, cc)) = lines.get(*pos) {
+                    if i != key_col || cc.starts_with("- ") || cc == "-" {
+                        break;
+                    }
+                    *pos += 1;
+                    entry(lines, pos, key_col, &item_path, dups, &mut map, l, cc)?;
+                }
+                seq.push(Value::Object(map));
+                continue;
             }
             seq.push(scalar(item, line)?);
             *pos += 1;
@@ -269,28 +287,43 @@ fn block(
         if ind > indent {
             return Err(format!("line {line}: unexpected indentation"));
         }
-        let (key, rest) = split_key(c, line)?;
         *pos += 1;
-        let child = format!("{path}{key}.");
-        let value = if rest.is_empty() {
-            match lines.get(*pos) {
-                Some(&(_, next, nc))
-                    if next > indent || (next == indent && nc.starts_with("- ")) =>
-                {
-                    block(lines, pos, next, &child, dups)?
-                }
-                _ => Value::Null,
-            }
-        } else {
-            scalar(rest, line)?
-        };
-        if map.contains_key(&key) {
-            dups.push(format!("{path}{key}"));
-        } else {
-            map.insert(key, value);
-        }
+        entry(lines, pos, indent, path, dups, &mut map, line, c)?;
     }
     Ok(Value::Object(map))
+}
+
+/// One `key: value` (or `key:` with a nested block) of a mapping whose keys sit at
+/// column `indent`.  `pos` is already past the key's line.
+#[allow(clippy::too_many_arguments)]
+fn entry(
+    lines: &[(usize, usize, &str)],
+    pos: &mut usize,
+    indent: usize,
+    path: &str,
+    dups: &mut Vec<String>,
+    map: &mut serde_json::Map<String, Value>,
+    line: usize,
+    c: &str,
+) -> Result<(), String> {
+    let (key, rest) = split_key(c, line)?;
+    let child = format!("{path}{key}.");
+    let value = if rest.is_empty() {
+        match lines.get(*pos) {
+            Some(&(_, next, nc)) if next > indent || (next == indent && nc.starts_with("- ")) => {
+                block(lines, pos, next, &child, dups)?
+            }
+            _ => Value::Null,
+        }
+    } else {
+        scalar(rest, line)?
+    };
+    if map.contains_key(&key) {
+        dups.push(format!("{path}{key}"));
+    } else {
+        map.insert(key, value);
+    }
+    Ok(())
 }
 
 // ── The IC crosswalk ──────────────────────────────────────────────────
@@ -409,6 +442,26 @@ mod tests {
         assert_eq!(v["b"]["263"]["level"], "1");
         assert!(v["f"].is_null());
         assert!(parse_yaml("a: |\n  x\n").is_err());
-        assert!(parse_yaml("a:\n  - b: 1\n").is_err());
+        assert!(parse_yaml("a:\n  -\n    b: 1\n").is_err());
+    }
+
+    #[test]
+    fn sequences_of_mappings_read_each_item_and_reject_deeper_nesting() {
+        let (v, dups) = parse_yaml(
+            "s:\n  - table: A\n    points: 5\n    refs: []\n  - table: B\n    points: 7\nt: 1\n",
+        )
+        .unwrap();
+        assert!(dups.is_empty());
+        assert_eq!(v["s"].as_array().unwrap().len(), 2);
+        assert_eq!(v["s"][0]["table"], "A");
+        assert_eq!(v["s"][0]["points"], "5");
+        assert_eq!(v["s"][1]["table"], "B");
+        assert_eq!(v["s"][1]["points"], "7");
+        assert_eq!(v["t"], "1");
+        let (v, dups) = parse_yaml("s:\n  - k: 1\n    k: 2\n").unwrap();
+        assert_eq!(dups, ["s.0.k"]);
+        assert_eq!(v["s"][0]["k"], "1");
+        assert!(parse_yaml("s:\n  - a: 1\n    b:\n      - c: 2\n").is_ok());
+        assert!(parse_yaml("s:\n  -\n    a: 1\n").is_err());
     }
 }
