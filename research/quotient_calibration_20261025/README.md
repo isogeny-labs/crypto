@@ -20,6 +20,11 @@ group checks, budgets and stop rules. The historical settings file retains
 its original paths; they resolve in the pinned source repository. The active
 native adaptation is stated at the beginning of the protocol.
 
+The [run report](reports/run-20261025T1845Z/REPORT.md),
+[one-page PDF](reports/run-20261025T1845Z/REPORT.pdf) and
+[validation record](reports/run-20261025T1845Z/VALIDATION.md) distinguish
+the passing native preflight from the unrelated baseline library gate.
+
 ## Reproduce the source preflight
 
 From the repository root, with Rust 1.99.1 (the recorded replay toolchain):
