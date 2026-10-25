@@ -1,0 +1,79 @@
+name: pqc-assay
+
+on:
+  push:
+    paths:
+      - 'src/pqc/fast/ml_dsa.rs'
+      - 'src/pqc/ml_dsa.rs'
+      - 'src/pqc/fast/keccak*.rs'
+      - 'src/hash/sha3.rs'
+      - 'verification/pqc-assay/**'
+      - '.github/workflows/pqc-assay.yml'
+  pull_request:
+    paths:
+      - 'src/pqc/fast/ml_dsa.rs'
+      - 'src/pqc/ml_dsa.rs'
+      - 'src/pqc/fast/keccak*.rs'
+      - 'src/hash/sha3.rs'
+      - 'verification/pqc-assay/**'
+      - '.github/workflows/pqc-assay.yml'
+  workflow_dispatch:
+    inputs:
+      math_reference:
+        description: Rebuild the pinned upstream Isabelle reduction proofs (cold build can take hours)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pqc-assay-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  rust-reduce:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/hash
+            src/pqc
+            verification/pqc-assay
+      - name: Install the pinned Rust compiler
+        run: rustup toolchain install 1.90.0 --profile minimal && rustup default 1.90.0
+      - uses: actions/cache@v4
+        with:
+          path: verification/pqc-assay/.cache
+          key: assay-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('verification/pqc-assay/toolchain.env') }}
+      - name: Install SAW and pin the upstream proof model
+        run: verification/pqc-assay/setup.sh
+      - name: Prove the production reductions and reject four wrong specifications
+        run: verification/pqc-assay/verify.sh
+      - name: Reject a changed production reduction
+        run: verification/pqc-assay/mutations.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pqc-assay-rust-reduce
+          path: verification/pqc-assay/build/*.txt
+          if-no-files-found: warn
+
+  math-reference:
+    if: github.event_name == 'workflow_dispatch' && inputs.math_reference
+    runs-on: macos-15
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: verification/pqc-assay
+      - uses: actions/cache@v4
+        with:
+          path: |
+            verification/pqc-assay/.cache
+            ~/.isabelle/Isabelle2025-2/heaps
+          key: assay-math-${{ runner.os }}-${{ hashFiles('verification/pqc-assay/toolchain.env') }}
+      - name: Regenerate the lifts and check the pinned model-to-math proofs
+        run: verification/pqc-assay/verify-math.sh
