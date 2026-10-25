@@ -428,6 +428,30 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "transfer.isogeny",
+            family: "rho",
+            summary: "move the instance across a rational ℓ-isogeny (ℓ = 2 or 3, Vélu), solve it on the isogenous curve with a generic inner method, check [k]G = Q on the source; kernel search and the two point maps recorded as unpriced field work; prime-field curves only",
+            entry: "ecbench::isogeny::{find_isogeny, Isogeny::map}",
+            applies: Applies::Any,
+            params: &[
+                ParamDecl {
+                    name: "ell",
+                    default: Some("3"),
+                    help: "isogeny degree, 2 or 3",
+                },
+                ParamDecl {
+                    name: "inner",
+                    default: Some("rho.negation"),
+                    help: "the generic method run on the isogenous curve: rho.plain, rho.negation, bsgs.textbook, bsgs.interleaved, bsgs.negation or kangaroo.vow",
+                },
+                ParamDecl {
+                    name: "cap_multiple",
+                    default: Some("64"),
+                    help: "the inner rho or kangaroo's step cap, in multiples of √r",
+                },
+            ],
+        },
+        MethodDecl {
             id: "ic.hyperelliptic",
             family: "ic",
             summary: "Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (genus2 workloads): factor base of degree-1 places, factor-base walk, smoothness by gcd, sparse elimination mod r; Jacobian group operations charged, field and row operations unpriced",
@@ -1395,6 +1419,17 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
                     curve.slug
                 ))
         }
+        Instance::Prime(i) if id == "transfer.isogeny" => {
+            let ell: u64 = m.params.get("ell").and_then(|v| v.parse().ok()).unwrap_or(3);
+            let mut t = crate::cryptanalysis::ecbench::isogeny::FieldTally::default();
+            crate::cryptanalysis::ecbench::isogeny::find_isogeny(&i.curve, ell, &mut t)
+                .map(|_| ())
+                .ok_or_else(|| format!("{} has no rational {ell}-isogeny", curve.slug))
+        }
+        _ if id == "transfer.isogeny" => Err(format!(
+            "`transfer.isogeny` runs on prime-field curves only; {} is {}",
+            curve.slug, curve.family
+        )),
         _ if id == "rho.quartic" || id == "rho.cubic" => Err(format!(
             "`{id}` runs on prime-field curves only; {} is {}",
             curve.slug, curve.family
@@ -1623,6 +1658,13 @@ fn solve_inner(
             rep.detail = class_setup_detail(setup);
             Ok(rep)
         }
+        (Instance::Prime(i), _) if m.id == "transfer.isogeny" => {
+            solve_isogeny_transfer(m, i, PrimePoint::affine(tx, ty), seed)
+        }
+        (_, _) if m.id == "transfer.isogeny" => Err(format!(
+            "`transfer.isogeny` runs on prime-field curves only; {} is {}",
+            curve.slug, curve.family
+        )),
         (Instance::Prime(i), _) if m.id == "rho.multitarget_pooled" => {
             solve_pooled(m, inst, curve, i, PrimePoint::affine(tx, ty), seed)
         }
@@ -1734,6 +1776,102 @@ fn solve_jacobian(
         }
         _ => Err("not a Jacobian".into()),
     }
+}
+
+/// `transfer.isogeny`: find the rational ℓ-isogeny, map `G` and `Q`,
+/// solve on the isogenous curve with the inner generic method, check the
+/// answer on the source.  Phases: `transfer` (0 GAE, its field work
+/// native and unpriced), the inner method's phases prefixed `target:`,
+/// and `verify` (one scalar multiplication on the source curve).
+fn solve_isogeny_transfer(
+    m: &ResolvedMethod,
+    inst: &PrimeInstance,
+    target: PrimePoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use crate::cryptanalysis::ecbench::isogeny::{find_isogeny, FieldTally};
+    let ell = param_u64(m, "ell")?;
+    if !matches!(ell, 2 | 3) {
+        return Err(format!("`ell` must be 2 or 3, not {ell}"));
+    }
+    if ell == inst.r {
+        return Err("ℓ equals the subgroup order; the isogeny would not preserve it".into());
+    }
+    let inner_id = m.params["inner"].clone();
+    if !JACOBIAN_GENERIC.contains(&inner_id.as_str()) || inner_id == "rho.frozen_reference" {
+        return Err(format!("`inner` must be a generic method, not `{inner_id}`"));
+    }
+    let t = Instant::now();
+    let mut tally = FieldTally::default();
+    let phi = find_isogeny(&inst.curve, ell, &mut tally).ok_or(format!(
+        "{} has no rational {ell}-isogeny",
+        inst.curve_id().slug
+    ))?;
+    let g1 = phi.map(inst.generator_point(), &mut tally);
+    let q1 = phi.map(target, &mut tally);
+    if g1.infinity || !phi.target.is_on_curve(g1) || !phi.target.is_on_curve(q1) {
+        return Err("the isogeny did not map the instance onto the target curve".into());
+    }
+    let mut inner_params = BTreeMap::new();
+    if inner_id.starts_with("rho.") || inner_id == "kangaroo.vow" {
+        inner_params.insert("cap_multiple".to_string(), m.params["cap_multiple"].clone());
+    }
+    let inner = ResolvedMethod {
+        id: inner_id.clone(),
+        params: inner_params,
+        ..m.clone()
+    };
+    let mut rep = solve_generic(&inner, &phi.target, g1, q1, inst.r, seed)?;
+    // The answer on E′ is the answer on E (φ is injective on ⟨G⟩); the
+    // check is what a careful attacker pays to know it.
+    let mut verify = GroupOps::default();
+    if let Some(k) = rep.recovered {
+        let kg = inst.curve.mul(&mut verify, inst.generator_point(), (k % u128::from(inst.r)) as u64);
+        if kg != target {
+            rep.recovered = None;
+        }
+    }
+    let mut transfer = ops_phase("transfer", GroupOps::default());
+    transfer.native.insert("field_muls".into(), tally.muls);
+    transfer.native.insert("field_invs".into(), tally.invs);
+    let mut phases = vec![transfer];
+    for mut ph in rep.phases {
+        ph.name = format!("target:{}", ph.name);
+        phases.push(ph);
+    }
+    phases.push(ops_phase("verify", verify));
+    rep.total_gae += verify.gae();
+    rep.phases = phases;
+    rep.counters.insert("isogeny_degree".into(), ell);
+    rep.counters
+        .insert("transfer_field_muls_uncharged".into(), tally.muls);
+    rep.counters
+        .insert("transfer_field_invs_uncharged".into(), tally.invs);
+    rep.unpriced = unpriced_of(&rep.counters);
+    rep.detail = json!({
+        "isogeny": {
+            "degree": ell,
+            "kernel_x": phi.x0,
+            "target_curve": {"p": phi.target.p, "a": phi.target.a, "b": phi.target.b},
+            "target_slug": PrimeInstance {
+                name: String::new(),
+                curve: phi.target.clone(),
+                group_order: inst.group_order,
+                r: inst.r,
+                cofactor: inst.cofactor,
+                generator: (g1.x, g1.y),
+            }.curve_id().slug,
+        },
+        "inner": inner_id,
+        "inner_detail": rep.detail,
+    });
+    rep.solve_wall_ns = t.elapsed().as_nanos() as u64;
+    if let Some(f) = rep.field_ops.as_mut() {
+        f.muls += verify.field_ops.muls;
+        f.sqrs += verify.field_ops.sqrs;
+        f.invs += verify.field_ops.invs;
+    }
+    Ok(rep)
 }
 
 /// `ic.hyperelliptic`: ADH/Gaudry index calculus on a genus-2 Jacobian.

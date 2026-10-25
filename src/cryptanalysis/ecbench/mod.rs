@@ -58,6 +58,7 @@ pub mod generic;
 pub mod gpu;
 pub mod host;
 pub mod isolab;
+pub mod isogeny;
 pub mod isolation;
 pub mod jacobian;
 pub mod methods;
