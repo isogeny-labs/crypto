@@ -39,4 +39,13 @@ python3 -m unittest research.n83_nearby_grid_tier1_20261024.test_gates
 The workflow `.github/workflows/n83-nearby-grid-tier1.yml` builds the
 frozen native IC and rho producers, runs the schedule, independently replays
 factor bases, rank, four-point relations, scalars, phase accounting, source
-and binary hashes, and preserves raw receipts. The result is pending.
+and binary hashes, and preserves raw receipts. The first hosted attempt,
+run 40136901841, stopped after build with 2.26 GiB free against the frozen
+4 GiB disk gate. The second, run 40143908265, copied out the exact binaries
+and cleaned its Cargo release target before measurement, but still had only
+2.93 GiB free. Both raw artifacts independently replay as `BOUNDED_UNKNOWN`
+with zero measured children. Their host, source, preflight and replay receipts
+are versioned in `results/run_40136901841_preflight/` and
+`results/run_40143908265_preflight/`. The workflow now records disk space before and
+after removing unused hosted Android, .NET and GHC SDKs ahead of the same
+pinned build. The 4 GiB disk gate remains unchanged.
