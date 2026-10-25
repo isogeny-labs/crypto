@@ -23,6 +23,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Free unused hosted image SDKs for the frozen disk gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          df -B1 / | tee "$RUNNER_TEMP/n83-nearby-grid-disk-before-cleanup.txt"
+          for path in /usr/local/lib/android /usr/share/dotnet /opt/ghc; do
+            if [ -d "$path" ]; then
+              sudo du -sh -- "$path" | tee -a \
+                "$RUNNER_TEMP/n83-nearby-grid-disk-before-cleanup.txt"
+              sudo rm -rf -- "$path"
+            fi
+          done
+          df -B1 / | tee "$RUNNER_TEMP/n83-nearby-grid-disk-after-cleanup.txt"
+
       - name: Install pinned Rust and freeze the public fixture
         shell: bash
         run: |
@@ -97,6 +111,7 @@ jobs:
             ${{ runner.temp }}/n83-nearby-grid-*.log
             ${{ runner.temp }}/n83-nearby-grid-*.json
             ${{ runner.temp }}/n83-nearby-grid-disk.txt
+            ${{ runner.temp }}/n83-nearby-grid-disk-*-cleanup.txt
             ${{ runner.temp }}/n83-nearby-grid-rustc.txt
           if-no-files-found: warn
           retention-days: 14
