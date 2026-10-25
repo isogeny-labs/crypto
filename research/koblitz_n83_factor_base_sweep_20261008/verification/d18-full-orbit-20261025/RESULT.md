@@ -59,3 +59,6 @@ measurement for this new base. `selected_best_total_runtime` remains `null`.
 The next discriminating gate is a source-pinned, same-target four-summand
 natural-query comparison with the prior half-size D18 base, independent
 group/rank replay, full build/import/failed-search charges and matched rho.
+The [AWS resume guide](AWS_RESUME.md) pins the exact S3 GET/replay commands,
+explains the missing full-base natural-query importer, and derives the current
+four-summand solver admission bounds before any hosted search is launched.
