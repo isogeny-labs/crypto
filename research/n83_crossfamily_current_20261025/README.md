@@ -54,7 +54,7 @@ provider mutation. It requires a verified source bundle before `--execute`.
 The Pod runner checks sealed file hashes, canonical
 single-target workload IDs, subgroup membership, and all 16 scalar replays
 without needing the repository's historical Git objects. The first allocation
-requests an NVIDIA RTX A5000 and the second a Tesla V100-PCIE-16GB, each with
+requests an NVIDIA GeForce RTX 3080 Ti and the second a Tesla V100-PCIE-16GB, each with
 at least 27 GiB of system memory and four vCPUs. The allocator verifies the
 returned machine GPU types, distinct machine IDs, and observed rates at most
 $0.20/hour per Pod. It requests a provider `terminateAfter` deadline of 360
@@ -66,8 +66,11 @@ watchers and provider access fail, the $2.50 projection is not a guaranteed
 account billing ceiling. Each Pod requests exactly 30 GB of container disk
 and zero persistent volume. The conservative six-hour projection at both rate
 ceilings is $2.46, including $2.40 of compute and $0.06 of container disk
-rounded upward using a 28-day month. At observed A5000 and V100 prices of
-$0.16 and $0.19 per hour, respectively, the projection is $2.16. It reads a configured
+rounded upward using a 28-day month. At observed 3080 Ti and V100 prices of
+$0.18 and $0.19 per hour, respectively, the projection is $2.28. The earlier
+A5000 request returned a provider error without a Pod ID; a subsequent provider
+readback found zero matching N83 Pods. This fallback retains the same host
+requirements and budget. It reads a configured
 RunPod key from the process environment or `~/.runpod/config.toml`, never
 copies it into the receipts, verifies provider readback and distinct machine
 IDs, and attempts to terminate every discovered Pod if allocation fails.
