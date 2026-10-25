@@ -83,5 +83,5 @@ before validation:
 
 ```sh
 python3 tools/artifacts/artifacts.py pull research/kummer_differential_collector_20261022/n16-action-certificate
-cargo run --offline --release --manifest-path research/kummer_differential_collector_20261022/n16-action-certificate/Cargo.toml --bin validate
+cargo run --offline --locked --release --manifest-path research/kummer_differential_collector_20261022/n16-action-certificate/Cargo.toml --bin validate
 ```
