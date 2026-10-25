@@ -1,0 +1,1 @@
+timeout --verbose --signal=INT --kill-after=15s 360 ./yafu -threads 2 -lathreads 2 -seed 20261025 -gnfs -xover 81 -ggnfsT 300 -nc1 -minrels 1 -ggnfs_dir /workspace/.tools/yafu-r02/factor/lasieve5_64/bin/ -job nfs.job -o nfs.dat -logfile factor.log -session session.log -R < /workspace/nist-filter-R07-20261025/filter-corrected/expression.txt

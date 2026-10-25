@@ -7,6 +7,8 @@ Sources (all committed, read at --ref unless noted):
   docs/perf/history.json          on branch origin/perf-history: chained Ir performance index per push
   benchmarks/README.md            append-only benchmark entries (one row per study)
   docs/ic/ci/runs/*.json          ic e2e history records
+  research/nist_skipped_curve_dissection_20261021/factorization/progress.json
+                                certified factorization status and recorded raw relation counts
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -160,6 +162,30 @@ def e2e_runs(ref):
          label="ic e2e gate history records", source="docs/ic/ci/runs/")
 
 
+def nist_factorization(ref, since):
+    path = "research/nist_skipped_curve_dissection_20261021/factorization/progress.json"
+    txt = show(ref, path)
+    if not txt:
+        return
+    data = json.loads(txt)
+    for row in data.get("observations", []):
+        date = row.get("date")
+        if not date or date < since:
+            continue
+        source = f"{path}: {row.get('source', '')}"
+        for field, better, unit, label in (
+            ("complete_targets", "higher", "count", "NIST timeout integers completely prime-certified"),
+            ("resolved_timeout_fields", "higher", "count", "NIST timeout fields resolved"),
+            ("largest_residual_bits", "lower", "bits", "Remaining skipped-P256 cofactor size"),
+            ("main_raw_relation_lines", "neutral", "lines", "Skipped-P256 raw relation lines; no dedup/rank claim"),
+            ("filter_unique_relations", "neutral", "relations", "Native unique relations, including generated free relations"),
+            ("filter_singleton_survivors", "neutral", "relations", "Native relations surviving singleton removal; no rank claim"),
+        ):
+            emit(f"nist.factorization.{field}", row.get(field), date=date,
+                 problem="nist-skipped-curve-factorization", unit=unit, better=better,
+                 label=label, source=source)
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -167,6 +193,7 @@ def main():
     perf_history(a.since)
     benchmarks(a.ref, a.since)
     e2e_runs(a.ref)
+    nist_factorization(a.ref, a.since)
 
 
 if __name__ == "__main__":
