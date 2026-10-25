@@ -366,22 +366,22 @@ fn kernel_degree(t: u64, n: u64) -> u64 {
     let mut q = n - 1;
     let mut f = 2;
     while f * f <= q {
-        if q % f == 0 {
-            while q % f == 0 {
+        if q.is_multiple_of(f) {
+            while q.is_multiple_of(f) {
                 q /= f;
             }
-            while ord % f == 0 && pw(x, ord / f, n) == 1 {
+            while ord.is_multiple_of(f) && pw(x, ord / f, n) == 1 {
                 ord /= f;
             }
         }
         f += 1;
     }
     if q > 1 {
-        while ord % q == 0 && pw(x, ord / q, n) == 1 {
+        while ord.is_multiple_of(q) && pw(x, ord / q, n) == 1 {
             ord /= q;
         }
     }
-    if ord % 2 == 0 {
+    if ord.is_multiple_of(2) {
         ord / 2
     } else {
         ord
@@ -394,7 +394,9 @@ fn j_value(c: &PrimeCurve) -> u64 {
     mm(mm(1728 % p, mm(4, a3, p), p), pw(den, p - 2, p), p)
 }
 fn witness(c: &PrimeCurve, r: u64) -> Option<PrimePoint> {
-    if (mm(4, mm(mm(c.a, c.a, c.p), c.a, c.p), c.p) + mm(27, mm(c.b, c.b, c.p), c.p)) % c.p == 0 {
+    if (mm(4, mm(mm(c.a, c.a, c.p), c.a, c.p), c.p) + mm(27, mm(c.b, c.b, c.p), c.p))
+        .is_multiple_of(c.p)
+    {
         return None;
     }
     for x in 1..=8 {
@@ -662,7 +664,7 @@ fn check_cm_bases(out: &Path) {
         let mut p = Params::default();
         p.set("columns", "4")
             .set("length", "32")
-            .set("abs_d", &u(m, "d").to_string())
+            .set("abs_d", u(m, "d").to_string())
             .set("mode", "scalar");
         let scalar = CmOrbitBase { instance: &inst }
             .build(&ctx, &p, &mut GroupOps::default())

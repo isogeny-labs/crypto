@@ -1,5 +1,5 @@
 // Metadata-only plan validation and provenance. No research algorithms.
-import {readFileSync,writeFileSync,readdirSync,mkdirSync,statSync} from 'node:fs';
+import {readFileSync,writeFileSync,readdirSync,mkdirSync,statSync,existsSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
@@ -16,7 +16,9 @@ for(const [panel,expected]of panels){
     const plan=JSON.parse(raw);
     assert(plan.workloads.every(w=>w.curve.registered),'all measured models must be registered');
     count+=plan.executions;
-    writeFileSync(root+'/plans/'+s.name+'.json',raw,{flag:'wx'});
+    const dest=root+'/plans/'+s.name+'.json';
+    if(existsSync(dest))assert.equal(readFileSync(dest).compare(raw),0,'frozen plan unchanged');
+    else writeFileSync(dest,raw,{flag:'wx'});
   }
   assert.equal(count,expected);
   results.push({panel,specs:manifest.specs.length,executions:count,all_registered:true});
@@ -30,5 +32,5 @@ const files=[...walk(root).filter(p=>!p.includes('/cards/')&&!p.includes('/sessi
 const receipt={schema:'conductor-gap.preflight/v1',source_commit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
   compiler:execFileSync('/workspace/crypto-toolchain/cargo/bin/rustc',['--version'],{encoding:'utf8'}).trim(),
   panels:results,files};
-writeFileSync(root+'/PREFLIGHT.json',JSON.stringify(receipt,null,2)+'\n',{flag:'wx'});
+writeFileSync(root+'/'+(process.argv[2]??'PREFLIGHT.json'),JSON.stringify(receipt,null,2)+'\n',{flag:'wx'});
 console.log(JSON.stringify({source_commit:receipt.source_commit,panels:results,bound_files:files.length}));
