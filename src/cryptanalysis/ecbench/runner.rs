@@ -1397,7 +1397,7 @@ mod robustness_tests {
         let d = tmp("spawn");
         let out = d.join("session");
         let opts = options(&d.join("lock"), "/nonexistent/ecbench", false);
-        let err = run_session(SPEC, &out, opts, |_| {}).err().expect("stops");
+        let err = run_session(SPEC, &out, opts, |_| {}).expect_err("stops");
         assert!(err.contains("cannot exec"), "{err}");
         let session = read_session(&out).unwrap();
         assert_eq!(session.status, "interrupted");
