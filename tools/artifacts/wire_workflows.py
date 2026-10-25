@@ -42,6 +42,16 @@ def moved_paths(root: Path) -> set[str]:
     return out
 
 
+def moved_dirs(moved: set[str]) -> set[str]:
+    """Directories specific enough to identify a moved-data subtree."""
+    return {
+        parent
+        for p in moved
+        for n in range(1, p.count("/") + 1)
+        if (parent := p.rsplit("/", n)[0]).count("/") >= 1
+    }
+
+
 def needed(text: str, moved: set[str], dirs: set[str]) -> list[str]:
     """Paths the workflow names that are, or contain, moved files; minimal cover."""
     found = set()
@@ -135,7 +145,10 @@ def main() -> int:
     args = ap.parse_args()
     root = artifacts.repo_root()
     moved = moved_paths(root)
-    dirs = {p.rsplit("/", n)[0] for p in moved for n in range(1, p.count("/") + 1)}
+    # Keep matching paths specific to a data subtree. Treating a top-level
+    # directory such as `research/` as a hit would make every workflow that
+    # mentions any research path pull the entire store.
+    dirs = moved_dirs(moved)
     files = [Path(w) for w in args.workflows] or sorted((root / ".github/workflows").glob("*.y*ml"))
     missing = 0
     for f in files:
