@@ -109,6 +109,29 @@ macOS time wrapper failed; both raw runs and the correction are committed.
 This is an opt-in `primary-full-d18-m4-l0-shared-phase-first` mode from source
 `57c20963924ab0097111b08fc6cb157400e87e53`. Freeze and validate a
 Linux hard-cgroup natural extension before interpreting any yield.
+
+The [same-binary L0 public natural screen](phase-first-natural-20261025/RESULT.md)
+is now retained from clean source commit
+`43a422ce66ebce82b48af036d15dcbef8a5ac785`. Its constructed gate
+passed, including independent original-field row replay. The one public
+natural query imported and modeled the full D18 base, then returned
+`UNKNOWN_wall_cap` at the frozen 300-second whole-process cap. This is
+censored, not a zero-yield observation. See the raw arm directories and
+[`audit.json`](phase-first-natural-20261025/audit.json); the exact binary
+SHA-256 is `9605c08a4aeeb61e6ce3196cb74d5a87ddea9d13f9f1d79a0a4e643d85ac5152`.
+To reproduce, build this frozen source commit, freshly fetch and verify the
+same object and manifest, then run the positive and natural modes serially
+with fresh outputs under the [protocol](PHASE_FIRST_NATURAL_PROTOCOL.md).
+
+The 17,757,116-byte minimal source archive for earlier D18 import source
+`54cbef1a6ce834a77632c1867acc801a31268ca2` is now at
+`s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/d18-full-direct-subgroup-v1/a0/runs/first-m4-20261025/source/n83-d18-source-minimal-54cbef1a6ce.tar.gz`.
+Its SHA-256 is `e679260bd849fed12f3588a57643277547b969399ab576a4883668821dabb3e4`;
+an immutable conditional put and fresh GET passed the provider and archive
+integrity checks in the [custody receipt](phase-first-natural-20261025/source-archive-custody.json).
+This archive predates the phase-first search code. Use the PR branch and the
+frozen source commit above for that experiment.
+
 That gate adds an opt-in `primary-full-d18-m4 positive|natural` worker with
 hard resource checks, durable phase/shape records, SAT-model verification,
 group lift, row replay and rank-one control. Its natural result requires a
