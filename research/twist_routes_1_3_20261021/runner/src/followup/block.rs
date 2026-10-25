@@ -369,6 +369,67 @@ fn gp_vec(v: &[u64]) -> String {
     )
 }
 
+/// Exact ordinary control for the Frobenius arm's surviving variable order.
+pub fn matched_control(input: &Path, out: &Path) -> Result<Vec<Value>> {
+    let mut jobs: Vec<Job> = serde_json::from_slice(&fs::read(input.join("JOBS.json"))?)?;
+    let mut proofs = vec![];
+    let mut controls = vec![];
+    for direct in jobs.iter().filter(|j| j.arm == "direct-chain") {
+        let c = &direct.case;
+        let order = (c.arity..c.names.len())
+            .chain(0..c.arity)
+            .collect::<Vec<_>>();
+        let mut ordinary = c.clone();
+        ordinary.encoding = "ordinary-prefix-order".into();
+        ordinary.names = order.iter().map(|i| c.names[*i].clone()).collect();
+        ordinary.equations = c.equations.iter().map(|q| permute(q, &order)).collect();
+        let frob = jobs
+            .iter()
+            .find(|j| j.workload == direct.workload && j.arm == "frobenius-block")
+            .unwrap();
+        let k = c.arity - 2;
+        let restricted = frob
+            .case
+            .equations
+            .iter()
+            .map(|q| {
+                norm(
+                    q.iter()
+                        .filter(|(e, _)| e[..k].iter().all(|v| *v == 0))
+                        .map(|(e, a)| (e[k..].to_vec(), *a))
+                        .collect(),
+                    c.p,
+                )
+            })
+            .filter(|q| !q.is_empty())
+            .map(|q| f4::normalise(&q, c.p, f4::Ordering::Grevlex))
+            .collect::<Vec<_>>();
+        let expected = ordinary
+            .equations
+            .iter()
+            .map(|q| f4::normalise(q, c.p, f4::Ordering::Grevlex))
+            .collect::<Vec<_>>();
+        assert_eq!(
+            restricted, expected,
+            "dropping the zero anti-block must recover the ordinary input exactly"
+        );
+        proofs.push(json!({"workload":direct.workload,"variable_permutation":order,"dropping_zero_anti_block_recovers_same_polynomial_coefficients":true,"expected_affine_assignments":direct.expected,"ordinary_input_sha256":digest(&serde_json::to_vec(&ordinary)?)}));
+        controls.push(Job {
+            id: format!("{}-ordinary-prefix-order-h0", direct.workload),
+            workload: direct.workload.clone(),
+            arm: "ordinary-prefix-order".into(),
+            branch: 0,
+            expected: direct.expected,
+            case: ordinary,
+        });
+    }
+    jobs.extend(controls);
+    write_json(out.join("JOBS.json"), &jobs)?;
+    fs::copy(input.join("WORKLOADS.json"), out.join("WORKLOADS.json"))?;
+    write_json(out.join("MATCHED_CONTROL_PROOFS.json"), &proofs)?;
+    Ok(proofs)
+}
+
 pub fn worker(input: &Path, out: &Path, budget_ms: u64) -> Result<()> {
     let job: Job = serde_json::from_slice(&fs::read(input)?)?;
     let c = &job.case;
@@ -422,6 +483,7 @@ fn bounded(
     .env("OMP_NUM_THREADS", "1")
     .env("OPENBLAS_NUM_THREADS", "1")
     .env("RAYON_NUM_THREADS", "1")
+    .env("F4_FP_GM", "1")
     .env(
         "LD_LIBRARY_PATH",
         format!("{root}/lib/x86_64-linux-gnu:{root}/lib/x86_64-linux-gnu/singular"),
@@ -537,6 +599,28 @@ pub fn panel(input: &Path, out: &Path) -> Result<Vec<Value>> {
         aa.id.push_str("-aa");
         jobs.push(aa);
     }
+    let workload_order: Vec<Value> =
+        serde_json::from_slice(&fs::read(input.join("WORKLOADS.json"))?)?;
+    let arm_order = [
+        "direct-aa",
+        "direct-chain",
+        "ordinary-prefix-order",
+        "frobenius-block",
+        "factored-control",
+        "bits-control",
+        "hybrid-eight",
+        "first-pair-invariant",
+    ];
+    jobs.sort_by_key(|j| {
+        (
+            workload_order
+                .iter()
+                .position(|w| w["workload"] == j.workload)
+                .unwrap(),
+            arm_order.iter().position(|a| *a == j.arm).unwrap(),
+            j.branch,
+        )
+    });
     fs::create_dir_all(out.join("cells"))?;
     let exe = std::env::current_exe()?;
     let mut rows = vec![];
@@ -672,8 +756,13 @@ pub fn panel(input: &Path, out: &Path) -> Result<Vec<Value>> {
         let baseline = matched
             .iter()
             .filter(|r| {
-                ["direct-chain", "factored-control", "bits-control"]
-                    .contains(&r["arm"].as_str().unwrap())
+                [
+                    "direct-chain",
+                    "factored-control",
+                    "bits-control",
+                    "ordinary-prefix-order",
+                ]
+                .contains(&r["arm"].as_str().unwrap())
                     && r["all_branches_independently_certified"] == true
             })
             .min_by_key(|r| r["native_row_reduction_multiplications"].as_u64().unwrap());

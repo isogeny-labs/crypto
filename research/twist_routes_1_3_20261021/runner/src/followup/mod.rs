@@ -118,6 +118,9 @@ pub fn main(args: &[String]) -> Result<()> {
     }
     let rows = match command.as_str() {
         "block-build" => block::build(&fixtures, out)?,
+        "block-match" => {
+            block::matched_control(Path::new(args.get(3).ok_or("block inputs")?), out)?
+        }
         "block-panel" => block::panel(Path::new(args.get(3).ok_or("block inputs")?), out)?,
         "incidence-pilot" => incidence::run(&fixtures, out)?,
         "assessment" => assessment::run(

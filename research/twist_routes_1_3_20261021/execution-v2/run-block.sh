@@ -4,7 +4,7 @@ set -euo pipefail
 task_command="${1:?block-build or block-panel}"
 task_output="${2:?fresh output directory}"
 task_input="${3:-}"
-case "$task_command" in block-build|block-panel) ;; *) exit 2 ;; esac
+case "$task_command" in block-build|block-match|block-panel) ;; *) exit 2 ;; esac
 task_binary="${TWIST_BLOCK_BIN:?pinned native binary required}"
 task_study=research/twist_routes_1_3_20261021
 task_receipt="$task_output.transport"
