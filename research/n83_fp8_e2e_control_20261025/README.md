@@ -85,3 +85,17 @@ python3 -m research.n83_fp8_e2e_control_20261025.verify \
 python3 -m research.n83_fp8_e2e_control_20261025.seal \
   research/n83_fp8_e2e_control_20261025/runs/n83-fp8-e2e-abba-20261025-1
 ```
+
+## Matched-index nearby factor-base control
+
+The next frozen local control alternates K1111 and K1115 in ABBA order, with
+the same public point, source, binary, split-at-512 four-byte index, byte
+sidecar, compact4 Bloom policy, thread counts and 1,200-second/16.37-GB
+child caps. The two exact base hashes are
+`f0c8213daff19553f3a3b450e89b5b8e85fb932d134c004ef89aeff89745b705`
+and `95e970dcb7cbc5c299498409cd062749c49c6320175e83e0db7e635d906a594f`.
+The [producer](run_base_abba.py) preserves every outcome, while the
+[independent replay](verify_base_abba.py) checks the 166-points-per-column
+base, full rank, scalar, and exclusive target phases. This local pairing
+tests the factor-base choice under one index policy; a fresh Tier 1 panel
+will supply the selection gate.
