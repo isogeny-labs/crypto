@@ -41,6 +41,15 @@ checks XCNF, archive, export-metadata, source-receipt and S3 receipt identity.
 The local source-pinned [wide-XOR run](../local-yield-frontier-20261025/RESULT.md)
 ended at its 1,350-second process watchdog without a terminal solver result.
 It is a censored L0 access observation; it cannot rank these bases.
+The separately frozen [Gray 5+1 first-pattern wide-XOR trial](../local-gray51-wide-access-20261025/RESULT.md)
+reached its 5,000,000-conflict cap after 1,264.671 L0 process-wall seconds,
+with terminal `INDETERMINATE` and no complete assignment. Its compressed
+raw stream, process receipt, independent replay and forged-status rejection
+are committed in that evidence directory. Ten XOR matrices were admitted;
+the result is a censored access datum, with `selected_best_total_runtime`
+still `null`. The trial's auditor pins Darwin worker and solver binaries,
+so a Linux agent should retain that receipt as a separate control and
+freeze Linux binary hashes and a new Linux protocol before its own timing.
 
 The intended EC2 profile `n83-xor-panel-20261025` permits `GetObject` on
 this panel's `inputs/*`, `PutObject` on its `outputs/*`, and SSM core access.
