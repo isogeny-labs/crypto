@@ -20,7 +20,8 @@ SOURCE_SHA256 = '58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d
 TARGETS_SHA256 = 'fd56a59079fc6cded14539320e0cc7ab88deda0f76fa4fbaf6b663c0cd7ac1b6'
 ANSWERS_SHA256 = '82f2cfdf0cf045f356e88a2c2347525e726f151ba27b0a693cfa08a6fe6312ee'
 PAIR_RHO_SEED_BASE = 2026122600
-IC_CAP_SECONDS = {"k3300_wide3": 1200, "k3500_root4": 1200,
+IC_CAP_SECONDS = {"k3300_wide3": 1200, "k3450_wide3": 1200,
+                  "k3500_root4": 1200,
                   "k3596_root4": 1200}
 RHO_CAP_SECONDS = 120
 GLOBAL_PRODUCER_CAP_SECONDS = 300 * 60
@@ -107,10 +108,10 @@ def fixture():
 
 
 def schedule(stratum, arms):
-    if (stratum not in range(2) or len(arms) != 3 or
+    if (stratum not in range(2) or len(arms) != 4 or
             len({arm[3] for arm in arms}) != len(arms) or
             len({arm[0] for arm in arms}) != len(arms)):
-        raise ValueError('three distinct frozen arms and stratum 0..1 required')
+        raise ValueError('four distinct frozen arms and stratum 0..1 required')
     events = []
     for local in range(8):
         index = stratum * 8 + local

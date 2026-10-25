@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve the three exact current-source N83 high-K arms."""
+"""Resolve the four exact current-source N83 high-K arms."""
 
 import hashlib
 import json
@@ -11,6 +11,8 @@ SOURCE_SHA256 = "58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d
 ARMS = (
     ("k3300_wide3", 3300, "root11_wide3",
      "IC1N83Ckb1a1fb547800PDP4rootRCguidedLAgaussTDdirectISO0hd2459867be83"),
+    ("k3450_wide3", 3450, "root11_wide3",
+     "IC1N83Ckb1a1fb572700PDP4rootRCguidedLAgaussTDdirectISO0h622efa367d76"),
     ("k3500_root4", 3500, "root4_standard",
      "IC1N83Ckb1a1fb581000PDP4rootRCguidedLAgaussTDdirectISO0h0de90f01951d"),
     ("k3596_root4", 3596, "root4_standard",
@@ -26,7 +28,7 @@ def manifest(arm):
     name, k, layout, candidate_id = arm
     if name == "k3300_wide3":
         directory = ROOT / "research/n83_k3300_current_source_prefix_20261025"
-    elif name == "k3500_root4":
+    elif name in ("k3450_wide3", "k3500_root4"):
         directory = HERE
     else:
         directory = ROOT / "research/n83_k3596_current_source_full_20261025"

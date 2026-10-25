@@ -53,10 +53,10 @@ def main():
     data = fixture()
     result = subject.select(data)
     assert result['admission_status'] == 'PASS'
-    assert result['online']['selected_candidate_id'] == subject.IDS[2]
-    assert result['cold']['selected_candidate_id'] == subject.IDS[2]
-    assert len(result['online']['comparisons']) == 3
-    assert result['online']['bonferroni_alpha_per_pair'] == 0.05 / 3
+    assert result['online']['selected_candidate_id'] == subject.IDS[3]
+    assert result['cold']['selected_candidate_id'] == subject.IDS[3]
+    assert len(result['online']['comparisons']) == 6
+    assert result['online']['bonferroni_alpha_per_pair'] == 0.05 / 6
     noisy = copy.deepcopy(data)
     noisy['host_strata'][0]['aa_status'] = 'NOISY_OR_INCOMPLETE'
     assert subject.select(noisy)['online']['selected_candidate_id'] is None
