@@ -21,11 +21,11 @@ from research.n83_crossfamily_current_20261025 import arms, run, source_bundle
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 API_URL = "https://api.runpod.io/graphql"
-GPU_TYPES = ("NVIDIA GeForce RTX 3080 Ti", "Tesla V100-PCIE-16GB")
+GPU_TYPES = ("NVIDIA GeForce RTX 4090", "NVIDIA GeForce RTX 4090")
 IMAGE = "runpod/base:1.0.2-ubuntu2404"
 CAP_SECONDS = 360 * 60
-PRICE_CAP_PER_HOUR = Decimal("0.20")
-TOTAL_CAP_USD = Decimal("2.50")
+PRICE_CAP_PER_HOUR = Decimal("0.34")
+TOTAL_CAP_USD = Decimal("4.20")
 CONTAINER_DISK_GB = 30
 CONTAINER_DISK_USD_PER_GB_MONTH = Decimal("0.10")
 MIN_BILLING_MONTH_HOURS = Decimal(28 * 24)
