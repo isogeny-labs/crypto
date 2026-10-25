@@ -724,11 +724,22 @@ pub(crate) fn multiplication_cost(model: &Model, k: u32, bits: u64) -> Option<u6
 /// [`Ext`] allocates for every base operation (measured near 100×).
 const GENERIC_OVERHEAD: u64 = 64;
 
+/// What a word product costs in [`Ext`] over the word field [`FpK`] (the
+/// extensions of `GF(p^k)` curves), relative to [`PrimeExt`] of the same
+/// degree over `GF(p)`: measured 1.9× to 2.8× for degrees 20 to 320 over a
+/// 26-bit `p`, rising with the degree.
+const TOWER_OVERHEAD: u64 = 3;
+
 /// [`multiplication_cost`] weighted by [`GENERIC_OVERHEAD`] where the
-/// extension is the generic one.
+/// extension is the generic one over a multi-word field, by
+/// [`TOWER_OVERHEAD`] where it is over [`FpK`].
 fn weighted_cost(model: &Model, k: u32, bits: u64) -> Option<u64> {
     let words = matches!(model, Model::Prime { p, .. } if p.bits() < 63);
-    let factor = if k == 1 || words { 1 } else { GENERIC_OVERHEAD };
+    let factor = match model {
+        _ if k == 1 || words => 1,
+        Model::Extension { .. } => TOWER_OVERHEAD,
+        _ => GENERIC_OVERHEAD,
+    };
     Some(multiplication_cost(model, k, bits)?.saturating_mul(factor))
 }
 

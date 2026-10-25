@@ -17,9 +17,6 @@ use std::{fs, path::PathBuf};
 struct Args {
     #[arg(long, default_value = "docs/curves/registry.json")]
     registry: PathBuf,
-    /// The registry rows the cover catalog certifies; other rows are ignored.
-    #[arg(long, default_value = links::CATALOG_PATH)]
-    catalog: PathBuf,
     #[arg(long, default_value = "docs/curves/covers.json")]
     output: PathBuf,
     /// Recompute the entire report and require byte-identical saved output.
@@ -37,19 +34,10 @@ fn run() -> Result<(), String> {
     {
         return Err("registry and output must be different files".into());
     }
-    if [&args.output, &args.links].iter().any(|p| {
-        *p == &args.catalog
-            || matches!((p.canonicalize(), args.catalog.canonicalize()), (Ok(a), Ok(b)) if a == b)
-    }) {
-        return Err("the cover catalog must not be an output".into());
-    }
     let input = fs::read(&args.registry).map_err(|e| e.to_string())?;
+    let report = checker::catalog(&input)?;
     let registry: serde_json::Value = serde_json::from_slice(&input).map_err(|e| e.to_string())?;
-    let manifest =
-        fs::read(&args.catalog).map_err(|e| format!("{}: {e}", args.catalog.display()))?;
-    let subset = links::catalog_subset(&registry, &manifest)?;
-    let report = links::bind_catalog(checker::catalog(subset.to_string().as_bytes())?, &subset);
-    let graph = links::graph(&subset, &report)?;
+    let graph = links::graph(&registry, &report)?;
     let graph_text = serde_json::to_string_pretty(&graph).map_err(|e| e.to_string())? + "\n";
     if [&args.registry, &args.output].iter().any(|p| {
         *p == &args.links

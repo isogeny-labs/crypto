@@ -4,8 +4,7 @@
 the supported elliptic model forms in the ICV1 catalog: short Weierstrass
 models over `GF(p)` and over extensions `GF(p^k)` with `p > 3`, and ordinary
 binary models. Findings are in
-[`covers.json`](covers.json), joined to the
-[cover-catalog](#the-cover-catalog) rows of [`registry.json`](registry.json)
+[`covers.json`](covers.json), joined to [`registry.json`](registry.json)
 by slug **and the full SHA-256 of the exact model JSON**. The registry's
 model and EC1 identities stay unchanged. The lab browser shows the finding
 and certificate on each curve page.
@@ -19,25 +18,8 @@ python3 scripts/build_lab_browser.py
 
 `--registry PATH --output PATH` accepts another ICV1 registry. `--check`
 recomputes the report, including all equations and checks, and requires
-byte-identical saved output. It rejects stale catalog/source digests and
+byte-identical saved output. It rejects stale registry/source digests and
 altered certificates. No network or external algebra service is used.
-
-## The cover catalog
-
-The report and the graph cover the registry rows
-[`cover-catalog.json`](cover-catalog.json) names (`--catalog PATH`), not
-every registry row. Both carry `catalog_rows_sha256`, the SHA-256 of the
-sorted-key compact UTF-8 JSON of `{"schema_version", "curves"}` with the
-named rows in registry order (`curve-covers/v2`, `curve-cover-graph/v2`).
-A change to any of those rows, or a named slug the registry lacks, still
-fails `--check`; a row the manifest does not name does not. That keeps the
-census curves the registry builder sweeps in from research JSON (13,219
-isogeny-volcano curves since aburan28/crypto#2446) from invalidating this
-report, the cover-transfer assessment and the IC leaderboard roster, which
-bind to the same rows. The catalog is the 2,572 rows the registry held
-before that census; adding a curve to it is an explicit edit of the manifest
-followed by the regeneration steps it lists. `scripts/cover_catalog.py`
-computes the same digest for the Python consumers.
 
 ## What a finding means
 

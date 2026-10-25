@@ -4,66 +4,7 @@ use super::checker::{digest, number};
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use serde_json::{json, Value};
-use std::collections::{BTreeMap, HashSet};
-
-pub(super) const CATALOG_PATH: &str = "docs/curves/cover-catalog.json";
-
-/// The cover catalog: the registry rows the manifest names, in registry
-/// order, as a sub-registry. Rows the manifest does not name (census curves
-/// the registry builder sweeps in) are left out, so they cannot stale the
-/// report or the graph.
-pub(super) fn catalog_subset(registry: &Value, manifest: &[u8]) -> Result<Value, String> {
-    let manifest: Value = serde_json::from_slice(manifest).map_err(|e| e.to_string())?;
-    if manifest["schema_version"] != "curve-cover-catalog/v1" {
-        return Err("unsupported cover catalog schema".into());
-    }
-    let slugs = manifest["slugs"]
-        .as_array()
-        .ok_or("missing cover catalog slugs")?;
-    let mut wanted = HashSet::new();
-    for slug in slugs {
-        let slug = slug.as_str().ok_or("cover catalog slug must be a string")?;
-        if !wanted.insert(slug) {
-            return Err(format!("duplicate cover catalog slug {slug}"));
-        }
-    }
-    if manifest["count"].as_u64() != Some(wanted.len() as u64) {
-        return Err("cover catalog count does not match its slugs".into());
-    }
-    let rows: Vec<Value> = registry["curves"]
-        .as_array()
-        .ok_or("missing curves array")?
-        .iter()
-        .filter(|row| row["slug"].as_str().is_some_and(|s| wanted.contains(s)))
-        .cloned()
-        .collect();
-    if rows.len() != wanted.len() {
-        let held: HashSet<&str> = rows.iter().filter_map(|r| r["slug"].as_str()).collect();
-        let missing: Vec<&&str> = wanted
-            .iter()
-            .filter(|s| !held.contains(**s))
-            .take(5)
-            .collect();
-        return Err(format!(
-            "cover catalog names slugs the registry does not hold: {missing:?}"
-        ));
-    }
-    Ok(json!({"schema_version":registry["schema_version"],"curves":rows}))
-}
-
-/// Rebind a report computed over the sub-registry to the catalog: the digest
-/// is of the sub-registry's sorted-key compact JSON, not of registry.json.
-pub(super) fn bind_catalog(mut report: Value, subset: &Value) -> Value {
-    let map = report.as_object_mut().expect("catalog report is an object");
-    map.remove("registry_sha256");
-    map.insert("schema_version".into(), json!("curve-covers/v2"));
-    map.insert("catalog".into(), json!(CATALOG_PATH));
-    map.insert(
-        "catalog_rows_sha256".into(),
-        json!(digest(subset.to_string().as_bytes())),
-    );
-    report
-}
+use std::collections::BTreeMap;
 
 fn integer(v: &Value) -> Result<BigUint, String> {
     number(
@@ -279,8 +220,8 @@ pub(super) fn graph(registry: &Value, report: &Value) -> Result<Value, String> {
             "standard_names":row["standard_names"],"standards_provenance":row["standards_provenance"]}));
     }
     Ok(
-        json!({"schema_version":"curve-cover-graph/v2","identity_rule":"SHA-256 of sorted-key compact UTF-8 JSON of each mathematical record; metadata excluded",
-        "catalog":report["catalog"],"catalog_rows_sha256":report["catalog_rows_sha256"],"global_standard_coverage":"not_claimed; see standards/coverage.json",
+        json!({"schema_version":"curve-cover-graph/v1","identity_rule":"SHA-256 of sorted-key compact UTF-8 JSON of each mathematical record; metadata excluded",
+        "registry_sha256":report["registry_sha256"],"global_standard_coverage":"not_claimed; see standards/coverage.json",
         "curves":curves,"covers":covers,"maps":maps}),
     )
 }

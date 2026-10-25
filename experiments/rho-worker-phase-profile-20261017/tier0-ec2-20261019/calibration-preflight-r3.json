@@ -1,0 +1,99 @@
+{
+  "evidence": {
+    "architecture": "x86_64",
+    "cgroup": "/sys/fs/cgroup/rho-tier0",
+    "cgroup.procs": "",
+    "cmdline": "BOOT_IMAGE=(hd0,gpt1)/boot/vmlinuz-6.18.54-121.166.amzn2023.x86_64 root=UUID=e1ba73b6-3ec8-4e69-a6ea-a5ee393d5bf6 ro console=tty0 console=ttyS0,115200n8 nvme_core.io_timeout=4294967295 rd.emergency=poweroff rd.shell=0 selinux=1 security=selinux quiet isolcpus=managed_irq,domain,23,47 nohz_full=23,47 rcu_nocbs=23,47 irqaffinity=0-22,24-46",
+    "compiler": "cc (GCC) 11.5.0 20240719 (Red Hat 11.5.0-5)",
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8252C CPU @ 3.80GHz",
+    "cpus": [
+      23,
+      47
+    ],
+    "cpuset.cpus.effective": "23,47",
+    "cpuset.cpus.exclusive.effective": "23,47",
+    "cpuset.cpus.partition": "isolated",
+    "cpuset.mems.effective": "1",
+    "execution_cpu": 23,
+    "frequency": {
+      "23": {
+        "current_khz": "3800000",
+        "governor": "performance",
+        "max_khz": "3800000",
+        "min_khz": "3800000"
+      },
+      "47": {
+        "current_khz": "3800000",
+        "governor": "performance",
+        "max_khz": "3800000",
+        "min_khz": "3800000"
+      }
+    },
+    "host": "ip-172-31-23-135.us-east-2.compute.internal",
+    "irq_affinity_overlap": [],
+    "isolated_partitions": "23,47",
+    "kernel": "6.18.54-121.166.amzn2023.x86_64",
+    "mem_nodes": [
+      1
+    ],
+    "nohz_full": "23,47",
+    "online": "0-47",
+    "os_release": "NAME=\"Amazon Linux\"\nVERSION=\"2023\"\nID=\"amzn\"\nID_LIKE=\"fedora\"\nVERSION_ID=\"2023\"\nPLATFORM_ID=\"platform:al2023\"\nPRETTY_NAME=\"Amazon Linux 2023.12.20261016\"\nANSI_COLOR=\"0;33\"\nCPE_NAME=\"cpe:2.3:o:amazon:amazon_linux:2023\"\nHOME_URL=\"https://aws.amazon.com/linux/amazon-linux-2023/\"\nDOCUMENTATION_URL=\"https://docs.aws.amazon.com/linux/\"\nSUPPORT_URL=\"https://aws.amazon.com/premiumsupport/\"\nBUG_REPORT_URL=\"https://github.com/amazonlinux/amazon-linux-2023\"\nVENDOR_NAME=\"AWS\"\nVENDOR_URL=\"https://aws.amazon.com/\"\nSUPPORT_END=\"2029-06-30\"",
+    "runner_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "timestamp_ns": 1792376062984445220,
+    "topology": {
+      "23": "23,47",
+      "47": "23,47"
+    },
+    "virtualization": "none"
+  },
+  "ok": true,
+  "problems": []
+}

@@ -4,29 +4,21 @@ import unittest
 import update_curve_standards as standards
 
 import build_lab_browser as browser
-import cover_catalog
 
 
 class CoverCatalogTests(unittest.TestCase):
     def test_complete_catalog_join(self):
         data = browser.build()
         self.assertEqual(data["counts"]["curves"], len(browser.load(browser.REGISTRY)["curves"]))
-        catalog = set(browser.load(cover_catalog.MANIFEST)["slugs"])
-        self.assertEqual(sum(c["slug"] in catalog for c in data["curves"]), len(catalog))
         for curve in data["curves"]:
             finding = curve["hyperelliptic_cover"]
-            if curve["slug"] not in catalog:
-                # Census rows outside the cover catalog carry no finding.
-                self.assertIsNone(finding)
-                self.assertEqual(curve["cover_links"], [])
-                continue
             self.assertEqual(finding["slug"], curve["slug"])
             self.assertEqual(finding["status"], "verified_over_declared_field")
-            self.assertTrue(curve["cover_links"])
-            self.assertTrue(curve["cover_links"][0]["cover_uid"].startswith("urn:hc-model:1:sha256:"))
         self.assertIn(browser.COVERS, data["sources"])
         self.assertIn(browser.COVER_LINKS, data["sources"])
-        self.assertIn(cover_catalog.MANIFEST, data["sources"])
+        for curve in data["curves"]:
+            self.assertTrue(curve["cover_links"])
+            self.assertTrue(curve["cover_links"][0]["cover_uid"].startswith("urn:hc-model:1:sha256:"))
 
     def test_source_inventory_and_idempotent_merge(self):
         catalog = browser.load(browser.REGISTRY)
@@ -53,15 +45,12 @@ class CoverCatalogTests(unittest.TestCase):
                 self.assertTrue(row["reason"])
 
     def test_stale_and_ambiguous_findings_rejected(self):
-        registry = browser.load(browser.REGISTRY)
-        curves = browser.curve_rows(registry, browser.load(browser.LEADERBOARD))
-        catalog = cover_catalog.subset(registry, browser.load(cover_catalog.MANIFEST))
+        curves = browser.curve_rows(browser.load(browser.REGISTRY), browser.load(browser.LEADERBOARD))
         original = browser.load(browser.COVERS)
-        browser.attach_covers(copy.deepcopy(curves), copy.deepcopy(original), catalog)
-        for mutation in ("catalog", "model", "missing", "duplicate"):
+        for mutation in ("registry", "model", "missing", "duplicate"):
             report = copy.deepcopy(original)
-            if mutation == "catalog":
-                report["catalog_rows_sha256"] = "0" * 64
+            if mutation == "registry":
+                report["registry_sha256"] = "0" * 64
             elif mutation == "model":
                 report["curves"][0]["model_sha256"] = "0" * 64
             elif mutation == "missing":
@@ -69,21 +58,7 @@ class CoverCatalogTests(unittest.TestCase):
             else:
                 report["curves"].append(report["curves"][0])
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
-                browser.attach_covers(copy.deepcopy(curves), report, catalog)
-
-    def test_census_rows_leave_the_catalog_digest(self):
-        registry = browser.load(browser.REGISTRY)
-        manifest = browser.load(cover_catalog.MANIFEST)
-        digest = cover_catalog.rows_sha256(cover_catalog.subset(registry, manifest))
-        self.assertEqual(digest, browser.load(browser.COVERS)["catalog_rows_sha256"])
-        grown = copy.deepcopy(registry)
-        grown["curves"].insert(0, dict(grown["curves"][0], slug="census-row-outside-the-catalog"))
-        self.assertEqual(cover_catalog.rows_sha256(cover_catalog.subset(grown, manifest)), digest)
-        grown["curves"][1]["sources"] = grown["curves"][1]["sources"] + ["edited"]
-        self.assertNotEqual(cover_catalog.rows_sha256(cover_catalog.subset(grown, manifest)), digest)
-        with self.assertRaises(ValueError):
-            cover_catalog.subset(registry, dict(manifest, slugs=manifest["slugs"] + ["absent"],
-                                                count=manifest["count"] + 1))
+                browser.attach_covers(copy.deepcopy(curves), report)
 
 
 if __name__ == "__main__":

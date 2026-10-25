@@ -1,0 +1,35 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-lead19-projected-base-20261023-2
+experiment_id: lead19_projected_base
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+commit: 1cb4924a9aec75ea575969ce248619a558dabdd2
+must_not_exist:
+  - research/lead19_projected_base/char2_repeats20.json
+receipt: research/lead19_projected_base/cards/CARD-lead19-projected-base-20261023-2.receipt.json
+binds:
+  - {path: research/lead19_projected_base/PROTOCOL.md, sha256: 0a1f10c2cf7f7203683795ba83e50524205525b9bf6761a60f90f2fcb46019ca}
+  - {path: ./target/release/ic, sha256: 373c0f1d02abc29465c4d434754f5e9c732e3ff82bcb836364d1655ca2d1e2ec}
+commands:
+  - id: build
+    argv: [cargo, build, --release, --bin, ic]
+    timeout_seconds: 2400
+    success_exit_codes: [0]
+    outputs: [target/release/ic]
+  - id: run-char2-repeats20
+    argv: [./target/release/ic, boundary, --regime, char2, --char2-degrees, "15,18,21,24,27", --repeats, "20", --seed, "123212651130", --s4-max-degree, "0", --base-arms, "raw,projected,subgroup", --out, research/lead19_projected_base/char2_repeats20.json]
+    timeout_seconds: 3600
+    success_exit_codes: [0]
+    stdout: research/lead19_projected_base/receipts/CARD-lead19-projected-base-20261023-2.run-char2-repeats20.stdout
+    stderr: research/lead19_projected_base/receipts/CARD-lead19-projected-base-20261023-2.run-char2-repeats20.stderr
+
+bus_address: executor-mechanical-lead19-projected-base
+background: false
+write_scope:
+  - research/lead19_projected_base/
+  - target/
+stop_when:
+  - Any command exits with a status other than 0.
+  - The tool exits with status 2 and prints an IMPEDIMENT line.

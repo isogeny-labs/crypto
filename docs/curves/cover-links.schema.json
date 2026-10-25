@@ -4,21 +4,16 @@
   "type": "object",
   "required": [
     "schema_version",
-    "catalog",
-    "catalog_rows_sha256",
+    "registry_sha256",
     "curves",
     "covers",
     "maps"
   ],
   "properties": {
     "schema_version": {
-      "const": "curve-cover-graph/v2"
+      "const": "curve-cover-graph/v1"
     },
-    "catalog": {
-      "const": "docs/curves/cover-catalog.json"
-    },
-    "catalog_rows_sha256": {
-      "description": "SHA-256 of the sorted-key compact UTF-8 JSON of {schema_version, curves}, where curves are the docs/curves/registry.json rows docs/curves/cover-catalog.json names, in registry order",
+    "registry_sha256": {
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"
     },

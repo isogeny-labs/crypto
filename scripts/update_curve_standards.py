@@ -21,10 +21,7 @@ def catalog_displays():
         roster.append({**row, 'curves_yaml_key': record['curves_yaml_key'],
                        'factor_base_link_status': record['factor_base_link_status']})
     doc['roster'] = roster
-    # The registry pin is the cover-catalog rows' digest, as the builder writes it.
-    fresh = display.source_digests()
-    for key in ('registry', 'cover_catalog'):
-        doc['sources'][key] = fresh[key]
+    doc['sources']['registry']['sha256'] = hashlib.sha256(REGISTRY.read_bytes()).hexdigest()
     return {display.OUT_JSON: json.dumps(doc, indent=1, ensure_ascii=False) + '\n',
             display.OUT_MD: display.markdown(doc),
             display.OUT_HTML: display.page(doc, standalone=True)}

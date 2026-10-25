@@ -189,6 +189,7 @@ jobs:
           cargo build --locked --release
           --bin crypto --bin ic --bin ecbench --bin curve_cover_check
           --bin curve_standards --bin hyperelliptic-cover --bin ecdlp-audit
+          --bin factor-base-sweep
           --target ${{ matrix.target }}
       - name: Smoke-test the binaries
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
@@ -198,7 +199,7 @@ jobs:
         run: |
           ext=""
           [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
-          for bin in crypto curve_cover_check curve_standards hyperelliptic-cover ecdlp-audit; do
+          for bin in crypto curve_cover_check curve_standards hyperelliptic-cover ecdlp-audit factor-base-sweep; do
             "./target/${{ matrix.target }}/release/$bin$ext" --help > /dev/null
           done
           "./target/${{ matrix.target }}/release/ic$ext" --help > /dev/null
@@ -229,8 +230,7 @@ jobs:
           cp "target/${{ matrix.target }}/release/curve_cover_check$ext" "dist/$name/"
           cp "target/${{ matrix.target }}/release/curve_standards$ext" "dist/$name/"
           mkdir -p "dist/$name/docs/curves"
-          cp docs/curves/registry.json docs/curves/cover-catalog.json \
-             docs/curves/covers.json docs/curves/cover-links.yaml \
+          cp docs/curves/registry.json docs/curves/covers.json docs/curves/cover-links.yaml \
              docs/curves/cover-links.schema.json docs/curves/COVERS.md docs/curves/ICV1.md \
              docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
              docs/curves/hyperelliptic-infrastructure.schema.json \
@@ -243,7 +243,7 @@ jobs:
           # verification checkout. The mock binds repository source/report
           # paths and pinned Git objects that are intentionally not staged.
           cp -R docs/ecdlp-audit "dist/$name/docs/"
-          for bin in crypto ic ecbench curve_cover_check hyperelliptic-cover ecdlp-audit; do
+          for bin in crypto ic ecbench curve_cover_check hyperelliptic-cover ecdlp-audit factor-base-sweep; do
             cp "target/${{ matrix.target }}/release/$bin$ext" "dist/$name/"
           done
           # `[ -f ] && cp` leaves the loop's exit status at 1 when the last
@@ -269,7 +269,6 @@ jobs:
             "./ecdlp-audit$ext" --help > /dev/null
             "./curve_cover_check$ext" \
               --registry docs/curves/registry.json \
-              --catalog docs/curves/cover-catalog.json \
               --output docs/curves/covers.json \
               --links docs/curves/cover-links.yaml --check \
               > curve-cover-check-smoke.json
@@ -357,6 +356,8 @@ jobs:
         run: |
           cargo build --locked --release --manifest-path tools/isogeny-cli/Cargo.toml --target ${{ matrix.target }}
           cargo test --locked --release --manifest-path tools/isogeny-cli/Cargo.toml --target ${{ matrix.target }}
+          cargo build --locked --release --manifest-path isogeny_algos/Cargo.toml --target ${{ matrix.target }} --bin isogeny-perf
+          cargo test --locked --release --manifest-path isogeny_algos/Cargo.toml --target ${{ matrix.target }} --bin isogeny-perf
       - name: Check the portable receipt-hash fallback
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         env:
@@ -373,8 +374,10 @@ jobs:
           [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
           mkdir -p "$RUNNER_TEMP/isogeny-installed"
           cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny$ext" "$RUNNER_TEMP/isogeny-installed/"
+          cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny-perf$ext" "$RUNNER_TEMP/isogeny-installed/"
           cd "$RUNNER_TEMP/isogeny-installed"
           "./isogeny$ext" --help > /dev/null
+          "./isogeny-perf$ext" --help > /dev/null
           "./isogeny$ext" --version > BUILD.json
           grep -Fq '"git_commit": "'"$GITHUB_SHA"'"' BUILD.json
           "./isogeny$ext" screen --curve p192 --from 1010 --to 65537 > screen.json
@@ -399,6 +402,7 @@ jobs:
           [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
           mkdir -p "dist/$name"
           cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny$ext" "dist/$name/"
+          cp "$CARGO_TARGET_DIR/${{ matrix.target }}/release/isogeny-perf$ext" "dist/$name/"
           cp tools/isogeny-cli/README.md "dist/$name/README.md"
           cp "$RUNNER_TEMP/isogeny-installed/BUILD.json" "dist/$name/BUILD.json"
           for license in LICENSE LICENSE.md; do
@@ -699,9 +703,9 @@ jobs:
 
           | Artifact | Contents |
           | --- | --- |
-          | `crypto-*-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `ecdlp-audit` — glibc |
-          | `crypto-*-aarch64-apple-darwin.tar.gz` | same seven executables — Apple silicon |
-          | `crypto-*-x86_64-pc-windows-msvc.zip` | same seven executables (`.exe`) |
+          | `crypto-*-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `ecdlp-audit`, `factor-base-sweep` — glibc |
+          | `crypto-*-aarch64-apple-darwin.tar.gz` | same eight executables — Apple silicon |
+          | `crypto-*-x86_64-pc-windows-msvc.zip` | same eight executables (`.exe`) |
           | `isogeny-*-x86_64-unknown-linux-gnu.tar.gz` | dedicated `isogeny` executable, README, BUILD.json — glibc |
           | `isogeny-*-x86_64-unknown-linux-musl.tar.gz` | dedicated tool — static |
           | `isogeny-*-aarch64-apple-darwin.tar.gz` | dedicated tool — Apple silicon |
@@ -714,6 +718,10 @@ jobs:
           | `ecc2k130-cuda-*.tar.gz` | ECC2K-130 client, CUDA fatbinary (sm_80–sm_120) |
 
           Verify with `sha256sum -c SHA256SUMS`.
+
+          Put the extracted `factor-base-sweep` executable on PATH and launch
+          `factor-base-sweep run --out runs/bases`. No Rust toolchain or source
+          checkout is needed to run the installed native CLI.
 
           Run `isogeny --help` after extracting the dedicated tool archive.
           `isogeny search --curve p224 --ell 1471 --out p224-1471` constructs

@@ -34,7 +34,6 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import cover_catalog  # noqa: E402
 import curve_id as cid  # noqa: E402
 import validation_gate as gate  # noqa: E402
 
@@ -58,7 +57,7 @@ SOURCES = {
     "koblitz_s21": "research/ic_constructions_20260926/analysis.json",
     "koblitz_s22": "research/ic_descent_20260930/analysis-isolated.json",
     "koblitz_s23": "research/ic_single_target_20260930/analysis.json",
-    "koblitz_rule_v3": "research/ic_tool_program/rule/v3/analysis.json",
+    "koblitz_rule_v7": "research/ic_tool_program/rule/v7/analysis.json",
     "oracles": "docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json",
     "n37_rank_columns": "research/ecbench_n37_rank_columns_20261004/RESULT.json",
     "n37_k8_k16": "research/ecbench_n37_k8_k16_20261004/DECISION.json",
@@ -82,14 +81,13 @@ SOURCES = {
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
     "jv_sieve_strong_rho": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
     "registry": "docs/curves/registry.json",
-    "cover_catalog": cover_catalog.MANIFEST,
     "curves_schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
 }
 GITHUB = "https://github.com/aburan28/crypto/blob/main/"
 S22_RUNS = "research/ic_descent_20260930/runs-isolated/main"
 S23_RUNS = "research/ic_single_target_20260930/runs"
-RULE_V3_RUNS = "research/ic_tool_program/rule/v3/runs"
+RULE_V7_RUNS = "research/ic_tool_program/rule/v7/runs"
 
 # Phases, in pipeline order, as the page groups them.
 PHASES = [
@@ -133,16 +131,16 @@ REGIME_NAME = {"prime": "Prime field", "char2": "Random binary", "koblitz": "Kob
 FAMILY_OF = {"koblitz": "A", "prime": "B", "char2": "B", "koblitz_batch": "C"}
 FAMILIES = {
     "A": {
-        "title": "Koblitz, one target", "regimes": ["koblitz"], "section": "§23, re-run at baseline v3",
+        "title": "Koblitz, one target", "regimes": ["koblitz"], "section": "§23, re-run at baseline v7",
         "status": "primary comparison: one target, as AGENTS.md's one-target rule requires",
         "targets": "one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks",
         "unit": "one batched affine addition (`add_many` over 1,024 subgroup points), per √r",
         "unit_how": "A clock reading, not a count: `ic price` times each phase exclusively, on one thread, "
                     "and divides by this unit, measured around each repetition (§20, §23). Each process measures its own "
-                    "unit, which is 2.3–3.2 times cheaper at baseline v3 than in §23's processes, so S here is not "
-                    "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v3/README.md).",
+                    "unit, so S here is not "
+                    "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).",
         "reference": "One-target rho on the same point, measured as built (its set-up plus its walk), "
-                     "in the same unit and the same process; its answer replayed and verified (§23; rule v3 at baseline v3).",
+                     "in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).",
         "floor": "√(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed "
                  "Frobenius and negation, n the extension degree. Stated in steps and not rescaled to "
                  "units, so × floor here divides units by steps.",
@@ -206,14 +204,8 @@ def load(rel: str):
 
 
 class Names:
-    """Curve names, resolved in the registry; the page reads only the
-    cover-catalog rows (docs/curves/cover-catalog.json), so census curves the
-    registry builder adds leave it current."""
-
     def __init__(self) -> None:
         self.reg = load(SOURCES["registry"])
-        self.catalog = cover_catalog.subset(self.reg, load(SOURCES["cover_catalog"]))
-        self.in_catalog = {c["slug"] for c in self.catalog["curves"]}
         self.by = {}
         for c in self.reg["curves"]:
             for a in c["aliases"] + c["standard_names"] + [c["slug"]]:
@@ -223,22 +215,7 @@ class Names:
         c = self.by.get(cid.normalise_alias(legacy))
         if c is None:
             raise SystemExit(f"{legacy!r} is not in docs/curves/registry.json")
-        if c["slug"] not in self.in_catalog:
-            raise SystemExit(f"{legacy!r} is {c['slug']}, which {SOURCES['cover_catalog']} does not name; "
-                             "add it there (and regenerate the cover report) before it reaches the board")
         return c
-
-
-def source_digests() -> dict:
-    """Each source's file SHA-256, except the registry's: that is the
-    cover-catalog rows' digest (catalog_rows_sha256 in docs/curves/covers.json),
-    the only rows the page reads."""
-    out = {k: {"path": v, "sha256": sha256(v)} for k, v in SOURCES.items()}
-    reg = load(SOURCES["registry"])
-    out["registry"] = {"path": SOURCES["registry"],
-                       "sha256": cover_catalog.rows_sha256(cover_catalog.subset(reg, load(SOURCES["cover_catalog"]))),
-                       "scope": f"rows named by {SOURCES['cover_catalog']}"}
-    return out
 
 
 def curve_records() -> dict:
@@ -456,7 +433,7 @@ def koblitz_rows(names: Names) -> list[dict]:
 
 def koblitz_one_target_rows(names: Names) -> list[dict]:
     """Ledger §23's comparison: one unseen public point per process, 64 per
-    size, re-run at the IC tool programme's baseline v3 as rule v3.  The
+    size, re-run at the IC tool programme's baseline v7 as rule v7.  The
     primary comparison under AGENTS.md's one-target rule.  S here is cold,
     the reusable set-up plus the online interval, against one-target rho's
     set-up plus its walk; the online speedup, the canonical-step reading and
@@ -466,13 +443,13 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
     compared with §23's; the ratios carry no unit."""
     rows = []
     s23 = {(x["a"], x["n"]): x for x in load(SOURCES["koblitz_s23"])["sizes"]}
-    for x in load(SOURCES["koblitz_rule_v3"])["sizes"]:
+    for x in load(SOURCES["koblitz_rule_v7"])["sizes"]:
         a, n = x["a"], x["n"]
         before = s23[(a, n)]
         c = names(before["curve"])
         if c["slug"] != x["curve"]:
-            raise SystemExit(f"rule v3's {x['curve']} is not §23's {before['curve']}")
-        par = json.loads((REPO / RULE_V3_RUNS / f"k{a}n{n}" / "T01.params.json").read_text())
+            raise SystemExit(f"rule v7's {x['curve']} is not §23's {before['curve']}")
+        par = json.loads((REPO / RULE_V7_RUNS / f"k{a}n{n}" / "T01.params.json").read_text())
         columns = int(re.search(r"-c(\d+)-", par["name"]).group(1))
         d = x["diagnostics"]
         sh = d["online_phase_shares"]
@@ -510,11 +487,11 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
         rows.append({
             "regime": "koblitz", "slug": c["slug"], "ec1": x.get("curve_id") or ec1_of(c),
             "legacy": before["curve"], "log2_r": x["log2_r"], "cofactor": None,
-            "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v3)",
+            "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
             "reference_s": x["s_rho_online_mean"] + x["s_rho_setup"], "floor_s": floor_s,
-            "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v3"],
+            "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v7"],
             "before_source": SOURCES["koblitz_s23"],
-            "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
+            "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
             "class": "accounting",
         })
     return rows
@@ -578,7 +555,7 @@ def exponents() -> dict:
 
 def roster(names: Names, measured: set[str]) -> list[dict]:
     out = []
-    for c in names.catalog["curves"]:
+    for c in names.reg["curves"]:
         p = c["params"]
         if c["family"] == "prime":
             field = f"GF(p), p = {p['p']}" if len(p["p"]) < 40 else f"GF(p), {int(p['p']).bit_length()}-bit p"
@@ -1160,7 +1137,7 @@ def build(allow_unvalidated: bool = False) -> dict:
                         "No new measurement.",
         "what_this_is_not": ["a measurement", "a speedup", "a claim about any curve not on it"],
         "class": "accounting",
-        "sources": source_digests(),
+        "sources": {k: {"path": v, "sha256": sha256(v)} for k, v in SOURCES.items()},
         "validation_gate": {"rule": "AGENTS.md, Validation gate (owner, 2026-10-19)",
                             "schema": gate.SCHEMA, "status_counts": gate.status_counts(board)},
         "families": families(board),
@@ -1683,8 +1660,7 @@ def markdown(doc: dict) -> str:
           "operation-unit S rankings.", ""]
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
-        scope = f" ({v['scope']})" if v.get("scope") else ""
-        L.append(f"- `{v['path']}`{scope} — sha256 `{v['sha256'][:16]}…`")
+        L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
     return "\n".join(L) + "\n"
 
 
@@ -1815,7 +1791,9 @@ def page(doc: dict, standalone: bool) -> str:
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500'
             '&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">\n'
-            f"<style>{STYLE}</style>\n")
+            f"<style>{STYLE}</style>\n"
+            '<link rel="stylesheet" href="ic-leaderboard/layout.css">\n'
+            '<script src="ic-leaderboard/layout.js" defer></script>\n')
     P = []
     K1 = L["koblitz"]
     kob_rows = by_regime["koblitz"]
@@ -1862,7 +1840,7 @@ def page(doc: dict, standalone: bool) -> str:
                  f'at the largest size, log₂ r = {big["log2_r"]:.1f}: {times(big["ratio_rho"])}'
                  f'{unit_ref("B")}</p></div>')
     P.append(f'<div class="fact"><dt>Curves</dt><dd>{len({r["slug"] for r in board})} priced</dd>'
-             f'<p>of {len(doc["roster"])} in the cover catalog; every one by its ICV1 slug</p></div></dl></header>')
+             f'<p>of {len(doc["roster"])} named in the repository; every one by its ICV1 slug</p></div></dl></header>')
     audit = doc["latest_frontier_audit"]
     acold = audit["cold"]
     admitted = audit["admitted_online"]
@@ -2193,7 +2171,7 @@ def page(doc: dict, standalone: bool) -> str:
              'and floors, stated at the head of each; S, × ref and × floor are comparable inside a table and '
              'nowhere else. Tables A and B solve one target per row, as AGENTS.md\'s one-target rule requires: '
              'A on one unseen public point per process against one-target rho on the same point (§23\'s comparison, '
-             're-run at the ic tool programme\'s baseline v3, 64 points per size, §23\'s figures kept as the '
+             're-run at the ic tool programme\'s baseline v7, 64 points per size, §23\'s figures kept as the '
              'before marks), B against the matched negation-map rho (ledger §18). Table C is a historical 32-target '
              'diagnostic. For the Koblitz rows of A the online interval, the reading with rho at the canonical '
              'step and the generic-precomputation model sit beside the cold ratio, as §23 requires. The bar '
@@ -2382,9 +2360,8 @@ def page(doc: dict, standalone: bool) -> str:
 
     # The curve roster.
     fam_order = ("koblitz", "subfield", "binary", "prime")
-    P.append('<section class="panel" id="curves"><h2>Every curve in the cover catalog</h2>'
-             f'<p>From the curve registry, the rows {gh(SOURCES["cover_catalog"])} names; census curves the registry also '
-             'holds (the isogeny-volcano runs) are in the lab browser. The slug is the curve\'s name in text; the EC1 alias identifies the exact '
+    P.append('<section class="panel" id="curves"><h2>Every curve the repository names</h2>'
+             '<p>From the curve registry. The slug is the curve\'s name in text; the EC1 alias identifies the exact '
              'representation measured (subgroup and generator included) for comparisons across repositories. '
              'Legacy spellings are what older notes and frozen reports called the curve.</p>')
     cr = doc["curve_records"]
@@ -2487,7 +2464,7 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>Current through ledger §{LEDGER_COVERED_THROUGH}; latest frontier audit '
              f'{esc(doc["latest_frontier_audit"]["date"])}. Built by '
              '<code>scripts/build_ic_leaderboard.py</code> from: '
-             + ", ".join(f'<code>{esc(v["path"])}</code> ({esc(v["scope"]) + ", " if v.get("scope") else ""}{v["sha256"][:12]})' for v in doc["sources"].values())
+             + ", ".join(f'<code>{esc(v["path"])}</code> ({v["sha256"][:12]})' for v in doc["sources"].values())
              + '. Curves are named by ICV1 slug (<a href="https://github.com/aburan28/crypto/blob/main/docs/curves/ICV1.md">docs/curves/ICV1.md</a>); '
              f'curve records: {gh(SOURCES["curves_schema"])} and {gh(SOURCES["curves_yaml"])} '
              '(<a href="#curve-records">coverage</a>).</p></footer></div>')

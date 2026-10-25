@@ -33,9 +33,6 @@ import sys
 from collections import Counter, defaultdict
 from functools import lru_cache
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import cover_catalog  # noqa: E402
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, ".."))
 OUT = os.path.join(ROOT, "docs", "browser", "data.json")
@@ -695,26 +692,21 @@ def candidate_identities(source: RepositoryInputs) -> list[dict]:
 def attach_covers(
     curves: list[dict],
     report: dict,
-    catalog: dict,
+    source: RepositoryInputs | None = None,
 ) -> None:
-    """Join preverified metadata only; mathematical checks are native Rust.
-
-    The report covers the cover-catalog rows (``cover_catalog.subset``), not
-    every registry curve; the others carry ``hyperelliptic_cover: None``.
-    """
+    """Join preverified metadata only; mathematical checks are native Rust."""
     if (
-        report.get("schema_version") != "curve-covers/v2"
-        or report.get("catalog") != cover_catalog.MANIFEST
-        or report.get("catalog_rows_sha256") != cover_catalog.rows_sha256(catalog)
+        report.get("schema_version") != "curve-covers/v1"
+        or report.get("registry_sha256") != sha256_file(REGISTRY, source)
     ):
-        raise ValueError("cover report schema or catalog digest is stale")
+        raise ValueError("cover report schema or registry digest is stale")
     findings = report.get("curves", [])
     by_slug = {r["slug"]: r for r in findings}
-    if len(by_slug) != len(findings) or set(by_slug) != {c["slug"] for c in catalog["curves"]}:
+    if len(by_slug) != len(findings) or set(by_slug) != {c["slug"] for c in curves}:
         raise ValueError("cover report must have exactly one finding per catalog model")
     for curve in curves:
-        finding = by_slug.get(curve["slug"])
-        if finding is not None and finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
+        finding = by_slug[curve["slug"]]
+        if finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
             raise ValueError(f"cover model digest mismatch: {curve['slug']}")
         curve["hyperelliptic_cover"] = finding
 
@@ -724,22 +716,18 @@ def build() -> dict:
     registry = load(REGISTRY, source)
     leaderboard = load(LEADERBOARD, source)
     curves = curve_rows(registry, leaderboard)
-    catalog = cover_catalog.subset(registry, load(cover_catalog.MANIFEST, source))
-    attach_covers(curves, load(COVERS, source), catalog)
+    attach_covers(curves, load(COVERS, source), source)
     graph = load(COVER_LINKS, source)  # JSON syntax is a subset of YAML 1.2.
     if (
-        graph.get("schema_version") != "curve-cover-graph/v2"
-        or graph.get("catalog_rows_sha256") != cover_catalog.rows_sha256(catalog)
+        graph.get("schema_version") != "curve-cover-graph/v1"
+        or graph.get("registry_sha256") != sha256_file(REGISTRY, source)
     ):
         raise ValueError("stale cover graph")
     nodes = {node["icv1_identity"]["slug"]: node for node in graph["curves"]}
-    if len(nodes) != len(graph["curves"]) or set(nodes) != {c["slug"] for c in catalog["curves"]}:
+    if len(nodes) != len(graph["curves"]) or set(nodes) != {c["slug"] for c in curves}:
         raise ValueError("cover graph must bind every catalog model exactly once")
     for curve in curves:
-        node = nodes.get(curve["slug"])
-        if node is None:
-            curve["cover_links"], curve["standards_provenance"] = [], []
-            continue
+        node = nodes[curve["slug"]]
         if node["model_json"] != curve["model_json"]:
             raise ValueError("cover graph model mismatch")
         curve["cover_links"] = [dict(link, cover_id=graph["covers"][link["cover_uid"]]["cover_id"],
@@ -757,7 +745,6 @@ def build() -> dict:
         cand["slug"] = tag_to_slug.get((cand.get("n"), cand.get("curve_tag")))
     sources = {
         REGISTRY: sha256_file(REGISTRY, source),
-        cover_catalog.MANIFEST: sha256_file(cover_catalog.MANIFEST, source),
         COVERS: sha256_file(COVERS, source),
         COVER_LINKS: sha256_file(COVER_LINKS, source),
         STANDARDS_COVERAGE: sha256_file(STANDARDS_COVERAGE, source),

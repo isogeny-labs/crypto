@@ -60,6 +60,9 @@ Type=notify
 NotifyAccess=main
 TimeoutStartSec=0
 UMask=0077
+RuntimeDirectory=spot-legacy
+RuntimeDirectoryMode=0755
+RuntimeDirectoryPreserve=yes
 ExecStart=/usr/bin/python3 {runtime}/codex_recovery.py --config /srv/experiments/agent-migration/agent.json
 Restart=on-failure
 RestartSec=20
@@ -83,6 +86,7 @@ User=root
 UMask=0077
 RuntimeDirectory=spot-legacy
 RuntimeDirectoryMode=0755
+RuntimeDirectoryPreserve=yes
 ExecStart=/usr/bin/python3 /opt/spot-criu/legacy_recovery.py --origin {legacy_origin} --table {table} --status /run/spot-legacy/status.json
 Restart=on-failure
 RestartSec=15
@@ -191,4 +195,8 @@ if __name__ == '__main__':
             Path('/etc/systemd/system/'+name).write_text(text)
         names.append('spot-checkpoint-discovery.timer')
     subprocess.run(['systemctl', 'daemon-reload'], check=True)
-    subprocess.run(['systemctl', 'enable', '--now', *names], check=True)
+    # Recovery may retry a slow provider snapshot. Do not make bootstrap's
+    # readiness publication depend on the first activation attempt succeeding.
+    # Endpoint reconciliation still requires the separate workload-owner fence.
+    subprocess.run(['systemctl', 'enable', *names], check=True)
+    subprocess.run(['systemctl', 'start', '--no-block', *names], check=True)

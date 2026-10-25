@@ -272,19 +272,12 @@ fn unknown_is_not_no_cover_and_identities_are_bound() {
 }
 #[test]
 fn entire_catalog_replays_deterministically() {
-    let full: Value =
-        serde_json::from_slice(include_bytes!("../../../docs/curves/registry.json")).unwrap();
-    let registry = super::links::catalog_subset(
-        &full,
-        include_bytes!("../../../docs/curves/cover-catalog.json"),
-    )
-    .unwrap();
-    let input = registry.to_string();
-    let first = catalog(input.as_bytes()).unwrap();
-    assert_eq!(first, catalog(input.as_bytes()).unwrap());
-    // Every catalog curve, the extension fields' included, has a verified cover.
+    let input = include_bytes!("../../../docs/curves/registry.json");
+    let first = catalog(input).unwrap();
+    assert_eq!(first, catalog(input).unwrap());
+    let registry: Value = serde_json::from_slice(input).unwrap();
+    // Every curve, the extension fields' included, has a verified cover.
     let rows = registry["curves"].as_array().unwrap();
-    assert_eq!(rows.len(), 2572);
     assert!(rows.iter().any(|r| r["family"] == "extension"));
     assert_eq!(
         first["summary"]["verified"].as_u64().unwrap() as usize,
@@ -428,37 +421,4 @@ fn cover_graph_is_content_addressed_and_rejects_wrong_ec1_binding() {
     registry["curves"][0]["representations"][0]["curve"]["coefficients"][4] = json!(2);
     identify(&mut registry["curves"][0]["representations"][0]);
     assert!(super::links::graph(&registry, &report).is_err());
-}
-#[test]
-fn rows_outside_the_cover_catalog_do_not_stale_the_report() {
-    let (kept, census) = (row(prime(5, 1, 1)), row(prime(7, 1, 1)));
-    let manifest = |slugs: &[&Value]| {
-        json!({"schema_version":"curve-cover-catalog/v1","count":slugs.len(),
-            "slugs":slugs.iter().map(|r| r["slug"].clone()).collect::<Vec<_>>()})
-        .to_string()
-    };
-    let bound = |registry: &Value, m: &str| {
-        let subset = super::links::catalog_subset(registry, m.as_bytes())?;
-        Ok::<_, String>(super::links::bind_catalog(
-            catalog(subset.to_string().as_bytes())?,
-            &subset,
-        ))
-    };
-    let only = json!({"schema_version":1,"curves":[kept.clone()]});
-    let grown = json!({"schema_version":1,"curves":[census.clone(),kept.clone()]});
-    let m = manifest(&[&kept]);
-    let report = bound(&only, &m).unwrap();
-    assert_eq!(report, bound(&grown, &m).unwrap());
-    assert_eq!(report["schema_version"], "curve-covers/v2");
-    assert!(report.get("registry_sha256").is_none());
-    // A catalog row that changes, or a slug the registry lacks, still fails.
-    let mut edited = grown.clone();
-    edited["curves"][1]["icv1"] = json!(format!("{}x", kept["icv1"].as_str().unwrap()));
-    assert!(bound(&edited, &m).is_err());
-    assert!(bound(&only, &manifest(&[&kept, &census])).is_err());
-    let both = manifest(&[&kept, &census]);
-    assert_ne!(
-        report["catalog_rows_sha256"],
-        bound(&grown, &both).unwrap()["catalog_rows_sha256"]
-    );
 }
