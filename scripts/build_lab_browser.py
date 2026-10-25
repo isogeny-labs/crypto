@@ -42,6 +42,9 @@ COVERS = "docs/curves/covers.json"
 COVER_LINKS = "docs/curves/cover-links.yaml"
 STANDARDS_COVERAGE = "docs/curves/standards/coverage.json"
 LEADERBOARD = "docs/ic/leaderboard.json"
+STORE_INDEX = "store/index.json"
+STORE_CONFIG = "store/config.json"
+STORE_SCHEMA = "crypto.store-index/v1"
 TOURNAMENT_RUNS = "research/ic_candidate_tournament_20260915/runs"
 ECBENCH_SESSIONS_GLOBS = ("research/ecbench_*/sessions/*", "research/isogeny_conductor_gap_*/sessions/*", "research/fiber_ic_scaling_*/sessions/*", "research/full_volcano_graphwide_ic_*/execution/campaigns/*/sessions/*")
 IC1_SCAN_GLOBS = (
@@ -711,6 +714,46 @@ def attach_covers(
         curve["hyperelliptic_cover"] = finding
 
 
+def store_objects(curves_by_slug: dict, fb_ids: set, source: RepositoryInputs) -> dict:
+    """The large files the repository keeps in its content-addressed store.
+
+    Quoted from the committed index (`store/index.json`); the bytes live in
+    the remote under their SHA-256 and are fetched on demand (`ecbench store
+    pull`).  The curve and factor-base links come from the entry's name, the
+    same rule the ecbench database uses (`factor-bases/<curve>/<FB1h id>.json`),
+    and are kept only where the id resolves to a row of this index.
+    """
+    index = load(STORE_INDEX, source)
+    if index.get("schema") != STORE_SCHEMA:
+        raise ValueError(f"{STORE_INDEX}: schema {index.get('schema')!r}, expected {STORE_SCHEMA!r}")
+    objects = []
+    for name, e in sorted(index["entries"].items()):
+        parts = name.split("/")
+        curve = fb = None
+        if parts[0] == "factor-bases" and len(parts) >= 3:
+            curve = parts[1]
+            stem = parts[-1].rsplit(".", 1)[0]
+            if stem.startswith("FB1h"):
+                fb = stem
+        objects.append(
+            {
+                "name": name,
+                "kind": parts[0],
+                "sha256": e["sha256"],
+                "bytes": e["bytes"],
+                "description": e.get("description") or None,
+                "tags": e.get("tags", []),
+                "provenance": e.get("provenance") or None,
+                "superseded": e.get("superseded", []),
+                "recorded_curve": curve,
+                "curve": curve if curve in curves_by_slug else None,
+                "fb_id": fb if fb in fb_ids else None,
+                "recorded_fb_id": fb,
+            }
+        )
+    return {"remote": load(STORE_CONFIG, source).get("remote"), "objects": objects}
+
+
 def build() -> dict:
     source = RepositoryInputs(ROOT)
     registry = load(REGISTRY, source)
@@ -735,6 +778,9 @@ def build() -> dict:
         curve["standards_provenance"] = node.get("standards_provenance") or []
     by_slug = {c["slug"]: c for c in curves}
     sessions, methods, fbs, yields = ecbench_sessions(by_slug, source)
+    store = store_objects(by_slug, {f["fb_id"] for f in fbs}, source)
+    for c in curves:
+        c["store_objects"] = [o["name"] for o in store["objects"] if o["curve"] == c["slug"]]
     rounds = tournament_rounds(curves, source)
     candidates = candidate_identities(source)
     tag_to_slug = {}
@@ -749,6 +795,8 @@ def build() -> dict:
         COVER_LINKS: sha256_file(COVER_LINKS, source),
         STANDARDS_COVERAGE: sha256_file(STANDARDS_COVERAGE, source),
         LEADERBOARD: sha256_file(LEADERBOARD, source),
+        STORE_INDEX: sha256_file(STORE_INDEX, source),
+        STORE_CONFIG: sha256_file(STORE_CONFIG, source),
         **{
             os.path.join(s["dir"], "records.jsonl"): sha256_file(
                 os.path.join(s["dir"], "records.jsonl"), source
@@ -760,7 +808,7 @@ def build() -> dict:
         "schema_version": "lab-browser/1",
         "generated_by": "scripts/build_lab_browser.py",
         "what_this_is": "A searchable index of the curves, methods, factor bases, candidate identities, tournament rounds and ecbench sessions this repository names, joined on the identities it already computes (ICV1 slugs, EC1 aliases, ECM1 method ids, FB1 factor-base ids, IC1 candidate ids). Every figure is quoted from a committed file named in `sources` or in the row; nothing is computed here beyond means over a session's own verified runs.",
-        "counts": {"curves": len(curves), "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates), "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields)},
+        "counts": {"curves": len(curves), "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates), "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields), "store_objects": len(store["objects"])},
         "sources": sources,
         "vocabulary": VOCABULARY,
         "standards_coverage": load(STANDARDS_COVERAGE, source),
@@ -771,6 +819,7 @@ def build() -> dict:
         "rounds": rounds,
         "sessions": sessions,
         "yields": yields,
+        "store": store,
     }
 
 

@@ -172,6 +172,16 @@ pub fn registry() -> &'static [ProblemDecl] {
             methods: &["klpt"],
             params: &[],
         },
+        ProblemDecl {
+            id: "radical.chain",
+            summary: "codomain j-path of a non-backtracking chain of n radical l-isogenies (Castryck-Decru-Vercauteren) on the X_1(l) family, one l-th root per step",
+            size: "n (chain length)",
+            unit: UNIT,
+            declared_alpha: 1.0,
+            model: Model::Power,
+            methods: &["radical"],
+            params: &[("ell", "7"), ("bits", "61")],
+        },
     ]
 }
 
@@ -594,6 +604,7 @@ pub fn run(
         "path.supersingular" => path_supersingular(params, size, index, method, seed),
         "csidh.action" => csidh_action(params, size, index, method, seed, counted, cal),
         "klpt" => klpt_run(size, index, seed),
+        "radical.chain" => radical_chain(params, size, index, counted, cal),
         _ => Err(format!("unknown problem {problem}")),
     }
 }
@@ -1010,6 +1021,121 @@ fn klpt_run(bits: u64, index: u64, seed: u64) -> Result<Outcome, String> {
     })
 }
 
+// ------------------------------------------------------------------ radical isogeny chains
+
+/// A deterministic prime of about `bits` bits with p = 3 mod 4 and gcd(l, p - 1) = 1 (so the
+/// l-th root used by each radical step is unique).
+fn radical_prime(bits: u64, ell: u64) -> Result<Int, String> {
+    if !(16..=512).contains(&bits) {
+        return Err(format!(
+            "radical.chain: bits {bits} out of range (16..=512)"
+        ));
+    }
+    let three = Int::from(3u64);
+    let four = Int::from(4u64);
+    let mut cand = &Int::from(2u64).pow((bits - 1) as u32) + &three; // 3 mod 4
+    loop {
+        if cand.mod_u64(ell) != 1 && cand.is_probable_prime() {
+            return Ok(cand);
+        }
+        cand = &cand + &four;
+    }
+}
+
+/// Validate the radical.chain parameters, shared by the runner and the verifier so the two can
+/// never disagree on the input domain: the degree must be a supported one (so prime generation
+/// is never reached with an unsupported or zero modulus) and the chain length at least two (so a
+/// non-backtracking step exists to check). Returns (ell, n).
+fn radical_params(params: &Params, size: u64) -> Result<(u64, usize), String> {
+    let ell = param_u64(params, "ell")?;
+    if ell != 5 && ell != 7 {
+        return Err("radical.chain: ell must be 5 or 7".into());
+    }
+    let n = usize::try_from(size).map_err(|_| "radical.chain: n too large".to_string())?;
+    if n < 2 {
+        return Err("radical.chain: n >= 2".into());
+    }
+    Ok((ell, n))
+}
+
+/// The Tate-normal-form coefficients of the X_1(l) member with parameter `param`
+/// (l = 7: family7; l = 5: c = b = param).
+fn radical_model<F: Field>(f: &F, ell: u64, param: F::E) -> [F::E; 5] {
+    if ell == 7 {
+        crate::kernel::radical::model7(f, param)
+    } else {
+        crate::kernel::radical::tate_model(f, param, param)
+    }
+}
+
+/// A deterministic valid start parameter for the radical l-chain: the first draw of the
+/// instance stream giving a non-singular curve with j not in {0, 1728} (so Phi_l applies and
+/// the X_1(l) member is in general position).
+fn radical_start<F: PrimeFieldInt>(f: &F, ell: u64, index: u64) -> Result<F::E, String> {
+    let mut rng = inst_rng("radical.chain", 0, index, "start");
+    let c1728 = f.from_u64(1728);
+    for _ in 0..2000 {
+        let param = f.random(&mut rng);
+        let short = crate::kernel::radical::to_short(f, radical_model(f, ell, param));
+        // non-singular: 4 a^3 + 27 b^2 != 0
+        let disc = f.add(
+            f.mul(f.from_u64(4), f.mul(short.a, f.mul(short.a, short.a))),
+            f.mul(f.from_u64(27), f.mul(short.b, short.b)),
+        );
+        if f.is_zero(disc) {
+            continue;
+        }
+        let j = crate::kernel::radical::weierstrass_j(f, radical_model(f, ell, param));
+        if !f.is_zero(j) && j != c1728 {
+            return Ok(param);
+        }
+    }
+    Err("radical.chain: no valid start parameter".into())
+}
+
+/// Run a chain of `n` radical l-isogeny steps and return the j-path j_0, ..., j_n.
+fn radical_chain(
+    params: &Params,
+    size: u64,
+    index: u64,
+    counted: bool,
+    cal: &Calibration,
+) -> Result<Outcome, String> {
+    let (ell, n) = radical_params(params, size)?;
+    let p = radical_prime(param_u64(params, "bits")?, ell)?;
+    struct T<'a>(u64, usize, u64, bool, &'a Calibration);
+    impl Task for T<'_> {
+        type Out = Result<Outcome, String>;
+        fn run<F: PrimeFieldInt + CalKey>(self, f: &F) -> Self::Out {
+            use crate::kernel::radical::{root_exponent, step5, step7, weierstrass_j};
+            let (ell, n, index) = (self.0, self.1, self.2);
+            let e = root_exponent(f, ell).ok_or("radical.chain: gcd(l, q - 1) != 1")?;
+            let param0 = radical_start(f, ell, index)?;
+            let (js, fme, tally, ms) = measure!(f, self.3, self.4, |g| {
+                let mut param = param0;
+                let mut js = vec![weierstrass_j(g, radical_model(g, ell, param))];
+                for _ in 0..n {
+                    param = if ell == 7 {
+                        step7(g, param, &e)
+                    } else {
+                        step5(g, param, &e)
+                    };
+                    js.push(weierstrass_j(g, radical_model(g, ell, param)));
+                }
+                js
+            });
+            Ok(Outcome {
+                answer: Some(ints(f, &js)),
+                cost: fme,
+                tally,
+                work: BTreeMap::new(),
+                ms,
+            })
+        }
+    }
+    with_field(&p, T(ell, n, index, counted, cal))
+}
+
 // ------------------------------------------------------------------ verification
 
 /// Check `answer` for instance (size, index) by a route independent of the method that produced
@@ -1195,6 +1321,52 @@ pub fn verify(
             Ok(format!(
                 "J = I xi is a primitive integral left O_0-ideal of norm 2^{e}"
             ))
+        }
+        "radical.chain" => {
+            let (ell, n) = radical_params(params, size)?;
+            let p = radical_prime(param_u64(params, "bits")?, ell)?;
+            struct V<'a>(u64, usize, u64, &'a str);
+            impl Task for V<'_> {
+                type Out = Result<String, String>;
+                fn run<F: PrimeFieldInt + CalKey>(self, f: &F) -> Self::Out {
+                    let (ell, n, index, answer) = (self.0, self.1, self.2, self.3);
+                    let js: Vec<F::E> = answer.split(',').map(|s| f.elem(&dec(s))).collect();
+                    let expected = n.checked_add(1).ok_or("radical.chain: n too large")?;
+                    if js.len() != expected {
+                        return Err(format!(
+                            "radical.chain: path has {} nodes, expected {expected}",
+                            js.len()
+                        ));
+                    }
+                    // j_0 is the start curve's j (ties the path to the instance)
+                    let param0 = radical_start(f, ell, index)?;
+                    let j0 =
+                        crate::kernel::radical::weierstrass_j(f, radical_model(f, ell, param0));
+                    if js[0] != j0 {
+                        return Err(
+                            "radical.chain: path does not start at the instance curve".into()
+                        );
+                    }
+                    // each step is an l-isogeny (root of Phi_l) and non-backtracking; Phi_l is
+                    // built independently of the radical-isogeny formulas
+                    let phi = Phi::via_crt(f, ell as usize);
+                    for i in 0..n {
+                        if !f.is_zero(phi.eval(f, js[i], js[i + 1])) {
+                            return Err(format!(
+                                "radical.chain: Phi_{ell}(j_{i}, j_{}) != 0",
+                                i + 1
+                            ));
+                        }
+                        if i >= 1 && js[i - 1] == js[i + 1] {
+                            return Err("radical.chain: a step backtracks".into());
+                        }
+                    }
+                    Ok(format!(
+                        "{n} radical {ell}-isogeny steps, each a root of Phi_{ell}, non-backtracking"
+                    ))
+                }
+            }
+            with_field(&p, V(ell, n, index, answer))
         }
         _ => Err(format!("unknown problem {problem}")),
     }
