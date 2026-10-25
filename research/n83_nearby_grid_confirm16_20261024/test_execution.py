@@ -1,12 +1,71 @@
 """Independent controls for the sealed confirmation schedule and selector."""
 
+import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
 import unittest
 from unittest import mock
 
-from research.n83_nearby_grid_confirm16_20261024 import aggregate, protocol
+from research.n83_nearby_grid_confirm16_20261024 import aggregate, protocol, verify
+from research.n83_nearby_grid_tier1_20261024 import protocol as screen
+from research.n83_nearby_grid_tier1_20261024 import run as screen_run
 
 
 class ConfirmationTests(unittest.TestCase):
+    def test_archived_launch_paths_replay_and_tampering_is_rejected(self):
+        selected = [1107, 1110, 1115]
+        events = protocol.events(0, selected)
+        with TemporaryDirectory() as temp:
+            original = Path(temp) / "runner" / "n83-confirm-results-s0"
+            extracted = Path(temp) / "download" / original.name
+
+            def folder(root, event):
+                return (root / "points" / f"p{event['point_index']:02d}" /
+                        "runs" / event["name"])
+
+            def save_launch(event, command, flags, cap):
+                local = folder(extracted, event)
+                local.mkdir(parents=True, exist_ok=True)
+                (local / "launch.json").write_text(json.dumps({
+                    "command": command, "environment_flags": flags,
+                    "cap_seconds": cap,
+                    "rss_cap_bytes": protocol.RSS_CAP_BYTES}))
+                return local
+
+            first = events[0]
+            first_original = folder(original, first)
+            first_target = first_original.parent.parent / "target.jsonl"
+            first_local = save_launch(first, [
+                str(original / "executed_bins/koblitz_orbit_dlp_fast"),
+                f"construct:83:1:{first['k']}", str(first_target), "29",
+                str(first_original / "targets_result.jsonl")],
+                screen_run.ic_flags(first_original, first["k"]),
+                protocol.IC_CAP_SECONDS)
+            recorded = verify.recorded_output_root(extracted, 0, selected)
+            self.assertEqual(recorded, original)
+            self.assertTrue(verify.launch_gate(first_local, first, recorded))
+
+            rho = next(event for event in events if event["kind"] == "rho")
+            rho_original = folder(original, rho)
+            rho_target = rho_original.parent.parent / "target.jsonl"
+            config = (Path(temp) / "checkout" /
+                      screen.RHO_CONFIG.relative_to(screen.ROOT))
+            rho_command = [
+                str(original / "executed_bins/n83_rho_optimization_eval"),
+                str(rho_target), str(rho["seed"]), str(config),
+                str(rho_original / "receipt.json")]
+            rho_local = save_launch(rho, rho_command, {},
+                                    protocol.RHO_CAP_SECONDS)
+            self.assertTrue(verify.launch_gate(rho_local, rho, recorded))
+
+            rho_command[3] = str(Path(temp) / "wrong-rho-config.json")
+            save_launch(rho, rho_command, {}, protocol.RHO_CAP_SECONDS)
+            self.assertFalse(verify.launch_gate(rho_local, rho, recorded))
+            rho_command[3] = str(config)
+            rho_command[1] = str(rho_target.with_name("wrong-target.jsonl"))
+            save_launch(rho, rho_command, {}, protocol.RHO_CAP_SECONDS)
+            self.assertFalse(verify.launch_gate(rho_local, rho, recorded))
+
     def test_every_public_point_and_workload_replays(self):
         manifest, points = protocol.fixture()
         self.assertEqual(manifest["point_count"], 16)
