@@ -1,0 +1,43 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-jv-sieve-prospective-20261023-3
+experiment_id: jv_sieve_prospective_20261023
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: def70079cc45cbb51f5fe3bab84704f2d20e057a
+receipt: research/jv_sieve_prospective_20261023/cards/CARD-jv-sieve-prospective-20261023-3.receipt.json
+binds:
+  - {path: research/jv_sieve_prospective_20261023/PROTOCOL.md, sha256: 500860fdaa4c525ff90f9d85fa4200ccb7f8a62e0ac98abd3a9a9c2444a588b6}
+  - {path: research/jv_sieve_prospective_20261023/run.sh, sha256: b0bdcc9c457b393939a5fd38aa61e005c06f2996a1cb8f8934a04f375aa84ebb}
+  - {path: research/jv_sieve_prospective_20261023/raw/endo_check.jsonl, sha256: c74bb16a2ab35c8c7ee6f80387932fbaadbb7b078ed9a8f69daf013cd0178980}
+  - {path: Cargo.toml, sha256: def239e6a4e217a3059fc5b6740d658fa353f6cb023b685aeb2c40e528e94bfc}
+  - {path: Cargo.lock, sha256: bf9f2d9eae5f6bfea66b0473d44bf77d63141dcc335fad01b30c420be444ea42}
+  - {path: ./target/release/examples/jv_cover, sha256: 8fbe95a6f0c4693b8de9d69c92a88d3b53b75db7c5cfaf71331b063cad384ffd}
+  - {path: ./target/release/examples/jv_endo_check, sha256: 06513248db9f5610521ed995ce4b8464308de84dc92f4ee7b23f07db0f8d6b6d}
+commands:
+  - id: build
+    argv: [cargo, build, --release, --example, jv_cover, --example, jv_endo_check]
+    cwd: .
+    timeout_seconds: 3600
+    success_exit_codes: [0]
+    stdout: research/jv_sieve_prospective_20261023/receipts/resume-build.stdout
+    stderr: research/jv_sieve_prospective_20261023/receipts/resume-build.stderr
+  - id: run-all
+    argv: [bash, research/jv_sieve_prospective_20261023/run.sh, all]
+    cwd: .
+    timeout_seconds: 64800
+    success_exit_codes: [0]
+    stdout: research/jv_sieve_prospective_20261023/receipts/resume-run-all.stdout
+    stderr: research/jv_sieve_prospective_20261023/receipts/resume-run-all.stderr
+bus_address: executor-mechanical-jv-sieve-prospective-20261023-3
+background: true
+write_scope:
+  - research/jv_sieve_prospective_20261023/raw/
+  - research/jv_sieve_prospective_20261023/receipts/
+  - research/jv_sieve_prospective_20261023/cards/
+  - target/
+stop_when:
+  - Any command exits with a non-zero status.
+  - The tool exits with status 2 and prints an IMPEDIMENT line.
+  - A line beginning with 'command' and ending with 'FAILED' is printed.
+notes: "Resume of CARD-jv-sieve-prospective-20261023-2 after the container was reclaimed (PROTOCOL.md Deviations log item 1); raw/endo_check.jsonl is completed and kept, run.sh skips completed outputs. The host is shared with another running experiment (research/ghs3_vs_rho_20261023/run.sh). Operation counts are the claim; wall time is an observation only. Binaries were built at HEAD before this card; the build step is a no-op. Launch the one command detached so it survives you: setsid nohup python3 tools/task_card.py run research/jv_sieve_prospective_20261023/cards/CARD-jv-sieve-prospective-20261023-3.yaml > research/jv_sieve_prospective_20261023/receipts/CARD-jv-sieve-prospective-20261023-3.launch.log 2>&1 < /dev/null & - then print the PID (echo $!) and return immediately with the PID and the log path. Do not wait for it, do not poll it."

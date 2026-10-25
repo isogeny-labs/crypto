@@ -38,6 +38,8 @@ jobs:
       - name: Native mathematical and verifier tests
         run: |
           python3 tools/isolated_bench.py busy -- cargo test --locked --release --manifest-path research/boolean_f5_call_only_ceiling_20261002/Cargo.toml -- --test-threads=1
+      - name: Install rustfmt (the runner toolchain ships without it)
+        run: rustup component add rustfmt
       - name: Rust formatting
         run: cargo fmt --manifest-path research/boolean_f5_call_only_ceiling_20261002/Cargo.toml --check
       - name: Development route and small F4 controls

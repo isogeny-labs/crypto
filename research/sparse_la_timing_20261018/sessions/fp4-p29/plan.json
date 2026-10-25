@@ -1,0 +1,438 @@
+{
+  "schema": "ecbench.plan/v1",
+  "spec_id": "ECS1hd976c781b39f",
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "family": "rho",
+        "params": {
+          "cap_multiple": "64"
+        },
+        "method_id": "ECM1hefea4e0ebe79",
+        "method_sha256": "efea4e0ebe79dadfedeb75106dab92e25fc26bfe282155ee0326380d4184e995",
+        "entry": "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())"
+      }
+    },
+    {
+      "name": "sg",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "linalg": "structured-gauss",
+          "max_trials": "20000",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1h851caee0753b",
+        "method_sha256": "851caee0753bc0a18de69b1c481099f1e826047f5b9c7d36f47d30e1736a8108",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "sg-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "linalg": "structured-gauss",
+          "max_trials": "20000",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1h851caee0753b",
+        "method_sha256": "851caee0753bc0a18de69b1c481099f1e826047f5b9c7d36f47d30e1736a8108",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "ig",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "linalg": "incremental-gauss",
+          "max_trials": "20000",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1h46db10858101",
+        "method_sha256": "46db108581014303e73b2600cdd66c8fd78c86e856a08848ff6f5f0764263ed3",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "igfr",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "linalg": "incremental-gauss-full-rank",
+          "max_trials": "20000",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1hae6fc7a418fe",
+        "method_sha256": "ae6fc7a418fee991840d6e8a6e3d5d3366c72bc871038303452b84222e25a5ab",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "sparse-cado",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "linalg": "sparse-cado",
+          "max_trials": "20000",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1h8062158180b3",
+        "method_sha256": "8062158180b3245e32e8aee3e4efc5ceef26dafa854558a427046ab39a61af94",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "filter-wiedemann",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "linalg": "filter+wiedemann",
+          "max_trials": "20000",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1h3a8e896d2eb3",
+        "method_sha256": "3a8e896d2eb30efefbc09e36b4320f1a15d74c88182918a0f8b6b58c0fdc9c4a",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "filter-lanczos",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "linalg": "filter+lanczos",
+          "max_trials": "20000",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1hca1f9f769a5a",
+        "method_sha256": "ca1f9f769a5a6dfadba5f64aa9303205ab62d47000a14c2fc5625c8af1135a23",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "wiedemann",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "linalg": "wiedemann",
+          "max_trials": "20000",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1hf5613bec34f1",
+        "method_sha256": "f5613bec34f14d7b4617e0811d9a71f9cbbc26e992f67955291c3beefe1493d8",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "lanczos",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "linalg": "lanczos",
+          "max_trials": "20000",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1h9047ebc4acaf",
+        "method_sha256": "9047ebc4acaf80abec1eea262b5afcab09cc7723d3d495674dd6633b4f81fe53",
+        "entry": "ic_framework::run_pipeline"
+      }
+    }
+  ],
+  "workloads": [
+    {
+      "workload_id": "Wc87e324798ff",
+      "workload_sha256": "c87e324798ffa1f191ddaf15a7992aaa04bf353df730024125036394f1dabc0b",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 29,
+        "seed": 1,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp5k4-tm926-7bc5b359",
+        "icv1": "ICV1:fpk-29-4-9dbb234a:-926:708208:5,20,2,25:unk:unk:r:7bc5b3595444",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(29, 1, 16)",
+        "field_degree": null,
+        "field_bits": 5,
+        "group_order": 708208,
+        "r": 44263,
+        "cofactor": 16,
+        "generator": [
+          "0x9a771",
+          "0x256e2"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 202610134029,
+      "target_index": 0,
+      "target": [
+        "0x4598d",
+        "0x60c4f"
+      ],
+      "planted": 5009
+    },
+    {
+      "workload_id": "W1016932647b2",
+      "workload_sha256": "1016932647b2d13dcc555d2c12fa2e17cc0c1e490173216707275623f72a061f",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 29,
+        "seed": 1,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp5k4-tm926-7bc5b359",
+        "icv1": "ICV1:fpk-29-4-9dbb234a:-926:708208:5,20,2,25:unk:unk:r:7bc5b3595444",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(29, 1, 16)",
+        "field_degree": null,
+        "field_bits": 5,
+        "group_order": 708208,
+        "r": 44263,
+        "cofactor": 16,
+        "generator": [
+          "0x9a771",
+          "0x256e2"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 202610134029,
+      "target_index": 1,
+      "target": [
+        "0x4862a",
+        "0x1f184"
+      ],
+      "planted": 28866
+    }
+  ],
+  "executions": [
+    {
+      "seq": 0,
+      "round": 0,
+      "warmup": false,
+      "arm": 6,
+      "workload": 0,
+      "algorithm_seed": 6441914249346652131
+    },
+    {
+      "seq": 1,
+      "round": 0,
+      "warmup": false,
+      "arm": 5,
+      "workload": 0,
+      "algorithm_seed": 6441914249346652131
+    },
+    {
+      "seq": 2,
+      "round": 0,
+      "warmup": false,
+      "arm": 7,
+      "workload": 0,
+      "algorithm_seed": 6441914249346652131
+    },
+    {
+      "seq": 3,
+      "round": 0,
+      "warmup": false,
+      "arm": 2,
+      "workload": 0,
+      "algorithm_seed": 6441914249346652131
+    },
+    {
+      "seq": 4,
+      "round": 0,
+      "warmup": false,
+      "arm": 8,
+      "workload": 0,
+      "algorithm_seed": 6441914249346652131
+    },
+    {
+      "seq": 5,
+      "round": 0,
+      "warmup": false,
+      "arm": 1,
+      "workload": 0,
+      "algorithm_seed": 6441914249346652131
+    },
+    {
+      "seq": 6,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 0,
+      "algorithm_seed": 6441914249346652131
+    },
+    {
+      "seq": 7,
+      "round": 0,
+      "warmup": false,
+      "arm": 4,
+      "workload": 0,
+      "algorithm_seed": 6441914249346652131
+    },
+    {
+      "seq": 8,
+      "round": 0,
+      "warmup": false,
+      "arm": 9,
+      "workload": 0,
+      "algorithm_seed": 6441914249346652131
+    },
+    {
+      "seq": 9,
+      "round": 0,
+      "warmup": false,
+      "arm": 3,
+      "workload": 0,
+      "algorithm_seed": 6441914249346652131
+    },
+    {
+      "seq": 10,
+      "round": 0,
+      "warmup": false,
+      "arm": 4,
+      "workload": 1,
+      "algorithm_seed": 6504574087212766840
+    },
+    {
+      "seq": 11,
+      "round": 0,
+      "warmup": false,
+      "arm": 1,
+      "workload": 1,
+      "algorithm_seed": 6504574087212766840
+    },
+    {
+      "seq": 12,
+      "round": 0,
+      "warmup": false,
+      "arm": 3,
+      "workload": 1,
+      "algorithm_seed": 6504574087212766840
+    },
+    {
+      "seq": 13,
+      "round": 0,
+      "warmup": false,
+      "arm": 7,
+      "workload": 1,
+      "algorithm_seed": 6504574087212766840
+    },
+    {
+      "seq": 14,
+      "round": 0,
+      "warmup": false,
+      "arm": 8,
+      "workload": 1,
+      "algorithm_seed": 6504574087212766840
+    },
+    {
+      "seq": 15,
+      "round": 0,
+      "warmup": false,
+      "arm": 6,
+      "workload": 1,
+      "algorithm_seed": 6504574087212766840
+    },
+    {
+      "seq": 16,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 1,
+      "algorithm_seed": 6504574087212766840
+    },
+    {
+      "seq": 17,
+      "round": 0,
+      "warmup": false,
+      "arm": 9,
+      "workload": 1,
+      "algorithm_seed": 6504574087212766840
+    },
+    {
+      "seq": 18,
+      "round": 0,
+      "warmup": false,
+      "arm": 2,
+      "workload": 1,
+      "algorithm_seed": 6504574087212766840
+    },
+    {
+      "seq": 19,
+      "round": 0,
+      "warmup": false,
+      "arm": 5,
+      "workload": 1,
+      "algorithm_seed": 6504574087212766840
+    }
+  ]
+}

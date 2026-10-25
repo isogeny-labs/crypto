@@ -30,6 +30,8 @@ jobs:
       - name: Native mathematical and verifier tests
         run: |
           python3 tools/isolated_bench.py busy -- cargo test --locked --release --manifest-path research/boolean_graded_tail_reuse_20261003/Cargo.toml -- --test-threads=1
+      - name: Install rustfmt (the runner toolchain ships without it)
+        run: rustup component add rustfmt
       - name: Rust formatting
         run: cargo fmt --manifest-path research/boolean_graded_tail_reuse_20261003/Cargo.toml --check
   qualified-discovery:
