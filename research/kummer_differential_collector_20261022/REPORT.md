@@ -2,7 +2,10 @@
 
 Later concrete arithmetic gates are recorded separately: [N13's exhaustive
 three-model 16-bit census](n13-concrete-gate/REPORT.md) and [N14's finite
-sample on the other 18 models](n14-concrete-gate/REPORT.md). Neither adds a
+sample on the other 18 models](n14-concrete-gate/REPORT.md). The [N15 bounded
+signed lift](n15-bounded-lift/REPORT.md) repairs all 1,125 direct-lift nulls
+within that same frozen 138,095-state scope, including 631 that remained null
+after the earlier fallback. These arithmetic packets add no
 new collector/rho cost ratio.
 
 Frozen output for `KUMMER-DIFFERENTIAL-COLLECTOR-20261022`, 2026-10-22 UTC.

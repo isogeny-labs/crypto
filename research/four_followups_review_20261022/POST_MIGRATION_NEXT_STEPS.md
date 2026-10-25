@@ -38,6 +38,14 @@ xADD calls matched the oracle; 62 signed lifts returned no divisor. This is a
 finite sample, so step 2's all-state and full cold-cost gates remain open and
 the rho ratio is null.
 
+The [N15 bounded-lift packet](../kummer_differential_collector_20261022/n15-bounded-lift/REPORT.md)
+replays the combined 138,095-state N13/N14 scope. Its source path recovered
+all 1,125 fast-law failures, including the 631 states that remained null after
+the earlier fallback, with zero final null or wrong result and
+retains the full operation counters. The algebraic candidate bound is
+conditional on model action/projection identities without an all-state
+certificate; no collector-level or rho ratio is inferred.
+
 The [N12 independent-host replay](../factor_base_heldout_replay_20261025/REPORT.md)
 verified all 420 candidate and rho scalars on a separate EC2 instance. Its
 seven raw files are byte-identical to the original; the aggregate ratio is
