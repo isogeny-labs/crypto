@@ -1275,6 +1275,44 @@ mod tests {
         assert_eq!(candidate.small_point_indices.len(), 3);
         assert_eq!(candidate.residual_points.len(), 2);
         graph.feed(candidate).unwrap();
+
+        // Exercise both six-summand shapes used by the hosted N83 pilots.
+        // The target coefficients are constructed from exact domain points;
+        // SAT must still find and group-verify a candidate through each path.
+        let single_six_a = BigUint::from(selected[0].0 * 3 + selected[1].0 * 2 + selected[2].0);
+        let (candidate, stats) = domains.search(
+            6,
+            &single_six_a,
+            &BigUint::zero(),
+            &target,
+            5,
+            1,
+            bounded,
+            true,
+        );
+        let candidate = candidate.unwrap_or_else(|| panic!("5+1 SAT search: {stats:?}"));
+        assert!(stats.models > 0);
+        assert_eq!(candidate.small_point_indices.len(), 5);
+        assert_eq!(candidate.residual_points.len(), 1);
+        graph.feed(candidate).unwrap();
+
+        let double_six_a =
+            BigUint::from(selected[0].0 * 2 + selected[1].0 * 2 + selected[2].0 + selected[3].0);
+        let (candidate, stats) = domains.search(
+            7,
+            &double_six_a,
+            &BigUint::zero(),
+            &target,
+            4,
+            2,
+            bounded,
+            true,
+        );
+        let candidate = candidate.unwrap_or_else(|| panic!("4+2 SAT search: {stats:?}"));
+        assert!(stats.models > 0);
+        assert_eq!(candidate.small_point_indices.len(), 4);
+        assert_eq!(candidate.residual_points.len(), 2);
+        graph.feed(candidate).unwrap();
     }
 
     #[test]
