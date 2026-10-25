@@ -91,6 +91,15 @@ The [selector-and-phase pinned planted control](root-pinned-20261025/RESULT.md)
 subsequently passed with independent original-field group and row replay.
 It supplies a circuit correctness gate, not a free-selector or natural-yield
 result. Keep the Linux control and natural-query gates separate.
+The [two choice-isolation controls](choice-pins-20261025/RESULT.md) use the
+same archive and checked planted row: phase zero pinned with selectors free
+searched for 0.239 seconds, and selectors pinned with phases free searched
+for 16.589 seconds. Their independent audit passed. Both are constructed L0
+controls; the free-choice Linux and natural-query gates remain open. The
+opt-in modes are `primary-full-d18-m4-l0-shared-phase-pinned` and
+`primary-full-d18-m4-l0-shared-selector-pinned`. Their source commit is
+`d775b18dc427188e0279f4189c3c63b570f780fc` and binary SHA-256 is
+`0826acbe6a3e55fc747be480453cd1bca9c053adb584ce7e55548e13985644e4`.
 That gate adds an opt-in `primary-full-d18-m4 positive|natural` worker with
 hard resource checks, durable phase/shape records, SAT-model verification,
 group lift, row replay and rank-one control. Its natural result requires a

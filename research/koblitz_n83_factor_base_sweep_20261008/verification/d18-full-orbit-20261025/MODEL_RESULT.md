@@ -51,3 +51,7 @@ seconds. The Linux positive-control gate remains open.
 An [additional selector-and-phase pinned control](root-pinned-20261025/RESULT.md)
 returned a checked planted row with independent group replay; the original
 free-selector Linux positive-control and natural gates remain open.
+Two [single-dimension choice controls](choice-pins-20261025/RESULT.md) also
+returned the same checked row: phase pinned with selectors free took 0.239 s
+of SAT search; selectors pinned with phases free took 16.589 s. Both are
+constructed L0 runs, with full import and process costs retained separately.

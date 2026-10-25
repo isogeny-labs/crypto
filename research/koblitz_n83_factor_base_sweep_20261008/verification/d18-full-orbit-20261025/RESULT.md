@@ -93,3 +93,8 @@ answer. A further [root-choice pinned planted control](root-pinned-20261025/RESU
 returned a checked rank-one row with independent group replay; it supplied
 the choices to SAT and is excluded from natural useful-rank counts. Natural
 relation yield and full IC stages remain unmeasured.
+The [choice-isolation controls](choice-pins-20261025/RESULT.md) then retained
+two more independently replayed planted rows under separate phase-only and
+selector-only pins. Their SAT search times were 0.239 s and 16.589 s,
+respectively. They remain component controls; the cold one-target runtime
+and best-base selection are still open.
