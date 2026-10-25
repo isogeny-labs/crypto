@@ -104,12 +104,14 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.sha }}
           fetch-depth: 0
+          filter: blob:none
       - name: Check out the history branch
         uses: actions/checkout@v4
         with:
           ref: ${{ env.HISTORY_BRANCH }}
           path: perf-history
           fetch-depth: 0
+          filter: blob:none
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Install the frozen profiler
