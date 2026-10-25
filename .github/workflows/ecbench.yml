@@ -517,6 +517,14 @@ jobs:
     needs: [scope, harness]
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 25
+    # The whole audit no longer fits one 2-vCPU hosted runner inside the PR
+    # cap: a shard of 273 MB of (decompressed) records took 15 min there, and
+    # there are ~3.2 GB in all. Sixteen jobs balanced by record bytes audit
+    # ~200 MB each.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -550,10 +558,11 @@ jobs:
           name: ecbench-pr-audit-bin
           path: target/release
       - name: Validate committed evidence integrity on pull requests
-        # The job keeps its 25-minute PR budget (check-pr-budgets.py). The 113
-        # gzipped isogeny-volcano-cost-v2 sessions alone take about 8 minutes
-        # to audit on 4 cores (decompress + verify --replay 0), so 12 is too short.
-        timeout-minutes: 22
+        # Sixteen byte-balanced shards keep per-run audit work within the PR cap;
+        # each shard verifies every assigned session and the matrix covers all.
+        timeout-minutes: 20
+        env:
+          AUDIT_SHARD: ${{ matrix.shard }}/16
         run: |
           chmod +x target/release/ecbench
           bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
