@@ -73,14 +73,19 @@ controls. Each candidate cold record charges4 membership checks once at setup,
 with unchanged matrix and group requests. The first rejected ordering assumption
 is retained with its pre-rerun correction. The next concrete draft is a
 [setup-charged signed base cache](../../backlog/XP-20261025-signed-base-cache/README.md);
-freeze its interface and charges before execution.
+This round is now [executed](reports/signed-cache-20261025/README.md):80 paired
+setups/800 scalars, identical ordered lifts/certificates and7 rehashed controls.
+All400 cached cold records use fewer point-add requests than the binary
+reference; first main125->47 and twist136->42, with setup included. The old
+loop includes unused doublings, so the next [direct-sign reference draft](../../backlog/XP-20261025-direct-sign-reference/README.md)
+keeps both old arms and adds uncached direct signs before a cache-cost verdict.
 A non-isomorphic twist comparison still needs an explicit scalar-preserving
 subgroup map or pairing-mediated route before claiming main-DLP benefit;
 base-field rational points must not be silently transported by a generic twist.
 
 | Work item | Next checkable deliverable | Evidence needed before promotion |
 | --- | --- | --- |
-| Solver relevance | Cache checked plus/minus base points for actual lifting, then rerun the fixed workload | Charge cache setup/validation/reads; preserve every ordered lift, witness, failed query and recovery; full calibration remains |
+| Solver relevance | Compare direct uncached signs with both frozen binary and cached arms | Preregister and independently verify120 setups/1200 separate recoveries, charge all sign/read/cache costs, preserve order and failures; complete pricing remains |
 | Alternative encoding | Specify an actual descent/rationality encoding and test whether its leading ideal can differ | Exact field/subgroup/map, actual-point lifting, matched-base/pullback controls, bounded native comparison and faithful Lean statements |
 | Useful yield | Test or prove the yield of rank-increasing rows under an explicit candidate/target policy | Full rank progression, failed attempts and dependence assumptions; raw zeros and multiple rows per call remain distinct |
 | Main-DLP benefit | Combine a surviving candidate with a scalar-preserving reduction and complete work accounting | Setup, relation solving, linear algebra, descent, transfer, recovery and verification on the same public synthetic target; applicable external references for any speed claim |

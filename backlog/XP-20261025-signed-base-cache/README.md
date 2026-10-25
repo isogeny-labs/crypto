@@ -1,24 +1,15 @@
-# Setup-charged signed base point cache
+# Signed base point cache: executed local evidence
 
-Draft next step, **not executed**. The known-root comparison verifies800 source
-recoveries while preserving all point-add requests; the first prefix target
-still needs125 main versus136 twist requests. Root lifting repeatedly computes
-plus/minus1 times the same two base points with a binary chain.
+[Executed comparison](../../research/quadratic_twist_evidence_20261021/reports/signed-cache-20261025/README.md):
+80 paired setups/800 source checks, all ordered lifts/rows/certificates unchanged,
+seven rehashed controls reject. First prefix cold point-add requests change
+main125->47, twist136->42, with cache validation charged. All400 candidate
+records use fewer such requests than the specified frozen binary reference.
 
-Preregister exact cached points, validation, setup/build/read charges, reference,
-coverage, counters, controls and native budget before execution. Keep all40
-setups/400 separate targets per arm, all policies and transported roles. Preserve
-ordered sign lifts including those after the first successful lift in a query,
-rows, solver certificates, failed shifts, base logs and source answers. Recovery
-must receive Q only. Charge cache creation and validation cold, not only lookups.
+Nine new public Lean theorems prove validation, ordered-list equality and actual
+F43 source recovery. The old loop includes unused final doublings; this request
+comparison is not a runtime/complete-cost result. The next draft tests direct
+uncached signs as a stronger reference and keeps the original binary arm.
 
-Prove the relevant group equivalences and check actual field/point operations
-independently. Include false cached sign, false point, missing entry, stale
-source, omitted failed query and false scalar controls. Use600s native caps,
-3600s iteration envelope and existing local resources only; no paid compute or
-uploads/credential reuse. A changed request profile is not a speed result;
-calibrated total, matched references and external-fastest gates remain.
-
-The future run-signed-cache.sh does not yet exist. Draft status means implement
-and freeze it, not block the overall program. The code commit remains null for
-main-ancestry/Cairn gates; no task lease, funding or publication is claimed.
+This card stays **draft** for main-ancestry/Cairn routing. Protocol/source commits
+precede execution; local evidence does not claim a lease, funding or publication.

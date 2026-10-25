@@ -194,8 +194,15 @@ failed query and scalar is unchanged; cold membership requests are645->4 and
 Lean theorems prove complete membership roots and actual-input equivalence;
 the scoped gate audits238 declarations /182 public theorems, zero extra trusted.
 The algorithm change is a verified request reduction, not a priced total gain.
-The [next draft](../backlog/XP-20261025-signed-base-cache/README.md) tests a
-setup-charged signed-point cache for the still-repeated actual lifting requests.
+The [signed-cache comparison](../research/quadratic_twist_evidence_20261021/reports/signed-cache-20261025/README.md)
+now executes80 paired setups/800 checked scalars, preserving all ordered lifts
+and certificates. All400 cached cold records reduce point-add requests relative
+to the frozen binary loop; first main125->47/twist136->42 including validation.
+Nine new public Lean theorems prove group/list/recovery implications and actual
+F43 cache/logs;191 public/249 audited declarations,0 extra trusted. This remains
+an unpriced request change. The old loop includes unused final doublings; the
+[next direct-sign draft](../backlog/XP-20261025-direct-sign-reference/README.md)
+adds a stronger uncached reference while preserving both old arms.
 
 The [executed adaptive-S3 round](../research/quadratic_twist_evidence_20261021/reports/adaptive-s3-20261025/README.md)
 checks the named row-reinsertion solver on all98 prior cases,188 comparisons

@@ -3,7 +3,7 @@
   "id": "XP-20261025-signed-base-cache",
   "title": "Cache checked signed base points for actual S3 lifting",
   "status": "draft",
-  "status_note": "Next unexecuted draft: preregister cache contents, setup and lookup charges, exact lift ordering and coverage before execution. No Cairn lease or promotion claimed.",
+  "status_note": "Executed local evidence in PR2381:80 paired setups/800 scalar checks, exact ordered lifts/certificates and7 rehashed controls. Remains draft for main-ancestry/Cairn gates; no task lease/publication claimed.",
   "created": "2026-10-25",
   "authors": [
     "research reasoning lane"
@@ -22,7 +22,7 @@
         "--release",
         "--locked",
         "--manifest-path",
-        "research/quadratic_twist_evidence_20261021/native/known-roots-audit/Cargo.toml"
+        "research/quadratic_twist_evidence_20261021/native/signed-cache-audit/Cargo.toml"
       ]
     ]
   },
@@ -67,7 +67,7 @@
     ],
     "env": {
       "name": "crypto-rust",
-      "recipe": "Draft: implement and independently verify setup-charged signed base point cache against known-roots route; preserve point lift ordering."
+      "recipe": "Executed local paired evidence is linked in notes; draft routing card only, no Cairn lease or publication. Preserve setup-charged requests and every ordered sign lift."
     },
     "exec": {
       "cpus": 2,
@@ -85,7 +85,9 @@
   },
   "outputs": {
     "result_schema": "quadratic-twist-signed-cache/v1",
-    "verify": [],
+    "verify": [
+      "bash research/quadratic_twist_evidence_20261021/run-signed-cache.sh {out}/replay"
+    ],
     "land": "research/quadratic_twist_evidence_20261021"
   },
   "links": {
@@ -95,7 +97,9 @@
     "lead": "crypto-autoresearcher:LEAD-ICE-charged-toy-ic-exponent-vs-rho",
     "notes": [
       "research/quadratic_twist_evidence_20261021/reports/known-roots-20261025/README.md",
-      "research/quadratic_twist_evidence_20261021/CONTINUATION.md"
+      "research/quadratic_twist_evidence_20261021/CONTINUATION.md",
+      "research/quadratic_twist_evidence_20261021/SIGNED_CACHE_20261025_PROTOCOL.md",
+      "research/quadratic_twist_evidence_20261021/reports/signed-cache-20261025/README.md"
     ]
   },
   "blocked_on": []

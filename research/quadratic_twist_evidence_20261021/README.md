@@ -244,3 +244,13 @@ roots, four membership evaluations per cold record. All other matrix/group
 requests remain; total cost is unpriced. Six new Lean theorems,182 public/238
 audited total, zero extra trusted. [Next draft](../../backlog/XP-20261025-signed-base-cache/README.md)
 tests charged signed-base caching; no running background job is claimed.
+
+## Signed base cache continuation (2026-10-25)
+
+[Executed report](reports/signed-cache-20261025/README.md):80 paired setups/800
+source checks, identical ordered lifts/certificates and7 rehashed rejection
+controls. All400 candidate records use fewer point-add requests than the frozen
+binary reference (first main125->47,twist136->42), with cache setup charged.
+Nine new public Lean theorems;191 public/249 audited total,0 extra trusted.
+The old loop includes unused doubling; [next draft](../../backlog/XP-20261025-direct-sign-reference/README.md)
+compares direct uncached signs before a cache-cost verdict. No speed claim.

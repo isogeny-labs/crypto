@@ -11,8 +11,8 @@
 | Independent verification of saved/new IC data | verified | tuple-based auditor verifies three headline and 81 complete-log certificates |
 | Native controls | verified | false new relation, removed log certificate and false historical census count rejected |
 | Historical general readable arguments | preserved | archived report remains available with its original hypotheses |
-| Checked Lean implications and proof map | partial overall; finite S3/degree/source-reduction, adaptive fixture and shifted recovery verified |182 public named theorems /238 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, yield/rank/cost, S3 ideals/degree certificates, F43 reduction, row-adjunction, D2/D3, exact twist vanishing space and annihilator-aware shifted recovery checked; general geometry and complete-work bridges remain open |
-| Algebraic identity certificates | verified for fifteen stated study identities | all previous fourteen retained; checked-root monic expansion IDC1he9f02ada0008638c adds32+16 replay, arithmetic false-identity and false-source controls; completeness is separately Lean-proved |
+| Checked Lean implications and proof map | partial overall; finite S3/degree/source-reduction, adaptive fixture and shifted recovery verified |191 public named theorems /249 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, yield/rank/cost, S3 ideals/degree certificates, F43 reduction, row-adjunction, D2/D3, exact twist vanishing space and annihilator-aware shifted recovery checked; general geometry and complete-work bridges remain open |
+| Algebraic identity certificates | verified for sixteen stated study identities | all previous fifteen retained; inverse-coordinate IDC1h202bb532af10c977 adds32+16 replay and false controls; cache/group/list implications separately Lean-proved |
 | Exact curve/model/subgroup identities | verified within stated representations | 1,921 registered monic models, 27 EC1 representations; unused subgroup choices stay unknown |
 | Shared Conductor check | blocked by unavailable tool/configuration | CLI exits 127; shared workflow/state unavailable; no reservation claimed |
 | Repository `cargo test --release --lib --locked` | passed on refreshed code and unchanged registry | 4,479 passed, 119 existing ignores; earlier 4,474 receipt and prior failures retained in `validation/` |
@@ -53,9 +53,11 @@
 | Shifted-relation recovery proof | kernel checked on actual F43 map | five new public theorems; source annihilator is explicit for modulo reduction; total176/231, zero extra trusted |
 | Known-factor-base-root query | executed locally and independently verified |80 paired setups/800 separate scalars; all100 certificates unchanged; root completeness proved,4 setup membership checks instead of129/query,9 corruption controls reject |
 | Complete-work improvement from checked roots | not priced |32 differently weighted request components; sorting and other overhead unpriced; no speed/GAE/S claim |
-| Signed base point cache | draft next experiment, not executed | `backlog/XP-20261025-signed-base-cache`; freeze exact cache validation/setup/read accounting and preserve all ordered lifts |
+| Signed base point cache | executed and independently replayed |80 paired setups/800 scalars; all400 candidate cold point-add counts lower than binary reference; first main125->47/twist136->42, cache validation included; seven controls reject |
+| Cached-lift/source proof | kernel checked |9 new public theorems,191 public/249 audited total,0 extra trusted; actual F43 cache/logs and arbitrary/repeated column recovery |
+| Direct uncached sign reference | next unexecuted draft | `backlog/XP-20261025-direct-sign-reference`; old binary loop includes unused doublings, so complete-cache advantage remains open |
 
-The fresh library suite for the checked-root continuation again passes 4,479
+The fresh library suite for the signed-cache continuation again passes 4,479
 tests with zero failures and 119 existing ignores; its 22 backend and four
 workflow metadata tests pass. Earlier library and 39/40 metadata-backend
 receipts remain historical records for their original source states.

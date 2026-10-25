@@ -179,9 +179,29 @@ def twist_known_roots(ref):
                  better="lower", label="F43 prefix/Q=P cold membership requests; unpriced", source=path)
 
 
+def twist_signed_cache(ref):
+    """Emit recorded request counts only, with no implied attack-speed ranking."""
+    path = "research/quadratic_twist_evidence_20261021/native/signed-cache-20261025/audit.json"
+    text = show(ref, path)
+    if text is None:
+        return
+    d = json.loads(text)
+    if d.get("status") != "passed":
+        return
+    emit("ic.twist.signed_cache.verified_targets", d["verified"], date="2026-10-25",
+         problem=P_IC, unit="verified separate recoveries", better="higher", source=path)
+    for arm in ("reference", "signed_cache"):
+        for role in ("main", "twist"):
+            value = d["first_policy_target"][arm][role]["cold"]["point_add_requests"]
+            emit(f"ic.twist.signed_cache.{arm}.{role}.prefix_target1.point_add_requests",
+                 value, date="2026-10-25", problem=P_IC, unit="point-add requests",
+                 better="lower", label="F43 prefix/Q=P cold point requests; unpriced", source=path)
+
+
 def main():
     a = args()
     twist_known_roots(a.ref)
+    twist_signed_cache(a.ref)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
     perf_history(a.since)
