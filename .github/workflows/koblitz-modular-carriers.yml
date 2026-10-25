@@ -204,7 +204,7 @@ jobs:
           set -euo pipefail
           round=research/koblitz_modular_ic_20261018/rounds/21
           (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
-          # The sealed validation archive awaits artifact-store access (round21/RELEASE.md).
+          # Validation logs are published in the artifact store; see round21/RELEASE.md.
           # Replay uses the committed raw archive; the complete Lean gate below is retained.
           "$round/REPLAY.sh"
           research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-sources "$round"

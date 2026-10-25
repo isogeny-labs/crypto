@@ -934,3 +934,22 @@ member manifest. Exit criterion: restore intended store access,push without
 replacement,verify a fresh pull,and commit the index entry. See
 [release evidence](../research/koblitz_modular_ic_20261018/rounds/21/RELEASE.md).
 This access gap does not change the mathematical acceptance criteria above.
+
+
+Artifact access follow-up: user-supplied artifact credentials pass STS
+authentication,but both an existing-object read and the conditional,
+checksum-protected PutObject to the configured store fail. No object/index
+promotion or fresh remote validation occurred. The exit criterion above
+remains open;see [attempt02](../research/koblitz_modular_ic_20261018/rounds/21/STORE_UPLOAD_ATTEMPT02.txt).
+
+
+Artifact publication gap resolved: the user corrected the intended bucket
+to setec-astronomy-artifacts. The same artifact credentials successfully
+uploaded the sealed14861500-byte archive through the native store,without
+replacement. A fresh remote pull passes native SHA256,byte equality and
+remote verification. The store index records the explicit remote in
+provenance;default configuration and the other26 entries are unchanged.
+See [receipt](../research/koblitz_modular_ic_20261018/rounds/21/ARTIFACT_PUBLICATION.json)
+and [download command](../research/koblitz_modular_ic_20261018/rounds/21/RELEASE.md).
+Only the artifact access/publication gap is closed;all mathematical
+acceptance criteria above remain open as previously recorded.

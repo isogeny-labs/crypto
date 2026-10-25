@@ -173,3 +173,18 @@ archive validation receipt. Reissue ledger.json after this protocol/CI
 release-only correction with the same144 raw files;require byte-identical
 runs.sha256 and a fresh current/committed source-pin check. No scientific
 computation,proof or budget is changed by this release amendment.
+
+
+## Corrected artifact destination,2026-10-25 UTC
+
+The user identified setec-astronomy-artifacts as the intended artifact
+bucket. A scoped CRYPTO_STORE_REMOTE=s3://setec-astronomy-artifacts/store
+override publishes the unchanged validation archive,without replacement.
+A new empty cache receives a full remote download;native digest equality,
+byte comparison and remote verification pass. Record the store index entry
+with the remote in provenance,retain earlier wrong-bucket failures and
+leave other entries/default configuration unchanged. No scientific run,
+proof,budget or archive byte changes. Preserve the51d1eb3 ledger as
+ledger-release01.json before repinning this release correction,requiring
+the identical144-member raw manifest. ARTIFACT_PUBLICATION.json and
+RELEASE.md supply the successful receipt and exact pull command.

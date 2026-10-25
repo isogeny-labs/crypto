@@ -100,3 +100,12 @@ local validation stands;remote publication is blocked,not passed. See
 RELEASE.md and the retained failed push receipt. The final ledger repins
 release-only protocol/CI changes;ledger-seal01.json retains the original
 source snapshot checked inside the unchanged validation archive.
+
+
+Artifact publication resolved after the user corrected the destination to
+setec-astronomy-artifacts. Native store push uploads the unchanged archive
+without replacement. A fresh remote download passes the committed native
+SHA256,full byte comparison and remote store verification. The27th store
+index entry records its remote in provenance;use the explicit remote
+override in RELEASE.md. Earlier failures remain as wrong-bucket evidence.
+No mathematical run or proof was repeated for this storage correction.
