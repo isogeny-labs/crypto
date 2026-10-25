@@ -252,8 +252,10 @@ supports, both conditional residue bridges from interpolation and valid
 curve-input congruences, the strict degree bound from a sextic upper bound
 with zero sixth coefficient, matching quintic heads, and quadratic supports,
 and the final coprime-divisibility-plus-degree
-implication in this paragraph. Runtime interpolation and the source residual
-head conditions have not been connected mechanically to every source
+implication in this paragraph. Four further Lean theorems expand a generic
+`N²-u1*u2*U` polynomial and identify its coefficients in degrees six, five,
+and four. Runtime interpolation and substitution of the source common-branch
+coefficients into that polynomial have not been connected mechanically to every source
 execution. The divisor-class step remains written mathematics.
 
 The checker also verifies the cleared identity

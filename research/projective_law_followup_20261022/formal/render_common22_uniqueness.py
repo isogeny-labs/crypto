@@ -12,6 +12,7 @@ ROWS = [
     ("runtime_interpolation", "source_link", "open_source_link", "runtime numerator satisfies both interpolation congruences"),
     ("first_residue", "premise", "kernel_checked_conditional", "interpolation and valid input imply first curve residue"),
     ("second_residue", "premise", "kernel_checked_conditional", "interpolation and valid input imply second curve residue"),
+    ("generic_head", "implication", "kernel_checked_conditional", "generic cubic and quadratic residual has recorded coefficients at degrees six five four"),
     ("source_head", "source_link", "open_source_link", "runtime residual has required degree-five and degree-four coefficients"),
     ("degree_bound", "implication", "kernel_checked_conditional", "matching quintic heads imply difference degree below support product"),
     ("crt_uniqueness", "implication", "kernel_checked_conditional", "the four premises imply residual equals scale times curve"),
@@ -34,6 +35,10 @@ packet = {
         "Common22Degree.cleared_difference_degree_lt_supports",
         "Common22Degree.natDegree_le_five_of_sextic_head_zero",
         "Common22Degree.cleared_difference_degree_lt_supports_of_sextic_head",
+        "Common22PolynomialHead.generic_expansion",
+        "Common22PolynomialHead.generic_coeff_six",
+        "Common22PolynomialHead.generic_coeff_five",
+        "Common22PolynomialHead.generic_coeff_four",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ],
@@ -42,7 +47,7 @@ packet = {
         {"obligation": name, "kind": kind, "status": status, "statement": statement}
         for name, kind, status, statement in ROWS
     ],
-    "scope": "conditional coprimeness, residues, degree implication, and curve equation over a field; runtime interpolation, source polynomial head, and geometry remain open",
+    "scope": "conditional coprimeness, residues, generic polynomial head, degree implication, and curve equation over a field; runtime interpolation, source-head substitution, and geometry remain open",
     "cost_ratio_change": None,
 }
 (ROOT / "common22-uniqueness.json").write_text(json.dumps(packet, indent=2) + "\n")
@@ -52,8 +57,8 @@ with (ROOT / "common22-uniqueness.csv").open("w", newline="") as handle:
     writer.writerows(packet["rows"])
 
 svg = [
-    '<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500">',
-    '<rect width="900" height="500" fill="white"/>',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="900" height="550" viewBox="0 0 900 550">',
+    '<rect width="900" height="550" fill="white"/>',
     '<style>text{font-family:DejaVu Sans,Arial,sans-serif;fill:#243447}.title{font-size:23px;font-weight:bold}.label{font-size:15px}.note{font-size:13px;fill:#475569}</style>',
     '<text x="28" y="38" class="title">Common 2+2 curve-equation proof boundary</text>',
     '<text x="28" y="61" class="note">Green: kernel-checked conditional step. Orange: source or geometry still to connect.</text>',
@@ -67,7 +72,7 @@ for index, (name, _, status, _) in enumerate(ROWS):
         f'<text x="590" y="{y + 16}" class="note">{status.replace("_", " ")}</text>',
     ])
 svg.extend([
-    '<text x="28" y="482" class="note">This diagram counts obligations; it does not measure proof effort or cost.</text>',
+    '<text x="28" y="532" class="note">This diagram counts obligations; it does not measure proof effort or cost.</text>',
     '</svg>',
 ])
 (ROOT / "common22-uniqueness.svg").write_text("\n".join(svg) + "\n")
@@ -84,9 +89,14 @@ to the cleared residual difference, this gives the conditional curve equation.
 A separate Lean lemma proves the strict degree bound from matching head
 coefficients and quadratic-support hypotheses. It covers a degree-at-most-six
 residual whose sixth coefficient vanishes.
+Four additional Lean theorems expand a generic cubic numerator against two
+quadratic supports and a quadratic residual support, then read its coefficients
+at degrees six, five, and four. Substitution of the runtime common-branch
+coefficients into this generic expansion remains open.
 The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log),
 [degree](common22-degree-build.log), and
-[uniqueness](common22-uniqueness-build.log) kernel logs record all fifteen
+[polynomial-head](common22-polynomial-head-build.log) and
+[uniqueness](common22-uniqueness-build.log) kernel logs record all nineteen
 theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list
@@ -96,7 +106,7 @@ printable copy for independent review. It is rendered from
 `COMMON22_UNIQUENESS.tex` with `pdflatex` and optimized with Ghostscript
 `pdfwrite`; the checksum manifest binds the final bytes.
 
-The source interpolation premises and source polynomial head have not been
+The source interpolation premises and source-head substitution have not been
 mechanically connected to the runtime formulas for all valid inputs. The
 principal-divisor and `Pic^0` bridge remain open. No new DLP experiment ran;
 the recorded cost ratios are unchanged.
@@ -117,6 +127,9 @@ $E=B^2F$. A separate theorem derives this degree bound when $E$ has degree
 at most six with zero sixth coefficient, $F$ has degree at most five, their
 scaled coefficients match in degrees five and four, and $u_1,u_2$ are nonzero
 quadratics. These are conditional polynomial statements.
+Four more theorems expand a generic cubic-minus-quadratic product and read its
+coefficients in degrees six, five, and four. The runtime coefficient
+substitution remains open.
 
 \begin{center}
 \begin{tabular}{ll}
@@ -126,6 +139,7 @@ Obligation & Recorded status\\
 Support coprimeness from $B\ne0$ & Kernel checked, conditional\\
 Runtime interpolation link & Open source link\\
 First and second curve residues & Kernel checked, conditional\\
+Generic polynomial head & Kernel checked, conditional\\
 Runtime residual head & Open source link\\
 Degree-bound implication & Kernel checked, conditional\\
 Coprime low-degree implication & Kernel checked, conditional\\

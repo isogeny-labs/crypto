@@ -491,6 +491,19 @@ def main() -> None:
         )
     require(forbidden_proof_token.search(degree_source) is None,
             "forbidden common degree proof token")
+    polynomial_source = (ROOT / "Common22PolynomialHead.lean").read_text()
+    polynomial_log = (ROOT / "common22-polynomial-head-build.log").read_text()
+    for theorem in ("generic_expansion", "generic_coeff_six",
+                    "generic_coeff_five", "generic_coeff_four"):
+        require(re.search(r"(?m)^theorem " + theorem + r"\b", polynomial_source) is not None,
+                f"common polynomial-head theorem missing: {theorem}")
+        require(
+            f"'Common22PolynomialHead.{theorem}' depends on axioms: "
+            "[propext, Classical.choice, Quot.sound]" in polynomial_log,
+            f"common polynomial-head kernel/axiom receipt missing: {theorem}",
+        )
+    require(forbidden_proof_token.search(polynomial_source) is None,
+            "forbidden common polynomial-head proof token")
     uniqueness_source = (ROOT / "Common22Uniqueness.lean").read_text()
     for theorem in ("zero_of_coprime_supports", "residual_eq_curve"):
         require(re.search(r"(?m)^theorem " + theorem + r"\b", uniqueness_source) is not None,
@@ -521,14 +534,18 @@ def main() -> None:
         "Common22Degree.cleared_difference_degree_lt_supports",
         "Common22Degree.natDegree_le_five_of_sextic_head_zero",
         "Common22Degree.cleared_difference_degree_lt_supports_of_sextic_head",
+        "Common22PolynomialHead.generic_expansion",
+        "Common22PolynomialHead.generic_coeff_six",
+        "Common22PolynomialHead.generic_coeff_five",
+        "Common22PolynomialHead.generic_coeff_four",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ], "common uniqueness theorem inventory mismatch")
-    require(len(uniqueness["rows"]) == 8, "common uniqueness obligation count mismatch")
+    require(len(uniqueness["rows"]) == 9, "common uniqueness obligation count mismatch")
     require([row["status"] for row in uniqueness["rows"]] ==
             ["kernel_checked_conditional", "open_source_link",
              "kernel_checked_conditional", "kernel_checked_conditional",
-             "open_source_link", "kernel_checked_conditional",
+             "kernel_checked_conditional", "open_source_link", "kernel_checked_conditional",
              "kernel_checked_conditional", "open_geometry"],
             "common uniqueness proof boundary mismatch")
     with (ROOT / "common22-uniqueness.csv").open(newline="") as handle:
