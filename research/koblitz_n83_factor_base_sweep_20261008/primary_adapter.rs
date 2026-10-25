@@ -645,7 +645,7 @@ pub(super) fn full_d18_m4_cli(
         output,
         false,
         FrobeniusOrbitRootEncoding::PerRepresentative,
-        false,
+        "none",
     )
 }
 
@@ -663,7 +663,7 @@ pub(super) fn full_d18_m4_l0_positive_cli(
         output,
         true,
         FrobeniusOrbitRootEncoding::PerRepresentative,
-        false,
+        "none",
     )
 }
 
@@ -679,7 +679,7 @@ pub(super) fn full_d18_m4_l0_shared_positive_cli(
         output,
         true,
         FrobeniusOrbitRootEncoding::SharedBits,
-        false,
+        "none",
     )
 }
 
@@ -695,7 +695,39 @@ pub(super) fn full_d18_m4_l0_shared_root_pinned_cli(
         output,
         true,
         FrobeniusOrbitRootEncoding::SharedBits,
+        "selector_and_phase_zero",
+    )
+}
+
+pub(super) fn full_d18_m4_l0_shared_phase_pinned_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
         true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "phase_zero",
+    )
+}
+
+pub(super) fn full_d18_m4_l0_shared_selector_pinned_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "selector",
     )
 }
 
@@ -706,7 +738,7 @@ fn full_d18_m4_impl(
     output: &Path,
     l0_diagnostic: bool,
     encoding: FrobeniusOrbitRootEncoding,
-    root_choice_pinned: bool,
+    choice_pins: &'static str,
 ) -> Result<Value> {
     if !["positive", "natural"].contains(&mode) || output.exists() {
         return Err("full D18 m4 mode or fresh output differs from protocol".into());
@@ -714,10 +746,15 @@ fn full_d18_m4_impl(
     if l0_diagnostic && mode != "positive" {
         return Err("L0 diagnostic permits only the constructed positive control".into());
     }
-    if root_choice_pinned && (!l0_diagnostic || encoding != FrobeniusOrbitRootEncoding::SharedBits)
+    if !["none", "phase_zero", "selector", "selector_and_phase_zero"].contains(&choice_pins) {
+        return Err("unsupported planted choice-pin policy".into());
+    }
+    if choice_pins != "none"
+        && (!l0_diagnostic || encoding != FrobeniusOrbitRootEncoding::SharedBits)
     {
         return Err("root-choice pins require the L0 shared-root planted control".into());
     }
+    let root_choice_pinned = choice_pins == "selector_and_phase_zero";
     let memory_limit_bytes = if l0_diagnostic {
         None
     } else {
@@ -740,7 +777,7 @@ fn full_d18_m4_impl(
         &mut phases,
         started,
         "started",
-        json!({"mode":mode, "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "source_commit":source_commit, "binary_sha256":binary_sha256}),
+        json!({"mode":mode, "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "source_commit":source_commit, "binary_sha256":binary_sha256}),
     )?;
     let cap_path = std::path::PathBuf::from(format!("{}.cap.json", output.display()));
     let cap_mode = mode.to_owned();
@@ -748,7 +785,7 @@ fn full_d18_m4_impl(
         std::thread::sleep(Duration::from_secs(budget_seconds));
         let cap = json!({
             "schema":"n83.full-d18-m4-cap/v1", "status":"UNKNOWN_wall_cap",
-            "mode":cap_mode, "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "budget_seconds":budget_seconds,
+            "mode":cap_mode, "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "budget_seconds":budget_seconds,
             "isolation":if l0_diagnostic {"L0_shared_host_no_hard_cgroup"} else {"hard_32GiB_cgroup_zero_swap"},
             "elapsed_process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
             "selected_best_total_runtime":Value::Null,
@@ -833,7 +870,7 @@ fn full_d18_m4_impl(
         12_000_000,
     )
     .map_err(|_| "full D18 m4 domain installation failed")?;
-    if root_choice_pinned {
+    if choice_pins != "none" {
         let (indices, _, _) = planted
             .as_ref()
             .ok_or("root-pinned control has no witness")?;
@@ -856,15 +893,19 @@ fn full_d18_m4_impl(
             if fb.signed_orbit_of[index].1 != 0 {
                 return Err("root-pinned control representative has nonzero phase".into());
             }
-            if !enc
-                .solver
-                .add_clause(vec![handles[block].selectors[column] as i32])
-            {
-                return Err("root-pinned control selector contradicted model".into());
+            if ["selector", "selector_and_phase_zero"].contains(&choice_pins) {
+                if !enc
+                    .solver
+                    .add_clause(vec![handles[block].selectors[column] as i32])
+                {
+                    return Err("root-pinned control selector contradicted model".into());
+                }
             }
-            for &wire in &handles[block].phase {
-                if !enc.solver.add_clause(vec![-(wire as i32)]) {
-                    return Err("root-pinned control phase contradicted model".into());
+            if ["phase_zero", "selector_and_phase_zero"].contains(&choice_pins) {
+                for &wire in &handles[block].phase {
+                    if !enc.solver.add_clause(vec![-(wire as i32)]) {
+                        return Err("root-pinned control phase contradicted model".into());
+                    }
                 }
             }
         }
@@ -897,7 +938,7 @@ fn full_d18_m4_impl(
     let model_ms = model_start.elapsed().as_secs_f64() * 1000.0;
     let shape = json!({
         "variables":enc.solver.n_vars(), "clauses":enc.solver.n_clauses(),
-        "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned,
+        "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins,
         "xor_rows":enc.solver.n_xors(), "model_ms":model_ms,
         "import_ms":import_ms, "object":row["object"],
         "point_set_blake3":FULL_D18_POINT_SET,
@@ -973,7 +1014,7 @@ fn full_d18_m4_impl(
     let result = json!({
         "schema":if l0_diagnostic {"n83.full-d18-m4-l0-positive/v1"} else {"n83.full-d18-m4-worker/v1"}, "status":status,
         "mode":mode, "source_commit":source_commit,
-        "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned,
+        "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins,
         "isolation":if l0_diagnostic {"L0_shared_host_no_hard_cgroup"} else {"hard_32GiB_cgroup_zero_swap"},
         "budget_seconds":budget_seconds,
         "source_attestation_mode":source_attestation_mode,
