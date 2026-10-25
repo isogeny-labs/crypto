@@ -5,10 +5,16 @@ on:
     paths:
       - .github/workflows/p192-geometry-collector-lean.yml
       - research/p192_extension_cover_20261012/lean/**
+      - research/p192_extension_cover_20261012/*cross_cubic_anchor*
+      - research/p192_extension_cover_20261012/*residual_point_reuse*
+      - research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/**
   pull_request:
     paths:
       - .github/workflows/p192-geometry-collector-lean.yml
       - research/p192_extension_cover_20261012/lean/**
+      - research/p192_extension_cover_20261012/*cross_cubic_anchor*
+      - research/p192_extension_cover_20261012/*residual_point_reuse*
+      - research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/**
   workflow_dispatch:
 
 jobs:
@@ -72,3 +78,30 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/verify_residual_endpoint_high_degree.py
           python3 -B research/p192_extension_cover_20261012/analyze_residual_endpoint_combined_rows.py
           sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024-high-degree/ARTIFACTS.sha256
+  cross-cubic-anchor-fan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and fresh-check anchored fan theorems
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: research/p192_extension_cover_20261012/lean
+          auto-config: false
+          use-mathlib-cache: true
+          build: true
+          build-args: 'CrossCubicAnchorFan'
+          test: false
+          lint: false
+          leanchecker: true
+          leanchecker-args: '--fresh --verbose CrossCubicAnchorFan'
+      - name: Audit axioms and replay anchored geometry
+        run: |
+          cd research/p192_extension_cover_20261012/lean
+          lake env lean CrossCubicAnchorFan.lean
+          cd ../../..
+          python3 -B research/p192_extension_cover_20261012/screen_residual_point_reuse.py
+          python3 -B research/p192_extension_cover_20261012/screen_cross_cubic_anchor.py
+          python3 -B research/p192_extension_cover_20261012/verify_cross_cubic_anchor_degree_eight.py
+          python3 -B research/p192_extension_cover_20261012/analyze_cross_cubic_anchor_combined_rows.py
+          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/ARTIFACTS.sha256
