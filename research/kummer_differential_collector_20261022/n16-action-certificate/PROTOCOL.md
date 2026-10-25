@@ -27,3 +27,9 @@ available square roots of `f(x)`. Record missing projections, action
 failures, and all tested class IDs. These are finite checks only. Provide an
 independent validator for raw counts and digests, plus a neutral report,
 graph, and PDF. Keep rho and end-to-end ratios null.
+
+Use a direct degree-one chart `q=(0,1,x,x²)` mapped by the fixed conversion
+matrix, the identity theta constants for degree zero, and the existing
+generic degree-two formula. Compare this independent chart with source
+`project_full` separately so the action identity check does not define its
+expected value through the action matrix being tested.
