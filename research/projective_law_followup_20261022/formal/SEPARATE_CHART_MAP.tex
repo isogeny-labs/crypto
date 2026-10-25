@@ -1,0 +1,35 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\title{Separate genus-2 charts: checked generators and open descent}
+\author{Formal result packet for independent review}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+Let $A=K[X,Y]/(Y^2-X^5-a_3X^3-a_2X^2-a_1X-a_0)$ and let $B$ be the separately
+presented infinity-chart coordinate ring. The candidate principal opens are
+$A_X$ and $B_z$. The pinned Lean source defines a map from the \emph{polynomial
+ring} $K[X,Y]$ to $B_z$ by $X\mapsto z^{-1}$ and $Y\mapsto wz^{-3}$.
+Lean checks those generator images, $z^{-1}z=1$, the coefficient expansion
+and the infinity-chart equation in $B_z$. Its compile exits zero, and the five
+theorem axiom audits list only \texttt{propext}, \texttt{Classical.choice},
+and \texttt{Quot.sound}.
+
+\begin{center}\begin{tabular}{p{0.59\linewidth}p{0.29\linewidth}}\toprule
+Gate & Status\\\midrule
+Separate coordinate rings and principal opens & Defined\\
+Polynomial map, generators, inverse, chart relation & Checked\\
+Affine defining equation in the map kernel & Open\\
+Descent to affine quotient and localization & Open\\
+Reverse map and separate-chart ring isomorphism & Open\\
+Scheme gluing, infinity stalk, divisor/$\operatorname{Pic}^0$ & Open\\
+Rust law semantics and rho cost & Open / not measured\\\bottomrule\end{tabular}\end{center}
+
+\noindent The precise next algebraic step is to derive the mapped affine
+equation from the localized infinity relation and $zz^{-1}=1$, then use
+\texttt{Ideal.Quotient.lift} and \texttt{IsLocalization.Away.lift}. A reverse
+map and two composition proofs are still required. The prior same-ambient
+quotient theorem does not identify these separately presented rings. See
+\texttt{Common22SeparateChartMap.lean}, \texttt{separate-chart-map.csv}, and
+\texttt{separate-chart-map.svg}. No empirical cost follows.
+\end{document}
