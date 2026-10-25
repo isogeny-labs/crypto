@@ -3065,7 +3065,7 @@ impl Default for GaudryOptions {
 }
 
 /// A relation as a sparse row: `Σ coeff · x_col ≡ rhs (mod n)`.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct SparseRel {
     pub cols: Vec<(usize, u64)>,
     pub rhs: u64,

@@ -100,6 +100,34 @@ impl Fp4 {
         self.count(4);
         E4(core::array::from_fn(|i| mm(a.0[i], k, self.p)))
     }
+    /// Characteristic-`p` Frobenius when `t^p = z t`, `z ∈ F_p`.
+    /// Three nonconstant coordinate multiplications are charged.
+    pub fn frob_p(&self, a: &E4, z: u64) -> E4 {
+        debug_assert_eq!(pow_mod(z, 4, self.p), 1);
+        let z2 = mm(z, z, self.p);
+        let z3 = mm(z2, z, self.p);
+        self.count(5); // z², z³, and three coordinate products.
+        E4([
+            a.0[0],
+            mm(a.0[1], z, self.p),
+            mm(a.0[2], z2, self.p),
+            mm(a.0[3], z3, self.p),
+        ])
+    }
+    /// Multiply by `k t^degree`, `degree < 4`.  This keeps a twist
+    /// Frobenius's monomial `y` multiplier out of a generic 19-product
+    /// field multiplication.  All four products and each reduction count.
+    pub fn mul_monomial(&self, a: &E4, k: u64, degree: usize) -> E4 {
+        assert!(degree < 4);
+        let mut out = [0u64; 4];
+        for (i, &ai) in a.0.iter().enumerate() {
+            let j = i + degree;
+            let v = mm(ai, k, self.p);
+            out[j % 4] = if j >= 4 { mm(v, self.c, self.p) } else { v };
+        }
+        self.count(4 + degree as u64);
+        E4(out)
+    }
     /// Schoolbook with `t⁴ = c`: 16 products and 3 reductions.
     pub fn mul(&self, a: &E4, b: &E4) -> E4 {
         let p = self.p;
