@@ -2,7 +2,7 @@
 # PS-6: charge the pairs-and-solve kernels in the counted unit and compare (protocols/PS-6.md).
 # Committed before any PS-6 session ran.  Every heavy step goes through the shared benchmark lock.
 #
-#   PS6_STAGES   space-separated subset of: build tests manifest counted calibrate opcount memory timed analyze
+#   PS6_STAGES   space-separated subset of: build tests manifest counted reaudit calibrate opcount memory timed analyze
 #                (default: all, in that order)
 #   PS6_RUNGS    default "15 18 21 24 27"
 #   PS6_CPU      the core the calibration pins to (tools/isolated_bench.py run), default 3
@@ -21,7 +21,7 @@ RAW=$R/raw
 SESS=$RAW/sessions
 LOGS=$RAW/logs
 TAG=${PS6_TAG:-}
-STAGES=${PS6_STAGES:-build tests manifest counted calibrate opcount memory timed analyze}
+STAGES=${PS6_STAGES:-build tests manifest counted reaudit calibrate opcount memory timed analyze}
 RUNGS=${PS6_RUNGS:-15 18 21 24 27}
 CPU=${PS6_CPU:-3}
 ECB=target/release/ecbench
@@ -53,10 +53,20 @@ fi
 
 if has tests; then
   # The kernel's parity tests (exhaustive on small random binary curves, both values of a), then the
-  # ecbench tests the ecbench-extend skill names.
-  $BUSY cargo test --release --bin ecbench ps6 -- --nocapture 2>&1 | tee "$LOGS/tests_ps6.log" | tail -12
-  $BUSY cargo test --release --lib ecbench 2>&1 | tee "$LOGS/tests_lib_ecbench.log" | tail -4
-  $BUSY cargo test --release --test ecbench 2>&1 | tee "$LOGS/tests_integration_ecbench.log" | tail -4
+  # ecbench tests the ecbench-extend skill names.  Exit codes are recorded, not fatal: a failing test is
+  # evidence to report, and the stages after it still run.
+  for t in "bin ecbench ps6 -- --nocapture:tests_ps6" "lib ecbench:tests_lib_ecbench" "test ecbench:tests_integration_ecbench"; do
+    args=${t%%:*}; name=${t##*:}
+    set +e
+    case "$args" in
+      bin*) $BUSY cargo test --release --bin ecbench ps6 -- --nocapture > "$LOGS/$name.log" 2>&1 ;;
+      lib*) $BUSY cargo test --release --lib ecbench > "$LOGS/$name.log" 2>&1 ;;
+      test*) $BUSY cargo test --release --test ecbench > "$LOGS/$name.log" 2>&1 ;;
+    esac
+    echo "$name exit $?" >> "$LOGS/tests.status"
+    set -e
+    tail -4 "$LOGS/$name.log"
+  done
 fi
 
 if has manifest; then
@@ -86,6 +96,27 @@ session() {   # kind n cpus_flag  -> runs the spec into a new directory, audits 
 if has counted; then
   # Operation counts need no isolation level (README section 6): --cpus none.
   for n in $RUNGS; do session counted "$n" none; done
+fi
+
+if has reaudit; then
+  # The counted sessions were recorded by the binary of the commit named in raw/build_env_premerge.txt (the
+  # first group; after the base branch was merged the library differs.  Replay them with the current
+  # binary: counts that reproduce exactly are a cross-build check.
+  for n in $RUNGS; do
+    d="$SESS/counted_n${n}"
+    [ -e "$d/session.json" ] || continue
+    out="$d.audit_postmerge.json"
+    [ ! -e "$out" ] || continue
+    replays=12; [ "$n" -le 24 ] && replays=all
+    set +e
+    if [ "$replays" = all ]; then
+      $BUSY "$ECB" verify --dir "$d" --replay-all --out "$out" > "$LOGS/counted_n${n}.verify_postmerge.log" 2>&1
+    else
+      $BUSY "$ECB" verify --dir "$d" --replay "$replays" --out "$out" > "$LOGS/counted_n${n}.verify_postmerge.log" 2>&1
+    fi
+    echo "counted_n${n} postmerge replay exit $?" >> "$LOGS/reaudit.status"
+    set -e
+  done
 fi
 
 if has calibrate; then

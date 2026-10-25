@@ -6,6 +6,9 @@
 //! ps6_tool memory    --n N --fold full|negation --out FILE
 //! ps6_tool analyze   --counted DIR... [--timed DIR...] --calibration FILE
 //!                    --memory FILE --out summary.json --markdown summary.md
+//! ps6_tool certify   --sessions DIR... --out replay-certificate.json
+//! ps6_tool validate  --counted DIR... --summary summary.json --out validator-report.json
+//! ps6_tool gate-json --summary summary.json --certificate F --report F --out VALIDATION.json
 //! ```
 //!
 //! This is analysis and measurement code in Rust, as the repository requires;
@@ -50,7 +53,7 @@ use crypto_lib::cryptanalysis::ic_boundary::{
 use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
 use crypto_lib::cryptanalysis::semaev_decomp::SubspaceOracle;
 
-use ps6_kernel::{base_with_torsion, degenerate_target, Kernel};
+use ps6_kernel::{base_with_torsion, degenerate_target, Kernel, Pt};
 
 /// The boundary ledger's seed (`BoundaryConfig::default().seed`), which fixes
 /// its char2 curves at `random_binary_instance(n, SEED, 8)`.
@@ -93,6 +96,37 @@ enum Cmd {
         n: u32,
         #[arg(long, default_value = "full")]
         fold: String,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Re-verify every recovered scalar with arithmetic that shares no code with the harness's
+    /// group law (the validation gate's replay certificate).
+    Certify {
+        #[arg(long, num_args = 1.., required = true)]
+        sessions: Vec<PathBuf>,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Recompute the headline numbers from the raw counters and the pinned calibration file,
+    /// without `price_phase` or the analysis code (the gate's validator report).
+    Validate {
+        #[arg(long, num_args = 1.., required = true)]
+        counted: Vec<PathBuf>,
+        #[arg(long)]
+        summary: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Write the gate's VALIDATION.json from the summary and the two artifacts.
+    GateJson {
+        #[arg(long)]
+        summary: PathBuf,
+        #[arg(long)]
+        certificate: PathBuf,
+        #[arg(long)]
+        report: PathBuf,
+        #[arg(long)]
+        row: String,
         #[arg(long)]
         out: PathBuf,
     },
@@ -141,6 +175,19 @@ fn run(cli: Cli) -> Result<(), String> {
             rungs,
             targets,
         } => opcount(&out, &rungs, targets),
+        Cmd::Certify { sessions, out } => certify(&sessions, &out),
+        Cmd::Validate {
+            counted,
+            summary,
+            out,
+        } => validate(&counted, &summary, &out),
+        Cmd::GateJson {
+            summary,
+            certificate,
+            report,
+            row,
+            out,
+        } => gate_json(&summary, &certificate, &report, &row, &out),
         Cmd::Memory { n, fold, out } => memory(n, &fold, &out),
         Cmd::Analyze {
             counted,
@@ -415,6 +462,32 @@ struct Row {
     level: String,
     lower_bound: bool,
     unpriced: Vec<String>,
+    /// Native operations the run left unpriced (the AGENTS.md section 5a band prices each at
+    /// 0, 0.1 and 1 GAE): kernel pairs, counted `*_uncharged` words, rho's canonicalisations.
+    unpriced_ops: f64,
+}
+
+/// Count of the native operations behind a record's `unpriced` list.
+fn unpriced_ops(r: &Record) -> f64 {
+    let mut total = 0.0;
+    for name in &r.cost.unpriced {
+        if name.starts_with("solver_") {
+            total += r.solver.as_ref().map_or(0, |s| s.ops) as f64;
+        } else if let Some(v) = r.counters.get(name) {
+            total += *v as f64;
+        } else {
+            let base = name.strip_suffix("_uncharged").unwrap_or(name);
+            for p in &r.phases {
+                total += p
+                    .native
+                    .get(name)
+                    .or_else(|| p.native.get(base))
+                    .copied()
+                    .unwrap_or(0) as f64;
+            }
+        }
+    }
+    total
 }
 
 struct Rung {
@@ -460,6 +533,7 @@ fn load_rung(dir: &Path) -> Result<Rung, String> {
             level: format!("{:?}", r.isolation.level),
             lower_bound: r.cost.lower_bound,
             unpriced: r.cost.unpriced.clone(),
+            unpriced_ops: unpriced_ops(r),
         };
         debug_assert!((total / r_sub.sqrt() - s).abs() <= 1e-6 * s.abs().max(1.0));
         arms.entry(r.arm.clone())
@@ -490,8 +564,12 @@ fn load_rung(dir: &Path) -> Result<Rung, String> {
 /// How the kernel's unpriced pairs are turned into the unit, if at all.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 enum Conv {
-    /// As recorded: the kernel's pairs left out (a lower bound).
+    /// As recorded: every unpriced operation at weight 0 (a lower bound).
     Lb,
+    /// Section 5a band: every unpriced native operation of every arm at 0.1 GAE.
+    B01,
+    /// Section 5a band: every unpriced native operation of every arm at 1 GAE.
+    B1,
     /// Each kernel pair priced as one baseline pair (the pinned `ns_per_s4_pair`).
     Pairs,
     /// Each kernel pair priced at the pinned baseline-pair price times the measured
@@ -505,9 +583,21 @@ enum Conv {
 }
 
 impl Conv {
+    /// GAE per unpriced native operation, for the band rows.
+    fn weight(self) -> Option<f64> {
+        match self {
+            Conv::Lb => Some(0.0),
+            Conv::B01 => Some(0.1),
+            Conv::B1 => Some(1.0),
+            _ => None,
+        }
+    }
+
     fn name(self) -> &'static str {
         match self {
-            Conv::Lb => "lower bound (recorded)",
+            Conv::Lb => "w = 0 (recorded)",
+            Conv::B01 => "w = 0.1",
+            Conv::B1 => "w = 1",
             Conv::Pairs => "pair-count (kernel pair = baseline pair)",
             Conv::Est => "anchored estimate",
             Conv::EstAdd => "add-ratio estimate",
@@ -540,6 +630,8 @@ fn value(rung: &Rung, arm: &str, conv: Conv, cal: &Calib, ops: bool, wl: &str) -
         .map(|r| {
             let extra_ops = match conv {
                 Conv::Lb => 0.0,
+                Conv::B01 => 0.1 * r.unpriced_ops,
+                Conv::B1 => r.unpriced_ops,
                 Conv::Pairs => r.solver_ops as f64 * cal.c_s4_pinned,
                 Conv::Est => r.solver_ops as f64 * cal.c_s4_pinned * cal.gl_over_s4,
                 Conv::EstAdd => r.solver_ops as f64 * cal.c_gl,
@@ -685,25 +777,23 @@ fn analyze(
     let mitm = "mitm";
     let mitm_nf = "mitm-negfold";
     let have_clmul = !cal.is_empty() && cal.values().all(|c| c.clmul_ratio.is_some());
-    let mut arm_list: Vec<(&str, Conv)> = vec![
-        (rho, Conv::Lb),
-        (base, Conv::Lb),
-        (gl, Conv::Lb),
-        (gl, Conv::Pairs),
-        (gl, Conv::Est),
-        (gl, Conv::EstAdd),
-        (gl, Conv::EstClmul),
-        (mitm, Conv::Lb),
-        (mitm_nf, Conv::Lb),
-    ];
-    arm_list.retain(|(_, c)| *c != Conv::EstClmul || have_clmul);
-    let label = |a: &str, c: Conv| -> String {
-        if a == gl {
-            format!("{a} [{}]", c.name())
-        } else {
-            a.to_string()
+    let mut arm_list: Vec<(&str, Conv)> = Vec::new();
+    for arm in [rho, base, gl, mitm, mitm_nf] {
+        for conv in [Conv::Lb, Conv::B01, Conv::B1] {
+            arm_list.push((arm, conv));
         }
-    };
+        if arm == gl {
+            // Further points, never a replacement for the band (AGENTS.md section 5a).
+            arm_list.extend([
+                (gl, Conv::Pairs),
+                (gl, Conv::Est),
+                (gl, Conv::EstAdd),
+                (gl, Conv::EstClmul),
+            ]);
+        }
+    }
+    arm_list.retain(|(_, c)| *c != Conv::EstClmul || have_clmul);
+    let label = |a: &str, c: Conv| -> String { format!("{a} [{}]", c.name()) };
 
     let mut rung_json = Vec::new();
     let mut md = String::new();
@@ -717,13 +807,19 @@ fn analyze(
             rg.n, rg.l, rg.slug, rg.log2_r, rg.floor_s, rg.session_id
         ));
         md.push_str("| arm [convention] | verified/measured | lower bound | mean S [95% CI over targets] | S / floor | S / matched rho [95% CI] |\n|:--|--:|:--|--:|--:|--:|\n");
-        let rho_vals = values(rg, rho, Conv::Lb, c, false);
         let mut arms_json = Vec::new();
         for (arm, conv) in &arm_list {
             if !rg.arms.contains_key(*arm) {
                 continue;
             }
             let v = values(rg, arm, *conv, c, false);
+            // The reference is priced at the same weight as the arm; a further (estimate) point is
+            // not ranked against a reference that is only a lower bound (section 5a).
+            let rho_vals = if conv.weight().is_some() {
+                values(rg, rho, *conv, c, false)
+            } else {
+                Vec::new()
+            };
             let seed = 1000 * ri as u64 + 17;
             let ci = ci_mean(&v, resamples, seed);
             let m = mean(&v);
@@ -735,18 +831,19 @@ fn analyze(
                 )
             });
             let lb = rg.arms[*arm].values().flatten().any(|r| r.lower_bound) && *conv == Conv::Lb;
+            let lb_text = match conv {
+                Conv::Lb if *arm == rho => "yes (rho's canonicalisations unpriced)",
+                Conv::Lb if lb => "yes",
+                Conv::Lb => "no",
+                Conv::B01 | Conv::B1 => "banded",
+                _ => "estimate, not pinned",
+            };
             md.push_str(&format!(
                 "| {} | {}/{} | {} | {} {} | {} | {} {} |\n",
                 label(arm, *conv),
                 rg.verified.get(*arm).copied().unwrap_or(0),
                 rg.measured.get(*arm).copied().unwrap_or(0),
-                if *arm == rho {
-                    "yes (canonicalisation uncounted for negation)"
-                } else if lb {
-                    "yes"
-                } else {
-                    "no"
-                },
+                lb_text,
                 fnum(m),
                 fci(ci),
                 fnum(ratio_floor),
@@ -781,12 +878,17 @@ fn analyze(
         md.push('\n');
         // Stage ratios against the baseline, paired by target.
         md.push_str("| comparison (STAGE DIAGNOSTIC unless noted) | sum S_baseline / sum S_arm [95% CI] |\n|:--|--:|\n");
-        let base_vals = values(rg, base, Conv::Lb, c, false);
         let mut cmp_json = Vec::new();
         for (arm, conv) in &arm_list {
             if *arm == rho || *arm == base || !rg.arms.contains_key(*arm) {
                 continue;
             }
+            let bconv = if conv.weight().is_some() {
+                *conv
+            } else {
+                Conv::Lb
+            };
+            let base_vals = values(rg, base, bconv, c, false);
             let v = values(rg, arm, *conv, c, false);
             if v.len() != base_vals.len() || v.is_empty() {
                 continue;
@@ -803,6 +905,51 @@ fn analyze(
                 json!({"arm": arm, "convention": conv.name(), "baseline_over_arm": r, "ci95": ci}),
             );
         }
+        // Section 5a: rank only where the order holds at every weight of the band.
+        md.push_str("\n| section 5a order test: sum S_A / sum S_B | w = 0 | w = 0.1 | w = 1 | verdict |\n|:--|--:|--:|--:|:--|\n");
+        let mut order_json = Vec::new();
+        for (a, b) in [
+            (gl, base),
+            (mitm, base),
+            (gl, mitm),
+            (mitm_nf, mitm),
+            (gl, rho),
+            (base, rho),
+            (mitm, rho),
+            (mitm_nf, rho),
+        ] {
+            if !rg.arms.contains_key(a) || !rg.arms.contains_key(b) {
+                continue;
+            }
+            let rs: Vec<Option<f64>> = [Conv::Lb, Conv::B01, Conv::B1]
+                .iter()
+                .map(|cv| {
+                    let va = values(rg, a, *cv, c, false);
+                    let vb = values(rg, b, *cv, c, false);
+                    (va.len() == vb.len() && !va.is_empty())
+                        .then(|| va.iter().sum::<f64>() / vb.iter().sum::<f64>())
+                })
+                .collect();
+            let all: Option<Vec<f64>> = rs.iter().copied().collect();
+            let verdict = match &all {
+                None => "not computable",
+                Some(v) if v.iter().all(|x| *x < 1.0) => "A below B at every weight",
+                Some(v) if v.iter().all(|x| *x > 1.0) => "A above B at every weight",
+                Some(_) => "unresolved: the order changes inside the band",
+            };
+            md.push_str(&format!(
+                "| {} / {} | {} | {} | {} | {} |\n",
+                a,
+                b,
+                fnum(rs[0]),
+                fnum(rs[1]),
+                fnum(rs[2]),
+                verdict
+            ));
+            order_json.push(
+                json!({"a": a, "b": b, "ratio_a_over_b_at_w0_w01_w1": rs, "verdict": verdict}),
+            );
+        }
         md.push_str(&format!(
             "\nConversions at this rung (GAE per pair): baseline pair pinned {:.3}; baseline pair measured here {:.3}; kernel pair / baseline pair time {:.4} (min {:.4}, max {:.4}), so anchored kernel pair {:.4}; kernel pair over a measured addition {:.4} (min {:.4}, max {:.4}).\n\n",
             c.c_s4_pinned, c.c_s4_measured, c.gl_over_s4, c.gl_over_s4_min, c.gl_over_s4_max,
@@ -811,7 +958,7 @@ fn analyze(
         rung_json.push(json!({
             "n": rg.n, "l": rg.l, "slug": rg.slug, "log2_r": rg.log2_r, "floor_s": rg.floor_s,
             "session": rg.session_id, "dir": rg.dir, "workloads": rg.workloads.len(),
-            "arms": arms_json, "baseline_over_arm": cmp_json,
+            "arms": arms_json, "baseline_over_arm": cmp_json, "order_across_band": order_json,
             "conversions": {"c_s4_pinned": c.c_s4_pinned, "c_gl_over_add_median": c.c_gl, "c_gl_over_add_min": c.c_gl_min, "c_gl_over_add_max": c.c_gl_max, "c_s4_measured_over_add": c.c_s4_measured, "gl_over_s4_median": c.gl_over_s4, "gl_over_s4_min": c.gl_over_s4_min, "gl_over_s4_max": c.gl_over_s4_max, "c_gl_anchored": c.c_s4_pinned * c.gl_over_s4},
         }));
     }
@@ -1088,4 +1235,467 @@ fn analyze(
     .map_err(|e| format!("{}: {e}", out.display()))?;
     std::fs::write(markdown, md).map_err(|e| format!("{}: {e}", markdown.display()))?;
     Ok(())
+}
+
+// ── certify: independent scalar verification ──────────────────────
+
+fn hex_u64(s: &str) -> Result<u64, String> {
+    u64::from_str_radix(s.trim_start_matches("0x"), 16).map_err(|e| format!("hex `{s}`: {e}"))
+}
+
+/// `[k]P` by double-and-add on the kernel module's own group law (`ps6_kernel::add`, built on
+/// `Gf2` and written separately from `FastCurve` / `BinaryGroup`, which the harness uses).
+fn smul(gf: &crypto_lib::cryptanalysis::semaev_decomp::Gf2, a: u64, k: u64, p: Pt) -> Pt {
+    let mut acc = Pt::Inf;
+    let mut base = p;
+    let mut k = k;
+    while k > 0 {
+        if k & 1 == 1 {
+            acc = ps6_kernel::add(gf, a, acc, base);
+        }
+        base = ps6_kernel::add(gf, a, base, base);
+        k >>= 1;
+    }
+    acc
+}
+
+fn on_curve(
+    gf: &crypto_lib::cryptanalysis::semaev_decomp::Gf2,
+    a: u64,
+    b: u64,
+    x: u64,
+    y: u64,
+) -> bool {
+    let x2 = gf.sqr(x);
+    gf.sqr(y) ^ gf.mul(x, y) == gf.mul(x2, x) ^ gf.mul(a, x2) ^ b
+}
+
+fn sha256_file(p: &Path) -> Result<String, String> {
+    let bytes = std::fs::read(p).map_err(|e| format!("{}: {e}", p.display()))?;
+    Ok(crypto_lib::cryptanalysis::ecbench::canonical::sha256_hex(
+        &bytes,
+    ))
+}
+
+fn certify(sessions: &[PathBuf], out: &Path) -> Result<(), String> {
+    use crypto_lib::cryptanalysis::ecbench::workload::CurveSpec;
+    let mut runs = Vec::new();
+    let mut errors: Vec<String> = Vec::new();
+    let (mut checked, mut negatives, mut curves_ok) = (0u64, 0u64, 0u64);
+    let mut receipts = Vec::new();
+    let mut seen_curves: BTreeMap<String, bool> = BTreeMap::new();
+    for dir in sessions {
+        let session = read_session(dir)?;
+        let recs = read_records(dir)?;
+        let audit = PathBuf::from(format!("{}.audit.json", dir.display()));
+        if audit.is_file() {
+            let a: Value =
+                serde_json::from_str(&std::fs::read_to_string(&audit).map_err(|e| e.to_string())?)
+                    .map_err(|e| e.to_string())?;
+            receipts.push(json!({
+                "session": session.session_id, "path": audit, "sha256": sha256_file(&audit)?,
+                "ok": a["ok"], "records": a["records"], "verified_records": a["verified_records"],
+                "replays": a["replays"].as_array().map(|v| v.len()),
+                "all_replays_reproduced": a["replays"].as_array().map(|v| v.iter().all(|r| r["reproduced"] == true)),
+                "auditor_env_class_id": a["auditor_env_class_id"], "original_env_class_id": session.env_class_id,
+            }));
+        }
+        for r in recs.iter().filter(|r| r.counts()) {
+            let CurveSpec::BinaryRandom {
+                n,
+                seed,
+                max_cofactor,
+            } = r.workload.curve_spec.clone()
+            else {
+                errors.push(format!(
+                    "{} seq {}: not a binary_random curve",
+                    session.session_id, r.seq
+                ));
+                continue;
+            };
+            let inst = random_binary_instance(n, seed, max_cofactor)
+                .ok_or(format!("no curve for n = {n}"))?;
+            let gf = &inst.gf;
+            let g = (
+                hex_u64(&r.workload.curve.generator[0])?,
+                hex_u64(&r.workload.curve.generator[1])?,
+            );
+            let q = (
+                hex_u64(&r.workload.target[0])?,
+                hex_u64(&r.workload.target[1])?,
+            );
+            let key = r.workload.curve.slug.clone();
+            if !seen_curves.contains_key(&key) {
+                // The curve's own facts, checked once: G and Q on the curve, [r]G = O.
+                let ok = (g.0, g.1) == (inst.generator.x, inst.generator.y)
+                    && on_curve(gf, inst.a, inst.b, g.0, g.1)
+                    && smul(gf, inst.a, inst.r, Pt::Aff(g.0, g.1)) == Pt::Inf
+                    && smul(gf, inst.a, inst.r - 1, Pt::Aff(g.0, g.1)) != Pt::Inf;
+                seen_curves.insert(key.clone(), ok);
+                if ok {
+                    curves_ok += 1;
+                } else {
+                    errors.push(format!(
+                        "{key}: generator not on the curve or not of order r"
+                    ));
+                }
+            }
+            if !on_curve(gf, inst.a, inst.b, q.0, q.1) {
+                errors.push(format!(
+                    "{} seq {}: target not on the curve",
+                    session.session_id, r.seq
+                ));
+            }
+            let d: u64 = r
+                .outcome
+                .recovered
+                .as_deref()
+                .ok_or("verified record without a scalar")?
+                .parse()
+                .map_err(|e| format!("scalar: {e}"))?;
+            let gp = Pt::Aff(g.0, g.1);
+            let hit = smul(gf, inst.a, d, gp) == Pt::Aff(q.0, q.1);
+            let wrong = smul(gf, inst.a, (d + 1) % inst.r, gp) != Pt::Aff(q.0, q.1);
+            checked += 1;
+            negatives += u64::from(wrong);
+            if !hit {
+                errors.push(format!("{} seq {}: [d]G != Q", session.session_id, r.seq));
+            }
+            if !wrong {
+                errors.push(format!(
+                    "{} seq {}: [d+1]G = Q (negative control accepted)",
+                    session.session_id, r.seq
+                ));
+            }
+            runs.push(json!({
+                "session": session.session_id, "seq": r.seq, "record_id": r.record_id, "arm": r.arm,
+                "workload_id": r.workload.workload_id, "round": r.round, "scalar": d.to_string(),
+                "verified": hit, "negative_control_rejected": wrong,
+            }));
+        }
+    }
+    let ok = errors.is_empty() && checked > 0;
+    let cert = json!({
+        "schema": "ps6-replay-certificate/v1",
+        "status": if ok { "verified" } else { "failed" },
+        "independent": true,
+        "scalars_verified": ok,
+        "method": "ps6_tool certify: for every verified record of the listed sessions, [d]G is recomputed with the group law of src/bin/ecbench/ps6_kernel.rs (Gf2 arithmetic, written separately from the FastCurve/BinaryGroup arithmetic the harness uses) from the curve parameters rebuilt from the workload's constructor call, and compared with the recorded target Q; [d+1]G != Q is checked as a negative control; each curve's generator is checked to lie on the curve and to have order r ([r]G = O, [r-1]G != O). The ecbench audit receipts (ecbench verify, exact re-execution of the runs by a separate process) are listed beside it.",
+        "limits": "One host class: the harness runs, the ecbench replays and this check ran on the same Xeon 2.10 GHz KVM guest. No second host class replayed these sessions. The scalar check is a separate implementation of the group law, by the same author; it is not a second party's.",
+        "outcomes_checked": checked, "negative_controls_rejected": negatives, "curves_checked": curves_ok,
+        "errors": errors, "ecbench_audit_receipts": receipts, "runs": runs,
+    });
+    std::fs::write(
+        out,
+        serde_json::to_string_pretty(&cert).map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| format!("{}: {e}", out.display()))?;
+    eprintln!(
+        "certify: {checked} outcomes, {negatives} negative controls rejected, {} errors",
+        cert["errors"].as_array().map_or(0, |e| e.len())
+    );
+    if ok {
+        Ok(())
+    } else {
+        Err("certificate failed".into())
+    }
+}
+
+// ── validate: recompute the headline numbers from raw counters ────
+
+/// Pinned GAE-per-operation ratios of one curve, read through `Calibration::pin` (the lookup
+/// only; the pricing below is this function's own arithmetic).
+fn pinned_ratios(slug: &str) -> BTreeMap<&'static str, f64> {
+    let mut c = Calibration {
+        ns_per_add: 1.0,
+        ns_per_double: 1.0,
+        ns_per_lookup: 1.0,
+        ns_per_row_op: 1.0,
+        ns_per_sqrt: Some(1.0),
+        ns_per_as_solve: Some(1.0),
+        ns_per_s4_pair: Some(1.0),
+        ns_per_word_xor: Some(1.0),
+        ns_per_legendre: Some(1.0),
+        ns_per_inversion: Some(1.0),
+        ns_per_frobenius: Some(1.0),
+        ns_per_canon: Some(1.0),
+        ..Default::default()
+    };
+    let pin = c.pin("char2", slug);
+    let has = |u: &str| pin.pinned.iter().any(|p| p == u);
+    let mut m = BTreeMap::new();
+    for (counter, unit, value) in [
+        ("sqrt_solves", "ns_per_sqrt", c.ns_per_sqrt),
+        ("as_solves", "ns_per_as_solve", c.ns_per_as_solve),
+        ("s4_pairs", "ns_per_s4_pair", c.ns_per_s4_pair),
+        ("lookups", "ns_per_lookup", Some(c.ns_per_lookup)),
+        ("row_ops", "ns_per_row_op", Some(c.ns_per_row_op)),
+        ("legendre_symbols", "ns_per_legendre", c.ns_per_legendre),
+        ("inversions", "ns_per_inversion", c.ns_per_inversion),
+        ("frobenius_maps", "ns_per_frobenius", c.ns_per_frobenius),
+        ("canonicalisations", "ns_per_canon", c.ns_per_canon),
+        (
+            "target_guard_probes",
+            "ns_per_lookup",
+            Some(c.ns_per_lookup),
+        ),
+    ] {
+        if has(unit) {
+            if let Some(v) = value {
+                m.insert(counter, v);
+            }
+        }
+    }
+    m
+}
+
+/// Total operations of one record from its raw counters.
+fn recompute_total(r: &Record, ratios: &BTreeMap<&'static str, f64>) -> Result<f64, String> {
+    if r.method.id.starts_with("ic.") {
+        let mut t = 0.0;
+        for p in &r.phases {
+            t += (p.adds + p.doubles) as f64;
+            for (name, count) in &p.native {
+                if let Some(ratio) = ratios.get(name.as_str()) {
+                    t += *count as f64 * ratio;
+                }
+            }
+        }
+        Ok(t)
+    } else if r.method.id == "rho.negation" {
+        let c = |k: &str| r.counters.get(k).copied().unwrap_or(0) as f64;
+        Ok(c("setup_additions")
+            + c("setup_doublings")
+            + c("steps")
+            + c("look_ahead_additions")
+            + c("start_additions")
+            + c("cycle_escape_doublings")
+            + c("verification_operations"))
+    } else {
+        Err(format!("no recompute for method {}", r.method.id))
+    }
+}
+
+/// Unpriced native operations of a record, from an explicit list of counter names.
+fn recompute_unpriced(r: &Record) -> f64 {
+    let mut t = r.solver.as_ref().map_or(0, |s| s.ops) as f64;
+    for p in &r.phases {
+        for k in [
+            "inversions",
+            "grouplaw_base_points_uncharged",
+            "s4_oracle_span_words_uncharged",
+            "s4_oracle_lv_coefficients_uncharged",
+        ] {
+            // `inversions` is unpriced only on the group-law arm (no pinned ratio for char2).
+            if k == "inversions"
+                && r.method
+                    .params
+                    .get("oracle")
+                    .map_or(true, |o| !o.starts_with("semaev-s4-grouplaw"))
+            {
+                continue;
+            }
+            t += p.native.get(k).copied().unwrap_or(0) as f64;
+        }
+    }
+    t + r
+        .counters
+        .get("canonicalisations_uncharged")
+        .copied()
+        .unwrap_or(0) as f64
+}
+
+fn validate(counted: &[PathBuf], summary: &Path, out: &Path) -> Result<(), String> {
+    let sum: Value = serde_json::from_str(
+        &std::fs::read_to_string(summary).map_err(|e| format!("{}: {e}", summary.display()))?,
+    )
+    .map_err(|e| e.to_string())?;
+    let mut headline = Vec::new();
+    let mut raw_data = Vec::new();
+    let mut mismatches = Vec::new();
+    let mut by_n: BTreeMap<u32, BTreeMap<String, Vec<(f64, f64)>>> = BTreeMap::new();
+    let (mut records_checked, mut totals_equal) = (0u64, 0u64);
+    for dir in counted {
+        let recs = read_records(dir)?;
+        raw_data.push(json!({"path": dir.join("records.jsonl"), "sha256": sha256_file(&dir.join("records.jsonl"))?}));
+        for r in recs.iter().filter(|r| r.counts()) {
+            let slug = &r.workload.curve.slug;
+            let ratios = pinned_ratios(slug);
+            let r_sub = r.workload.curve.r as f64;
+            let total = recompute_total(r, &ratios)?;
+            let recorded = r.cost.total_gae.ok_or("no total")?;
+            records_checked += 1;
+            if (total - recorded).abs() <= 1e-9 * recorded.abs().max(1.0) {
+                totals_equal += 1;
+            } else {
+                mismatches.push(format!(
+                    "{} seq {} arm {}: recomputed {total} but recorded {recorded}",
+                    dir.display(),
+                    r.seq,
+                    r.arm
+                ));
+            }
+            let n = r.workload.curve.field_degree.ok_or("degree")?;
+            let u = recompute_unpriced(r);
+            // (S at w = 0, S at w = 1), per record.
+            by_n.entry(n)
+                .or_default()
+                .entry(r.arm.clone())
+                .or_default()
+                .push((total / r_sub.sqrt(), (total + u) / r_sub.sqrt()));
+        }
+    }
+    // Headline: every rung's mean S per arm at w = 0 and at w = 1, and the baseline/kernel ratio.
+    let claimed_arm = |n: u32, arm: &str, conv: &str| -> Option<f64> {
+        sum["rungs"].as_array()?.iter().find(|r| r["n"] == n)?["arms"]
+            .as_array()?
+            .iter()
+            .find(|a| a["arm"] == arm && a["convention"] == conv)?["mean_S"]
+            .as_f64()
+    };
+    let claimed_ratio = |n: u32, arm: &str, conv: &str| -> Option<f64> {
+        sum["rungs"].as_array()?.iter().find(|r| r["n"] == n)?["baseline_over_arm"]
+            .as_array()?
+            .iter()
+            .find(|a| a["arm"] == arm && a["convention"] == conv)?["baseline_over_arm"]
+            .as_f64()
+    };
+    for (n, arms) in &by_n {
+        let mean_of = |arm: &str, w1: bool| -> Option<f64> {
+            let v = arms.get(arm)?;
+            // Mean over every record; with equal rounds per target this is the mean over
+            // targets of the per-target means.
+            Some(v.iter().map(|x| if w1 { x.1 } else { x.0 }).sum::<f64>() / v.len() as f64)
+        };
+        for arm in [
+            "rho-negation",
+            "s4-baseline",
+            "s4-grouplaw",
+            "mitm",
+            "mitm-negfold",
+        ] {
+            for (w1, conv) in [(false, "w = 0 (recorded)"), (true, "w = 1")] {
+                if let (Some(c), Some(rc)) = (claimed_arm(*n, arm, conv), mean_of(arm, w1)) {
+                    headline.push(json!({"name": format!("n={n} {arm} mean S, {conv}"), "claimed": c, "recomputed": rc, "rel_tol": 1e-9}));
+                }
+            }
+        }
+        for (arm, conv) in [
+            ("s4-grouplaw", "w = 0 (recorded)"),
+            ("s4-grouplaw", "w = 1"),
+            ("mitm", "w = 0 (recorded)"),
+        ] {
+            let w1 = conv == "w = 1";
+            if let (Some(c), Some(b), Some(k)) = (
+                claimed_ratio(*n, arm, conv),
+                mean_of("s4-baseline", w1),
+                mean_of(arm, w1),
+            ) {
+                // The tool's ratio is sum S_baseline / sum S_arm over targets; with equal
+                // target counts it equals the ratio of means.
+                headline.push(json!({"name": format!("n={n} baseline / {arm} sum-S ratio, {conv}"), "claimed": c, "recomputed": b / k, "rel_tol": 1e-9}));
+            }
+        }
+    }
+    let ok = mismatches.is_empty() && !headline.is_empty();
+    let all_match = headline.iter().all(|h| {
+        let (c, r) = (
+            h["claimed"].as_f64().unwrap_or(f64::NAN),
+            h["recomputed"].as_f64().unwrap_or(f64::NAN),
+        );
+        (c - r).abs() <= 1e-9 * c.abs().max(r.abs())
+    });
+    let report = json!({
+        "schema": "ps6-validator-report/v1",
+        "status": if ok && all_match { "pass" } else { "fail" },
+        "independent": true,
+        "method": "ps6_tool validate: each verified record's total operations are recomputed from its raw counters (group additions and doublings per phase, native counters times the pinned ratios of docs/ic/calibration.json read through Calibration::pin; rho from its step counters) with arithmetic that shares no code with price_phase, the ecbench runner or `ps6_tool analyze`, and compared with the recorded total; the headline numbers of summary.json are then recomputed from those totals.",
+        "limits": "Same author and host as the measurement; the pinned ratios are the repository's, not re-derived. The kernel's pairs are priced here only as the section 5a band (their count times 0 or 1 GAE).",
+        "records_checked": records_checked, "records_with_recomputed_total_equal_to_recorded": totals_equal,
+        "mismatches": mismatches, "raw_data": raw_data, "headline": headline,
+    });
+    std::fs::write(
+        out,
+        serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| format!("{}: {e}", out.display()))?;
+    eprintln!("validate: {records_checked} records, {totals_equal} totals equal; {} headline numbers; status {}", report["headline"].as_array().map_or(0, |h| h.len()), report["status"]);
+    if report["status"] == "pass" {
+        Ok(())
+    } else {
+        Err("validator report failed".into())
+    }
+}
+
+fn gate_json(
+    summary: &Path,
+    cert: &Path,
+    report: &Path,
+    row: &str,
+    out: &Path,
+) -> Result<(), String> {
+    let sum: Value =
+        serde_json::from_str(&std::fs::read_to_string(summary).map_err(|e| e.to_string())?)
+            .map_err(|e| e.to_string())?;
+    // The largest rung's mean S of the group-law arm (ic) and of the matched rho at each weight.
+    let top = sum["rungs"]
+        .as_array()
+        .and_then(|r| r.last())
+        .ok_or("no rungs")?;
+    let get = |arm: &str, conv: &str| -> Result<f64, String> {
+        top["arms"]
+            .as_array()
+            .ok_or("arms")?
+            .iter()
+            .find(|a| a["arm"] == arm && a["convention"] == conv)
+            .and_then(|a| a["mean_S"].as_f64())
+            .ok_or(format!("no {arm} {conv}"))
+    };
+    let band = |conv: &str| -> Result<Value, String> {
+        Ok(json!({"ic": get("s4-grouplaw", conv)?, "rho": get("rho-negation", conv)?}))
+    };
+    let (b0, b01, b1) = (band("w = 0 (recorded)")?, band("w = 0.1")?, band("w = 1")?);
+    let order_holds = [&b0, &b01, &b1]
+        .iter()
+        .all(|b| b["ic"].as_f64().unwrap_or(0.0) > b["rho"].as_f64().unwrap_or(f64::MAX));
+    let rel = |p: &Path, from: &Path| -> String { pathdiff(p, from) };
+    let dir = out.parent().ok_or("out dir")?;
+    let v = json!({
+        "schema": "validation-gate/v1",
+        "rows": [row],
+        "replay_certificate": {"path": rel(cert, dir), "sha256": sha256_file(cert)?},
+        "validator_report": {"path": rel(report, dir), "sha256": sha256_file(report)?},
+        "rho_reference": {
+            "kind": "negation",
+            "protocol": "PS-6 (protocols/PS-6.md): matched strong rho on the same one-target workloads; on a random binary curve the automorphism group is {+-1}, so rho.negation is the strongest single-target rho the harness has for these curves (no Frobenius structure).",
+            "unit": "S = group-addition equivalents / sqrt(r), cold, one target per run",
+            "binary_or_process": "one ecbench binary (SHA-256 in each session.json), every arm a fresh process of it inside one session, same workloads and algorithm seeds",
+            "matches_protocol": true, "strongest_available": true, "same_unit": true, "same_binary_or_process": true,
+            "gae_band": {"0": b0, "0.1": b01, "1": b1},
+            "gae_band_basis": format!("rung n = {}: ic is the group-law kernel arm (its {} unpriced native operations per run dominated by the kernel's pairs) and rho the rho.negation arm (its canonicalisations), each unpriced native operation priced at w GAE; means over the rung's targets and rounds; every other rung and arm is in summary.json", top["n"], "counted"),
+            "order_holds_across_band": order_holds,
+        },
+    });
+    std::fs::write(
+        out,
+        serde_json::to_string_pretty(&v).map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| format!("{}: {e}", out.display()))
+}
+
+/// `p` relative to directory `from`, both inside the repository (lexical).
+fn pathdiff(p: &Path, from: &Path) -> String {
+    let p = std::fs::canonicalize(p).unwrap_or_else(|_| p.to_path_buf());
+    let from = std::fs::canonicalize(from).unwrap_or_else(|_| from.to_path_buf());
+    let pc: Vec<_> = p.components().collect();
+    let fc: Vec<_> = from.components().collect();
+    let common = pc.iter().zip(&fc).take_while(|(a, b)| a == b).count();
+    let mut out = PathBuf::new();
+    for _ in common..fc.len() {
+        out.push("..");
+    }
+    for c in &pc[common..] {
+        out.push(c.as_os_str());
+    }
+    out.to_string_lossy().into_owned()
 }
