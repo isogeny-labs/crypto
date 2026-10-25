@@ -300,6 +300,14 @@ PDF record the completed gate. Identifying this scheme with a chosen smooth
 projective completion, its infinity stalk, divisor/`Pic⁰` transport, and
 Rust-law semantics remain open. Neither packet changes measured cost ratios.
 
+The [transition-cast packet](GLUE_CAST.md) additionally checks the two
+off-diagonal overlap-object equalities and the affine-to-infinity transition
+equality inside the constructed gluing datum, including the equality casts
+to the separately presented overlap schemes. Its [CSV](glue-cast.csv),
+[SVG](glue-cast.svg), and [PDF](GLUE_CAST.pdf) keep the checked and open gates
+separate. It does not identify the glued scheme with a chosen smooth
+projective completion or prove divisor/`Pic⁰` or Rust-law correspondence.
+
 The [exhaustive small-field gate](../exhaustive_small_field/README.md)
 checks all valid reduced-divisor pairs over the specified `F_7` and `F_11`
 models against independent Cantor addition under two weight settings. Its
