@@ -33,6 +33,9 @@ matrix, the identity theta constants for degree zero, and the existing
 generic degree-two formula. Compare this independent chart with source
 `project_full` separately so the action identity check does not define its
 expected value through the action matrix being tested.
+For degree-two outputs, also compare the extended chart with the source's
+direct generic projection wherever it is defined, and count source-zero
+cases recovered by the extension.
 
 Pre-final replay chart correction: the initial direct generic degree-two
 formula vanishes when `a0=b0=0`, the valid locus containing the branch
