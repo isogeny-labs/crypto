@@ -98,6 +98,19 @@ for arbitrary inputs.
   hashes. This is a narrower, reproducible manual abstraction boundary; it
   does not prove Rust-to-Lean semantic equivalence or construct the required
   smooth-curve/Mumford/principal-divisor instance.
+- **Mechanized, 2026-10-25 infinity point:** Pinned Lean proves that the
+  explicit infinity-chart complement of its `D(z)` overlap is exactly one
+  point, the origin `(z,w)`, over any field with arbitrary coefficients.
+  The [packet](../research/projective_law_followup_20261022/formal/COMMON22_COMPLETION_BRIDGE.md)
+  records exit 0 and only standard axioms. It does not construct a chosen
+  smooth projective completion or prove the divisor/`Pic⁰` bridge.
+- **Finite source-bound check, 2026-10-25:** One smooth `F17` 2-torsion
+  fixture makes both the pinned author public dispatcher and compiled Rust
+  dispatcher return identity, matching Cantor. A direct author doubling
+  subroutine has two zero weights on that input but is unreachable through
+  the public inverse-first dispatcher. The [packet](../research/projective_law_followup_20261022/exceptional_source_bridge/README.md)
+  preserves the initially failed assertion and corrected replay. No
+  public-law discrepancy or cost change follows from this one input.
 - **Suspected explanation:** None needed for the measured cost. Independent
   review of the written branch composition remains a proof obligation.
 - **Missing capability:** A mechanically derived or proved Rust-to-Lean

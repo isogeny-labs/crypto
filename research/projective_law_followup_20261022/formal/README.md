@@ -313,3 +313,23 @@ checks all valid reduced-divisor pairs over the specified `F_7` and `F_11`
 models against independent Cantor addition under two weight settings. Its
 zero-mismatch finite result is recorded in a PDF, SVG, CSV, and source-bound
 JSON; it is not a universal Rust-law or `Pic⁰` theorem.
+
+The [explicit infinity-point packet](COMMON22_COMPLETION_BRIDGE.md) proves
+in pinned Lean that the complement of `D(z)` in the infinity chart has
+exactly one point, the origin ideal `(z,w)`, over any field and for arbitrary
+coefficients. Its [four-row CSV](common22-completion-bridge.csv),
+[graph](common22-completion-bridge.svg), and
+[PDF](COMMON22_COMPLETION_BRIDGE.pdf) carry the compiler and axiom audit.
+Projective completion, properness, smoothness, divisor/`Pic⁰` transport,
+and Rust semantics remain separate obligations.
+
+The [source-bound F17 exceptional dispatch packet](../exceptional_source_bridge/README.md)
+checks one valid 2-torsion divisor against the pinned author expressions,
+compiled Rust dispatcher, and Cantor arithmetic. Both public dispatchers
+return identity. A direct author doubling subroutine returns invalid zero
+weights on this input, but the public inverse branch makes that path
+unreachable here. The packet retains the initial failed assertion, corrected
+replay, [PDF](../exceptional_source_bridge/REPORT.pdf),
+[graph](../exceptional_source_bridge/GRAPH.svg), and
+[CSV](../exceptional_source_bridge/ROWS.csv); it makes no cohort-cost or
+universal-law claim.
