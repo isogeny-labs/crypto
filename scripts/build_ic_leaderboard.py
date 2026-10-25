@@ -24,6 +24,7 @@ sqrt(r) to express S, and takes a phase's share of its row's total.
 from __future__ import annotations
 
 import argparse
+import difflib
 import hashlib
 import html
 import json
@@ -31,6 +32,7 @@ import math
 import re
 import statistics
 import sys
+from itertools import islice
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -2630,6 +2632,11 @@ def main() -> int:
                  if not p.exists() or p.read_text() != t]
         for s in stale:
             print(f"{s} is stale; run scripts/build_ic_leaderboard.py", file=sys.stderr)
+            actual = (REPO / s).read_text().splitlines() if (REPO / s).exists() else []
+            expected = outs[REPO / s].splitlines()
+            for line in islice(difflib.unified_diff(actual, expected, fromfile=f"{s} (committed)",
+                                                   tofile=f"{s} (generated)", n=1), 24):
+                print(line, file=sys.stderr)
         return 1 if stale else 0
     for p, t in outs.items():
         p.write_text(t)
