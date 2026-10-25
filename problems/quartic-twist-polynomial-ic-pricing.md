@@ -169,6 +169,12 @@ the [next-step plan](../research/twist_index_calculus_20261020/zero_fiber_collec
   implemented/gated follow-ups, not a new rank, complete-price or model-
   registration result. Their source/input freeze must be committed before
   actual corpus production; full original live panels remain unchanged.
+  Source/input/driver freeze `64c2a4a211a` is subsequently committed and
+  pushed before both managed owners are accepted at 2026-10-25T11:06:41Z:
+  `twist-multiset-root-panel-v1.service` and
+  `twist-curve-registry-binding-v1.service`, each with `Restart=no`.
+  Acceptance is not a completed corpus or registration; inspect native
+  phase/terminal receipts before any continuation or replacement action.
 - **CI resource failure:** the Lean gate selftest at head `59e732cff1c`
   failed before proving its positive fixtures because the CI runner had
   only 39 MB free and toolchain extraction returned `No space left on

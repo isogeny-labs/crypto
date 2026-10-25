@@ -5,6 +5,10 @@ existing outputs. Full production has not run at this source-freeze
 checkpoint. All 42 original case-arms remain registered; no completed
 189+21, collector or oracle study is repeated.
 
+The subsequent [managed launch](RUNNING.md) is accepted after the committed
+freeze. Follow actual phase and terminal receipts for current execution;
+the prelaunch control report remains a historical checkpoint.
+
 - [Protocol and acceptance criteria](PROTOCOL.md)
 - [Source/input/binary freeze](FREEZE.json)
 - [Actual build/control report](BUILD_AND_CONTROLS.md),
