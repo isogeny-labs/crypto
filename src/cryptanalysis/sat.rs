@@ -817,6 +817,30 @@ impl Solver {
         })
     }
 
+    /// Check a complete external assignment against the exact original
+    /// CNF and XOR rows, before accepting any independently produced model.
+    /// Learned clauses are deliberately excluded: they are not part of the
+    /// exported instance and may depend on a particular search history.
+    pub fn check_original_assignment(&self, model: &[bool]) -> bool {
+        if self.is_unsat || model.len() != self.n_vars as usize {
+            return false;
+        }
+        self.clause_at
+            .iter()
+            .take(self.n_orig_clauses)
+            .all(|&cref| {
+                clause_in(&self.arena, cref).iter().any(|&literal| {
+                    let value = model[var_of(literal) as usize];
+                    if is_neg(literal) {
+                        !value
+                    } else {
+                        value
+                    }
+                })
+            })
+            && self.check_xors(model)
+    }
+
     /// Add a clause `lits` (DIMACS literal encoding). Returns false if
     /// the empty clause is added (immediately UNSAT).
     pub fn add_clause(&mut self, mut lits: Vec<Lit>) -> bool {
@@ -2829,6 +2853,18 @@ mod tests {
         let s2 = parse_dimacs(&dimacs).expect("parse failed");
         assert_eq!(s2.n_vars(), 4);
         assert_eq!(s2.n_clauses(), 3);
+    }
+
+    #[test]
+    fn external_assignment_checks_original_cnf_and_xor_rows() {
+        let mut solver = Solver::new(3);
+        solver.add_clause(vec![1]);
+        solver.add_clause(vec![3]);
+        solver.add_xor(&[1, 2], true);
+        assert!(solver.check_original_assignment(&[true, false, true]));
+        assert!(!solver.check_original_assignment(&[true, true, true]));
+        assert!(!solver.check_original_assignment(&[false, false, true]));
+        assert!(!solver.check_original_assignment(&[true, false]));
     }
 
     /// Luby sequence check.

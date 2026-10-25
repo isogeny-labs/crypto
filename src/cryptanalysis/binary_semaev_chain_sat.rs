@@ -513,10 +513,33 @@ impl ChainedS3Encoding {
             .collect()
     }
 
+    /// Decode the summand x-coordinates from a complete external SAT model.
+    pub fn decode_summands_assignment(&self, model: &[bool]) -> Option<Vec<F2mElement>> {
+        (model.len() == self.solver.n_vars() as usize).then(|| {
+            self.blocks[..self.m]
+                .iter()
+                .map(|block| self.decode_block(block, model))
+                .collect()
+        })
+    }
+
+    /// Require an external model to satisfy every original CNF and XOR row,
+    /// then re-evaluate the chain over the original binary field.
+    pub fn verify_external_assignment(&self, model: &[bool]) -> bool {
+        self.solver.check_original_assignment(model) && self.verify_field_assignment(model)
+    }
+
     /// Re-evaluate every active S3 over the original field and each
     /// intermediate-identity equality. Call this after a SAT result.
     pub fn verify_model(&self) -> bool {
         let model = self.solver.model();
+        self.verify_field_assignment(&model)
+    }
+
+    fn verify_field_assignment(&self, model: &[bool]) -> bool {
+        if model.len() != self.solver.n_vars() as usize {
+            return false;
+        }
         let values: Vec<_> = self
             .blocks
             .iter()
@@ -950,6 +973,16 @@ mod tests {
         assert_eq!(affine.solver.solve(), SolveResult::Sat);
         assert!(affine.verify_model());
         assert!(affine.decode_summands().iter().all(|x| x == point_x));
+        let external = affine.solver.model();
+        assert!(affine.verify_external_assignment(&external));
+        assert_eq!(
+            affine.decode_summands_assignment(&external),
+            Some(affine.decode_summands())
+        );
+        let mut tampered = external.clone();
+        tampered[0] = !tampered[0];
+        assert!(!affine.verify_external_assignment(&tampered));
+        assert!(!affine.verify_external_assignment(&external[..external.len() - 1]));
 
         // Three P,-P pairs sum to O. Internal sums after 2 and 4 points
         // are O, while the intermediate sums after 3 and 5 are affine.

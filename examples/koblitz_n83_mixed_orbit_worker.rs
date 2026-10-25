@@ -8,6 +8,7 @@
 
 use crypto_lib::binary_ecc::curve::point_neg;
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
+use crypto_lib::cryptanalysis::binary_semaev_chain_sat::ChainedS3Encoding;
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_explicit_frobenius_point_factor_base, ChainS3Limits, FrobeniusFactorBase, KoblitzCurve,
 };
@@ -15,6 +16,7 @@ use crypto_lib::cryptanalysis::koblitz_large_prime::{
     build_exact_residual_difference_factor_base, build_exact_residual_suffix_factor_base,
     FeedOutcome, LargePrimeLimits, MixedOrbitDomains, WideLargePrimeEliminator,
 };
+use crypto_lib::cryptanalysis::sat::to_dimacs_xor;
 use flate2::read::GzDecoder;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -858,6 +860,247 @@ fn require_distinct_pilot_streams(base_row: &Value, pool_row: &Value) -> Result<
     Ok(())
 }
 
+/// One exact first-pattern instance for an external XOR-aware SAT solver.
+/// Export and verification rebuild it from the same pinned archive bytes.
+struct CrossXcnfInstance {
+    curve: KoblitzCurve,
+    base: FrobeniusFactorBase,
+    residual: FrobeniusFactorBase,
+    encoding: ChainedS3Encoding,
+    group_target: BinaryPoint,
+    coef_a: BigUint,
+    coef_b: BigUint,
+    base_hash: String,
+    pool_hash: String,
+    base_summands: usize,
+    residual_summands: usize,
+    shared_signed_orbits: usize,
+}
+
+fn cross_xcnf_instance(args: &[String]) -> Result<CrossXcnfInstance> {
+    if args.len() < 10 {
+        return Err("external instance arguments missing".into());
+    }
+    let base_summands: usize = args[8].parse()?;
+    let residual_summands: usize = args[9].parse()?;
+    if base_summands < 3
+        || !(1..=2).contains(&residual_summands)
+        || !(5..=6).contains(&(base_summands + residual_summands))
+    {
+        return Err("invalid external mixed-orbit shape".into());
+    }
+    let curve = KoblitzCurve::known_n83_k0().ok_or("pinned Koblitz curve")?;
+    if curve.label() != CURVE || curve.cofactor != BigUint::from(4u8) {
+        return Err("curve identity mismatch".into());
+    }
+    let (base_row, base) =
+        import_pilot(&args[1], Path::new(&args[2]), Path::new(&args[3]), &curve)?;
+    let (pool_row, pool) =
+        import_pilot(&args[4], Path::new(&args[5]), Path::new(&args[6]), &curve)?;
+    require_distinct_pilot_streams(&base_row, &pool_row)?;
+    let residual = build_exact_residual_difference_factor_base(&curve, &base, &pool)?;
+    let shared_signed_orbits = pool
+        .signed_orbits
+        .len()
+        .checked_sub(residual.signed_orbits.len())
+        .ok_or("residual orbit count exceeds pool")?;
+    let (public_point, _) = public_target(Path::new(&args[7]), &curve)?;
+    let coef_a = trial_coefficient(b"a", 0, &curve.subgroup_order);
+    let coef_b = trial_coefficient(b"b", 0, &curve.subgroup_order);
+    let domains = MixedOrbitDomains::new(&curve, &base, &residual)?;
+    let limits = ChainS3Limits {
+        max_variables: 150_000,
+        max_domain_clauses: 12_000_000,
+        max_models: 1,
+        conflict_budget: 1,
+    };
+    let (encoding, group_target) = domains.first_pattern_encoding(
+        &coef_a,
+        &coef_b,
+        &public_point,
+        base_summands,
+        residual_summands,
+        limits,
+        true,
+    )?;
+    Ok(CrossXcnfInstance {
+        curve,
+        base,
+        residual,
+        encoding,
+        group_target,
+        coef_a,
+        coef_b,
+        base_hash: args[1].clone(),
+        pool_hash: args[4].clone(),
+        base_summands,
+        residual_summands,
+        shared_signed_orbits,
+    })
+}
+
+fn cross_xcnf_metadata(instance: &CrossXcnfInstance, xcnf: &[u8]) -> Result<Value> {
+    Ok(json!({
+        "schema":"n83.cross-stream-first-pattern-xcnf/v1",
+        "study":STUDY, "curve_slug":CURVE,
+        "base_object_blake3":instance.base_hash,
+        "pool_object_blake3":instance.pool_hash,
+        "pilot_manifest_blake3":blake3::hash(SMALL_600_MANIFEST).to_hex().to_string(),
+        "source_files_blake3":{
+            "examples/koblitz_n83_mixed_orbit_worker.rs":blake3::hash(include_bytes!("koblitz_n83_mixed_orbit_worker.rs")).to_hex().to_string(),
+            "src/cryptanalysis/binary_semaev_chain_sat.rs":blake3::hash(include_bytes!("../src/cryptanalysis/binary_semaev_chain_sat.rs")).to_hex().to_string(),
+            "src/cryptanalysis/koblitz_large_prime.rs":blake3::hash(include_bytes!("../src/cryptanalysis/koblitz_large_prime.rs")).to_hex().to_string(),
+            "src/cryptanalysis/sat.rs":blake3::hash(include_bytes!("../src/cryptanalysis/sat.rs")).to_hex().to_string()
+        },
+        "public_corpus_canonical_json_blake3":PUBLIC_CORPUS_HASH,
+        "coef_a":instance.coef_a.to_string(), "coef_b":instance.coef_b.to_string(),
+        "group_target":point_json(&instance.group_target)?,
+        "base_summands":instance.base_summands,
+        "residual_summands":instance.residual_summands,
+        "base_points":instance.base.points.len(),
+        "residual_points":instance.residual.points.len(),
+        "shared_signed_orbits":instance.shared_signed_orbits,
+        "identity_mask":0, "order_first_pair":true,
+        "variables":instance.encoding.solver.n_vars(),
+        "original_clauses":instance.encoding.solver.n_original_clauses(),
+        "xor_rows":instance.encoding.solver.n_xors(),
+        "xcnf_bytes":xcnf.len(),
+        "xcnf_blake3":blake3::hash(xcnf).to_hex().to_string(),
+        "new_n83_solver_search_executed":false,
+        "selected_best_total_runtime":null
+    }))
+}
+
+/// Parse a complete CryptoMiniSat DIMACS model. Missing, repeated, and
+/// out-of-range variables fail closed before any curve-level interpretation.
+fn parse_external_sat_model(output: &[u8], variables: u32) -> Result<Vec<bool>> {
+    let text = std::str::from_utf8(output)?;
+    let mut values = vec![None; variables as usize];
+    let mut status_count = 0usize;
+    let mut terminated = false;
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line == "c" || line.starts_with("c ") {
+            continue;
+        }
+        if line == "s SATISFIABLE" {
+            status_count += 1;
+            continue;
+        }
+        let Some(words) = line.strip_prefix("v ") else {
+            return Err("unexpected external solver output line".into());
+        };
+        for word in words.split_whitespace() {
+            let literal: i32 = word.parse()?;
+            if literal == 0 {
+                if terminated {
+                    return Err("duplicate external model terminator".into());
+                }
+                terminated = true;
+                continue;
+            }
+            if terminated || literal.unsigned_abs() == 0 || literal.unsigned_abs() > variables {
+                return Err("external model literal outside exact variable domain".into());
+            }
+            let slot = &mut values[(literal.unsigned_abs() - 1) as usize];
+            if slot.replace(literal > 0).is_some() {
+                return Err("duplicate external model variable".into());
+            }
+        }
+    }
+    if status_count != 1 || !terminated {
+        return Err("external SAT status or model terminator missing".into());
+    }
+    values
+        .into_iter()
+        .collect::<Option<Vec<bool>>>()
+        .ok_or_else(|| "external SAT model is incomplete".into())
+}
+
+fn export_cross_xcnf(args: &[String]) -> Result<()> {
+    if args.len() != 11 {
+        return Err("usage: export-cross-xcnf BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR".into());
+    }
+    let instance = cross_xcnf_instance(args)?;
+    let xcnf = to_dimacs_xor(&instance.encoding.solver).into_bytes();
+    let metadata = cross_xcnf_metadata(&instance, &xcnf)?;
+    let output = Path::new(&args[10]);
+    fs::create_dir(output)?;
+    let mut stream = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(output.join("instance.xcnf"))?;
+    stream.write_all(&xcnf)?;
+    stream.sync_all()?;
+    write_new(&output.join("export.json"), &metadata)?;
+    println!(
+        "{}",
+        json!({"status":"PASS_XCNF_EXPORTED_NO_SOLVER","variables":metadata["variables"],"original_clauses":metadata["original_clauses"],"xor_rows":metadata["xor_rows"]})
+    );
+    Ok(())
+}
+
+fn verify_cross_xcnf(args: &[String]) -> Result<()> {
+    if args.len() != 13 {
+        return Err("usage: verify-cross-xcnf BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS EXPORT_DIR SOLVER_STDOUT OUTPUT_DIR".into());
+    }
+    let instance = cross_xcnf_instance(args)?;
+    let xcnf = to_dimacs_xor(&instance.encoding.solver).into_bytes();
+    let metadata = cross_xcnf_metadata(&instance, &xcnf)?;
+    let export_dir = Path::new(&args[10]);
+    if fs::read(export_dir.join("instance.xcnf"))? != xcnf
+        || serde_json::from_slice::<Value>(&fs::read(export_dir.join("export.json"))?)? != metadata
+    {
+        return Err("external XCNF bytes or metadata differ from pinned input replay".into());
+    }
+    let solver_output = fs::read(&args[11])?;
+    let assignment = parse_external_sat_model(&solver_output, instance.encoding.solver.n_vars())?;
+    if !instance.encoding.verify_external_assignment(&assignment) {
+        return Err("external model fails original CNF, XOR, or S3 equations".into());
+    }
+    let xs = instance
+        .encoding
+        .decode_summands_assignment(&assignment)
+        .ok_or("external model cannot decode summand x-coordinates")?;
+    let domains = MixedOrbitDomains::new(&instance.curve, &instance.base, &instance.residual)?;
+    let candidate = domains.lift(&xs, instance.base_summands, &instance.group_target);
+    let (status, candidate_json) = if let Some((base_indices, residual_points)) = candidate {
+        (
+            "PASS_ONE_EXTERNAL_PARTIAL",
+            Some(json!({
+                "source_id":1,
+                "a":instance.coef_a.to_string(), "b":instance.coef_b.to_string(),
+                "base_point_indices":base_indices,
+                "residual_points":residual_points.iter().map(point_json).collect::<Result<Vec<_>>>()?
+            })),
+        )
+    } else {
+        ("GROUP_REJECTED_EXTERNAL_MODEL", None)
+    };
+    let result = json!({
+        "schema":"n83.cross-stream-first-pattern-external-model/v1",
+        "status":status,
+        "xcnf_blake3":metadata["xcnf_blake3"],
+        "solver_stdout_blake3":blake3::hash(&solver_output).to_hex().to_string(),
+        "base_object_blake3":instance.base_hash,
+        "pool_object_blake3":instance.pool_hash,
+        "base_summands":instance.base_summands,
+        "residual_summands":instance.residual_summands,
+        "variables":assignment.len(),
+        "candidate":candidate_json,
+        "new_n83_solver_search_executed":true,
+        "selected_best_total_runtime":null
+    });
+    let output = Path::new(&args[12]);
+    fs::create_dir(output)?;
+    write_new(&output.join("result.json"), &result)?;
+    println!(
+        "{}",
+        json!({"status":status,"xcnf_blake3":metadata["xcnf_blake3"]})
+    );
+    Ok(())
+}
+
 /// One bounded natural-target call after exact replay of two different pilot streams.
 /// A separate supervisor must supply the local archive bytes and account for the run.
 fn run_cross_pilot(args: &[String]) -> Result<()> {
@@ -1070,6 +1313,8 @@ fn main() -> Result<()> {
         Some("run") => run(&args, &SMALL),
         Some("run-alt") => run(&args, &SMALL_600),
         Some("run-cross-pilot") => run_cross_pilot(&args),
+        Some("export-cross-xcnf") => export_cross_xcnf(&args),
+        Some("verify-cross-xcnf") => verify_cross_xcnf(&args),
         Some("verify-control") if args.len() == 6 => {
             let (curve, small, residual) = import_pair(&args, &SMALL)?;
             let target = control_target(Path::new(&args[5]), &curve, &small, &residual)?;
@@ -1208,5 +1453,26 @@ mod tests {
                 .as_str(),
             PUBLIC_CORPUS_HASH
         );
+    }
+
+    #[test]
+    fn external_sat_model_parser_requires_one_complete_assignment() {
+        assert_eq!(
+            parse_external_sat_model(b"c solver\ns SATISFIABLE\nv 1 -2\nv 3 0\n", 3).unwrap(),
+            vec![true, false, true]
+        );
+        for bad in [
+            "s UNSATISFIABLE\n",
+            "s SATISFIABLE\nv 1 -2 0\n",
+            "s SATISFIABLE\nv 1 -2 2 3 0\n",
+            "s SATISFIABLE\nv 1 -2 4 0\n",
+            "s SATISFIABLE\nv 1 -2 3 0\ns SATISFIABLE\n",
+            "s SATISFIABLE\nv 1 -2 3 0 0\n",
+        ] {
+            assert!(
+                parse_external_sat_model(bad.as_bytes(), 3).is_err(),
+                "{bad}"
+            );
+        }
     }
 }
