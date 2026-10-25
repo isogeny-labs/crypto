@@ -467,7 +467,7 @@ failures: 5 trials were not rankable because the solver counts in another unit
 (`crossbred-f2`, `sat-cdcl`, `buchberger-f2`), 3 hit the 120 s limit, and 2
 recovered no logarithm within the counted-trial cap. **No configuration beat
 the baseline at any rung**: every measured log2 ratio is positive (best
-completed trials +2.5 to +6 per rung), and the best projected objective is
+completed trials +1.5 to +6.2 per rung), and the best projected objective is
 +16.5 (slope 0.20 per bit), which §8 item 6 says to read with the per-rung
 ratios beside it. Twenty-four trials on a small space says little about which
 configuration is best; it shows the loop, the classes, the unit guard, the
