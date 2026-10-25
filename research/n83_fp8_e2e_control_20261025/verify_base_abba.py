@@ -23,8 +23,25 @@ def lines(path):
     return [json.loads(line) for line in Path(path).read_text().splitlines() if line]
 
 
+def verify_archive(output):
+    path = output / "archive_manifest.json"
+    if not path.exists():
+        return None
+    manifest = read(path)
+    files = {str(file.relative_to(output)): {
+        "size_bytes": file.stat().st_size, "sha256": run.sha(file)}
+        for file in output.rglob("*") if file.is_file() and
+        file.name not in ("archive_manifest.json", "independent_replay.json")}
+    if (manifest.get("schema") != "n83.fp8-base-abba-archive/v1" or
+            manifest.get("recorded_output_basename") != output.name or
+            manifest.get("files") != files):
+        raise ValueError("factor-base archive differs from immutable manifest")
+    return True
+
+
 def verify(output):
     output = Path(output).resolve(strict=True)
+    archive_ok = verify_archive(output)
     receipt = read(output / "summary.json")
     binary = output / "koblitz_orbit_dlp_fast"
     if (receipt.get("schema") != "n83.fp8-base-abba/v1" or
@@ -119,6 +136,7 @@ def verify(output):
         row["status"] == "PROCESS_EXITED" for row in checked)
     result = {"schema": "n83.fp8-base-abba-replay/v1",
               "status": "PASS_INDEPENDENT_REPLAY" if complete else "BOUNDED_INCOMPLETE",
+              "archive_ok": archive_ok,
               "rows": checked}
     (output / "independent_replay.json").write_text(
         json.dumps(result, sort_keys=True, indent=2) + "\n")
