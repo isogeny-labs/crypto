@@ -64,7 +64,7 @@ def fig_l2():
              f"({len(full)} draws). Each point is one draw.", fontsize=7, color=INK2)
     fig.tight_layout(rect=(0, 0.04, 1, 1))
     fig.savefig("l2_peak_rows.svg")
-    fig.savefig("l2_peak_rows.png", dpi=150)
+    fig.savefig("l2_peak_rows.png", dpi=110)
 
 
 def fig_l3():
@@ -79,18 +79,83 @@ def fig_l3():
             y = [math.log2(sum(r[key]["root_solves"] for r in sel if r["ell"] == e) /
                            sum(1 for r in sel if r["ell"] == e)) for e in ells]
             ax.plot(ells, y, color=col, lw=2, marker="o", ms=5, label=lab)
+        if m == 4:
+            a3 = [r for r in load("l3-gluing-a3.jsonl") if r["m"] == 4 and "gluing_left" in r]
+            if a3:
+                y = [math.log2(sum(r["gluing_left"]["root_solves"] for r in a3 if r["ell"] == e) /
+                               sum(1 for r in a3 if r["ell"] == e)) for e in ells]
+                ax.plot(ells, y, color=AQUA, lw=2, marker="s", ms=5, label="A–G, (L₁⋈L₂)⋈L₃")
         ax.plot(ells, [2 * e for e in ells], color=INK2, lw=1, ls=(0, (6, 3)), label="2ℓ")
         ax.set_xlabel("ℓ (subspace dimension)")
         ax.set_title(f"m = {m}, n = {m}ℓ", loc="left", fontsize=9, color=INK)
     axes[0].set_ylabel("log₂ root solves per target (mean of 4)")
     axes[0].legend(frameon=False, fontsize=8)
+    axes[1].legend(frameon=False, fontsize=7)
     fig.suptitle("L3: Agreeing–Gluing is the pair-table meet-in-the-middle", x=0.01,
                  ha="left", fontsize=10, color=INK)
     fig.text(0.01, 0.01, "Recorded: runs/l3-gluing.jsonl, 52 draws; both solvers return the "
              "same solution count on every draw.", fontsize=7, color=INK2)
     fig.tight_layout(rect=(0, 0.04, 1, 0.95))
     fig.savefig("l3_root_solves.svg")
-    fig.savefig("l3_root_solves.png", dpi=150)
+    fig.savefig("l3_root_solves.png", dpi=110)
+
+
+def fig_l2_sweep():
+    """Amendment 3 (order sweep) and Amendment 5 (restricted order, every draw)."""
+    rows = [r for r in load("a3o-*.jsonl") + load("a3b-*.jsonl") if r.get("built")]
+    a5 = [r for r in load("a5r-*.jsonl") if r.get("built")]
+    if not rows:
+        return
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 3.6), facecolor=SURF, sharey=True)
+    ax = axes[0]
+    style(ax)
+    cells = ["n11l5m4", "n22l6"]
+    names = {"n22l6": "m=3 (22,6) d0", "n11l5m4": "m=4 (11,5) d8", "n24l6": "m=3 (24,6)",
+             "n12l5m4": "m=4 (12,5)"}
+    for r in rows:
+        x = cells.index(r["cell"]) + (0.15 if r["restrict"] else -0.15)
+        col = BLUE if r["restrict"] else ORANGE
+        ax.scatter([x], [r["peak_basis_rows"] / r["columns"]], s=26, color=col, zorder=3,
+                   edgecolor=SURF, linewidth=1.2)
+    ax.scatter([], [], color=ORANGE, s=26, label="unrestricted (4 orders, 3 batches)")
+    ax.scatter([], [], color=BLUE, s=26, label="MXL variable restriction (4 orders)")
+    ax.set_xticks([0, 1])
+    ax.set_xticklabels([names[c] for c in cells])
+    ax.set_xlim(-0.6, 1.6)
+    ax.set_ylabel("peak basis rows / columns at refutation")
+    ax.set_title("A3: every order, one draw per cell", loc="left", fontsize=9, color=INK)
+    ax.legend(loc="lower left", frameon=False, fontsize=7)
+    ax = axes[1]
+    style(ax)
+    a5cells = ["n11l5m4", "n12l5m4", "n22l6", "n24l6"]
+    base = {(r["cell"], r["draw"]): r for r in load("g1-*.jsonl") if r.get("built")}
+    for r in a5 + [r for r in rows if r["restrict"] and r["order"] == "LowFirst"]:
+        if r["cell"] not in a5cells:
+            continue
+        x = a5cells.index(r["cell"])
+        ax.scatter([x + 0.12], [r["peak_basis_rows"] / r["columns"]], s=26, color=BLUE, zorder=3,
+                   edgecolor=SURF, linewidth=1.2)
+        b = base.get((r["cell"], r["draw"]))
+        if b:
+            ax.scatter([x - 0.12], [b["peak_basis_rows"] / b["columns"]], s=26, color=ORANGE,
+                       zorder=3, edgecolor=SURF, linewidth=1.2)
+            ax.plot([x - 0.12, x + 0.12], [b["peak_basis_rows"] / b["columns"],
+                                           r["peak_basis_rows"] / r["columns"]], color=GRID, lw=1)
+    ax.set_xticks(range(len(a5cells)))
+    ax.set_xticklabels([names[c] for c in a5cells], fontsize=7, rotation=20, ha="right")
+    ax.set_title("A5: low-first, unrestricted → restricted, per draw", loc="left", fontsize=9,
+                 color=INK)
+    for a in axes:
+        for v, lab in ((0.5, "falsifier 0.5"), (0.25, "payoff 0.25")):
+            a.axhline(v, color=INK2, lw=1, ls=(0, (6, 3)))
+        a.set_ylim(0, 1.08)
+    axes[1].text(3.5, 0.515, "falsifier 0.5", color=INK2, fontsize=7, ha="right")
+    axes[1].text(3.5, 0.265, "payoff 0.25", color=INK2, fontsize=7, ha="right")
+    fig.text(0.01, 0.01, "Recorded: runs/a3o-*, a3b-*, a5r-*, g1-*.jsonl. Each point is one run.",
+             fontsize=7, color=INK2)
+    fig.tight_layout(rect=(0, 0.04, 1, 1))
+    fig.savefig("l2_order_sweep.svg")
+    fig.savefig("l2_order_sweep.png", dpi=110)
 
 
 def fig_l4():
@@ -109,13 +174,21 @@ def fig_l4():
     ax.set_xticklabels(labels, rotation=30, ha="right", fontsize=8)
     ax.set_ylabel("degree")
     ax.legend(frameon=False, fontsize=8, loc="upper left")
-    ax.set_title("L4: the proved bound sits 12–22× above the measured degree", loc="left",
+    ax.set_title("L4: every proved bound sits far above the measured degree", loc="left",
                  fontsize=10, color=INK)
-    fig.text(0.01, 0.01, "Recorded: runs/l4-bounds.jsonl; measured degrees from the cited "
-             "closure studies.", fontsize=7, color=INK2)
+    a3 = {(r["m"], r["n"], r["ell"]): r for r in load("l4-bounds-a3.jsonl")}
+    hk = [a3.get((r["m"], r["n"], r["ell"]), {}).get("last_fall_bound") for r in rows]
+    if all(h is not None for h in hk):
+        ax.scatter(list(x), hk, color=AQUA, marker="D", s=24, zorder=3,
+                   label="last-fall bound (HKYY, q = 2)")
+        ax.set_yscale("log")
+        ax.legend(frameon=False, fontsize=8, loc="upper left")
+    fig.text(0.01, 0.01, "Recorded: runs/l4-bounds.jsonl, l4-bounds-a3.jsonl; measured degrees from "
+             "the cited closure studies. CCG Weil bound ≥ 2^15.5 on every cell (off scale).",
+             fontsize=7, color=INK2)
     fig.tight_layout(rect=(0, 0.04, 1, 1))
     fig.savefig("l4_bounds.svg")
-    fig.savefig("l4_bounds.png", dpi=150)
+    fig.savefig("l4_bounds.png", dpi=110)
 
 
 if __name__ == "__main__":
@@ -123,3 +196,4 @@ if __name__ == "__main__":
     fig_l4()
     if glob.glob(os.path.join(RUNS, "g1-*.jsonl")):
         fig_l2()
+        fig_l2_sweep()
