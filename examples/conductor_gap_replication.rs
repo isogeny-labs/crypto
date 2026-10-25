@@ -428,7 +428,15 @@ fn prepare_b(out: &Path, specs: &mut Vec<Value>, metadata: &mut Vec<Value>) {
                 );
                 let p = (t * t + d * ell * ell) / 4;
                 let r = p + 1 - t;
-                if !is_prime_u64(p) || !is_prime_u64(r) || (r as u128).pow(2) <= 16 * p as u128 {
+                // Pre-data amendment 2026-10-25: exclude anomalous curves and
+                // select the canonical degree-q CM kernel on the quadratic twist.
+                let q = (d + 1) / 4;
+                if t == 1
+                    || !(t + 2 * q - ell % (2 * q) + 2).is_multiple_of(2 * q)
+                    || !is_prime_u64(p)
+                    || !is_prime_u64(r)
+                    || (r as u128).pow(2) <= 16 * p as u128
+                {
                     continue;
                 }
                 let kd = kernel_degree(t, ell);
@@ -695,7 +703,7 @@ fn evidence_bytes(path: &Path) -> u64 {
         })
         .sum()
 }
-fn execute(out: &Path, audit: bool) {
+fn execute(out: &Path, audit: bool, selection: &str) {
     let manifest = load(out.join("manifest.json"));
     let clock = || {
         SystemTime::now()
@@ -712,6 +720,10 @@ fn execute(out: &Path, audit: bool) {
     }
     let first = u(&load(&receipt), "unix_seconds");
     for s in manifest["specs"].as_array().unwrap() {
+        let control = s["panel"] == "A-controls";
+        if (selection == "controls" && !control) || (selection == "primary" && control) {
+            continue;
+        }
         assert!(clock() - first < 5400, "90-minute admission guard");
         assert!(
             evidence_bytes(Path::new(ROOT)) < 8 * 1024 * 1024 * 1024,
@@ -783,6 +795,58 @@ fn execute(out: &Path, audit: bool) {
         .unwrap();
         println!("{name}: {}", if audit { "replayed" } else { "recorded" });
     }
+}
+fn gate_a(out: &Path) {
+    let manifest = load(out.join("manifest.json"));
+    let mut costs: BTreeMap<(u64, String), Vec<f64>> = BTreeMap::new();
+    let mut count = 0;
+    for s in manifest["specs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|s| s["panel"] == "A-controls")
+    {
+        let name = s["name"].as_str().unwrap();
+        let ci = name
+            .strip_prefix("a-c")
+            .unwrap()
+            .split('-')
+            .next()
+            .unwrap()
+            .parse::<u64>()
+            .unwrap();
+        let path = Path::new(ROOT)
+            .join("sessions")
+            .join(name)
+            .join("records.jsonl");
+        for r in lines(path) {
+            assert_eq!(
+                r["outcome"]["status"], "verified",
+                "control must recover correctly"
+            );
+            let arm = r["arm"].as_str().unwrap().to_string();
+            let value = r["cost"]["s"].as_f64().expect("counted S");
+            costs.entry((ci, arm)).or_default().push(value);
+            count += 1;
+        }
+    }
+    assert_eq!(count, 8192);
+    let logs = (0..8)
+        .map(|ci| {
+            let mean = |arm: &str| {
+                let xs = &costs[&(ci, arm.into())];
+                xs.iter().sum::<f64>() / xs.len() as f64
+            };
+            (mean("rho-plain") / mean("rho-neg-aa")).ln()
+        })
+        .collect::<Vec<_>>();
+    let result = interval(&logs, 2026102515);
+    let passed = result["ci95"][0].as_f64().unwrap() > 1.;
+    save(
+        Path::new(ROOT).join("positive-control-gate.json"),
+        &json!({"records":count,"rho_plain_over_negation":result,"passed":passed}),
+    );
+    assert!(passed, "positive control failed; primary must not start");
 }
 fn percentile(xs: &[f64], q: f64) -> f64 {
     let mut v = xs.to_vec();
@@ -1005,8 +1069,13 @@ fn main() {
         "prepare-b" => prepare(out, "B"),
         "identities" => identities(out),
         "check-bases" => check_cm_bases(out),
-        "run" => execute(out, false),
-        "audit" => execute(out, true),
+        "run" => execute(out, false, "all"),
+        "audit" => execute(out, true, "all"),
+        "run-controls" => execute(out, false, "controls"),
+        "audit-controls" => execute(out, true, "controls"),
+        "run-primary" => execute(out, false, "primary"),
+        "audit-primary" => execute(out, true, "primary"),
+        "gate-a" => gate_a(out),
         "analyze" => analyze(out),
         _ => panic!("unknown mode"),
     }

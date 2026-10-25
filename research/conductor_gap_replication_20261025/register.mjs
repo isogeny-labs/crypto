@@ -11,7 +11,7 @@ const doc=JSON.parse(original), aliases=JSON.parse(aliasOriginal);
 const frozen=new Map(doc.curves.map(c=>[c.slug,structuredClone(c)]));
 const bySlug=new Map(doc.curves.map(c=>[c.slug,c]));
 let added=0,representations=0;
-for(const panel of ['a','b']){
+for(const panel of ['a','b-v2']){
   const source=study+'/prepared-'+panel+'/identities.json';
   for(const row of JSON.parse(readFileSync(source,'utf8'))){
     const {normalized_aliases,...r}=row;
