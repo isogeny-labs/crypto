@@ -21,6 +21,10 @@ SOURCE_SHA256 = "05b64717b10e17c8cd09e8a6823e6efec600ac4b53c8a0e8e0476771c702cb7
 TARGETS_SHA256 = "2c068d2f659588edcdbaa685fc73bb146e2bfee3be123d377d537658f8021c6d"
 BASE_HASH = "0789049953a67b51dfe23f6fa2788d11e0bb4b35d52180fc038a3ffd2c0efb5f"
 STATE_COUNT = 1_255_377_750
+ROOT_ENTRIES = 2_510_698_617
+STATE_DIGEST = "9da41c8ab29021df544383ba46a7a380df24598d18257f9ece15db38f36e599f"
+TABLE_DIGEST = "706486ebe92dd362d51e61b411438dac97aaf877694a4768267374c7e11564b3"
+OVERFLOW_DIGEST = "32b38fbb451e10ac2b86949107bb93af67950ab6c6182b1ad0e39fc85b81fb33"
 SIDECAR_BYTES = 3_221_225_472
 ORDER = ("baseline", "fp8", "fp8", "baseline")
 STAGE_CAP_SECONDS = 2400
@@ -69,7 +73,13 @@ def parity_status(stages: list[dict]) -> str:
             or any(reference.get(field) != row["summary"].get(field)
                    for row in completed[1:] for field in SHARED_FIELDS)
             or any(row["summary"].get("base_hash") != BASE_HASH
+                   or row["summary"].get("factor_base_points") != 913_000
+                   or row["summary"].get("orbit_columns") != 5500
                    or row["summary"].get("regular_states") != STATE_COUNT
+                   or row["summary"].get("root_table_entries") != ROOT_ENTRIES
+                   or row["summary"].get("state_digest_blake3") != STATE_DIGEST
+                   or row["summary"].get("table_digest_blake3") != TABLE_DIGEST
+                   or row["summary"].get("overflow_digest_blake3") != OVERFLOW_DIGEST
                    or row["summary"].get("indexed4_split_at") != 4549
                    or row["summary"].get("root_fingerprint_sidecar_bytes") !=
                    (SIDECAR_BYTES if row["arm"] == "fp8" else 0)
