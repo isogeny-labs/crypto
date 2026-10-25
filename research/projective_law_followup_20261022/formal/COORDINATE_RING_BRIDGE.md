@@ -43,12 +43,21 @@ The remaining geometric obligation has four separate parts:
    Establish that the affine coordinate ring embeds in its function field.
 2. Prove the zero divisor of `n(X)/b - Y` includes the two input Mumford
    effective divisors, with scheme-theoretic multiplicity even when support
-   roots repeat or touch branch points. Identify the other degree-two zero
-   divisor with the *specific* output Mumford pair produced by reduction.
+   roots repeat or touch branch points. When the source coefficient `c≠0`,
+   identify the other degree-two zero divisor with the *specific* output
+   Mumford pair produced by reduction. When `c=0`, the support has degree at
+   most one and the output is the degree-one branch.
    The norm identity alone does not allocate zeros between conjugate factors.
-3. Prove its pole divisor is `6·∞`. The cubic interpolant has pole order six
-   at the unique point at infinity; this valuation is not represented by the
-   affine quotient theorem.
+3. Prove the pole divisor at the unique point at infinity is `6·∞` when
+   `c≠0`, and `5·∞` when `c=0`, for the smooth monic-quintic model. The
+   source-style interpolant has leading coefficient `-c`, so a nonzero
+   determinant `b` alone does not imply pole order six. The later Lean
+   `cubic_degree_le_two_of_c_zero` and
+   `support_degree_le_one_of_c_zero` prove the degree drops, but neither
+   formalizes this infinity valuation. For example, the source coefficients
+   `q1=q2=0`, `r1=1`, `r2=2`, `s1=s2=0`, `t1=t2=1` give `b=-1≠0` and
+   `c=0`; this is an algebraic gate witness, without a claimed smooth-curve
+   instance.
 4. Use the resulting principal divisor equation to identify the output class
    as the sum of input classes in `Pic⁰`, including all exceptional branches.
 

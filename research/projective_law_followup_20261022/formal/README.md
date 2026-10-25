@@ -68,6 +68,12 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   [JSON](common22-uniqueness.json), [graph](common22-uniqueness.svg), and
   [PDF](COMMON22_UNIQUENESS.pdf) distinguish the kernel-checked implication
   from source and geometric premises still to establish.
+- The [affine point-allocation packet](POINT_ALLOCATION.md) evaluates the
+  source-style norm identity at curve points. Its Lean theorems isolate the
+  overlap at `y=0`, prove that exactly one conjugate factor vanishes at an
+  unramified norm root when `2,B≠0`, and show the interpolant and support
+  degree drop when `C=0`. Zero-divisor multiplicities, infinity valuations,
+  output Mumford reduction, and the `Pic⁰` equation remain open.
 - `branch-coverage.json` gives the standardized runtime-label, Lean
   constructor, certificate-schema mapping and lists the five rejected or
   exceptional labels separately.

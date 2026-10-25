@@ -517,6 +517,13 @@ ordered common 2+2 coefficient and B/C guard statements to a Lean field
 model, with three kernel-checked theorems and mutation checks. The
 [coordinate-ring packet](formal/COORDINATE_RING_BRIDGE.md) then proves the
 source-style norm factorization in the affine ring `K[X,Y]/(Y²-f(X))`.
-These results do not prove compiled Rust field semantics, the returned
-coordinate formulas, principal-divisor zero/pole multiplicities, or the
-`Pic⁰` class equation; the full projective-law theorem remains open.
+The [point-allocation packet](formal/POINT_ALLOCATION.md) evaluates that
+identity on affine curve points: outside `y=0`, exactly one conjugate factor
+vanishes at a norm root; at `y=0`, both factors vanish. It also proves that
+`C=0` drops the interpolant degree to at most two and the residual support
+degree to at most one. Thus the infinity pole-order obligation is conditional:
+`6·∞` for `C≠0` and `5·∞` for `C=0` in the smooth monic-quintic model; these
+valuations are not yet formalized. These results do not prove compiled Rust
+field semantics, the returned coordinate formulas, principal-divisor
+zero/pole multiplicities, or the `Pic⁰` class equation; the full
+projective-law theorem remains open.
