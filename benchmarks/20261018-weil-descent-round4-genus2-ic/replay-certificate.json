@@ -1,0 +1,1515 @@
+{
+ "status": "verified",
+ "scalars_verified": true,
+ "schema": "replay-certificate (validation-gate/v1 fields + validator detail)",
+ "independent": true,
+ "validator": "Validator subagent (claude-opus-5-5, crypto-autoresearcher agents/validator.md), launched by the producing session but with its own nonce, sampling rule, replay builds, verifier and comparison code; the producer's numbers were not used as inputs",
+ "date": "2026-10-24",
+ "commit": "d01c574a271dbf8d04b19636d4612cf9926915eb",
+ "commit_notes": [
+  "Pinned snapshot d01c574a271dbf8d04b19636d4612cf9926915eb (coordinator update). The brief named 3a1aaa916c8017d58b53f08e15f9a8726640323d; the only difference in examples/n2_routes.rs is inside gae_band (Arm D priced over 6 cells), not on any replay path (validator-checked git diff).",
+  "The replay binary was built from the d01c574a271dbf8d04b19636d4612cf9926915eb source (sha256 33f1411d384b85c2fe72979a215181c9ba9336e2aa4e778f369c4b9a0bb0f230); the 3a1aaa916c8017d58b53f08e15f9a8726640323d source has sha256 0937a69b77be0e0ecf3cbb864446c49b2d29922d2bd05d985786838b7255c8f9.",
+  "HEAD later moved to dc46011b90c4ab81a9127616539fbd69bf5a2153 (adds Erratum V text to PROTOCOL.md, REPORT.md, REPORT_ROUND4.md only); every file used here is byte-identical between d01c574a271dbf8d04b19636d4612cf9926915eb and dc46011b90c4ab81a9127616539fbd69bf5a2153 except those three documents, and claimed values were read from the d01c574a271dbf8d04b19636d4612cf9926915eb tree (git archive)."
+ ],
+ "tool": "examples/n2_routes.rs",
+ "tool_sha256": "33f1411d384b85c2fe72979a215181c9ba9336e2aa4e778f369c4b9a0bb0f230",
+ "tool_build": "rustc 1.97.0 (2d8144b78 2026-07-07) --edition 2021 -O; host: this session's cloud container, 4 vCPU (the recorded H1/H2/H6 runs used rustc 1.99.1 on AMD EPYC 4564P RunPod pods; rows replay exactly across compiler and host)",
+ "nonce": "eba323dd9a142408f74d1cfa806c5289c39e639ca0a75f0c434f174baf57f4ad",
+ "nonce_source": "python3 -I -c 'import os; print(os.urandom(32).hex())'",
+ "nonce_drawn_at": "2026-10-24T20:14:11Z",
+ "sampling_rule": "select_jobs.py (fixed before the nonce was drawn): for each source run, enumerate its job list as n2_routes.rs main builds it for the recorded command; score each job by sha256('<nonce>|<run-dir>|<job-id>') ascending; select jobs of distinct sizes in score order up to the run's quota (itemOJ 3, itemF 2, H1 3, H2 3, H4 2, H6 1), a second pass admitting new cells if a run has fewer sizes than its quota. The replay unit is the smallest cell the tool can be restricted to by env (N2_SIZES, N2_HS, N2_CS), so every row of the selected job's cell is replayed and compared, and the selected job's own rows are reported separately. Supplementary cells (validator-chosen, NOT nonce-drawn, flagged nonce_drawn=false) extend coverage to every remaining recorded cell; they do not replace the nonce sample.",
+ "selection_script": {
+  "path": "research/weil_descent_angles_20261018/validation/select_jobs.py",
+  "sha256": "127b416824f812924d4aea6456eeb9f10f95a66ccfb45feb2356e21ef2626b72"
+ },
+ "comparison": {
+  "rule": "every replayed CSV row equals a recorded row of the same cell in every column except a trailing wall-clock `seconds` column (control.csv has none and is compared on all columns); multiset equality per cell; each dump line is tied 1:1 to its replayed row by (bits, [h], instance, target, arm[, theta]) with equal p, ell, N and verified == (k_found == k)",
+  "script": {
+   "path": "research/weil_descent_angles_20261018/validation/compare_replay.py",
+   "sha256": "7008dd0dfc9f1759d50234502a9f5e910dacdcbd1f0463b9cd1ef85ba31244af"
+  },
+  "negative_control": "a copy of routes.csv with walk_M + 1 in one 28-bit row gave 209/210 matched (exact false); a seconds-only change still matched 210/210"
+ },
+ "verifier": {
+  "path": "research/weil_descent_angles_20261018/validation/verify_dump.rs",
+  "sha256": "d9beef6702e78aaf4057414a8185d2e16c0adb0eff25b47a4f7d2843523a811b",
+  "build": "rustc --edition 2021 -O verify_dump.rs (unit test: rustc --test)",
+  "written_in": "/tmp/claude-0/-home-user/829a5db7-e7b3-5b24-827a-595408da4b3a/scratchpad/validator/ first, then copied byte-identical",
+  "independence": "std-only; its own F_{p^2} = F_p[i]/(i^2 - kappa), affine Weierstrass arithmetic, deterministic Miller-Rabin and Tonelli-Shanks over F_{p^2}; shares no code with n2_routes.rs",
+  "checks_per_line": [
+   "p prime",
+   "kappa a non-residue mod p",
+   "4a^3 + 27b^2 != 0",
+   "j(E) not in F_p (and not 0 or 1728)",
+   "P on E, P != O",
+   "Q on E",
+   "ell prime (deterministic Miller-Rabin)",
+   "ell*P = O",
+   "ell | N",
+   "|N - (p^2 + 1)| <= 2p",
+   "N*R = O for 4 random R on E",
+   "1 <= k < ell",
+   "k_found*P = Q",
+   "k_found == k"
+  ],
+  "negative_controls": "one real 44-bit dump line mutated 7 ways (k_found+1, k changed, Q negated, P off-curve, ell+2, N+2, N outside Hasse): each fails the expected checks, exit 1",
+  "output": {
+   "path": "research/weil_descent_angles_20261018/validation/replay/verify_dump.out.txt",
+   "sha256": "435b1f7c0ba1d023aee4c49e32937016f959a21677013fd5feafefb6e4134806"
+  }
+ },
+ "artifacts": {
+  "nonce.txt": {
+   "path": "research/weil_descent_angles_20261018/validation/replay/nonce.txt",
+   "sha256": "2a4c45b8a31ff8d0d43adbb491c6d994ae9b80e5c645aefe31659de76c8c1c1e"
+  },
+  "selection.json": {
+   "path": "research/weil_descent_angles_20261018/validation/replay/selection.json",
+   "sha256": "f579f06d7b84def3f731e29fab11b483de641ce086be938f6d822bd509a335c9"
+  },
+  "replay_log.txt": {
+   "path": "research/weil_descent_angles_20261018/validation/replay/replay_log.txt",
+   "sha256": "9d7f18822ff73e6444c1a72046a4981037a1c5695d3d5cca32c0984d35cc0c6f"
+  },
+  "replay-comparison.json": {
+   "path": "research/weil_descent_angles_20261018/validation/replay/replay-comparison.json",
+   "sha256": "4093f364bc113ab0da48202d45b962785de90f1f7fc502f6feff86b38100d00c"
+  },
+  "verify_dump.out.txt": {
+   "path": "research/weil_descent_angles_20261018/validation/replay/verify_dump.out.txt",
+   "sha256": "435b1f7c0ba1d023aee4c49e32937016f959a21677013fd5feafefb6e4134806"
+  },
+  "recompute.out.json": {
+   "path": "research/weil_descent_angles_20261018/validation/replay/recompute.out.json",
+   "sha256": "add99a117ba3905269b1aacfa099cd0e985f7001052607ef760ac8b8945c46ae"
+  },
+  "headlines.out.json": {
+   "path": "research/weil_descent_angles_20261018/validation/replay/headlines.out.json",
+   "sha256": "924ac31f11c50be381987d04a8a122da64eea14c8afc3f71081f617e094427dc"
+  }
+ },
+ "runs": [
+  {
+   "run": "research/weil_descent_angles_20261018/results/H1-hsweep-run-20261018T2240Z",
+   "recorded_with_commit": "0bd2a0f5c0b0f0005d57850c12466fa82b414c59",
+   "recorded_cmd": "rustc --edition 2021 -O examples/n2_routes.rs -o n2 && N2_THREADS=16 ./n2 \"$OUT\" hsweep",
+   "job_identity": "mode hsweep; job = (bits, h, instance), bits in {32,36,40}, h in {4,8,12,16,24,32,48,64,96,128}, instance 0..3; seed = splitmix(0x4831_0000 ^ (bits << 40) ^ (h << 8) ^ instance); 10 targets; arms R, J (+ Jind at 32 bits)",
+   "nonce_selected_jobs": [
+    {
+     "job": "bits=40,h=12,instance=2",
+     "score": "020ef71f0e863e9a9390803d3eca088fec1eb1f031dd4c98b0bbae90b9b722e1",
+     "mode": "hsweep",
+     "env": {
+      "N2_SIZES": "40",
+      "N2_HS": "12"
+     }
+    },
+    {
+     "job": "bits=32,h=96,instance=0",
+     "score": "0a8eb269d77dc7551be7b59432ec1bb8859430bcbb3ec16c9f20a507552dfafd",
+     "mode": "hsweep",
+     "env": {
+      "N2_SIZES": "32",
+      "N2_HS": "96"
+     }
+    },
+    {
+     "job": "bits=36,h=16,instance=2",
+     "score": "13b8bf56a0d58ef16455e95d558a2e80527778db16207ba06ad26574f611aec3",
+     "mode": "hsweep",
+     "env": {
+      "N2_SIZES": "36",
+      "N2_HS": "16"
+     }
+    }
+   ],
+   "replay_cells": [
+    {
+     "cell": "H1__b32_h96",
+     "nonce_drawn": true,
+     "cell_filter": {
+      "bits": "32",
+      "h": "96"
+     },
+     "replay": {
+      "command": "env N2_SIZES=32 N2_HS=96 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> hsweep",
+      "exit_code": 0,
+      "wall_seconds": 3
+     },
+     "rows_recorded_in_cell": 120,
+     "rows_replayed": 120,
+     "rows_matched": 120,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [
+      {
+       "job": "bits=32,h=96,instance=0",
+       "score": "0a8eb269d77dc7551be7b59432ec1bb8859430bcbb3ec16c9f20a507552dfafd",
+       "rows_recorded": 30,
+       "rows_replayed": 30,
+       "rows_matched": 30,
+       "exact": true
+      }
+     ],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H1__b32_h96/hsweep.csv",
+      "sha256": "9d516dc86049a0c63f44df423b256b7d5c73f96597fea060309bab55949eeedf"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H1__b32_h96/dump.jsonl.gz",
+      "sha256_gz": "f913dd1314a4150a2b429adff522cb0951165559cd0a66524f24bbffb470aa9c",
+      "sha256_uncompressed": "b8bd03cec0cf41585c51dbd71d4bf7705019bc44dd3faec0d32e3024ee06fe10",
+      "lines": 120
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 120,
+     "scalars_ok": 120,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "J": [
+       40,
+       40
+      ],
+      "Jind": [
+       40,
+       40
+      ],
+      "R": [
+       40,
+       40
+      ]
+     }
+    },
+    {
+     "cell": "H1__b36_h16",
+     "nonce_drawn": true,
+     "cell_filter": {
+      "bits": "36",
+      "h": "16"
+     },
+     "replay": {
+      "command": "env N2_SIZES=36 N2_HS=16 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> hsweep",
+      "exit_code": 0,
+      "wall_seconds": 5
+     },
+     "rows_recorded_in_cell": 80,
+     "rows_replayed": 80,
+     "rows_matched": 80,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [
+      {
+       "job": "bits=36,h=16,instance=2",
+       "score": "13b8bf56a0d58ef16455e95d558a2e80527778db16207ba06ad26574f611aec3",
+       "rows_recorded": 20,
+       "rows_replayed": 20,
+       "rows_matched": 20,
+       "exact": true
+      }
+     ],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H1__b36_h16/hsweep.csv",
+      "sha256": "ea9a29f981f5831b5b96a5732ed75fae4fa18fdb845efdcc6bbb7cbcab61759a"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H1__b36_h16/dump.jsonl.gz",
+      "sha256_gz": "b965afac255cce3d7ecf866b4eeeb13136dc6bf0d2a4cc821d97175474c549cb",
+      "sha256_uncompressed": "497ee1c2a2265179c1e36c93564e6c6f308e6d08b835c3d63b6a1b73677c9109",
+      "lines": 80
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 80,
+     "scalars_ok": 80,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "J": [
+       40,
+       40
+      ],
+      "R": [
+       40,
+       40
+      ]
+     }
+    },
+    {
+     "cell": "H1__b40_h12",
+     "nonce_drawn": true,
+     "cell_filter": {
+      "bits": "40",
+      "h": "12"
+     },
+     "replay": {
+      "command": "env N2_SIZES=40 N2_HS=12 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> hsweep",
+      "exit_code": 0,
+      "wall_seconds": 30
+     },
+     "rows_recorded_in_cell": 80,
+     "rows_replayed": 80,
+     "rows_matched": 80,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [
+      {
+       "job": "bits=40,h=12,instance=2",
+       "score": "020ef71f0e863e9a9390803d3eca088fec1eb1f031dd4c98b0bbae90b9b722e1",
+       "rows_recorded": 20,
+       "rows_replayed": 20,
+       "rows_matched": 20,
+       "exact": true
+      }
+     ],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H1__b40_h12/hsweep.csv",
+      "sha256": "d30ac198b833f6b4ebe525afe8a501552d74348831a142808290a0cc7588f8c4"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H1__b40_h12/dump.jsonl.gz",
+      "sha256_gz": "3ef36b5e6e89abd811c2a5bcfa32491d444063040e59b432be29ee026c57f1ad",
+      "sha256_uncompressed": "bfae6df49f044c6338ec2fa0ffde94d367b4eb13e0a4d7466c89e489f8ce348a",
+      "lines": 80
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 80,
+     "scalars_ok": 80,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "J": [
+       40,
+       40
+      ],
+      "R": [
+       40,
+       40
+      ]
+     }
+    },
+    {
+     "cell": "SUPP_H1__b32_rest",
+     "nonce_drawn": false,
+     "cell_filter": {
+      "bits": "32",
+      "h": [
+       "4",
+       "8",
+       "12",
+       "16",
+       "24",
+       "32",
+       "48",
+       "64",
+       "128"
+      ]
+     },
+     "replay": {
+      "command": "env N2_SIZES=32 N2_HS=4,8,12,16,24,32,48,64,128 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> hsweep",
+      "exit_code": 0,
+      "wall_seconds": 51
+     },
+     "rows_recorded_in_cell": 1080,
+     "rows_replayed": 1080,
+     "rows_matched": 1080,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H1__b32_rest/hsweep.csv",
+      "sha256": "e84cc1cb1aabeddf7bde5296efe02004d6816fde680ee1c01b67864d566c0d1e"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H1__b32_rest/dump.jsonl.gz",
+      "sha256_gz": "f289b1b55f2cce5dd1fd75640bb03500073c2c46d8e01ae219154f68274c0af8",
+      "sha256_uncompressed": "7c7f8ea94f9533c8072d0663acbca5442fe3a55b4990b6b8029ab44c450fe47e",
+      "lines": 1080
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 1080,
+     "scalars_ok": 1080,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 36,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "J": [
+       360,
+       360
+      ],
+      "Jind": [
+       360,
+       360
+      ],
+      "R": [
+       360,
+       360
+      ]
+     }
+    },
+    {
+     "cell": "SUPP_H1__b36_rest",
+     "nonce_drawn": false,
+     "cell_filter": {
+      "bits": "36",
+      "h": [
+       "4",
+       "8",
+       "12",
+       "24",
+       "32",
+       "48",
+       "64",
+       "96",
+       "128"
+      ]
+     },
+     "replay": {
+      "command": "env N2_SIZES=36 N2_HS=4,8,12,24,32,48,64,96,128 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> hsweep",
+      "exit_code": 0,
+      "wall_seconds": 51
+     },
+     "rows_recorded_in_cell": 720,
+     "rows_replayed": 720,
+     "rows_matched": 720,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H1__b36_rest/hsweep.csv",
+      "sha256": "99ce4c72d70e1b1e3b1e0ae5a8fa8c78f0f931bda5f117c05b3afea5baeb372a"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H1__b36_rest/dump.jsonl.gz",
+      "sha256_gz": "a94c369240ce9d059f03f181bfebb4a4595060395d03e1edf7dbd30b6e4e97b1",
+      "sha256_uncompressed": "54eda336939f704447a7528e2b01a7c453cbe7377fda6a10fabe3f822f6f960e",
+      "lines": 720
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 720,
+     "scalars_ok": 720,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 36,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "J": [
+       360,
+       360
+      ],
+      "R": [
+       360,
+       360
+      ]
+     }
+    },
+    {
+     "cell": "SUPP_H1__b40_rest",
+     "nonce_drawn": false,
+     "cell_filter": {
+      "bits": "40",
+      "h": [
+       "4",
+       "8",
+       "16",
+       "24",
+       "32",
+       "48",
+       "64",
+       "96",
+       "128"
+      ]
+     },
+     "replay": {
+      "command": "env N2_SIZES=40 N2_HS=4,8,16,24,32,48,64,96,128 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> hsweep",
+      "exit_code": 0,
+      "wall_seconds": 230
+     },
+     "rows_recorded_in_cell": 720,
+     "rows_replayed": 720,
+     "rows_matched": 720,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H1__b40_rest/hsweep.csv",
+      "sha256": "c0f1c6f11b021e869b57f3c5db2069f88a9c663e12dff2d627c5544e364cbea0"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H1__b40_rest/dump.jsonl.gz",
+      "sha256_gz": "e44332a80e303ebeb17edd975b729d408740b586b065f6378e4b2c2eb20a54b5",
+      "sha256_uncompressed": "26f746b29e81c3e5fdb7230711c0e9d7db323f5b229f45dcf7d7e1bed4ea5b6a",
+      "lines": 720
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 720,
+     "scalars_ok": 720,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 36,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "J": [
+       360,
+       360
+      ],
+      "R": [
+       360,
+       360
+      ]
+     }
+    }
+   ],
+   "rows_recorded_in_replayed_cells": 2800,
+   "rows_compared": 2800,
+   "rows_matched": 2800,
+   "nonce_rows_compared": 280,
+   "nonce_rows_matched": 280,
+   "scalars_checked": 2800,
+   "scalars_ok": 2800,
+   "dump_lines": 2800,
+   "rows_recorded_in_run": 2800,
+   "coverage": "2800/2800 recorded rows replayed",
+   "scalar_checks": {
+    "N_R_is_O": [
+     480,
+     480
+    ],
+    "N_in_Hasse_interval": [
+     120,
+     120
+    ],
+    "P_not_O": [
+     120,
+     120
+    ],
+    "P_on_E": [
+     120,
+     120
+    ],
+    "Q_on_E": [
+     2800,
+     2800
+    ],
+    "curve_nonsingular": [
+     120,
+     120
+    ],
+    "ell_P_is_O": [
+     120,
+     120
+    ],
+    "ell_divides_N": [
+     120,
+     120
+    ],
+    "ell_prime": [
+     120,
+     120
+    ],
+    "j_not_in_Fp": [
+     120,
+     120
+    ],
+    "k_found_P_eq_Q": [
+     2800,
+     2800
+    ],
+    "k_found_eq_k": [
+     2800,
+     2800
+    ],
+    "k_in_range": [
+     2800,
+     2800
+    ],
+    "kappa_nonresidue": [
+     120,
+     120
+    ],
+    "line_parses": [
+     2800,
+     2800
+    ],
+    "p_prime": [
+     120,
+     120
+    ],
+    "random_R_on_E": [
+     480,
+     480
+    ]
+   },
+   "all_rows_match": true,
+   "all_scalars_ok": true
+  },
+  {
+   "run": "research/weil_descent_angles_20261018/results/H2-glue-run-20261018T2240Z",
+   "recorded_with_commit": "0bd2a0f5c0b0f0005d57850c12466fa82b414c59",
+   "recorded_cmd": "rustc --edition 2021 -O examples/n2_routes.rs -o n2 && ./n2 \"$OUT\" gluecheck && N2_THREADS=16 ./n2 \"$OUT\" glue",
+   "job_identity": "mode glue; job = (bits, h, instance), bits in {28,32,36,40}, h in {1,4}, instance 0..3; seed = splitmix(0x6c75_0000 ^ (bits << 40) ^ (h << 8) ^ instance); 10 targets; arms R, Jglue (20 rows per job)",
+   "nonce_selected_jobs": [
+    {
+     "job": "bits=32,h=1,instance=0",
+     "score": "0117b8ad39207d57ce381514aff99b04b6cd7a8f33c4ef37ffd562c6fd2a4eaa",
+     "mode": "glue",
+     "env": {
+      "N2_SIZES": "32",
+      "N2_HS": "1"
+     }
+    },
+    {
+     "job": "bits=40,h=4,instance=2",
+     "score": "24a967e6eb84430ba0298e333229e09fde94ff3f91807e648cb20e2387660fa6",
+     "mode": "glue",
+     "env": {
+      "N2_SIZES": "40",
+      "N2_HS": "4"
+     }
+    },
+    {
+     "job": "bits=36,h=1,instance=1",
+     "score": "46783403f031456aa93dc7361c17f9bf43a95c82af03b89b10ca989acb3bf5f1",
+     "mode": "glue",
+     "env": {
+      "N2_SIZES": "36",
+      "N2_HS": "1"
+     }
+    }
+   ],
+   "replay_cells": [
+    {
+     "cell": "H2__b32_h1",
+     "nonce_drawn": true,
+     "cell_filter": {
+      "bits": "32",
+      "h": "1"
+     },
+     "replay": {
+      "command": "env N2_SIZES=32 N2_HS=1 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> glue",
+      "exit_code": 0,
+      "wall_seconds": 1
+     },
+     "rows_recorded_in_cell": 80,
+     "rows_replayed": 80,
+     "rows_matched": 80,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [
+      {
+       "job": "bits=32,h=1,instance=0",
+       "score": "0117b8ad39207d57ce381514aff99b04b6cd7a8f33c4ef37ffd562c6fd2a4eaa",
+       "rows_recorded": 20,
+       "rows_replayed": 20,
+       "rows_matched": 20,
+       "exact": true
+      }
+     ],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H2__b32_h1/glue.csv",
+      "sha256": "2221b2159e8827ff7ab3b421b034887c0f5e9c01d687483c21cc854f15d59ee2"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H2__b32_h1/dump.jsonl.gz",
+      "sha256_gz": "fbb57f910d46220d2f2a945403981e65b99bd6387fadda8ff58786d1136b0c70",
+      "sha256_uncompressed": "b0adb228a25f39bdd9eca794a1154e69846ad70c9eb030ece0ef1291221f23f4",
+      "lines": 80
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 80,
+     "scalars_ok": 80,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "Jglue": [
+       40,
+       40
+      ],
+      "R": [
+       40,
+       40
+      ]
+     }
+    },
+    {
+     "cell": "H2__b36_h1",
+     "nonce_drawn": true,
+     "cell_filter": {
+      "bits": "36",
+      "h": "1"
+     },
+     "replay": {
+      "command": "env N2_SIZES=36 N2_HS=1 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> glue",
+      "exit_code": 0,
+      "wall_seconds": 2
+     },
+     "rows_recorded_in_cell": 80,
+     "rows_replayed": 80,
+     "rows_matched": 80,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [
+      {
+       "job": "bits=36,h=1,instance=1",
+       "score": "46783403f031456aa93dc7361c17f9bf43a95c82af03b89b10ca989acb3bf5f1",
+       "rows_recorded": 20,
+       "rows_replayed": 20,
+       "rows_matched": 20,
+       "exact": true
+      }
+     ],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H2__b36_h1/glue.csv",
+      "sha256": "e2e2ee1459c0804ae2ab6a9b74485981e5b783ee1d4c4fdf526cb583eb34b195"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H2__b36_h1/dump.jsonl.gz",
+      "sha256_gz": "292d27dd7ec13bfd3bcd3c6ce8cac729d1ade949b7dfda9f42768022f686e4a1",
+      "sha256_uncompressed": "bf41a36401dc01b3fdc06a9053903c62e1a31a1574f3ac381579541a29ca0b8a",
+      "lines": 80
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 80,
+     "scalars_ok": 80,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "Jglue": [
+       40,
+       40
+      ],
+      "R": [
+       40,
+       40
+      ]
+     }
+    },
+    {
+     "cell": "H2__b40_h4",
+     "nonce_drawn": true,
+     "cell_filter": {
+      "bits": "40",
+      "h": "4"
+     },
+     "replay": {
+      "command": "env N2_SIZES=40 N2_HS=4 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> glue",
+      "exit_code": 0,
+      "wall_seconds": 21
+     },
+     "rows_recorded_in_cell": 80,
+     "rows_replayed": 80,
+     "rows_matched": 80,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [
+      {
+       "job": "bits=40,h=4,instance=2",
+       "score": "24a967e6eb84430ba0298e333229e09fde94ff3f91807e648cb20e2387660fa6",
+       "rows_recorded": 20,
+       "rows_replayed": 20,
+       "rows_matched": 20,
+       "exact": true
+      }
+     ],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H2__b40_h4/glue.csv",
+      "sha256": "fe3e0ff5ea9b8955820a3174940fcfc7ab1c03db5922033319302e9071f1af1d"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H2__b40_h4/dump.jsonl.gz",
+      "sha256_gz": "6f2027d94b620ffba7585a8e69129879b02459282fbd088b42c4a840ba371571",
+      "sha256_uncompressed": "dd56a770c5c41885f3731eb61b5f6598b8d8024a01fac0d2eed37073f34c8a2f",
+      "lines": 80
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 80,
+     "scalars_ok": 80,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "Jglue": [
+       40,
+       40
+      ],
+      "R": [
+       40,
+       40
+      ]
+     }
+    },
+    {
+     "cell": "SUPP_H2__b28_h1",
+     "nonce_drawn": false,
+     "cell_filter": {
+      "bits": "28",
+      "h": "1"
+     },
+     "replay": {
+      "command": "env N2_SIZES=28 N2_HS=1 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> glue",
+      "exit_code": 0,
+      "wall_seconds": 0
+     },
+     "rows_recorded_in_cell": 80,
+     "rows_replayed": 80,
+     "rows_matched": 80,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H2__b28_h1/glue.csv",
+      "sha256": "cb7139431bc5420820d434a3a427b2e9db6d3df25999b06e6fee35896c40db30"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H2__b28_h1/dump.jsonl.gz",
+      "sha256_gz": "08460fc50445079467cab38e458a618eb7511a6de1056af329070acefde14b3b",
+      "sha256_uncompressed": "66ba53ae895f1c05d4ffd6f247c0754a1411956ef194968eb14955c61753bf1a",
+      "lines": 80
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 80,
+     "scalars_ok": 80,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "Jglue": [
+       40,
+       40
+      ],
+      "R": [
+       40,
+       40
+      ]
+     }
+    },
+    {
+     "cell": "SUPP_H2__b28_h4",
+     "nonce_drawn": false,
+     "cell_filter": {
+      "bits": "28",
+      "h": "4"
+     },
+     "replay": {
+      "command": "env N2_SIZES=28 N2_HS=4 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> glue",
+      "exit_code": 0,
+      "wall_seconds": 0
+     },
+     "rows_recorded_in_cell": 80,
+     "rows_replayed": 80,
+     "rows_matched": 80,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H2__b28_h4/glue.csv",
+      "sha256": "50a4fccb2f9c1521171189c905fcdd426790ce84b55c5f8dd6db990e60a23fc5"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H2__b28_h4/dump.jsonl.gz",
+      "sha256_gz": "b945435fddf8d40b8cf127da2d347aafd2ee55435268cf3525ea22a238f218a4",
+      "sha256_uncompressed": "ae77bc28c0003aa15a6e8de5e40adb82b01fc884bdef2a873b6ab73602ac5d8f",
+      "lines": 80
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 80,
+     "scalars_ok": 80,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "Jglue": [
+       40,
+       40
+      ],
+      "R": [
+       40,
+       40
+      ]
+     }
+    },
+    {
+     "cell": "SUPP_H2__b32_h4",
+     "nonce_drawn": false,
+     "cell_filter": {
+      "bits": "32",
+      "h": "4"
+     },
+     "replay": {
+      "command": "env N2_SIZES=32 N2_HS=4 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> glue",
+      "exit_code": 0,
+      "wall_seconds": 1
+     },
+     "rows_recorded_in_cell": 80,
+     "rows_replayed": 80,
+     "rows_matched": 80,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H2__b32_h4/glue.csv",
+      "sha256": "baa4438981a0e8d141f1115618fa05f908accb2de102b67f4651d7ce6c54f673"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H2__b32_h4/dump.jsonl.gz",
+      "sha256_gz": "d66972aacfcc52b237ebbbf473c181090361d83a8ef7040c4f54182336cc3676",
+      "sha256_uncompressed": "52f9332b16672296de7fb23be8fc2db88ecb473cef92dccad2d607b1bd00d2e4",
+      "lines": 80
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 80,
+     "scalars_ok": 80,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "Jglue": [
+       40,
+       40
+      ],
+      "R": [
+       40,
+       40
+      ]
+     }
+    },
+    {
+     "cell": "SUPP_H2__b36_h4",
+     "nonce_drawn": false,
+     "cell_filter": {
+      "bits": "36",
+      "h": "4"
+     },
+     "replay": {
+      "command": "env N2_SIZES=36 N2_HS=4 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> glue",
+      "exit_code": 0,
+      "wall_seconds": 5
+     },
+     "rows_recorded_in_cell": 80,
+     "rows_replayed": 80,
+     "rows_matched": 80,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H2__b36_h4/glue.csv",
+      "sha256": "3283e3050fbe006250e79728ed1be0c04a190be15da3073fece7d6b9c45e3934"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H2__b36_h4/dump.jsonl.gz",
+      "sha256_gz": "f812393735bfb5c59ff5eae6ccc1341ce60ed3b9c707bc42373accc8f9e9dd36",
+      "sha256_uncompressed": "1056d0f6b8dd924d9f23932366b7594010046750272c6ba779da6cdc74afa20a",
+      "lines": 80
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 80,
+     "scalars_ok": 80,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "Jglue": [
+       40,
+       40
+      ],
+      "R": [
+       40,
+       40
+      ]
+     }
+    },
+    {
+     "cell": "SUPP_H2__b40_h1",
+     "nonce_drawn": false,
+     "cell_filter": {
+      "bits": "40",
+      "h": "1"
+     },
+     "replay": {
+      "command": "env N2_SIZES=40 N2_HS=1 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> glue",
+      "exit_code": 0,
+      "wall_seconds": 12
+     },
+     "rows_recorded_in_cell": 80,
+     "rows_replayed": 80,
+     "rows_matched": 80,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H2__b40_h1/glue.csv",
+      "sha256": "8c765f0df57345e254f6868d379c0cb4e6d942c6fa8112076c8d795173754721"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H2__b40_h1/dump.jsonl.gz",
+      "sha256_gz": "c9660ac3e1c2fbc9aecbda68db510ed52f4d8bdaadcdd48e30b5d1947fc44efc",
+      "sha256_uncompressed": "fc16428aed8b58cd2f21d182b5fa1ad570dca897b9bd0030412583fc902f3a12",
+      "lines": 80
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 80,
+     "scalars_ok": 80,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "Jglue": [
+       40,
+       40
+      ],
+      "R": [
+       40,
+       40
+      ]
+     }
+    }
+   ],
+   "rows_recorded_in_replayed_cells": 640,
+   "rows_compared": 640,
+   "rows_matched": 640,
+   "nonce_rows_compared": 240,
+   "nonce_rows_matched": 240,
+   "scalars_checked": 640,
+   "scalars_ok": 640,
+   "dump_lines": 640,
+   "rows_recorded_in_run": 640,
+   "coverage": "640/640 recorded rows replayed",
+   "scalar_checks": {
+    "N_R_is_O": [
+     128,
+     128
+    ],
+    "N_in_Hasse_interval": [
+     32,
+     32
+    ],
+    "P_not_O": [
+     32,
+     32
+    ],
+    "P_on_E": [
+     32,
+     32
+    ],
+    "Q_on_E": [
+     640,
+     640
+    ],
+    "curve_nonsingular": [
+     32,
+     32
+    ],
+    "ell_P_is_O": [
+     32,
+     32
+    ],
+    "ell_divides_N": [
+     32,
+     32
+    ],
+    "ell_prime": [
+     32,
+     32
+    ],
+    "j_not_in_Fp": [
+     32,
+     32
+    ],
+    "k_found_P_eq_Q": [
+     640,
+     640
+    ],
+    "k_found_eq_k": [
+     640,
+     640
+    ],
+    "k_in_range": [
+     640,
+     640
+    ],
+    "kappa_nonresidue": [
+     32,
+     32
+    ],
+    "line_parses": [
+     640,
+     640
+    ],
+    "p_prime": [
+     32,
+     32
+    ],
+    "random_R_on_E": [
+     128,
+     128
+    ]
+   },
+   "all_rows_match": true,
+   "all_scalars_ok": true
+  },
+  {
+   "run": "research/weil_descent_angles_20261018/results/H4-memsweep-run-20261018T2209Z",
+   "recorded_with_commit": "6083c58aa45e04e4d3194689b3b3e6ef5c7be115",
+   "recorded_cmd": "n2_routes <dir> memsweep (N2_THREADS=4, sizes 32,36)",
+   "job_identity": "mode memsweep; job = (bits, theta, instance), bits in {32,36}, theta in {1/2,1/4,1/8}, instance 0..3; seed = splitmix(0x4831_0000 ^ (bits << 40) ^ (4 << 8) ^ instance) (the h = 4 instances of H1); 10 targets; arm Jtheta (10 rows per job)",
+   "nonce_selected_jobs": [
+    {
+     "job": "bits=36,theta=0.25,instance=0",
+     "score": "1489fc0ad8cc7be560f887a9055813cee56d6b188c2d2ec23315508c1eddcf05",
+     "mode": "memsweep",
+     "env": {
+      "N2_SIZES": "36"
+     }
+    },
+    {
+     "job": "bits=32,theta=0.5,instance=1",
+     "score": "431ca3151923c3b2aab0a4ddde5ac996580009c047fc3e9f50c8fa87574da4e7",
+     "mode": "memsweep",
+     "env": {
+      "N2_SIZES": "32"
+     }
+    }
+   ],
+   "replay_cells": [
+    {
+     "cell": "H4__b32",
+     "nonce_drawn": true,
+     "cell_filter": {
+      "bits": "32"
+     },
+     "replay": {
+      "command": "env N2_SIZES=32 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> memsweep",
+      "exit_code": 0,
+      "wall_seconds": 1
+     },
+     "rows_recorded_in_cell": 120,
+     "rows_replayed": 120,
+     "rows_matched": 120,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [
+      {
+       "job": "bits=32,theta=0.5,instance=1",
+       "score": "431ca3151923c3b2aab0a4ddde5ac996580009c047fc3e9f50c8fa87574da4e7",
+       "rows_recorded": 10,
+       "rows_replayed": 10,
+       "rows_matched": 10,
+       "exact": true
+      }
+     ],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H4__b32/memsweep.csv",
+      "sha256": "01478ce8b14129edb7a27f92c9278ff8b52339eefcfa0e292a8e2ad92f77d873"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H4__b32/dump.jsonl.gz",
+      "sha256_gz": "92a23d4f61ff671bdee41b4622807606ada09bae999d58f6a235268c3d3f39ee",
+      "sha256_uncompressed": "e77797a540faffc9f2bf9767b434694e7a2fc9dfc59267119e952b3505e1ac07",
+      "lines": 120
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 120,
+     "scalars_ok": 120,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "Jtheta": [
+       120,
+       120
+      ]
+     }
+    },
+    {
+     "cell": "H4__b36",
+     "nonce_drawn": true,
+     "cell_filter": {
+      "bits": "36"
+     },
+     "replay": {
+      "command": "env N2_SIZES=36 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> memsweep",
+      "exit_code": 0,
+      "wall_seconds": 4
+     },
+     "rows_recorded_in_cell": 120,
+     "rows_replayed": 120,
+     "rows_matched": 120,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [
+      {
+       "job": "bits=36,theta=0.25,instance=0",
+       "score": "1489fc0ad8cc7be560f887a9055813cee56d6b188c2d2ec23315508c1eddcf05",
+       "rows_recorded": 10,
+       "rows_replayed": 10,
+       "rows_matched": 10,
+       "exact": true
+      }
+     ],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H4__b36/memsweep.csv",
+      "sha256": "2313ba1253bf736f5bf5b0cab47257e3b0d74c5bb54e9d0d0e7104d06bd77918"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H4__b36/dump.jsonl.gz",
+      "sha256_gz": "fb9d27413692fcd337082a7fd51aeca1666e7555fbbdccb940ab9196eb359e84",
+      "sha256_uncompressed": "ab80ea24b60f720c884c56db6f41a8cac23203cd3dcc91545965c18c26bc3d96",
+      "lines": 120
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 120,
+     "scalars_ok": 120,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 4,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "Jtheta": [
+       120,
+       120
+      ]
+     }
+    }
+   ],
+   "rows_recorded_in_replayed_cells": 240,
+   "rows_compared": 240,
+   "rows_matched": 240,
+   "nonce_rows_compared": 240,
+   "nonce_rows_matched": 240,
+   "scalars_checked": 240,
+   "scalars_ok": 240,
+   "dump_lines": 240,
+   "rows_recorded_in_run": 240,
+   "coverage": "240/240 recorded rows replayed",
+   "scalar_checks": {
+    "N_R_is_O": [
+     32,
+     32
+    ],
+    "N_in_Hasse_interval": [
+     8,
+     8
+    ],
+    "P_not_O": [
+     8,
+     8
+    ],
+    "P_on_E": [
+     8,
+     8
+    ],
+    "Q_on_E": [
+     240,
+     240
+    ],
+    "curve_nonsingular": [
+     8,
+     8
+    ],
+    "ell_P_is_O": [
+     8,
+     8
+    ],
+    "ell_divides_N": [
+     8,
+     8
+    ],
+    "ell_prime": [
+     8,
+     8
+    ],
+    "j_not_in_Fp": [
+     8,
+     8
+    ],
+    "k_found_P_eq_Q": [
+     240,
+     240
+    ],
+    "k_found_eq_k": [
+     240,
+     240
+    ],
+    "k_in_range": [
+     240,
+     240
+    ],
+    "kappa_nonresidue": [
+     8,
+     8
+    ],
+    "line_parses": [
+     240,
+     240
+    ],
+    "p_prime": [
+     8,
+     8
+    ],
+    "random_R_on_E": [
+     32,
+     32
+    ]
+   },
+   "all_rows_match": true,
+   "all_scalars_ok": true
+  },
+  {
+   "run": "research/weil_descent_angles_20261018/results/H6-large-run-20261018T2210Z",
+   "recorded_with_commit": "6083c58aa45e04e4d3194689b3b3e6ef5c7be115",
+   "recorded_cmd": "rustc --edition 2021 -O examples/n2_routes.rs -o n2 && N2_THREADS=16 N2_SIZES=44,48 N2_CS=2 ./n2 \"$OUT\" run",
+   "job_identity": "mode run with N2_CS=2; job = (bits, instance), bits in {44,48}, instance 0..2; seed = splitmix(0x6e32_5eed ^ (bits << 32) ^ instance); 10 targets; arms R, J2, D2 (30 rows per job)",
+   "nonce_selected_jobs": [
+    {
+     "job": "bits=44,instance=0",
+     "score": "29f52c113994cc78dd5834baed50729a828ce3cc1d8577f550c247e31609d554",
+     "mode": "run",
+     "env": {
+      "N2_SIZES": "44",
+      "N2_CS": "2"
+     }
+    }
+   ],
+   "replay_cells": [
+    {
+     "cell": "H6__b44_c2",
+     "nonce_drawn": true,
+     "cell_filter": {
+      "bits": "44"
+     },
+     "replay": {
+      "command": "env N2_SIZES=44 N2_CS=2 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> run",
+      "exit_code": 0,
+      "wall_seconds": 241
+     },
+     "rows_recorded_in_cell": 90,
+     "rows_replayed": 90,
+     "rows_matched": 90,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [
+      {
+       "job": "bits=44,instance=0",
+       "score": "29f52c113994cc78dd5834baed50729a828ce3cc1d8577f550c247e31609d554",
+       "rows_recorded": 30,
+       "rows_replayed": 30,
+       "rows_matched": 30,
+       "exact": true
+      }
+     ],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H6__b44_c2/routes.csv",
+      "sha256": "e18b0ea7f49634682e928fd082b84a59f43f38def9ba336632354489ef167571"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/H6__b44_c2/dump.jsonl.gz",
+      "sha256_gz": "0f192a59956dddff85bbab95751878d645eaa194d3693eacbecd3a1085b736e8",
+      "sha256_uncompressed": "9c920cc27056040bf98e5e8af7a07e8100b9f5f6d64d68c1aa190bcfee88dc0f",
+      "lines": 90
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 90,
+     "scalars_ok": 90,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 3,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "D2": [
+       30,
+       30
+      ],
+      "J2": [
+       30,
+       30
+      ],
+      "R0": [
+       30,
+       30
+      ]
+     }
+    },
+    {
+     "cell": "SUPP_H6__b48_c2",
+     "nonce_drawn": false,
+     "cell_filter": {
+      "bits": "48"
+     },
+     "replay": {
+      "command": "env N2_SIZES=48 N2_CS=2 N2_THREADS=4 N2_DUMP=<cell>/dump.jsonl n2 <cell> run",
+      "exit_code": 0,
+      "wall_seconds": 1282
+     },
+     "rows_recorded_in_cell": 90,
+     "rows_replayed": 90,
+     "rows_matched": 90,
+     "exact_match": true,
+     "compared_columns": "all but trailing seconds",
+     "selected_job_rows": [],
+     "replay_csv": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H6__b48_c2/routes.csv",
+      "sha256": "cec59b62a20eb839552935bf9b7ec0ed7420c3b3ab7f89e1d643eac5964e5772"
+     },
+     "dump": {
+      "path": "research/weil_descent_angles_20261018/validation/replay/SUPP_H6__b48_c2/dump.jsonl.gz",
+      "sha256_gz": "ae040f1da62873e5186d4cb6d76df0c741d5f9fb28ef7d4569f57d683703e934",
+      "sha256_uncompressed": "469c6657a1655a4093e9c9d4d602c70ff214a6d120aaf05c5bef20e0e0dc5bd2",
+      "lines": 90
+     },
+     "dump_tied_to_rows": true,
+     "scalars_checked": 90,
+     "scalars_ok": 90,
+     "scalars_ok_definition": "min over dump lines passing Q_on_E, k_found*P = Q and k_found == k",
+     "all_scalar_checks_ok": true,
+     "distinct_curves": 3,
+     "curves_with_j_in_Fp": 0,
+     "curves_with_j_0_or_1728": 0,
+     "answers_verified_per_arm": {
+      "D2": [
+       30,
+       30
+      ],
+      "J2": [
+       30,
+       30
+      ],
+      "R0": [
+       30,
+       30
+      ]
+     }
+    }
+   ],
+   "rows_recorded_in_replayed_cells": 180,
+   "rows_compared": 180,
+   "rows_matched": 180,
+   "nonce_rows_compared": 90,
+   "nonce_rows_matched": 90,
+   "scalars_checked": 180,
+   "scalars_ok": 180,
+   "dump_lines": 180,
+   "rows_recorded_in_run": 180,
+   "coverage": "180/180 recorded rows replayed",
+   "scalar_checks": {
+    "N_R_is_O": [
+     24,
+     24
+    ],
+    "N_in_Hasse_interval": [
+     6,
+     6
+    ],
+    "P_not_O": [
+     6,
+     6
+    ],
+    "P_on_E": [
+     6,
+     6
+    ],
+    "Q_on_E": [
+     180,
+     180
+    ],
+    "curve_nonsingular": [
+     6,
+     6
+    ],
+    "ell_P_is_O": [
+     6,
+     6
+    ],
+    "ell_divides_N": [
+     6,
+     6
+    ],
+    "ell_prime": [
+     6,
+     6
+    ],
+    "j_not_in_Fp": [
+     6,
+     6
+    ],
+    "k_found_P_eq_Q": [
+     180,
+     180
+    ],
+    "k_found_eq_k": [
+     180,
+     180
+    ],
+    "k_in_range": [
+     180,
+     180
+    ],
+    "kappa_nonresidue": [
+     6,
+     6
+    ],
+    "line_parses": [
+     180,
+     180
+    ],
+    "p_prime": [
+     6,
+     6
+    ],
+    "random_R_on_E": [
+     24,
+     24
+    ]
+   },
+   "all_rows_match": true,
+   "all_scalars_ok": true
+  }
+ ],
+ "totals": {
+  "rows_compared": 3860,
+  "rows_matched": 3860,
+  "nonce_rows_compared": 850,
+  "nonce_rows_matched": 850,
+  "scalars_checked": 3860,
+  "scalars_ok": 3860,
+  "rows_recorded": 3860
+ },
+ "limitations": [
+  "H4 ran in the producer's container at 6083c58aa without a recorded dirty-tree state or rusage; H1/H2/H6 pods fetched the tool at the cited commit with a sha256 check that the validator re-derived from git (fd8faeb6... for 0bd2a0f5c, fb19b56a... for 6083c58aa).",
+  "Wall-clock `seconds` is excluded from the match by rule; no timing claim is certified.",
+  "Operation counts (walk_M, jac_M, la_native, ...) are certified as reproducible (exact replay), not as independently re-derived: the verifier checks answers and group data, not the counting."
+ ]
+}
