@@ -76,7 +76,7 @@ policy after seeing outcomes and present it as a preregistered uniform result.
 ## Independence, proofs, controls and resource envelope
 
 C++ may reuse frozen native field/polynomial/adaptive helpers, exact rational
-arithmetic uses Boost multiprecision. Independent Rust uses existing separate
+arithmetic uses GMP exact rationals. Independent Rust uses existing separate
 point/field/row/witness arithmetic plus independently implemented exact
 rational/state recursion; no C++ arithmetic shared. Recompute all responses,
 matrices/ranks/states/rationals and actual scalars, not merely producer hashes.
@@ -97,3 +97,9 @@ update. No timing/GAE/S/rho/external-fastest/leaderboard promotion or general
 hardness claim. Actual Conductor precheck127/no reservation/replacement.
 Broader mathematical, coordination, review, CI/access and integration holds
 remain; open theorem/null result does not cancel independent feasible research.
+
+Pre-execution tooling correction: the first compile found Boost headers absent.
+Use existing installed GMP/gmpxx headers/libraries for exact C++ rationals
+(-lgmpxx -lgmp), preserving the same rational protocol and independent Rust
+implementation. Failed source/log retained; no native execution preceded this
+correction and no new resource/provisioning is requested.
