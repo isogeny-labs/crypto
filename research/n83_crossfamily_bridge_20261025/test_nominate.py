@@ -81,12 +81,14 @@ class NominationTests(unittest.TestCase):
     def test_complete_panels_nominate_exact_union(self):
         result = nominate.nominate(nearby_panel(), wide_panel())
         self.assertEqual(result["status"], "READY_FOR_BRIDGE_DISPATCH")
-        self.assertEqual(len(result["candidate_ids"]), 5)
+        self.assertEqual(len(result["candidate_ids"]), 7)
         self.assertEqual(set(result["candidate_ids"]), {
             nearby_catalog.CANDIDATES[1107][0],
             nearby_catalog.CANDIDATES[1115][0],
             wide_arms.ARMS[0][3], wide_arms.ARMS[3][3],
-            nominate.MIDDLE_ID})
+            nominate.MIDDLE_ID,
+            nominate.FRONTIER[4300][0],
+            nominate.FRONTIER[4405][0]})
         self.assertEqual(result["comparison_variable"],
                          "factor_base_and_index_policy")
         self.assertEqual(result["index_policy_by_candidate_id"][
@@ -96,6 +98,8 @@ class NominationTests(unittest.TestCase):
             wide_arms.ARMS[3][3]], "root4_fixed31_bloom_standard")
         self.assertEqual(result["index_policy_by_candidate_id"][
             nominate.MIDDLE_ID], "root5_dynamic_load75_no_bloom")
+        self.assertEqual(result["index_policy_by_candidate_id"][
+            nominate.FRONTIER[4405][0]], "root5_fixed30_bloom_wide3")
 
     def test_k2304_manifest_digest_is_required(self):
         with mock.patch.object(nominate, "MIDDLE_MANIFEST_SHA256", "0" * 64):
@@ -103,6 +107,16 @@ class NominationTests(unittest.TestCase):
         self.assertEqual(result["status"], "BOUNDED_UNKNOWN")
         self.assertEqual(result["reason"],
                          "K2304_CURRENT_SOURCE_IDENTITY_DIFFERS")
+
+    def test_frontier_manifest_digest_is_required(self):
+        broken = dict(nominate.FRONTIER)
+        original = broken[4405]
+        broken[4405] = (original[0], "0" * 64, original[2])
+        with mock.patch.object(nominate, "FRONTIER", broken):
+            result = nominate.nominate(nearby_panel(), wide_panel())
+        self.assertEqual(result["status"], "BOUNDED_UNKNOWN")
+        self.assertEqual(result["reason"],
+                         "K4300_K4405_CURRENT_SOURCE_IDENTITY_DIFFERS")
 
     def test_changed_nearby_row_fails_closed(self):
         panel = nearby_panel()

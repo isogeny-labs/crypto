@@ -18,6 +18,16 @@ MIDDLE_MANIFEST_SHA256 = "75b0215115399fcfafcf4f53aee90e6368d11ee823c5e942ee1a70
 MIDDLE_MANIFEST = (Path(__file__).resolve().parents[1] /
                    "n83_k2304_current_source_prefix_20261025" /
                    f"candidate_{MIDDLE_ID}.json")
+FRONTIER = {
+    4300: ("IC1N83Ckb1a1fb713800PDP4rootRCguidedLAgaussTDdirectISO0h067ce0b0fa30",
+           "4e3d2ba97c8cda83635efd074d2d1ddcc3273e00fa220fb944b76ac11ccb6039",
+           "ad3425c395a60dcf3f92b43f98b62146b23636a01cf77b88dfee8e73396c612f"),
+    4405: ("IC1N83Ckb1a1fb731230PDP4rootRCguidedLAgaussTDdirectISO0h76ff6ddee28c",
+           "1c98f5eb60a96280eb3790b4c7ad8f56032325318461aabb6240077f15a41690",
+           "d64fcee7ba4975873859d256302872681c82b99fbe687ff4fba0bf3ba3a4c8d2"),
+}
+FRONTIER_DIR = (Path(__file__).resolve().parents[1] /
+                "n83_k4300_k4405_current_source_prefix_20261025")
 
 
 def canonical(value):
@@ -50,6 +60,28 @@ def middle_identity():
                 base["effective_columns"] == 2304 and
                 base["source_base_hash_blake3"] ==
                 "cc39291fc49ba8d4c25c0c9aba46012bda023b4d7294a46f73d6c3f809727b3f")
+    except (OSError, ValueError, KeyError, TypeError):
+        return False
+
+
+def frontier_identity():
+    try:
+        for k, (candidate_id, digest, base_hash) in FRONTIER.items():
+            path = FRONTIER_DIR / f"candidate_{candidate_id}.json"
+            raw = path.read_bytes()
+            if hashlib.sha256(raw).hexdigest() != digest:
+                return False
+            manifest = json.loads(raw)
+            base = manifest["factor_base"]
+            if (manifest.get("candidate_id") != candidate_id or
+                    nearby_catalog.canonical_id(manifest) != candidate_id or
+                    manifest["implementation"]["source_sha256"]["ic"] !=
+                    wide_arms.SOURCE_SHA256 or
+                    base["actual_usable_points"] != 166 * k or
+                    base["effective_columns"] != k or
+                    base["source_base_hash_blake3"] != base_hash):
+                return False
+        return True
     except (OSError, ValueError, KeyError, TypeError):
         return False
 
@@ -116,6 +148,8 @@ def nominate(nearby, wide_validated):
         return reject("SOURCE_VERSION_DIFFERS")
     if not middle_identity():
         return reject("K2304_CURRENT_SOURCE_IDENTITY_DIFFERS")
+    if not frontier_identity():
+        return reject("K4300_K4405_CURRENT_SOURCE_IDENTITY_DIFFERS")
     nearby_choices = nearby_recheck(nearby)
     if nearby_choices is None:
         return reject("NEARBY_PANEL_NOT_ADMITTED_OR_CHANGED")
@@ -135,14 +169,16 @@ def nominate(nearby, wide_validated):
                  for choice in nearby_choices]
     wide_ids = [wide_choice[metric]["selected_candidate_id"]
                 for metric in ("online", "cold")]
-    ids = sorted(set(small_ids + wide_ids + [MIDDLE_ID]))
+    ids = sorted(set(small_ids + wide_ids + [MIDDLE_ID] +
+                     [entry[0] for entry in FRONTIER.values()]))
     wide_hashes = wide_arms.choose()[1]["candidate_manifest_sha256"]
     manifest_hashes = {nearby_catalog.CANDIDATES[k][0]:
                        nearby_catalog.CANDIDATES[k][1]
                        for k in nearby.get("selected_ks", [])}
     manifest_hashes.update(wide_hashes)
     manifest_hashes[MIDDLE_ID] = MIDDLE_MANIFEST_SHA256
-    if not 3 <= len(ids) <= 5 or any(candidate not in manifest_hashes
+    manifest_hashes.update({entry[0]: entry[1] for entry in FRONTIER.values()})
+    if not 5 <= len(ids) <= 7 or any(candidate not in manifest_hashes
                                     for candidate in ids):
         return reject("BRIDGE_CANDIDATE_IDENTITY_DIFFERS")
     index_policy = {candidate: "root5_dynamic_load75_no_bloom"
@@ -152,6 +188,8 @@ def nominate(nearby, wide_validated):
                  else "root4_fixed31_bloom_standard")
         for arm in wide_arms.ARMS if arm[3] in wide_ids})
     index_policy[MIDDLE_ID] = "root5_dynamic_load75_no_bloom"
+    index_policy.update({entry[0]: "root5_fixed30_bloom_wide3"
+                         for entry in FRONTIER.values()})
     return {
         "schema": "n83.crossfamily-bridge-nomination/v1",
         "status": "READY_FOR_BRIDGE_DISPATCH",
@@ -168,6 +206,8 @@ def nominate(nearby, wide_validated):
         "small_online_candidate_id": small_ids[0],
         "small_cold_candidate_id": small_ids[1],
         "middle_k2304_candidate_id": MIDDLE_ID,
+        "frontier_k4300_candidate_id": FRONTIER[4300][0],
+        "frontier_k4405_candidate_id": FRONTIER[4405][0],
         "wide_online_candidate_id": wide_ids[0],
         "wide_cold_candidate_id": wide_ids[1],
         "fresh_bridge_targets_sha256": hashlib.sha256(
