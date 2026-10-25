@@ -22,6 +22,18 @@ base sizes; they are not independent experimental samples. Verify all 90
 matched-order coefficient checks. Record step-log counter coverage separately;
 an inconsistency cannot be hidden by successful basis certificates.
 
+Additionally turn each retained signed witness into its B base coefficients
+and target coefficient -1 modulo the prime source order. Deduplicate those
+coefficient vectors and compute their rank by native modular elimination.
+Keep canonical-tuple counts, distinct row counts and rank separate: they
+measure different quantities. Use exactly the already retained deterministic
+sign witness per tuple; this is not a census of all possible sign witnesses.
+Generate a separate PARI input that independently recomputes every one of
+the 90 ranks. This analysis opens no new target labels and selects no
+candidate. Ratios per rank unit remain row-multiplication diagnostics with
+all other costs missing. The minimum ordinary count is a preregistered
+hindsight comparator; it is not an executable selector or a frozen IC pipeline.
+
 Run only after the solver/checker phases, with fresh output, one worker,
 4 GiB and a 600-second cap. Keep this source/protocol in Git before executing.
 This is independent aggregation on the same host. It does not replace the

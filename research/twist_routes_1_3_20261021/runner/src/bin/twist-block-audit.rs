@@ -3,7 +3,7 @@
 mod source_sha256;
 use serde_json::{json, Value};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     error::Error,
     fs,
     path::{Path, PathBuf},
@@ -20,6 +20,33 @@ fn number(v: &Value, key: &str) -> u64 {
 }
 fn leaf(root: &Path, id: &str, suffix: &str) -> PathBuf {
     root.join("cells").join(format!("{id}.{suffix}"))
+}
+fn rank_mod(rows: &BTreeSet<Vec<u64>>, p: u64) -> usize {
+    let mut basis = BTreeMap::<usize, Vec<u64>>::new();
+    for original in rows {
+        let mut row = original.clone();
+        for (pivot, b) in &basis {
+            let a = row[*pivot];
+            for j in *pivot..row.len() {
+                row[j] = (row[j] + p - a * b[j] % p) % p;
+            }
+        }
+        if let Some(pivot) = row.iter().position(|v| *v != 0) {
+            let (mut a, mut exponent, mut inverse) = (row[pivot], p - 2, 1u64);
+            while exponent > 0 {
+                if exponent & 1 == 1 {
+                    inverse = inverse * a % p;
+                }
+                a = a * a % p;
+                exponent >>= 1;
+            }
+            for a in &mut row {
+                *a = *a * inverse % p;
+            }
+            basis.insert(pivot, row);
+        }
+    }
+    basis.len()
 }
 fn main() -> Result<()> {
     let args = std::env::args().collect::<Vec<_>>();
@@ -74,6 +101,50 @@ fn main() -> Result<()> {
         .sum::<u64>();
     assert_eq!(witness_checks, expected_witnesses);
     assert!(negative_checks > 0);
+    let mut row_information = vec![];
+    let mut rank_gp = String::from("default(parisizemax,4000000000);\n");
+    for w in workloads.as_array().unwrap() {
+        let id = w["workload"].as_str().unwrap();
+        let witness_path = census.join("witnesses").join(format!("{id}.json"));
+        assert_eq!(w["witness_sha256"], sha(&witness_path)?);
+        let data = read(witness_path)?;
+        let base = data["base"].as_array().unwrap();
+        let order = number(&data["fixture"], "order");
+        let mut unique = BTreeSet::new();
+        let mut orientations = BTreeMap::new();
+        for witness in data["witnesses"].as_array().unwrap() {
+            let mut row = vec![0u64; base.len() + 1];
+            let mask = number(witness, "sign_mask");
+            for (i, x) in witness["x"].as_array().unwrap().iter().enumerate() {
+                let col = base.iter().position(|b| b == x).unwrap();
+                let y = witness["y"][i].as_u64().unwrap();
+                if let Some(old) = orientations.insert(x.as_u64().unwrap(), y) {
+                    assert_eq!(
+                        old, y,
+                        "base-point sign convention changed between witnesses"
+                    );
+                }
+                row[col] = (row[col] + if mask >> i & 1 == 0 { 1 } else { order - 1 }) % order;
+            }
+            row[base.len()] = order - 1;
+            unique.insert(row);
+        }
+        let rank = rank_mod(&unique, order);
+        assert!(rank <= base.len());
+        if !unique.is_empty() {
+            let matrix = unique
+                .iter()
+                .map(|r| r.iter().map(u64::to_string).collect::<Vec<_>>().join(","))
+                .collect::<Vec<_>>()
+                .join(";");
+            rank_gp.push_str(&format!(
+                "if(matrank(Mod([{matrix}],{order}))!={rank},error(\"projected row rank\"));\n"
+            ));
+        }
+        row_information.push(json!({"workload":id,"source_order":order,"canonical_tuple_witnesses":data["witnesses"].as_array().unwrap().len(),"distinct_projected_coefficient_rows":unique.len(),"rank_mod_source_order":rank,"row_columns":"B base-point coefficients followed by target coefficient -1","one_deterministic_sign_witness_per_canonical_tuple":true}));
+    }
+    rank_gp.push_str("print(\"ALL_BLOCK_REPLAY_OK RANKS 90\");quit;\n");
+    fs::write(out.join("verify-ranks.gp"), rank_gp)?;
     let mut totals = BTreeMap::<String, (u64, u64, u64, u64, u64)>::new();
     let mut input_cases = BTreeMap::new();
     let mut traces = vec![];
@@ -249,10 +320,22 @@ fn main() -> Result<()> {
             assert_eq!(p["paired_complete_affine_certificates"], paired);
             assert_eq!(p["candidate_row_reduction_multiplications"], count);
             assert_eq!(p["baseline_row_reduction_multiplications"], json!(base));
-            comparisons.push(json!({"workload":id,"p":w["p"],"B":w["B"],"arity":w["arity"],"arm":arm,"paired_complete_affine_certificates":paired,"candidate_row_multiplications":count,"best_ordinary_row_multiplications":base,"candidate_to_ordinary_ratio":ratio,"all_other_phase_costs_missing":true}));
+            let rank = row_information
+                .iter()
+                .find(|r| r["workload"] == id)
+                .unwrap()["rank_mod_source_order"]
+                .as_u64()
+                .unwrap();
+            comparisons.push(json!({"workload":id,"p":w["p"],"B":w["B"],"arity":w["arity"],"arm":arm,"paired_complete_affine_certificates":paired,"candidate_row_multiplications":count,"best_ordinary_row_multiplications":base,"candidate_to_ordinary_ratio":ratio,"verified_projected_row_rank":rank,"row_multiplications_per_rank_unit":if paired&&rank>0{Some(count as f64/rank as f64)}else{None},"all_other_phase_costs_missing":true}));
         }
     }
-    let summary = json!({"schema":"twist.block-independent-audit/v1","status":"raw-receipts-and-aggregates-verified","workloads":90,"requested_cells":631,"by_arm":by_arm,"matched_order_coefficient_checks":90,"independent_PARI_signed_witness_checks":witness_checks,"independent_PARI_wrong_sign_checks":negative_checks,"AA_identical_polynomial_inputs":true,"AA_equal_certified_row_multiplications":aa_equal,"counter_trace_entries_audited":traces.len(),"trace_coverage_failures":traces.iter().filter(|r|r["total_covers_logged_steps"]!=true).count(),"frobenius_vs_exact_ordinary_order":frobenius_control,"comparisons":comparisons,"primary_assessment_sha256":sha(panel.join("ASSESSMENT.json"))?,"panel_sha256":sha(panel.join("PANEL.json"))?,"counts_are_row_reduction_multiplications_only":true,"complete_solver_or_DLP_cost":false,"speedup_or_novelty_established":false,"final_E28_targets_opened":false});
+    let targets = workloads
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|w| format!("{}:{}", w["fixture"], w["target"]))
+        .collect::<BTreeSet<_>>();
+    let summary = json!({"schema":"twist.block-independent-audit/v1","status":"raw-receipts-and-aggregates-verified","workloads":90,"distinct_fixture_target_pairs":targets.len(),"requested_cells":631,"by_arm":by_arm,"matched_order_coefficient_checks":90,"independent_PARI_signed_witness_checks":witness_checks,"independent_PARI_wrong_sign_checks":negative_checks,"AA_identical_polynomial_inputs":true,"AA_equal_certified_row_multiplications":aa_equal,"counter_trace_entries_audited":traces.len(),"trace_coverage_failures":traces.iter().filter(|r|r["total_covers_logged_steps"]!=true).count(),"frobenius_vs_exact_ordinary_order":frobenius_control,"projected_row_information":row_information,"comparisons":comparisons,"ordinary_comparator_selection":"preregistered hindsight minimum of the four ordinary controls; not an executable portfolio selector","primary_assessment_sha256":sha(panel.join("ASSESSMENT.json"))?,"panel_sha256":sha(panel.join("PANEL.json"))?,"counts_are_row_reduction_multiplications_only":true,"complete_solver_or_DLP_cost":false,"speedup_or_novelty_established":false,"final_E28_targets_opened":false});
     fs::write(
         out.join("AUDIT.json"),
         serde_json::to_string_pretty(&summary)? + "\n",
