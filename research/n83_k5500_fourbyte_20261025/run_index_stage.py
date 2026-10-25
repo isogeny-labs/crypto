@@ -17,24 +17,44 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 SOURCE = ROOT / "examples/koblitz_orbit_dlp_fast.rs"
 PUBLIC_TARGETS = ROOT / "research/n83_cold_factor_base_20261016/targets.jsonl"
-SOURCE_SHA256 = "04f9aa202d3d516cd4ed895684cc9eb21aac46ddd4ef49c0ec460e58f076f835"
+SOURCE_SHA256 = "1c741f92a932e452b8210a8c080200ffa6d2511a605721ab156564e0663874ab"
 BASE_HASH = "0789049953a67b51dfe23f6fa2788d11e0bb4b35d52180fc038a3ffd2c0efb5f"
 K = 5500
 STATE_BOUND = 1255377750
-TABLE_BYTES = 4 * 2**32
-
-FLAGS = {
+COMMON_FLAGS = {
     "KIC_PACKED_ROOT_TABLE": "1",
     "KIC_SYMMETRIC_S3": "1",
     "KIC_ROOT_ONLY11": "1",
     "KIC_INDEXED_ROOT4": "1",
-    "KIC_INDEXED4_FIXED32": "1",
     "KIC_ROOT_BLOOM": "1",
     "KIC_ROOT_BLOOM_PROFILE": "compact4",
     "KIC_SPARSE_CANONICAL": "1",
     "KIC_INDEX_ROOT_BATCH": "1",
     "KIC_INDEX_ROOT_THREADS": "1",
     "KIC_INDEX_BUILD_ONLY": "1",
+}
+LAYOUTS = {
+    "monolithic": {
+        "flags": {"KIC_INDEXED4_FIXED32": "1"},
+        "table_layout": "indexed83_4byte_exact_id31",
+        "state_id_bits": 31,
+        "split_at": None,
+        "table_bytes": 4 * 2**32,
+        "overflow_bytes": 0,
+        "bloom_bytes": 2**30,
+    },
+    "split": {
+        "flags": {
+            "KIC_INDEXED4_SPLIT30": "1",
+            "KIC_INDEXED4_SPLIT_AT": "4549",
+        },
+        "table_layout": "indexed83_4byte_split_id30",
+        "state_id_bits": 30,
+        "split_at": 4549,
+        "table_bytes": 4 * (2**31 + 2**30),
+        "overflow_bytes": 4 * 2**30,
+        "bloom_bytes": 2**29 + 2**28,
+    },
 }
 
 
@@ -55,12 +75,14 @@ def peak_rss_bytes() -> int:
     return peak if sys.platform == "darwin" else peak * 1024
 
 
-def run(binary: Path, output: Path, cap_seconds: int) -> int:
+def run(binary: Path, output: Path, cap_seconds: int, layout: str = "monolithic") -> int:
     if cap_seconds <= 0:
         raise ValueError("cap_seconds must be positive")
     if sha256(SOURCE) != SOURCE_SHA256 or not PUBLIC_TARGETS.is_file():
         raise ValueError("source or public fixture differs from the frozen stage")
     binary = binary.resolve(strict=True)
+    mode = LAYOUTS[layout]
+    flags = {**COMMON_FLAGS, **mode["flags"]}
     output.mkdir(parents=True, exist_ok=False)
     command = [
         str(binary), f"construct:83:1:{K}", str(PUBLIC_TARGETS), "29",
@@ -68,14 +90,15 @@ def run(binary: Path, output: Path, cap_seconds: int) -> int:
     ]
     environment = {key: value for key, value in os.environ.items()
                    if not key.startswith("KIC_")}
-    environment.update(FLAGS)
+    environment.update(flags)
     launch = {
-        "schema": "n83.k5500-id31-fourbyte-index-launch/v1",
+        "schema": "n83.k5500-fourbyte-index-launch/v2",
+        "layout": layout,
         "source_sha256": SOURCE_SHA256,
         "binary_sha256": sha256(binary),
         "public_targets_sha256": sha256(PUBLIC_TARGETS),
         "command": command,
-        "environment_flags": FLAGS,
+        "environment_flags": flags,
         "cap_seconds": cap_seconds,
         "started_utc": datetime.now(timezone.utc).isoformat(),
     }
@@ -106,20 +129,30 @@ def run(binary: Path, output: Path, cap_seconds: int) -> int:
                 or summary.get("orbit_columns") != K
                 or summary.get("factor_base_points") != 166 * K
                 or summary.get("regular_states") != STATE_BOUND
-                or summary.get("root_table_layout") != "indexed83_4byte_exact_id31"
-                or summary.get("root_slot_state_id_bits") != 31
-                or summary.get("root_table_allocated_bytes") != TABLE_BYTES
-                or summary.get("root_bloom_bytes") != 2**30
+                or summary.get("root_table_layout") != mode["table_layout"]
+                or summary.get("root_slot_state_id_bits") != mode["state_id_bits"]
+                or summary.get("indexed4_split_at") != mode["split_at"]
+                or summary.get("root_table_allocated_bytes") != mode["table_bytes"]
+                or summary.get("overflow_table_allocated_bytes") != mode["overflow_bytes"]
+                or summary.get("root_bloom_bytes") != mode["bloom_bytes"]
                 or not isinstance(summary.get("table_digest_blake3"), str)
                 or len(summary["table_digest_blake3"]) != 64
                 or not isinstance(summary.get("state_digest_blake3"), str)
                 or len(summary["state_digest_blake3"]) != 64
+                or (
+                    layout == "split"
+                    and (
+                        not isinstance(summary.get("overflow_digest_blake3"), str)
+                        or len(summary["overflow_digest_blake3"]) != 64
+                    )
+                )
             ):
                 status = "IDENTITY_MISMATCH"
         except (ValueError, TypeError):
             status = "MALFORMED_OUTPUT"
     receipt = {
-        "schema": "n83.k5500-id31-fourbyte-index-receipt/v1",
+        "schema": "n83.k5500-fourbyte-index-receipt/v2",
+        "layout": layout,
         "status": status,
         "exit_code": code,
         "started_utc": launch["started_utc"],
@@ -144,5 +177,9 @@ if __name__ == "__main__":
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--cap-seconds", type=int, required=True)
+    parser.add_argument("--layout", choices=sorted(LAYOUTS), default="monolithic")
     arguments = parser.parse_args()
-    raise SystemExit(run(arguments.binary, arguments.output, arguments.cap_seconds))
+    raise SystemExit(run(
+        arguments.binary, arguments.output, arguments.cap_seconds,
+        arguments.layout,
+    ))
