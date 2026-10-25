@@ -65,6 +65,15 @@ kernel-checks the local chart equation and interpolant identities used by
 that pole-order argument. It does not construct the smooth projective local
 ring or prove the valuation, principal divisor, or `Pic⁰` bridge.
 
+The [conditional DVR packet](../projective_law_followup_20261022/formal/LOCAL_VALUATION.md)
+kernel-checks chart orders after assuming the local DVR and uniformizer.
+Those geometric hypotheses and the rational-function divisor transport are
+still open. The [N16 action packet](../kummer_differential_collector_20261022/n16-action-certificate/REPORT.md)
+checks exact matrix identities and a removable projection factor across all
+21 frozen models, plus 27,470 finite exceptional actions. The generic
+geometric action identity still lacks a polynomial-ideal certificate, so
+step 2's new-cohort gate remains closed.
+
 ## Ordered actions
 
 1. **Finish the two independent projective-law proof checks already in flight.**

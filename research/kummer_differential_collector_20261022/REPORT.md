@@ -7,6 +7,9 @@ signed lift](n15-bounded-lift/REPORT.md) repairs all 1,125 direct-lift nulls
 within that same frozen 138,095-state scope, including 631 that remained null
 after the earlier fallback. These arithmetic packets add no
 new collector/rho cost ratio.
+The [N16 action packet](n16-action-certificate/REPORT.md) proves exact matrix
+identities on the 21 frozen models and checks a direct zero-branch chart; its
+generic geometric action identity and collector/rho ratio remain open.
 
 Frozen output for `KUMMER-DIFFERENTIAL-COLLECTOR-20261022`, 2026-10-22 UTC.
 The protocol and cached-inverse amendment were fixed before their respective
