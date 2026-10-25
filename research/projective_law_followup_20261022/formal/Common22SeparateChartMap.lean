@@ -312,6 +312,13 @@ theorem infinityRingToAffineOpen_zbar (a3 a2 a1 a0 : K) :
   change infinityPolynomialToAffineOpen a3 a2 a1 a0 (X 0) = _
   simp [infinityPolynomialToAffineOpen]
 
+theorem infinityRingToAffineOpen_wbar (a3 a2 a1 a0 : K) :
+    infinityRingToAffineOpen a3 a2 a1 a0
+      (Common22ExplicitChart.wbar a3 a2 a1 a0) =
+        affineY a3 a2 a1 a0 * affineInvX a3 a2 a1 a0 ^ 3 := by
+  change infinityPolynomialToAffineOpen a3 a2 a1 a0 (X 1) = _
+  simp [infinityPolynomialToAffineOpen]
+
 theorem infinityRingToAffineOpen_zbar_isUnit (a3 a2 a1 a0 : K) :
     IsUnit (infinityRingToAffineOpen a3 a2 a1 a0
       (Common22ExplicitChart.zbar a3 a2 a1 a0)) := by
@@ -325,6 +332,130 @@ def infinityOpenToAffineOpen (a3 a2 a1 a0 : K) :
     (f := infinityRingToAffineOpen a3 a2 a1 a0)
     (Common22ExplicitChart.zbar a3 a2 a1 a0)
     (infinityRingToAffineOpen_zbar_isUnit a3 a2 a1 a0)
+
+theorem infinityOpenToAffineOpen_infinityZ (a3 a2 a1 a0 : K) :
+    infinityOpenToAffineOpen a3 a2 a1 a0 (infinityZ a3 a2 a1 a0) =
+      affineInvX a3 a2 a1 a0 := by
+  simpa [infinityOpenToAffineOpen, infinityZ] using
+    infinityRingToAffineOpen_zbar a3 a2 a1 a0
+
+theorem infinityOpenToAffineOpen_infinityW (a3 a2 a1 a0 : K) :
+    infinityOpenToAffineOpen a3 a2 a1 a0 (infinityW a3 a2 a1 a0) =
+      affineY a3 a2 a1 a0 * affineInvX a3 a2 a1 a0 ^ 3 := by
+  simpa [infinityOpenToAffineOpen, infinityW] using
+    infinityRingToAffineOpen_wbar a3 a2 a1 a0
+
+theorem right_inverse_unique {R : Type*} [CommMonoid R] {a b c : R}
+    (hab : a * b = 1) (hac : a * c = 1) : b = c := by
+  calc
+    b = b * (a * c) := by rw [hac]; simp
+    _ = (a * b) * c := by ac_rfl
+    _ = c := by rw [hab]; simp
+
+theorem affineOpenToInfinityOpen_invX (a3 a2 a1 a0 : K) :
+    affineOpenToInfinityOpen a3 a2 a1 a0 (affineInvX a3 a2 a1 a0) =
+      infinityZ a3 a2 a1 a0 := by
+  have h := congrArg (affineOpenToInfinityOpen a3 a2 a1 a0)
+    (affineX_mul_invX a3 a2 a1 a0)
+  have hfirst : infinityInvZ a3 a2 a1 a0 *
+      affineOpenToInfinityOpen a3 a2 a1 a0 (affineInvX a3 a2 a1 a0) = 1 := by
+    simpa [affineOpenToInfinityOpen_affineX] using h
+  exact right_inverse_unique hfirst (infinityInvZ_mul_z a3 a2 a1 a0)
+
+theorem infinityOpenToAffineOpen_invZ (a3 a2 a1 a0 : K) :
+    infinityOpenToAffineOpen a3 a2 a1 a0 (infinityInvZ a3 a2 a1 a0) =
+      affineX a3 a2 a1 a0 := by
+  have h := congrArg (infinityOpenToAffineOpen a3 a2 a1 a0)
+    (infinityInvZ_mul_z a3 a2 a1 a0)
+  have hfirst : affineInvX a3 a2 a1 a0 *
+      infinityOpenToAffineOpen a3 a2 a1 a0 (infinityInvZ a3 a2 a1 a0) = 1 := by
+    simpa [mul_comm, infinityOpenToAffineOpen_infinityZ] using h
+  exact right_inverse_unique hfirst
+    (by simpa only [mul_comm] using affineX_mul_invX a3 a2 a1 a0)
+
+theorem reverse_forward_affineX (a3 a2 a1 a0 : K) :
+    infinityOpenToAffineOpen a3 a2 a1 a0
+      (affineOpenToInfinityOpen a3 a2 a1 a0 (affineX a3 a2 a1 a0)) =
+        affineX a3 a2 a1 a0 := by
+  rw [affineOpenToInfinityOpen_affineX, infinityOpenToAffineOpen_invZ]
+
+theorem reverse_forward_affineY (a3 a2 a1 a0 : K) :
+    infinityOpenToAffineOpen a3 a2 a1 a0
+      (affineOpenToInfinityOpen a3 a2 a1 a0 (affineY a3 a2 a1 a0)) =
+        affineY a3 a2 a1 a0 := by
+  rw [affineOpenToInfinityOpen_affineY, map_mul, map_pow,
+    infinityOpenToAffineOpen_infinityW, infinityOpenToAffineOpen_invZ]
+  have hpow : affineInvX a3 a2 a1 a0 ^ 3 * affineX a3 a2 a1 a0 ^ 3 = 1 := by
+    rw [← mul_pow, mul_comm, affineX_mul_invX, one_pow]
+  calc
+    _ = affineY a3 a2 a1 a0 *
+        (affineInvX a3 a2 a1 a0 ^ 3 * affineX a3 a2 a1 a0 ^ 3) := by ring
+    _ = affineY a3 a2 a1 a0 := by rw [hpow]; ring
+
+theorem forward_reverse_infinityZ (a3 a2 a1 a0 : K) :
+    affineOpenToInfinityOpen a3 a2 a1 a0
+      (infinityOpenToAffineOpen a3 a2 a1 a0 (infinityZ a3 a2 a1 a0)) =
+        infinityZ a3 a2 a1 a0 := by
+  rw [infinityOpenToAffineOpen_infinityZ, affineOpenToInfinityOpen_invX]
+
+theorem forward_reverse_infinityW (a3 a2 a1 a0 : K) :
+    affineOpenToInfinityOpen a3 a2 a1 a0
+      (infinityOpenToAffineOpen a3 a2 a1 a0 (infinityW a3 a2 a1 a0)) =
+        infinityW a3 a2 a1 a0 := by
+  rw [infinityOpenToAffineOpen_infinityW, map_mul, map_pow,
+    affineOpenToInfinityOpen_affineY, affineOpenToInfinityOpen_invX]
+  have hpow : infinityInvZ a3 a2 a1 a0 ^ 3 * infinityZ a3 a2 a1 a0 ^ 3 = 1 := by
+    rw [← mul_pow, infinityInvZ_mul_z, one_pow]
+  calc
+    _ = infinityW a3 a2 a1 a0 *
+        (infinityInvZ a3 a2 a1 a0 ^ 3 * infinityZ a3 a2 a1 a0 ^ 3) := by ring
+    _ = infinityW a3 a2 a1 a0 := by rw [hpow]; ring
+
+theorem reverse_forward_eq_id (a3 a2 a1 a0 : K) :
+    (infinityOpenToAffineOpen a3 a2 a1 a0).comp
+      (affineOpenToInfinityOpen a3 a2 a1 a0) =
+        AlgHom.id K (AffineOpen a3 a2 a1 a0) := by
+  apply IsLocalization.algHom_ext (Submonoid.powers (xbar a3 a2 a1 a0))
+  apply Ideal.Quotient.algHom_ext
+  apply MvPolynomial.algHom_ext
+  intro i
+  fin_cases i
+  · change infinityOpenToAffineOpen a3 a2 a1 a0
+        (affineOpenToInfinityOpen a3 a2 a1 a0 (affineX a3 a2 a1 a0)) =
+          affineX a3 a2 a1 a0
+    exact reverse_forward_affineX a3 a2 a1 a0
+  · change infinityOpenToAffineOpen a3 a2 a1 a0
+        (affineOpenToInfinityOpen a3 a2 a1 a0 (affineY a3 a2 a1 a0)) =
+          affineY a3 a2 a1 a0
+    exact reverse_forward_affineY a3 a2 a1 a0
+
+theorem forward_reverse_eq_id (a3 a2 a1 a0 : K) :
+    (affineOpenToInfinityOpen a3 a2 a1 a0).comp
+      (infinityOpenToAffineOpen a3 a2 a1 a0) =
+        AlgHom.id K (InfinityOpen a3 a2 a1 a0) := by
+  apply IsLocalization.algHom_ext
+    (Submonoid.powers (Common22ExplicitChart.zbar a3 a2 a1 a0))
+  apply Ideal.Quotient.algHom_ext
+  apply MvPolynomial.algHom_ext
+  intro i
+  fin_cases i
+  · change affineOpenToInfinityOpen a3 a2 a1 a0
+        (infinityOpenToAffineOpen a3 a2 a1 a0 (infinityZ a3 a2 a1 a0)) =
+          infinityZ a3 a2 a1 a0
+    exact forward_reverse_infinityZ a3 a2 a1 a0
+  · change affineOpenToInfinityOpen a3 a2 a1 a0
+        (infinityOpenToAffineOpen a3 a2 a1 a0 (infinityW a3 a2 a1 a0)) =
+          infinityW a3 a2 a1 a0
+    exact forward_reverse_infinityW a3 a2 a1 a0
+
+/-- The two separately presented coordinate rings agree on their principal-open overlap. -/
+def separateChartOpenEquiv (a3 a2 a1 a0 : K) :
+    AffineOpen a3 a2 a1 a0 ≃ₐ[K] InfinityOpen a3 a2 a1 a0 :=
+  AlgEquiv.ofAlgHom
+    (affineOpenToInfinityOpen a3 a2 a1 a0)
+    (infinityOpenToAffineOpen a3 a2 a1 a0)
+    (forward_reverse_eq_id a3 a2 a1 a0)
+    (reverse_forward_eq_id a3 a2 a1 a0)
 
 #print axioms infinityInvZ_mul_z
 #print axioms affinePolynomialToInfinityOpen_X0
@@ -349,7 +480,19 @@ def infinityOpenToAffineOpen (a3 a2 a1 a0 : K) :
 #print axioms infinityIdeal_maps_zero
 #print axioms infinityRingToAffineOpen
 #print axioms infinityRingToAffineOpen_zbar
+#print axioms infinityRingToAffineOpen_wbar
 #print axioms infinityRingToAffineOpen_zbar_isUnit
 #print axioms infinityOpenToAffineOpen
+#print axioms infinityOpenToAffineOpen_infinityZ
+#print axioms infinityOpenToAffineOpen_infinityW
+#print axioms affineOpenToInfinityOpen_invX
+#print axioms infinityOpenToAffineOpen_invZ
+#print axioms reverse_forward_affineX
+#print axioms reverse_forward_affineY
+#print axioms forward_reverse_infinityZ
+#print axioms forward_reverse_infinityW
+#print axioms reverse_forward_eq_id
+#print axioms forward_reverse_eq_id
+#print axioms separateChartOpenEquiv
 
 end Common22SeparateChartMap

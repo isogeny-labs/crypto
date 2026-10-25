@@ -1,7 +1,7 @@
 \documentclass[11pt]{article}
 \usepackage[margin=0.8in]{geometry}
 \usepackage{amsmath,amssymb,booktabs}
-\title{Separate genus-2 charts: two checked maps, inverse proof open}
+\title{Separate genus-2 principal-open coordinate rings: checked equivalence}
 \author{Formal result packet for independent review}
 \date{25 October 2026}
 \begin{document}
@@ -12,23 +12,27 @@ $B_z$. Pinned Lean checks a map $A_X\to B_z$ with $X\mapsto z^{-1}$ and
 $Y\mapsto wz^{-3}$: the affine equation maps to zero, the map descends to the
 quotient, and the image of $X$ is a unit. It also checks the reverse map
 $B_z\to A_X$ with $z\mapsto X^{-1}$ and $w\mapsto YX^{-3}$, using the
-analogous equation, quotient, and unit proofs. The theorem axiom audits list
-only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+analogous equation, quotient, and unit proofs. Generator round trips and
+quotient/localization extensionality prove both full composition identities;
+\texttt{separateChartOpenEquiv} is an equivalence $A_X\simeq B_z$ of $K$-algebras.
+The theorem axiom audits list only \texttt{propext}, \texttt{Classical.choice},
+and \texttt{Quot.sound}.
 
 \begin{center}\begin{tabular}{p{0.59\linewidth}p{0.29\linewidth}}\toprule
 Gate & Status\\\midrule
 Separate coordinate rings and principal opens & Defined\\
 Affine equation kernel and localized map $A_X\to B_z$ & Checked\\
 Infinity equation kernel and reverse map $B_z\to A_X$ & Checked\\
-Two composition identities and ring isomorphism & Open\\
+Both composition identities and algebra equivalence & Checked\\
+Principal-open affine-scheme identification & Open\\
 Scheme gluing, infinity stalk, divisor/$\operatorname{Pic}^0$ & Open\\
 Rust law semantics and rho cost & Open / not measured\\\bottomrule\end{tabular}\end{center}
 
-\noindent The precise next algebraic step is to prove both compositions are
-identities, first on quotient generators and then by localization
-extensionality. Constructing maps in both directions alone does not prove an
-isomorphism. The prior same-ambient quotient theorem does not identify these
-separately presented rings. See
+\noindent This identifies the separately presented localized coordinate rings.
+It does not yet identify them with distinguished open subschemes of a smooth
+projective curve, transport its infinity stalk, or prove divisor/$\operatorname{Pic}^0$
+or Rust-law semantics. The prior same-ambient quotient theorem alone did not
+identify these rings; the checked inverse maps do. See
 \texttt{Common22SeparateChartMap.lean}, \texttt{separate-chart-map.csv}, and
 \texttt{separate-chart-map.svg}. No empirical cost follows.
 \end{document}
