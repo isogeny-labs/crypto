@@ -194,3 +194,9 @@ raise the false-H1 rate above the figures above.
 0.014 [0, 0.044]. Yield and projected solve are already under the H0 line. The
 subspace share of the time metrics (≈ 0.49) is a load artefact: the two 4-V batches
 ran at different times and the batch is confounded with the subspace.
+
+## Pointer (2026-10-25)
+
+Additive. The 32-V arm announced above has been run, and a second class (n = 23,
+a2 = 1, l = 8) was added. Both gave H0 under the pre-registered rule. See
+`m3-presentation-vs-curve-32v-20261025.md`. This note's earlier sections are unchanged.
