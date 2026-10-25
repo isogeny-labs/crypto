@@ -26,7 +26,7 @@ fn mul(gf: &Gf2, a: &Poly, b: &Poly) -> Poly {
     out.retain(|_, c| *c != 0);
     out
 }
-fn s3(gf: &Gf2, a: &Poly, c: &Poly, d: &Poly) -> Poly {
+fn s3(gf: &Gf2, a: &Poly, c: &Poly, d: &Poly, curve_b: u64) -> Poly {
     let ac = mul(gf, a, c);
     add(
         add(
@@ -36,11 +36,22 @@ fn s3(gf: &Gf2, a: &Poly, c: &Poly, d: &Poly) -> Poly {
             ),
             square(gf, &ac),
         ),
-        Poly::from([(0, 1)]),
+        Poly::from([(0, curve_b)]),
     )
 }
+#[allow(dead_code)] // Kept for the old b=1 native controls; qualified inputs use chain_for_b.
 pub fn chain(gf: &Gf2, bs: &[u64], xr: u64, m: usize) -> (Vec<Vec<u128>>, usize) {
+    chain_for_b(gf, bs, xr, m, 1)
+}
+pub fn chain_for_b(
+    gf: &Gf2,
+    bs: &[u64],
+    xr: u64,
+    m: usize,
+    curve_b: u64,
+) -> (Vec<Vec<u128>>, usize) {
     assert!(m >= 3);
+    assert!(curve_b != 0 && curve_b < (1u64 << gf.n));
     let nv = m * bs.len() + (m - 2) * gf.n as usize;
     assert!(
         nv <= 127,
@@ -66,11 +77,17 @@ pub fn chain(gf: &Gf2, bs: &[u64], xr: u64, m: usize) -> (Vec<Vec<u128>>, usize)
                 .collect()
         })
         .collect();
-    let mut links = vec![s3(gf, &xs[0], &xs[1], &us[0])];
+    let mut links = vec![s3(gf, &xs[0], &xs[1], &us[0], curve_b)];
     for i in 0..m - 3 {
-        links.push(s3(gf, &us[i], &xs[i + 2], &us[i + 1]));
+        links.push(s3(gf, &us[i], &xs[i + 2], &us[i + 1], curve_b));
     }
-    links.push(s3(gf, &us[m - 3], &xs[m - 1], &Poly::from([(0, xr)])));
+    links.push(s3(
+        gf,
+        &us[m - 3],
+        &xs[m - 1],
+        &Poly::from([(0, xr)]),
+        curve_b,
+    ));
     let eqs = links
         .into_iter()
         .flat_map(|p| {
@@ -298,6 +315,38 @@ mod tests {
                     if !expected.is_refuted() {
                         assert_eq!(got.rank, expected.rank());
                     }
+                }
+            }
+        }
+    }
+    #[test]
+    fn nonunit_curve_b_matches_the_independent_library_system() {
+        let n = 5;
+        let irr = find_irreducible_sparse(n).unwrap();
+        let gf = Gf2::new(&irr);
+        let st = FieldStructure::new(n, &irr);
+        let basis = [1, 2];
+        let base: Vec<_> = basis.iter().map(|&x| element(x, n)).collect();
+        for b in [2, 7] {
+            for m in [3, 4] {
+                for xr in 0..8 {
+                    let (mut actual, nv) = chain_for_b(&gf, &basis, xr, m, b);
+                    let expected =
+                        build_decomposition_system(&base, &element(xr, n), &element(b, n), m, &st)
+                            .unwrap();
+                    assert_eq!(nv, expected.n_vars);
+                    let mut expected: Vec<Vec<u128>> = expected
+                        .equations
+                        .iter()
+                        .map(|p| p.terms.iter().map(|m| u128::from(m.mask)).collect())
+                        .collect();
+                    for row in &mut actual {
+                        row.sort_unstable();
+                    }
+                    for row in &mut expected {
+                        row.sort_unstable();
+                    }
+                    assert_eq!(actual, expected);
                 }
             }
         }
