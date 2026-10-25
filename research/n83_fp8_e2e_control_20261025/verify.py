@@ -13,6 +13,7 @@ from research.n83_nearby_grid_tier1_20261024 import protocol as fixture
 
 PHASES = ("target_query_ms", "target_pdp_ms", "target_relation_check_ms",
           "target_descent_ms", "target_recovery_check_ms")
+CONTROL_BINARY_SHA256 = "a768b71f8059f0cf9049213ebc5bd2ed7ff9eccc3ab4947cff822093b58ef706"
 
 
 def read(path):
@@ -31,8 +32,11 @@ def verify(output):
             receipt.get("source_sha256") != run.SOURCE_SHA256 or
             run.sha(run.SOURCE) != run.SOURCE_SHA256 or
             receipt.get("binary_sha256") != run.sha(binary) or
-            receipt.get("target_sha256") != run.sha(fixture.TARGETS) != fixture.TARGETS_SHA256 or
-            receipt.get("answer_sha256") != run.sha(fixture.ANSWERS) != fixture.ANSWERS_SHA256 or
+            run.sha(binary) != CONTROL_BINARY_SHA256 or
+            receipt.get("target_sha256") != run.sha(fixture.TARGETS) or
+            run.sha(fixture.TARGETS) != fixture.TARGETS_SHA256 or
+            receipt.get("answer_sha256") != run.sha(fixture.ANSWERS) or
+            run.sha(fixture.ANSWERS) != fixture.ANSWERS_SHA256 or
             tuple(receipt.get("order", ())) != run.ORDER or
             receipt.get("base_flags") != run.FLAGS or
             receipt.get("k") != 1107 or
@@ -52,11 +56,23 @@ def verify(output):
         flags = dict(run.FLAGS)
         if arm == "fp8":
             flags["KIC_INDEXED4_FINGERPRINT8"] = "1"
-        command = [str(binary), "construct:83:1:1107", str(fixture.TARGETS),
-                   "29", str(folder / "target.jsonl")]
         launch = read(folder / "launch.json")
+        command = launch.get("command")
+        if not isinstance(command, list) or len(command) != 5:
+            raise ValueError(f"child {index} command is incomplete")
+        recorded_root = Path(command[0]).parent
+        relative_target = fixture.TARGETS.relative_to(run.ROOT)
+        if (not recorded_root.is_absolute() or ".." in recorded_root.parts or
+                recorded_root.name != output.name or
+                command[0] != str(recorded_root / binary.name) or
+                command[1] != "construct:83:1:1107" or
+                not Path(command[2]).is_absolute() or
+                Path(command[2]).parts[-len(relative_target.parts):] != relative_target.parts or
+                command[3] != "29" or
+                command[4] != str(recorded_root / f"{index}-{arm}/target.jsonl")):
+            raise ValueError(f"child {index} recorded paths differ")
         if (row.get("index") != index or row.get("arm") != arm or
-                launch.get("flags") != flags or launch.get("command") != command or
+                launch.get("flags") != flags or
                 row.get("stdout_sha256") != run.sha(folder / "stdout.jsonl") or
                 row.get("stderr_sha256") != run.sha(folder / "stderr.log") or
                 row.get("target_output_sha256") != (
