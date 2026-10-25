@@ -83,7 +83,7 @@ keeps both old arms and adds uncached direct signs. That comparison is now
 identical ordered operand/lift/certificate behavior; direct has two fewer cold
 additions than cache in all400 records, while cache has fewer negations. No
 overall cost ranking follows. The next [registered F13 degree-two transfer draft](../../backlog/XP-20261025-cm8-quadratic-transfer/README.md)
-is now [executed](reports/cm8-transfer-20261025/README.md):12arms/72source scalars/196actual addition pairs,3of54 reduced joint gains and0original. Matched rows/ranks are conserved;4matched degree changes favor the source. Actual F13 subgroup scalar transport is kernel checked. Next, the [explicit dual draft](../../backlog/XP-20261025-cm8-explicit-dual/README.md) checks doubling composition and an actual subgroup inverse before replacing enumerative base pullback.
+is now [executed](reports/cm8-transfer-20261025/README.md):12arms/72source scalars/196actual addition pairs,3of54 reduced joint gains and0original. Matched rows/ranks are conserved;4matched degree changes favor the source. Actual F13 subgroup scalar transport is kernel checked. A stronger [uniform useful-yield preflight](reports/uniform-yield-preflight-20261025/README.md) now has a preregistered96arm/896target/210policy protocol and compiled producer, but zero scientific executions. Its new checkpoint launch gate lacks upload authorization/token. The [explicit dual draft](../../backlog/XP-20261025-cm8-explicit-dual/README.md) remains queued to check doubling composition and an actual subgroup inverse before replacing enumerative base pullback.
 A non-isomorphic twist comparison still needs an explicit scalar-preserving
 subgroup map or pairing-mediated route before claiming main-DLP benefit;
 base-field rational points must not be silently transported by a generic twist.
@@ -128,3 +128,20 @@ always-running process. Each run must confirm its actual workspace/tool access
 and disclose anything it could not execute. Notify the user about meaningful
 results, a changed research direction or an actionable blocker. Do not ask the
 user to repeat routine authorization or send "keep going" after each null.
+
+## New pre-run checkpoint hold (2026-10-25)
+
+Current main20e8f44bba1f04e84a151e6f77e8fa752ebf7ad5 adds mandatory S3 resume
+checkpoints before experiment launches. Its unmodified gate auto-uploads after
+validating a complete RESUME. The existing user instruction forbids additional
+uploads/credential reuse; no checkpoint-only token is configured. A safe gate
+check before local RESUME initialization exits2 without uploading. RESUME is
+now locally complete; do not invoke the upload path until new authorization
+and access arrive. No skip, fabricated last-push or gate weakening.
+
+[Concrete upload scope/review](reports/uniform-yield-preflight-20261025/CHECKPOINT_UPLOAD_REVIEW.md) limits the requested new permission to this PR's checkpoint prefix.
+All uniform scientific workloads remain unexecuted; independent coding and
+review/ordinary validation can proceed. Do not repeat the permission question
+on unchanged automated checks or treat elapsed time as authorization. This
+real launch gate blocks dependent work only; existing mathematical/proof goals
+and queued dual remain open.

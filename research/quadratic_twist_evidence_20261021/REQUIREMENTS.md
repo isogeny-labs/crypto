@@ -58,6 +58,7 @@
 | Direct uncached sign reference | executed and independently replayed |120 setups/1200 source checks, equal ordered operand/lift traces/certificates; direct saves2 cold adds in all400 comparisons, cache saves negations; no total ranking |
 | Registered F13 degree-two twist route | executed finite reduction and actual systems |12arms/72source scalars/196addition pairs;17new public proofs,208public/269audit;3of54 reduced joint gains/0original; matched rows conserved,4degree changes favor source; general classification/geometry still explicit |
 | Explicit dual and subgroup inverse | next unexecuted draft | `backlog/XP-20261025-cm8-explicit-dual`; doubling composition and odd-annihilator inverse before replacing public-base enumeration |
+| Uniform sampler useful yield / state collection | preregistered, producer compiled, launch blocked |96arms/896targets/210policy comparisons planned;0scientific execution; new current-main checkpoint upload authorization/token absent; independent audit/proof implementation pending |
 
 The fresh library suite for the F13 continuation again passes 4,479
 tests with zero failures and 119 existing ignores; its 22 backend and four
