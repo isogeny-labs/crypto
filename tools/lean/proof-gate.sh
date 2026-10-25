@@ -76,8 +76,15 @@ run_target() {
     # Lake project. Mathlib projects fetch Mathlib's prebuilt cache first; a
     # failed fetch is an infrastructure error, never evidence about a proof.
     if grep -q '"name": *"mathlib"' "$root/$t/lake-manifest.json" 2>/dev/null; then
-      (cd "$root/$t" && lake exe cache get) > "$log/cache.log" 2>&1 \
-        || { echo "INFRA_cache   $t (lake exe cache get failed)"; return 3; }
+      if ! (cd "$root/$t" && lake exe cache get) > "$log/cache.log" 2>&1; then
+        echo INFRA_cache > "$log/status"
+        if [ -n "$out" ]; then
+          mkdir -p "$out/$slug"
+          cp "$log/cache.log" "$log/status" "$out/$slug/"
+        fi
+        echo "INFRA_cache   $t (lake exe cache get failed)"
+        return 3
+      fi
     fi
     if ! (cd "$root/$t" && lake build) > "$log/build.log" 2>&1; then
       status=FAIL_build
