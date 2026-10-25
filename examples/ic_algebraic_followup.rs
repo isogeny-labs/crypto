@@ -507,6 +507,22 @@ fn profile(args: &BTreeMap<String, String>) {
         }
     }
 }
+fn input_curve_b(input: &Value, n: u32) -> u64 {
+    let b = match input.get("curve_b") {
+        None => {
+            assert_ne!(
+                input["schema"], "ic-qualified-query/v1",
+                "qualified input must name curve_b"
+            );
+            1
+        }
+        Some(v) => v
+            .as_u64()
+            .expect("curve_b must be an exact unsigned field word"),
+    };
+    assert!(b != 0 && b < (1u64 << n), "invalid curve_b field word");
+    b
+}
 fn guess(args: &BTreeMap<String, String>) {
     let get = |k: &str| args.get(k).unwrap_or_else(|| panic!("missing {k}"));
     let source = std::fs::read(get("--input")).expect("input");
@@ -529,6 +545,7 @@ fn guess(args: &BTreeMap<String, String>) {
     );
     let n = input["n"].as_u64().unwrap() as u32;
     let m = input["m"].as_u64().unwrap_or(3) as usize;
+    let curve_b = input_curve_b(&input, n);
     let irr = find_irreducible_sparse(n).unwrap();
     let st = FieldStructure::new(n, &irr);
     let bs: Vec<_> = input["v_basis"]
@@ -540,7 +557,7 @@ fn guess(args: &BTreeMap<String, String>) {
     let sys = build_decomposition_system(
         &bs,
         &element(input["x_r"].as_u64().unwrap(), n),
-        &F2mElement::one(n),
+        &element(curve_b, n),
         m,
         &st,
     );
@@ -595,6 +612,10 @@ fn guess(args: &BTreeMap<String, String>) {
             "draw":draw,"m":m,"n":n,"ell":bs.len(),"variables":sys.n_vars,"guessed_variables":vars,
             "branch":branch,"degree":degree,"estimated_columns":cols.to_string(),"column_cap":cap.to_string(),
             "complete_dlp_cost":null,"rho_ratio":null,"status":"column_cap"});
+        if input.get("curve_b").is_some() {
+            row["schema"] = json!("ic-algebraic-guess/v2");
+            row["curve_b"] = json!(curve_b);
+        }
         if engine == "sparse" {
             let limit: usize = get("--max-entries").parse().unwrap();
             let start = std::time::Instant::now();
@@ -761,6 +782,7 @@ fn verify_fixtures(args: &BTreeMap<String, String>) {
         let input: Value = serde_json::from_str(line).unwrap();
         let n = input["n"].as_u64().unwrap() as u32;
         let m = input["m"].as_u64().unwrap_or(3) as usize;
+        let curve_b = input_curve_b(&input, n);
         let bs: Vec<_> = input["v_basis"]
             .as_array()
             .unwrap()
@@ -770,21 +792,26 @@ fn verify_fixtures(args: &BTreeMap<String, String>) {
         let xr = input["x_r"].as_u64().unwrap();
         let irr = find_irreducible_sparse(n).unwrap();
         let gf = Gf2::new(&irr);
-        let count = exact::count(&gf, &bs, xr, m);
+        let count = exact::count_for_b(&gf, &bs, xr, m, curve_b);
         assert_eq!(
             count,
             input["solutions"].as_u64().unwrap(),
             "fixture exact count mismatch"
         );
-        let witness = exact::witness(&gf, &bs, xr, m);
+        let witness = exact::witness_for_b(&gf, &bs, xr, m, curve_b);
         assert_eq!(witness.is_some(), count > 0);
         let mut row = json!({"schema":"ic-algebraic-fixture-replay/v1","input_sha256":digest(&source),
             "draw":input["draw"],"m":m,"n":n,"ell":bs.len(),"solutions":count,"count_matches":true,
             "witness_checked":false,"status":"verified"});
+        if input.get("curve_b").is_some() {
+            row["schema"] = json!("ic-algebraic-fixture-replay/v2");
+            row["curve_b"] = json!(curve_b);
+        }
         if let Some((xs, us)) = witness {
             let base: Vec<_> = bs.iter().map(|&x| element(x, n)).collect();
             let st = FieldStructure::new(n, &irr);
-            let sys = build_decomposition_system(&base, &element(xr, n), &element(1, n), m, &st);
+            let sys =
+                build_decomposition_system(&base, &element(xr, n), &element(curve_b, n), m, &st);
             row["witness_x"] = json!(xs);
             row["witness_intermediates"] = json!(us);
             let mut assignment = 0u128;
@@ -803,7 +830,7 @@ fn verify_fixtures(args: &BTreeMap<String, String>) {
             for (i, &u) in us.iter().enumerate() {
                 assignment |= (u as u128) << (m * bs.len() + i * n as usize);
             }
-            let (wide_eqs, _) = wide::chain(&gf, &bs, xr, m);
+            let (wide_eqs, _) = wide::chain_for_b(&gf, &bs, xr, m, curve_b);
             assert!(wide_eqs.iter().all(|p| p
                 .iter()
                 .filter(|&&m| assignment & m == m)
@@ -858,9 +885,20 @@ fn hky_run(args: &BTreeMap<String, String>) {
         .map(|v| v.as_u64().unwrap())
         .collect();
     let irr = find_irreducible_sparse(n).unwrap();
-    let (eqs, nv) = wide::chain(&Gf2::new(&irr), &bs, input["x_r"].as_u64().unwrap(), m);
+    let curve_b = input_curve_b(&input, n);
+    let (eqs, nv) = wide::chain_for_b(
+        &Gf2::new(&irr),
+        &bs,
+        input["x_r"].as_u64().unwrap(),
+        m,
+        curve_b,
+    );
     let mut row = json!({"schema":"ic-algebraic-hky/v1","input_sha256":digest(&source),"draw":draw,"m":m,"n":n,
         "ell":bs.len(),"complete_dlp_cost":null,"rho_ratio":null});
+    if input.get("curve_b").is_some() {
+        row["schema"] = json!("ic-algebraic-hky/v2");
+        row["curve_b"] = json!(curve_b);
+    }
     row["variables"] = json!(nv);
     let engine = args.get("--engine").map(String::as_str).unwrap_or("dense");
     assert!(engine == "dense" || engine == "sparse");
