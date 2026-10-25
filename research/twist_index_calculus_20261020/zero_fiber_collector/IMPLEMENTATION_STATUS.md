@@ -55,8 +55,9 @@ records are positive controls, not the full registered comparison.
 
 The post-gate audit review identified a validation gap: deserializing an
 array into a set silently collapses duplicate physical tuples. The auditor
-now rejects those duplicates, with a target-tuple mutation control. A fresh
-native gate is required for that verifier revision before the full panel.
+now rejects those duplicates, with a target-tuple mutation control. The fresh
+`phase2-native-gate-v2` passes all 89 tests, all three phases exit zero, and
+compiled-source seals remain unchanged for that verifier revision.
 The frozen family-baseline selection gives **85 distinct configurations
 and 255 first/A/A executions**. That panel has not started at this checkpoint;
 no elapsed-time or complete-price improvement is claimed.

@@ -129,3 +129,51 @@ are reconciled before the single native push. Native cache/remote verification
 and S3 whole-object SHA-256 and size checks match the canonical archive.
 All unrelated index entries remain byte-value equivalent. Failed v1 and
 terminal-transport records remain alongside the successful v2 receipt.
+
+## Phase 2 build and positive-control history
+
+The prospective [execution supplement](PHASE2_EXECUTION.md) was committed
+before any Phase 2 target solve. The new public-only pipeline and separate
+post-run prefix audit use the old complete physical sets solely as replay
+references; they do not rerun either oracle or the completed 189+21 panel.
+
+The first two `phase2-check` compilations exit 101: v1 requires parentheses
+around an array expression inside `json!`; v2 requires an explicit integer
+type for a conversion used by `AddAssign`. V3 exits zero. Their logs and
+pre-compilation source seals are retained under separate raw directories.
+The first v1 source-copy overlaps the one-line syntax repair and fails its
+seal check; `reconstructed-source-v2` reverses exactly that edit and matches
+the complete pre-compilation manifest. Both the failed copy and successful
+reconstruction remain, with the explicit reconciliation. V2's original
+source snapshot matches. These are compile failures, not solver outcomes.
+
+`phase2-bootstrap-build-v1` builds successfully. Native baseline selection
+and compact p37 replay-fixture projection both exit zero in
+`phase2-preregistration-v1`; their outputs are committed before comparison
+runs. The immutable baseline selection reuses 20 registered plain controls
+and adds only p97 seed1's `union-l2`, giving 85 configurations rather than
+105 duplicate executions.
+
+`phase2-native-gate-v1` is terminal with all three phases exiting zero,
+89 passing tests, no failures and unchanged compiled-source seals. Its
+actual p37 seed0 first-run records cover zero/plain phi/doubling, four
+independent physical-set/RREF replays and two extra zero-phi A/A records.
+They recover and verify the target and factor points. All raw records remain
+under the gate's `test-artifacts/p37-roundtrip/`. The runner is SHA-256
+`daeb82aec36b876927d98bd48051fc4bf9b28d64c3e5a18b6c5f8e02c04dad37`.
+
+A subsequent replay review finds that converting an array to a set can hide
+duplicate tuples. The auditor is tightened to reject that corruption, with
+an explicit mutation control. `phase2-native-gate-v2` is a fresh gate for
+that source revision; v1 remains unchanged. A separately built Rust
+workload/reducer tool and a driver with per-phase reservations prepare the
+full frozen comparison. At this checkpoint those builds are queued behind
+the common busy reservation; no full Phase 2 panel has started, and no new
+timing admission is claimed.
+
+The fresh `phase2-native-gate-v2` subsequently completes with all three
+phase exits zero, **89 tests passed, zero failed**, and stable compiled-source
+seals. Its tightened auditor rejects duplicated physical tuples. The same
+actual p37 recovery and A/A controls pass again. The independent panel-tool
+build then starts under the next reservation. No full panel is launched
+until its build, frozen workload and current launcher controls pass.

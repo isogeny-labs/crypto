@@ -33,10 +33,10 @@ flowchart LR
 | Registered 21 cases and both image controls | [Protocol](PROTOCOL.md); seven curves, all three presentations |
 | Public-only candidate inputs and charged reconstruction | Native collector calls the original cold builder; no reference argument |
 | Independent pair coverage and work-record auditing | Separate scalar-multiplication maps, exact partition, per-pair reference equality, transported union, and checked F4 counter sum |
-| Native correctness gate | Journalled version: 84/84 tests pass, source checks pass; [current receipts](results/native-journal-gate-v1/metadata/native-tests.stdout). Earlier passes/failures are retained separately. |
+| Native correctness gate | Phase 1: 84/84; current Phase 2: 89/89, source checks pass; [current receipts](results/phase2-native-gate-v2/metadata/native-tests.stdout). Earlier passes/failures are retained separately. |
 | Complete physical enumeration on all 42 case-arms | Verified complete; 33,696 S4 systems per arm, no undetermined systems |
 | Independent complete-set and matrix comparison | All 42 pass, including pair coverage, work records, RREF and corruption controls |
-| Charged target descent and matched controls | Not yet implemented or executed |
+| Charged target descent and matched controls | Implemented; all four public p37 zero/plain phi/doubling positive controls, independent replay and A/A pass. Full 85-configuration panel is not yet started. |
 | Calibrated complete IC price, strongest rho and external solver comparison | Open; this shared host admits correctness/counter diagnostics only |
 
 ## Reproduction
@@ -47,7 +47,21 @@ complete panel. Each arm reproduces 504 signed tuples and 15 projective rows
 in case-local totals. Phi/doubling ranks are 2/2 versus 1/2 at p37, 2/8
 versus 1/8 at p157, and 1/14 versus 3/14 at p337; the other tested primes
 have zero factor-log rank. Equal aggregate counts do not imply equal rank.
-Target recovery and complete cost remain open.
+The full registered target-recovery comparison and complete price remain open.
+Small p37 target recovery is now independently verified in the Phase 2 gate.
+
+## Phase 2 continuation
+
+The [execution supplement](PHASE2_EXECUTION.md) fixes stopped zero
+precomputation and actual target descent before the first new solve. The
+[pipeline implementation and workload](phase2/README.md) retain all 21
+cases, matched zero/plain phi and doubling, and the frozen best admitted
+parent-family control. Exact reuse of identical controls gives 85 distinct
+configurations and 255 first/A/A executions. No completed study is restarted.
+The [build-and-controls report](phase2/BUILD_AND_CONTROLS.md) preserves two
+failed compile checks, their corrected source binding, and the first
+89-test actual recovery gate. A fresh 89-test gate also passes after adding
+explicit duplicate-tuple rejection to the independent auditor.
 
 Run `run-native-gate.sh OUT CARGO_TARGET` through the repository's common busy
 wrapper. The saved continuation `run-complete-native-gate.sh` reuses only
