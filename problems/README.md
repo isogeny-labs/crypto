@@ -11,13 +11,17 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [N12 held-out paired wall isolation](n12-heldout-wall-isolation.md) | open | isolated A/A plus five-round candidate/rho wall ratio for the frozen 420 targets | authorized quiet host window, then complete uncontended 5,040-row source-verified schedule |
+| [N12 held-out original binary source binding](n12-heldout-original-binary-source-binding.md) | open | attributing the original EKS executable to an exact reviewed source build | original executable digest plus exact source, lock, toolchain and build receipt, or a matching reproducible build |
 | [Benchmark validation gate rejects post-freeze rows](benchmark-validation-gate-postfreeze-rows.md) | investigating | repository-wide validated benchmark dashboard; 24 benchmark rows remain after v6/v7 validation and exact archival cleanup | source-bound evidence or exact archival disposition per row, then green gate |
 | [NIST extension-twist composite cofactors](nist-extension-twist-composite-cofactors.md) | open | complete P-256 block-876 degree-2 extension-twist factorization; one timeout field | proper split of the exact remaining 444-bit residual followed by prime-certificate and exact-product replay |
 | [NIST factorization raw archive publication](nist-factorization-raw-archive-publication.md) | open | durable publication of complete R02 NFS evidence and R05 relation checkpoint, larger than Git's file limit | observed-ready AWS connection, unchanged archive uploads through `crypto store`, manifest commit and verified remote readback |
 | [ECCp-131 full-parameter index-calculus relation pipeline](eccp131-full-parameter-index-calculus.md) | open | checked two- and three-point small-x probes have zero natural rank in bounded exact-curve runs; three-point support is at most `8B³` points | exact relation oracle beyond the fixed small-x support bound, independently replayed rank and target-descent chain |
+| [AES integration root-library baseline](aes-integration-root-library-baseline.md) | open | completing the required root-library regression check and root-linked follow-up drivers | repair the unchanged base ecbench/Gaudry declarations/imports, then complete the root suite and current-head CI/review |
 | [No sub-base-restricted decomposition test in the cover attack](jv-cover-subbase-restricted-test.md) | open | a large-prime variation of `jv_cover` lowering S by 10 % at p <= 12k | a decomposition test (or the sieve path) whose cost falls with the sub-base size |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Rho worker confirmation after physical-host panel](rho-worker-tier1-host-access.md) | open | qualified 32-Q serial/batch worker throughput and default-routing decision | new independently verified targets, prospective A/A gate, dedicated host after AWS quota, complete audit |
+| [Photographed volcano strict two-sum IC recovery](photo-volcano-two-sum-ic-recovery.md) | open | genuine random-corpus IC recovery on the fixed 46-curve workload | useful independently checked relation rank and genuine target descent without generic-solver answers or private sampling coefficients |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
 | [SQISign statistical root gate](sqisign-statistical-root-gate.md) | investigating | green complete release-library validation of source3ce9694 | controlled cause and a complete passing final-source root gate; no substitution by a focused pass |
 | [Generalized rootfinding complete all-roots8x qualification](generalized-rootfinding-all-roots-8x.md) | open | novel qualified8x over matched genuine all-roots F4/F5/F6 across requested fields | native complete-output integration, independent replay, strongest external references and the unchanged hard gate |
@@ -98,5 +102,6 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
+
 
 
