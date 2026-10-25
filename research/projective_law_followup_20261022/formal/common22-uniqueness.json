@@ -1,0 +1,52 @@
+{
+  "schema": "projective-law-common22-uniqueness/v1",
+  "theorems": [
+    "Common22Uniqueness.zero_of_coprime_supports",
+    "Common22Uniqueness.residual_eq_curve"
+  ],
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "rows": [
+    {
+      "obligation": "support_coprime",
+      "kind": "premise",
+      "status": "open_source_link",
+      "statement": "B nonzero implies IsCoprime u1 u2"
+    },
+    {
+      "obligation": "first_residue",
+      "kind": "premise",
+      "status": "open_source_link",
+      "statement": "u1 divides residual minus scale times curve"
+    },
+    {
+      "obligation": "second_residue",
+      "kind": "premise",
+      "status": "open_source_link",
+      "statement": "u2 divides residual minus scale times curve"
+    },
+    {
+      "obligation": "degree_bound",
+      "kind": "premise",
+      "status": "open_source_link",
+      "statement": "difference degree is below degree of u1 times u2"
+    },
+    {
+      "obligation": "crt_uniqueness",
+      "kind": "implication",
+      "status": "kernel_checked_conditional",
+      "statement": "the four premises imply residual equals scale times curve"
+    },
+    {
+      "obligation": "divisor_class",
+      "kind": "conclusion",
+      "status": "open_geometry",
+      "statement": "residual curve equation yields the intended Pic0 class"
+    }
+  ],
+  "scope": "conditional polynomial uniqueness over a field; no source-to-premise or geometric proof",
+  "cost_ratio_change": null
+}

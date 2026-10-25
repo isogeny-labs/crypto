@@ -42,6 +42,12 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   both-side `Q` sign mutations. The [certificate](common22-support-head.json),
   [CSV](common22-support-head.csv), [graph](common22-support-head.svg), and
   artifact-stored [PDF](COMMON22_SUPPORT_HEAD.pdf) retain the bounded result.
+- The [coprime-support uniqueness packet](COMMON22_UNIQUENESS.md) proves that
+  two coprime support divisibilities and a strict degree bound force the
+  cleared residual difference to vanish. The [CSV](common22-uniqueness.csv),
+  [JSON](common22-uniqueness.json), [graph](common22-uniqueness.svg), and
+  [PDF](COMMON22_UNIQUENESS.pdf) distinguish the kernel-checked implication
+  from source and geometric premises still to establish.
 - `branch-coverage.json` gives the standardized runtime-label, Lean
   constructor, certificate-schema mapping and lists the five rejected or
   exceptional labels separately.

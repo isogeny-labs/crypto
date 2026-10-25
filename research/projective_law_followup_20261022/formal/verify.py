@@ -444,6 +444,36 @@ def main() -> None:
     require((ROOT / "COMMON22_SUPPORT_HEAD.pdf").read_bytes().startswith(b"%PDF-"),
             "invalid common support-head PDF")
 
+    uniqueness_source = (ROOT / "Common22Uniqueness.lean").read_text()
+    for theorem in ("zero_of_coprime_supports", "residual_eq_curve"):
+        require(re.search(r"(?m)^theorem " + theorem + r"\b", uniqueness_source) is not None,
+                f"common uniqueness theorem missing: {theorem}")
+    require(forbidden_proof_token.search(uniqueness_source) is None,
+            "forbidden common uniqueness proof token")
+    uniqueness_log = (ROOT / "common22-uniqueness-build.log").read_text()
+    for theorem in ("zero_of_coprime_supports", "residual_eq_curve"):
+        require(
+            f"'Common22Uniqueness.{theorem}' depends on axioms: "
+            "[propext, Classical.choice, Quot.sound]" in uniqueness_log,
+            f"common uniqueness kernel/axiom receipt missing: {theorem}",
+        )
+    uniqueness = json.loads((ROOT / "common22-uniqueness.json").read_text())
+    require(uniqueness["schema"] == "projective-law-common22-uniqueness/v1",
+            "common uniqueness schema mismatch")
+    require(len(uniqueness["rows"]) == 6, "common uniqueness obligation count mismatch")
+    require([row["status"] for row in uniqueness["rows"]] ==
+            ["open_source_link"] * 4 + ["kernel_checked_conditional", "open_geometry"],
+            "common uniqueness proof boundary mismatch")
+    with (ROOT / "common22-uniqueness.csv").open(newline="") as handle:
+        require(list(csv.DictReader(handle)) == uniqueness["rows"],
+                "common uniqueness CSV/JSON mismatch")
+    for artifact in ("COMMON22_UNIQUENESS.md", "COMMON22_UNIQUENESS.pdf",
+                     "common22-uniqueness.csv", "common22-uniqueness.svg"):
+        require((ROOT / artifact).is_file() and (ROOT / artifact).stat().st_size > 0,
+                f"missing common uniqueness artifact: {artifact}")
+    require((ROOT / "COMMON22_UNIQUENESS.pdf").read_bytes().startswith(b"%PDF-"),
+            "invalid common uniqueness PDF")
+
     for name, source in lean_sources.items():
         require(forbidden_proof_token.search(source) is None, f"forbidden proof token in {name}")
 

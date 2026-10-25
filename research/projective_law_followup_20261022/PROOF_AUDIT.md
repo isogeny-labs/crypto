@@ -245,6 +245,12 @@ divisible by that product; therefore `E=B²F` exactly. Thus
 `F-L²=-(u1*u2/B²)U`. The code returns `r3=C²Rbar` and
 `z3=C`, so its normalized output `u` is `U/C²`.
 
+The separate [Lean uniqueness packet](formal/COMMON22_UNIQUENESS.md)
+mechanizes only the final coprime-divisibility-plus-degree implication in
+this paragraph. Its coprimeness, residue, and degree premises have not been
+connected mechanically to the source-derived expressions or to valid
+Mumford inputs. The divisor-class step remains written mathematics.
+
 The checker also verifies the cleared identity
 `C⁵N+S*C²X+T = U*[-C⁴X+C³(-Cq1-A)+C²Q]`, where `S,T` are the
 literal output formulas. With `w3=B`, its normalized output
