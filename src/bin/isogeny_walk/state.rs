@@ -109,9 +109,9 @@ impl WalkState {
         fs::create_dir_all(&dir).map_err(|e| format!("creating {}: {e}", dir.display()))?;
         let lock = OpenOptions::new()
             .create(true)
-            .truncate(false)
             .read(true)
             .write(true)
+            .truncate(false)
             .open(dir.join(".walk.lock"))
             .map_err(|e| format!("opening walk state lock: {e}"))?;
         #[cfg(unix)]

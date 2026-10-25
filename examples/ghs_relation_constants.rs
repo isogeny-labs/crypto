@@ -9,6 +9,7 @@
 //! 2. Wall-clock per trial (root finding, degree 16, F_(2^31)) and per
 //!    affine EC addition on F_(2^155) (1 inversion, 2 mul, 1 squaring) as the
 //!    rho step.
+//!
 //! Output is a measurement of two inner loops. It omits the linear algebra,
 //! the factor-base build and divisor arithmetic, so the relation-phase total
 //! below is a LOWER bound on the Gaudry route, not its cost.
@@ -43,53 +44,87 @@ fn main() {
     let mut rng = SmallRng::seed_from_u64(0x6e75_7265);
     // 1. split probability, q = 2^8 so brute-force root finding is cheap.
     let m = 8u32;
-    let irr = IrreduciblePoly { degree: 8, low_terms: vec![0, 1, 3, 4] };
+    let irr = IrreduciblePoly {
+        degree: 8,
+        low_terms: vec![0, 1, 3, 4],
+    };
     println!("split probability over F_(2^{m}), trials per g:");
-    for (g, trials) in [(2usize, 200_000u32), (3, 200_000), (4, 200_000), (5, 400_000), (6, 800_000)] {
+    for (g, trials) in [
+        (2usize, 200_000u32),
+        (3, 200_000),
+        (4, 200_000),
+        (5, 400_000),
+        (6, 800_000),
+    ] {
         let mut split = 0u32;
         for _ in 0..trials {
             let p = rand_monic(&mut rng, g, m);
-            if find_roots_in_f2m(&p, m, &irr).len() == g { split += 1; }
+            if find_roots_in_f2m(&p, m, &irr).len() == g {
+                split += 1;
+            }
         }
         let fact: f64 = (1..=g).map(|k| k as f64).product();
         let phat = split as f64 / trials as f64;
-        println!("  g={g} measured={phat:.6} (n_split={split}) 1/g!={:.6} ratio={:.3}", 1.0 / fact, phat * fact);
+        println!(
+            "  g={g} measured={phat:.6} (n_split={split}) 1/g!={:.6} ratio={:.3}",
+            1.0 / fact,
+            phat * fact
+        );
     }
     // Agreement of the modular-squaring test with root finding.
     let mut disagree = 0u32;
     for _ in 0..5000 {
         let p = rand_monic(&mut rng, 4, m);
-        if splits(&p, m, &irr) != (find_roots_in_f2m(&p, m, &irr).len() == 4) { disagree += 1; }
+        if splits(&p, m, &irr) != (find_roots_in_f2m(&p, m, &irr).len() == 4) {
+            disagree += 1;
+        }
     }
     println!("splits() vs root finding on 5000 random degree-4 polys over F_(2^8): {disagree} disagreements");
     // 2a. per-trial root finding, degree 16 over F_(2^31).
     let m31 = 31u32;
-    let irr31 = IrreduciblePoly { degree: 31, low_terms: vec![0, 3] };
+    let irr31 = IrreduciblePoly {
+        degree: 31,
+        low_terms: vec![0, 3],
+    };
     let reps = 30;
     let polys: Vec<F2mPoly> = (0..reps).map(|_| rand_monic(&mut rng, 16, m31)).collect();
     let t = Instant::now();
     let mut nroots = 0usize;
-    for p in &polys { nroots += find_roots_in_f2m(p, m31, &irr31).len(); }
+    for p in &polys {
+        nroots += find_roots_in_f2m(p, m31, &irr31).len();
+    }
     let t_trial = t.elapsed().as_nanos() as f64 / reps as f64;
     println!("deg-16 root finding over F_(2^31): {t_trial:.0} ns/trial ({reps} trials, {nroots} roots seen)");
     let t = Instant::now();
     let mut nsplit = 0usize;
-    for p in &polys { if splits(p, m31, &irr31) { nsplit += 1; } }
+    for p in &polys {
+        if splits(p, m31, &irr31) {
+            nsplit += 1;
+        }
+    }
     let t_split = t.elapsed().as_nanos() as f64 / reps as f64;
     println!("deg-16 splitting test (x^q mod u) over F_(2^31): {t_split:.0} ns/trial ({nsplit} of {reps} split)");
     // 2b. affine EC add cost proxy on F_(2^155): 1 inversion + 2 mul + 1 square.
-    let irr155 = IrreduciblePoly { degree: 155, low_terms: vec![0, 62] };
+    let irr155 = IrreduciblePoly {
+        degree: 155,
+        low_terms: vec![0, 62],
+    };
     let xs: Vec<F2mElement> = (0..200).map(|_| rand_elt(&mut rng, 155)).collect();
     let t = Instant::now();
     let mut sink = F2mElement::zero(155);
     for x in &xs {
-        let inv = x.flt_inverse(&irr155).unwrap_or_else(|| F2mElement::one(155));
+        let inv = x
+            .flt_inverse(&irr155)
+            .unwrap_or_else(|| F2mElement::one(155));
         let a = inv.mul(x, &irr155);
         let b = a.mul(&inv, &irr155);
         sink = sink.add(&b.square(&irr155));
     }
     let t_step = t.elapsed().as_nanos() as f64 / xs.len() as f64;
-    println!("affine-add proxy over F_(2^155): {t_step:.0} ns/step (sink={})", sink.is_zero());
+    println!(
+        "affine-add proxy over F_(2^155): {t_step:.0} ns/step (sink={})",
+        sink.is_zero()
+    );
     // Model: relation phase only (>= q relations, 1/16! per trial) vs rho.
     let g = 16.0f64;
     let log2_fact: f64 = (1..=16).map(|k| (k as f64).log2()).sum();

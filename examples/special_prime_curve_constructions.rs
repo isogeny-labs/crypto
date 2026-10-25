@@ -27,7 +27,12 @@ fn rand_bits(s: &mut u64, bits: u32) -> BigUint {
     let mut left = bits;
     while left > 0 {
         let take = left.min(64);
-        let w = splitmix(s) & if take == 64 { u64::MAX } else { (1u64 << take) - 1 };
+        let w = splitmix(s)
+            & if take == 64 {
+                u64::MAX
+            } else {
+                (1u64 << take) - 1
+            };
         v = (v << take) | BigUint::from(w);
         left -= take;
     }
@@ -189,15 +194,15 @@ fn add(p1: &Pt, p2: &Pt, a: &BigUint, p: &BigUint) -> Pt {
         None => return p1.clone(),
         Some(v) => v,
     };
-    let lam;
-    if x1 == x2 {
+
+    let lam = if x1 == x2 {
         if ((y1 + y2) % p).is_zero() {
             return None;
         }
-        lam = ((BigUint::from(3u32) * x1 * x1 + a) % p) * inv(&((y1 << 1) % p), p) % p;
+        ((BigUint::from(3u32) * x1 * x1 + a) % p) * inv(&((y1 << 1) % p), p) % p
     } else {
-        lam = sub(y2, y1, p) * inv(&sub(x2, x1, p), p) % p;
-    }
+        sub(y2, y1, p) * inv(&sub(x2, x1, p), p) % p
+    };
     let x3 = sub(&sub(&(&lam * &lam % p), x1, p), x2, p);
     let y3 = sub(&(&lam * sub(x1, &x3, p) % p), y1, p);
     Some((x3, y3))
@@ -300,7 +305,9 @@ fn candidate_orders(d: u64, p: &BigUint, x: &BigUint, y: &BigUint) -> Vec<BigUin
 fn construct(p: &BigUint, s: &mut u64, cap: u32) -> Option<Cert> {
     let four_sqrt = (isqrt(p) + 1u32) << 2;
     for &(d, j) in CM.iter() {
-        let Some((x, y)) = cornacchia_4p(d, p) else { continue };
+        let Some((x, y)) = cornacchia_4p(d, p) else {
+            continue;
+        };
         for n in candidate_orders(d, p, &x, &y) {
             // N = r * h with r prime
             let mut found = None;
@@ -427,7 +434,9 @@ fn main() {
             let (p, shape) = match (fam, dd) {
                 ("proth", _) => {
                     let e = bits - 14;
-                    let c = (rand_bits(&mut s, 13) << 1usize) + BigUint::one() + (BigUint::one() << 13usize);
+                    let c = (rand_bits(&mut s, 13) << 1usize)
+                        + BigUint::one()
+                        + (BigUint::one() << 13usize);
                     ((c.clone() << e) + 1u32, format!("{}*2^{}+1", c, e))
                 }
                 ("phi_d", Some(d)) => {
@@ -446,11 +455,27 @@ fn main() {
                         prod *= q;
                         maxq = maxq.max(q);
                     }
-                    let p = if fam == "smooth_p_minus_1" { &prod + 1u32 } else { &prod - 1u32 };
-                    (p, format!("{} smooth to {}", if fam == "smooth_p_minus_1" { "p-1" } else { "p+1" }, maxq))
+                    let p = if fam == "smooth_p_minus_1" {
+                        &prod + 1u32
+                    } else {
+                        &prod - 1u32
+                    };
+                    (
+                        p,
+                        format!(
+                            "{} smooth to {}",
+                            if fam == "smooth_p_minus_1" {
+                                "p-1"
+                            } else {
+                                "p+1"
+                            },
+                            maxq
+                        ),
+                    )
                 }
                 _ => {
-                    let c = rand_bits(&mut s, bits) | (BigUint::one() << (bits - 1)) | BigUint::one();
+                    let c =
+                        rand_bits(&mut s, bits) | (BigUint::one() << (bits - 1)) | BigUint::one();
                     (c, "random".to_string())
                 }
             };
@@ -460,7 +485,11 @@ fn main() {
             tried += 1;
             match construct(&p, &mut s, cap) {
                 Some(c) => {
-                    let fam_name = if let Some(d) = dd { format!("{}_{}", fam, d) } else { fam.to_string() };
+                    let fam_name = if let Some(d) = dd {
+                        format!("{}_{}", fam, d)
+                    } else {
+                        fam.to_string()
+                    };
                     println!(
                         "{}\t{}\t{}\t0x{:x}\t{}\t{}\t{}\t{}\t{}\t0x{:x}\t0x{:x}\t0x{:x}\t0x{:x}",
                         fam_name,

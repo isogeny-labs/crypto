@@ -188,9 +188,9 @@ impl RunState {
         fs::create_dir_all(&dir).map_err(|e| format!("creating {}: {e}", dir.display()))?;
         let lock = OpenOptions::new()
             .create(true)
-            .truncate(false)
             .read(true)
             .write(true)
+            .truncate(false)
             .open(dir.join(".lock"))
             .map_err(|e| format!("opening ICX state lock: {e}"))?;
         #[cfg(unix)]
