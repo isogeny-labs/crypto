@@ -11,6 +11,16 @@ two dehomogenized equations obtained at `Z=1` and `X=1`. Its [CSV](weighted-proj
 mark the quotient grading, chart isomorphisms, projective completion, and
 `Pic⁰` transport as open.
 
+The [weighted-Proj cover packet](WEIGHTED_PROJ_COVER.md) proves in Lean that
+a prime containing the sextic equation and `Z` contains `Y`, and that adding
+`X` forces containment of the coordinate ideal. A native identity certificate
+independently checks the underlying sextic factorization; the [PDF](weighted-proj-cover.pdf),
+[dependency graph](weighted-proj-cover.svg), and [CSV](weighted-proj-cover.csv)
+keep the still-open graded-quotient and actual `Proj` cover steps visible.
+The separate [ordinary-quotient packet](WEIGHTED_PROJ_QUOTIENT.md) proves a
+surjective specialization map at `Z=1` and that `Z-1` lies in its kernel;
+it does not identify that kernel or a localized degree-zero chart ring.
+
 ## Pinned environment
 
 - Lean `v4.34.1`, pinned by `lean-toolchain`.

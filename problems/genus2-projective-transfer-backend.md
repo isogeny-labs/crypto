@@ -120,6 +120,16 @@ for arbitrary inputs.
   attempts remain preserved. A grading on the
   quotient, the `D₊(Z)` coordinate-ring isomorphism, completion and `Pic⁰`
   transport are still unproved.
+- **Mechanized, 2026-10-25 cover/quotient rungs:** The
+  [cover packet](../research/projective_law_followup_20261022/formal/WEIGHTED_PROJ_COVER.md)
+  checks the sextic factorization and proves that any ambient prime containing
+  `X`, `Z`, and the equation contains the coordinate ideal `(X,Y,Z)`; the
+  native factorization certificate is `IDC1h2022ac86a412d974`. The
+  [ordinary-quotient packet](../research/projective_law_followup_20261022/formal/WEIGHTED_PROJ_QUOTIENT.md)
+  checks a surjective `Z=1` algebra map to the affine chart ring, with `Z-1`
+  in its kernel. Neither packet constructs the weighted graded quotient or
+  proves the exact localized `Proj` chart isomorphism; the smooth projective
+  and `Pic⁰` bridge remains open.
 - **Finite source-bound check, 2026-10-25:** One smooth `F17` 2-torsion
   fixture makes both the pinned author public dispatcher and compiled Rust
   dispatcher return identity, matching Cantor. A direct author doubling

@@ -156,6 +156,12 @@ jobs:
           python-version: '3.11'
       - name: Install the pinned Draft 2020-12 validator
         run: python -m pip install jsonschema==4.23.0
+      - name: Hydrate cover-transfer assessment figures
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull research/cover_transfer_assessment_20261013
       - name: Check deterministic catalog-wide assessment generation
         run: node scripts/build_cover_transfer_assessments.mjs --check
       - name: Validate the assessment schema
