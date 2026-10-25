@@ -63,7 +63,17 @@ lemmas are proved, not assumed. All ten axioms are audited. The full Lean
 module still receives one 1,200-second/8 GiB phase; no per-lemma budget
 extension or weaker theorem is substituted.
 
-The theorem closes the explicit polynomial identity assumption for this
+Both v1 and v2 are now terminal with out-of-memory panics. Version 3
+changes only the generated instance's explicit ring normalization from
+`grind` to `grobner`, as used in the prior component proof. The unchanged
+generic prefix, balanced syntax, four product lemmas, literal coefficients,
+three final statements, ten axiom audits and aggregate 1,200-second/8 GiB
+Lean phase are retained. Freeze the new source and passing native gate
+before its export. This is a distinct proof-encoding experiment after
+the recorded resource failures, with no weakened statement or increased
+per-attempt envelope. Success or failure is not assumed.
+
+A successful theorem closes the explicit polynomial identity assumption for this
 one sealed instance in characteristic 37. It does not formalize the native
 parser/field implementation, the curve/decoder/group bridge, a parametric
 family, all twelve systems, all primes or a complexity improvement.

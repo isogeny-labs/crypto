@@ -31,7 +31,28 @@ separate release build and source seals pass. Binary SHA-256:
 The gate is `../runs/fp-residual-audit-native-gate-v1/`, with durable metadata
 copied under `../results/fp-residual-audit-v1/native-gate/`.
 
-Production has not run at this source freeze. The final descriptive report,
-graph/PDF, native totals and raw archive must be added after execution. The
+Both full executions have now passed all 42 arms, with identical complete
+output trees and passing final source/execution seals. The terminal receipt
+is zero, finished **2026-10-25T06:40:26Z**. The [report](REPORT.md),
+[inspected three-page PDF](REPORT.pdf) and native records give the exact
+300/150 eligible-system counts, 504 preserved physical tuples per arm and
+every case's independently preserved rank. This is a counterfactual census;
+the full cost of a deployed filter is still unmeasured. The
 existing conditional component proof and its full group/embedding gaps are
 described in `../../joint_image_elimination/reports/run-20261024T0445Z-square/`.
+
+`runs.tar.xz` contains only the terminal native gate, both complete audit
+processes and the inspected layout sources/pages. Its paths are rooted at
+the parent collector directory. From that directory:
+
+```sh
+(cd fp_residual_audit && sha256sum -c runs.tar.xz.sha256)
+tar -xJf fp_residual_audit/runs.tar.xz
+```
+
+Use `archive-build.sh FRESH_PATH` from the repository root to recreate the
+deterministic archive. The prior 42-arm public/reference archive is still
+a prerequisite; it is not repacked. Compact command/source/terminal receipts
+and the native summary are retained loose under
+`../results/fp-residual-audit-v1/`. Figure/PDF benchmark copies are unlisted;
+no complete-price, strongest-reference or VALIDATION gate is promoted.

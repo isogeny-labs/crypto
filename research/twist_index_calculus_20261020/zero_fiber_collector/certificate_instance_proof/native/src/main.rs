@@ -246,14 +246,14 @@ fn lean(prefix: &str, f: &[Poly], h: &[Poly], rem: &Poly, a: u64) -> String {
         .collect::<Vec<_>>()
         .join(" + ");
     for i in 0..4 {
-        text.push_str(&format!("\ntheorem product{i} (s1 s2 s3 : R) :\n    h{i} s1 s2 s3 * f{i} s1 s2 s3 = expanded{i} s1 s2 s3 := by\n  unfold h{i} f{i} expanded{i}\n  grind\n"));
+        text.push_str(&format!("\ntheorem product{i} (s1 s2 s3 : R) :\n    h{i} s1 s2 s3 * f{i} s1 s2 s3 = expanded{i} s1 s2 s3 := by\n  unfold h{i} f{i} expanded{i}\n  grobner\n"));
     }
     let expanded = (0..4)
         .map(|i| format!("expanded{i} s1 s2 s3"))
         .collect::<Vec<_>>()
         .join(" + ");
-    text.push_str(&format!("\ntheorem integer_lift (s1 s2 s3 : R) :\n    (q s1 s2 s3)^2 + 37 * remainder s1 s2 s3 =\n      {rhs} := by\n  calc\n    _ = {expanded} := by\n      unfold q remainder expanded0 expanded1 expanded2 expanded3\n      grind\n    _ = {rhs} := by\n      rw [product0, product1, product2, product3]\n"));
-    text.push_str(&format!("\ntheorem certificate_identity [Lean.Grind.IsCharP R 37] (s1 s2 s3 : R) :\n    (q s1 s2 s3)^2 = {rhs} := by\n  have hlift := integer_lift s1 s2 s3\n  grind\n"));
+    text.push_str(&format!("\ntheorem integer_lift (s1 s2 s3 : R) :\n    (q s1 s2 s3)^2 + 37 * remainder s1 s2 s3 =\n      {rhs} := by\n  calc\n    _ = {expanded} := by\n      unfold q remainder expanded0 expanded1 expanded2 expanded3\n      grobner\n    _ = {rhs} := by\n      rw [product0, product1, product2, product3]\n"));
+    text.push_str(&format!("\ntheorem certificate_identity [Lean.Grind.IsCharP R 37] (s1 s2 s3 : R) :\n    (q s1 s2 s3)^2 = {rhs} := by\n  have hlift := integer_lift s1 s2 s3\n  grobner\n"));
     text.push_str("\ntheorem repeated_factor_of_roots [Lean.Grind.IsCharP R 37]\n    (noZero : ∀ u v : R, u*v=0 → u=0 ∨ v=0)\n    (x y z : R)\n    (roots : f0 (x+y+z) (x*y+x*z+y*z) (x*y*z)=0 ∧\n      f1 (x+y+z) (x*y+x*z+y*z) (x*y*z)=0 ∧\n      f2 (x+y+z) (x*y+x*z+y*z) (x*y*z)=0 ∧\n      f3 (x+y+z) (x*y+x*z+y*z) (x*y*z)=0) :\n");
     text.push_str(&format!(
         "    ({a} : R)=x ∨ ({a} : R)=y ∨ ({a} : R)=z := by\n"

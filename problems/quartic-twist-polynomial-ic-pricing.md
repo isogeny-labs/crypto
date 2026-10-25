@@ -110,7 +110,13 @@ of the same literal products and integer lift, followed by characteristic
 integer-lift IDC. Splitting normalization into small independently proved
 coefficient or product blocks is a candidate encoding; it has not been
 implemented or run. The same aggregate proof limit and full statement
-must be retained. A successful instance proof would still leave the
+must be retained. A third, separately versioned encoding first tests
+explicit `grobner` ring normalization in place of `grind`, which handled
+the two failed instance expansions. The prior component theorem uses the
+explicit ring tactic. This prospective tactic experiment retains every
+literal coefficient, all final statements, ten axiom audits and the
+aggregate 1,200-second/8 GiB phase; its source/native gate must be committed
+before real export. Its outcome is not assumed. A successful instance proof would still leave the
 native parser, field/group/decoder and parametric-family bridges open.
 
 ## Evidence and uncertainty
