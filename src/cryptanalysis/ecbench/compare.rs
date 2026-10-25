@@ -2430,7 +2430,7 @@ mod tests {
         assert_eq!(zero.pricing_weight, Some(0.0));
         assert_eq!(one.pricing_weight, Some(1.0));
         assert_ne!(zero.comparison_id, one.comparison_id);
-        assert!(zero.legacy_comparison_id.is_some());
+        assert!(zero.legacy_comparison_id.is_none());
         assert!(one.legacy_comparison_id.is_none());
         assert!(one.workloads[0].a_mean_s.unwrap() > zero.workloads[0].a_mean_s.unwrap());
     }
