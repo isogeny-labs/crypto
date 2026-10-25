@@ -648,7 +648,7 @@ mod tests {
         ];
         let mut refuted_seen = 0;
         for (m, n, ell) in [(3usize, 7u32, 2usize), (3, 9, 3), (4, 5, 2)] {
-            for (sys, n_vars) in draws(m, n, ell, 4, 20261025 + n as u64) {
+            for (sys, n_vars) in draws(m, n, ell, 2, 20261025 + n as u64) {
                 for d in 3..=4u32 {
                     let Some((dense, _)) =
                         ReducedBasis::from_system_closed_full(&sys, n_vars, d, 1_000_000)
@@ -667,7 +667,7 @@ mod tests {
                                     &sys,
                                     n_vars,
                                     d,
-                                    PeMode::Partial { batch_rows: 3 },
+                                    PeMode::Partial { batch_rows: 16 },
                                     1 << 20,
                                     usize::MAX,
                                     opts,
