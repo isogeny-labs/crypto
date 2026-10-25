@@ -9,6 +9,7 @@ on:
       - 'src/hash/sha3.rs'
       - 'verification/pqc-assay/**'
       - '.github/workflows/pqc-assay.yml'
+      - '.gitmodules'
   pull_request:
     paths:
       - 'src/pqc/fast/ml_dsa.rs'
@@ -17,10 +18,15 @@ on:
       - 'src/hash/sha3.rs'
       - 'verification/pqc-assay/**'
       - '.github/workflows/pqc-assay.yml'
+      - '.gitmodules'
   workflow_dispatch:
     inputs:
       math_reference:
         description: Rebuild the pinned upstream Isabelle reduction proofs (cold build can take hours)
+        type: boolean
+        default: false
+      standalone_verify:
+        description: Run the pinned upstream make verify pipeline (cold build can take hours)
         type: boolean
         default: false
 
@@ -32,6 +38,22 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  standalone-integrity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: verification/pqc-assay
+      - name: Check the pinned standalone suite and its generated proof inputs
+        run: verification/pqc-assay/standalone.sh check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pqc-assay-standalone-integrity
+          path: verification/pqc-assay/build/standalone-*.txt
+          if-no-files-found: warn
+
   rust-reduce:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -59,6 +81,35 @@ jobs:
         with:
           name: pqc-assay-rust-reduce
           path: verification/pqc-assay/build/*.txt
+          if-no-files-found: warn
+
+  standalone-verify:
+    if: github.event_name == 'workflow_dispatch' && inputs.standalone_verify
+    runs-on: macos-15
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: verification/pqc-assay
+      - name: Check the pinned standalone suite
+        run: verification/pqc-assay/standalone.sh check
+      - uses: actions/cache@v4
+        with:
+          path: |
+            verification/pqc-assay/upstream/.tools
+            ~/.isabelle/Isabelle2025-2/heaps
+          key: assay-standalone-${{ runner.os }}-${{ hashFiles('verification/pqc-assay/toolchain.env') }}
+      - name: Install the upstream toolchain and Isabelle support sessions
+        env:
+          SKIP_PROVERIF: '1'
+        run: verification/pqc-assay/standalone.sh setup
+      - name: Run the upstream proof pipeline with its existing controls
+        run: verification/pqc-assay/standalone.sh make verify
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pqc-assay-standalone-verify
+          path: verification/pqc-assay/build/standalone-*.txt
           if-no-files-found: warn
 
   math-reference:

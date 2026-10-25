@@ -1,4 +1,66 @@
-# PQC-Assay: native Rust reduction proofs
+# PQC-Assay
+
+The complete [PQC-Assay](https://github.com/amarshat/pqc-assay) proof suite is
+imported as the standalone Git submodule [upstream/](upstream/), pinned to
+`6b0096f4a2bda9cf07c7347094affc85d9eb24ff`. Its Makefile, reference targets,
+models, proofs, assumptions and licenses remain unchanged. The native Rust
+adaptation below is an additional local check.
+
+## Standalone suite
+
+From the `crypto` repository root:
+
+```sh
+verification/pqc-assay/standalone.sh check
+verification/pqc-assay/standalone.sh setup
+verification/pqc-assay/standalone.sh make verify
+```
+
+The runner initializes only `verification/pqc-assay/upstream`, verifies both
+its Git link and checkout against `toolchain.env`, and rejects tracked source
+changes. Upstream's private `paper/` submodule is not initialized; the proof
+targets do not require it. No private repository access is needed.
+
+`check` needs Git, make and Python 3. It checks the vendored target identity,
+upstream claim lint and generated HQC proof inputs. These integrity checks do
+not execute the theorem provers. `setup` delegates to upstream's pinned
+toolchain and Isabelle-support installers. Upstream develops and runs CI on
+Apple Silicon macOS; its Linux setup path is experimental. The separate
+native Rust bootstrap below supports Linux x86_64.
+
+Every upstream make target remains available through `standalone.sh make`:
+
+| Command after `standalone.sh make` | Scope |
+| --- | --- |
+| `verify` | upstream's gated SAW/Isabelle pipeline, including its mutation controls |
+| `saw` | reference ML-DSA C-to-model checks and signing composition |
+| `mlkem-reduce mlkem-ntt` | reference ML-KEM reductions and transforms |
+| `hqc hqc-avx hqc-isabelle` | HQC reference, AVX2 and model-to-mathematics checks |
+| `qseal-tbs qseal-ref` | Q-SEAL model and reference serialization checks |
+
+Additional projects, including Cap-V1/Kani, AutoCorres2 and ProVerif, retain
+their own prerequisites and entry points in [upstream/README.md](upstream/README.md)
+and the project-specific READMEs. `make verify` is upstream's defined pipeline;
+it does not run every auxiliary target. `SKIP_ISABELLE=1` selects a SAW-only
+bootstrap; `SKIP_PROVERIF=1` omits the independent protocol tool.
+Compiler/tool overrides can be passed as make variables, for example
+`standalone.sh make mlkem-reduce SAW=/path/to/saw CLANG=/path/to/clang`.
+Logs go to the ignored `build/standalone-*.txt` files.
+
+CI runs the standalone integrity checks on every relevant change. The manual
+`standalone_verify` workflow input runs the full upstream `make verify` target
+on macOS 15 and uploads its logs. This import does not claim that the full
+pipeline has been rerun locally or that upstream's reference-C proofs cover
+this repository's Rust implementation. Consult [VALIDATION.md](VALIDATION.md)
+for actual execution results and [upstream/docs/ASSUMPTIONS.md](upstream/docs/ASSUMPTIONS.md)
+for the upstream trust and composition boundaries.
+
+To update the import, deliberately change the submodule commit and
+`ASSAY_UPSTREAM_REV` together, review the upstream diff and licenses, and rerun
+the affected proof and integrity targets. The native model cache is pinned
+to the same revision.
+
+## Native Rust reduction proofs
 
 This ports the implementation-to-model leg of
 [PQC-Assay](https://github.com/amarshat/pqc-assay) to this repository's
