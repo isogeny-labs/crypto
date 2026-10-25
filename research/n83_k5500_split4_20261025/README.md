@@ -86,3 +86,18 @@ lookups, digest receipts, memory peak, and index construction time. Then
 complete rank and independently replayed one-target IC/rho pairs at Tier 1,
 with the same point and resource envelope. Preserve both layouts as separate
 candidate identities and retain all capped or incomplete runs.
+
+The prepared RunPod diagnostic requests one Community Cloud A40 Pod with at
+least 48 GB of provider-reported system RAM, four vCPUs, a 60 GB container
+disk, and a maximum 2.5-hour provider lifetime. Its admitted quote is at most
+$0.70/hour: up to $1.75 of compute plus a $0.50 storage and billing reserve,
+for a $2.25 allocation ceiling. [`runpod_dispatch.py`](runpod_dispatch.py)
+prints the exact request with `--dry-run`; live dispatch reads the API key
+from the environment or a private local CLI config and runs the established
+REST custody guard until provider absence is verified. The local guard
+requests deletion ten minutes before the allocation deadline. Dispatch
+requires the owner's separate cost approval and configured replacement key.
+The Pod must report its actual cgroup memory and CPU limits before either
+layout runs. Keep the split first and the monolithic layout second, with both
+stage caps fitting the remaining provider deadline; retain each incomplete
+stage and the provider deletion receipt.
