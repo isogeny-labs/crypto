@@ -136,6 +136,25 @@ historical, distinct claims. Current native arithmetic explicitly refuses
 m=16--18; wider coefficients, keys, order and scalars are required.
 [Width problem](../../problems/quartic-binary-ic-wide-scalars.md).
 
+## Same-input external correctness
+
+The [Singular correctness report](reports/run-external-cas-20261025-01/report.pdf)
+covers 22 frozen equation systems, including two constructed positive
+controls. All 44 `std`/`slimgb` commands finish. Native reconstruction and
+complete Boolean enumeration agree with every external zero set and every
+complete native extraction. All original generators reduce to zero against
+the returned bases. The strengthened independent validator also checks the
+exact exported ideals and reproduces the original receipt byte for byte.
+
+This is a correctness baseline at L0, with explicit Boolean field equations,
+single-threaded 60-second/1-GiB external limits. A complete basis computation
+and root extraction have different output contracts, so no speed ratio is
+claimed. Magma, msolve, FGb, fastest-tool and hardware comparisons remain
+open. [Protocol](EXTERNAL_CAS_PROTOCOL.md),
+[receipt](pipeline-receipts/external-cas-strengthened-20261025/replay.json),
+[reproduction](verify-external-cas.sh); the separate hash-checked raw archive
+preserves all generated scripts, package hashes, outputs and statuses.
+
 ## Requirement status
 
 | Requirement | Status | Evidence or remaining gap |
@@ -149,7 +168,7 @@ m=16--18; wider coefficients, keys, order and scalars are required.
 | C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified records; all-record scalar replay running; m=14/15 full panels outstanding |
 | C2: m=14--18 ladder | blocked in part | supported rungs outstanding; m=16--18 need wider arithmetic |
 | C3: complete method and full native price | partial | n=13 complete-answer replay, other smoke outcomes retained; construction/split counts and qualified comparison missing |
-| D1: external/hardware controls | partial | native CPU controls pass; local Singular installed, same-input CAS baseline not yet run; fastest-tool and actual hardware comparisons remain |
+| D1: external/hardware controls | partial | all 44 same-input Singular correctness checks agree on 22 cases; fastest-tool performance and actual hardware comparisons remain |
 | D2: durable evidence and PR | partial | source/protocol/raw archive/native validator/visual PDFs provided; wider campaign remains open |
 
 [Cost/scaling problem](../../problems/ic-low-degree-complete-cost-and-scaling.md)

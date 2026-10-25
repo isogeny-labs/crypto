@@ -45,8 +45,9 @@ rho and native-price band at 0, 0.1 and 1 GAE, remains the downstream test.
   validated larger-cell closure and guess minima, same-input external CAS
   comparison, and measured hardware calibration. Local matrices have a
   12-GiB/900-second envelope. The 116 remaining balanced ell=8 branches are
-  queued at a 200k outer column cap under that unchanged envelope. Singular
-  is installed locally but not yet compared. The prescribed paid launcher
+  queued at a 200k outer column cap under that unchanged envelope. All 44
+  same-input Singular correctness checks agree on 22 small cases; equal-output
+  fastest-tool performance comparisons remain open. The prescribed paid launcher
   is blocked by an explicit identity-policy denial; no research VM launched.
 - **What this evidence does not establish:** a global minimum over all
   variable subsets, bounded last fall degree, a full IC speedup, or a

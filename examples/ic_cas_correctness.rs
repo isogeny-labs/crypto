@@ -200,8 +200,19 @@ fn verify(dir: &Path) {
         let name = case["case"].as_str().unwrap();
         let nv = case["n_vars"].as_u64().unwrap() as usize;
         let expected: Vec<u64> = serde_json::from_value(case["boolean_zero_set"].clone()).unwrap();
+        let (rebuilt, rebuilt_nv) = equations(&case["source"]);
+        assert_eq!(nv, rebuilt_nv);
+        assert_eq!(
+            sha(&serde_json::to_vec(&rebuilt).unwrap()),
+            case["equations_sha256"]
+        );
+        assert_eq!(zeros(&rebuilt, nv), expected);
+        let mut input = rebuilt.iter().map(poly_string).collect::<Vec<_>>();
+        input.extend((1..=nv).map(|i| format!("x{i}^2+x{i}")));
         for algorithm in ["std", "slimgb"] {
             let prefix = dir.join(format!("{name}-{algorithm}"));
+            let script = std::fs::read_to_string(prefix.with_extension("sing")).unwrap();
+            assert!(script.contains(&format!("ideal I={};", input.join(",\n"))));
             let status: Value = serde_json::from_slice(
                 &std::fs::read(prefix.with_extension("status.json")).unwrap(),
             )
