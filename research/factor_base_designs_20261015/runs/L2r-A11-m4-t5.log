@@ -1,0 +1,11 @@
+== A11 m=4 p1: commit 2cdebec959f9de948de29415e106db125d21dd5d, budget 14400 s, grace 600 s, ulimit -v 13483220, started 2026-10-19T17:40:40Z
+memory allocation of 765648 bytes failed
+stack backtrace:
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+A11  m=4 t= 5 target=0 b=5.000 |V|=32 n_vars=42 n_eqs=43 D=null reached=null 130.0 s aborted (memory allocation failed under ulimit -v 13483220 (signal: 6 (SIGABRT)))
+memory allocation of 765648 bytes failed
+stack backtrace:
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+A11  m=4 t= 5 target=1 b=5.000 |V|=32 n_vars=42 n_eqs=43 D=null reached=null 131.8 s aborted (memory allocation failed under ulimit -v 13483220 (signal: 6 (SIGABRT)))
+-- A11 m=4: a system at t = 5 hit a limit or failed; the series stops
+== A11 m=4: ended 2026-10-19T17:45:01Z
