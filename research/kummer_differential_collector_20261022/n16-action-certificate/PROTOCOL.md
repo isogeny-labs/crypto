@@ -33,3 +33,11 @@ matrix, the identity theta constants for degree zero, and the existing
 generic degree-two formula. Compare this independent chart with source
 `project_full` separately so the action identity check does not define its
 expected value through the action matrix being tested.
+
+Pre-final replay chart correction: the initial direct generic degree-two
+formula vanishes when `a0=b0=0`, the valid locus containing the branch
+point `x=0`. Replace it with the algebraically cancelled direct chart
+`project/a0`, using the constant coefficient of `f mod u` divided by `a0`
+as a polynomial. The fixed states and matrix tests are unchanged. Retain
+the initial missing-chart count in the report; do not count it as an action
+counterexample.
