@@ -12,6 +12,14 @@ import urllib.request
 
 def collect(root, nodes, proc=Path('/proc')):
     pending, busy, unknown = 0, False, False
+    if os.environ.get('SPOT_LEGACY_ENABLED') == 'true':
+        try:
+            for path in os.environ.get('SPOT_LEGACY_STATUS_FILES','/run/spot-legacy/status.json').split(':'):
+                legacy = json.loads(Path(path).read_text())
+                unknown = unknown or not (0 <= time.time() - legacy['observed'] <= 90) or legacy['state'] == 'error'
+                pending += int(legacy['pending'])
+        except (OSError, ValueError, KeyError, TypeError):
+            unknown = True
     try:
         jobs = json.loads((root / 'jobs.json').read_text())
         if not isinstance(jobs, list):

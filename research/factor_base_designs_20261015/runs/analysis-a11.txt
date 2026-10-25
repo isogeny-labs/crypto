@@ -1,0 +1,50 @@
+Factor-base designs, Amendment 11 (E1, T5): rows from research/factor_base_designs_20261015/runs
+
+════ E1: A0 on twisted Edwards curves (S3 in the y-coordinate) against A0 on short Weierstrass curves (the first run), p1, f4_fp
+
+── m = 2: t   D(Edwards)  D(Weierstrass)   max_cols(Edwards)  max_cols(Weierstrass)
+  2   3.5         4.0             28                 37
+  3   4.0         4.0             115                127
+  4   4.0         4.0             295                280
+  5   4.0         4.0             593                606
+  6   4.0         5.0             1173               2451
+  7   5.0         5.0             5507               5031
+  8   5.0         5.0             9980               9119
+  9   5.0         5.0             17227              14922
+
+── A0 Edwards m = 2 p1
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  4      5      [3, 4]        18,37                0.0,0.0               ok,ok
+  3   3.000  6      7      [4, 4]        115,115              0.0,0.0               ok,ok
+  4   4.000  8      9      [4, 4]        295,295              0.0,0.0               ok,ok
+  5   5.000  10     11     [4, 4]        593,593              0.0,0.0               ok,ok
+  6   6.000  12     13     [4, 4]        1173,1173            0.2,0.2               ok,ok
+  7   7.000  14     15     [5, 5]        5507,5507            1.2,1.4               ok,ok
+  8   8.000  16     17     [5, 5]        9980,9980            8.7,7.8               ok,ok
+  9   9.000  18     19     [5, 5]        17227,17227          42.8,40.0             ok,ok
+  completed cells 8: σ = 0.2202  →  candidate (σ ≤ 0.25 on ≥ 3 cells);  Δlog₂ max_cols/Δb = 1.320 (secondary, descriptive)
+
+── m = 3: t   D(Edwards)  D(Weierstrass)   max_cols(Edwards)  max_cols(Weierstrass)
+  2   6.0         5.0             252                368
+  3   6.0         6.0             1849               3285
+  4   6.0         6.0             11710              12314
+
+── A0 Edwards m = 3 p1
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  7      8      [6, 6]        252,252              0.0,0.0               ok,ok
+  3   3.000  10     11     [6, 6]        1849,1849            0.2,0.2               ok,ok
+  4   4.000  13     14     [6, 6]        11710,11710          5.0,5.4               ok,ok
+  completed cells 3: σ = 0.0000  →  candidate (σ ≤ 0.25 on ≥ 3 cells);  Δlog₂ max_cols/Δb = 2.769 (secondary, descriptive)
+
+rule: 11 shared completed cells → MODEL-DEPENDENT (a shared D differs)  (Edwards D above / equal / below: 1 / 8 / 2)
+
+════ T5: A0, m = 4, t = 4, p1, tower engine, budget 21600 s, second target only if the first completes
+  target 0: D 7, degree reached 8, max_cols 170363, time 4730 s, "ok"  null
+  target 1: D 7, degree reached 8, max_cols 170036, time 4721 s, "ok"  null
+
+── A0 m = 4, F4 cells and the T5 cell
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  10     11     [6, 6]        1911,1911            0.3,0.3               ok,ok
+  3   3.000  14     15     [7, 7]        21619,21619          96.4,93.8             ok,ok
+  4   4.000  18     19     [7, 7]        170363,170036        4730.0,4721.2         ok,ok
+  completed cells 3: σ = 0.5000  →  no middle ground at this arity (σ ≥ 0.5);  Δlog₂ max_cols/Δb = 3.238 (secondary, descriptive)

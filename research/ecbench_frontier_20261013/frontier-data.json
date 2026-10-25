@@ -154,7 +154,9 @@
       "setup_inclusive_ic_over_rho": 83.4,
       "setup_inclusive_class": "measured cold ratio",
       "setup_seconds_approx": 28.0,
-      "status": "admitted online",
+      "status": "superseded (empty-table rho)",
+      "original_status": "admitted online",
+      "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B row 108.1: ratio is against rho with an empty distinguished-point table; Bernstein-Lange rho at equal advice is 53-317x faster online (benchmarks row 20261014-ic-next10-09-equal-advice). Cold ratio unaffected.",
       "targets": 64,
       "source": "docs/ic/BOUNDARY_TARGETS.md:147"
     },
@@ -171,7 +173,9 @@
       "rho_online_seconds": 1.17329325,
       "derived_break_even_targets": 305.4175042931938,
       "first_integer_break_even_under_model": 306,
-      "status": "exploratory one point",
+      "status": "superseded (empty-table rho)",
+      "original_status": "exploratory one point",
+      "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B rows 108.1 and 110.1: empty-table rho, one target, L0 shared host; precomputed-table rho wins every N83 matched pair (benchmarks row 20261016-n83-precomputed-rho-control). Within-IC K1798 vs K1500 comparison unaffected.",
       "targets": 1,
       "source": "research/n83_dense_root_20261013/REPORT.md:3"
     }
@@ -273,7 +277,16 @@
         "replays_identical": 120,
         "replays_total": 168,
         "failures": 48,
-        "failure_scope": "all inherited-F4 rows differ in solver phase counts; root-finder and rho rows identical"
+        "failure_scope": "2026-10-13 receipt, preserved: 48 mismatches in solver phase counts. The earlier scope text 'all inherited-F4 rows differ; root-finder and rho rows identical' is withdrawn: Corrected 2026-10-20 by validation sweep (verdict: contradicted)",
+        "current_main_replay": {
+          "date": "2026-10-19",
+          "identical": 72,
+          "total": 168,
+          "failures": 96,
+          "scope": "mismatches in all four IC arms (ic-f4-m2, ic-f4-m3, ic-rootfind-m2, ic-rootfind-m3; 24 rows each); open regression under investigation (sweep D, PR #2290); root-finder and rho rows are not claimed to pass",
+          "source": "claude/validation-sweep-a-leaderboard-20261019:research/validation_sweep_20261019/A-leaderboard/verdicts.jsonl (row S:frontier:rootfinder-replay-block)",
+          "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted)"
+        }
       }
     ]
   }

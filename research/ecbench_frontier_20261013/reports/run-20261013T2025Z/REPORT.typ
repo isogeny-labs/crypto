@@ -1,3 +1,4 @@
+// Correction 2026-10-20 (validation sweep, verdict: contradicted): "all rootfinder/rho rows pass", 120/168, and the n=61 13.9x / N83 18.528x online points below are superseded; see research/ecbench_frontier_20261013/README.md. The 13.9x and 18.528x used an empty-table rho; replay on current main is 72/168.
 #set page(paper: "a4", margin: 1.7cm, numbering: "1")
 #set text(size: 9.2pt)
 #set heading(numbering: "1.")
