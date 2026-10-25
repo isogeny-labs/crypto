@@ -150,6 +150,22 @@ fn main() {
     }
     assert_eq!(count, 336);
     small_group_checks();
+    let pdf = fs::read(here.join("REPORT.pdf")).expect("PDF");
+    let pdf_text = std::str::from_utf8(&pdf).expect("native PDF bytes");
+    assert!(pdf_text.contains("/Count 2"), "report and chart pages");
+    assert!(
+        pdf_text.contains("Explicit state by subgroup size"),
+        "chart title"
+    );
+    assert!(pdf_text.contains("subgroup bits"), "chart horizontal axis");
+    assert!(
+        pdf_text.contains("bytes, log10 scale"),
+        "chart vertical axis"
+    );
+    assert!(
+        pdf_text.contains("N7 frozen inputs"),
+        "chart source caption"
+    );
     let sums = fs::read_to_string(here.join("SHA256SUMS")).expect("checksums");
     assert_eq!(sums.lines().count(), 14);
     for line in sums.lines() {

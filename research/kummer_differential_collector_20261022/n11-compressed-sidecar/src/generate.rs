@@ -77,7 +77,7 @@ fn main() {
     )
     .expect("write JSON");
     fs::write(here.join("state-graph.svg"), graph(&first_by_model)).expect("write graph");
-    fs::write(here.join("REPORT.pdf"), pdf()).expect("write deterministic PDF");
+    fs::write(here.join("REPORT.pdf"), pdf(&first_by_model)).expect("write deterministic PDF");
     let files = [
         "../orbit-proof/frozen-inputs.json",
         "../src/walk_impl.rs",
@@ -102,7 +102,7 @@ fn main() {
     println!("generated {} rows from {} models", rows.len(), models.len());
 }
 
-fn pdf() -> Vec<u8> {
+fn pdf(models: &[(u64, u64)]) -> Vec<u8> {
     // Base-14 Helvetica needs no embedded font file or generated timestamp.
     let lines = [
         "N11: compressed sign-safe Kummer sidecar",
@@ -137,12 +137,15 @@ fn pdf() -> Vec<u8> {
         writeln!(stream, "({escaped}) Tj T*").unwrap();
     }
     stream.push_str("ET\n");
+    let chart = pdf_chart(models);
     let objects = [
         "<< /Type /Catalog /Pages 2 0 R >>".to_owned(),
-        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>".to_owned(),
+        "<< /Type /Pages /Kids [3 0 R 6 0 R] /Count 2 >>".to_owned(),
         "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>".to_owned(),
         "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>".to_owned(),
         format!("<< /Length {} >>\nstream\n{}endstream", stream.len(), stream),
+        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 7 0 R >>".to_owned(),
+        format!("<< /Length {} >>\nstream\n{}endstream", chart.len(), chart),
     ];
     let mut out = String::from("%PDF-1.4\n");
     let mut offsets = vec![0];
@@ -151,16 +154,69 @@ fn pdf() -> Vec<u8> {
         writeln!(out, "{} 0 obj\n{}\nendobj", i + 1, object).unwrap();
     }
     let xref = out.len();
-    out.push_str("xref\n0 6\n0000000000 65535 f \n");
+    out.push_str("xref\n0 8\n0000000000 65535 f \n");
     for offset in offsets.iter().skip(1) {
         writeln!(out, "{offset:010} 00000 n ").unwrap();
     }
     write!(
         out,
-        "trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n"
+        "trailer\n<< /Size 8 /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n"
     )
     .unwrap();
     out.into_bytes()
+}
+
+fn pdf_chart(models: &[(u64, u64)]) -> String {
+    assert_eq!(models.len(), 21);
+    let (x0, x1, y0, y1) = (80.0, 550.0, 145.0, 610.0);
+    let top = models.iter().map(|(_, bytes)| *bytes).max().unwrap() as f64;
+    let xx = |bits: u64| x0 + (bits as f64 - 16.0) * (x1 - x0) / 24.0;
+    let yy = |bytes: f64| y0 + (bytes.log10() - 1.0) / (top.log10() - 1.0) * (y1 - y0);
+    let mut out = String::from("0 0 0 RG 0 0 0 rg\n");
+    out.push_str("BT /F1 16 Tf 48 743 Td (Explicit state by subgroup size) Tj ET\n");
+    out.push_str("BT /F1 10 Tf 48 720 Td (KUMMER-N11-COMPRESSED-SIDECAR-20261025 | 21 models, 336 model/jump rows) Tj ET\n");
+    out.push_str(
+        "BT /F1 10 Tf 48 701 Td (Derived bytes on a log10 axis; no measured timing) Tj ET\n",
+    );
+    out.push_str("0.85 0.85 0.85 RG 0.5 w\n");
+    for power in [2, 4, 6, 8, 10, 12, 14] {
+        let y = yy(10_f64.powi(power));
+        if (y0..=y1).contains(&y) {
+            writeln!(out, "{x0:.1} {y:.1} m {x1:.1} {y:.1} l S").unwrap();
+            writeln!(out, "BT /F1 9 Tf 39 {:.1} Td (10^{power}) Tj ET", y - 3.0).unwrap();
+        }
+    }
+    out.push_str("0 0 0 RG 1 w\n");
+    writeln!(out, "{x0:.1} {y0:.1} m {x0:.1} {y1:.1} l S").unwrap();
+    writeln!(out, "{x0:.1} {y0:.1} m {x1:.1} {y0:.1} l S").unwrap();
+    for bits in [16, 20, 24, 28, 32, 36, 40] {
+        writeln!(
+            out,
+            "BT /F1 9 Tf {:.1} 130 Td ({bits}) Tj ET",
+            xx(bits) - 5.0
+        )
+        .unwrap();
+    }
+    out.push_str("BT /F1 10 Tf 260 108 Td (subgroup bits) Tj ET\n");
+    out.push_str("BT /F1 10 Tf 39 631 Td (bytes, log10 scale) Tj ET\n");
+    out.push_str("0.10 0.40 0.64 RG 2 w\n");
+    writeln!(out, "{x0:.1} {:.1} m {x1:.1} {:.1} l S", yy(72.0), yy(72.0)).unwrap();
+    out.push_str("0.70 0.29 0.14 rg\n");
+    for &(bits, bytes) in models {
+        writeln!(
+            out,
+            "{:.1} {:.1} 7 7 re f",
+            xx(bits) - 3.5,
+            yy(bytes as f64) - 3.5
+        )
+        .unwrap();
+    }
+    out.push_str("0.70 0.29 0.14 rg 55 82 8 8 re f 0 0 0 rg\n");
+    out.push_str("BT /F1 9 Tf 70 82 Td (N7 fixed-offset explicit state: 32r bytes) Tj ET\n");
+    out.push_str("0.10 0.40 0.64 RG 2 w 55 67 m 65 67 l S 0 0 0 RG\n");
+    out.push_str("BT /F1 9 Tf 70 64 Td (differential pair + one label: 72 bytes, external step count) Tj ET\n");
+    out.push_str("BT /F1 8 Tf 48 39 Td (N7 frozen inputs; markers overlap at shared bit sizes. Different transitions.) Tj ET\n");
+    out
 }
 
 fn graph(models: &[(u64, u64)]) -> String {
