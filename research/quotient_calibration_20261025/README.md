@@ -1,6 +1,6 @@
 # Quotient-coordinate calibration: protocol and native source preflight
 
-**Destination: `aburan28/crypto`. Source preflight only; target calibration,
+**Current destination: `Isogeny-labs/crypto`. Source preflight only; target calibration,
 inversion and anchor-free initialization have not executed.**
 
 This relocates the experiment originally prepared in
@@ -11,6 +11,12 @@ copied byte for byte; no challenge was replaced, relabeled or evaluated on
 the target. The original Python execution path is replaced by Rust for this
 repository, with the original normal-Weil-function formulas and coefficient
 ordering. This is a correctness replay, with no performance comparison.
+
+The initial delivery was pushed to `aburan28/crypto`; the user has since
+identified `Isogeny-labs/crypto` as the current repository. The local remote
+now points there. Repository/PR identity after that change remains unverified
+because the current GitHub connection cannot access the organization repository.
+See the [repository follow-up](reports/repository-20261025T2314Z/STATUS.md).
 
 The user has since approved auto-merge for PR #2569 and the exact raw-log
 archive upload. Both remain blocked by GitHub/AWS access; see the

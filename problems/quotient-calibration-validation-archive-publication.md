@@ -52,6 +52,13 @@ artifact manifest update; otherwise retain the explicit unpublished state.
 
 ## Resolution and history
 
+2026-10-25 23:14 UTC: user identified `Isogeny-labs/crypto` as the current
+repository; the local Git remote now uses that URL. The GitHub connection
+cannot expose it (404/403), so repository identity and the current PR mapping
+must be verified after organization-repository access is restored. See
+[the repository follow-up](../research/quotient_calibration_20261025/reports/repository-20261025T2314Z/STATUS.md).
+The existing merge/upload approval and archive hash are unchanged.
+
 2026-10-25 21:44 UTC: explicit user approval received for the exact archive
 upload and PR #2569 auto-merge. Archive hash and size rechecked unchanged.
 AWS CLI installed; a normal SDK head request and repository artifact push
