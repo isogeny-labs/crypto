@@ -89,6 +89,8 @@ jobs:
             research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json
             research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz
       - uses: Swatinem/rust-cache@v2
+      - name: Install rustfmt (the runner toolchain ships without it)
+        run: rustup component add rustfmt
       - name: Check source hashes and Rust formatting
         run: |
           printf '%s  %s\n' \

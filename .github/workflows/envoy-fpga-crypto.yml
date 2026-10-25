@@ -1,0 +1,50 @@
+name: Envoy FPGA crypto
+
+on:
+  pull_request:
+    paths:
+      - integrations/envoy-fpga-crypto/**
+      - .github/workflows/envoy-fpga-crypto.yml
+  push:
+    paths:
+      - integrations/envoy-fpga-crypto/**
+      - .github/workflows/envoy-fpga-crypto.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: envoy-fpga-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  host-and-rtl:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: integrations/envoy-fpga-crypto
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: integrations/envoy-fpga-crypto
+      - name: Install native build and RTL tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ make libssl-dev verilator yosys curl unzip
+          mkdir -p "$RUNNER_TEMP/envoy-rtl"
+          curl -fsSL --retry 3 \
+            https://github.com/zachjs/sv2v/releases/download/v0.0.13/sv2v-Linux.zip \
+            -o "$RUNNER_TEMP/envoy-rtl/sv2v.zip"
+          cd "$RUNNER_TEMP/envoy-rtl"
+          echo '552799a1d76cd177b9b4cc63a3e77823a3d2a6eb4ec006569288abeff28e1ff8  sv2v.zip' | sha256sum -c -
+          unzip -q sv2v.zip
+          echo "$RUNNER_TEMP/envoy-rtl/sv2v-Linux" >> "$GITHUB_PATH"
+      - name: Validate host transport and actual RTL
+        run: |
+          g++ --version
+          verilator --version
+          yosys -V
+          sv2v --version
+          make test lint-rtl test-rtl test-rtl-synth
