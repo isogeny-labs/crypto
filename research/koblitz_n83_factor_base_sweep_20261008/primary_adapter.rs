@@ -21,7 +21,7 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     SatDecompositionOptions,
 };
 use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
-use crypto_lib::cryptanalysis::sat::SolveResult;
+use crypto_lib::cryptanalysis::sat::{to_dimacs_xor, SolveResult};
 use crypto_lib::hash::sha256;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
@@ -648,6 +648,7 @@ pub(super) fn full_d18_m4_cli(
         "none",
         false,
         1_200,
+        false,
     )
 }
 
@@ -668,6 +669,7 @@ pub(super) fn full_d18_m4_l0_positive_cli(
         "none",
         false,
         300,
+        false,
     )
 }
 
@@ -686,6 +688,7 @@ pub(super) fn full_d18_m4_l0_shared_positive_cli(
         "none",
         false,
         300,
+        false,
     )
 }
 
@@ -704,6 +707,7 @@ pub(super) fn full_d18_m4_l0_shared_root_pinned_cli(
         "selector_and_phase_zero",
         false,
         300,
+        false,
     )
 }
 
@@ -722,6 +726,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_pinned_cli(
         "phase_zero",
         false,
         300,
+        false,
     )
 }
 
@@ -740,6 +745,7 @@ pub(super) fn full_d18_m4_l0_shared_selector_pinned_cli(
         "selector",
         false,
         300,
+        false,
     )
 }
 
@@ -760,6 +766,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_cli(
         "none",
         true,
         300,
+        false,
     )
 }
 
@@ -780,6 +787,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_natural_cli(
         "none",
         true,
         300,
+        false,
     )
 }
 
@@ -800,6 +808,29 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_natural_1200_cli(
         "none",
         true,
         1_200,
+        false,
+    )
+}
+
+/// Export the same full-D18 shared-root formula as CryptoMiniSat XCNF.
+/// This source-bound arm performs no native relation search.
+pub(super) fn full_d18_m4_l0_xcnf_cli(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        300,
+        true,
     )
 }
 
@@ -821,6 +852,7 @@ pub(super) fn full_d18_m4_linux_shared_phase_first_cli(
         "none",
         true,
         1_200,
+        false,
     )
 }
 
@@ -834,6 +866,7 @@ fn full_d18_m4_impl(
     choice_pins: &'static str,
     phase_zero_first: bool,
     budget_seconds: u64,
+    export_xcnf: bool,
 ) -> Result<Value> {
     if !["positive", "natural"].contains(&mode) || output.exists() {
         return Err("full D18 m4 mode or fresh output differs from protocol".into());
@@ -863,6 +896,16 @@ fn full_d18_m4_impl(
                 && phase_zero_first))
     {
         return Err("full D18 m4 wall budget differs from a frozen mode".into());
+    }
+    if export_xcnf
+        && (!l0_diagnostic
+            || budget_seconds != 300
+            || encoding != FrobeniusOrbitRootEncoding::SharedBits
+            || !phase_zero_first
+            || choice_pins != "none"
+            || output.with_extension("xcnf").exists())
+    {
+        return Err("full D18 XCNF export differs from the frozen mode".into());
     }
     let root_choice_pinned = choice_pins == "selector_and_phase_zero";
     let search_policy = if phase_zero_first {
@@ -1083,6 +1126,48 @@ fn full_d18_m4_impl(
     let shape_path = std::path::PathBuf::from(format!("{}.shape.json", output.display()));
     write_new_json(&shape_path, &shape)?;
     full_d18_phase(&mut phases, started, "model_constructed", shape.clone())?;
+    if export_xcnf {
+        let export_start = Instant::now();
+        let xcnf = to_dimacs_xor(&enc.solver);
+        if xcnf.len() > 400_000_000 {
+            return Err("full D18 XCNF exceeds the frozen output cap".into());
+        }
+        let xcnf_path = output.with_extension("xcnf");
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&xcnf_path)?;
+        file.write_all(xcnf.as_bytes())?;
+        file.sync_all()?;
+        let xcnf_sha256 = sha256_hex(xcnf.as_bytes());
+        let export_ms = export_start.elapsed().as_secs_f64() * 1000.0;
+        full_d18_phase(
+            &mut phases,
+            started,
+            "xcnf_exported",
+            json!({"xcnf_sha256":xcnf_sha256,"xcnf_bytes":xcnf.len(),"export_ms":export_ms}),
+        )?;
+        let result = json!({
+            "schema":"n83.full-d18-m4-l0-xcnf-export/v1",
+            "status":"PASS_XCNF_EXPORT_ONLY", "mode":mode,
+            "source_commit":source_commit, "source_attestation_mode":source_attestation_mode,
+            "binary_sha256":binary_sha256, "isolation":isolation,
+            "budget_seconds":budget_seconds, "curve_a":0,
+            "summands":4, "identity_mask":0,
+            "root_encoding":encoding_name, "choice_pin_policy":choice_pins,
+            "search_policy":search_policy, "target":point_json(words(&target)),
+            "object":row["object"], "point_set_blake3":FULL_D18_POINT_SET,
+            "shape":shape, "xcnf_sha256":xcnf_sha256,
+            "xcnf_bytes":xcnf.len(), "xcnf_path":xcnf_path.to_string_lossy(),
+            "export_ms":export_ms,
+            "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+            "process_usage":process_usage(), "solver_search_executed":false,
+            "total_index_calculus_runtime_ms":Value::Null,
+            "selected_best_total_runtime":Value::Null,
+        });
+        write_new_json(output, &result)?;
+        return Ok(result);
+    }
     enc.solver.conflict_budget = 100_000;
     enc.solver.deadline = Some(started + Duration::from_secs(budget_seconds));
     let search_start = Instant::now();

@@ -1292,6 +1292,12 @@ fn main() -> Result<()> {
                 Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
             println!("{receipt}");
         },
+        Some("primary-full-d18-m4-l0-xcnf")=>{
+            if args.len()!=6 { return Err("primary-full-d18-m4-l0-xcnf positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (source-bound full-D18 XCNF export only; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_xcnf_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]))?;
+            println!("{receipt}");
+        },
         Some("primary-full-d18-m4-linux-shared-phase-first")=>{
             if args.len()!=6 { return Err("primary-full-d18-m4-linux-shared-phase-first positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (requires hard 8-GiB zero-swap cgroup and 1210-s outer cap)".into()); }
             let receipt=primary_adapter::full_d18_m4_linux_shared_phase_first_cli(
