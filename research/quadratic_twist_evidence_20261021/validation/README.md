@@ -1,5 +1,11 @@
 # Validation record
 
+Latest executed continuation: [reduced-s3-20261025](reduced-s3-20261025/README.md).
+Exact native replay, four semantic corruptions, source-bound polynomial
+controls and the unmodified207-declaration proof gate pass. Fresh library
+4,479/119 ignored,22 backend, four workflow metadata and backlog-card checks
+pass. This is a local verification record, not current-head GitHub CI.
+
 Artifact publication update: [all four artifacts uploaded and remotely verified](artifact-upload-20261025/README.md).
 The approved immutable files total684,341 bytes. The repository tool reports
 four uploads, two hydration manifests and zero verification problems; fresh

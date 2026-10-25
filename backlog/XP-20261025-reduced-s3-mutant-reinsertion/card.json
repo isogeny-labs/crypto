@@ -1,0 +1,101 @@
+{
+  "authors": [
+    "research reasoning lane"
+  ],
+  "blocked_on": [],
+  "cairn": {
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Draft: first implement and freeze adaptive native producer/auditor; the current reduced-S3 crate is the baseline dependency."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 1024,
+      "publish": "runs/XP-20261025-reduced-s3-mutant-reinsertion",
+      "sandbox": "auto",
+      "timeout_s": 3600
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "No funding or paid resource request; use existing local workspace for the next preregistered bounded step."
+    },
+    "mode": "lab-task",
+    "notes": "Draft only; no reservation, posting or task execution performed.",
+    "space": "unassigned",
+    "tasks": [
+      "XP-20261025-reduced-s3-mutant-reinsertion"
+    ],
+    "ttl_s": 86400
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/quadratic-twist-evidence-import",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--manifest-path",
+        "research/quadratic_twist_evidence_20261021/native/reduced-s3-audit/Cargo.toml"
+      ]
+    ]
+  },
+  "created": "2026-10-25",
+  "decision_value": "A checked lower operational degree advances the solver bridge beyond static closure profiles; equal or worse degree records a bounded null and selects another encoding. Expanded input-witness degree and every earlier higher-degree step remain explicit so reinsertion cannot hide work.",
+  "id": "XP-20261025-reduced-s3-mutant-reinsertion",
+  "links": {
+    "lead": "crypto-autoresearcher:LEAD-ICE-descent-closure-degree-at-scale",
+    "notes": [
+      "research/quadratic_twist_evidence_20261021/reports/reduced-s3-20261025/README.md",
+      "research/quadratic_twist_evidence_20261021/CONTINUATION.md"
+    ],
+    "prs": [
+      2381
+    ]
+  },
+  "outputs": {
+    "result_schema": "quadratic-twist-mutant-s3/v1",
+    "verify": [],
+    "land": "research/quadratic_twist_evidence_20261021"
+  },
+  "owner_hint": "Existing PR2381 research continuation",
+  "protocol": {
+    "blob": null,
+    "path": null
+  },
+  "question": "Can adaptive reinsertion certify a lower operational solver degree on the exact reduced S3 inputs while preserving rank and main-DLP transport?",
+  "resources": {
+    "cpus": 2,
+    "disk_gb": 4,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "gpu": null,
+    "notes": "Native-only bounded iteration using existing local caches. Estimates remain null until the producer/auditor and protocol are complete; no paid compute authorized.",
+    "ram_gb": 4
+  },
+  "run": {
+    "argv": [
+      "research/quadratic_twist_evidence_20261021/run-mutant-s3.sh",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 3600
+  },
+  "schema": "backlog.card/v1",
+  "shards": {
+    "count": 1,
+    "params": {},
+    "scheme": "single",
+    "stop": "all"
+  },
+  "status": "draft",
+  "status_note": "Next iteration: adaptive producer/auditor and frozen protocol still required; no execution or Cairn publication claimed.",
+  "title": "Adaptive row reinsertion on reduced twist S3 systems"
+}

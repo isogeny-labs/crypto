@@ -11,7 +11,7 @@
 | Independent verification of saved/new IC data | verified | tuple-based auditor verifies three headline and 81 complete-log certificates |
 | Native controls | verified | false new relation, removed log certificate and false historical census count rejected |
 | Historical general readable arguments | preserved | archived report remains available with its original hypotheses |
-| Checked Lean implications and proof map | partial overall; finite S3/degree/source-reduction bridges also verified |144 named theorems /185 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, yield/rank/cost, actual S3 leading ideals, degree4 obstruction /degree5 refutation and F43 reduction checked; general geometry and uniform useful-yield/regularity/work bridges remain open |
+| Checked Lean implications and proof map | partial overall; finite S3/degree/source-reduction and preprocessing bridges verified |159 named theorems /207 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, yield/rank/cost, S3 ideals/degree certificates, F43 reduction and exact reduced-generator equivalence/cutoff checked; general geometry and useful-yield/solver/work bridges remain open |
 | Algebraic identity certificates | verified for twelve stated identities | previous ten unchanged, plus S3 scaling IDC1hf15c17737ed713d5 and cleared unit IDC1hcee4710ff9dcf7e7;32+16 replay, arithmetic false identities and false source hashes |
 | Exact curve/model/subgroup identities | verified within stated representations | 1,921 registered monic models, 27 EC1 representations; unused subgroup choices stay unknown |
 | Shared Conductor check | blocked by unavailable tool/configuration | CLI exits 127; shared workflow/state unavailable; no reservation claimed |
@@ -39,9 +39,17 @@
 | New exact representation identity | explicit coordinates, not a registered EC1 | U=(24,26),r11 on existing twist model; never relabelled as prior generator(35,12); no registry or cross-repository performance claim |
 | Actual S3 continuation report and validation | supplied; four approved large assets uploaded and remotely verified | `reports/s3-yield-20261024/`, `validation/s3-yield-20261024/`; all four fresh downloads match the original approved hashes,684,341 bytes; two genuine hydration manifests; current record `validation/artifact-upload-20261025/` |
 
-The fresh library suite after the current-main refresh passes 4,479 tests with
-119 existing ignores. The new isolated native auditor's backend suite passes
-22 tests; the earlier 39/40 metadata-backend receipts remain historical records.
+| Additional requirement | Status | Evidence |
+| --- | --- | --- |
+| Factor-base-reduced actual S3 continuation | executed and independently replayed | 98 cases,188 comparisons,1,384 target comparisons; exact ideals/roots unchanged, new degree/rank profiles and four rehashed controls |
+| Actual preprocessed F43 leading cutoff | kernel checked in both arms | input-generator leading ideal becomes <xy,x^2,y^2>, first-empty degree2 versus original3; affine closure main4/twist2, useful rows0/2; not intrinsic regularity or an F4/F5 timing claim |
+| Reduced-S3 proof and certificate | verified |15 new named theorems; total159 named /207 audited,0 extra trusted; IDC1h77b3276833a18411 polynomial32+16 and false-source/identity controls |
+| Adaptive row reinsertion follow-up | draft next experiment, not executed | validated `backlog/XP-20261025-reduced-s3-mutant-reinsertion`; implement both native paths and freeze a protocol before promotion |
+
+The fresh library suite for the reduced-S3 continuation again passes 4,479
+tests with zero failures and 119 existing ignores; its 22 backend and four
+workflow metadata tests pass. Earlier library and 39/40 metadata-backend
+receipts remain historical records for their original source states.
 
 The [continuation policy and ordered queue](CONTINUATION.md) keep the open
 mathematical requirements active across scheduled research iterations. A null

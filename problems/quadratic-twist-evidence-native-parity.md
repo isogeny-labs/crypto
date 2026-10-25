@@ -100,7 +100,7 @@ reproduced by an exact pulled-back factor base on the main curve.
   leading ideal <x^2*y^2,x^b,y^b> has first-empty degree b+1 in both arms for
   b2/3. All-target mean closure is5.2 in both F43 arms, and the twist loses on
   targets4--7. This is a basis/target effect with no measured work advantage.
-  The unmodified gate now passes144 named theorems /185 audited declarations,
+  That prior S3 round's unmodified gate passed144 named theorems /185 audited declarations,
   zero extra trusted. Both new polynomial certificates and rehashed false-rank,
   false-degree, omitted-case and false-scaling controls pass. Previous evidence
   and all ten prior study certificates remain unchanged. The newly used twist
@@ -169,6 +169,18 @@ Satisfying these conditions would establish the stated formal parity. It would
 still not prove general ECDLP hardness or an asymptotic solver advantage.
 
 ## Next discriminating step
+
+The [executed reduced-S3 round](../research/quadratic_twist_evidence_20261021/reports/reduced-s3-20261025/README.md)
+adds an exact preprocessing/ideal-equality proof and independently verifies
+98 cases,188 comparisons and1,384 targets. F43 input-leading cutoff drops
+from3 to2 in both arms, with first-target affine closure4/2 and useful rows0/2.
+The unmodified gate now audits207 declarations (159 named theorems), with no
+extra trusted axioms. This closes the stated generator-preprocessing bridge;
+it does not identify that cutoff with intrinsic regularity or a solver runtime.
+The [validated draft follow-up](../backlog/XP-20261025-reduced-s3-mutant-reinsertion/README.md)
+specifies adaptive row reinsertion and separate operational/expanded-witness
+degree accounting. Implement and preregister that next step; no such run is
+claimed as already executed. All earlier evidence and broader gates remain.
 
 The [bounded continuation policy and queue](../research/quadratic_twist_evidence_20261021/CONTINUATION.md)
 extend the existing scheduled check with active research steps. The unsolved

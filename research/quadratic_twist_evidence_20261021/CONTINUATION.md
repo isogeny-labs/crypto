@@ -53,6 +53,13 @@ remains superseded by the positive pairing and yield research requests.
 
 ## Ordered work queue
 
+Completed next lead: [factor-base-reduced S3](reports/reduced-s3-20261025/README.md),
+98 cases /188 comparisons /1,384 targets, with15 new named Lean theorems.
+The next concrete work item is
+[adaptive row reinsertion](../../backlog/XP-20261025-reduced-s3-mutant-reinsertion/README.md).
+Its draft status means implement the native paths and freeze the protocol;
+it is not a reason to stop because its future runner is not implemented yet.
+
 | Work item | Next checkable deliverable | Evidence needed before promotion |
 | --- | --- | --- |
 | Solver relevance | Identify a precisely defined solver and certify its required degree on actual inputs | Actual polynomial/output bindings and independently checked certificates; state its relation to regularity rather than equating the two |

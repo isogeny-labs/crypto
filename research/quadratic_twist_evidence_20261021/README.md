@@ -1,5 +1,17 @@
 # Quadratic twists: native experiments and checked point/pairing transfers
 
+The [executed reduced-S3 continuation](reports/reduced-s3-20261025/README.md)
+checks 98 size2 cases, 188 comparisons and 1,384 target comparisons with
+independent native arithmetic/division/matrices. Exact generator preprocessing
+lowers the F43 leading-form cutoff from 3 to 2 on both curves and the twist's
+first-target finite closure from 4 to 2 (main:6 to4). The same two useful twist
+rows and the previously proved main-DLP reduction are retained. Fifteen new
+named Lean theorems bring the study to **159 named theorems /207 audited declarations**,
+zero extra trusted. [Protocol](REDUCED_S3_20261025_PROTOCOL.md),
+[validation](validation/reduced-s3-20261025/README.md),
+[next experiment card](../../backlog/XP-20261025-reduced-s3-mutant-reinsertion/README.md).
+The cutoff is generator-sensitive; no F4/F5 timing or speed claim is made.
+
 The [research continuation policy and work queue](CONTINUATION.md) directs
 the existing four-hour check to attempt a bounded new experiment or proof
 when feasible. An open mathematical obligation becomes the next work item;
@@ -14,7 +26,7 @@ and a Lean-verified injective scalar-preserving base-field map. Pulling back
 the twist base reproduces the entire gain on the main curve. The homogeneous
 leading ideal has the same first-zero degree in both arms; all-target mean
 closure is also equal. This is a finite factor-base/target effect, not a speed
-result. The unmodified gate now checks **144 named research theorems /185
+result. That prior S3 round's unmodified gate checked **144 named research theorems /185
 audited declarations**, zero extra trusted, including exact degree4-obstruction
 and degree5-refutation certificates. [Protocol](S3_YIELD_20261024_PROTOCOL.md),
 [validation](validation/s3-yield-20261024/README.md), [verified artifact publication](validation/artifact-upload-20261025/README.md).

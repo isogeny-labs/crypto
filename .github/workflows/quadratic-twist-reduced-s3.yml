@@ -1,0 +1,40 @@
+name: Quadratic twist reduced S3 native replay
+
+on:
+  pull_request:
+    paths:
+      - 'research/quadratic_twist_evidence_20261021/**'
+      - '.github/workflows/quadratic-twist-reduced-s3.yml'
+      - 'src/cryptanalysis/identity_certificate.rs'
+      - 'src/hash/sha256.rs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-reduced-s3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/quadratic_twist_evidence_20261021/
+            /src/hash/sha256.rs
+            /src/cryptanalysis/identity_certificate.rs
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.99.1'
+      - name: Install native dependencies
+        run: sudo apt-get update && sudo apt-get install -y g++ libssl-dev jq ripgrep
+      - name: Replay every reduced S3 case, identity and semantic control
+        run: bash research/quadratic_twist_evidence_20261021/run-reduced-s3.sh "$RUNNER_TEMP/twist-reduced-s3"
+      - name: Upload complete native evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quadratic-twist-reduced-s3
+          path: ${{ runner.temp }}/twist-reduced-s3/
+          if-no-files-found: error
