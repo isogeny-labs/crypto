@@ -50,8 +50,11 @@ fn rank_mod(rows: &BTreeSet<Vec<u64>>, p: u64) -> usize {
 }
 fn main() -> Result<()> {
     let args = std::env::args().collect::<Vec<_>>();
-    if args.len() != 5 {
-        return Err("usage: audit INPUT_CENSUS MATCHED_INPUTS PANEL FRESH_OUTPUT".into());
+    if args.len() != 5 && args.len() != 6 {
+        return Err(
+            "usage: audit INPUT_CENSUS MATCHED_INPUTS PANEL FRESH_OUTPUT [INSTRUCTION_PROBE]"
+                .into(),
+        );
     }
     let census = Path::new(&args[1]);
     let matched = Path::new(&args[2]);
@@ -341,6 +344,63 @@ fn main() -> Result<()> {
         .map(|w| format!("{}:{}", w["fixture"], w["target"]))
         .collect::<BTreeSet<_>>();
     let summary = json!({"schema":"twist.block-independent-audit/v1","status":"raw-receipts-and-aggregates-verified","workloads":90,"distinct_fixture_target_pairs":targets.len(),"requested_cells":631,"by_arm":by_arm,"matched_order_coefficient_checks":90,"independent_PARI_signed_witness_checks":witness_checks,"independent_PARI_wrong_sign_checks":negative_checks,"AA_identical_polynomial_inputs":true,"AA_equal_certified_row_multiplications":aa_equal,"counter_trace_entries_audited":traces.len(),"trace_coverage_failures":traces.iter().filter(|r|r["total_covers_logged_steps"]!=true).count(),"frobenius_vs_exact_ordinary_order":frobenius_control,"projected_row_information":row_information,"comparisons":comparisons,"ordinary_comparator_selection":"preregistered hindsight minimum of the four ordinary controls; not an executable portfolio selector","primary_assessment_sha256":sha(panel.join("ASSESSMENT.json"))?,"panel_sha256":sha(panel.join("PANEL.json"))?,"counts_are_row_reduction_multiplications_only":true,"complete_solver_or_DLP_cost":false,"speedup_or_novelty_established":false,"final_E28_targets_opened":false});
+    let mut summary = summary;
+    if args.len() == 6 {
+        let cost_dir = Path::new(&args[5]);
+        let records = read(cost_dir.join("RECORDS.json"))?;
+        let cost = read(cost_dir.join("COST.json"))?;
+        let mut totals = BTreeMap::<(String, String), (u64, u64, u64)>::new();
+        for (index, r) in records.as_array().unwrap().iter().enumerate() {
+            let key = (
+                r["arm"].as_str().unwrap().to_string(),
+                r["engine"].as_str().unwrap().to_string(),
+            );
+            let total = totals.entry(key).or_default();
+            total.0 += 1;
+            if r["status"] != "completed-and-output-matched" {
+                continue;
+            }
+            let trace = cost_dir.join(format!("process-{index:03}.callgrind"));
+            assert_eq!(r["trace_sha256"], sha(&trace)?);
+            let text = fs::read_to_string(trace)?;
+            assert_eq!(
+                text.lines()
+                    .find_map(|s| s.strip_prefix("events:"))
+                    .map(str::trim),
+                Some("Ir")
+            );
+            let n = text
+                .lines()
+                .rev()
+                .find_map(|s| s.strip_prefix("totals:"))
+                .or_else(|| text.lines().rev().find_map(|s| s.strip_prefix("summary:")))
+                .ok_or("missing Callgrind total")?
+                .trim()
+                .parse::<u64>()?;
+            assert_eq!(r["guest_instructions_Ir"], n);
+            assert_eq!(r["basis_and_native_counters_match_prior_certificate"], true);
+            total.1 += 1;
+            total.2 += n;
+        }
+        for entry in cost["by_arm"].as_array().unwrap() {
+            let key = (
+                entry["arm"].as_str().unwrap().to_string(),
+                entry["engine"].as_str().unwrap().to_string(),
+            );
+            let actual = totals.get(&key).unwrap();
+            assert_eq!(entry["requested_branches"], actual.0);
+            assert_eq!(entry["completed_branches"], actual.1);
+            assert_eq!(
+                entry["guest_instructions_Ir"],
+                json!(if actual.0 == actual.1 {
+                    Some(actual.2)
+                } else {
+                    None
+                })
+            );
+        }
+        summary["worker_instruction_probe_audit"] = json!({"status":"raw-Ir-counters-and-aggregates-verified","records":records.as_array().unwrap().len(),"cost_sha256":sha(cost_dir.join("COST.json"))?,"AA_within_5_percent":cost["AA_within_preregistered_5_percent"],"complete_DLP_cost":false});
+    }
     fs::write(
         out.join("AUDIT.json"),
         serde_json::to_string_pretty(&summary)? + "\n",

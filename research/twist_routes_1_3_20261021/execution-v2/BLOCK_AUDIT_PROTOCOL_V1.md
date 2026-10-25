@@ -40,3 +40,9 @@ Run only after the solver/checker phases, with fresh output, one worker,
 4 GiB and a 600-second cap. Keep this source/protocol in Git before executing.
 This is independent aggregation on the same host. It does not replace the
 PARI implementation checks, source-group witness checks or an independent host.
+
+When the fixed-worker instruction probe is supplied, independently reopen
+each completed raw Callgrind file, verify its hash and event Ir, re-read the
+final totals/summary counter, and recompute every branch sum. Compare these
+with COST.json; partial workers cannot supply a complete sum. Keep the A/A
+gate and all excluded costs visible. This does not convert Ir into GAE.
