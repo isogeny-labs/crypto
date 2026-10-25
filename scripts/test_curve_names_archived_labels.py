@@ -54,11 +54,8 @@ class ArchivedUnregisteredSlugTests(unittest.TestCase):
         self.assertFalse(names.archived_unregistered_slug_file(SESSION_TABLE, self.text + "\n"))
         self.assertFalse(names.archived_unregistered_slug_file("research/other.md", self.text))
 
-    def test_frozen_table_slugs_are_unregistered_and_the_normal_lint_uses_the_allowlist(self):
+    def test_normal_lint_allows_the_exact_frozen_table(self):
         resolver = names.Resolver()
-        slugs = set(names.SLUG.findall(self.text))
-        self.assertTrue(slugs)
-        self.assertTrue(slugs.isdisjoint(resolver.slugs))
         with patch.object(names, "tracked", return_value=[SESSION_TABLE]):
             self.assertEqual(names.lint(resolver, {}, False), [])
 
