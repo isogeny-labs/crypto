@@ -240,7 +240,11 @@ fn main() {
         pts.len(), slope, q(&slopes, 0.025), q(&slopes, 0.975), root, q(&roots, 0.025), q(&roots, 0.975)).unwrap();
     // POST HOC (not in PROTOCOL.md): IC cost depends on q only, rho on ell = N / c, so the
     // ratio carries the cofactor c. Group by c and regress log2 ratio on (log2 q, log2 c).
-    writeln!(md, "\n## Post hoc (not preregistered): the ratio by cofactor\n").unwrap();
+    writeln!(
+        md,
+        "\n## Post hoc (not preregistered): the ratio by cofactor\n"
+    )
+    .unwrap();
     writeln!(md, "IC cost depends on `q` alone; rho on `ell = #E0 / c`. So `IC / R_ideal` carries `sqrt(c)`. Labelled post hoc; it moves no preregistered decision.\n").unwrap();
     writeln!(md, "| cofactor c | log2 q | curve | IC/R_ideal |").unwrap();
     writeln!(md, "|---:|---:|---:|---:|").unwrap();
@@ -252,7 +256,7 @@ fn main() {
             (c, i.b, i.curve, i.ic / (i.r_ideal_ops * i.gae), i.ell)
         })
         .collect();
-    by_c.sort_by(|a, b| (a.0, a.1, a.2).cmp(&(b.0, b.1, b.2)));
+    by_c.sort_by_key(|a| (a.0, a.1, a.2));
     for (c, b, cu, r, _) in &by_c {
         writeln!(md, "| {c} | {b} | {cu} | {r:.3} |").unwrap();
     }
@@ -261,7 +265,11 @@ fn main() {
         .iter()
         .map(|i| {
             let c = 2f64.powi(3 * i.b as i32) / i.ell;
-            (i.b as f64, c.log2(), (i.ic / (i.r_ideal_ops * i.gae)).log2())
+            (
+                i.b as f64,
+                c.log2(),
+                (i.ic / (i.r_ideal_ops * i.gae)).log2(),
+            )
         })
         .collect();
     let n = rows3.len() as f64;
