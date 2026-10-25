@@ -68,6 +68,19 @@ ARCHIVED_LABELS = {
     },
 }
 
+# This first subfield-FP3 session predates registry registration. Its result
+# table is kept as frozen evidence; only this exact rendering may retain its
+# unregistered ICV1 slugs. A changed file is linted normally.
+ARCHIVED_UNREGISTERED_SLUGS = {
+    "research/ext_endo_rho_20261023/sessions/subfield-fp3.table.md":
+        "c7275bc7b32a9ea2facb598b0235c7cc7e0ff158a7836378511dffd3a08474d7",
+}
+
+
+def archived_unregistered_slug_file(rel: str, text: str) -> bool:
+    expected = ARCHIVED_UNREGISTERED_SLUGS.get(rel)
+    return expected is not None and hashlib.sha256(text.encode()).hexdigest() == expected
+
 
 def archived_label(rel: str, text: str, found: str, replacement: str | None) -> bool:
     context = ARCHIVED_LABELS.get(rel)
@@ -247,8 +260,9 @@ def lint(res: Resolver, pins: dict[str, set[str]], fix: bool) -> list[str]:
             line = text.count("\n", 0, a) + 1
             hint = f" (write {repl})" if repl else " (not in the registry)"
             problems.append(f"{rel}:{line}: retired curve name {found!r}{hint}")
+        allow_archived_slugs = archived_unregistered_slug_file(rel, text)
         for m in SLUG.finditer(text):
-            if m.group(0) not in res.slugs:
+            if m.group(0) not in res.slugs and not allow_archived_slugs:
                 line = text.count("\n", 0, m.start()) + 1
                 problems.append(f"{rel}:{line}: {m.group(0)} is not in docs/curves/registry.json")
     if fix:
