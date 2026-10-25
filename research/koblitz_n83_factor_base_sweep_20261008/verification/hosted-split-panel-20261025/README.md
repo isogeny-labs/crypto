@@ -16,6 +16,28 @@ The mathematical source is pinned to
 `cb98e85d1c1c1afdd5000bc70eea00969ee86c6c`; the dispatch checkout
 supplies only the new protocol, auditor, and workflow.
 
+The completed [hosted run 40157022080](https://github.com/aburan28/crypto/actions/runs/40157022080)
+uploaded [artifact 12586209154](https://github.com/aburan28/crypto/actions/runs/40157022080/artifacts/12586209154).
+Its 10,284,001-byte ZIP has SHA-256
+`f517adf5b3722a0b9189792e0208f3a2a16cfd02182bf24d9dc1408dd3ffe10d`
+and provider expiration `2027-01-23T03:07:07Z`. The committed
+[`attempt-1/replay-receipt.json`](attempt-1/replay-receipt.json) hashes all 51
+ZIP members and independently replays the pinned source and protocol, Docker
+stages, search outcomes, and three archive bytes against fresh S3 GETs and HEADs.
+It returned `PASS_INDEPENDENT_REPLAY_BOUNDED`:
+
+| Arm | Residual points | Conflicts / models | Worker wall (ms) | Peak cgroup bytes | Outcome |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Gray | 16,102 | 20,000 / 0 | 1,470,249.341 | 405,020,672 | `UNKNOWN_search_cap` |
+| Hash | 99,600 | 20,000 / 0 | 1,223,791.738 | 639,029,248 | `UNKNOWN_search_cap` |
+
+The observed combined preparation and arm elapsed time was 3,740.809
+seconds, including 345.504 seconds of preparation; the conservative full
+charge is 8,000 seconds. The two arms used byte-identical worker binaries.
+Both stopped in the first identity pattern without a model. These censored
+searches establish neither a relation-yield difference nor a total-runtime
+factor-base ranking.
+
 The frozen [v4 grid](../../PAIRED_FRONTIER_V4.md) addresses these exact
 source configurations at ordinals `11817231005` (Gray) and `11986592285`
 (hash). The protocol pins the v4 design hash, and a focused test decodes
@@ -57,7 +79,8 @@ python3.14 research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-s
 actionlint .github/workflows/n83-hosted-paired-gate.yml
 ```
 
-Once this protocol is committed, dispatch it with:
+The retained run was dispatched with this command; use its artifact for replay
+instead of launching another copy of the same trial:
 
 ```sh
 gh workflow run n83-hosted-paired-gate.yml \
@@ -69,10 +92,9 @@ search config/results, worker binaries, and outer outcomes even on failure.
 Any apparent positive result requires an independent replay of the uploaded
 artifact before it can inform a factor-base ranking.
 
-The first 5+1 dispatch is [run 40157022080](https://github.com/aburan28/crypto/actions/runs/40157022080)
-at commit `1f8ae24b3c7f98e241a7a9b44e718f567f33008e`. Wait for its
-`six-summand-access` job and `n83-hosted-sixsum-40157022080-1` artifact;
-do not restart it to collect this result. `replay_artifact.py` binds that
+The first 5+1 dispatch used commit
+`1f8ae24b3c7f98e241a7a9b44e718f567f33008e` and artifact
+`n83-hosted-sixsum-40157022080-1`. `replay_artifact.py` binds that
 run, the pinned source and protocol, provider responses, every ZIP member,
 Docker stages and worker receipts, group equation, and fresh S3 GET/HEAD
 responses. It accepts a bounded completed run while leaving
@@ -87,8 +109,7 @@ scratch=/tmp/n83-split-replay-40157022080
 mkdir -p "$scratch"
 gh api 'repos/aburan28/crypto/actions/runs/40157022080/jobs?per_page=100' \
   > "$scratch/provider_jobs.json"
-artifact_id=$(gh api repos/aburan28/crypto/actions/runs/40157022080/artifacts \
-  --jq '.artifacts[] | select(.name == "n83-hosted-sixsum-40157022080-1") | .id')
+artifact_id=12586209154
 gh api "repos/aburan28/crypto/actions/artifacts/$artifact_id" \
   > "$scratch/artifact_metadata.json"
 gh api "repos/aburan28/crypto/actions/artifacts/$artifact_id/zip" \
