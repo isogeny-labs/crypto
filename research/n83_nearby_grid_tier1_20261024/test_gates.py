@@ -138,6 +138,56 @@ class GateTests(unittest.TestCase):
         self.assertEqual(status, "BOUNDED_UNKNOWN")
         self.assertIsNone(cold_ratios)
 
+    def test_archived_launch_paths_replay_with_exact_original_root(self):
+        events = protocol.events()
+        rho, ic = events[0], events[1]
+        original = Path("/home/runner/work/_temp/n83-nearby-grid-results")
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / original.name
+            rho_folder = output / "runs" / rho["name"]
+            rho_folder.mkdir(parents=True)
+            recorded_rho_folder = original / "runs" / rho["name"]
+            config = (Path("/home/runner/work/crypto/crypto") /
+                      protocol.RHO_CONFIG.relative_to(protocol.ROOT))
+            rho_launch = {
+                "command": [str(original / "executed_bins/n83_rho_optimization_eval"),
+                            str(original / "target.jsonl"), str(rho["seed"]),
+                            str(config), str(recorded_rho_folder / "receipt.json")],
+                "environment_flags": {}, "rss_cap_bytes": protocol.RSS_CAP_BYTES,
+                "cap_seconds": protocol.RHO_CAP_SECONDS,
+            }
+            path = rho_folder / "launch.json"
+            path.write_text(json.dumps(rho_launch))
+            self.assertEqual(verify.recorded_output_root(output), original)
+            self.assertTrue(verify.launch_gate(rho_folder, rho, output))
+            rho_launch["command"][3] = str(config.parent / "wrong.json")
+            path.write_text(json.dumps(rho_launch))
+            self.assertFalse(verify.launch_gate(rho_folder, rho, output))
+            rho_launch["command"][3] = str(config)
+            path.write_text(json.dumps(rho_launch))
+
+            ic_folder = output / "runs" / ic["name"]
+            ic_folder.mkdir()
+            recorded_ic_folder = original / "runs" / ic["name"]
+            flags = run.ic_flags(recorded_ic_folder, ic["k"])
+            ic_launch = {
+                "command": [str(original / "executed_bins/koblitz_orbit_dlp_fast"),
+                            f"construct:83:1:{ic['k']}", str(original / "target.jsonl"),
+                            "29", str(recorded_ic_folder / "targets_result.jsonl")],
+                "environment_flags": flags, "rss_cap_bytes": protocol.RSS_CAP_BYTES,
+                "cap_seconds": protocol.IC_CAP_SECONDS,
+            }
+            ic_path = ic_folder / "launch.json"
+            ic_path.write_text(json.dumps(ic_launch))
+            self.assertTrue(verify.launch_gate(ic_folder, ic, output))
+            ic_launch["environment_flags"]["KIC_DUMP_BASE"] = str(ic_folder / "base_dump.jsonl")
+            ic_path.write_text(json.dumps(ic_launch))
+            self.assertFalse(verify.launch_gate(ic_folder, ic, output))
+            ic_launch["environment_flags"] = flags
+            ic_launch["command"][2] = str(output / "target.jsonl")
+            ic_path.write_text(json.dumps(ic_launch))
+            self.assertFalse(verify.launch_gate(ic_folder, ic, output))
+
 
 if __name__ == "__main__":
     unittest.main()

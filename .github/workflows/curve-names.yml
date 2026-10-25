@@ -43,9 +43,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # The PR check uses HEAD^1 and HEAD^2 of the synthetic merge commit.
-          # Fetching both parents avoids downloading the repository's full history.
+          # The PR check reads both parents of its synthetic merge commit.
           fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          # The linter reads every tracked Markdown/HTML file plus hashes in
+          # manifests, seals, and audits. The repository also holds large raw
+          # archives that the linter never opens.
+          sparse-checkout: |
+            /*.md
+            /**/*.md
+            /*.html
+            /**/*.html
+            /*manifest*.json
+            /**/*manifest*.json
+            /*seal*.json
+            /**/*seal*.json
+            /*audit*.json
+            /**/*audit*.json
+            /*SHA256SUMS*
+            /**/*SHA256SUMS*
+            /*.sha256
+            /**/*.sha256
+            /scripts/
+            /docs/curves/
+            /src/cryptanalysis/curve_aliases.json
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
