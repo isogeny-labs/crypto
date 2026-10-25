@@ -25,6 +25,7 @@
 #[allow(dead_code)]
 #[path = "../pdp_speedup/arms.rs"]
 mod arms;
+#[allow(dead_code)]
 #[path = "../pdp_speedup/bitslice.rs"]
 mod bitslice;
 #[allow(dead_code)]
@@ -45,8 +46,8 @@ mod group;
 #[allow(dead_code)]
 #[path = "../pdp_speedup/kernel.rs"]
 mod kernel;
-#[allow(dead_code)]
 #[cfg(target_arch = "x86_64")]
+#[allow(dead_code)]
 #[path = "../pdp_speedup/lanes_x86.rs"]
 mod lanes_x86;
 
