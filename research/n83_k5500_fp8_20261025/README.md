@@ -18,6 +18,17 @@ collision with the same slot and packed fingerprint bit but a different byte.
 The collision avoids full-root reconstruction; lookup still returns both
 exact witnesses.
 
+The capped [ABBA runner](run_abba.py) records exact source, binary, fixture,
+flags, host, per-process status, output digests, and complete stage summaries.
+For example, from this repository run:
+
+```sh
+python3 research/n83_k5500_fp8_20261025/run_abba.py \
+  --binary /absolute/path/to/koblitz_orbit_dlp_fast \
+  --output /absolute/path/to/new-output-directory \
+  --k 1024 --split-at 512 --cap-seconds 300
+```
+
 ## Local index controls
 
 The [K512 ABBA receipt](k512_abba.json) uses the formatted source SHA-256
@@ -32,6 +43,16 @@ bytes of sidecar storage at this size. Index-build intervals were 10.792 and
 6.072 seconds for baseline, versus 7.443 and 4.853 seconds with the filter:
 the ratio of geometric means is 1.347. These local shared-host timings are
 exploratory; no Tier 1 noise or same-target gate was applied.
+
+The [K128](k128_abba.json) and [K1024](k1024_abba.json) receipts use the
+same source and binary hashes and the same ABBA order. All four K1024 runs
+agree on the base hash, 43,516,416 regular states, 87,028,692 root entries,
+and complete state, primary-table, and overflow-table digests. The sidecar
+adds 167,772,160 bytes. K1024 baseline builds took 26.890 and 26.419
+seconds; filtered builds took 17.623 and 17.809 seconds, a geometric-mean
+ratio of 1.505. K128 likewise preserved exact digests and measured a 1.831
+ratio at 680,000 states. All three local sizes ran on a shared Darwin ARM64
+host with fourteen exposed logical CPUs; they are index-stage diagnostics.
 
 The [K5500 split launch](k5500_split_launch.json) and
 [completion receipt](k5500_split_receipt.json) document the immediately
