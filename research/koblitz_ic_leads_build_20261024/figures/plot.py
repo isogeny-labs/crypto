@@ -97,7 +97,7 @@ def fig_l3():
              "same solution count on every draw.", fontsize=7, color=INK2)
     fig.tight_layout(rect=(0, 0.04, 1, 0.95))
     fig.savefig("l3_root_solves.svg")
-    fig.savefig("l3_root_solves.png", dpi=110)
+    fig.savefig("l3_root_solves.png", dpi=95)
 
 
 def fig_l2_sweep():
@@ -142,7 +142,9 @@ def fig_l2_sweep():
             ax.plot([x - 0.12, x + 0.12], [b["peak_basis_rows"] / b["columns"],
                                            r["peak_basis_rows"] / r["columns"]], color=GRID, lw=1)
     ax.set_xticks(range(len(a5cells)))
-    ax.set_xticklabels([names[c] for c in a5cells], fontsize=7, rotation=20, ha="right")
+    cellnames = {"n22l6": "m=3 (22,6)", "n24l6": "m=3 (24,6)", "n11l5m4": "m=4 (11,5)",
+                 "n12l5m4": "m=4 (12,5)"}
+    ax.set_xticklabels([cellnames[c] for c in a5cells], fontsize=7, rotation=20, ha="right")
     ax.set_title("A5: low-first, unrestricted → restricted, per draw", loc="left", fontsize=9,
                  color=INK)
     for a in axes:
@@ -182,7 +184,8 @@ def fig_l4():
         ax.scatter(list(x), hk, color=AQUA, marker="D", s=24, zorder=3,
                    label="last-fall bound (HKYY, q = 2)")
         ax.set_yscale("log")
-        ax.legend(frameon=False, fontsize=8, loc="upper left")
+        ax.set_ylim(2, 2000)
+        ax.legend(frameon=False, fontsize=7, loc="upper left", ncol=3)
     fig.text(0.01, 0.01, "Recorded: runs/l4-bounds.jsonl, l4-bounds-a3.jsonl; measured degrees from "
              "the cited closure studies. CCG Weil bound ≥ 2^15.5 on every cell (off scale).",
              fontsize=7, color=INK2)
