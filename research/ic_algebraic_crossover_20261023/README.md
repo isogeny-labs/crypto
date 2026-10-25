@@ -30,8 +30,10 @@ degree four, complete guess minima and full query prices remain open.
 The [wide-core report](reports/run-wide-core-audit-20261025/report.pdf)
 checks standalone m=16/17/18 arithmetic, exact group orders, high scalar and
 coordinate bits, serialization and independent replays at extension degrees
-64/68/72. The full library suite passes 4,634 tests, zero failures, 119 ignored;
-later edits leave src/ identical to the frozen arithmetic controls. This is
+64/68/72. The completed wide-core wave passed 4,634 library tests, zero
+failures, 119 ignored, on its frozen source. The later narrow-constructor
+port described below has a separate full library gate queued; that earlier
+pass is not a verdict on the new source. This is
 not full wider ecbench/IC support. [Protocol](WIDE_GROUP_AUDIT_PROTOCOL.md),
 [reproduction](verify-wide-core.sh), [remaining integration](../../problems/quartic-binary-ic-wide-scalars.md).
 
@@ -42,6 +44,15 @@ native runtime and complete-IC pricing remain missing. The
 [proof map](lean/README.md) has six checked Lean algebraic dependencies;
 the finite-field specialization/irreducibility bridge is not formalized.
 Identity IDC1h0e27b483c3989bcd certifies only the integer expansion.
+
+A separate [narrow-constructor comparison](NARROW_CONSTRUCTOR_EXCLUSION_PROTOCOL.md)
+now has its old executable and seven even/odd field/product controls preserved.
+The baseline narrow6 profile records 8,774,220 simulated whole-process Ir.
+Commit c754e7111 ports the proved candidate exclusion to the narrow backend
+and adds frozen-model regression controls. Its build, full release library
+gate and candidate comparison are actually queued behind m14's resource lock;
+none has passed yet. This candidate is not a new IC performance result.
+The current m14/15 program keeps its original frozen binary unchanged.
 
 The [versioned curve-identity adapter](curve-identity-adapter.v1.json)
 binds all 18 reference/twist, four qualified-query and three wide-core models

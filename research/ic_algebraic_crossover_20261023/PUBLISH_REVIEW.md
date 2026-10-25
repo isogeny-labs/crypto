@@ -2,8 +2,13 @@
 
 Destination: https://github.com/aburan28/crypto/pull/2550, existing ready PR;
 normal forward-only update of its current branch. The campaign remains partial.
-This packet covers the local code, native evidence, reproduction scripts and
-inspected reports below. Pending artifacts are not uploaded or published.
+This packet covers the completed local wave through commit
+4d0bfe24276aac6ffc4b9c56afcd70429cd8e617: code, native evidence, reproduction
+scripts and inspected reports below. Pending artifacts are not uploaded or
+published. A later narrow-constructor comparison is separately in progress:
+its source is committed on the integration branch, while build/tests and
+candidate data await m14’s resource lock. Do not apply the earlier full-test
+pass to that changed source or publish it as verified.
 
 ## Proposed title and description
 
@@ -62,7 +67,7 @@ No new complete-price IC/rho, degree-law, asymptotic or measured-crossover claim
 A versioned metadata adapter preserves all 25 source curve records and supplies
 canonical global aliases/full UIDs without inferring mathematical equivalence.
 
-Validation: full release library 4,634 passed, zero failed, 119 ignored; src/
+Validation: full release library 4,634 passed, zero failed, 119 ignored; the source of that completed wave
 is identical to the frozen arithmetic controls. The earlier five touched examples
 pass 20 tests; the two added completion/cofactor auditors pass seven more.
 The complete 124-attempt archive, raw accounting, prefix costs and finite

@@ -65,7 +65,8 @@ Wider arithmetic only enables measurements; it does not predict their cost.
 ## Next discriminating step
 
 - **Action:** retain the completed 24-record smoke/replay, let the actual
-  queued additional capped L0 m14/15 runs execute after balanced guessing,
+  additional capped L0 m14 run (started 17:54:16 UTC) finish and its m15
+  successor execute,
   and integrate the verified wide core into a separately versioned full
   factor-base/oracle/relation/linear-algebra path. Original L2 full panels
   and eight-target wide IC/rho requirements remain open.
@@ -83,3 +84,10 @@ Wider arithmetic only enables measurements; it does not predict their cost.
 2026-10-25: source width audit and typed refusals recorded. Standalone wider
 core, exact order/high-scalar controls, three independent replays and the
 4,634-pass full library gate completed. Full integration and ladder unresolved.
+
+2026-10-25 constructor follow-up: the old narrow6 profile records 8,774,220
+simulated whole-process Ir, and seven even/odd native field/product controls
+pass before editing. Commit c754e7111 ports the already proved exclusion to
+the narrow constructor; its new library gate and candidate profile/parity
+checks are queued behind the real m14 resource lock. This source remains
+unverified until those receipts exist. The active quartic binary is unchanged.
