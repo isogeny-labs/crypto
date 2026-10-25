@@ -397,11 +397,11 @@ fn concurrent_claims_resolve_to_one_holder_after_sync() {
         assert_eq!(cols[1], "held", "{row}");
         assert_eq!(cols[3], "1", "one contended claim: {row}");
         holders.push(cols[2].to_string());
-        // The other shard was never claimed.
+        // Only the contended task is held; any other shard was never claimed.
         assert!(
             text.lines()
-                .any(|l| l.starts_with("XP-20261015-pkm-m3-n21-m4-n20/shard-1")
-                    && l.contains("unclaimed")),
+                .filter(|l| l.starts_with("XP-20261015-pkm-m3-n21-m4-n20/shard-") && *l != row)
+                .all(|l| l.contains("unclaimed")),
             "{text}"
         );
     }

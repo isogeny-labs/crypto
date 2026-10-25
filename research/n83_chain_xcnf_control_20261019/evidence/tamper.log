@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/tmp/n83_chain_xcnf_20261019/research/n83_chain_xcnf_control_20261019/verify.py", line 208, in <module>
+    raise SystemExit(main(*sys.argv[1:]))
+                     ~~~~^^^^^^^^^^^^^^^
+  File "/Volumes/SSD990-2/tmp/n83_chain_xcnf_20261019/research/n83_chain_xcnf_control_20261019/verify.py", line 166, in main
+    clauses, xors = check_constraints(xcnf, model, variables, declared)
+                    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/SSD990-2/tmp/n83_chain_xcnf_20261019/research/n83_chain_xcnf_control_20261019/verify.py", line 134, in check_constraints
+    raise ValueError(f'CNF clause {clauses} is false')
+ValueError: CNF clause 4 is false

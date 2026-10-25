@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Any AWS-authenticated harness can use this; no Kubernetes network route needed.
+set -euo pipefail
+[[ $# == 1 ]] || { echo 'Usage: launch-remote REQUEST.json' >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+: "${ISOLAB_BUCKET:?}" "${ISOLAB_CODEBUILD_PROJECT:?}" "${AWS_REGION:?}"
+output=${ISOLAB_CLIENT_OUTPUT:-isolab-launch-output}
+mkdir -p "$output"
+"$here/validate-request" "$1" > "$output/request.json"
+digest=$(sha256sum "$output/request.json" | cut -d ' ' -f1)
+key="inputs/requests/$digest.json"
+aws s3 cp "$output/request.json" "s3://$ISOLAB_BUCKET/$key" --only-show-errors
+jq -n --arg project "$ISOLAB_CODEBUILD_PROJECT" --arg key "$key" --arg token "$digest" \
+  '{projectName:$project,idempotencyToken:$token,environmentVariablesOverride:[{name:"ISOLAB_REQUEST_KEY",value:$key,type:"PLAINTEXT"}]}' > "$output/start-request.json"
+# Do not retry an ambiguous StartBuild failure automatically. Inspect by job name.
+aws codebuild start-build --cli-input-json "file://$output/start-request.json" > "$output/build-start.json"
+build_id=$(jq -er .build.id "$output/build-start.json")
+printf 'Launcher: %s\n' "$build_id"
+deadline=$((SECONDS+5400))
+while (( SECONDS < deadline )); do
+  aws codebuild batch-get-builds --ids "$build_id" > "$output/build.json"
+  status=$(jq -er '.builds[0].buildStatus' "$output/build.json")
+  [[ "$status" != IN_PROGRESS ]] && break
+  sleep 15
+done
+job=$(jq -r .job.job_name "$output/request.json")
+launch_id=${build_id##*:}
+uri="s3://$ISOLAB_BUCKET/runs/$job/launcher/$launch_id/"
+printf 'Launcher receipts: %s\n' "$uri"
+aws s3 cp "${uri}result.json" "$output/result.json" --only-show-errors || { echo 'No final receipt; inspect the saved build status and CloudWatch logs' >&2; exit 25; }
+cat "$output/result.json"
+[[ "$status" == SUCCEEDED ]] || exit 26
+jq -e '.state=="succeeded" and .exit_code==0' "$output/result.json" >/dev/null
