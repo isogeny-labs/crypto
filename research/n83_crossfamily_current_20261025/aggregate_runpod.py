@@ -57,6 +57,7 @@ def bind_archive(archive, results):
 
 def replay(stratum, results, archive, replay_dir):
     archive_receipt = bind_archive(archive, results)
+    archived_analysis = (results / 'analysis.json').read_bytes()
     process = subprocess.run(
         [sys.executable, str(HERE / 'verify.py'), str(results),
          '--stratum', str(stratum)], cwd=HERE.parents[1],
@@ -68,7 +69,8 @@ def replay(stratum, results, archive, replay_dir):
     if process.returncode not in (0, 2) or process.stderr:
         raise ValueError(f'stratum {stratum}: independent replay failed')
     analysis = json.loads((results / 'analysis.json').read_text())
-    if (json.loads(process.stdout) != analysis or
+    if ((results / 'analysis.json').read_bytes() != archived_analysis or
+            json.loads(process.stdout) != analysis or
             (process.returncode == 0) !=
             (analysis['status'] == 'STRATUM_ADMITTED')):
         raise ValueError(f'stratum {stratum}: replay output differs')
