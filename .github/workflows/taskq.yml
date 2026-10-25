@@ -55,7 +55,15 @@ jobs:
       run:
         working-directory: taskq/deploy/aws
     steps:
+      # Only the Terraform tree and the chart it deploys (helm.tf) are read. A
+      # full checkout plus the AWS provider unpacked twice (main stack and
+      # bootstrap, ~0.7 GB each) runs a hosted runner out of disk in the
+      # bootstrap init.
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            taskq/deploy/aws
+            taskq/deploy/helm
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.8
@@ -90,7 +98,11 @@ jobs:
       run:
         working-directory: taskq/deploy/ephemeral/cli
     steps:
+      # The crate is self-contained; the full 8 GB checkout plus its build no
+      # longer fits a hosted runner's disk.
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: taskq/deploy/ephemeral/cli
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
