@@ -59,6 +59,15 @@ class ArchivedUnregisteredSlugTests(unittest.TestCase):
         with patch.object(names, "tracked", return_value=[SESSION_TABLE]):
             self.assertEqual(names.lint(resolver, {}, False), [])
 
+    def test_original_gls_table_is_allowed_only_at_its_frozen_hash(self):
+        path = "research/ext_endo_rho_20261023/sessions/gls-fp2.table.md"
+        text = (names.REPO / path).read_text()
+        self.assertTrue(names.archived_unregistered_slug_file(path, text))
+        self.assertFalse(names.archived_unregistered_slug_file(path, text + "\n"))
+        resolver = names.Resolver()
+        with patch.object(names, "tracked", return_value=[path]):
+            self.assertEqual(names.lint(resolver, {}, False), [])
+
 
 if __name__ == "__main__":
     unittest.main()
