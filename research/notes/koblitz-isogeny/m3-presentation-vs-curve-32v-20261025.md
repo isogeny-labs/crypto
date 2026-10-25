@@ -187,3 +187,134 @@ Remains:
 - Run report: `research/koblitz-isogeny/reports/run-20261024T2200Z/`
   (`README.md`, `report.typ`, `report.pdf`, `plot.py`, `icc_vs_subspaces.svg`,
   `diagnostics.svg`, `power.svg`).
+
+## m = 2, random V, n = 19 at 32 V (2026-10-25)
+
+This section is additive; the text above is unchanged except that this arm, listed above
+as running, is now reported here. It extends the original m = 2 random-V arm at n = 19
+(`presentation-vs-curve-design-20261003.md`, `presentation-vs-curve-results-20261004.md`)
+from 4 to 32 random V on the first 32 curves of its sample. The model, the estimator,
+the metrics and the thresholds are unchanged.
+
+Question: does the curve effect found absent for geometric V at m = 3 (PinX3, linear
+algebra) also stay absent in the Gröbner regime with non-geometric V, where the
+decomposition algebra (first-fall degree, reduction count) could differ by curve?
+
+Run report, graph and PDF: `research/koblitz-isogeny/reports/run-20261025T0530Z/`.
+
+### Design delta against the original n = 19 arm
+
+| item | original arm (results note) | this extension |
+|---|---|---|
+| class | n = 19, a2 = 1, l = 9 | same |
+| solver | m = 2 Gröbner (S3) | same |
+| V | random (non-geometric) F2-subspaces, `basis_seed` | same, seeds 1–32 |
+| probes | 400 full-group probes per cell | same |
+| curves | 128 | the first 32 of the sample (the sweep's seeded hash order, K_a included; as stated by the operator) |
+| V per curve | 4 (seeds 1–4) | 32 (seeds 1–32) |
+| cells | 512 | 32 × 32 = 1024 (of 1408 rows in the file) |
+| metrics, 95 % bootstrap over curves, rule | as in the design note | unchanged |
+
+Data: `experiments/koblitz_presentation/pres_19_1_l9_s1-32.jsonl`, 1408 rows: the original
+512 rows (128 curves × seeds 1–4) and 896 new cells (32 curves × seeds 5–32). The ICC
+tool keeps only curves that have every seed, so the analysis in
+`icc_n19_m2_rand_s1-32.json` (key `n=19 a2=1 l=9 m=2`) uses exactly the 32 curves × 32 V
+= 1024 cells. The other 96 curves' 384 rows are not in the ICC.
+
+Record checks (counted from the JSONL for this note):
+
+| block | cells | `bsgs_ok` | `inconsistent` | skipped | relations | reductions per call (derived: sum of `reductions` / sum of `groebner_calls`) |
+|---|---|---|---|---|---|---|
+| original, seeds 1–4, 128 curves | 512 | 512 | 0 | none | 45430 | 3.371 |
+| new, seeds 5–32, 32 curves | 896 | 896 | 0 | none | 79490 | 3.373 |
+| file | 1408 | 1408 | 0 | none | 124920 | 3.372 |
+
+Per cell: factor-base size \|F\| 223–293 (median 257), relations 56–126 (median 88),
+reductions per call 3.165–3.625 (derived per cell). Every cell has 400 probes, l = 9 and
+n = 19. Every entry in the recorded `first_fall_hist` (4412 entries over the file) is at
+degree 3 and every `d_star_hist` entry is at 4. The 32 sampled curves hold 31 at depth 1
+and one (K_a) at depth 0.
+
+### Result
+
+ICC_curve and its 95 % interval, 32 curves × 32 V (`icc_n19_m2_rand_s1-32.json`). For
+comparison, the 128-curve × 4-V values from the results note, where listed there:
+
+| metric | 32 × 32: ICC_curve [95 % CI] | 32 × 32: subspace share | 128 × 4 (results note) |
+|---|---|---|---|
+| work per call (reductions per call) | 0.003 [0, 0.018] | 0.002 | 0.000 [0, 0.039] |
+| yield per \|F\|² | 0.002 [0, 0.022] | 0.000 | 0.000 [0, 0.045] |
+| ln µs per call | 0.000 [0, 0.009] | 0.013 | not comparable (curve-order timing, excluded in the results note) |
+| ln projected solve | 0.003 [0, 0.020] | 0.002 | not comparable (same reason) |
+
+Unrounded: work per call 0.00251 [0, 0.01795]; yield 0.00241 [0, 0.02231]; ln µs per
+call 0 [0, 0.00912]; ln projected solve 0.00259 [0, 0.01991]. Every lower bound is 0.
+Diagnostic (not pre-registered): \|F\| 0.000 [0, 0.012], subspace share 0.000. The
+`diag_pins_per_call`, `diag_roots_per_pin` and `diag_work_per_call_per_F` entries in the
+JSON are all zero with zero recorded variances (the m = 2 solver has no pin step); they
+carry no information and are not plotted.
+
+**Verdict by the pre-registered rule: H0.** The largest upper bound is 0.0223 (yield),
+below 0.05, and no lower bound is above 0, so H1 cannot fire.
+
+Next to the other two 32 × 32 arms (m = 3 PinX3, geometric V; tables above), the upper
+bounds are 0.0205 (n = 31), 0.0388 (n = 23) and 0.0223 (this arm).
+
+### Detection limit
+
+`power` rows at 32 V in the same JSON (200 simulations per point, 32 curves, fitted
+additive normal model with a planted curve share):
+
+| planted true ICC_curve | P(H0), range over the 4 metrics | P(H1), work per call | P(H1), range over the 4 metrics |
+|---|---|---|---|
+| 0 | 0.995–1.00 | 0.00 | 0.00 |
+| 0.05 | 0.08–0.11 | 0.015 | 0.01–0.025 |
+| 0.10 | 0.00 | 0.42 | 0.42–0.49 |
+| 0.20 | 0.00 | 0.99 | 0.98–0.995 |
+
+At the same 32 curves and 4 V, the same file gives P(H0) at ICC 0 of 0.25 for work per
+call. As in the m = 3 arms, a curve share of about 0.20 would have been called H1 in at
+least 98 % of simulations, a share of 0.10 in 42–49 % (a coin flip at the rule's
+threshold; Monte Carlo standard error about 0.035), and a share between 0.05 and 0.10 is
+not excluded.
+
+### Scope and caveats
+
+- **One class:** n = 19, a2 = 1, l = 9, cofactor 2, m = 2 Gröbner, 400 probes per cell,
+  32 curves of the sample. Other n, other l, other solvers and the first-fall quantity as
+  a separate metric are not covered. The recorded first-fall entries are all at degree 3,
+  so the file contains no variation in that quantity to attribute to curves.
+- **Not the same sample as before:** the 4-V n = 19 result of the results note
+  (128 curves) had upper bounds of 0.039 (reductions) and 0.045 (yield), and the note
+  did not establish H0 by the strict rule (the n = 19 timing metrics were excluded
+  as confounded there). This extension gives bounds of 0.018 and 0.022 on 32 of those curves. It does not redo
+  the 128-curve estimate.
+- **H0 reading:** no curve share was detected above the stated bounds on four metrics.
+  It is not a proof of curve independence.
+- **Timing:** wall clock on a shared container, no isolation. The 512 original cells
+  (seeds 1–4) are the curve-order run whose timings the results note excluded as
+  confounded by machine drift; 128 of the 1024 analysed cells (4 seeds × 32 curves) come
+  from that run. Cell order of the 896 new cells was not checked beyond noting that the
+  first rows interleave curves and seeds. The time metrics are therefore weaker evidence
+  than work per call and yield, which are deterministic.
+- **Model:** additive; a curve × V interaction is counted in the residual.
+- **Cost accounting and gates:** the arm compares decomposition cost across curves and V
+  inside one method. No cross-method (rho) comparison is made, so the §5a band does not
+  apply, no leaderboard or `benchmarks/` row is proposed, and no `VALIDATION.json`
+  exists for these data.
+
+### What remains
+
+- n = 23, m = 2, random V at 32 V was not run: a cell costs about 900 s (operator
+  figure), so 1024 cells would be about 256 core-hours (derived: 1024 × 900 s / 3600). The
+  results note's n = 23 arm (32 or 128 curves × 4 V) remains inconclusive by the strict
+  rule (yield upper bound 0.162 at 128 curves).
+- The 4-V arms at n = 16, 17 (full classes) are unchanged.
+- m = 3 with non-geometric V remains out of reach with the current solver.
+
+### Records for this section
+
+- Data: `experiments/koblitz_presentation/pres_19_1_l9_s1-32.jsonl`.
+- ICC: `experiments/koblitz_presentation/icc_n19_m2_rand_s1-32.json`.
+- Compared arms: `icc_n31_m3_geom_s1-32.json`, `icc_n23_m3_geom_s1-32.json`.
+- Run report: `research/koblitz-isogeny/reports/run-20261025T0530Z/`.
