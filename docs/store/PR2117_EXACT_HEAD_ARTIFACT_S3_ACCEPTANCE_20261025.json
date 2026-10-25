@@ -1,0 +1,58 @@
+{
+  "bucket": "setec-astronomy-artifacts",
+  "bytes": 70,
+  "cleanup_check": {
+    "method": "s3api list-objects-v2",
+    "objects_remaining": 0,
+    "prefix": "ic/v1/acceptance/pr2117-20261025T044307Z-c5cf40e1/"
+  },
+  "cleanup_exit_code": 0,
+  "cleanup_note": "High-level aws s3 ls returned exit 1 with empty stdout on the empty prefix; S3 ListObjectsV2 confirmed zero objects.",
+  "fresh_cache_bytes_equal": true,
+  "head": "2025935afae24b1d07645a1d66a4feb19a3e52ac",
+  "listed_objects_before_cleanup": 1,
+  "name": "acceptance/pr2117-20261025T044307Z-c5cf40e1/input.bin",
+  "prefix": "s3://setec-astronomy-artifacts/ic/v1/acceptance/pr2117-20261025T044307Z-c5cf40e1",
+  "prefix_empty_after_cleanup": true,
+  "pull": {
+    "bytes": 70,
+    "cache_path": "/Volumes/SSD990/llm/tmp/crypto-s3-pr2117-20261025T044307Z-c5cf40e1/fresh-cache/sha256/52/52e31e5723591a789884e28f14b7b055ce352ea5662ba5fd01037e2e02d738e2",
+    "copied": true,
+    "fetched": true,
+    "name": "acceptance/pr2117-20261025T044307Z-c5cf40e1/input.bin",
+    "path": "/Volumes/SSD990/llm/tmp/crypto-s3-pr2117-20261025T044307Z-c5cf40e1/retrieved.bin",
+    "sha256": "52e31e5723591a789884e28f14b7b055ce352ea5662ba5fd01037e2e02d738e2",
+    "status": "ok"
+  },
+  "push": {
+    "bytes": 70,
+    "cached": true,
+    "name": "acceptance/pr2117-20261025T044307Z-c5cf40e1/input.bin",
+    "replaced": false,
+    "sha256": "52e31e5723591a789884e28f14b7b055ce352ea5662ba5fd01037e2e02d738e2",
+    "uploaded": true
+  },
+  "remote_verify": {
+    "checked": 1,
+    "download_checked": true,
+    "entries": [
+      {
+        "bytes": 70,
+        "cache": {
+          "status": "ok"
+        },
+        "name": "acceptance/pr2117-20261025T044307Z-c5cf40e1/input.bin",
+        "remote": {
+          "status": "bytes_ok"
+        },
+        "sha256": "52e31e5723591a789884e28f14b7b055ce352ea5662ba5fd01037e2e02d738e2"
+      }
+    ],
+    "problems": 0,
+    "remote_checked": true,
+    "status": "ok"
+  },
+  "schema": "crypto-store-exact-head-acceptance/v1",
+  "sha256": "52e31e5723591a789884e28f14b7b055ce352ea5662ba5fd01037e2e02d738e2",
+  "status": "pass"
+}
