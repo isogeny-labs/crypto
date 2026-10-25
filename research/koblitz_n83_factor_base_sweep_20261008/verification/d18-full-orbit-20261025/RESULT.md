@@ -79,10 +79,14 @@ smoke run used an older standalone executable and is excluded from this
 source-bound result; the retained run followed a clean rebuild and its
 receipt's binary hash matches the rebuilt executable. The frozen
 [first-access protocol](NATURAL_PROTOCOL.md) specifies a separate positive
-control and bounded public natural query; neither has run yet.
+control and bounded public natural query. Two separately labeled local L0
+positive-control diagnostics have since reached their 300-second caps; the
+hard-cgroup Linux control and public natural arm have not run.
 
 The source-pinned [full m4 model construction](MODEL_RESULT.md) then passed:
 329,726 SAT variables, 11,424,742 total CNF clauses and 3,901 XOR rows.
 Import plus model took 68.19 seconds process wall with a 5.31 GB peak memory
-footprint on an L0 local host. The native SAT search and relation/rank stages
-remain unmeasured for this base.
+footprint on an L0 local host. The [default planted control](l0-positive-20261025/RESULT.md)
+and [shared-root option](shared-root-20261025/RESULT.md) both constructed the
+complete model and ran bounded SAT search, but neither returned a solver
+answer. Natural relation yield and relation/rank stages remain unmeasured.

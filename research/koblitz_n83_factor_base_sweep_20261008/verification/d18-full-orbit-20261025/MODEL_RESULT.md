@@ -45,3 +45,6 @@ independent replay before any useful-rank or runtime inference.
 A subsequent [L0 planted-control run](l0-positive-20261025/RESULT.md) used
 the complete pinned circuit and reached its 300-second whole-process cap
 without a solver answer. It leaves the Linux positive-control gate open.
+The [shared-root opt-in model and planted control](shared-root-20261025/RESULT.md)
+remove 8,617,488 clauses exactly, but the latter is also censored at 300
+seconds. The Linux positive-control gate remains open.
