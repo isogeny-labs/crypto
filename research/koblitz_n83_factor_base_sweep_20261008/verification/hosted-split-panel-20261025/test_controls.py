@@ -6,7 +6,9 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+from tempfile import TemporaryDirectory
 from unittest import TestCase, main
+from zipfile import ZipFile
 
 import blake3
 
@@ -18,6 +20,7 @@ import receipt_audit as pinned  # noqa: E402
 import audit  # noqa: E402
 import protocol  # noqa: E402
 import paired_frontier_v4 as grid  # noqa: E402
+import replay_artifact  # noqa: E402
 
 
 class SplitControls(TestCase):
@@ -137,6 +140,29 @@ class SplitControls(TestCase):
         }
         with self.assertRaisesRegex(ValueError, "outside exact domains"):
             self.replay()
+
+    def test_replay_refuses_wrong_dispatch_head(self) -> None:
+        jobs = {"total_count": 1, "jobs": [{
+            "name": "six-summand-access", "run_id": replay_artifact.RUN_ID,
+            "run_attempt": 1, "head_sha": "0" * 40,
+            "status": "completed", "conclusion": "success", "id": 1,
+            "steps": [],
+        }]}
+        with TemporaryDirectory() as directory:
+            jobs_path = Path(directory) / "jobs.json"
+            metadata_path = Path(directory) / "metadata.json"
+            jobs_path.write_text(json.dumps(jobs))
+            metadata_path.write_text("{}")
+            with self.assertRaisesRegex(ValueError, "provider job head_sha changed"):
+                replay_artifact.provider(jobs_path, metadata_path, 0, "0" * 64)
+
+    def test_replay_refuses_zip_path_traversal(self) -> None:
+        with TemporaryDirectory() as directory:
+            archive_path = Path(directory) / "artifact.zip"
+            with ZipFile(archive_path, "w") as archive:
+                archive.writestr("../outside.json", "{}")
+            with self.assertRaisesRegex(ValueError, "unsafe or duplicate ZIP member"):
+                replay_artifact.members(archive_path)
 
     def test_five_plus_one_group_equation_and_tamper(self) -> None:
         prior = pinned.PRIOR

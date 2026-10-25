@@ -68,3 +68,52 @@ The workflow retains preparation, archive bytes, Docker stage receipts,
 search config/results, worker binaries, and outer outcomes even on failure.
 Any apparent positive result requires an independent replay of the uploaded
 artifact before it can inform a factor-base ranking.
+
+The first 5+1 dispatch is [run 40157022080](https://github.com/aburan28/crypto/actions/runs/40157022080)
+at commit `1f8ae24b3c7f98e241a7a9b44e718f567f33008e`. Wait for its
+`six-summand-access` job and `n83-hosted-sixsum-40157022080-1` artifact;
+do not restart it to collect this result. `replay_artifact.py` binds that
+run, the pinned source and protocol, provider responses, every ZIP member,
+Docker stages and worker receipts, group equation, and fresh S3 GET/HEAD
+responses. It accepts a bounded completed run while leaving
+`selected_best_total_runtime` unset.
+
+From an AWS checkout of the PR with `gh`, `aws`, Python 3.14, and
+`blake3==1.0.8`, save the exact provider responses and artifact ZIP, and
+fetch the three archive objects afresh:
+
+```sh
+scratch=/tmp/n83-split-replay-40157022080
+mkdir -p "$scratch"
+gh api 'repos/aburan28/crypto/actions/runs/40157022080/jobs?per_page=100' \
+  > "$scratch/provider_jobs.json"
+artifact_id=$(gh api repos/aburan28/crypto/actions/runs/40157022080/artifacts \
+  --jq '.artifacts[] | select(.name == "n83-hosted-sixsum-40157022080-1") | .id')
+gh api "repos/aburan28/crypto/actions/artifacts/$artifact_id" \
+  > "$scratch/artifact_metadata.json"
+gh api "repos/aburan28/crypto/actions/artifacts/$artifact_id/zip" \
+  > "$scratch/artifact.zip"
+for digest in \
+  3888e2597fd3519807c9d722f49f83329c93ce5cb0929501cf7cb7cbc3cab1a0 \
+  966a0493c96674f0af6d184615ed05309d08fba5c7342957b4186cd50366dc47 \
+  b4dda45e6c3edfca673db6f3f82c16cce8c860f5e62c092155258df399a0363e
+do
+  aws s3 cp \
+    "s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/a0/objects/$digest.jsonl.gz" \
+    "$scratch/s3-$digest.jsonl.gz"
+  aws s3api head-object --bucket crypto-autoresearcher \
+    --key "factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/a0/objects/$digest.jsonl.gz" \
+    > "$scratch/s3-head-$digest.json"
+done
+python3.14 research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-split-panel-20261025/replay_artifact.py \
+  --artifact-zip "$scratch/artifact.zip" \
+  --provider-jobs "$scratch/provider_jobs.json" \
+  --artifact-metadata "$scratch/artifact_metadata.json" \
+  --s3-dir "$scratch" \
+  --output "$scratch/replay-receipt.json"
+```
+
+If the producer fails, retain its artifact and provider records and record
+the exact failure; the success-only replay auditor must reject it. Keep raw
+run logs in the GitHub artifact and commit provider, S3 custody, and replay
+receipts.
