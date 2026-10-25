@@ -40,10 +40,11 @@ OUT = os.path.join(ROOT, "docs", "browser", "data.json")
 REGISTRY = "docs/curves/registry.json"
 COVERS = "docs/curves/covers.json"
 COVER_LINKS = "docs/curves/cover-links.yaml"
-FROZEN_COVERS_REGISTRY_SHA256 = "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf"
-FROZEN_COVERS_COUNT = 2572
 STANDARDS_COVERAGE = "docs/curves/standards/coverage.json"
 LEADERBOARD = "docs/ic/leaderboard.json"
+STORE_INDEX = "store/index.json"
+STORE_CONFIG = "store/config.json"
+STORE_SCHEMA = "crypto.store-index/v1"
 TOURNAMENT_RUNS = "research/ic_candidate_tournament_20260915/runs"
 ECBENCH_SESSIONS_GLOBS = ("research/ecbench_*/sessions/*", "research/isogeny_conductor_gap_*/sessions/*", "research/fiber_ic_scaling_*/sessions/*", "research/full_volcano_graphwide_ic_*/execution/campaigns/*/sessions/*")
 IC1_SCAN_GLOBS = (
@@ -702,30 +703,63 @@ def attach_covers(
     report: dict,
     source: RepositoryInputs | None = None,
 ) -> set[str]:
-    """Join frozen certificates only where the exact model still matches."""
-    if report.get("schema_version") != "curve-covers/v1":
-        raise ValueError("cover report schema is unsupported")
+    """Join the current, complete native-verified cover catalog."""
+    if (
+        report.get("schema_version") != "curve-covers/v1"
+        or report.get("registry_sha256") != sha256_file(REGISTRY, source)
+    ):
+        raise ValueError("cover report schema or registry digest is stale")
     findings = report.get("curves", [])
     by_slug = {r["slug"]: r for r in findings}
     current_slugs = {c["slug"] for c in curves}
-    if len(by_slug) != len(findings) or not set(by_slug) <= current_slugs:
-        raise ValueError("cover report has duplicate or unregistered model identities")
-    current_digest = sha256_file(REGISTRY, source)
-    if report.get("registry_sha256") == current_digest:
-        if set(by_slug) != current_slugs:
-            raise ValueError("current cover report omits registered models")
-    elif (report.get("registry_sha256") != FROZEN_COVERS_REGISTRY_SHA256
-          or len(findings) != FROZEN_COVERS_COUNT):
-        raise ValueError("cover report is neither current nor the complete frozen catalog")
+    if len(by_slug) != len(findings) or set(by_slug) != current_slugs:
+        raise ValueError("cover report must have exactly one finding per catalog model")
     for curve in curves:
-        finding = by_slug.get(curve["slug"])
-        if finding is None:
-            curve["hyperelliptic_cover"] = None
-            continue
+        finding = by_slug[curve["slug"]]
         if finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
             raise ValueError(f"cover model digest mismatch: {curve['slug']}")
         curve["hyperelliptic_cover"] = finding
     return set(by_slug)
+
+
+def store_objects(curves_by_slug: dict, fb_ids: set, source: RepositoryInputs) -> dict:
+    """The large files the repository keeps in its content-addressed store.
+
+    Quoted from the committed index (`store/index.json`); the bytes live in
+    the remote under their SHA-256 and are fetched on demand (`ecbench store
+    pull`).  The curve and factor-base links come from the entry's name, the
+    same rule the ecbench database uses (`factor-bases/<curve>/<FB1h id>.json`),
+    and are kept only where the id resolves to a row of this index.
+    """
+    index = load(STORE_INDEX, source)
+    if index.get("schema") != STORE_SCHEMA:
+        raise ValueError(f"{STORE_INDEX}: schema {index.get('schema')!r}, expected {STORE_SCHEMA!r}")
+    objects = []
+    for name, e in sorted(index["entries"].items()):
+        parts = name.split("/")
+        curve = fb = None
+        if parts[0] == "factor-bases" and len(parts) >= 3:
+            curve = parts[1]
+            stem = parts[-1].rsplit(".", 1)[0]
+            if stem.startswith("FB1h"):
+                fb = stem
+        objects.append(
+            {
+                "name": name,
+                "kind": parts[0],
+                "sha256": e["sha256"],
+                "bytes": e["bytes"],
+                "description": e.get("description") or None,
+                "tags": e.get("tags", []),
+                "provenance": e.get("provenance") or None,
+                "superseded": e.get("superseded", []),
+                "recorded_curve": curve,
+                "curve": curve if curve in curves_by_slug else None,
+                "fb_id": fb if fb in fb_ids else None,
+                "recorded_fb_id": fb,
+            }
+        )
+    return {"remote": load(STORE_CONFIG, source).get("remote"), "objects": objects}
 
 
 def build() -> dict:
@@ -757,6 +791,9 @@ def build() -> dict:
         curve["standards_provenance"] = node.get("standards_provenance") or []
     by_slug = {c["slug"]: c for c in curves}
     sessions, methods, fbs, yields = ecbench_sessions(by_slug, source)
+    store = store_objects(by_slug, {f["fb_id"] for f in fbs}, source)
+    for c in curves:
+        c["store_objects"] = [o["name"] for o in store["objects"] if o["curve"] == c["slug"]]
     rounds = tournament_rounds(curves, source)
     candidates = candidate_identities(source)
     tag_to_slug = {}
@@ -771,6 +808,8 @@ def build() -> dict:
         COVER_LINKS: sha256_file(COVER_LINKS, source),
         STANDARDS_COVERAGE: sha256_file(STANDARDS_COVERAGE, source),
         LEADERBOARD: sha256_file(LEADERBOARD, source),
+        STORE_INDEX: sha256_file(STORE_INDEX, source),
+        STORE_CONFIG: sha256_file(STORE_CONFIG, source),
         **{
             os.path.join(s["dir"], "records.jsonl"): sha256_file(
                 os.path.join(s["dir"], "records.jsonl"), source
@@ -784,7 +823,9 @@ def build() -> dict:
         "what_this_is": "A searchable index of the curves, methods, factor bases, candidate identities, tournament rounds and ecbench sessions this repository names, joined on the identities it already computes (ICV1 slugs, EC1 aliases, ECM1 method ids, FB1 factor-base ids, IC1 candidate ids). Every figure is quoted from a committed file named in `sources` or in the row; nothing is computed here beyond means over a session's own verified runs.",
         "counts": {"curves": len(curves), "cover_assessed": len(covered_slugs),
                    "cover_unassessed": len(curves) - len(covered_slugs),
-                   "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates), "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields)},
+                   "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates),
+                   "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields),
+                   "store_objects": len(store["objects"])},
         "sources": sources,
         "vocabulary": VOCABULARY,
         "standards_coverage": load(STANDARDS_COVERAGE, source),
@@ -795,6 +836,7 @@ def build() -> dict:
         "rounds": rounds,
         "sessions": sessions,
         "yields": yields,
+        "store": store,
     }
 
 
