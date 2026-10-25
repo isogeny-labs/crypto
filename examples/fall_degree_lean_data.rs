@@ -105,7 +105,11 @@ fn main() {
     // E7 (Amendments 7, 8): kind 4, one shape per (m, n, ℓ) cell
     for f in files(&dir.join("e7"), "E7_") {
         for r in lines(&f) {
-            let (m, n, ell) = (r["m"].as_u64().unwrap(), r["n"].as_u64().unwrap(), r["ell"].as_u64().unwrap());
+            let (m, n, ell) = (
+                r["m"].as_u64().unwrap(),
+                r["n"].as_u64().unwrap(),
+                r["ell"].as_u64().unwrap(),
+            );
             rows.push(Row {
                 kind: 4,
                 m,
@@ -122,7 +126,11 @@ fn main() {
     // E8 (Amendment 9): kind 5, d_F against m at fixed (n, ℓ)
     for f in files(&dir.join("e8"), "E8_") {
         for r in lines(&f) {
-            let (m, n, ell) = (r["m"].as_u64().unwrap(), r["n"].as_u64().unwrap(), r["ell"].as_u64().unwrap());
+            let (m, n, ell) = (
+                r["m"].as_u64().unwrap(),
+                r["n"].as_u64().unwrap(),
+                r["ell"].as_u64().unwrap(),
+            );
             rows.push(Row {
                 kind: 5,
                 m,
