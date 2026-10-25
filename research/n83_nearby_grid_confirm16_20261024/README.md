@@ -53,8 +53,8 @@ runs fixture and schedule checks. Its measured jobs are skipped until a
 reviewed `dispatch.json` with schema
 `n83.nearby-grid-confirm16-dispatch/v1`, status `SEALED_FOR_DISPATCH`, and
 numeric `screen_run_id` and `screen_attempt` is committed after the first
-admitted 19-base screen. The same workflow can also be invoked manually with
-those two inputs. It downloads and independently replays the raw screen before
+admitted 19-base screen. Manual retries also read that committed dispatch.
+It downloads and independently replays the raw screen before
 building or timing either stratum, then uploads each stratum's raw receipts
 and the aggregate separately. The earlier run `40136901841` stopped at its
 frozen disk preflight and cannot nominate candidates.

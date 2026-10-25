@@ -7,16 +7,6 @@ on:
       - .github/workflows/n83-nearby-grid-confirm16.yml
       - research/n83_nearby_grid_confirm16_20261024/**
   workflow_dispatch:
-    inputs:
-      screen_run_id:
-        description: First admitted N83 19-base screen Actions run ID
-        required: true
-        type: string
-      screen_attempt:
-        description: Actions run attempt containing the raw screen artifact
-        required: true
-        default: "1"
-        type: string
 
 permissions:
   contents: read
@@ -34,9 +24,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify sealed fixture and resolve a reviewed dispatch
         id: dispatch
-        env:
-          REQUESTED_RUN_ID: ${{ inputs.screen_run_id }}
-          REQUESTED_ATTEMPT: ${{ inputs.screen_attempt }}
         shell: bash
         run: |
           set -euo pipefail
@@ -46,10 +33,7 @@ jobs:
           python3 -m unittest \
             research.n83_nearby_grid_confirm16_20261024.test_select \
             research.n83_nearby_grid_confirm16_20261024.test_execution
-          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
-            screen_run_id="$REQUESTED_RUN_ID"
-            screen_attempt="$REQUESTED_ATTEMPT"
-          elif [ -f research/n83_nearby_grid_confirm16_20261024/dispatch.json ]; then
+          if [ -f research/n83_nearby_grid_confirm16_20261024/dispatch.json ]; then
             read -r screen_run_id screen_attempt < <(python3 - <<'PY'
           import json
           from pathlib import Path
@@ -58,6 +42,11 @@ jobs:
           if record.get('schema') != 'n83.nearby-grid-confirm16-dispatch/v1' or \
                   record.get('status') != 'SEALED_FOR_DISPATCH':
               raise ValueError('confirmation dispatch is not sealed')
+          if (type(record.get('screen_run_id')) is not int or
+                  type(record.get('screen_attempt')) is not int or
+                  record['screen_run_id'] <= 0 or
+                  record['screen_attempt'] <= 0):
+              raise ValueError('confirmation dispatch IDs must be positive integers')
           print(record['screen_run_id'], record['screen_attempt'])
           PY
           )
