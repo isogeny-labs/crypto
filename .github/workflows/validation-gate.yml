@@ -67,6 +67,7 @@ jobs:
           python3 tools/artifacts/artifacts.py pull research/kummer_differential_collector_20261022/results
           python3 tools/artifacts/artifacts.py pull research/kummer_coordinates_20261022/results
           python3 tools/artifacts/artifacts.py pull research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst
+          python3 tools/artifacts/artifacts.py pull research/projective_law_followup_20261022/results
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Every leaderboard and benchmarks row is validated or frozen pre-gate
