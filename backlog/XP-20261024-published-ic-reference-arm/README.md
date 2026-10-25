@@ -32,7 +32,7 @@ against rho or the lab's previous producer.
 | regime | descent / system | factor base | symmetry | solver | m / n |
 |:--|:--|:--|:--|:--|:--|
 | binary `E(F_{2^n})`, random and Koblitz | Weil descent of Semaev `S_{m+1}` (Diem; Petit-Quisquater; Gaudry) | standard `{P : x(P) in V}`, `V` an `l`-dim `F_2`-subspace, `l ~ n/m`; for Koblitz also the Frobenius-invariant subspace base (same dimension), as a labelled second base | FGHR 2-torsion `T` (invariants in the frame with `T: t -> t+1`) + Galbraith-Gebregiyorgis variable choice; Frobenius invariants only on Koblitz | msolve F4; WDSat (SAT + XOR, pinned commit) | m in {3, 4} |
-| prime extension `E(F_{p^n})` | Gaudry/Diem, `S_{n+1}` over `F_p` | `{P : x(P) in F_p}` | FGHR `D_n` (n=4: `D_4`) | msolve | n in {4, 5} |
+| prime extension `E(F_{p^n})` | Gaudry/Diem `S_{n+1}` over `F_p`; and Joux-Vitse `(n-1)`-decomposition (published for small-degree extensions) | `{P : x(P) in F_p}` | FGHR `D_n` (n=4: `D_4`) | msolve | n in {4, 5} |
 
 ## 4. Frozen sizes (the existing ladders)
 
@@ -45,7 +45,7 @@ against rho or the lab's previous producer.
 - Prime `p^4`: `E(F_{29^4})` is the only ecbench end-to-end instance
   (`research/gaudry_quartic_d4_ecbench_20261013/README.md`); the twist ladder p = 37, 73, 97 is
   in REVIEW §1 item 2; oracle-only cost ladder p = 269, 1009 in `research/gaudry_quartic_d4_cost_20261014/README.md`.
-  `n = 5` has no instance, no calibration and no code in `src/cryptanalysis/gaudry_*`.
+  `n = 5` has no instance and no calibration; Joux-Vitse code exists (`joux_vitse.rs`, `jv_quintic*.rs`), a Gaudry/FGHR `S_6` does not.
 
 ## 5. Decision value
 
@@ -56,5 +56,5 @@ against). It also prices the (4,6) Weil-descent cell against a published floor (
 
 ## 6. Cost
 
-Spec: done here. Build: ~4-6 engineer-weeks (INVENTORY §3). Run: one week on the existing
+Spec: done here. Build: ~45-70 engineer-days (INVENTORY §3). Run: one week on the existing
 ladders after build (REVIEW §5.1 F2: 2-3 days to specify, one week to run).

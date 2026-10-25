@@ -20,6 +20,12 @@ subspace choice in characteristic two); Trimoska-Ionica-Dequen (WDSat, SAT+XOR f
 descent; the repository's symmetry-breaking commit is the 2024 one). Citing the papers is the
 spec; any detail this file does not fix is taken from them, and a deviation is recorded.
 
+Note on the lab's own constructions: `koblitz_symmetrised.rs` (u-frame 2-torsion invariants, per-point
+`w_i`, no reduction to elementary symmetric functions) is a lab-original construction. It may appear
+as a *candidate*, never as the reference. The reference binary system is the `e_i`-symmetrised `S_{m+1}`
+of FGHR (`binary_semaev_s4.rs`, `symmetrized_semaev.rs`, to be extended to m = 4: M1) on the x-base
+`{P : x(P) in V}`. The 2026-10-24 smoke ran the lab's u-frame system and says so (SMOKE_20261024.md).
+
 ## 2. Cells
 
 | id | family | sizes | m or n | base | symmetry | solver |
@@ -29,8 +35,8 @@ spec; any detail this file does not fix is taken from them, and a deviation is r
 | B4-F4 | same | n in {13,15,18,19,21,23,24,27} (n=37 only if M-cost allows) | m = 4 | `l = ceil((n+1)/4)` | FGHR `S_5` (T plus the symmetric group in the invariants) | msolve F4 |
 | B4-SAT | same | same | m = 4 | same | same | WDSat |
 | K3, K4 | Koblitz K_0/K_1 | n in {41,43,45,47,53,57,59,61} | m in {3,4} | (i) standard random `V`; (ii) Frobenius-invariant `V` (labelled second base, `x^n-1` root space, as `koblitz_symmetrised::divisor_for_dimension`) | FGHR T; plus Frobenius invariants only for base (ii) | msolve; WDSat |
-| P4 | `E(F_{p^4})` | p in {29, 37, 73, 97} (+ 269, 1009 oracle-only) | n = 4 | `{P : x(P) in F_p}` | FGHR `D_4` (`gaudry_quartic_d4`) | msolve |
-| P5 | `E(F_{p^5})` | p to be chosen at freeze, instance generated and pinned in `docs/ic/calibration.json` | n = 5 | `{x in F_p}` | FGHR `S_5 x {±1}` (no code) | msolve |
+| P4 | `E(F_{p^4})` | p in {29, 37, 73, 97} (+ 269, 1009 oracle-only) | n = 4 | `{P : x(P) in F_p}` | FGHR `D_4` (`gaudry_quartic_d4`); second arm Joux-Vitse `(n-1)`-decomposition (`jv_quartic.rs`) | msolve |
+| P5 | `E(F_{p^5})` | p to be chosen at freeze, instance generated and pinned in `docs/ic/calibration.json` | n = 5 | `{x in F_p}` | Joux-Vitse `(n-1)`-decomposition (`joux_vitse.rs`, `jv_quintic.rs`, `jv_quintic_edwards.rs`: the published method for small-degree extensions); Gaudry/FGHR `S_6` only if a published `n = 5` symmetrisation is adopted at freeze (no code) | msolve |
 
 Per cell: 8 targets, planted logarithm, `[d]G = Q` verified; 2 independent seeds for the
 instance subspace `V` (the base is part of the draw).
@@ -58,6 +64,12 @@ non-admissible: child CPU seconds (rusage), which is the smoke run's only quanti
 clock is ever a claim on a loaded host. Both numbers are always reported; the card does not
 choose between them post hoc.
 
+**Cross-unit control (before freeze).** Run one lab Rust solver (e.g. `f4-f2`) on the same B3 system
+both natively counted (word XORs through `calibration.json`) and under Callgrind (`Ir` through the
+`Ir`-per-GAE ratio). The two GAE figures must agree within a tolerance stated here before the run
+(proposal: a factor of 1.5; the tolerance is part of the freeze). If they do not, **every arm,
+including the lab's, is priced in `Ir`** and the native-count conversion is not used in this card.
+
 ## 5. Solver settings (fixed before running)
 
 - msolve: pinned release (repo recipe builds v0.6.5, `research/dreg_closure_m4l6_20261018/pod/boot.sh`
@@ -66,11 +78,21 @@ choose between them post hoc.
   (`ic_next10_06_chain_export`), `-g 2` reduced Groebner basis, one thread, memory cap 16 GB, no
   per-cell tuning of `-c`, `-t`. Roots: via the reduced basis and an FGLM/enumeration step charged
   to the arm (the smoke improvises evaluation, which is inadmissible beyond ~24 unknowns).
-- WDSat: upstream `github.com/mtrimoska/WDSat`, GPL-3.0, vendored as an external process (not
-  linked), commit `61c6ff3f49445af2729274819edb27b85a89efc1` (2024-06-20, "Add symmetry-breaking
-  technique", head of `master` when queried 2026-10-24 via the GitHub API); input produced by the
-  upstream generator with the symmetry-breaking option on; build per upstream README, recorded
-  compiler and flags, `-O3`. The commit is a *pin*, not a verification that it builds; M3 confirms.
+- WDSat: upstream `github.com/mtrimoska/WDSat`, GPL-3.0, external process only (not linked), pinned
+  commit `61c6ff3f49445af2729274819edb27b85a89efc1` (2024-06-20, "Add symmetry-breaking technique";
+  head of `master` when the GitHub API was queried 2026-10-24). At the pin the tree is `src/`
+  (`main.c`, `wdsat.c`, `config.h`, `makefile`, ...), `benchmarks/{IC_S4,MQ}` and a prebuilt
+  `wdsat_solver`; **there is no instance generator**, so the repo emits the input (CNF, CNF-XOR or ANF
+  per the upstream README) itself. **Build from `src/` with `make`; the checked-in binary is never
+  used.** CLI (from `main.c`): `-i <file> -o <file> -n <n> -l <l> -m <m> -x -b -c -s -g <mvc> -t <thr>`
+  and `-a compile|time|delete`; `-b` is the symmetry-breaking switch (`br_sym`), `-x` Gaussian
+  elimination; `wdsat_solve` also takes the field polynomial and `X3` argument. Problem sizes
+  (`__MAX_ANF_ID__`, `__MAX_DEGREE__`, `__MAX_ID__`, `__MAX_BUFFER_SIZE__`, `__MAX_EQ__`,
+  `__MAX_EQ_SIZE__`, `__MAX_XEQ__`, `__MAX_XEQ_SIZE__`, and `__FIND_ALL_SOLUTIONS__` for relation
+  enumeration) are compile-time constants in `config.h`: **one rebuild per cell, constants recorded in
+  the row**. `m = 4` support at the pin is unverified. The commit is a pin, not a verification that it
+  builds or that its input format matches our system; M3 confirms, and a failure there is a recorded
+  blocker, not a silent drop of the SAT arm.
 - Variable choice (Galbraith-Gebregiyorgis): the choice of `V` among random subspaces is the
   published recommendation; if the paper's special-subspace choice applies, it is run as a second
   labelled base, not substituted.
@@ -80,7 +102,9 @@ choose between them post hoc.
 The reference arm gets the same tuning budget as the best lab candidate: `m in {2,3,4}` where
 the paper allows it, `l` swept over `{l0-1, l0, l0+1}` with `l0 = ceil((n+1)/m)`, factor-base
 size swept as the lab's `K` sweep is. The reported reference is the best verified cell of that
-sweep. Otherwise "x times published" is a strawman. Sweep points are listed here before the
+sweep. The sweep also includes the large-prime option `LP in {0, 1, 2}` wherever the lab candidate
+uses large primes or the cited paper allows them (relations with up to `LP` summands outside the base,
+matched to the candidate's accounting). Otherwise "x times published" is a strawman. Sweep points are listed here before the
 run; the sweep itself is cold (each point a whole solve).
 
 ## 7. Controls
@@ -90,6 +114,12 @@ Positive control: the plain unsymmetrised arm (no FGHR) at the smallest n, expec
 costlier in system size (derived, `n_vars` and degree). Negative control: a target outside the
 base's span (relation systems with no solution) must be refuted, not "solved". Matched rho
 reference per `AGENTS.md` §5a band for every row.
+
+**Literature-calibration control (before freeze).** Reproduce one published number with the pinned
+tools: WDSat's own `benchmarks/IC_S4` instances (solve outcome and the solver's reported effort at the
+instance sizes the repository ships), or a Galbraith-Gebregiyorgis 2014 (ePrint 2014/806) `m = 3`
+timing or degree at a matching `n`. Record the expected value from the source, the measured value, and
+the agreement criterion in §10. A reference arm that cannot reproduce a published number is not frozen.
 
 ## 8. Predictions (stated before any run)
 

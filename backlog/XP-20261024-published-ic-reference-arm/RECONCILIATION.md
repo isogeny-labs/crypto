@@ -47,6 +47,11 @@ instance) and unit. Label: `vs-published`. A producer is never described as impr
 5. `CLAUDE.md` line 8 success-criterion paragraph: "Beating Pollard rho is the long-term goal" -> add
    "and beating the published index-calculus baseline is the external checkpoint on the way".
 
+Also: under `AGENTS.md` line 88 ("**Improvement.** The improvement must lower cost against that
+baseline on the same instances"), a vs-published ratio is never itself an "Improvement". A row
+counts as one only if it also passes the internal-baseline rules (frozen protocol, same instances,
+verified answers, matched references). Register E reports distance, Register I reports successes.
+
 ## 4. What stays the same
 
 The "Advance and engineering are both successes" rule, the relabelling/accounting exclusions,

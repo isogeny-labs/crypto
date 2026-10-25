@@ -1,6 +1,7 @@
 //! Smoke run of the published-IC reference arm (card XP-20261024-published-ic-reference-arm):
-//! Koblitz E(F_{2^n}), m = 3, standard (non-Frobenius-invariant) random subspace V containing 1,
-//! FGHR 2-torsion-symmetrised S4 in the Artin-Schreier frame, solved by an external msolve.
+//! Koblitz E(F_{2^n}), m = 3, base F_u = {P : u(P) in V}, u = 1/(x+1), V a random non-Frobenius-invariant
+//! subspace containing 1; the lab's u-frame 2-torsion invariants only (per-point w_i, no reduction to
+//! elementary symmetric functions, so NOT the FGHR S_m-symmetrised system); solved by external msolve.
 //! Per target: write the system (+ field equations) as msolve input over GF(2), run
 //! `msolve -g 2`, read the verdict (GB = [1] means no decomposition), and on a non-unit ideal
 //! extract roots by evaluation (IMPROVISED: 2^n_vars sweep), lift, and verify the sum in the group.
@@ -99,7 +100,8 @@ fn main() {
         let st_ = Command::new(&msolve).args(["-g", "2", "-t", "1", "-f"]).arg(&inp).arg("-o").arg(&out).output().expect("msolve");
         let cpu = children_cpu().saturating_sub(c0);
         let body = std::fs::read_to_string(&out).unwrap_or_default();
-        let unit = body.lines().find(|l| l.trim_start().starts_with('[')).map(|l| l.trim().starts_with("[1]"));
+        // Exact match: the reduced basis of the unit ideal is the single line `[1]:`.
+        let unit: Option<bool> = body.lines().map(|l| l.trim()).find(|l| l.starts_with('[')).map(|l| l == "[1]:");
         // IMPROVISED root extraction by evaluation over all 2^nv assignments.
         let mut verified = None;
         let mut roots = 0u64;
@@ -120,10 +122,16 @@ fn main() {
                 }
             }
         }
+        let js = |o: Option<bool>| match o {
+            Some(b) => b.to_string(),
+            None => "null".to_string(),
+        };
         println!(
-            "{{\"target\":{done},\"planted\":{},\"n_vars\":{nv},\"n_eqs\":{n_eqs},\"msolve_ok\":{},\"gb_is_one\":{unit:?},\"enum_truth_decomposable\":{truth},\"roots\":{roots},\"relation_verified\":{verified:?},\"msolve_cpu_s\":{:.4}}}",
+            "{{\"target\":{done},\"planted\":{},\"n_vars\":{nv},\"n_eqs\":{n_eqs},\"msolve_ok\":{},\"gb_is_one\":{},\"enum_truth_decomposable\":{truth},\"roots\":{roots},\"relation_verified\":{},\"msolve_cpu_s\":{:.4}}}",
             done % 2 == 0,
             st_.status.success(),
+            js(unit),
+            js(verified),
             cpu.as_secs_f64()
         );
     }

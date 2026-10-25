@@ -8,7 +8,7 @@
     "ic-regime-review follow-through workstream B"
   ],
   "status": "blocked",
-  "status_note": "Specified 2026-10-24 (README, DRAFT PROTOCOL, INVENTORY, RECONCILIATION). One relation-level smoke on Koblitz n = 13, 15, 17 at m = 3 is in SMOKE_20261024.md; it is not a solve and not a claim. The protocol is not frozen. WDSat is not installed; pin 61c6ff3f49445af2729274819edb27b85a89efc1 (mtrimoska/WDSat, 2024-06-20).",
+  "status_note": "Specified 2026-10-24 (README, DRAFT PROTOCOL, INVENTORY, RECONCILIATION). One relation-level smoke on Koblitz n = 13, 15, 17 at m = 3 is in SMOKE_20261024.md; it is not a solve and not a claim. The protocol is not frozen. WDSat is not installed; pin 61c6ff3f49445af2729274819edb27b85a89efc1 (mtrimoska/WDSat, 2024-06-20). code.build names the smoke harness only; run.argv names examples/published_ic_ref_arm (milestone M5, not written).",
   "blocked_on": [
     "note:M1 FGHR symmetrised S_{m+1} for random binary curves and m = 4: symmetrised_terms returns None for m >= 4 (src/cryptanalysis/koblitz_symmetrised.rs:414-443)",
     "note:M2 msolve is not a SystemSolver (src/cryptanalysis/ic_framework/solvers.rs registry) and root extraction from the msolve basis is not built",
@@ -39,7 +39,7 @@
   "code": {
     "repo": "crypto",
     "commit": null,
-    "branch": "main",
+    "branch": "research/published-ic-reference-arm-20261024",
     "build": [
       [
         "cargo",
