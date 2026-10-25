@@ -1,5 +1,10 @@
 # Fixed-difference Kummer collector: uncached and cached cohorts
 
+Later concrete arithmetic gates are recorded separately: [N13's exhaustive
+three-model 16-bit census](n13-concrete-gate/REPORT.md) and [N14's finite
+sample on the other 18 models](n14-concrete-gate/REPORT.md). Neither adds a
+new collector/rho cost ratio.
+
 Frozen output for `KUMMER-DIFFERENTIAL-COLLECTOR-20261022`, 2026-10-22 UTC.
 The protocol and cached-inverse amendment were fixed before their respective
 runs. Both arms completed the same 1,260-target cohort. The cached arm reused
