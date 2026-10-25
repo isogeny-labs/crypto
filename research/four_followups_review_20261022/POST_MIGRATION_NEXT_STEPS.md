@@ -38,6 +38,14 @@ xADD calls matched the oracle; 62 signed lifts returned no divisor. This is a
 finite sample, so step 2's all-state and full cold-cost gates remain open and
 the rho ratio is null.
 
+The [N12 independent-host replay](../factor_base_heldout_replay_20261025/REPORT.md)
+verified all 420 candidate and rho scalars on a separate EC2 instance. Its
+seven raw files are byte-identical to the original; the aggregate ratio is
+2.4799052224835276 at the frozen representative price, with 0/36 aggregate
+winning cells and 19/420 target-level wins. Two preliminary image-tool setup
+failures returned zero target rows and remain in the packet. Step 3's isolated
+paired wall-cost comparison is still open; the two hosts differed in hardware.
+
 The [N9 point-allocation packet](../projective_law_followup_20261022/formal/POINT_ALLOCATION.md)
 adds eight kernel-checked affine statements and corrects the earlier pole-order
 scope: a nonzero cubic coefficient gives order 6 at infinity, while the
