@@ -285,13 +285,23 @@ coordinate-ring equivalence to `Spec`. Pinned Lean proves that both
 localization maps are open immersions onto the expected basic opens and that
 the spectra of the localized chart rings are isomorphic. Its
 [CSV](principal-open-spec.csv), [SVG](principal-open-spec.svg), and
-artifact-stored PDF record the result. Constructing and identifying a glued
-smooth projective curve, its infinity stalk, divisor/`Pic⁰` transport, and
-Rust-law semantics remain open.
+artifact-stored PDF record the result. The later gluing construction is
+described below; identification with a smooth projective completion, its
+infinity stalk, divisor/`Pic⁰` transport, and Rust-law semantics remain open.
 
 The [gluing gate packet](GLUING_GATE.md) records the pinned Mathlib
 `Scheme.GlueData` requirements after the checked overlap. Its
-[CSV](gluing-gate.csv), [SVG](gluing-gate.svg), and artifact-stored PDF mark
-the full two-chart datum, glued scheme, and identification with a chosen
-smooth projective completion as open. The API replay constructs no curve and
-does not change the measured cost ratios.
+[CSV](gluing-gate.csv), [SVG](gluing-gate.svg), and artifact-stored PDF
+describe the obligations at that stage. The subsequent
+[two-chart construction](TWO_CHART_GLUE.md) checks the full datum and the
+resulting glued scheme in Lean, with open chart maps that jointly cover it;
+its [CSV](two-chart-glue.csv), [SVG](two-chart-glue.svg), and artifact-stored
+PDF record the completed gate. Identifying this scheme with a chosen smooth
+projective completion, its infinity stalk, divisor/`Pic⁰` transport, and
+Rust-law semantics remain open. Neither packet changes measured cost ratios.
+
+The [exhaustive small-field gate](../exhaustive_small_field/README.md)
+checks all valid reduced-divisor pairs over the specified `F_7` and `F_11`
+models against independent Cantor addition under two weight settings. Its
+zero-mismatch finite result is recorded in a PDF, SVG, CSV, and source-bound
+JSON; it is not a universal Rust-law or `Pic⁰` theorem.
