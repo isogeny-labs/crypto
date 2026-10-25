@@ -21,8 +21,8 @@ The merged base also adds the artifact-store policy: non-code files over
 1 MiB, and data-suffixed files over 64 KiB, must be uploaded unchanged to
 the configured store before manifests replace Git blobs. A scoped plan
 selects 34 earlier tracked campaign files, approximately 3.6 MB. The final
-explicit-file dry run includes those plus all 16 study and four benchmark
-pending files: 54 files, 8.4 MB, including unchanged constructor binaries,
+explicit-file dry run includes those plus all 19 study and six benchmark
+pending files: 59 files, 8.9 MB, including unchanged constructor binaries,
 complete raw validation bundles, logs, plots and inspected PDFs. The
 [concrete packet](../research/ic_algebraic_crossover_20261023/PUBLISH_REVIEW.md)
 lists the exact proposed publication scope and current checks.

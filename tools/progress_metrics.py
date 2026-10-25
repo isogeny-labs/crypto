@@ -251,6 +251,39 @@ def algebraic_audits(ref, since):
                      source=f"{path}@{commit}")
 
 
+def completed_guess(ref, since):
+    """Frozen producer counts; separate from independent HKY and full IC price."""
+    study = "research/ic_algebraic_crossover_20261023/pipeline-receipts/"
+    path = study + "guess-completion-20261025-01/summary.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("status") != "all_registered_attempts_terminated_native_raw_accounting_recomputed":
+            continue
+        for field in ("producer_refuted", "producer_saturated_nonrefuting", "producer_unknown"):
+            emit(f"ic.algebraic.completed-guess.{field}", data.get(field), date=date,
+                 problem=P_IC, unit="count", better="neutral",
+                 label=f"registered original Boolean branches: {field}; producer classification",
+                 source=f"{path}@{commit}")
+        for row in data.get("draws", []):
+            for field, unit in (("balanced_prefix_minimum", "count"),
+                                ("passing_set_solver_words", "solver_word_ops"),
+                                ("search_through_first_passing_set_solver_words", "solver_word_ops")):
+                emit(f"ic.algebraic.completed-guess.draw{row['draw']}.{field}", row.get(field),
+                     date=date, problem=P_IC, unit=unit, better="neutral",
+                     label=f"draw {row['draw']} registered balanced prefix: {field}; no global minimum or full price",
+                     source=f"{path}@{commit}")
+    path = study + "cofactor-projection-20261025/receipt.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("status") != "all_finite_projected_membership_and_relation_checks_agree":
+            continue
+        for field in ("selected_projected_witness_relations", "selected_all_summands_in_prime_subgroup_relations"):
+            emit(f"ic.algebraic.cofactor-projection.{field}", data.get(field), date=date,
+                 problem=P_IC, unit="count", better="neutral",
+                 label=f"one canonical-sign witness per original SAT draw: {field}; no base logs or full IC",
+                 source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -260,6 +293,7 @@ def main():
     e2e_runs(a.ref)
     algebraic_stage(a.ref, a.since)
     algebraic_audits(a.ref, a.since)
+    completed_guess(a.ref, a.since)
 
 
 if __name__ == "__main__":

@@ -43,7 +43,11 @@ rho and native-price band at 0, 0.1 and 1 GAE, remains the downstream test.
   resolves every earlier null: 105 of 1,159 target x-values are in the
   chosen reference/twist subgroups, 1,054 outside. All seven original E0
   bases have no points in its largest prime subgroup; draw 6 has none on
-  either chosen model. This limits the original ECDLP interpretation.
+  either chosen model. This strict-G audit is not a universal IC obstruction: a
+  [separate cofactor audit](../research/ic_algebraic_crossover_20261023/reports/run-cofactor-projection-20261025/report.pdf)
+  verifies three projected relations at nonzero targets and nonempty projected
+  bases on both models. A complete projected target/preimage law, base logs,
+  scalar recovery and cost accounting remain unimplemented.
 - **Additional qualified controls:** 2,048 explicit a0/full-degree-b public
   subgroup queries retain every planned draw. Native finite-chain replay
   and independent point arithmetic agree on all rows: 1,591 have Boolean
@@ -58,8 +62,12 @@ rho and native-price band at 0, 0.1 and 1 GAE, remains the downstream test.
 - **Missing capability:** complete native construction/split accounting,
   validated larger-cell closure and guess minima, same-input external CAS
   comparison, and measured hardware calibration. Local matrices have a
-  12-GiB/900-second envelope. The 116 additional balanced ell=8 attempts are
-  actively executing at a 200k outer column cap under that envelope. All 44
+  12-GiB/900-second envelope. All 116 additional balanced ell=8 attempts have
+  ended; with eight earlier k3 cases the 124 attempts contain 78 refutations,
+  45 nonrefuting fixed points and one timeout. Balanced-prefix minima are
+  4/4/4/0 on draws 0/3/5/6; all 64 k4 branches refute. These are not global
+  subset minima. Independent HKY replay is queued after the m14/15 quartic
+  diagnostic; no independent word recount or full query price follows. All 44
   same-input Singular correctness checks agree on 22 small cases; equal-output
   fastest-tool performance comparisons remain open. The prescribed paid launcher
   is blocked by an explicit identity-policy denial; no research VM launched.

@@ -51,10 +51,13 @@ remain source/provisional labels; they must not be silently used as canonical
 global aliases. Exact records, hash-to-target inputs and measurements are
 unchanged. [Metadata reproduction](adapt-curve-identities.py).
 
-Both local experiment queues are real: the original 116-branch balanced
-campaign is active, and the separate capped L0 m14/15 quartic diagnostics
-wait for its identity-guarded completion. Original L2 full-panel specs and
-larger-host shards remain unchanged and unexecuted. The USD 100 extra-cloud
+The original 116-attempt balanced campaign ended at 17:53:53 UTC on
+2026-10-25. With eight earlier draw-0/k3 branches, all 124 attempts are
+accounted for: 78 refute, 45 saturate without refuting and one times out.
+The supported capped L0 m14 quartic diagnostic started at 17:54:16 UTC; m15
+and the independent 124-case HKY replay wait in real identity-guarded queues.
+Original L2 full-panel specs and larger-host shards remain unchanged and
+unexecuted. The USD 100 extra-cloud
 ceiling includes replay; no additional VM has launched. Raw bundles and
 oversized inspected PDFs are local pending verified artifact-store upload.
 The [publication packet](PUBLISH_REVIEW.md) and pending plans distinguish
@@ -145,8 +148,20 @@ models, and its target is outside E0's r-subgroup. Each of the three selected
 SAT witnesses gives two signed curve relations on its matching model, but
 zero relations whose summands all belong to the declared subgroup. Other
 Boolean witnesses and other subgroups are not exhausted by this diagnostic.
-These facts materially qualify the ECDLP relevance of the guessing fixtures;
-their Boolean solution and closure observations remain valid finite results.
+These are strict original-point membership facts, not a universal
+obstruction to IC. A separately frozen [cofactor audit](reports/run-cofactor-projection-20261025/report.pdf)
+checks the projected alternative: every original base has nonzero projected
+points hP on both models. One canonical target sign for each of the three
+selected SAT witnesses gives three valid relations at nonzero hR, despite
+zero relations with all original summands in G. Draw 6 has 254 distinct
+nonzero E0 projected points and a nonzero projected target that is not a
+direct base hit. Projected x-coordinates need not remain in V; a projected
+method would retain original preimages for its oracle. The original fixtures
+still supply no complete target/preimage/cofactor-component law, factor-base
+logs, scalar recovery or full cost. The strict-G contract of the separate
+1,591/161 panel remains distinct. [Native receipt](pipeline-receipts/cofactor-projection-20261025/receipt.json),
+[protocol](COFACTOR_PROJECTION_PROTOCOL.md), [reproduction](verify-completed-guess.sh).
+The prior subgroup PDFs and receipts remain unchanged.
 
 The [first subgroup receipt](pipeline-receipts/fixture-subgroups-20261025/receipt.json)
 conservatively retained 152 unknowns where gcd(r,cofactor)>1. A declared
@@ -157,15 +172,28 @@ order, replay byte-identically and retain all original inputs. The
 [amended native receipt](pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json)
 and [verifier](verify-relevance.sh) preserve that distinction.
 
-The [200,000-column continuation](GUESS_CAP200K_PROTOCOL.md) is running
-locally after completion of the quartic/HKY queue. Its first probe observes
-a degree-four refutation on original draw 6 with **zero guesses**, 179,447
-columns and 1,548,633,051,630 solver-word operations. Independent solver/cost
-replay of this cell is outstanding. The [pilot report](reports/run-guess-zero-draw6-20261025/report.pdf)
-keeps its scope separate from draw 0 and from ordinary subgroup queries.
-The full 116-attempt balanced k=0--4 continuation retains the same
-12-GiB/900-second limits. Later cells remain a live campaign; the earlier
-140k-cap refusals are preserved and remain inconclusive as those attempts.
+The [200,000-column continuation](GUESS_CAP200K_PROTOCOL.md) has ended.
+The [completed report](reports/run-completed-balanced-guess-20261025/report.pdf)
+charges every one of its 116 new attempts and the eight earlier k3 branches.
+For prefixes of [7,15,23,24] the first all-branch refuting k is **4,4,4,0**
+on draws 0,3,5,6. Every smaller prefix on draws 0,3,5 has a nonrefuting
+branch; draw 6 already refutes without guesses. All 64 k4 branches refute,
+charging **23,078,681,663,212 solver-word operations** in total. The passing
+sets cost 6,542,971,204,156 / 6,266,204,429,585 / 6,095,932,567,609 /
+1,548,633,051,630 words respectively. Including all failed smaller prefixes
+through success gives 21,448,879,433,676 / 21,064,467,554,811 /
+22,191,811,097,962 / 1,548,633,051,630 words. The one timeout is draw 6,
+k1, branch 1; its complete cost remains null, so the full 124-attempt cost
+is unknown. It does not affect the zero-guess minimum on that draw.
+
+These are minima within this registered balanced-prefix family at degree
+four, not over arbitrary variable subsets or orderings. Native raw accounting
+and the prefix summary reproduce byte-identically from the complete archive;
+independent HKY verdict replay is queued after m14/15 and has not run.
+Independent word recount, construction, splitting/lifting, verification and
+physical conversion remain open. [Summary](pipeline-receipts/guess-completion-20261025-01/summary.json),
+[reproduction](verify-completed-guess.sh), [replay protocol](COMPLETED_GUESS_REPLAY_PROTOCOL.md).
+The earlier 140k cap refusals and original draw-6 pilot remain preserved.
 
 Exact independent fixture counting reproduces `0,6,6,0,18,0,0`, with
 checked Boolean witnesses for all three SAT controls. Small controls
@@ -279,10 +307,10 @@ preserves all generated scripts, package hashes, outputs and statuses.
 | A1: independent structural replay | partial | exact original fixtures and small equations/roots checked; upstream large fall-degree panel not fully replayed |
 | A2: native structured bases and symmetric formulation | verified, finite pilot | Rust implementations, all four families, identity/splitting/repeated-root controls; limits in PIPELINE.md |
 | A3: combine formulations and closure | verified, finite stage panel | three matched panels above; no whole-query performance conclusion |
-| B1: ell=8 minimum guesses | partial | draw-6 zero-guess Boolean refutation and eight nonrefuting k=3 draw-0 branches; original models have subgroup-support gaps; remaining branches, alternative sets, ordinary-query controls and independent pilot replay remain |
+| B1: ell=8 minimum guesses | partial | all 124 registered attempts terminated; balanced-prefix minima 4/4/4/0; one retained timeout; independent HKY replay queued, arbitrary sets, ordinary-query interpretation and full prices remain |
 | B2: ell=9 and four summands | partial | 2,048 additional qualified queries, independently recounted points and D2/D3 controls; original 1,152 fixtures preserved; larger guessing/degree-four shards unexecuted |
 | B3: N=58/60/100 continuation | partial | degree-two/three nonrefuting fixed points on three fixtures; all degree-four results resource-capped; independent large fixed-point certificates remain |
-| C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified and identically replayed records; separate capped L0 m14/15 queue waits; original L2 full panels outstanding |
+| C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified and identically replayed records; separate capped L0 m14 running and m15 queued; original L2 full panels outstanding |
 | C2: m=14--18 ladder | partial, integration/compute blocked | standalone m16--18 core/order/encoding controls and independent replay pass; full wide stage adapters, eight-target IC/rho ladder and complete prices remain |
 | C3: complete method and full native price | partial | n13/n23 answer replay and ten n13 instruction profiles; construction/split counters, native allocator/physical costs and qualified comparison missing |
 | D1: external/hardware controls | partial | all 44 same-input Singular correctness checks agree on 22 cases; fastest-tool performance and actual hardware comparisons remain |

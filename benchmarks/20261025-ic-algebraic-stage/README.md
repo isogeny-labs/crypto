@@ -22,8 +22,10 @@ smoke, all N=58/60/100 capped probes and the one-cell zero-guess pilot.
 Quartic prices remain count conventions with missing physical conversion;
 all three larger degree-four outcomes remain unknown. The pilot's original
 draw 6 has no base points in either declared reference/twist prime subgroup,
-as established by the later subgroup relevance audit. A zero-guess Boolean
-refutation is not a complete IC relation or an algorithmic speed gain.
+as established by the later subgroup relevance audit. The subsequent cofactor audit verifies nonempty projected bases and three
+projected witness relations at nonzero targets; strict original-point
+subgroup gaps do not rule out that alternative. A zero-guess Boolean
+refutation still supplies no complete IC pipeline or cost improvement.
 The instruction profiles are attribution diagnostics, not benchmark timings.
 
 The additional browsing copies show the qualified 158-attempt D2/D3
@@ -40,3 +42,10 @@ No `VALIDATION.json` is fabricated for an unqualified comparison. A matched
 full-cost rho reference, independent replay and complete cost validator
 would be needed for admission. Copies are byte-identical to the study;
 edit its rendering source and regenerate both locations.
+
+The completed balanced-prefix report preserves all 124 attempts: 78 refute,
+45 saturate without refuting, one is censored. First passing k is 4/4/4/0
+within the registered family; all 64 k4 branches cost 23,078,681,663,212
+solver words. Failed-prefix work is charged in the report, and the censored
+experiment total remains unknown. Independent HKY replay is queued, not
+complete. The new browsing copies remain unadmitted.
