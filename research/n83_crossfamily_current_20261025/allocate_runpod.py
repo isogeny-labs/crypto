@@ -22,7 +22,7 @@ ROOT = HERE.parents[1]
 API_URL = "https://api.runpod.io/graphql"
 GPU_TYPE = "NVIDIA GeForce RTX 3070"
 IMAGE = "runpod/base:1.0.2-ubuntu2404"
-CAP_SECONDS = 330 * 60
+CAP_SECONDS = 360 * 60
 PRICE_CAP_PER_HOUR = Decimal("0.30")
 TOTAL_CAP_USD = Decimal("5.00")
 READBACK_ATTEMPTS = 30
@@ -110,7 +110,7 @@ def mutation(name, terminate_at):
         ", gpuCount: 1, cloudType: COMMUNITY, minMemoryInGb: 27, "
         "minVcpuCount: 4, imageName: " + json.dumps(IMAGE) +
         ", templateId: \"runpod-ubuntu\", containerDiskInGb: 30, "
-        "startSsh: true, ports: \"22/tcp\", terminateAfter: " +
+        "startSsh: true, supportPublicIp: true, ports: \"22/tcp\", terminateAfter: " +
         json.dumps(terminate_at) +
         " }) { id name desiredStatus costPerHr machineId memoryInGb "
         "vcpuCount imageName gpuCount createdAt podType } }")

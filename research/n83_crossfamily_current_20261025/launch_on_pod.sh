@@ -18,11 +18,12 @@ export RUST_TEST_THREADS=1
 
 finish() {
   code=$?
-  printf 'EXIT %s %s\n' "$code" "$(date -u +%FT%TZ)" > "$base/run.status"
+  printf 'FINALIZING %s %s\n' "$code" "$(date -u +%FT%TZ)" > "$base/run.status"
   if [ -d "$base/results" ]; then
     tar -C "$base" -czf "$base/raw_results.tar.gz" results
     sha256sum "$base/raw_results.tar.gz" > "$base/raw_results.sha256"
   fi
+  printf 'EXIT %s %s\n' "$code" "$(date -u +%FT%TZ)" > "$base/run.status"
 }
 trap finish EXIT
 printf 'START %s\n' "$(date -u +%FT%TZ)" > "$base/run.status"

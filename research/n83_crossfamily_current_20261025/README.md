@@ -55,21 +55,26 @@ The Pod runner checks sealed file hashes, canonical
 single-target workload IDs, subgroup membership, and all 16 scalar replays
 without needing the repository's historical Git objects. Its two 27 GiB, four-vCPU
 minimum allocations each require an observed rate at most $0.30/hour and a
-provider `terminateAfter` deadline of 330 minutes. The two-rate reservation
-estimate is at most $3.30, below its $5 campaign cap. It reads a configured
+provider `terminateAfter` deadline of 360 minutes. The two-rate reservation
+estimate is at most $3.60, below its $5 campaign cap. It reads a configured
 RunPod key from the process environment or `~/.runpod/config.toml`, never
 copies it into the receipts, verifies provider readback and distinct machine
 IDs, and attempts to terminate every discovered Pod if allocation fails.
-The $3.30 figure bounds the observed `costPerHr` field for both Pods over the
-330-minute window; any separately billed storage remains outside that field
-and must fit the remaining $1.70 allowance.
+The $3.60 figure bounds the observed `costPerHr` field for both Pods over the
+360-minute window; any separately billed storage remains outside that field
+and must fit the remaining $1.40 allowance.
 The allocation output belongs outside the repository. Raw result transfer
-and termination receipts still need to be completed before aggregate replay.
+and termination receipts are handled by `dispatch_runpod.py`: `--stage`
+transfers the sealed source and allocation receipts to two public SSH
+endpoints, and repeatable `--collect` calls retrieve checksummed raw archives
+and logs, then terminate both Pods after both have finished. A failed stage
+attempt records cleanup; a failed transfer keeps both Pods available until
+the provider auto-termination deadline.
 `launch_on_pod.sh` installs the pinned Rust toolchain, tests and builds the
 two exact producers, runs one stratum with four exposed CPU IDs, verifies the
-raw receipts, and archives them even when a stage fails. The caller must
-transfer the archive and allocation receipt, invoke the launcher, retrieve
-the raw archive and logs, and terminate both Pods before their deadline.
+raw receipts, and archives them even when a stage fails. The dispatch output
+and source bundle both belong outside the repository. Stage and collect require
+the configured RunPod key and SSH public-key access to the account's Pods.
 
 Replay the sealed preparation in a full checkout with Python `blake3==1.0.8`
 installed and the archived K3596 dump available:
@@ -87,9 +92,20 @@ python3 -m research.n83_crossfamily_current_20261025.run --preflight --stratum 1
 python3 -m research.n83_crossfamily_current_20261025.test_select
 python3 -m research.n83_crossfamily_current_20261025.test_runpod_provider
 python3 -m research.n83_crossfamily_current_20261025.test_allocate_runpod
+python3 -m research.n83_crossfamily_current_20261025.test_dispatch_runpod
 python3 -m research.n83_crossfamily_current_20261025.source_bundle \
   --build /absolute/path/outside/repository/n83-source-bundle
 python3 -m research.n83_crossfamily_current_20261025.allocate_runpod \
   --source-bundle /absolute/path/outside/repository/n83-source-bundle \
   --output /absolute/path/outside/repository/n83-allocation
+# Once the source bundle and SSH account are ready, add --execute to allocate.
+python3 -m research.n83_crossfamily_current_20261025.dispatch_runpod \
+  --allocation-dir /absolute/path/outside/repository/n83-allocation \
+  --source-bundle /absolute/path/outside/repository/n83-source-bundle \
+  --output /absolute/path/outside/repository/n83-dispatch --stage
+# Repeat --collect until both strata have a termination receipt.
+python3 -m research.n83_crossfamily_current_20261025.dispatch_runpod \
+  --allocation-dir /absolute/path/outside/repository/n83-allocation \
+  --source-bundle /absolute/path/outside/repository/n83-source-bundle \
+  --output /absolute/path/outside/repository/n83-dispatch --collect
 ```
