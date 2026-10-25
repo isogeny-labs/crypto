@@ -36,16 +36,21 @@ The four \texttt{\#print axioms} lines list exactly
 The adjacent CSV records each theorem, its hypotheses, and status; the SVG
 shows the dependency and open-obligation graph.
 
-\textbf{Remaining bridge.} A chosen smooth projective completion must be
-constructed and its two affine charts identified with the present quotient
-rings, with the same overlap isomorphism. Alternatively, construct a finite
-map from the glued scheme to $\mathbf P^1_K$, then prove the properness and
-chartwise smoothness hypotheses under an explicit squarefree condition.
-The pinned Mathlib supplies generic gluing and $\operatorname{Proj}$ APIs,
-but no genus-2 hyperelliptic completion theorem was found. The principal
-divisor of the interpolating function, including its order at this unique
-point, and the resulting $\operatorname{Pic}^0$ equation remain separate
-proof obligations.
+\textbf{Chosen completion target.} Let $A$ be the graded quotient
+\[
+K[X,Y,Z]/(Y^2-X^5Z-a_3X^3Z^3-a_2X^2Z^4-a_1XZ^5-a_0Z^6),
+\quad (\deg X,\deg Y,\deg Z)=(1,3,1).
+\]
+On $D_+(Z)$ set $x=X/Z,\ y=Y/Z^3$; on $D_+(X)$ set
+$z=Z/X,\ w=Y/X^3$. Their equations are the two checked affine chart
+equations. The equation forces $Y^2=0$ when $X=Z=0$, so these two opens
+cover the relevant homogeneous primes. The graded construction,
+chart-ring isomorphisms, and overlap comparison remain unproved in Lean.
+The pinned Mathlib supplies $\operatorname{Proj}$ properness for finite-type
+graded rings over their degree-zero part; smoothness still needs the
+squarefree hypothesis and chartwise proof. The principal divisor of the
+interpolating function, including its order at this unique point, and the
+resulting $\operatorname{Pic}^0$ equation remain separate proof obligations.
 
 \textbf{Interpretation.} This packet advances the local geometry of the
 constructed chart. It does not revise measured cost ratios or assert

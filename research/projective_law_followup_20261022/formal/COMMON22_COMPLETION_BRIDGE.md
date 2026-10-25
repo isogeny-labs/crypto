@@ -41,18 +41,33 @@ The checked gluing maps are open immersions and jointly cover the resulting
 scheme. To identify it with a chosen smooth projective completion, a new
 construction must supply either:
 
-1. a concrete projective scheme (for example `Proj` of a specified graded
-   ring, with the singular weighted-plane presentation treated correctly),
-   an open cover by these two quotient charts, and overlap maps matching
+1. a concrete projective scheme, with an open cover by these two quotient
+   charts and overlap maps matching
    `Common22PrincipalOpenSpec.principalOpenSpecIso`; or
 2. a finite morphism from `gluedCurve` to a constructed `P¹_K`, together
    with the finite-type and separation arguments that make the glued curve
    proper, and a proof that its two charts are smooth under an explicit
    squarefree or discriminant hypothesis.
 
+One explicit candidate is weighted `Proj A`, where
+
+`A = K[X,Y,Z]/(Y² - X⁵Z - a3 X³Z³ - a2 X²Z⁴ - a1 XZ⁵ - a0 Z⁶)`
+
+and `deg X = deg Z = 1`, `deg Y = 3`. Formally dehomogenizing at `Z` gives
+the affine `y²=f(x)` chart (`x=X/Z`, `y=Y/Z³`), and at `X` gives the infinity
+chart (`z=Z/X`, `w=Y/X³`). At `X=Z=0` the equation forces `Y²=0`, so no
+relevant homogeneous prime lies outside those two opens. These symbolic
+observations specify the needed graded-ring quotient, open-cover and
+transition isomorphism; they are **not** formalized in this packet. The
+ordinary plane closure has a singular point at infinity and is therefore
+not the desired smooth model without normalization.
+
 The pinned Mathlib has `Scheme.GlueData`, `Cover.gluedCover`, and the
 isomorphism `Cover.fromGlued` for an *already supplied* open cover. It does
 not turn the present two charts into a projective completion automatically.
+It also has `Proj.toSpecZero` proper when the graded ring is finite type over
+its degree-zero part, so a formalized weighted quotient and chart-cover
+equivalence would provide a direct properness route.
 No generic hyperelliptic smooth-completion object or theorem was found in
 the pinned `Mathlib/AlgebraicGeometry` tree; the existing projective curve
 point APIs there are for elliptic curves. Consequently this packet proves a
