@@ -83,3 +83,28 @@ source, base, CPU allocation, and caps. Preserve cgroup CPU and memory
 receipts, exact table digests, failed or capped runs, and the provider deletion
 receipt. Then include the winning index in one-target IC and same-point rho
 comparisons with target-independent setup recorded separately.
+
+The [bounded Pod runner](pod_run.py) uses the approved one-A40 allocation
+contract in the split-index controller: at most $0.70/hour, 9,000 seconds,
+and $2.25 including storage reserve. It verifies the allocation, source
+bundle, Rust source and public fixture before building. It requires at least
+40 GiB effective memory and four effective CPUs, then pins each index child
+to the same four CPUs. After a twenty-minute build cap it attempts baseline,
+filtered, filtered, baseline, each with at most forty minutes and a
+twenty-minute provider deadline margin. A shorter admissible pair remains
+explicitly partial. Every arm retains its raw output, cgroup and process CPU
+counters, cap, status and parsed stage summary. Exact state and table digest
+parity is checked before returning a passing pair or ABBA status.
+
+```sh
+python3 -m research.n83_k5500_fp8_20261025.pod_run \
+  --allocation /workspace/n83_k5500/allocation.json \
+  --bundle /workspace/n83_k5500/source.tar.gz \
+  --bundle-sha256 EXPECTED_SOURCE_BUNDLE_SHA256 \
+  --output /workspace/n83_k5500/fp8_results \
+  --archive /workspace/n83_k5500/fp8_results.tar.gz
+```
+
+Copy the raw archive and SHA-256 sidecar back before the independent Pod
+controller verifies deletion. A configured RunPod API key is required for
+dispatch; the local source and index controls above do not use one.
