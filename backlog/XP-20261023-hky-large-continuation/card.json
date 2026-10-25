@@ -1,0 +1,273 @@
+{
+  "authors": [
+    "Codex research lane"
+  ],
+  "blocked_on": [
+    "hw:64 GB ephemeral host",
+    "note:No cloud launcher credentials or lab identity are configured",
+    "branch:codex/ic-algebraic-crossover-20261023 source and frozen inputs must land"
+  ],
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unconfigured",
+    "tasks": [
+      "XP-20261023-hky-large-continuation/shard-{k}"
+    ],
+    "ttl_s": 10800,
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Build code.build from a pinned merged source; GNU time, jq and coreutils required."
+    },
+    "exec": {
+      "cpus": 4,
+      "memory_mb": 65536,
+      "timeout_s": 7200,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261023-hky-large-continuation"
+    },
+    "funding": {
+      "units": 131072,
+      "rationale": "Proposed at the lower seed-card tier for existing owner-requested continuations; not published or funded."
+    },
+    "notes": "No lease or job exists. The USD 100 authorization applies to the entire campaign, not each card."
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "code": {
+    "repo": "crypto",
+    "branch": "codex/ic-algebraic-crossover-20261023",
+    "commit": null,
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "ic_algebraic_followup",
+        "--bin",
+        "ecbench"
+      ]
+    ]
+  },
+  "created": "2026-10-23",
+  "decision_value": "This completes the owner-requested continuation using the actual registered cells. Its outcome determines whether the corresponding bounded-degree, bounded-guess or crossover hypothesis survives. An incomplete branch remains unknown and never substitutes for an unexecuted full panel.",
+  "id": "XP-20261023-hky-large-continuation",
+  "links": {
+    "lead": "research/ic_algebraic_crossover_20261023/PROTOCOL.md",
+    "notes": [
+      "research/ic_algebraic_crossover_20261023/README.md",
+      "research/ic_algebraic_crossover_20261023/PIPELINE.md"
+    ],
+    "prs": []
+  },
+  "outputs": {
+    "result_schema": "ic-algebraic-shard/v1",
+    "verify": [
+      "bash",
+      "research/ic_algebraic_crossover_20261023/verify-remote.sh",
+      "{out}"
+    ],
+    "land": "research/ic_algebraic_crossover_20261023"
+  },
+  "owner_hint": null,
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "3685cb3e5cab691836b3e14b22c93dd29d3d0531"
+  },
+  "question": "Does degree-four closure survive the actual higher-summand N=58 and N=60 continuation?",
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 64,
+    "disk_gb": 40,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Per-shard bounds are recorded; no measured aggregate forecast or price quote is available. 32 exact shards. Total campaign spend must not exceed USD 100."
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "research/ic_algebraic_crossover_20261023/run-remote.sh",
+      "hky",
+      "{shard}",
+      "{out}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 7200
+  },
+  "schema": "backlog.card/v1",
+  "shards": {
+    "count": 32,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "vars": {
+            "index": "0"
+          }
+        },
+        {
+          "vars": {
+            "index": "1"
+          }
+        },
+        {
+          "vars": {
+            "index": "2"
+          }
+        },
+        {
+          "vars": {
+            "index": "3"
+          }
+        },
+        {
+          "vars": {
+            "index": "4"
+          }
+        },
+        {
+          "vars": {
+            "index": "5"
+          }
+        },
+        {
+          "vars": {
+            "index": "6"
+          }
+        },
+        {
+          "vars": {
+            "index": "7"
+          }
+        },
+        {
+          "vars": {
+            "index": "8"
+          }
+        },
+        {
+          "vars": {
+            "index": "9"
+          }
+        },
+        {
+          "vars": {
+            "index": "10"
+          }
+        },
+        {
+          "vars": {
+            "index": "11"
+          }
+        },
+        {
+          "vars": {
+            "index": "12"
+          }
+        },
+        {
+          "vars": {
+            "index": "13"
+          }
+        },
+        {
+          "vars": {
+            "index": "14"
+          }
+        },
+        {
+          "vars": {
+            "index": "15"
+          }
+        },
+        {
+          "vars": {
+            "index": "16"
+          }
+        },
+        {
+          "vars": {
+            "index": "17"
+          }
+        },
+        {
+          "vars": {
+            "index": "18"
+          }
+        },
+        {
+          "vars": {
+            "index": "19"
+          }
+        },
+        {
+          "vars": {
+            "index": "20"
+          }
+        },
+        {
+          "vars": {
+            "index": "21"
+          }
+        },
+        {
+          "vars": {
+            "index": "22"
+          }
+        },
+        {
+          "vars": {
+            "index": "23"
+          }
+        },
+        {
+          "vars": {
+            "index": "24"
+          }
+        },
+        {
+          "vars": {
+            "index": "25"
+          }
+        },
+        {
+          "vars": {
+            "index": "26"
+          }
+        },
+        {
+          "vars": {
+            "index": "27"
+          }
+        },
+        {
+          "vars": {
+            "index": "28"
+          }
+        },
+        {
+          "vars": {
+            "index": "29"
+          }
+        },
+        {
+          "vars": {
+            "index": "30"
+          }
+        },
+        {
+          "vars": {
+            "index": "31"
+          }
+        }
+      ]
+    },
+    "stop": "all"
+  },
+  "status": "blocked",
+  "status_note": "Prepared, unleased and unlaunched. Owner authorized USD 100 total additional cloud compute on 2026-10-25; launcher access is not configured.",
+  "title": "Complete HKY N=58 and N=60"
+}

@@ -1,0 +1,123 @@
+{
+  "authors": [
+    "Codex research lane"
+  ],
+  "blocked_on": [
+    "hw:32 GB ephemeral host",
+    "note:No cloud launcher credentials or lab identity are configured",
+    "branch:codex/ic-algebraic-crossover-20261023 source and frozen inputs must land"
+  ],
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unconfigured",
+    "tasks": [
+      "XP-20261023-quartic-complete-ladder/shard-{k}"
+    ],
+    "ttl_s": 172800,
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Build code.build from a pinned merged source; GNU time, jq and coreutils required."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 32768,
+      "timeout_s": 170000,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261023-quartic-complete-ladder"
+    },
+    "funding": {
+      "units": 131072,
+      "rationale": "Proposed at the lower seed-card tier for existing owner-requested continuations; not published or funded."
+    },
+    "notes": "No lease or job exists. The USD 100 authorization applies to the entire campaign, not each card."
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "code": {
+    "repo": "crypto",
+    "branch": "codex/ic-algebraic-crossover-20261023",
+    "commit": null,
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "ic_algebraic_followup",
+        "--bin",
+        "ecbench"
+      ]
+    ]
+  },
+  "created": "2026-10-23",
+  "decision_value": "This completes the owner-requested continuation using the actual registered cells. Its outcome determines whether the corresponding bounded-degree, bounded-guess or crossover hypothesis survives. An incomplete branch remains unknown and never substitutes for an unexecuted full panel.",
+  "id": "XP-20261023-quartic-complete-ladder",
+  "links": {
+    "lead": "research/ic_algebraic_crossover_20261023/PROTOCOL.md",
+    "notes": [
+      "research/ic_algebraic_crossover_20261023/README.md",
+      "research/ic_algebraic_crossover_20261023/PIPELINE.md"
+    ],
+    "prs": []
+  },
+  "outputs": {
+    "result_schema": "ecbench.session/v1",
+    "verify": [
+      "bash",
+      "research/ic_algebraic_crossover_20261023/verify-remote.sh",
+      "{out}"
+    ],
+    "land": "research/ic_algebraic_crossover_20261023"
+  },
+  "owner_hint": null,
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "7b20e793b5c12010fa6de6690e7ee090971b99e0"
+  },
+  "question": "Does the measured IC/rho trend survive eight independent targets at each supported rung?",
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 32,
+    "disk_gb": 60,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Per-shard bounds are recorded; no measured aggregate forecast or price quote is available. 2 exact shards. Total campaign spend must not exceed USD 100."
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "research/ic_algebraic_crossover_20261023/run-remote.sh",
+      "quartic",
+      "{shard}",
+      "{out}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 170000
+  },
+  "schema": "backlog.card/v1",
+  "shards": {
+    "count": 2,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "vars": {
+            "index": "0"
+          }
+        },
+        {
+          "vars": {
+            "index": "1"
+          }
+        }
+      ]
+    },
+    "stop": "all"
+  },
+  "status": "blocked",
+  "status_note": "Prepared, unleased and unlaunched. Owner authorized USD 100 total additional cloud compute on 2026-10-25; launcher access is not configured.",
+  "title": "Complete and replay quartic m=14 and m=15"
+}

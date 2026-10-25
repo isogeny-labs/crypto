@@ -453,6 +453,20 @@ frozen-source replays rebuild it against pre-F6 snapshots of
 evaluations, and the tournament admits no root build script. It also
 refuses to run while a `KIC_*`, `F4_*` or `SOLVER_*` tuning override is set.
 
+`structured-s4-base-v1:dimension=L,family=geometric,seed=S` and
+`structured-s4-oracle-v1:m=3,form=symmetric,degree=2,preclose=1,node_budget=20000,max_solutions=4096,max_cols=30000`
+run the geometric/product-space follow-up in the complete native pipeline.
+All search parameters are mandatory. `form=direct,preclose=0` is its direct
+S4 control; `mitm:m=3,negation_folded=1` is the compatible complete pair-table
+control on the same base. The standard-subspace-only `pdp3-koblitz` adapter
+refuses a different geometric base. Extraction above 21 variables is refused.
+
+The new adapter charges signed lifts through GroupOps and reports closure,
+readback and hybrid word operations in the inherited-F4 unit. Symbolic
+construction and cubic-split field arithmetic are not completely counted:
+S remains a lower bound, and the common native-work band does not calibrate
+those omissions. See the [protocol and accounting scope](../../research/ic_algebraic_crossover_20261023/PIPELINE.md).
+
 `prime-kummer:t=T[,g=G]` and `prime-isogeny:t=T[,seed=S]` are Petit,
 Kosters and Messeng's tower bases for prime curves
 (`ic_framework::prime_tower`): every point whose abscissa lies in a set `V`

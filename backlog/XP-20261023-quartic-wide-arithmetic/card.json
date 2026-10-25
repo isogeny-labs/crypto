@@ -1,0 +1,104 @@
+{
+  "authors": [
+    "Codex research lane"
+  ],
+  "blocked_on": [
+    "note:Versioned wider field coefficients, point keys, scalars, tower basis and relation linear algebra are not implemented",
+    "branch:codex/ic-algebraic-crossover-20261023 current m=16..18 plan refuses"
+  ],
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unconfigured",
+    "tasks": [
+      "XP-20261023-quartic-wide-arithmetic"
+    ],
+    "ttl_s": 10800,
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Build code.build from a pinned merged source; GNU time, jq and coreutils required."
+    },
+    "exec": {
+      "cpus": 4,
+      "memory_mb": 16384,
+      "timeout_s": 7200,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261023-quartic-wide-arithmetic"
+    },
+    "funding": {
+      "units": 131072,
+      "rationale": "Proposed at the lower seed-card tier for existing owner-requested continuations; not published or funded."
+    },
+    "notes": "No lease or job exists. The USD 100 authorization applies to the entire campaign, not each card."
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "code": {
+    "repo": "crypto",
+    "branch": "codex/ic-algebraic-crossover-20261023",
+    "commit": null,
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "ic_algebraic_followup",
+        "--bin",
+        "ecbench"
+      ]
+    ]
+  },
+  "created": "2026-10-23",
+  "decision_value": "This completes the owner-requested continuation using the actual registered cells. Its outcome determines whether the corresponding bounded-degree, bounded-guess or crossover hypothesis survives. An incomplete branch remains unknown and never substitutes for an unexecuted full panel.",
+  "id": "XP-20261023-quartic-wide-arithmetic",
+  "links": {
+    "lead": "research/ic_algebraic_crossover_20261023/PROTOCOL.md",
+    "notes": [
+      "research/ic_algebraic_crossover_20261023/README.md",
+      "research/ic_algebraic_crossover_20261023/PIPELINE.md"
+    ],
+    "prs": []
+  },
+  "outputs": {
+    "result_schema": "ic-algebraic-shard/v1",
+    "verify": [],
+    "land": "research/ic_algebraic_crossover_20261023"
+  },
+  "owner_hint": null,
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "7d28ce852b89d8bac98c8e7a889f36a5d013903a"
+  },
+  "question": "Can the larger quartic workloads be represented and verified without coefficient, key, or scalar truncation?",
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 16,
+    "disk_gb": 30,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Per-shard bounds are recorded; no measured aggregate forecast or price quote is available. 1 exact shards. Total campaign spend must not exceed USD 100."
+  },
+  "run": {
+    "argv": [
+      "target/release/ecbench",
+      "plan",
+      "--spec",
+      "research/ic_algebraic_crossover_20261023/specs/quartic-m17.json"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 7200
+  },
+  "schema": "backlog.card/v1",
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "status": "blocked",
+  "status_note": "Prepared, unleased and unlaunched. Owner authorized USD 100 total additional cloud compute on 2026-10-25; launcher access is not configured.",
+  "title": "Implement a versioned quartic m=16 through m=18 path"
+}

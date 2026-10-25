@@ -270,3 +270,18 @@ every successful run, and report the common native-work sensitivity band
 0,0.1,1 GAE. This smoke does not establish a scaling win, fastest-oracle
 claim, or net gain over the best verified IC pipeline. Full calibrated and
 external-tool comparisons remain C3/D1 obligations.
+
+Implementation correction before pipeline data: use the generic
+`mitm:m=3,negation_folded=1` pair-table control. Inspection showed that the
+`pdp3-koblitz` adapter explicitly requires its standard prefix base and
+refuses an arbitrary geometric base. Both use the existing negation-folded
+pair-table algorithm; no existing oracle or its counting is changed.
+
+## Budget authorization, 2026-10-25
+
+The owner authorized up to USD 100 total additional cloud compute for this
+campaign. This is a total ceiling across jobs, replay and supporting cloud
+resources, not a per-job allowance. No paid job has been launched. Launcher
+credentials and an allocation still need to be verified. Prioritize the
+next discriminating cells within that ceiling; keep any unfunded inventory
+open and never describe prepared cards as queued.

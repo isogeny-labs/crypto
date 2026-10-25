@@ -52,7 +52,7 @@
         "id": "ic.pipeline",
         "params": {
           "factor_base": "structured-s4-base-v1:dimension=4,family=geometric,seed=17",
-          "oracle": "pdp3-koblitz:m=3,engine=rootfind-negfold",
+          "oracle": "mitm:m=3,negation_folded=1",
           "max_trials": "100000"
         }
       }

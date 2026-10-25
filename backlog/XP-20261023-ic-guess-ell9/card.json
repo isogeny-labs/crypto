@@ -1,0 +1,2593 @@
+{
+  "authors": [
+    "Codex research lane"
+  ],
+  "blocked_on": [
+    "hw:64 GB ephemeral host",
+    "note:No cloud launcher credentials or lab identity are configured",
+    "branch:codex/ic-algebraic-crossover-20261023 source and frozen inputs must land"
+  ],
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unconfigured",
+    "tasks": [
+      "XP-20261023-ic-guess-ell9/shard-{k}"
+    ],
+    "ttl_s": 10800,
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Build code.build from a pinned merged source; GNU time, jq and coreutils required."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 65536,
+      "timeout_s": 7200,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261023-ic-guess-ell9"
+    },
+    "funding": {
+      "units": 131072,
+      "rationale": "Proposed at the lower seed-card tier for existing owner-requested continuations; not published or funded."
+    },
+    "notes": "No lease or job exists. The USD 100 authorization applies to the entire campaign, not each card."
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "code": {
+    "repo": "crypto",
+    "branch": "codex/ic-algebraic-crossover-20261023",
+    "commit": null,
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "ic_algebraic_followup",
+        "--bin",
+        "ecbench"
+      ]
+    ]
+  },
+  "created": "2026-10-23",
+  "decision_value": "This completes the owner-requested continuation using the actual registered cells. Its outcome determines whether the corresponding bounded-degree, bounded-guess or crossover hypothesis survives. An incomplete branch remains unknown and never substitutes for an unexecuted full panel.",
+  "id": "XP-20261023-ic-guess-ell9",
+  "links": {
+    "lead": "research/ic_algebraic_crossover_20261023/PROTOCOL.md",
+    "notes": [
+      "research/ic_algebraic_crossover_20261023/README.md",
+      "research/ic_algebraic_crossover_20261023/PIPELINE.md"
+    ],
+    "prs": []
+  },
+  "outputs": {
+    "result_schema": "ic-algebraic-shard/v1",
+    "verify": [
+      "bash",
+      "research/ic_algebraic_crossover_20261023/verify-remote.sh",
+      "{out}"
+    ],
+    "land": "research/ic_algebraic_crossover_20261023"
+  },
+  "owner_hint": null,
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "aa778163c5e7caee2cea77e3f6da03a769565015"
+  },
+  "question": "Do zero through four balanced guesses suffice across the four factor-base families?",
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 64,
+    "disk_gb": 40,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Per-shard bounds are recorded; no measured aggregate forecast or price quote is available. 496 exact shards. Total campaign spend must not exceed USD 100."
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "research/ic_algebraic_crossover_20261023/run-remote.sh",
+      "guess",
+      "{shard}",
+      "{out}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 7200
+  },
+  "schema": "backlog.card/v1",
+  "shards": {
+    "count": 496,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "vars": {
+            "index": "0"
+          }
+        },
+        {
+          "vars": {
+            "index": "1"
+          }
+        },
+        {
+          "vars": {
+            "index": "2"
+          }
+        },
+        {
+          "vars": {
+            "index": "3"
+          }
+        },
+        {
+          "vars": {
+            "index": "4"
+          }
+        },
+        {
+          "vars": {
+            "index": "5"
+          }
+        },
+        {
+          "vars": {
+            "index": "6"
+          }
+        },
+        {
+          "vars": {
+            "index": "7"
+          }
+        },
+        {
+          "vars": {
+            "index": "8"
+          }
+        },
+        {
+          "vars": {
+            "index": "9"
+          }
+        },
+        {
+          "vars": {
+            "index": "10"
+          }
+        },
+        {
+          "vars": {
+            "index": "11"
+          }
+        },
+        {
+          "vars": {
+            "index": "12"
+          }
+        },
+        {
+          "vars": {
+            "index": "13"
+          }
+        },
+        {
+          "vars": {
+            "index": "14"
+          }
+        },
+        {
+          "vars": {
+            "index": "15"
+          }
+        },
+        {
+          "vars": {
+            "index": "16"
+          }
+        },
+        {
+          "vars": {
+            "index": "17"
+          }
+        },
+        {
+          "vars": {
+            "index": "18"
+          }
+        },
+        {
+          "vars": {
+            "index": "19"
+          }
+        },
+        {
+          "vars": {
+            "index": "20"
+          }
+        },
+        {
+          "vars": {
+            "index": "21"
+          }
+        },
+        {
+          "vars": {
+            "index": "22"
+          }
+        },
+        {
+          "vars": {
+            "index": "23"
+          }
+        },
+        {
+          "vars": {
+            "index": "24"
+          }
+        },
+        {
+          "vars": {
+            "index": "25"
+          }
+        },
+        {
+          "vars": {
+            "index": "26"
+          }
+        },
+        {
+          "vars": {
+            "index": "27"
+          }
+        },
+        {
+          "vars": {
+            "index": "28"
+          }
+        },
+        {
+          "vars": {
+            "index": "29"
+          }
+        },
+        {
+          "vars": {
+            "index": "30"
+          }
+        },
+        {
+          "vars": {
+            "index": "31"
+          }
+        },
+        {
+          "vars": {
+            "index": "32"
+          }
+        },
+        {
+          "vars": {
+            "index": "33"
+          }
+        },
+        {
+          "vars": {
+            "index": "34"
+          }
+        },
+        {
+          "vars": {
+            "index": "35"
+          }
+        },
+        {
+          "vars": {
+            "index": "36"
+          }
+        },
+        {
+          "vars": {
+            "index": "37"
+          }
+        },
+        {
+          "vars": {
+            "index": "38"
+          }
+        },
+        {
+          "vars": {
+            "index": "39"
+          }
+        },
+        {
+          "vars": {
+            "index": "40"
+          }
+        },
+        {
+          "vars": {
+            "index": "41"
+          }
+        },
+        {
+          "vars": {
+            "index": "42"
+          }
+        },
+        {
+          "vars": {
+            "index": "43"
+          }
+        },
+        {
+          "vars": {
+            "index": "44"
+          }
+        },
+        {
+          "vars": {
+            "index": "45"
+          }
+        },
+        {
+          "vars": {
+            "index": "46"
+          }
+        },
+        {
+          "vars": {
+            "index": "47"
+          }
+        },
+        {
+          "vars": {
+            "index": "48"
+          }
+        },
+        {
+          "vars": {
+            "index": "49"
+          }
+        },
+        {
+          "vars": {
+            "index": "50"
+          }
+        },
+        {
+          "vars": {
+            "index": "51"
+          }
+        },
+        {
+          "vars": {
+            "index": "52"
+          }
+        },
+        {
+          "vars": {
+            "index": "53"
+          }
+        },
+        {
+          "vars": {
+            "index": "54"
+          }
+        },
+        {
+          "vars": {
+            "index": "55"
+          }
+        },
+        {
+          "vars": {
+            "index": "56"
+          }
+        },
+        {
+          "vars": {
+            "index": "57"
+          }
+        },
+        {
+          "vars": {
+            "index": "58"
+          }
+        },
+        {
+          "vars": {
+            "index": "59"
+          }
+        },
+        {
+          "vars": {
+            "index": "60"
+          }
+        },
+        {
+          "vars": {
+            "index": "61"
+          }
+        },
+        {
+          "vars": {
+            "index": "62"
+          }
+        },
+        {
+          "vars": {
+            "index": "63"
+          }
+        },
+        {
+          "vars": {
+            "index": "64"
+          }
+        },
+        {
+          "vars": {
+            "index": "65"
+          }
+        },
+        {
+          "vars": {
+            "index": "66"
+          }
+        },
+        {
+          "vars": {
+            "index": "67"
+          }
+        },
+        {
+          "vars": {
+            "index": "68"
+          }
+        },
+        {
+          "vars": {
+            "index": "69"
+          }
+        },
+        {
+          "vars": {
+            "index": "70"
+          }
+        },
+        {
+          "vars": {
+            "index": "71"
+          }
+        },
+        {
+          "vars": {
+            "index": "72"
+          }
+        },
+        {
+          "vars": {
+            "index": "73"
+          }
+        },
+        {
+          "vars": {
+            "index": "74"
+          }
+        },
+        {
+          "vars": {
+            "index": "75"
+          }
+        },
+        {
+          "vars": {
+            "index": "76"
+          }
+        },
+        {
+          "vars": {
+            "index": "77"
+          }
+        },
+        {
+          "vars": {
+            "index": "78"
+          }
+        },
+        {
+          "vars": {
+            "index": "79"
+          }
+        },
+        {
+          "vars": {
+            "index": "80"
+          }
+        },
+        {
+          "vars": {
+            "index": "81"
+          }
+        },
+        {
+          "vars": {
+            "index": "82"
+          }
+        },
+        {
+          "vars": {
+            "index": "83"
+          }
+        },
+        {
+          "vars": {
+            "index": "84"
+          }
+        },
+        {
+          "vars": {
+            "index": "85"
+          }
+        },
+        {
+          "vars": {
+            "index": "86"
+          }
+        },
+        {
+          "vars": {
+            "index": "87"
+          }
+        },
+        {
+          "vars": {
+            "index": "88"
+          }
+        },
+        {
+          "vars": {
+            "index": "89"
+          }
+        },
+        {
+          "vars": {
+            "index": "90"
+          }
+        },
+        {
+          "vars": {
+            "index": "91"
+          }
+        },
+        {
+          "vars": {
+            "index": "92"
+          }
+        },
+        {
+          "vars": {
+            "index": "93"
+          }
+        },
+        {
+          "vars": {
+            "index": "94"
+          }
+        },
+        {
+          "vars": {
+            "index": "95"
+          }
+        },
+        {
+          "vars": {
+            "index": "96"
+          }
+        },
+        {
+          "vars": {
+            "index": "97"
+          }
+        },
+        {
+          "vars": {
+            "index": "98"
+          }
+        },
+        {
+          "vars": {
+            "index": "99"
+          }
+        },
+        {
+          "vars": {
+            "index": "100"
+          }
+        },
+        {
+          "vars": {
+            "index": "101"
+          }
+        },
+        {
+          "vars": {
+            "index": "102"
+          }
+        },
+        {
+          "vars": {
+            "index": "103"
+          }
+        },
+        {
+          "vars": {
+            "index": "104"
+          }
+        },
+        {
+          "vars": {
+            "index": "105"
+          }
+        },
+        {
+          "vars": {
+            "index": "106"
+          }
+        },
+        {
+          "vars": {
+            "index": "107"
+          }
+        },
+        {
+          "vars": {
+            "index": "108"
+          }
+        },
+        {
+          "vars": {
+            "index": "109"
+          }
+        },
+        {
+          "vars": {
+            "index": "110"
+          }
+        },
+        {
+          "vars": {
+            "index": "111"
+          }
+        },
+        {
+          "vars": {
+            "index": "112"
+          }
+        },
+        {
+          "vars": {
+            "index": "113"
+          }
+        },
+        {
+          "vars": {
+            "index": "114"
+          }
+        },
+        {
+          "vars": {
+            "index": "115"
+          }
+        },
+        {
+          "vars": {
+            "index": "116"
+          }
+        },
+        {
+          "vars": {
+            "index": "117"
+          }
+        },
+        {
+          "vars": {
+            "index": "118"
+          }
+        },
+        {
+          "vars": {
+            "index": "119"
+          }
+        },
+        {
+          "vars": {
+            "index": "120"
+          }
+        },
+        {
+          "vars": {
+            "index": "121"
+          }
+        },
+        {
+          "vars": {
+            "index": "122"
+          }
+        },
+        {
+          "vars": {
+            "index": "123"
+          }
+        },
+        {
+          "vars": {
+            "index": "124"
+          }
+        },
+        {
+          "vars": {
+            "index": "125"
+          }
+        },
+        {
+          "vars": {
+            "index": "126"
+          }
+        },
+        {
+          "vars": {
+            "index": "127"
+          }
+        },
+        {
+          "vars": {
+            "index": "128"
+          }
+        },
+        {
+          "vars": {
+            "index": "129"
+          }
+        },
+        {
+          "vars": {
+            "index": "130"
+          }
+        },
+        {
+          "vars": {
+            "index": "131"
+          }
+        },
+        {
+          "vars": {
+            "index": "132"
+          }
+        },
+        {
+          "vars": {
+            "index": "133"
+          }
+        },
+        {
+          "vars": {
+            "index": "134"
+          }
+        },
+        {
+          "vars": {
+            "index": "135"
+          }
+        },
+        {
+          "vars": {
+            "index": "136"
+          }
+        },
+        {
+          "vars": {
+            "index": "137"
+          }
+        },
+        {
+          "vars": {
+            "index": "138"
+          }
+        },
+        {
+          "vars": {
+            "index": "139"
+          }
+        },
+        {
+          "vars": {
+            "index": "140"
+          }
+        },
+        {
+          "vars": {
+            "index": "141"
+          }
+        },
+        {
+          "vars": {
+            "index": "142"
+          }
+        },
+        {
+          "vars": {
+            "index": "143"
+          }
+        },
+        {
+          "vars": {
+            "index": "144"
+          }
+        },
+        {
+          "vars": {
+            "index": "145"
+          }
+        },
+        {
+          "vars": {
+            "index": "146"
+          }
+        },
+        {
+          "vars": {
+            "index": "147"
+          }
+        },
+        {
+          "vars": {
+            "index": "148"
+          }
+        },
+        {
+          "vars": {
+            "index": "149"
+          }
+        },
+        {
+          "vars": {
+            "index": "150"
+          }
+        },
+        {
+          "vars": {
+            "index": "151"
+          }
+        },
+        {
+          "vars": {
+            "index": "152"
+          }
+        },
+        {
+          "vars": {
+            "index": "153"
+          }
+        },
+        {
+          "vars": {
+            "index": "154"
+          }
+        },
+        {
+          "vars": {
+            "index": "155"
+          }
+        },
+        {
+          "vars": {
+            "index": "156"
+          }
+        },
+        {
+          "vars": {
+            "index": "157"
+          }
+        },
+        {
+          "vars": {
+            "index": "158"
+          }
+        },
+        {
+          "vars": {
+            "index": "159"
+          }
+        },
+        {
+          "vars": {
+            "index": "160"
+          }
+        },
+        {
+          "vars": {
+            "index": "161"
+          }
+        },
+        {
+          "vars": {
+            "index": "162"
+          }
+        },
+        {
+          "vars": {
+            "index": "163"
+          }
+        },
+        {
+          "vars": {
+            "index": "164"
+          }
+        },
+        {
+          "vars": {
+            "index": "165"
+          }
+        },
+        {
+          "vars": {
+            "index": "166"
+          }
+        },
+        {
+          "vars": {
+            "index": "167"
+          }
+        },
+        {
+          "vars": {
+            "index": "168"
+          }
+        },
+        {
+          "vars": {
+            "index": "169"
+          }
+        },
+        {
+          "vars": {
+            "index": "170"
+          }
+        },
+        {
+          "vars": {
+            "index": "171"
+          }
+        },
+        {
+          "vars": {
+            "index": "172"
+          }
+        },
+        {
+          "vars": {
+            "index": "173"
+          }
+        },
+        {
+          "vars": {
+            "index": "174"
+          }
+        },
+        {
+          "vars": {
+            "index": "175"
+          }
+        },
+        {
+          "vars": {
+            "index": "176"
+          }
+        },
+        {
+          "vars": {
+            "index": "177"
+          }
+        },
+        {
+          "vars": {
+            "index": "178"
+          }
+        },
+        {
+          "vars": {
+            "index": "179"
+          }
+        },
+        {
+          "vars": {
+            "index": "180"
+          }
+        },
+        {
+          "vars": {
+            "index": "181"
+          }
+        },
+        {
+          "vars": {
+            "index": "182"
+          }
+        },
+        {
+          "vars": {
+            "index": "183"
+          }
+        },
+        {
+          "vars": {
+            "index": "184"
+          }
+        },
+        {
+          "vars": {
+            "index": "185"
+          }
+        },
+        {
+          "vars": {
+            "index": "186"
+          }
+        },
+        {
+          "vars": {
+            "index": "187"
+          }
+        },
+        {
+          "vars": {
+            "index": "188"
+          }
+        },
+        {
+          "vars": {
+            "index": "189"
+          }
+        },
+        {
+          "vars": {
+            "index": "190"
+          }
+        },
+        {
+          "vars": {
+            "index": "191"
+          }
+        },
+        {
+          "vars": {
+            "index": "192"
+          }
+        },
+        {
+          "vars": {
+            "index": "193"
+          }
+        },
+        {
+          "vars": {
+            "index": "194"
+          }
+        },
+        {
+          "vars": {
+            "index": "195"
+          }
+        },
+        {
+          "vars": {
+            "index": "196"
+          }
+        },
+        {
+          "vars": {
+            "index": "197"
+          }
+        },
+        {
+          "vars": {
+            "index": "198"
+          }
+        },
+        {
+          "vars": {
+            "index": "199"
+          }
+        },
+        {
+          "vars": {
+            "index": "200"
+          }
+        },
+        {
+          "vars": {
+            "index": "201"
+          }
+        },
+        {
+          "vars": {
+            "index": "202"
+          }
+        },
+        {
+          "vars": {
+            "index": "203"
+          }
+        },
+        {
+          "vars": {
+            "index": "204"
+          }
+        },
+        {
+          "vars": {
+            "index": "205"
+          }
+        },
+        {
+          "vars": {
+            "index": "206"
+          }
+        },
+        {
+          "vars": {
+            "index": "207"
+          }
+        },
+        {
+          "vars": {
+            "index": "208"
+          }
+        },
+        {
+          "vars": {
+            "index": "209"
+          }
+        },
+        {
+          "vars": {
+            "index": "210"
+          }
+        },
+        {
+          "vars": {
+            "index": "211"
+          }
+        },
+        {
+          "vars": {
+            "index": "212"
+          }
+        },
+        {
+          "vars": {
+            "index": "213"
+          }
+        },
+        {
+          "vars": {
+            "index": "214"
+          }
+        },
+        {
+          "vars": {
+            "index": "215"
+          }
+        },
+        {
+          "vars": {
+            "index": "216"
+          }
+        },
+        {
+          "vars": {
+            "index": "217"
+          }
+        },
+        {
+          "vars": {
+            "index": "218"
+          }
+        },
+        {
+          "vars": {
+            "index": "219"
+          }
+        },
+        {
+          "vars": {
+            "index": "220"
+          }
+        },
+        {
+          "vars": {
+            "index": "221"
+          }
+        },
+        {
+          "vars": {
+            "index": "222"
+          }
+        },
+        {
+          "vars": {
+            "index": "223"
+          }
+        },
+        {
+          "vars": {
+            "index": "224"
+          }
+        },
+        {
+          "vars": {
+            "index": "225"
+          }
+        },
+        {
+          "vars": {
+            "index": "226"
+          }
+        },
+        {
+          "vars": {
+            "index": "227"
+          }
+        },
+        {
+          "vars": {
+            "index": "228"
+          }
+        },
+        {
+          "vars": {
+            "index": "229"
+          }
+        },
+        {
+          "vars": {
+            "index": "230"
+          }
+        },
+        {
+          "vars": {
+            "index": "231"
+          }
+        },
+        {
+          "vars": {
+            "index": "232"
+          }
+        },
+        {
+          "vars": {
+            "index": "233"
+          }
+        },
+        {
+          "vars": {
+            "index": "234"
+          }
+        },
+        {
+          "vars": {
+            "index": "235"
+          }
+        },
+        {
+          "vars": {
+            "index": "236"
+          }
+        },
+        {
+          "vars": {
+            "index": "237"
+          }
+        },
+        {
+          "vars": {
+            "index": "238"
+          }
+        },
+        {
+          "vars": {
+            "index": "239"
+          }
+        },
+        {
+          "vars": {
+            "index": "240"
+          }
+        },
+        {
+          "vars": {
+            "index": "241"
+          }
+        },
+        {
+          "vars": {
+            "index": "242"
+          }
+        },
+        {
+          "vars": {
+            "index": "243"
+          }
+        },
+        {
+          "vars": {
+            "index": "244"
+          }
+        },
+        {
+          "vars": {
+            "index": "245"
+          }
+        },
+        {
+          "vars": {
+            "index": "246"
+          }
+        },
+        {
+          "vars": {
+            "index": "247"
+          }
+        },
+        {
+          "vars": {
+            "index": "248"
+          }
+        },
+        {
+          "vars": {
+            "index": "249"
+          }
+        },
+        {
+          "vars": {
+            "index": "250"
+          }
+        },
+        {
+          "vars": {
+            "index": "251"
+          }
+        },
+        {
+          "vars": {
+            "index": "252"
+          }
+        },
+        {
+          "vars": {
+            "index": "253"
+          }
+        },
+        {
+          "vars": {
+            "index": "254"
+          }
+        },
+        {
+          "vars": {
+            "index": "255"
+          }
+        },
+        {
+          "vars": {
+            "index": "256"
+          }
+        },
+        {
+          "vars": {
+            "index": "257"
+          }
+        },
+        {
+          "vars": {
+            "index": "258"
+          }
+        },
+        {
+          "vars": {
+            "index": "259"
+          }
+        },
+        {
+          "vars": {
+            "index": "260"
+          }
+        },
+        {
+          "vars": {
+            "index": "261"
+          }
+        },
+        {
+          "vars": {
+            "index": "262"
+          }
+        },
+        {
+          "vars": {
+            "index": "263"
+          }
+        },
+        {
+          "vars": {
+            "index": "264"
+          }
+        },
+        {
+          "vars": {
+            "index": "265"
+          }
+        },
+        {
+          "vars": {
+            "index": "266"
+          }
+        },
+        {
+          "vars": {
+            "index": "267"
+          }
+        },
+        {
+          "vars": {
+            "index": "268"
+          }
+        },
+        {
+          "vars": {
+            "index": "269"
+          }
+        },
+        {
+          "vars": {
+            "index": "270"
+          }
+        },
+        {
+          "vars": {
+            "index": "271"
+          }
+        },
+        {
+          "vars": {
+            "index": "272"
+          }
+        },
+        {
+          "vars": {
+            "index": "273"
+          }
+        },
+        {
+          "vars": {
+            "index": "274"
+          }
+        },
+        {
+          "vars": {
+            "index": "275"
+          }
+        },
+        {
+          "vars": {
+            "index": "276"
+          }
+        },
+        {
+          "vars": {
+            "index": "277"
+          }
+        },
+        {
+          "vars": {
+            "index": "278"
+          }
+        },
+        {
+          "vars": {
+            "index": "279"
+          }
+        },
+        {
+          "vars": {
+            "index": "280"
+          }
+        },
+        {
+          "vars": {
+            "index": "281"
+          }
+        },
+        {
+          "vars": {
+            "index": "282"
+          }
+        },
+        {
+          "vars": {
+            "index": "283"
+          }
+        },
+        {
+          "vars": {
+            "index": "284"
+          }
+        },
+        {
+          "vars": {
+            "index": "285"
+          }
+        },
+        {
+          "vars": {
+            "index": "286"
+          }
+        },
+        {
+          "vars": {
+            "index": "287"
+          }
+        },
+        {
+          "vars": {
+            "index": "288"
+          }
+        },
+        {
+          "vars": {
+            "index": "289"
+          }
+        },
+        {
+          "vars": {
+            "index": "290"
+          }
+        },
+        {
+          "vars": {
+            "index": "291"
+          }
+        },
+        {
+          "vars": {
+            "index": "292"
+          }
+        },
+        {
+          "vars": {
+            "index": "293"
+          }
+        },
+        {
+          "vars": {
+            "index": "294"
+          }
+        },
+        {
+          "vars": {
+            "index": "295"
+          }
+        },
+        {
+          "vars": {
+            "index": "296"
+          }
+        },
+        {
+          "vars": {
+            "index": "297"
+          }
+        },
+        {
+          "vars": {
+            "index": "298"
+          }
+        },
+        {
+          "vars": {
+            "index": "299"
+          }
+        },
+        {
+          "vars": {
+            "index": "300"
+          }
+        },
+        {
+          "vars": {
+            "index": "301"
+          }
+        },
+        {
+          "vars": {
+            "index": "302"
+          }
+        },
+        {
+          "vars": {
+            "index": "303"
+          }
+        },
+        {
+          "vars": {
+            "index": "304"
+          }
+        },
+        {
+          "vars": {
+            "index": "305"
+          }
+        },
+        {
+          "vars": {
+            "index": "306"
+          }
+        },
+        {
+          "vars": {
+            "index": "307"
+          }
+        },
+        {
+          "vars": {
+            "index": "308"
+          }
+        },
+        {
+          "vars": {
+            "index": "309"
+          }
+        },
+        {
+          "vars": {
+            "index": "310"
+          }
+        },
+        {
+          "vars": {
+            "index": "311"
+          }
+        },
+        {
+          "vars": {
+            "index": "312"
+          }
+        },
+        {
+          "vars": {
+            "index": "313"
+          }
+        },
+        {
+          "vars": {
+            "index": "314"
+          }
+        },
+        {
+          "vars": {
+            "index": "315"
+          }
+        },
+        {
+          "vars": {
+            "index": "316"
+          }
+        },
+        {
+          "vars": {
+            "index": "317"
+          }
+        },
+        {
+          "vars": {
+            "index": "318"
+          }
+        },
+        {
+          "vars": {
+            "index": "319"
+          }
+        },
+        {
+          "vars": {
+            "index": "320"
+          }
+        },
+        {
+          "vars": {
+            "index": "321"
+          }
+        },
+        {
+          "vars": {
+            "index": "322"
+          }
+        },
+        {
+          "vars": {
+            "index": "323"
+          }
+        },
+        {
+          "vars": {
+            "index": "324"
+          }
+        },
+        {
+          "vars": {
+            "index": "325"
+          }
+        },
+        {
+          "vars": {
+            "index": "326"
+          }
+        },
+        {
+          "vars": {
+            "index": "327"
+          }
+        },
+        {
+          "vars": {
+            "index": "328"
+          }
+        },
+        {
+          "vars": {
+            "index": "329"
+          }
+        },
+        {
+          "vars": {
+            "index": "330"
+          }
+        },
+        {
+          "vars": {
+            "index": "331"
+          }
+        },
+        {
+          "vars": {
+            "index": "332"
+          }
+        },
+        {
+          "vars": {
+            "index": "333"
+          }
+        },
+        {
+          "vars": {
+            "index": "334"
+          }
+        },
+        {
+          "vars": {
+            "index": "335"
+          }
+        },
+        {
+          "vars": {
+            "index": "336"
+          }
+        },
+        {
+          "vars": {
+            "index": "337"
+          }
+        },
+        {
+          "vars": {
+            "index": "338"
+          }
+        },
+        {
+          "vars": {
+            "index": "339"
+          }
+        },
+        {
+          "vars": {
+            "index": "340"
+          }
+        },
+        {
+          "vars": {
+            "index": "341"
+          }
+        },
+        {
+          "vars": {
+            "index": "342"
+          }
+        },
+        {
+          "vars": {
+            "index": "343"
+          }
+        },
+        {
+          "vars": {
+            "index": "344"
+          }
+        },
+        {
+          "vars": {
+            "index": "345"
+          }
+        },
+        {
+          "vars": {
+            "index": "346"
+          }
+        },
+        {
+          "vars": {
+            "index": "347"
+          }
+        },
+        {
+          "vars": {
+            "index": "348"
+          }
+        },
+        {
+          "vars": {
+            "index": "349"
+          }
+        },
+        {
+          "vars": {
+            "index": "350"
+          }
+        },
+        {
+          "vars": {
+            "index": "351"
+          }
+        },
+        {
+          "vars": {
+            "index": "352"
+          }
+        },
+        {
+          "vars": {
+            "index": "353"
+          }
+        },
+        {
+          "vars": {
+            "index": "354"
+          }
+        },
+        {
+          "vars": {
+            "index": "355"
+          }
+        },
+        {
+          "vars": {
+            "index": "356"
+          }
+        },
+        {
+          "vars": {
+            "index": "357"
+          }
+        },
+        {
+          "vars": {
+            "index": "358"
+          }
+        },
+        {
+          "vars": {
+            "index": "359"
+          }
+        },
+        {
+          "vars": {
+            "index": "360"
+          }
+        },
+        {
+          "vars": {
+            "index": "361"
+          }
+        },
+        {
+          "vars": {
+            "index": "362"
+          }
+        },
+        {
+          "vars": {
+            "index": "363"
+          }
+        },
+        {
+          "vars": {
+            "index": "364"
+          }
+        },
+        {
+          "vars": {
+            "index": "365"
+          }
+        },
+        {
+          "vars": {
+            "index": "366"
+          }
+        },
+        {
+          "vars": {
+            "index": "367"
+          }
+        },
+        {
+          "vars": {
+            "index": "368"
+          }
+        },
+        {
+          "vars": {
+            "index": "369"
+          }
+        },
+        {
+          "vars": {
+            "index": "370"
+          }
+        },
+        {
+          "vars": {
+            "index": "371"
+          }
+        },
+        {
+          "vars": {
+            "index": "372"
+          }
+        },
+        {
+          "vars": {
+            "index": "373"
+          }
+        },
+        {
+          "vars": {
+            "index": "374"
+          }
+        },
+        {
+          "vars": {
+            "index": "375"
+          }
+        },
+        {
+          "vars": {
+            "index": "376"
+          }
+        },
+        {
+          "vars": {
+            "index": "377"
+          }
+        },
+        {
+          "vars": {
+            "index": "378"
+          }
+        },
+        {
+          "vars": {
+            "index": "379"
+          }
+        },
+        {
+          "vars": {
+            "index": "380"
+          }
+        },
+        {
+          "vars": {
+            "index": "381"
+          }
+        },
+        {
+          "vars": {
+            "index": "382"
+          }
+        },
+        {
+          "vars": {
+            "index": "383"
+          }
+        },
+        {
+          "vars": {
+            "index": "384"
+          }
+        },
+        {
+          "vars": {
+            "index": "385"
+          }
+        },
+        {
+          "vars": {
+            "index": "386"
+          }
+        },
+        {
+          "vars": {
+            "index": "387"
+          }
+        },
+        {
+          "vars": {
+            "index": "388"
+          }
+        },
+        {
+          "vars": {
+            "index": "389"
+          }
+        },
+        {
+          "vars": {
+            "index": "390"
+          }
+        },
+        {
+          "vars": {
+            "index": "391"
+          }
+        },
+        {
+          "vars": {
+            "index": "392"
+          }
+        },
+        {
+          "vars": {
+            "index": "393"
+          }
+        },
+        {
+          "vars": {
+            "index": "394"
+          }
+        },
+        {
+          "vars": {
+            "index": "395"
+          }
+        },
+        {
+          "vars": {
+            "index": "396"
+          }
+        },
+        {
+          "vars": {
+            "index": "397"
+          }
+        },
+        {
+          "vars": {
+            "index": "398"
+          }
+        },
+        {
+          "vars": {
+            "index": "399"
+          }
+        },
+        {
+          "vars": {
+            "index": "400"
+          }
+        },
+        {
+          "vars": {
+            "index": "401"
+          }
+        },
+        {
+          "vars": {
+            "index": "402"
+          }
+        },
+        {
+          "vars": {
+            "index": "403"
+          }
+        },
+        {
+          "vars": {
+            "index": "404"
+          }
+        },
+        {
+          "vars": {
+            "index": "405"
+          }
+        },
+        {
+          "vars": {
+            "index": "406"
+          }
+        },
+        {
+          "vars": {
+            "index": "407"
+          }
+        },
+        {
+          "vars": {
+            "index": "408"
+          }
+        },
+        {
+          "vars": {
+            "index": "409"
+          }
+        },
+        {
+          "vars": {
+            "index": "410"
+          }
+        },
+        {
+          "vars": {
+            "index": "411"
+          }
+        },
+        {
+          "vars": {
+            "index": "412"
+          }
+        },
+        {
+          "vars": {
+            "index": "413"
+          }
+        },
+        {
+          "vars": {
+            "index": "414"
+          }
+        },
+        {
+          "vars": {
+            "index": "415"
+          }
+        },
+        {
+          "vars": {
+            "index": "416"
+          }
+        },
+        {
+          "vars": {
+            "index": "417"
+          }
+        },
+        {
+          "vars": {
+            "index": "418"
+          }
+        },
+        {
+          "vars": {
+            "index": "419"
+          }
+        },
+        {
+          "vars": {
+            "index": "420"
+          }
+        },
+        {
+          "vars": {
+            "index": "421"
+          }
+        },
+        {
+          "vars": {
+            "index": "422"
+          }
+        },
+        {
+          "vars": {
+            "index": "423"
+          }
+        },
+        {
+          "vars": {
+            "index": "424"
+          }
+        },
+        {
+          "vars": {
+            "index": "425"
+          }
+        },
+        {
+          "vars": {
+            "index": "426"
+          }
+        },
+        {
+          "vars": {
+            "index": "427"
+          }
+        },
+        {
+          "vars": {
+            "index": "428"
+          }
+        },
+        {
+          "vars": {
+            "index": "429"
+          }
+        },
+        {
+          "vars": {
+            "index": "430"
+          }
+        },
+        {
+          "vars": {
+            "index": "431"
+          }
+        },
+        {
+          "vars": {
+            "index": "432"
+          }
+        },
+        {
+          "vars": {
+            "index": "433"
+          }
+        },
+        {
+          "vars": {
+            "index": "434"
+          }
+        },
+        {
+          "vars": {
+            "index": "435"
+          }
+        },
+        {
+          "vars": {
+            "index": "436"
+          }
+        },
+        {
+          "vars": {
+            "index": "437"
+          }
+        },
+        {
+          "vars": {
+            "index": "438"
+          }
+        },
+        {
+          "vars": {
+            "index": "439"
+          }
+        },
+        {
+          "vars": {
+            "index": "440"
+          }
+        },
+        {
+          "vars": {
+            "index": "441"
+          }
+        },
+        {
+          "vars": {
+            "index": "442"
+          }
+        },
+        {
+          "vars": {
+            "index": "443"
+          }
+        },
+        {
+          "vars": {
+            "index": "444"
+          }
+        },
+        {
+          "vars": {
+            "index": "445"
+          }
+        },
+        {
+          "vars": {
+            "index": "446"
+          }
+        },
+        {
+          "vars": {
+            "index": "447"
+          }
+        },
+        {
+          "vars": {
+            "index": "448"
+          }
+        },
+        {
+          "vars": {
+            "index": "449"
+          }
+        },
+        {
+          "vars": {
+            "index": "450"
+          }
+        },
+        {
+          "vars": {
+            "index": "451"
+          }
+        },
+        {
+          "vars": {
+            "index": "452"
+          }
+        },
+        {
+          "vars": {
+            "index": "453"
+          }
+        },
+        {
+          "vars": {
+            "index": "454"
+          }
+        },
+        {
+          "vars": {
+            "index": "455"
+          }
+        },
+        {
+          "vars": {
+            "index": "456"
+          }
+        },
+        {
+          "vars": {
+            "index": "457"
+          }
+        },
+        {
+          "vars": {
+            "index": "458"
+          }
+        },
+        {
+          "vars": {
+            "index": "459"
+          }
+        },
+        {
+          "vars": {
+            "index": "460"
+          }
+        },
+        {
+          "vars": {
+            "index": "461"
+          }
+        },
+        {
+          "vars": {
+            "index": "462"
+          }
+        },
+        {
+          "vars": {
+            "index": "463"
+          }
+        },
+        {
+          "vars": {
+            "index": "464"
+          }
+        },
+        {
+          "vars": {
+            "index": "465"
+          }
+        },
+        {
+          "vars": {
+            "index": "466"
+          }
+        },
+        {
+          "vars": {
+            "index": "467"
+          }
+        },
+        {
+          "vars": {
+            "index": "468"
+          }
+        },
+        {
+          "vars": {
+            "index": "469"
+          }
+        },
+        {
+          "vars": {
+            "index": "470"
+          }
+        },
+        {
+          "vars": {
+            "index": "471"
+          }
+        },
+        {
+          "vars": {
+            "index": "472"
+          }
+        },
+        {
+          "vars": {
+            "index": "473"
+          }
+        },
+        {
+          "vars": {
+            "index": "474"
+          }
+        },
+        {
+          "vars": {
+            "index": "475"
+          }
+        },
+        {
+          "vars": {
+            "index": "476"
+          }
+        },
+        {
+          "vars": {
+            "index": "477"
+          }
+        },
+        {
+          "vars": {
+            "index": "478"
+          }
+        },
+        {
+          "vars": {
+            "index": "479"
+          }
+        },
+        {
+          "vars": {
+            "index": "480"
+          }
+        },
+        {
+          "vars": {
+            "index": "481"
+          }
+        },
+        {
+          "vars": {
+            "index": "482"
+          }
+        },
+        {
+          "vars": {
+            "index": "483"
+          }
+        },
+        {
+          "vars": {
+            "index": "484"
+          }
+        },
+        {
+          "vars": {
+            "index": "485"
+          }
+        },
+        {
+          "vars": {
+            "index": "486"
+          }
+        },
+        {
+          "vars": {
+            "index": "487"
+          }
+        },
+        {
+          "vars": {
+            "index": "488"
+          }
+        },
+        {
+          "vars": {
+            "index": "489"
+          }
+        },
+        {
+          "vars": {
+            "index": "490"
+          }
+        },
+        {
+          "vars": {
+            "index": "491"
+          }
+        },
+        {
+          "vars": {
+            "index": "492"
+          }
+        },
+        {
+          "vars": {
+            "index": "493"
+          }
+        },
+        {
+          "vars": {
+            "index": "494"
+          }
+        },
+        {
+          "vars": {
+            "index": "495"
+          }
+        }
+      ]
+    },
+    "stop": "all"
+  },
+  "status": "blocked",
+  "status_note": "Prepared, unleased and unlaunched. Owner authorized USD 100 total additional cloud compute on 2026-10-25; launcher access is not configured.",
+  "title": "Complete the ell=9 guessing panel"
+}
