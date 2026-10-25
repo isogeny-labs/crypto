@@ -9,7 +9,7 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
 const ASSESSMENT_DATE = "2026-10-24";
-const CATALOG_COMMIT = "0c7310ba96739ab57c35ac4e4a7654e117a854ad";
+const CATALOG_COMMIT = "17922e31b1ef00ca0f1c3cc04647b10d7f278198";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -158,7 +158,7 @@ const obligations = [
   {
     id: "catalog_generator_validation",
     description:
-      "Replay generator membership and catalog-order annihilation for all 837 linked odd-characteristic EC1 representations and the two binary triples outside the retained native batch.",
+      "Replay generator membership and catalog-order annihilation for all 859 linked odd-characteristic EC1 representations and the two binary triples outside the retained native batch.",
     status: "unknown",
   },
   {
@@ -170,7 +170,7 @@ const obligations = [
   {
     id: "catalog_wide_packaged_binary",
     description:
-      "Build and publish a standalone artifact that accepts every currently supported catalog input form, including odd-characteristic extension fields and normalized target models, then replay all 15,791 direct commands against that exact artifact.",
+      "Build and publish a standalone artifact that accepts every currently supported catalog input form, including odd-characteristic extension fields and normalized target models, then replay all 15,813 direct commands against that exact artifact.",
     status: "unknown",
   },
   {
@@ -183,12 +183,6 @@ const obligations = [
     id: "extension_descent",
     description:
       "Assess descent from each declared odd-characteristic extension field; same-declared-field cover geometry is not a descent certificate.",
-    status: "unknown",
-  },
-  {
-    id: "refresh_formula_inventory",
-    description:
-      "Regenerate jacobian-transfers.json against the current registry and preserve modeled formulas separately from transfer certificates.",
     status: "unknown",
   },
   {
@@ -540,7 +534,7 @@ const resultTemplates = {
   "subgroup.prime-generator.unknown": {
     status: "unknown",
     scope:
-      "Generator membership and [r]G=O replay for all 837 linked odd-characteristic EC1 representations.",
+      "Generator membership and [r]G=O replay for all 859 linked odd-characteristic EC1 representations.",
     rationale:
       "The current ledger binds their catalog identities but does not attach a catalog-wide native generator arithmetic replay.",
     evidence_refs: [],
@@ -875,7 +869,7 @@ async function buildSourceArtifacts() {
       "exact ICV1/EC1 input registry",
       freshness(
         "supported",
-        "the exact input registry for all 15,791 assessed map rows",
+        "the exact input registry for all 15,813 assessed map rows",
         "The digest is computed from the current file and every membership is joined through its model hash.",
         ["docs/curves/registry.json"],
       ),
@@ -885,7 +879,7 @@ async function buildSourceArtifacts() {
       "generated curve-level geometry catalog",
       freshness(
         "supported",
-        "all 15,791 current verified-over-declared-field geometry rows",
+        "all 15,813 current verified-over-declared-field geometry rows",
         "The ledger derives every map profile predicate from this exact file.",
         ["docs/curves/covers.json"],
       ),
@@ -895,7 +889,7 @@ async function buildSourceArtifacts() {
       "content-addressed ICV1/EC1/HC1/CV1 graph",
       freshness(
         "supported",
-        "15,791 exact map links, 15,789 unique cover objects, and 979 EC1 triples",
+        "15,813 exact map links, 15,811 unique cover objects, and 1001 EC1 triples",
         "The ledger records exact sorted UID memberships rather than count-only coverage.",
         ["docs/curves/cover-links.yaml"],
       ),
@@ -1040,21 +1034,20 @@ async function buildSourceArtifacts() {
     ),
     sourceArtifact(
       "docs/curves/jacobian-transfers.json",
-      "legacy formula-screen inventory; not a transfer certificate",
+      "current formula-screen inventory; not a transfer certificate",
       freshness(
-        "refuted",
-        "claim that this inventory is current for the 15,791-row registry",
-        "It pins an older registry, omits current slugs, and contains modeled routes without exact HC1/CV1 subgroup certificates.",
+        "supported",
+        "claim that this inventory is current for the 15,813-row registry",
+        "The regenerated inventory binds the current registry digest and all 15,813 slugs; modeled routes still do not supply HC1/CV1 subgroup transfer certificates.",
         [
           "docs/curves/jacobian-transfers.json",
           "docs/curves/JACOBIAN_TRANSFERS.md",
         ],
-        "refresh_formula_inventory",
       ),
     ),
     integrityArtifact(
       "docs/curves/JACOBIAN_TRANSFERS.md",
-      "legacy formula-screen documentation pinned for the stale-inventory finding",
+      "formula-screen documentation pinned for the current-inventory boundary",
     ),
     sourceArtifact(
       "docs/curves/COVERS.md",
@@ -1098,7 +1091,7 @@ async function buildSourceArtifacts() {
     ),
     integrityArtifact(
       "research/cover_transfer_assessment_20261013/README.md",
-      "source-linked catalog-wide assessment report",
+      "source-linked assessment report for the prior 15,791-model catalog snapshot",
     ),
     integrityArtifact(
       "research/cover_transfer_assessment_20261013/release_replay.txt",
@@ -1130,7 +1123,7 @@ async function buildSourceArtifacts() {
     ),
     integrityArtifact(
       "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-      "rendered catalog-wide assessment PDF",
+      "rendered assessment PDF for the prior 15,791-model catalog snapshot",
     ),
   ]);
 }
@@ -1149,15 +1142,15 @@ async function buildLedger() {
     readJson("docs/curves/covers.json"),
     readJson("docs/curves/cover-links.yaml"),
   ]);
-  assert(covers.curves.length === 15791, "unexpected covers row count");
-  assert(Object.keys(graph.maps).length === 15791, "unexpected graph map count");
-  assert(Object.keys(graph.covers).length === 15789, "unexpected graph cover count");
-  assert(graph.curves.length === 15791, "unexpected graph curve count");
+  assert(covers.curves.length === 15813, "unexpected covers row count");
+  assert(Object.keys(graph.maps).length === 15813, "unexpected graph map count");
+  assert(Object.keys(graph.covers).length === 15811, "unexpected graph cover count");
+  assert(graph.curves.length === 15813, "unexpected graph curve count");
 
   const coverRowsByModel = new Map(
     covers.curves.map((row) => [row.model_sha256, row]),
   );
-  assert(coverRowsByModel.size === 15791, "cover rows must have unique model hashes");
+  assert(coverRowsByModel.size === 15813, "cover rows must have unique model hashes");
 
   const mapMembers = new Map(
     Object.entries(profiles)
@@ -1274,16 +1267,16 @@ async function buildLedger() {
   );
   const mapCount = mapBase.reduce((sum, group) => sum + group.count, 0);
   const subgroupCount = subgroupBase.reduce((sum, group) => sum + group.count, 0);
-  assert(mapCount === 15791, `map membership count is ${mapCount}`);
-  assert(subgroupCount === 979, `subgroup membership count is ${subgroupCount}`);
-  assert(fieldBindings.size === 557, `declared-field binding count is ${fieldBindings.size}`);
-  assert(jacobianBindings.size === 15789, `Jacobian binding count is ${jacobianBindings.size}`);
-  assert(typedMapBindings.size === 15791, `typed map binding count is ${typedMapBindings.size}`);
+  assert(mapCount === 15813, `map membership count is ${mapCount}`);
+  assert(subgroupCount === 1001, `subgroup membership count is ${subgroupCount}`);
+  assert(fieldBindings.size === 579, `declared-field binding count is ${fieldBindings.size}`);
+  assert(jacobianBindings.size === 15811, `Jacobian binding count is ${jacobianBindings.size}`);
+  assert(typedMapBindings.size === 15813, `typed map binding count is ${typedMapBindings.size}`);
   const expectedMapCounts = new Map([
     ["map.binary-cubic.same-field", 165],
-    ["map.odd-prime-quadratic.direct", 14272],
+    ["map.odd-prime-quadratic.direct", 14275],
     ["map.odd-prime-quadratic.normalized", 30],
-    ["map.odd-extension-quadratic.direct", 1324],
+    ["map.odd-extension-quadratic.direct", 1343],
   ]);
   for (const group of mapBase) {
     assert(
@@ -1293,7 +1286,7 @@ async function buildLedger() {
   }
   const expectedSubgroupCounts = new Map([
     ["subgroup.binary-degree3", 142],
-    ["subgroup.odd-degree2", 837],
+    ["subgroup.odd-degree2", 859],
   ]);
   for (const group of subgroupBase) {
     assert(
@@ -1504,13 +1497,13 @@ async function buildLedger() {
       },
     ],
     coverage: {
-      catalog_maps: 15791,
-      unique_cover_models: 15789,
-      geometry_verified_maps: 15791,
-      ec1_representations: 979,
-      assessed_maps: 15791,
+      catalog_maps: 15813,
+      unique_cover_models: 15811,
+      geometry_verified_maps: 15813,
+      ec1_representations: 1001,
+      assessed_maps: 15813,
       unassessed_maps: 0,
-      assessed_subgroups: 979,
+      assessed_subgroups: 1001,
       unassessed_subgroups: 0,
       map_membership_entries: mapCount,
       subgroup_membership_entries: subgroupCount,
@@ -1555,7 +1548,7 @@ async function buildLedger() {
         control: "identity",
         assessment: freshness(
           "supported",
-          "all 15,791 map UIDs and 979 exact EC1/curve/map triples",
+          "all 15,813 map UIDs and 1001 exact EC1/curve/map triples",
           "The generator resolves exact content-addressed joins and rejects duplicates or missing rows.",
           [
             "scripts/build_cover_transfer_assessments.mjs",
@@ -1568,7 +1561,7 @@ async function buildLedger() {
         control: "geometry",
         assessment: freshness(
           "supported",
-          "all 15,791 fixed-family cover rows",
+          "all 15,813 fixed-family cover rows",
           "Native certificates cover defining identities, smoothness, genus, degree, separability, and infinity behavior.",
           ["src/bin/curve_cover_check/checker.rs", "docs/curves/covers.json"],
         ),
@@ -1627,8 +1620,8 @@ async function buildLedger() {
         control: "published_artifact",
         assessment: freshness(
           "refuted",
-          "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 15,791 current catalog models",
-          "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison classified 746 of the earlier 2,100 forms as inside the pinned source allowlist (160 binary and 586 direct prime-field) and 1,354 as outside it. That comparison has not been rerun against the expanded catalog and is not a 15,791-command artifact receipt. Current source accepts the new forms, but this artifact does not contain it.",
+          "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 15,813 current catalog models",
+          "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison classified 746 of the earlier 2,100 forms as inside the pinned source allowlist (160 binary and 586 direct prime-field) and 1,354 as outside it. That comparison has not been rerun against the expanded catalog and is not a 15,813-command artifact receipt. Current source accepts the new forms, but this artifact does not contain it.",
           [
             "research/cover_transfer_assessment_20261013/release_replay.txt",
             "src/bin/hyperelliptic_cover.rs#every_current_catalog_model_reaches_the_standalone_constructor",
@@ -1686,9 +1679,9 @@ async function buildLedger() {
     ],
     exploration_boundary: [
       "No search for production targets, private keys, or discrete logarithms was performed.",
-      "All 15,791 map rows and all 979 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
+      "All 15,813 map rows and all 1001 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
       "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
-      "The 15,626 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
+      "The 15,648 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
       "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
       "Formula-screen outputs in jacobian-transfers.json were not promoted to executable or measured claims.",
       "A full cover-integrated Jacobian index-calculus solver, relation collection, linear algebra, and target decomposition remain a separate deliverable. The bounded odd-prime one-infinity solver library is outside these catalog-cover paths.",
