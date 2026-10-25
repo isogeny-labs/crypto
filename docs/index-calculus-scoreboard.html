@@ -1873,7 +1873,10 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
   var NS = 'http://www.w3.org/2000/svg';
   function mk(n, a, parent) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); if (parent) parent.appendChild(e); return e; }
   function day(s) { return Date.UTC(+s.slice(0,4), +s.slice(5,7)-1, +s.slice(8,10)) / 864e5; }
-  var t0 = day('2026-09-14'), t1 = day('2026-10-07');
+  var t0 = day('2026-09-14');
+  var t1 = Math.max(day('2026-10-07'), ...D.series.flatMap(function (s) {
+    return s.points.map(function (p) { return day(p.date); });
+  })) + 2;
   var W = 760, Hh = 360, L = 52, R = 18, T = 14, B = 44;
   var yMin = Math.log10(0.0001), yMax = Math.log10(30000);
   function X(t) { return L + (t - t0) / (t1 - t0) * (W - L - R); }
@@ -1884,10 +1887,11 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
     var tx = mk('text', { x: L - 8, y: Y(v) + 4, 'class': 'tick', 'text-anchor': 'end' }, svg); tx.textContent = v + '×';
   });
   var bl = mk('text', { x: L + 6, y: Y(1) - 7, 'class': 'barrier-label', 'text-anchor': 'start' }, svg); bl.textContent = 'rho, matched reference = 1';
-  ['2026-09-14','2026-09-21','2026-09-28','2026-10-05','2026-10-07'].forEach(function (s) {
-    var x = X(day(s)); mk('line', { x1: x, x2: x, y1: Hh - B, y2: Hh - B + 5, 'class': 'grid' }, svg);
-    var tx = mk('text', { x: x, y: Hh - B + 18, 'class': 'tick', 'text-anchor': 'middle' }, svg); tx.textContent = s.slice(5).replace('-', ' ').replace('09 ', 'Sep ').replace('10 ', 'Oct ');
-  });
+  for (var tickDay = t0; tickDay <= t1; tickDay += 7) {
+    var x = X(tickDay); mk('line', { x1: x, x2: x, y1: Hh - B, y2: Hh - B + 5, 'class': 'grid' }, svg);
+    var tx = mk('text', { x: x, y: Hh - B + 18, 'class': 'tick', 'text-anchor': 'middle' }, svg);
+    tx.textContent = new Date(tickDay * 864e5).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+  }
   var yl = mk('text', { x: L - 40, y: T + 6, 'class': 'tick', 'text-anchor': 'start' }, svg); yl.textContent = 'IC / rho';
   var all = [];
   D.series.forEach(function (ser) {

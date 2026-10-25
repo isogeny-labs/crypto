@@ -64,10 +64,19 @@
     if (c.field.degree > 1) return "GF(p^" + c.field.degree + ") = GF(p)[t]/(" + extensionModulus(c.field.modulus) + "), p = " + c.field.p + "; coefficients listed over 1, t, …, t^" + (c.field.degree - 1);
     return "GF(p), p = " + c.field.p + " (" + c.field.bits + " bits)";
   }
+  function bestRow(c) {
+    var rows = (c.leaderboard || []).filter(function (b) {
+      return b.regime !== "koblitz_batch" && b.verified && typeof b.ratio_rho === "number";
+    });
+    rows.sort(function (a, b) { return a.ratio_rho - b.ratio_rho; });
+    return rows[0] || null;
+  }
   function bestRatio(c) {
-    var vals = (c.leaderboard || []).filter(function (b) { return b.regime !== "koblitz_batch"; })
-      .map(function (b) { return b.ratio_rho; }).filter(function (v) { return typeof v === "number"; });
-    return vals.length ? Math.min.apply(null, vals) : null;
+    var row = bestRow(c);
+    return row ? row.ratio_rho : null;
+  }
+  function opsCell(log2) {
+    return el("td", { class: "n", text: typeof log2 === "number" ? "2^" + fmt(log2, 2) + " GAE" : "–" });
   }
   function parseHash() {
     var h = location.hash.replace(/^#/, "") || "curves";
@@ -178,7 +187,8 @@
   function curvesView(q) {
     var head = el("div", null, [
       el("h1", { text: "Curves" }),
-      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. Cover certificates are available for " + DATA.counts.cover_assessed + "; the other " + DATA.counts.cover_unassessed + " models remain unassessed in the frozen cover catalog. Search by name or identity, filter by family, field, trace, order, subgroup and what has been measured on it. Click a slug for its full record and everything that cites it. This catalog filters the recorded endomorphism discriminant. Volcano conductors require a certified endomorphism order; missing order data is not a conductor assignment." })
+      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. The lowest cold one-target ratio in the ranked leaderboard subset identifies a base and recipe for each measured curve; later studies also appear in the progress timeline. IC/rho = 1.0× is parity; larger means IC costs more. Absolute 2^x GAE is shown only for counted whole-pipeline rows. Cover certificates are available for " + DATA.counts.cover_assessed + "; the other " + DATA.counts.cover_unassessed + " models remain unassessed in the frozen cover catalog. Search by identity and filter by field or measurement. Click a slug for its full record. Volcano conductors require a certified endomorphism order; missing order data is not a conductor assignment." }),
+      el("p", { class: "note" }, ["Progress by merge date: ", link("../scoreboard/#lab-progress", "full IC/rho timeline"), "."])
     ]);
     var f = el("form", { class: "filters" });
     function input(name, label, type, extra) {
@@ -210,7 +220,7 @@
       f.appendChild(el("label", { class: "check" }, [inp, label]));
       return inp;
     }
-    var text = input("q", "Search slug, ICV1, EC1, standard or retired name", "search", { wide: true, placeholder: "e.g. ECC2K-130, f2m41, sect163k1, k0n31, EC1N7C…" });
+    var text = input("q", "Search ICV1 slug, EC1, standard or retired alias", "search", { wide: true, placeholder: "e.g. icv1-f2m83-tm6151469093347-debefd74, ECC2K-130, EC1N7C…" });
     var family = select("family", "Family", [["", "any"], ["koblitz", "Koblitz"], ["binary", "random binary"], ["prime", "prime field"], ["subfield", "subfield"]]);
     var ch = select("char", "Characteristic", [["", "any"], ["2", "2"], ["p", "p (prime field)"]]);
     var deg = range("bits", "Field bits (degree m, or bits of p)");
@@ -285,7 +295,13 @@
           return tdText(cert ? "genus " + cert.genus + ", degree " + cert.degree :
             (c.hyperelliptic_cover ? "unresolved" : "not assessed"));
         } },
-        { key: "best", label: "Cold one-target IC / rho", numeric: true, sort: bestRatio, cell: function (c) { return ratioCell(bestRatio(c)); } },
+        { key: "base", label: "Ranked factor base", sort: function (c) { var b = bestRow(c); return b ? b.best_base_points : null; }, cell: function (c) {
+          var b = bestRow(c);
+          return tdText(b ? "|F|=" + b.best_base_points + " · " + b.best_recipe : "–", "wrap");
+        } },
+        { key: "ic_ops", label: "IC operations", numeric: true, sort: function (c) { var b = bestRow(c); return b ? b.log2_ic_gae : null; }, cell: function (c) { var b = bestRow(c); return opsCell(b && b.log2_ic_gae); } },
+        { key: "rho_ops", label: "rho operations", numeric: true, sort: function (c) { var b = bestRow(c); return b ? b.log2_rho_gae : null; }, cell: function (c) { var b = bestRow(c); return opsCell(b && b.log2_rho_gae); } },
+        { key: "best", label: "Ranked cold IC / rho", numeric: true, sort: bestRatio, cell: function (c) { return ratioCell(bestRatio(c)); } },
         { key: "measured", label: "Cited by", sort: function (c) { return c.ecbench.length + c.tournament_cells.length + (c.on_leaderboard ? 1 : 0); }, cell: function (c) {
           var items = [];
           if (c.on_leaderboard) items.push(chip("leaderboard", "ok"));
@@ -385,14 +401,20 @@
 
     view.appendChild(el("h2", { text: "On the leaderboard" }));
     if (c.leaderboard.length) {
+      view.appendChild(el("p", { class: "note" }, ["Ranked factor base is the base of the lowest verified cold one-target IC/rho row in this leaderboard subset. Later studies are retained in the timeline. 1.0× is parity. GAE counts are available only where the frozen whole-pipeline record counted them. See ", link("../scoreboard/#lab-progress", "progress over time"), "."]));
       view.appendChild(table([
         { key: "regime", label: "Regime" },
         { key: "log2_r", label: "log₂ r", numeric: true, digits: 2 },
         { key: "best_recipe", label: "Best recipe", cell: function (b) { return tdText(fmt(b.best_recipe), "mono"); } },
+        { key: "best_base_points", label: "Base |F|", numeric: true },
+        { key: "best_base_columns", label: "Columns", numeric: true },
+        { key: "log2_ic_gae", label: "IC operations", numeric: true, cell: function (b) { return opsCell(b.log2_ic_gae); } },
+        { key: "log2_rho_gae", label: "rho operations", numeric: true, cell: function (b) { return opsCell(b.log2_rho_gae); } },
         { key: "best_s", label: "S", numeric: true, digits: 3 },
         { key: "ratio_rho", label: "IC / rho", numeric: true, cell: function (b) { return ratioCell(b.ratio_rho); } },
         { key: "ratio_floor", label: "IC / floor", numeric: true, cell: function (b) { return ratioCell(b.ratio_floor); } },
-        { key: "reference", label: "Reference", cell: function (b) { return tdText(fmt(b.reference), "wrap"); } }
+        { key: "reference", label: "Reference", cell: function (b) { return tdText(fmt(b.reference), "wrap"); } },
+        { key: "best_base_source", label: "Frozen source", cell: function (b) { return el("td", null, [repoLink(b.best_base_source, "record")]); } }
       ], c.leaderboard));
       view.appendChild(el("p", { class: "note" }, ["Quoted from ", repoLink("docs/ic/leaderboard.json"), "; drawn on the ", link("../scoreboard/ic-leaderboard.html", "leaderboard page"), "."]));
     } else view.appendChild(el("p", { class: "note", text: "No whole-pipeline index-calculus row on the leaderboard for this curve." }));
