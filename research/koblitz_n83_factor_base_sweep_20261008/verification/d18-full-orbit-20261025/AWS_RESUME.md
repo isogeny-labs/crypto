@@ -145,6 +145,11 @@ one public natural query only if that gate passes. It uploads source, image,
 S3, cgroup, stage and audit receipts on every terminal path. Its run status
 must be checked live; a queued dispatch or a completed constructed control
 does not establish natural yield or a runtime winner.
+[Run 40220890684](https://github.com/aburan28/crypto/actions/runs/40220890684)
+was accepted from exact source/protocol commit
+`2b7b04e1d613debe9d71c6403afba09ac3d9b289` and initially queued.
+Inspect that run's current provider jobs and artifact before interpreting an
+outcome or retrying; subsequent documentation commits are not its source.
 
 That gate adds an opt-in `primary-full-d18-m4 positive|natural` worker with
 hard resource checks, durable phase/shape records, SAT-model verification,
