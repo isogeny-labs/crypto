@@ -162,7 +162,13 @@ the [next-step plan](../research/twist_index_calculus_20261020/zero_fiber_collec
   `../research/twist_index_calculus_20261020/zero_fiber_collector/results/lean-selftest-sparse-v1/`.
   The proposed selftest-only sparse checkout retains the exact
   `tools/lean/` input closure, pinned toolchain and all positive/negative
-  expectations. Local verification and new-head CI are separate gates;
+  expectations. The full unchanged seven-fixture suite now passes from
+  that exact subtree with explicit single-thread Lean calls under the
+  same 8 GiB / 1,200-second envelope; both positives and all five negative
+  reasons match. The interrupted first local attempt and its retained
+  thread-creation failure remain separate. See the
+  [complete local validation](../research/twist_index_calculus_20261020/zero_fiber_collector/results/lean-selftest-sparse-v2/README.md).
+  Local verification and new-head CI are separate gates;
   a resource failure is not a proof verdict or permission to bypass them.
 - **Complete bounded degree/closure diagnostic:** all twelve rows and 24
   producers, twelve audits/parities, native reducer and final seals pass,

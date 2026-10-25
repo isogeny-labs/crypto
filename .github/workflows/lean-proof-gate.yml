@@ -43,6 +43,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The gate's fixtures need only this subtree. A full research
+          # checkout can exhaust disk before the Lean toolchain extracts.
+          sparse-checkout: /tools/lean/
+          sparse-checkout-cone-mode: false
       - name: Install elan
         run: |
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain "$(cat tools/lean/lean-toolchain)"
