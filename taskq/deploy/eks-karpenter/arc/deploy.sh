@@ -15,6 +15,7 @@ kubectl -n arc-runners get secret arc-github-auth >/dev/null || {
   exit 1
 }
 
+kubectl apply -f ../spot-only-policy.yaml
 kubectl apply -f nodepool.yaml
 kubectl wait --for=condition=Ready ec2nodeclass/gha --timeout=5m
 kubectl wait --for=condition=Ready nodepool/gha-on-demand --timeout=5m
