@@ -14,7 +14,6 @@ from research.n83_nearby_grid_tier1_20261024 import protocol as fixture
 HERE = Path(__file__).resolve().parent
 BASE_IDENTITIES = run.ROOT / "research/n83_nearby_full_grid_20261024/identities"
 SOURCE_COMMIT = "08e1ef3aa4426eb7670436405f7f1f4ca0e95419"
-PREFIX = "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0h"
 
 
 def canonical(value):
@@ -25,6 +24,10 @@ def canonical(value):
 def named_candidate(base, arm):
     record = copy.deepcopy(base)
     record.pop("candidate_id")
+    columns = record["factor_base"]["effective_columns"]
+    points = record["factor_base"]["actual_usable_points"]
+    if columns <= 512 or points != 166 * columns:
+        raise ValueError("factor base is outside the frozen split-index class")
     record["implementation"]["source_commit"] = SOURCE_COMMIT
     record["implementation"]["source_sha256"]["ic"] = run.SOURCE_SHA256
     record["implementation"]["algorithm_flags"] = dict(run.FLAGS)
@@ -40,7 +43,7 @@ def named_candidate(base, arm):
         "sidecar_fingerprint_bits": 8 if arm == "fp8" else 0,
         "sidecar_bytes_per_slot": 1 if arm == "fp8" else 0,
         "state_id_rule": "relative_to_primary_or_extension_segment",
-        "primary_segment_columns": 512, "extension_segment_columns": 595,
+        "primary_segment_columns": 512, "extension_segment_columns": columns - 512,
         "request_rule": "ceil_five_times_segment_states_over_four_then_two_power_of_two_slots",
         "duplicate_policy": "first_inserted_exact_root_wins_primary_before_extension",
         "empty_marker": "zero_packed_word",
@@ -53,7 +56,8 @@ def named_candidate(base, arm):
     for section in ("relation_collection", "relation_linear_algebra", "target_descent"):
         record[section]["source_digest"] = run.SOURCE_SHA256
     digest = hashlib.sha256(canonical(record)).hexdigest()[:12]
-    record["candidate_id"] = PREFIX + digest
+    record["candidate_id"] = (
+        f"IC1N83Ckb1a1fb{points}PDP4rootRCguidedLAgaussTDdirectISO0h{digest}")
     return record
 
 
