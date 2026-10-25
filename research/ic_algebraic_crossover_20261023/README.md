@@ -59,17 +59,31 @@ they are retained and excluded from the successful process counts.
 
 A [separate curve-membership audit](reports/run-fixture-group-audit-20261025/report.pdf)
 checks every y root by substitution and an independent trace criterion.
-Original UNSAT draw 5 and SAT draw 4 are not liftable on the recorded E0
-curve; draw 0 is liftable. These remain valid Boolean fixtures, but not all
-are ordinary curve queries. Target and base subgroup membership remain
+Original UNSAT draw 5 and SAT draw 4 are not liftable on this campaign's E0
+reference curve; draw 0 is liftable. These x-only fixtures do not specify
+the full curve coefficient a. S3 at b=1 is independent of a, so nonliftability
+on E0 does not imply invalidity on every such curve or twist. Target and base subgroup membership remain
 unknown. The [native receipt](pipeline-receipts/fixture-group-audit-20261025/receipt.json)
 retains both positive and negative outcomes.
 
-The [200,000-column continuation](GUESS_CAP200K_PROTOCOL.md) is queued
-locally after the current quartic/HKY process. Its 116 branch attempts
-cover the remaining balanced k=0--4 cells with the same 12-GiB/900-second
-limits. This is a queued local process, not a completed result or a cloud
-allocation. The earlier capped attempts remain unchanged and inconclusive.
+The [fresh-target audit](reports/run-fresh-target-relevance-20261025/report.pdf)
+extends this reference-model check to all 1,152 frozen targets. SAT draws
+split into 154 E0-liftable and 176 nonliftable; UNSAT draws into 434 and 388.
+Every y-root satisfies the curve equation and an independent trace criterion
+agrees for every target; a native rerun is byte-identical. These remain
+uniform field-x Boolean fixtures, not established ordinary subgroup queries.
+Their exact inputs, all outcomes and unknown subgroup membership are retained
+in the [native receipt](pipeline-receipts/fresh-target-relevance-20261025/receipt.json).
+
+The [200,000-column continuation](GUESS_CAP200K_PROTOCOL.md) is running
+locally after completion of the quartic/HKY queue. Its first probe observes
+a degree-four refutation on original draw 6 with **zero guesses**, 179,447
+columns and 1,548,633,051,630 solver-word operations. Independent solver/cost
+replay of this cell is outstanding. The [pilot report](reports/run-guess-zero-draw6-20261025/report.pdf)
+keeps its scope separate from draw 0 and from ordinary subgroup queries.
+The full 116-attempt balanced k=0--4 continuation retains the same
+12-GiB/900-second limits. Later cells remain a live campaign; the earlier
+140k-cap refusals are preserved and remain inconclusive as those attempts.
 
 Exact independent fixture counting reproduces `0,6,6,0,18,0,0`, with
 checked Boolean witnesses for all three SAT controls. Small controls
@@ -121,13 +135,32 @@ There is no robust complete-price gain over the existing references.
 
 The [pricing-audit PDF](reports/run-pricing-audit-20261025/report.pdf)
 documents the native reconstruction and its byte-identical reproduction.
-The quartic smoke has 24/24 verified records at m=6,8,10,12; its complete
-scalar replay is still running in this snapshot. Canonical `ecbench band`
+The [quartic smoke](reports/run-quartic-smoke-20261025-02/report.pdf) has
+24/24 verified records at m=6,8,10,12 and 24/24 identical independent
+deterministic replays, with zero audit problems. Canonical `ecbench band`
 refuses its constructed curve slugs because the virtual calibration rows
 are absent from the global table. The audit reproduces those deterministic
 count conventions without changing the table and separately labels an
 additional scenario that varies counted Fq solver work. Neither scenario
 is hardware calibration or an algorithmic gain.
+
+Ten [n13 instruction profiles](reports/run-instruction-profiles-n13-20261025-01/report.pdf)
+reproduce all recovered scalars and integer native counters. The two-target
+whole-solve Callgrind counts are about 0.38--0.39 million for strong rho,
+0.97--3.44 billion for direct S4, 0.52--1.89 billion for symmetric S4 and
+28.6--29.8 million for generic MITM. Both rho repeats have identical counts.
+These are implementation instructions under Valgrind's allocator; real
+allocator work and physical throughput are absent. IC online intervals lack
+markers and remain null. Four rho rows have one-ULP serialized price
+differences under the explicitly recorded tolerance. This diagnostic does
+not repair complete native-price accounting or establish a runtime speedup.
+
+The [N=58/60/100 probes](reports/run-hky-probes-20261025/report.pdf) all
+saturate without refuting at degrees two and three. Dense N=58/60 allocate
+unsuccessfully at degree four under the local limit; sparse N=100 reaches
+25 million entries after admitting an implicit 4,087,976-column universe.
+All three degree-four verdicts remain unknown. These are fixed Boolean
+fixtures over n=10 or 15, not curves with 58--100-bit subgroup security.
 
 Quartic IC remains separate over GF((2^m)^4), requiring its proper
 intermediate field. The historical single-target m=14 gap near 4.3 times
@@ -162,14 +195,14 @@ preserves all generated scripts, package hashes, outputs and statuses.
 | A1: independent structural replay | partial | exact original fixtures and small equations/roots checked; upstream large fall-degree panel not fully replayed |
 | A2: native structured bases and symmetric formulation | verified, finite pilot | Rust implementations, all four families, identity/splitting/repeated-root controls; limits in PIPELINE.md |
 | A3: combine formulations and closure | verified, finite stage panel | three matched panels above; no whole-query performance conclusion |
-| B1: ell=8 minimum guesses | partial | all eight balanced k=3 draw-0 branches fail; 116 remaining balanced branch attempts queued at cap 200k; alternative sets and finite-query relevance remain |
-| B2: ell=9 and four summands | implemented, unverified | 1,152 fresh fixtures across nine cells/four families, frozen selection and remote shards; no larger-guess result yet |
-| B3: N=58/60/100 continuation | implemented, unverified | u128/sparse engines and exact fixtures; fixed-point measurements outstanding |
-| C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified records; all-record scalar replay running; m=14/15 full panels outstanding |
+| B1: ell=8 minimum guesses | partial | draw 6 refutes with zero guesses at cap 200k; all eight balanced k=3 draw-0 branches fail; remaining branches, alternative sets and independent pilot replay remain |
+| B2: ell=9 and four summands | implemented, unverified | 1,152 fresh fixtures and reference-curve target audit; frozen selection and remote shards; no larger-guess or ordinary-subgroup-query result yet |
+| B3: N=58/60/100 continuation | partial | degree-two/three nonrefuting fixed points on three fixtures; all degree-four results resource-capped; independent large fixed-point certificates remain |
+| C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified and identically replayed records; m=14/15 full panels outstanding |
 | C2: m=14--18 ladder | blocked in part | supported rungs outstanding; m=16--18 need wider arithmetic |
-| C3: complete method and full native price | partial | n=13 complete-answer replay, other smoke outcomes retained; construction/split counts and qualified comparison missing |
+| C3: complete method and full native price | partial | n13/n23 answer replay and ten n13 instruction profiles; construction/split counters, native allocator/physical costs and qualified comparison missing |
 | D1: external/hardware controls | partial | all 44 same-input Singular correctness checks agree on 22 cases; fastest-tool performance and actual hardware comparisons remain |
-| D2: durable evidence and PR | partial | source/protocol/raw archive/native validator/visual PDFs provided; wider campaign remains open |
+| D2: durable evidence and PR | partial, publication blocked | earlier PR is ready/open; new local evidence and inspected PDFs prepared; broader publication approval and artifact-store upload/readback remain |
 
 [Cost/scaling problem](../../problems/ic-low-degree-complete-cost-and-scaling.md)
 and the four `XP-20261023-*` backlog cards preserve unresolved obligations.
