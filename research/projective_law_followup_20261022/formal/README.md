@@ -23,6 +23,12 @@ the [exact-kernel packet](WEIGHTED_PROJ_KERNEL.md) proves equality with that
 principal ideal and an ordinary affine-algebra equivalence. Its [PDF](WEIGHTED_PROJ_KERNEL.pdf),
 [graph](weighted-proj-kernel.svg), and [CSV](weighted-proj-kernel.csv) keep the
 graded quotient and localized degree-zero `Proj` chart open.
+The [componentwise quotient packet](weighted-proj-components/README.md)
+checks finite weighted-homogeneous lifts and equality degree by degree in
+pinned Lean. Its [PDF](weighted-proj-components/REPORT.pdf),
+[graph](weighted-proj-components/componentwise-dependencies.svg), and
+[CSV](weighted-proj-components/componentwise-status.csv) mark construction of
+the quotient `GradedRing` and localized degree-zero chart as open.
 
 ## Pinned environment
 

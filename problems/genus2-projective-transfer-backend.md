@@ -139,6 +139,13 @@ for arbitrary inputs.
   report standard axioms only. This ordinary quotient result does not
   identify the degree-zero localization in weighted `Proj`, prove its chart
   cover, or supply smooth-projective/`Pic⁰` transport.
+- **Mechanized, 2026-10-25 componentwise quotient:** A bounded
+  [pinned Lean packet](../research/projective_law_followup_20261022/formal/weighted-proj-components/README.md)
+  proves every ordinary sextic quotient class has a finite sum of
+  weighted-homogeneous lifts and equality of classes is equivalent to
+  equality in every weighted degree. It supplies a descent prerequisite for
+  the graded quotient; the `GradedRing` instance, `HomogeneousLocalization.Away`
+  identification, and `Proj` chart still have no theorem.
 - **Finite source-bound check, 2026-10-25:** One smooth `F17` 2-torsion
   fixture makes both the pinned author public dispatcher and compiled Rust
   dispatcher return identity, matching Cantor. A direct author doubling
