@@ -19,6 +19,13 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   sides. Its [certificate](coefficient-slice.json), [CSV](coefficient-slice.csv),
   [graph](coefficient-slice.svg), and [PDF](COEFFICIENT_SLICE.pdf) are reviewable
   separately. This check covers only those seven expressions.
+- The [cross-scaling packet](CROSS_SCALE22.md) compares the eight power
+  intermediates, eight weighted common-branch input expressions, and seven
+  composed coefficients with their Lean definitions. Its kernel-checked theorem proves the common
+  `Z=z1*z2`, `W=w1*w2` weights when the weighted numerator equations hold.
+  The packet includes a [certificate](cross-scale22.json),
+  [CSV](cross-scale22.csv), [graph](cross-scale22.svg), and
+  [PDF](CROSS_SCALE22.pdf); it does not prove the returned Jacobian class.
 - `branch-coverage.json` gives the standardized runtime-label, Lean
   constructor, certificate-schema mapping and lists the five rejected or
   exceptional labels separately.
@@ -77,7 +84,7 @@ does not expose that variable.
 those accepted Lean/Mathlib foundations.  The mapping theorem and the explicit
 bridge implication use no axioms.
 
-`verify.py` also runs the coefficient-slice checker in read-only mode; a stale
+`verify.py` also runs both source-derived checkers in read-only mode; a stale
 or altered certificate fails verification. It requires exactly four distinct Rust functions and their exact Lean
 declaration sets, parses declarations after removing nested comments and
 strings, and cross-checks the status count, schema, binding kind, and audited

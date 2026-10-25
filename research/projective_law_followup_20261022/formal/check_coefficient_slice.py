@@ -48,22 +48,29 @@ def mul(left: dict, right: dict) -> dict:
     return {m: c for m, c in out.items() if c}
 
 
-def evaluate(node: ast.AST, environment: dict[str, dict], *, rust: bool) -> dict:
+def evaluate(
+    node: ast.AST,
+    environment: dict[str, dict],
+    *,
+    rust: bool,
+    variables: tuple[str, ...] = VARIABLES,
+    rename: dict[str, str] = SOURCE_RENAME,
+) -> dict:
     if not rust and isinstance(node, ast.Attribute):
-        if isinstance(node.value, ast.Name) and node.value.id == "i" and node.attr in VARIABLES:
-            return {(node.attr,): 1}
+        if isinstance(node.value, ast.Name) and node.value.id == "i" and node.attr in variables:
+            return environment.get(node.attr, {(node.attr,): 1})
         fail(f"unsupported Lean projection: {ast.dump(node)}")
     if isinstance(node, ast.Name):
-        name = SOURCE_RENAME.get(node.id, node.id) if rust else node.id
+        name = rename.get(node.id, node.id) if rust else node.id
         if name in environment:
             return environment[name]
-        if name in VARIABLES:
+        if name in variables:
             return {(name,): 1}
         fail(f"unknown variable: {name}")
     if isinstance(node, ast.Constant) and type(node.value) is int:
         return {(): node.value} if node.value else {}
     if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
-        return mul({(): -1}, evaluate(node.operand, environment, rust=rust))
+        return mul({(): -1}, evaluate(node.operand, environment, rust=rust, variables=variables, rename=rename))
     if rust and isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
         if not isinstance(node.func.value, ast.Name) or node.func.value.id != "f":
             fail("unsupported Rust receiver")
@@ -73,19 +80,19 @@ def evaluate(node: ast.AST, environment: dict[str, dict], *, rust: bool) -> dict
         required = 1 if operation == "sq" else 2
         if len(node.args) != required:
             fail(f"wrong arity: {operation}")
-        values = [evaluate(arg, environment, rust=True) for arg in node.args]
+        values = [evaluate(arg, environment, rust=True, variables=variables, rename=rename) for arg in node.args]
         if operation == "add":
             return add(*values)
         if operation == "sub":
             return add(values[0], values[1], -1)
         return mul(values[0], values[0] if operation == "sq" else values[1])
     if not rust and isinstance(node, ast.BinOp):
-        left = evaluate(node.left, environment, rust=False)
+        left = evaluate(node.left, environment, rust=False, variables=variables, rename=rename)
         if isinstance(node.op, ast.Pow):
             if not isinstance(node.right, ast.Constant) or type(node.right.value) is not int or node.right.value != 2:
                 fail("only square powers are supported")
             return mul(left, left)
-        right = evaluate(node.right, environment, rust=False)
+        right = evaluate(node.right, environment, rust=False, variables=variables, rename=rename)
         if isinstance(node.op, ast.Add):
             return add(left, right)
         if isinstance(node.op, ast.Sub):

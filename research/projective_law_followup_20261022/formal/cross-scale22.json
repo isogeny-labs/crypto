@@ -1,0 +1,913 @@
+{
+  "schema": "projective-law-cross-scale22/v1",
+  "scope": "eight power intermediates, eight cross-scaled inputs, seven composed coefficients; no returned Jacobian-class proof",
+  "rust_source_sha256": "5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0",
+  "lean_source_sha256": "e4a95f83fe1ab100509545b1a7d6d64b5605a2a8fcc425d8df12030afa83572b",
+  "lean_coefficient_source_sha256": "998a68152efb48c1a77bfbb82ed22a8c7d9c9910f1177ce159589e6c1e6cab79",
+  "rows": [
+    {
+      "rust": "z1_2",
+      "lean": "z1_2",
+      "kind": "power_intermediate",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "z1",
+            "z1"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "z2_2",
+      "lean": "z2_2",
+      "kind": "power_intermediate",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "z1_3",
+      "lean": "z1_3",
+      "kind": "power_intermediate",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "z2_3",
+      "lean": "z2_3",
+      "kind": "power_intermediate",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "z1_4",
+      "lean": "z1_4",
+      "kind": "power_intermediate",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "z2_4",
+      "lean": "z2_4",
+      "kind": "power_intermediate",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "z1_5",
+      "lean": "z1_5",
+      "kind": "power_intermediate",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "z2_5",
+      "lean": "z2_5",
+      "kind": "power_intermediate",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "q1c",
+      "lean": "q1c",
+      "kind": "cross_input",
+      "z_power": 2,
+      "w_power": 0,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "q1",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "q2c",
+      "lean": "q2c",
+      "kind": "cross_input",
+      "z_power": 2,
+      "w_power": 0,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "q2",
+            "z1",
+            "z1"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "r1c",
+      "lean": "r1c",
+      "kind": "cross_input",
+      "z_power": 4,
+      "w_power": 0,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "r1",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "r2c",
+      "lean": "r2c",
+      "kind": "cross_input",
+      "z_power": 4,
+      "w_power": 0,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "r2",
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "s1c",
+      "lean": "s1c",
+      "kind": "cross_input",
+      "z_power": 3,
+      "w_power": 1,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "s1",
+            "w2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "s2c",
+      "lean": "s2c",
+      "kind": "cross_input",
+      "z_power": 3,
+      "w_power": 1,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "s2",
+            "w1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "t1c",
+      "lean": "t1c",
+      "kind": "cross_input",
+      "z_power": 5,
+      "w_power": 1,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "t1",
+            "w2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "t2c",
+      "lean": "t2c",
+      "kind": "cross_input",
+      "z_power": 5,
+      "w_power": 1,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "t2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": 1
+        }
+      ]
+    },
+    {
+      "rust": "dq",
+      "lean": "dq",
+      "kind": "composed_coefficient",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "q1",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q2",
+            "z1",
+            "z1"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "dr",
+      "lean": "dr",
+      "kind": "composed_coefficient",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "r1",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r2",
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "ds",
+      "lean": "ds",
+      "kind": "composed_coefficient",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "s1",
+            "w2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "s2",
+            "w1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "dt",
+      "lean": "dt",
+      "kind": "composed_coefficient",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "t1",
+            "w2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "t2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "bcoef",
+      "lean": "B",
+      "kind": "composed_coefficient",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "q1",
+            "q1",
+            "r2",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q1",
+            "q2",
+            "r1",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q1",
+            "q2",
+            "r2",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q2",
+            "q2",
+            "r1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "r1",
+            "r1",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "r1",
+            "r2",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 2
+        },
+        {
+          "variables": [
+            "r2",
+            "r2",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "acoef",
+      "lean": "A",
+      "kind": "composed_coefficient",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "q1",
+            "q2",
+            "t1",
+            "w2",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q1",
+            "q2",
+            "t2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q1",
+            "r2",
+            "s1",
+            "w2",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q1",
+            "r2",
+            "s2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q2",
+            "q2",
+            "t1",
+            "w2",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q2",
+            "q2",
+            "t2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q2",
+            "r2",
+            "s1",
+            "w2",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q2",
+            "r2",
+            "s2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "r1",
+            "t1",
+            "w2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "r1",
+            "t2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r2",
+            "t1",
+            "w2",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r2",
+            "t2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "ccoef",
+      "lean": "C",
+      "kind": "composed_coefficient",
+      "z_power": null,
+      "w_power": null,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "q1",
+            "t1",
+            "w2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q1",
+            "t2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q2",
+            "t1",
+            "w2",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q2",
+            "t2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r1",
+            "s1",
+            "w2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "r1",
+            "s2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r2",
+            "s1",
+            "w2",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z2",
+            "z2",
+            "z2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r2",
+            "s2",
+            "w1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1",
+            "z1"
+          ],
+          "coefficient": -1
+        }
+      ]
+    }
+  ],
+  "negative_checks": [
+    "Rust z2_3 mul-to-add rejected",
+    "Lean z2_3 mul-to-add rejected",
+    "Rust composed B sub-to-add rejected"
+  ]
+}

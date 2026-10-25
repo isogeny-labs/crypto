@@ -343,14 +343,45 @@ def main() -> None:
     runtime_bindings = json.loads((ROOT / "runtime-bindings.json").read_text())
     validate_runtime_bindings(runtime_bindings, runtime_bytes, declarations)
     negative_checks = run_negative_self_tests(runtime_bindings, runtime_bytes, declarations)
+    forbidden_proof_token = re.compile(r"(?m)\b(?:sorry|admit)\b|^\s*axiom\b")
     subprocess.run(
         [sys.executable, str(ROOT / "check_coefficient_slice.py"), "--check"],
         check=True,
         capture_output=True,
         text=True,
     )
+    subprocess.run(
+        [sys.executable, str(ROOT / "check_cross_scale22.py"), "--check"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    cross_source = (ROOT / "CrossScale22.lean").read_text()
+    require(
+        re.search(r"(?m)^theorem crossScale22_represents_affine\b", cross_source) is not None,
+        "cross-scale theorem missing",
+    )
+    require(forbidden_proof_token.search(cross_source) is None,
+            "forbidden cross-scale proof token")
+    cross_log = (ROOT / "cross-scale22-build.log").read_text()
+    require(
+        "'CrossScale22.crossScale22_represents_affine' depends on axioms: [propext]" in cross_log,
+        "cross-scale kernel/axiom receipt missing",
+    )
+    cross_cert = json.loads((ROOT / "cross-scale22.json").read_text())
+    require(cross_cert["schema"] == "projective-law-cross-scale22/v1", "cross-scale schema mismatch")
+    require(len(cross_cert["rows"]) == 23, "cross-scale row count mismatch")
+    require(sum(row["kind"] == "cross_input" for row in cross_cert["rows"]) == 8,
+            "cross-scale input row count mismatch")
+    require(sum(row["kind"] == "composed_coefficient" for row in cross_cert["rows"]) == 7,
+            "cross-scale composed row count mismatch")
+    require(all(row["equal"] is True for row in cross_cert["rows"]), "cross-scale equality failure")
+    for artifact in ("CROSS_SCALE22.md", "CROSS_SCALE22.pdf", "cross-scale22.csv", "cross-scale22.svg"):
+        require((ROOT / artifact).is_file() and (ROOT / artifact).stat().st_size > 0,
+                f"missing cross-scale artifact: {artifact}")
+    require((ROOT / "CROSS_SCALE22.pdf").read_bytes().startswith(b"%PDF-"),
+            "invalid cross-scale PDF")
 
-    forbidden_proof_token = re.compile(r"(?m)\b(?:sorry|admit)\b|^\s*axiom\b")
     for name, source in lean_sources.items():
         require(forbidden_proof_token.search(source) is None, f"forbidden proof token in {name}")
 
