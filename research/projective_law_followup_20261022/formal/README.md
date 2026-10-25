@@ -79,6 +79,11 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   cleared interpolant on that chart. It identifies the local-unit residue
   and the `C=0` linear `w` coefficient. A formal smooth local-ring/DVR
   construction and its valuation remain open.
+- The [conditional DVR valuation packet](LOCAL_VALUATION.md) proves
+  `addVal(z)=2` and source-shape cleared-interpolant orders zero and one
+  in an abstract DVR with the stated chart and unit hypotheses. The actual
+  projective infinity stalk, rational-function pole orders, divisor and
+  `Pic⁰` transport remain open.
 - `branch-coverage.json` gives the standardized runtime-label, Lean
   constructor, certificate-schema mapping and lists the five rejected or
   exceptional labels separately.
