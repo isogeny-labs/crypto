@@ -210,11 +210,17 @@ def run(allocation_path: Path, bundle: Path, expected_bundle_sha: str,
                 "--binary", str(binary), "--output", str(output / layout),
                 "--cap-seconds", str(cap), "--layout", layout,
             ]
+            counters_before = probe_pod.proc_cpu_counters()
+            cgroup_before = probe_pod.cgroup_snapshot()
             stage = run_capped(
                 command, ROOT, environment, cap + 60,
                 output / f"{layout}.stdout", output / f"{layout}.stderr",
                 affinity,
             )
+            stage["cpu_counters_before"] = counters_before
+            stage["cpu_counters_after"] = probe_pod.proc_cpu_counters()
+            stage["cgroup_before"] = cgroup_before
+            stage["cgroup_after"] = probe_pod.cgroup_snapshot()
             receipt = output / layout / "receipt.json"
             if receipt.exists():
                 stage["index_receipt_sha256"] = digest(receipt)
