@@ -31,16 +31,24 @@ formulas are under
 Their compressed BLAKE3 and SHA-256 digests are in the
 [export protocol](../external-xor-20261025/PROTOCOL.md). The public manifest
 and corpus are `pilot-01/manifest.json` and `pilot-01/probe-corpus.json`.
+Exact write-once copies of those three compressed archives and the four
+`export.json` files are now under this panel's `inputs/` prefix. The
+[11-object manifest](../linux-xor-complete-inputs-20261025/manifest.json) and
+[fresh-download receipt](../linux-xor-complete-inputs-20261025/receipt.json)
+bind every object to its source SHA-256 and, for archives, compressed BLAKE3.
+The [independent replay](../linux-xor-complete-inputs-20261025/audit.py)
+checks XCNF, archive, export-metadata, source-receipt and S3 receipt identity.
 The local source-pinned [wide-XOR run](../local-yield-frontier-20261025/RESULT.md)
 ended at its 1,350-second process watchdog without a terminal solver result.
 It is a censored L0 access observation; it cannot rank these bases.
 
 The intended EC2 profile `n83-xor-panel-20261025` permits `GetObject` on
 this panel's `inputs/*`, `PutObject` on its `outputs/*`, and SSM core access.
-It **does not** permit reading the base archives or reading back outputs.
-An independent verifier therefore needs separately authorized read access
-to those paths, or a reviewed policy change, before any model or uploaded
-result can be accepted. The attempted `us-west-2` `c7i.2xlarge` launch
+The mirrored archives and export metadata are therefore readable without
+changing the role. It **does not** permit reading back `outputs/*`; an
+independent output auditor needs separately authorized read access, or a
+reviewed policy change, before any uploaded result can be accepted. The
+attempted `us-west-2` `c7i.2xlarge` launch
 returned the provider's `Blocked` account-admission error after a successful
 dry run; it allocated no instance. Admission must be established on an
 eligible account before allocating a new run. The old dry-run response is
@@ -53,22 +61,25 @@ not evidence of present admission.
    and an all-stage cost envelope. Keep Linux measurements separate from the
    Darwin receipts. Freeze arm order, A/A controls, flags, caps, and stop
    rules in a new committed protocol **before** timing.
-2. Fetch the four XCNFs to a new directory and run the existing byte-level
-   auditor. This audit checks the prior admission record and input identity;
-   it does not claim that a new EC2 launch succeeded:
+2. Fetch all 11 inputs to a new directory with the committed command below.
+   It checks the S3 checksum headers, downloads, compressed hashes and
+   source metadata. It does not claim that a new EC2 launch succeeded. The
+   Python dependency is pinned in the bundle's `requirements.txt`:
 
    ```sh
    set -euo pipefail
-   PANEL=research/koblitz_n83_factor_base_sweep_20261008/verification/linux-xor-panel-20261025
-   BUCKET=crypto-autoresearcher
-   PREFIX=factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025
-   INPUT_DIR="$(mktemp -d)"
+   BUNDLE=research/koblitz_n83_factor_base_sweep_20261008/verification/linux-xor-complete-inputs-20261025
+   python3 -m venv /tmp/n83-input-venv
+   /tmp/n83-input-venv/bin/python -m pip install -r "$BUNDLE/requirements.txt"
+   INPUT_DIR=/tmp/n83-xor-inputs
+   /tmp/n83-input-venv/bin/python "$BUNDLE/fetch.py" --out "$INPUT_DIR"
+   FORMULAS=/tmp/n83-xor-formulas
+   mkdir "$FORMULAS"
    for arm in hash_5_1 gray_5_1 hash_4_2 gray_4_2; do
-     aws s3api get-object --bucket "$BUCKET" \
-       --key "$PREFIX/inputs/$arm.xcnf" "$INPUT_DIR/$arm.xcnf" >/dev/null
+     mkdir "$FORMULAS/$arm"
+     ln -s "$INPUT_DIR/$arm.xcnf" "$FORMULAS/$arm/instance.xcnf"
+     ln -s "$INPUT_DIR/exports/$arm/export.json" "$FORMULAS/$arm/export.json"
    done
-   PYTHONDONTWRITEBYTECODE=1 python3 "$PANEL/audit_admission.py" \
-     --downloads-dir "$INPUT_DIR"
    ```
 
 3. Run the separately frozen, bounded Linux comparison on one isolated host.
@@ -82,8 +93,10 @@ not evidence of present admission.
 4. Upload generation-specific output keys with `If-None-Match: *`, retain
    SHA-256 receipts, then have a separate reader fetch and independently
    replay the exact bytes. Any complete SAT assignment must pass the
-   worker's `verify-cross-xcnf` check against the original base/pool archives,
-   manifest, corpus, and XCNF. Its original CNF/XOR, field, orbit-domain,
+   worker's `verify-cross-xcnf` check against the byte-identical mirrored
+   base/pool archives in `INPUT_DIR/archives/`, the checked-out public
+   manifest and corpus, and `FORMULAS/<arm>/`. Its original CNF/XOR, field,
+   orbit-domain,
    and curve-group checks are required. A rejected or incomplete model is
    not useful relation yield.
 5. Continue only from verified natural partials to graph closure, useful
