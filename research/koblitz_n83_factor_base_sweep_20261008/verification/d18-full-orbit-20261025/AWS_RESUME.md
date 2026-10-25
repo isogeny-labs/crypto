@@ -123,6 +123,21 @@ To reproduce, build this frozen source commit, freshly fetch and verify the
 same object and manifest, then run the positive and natural modes serially
 with fresh outputs under the [protocol](PHASE_FIRST_NATURAL_PROTOCOL.md).
 
+The [extended local screen](local-extended-natural-20261025/RESULT.md) used
+clean source commit `a79536d6605216d258771dffba9cee94072363a5` and
+release binary SHA-256
+`ee2fd534ed952f512577440ea6b2adb0c0fab8a35a25ea0da6d9991a83a6e645`.
+Its newly fetched S3 object passed provider checksums and importer replay;
+the same-binary constructed arm passed independent original-field relation,
+rank-one and tamper replay. One public natural arm then reached its
+1,200-second whole-process cap after a 79.071-second import and 0.294-second
+model build. The solver did not return, so its conflicts and useful natural
+yield remain unknown; the retained post-model window was 1,120.361 seconds.
+The 1,210-second supervisor did not fire. The raw files, negative cap check,
+compressed validation logs and SHA-256 inventory are committed there. This
+L0 Mac run had no hard memory cgroup and does not replace the pending Linux
+capacity gate or support a total-runtime selection.
+
 The 17,757,116-byte minimal source archive for earlier D18 import source
 `54cbef1a6ce834a77632c1867acc801a31268ca2` is now at
 `s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/d18-full-direct-subgroup-v1/a0/runs/first-m4-20261025/source/n83-d18-source-minimal-54cbef1a6ce.tar.gz`.
