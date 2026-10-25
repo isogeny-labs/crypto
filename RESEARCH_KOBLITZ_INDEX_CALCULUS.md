@@ -12,6 +12,17 @@ pre-registered hypotheses)
 (ePrint 2020/1315).
 
 **Modular and low-genus carrier follow-up (2026-10-24):**
+[Round21](research/koblitz_modular_ic_20261018/rounds/21/REPORT.md)
+proves the characteristic2 five-root obstruction. Combined with actual
+trace-zero descent and a written valuative/formal-group bridge,it excludes
+the old Q34 scalar points.32 coupled norms and1330 pure-source resultants
+retain four new complete scalar models on node187;whole saturation remains
+open. The averaged recovery A*Phi=5I is equivariant,with denominator5 sharp
+in this regular-target CM presentation by a mod5 norm/fixed-vector proof.
+The206-statement proof map separates universal/actual coefficients from
+written geometry and native field/DAG semantics. The final quotient,
+243 sections,full theta actions and integral level77 map remain open.
+
 [Round20](research/koblitz_modular_ic_20261018/rounds/20/REPORT.md)
 constructs an explicit integral CM retraction for the20 weighted orbit
 maps. It gives a proper scalar-cover embedding and20 global source-image

@@ -888,3 +888,49 @@ certificates and structural lift/projector/fixed-image implications.
 Group schemes,divisors,descent,native field semantics,exhaustion and section
 rank retain their explicit proof-map limits. No IC assessment,relation-rank
 promotion or proof of nonexistence is supplied.
+
+
+## Round21: complete descent obstruction and node187 frontier
+
+[Round21](../research/koblitz_modular_ic_20261018/rounds/21/REPORT.md)
+checks130321 root prefixes and proves universally that five nineteenth
+roots cannot sum to zero in characteristic2. The actual source descent
+implies the fivefold trace-zero identity. With the written DVR/splitting/
+proper-elliptic/formal-group bridge this excludes the Q34 scalar points;
+it does not construct an expanded saturated separator. The coefficient
+Frobenius fixes the arc parameter and must not be replaced by absolute
+Frobenius. The bridge and formal limits are in SATURATION.md/PROOF_MAP.md.
+
+Q36 retains four models on155,157,184,186.32 exact coupled norms,186 terms
+each, reject those points but Q38 returns four on180,182.1330 exact
+pure-source resultants across all20 elliptic input families leave Q40
+models only on node187,one per graph,9 visits each,no caps. Node187 is a
+cumulative product of two ordinary Miller functions. These are complete
+finite necessary-system models;their source closure status and whole
+saturated ideal are not established. Next acceptance requires a complete
+coupled product divisor/source relation that rejects them,or a complete
+simultaneous arc satisfying every inverse,Kummer and coefficient-descent
+block. A leading-pole sketch or another Boolean model is insufficient.
+
+G31 constructs an actual equivariant recovery A*Phi=5I over Z[w]. A mod5
+norm/fixed-vector argument proves denominator5 sharp in this regular-target
+CM category. This is compatible with Round20's closed source immersion:
+an equivariant integral ambient retraction need not exist. The written
+CM reduction/morphism bridge remains explicit. Final105/19 quotient
+geometry,243 sections,full theta actions/rational divisor trivialization,
+integral level77 normalization/pole spaces/factor-divisor map and460/367
+norm fibers/images retain their original acceptance criteria.206 named
+Lean statements cover the indicated universal/finite results;native field/
+DAG/resultant and global geometric semantics remain separately identified.
+No IC efficiency assessment is supplied.
+
+
+Round21 release access gap (2026-10-25): the sealed validation archive is
+14861500 bytes and must use the configured artifact store. The migrated
+worker's store status/push return AccessDenied/403;no object/index publication
+succeeded. The source/proofs/raw archive can be reviewed,while the separate
+validation archive remains preserved locally with its committed digest and
+member manifest. Exit criterion: restore intended store access,push without
+replacement,verify a fresh pull,and commit the index entry. See
+[release evidence](../research/koblitz_modular_ic_20261018/rounds/21/RELEASE.md).
+This access gap does not change the mathematical acceptance criteria above.

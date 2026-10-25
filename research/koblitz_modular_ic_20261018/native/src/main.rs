@@ -73,6 +73,7 @@ mod oddtheta17;
 mod ordinary13;
 mod polarized;
 mod poles19;
+mod proof_cache21;
 mod proofs15;
 mod quotient_geometry;
 mod quotients06;
@@ -98,6 +99,7 @@ mod round10_record;
 mod round11_record;
 mod round12_record;
 mod round13_record;
+mod round21;
 mod round_record;
 mod saturation10;
 mod saturation11;
@@ -400,6 +402,66 @@ fn main() {
     }
     if args10.get(1).map(String::as_str) == Some("--round17-lifts") {
         oddtheta17::lifts::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-tangent") {
+        round21::tangent(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-proof-cache") {
+        proof_cache21::run(
+            std::path::Path::new(&args10[2]),
+            std::path::Path::new(&args10[3]),
+            std::path::Path::new(&args10[4]),
+        );
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-proof-signatures") {
+        proof_cache21::signatures(
+            std::path::Path::new(&args10[2]),
+            std::path::Path::new(&args10[3]),
+            std::path::Path::new(&args10[4]),
+        );
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-summary") {
+        round13_record::round21::summary(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--record-round21") {
+        round13_record::round21::record(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-issue-identities") {
+        round13_record::round21::identities(std::path::Path::new(&args10[2]), true);
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-check-identities") {
+        round13_record::round21::identities(std::path::Path::new(&args10[2]), false);
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-families") {
+        survivors17::source19::family21::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-last-boundary") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::boundary21::last_run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-quotients") {
+        survivors17::source19::source21::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-final-boundary") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::boundary21::final_run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-boundary") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::boundary21::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round21-descent") {
+        round21::descent(std::path::Path::new(&args10[2]));
         return;
     }
     if args10.get(1).map(String::as_str) == Some("--round20-projector") {

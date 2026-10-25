@@ -1,0 +1,5 @@
+2026-10-25, configured store, migrated worker identity, exit2; no upload/index change.
+Command (repository root):
+ecbench store push research/koblitz_modular_ic_20261018/rounds/21/validation-runs.tar.xz --name evidence/koblitz_modular_ic_20261018/round21-validation-runs.tar.xz --description 'Round21 complete validation, failed attempts, fresh extraction and strict native replay' --provenance 'R21 archive-validation.sh: deterministic tar mtime 2026-10-24 00:00:00Z, owner/group0, GNU, xz -6 -T1; see rounds/21/ARCHIVE_VALIDATION.txt' --json
+
+ecbench: aws head-object failed (exit status: 254): aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 also answers 403 for an absent key when the caller lacks s3:ListBucket; check the credentials and the bucket policy)

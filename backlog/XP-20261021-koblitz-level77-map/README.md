@@ -48,6 +48,10 @@ not establish this F2 modular map. A positive result establishes only
 its actual map/subgroup/divisor obligations. Runtime, relation usefulness
 and IC assessment remain separate.
 
-The related3Theta section construction, new Q34 complete-arc/separator identification and460/367
+The related3Theta section construction, new Q40 node187 coupled-product arc/separator identification and460/367
 ordinary-support source fibers remain explicit acceptance tests in the
 [recurring problem](../../problems/koblitz-modular-carrier-transfer.md).
+
+Round21 leaves this integral-map lane open and does not rerun the ansatz. Its
+sharp equivariant CM denominator5 belongs to another presentation and is
+not an obstruction to the modular factor map. See [Round21 CM](../../research/koblitz_modular_ic_20261018/rounds/21/CM.md).

@@ -1,29 +1,28 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [20](rounds/20/README.md), with its
-[report](rounds/20/REPORT.md), [PDF](rounds/20/report.pdf),
-[controlled-pole maps](rounds/20/CM.md), [source geometry](rounds/20/THETA.md),
-[saturation](rounds/20/SATURATION.md), [proof map](rounds/20/PROOF_MAP.md)
-and [ledger](rounds/20/ledger.json).
+The current round is [21](rounds/21/README.md), with its
+[report](rounds/21/REPORT.md), [PDF](rounds/21/report.pdf),
+[descent geometry](rounds/21/THETA.md), [saturation](rounds/21/SATURATION.md),
+[map status](rounds/21/CM.md), [proof map](rounds/21/PROOF_MAP.md)
+and [ledger](rounds/21/ledger.json).
 
-An explicit integral CM left inverse of the20 weighted row maps gives a
-proper scalar-cover embedding and20 global source-image equations,or100
-Galois-stable conjugates. The canonical symmetric Pic2 class matches under
-the written geometric bridges. Full elliptic factor bases specify a
-factorized proper polarized source embedding;2952 ordinary F2 sections
-have binary evaluation rank2688 on16 tuples per sign. All48 tested
-scalar-kernel shifts are noninvariant;the final243-space and quotient
-kernel actions remain open.
+Five nineteenth roots cannot sum to zero in characteristic two. With the
+actual trace-zero descent and written valuative/formal-group bridge this
+excludes the old Q34 scalar points.32 coupled norms and1330 pure-source
+resultants still leave four complete scalar models on node187. Whole
+saturation and complete coupled product divisors/arcs remain open.
 
-The complementary524288 quadratic numerator/sign search leaves ten
-constant maps. Q33's coupled relation has top(U+V)^19 and excludes none
-of Q32;Q34 retains four complete uncapped models on123,124,126,127.
-The integral level77 map and whole saturation remain open. There are76
-new named Lean results with explicit written/native proof limits. Earlier
-relation ranks,divisors and cost rows stay frozen;no IC efficiency
-assessment is supplied.
+The actual averaged CM recovery is equivariant and satisfies A*Phi=5I.
+A norm/fixed-vector obstruction modulo5 makes denominator5 sharp in this
+CM presentation;the proper source immersion still descends. Full theta
+kernel actions/rational trivialization,243 final quotient sections and
+the integral level77 factor/divisor evaluator remain open. The proof map
+records206 named Lean statements and the explicit native/written limits.
+Earlier relation ranks and costs stay frozen;no IC assessment is supplied.
 
 Earlier evidence stays frozen:
+
+- [Round 20](rounds/20/README.md):integral split recovery,proper source equations,canonical Pic2 match,2952 sections and the524288-case controlled-pole null.
 
 - [Round 19](rounds/19/README.md):335544320 controlled-pole numerators,
   correctly polarized weighted orbit divisor and Q28/Q30 exclusions.

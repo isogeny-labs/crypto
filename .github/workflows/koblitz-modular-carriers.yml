@@ -196,6 +196,17 @@ jobs:
           (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
           (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
           "$round/REPLAY.sh"
+          git fetch --no-tags origin 63bc0895df3d2cbd38e22a3efe828a52a0fad731
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" 63bc0895df3d2cbd38e22a3efe828a52a0fad731
+      - name: Replay round 21 complete descent controls and all elliptic source repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/21
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          # The sealed validation archive awaits artifact-store access (round21/RELEASE.md).
+          # Replay uses the committed raw archive; the complete Lean gate below is retained.
+          "$round/REPLAY.sh"
           research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-sources "$round"
       - name: Install pinned Lean
         run: |
