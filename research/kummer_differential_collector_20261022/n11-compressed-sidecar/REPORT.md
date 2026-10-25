@@ -52,6 +52,18 @@ coordinate candidates fail; the available results are finite samples rather
 than an all-state exception bound. The raw rows mark this bound `null` and
 `cohort_eligible=false`. A public known-answer cohort would be premature.
 
-The [PDF](REPORT.pdf) is a neutral review summary. `validate.py` independently
-recomputes all 336 rows, checks the source digest and exhaustive small-group
-instances of the pair and recurrence lemmas, and verifies `SHA256SUMS`.
+The [PDF](REPORT.pdf) is a neutral review summary generated deterministically
+in Rust using a standard PDF font. The native Rust validator
+independently recomputes all 336 rows, checks the source digest and exhaustive
+small-group instances of the pair and recurrence lemmas, and verifies
+`SHA256SUMS`. JSON v2 stores the same typed rows as arrays in the declared CSV
+column order to keep the raw packet below the repository's artifact threshold.
+The previous Python-generated v1 packet in commit `9dc8d81484` is superseded;
+it contained no timings or cohort run.
+
+From the repository root, regenerate and validate with:
+
+```sh
+cargo run --offline --release --manifest-path research/kummer_differential_collector_20261022/n11-compressed-sidecar/Cargo.toml --bin generate
+cargo run --offline --release --manifest-path research/kummer_differential_collector_20261022/n11-compressed-sidecar/Cargo.toml --bin validate
+```
