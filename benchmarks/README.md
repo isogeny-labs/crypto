@@ -177,3 +177,17 @@ The [Jacobian-cover cost breakdown and proposed leads](20261018-jv-cover-cost-br
 The [n = 2 real-model addition study](20261024-n2-real-model-addition/) (engineering on the validated H2 baseline VAL-20261024-wd4) keeps its report and graphs in that directory. New reduced real-model formulas, 30 M + I per addition against 41 M + I, are checked against the generic law on 175,000 pairs. They bring IC/rho at 40 bits, h = 1, from 1.78 / 1.80 / 1.88 to 1.39 / 1.48 / 1.75 at native 0 / 0.1 / 1 GAE, with all 1,200 answers verified. The 12-cell band remains unresolved, so the distance to rho is still 1.39x at measured cost. It is not admitted to the results table until it has its own `VALIDATION.json`. Source: [`research/n2_real_model_addition_20261024`](../research/n2_real_model_addition_20261024/REPORT.md).
 
 The [n = 3 Tian route study](20261024-tian-n3-quartic-ic/) is not admitted to the results table until it has its own `VALIDATION.json`. It measures double-large-prime index calculus on generic plane-quartic Jacobians against Pollard rho, in the same process, at `q` = 127–8191, with 52/52 answers verified. With native work at 0 the index calculus needs 180–340 group additions against rho's 5,000–300,000. At 0.1 and 1 GAE its dense linear algebra, growing like `q^1.4`, makes it 0.7–32× rho, so the ranking is unresolved at every `q`. The study also finds plane-quartic Jacobians in the isogeny class of every Theorem-4-flagged prime-order `E/F_{q³}` at `q` ≤ 17 (26/26). This is not an end-to-end attack: no isogeny was computed. Source: [`research/tian_n3_quartic_route_20261024`](../research/tian_n3_quartic_route_20261024/REPORT.md).
+## Security timing (outside the results table)
+
+Timing studies of constant-time fixes keep their visual record here, but they
+measure side-channel leakage, not solver performance: they compare no ECDLP
+method, have no matched rho reference, and are never rows of the admitted table
+above.
+
+- 2026-10-22, [`20261022-scalar-mul-ct-timing`](20261022-scalar-mul-ct-timing/README.md):
+  the affine ladder behind `scalar_mul_secret` (every curve but secp256k1 and
+  P-256) leaked the scalar's bit length. Before the fix, a scalar with 224
+  leading zero bits took 0.33–0.47 of a full-length one's time (SM2 and the
+  GOST-256 test curve). After it, every class is within 0.165 of full length,
+  inside the A/A band 0.296, at a full-length cost of 0.86–1.09×. Study:
+  [`research/scalar_mul_ct_timing_20261022`](../research/scalar_mul_ct_timing_20261022/README.md).
