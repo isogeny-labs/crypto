@@ -12,6 +12,11 @@ the target. The original Python execution path is replaced by Rust for this
 repository, with the original normal-Weil-function formulas and coefficient
 ordering. This is a correctness replay, with no performance comparison.
 
+The user has since approved auto-merge for PR #2569 and the exact raw-log
+archive upload. Both remain blocked by GitHub/AWS access; see the
+[approved publication follow-up](reports/publication-20261025T2144Z/STATUS.md).
+The original run records below preserve their earlier publication state.
+
 Read [PROTOCOL.md](PROTOCOL.md) for the full five-gate experiment: the fixed
 source over F343, its order-373 subgroup, kernel 153, chart transforms,
 divisor origin, certified inherited anchor, field-embedding requirements,

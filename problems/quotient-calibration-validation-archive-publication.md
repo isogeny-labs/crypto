@@ -1,9 +1,9 @@
 # Quotient-calibration raw validation archive is not published
 
 - **Status:** `open`
-- **Kind:** upload approval and tool/access limits
+- **Kind:** tool/access limits; upload approval received
 - **Affected work:** [relocation validation](../research/quotient_calibration_20261025/reports/run-20261025T1845Z/VALIDATION.md)
-- **Next action owner:** user for upload authorization and configured AWS access; then the repository operator
+- **Next action owner:** user for restored GitHub and configured AWS access; then the repository operator
 - **Last updated:** 2026-10-25
 
 ## Problem
@@ -32,7 +32,7 @@ has no durable published copy. It is 67,540 bytes, above AGENTS.md section
 
 ## What would unblock it
 
-- [ ] Obtain explicit approval for the exact archived payload and
+- [x] Obtain explicit approval for the exact archived payload and
   `s3://setec-astronomy-artifacts/store` destination.
 - [ ] Configure supported AWS access and the artifact-store CLI.
 - [ ] Upload the unchanged archive through `tools/artifacts`, commit its
@@ -51,6 +51,16 @@ upload failure or readback mismatch. A verified upload permits the normal
 artifact manifest update; otherwise retain the explicit unpublished state.
 
 ## Resolution and history
+
+2026-10-25 21:44 UTC: explicit user approval received for the exact archive
+upload and PR #2569 auto-merge. Archive hash and size rechecked unchanged.
+AWS CLI installed; a normal SDK head request and repository artifact push
+fail with `Unable to locate credentials`. GitHub repository/PR reads now
+return 404 and Git remote access returns 403, preventing current-head
+verification and publishing the manifest/status follow-up. See
+[the approved follow-up](../research/quotient_calibration_20261025/reports/publication-20261025T2144Z/STATUS.md).
+The approval requirement is satisfied; the remaining requirements are
+supported account access, immutable upload and readback verification.
 
 Unresolved. The local archive is retained at
 `/workspace/crypto/research/quotient_calibration_20261025/reports/run-20261025T1845Z/runs.tar.xz`.
