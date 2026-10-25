@@ -132,6 +132,20 @@ integrity checks in the [custody receipt](phase-first-natural-20261025/source-ar
 This archive predates the phase-first search code. Use the PR branch and the
 frozen source commit above for that experiment.
 
+The next [Linux phase-first protocol](linux-phase-first-20261025/PROTOCOL.md)
+extends the same free-choice shared-root circuit to an exact 8 GiB,
+zero-swap, one-CPU cgroup with a 1,200-s internal and 1,210-s independent
+outer cap. The opt-in command is
+`primary-full-d18-m4-linux-shared-phase-first positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON`.
+The branch-specific
+[`n83-d18-phase-first-linux.yml`](../../../../.github/workflows/n83-d18-phase-first-linux.yml)
+checks out the pushed source, freshly fetches and checks the full S3 object,
+builds one Linux binary, audits the constructed gate independently, and runs
+one public natural query only if that gate passes. It uploads source, image,
+S3, cgroup, stage and audit receipts on every terminal path. Its run status
+must be checked live; a queued dispatch or a completed constructed control
+does not establish natural yield or a runtime winner.
+
 That gate adds an opt-in `primary-full-d18-m4 positive|natural` worker with
 hard resource checks, durable phase/shape records, SAT-model verification,
 group lift, row replay and rank-one control. Its natural result requires a
