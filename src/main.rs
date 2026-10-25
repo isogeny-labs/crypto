@@ -616,6 +616,23 @@ enum CryptanalysisOp {
         #[arg(long)]
         output_bytes: Option<usize>,
     },
+    /// Build and replay a Joux collision chain in a reduced-state MD construction.
+    HashJouxReduced {
+        /// Merkle-Damgard hash adapter: md4, md5, sha1, sha256, or sha512.
+        #[arg(long)]
+        hash: String,
+        /// Compression-state bits retained after every block (8..=24).
+        #[arg(long, default_value_t = 16)]
+        truncate_bits: u32,
+        /// Collision links; the chain represents 2^length paths (1..=8).
+        #[arg(long, default_value_t = 3)]
+        chain_length: usize,
+        /// Search trials per link (2..=200000).
+        #[arg(long, default_value_t = 200_000)]
+        max_trials_per_block: usize,
+        #[arg(long, default_value_t = 42)]
+        seed: u64,
+    },
     /// Measure output bit distances for a specified hash on observed message pairs.
     HashDifferentialObserved {
         /// Hash identifier accepted by `crypto hash` (including SHA-2, SHA-3, and SHAKE).
@@ -3205,6 +3222,118 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
                 Ok(md) => println!("{}", md),
                 Err(e) => {
                     eprintln!("error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+        CryptanalysisOp::HashJouxReduced {
+            hash,
+            truncate_bits,
+            chain_length,
+            max_trials_per_block,
+            seed,
+        } => {
+            use crypto_lib::cryptanalysis::hash_attacks::{
+                joux_multicollision, Md4, Md5, MerkleDamgardHash, Sha1, Sha256, Sha512,
+            };
+            fn truncate(state: &mut [u8], bits: u32) {
+                let bytes = (bits as usize).div_ceil(8);
+                if bits % 8 != 0 {
+                    state[bytes - 1] &= 0xff >> (8 - bits % 8);
+                }
+                state[bytes..].fill(0);
+            }
+            fn run<H: MerkleDamgardHash>(
+                hash: H,
+                bits: u32,
+                length: usize,
+                trials: usize,
+                seed: u64,
+            ) -> Result<Option<serde_json::Value>, String> {
+                let Some(pairs) = joux_multicollision(&hash, bits, length, trials, seed) else {
+                    return Ok(None);
+                };
+                let mut state = hash.hash(&[])[..hash.state_bytes()].to_vec();
+                truncate(&mut state, bits);
+                let initial_state_hex = to_hex(&state);
+                let mut links = Vec::with_capacity(pairs.len());
+                for (a, b) in pairs {
+                    if a == b || a.len() != hash.block_bytes() || b.len() != hash.block_bytes() {
+                        return Err("invalid collision-link blocks".into());
+                    }
+                    let mut left = state.clone();
+                    let mut right = state.clone();
+                    hash.compress(&mut left, &a);
+                    hash.compress(&mut right, &b);
+                    truncate(&mut left, bits);
+                    truncate(&mut right, bits);
+                    if left != right {
+                        return Err("collision-link replay failed".into());
+                    }
+                    links.push(serde_json::json!({"left_hex":to_hex(&a),"right_hex":to_hex(&b)}));
+                    state = left;
+                }
+                Ok(Some(serde_json::json!({
+                    "status":"complete",
+                    "operation":"hash-joux-reduced",
+                    "algorithm":hash.name(),
+                    "truncate_bits":bits,
+                    "chain_length":length,
+                    "represented_paths":1usize << length,
+                    "initial_state_hex":initial_state_hex,
+                    "final_state_hex":to_hex(&state),
+                    "links":links,
+                    "verified":true,
+                    "scope":"compression state truncated after every block"
+                })))
+            }
+            if !(8..=24).contains(&truncate_bits)
+                || !(1..=8).contains(&chain_length)
+                || !(2..=200_000).contains(&max_trials_per_block)
+            {
+                eprintln!("error: require --truncate-bits 8..=24, --chain-length 1..=8, and --max-trials-per-block 2..=200000");
+                std::process::exit(2);
+            }
+            let result = match hash.as_str() {
+                "md4" => run(Md4, truncate_bits, chain_length, max_trials_per_block, seed),
+                "md5" => run(Md5, truncate_bits, chain_length, max_trials_per_block, seed),
+                "sha1" => run(
+                    Sha1,
+                    truncate_bits,
+                    chain_length,
+                    max_trials_per_block,
+                    seed,
+                ),
+                "sha256" => run(
+                    Sha256,
+                    truncate_bits,
+                    chain_length,
+                    max_trials_per_block,
+                    seed,
+                ),
+                "sha512" => run(
+                    Sha512,
+                    truncate_bits,
+                    chain_length,
+                    max_trials_per_block,
+                    seed,
+                ),
+                _ => {
+                    eprintln!("error: --hash must be md4, md5, sha1, sha256, or sha512");
+                    std::process::exit(2);
+                }
+            };
+            match result {
+                Ok(Some(report)) => println!("{}", serde_json::to_string_pretty(&report).unwrap()),
+                Ok(None) => {
+                    println!(
+                        "{}",
+                        serde_json::json!({"status":"bounded_unknown","operation":"hash-joux-reduced","algorithm":hash,"truncate_bits":truncate_bits,"chain_length":chain_length,"max_trials_per_block":max_trials_per_block})
+                    );
+                    std::process::exit(1);
+                }
+                Err(e) => {
+                    eprintln!("error: {e}");
                     std::process::exit(1);
                 }
             }
