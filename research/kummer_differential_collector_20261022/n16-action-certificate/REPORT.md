@@ -46,11 +46,14 @@ recorded theta diagonal. Thus it agrees projectively with the existing
 source projection wherever `a0!=0`, and it remains defined at `a0=0`
 without division by `a0` or use of an action matrix. The source expression
 and the polynomial recurrence make this an exact identity in the quotient
-by the Mumford curve equations. The 21 nonzero fixed conversion
-determinants certify that the corresponding general coordinate chart has
-full rank; the final finite replay checked nonzero output on the frozen
-exceptional classes. A proof of nonvanishing for every valid degree-two
-class at `a0=0` remains to be formalized.
+by the Mumford curve equations. The [chart proof](CHART_NONVANISHING.md)
+also expresses the direct chart as the recorded invertible conversion
+matrix applied to a vector with first coordinate 1. Consequently it is
+nonzero for **every** degree-two polynomial input over each of the 21
+recorded fields, including `a0=0`; this is stronger than the finite
+exceptional replay. The same argument establishes nonvanishing of the
+degree-one candidate chart. It does not prove the degree-one chart's
+geometric interpretation or any action identity.
 
 The degree-one candidate chart used for the finite check is the fixed
 conversion of `(0,1,x,x²)`. Its 27,470 comparisons use native Jacobian

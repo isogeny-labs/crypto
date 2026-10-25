@@ -38,14 +38,21 @@ is a polynomial even at $a_0=0$. Every generic projection numerator
 $a_0T_i-b_0^2$ therefore has the direct continuation
 $T_i-b_1^2-R_0/a_0$. This cancels the common factor that caused the
 source's 5,599 zero vectors; it does not use a torsion action to set its
-expected value. The finite replay found every extended output nonzero.
+expected value. More strongly, the four coordinates equal the recorded
+conversion matrix $C$ applied to
+$(1,-a_1,-a_0,a_0a_1+b_1^2+R_0/a_0)^T$. Its first entry is 1 and
+the exactly checked $\det C$ is nonzero on every frozen model, so the
+continued chart is nonzero for every degree-two polynomial input, including
+$a_0=0$. The degree-one candidate chart $C(0,1,x,x^2)^T$ is likewise
+nonzero for every $x$. These are all-state chart statements, not an
+all-state geometric translation theorem.
 
 \noindent The degree-one candidate chart is the fixed conversion of
 $(0,1,x,x^2)$. Native Jacobian addition built each translated class for
 the finite check. Its geometric interpretation and the generic identity
 $K(D+T_r)\sim M_rK(D)$ are not certified for every divisor. For
 $U=u(r)\ne0$, the remaining proof can use $c=-v(r)/U$,
-$L=v+cu$, $u'=(f-L^2)/(u(x)(x-r))$, and $v'=-L\bmod u'$; clear powers of
+$L=v+cu$, $u'=(f-L^2)/(u(x-r))$, and $v'=-L\bmod u'$; clear powers of
 $U$ and reduce cross-products modulo both coefficients of $v^2-f\bmod u$.
 That ideal-reduction certificate is absent. No cohort or rho comparison
 was run; the rho ratio remains null.
