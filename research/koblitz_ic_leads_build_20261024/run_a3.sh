@@ -8,6 +8,9 @@ BIN=target/release/examples/pe_closure
 BENCH=target/release/examples/koblitz_ic_leads_bench
 DR=research/dreg_closure_driver_20261016/draws
 export RAYON_NUM_THREADS=2
+# The Macaulay builder caps a matrix at 20,000 rows unless told otherwise
+# (koblitz_groebner::max_f4_rows); the full-order seed at degree 4 exceeds it.
+export F4_F2_MAX_ROWS=50000000 F4_F2_MAX_COLS=50000000
 log() { echo "$(date -u +%H:%M:%SZ) $*" >> "$OUT/queue-a3.log"; }
 one() { # tag file draw mode [flags]
   local tag=$1 f=$2 k=$3 mode=$4; shift 4
