@@ -42,6 +42,32 @@ PDF: [`report/report.pdf`](report/report.pdf).
 - **Five rows ran again:** their first attempt was contended, and each
   re-ran clean; only the clean attempt counts. No row failed.
 
+## Independent validation, 2026-10-24
+
+[`validate_independently.py`](validate_independently.py) reads the 408
+claim-selected reports without invoking either producer. It independently
+checks 816 `[d]G = Q` certificates, rejects 816 altered-scalar controls,
+matches all 4,608 recorded repetition-arm answers to their certificates,
+checks the field polynomials and prime subgroup orders, and recomputes the six
+cold and online point estimates. A separate seeded bootstrap places all 24
+published interval endpoints within 1.7% of its own endpoints. On 48 identical
+public targets, the measured same-process rho is no slower per step than the
+separate strong signed-Frobenius reference. The clean retry selection and the
+shared process/resource fields are checked for every retained report.
+
+The [SHA-bound gate manifest](VALIDATION.json) points to the
+[replay](replay-certificate.json), [metric validator](validator-report.json),
+and [rho reference](rho-reference.json). Reproduce them with
+`python3 research/ic_tool_program/rule/v7/validate_independently.py --check`.
+The matching [historical benchmark entry](../../../../benchmarks/20261016-ic-rule-v7/VALIDATION.json)
+has a separate manifest pointing to the same SHA-bound raw reports. The
+[remaining benchmark gate backlog](../../../../problems/benchmark-validation-gate-postfreeze-rows.md)
+is tracked separately.
+The comparison remains a bounded six-size measurement on public fixtures:
+rho is faster cold at every size, and the checks do not prove an asymptotic
+result or a deployed-curve attack. The strong walk comparison only covers the
+48 recorded targets and the available reference binary.
+
 ## Results
 
 **Cold** is set-up plus online, index calculus over rho: above 1, rho is

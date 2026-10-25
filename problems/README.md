@@ -16,6 +16,7 @@ Keep resolved and superseded records in the index.
 | [Quartic binary IC wide arithmetic](quartic-binary-ic-wide-scalars.md) | open | requested base-field m=16--18 crossover rungs | wider coefficients, keys, order/scalars, old-path agreement and complete verified ladder |
 | [NIST extension-twist composite cofactors](nist-extension-twist-composite-cofactors.md) | open | complete P-256 block-876 degree-2 extension-twist factorization; one timeout field | proper split of the exact remaining 444-bit residual followed by prime-certificate and exact-product replay |
 | [NIST factorization raw archive publication](nist-factorization-raw-archive-publication.md) | open | durable publication of complete R02 NFS evidence and R05 relation checkpoint, larger than Git's file limit | observed-ready AWS connection, unchanged archive uploads through `crypto store`, manifest commit and verified remote readback |
+| [Benchmark validation gate rejects post-freeze rows](benchmark-validation-gate-postfreeze-rows.md) | investigating | repository-wide validated benchmark dashboard; 24 benchmark rows remain after v6/v7 validation and exact archival cleanup | source-bound evidence or exact archival disposition per row, then green gate |
 | [ECCp-131 full-parameter index-calculus relation pipeline](eccp131-full-parameter-index-calculus.md) | open | checked two- and three-point small-x probes have zero natural rank in bounded exact-curve runs; three-point support is at most `8B³` points | exact relation oracle beyond the fixed small-x support bound, independently replayed rank and target-descent chain |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Rho worker confirmation after physical-host panel](rho-worker-tier1-host-access.md) | open | qualified 32-Q serial/batch worker throughput and default-routing decision | new independently verified targets, prospective A/A gate, dedicated host after AWS quota, complete audit |
@@ -98,5 +99,3 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
-
-
