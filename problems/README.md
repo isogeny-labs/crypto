@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Twist GitHub repository access](twist-github-repository-access.md) | open | pushing the locally frozen E26 work and updating PR #2380 | restore repository access, fetch the actual remote head, push preserved commits and check CI |
 | [Twist trace constraint and solver comparison](twist-trace-constraint-and-solver-gap.md) | open; explicit geometry and bounded controls checked locally | establishing a calibrated twist-assisted IC improvement for NIST prime-field P-curves | polarized graph identification, higher-prime quotients, formal bridges, broader grids, complete costs and independent-host replay |
 | [Twist follow-up evidence publication](twist-followup-evidence-publication.md) | open; corrected remote publication verified | full scientific replay and the twelve existing oversized Git blobs | verified Setec upload/pull, member hashes and frozen incidence replay are complete; remaining checker replays and owner/reviewer size-policy resolution |
 | [ECCp-131 full-parameter index-calculus relation pipeline](eccp131-full-parameter-index-calculus.md) | open | checked two- and three-point small-x probes have zero natural rank in bounded exact-curve runs; three-point support is at most `8B³` points | exact relation oracle beyond the fixed small-x support bound, independently replayed rank and target-descent chain |

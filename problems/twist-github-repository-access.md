@@ -1,0 +1,36 @@
+# Twist experiment delivery: GitHub repository access
+
+- **Status:** open
+- **Kind:** access/tool limit; local computation is available
+- **Affected work:** [PR #2380](https://github.com/aburan28/crypto/pull/2380)
+- **Last updated:** 2026-10-25
+
+## Problem and observed evidence
+
+When resuming the E26 encoding pilot from local commit
+`88a27612152e9fdd74c1ed0a17f964442c4c3159`, fetching the existing PR branch
+through the previously working Git credential helper returns HTTP 403,
+"Write access to repository not granted." The connected GitHub PR read
+returns HTTP 404. The precise credential or installation cause is unknown;
+this is not a mathematical obstruction or an automatic approval rejection.
+No credential values are inspected, retained or placed in reports.
+
+Local source, tests, frozen protocols and bounded computation remain
+available. Preserve finished work as local feature-branch commits. Do not
+claim a successful push, updated PR or current remote head without checking.
+
+## Exit conditions and next step
+
+- Restore the connected identity's access to `aburan28/crypto`.
+- Read the actual PR head and fetch it; reconcile any remote changes without
+  force-pushing or rewriting frozen evidence.
+- Push the preserved local work to the existing PR branch, update its report
+  links and inspect current-head CI and review.
+
+These checks close delivery only. Original scientific, cost, heldout,
+historical file-size and review requirements remain separate.
+
+The user was informed through the asynchronous input channel while local
+experiments continued. Recheck when connection readiness changes or before
+the final delivery attempt; repeated access failures alone supply no new
+evidence about the experiments.

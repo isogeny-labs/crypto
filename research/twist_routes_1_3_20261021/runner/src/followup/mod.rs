@@ -1,6 +1,7 @@
 //! Native follow-up experiments. Every command requires a fresh output tree.
 mod assessment;
 mod bigfield;
+mod block;
 mod coupled;
 mod divisors;
 mod finite;
@@ -91,6 +92,13 @@ pub fn sources(fixtures: &[Fixture]) -> Result<Vec<Source>> {
 }
 pub fn main(args: &[String]) -> Result<()> {
     let command = args.first().ok_or("missing follow-up command")?;
+    if command == "block-worker" {
+        return block::worker(
+            Path::new(args.get(1).ok_or("input")?),
+            Path::new(args.get(2).ok_or("output")?),
+            args.get(3).ok_or("budget milliseconds")?.parse()?,
+        );
+    }
     let manifest = fs::read(args.get(1).ok_or("missing frozen fixture manifest")?)?;
     let v: Value = serde_json::from_slice(&manifest)?;
     let fixtures: Vec<Fixture> = serde_json::from_value(v["fixtures"].clone())?;
@@ -109,6 +117,8 @@ pub fn main(args: &[String]) -> Result<()> {
         }
     }
     let rows = match command.as_str() {
+        "block-build" => block::build(&fixtures, out)?,
+        "block-panel" => block::panel(Path::new(args.get(3).ok_or("block inputs")?), out)?,
         "incidence-pilot" => incidence::run(&fixtures, out)?,
         "assessment" => assessment::run(
             &fixtures,
@@ -227,7 +237,8 @@ fn adjudicate(prefix: &Path, out: &Path) -> Result<Vec<Value>> {
         || text.contains("ALL_DIVISOR_REPLAY_OK");
     let marker = marker
         || text.contains("ALL_HIGHER_TORSION_CONSTRUCTION_DONE")
-        || text.contains("ALL_INCIDENCE_REPLAY_OK");
+        || text.contains("ALL_INCIDENCE_REPLAY_OK")
+        || text.contains("ALL_BLOCK_REPLAY_OK");
     let hashes_match =
         meta["stdout_sha256"] == digest(&stdout) && meta["stderr_sha256"] == digest(&stderr);
     let script = meta["argv"]
