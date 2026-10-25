@@ -66,6 +66,7 @@
 use std::collections::{BTreeMap, HashMap};
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
+use std::os::unix::process::ExitStatusExt;
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
@@ -1578,6 +1579,8 @@ struct RunArgs {
 
 /// Run one system in a child under `ulimit -v` and a hard wall limit of
 /// budget + grace; the row, or a failure row with its reason.
+// The child is reaped by `wait4`, which clippy cannot see.
+#[allow(clippy::zombie_processes)]
 fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File) -> Value {
     let exe = std::env::current_exe().expect("current exe");
     let mut child = Command::new("sh")
@@ -1618,17 +1621,26 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
     let started = Instant::now();
     let limit = Duration::from_secs(a.budget + a.grace);
     let mut killed = false;
+    // `wait4` rather than `try_wait`, so the child's own peak resident set
+    // (`ru_maxrss`, kB on Linux) comes back with its status. The `sh`
+    // wrapper execs, so the pid is the system's process.
+    let pid = child.id() as libc::pid_t;
+    let mut ru: libc::rusage = unsafe { std::mem::zeroed() };
+    let mut raw: libc::c_int = 0;
     let status = loop {
-        if let Some(st) = child.try_wait().expect("wait") {
-            break st;
+        let r = unsafe { libc::wait4(pid, &mut raw, libc::WNOHANG, &mut ru) };
+        if r == pid {
+            break std::process::ExitStatus::from_raw(raw);
         }
         if started.elapsed() > limit {
             child.kill().ok();
             killed = true;
-            break child.wait().expect("wait");
+            unsafe { libc::wait4(pid, &mut raw, 0, &mut ru) };
+            break std::process::ExitStatus::from_raw(raw);
         }
         std::thread::sleep(Duration::from_millis(200));
     };
+    let peak_rss_kb = ru.ru_maxrss as u64;
     let wall = started.elapsed().as_secs_f64();
     let stdout = out_t.join().unwrap_or_default();
     let stderr = err_t.join().unwrap_or_default();
@@ -1685,7 +1697,8 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
     };
     merge(
         &mut row,
-        &json!({"process_wall_s": wall, "budget_s": a.budget, "ulimit_v_kb": a.vmem_kb}),
+        &json!({"process_wall_s": wall, "budget_s": a.budget, "ulimit_v_kb": a.vmem_kb,
+                "peak_rss_kb": peak_rss_kb}),
     );
     row
 }
@@ -2359,8 +2372,13 @@ impl Cell2 {
 /// Which study group a row file belongs to: `F1` … `F4`, or `p1` for the
 /// committed p₁ rows of the first run.
 fn group_of(file: &str) -> &str {
+    if file.starts_with("L2r-") {
+        return "L2r";
+    }
     match file.get(..3) {
-        Some(g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-")) => &g[..2],
+        Some(
+            g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "L1-" | "L2-"),
+        ) => &g[..2],
         _ => "p1",
     }
 }
@@ -3247,6 +3265,489 @@ fn analyze4(dir: &str) {
     }
 }
 
+/// Amendment 5: the m = 4 longer-budget cells L1 (A0, t = 4) and L2 (A11,
+/// t = 5), rules R1 and R2, σ and κ for A0 and A11 at m = 4 with every
+/// completed cell (F4 through its C1 replays, C2, L1, L2), and the
+/// predictions scorecard.
+fn of_arm<'a>(rs: &[&'a Value], a: &str) -> Vec<&'a Value> {
+    rs.iter().copied().filter(|r| r["arm"] == a).collect()
+}
+
+fn analyze5(dir: &str) {
+    let rows = read_rows(dir);
+    let group = |g: &'static str| -> Vec<&Value> {
+        rows.iter()
+            .filter(|(f, _)| group_of(f) == g)
+            .map(|(_, r)| r)
+            .collect()
+    };
+    let (c1, c2, l1, l2) = (group("C1"), group("C2"), group("L1"), group("L2"));
+    let f4 = |a: &str| -> Vec<&Value> {
+        c1.iter()
+            .copied()
+            .filter(|r| {
+                r["arm"] == a
+                    && r["m"] == 4
+                    && r["replay_of"]
+                        .as_str()
+                        .is_some_and(|f| f.starts_with("F4-"))
+            })
+            .collect()
+    };
+    println!("Factor-base designs, Amendment 5 (L1, L2): rows from {dir}");
+    println!("(field_ops = F_p multiplications in F4's row reduction; κ = least-squares slope of log₂ of a cell's mean");
+    println!(" field_ops on b; σ = least-squares slope of D on b. F4's cells enter through their C1 replays, whose");
+    println!(" traces matched. A cell counts only if both of its systems are ok. peak_rss_kb is descriptive only.)");
+
+    let show_rows = |title: &str, rs: &[&Value]| {
+        println!();
+        println!("════ {title}");
+        if rs.is_empty() {
+            println!("  no rows");
+        }
+        for r in rs {
+            println!(
+                "  {} t={} target {}: status {}, D {}, degree_reached {}, max_cols {}, field_ops {}, time {:.1} s, peak_rss_kb {}, ulimit_v_kb {}, budget {} s{}",
+                r["arm"].as_str().unwrap_or("?"),
+                r["t"],
+                r["target"],
+                r["status"].as_str().unwrap_or("?"),
+                r["D"],
+                r["degree_reached"],
+                r["max_cols"],
+                r["field_ops"],
+                r["time"].as_f64().unwrap_or(f64::NAN),
+                r["peak_rss_kb"],
+                r["ulimit_v_kb"],
+                r["budget_s"],
+                r["failure_reason"]
+                    .as_str()
+                    .map(|s| format!(" ({s})"))
+                    .unwrap_or_default()
+            );
+        }
+    };
+    show_rows("L1: A0 m = 4, t = 4, p1, budget 14400 s + grace 600 s", &l1);
+
+    // L1 and C2 must be the same systems.
+    let a0_c2 = of_arm(&c2, "A0");
+    let same: Vec<bool> = l1
+        .iter()
+        .map(|r| {
+            a0_c2.iter().any(|c| {
+                c["target"] == r["target"]
+                    && [
+                        "cell_seed",
+                        "target_seed",
+                        "n_vars",
+                        "n_eqs",
+                        "planted_x",
+                        "x_r",
+                        "curve",
+                        "set",
+                    ]
+                    .iter()
+                    .all(|k| c[*k] == r[*k])
+            })
+        })
+        .collect();
+    println!(
+        "  identity with C2's A0 systems (cell_seed, target_seed, n_vars, n_eqs, planted_x, x_r, curve, set): {} of {} L1 systems match",
+        same.iter().filter(|x| **x).count(),
+        l1.len()
+    );
+    for c in &a0_c2 {
+        println!(
+            "  C2 (prior attempt) A0 t=4 target {}: {} under ulimit -v {}, {:.1} s",
+            c["target"],
+            c["status"].as_str().unwrap_or("?"),
+            c["ulimit_v_kb"],
+            c["time"].as_f64().unwrap_or(f64::NAN)
+        );
+    }
+    show_rows(
+        "L2: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s",
+        &l2,
+    );
+
+    let cell_done = |rs: &[&Value]| -> bool {
+        rs.len() == 2
+            && rs
+                .iter()
+                .all(|r| r["status"] == "ok" && r["field_ops"].is_u64())
+    };
+    let l1_done = cell_done(&l1);
+    let l2_done = cell_done(&l2);
+    let mean_ops = |rs: &[&Value]| {
+        rs.iter()
+            .map(|r| r["field_ops"].as_u64().unwrap_or(0) as f64)
+            .sum::<f64>()
+            / rs.len() as f64
+    };
+
+    // A SIGKILL the harness did not send (it sends one only at the hard
+    // wall limit, recorded as `timeout`) is attributed from the kernel log
+    // copied beside the rows, if one is there.
+    let oom = |file: &str| -> Option<String> {
+        let log = std::fs::read_to_string(format!("{dir}/{file}")).ok()?;
+        let kills = log
+            .lines()
+            .filter(|l| l.contains("Memory cgroup out of memory: Killed process"))
+            .count();
+        let lim = log
+            .lines()
+            .find(|l| l.contains("] memory: usage"))
+            .and_then(|l| l.split("limit ").nth(1))
+            .and_then(|x| x.split(',').next())
+            .unwrap_or("?")
+            .to_string();
+        Some(format!(
+            "memory cgroup: {kills} kernel OOM kills at the cgroup limit {lim} (below ulimit -v; {file})"
+        ))
+    };
+    let limit = |rs: &[&Value], dmesg: &str| -> String {
+        let mut v: Vec<String> = rs
+            .iter()
+            .filter(|r| r["status"] != "ok")
+            .map(|r| {
+                let why = r["failure_reason"].as_str().unwrap_or("");
+                if why.contains("memory") {
+                    "memory (ulimit -v)".to_string()
+                } else if why.contains("signal: 9") {
+                    oom(dmesg).unwrap_or_else(|| "SIGKILL from outside the harness".into())
+                } else {
+                    r["status"].as_str().unwrap_or("?").to_string()
+                }
+            })
+            .collect();
+        v.dedup();
+        v.join(",")
+    };
+
+    // Series. A0: F4 + L1 (L1 re-measures C2's A0 systems under the raised
+    // limits, so C2's aborted rows do not enter). A11: F4 + C2 + L2.
+    let a0: Vec<&Value> = f4("A0").into_iter().chain(l1.iter().copied()).collect();
+    let a11: Vec<&Value> = f4("A11")
+        .into_iter()
+        .chain(of_arm(&c2, "A11"))
+        .chain(l2.iter().copied())
+        .collect();
+    println!();
+    println!("════ σ and κ at m = 4, p1");
+    let (n0, s0, k0) = show4(
+        "A0 m = 4 p1 (F4 via C1, L1's t = 4 cell)",
+        4,
+        &cells4(a0.into_iter()),
+    );
+    let (n11, s11, k11) = show4(
+        "A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, L2's t = 5 cell)",
+        4,
+        &cells4(a11.into_iter()),
+    );
+
+    println!();
+    println!("════ R1: does A11's constant factor survive at m = 4, t = 4?");
+    let a11_t4 = of_arm(&c2, "A11");
+    if l1_done && cell_done(&a11_t4) {
+        let (x, y) = (mean_ops(&a11_t4), mean_ops(&l1));
+        println!(
+            "  A11 t = 4 (C2) mean field_ops {x:.0} (log₂ {:.3}); A0 t = 4 (L1) mean field_ops {y:.0} (log₂ {:.3})",
+            x.log2(),
+            y.log2()
+        );
+        println!(
+            "  R1: {}",
+            if x < y {
+                "SURVIVES (A11 below A0)"
+            } else {
+                "CROSSED (A11 not below A0)"
+            }
+        );
+    } else if l1.len() < 2 {
+        println!("  R1: NOT DECIDED (L1 has {} of 2 rows)", l1.len());
+    } else {
+        println!("  R1: A0 NOT MEASURABLE AT t = 4 WITHIN 14.5 GB AND 4 h (limit and partial values in L1 above); no cost comparison");
+    }
+
+    println!();
+    println!("════ R2: A11 at m = 4, t = 5");
+    if l2_done {
+        println!(
+            "  L2 completed: the 4-cell series gives κ = {} ({}), σ = {} ({})",
+            k11.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n11, k11, 4),
+            s11.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n11, s11)
+        );
+    } else if l2.len() < 2 {
+        println!("  R2: NOT DECIDED (L2 has {} of 2 rows)", l2.len());
+    } else {
+        println!(
+            "  L2 did not complete (limit: {}); the {n11}-cell verdicts stand: κ = {} ({}), σ = {} ({})",
+            limit(&l2, "L2-A11-m4-t5.dmesg.txt"),
+            k11.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n11, k11, 4),
+            s11.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n11, s11)
+        );
+    }
+    println!(
+        "  A0 m = 4: {n0} completed cells: κ = {} ({}), σ = {} ({})",
+        k0.map_or("-".into(), |x| format!("{x:.3}")),
+        kappa_verdict(n0, k0, 4),
+        s0.map_or("-".into(), |x| format!("{x:.4}")),
+        verdict(n0, s0)
+    );
+
+    println!();
+    println!("════ Predictions scorecard (Amendment 5)");
+    let l1_mem = l1.iter().any(|r| {
+        r["failure_reason"]
+            .as_str()
+            .is_some_and(|s| s.contains("memory"))
+    });
+    println!(
+        "  L1: A0 aborts for memory again: completed {l1_done}, limit {}  →  {}",
+        if l1_done {
+            "none".into()
+        } else {
+            limit(&l1, "L1-A0-m4-t4.dmesg.txt")
+        },
+        if l1.len() < 2 {
+            "not decided"
+        } else if !l1_done && l1_mem {
+            "held"
+        } else {
+            "did not hold"
+        }
+    );
+    let l2_mem = l2.iter().any(|r| {
+        r["failure_reason"]
+            .as_str()
+            .is_some_and(|s| s.contains("memory"))
+    });
+    println!(
+        "  L2: A11 does not complete within 14.5 GB: completed {l2_done}, limit {}  →  {}",
+        if l2_done {
+            "none".into()
+        } else {
+            limit(&l2, "L2-A11-m4-t5.dmesg.txt")
+        },
+        if l2.len() < 2 {
+            "not decided"
+        } else if l2_done {
+            "did not hold"
+        } else if l2_mem {
+            "held"
+        } else if oom("L2-A11-m4-t5.dmesg.txt").is_some() {
+            "not decided as registered (did not complete, but the binding limit was the host's memory cgroup, below the registered 14.5 GB)"
+        } else {
+            "held in part (did not complete, but the limit was not memory)"
+        }
+    );
+}
+
+/// Amendment 6: L2r, the L2 systems rerun under an address-space limit
+/// below the host's memory cgroup; the attribution check against the kernel
+/// log copied beside the rows, R2 applied to L2r, and the prediction.
+fn analyze6(dir: &str) {
+    let rows = read_rows(dir);
+    let group = |g: &'static str| -> Vec<&Value> {
+        rows.iter()
+            .filter(|(f, _)| group_of(f) == g)
+            .map(|(_, r)| r)
+            .collect()
+    };
+    let (c1, c2, l2, l2r) = (group("C1"), group("C2"), group("L2"), group("L2r"));
+    println!("Factor-base designs, Amendment 6 (L2r): rows from {dir}");
+    println!("(L2r = L2's two A11 m = 4, t = 5 systems under ulimit -v V below the memory cgroup. A system's");
+    println!(" limit is attributable only if its row is a ulimit -v malloc failure or a timeout and the kernel");
+    println!(" log beside the rows has no OOM kill. peak_rss_kb is descriptive only.)");
+
+    let dmesg = std::fs::read_to_string(format!("{dir}/L2r-A11-m4-t5.dmesg.txt")).ok();
+    let kills: Vec<String> = dmesg
+        .as_deref()
+        .unwrap_or("")
+        .lines()
+        .filter(|l| l.contains("Memory cgroup out of memory: Killed process"))
+        .map(String::from)
+        .collect();
+    let preflight: Vec<String> = dmesg
+        .as_deref()
+        .unwrap_or("")
+        .lines()
+        .filter(|l| l.starts_with("# pre-flight"))
+        .map(String::from)
+        .collect();
+
+    println!();
+    println!(
+        "════ Pre-flight and kernel log ({})",
+        if dmesg.is_some() {
+            "runs/L2r-A11-m4-t5.dmesg.txt"
+        } else {
+            "MISSING"
+        }
+    );
+    for l in &preflight {
+        println!("  {}", l.trim_start_matches("# "));
+    }
+    println!("  kernel OOM kills recorded: {}", kills.len());
+    for k in &kills {
+        println!("    {k}");
+    }
+
+    println!();
+    println!("════ L2r: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s");
+    if l2r.is_empty() {
+        println!("  no rows");
+    }
+    let mut attributable = Vec::new();
+    for r in &l2r {
+        let why = r["failure_reason"].as_str().unwrap_or("");
+        let v = r["ulimit_v_kb"].as_u64().unwrap_or(0);
+        let ok = r["status"] == "ok";
+        let attr = dmesg.is_some()
+            && kills.is_empty()
+            && (ok
+                || r["status"] == "timeout"
+                || why.contains(&format!("memory allocation failed under ulimit -v {v}")));
+        attributable.push(attr);
+        println!(
+            "  A11 t={} target {}: status {}, D {}, max_cols {}, field_ops {}, time {:.1} s, peak_rss_kb {}, ulimit_v_kb {}, budget {} s{}  →  limit {}",
+            r["t"],
+            r["target"],
+            r["status"].as_str().unwrap_or("?"),
+            r["D"],
+            r["max_cols"],
+            r["field_ops"],
+            r["time"].as_f64().unwrap_or(f64::NAN),
+            r["peak_rss_kb"],
+            r["ulimit_v_kb"],
+            r["budget_s"],
+            r["failure_reason"].as_str().map(|s| format!(" ({s})")).unwrap_or_default(),
+            if ok { "none (completed)" } else if attr { "attributable (the registered one)" } else { "NOT ATTRIBUTABLE" }
+        );
+    }
+    let same = l2r
+        .iter()
+        .filter(|r| {
+            l2.iter().any(|c| {
+                c["target"] == r["target"]
+                    && [
+                        "cell_seed",
+                        "target_seed",
+                        "n_vars",
+                        "n_eqs",
+                        "planted_x",
+                        "x_r",
+                        "curve",
+                        "set",
+                    ]
+                    .iter()
+                    .all(|k| c[*k] == r[*k])
+            })
+        })
+        .count();
+    println!(
+        "  identity with L2's systems (cell_seed, target_seeds, n_vars, n_eqs, planted_x, x_r, curve, set): {same} of {} L2r systems match",
+        l2r.len()
+    );
+    for r in &l2 {
+        println!(
+            "  L2 (prior attempt) target {}: {} at {:.1} s, peak_rss_kb {} ({})",
+            r["target"],
+            r["status"].as_str().unwrap_or("?"),
+            r["time"].as_f64().unwrap_or(f64::NAN),
+            r["peak_rss_kb"],
+            r["failure_reason"].as_str().unwrap_or("")
+        );
+    }
+
+    // R2 on L2r: A11 series F4 (via C1) + C2 + L2r.
+    let a11: Vec<&Value> = c1
+        .iter()
+        .copied()
+        .filter(|r| {
+            r["arm"] == "A11"
+                && r["m"] == 4
+                && r["replay_of"]
+                    .as_str()
+                    .is_some_and(|f| f.starts_with("F4-"))
+        })
+        .chain(of_arm(&c2, "A11"))
+        .chain(l2r.iter().copied())
+        .collect();
+    println!();
+    println!("════ σ and κ at m = 4, p1");
+    let (n, s, k) = show4(
+        "A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, L2r's t = 5 cell)",
+        4,
+        &cells4(a11.into_iter()),
+    );
+    let done = l2r.len() == 2
+        && l2r
+            .iter()
+            .all(|r| r["status"] == "ok" && r["field_ops"].is_u64());
+    let v = l2r
+        .first()
+        .and_then(|r| r["ulimit_v_kb"].as_u64())
+        .unwrap_or(0);
+    println!();
+    println!("════ R2 applied to L2r");
+    let outcome = if l2r.len() < 2 {
+        format!("NOT DECIDED (L2r has {} of 2 rows)", l2r.len())
+    } else if done {
+        format!(
+            "L2r completed: the {n}-cell series gives κ = {} ({}), σ = {} ({})",
+            k.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n, k, 4),
+            s.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n, s)
+        )
+    } else if attributable.iter().all(|x| *x) {
+        format!(
+            "A11 NOT MEASURABLE AT m = 4, t = 5 WITHIN {v} kB AND 4 h; the {n}-cell verdicts stand: κ = {} ({}), σ = {} ({})",
+            k.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n, k, 4),
+            s.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n, s)
+        )
+    } else {
+        "NOT DECIDED (a limit is not attributable; see the rows above)".to_string()
+    };
+    println!("  R2: {outcome}");
+    println!(
+        "  Amendment 5's L2 prediction keeps its recorded outcome (not decided as registered)."
+    );
+
+    println!();
+    println!("════ Predictions scorecard (Amendment 6)");
+    let mut held = l2r.len() == 2;
+    for r in &l2r {
+        let t = r["target"].as_u64().unwrap_or(9);
+        let prior = l2
+            .iter()
+            .find(|c| c["target"] == t)
+            .and_then(|c| c["time"].as_f64())
+            .unwrap_or(f64::NAN);
+        let why = r["failure_reason"].as_str().unwrap_or("");
+        let malloc = why.contains(&format!("memory allocation failed under ulimit -v {v}"));
+        let time = r["time"].as_f64().unwrap_or(f64::NAN);
+        let ok = malloc && kills.is_empty() && dmesg.is_some() && time < prior;
+        println!(
+            "  target {t}: ulimit -v malloc failure {malloc}, no OOM kill {}, time {time:.1} s against L2's {prior:.1} s  →  {}",
+            dmesg.is_some() && kills.is_empty(),
+            if ok { "as predicted" } else { "not as predicted" }
+        );
+        held &= ok;
+    }
+    println!(
+        "  L2r: both systems abort under ulimit -v V, no OOM kill, each before its L2 kill time  →  {}",
+        if l2r.len() < 2 { "not decided" } else if held { "held" } else { "did not hold" }
+    );
+}
+
 // ── Arguments ──────────────────────────────────────────────────────
 
 fn flag(args: &[String], name: &str) -> Option<String> {
@@ -3311,7 +3812,11 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--amendment4") {
+            if args.iter().any(|a| a == "--amendment6") {
+                analyze6(dir);
+            } else if args.iter().any(|a| a == "--amendment5") {
+                analyze5(dir);
+            } else if args.iter().any(|a| a == "--amendment4") {
                 analyze4(dir);
             } else if args.iter().any(|a| a == "--amendment2") {
                 analyze2(dir);

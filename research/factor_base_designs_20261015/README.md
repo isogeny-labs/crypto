@@ -66,7 +66,7 @@ Status vocabulary:
 
 | # | design | status | Lean | experiment |
 |:--|:--|:--|:--|:--|
-| 11 | Norm-divisibility chain over a Kummer fibre (prime) | **open: better presentation, no slope change** (§5: replicates on p₂; equals its own shape null; growth per bit no flatter, steeper at `m = 4`) | `chain_sound` (soundness at each root), `pencil_norm_factor` (the `m = 2` norm factorization), `norm_chain_excess` (one more equation than unknown, every `m`) | A11, F1–F4 |
+| 11 | Norm-divisibility chain over a Kummer fibre (prime) | **open: better presentation, no slope change** (§5: replicates on p₂; equals its own shape null; growth per bit no flatter, steeper at `m = 4`; cost-unfavourable on measured `field_ops`; `m = 4`, t ≥ 4 comparison needs > 14 GB, Amendments 5–6) | `chain_sound` (soundness at each root), `pencil_norm_factor` (the `m = 2` norm factorization), `norm_chain_excess` (one more equation than unknown, every `m`) | A11, F1–F4, C1–C4, L1, L2, L2r |
 | 12 | Binary norm chain as an auxiliary-variable solver input (credits `research/nagao_relations/` open item 1) | open | `chain_sound` applies verbatim | E12 |
 | 13 | Algebraic large prime (partial divisibility) | open | — | E13 |
 
@@ -228,6 +228,37 @@ Amendment 4 was registered before any of its rows. Every row now records
   `m ≤ 4`. A11's advantage is a smaller starting cost from the
   function-and-chain combination, with a steeper per-bit growth. It is not a
   slope change.
+
+### Amendments 5–6: the `m = 4` longer-budget follow-up (run-20261019T1633Z, run-20261019T1740Z)
+
+Rows: `runs/L1-*`, `runs/L2-*` and `runs/L2r-*`, with kernel logs
+`runs/*.dmesg.txt`. Analyses: `runs/analysis-amendment5.txt` and
+`runs/analysis-amendment6.txt`. Reports:
+[`reports/run-20261019T1633Z/REPORT.pdf`](reports/run-20261019T1633Z/REPORT.pdf)
+and [`reports/run-20261019T1740Z/REPORT.pdf`](reports/run-20261019T1740Z/REPORT.pdf).
+Every system was rebuilt from the same seeds as before, and that was checked.
+Each row now records the child's peak RSS.
+
+- **L1, A0 at `m = 4`, `t = 4`, 4 h, `ulimit -v 14.5 GB`:** not measurable.
+  Both systems aborted at 517 s and 540 s, peak RSS 12.8–12.9 GB, about
+  when they died under 13 GB (C2: about 525 s). The extra memory bought
+  essentially no time. **R1:** no cost comparison at `t = 4`. Whether A11's
+  constant factor survives there is still undecided.
+- **L2, A11 at `m = 4`, `t = 5`:** killed by the container's memory-cgroup
+  OOM killer at 97 s and 108 s. The cgroup limit, 14.0 GB, was below the
+  registered 14.5 GB, so the prediction was scored *not decided as
+  registered*.
+- **L2r (Amendment 6), the same cell under `ulimit -v 13.48 GB`,** set below
+  the cgroup limit read in pre-flight. Both systems hit the registered limit
+  (allocation failure at 130 s and 132 s, no kernel OOM kill), so the limit
+  is attributable. **R2:** A11 is not measurable at `t = 5` within 13.48 GB
+  and 4 h. Its 3-cell `m = 4` verdicts stand: κ = 14.9 against 3
+  (cost-unfavourable), σ = 1.5. The prediction that each L2r system would stop
+  before its L2 kill time did not hold.
+- **Reading:** this host cannot measure either open `m = 4` cell. Settling
+  whether A11's constant factor survives at `m = 4`, `t ≥ 4` needs a host
+  with well over 15 GB (the independent lab runner, not reachable from these
+  containers). No recorded verdict changed.
 
 ## 6. What this round does not establish
 

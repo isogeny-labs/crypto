@@ -1,0 +1,13 @@
+FROM public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39
+ARG SOURCE_REVISION
+LABEL org.opencontainers.image.source="https://github.com/aburan28/crypto" \
+      org.opencontainers.image.revision="${SOURCE_REVISION}"
+# Build context contains only these three files, never a repository or keys.
+COPY ecbench /usr/local/bin/ecbench
+COPY smoke-prime.json /opt/isolab/specs/smoke-prime.json
+COPY build-info.json /opt/isolab/build-info.json
+ENV HOME=/work
+WORKDIR /work
+USER 1000:1000
+ENTRYPOINT []
+CMD ["/usr/local/bin/ecbench", "--help"]

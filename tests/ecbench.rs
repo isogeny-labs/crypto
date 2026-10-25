@@ -1272,13 +1272,20 @@ fn pkm_tower_runs_every_engine_on_a_prime_curve() {
     assert_eq!(by_arm.len(), 4);
     let extra = |a: &str, k: &str| by_arm[a]["solver"]["extra"][k].as_u64().unwrap();
     for k in ["nodes", "refuted", "leaves"] {
-        assert_eq!(extra("f4", k), extra("f5", k), "F4 and signature F5 diverged at {k}");
+        assert_eq!(
+            extra("f4", k),
+            extra("f5", k),
+            "F4 and signature F5 diverged at {k}"
+        );
     }
     for key in ["targets_tried", "relations_found"] {
         assert_eq!(by_arm["f4"]["counters"][key], by_arm["f5"]["counters"][key]);
     }
     assert!(by_arm["f4"]["solver"]["ops"].as_u64().unwrap() > 0);
-    assert!(extra("f6", "geometric_group_additions") > 0, "F6 charged no geometry");
+    assert!(
+        extra("f6", "geometric_group_additions") > 0,
+        "F6 charged no geometry"
+    );
     assert_eq!(extra("f4", "geometric_group_additions"), 0);
     assert_eq!(by_arm["enum"]["solver"]["ops"].as_u64(), Some(0));
     let (ok, _, err) = ecbench(&[
