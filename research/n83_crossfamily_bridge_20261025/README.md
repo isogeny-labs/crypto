@@ -15,6 +15,16 @@ hashes, execution limits, order rotation, and the statistical rule must be
 frozen in a separate bridge dispatch before any timing begins. This fixture
 contains no comparison timings or selected factor base.
 
+`nominate.py` freezes the candidate rule before either panel result is
+available: require complete admission and a statistically selected online
+and cold candidate within each family, then compare the deduplicated union
+(two to four exact candidate IDs) on these new points. It recomputes the
+nearby-panel selection from its individual rows and the wide-panel selection
+from its validated rows. An inconclusive panel leaves nomination unknown.
+The raw panel archives must be independently replayed before their aggregate
+JSON is passed to this nominator; the nominator's output is not a bridge
+dispatch or a timing result.
+
 Regenerate and check the committed artifacts from the repository root:
 
 ```sh
