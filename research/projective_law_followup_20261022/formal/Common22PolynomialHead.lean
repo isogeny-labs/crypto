@@ -76,9 +76,34 @@ theorem generic_coeff_four
   simp only [coeff_add, coeff_C_mul_X_pow, coeff_C_mul_X, coeff_C]
   simp
 
+/-- The same explicit expansion bounds the residual degree by six. -/
+theorem generic_natDegree_le_six
+    (q1 r1 q2 r2 n3 n2 n1 n0 ucoef qcoef rcoef : K) :
+    let u1 : K[X] := X ^ 2 + C q1 * X + C r1
+    let u2 : K[X] := X ^ 2 + C q2 * X + C r2
+    let n : K[X] := C n3 * X ^ 3 + C n2 * X ^ 2 + C n1 * X + C n0
+    let support : K[X] := C ucoef * X ^ 2 + C qcoef * X + C rcoef
+    (n ^ 2 - u1 * u2 * support).natDegree ≤ 6 := by
+  dsimp
+  apply natDegree_le_iff_degree_le.mpr
+  apply (degree_le_iff_coeff_zero _ 6).2
+  intro m hm
+  have hnat : 6 < m := by exact_mod_cast hm
+  rw [generic_expansion q1 r1 q2 r2 n3 n2 n1 n0 ucoef qcoef rcoef]
+  simp only [coeff_add, coeff_C_mul_X_pow, coeff_C_mul_X, coeff_C]
+  have h6 : m ≠ 6 := by omega
+  have h5 : m ≠ 5 := by omega
+  have h4 : m ≠ 4 := by omega
+  have h3 : m ≠ 3 := by omega
+  have h2 : m ≠ 2 := by omega
+  have h1 : m ≠ 1 := by omega
+  have h0 : m ≠ 0 := by omega
+  simp [h6, h5, h4, h3, h2, h1, h0]
+
 end Common22PolynomialHead
 
 #print axioms Common22PolynomialHead.generic_expansion
 #print axioms Common22PolynomialHead.generic_coeff_six
 #print axioms Common22PolynomialHead.generic_coeff_five
 #print axioms Common22PolynomialHead.generic_coeff_four
+#print axioms Common22PolynomialHead.generic_natDegree_le_six

@@ -1,5 +1,7 @@
 import Common22PolynomialHead
 import Common22SupportHead
+import Common22Coprime
+import Common22Degree
 
 /-!
 Actual polynomial head for the proof-side unit-weight common 2+2 residual.
@@ -53,9 +55,46 @@ theorem sourceE_coeff_four (q1 r1 s1 t1 q2 r2 s2 t2 : K) :
   rw [Common22PolynomialHead.generic_coeff_four]
   ring_nf
 
+/-- The proof-side source-style residual is at most sextic. -/
+theorem sourceE_natDegree_le_six (q1 r1 s1 t1 q2 r2 s2 t2 : K) :
+    (sourceE q1 r1 s1 t1 q2 r2 s2 t2).natDegree ≤ 6 := by
+  unfold sourceE
+  simp only [Common22SupportHead.coefficientData]
+  apply Common22PolynomialHead.generic_natDegree_le_six
+
+/-- For a monic quintic with zero fourth coefficient, the source-style
+residual difference has degree below the two-support product. -/
+theorem sourceE_strict_degree
+    (q1 r1 s1 t1 q2 r2 s2 t2 : K) (f : K[X])
+    (f_degree : f.natDegree ≤ 5)
+    (f_five : f.coeff 5 = 1)
+    (f_four : f.coeff 4 = 0) :
+    degree (sourceE q1 r1 s1 t1 q2 r2 s2 t2 -
+      C ((Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2).1 ^ 2) * f) <
+    degree (Common22Coprime.firstSupport q1 r1 *
+      Common22Coprime.secondSupport q2 r2) := by
+  exact Common22Degree.cleared_difference_degree_lt_supports_of_sextic_head
+    (Common22Coprime.firstSupport q1 r1)
+    (Common22Coprime.secondSupport q2 r2)
+    (sourceE q1 r1 s1 t1 q2 r2 s2 t2) f
+    (Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2).1
+    (Common22Coprime.firstSupport_nonzero q1 r1)
+    (Common22Coprime.secondSupport_nonzero q2 r2)
+    (Common22Coprime.firstSupport_natDegree q1 r1)
+    (Common22Coprime.secondSupport_natDegree q2 r2)
+    (sourceE_natDegree_le_six q1 r1 s1 t1 q2 r2 s2 t2)
+    (sourceE_coeff_six q1 r1 s1 t1 q2 r2 s2 t2)
+    f_degree
+    (sourceE_coeff_five q1 r1 s1 t1 q2 r2 s2 t2)
+    f_five
+    (sourceE_coeff_four q1 r1 s1 t1 q2 r2 s2 t2)
+    f_four
+
 end Common22SourceHead
 
 #print axioms Common22SourceHead.sourceE_coeff_six
 #print axioms Common22SourceHead.sourceE_coeff_five
 #print axioms Common22SourceHead.sourceE_coeff_four
 #print axioms Common22SourceHead.canonical_n_eq_interpolant
+#print axioms Common22SourceHead.sourceE_natDegree_le_six
+#print axioms Common22SourceHead.sourceE_strict_degree

@@ -494,7 +494,8 @@ def main() -> None:
     polynomial_source = (ROOT / "Common22PolynomialHead.lean").read_text()
     polynomial_log = (ROOT / "common22-polynomial-head-build.log").read_text()
     for theorem in ("generic_expansion", "generic_coeff_six",
-                    "generic_coeff_five", "generic_coeff_four"):
+                    "generic_coeff_five", "generic_coeff_four",
+                    "generic_natDegree_le_six"):
         require(re.search(r"(?m)^theorem " + theorem + r"\b", polynomial_source) is not None,
                 f"common polynomial-head theorem missing: {theorem}")
         require(
@@ -507,7 +508,8 @@ def main() -> None:
     source_head_source = (ROOT / "Common22SourceHead.lean").read_text()
     source_head_log = (ROOT / "common22-source-head-build.log").read_text()
     for theorem in ("sourceE_coeff_six", "sourceE_coeff_five",
-                    "sourceE_coeff_four", "canonical_n_eq_interpolant"):
+                    "sourceE_coeff_four", "canonical_n_eq_interpolant",
+                    "sourceE_natDegree_le_six", "sourceE_strict_degree"):
         require(re.search(r"(?m)^theorem " + theorem + r"\b", source_head_source) is not None,
                 f"common source-head theorem missing: {theorem}")
         require(
@@ -551,10 +553,13 @@ def main() -> None:
         "Common22PolynomialHead.generic_coeff_six",
         "Common22PolynomialHead.generic_coeff_five",
         "Common22PolynomialHead.generic_coeff_four",
+        "Common22PolynomialHead.generic_natDegree_le_six",
         "Common22SourceHead.sourceE_coeff_six",
         "Common22SourceHead.sourceE_coeff_five",
         "Common22SourceHead.sourceE_coeff_four",
         "Common22SourceHead.canonical_n_eq_interpolant",
+        "Common22SourceHead.sourceE_natDegree_le_six",
+        "Common22SourceHead.sourceE_strict_degree",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ], "common uniqueness theorem inventory mismatch")

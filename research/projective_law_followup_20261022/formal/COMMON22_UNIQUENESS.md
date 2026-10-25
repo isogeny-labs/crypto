@@ -16,11 +16,14 @@ at degrees six, five, and four. Four more substitute the proof-side
 source-style coefficients and show `0`, `B²`, `0`; they also equate the
 canonical numerator with its interpolation expression. The semantic link
 from Rust execution to that proof-side polynomial remains open.
+The source-style residual is also proved at most sextic, and its cleared
+difference from a monic quintic with zero fourth coefficient has degree
+strictly below the two-support product.
 The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log),
 [degree](common22-degree-build.log),
 [polynomial-head](common22-polynomial-head-build.log),
 [source-head](common22-source-head-build.log), and
-[uniqueness](common22-uniqueness-build.log) kernel logs record all twenty-three
+[uniqueness](common22-uniqueness-build.log) kernel logs record all twenty-six
 theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list

@@ -256,7 +256,9 @@ implication in this paragraph. Four further Lean theorems expand a generic
 `N²-u1*u2*U` polynomial and identify its coefficients in degrees six, five,
 and four. Four source-style Lean theorems substitute the common-branch
 coefficient formulas into the proof-side polynomial, obtaining `0,B²,0`,
-and identify the cubic with its interpolation expression. Rust-to-Lean
+and identify the cubic with its interpolation expression. The proof-side
+residual has degree at most six; for any monic quintic with zero fourth
+coefficient, its cleared difference has degree below `u1*u2`. Rust-to-Lean
 semantic correspondence has not been proved for every runtime execution.
 The divisor-class step remains written mathematics.
 

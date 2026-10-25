@@ -39,10 +39,13 @@ packet = {
         "Common22PolynomialHead.generic_coeff_six",
         "Common22PolynomialHead.generic_coeff_five",
         "Common22PolynomialHead.generic_coeff_four",
+        "Common22PolynomialHead.generic_natDegree_le_six",
         "Common22SourceHead.sourceE_coeff_six",
         "Common22SourceHead.sourceE_coeff_five",
         "Common22SourceHead.sourceE_coeff_four",
         "Common22SourceHead.canonical_n_eq_interpolant",
+        "Common22SourceHead.sourceE_natDegree_le_six",
+        "Common22SourceHead.sourceE_strict_degree",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ],
@@ -51,7 +54,7 @@ packet = {
         {"obligation": name, "kind": kind, "status": status, "statement": statement}
         for name, kind, status, statement in ROWS
     ],
-    "scope": "conditional coprimeness, residues, proof-side source-style polynomial head, degree implication, and curve equation over a field; runtime semantic correspondence and geometry remain open",
+    "scope": "conditional coprimeness, residues, proof-side source-style polynomial head and strict degree, and curve equation over a field; runtime semantic correspondence and geometry remain open",
     "cost_ratio_change": None,
 }
 (ROOT / "common22-uniqueness.json").write_text(json.dumps(packet, indent=2) + "\n")
@@ -99,11 +102,14 @@ at degrees six, five, and four. Four more substitute the proof-side
 source-style coefficients and show `0`, `B²`, `0`; they also equate the
 canonical numerator with its interpolation expression. The semantic link
 from Rust execution to that proof-side polynomial remains open.
+The source-style residual is also proved at most sextic, and its cleared
+difference from a monic quintic with zero fourth coefficient has degree
+strictly below the two-support product.
 The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log),
 [degree](common22-degree-build.log),
 [polynomial-head](common22-polynomial-head-build.log),
 [source-head](common22-source-head-build.log), and
-[uniqueness](common22-uniqueness-build.log) kernel logs record all twenty-three
+[uniqueness](common22-uniqueness-build.log) kernel logs record all twenty-six
 theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list
@@ -137,7 +143,9 @@ quadratics. These are conditional polynomial statements.
 Four more theorems expand a generic cubic-minus-quadratic product and read its
 coefficients in degrees six, five, and four. Four source-style theorems show
 those coefficients are $0,B^2,0$ and equate the cubic's canonical and
-interpolation forms. Rust execution is not translated into Lean here.
+interpolation forms. Two further theorems prove the proof-side residual is
+at most sextic and obtain the strict degree bound for a monic quintic with
+zero fourth coefficient. Rust execution is not translated into Lean here.
 
 \begin{center}
 \begin{tabular}{ll}
