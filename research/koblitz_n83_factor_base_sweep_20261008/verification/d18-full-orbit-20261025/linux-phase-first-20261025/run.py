@@ -55,6 +55,7 @@ def supervise(mode, source, binary, base, image, root, source_commit, binary_sha
         "--mount", f"type=bind,src={binary},dst=/worker,readonly",
         "--mount", f"type=bind,src={base},dst=/base,readonly",
         "--mount", f"type=bind,src={arm},dst=/out",
+        "--env", "GIT_OPTIONAL_LOCKS=0",
         "--workdir", "/src", image,
         "/worker", MODE, mode, "/base", f"/src/{FIXTURE_REL}", "/out/result.json",
     ]
