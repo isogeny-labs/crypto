@@ -24,6 +24,14 @@ shared target indices limit inference beyond these cases.
 Class 7's observed crater and deepest-level ratios are about 1.12; pooled
 parity does not establish uniform equivalence across individual classes.
 
+The [crater reanalysis and repetition design](../conductor_gap_crater_design_20261025/REPORT.md)
+enumerates the complete class-bootstrap distribution: its 98% interval is
+[0.97323, 1.05706], also inconclusive. It explains why distinct targets,
+solver seeds and classes are different repetition units, and records that
+this replication's prime subgroups are only 25–32 bits. Its proposed new
+measurement counts are planning scenarios, not completed solver runs; the
+frozen data and original interval above are unchanged.
+
 CM scalar/recurrence and scalar/map comparisons keep queries, relations,
 ranks and answers identical. Their differences are factor-base construction
 work. Complete native setup counts/prices, a prime-field F4/SAT oracle,
