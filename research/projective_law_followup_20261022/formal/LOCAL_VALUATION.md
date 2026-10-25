@@ -19,9 +19,13 @@ ring, so cancellation cannot raise the order. These theorems retain all
 coefficient terms and require no distinct-root assumption.
 
 The chart identity in `Common22InfinityChart.lean` says `G=z³g` on the
-affine overlap. In the *intended* projective stalk, the formal equalities
-would give `ord∞(g)=0−3·2=−6` for `C≠0`, and `1−3·2=−5` for `C=0,B≠0`.
-That rational-function valuation step is **not** a Lean theorem here.
+affine overlap. The separate [fraction-field packet](FRACTION_POLE.md)
+now proves the valuation arithmetic in Lean under supplied field-valuation
+and chart hypotheses, giving `v(g)=v(w)⁻⁶` for unit `G` and
+`v(g)=v(w)⁻⁵` for `v(G)=v(w)`. For the *intended* projective stalk these
+would be additive pole orders six and five. The geometric specialization to
+that stalk and the identification of its uniformizer are **not** Lean
+theorems in this packet.
 
 The next minimal formal obligation is to construct the smooth projective
 completion of the squarefree monic quintic, identify its unique infinity

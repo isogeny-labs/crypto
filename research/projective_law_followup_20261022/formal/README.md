@@ -84,6 +84,11 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   in an abstract DVR with the stated chart and unit hypotheses. The actual
   projective infinity stalk, rational-function pole orders, divisor and
   `Pic⁰` transport remain open.
+- The [conditional fraction-field packet](FRACTION_POLE.md) proves in Lean
+  that `w²=z*u`, `v(u)=1`, and `z³*g=G` imply `v(g)=v(w)⁻⁶` when `v(G)=1`,
+  or `v(g)=v(w)⁻⁵` when `v(G)=v(w)`. It does not construct the projective
+  infinity stalk or identify its valuation and uniformizer; that geometric
+  specialization, principal divisor, and `Pic⁰` transport remain open.
 - `branch-coverage.json` gives the standardized runtime-label, Lean
   constructor, certificate-schema mapping and lists the five rejected or
   exceptional labels separately.
