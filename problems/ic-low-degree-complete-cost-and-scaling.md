@@ -29,17 +29,25 @@ rho and native-price band at 0, 0.1 and 1 GAE, remains the downstream test.
   saturate degree four without refuting; 28 k=0/1/2 attempts hit the local
   column cap. Original fixtures' exact counts and SAT witnesses replay.
 - **Observed:** native complete-DLP smoke uses source-pinned v1 adapters;
-  construction and cubic-split work are incompletely counted. Legacy raw S
-  includes a wall-priced solver term and is inadmissible as a counted L0
-  comparison. [Pricing disclosure](../research/ic_algebraic_crossover_20261023/PIPELINE.md).
+  construction and cubic-split work are incompletely counted. Completed
+  n=13/n=23 S uses pinned word rates; an earlier wall-pricing explanation
+  was wrong and has a native reconstruction and explicit correction.
+  [Pricing correction](../research/ic_algebraic_crossover_20261023/PIPELINE.md).
 - **Derived or proved:** summand exchange has an exact polynomial/permutation
   certificate, IDC1ha27a77e72057f9cb, scoped to degree verdicts, not costs.
+- **Observed relevance limit:** original UNSAT draw 5 and SAT draw 4 have no
+  y lift on E0; draw 0 does. Subgroup membership is unknown. The
+  [finite curve audit](../research/ic_algebraic_crossover_20261023/reports/run-fixture-group-audit-20261025/report.pdf)
+  qualifies these Boolean fixtures without changing their recorded counts.
 - **Suspected explanation:** additional closure work can outweigh smaller
   product spaces. The fixed finite observations do not determine its growth.
 - **Missing capability:** complete native construction/split accounting,
   validated larger-cell closure and guess minima, same-input external CAS
   comparison, and measured hardware calibration. Local matrices have a
-  12-GiB/900-second envelope; paid launcher access is not yet verified.
+  12-GiB/900-second envelope. The 116 remaining balanced ell=8 branches are
+  queued at a 200k outer column cap under that unchanged envelope. Singular
+  is installed locally but not yet compared. The prescribed paid launcher
+  is blocked by an explicit identity-policy denial; no research VM launched.
 - **What this evidence does not establish:** a global minimum over all
   variable subsets, bounded last fall degree, a full IC speedup, or a
   security conclusion at a larger curve.

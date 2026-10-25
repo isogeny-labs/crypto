@@ -11,9 +11,11 @@ Symmetric solver words are lower in 263 pairs at degree two and zero at
 degrees three/four. All eight balanced three-guess branches on original
 ell=8 draw 0 saturate without refuting. The x86-64 shared host earns L0;
 wall time is diagnostic. Construction, splitting and physical conversion
-are absent from solver-word ratios. Complete-DLP smoke omits native work
-and contains a legacy wall-priced displayed S, so neither the stage ratios
-nor its native bands support a complete-price IC win.
+are absent from solver-word ratios. Complete-DLP smoke omits native work,
+so neither the stage ratios nor its native bands support a complete-price
+IC win. An earlier wall-pricing explanation was incorrect: n=13/n=23
+solvers use pinned word rates. The original PDFs are preserved with
+correction notices; corrected copies supersede that pricing paragraph.
 
 No `VALIDATION.json` is fabricated for an unqualified comparison. A matched
 full-cost rho reference, independent replay and complete cost validator

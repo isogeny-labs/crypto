@@ -57,6 +57,20 @@ replayed here. Our 28 k=0/1/2 attempts hit a column cap and remain inconclusive.
 Eight earlier three-guess attempts hit the library's default internal cap;
 they are retained and excluded from the successful process counts.
 
+A [separate curve-membership audit](reports/run-fixture-group-audit-20261025/report.pdf)
+checks every y root by substitution and an independent trace criterion.
+Original UNSAT draw 5 and SAT draw 4 are not liftable on the recorded E0
+curve; draw 0 is liftable. These remain valid Boolean fixtures, but not all
+are ordinary curve queries. Target and base subgroup membership remain
+unknown. The [native receipt](pipeline-receipts/fixture-group-audit-20261025/receipt.json)
+retains both positive and negative outcomes.
+
+The [200,000-column continuation](GUESS_CAP200K_PROTOCOL.md) is queued
+locally after the current quartic/HKY process. Its 116 branch attempts
+cover the remaining balanced k=0--4 cells with the same 12-GiB/900-second
+limits. This is a queued local process, not a completed result or a cloud
+allocation. The earlier capped attempts remain unchanged and inconclusive.
+
 Exact independent fixture counting reproduces `0,6,6,0,18,0,0`, with
 checked Boolean witnesses for all three SAT controls. Small controls
 check 2,304 assignments, 373 corresponding symmetric roots and 2,880 signed
@@ -85,21 +99,35 @@ passing the configured four-bit distinguished-point predicate. These exact
 finite support failures explain the two exhausted methods; they do not
 generalize to larger fields or retune the frozen session.
 
-The [n=13 report](reports/run-structured-n13-20261025-01/report.pdf) and
-[n=23 report](reports/run-structured-n23-20261025-01/report.pdf) quote the
+The [corrected n=13 report](reports/run-structured-n13-20261025-01-pricing-correction/report.pdf) and
+[corrected n=23 report](reports/run-structured-n23-20261025-01-pricing-correction/report.pdf) quote the
 native cost bands. All nine verified n=23 records independently replayed;
 the incomplete direct arm is excluded from the complete-arm plot. The
 [setup-refusal report](reports/run-pipeline-setup-refusals-20261025/report.pdf)
 preserves the n=17 refusal and the later sparse-input setup failures.
 
-The legacy displayed S includes a wall-priced solver term. We do not admit
-it as a counted L0 result. The native band at n=13 gives mean S for
+**Pricing correction:** our earlier prose incorrectly called these S
+values wall-priced. Completed n=13/n=23 solvers use fixed pinned word
+rates; the measured n=7 solver term is removed. The
+[native pricing audit](pipeline-receipts/pricing-audit-20261025/receipt.json)
+rebuilds the available IC charges from counts and fixed prices. Raw S
+remains an incomplete fixed-price estimate. The native band at n=13 gives mean S for
 direct/symmetric/pair-table/strong-rho of
 `19.573/19.473/54.285/14.330` at weight 0,
 `7290.842/2883.805/58.245/14.552` at 0.1, and
 `72732.257/28662.791/93.889/16.553` at 1.
 Uncounted construction and split arithmetic remain missing at every weight.
 There is no robust complete-price gain over the existing references.
+
+The [pricing-audit PDF](reports/run-pricing-audit-20261025/report.pdf)
+documents the native reconstruction and its byte-identical reproduction.
+The quartic smoke has 24/24 verified records at m=6,8,10,12; its complete
+scalar replay is still running in this snapshot. Canonical `ecbench band`
+refuses its constructed curve slugs because the virtual calibration rows
+are absent from the global table. The audit reproduces those deterministic
+count conventions without changing the table and separately labels an
+additional scenario that varies counted Fq solver work. Neither scenario
+is hardware calibration or an algorithmic gain.
 
 Quartic IC remains separate over GF((2^m)^4), requiring its proper
 intermediate field. The historical single-target m=14 gap near 4.3 times
@@ -115,13 +143,13 @@ m=16--18; wider coefficients, keys, order and scalars are required.
 | A1: independent structural replay | partial | exact original fixtures and small equations/roots checked; upstream large fall-degree panel not fully replayed |
 | A2: native structured bases and symmetric formulation | verified, finite pilot | Rust implementations, all four families, identity/splitting/repeated-root controls; limits in PIPELINE.md |
 | A3: combine formulations and closure | verified, finite stage panel | three matched panels above; no whole-query performance conclusion |
-| B1: ell=8 minimum guesses | partial | all eight balanced k=3 draw-0 branches fail; smaller caps, other draws/sets and independent k=4 replay remain |
+| B1: ell=8 minimum guesses | partial | all eight balanced k=3 draw-0 branches fail; 116 remaining balanced branch attempts queued at cap 200k; alternative sets and finite-query relevance remain |
 | B2: ell=9 and four summands | implemented, unverified | 1,152 fresh fixtures across nine cells/four families, frozen selection and remote shards; no larger-guess result yet |
 | B3: N=58/60/100 continuation | implemented, unverified | u128/sparse engines and exact fixtures; fixed-point measurements outstanding |
-| C1: quartic independent replay | not yet verified | frozen m=6/8/10/12 smoke and full m=14/15 panels |
+| C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified records; all-record scalar replay running; m=14/15 full panels outstanding |
 | C2: m=14--18 ladder | blocked in part | supported rungs outstanding; m=16--18 need wider arithmetic |
 | C3: complete method and full native price | partial | n=13 complete-answer replay, other smoke outcomes retained; construction/split counts and qualified comparison missing |
-| D1: external/hardware controls | blocked in part | native CPU controls pass; no same-input external CAS or actual GPU/hardware calibration available |
+| D1: external/hardware controls | partial | native CPU controls pass; local Singular installed, same-input CAS baseline not yet run; fastest-tool and actual hardware comparisons remain |
 | D2: durable evidence and PR | partial | source/protocol/raw archive/native validator/visual PDFs provided; wider campaign remains open |
 
 [Cost/scaling problem](../../problems/ic-low-degree-complete-cost-and-scaling.md)

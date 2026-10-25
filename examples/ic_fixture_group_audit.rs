@@ -6,6 +6,11 @@ use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
 
+#[cfg(test)]
+fn element(x: u64, n: u32) -> crypto_lib::binary_ecc::F2mElement {
+    crypto_lib::binary_ecc::F2mElement::from_biguint(&num_bigint::BigUint::from(x), n)
+}
+
 #[allow(dead_code)]
 #[path = "ic_algebraic_followup/exact.rs"]
 mod exact;
@@ -91,4 +96,22 @@ fn main() {
         "input_sha256":format!("{:x}",Sha256::digest(&source)),"draws":draws,
         "unsat_draws":unsat,"unsat_curve_liftable":unsat_liftable,"sat_draws":sat,"sat_curve_liftable":sat_liftable,
         "scope":"Curve membership of frozen Boolean fixtures only; subgroup membership and complete point decompositions remain untested."})).unwrap());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn curve_lifts_equal_exhaustive_small_fields() {
+        for n in [5, 6, 7] {
+            let gf = Gf2::new(&find_irreducible_sparse(n).unwrap());
+            let quad = exact::Quadratic::new(&gf);
+            for x in 0..1u64 << n {
+                let expected: Vec<_> = (0..1u64 << n)
+                    .filter(|&y| gf.sqr(y) ^ gf.mul(x, y) == gf.mul(gf.sqr(x), x) ^ 1)
+                    .collect();
+                assert_eq!(lifts(&gf, &quad, x), expected);
+            }
+        }
+    }
 }
