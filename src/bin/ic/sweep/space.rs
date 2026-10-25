@@ -13,10 +13,12 @@
 //!   large primes on a pair table).  It is searched and reported, and is
 //!   never ranked against the algebraic track as an improvement.
 //!
-//! The `rootfind-*` oracles are in neither: whether solving the univariate
-//! Semaev polynomial per base point counts as "solving a summation
-//! polynomial system" or as a root table is not decided by the criterion as
-//! recorded, so no space offers them until the owner rules.
+//! - [`Track::Unclassified`]: the `rootfind-*` oracles.  Whether solving the
+//!   univariate Semaev polynomial per base point counts as "solving a
+//!   summation polynomial system" or as a root table is not decided by the
+//!   criterion as recorded.  Included at the owner's request, searched and
+//!   reported in its own track, never counted and never ranked against the
+//!   other two until the owner rules.
 //!
 //! # Scale-relative knobs
 //!
@@ -53,6 +55,11 @@ pub const MAX_BASE: u64 = 4096;
 pub enum Track {
     Algebraic,
     Table,
+    /// Not decided by the owner's criterion as recorded: solving the
+    /// univariate Semaev polynomial per base point is neither plainly "a
+    /// summation-polynomial system" nor plainly a table.  Searched and
+    /// reported, never counted, never ranked against the other tracks.
+    Unclassified,
 }
 
 impl Track {
@@ -60,6 +67,7 @@ impl Track {
         match self {
             Track::Algebraic => "algebraic",
             Track::Table => "table",
+            Track::Unclassified => "unclassified",
         }
     }
     /// Whether results on this track count towards an improvement claim.
@@ -157,13 +165,22 @@ impl InstanceKind {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Kind {
+    // The algebraic kinds come in two accounting scopes.  The plain ones are
+    // scored against inherited F4, whose `word XORs` count elimination,
+    // specialisation and linear elimination; the `Elim` ones against `f4-f2`,
+    // `matrix-f4` and `matrix-f5`, whose `word XORs` count elimination only.
+    // Solver operations are comparable only inside one scope, so each scope is
+    // its own space (see `trial::unit_key`).
     /// Built by `Space::custom` in tests: no mapping to a trial configuration.
     #[cfg_attr(not(test), allow(dead_code))]
     Custom,
     KoblitzAlgebraic,
+    KoblitzAlgebraicElim,
     Char2Algebraic,
+    Char2AlgebraicElim,
     KoblitzTable,
     PrimeTable,
+    PrimeRootfind,
 }
 
 #[derive(Clone, Debug)]
@@ -178,9 +195,12 @@ pub struct Space {
 
 pub const SPACE_NAMES: &[&str] = &[
     "koblitz-algebraic",
+    "koblitz-algebraic-elim",
     "char2-algebraic",
+    "char2-algebraic-elim",
     "koblitz-table",
     "prime-table",
+    "prime-rootfind",
 ];
 
 /// The space called `name`, for an instance.
@@ -196,20 +216,40 @@ pub fn space_for(name: &str, instance: &InstanceKind) -> Result<Space, String> {
         }
     };
     match name {
-        "koblitz-algebraic" => {
+        "koblitz-algebraic" | "koblitz-algebraic-elim" => {
             want("koblitz")?;
+            let elim = name.ends_with("-elim");
+            let kind = if elim {
+                Kind::KoblitzAlgebraicElim
+            } else {
+                Kind::KoblitzAlgebraic
+            };
             Ok(algebraic_space(
-                Kind::KoblitzAlgebraic,
-                "koblitz-algebraic",
+                kind,
+                if elim {
+                    "koblitz-algebraic-elim"
+                } else {
+                    "koblitz-algebraic"
+                },
                 true,
                 instance,
             ))
         }
-        "char2-algebraic" => {
+        "char2-algebraic" | "char2-algebraic-elim" => {
             want("char2")?;
+            let elim = name.ends_with("-elim");
+            let kind = if elim {
+                Kind::Char2AlgebraicElim
+            } else {
+                Kind::Char2Algebraic
+            };
             Ok(algebraic_space(
-                Kind::Char2Algebraic,
-                "char2-algebraic",
+                kind,
+                if elim {
+                    "char2-algebraic-elim"
+                } else {
+                    "char2-algebraic"
+                },
                 false,
                 instance,
             ))
@@ -222,6 +262,10 @@ pub fn space_for(name: &str, instance: &InstanceKind) -> Result<Space, String> {
             want("prime")?;
             Ok(prime_table_space(instance))
         }
+        "prime-rootfind" => {
+            want("prime")?;
+            Ok(prime_rootfind_space(instance))
+        }
         other => Err(format!(
             "unknown space `{other}`; the spaces are {}",
             SPACE_NAMES.join(", ")
@@ -229,7 +273,7 @@ pub fn space_for(name: &str, instance: &InstanceKind) -> Result<Space, String> {
     }
 }
 
-const MATRIX_SOLVERS: &[&str] = &["inherited-f4", "matrix-f4", "matrix-f5"];
+const MATRIX_SOLVERS: &[&str] = &["matrix-f4", "matrix-f5"];
 
 fn algebraic_space(kind: Kind, name: &'static str, koblitz: bool, inst: &InstanceKind) -> Space {
     let bases: &[&str] = if koblitz {
@@ -262,62 +306,35 @@ fn algebraic_space(kind: Kind, name: &'static str, koblitz: bool, inst: &Instanc
             .when("base", &["koblitz-closure"]),
         );
     }
-    params.extend([
-        Param::cat(
+    let elim = matches!(kind, Kind::KoblitzAlgebraicElim | Kind::Char2AlgebraicElim);
+    if elim {
+        params.push(Param::cat(
             "solver",
-            &[
-                "inherited-f4",
-                "matrix-f4",
-                "matrix-f5",
-                "f4-f2",
-                "crossbred-f2",
-                "fes-f2",
-                "sat-cdcl",
-                "buchberger-f2",
-            ],
-            "the polynomial system solver",
-        ),
-        Param::int(
-            "max_degree",
-            3,
-            6,
-            false,
-            "Macaulay degree cap before splitting",
-        )
-        .when("solver", MATRIX_SOLVERS),
-        Param::int(
-            "node_budget",
-            256,
-            65536,
-            true,
-            "algebraic reduction calls before a solve gives up (a count)",
-        )
-        .when("solver", MATRIX_SOLVERS),
-        Param::int(
-            "crossbred_D",
-            2,
-            5,
-            false,
-            "Macaulay degree of the Crossbred preprocessing",
-        )
-        .when("solver", &["crossbred-f2"]),
-        Param::int(
-            "crossbred_k",
-            4,
-            16,
-            false,
-            "variables Crossbred enumerates",
-        )
-        .when("solver", &["crossbred-f2"]),
-        Param::int(
-            "sat_conflicts",
-            10_000,
-            1_000_000,
-            true,
-            "CDCL conflict budget (a count, not a time)",
-        )
-        .when("solver", &["sat-cdcl"]),
-        Param::cat("sat_xor", &["cnf", "native"], "parity encoding").when("solver", &["sat-cdcl"]),
+            &["f4-f2", "matrix-f4", "matrix-f5"],
+            "engines whose word XORs count elimination only, so their scores are comparable",
+        ));
+    }
+    let degree_cap = Param::int(
+        "max_degree",
+        3,
+        6,
+        false,
+        "Macaulay degree cap before splitting",
+    );
+    let node_budget = Param::int(
+        "node_budget",
+        256,
+        65536,
+        true,
+        "algebraic reduction calls before a solve gives up (a count)",
+    );
+    if elim {
+        params.push(degree_cap.when("solver", MATRIX_SOLVERS));
+        params.push(node_budget.when("solver", MATRIX_SOLVERS));
+    } else {
+        params.extend([degree_cap, node_budget]);
+    }
+    params.extend([
         Param::cat(
             "linalg",
             &["incremental-gauss", "structured-gauss"],
@@ -332,7 +349,11 @@ fn algebraic_space(kind: Kind, name: &'static str, koblitz: bool, inst: &Instanc
     Space {
         name,
         track: Track::Algebraic,
-        doc: "Relations from a descent-algebraic solve of S3 or S4 over a subspace base.",
+        doc: if elim {
+            "Relations from a descent-algebraic solve over a subspace base; engines that count elimination only (f4-f2, matrix-f4, matrix-f5), scored against f4-f2."
+        } else {
+            "Relations from a descent-algebraic solve over a subspace base; inherited F4, scored against inherited F4 with the default caps."
+        },
         params,
         kind,
         instance: inst.clone(),
@@ -403,6 +424,17 @@ fn prime_table_space(inst: &InstanceKind) -> Space {
         kind: Kind::PrimeTable,
         instance: inst.clone(),
     }
+}
+
+fn prime_rootfind_space(inst: &InstanceKind) -> Space {
+    let mut space = prime_table_space(inst);
+    space.name = "prime-rootfind";
+    space.track = Track::Unclassified;
+    space.doc = "Unclassified track: prime-field root-finding decomposition (rootfind-subtract) over abscissa, GLV-orbit or CM-multiplier bases. Not counted; see the track note in the module docs.";
+    space.kind = Kind::PrimeRootfind;
+    // The oracle has no `negation_folded`; the rest of the space is shared.
+    space.params.retain(|p| p.name != "negation_folded");
+    space
 }
 
 // ── Assignment accessors ────────────────────────────────────────────
@@ -497,7 +529,10 @@ impl Space {
     pub fn build(&self, a: &Assignment, scale: u32) -> Result<TrialConfig, String> {
         match self.kind {
             Kind::Custom => Err("a custom space has no pipeline".into()),
-            Kind::KoblitzAlgebraic | Kind::Char2Algebraic => {
+            Kind::KoblitzAlgebraic
+            | Kind::KoblitzAlgebraicElim
+            | Kind::Char2Algebraic
+            | Kind::Char2AlgebraicElim => {
                 let m = text(a, "m")?;
                 let n = scale as f64;
                 let dimension = ((float(a, "dim_frac")? * n).round() as i64).clamp(2, 30);
@@ -507,26 +542,18 @@ impl Space {
                 if a.get("slots").and_then(Value::as_str) == Some("all") {
                     oracle.push_str(",slots=all");
                 }
-                let solver_name = text(a, "solver")?;
+                // The plain spaces have one engine; the `Elim` ones choose.
+                let solver_name = a
+                    .get("solver")
+                    .and_then(Value::as_str)
+                    .unwrap_or("inherited-f4");
                 let mut solver = solver_name.to_string();
-                let mut kv: Vec<String> = Vec::new();
-                match solver_name {
-                    "inherited-f4" | "matrix-f4" | "matrix-f5" => {
-                        kv.push(format!("max_degree={}", int(a, "max_degree")?));
-                        kv.push(format!("node_budget={}", int(a, "node_budget")?));
-                    }
-                    "crossbred-f2" => {
-                        kv.push(format!("D={}", int(a, "crossbred_D")?));
-                        kv.push(format!("k={}", int(a, "crossbred_k")?));
-                    }
-                    "sat-cdcl" => {
-                        kv.push(format!("sat_conflict_budget={}", int(a, "sat_conflicts")?));
-                        kv.push(format!("sat_xor_encoding={}", text(a, "sat_xor")?));
-                    }
-                    _ => {}
-                }
-                if !kv.is_empty() {
-                    solver = format!("{solver_name}:{}", kv.join(","));
+                if matches!(solver_name, "inherited-f4" | "matrix-f4" | "matrix-f5") {
+                    solver = format!(
+                        "{solver_name}:max_degree={},node_budget={}",
+                        int(a, "max_degree")?,
+                        int(a, "node_budget")?
+                    );
                 }
                 let mut cfg = self.base_config(scale, factor_base, oracle, Some(solver));
                 cfg.linalg = text(a, "linalg")?.into();
@@ -556,7 +583,7 @@ impl Space {
                 cfg.targets = text(a, "targets")?.into();
                 Ok(cfg)
             }
-            Kind::PrimeTable => {
+            Kind::PrimeTable | Kind::PrimeRootfind => {
                 let m = text(a, "m")?;
                 let size = scaled_size(float(a, "size_exp")?, scale, 4);
                 let base = text(a, "base")?;
@@ -567,7 +594,11 @@ impl Space {
                         fb.push_str(&format!(",norm={norm}"));
                     }
                 }
-                let oracle = format!("mitm:m={m},negation_folded={}", text(a, "negation_folded")?);
+                let oracle = if self.kind == Kind::PrimeRootfind {
+                    format!("rootfind-subtract:m={m}")
+                } else {
+                    format!("mitm:m={m},negation_folded={}", text(a, "negation_folded")?)
+                };
                 let mut cfg = self.base_config(scale, fb, oracle, None);
                 cfg.linalg = text(a, "linalg")?.into();
                 cfg.targets = text(a, "targets")?.into();
@@ -597,11 +628,25 @@ impl Space {
                 "descent-algebraic:m=2".into(),
                 Some("inherited-f4".into()),
             ),
+            // The elimination-scope baseline: `f4-f2` on the same descent.
+            Kind::KoblitzAlgebraicElim | Kind::Char2AlgebraicElim => self.base_config(
+                scale,
+                format!("binary-subspace:dimension={}", ((scale + 1) / 3).max(2)),
+                "descent-algebraic:m=2".into(),
+                Some("f4-f2".into()),
+            ),
             // The leaderboard's Koblitz recipe: a small compact base, m = 3.
             Kind::KoblitzTable => self.base_config(
                 scale,
                 "compact-orbit-scan:columns=8,raw_x_cap=1073741824".into(),
                 "mitm-frobenius:m=3".into(),
+                None,
+            ),
+            // The root-finding arm on the same base.
+            Kind::PrimeRootfind => self.base_config(
+                scale,
+                format!("prime-abscissa:size={}", scaled_size(1.0 / 3.0, scale, 4)),
+                "rootfind-subtract:m=2".into(),
                 None,
             ),
             // The leaderboard's prime recipe: a folded table, m = 2, base at
@@ -659,7 +704,9 @@ mod tests {
         };
         for space in [
             space_for("koblitz-algebraic", &koblitz0()).unwrap(),
+            space_for("koblitz-algebraic-elim", &koblitz0()).unwrap(),
             space_for("char2-algebraic", &char2).unwrap(),
+            space_for("char2-algebraic-elim", &char2).unwrap(),
             space_for("koblitz-table", &koblitz0()).unwrap(),
             space_for("prime-table", &prime).unwrap(),
         ] {
@@ -681,49 +728,106 @@ mod tests {
 
     #[test]
     fn conditions_activate_only_on_the_named_values() {
-        let space = space_for("koblitz-algebraic", &koblitz0()).unwrap();
-        let crossbred_d = space
+        let space = space_for("koblitz-algebraic-elim", &koblitz0()).unwrap();
+        let cap = space
             .params
             .iter()
-            .find(|p| p.name == "crossbred_D")
+            .find(|p| p.name == "max_degree")
             .unwrap();
         let mut a = Assignment::new();
-        sample(&mut a, "solver", json!("crossbred-f2"));
-        assert!(crossbred_d.active(&a));
-        sample(&mut a, "solver", json!("sat-cdcl"));
-        assert!(!crossbred_d.active(&a));
+        sample(&mut a, "solver", json!("matrix-f5"));
+        assert!(cap.active(&a));
+        sample(&mut a, "solver", json!("f4-f2"));
+        assert!(!cap.active(&a), "f4-f2 has no Macaulay degree cap");
         assert!(
-            !crossbred_d.active(&Assignment::new()),
+            !cap.active(&Assignment::new()),
             "a missing parent means inactive"
         );
+        // The plain space has one engine, so its caps always exist.
+        let plain = space_for("koblitz-algebraic", &koblitz0()).unwrap();
+        assert!(plain.params.iter().all(|p| p.name != "solver"));
+        let cap = plain
+            .params
+            .iter()
+            .find(|p| p.name == "max_degree")
+            .unwrap();
+        assert!(cap.active(&Assignment::new()));
     }
 
     #[test]
     fn an_assignment_becomes_the_configuration_it_names() {
-        let space = space_for("koblitz-algebraic", &koblitz0()).unwrap();
         let mut a = Assignment::new();
         for (k, v) in [
             ("m", json!("2")),
             ("base", json!("koblitz-closure")),
             ("dim_frac", json!(0.3)),
             ("slots", json!("all")),
-            ("solver", json!("crossbred-f2")),
-            ("crossbred_D", json!(3)),
-            ("crossbred_k", json!(8)),
+            ("max_degree", json!(4)),
+            ("node_budget", json!(1024)),
             ("linalg", json!("structured-gauss")),
             ("targets", json!("walk")),
         ] {
             sample(&mut a, k, v);
         }
-        let cfg = space.build(&a, 23).unwrap();
+        let plain = space_for("koblitz-algebraic", &koblitz0()).unwrap();
+        let cfg = plain.build(&a, 23).unwrap();
         assert_eq!(cfg.factor_base, "koblitz-closure:dimension=7");
         assert_eq!(cfg.oracle, "descent-algebraic:m=2,slots=all");
-        assert_eq!(cfg.solver.as_deref(), Some("crossbred-f2:D=3,k=8"));
+        assert_eq!(
+            cfg.solver.as_deref(),
+            Some("inherited-f4:max_degree=4,node_budget=1024")
+        );
         assert_eq!(cfg.linalg, "structured-gauss");
         assert_eq!(
             (cfg.regime.as_str(), cfg.degree, cfg.koblitz_a),
             ("koblitz", 23, Some(0))
         );
+        // The elimination-scope space names its engine.
+        sample(&mut a, "solver", json!("matrix-f5"));
+        let elim = space_for("koblitz-algebraic-elim", &koblitz0()).unwrap();
+        assert_eq!(
+            elim.build(&a, 23).unwrap().solver.as_deref(),
+            Some("matrix-f5:max_degree=4,node_budget=1024")
+        );
+        sample(&mut a, "solver", json!("f4-f2"));
+        assert_eq!(elim.build(&a, 23).unwrap().solver.as_deref(), Some("f4-f2"));
+    }
+
+    /// Solver operations are comparable only inside one accounting scope, so
+    /// no space mixes the scopes, and nothing offers an engine whose unit has
+    /// no scope-mate (Crossbred, SAT, Buchberger).
+    #[test]
+    fn each_algebraic_space_offers_only_engines_that_count_alike() {
+        let elim = space_for("koblitz-algebraic-elim", &koblitz0()).unwrap();
+        match &elim
+            .params
+            .iter()
+            .find(|p| p.name == "solver")
+            .unwrap()
+            .domain
+        {
+            Domain::Cat(v) => assert_eq!(v, &["f4-f2", "matrix-f4", "matrix-f5"]),
+            _ => unreachable!(),
+        }
+        for name in ["koblitz-algebraic", "koblitz-algebraic-elim"] {
+            let space = space_for(name, &koblitz0()).unwrap();
+            for engine in ["crossbred", "sat", "buchberger", "fes"] {
+                assert!(
+                    space.params.iter().all(|p| !p.name.contains(engine)),
+                    "{name} must not carry {engine} parameters"
+                );
+            }
+        }
+        // The baselines sit in their own scopes.
+        assert_eq!(
+            space_for("koblitz-algebraic", &koblitz0())
+                .unwrap()
+                .baseline(19)
+                .solver
+                .as_deref(),
+            Some("inherited-f4")
+        );
+        assert_eq!(elim.baseline(19).solver.as_deref(), Some("f4-f2"));
     }
 
     #[test]
@@ -745,8 +849,10 @@ mod tests {
         };
         for space in [
             space_for("koblitz-algebraic", &koblitz0()).unwrap(),
+            space_for("koblitz-algebraic-elim", &koblitz0()).unwrap(),
             space_for("koblitz-table", &koblitz0()).unwrap(),
             space_for("prime-table", &prime).unwrap(),
+            space_for("prime-rootfind", &prime).unwrap(),
         ] {
             let cfg = space.baseline(19);
             assert!(cfg.bench_args().is_ok(), "{}: {:?}", space.name, cfg);
@@ -763,6 +869,46 @@ mod tests {
             .unwrap()
             .track
             .counted());
+        let rootfind = space_for("prime-rootfind", &generic_prime()).unwrap();
+        assert_eq!(rootfind.track, Track::Unclassified);
+        assert_eq!(rootfind.track.as_str(), "unclassified");
+        assert!(
+            !rootfind.track.counted(),
+            "the root-finding oracles stay uncounted until the owner rules"
+        );
+    }
+
+    fn generic_prime() -> InstanceKind {
+        InstanceKind {
+            regime: "prime".into(),
+            koblitz_a: None,
+            family: Some("generic".into()),
+            max_cofactor: None,
+        }
+    }
+
+    #[test]
+    fn the_rootfind_space_builds_a_rootfind_oracle_and_the_table_space_does_not() {
+        let space = space_for("prime-rootfind", &generic_prime()).unwrap();
+        assert!(space.params.iter().all(|p| p.name != "negation_folded"));
+        let mut a = Assignment::new();
+        for (k, v) in [
+            ("m", json!("3")),
+            ("base", json!("prime-abscissa")),
+            ("size_exp", json!(0.3)),
+            ("linalg", json!("incremental-gauss")),
+            ("targets", json!("walk")),
+        ] {
+            sample(&mut a, k, v);
+        }
+        let cfg = space.build(&a, 20).unwrap();
+        assert_eq!(cfg.oracle, "rootfind-subtract:m=3");
+        assert_eq!(cfg.factor_base, "prime-abscissa:size=64");
+        assert!(cfg.bench_args().is_ok());
+        assert!(space.baseline(20).bench_args().is_ok());
+        let table = space_for("prime-table", &generic_prime()).unwrap();
+        assert!(table.params.iter().any(|p| p.name == "negation_folded"));
+        assert_eq!(table.track, Track::Table);
     }
 
     #[test]

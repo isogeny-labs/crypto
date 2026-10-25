@@ -32,7 +32,7 @@
 //!
 //! The solver's operations are in the solver's own unit, so a trial's score
 //! is comparable with a baseline's only where the units agree: see
-//! [`unit_family`].
+//! [`unit_key`].
 //!
 //! # Failure classes
 //!
@@ -77,32 +77,30 @@ const PRICED_NATIVE: &[&str] = &[
     "target_guard_probes",
 ];
 
-/// The unit a solver's operations are counted in, normalised the way the
-/// repository's own pricing does it (`ic_framework::is_word_xor_op_unit`):
-/// `word XORs` with or without a qualifier is one family, priced by the one
-/// pinned ratio.  Any other unit stands for itself.
+/// The unit a solver's operations are counted in, **exactly as the solver
+/// reports it, qualifier included**.
 ///
-/// Two solvers' operations can be compared only inside one family.  The
-/// framework measured a Buchberger monomial operation at about 50 ns against
-/// 0.4 ns for a word XOR, and a SAT conflict is neither, so a ratio of
-/// `S` across units says which engine counts coarsely, not which is cheaper.
-/// An optimiser would find the coarsest unit, which is "changing the unit"
-/// (AGENTS.md §6).
-pub fn unit_family(op_unit: &str) -> String {
-    if op_unit == "word XORs" || op_unit.starts_with("word XORs (") {
-        "word XORs".into()
-    } else {
-        op_unit.to_string()
-    }
+/// Two solvers' operations are comparable only if they count the same thing.
+/// The repository prices `word XORs` and `word XORs (…)` by one pinned ratio
+/// (`ic_framework::is_word_xor_op_unit`), which is right for pricing and
+/// wrong for ranking: measured at n = 31 on one instance with identical
+/// relations, `f4-f2` ("word XORs (elimination only)") scored S(0.1) = 9,078
+/// and `inherited-f4` ("… elimination, specialisation and linear elimination
+/// only") 630,638, a 70× gap that is only the scope each one counts.  A
+/// search that minimised the ratio would pick the engine that counts least,
+/// which is "changing the unit" (AGENTS.md §6).  So the key is the whole
+/// string.
+pub fn unit_key(op_unit: &str) -> String {
+    op_unit.trim().to_string()
 }
 
-/// The unit family of a record's solver, `None` when no solver ran.
+/// The unit of a record's solver, `None` when no solver ran.
 pub fn solver_unit(record: &TrialRecord) -> Option<String> {
     record
         .context
         .pointer("/solver/op_unit")
         .and_then(Value::as_str)
-        .map(unit_family)
+        .map(unit_key)
 }
 
 /// Where each phase's cost sits in a `RunReport`.
@@ -777,26 +775,22 @@ mod tests {
     }
 
     #[test]
-    fn units_are_compared_by_the_repositorys_family_rule() {
-        // The F4 family and Gray-code FES are one priced unit, as in
-        // `ic_framework::is_word_xor_op_unit`.
-        for u in [
-            "word XORs",
+    fn units_are_compared_exactly_qualifier_included() {
+        // The repository prices these alike; they must not be ranked alike.
+        let scopes = [
             "word XORs (elimination only)",
             "word XORs (elimination, specialisation and linear elimination only)",
             "word XORs (Gray-code steps)",
-        ] {
-            assert_eq!(unit_family(u), "word XORs", "{u}");
-        }
-        // Everything else is its own unit, and none is a word XOR.
-        for u in [
+            "word XORs",
             "monomial operations",
             "conflicts",
-            "word operations (partial: extraction, transform and filter; per-point solves in solve_row_ops)",
-        ] {
-            assert_eq!(unit_family(u), u);
-            assert_ne!(unit_family(u), "word XORs");
+        ];
+        for (i, a) in scopes.iter().enumerate() {
+            for (j, b) in scopes.iter().enumerate() {
+                assert_eq!(unit_key(a) == unit_key(b), i == j, "{a} vs {b}");
+            }
         }
+        assert_eq!(unit_key("  conflicts "), "conflicts");
     }
 
     #[test]

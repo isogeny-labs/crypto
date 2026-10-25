@@ -570,45 +570,42 @@ mod tests {
                 band: None,
                 context: Value::Null,
             };
-            if solver.starts_with("sat-cdcl") && cfg.degree >= 19 {
-                rec.class = Class::Exhausted;
-                rec.detail = "conflict budget".into();
-                return rec;
-            }
             let dim: f64 = field(&cfg.factor_base, "dimension")
                 .unwrap()
                 .parse()
                 .unwrap();
             let m: f64 = field(&cfg.oracle, "m").unwrap().parse().unwrap();
             let ideal = n / 3.0;
-            // `matrix-f5` is genuinely cheaper and in the baseline's unit.
-            // `crossbred-f2` and `buchberger-f2` look far cheaper, but count
-            // in other units: a ratio against the word-XOR baseline would
-            // reward the unit, not the engine.
+            // A subspace far past the ideal never finishes on the larger rungs.
+            if cfg.degree >= 19 && dim > 1.5 * ideal {
+                rec.class = Class::Exhausted;
+                rec.detail = "budget".into();
+                return rec;
+            }
+            // Two levers change what the mock *counts*, not what it does.
+            // `structured-gauss` makes it count in another unit and 100× less:
+            // a ratio against the baseline would reward the unit, and must
+            // not win.  `matrix-f5` is a genuine 2× in the elimination scope
+            // it shares with its baseline `f4-f2`.
+            let other_unit = cfg.linalg == "structured-gauss";
             let solver_factor = if solver.starts_with("matrix-f5") {
                 0.5
-            } else if solver.starts_with("crossbred-f2") {
-                0.3
-            } else if solver.starts_with("buchberger-f2") {
+            } else if other_unit {
                 0.01
-            } else if solver.starts_with("fes-f2") {
-                3.0
             } else {
                 1.0
             };
-            let unit = if solver.starts_with("buchberger-f2") {
-                "monomial operations"
-            } else if solver.starts_with("crossbred-f2") {
-                "word operations (partial: extraction, transform and filter)"
-            } else if solver.starts_with("sat-cdcl") {
+            let unit = if other_unit {
                 "conflicts"
+            } else if solver.starts_with("inherited-f4") {
+                "word XORs (elimination, specialisation and linear elimination only)"
             } else {
                 "word XORs (elimination only)"
             };
             rec.context = serde_json::json!({"solver": {"op_unit": unit}});
             let growth = 2f64.powf(0.5 * n);
             let shape =
-                1.0 + 4.0 * ((dim - ideal) / ideal).powi(2) + if m == 2.0 { 0.2 } else { 0.0 };
+                1.0 + 4.0 * ((dim - ideal) / ideal).powi(2) + if m == 2.0 { 0.6 } else { 0.0 };
             let g = growth * shape * solver_factor;
             let s: Vec<f64> = [0.0, 0.1, 1.0]
                 .iter()
@@ -687,12 +684,10 @@ mod tests {
             "the best configuration must beat the baseline: {:?}",
             best.objective
         );
-        assert!(
-            matches!(
-                best.assignment["solver"].as_str(),
-                Some("inherited-f4" | "matrix-f4" | "matrix-f5" | "f4-f2" | "fes-f2")
-            ),
-            "only a solver in the baseline's unit can win: {:?}",
+        assert_eq!(
+            best.assignment["linalg"],
+            serde_json::json!("incremental-gauss"),
+            "only a configuration counted in the baseline's unit can win: {:?}",
             best.assignment
         );
         assert!(best.projected, "four rungs are enough for a fit");
@@ -702,7 +697,7 @@ mod tests {
         );
         assert!(
             summary.failed > 0,
-            "SAT exhausts on the larger rungs and must be recorded as failed"
+            "oversized subspaces exhaust and unrankable units fail; both are recorded"
         );
         // A pruned trial never ran the later rungs.
         let pruned = store
@@ -717,9 +712,10 @@ mod tests {
     }
 
     /// The unit guard.  The mock makes `buchberger-f2` (monomial operations)
-    /// 100× and `crossbred-f2` (partial word operations) 3× cheaper than the
-    /// word-XOR baseline by their units alone.  A search that minimised the
-    /// ratio would learn to pick them; it must not be able to win with them.
+    /// 100×, `crossbred-f2` (partial word operations) 3× and `matrix-f5`
+    /// ("elimination only") 2× cheaper than the `inherited-f4` baseline by
+    /// what they count alone.  A search that minimised the ratio would learn
+    /// to pick them; it must not be able to win with them.
     #[test]
     fn a_coarser_solver_unit_cannot_win_by_changing_the_unit() {
         let space = space_for("koblitz-algebraic", &instance()).unwrap();
@@ -731,10 +727,8 @@ mod tests {
         };
         let summary = run_study(&space, &st, &mut store, &mock, &|_| {}).unwrap();
         let other_unit = |t: &TrialLine| {
-            matches!(
-                t.assignment["solver"].as_str(),
-                Some("buchberger-f2" | "crossbred-f2" | "sat-cdcl")
-            )
+            // `structured-gauss` is the lever the mock counts in another unit.
+            t.assignment["linalg"] == serde_json::json!("structured-gauss")
         };
         let tried: Vec<&TrialLine> = store.trials.iter().filter(|t| other_unit(t)).collect();
         assert!(
@@ -747,7 +741,7 @@ mod tests {
                 TrialState::Failed,
                 "trial {} used {:?}",
                 t.id,
-                t.assignment["solver"]
+                t.assignment["linalg"]
             );
             assert!(t.objective.is_none());
         }
@@ -755,7 +749,7 @@ mod tests {
         // rankable, with no ratio, so the store shows what was refused.
         let rec = tried
             .iter()
-            .find(|t| t.assignment["solver"] != serde_json::json!("sat-cdcl"))
+            .find(|t| t.rungs.last().is_some_and(|r| !r.rankable))
             .and_then(|t| t.rungs.last())
             .expect("a recorded rung");
         assert!(!rec.rankable && rec.ratio.is_none() && rec.band.is_some());
@@ -771,6 +765,43 @@ mod tests {
                 .all(|t| !other_unit(t)),
             "no coarse-unit trial may complete"
         );
+        let _ = std::fs::remove_file(&path);
+    }
+
+    /// Inside one accounting scope every engine is comparable with the
+    /// baseline, so none is refused for its unit and a better configuration
+    /// is found: `matrix-f5` is a true 2× in the mock, though which of the
+    /// three engines holds the single best trial depends on the dimension it
+    /// happened to be paired with.
+    #[test]
+    fn inside_one_scope_the_search_may_prefer_an_engine() {
+        let space = space_for("koblitz-algebraic-elim", &instance()).unwrap();
+        let st = study(60);
+        let path = tmp("elim");
+        let mut store = Store::open(&path, &header(&st, &space)).unwrap();
+        let mock = Mock {
+            calls: AtomicUsize::new(0),
+        };
+        let summary = run_study(&space, &st, &mut store, &mock, &|_| {}).unwrap();
+        let best = summary.best.expect("a trial completes");
+        assert!(best.objective.unwrap() < 0.0, "{:?}", best.objective);
+        let engines: std::collections::BTreeSet<String> = store
+            .trials
+            .iter()
+            .filter(|t| t.state == TrialState::Complete)
+            .filter_map(|t| t.assignment["solver"].as_str().map(str::to_string))
+            .collect();
+        assert!(
+            engines.len() >= 2,
+            "several engines complete inside one scope: {engines:?}"
+        );
+        // Every rung of every scored trial was rankable: one scope.
+        assert!(store
+            .trials
+            .iter()
+            .flat_map(|t| &t.rungs)
+            .filter(|r| r.log2_ratio.is_some())
+            .all(|r| r.rankable));
         let _ = std::fs::remove_file(&path);
     }
 

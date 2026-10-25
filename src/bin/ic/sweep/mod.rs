@@ -149,8 +149,8 @@ fn instance_for(
 ) -> Result<InstanceKind, String> {
     let regime = match space {
         s if s.starts_with("koblitz") => "koblitz",
-        "char2-algebraic" => "char2",
-        "prime-table" => "prime",
+        "char2-algebraic" | "char2-algebraic-elim" => "char2",
+        "prime-table" | "prime-rootfind" => "prime",
         other => {
             return Err(format!(
                 "unknown space `{other}`; the spaces are {}",
@@ -195,6 +195,7 @@ fn spaces(a: SpacesArgs) -> Result<Value, String> {
         "tracks": {
             "algebraic": "counted: relations come from solving summation-polynomial systems (owner decision 2026-10-24)",
             "table": "reference only: never ranked against the algebraic track as an improvement",
+            "unclassified": "the rootfind-* oracles: not counted until the owner rules whether solving the univariate Semaev polynomial counts as algebraic",
         },
         "spaces": listing,
     }))
@@ -263,10 +264,10 @@ fn run(a: RunArgs, json_only: bool) -> Result<Value, String> {
         "{} ({} track, {}) on {}: rungs {:?}, {} trials, {} worker(s), store {}",
         space.name,
         space.track.as_str(),
-        if space.track.counted() {
-            "counted"
-        } else {
-            "reference only"
+        match space.track {
+            space::Track::Algebraic => "counted",
+            space::Track::Table => "reference only",
+            space::Track::Unclassified => "unclassified: not counted",
         },
         inst.describe(),
         a.rungs,
