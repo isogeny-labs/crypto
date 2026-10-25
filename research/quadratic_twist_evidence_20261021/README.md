@@ -1,5 +1,11 @@
 # Quadratic twists: native experiments and checked point/pairing transfers
 
+The [research continuation policy and work queue](CONTINUATION.md) directs
+the existing four-hour check to attempt a bounded new experiment or proof
+when feasible. An open mathematical obligation becomes the next work item;
+negative findings are retained. Scheduled work is distinct from a running job,
+and all existing research, access and merge gates remain in force.
+
 The [actual S3 yield/degree experiment](reports/s3-yield-20261024/README.md)
 checks124 base comparisons /1,904 target systems with independent C++/Rust
 arithmetic and matrices. In the F43 prefix example, the first public relation

@@ -43,5 +43,11 @@ The fresh library suite after the current-main refresh passes 4,479 tests with
 119 existing ignores. The new isolated native auditor's backend suite passes
 22 tests; the earlier 39/40 metadata-backend receipts remain historical records.
 
+The [continuation policy and ordered queue](CONTINUATION.md) keep the open
+mathematical requirements active across scheduled research iterations. A null
+candidate does not settle the broader objective; concrete access/resource
+limits are recorded separately. The policy itself is complete planning work,
+not evidence that any queued experiment or theorem has executed.
+
 The original request remains broader than the finite evidence. Closing a native
 implementation gap or passing CI does not settle general ECDLP hardness.

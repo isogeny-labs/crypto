@@ -146,9 +146,11 @@ reproduced by an exact pulled-back factor base on the main curve.
 - [x] Check a finite actual small-base useful-row/closure improvement and an
   applicable main-DLP reduction: F43 prefix fixture; verify its factor-base
   pullback control and all-target losses, without claiming uniform advantage.
-- [ ] Establish a useful-yield improvement beyond a changed base/finite rank
-  state, a genuinely lower regularity/solver-degree bound in an applicable
-  encoding, and compatible complete work bounds before an actual speed claim.
+- [ ] Establish a useful-yield improvement under an explicit candidate/target
+  policy, a certified lower regularity or applicable solver-degree bound,
+  and compatible complete work bounds before an actual speed claim.
+  Attribute a gain reproduced by changing the main factor base accordingly;
+  an intrinsic twist-only gain is not an added acceptance requirement.
   For the tested S3 encoding, equal leading ideals rule out a strict homogeneous
   regularity gain. A new encoding must name the changed leading ideal rather
   than silently substitute finite closure degree for regularity.
@@ -167,6 +169,12 @@ Satisfying these conditions would establish the stated formal parity. It would
 still not prove general ECDLP hardness or an asymptotic solver advantage.
 
 ## Next discriminating step
+
+The [bounded continuation policy and queue](../research/quadratic_twist_evidence_20261021/CONTINUATION.md)
+extend the existing scheduled check with active research steps. The unsolved
+encoding/theorem is an open mathematical work item, not sufficient reason to
+end the whole investigation. Access and resource blocks remain separate and
+must not be bypassed. No new experiment is claimed as executed by this policy.
 
 - **Actual-system construction obligation:** specify a descent/rationality
   encoding whose actual leading ideal can differ between the two arms, an
