@@ -13,9 +13,15 @@ The worker source is the immutable `acfcd8adfad8d45ddf9c5f799f9385120dce6cf4`
 commit from PR #2551, which includes `verify-cross-xcnf`. The preflight
 protocol comes from the dispatch commit on PR #2557. The Rust image is pinned
 by digest, while the Ubuntu package is deliberately discovered and recorded.
-The binary, build logs, smoke streams and hashes, host/image/source IDs,
-11-object replay receipt and verifier gate are retained in one Actions
-artifact even if a stage fails. The factor-base archives remain in S3.
+Completed-stage binary bytes, build logs, smoke streams and hashes,
+host/image/source IDs, S3 replay receipt and verifier gate are retained in
+one Actions artifact. A failure before a stage begins leaves its outputs
+absent and cannot be interpreted as a pass. The factor-base archives remain
+in S3.
+The [first attempt](RESULT.md) stopped at its first panel-input S3 GET after
+the solver smoke and worker build passed. Its failure artifact is retained and
+audited in both GitHub Actions and a write-once S3 output object; the next
+push records the exact AWS caller and GET error before building again.
 
 The first push of this workflow and smoke script to
 `codex/n83-aws-handoff-20261025` triggers the qualification job. The push

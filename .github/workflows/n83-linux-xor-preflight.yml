@@ -45,9 +45,6 @@ jobs:
           uname -a > "$RUNNER_TEMP/n83-linux-xor-preflight/uname.txt"
           git -C source rev-parse HEAD > "$RUNNER_TEMP/n83-linux-xor-preflight/source-commit.txt"
           git -C protocol rev-parse HEAD > "$RUNNER_TEMP/n83-linux-xor-preflight/protocol-commit.txt"
-          docker pull --platform linux/arm64 "$IMAGE_REF"
-          docker image inspect "$IMAGE_REF" --format '{{.Id}} {{.Architecture}} {{.Os}} {{json .RepoDigests}}' \
-            > "$RUNNER_TEMP/n83-linux-xor-preflight/image.txt"
       - name: Install and smoke Linux XOR solver
         run: |
           set -euo pipefail
@@ -57,9 +54,42 @@ jobs:
             | tee "$RUNNER_TEMP/n83-linux-xor-preflight/apt-install.log"
           python3 "protocol/$PREFLIGHT/smoke.py" \
             --out "$RUNNER_TEMP/n83-linux-xor-preflight"
+          install -m 755 "$(command -v cryptominisat5)" \
+            "$RUNNER_TEMP/n83-linux-xor-preflight/cryptominisat5"
+          ldd "$(command -v cryptominisat5)" \
+            > "$RUNNER_TEMP/n83-linux-xor-preflight/solver-ldd.txt"
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      - name: Probe exact S3 input access before the worker build
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/n83-linux-xor-preflight"
+          aws sts get-caller-identity --query '{Account:Account,Arn:Arn}' --output json \
+            > "$root/aws-identity.json"
+          key='factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/hash_5_1.xcnf'
+          aws s3api get-object --bucket crypto-autoresearcher --key "$key" \
+            --checksum-mode ENABLED "$root/s3-probe.xcnf" --output json \
+            > "$root/s3-probe.json" 2> "$root/s3-probe.stderr" || {
+              code=$?
+              printf '%s\n' "$code" > "$root/s3-probe-exit.txt"
+              cat "$root/s3-probe.stderr" >&2
+              exit "$code"
+            }
+          printf '%s\n' '0' > "$root/s3-probe-exit.txt"
+          printf '%s  %s\n' \
+            2c6dba1feabb28bc6b064268a1f53ebe3b0ecd8aa731d26b31016830ce431022 \
+            "$root/s3-probe.xcnf" | sha256sum -c \
+            > "$root/s3-probe.sha256-check"
+          rm "$root/s3-probe.xcnf"
       - name: Build pinned Linux external-model verifier
         run: |
           set -euo pipefail
+          docker pull --platform linux/arm64 "$IMAGE_REF"
+          docker image inspect "$IMAGE_REF" --format '{{.Id}} {{.Architecture}} {{.Os}} {{json .RepoDigests}}' \
+            > "$RUNNER_TEMP/n83-linux-xor-preflight/image.txt"
           mkdir -p "$RUNNER_TEMP/n83-cargo" "$RUNNER_TEMP/n83-target"
           docker run --rm --pull never --platform linux/arm64 \
             --cpus 2 --memory 8192m --memory-swap 8192m \
@@ -77,11 +107,6 @@ jobs:
             "$RUNNER_TEMP/n83-linux-xor-preflight/koblitz_n83_mixed_orbit_worker"
           sha256sum "$RUNNER_TEMP/n83-linux-xor-preflight/koblitz_n83_mixed_orbit_worker" \
             > "$RUNNER_TEMP/n83-linux-xor-preflight/worker.sha256"
-      - uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
       - name: Fresh-fetch and replay all eleven S3 inputs
         run: |
           set -euo pipefail
@@ -89,7 +114,12 @@ jobs:
             --target "$RUNNER_TEMP/n83-pydeps" -r "protocol/$BUNDLE/requirements.txt"
           PYTHONPATH="$RUNNER_TEMP/n83-pydeps" python3 "protocol/$BUNDLE/fetch.py" \
             --out "$RUNNER_TEMP/n83-xor-inputs" \
-            > "$RUNNER_TEMP/n83-linux-xor-preflight/input-replay.json"
+            > "$RUNNER_TEMP/n83-linux-xor-preflight/input-replay.json" \
+            2> "$RUNNER_TEMP/n83-linux-xor-preflight/input-replay.stderr" || {
+              code=$?
+              cat "$RUNNER_TEMP/n83-linux-xor-preflight/input-replay.stderr" >&2
+              exit "$code"
+            }
           PYTHONPATH="$RUNNER_TEMP/n83-pydeps" python3 "protocol/$BUNDLE/verifier_gate.py" \
             --inputs-dir "$RUNNER_TEMP/n83-xor-inputs" \
             --worker "$RUNNER_TEMP/n83-linux-xor-preflight/koblitz_n83_mixed_orbit_worker" \
