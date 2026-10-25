@@ -23,15 +23,15 @@ random binary, with the 95% interval excluding 0 in the pooled prime fits and th
    Restricted to bases with >= 256 columns on both sides (`R_adm`), the multiplier base is *worse* than the incumbent
    (gain 0.26x..0.49x) at every size except j0 36 bit (2.07x) and j1728 32 bit (1.39x). Only 99 of 750 multiplier cells
    (13%) have >= 256 columns; 106 of 192 incumbent cells do.
-3. **Grid-edge confounds.** The multiplier minimiser sits on the smallest-points edge of its grid in 29 of 33 instances,
-   and the incumbent at the smallest edge for the small-r rows; those S values are upper bounds (the K*N >= 256 and
+3. **Grid-edge confounds.** The multiplier minimiser sits on the smallest-points edge of its grid in 22 of 33 instances (never on the upper edge),
+   and the incumbent at its smallest edge in 9 of 33 (small-r rows; never the upper edge); those S values are upper bounds (the K*N >= 256 and
    points-cap rules limit how small a multiplier base can be). The unflagged subset (post-hoc, n = 1..6) is too small to
    fit on prime and gives slope +0.10 [-0.41, +0.60] pooled prime (n = 4), -0.27 binary (n = 6).
    The slope is therefore a statement about where each grid's optimum falls in r in [2^18, 2^34], not about exponents:
    both are the same table pipeline and the exponent is unchanged; a flat S ~ 10 for a 960-point table cannot persist
    as r grows (relation cost ~ r / (pairs * points) per relation rises).
 
-Admissible rows (>= 256 folded columns): 205 of 1,036 distinct configuration cells (106/192 incumbent, 99/750 multiplier);
+Admissible rows (>= 256 folded columns): 205 of 942 distinct configuration cells (106/192 incumbent, 99/750 multiplier);
 admissible instance pairs 33 of 33, but `R_adm` fits are testable (>= 4 sizes) for prime j0, pooled prime and binary only
 (j1728 has 3 sizes: not testable).
 
