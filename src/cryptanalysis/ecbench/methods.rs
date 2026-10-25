@@ -92,6 +92,10 @@ pub enum Applies {
     Any,
     KoblitzOnly,
     BinaryOnly,
+    /// Runs on [`Instance::Prime`] only (a single-word prime-field curve).
+    /// The planner refuses any other instance before a session starts, and
+    /// [`solve`] refuses it again as a backstop.
+    PrimeOnly,
 }
 
 /// One registered method.
@@ -288,7 +292,7 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "rho",
             summary: "Kuhn–Struik batch: the record's target and L − 1 public companions (hashed to ⟨G⟩, logs unknown to anyone) solved in sequence on {P, −P} (A = 2) with one shared distinguished-point table and jumps in G only; S is the whole batch's operations over √r, expected ≈ Σ_{i<L} C(2i,i)4^{−i}·√(π/4) → √L",
             entry: "ic_boundary::rho_batch_with(NegationClasses, RhoWalk::negation())",
-            applies: Applies::Any,
+            applies: Applies::PrimeOnly,
             params: POOLED_PARAMS,
         },
         MethodDecl {
@@ -1323,13 +1327,19 @@ fn parse_hex(s: &str) -> Result<u64, String> {
 /// Koblitz curve past one word, which only the strong rhos and
 /// `claw.pair_table` implement; the CM folded controls and
 /// `ic.k4_gaudry`, each bound to one construction; and `rho.quartic` /
-/// `rho.cubic`, which need the j = 1728 / j = 0 structure on the subgroup.
-/// An arm that cannot run is a spec error, not a session of `error`
+/// `rho.cubic`, which need the j = 1728 / j = 0 structure on the subgroup;
+/// and every [`Applies::PrimeOnly`] method (`rho.multitarget_pooled`) on a
+/// non-prime instance. An arm that cannot run is a spec error, not a session of `error`
 /// records that `compare` then reports as incomplete.
 pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Result<(), String> {
     let id = full_price::base_of(&m.id).unwrap_or(m.id.as_str());
     if id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
+    }
+    if decl(id).is_some_and(|d| d.applies == Applies::PrimeOnly)
+        && !matches!(inst, Instance::Prime(_))
+    {
+        return Err(prime_only_refusal(id, curve));
     }
     if id == "ic.k4_gaudry" && !matches!(inst, Instance::Fp4(_)) {
         return Err(format!(
@@ -1374,6 +1384,14 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
     }
 }
 
+/// The refusal of a [`Applies::PrimeOnly`] method on any other instance.
+fn prime_only_refusal(id: &str, curve: &CurveFacts) -> String {
+    format!(
+        "`{id}` runs on single-word prime-field curves only; {} is {}",
+        curve.slug, curve.family
+    )
+}
+
 /// Solve for `target` with method `m` on `inst`, under algorithm seed
 /// `seed`.  The planted logarithm is not an argument.
 pub fn solve(
@@ -1413,6 +1431,9 @@ pub fn solve(
             "`{}` runs on binary curves only; {} is {}",
             m.id, curve.slug, curve.family
         ));
+    }
+    if d.applies == Applies::PrimeOnly && !matches!(inst, Instance::Prime(_)) {
+        return Err(prime_only_refusal(&m.id, curve));
     }
     // The phase clock: the methods open and close the online window, the
     // session turns it into exclusive phase times.
@@ -3414,6 +3435,52 @@ mod tests {
             params: BTreeMap::new(),
         })
         .is_err());
+    }
+
+    /// `rho.multitarget_pooled` implements the prime-field batch only: it is
+    /// registered `PrimeOnly`, and both `applicable` (the planner's check)
+    /// and `solve` refuse a binary instance instead of falling through to a
+    /// generic solver with an unsupported method id.
+    #[test]
+    fn pooled_multitarget_rho_is_prime_only_and_refuses_binary_instances() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+        assert_eq!(
+            decl("rho.multitarget_pooled").unwrap().applies,
+            Applies::PrimeOnly
+        );
+        let mut params = BTreeMap::new();
+        params.insert("batch".to_string(), "4".to_string());
+        let m = resolve(&MethodSpec {
+            id: "rho.multitarget_pooled".into(),
+            params,
+        })
+        .unwrap();
+        // Negative controls: a Koblitz and a random binary curve.
+        for spec in [
+            CurveSpec::Koblitz { a: 1, n: 17 },
+            CurveSpec::BinaryRandom {
+                n: 17,
+                seed: 3,
+                max_cofactor: 4,
+            },
+        ] {
+            let (w, inst) = Workload::build(&spec, 11, 0, TargetKind::Planted).unwrap();
+            assert!(matches!(inst, Instance::Binary(_)));
+            let planner = applicable(&m, &inst, &w.curve).unwrap_err();
+            assert!(planner.contains("prime-field curves only"), "{planner}");
+            let solver = solve(&m, &inst, &w.curve, &w.target, 1).unwrap_err();
+            assert!(solver.contains("prime-field curves only"), "{solver}");
+        }
+        // Positive control: the prime curve it implements is accepted.
+        let (w, inst) = Workload::build(
+            &CurveSpec::PrimeSearch { bits: 24, seed: 3 },
+            11,
+            0,
+            TargetKind::Planted,
+        )
+        .unwrap();
+        assert!(applicable(&m, &inst, &w.curve).is_ok());
+        assert!(solve(&m, &inst, &w.curve, &w.target, 1).is_ok());
     }
 
     #[test]
