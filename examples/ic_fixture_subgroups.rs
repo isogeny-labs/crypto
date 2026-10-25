@@ -107,6 +107,7 @@ struct Model {
     order: u64,
     r: u64,
     unique: bool,
+    enumerated_subgroup: Option<Vec<BinaryPoint>>,
 }
 fn model(gf: &Gf2, quad: &exact::Quadratic<'_>, a: u64, order: u64) -> Model {
     let factors = factor(order);
@@ -178,6 +179,26 @@ fn model(gf: &Gf2, quad: &exact::Quadratic<'_>, a: u64, order: u64) -> Model {
     record["trace_a"] = json!(trace(gf, a));
     record["gcd_r_cofactor"] = json!(gcd(r, h));
     record["unique_order_r_subgroup"] = json!(gcd(r, h) == 1);
+    let enumerated_subgroup = if gcd(r, h) != 1 && r <= 4096 {
+        let mut points = vec![];
+        let mut p = BinaryPoint::Infinity;
+        for _ in 0..r {
+            assert!(!points.contains(&p));
+            points.push(p.clone());
+            p = point_add(&curve, &p, &curve.generator);
+        }
+        assert_eq!(p, BinaryPoint::Infinity);
+        Some(points)
+    } else {
+        None
+    };
+    record["generated_subgroup_check"] = json!(if gcd(r, h) == 1 {
+        "unique_order_r"
+    } else if enumerated_subgroup.is_some() {
+        "enumerated_actual_cyclic_subgroup"
+    } else {
+        "unknown"
+    });
     Model {
         curve,
         id,
@@ -186,6 +207,7 @@ fn model(gf: &Gf2, quad: &exact::Quadratic<'_>, a: u64, order: u64) -> Model {
         order,
         r,
         unique: gcd(r, h) == 1,
+        enumerated_subgroup,
     }
 }
 fn r_torsion(model: &Model, p: &BinaryPoint) -> bool {
@@ -195,6 +217,16 @@ fn r_torsion(model: &Model, p: &BinaryPoint) -> bool {
         BinaryPoint::Infinity
     );
     scalar_mul(&model.curve, p, &BigUint::from(model.r)) == BinaryPoint::Infinity
+}
+fn generated_membership(model: &Model, p: &BinaryPoint, killed_by_r: bool) -> Option<bool> {
+    if model.unique {
+        Some(killed_by_r)
+    } else {
+        model
+            .enumerated_subgroup
+            .as_ref()
+            .map(|points| points.contains(p))
+    }
 }
 fn signed_sums(
     curve: &BinaryCurve,
@@ -284,7 +316,9 @@ fn main() {
                 for p in &ps {
                     assert_eq!(Some(r_torsion(model, p)), killed);
                 }
-                let membership = if model.unique { killed } else { None };
+                let membership = ps
+                    .first()
+                    .and_then(|p| generated_membership(model, p, killed.unwrap()));
                 if !ys.is_empty() {
                     totals[0] += 1;
                     match membership {
@@ -327,7 +361,15 @@ fn main() {
                         let all_killed = options
                             .iter()
                             .all(|ps| !ps.is_empty() && ps.iter().all(|p| r_torsion(model, p)));
-                        result["selected_boolean_witness"] = json!({"summand_xs":xs,"aux_xs":aux,"signed_tuples_tested":tested,"signed_curve_relations":accepted,"all_summands_killed_by_r":all_killed,"usable_generated_subgroup_relations":if model.unique && all_killed {Some(accepted)} else {None}});
+                        let all_members: Option<bool> =
+                            options.iter().try_fold(true, |so_far, ps| {
+                                if ps.is_empty() {
+                                    return Some(false);
+                                }
+                                generated_membership(model, &ps[0], r_torsion(model, &ps[0]))
+                                    .map(|b| so_far && b)
+                            });
+                        result["selected_boolean_witness"] = json!({"summand_xs":xs,"aux_xs":aux,"signed_tuples_tested":tested,"signed_curve_relations":accepted,"all_summands_killed_by_r":all_killed,"all_summands_in_generated_subgroup":all_members,"usable_generated_subgroup_relations":all_members.map(|all|if all {accepted} else {0})});
                     }
                 }
                 checked_models.push(result);
@@ -337,7 +379,7 @@ fn main() {
         }
     }
     assert_eq!(receipts.len(), 1159);
-    println!("{}",serde_json::to_string_pretty(&json!({"schema":"ic-fixture-subgroups/v1","status":"all_lifts_trace_orders_and_membership_checks_agree","sources":sources,"curve_models":models,"targets":receipts,"totals":{"lifted_target_models":totals[0],"in_unique_generated_subgroup":totals[1],"outside_unique_generated_subgroup":totals[2],"sat_in_unique_generated_subgroup":totals[3],"unsat_in_unique_generated_subgroup":totals[4],"generated_subgroup_unknown":totals[5]},"scope":"Reference/twist models only; x-only inputs specify neither model nor subgroup. Non-coprime r/cofactor leaves generated-subgroup membership unknown. Selected SAT witnesses are not complete relation enumeration. No query-law, degree-scaling or cost conclusion."})).unwrap());
+    println!("{}",serde_json::to_string_pretty(&json!({"schema":"ic-fixture-subgroups/v2","status":"all_lifts_trace_orders_and_membership_checks_agree","sources":sources,"curve_models":models,"targets":receipts,"totals":{"lifted_target_models":totals[0],"in_generated_subgroup":totals[1],"outside_generated_subgroup":totals[2],"sat_in_generated_subgroup":totals[3],"unsat_in_generated_subgroup":totals[4],"generated_subgroup_unknown":totals[5]},"scope":"Reference/twist models only; x-only inputs specify neither model nor subgroup. Membership uses coprime uniqueness or exact actual-subgroup enumeration up to r=4096; larger ambiguous cases remain unknown. Selected SAT witnesses are not complete relation enumeration. No query-law, degree-scaling or cost conclusion."})).unwrap());
 }
 
 #[cfg(test)]
@@ -400,5 +442,21 @@ mod tests {
         assert!(!m.unique);
         assert!(r_torsion(&m, &m.curve.generator));
         assert_eq!(m.r, 11);
+        assert_eq!(
+            generated_membership(&m, &m.curve.generator, true),
+            Some(true)
+        );
+        let other = (0..1024)
+            .flat_map(|x| {
+                roots(&gf, &quad, 0, x)
+                    .into_iter()
+                    .map(move |y| point(x, y, 10))
+            })
+            .find(|p| r_torsion(&m, p) && generated_membership(&m, p, true) == Some(false))
+            .unwrap();
+        assert_eq!(
+            scalar_mul(&m.curve, &other, &BigUint::from(m.r)),
+            BinaryPoint::Infinity
+        );
     }
 }
