@@ -9,7 +9,7 @@ on:
 
 jobs:
   validate:
-    runs-on: ubuntu-24.04
+    runs-on: main
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
   measure:
     if: github.event_name == 'workflow_dispatch'
     needs: validate
-    runs-on: ubuntu-24.04
+    runs-on: main
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
