@@ -1,0 +1,229 @@
+name: N83 nearby-grid sealed 16-point Tier 1 confirmation
+
+on:
+  push:
+    branches: [codex/n83-confirm16-fixture-20261024]
+    paths:
+      - .github/workflows/n83-nearby-grid-confirm16.yml
+      - research/n83_nearby_grid_confirm16_20261024/**
+  workflow_dispatch:
+    inputs:
+      screen_run_id:
+        description: First admitted N83 19-base screen Actions run ID
+        required: true
+        type: string
+      screen_attempt:
+        description: Actions run attempt containing the raw screen artifact
+        required: true
+        default: "1"
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  prepare:
+    if: github.repository == 'aburan28/crypto'
+    runs-on: ubuntu-24.04
+    outputs:
+      ready: ${{ steps.dispatch.outputs.ready }}
+      screen_run_id: ${{ steps.dispatch.outputs.screen_run_id }}
+      screen_attempt: ${{ steps.dispatch.outputs.screen_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify sealed fixture and resolve a reviewed dispatch
+        id: dispatch
+        env:
+          REQUESTED_RUN_ID: ${{ inputs.screen_run_id }}
+          REQUESTED_ATTEMPT: ${{ inputs.screen_attempt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          python3 -m research.n83_nearby_grid_confirm16_20261024.run \
+            --fixture-preflight
+          python3 -m unittest \
+            research.n83_nearby_grid_confirm16_20261024.test_select \
+            research.n83_nearby_grid_confirm16_20261024.test_execution
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            screen_run_id="$REQUESTED_RUN_ID"
+            screen_attempt="$REQUESTED_ATTEMPT"
+          elif [ -f research/n83_nearby_grid_confirm16_20261024/dispatch.json ]; then
+            read -r screen_run_id screen_attempt < <(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('research/n83_nearby_grid_confirm16_20261024/dispatch.json')
+          record = json.loads(path.read_text())
+          if record.get('schema') != 'n83.nearby-grid-confirm16-dispatch/v1' or \
+                  record.get('status') != 'SEALED_FOR_DISPATCH':
+              raise ValueError('confirmation dispatch is not sealed')
+          print(record['screen_run_id'], record['screen_attempt'])
+          PY
+          )
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          [[ "$screen_run_id" =~ ^[0-9]+$ ]]
+          [[ "$screen_attempt" =~ ^[0-9]+$ ]]
+          {
+            echo 'ready=true'
+            echo "screen_run_id=$screen_run_id"
+            echo "screen_attempt=$screen_attempt"
+          } >> "$GITHUB_OUTPUT"
+
+  confirm-stratum:
+    needs: prepare
+    if: needs.prepare.outputs.ready == 'true' && github.repository == 'aburan28/crypto'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        stratum: [0, 1]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SCREEN_RUN_ID: ${{ needs.prepare.outputs.screen_run_id }}
+      SCREEN_ATTEMPT: ${{ needs.prepare.outputs.screen_attempt }}
+      STRATUM: ${{ matrix.stratum }}
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch and independently replay the admitted screen
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$SCREEN_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$SCREEN_ATTEMPT" =~ ^[0-9]+$ ]]
+          mkdir -p "$RUNNER_TEMP/n83-screen"
+          gh run download "$SCREEN_RUN_ID" \
+            --name "n83-nearby-grid-tier1-${SCREEN_RUN_ID}-${SCREEN_ATTEMPT}" \
+            --dir "$RUNNER_TEMP/n83-screen"
+          python3 -m research.n83_nearby_grid_confirm16_20261024.run \
+            --fixture-preflight > "$RUNNER_TEMP/n83-confirm-fixture.json"
+          python3 -m research.n83_nearby_grid_confirm16_20261024.select \
+            "$RUNNER_TEMP/n83-screen/n83-nearby-grid-results" \
+            > "$RUNNER_TEMP/n83-confirm-selection.json"
+          python3 -m unittest \
+            research.n83_nearby_grid_confirm16_20261024.test_select \
+            research.n83_nearby_grid_confirm16_20261024.test_execution -v \
+            > "$RUNNER_TEMP/n83-confirm-python-test.log" 2>&1
+
+      - name: Build the same-source native producers and free build cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.1 --profile minimal
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-confirm-target"
+          export CARGO_BUILD_JOBS=2
+          export RUST_TEST_THREADS=1
+          cargo +1.99.1 test --release --locked \
+            --example koblitz_orbit_dlp_fast \
+            > "$RUNNER_TEMP/n83-confirm-ic-test.log" 2>&1
+          cargo +1.99.1 test --release --locked \
+            --example n83_rho_optimization_eval \
+            > "$RUNNER_TEMP/n83-confirm-rho-test.log" 2>&1
+          cargo +1.99.1 build --release --locked \
+            --example koblitz_orbit_dlp_fast \
+            --example n83_rho_optimization_eval \
+            > "$RUNNER_TEMP/n83-confirm-build.log" 2>&1
+          mkdir -p "$RUNNER_TEMP/n83-confirm-bins"
+          install -m 755 \
+            "$CARGO_TARGET_DIR/release/examples/koblitz_orbit_dlp_fast" \
+            "$RUNNER_TEMP/n83-confirm-bins/koblitz_orbit_dlp_fast"
+          install -m 755 \
+            "$CARGO_TARGET_DIR/release/examples/n83_rho_optimization_eval" \
+            "$RUNNER_TEMP/n83-confirm-bins/n83_rho_optimization_eval"
+          cargo +1.99.1 clean --release --target-dir "$CARGO_TARGET_DIR" \
+            > "$RUNNER_TEMP/n83-confirm-clean.log" 2>&1
+          df -h "$RUNNER_TEMP" | tee "$RUNNER_TEMP/n83-confirm-disk.txt"
+          rustc +1.99.1 --version | tee "$RUNNER_TEMP/n83-confirm-rustc.txt"
+
+      - name: Run separate one-target IC and rho pairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.n83_nearby_grid_confirm16_20261024.run \
+            --screen-output "$RUNNER_TEMP/n83-screen/n83-nearby-grid-results" \
+            --stratum "$STRATUM" \
+            --binary "$RUNNER_TEMP/n83-confirm-bins/koblitz_orbit_dlp_fast" \
+            --rho-binary "$RUNNER_TEMP/n83-confirm-bins/n83_rho_optimization_eval" \
+            --output "$RUNNER_TEMP/n83-confirm-results-s${STRATUM}" \
+            | tee "$RUNNER_TEMP/n83-confirm-run.log"
+
+      - name: Replay every child, point, phase and resource receipt
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f "$RUNNER_TEMP/n83-confirm-results-s${STRATUM}/source.json" ]; then
+            python3 -m research.n83_nearby_grid_confirm16_20261024.verify \
+              "$RUNNER_TEMP/n83-confirm-results-s${STRATUM}" \
+              --screen-output "$RUNNER_TEMP/n83-screen/n83-nearby-grid-results" \
+              | tee "$RUNNER_TEMP/n83-confirm-verify.log"
+          fi
+
+      - name: Preserve raw rows and bounded attempts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-confirm16-${{ github.run_id }}-${{ github.run_attempt }}-s${{ matrix.stratum }}
+          path: |
+            ${{ runner.temp }}/n83-confirm-results-s${{ matrix.stratum }}/
+            ${{ runner.temp }}/n83-confirm-*.log
+            ${{ runner.temp }}/n83-confirm-*.json
+            ${{ runner.temp }}/n83-confirm-disk.txt
+            ${{ runner.temp }}/n83-confirm-rustc.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  aggregate:
+    needs: [prepare, confirm-stratum]
+    if: always() && needs.prepare.outputs.ready == 'true' && github.repository == 'aburan28/crypto'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SCREEN_RUN_ID: ${{ needs.prepare.outputs.screen_run_id }}
+      SCREEN_ATTEMPT: ${{ needs.prepare.outputs.screen_attempt }}
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch exact screen and both stratum artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/n83-screen" "$RUNNER_TEMP/n83-confirm-strata"
+          gh run download "$SCREEN_RUN_ID" \
+            --name "n83-nearby-grid-tier1-${SCREEN_RUN_ID}-${SCREEN_ATTEMPT}" \
+            --dir "$RUNNER_TEMP/n83-screen"
+          for stratum in 0 1; do
+            if ! gh run download "$GITHUB_RUN_ID" \
+                --name "n83-confirm16-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-s${stratum}" \
+                --dir "$RUNNER_TEMP/n83-confirm-strata/s${stratum}"; then
+              echo "stratum ${stratum} artifact missing" \
+                > "$RUNNER_TEMP/n83-confirm-strata/s${stratum}-missing.txt"
+            fi
+          done
+      - name: Verify the complete paired confirmation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.n83_nearby_grid_confirm16_20261024.aggregate \
+            "$RUNNER_TEMP/n83-confirm-strata/s0/n83-confirm-results-s0" \
+            "$RUNNER_TEMP/n83-confirm-strata/s1/n83-confirm-results-s1" \
+            --screen-output "$RUNNER_TEMP/n83-screen/n83-nearby-grid-results" \
+            --output "$RUNNER_TEMP/n83-confirm-aggregate.json" \
+            | tee "$RUNNER_TEMP/n83-confirm-aggregate.log"
+      - name: Preserve aggregate and incomplete status
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-confirm16-${{ github.run_id }}-${{ github.run_attempt }}-aggregate
+          path: |
+            ${{ runner.temp }}/n83-confirm-aggregate.json
+            ${{ runner.temp }}/n83-confirm-aggregate.log
+          if-no-files-found: warn
+          retention-days: 30

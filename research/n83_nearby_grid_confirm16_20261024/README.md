@@ -24,9 +24,46 @@ over these 19 signed-Frobenius orbit bases requires the complete admitted
 confirmation; wider factor-base families require a separate paired
 comparison.
 
+`protocol.py`, `run.py`, `verify.py`, and `aggregate.py` implement that
+confirmation. Two distinct GitHub Actions Tier 1 runners each receive eight
+points. For every point, the selected candidates rotate in order; each has
+one independent IC and same-point rho child, with their order alternating by
+point and candidate. K1107 fresh-process controls bracket each point.
+Every child is capped at 900 seconds for IC or 120 seconds for rho, with a
+240-minute producer cap per stratum, 4 GiB child RSS cap, and 4 GiB free-disk
+preflight. The verifier checks the exact candidate/base digest, relation,
+scalar, one-target online phases, cold process cost, resource receipt, and
+same-point rho result. All child resources must pass, visible CPU steal must
+stay below 0.5% of that child's CPU wall, and each point's online and cold
+K1107 controls must agree within 20%. Failed rows retain their status and
+null costs.
+
+The two-stratum aggregate requires 16 verified rows for every selected
+candidate and distinct runner names. It reports every canonical
+`IC1...W...R1` row. Its online ranking uses each candidate's geometric mean
+of the 16 one-target online times; fresh-process cold ranking is
+supplementary. For the descriptive fastest candidate, exact two-sided sign
+flips test paired log online ratios or cold millisecond differences against
+every other candidate. The threshold is `0.05 / C(selected_count, 2)`.
+If any stratum or pair fails its gate, the corresponding selection stays
+`BOUNDED_UNKNOWN`.
+
+The [workflow](../../.github/workflows/n83-nearby-grid-confirm16.yml) first
+runs fixture and schedule checks. Its measured jobs are skipped until a
+reviewed `dispatch.json` with schema
+`n83.nearby-grid-confirm16-dispatch/v1`, status `SEALED_FOR_DISPATCH`, and
+numeric `screen_run_id` and `screen_attempt` is committed after the first
+admitted 19-base screen. The same workflow can also be invoked manually with
+those two inputs. It downloads and independently replays the raw screen before
+building or timing either stratum, then uploads each stratum's raw receipts
+and the aggregate separately. The earlier run `40136901841` stopped at its
+frozen disk preflight and cannot nominate candidates.
+
 Regenerate and check the immutable fixture from the repository root:
 
 ```sh
 python3 -m research.n83_nearby_grid_confirm16_20261024.generate_fixture
 python3 -m unittest research.n83_nearby_grid_confirm16_20261024.test_select
+python3 -m unittest research.n83_nearby_grid_confirm16_20261024.test_execution
+python3 -m research.n83_nearby_grid_confirm16_20261024.run --fixture-preflight
 ```
