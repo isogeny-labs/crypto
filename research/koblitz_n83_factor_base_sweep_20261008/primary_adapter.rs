@@ -647,6 +647,7 @@ pub(super) fn full_d18_m4_cli(
         FrobeniusOrbitRootEncoding::PerRepresentative,
         "none",
         false,
+        1_200,
     )
 }
 
@@ -666,6 +667,7 @@ pub(super) fn full_d18_m4_l0_positive_cli(
         FrobeniusOrbitRootEncoding::PerRepresentative,
         "none",
         false,
+        300,
     )
 }
 
@@ -683,6 +685,7 @@ pub(super) fn full_d18_m4_l0_shared_positive_cli(
         FrobeniusOrbitRootEncoding::SharedBits,
         "none",
         false,
+        300,
     )
 }
 
@@ -700,6 +703,7 @@ pub(super) fn full_d18_m4_l0_shared_root_pinned_cli(
         FrobeniusOrbitRootEncoding::SharedBits,
         "selector_and_phase_zero",
         false,
+        300,
     )
 }
 
@@ -717,6 +721,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_pinned_cli(
         FrobeniusOrbitRootEncoding::SharedBits,
         "phase_zero",
         false,
+        300,
     )
 }
 
@@ -734,6 +739,7 @@ pub(super) fn full_d18_m4_l0_shared_selector_pinned_cli(
         FrobeniusOrbitRootEncoding::SharedBits,
         "selector",
         false,
+        300,
     )
 }
 
@@ -753,6 +759,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_cli(
         FrobeniusOrbitRootEncoding::SharedBits,
         "none",
         true,
+        300,
     )
 }
 
@@ -772,6 +779,27 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_natural_cli(
         FrobeniusOrbitRootEncoding::SharedBits,
         "none",
         true,
+        300,
+    )
+}
+
+/// Longer local screen of the same public target and free-choice model.
+/// It stays an L0 shared-host diagnostic, with no hard-memory claim.
+pub(super) fn full_d18_m4_l0_shared_phase_first_natural_1200_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "natural",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        1_200,
     )
 }
 
@@ -792,6 +820,7 @@ pub(super) fn full_d18_m4_linux_shared_phase_first_cli(
         FrobeniusOrbitRootEncoding::SharedBits,
         "none",
         true,
+        1_200,
     )
 }
 
@@ -804,6 +833,7 @@ fn full_d18_m4_impl(
     encoding: FrobeniusOrbitRootEncoding,
     choice_pins: &'static str,
     phase_zero_first: bool,
+    budget_seconds: u64,
 ) -> Result<Value> {
     if !["positive", "natural"].contains(&mode) || output.exists() {
         return Err("full D18 m4 mode or fresh output differs from protocol".into());
@@ -824,6 +854,16 @@ fn full_d18_m4_impl(
     {
         return Err("phase-first policy requires the free-choice shared-root mode".into());
     }
+    if (!l0_diagnostic && budget_seconds != 1_200)
+        || (l0_diagnostic
+            && budget_seconds != 300
+            && !(budget_seconds == 1_200
+                && mode == "natural"
+                && encoding == FrobeniusOrbitRootEncoding::SharedBits
+                && phase_zero_first))
+    {
+        return Err("full D18 m4 wall budget differs from a frozen mode".into());
+    }
     let root_choice_pinned = choice_pins == "selector_and_phase_zero";
     let search_policy = if phase_zero_first {
         "phase_zero_first"
@@ -843,7 +883,6 @@ fn full_d18_m4_impl(
     } else {
         Some(checked_cgroup_memory_limit(hard_memory_mib)?)
     };
-    let budget_seconds = if l0_diagnostic { 300 } else { 1_200 };
     let encoding_name = match encoding {
         FrobeniusOrbitRootEncoding::PerRepresentative => "per_representative",
         FrobeniusOrbitRootEncoding::SharedBits => "shared_root_bits",
