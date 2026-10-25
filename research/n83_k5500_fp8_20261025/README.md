@@ -54,6 +54,14 @@ ratio of 1.505. K128 likewise preserved exact digests and measured a 1.831
 ratio at 680,000 states. All three local sizes ran on a shared Darwin ARM64
 host with fourteen exposed logical CPUs; they are index-stage diagnostics.
 
+The [K2048 control](k2048_abba.json) extends exact digest parity to
+174,064,640 regular states and 348,120,365 root entries. Its sidecars add
+671,088,640 bytes. The two filtered builds took 78.218 and 78.878 seconds;
+baseline builds took 117.335 and 166.582 seconds. The closing baseline was
+42% slower than the opening baseline while other host jobs were active.
+Keep both baselines and the resulting timing spread in the receipt; this
+comparison needs a calibrated Tier 1 repeat before using its timing ratio.
+
 The [K5500 split launch](k5500_split_launch.json) and
 [completion receipt](k5500_split_receipt.json) document the immediately
 preceding baseline build on the source branch. It completed 1,255,377,750
