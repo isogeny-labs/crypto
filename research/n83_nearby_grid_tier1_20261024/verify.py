@@ -68,24 +68,49 @@ def resource_gate(folder):
             "child_status": usage.get("status")}
 
 
+def recorded_output_root(output):
+    """Recover the original run root from its first frozen child receipt.
+
+    An artifact is replayed after extraction at a different location. All
+    recorded launch paths must still agree on one absolute original root.
+    """
+    first = spec.events()[0]["name"]
+    command = read(output / "runs" / first / "launch.json")["command"]
+    root = Path(command[0]).parent.parent
+    if (not root.is_absolute() or ".." in root.parts or
+            root.name != output.name or
+            command[0] != str(root / "executed_bins/n83_rho_optimization_eval")):
+        raise ValueError("first child has no consistent recorded run root")
+    return root
+
+
 def launch_gate(folder, event, output):
     launch = read(folder / "launch.json")
     command = launch["command"]
-    target = output / "target.jsonl"
-    if (launch.get("rss_cap_bytes") != spec.RSS_CAP_BYTES or
-            command[1] != (f"construct:83:1:{event['k']}"
-                           if event["kind"] == "ic" else str(target))):
+    recorded_root = recorded_output_root(output)
+    recorded_folder = recorded_root / "runs" / event["name"]
+    target = recorded_root / "target.jsonl"
+    if launch.get("rss_cap_bytes") != spec.RSS_CAP_BYTES:
         return False
     if event["kind"] == "ic":
-        expected = producer.ic_flags(folder, event["k"])
-        return (command == [str(output / "executed_bins/koblitz_orbit_dlp_fast"),
+        expected = producer.ic_flags(recorded_folder, event["k"])
+        return (command == [str(recorded_root /
+                               "executed_bins/koblitz_orbit_dlp_fast"),
                             f"construct:83:1:{event['k']}", str(target), "29",
-                            str(folder / "targets_result.jsonl")] and
+                            str(recorded_folder / "targets_result.jsonl")] and
                 launch["environment_flags"] == expected and
                 launch["cap_seconds"] == spec.IC_CAP_SECONDS)
-    return (command == [str(output / "executed_bins/n83_rho_optimization_eval"),
-                        str(target), str(event["seed"]), str(spec.RHO_CONFIG),
-                        str(folder / "receipt.json")] and
+    if len(command) != 5:
+        return False
+    config = Path(command[3])
+    relative_config = spec.RHO_CONFIG.relative_to(spec.ROOT)
+    if (not config.is_absolute() or ".." in config.parts or
+            config.parts[-len(relative_config.parts):] != relative_config.parts):
+        return False
+    return (command == [str(recorded_root /
+                            "executed_bins/n83_rho_optimization_eval"),
+                        str(target), str(event["seed"]), str(config),
+                        str(recorded_folder / "receipt.json")] and
             launch["environment_flags"] == {} and
             launch["cap_seconds"] == spec.RHO_CAP_SECONDS)
 
