@@ -1,0 +1,111 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261022-nist-p256-nfs-resume",
+  "title": "Resume native NFS on the remaining skipped P256 extension-twist cofactor",
+  "created": "2026-10-22",
+  "authors": [
+    "NIST seed provenance research"
+  ],
+  "status": "draft",
+  "status_note": "Draft, unqueued. Resume the R05 relation checkpoint after required store publication. Ready promotion also requires a merged source pin, compatible selected lab and binary-bound native timeout controls for the patched tool.",
+  "blocked_on": [],
+  "links": {
+    "lead": "backlog/XP-20261022-nist-p256-nfs-resume/README.md",
+    "notes": [
+      "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R02-20261022/README.md",
+      "problems/nist-extension-twist-composite-cofactors.md",
+      "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R04-20261022/README.md",
+      "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R05-20261022/README.md",
+      "research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/README.md"
+    ],
+    "prs": [
+      2379
+    ]
+  },
+  "question": "Can a further bounded native NFS checkpoint allocation split the remaining 444-bit P256 cofactor?",
+  "decision_value": "A prime-certified split refines the only unresolved DiSSECT target. Native state progress without factors is reported separately; an incomplete or failed run leaves the mathematical requirement open and informs the next allocation.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "8da492df891365d6b6dd8d48d43b5edebc4f2bcd"
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/nist-skipped-curve-jobs",
+    "build": []
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 16,
+    "disk_gb": 32,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Configured native 1800s, outer 1860s plus 30s grace, task 2400s. These ceilings are not completion-time estimates. Requires AVX2/BMI2 and compatible libecm."
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/resume_with_checked_tool.sh",
+      "skipped_256_876-twist2",
+      "{out}",
+      "1800",
+      "--resume"
+    ],
+    "env": {
+      "GP_BIN": "gp",
+      "GNFS_BIN_DIR": "/opt/yafu/factor/lasieve5_64/bin",
+      "NIST_FACTOR_CHECKPOINT": "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R05-20261022/runs.tar.xz",
+      "NFS_POLY_BATCH": "120",
+      "YAFU_PATCHED_BIN": "/opt/yafu-timeout-fix/yafu",
+      "YAFU_TIMEOUT_CONTROL_DIR": "/opt/yafu-timeout-fix/native-controls"
+    },
+    "timeout_per_shard_s": 2400
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": "checkpoint.json",
+    "resume_flag": "--resume"
+  },
+  "outputs": {
+    "result_schema": "nist-nfs-checkpoint/v1 plus independently verified exact target partition",
+    "verify": [
+      "bash",
+      "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R02-20261022/verify_nfs_artifact.sh",
+      "{out}",
+      "skipped_256_876-twist2",
+      "33492266050798185653682380062483799213318454801653963493134064721059735936944520907295931496614455858076048437184499090478420204888353"
+    ],
+    "land": "research/nist_skipped_curve_dissection_20261021/factorization/rounds"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261022-nist-p256-nfs-resume"
+    ],
+    "ttl_s": 7200,
+    "env": {
+      "name": "nist-yafu-c7d902-pari217",
+      "recipe": "Build pinned YAFU c7d90283972820f99b3b4920bfc1eff05c1f6342 with AVX2/BMI2, GMP and matching libecm 7.0.6 headers; make bundled native lattice sievers executable. Install PARI/GP 2.17.2, Bash, jq, ripgrep, GNU coreutils, xz and util-linux. Verify archive checksum and executable hashes; use compatible AVX2/BMI2 hardware. Pin the selected environment before ready promotion. Apply the recorded timeout-printf.patch, rebuild and run the bounded original-versus-patched native controls. Supply the exact validated executable and its binary-bound control summary at the card paths. Materialize the unchanged R05 checkpoint and sibling checksum after actual artifact-store publication; no remote object is currently claimed."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 16384,
+      "timeout_s": 2400,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261022-nist-p256-nfs-resume"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Unqueued draft follow-up with no priority against existing funded cards until merged pin, checkpoint and execution environment are selected."
+    },
+    "notes": "No task, lease, external message, funding or paid compute is created. A sound partial verifier verdict does not certify complete factorization."
+  }
+}

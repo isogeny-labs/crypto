@@ -57,7 +57,7 @@ SOURCES = {
     "koblitz_s21": "research/ic_constructions_20260926/analysis.json",
     "koblitz_s22": "research/ic_descent_20260930/analysis-isolated.json",
     "koblitz_s23": "research/ic_single_target_20260930/analysis.json",
-    "koblitz_rule_v3": "research/ic_tool_program/rule/v3/analysis.json",
+    "koblitz_rule_v7": "research/ic_tool_program/rule/v7/analysis.json",
     "oracles": "docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json",
     "n37_rank_columns": "research/ecbench_n37_rank_columns_20261004/RESULT.json",
     "n37_k8_k16": "research/ecbench_n37_k8_k16_20261004/DECISION.json",
@@ -73,6 +73,7 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -90,7 +91,7 @@ SOURCES = {
 GITHUB = "https://github.com/aburan28/crypto/blob/main/"
 S22_RUNS = "research/ic_descent_20260930/runs-isolated/main"
 S23_RUNS = "research/ic_single_target_20260930/runs"
-RULE_V3_RUNS = "research/ic_tool_program/rule/v3/runs"
+RULE_V7_RUNS = "research/ic_tool_program/rule/v7/runs"
 
 # Phases, in pipeline order, as the page groups them.
 PHASES = [
@@ -134,16 +135,16 @@ REGIME_NAME = {"prime": "Prime field", "char2": "Random binary", "koblitz": "Kob
 FAMILY_OF = {"koblitz": "A", "prime": "B", "char2": "B", "koblitz_batch": "C"}
 FAMILIES = {
     "A": {
-        "title": "Koblitz, one target", "regimes": ["koblitz"], "section": "§23, re-run at baseline v3",
+        "title": "Koblitz, one target", "regimes": ["koblitz"], "section": "§23, re-run at baseline v7",
         "status": "primary comparison: one target, as AGENTS.md's one-target rule requires",
         "targets": "one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks",
         "unit": "one batched affine addition (`add_many` over 1,024 subgroup points), per √r",
         "unit_how": "A clock reading, not a count: `ic price` times each phase exclusively, on one thread, "
                     "and divides by this unit, measured around each repetition (§20, §23). Each process measures its own "
-                    "unit, which is 2.3–3.2 times cheaper at baseline v3 than in §23's processes, so S here is not "
-                    "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v3/README.md).",
+                    "unit, so S here is not "
+                    "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).",
         "reference": "One-target rho on the same point, measured as built (its set-up plus its walk), "
-                     "in the same unit and the same process; its answer replayed and verified (§23; rule v3 at baseline v3).",
+                     "in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).",
         "floor": "√(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed "
                  "Frobenius and negation, n the extension degree. Stated in steps and not rescaled to "
                  "units, so × floor here divides units by steps.",
@@ -436,7 +437,7 @@ def koblitz_rows(names: Names) -> list[dict]:
 
 def koblitz_one_target_rows(names: Names) -> list[dict]:
     """Ledger §23's comparison: one unseen public point per process, 64 per
-    size, re-run at the IC tool programme's baseline v3 as rule v3.  The
+    size, re-run at the IC tool programme's baseline v7 as rule v7.  The
     primary comparison under AGENTS.md's one-target rule.  S here is cold,
     the reusable set-up plus the online interval, against one-target rho's
     set-up plus its walk; the online speedup, the canonical-step reading and
@@ -446,13 +447,13 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
     compared with §23's; the ratios carry no unit."""
     rows = []
     s23 = {(x["a"], x["n"]): x for x in load(SOURCES["koblitz_s23"])["sizes"]}
-    for x in load(SOURCES["koblitz_rule_v3"])["sizes"]:
+    for x in load(SOURCES["koblitz_rule_v7"])["sizes"]:
         a, n = x["a"], x["n"]
         before = s23[(a, n)]
         c = names(before["curve"])
         if c["slug"] != x["curve"]:
-            raise SystemExit(f"rule v3's {x['curve']} is not §23's {before['curve']}")
-        par = json.loads((REPO / RULE_V3_RUNS / f"k{a}n{n}" / "T01.params.json").read_text())
+            raise SystemExit(f"rule v7's {x['curve']} is not §23's {before['curve']}")
+        par = json.loads((REPO / RULE_V7_RUNS / f"k{a}n{n}" / "T01.params.json").read_text())
         columns = int(re.search(r"-c(\d+)-", par["name"]).group(1))
         d = x["diagnostics"]
         sh = d["online_phase_shares"]
@@ -490,11 +491,11 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
         rows.append({
             "regime": "koblitz", "slug": c["slug"], "ec1": x.get("curve_id") or ec1_of(c),
             "legacy": before["curve"], "log2_r": x["log2_r"], "cofactor": None,
-            "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v3)",
+            "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
             "reference_s": x["s_rho_online_mean"] + x["s_rho_setup"], "floor_s": floor_s,
-            "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v3"],
+            "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v7"],
             "before_source": SOURCES["koblitz_s23"],
-            "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
+            "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
             "class": "accounting",
         })
     return rows
@@ -1224,6 +1225,9 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        # A component speed-up (the linear stage after F4 in jv_cover) copied
+        # from its study's frozen summary; it moves no row of tables A-C.
+        "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "pair_table_component": pair_table_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
@@ -1652,6 +1656,18 @@ def markdown(doc: dict) -> str:
         observed = session["arms"]["ic-mitm"]["cross_curve"]
         L.append(f"| {session['ell']} | {observed['ratio_floor_over_crater']:.6f} | "
                  f"{observed['ci99'][0]:.6f} to {observed['ci99'][1]:.6f} |")
+    ls = doc["jv_cover_linear_stage_component"]
+    L += ["", "## Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC", "",
+          f"Component speed-up, class {ls['class']}: the dense linear stage against sparse FGLM "
+          f"(Wiedemann / Berlekamp–Massey on M_xn, shift-chain eigenvectors) in {ls['pipeline']}, "
+          f"same binary and seeds, the same relations, every DLP solved and verified by both arms "
+          f"(`{ls['study']}`, {ls['run']}). It moves no row of tables A–C. "
+          "S/rho is a lower-bound comparison (unpriced native work is not emitted).", "",
+          "| p | seed | relations | S dense | S sparse | dense ÷ sparse | S/rho dense | S/rho sparse (distance to rho) |",
+          "|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    for r in ls["dlp"]:
+        L.append(f"| {r['p']} | {r['seed']} | {r['relations']} | {r['s_before']:.4g} | {r['s_after']:.4g} | "
+                 f"{r['s_ratio']:.2f} | {r['s_over_rho_before']:.0f} | {r['s_over_rho_after']:.0f} |")
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -1845,7 +1861,9 @@ def page(doc: dict, standalone: bool) -> str:
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500'
             '&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">\n'
-            f"<style>{STYLE}</style>\n")
+            f"<style>{STYLE}</style>\n"
+            '<link rel="stylesheet" href="ic-leaderboard/layout.css">\n'
+            '<script src="ic-leaderboard/layout.js" defer></script>\n')
     P = []
     K1 = L["koblitz"]
     kob_rows = by_regime["koblitz"]
@@ -2223,7 +2241,7 @@ def page(doc: dict, standalone: bool) -> str:
              'and floors, stated at the head of each; S, × ref and × floor are comparable inside a table and '
              'nowhere else. Tables A and B solve one target per row, as AGENTS.md\'s one-target rule requires: '
              'A on one unseen public point per process against one-target rho on the same point (§23\'s comparison, '
-             're-run at the ic tool programme\'s baseline v3, 64 points per size, §23\'s figures kept as the '
+             're-run at the ic tool programme\'s baseline v7, 64 points per size, §23\'s figures kept as the '
              'before marks), B against the matched negation-map rho (ledger §18). Table C is a historical 32-target '
              'diagnostic. For the Koblitz rows of A the online interval, the reading with rho at the canonical '
              'step and the generic-precomputation model sit beside the cold ratio, as §23 requires. The bar '
@@ -2453,6 +2471,21 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<tr><td>{session["ell"]}</td><td>{observed["ratio_floor_over_crater"]:.6f}</td>'
                  f'<td>{observed["ci99"][0]:.6f} to {observed["ci99"][1]:.6f}</td></tr>')
     P.append('</tbody></table>' + gh(SOURCES["conductor_gap_counts"], 'Native analysis and source records') + '</section>')
+
+    ls = doc["jv_cover_linear_stage_component"]
+    P.append('<section id="jv-cover-linear-stage-component"><h2>Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC</h2>'
+             f'<p>Component speed-up, class {esc(ls["class"])}: the dense linear stage against sparse FGLM '
+             f'(Wiedemann / Berlekamp–Massey on M<sub>x<sub>n</sub></sub>, shift-chain eigenvectors) in {esc(ls["pipeline"])}, '
+             'same binary and seeds, the same relations, every DLP solved and verified by both arms. It moves no row '
+             'of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted); the sparse '
+             'column is the distance remaining to rho.</p>'
+             '<table><thead><tr><th>p</th><th>seed</th><th>relations</th><th>S dense</th><th>S sparse</th>'
+             '<th>dense ÷ sparse</th><th>S/rho dense</th><th>S/rho sparse</th></tr></thead><tbody>')
+    for r in ls["dlp"]:
+        P.append(f'<tr><td>{r["p"]}</td><td>{r["seed"]}</td><td>{r["relations"]}</td><td>{r["s_before"]:.4g}</td>'
+                 f'<td>{r["s_after"]:.4g}</td><td>{r["s_ratio"]:.2f}</td><td>{r["s_over_rho_before"]:.0f}</td>'
+                 f'<td>{r["s_over_rho_after"]:.0f}</td></tr>')
+    P.append('</tbody></table>' + gh(ls["study"], 'Study, run report and raw records') + '</section>')
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]

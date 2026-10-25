@@ -4139,7 +4139,7 @@ mod wide {
                         || indexed5_fixed31)
                     && !indexed4_table)
                     || (indexed4_table
-                        && indexed4_fixed31
+                        && (indexed4_fixed30 || indexed4_fixed31)
                         && std::env::var("KIC_INDEXED_ROOT5").as_deref() != Ok("1")
                         && !indexed5_load75
                         && !indexed5_load80))
@@ -4151,7 +4151,7 @@ mod wide {
                     < (1usize
                         << if indexed5_id31 {
                             32
-                        } else if indexed4_table || indexed5_id30 {
+                        } else if indexed4_table || indexed4_fixed31 || indexed5_id30 {
                             31
                         } else {
                             30
@@ -4191,7 +4191,11 @@ mod wide {
         // symmetric traversal, so load75 can size this early table exactly.
         let root11_request_entries = root_only11.then(|| {
             if indexed4_table {
-                1usize << 30
+                if indexed4_fixed30 {
+                    1usize << 29
+                } else {
+                    1usize << 30
+                }
             } else if indexed5_fixed31 {
                 1usize << 30
             } else if indexed5_load75 {
@@ -4455,8 +4459,9 @@ mod wide {
         assert!(
             !indexed4_table
                 || (!indexed5_table
-                    && ((root_only11 && indexed4_fixed31) || (root_only21 && indexed4_fixed30))),
-            "four-byte root slots require one-root/fixed31 or 21-byte/fixed30 states"
+                    && ((root_only11 && (indexed4_fixed30 || indexed4_fixed31))
+                        || (root_only21 && indexed4_fixed30))),
+            "four-byte root slots require one-root/fixed30 or fixed31, or 21-byte/fixed30 states"
         );
         assert!(
             !(dense_table || load75_table) || packed,
@@ -4516,7 +4521,7 @@ mod wide {
         if indexed4_fixed30 {
             assert!(
                 indexed4_table
-                    && root_only21
+                    && (root_only21 || root_only11)
                     && max_states < (1usize << 29)
                     && max_states.checked_mul(2).unwrap() < (1usize << 30),
                 "fixed 2^30 four-byte table cannot encode all state roots"

@@ -78,6 +78,8 @@ def normalize_spec(spec: dict[str, Any]) -> dict[str, Any]:
     for sp in out["source"].get("sparse_paths") or []:
         if ".." in Path(sp).parts:
             raise SpecError(f"source/sparse_paths: {sp!r} escapes the checkout")
+    if out.get("checkpoint") and out["kind"] != "command":
+        raise SpecError("checkpoint is supported only for command tasks")
     return out
 
 

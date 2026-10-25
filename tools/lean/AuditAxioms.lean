@@ -1,7 +1,7 @@
 /-
 Axiom audit for the repository's Lean proof gate (tools/lean/proof-gate.sh).
 
-Usage: lake env lean --run tools/lean/AuditAxioms.lean [--trusted FILE] <Module> [<Module> ...]
+Usage: lake env lean --run tools/lean/AuditAxioms.lean -- [--trusted FILE] <Module> [<Module> ...]
 
 Imports the named modules, then, for every theorem declared in them (including
 submodules sharing the prefix), collects the axioms it depends on transitively.
@@ -50,7 +50,7 @@ def readTrusted (path : String) : IO (List Name) := do
     if n.isEmpty then none else some n.toName
 
 def main (args : List String) : IO UInt32 := do
-  -- Lean 4.19 consumes the option terminator; newer versions pass it to main.
+  -- Lean 4.19 consumes the separator; newer Lean versions pass it to main.
   let args := match args with
     | "--" :: rest => rest
     | _ => args
