@@ -1,9 +1,15 @@
 ---
 name: isolab-eks
-description: Submit crypto experiments to Iso Lab on EKS Spot workers from Claude, Codex, OpenCode, another harness, or GitHub Actions; verify the tested commit, earned L2 isolation, private S3 results, and checkpoint/resume readiness. Use for Kubernetes lab execution, not the separate legacy NATS Iso Lab service.
+description: Default execution path for authorized x86 CPU experiments and crypto benchmarks in this repository. Submit to Iso Lab on EKS Spot from Claude, Codex, OpenCode or a harness; verify the tested commit, L2, S3 results and checkpoint/resume requirements. Explicit legacy NATS or bare-metal requests use their own runner.
 ---
 
 # Iso Lab on EKS
+
+When the user asks to run a supported experiment, use this skill and execute
+the submission with the available authenticated client. Do not stop at giving
+the user a launch command. Loading the skill alone does not request a new run.
+Honor an explicitly selected backend, frozen workload, budget and stop condition.
+Local builds, unit tests and static checks remain development work.
 
 Use the repository's maintained harness contract in
 [`taskq/deploy/eks-karpenter/HARNESS.md`](../../../taskq/deploy/eks-karpenter/HARNESS.md).
@@ -27,6 +33,13 @@ policy; ordinary v1 jobs are fresh, non-resumable jobs. Read
 
 ## Select the submission path
 
+- **Existing AWS credentials:** use the installed EKS MCP when available;
+  otherwise use the portable AWS launcher below. Run `aws sts get-caller-identity`
+  in the executor's environment and confirm account `104186811093`. Keep its
+  existing role/profile; do not initiate SSO or ask for another key when that
+  identity already has the required permissions. STS identifies the caller;
+  it does not prove permission to submit. Follow the access guide for actual
+  authorization checks. A missing MCP connection does not block the AWS bridge.
 - **GitHub identity, callers anywhere:** dispatch `isolab-experiment.yml` on
   `main` with an explicit 40-character `source_revision`. It builds that commit,
   publishes a digest-pinned image, launches EKS and verifies S3 receipts. Read
@@ -46,10 +59,18 @@ policy; ordinary v1 jobs are fresh, non-resumable jobs. Read
   authorized arbitrary command. Read the live tool schema first. Benchmark
   takes the inner `job` object, not the portable request envelope.
 
-Prefer the commit-building GitHub path for new code when no per-run image has
-already been built and verified. A caller provenance SHA on its own does not
-change the executable in the default image. Keep the tested source SHA,
-workflow SHA, binary SHA-256 and OCI digest distinct.
+For a new source revision, use a verified image built from that commit. Prefer
+the commit-building GitHub path when the reviewed workflow is available on
+`main` and its OIDC trust matches the current repository. A pending merge or
+repository transfer can block that route; use an already verified per-run image
+through the AWS bridge when available, or report the missing build explicitly.
+A caller provenance SHA does not change the executable in the default image.
+Never replace the requested experiment with the deployed integration fixture.
+Keep source SHA, workflow SHA, binary SHA-256 and OCI digest distinct.
+
+For a Claude director/executor card, freeze the request, launcher argv,
+non-secret environment, receipt directory and timeout before delegation. Follow
+[the card instructions](references/submission.md#mechanical-task-cards).
 
 ## Before launch
 

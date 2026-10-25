@@ -2,6 +2,12 @@
 
 ## Standing workflow rules (from the owner)
 
+- **Run experiments on EKS Spot by default** (owner, 2026-10-25). For an
+  authorized x86 CPU experiment or crypto benchmark, read and use
+  [isolab-eks](.agents/skills/isolab-eks/SKILL.md), then submit and verify it;
+  do not merely give the user commands to run. This applies to Claude, Codex,
+  OpenCode and their experiment agents. Authentication and routing are in
+  §9a. Honor an explicitly requested backend, workload and budget.
 - **Always commit finished work and open or update a PR.** Landed rungs,
   ledger promotions, evidence directories, and code changes land as commits
   on a feature branch. If the branch already has an open PR, extend that
@@ -1099,10 +1105,53 @@ existing EC2 key-pair name **`meow34`** when launching the instance.
   accessible, report that access blocker and continue with non-SSH work where
   possible.
 
-### 9a. Experiments that do not run locally go through `ephemeral`
+### 9a. Experiments default to Iso Lab on EKS Spot
 
-When an experiment, benchmark or build is to run in the cloud rather than on
-the local machine, run it with the ephemeral runner
+Use [isolab-eks](.agents/skills/isolab-eks/SKILL.md) for supported x86 CPU
+experiments and benchmarks. Freeze the requested spec, source/image identity,
+resources, deadline and acceptance criteria, submit the job, and retain its
+receipt. The experiment runs in a pod in cluster `isolab`, namespace `isolab`,
+region `us-east-2`, account `104186811093`. Karpenter starts Spot workers;
+`cpu-spot` serves ordinary work and `cpu-l2-spot` serves native L2 benchmarks.
+Keep the combined 64-vCPU worker cap and the shared 96-vCPU account quota.
+
+- **Use existing authentication.** Verify the caller with
+  `aws sts get-caller-identity` and check the required permissions using
+  [ACCESS.md](taskq/deploy/eks-karpenter/ACCESS.md). Keep a working AWS
+  role/profile; do not request new keys or SSO setup merely because an agent
+  session is new. Never embed credentials in cards, requests or artifacts.
+- **Submit from the agent.** Use an installed EKS MCP connection, or the
+  portable `remote/validate-request` and `remote/launch-remote` clients under
+  `taskq/deploy/eks-karpenter/`. CodeBuild supplies the private cluster route
+  for remote callers. Missing local kubectl or MCP does not require a backend
+  change. Long launches run in the background with their request/build identity
+  retained; reconcile an ambiguous submission before retrying.
+- **Build identity is required.** Use the requested spec and an image built
+  from its tested commit. The main-only GitHub workflow is usable only after
+  its reviewed implementation and matching OIDC trust are available. A source
+  label on the deployed fixture does not build that source. Report a missing
+  image/build route instead of running a different experiment.
+- **Earn the result.** Require native L2, replay and A/A admission for an L2
+  benchmark, and download and verify S3 payload hashes. A successful pod is
+  not enough. Preserve failures and keep all original measurement thresholds.
+- **Resume explicitly.** Requested resumability uses CRIU plus EBS snapshots
+  through `isolab.eks.resumable/v1`, with compatible workers and a fresh
+  measurement epoch after interruption. Ordinary request-v1 is non-resumable.
+  Report unsupported workloads or restore compatibility before launching them.
+- **Preserve other requirements.** An explicit local, GPU, ARM, bare-metal or
+  L3 request retains its requested environment and gates. Do not silently route
+  an unsupported workload to a different backend. Local builds, unit tests,
+  static checks and analysis of existing results remain development work.
+
+Claude's experiment director freezes the EKS client commands and environment in
+the existing task-card format; the mechanical executor runs that card unchanged.
+Codex and OpenCode use the same submission contract. Agent instructions select
+the path; they do not create experiments without a user task or scheduled job.
+
+### 9b. Explicit ephemeral experiments and cloud builds
+
+Use the ephemeral runner for an explicitly selected ephemeral experiment, or
+for a standalone cloud build outside the EKS image-building workflow
 ([`taskq/deploy/ephemeral/`](taskq/deploy/ephemeral/README.md)). Do not
 launch EC2 instances by hand for it. `conductor/deploy/aws/launch.py`, in the
 Conductor repository, starts the Conductor control plane, not experiments.
@@ -1147,7 +1196,9 @@ conditions both sides ran under.  Before changing code for speed:
   is a different algorithm, not a speedup.
 - **Isolate every timed run: pin it, reserve its core, and record the
   conditions.  This is mandatory for any wall-clock or native-time number.**
-  Run the benchmark through `tools/isolated_bench.py`: `run` for a single
+  EKS experiments use the native isolation and admission in §9a; the submitting
+  machine's lock does not isolate the remote pod. For an explicitly selected
+  local or ephemeral run, use `tools/isolated_bench.py`: `run` for a single
   command it pins itself, `reserve` for a harness that pins its own children
   (such as the tournament evaluator's `--cpu`). The tool does the following:
   - It takes an exclusive lock, so only one benchmark runs at a time.

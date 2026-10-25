@@ -1,3 +1,13 @@
+Run authorized x86 CPU experiments and crypto benchmarks through
+[`isolab-eks`](.claude/skills/isolab-eks/SKILL.md) on EKS Spot by default
+(owner, 2026-10-25; AGENTS.md §9a). Use the executor's existing AWS identity,
+submit from the agent, and verify source/image identity and S3 hashes. L2
+benchmarks require native L2/replay/A/A admission. Requested resume uses the
+separate CRIU/EBS contract. The
+experiment director freezes this route in the task card; the executor runs it
+unchanged. Preserve explicitly requested environments and keep local development
+checks local. Loading instructions alone does not authorize an experiment.
+
 Open pull requests ready for review, never as drafts, whatever the runtime
 defaults to, and mark an existing draft ready; only a user request in the task
 makes a draft. This and the repository's other rules are in
