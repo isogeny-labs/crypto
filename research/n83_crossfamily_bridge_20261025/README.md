@@ -25,6 +25,14 @@ The raw panel archives must be independently replayed before their aggregate
 JSON is passed to this nominator; the nominator's output is not a bridge
 dispatch or a timing result.
 
+The admitted arms share the same IC producer source but use different root
+index policies: nearby-grid arms use dynamic five-byte slots at 75% load
+without a Bloom filter; K3300/K3450 use fixed five-byte slots with the wide3
+Bloom profile; K3500/K3596 use fixed four-byte slots with the standard Bloom
+profile. The bridge therefore compares complete candidate pipelines while
+factor-base size and index policy both vary. A claim about the factor-base
+effect alone needs a matched-index comparison on the same points and hosts.
+
 Regenerate and check the committed artifacts from the repository root:
 
 ```sh

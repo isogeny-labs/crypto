@@ -85,6 +85,13 @@ class NominationTests(unittest.TestCase):
             nearby_catalog.CANDIDATES[1107][0],
             nearby_catalog.CANDIDATES[1115][0],
             wide_arms.ARMS[0][3], wide_arms.ARMS[3][3]})
+        self.assertEqual(result["comparison_variable"],
+                         "factor_base_and_index_policy")
+        self.assertEqual(result["index_policy_by_candidate_id"][
+            nearby_catalog.CANDIDATES[1107][0]],
+            "root5_dynamic_load75_no_bloom")
+        self.assertEqual(result["index_policy_by_candidate_id"][
+            wide_arms.ARMS[3][3]], "root4_fixed31_bloom_standard")
 
     def test_changed_nearby_row_fails_closed(self):
         panel = nearby_panel()

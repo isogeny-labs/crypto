@@ -117,6 +117,12 @@ def nominate(nearby, wide_validated):
     if not 2 <= len(ids) <= 4 or any(candidate not in manifest_hashes
                                     for candidate in ids):
         return reject("BRIDGE_CANDIDATE_IDENTITY_DIFFERS")
+    index_policy = {candidate: "root5_dynamic_load75_no_bloom"
+                    for candidate in small_ids}
+    index_policy.update({
+        arm[3]: ("root5_fixed30_bloom_wide3" if arm[2] == "root11_wide3"
+                 else "root4_fixed31_bloom_standard")
+        for arm in wide_arms.ARMS if arm[3] in wide_ids})
     return {
         "schema": "n83.crossfamily-bridge-nomination/v1",
         "status": "READY_FOR_BRIDGE_DISPATCH",
@@ -127,6 +133,9 @@ def nominate(nearby, wide_validated):
         "candidate_ids": ids,
         "candidate_manifest_sha256": {candidate: manifest_hashes[candidate]
                                       for candidate in ids},
+        "comparison_variable": "factor_base_and_index_policy",
+        "index_policy_by_candidate_id": {candidate: index_policy[candidate]
+                                         for candidate in ids},
         "small_online_candidate_id": small_ids[0],
         "small_cold_candidate_id": small_ids[1],
         "wide_online_candidate_id": wide_ids[0],
