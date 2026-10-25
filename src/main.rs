@@ -399,6 +399,22 @@ enum CryptanalysisOp {
         #[arg(long)]
         row: Option<u8>,
     },
+    /// Verify the quadratic equation system for the four-bit AES-like S-box.
+    AesAlgebraicEquations,
+    /// Compare slide-pair searches on repeated-round-key and standard AES-128.
+    AesSlideComparison {
+        /// Chosen plaintext samples per cipher (1..=1,000,000).
+        #[arg(long, default_value_t = 4096)]
+        samples: usize,
+        #[arg(long, default_value_t = 0xdead_beef_cafe)]
+        seed: u64,
+    },
+    /// Estimate logical Grover resources for AES key search.
+    AesGroverCost {
+        /// AES key size: 128, 192, or 256 bits.
+        #[arg(long, default_value_t = 128)]
+        key_bits: u32,
+    },
     /// Check a supplied sequence of AES active-byte patterns against MixColumns branch constraints.
     AesTrailCheck {
         /// One four-digit hex mask per round, bit 4*column+row marking an active byte; repeat --pattern.
@@ -2903,6 +2919,43 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
                 std::process::exit(1);
             }
         },
+        CryptanalysisOp::AesAlgebraicEquations => {
+            use crypto_lib::cryptanalysis::aes::algebraic::{
+                sbox4_quadratic_equations, verify_quadratic_equations,
+            };
+            let equations = sbox4_quadratic_equations();
+            let verified = verify_quadratic_equations(&equations);
+            println!("# Four-bit AES-like S-box quadratic system");
+            println!("- equations: {}", equations.len());
+            println!("- vanishes on all 16 input/output pairs: {verified}");
+            if !verified {
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesSlideComparison { samples, seed } => {
+            if !(1..=1_000_000).contains(&samples) {
+                eprintln!("error: --samples must be in 1..=1000000");
+                std::process::exit(2);
+            }
+            use crypto_lib::cryptanalysis::aes::slide::run_slide_comparison;
+            let report = run_slide_comparison(samples, seed);
+            println!("# Bounded AES slide-pair search");
+            println!("- samples per cipher: {}", report.n_samples);
+            println!(
+                "- repeated-round-key variant pair: {:?}",
+                report.symmetric_aes_slid_pair
+            );
+            println!("- AES-128 pair: {:?}", report.genuine_aes_slid_pair);
+            println!("- result scope: observations within the requested samples");
+        }
+        CryptanalysisOp::AesGroverCost { key_bits } => {
+            if !matches!(key_bits, 128 | 192 | 256) {
+                eprintln!("error: --key-bits must be 128, 192, or 256");
+                std::process::exit(2);
+            }
+            let cost = crypto_lib::cryptanalysis::aes::quantum_grover::grover_cost_aes(key_bits);
+            println!("{cost}");
+        }
         CryptanalysisOp::AesTrailCheck { pattern } => match aes_trail_check_report(&pattern) {
             Ok(report) => println!("{}", serde_json::to_string_pretty(&report).unwrap()),
             Err(e) => {
