@@ -1,6 +1,7 @@
 {
   "schema": "four-followups-spot-migration-reconciliation/v1",
-  "observed_utc": "2026-10-24T23:02:38Z",
+  "observed_utc": "2026-10-25T01:15:12Z",
+  "initial_observed_utc": "2026-10-24T23:02:38Z",
   "source_instance": "i-01f85a6c905181498",
   "destination_instance": "i-09774109223fde89e",
   "migration": {
@@ -11,7 +12,8 @@
   },
   "diem": {
     "runtime_receipt_path": "/run/spot-legacy/diem.json",
-    "runtime_receipt_sha256": "9e3315bf48e1145d46af310a62c66d56701b639e9f02a86bdec0e37afdf7f14c",
+    "runtime_receipt_sha256": "ab44f34f7e2b24eb62ae9faa0440fdf661b3d150aadd1edc2f99160f8250cd25",
+    "previous_runtime_receipt_sha256": "9e3315bf48e1145d46af310a62c66d56701b639e9f02a86bdec0e37afdf7f14c",
     "native_config_sha256": "bac57870775ace9605769b2eeb11ebf5ba5eaf492f2a796c9fabe07ce2901b58",
     "state": "deadline-expired",
     "durable_records": 50,
@@ -19,6 +21,8 @@
     "pending": false,
     "managed_service": "spot-diem-recovery.service",
     "managed_service_result": "inactive_after_successful_reconciliation",
+    "receipt_refresh_changed_state": false,
+    "receipt_refresh_changed_durable_records": false,
     "decision": "do_not_relaunch"
   },
   "source_freeze_followup": {
@@ -36,13 +40,23 @@
       "candidate_verified": false,
       "rho_verified": true
     },
+    "hashes_reverified_after_continuation": true,
+    "original_authorization": "preserved full-cohort research authorization; exact sparse continuation remains excluded by the prior assistance-boundary decision",
     "decision": "preserve_without_repeat; exact sparse continuation remains outside this local lane"
   },
   "eks": {
     "cluster": "isolab",
     "cluster_state": "ACTIVE",
     "caller_role": "spot-experiments-WorkerRole-G1FZ84yk3gS6",
-    "cluster_list_permission": "denied_by_scoped_rbac",
+    "cluster_list_permission": "allowed_at_refreshed_observation",
+    "namespace": "isolab",
+    "kubernetes_jobs_total": 28,
+    "kubernetes_jobs_active": 0,
+    "kubernetes_jobs_incomplete": 0,
+    "kubernetes_jobs_succeeded": 18,
+    "kubernetes_jobs_failed": 10,
+    "kubernetes_pods_total": 0,
+    "four_followup_related_jobs": 0,
     "launcher_project": "isolab-experiment-launcher",
     "recent_launcher_builds_checked": 6,
     "recent_launcher_builds_active": 0,
@@ -50,6 +64,6 @@
     "recent_launcher_builds_failed": 1,
     "latest_observed_run_object": "runs/boolean-f6-full-rank-index-results-fresh-20261024t174213z/report-evidence.tar.gz",
     "latest_observed_run_object_utc": "2026-10-24T22:25:35Z",
-    "decision": "do_not_repeat_or_modify_existing_jobs; current N6-N8 work is local and receipt-driven"
+    "decision": "do_not_repeat, stop, or modify existing jobs; current N6-N9 work is local and receipt-driven"
   }
 }
