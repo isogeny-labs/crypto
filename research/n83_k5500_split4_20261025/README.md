@@ -41,23 +41,26 @@ tables. With a 2^31-slot primary and this load80 request rule, K4549 is the
 largest possible first state segment. This maximizes the number of states routed to
 the first table within these fixed slot buckets.
 
-| Result | Lean declaration | Status |
-| --- | --- | --- |
-| State and request monotonicity | `states_monotone`, `request_monotone` | Checked |
-| Core, full, and extension counts | `core_states`, `full_states`, `extension_states` | Checked |
-| Relative ID and slot-bucket bounds | `relative_ids_fit`, `split_slot_buckets` | Checked |
-| Maximal first state segment under the primary bucket | `k4549_max_primary` | Checked |
-| Two-root load bound | `split_load80` | Checked |
-| Exact global ordinal recovery from either segment | `ordinal_split_roundtrip` | Checked |
-| Exact slot decoding and unique witness | `relative_witness_roundtrip`, `relative_witness_injective` | Checked |
-| Principal bytes and saving | `k5500_split_principal_bytes`, `split_saves_425_gib` | Checked |
+| Result | Lean declaration | Exact hypotheses | Status |
+| --- | --- | --- | --- |
+| State and request monotonicity | `states_monotone`, `request_monotone` | Natural inputs with `a ≤ b` | Checked |
+| Core, full, and extension counts | `core_states`, `full_states`, `extension_states` | `S(K)` formula at K4549 and K5500 | Checked |
+| Relative ID and slot-bucket bounds | `relative_ids_fit`, `split_slot_buckets` | `S(K)` and `request(s)=(5s+3)/4` | Checked |
+| Maximal first state segment under the primary bucket | `k4549_max_primary` | Natural K with `request(S(K)) ≤ 2^30` | Checked |
+| Two-root load bound | `split_load80` | At most two roots per state; 2^31 and 2^30 table slots | Checked |
+| Exact global ordinal recovery from either segment | `ordinal_split_roundtrip` | `cut ≤ total`, `global < total` | Checked |
+| Exact slot decoding and unique witness | `relative_witness_roundtrip`, `relative_witness_injective` | Local ID below `2^30−1`; selector and fingerprint below 2 | Checked |
+| Principal bytes and saving | `k5500_split_principal_bytes`, `split_saves_425_gib` | Four-byte slots, eleven-byte states, compact4 Bloom buckets | Checked |
 
 The [Lean source](Capacity.lean) pins Lean 4.35.0 in
 [`lean-toolchain`](lean-toolchain). Run `lean Capacity.lean`; the version,
 build output and `#print axioms` audit are in [`lean-check.log`](lean-check.log).
 No declaration uses `sorry`, `admit`, custom claim axioms, or native
 evaluation. The structural lemmas use the standard foundations reported in
-the log. `lean4checker --fresh` is unavailable on this host.
+the log. `lean4checker --fresh` is unavailable on this host. The proof uses
+the state and request formulas as explicit definitions; the correspondence
+between those formulas and the compiled Rust allocation path is checked by
+source review and the K128 receipt and remains an open Lean bridge.
 
 ## K128 implementation control
 
