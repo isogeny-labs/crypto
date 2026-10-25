@@ -646,6 +646,7 @@ pub(super) fn full_d18_m4_cli(
         false,
         FrobeniusOrbitRootEncoding::PerRepresentative,
         "none",
+        false,
     )
 }
 
@@ -664,6 +665,7 @@ pub(super) fn full_d18_m4_l0_positive_cli(
         true,
         FrobeniusOrbitRootEncoding::PerRepresentative,
         "none",
+        false,
     )
 }
 
@@ -680,6 +682,7 @@ pub(super) fn full_d18_m4_l0_shared_positive_cli(
         true,
         FrobeniusOrbitRootEncoding::SharedBits,
         "none",
+        false,
     )
 }
 
@@ -696,6 +699,7 @@ pub(super) fn full_d18_m4_l0_shared_root_pinned_cli(
         true,
         FrobeniusOrbitRootEncoding::SharedBits,
         "selector_and_phase_zero",
+        false,
     )
 }
 
@@ -712,6 +716,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_pinned_cli(
         true,
         FrobeniusOrbitRootEncoding::SharedBits,
         "phase_zero",
+        false,
     )
 }
 
@@ -728,6 +733,26 @@ pub(super) fn full_d18_m4_l0_shared_selector_pinned_cli(
         true,
         FrobeniusOrbitRootEncoding::SharedBits,
         "selector",
+        false,
+    )
+}
+
+/// Search the unchanged free-choice planted formula with Frobenius phase
+/// wires prioritized and initially false. No selector or phase is pinned.
+pub(super) fn full_d18_m4_l0_shared_phase_first_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
     )
 }
 
@@ -739,6 +764,7 @@ fn full_d18_m4_impl(
     l0_diagnostic: bool,
     encoding: FrobeniusOrbitRootEncoding,
     choice_pins: &'static str,
+    phase_zero_first: bool,
 ) -> Result<Value> {
     if !["positive", "natural"].contains(&mode) || output.exists() {
         return Err("full D18 m4 mode or fresh output differs from protocol".into());
@@ -754,7 +780,22 @@ fn full_d18_m4_impl(
     {
         return Err("root-choice pins require the L0 shared-root planted control".into());
     }
+    if phase_zero_first
+        && (!l0_diagnostic
+            || mode != "positive"
+            || encoding != FrobeniusOrbitRootEncoding::SharedBits
+            || choice_pins != "none")
+    {
+        return Err(
+            "phase-first policy requires the free-choice L0 shared-root planted control".into(),
+        );
+    }
     let root_choice_pinned = choice_pins == "selector_and_phase_zero";
+    let search_policy = if phase_zero_first {
+        "phase_zero_first"
+    } else {
+        "default"
+    };
     let memory_limit_bytes = if l0_diagnostic {
         None
     } else {
@@ -777,7 +818,7 @@ fn full_d18_m4_impl(
         &mut phases,
         started,
         "started",
-        json!({"mode":mode, "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "source_commit":source_commit, "binary_sha256":binary_sha256}),
+        json!({"mode":mode, "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy, "source_commit":source_commit, "binary_sha256":binary_sha256}),
     )?;
     let cap_path = std::path::PathBuf::from(format!("{}.cap.json", output.display()));
     let cap_mode = mode.to_owned();
@@ -785,7 +826,7 @@ fn full_d18_m4_impl(
         std::thread::sleep(Duration::from_secs(budget_seconds));
         let cap = json!({
             "schema":"n83.full-d18-m4-cap/v1", "status":"UNKNOWN_wall_cap",
-            "mode":cap_mode, "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "budget_seconds":budget_seconds,
+            "mode":cap_mode, "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy, "budget_seconds":budget_seconds,
             "isolation":if l0_diagnostic {"L0_shared_host_no_hard_cgroup"} else {"hard_32GiB_cgroup_zero_swap"},
             "elapsed_process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
             "selected_best_total_runtime":Value::Null,
@@ -935,10 +976,25 @@ fn full_d18_m4_impl(
             }
         }
     }
+    if phase_zero_first {
+        let phase_wires: Vec<u32> = enc
+            .orbit_choice_wires()
+            .ok_or("phase-first control lacks choice wires")?
+            .iter()
+            .flat_map(|handles| handles.phase.iter().copied())
+            .collect();
+        if phase_wires.len() != 28 {
+            return Err("phase-first control phase-wire count differs".into());
+        }
+        let mut priority: Vec<u32> = (1..=(4 * 83)).collect();
+        priority.extend_from_slice(&phase_wires);
+        enc.solver.set_branch_priority(&priority);
+        enc.solver.set_saved_phase_for_vars(&phase_wires, false);
+    }
     let model_ms = model_start.elapsed().as_secs_f64() * 1000.0;
     let shape = json!({
         "variables":enc.solver.n_vars(), "clauses":enc.solver.n_clauses(),
-        "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins,
+        "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy,
         "xor_rows":enc.solver.n_xors(), "model_ms":model_ms,
         "import_ms":import_ms, "object":row["object"],
         "point_set_blake3":FULL_D18_POINT_SET,
@@ -1014,7 +1070,7 @@ fn full_d18_m4_impl(
     let result = json!({
         "schema":if l0_diagnostic {"n83.full-d18-m4-l0-positive/v1"} else {"n83.full-d18-m4-worker/v1"}, "status":status,
         "mode":mode, "source_commit":source_commit,
-        "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins,
+        "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy,
         "isolation":if l0_diagnostic {"L0_shared_host_no_hard_cgroup"} else {"hard_32GiB_cgroup_zero_swap"},
         "budget_seconds":budget_seconds,
         "source_attestation_mode":source_attestation_mode,

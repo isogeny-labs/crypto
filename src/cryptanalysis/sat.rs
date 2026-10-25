@@ -1991,6 +1991,18 @@ impl Solver {
         self.saved_phase.fill(value);
     }
 
+    /// Set the initial decision polarity of selected 1-indexed variables.
+    /// This changes search order only; it adds no constraint to the formula.
+    pub fn set_saved_phase_for_vars(&mut self, vars: &[u32], value: bool) {
+        for &var in vars {
+            assert!(
+                var >= 1 && var <= self.n_vars,
+                "saved-phase variable out of range"
+            );
+            self.saved_phase[(var - 1) as usize] = value;
+        }
+    }
+
     /// Cumulative conflicts across all calls to [`Self::solve`].
     ///
     /// A machine-independent measure of search effort: unlike wall
@@ -2590,6 +2602,19 @@ mod tests {
                 .solve(),
             SolveResult::Unsat
         );
+    }
+
+    #[test]
+    fn targeted_saved_phase_changes_first_decision_without_changing_satisfiability() {
+        for value in [false, true] {
+            let mut solver = Solver::new(2);
+            assert!(solver.add_clause(vec![1, 2]));
+            solver.set_branch_priority(&[1]);
+            solver.set_saved_phase_for_vars(&[1], value);
+            assert_eq!(solver.solve(), SolveResult::Sat);
+            assert_eq!(solver.model()[0], value);
+            assert!(solver.check_original_assignment(&solver.model()));
+        }
     }
 
     #[test]
