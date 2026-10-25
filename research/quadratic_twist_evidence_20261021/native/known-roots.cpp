@@ -102,10 +102,11 @@ Json run_role(bool known,const std::string&role,const Json&src,const Json&old){
   if(known){
     require(xs.size()==2&&base.size()==2,"two root entries");
     for(I i=0;i<2;++i){++setup["root_entries_validated"];require(xs[i]>=0&&xs[i]<43&&!base[i].infinity()&&base[i].x==xs[i],"root coordinate binding");}
-    ++setup["root_order_checks"];require(xs[0]<xs[1],"distinct ascending roots");
+    checked_xs=xs;std::sort(checked_xs.begin(),checked_xs.end());
+    ++setup["root_order_checks"];require(checked_xs[0]<checked_xs[1],"distinct query roots");
     for(I v=0;v<2;++v){++setup["root_polynomial_bindings"];Polynomial expected;term(expected,v==0?Mono{2,0}:Mono{0,2},1,43);term(expected,v==0?Mono{1,0}:Mono{0,1},-xs[0]-xs[1],43);term(expected,{0,0},xs[0]*xs[1],43);require(expected==(v==0?gx:gy),"expanded membership binding");}
-    for(I x:xs){require(evaluate_counted(gx,x,0,43,true,setup)==0,"false x root");require(evaluate_counted(gy,0,x,43,true,setup)==0,"false y root");}
-    checked_xs=xs;root_contract=obj({{"roots",nums(xs)},{"gx",poly(gx)},{"gy",poly(gy)}});
+    for(I x:checked_xs){require(evaluate_counted(gx,x,0,43,true,setup)==0,"false x root");require(evaluate_counted(gy,0,x,43,true,setup)==0,"false y root");}
+    root_contract=obj({{"roots",nums(checked_xs)},{"gx",poly(gx)},{"gy",poly(gy)}});
   }
   NumSpace linear(11,"linear",setup);auto queries=arr();
   for(I m=1;m<=10&&linear.pivots.size()<2;++m){Demand d;Point R=phase::mul(c,m,G,d);auto q=query(c,R,src,old,base,xs,gx,gy,d);I before=I(linear.pivots.size());

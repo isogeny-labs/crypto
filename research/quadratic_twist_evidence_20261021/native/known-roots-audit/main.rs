@@ -484,7 +484,7 @@ fn proof_json(r:&ProofRow,orig:&[Poly;3])->Value{json!({"poly":poly_json(&r.f),"
 fn request_eval(f:&Poly,x:I,y:I,p:I,is_mem:bool,ct:&mut Demand)->I{ct.inc(if is_mem{"membership_evals"}else{"constraint_evals"},1);ct.inc("eval_term_visits",f.len());ev(f,x,y,p)}
 fn request_solve(f:[Poly;3],p:I,ct:&mut Demand,known:bool,xs:&[I])->Value{
  ct.inc("solver_calls",1);let mut pool:Vec<_>=(0..3).map(|j|ProofRow{f:f[j].clone(),w:std::array::from_fn(|i|if i==j{[((0,0),1)].into()}else{Poly::new()})}).collect();let input_max=f.iter().filter(|f|!f.is_empty()).map(degree).max().unwrap_or(0);
- let mut rr=vec![];if known{for &x in xs{for &y in xs{if request_eval(&f[0],x,y,p,false,ct)==0{rr.push((x,y));}}}}else{for x in 0..p{if request_eval(&f[1],x,0,p,true,ct)==0{for y in 0..p{if request_eval(&f[2],0,y,p,true,ct)==0&&request_eval(&f[0],x,y,p,false,ct)==0{rr.push((x,y));}}}}}
+ let mut rr=vec![];if known{let mut roots=xs.to_vec();roots.sort();for &x in &roots{for &y in &roots{if request_eval(&f[0],x,y,p,false,ct)==0{rr.push((x,y));}}}}else{for x in 0..p{if request_eval(&f[1],x,0,p,true,ct)==0{for y in 0..p{if request_eval(&f[2],0,y,p,true,ct)==0&&request_eval(&f[0],x,y,p,false,ct)==0{rr.push((x,y));}}}}}
  let roots:Vec<_>=rr.iter().map(|&(x,y)|vec![x,y]).collect();let(mut trace,mut peak)=(vec![],0);
  for d in 0..=8{for round in 0..64{
   let before=pool.len();let mut b=request_basis(&pool,d,p,&f,&mut peak,ct);let ms=desc_monomials(d);let mut evaluation=Space::new(p,"evaluation");
@@ -514,10 +514,10 @@ fn phase_role(role:&str,src:&Value,old:&Value,checked:&mut BTreeSet<String>,know
  if known{
   assert_eq!(xs.len(),2);assert_eq!(base.len(),2);
   for i in 0..2{setup.inc("root_entries_validated",1);assert!((0..43).contains(&xs[i]));assert_eq!(base[i].unwrap().0,xs[i]);}
-  setup.inc("root_order_checks",1);assert!(xs[0]<xs[1]);
+  let mut roots=xs.clone();roots.sort();setup.inc("root_order_checks",1);assert!(roots[0]<roots[1]);
   for v in 0..2{setup.inc("root_polynomial_bindings",1);let mut expected=Poly::new();add_term(&mut expected,if v==0{(2,0)}else{(0,2)},1,43);add_term(&mut expected,if v==0{(1,0)}else{(0,1)},-xs[0]-xs[1],43);add_term(&mut expected,(0,0),xs[0]*xs[1],43);assert_eq!(expected,if v==0{gx.clone()}else{gy.clone()});}
-  for &x in &xs{assert_eq!(request_eval(&gx,x,0,43,true,&mut setup),0);assert_eq!(request_eval(&gy,0,x,43,true,&mut setup),0);}
-  root_contract=json!({"roots":xs,"gx":poly_json(&gx),"gy":poly_json(&gy)});
+  for &x in &roots{assert_eq!(request_eval(&gx,x,0,43,true,&mut setup),0);assert_eq!(request_eval(&gy,0,x,43,true,&mut setup),0);}
+  root_contract=json!({"roots":roots,"gx":poly_json(&gx),"gy":poly_json(&gy)});
  }
  let mut linear=Space::new(11,"linear");let mut queries=vec![];
  for m in 1..=10{if linear.pivots.len()>=2{break;}let mut d=Demand::new();let r=request_mul(c,m,g,&mut d);let(mut q,_,rows)=request_query(c,r,src,old,&base,&xs,&gx,&gy,&mut d,checked,known);let before=linear.pivots.len();for mut row in rows{row.push(m);linear.insert(row,&mut d);}q["m"]=json!(m);q["before"]=json!(before);q["after"]=json!(linear.pivots.len());q["demand"]=d.value();queries.push(q);setup.merge(&d);}
