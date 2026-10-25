@@ -20,6 +20,7 @@ python3 tools/artifacts/artifacts.py pull research/pencil_sparse_20261022
 python3 tools/artifacts/artifacts.py pull research/factor_base_replication_20261024
 python3 tools/artifacts/artifacts.py pull research/factor_base_heldout_20261025
 python3 tools/artifacts/artifacts.py pull research/factor_base_heldout_replay_20261025
+python3 tools/artifacts/artifacts.py pull research/factor_base_heldout_wall_20261025
 ```
 
 The corresponding benchmark mirrors can be hydrated by passing their

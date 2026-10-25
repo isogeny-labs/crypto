@@ -54,6 +54,13 @@ winning cells and 19/420 target-level wins. Two preliminary image-tool setup
 failures returned zero target rows and remain in the packet. Step 3's isolated
 paired wall-cost comparison is still open; the two hosts differed in hardware.
 
+The [paired wall no-run packet](../factor_base_heldout_wall_20261025/REPORT.md)
+closed at its frozen 09:03 UTC gate with the benchmark lock occupied. Its
+validator enumerated all 5,040 expected target-arm rows as `not_run`, with
+zero invalid rows and a null wall ratio. The separate 2.4799052224835276
+operation-count ratio is unchanged; a quiet-host wall run remains an open
+experiment under the [obstruction record](../../problems/n12-heldout-wall-isolation.md).
+
 The [N9 point-allocation packet](../projective_law_followup_20261022/formal/POINT_ALLOCATION.md)
 adds eight kernel-checked affine statements and corrects the earlier pole-order
 scope: a nonzero cubic coefficient gives order 6 at infinity, while the
