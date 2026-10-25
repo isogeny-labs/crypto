@@ -151,6 +151,14 @@ validate-cross-scale-weights` from the parent study directory. It checks the
 Lean declaration and kernel receipts, exact CSV/JSON values, explicit open
 runtime link and null cost change, and the report artifact inventory.
 
+`WeightedSource22.lean` composes the cross-scaled B/A/C identities with the
+ordered common-branch B/C guards. The native `verify-weighted-source22` binary
+matches every Rust statement in the represented prefix and rejects source
+mutations. Its [certificate](weighted-source22.json), [CSV](weighted-source22.csv),
+[graph](weighted-source22.svg), and [PDF](WEIGHTED_SOURCE22.pdf) mark the exact
+boundary. This source-shape check does not prove compiled Rust field semantics,
+the output coordinate formulas, or the divisor-class map.
+
 ## Remaining theorem bridge
 
 The packet does **not** define the smooth hyperelliptic curve, Mumford

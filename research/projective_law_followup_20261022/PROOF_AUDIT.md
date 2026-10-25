@@ -230,6 +230,16 @@ separately; runtime semantic equivalence remains open. The [CSV](formal/cross-sc
 [JSON](formal/cross-scale22-weights.json), [graph](formal/cross-scale22.svg),
 and [PDF](formal/CROSS_SCALE22.pdf) retain the exponents and proof boundary.
 
+The follow-up [weighted source-prefix packet](formal/WEIGHTED_SOURCE22.md)
+checks the literal Rust assignments and ordered B/C exits with a native Rust
+verifier, then proves in Lean that the abstract prefix has the stated scaled
+B/A/C coefficients and, for nonzero input weights, takes the common branch
+exactly when the affine B and C are nonzero. Its [CSV](formal/weighted-source22.csv),
+[graph](formal/weighted-source22.svg), and [PDF](formal/WEIGHTED_SOURCE22.pdf)
+show the remaining obligations. The byte-level source match is not a verified
+Rust-to-Lean compiler translation; concrete `Field` semantics and returned
+coordinates are still outside the theorem.
+
 `B` is minus the resultant of `u1,u2`, so `B≠0` means their supports
 are coprime. The cubic numerator
 `N=B*v1-(C*X+A)*u1` is checked to satisfy
