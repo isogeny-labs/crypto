@@ -44,6 +44,29 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          # The linter reads every tracked Markdown/HTML file plus hashes in
+          # manifests, seals, and audits. The repository also holds large raw
+          # archives that the linter never opens.
+          sparse-checkout: |
+            /*.md
+            /**/*.md
+            /*.html
+            /**/*.html
+            /*manifest*.json
+            /**/*manifest*.json
+            /*seal*.json
+            /**/*seal*.json
+            /*audit*.json
+            /**/*audit*.json
+            /*SHA256SUMS*
+            /**/*SHA256SUMS*
+            /*.sha256
+            /**/*.sha256
+            /scripts/
+            /docs/curves/
+            /src/cryptanalysis/curve_aliases.json
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
