@@ -174,12 +174,15 @@ restricted, batch 64, against the registered order (G1):
 |---|---|---|---|
 | m = 4 (11, 5) | 0.377, 0.425, 0.441, 0.449 | 0.661, 0.863, 0.848, 0.754 | 4 of 4 |
 | m = 4 (12, 5) | 0.978, 0.402, 0.946, 0.958 | 0.976, 0.725, 0.962, 0.987 | 1 of 4 |
-| m = 3 (22, 6) | 0.970, 0.957, 0.966, A5_M3_22_D3 | 0.990, 0.997, 0.997, 0.997 | A5_M3_22_N |
-| m = 3 (24, 6) | A5_M3_24 | 0.970, 0.970, 0.983, 0.986 | A5_M3_24_N |
+| m = 3 (22, 6) | 0.970, 0.957, 0.966, 0.973 | 0.990, 0.997, 0.997, 0.997 | 0 of 4 |
+| m = 3 (24, 6) | 0.976, 0.949, 0.969, 0.968 | 0.970, 0.970, 0.983, 0.986 | 0 of 4 |
 
 - **Draw order.** Draws are listed in committed order: 8/67/107/143,
   24/26/47/52, 0–3 and 0–3.
-- **Soundness controls.** A5_CONTROLS
+- **Soundness controls.** The satisfiable m = 4 (11, 5) draws 0 and 1,
+  run restricted, saturate without refuting. Their final ranks are 95,105
+  and 91,008, the same as the unrestricted controls and the dense engine's
+  `closure_rank`.
 - **m = 4 (11, 5).** The cell passes the registered "3 of 4 below the
   falsifier" reading, with 1.8–2.5× fewer products. On draws 67, 107 and
   143, `1` arrives in the completion pass, but the peak still stays
