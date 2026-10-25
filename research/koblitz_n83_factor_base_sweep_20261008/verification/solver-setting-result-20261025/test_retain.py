@@ -46,6 +46,26 @@ class RetentionControls(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "audit identity"):
                 retain(Path(temp))
 
+    def test_complete_run_snapshot_and_second_audit_are_required(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "run"
+            shutil.copytree(RUN, root)
+            self.assertEqual(retain(root)["retained_strata"], 8)
+            run_path = root / "provider-run.json"
+            original = run_path.read_bytes()
+            run = json.loads(original)
+            run["head_sha"] = "0" * 40
+            run_path.write_text(json.dumps(run))
+            with self.assertRaisesRegex(ValueError, "exact frozen provider run"):
+                retain(root)
+            run_path.write_bytes(original)
+            second = root / "collector-audits" / f"{FIRST}.audit.json"
+            audit = json.loads(second.read_bytes())
+            audit["artifact_zip_sha256"] = "0" * 64
+            second.write_text(json.dumps(audit))
+            with self.assertRaisesRegex(ValueError, "two independent audit passes"):
+                retain(root)
+
 
 if __name__ == "__main__":
     unittest.main()

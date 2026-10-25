@@ -11,8 +11,11 @@ import sys
 
 HERE = Path(__file__).resolve().parent
 PANEL = HERE.parent / "solver-setting-panel-20261025"
+COLLECTOR = HERE.parent / "solver-setting-collector-20261025"
 sys.path.insert(0, str(PANEL))
+sys.path.insert(0, str(COLLECTOR))
 from audit_artifact import audit  # noqa: E402
+from collect import assess  # noqa: E402
 
 PROTOCOL = json.loads((PANEL / "protocol.json").read_bytes())
 RUN_ID = 40193751812
@@ -38,8 +41,12 @@ def retain(root: Path, source_dir: Path | None = None,
     require(len(expected) == 8 and PROTOCOL["schema"]
             == "n83.solver-setting-screen-protocol/v1",
             "exact frozen eight-stratum protocol")
-    directories = {path.name: path for path in root.iterdir() if path.is_dir()}
-    require(directories and set(directories) <= set(expected),
+    all_directories = {path.name: path for path in root.iterdir()
+                       if path.is_dir()}
+    directories = {name: path for name, path in all_directories.items()
+                   if name != "collector-audits"}
+    require(directories and set(all_directories)
+            <= set(expected) | {"collector-audits"},
             "only named provider strata retained")
     rows = []
     for stratum, directory in sorted(directories.items()):
@@ -98,6 +105,42 @@ def retain(root: Path, source_dir: Path | None = None,
                      "arms": arms})
     statuses = Counter(row["audit_status"] for row in rows)
     solver = Counter(arm["status"] for row in rows for arm in row["arms"])
+    wall = sum(arm["wall_seconds_L0"] for row in rows for arm in row["arms"])
+    if len(rows) == 8:
+        provider = [json.loads((root / name).read_bytes()) for name in
+                    ("provider-run.json", "provider-jobs.json",
+                     "provider-artifacts.json")]
+        assessment = assess(*provider)
+        require(assessment["status"] == "READY_TO_AUDIT"
+                and assessment["artifact_ids"]
+                == {row["stratum"]: row["artifact_id"] for row in rows},
+                "full terminal provider run and artifact identities")
+        collected = json.loads((root / "collection.json").read_bytes())
+        require(collected["schema"] == "n83.solver-setting-run-collection/v1"
+                and collected["run_id"] == RUN_ID
+                and collected["attempt"] == ATTEMPT
+                and collected["head_sha"] == HEAD
+                and collected["provider_job_count"] == 8
+                and collected["provider_artifact_count"] == 8
+                and collected["audited_strata"] == 8
+                and collected["audited_arms"] == sum(solver.values())
+                and collected["audit_status_counts"] == dict(statuses)
+                and collected["solver_status_counts"] == dict(solver)
+                and abs(collected["summed_solver_wall_seconds_L0"] - wall)
+                    < 1e-6
+                and collected["selected_best_total_runtime"] is None,
+                "independent complete collection summary")
+        for stratum, directory in directories.items():
+            independent = json.loads((root / "collector-audits" /
+                                      f"{stratum}.audit.json").read_bytes())
+            prior = json.loads((directory / "audit.json").read_bytes())
+            require(independent == prior,
+                    f"{stratum}: two independent audit passes agree")
+        require(collected["status"] == (
+            "PASS_EIGHT_CENSORED_STRATA" if statuses
+            == {"PASS_FIVE_CENSORED_SETTINGS_REPLAY": 8}
+            else "AUDITED_WITH_PENDING_OR_STOPPED_ARMS"),
+            "complete collector outcome")
     all_censored = (statuses
                     == {"PASS_FIVE_CENSORED_SETTINGS_REPLAY": len(rows)})
     status = ("PASS_RETAINED_ALL_EIGHT_CENSORED" if
@@ -106,7 +149,7 @@ def retain(root: Path, source_dir: Path | None = None,
               "RETAINED_PENDING_OR_NONCENSORED")
     if source_dir is None:
         status = "BINDING_ONLY_SOURCE_ZIPS_REQUIRED"
-    return {"schema": "n83.solver-setting-retained-partial/v1",
+    return {"schema": "n83.solver-setting-retained/v1",
             "status": status,
             "run_id": RUN_ID, "attempt": ATTEMPT, "head_sha": HEAD,
             "retained_strata": len(rows),
@@ -114,8 +157,8 @@ def retain(root: Path, source_dir: Path | None = None,
             "retained_arms": sum(len(row["arms"]) for row in rows),
             "audit_status_counts": dict(statuses),
             "solver_status_counts": dict(solver),
-            "summed_solver_wall_seconds_L0": sum(
-                arm["wall_seconds_L0"] for row in rows for arm in row["arms"]),
+            "summed_solver_wall_seconds_L0": wall,
+            "full_provider_run_reconciliation": len(rows) == 8,
             "full_provider_zip_replay": source_dir is not None,
             "rows": rows,
             "selected_best_total_runtime": None}
