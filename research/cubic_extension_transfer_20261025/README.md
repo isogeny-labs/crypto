@@ -66,8 +66,10 @@ file against PUBLICATION.json before replay. Do not execute new research
 comparisons with this historical Python path: a native implementation and
 the repository's matched validation protocol are still required.
 
-Conductor, Cargo/Rust, Lean/Lake, and an authenticated CLI checkout are not
-available in this task environment. Existing Sage execution records are
+Conductor, Cargo/Rust, and Lean/Lake are not available in this task
+environment. A later read-only CLI check with permitted proxy access verified
+the GitHub login; the earlier authentication warning was caused by blocked
+network access. No repository-wide native test run is claimed. Existing Sage execution records are
 preserved; repository-wide release tests and formal proof checks are not
 reported as passed. See [the admission problem](../../problems/cubic-extension-transfer-admission.md)
 for the exact remaining obligations. The repository scoreboard, benchmark

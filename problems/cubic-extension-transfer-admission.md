@@ -27,8 +27,10 @@ does not settle those research questions.
   await upload and readback. The publication manifest does not claim remote
   availability.
 - **Missing tools:** conductor is not installed; Cargo/Rust and Lean/Lake are
-  absent; the CLI GitHub token is invalid. GitHub app access can publish the
-  PR but does not supply a local authenticated checkout or release test run.
+  absent. The initial CLI authentication warning was caused by a sandbox
+  network denial: a later permitted-proxy read verified the GitHub login as
+  aburan28. CLI access is available; this does not supply a Cargo toolchain or
+  establish a repository release test run.
 - **Missing implementation:** native replacement and complete geometric
   exception coverage.
 - **Missing validation:** isolated matched operation-cost runs, the strongest
