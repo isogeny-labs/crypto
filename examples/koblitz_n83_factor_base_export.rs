@@ -1298,6 +1298,12 @@ fn main() -> Result<()> {
                 &args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]))?;
             println!("{receipt}");
         },
+        Some("primary-full-d18-m4-l0-xcnf-witness")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-l0-xcnf-witness BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (source-bound constructed XCNF and native assignment; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_xcnf_witness_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
         Some("primary-full-d18-m4-linux-shared-phase-first")=>{
             if args.len()!=6 { return Err("primary-full-d18-m4-linux-shared-phase-first positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (requires hard 8-GiB zero-swap cgroup and 1210-s outer cap)".into()); }
             let receipt=primary_adapter::full_d18_m4_linux_shared_phase_first_cli(

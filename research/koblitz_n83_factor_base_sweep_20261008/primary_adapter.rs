@@ -649,6 +649,7 @@ pub(super) fn full_d18_m4_cli(
         false,
         1_200,
         false,
+        false,
     )
 }
 
@@ -670,6 +671,7 @@ pub(super) fn full_d18_m4_l0_positive_cli(
         false,
         300,
         false,
+        false,
     )
 }
 
@@ -688,6 +690,7 @@ pub(super) fn full_d18_m4_l0_shared_positive_cli(
         "none",
         false,
         300,
+        false,
         false,
     )
 }
@@ -708,6 +711,7 @@ pub(super) fn full_d18_m4_l0_shared_root_pinned_cli(
         false,
         300,
         false,
+        false,
     )
 }
 
@@ -727,6 +731,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_pinned_cli(
         false,
         300,
         false,
+        false,
     )
 }
 
@@ -745,6 +750,7 @@ pub(super) fn full_d18_m4_l0_shared_selector_pinned_cli(
         "selector",
         false,
         300,
+        false,
         false,
     )
 }
@@ -767,6 +773,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_cli(
         true,
         300,
         false,
+        false,
     )
 }
 
@@ -788,6 +795,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_natural_cli(
         true,
         300,
         false,
+        false,
     )
 }
 
@@ -808,6 +816,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_natural_1200_cli(
         "none",
         true,
         1_200,
+        false,
         false,
     )
 }
@@ -831,6 +840,29 @@ pub(super) fn full_d18_m4_l0_xcnf_cli(
         true,
         300,
         true,
+        false,
+    )
+}
+
+/// Export the unchanged constructed full-D18 XCNF and save one native SAT
+/// assignment so an independent verifier can test every exported constraint.
+pub(super) fn full_d18_m4_l0_xcnf_witness_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        300,
+        true,
+        true,
     )
 }
 
@@ -853,6 +885,7 @@ pub(super) fn full_d18_m4_linux_shared_phase_first_cli(
         true,
         1_200,
         false,
+        false,
     )
 }
 
@@ -867,6 +900,7 @@ fn full_d18_m4_impl(
     phase_zero_first: bool,
     budget_seconds: u64,
     export_xcnf: bool,
+    native_xcnf_witness: bool,
 ) -> Result<Value> {
     if !["positive", "natural"].contains(&mode) || output.exists() {
         return Err("full D18 m4 mode or fresh output differs from protocol".into());
@@ -906,6 +940,11 @@ fn full_d18_m4_impl(
             || output.with_extension("xcnf").exists())
     {
         return Err("full D18 XCNF export differs from the frozen mode".into());
+    }
+    if native_xcnf_witness
+        && (!export_xcnf || mode != "positive" || output.with_extension("model.bin").exists())
+    {
+        return Err("full D18 native XCNF witness differs from the frozen mode".into());
     }
     let root_choice_pinned = choice_pins == "selector_and_phase_zero";
     let search_policy = if phase_zero_first {
@@ -1147,6 +1186,99 @@ fn full_d18_m4_impl(
             "xcnf_exported",
             json!({"xcnf_sha256":xcnf_sha256,"xcnf_bytes":xcnf.len(),"export_ms":export_ms}),
         )?;
+        if native_xcnf_witness {
+            enc.solver.conflict_budget = 100_000;
+            enc.solver.deadline = Some(started + Duration::from_secs(budget_seconds));
+            let search_start = Instant::now();
+            let answer = enc.solver.solve();
+            let search_ms = search_start.elapsed().as_secs_f64() * 1000.0;
+            full_d18_phase(
+                &mut phases,
+                started,
+                "solver_returned",
+                json!({"answer":format!("{answer:?}"),"search_ms":search_ms,
+                    "conflicts":enc.solver.conflicts()}),
+            )?;
+            if answer != SolveResult::Sat {
+                return Err("constructed full D18 XCNF witness did not return SAT".into());
+            }
+            let model = enc.solver.model();
+            if !enc.verify_external_assignment(&model) {
+                return Err("native XCNF witness fails original clauses, XOR or field".into());
+            }
+            let xs = enc
+                .decode_summands_assignment(&model)
+                .ok_or("native XCNF witness summands missing")?;
+            let (indices, relation_row) = full_d18_four_x_lift(&base.curve, fb, &xs, &target)?
+                .ok_or("native XCNF witness lacks a checked group lift")?;
+            let (planted_indices, _, planted_row) = planted
+                .as_ref()
+                .ok_or("native XCNF witness lacks constructed relation")?;
+            if &indices != planted_indices || &relation_row != planted_row {
+                return Err("native XCNF witness differs from constructed relation".into());
+            }
+            let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
+            if rank.insert(relation_row.clone()) != 1 {
+                return Err("native XCNF witness row failed rank-one insertion".into());
+            }
+            let changed = base.curve.add(&target, base.curve.generator());
+            if checked_primary_relation_row(&base.curve, fb, &indices, &changed).is_ok() {
+                return Err("native XCNF witness accepted altered target".into());
+            }
+            let mut packed = vec![0u8; model.len().div_ceil(8)];
+            for (index, &value) in model.iter().enumerate() {
+                if value {
+                    packed[index / 8] |= 1 << (index % 8);
+                }
+            }
+            let model_path = output.with_extension("model.bin");
+            let mut model_file = OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&model_path)?;
+            model_file.write_all(&packed)?;
+            model_file.sync_all()?;
+            let model_sha256 = sha256_hex(&packed);
+            full_d18_phase(
+                &mut phases,
+                started,
+                "native_model_verified",
+                json!({"model_sha256":model_sha256,"model_bits":model.len(),
+                    "indices":indices,"rank_after_insert":1}),
+            )?;
+            let result = json!({
+                "schema":"n83.full-d18-m4-l0-xcnf-native-witness/v1",
+                "status":"PASS_NATIVE_XCNF_WITNESS", "mode":mode,
+                "source_commit":source_commit,
+                "source_attestation_mode":source_attestation_mode,
+                "binary_sha256":binary_sha256,
+                "isolation":isolation, "budget_seconds":budget_seconds,
+                "curve_a":0, "summands":4, "identity_mask":0,
+                "root_encoding":encoding_name,"choice_pin_policy":choice_pins,
+                "search_policy":search_policy,"target":point_json(words(&target)),
+                "object":row["object"],"point_set_blake3":FULL_D18_POINT_SET,
+                "public_corpus_blake3":corpus_hash,
+                "shape":shape,"xcnf_sha256":xcnf_sha256,"xcnf_bytes":xcnf.len(),
+                "xcnf_path":xcnf_path.to_string_lossy(),"export_ms":export_ms,
+                "model_encoding":"bit i of byte i/8 is variable i+1, low bit first",
+                "model_bits":model.len(),"model_bytes":packed.len(),
+                "model_sha256":model_sha256,
+                "model_path":model_path.to_string_lossy(),
+                "solver_answer":"Sat","solver_search_executed":true,
+                "solver_conflicts":enc.solver.conflicts(),"search_ms":search_ms,
+                "relation_indices":indices,
+                "relation_row_decimal_blake3":blake3::hash(&serde_json::to_vec(
+                    &relation_row.iter().map(ToString::to_string).collect::<Vec<_>>())?)
+                    .to_hex().to_string(),
+                "rank_after_insert":1,"altered_target_rejected":true,
+                "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+                "process_usage":process_usage(),
+                "total_index_calculus_runtime_ms":Value::Null,
+                "selected_best_total_runtime":Value::Null,
+            });
+            write_new_json(output, &result)?;
+            return Ok(result);
+        }
         let result = json!({
             "schema":"n83.full-d18-m4-l0-xcnf-export/v1",
             "status":"PASS_XCNF_EXPORT_ONLY", "mode":mode,
