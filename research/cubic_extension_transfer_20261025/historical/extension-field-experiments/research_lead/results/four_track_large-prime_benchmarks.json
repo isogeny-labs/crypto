@@ -1,0 +1,8414 @@
+{
+  "status": "complete",
+  "seed": 20261108,
+  "experiments": [
+    {
+      "status": "passed",
+      "scalar": 49,
+      "p": 7,
+      "r": 373,
+      "seconds": 65.47599838300084,
+      "source_curve": "Elliptic Curve defined by y^2 = x^3 + (4*z^2+3*z+3)*x + (4*z^2+5*z+2) over Finite Field in z of size 7^3",
+      "source_field": {
+        "characteristic": 7,
+        "degree": 3,
+        "order": 343,
+        "modulus": "x^3 + 6*x^2 + 4"
+      },
+      "source_generator": {
+        "x": "5*z + 4",
+        "y": "4*z^2 + z"
+      },
+      "source_target": {
+        "x": "6*z^2 + 3*z + 5",
+        "y": "4*z^2 + 5"
+      },
+      "quartic": "X^2*Y^2 + 2*X*Y^3 + 3*Y^4 + 3*X^3*Z - 2*X*Y^2*Z + Y^3*Z + X^2*Z^2 + 3*X*Y*Z^2 - 2*Y^2*Z^2 + 2*X*Z^3 - Y*Z^3 - 3*Z^4",
+      "isogeny_steps": 1,
+      "isogeny_kernels": [
+        "x + 5*z^2 + 5*z + 1"
+      ],
+      "obstruction_walk": [
+        {
+          "curve": "Elliptic Curve defined by y^2 = x^3 + (3*z^2+6*z+4)*x + (4*z^2+5*z+2) over Finite Field in z of size 7^3",
+          "steps": 1,
+          "kernels_tested": 1,
+          "usable": true
+        }
+      ],
+      "setup_seconds": 43.517379266002536,
+      "sections_seconds": 6.780701186999067,
+      "section_certificate": {
+        "diagonal_constraint_rank": 112,
+        "section_dimension": 8,
+        "sampled_curve_points": 192,
+        "extension_field_point_enumeration_used": false,
+        "exact_diagonal_identities_verified": 8,
+        "maximum_total_degree": 8
+      },
+      "interpolation_holdouts": 12,
+      "chart_failures": [
+        {
+          "attempt": 0,
+          "multiplier": 1,
+          "reason": "evaluation pole"
+        }
+      ],
+      "source_randomization_multiplier": 155,
+      "inversions": [
+        {
+          "seconds": 2.027526673999091,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 1.522356781999406,
+          "ordered_solutions": 6,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 1.6059692960006942,
+          "ordered_solutions": 6,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        }
+      ],
+      "target_solver": {
+        "scalar": 49,
+        "seconds": 3.665740904998529,
+        "precompute_seconds": 1.7956419160000223,
+        "factor_base_size": 7,
+        "factor_base_including_reference": 8,
+        "curve_rational_points": 8,
+        "covered_points": 8,
+        "tree_maximum_depth": 0,
+        "tree_depth_limit": 3,
+        "line_attempts": 28,
+        "distinct_lines": 17,
+        "split_lines": 6,
+        "geometric_rank": 6,
+        "linear_system_rank": 9,
+        "trials": 7,
+        "smooth_relations": 3,
+        "usable_smooth_relations": 3,
+        "walk_resets": 1,
+        "walk_additions": 6,
+        "graph_parent_edges": {},
+        "graph_expressions": {
+          "0": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "7": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "2": [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "1": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "6": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "5": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "3": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "4": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ]
+        },
+        "chosen_points": [
+          0,
+          7,
+          2,
+          1,
+          6,
+          5,
+          3,
+          4
+        ],
+        "line_certificates": [
+          {
+            "counts": {
+              "7": 1,
+              "5": 1,
+              "1": 1,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                1,
+                4
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                5,
+                4,
+                2
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  3,
+                  1
+                ],
+                [
+                  2,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "4": 2,
+              "0": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                1,
+                4
+              ],
+              "parameter_Q": [
+                1,
+                3,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                3
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "counts": {
+              "4": 1,
+              "2": 2,
+              "7": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                0
+              ],
+              "parameter_Q": [
+                1,
+                5,
+                5
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                4,
+                1
+              ],
+              "finite_roots": [
+                [
+                  3,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "3": 3,
+              "2": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                5,
+                5
+              ],
+              "parameter_Q": [
+                1,
+                2,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                0,
+                1
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  3
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "3": 1,
+              "6": 2,
+              "1": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                3,
+                5
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                6
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                6,
+                4
+              ],
+              "finite_roots": [
+                [
+                  2,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "3": 1,
+              "4": 1,
+              "5": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                6,
+                3
+              ],
+              "parameter_Q": [
+                1,
+                2,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                4,
+                2
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  5,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          }
+        ],
+        "independent_relations": [
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              372
+            ],
+            "counts": {
+              "7": 1,
+              "5": 1,
+              "1": 1,
+              "0": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              372
+            ],
+            "counts": {
+              "4": 2,
+              "0": 2
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              2,
+              0,
+              0,
+              0,
+              0,
+              1,
+              372
+            ],
+            "counts": {
+              "4": 1,
+              "2": 2,
+              "7": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              3,
+              0,
+              372
+            ],
+            "counts": {
+              "3": 3,
+              "2": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              1,
+              2,
+              0,
+              1,
+              0,
+              372
+            ],
+            "counts": {
+              "3": 1,
+              "6": 2,
+              "1": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              2,
+              1,
+              1,
+              372
+            ],
+            "counts": {
+              "3": 1,
+              "4": 1,
+              "5": 2
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 335,
+            "b": 105,
+            "counts": {
+              "3": 1,
+              "4": 2
+            },
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              2,
+              0
+            ],
+            "rhs": 335
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 336,
+            "b": 105,
+            "counts": {
+              "2": 2,
+              "0": 1
+            },
+            "coefficients": [
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 336
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 341,
+            "b": 105,
+            "counts": {
+              "7": 1,
+              "6": 2
+            },
+            "coefficients": [
+              1,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 341
+          }
+        ],
+        "seed": 20261117,
+        "algorithm": "split-line double-large-prime tree index calculus with translate-walk anchors",
+        "limits": [
+          "Dense elimination for small experiments; no new exponent claim.",
+          "The translate walk is a practical heuristic, not independent uniform relation sampling.",
+          "No universal graph-coverage or rank guarantee; bounded trial budget."
+        ]
+      },
+      "target_solver_used": true,
+      "target_group_enumeration_used": false,
+      "source_log_used_in_transfer": false,
+      "all_image_coordinates_in_base_field": true,
+      "limits": [
+        "Bounded retries, not a universal exceptional-chart proof.",
+        "These experimental target solvers use dense linear algebra, without a new exponent claim.",
+        "Small-field experiments do not establish an asymptotic or practical advantage."
+      ],
+      "source_pollard_rho": {
+        "runs": [
+          {
+            "scalar": 49,
+            "seconds": 0.010359562002122402,
+            "group_additions": 36,
+            "restarts": 0,
+            "seed": 20261115,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 49,
+            "seconds": 0.014563730001100339,
+            "group_additions": 144,
+            "restarts": 0,
+            "seed": 20261116,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 49,
+            "seconds": 0.010457850999955554,
+            "group_additions": 102,
+            "restarts": 0,
+            "seed": 20261117,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 49,
+            "seconds": 0.010417004999908386,
+            "group_additions": 72,
+            "restarts": 0,
+            "seed": 20261118,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 49,
+            "seconds": 0.01305399199918611,
+            "group_additions": 39,
+            "restarts": 0,
+            "seed": 20261119,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          }
+        ],
+        "median_seconds": 0.010457850999955554
+      },
+      "source_bsgs": {
+        "scalar": 49,
+        "seconds": 0.0011882189974130597,
+        "group_additions": 22,
+        "baby_steps": 20,
+        "algorithm": "BSGS",
+        "interval_size": 373
+      },
+      "basic_target_comparison": {
+        "scalar": 49,
+        "seconds": 30.19363814999815,
+        "trials": 31,
+        "smooth_relations": 11,
+        "factor_base_size": 7,
+        "linear_system_rank": 8,
+        "independent_relations": [
+          {
+            "a": 65,
+            "b": 154,
+            "factor_base_coefficients": [
+              1,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 1
+          },
+          {
+            "a": 336,
+            "b": 340,
+            "factor_base_coefficients": [
+              0,
+              0,
+              2,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 2
+          },
+          {
+            "a": 298,
+            "b": 317,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rank": 3
+          },
+          {
+            "a": 352,
+            "b": 359,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 4
+          },
+          {
+            "a": 273,
+            "b": 49,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              2
+            ],
+            "rank": 5
+          },
+          {
+            "a": 314,
+            "b": 39,
+            "factor_base_coefficients": [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 6
+          },
+          {
+            "a": 353,
+            "b": 84,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              3,
+              0,
+              0
+            ],
+            "rank": 7
+          },
+          {
+            "a": 38,
+            "b": 37,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 8
+          }
+        ],
+        "algorithm": "basic rational-point smooth-divisor index calculus",
+        "claim": "Actual target Jacobian DLP; not an optimized Diem solver or speedup claim"
+      },
+      "generation_scalar_verified_only_after_solve": true
+    },
+    {
+      "status": "passed",
+      "scalar": 369,
+      "p": 13,
+      "r": 2137,
+      "seconds": 63.09632302599857,
+      "source_curve": "Elliptic Curve defined by y^2 = x^3 + (10*z^2+6*z+12)*x + (7*z^2+7*z+5) over Finite Field in z of size 13^3",
+      "source_field": {
+        "characteristic": 13,
+        "degree": 3,
+        "order": 2197,
+        "modulus": "x^3 + 2*x + 11"
+      },
+      "source_generator": {
+        "x": "10*z^2 + 3*z + 5",
+        "y": "6*z^2 + z"
+      },
+      "source_target": {
+        "x": "8*z^2 + 5*z + 3",
+        "y": "2*z^2 + 10*z + 11"
+      },
+      "quartic": "X^2*Y^2 - 6*X*Y^3 - 2*Y^4 - 6*X^3*Z - 5*X^2*Y*Z + 2*X*Y^2*Z - 6*Y^3*Z - X^2*Z^2 - 5*X*Y*Z^2 + Y^2*Z^2 - 5*X*Z^3 - 5*Y*Z^3 + 6*Z^4",
+      "isogeny_steps": 0,
+      "isogeny_kernels": [],
+      "obstruction_walk": [
+        {
+          "curve": "Elliptic Curve defined by y^2 = x^3 + (10*z^2+6*z+12)*x + (7*z^2+7*z+5) over Finite Field in z of size 13^3",
+          "steps": 0,
+          "kernels_tested": 4,
+          "usable": true
+        }
+      ],
+      "setup_seconds": 38.439678497001296,
+      "sections_seconds": 7.251218422999955,
+      "section_certificate": {
+        "diagonal_constraint_rank": 112,
+        "section_dimension": 8,
+        "sampled_curve_points": 192,
+        "extension_field_point_enumeration_used": false,
+        "exact_diagonal_identities_verified": 8,
+        "maximum_total_degree": 8
+      },
+      "interpolation_holdouts": 12,
+      "chart_failures": [],
+      "source_randomization_multiplier": 1,
+      "inversions": [
+        {
+          "seconds": 1.7016041989991209,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 1.597074336001242,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 1.0406340160006948,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        }
+      ],
+      "target_solver": {
+        "scalar": 369,
+        "seconds": 4.40856433999943,
+        "precompute_seconds": 2.229348750999634,
+        "factor_base_size": 10,
+        "factor_base_including_reference": 11,
+        "curve_rational_points": 14,
+        "covered_points": 14,
+        "tree_maximum_depth": 1,
+        "tree_depth_limit": 4,
+        "line_attempts": 55,
+        "distinct_lines": 36,
+        "split_lines": 13,
+        "geometric_rank": 10,
+        "linear_system_rank": 12,
+        "trials": 10,
+        "smooth_relations": 2,
+        "usable_smooth_relations": 2,
+        "walk_resets": 1,
+        "walk_additions": 9,
+        "graph_parent_edges": {
+          "6": {
+            "parent": null,
+            "edge": 4
+          },
+          "12": {
+            "parent": null,
+            "edge": 5
+          },
+          "2": {
+            "parent": null,
+            "edge": 10
+          }
+        },
+        "graph_expressions": {
+          "0": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "13": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "10": [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "11": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "8": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "3": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "9": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "7": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "5": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "1": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "4": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "6": [
+            1068,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1068,
+            0,
+            0,
+            0,
+            1069
+          ],
+          "12": [
+            0,
+            2136,
+            0,
+            0,
+            0,
+            2136,
+            0,
+            0,
+            2136,
+            0,
+            1
+          ],
+          "2": [
+            0,
+            0,
+            0,
+            0,
+            2135,
+            0,
+            0,
+            0,
+            2136,
+            0,
+            1
+          ]
+        },
+        "chosen_points": [
+          0,
+          13,
+          10,
+          11,
+          8,
+          3,
+          9,
+          7,
+          5,
+          1,
+          4
+        ],
+        "line_certificates": [
+          {
+            "counts": {
+              "13": 1,
+              "5": 1,
+              "8": 1,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                11,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                7,
+                8,
+                4
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ],
+                [
+                  2,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "11": 1,
+              "1": 1,
+              "0": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                11,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                5,
+                12
+              ],
+              "restriction_coefficients": [
+                0,
+                1,
+                4
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  3,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "counts": {
+              "3": 1,
+              "9": 2,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                11,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                2,
+                7
+              ],
+              "restriction_coefficients": [
+                0,
+                5,
+                6,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  7,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "11": 1,
+              "10": 2,
+              "13": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                0
+              ],
+              "parameter_Q": [
+                1,
+                6,
+                4
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                10,
+                2
+              ],
+              "finite_roots": [
+                [
+                  8,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "7": 1,
+              "6": 2,
+              "13": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                0
+              ],
+              "parameter_Q": [
+                1,
+                7,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                4,
+                4,
+                1
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  11,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "9": 1,
+              "1": 1,
+              "12": 1,
+              "10": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                6,
+                4
+              ],
+              "parameter_Q": [
+                1,
+                5,
+                5
+              ],
+              "restriction_coefficients": [
+                0,
+                10,
+                6,
+                6
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  8,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "5": 1,
+              "6": 1,
+              "4": 1,
+              "10": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                6,
+                4
+              ],
+              "parameter_Q": [
+                1,
+                6,
+                10
+              ],
+              "restriction_coefficients": [
+                0,
+                8,
+                3,
+                6
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  11,
+                  1
+                ],
+                [
+                  8,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "8": 1,
+              "4": 1,
+              "11": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                5,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                3,
+                5
+              ],
+              "restriction_coefficients": [
+                0,
+                5,
+                6
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  10,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "counts": {
+              "3": 1,
+              "8": 3
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                3,
+                5
+              ],
+              "parameter_Q": [
+                1,
+                2,
+                7
+              ],
+              "restriction_coefficients": [
+                0,
+                6
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 3
+            }
+          },
+          {
+            "counts": {
+              "12": 1,
+              "7": 2,
+              "8": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                3,
+                5
+              ],
+              "parameter_Q": [
+                1,
+                7,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                10,
+                7
+              ],
+              "finite_roots": [
+                [
+                  6,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "1": 1,
+              "2": 1,
+              "3": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                7
+              ],
+              "parameter_Q": [
+                1,
+                3,
+                7
+              ],
+              "restriction_coefficients": [
+                0,
+                3,
+                1
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  10,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "counts": {
+              "7": 1,
+              "2": 1,
+              "5": 1,
+              "9": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                5,
+                5
+              ],
+              "parameter_Q": [
+                1,
+                7,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                5,
+                10,
+                11
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ],
+                [
+                  1,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "4": 2,
+              "1": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                3,
+                7
+              ],
+              "parameter_Q": [
+                1,
+                6,
+                9
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          }
+        ],
+        "independent_relations": [
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              2136
+            ],
+            "counts": {
+              "13": 1,
+              "5": 1,
+              "8": 1,
+              "0": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              2136
+            ],
+            "counts": {
+              "11": 1,
+              "1": 1,
+              "0": 2
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              2,
+              0,
+              0,
+              0,
+              0,
+              2136
+            ],
+            "counts": {
+              "3": 1,
+              "9": 2,
+              "0": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              2,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2136
+            ],
+            "counts": {
+              "11": 1,
+              "10": 2,
+              "13": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1068,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1068,
+              1,
+              0,
+              1,
+              1068
+            ],
+            "counts": {
+              "5": 1,
+              "6": 1,
+              "4": 1,
+              "10": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              2,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              2136
+            ],
+            "counts": {
+              "8": 1,
+              "4": 1,
+              "11": 2
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              3,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2136
+            ],
+            "counts": {
+              "3": 1,
+              "8": 3
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              2136,
+              0,
+              1,
+              0,
+              2136,
+              2,
+              0,
+              2136,
+              0,
+              0
+            ],
+            "counts": {
+              "12": 1,
+              "7": 2,
+              "8": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              2135,
+              1,
+              1,
+              1,
+              2136,
+              0,
+              0
+            ],
+            "counts": {
+              "7": 1,
+              "2": 1,
+              "5": 1,
+              "9": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              2,
+              2136
+            ],
+            "counts": {
+              "4": 2,
+              "1": 2
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 710,
+            "b": 15,
+            "counts": {
+              "9": 1,
+              "6": 1,
+              "1": 1
+            },
+            "coefficients": [
+              1068,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1068,
+              0,
+              1,
+              0,
+              1069
+            ],
+            "rhs": 710
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 718,
+            "b": 15,
+            "counts": {
+              "6": 2,
+              "1": 1
+            },
+            "coefficients": [
+              2136,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2136,
+              0,
+              1,
+              0,
+              1
+            ],
+            "rhs": 718
+          }
+        ],
+        "seed": 20261123,
+        "algorithm": "split-line double-large-prime tree index calculus with translate-walk anchors",
+        "limits": [
+          "Dense elimination for small experiments; no new exponent claim.",
+          "The translate walk is a practical heuristic, not independent uniform relation sampling.",
+          "No universal graph-coverage or rank guarantee; bounded trial budget."
+        ]
+      },
+      "target_solver_used": true,
+      "target_group_enumeration_used": false,
+      "source_log_used_in_transfer": false,
+      "all_image_coordinates_in_base_field": true,
+      "limits": [
+        "Bounded retries, not a universal exceptional-chart proof.",
+        "These experimental target solvers use dense linear algebra, without a new exponent claim.",
+        "Small-field experiments do not establish an asymptotic or practical advantage."
+      ],
+      "source_pollard_rho": {
+        "runs": [
+          {
+            "scalar": 369,
+            "seconds": 0.014494925999315456,
+            "group_additions": 144,
+            "restarts": 0,
+            "seed": 20261121,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 369,
+            "seconds": 0.013758085002336884,
+            "group_additions": 144,
+            "restarts": 0,
+            "seed": 20261122,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 369,
+            "seconds": 0.010686962999898242,
+            "group_additions": 69,
+            "restarts": 0,
+            "seed": 20261123,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 369,
+            "seconds": 0.014862177999020787,
+            "group_additions": 192,
+            "restarts": 0,
+            "seed": 20261124,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 369,
+            "seconds": 0.03444895599750453,
+            "group_additions": 252,
+            "restarts": 0,
+            "seed": 20261125,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          }
+        ],
+        "median_seconds": 0.014494925999315456
+      },
+      "source_bsgs": {
+        "scalar": 369,
+        "seconds": 0.001869701998657547,
+        "group_additions": 54,
+        "baby_steps": 47,
+        "algorithm": "BSGS",
+        "interval_size": 2137
+      },
+      "basic_target_comparison": {
+        "scalar": 369,
+        "seconds": 91.23877291900135,
+        "trials": 65,
+        "smooth_relations": 21,
+        "factor_base_size": 13,
+        "linear_system_rank": 14,
+        "independent_relations": [
+          {
+            "a": 761,
+            "b": 120,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 1
+          },
+          {
+            "a": 1154,
+            "b": 1401,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 2
+          },
+          {
+            "a": 184,
+            "b": 248,
+            "factor_base_coefficients": [
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 3
+          },
+          {
+            "a": 1114,
+            "b": 206,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 4
+          },
+          {
+            "a": 1351,
+            "b": 1617,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 5
+          },
+          {
+            "a": 1097,
+            "b": 60,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 6
+          },
+          {
+            "a": 1730,
+            "b": 1917,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 7
+          },
+          {
+            "a": 765,
+            "b": 775,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rank": 8
+          },
+          {
+            "a": 1929,
+            "b": 1833,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 9
+          },
+          {
+            "a": 1063,
+            "b": 502,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rank": 10
+          },
+          {
+            "a": 1206,
+            "b": 1029,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 11
+          },
+          {
+            "a": 1353,
+            "b": 1451,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rank": 12
+          },
+          {
+            "a": 1478,
+            "b": 1566,
+            "factor_base_coefficients": [
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rank": 13
+          },
+          {
+            "a": 233,
+            "b": 373,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 14
+          }
+        ],
+        "algorithm": "basic rational-point smooth-divisor index calculus",
+        "claim": "Actual target Jacobian DLP; not an optimized Diem solver or speedup claim"
+      },
+      "generation_scalar_verified_only_after_solve": true
+    },
+    {
+      "status": "passed",
+      "scalar": 1313,
+      "p": 19,
+      "r": 6871,
+      "seconds": 77.40304646599907,
+      "source_curve": "Elliptic Curve defined by y^2 = x^3 + (17*z^2+6)*x + (5*z^2+3*z) over Finite Field in z of size 19^3",
+      "source_field": {
+        "characteristic": 19,
+        "degree": 3,
+        "order": 6859,
+        "modulus": "x^3 + 4*x + 17"
+      },
+      "source_generator": {
+        "x": "6*z^2 + 13*z + 1",
+        "y": "13*z^2 + 18*z + 17"
+      },
+      "source_target": {
+        "x": "9*z^2 + 4*z + 15",
+        "y": "18*z^2 + 5*z + 12"
+      },
+      "quartic": "X^2*Y^2 + 2*X*Y^3 - 8*Y^4 - 6*X^3*Z - 7*X^2*Y*Z - 2*X*Y^2*Z - 5*Y^3*Z + 2*X^2*Z^2 - X*Y*Z^2 - 3*Y^2*Z^2 - 6*X*Z^3 - 3*Y*Z^3 + 7*Z^4",
+      "isogeny_steps": 1,
+      "isogeny_kernels": [
+        "x + 10*z^2 + 11*z + 11"
+      ],
+      "obstruction_walk": [
+        {
+          "curve": "Elliptic Curve defined by y^2 = x^3 + (2*z^2+11*z+7)*x + (6*z^2+13*z+2) over Finite Field in z of size 19^3",
+          "steps": 1,
+          "kernels_tested": 1,
+          "usable": true
+        }
+      ],
+      "setup_seconds": 45.445704629997635,
+      "sections_seconds": 7.865284751998843,
+      "section_certificate": {
+        "diagonal_constraint_rank": 112,
+        "section_dimension": 8,
+        "sampled_curve_points": 192,
+        "extension_field_point_enumeration_used": false,
+        "exact_diagonal_identities_verified": 8,
+        "maximum_total_degree": 8
+      },
+      "interpolation_holdouts": 12,
+      "chart_failures": [
+        {
+          "attempt": 0,
+          "multiplier": 1,
+          "reason": "evaluation pole"
+        },
+        {
+          "attempt": 1,
+          "multiplier": 303,
+          "reason": "evaluation pole"
+        },
+        {
+          "attempt": 2,
+          "multiplier": 4855,
+          "reason": "Inversion chart has fiber dimension -1; a common-scalar retry is required"
+        }
+      ],
+      "source_randomization_multiplier": 2144,
+      "inversions": [
+        {
+          "seconds": 1.9625210229969525,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 1.357441761996597,
+          "ordered_solutions": 6,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 2.8749307469988707,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        }
+      ],
+      "target_solver": {
+        "scalar": 1313,
+        "seconds": 7.043895831000555,
+        "precompute_seconds": 3.9809902449997026,
+        "factor_base_size": 13,
+        "factor_base_including_reference": 14,
+        "curve_rational_points": 20,
+        "covered_points": 20,
+        "tree_maximum_depth": 2,
+        "tree_depth_limit": 5,
+        "line_attempts": 91,
+        "distinct_lines": 64,
+        "split_lines": 22,
+        "geometric_rank": 13,
+        "linear_system_rank": 15,
+        "trials": 13,
+        "smooth_relations": 2,
+        "usable_smooth_relations": 2,
+        "walk_resets": 1,
+        "walk_additions": 12,
+        "graph_parent_edges": {
+          "11": {
+            "parent": null,
+            "edge": 3
+          },
+          "12": {
+            "parent": null,
+            "edge": 12
+          },
+          "16": {
+            "parent": null,
+            "edge": 13
+          },
+          "8": {
+            "parent": null,
+            "edge": 17
+          },
+          "9": {
+            "parent": 11,
+            "edge": 18
+          },
+          "13": {
+            "parent": 16,
+            "edge": 19
+          }
+        },
+        "graph_expressions": {
+          "0": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "1": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "14": [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "10": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "6": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "18": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "19": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "7": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "5": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "3": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "4": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "15": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "2": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "17": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "11": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3435,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3436
+          ],
+          "12": [
+            0,
+            0,
+            6870,
+            0,
+            0,
+            0,
+            0,
+            6869,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "16": [
+            0,
+            0,
+            3435,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3435,
+            0,
+            0,
+            0,
+            0,
+            3436
+          ],
+          "8": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            6870,
+            0,
+            6870,
+            6870,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "9": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            6870,
+            0,
+            3436,
+            0,
+            0,
+            6870,
+            0,
+            0,
+            3436
+          ],
+          "13": [
+            0,
+            0,
+            3436,
+            0,
+            0,
+            0,
+            0,
+            6870,
+            3436,
+            0,
+            0,
+            0,
+            6870,
+            3436
+          ]
+        },
+        "chosen_points": [
+          0,
+          1,
+          14,
+          10,
+          6,
+          18,
+          19,
+          7,
+          5,
+          3,
+          4,
+          15,
+          2,
+          17
+        ],
+        "line_certificates": [
+          {
+            "counts": {
+              "14": 1,
+              "17": 1,
+              "15": 1,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                6,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                9,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                14,
+                9,
+                12
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  16,
+                  1
+                ],
+                [
+                  7,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "18": 1,
+              "8": 1,
+              "13": 1,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                6,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                10,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                12,
+                12,
+                9
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  16,
+                  1
+                ],
+                [
+                  8,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "19": 1,
+              "16": 1,
+              "12": 1,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                6,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                13,
+                16,
+                18
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ],
+                [
+                  7,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "5": 1,
+              "11": 2,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                6,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                11,
+                16
+              ],
+              "restriction_coefficients": [
+                0,
+                7,
+                15,
+                6
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  13,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "14": 1,
+              "9": 1,
+              "16": 1,
+              "1": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                9,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                2,
+                1,
+                9
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  11,
+                  1
+                ],
+                [
+                  10,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "10": 1,
+              "4": 1,
+              "15": 1,
+              "1": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                1,
+                12
+              ],
+              "restriction_coefficients": [
+                0,
+                15,
+                4,
+                15
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  12,
+                  1
+                ],
+                [
+                  8,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "6": 3,
+              "1": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                11
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                0,
+                11
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  3
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "18": 1,
+              "7": 2,
+              "1": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                10,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                15,
+                1,
+                13
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  8,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "2": 1,
+              "11": 1,
+              "17": 1,
+              "1": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                6,
+                13
+              ],
+              "restriction_coefficients": [
+                0,
+                7,
+                18,
+                16
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  13,
+                  1
+                ],
+                [
+                  12,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "10": 1,
+              "8": 1,
+              "11": 1,
+              "14": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                9,
+                3
+              ],
+              "parameter_Q": [
+                1,
+                1,
+                12
+              ],
+              "restriction_coefficients": [
+                0,
+                10,
+                5,
+                4
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  12,
+                  1
+                ],
+                [
+                  1,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "6": 1,
+              "18": 1,
+              "5": 1,
+              "14": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                9,
+                3
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                11
+              ],
+              "restriction_coefficients": [
+                0,
+                1,
+                16,
+                9
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "18": 2,
+              "10": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                1,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                10,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                1
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "counts": {
+              "12": 1,
+              "5": 2,
+              "10": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                1,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                11,
+                16
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                18,
+                9
+              ],
+              "finite_roots": [
+                [
+                  17,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "3": 1,
+              "16": 2,
+              "10": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                1,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                3,
+                13
+              ],
+              "restriction_coefficients": [
+                0,
+                10,
+                5,
+                3
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  15,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "7": 1,
+              "8": 1,
+              "9": 1,
+              "6": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                11
+              ],
+              "parameter_Q": [
+                1,
+                5,
+                11
+              ],
+              "restriction_coefficients": [
+                0,
+                2,
+                1,
+                2
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  5,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "15": 1,
+              "12": 1,
+              "2": 1,
+              "6": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                11
+              ],
+              "parameter_Q": [
+                1,
+                4,
+                6
+              ],
+              "restriction_coefficients": [
+                0,
+                17,
+                16,
+                9
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  7,
+                  1
+                ],
+                [
+                  6,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "17": 1,
+              "19": 2,
+              "18": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                10,
+                0
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                5,
+                15
+              ],
+              "finite_roots": [
+                [
+                  6,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "5": 1,
+              "8": 1,
+              "3": 1,
+              "19": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                0
+              ],
+              "parameter_Q": [
+                1,
+                11,
+                16
+              ],
+              "restriction_coefficients": [
+                0,
+                8,
+                6,
+                18
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  16,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "15": 1,
+              "11": 1,
+              "9": 1,
+              "19": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                0
+              ],
+              "parameter_Q": [
+                1,
+                4,
+                6
+              ],
+              "restriction_coefficients": [
+                0,
+                14,
+                2,
+                2
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  15,
+                  1
+                ],
+                [
+                  3,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "17": 1,
+              "16": 1,
+              "13": 1,
+              "5": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                11,
+                16
+              ],
+              "parameter_Q": [
+                1,
+                14,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                18,
+                0,
+                4
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  10,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "17": 1,
+              "4": 2,
+              "3": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                3,
+                13
+              ],
+              "parameter_Q": [
+                1,
+                18,
+                16
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                2,
+                4
+              ],
+              "finite_roots": [
+                [
+                  9,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "15": 1,
+              "3": 3
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                3,
+                13
+              ],
+              "parameter_Q": [
+                1,
+                4,
+                6
+              ],
+              "restriction_coefficients": [
+                0,
+                11
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 3
+            }
+          }
+        ],
+        "independent_relations": [
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              6870
+            ],
+            "counts": {
+              "14": 1,
+              "17": 1,
+              "15": 1,
+              "0": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              3436,
+              0,
+              1,
+              6870,
+              0,
+              6869,
+              3435,
+              0,
+              0,
+              0,
+              6870,
+              3436
+            ],
+            "counts": {
+              "18": 1,
+              "8": 1,
+              "13": 1,
+              "0": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              3434,
+              0,
+              0,
+              1,
+              0,
+              6869,
+              3435,
+              0,
+              0,
+              0,
+              0,
+              3436
+            ],
+            "counts": {
+              "19": 1,
+              "16": 1,
+              "12": 1,
+              "0": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              1,
+              3435,
+              0,
+              0,
+              6870,
+              0,
+              3436,
+              3435,
+              0,
+              6870,
+              0,
+              0,
+              0
+            ],
+            "counts": {
+              "14": 1,
+              "9": 1,
+              "16": 1,
+              "1": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              6870
+            ],
+            "counts": {
+              "10": 1,
+              "4": 1,
+              "15": 1,
+              "1": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              0,
+              0,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              6870
+            ],
+            "counts": {
+              "6": 3,
+              "1": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              6870
+            ],
+            "counts": {
+              "18": 1,
+              "7": 2,
+              "1": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3435,
+              0,
+              0,
+              0,
+              1,
+              1,
+              3435
+            ],
+            "counts": {
+              "2": 1,
+              "11": 1,
+              "17": 1,
+              "1": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              1,
+              1,
+              0,
+              0,
+              6870,
+              0,
+              3434,
+              6870,
+              0,
+              0,
+              0,
+              0,
+              3436
+            ],
+            "counts": {
+              "10": 1,
+              "8": 1,
+              "11": 1,
+              "14": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              1,
+              0,
+              1,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              6870
+            ],
+            "counts": {
+              "6": 1,
+              "18": 1,
+              "5": 1,
+              "14": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              2,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              6870
+            ],
+            "counts": {
+              "18": 2,
+              "10": 2
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              6869,
+              1,
+              3435,
+              6870,
+              0,
+              6870,
+              0,
+              0,
+              3436
+            ],
+            "counts": {
+              "7": 1,
+              "8": 1,
+              "9": 1,
+              "6": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              2,
+              0,
+              0,
+              1,
+              6870
+            ],
+            "counts": {
+              "17": 1,
+              "4": 2,
+              "3": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 6240,
+            "b": 1140,
+            "counts": {
+              "19": 1,
+              "6": 1,
+              "2": 1
+            },
+            "coefficients": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rhs": 6240
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 6244,
+            "b": 1140,
+            "counts": {
+              "7": 1,
+              "5": 2
+            },
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 6244
+          }
+        ],
+        "seed": 20261129,
+        "algorithm": "split-line double-large-prime tree index calculus with translate-walk anchors",
+        "limits": [
+          "Dense elimination for small experiments; no new exponent claim.",
+          "The translate walk is a practical heuristic, not independent uniform relation sampling.",
+          "No universal graph-coverage or rank guarantee; bounded trial budget."
+        ]
+      },
+      "target_solver_used": true,
+      "target_group_enumeration_used": false,
+      "source_log_used_in_transfer": false,
+      "all_image_coordinates_in_base_field": true,
+      "limits": [
+        "Bounded retries, not a universal exceptional-chart proof.",
+        "These experimental target solvers use dense linear algebra, without a new exponent claim.",
+        "Small-field experiments do not establish an asymptotic or practical advantage."
+      ],
+      "source_pollard_rho": {
+        "runs": [
+          {
+            "scalar": 1313,
+            "seconds": 0.04332577099921764,
+            "group_additions": 222,
+            "restarts": 0,
+            "seed": 20261127,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 1313,
+            "seconds": 0.013878043999284273,
+            "group_additions": 174,
+            "restarts": 0,
+            "seed": 20261128,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 1313,
+            "seconds": 0.023289993001526454,
+            "group_additions": 528,
+            "restarts": 0,
+            "seed": 20261129,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 1313,
+            "seconds": 0.016519720000360394,
+            "group_additions": 225,
+            "restarts": 0,
+            "seed": 20261130,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 1313,
+            "seconds": 0.012750783000228694,
+            "group_additions": 162,
+            "restarts": 0,
+            "seed": 20261131,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          }
+        ],
+        "median_seconds": 0.016519720000360394
+      },
+      "source_bsgs": {
+        "scalar": 1313,
+        "seconds": 0.022773142001824453,
+        "group_additions": 98,
+        "baby_steps": 83,
+        "algorithm": "BSGS",
+        "interval_size": 6871
+      },
+      "basic_target_comparison": {
+        "scalar": 1313,
+        "seconds": 294.96243704000153,
+        "trials": 293,
+        "smooth_relations": 71,
+        "factor_base_size": 19,
+        "linear_system_rank": 20,
+        "independent_relations": [
+          {
+            "a": 191,
+            "b": 3480,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 1
+          },
+          {
+            "a": 5504,
+            "b": 2420,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rank": 2
+          },
+          {
+            "a": 5892,
+            "b": 6300,
+            "factor_base_coefficients": [
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 3
+          },
+          {
+            "a": 1591,
+            "b": 5125,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 4
+          },
+          {
+            "a": 218,
+            "b": 642,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 5
+          },
+          {
+            "a": 3482,
+            "b": 5032,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rank": 6
+          },
+          {
+            "a": 4619,
+            "b": 5078,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rank": 7
+          },
+          {
+            "a": 4792,
+            "b": 340,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rank": 8
+          },
+          {
+            "a": 6005,
+            "b": 2844,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 9
+          },
+          {
+            "a": 4671,
+            "b": 5399,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 10
+          },
+          {
+            "a": 6293,
+            "b": 766,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0
+            ],
+            "rank": 11
+          },
+          {
+            "a": 1105,
+            "b": 1766,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0
+            ],
+            "rank": 12
+          },
+          {
+            "a": 4033,
+            "b": 1487,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 13
+          },
+          {
+            "a": 1620,
+            "b": 2480,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 14
+          },
+          {
+            "a": 3450,
+            "b": 6028,
+            "factor_base_coefficients": [
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 15
+          },
+          {
+            "a": 1463,
+            "b": 2883,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rank": 16
+          },
+          {
+            "a": 1972,
+            "b": 4141,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rank": 17
+          },
+          {
+            "a": 2417,
+            "b": 207,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 18
+          },
+          {
+            "a": 4827,
+            "b": 6473,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 19
+          },
+          {
+            "a": 6791,
+            "b": 4704,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 20
+          }
+        ],
+        "algorithm": "basic rational-point smooth-divisor index calculus",
+        "claim": "Actual target Jacobian DLP; not an optimized Diem solver or speedup claim"
+      },
+      "generation_scalar_verified_only_after_solve": true
+    },
+    {
+      "status": "passed",
+      "scalar": 11954,
+      "p": 31,
+      "r": 29641,
+      "seconds": 59.044050912001694,
+      "source_curve": "Elliptic Curve defined by y^2 = x^3 + (4*z^2+21*z+22)*x + (11*z^2+28*z+11) over Finite Field in z of size 31^3",
+      "source_field": {
+        "characteristic": 31,
+        "degree": 3,
+        "order": 29791,
+        "modulus": "x^3 + x + 28"
+      },
+      "source_generator": {
+        "x": "7*z^2 + 26*z + 5",
+        "y": "10"
+      },
+      "source_target": {
+        "x": "11*z^2 + 16*z + 30",
+        "y": "17*z^2 + 22*z + 17"
+      },
+      "quartic": "X^2*Y^2 + 11*X*Y^3 + 15*Y^4 + X^3*Z - 10*X^2*Y*Z - 14*X*Y^2*Z - Y^3*Z - 9*X^2*Z^2 - 11*X*Y*Z^2 + 13*Y^2*Z^2 + 13*X*Z^3 - 6*Y*Z^3 - 8*Z^4",
+      "isogeny_steps": 0,
+      "isogeny_kernels": [],
+      "obstruction_walk": [
+        {
+          "curve": "Elliptic Curve defined by y^2 = x^3 + (4*z^2+21*z+22)*x + (11*z^2+28*z+11) over Finite Field in z of size 31^3",
+          "steps": 0,
+          "kernels_tested": 3,
+          "usable": true
+        }
+      ],
+      "setup_seconds": 33.56254740700024,
+      "sections_seconds": 7.304603992997727,
+      "section_certificate": {
+        "diagonal_constraint_rank": 112,
+        "section_dimension": 8,
+        "sampled_curve_points": 192,
+        "extension_field_point_enumeration_used": false,
+        "exact_diagonal_identities_verified": 8,
+        "maximum_total_degree": 8
+      },
+      "interpolation_holdouts": 12,
+      "chart_failures": [],
+      "source_randomization_multiplier": 1,
+      "inversions": [
+        {
+          "seconds": 1.8821243240017793,
+          "ordered_solutions": 6,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 1.5567571480023616,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 16,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 1.6465602060015954,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        }
+      ],
+      "target_solver": {
+        "scalar": 11954,
+        "seconds": 5.414652347997617,
+        "precompute_seconds": 2.75839251099751,
+        "factor_base_size": 16,
+        "factor_base_including_reference": 17,
+        "curve_rational_points": 32,
+        "covered_points": 32,
+        "tree_maximum_depth": 3,
+        "tree_depth_limit": 5,
+        "line_attempts": 136,
+        "distinct_lines": 103,
+        "split_lines": 33,
+        "geometric_rank": 16,
+        "linear_system_rank": 18,
+        "trials": 6,
+        "smooth_relations": 2,
+        "usable_smooth_relations": 2,
+        "walk_resets": 1,
+        "walk_additions": 5,
+        "graph_parent_edges": {
+          "17": {
+            "parent": null,
+            "edge": 0
+          },
+          "23": {
+            "parent": null,
+            "edge": 1
+          },
+          "21": {
+            "parent": null,
+            "edge": 2
+          },
+          "1": {
+            "parent": null,
+            "edge": 6
+          },
+          "16": {
+            "parent": null,
+            "edge": 10
+          },
+          "7": {
+            "parent": null,
+            "edge": 13
+          },
+          "29": {
+            "parent": null,
+            "edge": 17
+          },
+          "25": {
+            "parent": null,
+            "edge": 19
+          },
+          "24": {
+            "parent": null,
+            "edge": 21
+          },
+          "3": {
+            "parent": null,
+            "edge": 23
+          },
+          "30": {
+            "parent": null,
+            "edge": 24
+          },
+          "12": {
+            "parent": 7,
+            "edge": 9
+          },
+          "20": {
+            "parent": 29,
+            "edge": 3
+          },
+          "26": {
+            "parent": 3,
+            "edge": 25
+          },
+          "18": {
+            "parent": 12,
+            "edge": 26
+          }
+        },
+        "graph_expressions": {
+          "0": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "9": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "6": [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "14": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "19": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "5": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "10": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "15": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "11": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "27": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "28": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "22": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "4": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "2": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "31": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "8": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "13": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "17": [
+            29640,
+            0,
+            0,
+            0,
+            29640,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "23": [
+            0,
+            29640,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            29640,
+            0,
+            0,
+            0,
+            1
+          ],
+          "21": [
+            0,
+            0,
+            14820,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            14821
+          ],
+          "1": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            14820,
+            14821
+          ],
+          "16": [
+            0,
+            29640,
+            0,
+            29640,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            29640,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "7": [
+            0,
+            29640,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            29639,
+            0,
+            1
+          ],
+          "29": [
+            0,
+            0,
+            14820,
+            0,
+            0,
+            0,
+            14820,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            14821
+          ],
+          "25": [
+            0,
+            0,
+            29640,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            29640,
+            0,
+            0,
+            0,
+            29640,
+            0,
+            1
+          ],
+          "24": [
+            0,
+            0,
+            0,
+            29639,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            29640,
+            1
+          ],
+          "3": [
+            0,
+            0,
+            0,
+            0,
+            29639,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            29640,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "30": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            29640,
+            0,
+            0,
+            29640,
+            0,
+            0,
+            0,
+            0,
+            29640,
+            0,
+            0,
+            1
+          ],
+          "12": [
+            29640,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            29640,
+            0
+          ],
+          "20": [
+            0,
+            0,
+            14821,
+            0,
+            0,
+            29640,
+            14821,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            14821
+          ],
+          "26": [
+            0,
+            0,
+            0,
+            0,
+            2,
+            29640,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            29640,
+            0,
+            0,
+            0,
+            0
+          ],
+          "18": [
+            1,
+            29640,
+            0,
+            0,
+            0,
+            29640,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            29638,
+            1,
+            1
+          ]
+        },
+        "chosen_points": [
+          0,
+          9,
+          6,
+          14,
+          19,
+          5,
+          10,
+          15,
+          11,
+          27,
+          28,
+          22,
+          4,
+          2,
+          31,
+          8,
+          13
+        ],
+        "line_certificates": [
+          {
+            "counts": {
+              "9": 1,
+              "5": 1,
+              "17": 1,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                28,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                13,
+                7
+              ],
+              "restriction_coefficients": [
+                0,
+                25,
+                29,
+                16
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  29,
+                  1
+                ],
+                [
+                  6,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "6": 1,
+              "23": 1,
+              "2": 1,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                28,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                24,
+                9
+              ],
+              "restriction_coefficients": [
+                0,
+                17,
+                11,
+                20
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  23,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "14": 1,
+              "21": 2,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                28,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                22,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                21,
+                4,
+                12
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  5,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "10": 1,
+              "20": 1,
+              "29": 1,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                28,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                12
+              ],
+              "restriction_coefficients": [
+                0,
+                29,
+                12,
+                10
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  3,
+                  1
+                ],
+                [
+                  2,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "28": 1,
+              "22": 2,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                28,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                17,
+                10
+              ],
+              "restriction_coefficients": [
+                0,
+                9,
+                16,
+                14
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  26,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "31": 1,
+              "3": 1,
+              "24": 1,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                28,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                1,
+                2,
+                27
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  25,
+                  1
+                ],
+                [
+                  22,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "13": 1,
+              "1": 2,
+              "0": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                28,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                29,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                28,
+                24,
+                14
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  8,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "6": 1,
+              "25": 1,
+              "30": 1,
+              "9": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                13,
+                7
+              ],
+              "parameter_Q": [
+                1,
+                24,
+                9
+              ],
+              "restriction_coefficients": [
+                0,
+                3,
+                7,
+                26
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  29,
+                  1
+                ],
+                [
+                  22,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "28": 1,
+              "23": 1,
+              "1": 1,
+              "9": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                13,
+                7
+              ],
+              "parameter_Q": [
+                1,
+                17,
+                10
+              ],
+              "restriction_coefficients": [
+                0,
+                11,
+                16,
+                28
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  24,
+                  1
+                ],
+                [
+                  2,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "13": 1,
+              "7": 1,
+              "12": 1,
+              "9": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                13,
+                7
+              ],
+              "parameter_Q": [
+                1,
+                29,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                3,
+                20,
+                8
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  12,
+                  1
+                ],
+                [
+                  1,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "19": 1,
+              "16": 1,
+              "4": 1,
+              "6": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                9
+              ],
+              "parameter_Q": [
+                1,
+                24,
+                27
+              ],
+              "restriction_coefficients": [
+                0,
+                22,
+                19,
+                15
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  27,
+                  1
+                ],
+                [
+                  11,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "5": 1,
+              "10": 1,
+              "6": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                9
+              ],
+              "parameter_Q": [
+                1,
+                12,
+                26
+              ],
+              "restriction_coefficients": [
+                0,
+                2,
+                4
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  15,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "counts": {
+              "15": 1,
+              "11": 1,
+              "27": 1,
+              "6": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                9
+              ],
+              "parameter_Q": [
+                1,
+                13,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                24,
+                7,
+                10
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  28,
+                  1
+                ],
+                [
+                  24,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "7": 1,
+              "8": 2,
+              "6": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                9
+              ],
+              "parameter_Q": [
+                1,
+                27,
+                9
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                16,
+                10
+              ],
+              "finite_roots": [
+                [
+                  17,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "13": 1,
+              "18": 1,
+              "26": 1,
+              "6": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                9
+              ],
+              "parameter_Q": [
+                1,
+                29,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                23,
+                29,
+                16
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  21,
+                  1
+                ],
+                [
+                  14,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "5": 1,
+              "30": 1,
+              "1": 1,
+              "14": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                22,
+                2
+              ],
+              "parameter_Q": [
+                1,
+                12,
+                26
+              ],
+              "restriction_coefficients": [
+                0,
+                1,
+                17,
+                8
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  22,
+                  1
+                ],
+                [
+                  3,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "10": 1,
+              "7": 1,
+              "17": 1,
+              "14": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                22,
+                2
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                12
+              ],
+              "restriction_coefficients": [
+                0,
+                29,
+                1,
+                12
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  27,
+                  1
+                ],
+                [
+                  22,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "15": 1,
+              "29": 2,
+              "14": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                22,
+                2
+              ],
+              "parameter_Q": [
+                1,
+                13,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                3,
+                22,
+                30
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  11,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "28": 1,
+              "31": 1,
+              "14": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                22,
+                2
+              ],
+              "parameter_Q": [
+                1,
+                17,
+                10
+              ],
+              "restriction_coefficients": [
+                0,
+                4,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  26,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "counts": {
+              "22": 1,
+              "8": 1,
+              "25": 1,
+              "14": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                22,
+                2
+              ],
+              "parameter_Q": [
+                1,
+                23,
+                22
+              ],
+              "restriction_coefficients": [
+                0,
+                5,
+                4,
+                3
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  24,
+                  1
+                ],
+                [
+                  16,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "15": 1,
+              "31": 1,
+              "22": 1,
+              "19": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                27
+              ],
+              "parameter_Q": [
+                1,
+                13,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                6,
+                10,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  24,
+                  1
+                ],
+                [
+                  10,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "13": 1,
+              "24": 1,
+              "19": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                27
+              ],
+              "parameter_Q": [
+                1,
+                29,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                18,
+                23
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  10,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "counts": {
+              "28": 1,
+              "29": 1,
+              "8": 1,
+              "5": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                12,
+                26
+              ],
+              "parameter_Q": [
+                1,
+                17,
+                10
+              ],
+              "restriction_coefficients": [
+                0,
+                7,
+                23,
+                11
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  23,
+                  1
+                ],
+                [
+                  20,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "4": 1,
+              "3": 1,
+              "5": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                12,
+                26
+              ],
+              "parameter_Q": [
+                1,
+                24,
+                26
+              ],
+              "restriction_coefficients": [
+                0,
+                26,
+                12
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  3,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "counts": {
+              "27": 1,
+              "31": 1,
+              "30": 1,
+              "10": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                10
+              ],
+              "restriction_coefficients": [
+                0,
+                17,
+                14,
+                1
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  25,
+                  1
+                ],
+                [
+                  23,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "2": 1,
+              "26": 1,
+              "3": 1,
+              "10": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                9,
+                8
+              ],
+              "restriction_coefficients": [
+                0,
+                19,
+                17,
+                9
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  24,
+                  1
+                ],
+                [
+                  12,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "8": 1,
+              "12": 1,
+              "18": 1,
+              "10": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                27,
+                9
+              ],
+              "restriction_coefficients": [
+                0,
+                10,
+                25,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  18,
+                  1
+                ],
+                [
+                  5,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "13": 1,
+              "23": 1,
+              "10": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                29,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                21,
+                26
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  29,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "counts": {
+              "8": 1,
+              "1": 1,
+              "3": 1,
+              "15": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                13,
+                3
+              ],
+              "parameter_Q": [
+                1,
+                27,
+                9
+              ],
+              "restriction_coefficients": [
+                0,
+                11,
+                0,
+                4
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  25,
+                  1
+                ],
+                [
+                  6,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "28": 1,
+              "13": 1,
+              "4": 1,
+              "11": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                14,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                17,
+                10
+              ],
+              "restriction_coefficients": [
+                0,
+                17,
+                9,
+                6
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  24,
+                  1
+                ],
+                [
+                  21,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "2": 2,
+              "11": 2
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                14,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                9,
+                8
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                1
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "counts": {
+              "4": 1,
+              "29": 1,
+              "1": 1,
+              "22": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                23,
+                22
+              ],
+              "parameter_Q": [
+                1,
+                24,
+                26
+              ],
+              "restriction_coefficients": [
+                0,
+                9,
+                24,
+                27
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  25,
+                  1
+                ],
+                [
+                  12,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "counts": {
+              "2": 1,
+              "12": 1,
+              "30": 1,
+              "22": 1
+            },
+            "certificate": {
+              "parameter_P": [
+                1,
+                23,
+                22
+              ],
+              "parameter_Q": [
+                1,
+                9,
+                8
+              ],
+              "restriction_coefficients": [
+                0,
+                28,
+                29,
+                3
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  6,
+                  1
+                ],
+                [
+                  5,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          }
+        ],
+        "independent_relations": [
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              29640
+            ],
+            "counts": {
+              "28": 1,
+              "22": 2,
+              "0": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              29639,
+              29639,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              29640,
+              0,
+              1,
+              0,
+              29640,
+              1
+            ],
+            "counts": {
+              "31": 1,
+              "3": 1,
+              "24": 1,
+              "0": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              1,
+              29640,
+              0,
+              0,
+              29640,
+              0,
+              0,
+              29640,
+              0,
+              29640,
+              0,
+              0,
+              29640,
+              29640,
+              0,
+              1
+            ],
+            "counts": {
+              "6": 1,
+              "25": 1,
+              "30": 1,
+              "9": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              29640,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              29640,
+              0,
+              0,
+              14820,
+              14821
+            ],
+            "counts": {
+              "28": 1,
+              "23": 1,
+              "1": 1,
+              "9": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              2,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              29640
+            ],
+            "counts": {
+              "5": 1,
+              "10": 1,
+              "6": 2
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              29640
+            ],
+            "counts": {
+              "15": 1,
+              "11": 1,
+              "27": 1,
+              "6": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              1,
+              0,
+              0,
+              0,
+              2,
+              29639,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              29640,
+              0,
+              29638,
+              2,
+              0
+            ],
+            "counts": {
+              "13": 1,
+              "18": 1,
+              "26": 1,
+              "6": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              1,
+              0,
+              1,
+              29640,
+              0,
+              0,
+              29640,
+              0,
+              0,
+              0,
+              0,
+              29640,
+              0,
+              14820,
+              14821
+            ],
+            "counts": {
+              "5": 1,
+              "30": 1,
+              "1": 1,
+              "14": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              29640,
+              29640,
+              1,
+              0,
+              29640,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              29639,
+              0,
+              1
+            ],
+            "counts": {
+              "10": 1,
+              "7": 1,
+              "17": 1,
+              "14": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              29640
+            ],
+            "counts": {
+              "28": 1,
+              "31": 1,
+              "14": 2
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              29640
+            ],
+            "counts": {
+              "15": 1,
+              "31": 1,
+              "22": 1,
+              "19": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              14820,
+              0,
+              1,
+              0,
+              14820,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              14820
+            ],
+            "counts": {
+              "28": 1,
+              "29": 1,
+              "8": 1,
+              "5": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              29640,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              29640,
+              0,
+              0,
+              1,
+              0
+            ],
+            "counts": {
+              "13": 1,
+              "23": 1,
+              "10": 2
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              29639,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              29640,
+              0,
+              0,
+              1,
+              14820,
+              14821
+            ],
+            "counts": {
+              "8": 1,
+              "1": 1,
+              "3": 1,
+              "15": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              29640
+            ],
+            "counts": {
+              "28": 1,
+              "13": 1,
+              "4": 1,
+              "11": 1
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "recombined_line",
+            "coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              29640
+            ],
+            "counts": {
+              "2": 2,
+              "11": 2
+            },
+            "rhs": 0
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 24360,
+            "b": 28149,
+            "counts": {
+              "20": 1,
+              "13": 1,
+              "6": 1
+            },
+            "coefficients": [
+              0,
+              1,
+              14821,
+              0,
+              0,
+              29640,
+              14821,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              14821
+            ],
+            "rhs": 24360
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 24365,
+            "b": 28149,
+            "counts": {
+              "6": 1,
+              "8": 1,
+              "2": 1
+            },
+            "coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rhs": 24365
+          }
+        ],
+        "seed": 20261141,
+        "algorithm": "split-line double-large-prime tree index calculus with translate-walk anchors",
+        "limits": [
+          "Dense elimination for small experiments; no new exponent claim.",
+          "The translate walk is a practical heuristic, not independent uniform relation sampling.",
+          "No universal graph-coverage or rank guarantee; bounded trial budget."
+        ]
+      },
+      "target_solver_used": true,
+      "target_group_enumeration_used": false,
+      "source_log_used_in_transfer": false,
+      "all_image_coordinates_in_base_field": true,
+      "limits": [
+        "Bounded retries, not a universal exceptional-chart proof.",
+        "These experimental target solvers use dense linear algebra, without a new exponent claim.",
+        "Small-field experiments do not establish an asymptotic or practical advantage."
+      ],
+      "source_pollard_rho": {
+        "runs": [
+          {
+            "scalar": 11954,
+            "seconds": 0.024913754998124205,
+            "group_additions": 474,
+            "restarts": 0,
+            "seed": 20261139,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 11954,
+            "seconds": 0.030420975999732036,
+            "group_additions": 663,
+            "restarts": 0,
+            "seed": 20261140,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 11954,
+            "seconds": 0.01702089500031434,
+            "group_additions": 207,
+            "restarts": 0,
+            "seed": 20261141,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 11954,
+            "seconds": 0.014376985000126297,
+            "group_additions": 180,
+            "restarts": 0,
+            "seed": 20261142,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 11954,
+            "seconds": 0.026895539998804452,
+            "group_additions": 432,
+            "restarts": 0,
+            "seed": 20261143,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          }
+        ],
+        "median_seconds": 0.024913754998124205
+      },
+      "source_bsgs": {
+        "scalar": 11954,
+        "seconds": 0.00937572399925557,
+        "group_additions": 242,
+        "baby_steps": 173,
+        "algorithm": "BSGS",
+        "interval_size": 29641
+      },
+      "basic_target_comparison": {
+        "scalar": 11954,
+        "seconds": 363.2915252829989,
+        "trials": 324,
+        "smooth_relations": 69,
+        "factor_base_size": 31,
+        "linear_system_rank": 32,
+        "independent_relations": [
+          {
+            "a": 13751,
+            "b": 19335,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 1
+          },
+          {
+            "a": 19403,
+            "b": 3144,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 2
+          },
+          {
+            "a": 12485,
+            "b": 5212,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 3
+          },
+          {
+            "a": 21522,
+            "b": 20533,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 4
+          },
+          {
+            "a": 19,
+            "b": 27058,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 5
+          },
+          {
+            "a": 15155,
+            "b": 15497,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 6
+          },
+          {
+            "a": 13295,
+            "b": 3916,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rank": 7
+          },
+          {
+            "a": 17256,
+            "b": 19339,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 8
+          },
+          {
+            "a": 1379,
+            "b": 21951,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 9
+          },
+          {
+            "a": 7310,
+            "b": 22268,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 10
+          },
+          {
+            "a": 21156,
+            "b": 9494,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 11
+          },
+          {
+            "a": 24649,
+            "b": 14250,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rank": 12
+          },
+          {
+            "a": 11165,
+            "b": 16499,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 13
+          },
+          {
+            "a": 18453,
+            "b": 319,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            "rank": 14
+          },
+          {
+            "a": 988,
+            "b": 21075,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 15
+          },
+          {
+            "a": 27107,
+            "b": 7794,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 16
+          },
+          {
+            "a": 24999,
+            "b": 26335,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 17
+          },
+          {
+            "a": 11456,
+            "b": 9992,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 18
+          },
+          {
+            "a": 16809,
+            "b": 5195,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 19
+          },
+          {
+            "a": 22120,
+            "b": 4617,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 20
+          },
+          {
+            "a": 6674,
+            "b": 20157,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 21
+          },
+          {
+            "a": 27654,
+            "b": 4863,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 22
+          },
+          {
+            "a": 25656,
+            "b": 651,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 23
+          },
+          {
+            "a": 6936,
+            "b": 25955,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 24
+          },
+          {
+            "a": 20440,
+            "b": 28967,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 25
+          },
+          {
+            "a": 3260,
+            "b": 670,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 26
+          },
+          {
+            "a": 9526,
+            "b": 7734,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 27
+          },
+          {
+            "a": 23841,
+            "b": 2704,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 28
+          },
+          {
+            "a": 13823,
+            "b": 19440,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 29
+          },
+          {
+            "a": 24976,
+            "b": 26163,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 30
+          },
+          {
+            "a": 8173,
+            "b": 25237,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 31
+          },
+          {
+            "a": 8832,
+            "b": 28134,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 32
+          }
+        ],
+        "algorithm": "basic rational-point smooth-divisor index calculus",
+        "claim": "Actual target Jacobian DLP; not an optimized Diem solver or speedup claim"
+      },
+      "generation_scalar_verified_only_after_solve": true
+    }
+  ]
+}
