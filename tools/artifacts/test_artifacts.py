@@ -16,6 +16,7 @@ from pathlib import Path
 TOOL = Path(__file__).resolve().parent / "artifacts.py"
 sys.path.insert(0, str(TOOL.parent))
 import artifacts  # noqa: E402
+import wire_workflows  # noqa: E402
 
 
 def sh(cwd, *argv, check=True, env=None):
@@ -182,6 +183,28 @@ class Policy(unittest.TestCase):
         self.assertTrue(f("x/fb.tar.part-0001", 100_000, self.P))
         self.assertFalse(f("x/.artifacts.json", 5 << 20, self.P))
         self.assertFalse(f("docs/browser/data.json", 30 << 20, {**self.P, "keep": ["docs/browser/data.json"]}))
+
+
+class WorkflowWiringPaths(unittest.TestCase):
+    def setUp(self):
+        self.moved = {"research/scalar_mul_ct_timing_20261022/REPORT.pdf"}
+        self.dirs = wire_workflows.moved_dirs(self.moved)
+
+    def test_unrelated_research_path_does_not_pull_all_research_data(self):
+        paths = wire_workflows.needed(
+            "run: python research/notes/other_study/verify.py",
+            self.moved,
+            self.dirs,
+        )
+        self.assertEqual(paths, [])
+
+    def test_research_study_path_pulls_its_moved_data(self):
+        paths = wire_workflows.needed(
+            "run: python research/scalar_mul_ct_timing_20261022/verify.py",
+            self.moved,
+            self.dirs,
+        )
+        self.assertEqual(paths, ["research/scalar_mul_ct_timing_20261022"])
 
 
 class S3Argv(unittest.TestCase):
