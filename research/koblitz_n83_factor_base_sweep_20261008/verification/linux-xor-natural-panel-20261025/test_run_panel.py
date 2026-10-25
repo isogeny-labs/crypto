@@ -7,6 +7,7 @@ import unittest
 from unittest import mock
 
 import run_panel
+import audit_artifact
 
 
 HERE = Path(__file__).resolve().parent
@@ -75,6 +76,18 @@ class LinuxNaturalPanelTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 with mock.patch.object(run_panel.resource, "setrlimit"):
                     run_panel.run_arm(protocol, arm, inputs, solver, out)
+
+    def test_independent_audit_rejects_forged_extra_status(self):
+        receipt = {"watchdog": False, "oom_kill_delta": 0, "exit_code": 10}
+        body = b"c conflicts : 11\ns SATISFIABLE\nv 1 0\n"
+        self.assertEqual(audit_artifact.interpret(body, b"", receipt),
+                         ("SATISFIABLE", 11))
+        forged = body + b"s INDETERMINATE\n"
+        self.assertEqual(audit_artifact.interpret(forged, b"", receipt)[0],
+                         "MALFORMED")
+        with self.assertRaises(ValueError):
+            audit_artifact.exact_prefix({"one/host.json", "two/host.json"},
+                                        "host.json")
 
 
 if __name__ == "__main__":
