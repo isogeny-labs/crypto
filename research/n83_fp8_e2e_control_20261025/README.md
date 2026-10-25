@@ -99,3 +99,44 @@ The [producer](run_base_abba.py) preserves every outcome, while the
 base, full rank, scalar, and exclusive target phases. This local pairing
 tests the factor-base choice under one index policy; a fresh Tier 1 panel
 will supply the selection gate.
+
+The [archived comparison](runs/n83-fp8-base-abba-20261025-1) completed four
+full processes and reports `PASS_INDEPENDENT_REPLAY` after relocation.
+K1111 has 184,426 usable base points and 102,445,232 indexed roots;
+K1115 has 185,090 usable points and 103,184,249 indexed roots. The same
+scalar `2948503450338408` was recovered and group-verified in all four
+runs, with final rank equal to the respective column count. The candidate
+IDs are
+`IC1N83Ckb1a1fb184426PDP4rootRCguidedLAgaussTDdirectISO0h15381bae1243`
+and
+`IC1N83Ckb1a1fb185090PDP4rootRCguidedLAgaussTDdirectISO0hee96fa97292d`.
+The shared workload ID remains `1b2e5e958684`, and the
+[sealed result](runs/n83-fp8-base-abba-20261025-1/sealed_result.json)
+lists all run IDs. The 20-file SHA-256 archive manifest covers the
+executable, all raw child records, sealed result and host-noise snapshot.
+
+| ABBA arm | Full process (ms) | Index build (ms) | Rank stage (ms) | One-target online (ms) |
+| --- | ---: | ---: | ---: | ---: |
+| K1111 1 | 156,417.233 | 59,898.510 | 95,993.823 | 58.511 |
+| K1115 1 | 143,402.447 | 37,607.105 | 105,285.595 | 19.416 |
+| K1115 2 | 234,660.863 | 50,871.671 | 183,264.657 | 25.904 |
+| K1111 2 | 121,936.800 | 40,016.877 | 80,828.241 | 49.044 |
+
+K1115's target interval was shorter on both adjacent pairs, by factors
+3.014 and 1.893, on this one public point. Full-process order reversed:
+the K1111/K1115 adjacent ratios were 1.091 and 0.520. K1115's second
+process was 63.6% slower than its first. During that run the shared host
+reported load average 71.25, 0% idle CPU, and 18 GB of memory compression.
+The factor-base wall-time selection is therefore unresolved under the
+Tier 1 noise gate. The next comparison uses the sealed fresh-point panel
+on one Pod allocation, with paired rho and independently replayed online
+intervals.
+
+Replay the archived comparison directly:
+
+```sh
+python3 -m research.n83_fp8_e2e_control_20261025.verify_base_abba \
+  research/n83_fp8_e2e_control_20261025/runs/n83-fp8-base-abba-20261025-1
+python3 -m research.n83_fp8_e2e_control_20261025.seal_base_abba \
+  research/n83_fp8_e2e_control_20261025/runs/n83-fp8-base-abba-20261025-1
+```
