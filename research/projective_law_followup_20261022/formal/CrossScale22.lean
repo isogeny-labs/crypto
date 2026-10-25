@@ -106,6 +106,56 @@ theorem crossScale22_represents_affine
     rw [ht2]
     ring
 
+/-! The common weighted branch uses the same Z and W factors for all eight
+normalized inputs. These identities compute the weights of its B, A, and C
+coefficient expressions; the nonzero corollaries cover its B/C branch gates. -/
+
+theorem scale_B (q1 r1 q2 r2 z : R) :
+    ((q1 * z ^ 2 - q2 * z ^ 2) *
+        ((q2 * z ^ 2) * (r1 * z ^ 4) - (q1 * z ^ 2) * (r2 * z ^ 4)) -
+        (r1 * z ^ 4 - r2 * z ^ 4) ^ 2) =
+      ((q1 - q2) * (q2 * r1 - q1 * r2) - (r1 - r2) ^ 2) * z ^ 8 := by
+  ring
+
+theorem scale_A (q1 r1 s1 t1 q2 r2 s2 t2 z w : R) :
+    ((q1 * z ^ 2 - q2 * z ^ 2) *
+        ((t1 * z ^ 5 * w - t2 * z ^ 5 * w) * (q2 * z ^ 2) -
+         (s1 * z ^ 3 * w - s2 * z ^ 3 * w) * (r2 * z ^ 4)) -
+      (r1 * z ^ 4 - r2 * z ^ 4) * (t1 * z ^ 5 * w - t2 * z ^ 5 * w)) =
+      ((q1 - q2) * ((t1 - t2) * q2 - (s1 - s2) * r2) -
+       (r1 - r2) * (t1 - t2)) * z ^ 9 * w := by
+  ring
+
+theorem scale_C (q1 r1 s1 t1 q2 r2 s2 t2 z w : R) :
+    ((q1 * z ^ 2 - q2 * z ^ 2) * (t1 * z ^ 5 * w - t2 * z ^ 5 * w) -
+      (r1 * z ^ 4 - r2 * z ^ 4) * (s1 * z ^ 3 * w - s2 * z ^ 3 * w)) =
+      ((q1 - q2) * (t1 - t2) - (r1 - r2) * (s1 - s2)) * z ^ 7 * w := by
+  ring
+
+variable {K : Type*} [Field K]
+
+theorem scale_B_ne_zero_iff (q1 r1 q2 r2 z : K) (hz : z ≠ 0) :
+    ((q1 * z ^ 2 - q2 * z ^ 2) *
+        ((q2 * z ^ 2) * (r1 * z ^ 4) - (q1 * z ^ 2) * (r2 * z ^ 4)) -
+        (r1 * z ^ 4 - r2 * z ^ 4) ^ 2 ≠ 0) ↔
+      ((q1 - q2) * (q2 * r1 - q1 * r2) - (r1 - r2) ^ 2 ≠ 0) := by
+  rw [scale_B]
+  simp [hz]
+
+theorem scale_C_ne_zero_iff (q1 r1 s1 t1 q2 r2 s2 t2 z w : K)
+    (hz : z ≠ 0) (hw : w ≠ 0) :
+    ((q1 * z ^ 2 - q2 * z ^ 2) * (t1 * z ^ 5 * w - t2 * z ^ 5 * w) -
+      (r1 * z ^ 4 - r2 * z ^ 4) * (s1 * z ^ 3 * w - s2 * z ^ 3 * w) ≠ 0) ↔
+      ((q1 - q2) * (t1 - t2) - (r1 - r2) * (s1 - s2) ≠ 0) := by
+  rw [scale_C]
+  simp [hz, hw]
+
 end CrossScale22
 
 #print axioms CrossScale22.crossScale22_represents_affine
+
+#print axioms CrossScale22.scale_B
+#print axioms CrossScale22.scale_A
+#print axioms CrossScale22.scale_C
+#print axioms CrossScale22.scale_B_ne_zero_iff
+#print axioms CrossScale22.scale_C_ne_zero_iff

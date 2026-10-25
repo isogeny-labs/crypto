@@ -368,6 +368,17 @@ def main() -> None:
         "'CrossScale22.crossScale22_represents_affine' depends on axioms: [propext]" in cross_log,
         "cross-scale kernel/axiom receipt missing",
     )
+    for theorem, axioms in (
+        ("scale_B", "[propext, Quot.sound]"),
+        ("scale_A", "[propext, Quot.sound]"),
+        ("scale_C", "[propext, Quot.sound]"),
+        ("scale_B_ne_zero_iff", "[propext, Classical.choice, Quot.sound]"),
+        ("scale_C_ne_zero_iff", "[propext, Classical.choice, Quot.sound]"),
+    ):
+        require(re.search(r"(?m)^theorem " + theorem + r"\b", cross_source) is not None,
+                f"cross-scale theorem missing: {theorem}")
+        require(f"'CrossScale22.{theorem}' depends on axioms: {axioms}" in cross_log,
+                f"cross-scale kernel/axiom receipt missing: {theorem}")
     cross_cert = json.loads((ROOT / "cross-scale22.json").read_text())
     require(cross_cert["schema"] == "projective-law-cross-scale22/v1", "cross-scale schema mismatch")
     require(len(cross_cert["rows"]) == 23, "cross-scale row count mismatch")
@@ -376,7 +387,24 @@ def main() -> None:
     require(sum(row["kind"] == "composed_coefficient" for row in cross_cert["rows"]) == 7,
             "cross-scale composed row count mismatch")
     require(all(row["equal"] is True for row in cross_cert["rows"]), "cross-scale equality failure")
-    for artifact in ("CROSS_SCALE22.md", "CROSS_SCALE22.pdf", "cross-scale22.csv", "cross-scale22.svg"):
+    weights = json.loads((ROOT / "cross-scale22-weights.json").read_text())
+    require(weights["schema"] == "projective-law-cross-scale22-weights/v1",
+            "cross-scale weights schema mismatch")
+    require([(row["coefficient"], row["z_power"], row["w_power"],
+              row["theorem"], row["nonzero_theorem"]) for row in weights["rows"]] == [
+                ("B", 8, 0, "CrossScale22.scale_B", "CrossScale22.scale_B_ne_zero_iff"),
+                ("A", 9, 1, "CrossScale22.scale_A", None),
+                ("C", 7, 1, "CrossScale22.scale_C", "CrossScale22.scale_C_ne_zero_iff"),
+            ], "cross-scale weights inventory mismatch")
+    with (ROOT / "cross-scale22-weights.csv").open(newline="") as handle:
+        require(list(csv.DictReader(handle)) == [
+            {key: "" if value is None else str(value) for key, value in row.items()}
+            for row in weights["rows"]], "cross-scale weights CSV/JSON mismatch")
+    require(weights["runtime_semantic_link"] == "open" and
+            weights["cost_ratio_change"] is None, "cross-scale scope mismatch")
+    for artifact in ("CROSS_SCALE22.md", "CROSS_SCALE22.pdf", "cross-scale22.csv",
+                     "cross-scale22.svg", "cross-scale22.png", "cross-scale22-weights.csv",
+                     "cross-scale22-weights.json"):
         require((ROOT / artifact).is_file() and (ROOT / artifact).stat().st_size > 0,
                 f"missing cross-scale artifact: {artifact}")
     require((ROOT / "CROSS_SCALE22.pdf").read_bytes().startswith(b"%PDF-"),

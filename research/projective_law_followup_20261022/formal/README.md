@@ -21,11 +21,14 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   separately. This check covers only those seven expressions.
 - The [cross-scaling packet](CROSS_SCALE22.md) compares the eight power
   intermediates, eight weighted common-branch input expressions, and seven
-  composed coefficients with their Lean definitions. Its kernel-checked theorem proves the common
-  `Z=z1*z2`, `W=w1*w2` weights when the weighted numerator equations hold.
+  composed coefficients with their Lean definitions. Its kernel-checked theorems prove the common
+  `Z=z1*z2`, `W=w1*w2` weights when the weighted numerator equations hold,
+  derive `B=Z⁸B_aff`, `A=Z⁹WA_aff`, `C=Z⁷WC_aff`, and preserve the nonzero
+  `B,C` gates for nonzero weights.
   The packet includes a [certificate](cross-scale22.json),
   [CSV](cross-scale22.csv), [graph](cross-scale22.svg), and
-  [PDF](CROSS_SCALE22.pdf); it does not prove the returned Jacobian class.
+  [PDF](CROSS_SCALE22.pdf) and a [coefficient-weight table](cross-scale22-weights.csv);
+  it does not prove the returned Jacobian class.
 - The [common residual packet](COMMON22_RESIDUAL.md) proves the exact cleared
   ordinate congruence in Lean and checks five source-to-theorem output
   obligations. Its [certificate](common22-residual.json),

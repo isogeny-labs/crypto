@@ -221,6 +221,15 @@ A = dq*(dt*q2-ds*r2)-dr*dt
 C = dq*dt-dr*ds.
 ```
 
+The weighted cross-input theorem assigns common scales `Z²,Z⁴,Z³W,Z⁵W`
+to `q,r,s,t`, where `Z=z1z2` and `W=w1w2`. Five further Lean theorems
+derive `B_cross=Z⁸B`, `A_cross=Z⁹WA`, and `C_cross=Z⁷WC`, and show that
+nonzero `Z,W` preserve the `B≠0` and `C≠0` branch tests. The source-derived
+cross-scaling certificate still checks the exact Rust and Lean expressions
+separately; runtime semantic equivalence remains open. The [CSV](formal/cross-scale22-weights.csv),
+[JSON](formal/cross-scale22-weights.json), [graph](formal/cross-scale22.svg),
+and [PDF](formal/CROSS_SCALE22.pdf) retain the exponents and proof boundary.
+
 `B` is minus the resultant of `u1,u2`, so `B≠0` means their supports
 are coprime. The cubic numerator
 `N=B*v1-(C*X+A)*u1` is checked to satisfy
