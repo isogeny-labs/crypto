@@ -13,17 +13,19 @@ from order_arithmetic import certify, mul, require, selftest
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 BASE = "a53a7e2bfa20080a424b9a2484a16932b6e3c116"
+COVER_PARENT = "0eb46fb21b060df7f3265b7d22500b54e9d3bd99"
 REGISTRY = ROOT / "docs/curves/registry.json"
 ALIASES = ROOT / "src/cryptanalysis/curve_aliases.json"
 EXPECTED_ADDED = 13219
+EXPECTED_COVER_ADDED = 22
 
 
 def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def git_file(path: str) -> bytes:
-    return subprocess.check_output(["git", "show", f"{BASE}:{path}"], cwd=ROOT)
+def git_file(path: str, revision: str = BASE) -> bytes:
+    return subprocess.check_output(["git", "show", f"{revision}:{path}"], cwd=ROOT)
 
 
 def load_lines(path: Path) -> dict[str, dict]:
@@ -85,7 +87,19 @@ def main() -> None:
     old = {row["icv1"]: row for row in baseline}
     require(len(now) == len(current) and len(old) == len(baseline), "duplicate ICV1")
     require(set(old) <= set(now), "previous model identity removed")
-    require(len(current) == len(baseline) + EXPECTED_ADDED, "unexpected registry growth")
+    certs = load_lines(HERE / "candidate-order-certificates.jsonl")
+    bindings = load_lines(HERE / "candidate-source-bindings.jsonl")
+    require(len(certs) == EXPECTED_ADDED and set(certs) == set(bindings),
+            "source-bound certificate count or identity set changed")
+    cover_rows = json.loads(git_file("docs/curves/registry.json", COVER_PARENT))["curves"]
+    cover_by_id = {row["icv1"]: row for row in cover_rows}
+    require(len(cover_by_id) == len(cover_rows), "duplicate cover-parent identity")
+    cover_added = {identity: row for identity, row in cover_by_id.items()
+                   if identity not in old and identity not in certs}
+    require(len(cover_added) == EXPECTED_COVER_ADDED,
+            "cover-parent addition count changed")
+    require(len(current) == len(baseline) + EXPECTED_ADDED + EXPECTED_COVER_ADDED,
+            "unexpected registry growth")
     for identity, before in old.items():
         after = now[identity]
         require(before["slug"] == after["slug"], f"slug changed: {identity}")
@@ -98,10 +112,12 @@ def main() -> None:
     require(all(current_aliases.get(name) == slug for name, slug in old_aliases.items()),
             "existing alias mapping changed")
 
-    added = {identity: row for identity, row in now.items() if identity not in old}
-    certs = load_lines(HERE / "candidate-order-certificates.jsonl")
-    bindings = load_lines(HERE / "candidate-source-bindings.jsonl")
-    require(set(added) == set(certs) == set(bindings), "certificate identity set differs")
+    all_added = {identity: row for identity, row in now.items() if identity not in old}
+    require(set(all_added) == set(certs) | set(cover_added),
+            "combined registry addition set differs from frozen evidence")
+    require(all(all_added[identity] == row for identity, row in cover_added.items()),
+            "cover-parent row changed")
+    added = {identity: all_added[identity] for identity in certs}
     source_cache: dict[str, object] = {}
     source_indexes: dict[str, dict[tuple[int, int, int, int], list[str]]] = {}
     for identity, entry in added.items():
@@ -171,6 +187,7 @@ def main() -> None:
         raise ValueError("wrong-order negative control unexpectedly passed")
     print(json.dumps({"baseline": BASE, "registry_sha256": sha(current_bytes),
                       "models": len(current), "added_source_bound_and_order_certified": len(added),
+                      "added_cover_rows_preserved": len(cover_added),
                       "source_files": len(source_cache), "old_aliases_preserved": len(old_aliases),
                       "conductor_generators_checked": conductor_rows,
                       "negative_order_control": "rejected"}, sort_keys=True))
