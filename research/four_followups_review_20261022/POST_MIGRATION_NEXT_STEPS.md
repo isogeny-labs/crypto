@@ -52,6 +52,11 @@ scope: a nonzero cubic coefficient gives order 6 at infinity, while the
 degree-drop case gives order 5 in the smooth monic-quintic model. The infinity
 valuations and resulting divisor-class equality have not been formalized.
 
+The [infinity-chart packet](../projective_law_followup_20261022/formal/INFINITY_CHART.md)
+kernel-checks the local chart equation and interpolant identities used by
+that pole-order argument. It does not construct the smooth projective local
+ring or prove the valuation, principal divisor, or `Pic⁰` bridge.
+
 ## Ordered actions
 
 1. **Finish the two independent projective-law proof checks already in flight.**
