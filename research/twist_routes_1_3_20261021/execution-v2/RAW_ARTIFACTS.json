@@ -10,15 +10,17 @@
     "extracted_tree_repack_sha256": "6fb0de2cf9ad5c2b9acd1703372560550433da7c095f5f42202100aba31ef167",
     "deterministic_repack_verified": true
   },
-  "status": "local-ready-remote-upload-blocked",
+  "status": "local-ready-remote-upload-denied",
   "remote_uploaded": false,
   "store_index_entry_committed": false,
   "expected_store_name": "evidence/twist_routes_1_3_20261021/execution-v2-20261023/runs.tar.xz",
   "store_name_resolvable": false,
-  "reason": "AWS CLI installed; configured S3 store status reports NoCredentials.",
+  "reason": "2026-10-25: ephemeral credentials authenticate successfully with STS, but S3 denies HeadObject, exact-prefix listing and conditional PutObject on the configured artifact store. No successful upload or verified download.",
   "loose_metadata_manifest": "LOOSE_METADATA.json",
   "full_member_manifest": "RAW_MEMBERS_FINAL.json",
   "historical_member_inventories_retained": true,
   "original_committed_trees_repacked": false,
-  "performance_claim": false
+  "performance_claim": false,
+  "previous_status_snapshot": "git:07fbf5a8fe586302908abcfbb395786de2f11b1f:research/twist_routes_1_3_20261021/execution-v2/RAW_ARTIFACTS.json",
+  "latest_publication_assessment": "../reports/publication-20261025/ASSESSMENT.json"
 }

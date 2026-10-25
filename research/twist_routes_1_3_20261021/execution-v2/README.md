@@ -25,9 +25,14 @@ The full deterministic raw archive exceeds Git's 10 MiB limit. It is prepared
 in the persistent workspace, with its digest, size and exact local location
 in [RAW_ARTIFACTS.json](RAW_ARTIFACTS.json). **The object has not been uploaded
 to the configured store, and no resolvable store name/index entry is claimed.**
-The environment has no AWS credentials. The installed AWS CLI reaches the
-credential check and reports `NoCredentials`; both store-status attempts are
-retained in [checks/final-20261023/](checks/final-20261023/).
+The 2026-10-23 attempts lacked credentials and are preserved in
+[checks/final-20261023/](checks/final-20261023/). On 2026-10-25, ephemeral
+credentials authenticated successfully with AWS STS, but S3 denied object
+HEAD, exact-prefix listing and an atomic conditional PutObject. No upload or
+fresh download succeeded, and the store index is unchanged. See the
+[publication attempt and narrow proposed policy](../reports/publication-20261025/REPORT.md).
+The proposed policy has not been applied; no credential values or caller
+identity values are included in these records.
 See the [publication blocker](../../../problems/twist-followup-evidence-publication.md).
 
 Small `SUMMARY.json`, `ADJUDICATION.json` and `INVENTORY.json` files stay loose

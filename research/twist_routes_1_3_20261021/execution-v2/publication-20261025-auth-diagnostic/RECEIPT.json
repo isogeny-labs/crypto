@@ -1,0 +1,73 @@
+{
+  "schema": "twist.store-publication/v1",
+  "started_utc": "2026-10-25T01:01:44.440Z",
+  "remote": "s3://crypto-autoresearcher/store",
+  "name": "evidence/twist_routes_1_3_20261021/execution-v2-20261023/runs.tar.xz",
+  "sha256": "6fb0de2cf9ad5c2b9acd1703372560550433da7c095f5f42202100aba31ef167",
+  "bytes": 38156064,
+  "uploader_binary_sha256": "ba2e6347f619988ed68075d7bacb242044221f67557ee18977ee9c4458d67b44",
+  "aws_binary_sha256": "84958b12b8c1d794ba565acec08444cba19704e3e484d38eb45c60c51772460d",
+  "inherited_uploader_binary": true,
+  "script_sha256": "ec7397cdf68c013ca8c3b65f87274c9d3d59c7ab4d86847572191980d901a4d4",
+  "original_source_revision": "07fbf5a8fe586302908abcfbb395786de2f11b1f",
+  "credentials_persisted": false,
+  "credential_values_in_receipts": false,
+  "scientific_results_changed": false,
+  "performance_claim": false,
+  "steps": [
+    {
+      "label": "sts-caller-identity",
+      "argv": [
+        "/workspace/shared/twist-tools-20261023/awscli/aws/dist/aws",
+        "sts",
+        "get-caller-identity",
+        "--output",
+        "json"
+      ],
+      "started_utc": "2026-10-25T01:01:56.627Z",
+      "finished_utc": "2026-10-25T01:01:57.495Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout_sha256": "5bfbde34e98ac7e32a7c4f6a345c2133e533826ecfa8b46c09bec65505392d06",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputs_redacted_before_persistence": true
+    },
+    {
+      "label": "s3-list-exact-object",
+      "argv": [
+        "/workspace/shared/twist-tools-20261023/awscli/aws/dist/aws",
+        "s3api",
+        "list-objects-v2",
+        "--bucket",
+        "crypto-autoresearcher",
+        "--prefix",
+        "store/sha256/6f/6fb0de2cf9ad5c2b9acd1703372560550433da7c095f5f42202100aba31ef167",
+        "--max-keys",
+        "1",
+        "--output",
+        "json"
+      ],
+      "started_utc": "2026-10-25T01:01:57.495Z",
+      "finished_utc": "2026-10-25T01:01:58.824Z",
+      "exit_code": 254,
+      "signal": null,
+      "stdout_sha256": "27d12244e29978e03b58a8ad64de538340cb4d396b1db7ea054079bfe98da944",
+      "stderr_sha256": "b0530c5ff086bf8d0aee0a1538dd6ca9c7fca5f932da4d2021b6355b0129f9de",
+      "outputs_redacted_before_persistence": true
+    }
+  ],
+  "authentication_diagnostics": [
+    {
+      "label": "sts-caller-identity",
+      "accepted": true
+    },
+    {
+      "label": "s3-list-exact-object",
+      "accepted": false,
+      "error": "Error: s3-list-exact-object failed: {\"error_code\":\"AccessDenied\",\"operation\":\"s3-list-exact-object\",\"exit_code\":254}"
+    }
+  ],
+  "remote_write_performed": false,
+  "status": "read-only-authentication-diagnostics-complete",
+  "finished_utc": "2026-10-25T01:01:58.825Z"
+}

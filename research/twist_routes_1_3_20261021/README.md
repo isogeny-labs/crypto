@@ -42,7 +42,10 @@ polarized gluing identification, higher-degree factorization, broader solver
 grids, full accounting/calibration, formal map bridges and independent-host
 replay as open requirements. The backlog cards remain blocked and unfunded.
 E26–E28 have not run. The full raw bundle is prepared locally but its remote
-store publication is blocked by missing AWS credentials. No continuing
+store publication is blocked by S3 permissions: the 2026-10-25 credentials
+authenticate, but the object write is denied. See the
+[publication record and required object policy](reports/publication-20261025/REPORT.md).
+No continuing
 background computation is implied by these records.
 
 ## Reproduction
