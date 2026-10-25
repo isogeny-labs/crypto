@@ -243,3 +243,17 @@ The projective infinity-stalk identification, divisor and `Pic⁰` transport,
 and independent Rust-law correspondence remain open. Its
 [CSV](domain-dvr.csv), [JSON](domain-dvr.json), [SVG](domain-dvr.svg), and PDF
 preserve the separate theorem and open-gate inventory.
+
+The [affine-stalk packet](AFFINE_STALK.md) identifies the structure-sheaf
+stalk of this explicit **affine** chart at its origin with that localization.
+Its [CSV](affine-stalk.csv), [SVG](affine-stalk.svg), and artifact-stored PDF
+record the theorem audit. This does not identify the stalk in a smooth
+projective completion.
+
+The [chart-overlap packet](CHART_OVERLAP.md) proves the affine and infinity
+equations are equivalent on the nonzero-coordinate overlap under
+`z=1/x, w=y/x³`, together with four reciprocal-coordinate round trips.
+Its [CSV](chart-overlap.csv), [SVG](chart-overlap.svg), and artifact-stored
+PDF record checked and open gates. A principal-open scheme isomorphism,
+two-chart gluing, smooth projective completion, infinity-stalk transport,
+divisor/`Pic⁰` bridge, and Rust-law correspondence remain open.
