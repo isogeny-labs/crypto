@@ -22,6 +22,16 @@ declarations compiled with only the recorded standard axioms.
 | point-driven pencil | 543 distinct verified candidate targets; one cap-only target; 716 targets with no pencil record | 717 primary and 717 disjoint-process replay records, then the existing intake and publication gates |
 | sign-safe Kummer | Full 1,260-target fixed-difference collector; compressed pair-state packet checks 336 abstract rows and sign uniqueness | Concrete theta xADD exceptional-state bound and measured signed-lift cost before a new cohort |
 
+Evidence added later on 2026-10-25: the
+[source-prefix packet](../projective_law_followup_20261022/formal/WEIGHTED_SOURCE22.md)
+and [affine coordinate-ring packet](../projective_law_followup_20261022/formal/COORDINATE_RING_BRIDGE.md)
+kernel-check bounded parts of step 1; compiled Rust and the divisor-class
+bridge remain open. The [N13 concrete Kummer census](../kummer_differential_collector_20261022/n13-concrete-gate/REPORT.md)
+checked all 119,573 states in the three frozen 16-bit groups: 358,719 xADD
+calls matched the oracle, 494 fallback lifts succeeded, and 569 final lifts
+returned no divisor. Step 2 remains open for the other 18 models and complete
+cold cost. The table above records the starting state, not these added results.
+
 ## Ordered actions
 
 1. **Finish the two independent projective-law proof checks already in flight.**

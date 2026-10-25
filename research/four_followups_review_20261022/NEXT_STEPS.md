@@ -13,7 +13,7 @@ format.
 | factor-base/graph sweep | five arms over all 1,260 fresh targets; 6,300 candidate and 6,300 matched-rho solves; independent replication complete; [N12 model-held-out tuning](../factor_base_heldout_20261025/REPORT.md) selected `fb1-any-j32` on 14 training models and verified 420 candidate and 420 rho solves on seven unseen models, with representative ratio 2.479905 and 0 winning/36 losing price cells | independent-host replay and isolated wall comparison remain open; the deterministic cohorts do not support a sampling interval for the earlier 0.999323 difference |
 | projective law | wrapper and retained-state arms over all 1,260 targets; 1,224,000 checked additions; exact certificate equalities | a mechanized divisor-class theorem and independent mathematical review |
 | point-driven pencil | 543 distinct verified targets, one target with cap-only records, 716 targets without a pencil record; exact 717-row continuation inventory and synthetic-only intake gate verified | 717 primary and independent-replay target records; a complete aggregate ratio requires verified candidate solves |
-| sign-safe Kummer | fixed-difference collector over all 1,260 targets; 8,820 labels and 1,260 signed recoveries checked; [N11 compressed sidecar](../kummer_differential_collector_20261022/n11-compressed-sidecar/REPORT.md) checks 336 model/jump rows and proves pair-sign uniqueness in an abstract odd-prime group | concrete theta xADD exception and signed-lift cost bounds remain open; N11 ran no cohort or timing comparison |
+| sign-safe Kummer | fixed-difference collector over all 1,260 targets; 8,820 labels and 1,260 signed recoveries checked; [N11 compressed sidecar](../kummer_differential_collector_20261022/n11-compressed-sidecar/REPORT.md) checks 336 abstract rows; [N13 concrete census](../kummer_differential_collector_20261022/n13-concrete-gate/REPORT.md) exhausts 119,573 states on the three frozen 16-bit groups, with 358,719 xADD calls matching the oracle and 569 final lift nulls | concrete all-state bound on the other 18 models, complete signed-lift/fallback cost, and a new cohort remain open; N13 makes no rho ratio claim |
 | review packet | 18 checksum-bound artifacts plus the checksum manifest, 12,850 target-arm rows, 3,067 grid rows, three graphs, standardized CSVs, and a three-page PDF; reviewer-pattern appendix adds paired deltas, right-continuous bounded ECDFs, heatmaps, descriptive resampling, and exact grid-derived break-even surfaces | reviewer-pattern phase fractions remain absent because the standardized inputs have no common phase counters; source-specific counter normalization is required |
 
 ## Continuation state
@@ -30,7 +30,7 @@ format.
 | N8 | verified fresh-cohort replication; packet partially complete | 6,300 candidate and 6,300 matched-rho records over 1,260 fresh public targets; five full-cohort ratios and every one of 1,440 pricing rows retained; independent-host replay and a model-cluster interval were not produced |
 | N9 | verified partial source and affine bridge | 742-job pinned Lean build and 13-theorem axiom audit; [weighted 2+2 scaling](../projective_law_followup_20261022/formal/CROSS_SCALE22.md), [source-prefix guards](../projective_law_followup_20261022/formal/WEIGHTED_SOURCE22.md), and [affine coordinate-ring norm factorization](../projective_law_followup_20261022/formal/COORDINATE_RING_BRIDGE.md) are kernel-checked within their stated scopes; compiled Rust field semantics, output construction, principal divisors and `Pic⁰` remain open |
 | N10 | verified derived appendix | source-specific counters map to a declared phase class and retain original phase names; 23,176 representative method rows and 6,120 aggregate method cells reconcile; 1,264 candidate nulls retained; graph, PDF, and artifact-store CSVs included |
-| N11 | verified abstract derivation; cohort gate closed | native Rust packet checks 336 rows over 21 groups and small-group sign/recurrence cases; pair-state size is 72 bytes with external step count or 80 bytes with stored counter; concrete xADD exception and signed-lift cost bounds remain unknown, so no cohort ran |
+| N11/N13 | verified abstract derivation and bounded concrete census; cohort gate closed | N11 checks 336 rows over 21 groups; pair-state is 72 bytes with external step count or 80 bytes with stored counter. N13 checks all 119,573 states in three frozen 16-bit groups: 358,719 xADD calls, zero undefined/mismatched, 494 fallback repairs and 569 final lift nulls. The other 18 models and complete cold cost remain unverified, so no new cohort ran |
 | N12 | verified frozen held-out packet | seven prespecified policies, 840 training targets per policy and seven unseen evaluation models with 420 targets; 420/420 candidate and rho solves verified, ratio 2.479905 at the representative price, 0 win/36 loss cells; independent-host and isolated wall checks not attempted |
 
 N6, N7, N8, N10, N11 and N12 have verified results within their stated narrower
@@ -272,6 +272,14 @@ states, and compare its stored state and per-step operations with the verified
 fixed-offset bounds. Only a construction passing those checks may proceed to a
 public known-answer cohort. A failed construction records the exact missing
 lemma or counterexample without a broad impossibility claim.
+
+The later [N13 concrete census](../kummer_differential_collector_20261022/n13-concrete-gate/REPORT.md)
+checks every signed state in the three frozen 16-bit groups. All 358,719
+source theta xADD calls matched an independent Jacobian oracle. Fast recovery
+failed on 1,063 states; enumerated fallback repaired 494, leaving 569 final
+no-divisor states. Its raw CSV, graph, PDF, native validator and checksum
+manifest retain the counts and operation totals. This finite census does not
+close the other 18 models or the full cold-cost gate.
 
 ### N12. Run held-out factor-base tuning
 
