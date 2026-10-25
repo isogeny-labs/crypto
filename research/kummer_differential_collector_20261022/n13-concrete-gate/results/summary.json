@@ -1,0 +1,156 @@
+{
+  "cohort_eligible": false,
+  "larger_model_exception_bound": null,
+  "models": [
+    {
+      "counts": {
+        "dbl:diff_zero_count:0": 34147,
+        "dbl:raw:match": 34147,
+        "dbl:repair:match": 34147,
+        "mix:diff_zero_count:0": 34147,
+        "mix:raw:match": 34147,
+        "mix:repair:match": 34147,
+        "plus_dbl:diff_zero_count:0": 34147,
+        "plus_dbl:raw:match": 34147,
+        "plus_dbl:repair:match": 34147,
+        "projection:available": 34147
+      },
+      "input_target_workload_id": "Wcf52db405c0d",
+      "lift_counts": {
+        "Delta_zero:false": 108,
+        "b1_coefficient_zero:false": 46,
+        "computed:true": 33686,
+        "enumerated_exception_lift:true": 170,
+        "general_conversion_inapplicable:false": 137
+      },
+      "lift_ops_totals": {
+        "a": 9612886,
+        "exception_candidates": 255,
+        "i": 647371,
+        "jacobian_field_counts": {
+          "bit_ops": 0,
+          "ec_adds": 0,
+          "field_adds": 58437,
+          "i": 1263,
+          "jac_adds": 255,
+          "m": 31963,
+          "s": 510,
+          "sqrt_calls": 0
+        },
+        "m": 11956985
+      },
+      "p": 739,
+      "r": 34147,
+      "states": 34147
+    },
+    {
+      "counts": {
+        "dbl:diff_zero_count:0": 41399,
+        "dbl:raw:match": 41399,
+        "dbl:repair:match": 41399,
+        "mix:diff_zero_count:0": 41399,
+        "mix:raw:match": 41399,
+        "mix:repair:match": 41399,
+        "plus_dbl:diff_zero_count:0": 41399,
+        "plus_dbl:raw:match": 41399,
+        "plus_dbl:repair:match": 41399,
+        "projection:available": 41399
+      },
+      "input_target_workload_id": "W9aa690d00096",
+      "lift_counts": {
+        "b1_coefficient_zero:false": 26,
+        "computed:true": 41066,
+        "enumerated_exception_lift:true": 190,
+        "general_conversion_inapplicable:false": 117
+      },
+      "lift_ops_totals": {
+        "a": 11648518,
+        "exception_candidates": 285,
+        "i": 785469,
+        "jacobian_field_counts": {
+          "bit_ops": 0,
+          "ec_adds": 0,
+          "field_adds": 65305,
+          "i": 1413,
+          "jac_adds": 285,
+          "m": 35684,
+          "s": 570,
+          "sqrt_calls": 0
+        },
+        "m": 14526639
+      },
+      "p": 1151,
+      "r": 41399,
+      "states": 41399
+    },
+    {
+      "counts": {
+        "dbl:diff_zero_count:0": 44027,
+        "dbl:raw:match": 44027,
+        "dbl:repair:match": 44027,
+        "mix:diff_zero_count:0": 44027,
+        "mix:raw:match": 44027,
+        "mix:repair:match": 44027,
+        "plus_dbl:diff_zero_count:0": 44027,
+        "plus_dbl:raw:match": 44027,
+        "plus_dbl:repair:match": 44027,
+        "projection:available": 44027
+      },
+      "input_target_workload_id": "W0793a817e198",
+      "lift_counts": {
+        "b1_coefficient_zero:false": 36,
+        "computed:true": 43758,
+        "enumerated_exception_lift:true": 134,
+        "general_conversion_inapplicable:false": 99
+      },
+      "lift_ops_totals": {
+        "a": 12377648,
+        "exception_candidates": 201,
+        "i": 835611,
+        "jacobian_field_counts": {
+          "bit_ops": 0,
+          "ec_adds": 0,
+          "field_adds": 46240,
+          "i": 1001,
+          "jac_adds": 201,
+          "m": 25278,
+          "s": 402,
+          "sqrt_calls": 0
+        },
+        "m": 15404177
+      },
+      "p": 1187,
+      "r": 44027,
+      "states": 44027
+    }
+  ],
+  "schema": "kummer-n13-concrete-gate/v1",
+  "scope": "all signed states and signed-lift attempts in three frozen 16-bit odd-prime subgroups",
+  "source_digests": [
+    {
+      "path": "research/kummer_theta_20261022/results/theta-models.jsonl",
+      "sha256": "b76424d8195335452c679c69b7c759a22e5721ce4811ff005304a61ab5bbab87"
+    },
+    {
+      "path": "research/kummer_coordinates_20261022/results/generic-models.jsonl",
+      "sha256": "0e71f5493f217a1524104cd8706208355f1730ce76a584ccf69d82eda89ba469"
+    },
+    {
+      "path": "research/kummer_coordinates_20261022/results/target-gate-16.jsonl",
+      "sha256": "2ebe38227ee9b2bd8cfcc460dfa0766804e650a962972a2b5054cfb74c4ef54a"
+    },
+    {
+      "path": "research/kummer_differential_collector_20261022/src/walk_impl.rs",
+      "sha256": "8ce693805a5814327e88872dd33e95d47434d602a3dfe076c8f80cb9381ea2e2"
+    },
+    {
+      "path": "research/kummer_differential_collector_20261022/src/recover_impl.rs",
+      "sha256": "4a76b277f7dc3939d9e0c35e02664aaacdf61e1e1fa5d665c2f2715635e3b184"
+    },
+    {
+      "path": "research/kummer_differential_collector_20261022/n13-concrete-gate/src/main.rs",
+      "sha256": "592e129f163eb30db6997d463ec0cc056f7be5727caf03ed58830c436e116994"
+    }
+  ],
+  "states_sha256": "0eda42eb291fa1d7cc9fec2ac41c513e18a748c59ce6f3d23854667be10a557c"
+}
