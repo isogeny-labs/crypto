@@ -228,3 +228,22 @@ Two pods (`hd6s92ssyztxjh` and `cwacs7yb5zj1hh`) booted but never ran the job. E
 - **Job.** `pod/job.sh` runs the same command as `run.sh deg5`: `--to 5 --max-cols 1100000`, `prlimit --as` at 92% of the host limit, and a 280 GB floor. It takes the unsatisfiable draws 0, 3, 5 and 7 with 4 h each, then satisfiable draw 1 with the time left.
 - **Budget.** The lifetime cap is 20.5 h on `cpu3m-64-512` ($3.52/h), at most $72.20. That keeps the total under the owner's $80 cap.
 - **Reading.** Outcomes are read as in §C1, unchanged.
+
+## Amendment 5 (2026-10-25, after the Amendment 3 sweep, before these runs): the restricted order on every draw
+
+**What the sweep showed** (`runs/a3o-*`).
+- **m = 4 (11, 5), draw 8.** With MXL's variable restriction, the closure refutes within the restricted phase. Peak basis rows are 0.33–0.42 × columns across all four orders. That is below the P1 falsifier (0.5) but not below the payoff (0.25). Without the restriction, the same draw refutes at 0.61–0.81 in every order.
+- **m = 3 (22, 6), draw 0.** Every configuration refutes at ≥ 0.97 × columns. The restricted phase saturates at about 0.68 × columns without `1`, and `1` appears only in the completion pass.
+
+**Change.** The m = 4 result rests on one draw. Registered before running, the low-first restricted order (`--order low --restrict`, batch 64) runs on every other committed degree-4 refutation draw:
+- m = 4 (11, 5): draws 67, 107, 143;
+- m = 4 (12, 5): draws 24, 26, 47, 52;
+- m = 3 (22, 6): draws 1–3;
+- m = 3 (24, 6): draws 0–3.
+
+The satisfiable draws m = 4 (11, 5) 0 and 1 run under the same option as a soundness control. Any refutation of them is an instrument failure.
+
+**Reading.**
+- **Per cell.** A cell's restricted order is below the falsifier if at least 3 of its 4 draws have a ratio < 0.5. It reaches the payoff only if 3 of 4 are < 0.25.
+- **What a pass means.** Either outcome is a stage-level instrument result: a smaller peak echelon at degree 4. It is not an index-calculus cost change. It bears on C1 only through the memory a degree-5 run would need.
+- **m = 3.** These cells close L2 if all their draws stay ≥ 0.5.
