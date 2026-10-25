@@ -1,6 +1,8 @@
 name: Lean proof gate
-# Builds every Lean target in the repository and audits each theorem's
+# Builds every claimed Lean target in the repository and audits each theorem's
 # transitive axioms (tools/lean/proof-gate.sh, tools/lean/AuditAxioms.lean).
+# Archived *.failed.lean attempts remain in Git and are excluded from discovery;
+# an explicit proof-gate.sh path still reproduces their failure.
 # Fails on `sorry`, unlisted `native_decide`, user axioms, a build failure, or a
 # target with no theorems. Reviewed `native_decide` uses live in
 # tools/lean/trusted-native.txt and are reported as TRUST.

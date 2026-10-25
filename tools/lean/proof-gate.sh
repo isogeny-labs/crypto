@@ -2,7 +2,7 @@
 # Repository-wide Lean proof gate (AGENTS.md "Mathematical results should
 # include Lean proofs").
 #
-# For every Lean target in the repository:
+# For every claimed Lean target in the repository:
 #   * a Lake project (a directory with lakefile.toml / lakefile.lean): `lake build`,
 #     then audit every module the project itself built;
 #   * a standalone .lean file outside any Lake project: compile it with `lean -o`
@@ -46,8 +46,10 @@ discover() {
   cd "$root" || exit 3
   # Lake projects: every lakefile outside build output and vendored packages.
   git ls-files -- '*lakefile.toml' '*lakefile.lean' | xargs -r -n1 dirname | sort -u
+  # Archived *.failed.lean files are failed attempts, not claimed proofs.
+  # They remain tracked and can still be checked by passing an explicit path.
   # Standalone files: tracked .lean files with no lakefile in any parent directory.
-  git ls-files -- '*.lean' | grep -vE '^tools/(lean|selftest)/' | while read -r f; do
+  git ls-files -- '*.lean' | grep -vE '^tools/(lean|selftest)/' | grep -vE '\.failed\.lean$' | while read -r f; do
     d=$(dirname "$f")
     while [ "$d" != "." ] && [ ! -f "$d/lakefile.toml" ] && [ ! -f "$d/lakefile.lean" ]; do
       d=$(dirname "$d")

@@ -546,6 +546,11 @@ jobs:
         run: |
           echo '::error::CI scope or release metadata failed; refusing to skip validation.'
           exit 1
+      - name: Free disk for the native release build
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/hostedtoolcache/CodeQL
+          df -h .
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         uses: actions/checkout@v4
       - name: Build the ECC2K-130 CPU client
