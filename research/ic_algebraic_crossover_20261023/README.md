@@ -62,8 +62,8 @@ checks every y root by substitution and an independent trace criterion.
 Original UNSAT draw 5 and SAT draw 4 are not liftable on this campaign's E0
 reference curve; draw 0 is liftable. These x-only fixtures do not specify
 the full curve coefficient a. S3 at b=1 is independent of a, so nonliftability
-on E0 does not imply invalidity on every such curve or twist. Target and base subgroup membership remain
-unknown. The [native receipt](pipeline-receipts/fixture-group-audit-20261025/receipt.json)
+on E0 does not imply invalidity on every such curve or twist. This first audit leaves
+target/base subgroup membership unknown. The [native receipt](pipeline-receipts/fixture-group-audit-20261025/receipt.json)
 retains both positive and negative outcomes.
 
 The [fresh-target audit](reports/run-fresh-target-relevance-20261025/report.pdf)
@@ -72,8 +72,36 @@ split into 154 E0-liftable and 176 nonliftable; UNSAT draws into 434 and 388.
 Every y-root satisfies the curve equation and an independent trace criterion
 agrees for every target; a native rerun is byte-identical. These remain
 uniform field-x Boolean fixtures, not established ordinary subgroup queries.
-Their exact inputs, all outcomes and unknown subgroup membership are retained
+Their exact inputs, all outcomes and the first audit's unknown subgroup membership are retained
 in the [native receipt](pipeline-receipts/fresh-target-relevance-20261025/receipt.json).
+
+The [declared-subgroup follow-up](reports/run-fixture-subgroups-enumerated-20261025/report.pdf)
+checks all 1,159 original/fresh target x-values on E0 and an explicitly chosen
+trace-one-a twist in each exact field. It binds each model, largest odd prime
+r, full order/factorization and a verified G with an unregistered EC1 record
+identity. **105 targets lie in the declared cyclic subgroups and 1,054 lie
+outside**, with no remaining unknowns for these models; 69 of the members
+are Boolean SAT and 36 UNSAT. This is model-specific membership, not a
+replacement for the original uniform field-x law or a verified relation.
+
+For the original n=22 inputs, E0 has r=991 and cofactor 4232; the chosen
+twist has r=2,097,349 and cofactor 2. All seven E0 factor bases have zero
+abscissae supporting r-subgroup points. Original draw 6 has zero on both
+models, and its target is outside E0's r-subgroup. Each of the three selected
+SAT witnesses gives two signed curve relations on its matching model, but
+zero relations whose summands all belong to the declared subgroup. Other
+Boolean witnesses and other subgroups are not exhausted by this diagnostic.
+These facts materially qualify the ECDLP relevance of the guessing fixtures;
+their Boolean solution and closure observations remain valid finite results.
+
+The [first subgroup receipt](pipeline-receipts/fixture-subgroups-20261025/receipt.json)
+conservatively retained 152 unknowns where gcd(r,cofactor)>1. A declared
+[amendment](SUBGROUP_RELEVANCE_AMENDMENT.md) resolves those by enumerating
+the actual 11-point cyclic subgroup, with an r-torsion-outside-G control.
+Both versions independently trace-check lifts, annihilate points by the full
+order, replay byte-identically and retain all original inputs. The
+[amended native receipt](pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json)
+and [verifier](verify-relevance.sh) preserve that distinction.
 
 The [200,000-column continuation](GUESS_CAP200K_PROTOCOL.md) is running
 locally after completion of the quartic/HKY queue. Its first probe observes
@@ -195,8 +223,8 @@ preserves all generated scripts, package hashes, outputs and statuses.
 | A1: independent structural replay | partial | exact original fixtures and small equations/roots checked; upstream large fall-degree panel not fully replayed |
 | A2: native structured bases and symmetric formulation | verified, finite pilot | Rust implementations, all four families, identity/splitting/repeated-root controls; limits in PIPELINE.md |
 | A3: combine formulations and closure | verified, finite stage panel | three matched panels above; no whole-query performance conclusion |
-| B1: ell=8 minimum guesses | partial | draw 6 refutes with zero guesses at cap 200k; all eight balanced k=3 draw-0 branches fail; remaining branches, alternative sets and independent pilot replay remain |
-| B2: ell=9 and four summands | implemented, unverified | 1,152 fresh fixtures and reference-curve target audit; frozen selection and remote shards; no larger-guess or ordinary-subgroup-query result yet |
+| B1: ell=8 minimum guesses | partial | draw-6 zero-guess Boolean refutation and eight nonrefuting k=3 draw-0 branches; original models have subgroup-support gaps; remaining branches, alternative sets, ordinary-query controls and independent pilot replay remain |
+| B2: ell=9 and four summands | implemented, unverified | 1,152 fresh fixtures, reference/twist target subgroup audit and frozen remote shards; no larger-guess or ordinary-query-law result yet |
 | B3: N=58/60/100 continuation | partial | degree-two/three nonrefuting fixed points on three fixtures; all degree-four results resource-capped; independent large fixed-point certificates remain |
 | C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified and identically replayed records; m=14/15 full panels outstanding |
 | C2: m=14--18 ladder | blocked in part | supported rungs outstanding; m=16--18 need wider arithmetic |

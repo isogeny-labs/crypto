@@ -25,6 +25,14 @@ manifests replace Git data under the current policy.
   do not specify the full curve coefficient a; E0 nonliftability does not
   imply invalidity on every b=1 curve or twist. Subgroup membership remains
   unknown.
+- The follow-up chooses explicit reference/twist models and subgroups for
+  all 1,159 targets. It finds 105 members and 1,054 nonmembers, after exact
+  11-point subgroup enumeration resolves all 152 conservative nulls in
+  the preserved first audit. All seven original E0 factor bases have no
+  points in its largest prime subgroup; draw 6 has none on either chosen
+  model. Three selected SAT witnesses give curve relations but no relation
+  with every summand in the declared subgroup. This materially limits
+  ordinary-query interpretations without invalidating the Boolean results.
 - All 44 Singular std/slimgb runs agree with complete native Boolean zero
   sets on 22 frozen systems. This is correctness, not fastest-tool timing.
 - Quartic m=6/8/10/12 smoke: 24 verified records, 24 identical independent
