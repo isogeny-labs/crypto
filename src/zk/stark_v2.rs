@@ -74,12 +74,14 @@
 //! are; a prover making `T` hash queries also gains a factor of about
 //! `T` through Fiat–Shamir.  Proven (non-conjectural) FRI bounds are
 //! weaker than the conjectured query term; this module does not state
-//! one.  The transition must be of degree 1 in the trace values.
+//! one.  [`AffineTransition`] fixes total degree at most one in the trace
+//! values; this degree restriction is part of the API rather than a caller
+//! supplied promise.
 //!
 //! ## API
 //!
-//! - [`AirV2`]: boundary constraints and a closure-based transition
-//!   on adjacent trace rows.
+//! - [`AirV2`]: boundary constraints and an explicit affine transition
+//!   on adjacent trace rows.  The transition degree is fixed by its type.
 //! - [`StarkConfig`]: `(blow_up, query_count)`.
 //! - [`prove`] / [`verify`].
 
@@ -133,7 +135,37 @@ impl StarkConfig {
     }
 }
 
-/// An AIR with boundary constraints and a transition operating on
+/// An affine adjacent-row constraint `a·prev + b·next + c` over the scalar
+/// field.  Its representation fixes the total degree at most one; callers
+/// cannot supply an arbitrary transition closure with a hidden higher degree.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AffineTransition {
+    previous: BigUint,
+    next: BigUint,
+    constant: BigUint,
+}
+
+impl AffineTransition {
+    /// Coefficients are reduced to canonical scalar-field representatives.
+    pub fn new(previous: BigUint, next: BigUint, constant: BigUint) -> Self {
+        let modulus = scalar_modulus();
+        Self {
+            previous: previous % &modulus,
+            next: next % &modulus,
+            constant: constant % &modulus,
+        }
+    }
+
+    /// Evaluate the complete transition constraint in the scalar field.
+    pub fn evaluate(&self, previous: &BigUint, next: &BigUint) -> BigUint {
+        fr_add(
+            &fr_add(&fr_mul(&self.previous, previous), &fr_mul(&self.next, next)),
+            &self.constant,
+        )
+    }
+}
+
+/// An AIR with boundary constraints and an affine transition operating on
 /// adjacent trace rows (`f(X), f(ω·X)`).
 #[derive(Clone)]
 pub struct AirV2 {
@@ -142,9 +174,9 @@ pub struct AirV2 {
     /// Boundary constraints: `(position, expected_value)` pairs.
     /// Each `position` is in `[0, n)`.
     pub boundary: Vec<(usize, BigUint)>,
-    /// Transition: given two consecutive trace values, return the
-    /// constraint value (should be zero on valid traces).
-    pub transition: Arc<dyn Fn(&BigUint, &BigUint) -> BigUint + Send + Sync>,
+    /// Degree-at-most-one constraint on consecutive trace values.  It must
+    /// evaluate to zero on valid adjacent rows.
+    pub transition: AffineTransition,
     /// Generator of the trace (the prover's actual computation).
     pub generate_trace: Arc<dyn Fn() -> Vec<BigUint> + Send + Sync>,
 }
@@ -163,10 +195,12 @@ impl AirV2 {
             }
             t
         };
-        let transition = Arc::new(|prev: &BigUint, next: &BigUint| -> BigUint {
-            // Constraint: next − 2·prev = 0.
-            fr_sub(next, &fr_mul(prev, &BigUint::from(2u32)))
-        });
+        // Constraint: next − 2·prev = 0.
+        let transition = AffineTransition::new(
+            fr_sub(&BigUint::from(0u32), &BigUint::from(2u32)),
+            BigUint::one(),
+            BigUint::from(0u32),
+        );
         let generate_trace = Arc::new(gen);
         let boundary = vec![(0, BigUint::from(s))];
         Self {
@@ -250,7 +284,7 @@ fn composition_at(
         &fr_inv(&fr_sub(x, &h_trace[n - 1])).expect("coset point off the trace domain"),
     );
     let transition = fr_mul(
-        &(air.transition)(fx, f_wx),
+        &air.transition.evaluate(fx, f_wx),
         &fr_inv(&z).expect("coset point off the trace domain"),
     );
     let mut acc = fr_mul(alpha1, &transition);
@@ -270,7 +304,8 @@ fn composition_at(
 /// `(1,0)`, `(0,1)` and [`AIR_PROBES`] fixed public points
 /// `H("ZK-STARK-V2/air-probe" ‖ j)`.  A transition of degree `≤ 1`
 /// (the only kind this module supports) is determined exactly by its
-/// first three values; for higher degree this is a fingerprint.
+/// first three values.  Higher-degree transitions are not representable by
+/// [`AffineTransition`].
 pub fn air_fingerprint(air: &AirV2) -> Vec<u8> {
     let (zero, one) = (BigUint::from(0u32), BigUint::one());
     let mut points = vec![
@@ -286,7 +321,7 @@ pub fn air_fingerprint(air: &AirV2) -> Vec<u8> {
     }));
     let mut out = b"air:v2-adjacent-row-transition".to_vec();
     for (a, b) in &points {
-        out.extend_from_slice(&reduced_bytes(&(air.transition)(a, b)));
+        out.extend_from_slice(&reduced_bytes(&air.transition.evaluate(a, b)));
     }
     out
 }
@@ -522,16 +557,16 @@ mod tests {
     use super::*;
     use num_traits::Zero;
 
-    type T2 = Arc<dyn Fn(&BigUint, &BigUint) -> BigUint + Send + Sync>;
+    type T2 = AffineTransition;
 
     fn big(x: u64) -> BigUint {
         BigUint::from(x)
     }
     fn dbl() -> T2 {
-        Arc::new(|p: &BigUint, nx: &BigUint| fr_sub(nx, &fr_mul(p, &big(2))))
+        AffineTransition::new(fr_sub(&big(0), &big(2)), big(1), big(0))
     }
     fn trip() -> T2 {
-        Arc::new(|p: &BigUint, nx: &BigUint| fr_sub(nx, &fr_mul(p, &big(3))))
+        AffineTransition::new(fr_sub(&big(0), &big(3)), big(1), big(0))
     }
     fn air2(n: usize, boundary: Vec<(usize, BigUint)>, t: T2, trace: Vec<BigUint>) -> AirV2 {
         AirV2 {
@@ -575,7 +610,9 @@ mod tests {
     fn air_transition_zero_on_valid_pair() {
         let air = AirV2::doubling(8, 3);
         // Valid pair: (3, 6).  3·2 = 6.
-        let c = (air.transition)(&BigUint::from(3u32), &BigUint::from(6u32));
+        let c = air
+            .transition
+            .evaluate(&BigUint::from(3u32), &BigUint::from(6u32));
         assert!(c.is_zero());
     }
 
@@ -584,8 +621,29 @@ mod tests {
     fn air_transition_nonzero_on_invalid_pair() {
         let air = AirV2::doubling(8, 3);
         // Invalid pair: (3, 7).
-        let c = (air.transition)(&BigUint::from(3u32), &BigUint::from(7u32));
+        let c = air
+            .transition
+            .evaluate(&BigUint::from(3u32), &BigUint::from(7u32));
         assert!(!c.is_zero());
+    }
+
+    /// The old closure API could encode this quadratic rule while the proof
+    /// bound assumed total degree one.  No affine rule agrees with `prev·next`
+    /// at these four field points: the first three force all coefficients to
+    /// zero, and the fourth then differs.
+    #[test]
+    fn quadratic_transition_is_outside_the_air_type() {
+        let zero = big(0);
+        let one = big(1);
+        let product = |a: &BigUint, b: &BigUint| fr_mul(a, b);
+        let constant = product(&zero, &zero);
+        let previous = fr_sub(&product(&one, &zero), &constant);
+        let next = fr_sub(&product(&zero, &one), &constant);
+        let affine = AffineTransition::new(previous, next, constant);
+        for (a, b) in [(&zero, &zero), (&one, &zero), (&zero, &one)] {
+            assert_eq!(affine.evaluate(a, b), product(a, b));
+        }
+        assert_ne!(affine.evaluate(&one, &one), product(&one, &one));
     }
 
     /// **End-to-end STARK v2** with fast config (blow_up=4, queries=20).
@@ -880,7 +938,7 @@ mod tests {
                 zp = fr_mul(&zp, &fr_sub(&h[p], hi));
             }
         }
-        let c_p = (dbl())(&cheat[p], &cheat[p + 1]);
+        let c_p = dbl().evaluate(&cheat[p], &cheat[p + 1]);
         let mut a2k = BigUint::one();
         for _ in 0..k_index {
             a2k = fr_mul(&a2k, &a2);

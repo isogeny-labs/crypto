@@ -1,0 +1,15 @@
+{
+  "schema": "volcano-census.costmodel/v1",
+  "source": "census runs/progress.jsonl wall_s and runs/manifest.json passes, all 79 audited census sessions (b = 26)",
+  "formula": "est_s = 15 + passes * K * f(V) * (cheap_s * cheap_arms + ic_s * ic_arms); cheap arms = every arm except ic (rho, bsgs, rho-cubic, A/A)",
+  "cheap_s": 0.0415,
+  "ic_s": 0.15,
+  "K": 1.2465034965034965,
+  "K_definition": "max over the 79 census sessions of ((wall_s - 15) / passes) / ((arms - 1) * 0.0415 + 0.15); the largest measured per-pass wall was 0.4456 s (6 arms)",
+  "f_definition": "f(V) = max(1, sqrt(n_V / 10759409)); 10759409 = the largest r of a census volcano (V1)",
+  "f": {"V5": 1.24456, "V6": 1.0},
+  "session_cap_s": 1620,
+  "session_cap_note": "27 min, so the 30 min limit holds with margin",
+  "maxpass_basis": "V5: 6 cheap arms + ic (rho-cubic present on the crater specs, used for all V5 chunking); V6: 5 cheap arms + ic",
+  "maxpass": {"V5": 2592, "V6": 3601}
+}

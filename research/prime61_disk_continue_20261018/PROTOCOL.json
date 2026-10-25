@@ -1,0 +1,26 @@
+{
+  "schema": "prime61.disk-continuation-protocol/v1",
+  "request": "Continue the user's all-horizontal-isogeny factor-base experiment at p=2^61-1, retaining the full-class goal and immutable Drive checkpoints.",
+  "source_revision": "e063d98475589d9aba7ae265a8cba830927e3156",
+  "predecessor": "research/prime61_disk_walk_20261017/README.md (merged PR 1977)",
+  "input": "The Drive checkpoint at 32 expanded / 250 discovered / 64 measured curves; archive SHA256 eb5ee1c252943ddeae9d62f49e3065e6b2e5f06e20a2c8598d804f8fc35dec32. Require archive and internal SHA256 checks before restore.",
+  "spec": "spec.json is byte-identical to the preceding study: p=2305843009213693951, r=2305843010818082053, a=p-3, b=111, fixed public synthetic G,Q, scalar 539365399; degrees [3,7,11,13,19,23,53,61]; 12 streams per curve starting seed 2026101600; three inverse pairs, 20 required relations, 100000 target trials per stream.",
+  "hypothesis": "The native disk walker can extend a restored checkpoint on the current library revision while preserving all existing logical records, subgroup maps and deterministic collector counters.",
+  "controls": [
+    "Verify every archived record and map, replay the first 16 curves / 192 collector streams on the current source, and require the logical dump to match the archived dump exactly before continuation.",
+    "Require the final logical dump to retain every restored record's immutable payload; only expanded/measured flags may advance. Reverify every final map, expanded source roster, relation and solved scalar.",
+    "Upload an immutable final archive to Drive, read its metadata back, download it, check its SHA256 and internal manifest, and compare restored database bytes and logical dump. Retain all failures and limits."
+  ],
+  "batches": [
+    {"expanded_sources_cumulative":64,"measured_curves_cumulative":128},
+    {"expanded_sources_cumulative":128,"measured_curves_cumulative":256},
+    {"expanded_sources_cumulative":256,"measured_curves_cumulative":512}
+  ],
+  "chunk_policy": "Advance in cumulative increments of at most 32 sources; measure in cumulative increments of at most 64 curve IDs. Each native command has a 300-second outer cap. A timeout is retained and may be retried at the same cumulative target, preserving committed transactions. Do not alter per-stream limits. Verify each batch before the next. A failed correctness control stops dependent execution.",
+  "resource_envelope": {"execution":"one native worker on the existing container; no remote provisioning","memory_limit_bytes":17179869184,"sqlite_cache_kib":8192,"disk_guard_free_bytes":2147483648,"study_disk_cap_bytes":2147483648,"concurrency":1,"process_timeout_seconds":300},
+  "stop": "Finish the three stated batches or retain a precise correctness/resource blocker. This bounded continuation leaves the exhaustive class experiment open. Further expansion requires another frozen envelope.",
+  "coverage": "Keep discovered, expanded, pending, measured, failed kernels, trials, relations and verified solves separate. Neither a prefix nor closure under the selected primes proves entire-class coverage. Full class certification and generation by the selected degrees remain outstanding. The previously proved fundamental discriminant excludes vertical base-field edges for this fixed ordinary class; this does not cover extension fields or other classes.",
+  "accounting": "Capacity and relation-stage evidence only. Record source/toolchain/build inputs, native status RSS and database bytes. No timed speed comparison, fastest-tool claim, S, or end-to-end IC/rho speedup; these remain unknown. Distinguish inherited and newly collected streams/trials.",
+  "delivery": "New ready PR because PR 1977 has merged; preserve all earlier frozen evidence. Source-linked run/results report, quantitative SVG, inspected PDF, replay receipts and sanitized Drive receipts. Private Drive IDs and URLs stay out of the public repository.",
+  "coordination": "Conductor check attempted before edits; executable is unavailable and .conductor/WORKFLOW.md is not tracked. Scope: this new study, the existing class problem, and its backlog card."
+}
