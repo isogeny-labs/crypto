@@ -80,3 +80,9 @@ source-bound result; the retained run followed a clean rebuild and its
 receipt's binary hash matches the rebuilt executable. The frozen
 [first-access protocol](NATURAL_PROTOCOL.md) specifies a separate positive
 control and bounded public natural query; neither has run yet.
+
+The source-pinned [full m4 model construction](MODEL_RESULT.md) then passed:
+329,726 SAT variables, 11,424,742 total CNF clauses and 3,901 XOR rows.
+Import plus model took 68.19 seconds process wall with a 5.31 GB peak memory
+footprint on an L0 local host. The native SAT search and relation/rank stages
+remain unmeasured for this base.
