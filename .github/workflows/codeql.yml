@@ -286,6 +286,7 @@ jobs:
       uses: github/codeql-action/setup-codeql@v4
       with:
         languages: rust
+        tools: https://github.com/github/codeql-action/releases/download/codeql-bundle-v${{ needs.build-rust-database.outputs.codeql-version }}/codeql-bundle-linux-arm64.tar.zst
     - name: Download this workflow attempt's warmed database
       if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language == 'rust' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
       uses: actions/download-artifact@v4
@@ -325,6 +326,8 @@ jobs:
     name: Build database (rust)
     if: needs.scope.outputs.rust != 'false' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
     needs: scope
+    outputs:
+      codeql-version: ${{ steps.init.outputs.codeql-version }}
     timeout-minutes: 25
     runs-on: ubuntu-24.04-arm
     permissions:
@@ -438,6 +441,8 @@ jobs:
         uses: github/codeql-action/setup-codeql@v4
         with:
           languages: rust
+          # Queued jobs may span a CodeQL release; consume the producer's exact bundle.
+          tools: https://github.com/github/codeql-action/releases/download/codeql-bundle-v${{ needs.build-rust-database.outputs.codeql-version }}/codeql-bundle-linux-arm64.tar.zst
       - name: Download this workflow attempt's finalized database
         uses: actions/download-artifact@v4
         with:
