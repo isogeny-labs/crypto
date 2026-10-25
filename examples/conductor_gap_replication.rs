@@ -42,6 +42,14 @@ fn save(p: impl AsRef<Path>, v: &Value) {
         .unwrap();
     writeln!(f, "{}", serde_json::to_string_pretty(v).unwrap()).unwrap();
 }
+// Postprocessing can be replayed in a fresh directory without touching a
+// committed summary or any sealed session. The frozen solver argv are unchanged.
+fn analysis_dir() -> PathBuf {
+    std::env::args()
+        .nth(3)
+        .map(PathBuf::from)
+        .unwrap_or_else(|| Path::new(ROOT).join("analysis"))
+}
 fn lines(p: impl AsRef<Path>) -> Vec<Value> {
     BufReader::new(File::open(p).unwrap())
         .lines()
@@ -894,7 +902,7 @@ fn analyze(out: &Path) {
     let mut status = BTreeMap::<String, u64>::new();
     let mut bsgs: BTreeMap<(u64, u64), BTreeSet<u64>> = BTreeMap::new();
     let mut counts = 0;
-    let result_dir = Path::new(ROOT).join("analysis");
+    let result_dir = analysis_dir();
     fs::create_dir_all(&result_dir).unwrap();
     let panel = manifest["panel"].as_str().unwrap();
     let mut csv = OpenOptions::new()
@@ -1113,15 +1121,14 @@ fn diagnostics(out: &Path) {
     }
     let panel = manifest["panel"].as_str().unwrap_or("calibration");
     save(
-        Path::new(ROOT)
-            .join("analysis")
-            .join(format!("diagnostics-{panel}.json")),
+        analysis_dir().join(format!("diagnostics-{panel}.json")),
         &json!({"panel":panel,"sessions":sessions}),
     );
 }
+include!("../research/conductor_gap_replication_20261025/analysis_b.inc.rs");
 fn main() {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
-    assert!(args.len() >= 2, "prepare-a|prepare-b|run|audit|analyze OUT");
+    assert!(args.len() >= 2, "MODE PREPARED_DIR [ANALYSIS_OUTPUT_DIR]");
     let out = Path::new(&args[1]);
     match args[0].as_str() {
         "prepare-a" => prepare(out, "A"),
@@ -1137,6 +1144,7 @@ fn main() {
         "gate-a" => gate_a(out),
         "analyze" => analyze(out),
         "diagnostics" => diagnostics(out),
+        "b-checks" => b_checks(out),
         _ => panic!("unknown mode"),
     }
 }

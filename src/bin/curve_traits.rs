@@ -79,6 +79,11 @@ enum Cmd {
         #[arg(long, default_value = TRAITS)]
         traits: String,
     },
+    /// Re-encode an existing report without recomputing or changing its values.
+    Format {
+        #[arg(long, default_value = TRAITS)]
+        traits: String,
+    },
     /// Print one curve's record (slug, standard name or legacy spelling).
     Show {
         name: String,
@@ -288,6 +293,18 @@ fn show(c: &CurveTraits) {
     );
 }
 
+// The complete catalogue can exceed GitHub's 100 MiB blob limit when pretty
+// printed. Keep small reports readable and large ones compact, with the same
+// canonical encoding in build/check. This changes no derived trait or budget.
+fn catalogue_json(file: &TraitFile) -> String {
+    let pretty = file.to_json();
+    if pretty.len() <= 64 * 1024 * 1024 {
+        pretty
+    } else {
+        serde_json::to_string(file).expect("serialisable") + "\n"
+    }
+}
+
 fn run(cli: Cli) -> Result<bool, String> {
     match cli.cmd {
         Cmd::Build {
@@ -296,7 +313,7 @@ fn run(cli: Cli) -> Result<bool, String> {
             budget,
         } => {
             let (file, _) = build(&registry, budget)?;
-            std::fs::write(&out, file.to_json()).map_err(|e| format!("{out}: {e}"))?;
+            std::fs::write(&out, catalogue_json(&file)).map_err(|e| format!("{out}: {e}"))?;
             eprintln!("wrote {} curves to {out}", file.curves.len());
             Ok(true)
         }
@@ -304,7 +321,7 @@ fn run(cli: Cli) -> Result<bool, String> {
             let committed =
                 std::fs::read_to_string(&traits).map_err(|e| format!("{traits}: {e}"))?;
             let budget = load(&traits)?.factor_budget;
-            let fresh = build(&registry, budget)?.0.to_json();
+            let fresh = catalogue_json(&build(&registry, budget)?.0);
             if fresh == committed {
                 eprintln!("{traits} is current");
                 return Ok(true);
@@ -313,6 +330,26 @@ fn run(cli: Cli) -> Result<bool, String> {
                 "{traits} is stale: run `cargo run --release --bin curve_traits -- build --budget {budget}`"
             );
             Ok(false)
+        }
+        Cmd::Format { traits } => {
+            let original =
+                std::fs::read_to_string(&traits).map_err(|e| format!("{traits}: {e}"))?;
+            let file: TraitFile = serde_json::from_str(&original).map_err(|e| e.to_string())?;
+            let encoded = catalogue_json(&file);
+            let before: serde_json::Value =
+                serde_json::from_str(&original).map_err(|e| e.to_string())?;
+            let after: serde_json::Value =
+                serde_json::from_str(&encoded).map_err(|e| e.to_string())?;
+            if before != after {
+                return Err("refusing a format change that changes JSON values".into());
+            }
+            std::fs::write(&traits, &encoded).map_err(|e| format!("{traits}: {e}"))?;
+            eprintln!(
+                "formatted {traits}: {} -> {} bytes; all values equal",
+                original.len(),
+                encoded.len()
+            );
+            Ok(true)
         }
         Cmd::Show { name, traits, json } => {
             let file = load(&traits)?;

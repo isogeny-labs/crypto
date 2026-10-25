@@ -120,7 +120,7 @@ jobs:
         if: matrix.task == 'altered'
         run: |
           cp docs/curves/traits.json /tmp/altered.json
-          sed -i '0,/"conductor": "7"/s//"conductor": "11"/' /tmp/altered.json
+          sed -i '0,/"conductor":[[:space:]]*"7"/s//"conductor":"11"/' /tmp/altered.json
           if cmp -s docs/curves/traits.json /tmp/altered.json; then
             echo 'the edit did not apply'; exit 1
           fi

@@ -4,10 +4,30 @@ Study of 2026-10-22, on public synthetic prime-field curves. Classification:
 theorem note plus a preregistered, controlled measurement (rho against rho).
 No security statement about any deployed curve.
 
+> **Interpretation correction, 2026-10-25.** The historical data and PDF below
+> are retained. The transfer gives an algorithm conversion with additive
+> construction/evaluation overhead; it does not by itself equate optimal
+> constants or preserve an advantage below that overhead. The displayed
+> `log_p(N) = 0.370557...` is one finite tuple, not an asymptotic exponent:
+> a growing parameter family must be specified. The roughly 0.04-second
+> warm two-point evaluation omits the separately recorded 0.145098486-second
+> construction; their descriptive sum is 0.182379878 seconds before other
+> discovery/certification work. The Lean results are conditional transfer
+> and arithmetic statements, with CM/order/geometry bridges still open.
+> See the explicit [claim corrections](../conductor_gap_replication_20261025/CLAIM_CORRECTIONS.md).
+>
+> The [new bounded replication](../conductor_gap_replication_20261025/REPORT.md)
+> adds eight classes and three S2 volcanoes per class, balanced depth sampling,
+> and a separate CM-aware collector panel. All 43,520 attempts verify and
+> replay. All five levels meet the nominal +/-5% counted-rho rule; the
+> simultaneous rule remains inconclusive at the crater. This strengthens
+> finite generic-rho evidence; a broader endomorphism-dependent hardness
+> conclusion remains unestablished.
+
 **Question.** Is ECDLP hardness the same on both sides of a large prime
 conductor gap, on a deep isogeny volcano?
 
-## Answer
+## Historical 2026-10-22 answer, subject to the correction above
 
 **Proved** ([THEOREMS.md](THEOREMS.md), with Lean for the parts Lean can
 state):

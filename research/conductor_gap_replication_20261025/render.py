@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Render recorded native summaries only; performs no research statistics."""
 import json
+from datetime import datetime, timezone
 import os
 from pathlib import Path
 import subprocess
@@ -27,12 +28,14 @@ def pdf(md):
                    cwd=md.parent, check=True, stdout=subprocess.DEVNULL)
 
 def run_reports():
+    index = ["# Session reports", "", "Each report describes recorded observations; no timing or full-cost ranking is admitted.", ""]
     for source in sorted((ROOT / "analysis").glob("diagnostics-*.json")):
         for row in load(source)["sessions"]:
             session = REPO / row["session"]
             meta = load(session / "session.json")
             name = row["name"]
-            dest = ROOT / "reports" / name
+            stamp = datetime.fromtimestamp(meta["started_unix_ms"] / 1000, timezone.utc).strftime("%Y%m%dT%H%MZ")
+            dest = ROOT / "reports" / f"run-{stamp}-{name}"
             dest.mkdir(parents=True, exist_ok=True)
             band = row["band"]
             fig, ax = plt.subplots(figsize=(8, 3.3))
@@ -62,6 +65,41 @@ def run_reports():
             text += "These observations alone admit no full-cost method ranking. Calibration sessions are excluded from primary inference.\n"
             (dest / "REPORT.md").write_text(text)
             pdf(dest / "REPORT.md")
+            index.append(f"- [{name}]({dest.name}/REPORT.md) ([PDF]({dest.name}/REPORT.pdf)); `{meta['session_id']}`")
+    (ROOT / "reports/README.md").write_text("\n".join(index) + "\n")
+
+def preflight():
+    dest = ROOT / "reports/run-20261025-rejected-preflight-v1"
+    dest.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(8.5, 3))
+    ax.axis("off")
+    for x, label in [(0.15, "v1 parameter scan\n4 prepared classes"),
+                     (0.5, "Direct-map preflight\nmissing twist kernel"),
+                     (0.85, "STOP before solvers\nv2 eligibility amendment")]:
+        ax.text(x, .55, label, ha="center", va="center", transform=ax.transAxes,
+                bbox={"boxstyle":"round,pad=.5", "facecolor":"#edf1f7", "edgecolor":"#65758d"})
+    ax.annotate("", xy=(.37,.55), xytext=(.29,.55), xycoords="axes fraction", arrowprops={"arrowstyle":"->"})
+    ax.annotate("", xy=(.72,.55), xytext=(.64,.55), xycoords="axes fraction", arrowprops={"arrowstyle":"->"})
+    ax.text(.5,.12,"No solver observations: an execution diagram replaces a quantitative comparison.", ha="center", transform=ax.transAxes, fontsize=10)
+    save(fig, dest / "preflight")
+    (dest / "REPORT.md").write_text("""# Rejected v1 preparation
+
+The first B parameter set reached the direct-map base-equality preflight,
+which failed with `this trace has no required rational twist kernel`.
+No solver campaign ran on those fixtures. A trace-one anomalous fixture
+was also identified before measurement. The dated v2 amendment retained
+the original fixtures, added map eligibility and excluded trace one.
+
+![Observed preparation path; no measured solver comparison exists.](preflight.pdf)
+
+Evidence: `prepared-b/b-classes.json`, `preflight-v1/base-equality.stderr`,
+source commit `6e30fc1de378ee764f4a63abfddc26298748b01c`, and `AMENDMENTS.md`.
+The corrected 32-model base equality is in `prepared-b-v2/base-equality.json`.
+This is an implementation-preflight finding, not a mathematical obstruction.
+The original start timestamp was not separately recorded; the directory
+therefore gives the date without inventing a start minute.
+""")
+    pdf(dest / "REPORT.md")
 
 def campaign():
     a = load(ROOT / "analysis/panel-A.json")
@@ -77,6 +115,7 @@ def campaign():
            title="Eight classes; three S2 volcanoes per class; 192 solves per level/volcano")
     ax.text(.01, .02, "Dark: 90% CI. Light: 98% CI. Whole-class bootstrap.\n30,720 primary solves; controls excluded.", transform=ax.transAxes, fontsize=9)
     ax.grid(axis="y", alpha=.2)
+    ax.legend(loc="lower right", fontsize=8, frameon=False)
     save(fig, ROOT / "figures/level-ratios")
     b = load(ROOT / "analysis/panel-B.json")
     fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
@@ -132,5 +171,7 @@ if __name__ == "__main__":
         campaign()
     elif sys.argv[1:] == ["volcanoes"]:
         volcanoes()
+    elif sys.argv[1:] == ["preflight"]:
+        preflight()
     else:
         raise SystemExit("runs | campaign")
