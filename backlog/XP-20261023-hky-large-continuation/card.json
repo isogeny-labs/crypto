@@ -4,7 +4,7 @@
   ],
   "blocked_on": [
     "hw:64 GB ephemeral host",
-    "note:No cloud launcher credentials or lab identity are configured",
+    "note:AWS CI identity authenticates, but an explicit IAM deny blocks ssm:GetParameter for /ephemeral/config; no authorized launcher or lab identity is available",
     "branch:codex/ic-algebraic-crossover-20261023 source and frozen inputs must land"
   ],
   "cairn": {
@@ -268,6 +268,6 @@
     "stop": "all"
   },
   "status": "blocked",
-  "status_note": "Prepared, unleased and unlaunched. Owner authorized USD 100 total additional cloud compute on 2026-10-25; launcher access is not configured.",
+  "status_note": "Prepared, unleased and unlaunched. USD 100 total additional cloud compute authorized 2026-10-25. Read-only CI probe 40157931986 authenticated but hit an explicit IAM deny on the required launcher configuration; implementation and source gates remain as listed.",
   "title": "Complete HKY N=58 and N=60"
 }

@@ -285,3 +285,26 @@ resources, not a per-job allowance. No paid job has been launched. Launcher
 credentials and an allocation still need to be verified. Prioritize the
 next discriminating cells within that ceiling; keep any unfunded inventory
 open and never describe prepared cards as queued.
+
+## Complete-pipeline pricing disclosure, 2026-10-25
+
+The initial pipeline spec's assumption that raw S would leave solver words
+unpriced was incorrect for this framework version: the native table uses a
+legacy wall-priced solver component. Preserve the raw sessions and this
+deviation. Do not interpret raw S or the `lower_bound` flag as a complete
+counted cost. Canonical native-work bands reconstruct the recorded parts,
+but construction and splitting remain incomplete. No whole-pipeline win,
+rho crossover or ledger promotion is licensed by these smoke records.
+The n=7 cell exhausted, n=17 was refused by the K_0 constructor, and n=13
+completed with exact replays. The n=23 cell was still running at this
+disclosure. Missing cells and references remain missing.
+
+## Amendment 5: finite diagnosis of the failed n=7 smoke (2026-10-25)
+
+After the frozen n=7 panel exhausted every arm, independently enumerate its
+four seeded factor-base points and every ordered three-point sum including
+repetitions, and test prime-subgroup membership. Enumerate all 29 subgroup
+elements, their strong-rho canonical forms and the literal source-pinned
+four-bit distinguished-point predicate. This is a post-outcome diagnosis,
+not a new timing comparison, parameter selection or replacement of the
+failed panel. Preserve its complete JSON, exact source hashes and report.

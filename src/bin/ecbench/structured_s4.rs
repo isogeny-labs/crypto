@@ -1,6 +1,7 @@
 //! Product-space S4 relaxation in the native IC pipeline. Every returned
-//! relation is lifted and verified by the counted group. Solver words are
-//! unpriced; symbolic construction and splitting prevent a full-cost claim.
+//! relation is lifted and verified by the counted group. Native solver words
+//! are retained for the common band; raw S has a legacy wall-priced solver
+//! term. Incomplete construction/split accounting prevents a full-cost claim.
 use crypto_lib::cryptanalysis::ic_boundary::{
     binary_subspace_factor_base, lift_abscissae, BinaryGroup, BinaryInstance, FactorBase, GroupOps,
     OracleCounters,

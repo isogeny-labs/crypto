@@ -1,0 +1,55 @@
+\documentclass[10pt]{article}
+\usepackage[margin=18mm]{geometry}
+\usepackage{graphicx,booktabs,hyperref}
+\usepackage[strings]{underscore}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\begin{document}
+\section*{Complete-DLP smoke: K0 over GF($2^{23}$)}
+Report date 2026-10-25; session \texttt{ECBS1h6022e731d781}.
+Nine answers verify and reproduce; one direct run timed out. Its missing cost is not zero. The direct arm is excluded from the complete-arm mean plot.
+
+Exact curve: \path{ICV1:f2m-23-c07a6b8c:5197:8383412:0x1:-7:unk:r:69e76b739aa7}. Prime subgroup r=2095853,
+cofactor 4, generator (0x727a76,0x5e8aa9).
+Two public known-answer one-target workloads, target seed 202610230101;
+one round, no warmup, alternate order, per-child timeout 900 seconds.
+Shared x86-64 host earns L0; elapsed times are diagnostic.
+
+Arms: strong signed-Frobenius rho and its identical repeat; direct S4;
+symmetric product-space S4 with degree-two closure; generic three-summand
+MITM with negation folding. Every IC arm uses the same geometric factor
+base, seed 17. Frozen complete parameters are in the session spec/plan.
+The direct hybrid extraction has an input-degree floor, up to six.
+
+\begin{center}\includegraphics[width=.98\linewidth]{native-band.pdf}\end{center}
+
+\begin{center}\begin{tabular}{lrl}\toprule
+Arm & verified/planned & recorded S at weights 0 / 0.1 / 1\\\midrule
+ic-direct & 1/2 & incomplete; not compared \\
+ic-pair-table & 2/2 & 844.2 / 928.5 / 1687 \\
+ic-symmetric & 2/2 & 38.54 / 4.548e+05 / 4.548e+06 \\
+rho-strong & 2/2 & 1.149 / 1.227 / 1.927 \\
+rho-strong-aa & 2/2 & 1.149 / 1.227 / 1.927 \\
+\bottomrule\end{tabular}\end{center}
+
+The graph quotes native ecbench band output, which re-prices recorded
+group and native counters. It omits incompletely counted construction and
+cubic splitting, and is not a complete-price comparison. No population
+interval is claimed from two targets. The displayed raw S in the original
+session includes a legacy wall-priced solver term; it is not admitted as
+a counted L0 measurement. The raw lower-bound flag does not mark these
+omissions. Automated pair ranks do not repair missing costs or censored runs.
+
+Source pushed through a5ff7036; the sealed records pin the actual binary.
+The independent native audit reports 10 records,
+9 verified, and 9 reproduced
+replays, zero audit problems. Same-host replay checks correctness and
+deterministic counts, not independent-host physical performance.
+
+Raw sealed directory: \path{../../pipeline-runs/structured-n23-20261025-01/}.
+Native replay: \path{../../pipeline-receipts/structured-n23-20261025-01.json};
+native band: \path{../../pipeline-receipts/structured-n23-band.json}.
+Plugin source: src/bin/ecbench/structured_s4.rs and structured_s4_math.rs.
+All original failures remain recorded. No full IC gain or rho crossover
+is promoted to the leaderboard or benchmark results table.
+
+\end{document}

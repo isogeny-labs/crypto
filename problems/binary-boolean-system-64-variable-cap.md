@@ -6,7 +6,7 @@
   (the `m = 4` algebraic arms at n ≥ 23); any Gröbner/SAT decomposition of a
   binary summation-polynomial system with more than 64 Weil-descended unknowns
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-15
+- **Last updated:** 2026-10-25
 
 ## Problem
 
@@ -26,6 +26,13 @@ The study wanted an `m = 4` slope over n = 13…31. It got four cells
 (n = 11–19) instead of seven.
 
 ## Evidence and uncertainty
+
+- **2026-10-25 follow-up:** the campaign-local
+  [`ic_algebraic_followup/wide.rs`](../examples/ic_algebraic_followup/wide.rs)
+  builds S3 chains with u128 monomials, with m=3--6 old-path agreement and
+  bounded sparse-closure controls. This does not replace the public F4/SAT
+  interfaces or meet the original complete-query exit criteria. The broader
+  [cost/scaling gap](ic-low-degree-complete-cost-and-scaling.md) remains open.
 
 - **Observed:** `ic_algebraic_floor solve --m 4 --arm f4-chain --cell
   1:23:6` returns `unsupported` immediately. The same holds for `f6-ic`, and

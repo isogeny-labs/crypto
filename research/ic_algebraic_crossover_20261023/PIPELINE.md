@@ -22,7 +22,7 @@ on GroupOps; missing parameters are rejected.
 
 **Accounting scope.** Lifts are charged group additions. Fixed closure,
 readback and hybrid word operations are counted in the existing inherited-
-F4 unit, unpriced in S. Input term counts, algebraic roots, split tests,
+F4 unit. Input term counts, algebraic roots, split tests,
 non-splitting roots, refutations and exhausted queries are retained. All
 full-pipeline phases remain present. Symbolic-construction and split field
 arithmetic are not completely counted in native units, so these sessions
@@ -31,3 +31,12 @@ cannot support a full-price win. Elapsed phases at L0 remain diagnostic.
 The common band at 0, 0.1 and 1 GAE is a sensitivity scenario for recorded
 native work, not a calibration of the unmeasured construction and splitting.
 Neither a low S nor a solver-stage word reduction discharges those costs.
+
+**Framework pricing disclosure (2026-10-25).** The initial complete-DLP
+records showed that the legacy raw `S` includes a wall-priced solver term
+when `SolverCost.wall_ns` is present. Its `lower_bound` flag does not identify
+the construction and splitting omissions above. Raw `S` is an incomplete
+estimate and is not admitted as a counted comparison at L0. Use `ecbench
+band`, which reconstructs the recorded group/native-work scenarios, and
+keep their remaining omissions explicit. The registered v1 adapter and
+sealed sessions are retained unchanged for replay.
