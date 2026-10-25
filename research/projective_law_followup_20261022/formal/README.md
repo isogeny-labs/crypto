@@ -50,15 +50,17 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   congruences. Separate theorems derive the strict degree bound from a
   sextic upper bound with zero sixth coefficient, matching quintic heads,
   and nonzero quadratic supports; the bound then
-  forces the cleared residual difference to vanish. The source polynomial
-  head and runtime interpolation links remain open. Four generic polynomial
+  forces the cleared residual difference to vanish. The runtime interpolation
+  link remains open. Four generic polynomial
   theorems now expand `N²-u₁u₂U` and read its degree-six, five, and four
   coefficients. Four source-style theorems substitute the proof-side
   coefficient formulas and recover `0,B²,0`; they also equate the canonical
   cubic with its interpolation form and prove its second-support
   factorization. The proof-side residual is at most
   sextic, and its difference from a monic quintic with zero fourth
-  coefficient has degree below the support product. Runtime semantic correspondence remains
+  coefficient has degree below the support product. A further theorem
+  combines these source-style ingredients into the cleared curve equation
+  under valid-input assumptions. Runtime semantic correspondence remains
   open. The [CSV](common22-uniqueness.csv),
   [JSON](common22-uniqueness.json), [graph](common22-uniqueness.svg), and
   [PDF](COMMON22_UNIQUENESS.pdf) distinguish the kernel-checked implication

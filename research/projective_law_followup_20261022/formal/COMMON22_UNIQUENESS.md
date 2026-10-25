@@ -20,11 +20,14 @@ second-support factorization is also proved for the same canonical cubic.
 The source-style residual is also proved at most sextic, and its cleared
 difference from a monic quintic with zero fourth coefficient has degree
 strictly below the two-support product.
+The source-style theorem combines valid input congruences, nonzero `B`, the
+source numerator and support formulas, and those head bounds to prove the
+cleared curve equation directly. It is conditional on those inputs.
 The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log),
 [degree](common22-degree-build.log),
 [polynomial-head](common22-polynomial-head-build.log),
 [source-head](common22-source-head-build.log), and
-[uniqueness](common22-uniqueness-build.log) kernel logs record all twenty-seven
+[uniqueness](common22-uniqueness-build.log) kernel logs record all twenty-eight
 theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list

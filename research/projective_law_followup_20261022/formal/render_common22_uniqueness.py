@@ -16,6 +16,7 @@ ROWS = [
     ("source_head", "implication", "kernel_checked_conditional", "proof-side source-style residual has head coefficients zero B squared zero"),
     ("degree_bound", "implication", "kernel_checked_conditional", "matching quintic heads imply difference degree below support product"),
     ("crt_uniqueness", "implication", "kernel_checked_conditional", "the four premises imply residual equals scale times curve"),
+    ("source_curve_equation", "implication", "kernel_checked_conditional", "source-style support and ordinate formulas plus valid inputs imply the cleared curve equation"),
     ("divisor_class", "conclusion", "open_geometry", "residual curve equation yields the intended Pic0 class"),
 ]
 
@@ -47,6 +48,7 @@ packet = {
         "Common22SourceHead.canonical_n_interpolates_second",
         "Common22SourceHead.sourceE_natDegree_le_six",
         "Common22SourceHead.sourceE_strict_degree",
+        "Common22SourceHead.source_curve_eq",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ],
@@ -55,7 +57,7 @@ packet = {
         {"obligation": name, "kind": kind, "status": status, "statement": statement}
         for name, kind, status, statement in ROWS
     ],
-    "scope": "conditional coprimeness, residues, proof-side source-style polynomial head and strict degree, and curve equation over a field; runtime semantic correspondence and geometry remain open",
+    "scope": "conditional coprimeness, residues, proof-side source-style polynomial head, strict degree, and source-style curve equation over a field; runtime semantic correspondence and geometry remain open",
     "cost_ratio_change": None,
 }
 (ROOT / "common22-uniqueness.json").write_text(json.dumps(packet, indent=2) + "\n")
@@ -65,7 +67,7 @@ with (ROOT / "common22-uniqueness.csv").open("w", newline="") as handle:
     writer.writerows(packet["rows"])
 
 svg = [
-    '<svg xmlns="http://www.w3.org/2000/svg" width="900" height="550" viewBox="0 0 900 550">',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="900" height="610" viewBox="0 0 900 610">',
     '<rect width="900" height="550" fill="white"/>',
     '<style>text{font-family:DejaVu Sans,Arial,sans-serif;fill:#243447}.title{font-size:23px;font-weight:bold}.label{font-size:15px}.note{font-size:13px;fill:#475569}</style>',
     '<text x="28" y="38" class="title">Common 2+2 curve-equation proof boundary</text>',
@@ -80,7 +82,7 @@ for index, (name, _, status, _) in enumerate(ROWS):
         f'<text x="590" y="{y + 16}" class="note">{status.replace("_", " ")}</text>',
     ])
 svg.extend([
-    '<text x="28" y="532" class="note">This diagram counts obligations; it does not measure proof effort or cost.</text>',
+    '<text x="28" y="590" class="note">This diagram counts obligations; it does not measure proof effort or cost.</text>',
     '</svg>',
 ])
 (ROOT / "common22-uniqueness.svg").write_text("\n".join(svg) + "\n")
@@ -107,11 +109,14 @@ second-support factorization is also proved for the same canonical cubic.
 The source-style residual is also proved at most sextic, and its cleared
 difference from a monic quintic with zero fourth coefficient has degree
 strictly below the two-support product.
+The source-style theorem combines valid input congruences, nonzero `B`, the
+source numerator and support formulas, and those head bounds to prove the
+cleared curve equation directly. It is conditional on those inputs.
 The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log),
 [degree](common22-degree-build.log),
 [polynomial-head](common22-polynomial-head-build.log),
 [source-head](common22-source-head-build.log), and
-[uniqueness](common22-uniqueness-build.log) kernel logs record all twenty-seven
+[uniqueness](common22-uniqueness-build.log) kernel logs record all twenty-eight
 theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list
@@ -148,7 +153,10 @@ those coefficients are $0,B^2,0$ and equate the cubic's canonical and
 interpolation forms; an additional theorem proves its second-support
 factorization. Two further theorems prove the proof-side residual is
 at most sextic and obtain the strict degree bound for a monic quintic with
-zero fourth coefficient. Rust execution is not translated into Lean here.
+zero fourth coefficient. A source-style theorem combines the checked
+interpolation, coprimeness, residues, and degree bound into the cleared
+curve equation under valid-input assumptions. Rust execution is not
+translated into Lean here.
 
 \begin{center}
 \begin{tabular}{ll}
@@ -162,6 +170,7 @@ Generic polynomial head & Kernel checked, conditional\\
 Proof-side source-style head & Kernel checked, conditional\\
 Degree-bound implication & Kernel checked, conditional\\
 Coprime low-degree implication & Kernel checked, conditional\\
+Source-style curve equation & Kernel checked, conditional\\
 Divisor-class conclusion & Open geometry\\
 \bottomrule
 \end{tabular}

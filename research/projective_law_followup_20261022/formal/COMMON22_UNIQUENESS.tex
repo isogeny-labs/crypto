@@ -19,7 +19,10 @@ those coefficients are $0,B^2,0$ and equate the cubic's canonical and
 interpolation forms; an additional theorem proves its second-support
 factorization. Two further theorems prove the proof-side residual is
 at most sextic and obtain the strict degree bound for a monic quintic with
-zero fourth coefficient. Rust execution is not translated into Lean here.
+zero fourth coefficient. A source-style theorem combines the checked
+interpolation, coprimeness, residues, and degree bound into the cleared
+curve equation under valid-input assumptions. Rust execution is not
+translated into Lean here.
 
 \begin{center}
 \begin{tabular}{ll}
@@ -33,6 +36,7 @@ Generic polynomial head & Kernel checked, conditional\\
 Proof-side source-style head & Kernel checked, conditional\\
 Degree-bound implication & Kernel checked, conditional\\
 Coprime low-degree implication & Kernel checked, conditional\\
+Source-style curve equation & Kernel checked, conditional\\
 Divisor-class conclusion & Open geometry\\
 \bottomrule
 \end{tabular}

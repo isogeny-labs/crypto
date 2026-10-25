@@ -26,6 +26,7 @@
     "Common22SourceHead.canonical_n_interpolates_second",
     "Common22SourceHead.sourceE_natDegree_le_six",
     "Common22SourceHead.sourceE_strict_degree",
+    "Common22SourceHead.source_curve_eq",
     "Common22Uniqueness.zero_of_coprime_supports",
     "Common22Uniqueness.residual_eq_curve"
   ],
@@ -84,12 +85,18 @@
       "statement": "the four premises imply residual equals scale times curve"
     },
     {
+      "obligation": "source_curve_equation",
+      "kind": "implication",
+      "status": "kernel_checked_conditional",
+      "statement": "source-style support and ordinate formulas plus valid inputs imply the cleared curve equation"
+    },
+    {
       "obligation": "divisor_class",
       "kind": "conclusion",
       "status": "open_geometry",
       "statement": "residual curve equation yields the intended Pic0 class"
     }
   ],
-  "scope": "conditional coprimeness, residues, proof-side source-style polynomial head and strict degree, and curve equation over a field; runtime semantic correspondence and geometry remain open",
+  "scope": "conditional coprimeness, residues, proof-side source-style polynomial head, strict degree, and source-style curve equation over a field; runtime semantic correspondence and geometry remain open",
   "cost_ratio_change": null
 }

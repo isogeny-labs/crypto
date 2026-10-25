@@ -510,7 +510,8 @@ def main() -> None:
     for theorem in ("sourceE_coeff_six", "sourceE_coeff_five",
                     "sourceE_coeff_four", "canonical_n_eq_interpolant",
                     "canonical_n_interpolates_second",
-                    "sourceE_natDegree_le_six", "sourceE_strict_degree"):
+                    "sourceE_natDegree_le_six", "sourceE_strict_degree",
+                    "source_curve_eq"):
         require(re.search(r"(?m)^theorem " + theorem + r"\b", source_head_source) is not None,
                 f"common source-head theorem missing: {theorem}")
         require(
@@ -562,15 +563,16 @@ def main() -> None:
         "Common22SourceHead.canonical_n_interpolates_second",
         "Common22SourceHead.sourceE_natDegree_le_six",
         "Common22SourceHead.sourceE_strict_degree",
+        "Common22SourceHead.source_curve_eq",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ], "common uniqueness theorem inventory mismatch")
-    require(len(uniqueness["rows"]) == 9, "common uniqueness obligation count mismatch")
+    require(len(uniqueness["rows"]) == 10, "common uniqueness obligation count mismatch")
     require([row["status"] for row in uniqueness["rows"]] ==
             ["kernel_checked_conditional", "open_source_link",
              "kernel_checked_conditional", "kernel_checked_conditional",
              "kernel_checked_conditional", "kernel_checked_conditional", "kernel_checked_conditional",
-             "kernel_checked_conditional", "open_geometry"],
+             "kernel_checked_conditional", "kernel_checked_conditional", "open_geometry"],
             "common uniqueness proof boundary mismatch")
     with (ROOT / "common22-uniqueness.csv").open(newline="") as handle:
         require(list(csv.DictReader(handle)) == uniqueness["rows"],

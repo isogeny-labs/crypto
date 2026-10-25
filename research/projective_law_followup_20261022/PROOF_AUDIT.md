@@ -259,8 +259,12 @@ coefficient formulas into the proof-side polynomial, obtaining `0,B²,0`,
 and identify the cubic with its interpolation expression. The source-style
 cubic also has an exact factorization modulo the second support. The residual
 has degree at most six; for any monic quintic with zero fourth
-coefficient, its cleared difference has degree below `u1*u2`. Rust-to-Lean
-semantic correspondence has not been proved for every runtime execution.
+coefficient, its cleared difference has degree below `u1*u2`.
+The source-style theorem now combines nonzero `B`, valid Mumford input
+congruences, interpolation, coprimeness, and the degree bound to prove
+`E=B²F` for that proof-side polynomial. This does not establish that every
+Rust execution satisfies the theorem's premises. Rust-to-Lean semantic
+correspondence has not been proved for every runtime execution.
 The divisor-class step remains written mathematics.
 
 The checker also verifies the cleared identity
