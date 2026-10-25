@@ -45,3 +45,10 @@ isogeny-labs/crypto#2380; the connector old path still returns 404.
 DELIVERY.json records the actual pushed head and current-head CI separately.
 The existing twelve oversized historical blobs
 remain a separate full-PR merge hold. Neither is a scientific impossibility.
+
+The evidence/index commit is now pushed and the PR title/body updated through
+the canonical connector. The evidence head has a queued review and conflicts
+with main; there is no all-green CI claim. Connector combined-status and
+pull-request-workflow responses were empty, so the CLI check-run rollup was
+read as well. The first CLI query used an unsupported `baseRefOid` field;
+its empty stdout is retained, and the corrected query has an actual exit 0.

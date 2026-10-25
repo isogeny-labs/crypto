@@ -1,6 +1,6 @@
 # Twist experiment delivery: GitHub repository access
 
-- **Status:** CLI access restored; delivery verification pending
+- **Status:** resolved for canonical repository access and evidence delivery
 - **Kind:** access/tool limit; local computation is available
 - **Affected work:** [PR #2380](https://github.com/aburan28/crypto/pull/2380)
 - **Last updated:** 2026-10-25
@@ -46,3 +46,11 @@ credential failure cause is unknown; the CLI now provides the required route.
 The fetch log and subsequent actual push/head/CI state are recorded in
 [the E26 checks](../research/twist_routes_1_3_20261021/execution-v2/block-checks-20261025/).
 Do not infer that the scientific or historical file-size holds are resolved.
+
+Evidence/index commit `02e233a645e090f374aad0c7260ee7a91e46c4cb` was pushed
+without force to the existing branch. The canonical connector confirms that
+exact PR head, and the PR title/body update succeeds with draft=false.
+The [delivery receipt](../research/twist_routes_1_3_20261021/execution-v2/block-checks-20261025/DELIVERY.json)
+records the push and exact-head CI observation: review queued, conflicts with
+main, no all-green conclusion. Access and delivery are resolved; CI/review,
+merge conflicts, the historical size-policy hold and scientific gaps remain.
