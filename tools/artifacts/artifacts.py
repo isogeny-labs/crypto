@@ -620,9 +620,10 @@ def cmd_status(cfg: Config, args) -> int:
 
 def cmd_check(cfg: Config, args) -> int:
     """Fail when BASE..HEAD adds or grows a tracked file the policy assigns to the store."""
-    # Partial clones cannot lazy-fetch a missing blob by an abbreviated object
-    # name. Keep the full object ID from the raw diff for the size check below.
-    out = git(cfg.root, "diff", "--raw", "--abbrev=40", "-z", "--no-renames", "--diff-filter=AM", args.base, args.head)
+    # Full object ids: --full-index only widens the patch "index" line, not
+    # --raw. A blobless checkout can fetch a full id on demand, but the default
+    # 7-character raw id is not a valid object name when that blob is absent.
+    out = git(cfg.root, "diff", "--raw", "--no-abbrev", "-z", "--no-renames", "--diff-filter=AM", args.base, args.head)
     fields = out.decode(errors="surrogateescape").split("\0")
     offenders = []
     for meta, path in zip(fields[0::2], fields[1::2]):
