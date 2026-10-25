@@ -21,5 +21,7 @@ To replay from this directory, build `Common22ExplicitChart.olean`,
 `Common22PrincipalOpenEquation.olean`, `Common22SeparateChartMap.olean`,
 `Common22PrincipalOpenSpec.olean`, and `Common22TwoChartGlue.olean` from the
 pinned source files in that dependency order, then run
-`LEAN_PATH=/dev/shm lake env lean Common22GlueCast.lean`. The packet's build
+`lake env sh -c 'LEAN_PATH="/dev/shm:$LEAN_PATH" lean Common22GlueCast.lean'`.
+Lake supplies the pinned dependency paths and the inner shell adds the local
+checked modules. The packet's build
 log records the exact completed check, including `#print axioms`.
