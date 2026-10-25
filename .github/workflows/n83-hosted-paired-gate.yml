@@ -10,6 +10,7 @@ on:
         options:
           - five_sum
           - six_sum_access
+          - six_sum_split
         default: five_sum
 
 permissions:
@@ -105,7 +106,7 @@ jobs:
           retention-days: 90
 
   six-summand-access:
-    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-aws-resume-20261024' && inputs.experiment == 'six_sum_access'
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-aws-resume-20261024' && (inputs.experiment == 'six_sum_access' || inputs.experiment == 'six_sum_split')
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 150
     env:
@@ -113,6 +114,7 @@ jobs:
       RAYON_NUM_THREADS: '1'
       OMP_NUM_THREADS: '1'
       IMAGE_REF: rust:1.98.1-bookworm@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e
+      PROTOCOL_REL: ${{ inputs.experiment == 'six_sum_split' && 'research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-split-panel-20261025' || 'research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-sixsum-access-20261025' }}
     steps:
       - name: Check out pinned mathematical source
         uses: actions/checkout@v4
@@ -197,12 +199,12 @@ jobs:
             --started-unix-seconds "$started" \
             > "$RUNNER_TEMP/n83-sixsum-setup/regeneration.stdout" \
             2> "$RUNNER_TEMP/n83-sixsum-setup/regeneration.stderr"
-      - name: Run separately cold bounded 4+2 Gray and hash arms
+      - name: Run separately cold bounded six-summand Gray and hash arms
         env:
           PYTHONPATH: ${{ runner.temp }}/n83-pydeps
         run: |
           set -euo pipefail
-          python3 "$GITHUB_WORKSPACE/protocol/research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-sixsum-access-20261025/run.py" \
+          python3 "$GITHUB_WORKSPACE/protocol/$PROTOCOL_REL/run.py" \
             --source "$GITHUB_WORKSPACE/source" \
             --archives "$ARCHIVE_DIR" --output "$OUT_DIR" --scratch "$SCRATCH_DIR" \
             --preparation-receipt "$RUNNER_TEMP/n83-sixsum-setup/regeneration.json" \
