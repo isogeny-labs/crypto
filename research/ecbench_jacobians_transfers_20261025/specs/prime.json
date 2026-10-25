@@ -1,0 +1,10 @@
+{"schema": "ecbench.spec/v1", "label": "isogeny and plane-quartic cover transfers on a prime curve",
+ "workloads": {"curves": [{"kind": "prime_search", "bits": 16, "seed": 3}],
+               "targets_per_curve": 4, "target_seed": 20261025},
+ "arms": [
+  {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+  {"name": "rho-plain", "role": "candidate", "method": {"id": "rho.plain"}},
+  {"name": "iso3-rho-neg", "role": "candidate", "method": {"id": "transfer.isogeny", "params": {"ell": "3"}}},
+  {"name": "qcover-rho-plain", "role": "candidate", "method": {"id": "transfer.quartic_cover"}},
+  {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}}],
+ "measurement": {"rounds": 3, "warmup": 1, "seed": 20261025, "isolation_required": "L0", "timeout_seconds": 600}}
