@@ -18,8 +18,13 @@ manifests replace Git data under the current policy.
 - Three structural panels retain their 304 completed pairs: symmetric
   words are lower in 263 degree-two pairs and zero degree-three/four pairs.
   Construction, splitting and physical prices remain incomplete.
-- Original UNSAT draw 5 and SAT draw 4 do not lift on the recorded E0
-  curve. Draw 0 lifts; subgroup membership remains unknown.
+- Original UNSAT draw 5 and SAT draw 4 do not lift on this campaign's E0
+  reference curve. Draw 0 lifts. Across all 1,152 fresh targets, SAT draws
+  split into 154 liftable and 176 nonliftable; UNSAT into 434 and 388.
+  All roots and independent trace criteria agree. These x-only fixtures
+  do not specify the full curve coefficient a; E0 nonliftability does not
+  imply invalidity on every b=1 curve or twist. Subgroup membership remains
+  unknown.
 - All 44 Singular std/slimgb runs agree with complete native Boolean zero
   sets on 22 frozen systems. This is correctness, not fastest-tool timing.
 - Quartic m=6/8/10/12 smoke: 24 verified records, 24 identical independent

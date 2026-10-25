@@ -59,11 +59,21 @@ they are retained and excluded from the successful process counts.
 
 A [separate curve-membership audit](reports/run-fixture-group-audit-20261025/report.pdf)
 checks every y root by substitution and an independent trace criterion.
-Original UNSAT draw 5 and SAT draw 4 are not liftable on the recorded E0
-curve; draw 0 is liftable. These remain valid Boolean fixtures, but not all
-are ordinary curve queries. Target and base subgroup membership remain
+Original UNSAT draw 5 and SAT draw 4 are not liftable on this campaign's E0
+reference curve; draw 0 is liftable. These x-only fixtures do not specify
+the full curve coefficient a. S3 at b=1 is independent of a, so nonliftability
+on E0 does not imply invalidity on every such curve or twist. Target and base subgroup membership remain
 unknown. The [native receipt](pipeline-receipts/fixture-group-audit-20261025/receipt.json)
 retains both positive and negative outcomes.
+
+The [fresh-target audit](reports/run-fresh-target-relevance-20261025/report.pdf)
+extends this reference-model check to all 1,152 frozen targets. SAT draws
+split into 154 E0-liftable and 176 nonliftable; UNSAT draws into 434 and 388.
+Every y-root satisfies the curve equation and an independent trace criterion
+agrees for every target; a native rerun is byte-identical. These remain
+uniform field-x Boolean fixtures, not established ordinary subgroup queries.
+Their exact inputs, all outcomes and unknown subgroup membership are retained
+in the [native receipt](pipeline-receipts/fresh-target-relevance-20261025/receipt.json).
 
 The [200,000-column continuation](GUESS_CAP200K_PROTOCOL.md) is running
 locally after completion of the quartic/HKY queue. Its first probe observes
@@ -186,7 +196,7 @@ preserves all generated scripts, package hashes, outputs and statuses.
 | A2: native structured bases and symmetric formulation | verified, finite pilot | Rust implementations, all four families, identity/splitting/repeated-root controls; limits in PIPELINE.md |
 | A3: combine formulations and closure | verified, finite stage panel | three matched panels above; no whole-query performance conclusion |
 | B1: ell=8 minimum guesses | partial | draw 6 refutes with zero guesses at cap 200k; all eight balanced k=3 draw-0 branches fail; remaining branches, alternative sets and independent pilot replay remain |
-| B2: ell=9 and four summands | implemented, unverified | 1,152 fresh fixtures across nine cells/four families, frozen selection and remote shards; no larger-guess result yet |
+| B2: ell=9 and four summands | implemented, unverified | 1,152 fresh fixtures and reference-curve target audit; frozen selection and remote shards; no larger-guess or ordinary-subgroup-query result yet |
 | B3: N=58/60/100 continuation | partial | degree-two/three nonrefuting fixed points on three fixtures; all degree-four results resource-capped; independent large fixed-point certificates remain |
 | C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified and identically replayed records; m=14/15 full panels outstanding |
 | C2: m=14--18 ladder | blocked in part | supported rungs outstanding; m=16--18 need wider arithmetic |
