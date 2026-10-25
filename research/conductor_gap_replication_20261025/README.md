@@ -49,3 +49,12 @@ The branch is stacked on PR #2430. No evidence is promoted to a hardness,
 scaling, fastest-method or deployed-curve-security claim. The CM collector's
 cofactor-one restriction is retained; it is not run on the deep-volcano
 panel. A prime-field algebraic F4/SAT collector remains unimplemented.
+
+CI follow-up, 2026-10-25: the delivered head `b9d5caad` passed the
+[archive replay and independent-check workflow](https://github.com/aburan28/crypto/actions/runs/40179357412).
+The [CI receipt](validation/ci-20261025-b9d5caad.json) pins the retained,
+hash-matched artifact: all 43,648 archived records replay exactly, with
+43,520 independent main-scalar checks and 114 headline comparisons.
+[CI follow-up notes](checks/CI_FOLLOWUP-20261025.md) distinguish this
+completed verification from the remaining PR-wide CI gates. Scientific
+scope and the open CM accounting/algebraic-oracle obligations are unchanged.

@@ -288,6 +288,7 @@ const oldFront = between(page, START, END);
 const historical = section(oldFront, 'lab-best');
 const progressRaw = readFileSync(resolve(ROOT,'docs/ic/progress-timeline.json'));
 const retainedPanels = [
+  ['conductor-gap-replication-20261025','Conductor-gap replication: eight classes and CM controls · 25 October 2026'],
   ['conductor-gap-native-20261015','Conductor-gap native controls: paired solves and generic recurrence · 15 October 2026'],
   ['cold-compact-orbit-20261003','Historical compact-orbit cold-cost panel'],
   ['full-rank-compact-orbit-20261003','Historical compact-orbit full-rank panel'],

@@ -1,6 +1,11 @@
 // Render native results into the existing dashboard; never computes a result.
 import {readFileSync,writeFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+function renderDashboard(){
+  const rendered=spawnSync(process.execPath,['tools/render_ic_dashboard.mjs'],{stdio:'inherit'});
+  assert.equal(rendered.status,0,'canonical dashboard rendering failed');
+}
 const root='research/conductor_gap_replication_20261025';
 const a=JSON.parse(readFileSync(root+'/analysis/panel-A.json','utf8'));
 const timelinePath='docs/ic/progress-timeline.json';
@@ -22,6 +27,7 @@ if(process.argv[2]==='--repair-timeline'){
   assert(pattern.test(page));
   writeFileSync(scorePath,page.replace(pattern,'<script type="application/json" id="progress-data">\n'+exact+'</script>'));
   console.log('Restored all prior timeline content and exact numeric tokens; retained the new non-numeric result.');
+  renderDashboard();
   process.exit(0);
 }
 const anchor='#conductor-gap-replication-20261025';
@@ -57,3 +63,4 @@ const old='<p id="conductor-gap-unplotted">';
 assert(page.includes(old));
 page=page.replace(old,'<p id="conductor-gap-replication-unplotted">25 October: the <a href="#conductor-gap-replication-20261025">eight-class conductor-gap replication</a> has no admitted complete-cost IC/rho point. Its bounded result is retained in the non-numeric ledger.</p>\n'+old);
 writeFileSync(path,page);
+renderDashboard();
