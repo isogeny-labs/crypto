@@ -1,5 +1,10 @@
 # Infinity-chart derivative and conditional local parameter
 
+Later work in the [explicit-chart packet](EXPLICIT_CHART.md) constructs the
+affine quotient and origin localization, discharging the supplied
+coordinate-ideal and unit hypotheses for that particular local ring. The
+projective infinity stalk and DVR identification remain open.
+
 Status: the pinned Lean packet checks the chart's transverse derivative and
 a conditional local-ring implication. It does not construct the smooth
 projective completion or its infinity stalk.
