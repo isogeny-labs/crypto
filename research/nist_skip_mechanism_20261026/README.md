@@ -9,7 +9,7 @@ claim about the historical skip rule, and no bearing on ECDLP hardness. The atla
 from the 11 skipped valid seed candidates. Do those rules hold out of sample? Is there a
 mechanism with independent predictions?
 
-**Protocol.** [`PROTOCOL.md`](PROTOCOL.md). The holdout prediction was frozen before any
+**Protocol.** [`PROTOCOL.md`](PROTOCOL.md). Amendments 1–2 (the B1 calibration and the added controls) were filed after the data they affect and say so. Machine-readable record: [`protocol.json`](protocol.json) (`experiment.protocol/v1`, written after the data, left as a **draft**; see "Protocol and export records" below). The holdout prediction was frozen before any
 rule value was computed on the holdout curves. Addendum B was frozen and pushed in
 `6a14c3d` before any native computation. Inputs: `inputs/historical.tsv` (sha256
 `f425dc7c…`, source commit in `inputs/historical.SOURCE`) and `inputs/binary.tsv`
@@ -40,8 +40,10 @@ Frobenius mod `l` as a uniform matrix in `GL₂(F_l)` with determinant `q`, inde
 | A/H2: skipped curves have a larger L_E | P(≥ obs) small | **P(≥ obs) = 0.9998**; reverse tail P(≤ obs) = 0.00112 | falsified in the predicted direction |
 | A/H4: published curves have `t > 0` | P small | P = 0.50 | null |
 | B0: native port of A | GP matches Python | exact match on every value | passed |
-| B1: NSA binary curves, mean L_E percentile > 50 | P small | mean 35.9, Irwin–Hall P = 0.83 | null |
+| B1: NSA binary curves, mean L_E percentile > 50 | P small | mean 35.9, Monte Carlo P = 0.83 (20,000 replicates) | null |
 | B2: an Elkies-failure covering set S, `l ≤ 100` | S covers all 11 skipped curves | S_max = ∅; 0 of 4,480 assignments admit a cover | falsified; **the test had no power** |
+| PC1 positive control (Amendment 2): planted smallest-L_E labels | the smallest attainable P | P = 0.00022 = smallest attainable | detected |
+| PC2 power of B1 (Amendment 2): binary curves at the prime-published mean of 74.6 | small P | P = 0.045 | marginal power: 4 curves |
 
 Post hoc (Python, then reproduced in GP): mean Gekeler-null percentile of L_E is 74.6 for
 published curves (n = 10) and 39.9 for skipped curves (n = 11). Split at `l < 200`: the
@@ -70,6 +72,28 @@ other Elkies primes gives P(≥ obs) = 0.032 for the published direction.
 - **No new labels exist publicly.** SEC 2 and the X9.62 binary seeds are Certicom's. The
   NSA binary runs have no skips. B-163's seed is unexplained. A confirmatory test needs the
   generator's code or logs, or genuinely new labelled candidates.
+
+## Protocol and export records
+
+`protocol.json` transcribes PROTOCOL.md into `experiment.protocol/v1`. It was written after all
+the data, so it is kept as a draft and carries no amendments of its own. The amendment history and
+the freeze evidence are in its `links` block. Tool outcomes (crypto-autoresearcher
+`tools/experiment_protocol.py` at `fd387705`):
+
+- `validate protocol.json`: `OK (0 finding(s))` as a draft. With the two amendments recorded as
+  `amendments` entries, it reports "amendment A1/A2 was filed after the data it affects: report both
+  versions, and the amended cells decide nothing", which is correct.
+- `freeze`: refused ("frozen protocol: analysis_plan.frozen_before_data is false"). Freezing would
+  assert a pre-data analysis plan that did not exist for B1's final statistic or for the controls.
+- `from-rows out/rows.jsonl`: refused ("the protocol is not frozen; an export binds a frozen
+  protocol only"). So there is **no `export.json`**. The ten test rows (status, arm, statistic,
+  p-value; the unrun validation as `cancelled` / `not_run`) are in `out/rows.jsonl`. Flow:
+  planned 10, completed 9, not run 1 (C1, checkpoint gate).
+- What actually was frozen before data: addendum B in git commit `6a14c3d`. The holdout section
+  and addendum A were frozen only in a scratchpad file before computing, with no commit.
+
+Under the protocol rules, the in-sample predictions (H2, B2) are calibration only. The one decisive
+out-of-sample prediction is B1, whose statistic was amended after the data.
 
 ## Reproduce
 

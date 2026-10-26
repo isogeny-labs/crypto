@@ -76,19 +76,35 @@ pub = select(i -> C[i][2], [1..#C]);
   NNULL, vecsum(vector(#pub, k, pp[pub[k]]))/#pub, #pub, vecsum(vector(#TRUE, k, pp[TRUE[k]]))/#TRUE, #TRUE));}
 
 \\ ---------- B1: NSA binary curves ----------
-\\ exact Irwin-Hall upper tail: P(mean of k independent U(0,1) >= x)
-ihtail(k, x) = my(s = k*x); 1 - sum(j = 0, floor(s), (-1)^j*binomial(k, j)*(s - j)^k)/k!;
+\\ L_E is discrete, so midrank percentiles are not uniform under the null and Irwin-Hall does not
+\\ apply. The tail of the mean is calibrated by Monte Carlo instead: each replicate draws one
+\\ independent L_E per primary curve from its field's model and scores it against the same reference.
+{pctmap(V) = my(M = Map(), u = Set(V));
+  for (k = 1, #u, mapput(M, u[k], pct(V, u[k])));
+  M;}
+\\ midrank percentile of a value absent from the reference sample
+pctof(M, V, x) = if (mapisdefined(M, x), mapget(M, x), pct(V, x));
+NCAL = 20000;
 BIN = readtsv("inputs/binary.tsv");
 write("out/binary.tsv", "label\trole\tm\tt\tL_E\tnull_pct");
 OUT("B1 NSA binary curves (q = 2^m, #E = h*n)");
-bp = List();
+bp = List(); bref = List();
 {for (i = 1, #BIN, my(r = BIN[i], m = eval(r[2]), q = 2^m, N = eval(r[3])*eval(r[4]), t = q + 1 - N,
     L = LE(q, t^2 - 4*q), V = nullLE(q, NNULL), x = pct(V, L));
   write("out/binary.tsv", r[1], "\t", r[5], "\t", m, "\t", t, "\t", L, "\t", strprintf("%.1f", x));
   OUT(strprintf("  %s (%s): L_E = %d, null median %d, percentile %.1f", r[1], r[5], L, V[NNULL\2], x));
-  if (r[5] == "primary", listput(bp, x/100)));}
+  if (r[5] == "primary", listput(bp, x); listput(bref, [q, V, pctmap(V)])));}
 mb = vecsum(Vec(bp))/#bp;
-OUT(strprintf("  primary mean percentile %.1f; one-sided Irwin-Hall P(mean >= obs) = %.4f", 100*mb, ihtail(#bp, mb)));
+\\ calibration draws: column k holds NCAL independent model draws of L_E for primary curve k
+caldraws = vector(#bref, k, nullLE(bref[k][1], NCAL));
+\\ nullLE sorts its output; shuffle each column so that replicate s pairs independent draws
+{for (k = 1, #caldraws, my(v = caldraws[k]);
+  forstep (i = #v, 2, -1, my(j = random(i) + 1, tmp = v[i]); v[i] = v[j]; v[j] = tmp);
+  caldraws[k] = v);}
+calmean = vector(NCAL, s, sum(k = 1, #bref, pctof(bref[k][3], bref[k][2], caldraws[k][s]))/#bref);
+calge = sum(s = 1, NCAL, calmean[s] >= mb);
+{OUT(strprintf("  primary mean percentile %.1f; Monte Carlo P(mean >= obs) = %.4f (add-one, %d replicates; calibrated null mean %.1f)",
+  mb, (1 + calge)/(NCAL + 1.), NCAL, vecsum(calmean)/NCAL));}
 
 \\ ---------- B2: Elkies-failure covering rule ----------
 L100 = primes([3, 100]);
@@ -106,4 +122,22 @@ write("out/b2_cover.tsv", "label\trole\telkies_primes_in_Smax");
   select(l -> elk(i, l), cv[1])));}
 cal = sum(a = 1, #AS, covers(AS[a])[2] == 0);
 OUT(Str("  calibration: ", cal, " of ", #AS, " assignments admit a covering S (rate ", strprintf("%.4f", cal/#AS), ")"));
+
+\\ ---------- Amendment 2 controls (added after the data; no new inputs) ----------
+\\ PC1: plant labels that the L_E permutation test must find. In every stream the skipped
+\\ candidates are relabelled as the ones with the smallest L_E (ties broken by row order).
+{planted = concat(vector(#S, j, my(s = S[j], k = #select(i -> !C[i][2], s),
+    o = vecsort(vector(#s, a, [le[s[a]], s[a]]), 1)); vector(k, a, o[a][2])));}
+{permtest_set(val, skipset) = my(R = streamranks(val), obs = sum(k = 1, #skipset, R[skipset[k]]), le_ = 0);
+  for (a = 1, #AS, le_ += (sum(k = 1, #AS[a], R[AS[a][k]]) <= obs));
+  le_/#AS;}
+pmin = vecmin(vector(#AS, a, sum(k = 1, #AS[a], streamranks(le)[AS[a][k]])));
+R_le = streamranks(le);
+pminp = sum(a = 1, #AS, sum(k = 1, #AS[a], R_le[AS[a][k]]) <= pmin)/#AS;
+{OUT(strprintf("PC1 planted smallest-L_E labels: P(<=obs) = %.5f (smallest attainable %.5f); detected = %d",
+  permtest_set(le, planted), pminp, permtest_set(le, planted) <= 0.01));}
+\\ PC2: B1 power. P(calibrated mean >= 74.6), the published prime curves' mean percentile;
+\\ a detector with power gives a small value when the binary curves sit at that effect size.
+{OUT(strprintf("PC2 B1 power at the prime-published effect size (mean 74.6): Monte Carlo P = %.4f",
+  (1 + sum(s = 1, NCAL, calmean[s] >= 74.6))/(NCAL + 1.)));}
 quit;

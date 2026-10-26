@@ -76,3 +76,26 @@ B2 Elkies-failure mechanism (predicts the observed direction): the historical SE
    holds iff S_max covers all 11 skipped. Calibration: the fraction of the 4,480
    assignments (P-384 and P-521 fixed as published) for which the same construction
    covers. The rule falsifies if S_max fails to cover any skipped curve.
+
+## Amendment 1 (2026-10-26T16:20Z, after the B1 data; prompted by review)
+B1 named an exact Irwin-Hall tail for the mean percentile. L_E is discrete, so midrank
+percentiles are not uniform under the null and that tail is not exact. The B1 probability is
+recalibrated by Monte Carlo: 20,000 replicates, each drawing one independent L_E per primary
+curve from its field's model and scoring it against the same reference sample (add-one estimate).
+Irwin-Hall gave 0.8283; Monte Carlo gives 0.8313. The verdict (null) is unchanged.
+
+## Amendment 2 (2026-10-26T16:30Z, after the data; prompted by review)
+Controls added, computed on the same frozen inputs, with no new data.
+PC1 (positive control for the permutation test): in every stream, relabel as skipped the
+candidates with the smallest L_E. The test must reach the smallest attainable P(<=obs).
+Result: 0.00022 = the smallest attainable, so it was detected.
+PC2 (power of B1): Monte Carlo P that the calibrated mean reaches 74.6, the published prime curves'
+mean. Result: 0.0451. B1 had marginal power (4 curves) at that effect size.
+Machine-readable records added: protocol.json (frozen after the data,
+filed_before_affected_data = false) and export.json (experiment.export/v1, from out/rows.jsonl).
+
+## Correction to amendment 2 (2026-10-26T16:45Z)
+protocol.json is a validated draft, not frozen, and there is no export.json: the protocol tool
+refuses to freeze a record whose analysis plan was not frozen before the data, and refuses to
+export against an unfrozen protocol. The test rows are in out/rows.jsonl. See the README section
+"Protocol and export records".
