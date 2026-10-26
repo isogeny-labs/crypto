@@ -365,3 +365,15 @@ frozen `45ce91d5` cadence source. A reviewed exact-source delivery route
 must pass before the Linux build, independently of the still-unapplied
 two-sided original-D18 object read proposal. The temporary user IAM grant
 remains active pending completion or cancellation of the hosted attempt.
+
+The [follow-up no-source Rust Spot smoke](native-cadence-replay-20261026/linux-build-smoke-20261026/REPORT.md)
+executed `rustc` and AWS CLI, uploaded outputs with exit 0, and its EC2
+instance terminated, without trying private GitHub. A 58,011,243-byte
+[exact-source archive proposal](native-cadence-replay-20261026/linux-build-smoke-20261026/SOURCE_DELIVERY_PROPOSAL.md)
+is prepared with SHA-256 `dcc242fc0c4e6b4af99a854b885b0dece5d18ef69716a82cc5b5cc98d86044cd`.
+Fresh extraction resolves clean `45ce91d5`, the patched verifier blob and
+no Git remote; offline release example tests passed 20 worker and 5 verifier
+cases. The archive has not been uploaded. A proposed three-object temporary
+bucket/runner-role policy would cover this exact source key plus the two
+original D18 inputs and would supersede the unapplied two-object proposal
+only after explicit authorization. No Linux cryptographic arm has run.
