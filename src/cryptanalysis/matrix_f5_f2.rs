@@ -104,7 +104,7 @@ use crate::cryptanalysis::fx_hash::{FxMap, MaskMap, MaskSet};
 use crate::cryptanalysis::koblitz_groebner::{
     all_variable_mask, macaulay_columns, monomials_up_to_mask, occurring_vars,
 };
-use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{low_bits, F2BoolMono, F2BoolPoly, Mask};
 
 /// Degree of a Boolean polynomial (`0` for a constant or zero).
 fn poly_degree(p: &F2BoolPoly) -> u32 {
@@ -118,8 +118,12 @@ fn poly_degree(p: &F2BoolPoly) -> u32 {
 /// Product `p · s` as a set of monomial masks with even multiplicities
 /// cancelled — the same row construction as the F4 builder, kept here so
 /// the criterion's rows and the matrix's rows cannot disagree.
-fn product_monos(p: &F2BoolPoly, s: u64) -> Vec<u64> {
-    let mut all: Vec<u64> = p.terms.iter().map(|t| t.mask | s).collect();
+fn product_monos(p: &F2BoolPoly, s: Mask) -> Vec<Mask> {
+    // `bitop/v1`: an OR a term, the sort, the parity scan
+    crate::cryptanalysis::bitop_tally::word_ops(
+        2 * p.terms.len() as u64 + crate::cryptanalysis::bitop_tally::sort_cost(p.terms.len()),
+    );
+    let mut all: Vec<Mask> = p.terms.iter().map(|t| t.mask | s).collect();
     all.sort_unstable();
     let mut out = Vec::with_capacity(all.len());
     let mut i = 0;
@@ -146,13 +150,17 @@ fn product_monos(p: &F2BoolPoly, s: u64) -> Vec<u64> {
 /// which prefix each pivot first appeared in so that every prefix's
 /// leading-monomial set can be read off one structure.
 struct PrefixEchelon {
-    columns: Vec<u64>,
+    columns: Vec<Mask>,
     // Monomial masks need high-bit mixing, as in the F4 column layouts.
     index: MaskMap<usize>,
     words: usize,
     /// `pivot[c]` is the index into `rows` of the row leading at column `c`.
     pivot: Vec<Option<usize>>,
     rows: Vec<Vec<u64>>,
+    /// `leads[k]` is the leading column of `rows[k]`, kept from its
+    /// insertion (rows are never modified after it) so that a prefix's
+    /// leading monomials are read without rescanning every row.
+    leads: Vec<usize>,
     /// Prefix (generator index, 1-based) whose insertion created the pivot.
     created_at: Vec<usize>,
     word_ops: u64,
@@ -168,7 +176,10 @@ fn leading_column(row: &[u64]) -> Option<usize> {
 }
 
 impl PrefixEchelon {
-    fn new(columns: Vec<u64>) -> Self {
+    fn new(columns: Vec<Mask>) -> Self {
+        // `bitop/v1`: the hashed column index and the cleared pivot index
+        crate::cryptanalysis::bitop_tally::hash_probes(columns.len() as u64);
+        crate::cryptanalysis::bitop_tally::word_ops(columns.len() as u64);
         let index = columns.iter().enumerate().map(|(i, &m)| (m, i)).collect();
         let words = columns.len().div_ceil(64).max(1);
         Self {
@@ -177,6 +188,7 @@ impl PrefixEchelon {
             index,
             words,
             rows: Vec::new(),
+            leads: Vec::new(),
             created_at: Vec::new(),
             word_ops: 0,
             inserted: 0,
@@ -184,7 +196,9 @@ impl PrefixEchelon {
         }
     }
 
-    fn pack(&self, monos: &[u64]) -> Option<Vec<u64>> {
+    fn pack(&self, monos: &[Mask]) -> Option<Vec<u64>> {
+        crate::cryptanalysis::bitop_tally::word_ops((self.words + monos.len()) as u64);
+        crate::cryptanalysis::bitop_tally::hash_probes(monos.len() as u64);
         let mut row = vec![0u64; self.words];
         for m in monos {
             let &c = self.index.get(m)?;
@@ -195,7 +209,11 @@ impl PrefixEchelon {
 
     /// XOR products directly into a reusable row; repeated masks cancel
     /// without temporary monomial lists or sorting.
-    fn pack_product(&self, p: &F2BoolPoly, multiplier: u64, row: &mut Vec<u64>) -> bool {
+    fn pack_product(&self, p: &F2BoolPoly, multiplier: Mask, row: &mut Vec<u64>) -> bool {
+        // `bitop/v1`: the cleared row and its zero test, an OR, a probe and
+        // an XOR a term
+        crate::cryptanalysis::bitop_tally::word_ops((2 * self.words + 2 * p.terms.len()) as u64);
+        crate::cryptanalysis::bitop_tally::hash_probes(p.terms.len() as u64);
         row.resize(self.words, 0);
         row.fill(0);
         for term in &p.terms {
@@ -219,9 +237,12 @@ impl PrefixEchelon {
     /// leading column or zero.  Returns that column.
     fn reduce_leading(&mut self, row: &mut [u64], extra: Option<&TempEchelon>) -> Option<usize> {
         let mut w = 0;
+        let mut tally = crate::cryptanalysis::bitop_tally::Pending::default();
         loop {
             // Pivots have no bits before their lead, so reduction cannot
             // reintroduce a bit in the already-zero prefix words.
+            // `bitop/v1`: the lead scan's words and the pivot lookups
+            tally.word_ops += 2 + row[w..].iter().take_while(|&&x| x == 0).count() as u64;
             let c = w * 64 + leading_column(&row[w..])?;
             w = c / 64;
             if let Some(r) = self.pivot[c] {
@@ -233,6 +254,7 @@ impl PrefixEchelon {
                 continue;
             }
             if let Some(extra) = extra {
+                tally.hash_probes += 1;
                 if let Some(r) = extra.pivot.get(&c) {
                     let pivot = &extra.rows[*r];
                     for (dst, &src) in row[w..].iter_mut().zip(&pivot[w..]) {
@@ -253,6 +275,7 @@ impl PrefixEchelon {
             Some(c) => {
                 self.pivot[c] = Some(self.rows.len());
                 self.rows.push(std::mem::take(row));
+                self.leads.push(c);
                 self.created_at.push(prefix);
             }
             None => self.zero_reductions += 1,
@@ -260,13 +283,17 @@ impl PrefixEchelon {
     }
 
     /// Leading monomials of `V_j(e)` for `j = prefix`.
-    fn leading_monomials(&self, prefix: usize) -> impl Iterator<Item = u64> + '_ {
-        self.rows
+    fn leading_monomials(&self, prefix: usize) -> impl Iterator<Item = Mask> + '_ {
+        // `bitop/v1`: each row's prefix test and the set insertion of its
+        // cached lead (charged by the caller as a probe); the leads are
+        // cached, so there is no per-row lead scan
+        crate::cryptanalysis::bitop_tally::word_ops(self.leads.len() as u64);
+        crate::cryptanalysis::bitop_tally::hash_probes(self.leads.len() as u64);
+        self.leads
             .iter()
             .zip(&self.created_at)
             .filter(move |(_, &created)| created <= prefix)
-            .filter_map(|(row, _)| leading_column(row))
-            .map(|c| self.columns[c])
+            .map(|(&c, _)| self.columns[c])
     }
 }
 
@@ -305,7 +332,7 @@ impl F5Criterion {
     /// The lower-level matrices are built over the variables occurring in
     /// the system together with the multiplier mask, which is the subring
     /// every row of the degree-`degree` matrix lives in.
-    pub fn new(polys: &[F2BoolPoly], n_vars: usize, degree: u32, multiplier_mask: u64) -> Self {
+    pub fn new(polys: &[F2BoolPoly], n_vars: usize, degree: u32, multiplier_mask: Mask) -> Self {
         let m = polys.len();
         let mut out = Self {
             pruned: vec![MaskSet::default(); m],
@@ -319,6 +346,9 @@ impl F5Criterion {
             return out;
         }
         let degrees: Vec<u32> = polys.iter().map(poly_degree).collect();
+        crate::cryptanalysis::bitop_tally::word_ops(
+            polys.iter().map(|p| p.terms.len() as u64).sum(),
+        );
         // A constant generator (`1`, or zero) is outside the criterion's
         // hypotheses; the solver never passes one, so prune nothing.
         if degrees.contains(&0) {
@@ -362,6 +392,7 @@ impl F5Criterion {
                                 temp.rows.push(std::mem::take(&mut row));
                             }
                         }
+                        crate::cryptanalysis::bitop_tally::hash_probes(2 * temp.pivot.len() as u64);
                         for &c in temp.pivot.keys() {
                             if pruned.insert(echelon.columns[c]) {
                                 out.frobenius_pruned += 1;
@@ -388,7 +419,8 @@ impl F5Criterion {
     }
 
     /// Is the row `t·f_i` (generator index `i`, 0-based) pruned?
-    pub fn prunes(&self, i: usize, t: u64) -> bool {
+    pub fn prunes(&self, i: usize, t: Mask) -> bool {
+        // (charged by the row visitor, one probe a multiplier)
         self.pruned.get(i).is_some_and(|set| set.contains(&t))
     }
 
@@ -575,7 +607,7 @@ fn support_group_rank(
 /// full row rank before the unchanged original rows can be returned.
 fn certify_support_split_or_echelon(
     matrix: &mut [Vec<u64>],
-    cols: &[u64],
+    cols: &[Mask],
     inner_variables: usize,
     word_ops: &mut u64,
 ) -> (usize, bool, usize, usize) {
@@ -590,7 +622,7 @@ fn certify_support_split_or_echelon(
     {
         return fallback(matrix, word_ops, 0, 0);
     }
-    let inner_mask = (1u64 << inner_variables) - 1;
+    let inner_mask: Mask = low_bits(inner_variables);
     let mut by_degree: [Vec<usize>; 5] = std::array::from_fn(|_| Vec::new());
     for (index, row) in matrix.iter().enumerate() {
         let first = row.iter().enumerate().find_map(|(word, &bits)| {
@@ -733,7 +765,7 @@ fn certify_full_rank_or_echelon(
 }
 
 /// Expand a packed pivot row into its canonical, descending monomial list.
-fn unpack_row_scalar(row: &[u64], cols: &[u64], n_vars: usize) -> F2BoolPoly {
+fn unpack_row_scalar(row: &[u64], cols: &[Mask], n_vars: usize) -> F2BoolPoly {
     let terms = row.iter().map(|w| w.count_ones() as usize).sum();
     let mut monos = Vec::with_capacity(terms);
     for (w, &word) in row.iter().enumerate() {
@@ -751,7 +783,7 @@ fn unpack_row_scalar(row: &[u64], cols: &[u64], n_vars: usize) -> F2BoolPoly {
 }
 
 /// Expand a packed row into the exact preallocated number of terms.
-fn unpack_row_scalar_direct(row: &[u64], cols: &[u64], n_vars: usize) -> F2BoolPoly {
+fn unpack_row_scalar_direct(row: &[u64], cols: &[Mask], n_vars: usize) -> F2BoolPoly {
     let terms = row.iter().map(|w| w.count_ones() as usize).sum();
     let mut monos = Vec::<F2BoolMono>::with_capacity(terms);
     let out = monos.as_mut_ptr();
@@ -777,9 +809,9 @@ fn unpack_row_scalar_direct(row: &[u64], cols: &[u64], n_vars: usize) -> F2BoolP
     }
 }
 
-#[cfg(target_arch = "x86_64")]
+#[cfg(all(target_arch = "x86_64", not(feature = "wide-vars")))]
 #[target_feature(enable = "avx512f")]
-unsafe fn unpack_row_avx512(row: &[u64], cols: &[u64], n_vars: usize) -> F2BoolPoly {
+unsafe fn unpack_row_avx512(row: &[u64], cols: &[Mask], n_vars: usize) -> F2BoolPoly {
     use std::arch::x86_64::{_mm512_loadu_si512, _mm512_mask_compressstoreu_epi64};
 
     let terms: usize = row.iter().map(|w| w.count_ones() as usize).sum();
@@ -820,8 +852,10 @@ unsafe fn unpack_row_avx512(row: &[u64], cols: &[u64], n_vars: usize) -> F2BoolP
     }
 }
 
-fn unpack_row(row: &[u64], cols: &[u64], n_vars: usize, avx512: bool, direct: bool) -> F2BoolPoly {
-    #[cfg(target_arch = "x86_64")]
+fn unpack_row(row: &[u64], cols: &[Mask], n_vars: usize, avx512: bool, direct: bool) -> F2BoolPoly {
+    // The AVX-512 path stores 64-bit masks straight into the terms, so it
+    // exists only for 64-bit masks.
+    #[cfg(all(target_arch = "x86_64", not(feature = "wide-vars")))]
     if avx512 {
         // SAFETY: the caller selects this path only after a runtime check.
         return unsafe { unpack_row_avx512(row, cols, n_vars) };
@@ -1035,7 +1069,7 @@ pub fn matrix_f5_f2_with_form_timed(
 pub fn canonical_row_space_fingerprint(rows: &[F2BoolPoly]) -> Option<u64> {
     use crate::cryptanalysis::koblitz_groebner::{pack_rows, rref_f2_counted};
     use std::hash::{Hash, Hasher};
-    let rows_monos: Vec<Vec<u64>> = rows
+    let rows_monos: Vec<Vec<Mask>> = rows
         .iter()
         .map(|p| p.terms.iter().map(|t| t.mask).collect())
         .collect();
@@ -1064,6 +1098,10 @@ mod tests {
     use crate::cryptanalysis::koblitz_groebner::{
         f5_rows_monos_with_f4_count, f5_rows_packed_full_columns, matrix_f4_f2, pack_rows,
     };
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use std::collections::HashSet;
 
     #[test]
@@ -1073,9 +1111,9 @@ mod tests {
             (8, (1u64 << 8) - 1),
             (64, (1u64 << 3) | (1u64 << 7) | (1u64 << 61) | (1u64 << 63)),
         ] {
-            let columns = macaulay_columns(&[monomials_up_to_mask(mask, 4)]).unwrap();
+            let columns = macaulay_columns(&[monomials_up_to_mask(mask_from64(mask), 4)]).unwrap();
             let echelon = PrefixEchelon::new(columns);
-            let terms = monomials_up_to_mask(mask, 2);
+            let terms = monomials_up_to_mask(mask_from64(mask), 2);
             let mut row = Vec::new();
             for _ in 0..30 {
                 let p = F2BoolPoly::from_monos(
@@ -1090,9 +1128,9 @@ mod tests {
                         .collect(),
                     n_vars,
                 );
-                for multiplier in monomials_up_to_mask(mask, 2) {
+                for multiplier in monomials_up_to_mask(mask_from64(mask), 2) {
                     let product = p.mul_mono(F2BoolMono::from_mask(multiplier));
-                    let expected: Vec<u64> = product.terms.iter().map(|t| t.mask).collect();
+                    let expected: Vec<Mask> = product.terms.iter().map(|t| t.mask).collect();
                     assert_eq!(
                         echelon.pack_product(&p, multiplier, &mut row),
                         !product.is_zero()
@@ -1148,6 +1186,127 @@ mod tests {
         assert_eq!(echelon.word_ops, 18);
     }
 
+    /// The leading column of `row`, scanned from word 0.
+    fn lead_by_scan(row: &[u64]) -> Option<usize> {
+        let k = row.iter().position(|&w| w != 0)?;
+        Some(k * 64 + row[k].trailing_zeros() as usize)
+    }
+
+    /// `PrefixEchelon::reduce_leading` as it was before the lead search
+    /// resumed at the current word: every lead rescanned from word 0.
+    /// Returns the lead and the word XORs the reduction costs.
+    fn reduce_leading_by_scan(
+        echelon: &PrefixEchelon,
+        row: &mut [u64],
+        extra: Option<&TempEchelon>,
+    ) -> (Option<usize>, u64) {
+        let mut ops = 0;
+        loop {
+            let Some(c) = lead_by_scan(row) else {
+                return (None, ops);
+            };
+            let pivot = match (echelon.pivot[c], extra.and_then(|e| e.pivot.get(&c))) {
+                (Some(r), _) => &echelon.rows[r],
+                (None, Some(&r)) => &extra.unwrap().rows[r],
+                (None, None) => return (Some(c), ops),
+            };
+            for (dst, &src) in row[c / 64..].iter_mut().zip(&pivot[c / 64..]) {
+                *dst ^= src;
+            }
+            ops += (echelon.words - c / 64) as u64;
+        }
+    }
+
+    /// Resuming the lead search at the word of the last lead, and caching
+    /// each inserted row's lead, change nothing a rescan from word 0 does:
+    /// the same leads, the same reduced rows, the same word XORs, with and
+    /// without a temporary echelon, on sparse rows whose leads sit in every
+    /// word and chain through many pivots; and `leading_monomials`, which
+    /// reads the cached leads, is the rescan's for every prefix.
+    #[test]
+    fn prefix_echelon_resumes_its_lead_search_where_the_last_lead_was() {
+        let mut seed = 0x51ed_270b_a1d5_c0deu64;
+        let mut next = move || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        let (mut chained, mut zero) = (0, 0);
+        for &(cols, n_rows) in &[(1usize, 3usize), (63, 80), (64, 80), (130, 200), (300, 400)] {
+            let mut echelon = PrefixEchelon::new((0..cols as Mask).map(|c| 3 * c + 1).collect());
+            let words = echelon.words;
+            let random_row = |next: &mut dyn FnMut() -> u64| {
+                let mut row = vec![0u64; words];
+                for _ in 0..1 + next() % 7 {
+                    let c = (next() % cols as u64) as usize;
+                    row[c / 64] ^= 1 << (c % 64);
+                }
+                row
+            };
+            for i in 0..n_rows {
+                // A temporary echelon over the current rows, as the criterion
+                // builds one for a generator's Frobenius span.
+                if i % 8 == 0 {
+                    let mut temp = TempEchelon::default();
+                    for _ in 0..12 {
+                        let mut row = random_row(&mut next);
+                        let mut want = row.clone();
+                        let before = echelon.word_ops;
+                        let (want_lead, want_ops) =
+                            reduce_leading_by_scan(&echelon, &mut want, Some(&temp));
+                        let got_lead = echelon.reduce_leading(&mut row, Some(&temp));
+                        assert_eq!((got_lead, &row), (want_lead, &want), "{cols} cols, temp");
+                        assert_eq!(echelon.word_ops - before, want_ops);
+                        if let Some(c) = got_lead {
+                            temp.pivot.insert(c, temp.rows.len());
+                            temp.rows.push(row);
+                        }
+                    }
+                }
+                let mut row = random_row(&mut next);
+                let mut want = row.clone();
+                let (want_lead, want_ops) = reduce_leading_by_scan(&echelon, &mut want, None);
+                let (before, rows_before) = (echelon.word_ops, echelon.rows.len());
+                echelon.insert(&mut row, 1 + i / 16);
+                assert_eq!(echelon.word_ops - before, want_ops);
+                match want_lead {
+                    Some(c) => {
+                        assert_eq!(echelon.rows.len(), rows_before + 1);
+                        assert_eq!(echelon.rows.last(), Some(&want));
+                        assert_eq!(echelon.leads.last(), Some(&c));
+                        chained += (want_ops > 2 * echelon.words as u64) as u32;
+                    }
+                    None => {
+                        assert_eq!(echelon.rows.len(), rows_before);
+                        zero += 1;
+                    }
+                }
+            }
+            // The cached leads are the rows' leads, and read back through
+            // `leading_monomials` they are the rescan's, for every prefix.
+            assert_eq!(echelon.leads.len(), echelon.rows.len());
+            for (k, row) in echelon.rows.iter().enumerate() {
+                assert_eq!(lead_by_scan(row), Some(echelon.leads[k]));
+                assert_eq!(echelon.pivot[echelon.leads[k]], Some(k));
+            }
+            for prefix in 0..=1 + n_rows / 16 {
+                let want: Vec<Mask> = echelon
+                    .rows
+                    .iter()
+                    .zip(&echelon.created_at)
+                    .filter(|(_, &created)| created <= prefix)
+                    .map(|(row, _)| echelon.columns[lead_by_scan(row).unwrap()])
+                    .collect();
+                assert_eq!(echelon.leading_monomials(prefix).collect::<Vec<_>>(), want);
+            }
+        }
+        assert!(
+            chained > 50 && zero > 20,
+            "rows chained through several pivots: {chained}, rows reduced to zero: {zero}"
+        );
+    }
+
     #[test]
     fn criterion_pruning_and_row_spaces_survive_high_bit_embedding() {
         let positions = [52, 54, 57, 60, 63];
@@ -1177,21 +1336,24 @@ mod tests {
                     F2BoolPoly::from_monos(
                         p.terms
                             .iter()
-                            .map(|term| F2BoolMono::from_mask(embed(term.mask)))
+                            .map(|term| F2BoolMono::from_mask(embed(mask_low64(term.mask))))
                             .collect(),
                         64,
                     )
                 })
                 .collect();
             for degree in 2..=5 {
-                let a = F5Criterion::new(&low, 5, degree, low_mask);
+                let a = F5Criterion::new(&low, 5, degree, mask_from64(low_mask));
                 let b = F5Criterion::new(&high, 64, degree, high_mask);
                 assert_eq!(a.lower_level_rows(), b.lower_level_rows());
                 assert_eq!(a.pruned_by_part(), b.pruned_by_part());
                 assert_eq!(a.word_ops(), b.word_ops());
                 for i in 0..low.len() {
-                    for multiplier in monomials_up_to_mask(low_mask, degree) {
-                        assert_eq!(a.prunes(i, multiplier), b.prunes(i, embed(multiplier)));
+                    for multiplier in monomials_up_to_mask(mask_from64(low_mask), degree) {
+                        assert_eq!(
+                            a.prunes(i, multiplier),
+                            b.prunes(i, embed(mask_low64(multiplier)))
+                        );
                     }
                 }
                 let full = crate::cryptanalysis::koblitz_groebner::macaulay_rows_monos_with_mask(
@@ -1202,7 +1364,7 @@ mod tests {
                     &high, 64, degree, high_mask, &b,
                 )
                 .unwrap();
-                let as_polys = |rows: Vec<Vec<u64>>| {
+                let as_polys = |rows: Vec<Vec<Mask>>| {
                     rows.into_iter()
                         .map(|row| {
                             F2BoolPoly::from_monos(
@@ -1361,8 +1523,8 @@ mod tests {
     #[test]
     fn direct_scalar_unpack_matches_push_path() {
         for cols_len in [1usize, 7, 64, 65, 127, 129, 4097] {
-            let cols: Vec<u64> = (0..cols_len)
-                .map(|i| (i as u64).wrapping_mul(0x9e37_79b9_7f4a_7c15))
+            let cols: Vec<Mask> = (0..cols_len)
+                .map(|i| mask_from64((i as u64).wrapping_mul(0x9e37_79b9_7f4a_7c15)))
                 .collect();
             for salt in [0u64, 1, 3, 7, u64::MAX] {
                 let row: Vec<u64> = (0..cols_len.div_ceil(64))
@@ -1423,12 +1585,13 @@ mod tests {
     }
 
     #[test]
+    #[cfg(not(feature = "wide-vars"))]
     fn avx512_unpack_matches_scalar_for_sparse_dense_and_partial_words() {
         #[cfg(target_arch = "x86_64")]
         if std::arch::is_x86_feature_detected!("avx512f") {
             for cols_len in [1usize, 7, 8, 9, 63, 64, 65, 127, 128, 129, 4097] {
-                let cols: Vec<u64> = (0..cols_len)
-                    .map(|i| (i as u64).wrapping_mul(0x9e37_79b9_7f4a_7c15))
+                let cols: Vec<Mask> = (0..cols_len)
+                    .map(|i| mask_from64((i as u64).wrapping_mul(0x9e37_79b9_7f4a_7c15)))
                     .collect();
                 for salt in [0u64, 1, 3, 7, u64::MAX] {
                     let row: Vec<u64> = (0..cols_len.div_ceil(64))
@@ -1451,7 +1614,7 @@ mod tests {
             monos
                 .iter()
                 .map(|vars| {
-                    F2BoolMono::from_mask(vars.iter().fold(0u64, |acc, &v| acc | (1u64 << v)))
+                    F2BoolMono::from_mask(vars.iter().fold(0 as Mask, |acc, &v| acc | bit(v)))
                 })
                 .collect(),
             n_vars,
@@ -1473,7 +1636,7 @@ mod tests {
             for _ in 0..d {
                 mask |= 1u64 << (next() % n_vars as u64);
             }
-            monos.push(F2BoolMono::from_mask(mask));
+            monos.push(F2BoolMono::from_mask(mask_from64(mask)));
         }
         F2BoolPoly::from_monos(monos, n_vars)
     }
@@ -1482,7 +1645,7 @@ mod tests {
     /// as a canonical set.
     fn row_space_canonical(polys: &[F2BoolPoly], n_vars: usize) -> Vec<F2BoolPoly> {
         use crate::cryptanalysis::koblitz_groebner::{pack_rows, rref_f2_counted};
-        let rows_monos: Vec<Vec<u64>> = polys
+        let rows_monos: Vec<Vec<Mask>> = polys
             .iter()
             .filter(|p| !p.is_zero())
             .map(|p| p.terms.iter().map(|t| t.mask).collect())
@@ -1660,7 +1823,7 @@ mod tests {
             .into_iter()
             .map(|s| f.mul_mono(F2BoolMono::from_mask(s)))
             .collect();
-        let naive: HashSet<u64> = row_space_canonical(&level, n_vars)
+        let naive: HashSet<Mask> = row_space_canonical(&level, n_vars)
             .iter()
             .filter_map(|p| p.lt().map(|m| m.mask))
             .collect();

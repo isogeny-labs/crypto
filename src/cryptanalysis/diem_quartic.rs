@@ -1859,9 +1859,9 @@ pub struct LpGraph {
     pub ops: u64,
 }
 
-impl LpGraph {
-    pub fn new() -> LpGraph {
-        LpGraph {
+impl Default for LpGraph {
+    fn default() -> Self {
+        Self {
             parent: vec![0],
             parity: vec![0],
             sink: vec![true],
@@ -1871,6 +1871,12 @@ impl LpGraph {
             bip: 0,
             ops: 0,
         }
+    }
+}
+
+impl LpGraph {
+    pub fn new() -> LpGraph {
+        Self::default()
     }
     fn find(&mut self, mut v: u32) -> (u32, u8) {
         let mut path = vec![];
@@ -1926,12 +1932,6 @@ impl LpGraph {
     /// Number of FB-only relations the large-prime part can yield: `E - V + B`.
     pub fn yield_count(&self) -> i64 {
         self.edges as i64 - self.verts as i64 + self.bip
-    }
-}
-
-impl Default for LpGraph {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -3024,9 +3024,15 @@ pub fn measure_rho_inv(q: u64, samples: u64) -> f64 {
 
 /// Tiny JSON-object builder (numbers via `Display`, strings escaped minimally).
 pub struct J(pub String);
+impl Default for J {
+    fn default() -> Self {
+        Self(String::from("{"))
+    }
+}
+
 impl J {
     pub fn new() -> J {
-        J(String::from("{"))
+        Self::default()
     }
     fn sep(&mut self) {
         if self.0.len() > 1 {
@@ -3060,12 +3066,6 @@ impl J {
     }
     pub fn done(&self) -> String {
         format!("{}}}", self.0)
-    }
-}
-
-impl Default for J {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

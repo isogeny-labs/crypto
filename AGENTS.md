@@ -1,4 +1,50 @@
+<!-- BEGIN SHARED SESSION LOG -->
+
+## Session log
+
+At the start of every session, read the newest dated Markdown file in
+`docs/session-logs/`.
+
+Write today's log at `docs/session-logs/YYYY-MM-DD.md`, using the current date.
+These paths are relative to the repository or workspace root.
+Create the folder and file if missing. Claude and Codex share this directory.
+
+Do not wait for the user to end the session. Append a timestamped entry after
+every finished piece of work, after every decision, and whenever we switch
+tasks. Preserve previous entries. Record concrete facts from commands and
+logs; distinguish verified results from plans or assumptions.
+
+Every entry has four headings:
+
+- What was done (commands, files, features)
+- Decisions made (and why)
+- Open threads (unfinished, pick up next time)
+- Errors (what went wrong, how it was handled)
+
+Commit project handoffs with the related PR so they survive across sessions.
+Keep entries about this project; do not copy private global logs or chat transcripts.
+
+<!-- END SHARED SESSION LOG -->
+
 # Agent instructions
+
+## Literature first
+
+Owner instruction (2026-10-19): check relevant literature before doing any work.
+For every task, complete this review before choosing an approach, editing files,
+implementing, running experiments, or making recommendations.
+
+- Start with this repository's references, research notes and prior results, then
+  check relevant papers, standards and official documentation for current methods,
+  limitations and known negative results.
+- Read the primary sources that matter. Verify their assumptions, parameters and
+  conclusions rather than relying on memory, abstracts or search snippets.
+- Briefly record the sources checked, with links or repository paths, and explain
+  how they inform the work in the task notes, report or PR. Check novelty claims
+  against that prior work and reuse established methods where appropriate.
+- If relevant sources are inaccessible or no relevant work is found, state the
+  search scope and evidence gaps before proceeding. Never invent citations or
+  treat an unsuccessful search as proof that no prior work exists.
 
 ## Standing workflow rules (from the owner)
 
@@ -7,6 +53,21 @@
   on a feature branch. If the branch already has an open PR, extend that
   PR and update its title and description to match the new scope instead of
   opening a second one. Do not leave finished work uncommitted.
+- **Use regular PRs.** Create pull requests with `draft=false` and mark an
+  existing draft ready for review when you update it. Record pending CI,
+  review, and follow-up work in the PR description; draft status is not a
+  holding queue. Ready for review invites review; it does not authorize a
+  merge. All validation, evidence, review, and merge gates below still apply.
+  Use a draft only when the user explicitly asks for one.
+- **Enable auto-merge when you open the PR** (owner, 2026-10-24):
+  `gh pr merge <n> --auto --merge`. It is the default for every PR whose base
+  is `main`, not an optional extra, and it does not replace the check-in and
+  merge rules below. GitHub offers auto-merge only when the base is the
+  repository's default branch: a PR stacked on a feature branch cannot
+  auto-merge, so retarget it to `main` once its parent lands and enable
+  auto-merge then, or merge the stack bottom-up. If the user asks to keep a PR
+  open or wait for review, disable auto-merge (`gh pr merge <n>
+  --disable-auto`).
 - **Verify before pushing:** run `cargo test --release --lib`, the touched
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
@@ -29,6 +90,29 @@
   or a component (an engine, filter, oracle, solver or kernel), regenerates
   `docs/ic-leaderboard.html` and its twins in the same PR (§7b), even when
   no row of tables A–C moves; it is not a follow-up.
+- **Validation gate** (owner, 2026-10-19; schema and mechanics in
+  [`docs/VALIDATION_GATE.md`](docs/VALIDATION_GATE.md)). No row reaches the
+  IC leaderboard (`docs/ic/LEADERBOARD.md`, `docs/ic/leaderboard.json`,
+  `docs/ic-leaderboard.html`) or `benchmarks/README.md` unless its evidence
+  directory carries a `VALIDATION.json` pointing to three artifacts: (1) a
+  **replay certificate**, an independent replay of the recorded runs with the
+  scalars verified; (2) a **validator report**, an independent recompute of the
+  headline numbers from raw data that is in the repository; (3) a **rho
+  reference matched to the protocol**, the reference the protocol names and
+  the strongest available for that curve (negation, Frobenius or the
+  automorphism fold), priced in the same unit and the same binary or process,
+  with the §5a band at 0, 0.1 and 1 GAE. `scripts/build_ic_leaderboard.py`
+  refuses a row without them, and `scripts/validation_gate.py check` (workflow
+  `validation-gate`) fails a PR that adds or changes such a row. Existing
+  rows are not deleted: those frozen in `docs/ic/validation/PRE_GATE.json` and
+  `benchmarks/PRE_GATE.json` render as "unvalidated (pre-gate)" until a
+  validation sweep verdict
+  (`research/validation_sweep_20261019/{A-leaderboard,B-benchmarks}/verdicts.jsonl`)
+  or a `VALIDATION.json` validates them; the freeze files may only shrink. The
+  `audit-runs` skill re-audits finished runbook and ecbench sessions daily
+  (`.github/workflows/audit-runs-daily.yml`). Like the success criterion, the
+  gate decides what may be shown as a result, never whether an honest null or
+  negative result may be recorded: those stay in their research directories.
 - **Conductor:** run `conductor check --summary "…" --scope path:…` before
   editing; report scope expansion before editing outside reserved paths. Do
   not publish chat transcripts or secrets as task metadata.
@@ -73,6 +157,13 @@ baseline. Every such improvement is a success and is reported as one.**
 
 ## Pointers
 
+- **What has already been tried against ECDLP, here and in the sibling
+  repositories:** the lead atlas in aburan28/crypto-autoresearcher,
+  `knowledge/leads/ecdlp/` (`python3 tools/lead_atlas.py --brief`, printed by
+  `.claude/hooks/session-start.sh`). Read it before surveying `research/` for
+  leads, and run `--match "<idea>"` before proposing an ECDLP mechanism. A
+  result that lands here updates the lead it advances in the same PR or the
+  next atlas review (skill `lead-atlas` there).
 - Boundary ledger (machine): `docs/ic/boundary_targets.json`
 - Boundary scoreboard (human): `docs/ic/BOUNDARY_TARGETS.md`
 - Autolab runner: `research/sat_factor_base_review_20260908/autolab/`
@@ -80,6 +171,9 @@ baseline. Every such improvement is a success and is reported as one.**
   `RESEARCH_ECC2K130_IC_FEASIBILITY.md`
 - Faster checkouts (blobless clone, sparse profiles, cloud-session
   settings): [docs/sparse-checkout.md](docs/sparse-checkout.md)
+- Experiment design and records: `controlled-experiment` (claims, controls,
+  confounders), `experiment-protocol` and `review-run` (pointers to the
+  canonical schemas in crypto-autoresearcher), `queue-experiment` (§9b)
 
 For small-prime or pinned GF(2^83) elliptic-curve surface searches, quartic
 subgroup transfers, genus-2+ Jacobian transfers, hyperelliptic covers, Mumford
@@ -101,8 +195,9 @@ commands, and interpretation limits.
   `*.jsonl`, logs and CSVs by key or range (`jq`, `rg`), never whole; a
   session is read through its audit, replay or claim JSON.
 - **Paths, not contents,** in handoffs and subagent prompts.
-- **Off disk is not absent.** In a sparse checkout (`docs/sparse-checkout.md`)
-  a path `git ls-files` lists is materialized with
+- **Off disk is not absent.** Cloud sessions start in the sparse `harness`
+  profile, without the 18 largest `research/` archives. In a sparse checkout
+  (`docs/sparse-checkout.md`) a path `git ls-files` lists is materialized with
   `scripts/sparse-checkout.sh add --path`, never reported missing.
 
 # AGENTS.md
@@ -264,6 +359,55 @@ factor, class number, embedding degree, or composite map degree is a lead with
 specific hypotheses, not a universal verdict. Preserve negative searches
 within their exact bounds and run authorized feasible experiments under the
 existing evidence, review, and benchmark rules.
+
+## Resume checkpoints in S3 before every run
+
+A session can end at any moment (token or usage limits, a crash, a reclaimed
+container), and a worktree that only it knew about is then lost. So **before
+any experiment run starts, the leads, the spec and everything needed to
+resume the effort are checked into S3**, and kept current while it runs.
+
+- `scripts/checkpoint.sh init` writes `.resume/RESUME.md` (gitignored). Fill
+  every section for a reader who has none of this conversation: goal, the
+  lead or hypothesis and where it came from, the spec or protocol path with
+  frozen inputs, the current state with measured numbers and where raw output
+  lives, next steps with exact commands, every run in flight (command, host,
+  instance id or pid, log and output paths, how to collect it), and the stop
+  and success conditions. The gate rejects missing or empty sections and
+  leftover `TODO(checkpoint)` markers.
+- `scripts/checkpoint.sh push` uploads one checkpoint to
+  `s3://setec-astronomy-artifacts/checkpoints/<repo>/<branch>/<stamp>/`:
+  `RESUME.md`, the spec, leads, protocol and plan files the branch changed, a
+  git bundle of unpushed commits, a patch of uncommitted changes, untracked
+  files (large ones listed, not copied) and `meta.json`. Earlier checkpoints
+  are never overwritten. Push again whenever a run starts or finishes,
+  results arrive, or the plan changes.
+- **Claude Code enforces this** (`.claude/hooks/checkpoint-hook.sh`): writing
+  a spec, leads, protocol or plan file, or `RESUME.md`, pushes a checkpoint,
+  and run launchers (`scripts/run_*`, sweeps, benchmarks, `nohup`, background
+  commands, `cargo run --release`, `expspec run`, `sage-run`, cloud launches)
+  are refused until `RESUME.md` is complete and the push succeeded. A command
+  that is not an experiment run may opt out with `CHECKPOINT_SKIP=<reason>`.
+  **Other runtimes (Codex)** run `scripts/checkpoint.sh gate` before
+  launching and do not launch if it fails.
+- Claude Code sessions have no AWS credentials, so the script works from a
+  token (tried first; an AWS profile is only a fallback). The token is a
+  presigned POST policy that can only write under `checkpoints/`, plus a
+  presigned link to an index of recent checkpoints, so push, `list`, `share`
+  and `restore` all work without credentials. A job on the owner's Mac
+  re-mints it every 15 minutes (7-day lifetime) into
+  `~/.config/checkpoint/upload-token`, where the script finds it; a session
+  elsewhere is given it as `CHECKPOINT_UPLOAD_TOKEN`. The bucket host is in
+  this repo's sandbox network allowlist (`.claude/settings.json`). It is a bearer credential: never
+  commit it or put it in a PR, report or task card.
+- To resume: `scripts/checkpoint.sh list` shows the latest checkpoint per
+  branch (from the index, up to 15 minutes behind);
+  `scripts/checkpoint.sh restore <repo>/<branch>[/<stamp>]` rebuilds the
+  worktree next to this checkout and puts `RESUME.md` in it. `share` prints a
+  presigned URL that `restore <url>` accepts anywhere.
+
+A checkpoint is a safety net, not the record: the spec, protocol and results
+still land in a PR under the rules above.
 
 ## Research searches must leave visual reports
 
@@ -433,6 +577,15 @@ in aburan28/crypto-autoresearcher.
   The director's assessment says only whether the run executed as specified
   and the relay was verbatim. What the numbers mean is decided by the
   frontier or core tier under the measurement rules below.
+- **Subagent roster and pins.** The pins live in `.claude/agents/`; the tier
+  decides the model, never the reverse. `executor-mechanical` is Haiku 5.5
+  (effort low); `experiment-director` and `idea-generator` are Sonnet 5.5;
+  `idea-synthesist` is Opus 5.5 (effort high); the independent reviewers
+  `red-team` and `validator` inherit the session model at effort `xhigh`;
+  their breakthrough siblings `red-team-breakthrough` and
+  `validator-breakthrough` are Opus 5.5 at effort `max`. A claimed break,
+  closure, or contradiction is reviewed only by the breakthrough siblings, in
+  their own sessions.
 
 ## Default workflow: open the PR, check in, and land it
 
@@ -447,10 +600,10 @@ separate small-model automation did the CI work and the merge.
 commits, pushes, and opens the PR (or updates the existing one). It then
 follows the PR until it lands, under the check-in and merge rules below.
 
-- **Open every PR ready for review, never as a draft**, whatever a tool or
-  runtime defaults to, and mark an existing draft ready when you update it,
-  so reviews and checks that skip drafts (`llm-review`) run from the first
-  push. Open a draft only when the user asks for one in that task.
+- **Open every PR ready for review (`draft=false`)**, whatever a tool or
+  runtime defaults to. Before ending an update to an existing draft, mark it
+  ready so reviews and checks that skip drafts (`llm-review`) can run. An
+  explicit user request to keep a particular PR in draft is the only exception.
 - Review the final diff and confirm that the requested scope, relevant tests,
   evidence, and documentation are complete before opening the PR. Passing CI
   does not substitute for checking that the work is finished.
@@ -474,13 +627,32 @@ follows the PR until it lands, under the check-in and merge rules below.
 another approval to merge a completed, passing PR unless a policy or reviewer
 requires explicit authorization for that merge, and it follows these rules:
 
+- **The merge set is three checks.** A pull request merges when `gate`
+  (validation-gate), `size` (large-files), and `artifacts` have passed on the
+  current head. Those are the only workflows that run on `pull_request`,
+  besides the pull-request review and the autofix label queue. Rust lint, the
+  workspace compile, ecbench, CodeQL, Lean, the release build, and the
+  research workflows run after the change is on `main` (a push, usually
+  limited to the paths that workflow names) or on their existing schedule.
+  CodeQL runs weekly. `workflow_dispatch` runs one of them now. Do not wait
+  on a pull request for a check that did not run, and do not put
+  `pull_request` back on those workflows to chase a green box.
 - Apply merge authorization to PRs created or maintained for the current user
   task, not unrelated PRs. An explicit instruction to leave a PR open, keep it
   as a draft, wait for review, or avoid merging overrides this default.
-- Check the current PR head: all required and applicable CI checks must have
-  completed successfully. Pending, cancelled, timed-out, or failed checks are
-  not a pass. A skipped job counts as inapplicable only when its conditions or
-  path filters justify that status; required checks must still be satisfied.
+- Check the current PR head: the merge set above must have completed
+  successfully. Pending, cancelled, timed-out, or failed checks in that set
+  are not a pass. A skipped job counts as inapplicable only when its
+  conditions or path filters justify that status; a required check must still
+  be satisfied.
+- **Checks that never start do not block** (owner, 2026-10-23). A check that
+  no branch-protection rule or ruleset requires, and that has been queued for
+  24 hours or more without starting (no runner picked it up), does not hold
+  the merge, provided every check that did run on the current head passed.
+  Name each such job and how long it waited in the merge commit message. A
+  required check never falls under this: if one has not run, the PR waits and
+  the session says so on the PR. A check that started and is still running is
+  pending, not stuck.
 - Fix failures caused by the change autonomously: read the failing check's
   log, reproduce the failure locally, fix it, and rerun the affected
   validation before pushing. Never skip, disable, or quarantine a test to get
@@ -517,9 +689,10 @@ requires explicit authorization for that merge, and it follows these rules:
 - If a documentation-only change legitimately triggers no CI, verify the
   workflow filters, inspect the diff, and run any relevant local validation.
   State that no CI applied; do not claim that nonexistent checks passed.
-- Merge using the repository's permitted merge method and an expected-head-SHA
-  guard where supported. Confirm that GitHub reports the PR as merged, then
-  record the merge commit and validation outcome on the PR.
+- Auto-merge is already enabled when the PR was opened, so merge with the
+  repository's permitted merge method and an expected-head-SHA guard where
+  supported. Confirm that GitHub reports the PR as merged, then record the
+  merge commit and validation outcome on the PR.
 - If access, required external review, a persistent CI failure, or another
   concrete gate prevents merging, report that blocker precisely on the PR
   rather than asking the user to repeat the authorization already given.
@@ -1085,6 +1258,25 @@ $E status last; $E logs -f last; $E fetch last
   fetched `job.json`, `host.txt` and `rusage.txt` in
   `~/.cache/ephemeral/runs/<id>/`.
 
+### 9b. Protocol-bound jobs on the queue, and what a restore means
+
+Owner request, 2026-10-22; design in
+[`taskq/deploy/spot-checkpoint/README.md`](taskq/deploy/spot-checkpoint/README.md),
+submission in the `queue-experiment` skill. Every job a queue runs binds a
+frozen `experiment.protocol/v1` (`experiment-protocol` skill; the schemas and
+checker are canonical in aburan28/crypto-autoresearcher) and lands as one
+`experiment.export/v1` beside its raw records, one row per execution with the
+isolation level it earned and its checkpoint history. The protocol's
+`measurement_class` picks the pool: a job whose clock or counter is read
+against an A/A interval goes to an isolated pool and is never resumed (an
+interrupted row is abandoned and a new row runs); a throughput, search or
+training job goes to Spot capacity and checkpoints under the application
+manifest contract or, where a program cannot save itself, a CRIU image. After
+a restore, counted units stay valid and wall and CPU time do not
+(`wall_valid: false`, `resumed > 0`); the export checker refuses a resumed row
+with a valid clock. A `review-run` record by another runner is the second
+reading of an export and an input to the validation gate, never a row.
+
 ### 10. Performance work starts from a clean, recorded baseline
 
 A speedup is a comparison, so it is only as good as the baseline and the
@@ -1132,6 +1324,14 @@ conditions both sides ran under.  Before changing code for speed:
   tool's reach. Expect ±5–10% residual wall noise on cloud containers and
   CI runners, and measure it with an A/A run. Fix the thread count
   explicitly (`RAYON_NUM_THREADS=1`), and report the pinned CPUs.
+- **Profile to find the cost, then measure the change.** Before tuning a CPU
+  loop or a CUDA kernel, find where the time goes with `tools/profile.sh`
+  (the [profile skill](.agents/skills/profile/SKILL.md)). It covers `perf`
+  sampling, Callgrind, top-down, `nsys`, `ncu` and `nvidia-smi`, and records
+  the host, the tool versions and the binary hash. Profilers perturb what
+  they observe (ncu replays each launch at locked clocks), so a profile
+  explains a cost but never establishes a speedup. The measurement below
+  does.
 - **Measure the noise floor, then interleave.** Run the baseline against a
   copy of itself (A/A) to see the spread, then alternate baseline and
   candidate (ABAB…, at least five rounds) and report median and minimum.
@@ -1229,6 +1429,15 @@ Historical autolab, tournament and ICMS evidence keeps its own protocols.
 
 ### 13. Large files go through the store
 
+Data files follow the artifact-store policy (owner, 2026-10-24): any non-code
+file over 1 MiB, and any data-suffixed file (`.jsonl`, `.gz`, `.npy`, logs,
+archives) over 64 KiB, lives in `s3://setec-astronomy-artifacts` with a
+`.artifacts.json` manifest in its directory, moved with `tools/artifacts`
+(`artifacts.py push`, `pull`, `status`, `verify`) instead of `git add`. See
+[docs/artifacts.md](docs/artifacts.md). The rest of this section describes
+`crypto store`, which stays for named single-file references (`store:NAME`);
+both share one object layout and cache.
+
 A factor base, relation table or raw evidence file too big for Git is pushed
 with `crypto store push` (or `ecbench store push`) and referred to by name,
 not by a local path or a one-off bucket URL: `store:<name>`, accepted
@@ -1240,6 +1449,17 @@ entry in the PR that lands the result. Objects are immutable and keyed by
 SHA-256; a name is not repointed without `--replace`, which keeps the old
 digest as superseded. Never delete remote objects from an agent session.
 See [docs/store/README.md](docs/store/README.md).
+
+"Too big for Git" means over 10 MiB (owner, 2026-10-22); for data files the
+thresholds above now apply first, and the 10 MiB limit still covers anything the
+artifact policy does not select. Every blob committed
+stays in every future clone. The `large-files` workflow
+(`scripts/check-large-files.sh`) fails a PR that adds or modifies such a file,
+except generated text that git delta-compresses well (`docs/browser/data.json`,
+`docs/curves/*.json`). A PR that must commit one anyway carries the
+`large-file-ok` label, added by the owner or a reviewer. Do not pre-compress
+text files to get under the limit: compressed blobs do not delta, so each
+revision costs its full size again.
 
 ### 13a. Raw run trees land as one archive
 
@@ -1269,9 +1489,12 @@ manifest or verifier names individual run records by repository path (the
 records stay committed as loose files. Only the part nothing names goes in the
 archive; say in the README which part is which.
 
-This applies to new run trees. Never re-pack, compress or move a committed
-tree, or rewrite history to slim one: committed evidence stays as it was
-written. A tree too big for Git even compressed goes through the store (§13).
+This applies to new run trees. Never re-pack or compress a committed tree, or
+rewrite history to slim one: committed evidence stays as it was written. The
+one exception (owner, 2026-10-24): data files move out of Git to
+`s3://setec-astronomy-artifacts` ([docs/artifacts.md](docs/artifacts.md)); a
+moved file keeps its path and bytes (checked by hash) and history is not
+rewritten. A tree too big for Git even compressed goes through the store (§13).
 Checkouts that do not need a research tree leave it off disk instead
 ([docs/sparse-checkout.md](docs/sparse-checkout.md)).
 
@@ -1468,3 +1691,16 @@ those files, it will tell you who and what to do about it. Read `.conductor/WORK
 and the active task card. Report scope expansion before editing outside the reserved paths.
 Do not publish chat transcripts or secrets as task metadata.
 <!-- conductor:end -->
+
+## Progress metrics (daily lab report)
+
+`tools/progress_metrics.py` exports this repo's progress KPIs as JSONL for the lab-wide daily
+report (`/Volumes/SSD990-2/progress-metrics`). It reads committed state at `origin/<default>` and
+prints one sample per line (`metric, value, date, problem, unit, better, kind, label, source`).
+
+- When a PR adds or changes a benchmark, leaderboard, result file or ledger source that carries a
+  number worth tracking day over day, extend the exporter in the same PR. Keep metric ids stable;
+  a renamed id is a new series.
+- Never emit estimates. If a source is missing, emit nothing for it.
+- `python3 tools/progress_metrics.py --since 2026-10-01` must run in under a minute, stdlib only,
+  no builds, and never read the working tree.

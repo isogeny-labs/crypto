@@ -76,8 +76,15 @@ run_target() {
     # Lake project. Mathlib projects fetch Mathlib's prebuilt cache first; a
     # failed fetch is an infrastructure error, never evidence about a proof.
     if grep -q '"name": *"mathlib"' "$root/$t/lake-manifest.json" 2>/dev/null; then
-      (cd "$root/$t" && lake exe cache get) > "$log/cache.log" 2>&1 \
-        || { echo "INFRA_cache   $t (lake exe cache get failed)"; return 3; }
+      if ! (cd "$root/$t" && lake exe cache get) > "$log/cache.log" 2>&1; then
+        echo INFRA_cache > "$log/status"
+        if [ -n "$out" ]; then
+          mkdir -p "$out/$slug"
+          cp "$log/cache.log" "$log/status" "$out/$slug/"
+        fi
+        echo "INFRA_cache   $t (lake exe cache get failed)"
+        return 3
+      fi
     fi
     if ! (cd "$root/$t" && lake build) > "$log/build.log" 2>&1; then
       status=FAIL_build
@@ -87,7 +94,7 @@ run_target() {
         | sed 's|^\./||; s|\.olean$||; s|/|.|g' | sort | tr '\n' ' ')
       if [ -z "$mods" ]; then
         status=FAIL_no_modules
-      elif ! (cd "$root/$t" && lake env lean --run "$audit" "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
+      elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
         status=FAIL_audit
       fi
     fi
@@ -100,7 +107,7 @@ run_target() {
     toolchain=$(cat "$(dirname "$root/$t")/lean-toolchain" 2>/dev/null || true)
     if ! (cd "$(dirname "$root/$t")" && lean -o "$dir/$mod.olean" "$root/$t") > "$log/build.log" 2>&1; then
       status=FAIL_build
-    elif ! LEAN_PATH="$dir:${LEAN_PATH:-}" lean --run "$audit" "${trust_args[@]}" "$mod" > "$log/audit.log" 2>&1; then
+    elif ! LEAN_PATH="$dir:${LEAN_PATH:-}" lean --run "$audit" -- "${trust_args[@]}" "$mod" > "$log/audit.log" 2>&1; then
       status=FAIL_audit
     fi
     [ -n "$toolchain" ] && echo "toolchain pin: $toolchain" >> "$log/build.log"
