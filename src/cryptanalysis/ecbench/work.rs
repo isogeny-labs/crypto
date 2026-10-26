@@ -1,4 +1,6 @@
-//! Every ecbench record priced in `bitop/v1` (`crate::cryptanalysis::bitops`).
+//! Every ecbench record priced in `bitop/v1` (`crate::cryptanalysis::bitops`),
+//! and in `bitop/v2`, the same gates plus a declared memory term
+//! ([`memory`], [`price_v2`]; `docs/units/BITOPS.md`, "bitop/v2: memory").
 //!
 //! A record's work is rebuilt from what it already carries — the curve, the
 //! phases' group operations, the native counters and the solver block — so
@@ -28,7 +30,7 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use crate::cryptanalysis::bitops::{self, Field, Prim, Widths};
-use crate::cryptanalysis::ecbench::methods::{PhaseRecord, SolverStats};
+use crate::cryptanalysis::ecbench::methods::{FactorBaseFacts, PhaseRecord, SolverStats};
 use crate::cryptanalysis::ecbench::workload::CurveFacts;
 
 pub const WORK_SCHEMA: &str = "ecbench.work/v1";
@@ -420,9 +422,58 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         "tally_field_muls" => Prims(&[(FieldMul, 1)]),
         "tally_field_sqrs" => Prims(&[(FieldSqr, 1)]),
         "tally_field_invs" => Prims(&[(FieldInv, 1)]),
+
+        // ── Extension of 2026-10-21 (ic-acct-6; docs/units/BITOPS.md,
+        // "Extensions").  No primitive weight changes; these rules classify
+        // counters that committed records carry and no rule priced.
+        //
+        // `prime-projected-abscissa`: the membership check `[r]P = O` is a
+        // counted double-and-add (`CountedGroup::mul` charges its additions
+        // and doublings to the phase), so the counter is a sub-total of the
+        // phase's group operations.
+        "projected_base_membership_checks_uncharged" => Shape,
+        // The duplicate-abscissa guard: one keyed-set insert of a field
+        // element, a hash probe (the unit prices a keyed-set probe, not
+        // the container the code happens to use).
+        "projected_base_dedup_probes_uncharged" => HASH,
+        // An outcome, and the column map's size: the vectors are memory,
+        // and the indexes derived from them are the `base_index_builds`
+        // item (counted by `index_inserts` where the record carries it).
+        "projected_base_duplicate_points" | "projected_base_column_map_entries_uncharged" => Shape,
+        // `isogeny-tower`'s flag for a supersingular auxiliary curve.
+        "aux_supersingular" => Shape,
+        // `ic.cm_folded_*`: the native backend's own counters
+        // (`research/conductor_gap_cm_orbits_20261015/native/group.hpp`).
+        // Every `mul` and `sq` there increments these, including the
+        // products inside its Jacobian doublings and mixed additions, so
+        // the products and squarings are priced and the group-operation
+        // counts are sub-totals of them.  What the backend does without a
+        // counter (its `power` exponentiations, field additions, hashing,
+        // arithmetic modulo r, elimination, the CM map) is listed in
+        // `known_uncounted`.
+        "native_field_muls_uncharged" => Prims(&[(FieldMul, 1)]),
+        "native_field_sqrs_uncharged" => Prims(&[(FieldSqr, 1)]),
+        "native_group_doubles_uncharged"
+        | "native_group_mixed_uncharged"
+        | "native_scalar_calls_uncharged"
+        | "native_factor_base_scans_uncharged"
+        | "native_queries_uncharged"
+        | "native_hits_uncharged"
+        | "native_rank_uncharged"
+        | "native_rejected_duplicate_columns_uncharged"
+        | "native_pair_table_keys_uncharged"
+        | "native_table_bytes_uncharged" => Shape,
+        // Excluded diagnostics: wall-clock time is not work and is never
+        // priced in the unit.
+        "independent_replay_wall_ns" => Shape,
         _ => return None,
     })
 }
+
+/// The `known_uncounted` item of the `ic.cm_folded_*` native backend
+/// (2026-10-21): the work its counters do not see.
+pub const CM_FOLDED_NATIVE_GAP: &str =
+    "native_backend_exponentiations_field_adds_hashing_modr_elimination_and_cm_map";
 
 /// Counters of the generic methods (rho, BSGS, kangaroo, the claw).
 fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
@@ -573,6 +624,9 @@ fn known_uncounted(
         if method == "ic.large_prime" {
             out.push("large_prime_merge_rebuilds");
         }
+        if method.starts_with("ic.cm_folded_") {
+            out.push(CM_FOLDED_NATIVE_GAP);
+        }
     }
     if let Some(s) = solver.filter(|s| !solver_complete(s)) {
         if let Some(gap) = solver_gap(&s.op_unit) {
@@ -667,9 +721,62 @@ pub fn widths_of(curve: &CurveFacts) -> Result<Widths, String> {
         "fp4" => Field::Fp4 {
             bits: curve.field_bits.ok_or("fp4 curve without field_bits")?,
         },
+        // Extension of 2026-10-21: the two `extension` constructions
+        // (`workload.rs`, `Instance::F2m4` and `Instance::Fp4Torsion`),
+        // whose widths the ICV1 slug names.
+        "extension" => extension_field(curve)?,
         f => return Err(format!("no bitop/v1 field for family `{f}`")),
     };
     Ok(Widths { field, r_bits })
+}
+
+/// The field of an `extension`-family curve (extension of 2026-10-21).
+///
+/// - `icv1-f2m<N>-…` is a curve `y² + xy = x³ + ax² + b` over
+///   `F_{2^N}`, `N = 4m` with `field_bits = m` the tower's base degree
+///   (`gaudry_quartic_bin`): a binary field of degree `N`, priced as every
+///   `F_{2^n}` is, by its degree alone (the convention prices the field, not
+///   the tower the code computes in).
+/// - `icv1-fp<b>k4-…` is a curve over `F_{p⁴}` with `p` of `b` bits
+///   (`field_bits = b`): the `F_{p⁴}` convention.
+///
+/// Anything else, or a slug that disagrees with `field_bits`, has no field.
+fn extension_field(curve: &CurveFacts) -> Result<Field, String> {
+    let bits = curve
+        .field_bits
+        .ok_or("extension curve without field_bits")?;
+    let digits = |s: &str| -> Option<u32> {
+        let d: String = s.chars().take_while(char::is_ascii_digit).collect();
+        d.parse().ok()
+    };
+    if let Some(rest) = curve.slug.strip_prefix("icv1-f2m") {
+        let n = digits(rest).ok_or("extension slug without a degree")?;
+        if n != 4 * bits {
+            return Err(format!(
+                "extension curve {}: degree {n} is not 4 × field_bits {bits}",
+                curve.slug
+            ));
+        }
+        return Ok(Field::Binary { n });
+    }
+    if let Some(rest) = curve.slug.strip_prefix("icv1-fp") {
+        let b = digits(rest).ok_or("extension slug without a width")?;
+        let k = rest
+            .split_once('k')
+            .and_then(|(_, t)| digits(t))
+            .ok_or("extension slug without a degree")?;
+        if k == 4 && b == bits {
+            return Ok(Field::Fp4 { bits });
+        }
+        return Err(format!(
+            "no bitop/v1 field for extension curve {} (p of {b} bits, degree {k})",
+            curve.slug
+        ));
+    }
+    Err(format!(
+        "no bitop/v1 field for extension curve {}",
+        curve.slug
+    ))
 }
 
 fn add_prims(into: &mut BTreeMap<Prim, u128>, prims: &[(Prim, u32)], count: u128) {
@@ -788,6 +895,9 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
                             | "merge_modr_mults"
                             | "row_ops_uncharged"
                             | "lp_merge_ops_uncharged" => "linear_algebra",
+                            "native_field_muls_uncharged" | "native_field_sqrs_uncharged" => {
+                                "native_cold_backend"
+                            }
                             _ => "relations",
                         };
                         let slot = phase_slot(&mut phases, phase);
@@ -1086,6 +1196,340 @@ pub fn summarise(
         });
     }
     Ok(out)
+}
+
+// ── `bitop/v2`: the memory term ──────────────────────────────────────────
+
+pub const WORK_SCHEMA_V2: &str = "ecbench.work/v2";
+
+/// A record's declared memory under `bitop/v2` (`docs/units/BITOPS.md`,
+/// "bitop/v2: memory"): each stored structure's entries times its frozen
+/// entry width, from fields the record already carries.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct Memory {
+    /// Bits by structure: `factor_base`, `matrix`, `tables`, `solver`,
+    /// `native_table`, `table`.
+    pub terms: BTreeMap<String, u128>,
+    /// Fields the rule reads that the record lacks.  Nonempty makes the
+    /// total a lower bound.
+    pub unpriced: Vec<String>,
+}
+
+impl Memory {
+    pub fn bits(&self) -> u128 {
+        self.terms.values().sum()
+    }
+}
+
+/// The counters a generic method reports its stored table through, read in
+/// this order (`bounds::MEMORY_COUNTERS`, the bound fitter's memory axis).
+fn generic_table_entries(counters: &BTreeMap<String, u64>) -> Option<u64> {
+    crate::cryptanalysis::ecbench::bounds::MEMORY_COUNTERS
+        .iter()
+        .find_map(|k| counters.get(*k))
+        .copied()
+}
+
+/// A phase's native or work-native counter, summed over the phases.
+fn phase_sum(phases: &[PhaseRecord], name: &str) -> u128 {
+    phases
+        .iter()
+        .map(|p| {
+            p.native.get(name).copied().unwrap_or(0) as u128
+                + p.work_native.get(name).copied().unwrap_or(0) as u128
+        })
+        .sum()
+}
+
+fn phase_native(phases: &[PhaseRecord], phase: &str, name: &str) -> Option<u64> {
+    phases
+        .iter()
+        .find(|p| p.name == phase)
+        .and_then(|p| p.native.get(name))
+        .copied()
+}
+
+/// Oracle-table natives a record written before the `table_insert_attempts`
+/// counter may carry instead: entries kept.
+const TABLE_ENTRY_NATIVES: &[&str] = &[
+    "pair_table_entries",
+    "fiber_table_entries",
+    "aux_bsgs_table_entries",
+];
+
+/// The memory a record declares, by the rule of `docs/units/BITOPS.md`,
+/// "Which fields a record kind is read from".
+pub fn memory(x: &Priceable, factor_base: Option<&FactorBaseFacts>, widths: &Widths) -> Memory {
+    use bitops::Entry;
+    let mut m = Memory::default();
+    let method = x.method_id;
+    fn term(m: &mut Memory, name: &str, bits: u128) {
+        *m.terms.entry(name.to_string()).or_default() += bits;
+    }
+    if !is_ic(method) {
+        let entry = if method.starts_with("bsgs") {
+            Entry::BabyStep
+        } else {
+            Entry::DistinguishedPoint
+        };
+        match generic_table_entries(x.counters) {
+            Some(n) => term(&mut m, "table", n as u128 * widths.entry_bits(entry)),
+            None => m.unpriced.push("table_entries".into()),
+        }
+        return m;
+    }
+    // The factor base, affine points.
+    match factor_base {
+        Some(fb) => term(
+            &mut m,
+            "factor_base",
+            fb.signed_points as u128 * widths.entry_bits(Entry::FactorBasePoint),
+        ),
+        None => m.unpriced.push("factor_base.signed_points".into()),
+    }
+    // The relation matrix, dense: rows × (columns + the target column).
+    let rows = x
+        .counters
+        .get("matrix_rows")
+        .copied()
+        .or_else(|| phase_native(x.phases, "linear_algebra", "rows"));
+    let columns = factor_base
+        .map(|fb| fb.columns + 1)
+        .or_else(|| phase_native(x.phases, "linear_algebra", "columns"));
+    match (rows, columns) {
+        (Some(r), Some(c)) => term(
+            &mut m,
+            "matrix",
+            r as u128 * c as u128 * widths.entry_bits(Entry::MatrixEntry),
+        ),
+        (r, c) => {
+            if r.is_none() {
+                m.unpriced.push("matrix_rows".into());
+            }
+            if c.is_none() {
+                m.unpriced.push("factor_base.columns".into());
+            }
+        }
+    }
+    // The oracle's tables.
+    if method == "ic.k4_gaudry" {
+        m.unpriced.push("oracle_table_entries".into());
+    } else if x
+        .phases
+        .iter()
+        .any(|p| p.work_native.contains_key("counted:table_insert_attempts"))
+    {
+        term(
+            &mut m,
+            "tables",
+            phase_sum(x.phases, "table_insert_attempts") * widths.entry_bits(Entry::TableEntry),
+        );
+    } else {
+        let present = TABLE_ENTRY_NATIVES.iter().any(|n| {
+            x.counters.contains_key(*n) || x.phases.iter().any(|p| p.native.contains_key(*n))
+        });
+        if present {
+            let entries: u128 = TABLE_ENTRY_NATIVES
+                .iter()
+                .map(|n| phase_sum(x.phases, n) + x.counters.get(*n).copied().unwrap_or(0) as u128)
+                .sum();
+            term(
+                &mut m,
+                "tables",
+                entries * widths.entry_bits(Entry::TableEntry),
+            );
+        } else {
+            m.unpriced.push("table_insert_attempts".into());
+        }
+    }
+    // The solver's peak, where the engine measured it.
+    if let Some(s) = x.solver {
+        if s.peak_bytes > 0 {
+            term(
+                &mut m,
+                "solver",
+                s.peak_bytes as u128 * bitops::BITS_PER_BYTE,
+            );
+        } else {
+            m.unpriced.push("solver.peak_bytes".into());
+        }
+    }
+    // A native backend's declared table.
+    if let Some(&b) = x.counters.get("native_table_bytes_uncharged") {
+        term(&mut m, "native_table", b as u128 * bitops::BITS_PER_BYTE);
+    }
+    m
+}
+
+/// A record's work in `bitop/v2`: the `bitop/v1` gates, the declared
+/// memory, and their product.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct WorkBlockV2 {
+    pub schema: String,
+    pub unit: String,
+    pub widths: Widths,
+    /// Total gates, as a decimal integer: the `bitop/v1` total of the same
+    /// record, the same integer.
+    pub bitops: String,
+    pub log2_bitops: Option<f64>,
+    pub ratio_to_floor: f64,
+    /// Counters with no gate rule; nonempty makes `bitops` a lower bound.
+    pub unpriced: Vec<String>,
+    pub known_uncounted: Vec<String>,
+    /// `unpriced` and `known_uncounted` are both empty.
+    pub complete: bool,
+    /// Bits of the structures held, as a decimal integer.
+    pub memory_bits: String,
+    pub log2_memory_bits: Option<f64>,
+    /// Bits by structure.
+    pub memory_terms: BTreeMap<String, String>,
+    /// Fields the memory rule reads that the record lacks; nonempty makes
+    /// `memory_bits` and `at` lower bounds.
+    pub memory_unpriced: Vec<String>,
+    pub memory_complete: bool,
+    /// `bitops × memory_bits`, exact, as a decimal integer.
+    pub at: String,
+    pub log2_at: Option<f64>,
+}
+
+/// The exact decimal product of two `u128`s (it can exceed `u128`).
+pub fn mul_decimal(a: u128, b: u128) -> String {
+    const BASE: u128 = 1_000_000_000;
+    let limbs = |mut v: u128| {
+        let mut out = Vec::new();
+        while v > 0 {
+            out.push(v % BASE);
+            v /= BASE;
+        }
+        out
+    };
+    let (la, lb) = (limbs(a), limbs(b));
+    if la.is_empty() || lb.is_empty() {
+        return "0".into();
+    }
+    let mut acc = vec![0u128; la.len() + lb.len()];
+    for (i, x) in la.iter().enumerate() {
+        for (j, y) in lb.iter().enumerate() {
+            acc[i + j] += x * y;
+        }
+    }
+    for i in 0..acc.len() {
+        let carry = acc[i] / BASE;
+        acc[i] %= BASE;
+        if carry > 0 && i + 1 < acc.len() {
+            acc[i + 1] += carry;
+        }
+    }
+    while acc.len() > 1 && *acc.last().unwrap() == 0 {
+        acc.pop();
+    }
+    let mut s = acc.last().unwrap().to_string();
+    for limb in acc.iter().rev().skip(1) {
+        s.push_str(&format!("{limb:09}"));
+    }
+    s
+}
+
+/// Price a record in `bitop/v2`.
+pub fn price_v2(
+    x: &Priceable,
+    factor_base: Option<&FactorBaseFacts>,
+) -> Result<WorkBlockV2, String> {
+    let v1 = price(x)?;
+    let mem = memory(x, factor_base, &v1.widths);
+    let total: u128 = v1.bitops.parse().map_err(|_| "bitops is not an integer")?;
+    let bits = mem.bits();
+    let at = mul_decimal(total, bits);
+    Ok(WorkBlockV2 {
+        schema: WORK_SCHEMA_V2.into(),
+        unit: bitops::UNIT_V2.into(),
+        widths: v1.widths,
+        bitops: v1.bitops,
+        log2_bitops: v1.log2_bitops,
+        ratio_to_floor: v1.ratio_to_floor,
+        unpriced: v1.unpriced,
+        known_uncounted: v1.known_uncounted,
+        complete: v1.complete,
+        memory_bits: bits.to_string(),
+        log2_memory_bits: (bits > 0).then(|| bitops::log2(bits)),
+        memory_terms: mem
+            .terms
+            .iter()
+            .map(|(k, v)| (k.clone(), v.to_string()))
+            .collect(),
+        memory_complete: mem.unpriced.is_empty(),
+        memory_unpriced: mem.unpriced,
+        log2_at: (total > 0 && bits > 0).then(|| bitops::log2(total) + bitops::log2(bits)),
+        at,
+    })
+}
+
+/// Price a committed record in `bitop/v2`.
+pub fn price_record_v2(
+    r: &crate::cryptanalysis::ecbench::record::Record,
+) -> Result<WorkBlockV2, String> {
+    price_v2(
+        &Priceable {
+            method_id: &r.method.id,
+            method_params: &r.method.params,
+            curve: &r.workload.curve,
+            phases: &r.phases,
+            counters: &r.counters,
+            solver: r.solver.as_ref(),
+        },
+        r.factor_base.as_ref(),
+    )
+}
+
+/// The record as the bound fitter reads it in `bitop/v2`: [`bitop_view`]
+/// with the unit renamed, and a record incomplete in memory a lower bound
+/// naming the fields it lacks (as `memory:<field>`).  The gate figures are
+/// `bitop/v1`'s.
+pub fn bitop_v2_view(
+    r: &crate::cryptanalysis::ecbench::record::Record,
+) -> Result<crate::cryptanalysis::ecbench::record::Record, String> {
+    let mut v = bitop_view(r)?;
+    let w2 = price_record_v2(r)?;
+    v.cost.unit = bitops::UNIT_V2.into();
+    v.cost.lower_bound = !w2.complete || !w2.memory_complete;
+    v.cost
+        .unpriced
+        .extend(w2.memory_unpriced.iter().map(|m| format!("memory:{m}")));
+    Ok(v)
+}
+
+/// One line of `ecbench work --unit bitop/v2`.
+#[derive(Debug, Serialize)]
+pub struct WorkLineV2 {
+    pub record_id: String,
+    pub session_id: String,
+    pub arm: String,
+    pub method: String,
+    pub params: BTreeMap<String, String>,
+    pub curve: String,
+    pub family: String,
+    pub log2_r: f64,
+    pub status: String,
+    pub warmup: bool,
+    pub total_gae: Option<f64>,
+    pub work: Result<WorkBlockV2, String>,
+}
+
+pub fn work_line_v2(r: &crate::cryptanalysis::ecbench::record::Record) -> WorkLineV2 {
+    WorkLineV2 {
+        record_id: r.record_id.clone(),
+        session_id: r.session_id.clone(),
+        arm: r.arm.clone(),
+        method: r.method.id.clone(),
+        params: r.method.params.clone(),
+        curve: r.workload.curve.slug.clone(),
+        family: r.workload.curve.family.clone(),
+        log2_r: (r.workload.curve.r as f64).log2(),
+        status: r.outcome.status.clone(),
+        warmup: r.warmup,
+        total_gae: r.cost.total_gae,
+        work: price_record_v2(r),
+    }
 }
 
 fn push_unique(v: &mut Vec<String>, s: &str) {
@@ -1389,6 +1833,173 @@ mod tests {
             vec!["solver_macaulay_build_and_summation_polynomials".to_string()]
         );
         assert!(!w.complete);
+    fn price_ic(
+        method: &str,
+        c: &CurveFacts,
+        phases: &[PhaseRecord],
+        counters: &BTreeMap<String, u64>,
+    ) -> WorkBlock {
+        let params = BTreeMap::new();
+        price(&Priceable {
+            method_id: method,
+            method_params: &params,
+            curve: c,
+            phases,
+            counters,
+            solver: None,
+        })
+        .unwrap()
+    }
+
+    /// Extension of 2026-10-21: the projected base's counters.
+    #[test]
+    fn projected_base_counters_price_the_probe_and_nothing_twice() {
+        let c = curve("prime", 24, (1 << 23) + 15, 2);
+        let phases = vec![PhaseRecord {
+            name: "factor_base".into(),
+            adds: 40,
+            doubles: 60,
+            native: [
+                (
+                    "projected_base_membership_checks_uncharged".to_string(),
+                    7u64,
+                ),
+                ("projected_base_dedup_probes_uncharged".into(), 7),
+                ("projected_base_duplicate_points".into(), 2),
+                ("projected_base_column_map_entries_uncharged".into(), 10),
+                ("aux_supersingular".into(), 1),
+            ]
+            .into_iter()
+            .collect(),
+            ..Default::default()
+        }];
+        let w = price_ic("ic.pipeline", &c, &phases, &BTreeMap::new());
+        assert!(w.unpriced.is_empty(), "{:?}", w.unpriced);
+        let p = &w.phases[0].prims;
+        // Only the dedup probes add primitives; the membership checks are
+        // inside the phase's 40 additions and 60 doublings.
+        assert_eq!(p["hash_probe"], 7);
+        assert_eq!(p["group_add"], 40);
+        assert_eq!(p["group_double"], 60);
+        assert_eq!(p.len(), 3);
+    }
+
+    /// Extension of 2026-10-21: the CM-folded native backend.
+    #[test]
+    fn cm_folded_native_products_are_priced_and_the_rest_is_listed() {
+        let c = curve("prime", 30, (1 << 29) + 11, 2);
+        let phases = vec![
+            PhaseRecord {
+                name: "native_cold_backend".into(),
+                wall_ns: Some(5),
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "independent_replay".into(),
+                adds: 3,
+                ..Default::default()
+            },
+        ];
+        let counters: BTreeMap<String, u64> = [
+            ("native_field_muls_uncharged", 1000u64),
+            ("native_field_sqrs_uncharged", 300),
+            ("native_group_doubles_uncharged", 20),
+            ("native_group_mixed_uncharged", 10),
+            ("native_scalar_calls_uncharged", 2),
+            ("native_factor_base_scans_uncharged", 9),
+            ("native_queries_uncharged", 64),
+            ("native_hits_uncharged", 5),
+            ("native_rank_uncharged", 5),
+            ("native_rejected_duplicate_columns_uncharged", 1),
+            ("native_pair_table_keys_uncharged", 100),
+            ("native_table_bytes_uncharged", 4096),
+            ("independent_replay_wall_ns", 123_456_789),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), v))
+        .collect();
+        let w = price_ic("ic.cm_folded_native_v1", &c, &phases, &counters);
+        assert!(w.unpriced.is_empty(), "{:?}", w.unpriced);
+        assert!(!w.complete);
+        assert!(w.known_uncounted.iter().any(|k| k == CM_FOLDED_NATIVE_GAP));
+        let native = w
+            .phases
+            .iter()
+            .find(|p| p.name == "native_cold_backend")
+            .unwrap();
+        assert_eq!(native.prims["field_mul"], 1000);
+        assert_eq!(native.prims["field_sqr"], 300);
+        assert_eq!(native.prims.values().filter(|c| **c > 0).count(), 2);
+        let ws = widths_of(&c).unwrap();
+        let expect = 1000 * ws.gates(FieldMul).unwrap()
+            + 300 * ws.gates(FieldSqr).unwrap()
+            + 3 * ws.gates(GroupAdd).unwrap();
+        // The wall-clock diagnostic adds nothing.
+        assert_eq!(w.bitops, expect.to_string());
+    }
+
+    fn extension_curve(slug: &str, bits: u32) -> CurveFacts {
+        let mut c = curve("prime", bits, 1_000_003, 2);
+        c.family = "extension".into();
+        c.slug = slug.into();
+        c.field_degree = None;
+        c.field_bits = Some(bits);
+        c
+    }
+
+    /// Extension of 2026-10-21: the `extension` family's fields.
+    #[test]
+    fn extension_curves_take_their_field_from_the_slug() {
+        let f2m = extension_curve("icv1-f2m56-tm338854401-5d597dcf", 14);
+        assert_eq!(widths_of(&f2m).unwrap().field, Field::Binary { n: 56 });
+        let fp4 = extension_curve("icv1-fp5k4-tm926-0123abcd", 5);
+        assert_eq!(widths_of(&fp4).unwrap().field, Field::Fp4 { bits: 5 });
+        // A slug that disagrees with field_bits, a degree other than 4 and
+        // an unknown shape have no field.
+        assert!(widths_of(&extension_curve("icv1-f2m56-x", 13)).is_err());
+        assert!(widths_of(&extension_curve("icv1-fp5k2-x", 5)).is_err());
+        assert!(widths_of(&extension_curve("icv1-hec-x", 5)).is_err());
+        // The binary extension's addition is the F_{2^56} affine addition.
+        let b = Widths {
+            field: Field::Binary { n: 56 },
+            r_bits: 55,
+        };
+        let phases = vec![PhaseRecord {
+            name: "setup".into(),
+            adds: 2,
+            ..Default::default()
+        }];
+        let params = BTreeMap::new();
+        let w = price(&Priceable {
+            method_id: "rho.negation",
+            method_params: &params,
+            curve: &f2m,
+            phases: &phases,
+            counters: &BTreeMap::new(),
+            solver: None,
+        })
+        .unwrap();
+        assert_eq!(w.bitops, (2 * b.gates(GroupAdd).unwrap()).to_string());
+    }
+
+    /// Kept unpriced on 2026-10-21: the counter records the enumerated
+    /// set's size, not the subsets summed or their weight, so no fixed
+    /// primitive sum per increment exists.
+    #[test]
+    fn enumerated_abscissae_stay_unpriced() {
+        let c = curve("binary", 23, (1 << 21) + 5, 2);
+        let phases = vec![PhaseRecord {
+            name: "factor_base".into(),
+            native: [("abscissae_enumerated_uncharged".to_string(), 5u64)]
+                .into_iter()
+                .collect(),
+            ..Default::default()
+        }];
+        let w = price_ic("ic.pipeline", &c, &phases, &BTreeMap::new());
+        assert_eq!(
+            w.unpriced,
+            vec!["abscissae_enumerated_uncharged".to_string()]
+        );
     }
 
     #[test]
@@ -1413,5 +2024,190 @@ mod tests {
         .unwrap();
         assert_eq!(w.phases[0].prims["modr_mul"], 50);
         assert_eq!(w.phases.len(), 1);
+    }
+
+    #[test]
+    fn memory_of_a_baby_step_table_and_of_a_walk() {
+        let c = curve("prime", 20, (1 << 19) + 21, 2);
+        let params = BTreeMap::new();
+        let ws = widths_of(&c).unwrap();
+        let at = |method: &'static str, counters: &BTreeMap<String, u64>| {
+            memory(
+                &Priceable {
+                    method_id: method,
+                    method_params: &params,
+                    curve: &c,
+                    phases: &[],
+                    counters,
+                    solver: None,
+                },
+                None,
+                &ws,
+            )
+        };
+        let bsgs: BTreeMap<String, u64> = [
+            ("inserts_uncharged".to_string(), 513u64),
+            ("lookups_uncharged".into(), 16),
+        ]
+        .into_iter()
+        .collect();
+        let m = at("bsgs.negation", &bsgs);
+        assert_eq!(m.terms["table"], 513 * (20 + 20));
+        assert!(m.unpriced.is_empty());
+        let rho: BTreeMap<String, u64> = [("distinguished_points".to_string(), 71u64)]
+            .into_iter()
+            .collect();
+        let m = at("rho.negation", &rho);
+        assert_eq!(m.terms["table"], 71 * (40 + 40));
+        assert_eq!(m.bits(), 71 * 80);
+        let m = at("rho.plain", &BTreeMap::new());
+        assert!(m.terms.is_empty());
+        assert_eq!(m.unpriced, vec!["table_entries".to_string()]);
+    }
+
+    #[test]
+    fn memory_of_an_index_calculus_record_and_what_an_older_one_lacks() {
+        // κ = 23, w = 22.
+        let c = curve("koblitz", 23, (1 << 21) + 5, 46);
+        let fb = FactorBaseFacts {
+            fb_id: String::new(),
+            fb_sha256: String::new(),
+            family: "binary-subspace".into(),
+            params: BTreeMap::new(),
+            description: String::new(),
+            signed_points: 64,
+            abscissae: 32,
+            columns: 32,
+            dimension: Some(6),
+            points_sha256: String::new(),
+        };
+        let phases = vec![
+            PhaseRecord {
+                name: "oracle_setup".into(),
+                work_native: [
+                    ("counted:table_insert_attempts".to_string(), 1u64),
+                    ("table_insert_attempts".into(), 2025),
+                ]
+                .into_iter()
+                .collect(),
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "linear_algebra".into(),
+                native: [("rows".to_string(), 17u64), ("columns".into(), 33)]
+                    .into_iter()
+                    .collect(),
+                ..Default::default()
+            },
+        ];
+        let counters: BTreeMap<String, u64> =
+            [("matrix_rows".to_string(), 17u64)].into_iter().collect();
+        let params = BTreeMap::new();
+        let x = Priceable {
+            method_id: "ic.pipeline",
+            method_params: &params,
+            curve: &c,
+            phases: &phases,
+            counters: &counters,
+            solver: None,
+        };
+        let ws = widths_of(&c).unwrap();
+        let m = memory(&x, Some(&fb), &ws);
+        assert_eq!(m.terms["factor_base"], 64 * 46);
+        assert_eq!(m.terms["matrix"], 17 * 33 * 22);
+        assert_eq!(m.terms["tables"], 2025 * 45);
+        assert!(m.unpriced.is_empty());
+        assert_eq!(m.bits(), 64 * 46 + 17 * 33 * 22 + 2025 * 45);
+        // Without the base block and the marker, and with a solver that did
+        // not measure its peak: the matrix width falls back to the phase's
+        // column count, and every other field is named, never zero.
+        let solver = SolverStats::default();
+        let older = vec![phases[1].clone()];
+        let x = Priceable {
+            phases: &older,
+            solver: Some(&solver),
+            ..x
+        };
+        let m = memory(&x, None, &ws);
+        assert_eq!(m.terms.get("factor_base"), None);
+        assert_eq!(m.terms["matrix"], 17 * 33 * 22);
+        assert_eq!(
+            m.unpriced,
+            vec![
+                "factor_base.signed_points".to_string(),
+                "table_insert_attempts".into(),
+                "solver.peak_bytes".into(),
+            ]
+        );
+        let w2 = price_v2(&x, None).unwrap();
+        let v1 = price(&x).unwrap();
+        assert!(!w2.memory_complete);
+        assert_eq!(w2.schema, WORK_SCHEMA_V2);
+        assert_eq!(w2.unit, bitops::UNIT_V2);
+        assert_eq!(w2.bitops, v1.bitops);
+        assert_eq!(w2.memory_bits, (17 * 33 * 22).to_string());
+        assert_eq!(w2.at, mul_decimal(v1.bitops.parse().unwrap(), 17 * 33 * 22));
+        // ic.k4_gaudry keeps its oracle table in no counter.
+        let x = Priceable {
+            method_id: "ic.k4_gaudry",
+            solver: None,
+            ..x
+        };
+        let m = memory(&x, None, &ws);
+        assert!(m.unpriced.contains(&"oracle_table_entries".to_string()));
+        assert!(!m.unpriced.contains(&"table_insert_attempts".to_string()));
+    }
+
+    #[test]
+    fn decimal_products_are_exact_past_u128() {
+        assert_eq!(mul_decimal(0, 5), "0");
+        assert_eq!(mul_decimal(7, 0), "0");
+        assert_eq!(
+            mul_decimal(123456789012345678901234567890, 1),
+            "123456789012345678901234567890"
+        );
+        assert_eq!(
+            mul_decimal(1_000_000_000, 1_000_000_000),
+            "1000000000000000000"
+        );
+        assert_eq!(
+            mul_decimal(u128::MAX, u128::MAX),
+            "115792089237316195423570985008687907852589419931798687112530834793049593217025"
+        );
+    }
+
+    /// The fixture records of `tests/fixtures/ecbench/work-v1` carry the
+    /// `bitop/v1` block the session wrote; the pricing must reproduce it,
+    /// and `bitop/v2` must carry the same gates.
+    #[test]
+    fn fixture_records_reprice_to_their_committed_blocks() {
+        let dir =
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/ecbench/work-v1");
+        let lines = crate::cryptanalysis::ecbench::runner::read_record_lines(&dir).unwrap();
+        assert_eq!(lines.len(), 4);
+        for (line, r) in &lines {
+            let committed = r.work.as_ref().expect("fixture carries a work block");
+            // `read_record_lines` parses floats with the legacy decimal path,
+            // one ulp off the written text for some values, so compare with
+            // the line as written: under `arbitrary_precision` a `Value`
+            // keeps each number's decimal token, and the comparison is exact.
+            let written: serde_json::Value = serde_json::from_str(line).unwrap();
+            assert_eq!(
+                serde_json::to_value(price_record(r).unwrap()).unwrap(),
+                written["work"],
+                "{}",
+                r.record_id
+            );
+            let v2 = price_record_v2(r).unwrap();
+            assert_eq!(v2.bitops, committed.bitops, "{}", r.record_id);
+            assert!(
+                v2.memory_complete,
+                "{}: {:?}",
+                r.record_id, v2.memory_unpriced
+            );
+            let bits: u128 = v2.memory_bits.parse().unwrap();
+            assert!(bits > 0);
+            assert_eq!(v2.at, mul_decimal(committed.bitops.parse().unwrap(), bits));
+        }
     }
 }

@@ -34,15 +34,6 @@ mod bskernel;
 #[path = "../pdp_speedup/bspairs.rs"]
 mod bspairs;
 #[allow(dead_code)]
-#[path = "../pdp_speedup/bitslice.rs"]
-mod bitslice;
-#[allow(dead_code)]
-#[path = "../pdp_speedup/bskernel.rs"]
-mod bskernel;
-#[allow(dead_code)]
-#[path = "../pdp_speedup/bspairs.rs"]
-mod bspairs;
-#[allow(dead_code)]
 #[path = "../pdp_speedup/common.rs"]
 mod common;
 #[allow(dead_code)]

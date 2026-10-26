@@ -3606,7 +3606,7 @@ thread_local! {
     // The profile API is for a single-threaded solve. A process-global flag
     // also counted unrelated solves running on other test/worker threads.
     static F4_SUPPORT_LOCAL_PROFILE_ENABLED: std::cell::Cell<bool> =
-        std::cell::Cell::new(false);
+        const { std::cell::Cell::new(false) };
 }
 static F4_INHERITED_BASIS_PROFILE_ENABLED: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
