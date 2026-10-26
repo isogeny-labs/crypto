@@ -65,7 +65,9 @@ use crypto_lib::cryptanalysis::koblitz_symmetrised::{
     divisor_for_dimension, enumerate_symmetrised, lift_symmetrised_root, plain_terms,
     symmetrised_terms, u_of_x, SymmetrisedFactorBase,
 };
-use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{
+    bit, mask_from64, masks_low64, F2BoolMono, F2BoolPoly, Mask,
+};
 
 // ════════════════════════════════════════════════════════════════════
 // Field helpers
@@ -458,7 +460,8 @@ fn timed_solve(
     };
     let w0 = f4_word_ops_thread();
     let t0 = Instant::now();
-    let (mut roots, stats): (Vec<u64>, SolveStats) = solve_boolean_system(eqs, n_vars, &opts);
+    let (roots, stats): (Vec<Mask>, SolveStats) = solve_boolean_system(eqs, n_vars, &opts);
+    let mut roots = masks_low64(&roots);
     let ms = t0.elapsed().as_secs_f64() * 1e3;
     let w = f4_word_ops_thread() - w0;
     roots.sort_unstable();
@@ -797,9 +800,9 @@ fn run_eg_cell(
                     // Verdict gate: does some sym root lift?
                     let t = &tgts[ti];
                     let sys = build_symmetrised_system(&kc, &fb, t, m, &st).unwrap();
-                    let lifts = roots
-                        .iter()
-                        .any(|&rt| lift_symmetrised_root(&kc, &fb, &sys, rt, t).is_some());
+                    let lifts = roots.iter().any(|&rt| {
+                        lift_symmetrised_root(&kc, &fb, &sys, mask_from64(rt), t).is_some()
+                    });
                     verdict_ok.push(lifts == truths[ti]);
                 }
                 reports[ai].samples[ti].push(s);
@@ -1559,7 +1562,7 @@ fn run_frob_cell(
 fn anf_to_bool(p: &AnfPoly, offset: u32, n_vars: usize) -> F2BoolPoly {
     let monos: Vec<F2BoolMono> = p
         .monomials()
-        .map(|vs| F2BoolMono::from_mask(vs.iter().fold(0u64, |m, &v| m | (1u64 << (v + offset)))))
+        .map(|vs| F2BoolMono::from_mask(vs.iter().fold(0 as Mask, |m, &v| m | bit(v + offset))))
         .collect();
     F2BoolPoly::from_monos(monos, n_vars)
 }
@@ -1570,13 +1573,13 @@ fn anf_to_bool_two(p: &AnfPoly, split: u32, off_lo: u32, off_hi: u32, n_vars: us
     let monos: Vec<F2BoolMono> = p
         .monomials()
         .map(|vs| {
-            F2BoolMono::from_mask(vs.iter().fold(0u64, |m, &v| {
+            F2BoolMono::from_mask(vs.iter().fold(0 as Mask, |m, &v| {
                 let idx = if v < split {
                     v + off_lo
                 } else {
                     v - split + off_hi
                 };
-                m | (1u64 << idx)
+                m | bit(idx)
             }))
         })
         .collect();

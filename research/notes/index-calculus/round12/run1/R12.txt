@@ -1,0 +1,27 @@
+Round twelve. Plain DP rho, 8-bit vs full-width branch coefficients (S_walk = mean walk ops / sqrt(N), 40 seeds from 0xc0ffee).
+ g    p         N   jac 8b jac full   int 8b int full  full pre  ok
+ 2   41      1321    1.390    1.385    1.259    1.209       408   y
+ 2   61      1399    1.273    1.240    1.269    1.317       408   y
+ 2  101      4663    1.287    1.244    1.352    1.370       476   y
+ 2  151      7949    1.421    1.284    1.324    1.530       476   y
+ 2  211     11813    1.333    1.676    1.401    1.331       510   y
+ 2  251     61667    1.246    1.308    1.327    1.398       578   y
+ 3   23      6299    1.159    1.340    1.346    1.471       476   y
+ 3   31      7333    1.047    1.317    1.261    1.228       476   y
+ 3   41      6679    1.314    1.333    1.291    1.375       476   y
+ 3   61    124459    1.477    1.390    1.521    1.347       612   y
+ 3  101    364747    1.407    1.484    1.406    1.219       680   y
+ 3  151   1180351    1.706    1.457    1.514    1.331       748   y
+ 3  211   4620611    1.820    1.212    1.752    1.303       816   y
+ 4   17      5639    1.422    1.346    1.453    1.245       476   y
+ 4   23     30223    1.233    1.286    1.387    1.230       544   y
+ 4   31    239753    1.303    1.287    1.549    1.239       646   y
+ 4   41    333041    1.344    1.327    1.259    1.173       680   y
+ 4   61  16790591    2.100    1.481    2.171    1.505       884   y
+
+W1 (integer full width, N >= 1e5, 7 rows): median 1.303 (in [1.10, 1.40]), two largest ["1.505", "1.303"] (<= 1.55) -> HOLDS
+W2 (Jacobian full width, N >= 1e5, 7 rows): median 1.390 (in [1.10, 1.40]), two largest ["1.481", "1.212"] (<= 1.55) -> HOLDS
+W3 (control, N <= 6e4, 10 rows): |median full - median 8-bit| Jacobian S_walk = 0.025 -> HOLDS
+W4 (every run verified): HOLDS
+Largest row: Jacobian 8-bit / full-width S_walk = 1.418; full-width precompute 884 ops = 0.2157 sqrt(N).
+Ideal S_walk: 1.2533.
