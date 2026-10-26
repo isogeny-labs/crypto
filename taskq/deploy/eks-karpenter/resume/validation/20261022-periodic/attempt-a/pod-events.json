@@ -1,0 +1,482 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:18:06Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271166",
+                "uid": "9f592020-af0c-40b0-b3d9-65ec29f2a654"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:18:06Z",
+            "message": "waiting for first consumer to be created before binding",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:18:06Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c24ccd404e82",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271167",
+                "uid": "a3b93ac3-e3fd-4fce-a552-1780efb47ad7"
+            },
+            "reason": "WaitForFirstConsumer",
+            "reportingComponent": "persistentvolume-controller",
+            "reportingInstance": "",
+            "source": {
+                "component": "persistentvolume-controller"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:18:08Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271187",
+                "uid": "e6e82af7-e9c4-4de0-9687-89a45199c773"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:18:08Z",
+            "message": "0/6 nodes are available: 2 node(s) didn't match Pod's node affinity/selector, 4 node(s) had untolerated taint(s). no new claims to deallocate, preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling.",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:18:08Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c24d45a4f9e4",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271188",
+                "uid": "8907e3d0-7c74-48a3-9b1c-e59486ad5290"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:18:10Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271189",
+                "uid": "e6e82af7-e9c4-4de0-9687-89a45199c773"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:18:10Z",
+            "message": "Pod should schedule on: nodeclaim/cpu-spot-ggrjf",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:18:10Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c24d97147274",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271197",
+                "uid": "2945f1c8-e940-47a3-9d97-c3d26e8addac"
+            },
+            "reason": "Nominated",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 3,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:18:10Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271166",
+                "uid": "9f592020-af0c-40b0-b3d9-65ec29f2a654"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:18:40Z",
+            "message": "waiting for pod ecbench-periodic-20261022-a-a0 to be scheduled",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:18:10Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c24db5330112",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271420",
+                "uid": "0929703a-2b4e-4294-9a85-3e7fb39a66fd"
+            },
+            "reason": "WaitForPodScheduled",
+            "reportingComponent": "persistentvolume-controller",
+            "reportingInstance": "",
+            "source": {
+                "component": "persistentvolume-controller"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 3,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:18:44Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271189",
+                "uid": "e6e82af7-e9c4-4de0-9687-89a45199c773"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:18:49Z",
+            "message": "0/7 nodes are available: 2 node(s) didn't match Pod's node affinity/selector, 5 node(s) had untolerated taint(s). no new claims to deallocate, preemption: 0/7 nodes are available: 7 Preemption is not helpful for scheduling.",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:18:44Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c255aa6f87c9",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271551",
+                "uid": "6f785751-86c7-4c24-85e0-0bb63629bb76"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 2,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:18:52Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271581",
+                "uid": "9f592020-af0c-40b0-b3d9-65ec29f2a654"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:18:55Z",
+            "message": "Waiting for a volume to be created either by the external provisioner 'ebs.csi.aws.com' or manually by the system administrator. If volume creation is delayed, please verify that the provisioner is running and correctly registered.",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:18:52Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c257833bd265",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271628",
+                "uid": "250482e9-3994-49aa-a4d8-4397c5438c55"
+            },
+            "reason": "ExternalProvisioning",
+            "reportingComponent": "persistentvolume-controller",
+            "reportingInstance": "",
+            "source": {
+                "component": "persistentvolume-controller"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 5,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:18:52Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271581",
+                "uid": "9f592020-af0c-40b0-b3d9-65ec29f2a654"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:19:07Z",
+            "message": "External provisioner is provisioning volume for claim \"isolab-recovery-system/ecbench-periodic-20261022-a-a0\"",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:18:52Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c25783404da1",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271713",
+                "uid": "88450ee8-2235-4438-a776-0eab969a1feb"
+            },
+            "reason": "Provisioning",
+            "reportingComponent": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf",
+            "reportingInstance": "",
+            "source": {
+                "component": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 4,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:18:52Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271581",
+                "uid": "9f592020-af0c-40b0-b3d9-65ec29f2a654"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:18:59Z",
+            "message": "error generating accessibility requirements: no topology key found for node ip-10-84-162-124.us-east-2.compute.internal",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:18:52Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c25783413eb1",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271661",
+                "uid": "c5c1b94b-ba7c-4b43-b54f-53fd37baa917"
+            },
+            "reason": "ProvisioningFailed",
+            "reportingComponent": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf",
+            "reportingInstance": "",
+            "source": {
+                "component": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:19:10Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271581",
+                "uid": "9f592020-af0c-40b0-b3d9-65ec29f2a654"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:19:10Z",
+            "message": "Successfully provisioned volume pvc-9f592020-af0c-40b0-b3d9-65ec29f2a654",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:19:10Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c25b8a29b63b",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271730",
+                "uid": "76ae3457-ce9f-44a3-b7dc-cbccdcfb09c3"
+            },
+            "reason": "ProvisioningSucceeded",
+            "reportingComponent": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf",
+            "reportingInstance": "",
+            "source": {
+                "component": "ebs.csi.aws.com_ebs-csi-controller-6c89866cf-txjj6_63c0fc10-58fa-431f-8081-c02dae6dabbf"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:19:10Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271478",
+                "uid": "e6e82af7-e9c4-4de0-9687-89a45199c773"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:19:10Z",
+            "message": "Successfully assigned isolab-recovery-system/ecbench-periodic-20261022-a-a0 to ip-10-84-162-124.us-east-2.compute.internal",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:19:10Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c25bb42986a8",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271739",
+                "uid": "54099672-4ed4-4cc2-b9e2-538c7c51c15e"
+            },
+            "reason": "Scheduled",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:19:13Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271738",
+                "uid": "e6e82af7-e9c4-4de0-9687-89a45199c773"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:19:13Z",
+            "message": "AttachVolume.Attach succeeded for volume \"pvc-9f592020-af0c-40b0-b3d9-65ec29f2a654\" ",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:19:13Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c25c3a235341",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271757",
+                "uid": "b89e5aa3-c344-4a5a-af98-cd0fffece524"
+            },
+            "reason": "SuccessfulAttachVolume",
+            "reportingComponent": "attachdetach-controller",
+            "reportingInstance": "",
+            "source": {
+                "component": "attachdetach-controller"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:19:16Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{supervisor}",
+                "kind": "Pod",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271738",
+                "uid": "e6e82af7-e9c4-4de0-9687-89a45199c773"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:19:16Z",
+            "message": "Pulling image \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:5f8809b2531682312e6763518f882edfcb3bbf2cdf0c953851983a9e4364db1f\"",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:19:16Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c25cf4f3beb6",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271781",
+                "uid": "1801c96e-b77f-4d45-bd45-2e38d137d1ad"
+            },
+            "reason": "Pulling",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-162-124.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-162-124.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:19:18Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{supervisor}",
+                "kind": "Pod",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271738",
+                "uid": "e6e82af7-e9c4-4de0-9687-89a45199c773"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:19:18Z",
+            "message": "Successfully pulled image \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:5f8809b2531682312e6763518f882edfcb3bbf2cdf0c953851983a9e4364db1f\" in 2.79s (2.79s including waiting). Image size: 151592727 bytes.",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:19:18Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c25d9b49bce1",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271799",
+                "uid": "c3d41bc8-6bdb-41f2-bf7e-27c60cdd8021"
+            },
+            "reason": "Pulled",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-162-124.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-162-124.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:19:18Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{supervisor}",
+                "kind": "Pod",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271738",
+                "uid": "e6e82af7-e9c4-4de0-9687-89a45199c773"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:19:18Z",
+            "message": "Container created",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:19:18Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c25d9be3e0cc",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271800",
+                "uid": "c163cddd-4b4e-4a3b-935b-e2b72abb31da"
+            },
+            "reason": "Created",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-162-124.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-162-124.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-22T05:19:19Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{supervisor}",
+                "kind": "Pod",
+                "name": "ecbench-periodic-20261022-a-a0",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271738",
+                "uid": "e6e82af7-e9c4-4de0-9687-89a45199c773"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-22T05:19:19Z",
+            "message": "Container started",
+            "metadata": {
+                "creationTimestamp": "2026-10-22T05:19:19Z",
+                "name": "ecbench-periodic-20261022-a-a0.18e0c25d9eb17130",
+                "namespace": "isolab-recovery-system",
+                "resourceVersion": "1271801",
+                "uid": "ff881a26-4624-42b4-9fdb-903d66d01b21"
+            },
+            "reason": "Started",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "ip-10-84-162-124.us-east-2.compute.internal",
+            "source": {
+                "component": "kubelet",
+                "host": "ip-10-84-162-124.us-east-2.compute.internal"
+            },
+            "type": "Normal"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
