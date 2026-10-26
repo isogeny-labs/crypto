@@ -207,10 +207,40 @@ fn dot_body(a: &[u32], b: &[u32]) -> (u64, u64) {
     (l, h)
 }
 
+// Explicit kernels. `vpmuludq` multiplies the low 32 bits of each 64-bit
+// lane, so the even lanes of `x · y` come from `x`, `y` directly and the odd
+// lanes from both shifted right by 32. Low and high halves of the products
+// accumulate in separate 64-bit lanes, as in `dot_body`.
+
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "avx2")]
 unsafe fn dot_avx2(a: &[u32], b: &[u32]) -> (u64, u64) {
-    dot_body(a, b)
+    use std::arch::x86_64::*;
+    let n = a.len();
+    let mask = _mm256_set1_epi64x(LO as i64);
+    let (mut lo, mut hi) = (_mm256_setzero_si256(), _mm256_setzero_si256());
+    let mut i = 0;
+    while i + 8 <= n {
+        let x = _mm256_loadu_si256(a.as_ptr().add(i).cast());
+        let y = _mm256_loadu_si256(b.as_ptr().add(i).cast());
+        let pe = _mm256_mul_epu32(x, y);
+        let po = _mm256_mul_epu32(_mm256_srli_epi64(x, 32), _mm256_srli_epi64(y, 32));
+        lo = _mm256_add_epi64(lo, _mm256_add_epi64(_mm256_and_si256(pe, mask), _mm256_and_si256(po, mask)));
+        hi = _mm256_add_epi64(hi, _mm256_add_epi64(_mm256_srli_epi64(pe, 32), _mm256_srli_epi64(po, 32)));
+        i += 8;
+    }
+    let mut lv = [0u64; 4];
+    let mut hv = [0u64; 4];
+    _mm256_storeu_si256(lv.as_mut_ptr().cast(), lo);
+    _mm256_storeu_si256(hv.as_mut_ptr().cast(), hi);
+    let (mut l, mut h) = (lv.iter().sum::<u64>(), hv.iter().sum::<u64>());
+    while i < n {
+        let pr = a[i] as u64 * b[i] as u64;
+        l += pr & LO;
+        h += pr >> 32;
+        i += 1;
+    }
+    (l, h)
 }
 
 /// Four dot products against one `w`, sharing its loads.
@@ -249,14 +279,37 @@ fn dot4_body(r: [&[u32]; 4], w: &[u32]) -> [(u64, u64); 4] {
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "avx512f")]
 unsafe fn dot4_avx512(r: [&[u32]; 4], w: &[u32]) -> [(u64, u64); 4] {
-    dot4_body(r, w)
+    use std::arch::x86_64::*;
+    let n = w.len();
+    let mask = _mm512_set1_epi64(LO as i64);
+    let mut lo = [_mm512_setzero_si512(); 4];
+    let mut hi = [_mm512_setzero_si512(); 4];
+    let mut i = 0;
+    while i + 16 <= n {
+        let y = _mm512_loadu_si512(w.as_ptr().add(i).cast());
+        let yo = _mm512_srli_epi64(y, 32);
+        for k in 0..4 {
+            let x = _mm512_loadu_si512(r[k].as_ptr().add(i).cast());
+            let pe = _mm512_mul_epu32(x, y);
+            let po = _mm512_mul_epu32(_mm512_srli_epi64(x, 32), yo);
+            lo[k] = _mm512_add_epi64(lo[k], _mm512_add_epi64(_mm512_and_si512(pe, mask), _mm512_and_si512(po, mask)));
+            hi[k] = _mm512_add_epi64(hi[k], _mm512_add_epi64(_mm512_srli_epi64(pe, 32), _mm512_srli_epi64(po, 32)));
+        }
+        i += 16;
+    }
+    let mut out = [(0u64, 0u64); 4];
+    for k in 0..4 {
+        let (mut l, mut h) = (_mm512_reduce_add_epi64(lo[k]) as u64, _mm512_reduce_add_epi64(hi[k]) as u64);
+        for j in i..n {
+            let pr = r[k][j] as u64 * w[j] as u64;
+            l += pr & LO;
+            h += pr >> 32;
+        }
+        out[k] = (l, h);
+    }
+    out
 }
 
-#[cfg(target_arch = "x86_64")]
-#[target_feature(enable = "avx2")]
-unsafe fn dot4_avx2(r: [&[u32]; 4], w: &[u32]) -> [(u64, u64); 4] {
-    dot4_body(r, w)
-}
 
 #[inline(always)]
 fn axpy_body(lo: &mut [u64], hi: &mut [u64], c: u32, row: &[u32]) {
@@ -277,13 +330,48 @@ unsafe fn axpy_avx2(lo: &mut [u64], hi: &mut [u64], c: u32, row: &[u32]) {
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "avx512f")]
 unsafe fn dot_avx512(a: &[u32], b: &[u32]) -> (u64, u64) {
-    dot_body(a, b)
+    use std::arch::x86_64::*;
+    let n = a.len();
+    let mask = _mm512_set1_epi64(LO as i64);
+    let (mut lo, mut hi) = (_mm512_setzero_si512(), _mm512_setzero_si512());
+    let mut i = 0;
+    while i + 16 <= n {
+        let x = _mm512_loadu_si512(a.as_ptr().add(i).cast());
+        let y = _mm512_loadu_si512(b.as_ptr().add(i).cast());
+        let pe = _mm512_mul_epu32(x, y);
+        let po = _mm512_mul_epu32(_mm512_srli_epi64(x, 32), _mm512_srli_epi64(y, 32));
+        lo = _mm512_add_epi64(lo, _mm512_add_epi64(_mm512_and_si512(pe, mask), _mm512_and_si512(po, mask)));
+        hi = _mm512_add_epi64(hi, _mm512_add_epi64(_mm512_srli_epi64(pe, 32), _mm512_srli_epi64(po, 32)));
+        i += 16;
+    }
+    let (mut l, mut h) = (_mm512_reduce_add_epi64(lo) as u64, _mm512_reduce_add_epi64(hi) as u64);
+    while i < n {
+        let pr = a[i] as u64 * b[i] as u64;
+        l += pr & LO;
+        h += pr >> 32;
+        i += 1;
+    }
+    (l, h)
 }
 
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "avx512f")]
 unsafe fn axpy_avx512(lo: &mut [u64], hi: &mut [u64], c: u32, row: &[u32]) {
-    axpy_body(lo, hi, c, row)
+    use std::arch::x86_64::*;
+    let n = row.len().min(lo.len()).min(hi.len());
+    let mask = _mm512_set1_epi64(LO as i64);
+    let cv = _mm512_set1_epi64(c as i64);
+    let mut i = 0;
+    while i + 8 <= n {
+        let x = _mm512_cvtepu32_epi64(_mm256_loadu_si256(row.as_ptr().add(i).cast()));
+        let pr = _mm512_mul_epu32(x, cv);
+        let l = _mm512_loadu_si512(lo.as_ptr().add(i).cast());
+        let h = _mm512_loadu_si512(hi.as_ptr().add(i).cast());
+        _mm512_storeu_si512(lo.as_mut_ptr().add(i).cast(), _mm512_add_epi64(l, _mm512_and_si512(pr, mask)));
+        _mm512_storeu_si512(hi.as_mut_ptr().add(i).cast(), _mm512_add_epi64(h, _mm512_srli_epi64(pr, 32)));
+        i += 8;
+    }
+    axpy_body(&mut lo[i..n], &mut hi[i..n], c, &row[i..n]);
 }
 
 /// The widest vector unit to use: 2 = AVX-512, 1 = AVX2, 0 = portable.
@@ -374,7 +462,7 @@ impl Fp {
         #[cfg(target_arch = "x86_64")]
         let v = match simd_level() {
             2 => unsafe { dot4_avx512(r, w) },
-            1 => unsafe { dot4_avx2(r, w) },
+            1 => unsafe { [dot_avx2(r[0], w), dot_avx2(r[1], w), dot_avx2(r[2], w), dot_avx2(r[3], w)] },
             _ => dot4_body(r, w),
         };
         #[cfg(not(target_arch = "x86_64"))]
@@ -714,7 +802,8 @@ fn berlekamp_massey(f: &Fp, seq: &[u64], muls: &mut u64) -> Vec<u64> {
     let mut b: Vec<u32> = vec![1];
     let mut l = 0usize;
     let mut m = 1usize;
-    let mut bd = 1u64;
+    // the inverse of the last nonzero discrepancy, kept with `b`
+    let mut bd_inv = 1u64;
     for n in 0..len {
         let top = l.min(c.len() - 1);
         let d = if top == 0 {
@@ -728,7 +817,7 @@ fn berlekamp_massey(f: &Fp, seq: &[u64], muls: &mut u64) -> Vec<u64> {
             m += 1;
             continue;
         }
-        let coef = f.mul(d, f.inv(bd));
+        let coef = f.mul(d, bd_inv);
         let t = if 2 * l <= n { Some(c.clone()) } else { None };
         if c.len() < b.len() + m {
             c.resize(b.len() + m, 0);
@@ -740,7 +829,7 @@ fn berlekamp_massey(f: &Fp, seq: &[u64], muls: &mut u64) -> Vec<u64> {
         if let Some(t) = t {
             l = n + 1 - l;
             b = t;
-            bd = d;
+            bd_inv = f.inv(d);
             m = 1;
         } else {
             m += 1;
@@ -1444,6 +1533,37 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// Kernel throughput (run by hand: `--ignored --nocapture`).
+    #[test]
+    #[ignore]
+    fn kernel_throughput() {
+        let p = 4_294_967_291u64;
+        let fp = Fp::new(p);
+        let mut rng = StdRng::seed_from_u64(1);
+        let n = 1024;
+        let rows: Vec<Vec<u32>> = (0..160).map(|_| (0..n).map(|_| rng.gen_range(0..p) as u32).collect()).collect();
+        let w: Vec<u32> = (0..n).map(|_| rng.gen_range(0..p) as u32).collect();
+        let reps = 400;
+        let t = std::time::Instant::now();
+        let mut acc = 0u64;
+        for _ in 0..reps {
+            for r in &rows {
+                acc ^= fp.dot(r, &w);
+            }
+        }
+        let e = t.elapsed().as_secs_f64();
+        let t2 = std::time::Instant::now();
+        for _ in 0..reps {
+            for c in (0..160).step_by(4) {
+                let v = fp.dot4([&rows[c], &rows[c + 1], &rows[c + 2], &rows[c + 3]], &w);
+                acc ^= v[0] ^ v[3];
+            }
+        }
+        let e2 = t2.elapsed().as_secs_f64();
+        let prods = (reps * 160 * n) as f64;
+        println!("{} dot {:.2} products/ns, dot4 {:.2} products/ns ({acc})", simd_name(), prods / e / 1e9, prods / e2 / 1e9);
     }
 
     #[test]
