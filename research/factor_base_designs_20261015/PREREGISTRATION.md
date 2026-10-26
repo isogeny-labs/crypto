@@ -1360,3 +1360,85 @@ stops are on different hosts, so the fit is a rough guide:
   timeout at 14 400 s with peak RSS around 90 GB.
 - Neither outcome would change a recorded verdict. An K8S-A11 timeout would be
   the first time-bound m = 4 stop in this study.
+
+### Amendment 14, 2026-10-26: the two `m = 4` cells on a 256 GiB EC2 host (R256-A0, R256-A11), before any of their rows
+
+Registered after Amendments 12 and 13 and before any R256 row exists. It adds
+two cells. It changes no existing row, verdict, threshold or prediction.
+Instrument, seeds, the completed-cell rule, σ, κ, R1 and R2 are unchanged.
+Amendment 13 stays registered as written. It has no rows.
+
+**Why.** Amendment 12 left both open cells *not measurable within 64 GB*: all
+four systems were stopped by `ulimit -v`, A0 at `t = 4` at 1874–1916 s and A11
+at `t = 5` at 6011–6024 s. Amendment 13 registered them on the EKS
+high-memory runner. That run could not start. The ARC controller registers
+its scale set with the token in `arc-github-auth`, and after the repository
+moved to `isogeny-labs/crypto` GitHub answers that call with 404
+(controller log, 2026-10-26, `POST /repos/isogeny-labs/crypto/actions/runners/registration-token`),
+so no listener exists and the queued workflow run never got a runner. The
+owner decided not to replace the token. The owner approved a larger EC2 host
+on 2026-10-26: one `r7i.8xlarge`, up to about 17 h, about $35.
+
+- **Host.** One AWS EC2 `r7i.8xlarge` (32 vCPU, 256 GiB) in us-west-2, Ubuntu
+  24.04, on demand, otherwise idle, with no memory cgroup limit. The two cells
+  run one after the other, R256-A0 first, with
+  `scripts/run_amendment14.sh CELL BINARY OUT`. The instance terminates itself
+  when both cells end, and at a hard cap of 16 h in any case.
+- **Build.** On the instance, from a source archive of the commit that adds
+  this amendment, with `cargo build --release --example fb_designs_slope`. The
+  pre-flight records `rustc` and `cargo` versions, the commit
+  (`FB_DESIGNS_COMMIT`) and the binary's sha256. A failed build ends the
+  instance before any cell runs and leaves no row. Operation counts depend
+  only on code, seed and system, so rows compare with C2, L1 and H64 on
+  `field_ops`, D and `max_cols`. Wall times are descriptive only.
+- **Limit.** `V = min(cgroup_limit_kB − 524288, MemTotal_kB − 524288)` kB as in
+  Amendments 6, 12 and 13. With no cgroup limit this is `MemTotal − 524288`,
+  about 258.6 GB for this instance type (estimated from the 64 GiB host's
+  `MemTotal`, to be read in the pre-flight).
+- **R256-A0, A0 m = 4, t = 4, p₁.** The same two planted systems as C2, L1 and
+  H64-A0:
+  `run --arms A0 --m 4 --t-min 4 --t-max 4 --budget 14400 --grace 600 --vmem-kb V --file 'R256-{arm}-m4-t4'`.
+- **R256-A11, A11 m = 4, t = 5, p₁.** The same two planted systems as L2, L2r
+  and H64-A11:
+  `run --arms A11 --m 4 --t-min 5 --t-max 5 --budget 14400 --grace 600 --vmem-kb V --file 'R256-{arm}-m4-t5'`.
+- **Attribution** is Amendment 13's: `runs/<cell>.oom.txt` holds the job
+  cgroup's OOM-kill counter before and after the run, and the kernel log's OOM
+  lines when it is readable (as root on EC2 it is). A system's limit is
+  attributable only if its row is a `ulimit -v` malloc failure, a timeout or
+  ok, and the record shows no OOM kill. An unreadable counter is not a kill.
+- **Failure of the host.** An instance that ends before both cells finish
+  (hardware failure, the 16 h cap) leaves the unfinished cell *not decided*,
+  with the pushed progress files as the only record. A cell's rows all come
+  from one attempt.
+- **Identity.** `analyze --amendment14` checks that the R256 systems equal
+  C2's, L1's and H64's (A0), and L2's, L2r's and H64's (A11).
+
+**Decision rules, fixed now.** Amendment 13's, with the limit "V kB on the EC2
+host and 4 h". R1: if both R256-A0 systems complete, A11's C2 `t = 4` mean
+`field_ops` against R256-A0's mean decides *survives* or *crossed*, and A0's
+`m = 4` series gains its third cell. If not: *A0 not measurable at `t = 4`
+within V kB and 4 h*, with the binding limit and the partial values. R2: if
+both R256-A11 systems complete, the cell joins A11's `m = 4` series as a
+fourth point and σ and κ are recomputed. If not: *A11 not measurable at
+`m = 4`, `t = 5` within V kB and 4 h*, with the binding limit, and the 3-cell
+verdicts stand. A limit that is not attributable makes the outcome *not
+decided*, with the reason.
+
+**Predictions** (made before any row), by the same power law of peak RSS in
+wall time through each cell's two measured stops as Amendment 13, which are
+on different hosts, so the fit is rough:
+- R256-A0: L1 reached 12.9 GB at 527 s and H64-A0 60.7 GB at 1895 s (means),
+  so the exponent is 1.21. Peak RSS reaches 97 % of V (about 251 GB) at about
+  6100 s. R256-A0 **does not complete**, and its binding limit is **memory**,
+  near 6100 s.
+- R256-A11: L2r reached 13.3 GB at 131 s and H64-A11 62.9 GB at 6018 s, so the
+  exponent is 0.41. That gives about 90 GB at 14 400 s and reaches 250 GB only
+  at about 180 000 s. R256-A11 **does not complete**, and its binding limit is
+  **time**, a timeout at 14 400 s with peak RSS near 90 GB.
+- Neither outcome would change a recorded verdict. If R256-A0 runs out of
+  memory at 256 GiB too, that is the first result that rules out a working set
+  under about 258 GB for A0 at `t = 4`. (An allocation failure under
+  `ulimit -v` bounds the address space, not the resident set, as the review
+  of Amendment 12 recorded.)
+- Worst-case wall time is about 11.7 h (A0 about 2 × 6100 s, A11 up to
+  2 × 15 000 s).
