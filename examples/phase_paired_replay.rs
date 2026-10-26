@@ -1797,7 +1797,7 @@ fn cms_tables_md(cms: &Replayed, native: Option<&Replayed>) -> String {
         "\nDirection on CPU per new relation (B/A above 1 is the legacy direction: {LEGACY_B_OVER_A_CPU}): read the CMS column above; a repetition with arm B skipped has no ratio.\n"
     ));
 
-    md.push_str("\n### Full tables, same renderer as the native study\n\n");
+    md.push_str("\n### Full tables, same renderer as the native study\n\nThe block headed \"Decision rule (PROTOCOL.md)\" below applies the native study's H1 rule to this solver's data. It is exploratory here: the preregistered rule of this follow-up is the verdict at the top.\n\n");
     md.push_str(&tables_md(cms, 5));
     md
 }
