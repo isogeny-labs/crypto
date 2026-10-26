@@ -70,3 +70,7 @@ The digest must match. Before upload the packer extracted/checksummed every
 archived member and repacked to identical bytes. Fresh remote download/member
 verification is additional. Archive/caches are ignored; native study index and
 loose manifests accompany the result.
+
+## Inspected reports in the same bucket
+
+A separate immutable publication copy keeps all eight inspected PDFs, editable figures, 150-dpi PNGs, source data and render sources in `store:evidence/twist_routes_1_3_20261021/continue-20261026/reports.tar.xz`. It has **77 files**, **2,542,272 bytes**, SHA-256 `1d780b238cdfde2af4a311f235cfcd931e53c0028d9ffe34e9496ee9c0f55832`. Conditional upload, native index, fresh-cache pull, remote verification and every member hash pass. [Report manifest](REPORT_ARTIFACTS.json) and [member check](../report-member-verification-20261026-v1/ARCHIVE_CHECK.json). Git report sources remain committed loose; this is a publication copy, not a history repack. Pull with the study-local remote/index above, then run `node research/twist_routes_1_3_20261021/verify-continue-reports.mjs ARCHIVE FRESH_CHECK_DIRECTORY`.
