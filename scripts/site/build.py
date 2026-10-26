@@ -31,7 +31,7 @@ Layout, and why each path is where it is:
 
 The two root-level JSON copies are a compatibility contract, not a
 convenience: the publish workflow reads the previous
-https://aburan28.github.io/crypto/history.json to merge history forward, so
+https://isogeny-labs.github.io/crypto/history.json to merge history forward, so
 moving that file loses every published snapshot before the move. The copies
 under /status/ let the dashboard use relative fetches and so keep working
 when opened straight from the working tree.
@@ -48,7 +48,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 
-BASE_URL = "https://aburan28.github.io/crypto"
+BASE_URL = "https://isogeny-labs.github.io/crypto"
 
 # (source relative to repo root, destination relative to the site root).
 PAGES = (

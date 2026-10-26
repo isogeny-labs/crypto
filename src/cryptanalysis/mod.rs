@@ -95,6 +95,7 @@
 pub mod aes;
 pub mod ai_schoof;
 pub mod algebra_cache;
+pub mod aps_single_relation;
 pub mod aut_folded_rho;
 pub mod auto_attack;
 pub mod avalanche;
