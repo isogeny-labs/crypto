@@ -9,6 +9,11 @@ one warmup and five measured alternating rounds, requires L2 isolation, and
 checks its recovered scalar. The panel validates plumbing and correctness;
 online timing excludes setup, so it makes no end-to-end speed claim.
 
+`n32-resumable.json` is the same 32-bit curve, target and arms with a
+600-second per-round timeout. CRIU can pause computation during an EBS
+checkpoint, so this separate frozen fixture budgets that pause without
+changing the ordinary panel's protocol. Its own validation receipt is pending.
+
 After this directory lands on `main`, dispatch **Iso Lab experiment** from
 `main` with `size_sweep=true`, `instance_type=c8a.2xlarge`, and `seconds=900`.
 For CRIU computation checkpoint and restore, also set `resumable=true`,

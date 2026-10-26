@@ -8,7 +8,7 @@
 | CPU Spot with L2 isolation | `n*/l2-gate.json`, `n*/runner-identity.json`; `cpu-l2-spot` NodePool has `karpenter.sh/capacity-type: spot` | Verified complete for the four jobs |
 | Correctness and independent audit | `n*/audit.json`, `n*/SHA256SUMS`; all four audits passed, 18/18 records L2 per job, 15 exact replays per job | Verified complete |
 | Repeatable Actions dispatch | frozen `../../specs/ic-size-sweep/`, `../../run-ic-sweep`, `../../test-ic-sweep.sh`, `isolab-experiment.yml` | Implemented; Actions dispatch awaits merge to `main` |
-| CRIU checkpoint and restore | `resume/` controller and live `ic-criu-n32-20261026-v1` request | Live request pending Spot provisioning at report time; no new restore claim |
+| CRIU checkpoint and restore | [`criu/v3/state.json`](criu/v3/state.json), computation and fresh-epoch receipts | Verified after one Spot-worker loss and one restore; fresh L2/replay/A/A/S3 epoch passed |
 
 ## Frozen execution
 
@@ -40,6 +40,49 @@ comparison, and L2 gate. SHA-256 verification of every downloaded file passed.
 The bucket for all four prefixes is
 `s3://isolab-results-104186811093-us-east-2/`. The local copy is the
 reviewable source of truth; S3 provides durable originals.
+
+## CRIU recovery diagnostics
+
+The original n32 resumable request (`criu/v1/state.json`) used the same
+120-second per-round timeout. AWS ended its Spot instance before any checkpoint
+was committed (`instance-terminated-no-capacity`), and the controller refused
+to restart from zero. This is the required fail-closed behavior, not a restore.
+
+The second request (`criu/v2/state.json`) committed one encrypted CRIU archive
+and EBS snapshot with S3 readback verification. The computation then exited
+zero, but native replay rejected it. The audit retrieved directly from that
+worker is preserved as [`criu/v2/audit.json`](criu/v2/audit.json), alongside
+the controller's failure receipt. It reports 18 records, 17 verified records,
+14 exact replays reproduced, and no `problems`; the supervisor correctly
+required every record to verify and did not launch a fresh benchmark. The
+failing record's reason was not exported before the PVC was cleaned up.
+Because this run checkpointed a 32-bit computation under the original
+120-second per-round timeout, checkpoint pause is a possible explanation,
+not a proven cause.
+
+The third request ([`criu/v3/request.json`](criu/v3/request.json)) freezes the
+same curve, target, arms, rounds and seeds with a 600-second per-round timeout
+in [`n32-resumable.json`](../../specs/ic-size-sweep/n32-resumable.json). It is
+a separate diagnostic and cannot be pooled with the original panel. The
+controller committed two encrypted CRIU archives and EBS snapshots, verified
+both S3 readbacks, and selected generation 2 after AWS reclaimed the original
+`c8a.2xlarge` Spot instance. It restored on a different `c8a.2xlarge` Spot
+instance. The frozen computation archive has the SHA-256 recorded in
+[`computation-result.json`](criu/v3/computation-result.json), which reports
+`native_replay: true` and `timing_valid: false`. Its extracted
+[`computation-audit.json`](criu/v3/computation-audit.json) verifies all 18
+records and all 15 exact replays; [`restore-result.json`](criu/v3/restore-result.json)
+records a zero CRIU restore exit code.
+
+The controller then created the distinct fresh Spot Job
+`ic-criu-n32-20261026-v3-epoch-1`. Its [result](criu/v3/benchmark-result.json)
+and [`fresh-epoch/`](criu/v3/fresh-epoch/) files record 18/18 L2 executions,
+18/18 verified records, 15 exact replays, an admitted five-pair A/A control,
+and 19/19 S3 payload hashes verified. `SHA256SUMS` was checked against every
+downloaded fresh-epoch file. The [terminal state](criu/v3/state.json) binds
+the original and replacement instance IDs, selected generation, one restore,
+and the fresh Job UID. The interrupted computation's timing is excluded from
+the panel and from any performance claim.
 
 ## Recorded online diagnostics
 

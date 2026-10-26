@@ -28,6 +28,11 @@ for bits in 20 24 28 32; do
   out="$root/n$bits"
   mkdir -p "$out"
   spec_path="taskq/deploy/eks-karpenter/specs/ic-size-sweep/n$bits.json"
+  # CRIU may pause a 32-bit round during its EBS checkpoint. The separately
+  # frozen resumable fixture keeps the same curve/arms and budgets that pause.
+  if [[ "$ISOLAB_SWEEP_RESUMABLE" == true && "$bits" == 32 ]]; then
+    spec_path="taskq/deploy/eks-karpenter/specs/ic-size-sweep/n32-resumable.json"
+  fi
   # The tested commit owns the spec, even when the workflow file is newer.
   if ! curl --fail --silent --show-error \
     -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' \

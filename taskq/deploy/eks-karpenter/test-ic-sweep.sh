@@ -21,8 +21,8 @@ SH
 cat > "$work/fakebin/curl" <<'SH'
 #!/usr/bin/env bash
 url=${!#}
-[[ "$url" =~ /n(20|24|28|32)\.json\?ref= ]] || exit 22
-jq -n --rawfile spec "$FAKE_SPEC_DIR/n${BASH_REMATCH[1]}.json" '{content:($spec|@base64)}'
+[[ "$url" =~ /n(20|24|28|32)(-resumable)?\.json\?ref= ]] || exit 22
+jq -n --rawfile spec "$FAKE_SPEC_DIR/n${BASH_REMATCH[1]}${BASH_REMATCH[2]}.json" '{content:($spec|@base64)}'
 SH
 cat > "$work/bin/resume/fetch-client" <<'SH'
 #!/usr/bin/env bash
@@ -71,4 +71,5 @@ for bits in 20 24 28 32; do
   jq -e --arg name "gh-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT-n$bits" '.schema=="isolab.eks.resumable/v1" and .run_name==$name and .max_restores==2' "$RUNNER_TEMP/isolab-sweep/n$bits/request.json" >/dev/null
   cmp "$RUNNER_TEMP/isolab-sweep/n$bits/request.json" "$RUNNER_TEMP/isolab-sweep/n$bits/results/submitted.json"
 done
+cmp "$here/specs/ic-size-sweep/n32-resumable.json" "$RUNNER_TEMP/isolab-sweep/n32/spec.json"
 echo 'IC sweep offline contract passed'
