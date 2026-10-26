@@ -65,13 +65,26 @@ def collect(receipt_path, output):
     output.mkdir(parents=True, exist_ok=False)
     ec2 = boto3.client('ec2', region_name=controller['region'])
     s3 = boto3.client('s3', region_name=controller['region'])
-    response = ec2.describe_instances(InstanceIds=controller['instance_ids'])
-    instances = [api_instance(instance, controller['account_id'])
-                 for reservation in response['Reservations']
-                 for instance in reservation['Instances']]
-    snapshot = {'schema': 'n83.crossfamily-aws-provider-snapshot/v1',
-                'captured_utc': datetime.now(timezone.utc).isoformat(),
-                'controller': controller, 'instances': instances}
+    launch_snapshot = receipt_path.parent / 'provider_snapshot_at_launch.json'
+    if launch_snapshot.exists():
+        snapshot = json.loads(launch_snapshot.read_text())
+        if (snapshot.get('schema') !=
+                'n83.crossfamily-aws-provider-snapshot/v1' or
+                snapshot.get('controller', {}).get('run_id') !=
+                controller['run_id'] or
+                set(item['instance_id'] for item in
+                    snapshot.get('instances', [])) !=
+                set(controller['instance_ids'])):
+            raise ValueError('launch EC2 snapshot differs from controller')
+    else:
+        response = ec2.describe_instances(InstanceIds=controller['instance_ids'])
+        instances = [api_instance(instance, controller['account_id'])
+                     for reservation in response['Reservations']
+                     for instance in reservation['Instances']]
+        snapshot = {'schema': 'n83.crossfamily-aws-provider-snapshot/v1',
+                    'captured_utc': datetime.now(timezone.utc).isoformat(),
+                    'snapshot_source': 'ec2_describe_instances_at_collection',
+                    'controller': controller, 'instances': instances}
     (output / 'provider_snapshot.json').write_text(json.dumps(
         snapshot, sort_keys=True, indent=2) + '\n')
     archives = []

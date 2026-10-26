@@ -1,6 +1,7 @@
 """Failure gates for the EC2 launch, termination and archive path."""
 
 import io
+from datetime import datetime, timezone
 import tarfile
 import tempfile
 import unittest
@@ -26,6 +27,27 @@ class FakeEc2:
 
 
 class AwsAllocationTest(unittest.TestCase):
+    def test_launch_snapshot_keeps_both_provider_identities(self):
+        class SnapshotEc2:
+            def describe_instances(self, **kwargs):
+                return {'Reservations': [{'Instances': [
+                    {'InstanceId': instance_id, 'InstanceType': 'g5g.4xlarge',
+                     'InstanceLifecycle': 'spot', 'ImageId': 'ami-example',
+                     'Placement': {'AvailabilityZone': 'us-east-1d'},
+                     'SubnetId': 'subnet-example', 'State': {'Name': 'pending'},
+                     'LaunchTime': datetime(2026, 10, 26, 19,
+                                            tzinfo=timezone.utc),
+                     'Tags': [{'Key': 'RunId', 'Value': 'run1'}]}
+                    for instance_id in kwargs['InstanceIds']]}]}
+
+        receipt = {'account_id': '590183823895',
+                   'instance_ids': ['i-first', 'i-second'], 'run_id': 'run1'}
+        snapshot = allocate_aws.provider_snapshot(SnapshotEc2(), receipt)
+        self.assertEqual({item['instance_id'] for item in snapshot['instances']},
+                         {'i-first', 'i-second'})
+        self.assertEqual(snapshot['snapshot_source'],
+                         'ec2_describe_instances_at_launch')
+
     def test_user_data_has_both_guards_and_fits_ec2_limit(self):
         plan = {'account_id': '590183823895', 'region': 'us-east-1',
                 'instance_type': 'g5g.4xlarge', 'image_id': 'ami-example',

@@ -159,6 +159,46 @@ def start_guard(receipt, output):
     return process.pid
 
 
+def provider_snapshot(ec2, receipt):
+    expected = set(receipt['instance_ids'])
+    for attempt in range(8):
+        try:
+            response = ec2.describe_instances(InstanceIds=sorted(expected))
+        except Exception as error:
+            if getattr(error, 'response', {}).get('Error', {}).get(
+                    'Code') != 'InvalidInstanceID.NotFound':
+                raise
+            time.sleep(min(2 ** attempt, 15))
+            continue
+        instances = [instance for reservation in response['Reservations']
+                     for instance in reservation['Instances']]
+        if ({item['InstanceId'] for item in instances} == expected and
+                all({tag['Key']: tag['Value'] for tag in item.get('Tags', [])}.get(
+                    'RunId') == receipt['run_id'] for item in instances)):
+            break
+        time.sleep(min(2 ** attempt, 15))
+    else:
+        raise ValueError('EC2 did not return both allocated instances')
+    frozen = []
+    for item in instances:
+        frozen.append({
+            'account_id': receipt['account_id'],
+            'instance_id': item['InstanceId'],
+            'instance_type': item['InstanceType'],
+            'instance_lifecycle': item.get('InstanceLifecycle'),
+            'image_id': item['ImageId'],
+            'availability_zone': item['Placement']['AvailabilityZone'],
+            'subnet_id': item['SubnetId'],
+            'state': item['State']['Name'],
+            'launch_time': item['LaunchTime'].isoformat(),
+            'tags': {tag['Key']: tag['Value'] for tag in item.get('Tags', [])},
+        })
+    return {'schema': 'n83.crossfamily-aws-provider-snapshot/v1',
+            'captured_utc': utcnow().isoformat(),
+            'snapshot_source': 'ec2_describe_instances_at_launch',
+            'controller': receipt, 'instances': frozen}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--plan', type=Path, required=True)
@@ -223,6 +263,8 @@ def main():
             receipt['result_objects'][str(stratum)] = key
             receipt['status_objects'][str(stratum)] = status_key
             json_write(receipt_path, receipt)
+        json_write(output / 'provider_snapshot_at_launch.json',
+                   provider_snapshot(ec2, receipt))
     except BaseException:
         discovered = ec2.describe_instances(Filters=[
             {'Name': 'tag:Project', 'Values': [PROJECT_TAG]},

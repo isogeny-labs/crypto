@@ -14,7 +14,12 @@ def timestamp(value):
 def verify(snapshot, strata, head):
     controller = snapshot['controller']
     instances = snapshot['instances']
-    if (controller.get('schema') != 'n83.crossfamily-aws-controller/v1' or
+    if (snapshot.get('schema') !=
+            'n83.crossfamily-aws-provider-snapshot/v1' or
+            snapshot.get('snapshot_source') not in (
+                'ec2_describe_instances_at_launch',
+                'ec2_describe_instances_at_collection') or
+            controller.get('schema') != 'n83.crossfamily-aws-controller/v1' or
             controller.get('account_id') != '590183823895' or
             controller.get('region') != 'us-east-1' or
             controller.get('source_head_sha') != head or

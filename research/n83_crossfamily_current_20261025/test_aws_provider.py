@@ -49,7 +49,9 @@ class AwsProviderTest(unittest.TestCase):
                     'tags': {'Project': 'N83HighKCurrent',
                              'RunId': 'run1', 'Stratum': str(index),
                              'SourceHead': head}})
-            snapshot = {'controller': controller, 'instances': instances,
+            snapshot = {'schema': 'n83.crossfamily-aws-provider-snapshot/v1',
+                        'snapshot_source': 'ec2_describe_instances_at_launch',
+                        'controller': controller, 'instances': instances,
                         'captured_utc': '2026-10-26T19:11:00+00:00'}
             self.assertEqual(aws_provider.verify(snapshot, strata, head)[
                 'status'], 'PASS_TWO_DISTINCT_CONCURRENT_AWS_SPOT_INSTANCES')
