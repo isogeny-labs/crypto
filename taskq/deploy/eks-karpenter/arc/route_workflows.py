@@ -16,7 +16,14 @@ ROOT = Path(__file__).resolve().parents[4]
 WORKFLOWS = ROOT / ".github" / "workflows"
 DIRECT = re.compile(r"^(\s*runs-on:) (ubuntu-24\.04|ubuntu-latest)(\s*)$", re.M)
 # ic-dashboard.yml drives a real Chrome; the ARC runner image has none.
-SEALED = {"weak-curve-lean.yml", "weak-curve-conjectures.yml", "ic-dashboard.yml"}
+# ecc2k130-pdp-difficulty-protocol.yml is hashed by SOURCE_LOCK.json and SOURCE_CHECK.json
+# under research/notes/ecc2k130/pdp_difficulty_features_20261001; rewriting it breaks verify.py.
+SEALED = {
+    "weak-curve-lean.yml",
+    "weak-curve-conjectures.yml",
+    "ic-dashboard.yml",
+    "ecc2k130-pdp-difficulty-protocol.yml",
+}
 TRUSTED = (
     "(github.event_name == 'push' || github.event_name == 'schedule' || "
     "github.event_name == 'release' || github.event_name == 'workflow_dispatch' || "
