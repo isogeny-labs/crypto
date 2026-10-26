@@ -324,3 +324,61 @@ scratch directory while the tool was being debugged; the committed run follows t
    coefficients equal the registry model. The explicit sect113r1 degree-5 rows are priced as an
    identity path (same order, same class), not as a Jacobian route.
 
+
+### Amendment 3 (2026-10-26, after an independent review of the merged tool, PR #2594)
+
+Made after the committed run, in response to review findings that were checked against the code
+before anything was changed. Nothing above is rewritten. The certificates are regenerated with the
+tool's own `suite` command as schema `transfer-audit/certificate/v2` (tool `transfer-audit/2`); the
+F9 records and `run-log.json` of the first run are kept as they were. [RESULTS.md](RESULTS.md)
+section 10 lists each change with the effect on the recorded numbers.
+
+1. **Baseline (section 4).** The model's `sqrt(pi r / 4)` is rho *with* negation (`c = 2`); section 4
+   divided it by `sqrt(c)` with `c >= 2`, counting negation twice and putting every baseline 0.5 bit
+   too low. The baseline is `sqrt(pi r / (2c))`: a class of `c` elements (negation included) enters as
+   `sqrt(c / 2)`. The trace-route destination uses the same function. The certificate key
+   `baseline.log2_total_without_automorphisms` is renamed `log2_total_negation_only`, which is what it
+   was. Every baseline rises by 0.5 bit.
+2. **Cover image class (section 6).** Rho on the Jacobian image was priced with negation only while
+   the baseline of a Koblitz-type curve had the Frobenius class `c = 2n/d`, overstating Koblitz cover
+   ratios by `0.5 log2(n/d)` bits. For the binary cover, which is defined over the subfield `F_(2^d)`
+   that gives `E` its class (Frobenius commutes with the pullback), and as a best case for the genus
+   sweep, rho on the image now gets the baseline's class. Prime covers keep negation only (an
+   automorphism of `E` of order 3 or 4 does not lift to `v^2 = F(u^2 + c)`). The certificate records
+   the total under the frozen model alone (`costs.log2_total_frozen_model`), and the F2 cross-check
+   with `docs/curves/jacobian-transfers.json` compares that, so F2 stays a wiring check of the frozen
+   formulas and says so.
+3. **Margin (section 7, condition 2).** "The total is below the baseline" is read as "below the
+   baseline by at least `CostModel::advantage_margin_bits` (8 bits)", the threshold the lead class
+   already used. The prices are formulas with `o(1)` dropped ("can move it by many bits"), and the
+   sign of a three-bit difference decided a weakness verdict in the first run (BN318). A price below
+   the baseline by less than the margin is a `formula_marginal` lead and the verdict stays
+   `no weakness found in scope`. The vocabulary is unchanged. The verdict explanation says it is
+   relative to rho on `<G>`, not a statement of absolute security.
+4. **Calibration (section 8, controls).** Boundary controls are added on both sides of both lines
+   that decided a verdict: BN254, BN318, BLS12-638, BN350 and BN446 (the registry has no BN462).
+   `transfer-audit sweep` audits every prime-field registry curve with a generator and embedding
+   degree at most 64, and a unit test pins the measured set of `class-weak` curves (13 of 29).
+5. **Obligation `computational_advantage` and the `evaluation` field.** `refuted` is kept only for a
+   carried route priced as a route whose total (a lower bound where phases are unpriced) is not below
+   the baseline. `not_applicable` when the route does not carry `<G>` or does not exist; `unknown`
+   for an identity-path price (class invariants, the explicit degree-5 replay), a formula sweep or
+   heuristic, an unconstructed map whose priced part is below the baseline, a price inside the margin
+   and a price band that straddles the baseline. Every certificate also carries
+   `evaluation: {status, reason}` with `status` one of `evaluated`, `excluded`, `not_evaluable`, so a
+   reader can tell a negative result from a route the tool could not decide; this is a field, not a
+   verdict label.
+6. **F10 through the decision path.** The synthetic control builds a candidate and is judged by the
+   same function as every certificate (`ctx::judge`), with a counterfactual that grants the map and
+   the subgroup, instead of calling the lead classifier directly.
+7. **Smaller corrections.** The subgroup checker no longer returns `verified` without a homomorphism
+   test and treats a map evaluation error as `not_evaluated`, not `refuted`; the pairing candidate
+   checks `r` does not divide `q` before computing the embedding degree; the `End(E)` check passes
+   only for status `proved`; the pairing price band that straddles rho is no longer recorded as a
+   refuted advantage.
+8. **Not a change, a critique.** The F9(a) threshold "fitted exponent `>= 1`" was a design flaw at
+   genus 2 (the model total is exactly `6q`, so any additive overhead puts the finite-range slope
+   below 1). The recorded F9 result is unchanged; the note is in RESULTS.md section 6.
+9. **Section 5D as written.** Amendment 2 moved the pairing verdict to the conservative end of the
+   price band after a scratch run. The rule of section 5D (attacker-favourable end against the
+   baseline) would have made BLS12-381 `class-weak`; RESULTS.md says so.

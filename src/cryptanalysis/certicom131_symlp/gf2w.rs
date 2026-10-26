@@ -134,7 +134,10 @@ impl Gf2W {
         let mut low_terms = irr.low_terms.clone();
         low_terms.sort_unstable();
         low_terms.dedup();
-        assert!(low_terms.iter().all(|&t| t < n), "a low term at or above z^n");
+        assert!(
+            low_terms.iter().all(|&t| t < n),
+            "a low term at or above z^n"
+        );
         // Reduction folds the part above z^n down by at most the largest
         // low term each round; it terminates for any modulus, but is only
         // fast when the low terms are small, as for all standard moduli.
@@ -478,9 +481,9 @@ pub fn is_irreducible(irr: &IrreduciblePoly) -> bool {
     let mut q = 2;
     let mut primes = Vec::new();
     while q * q <= m {
-        if m % q == 0 {
+        if m.is_multiple_of(q) {
             primes.push(q);
-            while m % q == 0 {
+            while m.is_multiple_of(q) {
                 m /= q;
             }
         }
@@ -492,7 +495,7 @@ pub fn is_irreducible(irr: &IrreduciblePoly) -> bool {
     let f = poly_of(irr);
     for q in primes {
         let h = xor(ring.sqr_k(&z, n / q), z);
-        if poly_gcd_is_one(&f, &h) == false {
+        if !poly_gcd_is_one(&f, &h) {
             return false;
         }
     }

@@ -29,6 +29,7 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-18 | [Lazy orbit-member index, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)](https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf) | 1.27× | matched | S |
 | 2026-10-20 | [Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6](https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md) | 4.67× | matched | source-specific; see result |
 | 2026-10-21 | [Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md) | 14.4× | matched | source-specific; see result |
+| 2026-10-17 | [n83 K1107/root11 sixteen-point cold factor-base frontier](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md) | 47.1× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
 
 ## Frontier audit and subsequent corrections (implementation result 2026-10-14)
 
@@ -450,6 +451,81 @@ Owner criterion (2026-10-24): relations come from solving summation-polynomial s
 | 1 | 23 | 8 | 2 | 8 | 48,821 | 0.07077 | 0.000359 | 197 |
 | 0 | 41 | 14 | 4 | 4 | 181,803,464 | 478.4 | 0.0131 | 36,440 |
 
+## GHS-weak E0/F_{q^3} (N4 v2): frozen B0 vs double large primes, SGE + block Lanczos; plain and negation-map rho
+
+Copied from `research/quartic_n4v2_20261020/results/summary.json`. Same restrictions as the N4 section: one special GHS-weak family, outside tables A–C, cold one-target cost in F_q-multiplication equivalents. Class: improvement over the frozen N4 B0 (restricted to the GHS-weak family). Headline (pre-registered) arm DL; baseline B0. Arm / B0 on the same instances (w = 0):
+
+- D / B0 at q = 65479: 0.138 [0.137, 0.139] (lower)
+- D / B0 at q = 131071: 0.119 [0.119, 0.12] (lower)
+- D / B0 at q = 262111: 0.11 [0.109, 0.111] (lower)
+- D / B0 at q = 524287: 0.0953 [0.0933, 0.0971] (lower)
+- D / B0 at q = 1048507: 0.0905 [0.0901, 0.0908] (lower)
+- D / B0 at q = 2097091: 0.0812 [0.0809, 0.0817] (lower)
+- DL / B0 at q = 65479: 0.0838 [0.0828, 0.0847] (lower)
+- DL / B0 at q = 131071: 0.0647 [0.0642, 0.0654] (lower)
+- DL / B0 at q = 262111: 0.0607 [0.0604, 0.0609] (lower)
+- DL / B0 at q = 524287: 0.05 [0.0498, 0.0501] (lower)
+- DL / B0 at q = 1048507: 0.0479 [0.0478, 0.0479] (lower)
+- DL / B0 at q = 2097091: 0.0418 [0.0418, 0.0419] (lower)
+- L / B0 at q = 65479: 0.773 [0.764, 0.782] (lower)
+- L / B0 at q = 131071: 0.792 [0.735, 0.89] (lower)
+- L / B0 at q = 262111: 0.762 [0.754, 0.776] (lower)
+- L / B0 at q = 524287: 0.756 [0.751, 0.765] (lower)
+- L / B0 at q = 1048507: 0.778 [0.767, 0.789] (lower)
+- L / B0 at q = 2097091: 0.784 [0.767, 0.816] (lower)
+
+| IC arm | rho | q | IC/rho (w=0) | IC/rho (w=1) | resolved |
+|:--|:--|--:|:--|:--|:--|
+| B0 | plain | 4051 | 0.88 [0.802, 0.974] | 0.728 [0.665, 0.799] | IC lower |
+| B0 | plain | 65479 | 0.271 [0.241, 0.306] | 0.254 [0.228, 0.285] | IC lower |
+| B0 | plain | 1048507 | 0.164 [0.127, 0.221] | 0.144 [0.112, 0.193] | IC lower |
+| B0 | plain | 2097091 | 0.109 [0.0903, 0.142] | 0.0973 [0.0802, 0.13] | IC lower |
+| B0 | neg | 4051 | 1.19 [1.09, 1.3] | 0.51 [0.47, 0.554] | unresolved |
+| B0 | neg | 65479 | 0.403 [0.361, 0.453] | 0.192 [0.173, 0.217] | IC lower |
+| B0 | neg | 2097091 | 0.125 [0.0945, 0.183] | 0.0567 [0.0428, 0.082] | IC lower |
+| DL | plain | 4051 | 0.171 [0.148, 0.198] | 0.17 [0.153, 0.189] | IC lower |
+| DL | plain | 65479 | 0.0227 [0.0202, 0.0256] | 0.0307 [0.0276, 0.0345] | IC lower |
+| DL | plain | 1048507 | 0.00787 [0.0061, 0.0106] | 0.00979 [0.00762, 0.0131] | IC lower |
+| DL | plain | 2097091 | 0.00456 [0.00378, 0.00592] | 0.00579 [0.00477, 0.00772] | IC lower |
+| DL | neg | 4051 | 0.231 [0.199, 0.265] | 0.119 [0.108, 0.132] | IC lower |
+| DL | neg | 65479 | 0.0337 [0.0302, 0.038] | 0.0233 [0.0209, 0.0262] | IC lower |
+| DL | neg | 2097091 | 0.00523 [0.00395, 0.00764] | 0.00337 [0.00255, 0.00488] | IC lower |
+
+Fitted exponents (w = 0):
+
+- B0, full (k 12..22): 1.209 [1.204, 1.214]
+- B0, high (k 17..22): 1.141 [1.139, 1.142]
+- S, full (k 12..22): 1.211 [1.203, 1.218]
+- S, high (k 17..22): 1.108 [1.050, 1.153]
+- L0, full (k 12..22): 1.167 [1.157, 1.175]
+- L0, high (k 17..22): 1.102 [1.046, 1.148]
+- L1, full (k 12..22): 1.142 [1.132, 1.151]
+- L1, high (k 17..22): 1.149 [1.130, 1.165]
+- L, full (k 12..22): 1.212 [1.204, 1.220]
+- L, high (k 17..22): 1.162 [1.138, 1.184]
+- D, full (k 12..22): 1.035 [1.028, 1.042]
+- D, high (k 17..22): 1.008 [1.006, 1.011]
+- DL1, full (k 12..22): 0.938 [0.927, 0.950]
+- DL1, high (k 17..22): 1.017 [1.015, 1.021]
+- DL, full (k 12..22): 0.983 [0.975, 0.993]
+- DL, high (k 17..22): 0.988 [0.986, 0.989]
+- plain, full (k 12..22): 1.504 [1.470, 1.532]
+- plain, high (k 17..22): 1.475 [1.373, 1.573]
+- neg, full (k 12..22): 1.543 [1.494, 1.583]
+- neg, high (k 17..22): 1.640 [1.493, 1.769]
+
+Crossover against negation-map rho:
+
+- B0, M-eq w=0: resolved from q = 16363, interpolated q* = 6371.2 [5383.3, 8267.3]
+- B0, M-eq w=0.1: resolved from q = 16363, interpolated q* = 3952.5 [3516.3, 4757.4]
+- B0, M-eq w=1: resolved from q = 16363, interpolated q* = 894.5 [774.6, 1083.7]
+- B0, wall: resolved from q = 2097091, interpolated q* = 276577.8 [231720.5, 426374.6]
+- DL, M-eq w=0: resolved from q = 991, interpolated q* = 555.4 [388.9, 751.7]
+- DL, M-eq w=0.1: resolved from q = 991, interpolated q* = 456.2 [343.7, 639.0]
+- DL, M-eq w=1: resolved from q = 991, interpolated q* = 276.3 [231.9, 319.4]
+- DL, wall: resolved from q = 8191, interpolated q* = 5704.2 [1495.3, 7612.6]
+
+
 ## N83 Tier 1 one-target cold factor-base holdout
 
 Five sealed public points, one fresh process per IC arm, and a same-point rho solve per point completed on one GitHub-hosted cloud instance. Each of the 25 IC arms and five rho arms passed independent replay. K1152 ran twice per point as the local A/A control. The selected candidate is `null`; the frozen decision is `BOUNDED_UNKNOWN`.
@@ -563,12 +639,30 @@ Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two
 | 4 | 5 | -0.232 | [-0.320, -0.082] |
 
 
+## N83 Tier 1 sixteen-point factor-base frontier
+
+Eight exact packed-root configurations ran on sixteen sealed public points across two admitted cloud hosts, one fresh IC process and a same-point rho solve for every candidate-point pair. All 128 pairs passed independent replay. The frozen online and cold selectors both report `BOUNDED_UNKNOWN`; the cold K1107 factor-base size lowers process cost against K1120, while its root11 and root22 layouts remain unresolved.
+
+| Configuration | Actual usable points | Folded columns | Online median ms | Cold mean s | Paired rho/IC median | IC faster / 16 |
+|:--|--:|--:|--:|--:|--:|--:|
+| 1104/r11 | 183,264 | 1,104 | 113.394 | 108.382 | 16.247 | 16/16 |
+| 1104/r22 | 183,264 | 1,104 | 111.651 | 108.112 | 11.334 | 16/16 |
+| 1107/r11 | 183,762 | 1,107 | 79.820 | 104.826 | 18.507 | 16/16 |
+| 1107/r22 | 183,762 | 1,107 | 82.929 | 104.635 | 23.910 | 16/16 |
+| 1112/r11 | 184,592 | 1,112 | 195.899 | 106.596 | 12.457 | 15/16 |
+| 1112/r22 | 184,592 | 1,112 | 191.117 | 106.699 | 15.636 | 16/16 |
+| 1120/r11 | 185,920 | 1,120 | 73.487 | 108.775 | 22.355 | 16/16 |
+| 1120/r22 | 185,920 | 1,120 | 71.913 | 108.966 | 19.394 | 16/16 |
+
+[Frozen 132 IC1 rows](../../research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json) and [provider-bound result and graph](../../research/n83_e2e_finalist_results_20261017/RESULT.md). The online interval excludes reusable preparation; the separate cold column charges it. This Tier 1 wall-time panel is separate from Tables A–C and their operation-unit S rankings.
+
+
 ## Sources
 
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `87999f37f2d5669a…`
+- `docs/ic/progress-timeline.json` — sha256 `9013f0034e9c68e3…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
@@ -627,10 +721,15 @@ Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two
 - `research/s5_plain_c4_options_20261019/raw/summary_r13.json` — sha256 `d5ae9560f6cf3cad…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
+- `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
+- `research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json` — sha256 `a789512e3192b960…`
+- `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
+- `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
+- `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
 - `docs/curves/registry.json` — sha256 `46d4060fafd71863…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`

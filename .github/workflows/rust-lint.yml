@@ -12,8 +12,8 @@ name: Rust lint
 #   remaining exception is an item-level #[allow] next to the code.
 
 on:
-  pull_request:
-  merge_group:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
   workflow_dispatch:
@@ -23,7 +23,8 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Merges land minutes apart; cancelling would leave most main pushes unlinted.
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
   CARGO_TERM_COLOR: always
@@ -77,6 +78,13 @@ jobs:
           if [ "$CI_EVENT" = pull_request ]; then
             test "$(git rev-parse HEAD^2)" = "$CI_PR_HEAD"
             CI_BASE="$(git rev-parse HEAD^1)"
+            export CI_BASE
+          fi
+          # A push to main lints the whole tree. Diffing against the previous
+          # push skipped clippy whenever a Rust merge's run was superseded by a
+          # later non-Rust merge, so lint regressions reached main unchecked.
+          if [ "$CI_EVENT" = push ]; then
+            CI_BASE=
             export CI_BASE
           fi
           node .github/scripts/ci-scope.mjs
