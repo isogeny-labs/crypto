@@ -22,7 +22,9 @@ We cannot replay `claim-n13` on current `main` because the session was recorded 
 ## What would unblock it
 
 - [ ] An owner decision: keep the post-#2043 eager definition as the method identity (then `claim-n13` is replayable only by its recording commit and must be re-recorded or marked pre-#2043), or restore the lazy definition (then every session recorded since 2026-10-17 on x86 stops replaying).
-- [ ] Either way, a method-identity field naming the specialisation accounting version, so the audit refuses cross-version replay by name instead of reporting counts.
+- [x] Either way, a field naming the specialisation accounting version, so the audit names a cross-version replay instead of reporting bare counts. Done 2026-10-26 as `Session.accounting_versions` (`INHERITED_F4_ACCOUNTING_VERSION = 2`), not as part of the method identity: the identity hashes `{id, params}`, and a new parameter would change the id of every committed F4 method and fail every committed session's plan check. A session without the field is reported as predating versions.
+- [x] Considered and rejected: making the lazy mode charge the eager amount. Lazy mode never builds the child-layout image of a row nobody reads, so the eager charge (words read plus words from the image's first nonzero word) is undefined for it without running the eager rewrite as a shadow, which removes the lazy mode's only use (a performance control), and it would not make `claim-n13` replay (its record holds the lazy charge).
+- [ ] The owner decision above stands as taken by `main`: the post-#2043 eager definition is version 2. `claim-n13` stays replayable only by its recording commit; re-record it or mark it pre-#2043.
 
 ## Next discriminating step
 
@@ -32,3 +34,4 @@ We cannot replay `claim-n13` on current `main` because the session was recorded 
 ## Resolution and history
 
 2026-10-23: the host-path dependence is closed on `main` (test above). The accounting-version drift is unresolved; recorded evidence under `research/` was not edited.
+2026-10-26: accounting versions recorded in new sessions and named by the audit; the charge is pinned by `inherited_f4_accounting_version_pins_the_charge`. The recorded `claim-n13` session still does not replay on `main`; it now fails with its cause stated. Evidence under `research/` was not edited.
