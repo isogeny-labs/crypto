@@ -38,7 +38,7 @@ struct Active {
     input: String,
     degree: u32,
     profiles: Vec<SolvingProfile>,
-    cols: Vec<u64>,
+    cols: Vec<Mask>,
     n_rows: usize,
 }
 
@@ -82,6 +82,7 @@ fn write_file(
 ) -> io::Result<Entry> {
     let mut options = OpenOptions::new();
     options.write(true).create_new(true);
+    // Owner-only where the platform has Unix permissions.
     #[cfg(unix)]
     options.mode(0o600);
     let file = options.open(dir.join(name))?;
@@ -574,6 +575,10 @@ impl Store {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use std::process::{Command, Stdio};
     use std::time::{SystemTime, UNIX_EPOCH};
 

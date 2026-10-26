@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# Runs inside the VPC launcher. The experiment itself always runs in EKS.
+set -euo pipefail
+here=$(cd "$(dirname "$0")" && pwd)
+: "${ISOLAB_CLUSTER:?}" "${ISOLAB_BUCKET:?}" "${AWS_REGION:?}" "${ISOLAB_REQUEST_KEY:?}"
+[[ "$ISOLAB_REQUEST_KEY" =~ ^inputs/requests/([a-f0-9]{64})\.json$ ]] || { echo 'Invalid request key' >&2; exit 2; }
+request_hash=${BASH_REMATCH[1]}
+receipt_dir=$(mktemp -d)
+aws s3 cp "s3://$ISOLAB_BUCKET/$ISOLAB_REQUEST_KEY" "$receipt_dir/original-request.json" --only-show-errors
+printf '%s  %s\n' "$request_hash" "$receipt_dir/original-request.json" | sha256sum -c - >/dev/null
+"$here/validate-request" "$receipt_dir/original-request.json" > "$receipt_dir/request.json"
+job=$(jq -r .job.job_name "$receipt_dir/request.json")
+duration=$(jq -r .job.seconds "$receipt_dir/request.json")
+launch_id=${CODEBUILD_BUILD_ID:-local-$(date -u +%Y%m%dT%H%M%SZ)}
+launch_id=${launch_id##*:}
+receipt_uri="s3://$ISOLAB_BUCKET/runs/$job/launcher/$launch_id/"
+job_uid='' pod_uid='' state=launcher_failed raw_uri=''
+finish() {
+  exit_code=$?
+  trap - EXIT
+  set +e
+  if [[ "$exit_code" != 0 && ( "$state" == active || "$state" == pending ) ]]; then state=launcher_failed; fi
+  jq -n --arg state "$state" --arg job "$job" --arg job_uid "$job_uid" --arg pod_uid "$pod_uid" \
+    --arg raw_uri "$raw_uri" --arg receipts "$receipt_uri" --arg request_sha256 "$request_hash" \
+    --arg launcher "${CODEBUILD_BUILD_ID:-local}" --argjson exit_code "$exit_code" \
+    '{schema:"isolab.eks.result/v1",state:$state,job_name:$job,job_uid:$job_uid,pod_uid:$pod_uid,
+      results_uri:$raw_uri,receipt_uri:$receipts,request_sha256:$request_sha256,launcher:$launcher,exit_code:$exit_code}' \
+    > "$receipt_dir/result.json"
+  if ! aws s3 cp "$receipt_dir/" "$receipt_uri" --recursive --only-show-errors; then exit 91; fi
+  cat "$receipt_dir/result.json"
+  exit "$exit_code"
+}
+trap finish EXIT
+export KUBECONFIG="$receipt_dir/kubeconfig"
+export ISOLAB_KUBE_CONTEXT=isolab
+aws eks update-kubeconfig --name "$ISOLAB_CLUSTER" --region "$AWS_REGION" --alias "$ISOLAB_KUBE_CONTEXT" --kubeconfig "$KUBECONFIG" > "$receipt_dir/kubeconfig-setup.log"
+# The kubeconfig has an exec credential plugin, no embedded credentials; keep it
+# outside uploaded receipts anyway.
+mv "$KUBECONFIG" "$receipt_dir/../kubeconfig-$launch_id"
+export KUBECONFIG="$receipt_dir/../kubeconfig-$launch_id"
+"$here/check-ready" > "$receipt_dir/readiness.json"
+isolab-eks-mcp call isolab_k8s_overview '{}' > "$receipt_dir/overview.json"
+args=$(jq -c .job "$receipt_dir/request.json")
+# No submission retry: a timeout can leave a live Job. Record status separately.
+if ! isolab-eks-mcp call isolab_k8s_benchmark "$args" > "$receipt_dir/submission.json" 2> "$receipt_dir/submission.stderr"; then
+  state=submission_unknown
+  isolab-eks-mcp call isolab_k8s_status "$(jq -nc --arg job "$job" '{job_name:$job}')" > "$receipt_dir/status-after-error.json" 2>&1 || true
+  exit 20
+fi
+job_uid=$(jq -er .job.uid "$receipt_dir/submission.json")
+status_args=$(jq -nc --arg job "$job" '{job_name:$job}')
+deadline=$((SECONDS + duration + 180))
+while (( SECONDS < deadline )); do
+  isolab-eks-mcp call isolab_k8s_status "$status_args" > "$receipt_dir/status.json"
+  [[ $(jq -r .job.uid "$receipt_dir/status.json") == "$job_uid" ]] || { state=identity_mismatch; exit 21; }
+  state=$(jq -r .job.state "$receipt_dir/status.json")
+  [[ "$state" == succeeded || "$state" == failed ]] && break
+  sleep 15
+done
+isolab-eks-mcp call isolab_k8s_logs "$status_args" > "$receipt_dir/logs.json" 2> "$receipt_dir/logs.stderr" || true
+isolab-eks-mcp call isolab_k8s_results "$status_args" > "$receipt_dir/objects.json"
+if [[ "$state" != succeeded && "$state" != failed ]]; then state=launcher_timed_out; exit 22; fi
+[[ "$state" == succeeded ]] || exit 23
+# Successful Kubernetes completion alone is insufficient. Download its exact
+# attempt, verify its manifest, then verify the native audit and isolation gate.
+pod_uid=$(jq -er '.pods[] | select(any(.status.containerStatuses[]?; .state.terminated.exitCode==0)) | .uid' "$receipt_dir/status.json")
+[[ "$pod_uid" =~ ^[a-f0-9-]{36}$ ]] || { state=verification_failed; exit 24; }
+raw_uri="s3://$ISOLAB_BUCKET/runs/$job/$pod_uid/"
+mkdir "$receipt_dir/artifacts"
+state=verification_failed
+aws s3 cp "$raw_uri" "$receipt_dir/artifacts/" --recursive --only-show-errors
+(cd "$receipt_dir/artifacts" && sha256sum -c SHA256SUMS) > "$receipt_dir/download-hashes.txt"
+jq -e '.exit_code==0' "$receipt_dir/artifacts/job-exit.json" >/dev/null
+jq -e '.accepted and .executions>0 and (.below_l2|length)==0 and (.invalid_outcomes|length)==0' "$receipt_dir/artifacts/l2-gate.json" >/dev/null
+jq -e '.ok and .regraded and .records_bound and .verified_records==.records and (.replays|length)>0 and all(.replays[];.reproduced)' "$receipt_dir/artifacts/audit.json" >/dev/null
+jq -e '.wall.status=="admitted" and .wall.aa_pairs>=5 and .wall.aa_ci95!=null' "$receipt_dir/artifacts/control-comparison.json" >/dev/null
+state=succeeded
