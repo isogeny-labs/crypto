@@ -462,6 +462,119 @@ pub fn batch_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<()> {
 
 /// Construct the public finite task, solve it, recover signs and deduplicate.
 /// This worker reads no prior basis, expected tuple list or known logarithm.
+fn pair_ys(e: Quad, x: u64, y: u64, target: P) -> Option<[u64; 2]> {
+    let (z, w) = target?;
+    if z.1 != 0 || w.1 != 0 || w.0 == 0 {
+        return None;
+    }
+    // Classical F3 discriminant identity; see lean-v3/TwistPairLift.lean.
+    let denominator = inv(4 * w.0 % e.p, e.p);
+    let lift = |u: u64, v: u64| {
+        let delta = (u + e.p - z.0) % e.p;
+        let a = delta * delta % e.p;
+        let middle = ((u + z.0) * ((u * z.0 + e.a) % e.p) + 2 * e.b) % e.p;
+        (2 * a % e.p * v + 2 * e.p - 2 * middle) % e.p * denominator % e.p
+    };
+    let ys = [lift(x, y), lift(y, x)];
+    let p1 = Some((Q(x, 0), Q(ys[0], 0)));
+    let p2 = Some((Q(y, 0), Q(ys[1], 0)));
+    (e.on(p1) && e.on(p2) && e.pa(p1, p2) == target).then_some(ys)
+}
+fn keep_min(tuples: &mut BTreeMap<Vec<u64>, u64>, t: Vec<u64>, mask: u64) {
+    tuples
+        .entry(t)
+        .and_modify(|old| *old = (*old).min(mask))
+        .or_insert(mask);
+}
+fn propagated_mask(
+    e: Quad,
+    t: &[u64],
+    prefix: Option<u64>,
+    points: &BTreeMap<u64, P>,
+    target: P,
+) -> Option<u64> {
+    let ys = if t.len() == 2 {
+        pair_ys(e, t[0], t[1], target)?.to_vec()
+    } else {
+        let prefix = prefix?;
+        let last = pair_ys(e, prefix, t[2], target)?;
+        let first = pair_ys(e, t[0], t[1], Some((Q(prefix, 0), Q(last[0], 0))))?;
+        vec![first[0], first[1], last[1]]
+    };
+    let mut mask = 0;
+    for (i, (x, y)) in t.iter().zip(ys).enumerate() {
+        let positive = points[x]?.1 .0;
+        if y != positive {
+            if y != (e.p - positive) % e.p {
+                return None;
+            }
+            mask |= 1 << i;
+        }
+    }
+    Some(mask)
+}
+fn group_mitm(
+    e: Quad,
+    xs: &[u64],
+    points: &BTreeMap<u64, P>,
+    target: P,
+    m: usize,
+) -> BTreeMap<Vec<u64>, u64> {
+    let signed_points = xs
+        .iter()
+        .flat_map(|x| [(points[x], *x, 0u64), (e.pn(points[x]), *x, 1u64)])
+        .collect::<Vec<_>>();
+    let mut tuples = BTreeMap::new();
+    if m == 2 {
+        let lookup = signed_points
+            .iter()
+            .map(|(p, x, sign)| (*p, (*x, *sign)))
+            .collect::<BTreeMap<_, _>>();
+        for (p, x, sign) in &signed_points {
+            if let Some((y, other)) = lookup.get(&e.pa(target, e.pn(*p))) {
+                let (t, mask) = if x <= y {
+                    (vec![*x, *y], sign | other << 1)
+                } else {
+                    (vec![*y, *x], other | sign << 1)
+                };
+                keep_min(&mut tuples, t, mask);
+            }
+        }
+    } else {
+        let mut sums = BTreeMap::<P, Vec<(u64, u64, u64)>>::new();
+        for (p, x, sign) in &signed_points {
+            for (q, y, other) in &signed_points {
+                if x <= y {
+                    sums.entry(e.pa(*p, *q))
+                        .or_default()
+                        .push((*x, *y, sign | other << 1));
+                }
+            }
+        }
+        for (p, z, sign) in &signed_points {
+            if let Some(pairs) = sums.get(&e.pa(target, e.pn(*p))) {
+                for (x, y, mask) in pairs {
+                    keep_min(&mut tuples, vec![*x, *y, *z], mask | sign << 2);
+                }
+            }
+        }
+    }
+    // Verify the selected rows once, including the zero-prefix rows.
+    for (t, mask) in &tuples {
+        assert_eq!(
+            t.iter().enumerate().fold(None, |s, (i, x)| e.pa(
+                s,
+                if mask >> i & 1 == 0 {
+                    points[x]
+                } else {
+                    e.pn(points[x])
+                }
+            )),
+            target
+        );
+    }
+    tuples
+}
 pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<()> {
     let task: Value = serde_json::from_slice(&fs::read(input)?)?;
     let f: Fixture = serde_json::from_value(task["fixture"].clone())?;
@@ -469,6 +582,10 @@ pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<
     let bsize = task["B"].as_u64().ok_or("B")? as usize;
     let m = task["arity"].as_u64().ok_or("arity")? as usize;
     let arm = task["arm"].as_str().ok_or("arm")?;
+    let lift_method = task["lift_method"].as_str().unwrap_or("search");
+    if !["search", "propagate"].contains(&lift_method) {
+        return Err("unknown lifting method".into());
+    }
     if !(2..=3).contains(&m) {
         return Err("decomposition pilot only supports m=2,3".into());
     }
@@ -490,33 +607,41 @@ pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<
             )
         })
         .collect::<BTreeMap<_, _>>();
-    let direct = alg::build(f.p, f.a, f.b, tx, &xs, m, "product");
-    let cases = match arm {
-        "direct-chain" => vec![direct],
-        "first-pair-invariant" => vec![
-            alg::build(f.p, f.a, f.b, tx, &xs, m, "symmetric"),
-            diagonal(&direct),
-        ],
-        "hybrid-eight" => (0..8)
-            .map(|bucket| {
-                let mut c = direct.clone();
-                c.encoding = "hybrid-eight".into();
-                c.equations[0] = membership(
-                    c.names.len(),
-                    0,
-                    &xs.iter()
-                        .enumerate()
-                        .filter(|(i, _)| i % 8 == bucket)
-                        .map(|(_, x)| *x)
-                        .collect::<Vec<_>>(),
-                    f.p,
-                );
-                c
-            })
-            .collect(),
-        _ => return Err("unsupported decomposition encoding".into()),
+    let cases = if arm == "group-mitm" {
+        vec![]
+    } else {
+        let direct = alg::build(f.p, f.a, f.b, tx, &xs, m, "product");
+        match arm {
+            "direct-chain" => vec![direct],
+            "first-pair-invariant" => vec![
+                alg::build(f.p, f.a, f.b, tx, &xs, m, "symmetric"),
+                diagonal(&direct),
+            ],
+            "hybrid-eight" => (0..8)
+                .map(|bucket| {
+                    let mut c = direct.clone();
+                    c.encoding = "hybrid-eight".into();
+                    c.equations[0] = membership(
+                        c.names.len(),
+                        0,
+                        &xs.iter()
+                            .enumerate()
+                            .filter(|(i, _)| i % 8 == bucket)
+                            .map(|(_, x)| *x)
+                            .collect::<Vec<_>>(),
+                        f.p,
+                    );
+                    c
+                })
+                .collect(),
+            _ => return Err("unsupported decomposition encoding".into()),
+        }
     };
-    let mut tuples = BTreeMap::<Vec<u64>, u64>::new();
+    let mut tuples = if arm == "group-mitm" {
+        group_mitm(e, &xs, &points, target, m)
+    } else {
+        BTreeMap::<Vec<u64>, u64>::new()
+    };
     let mut branches = vec![];
     let mut complete = true;
     let mut invalid_lifts = 0u64;
@@ -558,8 +683,14 @@ pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<
                 };
                 t[..2].sort();
                 assert!(t.iter().all(|x| xs.contains(x)));
-                if let Some(mask) = signed(e, &t, &points, target) {
-                    tuples.entry(t).or_insert(mask);
+                let mask = if lift_method == "propagate" {
+                    let prefix = c.names.iter().position(|name| name == "t1").map(|i| s[i]);
+                    propagated_mask(e, &t, prefix, &points, target)
+                } else {
+                    signed(e, &t, &points, target)
+                };
+                if let Some(mask) = mask {
+                    keep_min(&mut tuples, t, mask);
                 } else {
                     invalid_lifts += 1;
                 }
@@ -569,12 +700,24 @@ pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<
     }
     // For m=3 the only missing chain chart is P1+P2=O; enumerate and charge it.
     let mut exceptional_candidates = 0;
-    if m == 3 && xs.contains(&tx) {
+    if arm != "group-mitm" && m == 3 && xs.contains(&tx) {
         for x in &xs {
             let t = vec![*x, *x, tx];
             exceptional_candidates += 1;
-            if let Some(mask) = signed(e, &t, &points, target) {
-                tuples.entry(t).or_insert(mask);
+            let mask = if lift_method == "propagate" {
+                let target_y = target.unwrap().1 .0;
+                Some(
+                    1 | if points[&tx].unwrap().1 .0 == target_y {
+                        0
+                    } else {
+                        4
+                    },
+                )
+            } else {
+                signed(e, &t, &points, target)
+            };
+            if let Some(mask) = mask {
+                keep_min(&mut tuples, t, mask);
             }
         }
     }
@@ -582,7 +725,7 @@ pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<
     let canonical = tuples.keys().cloned().collect::<Vec<_>>();
     write_json(
         out,
-        &json!({"schema":"twist.decomposition-worker/v1","workload":task["workload"],"arm":arm,"base":xs,"target":target,"branches":branches,"canonical_projected_tuples":canonical,"signed_witnesses":witnesses,"exceptional_candidates_enumerated":exceptional_candidates,"invalid_signed_lifts":invalid_lifts,"complete_projection":complete,"construction_roots_signs_dedup_and_source_verification_included":true,"complete_IC_cost":false,"wall_time_admitted":false}),
+        &json!({"schema":"twist.decomposition-worker/v1","workload":task["workload"],"arm":arm,"lift_method":lift_method,"base":xs,"target":target,"branches":branches,"canonical_projected_tuples":canonical,"signed_witnesses":witnesses,"exceptional_candidates_enumerated":exceptional_candidates,"invalid_signed_lifts":invalid_lifts,"complete_projection":complete,"construction_roots_signs_dedup_and_source_verification_included":true,"complete_IC_cost":false,"wall_time_admitted":false}),
     )
 }
 fn suffix(p: &Path, s: &str) -> PathBuf {
@@ -944,6 +1087,69 @@ pub fn panel(input: &Path, out: &Path) -> Result<Vec<Value>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn classical_lift_and_group_mitm_preserve_minimum_sign_rows() {
+        let e = Quad::new(59, 1, 13);
+        let xs = (0..59)
+            .filter(|x| sqrt(e.rhs(Q(*x, 0)).0, 59).is_some_and(|y| y != 0))
+            .take(6)
+            .collect::<Vec<_>>();
+        let points = xs
+            .iter()
+            .map(|x| {
+                (
+                    *x,
+                    Some((Q(*x, 0), Q(sqrt(e.rhs(Q(*x, 0)).0, 59).unwrap(), 0))),
+                )
+            })
+            .collect::<BTreeMap<_, _>>();
+        for x in &xs {
+            for y in &xs {
+                for mask in 0..4 {
+                    let a = if mask & 1 == 0 {
+                        points[x]
+                    } else {
+                        e.pn(points[x])
+                    };
+                    let b = if mask & 2 == 0 {
+                        points[y]
+                    } else {
+                        e.pn(points[y])
+                    };
+                    let target = e.pa(a, b);
+                    if target.is_some_and(|(_, y)| y.0 != 0) {
+                        assert_eq!(
+                            pair_ys(e, *x, *y, target),
+                            Some([a.unwrap().1 .0, b.unwrap().1 .0])
+                        );
+                    }
+                }
+            }
+        }
+        for target in points.values().take(3) {
+            for m in [2, 3] {
+                let mut expected = BTreeMap::new();
+                for x in &xs {
+                    for y in xs.iter().filter(|y| x <= *y) {
+                        if m == 2 {
+                            let t = vec![*x, *y];
+                            if let Some(mask) = signed(e, &t, &points, *target) {
+                                expected.insert(t, mask);
+                            }
+                        } else {
+                            for z in &xs {
+                                let t = vec![*x, *y, *z];
+                                if let Some(mask) = signed(e, &t, &points, *target) {
+                                    expected.insert(t, mask);
+                                }
+                            }
+                        }
+                    }
+                }
+                assert_eq!(group_mitm(e, &xs, &points, *target, m), expected);
+            }
+        }
+    }
     #[test]
     fn frobenius_expansion_at_zero_and_diagonal_preserve_every_input() {
         let xs = [1, 3, 5, 8];

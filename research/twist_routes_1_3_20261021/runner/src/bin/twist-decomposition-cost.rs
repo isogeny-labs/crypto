@@ -80,6 +80,49 @@ fn plan(fixtures: &Path, census: &Path, base: u64) -> Result<Value> {
         json!({"schema":"twist.decomposition-plan/v1","fixtures_sha256":sha(fixtures)?,"census_workloads_sha256":sha(census.join("WORKLOADS.json"))?,"requested":cells.len(),"cells":cells,"target_label":0,"B_filter_zero_means_all":base,"new_targets_opened":false}),
     )
 }
+fn controls(fixtures: &Path, census: &Path) -> Result<Value> {
+    let old = plan(fixtures, census, 8)?;
+    let mut cells = vec![];
+    for chunk in old["cells"].as_array().unwrap().chunks(4) {
+        for method in ["search", "propagate"] {
+            for cell in chunk {
+                let mut cell = cell.clone();
+                cell["index"] = json!(cells.len());
+                cell["task"]["lift_method"] = json!(method);
+                if method == "propagate" {
+                    cell["arm"] = json!(format!("{}-propagate", cell["arm"].as_str().unwrap()));
+                }
+                cells.push(cell);
+            }
+        }
+        for arm in ["group-aa", "group-mitm"] {
+            let mut cell = chunk[0].clone();
+            cell["index"] = json!(cells.len());
+            cell["arm"] = json!(arm);
+            cell["task"]["arm"] = json!("group-mitm");
+            cell["task"]["lift_method"] = json!("search");
+            cells.push(cell);
+        }
+    }
+    let mut comparisons = vec![];
+    for candidate in [
+        "hybrid-eight",
+        "first-pair-invariant",
+        "group-mitm",
+        "direct-chain-propagate",
+        "hybrid-eight-propagate",
+        "first-pair-invariant-propagate",
+    ] {
+        comparisons.push(json!({"candidate":candidate,"control":"direct-chain"}));
+    }
+    for arm in ["direct-chain", "hybrid-eight", "first-pair-invariant"] {
+        comparisons.push(json!({"candidate":format!("{arm}-propagate"),"control":arm}));
+        comparisons.push(json!({"candidate":format!("{arm}-propagate"),"control":"group-mitm"}));
+    }
+    Ok(
+        json!({"schema":"twist.decomposition-control-plan/v1","requested":cells.len(),"cells":cells,"target_label":0,"B":8,"strict_signed_witness_equality":true,"global_budget_s":3800,"new_targets_opened":false,"AA_pairs":[["direct-chain","direct-aa"],["direct-chain-propagate","direct-aa-propagate"],["group-mitm","group-aa"]],"comparisons":comparisons,"fixtures_sha256":old["fixtures_sha256"],"census_workloads_sha256":old["census_workloads_sha256"]}),
+    )
+}
 fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
     if out.exists() {
         return Err("fresh output required".into());
@@ -94,7 +137,9 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
     let mut gp = String::from("default(parisizemax,4000000000);\ngood=0;bad=0;\n");
     for cell in plan["cells"].as_array().unwrap() {
         let mut row = cell.clone();
-        if start.elapsed().as_secs() >= 1800 || bytes(out) >= 1_073_741_824 {
+        if start.elapsed().as_secs() >= plan["global_budget_s"].as_u64().unwrap_or(1800)
+            || bytes(out) >= 1_073_741_824
+        {
             row["status"] = json!("not-started-global-cap");
             records.push(row);
             continue;
@@ -154,6 +199,8 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
                     && r["canonical_projected_tuples"] == expected["canonical_projected_tuples"]
                     && r["base"] == expected["base"]
                     && r["target"] == expected["target"]
+                    && (plan["strict_signed_witness_equality"] != true
+                        || r["signed_witnesses"] == expected["witnesses"])
             });
         if matched {
             let r = result.as_ref().unwrap();
@@ -231,9 +278,13 @@ fn main() -> Result<()> {
                 &plan(Path::new(&a[2]), Path::new(&a[3]), a[4].parse()?)?,
             )
         }
+        Some("plan-controls") if a.len() == 5 => {
+            if Path::new(&a[4]).exists() { return Err("fresh plan required".into()); }
+            write(&a[4], &controls(Path::new(&a[2]), Path::new(&a[3]))?)
+        }
         Some("run") if a.len() == 5 => run(Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4])),
         _ => {
-            Err("usage: plan FIXTURES CENSUS B_OR_0 FRESH_PLAN | run PLAN WORKER FRESH_OUT".into())
+            Err("usage: plan FIXTURES CENSUS B_OR_0 FRESH_PLAN | plan-controls FIXTURES CENSUS FRESH_PLAN | run PLAN WORKER FRESH_OUT".into())
         }
     }
 }

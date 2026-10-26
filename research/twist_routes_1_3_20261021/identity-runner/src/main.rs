@@ -61,6 +61,39 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             source:"E30 finite-grid interpolation; integer identity, denominators invertible on all frozen fields".into(),
             variables:vec!["x".into()],degree_bound:(size-1) as u32,lhs:a(sum),rhs:n(den)});
     }
+    let pair_lift = argv.get(2).is_some_and(|s| s == "pair-lift");
+    let proof = if pair_lift {
+        let cubic = |x: E| a(vec![power(x.clone(), 3), m(vec![v("a"), x]), v("b")]);
+        let middle = |x: E, y: E| {
+            a(vec![
+                m(vec![
+                    a(vec![x.clone(), y.clone()]),
+                    a(vec![m(vec![x, y]), v("a")]),
+                ]),
+                m(vec![n(2), v("b")]),
+            ])
+        };
+        let difference = |x: E, y: E| a(vec![x, m(vec![n(-1), y])]);
+        let s3 = a(vec![
+            m(vec![power(difference(v("x"), v("y")), 2), power(v("z"), 2)]),
+            m(vec![n(-2), middle(v("x"), v("y")), v("z")]),
+            power(difference(m(vec![v("x"), v("y")]), v("a")), 2),
+            m(vec![n(-4), v("b"), a(vec![v("x"), v("y")])]),
+        ]);
+        let numerator = a(vec![
+            m(vec![n(2), power(difference(v("x"), v("z")), 2), v("y")]),
+            m(vec![n(-2), middle(v("x"), v("z"))]),
+        ]);
+        statements=vec![S{name:"classical F3 discriminant numerator square identity".into(),source:"lean-v3/TwistPairLift.lean numerator_square; standard Semaev identity, no novelty claim".into(),variables:["x","y","z","a","b"].iter().map(|s|s.to_string()).collect(),degree_bound:6,lhs:power(numerator,2),rhs:a(vec![m(vec![n(16),cubic(v("x")),cubic(v("z"))]),m(vec![n(4),power(difference(v("x"),v("z")),2),s3])])}];
+        let path = "research/twist_routes_1_3_20261021/lean-v3/TwistPairLift.lean";
+        Some(certificate::ProofRef {
+            kind: "lean4".into(),
+            path: path.into(),
+            sha256: hex::encode(source_sha256::sha256(&fs::read(path)?)),
+        })
+    } else {
+        None
+    };
     let mut records = vec![];
     for (index, statement) in statements.into_iter().enumerate() {
         let cert = certificate::issue(
@@ -68,7 +101,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             20261023,
             32,
             "native issuer plus extra domain-separated checker points; this is same-host replay",
-            None,
+            proof.clone(),
         )
         .map_err(|e| format!("issue: {e:?}"))?;
         let verdict = certificate::check_with_extra(&cert, Some((0x2026_1023_4944_4331, 64)))

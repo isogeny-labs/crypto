@@ -138,11 +138,16 @@ fn main() -> Result<()> {
                 matched &= r["complete_projection"] == true
                     && r["canonical_projected_tuples"] == truth["canonical_projected_tuples"]
                     && r["base"] == truth["base"];
+                if plan["strict_signed_witness_equality"] == true {
+                    matched &= r["signed_witnesses"] == truth["witnesses"]
+                        && r["lift_method"] == row["task"]["lift_method"];
+                }
                 let branches = r["branches"].as_array().ok_or("branches")?;
                 let wanted = match row["task"]["arm"].as_str().unwrap() {
                     "direct-chain" => 1,
                     "hybrid-eight" => 8,
                     "first-pair-invariant" => 2,
+                    "group-mitm" => 0,
                     _ => return Err("unexpected decomposition arm".into()),
                 };
                 matched &= branches.len() == wanted
@@ -263,28 +268,70 @@ fn main() -> Result<()> {
         if mode == "transfer" {
             pass &= transfer_spread.is_some_and(|s| s <= 0.05);
         }
-        aa.push(json!({"case":key,"source_or_direct_spread":spread,"transfer_spread":transfer_spread,"within_frozen_5_percent_gate":pass}));
-        let candidates = if mode == "decomposition" {
-            vec!["hybrid-eight", "first-pair-invariant"]
+        let mut extra_aa = vec![];
+        if let Some(pairs) = plan["AA_pairs"].as_array() {
+            for pair in pairs {
+                let control = pair[0].as_str().ok_or("AA control")?;
+                let repeat = pair[1].as_str().ok_or("AA repeat")?;
+                let spread = c
+                    .get(control)
+                    .zip(c.get(repeat))
+                    .map(|(x, y)| x.abs_diff(*y) as f64 / ((*x as f64 + *y as f64) / 2.));
+                let gate = spread.is_some_and(|s| s <= 0.05);
+                pass &= gate;
+                extra_aa
+                    .push(json!({"control":control,"repeat":repeat,"spread":spread,"pass":gate}));
+            }
+        }
+        aa.push(json!({"case":key,"source_or_direct_spread":spread,"transfer_spread":transfer_spread,"additional_pairs":extra_aa,"within_frozen_5_percent_gate":pass}));
+        let pairs = if let Some(pairs) = plan["comparisons"].as_array() {
+            pairs
+                .iter()
+                .map(|p| {
+                    (
+                        p["candidate"].as_str().unwrap(),
+                        p["control"].as_str().unwrap(),
+                    )
+                })
+                .collect::<Vec<_>>()
+        } else if mode == "decomposition" {
+            vec![("hybrid-eight", control), ("first-pair-invariant", control)]
         } else {
-            vec!["transfer-bsgs"]
+            vec![("transfer-bsgs", control)]
         };
-        for candidate in candidates {
+        for (candidate, control) in pairs {
             let p = c.get(candidate).zip(c.get(control));
             let paired = pass && p.is_some();
             comparisons.push(json!({"case":key,"info":case,"candidate":candidate,"control":control,"paired_accepted":paired,"candidate_Ir":c.get(candidate),"control_Ir":c.get(control),"candidate_to_control_ratio":if paired{p.map(|(x,y)|*x as f64/ *y as f64)}else{None},"candidate_uses_fewer_instructions":paired&&p.is_some_and(|(x,y)|x<y)}));
         }
     }
-    let candidates = if mode == "decomposition" {
-        vec!["hybrid-eight", "first-pair-invariant"]
+    let pairs = if let Some(pairs) = plan["comparisons"].as_array() {
+        pairs
+            .iter()
+            .map(|p| {
+                (
+                    p["candidate"].as_str().unwrap(),
+                    p["control"].as_str().unwrap(),
+                )
+            })
+            .collect::<Vec<_>>()
+    } else if mode == "decomposition" {
+        vec![
+            ("hybrid-eight", "direct-chain"),
+            ("first-pair-invariant", "direct-chain"),
+        ]
     } else {
-        vec!["transfer-bsgs"]
+        vec![("transfer-bsgs", "source-bsgs")]
     };
     let mut distributions = vec![];
-    for candidate in candidates {
+    for (candidate, control) in pairs {
         let pairs = comparisons
             .iter()
-            .filter(|r| r["candidate"] == candidate && r["paired_accepted"] == true)
+            .filter(|r| {
+                r["candidate"] == candidate
+                    && r["control"] == control
+                    && r["paired_accepted"] == true
+            })
             .collect::<Vec<_>>();
         let mut ratios = pairs
             .iter()
@@ -301,7 +348,7 @@ fn main() -> Result<()> {
                 ratios[n / 2]
             })
         };
-        distributions.push(json!({"candidate":candidate,"requested_pairs":info.len(),"accepted_pairs":n,"fewer_instruction_pairs":pairs.iter().filter(|r|r["candidate_uses_fewer_instructions"]==true).count(),"ratio_min":ratios.first(),"ratio_median":median,"ratio_max":ratios.last(),"descriptive_only":true}));
+        distributions.push(json!({"candidate":candidate,"control":control,"requested_pairs":info.len(),"accepted_pairs":n,"fewer_instruction_pairs":pairs.iter().filter(|r|r["candidate_uses_fewer_instructions"]==true).count(),"ratio_min":ratios.first(),"ratio_median":median,"ratio_max":ratios.last(),"descriptive_only":true}));
     }
     fs::create_dir_all(out)?;
     let result = json!({"schema":"twist.interval-independent-audit/v1","status":"raw-counts-projections-or-scalars-and-independent-replay-verified","mode":mode,"requested_cells":expected.len(),"accepted_cells":accepted_cells,"matched_output_cells":matched_cells,"configurations":info.len(),"distinct_fixture_target_pairs":targets.len(),"independent_PARI_positive_and_negative_checks_each":replay_checks,"by_arm":totals.iter().map(|(arm,c)|json!({"arm":arm,"requested":c[0],"attempted":c[1],"accepted":c[2]})).collect::<Vec<_>>(),"AA":aa,"comparisons":comparisons,"distributions":distributions,"records_sha256":sha(run.join("RECORDS.json"))?,"plan_sha256":sha(&a[2])?,"CAS_receipt_sha256":sha(format!("{prefix}.json"))?,"unit":"Callgrind simulated guest instructions Ir","complete_IC_cost_or_fastest_claim":false,"wall_time_admitted":false});
