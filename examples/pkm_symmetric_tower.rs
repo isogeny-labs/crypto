@@ -127,7 +127,10 @@ struct Pol {
 
 impl Pol {
     fn zero(n: usize) -> Self {
-        Pol { n, t: HashMap::new() }
+        Pol {
+            n,
+            t: HashMap::new(),
+        }
     }
     fn c(n: usize, c: u64, p: u64) -> Self {
         let mut f = Self::zero(n);
@@ -236,7 +239,9 @@ fn s3(x1: &Pol, x2: &Pol, x3: &Pol, a: u64, b: u64, p: u64) -> Pol {
     let t1 = d.mul(&d, p).mul(x3, p).mul(x3, p);
     let s = x1.add(x2, p);
     let pr = x1.mul(x2, p);
-    let inner = s.mul(&pr.add(&Pol::c(n, a, p), p), p).add(&Pol::c(n, mulm(2, b, p), p), p);
+    let inner = s
+        .mul(&pr.add(&Pol::c(n, a, p), p), p)
+        .add(&Pol::c(n, mulm(2, b, p), p), p);
     let t2 = inner.mul(x3, p).scale(p - 2, p);
     let q = pr.sub(&Pol::c(n, a, p), p);
     let t3 = q.mul(&q, p).sub(&s.scale(mulm(4, b, p), p), p);
@@ -249,13 +254,27 @@ fn s3(x1: &Pol, x2: &Pol, x3: &Pol, a: u64, b: u64, p: u64) -> Pol {
 fn summation_poly(m: usize, x_r: u64, a: u64, b: u64, p: u64) -> Pol {
     if m == 2 {
         let n = 2;
-        return s3(&Pol::var(n, 0), &Pol::var(n, 1), &Pol::c(n, x_r, p), a, b, p);
+        return s3(
+            &Pol::var(n, 0),
+            &Pol::var(n, 1),
+            &Pol::c(n, x_r, p),
+            a,
+            b,
+            p,
+        );
     }
     assert_eq!(m, 3);
     // Work in variables (x1, x2, x3, u), then eliminate u (degree 2 in each).
     let n = 4;
     let f = s3(&Pol::var(n, 0), &Pol::var(n, 1), &Pol::var(n, 3), a, b, p);
-    let g = s3(&Pol::var(n, 3), &Pol::var(n, 2), &Pol::c(n, x_r, p), a, b, p);
+    let g = s3(
+        &Pol::var(n, 3),
+        &Pol::var(n, 2),
+        &Pol::c(n, x_r, p),
+        a,
+        b,
+        p,
+    );
     let coeffs = |h: &Pol| -> [Pol; 3] {
         let mut c = [Pol::zero(n), Pol::zero(n), Pol::zero(n)];
         for (e, &v) in &h.t {
@@ -306,7 +325,10 @@ fn to_elementary(f: &Pol, m: usize, p: u64) -> Pol {
         let (lead, &c) = rest.t.iter().max_by(|a, b| a.0.cmp(b.0)).unwrap();
         let lead = lead.clone();
         for i in 1..m {
-            assert!(lead[i - 1] >= lead[i], "not symmetric: leading exponent {lead:?}");
+            assert!(
+                lead[i - 1] >= lead[i],
+                "not symmetric: leading exponent {lead:?}"
+            );
         }
         let mut pw = vec![0u32; m];
         let mut term = Pol::c(m, c, p);
@@ -359,7 +381,14 @@ fn plain_system(inst: &Instance, m: usize, x_r: u64, chain: bool) -> (Vec<Pol>, 
         for k in 1..m - 2 {
             eqs.push(s3(&u(k - 1), &x(k + 1), &u(k), inst.a, inst.b, p));
         }
-        eqs.push(s3(&u(m - 3), &x(m - 1), &Pol::c(n, x_r, p), inst.a, inst.b, p));
+        eqs.push(s3(
+            &u(m - 3),
+            &x(m - 1),
+            &Pol::c(n, x_r, p),
+            inst.a,
+            inst.b,
+            p,
+        ));
     } else {
         let s = summation_poly(m, x_r, inst.a, inst.b, p);
         let mut f = s.remap(n, &(0..m).map(|i| i * t).collect::<Vec<_>>());
@@ -371,7 +400,11 @@ fn plain_system(inst: &Instance, m: usize, x_r: u64, chain: bool) -> (Vec<Pol>, 
     for i in 0..m {
         for j in 0..t {
             let y = Pol::var(n, i * t + j);
-            let next = if j + 1 < t { Pol::var(n, i * t + j + 1) } else { Pol::c(n, 1, p) };
+            let next = if j + 1 < t {
+                Pol::var(n, i * t + j + 1)
+            } else {
+                Pol::c(n, 1, p)
+            };
             eqs.push(next.sub(&y.mul(&y, p), p));
         }
     }
@@ -393,7 +426,11 @@ fn symmetric_system(inst: &Instance, m: usize, x_r: u64) -> (Vec<Pol>, usize) {
             for k in 1..=m {
                 let term = top.mul(&e(k), p);
                 let idx = d - k;
-                c[idx] = if k % 2 == 1 { c[idx].add(&term, p) } else { c[idx].sub(&term, p) };
+                c[idx] = if k % 2 == 1 {
+                    c[idx].add(&term, p)
+                } else {
+                    c[idx].sub(&term, p)
+                };
             }
         }
         while c.len() < m {
@@ -412,7 +449,15 @@ fn symmetric_system(inst: &Instance, m: usize, x_r: u64) -> (Vec<Pol>, usize) {
     };
     let mut eqs = Vec::new();
     // R_0 = X.
-    let mut r: Vec<Pol> = (0..m).map(|k| if k == 1 { Pol::c(n, 1, p) } else { Pol::zero(n) }).collect();
+    let mut r: Vec<Pol> = (0..m)
+        .map(|k| {
+            if k == 1 {
+                Pol::c(n, 1, p)
+            } else {
+                Pol::zero(n)
+            }
+        })
+        .collect();
     if m == 1 {
         r = reduce(vec![Pol::zero(n), Pol::c(n, 1, p)]);
     }
@@ -426,7 +471,11 @@ fn symmetric_system(inst: &Instance, m: usize, x_r: u64) -> (Vec<Pol>, usize) {
     }
     let last = square(&r);
     for (k, c) in last.iter().enumerate() {
-        let target = if k == 0 { Pol::c(n, 1, p) } else { Pol::zero(n) };
+        let target = if k == 0 {
+            Pol::c(n, 1, p)
+        } else {
+            Pol::zero(n)
+        };
         eqs.push(c.sub(&target, p));
     }
     // S_{m+1}(g w_1..g w_m, x_R) in e_k(w): substitute x_i = g w_i first.
@@ -466,7 +515,11 @@ fn symmetric_solution(inst: &Instance, m: usize, w: &[u64]) -> Vec<u64> {
             let d = c.len();
             for k in 1..=m {
                 let term = mulm(top, ek[k], p);
-                c[d - k] = if k % 2 == 1 { addm(c[d - k], term, p) } else { subm(c[d - k], term, p) };
+                c[d - k] = if k % 2 == 1 {
+                    addm(c[d - k], term, p)
+                } else {
+                    subm(c[d - k], term, p)
+                };
             }
         }
         c
@@ -495,7 +548,14 @@ fn plain_solution(inst: &Instance, w: &[u64], partial: &[u64]) -> Vec<u64> {
 
 /// A root `x` of the quadratic `S_3(x1, x2, X)`.
 fn s3_root(x1: u64, x2: u64, a: u64, b: u64, p: u64) -> Option<u64> {
-    let f = s3(&Pol::c(1, x1, p), &Pol::c(1, x2, p), &Pol::var(1, 0), a, b, p);
+    let f = s3(
+        &Pol::c(1, x1, p),
+        &Pol::c(1, x2, p),
+        &Pol::var(1, 0),
+        a,
+        b,
+        p,
+    );
     let co = |k: u32| f.t.get(&vec![k]).copied().unwrap_or(0);
     let (c2, c1, c0) = (co(2), co(1), co(0));
     if c2 == 0 {
@@ -508,7 +568,11 @@ fn s3_root(x1: u64, x2: u64, a: u64, b: u64, p: u64) -> Option<u64> {
 
 fn measure(eqs: &[Pol], n: usize, p: u64, budget: Duration) -> f4_fp::F4Report {
     let d = eqs.iter().map(|e| e.degree()).max().unwrap_or(1);
-    let input: Vec<Poly> = eqs.iter().map(|e| e.to_poly(p)).filter(|f| !f.is_empty()).collect();
+    let input: Vec<Poly> = eqs
+        .iter()
+        .map(|e| e.to_poly(p))
+        .filter(|f| !f.is_empty())
+        .collect();
     let opts = F4Options::new(Ordering::Grevlex, n as u32 + d + 6).with_budget(budget);
     f4_fp::f4(&input, n, p, &opts)
 }
@@ -522,7 +586,10 @@ fn main() {
             .unwrap_or_else(|| d.to_string())
     };
     let p: u64 = get("--p", "786433").parse().unwrap();
-    let ms: Vec<usize> = get("--m", "2,3").split(',').map(|s| s.parse().unwrap()).collect();
+    let ms: Vec<usize> = get("--m", "2,3")
+        .split(',')
+        .map(|s| s.parse().unwrap())
+        .collect();
     let tmax2: usize = get("--t-max-m2", "9").parse().unwrap();
     let tmax3: usize = get("--t-max-m3", "5").parse().unwrap();
     let randoms: usize = get("--random", "2").parse().unwrap();
@@ -593,7 +660,11 @@ fn main() {
                     }
                 };
                 for (k, e) in eqs.iter().enumerate() {
-                    assert_eq!(e.eval(&sol, p), 0, "{arm} m={m} t={t}: equation {k} fails at the planted point");
+                    assert_eq!(
+                        e.eval(&sol, p),
+                        0,
+                        "{arm} m={m} t={t}: equation {k} fails at the planted point"
+                    );
                 }
                 let _ = n;
             }
