@@ -92,6 +92,13 @@ pub fn sources(fixtures: &[Fixture]) -> Result<Vec<Source>> {
 }
 pub fn main(args: &[String]) -> Result<()> {
     let command = args.first().ok_or("missing follow-up command")?;
+    if command == "decomposition-worker" {
+        return block::decomposition_worker(
+            Path::new(args.get(1).ok_or("input")?),
+            Path::new(args.get(2).ok_or("output")?),
+            args.get(3).ok_or("budget milliseconds")?.parse()?,
+        );
+    }
     if command == "block-worker" || command == "block-batch-worker" {
         let run = if command == "block-worker" {
             block::worker

@@ -459,6 +459,132 @@ pub fn batch_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<()> {
         .collect::<Vec<_>>();
     write_json(out, &results)
 }
+
+/// Construct the public finite task, solve it, recover signs and deduplicate.
+/// This worker reads no prior basis, expected tuple list or known logarithm.
+pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<()> {
+    let task: Value = serde_json::from_slice(&fs::read(input)?)?;
+    let f: Fixture = serde_json::from_value(task["fixture"].clone())?;
+    let target: P = serde_json::from_value(task["target"].clone())?;
+    let bsize = task["B"].as_u64().ok_or("B")? as usize;
+    let m = task["arity"].as_u64().ok_or("arity")? as usize;
+    let arm = task["arm"].as_str().ok_or("arm")?;
+    if !(2..=3).contains(&m) {
+        return Err("decomposition pilot only supports m=2,3".into());
+    }
+    let started = Instant::now();
+    let e = f.curve();
+    let tx = target.ok_or("nonidentity target required")?.0 .0;
+    assert!(e.on(target));
+    let xs = (0..f.p)
+        .filter(|x| sqrt(e.rhs(Q(*x, 0)).0, f.p).is_some_and(|y| y != 0))
+        .take(bsize)
+        .collect::<Vec<_>>();
+    assert_eq!(xs.len(), bsize);
+    let points = xs
+        .iter()
+        .map(|x| {
+            (
+                *x,
+                Some((Q(*x, 0), Q(sqrt(e.rhs(Q(*x, 0)).0, f.p).unwrap(), 0))),
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
+    let direct = alg::build(f.p, f.a, f.b, tx, &xs, m, "product");
+    let cases = match arm {
+        "direct-chain" => vec![direct],
+        "first-pair-invariant" => vec![
+            alg::build(f.p, f.a, f.b, tx, &xs, m, "symmetric"),
+            diagonal(&direct),
+        ],
+        "hybrid-eight" => (0..8)
+            .map(|bucket| {
+                let mut c = direct.clone();
+                c.encoding = "hybrid-eight".into();
+                c.equations[0] = membership(
+                    c.names.len(),
+                    0,
+                    &xs.iter()
+                        .enumerate()
+                        .filter(|(i, _)| i % 8 == bucket)
+                        .map(|(_, x)| *x)
+                        .collect::<Vec<_>>(),
+                    f.p,
+                );
+                c
+            })
+            .collect(),
+        _ => return Err("unsupported decomposition encoding".into()),
+    };
+    let mut tuples = BTreeMap::<Vec<u64>, u64>::new();
+    let mut branches = vec![];
+    let mut complete = true;
+    let mut invalid_lifts = 0u64;
+    for c in cases {
+        let remaining = budget_ms
+            .saturating_sub(started.elapsed().as_millis() as u64)
+            .max(1);
+        let options = f4::F4Options::new(f4::Ordering::Grevlex, 32)
+            .with_budget(Duration::from_millis(remaining));
+        let r = f4::solve(&c.equations, c.names.len(), c.p, &options);
+        let solutions = match &r.verdict {
+            f4::Verdict::Solutions(s) => Some(s.clone()),
+            f4::Verdict::Inconsistent => Some(vec![]),
+            f4::Verdict::Undetermined => None,
+        };
+        complete &= solutions.is_some() && !r.timed_out;
+        if let Some(solutions) = &solutions {
+            for s in solutions {
+                assert!(c.equations.iter().all(|q| f4::eval(q, s, c.p) == 0));
+                let mut t = if c.encoding == "symmetric" {
+                    let disc = (s[0] * s[0] + f.p - 4 * s[1] % f.p) % f.p;
+                    let root = sqrt(disc, f.p).ok_or("pair discriminant did not split")?;
+                    let half = inv(2, f.p);
+                    let mut pair = [
+                        (s[0] + root) % f.p * half % f.p,
+                        (s[0] + f.p - root) % f.p * half % f.p,
+                    ];
+                    pair.sort();
+                    assert_ne!(pair[0], pair[1]);
+                    let mut t = pair.to_vec();
+                    t.extend_from_slice(&s[2..m]);
+                    t
+                } else if c.encoding == "invariant-diagonal" {
+                    let mut t = vec![s[0], s[0]];
+                    t.extend_from_slice(&s[1..m - 1]);
+                    t
+                } else {
+                    s[..m].to_vec()
+                };
+                t[..2].sort();
+                assert!(t.iter().all(|x| xs.contains(x)));
+                if let Some(mask) = signed(e, &t, &points, target) {
+                    tuples.entry(t).or_insert(mask);
+                } else {
+                    invalid_lifts += 1;
+                }
+            }
+        }
+        branches.push(json!({"encoding":c.encoding,"names":c.names,"solutions":solutions,"timed_out":r.timed_out,"solver_field_multiplications_row_reduction":r.field_ops,"f4_runs":r.f4_runs,"max_rows":r.max_rows,"max_cols":r.max_cols,"candidates_rejected":r.candidates_rejected}));
+    }
+    // For m=3 the only missing chain chart is P1+P2=O; enumerate and charge it.
+    let mut exceptional_candidates = 0;
+    if m == 3 && xs.contains(&tx) {
+        for x in &xs {
+            let t = vec![*x, *x, tx];
+            exceptional_candidates += 1;
+            if let Some(mask) = signed(e, &t, &points, target) {
+                tuples.entry(t).or_insert(mask);
+            }
+        }
+    }
+    let witnesses=tuples.iter().map(|(t,mask)|json!({"x":t,"y":t.iter().map(|x|points[x].unwrap().1.0).collect::<Vec<_>>(),"sign_mask":mask})).collect::<Vec<_>>();
+    let canonical = tuples.keys().cloned().collect::<Vec<_>>();
+    write_json(
+        out,
+        &json!({"schema":"twist.decomposition-worker/v1","workload":task["workload"],"arm":arm,"base":xs,"target":target,"branches":branches,"canonical_projected_tuples":canonical,"signed_witnesses":witnesses,"exceptional_candidates_enumerated":exceptional_candidates,"invalid_signed_lifts":invalid_lifts,"complete_projection":complete,"construction_roots_signs_dedup_and_source_verification_included":true,"complete_IC_cost":false,"wall_time_admitted":false}),
+    )
+}
 fn suffix(p: &Path, s: &str) -> PathBuf {
     PathBuf::from(format!("{}.{s}", p.display()))
 }
