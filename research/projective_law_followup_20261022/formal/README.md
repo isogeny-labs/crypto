@@ -354,6 +354,16 @@ used by the separately glued two-chart scheme. This is an equality of
 principal-open overlap morphisms under the chosen chart identifications;
 identifying the glued scheme itself with weighted Proj and transporting
 its local stalks remain open.
+`WeightedOverlapEmbedding.lean` checks that both localized chart Spec maps
+into weighted Proj factor through the canonical `D₊(XZ)` immersion.
+`WeightedInfinityJacobian.lean` proves that `z` and the `z`-partial generate
+the unit ideal in the explicit infinity chart for arbitrary coefficients.
+The [weighted quotient proof packet](WEIGHTED_QUOTIENT_COMPONENTS.md)
+includes these declarations, their [status CSV](weighted-quotient-components.csv),
+[graph](weighted-quotient-components.svg), and
+[PDF](WEIGHTED_QUOTIENT_COMPONENTS.pdf). Global scheme smoothness, the
+isomorphism to the separately glued scheme, stalk transport, and `Pic⁰`
+remain open.
 The [bounded weighted-Proj attempt](WEIGHTED_PROJ_HEAD.md) records the
 specific quotient-grading and `D₊(Z)` chart-isomorphism obligations, available
 pinned APIs, and three failed/timed-out compiler commands. Its

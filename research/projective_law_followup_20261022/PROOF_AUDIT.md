@@ -554,7 +554,7 @@ isomorphisms to the explicit affine and infinity charts, the cover
 comparison of the overlap with the separately glued curve, local-stalk
 transport, and the `Pic⁰` class equation remain open.
 The [same packet](formal/WEIGHTED_QUOTIENT_COMPONENTS.md) also checks
-pointwise Jacobian nonvanishing and a ring-global affine Jacobian ideal certificate under stated hypotheses, plus the chart
+pointwise Jacobian nonvanishing and a ring-global affine Jacobian ideal certificate under stated hypotheses. `WeightedInfinityJacobian.infinity_jacobian_ideal_top` additionally proves, for any field and coefficients, that `z` and the `z`-partial generate the unit ideal on the explicit infinity chart. The packet also checks the chart
 generator identities `x·z=1`, `w·x³=y` in the common overlap ring. These
 bounded facts do not prove global scheme smoothness or equality of the
 overlap morphisms as morphisms of the separately constructed schemes. The common localized overlap rings have a checked
@@ -564,9 +564,11 @@ every base-field scalar, and `projTransition_eq_separate` therefore proves
 unconditional equality with the separately presented overlap-ring transition.
 `WeightedOverlapScheme.projTransitionSpecIso_hom_eq_glue` further checks that
 the induced Spec morphism is the transition morphism used in the separately
-glued two-chart scheme. The actual weighted-Proj overlap embeddings have
-not been identified with those of the glued scheme; global scheme
-identification and transport of local stalks remain open.
+glued two-chart scheme. `WeightedOverlapEmbedding.zLocalized_awayι` and
+`xLocalized_awayι` now check that both localized chart Spec maps enter
+weighted Proj through the same canonical `D₊(XZ)` immersion. Constructing
+the global isomorphism between weighted Proj and the separately glued scheme,
+then transporting local stalks, remains open.
 Identifying that chart stalk with the chosen projective completion's
 infinity stalk remains open. The [infinity-chart packet](formal/INFINITY_CHART.md)
 now proves the chart equation `w²=z(1+a3z²+a2z³+a1z⁴+a0z⁵)` for
