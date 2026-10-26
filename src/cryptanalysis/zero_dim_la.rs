@@ -249,6 +249,30 @@ fn simd_level() -> u8 {
     })
 }
 
+/// Threads for the dense part of each Krylov step: `ZERO_DIM_LA_THREADS`
+/// (default 1, the single-threaded comparison).
+fn krylov_pool() -> Option<&'static rayon::ThreadPool> {
+    static P: std::sync::OnceLock<Option<rayon::ThreadPool>> = std::sync::OnceLock::new();
+    P.get_or_init(|| {
+        let t: usize = std::env::var("ZERO_DIM_LA_THREADS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(1);
+        (t > 1).then(|| {
+            rayon::ThreadPoolBuilder::new()
+                .num_threads(t)
+                .build()
+                .expect("thread pool")
+        })
+    })
+    .as_ref()
+}
+
+/// Threads the Krylov pass uses, for the records.
+pub fn krylov_threads() -> usize {
+    krylov_pool().map_or(1, |p| p.current_num_threads())
+}
+
 /// The kernel set in use, for the records.
 pub fn simd_name() -> &'static str {
     match simd_level() {
@@ -421,11 +445,14 @@ impl ModF {
             .map(|i| fp.sub(a[i] as u64, qf.get(i).copied().unwrap_or(0) as u64) as u32)
             .collect()
     }
+    /// Reference for the tests of [`Powering`].
+    #[allow(dead_code)]
     fn sqrmod(&self, fp: &Fp, a: &[u32], muls: &mut u64) -> Vec<u32> {
         let sq = pmul(fp, a, a, muls);
         self.reduce(fp, &sq, muls)
     }
     /// `x · a mod f`.
+    #[allow(dead_code)]
     fn mulx(&self, fp: &Fp, a: &[u32]) -> Vec<u32> {
         let d = self.d;
         let top = a[d - 1] as u64;
@@ -641,16 +668,180 @@ fn berlekamp_massey(f: &Fp, seq: &[u64], muls: &mut u64) -> Vec<u64> {
     c.into_iter().map(|x| x as u64).collect()
 }
 
+// ── Allocation-free Karatsuba and Barrett for the powering ───────────────
+
+/// Below this length the product is schoolbook. `ZERO_DIM_LA_KARA` overrides
+/// it (tuning only).
+fn kara_threshold() -> usize {
+    static T: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *T.get_or_init(|| {
+        std::env::var("ZERO_DIM_LA_KARA")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(48)
+            .clamp(4, 512)
+    })
+}
+
+/// `out[..la + lb − 1] = a · b` by schoolbook, lazily (one reduction per output).
+fn school_into(fp: &Fp, a: &[u32], b: &[u32], out: &mut [u32], lo: &mut [u64], hi: &mut [u64]) {
+    let len = a.len() + b.len() - 1;
+    let (lo, hi) = (&mut lo[..len], &mut hi[..len]);
+    lo.fill(0);
+    hi.fill(0);
+    let (s, l) = if a.len() <= b.len() { (a, b) } else { (b, a) };
+    for (i, &c) in s.iter().enumerate() {
+        if c != 0 {
+            fp.axpy(&mut lo[i..i + l.len()], &mut hi[i..i + l.len()], c, l);
+        }
+    }
+    for i in 0..len {
+        out[i] = fp.red_lohi(lo[i], hi[i]) as u32;
+    }
+}
+
+/// Scratch for [`kmul`]: about `6n` words and two `2n` lane buffers.
+struct KScratch {
+    w: Vec<u32>,
+    lo: Vec<u64>,
+    hi: Vec<u64>,
+}
+
+impl KScratch {
+    fn new(n: usize) -> Self {
+        KScratch {
+            w: vec![0; 8 * n + 64],
+            lo: vec![0; 2 * n + 2],
+            hi: vec![0; 2 * n + 2],
+        }
+    }
+}
+
+/// `out[..2n − 1] = a · b` for `a, b` of the same length `n`.
+fn kmul(fp: &Fp, a: &[u32], b: &[u32], out: &mut [u32], w: &mut [u32], lo: &mut [u64], hi: &mut [u64]) {
+    let n = a.len();
+    debug_assert_eq!(b.len(), n);
+    if n == 0 {
+        return;
+    }
+    if n <= kara_threshold() {
+        school_into(fp, a, b, out, lo, hi);
+        return;
+    }
+    let h = n / 2;
+    let m = n - h;
+    let (a0, a1) = a.split_at(h);
+    let (b0, b1) = b.split_at(h);
+    // z0 = a0·b0 at out[0..2h−1], z2 = a1·b1 at out[2h..2n−1], out[2h−1] = 0
+    {
+        let (o0, o2) = out.split_at_mut(2 * h);
+        if h > 0 {
+            kmul(fp, a0, b0, &mut o0[..2 * h - 1], w, lo, hi);
+            o0[2 * h - 1] = 0;
+        }
+        kmul(fp, a1, b1, &mut o2[..2 * m - 1], w, lo, hi);
+    }
+    // z1 = (a0 + a1)(b0 + b1) in scratch, the low halves padded to m
+    let (sa, rest) = w.split_at_mut(m);
+    let (sb, rest) = rest.split_at_mut(m);
+    let (z1, rest) = rest.split_at_mut(2 * m - 1);
+    for i in 0..m {
+        let x0 = if i < h { a0[i] as u64 } else { 0 };
+        let y0 = if i < h { b0[i] as u64 } else { 0 };
+        sa[i] = fp.add(x0, a1[i] as u64) as u32;
+        sb[i] = fp.add(y0, b1[i] as u64) as u32;
+    }
+    kmul(fp, sa, sb, z1, rest, lo, hi);
+    // out[h + i] += z1_i − z0_i − z2_i
+    for i in 0..2 * m - 1 {
+        let z0 = if i < 2 * h - 1 { out[i] as u64 } else { 0 };
+        let z2 = out[2 * h + i] as u64;
+        let mid = fp.sub(fp.sub(z1[i] as u64, z0), z2);
+        out[h + i] = fp.add(out[h + i] as u64, mid) as u32;
+    }
+}
+
+/// Squaring and Barrett reduction modulo a monic `f` (degree `d ≥ 3`), with
+/// every buffer preallocated: the powering allocates nothing per step.
+struct Powering {
+    d: usize,
+    /// `f` padded to `d + 1`, `finv = rev(f)^{-1} mod x^{d−1}` padded to `d − 1`.
+    f: Vec<u32>,
+    finv: Vec<u32>,
+    prod: Vec<u32>,
+    ra: Vec<u32>,
+    qr: Vec<u32>,
+    q: Vec<u32>,
+    qf: Vec<u32>,
+    ks: KScratch,
+}
+
+impl Powering {
+    fn new(mf: &ModF) -> Self {
+        let d = mf.d;
+        let mut finv = mf.finv.clone();
+        finv.resize(d - 1, 0);
+        Powering {
+            d,
+            f: mf.f.clone(),
+            finv,
+            prod: vec![0; 2 * d + 1],
+            ra: vec![0; d - 1],
+            qr: vec![0; 2 * d],
+            q: vec![0; d + 1],
+            qf: vec![0; 2 * d + 2],
+            ks: KScratch::new(d + 1),
+        }
+    }
+    /// `acc ← acc² mod f` in place (`acc` has length `d`).
+    fn square(&mut self, fp: &Fp, acc: &mut [u32], muls: &mut u64) {
+        let d = self.d;
+        let k = d - 1;
+        let KScratch { w, lo, hi } = &mut self.ks;
+        kmul(fp, acc, acc, &mut self.prod[..2 * d - 1], w, lo, hi);
+        // rev(q) = rev(prod)_{<k} · finv mod x^k
+        for i in 0..k {
+            self.ra[i] = self.prod[2 * d - 2 - i];
+        }
+        kmul(fp, &self.ra, &self.finv, &mut self.qr[..2 * k - 1], w, lo, hi);
+        // q (degree ≤ d − 2) padded to d + 1, times f; keep the low d
+        for i in 0..k {
+            self.q[i] = self.qr[k - 1 - i];
+        }
+        self.q[k] = 0;
+        self.q[k + 1] = 0;
+        kmul(fp, &self.q, &self.f, &mut self.qf[..2 * d + 1], w, lo, hi);
+        for i in 0..d {
+            acc[i] = fp.sub(self.prod[i] as u64, self.qf[i] as u64) as u32;
+        }
+        *muls += 3 * (d as u64).pow(2) / 2;
+    }
+    /// `acc ← x · acc mod f`.
+    fn times_x(&self, fp: &Fp, acc: &mut [u32]) {
+        let d = self.d;
+        let top = acc[d - 1] as u64;
+        for i in (1..d).rev() {
+            acc[i] = acc[i - 1];
+        }
+        acc[0] = 0;
+        if top != 0 {
+            for i in 0..d {
+                acc[i] = fp.sub(acc[i] as u64, fp.mul(top, self.f[i] as u64)) as u32;
+            }
+        }
+    }
+}
+
 /// `x^p mod f` by left-to-right binary powering (square, then times `x`).
 fn x_pow_p(fp: &Fp, mf: &ModF, muls: &mut u64) -> Vec<u32> {
-    let d = mf.d;
-    let mut acc = vec![0u32; d];
+    let mut pw = Powering::new(mf);
+    let mut acc = vec![0u32; mf.d];
     acc[0] = 1;
     let e = fp.p;
     for bit in (0..64 - e.leading_zeros()).rev() {
-        acc = mf.sqrmod(fp, &acc, muls);
+        pw.square(fp, &mut acc, muls);
         if (e >> bit) & 1 == 1 {
-            acc = mf.mulx(fp, &acc);
+            pw.times_x(fp, &mut acc);
         }
     }
     acc
@@ -863,6 +1054,8 @@ fn fast_inner(
         let t = Instant::now();
         let mut w: Vec<u32> = (0..delta).map(|_| lrng.gen_range(0..p) as u32).collect();
         let mut y = vec![0u32; delta];
+        let pool = krylov_pool();
+        let mut dvals = vec![0u32; dense_pos.len()];
         seqs = vec![Vec::with_capacity(2 * delta); n];
         for j in 0..2 * delta {
             for (s, v) in seqs.iter_mut().zip(reads.iter()) {
@@ -885,8 +1078,24 @@ fn fast_inner(
             for &(pos, k) in &shifts {
                 y[pos as usize] = w[k as usize];
             }
-            for (c, &pos) in dense_pos.iter().enumerate() {
-                y[pos] = fp.dot(&dmat[c * delta..(c + 1) * delta], &w) as u32;
+            match pool {
+                Some(pool) if dense_pos.len() * delta >= 1 << 15 => {
+                    use rayon::prelude::*;
+                    let wr = &w;
+                    pool.install(|| {
+                        dvals.par_iter_mut().enumerate().with_min_len(4).for_each(|(c, v)| {
+                            *v = fp.dot(&dmat[c * delta..(c + 1) * delta], wr) as u32;
+                        })
+                    });
+                    for (&pos, &v) in dense_pos.iter().zip(&dvals) {
+                        y[pos] = v;
+                    }
+                }
+                _ => {
+                    for (c, &pos) in dense_pos.iter().enumerate() {
+                        y[pos] = fp.dot(&dmat[c * delta..(c + 1) * delta], &w) as u32;
+                    }
+                }
             }
             for (pos, nz) in &sparse_cols {
                 let (mut lo, mut hi) = (0u64, 0u64);
@@ -1005,6 +1214,37 @@ mod tests {
                 }
                 let want: Vec<u32> = r[..d].iter().map(|&c| c as u32).collect();
                 assert_eq!(mf.reduce(&fp, &a, &mut m), want, "p={p} d={d}");
+            }
+        }
+    }
+
+    #[test]
+    fn allocation_free_powering_matches_the_reference() {
+        let mut rng = StdRng::seed_from_u64(11);
+        for &p in &[101u64, 65_521, 4_294_967_291] {
+            let fp = Fp::new(p);
+            for &d in &[3usize, 5, 47, 48, 49, 64, 97, 130] {
+                let mut f: Vec<u64> = (0..d).map(|_| rng.gen_range(0..p)).collect();
+                f.push(1);
+                let mut m = 0;
+                let mf = ModF::new(&fp, &f, &mut m);
+                // reference: allocating sqrmod / mulx
+                let mut want = vec![0u32; d];
+                want[0] = 1;
+                for bit in (0..64 - p.leading_zeros()).rev() {
+                    want = mf.sqrmod(&fp, &want, &mut m);
+                    if (p >> bit) & 1 == 1 {
+                        want = mf.mulx(&fp, &want);
+                    }
+                }
+                assert_eq!(x_pow_p(&fp, &mf, &mut m), want, "p={p} d={d}");
+                // kmul against the naive product
+                let a: Vec<u32> = (0..d).map(|_| rng.gen_range(0..p) as u32).collect();
+                let b: Vec<u32> = (0..d).map(|_| rng.gen_range(0..p) as u32).collect();
+                let mut ks = KScratch::new(d);
+                let mut out = vec![0u32; 2 * d - 1];
+                kmul(&fp, &a, &b, &mut out, &mut ks.w, &mut ks.lo, &mut ks.hi);
+                assert_eq!(out, naive_mul(p, &a, &b), "kmul p={p} d={d}");
             }
         }
     }

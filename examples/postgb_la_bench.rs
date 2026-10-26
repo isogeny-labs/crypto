@@ -392,6 +392,7 @@ fn main() {
         let doc = serde_json::json!({
             "schema": "postgb_la_bench/v1",
             "simd": crypto_lib::cryptanalysis::zero_dim_la::simd_name(),
+            "fast_threads": crypto_lib::cryptanalysis::zero_dim_la::krylov_threads(),
             "families": families,
             "reps": reps,
             "per": per,
