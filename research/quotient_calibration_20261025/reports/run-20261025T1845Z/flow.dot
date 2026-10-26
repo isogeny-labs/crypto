@@ -1,0 +1,12 @@
+digraph preflight {
+  graph [rankdir=LR, bgcolor="white", pad="0.2", nodesep="0.3", ranksep="0.35"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, color="#256454", fillcolor="#e9f4ef", margin="0.15,0.13"];
+  edge [color="#256454", arrowsize=0.7];
+  source [label="Frozen source\nF343, r=373\nkernel 153"];
+  replay [label="Rust replay: PASS\n32 pilots x 64 sections\nrank 8; frame 9"];
+  holdout [label="Freeze preserved\n32 challenge inputs\n99 stream counters"];
+  target [label="Target calibration\nNOT EXECUTED\nfreeze M; require 32/32", color="#7a8592", fillcolor="#f0f2f5"];
+  inverse [label="Inverse + group checks\nNOT EXECUTED\nProfile B identity pending", color="#7a8592", fillcolor="#f0f2f5"];
+  source -> replay -> holdout;
+  holdout -> target -> inverse [style=dashed, color="#7a8592"];
+}

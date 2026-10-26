@@ -1,0 +1,127 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "volcano census follow-up V6 M vertex 262 (level 2), 8 isomorphic models",
+ "description": "Volcano ECDLP census follow-up Phase B (research/volcano_ecdlp_census_followup_20261023/PLAN.md). Known-answer synthetic curves, planted_shared targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 38002051,
+    "a": 13997438,
+    "b": 17850505,
+    "group_order": 38003683,
+    "r": 808589,
+    "gx": 4959473,
+    "gy": 18057567
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 38002051,
+    "a": 3591847,
+    "b": 8949039,
+    "group_order": 38003683,
+    "r": 808589,
+    "gx": 15750450,
+    "gy": 10058476
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 38002051,
+    "a": 26674606,
+    "b": 16353151,
+    "group_order": 38003683,
+    "r": 808589,
+    "gx": 1960581,
+    "gy": 29684465
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 38002051,
+    "a": 9015099,
+    "b": 29149346,
+    "group_order": 38003683,
+    "r": 808589,
+    "gx": 34180208,
+    "gy": 17783518
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 38002051,
+    "a": 30311386,
+    "b": 17178355,
+    "group_order": 38003683,
+    "r": 808589,
+    "gx": 10262603,
+    "gy": 12146880
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 38002051,
+    "a": 7144771,
+    "b": 24892586,
+    "group_order": 38003683,
+    "r": 808589,
+    "gx": 18915347,
+    "gy": 11443212
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 38002051,
+    "a": 34620461,
+    "b": 8867535,
+    "group_order": 38003683,
+    "r": 808589,
+    "gx": 1439128,
+    "gy": 609884
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 38002051,
+    "a": 20194119,
+    "b": 9322145,
+    "group_order": 38003683,
+    "r": 808589,
+    "gx": 1613661,
+    "gy": 37789741
+   }
+  ],
+  "targets_per_curve": 16,
+  "target_seed": 20261127,
+  "target_kind": "planted_shared"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "bsgs",
+   "role": "candidate",
+   "method": {
+    "id": "bsgs.textbook"
+   }
+  },
+  {
+   "name": "ic",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=64",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 4,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261023,
+  "isolation_required": "L2",
+  "timeout_seconds": 600
+ }
+}

@@ -1,14 +1,7 @@
 name: SEA formal verification
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - 'isogeny_algos/src/find/sea.rs'
-      - 'isogeny_algos/src/curve.rs'
-      - 'isogeny_algos/src/api.rs'
-      - 'isogeny_algos/src/gls_loop.rs'
-      - 'research/sea_point_count_20261016/**'
-      - '.github/workflows/sea-formal.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
