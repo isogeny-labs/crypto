@@ -568,8 +568,54 @@ pub fn sea_atkin_tower(
     sea_resolved(fp, e, max_ell, phis, rng, CYCLE_DEGREE, Some(&mut resolver))
 }
 
-/// Stop adding primes once at most this many candidates for t remain.
-pub const SEA_STOP_CANDIDATES: f64 = 4_194_304.0;
+/// Stop adding primes once the final search (`search_plan`) needs at most this many point
+/// additions, or fewer than the next prime would cost (`SEA_PRIME_ADDS`); 4096 is 2 sqrt(4M),
+/// a plain baby-step giant-step over 4M candidates (the earlier rule).
+pub const SEA_STOP_ADDS: f64 = 4096.0;
+/// Cost of SEA at prime l in point additions, taken as this many times l^2 (measured over
+/// 2^127 - 1: an Elkies prime near 67 takes 10-17 ms, a point addition about 1.3 us, so about
+/// 2.3 l^2; 3 performed as well as 2 and 5 in A/B runs): SEA stops once the final search is
+/// cheaper than the next prime.
+pub const SEA_PRIME_ADDS: f64 = 3.0;
+/// Largest number of residues the final search enumerates (one giant-step walk each).
+pub const SEA_MAX_RESIDUES: f64 = 4096.0;
+
+/// The final search over `count` candidates t = t0 + k m and its estimated cost in point
+/// additions, given the Atkin sets (l, allowed t mod l): enumerating the residues of k modulo
+/// the product M_A of a subset of the Atkin primes allowed by their sets (R of them) leaves
+/// J = count / M_A steps per residue, searched by baby-step giant-step with one shared table of
+/// b = sqrt(R J) baby steps; cost b + R (J / b + 2 log2 M_A) (the last term: placing each
+/// residue's walk). Atkin primes are taken greedily by their fraction |S| / l while the cost
+/// drops. Returns (cost, indices of the Atkin sets used).
+pub fn search_plan(count: f64, atkin_sets: &[(u64, Vec<u64>)]) -> (f64, Vec<usize>) {
+    let cost = |r: f64, ma: f64| {
+        let j = (count / ma).max(1.0);
+        let b = (r * j).sqrt().min(j);
+        b + r * (j / b + 2.0 * ma.log2())
+    };
+    let mut order: Vec<usize> = (0..atkin_sets.len()).collect();
+    order.sort_by(|&a, &b| {
+        let fa = atkin_sets[a].1.len() as f64 / atkin_sets[a].0 as f64;
+        let fb = atkin_sets[b].1.len() as f64 / atkin_sets[b].0 as f64;
+        fa.partial_cmp(&fb).unwrap()
+    });
+    let (mut r, mut ma) = (1.0f64, 1.0f64);
+    let mut best = cost(r, ma);
+    let mut used = vec![];
+    for i in order {
+        let (l, set) = &atkin_sets[i];
+        let (r2, ma2) = (r * set.len() as f64, ma * *l as f64);
+        if r2 > SEA_MAX_RESIDUES || ma2 > count {
+            continue;
+        }
+        let c = cost(r2, ma2);
+        if c < best {
+            (best, r, ma) = (c, r2, ma2);
+            used.push(i);
+        }
+    }
+    (best, used)
+}
 /// Candidate counts up to this are walked one point addition each; above, baby-step giant-step.
 pub const SEA_WALK_MAX: u128 = 1024;
 
@@ -751,10 +797,14 @@ pub fn sea_resolved<F: Field>(
                 }
             }
         }
-        // stop once the search over the candidates (Hasse width / M_E of them, ~2 sqrt(.) point
-        // additions by baby-step giant-step; the Atkin sets only filter the hits) is cheaper
-        // than another prime (roots of Phi_l(j, Y), a kernel polynomial, a Frobenius power)
-        if width.to_f64() / m.to_f64() < SEA_STOP_CANDIDATES {
+        // stop once the search over the candidates (point additions, `search_plan`: Hasse width
+        // / M_E of them, cut down by the Atkin sets it uses) is cheaper than the next prime
+        // (roots of Phi_l(j, Y), a kernel polynomial, a Frobenius power: ~ SEA_PRIME_ADDS l^2)
+        let next = (ell + 2..)
+            .find(|&k| crate::field::is_prime(k as u64))
+            .unwrap();
+        let next_cost = SEA_PRIME_ADDS * (next * next) as f64;
+        if search_plan(width.to_f64() / m.to_f64(), &atkin_sets).0 <= next_cost.max(SEA_STOP_ADDS) {
             break;
         }
         ell += 2;
@@ -803,7 +853,9 @@ pub fn sea_resolved<F: Field>(
                 t = &t + &m;
             }
         } else {
-            // baby-step giant-step: [q+1-t0] P = [k m] P, k in [0, count)
+            // baby-step giant-step per residue r: [q + 1 - t0] P - [r m] P = [j M_A m] P,
+            // j < J = ceil(count / M_A); one table of baby steps [i M_A m] P, i < b, shared by
+            // all residues
             let base = pmul_big(f, e, &p, &to_big(&(&q1 - &t0)));
             let mp = pmul_big(f, e, &p, &to_big(&m));
             st.tested += progression_bsgs(f, e, base, mp, count, |kp| {

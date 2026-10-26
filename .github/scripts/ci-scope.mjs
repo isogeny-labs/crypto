@@ -47,7 +47,6 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
     const root = /\.rs$/.test(file) && maintained.test(file) || frozenExamples.test(file) || cargoSources.has(file) || rustConfig.test(file) || embedded.has(file)
       || (volcanoCliRust.test(file) && !prose.test(file)) || isogenyAlgosInputs.test(file);
     const releaseAttributes = file === '.gitattributes';
-    const root = /\.rs$/.test(file) && maintained.test(file) || frozenExamples.test(file) || cargoSources.has(file) || rustConfig.test(file) || embedded.has(file);
     result.rust_root ||= root || sharedAnalysis.test(file) || file === 'scripts/clippy-maintained.sh';
     result.rust_cd ||= /^cd_attack\/(src|tests|examples|benches)\//.test(file) && !prose.test(file)
       || /^cd_attack\/(Cargo\.(toml|lock)|build\.rs|rust-toolchain(\.toml)?|\.cargo\/.*)$/.test(file)
@@ -69,6 +68,7 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
       || /^gpu\/(ecc|ecc2k|semaev|macaulay|btcpuzzle)\//.test(file) && !prose.test(file);
     result.release_cuda ||= client || releaseAttributes;
     result.ecbench_replay ||= root
+      || /^research\/factor_base_shape_leads_20261018\//.test(file) && !prose.test(file)
       || /^docs\/(ecbench|bounds)\//.test(file) && !prose.test(file)
       || /^research\/(ecbench_[^/]+|ghs_curve_comparison_20261009)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
       || /^research\/notes\/ecc2k130\/(cold_compact_orbit_ic_20261003|full_rank_compact_orbit_ic_20261003)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))

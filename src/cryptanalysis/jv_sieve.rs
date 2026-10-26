@@ -1374,6 +1374,13 @@ pub struct SieveDlpReport {
     pub descent_f4_muls: u64,
     pub descent_lin_muls: u64,
     pub descent_post_muls: u64,
+    /// Tests whose sparse linear stage fell back to the dense one (counted).
+    pub descent_lin_fallback: u64,
+    /// `JV_LIN` arm of the descent's linear stage (`dense`, `l1a`, `sparse`).
+    pub lin_mode: String,
+    /// FNV digest of the descent's successful rows in residual order: equal
+    /// digests across `JV_LIN` arms mean bit-identical decompositions.
+    pub descent_digest: u64,
     pub descent_verify_muls: u64,
     pub descent_stream_muls: u64,
     pub descent_muls: u64,
@@ -1575,6 +1582,7 @@ pub fn run_cover_sieve_dlp_on(
         relations_available: (p as f64).powi(m_rule as i32 - 6) / fact(m_rule),
         estimate_by_m: (9..=13).map(|mm| (mm, relations_estimate(p, mm))).collect(),
         base_muls,
+        lin_mode: super::jv_cover::lin_mode_name().to_string(),
         ..Default::default()
     };
     // ── the residual stream for the descent: R = aG′ + bQ′, R₀ + i·M
@@ -1735,6 +1743,7 @@ pub fn run_cover_sieve_dlp_on(
             rep.descent_weil_muls += cost.weil_muls;
             rep.descent_lin_muls += cost.lin_muls;
             rep.descent_post_muls += cost.post_muls;
+            rep.descent_lin_fallback += cost.lin_fallback as u64;
             rep.descent_verify_muls += vm;
             if cost.incomplete {
                 rep.descent_incomplete += 1;
@@ -1753,6 +1762,11 @@ pub fn run_cover_sieve_dlp_on(
             }
             if let Some(d) = decs.first() {
                 rep.descent_successes += 1;
+                let mut h = rep.descent_digest ^ 0xcbf2_9ce4_8422_2325;
+                for &(i, e) in &d.terms {
+                    h = (h ^ (i as u64 * 3 + (e + 1) as u64)).wrapping_mul(0x100_0000_01b3);
+                }
+                rep.descent_digest = h;
                 let mut cols: Vec<(usize, u64)> = d
                     .terms
                     .iter()

@@ -58,6 +58,17 @@
 //! $B run --arms A0,A11 --m 4 --file 'F4-{arm}-m{m}' --out-dir $R
 //! $B run --arms A0,A11 --m 3 --t-min 5 --t-max 5 --budget 3600 --grace 300 --file 'F3-{arm}-m3-t5' --out-dir $R
 //! $B analyze $R --amendment2                   # every Amendment 2 decision rule
+//! # Amendment 5 (G1, G2): m = 4 from t = 4 at 3600 s, distinct targets.
+//! $B run --arms A0,A11 --m 4 --t-min 4 --budget 3600 --grace 300 --vmem-kb 15000000 \
+//!     --distinct-targets --file 'G1-{arm}-m{m}' --out-dir $R
+//! $B analyze $R --g1                            # the G1 series and verdicts
+//! $B compare-rows A.jsonl B.jsonl               # two runs of the same systems, row by row
+//! # Amendment 6 (T1, T2): A0 on the sparse tower engine, under an admission rule.
+//! $B admit-tower $R                             # T1: 26 committed A0 systems, D must match
+//! $B run --engine tower --arms A0 --m 3 --t-min 5 --t-max 5 --budget 3600 --grace 300 \
+//!     --vmem-kb 15000000 --file 'T2-{arm}-m{m}' --out-dir $R   # T2, only if admitted (and m = 4, t = 4)
+//! $B analyze $R --tower                         # T1 verdict and A0's extended series
+//! # Amendment 8 (T4, K1, X1): analyze $R --a8
 //! ```
 //!
 //! A stage diagnostic of the solver axis (`AGENTS.md` §2): it prices no
@@ -66,10 +77,12 @@
 use std::collections::{BTreeMap, HashMap};
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
+use std::os::unix::process::ExitStatusExt;
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
 use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, Ordering, Poly};
+use crypto_lib::cryptanalysis::f4_fp_tower::{self, SquareRule, TowerF4Options, TowerRing};
 use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -83,19 +96,24 @@ const P2: u64 = 2_013_265_921;
 /// `p₃ = 5·2^13 + 1`, below 2^16: F4's narrow path (Amendment 4, C3).
 const P3: u64 = 40_961;
 
-/// A prime by its index in the seed rule (Amendments 2 and 4): `p₁ = 0`,
-/// `p₂ = 1`, `p₃ = 2`.
+/// `p₄ = 2⁸·39091 + 1` (`p₄ − 1 = 2⁸·13·31·97`): 2-adic valuation 8, so
+/// `t ≤ 8`, with a smooth odd part (Amendment 9, P4).
+const P4: u64 = 10_007_297;
+
+/// A prime by its index in the seed rule (Amendments 2, 4 and 9): `p₁ = 0`,
+/// `p₂ = 1`, `p₃ = 2`, `p₄ = 3`.
 fn prime_of(idx: usize) -> u64 {
     match idx {
         0 => P1,
         1 => P2,
         2 => P3,
+        3 => P4,
         _ => panic!("unknown prime index {idx}"),
     }
 }
 
 fn prime_label(idx: usize) -> &'static str {
-    ["p1", "p2", "p3"][idx]
+    ["p1", "p2", "p3", "p4"][idx]
 }
 
 fn parse_prime(s: &str) -> usize {
@@ -103,7 +121,8 @@ fn parse_prime(s: &str) -> usize {
         "p1" => 0,
         "p2" => 1,
         "p3" => 2,
-        _ => panic!("unknown prime `{s}` (p1, p2 or p3)"),
+        "p4" => 3,
+        _ => panic!("unknown prime `{s}` (p1, p2, p3 or p4)"),
     }
 }
 /// "FBDS", the preregistered seed base.
@@ -710,9 +729,61 @@ fn nonsingular(a: u64, b: u64, p: u64) -> bool {
 }
 
 /// A target curve on which at least `need` elements of `V` are abscissae.
+/// Amendment 8, K1: the curve family of the target curve, fixed per process
+/// (0 = generic: `a` and `b` uniform, as in every earlier run; 1 = `a = 0`;
+/// 2 = `a = −3`). Children get it with `--family`.
+static FAMILY: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+/// Amendment 8, T4: stop the tower engine once at most this many standard
+/// monomials remain (0 = never, as in every earlier run). Children get it
+/// with `--stop-below`.
+static STOP_BELOW: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+/// Amendment 9, Z1: the structure of the planted target, fixed per process
+/// (0 = random, as in every earlier run; 1 = `x_R = 0`, with the curve built
+/// around the targeted points). Children get it with `--target-structure`.
+static TARGET: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+/// Amendment 11, E1: the curve model of the target (0 = short Weierstrass,
+/// as in every earlier run; 1 = twisted Edwards `a·x² + y² = 1 + d·x²y²`, with
+/// the summation polynomial in the `y`-coordinate and the factor base on `y`).
+/// An Edwards curve is carried in a `PrimeCurve` with `a` = `a` and `b` = `d`,
+/// and a point as `(y, x)` so that `.x` is the coordinate the base lives in.
+/// Children get it with `--model`.
+static MODEL: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+fn model() -> usize {
+    MODEL.load(std::sync::atomic::Ordering::Relaxed)
+}
+
+fn target_structure() -> usize {
+    TARGET.load(std::sync::atomic::Ordering::Relaxed)
+}
+
+fn family() -> usize {
+    FAMILY.load(std::sync::atomic::Ordering::Relaxed)
+}
+
+fn family_name(f: usize) -> &'static str {
+    ["generic", "a0", "am3"][f]
+}
+
+fn parse_family(s: &str) -> usize {
+    ["generic", "a0", "am3"]
+        .iter()
+        .position(|n| *n == s)
+        .unwrap_or_else(|| panic!("unknown curve family `{s}` (generic, a0, am3)"))
+}
+
 fn target_curve(p: u64, v: &[u64], need: usize, rng: &mut StdRng) -> (PrimeCurve, Vec<u64>) {
     loop {
-        let a = rng.gen_range(0..p);
+        // `a` is always drawn, so the stream of the generic family is the
+        // one every earlier run used; a family then overrides it.
+        let drawn = rng.gen_range(0..p);
+        let a = match family() {
+            1 => 0,
+            2 => p - 3,
+            _ => drawn,
+        };
         let b = rng.gen_range(1..p);
         if !nonsingular(a, b, p) {
             continue;
@@ -774,6 +845,446 @@ fn plant(curve: &PrimeCurve, m: usize, on: &[u64], rng: &mut StdRng) -> Option<T
     })
 }
 
+/// `P_1 + … + P_m` with the partial sums, as `plant` forms them; `None` when
+/// a partial sum is the identity.
+fn sum_target(curve: &PrimeCurve, pts: Vec<PrimePoint>) -> Option<Target> {
+    let mut ops = GroupOps::default();
+    let mut acc = pts[0];
+    let mut partial = Vec::new();
+    for pt in &pts[1..] {
+        acc = curve.add(&mut ops, acc, *pt);
+        if acc.infinity {
+            return None;
+        }
+        partial.push(acc.x);
+    }
+    Some(Target {
+        x_r: acc.x,
+        r: acc,
+        pts,
+        partial,
+    })
+}
+
+/// Amendment 9, Z1: a planted target with `x_R = 0`, on a curve built around
+/// its points. `m = 2`: with `x_1 ≠ x_2` in `V` and `x_1 + x_2` a non-zero
+/// square, `y_2 = y_1 + λ(x_2 − x_1)` with `λ² = x_1 + x_2` gives
+/// `x(P_1 + P_2) = λ² − x_1 − x_2 = 0`, and `a`, `b` follow from the two
+/// points. `m = 3`: `a`, `b` from `P_1`, `P_2` for random `y_1`, `y_2`, then
+/// `y_3` from the curve, searching until `x(P_1 + P_2 + P_3) = 0` (about `p`
+/// trials). The result is checked on the curve and by the group law.
+fn plant_x0(p: u64, v: &[u64], m: usize, rng: &mut StdRng) -> (PrimeCurve, Target) {
+    assert!(
+        m == 2 || m == 3,
+        "x_R = 0 targets are written for m ∈ {{2, 3}}"
+    );
+    let helper = PrimeCurve { p, a: 0, b: 1 };
+    let cube = |x: u64| mulm(x, mulm(x, x, p), p);
+    let from_two = |x1: u64, y1: u64, x2: u64, y2: u64| -> Option<(u64, u64)> {
+        let dx = subm(x2, x1, p);
+        let num = subm(
+            addm(subm(mulm(y2, y2, p), mulm(y1, y1, p), p), cube(x1), p),
+            cube(x2),
+            p,
+        );
+        let a = mulm(num, invm(dx, p), p);
+        let b = subm(subm(mulm(y1, y1, p), cube(x1), p), mulm(a, x1, p), p);
+        (nonsingular(a, b, p) && b != 0).then_some((a, b))
+    };
+    let mut trials = 0u64;
+    loop {
+        trials += 1;
+        assert!(
+            trials < 64 * p,
+            "plant_x0: no target with x_R = 0 after {trials} trials"
+        );
+        let mut xs: Vec<u64> = Vec::with_capacity(m);
+        while xs.len() < m {
+            let x = v[rng.gen_range(0..v.len())];
+            if !xs.contains(&x) {
+                xs.push(x);
+            }
+        }
+        let (x1, x2) = (xs[0], xs[1]);
+        let y1 = rng.gen_range(1..p);
+        if m == 2 {
+            let sum = addm(x1, x2, p);
+            if sum == 0 {
+                continue;
+            }
+            let Some(r) = helper.sqrt(sum).filter(|&r| r != 0) else {
+                continue;
+            };
+            let lam = if rng.gen::<bool>() { r } else { p - r };
+            let y2 = addm(y1, mulm(subm(x2, x1, p), lam, p), p);
+            let Some((a, b)) = from_two(x1, y1, x2, y2) else {
+                continue;
+            };
+            let curve = PrimeCurve { p, a, b };
+            let pts = vec![PrimePoint::affine(x1, y1), PrimePoint::affine(x2, y2)];
+            assert!(
+                pts.iter().all(|&q| curve.is_on_curve(q)),
+                "a point is off the curve"
+            );
+            let Some(tg) = sum_target(&curve, pts) else {
+                continue;
+            };
+            assert_eq!(tg.x_r, 0, "x(P_1 + P_2) is not 0");
+            return (curve, tg);
+        }
+        let y2 = rng.gen_range(1..p);
+        let Some((a, b)) = from_two(x1, y1, x2, y2) else {
+            continue;
+        };
+        let curve = PrimeCurve { p, a, b };
+        let x3 = xs[2];
+        let rhs = curve.rhs(x3);
+        let Some(y3) = curve.sqrt(rhs).filter(|&r| r != 0) else {
+            continue;
+        };
+        for y in [y3, p - y3] {
+            let pts = vec![
+                PrimePoint::affine(x1, y1),
+                PrimePoint::affine(x2, y2),
+                PrimePoint::affine(x3, y),
+            ];
+            if let Some(tg) = sum_target(&curve, pts) {
+                if tg.x_r == 0 {
+                    assert!(
+                        tg.pts.iter().all(|&q| curve.is_on_curve(q)),
+                        "a point is off the curve"
+                    );
+                    return (curve, tg);
+                }
+            }
+        }
+    }
+}
+
+// ── Twisted Edwards curves (Amendment 11, E1) ──────────────────────
+
+/// `a·x² + y² = 1 + d·x²y²`: the sum of two points, `None` when a
+/// denominator vanishes. Points are `(x, y)`.
+fn edwards_add(p: u64, a: u64, d: u64, p1: (u64, u64), p2: (u64, u64)) -> Option<(u64, u64)> {
+    let (x1, y1) = p1;
+    let (x2, y2) = p2;
+    let t = mulm(d, mulm(mulm(x1, x2, p), mulm(y1, y2, p), p), p);
+    let (dx, dy) = (addm(1, t, p), subm(1, t, p));
+    if dx == 0 || dy == 0 {
+        return None;
+    }
+    let x3 = mulm(addm(mulm(x1, y2, p), mulm(y1, x2, p), p), invm(dx, p), p);
+    let y3 = mulm(
+        subm(mulm(y1, y2, p), mulm(a, mulm(x1, x2, p), p), p),
+        invm(dy, p),
+        p,
+    );
+    Some((x3, y3))
+}
+
+/// A random point of the twisted Edwards curve, as `(x, y)`.
+fn edwards_point(p: u64, a: u64, d: u64, rng: &mut StdRng) -> Option<(u64, u64)> {
+    let y = rng.gen_range(0..p);
+    let den = subm(a, mulm(d, mulm(y, y, p), p), p);
+    if den == 0 {
+        return None;
+    }
+    let x2 = mulm(subm(1, mulm(y, y, p), p), invm(den, p), p);
+    let x = (PrimeCurve { p, a: 0, b: 1 }).sqrt(x2)?;
+    Some((if rng.gen::<bool>() { x } else { p - x }, y))
+}
+
+/// An Edwards target curve on which at least `need` elements of `V` are
+/// `y`-coordinates of points (`x² = (1 − y²)/(a − d·y²)` a non-zero square).
+fn edwards_curve(p: u64, v: &[u64], need: usize, rng: &mut StdRng) -> (PrimeCurve, Vec<u64>) {
+    loop {
+        let a = rng.gen_range(1..p);
+        let d = rng.gen_range(1..p);
+        if a == d {
+            continue;
+        }
+        let on: Vec<u64> = v
+            .iter()
+            .copied()
+            .filter(|&y| {
+                let den = subm(a, mulm(d, mulm(y, y, p), p), p);
+                let x2 = subm(1, mulm(y, y, p), p);
+                den != 0
+                    && x2 != 0
+                    && (PrimeCurve { p, a: 0, b: 1 })
+                        .sqrt(mulm(x2, invm(den, p), p))
+                        .is_some()
+            })
+            .collect();
+        if on.len() >= need {
+            return (PrimeCurve { p, a, b: d }, on);
+        }
+    }
+}
+
+/// A planted Edwards target: `m` distinct `y` of `on`, random signs of `x`,
+/// the sum by the Edwards law. `None` when a denominator vanishes or a
+/// partial sum is the neutral point `(0, 1)`. Points are stored as `(y, x)`;
+/// `x_r` is the sum's `y`, and `partial` the `y` of the partial sums.
+fn plant_edwards(curve: &PrimeCurve, m: usize, on: &[u64], rng: &mut StdRng) -> Option<Target> {
+    let (p, a, d) = (curve.p, curve.a, curve.b);
+    let helper = PrimeCurve { p, a: 0, b: 1 };
+    let mut ys: Vec<u64> = Vec::with_capacity(m);
+    while ys.len() < m {
+        let y = on[rng.gen_range(0..on.len())];
+        if !ys.contains(&y) {
+            ys.push(y);
+        }
+    }
+    let pts: Vec<(u64, u64)> = ys
+        .iter()
+        .map(|&y| {
+            let den = subm(a, mulm(d, mulm(y, y, p), p), p);
+            let x = helper
+                .sqrt(mulm(subm(1, mulm(y, y, p), p), invm(den, p), p))
+                .expect("a base point");
+            (if rng.gen::<bool>() { x } else { p - x }, y)
+        })
+        .collect();
+    let on_curve = |(x, y): (u64, u64)| {
+        addm(mulm(a, mulm(x, x, p), p), mulm(y, y, p), p)
+            == addm(1, mulm(d, mulm(mulm(x, x, p), mulm(y, y, p), p), p), p)
+    };
+    assert!(
+        pts.iter().all(|&q| on_curve(q)),
+        "a point is off the Edwards curve"
+    );
+    let mut acc = pts[0];
+    let mut partial = Vec::new();
+    for &q in &pts[1..] {
+        acc = edwards_add(p, a, d, acc, q)?;
+        assert!(on_curve(acc), "a sum is off the Edwards curve");
+        if acc == (0, 1) {
+            return None;
+        }
+        partial.push(acc.1);
+    }
+    Some(Target {
+        x_r: acc.1,
+        r: PrimePoint::affine(acc.1, acc.0),
+        pts: pts.iter().map(|&(x, y)| PrimePoint::affine(y, x)).collect(),
+        partial,
+    })
+}
+
+/// The monomials `y₁^i y₂^j y₃^k`, `i, j, k ≤ 2`, in a fixed order.
+fn edwards_monomials() -> Vec<(usize, usize, usize)> {
+    let mut v = Vec::new();
+    for i in 0..3 {
+        for j in 0..3 {
+            for k in 0..3 {
+                v.push((i, j, k));
+            }
+        }
+    }
+    v
+}
+
+/// The null space of a matrix over `F_p` (rows given), as basis vectors.
+fn nullspace(mut rows: Vec<Vec<u64>>, ncols: usize, p: u64) -> Vec<Vec<u64>> {
+    let mut pivots: Vec<usize> = Vec::new();
+    let mut r = 0usize;
+    for c in 0..ncols {
+        let Some(k) = (r..rows.len()).find(|&i| rows[i][c] != 0) else {
+            continue;
+        };
+        rows.swap(r, k);
+        let inv = invm(rows[r][c], p);
+        for x in rows[r].iter_mut() {
+            *x = mulm(*x, inv, p);
+        }
+        for i in 0..rows.len() {
+            if i != r && rows[i][c] != 0 {
+                let f = rows[i][c];
+                for j in 0..ncols {
+                    let sub = mulm(f, rows[r][j], p);
+                    rows[i][j] = subm(rows[i][j], sub, p);
+                }
+            }
+        }
+        pivots.push(c);
+        r += 1;
+        if r == rows.len() {
+            break;
+        }
+    }
+    let free: Vec<usize> = (0..ncols).filter(|c| !pivots.contains(c)).collect();
+    free.iter()
+        .map(|&f| {
+            let mut v = vec![0u64; ncols];
+            v[f] = 1;
+            for (ri, &pc) in pivots.iter().enumerate() {
+                v[pc] = subm(0, rows[ri][f], p);
+            }
+            v
+        })
+        .collect()
+}
+
+/// The summation polynomial `S₃` of a twisted Edwards curve in the
+/// `y`-coordinate, found as the null space of the monomials of degree at
+/// most 2 in each variable on random triples `(y(P₁), y(P₂), y(P₁ + P₂))`
+/// (`y(−Q) = y(Q)`), normalised to a leading coefficient 1. Returns the
+/// coefficients, in `edwards_monomials` order, and the null-space
+/// dimension (1 when `S₃` is unique at this degree).
+fn edwards_s3_coeffs(p: u64, a: u64, d: u64) -> (Vec<u64>, usize) {
+    let mons = edwards_monomials();
+    let mut rng = StdRng::seed_from_u64(a ^ (d << 20) ^ 0xED_5E_3);
+    let mut rows: Vec<Vec<u64>> = Vec::new();
+    while rows.len() < 3 * mons.len() {
+        let (Some(p1), Some(p2)) = (
+            edwards_point(p, a, d, &mut rng),
+            edwards_point(p, a, d, &mut rng),
+        ) else {
+            continue;
+        };
+        let Some(sum) = edwards_add(p, a, d, p1, p2) else {
+            continue;
+        };
+        let ys = [p1.1, p2.1, sum.1];
+        rows.push(
+            mons.iter()
+                .map(|&(i, j, k)| {
+                    mulm(
+                        mulm(powm(ys[0], i as u64, p), powm(ys[1], j as u64, p), p),
+                        powm(ys[2], k as u64, p),
+                        p,
+                    )
+                })
+                .collect(),
+        );
+    }
+    let ns = nullspace(rows, mons.len(), p);
+    let dim = ns.len();
+    let mut c = ns.into_iter().next().unwrap_or_else(|| vec![0; mons.len()]);
+    if let Some(&lead) = c.iter().find(|&&x| x != 0) {
+        let inv = invm(lead, p);
+        for x in c.iter_mut() {
+            *x = mulm(*x, inv, p);
+        }
+    }
+    (c, dim)
+}
+
+/// The closed form of that polynomial, found from the interpolated tables
+/// and checked against them for every curve `edwards-s3` tries:
+/// `a·S₃ = a − a·Σyᵢ² + d·Σᵢ<ⱼ yᵢ²yⱼ² − 2(d − a)·y₁y₂y₃ − d·y₁²y₂²y₃²`
+/// (not normalised; the monomial order is `edwards_monomials`).
+fn edwards_s3_closed(p: u64, a: u64, d: u64) -> Vec<u64> {
+    let mut c = vec![0u64; 27];
+    let idx = |i: usize, j: usize, k: usize| i * 9 + j * 3 + k;
+    c[idx(0, 0, 0)] = a;
+    for (i, j, k) in [(2, 0, 0), (0, 2, 0), (0, 0, 2)] {
+        c[idx(i, j, k)] = subm(0, a, p);
+    }
+    for (i, j, k) in [(2, 2, 0), (2, 0, 2), (0, 2, 2)] {
+        c[idx(i, j, k)] = d;
+    }
+    c[idx(1, 1, 1)] = subm(0, mulm(2, subm(d, a, p), p), p);
+    c[idx(2, 2, 2)] = subm(0, d, p);
+    c
+}
+
+/// `S₃` on three polynomial arguments.
+fn s3_edwards(coefs: &[u64], y1: &Pol, y2: &Pol, y3: &Pol, p: u64) -> Pol {
+    let n = y1.n;
+    let pows = |y: &Pol| -> [Pol; 3] {
+        let one = Pol::constant(n, 1, p);
+        let sq = y.mul(y, p);
+        [one, y.clone(), sq]
+    };
+    let (p1, p2, p3) = (pows(y1), pows(y2), pows(y3));
+    let mut out = Pol::zero(n);
+    for (&(i, j, k), &c) in edwards_monomials().iter().zip(coefs) {
+        if c != 0 {
+            out = out.add(&p1[i].mul(&p2[j], p).mul(&p3[k], p).scale(c, p), p);
+        }
+    }
+    out
+}
+
+/// `edwards-s3 [--prime p1] [--curves N]`: derive `S₃` for random twisted
+/// Edwards curves and check it, printing one line per curve.
+fn edwards_s3_check(prime: usize, curves: usize) -> bool {
+    let p = prime_of(prime);
+    let mons = edwards_monomials();
+    let mut rng = StdRng::seed_from_u64(0xED6E5);
+    let mut all = true;
+    let mut seen = 0;
+    while seen < curves {
+        let (a, d) = (rng.gen_range(1..p), rng.gen_range(1..p));
+        if a == d {
+            continue;
+        }
+        seen += 1;
+        let (c, dim) = edwards_s3_coeffs(p, a, d);
+        let at = |c: &[u64], ys: [u64; 3]| -> u64 {
+            let mut acc = 0u64;
+            for (&(i, j, k), &co) in mons.iter().zip(c) {
+                let t = mulm(
+                    mulm(powm(ys[0], i as u64, p), powm(ys[1], j as u64, p), p),
+                    mulm(co, powm(ys[2], k as u64, p), p),
+                    p,
+                );
+                acc = addm(acc, t, p);
+            }
+            acc
+        };
+        // Fresh triples, with the points in every order.
+        let (mut vanish, mut total) = (0usize, 0usize);
+        while total < 200 {
+            let (Some(p1), Some(p2)) = (
+                edwards_point(p, a, d, &mut rng),
+                edwards_point(p, a, d, &mut rng),
+            ) else {
+                continue;
+            };
+            let Some(s) = edwards_add(p, a, d, p1, p2) else {
+                continue;
+            };
+            let (y1, y2, y3) = (p1.1, p2.1, s.1);
+            for ys in [[y1, y2, y3], [y3, y1, y2], [y2, y3, y1], [y1, y3, y2]] {
+                total += 1;
+                vanish += usize::from(at(&c, ys) == 0);
+            }
+        }
+        // Symmetry of the coefficient table under the six permutations.
+        let idx = |i: usize, j: usize, k: usize| i * 9 + j * 3 + k;
+        let mut sym = true;
+        for &(i, j, k) in &mons {
+            let v = c[idx(i, j, k)];
+            for (u, w, z) in [(j, i, k), (i, k, j), (k, j, i), (j, k, i), (k, i, j)] {
+                sym &= c[idx(u, w, z)] == v;
+            }
+        }
+        let degree = mons
+            .iter()
+            .zip(&c)
+            .filter(|(_, &co)| co != 0)
+            .map(|(&(i, j, k), _)| i + j + k)
+            .max()
+            .unwrap_or(0);
+        let nz = c.iter().filter(|&&x| x != 0).count();
+        println!(
+            "a = {a}, d = {d}: null space {dim}; vanishes on {vanish} of {total} fresh triples (all orders); \
+             symmetric {sym}; {nz} terms, total degree {degree}"
+        );
+        // The closed form, scaled to the interpolated normalisation.
+        let closed = edwards_s3_closed(p, a, d);
+        let inv_a = invm(a, p);
+        let matches = closed.iter().zip(&c).all(|(&x, &y)| mulm(x, inv_a, p) == y);
+        println!("  closed form equals the interpolated polynomial: {matches}");
+        all &= dim == 1 && vanish == total && sym && matches;
+    }
+    println!("{}", if all { "S3 PASS" } else { "S3 FAIL" });
+    all
+}
+
 // ── Systems ────────────────────────────────────────────────────────
 
 /// `S₃(x_1, x_2, x_R)` at `m = 2`; at `m = 3` the pilot's chain
@@ -781,6 +1292,19 @@ fn plant(curve: &PrimeCurve, m: usize, on: &[u64], rng: &mut StdRng) -> Option<T
 fn summation(d: &Design, curve: &PrimeCurve, m: usize, n: usize, x_r: u64) -> Vec<Pol> {
     let p = curve.p;
     let (a, b) = (curve.a, curve.b);
+    // Amendment 11, E1: on an Edwards curve (a, b = d) the summation polynomial
+    // is the symmetric one in the y-coordinate.
+    let edwards = if model() == 1 {
+        Some(edwards_s3_closed(p, a, b))
+    } else {
+        None
+    };
+    let s3 = |x1: &Pol, x2: &Pol, x3: &Pol, a: u64, b: u64, p: u64| -> Pol {
+        match &edwards {
+            Some(c) => s3_edwards(c, x1, x2, x3, p),
+            None => s3(x1, x2, x3, a, b, p),
+        }
+    };
     let x = |i: usize| d.x_expr(n, i * d.per, p);
     let xr = Pol::constant(n, x_r, p);
     if m == 2 {
@@ -1384,6 +1908,134 @@ fn measure(eqs: &[Pol], n: usize, p: u64, sol: &[u64], budget: Duration) -> Valu
     })
 }
 
+/// Amendment 6: an A0 system on the sparse tower engine. The Kummer
+/// equations become the ring's square rules (`y_{j+1} = y_j²`,
+/// `y_{t−1}² = 1`, summand by summand, the chain unknowns free); the
+/// summation equations, reduced into the ring, are the input. Every
+/// equation is checked at the planted solution, and every tower equation
+/// is checked to vanish in the ring, before the engine runs.
+fn measure_tower(
+    eqs: &[Pol],
+    n: usize,
+    m: usize,
+    t: usize,
+    p: u64,
+    sol: &[u64],
+    budget: Duration,
+) -> Value {
+    for (k, e) in eqs.iter().enumerate() {
+        assert_eq!(
+            e.eval(sol, p),
+            0,
+            "equation {k} does not vanish at the planted solution"
+        );
+    }
+    assert_eq!(
+        n,
+        m * t + (m - 2),
+        "an A0 layout: m towers of depth t, then the chain"
+    );
+    let mut rules = Vec::with_capacity(m * t);
+    for i in 0..m {
+        for j in 0..t {
+            rules.push(if j + 1 < t {
+                SquareRule {
+                    next: Some((i * t + j + 1) as u8),
+                    a: 0,
+                    b: 1,
+                    c: 0,
+                    d: 0,
+                }
+            } else {
+                SquareRule {
+                    next: None,
+                    a: 0,
+                    b: 0,
+                    c: 0,
+                    d: 1,
+                }
+            });
+        }
+    }
+    let ring = TowerRing {
+        p,
+        rules,
+        n_free: m - 2,
+    };
+    ring.check();
+    let raw = |e: &Pol| -> Vec<(Vec<u32>, u64)> {
+        e.terms.iter().map(|(k, v)| (k.clone(), *v)).collect()
+    };
+    // A0's system: the m − 1 summation equations, then m·t tower equations.
+    let n_sum = m - 1;
+    assert_eq!(eqs.len(), n_sum + m * t, "an A0 system");
+    for (k, e) in eqs.iter().enumerate().skip(n_sum) {
+        assert!(
+            ring.from_raw(&raw(e)).is_empty(),
+            "tower equation {k} is not zero in the ring"
+        );
+    }
+    let input: Vec<_> = eqs[..n_sum]
+        .iter()
+        .map(|e| ring.from_raw(&raw(e)))
+        .filter(|f| !f.is_empty())
+        .collect();
+    let d_in: Vec<u32> = eqs.iter().map(Pol::degree).collect();
+    let d_max = d_in.iter().copied().max().unwrap_or(1);
+    let max_degree = n as u32 + d_max + 6;
+    let mut opts = TowerF4Options::new(max_degree).with_budget(budget);
+    let stop = STOP_BELOW.load(std::sync::atomic::Ordering::Relaxed);
+    if stop > 0 {
+        opts = opts.stopping_below(stop);
+    }
+    let started = Instant::now();
+    let r = f4_fp_tower::f4_tower(&input, &ring, &opts);
+    let wall = started.elapsed().as_secs_f64();
+    let stopped = r.timed_out || r.oversize;
+    let planted_ok = !r.inconsistent && r.basis.iter().all(|f| ring.eval(f, sol) == 0);
+    let status = if stopped {
+        "timeout"
+    } else if !planted_ok {
+        "planted_violation"
+    } else {
+        "ok"
+    };
+    let reason = match status {
+        "timeout" => Value::from(format!("tower engine budget of {} s", budget.as_secs())),
+        "planted_violation" => Value::from("the planted solution fails the engine's basis"),
+        _ => Value::Null,
+    };
+    json!({
+        "engine": "f4_fp_tower",
+        "input_degrees": d_in,
+        "max_degree_bound": max_degree,
+        "D": r.solving_degree_max,
+        "solving_degree_max": r.solving_degree_max,
+        "last_productive_degree": r.last_productive_degree,
+        "degree_reached": r.degree_reached,
+        "max_cols_to_solution": r.max_cols_to_solution,
+        "steps_to_solution": r.steps_to_solution,
+        "inconsistent": r.inconsistent,
+        "basis_len": r.basis.len(),
+        "steps": r.steps,
+        "max_rows": r.max_rows,
+        "max_cols": r.max_cols,
+        "max_nnz": r.max_nnz,
+        "stop_below": if stop > 0 { json!(stop) } else { Value::Null },
+        "staircase_at_stop": r.staircase_at_stop,
+        "field_ops": null,
+        "muladds": r.muladds,
+        "f4_ms": r.ms,
+        "time": wall,
+        "timed_out": stopped,
+        "oversize": r.oversize,
+        "pairs_above_bound": r.pairs_above_bound,
+        "planted_ok": planted_ok,
+        "status": status,
+        "failure_reason": reason,
+    })
+}
+
 fn merge(into: &mut Value, from: &Value) {
     if let (Some(a), Some(b)) = (into.as_object_mut(), from.as_object()) {
         for (k, v) in b {
@@ -1395,7 +2047,15 @@ fn merge(into: &mut Value, from: &Value) {
 /// Amendment 1 item 3, with Amendment 2's prime index (`p₁ = 0`, so every
 /// `p₁` seed is unchanged).
 fn cell_seed(prime: usize, arm: Arm, m: usize, t: usize) -> u64 {
-    SEED ^ ((prime as u64) << 48) ^ (arm.id() << 40) ^ ((m as u64) << 32) ^ ((t as u64) << 16)
+    // Amendment 8: the curve family joins the seed at bit 52 (generic = 0,
+    // so every earlier seed is unchanged).
+    SEED ^ ((model() as u64) << 58)
+        ^ ((target_structure() as u64) << 56)
+        ^ ((family() as u64) << 52)
+        ^ ((prime as u64) << 48)
+        ^ (arm.id() << 40)
+        ^ ((m as u64) << 32)
+        ^ ((t as u64) << 16)
 }
 
 fn target_seed(cell: u64, k: usize) -> u64 {
@@ -1404,43 +2064,72 @@ fn target_seed(cell: u64, k: usize) -> u64 {
 
 /// Build and measure one system; prints a description line (`"phase":
 /// "built"`) before F4 runs, and the row after.
-fn one(prime: usize, arm: Arm, m: usize, t: usize, k: usize, budget: Duration) -> Value {
-    let (mut row, eqs, n, sol) = build_system(prime, arm, m, t, k);
-    let mut built = row.clone();
-    merge(&mut built, &json!({"phase": "built"}));
-    println!("{built}");
-    std::io::stdout().flush().ok();
-    let r = measure(&eqs, n, prime_of(prime), &sol, budget);
-    merge(&mut row, &r);
-    row
-}
-
-/// One system with every check before measuring: its row so far (no F4
-/// fields), equations, unknown count and planted solution.
-fn build_system(
+#[allow(clippy::too_many_arguments)]
+fn one(
     prime: usize,
     arm: Arm,
     m: usize,
     t: usize,
     k: usize,
-) -> (Value, Vec<Pol>, usize, Vec<u64>) {
-    let p = prime_of(prime);
-    let cs = cell_seed(prime, arm, m, t);
-    let mut rng = StdRng::seed_from_u64(cs);
-    let d = build_design(arm, p, t, &mut rng);
-    let (curve, on) = target_curve(p, &d.v, m.max(2), &mut rng);
-    let ts = target_seed(cs, k);
-    let mut trng = StdRng::seed_from_u64(ts);
-    let mut extra = Value::Null;
-    let (eqs, n, sol, target) = loop {
-        let Some(tg) = plant(&curve, m, &on, &mut trng) else {
-            continue;
+    budget: Duration,
+    distinct: bool,
+    tower: bool,
+) -> Value {
+    let (mut row, eqs, n, sol) = build_system(prime, arm, m, t, k, distinct);
+    let mut built = row.clone();
+    merge(&mut built, &json!({"phase": "built"}));
+    println!("{built}");
+    std::io::stdout().flush().ok();
+    let r = if tower {
+        assert_eq!(arm, Arm::A0, "the tower engine runs A0 only (Amendment 6)");
+        measure_tower(&eqs, n, m, t, prime_of(prime), &sol, budget)
+    } else {
+        measure(&eqs, n, prime_of(prime), &sol, budget)
+    };
+    merge(&mut row, &r);
+    row
+}
+
+/// Two systems are the same when every equation has the same terms.
+fn same_system(a: &[Pol], b: &[Pol]) -> bool {
+    a.len() == b.len() && a.iter().zip(b).all(|(x, y)| x.terms == y.terms)
+}
+
+/// One planted target and its system, drawn from `trng` (replanting until a
+/// draw is valid): equations, unknown count, planted solution, target, and
+/// the presentation's info.
+#[allow(clippy::too_many_arguments)]
+fn draw_target(
+    arm: Arm,
+    m: usize,
+    t: usize,
+    p: u64,
+    d: &Design,
+    curve: &PrimeCurve,
+    on: &[u64],
+    trng: &mut StdRng,
+) -> (Vec<Pol>, usize, Vec<u64>, Target, Value, PrimeCurve) {
+    loop {
+        // Amendment 9, Z1: a structured target brings its own curve.
+        let (cur, tg) = if model() == 1 {
+            let Some(tg) = plant_edwards(curve, m, on, trng) else {
+                continue;
+            };
+            (curve.clone(), tg)
+        } else if target_structure() == 1 {
+            plant_x0(p, &d.v, m, trng)
+        } else {
+            let Some(tg) = plant(curve, m, on, trng) else {
+                continue;
+            };
+            (curve.clone(), tg)
         };
+        let curve = &cur;
         if arm == Arm::A11 || arm == Arm::N11 {
             let Shape::Kummer { g } = d.shape else {
                 unreachable!()
             };
-            let Some((mut eqs, n, sol, mut info)) = norm_chain_system(g, t, &curve, m, &tg) else {
+            let Some((mut eqs, n, sol, mut info)) = norm_chain_system(g, t, curve, m, &tg) else {
                 continue;
             };
             if arm == Arm::N11 {
@@ -1460,31 +2149,88 @@ fn build_system(
                     &json!({"null": "s-defining equations randomised", "null_eqs": m}),
                 );
             }
-            extra = info;
-            break (eqs, n, sol, tg);
+            return (eqs, n, sol, tg, info, cur.clone());
         }
         if arm == Arm::H1 || arm == Arm::H2 {
             let Shape::Kummer { g } = d.shape else {
                 unreachable!()
             };
             let built = if arm == Arm::H1 {
-                hybrid_h1(g, t, &curve, m, &tg)
+                hybrid_h1(g, t, curve, m, &tg)
             } else {
-                Some(hybrid_h2(g, t, &curve, m, &tg))
+                Some(hybrid_h2(g, t, curve, m, &tg))
             };
             let Some((eqs, n, sol, info)) = built else {
                 continue;
             };
-            extra = info;
-            break (eqs, n, sol, tg);
+            return (eqs, n, sol, tg, info, cur.clone());
         }
-        let null = (arm == Arm::N).then_some(&mut trng);
-        let (eqs, n, sol) = tower_system(&d, &curve, m, &tg, null);
-        break (eqs, n, sol, tg);
+        let null = (arm == Arm::N).then_some(&mut *trng);
+        let (eqs, n, sol) = tower_system(d, curve, m, &tg, null);
+        return (eqs, n, sol, tg, Value::Null, cur.clone());
+    }
+}
+
+/// One system with every check before measuring: its row so far (no F4
+/// fields), equations, unknown count and planted solution.
+fn build_system(
+    prime: usize,
+    arm: Arm,
+    m: usize,
+    t: usize,
+    k: usize,
+    distinct: bool,
+) -> (Value, Vec<Pol>, usize, Vec<u64>) {
+    let p = prime_of(prime);
+    let cs = cell_seed(prime, arm, m, t);
+    let mut rng = StdRng::seed_from_u64(cs);
+    let d = build_design(arm, p, t, &mut rng);
+    assert!(
+        d.v.len() >= m,
+        "m = {m} summands need |V| ≥ m distinct abscissae (t = {t} gives {})",
+        d.v.len()
+    );
+    let (curve, on) = if model() == 1 {
+        assert_eq!(
+            arm,
+            Arm::A0,
+            "the Edwards model runs A0 only (Amendment 11)"
+        );
+        edwards_curve(p, &d.v, m.max(2), &mut rng)
+    } else {
+        target_curve(p, &d.v, m.max(2), &mut rng)
     };
+    let ts = target_seed(cs, k);
+    // Targets 0 … k in order, each from its own stream. With `distinct`
+    // (Amendment 5, G2) a target whose system equals an earlier target's is
+    // redrawn from the same stream; without a collision every draw is the
+    // first one, so the rule changes no collision-free row.
+    let mut accepted: Vec<Vec<Pol>> = Vec::new();
+    let mut redraws = 0usize;
+    let mut chosen = None;
+    for j in if distinct { 0..=k } else { k..=k } {
+        let mut trng = StdRng::seed_from_u64(target_seed(cs, j));
+        loop {
+            let r = draw_target(arm, m, t, p, &d, &curve, &on, &mut trng);
+            if distinct && accepted.iter().any(|e| same_system(e, &r.0)) {
+                if j == k {
+                    redraws += 1;
+                }
+                continue;
+            }
+            accepted.push(r.0.clone());
+            if j == k {
+                chosen = Some(r);
+            }
+            break;
+        }
+    }
+    let (eqs, n, sol, target, extra, used) = chosen.expect("target k drawn");
     if arm == Arm::A11 || arm == Arm::N11 || arm == Arm::H2 {
         check_norm_chain(&d, m, p, &mut StdRng::seed_from_u64(ts ^ 0xC4EC));
     }
+    let structure_name = ["random", "xr0"][target_structure()];
+    let model_name = ["weierstrass", "edwards"][model()];
     let row = json!({
         "arm": arm.name(),
         "m": m,
@@ -1500,11 +2246,16 @@ fn build_system(
         "seed_base": SEED,
         "cell_seed": cs,
         "target_seed": ts,
-        "curve": {"a": curve.a, "b": curve.b},
+        "curve": {"a": used.a, "b": used.b},
+        "curve_family": family_name(family()),
+        "target_structure": structure_name,
+        "model": model_name,
         "x_r": target.x_r,
         "planted_x": target.pts.iter().map(|pt| pt.x).collect::<Vec<_>>(),
         "set": d.info,
         "presentation": extra,
+        "distinct_targets": distinct,
+        "target_redraws": redraws,
         "engine": "f4_fp",
         "order": "grevlex",
     });
@@ -1574,10 +2325,19 @@ struct RunArgs {
     prime: usize,
     /// Row file name without extension; `{arm}` and `{m}` are substituted.
     file: String,
+    /// Amendment 5, G2: redraw a target whose system repeats an earlier one.
+    distinct: bool,
+    /// Amendment 6: measure on the sparse tower engine (A0 only).
+    tower: bool,
+    /// Amendment 11: the first target index to run (0 unless a later target
+    /// is run on its own, after an earlier one).
+    first_target: usize,
 }
 
 /// Run one system in a child under `ulimit -v` and a hard wall limit of
 /// budget + grace; the row, or a failure row with its reason.
+// The child is reaped by `wait4`, which clippy cannot see.
+#[allow(clippy::zombie_processes)]
 fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File) -> Value {
     let exe = std::env::current_exe().expect("current exe");
     let mut child = Command::new("sh")
@@ -1599,6 +2359,35 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
             "--budget",
             &a.budget.to_string(),
         ])
+        .args(a.distinct.then_some("--distinct-targets"))
+        .args(if family() > 0 {
+            vec!["--family".to_string(), family_name(family()).to_string()]
+        } else {
+            vec![]
+        })
+        .args(if model() > 0 {
+            vec!["--model".to_string(), "edwards".to_string()]
+        } else {
+            vec![]
+        })
+        .args(if target_structure() > 0 {
+            vec!["--target-structure".to_string(), "xr0".to_string()]
+        } else {
+            vec![]
+        })
+        .args({
+            let st = STOP_BELOW.load(std::sync::atomic::Ordering::Relaxed);
+            if st > 0 {
+                vec!["--stop-below".to_string(), st.to_string()]
+            } else {
+                vec![]
+            }
+        })
+        .args(if a.tower {
+            vec!["--engine", "tower"]
+        } else {
+            vec![]
+        })
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -1618,17 +2407,26 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
     let started = Instant::now();
     let limit = Duration::from_secs(a.budget + a.grace);
     let mut killed = false;
+    // `wait4` rather than `try_wait`, so the child's own peak resident set
+    // (`ru_maxrss`, kB on Linux) comes back with its status. The `sh`
+    // wrapper execs, so the pid is the system's process.
+    let pid = child.id() as libc::pid_t;
+    let mut ru: libc::rusage = unsafe { std::mem::zeroed() };
+    let mut raw: libc::c_int = 0;
     let status = loop {
-        if let Some(st) = child.try_wait().expect("wait") {
-            break st;
+        let r = unsafe { libc::wait4(pid, &mut raw, libc::WNOHANG, &mut ru) };
+        if r == pid {
+            break std::process::ExitStatus::from_raw(raw);
         }
         if started.elapsed() > limit {
             child.kill().ok();
             killed = true;
-            break child.wait().expect("wait");
+            unsafe { libc::wait4(pid, &mut raw, 0, &mut ru) };
+            break std::process::ExitStatus::from_raw(raw);
         }
         std::thread::sleep(Duration::from_millis(200));
     };
+    let peak_rss_kb = ru.ru_maxrss as u64;
     let wall = started.elapsed().as_secs_f64();
     let stdout = out_t.join().unwrap_or_default();
     let stderr = err_t.join().unwrap_or_default();
@@ -1685,7 +2483,8 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
     };
     merge(
         &mut row,
-        &json!({"process_wall_s": wall, "budget_s": a.budget, "ulimit_v_kb": a.vmem_kb}),
+        &json!({"process_wall_s": wall, "budget_s": a.budget, "ulimit_v_kb": a.vmem_kb,
+                "peak_rss_kb": peak_rss_kb}),
     );
     row
 }
@@ -1725,7 +2524,7 @@ fn run(a: &RunArgs) {
             .ok();
             for t in a.t_min..=a.t_max {
                 let mut all_ok = true;
-                for k in 0..a.targets {
+                for k in a.first_target..a.first_target + a.targets {
                     let mut row = run_child(a, arm, m, t, k, &mut log);
                     merge(&mut row, &json!({"git_commit": commit, "host": host}));
                     let line = format!(
@@ -2187,7 +2986,7 @@ fn check_p2(budget: Duration) -> bool {
     );
     println!("planted systems at t = 2 (the p2 seeds of F1, target 0)");
     for (arm, m) in [(Arm::A0, 2), (Arm::A11, 2), (Arm::A0, 3), (Arm::A11, 3)] {
-        let (row, eqs, n, sol) = build_system(1, arm, m, 2, 0);
+        let (row, eqs, n, sol) = build_system(1, arm, m, 2, 0, false);
         let r = measure(&eqs, n, p, &sol, budget);
         let input: Vec<Poly> = eqs
             .iter()
@@ -2293,7 +3092,7 @@ fn regress(file: &str, arm: Arm, m: usize, t: usize, budget: Duration) -> bool {
     let mut all = !committed.is_empty();
     for c in &committed {
         let k = c["target"].as_u64().expect("a target") as usize;
-        let (mut row, eqs, n, sol) = build_system(0, arm, m, t, k);
+        let (mut row, eqs, n, sol) = build_system(0, arm, m, t, k, false);
         merge(&mut row, &measure(&eqs, n, P1, &sol, budget));
         let differ: Vec<&str> = REGRESS_FIELDS
             .iter()
@@ -2359,16 +3158,30 @@ impl Cell2 {
 /// Which study group a row file belongs to: `F1` … `F4`, or `p1` for the
 /// committed p₁ rows of the first run.
 fn group_of(file: &str) -> &str {
+    if file.starts_with("L2r-") {
+        return "L2r";
+    }
     match file.get(..3) {
-        Some(g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-")) => &g[..2],
+        Some(
+            g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "G1-" | "T1-"
+            | "T2-" | "T3-" | "T4-" | "K1-" | "X1-" | "P4-" | "Z1-" | "M5-" | "E1-" | "T5-"
+            | "L1-" | "L2-"),
+        ) => &g[..2],
         _ => "p1",
     }
 }
 
 fn cells2(rows: &[(String, Value)], group: &str, arm: &str, m: usize) -> Vec<Cell2> {
+    cells2_where(rows, |f, r| {
+        group_of(f) == group && r["arm"] == arm && r["m"] == m
+    })
+}
+
+/// The cells of the rows a predicate keeps, one per `t`.
+fn cells2_where(rows: &[(String, Value)], keep: impl Fn(&str, &Value) -> bool) -> Vec<Cell2> {
     let mut by_t: BTreeMap<usize, Cell2> = BTreeMap::new();
     for (f, r) in rows {
-        if group_of(f) != group || r["arm"] != arm || r["m"] != m {
+        if !keep(f, r) {
             continue;
         }
         let t = r["t"].as_u64().unwrap_or(0) as usize;
@@ -2450,6 +3263,659 @@ fn print_fits(f: &Fits) {
 
 fn find(cells: &[Cell2], t: usize) -> Option<&Cell2> {
     cells.iter().find(|c| c.t == t && c.complete())
+}
+
+/// Amendment 5 (registered as "Amendment 4" on the experiment lane), G1: each arm's `m = 4` series is its F4 rows at `t ≤ 3`
+/// plus its G1 rows; σ verdicts of §1, the secondary width slope, and A11's
+/// cell `max_cols` over A0's at shared completed `t`.
+fn analyze_g1(dir: &str) {
+    let rows = read_rows(dir);
+    println!("Factor-base designs, Amendment 5 (G1): m = 4 on p1 = {P1}; rows from {dir}");
+    println!("(series = F4 rows at t ≤ 3 + G1 rows at t ≥ 4; a cell is completed when both systems are `ok`;");
+    println!(" a cell's D and max_cols are means over its systems; σ and Δlog₂ max_cols/Δb are least-squares slopes on b)");
+    let mut series: Vec<(&str, Vec<Cell2>, Fits)> = Vec::new();
+    for a in ["A0", "A11"] {
+        let mut cells: Vec<Cell2> = cells2(&rows, "F4", a, 4)
+            .into_iter()
+            .filter(|c| c.t <= 3)
+            .collect();
+        cells.extend(cells2(&rows, "G1", a, 4));
+        cells.sort_by_key(|c| c.t);
+        let f = show_series(&format!("{a} m = 4 p1 (F4 t ≤ 3, G1 t ≥ 4)"), &cells);
+        series.push((a, cells, f));
+    }
+    println!();
+    println!("A11 max_cols / A0 max_cols at shared completed t (secondary, descriptive)");
+    let (a0, a11) = (&series[0].1, &series[1].1);
+    let mut shared = 0;
+    for c in a11.iter().filter(|c| c.complete()) {
+        if let Some(z) = find(a0, c.t) {
+            shared += 1;
+            println!(
+                "  t={} A11 {:.0} / A0 {:.0} = {:.4}",
+                c.t,
+                c.cols_mean(),
+                z.cols_mean(),
+                c.cols_mean() / z.cols_mean()
+            );
+        }
+    }
+    if shared == 0 {
+        println!("  none");
+    }
+    println!();
+    println!("Predictions (Amendment 5)");
+    let a0n = series[0].2 .0;
+    let a0s = series[0].2 .1.map(|x| x.0);
+    println!(
+        "  A0 σ ≥ 0.5 at m = 4: {}",
+        match a0s {
+            Some(s) if a0n >= 3 => format!(
+                "σ = {s:.4} on {a0n} cells → {}",
+                if s >= 0.5 { "held" } else { "did not hold" }
+            ),
+            _ => format!("not decided ({a0n} completed cells)"),
+        }
+    );
+    println!("  A11: no prediction");
+}
+
+/// Amendment 6: the T1 admission verdict, then A0's `m = 3` and `m = 4`
+/// series with and without the T2 cells, and A0's `m = 3`, `t = 5` cell
+/// beside A11's (F3).
+fn analyze_tower(dir: &str) {
+    let rows = read_rows(dir);
+    println!("Factor-base designs, Amendments 6 and 7 (T1, T2, T3): A0 on the sparse tower engine; rows from {dir}");
+    let mut admitted_p: [bool; 2] = [false; 2];
+    for (prime, need) in [(0usize, 26usize), (1, 22)] {
+        let t1: Vec<&Value> = rows
+            .iter()
+            .filter(|(f, r)| group_of(f) == "T1" && row_prime(r) == prime)
+            .map(|(_, r)| r)
+            .collect();
+        if t1.is_empty() {
+            continue;
+        }
+        let matched = t1.iter().filter(|r| r["admission_match"] == true).count();
+        admitted_p[prime] = matched == t1.len() && t1.len() == need;
+        println!();
+        println!(
+            "{} admission at {}: {matched} of {} systems complete on the tower engine with the committed D,",
+            if prime == 0 { "T1" } else { "T3a" },
+            prime_label(prime),
+            t1.len()
+        );
+        println!(
+            "  no derived 1 and the planted solution kept ({need} required)  →  {}",
+            if admitted_p[prime] {
+                "ADMITTED"
+            } else {
+                "NOT ADMITTED"
+            }
+        );
+        for r in t1.iter().filter(|r| r["admission_match"] != true) {
+            println!(
+                "  mismatch: {} m={} t={} target={}: tower D {} vs {}, {}",
+                r["admission_of"],
+                r["m"],
+                r["t"],
+                r["target"],
+                r["D"],
+                r["committed"]["D"],
+                r["status"]
+            );
+        }
+    }
+    analyze_t3(&rows);
+    let t2_3 = cells2(&rows, "T2", "A0", 3);
+    let t2_4 = cells2(&rows, "T2", "A0", 4);
+    if t2_3.is_empty() && t2_4.is_empty() {
+        println!();
+        println!("T2: no rows (run only if T1 admits the engine).");
+        return;
+    }
+    let base3 = cells2(&rows, "p1", "A0", 3);
+    let base4: Vec<Cell2> = cells2(&rows, "F4", "A0", 4)
+        .into_iter()
+        .filter(|c| c.t <= 3)
+        .collect();
+    for (m, base, ext) in [(3usize, base3, t2_3), (4, base4, t2_4)] {
+        println!();
+        println!("════ A0 m = {m} p1");
+        show_series(&format!("A0 m = {m}, f4_fp cells only"), &base);
+        // A T2 cell replaces the f4_fp cell at its t when that one did not
+        // complete (it is the cell the engine was admitted to measure).
+        let mut all: Vec<Cell2> = base
+            .into_iter()
+            .filter(|c| c.complete() || !ext.iter().any(|e| e.t == c.t))
+            .collect();
+        all.extend(ext);
+        all.sort_by_key(|c| c.t);
+        show_series(
+            &format!("A0 m = {m}, with the T2 (tower-engine) cell"),
+            &all,
+        );
+        println!("  (the width slope on the line above mixes f4_fp and tower-engine columns, which count different");
+        println!("   things; it is not registered for T2 and is not used. D and σ are engine-independent here: T1.)");
+    }
+    let a11 = cells2(&rows, "F3", "A11", 3);
+    let a0 = cells2(&rows, "T2", "A0", 3);
+    if let (Some(x), Some(y)) = (find(&a11, 5), find(&a0, 5)) {
+        println!();
+        println!(
+            "m = 3, t = 5 (descriptive): A11 D {:.1} (F3, f4_fp) against A0 D {:.1} (T2, tower engine): difference {:+.1}",
+            x.d_mean(),
+            y.d_mean(),
+            x.d_mean() - y.d_mean()
+        );
+    }
+}
+
+/// Amendment 7: the `m = 3`, `t = 5` cell on p₂ (A0 on the tower engine, A11
+/// on `f4_fp`) against its p₁ values, and the p₂ σ fits with the cell.
+fn analyze_t3(rows: &[(String, Value)]) {
+    let a0 = cells2(rows, "T3", "A0", 3);
+    let a11 = cells2(rows, "T3", "A11", 3);
+    if a0.is_empty() && a11.is_empty() {
+        return;
+    }
+    println!();
+    println!("════ T3: m = 3, t = 5 on p2 (A0 on the tower engine, A11 on f4_fp)");
+    show_series("T3 A0 m = 3 t = 5 p2", &a0);
+    show_series("T3 A11 m = 3 t = 5 p2", &a11);
+    let p1_d =
+        |a: &str, g: &str| -> Option<f64> { find(&cells2(rows, g, a, 3), 5).map(|x| x.d_mean()) };
+    let (p1_a0, p1_a11) = (p1_d("A0", "T2"), p1_d("A11", "F3"));
+    println!();
+    println!(
+        "p1 cell D (T2, F3): A0 {}, A11 {}",
+        p1_a0.map_or("-".into(), |d| format!("{d:.1}")),
+        p1_a11.map_or("-".into(), |d| format!("{d:.1}"))
+    );
+    let verdict = match (find(&a0, 5), find(&a11, 5), p1_a0, p1_a11) {
+        (Some(x), Some(y), Some(px), Some(py)) => {
+            if x.d_mean() == px && y.d_mean() == py {
+                "THE GAP REPLICATES (each arm's p2 cell D equals its p1 cell D)"
+            } else {
+                "FAILS TO REPLICATE (a completed cell's D differs from its p1 value)"
+            }
+        }
+        _ => "INCONCLUSIVE (a cell did not complete)",
+    };
+    println!("T3 rule: {verdict}");
+    for (a, t3) in [("A0", &a0), ("A11", &a11)] {
+        let mut base = cells2(rows, "F1", a, 3);
+        println!();
+        show_series(&format!("{a} m = 3 p2, F1 cells only"), &base);
+        base.retain(|c| c.complete() || !t3.iter().any(|e| e.t == c.t));
+        base.extend(t3.iter().map(|c| Cell2 {
+            t: c.t,
+            b: c.b,
+            d: c.d.clone(),
+            cols: c.cols.clone(),
+            time: c.time.clone(),
+            status: c.status.clone(),
+            shape: c.shape,
+        }));
+        base.sort_by_key(|c| c.t);
+        show_series(&format!("{a} m = 3 p2, with the T3 cell"), &base);
+    }
+    println!("  (the width slopes above mix engines for A0 and are not used)");
+}
+
+/// Amendment 8: K1 (curve families), T4 (a staircase stop on the tower
+/// engine) and X1 (p₃ on the narrow path), each against its registered rule.
+fn analyze_a8(dir: &str) {
+    let rows = read_rows(dir);
+    println!("Factor-base designs, Amendment 8 (T4, K1, X1): rows from {dir}");
+
+    // ── K1 ─────────────────────────────────────────────────────────────
+    println!();
+    println!(
+        "════ K1: curve families, p1, f4_fp (generic = the first run's committed A0 and A11 rows)"
+    );
+    for fam in ["a0", "am3"] {
+        let mut indep = true;
+        let mut shared = 0usize;
+        let mut widths_eq = true;
+        let mut widths_le = true;
+        let mut gap_ok = true;
+        let mut gap_cells = 0usize;
+        let mut d_at: BTreeMap<(String, usize), f64> = BTreeMap::new();
+        println!();
+        println!("── family {fam}");
+        println!("  arm  m  t   D(fam)  D(generic)  max_cols(fam)  max_cols(generic)");
+        for arm in ["A0", "A11"] {
+            for m in [2usize, 3] {
+                let kf = cells2_where(&rows, |f, r| {
+                    group_of(f) == "K1"
+                        && r["curve_family"] == fam
+                        && r["arm"] == arm
+                        && r["m"] == m
+                });
+                let gen = cells2(&rows, "p1", arm, m);
+                for c in kf.iter().filter(|c| c.complete()) {
+                    d_at.insert((format!("{arm}{m}"), c.t), c.d_mean());
+                    let Some(g) = find(&gen, c.t) else { continue };
+                    shared += 1;
+                    let (df, dg, cf, cg) = (c.d_mean(), g.d_mean(), c.cols_mean(), g.cols_mean());
+                    indep &= df == dg;
+                    widths_eq &= cf == cg;
+                    widths_le &= cf <= cg;
+                    println!(
+                        "  {arm:<4} {m}  {:<3} {df:<7.1} {dg:<11.1} {cf:<14.0} {cg:.0}{}",
+                        c.t,
+                        if df == dg { "" } else { "   D DIFFERS" }
+                    );
+                }
+                let missing: Vec<String> = kf
+                    .iter()
+                    .filter(|c| !c.complete())
+                    .map(|c| format!("t={}:{}", c.t, c.status.join("/")))
+                    .collect();
+                if !missing.is_empty() {
+                    println!("  {arm} m={m}: not completed: {}", missing.join(", "));
+                }
+            }
+        }
+        for t in 2..=4usize {
+            if let (Some(a11), Some(a0)) = (
+                d_at.get(&("A113".to_string(), t)),
+                d_at.get(&("A03".to_string(), t)),
+            ) {
+                gap_cells += 1;
+                gap_ok &= *a11 <= *a0 - 1.0;
+            }
+        }
+        println!(
+            "  rule: {shared} shared completed cells → {}",
+            if shared == 0 {
+                "INCONCLUSIVE (no shared cell)"
+            } else if indep {
+                "CURVE-INDEPENDENT (every shared D equals the generic D)"
+            } else {
+                "CURVE-DEPENDENT (a shared D differs)"
+            }
+        );
+        println!(
+            "  gap at m = 3 (A11 D ≤ A0 D − 1 at every shared t): {gap_cells} cells → {}",
+            if gap_cells == 0 {
+                "not measurable"
+            } else if gap_ok {
+                "HOLDS"
+            } else {
+                "does not hold"
+            }
+        );
+        println!(
+            "  max_cols against generic (descriptive): equal at every shared cell: {widths_eq}; at most generic at every shared cell: {widths_le}"
+        );
+    }
+
+    // ── T4 ─────────────────────────────────────────────────────────────
+    println!();
+    println!("════ T4: a staircase stop (k = 64) on the tower engine, A0");
+    let adm: Vec<&Value> = rows
+        .iter()
+        .filter(|(f, r)| group_of(f) == "T4" && r.get("admission_match").is_some())
+        .map(|(_, r)| r)
+        .collect();
+    if adm.is_empty() {
+        println!("T4a: no rows.");
+    } else {
+        let gate: Vec<&&Value> = adm.iter().filter(|r| r["gating"] == true).collect();
+        let ok = gate.iter().filter(|r| r["admission_match"] == true).count();
+        println!(
+            "T4a, gating (m = 4, 4 systems): {ok} of {} complete with the committed D, no derived 1, planted solution kept  →  {}",
+            gate.len(),
+            if ok == gate.len() && gate.len() == 4 { "ADMITTED" } else { "NOT ADMITTED" }
+        );
+        for m in [2u64, 3, 4] {
+            let sub: Vec<&&Value> = adm.iter().filter(|r| r["m"] == m).collect();
+            let eq = sub.iter().filter(|r| r["admission_match"] == true).count();
+            let lower = sub
+                .iter()
+                .filter(|r| r["D"].as_u64() < r["committed"]["D"].as_u64())
+                .count();
+            println!(
+                "  m = {m}{}: {eq} of {} systems equal the committed D; {lower} lower under the stop",
+                if m == 4 { " (gating)" } else { " (reported)" },
+                sub.len()
+            );
+        }
+        for r in adm.iter().filter(|r| r["admission_match"] != true) {
+            println!(
+                "  mismatch: {} m={} t={} target={}: stop-bounded D {} vs {}, staircase {}, {}",
+                r["admission_of"],
+                r["m"],
+                r["t"],
+                r["target"],
+                r["D"],
+                r["committed"]["D"],
+                r["staircase_at_stop"],
+                r["status"]
+            );
+        }
+    }
+    let t4b = cells2_where(&rows, |f, r| {
+        group_of(f) == "T4" && r.get("admission_match").is_none() && r["arm"] == "A0" && r["m"] == 4
+    });
+    if t4b.is_empty() {
+        println!("T4b: no rows.");
+    }
+    for c in &t4b {
+        println!(
+            "T4b A0 m=4 t={}: D {:?} (stop-bounded), max_cols {:?}, time {:?}, {}",
+            c.t,
+            c.d,
+            c.cols,
+            c.time,
+            c.status.join(",")
+        );
+    }
+    for r in rows
+        .iter()
+        .filter(|(f, r)| group_of(f) == "T4" && r.get("admission_match").is_none())
+        .map(|(_, r)| r)
+    {
+        println!(
+            "  system target {}: staircase_at_stop {}, status {}, reason {}",
+            r["target"], r["staircase_at_stop"], r["status"], r["failure_reason"]
+        );
+    }
+
+    // ── X1 ─────────────────────────────────────────────────────────────
+    println!();
+    println!("════ X1: p3 = {P3} on the narrow f4_fp path (A0 and A11 only)");
+    for (arm, m) in [("A0", 3usize), ("A0", 4), ("A11", 4)] {
+        let c = cells2(&rows, "X1", arm, m);
+        if c.is_empty() {
+            println!("X1 {arm} m = {m}: no rows.");
+        } else {
+            show_series(&format!("X1 {arm} m = {m} p3"), &c);
+        }
+    }
+    let x_a0_3 = cells2(&rows, "X1", "A0", 3);
+    let tower_d = find(&cells2(&rows, "T2", "A0", 3), 5).map(|c| c.d_mean());
+    println!();
+    println!(
+        "Cross-engine check (A0, m = 3, t = 5): tower engine D (T2, p1) = {}; f4_fp on p3: {}  →  {}",
+        tower_d.map_or("-".into(), |d| format!("{d:.1}")),
+        find(&x_a0_3, 5).map_or("did not complete".into(), |c| format!("D = {:.1}", c.d_mean())),
+        match (find(&x_a0_3, 5), tower_d) {
+            (Some(c), Some(d)) if c.d_mean() == d => "CONFIRMS",
+            (Some(_), Some(_)) => "CONTRADICTS",
+            _ => "INCONCLUSIVE",
+        }
+    );
+    let a11_p1 = find(&cells2(&rows, "G1", "A11", 4), 4).map(|c| c.d_mean());
+    if let Some(c) = find(&cells2(&rows, "X1", "A11", 4), 4) {
+        println!(
+            "A11, m = 4, t = 4: p3 D = {:.1}, p1 D (G1) = {}",
+            c.d_mean(),
+            a11_p1.map_or("-".into(), |d| format!("{d:.1}"))
+        );
+    }
+
+    // ── A0's m = 4 series, with each source labelled ───────────────────
+    println!();
+    println!("════ A0 m = 4: the series with each source of a t = 4 cell (the bound: a completed t = 4 cell has σ ≥ 0.5)");
+    let base: Vec<Cell2> = cells2(&rows, "F4", "A0", 4)
+        .into_iter()
+        .filter(|c| c.t <= 3)
+        .collect();
+    let copy = |c: &Cell2| Cell2 {
+        t: c.t,
+        b: c.b,
+        d: c.d.clone(),
+        cols: c.cols.clone(),
+        time: c.time.clone(),
+        status: c.status.clone(),
+        shape: c.shape,
+    };
+    let extra: Vec<(&str, Vec<Cell2>)> = vec![
+        (
+            "with the T4b stop-bounded cell",
+            t4b.iter().map(copy).collect(),
+        ),
+        (
+            "with the X1 p3 cell",
+            cells2(&rows, "X1", "A0", 4).iter().map(copy).collect(),
+        ),
+    ];
+    show_series("A0 m = 4, F4 cells only", &base);
+    for (label, ex) in extra {
+        if ex.is_empty() {
+            continue;
+        }
+        let mut all: Vec<Cell2> = base.iter().map(copy).collect();
+        all.extend(ex);
+        all.sort_by_key(|c| c.t);
+        show_series(&format!("A0 m = 4, {label}"), &all);
+    }
+    println!("  (width slopes on lines above mix engines or primes where a source differs; D and σ are the readings)");
+}
+
+/// Amendment 9: P4 (a prime of another 2-adic shape), Z1 (structured
+/// targets, `x_R = 0`) and M5 (A0 at `m = 5`), each against its registered
+/// rule. The reference is the first run's committed generic cells on p₁.
+fn analyze_a9(dir: &str) {
+    let rows = read_rows(dir);
+    println!("Factor-base designs, Amendment 9 (P4, Z1, M5): rows from {dir}");
+    for (group, title, same, differs) in [
+        (
+            "P4",
+            "P4: p4 = 10007297 = 2^8 · 39091 + 1 (2-adic valuation 8), generic target, f4_fp",
+            "PRIME-INDEPENDENT (D equals the p1 D at every shared completed cell)",
+            "PRIME-DEPENDENT (a shared D differs from p1's)",
+        ),
+        (
+            "Z1",
+            "Z1: structured target x_R = 0, p1, f4_fp (the curve is built around each target)",
+            "TARGET-INDEPENDENT (D equals the generic D at every shared completed cell)",
+            "TARGET-DEPENDENT (a shared D differs from the generic D)",
+        ),
+    ] {
+        println!();
+        println!("════ {title}");
+        println!("  arm  m  t   D(new)  D(p1)   max_cols(new)  max_cols(p1)");
+        let (mut shared, mut indep, mut eq, mut lt, mut gt) =
+            (0usize, true, 0usize, 0usize, 0usize);
+        let mut d_at: BTreeMap<(String, usize), f64> = BTreeMap::new();
+        for arm in ["A0", "A11"] {
+            for m in [2usize, 3] {
+                let new = cells2(&rows, group, arm, m);
+                let gen = cells2(&rows, "p1", arm, m);
+                for c in new.iter().filter(|c| c.complete()) {
+                    d_at.insert((format!("{arm}{m}"), c.t), c.d_mean());
+                    let Some(g) = find(&gen, c.t) else { continue };
+                    shared += 1;
+                    let (dn, dg, wn, wg) = (c.d_mean(), g.d_mean(), c.cols_mean(), g.cols_mean());
+                    indep &= dn == dg;
+                    match wn.partial_cmp(&wg) {
+                        Some(std::cmp::Ordering::Equal) => eq += 1,
+                        Some(std::cmp::Ordering::Less) => lt += 1,
+                        _ => gt += 1,
+                    }
+                    println!(
+                        "  {arm:<4} {m}  {:<3} {dn:<7.1} {dg:<7.1} {wn:<14.0} {wg:.0}{}",
+                        c.t,
+                        if dn == dg { "" } else { "   D DIFFERS" }
+                    );
+                }
+                let missing: Vec<String> = new
+                    .iter()
+                    .filter(|c| !c.complete())
+                    .map(|c| format!("t={}:{}", c.t, c.status.join("/")))
+                    .collect();
+                if !missing.is_empty() {
+                    println!("  {arm} m={m}: not completed: {}", missing.join(", "));
+                }
+            }
+        }
+        println!(
+            "  rule: {shared} shared completed cells → {}",
+            if shared == 0 {
+                "INCONCLUSIVE (no shared cell)"
+            } else if indep {
+                same
+            } else {
+                differs
+            }
+        );
+        let mut gap = (0usize, true);
+        for t in 2..=4usize {
+            if let (Some(a11), Some(a0)) = (
+                d_at.get(&("A113".to_string(), t)),
+                d_at.get(&("A03".to_string(), t)),
+            ) {
+                gap.0 += 1;
+                gap.1 &= *a11 <= *a0 - 1.0;
+            }
+        }
+        println!(
+            "  gap at m = 3 (A11 D ≤ A0 D − 1 at every shared t): {} cells → {}",
+            gap.0,
+            if gap.0 == 0 {
+                "not measurable"
+            } else if gap.1 {
+                "HOLDS"
+            } else {
+                "does not hold"
+            }
+        );
+        println!(
+            "  max_cols against the p1 cell (descriptive): {eq} equal, {lt} smaller, {gt} larger"
+        );
+    }
+    println!();
+    println!("════ M5: A0 at m = 5, the smallest cell (t = 3: |V| = 8 ≥ 5), p1, f4_fp");
+    let m5 = cells2(&rows, "M5", "A0", 5);
+    if m5.is_empty() {
+        println!("M5: no rows.");
+    } else {
+        show_series("A0 m = 5 p1", &m5);
+        for c in &m5 {
+            println!(
+                "  t={}: {}",
+                c.t,
+                if c.complete() {
+                    format!("completed, D = {:.1}", c.d_mean())
+                } else {
+                    format!("did not complete ({})", c.status.join(", "))
+                }
+            );
+        }
+    }
+}
+
+/// Amendment 11: E1 (A0 on twisted Edwards curves, against A0 on short
+/// Weierstrass curves) and T5 (A0 at `m = 4`, `t = 4` on the tower engine
+/// with a long budget).
+fn analyze_a11(dir: &str) {
+    let rows = read_rows(dir);
+    println!("Factor-base designs, Amendment 11 (E1, T5): rows from {dir}");
+    println!();
+    println!("════ E1: A0 on twisted Edwards curves (S3 in the y-coordinate) against A0 on short Weierstrass curves (the first run), p1, f4_fp");
+    let (mut shared, mut eq, mut gt, mut lt) = (0usize, 0usize, 0usize, 0usize);
+    for m in [2usize, 3] {
+        let e = cells2(&rows, "E1", "A0", m);
+        let w = cells2(&rows, "p1", "A0", m);
+        if e.is_empty() {
+            continue;
+        }
+        println!();
+        println!(
+            "── m = {m}: t   D(Edwards)  D(Weierstrass)   max_cols(Edwards)  max_cols(Weierstrass)"
+        );
+        for c in e.iter().filter(|c| c.complete()) {
+            let Some(g) = find(&w, c.t) else { continue };
+            shared += 1;
+            let (de, dw) = (c.d_mean(), g.d_mean());
+            match de.partial_cmp(&dw) {
+                Some(std::cmp::Ordering::Equal) => eq += 1,
+                Some(std::cmp::Ordering::Greater) => gt += 1,
+                _ => lt += 1,
+            }
+            println!(
+                "  {:<3} {de:<11.1} {dw:<15.1} {:<18.0} {:.0}",
+                c.t,
+                c.cols_mean(),
+                g.cols_mean()
+            );
+        }
+        let missing: Vec<String> = e
+            .iter()
+            .filter(|c| !c.complete())
+            .map(|c| format!("t={}:{}", c.t, c.status.join("/")))
+            .collect();
+        if !missing.is_empty() {
+            println!("  not completed: {}", missing.join(", "));
+        }
+        show_series(&format!("A0 Edwards m = {m} p1"), &e);
+    }
+    println!();
+    println!(
+        "rule: {shared} shared completed cells → {}  (Edwards D above / equal / below: {gt} / {eq} / {lt})",
+        if shared == 0 {
+            "INCONCLUSIVE (no shared cell)"
+        } else if gt == 0 && lt == 0 {
+            "MODEL-INDEPENDENT (D equals the Weierstrass D at every shared cell)"
+        } else {
+            "MODEL-DEPENDENT (a shared D differs)"
+        }
+    );
+    println!();
+    println!("════ T5: A0, m = 4, t = 4, p1, tower engine, budget 21600 s, second target only if the first completes");
+    let t5 = cells2(&rows, "T5", "A0", 4);
+    if t5.is_empty() {
+        println!("T5: no rows.");
+    }
+    for r in rows
+        .iter()
+        .filter(|(f, _)| group_of(f) == "T5")
+        .map(|(_, r)| r)
+    {
+        println!(
+            "  target {}: D {}, degree reached {}, max_cols {}, time {:.0} s, {}  {}",
+            r["target"],
+            r["D"],
+            r["degree_reached"],
+            r["max_cols"],
+            r["time"].as_f64().unwrap_or(f64::NAN),
+            r["status"],
+            r["failure_reason"]
+        );
+    }
+    let base: Vec<Cell2> = cells2(&rows, "F4", "A0", 4)
+        .into_iter()
+        .filter(|c| c.t <= 3)
+        .collect();
+    if !t5.is_empty() {
+        let mut all: Vec<Cell2> = base
+            .iter()
+            .map(|c| Cell2 {
+                t: c.t,
+                b: c.b,
+                d: c.d.clone(),
+                cols: c.cols.clone(),
+                time: c.time.clone(),
+                status: c.status.clone(),
+                shape: c.shape,
+            })
+            .collect();
+        all.extend(t5.iter().map(|c| Cell2 {
+            t: c.t,
+            b: c.b,
+            d: c.d.clone(),
+            cols: c.cols.clone(),
+            time: c.time.clone(),
+            status: c.status.clone(),
+            shape: c.shape,
+        }));
+        all.sort_by_key(|c| c.t);
+        show_series("A0 m = 4, F4 cells and the T5 cell", &all);
+    }
 }
 
 fn analyze2(dir: &str) {
@@ -2747,6 +4213,132 @@ fn completed_rows<'a>(rows: &'a [(String, Value)], groups: &[&str]) -> Vec<&'a (
         .collect()
 }
 
+/// Amendment 6, T1: every planted A0 system of a completed `f4_fp` cell on
+/// p₁ (the first run at `m = 2, 3`; F4 at `m = 4`, `t ≤ 3`) measured again on
+/// the tower engine, in a child under the committed row's own limits. The
+/// engine is admitted if every system completes with the committed D, does
+/// not derive 1 and keeps its planted solution. Returns the verdict.
+fn admit_tower(dir: &str, out: &str, prime: usize) -> bool {
+    let rows = read_rows(dir);
+    // p₁ (Amendment 6, T1): the first run and F4, 26 systems. p₂
+    // (Amendment 7, T3a): F1's A0 series, 22 systems.
+    let stop_mode = STOP_BELOW.load(std::sync::atomic::Ordering::Relaxed) > 0;
+    let (groups, need): (&[&str], usize) = if prime == 0 {
+        (&["p1", "F4"], if stop_mode { 4 } else { 26 })
+    } else {
+        (&["F1"], 22)
+    };
+    let sel: Vec<&(String, Value)> = completed_rows(&rows, groups)
+        .into_iter()
+        .filter(|(f, r)| {
+            r["arm"] == "A0"
+                && row_prime(r) == prime
+                && match group_of(f) {
+                    "F4" => r["m"] == 4 && r["t"].as_u64().unwrap_or(99) <= 3,
+                    _ => r["m"] == 2 || r["m"] == 3,
+                }
+        })
+        .collect();
+    let commit = git_commit();
+    let host = host();
+    let mut file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(format!("{dir}/{out}.jsonl"))
+        .expect("open rows");
+    let mut log = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(format!("{dir}/{out}.log"))
+        .expect("open log");
+    writeln!(
+        log,
+        "== T1/T3a (Amendments 6, 7): {} A0 systems on the tower engine at {}; commit {commit}, started {}",
+        sel.len(),
+        prime_label(prime),
+        utc_now()
+    )
+    .ok();
+    let mut fails: Vec<String> = Vec::new();
+    let mut gating = 0usize;
+    let stop = STOP_BELOW.load(std::sync::atomic::Ordering::Relaxed);
+    for (f, c) in &sel {
+        let m = c["m"].as_u64().expect("m") as usize;
+        let t = c["t"].as_u64().expect("t") as usize;
+        let k = c["target"].as_u64().expect("a target") as usize;
+        let budget = c["budget_s"].as_u64().unwrap_or(300);
+        let a = RunArgs {
+            arms: vec![Arm::A0],
+            ms: vec![m],
+            t_min: t,
+            t_max: t,
+            targets: 1,
+            budget,
+            vmem_kb: c["ulimit_v_kb"].as_u64().unwrap_or(13_000_000),
+            grace: if budget > 300 { 300 } else { 120 },
+            out_dir: dir.to_string(),
+            prime,
+            file: String::new(),
+            distinct: c["distinct_targets"] == true,
+            tower: true,
+            first_target: 0,
+        };
+        let mut row = run_child(&a, Arm::A0, m, t, k, &mut log);
+        let same = row["status"] == "ok"
+            && row["D"] == c["D"]
+            && row["inconsistent"] == false
+            && row["planted_ok"] == true;
+        // With a staircase stop (Amendment 8, T4) only the `m = 4` systems,
+        // the arity the stop is used at, gate the verdict; `m = 2, 3` are
+        // reported.
+        let gates = stop == 0 || m >= 4;
+        if gates {
+            gating += 1;
+        }
+        if !same && gates {
+            fails.push(format!("{f} m={m} t={t} target={k}"));
+        }
+        merge(
+            &mut row,
+            &json!({"git_commit": commit, "host": host, "admission_of": f,
+                    "committed": {"D": c["D"], "max_cols": c["max_cols"], "engine": "f4_fp"},
+                    "admission_match": same, "gating": gates}),
+        );
+        let line = format!(
+            "{f} A0 m={m} t={t} target={k}: tower D {} (f4_fp {}), max_cols {} (f4_fp {}), muladds {}, {:.1} s, {} {}",
+            row["D"],
+            c["D"],
+            row["max_cols"],
+            c["max_cols"],
+            row["muladds"],
+            row["time"].as_f64().unwrap_or(f64::NAN),
+            row["status"].as_str().unwrap_or("?"),
+            if same { "MATCH" } else { "MISMATCH" }
+        );
+        eprintln!("{line}");
+        writeln!(log, "{line}").ok();
+        writeln!(file, "{row}").expect("write a row");
+        file.flush().ok();
+        log.flush().ok();
+    }
+    let admitted = fails.is_empty() && gating == need;
+    let msg = format!(
+        "== T1: {} of {} systems match{}; {}; ended {}",
+        sel.len() - fails.len(),
+        sel.len(),
+        if fails.is_empty() {
+            String::new()
+        } else {
+            format!(" (failing: {})", fails.join("; "))
+        },
+        if admitted { "ADMITTED" } else { "NOT ADMITTED" },
+        utc_now()
+    );
+    eprintln!("{msg}");
+    writeln!(log, "{msg}").ok();
+    admitted
+}
+
 /// Re-measure every system of a completed cell in `groups`, in a child
 /// process under the same limits as its committed row, at the row's own
 /// prime (`prime = None`, C1) or at another prime (`Some`, C3). Each new row
@@ -2802,6 +4394,10 @@ fn replay(dir: &str, out: &str, groups: &[&str], prime: Option<usize>, only_prim
             out_dir: dir.to_string(),
             prime: prime.unwrap_or_else(|| row_prime(c)),
             file: String::new(),
+            // Rebuild the row the way it was drawn (Amendment 5, G2).
+            distinct: c["distinct_targets"] == true,
+            tower: c["engine"] == "f4_fp_tower",
+            first_target: 0,
         };
         let mut row = run_child(&a, arm, m, t, k, &mut log);
         let fields = ["D", "max_cols", "max_rows", "steps"];
@@ -3247,7 +4843,589 @@ fn analyze4(dir: &str) {
     }
 }
 
+/// Amendment 5: the m = 4 longer-budget cells L1 (A0, t = 4) and L2 (A11,
+/// t = 5), rules R1 and R2, σ and κ for A0 and A11 at m = 4 with every
+/// completed cell (F4 through its C1 replays, C2, L1, L2), and the
+/// predictions scorecard.
+fn of_arm<'a>(rs: &[&'a Value], a: &str) -> Vec<&'a Value> {
+    rs.iter().copied().filter(|r| r["arm"] == a).collect()
+}
+
+fn analyze5(dir: &str) {
+    let rows = read_rows(dir);
+    let group = |g: &'static str| -> Vec<&Value> {
+        rows.iter()
+            .filter(|(f, _)| group_of(f) == g)
+            .map(|(_, r)| r)
+            .collect()
+    };
+    let (c1, c2, l1, l2) = (group("C1"), group("C2"), group("L1"), group("L2"));
+    let f4 = |a: &str| -> Vec<&Value> {
+        c1.iter()
+            .copied()
+            .filter(|r| {
+                r["arm"] == a
+                    && r["m"] == 4
+                    && r["replay_of"]
+                        .as_str()
+                        .is_some_and(|f| f.starts_with("F4-"))
+            })
+            .collect()
+    };
+    println!("Factor-base designs, Amendment 5 (L1, L2): rows from {dir}");
+    println!("(field_ops = F_p multiplications in F4's row reduction; κ = least-squares slope of log₂ of a cell's mean");
+    println!(" field_ops on b; σ = least-squares slope of D on b. F4's cells enter through their C1 replays, whose");
+    println!(" traces matched. A cell counts only if both of its systems are ok. peak_rss_kb is descriptive only.)");
+
+    let show_rows = |title: &str, rs: &[&Value]| {
+        println!();
+        println!("════ {title}");
+        if rs.is_empty() {
+            println!("  no rows");
+        }
+        for r in rs {
+            println!(
+                "  {} t={} target {}: status {}, D {}, degree_reached {}, max_cols {}, field_ops {}, time {:.1} s, peak_rss_kb {}, ulimit_v_kb {}, budget {} s{}",
+                r["arm"].as_str().unwrap_or("?"),
+                r["t"],
+                r["target"],
+                r["status"].as_str().unwrap_or("?"),
+                r["D"],
+                r["degree_reached"],
+                r["max_cols"],
+                r["field_ops"],
+                r["time"].as_f64().unwrap_or(f64::NAN),
+                r["peak_rss_kb"],
+                r["ulimit_v_kb"],
+                r["budget_s"],
+                r["failure_reason"]
+                    .as_str()
+                    .map(|s| format!(" ({s})"))
+                    .unwrap_or_default()
+            );
+        }
+    };
+    show_rows("L1: A0 m = 4, t = 4, p1, budget 14400 s + grace 600 s", &l1);
+
+    // L1 and C2 must be the same systems.
+    let a0_c2 = of_arm(&c2, "A0");
+    let same: Vec<bool> = l1
+        .iter()
+        .map(|r| {
+            a0_c2.iter().any(|c| {
+                c["target"] == r["target"]
+                    && [
+                        "cell_seed",
+                        "target_seed",
+                        "n_vars",
+                        "n_eqs",
+                        "planted_x",
+                        "x_r",
+                        "curve",
+                        "set",
+                    ]
+                    .iter()
+                    .all(|k| c[*k] == r[*k])
+            })
+        })
+        .collect();
+    println!(
+        "  identity with C2's A0 systems (cell_seed, target_seed, n_vars, n_eqs, planted_x, x_r, curve, set): {} of {} L1 systems match",
+        same.iter().filter(|x| **x).count(),
+        l1.len()
+    );
+    for c in &a0_c2 {
+        println!(
+            "  C2 (prior attempt) A0 t=4 target {}: {} under ulimit -v {}, {:.1} s",
+            c["target"],
+            c["status"].as_str().unwrap_or("?"),
+            c["ulimit_v_kb"],
+            c["time"].as_f64().unwrap_or(f64::NAN)
+        );
+    }
+    show_rows(
+        "L2: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s",
+        &l2,
+    );
+
+    let cell_done = |rs: &[&Value]| -> bool {
+        rs.len() == 2
+            && rs
+                .iter()
+                .all(|r| r["status"] == "ok" && r["field_ops"].is_u64())
+    };
+    let l1_done = cell_done(&l1);
+    let l2_done = cell_done(&l2);
+    let mean_ops = |rs: &[&Value]| {
+        rs.iter()
+            .map(|r| r["field_ops"].as_u64().unwrap_or(0) as f64)
+            .sum::<f64>()
+            / rs.len() as f64
+    };
+
+    // A SIGKILL the harness did not send (it sends one only at the hard
+    // wall limit, recorded as `timeout`) is attributed from the kernel log
+    // copied beside the rows, if one is there.
+    let oom = |file: &str| -> Option<String> {
+        let log = std::fs::read_to_string(format!("{dir}/{file}")).ok()?;
+        let kills = log
+            .lines()
+            .filter(|l| l.contains("Memory cgroup out of memory: Killed process"))
+            .count();
+        let lim = log
+            .lines()
+            .find(|l| l.contains("] memory: usage"))
+            .and_then(|l| l.split("limit ").nth(1))
+            .and_then(|x| x.split(',').next())
+            .unwrap_or("?")
+            .to_string();
+        Some(format!(
+            "memory cgroup: {kills} kernel OOM kills at the cgroup limit {lim} (below ulimit -v; {file})"
+        ))
+    };
+    let limit = |rs: &[&Value], dmesg: &str| -> String {
+        let mut v: Vec<String> = rs
+            .iter()
+            .filter(|r| r["status"] != "ok")
+            .map(|r| {
+                let why = r["failure_reason"].as_str().unwrap_or("");
+                if why.contains("memory") {
+                    "memory (ulimit -v)".to_string()
+                } else if why.contains("signal: 9") {
+                    oom(dmesg).unwrap_or_else(|| "SIGKILL from outside the harness".into())
+                } else {
+                    r["status"].as_str().unwrap_or("?").to_string()
+                }
+            })
+            .collect();
+        v.dedup();
+        v.join(",")
+    };
+
+    // Series. A0: F4 + L1 (L1 re-measures C2's A0 systems under the raised
+    // limits, so C2's aborted rows do not enter). A11: F4 + C2 + L2.
+    let a0: Vec<&Value> = f4("A0").into_iter().chain(l1.iter().copied()).collect();
+    let a11: Vec<&Value> = f4("A11")
+        .into_iter()
+        .chain(of_arm(&c2, "A11"))
+        .chain(l2.iter().copied())
+        .collect();
+    println!();
+    println!("════ σ and κ at m = 4, p1");
+    let (n0, s0, k0) = show4(
+        "A0 m = 4 p1 (F4 via C1, L1's t = 4 cell)",
+        4,
+        &cells4(a0.into_iter()),
+    );
+    let (n11, s11, k11) = show4(
+        "A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, L2's t = 5 cell)",
+        4,
+        &cells4(a11.into_iter()),
+    );
+
+    println!();
+    println!("════ R1: does A11's constant factor survive at m = 4, t = 4?");
+    let a11_t4 = of_arm(&c2, "A11");
+    if l1_done && cell_done(&a11_t4) {
+        let (x, y) = (mean_ops(&a11_t4), mean_ops(&l1));
+        println!(
+            "  A11 t = 4 (C2) mean field_ops {x:.0} (log₂ {:.3}); A0 t = 4 (L1) mean field_ops {y:.0} (log₂ {:.3})",
+            x.log2(),
+            y.log2()
+        );
+        println!(
+            "  R1: {}",
+            if x < y {
+                "SURVIVES (A11 below A0)"
+            } else {
+                "CROSSED (A11 not below A0)"
+            }
+        );
+    } else if l1.len() < 2 {
+        println!("  R1: NOT DECIDED (L1 has {} of 2 rows)", l1.len());
+    } else {
+        println!("  R1: A0 NOT MEASURABLE AT t = 4 WITHIN 14.5 GB AND 4 h (limit and partial values in L1 above); no cost comparison");
+    }
+
+    println!();
+    println!("════ R2: A11 at m = 4, t = 5");
+    if l2_done {
+        println!(
+            "  L2 completed: the 4-cell series gives κ = {} ({}), σ = {} ({})",
+            k11.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n11, k11, 4),
+            s11.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n11, s11)
+        );
+    } else if l2.len() < 2 {
+        println!("  R2: NOT DECIDED (L2 has {} of 2 rows)", l2.len());
+    } else {
+        println!(
+            "  L2 did not complete (limit: {}); the {n11}-cell verdicts stand: κ = {} ({}), σ = {} ({})",
+            limit(&l2, "L2-A11-m4-t5.dmesg.txt"),
+            k11.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n11, k11, 4),
+            s11.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n11, s11)
+        );
+    }
+    println!(
+        "  A0 m = 4: {n0} completed cells: κ = {} ({}), σ = {} ({})",
+        k0.map_or("-".into(), |x| format!("{x:.3}")),
+        kappa_verdict(n0, k0, 4),
+        s0.map_or("-".into(), |x| format!("{x:.4}")),
+        verdict(n0, s0)
+    );
+
+    println!();
+    println!("════ Predictions scorecard (Amendment 5)");
+    let l1_mem = l1.iter().any(|r| {
+        r["failure_reason"]
+            .as_str()
+            .is_some_and(|s| s.contains("memory"))
+    });
+    println!(
+        "  L1: A0 aborts for memory again: completed {l1_done}, limit {}  →  {}",
+        if l1_done {
+            "none".into()
+        } else {
+            limit(&l1, "L1-A0-m4-t4.dmesg.txt")
+        },
+        if l1.len() < 2 {
+            "not decided"
+        } else if !l1_done && l1_mem {
+            "held"
+        } else {
+            "did not hold"
+        }
+    );
+    let l2_mem = l2.iter().any(|r| {
+        r["failure_reason"]
+            .as_str()
+            .is_some_and(|s| s.contains("memory"))
+    });
+    println!(
+        "  L2: A11 does not complete within 14.5 GB: completed {l2_done}, limit {}  →  {}",
+        if l2_done {
+            "none".into()
+        } else {
+            limit(&l2, "L2-A11-m4-t5.dmesg.txt")
+        },
+        if l2.len() < 2 {
+            "not decided"
+        } else if l2_done {
+            "did not hold"
+        } else if l2_mem {
+            "held"
+        } else if oom("L2-A11-m4-t5.dmesg.txt").is_some() {
+            "not decided as registered (did not complete, but the binding limit was the host's memory cgroup, below the registered 14.5 GB)"
+        } else {
+            "held in part (did not complete, but the limit was not memory)"
+        }
+    );
+}
+
+/// Amendment 6: L2r, the L2 systems rerun under an address-space limit
+/// below the host's memory cgroup; the attribution check against the kernel
+/// log copied beside the rows, R2 applied to L2r, and the prediction.
+fn analyze6(dir: &str) {
+    let rows = read_rows(dir);
+    let group = |g: &'static str| -> Vec<&Value> {
+        rows.iter()
+            .filter(|(f, _)| group_of(f) == g)
+            .map(|(_, r)| r)
+            .collect()
+    };
+    let (c1, c2, l2, l2r) = (group("C1"), group("C2"), group("L2"), group("L2r"));
+    println!("Factor-base designs, Amendment 6 (L2r): rows from {dir}");
+    println!("(L2r = L2's two A11 m = 4, t = 5 systems under ulimit -v V below the memory cgroup. A system's");
+    println!(" limit is attributable only if its row is a ulimit -v malloc failure or a timeout and the kernel");
+    println!(" log beside the rows has no OOM kill. peak_rss_kb is descriptive only.)");
+
+    let dmesg = std::fs::read_to_string(format!("{dir}/L2r-A11-m4-t5.dmesg.txt")).ok();
+    let kills: Vec<String> = dmesg
+        .as_deref()
+        .unwrap_or("")
+        .lines()
+        .filter(|l| l.contains("Memory cgroup out of memory: Killed process"))
+        .map(String::from)
+        .collect();
+    let preflight: Vec<String> = dmesg
+        .as_deref()
+        .unwrap_or("")
+        .lines()
+        .filter(|l| l.starts_with("# pre-flight"))
+        .map(String::from)
+        .collect();
+
+    println!();
+    println!(
+        "════ Pre-flight and kernel log ({})",
+        if dmesg.is_some() {
+            "runs/L2r-A11-m4-t5.dmesg.txt"
+        } else {
+            "MISSING"
+        }
+    );
+    for l in &preflight {
+        println!("  {}", l.trim_start_matches("# "));
+    }
+    println!("  kernel OOM kills recorded: {}", kills.len());
+    for k in &kills {
+        println!("    {k}");
+    }
+
+    println!();
+    println!("════ L2r: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s");
+    if l2r.is_empty() {
+        println!("  no rows");
+    }
+    let mut attributable = Vec::new();
+    for r in &l2r {
+        let why = r["failure_reason"].as_str().unwrap_or("");
+        let v = r["ulimit_v_kb"].as_u64().unwrap_or(0);
+        let ok = r["status"] == "ok";
+        let attr = dmesg.is_some()
+            && kills.is_empty()
+            && (ok
+                || r["status"] == "timeout"
+                || why.contains(&format!("memory allocation failed under ulimit -v {v}")));
+        attributable.push(attr);
+        println!(
+            "  A11 t={} target {}: status {}, D {}, max_cols {}, field_ops {}, time {:.1} s, peak_rss_kb {}, ulimit_v_kb {}, budget {} s{}  →  limit {}",
+            r["t"],
+            r["target"],
+            r["status"].as_str().unwrap_or("?"),
+            r["D"],
+            r["max_cols"],
+            r["field_ops"],
+            r["time"].as_f64().unwrap_or(f64::NAN),
+            r["peak_rss_kb"],
+            r["ulimit_v_kb"],
+            r["budget_s"],
+            r["failure_reason"].as_str().map(|s| format!(" ({s})")).unwrap_or_default(),
+            if ok { "none (completed)" } else if attr { "attributable (the registered one)" } else { "NOT ATTRIBUTABLE" }
+        );
+    }
+    let same = l2r
+        .iter()
+        .filter(|r| {
+            l2.iter().any(|c| {
+                c["target"] == r["target"]
+                    && [
+                        "cell_seed",
+                        "target_seed",
+                        "n_vars",
+                        "n_eqs",
+                        "planted_x",
+                        "x_r",
+                        "curve",
+                        "set",
+                    ]
+                    .iter()
+                    .all(|k| c[*k] == r[*k])
+            })
+        })
+        .count();
+    println!(
+        "  identity with L2's systems (cell_seed, target_seeds, n_vars, n_eqs, planted_x, x_r, curve, set): {same} of {} L2r systems match",
+        l2r.len()
+    );
+    for r in &l2 {
+        println!(
+            "  L2 (prior attempt) target {}: {} at {:.1} s, peak_rss_kb {} ({})",
+            r["target"],
+            r["status"].as_str().unwrap_or("?"),
+            r["time"].as_f64().unwrap_or(f64::NAN),
+            r["peak_rss_kb"],
+            r["failure_reason"].as_str().unwrap_or("")
+        );
+    }
+
+    // R2 on L2r: A11 series F4 (via C1) + C2 + L2r.
+    let a11: Vec<&Value> = c1
+        .iter()
+        .copied()
+        .filter(|r| {
+            r["arm"] == "A11"
+                && r["m"] == 4
+                && r["replay_of"]
+                    .as_str()
+                    .is_some_and(|f| f.starts_with("F4-"))
+        })
+        .chain(of_arm(&c2, "A11"))
+        .chain(l2r.iter().copied())
+        .collect();
+    println!();
+    println!("════ σ and κ at m = 4, p1");
+    let (n, s, k) = show4(
+        "A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, L2r's t = 5 cell)",
+        4,
+        &cells4(a11.into_iter()),
+    );
+    let done = l2r.len() == 2
+        && l2r
+            .iter()
+            .all(|r| r["status"] == "ok" && r["field_ops"].is_u64());
+    let v = l2r
+        .first()
+        .and_then(|r| r["ulimit_v_kb"].as_u64())
+        .unwrap_or(0);
+    println!();
+    println!("════ R2 applied to L2r");
+    let outcome = if l2r.len() < 2 {
+        format!("NOT DECIDED (L2r has {} of 2 rows)", l2r.len())
+    } else if done {
+        format!(
+            "L2r completed: the {n}-cell series gives κ = {} ({}), σ = {} ({})",
+            k.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n, k, 4),
+            s.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n, s)
+        )
+    } else if attributable.iter().all(|x| *x) {
+        format!(
+            "A11 NOT MEASURABLE AT m = 4, t = 5 WITHIN {v} kB AND 4 h; the {n}-cell verdicts stand: κ = {} ({}), σ = {} ({})",
+            k.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n, k, 4),
+            s.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n, s)
+        )
+    } else {
+        "NOT DECIDED (a limit is not attributable; see the rows above)".to_string()
+    };
+    println!("  R2: {outcome}");
+    println!(
+        "  Amendment 5's L2 prediction keeps its recorded outcome (not decided as registered)."
+    );
+
+    println!();
+    println!("════ Predictions scorecard (Amendment 6)");
+    let mut held = l2r.len() == 2;
+    for r in &l2r {
+        let t = r["target"].as_u64().unwrap_or(9);
+        let prior = l2
+            .iter()
+            .find(|c| c["target"] == t)
+            .and_then(|c| c["time"].as_f64())
+            .unwrap_or(f64::NAN);
+        let why = r["failure_reason"].as_str().unwrap_or("");
+        let malloc = why.contains(&format!("memory allocation failed under ulimit -v {v}"));
+        let time = r["time"].as_f64().unwrap_or(f64::NAN);
+        let ok = malloc && kills.is_empty() && dmesg.is_some() && time < prior;
+        println!(
+            "  target {t}: ulimit -v malloc failure {malloc}, no OOM kill {}, time {time:.1} s against L2's {prior:.1} s  →  {}",
+            dmesg.is_some() && kills.is_empty(),
+            if ok { "as predicted" } else { "not as predicted" }
+        );
+        held &= ok;
+    }
+    println!(
+        "  L2r: both systems abort under ulimit -v V, no OOM kill, each before its L2 kill time  →  {}",
+        if l2r.len() < 2 { "not decided" } else if held { "held" } else { "did not hold" }
+    );
+}
+
 // ── Arguments ──────────────────────────────────────────────────────
+
+/// Compare two row files system by system, keyed by (arm, m, t, target):
+/// the construction (seeds, `x_R`, curve, counts) must agree on every
+/// shared row; where both systems completed, so must F4's deterministic
+/// output (D, `degree_reached`, `max_cols`, `inconsistent`, `planted_ok`).
+/// A status that differs (one host finished within the budget, the other
+/// did not) is listed, not counted as a disagreement. Returns false on any
+/// disagreement.
+fn compare_rows(a: &str, b: &str) -> bool {
+    let load = |f: &str| -> BTreeMap<(String, u64, u64, u64), Value> {
+        std::fs::read_to_string(f)
+            .unwrap_or_else(|e| panic!("read {f}: {e}"))
+            .lines()
+            .filter(|l| !l.trim().is_empty())
+            .map(|l| serde_json::from_str::<Value>(l).expect("a JSON row"))
+            .filter(|r| r.get("summary").is_none())
+            .map(|r| {
+                let key = (
+                    r["arm"].as_str().unwrap_or("?").to_string(),
+                    r["m"].as_u64().unwrap_or(0),
+                    r["t"].as_u64().unwrap_or(0),
+                    r["target"].as_u64().unwrap_or(0),
+                );
+                (key, r)
+            })
+            .collect()
+    };
+    let (ra, rb) = (load(a), load(b));
+    const BUILD: [&str; 8] = [
+        "p",
+        "cell_seed",
+        "target_seed",
+        "x_r",
+        "curve",
+        "planted_x",
+        "n_vars",
+        "n_eqs",
+    ];
+    const F4: [&str; 5] = [
+        "D",
+        "degree_reached",
+        "max_cols",
+        "inconsistent",
+        "planted_ok",
+    ];
+    let (mut same, mut differ, mut status) = (0usize, 0usize, 0usize);
+    println!("compare-rows\n  A = {a}\n  B = {b}");
+    for (k, x) in &ra {
+        let Some(y) = rb.get(k) else { continue };
+        let mut bad: Vec<&str> = BUILD.iter().copied().filter(|f| x[*f] != y[*f]).collect();
+        let both_ok = x["status"] == "ok" && y["status"] == "ok";
+        if both_ok {
+            bad.extend(F4.iter().copied().filter(|f| x[*f] != y[*f]));
+        }
+        let label = format!("{} m={} t={} target={}", k.0, k.1, k.2, k.3);
+        if !bad.is_empty() {
+            differ += 1;
+            println!("  DIFFER {label}: {}", bad.join(", "));
+        } else if x["status"] != y["status"] {
+            status += 1;
+            println!(
+                "  status {label}: A {} (D {}, {} s), B {} (D {}, {} s); construction identical",
+                x["status"], x["D"], x["time"], y["status"], y["D"], y["time"]
+            );
+        } else {
+            same += 1;
+        }
+    }
+    let only = |p: &BTreeMap<_, Value>, q: &BTreeMap<_, Value>| -> Vec<String> {
+        p.keys()
+            .filter(|k| !q.contains_key(*k))
+            .map(|k: &(String, u64, u64, u64)| {
+                format!("{} m={} t={} target={}", k.0, k.1, k.2, k.3)
+            })
+            .collect()
+    };
+    let (oa, ob) = (only(&ra, &rb), only(&rb, &ra));
+    println!(
+        "  shared {}: identical {same}, status differs {status}, disagree {differ}",
+        same + status + differ
+    );
+    println!(
+        "  only in A: {}",
+        if oa.is_empty() {
+            "none".into()
+        } else {
+            oa.join("; ")
+        }
+    );
+    println!(
+        "  only in B: {}",
+        if ob.is_empty() {
+            "none".into()
+        } else {
+            ob.join("; ")
+        }
+    );
+    differ == 0
+}
 
 fn flag(args: &[String], name: &str) -> Option<String> {
     args.iter()
@@ -3261,6 +5439,31 @@ fn list(s: &str) -> Vec<usize> {
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
+    if let Some(f) = flag(&args, "--family") {
+        FAMILY.store(parse_family(&f), std::sync::atomic::Ordering::Relaxed);
+    }
+    if let Some(md) = flag(&args, "--model") {
+        let v = match md.as_str() {
+            "weierstrass" => 0,
+            "edwards" => 1,
+            other => panic!("unknown --model `{other}` (weierstrass, edwards)"),
+        };
+        MODEL.store(v, std::sync::atomic::Ordering::Relaxed);
+    }
+    if let Some(ts) = flag(&args, "--target-structure") {
+        let v = match ts.as_str() {
+            "random" => 0,
+            "xr0" => 1,
+            other => panic!("unknown --target-structure `{other}` (random, xr0)"),
+        };
+        TARGET.store(v, std::sync::atomic::Ordering::Relaxed);
+    }
+    if let Some(b) = flag(&args, "--stop-below") {
+        STOP_BELOW.store(
+            b.parse().expect("--stop-below"),
+            std::sync::atomic::Ordering::Relaxed,
+        );
+    }
     let cmd = args.first().map(String::as_str).unwrap_or("");
     match cmd {
         "one" => {
@@ -3270,7 +5473,18 @@ fn main() {
             let k: usize = flag(&args, "--target").map_or(0, |s| s.parse().unwrap());
             let budget = flag(&args, "--budget").map_or(300, |s| s.parse().unwrap());
             let prime = flag(&args, "--prime").map_or(0, |s| parse_prime(&s));
-            let row = one(prime, arm, m, t, k, Duration::from_secs(budget));
+            let distinct = args.iter().any(|a| a == "--distinct-targets");
+            let tower = flag(&args, "--engine").is_some_and(|e| e == "tower");
+            let row = one(
+                prime,
+                arm,
+                m,
+                t,
+                k,
+                Duration::from_secs(budget),
+                distinct,
+                tower,
+            );
             println!("{row}");
         }
         "run" => {
@@ -3294,6 +5508,9 @@ fn main() {
                 out_dir: flag(&args, "--out-dir").expect("--out-dir"),
                 prime: flag(&args, "--prime").map_or(0, |s| parse_prime(&s)),
                 file: flag(&args, "--file").unwrap_or_else(|| "{arm}-m{m}".into()),
+                distinct: args.iter().any(|a| a == "--distinct-targets"),
+                tower: flag(&args, "--engine").is_some_and(|e| e == "tower"),
+                first_target: flag(&args, "--first-target").map_or(0, |s| s.parse().unwrap()),
             };
             assert!(a.t_min >= 2, "t starts at 2");
             let two = (prime_of(a.prime) - 1).trailing_zeros() as usize;
@@ -3311,7 +5528,21 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--amendment4") {
+            if args.iter().any(|a| a == "--amendment6") {
+                analyze6(dir);
+            } else if args.iter().any(|a| a == "--amendment5") {
+                analyze5(dir);
+            } else if args.iter().any(|a| a == "--a11") {
+                analyze_a11(dir);
+            } else if args.iter().any(|a| a == "--a9") {
+                analyze_a9(dir);
+            } else if args.iter().any(|a| a == "--a8") {
+                analyze_a8(dir);
+            } else if args.iter().any(|a| a == "--tower") {
+                analyze_tower(dir);
+            } else if args.iter().any(|a| a == "--g1") {
+                analyze_g1(dir);
+            } else if args.iter().any(|a| a == "--amendment4") {
                 analyze4(dir);
             } else if args.iter().any(|a| a == "--amendment2") {
                 analyze2(dir);
@@ -3336,6 +5567,46 @@ fn main() {
                 std::process::exit(1);
             }
         }
+        "admit-tower" => {
+            let dir = args.get(1).expect("a runs directory");
+            let out = flag(&args, "--file").unwrap_or_else(|| "T1-admission".into());
+            let prime = flag(&args, "--prime").map_or(0, |s| parse_prime(&s));
+            if !admit_tower(dir, &out, prime) {
+                std::process::exit(1);
+            }
+        }
+        "edwards-s3-table" => {
+            // Print the coefficients for given (a, d) (small values show the closed form).
+            let prime = flag(&args, "--prime").map_or(0, |s| parse_prime(&s));
+            let p = prime_of(prime);
+            let a: u64 = flag(&args, "--a").expect("--a").parse().unwrap();
+            let d: u64 = flag(&args, "--d").expect("--d").parse().unwrap();
+            let (c, dim) = edwards_s3_coeffs(p, a, d);
+            println!("a = {a}, d = {d}, p = {p}, null space {dim}");
+            for (&(i, j, k), &co) in edwards_monomials().iter().zip(&c) {
+                if co != 0 {
+                    let signed = if co > p / 2 {
+                        format!("-{}", p - co)
+                    } else {
+                        co.to_string()
+                    };
+                    println!("  y1^{i} y2^{j} y3^{k}: {signed}");
+                }
+            }
+        }
+        "edwards-s3" => {
+            let prime = flag(&args, "--prime").map_or(0, |s| parse_prime(&s));
+            let curves = flag(&args, "--curves").map_or(5, |s| s.parse().unwrap());
+            if !edwards_s3_check(prime, curves) {
+                std::process::exit(1);
+            }
+        }
+        "compare-rows" => {
+            let (a, b) = (args.get(1).expect("rows A"), args.get(2).expect("rows B"));
+            if !compare_rows(a, b) {
+                std::process::exit(1);
+            }
+        }
         "regress" => {
             let file = flag(&args, "--rows").expect("--rows");
             let arm = Arm::parse(&flag(&args, "--arm").expect("--arm"));
@@ -3348,7 +5619,7 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: fb_designs_slope run|one|repro|analyze|check-p2|regress …  (see the module docs)"
+                "usage: fb_designs_slope run|one|repro|analyze|check-p2|regress|compare-rows|admit-tower …  (see the module docs)"
             );
             std::process::exit(2);
         }

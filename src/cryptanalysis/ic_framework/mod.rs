@@ -62,9 +62,11 @@
 //! worked example of adding a solver, how to run a sweep, and how to
 //! report what comes out.
 
+pub mod cm_orbit;
 pub mod fiber;
 pub mod large_prime;
 pub mod linalg;
+pub mod planner;
 pub mod plugins;
 pub mod prime_tower;
 pub mod residual;
@@ -99,7 +101,8 @@ pub struct PipelineSpec {
     pub targets: Targets,
     /// The matrix and stop rule: `incremental-gauss`,
     /// `incremental-gauss-full-rank`, its `-checked` variant,
-    /// `structured-gauss`, or `sparse-cado` (full-rank rule).
+    /// `structured-gauss`, or a deferred sparse solver (`sparse-cado`,
+    /// `filter+wiedemann`, `filter+lanczos`, `wiedemann`, `lanczos`; full-rank rule).
     pub linalg: String,
     /// Cap on targets drawn before the run gives up.
     pub max_trials: u64,
@@ -259,6 +262,17 @@ pub struct RunReport {
 /// inherited-F4 / pdp3 qualifier
 /// `word XORs (elimination, specialisation and linear elimination only)`
 /// both count; `vector XORs` / `word operations (…)` do not.
+///
+/// Accounting, not an algorithm change: before PR #1774 (merge `cd226d0ce`,
+/// 2026-10-14) only the bare unit matched, so inherited-F4 / pdp3 records
+/// left their word XORs unpriced (`solver_word_XORs_(…)_uncharged`,
+/// `lower_bound: true`) even where `docs/ic/calibration.json` pins
+/// `ns_per_word_xor`.  Since then those curves charge them (K_0/GF(2^13):
+/// 0.002304 GAE per word XOR, e.g. `ic-f4-m3` target 0 671 → 24,415 GAE at
+/// that merge, same word-XOR count),
+/// while curves without a pinned ratio still record a lower bound.  Do not
+/// compare an F4 `S` from before that merge with one after it, or a priced
+/// curve with an unpriced one: `research/f4_pricing_jump_20261018/`.
 fn is_word_xor_op_unit(op_unit: &str) -> bool {
     op_unit == "word XORs" || op_unit.starts_with("word XORs (")
 }
@@ -317,6 +331,24 @@ pub fn run_pipeline<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
 ) -> Result<RunReport, String> {
+    run_pipeline_with_base(ctx, spec, base_builder, oracle, planted, calib, rho_s)
+        .map(|(report, _)| report)
+}
+
+/// [`run_pipeline`], also returning the factor base it built and used,
+/// for a caller that describes the base afterwards (its point digest,
+/// column count): rebuilding it would repeat the whole build outside the
+/// measured run, and could describe a different base than the one used.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_with_base<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    planted: u64,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<(RunReport, FactorBase<G::Elt>), String> {
     let started = Instant::now();
 
     // ── Stage 1: the factor base ───────────────────────────────────
@@ -406,7 +438,7 @@ pub fn run_pipeline<G: CountedGroup>(
     // rank, so it runs under the full-rank rule.
     let completion = if linalg_name == "incremental-gauss-full-rank"
         || checked_full_rank
-        || linalg_name == "sparse-cado"
+        || linalg::is_deferred_sparse(linalg_name)
     {
         CompletionRule::FullRank
     } else {
@@ -564,54 +596,57 @@ pub fn run_pipeline<G: CountedGroup>(
 
     let (work, work_unit) = matrix.work();
 
-    Ok(RunReport {
-        instance: ctx.name.clone(),
-        log2_r: (ctx.r as f64).log2(),
-        r: ctx.r,
-        group_order: ctx.group_order,
-        spec: spec.clone(),
-        label: spec.label(),
-        factor_base: FactorBaseReport {
-            name: base_builder.name().to_string(),
-            description: base_builder.describe(&spec.factor_base_params),
-            signed_points: fb.points.len(),
-            abscissae: fb.abscissae,
-            columns: fb.columns,
-            points_per_column: fb.points.len() as f64 / fb.columns.max(1) as f64,
-            cost: fb_phase,
+    Ok((
+        RunReport {
+            instance: ctx.name.clone(),
+            log2_r: (ctx.r as f64).log2(),
+            r: ctx.r,
+            group_order: ctx.group_order,
+            spec: spec.clone(),
+            label: spec.label(),
+            factor_base: FactorBaseReport {
+                name: base_builder.name().to_string(),
+                description: base_builder.describe(&spec.factor_base_params),
+                signed_points: fb.points.len(),
+                abscissae: fb.abscissae,
+                columns: fb.columns,
+                points_per_column: fb.points.len() as f64 / fb.columns.max(1) as f64,
+                cost: fb_phase,
+            },
+            decomposition: DecompositionReport {
+                name: oracle.name().to_string(),
+                summands: oracle.summands(),
+                description: oracle.describe(&spec.oracle_params),
+                targets_tried: outcome.trials,
+                relations_found: outcome.relations_found,
+                hit_rate: outcome.relations_found as f64 / outcome.trials.max(1) as f64,
+                setup: prep_cost,
+                cost: rel,
+                gae_before_solver,
+                system: oracle.last_system(),
+                solver: solver_report,
+            },
+            linear_algebra: LinearAlgebraReport {
+                name: linalg_name.into(),
+                rows: outcome.relations_found,
+                rank: outcome.rank,
+                dependent: outcome.dependent,
+                work,
+                work_unit: work_unit.into(),
+                cost: la,
+            },
+            verify: ver,
+            recovered: outcome.recovered,
+            verified: outcome.verified && outcome.recovered == Some(planted),
+            total_gae,
+            s,
+            rho_s,
+            s_over_rho: rho_s.map(|rho| s / rho),
+            wall_seconds: started.elapsed().as_secs_f64(),
+            exhausted: outcome.recovered.is_none(),
         },
-        decomposition: DecompositionReport {
-            name: oracle.name().to_string(),
-            summands: oracle.summands(),
-            description: oracle.describe(&spec.oracle_params),
-            targets_tried: outcome.trials,
-            relations_found: outcome.relations_found,
-            hit_rate: outcome.relations_found as f64 / outcome.trials.max(1) as f64,
-            setup: prep_cost,
-            cost: rel,
-            gae_before_solver,
-            system: oracle.last_system(),
-            solver: solver_report,
-        },
-        linear_algebra: LinearAlgebraReport {
-            name: linalg_name.into(),
-            rows: outcome.relations_found,
-            rank: outcome.rank,
-            dependent: outcome.dependent,
-            work,
-            work_unit: work_unit.into(),
-            cost: la,
-        },
-        verify: ver,
-        recovered: outcome.recovered,
-        verified: outcome.verified && outcome.recovered == Some(planted),
-        total_gae,
-        s,
-        rho_s,
-        s_over_rho: rho_s.map(|rho| s / rho),
-        wall_seconds: started.elapsed().as_secs_f64(),
-        exhausted: outcome.recovered.is_none(),
-    })
+        fb,
+    ))
 }
 
 /// The table a sweep prints.
@@ -1415,6 +1450,14 @@ mod tests {
             .unwrap()
         };
         let dense = run(&spec);
+        for name in ["wiedemann", "lanczos", "filter+lanczos", "filter+wiedemann"] {
+            spec.linalg = name.into();
+            let other = run(&spec);
+            assert!(other.verified, "{name}");
+            assert_eq!(other.recovered, dense.recovered, "{name}");
+            assert_eq!(other.linear_algebra.work_unit, "row_ops", "{name}");
+            assert!(other.linear_algebra.work > 0, "{name}");
+        }
         spec.linalg = "sparse-cado".into();
         let sparse = run(&spec);
         assert!(dense.verified && sparse.verified);

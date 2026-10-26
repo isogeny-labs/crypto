@@ -35,7 +35,9 @@
 # Set PREWARM=0 to skip when the image is already warm.
 #
 # CURVE=131 selects the verified sigma-table RTX PRO 6000 packed preset:
-# batch 16, 512 block threads, 385024 workers, dp weight 32. The table
+# batch 16, 512 block threads, 96256 workers, dp weight 32, with the
+# persisting L2 window and tail layout (385024 workers before 2026-10-17;
+# resume those run ids with WORKERS=385024). The table
 # evaluates the same sigma walk and preserves the checkpoint and DP format.
 # On that curve RUNID is required and must come from the Modal range
 # (8000-9999): a run id an AWS slot has used walks that slot's seeds again,
@@ -65,6 +67,10 @@ if [ "$CURVE" = 131 ]; then
     export ECC_PACKED_INLINE_POLY="${ECC_PACKED_INLINE_POLY:-3}"
     export ECC_SIGMA_FUSED="${ECC_SIGMA_FUSED:-1}"
     export ECC_PACKED_SIGMA_TABLE="${ECC_PACKED_SIGMA_TABLE:-1}"
+    # Promoted 2026-10-17 (benchmarks/sigma-table-tuned): the persisting L2
+    # window and the tail layout, at the automatic 96,256 workers below.
+    export ECC_PACKED_L2_PERSIST="${ECC_PACKED_L2_PERSIST:-1}"
+    export ECC_PACKED_TAIL_LAYOUT="${ECC_PACKED_TAIL_LAYOUT:-1}"
     default_threads=256
     default_minblocks=2
     if [ "$ECC_PACKED_SIGMA_TABLE" = 1 ]; then
@@ -75,7 +81,11 @@ if [ "$CURVE" = 131 ]; then
     BATCH=${BATCH:-16}
     THREADS=${THREADS:-$default_threads}
     LEAF=${LEAF:-0}
-    WORKERS=${WORKERS:-385024}
+    # 96,256 = 188 SMs x 512 threads, the engine's automatic count on an RTX
+    # PRO 6000, where the L2 window covers 80% of the state (20% at the old
+    # 385,024). Run ids started at 385,024 must still be resumed with
+    # WORKERS=385024; modal_app refuses a mismatched checkpoint.
+    WORKERS=${WORKERS:-96256}
     WALKS=${WALKS:-$((WORKERS * BATCH))}
     DPW=${DPW:-32}
     LOADMAX=${LOADMAX:-2000000}

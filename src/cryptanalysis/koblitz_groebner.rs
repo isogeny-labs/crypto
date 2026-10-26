@@ -4362,7 +4362,7 @@ pub fn first_fall_degree(
 /// A refutation or full pinning is sufficient to decide this diagnostic.
 /// Multi-solution SAT ideals may already have a complete Gröbner basis
 /// while remaining unresolved by this test.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct SolvingProfile {
     /// Degree the matrix was built at.
     pub degree: u32,
@@ -4613,6 +4613,23 @@ pub fn solving_profile_sparse(
         eliminate_high_columns(rows, n_cols, low_start)
     };
 
+    Some(finish_sparse_profile(
+        polys, degree, &cols, n_rows, low_start, elim,
+    ))
+}
+
+/// Durable checkpoints for the all-sparse bounded Macaulay diagnostic.
+pub mod checkpoint;
+
+fn finish_sparse_profile(
+    polys: &[F2BoolPoly],
+    degree: u32,
+    cols: &[u64],
+    n_rows: usize,
+    low_start: usize,
+    elim: crate::cryptanalysis::sparse_macaulay::SparseElimination,
+) -> SolvingProfile {
+    let n_cols = cols.len();
     // The surviving linear consequences span `cols[low_start..]` only.
     // Echelon form is not enough to read off a pinned variable — `{v+w,
     // w}` must reduce to `{v, w}` first — so reduce this block densely.
@@ -4663,7 +4680,7 @@ pub fn solving_profile_sparse(
         }
     }
 
-    Some(SolvingProfile {
+    SolvingProfile {
         degree,
         rows: n_rows,
         cols: n_cols,
@@ -4671,7 +4688,7 @@ pub fn solving_profile_sparse(
         vars_determined: (determined & occurring).count_ones() as usize,
         vars_occurring: occurring.count_ones() as usize,
         refuted,
-    })
+    }
 }
 
 /// Legacy name for the first **bounded-Macaulay resolution degree**:
@@ -8095,6 +8112,148 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// The systems the word-XOR determinism probe solves: 24 random small
+    /// Boolean systems, fixed by a seed so every process builds the same ones.
+    fn inherited_f4_word_xor_probe_systems() -> Vec<(Vec<F2BoolPoly>, usize)> {
+        let mut seed = 0x5eed_f4f4_0123_4567u64;
+        let mut next = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        let mut systems = Vec::new();
+        for trial in 0..24 {
+            let n_vars = 7 + (trial % 4);
+            let system: Vec<F2BoolPoly> = (0..5 + trial % 3)
+                .map(|k| {
+                    let deg = if k % 3 == 2 { 1 } else { 2 };
+                    let monos = (0..3 + (next() % 6) as usize)
+                        .map(|_| {
+                            let d = (next() % (deg + 1)) as u32;
+                            let mut mask = 0u64;
+                            for _ in 0..d {
+                                mask |= 1u64 << (next() % n_vars as u64);
+                            }
+                            F2BoolMono::from_mask(mask)
+                        })
+                        .collect();
+                    F2BoolPoly::from_monos(monos, n_vars)
+                })
+                .filter(|p| !p.is_zero())
+                .collect();
+            systems.push((system, n_vars));
+        }
+        systems
+    }
+
+    /// One configuration of the word-XOR determinism probe.  It runs in its
+    /// own process (see the test below) because the hash salt is a
+    /// process-wide setting: set in a shared test process it would change
+    /// the hash iteration order every concurrently running test sees.
+    /// `KIC_TEST_THREADS` is the rayon pool size and `KIC_TEST_SALT` the
+    /// hasher salt; one `XORS <word_ops> <roots>` line per system is printed.
+    #[test]
+    #[ignore = "driven by inherited_f4_word_xors_ignore_thread_count_and_hash_salt"]
+    fn inherited_f4_word_xors_probe() {
+        use std::sync::atomic::Ordering::Relaxed;
+        let threads: usize = std::env::var("KIC_TEST_THREADS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(1);
+        let salt: u64 = std::env::var("KIC_TEST_SALT")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(0);
+        crate::cryptanalysis::fx_hash::TEST_SALT.store(salt, Relaxed);
+        let systems = inherited_f4_word_xor_probe_systems();
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .unwrap();
+        let rows: Vec<(u64, usize)> = pool.install(|| {
+            systems
+                .iter()
+                .map(|(system, n_vars)| {
+                    let opts = SolveOptions {
+                        max_solutions: 1 << 12,
+                        engine: SolverEngine::InheritedF4 { max_degree: 3 },
+                        ..SolveOptions::default()
+                    };
+                    let before = f4_word_ops_thread();
+                    let (roots, _) = solve_boolean_system(system, *n_vars, &opts);
+                    (f4_word_ops_thread() - before, roots.len())
+                })
+                .collect()
+        });
+        for (ops, roots) in rows {
+            println!("XORS {ops} {roots}");
+        }
+    }
+
+    /// The counted word XORs of inherited F4 do not depend on the rayon
+    /// pool size the caller runs in, nor on the hash layout of the engine's
+    /// maps (two salts of the monomial hashers).  Replay-all of
+    /// `research/ecbench_frontier_20261013` found the counter unreproducible
+    /// across hosts; this pins the two within-host sources it could have been.
+    /// Each configuration runs `inherited_f4_word_xors_probe` in a child
+    /// process so the process-wide salt never leaks into other tests.
+    #[test]
+    fn inherited_f4_word_xors_ignore_thread_count_and_hash_salt() {
+        let run = |threads: usize, salt: u64| -> Vec<(u64, usize)> {
+            let out = std::process::Command::new(std::env::current_exe().unwrap())
+                .args([
+                    "--exact",
+                    "--ignored",
+                    "--test-threads=1",
+                    "--nocapture",
+                    "cryptanalysis::koblitz_groebner::tests::inherited_f4_word_xors_probe",
+                ])
+                .env("KIC_TEST_THREADS", threads.to_string())
+                .env("KIC_TEST_SALT", salt.to_string())
+                .output()
+                .expect("spawn the probe");
+            assert!(
+                out.status.success(),
+                "probe threads={threads} salt={salt:#x} failed:\n{}",
+                String::from_utf8_lossy(&out.stderr)
+            );
+            let rows: Vec<(u64, usize)> = String::from_utf8_lossy(&out.stdout)
+                .lines()
+                // Under --nocapture libtest prints "test … ... " without a
+                // newline before the test's own output, so the marker can
+                // sit mid-line.
+                .filter_map(|l| l.split("XORS ").nth(1))
+                .map(|l| {
+                    let mut it = l.split_whitespace();
+                    (
+                        it.next().unwrap().parse().unwrap(),
+                        it.next().unwrap().parse().unwrap(),
+                    )
+                })
+                .collect();
+            assert_eq!(
+                rows.len(),
+                24,
+                "probe threads={threads} salt={salt:#x}: rows"
+            );
+            rows
+        };
+        let base = run(1, 0);
+        assert!(base.iter().any(|&(ops, _)| ops > 0), "counter never moved");
+        assert_eq!(base, run(4, 0), "thread count changed the counters");
+        assert_eq!(
+            base,
+            run(1, 0x9e37_79b9_7f4a_7c15),
+            "hash salt changed the counters"
+        );
+        assert_eq!(
+            base,
+            run(4, 0x1234_5678_9abc_def1),
+            "threads+salt changed the counters"
+        );
     }
 
     /// Linear elimination changes the tree, never the roots: on random

@@ -61,7 +61,28 @@ PALETTE = {
     "relation": "#b07aa1",
     "dlp": "#ff9da7",
     ECBENCH_AREA: "#9c755f",
+    "ic_factor_base": "#6b6ecf",
 }
+# Factor-base symmetry classes (docs/ecbench/FACTOR_BASE_PROTOCOL.md): which
+# automorphism the base is closed under and the oracle folds by.  Colours are
+# fixed per class so every chart reads the same.
+SYMMETRY_COLORS = {
+    "none": "#9a9a9a",
+    "negation": "#e15759",
+    "signed Frobenius": "#4e79a7",
+    "GLV (order 6)": "#59a14f",
+}
+# A kernel is flagged when its Ir rises more than REGRESSION_THRESHOLD above
+# the highest value it showed over the previous REGRESSION_WINDOW snapshots
+# with the same fingerprint (and symmetrically for improvements against the
+# lowest).  Several kernels flip between two codegen levels from build to
+# build (ct_scalar_mul_* by about 7 %); comparing against the recent range
+# instead of the last value ignores that flapping.  Replayed over the 74
+# steps recorded by 2026-10-17 this fires on 3 steps, against 38 for a plain
+# 5 % step threshold.
+REGRESSION_THRESHOLD = 0.08
+REGRESSION_WINDOW = 5
+SUPERSCRIPT = str.maketrans("-0123456789", "⁻⁰¹²³⁴⁵⁶⁷⁸⁹")
 
 
 # ----------------------------------------------------------------------------
@@ -167,6 +188,32 @@ def child_fingerprint(out: dict) -> str:
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
 
 
+def child_facts(child: dict, report: dict) -> dict:
+    """What a chart needs to say about a child beyond its Ir: the curve it
+    ran on, the counted group operations, and for index calculus the factor
+    base as the run actually built it (size, symmetry class, identity)."""
+    facts: dict = {}
+    if child.get("curve_label"):
+        facts["curve_label"] = child["curve_label"]
+    ops = 0
+    for ph in report.get("phases", []):
+        ops += int(ph.get("adds", 0) or 0) + int(ph.get("doubles", 0) or 0)
+    facts["group_ops"] = ops
+    declared = child.get("factor_base")
+    if declared:
+        fb = report.get("factor_base") or {}
+        facts["factor_base"] = {
+            "spec": declared["spec"],
+            "symmetry": declared["symmetry"],
+            "family": fb.get("family"),
+            "columns": fb.get("columns"),
+            "signed_points": fb.get("signed_points"),
+            "abscissae": fb.get("abscissae"),
+            "fb_id": fb.get("fb_id"),
+        }
+    return facts
+
+
 def measure_ecbench(ecbench: str, children_path: Path, wall_samples: int, with_wall: bool, log) -> list[dict]:
     doc = json.loads(children_path.read_text())
     rows = []
@@ -180,13 +227,14 @@ def measure_ecbench(ecbench: str, children_path: Path, wall_samples: int, with_w
                 raise RuntimeError(f"{child['id']}: recovered {rec}, expected {child['expected_recovered']}")
             row = {
                 "id": child["id"],
-                "area": ECBENCH_AREA,
+                "area": child.get("area", ECBENCH_AREA),
                 "tier": "Quick",
                 "fingerprint": child_fingerprint(out),
                 "ir": ir["solve_ir"],
                 "prework_ir": ir["prework_ir"],
                 "wall_ns": None,
             }
+            row.update(child_facts(child, out["report"]))
             if with_wall:
                 times = []
                 for _ in range(max(1, wall_samples)):
@@ -385,7 +433,8 @@ def svg_chart(snaps: list[dict], ch: dict, title: str) -> str:
     # x labels
     step = max(1, math.ceil(n / 8))
     for i, s in enumerate(snaps):
-        if i % step == 0 or i == n - 1:
+        # the last snapshot is always labelled; a regular label too close to it is dropped
+        if i == n - 1 or (i % step == 0 and n - 1 - i >= 0.8 * step):
             x = X(i)
             out.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="{mt + ph}" y2="{mt + ph + 5}" stroke="#555"/>')
             date = s["committed_at"][:10]
@@ -415,6 +464,284 @@ def svg_chart(snaps: list[dict], ch: dict, title: str) -> str:
     return "\n".join(out) + "\n"
 
 
+def _esc(t: str) -> str:
+    return str(t).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def _area_color(area: str) -> str:
+    return PALETTE.get(area, "#333333")
+
+
+def step_changes(snaps: list[dict], threshold: float, window: int = REGRESSION_WINDOW) -> dict:
+    """The latest snapshot against the recent past: kernels whose Ir rose
+    above the highest value of their last `window` same-fingerprint
+    snapshots by more than `threshold` (regressions), fell below the lowest
+    (improvements), or now compute something else (re-based).  `before` is
+    that recent maximum (minimum for improvements), `previous` the last value."""
+    out = {"base": None, "head": snaps[-1] if snaps else None, "regressions": [],
+           "improvements": [], "rebased": [], "new": [], "threshold": threshold, "window": window}
+    if len(snaps) < 2:
+        return out
+    cur = snaps[-1]
+    out["base"] = snaps[-2]
+    past = [{k["id"]: k for k in s_["kernels"]} for s_ in snaps[-1 - window:-1]][::-1]
+    for k in cur["kernels"]:
+        q = past[0].get(k["id"])
+        if q is None:
+            out["new"].append(k["id"])
+            continue
+        if q["fingerprint"] != k["fingerprint"]:
+            out["rebased"].append(k["id"])
+            continue
+        hist = []
+        for snap in past:
+            h = snap.get(k["id"])
+            if h is None or h["fingerprint"] != k["fingerprint"] or not h.get("ir"):
+                break
+            hist.append(h["ir"])
+        if not hist or not k.get("ir"):
+            continue
+        hi, lo = max(hist), min(hist)
+        if k["ir"] > (1 + threshold) * hi:
+            out["regressions"].append({"id": k["id"], "area": k["area"], "before": hi, "previous": hist[0],
+                                       "after": k["ir"], "ratio": k["ir"] / hi})
+        elif k["ir"] * (1 + threshold) < lo:
+            out["improvements"].append({"id": k["id"], "area": k["area"], "before": lo, "previous": hist[0],
+                                        "after": k["ir"], "ratio": k["ir"] / lo})
+    out["regressions"].sort(key=lambda r: -r["ratio"])
+    out["improvements"].sort(key=lambda r: r["ratio"])
+    return out
+
+
+def regressions_md(sc: dict, history_url: str | None) -> str:
+    head, base = sc["head"], sc["base"]
+    if base is None:
+        return "Only one snapshot: nothing to compare yet.\n"
+    L = [f"### Performance history: `{base['rev_short'][:8]}` → `{head['rev_short'][:8]}`\n",
+         f"Callgrind instruction counts (`Ir`) of each perfbench kernel and ecbench child against its range over "
+         f"the previous {sc['window']} snapshots on `main` with the same fingerprint. Flagged when it leaves that "
+         f"range by more than {sc['threshold'] * 100:.0f} % (kernels that flip between two build levels stay quiet). "
+         "This is a signal to look, never a failing check.\n"]
+    if sc["regressions"]:
+        L.append(f"**{len(sc['regressions'])} kernel(s) got more expensive:**\n")
+        L.append("| kernel | area | recent max Ir | this commit Ir | change |")
+        L.append("|---|---|---:|---:|---:|")
+        for r in sc["regressions"]:
+            L.append(f"| `{r['id']}` | {r['area']} | {r['before']:,} | {r['after']:,} | **+{(r['ratio'] - 1) * 100:.1f} %** |")
+        L.append("")
+    else:
+        L.append("No kernel got more expensive.\n")
+    if sc["improvements"]:
+        L.append(f"{len(sc['improvements'])} kernel(s) got cheaper: " + ", ".join(
+            f"`{r['id']}` {(r['ratio'] - 1) * 100:+.1f} %" for r in sc["improvements"][:8])
+            + (" …" if len(sc["improvements"]) > 8 else "") + "\n")
+    if sc["rebased"]:
+        L.append("Re-based (computes something else now, not a speed comparison): "
+                 + ", ".join(f"`{k}`" for k in sc["rebased"]) + "\n")
+    if history_url:
+        L.append(f"Charts and every kernel: {history_url}\n")
+    return "\n".join(L)
+
+
+def cmd_regressions(a: argparse.Namespace) -> None:
+    snaps = load_history(Path(a.history))
+    if not snaps:
+        raise SystemExit(f"no snapshots in {a.history}")
+    sc = step_changes(snaps, a.threshold)
+    md = regressions_md(sc, a.history_url)
+    if a.md:
+        Path(a.md).write_text(md)
+    if a.json:
+        Path(a.json).write_text(json.dumps({k: v for k, v in sc.items() if k not in ("head", "base")}
+                                           | {"head": sc["head"]["rev"] if sc["head"] else None,
+                                              "base": sc["base"]["rev"] if sc["base"] else None}, indent=1) + "\n")
+    if a.annotate:
+        for r in sc["regressions"]:
+            print(f"::warning title=perf regression::{r['id']} +{(r['ratio'] - 1) * 100:.1f} % Ir "
+                  f"({r['before']:,} -> {r['after']:,})")
+    print(md)
+
+
+def svg_panels(snaps: list[dict], ch: dict, threshold: float = REGRESSION_THRESHOLD) -> str:
+    """Small multiples: one panel per area, one thin line per kernel's chained
+    index, the area index drawn thick.  A kernel whose latest step got more
+    expensive than the threshold is ringed in red, so regressions are visible
+    without reading a table."""
+    n = len(snaps)
+    sc = step_changes(snaps, threshold)
+    regressed = {r["id"] for r in sc["regressions"]}
+    areas = ch["areas"]
+    cols = 3
+    pw, ph, gap = 300, 170, 24
+    ml, mt = 16, 56
+    rows = math.ceil(len(areas) / cols)
+    W = ml * 2 + cols * pw + (cols - 1) * gap
+    H = mt + rows * (ph + gap) + 20
+    vals = [math.log2(h["index"]) for kid in ch["ids"] for h in ch["per"][kid] if h["index"] > 0]
+    lo, hi = (min(vals + [0.0]), max(vals + [0.0])) if vals else (0.0, 0.0)
+    pad = max(0.15, (hi - lo) * 0.06)
+    lo, hi = lo - pad, hi + pad
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
+           'font-family="ui-sans-serif, system-ui, sans-serif" font-size="11">',
+           f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
+           f'<text x="{ml}" y="22" font-size="15" font-weight="600" fill="#111">Every kernel, by area</text>',
+           f'<text x="{ml}" y="40" fill="#555">chained Ir index over {n} snapshots (shared log scale, above the dashed '
+           'line = fewer instructions). Thick line: the area index. Red ring: latest step more than '
+           f'{threshold * 100:.0f} % more expensive.</text>']
+    for i, area in enumerate(areas):
+        r, c = divmod(i, cols)
+        x0 = ml + c * (pw + gap)
+        y0 = mt + r * (ph + gap)
+        ix0, iy0, iw, ih = x0 + 34, y0 + 22, pw - 44, ph - 40
+
+        def X(t):
+            return ix0 + (iw * t / (n - 1) if n > 1 else iw / 2)
+
+        def Y(v):
+            return iy0 + ih * (1 - (math.log2(v) - lo) / (hi - lo))
+
+        color = _area_color(area)
+        kids = sorted(k for k, a in ch["ids"].items() if a == area)
+        out.append(f'<rect x="{x0}" y="{y0}" width="{pw}" height="{ph}" fill="#fafafa" stroke="#e3e3e3"/>')
+        out.append(f'<text x="{x0 + 8}" y="{y0 + 15}" font-weight="600" fill="#111">{_esc(area)}</text>')
+        out.append(f'<text x="{x0 + pw - 8}" y="{y0 + 15}" text-anchor="end" fill="#333">'
+                   f'{fmt_x(ch["area_index"][area][-1])} · {len(kids)} kernels</text>')
+        for k in range(math.floor(lo), math.ceil(hi) + 1):
+            y = iy0 + ih * (1 - (k - lo) / (hi - lo))
+            if iy0 <= y <= iy0 + ih:
+                out.append(f'<line x1="{ix0}" x2="{ix0 + iw}" y1="{y:.1f}" y2="{y:.1f}" stroke="#ececec"/>')
+                lab = f"{2 ** k:g}×" if k >= 0 else f"1/{2 ** (-k):g}"
+                out.append(f'<text x="{ix0 - 4}" y="{y + 3:.1f}" text-anchor="end" fill="#888" font-size="9">{lab}</text>')
+        out.append(f'<line x1="{ix0}" x2="{ix0 + iw}" y1="{Y(1.0):.1f}" y2="{Y(1.0):.1f}" stroke="#aaa" stroke-dasharray="3 3"/>')
+        for kid in kids:
+            pts = [(X(t), Y(h["index"])) for t, h in enumerate(ch["per"][kid])]
+            if n > 1:
+                out.append('<polyline points="' + " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+                           + f'" fill="none" stroke="{color}" stroke-opacity="0.35" stroke-width="1"><title>{_esc(kid)}</title></polyline>')
+            if kid in regressed:
+                x, y = pts[-1]
+                out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="none" stroke="#d62728" stroke-width="2">'
+                           f'<title>{_esc(kid)} regressed</title></circle>')
+        apts = " ".join(f"{X(t):.1f},{Y(v):.1f}" for t, v in enumerate(ch["area_index"][area]))
+        if n > 1:
+            out.append(f'<polyline points="{apts}" fill="none" stroke="{color}" stroke-width="2.6"/>')
+        out.append(f'<text x="{ix0}" y="{y0 + ph - 5}" fill="#888" font-size="9">{snaps[0]["committed_at"][:10]}</text>')
+        out.append(f'<text x="{ix0 + iw}" y="{y0 + ph - 5}" text-anchor="end" fill="#888" font-size="9">{snaps[-1]["committed_at"][:10]}</text>')
+    out.append("</svg>")
+    return "\n".join(out) + "\n"
+
+
+def factor_base_rows(snap: dict) -> list[dict]:
+    """The latest snapshot's ecbench children that name a curve: index-calculus
+    runs with their factor base, and the matched rho reference on that curve."""
+    return [k for k in snap["kernels"] if k.get("curve_label")]
+
+
+def svg_factor_bases(snaps: list[dict], ch: dict) -> str:
+    """One row per index-calculus run, grouped by curve: a bar of its solve Ir
+    (log scale) coloured by the factor base's symmetry class, labelled with the
+    factor base and its size, next to the matched rho reference on the same
+    curve (grey) and the run's index since it was first tracked."""
+    rows = factor_base_rows(snaps[-1])
+    if not rows:
+        return ""
+    curves: dict[str, list[dict]] = {}
+    for k in rows:
+        curves.setdefault(k["curve_label"], []).append(k)
+    for v in curves.values():
+        v.sort(key=lambda k: (k.get("factor_base") is not None, k.get("ir") or 0))
+    irs = [k["ir"] for k in rows if k.get("ir")]
+    lo, hi = math.log10(min(irs)) - 0.3, math.log10(max(irs)) + 0.15
+    bar_h, gap, head = 22, 6, 30
+    ml, label_w, chart_w, right_w = 16, 300, 420, 150
+    total_rows = sum(len(v) for v in curves.values())
+    H = 96 + total_rows * (bar_h + gap) + len(curves) * head + 40
+    W = ml * 2 + label_w + chart_w + right_w
+    x0 = ml + label_w
+
+    def X(v):
+        return x0 + chart_w * (math.log10(v) - lo) / (hi - lo)
+
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
+           'font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">',
+           f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
+           f'<text x="{ml}" y="22" font-size="15" font-weight="600" fill="#111">Factor bases: solve cost by size and symmetry</text>',
+           f'<text x="{ml}" y="40" fill="#555">callgrind Ir of one frozen solve (log scale, shorter is cheaper), snapshot '
+           f'{snaps[-1]["rev_short"][:8]} · grey = matched rho on the same curve · right: index since first tracked</text>']
+    lx = ml
+    for sym, colr in SYMMETRY_COLORS.items():
+        out.append(f'<rect x="{lx}" y="52" width="12" height="12" fill="{colr}"/>')
+        out.append(f'<text x="{lx + 17}" y="62" fill="#333">{_esc(sym)}</text>')
+        lx += 30 + 7 * len(sym)
+    out.append(f'<rect x="{lx}" y="52" width="12" height="12" fill="#d9d9d9" stroke="#999" stroke-dasharray="2 2"/>')
+    out.append(f'<text x="{lx + 17}" y="62" fill="#333">rho reference</text>')
+    y = 84
+    for k in range(math.ceil(lo), math.floor(hi) + 1):
+        x = X(10 ** k)
+        out.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="{y - 4}" y2="{H - 30}" stroke="#eeeeee"/>')
+        out.append(f'<text x="{x:.1f}" y="{H - 14}" text-anchor="middle" fill="#888" font-size="10">10{str(k).translate(SUPERSCRIPT)}</text>')
+    for curve, ks in curves.items():
+        out.append(f'<text x="{ml}" y="{y + 16}" font-weight="600" fill="#111">{_esc(curve)}</text>')
+        y += head
+        for k in ks:
+            fb = k.get("factor_base")
+            if fb:
+                colr = SYMMETRY_COLORS.get(fb["symmetry"], "#333")
+                size = []
+                if fb.get("columns") is not None:
+                    size.append(f"{fb['columns']} columns")
+                if fb.get("signed_points") is not None:
+                    size.append(f"{fb['signed_points']} signed points")
+                label = f"{fb['spec']}"
+                sub = " · ".join(size)
+                out.append(f'<rect x="{x0}" y="{y}" width="{max(2.0, X(k["ir"]) - x0):.1f}" height="{bar_h}" fill="{colr}">'
+                           f'<title>{_esc(k["id"])}: {k["ir"]:,} Ir, {k.get("group_ops", 0):,} group ops</title></rect>')
+            else:
+                label, sub = k["id"].split("/")[-1], "rho reference"
+                out.append(f'<rect x="{x0}" y="{y}" width="{max(2.0, X(k["ir"]) - x0):.1f}" height="{bar_h}" fill="#d9d9d9" '
+                           f'stroke="#999" stroke-dasharray="3 2"><title>{_esc(k["id"])}: {k["ir"]:,} Ir</title></rect>')
+            out.append(f'<text x="{x0 - 8}" y="{y + 10}" text-anchor="end" fill="#111">{_esc(label)}</text>')
+            out.append(f'<text x="{x0 - 8}" y="{y + 21}" text-anchor="end" fill="#777" font-size="10">{_esc(sub)}</text>')
+            out.append(f'<text x="{X(k["ir"]) + 6:.1f}" y="{y + 15}" fill="#333" font-size="11">{k["ir"]:,}</text>')
+            idx = ch["per"].get(k["id"], [{}])[-1].get("index", 1.0)
+            out.append(f'<text x="{W - ml}" y="{y + 15}" text-anchor="end" fill="#333">{fmt_x(idx)}</text>')
+            y += bar_h + gap
+        y += 6
+    out.append("</svg>")
+    return "\n".join(out) + "\n"
+
+
+def factor_base_md(snaps: list[dict], ch: dict, svg_rel: str | None) -> list[str]:
+    rows = factor_base_rows(snaps[-1])
+    if not rows:
+        return []
+    L = ["## Factor bases\n",
+         "Frozen index-calculus solves (`ecbench exec`, area `ic_factor_base`, weight 0 so they never move the "
+         "overall index) with the factor base each one built, its size and the symmetry it is closed under, next "
+         "to the matched rho reference on the same curve. Symmetry classes follow "
+         "`docs/ecbench/FACTOR_BASE_PROTOCOL.md`: a base folded by signed Frobenius or by the GLV automorphism "
+         "needs fewer columns for the same coverage.\n"]
+    if svg_rel:
+        L.append(f"![factor bases]({svg_rel})\n")
+    L.append("| curve | run | factor base | symmetry | columns | signed points | solve Ir | group ops | × rho Ir | index |")
+    L.append("|---|---|---|---|---:|---:|---:|---:|---:|---:|")
+    by_curve: dict[str, list[dict]] = {}
+    for k in rows:
+        by_curve.setdefault(k["curve_label"], []).append(k)
+    for curve, ks in by_curve.items():
+        rho = next((k for k in ks if not k.get("factor_base")), None)
+        for k in sorted(ks, key=lambda k: (k.get("factor_base") is not None, k["ir"])):
+            fb = k.get("factor_base") or {}
+            ratio = f"{k['ir'] / rho['ir']:.1f}×" if rho and fb else ("1×" if not fb else "")
+            idx = ch["per"].get(k["id"], [{}])[-1].get("index", 1.0)
+            L.append(f"| {curve} | `{k['id'].split('/')[-1]}` | {('`' + fb['spec'] + '`') if fb else 'rho'} | "
+                     f"{fb.get('symmetry', '—')} | {fb.get('columns') if fb.get('columns') is not None else '—'} | "
+                     f"{fb.get('signed_points') if fb.get('signed_points') is not None else '—'} | {k['ir']:,} | "
+                     f"{k.get('group_ops', 0):,} | {ratio} | {fmt_x(idx)} |")
+    L.append("")
+    return L
+
+
 def pct(a, b):
     """b relative to a, as a signed percentage of change in Ir (negative = fewer instructions)."""
     if not a or not b:
@@ -422,7 +749,8 @@ def pct(a, b):
     return (b / a - 1.0) * 100.0
 
 
-def render_md(snaps: list[dict], ch: dict, svg_rel: str | None) -> str:
+def render_md(snaps: list[dict], ch: dict, svg_rel: str | None, panels_rel: str | None = None,
+              fb_rel: str | None = None) -> str:
     n = len(snaps)
     last = snaps[-1]
     L = []
@@ -447,6 +775,18 @@ def render_md(snaps: list[dict], ch: dict, svg_rel: str | None) -> str:
     if last.get("note"):
         L.append(f"**Note on the latest snapshot:** {last['note']}  ")
     L.append("")
+    sc = step_changes(snaps, REGRESSION_THRESHOLD)
+    if sc["base"] is not None:
+        if sc["regressions"]:
+            L.append(f"> **{len(sc['regressions'])} kernel(s) got more than {REGRESSION_THRESHOLD * 100:.0f} % more expensive "
+                     f"in the latest step:** " + ", ".join(f"`{r['id']}` +{(r['ratio'] - 1) * 100:.1f} %"
+                                                       for r in sc["regressions"][:6])
+                     + (" …" if len(sc["regressions"]) > 6 else "") + "\n")
+        else:
+            L.append(f"> No kernel got more than {REGRESSION_THRESHOLD * 100:.0f} % more expensive in the latest step.\n")
+    if panels_rel:
+        L.append(f"![every kernel by area]({panels_rel})\n")
+    L += factor_base_md(snaps, ch, fb_rel)
     # areas
     L.append("## Areas\n")
     L.append("| area | kernels | index since first | step from previous |")
@@ -540,6 +880,8 @@ def render_json(snaps: list[dict], ch: dict) -> dict:
         "kernels": {kid: {"area": ch["ids"][kid],
                           "latest_ir": ch["per"][kid][-1]["ir"],
                           "latest_wall_ns": ch["per"][kid][-1]["wall_ns"],
+                          "factor_base": next((k.get("factor_base") for k in snaps[-1]["kernels"]
+                                               if k["id"] == kid and k.get("factor_base")), None),
                           "index": ch["per"][kid][-1]["index"],
                           "series_ir": [h["ir"] for h in ch["per"][kid]],
                           "rebased_at": [snaps[t]["rev"] for t, h in enumerate(ch["per"][kid]) if h["rebased"]]}
@@ -557,8 +899,19 @@ def cmd_render(a: argparse.Namespace) -> None:
     svg_rel = None
     if a.svg and a.md:
         svg_rel = os.path.relpath(a.svg, Path(a.md).parent)
+    panels_rel = fb_rel = None
+    if a.panels_svg:
+        Path(a.panels_svg).write_text(svg_panels(snaps, ch))
+        if a.md:
+            panels_rel = os.path.relpath(a.panels_svg, Path(a.md).parent)
+    if a.factor_base_svg:
+        fb_svg = svg_factor_bases(snaps, ch)
+        if fb_svg:
+            Path(a.factor_base_svg).write_text(fb_svg)
+            if a.md:
+                fb_rel = os.path.relpath(a.factor_base_svg, Path(a.md).parent)
     if a.md:
-        Path(a.md).write_text(render_md(snaps, ch, svg_rel))
+        Path(a.md).write_text(render_md(snaps, ch, svg_rel, panels_rel, fb_rel))
     if a.json:
         Path(a.json).write_text(json.dumps(render_json(snaps, ch), indent=1) + "\n")
     print(f"{len(snaps)} snapshots; overall index {fmt_x(ch['overall'][-1])}; "
@@ -655,7 +1008,18 @@ def main() -> None:
     d.add_argument("--svg")
     d.add_argument("--json")
     d.add_argument("--weights")
+    d.add_argument("--panels-svg", help="small multiples: one panel per area, one line per kernel")
+    d.add_argument("--factor-base-svg", help="index-calculus solves by factor base, size and symmetry")
     d.set_defaults(func=cmd_render)
+
+    g = sub.add_parser("regressions", help="surface Ir changes between the last two snapshots (never fails)")
+    g.add_argument("--history", required=True)
+    g.add_argument("--threshold", type=float, default=REGRESSION_THRESHOLD)
+    g.add_argument("--md")
+    g.add_argument("--json")
+    g.add_argument("--history-url")
+    g.add_argument("--annotate", action="store_true", help="print GitHub ::warning annotations")
+    g.set_defaults(func=cmd_regressions)
 
     c = sub.add_parser("check", help="compare the working tree's Ir against the latest snapshot")
     c.add_argument("--binary", required=True)

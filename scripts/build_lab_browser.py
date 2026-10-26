@@ -42,6 +42,9 @@ COVERS = "docs/curves/covers.json"
 COVER_LINKS = "docs/curves/cover-links.yaml"
 STANDARDS_COVERAGE = "docs/curves/standards/coverage.json"
 LEADERBOARD = "docs/ic/leaderboard.json"
+STORE_INDEX = "store/index.json"
+STORE_CONFIG = "store/config.json"
+STORE_SCHEMA = "crypto.store-index/v1"
 TOURNAMENT_RUNS = "research/ic_candidate_tournament_20260915/runs"
 ECBENCH_SESSIONS_GLOBS = ("research/ecbench_*/sessions/*", "research/isogeny_conductor_gap_*/sessions/*", "research/fiber_ic_scaling_*/sessions/*", "research/full_volcano_graphwide_ic_*/execution/campaigns/*/sessions/*")
 IC1_SCAN_GLOBS = (
@@ -402,7 +405,7 @@ def ecbench_sessions(
     curves_by_slug: dict, source: RepositoryInputs
 ) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
     sessions, methods, fbs, yields = [], {}, {}, []
-    per_curve_arm = defaultdict(lambda: {"n": 0, "verified": 0, "s_sum": 0.0, "floor_sum": 0.0})
+    per_curve_arm = defaultdict(lambda: {"n": 0, "verified": 0, "s_sum": 0.0, "floor_sum": 0.0, "unpriced_zero_runs": 0})
     session_paths = {
         path
         for pattern in ECBENCH_SESSIONS_GLOBS
@@ -465,6 +468,10 @@ def ecbench_sessions(
                     agg["verified"] += 1
                     agg["s_sum"] += float(r["cost"]["s"])
                     agg["floor_sum"] += float(r["boundaries"]["floor_s"])
+                    # A zero charged lower bound with unpriced native work is
+                    # not a complete zero-cost solve or a sortable S=0 result.
+                    if r["cost"].get("unpriced") and r["cost"].get("total_gae") == 0:
+                        agg["unpriced_zero_runs"] += 1
         sessions.append(
             {
                 "session_id": s["session_id"],
@@ -492,8 +499,9 @@ def ecbench_sessions(
                     "method_id": agg["method_id"],
                     "runs": agg["n"],
                     "verified": agg["verified"],
-                    "mean_s": round(agg["s_sum"] / agg["verified"], 4) if agg["verified"] else None,
-                    "mean_ratio_to_floor": round(agg["s_sum"] / agg["floor_sum"], 3) if agg["floor_sum"] else None,
+                    "mean_s": round(agg["s_sum"] / agg["verified"], 4) if agg["verified"] and not agg["unpriced_zero_runs"] else None,
+                    "mean_ratio_to_floor": round(agg["s_sum"] / agg["floor_sum"], 3) if agg["floor_sum"] and not agg["unpriced_zero_runs"] else None,
+                    **({"unpriced_zero_runs": agg["unpriced_zero_runs"], "score_status": "unknown complete price; zero charged lower bound"} if agg["unpriced_zero_runs"] else {}),
                 }
             )
     for f in fbs.values():
@@ -534,6 +542,8 @@ def yield_row(r: dict, session_id: str) -> dict:
     workload = r["workload"]
     curve = workload.get("curve") or {}
     phase_gae = {p["name"]: p.get("gae") for p in r.get("phases", [])}
+    cost = r.get("cost") or {}
+    uninformative_zero = bool(cost.get("unpriced")) and cost.get("total_gae") == 0
     return {
         "run_id": r["run_id"],
         "record_id": r["record_id"],
@@ -569,8 +579,9 @@ def yield_row(r: dict, session_id: str) -> dict:
         "matrix_rank": la.get("rank"),
         "row_ops": la.get("row_ops"),
         "gae": {k: phase_gae.get(k) for k in ("factor_base", "oracle_setup", "relations", "linear_algebra", "verify")},
-        "total_gae": (r.get("cost") or {}).get("total_gae"),
-        "s": (r.get("cost") or {}).get("s"),
+        "total_gae": None if uninformative_zero else cost.get("total_gae"),
+        "s": None if uninformative_zero else cost.get("s"),
+        **({"charged_gae_lower_bound": 0, "charged_s_lower_bound": 0, "score_status": "unknown complete price; zero charged lower bound", "unpriced": cost["unpriced"]} if uninformative_zero else {}),
         "deterministic": (r.get("cost") or {}).get("deterministic"),
         "solver": r.get("solver"),
     }
@@ -703,6 +714,46 @@ def attach_covers(
         curve["hyperelliptic_cover"] = finding
 
 
+def store_objects(curves_by_slug: dict, fb_ids: set, source: RepositoryInputs) -> dict:
+    """The large files the repository keeps in its content-addressed store.
+
+    Quoted from the committed index (`store/index.json`); the bytes live in
+    the remote under their SHA-256 and are fetched on demand (`ecbench store
+    pull`).  The curve and factor-base links come from the entry's name, the
+    same rule the ecbench database uses (`factor-bases/<curve>/<FB1h id>.json`),
+    and are kept only where the id resolves to a row of this index.
+    """
+    index = load(STORE_INDEX, source)
+    if index.get("schema") != STORE_SCHEMA:
+        raise ValueError(f"{STORE_INDEX}: schema {index.get('schema')!r}, expected {STORE_SCHEMA!r}")
+    objects = []
+    for name, e in sorted(index["entries"].items()):
+        parts = name.split("/")
+        curve = fb = None
+        if parts[0] == "factor-bases" and len(parts) >= 3:
+            curve = parts[1]
+            stem = parts[-1].rsplit(".", 1)[0]
+            if stem.startswith("FB1h"):
+                fb = stem
+        objects.append(
+            {
+                "name": name,
+                "kind": parts[0],
+                "sha256": e["sha256"],
+                "bytes": e["bytes"],
+                "description": e.get("description") or None,
+                "tags": e.get("tags", []),
+                "provenance": e.get("provenance") or None,
+                "superseded": e.get("superseded", []),
+                "recorded_curve": curve,
+                "curve": curve if curve in curves_by_slug else None,
+                "fb_id": fb if fb in fb_ids else None,
+                "recorded_fb_id": fb,
+            }
+        )
+    return {"remote": load(STORE_CONFIG, source).get("remote"), "objects": objects}
+
+
 def build() -> dict:
     source = RepositoryInputs(ROOT)
     registry = load(REGISTRY, source)
@@ -727,6 +778,9 @@ def build() -> dict:
         curve["standards_provenance"] = node.get("standards_provenance") or []
     by_slug = {c["slug"]: c for c in curves}
     sessions, methods, fbs, yields = ecbench_sessions(by_slug, source)
+    store = store_objects(by_slug, {f["fb_id"] for f in fbs}, source)
+    for c in curves:
+        c["store_objects"] = [o["name"] for o in store["objects"] if o["curve"] == c["slug"]]
     rounds = tournament_rounds(curves, source)
     candidates = candidate_identities(source)
     tag_to_slug = {}
@@ -741,6 +795,8 @@ def build() -> dict:
         COVER_LINKS: sha256_file(COVER_LINKS, source),
         STANDARDS_COVERAGE: sha256_file(STANDARDS_COVERAGE, source),
         LEADERBOARD: sha256_file(LEADERBOARD, source),
+        STORE_INDEX: sha256_file(STORE_INDEX, source),
+        STORE_CONFIG: sha256_file(STORE_CONFIG, source),
         **{
             os.path.join(s["dir"], "records.jsonl"): sha256_file(
                 os.path.join(s["dir"], "records.jsonl"), source
@@ -752,7 +808,7 @@ def build() -> dict:
         "schema_version": "lab-browser/1",
         "generated_by": "scripts/build_lab_browser.py",
         "what_this_is": "A searchable index of the curves, methods, factor bases, candidate identities, tournament rounds and ecbench sessions this repository names, joined on the identities it already computes (ICV1 slugs, EC1 aliases, ECM1 method ids, FB1 factor-base ids, IC1 candidate ids). Every figure is quoted from a committed file named in `sources` or in the row; nothing is computed here beyond means over a session's own verified runs.",
-        "counts": {"curves": len(curves), "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates), "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields)},
+        "counts": {"curves": len(curves), "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates), "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields), "store_objects": len(store["objects"])},
         "sources": sources,
         "vocabulary": VOCABULARY,
         "standards_coverage": load(STANDARDS_COVERAGE, source),
@@ -763,6 +819,7 @@ def build() -> dict:
         "rounds": rounds,
         "sessions": sessions,
         "yields": yields,
+        "store": store,
     }
 
 
