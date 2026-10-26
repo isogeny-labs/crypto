@@ -63,6 +63,8 @@ Two one-query arms used the same worker binary and source, 150,000-variable
 and 3,000,000-domain-clause limits, a 10,000-conflict cap, one CPU, 4 GiB
 memory, zero swap and a 300-second outer wall cap. Karatsuba ended at
 `UNKNOWN_wall_cap` after 301.1 seconds and emitted no final worker summary.
+Its progress log reached `RelationCollectionStarted`, then contains no
+completed SAT attempt. Thus the wall cap gives no conflict count for that arm.
 Schoolbook emitted `UNKNOWN_solver_cap` after 10,000 conflicts, with zero
 models, relations and rank increase, in 163.7 seconds of outer process time.
 Its outer status is `PRODUCER_FAILURE_worker_exit`: Docker returned exit 125
@@ -74,8 +76,9 @@ summary is retained as a diagnostic; it does not pass the outer receipt gate.
 These source-matched local runs establish preflight compatibility and an
 inconclusive bounded search comparison. The next operational step is to
 repair Docker's metadata store without disrupting other containers, then
-rerun a short matched pair with progress checkpoints so outer caps retain
-conflict counts. A Tier 1 paired one-target comparison is still required for
+rerun a short matched pair with a lower conflict cap. In-attempt SAT
+checkpoints would let a wall-capped arm retain its conflict count. A Tier 1
+paired one-target comparison is still required for
 factor-base ranking. The exact configs, outer receipts, build identity and
 worker summary are in
 [`verification/karatsuba-k64-guarded-20261026/`](verification/karatsuba-k64-guarded-20261026/).
