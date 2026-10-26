@@ -19,7 +19,7 @@ binary Jacobian (`hcdlp_bsgs` and `hcdlp_pollard_rho` only).
 The `transfer-audit` tool prices these candidates by formula and certifies what it can: the exact
 magic number and genus, MMT Lemma 6 condition (8), the Hasse-Weil capacity gate (the descent
 Jacobian must be large enough to hold `r`), and the class-wide set of achievable magic numbers. All
-three deployed binary curves audited there (sect113r1, K-163, B-163, ECC2K-130) have prime `n`, so
+four deployed binary curves audited there (sect113r1, K-163, B-163, ECC2K-130) have prime `n`, so
 their only tower is `F_2 <= F_(2^n)`, with genus `>= 2^28 - 1` (sect113r1) or the trace map killing
 `<G>` (Koblitz); the missing construction does not change those verdicts. It does leave every
 composite-degree binary curve unexecutable for `m >= 2`.
@@ -73,3 +73,9 @@ A planned step is not a completed experiment.
 ## Resolution and history
 
 - 2026-10-26: recorded while building `transfer-audit`; unresolved.
+- 2026-10-26: wording correction after review of the merged tool: "three deployed binary curves"
+  listed four (sect113r1, K-163, B-163, ECC2K-130); now "four". Also added to the tool: every
+  candidate certificate carries an `evaluation` field (`evaluated`, `excluded` or `not_evaluable`),
+  so a composite-degree `m >= 2` route whose priced part is below the baseline reads
+  `not_evaluable` (the verdict `no weakness found in scope` is vacuous for it) instead of looking
+  like a negative result. Status unchanged: open.
