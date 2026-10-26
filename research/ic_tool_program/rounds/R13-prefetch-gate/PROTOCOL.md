@@ -178,6 +178,19 @@ If AWS permission changes, repeat the dry-run before the one authorized
 launch, then qualify source, binaries, host class, holdouts, pin and
 isolation on that host before any timed sample; retain the six-hour limit.
 
+### Bounded shared-host A/A result (2026-10-26)
+
+The queued A/A on `i-03d5e15a586275e77` exhausted its 60 corrected
+quiet-host attempts at 21:48:33 UTC. Every attempt refused machine
+contention; the first A/A price file was never created. The earlier five
+SMT-topology refusals and all corrected refusals are preserved in
+[`runs/aa/refusals.log`](runs/aa/refusals.log), with the native exit in
+[`reports/run-20261026T2055Z/aa-return.log`](reports/run-20261026T2055Z/aa-return.log).
+The [run report](reports/run-20261026T2055Z/REPORT.md), diagram and PDF
+record this infrastructure outcome. It supplies no paired ratio or Table A
+value. Resume only after a qualified quiet window or an allowed stable host;
+the frozen candidate, panel and decision rule remain unchanged.
+
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
 for this CPU subclass only if every primary size's suite and holdout
