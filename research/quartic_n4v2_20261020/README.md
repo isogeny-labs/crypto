@@ -14,8 +14,14 @@ implementation was compared (none installed), so there is no fastest-implementat
 
 ## Answer
 
-* **Bend.** Over q = 2^12..2^22 the double-large-prime arms bend toward 1, the single-large-prime
-  arms do not reach 6/5. Measured exponents of cold M-eq (w = 0, 95% bootstrap over units and runs):
+* **Bend (frozen rule on the high-range exponent `e_high`, k = 17..22, 95% bootstrap).** At w = 0:
+  B0, S, L, D and DL1 are **between 1 and 6/5**; DL is **below 1**; no arm is "toward 1" or "toward
+  6/5". At w = 1: every IC arm is between 1 and 6/5. *Interpretation (not the rule):* the
+  double-large-prime arms steepen from the low range and settle at 0.99-1.02, the `O~(q)` model; the
+  single-large-prime arms rise but stay below 6/5 on this range. The intervals come from resampling
+  3 units per size (few distinct draws), so they are narrow: D excludes 1 by only 0.007, and the
+  conversion-constant sensitivity below moves D's `e_high` to 1.048, more than any interval.
+  Measured exponents of cold M-eq (w = 0):
 
   | arm | full k 12..22 | low k 12..16 | high k 17..22 | frozen bend rule on `e_high` (w = 0) |
   |:--|:--|:--|:--|:--|
@@ -33,7 +39,8 @@ implementation was compared (none installed), so there is no fastest-implementat
   below 6/5; its full-range 1.209 is pushed up by a step in the measured `lmul/mul` ratio at
   k = 17 (1.55 -> 2.37, when `ell` passes about 2^50: the u128 remainder becomes slower on this
   host). With N4's Xeon constants (`r_inv = 15`, `r_lmul = 1.1`, sensitivity) B0 is 1.144 full,
-  1.099 low, 1.179 high (toward 6/5, interval still below 1.2), and DL is 0.942 / 0.811 / 1.029.
+  1.099 low, 1.179 high (still "between" by the rule), D 0.982 / 0.877 / 1.048, and DL
+  0.942 / 0.811 / 1.029.
   The bootstrap intervals cover sampling of units and runs only, not the conversion constants.
 * **Crossover in M-eq, against rho-neg (the pre-registered comparison; DL headline arm).** DL is
   band-resolved below rho-neg from q = 991 at every larger size; interpolated `q*` = 555 [389, 752]
@@ -99,7 +106,7 @@ implementation was compared (none installed), so there is no fastest-implementat
 |:--|:--|:--|
 | P1 | every unit verifies; relations_bad = holdout_bad = 0 | holds (501/501 units; 6 failed attempts charged) |
 | P2 | rho exponents 1.50 +- 0.10; neg/plain in [0.60, 0.85] | holds: 1.504, 1.543; 0.715 [0.656, 0.777] |
-| P3 | S/L/D/DL replay; S relation mul = B0 within 1%; S relation wall < B0 at k >= 18 | replay holds; mul within 1% only for k >= 14 (1.087 at q = 223 to 1.012 at 8191: S recomputes 4-point lines from their second point); wall 0.26-0.48 at k >= 18 (holds) |
+| P3 | S/L/D/DL replay; S relation mul = B0 within 1%; S relation wall < B0 at k >= 18 | replay holds; mul within 1% only for k >= 14 (1.087 at q = 223 to 1.012 at 8191: S recomputes 4-point lines from their second point; the 1.44 at q = 262111 is the charged S/L0 retry, not the method); wall 0.26-0.48 at k >= 18 (holds) |
 | P4 | SGE dimension >= 2x smaller (k >= 16); L1 LA >= 2x below S; L LA in 1-3x L1 and below S | dimension factor 0.74-0.78 (**fails**); L1/S LA 0.20-0.22 (holds); L/L1 LA 3.6 (**fails**, above 3); L/S LA 0.70-0.79 (holds) |
 | P5 | D below S at k >= 14; D, DL `e_high` in [0.95, 1.15]; B0, S `e_high` in [1.10, 1.30] | holds: D/S 0.07-0.26; 1.009, 0.988; 1.141, 1.108 |
 | P6 | DL vs rho-neg below 2^12; B0 vs rho-neg 2^12..2^14 (M-eq); wall B0 3e4..3e5, DL < 2^15 | holds: 555; 6371; wall 2.77e5; 5704 |
@@ -108,7 +115,8 @@ Where the LA gain of L comes from (attribution on the same matrices, LA-phase M-
 q = 4194271): `+-1` skip alone (L0) 0.364 of S's LA (0.445 of S's whole cost), SGE + scalar
 Lanczos (L1) 0.218 of S's LA, block Lanczos width 4 (L) 0.79 of S's LA: in a large prime field the
 4x4 block operations cost `b^2` per vector entry, so the block arm is 3.6x the scalar one after SGE.
-The best measured pipeline is **DL1** (D + SGE + scalar Lanczos), 0.27x D and 0.53x DL at k = 22;
+The best measured pipeline is **DL1** (D + SGE + scalar Lanczos): paired DL1/DL = 0.536 [0.536, 0.536]
+at q = 4194271 and 0.531 at 2097091 (band-resolved, 0.818 at w = 1), DL1/B0 = 0.022 at q = 2097091;
 it is reported as a post-hoc secondary, DL stays the pre-registered headline.
 
 Phase shares at the top size: B0 (k = 21) linear algebra 87%, relations 13%, descent < 1%;
@@ -141,7 +149,11 @@ registered headline. Distance to rho-neg at the top size: DL 0.004, DL1 0.002 (k
    are noisy; the pooled-calibration model is given next to every measured mean in `summary.md`.
 6. Exponent intervals are narrow because the IC cost varies little between instances; they do not
    include the conversion-constant uncertainty (deviation 1).
-7. Not done: an external-implementation comparison (no Magma/Sage/PARI installed); k > 22 (needs
+7. Analysis-side changes after the grid (grid binary unchanged): the summarizer gained the
+   frozen rho-calibration exclusion, the P3/P4 table, the DL1 pairs and the CPU / fixed-constant
+   modes, and `v2 homcheck`; every reported number comes from that summarizer (`v2_sum`, built
+   from the committed `summ2.rs`).
+8. Not done: an external-implementation comparison (no Magma/Sage/PARI installed); k > 22 (needs
    128-bit `ell` arithmetic in the builder and solver); the W2a instance list (incomplete).
 
 ## Reproduce

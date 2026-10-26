@@ -372,7 +372,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
-- `research/quartic_n4v2_20261020/results/summary.json` — sha256 `98c8c09434c4877e…`
+- `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`

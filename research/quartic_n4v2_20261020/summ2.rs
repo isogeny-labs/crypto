@@ -363,7 +363,7 @@ pub fn run(args: &[String]) {
     println!("\n## Paired arm ratios on the same instances (bootstrap over seeds), M-eq w = 0 / 0.1 / 1, wall\n");
     println!("| arm / reference | q | w=0 | w=0.1 | w=1 | resolved | wall |");
     println!("|:--|--:|:--|:--|:--|:--|:--|");
-    let pairs = [("S", "B0"), ("L0", "S"), ("L1", "S"), ("L", "S"), ("L", "L1"), ("L", "B0"), ("D", "S"), ("D", "B0"), ("DL1", "D"), ("DL", "D"), ("DL", "B0"), ("DL", "S")];
+    let pairs = [("S", "B0"), ("L0", "S"), ("L1", "S"), ("L", "S"), ("L", "L1"), ("L", "B0"), ("D", "S"), ("D", "B0"), ("DL1", "D"), ("DL", "D"), ("DL", "B0"), ("DL", "S"), ("DL1", "DL"), ("DL1", "B0")];
     for (a, b) in pairs {
         let (Some(ma), Some(mb)) = (ic.get(a), ic.get(b)) else { continue };
         for (&q, ua) in ma {
