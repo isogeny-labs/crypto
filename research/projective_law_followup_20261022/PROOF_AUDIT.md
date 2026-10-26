@@ -554,7 +554,7 @@ isomorphisms to the explicit affine and infinity charts, the cover
 comparison of the overlap with the separately glued curve, local-stalk
 transport, and the `Pic⁰` class equation remain open.
 The [same packet](formal/WEIGHTED_QUOTIENT_COMPONENTS.md) also checks
-pointwise Jacobian nonvanishing under stated hypotheses and the chart
+pointwise Jacobian nonvanishing and a ring-global affine Jacobian ideal certificate under stated hypotheses, plus the chart
 generator identities `x·z=1`, `w·x³=y` in the common overlap ring. These
 bounded facts do not prove global scheme smoothness or equality of the
 overlap morphisms. The common localized overlap rings now have a checked
