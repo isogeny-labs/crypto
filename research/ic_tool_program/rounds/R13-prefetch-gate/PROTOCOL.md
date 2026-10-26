@@ -87,6 +87,29 @@ No timed A/A, suite, or holdout record preceded this addendum. A future host
 uses its actual `thread_siblings_list`; a missing or changed topology stops
 the run until its CPU set and manifest are recorded.
 
+### Pre-timing dedicated-host addendum (2026-10-26)
+
+The shared `m8i-flex.8xlarge` host was unavailable for R13 timing: another
+validation job held `/tmp/crypto-bench.lock`, and its CPU work continued.
+The corrected A/A process was stopped while waiting for that lock; it
+produced zero timed price files. Its refusal and wait receipts remain
+separate from the measurements below.
+
+The round moves before any timed sample to a dedicated
+`m8i-flex.4xlarge` Spot instance (`i-06ef80569878fa0d5`, us-east-2a).
+It reports the same Intel Xeon 6975P-C model and required AVX512F,
+PCLMULQDQ, VPCLMULQDQ and GFNI features, with 16 logical CPUs and 61 GiB
+of memory. CPU 2's SMT sibling is CPU 10, so set
+`ICPROG_BENCH_CPUS=2,10` on this host. Rebuild both `ic` arms from the frozen
+base and candidate source with the same Rust toolchain and `Cargo.lock`,
+and repeat the native host-class, 24-holdout and 90-row pin checks before
+A/A. Run all five-round suite and holdout comparisons on this one host;
+never pool its times with the shared host. Preserve its public IP, binary
+digests, isolation receipts, and an S3 copy of raw runs. The six-hour host
+budget starts at its 2026-10-26 20:43:31 UTC launch; terminate it by
+2026-10-27 02:43:31 UTC. The threshold, targets, rho rule, acceptance
+criterion and conditional extension remain fixed.
+
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
 for this CPU subclass only if every primary size's suite and holdout
