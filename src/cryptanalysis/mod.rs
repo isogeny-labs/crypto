@@ -115,6 +115,7 @@ pub mod boolean;
 pub mod boomerang;
 pub mod bsgs_fast;
 pub mod canonical_lift;
+pub mod certicom131_symlp;
 pub mod cga_hnc;
 pub mod challenge_ladder;
 pub mod cheon_attack;
