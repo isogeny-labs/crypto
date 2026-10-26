@@ -28,7 +28,7 @@ use crypto_lib::cryptanalysis::jv_cover::{
 use crypto_lib::cryptanalysis::gaudry_cubic::{generate_instance3, SymmetrisedS4};
 use crypto_lib::cryptanalysis::gaudry_quartic::{generate_instance4, SymmetrisedS5};
 use crypto_lib::cryptanalysis::gaudry_quartic_d4::{generate_d4_instance, SymmetrisedD4};
-use crypto_lib::cryptanalysis::zero_dim_la::{fast_stage, FastStats};
+use crypto_lib::cryptanalysis::zero_dim_la::{fast_stage, staircase_size, FastStats};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use serde::Serialize;
@@ -124,7 +124,7 @@ fn gb_opts() -> F4Options {
     F4Options::new(F4Ordering::Grevlex, 64).with_budget(std::time::Duration::from_secs(900))
 }
 
-fn corpus(families: &str, per: usize) -> Vec<Sys> {
+fn corpus(families: &str, per: usize, shapes_only: Option<&str>) -> Vec<Sys> {
     let want = |f: &str| families == "all" || families.split(',').any(|x| x == f);
     let mut out = Vec::new();
     if want("jv-nagao") {
@@ -235,7 +235,11 @@ fn corpus(families: &str, per: usize) -> Vec<Sys> {
         (8, 2),
     ];
     if want("dense") {
-        for &(n, d) in shapes {
+        // `--shapes n2d8,n3d10,…` restricts the dense family (to split a run)
+        let keep = |n: usize, d: u32| {
+            shapes_only.is_none_or(|v| v.split(',').any(|x| x == format!("n{n}d{d}")))
+        };
+        for &(n, d) in shapes.iter().filter(|(n, d)| keep(*n, *d)) {
             for (pi, &p) in primes.iter().enumerate() {
                 for k in 0..per.min(3) {
                     let (input, pt) = dense_system(n, d, p, 1000 * n as u64 + 10 * d as u64 + k as u64 + 7 * pi as u64);
@@ -264,6 +268,7 @@ fn main() {
     let mut json: Option<String> = None;
     let mut max_delta = 1usize << 14;
     let mut arm_list = "dense,sparse,fast".to_string();
+    let mut shapes_only: Option<String> = None;
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -273,11 +278,12 @@ fn main() {
             "--json" => json = Some(args[i + 1].clone()),
             "--max-delta" => max_delta = args[i + 1].parse().unwrap(),
             "--arms" => arm_list = args[i + 1].clone(),
+            "--shapes" => shapes_only = Some(args[i + 1].clone()),
             a => panic!("unknown argument {a}"),
         }
         i += 2;
     }
-    let systems = corpus(&families, per);
+    let systems = corpus(&families, per, shapes_only.as_deref());
     eprintln!("{} systems", systems.len());
     let mut rows = Vec::new();
     for (si, s) in systems.iter().enumerate() {
@@ -288,7 +294,12 @@ fn main() {
             eprintln!("{} {}: F4 not usable, skipped", s.family, s.label);
             continue;
         }
-        let arms: Vec<&str> = arm_list.split(',').collect();
+        // PROTOCOL.md: the dense arm (cubic in δ) is not run above δ = 1024
+        let delta0 = staircase_size(&r.basis, s.n, 1 << 16).unwrap_or(0);
+        let arms: Vec<&str> = arm_list
+            .split(',')
+            .filter(|&a| !(a == "dense" && delta0 > 1024))
+            .collect();
         let mut res: Vec<ArmRow> = arms
             .iter()
             .map(|a| ArmRow {
@@ -397,6 +408,7 @@ fn main() {
             "reps": reps,
             "per": per,
             "arms": arm_list,
+            "shapes": shapes_only,
             "rows": rows,
         });
         std::fs::write(&path, serde_json::to_string_pretty(&doc).unwrap()).unwrap();

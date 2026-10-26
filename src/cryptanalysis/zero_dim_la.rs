@@ -701,6 +701,14 @@ fn staircase(lms: &[Vec<u32>], n: usize, limit: usize) -> Option<Vec<Vec<u32>>> 
     walk(0, &mut mono, &cap, lms, &mut out, limit).then_some(out)
 }
 
+/// The number of standard monomials of a grevlex basis (the degree δ of a
+/// zero-dimensional ideal), or `None` if it is not zero-dimensional or has
+/// more than `limit`.
+pub fn staircase_size(basis: &[Poly], n: usize, limit: usize) -> Option<usize> {
+    let lms: Vec<Vec<u32>> = basis.iter().map(|g| g[0].0.clone()).collect();
+    staircase(&lms, n, limit).map(|v| v.len())
+}
+
 /// A normal form: a standard monomial, or a memoised dense row.
 #[derive(Clone, Copy)]
 enum Nf {
