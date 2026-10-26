@@ -98,6 +98,8 @@ struct Fp {
     r64: u64,
     /// `2^32 mod p`.
     r32: u64,
+    /// `⌊2^64 / p⌋`, for Barrett reduction of a `u64`.
+    bm: u64,
     small: bool,
 }
 
@@ -115,23 +117,42 @@ impl Fp {
             chunk: chunk.max(1),
             r64,
             r32: (1u64 << 32) % p,
+            bm: (u128::from(u64::MAX) / u128::from(p)) as u64,
             small: p < (1u64 << 32),
         }
+    }
+    /// `x mod p` for any `u64`, by Barrett: `q = ⌊x·bm / 2^64⌋` is at most two
+    /// short of `⌊x/p⌋`.
+    #[inline(always)]
+    fn bred(&self, x: u64) -> u64 {
+        let q = ((x as u128 * self.bm as u128) >> 64) as u64;
+        let mut r = x - q * self.p;
+        if r >= self.p {
+            r -= self.p;
+        }
+        if r >= self.p {
+            r -= self.p;
+        }
+        r
     }
     #[inline(always)]
     fn red(&self, x: u128) -> u64 {
         if self.small {
-            let hi = (x >> 64) as u64 % self.p;
-            let lo = x as u64 % self.p;
-            // hi·r64 < p² < 2^64 and adding lo < p stays below 2^64
-            (hi * self.r64 + lo) % self.p
+            let hi = self.bred((x >> 64) as u64);
+            let lo = self.bred(x as u64);
+            // hi·r64 < p² < 2^64
+            self.add(self.bred(hi * self.r64), lo)
         } else {
             (x % self.p as u128) as u64
         }
     }
     #[inline(always)]
     fn mul(&self, a: u64, b: u64) -> u64 {
-        self.red(a as u128 * b as u128)
+        if self.small && a < self.p && b < self.p {
+            self.bred(a * b)
+        } else {
+            self.red(a as u128 * b as u128)
+        }
     }
     #[inline(always)]
     fn add(&self, a: u64, b: u64) -> u64 {
@@ -190,6 +211,51 @@ fn dot_body(a: &[u32], b: &[u32]) -> (u64, u64) {
 #[target_feature(enable = "avx2")]
 unsafe fn dot_avx2(a: &[u32], b: &[u32]) -> (u64, u64) {
     dot_body(a, b)
+}
+
+/// Four dot products against one `w`, sharing its loads.
+#[inline(always)]
+fn dot4_body(r: [&[u32]; 4], w: &[u32]) -> [(u64, u64); 4] {
+    let n = w.len();
+    let mut lo = [[0u64; 8]; 4];
+    let mut hi = [[0u64; 8]; 4];
+    let full = n / 8 * 8;
+    let mut i = 0;
+    while i < full {
+        let wc: &[u32; 8] = w[i..i + 8].try_into().unwrap();
+        for k in 0..4 {
+            let rc: &[u32; 8] = r[k][i..i + 8].try_into().unwrap();
+            for j in 0..8 {
+                let pr = rc[j] as u64 * wc[j] as u64;
+                lo[k][j] += pr & LO;
+                hi[k][j] += pr >> 32;
+            }
+        }
+        i += 8;
+    }
+    let mut out = [(0u64, 0u64); 4];
+    for k in 0..4 {
+        let (mut l, mut h) = (lo[k].iter().sum::<u64>(), hi[k].iter().sum::<u64>());
+        for j in full..n {
+            let pr = r[k][j] as u64 * w[j] as u64;
+            l += pr & LO;
+            h += pr >> 32;
+        }
+        out[k] = (l, h);
+    }
+    out
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn dot4_avx512(r: [&[u32]; 4], w: &[u32]) -> [(u64, u64); 4] {
+    dot4_body(r, w)
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn dot4_avx2(r: [&[u32]; 4], w: &[u32]) -> [(u64, u64); 4] {
+    dot4_body(r, w)
 }
 
 #[inline(always)]
@@ -286,9 +352,8 @@ impl Fp {
     /// `(hi·2^32 + lo) mod p`.
     #[inline(always)]
     fn red_lohi(&self, lo: u64, hi: u64) -> u64 {
-        let h = (hi % self.p) * self.r32 % self.p;
-        let l = lo % self.p;
-        self.add(h, l)
+        let h = self.bred(self.bred(hi) * self.r32);
+        self.add(h, self.bred(lo))
     }
     /// `Σ a_i b_i mod p`, `a, b` reduced, fewer than 2^32 terms.
     #[inline]
@@ -302,6 +367,24 @@ impl Fp {
         #[cfg(not(target_arch = "x86_64"))]
         let (l, h) = dot_body(a, b);
         self.red_lohi(l, h)
+    }
+    /// Four dot products `r_k · w mod p`.
+    #[inline]
+    fn dot4(&self, r: [&[u32]; 4], w: &[u32]) -> [u64; 4] {
+        #[cfg(target_arch = "x86_64")]
+        let v = match simd_level() {
+            2 => unsafe { dot4_avx512(r, w) },
+            1 => unsafe { dot4_avx2(r, w) },
+            _ => dot4_body(r, w),
+        };
+        #[cfg(not(target_arch = "x86_64"))]
+        let v = dot4_body(r, w);
+        [
+            self.red_lohi(v[0].0, v[0].1),
+            self.red_lohi(v[1].0, v[1].1),
+            self.red_lohi(v[2].0, v[2].1),
+            self.red_lohi(v[3].0, v[3].1),
+        ]
     }
     /// `(lo, hi) += c · row`, lane-wise.
     #[inline]
@@ -678,7 +761,7 @@ fn kara_threshold() -> usize {
         std::env::var("ZERO_DIM_LA_KARA")
             .ok()
             .and_then(|v| v.parse().ok())
-            .unwrap_or(48)
+            .unwrap_or(256)
             .clamp(4, 512)
     })
 }
@@ -697,6 +780,65 @@ fn school_into(fp: &Fp, a: &[u32], b: &[u32], out: &mut [u32], lo: &mut [u64], h
     }
     for i in 0..len {
         out[i] = fp.red_lohi(lo[i], hi[i]) as u32;
+    }
+}
+
+/// `out[..lim] = (a · b) mod x^lim`, schoolbook below the threshold.
+fn mul_low(fp: &Fp, a: &[u32], b: &[u32], lim: usize, out: &mut [u32], ks: &mut KScratch) {
+    let n = a.len();
+    if n > kara_threshold() || b.len() != n {
+        let mut full = vec![0u32; a.len() + b.len() - 1];
+        if b.len() == n {
+            kmul(fp, a, b, &mut full, &mut ks.w, &mut ks.lo, &mut ks.hi);
+        } else {
+            school_into(fp, a, b, &mut full, &mut ks.lo, &mut ks.hi);
+        }
+        out[..lim].copy_from_slice(&full[..lim]);
+        return;
+    }
+    let (lo, hi) = (&mut ks.lo[..lim], &mut ks.hi[..lim]);
+    lo.fill(0);
+    hi.fill(0);
+    for (i, &c) in a.iter().enumerate().take(lim) {
+        if c != 0 {
+            let len = b.len().min(lim - i);
+            fp.axpy(&mut lo[i..i + len], &mut hi[i..i + len], c, &b[..len]);
+        }
+    }
+    for i in 0..lim {
+        out[i] = fp.red_lohi(lo[i], hi[i]) as u32;
+    }
+}
+
+/// `out[..2n − 1] = a²`, schoolbook with the symmetric half below the
+/// threshold.
+fn square_into(fp: &Fp, a: &[u32], out: &mut [u32], ks: &mut KScratch) {
+    let n = a.len();
+    if n > kara_threshold() {
+        kmul(fp, a, a, out, &mut ks.w, &mut ks.lo, &mut ks.hi);
+        return;
+    }
+    let len = 2 * n - 1;
+    let (lo, hi) = (&mut ks.lo[..len], &mut ks.hi[..len]);
+    lo.fill(0);
+    hi.fill(0);
+    // off-diagonal Σ_{i<j} a_i a_j x^{i+j}, doubled below
+    for i in 0..n.saturating_sub(1) {
+        let c = a[i];
+        if c != 0 {
+            let row = &a[i + 1..];
+            fp.axpy(&mut lo[2 * i + 1..2 * i + 1 + row.len()], &mut hi[2 * i + 1..2 * i + 1 + row.len()], c, row);
+        }
+    }
+    for i in 0..len {
+        // a lane is below 2^32·n, so doubling it stays far from 2^64
+        let (mut l, mut h) = (2 * lo[i], 2 * hi[i]);
+        if i % 2 == 0 {
+            let pr = a[i / 2] as u64 * a[i / 2] as u64;
+            l += pr & LO;
+            h += pr >> 32;
+        }
+        out[i] = fp.red_lohi(l, h) as u32;
     }
 }
 
@@ -752,12 +894,14 @@ fn kmul(fp: &Fp, a: &[u32], b: &[u32], out: &mut [u32], w: &mut [u32], lo: &mut 
         sb[i] = fp.add(y0, b1[i] as u64) as u32;
     }
     kmul(fp, sa, sb, z1, rest, lo, hi);
-    // out[h + i] += z1_i − z0_i − z2_i
+    // z1 − z0 − z2 first (it reads `out`), then out[h + i] += it
     for i in 0..2 * m - 1 {
         let z0 = if i < 2 * h - 1 { out[i] as u64 } else { 0 };
         let z2 = out[2 * h + i] as u64;
-        let mid = fp.sub(fp.sub(z1[i] as u64, z0), z2);
-        out[h + i] = fp.add(out[h + i] as u64, mid) as u32;
+        z1[i] = fp.sub(fp.sub(z1[i] as u64, z0), z2) as u32;
+    }
+    for i in 0..2 * m - 1 {
+        out[h + i] = fp.add(out[h + i] as u64, z1[i] as u64) as u32;
     }
 }
 
@@ -797,20 +941,19 @@ impl Powering {
     fn square(&mut self, fp: &Fp, acc: &mut [u32], muls: &mut u64) {
         let d = self.d;
         let k = d - 1;
-        let KScratch { w, lo, hi } = &mut self.ks;
-        kmul(fp, acc, acc, &mut self.prod[..2 * d - 1], w, lo, hi);
+        square_into(fp, acc, &mut self.prod[..2 * d - 1], &mut self.ks);
         // rev(q) = rev(prod)_{<k} · finv mod x^k
         for i in 0..k {
             self.ra[i] = self.prod[2 * d - 2 - i];
         }
-        kmul(fp, &self.ra, &self.finv, &mut self.qr[..2 * k - 1], w, lo, hi);
+        mul_low(fp, &self.ra, &self.finv, k, &mut self.qr, &mut self.ks);
         // q (degree ≤ d − 2) padded to d + 1, times f; keep the low d
         for i in 0..k {
             self.q[i] = self.qr[k - 1 - i];
         }
         self.q[k] = 0;
         self.q[k + 1] = 0;
-        kmul(fp, &self.q, &self.f, &mut self.qf[..2 * d + 1], w, lo, hi);
+        mul_low(fp, &self.q, &self.f, d, &mut self.qf, &mut self.ks);
         for i in 0..d {
             acc[i] = fp.sub(self.prod[i] as u64, self.qf[i] as u64) as u32;
         }
@@ -1092,8 +1235,19 @@ fn fast_inner(
                     }
                 }
                 _ => {
-                    for (c, &pos) in dense_pos.iter().enumerate() {
-                        y[pos] = fp.dot(&dmat[c * delta..(c + 1) * delta], &w) as u32;
+                    let nd = dense_pos.len();
+                    let row = |c: usize| &dmat[c * delta..(c + 1) * delta];
+                    let mut c = 0;
+                    while c + 4 <= nd {
+                        let v = fp.dot4([row(c), row(c + 1), row(c + 2), row(c + 3)], &w);
+                        for k in 0..4 {
+                            y[dense_pos[c + k]] = v[k] as u32;
+                        }
+                        c += 4;
+                    }
+                    while c < nd {
+                        y[dense_pos[c]] = fp.dot(row(c), &w) as u32;
+                        c += 1;
                     }
                 }
             }
@@ -1223,7 +1377,7 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(11);
         for &p in &[101u64, 65_521, 4_294_967_291] {
             let fp = Fp::new(p);
-            for &d in &[3usize, 5, 47, 48, 49, 64, 97, 130] {
+            for &d in &[3usize, 5, 47, 48, 49, 64, 97, 130, 257, 300, 600] {
                 let mut f: Vec<u64> = (0..d).map(|_| rng.gen_range(0..p)).collect();
                 f.push(1);
                 let mut m = 0;
@@ -1245,6 +1399,49 @@ mod tests {
                 let mut out = vec![0u32; 2 * d - 1];
                 kmul(&fp, &a, &b, &mut out, &mut ks.w, &mut ks.lo, &mut ks.hi);
                 assert_eq!(out, naive_mul(p, &a, &b), "kmul p={p} d={d}");
+            }
+        }
+    }
+
+    #[test]
+    fn barrett_reduction_matches_the_remainder() {
+        let mut rng = StdRng::seed_from_u64(13);
+        for &p in &[3u64, 101, 65_521, 2_147_483_647, 4_294_967_291] {
+            let fp = Fp::new(p);
+            for x in [0u64, 1, p - 1, p, p + 1, u64::MAX, u64::MAX - 1, (p - 1) * (p - 1)] {
+                assert_eq!(fp.bred(x), x % p, "p={p} x={x}");
+            }
+            for _ in 0..20_000 {
+                let x: u64 = rng.gen();
+                assert_eq!(fp.bred(x), x % p);
+                let (lo, hi) = (rng.gen_range(0..1u64 << 50), rng.gen_range(0..1u64 << 50));
+                let want = ((((hi as u128) << 32) + lo as u128) % p as u128) as u64;
+                assert_eq!(fp.red_lohi(lo, hi), want);
+                let (a, b) = (rng.gen_range(0..p), rng.gen_range(0..p));
+                assert_eq!(fp.mul(a, b), ((a as u128 * b as u128) % p as u128) as u64);
+            }
+        }
+    }
+
+    #[test]
+    fn dot4_matches_four_dots() {
+        let mut rng = StdRng::seed_from_u64(17);
+        for &p in &[101u64, 4_294_967_291] {
+            let fp = Fp::new(p);
+            for &n in &[1usize, 7, 8, 9, 64, 1000] {
+                let rows: Vec<Vec<u32>> = (0..4)
+                    .map(|_| (0..n).map(|_| rng.gen_range(0..p) as u32).collect())
+                    .collect();
+                let w: Vec<u32> = (0..n).map(|_| rng.gen_range(0..p) as u32).collect();
+                let got = fp.dot4([&rows[0], &rows[1], &rows[2], &rows[3]], &w);
+                for k in 0..4 {
+                    let want = rows[k]
+                        .iter()
+                        .zip(&w)
+                        .fold(0u128, |a, (&x, &y)| a + x as u128 * y as u128)
+                        % p as u128;
+                    assert_eq!(got[k] as u128, want, "p={p} n={n} k={k}");
+                }
             }
         }
     }
