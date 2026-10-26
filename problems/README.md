@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [GHS descent with magic number two or more is not executable](ghs-higher-magic-descent-not-executable.md) | open | executed subgroup-preservation certificates and relation counts for composite-degree binary curves with `m >= 2` (transfer-audit family A) | a smooth model of the GHS curve and the norm-conorm point map on one toy tower, checked on all point pairs, then a binary-Jacobian relation search in the `S = ops/sqrt(r)` unit |
 | [N12 held-out paired wall isolation](n12-heldout-wall-isolation.md) | open | isolated A/A plus five-round candidate/rho wall ratio for the frozen 420 targets | authorized quiet host window, then complete uncontended 5,040-row source-verified schedule |
 | [N12 held-out original binary source binding](n12-heldout-original-binary-source-binding.md) | open | attributing the original EKS executable to an exact reviewed source build | original executable digest plus exact source, lock, toolchain and build receipt, or a matching reproducible build |
 | [Benchmark validation gate rejects post-freeze rows](benchmark-validation-gate-postfreeze-rows.md) | investigating | repository-wide validated benchmark dashboard; 24 benchmark rows remain after v6/v7 validation and exact archival cleanup | source-bound evidence or exact archival disposition per row, then green gate |

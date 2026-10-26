@@ -254,4 +254,73 @@ subgroup preserved; destination solver advantage; complete-cost advantage.
 
 ## Amendments
 
-(none yet)
+### Amendment 1 (2026-10-26, before the first run of the suite)
+
+Made while writing the tool, before any certificate was generated. Nothing above is rewritten.
+
+1. **Map basis in the verdict rule (section 7, condition 3).** The rule reads "executed or
+   constructible by code in the repository". The pairing reduction is a theorem (Frey-Ruck
+   non-degeneracy of the Tate pairing) with no pairing implementation in the repository, and the
+   `audit-curve` skill allows "a certified structural condition with a cited reduction and total
+   cost below the threshold". The tool therefore distinguishes three map bases: `Executed`,
+   `Theorem` (a cited theorem whose antecedents the tool checked; used only for the pairing, and
+   only when the embedding degree is exact) and `Existence`. Condition 3 is satisfied by
+   `Executed` or `Theorem`. Genus covers over prime fields, GHS with `m >= 2` and isogeny moves
+   without an exhibited destination are `Existence`.
+2. **Lower-bound totals.** A route with a required phase that nothing in the repository can price
+   (GHS map construction, an isogeny walk to an unidentified representative, an unknown exact
+   embedding degree) carries `total_is_lower_bound`. Such a total can show a route is too
+   expensive; it can never support a weakness verdict.
+3. **Out-of-scope certificate for prime degree.** For prime `n` the tool emits an extra candidate
+   `ghs:proper_subfield` (construction status `out of scope`) holding the divisor list of `n`, the
+   magic numbers achievable by any curve over the field for the tower `F_2 <= F_(2^n)`
+   (`ball::achievable_magic_numbers`) and the emptiness of the window 2..=6. The candidate `ghs:l=1`
+   (descent to `F_2` itself) is still enumerated and priced.
+4. **Destination class of the trace route.** The trace route's destination is `E(F_(2^l))`, priced as
+   rho on that curve with its own equivalence class (`2 l / d`), so the subfield-subgroup control is
+   not charged against a destination weaker than the one it reaches.
+5. **No measured cost row.** `measured` stays in the cost vocabulary, but no cost cell of any
+   certificate is measured; the only measured quantity is the F9 control, a separate record that
+   `check` excludes because its group-operation equivalents include wall-clock calibration.
+6. **F2 scope.** The cross-check against `docs/curves/jacobian-transfers.json` applies to GHS rows
+   with `m >= 2` and to the same-field cover rows. Trace rows (`m = 1`) are priced against the
+   destination's own class and are not comparable to the repository's unaccelerated row.
+
+### Amendment 2 (2026-10-26, after a development run in a scratch directory, before the committed run)
+
+Recorded so the order of events is visible. The suite and the F9 control were first executed in a
+scratch directory while the tool was being debugged; the committed run follows these changes.
+
+1. **F9 was looked at before the committed run.** The scratch run of the protocol's plan (22 s)
+   gave fitted exponents 0.857 (genus 2) and 0.967 (genus 3), both below the pre-registered
+   threshold 1, with every index-calculus run above the modelled source rho. The threshold is not
+   changed: F9(a) is reported as failed if the committed run also fails it. A longer plan
+   (genus 2: p up to 401; genus 3: p up to 151) is run as a separate, labelled post-hoc record,
+   `controls/hec_ic_control_extended.json`, and does not replace the F9 result.
+2. **F13, end-to-end positive controls on registered curves.** Two pairing-friendly curves are
+   audited by the same code: `mnt/mnt1` (embedding degree 3, an MNT example whose intended attack
+   is the pairing; registry adoption status `not_asserted`) and BLS12-381 (embedding degree 12).
+   Expectation fixed here, before the committed run: `mnt/mnt1` is `class-weak` under the
+   conservative end of the pairing price band; BLS12-381 is `no weakness found in scope` with a
+   marginal lead (the band straddles rho). The live `curve_traits::compute` of `mnt/mnt1` takes about
+   six minutes in the repository's code, so its trait record is read from the committed
+   `docs/curves/traits.json` (order and trace checked against the instance) and the certificate
+   says so.
+3. **Pairing price band.** The index-calculus price in `F_(q^k)` is a band: attacker-favourable
+   (`c = (32/9)^(1/3)`, `o(1)` dropped, unweighted) to conservative (`c = (64/9)^(1/3)`, weighted by
+   the field-multiplication cost). The cost table carries the conservative end, which alone may
+   support a weakness verdict; the favourable end only excludes. A band that straddles the matched
+   rho is a marginal lead with verdict `no weakness found in scope`. A check records whether one
+   element of `F_(q^k)` fits in 1 TiB; above that the pairing cannot be evaluated and the price is
+   a formal extrapolation.
+4. **Lead class against the matched baseline.** The lead class uses the advantage over the matched
+   rho baseline (with the curve's equivalence class), not over the repository's unaccelerated
+   reference; the latter stays in the certificate as `repo_ratio_log2` for the F2 cross-check.
+5. **`carried`.** Each certificate records whether the subgroup is, or may be, carried. A route that
+   does not carry it (refuted, obstructed, not applicable) is priced for the record only; the report
+   shows no ratio for it, because the route solves a different problem.
+6. **Tool changes found by running.** ECC2K-130 has no generator in `docs/curves/registry.json`; the
+   tool attaches the repository's Certicom challenge parameters after checking the field and both
+   coefficients equal the registry model. The explicit sect113r1 degree-5 rows are priced as an
+   identity path (same order, same class), not as a Jacobian route.
+
