@@ -1619,7 +1619,22 @@ pub struct WalkResult {
     /// Distinct Smith signatures seen on the JV-weak hits (per hit, max).
     pub max_distinct_sigs: u64,
     pub hits_all_fail: u64,
+    /// Which cap censored the walk: `"nodes"`, `"steps"` or `"wall"`
+    /// (empty when not censored).
+    pub censor_cause: String,
+    /// Distinct j-invariants among tested nodes (diagnostic, not costed),
+    /// counted up to `DISTINCT_J_CAP`.
+    pub distinct_j: u64,
+    pub distinct_j_saturated: bool,
 }
+
+/// Cap on the distinct-j diagnostic set of one walk (memory bound).
+pub const DISTINCT_J_CAP: usize = 4_000_000;
+/// Trap rule (amendment 2026-10-25): censor a walk that has tested at least
+/// `TRAP_MIN_NODES` nodes but seen at most `TRAP_MAX_DISTINCT` distinct
+/// j-invariants.
+pub const TRAP_MIN_NODES: u64 = 200_000;
+pub const TRAP_MAX_DISTINCT: u64 = 1_000;
 
 /// Test a JV-weak node: try its explicit models until one passes Smith.
 /// Returns `(passed, models_tried, smith_calls, smith_ns, distinct signatures)`.
@@ -1691,6 +1706,7 @@ pub fn walk(
     let mut res = WalkResult::default();
     let mut cur = start;
     let mut skip_test = !test_start;
+    let mut seen_j: HashSet<El> = HashSet::new();
     loop {
         if !skip_test {
             let t0 = std::time::Instant::now();
@@ -1702,6 +1718,21 @@ pub fn walk(
             res.cost_test.invs += k.invs.get() - i0;
             res.cost_test.ns += t0.elapsed().as_nanos();
             res.nodes_tested += 1;
+            // Diagnostic (amendment 2026-10-25), outside the cost counters:
+            // distinct j-invariants among tested nodes, so retests of a closed
+            // component are distinguishable from new curves.
+            if seen_j.len() < DISTINCT_J_CAP {
+                let (m1, i1) = (k.mults.get(), k.invs.get());
+                let a3 = k.mulf(&k.mul(&k.mul(&cur.a, &cur.a), &cur.a), 4);
+                let den = k.add(&a3, &k.mulf(&k.mul(&cur.b, &cur.b), 27));
+                let j = k.mul(&a3, &k.inv(&den));
+                seen_j.insert(j);
+                k.mults.set(m1);
+                k.invs.set(i1);
+                res.distinct_j = seen_j.len() as u64;
+            } else {
+                res.distinct_j_saturated = true;
+            }
             if hit {
                 let (passed, tried, calls, sm_ns, dsig) =
                     test_models(k, &cur, rng, stop_on_pass, &mut res.cost_descent);
@@ -1723,8 +1754,25 @@ pub fn walk(
             }
         }
         skip_test = false;
-        if res.nodes_tested >= max_nodes || wall.elapsed().as_nanos() >= max_ns {
+        // Step cap (amendment 2026-10-25): a reflection loop between nodes
+        // that are never retested does not advance `nodes_tested`, so steps
+        // are also capped at four times the node cap; any cap censors.
+        let cause = if res.nodes_tested >= max_nodes {
+            "nodes"
+        } else if res.steps >= max_nodes.saturating_mul(4) {
+            "steps"
+        } else if wall.elapsed().as_nanos() >= max_ns {
+            "wall"
+        } else if res.nodes_tested >= TRAP_MIN_NODES && res.distinct_j <= TRAP_MAX_DISTINCT {
+            // Amendment 2026-10-25: the walk keeps retesting a closed set of
+            // at most TRAP_MAX_DISTINCT classes; it is censored as trapped.
+            "trapped"
+        } else {
+            ""
+        };
+        if !cause.is_empty() {
             res.censored = true;
+            res.censor_cause = cause.to_string();
             break;
         }
         let t0 = std::time::Instant::now();
@@ -1734,6 +1782,14 @@ pub fn walk(
             Some((nx, _)) => {
                 cur = nx;
                 res.steps += 1;
+            }
+            None if cur.back.is_none() => {
+                // Amendment 2026-10-25: the start node has no neighbour with
+                // full rational 2-torsion at all (an isolated node of the
+                // walk graph). The walk cannot move; it is censored.
+                res.censored = true;
+                res.censor_cause = "isolated".to_string();
+                break;
             }
             None => {
                 // Dead end: both forward neighbours lack full 2-torsion. Take
@@ -2105,6 +2161,44 @@ mod tests {
         let r = walk(&k, start, &mut rng, 200_000, u128::MAX, false, true);
         assert!(r.passed && !r.censored, "{r:?}");
         assert!(r.jv_weak_hits == 1);
+    }
+
+    #[test]
+    fn walk_step_cap_bounds_reflection_loops() {
+        // Seeds 0 and 7 can reflect between nodes without retesting them
+        // (the 2026-10-19 diagnostic). With no wall budget, the walk must
+        // still stop, by a pass or by the node or step cap.
+        let k = Fp3::new(61);
+        for seed in [0u64, 7] {
+            let mut rng = sp::SplitMix64(seed);
+            let start = random_full2_start(&k, &mut rng);
+            let r = walk(&k, start, &mut rng, 1_000, u128::MAX, false, true);
+            assert!(r.passed || r.censored, "seed {seed}: {r:?}");
+            assert!(
+                r.steps <= 4_000 && r.nodes_tested <= 1_000,
+                "seed {seed}: {r:?}"
+            );
+            assert!(r.passed || r.censor_cause == "nodes" || r.censor_cause == "steps");
+        }
+    }
+
+    #[test]
+    fn walk_censors_isolated_starts_instead_of_panicking() {
+        // A random full-2-torsion start whose three 2-neighbours all lack
+        // full 2-torsion cannot move (arm B pilot, 2026-10-25, panicked).
+        let k = Fp3::new(61);
+        let mut isolated = 0;
+        for seed in 0u64..300 {
+            let mut rng = sp::SplitMix64(seed);
+            let start = random_full2_start(&k, &mut rng);
+            let r = walk(&k, start, &mut rng, 500, u128::MAX, false, true);
+            assert!(r.passed || r.censored, "seed {seed}: {r:?}");
+            if r.censor_cause == "isolated" {
+                isolated += 1;
+                assert_eq!((r.steps, r.nodes_tested), (0, 1), "seed {seed}: {r:?}");
+            }
+        }
+        assert!(isolated > 0, "no isolated start among 300 seeds");
     }
 
     #[test]

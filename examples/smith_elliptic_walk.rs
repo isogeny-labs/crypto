@@ -104,7 +104,8 @@ fn exhaustive(args: &[String]) {
             .enumerate()
             .map(|(i, n)| {
                 json!({"id": i, "weak": n.weak, "pass": n.pass, "jv": n.jv_weak, "t": n.t,
-                                 "comp2": n.comp2, "comp23": n.comp23})
+                                 "comp2": n.comp2, "comp23": n.comp23,
+                                 "key": [n.key.0, n.key.1, n.key.2], "a": n.a, "b": n.b})
             })
             .collect();
         let mut e2 = vec![];
@@ -344,6 +345,25 @@ fn fit(args: &[String]) {
             m + iv * inv_ratio
         };
         let cost = sum(&cost_of);
+        // labelled sensitivity: walks censored by a trap (step cap, trap
+        // rule, isolated start) left out of the numerator
+        let trapped = |v: &&Value| {
+            matches!(
+                v["res"]["censor_cause"].as_str(),
+                Some("steps") | Some("trapped") | Some("isolated")
+            )
+        };
+        let steps_excl: f64 = ws
+            .iter()
+            .filter(|v| !trapped(v))
+            .map(|v| g(v, &["res", "steps"]))
+            .sum();
+        let cost_excl: f64 = ws.iter().filter(|v| !trapped(v)).map(|v| cost_of(v)).sum();
+        let cause = |c: &str| {
+            ws.iter()
+                .filter(|v| v["res"]["censor_cause"].as_str() == Some(c))
+                .count()
+        };
         let wall = sum(&|v| g(v, &["wall_s"]));
         let smith_s = sum(&|v| g(v, &["res", "smith_ns"])) * 1e-9;
         // censored-exponential means: total / successes
@@ -360,6 +380,13 @@ fn fit(args: &[String]) {
             "cost_per_step": cost / steps.max(1.0),
             "reflect_share": sum(&|v| g(v, &["res", "reflects"])) / steps.max(1.0),
             "censored": ws.iter().filter(|v| v["res"]["censored"].as_bool().unwrap()).count(),
+            "censored_nodes": cause("nodes"), "censored_steps": cause("steps"),
+            "censored_wall": cause("wall"), "censored_trapped": cause("trapped"),
+            "censored_isolated": cause("isolated"),
+            "mean_cost_excl_trapped": cost_excl / succ.max(1.0),
+            // labelled sensitivity: walks stopped by the step cap (reflection
+            // traps) left out of numerator and denominator
+            "mean_steps_excl_trapped": steps_excl / succ.max(1.0),
         }));
     }
     // fits per arm: ln(mean) on ln p, bootstrap over walks within each p
@@ -391,10 +418,10 @@ fn fit(args: &[String]) {
                 }),
             ),
         ] {
-            let est = |sel: &dyn Fn(&Vec<Value>) -> Vec<Value>| -> (f64, f64) {
+            let est = |pset: &[u64], sel: &dyn Fn(&Vec<Value>) -> Vec<Value>| -> (f64, f64) {
                 let mut xs = vec![];
                 let mut ys = vec![];
-                for &p in &ps {
+                for &p in pset {
                     let ws = &per[&(arm.to_string(), p)];
                     let ws = sel(ws);
                     let succ = ws
@@ -410,23 +437,60 @@ fn fit(args: &[String]) {
                 }
                 ols(&xs, &ys)
             };
-            let (a, b) = est(&|w| w.clone());
+            let (a, b) = est(&ps, &|w| w.clone());
             let rng = std::cell::RefCell::new(sp::SplitMix64(99));
+            let resample = |ws: &Vec<Value>| -> Vec<Value> {
+                (0..ws.len())
+                    .map(|_| ws[rng_below(&mut rng.borrow_mut(), ws.len())].clone())
+                    .collect()
+            };
+            let ci = |slopes: &mut Vec<f64>| -> (f64, f64) {
+                slopes.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                (
+                    slopes[(slopes.len() as f64 * 0.025) as usize],
+                    slopes[(slopes.len() as f64 * 0.975) as usize],
+                )
+            };
+            // (i) walks resampled within each prime
             let mut slopes = vec![];
             for _ in 0..2000 {
-                let (s, _) = est(&|ws: &Vec<Value>| {
-                    (0..ws.len())
-                        .map(|_| ws[rng_below(&mut rng.borrow_mut(), ws.len())].clone())
-                        .collect()
-                });
+                let (s, _) = est(&ps, &resample);
                 if s.is_finite() {
                     slopes.push(s);
                 }
             }
-            slopes.sort_by(|a, b| a.partial_cmp(b).unwrap());
-            let lo = slopes[(slopes.len() as f64 * 0.025) as usize];
-            let hi = slopes[(slopes.len() as f64 * 0.975) as usize];
-            let verdict = if hi < 1.0 {
+            let (lo_w, hi_w) = ci(&mut slopes);
+            // (ii) primes resampled with replacement, then walks within each
+            // (the protocol's slope interval; the frozen verdict uses it)
+            let mut slopes_p = vec![];
+            for _ in 0..2000 {
+                let pset: Vec<u64> = (0..ps.len())
+                    .map(|_| ps[rng_below(&mut rng.borrow_mut(), ps.len())])
+                    .collect();
+                let mut uniq = pset.clone();
+                uniq.sort_unstable();
+                uniq.dedup();
+                if uniq.len() < 2 {
+                    continue;
+                }
+                let (s, _) = est(&pset, &resample);
+                if s.is_finite() {
+                    slopes_p.push(s);
+                }
+            }
+            let (lo, hi) = ci(&mut slopes_p);
+            let no_success: Vec<u64> = ps
+                .iter()
+                .copied()
+                .filter(|p| {
+                    !per[&(arm.to_string(), *p)]
+                        .iter()
+                        .any(|v| v["res"]["passed"].as_bool().unwrap())
+                })
+                .collect();
+            let verdict = if !no_success.is_empty() {
+                "undetermined: prime(s) with no success"
+            } else if hi < 1.0 {
                 "o(p)"
             } else if lo > 1.0 {
                 "omega(p)"
@@ -435,7 +499,9 @@ fn fit(args: &[String]) {
             };
             fits.push(
                 json!({"arm": arm, "metric": metric, "exponent": a, "intercept": b,
-                              "ci95": [lo, hi], "verdict": verdict, "n_primes": ps.len()}),
+                       "ci95": [lo, hi], "ci95_walks_only": [lo_w, hi_w],
+                       "verdict": verdict, "n_primes": ps.len(),
+                       "primes_without_success": no_success}),
             );
         }
     }
