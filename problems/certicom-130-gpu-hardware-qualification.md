@@ -2,9 +2,9 @@
 
 - **Status:** `open`
 - **Kind:** hardware access limit; device correctness unverified
-- **Affected work:** [crypto #2250](https://github.com/aburan28/crypto/pull/2250), [cryptanalysis #968](https://github.com/aburan28/cryptanalysis/pull/968), and [the shared native workers](../gpu/certicom/README.md)
+- **Affected work:** [crypto #2250](https://github.com/isogeny-labs/crypto/pull/2250), [cryptanalysis follow-up #1138](https://github.com/isogeny-labs/cryptanalysis/pull/1138), the historical merged [cryptanalysis #968](https://github.com/isogeny-labs/cryptanalysis/pull/968), and [the shared native workers](../gpu/certicom/README.md)
 - **Next action owner:** the PR author for hosted CI; the owner for existing physical GPU access
-- **Last updated:** 2026-10-21
+- **Last updated:** 2026-10-26
 
 ## Problem
 
@@ -91,20 +91,21 @@ and hardware. It does not establish a speedup or practical public-target solve.
 - **Action:** build/probe the selected native worker and run the hardware
   job in `.github/workflows/certicom-devices.yml` on an existing authorized
   runner. It executes `bash gpu/certicom/qualify.sh`, including device and
-  release CLI tests. A prepared repair separates hosted library and CLI phases
-  to keep each job within 25 minutes. Both phases must pass; a partial receipt
-  cannot qualify the whole backend. Publishing the shared repair requires a
-  new cryptanalysis follow-up PR because #968 has merged. That new branch's
-  push was rejected by automatic approval review as outside the explicit
-  two-PR scope without direct approval; approval has been requested. The repair
-  remains local until that approval arrives. Inspect the device identity and
-  retain physical provenance separately from API execution.
+  release CLI tests. The repair separates hosted library and CLI phases
+  into independent 45-minute jobs. Both phases must pass; a partial receipt
+  cannot qualify the whole backend. The user explicitly approved the required
+  cryptanalysis follow-up on 2026-10-25, resolving the earlier publication-scope
+  rejection. Follow-up #1138 is now open and ready; #968 and its merged branch
+  remain untouched. Inspect the device identity and retain physical provenance
+  separately from API execution. The user requires these PRs to remain open
+  until qualification and current-head CI/review gates pass, so auto-merge
+  remains disabled despite the repository default.
 - **Inputs and controls:** the exact published instances; full-width random
   arithmetic against independent Rust; constructed known answers; public Q
   with small search budgets; worker identity, malformed-input and timeout
   controls. `gpu-emulator` stays explicitly labelled host execution.
 - **Execution limits:** checked-in per-walk/query/table/matrix budgets and
-  whole-session deadlines; serial hardware tests; 25 minutes per hosted phase
+  whole-session deadlines; serial hardware tests; 45 minutes per hosted phase
   and 45 minutes for a manually dispatched complete hardware job.
   Stop on any mismatch, worker error or deadline. No benchmark campaign,
   paid provisioning or public-challenge solve is authorized by this record.
@@ -116,6 +117,25 @@ and hardware. It does not establish a speedup or practical public-target solve.
   a physical execution receipt, or new current-head CI/review feedback.
 
 ## Resolution and history
+
+- 2026-10-26: GitHub now resolves both repositories under `isogeny-labs`;
+  the preceding 404 access observation is resolved. At cryptanalysis main
+  `379faa0f1e38facd9c8fdfc527f0b89518cf2e70`, the Certicom modules, native
+  workers and workflow previously merged in #968 were absent. Follow-up
+  [#1138](https://github.com/isogeny-labs/cryptanalysis/pull/1138), head
+  `87df3734cc1345548fdcb174a97a541b4c36cd4c`, restores those task files and
+  their CLI/catalogue integration while preserving unrelated main changes.
+  Its full release library passes 3,042 tests (0 failed, 90 existing ignored),
+  including all 14 solver/device-policy tests. The real `ca-icx` and `crax icx`
+  pass all seven checked-in CLI cases on CPU and explicit host emulation:
+  28 executions. Initial sparse-checkout missing-header/corpus failures and
+  their unchanged passing controls are retained in the PR history. Current
+  main has a different overall library test count from the earlier df69 tree.
+  Three restored C/CUDA files now satisfy the current formatting gate;
+  comment/whitespace-normalized tokens are identical to the preceding worker
+  source. All 21 shared files match the prepared crypto repair. No new CUDA
+  device execution, Metal CLI result or physical GPU provenance is claimed;
+  earlier native device observations remain tied to their earlier revisions.
 
 - 2026-10-19: recorded the cross-repository physical qualification gap and
   successful compilation controls. Added the CLI checks to the hardware job;

@@ -63,9 +63,13 @@ jobs:
           for arch in sm_70 sm_80 sm_90; do
             nvcc -O2 -std=c++17 -arch="$arch" gpu/certicom/cuda.cu -o "/tmp/certicom_cuda_$arch"
           done
-  metal-build:
+  metal-qualification:
     runs-on: macos-14
-    timeout-minutes: 25
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        phase: [library, cli]
     steps:
       - uses: actions/checkout@v4
       - name: Compile native Metal shader and worker
@@ -89,18 +93,29 @@ jobs:
           fi
       - uses: dtolnay/rust-toolchain@stable
         if: steps.probe.outputs.available == 'true'
-      - name: Qualify Metal arithmetic and all three solvers through the library and CLI
+      - name: Qualify Metal arithmetic and all three solvers (${{ matrix.phase }})
         if: steps.probe.outputs.available == 'true'
         env:
           CERTICOM_TEST_BACKEND: metal
+          CERTICOM_TEST_PHASE: ${{ matrix.phase }}
           CARGO_BUILD_JOBS: '2'
         run: bash gpu/certicom/qualify.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: certicom-metal-hosted-device-observation
+          name: certicom-metal-hosted-device-observation-${{ matrix.phase }}
           path: certicom-device-*.log
           if-no-files-found: error
+  metal-build:
+    needs: metal-qualification
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: Require both Metal qualification phases
+        env:
+          QUALIFICATION_RESULT: ${{ needs.metal-qualification.result }}
+        run: test "$QUALIFICATION_RESULT" = success
   hardware:
     if: github.event_name == 'workflow_dispatch' && inputs.hardware_runner != ''
     runs-on: ${{ inputs.hardware_runner || 'ubuntu-24.04' }}
