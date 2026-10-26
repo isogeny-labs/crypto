@@ -144,9 +144,15 @@ Engineering (AGENTS.md §3): a configuration choice conditional on the weight.
   - Binary sha256 `25e1e76f…c53f`, built from `7cf06ed6e` on a clean tree.
   - Every session records a clean tree.
 - **Audits:** `sessions/*.audit.json`, all OK, each with 12 exact replays.
-- **Comparisons:** `sessions/*/comparisons/`, written by `ecbench compare --save`
-  with `--weight`. That flag is added by this change; without it `compare` is
-  unchanged.
+- **Comparisons:** `sessions/*/comparisons/`, written by the frozen binary
+  (`7cf06ed6e`) with `ecbench compare --save --weight`.
+  - Those files use a cluster-bootstrap interval.
+  - `main` has since gained its own `compare --weight` (PR #2441), which this
+    branch now uses.
+  - It gives identical point ratios, with a linearised-t interval.
+  - Under it the held-out `w = 1` intervals are h21 [0.699, 1.032], h22
+    [0.747, 0.979], h24 [0.665, 0.865] and h29 [0.759, 0.884].
+  - That is still 3 of 4 below 1, so P3's verdict is the same.
 - **Derived:**
   - `analysis/band-*.{txt,json}` (`ecbench band`);
   - `analysis/derivation.json` (`scripts/derive.jq`);
