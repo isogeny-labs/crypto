@@ -1,7 +1,10 @@
 name: Compact orbit independent rank replay
 
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - 'examples/koblitz_orbit_dlp_fast.rs'
       - 'research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/**'
@@ -11,14 +14,21 @@ on:
 permissions:
   contents: read
 
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch, merge queue) gets a group of its own and is never cancelled.
+concurrency:
+  group: ${{ github.event_name == 'push' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
 jobs:
   rank-control:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-orbit-rank-evidence.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-orbit-rank-evidence.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: blob:none
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/setup-python@v5
         with:
@@ -26,9 +36,16 @@ jobs:
       - name: Prepare immutable hosted-control source
         run: |
           # FROZEN.json describes the historical control, not the current PR.
-          git fetch origin 36592609af4367d589b320711552a2980371f159
-          git worktree add --detach "$RUNNER_TEMP/compact-orbit-rank-source" \
+          git fetch --filter=blob:none origin 36592609af4367d589b320711552a2980371f159
+          git worktree add --no-checkout --detach "$RUNNER_TEMP/compact-orbit-rank-source" \
             36592609af4367d589b320711552a2980371f159
+          git -C "$RUNNER_TEMP/compact-orbit-rank-source" sparse-checkout set --no-cone \
+            /Cargo.toml /Cargo.lock /src/ /examples/ /docs/ic/calibration.json \
+            /.github/workflows/compact-orbit-rank-evidence.yml \
+            /research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/ \
+            /research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock \
+            /research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
+          git -C "$RUNNER_TEMP/compact-orbit-rank-source" reset --hard HEAD
       - name: Check archived evidence and verifier syntax
         run: |
           python3 -m py_compile research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/{ci_replay,run_control,verify_rank,verify_archive,test_verify_rank}.py

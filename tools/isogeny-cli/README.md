@@ -1,5 +1,10 @@
 # isogeny
 
+`isogeny class plan|build|resume|status|verify|vertex|solve` adds disk-backed
+ordinary prime-field class enumeration from exact curve JSON. See the
+[class-command contract](../volcano-cli/README.md) for supported inputs,
+finite degree sets, completeness certificates, checkpoints and DLP scope.
+
 `isogeny` is one executable for catalogue-wide prime-degree screening, bounded
 isogeny construction, and independent exact verification. Its algorithms and standard
 curve data are compiled into the binary. Running it requires no checkout, Cargo,
@@ -113,6 +118,47 @@ verifier checks the kernel, codomain, rational-map identity, standard subgroup,
 and 20 fresh public scalar-transport cases. Failed runs retain their construction
 records. The tool never promotes its results into the canonical catalogue automatically.
 
+## Compare constructor performance
+
+The ReleaseMe archive also packages `isogeny-perf`, a separate native executable
+for reproducible constructor measurements. It does not need Cargo or a checkout
+at runtime. Use the source SHA from the archive's `BUILD.json` as `--revision`:
+
+```sh
+isogeny-perf --help
+isogeny-perf --out ./bmss-counts.jsonl --revision <40-character-source-sha> \
+  --bits 192,224,256,511 --ells 7,31,101
+isogeny-perf compare baseline.jsonl candidate.jsonl comparison.json
+```
+
+This first performance series covers all eight BMSS methods on fixed public
+supersingular fixtures. Field widths do not identify the published NIST curves.
+Each constructor must reproduce the independent Kohel kernel and exact map;
+the tool records complete inputs, binary and output hashes, and field-call
+counts. The output file must be fresh. Interrupted output lacks a PASS terminal
+receipt and cannot be accepted by `compare`.
+
+For two retained binaries, the native campaign executes five A/A pairs followed
+by five interleaved A/B pairs:
+
+```sh
+isogeny-perf campaign ./baseline ./candidate BASE_SHA HEAD_SHA ./fresh-campaign
+```
+
+This form checks repeatable counts and exact outputs without collecting wall
+samples. On Linux, append the repository's native `isolated-bench` executable
+and its reserved CPU list to collect timing samples and isolation receipts:
+
+```sh
+isogeny-perf campaign ./baseline ./candidate BASE_SHA HEAD_SHA ./fresh-campaign \
+  ./isolated-bench 3
+```
+
+Reserve SMT siblings together. Interference, missing isolation receipts and
+failed commands remain censored; macOS counts do not establish wall-time
+speedups. See the frozen [performance protocol](../../research/isogeny_performance_20261014/PROTOCOL.md)
+and [algorithm inventory](../../research/isogeny_performance_20261014/INVENTORY.md).
+
 ## Maintainer build and checks
 
 The repository builds this standalone package in the release workflow. These are
@@ -127,3 +173,77 @@ The package links the existing standalone algorithms and the independently valid
 field, polynomial, and kernel verification implementations. The dated research sources
 and evidence remain frozen. Dependencies are pinned to the independent replay study's
 lockfile versions. Runtime curve data and version/source provenance are embedded.
+
+## Largest prime-degree challenge
+
+`isogeny challenge policy` prints the pinned **Prime Degree Frontier** rules
+and all registered standard prime-field models. Each exact source curve ranks separately;
+unsupported models stay visible. `challenge plan --curve all` creates a
+candidate-only ladder. `challenge run`, `challenge judge` and
+`challenge leaderboard` construct or independently replay explicit maps in
+fresh directories. Saved scores are not accepted as submissions. See
+[challenge rules and commands](../../docs/challenges/isogeny-prime-degree/README.md).
+The new command is included by the existing ReleaseMe build; actual new-asset
+publication remains a separate release gate.
+
+## Compact CM expressions on secp256k1
+
+A build whose help lists `compact-cm` can construct and independently check
+compact known-endomorphism self-maps on the exact registered secp256k1 source:
+
+```sh
+isogeny compact-cm construct --exponent 3 --out ./compact-7 --timeout 1800
+isogeny compact-cm verify --input ./compact-7/certificate.json --out ./compact-7-replay --timeout 3600
+```
+
+Both commands require fresh output directories. They run a separate native worker
+with an 8 GiB sampled RSS limit, native watchdog and retained stdout, stderr,
+PID, resource receipt, artifact and input/output hashes. The public construction
+result is `CONSTRUCTED`; independent verification reports `VERIFIED_COMPACT` only
+after its checks pass. Failures and resource censorship keep their receipts.
+
+The geometric map is `[a]+[b]phi`, where `phi(x,y)=(beta*x,y)`, and its degree is
+computed from the exact signed unreduced integers as `a*a-a*b+b*b`. The supported
+constructor uses Mersenne degrees with odd prime exponents in `3..=65536`,
+Lucas-Lehmer certification and Cornacchia. The independent verifier uses a separate
+integer backend, different group arithmetic, exact integer identities, differential
+and subgroup checks, eight fixed public point images and both dual compositions.
+Primality of the standardized field and subgroup parameters is explicitly trusted
+from SEC2; degree primality is independently replayed.
+
+`compact-cm evaluate --input CERTIFICATE --x X --y Y --mode geometric` evaluates
+the unreduced expression. `--mode subgroup` uses the separately checked scalar
+restriction on the rational subgroup. Each evaluation rechecks the certificate;
+the constructor/replay watchdogs apply to `construct` and `verify`. The degree
+proof remains separate from agreement of point outputs. This is a compact
+known-endomorphism category and receives no expanded-map challenge score.
+
+See the source distribution's `docs/identity-certificates/cm-eisenstein-norm.md`
+for its exact proof basis, evaluated IDC1 supplement, controls and representation
+limits. Larger scientific target instances require their own retained execution
+and independent replay; the example above is the fixed degree-7 control.
+
+Opt-in replay stage tracing uses one absolute, absent file per replay process:
+
+```sh
+ISOGENY_REPLAY_TRACE=/absolute/fresh/stages.jsonl \
+  isogeny challenge judge --input /absolute/sealed-map --out /absolute/fresh/judgement
+```
+
+The trace parent directory must exist. The tool refuses an existing trace file,
+a relative path, or a requested trace it cannot write; it never silently disables
+requested evidence. Every begin/end/error boundary is written and flushed as one
+JSONL record with schema, stage and parent IDs, PID and monotonic operational
+milliseconds. Core completion uses terminal status COMPLETED; challenge admission
+still comes from the independently bound public judgment. An outer watchdog can
+leave a durable begin without an end or terminal record: that stage is unfinished,
+and its absent completed duration is not zero. Default runs emit no trace. Tracing
+covers dispatcher parsing, kernel GCD/torsion/subgroup stages, exact map checks and
+each of20 transports per map. It preserves the original arithmetic and admission
+checks. One trace path cannot be shared across multiple replays or walk steps.
+
+Fixed P-192/13 native controls compare trace-off/on verification bytes and all nine
+existing adversarial verdicts. Separate controls cover malformed parsing, trace
+path/write failures, deterministic nesting and a bounded interrupted fixture with
+no cryptographic work. These controls establish no timing advantage; a performance
+comparison requires its own frozen same-map A/A and paired measurements.

@@ -100,6 +100,34 @@ impl Fp4 {
         self.count(4);
         E4(core::array::from_fn(|i| mm(a.0[i], k, self.p)))
     }
+    /// Characteristic-`p` Frobenius when `t^p = z t`, `z ∈ F_p`.
+    /// Three nonconstant coordinate multiplications are charged.
+    pub fn frob_p(&self, a: &E4, z: u64) -> E4 {
+        debug_assert_eq!(pow_mod(z, 4, self.p), 1);
+        let z2 = mm(z, z, self.p);
+        let z3 = mm(z2, z, self.p);
+        self.count(5); // z², z³, and three coordinate products.
+        E4([
+            a.0[0],
+            mm(a.0[1], z, self.p),
+            mm(a.0[2], z2, self.p),
+            mm(a.0[3], z3, self.p),
+        ])
+    }
+    /// Multiply by `k t^degree`, `degree < 4`.  This keeps a twist
+    /// Frobenius's monomial `y` multiplier out of a generic 19-product
+    /// field multiplication.  All four products and each reduction count.
+    pub fn mul_monomial(&self, a: &E4, k: u64, degree: usize) -> E4 {
+        assert!(degree < 4);
+        let mut out = [0u64; 4];
+        for (i, &ai) in a.0.iter().enumerate() {
+            let j = i + degree;
+            let v = mm(ai, k, self.p);
+            out[j % 4] = if j >= 4 { mm(v, self.c, self.p) } else { v };
+        }
+        self.count(4 + degree as u64);
+        E4(out)
+    }
     /// Schoolbook with `t⁴ = c`: 16 products and 3 reductions.
     pub fn mul(&self, a: &E4, b: &E4) -> E4 {
         let p = self.p;
@@ -843,7 +871,7 @@ unsafe fn axpy_avx2(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
 }
 
 #[inline]
-fn axpy(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
+pub(crate) fn axpy(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
     #[cfg(target_arch = "x86_64")]
     {
         if is_x86_feature_detected!("avx512bw") && is_x86_feature_detected!("avx512vl") {
@@ -906,7 +934,7 @@ fn rref_u16(m: &mut [Vec<u16>], p: u32, muls: &mut u64) -> Vec<usize> {
 /// is a similarity by `I + Σ fᵢ E_{i,j+1}`, whose elementary factors
 /// commute (their products vanish), so its row operations can all run
 /// before its column operations: the same matrix as the interleaved order.
-fn charpoly_u16(a: &[Vec<u64>], p: u32, muls: &mut u64) -> UPoly {
+pub(crate) fn charpoly_u16(a: &[Vec<u64>], p: u32, muls: &mut u64) -> UPoly {
     let n = a.len();
     let mut h: Vec<Vec<u16>> = a
         .iter()
@@ -986,7 +1014,12 @@ fn charpoly_u16(a: &[Vec<u64>], p: u32, muls: &mut u64) -> UPoly {
 }
 
 /// As `gaudry_cubic::eigenvectors_mod_p`: a kernel basis of `m − λI`.
-fn eigenvectors_u16(m: &[Vec<u16>], lambda: u64, p: u32, muls: &mut u64) -> Vec<Vec<u64>> {
+pub(crate) fn eigenvectors_u16(
+    m: &[Vec<u16>],
+    lambda: u64,
+    p: u32,
+    muls: &mut u64,
+) -> Vec<Vec<u64>> {
     let n = m.len();
     let mut a: Vec<Vec<u16>> = m.to_vec();
     for (i, row) in a.iter_mut().enumerate() {
@@ -1075,12 +1108,12 @@ impl QuarticSolve {
     }
 }
 
-struct Echelon {
-    rows: Vec<Vec<u16>>,
-    pivot_row: Vec<u32>,
-    zero_rows: usize,
+pub(crate) struct Echelon {
+    pub(crate) rows: Vec<Vec<u16>>,
+    pub(crate) pivot_row: Vec<u32>,
+    pub(crate) zero_rows: usize,
     /// Input rows that reduced to zero (or were zero), by index.
-    zero_ids: Vec<u32>,
+    pub(crate) zero_ids: Vec<u32>,
 }
 
 /// Forward elimination by leading column.  Every unused row has zeros
@@ -1091,12 +1124,17 @@ struct Echelon {
 /// elimination, without scanning rows that are already zero there;
 /// `muls` counts the nonzero entries of each pivot row once per row it is
 /// subtracted from, and once for its normalisation.
+pub(crate) fn echelon_by_lead(rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool) -> Echelon {
+    echelon_by_lead_with(rows, p, muls, debug, false)
+}
+
+/// [`echelon_by_lead`], optionally with sparsest pivots.
 ///
 /// With `sparsest`, each column's pivot is instead the row of its bucket
 /// with the fewest nonzero entries (lowest index on a tie), which cuts the
 /// work and the fill; the row space and the pivot columns are the same
 /// either way.
-fn echelon_by_lead_with(
+pub(crate) fn echelon_by_lead_with(
     mut rows: Vec<Vec<u16>>,
     p: u32,
     muls: &mut u64,
@@ -1264,20 +1302,20 @@ fn top_up_echelon(
 /// of target columns by one sweep from the right over the pivots they
 /// reach — iteratively, since a chain of pivots can be tens of thousands
 /// deep.
-struct NormalForms4<'a> {
-    ech: &'a Echelon,
-    is_std: Vec<bool>,
-    std_index: Vec<u32>,
-    dim: usize,
-    p: u32,
-    memo: Vec<Option<(Vec<u16>, u64)>>,
-    reached: usize,
+pub(crate) struct NormalForms4<'a> {
+    pub(crate) ech: &'a Echelon,
+    pub(crate) is_std: Vec<bool>,
+    pub(crate) std_index: Vec<u32>,
+    pub(crate) dim: usize,
+    pub(crate) p: u32,
+    pub(crate) memo: Vec<Option<(Vec<u16>, u64)>>,
+    pub(crate) reached: usize,
 }
 
 impl<'a> NormalForms4<'a> {
     /// Make every column in `targets` resolvable.  `Err(c)` names a column
     /// reached that is neither standard nor a pivot.
-    fn ensure(&mut self, targets: &[usize], muls: &mut u64) -> Result<(), usize> {
+    pub(crate) fn ensure(&mut self, targets: &[usize], muls: &mut u64) -> Result<(), usize> {
         let ncols = self.is_std.len();
         let mut need: Vec<usize> = Vec::new();
         let mut seen = vec![false; ncols];
@@ -1360,7 +1398,7 @@ impl<'a> NormalForms4<'a> {
         Ok(())
     }
 
-    fn vector(&self, c: usize) -> Vec<u64> {
+    pub(crate) fn vector(&self, c: usize) -> Vec<u64> {
         if self.is_std[c] {
             let mut v = vec![0u64; self.dim];
             v[self.std_index[c] as usize] = 1;
@@ -2440,6 +2478,103 @@ pub fn solve_s5_subspace(
     Some(out)
 }
 
+/// Solver options the `D₄` oracle uses ([`crate::cryptanalysis::gaudry_quartic_d4::D4Options`]),
+/// applied to the plain system.  All off is [`solve_s5_subspace`] /
+/// [`solve_system4`], operation for operation.  There is no `weighted`:
+/// the plain `S₅` has no `σ₄ = π²` to substitute.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct PlainOptions {
+    /// The eigen step along the chains of `e₁` ([`solve_along_chains`]).
+    pub chains: bool,
+    /// The elimination's pivot in each column is the sparsest candidate.
+    pub sparsest: bool,
+}
+
+/// [`solve_system4_traced`] with [`PlainOptions`].  A replay that does not
+/// match runs the full solve as well, both charged in `st`; with options
+/// on, a replay tops up a rank shortfall from the held rows, as the `D₄`
+/// oracle's does.
+#[allow(clippy::too_many_arguments)]
+pub fn solve_system4_with(
+    comps: &[HashMap<[u8; 4], u64>],
+    opts: PlainOptions,
+    equation_degree: u8,
+    macaulay_degree: u8,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    debug: bool,
+    replay: Option<&ShapeTrace>,
+    record: Option<&mut ShapeTrace>,
+) -> Option<Vec<[u64; 4]>> {
+    let top_up = opts != PlainOptions::default();
+    let run = |rng: &mut StdRng,
+               st: &mut QuarticSolve,
+               replay: Option<&ShapeTrace>,
+               record: Option<&mut ShapeTrace>| {
+        solve_system_w_inner::<4>(
+            comps,
+            &[1; 4],
+            opts.chains,
+            opts.sparsest,
+            top_up,
+            equation_degree,
+            macaulay_degree,
+            p,
+            rng,
+            st,
+            debug,
+            replay,
+            record,
+        )
+    };
+    let mut outcome = ReplayOutcome::Recorded;
+    if let Some(t) = replay {
+        match run(rng, st, Some(t), None) {
+            Ok(sols) => {
+                st.replay = ReplayOutcome::Replayed;
+                return sols;
+            }
+            Err(()) => outcome = ReplayOutcome::FellBack,
+        }
+    }
+    let r = run(rng, st, None, record).unwrap_or(None);
+    st.replay = outcome;
+    r
+}
+
+/// [`solve_s5_subspace`] with [`PlainOptions`] and an optional shape trace
+/// ([`solve_system4_with`]).
+#[allow(clippy::too_many_arguments)]
+pub fn solve_s5_subspace_with(
+    curve: &Curve4,
+    pre: &SymmetrisedS5,
+    x_r: &E4,
+    opts: PlainOptions,
+    replay: Option<&ShapeTrace>,
+    record: Option<&mut ShapeTrace>,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    debug: bool,
+) -> Option<Vec<[u64; 4]>> {
+    let f = &curve.f;
+    let before = f.muls();
+    let comps = pre.weil_restrict(f, x_r);
+    st.weil_muls += f.muls() - before;
+    let es = solve_system4_with(&comps, opts, 8, 29, f.p, rng, st, debug, replay, record)?;
+    let mut out = Vec::new();
+    for e in es {
+        let mut sm_ = 0u64;
+        if let Some(x) = split_quartic(&e, f.p, rng, &mut sm_) {
+            out.push(x);
+        }
+        st.split_muls += sm_;
+    }
+    st.close();
+    out.sort_unstable();
+    Some(out)
+}
+
 // ── The independent check ─────────────────────────────────────────────────
 
 /// The subspace factor base: one point per `x ∈ F_p` whose right-hand side
@@ -3077,6 +3212,73 @@ mod tests {
     #[test]
     fn the_solver_finds_planted_roots_of_cubics() {
         planted(3, 7);
+    }
+
+    /// [`PlainOptions`] all off is [`solve_system4`], count for count; each
+    /// option on returns the same solutions, and a replay of the first
+    /// system's shape on a second system of the same support does too.
+    #[test]
+    fn plain_options_keep_the_solutions_and_off_is_the_committed_solve() {
+        let p = 269u64;
+        let system = |seed: u64| {
+            let mut rng = StdRng::seed_from_u64(seed);
+            let root: [u64; 4] = core::array::from_fn(|_| rng.gen_range(0..p));
+            let comps: Vec<HashMap<[u8; 4], u64>> = (0..4)
+                .map(|_| {
+                    let mut c: HashMap<[u8; 4], u64> = exponents4(3)
+                        .iter()
+                        .map(|m| (*m, rng.gen_range(1..p)))
+                        .collect();
+                    let mut dummy = 0u64;
+                    let v = eval4(&c, &root, p, &mut dummy);
+                    let e = c.entry([0, 0, 0, 0]).or_insert(0);
+                    *e = sm(*e, v, p);
+                    c
+                })
+                .collect();
+            (comps, root)
+        };
+        let (comps, root) = system(11);
+        let solve = |opts: PlainOptions,
+                     comps: &[HashMap<[u8; 4], u64>],
+                     replay: Option<&ShapeTrace>,
+                     record: Option<&mut ShapeTrace>| {
+            let mut st = QuarticSolve::default();
+            let mut rng = StdRng::seed_from_u64(5);
+            let s = solve_system4_with(
+                comps, opts, 3, 9, p, &mut rng, &mut st, false, replay, record,
+            )
+            .expect("closes");
+            (s, st)
+        };
+        let mut rng = StdRng::seed_from_u64(5);
+        let mut st0 = QuarticSolve::default();
+        let base = solve_system4(&comps, 3, 9, p, &mut rng, &mut st0, false).expect("closes");
+        assert!(base.contains(&root));
+        let (off, st_off) = solve(PlainOptions::default(), &comps, None, None);
+        assert_eq!(off, base);
+        assert_eq!(st_off.total_muls, st0.total_muls);
+        assert_eq!(st_off.echelon_muls, st0.echelon_muls);
+        for (chains, sparsest) in [(false, true), (true, false), (true, true)] {
+            let opts = PlainOptions { chains, sparsest };
+            let (s, st) = solve(opts, &comps, None, None);
+            assert_eq!(s, base, "{opts:?}");
+            if sparsest {
+                assert!(st.echelon_muls < st0.echelon_muls, "{opts:?}");
+            }
+        }
+        let opts = PlainOptions {
+            chains: true,
+            sparsest: true,
+        };
+        let mut shape = ShapeTrace::default();
+        let _ = solve(opts, &comps, None, Some(&mut shape));
+        let (comps2, root2) = system(12);
+        let (full, _) = solve(opts, &comps2, None, None);
+        let (replayed, st_r) = solve(opts, &comps2, Some(&shape), None);
+        assert!(full.contains(&root2));
+        assert_eq!(replayed, full);
+        assert_ne!(st_r.replay, ReplayOutcome::Recorded);
     }
 
     /// §11.18's pipeline end to end at a toy size: a prime-order curve,

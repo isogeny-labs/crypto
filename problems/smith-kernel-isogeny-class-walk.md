@@ -1,20 +1,26 @@
 # Enlarging Smith's 18.57% by isogeny walks: only the rationality conditions can move
 
-- **Status:** `open`
+- **Status:** `open` (the walk via the elliptic side is built and priced,
+  2026-10-25: short in the isogeny graph, `Θ(p)` as a sampled walk; no
+  hyperelliptic-to-hyperelliptic walk exists to compare)
 - **Kind:** implementation gap; empirical bottleneck (walk cost unknown)
 - **Affected work:** [weak isogeny classes study, 2026-10-13](../research/weak_isogeny_classes_20261013/REPORT.md),
-  lead 2
+  lead 2; [Smith Prop. 2/4 native study, 2026-10-14](../research/smith_prop24_native_20261014/REPORT.pdf)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-13
+- **Last updated:** 2026-10-25
 
 ## Problem
 
-We cannot yet say how much of the gap between Smith's 18.57% and the 50.16%
-ceiling an isogeny walk inside the hyperelliptic locus recovers. The
-per-subgroup rationality conditions (Smith's Proposition 2: a discriminant
-is a square; Proposition 4: the leading coefficient of `s(t)` is a square) are
-not implemented here. Neither is any explicit hyperelliptic-to-hyperelliptic
-isogeny inside the class.
+We cannot yet say what an isogeny walk inside the hyperelliptic locus costs
+to move a curve to a member of its class where Smith's construction succeeds.
+Since 2026-10-14 the per-subgroup rationality conditions (Smith's
+Proposition 2: a discriminant is a square; Proposition 4: the leading
+coefficient of `s(t)` is a square) are implemented natively
+(`src/cryptanalysis/smith_prop24.rs`), and the share of curves whose class
+holds such a member is measured exactly at `p = 7, 11`. No explicit
+hyperelliptic-to-hyperelliptic isogeny inside the class is implemented, so
+the walk's existence along explicit steps, its length and its cost remain
+open.
 
 ## Evidence and uncertainty
 
@@ -31,29 +37,180 @@ isogeny inside the class.
   the outcome of the two square conditions, which Smith models as
   independent fair coins (Hypotheses 2 and 3). Under those hypotheses the
   asymptotic ceiling is `P(#S(H) > 0) = 0.50159` against Smith's `0.18574`.
-- **Missing capability:** native Proposition 2 and 4 tests. Explicit
-  `(2,2,2)` or `(l,l,l)` isogenies between hyperelliptic genus-3 Jacobians,
-  with their cost.
+- **Observed (2026-10-14, [study](../research/smith_prop24_native_20261014/REPORT.pdf),
+  protocol frozen at `31d0beec8` before data):**
+  - Question 1: on 10^6 random degree-8 models over `p = 2^31 - 1` the native
+    tests reproduce Smith §8 (Example 2) within ±0.01 on all four fractions:
+    0.50187 [0.50062, 0.50312] with a rational tractable subgroup, 0.49999
+    of subgroups pass Prop. 2, 0.50102 of those pass Prop. 4, 0.18638
+    [0.18541, 0.18736] of curves have `full_success` (Theorem 2: 0.18574;
+    98.75% Clopper–Pearson intervals).
+  - Question 2 (exhaustive, curve + twist, classes = `L`-polynomials): the
+    share of curves whose class holds a `full_success` curve is
+    `C = 0.4304` at `p = 7` and `0.4750` at `p = 11`, against `D = 0.1758`
+    and `0.1805` directly and the ceiling `U = 0.4897` and `0.4943`;
+    `r = (C − D)/(U − D) = 0.811` and `0.938`, both "near the ceiling" under
+    the frozen 0.75 threshold. Controls passed: Smith's Example 1 reproduced
+    (`N`, `D`, `δ_i`, `f_i`, `#H(F_37) = 42`); the 2026-10-13 counts
+    reproduced; class closure of "has a rational tractable subgroup" equals
+    its direct fraction; the point count of Recillas' curve `X` agreed with
+    Prop. 4 in 18,381,760 cases and disagreed in 0.
+  - Post hoc, descriptive: `C` is below the independence null (`C = U` in all
+    199 permutations), because 560 of 1,855 (`p = 7`) and 1,210 of 7,431
+    (`p = 11`) tractable classes hold no `full_success` curve; those classes
+    are smaller (median 108 vs 348 models at `p = 7`, 420 vs 1,860 at
+    `p = 11`). The two conditions are neither class invariants nor
+    independent across class members.
+- **Observed (2026-10-25, W3a, [study](../research/smith_elliptic_walk_20261018/REPORT.pdf),
+  protocol frozen at `eba0a48fbf`):** the walk on the elliptic side. Start
+  from `E/F_{p^3}` with a `(3,5)` Joux-Vitse/Momose-Chao descent to `H`, move
+  `E` by rational 2-isogenies, re-descend and run `full_success`.
+  - Exhaustive at `p = 7..31`: every descended `H` has a rational tractable
+    subgroup. `full_success` holds for 0.53-0.61 of them, against 0.1857 for
+    random `H`, so the 0.43-0.50 class ceiling above does not bound this
+    locus.
+  - A failing weak `E` has a passing weak `E'` in its 2-isogeny component in
+    74-98% of cases. That `E'` is on average 1.5-3.6 steps away (maximum
+    3-11). Passing is not constant on components.
+  - Sampled walks at `p = 2^10..2^20`: the frozen fit's `o(p)` label is a
+    censoring artifact. Post hoc, successful walks at `p = 3 mod 4` scale as
+    `p^1.07` [0.95, 1.19] tested nodes. Each step costs about 2-3 k `F_p`
+    multiplications, a descent 2-4 k and a Smith call 25-61 k (derived).
+  - At `p = 1 mod 4` the full-2-torsion walk branches or dead-ends, by the
+    sign of `-1`, and is usually trapped in closed sets of 6-30 classes.
+- **Missing capability:** explicit `(2,2,2)` or `(l,l,l)` isogenies between
+  hyperelliptic genus-3 Jacobians, with their cost. (Native Proposition 2 and 4
+  tests: done 2026-10-14.)
 - **What this does not establish:** that the ceiling is reached, or the cost
   of reaching it. It also leaves out walks through non-hyperelliptic members
   of the class.
 
 ## What would unblock it
 
-- [ ] Native Proposition 2 and 4 tests, validated by reproducing Smith's
-  experiment (18.58% success on random curves; Smith §8).
-- [ ] Exhaustive per-class success at `p = 7, 11`: the share of curves whose
-  class has a member where some tractable subgroup passes both tests.
+- [x] Native Proposition 2 and 4 tests, validated by reproducing Smith's
+  experiment (18.58% success on random curves; Smith §8). Done 2026-10-14:
+  18.638% [18.541%, 18.736%] on 10^6 curves.
+- [x] Exhaustive per-class success at `p = 7, 11`: the share of curves whose
+  class has a member where some tractable subgroup passes both tests. Done
+  2026-10-14: 43.04% and 47.50%.
+- [ ] Explicit isogenies between hyperelliptic members of a class, and the
+  walk distance from each tractable non-`full_success` curve to a
+  `full_success` one at `p = 7, 11`, with the cost per step in field
+  operations.
 
 ## Next discriminating step
 
-- **Action:** implement Smith's matrix `M` (eq. (2)), the discriminant (4)
-  and `s(t)` (Lemma 4) in Rust. Add a `full_success` column to `PrimeReport`.
-- **Outcomes:** if the class-level success is near 50%, the walk extension is
-  worth costing. If it is near 18.6%, the conditions are correlated within a
-  class and the extension gains little.
-- **Recheck trigger:** that implementation landing.
+- **Done (2026-10-14):** the step recorded on 2026-10-13 (implement `M`, the
+  discriminant and `s(t)`; measure class-level success) ran under a frozen
+  protocol. Outcome: near the ceiling at both primes, so the walk extension
+  is worth costing.
+- **Action now:** build explicit isogenies between hyperelliptic members of
+  one class at `p = 7` (for example Smith's trigonal construction when `X`
+  is hyperelliptic, or Richelot-type `(2,2,2)` steps), and measure on the
+  exhaustive census the number of steps from each tractable
+  non-`full_success` curve to a `full_success` curve, with field-operation
+  counts per step. Controls: the class rows of
+  `research/smith_prop24_native_20261014/data/` give the reachable set
+  exactly, so a walk that reaches beyond `C` or misses a class it should reach
+  is a bug.
+- **Narrowed (2026-10-15,
+  [study](../research/smith_iso_granularity_20261015/REPORT.pdf)):** why a
+  minority of classes holds no `full_success` curve. Sparsity is not the
+  answer: counting `F_p`-isomorphism classes of curves instead of models
+  (34,227 at `p = 7`, 324,562 at `p = 11`; `full_success` checked constant on
+  every model) moves the null median of `C` from `U` to 0.4579 / 0.4864, but
+  the observed 0.4304 / 0.4750 stays below all 999 permutations at both
+  primes (frozen verdict: residual deficit beyond granularity). Empty
+  tractable classes: 560 vs 395 expected and 1,210 vs 720, in excess at every
+  class size. Successes are positively correlated within an `L`-class; the
+  2-adic valuation of `#J(F_p)` does not explain it (post hoc).
+- **Narrowed further (2026-10-16,
+  [study](../research/smith_class_invariant_20261015/REPORT.pdf)):** the
+  shared factor is not a 2-adic Galois-module invariant of `J_H` at the
+  levels tested. Under a frozen protocol, conditioning the iso-level null on
+  the Frobenius cycle type on `J[2]` (the finest `J[2]` invariant for a
+  hyperelliptic curve), the 2-Sylow subgroup of `J(F_p)` (class group,
+  certified on all 16,823 / 160,010 tractable classes) or the corrected
+  `J[4]` descent invariants leaves `C` below all 999 permutations at both
+  primes; at most 9% of the gap closes (verdict: does not explain, all
+  valid candidates). The frozen `J[4]` descent instrument was invalid
+  (order-2 descent kernel on all-even factorizations; Amendment 1).
+  Next discriminating step: compute, per rational tractable subgroup `S`,
+  the `F_p`-isomorphism class of the quotient curve `X` (or of the
+  p.p.a.v. `J_H/S`, e.g. Dixmier–Ohno invariants with the twist bit) and
+  test whether `full_success` within an `L`-class is explained by shared
+  quotients (Serre's obstruction on a common target); control: the
+  `#X(F_p)` point count already checked in `smith_prop24::x_check`.
+- **Largely explained (2026-10-16,
+  [study](../research/smith_serre_sign_20261016/REPORT.pdf)):** the clustering
+  is mostly in the Prop. 4 sign (Serre's obstruction), which is biased by
+  `N1 = #H(F_p)`, an `L`-class invariant. Twisting preserves Prop. 2 and flips
+  Prop. 4 (except on degenerate subgroups), so `X` has either `N1` or
+  `2p + 2 − N1` rational points. Among non-degenerate Prop. 2 passes the
+  Prop. 4 rate rises with `N1`, close to `N1 / (2p + 2)`. This was found at
+  `p = 7` and confirmed on held-out `p = 11` (max deviation 0.080, frozen bar
+  0.10). Conditioning the iso-level null on `(stratum, N1, any Prop. 2 pass)`
+  closes 80% / 76% of `U − C`, against 63% / 52% for a random class label.
+  The remaining ~24% is open. For the walk: a walk inside an `L`-class
+  cannot change `N1`, so classes with few rational points are poor targets
+  and their twist classes good ones. The asymptotic extrapolation (bias
+  `O(1/√p)`, Smith's fair coin recovered) is untested.
+- **Scaling settled (2026-10-16,
+  [study](../research/smith_sign_scaling_20261016/REPORT.pdf)):** on 10^6
+  random curves at each of `p = 101, 1009, 10007` the Prop. 4 rate is
+  `1/2 + β a1/(2p+2)` with `β` = 1.02, 1.09, 0.94. The scaling exponent of `β`
+  in `p` is `γ = 0.019` [−0.014, 0.051] (frozen verdict: bias shrinks like
+  `1/√p`). So the sign bias and the clustering it causes are small-prime
+  effects, and Smith's fair coin holds asymptotically. The rule
+  `r ≈ #H(F_p)/(2p+2)` holds over the whole range; its mechanism is not
+  identified. A post hoc check found that the Prop. 2 count adds nothing to
+  the residual quarter of the clustering, and `N3` at most a few points.
+  Still open: Smith's Remark 5 alternative (descending `X` when the trigonal
+  map is not rational, which would raise the direct rate to 31.13% under his
+  hypotheses) as a route that needs no walk.
+- **W3a done (2026-10-25,
+  [study](../research/smith_elliptic_walk_20261018/REPORT.pdf)):** the
+  elliptic-side walk is short in the graph at `p <= 31`, but `Θ~(p)` as a
+  sampled walk. JV-weak nodes have density about `c/p`. General `(3,5)`-weak
+  curves are also about `1/p` of all classes (`2p^2` models against `~2p^3`
+  classes), so a general weakness test alone would not obviously help. The
+  walk's cost does not vanish against `Õ(q)` index calculus.
+  **Next discriminating step:** measure whether weak and passing curves
+  cluster in the 2-isogeny graph beyond density `1/p`, and whether the
+  distance to a passing `E` grows like `log p`. In the Q1 graphs
+  (`research/smith_elliptic_walk_20261018/data/exhaustive/graph_p*.json`)
+  the explored components are about 4x enriched in weak curves at `p = 31`
+  (derived). Test whether that persists at larger `p`, on larger exhaustive
+  or sampled components. Only if it does is a general weakness test with a
+  short search worth building. Also open: a walk policy that avoids the
+  `p = 1 mod 4` traps, and why the descended locus passes at about 0.55.
+- **Outcomes:** short walks with cheap steps make the extension a practical
+  enlargement of Smith's weak set; long or expensive walks bound it as a
+  counting fact only.
+- **Recheck trigger:** an explicit hyperelliptic-to-hyperelliptic genus-3
+  isogeny landing in the repository.
 
 ## Resolution and history
 
 - 2026-10-13: opened with the coverage study. Unresolved.
+- 2026-10-14: native Proposition 2 and 4 tests landed; Smith §8 reproduced on
+  10^6 curves; class-level success near the ceiling at `p = 7` (`r = 0.811`)
+  and `p = 11` (`r = 0.938`). Unblock items 1 and 2 done; the walk's cost
+  stays open.
+- 2026-10-15: isomorphism-class granularity tested under a frozen protocol;
+  it explains 54% (`p = 7`) and 41% (`p = 11`) of the gap `U − C`, and the
+  rest is a within-class correlation not yet named.
+- 2026-10-16: candidate invariants of `J_H` tested (cycle type on `J[2]`,
+  2-Sylow of `J(F_p)`, `J[4]` descent data); none explains the within-class
+  correlation at `p = 7, 11`. Unresolved; next step is the quotient-curve
+  class.
+- 2026-10-16: the Prop. 4 sign follows `#H(F_p)` (confirmed at `p = 11`);
+  with Prop. 2 this accounts for about three quarters of the clustering.
+- 2026-10-16: the Prop. 4 sign bias shrinks like `1/√p` (`β` bounded at
+  `p = 101, 1009, 10007`); the clustering is a small-prime effect.
+- 2026-10-25: W3a frozen protocol run. On the descended locus Smith passes at
+  0.53-0.61. Exhaustive closure under elliptic 2-isogenies reaches 74-98% at
+  `p <= 31`, at distances of 1.5-3.6 steps. Sampled walks are `Θ(p)` to the
+  first pass (post hoc; the frozen `o(p)` label is a censoring artifact) and
+  are trapped at `p = 1 mod 4`. Unresolved; next step is to measure whether
+  weak and passing curves cluster beyond `1/p`.

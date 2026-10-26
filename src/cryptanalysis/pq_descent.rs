@@ -61,7 +61,7 @@
 
 use crate::binary_ecc::{BinaryCurve, F2mElement};
 use crate::cryptanalysis::binary_semaev::binary_semaev_s3;
-use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{mask_from64, F2BoolMono, F2BoolPoly};
 use num_bigint::BigUint;
 
 // ── Descent result ─────────────────────────────────────────────────
@@ -123,7 +123,7 @@ fn anf_to_poly(anf: &[bool], n_vars: usize) -> F2BoolPoly {
     let mut monos = Vec::new();
     for (s, &on) in anf.iter().enumerate() {
         if on {
-            monos.push(F2BoolMono::from_mask(s as u64));
+            monos.push(F2BoolMono::from_mask(mask_from64(s as u64)));
         }
     }
     F2BoolPoly::from_monos(monos, n_vars)
@@ -446,6 +446,10 @@ mod tests {
     use super::*;
     use crate::binary_ecc::IrreduciblePoly;
     use crate::cryptanalysis::binary_semaev::binary_semaev_s3;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     /// Standard low-order basis `{1, z, z², …, z^{m'-1}}` for V ⊂ F_{2^m}.
     fn standard_basis(m: u32, m_prime: u32) -> Vec<F2mElement> {
@@ -537,7 +541,7 @@ mod tests {
             let direct_bits = direct.to_biguint();
             for j in 0..(m as usize) {
                 let expected = ((&direct_bits >> j) & BigUint::from(1u32)) == BigUint::from(1u32);
-                let got = sys.equations[j].eval(v) == 1;
+                let got = sys.equations[j].eval(mask_from64(v)) == 1;
                 assert_eq!(
                     got, expected,
                     "descent eq {} at v={:#b} disagreed with direct S_3 bit (got {}, expected {})",
@@ -640,7 +644,7 @@ mod tests {
             let direct_bits = direct.to_biguint();
             for j in 0..(m as usize) {
                 let expected = ((&direct_bits >> j) & BigUint::from(1u32)) == BigUint::from(1u32);
-                let got = sys.equations[j].eval(v) == 1;
+                let got = sys.equations[j].eval(mask_from64(v)) == 1;
                 assert_eq!(
                     got, expected,
                     "n=3 descent eq {} at v={:#b} disagreed with direct S_4 bit",
