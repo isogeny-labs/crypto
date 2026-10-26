@@ -234,7 +234,12 @@ fn partial(study: &Path, m: u32) -> Value {
 }
 fn main() {
     let a: Vec<_> = std::env::args().skip(1).collect();
-    assert_eq!(a.len(), 1, "STUDY");
+    if a.len() == 2 && a[0] == "partial" {
+        let study = Path::new(&a[1]);
+        println!("{}", json!([14, 15].map(|m| partial(study, m))));
+        return;
+    }
+    assert_eq!(a.len(), 1, "STUDY | partial STUDY");
     let study = Path::new(&a[0]);
     let profiles = constructor(study);
     let quartic = [14, 15].map(|m| partial(study, m));
