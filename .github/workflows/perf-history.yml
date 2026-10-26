@@ -48,9 +48,16 @@ on:
       - 'rust-toolchain*'
       - 'src/**'
       - 'examples/perfbench/**'
+      - 'examples/performance_gains_audit.rs'
       - 'examples/perfindex/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
+      - 'docs/performance-gains.html'
+      - 'docs/performance-gains/**'
+      - 'research/summation_polynomials_20260914/run-01/**'
+      - 'research/summation_polynomials_20260914/confirmation-01/comparison.json'
+      - 'research/gaudry_allocation_20260914/run-01/comparison.json'
+      - 'gpu/macaulay/benchmarks/pipeline-20260914/run-01/summary.json'
       - 'scripts/perf/perfhistory.py'
       - 'scripts/perf/perfindex.py'
       - 'docs/perf/ecbench-children.json'
@@ -94,7 +101,7 @@ jobs:
   record:
     # Append one snapshot for the pushed (or dispatched) revision.
     if: github.event_name != 'pull_request' && github.event_name != 'merge_group' && !inputs.check_only
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|perf-history.yml|') && 'experiment' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|perf-history.yml|') && 'main' || 'main' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|perf-history.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|perf-history.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
     timeout-minutes: 120
     permissions:
       contents: write
@@ -246,7 +253,7 @@ jobs:
   check:
     # PRs validate the history machinery; check_only dispatches retain the full comparison.
     if: github.event_name == 'pull_request' || github.event_name == 'merge_group' || inputs.check_only
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|perf-history.yml|') && 'experiment' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|perf-history.yml|') && 'main' || 'main' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|perf-history.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|perf-history.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 90 }}
     steps:
       - uses: actions/checkout@v4
@@ -271,6 +278,8 @@ jobs:
           cargo test --release --example perfindex
       - name: Build perfbench and ecbench
         run: cargo build --release --example perfbench --bin ecbench
+      - name: Audit frozen performance-gains dashboard
+        run: cargo run --release --example performance_gains_audit --quiet
       - name: Check kernel fingerprints
         # A kernel's fingerprint is the work it does; if a change moves it, the
         # change is not a speed-up and the index must not be read across it.
