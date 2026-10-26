@@ -1,5 +1,5 @@
 #set page(margin:1.6cm)
-#set text(size:9.5pt)
+#set text(size:9.5pt, font: "Libertinus Serif")
 = Keeping the IC leaderboard rigorous and current (2026-10-21, merged with main 2026-10-26)
 
 Follow-up to the slice A validation sweep (#2293). Question: what makes a number on the board true, and what
