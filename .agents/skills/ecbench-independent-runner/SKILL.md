@@ -1,15 +1,23 @@
 ---
 name: ecbench-independent-runner
-description: Run an ecbench ECDLP measurement on an independent lab runner (isolab) with whole-core NUMA-local placement, and reproduce or cross-check a committed ecbench session on another machine with exact replays and a replay certificate. Use when a result needs L2/L3 isolation, a second host, or independent validation before a claim.
+description: Reproduce or cross-check an ecbench session on another machine with exact replays and an independent replay certificate. Route default x86 lab measurements to isolab-eks; retain the legacy runner for explicitly requested NATS or bare-metal placement. Use for a second host or independent validation before a claim.
 ---
 
 # Independent runs and reproduction
 
-Read [`docs/ecbench/README.md`](../../../docs/ecbench/README.md) §6 and §9, and
-`isolab/README.md` for the lab itself. ecbench writes the job and isolab places
-and isolates it. Every run is still graded by ecbench from its own observations.
+Read [`docs/ecbench/README.md`](../../../docs/ecbench/README.md) §6 and §9.
+For default x86 lab experiments, use [isolab-eks](../isolab-eks/SKILL.md) and
+its EKS Spot request, authentication and S3 verification contract. An independent
+replay still needs the distinct host class required below; another pod alone
+does not establish independence. EKS L2 does not establish L3 or bare metal.
+If those are explicitly required, retain that requirement and use the specified
+qualified runner or report the missing capability.
 
-## Submit a spec to isolab
+## Explicit legacy NATS or bare-metal submission
+
+Only for an explicitly selected legacy backend, read `isolab/README.md` and use
+the following commands. These are a different API from `isolab_k8s_*` and the
+EKS portable launcher. Every run is graded from ecbench's own observations.
 
 For client installation and project MCP registration, start with
 [`docs/ISOLAB_AGENTS.md`](../../../docs/ISOLAB_AGENTS.md). The `isolab` connection
@@ -79,8 +87,10 @@ machine can therefore check them:
 
 ## Under Claude Code
 
-The `isolab-job`, fetch and `ecbench verify --replay` commands above may run
-as a command card: `experiment-director` writes it from the frozen spec or
+For EKS, use the task-card procedure in the `isolab-eks` submission reference.
+For explicitly selected legacy runs, the `isolab-job`, fetch and
+`ecbench verify --replay` commands above may run as a command card:
+`experiment-director` writes it from the frozen spec or
 session path, the main session relays it verbatim to `executor-mechanical`,
 and `experiment-director` assesses the returned text against the receipt on
 disk (AGENTS.md "Model tiers"). Comparing levels, blockers and
