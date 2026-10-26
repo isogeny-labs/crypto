@@ -56,3 +56,17 @@
    of its 10-hour budget). `run_edwards_resume.sh` resumed it from that
    checkpoint at 11:52Z. The record's `resume` row marks the join, and the
    wall cap counts the time before the restart.
+
+6. **Third container restart (found 2026-10-19 16:11Z).** `dlp_p71_s1` was
+   found stopped at its last checkpoint (1,434,848 trials, 9 relations, 7.16 h
+   of its 10-hour budget), with no process running; `dlp_p41_s1` had not
+   started. `run_edwards_resume.sh` resumed both from their checkpoints at
+   16:12Z. The wall cap counts only time spent running, so the days between
+   do not count against the budget.
+
+7. **`dlp_p41_s1` ended at its cap (2026-10-20 03:58Z).** 10.0 h of wall
+   time, 1,377,312 trials, 3 of the 7 relations it needs, no logarithm. It is
+   reported as incomplete; its cost to the cap (`8.76·10¹³` `F_p`
+   multiplications, `1.5·10⁷` times rho's) is a lower bound on a solve, not a
+   ratio. Every arm of PROTOCOL_EDWARDS.md has now run: five solved and
+   verified, one stopped at its cap.
