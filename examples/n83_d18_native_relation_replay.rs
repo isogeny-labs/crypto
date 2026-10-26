@@ -52,6 +52,15 @@ fn classify_cap_phases(phases: &[Value]) -> Result<&'static str> {
     }
 }
 
+fn require_terminal_exit(worker: &Path) -> Result<()> {
+    let name = worker.to_str().ok_or("worker result path is not UTF-8")?;
+    let exit_text = fs::read_to_string(format!("{name}.exit.txt"))?;
+    if exit_text.trim() != "0" {
+        return Err("terminal worker exit code is not zero".into());
+    }
+    Ok(())
+}
+
 fn audit_cap(path: &Path, cap: &Value, binary_sha: &str, receipt: &Path) -> Result<()> {
     let name = path.to_str().ok_or("cap path is not UTF-8")?;
     let result_name = name
@@ -395,6 +404,7 @@ fn replay(base: &Path, worker: &Path, binary: &Path, fixture: &Path, receipt: &P
     if result["status"] == "UNKNOWN_wall_cap" {
         return audit_cap(worker, &result, &binary_sha, receipt);
     }
+    require_terminal_exit(worker)?;
     let mode = result["mode"].as_str().ok_or("worker mode absent")?;
     if !["positive", "natural"].contains(&mode) {
         return Err("worker mode differs".into());
@@ -655,6 +665,29 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn terminal_replay_requires_zero_worker_exit() {
+        let directory = std::env::temp_dir().join(format!(
+            "n83-d18-terminal-exit-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir(&directory).unwrap();
+        let result = directory.join("result.json");
+        let exit = directory.join("result.json.exit.txt");
+        assert!(require_terminal_exit(&result).is_err());
+        fs::write(&exit, "1\n").unwrap();
+        assert!(require_terminal_exit(&result).is_err());
+        fs::write(&exit, "124\n").unwrap();
+        assert!(require_terminal_exit(&result).is_err());
+        fs::write(&exit, "0\n").unwrap();
+        require_terminal_exit(&result).unwrap();
+        fs::remove_dir_all(directory).unwrap();
+    }
 
     #[test]
     fn retained_model_certificate_rejects_tampering_and_padding() {

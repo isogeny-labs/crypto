@@ -45,6 +45,15 @@ is preserved separately pending validation admission.
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [2026-10-26 full-D18 cadence-32 constructed control](20261026-n83-d18-cadence32-control/)
+records 85.564 s import, 0.153 s formula construction, 0.352 s SAT search,
+and 86.603 s worker wall on the shared Apple M4 Pro (L0), with group, row,
+and retained-assignment replay. Its timing wrapper exited 1 on a denied
+macOS `kern.clockrate` query, and the natural arm was held. The report PDF,
+SVG and PNG are copied there from the [study directory](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-5/REPORT.md).
+It has no matched rho or cold total-runtime row and remains outside the
+admitted table under the validation gate.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-26 | [`20261026-n83-d18-solver-gates`](20261026-n83-d18-solver-gates/) ([ordered PDF](20261026-n83-d18-solver-gates/ordered-RUN.pdf), [cadence PDF](20261026-n83-d18-solver-gates/cadence32-RUN.pdf), [result PDF](20261026-n83-d18-solver-gates/RESULT.pdf)) | Exact full-D18 N83 base, separate ordered and native XOR cadence-32 solver-gate attempts; one constructed control and one natural query attempted in the ordered run, one constructed attempt in the cadence run | Ordered constructed: 66.994 s import, 1.077 s search, checked rank one; natural censored at 2,400 s worker cap. Cadence-32: 303.192 s supervisor wall, censored before model import. Cold IC and same-target rho missing; no ratio or selection | Shared Apple M4 Pro, L0 exploratory; cadence host saturated | [ordered run](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261025T2339Z-ordered-d18/REPORT.md), [cadence run](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261026T0121Z-cadence32/REPORT.md), [result](../research/koblitz_n83_factor_base_sweep_20261008/reports/d18-solver-gates-20261026/RESULT.md) |

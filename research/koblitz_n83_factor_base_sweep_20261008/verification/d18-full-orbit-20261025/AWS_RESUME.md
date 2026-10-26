@@ -322,3 +322,17 @@ passed the exact fresh S3-input and local capacity gates, then exited in
 `CARGO_MANIFEST_DIR` still named the dirty original checkout. The correction
 is a fresh release build in a clean checkout of frozen source `45ce91d5`,
 with new worker/verifier hashes recorded before the next positive arm.
+
+The resulting [attempt-5 constructed control](native-cadence-replay-20261026/attempt-5/REPORT.md)
+used a new clean-source worker, fresh provider-checked D18 GET, and a launch
+load of 21.65. It produced constructed SAT after 85.564 seconds of import,
+0.153 seconds of model construction, and 0.352 seconds of SAT search; its
+retained model passed separate native group/row/assignment replay. Its
+`/usr/bin/time -l` wrapper exited 1 on a denied macOS `kern.clockrate`
+query, independently reproduced with `/usr/bin/true`, so the natural arm
+was held. The [exit-policy amendment](native-cadence-replay-20261026/EXIT_POLICY_AMENDMENT.md)
+uses `time -p` with an explicit terminal exit-0 gate for a fresh rerun.
+Attempt 6 has a newly verified full-object GET, but its current host load
+remains above the frozen launch maximum; no attempt-6 worker was launched
+at this handoff update. The verifier's terminal path also needs an explicit
+exit-code check in code; its cap path already checks exit 124.
