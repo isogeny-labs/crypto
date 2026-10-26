@@ -557,11 +557,13 @@ The [same packet](formal/WEIGHTED_QUOTIENT_COMPONENTS.md) also checks
 pointwise Jacobian nonvanishing and a ring-global affine Jacobian ideal certificate under stated hypotheses, plus the chart
 generator identities `x·z=1`, `w·x³=y` in the common overlap ring. These
 bounded facts do not prove global scheme smoothness or equality of the
-overlap morphisms. The common localized overlap rings now have a checked
-canonical equivalence through `Away(XZ)`; its affine generator images now match the separately defined transition
-formulas. A checked conditional theorem extends this to full map equality if the
-canonical transition preserves every base-field scalar. That scalar premise
-and gluing to the separately built curve remain open.
+overlap morphisms as morphisms of the separately constructed schemes. The common localized overlap rings have a checked
+canonical equivalence through `Away(XZ)`; its affine generator images match the separately defined transition
+formulas. `WeightedOverlapScalar.projTransition_scalar` proves preservation of
+every base-field scalar, and `projTransition_eq_separate` therefore proves
+unconditional equality with the separately presented overlap-ring transition.
+Identifying the weighted-Proj overlap morphism with the separately glued curve
+and transporting local stalks remain open.
 Identifying that chart stalk with the chosen projective completion's
 infinity stalk remains open. The [infinity-chart packet](formal/INFINITY_CHART.md)
 now proves the chart equation `w²=z(1+a3z²+a2z³+a1z⁴+a0z⁵)` for
