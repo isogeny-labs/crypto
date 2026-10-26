@@ -1,0 +1,52 @@
+name: N83 high-K fixed31 capacity and correctness
+
+on:
+  push:
+    branches: [codex/n83-highk-beyond4405-20261021]
+    paths:
+      - examples/koblitz_orbit_dlp_fast.rs
+      - research/n83_highk_beyond4405_20261021/**
+      - .github/workflows/n83-highk-beyond4405.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capacity-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check capacity model
+        run: python3 research/n83_highk_beyond4405_20261021/capacity.py
+      - name: Install pinned Lean
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o "$RUNNER_TEMP/elan-init.sh"
+          sh "$RUNNER_TEMP/elan-init.sh" -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Check theorem module and axioms
+        shell: bash
+        working-directory: research/n83_highk_beyond4405_20261021
+        run: |
+          set -euo pipefail
+          lean --version
+          lean Capacity.lean | tee "$RUNNER_TEMP/n83-capacity-lean.log"
+          grep -F "'max_k_load75' depends on axioms: [propext, Quot.sound]" "$RUNNER_TEMP/n83-capacity-lean.log"
+          grep -F "'max_k_load80' depends on axioms: [propext, Quot.sound]" "$RUNNER_TEMP/n83-capacity-lean.log"
+
+  exact-index-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test N83 root index and fixed31 guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.1 --profile minimal
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-fixed31-target"
+          export CARGO_BUILD_JOBS=2
+          cargo +1.99.1 test --release --locked --example koblitz_orbit_dlp_fast
