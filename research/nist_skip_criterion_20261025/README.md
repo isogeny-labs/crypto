@@ -1,0 +1,76 @@
+# NIST skipped-curve criterion search
+
+The [report](REPORT.md) and [PDF](REPORT.pdf) give an independently checked
+two-test empirical separator for all 21 recorded eligible curves, its
+root-convention dependence, and the calibration that prevents treating the
+fit as an established historical explanation. The broader weakness and
+selection hypotheses remain unresolved.
+
+Start with [the truth table](results/criterion-truth-table.tsv),
+[calibration](results/calibration-union.json), and the [RNG-model verdict](results/rng-models.json).
+The raw evidence is packed in `evidence/runs.tar.xz` with
+per-member hashes. The PDF, archive and large PNG are delivered in the local
+workspace; their S3 upload remains blocked by unavailable upload credentials.
+See `ARTIFACT_DELIVERY.json` for exact names, sizes, hashes and delivery status.
+No active curve registry, solver or benchmark is changed.
+
+## Reproduce the native checks
+
+Install native PARI headers/library and OpenSSL development files. Compile
+the C++ sources with C++17; the recorded build uses `-O2 -Wall -Wextra -Werror`.
+All native execution is independent of Python. A scratch feature run is:
+
+```sh
+PARI_PREFIX=/path/to/pari SKIP_SEARCH_OUT=/new/scratch/directory sh native/run_features.sh
+```
+
+`native/root_convention.cpp` writes historical and smaller-root input variants.
+`native/search.cpp` reads the native feature tables and enumerates all 4,480
+permitted label assignments. Its `--self-test` exercises planted rules and
+negative controls. `native/verify_rules.cpp` independently evaluates the
+explicit candidate formulae from the exact parameter table.
+
+`native/rng_models.cpp` performs the defined 52,520-model visitation/point-gate
+test and has a separate `--self-test`. `native/factor_target.cpp` and
+`native/verify_factor_hint.cpp` produce and check proof-enabled factor records;
+`native/extend_features.cpp` only enables complete-factor features available
+for the entire selected cohort. `native/primality_gates.cpp` checks candidate
+incomplete-test gates on the proven prime orders. No unknown factor is
+represented as a prime or a fabricated numeric observation.
+
+The evidence archive contains the exact outputs for each phase, including
+timeouts, rejected partial hints and a superseded interpretation bucket.
+Every source used by a run is frozen beside those records. Reproducing the
+integer results is distinct from reproducing a machine's timeout outcome.
+
+## Integrity and rendering
+
+```sh
+sha256sum -c SHA256SUMS
+sha256sum -c evidence/runs.tar.xz.sha256
+tar -xJf evidence/runs.tar.xz -C evidence
+python3 reports/render.py
+```
+
+The first command checks tracked sources and records. The archive commands
+also need the locally delivered archive; it cannot yet be hydrated from the
+repository's artifact store. `ARTIFACT_DELIVERY.json` binds the delivered
+binary files separately. Do not treat a planned object key as an uploaded object.
+
+The last command only plots recorded counts and renders `REPORT.md`, using
+matplotlib, ReportLab, PyMuPDF and DejaVu fonts. The PDF embeds the raw archive,
+historical input table and direct truth table. Rebuilding a document can change
+timestamps and byte hashes; the recorded files are bound by `SHA256SUMS`.
+
+The archive contains `runs/manifest.json`, whose SHA-256 entries name every
+other member. Pack the extracted tree deterministically from `evidence/` with:
+
+```sh
+tar --sort=name --mtime='2026-10-25 00:00:00Z' --owner=0 --group=0 \
+    --numeric-owner --mode='u+rwX,go+rX,go-w' --format=gnu -cf - runs \
+  | xz -6 -T1 > runs.tar.xz
+```
+
+This is a frozen study. Exact models and witnesses are held in its parameter
+tables and raw archive; it does not introduce new active catalogue aliases.
+See the report for workflow limits and the pending artifact-store upload.

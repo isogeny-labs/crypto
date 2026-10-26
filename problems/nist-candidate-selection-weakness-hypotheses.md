@@ -4,7 +4,8 @@
 - **Kind:** unknown selection cause; missing applicable attack construction and validation
 - **Affected work:** [selected/skipped comparison and protocol](../research/curve_candidates_dissect_20261021/hypotheses/REPORT.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-21
+- **Last updated:** 2026-10-26
+- **Latest search:** [25–26 October full-census criterion search](../research/nist_skip_criterion_20261025/REPORT.md)
 
 ## Problem
 
@@ -13,12 +14,12 @@ to an ordinary-input attack, or that weaknesses in earlier eligible curves
 explain why they were skipped. The historical skip rule and any applicable
 hidden-attack witness remain unknown.
 
-The exact fields, models, prime subgroups, generators, full ICV1 identities
-and stream positions are frozen in the study's `hypotheses/inputs.tsv`.
-The two within-stream cohorts contain six eligible candidates: P-224
-indices 777, 1485, 5736, 7026 and P-256 indices 876, 1842. The last index in
-each cohort was published. Eligibility uses the pinned census's known
-checks; it is not a historical decision log.
+The initial six exact models, generators and full ICV1 identities remain
+frozen in the study's `hypotheses/inputs.tsv`. The latest linked study expands
+the recorded population to 21 eligible prime curves: ten published and eleven
+skipped across six streams. Its source and normalized parameter tables remain
+separate. Eligibility uses the recorded known checks; it is not a historical
+decision log.
 
 ## Evidence and uncertainty
 
@@ -60,16 +61,32 @@ a route within the present diagnostic.
 
 ## Next discriminating step
 
-Complete the native matched trait baseline, then resolve the published
-P-224 local 3-isogeny/endomorphism structure using explicit coordinate and
-map certificates. In parallel, make the nearby-order attack preconditions
-explicit. The report defines controls and the broader 21-candidate census.
-Only the six-row arithmetic diagnostic ran; future attack, map and fresh
-control campaigns have not been scheduled. New runs retain their own
-protocol, limits, failures and exact witness obligations.
+For the selection question, obtain an original generator/acceptance log,
+additional genuine historical choices outside the fitted dataset, or a
+specified mathematical mechanism with independent predictions. Freeze the
+rule before examining new labels, and replay any recovered code against the
+entire recorded stream. Random new streams alone cannot validate a claim
+about historical choices. Group-order-dependent RNG schedules and an
+unrecovered old SEA implementation remain outside the tested finite family.
+
+The 21-curve diagnostic, short-rule calibration and 52,520-model generation
+search ran. No attack, explicit map or new historical holdout campaign has
+been scheduled. For the vulnerability tracks, the original explicit-map and
+auxiliary-input obligations remain. New runs retain their own protocol,
+limits, failures and exact witness obligations.
 
 ## Resolution and history
 
 2026-10-21: connected the supplied curves to the pinned earlier-candidate
 census and added a native six-curve diagnostic. Both weakness hypotheses
 and the historical skip explanation remain unresolved.
+
+2026-10-26: expanded to all 21 eligible prime curves and found independently
+verified empirical two-test and three-test separators. No historical
+mechanism is established: 4,385 of 4,480 permitted shuffled labelings admit
+an exact one- or two-test separator somewhere in the compared search families.
+None of 52,520 defined RNG/generation models fits all labels. All 21 twist
+orders are fully factored and proved. The raw records, finite search scope,
+root-convention counterexample and remaining evidence obligations are retained
+in the linked report. An exact fit does not resolve the selection explanation
+or establish a vulnerability. Unresolved.
