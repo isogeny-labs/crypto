@@ -31,6 +31,7 @@ import json
 import math
 import re
 import statistics
+import subprocess
 import sys
 from itertools import islice
 from pathlib import Path
@@ -363,6 +364,46 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
                 raise SystemExit(f"counted operation quotient disagrees with S on {row['slug']}: {recipe['variant']}")
             recipe["mean_total_gae"] = total_gae
             recipe["log2_total_gae"] = math.log2(total_gae)
+
+
+def require_materialized_gate_inputs(board: list[dict]) -> None:
+    """Do not demote validated rows because their certificates are sparse-excluded.
+
+    The validation gate reads ordinary files.  In a sparse worktree, a pinned
+    certificate can be tracked at HEAD but absent on disk, which otherwise
+    makes the generated page disagree with a complete CI checkout.
+    """
+    raw = subprocess.check_output(["git", "ls-files", "-t", "-z"], cwd=REPO)
+    sparse = {item[2:].decode("utf-8", "surrogateescape")
+              for item in raw.split(b"\0") if item.startswith(b"S ")}
+    needed = {gate.PRE_GATE_LEADERBOARD, gate.SWEEPS["leaderboard"]}
+    for row in board:
+        evidence = REPO / gate.board_evidence_dir(row)
+        manifest = evidence / gate.MANIFEST
+        needed.add(str(manifest.relative_to(REPO)))
+        if not manifest.is_file():
+            continue
+        document = json.loads(manifest.read_text())
+        for key in ("replay_certificate", "validator_report"):
+            spec = document.get(key)
+            if not isinstance(spec, dict) or not isinstance(spec.get("path"), str):
+                continue
+            path = (evidence / spec["path"]).resolve()
+            if not path.is_relative_to(REPO):
+                continue  # validation_gate reports the invalid path
+            needed.add(str(path.relative_to(REPO)))
+            if key == "validator_report" and path.is_file():
+                report = json.loads(path.read_text())
+                for item in report.get("raw_data", []):
+                    name = item.get("path") if isinstance(item, dict) else item
+                    if isinstance(name, str):
+                        raw_path = (evidence / name).resolve()
+                        if raw_path.is_relative_to(REPO):
+                            needed.add(str(raw_path.relative_to(REPO)))
+    missing = sorted(needed & sparse)
+    if missing:
+        raise SystemExit("leaderboard validation inputs are sparse-excluded; hydrate these "
+                         "committed paths before generating:\n" + "\n".join(missing))
 
 
 # ---------------------------------------------------------------------------
@@ -1142,6 +1183,7 @@ def build(allow_unvalidated: bool = False) -> dict:
                             "variant": r["best"].get("variant"), "source": r["source"],
                             "refs": r["curve_record"]["factor_base_refs"],
                             "link_status": r["curve_record"]["factor_base_link_status"]}
+    require_materialized_gate_inputs(board)
     # The validation gate (AGENTS.md, owner rule 2026-10-19): a row is validated,
     # frozen as unvalidated (pre-gate), or refused.
     gate.annotate_board(board, lambda r: gate.row_digest(stable(r)),
