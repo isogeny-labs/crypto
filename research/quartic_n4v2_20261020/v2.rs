@@ -171,7 +171,9 @@ fn ic_cmd(q: u64, seed: u64, arms: &str, c_s: f64, c_d: f64, gamma: f64, block: 
                     attempt += 1;
                     let nfb = ((c * (q as f64).powf(0.6)).ceil() as usize).min(q as usize + 1);
                     let prm = solver::Params { nfb, rows_mult: 1.2, max_desc: 100000 };
+                    let cpu0 = ic2::cpu_now();
                     let rep = solver::ic_solve(inst, &prm, k, seed * 100 + attempt, true);
+                    let cpu_att = ic2::cpu_now() - cpu0;
                     let mut f: Vec<String> = Vec::new();
                     for (n, cc, w) in &rep.phases {
                         flat_cnt(n, cc, &mut f);
@@ -180,6 +182,7 @@ fn ic_cmd(q: u64, seed: u64, arms: &str, c_s: f64, c_d: f64, gamma: f64, block: 
                     for (k2, v) in &rep.stats {
                         f.push(format!("\"s.{}\":{}", k2, v));
                     }
+                    f.push(format!("\"attempt_cpu\":{:.4}", cpu_att));
                     println!(
                         "{{\"rec\":\"ic\",\"arm\":\"B0\",\"q\":{},\"seed\":{},\"attempt\":{},\"c\":{:.2},\"nfb\":{},\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"fail\":\"{}\",{}}}",
                         q, seed, attempt, c, nfb, inst.ell, k, rep.k_found.map(|x| x.to_string()).unwrap_or("null".into()), rep.ok, rep.fail, f.join(",")
@@ -210,9 +213,9 @@ fn ic_cmd(q: u64, seed: u64, arms: &str, c_s: f64, c_d: f64, gamma: f64, block: 
                     for (t, rep) in reps.iter().enumerate() {
                         let i = pending[t];
                         let mut f: Vec<String> = Vec::new();
-                        for (n, cc, w) in &rep.phases {
+                        for (n, cc, w, cpu) in &rep.phases {
                             flat_cnt(n, cc, &mut f);
-                            f.push(format!("\"{}.wall\":{:.4}", n, w));
+                            f.push(format!("\"{}.wall\":{:.4},\"{}.cpu\":{:.4}", n, w, n, cpu));
                         }
                         for (k2, v) in &rep.stats {
                             f.push(format!("\"s.{}\":{}", k2, v));
@@ -244,16 +247,18 @@ fn rho_cmd(q: u64, seed: u64, i0: usize, i1: usize, which: &str) {
             continue;
         }
         for w in which.split(',') {
+            let cpu0 = ic2::cpu_now();
             let r = match w {
                 "plain" => rho2::rho_plain(inst, kk, seed * 1000 + i as u64),
                 "neg" => rho2::rho_neg(inst, kk, seed * 1000 + i as u64),
                 _ => panic!("rho variant"),
             };
+            let cpu_run = ic2::cpu_now() - cpu0;
             let mut f = Vec::new();
             flat_cnt("c", &r.cnt, &mut f);
             println!(
-                "{{\"rec\":\"rho\",\"arm\":\"{}\",\"q\":{},\"seed\":{},\"i\":{},\"ell\":{},\"ok\":{},\"steps\":{},\"adds\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"wall\":{:.4},\"load1\":{:.2},{}}}",
-                w, q, seed, i, inst.ell, r.ok, r.steps, r.adds, r.dps, r.restarts, r.lookahead, r.cycles, r.cycle_adds, r.wall, load1(), f.join(",")
+                "{{\"rec\":\"rho\",\"arm\":\"{}\",\"q\":{},\"seed\":{},\"i\":{},\"ell\":{},\"ok\":{},\"steps\":{},\"adds\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"wall\":{:.4},\"cpu\":{:.4},\"load1\":{:.2},{}}}",
+                w, q, seed, i, inst.ell, r.ok, r.steps, r.adds, r.dps, r.restarts, r.lookahead, r.cycles, r.cycle_adds, r.wall, cpu_run, load1(), f.join(",")
             );
         }
     }

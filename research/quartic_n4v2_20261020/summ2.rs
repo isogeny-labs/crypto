@@ -120,6 +120,8 @@ fn kof(q: u64) -> u32 {
 
 pub fn run(args: &[String]) {
     let out_path = args[0].clone();
+    // N4V2_TIME=cpu: the time column (index 3, "wall") uses process CPU seconds instead (addendum)
+    let use_cpu = std::env::var("N4V2_TIME").map(|v| v == "cpu").unwrap_or(false);
     let mut recs: Vec<Rec> = Vec::new();
     for p in &args[1..] {
         let txt = std::fs::read_to_string(p).unwrap_or_default();
@@ -176,8 +178,12 @@ pub fn run(args: &[String]) {
                 u.ph[i] += m;
                 u.meq += m;
                 u.unp += f(r, &format!("{p}.hash")) + f(r, &format!("{p}.cmp"));
-                u.phw[i] += f(r, &format!("{p}.wall"));
-                u.wall += f(r, &format!("{p}.wall"));
+                let tk = if use_cpu { "cpu" } else { "wall" };
+                u.phw[i] += f(r, &format!("{p}.{tk}"));
+                u.wall += f(r, &format!("{p}.{tk}"));
+            }
+            if use_cpu && r.contains_key("attempt_cpu") {
+                u.wall += f(r, "attempt_cpu"); // B0: CPU per attempt (no per-phase CPU in N4's code)
             }
             for (k, v) in r.iter() {
                 if let Some(st) = k.strip_prefix("s.") {
@@ -205,7 +211,7 @@ pub fn run(args: &[String]) {
             ok: s(r, "ok") == "true",
             meq,
             unp: f(r, "c.hash") + f(r, "c.cmp"),
-            wall: f(r, "wall"),
+            wall: if use_cpu { f(r, "cpu") } else { f(r, "wall") },
             steps: f(r, "steps"),
             sqrt_ell: f(r, "ell").sqrt(),
         });
@@ -572,7 +578,7 @@ pub fn run(args: &[String]) {
 pub fn replay_cmp(a: &str, b: &str) -> bool {
     let rd = |p: &str| -> Vec<Rec> { std::fs::read_to_string(p).unwrap().lines().filter(|l| l.starts_with('{')).map(parse_line).filter(|r| s(r, "rec") != "ratios").collect() };
     let (ra, rb) = (rd(a), rd(b));
-    let skip = |k: &str| k.ends_with("wall") || k == "load1" || k == "s.wall_total" || k == "r_inv" || k == "r_lmul" || k == "search_s";
+    let skip = |k: &str| k.ends_with("wall") || k.ends_with("cpu") || k == "s.controls_wall" || k == "s.controls_cpu" || k == "load1" || k == "s.wall_total" || k == "r_inv" || k == "r_lmul" || k == "search_s";
     if ra.len() != rb.len() {
         println!("record count differs: {} vs {}", ra.len(), rb.len());
         return false;

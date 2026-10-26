@@ -87,6 +87,30 @@ pub fn sample_points2(cv: &Curve, n: usize, rng: &mut Rng) -> Vec<P3> {
     out
 }
 
+// ------------------------------------------------------------------ process CPU time
+#[repr(C)]
+struct TimeVal {
+    sec: i64,
+    usec: i32,
+}
+#[repr(C)]
+struct RUsage {
+    utime: TimeVal,
+    stime: TimeVal,
+    rest: [i64; 14],
+}
+extern "C" {
+    fn getrusage(who: i32, usage: *mut RUsage) -> i32;
+}
+/// user + system CPU seconds of this process (RUSAGE_SELF)
+pub fn cpu_now() -> f64 {
+    let mut u = RUsage { utime: TimeVal { sec: 0, usec: 0 }, stime: TimeVal { sec: 0, usec: 0 }, rest: [0; 14] };
+    unsafe {
+        getrusage(0, &mut u);
+    }
+    u.utime.sec as f64 + u.utime.usec as f64 * 1e-6 + u.stime.sec as f64 + u.stime.usec as f64 * 1e-6
+}
+
 // ------------------------------------------------------------------ arm S: sorted bucketing
 pub struct SortStats {
     pub sort_keys: u64,

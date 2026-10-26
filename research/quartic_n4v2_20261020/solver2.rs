@@ -39,7 +39,7 @@ pub struct ArmRep {
     pub ok: bool,
     pub fail: String,
     pub k_found: Option<u64>,
-    pub phases: Vec<(String, Cnt, f64)>,
+    pub phases: Vec<(String, Cnt, f64, f64)>,
     pub stats: Vec<(String, f64)>,
 }
 
@@ -56,18 +56,35 @@ fn to_u32(p: &P3) -> [u32; 3] {
     [p[0] as u32, p[1] as u32, p[2] as u32]
 }
 
+/// Phase meter: counts, wall seconds and process CPU seconds (getrusage; addendum 2026-10-25).
 struct Meter {
-    mark: (Cnt, std::time::Instant),
+    mark: (Cnt, std::time::Instant, f64),
+    pause: Option<(std::time::Instant, f64)>,
 }
 impl Meter {
     fn new() -> Meter {
-        Meter { mark: (snap(), std::time::Instant::now()) }
+        Meter { mark: (snap(), std::time::Instant::now(), cpu_now()), pause: None }
     }
-    fn take(&mut self, name: &str) -> (String, Cnt, f64) {
+    fn take(&mut self, name: &str) -> (String, Cnt, f64, f64) {
         let now = snap();
-        let r = (name.to_string(), now.since(&self.mark.0), self.mark.1.elapsed().as_secs_f64());
-        self.mark = (now, std::time::Instant::now());
+        let c = cpu_now();
+        let r = (name.to_string(), now.since(&self.mark.0), self.mark.1.elapsed().as_secs_f64(), c - self.mark.2);
+        self.mark = (now, std::time::Instant::now(), c);
         r
+    }
+    /// exclude an uncharged control block from the running phase (its wall/cpu go to stats)
+    fn pause_start(&mut self) {
+        self.pause = Some((std::time::Instant::now(), cpu_now()));
+    }
+    fn pause_end(&mut self, st: &mut Vec<(String, f64)>) {
+        if let Some((t, c)) = self.pause.take() {
+            let dw = t.elapsed();
+            let dc = cpu_now() - c;
+            self.mark.1 += dw;
+            self.mark.2 += dc;
+            st.push(("controls_wall".into(), dw.as_secs_f64()));
+            st.push(("controls_cpu".into(), dc));
+        }
     }
 }
 
@@ -77,9 +94,9 @@ enum LpData {
 }
 
 pub fn run_family(inst: &Inst, cfg: &Cfg, vars: &[Var], k_true: u64, seed: u64, verify_rel: bool) -> Vec<ArmRep> {
-    let mut shared: Vec<(String, Cnt, f64)> = Vec::new();
+    let mut shared: Vec<(String, Cnt, f64, f64)> = Vec::new();
     let mut st: Vec<(String, f64)> = Vec::new();
-    let fail_all = |shared: &Vec<(String, Cnt, f64)>, st: &Vec<(String, f64)>, msg: String| -> Vec<ArmRep> {
+    let fail_all = |shared: &Vec<(String, Cnt, f64, f64)>, st: &Vec<(String, f64)>, msg: String| -> Vec<ArmRep> {
         vars.iter().map(|_| ArmRep { ok: false, fail: msg.clone(), k_found: None, phases: shared.clone(), stats: st.clone() }).collect()
     };
     let q = inst.q;
@@ -141,10 +158,12 @@ pub fn run_family(inst: &Inst, cfg: &Cfg, vars: &[Var], k_true: u64, seed: u64, 
             st.push(("dup_skipped".into(), ss.dup_skipped as f64));
             shared.push(m.take("relations"));
             if verify_rel {
+                m.pause_start();
                 let (t, b) = verify_star(&cv, &fb, &ro);
                 st.push(("relations_verified".into(), t as f64));
                 st.push(("relations_bad".into(), b as f64));
                 cv.reset_counter();
+                m.pause_end(&mut st);
             }
             let (fr, lr) = rows_from_relout(&ro, n, ell);
             st.push(("rows_full".into(), fr.len() as f64));
@@ -186,10 +205,12 @@ pub fn run_family(inst: &Inst, cfg: &Cfg, vars: &[Var], k_true: u64, seed: u64, 
             st.push(("cycle_rows_empty".into(), skipped as f64));
             st.push(("cycle_row_weight_mean".into(), if cr.is_empty() { 0.0 } else { cr.iter().map(|r| r.len()).sum::<usize>() as f64 / cr.len() as f64 }));
             if verify_rel {
+                m.pause_start();
                 let (t, b) = verify_d(&cv, &fb, &d, &cr, ell);
                 st.push(("relations_verified".into(), t as f64));
                 st.push(("relations_bad".into(), b as f64));
                 cv.reset_counter();
+                m.pause_end(&mut st);
             }
             st.push(("rows_full".into(), fr.len() as f64));
             full_rows = fr;
@@ -269,7 +290,7 @@ pub fn run_family(inst: &Inst, cfg: &Cfg, vars: &[Var], k_true: u64, seed: u64, 
 
     // 4. linear algebra, per variant
     struct VOut {
-        la: (String, Cnt, f64),
+        la: (String, Cnt, f64, f64),
         z: Option<Vec<Option<u64>>>,
         fail: String,
         st: Vec<(String, f64)>,
@@ -379,7 +400,7 @@ pub fn run_family(inst: &Inst, cfg: &Cfg, vars: &[Var], k_true: u64, seed: u64, 
 
     // 5. downstream per distinct vector
     let mut reps: Vec<ArmRep> = Vec::new();
-    let mut groups: Vec<(Vec<Option<u64>>, Vec<(String, Cnt, f64)>, Option<u64>, bool, String, Vec<(String, f64)>)> = Vec::new();
+    let mut groups: Vec<(Vec<Option<u64>>, Vec<(String, Cnt, f64, f64)>, Option<u64>, bool, String, Vec<(String, f64)>)> = Vec::new();
     for vo in &vouts {
         let mut rep = ArmRep { ok: false, fail: vo.fail.clone(), k_found: None, phases: shared.clone(), stats: st.clone() };
         rep.phases.push(vo.la.clone());
@@ -428,7 +449,7 @@ fn downstream(
     rseed: u64,
     max_desc: usize,
     n: usize,
-) -> (Vec<(String, Cnt, f64)>, Option<u64>, bool, String, Vec<(String, f64)>) {
+) -> (Vec<(String, Cnt, f64, f64)>, Option<u64>, bool, String, Vec<(String, f64)>) {
     let ell = inst.ell;
     let f = curve.f;
     let mut rng = Rng(rseed);
@@ -507,7 +528,7 @@ fn downstream(
     let mut ys: Vec<u64> = Vec::new();
     let mut rtries = 0;
     let mut desc_ok = true;
-    let fail_ret = |ph: Vec<(String, Cnt, f64)>, st: Vec<(String, f64)>, msg: &str| (ph, None, false, msg.to_string(), st);
+    let fail_ret = |ph: Vec<(String, Cnt, f64, f64)>, st: Vec<(String, f64)>, msg: &str| (ph, None, false, msg.to_string(), st);
     if active_idx.is_empty() {
         ph.push(m.take("descent"));
         return fail_ret(ph, st, "no known factor-base logs");
