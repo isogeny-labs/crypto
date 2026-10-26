@@ -110,6 +110,10 @@
    "path": "research/jv_cover_sparse_fglm_20261018/summary.json",
    "sha256": "4217cb1de3458ee8227da4283028fce724aed83505f1d48bb9d9dc7c0637ad5b"
   },
+  "ic_m2_linear_ladder": {
+   "path": "research/ic_m2_linear_ladder_20261024/fit.json",
+   "sha256": "f69558da047b752ad3a3952ad6680d73fa6984e92b66561717db29e6f8475203"
+  },
   "pair_table_setup": {
    "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
    "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
@@ -235414,6 +235418,116 @@
     "s_over_rho_l1a": 303.746850733
    }
   ]
+ },
+ "algebraic_ladder": {
+  "source": "research/ic_m2_linear_ladder_20261024/fit.json",
+  "study": "research/ic_m2_linear_ladder_20261024/",
+  "report": "research/ic_m2_linear_ladder_20261024/REPORT.md",
+  "rungs": [
+   {
+    "a": 0,
+    "n": 13,
+    "d": 4,
+    "cofactor": "4",
+    "log2_r": 10.9679467058,
+    "targets": 8,
+    "mean_ic_trials": 591.625,
+    "mean_ic_s": 0.00040408775,
+    "mean_rho_s": 0.000111808625,
+    "ic_over_rho_wall": 3.61410177435
+   },
+   {
+    "a": 1,
+    "n": 17,
+    "d": 6,
+    "cofactor": "2",
+    "log2_r": 16.0011222661,
+    "targets": 8,
+    "mean_ic_trials": 3230.625,
+    "mean_ic_s": 0.00377013925,
+    "mean_rho_s": 0.000258828,
+    "ic_over_rho_wall": 14.5661955044
+   },
+   {
+    "a": 0,
+    "n": 19,
+    "d": 6,
+    "cofactor": "4",
+    "log2_r": 16.9978079645,
+    "targets": 8,
+    "mean_ic_trials": 11476.75,
+    "mean_ic_s": 0.008189665625,
+    "mean_rho_s": 0.000169509375,
+    "ic_over_rho_wall": 48.3139391258
+   },
+   {
+    "a": 1,
+    "n": 19,
+    "d": 6,
+    "cofactor": "2",
+    "log2_r": 18.002194205,
+    "targets": 8,
+    "mean_ic_trials": 12076.875,
+    "mean_ic_s": 0.007836684375,
+    "mean_rho_s": 0.000183492375,
+    "ic_over_rho_wall": 42.7085015113
+   },
+   {
+    "a": 0,
+    "n": 23,
+    "d": 8,
+    "cofactor": "4",
+    "log2_r": 20.9991061013,
+    "targets": 8,
+    "mean_ic_trials": 41855.5,
+    "mean_ic_s": 0.04609912625,
+    "mean_rho_s": 0.00027292525,
+    "ic_over_rho_wall": 168.907516802
+   },
+   {
+    "a": 1,
+    "n": 23,
+    "d": 8,
+    "cofactor": "2",
+    "log2_r": 22.000893689,
+    "targets": 8,
+    "mean_ic_trials": 48821.125,
+    "mean_ic_s": 0.0707728785,
+    "mean_rho_s": 0.00035873875,
+    "ic_over_rho_wall": 197.282502936
+   },
+   {
+    "a": 0,
+    "n": 41,
+    "d": 14,
+    "cofactor": "4",
+    "log2_r": 39.0000015143,
+    "targets": 4,
+    "mean_ic_trials": 181803464.25,
+    "mean_ic_s": 478.378530734,
+    "mean_rho_s": 0.0131277305,
+    "ic_over_rho_wall": 36440.3070839
+   }
+  ],
+  "slope_ic_trials": {
+   "boot95": [
+    0.638679584541,
+    0.654544469455
+   ],
+   "intercept": 0.867000408935,
+   "rungs": 7,
+   "slope_log2_per_n": 0.646514012862
+  },
+  "slope_ic_wall": {
+   "boot95": [
+    0.710000396901,
+    0.723987515461
+   ],
+   "intercept": -20.5329320785,
+   "rungs": 7,
+   "slope_log2_per_n": 0.716909846095
+  },
+  "f4_slope": 1.07904930561
  },
  "pair_table_component": {
   "schema": "ic_oracle_setup_blocked.result/v1",
