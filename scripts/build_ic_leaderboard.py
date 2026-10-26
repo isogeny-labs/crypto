@@ -50,7 +50,7 @@ OUT_HTML = REPO / "docs/ic-leaderboard.html"
 # changes nothing on it, and then raise this number; `--check` fails until it
 # does, because it cannot otherwise see evidence the builder does not read.
 LEDGER = "research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md"
-LEDGER_COVERED_THROUGH = 23
+LEDGER_COVERED_THROUGH = 24
 
 SOURCES = {
     "round5": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
@@ -115,10 +115,15 @@ SOURCES = {
     "s5_c4_component": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
+    "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
     "jv_sieve_strong_rho": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
+    "n83_tier1_finalist_rows": "research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json",
+    "n83_tier1_finalist_validated": "research/n83_e2e_final_holdout_20261016/validated_rows.json",
+    "n83_tier1_finalist_selection": "research/n83_e2e_final_holdout_20261016/selection.json",
+    "n83_tier1_finalist_plot": "research/n83_e2e_finalist_results_20261017/plot_data.json",
     "registry": "docs/curves/registry.json",
     "curves_schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
@@ -1196,6 +1201,61 @@ def ghs_weak_n4() -> dict:
             "report": "research/quartic_n4_20261019/README.md"}
 
 
+def ghs_weak_n4v2() -> dict:
+    """N4 v2 (research/quartic_n4v2_20261020): the same GHS-weak family over q = 2^8..2^22, frozen
+    B0 against four changes (sorted bucketing S, SGE + block Lanczos L, double large primes D, both
+    DL) and against plain and negation-map rho. Copied from the frozen summary (computed there);
+    restricted to one special family, outside tables A-C."""
+    recs = _jsonl(SOURCES["ghs_weak_n4v2"])
+    arms = ("B0", "DL")
+    rows = [r for r in recs if r.get("kind") == "ratio" and r["ic"] in arms]
+    fits = [r for r in recs if r.get("kind") == "fit" and r["range"] in ("full", "high")]
+    paired = [r for r in recs if r.get("kind") == "paired" and r["ref"] == "B0" and r["arm"] in ("L", "D", "DL")]
+    cross = [r for r in recs if r.get("kind") == "crossover" and r["ic"] in ("B0", "DL") and r["rho"] == "neg"]
+    return {"rows": rows, "fits": fits, "paired": paired, "crossovers": cross,
+            "class": "improvement over the frozen N4 B0 (restricted to the GHS-weak family)",
+            "baseline_arm": "B0", "headline_arm": "DL", "study": "research/quartic_n4v2_20261020/",
+            "report": "research/quartic_n4v2_20261020/README.md"}
+
+
+def _ci(v, lo, hi, i):
+    return f"{v[i]:.3g} [{lo[i]:.3g}, {hi[i]:.3g}]"
+
+
+def ghs2_md(g: dict) -> list[str]:
+    L = ["", "## GHS-weak E0/F_{q^3} (N4 v2): frozen B0 vs double large primes, SGE + block Lanczos; plain and negation-map rho", "",
+         "Copied from `" + SOURCES["ghs_weak_n4v2"] + "`. Same restrictions as the N4 section: one special GHS-weak "
+         "family, outside tables A–C, cold one-target cost in F_q-multiplication equivalents. Class: " + g["class"] +
+         ". Headline (pre-registered) arm DL; baseline B0. Arm / B0 on the same instances (w = 0):", ""]
+    for r in sorted(g["paired"], key=lambda r: (r["arm"], r["q"])):
+        if r["q"] >= 65479:
+            L.append(f"- {r['arm']} / B0 at q = {r['q']}: {_ci(r['ratio'], r['lo'], r['hi'], 0)} ({r['resolved']})")
+    L += ["", "| IC arm | rho | q | IC/rho (w=0) | IC/rho (w=1) | resolved |", "|:--|:--|--:|:--|:--|:--|"]
+    for r in g["rows"]:
+        if r["ic"] in ("B0", "DL") and r["q"] in (4051, 65479, 1048507, 2097091, 4194271):
+            L.append(f"| {r['ic']} | {r['rho']} | {r['q']} | {_ci(r['ratio'], r['lo'], r['hi'], 0)} | {_ci(r['ratio'], r['lo'], r['hi'], 2)} | {r['resolved']} |")
+    L += ["", "Fitted exponents (w = 0):", ""]
+    for f in g["fits"]:
+        L.append(f"- {f['arm']}, {f['range']} (k {f['k0']}..{f['k1']}): {f['e'][0]:.3f} [{f['lo'][0]:.3f}, {f['hi'][0]:.3f}]")
+    L += ["", "Crossover against negation-map rho:", ""]
+    for c in g["crossovers"]:
+        L.append(f"- {c['ic']}, {c['measure']}: resolved from q = {c['resolved_q']}, interpolated q* = {c['qstar']} [{c['qstar_lo']}, {c['qstar_hi']}]")
+    L.append("")
+    return L
+
+
+def ghs2_html(g: dict) -> str:
+    md = ghs2_md(g)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    tr = [x for x in md if x.startswith("| ") and not x.startswith("| IC arm")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip())}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="ghs-weak-n4v2-20261020"><h2>GHS-weak E0/F<sub>q<sup>3</sup></sub> (N4 v2): frozen B0 vs '
+            'double large primes and SGE + block Lanczos; plain and negation-map rho</h2>' + body +
+            '<div class="scroll"><table><thead><tr><th>IC arm</th><th>rho</th><th>q</th><th>IC/rho (w=0)</th>'
+            '<th>IC/rho (w=1)</th><th>resolved</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+            gh(SOURCES["ghs_weak_n4v2"], "Frozen summary") + '</section>')
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1360,6 +1420,25 @@ def build(allow_unvalidated: bool = False) -> dict:
             or set(n83_holdout["pipeline_summaries"]) !=
             {"k1104", "k1108", "k1120", "k1152"}):
         raise ValueError("N83 cold holdout source is incomplete")
+    n83_finalist_rows = load(SOURCES["n83_tier1_finalist_rows"])
+    n83_finalist_validated = load(SOURCES["n83_tier1_finalist_validated"])
+    n83_finalist_selection = load(SOURCES["n83_tier1_finalist_selection"])
+    n83_finalist_plot = load(SOURCES["n83_tier1_finalist_plot"])
+    if (n83_finalist_rows["schema"] != "n83.e2e-finalist-ic1/v1"
+            or n83_finalist_rows["evidence_status"] != "PASS_INDEPENDENT_REPLAY"
+            or len(n83_finalist_rows["rows"]) != 132
+            or len(n83_finalist_rows["rho_rows"]) != 128
+            or len(n83_finalist_rows["workloads"]) != 16
+            or n83_finalist_validated["evidence_status"] != "PASS_INDEPENDENT_REPLAY"
+            or n83_finalist_plot["schema"] != "n83.finalist-plot-data/v1"
+            or n83_finalist_plot["validated_rows_sha256"] !=
+            sha256(SOURCES["n83_tier1_finalist_validated"])
+            or n83_finalist_plot["selection_sha256"] !=
+            sha256(SOURCES["n83_tier1_finalist_selection"])
+            or n83_finalist_selection["admission_status"] != "PASS"
+            or {item["candidate_id"] for item in n83_finalist_plot["candidates"]}
+            != set(n83_finalist_rows["candidates"])):
+        raise ValueError("N83 finalist source is incomplete")
     small_rows = [json.loads(line) for line in (REPO / SOURCES["f6_small_cold_rows"]).read_text().splitlines() if line]
     small_replay = load(SOURCES["f6_small_cold_replay"])
     small_by_arm = {row["arm"]: row for row in small_rows}
@@ -1691,6 +1770,29 @@ def build(allow_unvalidated: bool = False) -> dict:
             "paired_intervals": n83_holdout["paired_intervals"],
             "aa_controls": n83_holdout["aa_controls"],
         },
+        "n83_tier1_finalist": {
+            "source": SOURCES["n83_tier1_finalist_rows"],
+            "report": "research/n83_e2e_finalist_results_20261017/RESULT.md",
+            "curve_slug": "icv1-f2m83-t6151469093347-9eba6cd5",
+            "run_id": n83_finalist_rows["run_id"],
+            "point_count": n83_finalist_plot["points"],
+            "online_selection_status": n83_finalist_selection["online"]["status"],
+            "cold_selection_status": n83_finalist_selection["cold"]["status"],
+            "online_selected_candidate_id": n83_finalist_selection["online"]["selected_candidate_id"],
+            "cold_selected_candidate_id": n83_finalist_selection["cold"]["selected_candidate_id"],
+            "candidates": [{
+                "label": item["label"],
+                "candidate_id": item["candidate_id"],
+                "actual_usable_points": item["actual_usable_points"],
+                "effective_columns": item["effective_columns"],
+                "online_median_ms": item["online_quartiles_ms"][1],
+                "cold_mean_s": item["cold_mean_s"],
+                "rho_over_ic_online_median": item["ratio_quartiles"][1],
+                "median_paired_ic_over_rho_online": item["median_paired_ic_over_rho_online"],
+                "cold_mean_over_rho_mean_online": item["cold_mean_over_rho_mean_online"],
+                "ic_faster_points": item["ic_faster_points"],
+            } for item in n83_finalist_plot["candidates"]],
+        },
         "curve_records": {
             "current_board_records": {slug: curve_record(records, slug) for slug in sorted(measured)},
             "registry": SOURCES["registry"], "schema": SOURCES["curves_schema"], "yaml": SOURCES["curves_yaml"],
@@ -1725,6 +1827,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "hyperelliptic_bitop_reprice": hec_bitop(),
         "s5_c4_component": s5_c4_component(),
         "ghs_weak_n4_component": ghs_weak_n4(),
+        "ghs_weak_n4v2_component": ghs_weak_n4v2(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -2497,6 +2600,7 @@ def markdown(doc: dict) -> str:
     for r in al["rungs"]:
         L.append(f"| {r['a']} | {r['n']} | {r['d']} | {r['cofactor']} | {r['targets']} | {r['mean_ic_trials']:,.0f} | "
                  f"{r['mean_ic_s']:.4g} | {r['mean_rho_s']:.3g} | {r['ic_over_rho_wall']:,.0f} |")
+    L += ghs2_md(doc["ghs_weak_n4v2_component"])
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -2574,6 +2678,28 @@ def markdown(doc: dict) -> str:
         v, ci = fmt_ci(f["slope"], f["slope_ci95"], "+.3f")
         L.append(f"| {f['genus']} | {f['rows']} | {v} | {ci} |")
     L.append("")
+    finalist = doc["n83_tier1_finalist"]
+    L += ["", "## N83 Tier 1 sixteen-point factor-base frontier", "",
+          "Eight exact packed-root configurations ran on sixteen sealed public points "
+          "across two admitted cloud hosts, one fresh IC process and a same-point rho "
+          "solve for every candidate-point pair. All 128 pairs passed independent "
+          "replay. The frozen online and cold selectors both report `" +
+          finalist["online_selection_status"] + "`; the cold K1107 factor-base "
+          "size lowers process cost against K1120, while its root11 and root22 "
+          "layouts remain unresolved.", "",
+          "| Configuration | Actual usable points | Folded columns | Online median ms | Cold mean s | Paired rho/IC median | IC faster / 16 |",
+          "|:--|--:|--:|--:|--:|--:|--:|"]
+    for item in finalist["candidates"]:
+        L.append(f"| {item['label']} | {item['actual_usable_points']:,} | "
+                 f"{item['effective_columns']:,} | {item['online_median_ms']:.3f} | "
+                 f"{item['cold_mean_s']:.3f} | "
+                 f"{item['rho_over_ic_online_median']:.3f} | "
+                 f"{item['ic_faster_points']}/16 |")
+    L += ["", f"[Frozen 132 IC1 rows](../../{finalist['source']}) and "
+          f"[provider-bound result and graph](../../{finalist['report']}). "
+          "The online interval excludes reusable preparation; the separate cold "
+          "column charges it. This Tier 1 wall-time panel is separate from "
+          "Tables A–C and their operation-unit S rankings.", ""]
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
@@ -2717,7 +2843,7 @@ def page(doc: dict, standalone: bool) -> str:
     online_hi = max(r["best"]["online_speedup"] for r in kob_rows)
     cold = [r["best"]["ratio_rho"] for r in kob_rows if not r["best"]["construction_artefact"]]
     model = [r["best"]["ic_online_over_precomputation_model"] for r in kob_rows]
-    site = "https://aburan28.github.io/crypto/"
+    site = "https://isogeny-labs.github.io/crypto/"
     nav = [("Overview", site), ("Scoreboard", site + "scoreboard/"),
            ("Leaderboard", None), ("Where things stand", site + "scoreboard/ic-current-state.html"),
            ("Algorithm lab", site + "scoreboard/algorithm-lab.html"), ("Campaign status", site + "status/"),
@@ -3545,6 +3671,7 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{r["mean_ic_trials"]:,.0f}</td><td>{r["mean_ic_s"]:.4g}</td><td>{r["mean_rho_s"]:.3g}</td>'
                  f'<td>{r["ic_over_rho_wall"]:,.0f}</td></tr>')
     P.append('</tbody></table>' + gh(al["study"], 'Study, report, raw records and validation') + '</section>')
+    P.append(ghs2_html(doc["ghs_weak_n4v2_component"]))
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]
@@ -3638,12 +3765,39 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td class="n">{v} <span class="muted">{ci}</span></td></tr>')
     P.append('</tbody></table></div></section>')
 
+    finalist = doc["n83_tier1_finalist"]
+    P.append('<section id="n83-tier1-finalist-20261017"><h2>N83 sixteen-point Tier 1 factor-base frontier</h2>'
+             '<p>Eight exact configurations, each with a fresh one-target IC process and '
+             'a same-point rho solve on each of sixteen sealed public points. Two cloud '
+             'hosts and all 128 pairs passed independent replay. The frozen online and '
+             'cold configuration selectors both report <code>' +
+             esc(finalist["online_selection_status"]) + '</code>. K1107 lowers '
+             'cold process cost against the K1120 reference within both root layouts.</p>'
+             '<div class="scroll"><table><thead><tr><th>Configuration</th>'
+             '<th>Usable points</th><th>Columns</th><th>Online median ms</th>'
+             '<th>Cold mean s</th><th>Median rho / IC online</th>'
+             '<th>IC faster / 16</th></tr></thead><tbody>')
+    for item in finalist["candidates"]:
+        P.append(f'<tr><td>{esc(item["label"])}</td>'
+                 f'<td>{item["actual_usable_points"]:,}</td>'
+                 f'<td>{item["effective_columns"]:,}</td>'
+                 f'<td>{item["online_median_ms"]:.3f}</td>'
+                 f'<td>{item["cold_mean_s"]:.3f}</td>'
+                 f'<td>{item["rho_over_ic_online_median"]:.3f}</td>'
+                 f'<td>{item["ic_faster_points"]}/16</td></tr>')
+    P.append('</tbody></table></div><p>The online interval starts after reusable '
+             'preparation; the cold interval charges it. All 28 candidate pairs use '
+             'the frozen exact sign-flip and Bonferroni rule. These Tier 1 wall times '
+             'remain separate from operation-unit S rankings.</p>' +
+             gh(finalist["source"], 'Frozen 132 IC1 rows') + ' · ' +
+             gh(finalist["report"], 'Provider-bound result and graph') + '</section>')
+
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '
              'here was measured for this page, and nothing is a speedup. Records kept in other units, wall-clock '
              'panels and batched producers awaiting independent replay, are in '
              '<a href="https://github.com/aburan28/crypto/blob/main/docs/ic/BOUNDARY_TARGETS.md">docs/ic/BOUNDARY_TARGETS.md</a>; the canonical page is the '
-             '<a href="https://aburan28.github.io/crypto/scoreboard/">index-calculus scoreboard</a>. No IC pipeline has been priced '
+             '<a href="https://isogeny-labs.github.io/crypto/scoreboard/">index-calculus scoreboard</a>. No IC pipeline has been priced '
              'end to end on ECC2K-130 or on the m = 83 confidence gate (AGENTS.md §8a).</p>'
              f'<p>Current through ledger §{LEDGER_COVERED_THROUGH}; latest frontier audit '
              f'{esc(doc["latest_frontier_audit"]["date"])}. Built by '

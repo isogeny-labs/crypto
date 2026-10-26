@@ -9,9 +9,15 @@ use std::collections::BTreeMap;
 fn ln_gamma(x: f64) -> f64 {
     // Lanczos, g = 7, n = 9.
     const C: [f64; 9] = [
-        0.999_999_999_999_809_9, 676.520_368_121_885_1, -1_259.139_216_722_402_8,
-        771.323_428_777_653_1, -176.615_029_162_140_6, 12.507_343_278_686_905,
-        -0.138_571_095_265_720_12, 9.984_369_578_019_572e-6, 1.505_632_735_149_311_6e-7,
+        0.999_999_999_999_809_9,
+        676.520_368_121_885_1,
+        -1_259.139_216_722_402_8,
+        771.323_428_777_653_1,
+        -176.615_029_162_140_6,
+        12.507_343_278_686_905,
+        -0.138_571_095_265_720_12,
+        9.984_369_578_019_572e-6,
+        1.505_632_735_149_311_6e-7,
     ];
     if x < 0.5 {
         return (std::f64::consts::PI / (std::f64::consts::PI * x).sin()).ln() - ln_gamma(1.0 - x);
@@ -59,8 +65,16 @@ fn bisect(f: impl Fn(f64) -> f64, target: f64) -> f64 {
 }
 
 fn clopper_pearson(k: u64, n: u64) -> (f64, f64) {
-    let lo = if k == 0 { 0.0 } else { bisect(|p| binom_cdf(k - 1, n, p), 0.975) };
-    let hi = if k == n { 1.0 } else { bisect(|p| binom_cdf(k, n, p), 0.025) };
+    let lo = if k == 0 {
+        0.0
+    } else {
+        bisect(|p| binom_cdf(k - 1, n, p), 0.975)
+    };
+    let hi = if k == n {
+        1.0
+    } else {
+        bisect(|p| binom_cdf(k, n, p), 0.025)
+    };
     (lo, hi)
 }
 
@@ -69,18 +83,35 @@ fn u(v: &Value, k: &str) -> u64 {
 }
 
 const TALLY: [&str; 11] = [
-    "solutions", "pure", "pure_with_2tor", "off_O", "off_T", "violation", "witness_fail",
-    "obs_off", "pred_off", "obs_minus_pred", "pred_minus_obs",
+    "solutions",
+    "pure",
+    "pure_with_2tor",
+    "off_O",
+    "off_T",
+    "violation",
+    "witness_fail",
+    "obs_off",
+    "pred_off",
+    "obs_minus_pred",
+    "pred_minus_obs",
 ];
 
 fn main() {
     // Known values: CP(5, 10) = [0.1871, 0.8129]; CP(0, 3000) upper = 0.00123.
     let (a, b) = clopper_pearson(5, 10);
-    assert!((a - 0.1871).abs() < 1e-3 && (b - 0.8129).abs() < 1e-3, "{} {}", a, b);
+    assert!(
+        (a - 0.1871).abs() < 1e-3 && (b - 0.8129).abs() < 1e-3,
+        "{} {}",
+        a,
+        b
+    );
     assert!((clopper_pearson(0, 3000).1 - 0.00123).abs() < 1e-5);
     let dir = std::env::args().nth(1).expect("run directory");
     let text = std::fs::read_to_string(format!("{}/rows.jsonl", dir)).unwrap();
-    let rows: Vec<Value> = text.lines().map(|l| serde_json::from_str(l).unwrap()).collect();
+    let rows: Vec<Value> = text
+        .lines()
+        .map(|l| serde_json::from_str(l).unwrap())
+        .collect();
 
     let mut census = Vec::new();
     let mut census_tot = BTreeMap::<&str, u64>::new();
@@ -93,7 +124,13 @@ fn main() {
             let mismatch = (u(r, "sigma_minus") != u(r, "twist_count_Fq")) as u64
                 + (u(r, "phi_image_ok") + 2 != u(r, "sigma_minus")) as u64
                 + (u(r, "E_Fq") + u(r, "sigma_minus") != 2 * (1u64 << u(r, "n")) + 2) as u64;
-            for k in ["pairs", "nontor_rational", "nontor_irrational", "tor_rational", "tor_irrational"] {
+            for k in [
+                "pairs",
+                "nontor_rational",
+                "nontor_irrational",
+                "tor_rational",
+                "tor_irrational",
+            ] {
                 *census_tot.entry(k).or_default() += u(r, k);
             }
             *census_tot.entry("count_mismatches").or_default() += mismatch;
@@ -116,10 +153,15 @@ fn main() {
             *a.entry(format!("curve.{}", k)).or_default() += u(cm, k) as f64;
             *a.entry(format!("twist.{}", k)).or_default() += u(tm, k) as f64;
         }
-        *a.entry("targets_off_set_mismatch".into()).or_default() +=
-            ((u(cm, "obs_minus_pred") + u(cm, "pred_minus_obs") + u(tm, "obs_minus_pred") + u(tm, "pred_minus_obs")) > 0) as u64 as f64;
-        *a.entry("targets_pred_nonempty".into()).or_default() += (u(cm, "pred_off") > 0) as u64 as f64;
-        *a.entry("xset_mismatch_targets".into()).or_default() += (!r["xsets_equal"].as_bool().unwrap()) as u64 as f64;
+        *a.entry("targets_off_set_mismatch".into()).or_default() += ((u(cm, "obs_minus_pred")
+            + u(cm, "pred_minus_obs")
+            + u(tm, "obs_minus_pred")
+            + u(tm, "pred_minus_obs"))
+            > 0) as u64 as f64;
+        *a.entry("targets_pred_nonempty".into()).or_default() +=
+            (u(cm, "pred_off") > 0) as u64 as f64;
+        *a.entry("xset_mismatch_targets".into()).or_default() +=
+            (!r["xsets_equal"].as_bool().unwrap()) as u64 as f64;
         *a.entry("heuristic_weighted".into()).or_default() += sols * (1.0 - p_e.powi(m));
         *a.entry("p_E_sum".into()).or_default() += p_e;
         if r["poly_checked"].as_bool().unwrap() {
@@ -128,13 +170,31 @@ fn main() {
             *a.entry("poly_minus_points".into()).or_default() += u(r, "poly_minus_points") as f64;
             *a.entry("points_minus_poly".into()).or_default() += u(r, "points_minus_poly") as f64;
             for s in r["poly_minus_points_sample"].as_array().unwrap() {
-                let k: Vec<u64> = s.as_array().unwrap().iter().map(|x| x.as_u64().unwrap()).collect();
+                let k: Vec<u64> = s
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|x| x.as_u64().unwrap())
+                    .collect();
                 let tx = u(r, "target_x");
                 // Formal-resultant degeneracy: x1 = x2 and x3 = x_R.
                 let degenerate = k.len() == 3 && k[0] == k[1] && k[2] == tx;
-                *a.entry(if degenerate { "poly_extra_degenerate" } else { "poly_extra_unexplained" }.into()).or_default() += 1.0;
-                fam.entry(key.clone()).or_default().entry("poly_extra_examples").or_insert(json!([]))
-                    .as_array_mut().unwrap().push(json!({"target_x": tx, "a": r["a"], "b": r["b"], "tuple": k}));
+                *a.entry(
+                    if degenerate {
+                        "poly_extra_degenerate"
+                    } else {
+                        "poly_extra_unexplained"
+                    }
+                    .into(),
+                )
+                .or_default() += 1.0;
+                fam.entry(key.clone())
+                    .or_default()
+                    .entry("poly_extra_examples")
+                    .or_insert(json!([]))
+                    .as_array_mut()
+                    .unwrap()
+                    .push(json!({"target_x": tx, "a": r["a"], "b": r["b"], "tuple": k}));
             }
         }
     }
@@ -151,15 +211,40 @@ fn main() {
         f.insert("n".into(), json!(key.1));
         f.insert("m".into(), json!(key.2));
         for (k, v) in a {
-            f.insert(k.clone(), json!(*v as f64));
+            f.insert(k.clone(), json!(*v));
         }
         f.insert("mean_p_E".into(), json!(g("p_E_sum") / g("targets")));
-        f.insert("observed_off_fraction".into(), json!(if n_sol > 0 { n_off as f64 / n_sol as f64 } else { 0.0 }));
+        f.insert(
+            "observed_off_fraction".into(),
+            json!(if n_sol > 0 {
+                n_off as f64 / n_sol as f64
+            } else {
+                0.0
+            }),
+        );
         f.insert("observed_off_cp95".into(), json!([lo, hi]));
-        f.insert("heuristic_off_fraction".into(), json!(if n_sol > 0 { g("heuristic_weighted") / n_sol as f64 } else { 0.0 }));
-        f.insert("violation_rate_upper95".into(), json!(clopper_pearson(0, n_sol).1));
-        for k in ["curve.violation", "twist.violation", "curve.witness_fail", "twist.witness_fail",
-                  "targets_off_set_mismatch", "xset_mismatch_targets", "points_minus_poly", "poly_extra_unexplained"] {
+        f.insert(
+            "heuristic_off_fraction".into(),
+            json!(if n_sol > 0 {
+                g("heuristic_weighted") / n_sol as f64
+            } else {
+                0.0
+            }),
+        );
+        f.insert(
+            "violation_rate_upper95".into(),
+            json!(clopper_pearson(0, n_sol).1),
+        );
+        for k in [
+            "curve.violation",
+            "twist.violation",
+            "curve.witness_fail",
+            "twist.witness_fail",
+            "targets_off_set_mismatch",
+            "xset_mismatch_targets",
+            "points_minus_poly",
+            "poly_extra_unexplained",
+        ] {
             *gate.entry(k).or_default() += g(k);
         }
         families.push(Value::Object(f));
@@ -169,10 +254,17 @@ fn main() {
             gate.insert(k, *v as f64);
         }
     }
-    let c1_ok = acc.iter().filter(|(k, _)| k.0 == "C1_planted_xR_in_V").all(|(_, a)| {
-        a["targets_pred_nonempty"] == a["targets"] && a["targets_off_set_mismatch"] == 0.0
-    });
-    let c2_off_t: f64 = acc.iter().filter(|(k, _)| k.0 == "C2_planted_T_pairs").map(|(_, a)| a["curve.off_T"]).sum();
+    let c1_ok = acc
+        .iter()
+        .filter(|(k, _)| k.0 == "C1_planted_xR_in_V")
+        .all(|(_, a)| {
+            a["targets_pred_nonempty"] == a["targets"] && a["targets_off_set_mismatch"] == 0.0
+        });
+    let c2_off_t: f64 = acc
+        .iter()
+        .filter(|(k, _)| k.0 == "C2_planted_T_pairs")
+        .map(|(_, a)| a["curve.off_T"])
+        .sum();
     let consistent = gate.values().all(|v| *v == 0.0);
     let out = json!({
         "run_dir": dir,
@@ -188,6 +280,13 @@ fn main() {
         "census": census,
         "families": families,
     });
-    std::fs::write(format!("{}/summary.json", dir), serde_json::to_string_pretty(&out).unwrap()).unwrap();
-    println!("{}", serde_json::to_string_pretty(&out["decision"]).unwrap());
+    std::fs::write(
+        format!("{}/summary.json", dir),
+        serde_json::to_string_pretty(&out).unwrap(),
+    )
+    .unwrap();
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&out["decision"]).unwrap()
+    );
 }

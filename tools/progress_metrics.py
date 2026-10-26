@@ -9,6 +9,8 @@ Sources (all committed, read at --ref unless noted):
   docs/ic/ci/runs/*.json          ic e2e history records
   research/nist_skipped_curve_dissection_20261021/factorization/progress.json
                                 certified factorization status and recorded raw relation counts
+  research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json
+                                proved complete integer records in the all-21 selection census
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -209,6 +211,30 @@ def nist_factorization(ref, since):
                  problem="nist-skipped-curve-factorization", unit=unit, better=better,
                  label=label, source=source)
 
+def nist_selection_factor_census(ref, since):
+    path = "research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        source = f"{path}@{commit}"
+        emit("nist.selection_factor_census.complete_targets", data.get("complete_and_proven"),
+             date=date, problem="nist-candidate-selection", unit="integers", better="higher",
+             label="NIST all-21 census: proved complete factorization records", source=source)
+        for family, count in (data.get("complete_by_family") or {}).items():
+            emit(f"nist.selection_factor_census.{family}.complete_targets", count,
+                 date=date, problem="nist-candidate-selection", unit="integers", better="higher",
+                 label=f"NIST all-21 census: complete {family} records", source=source)
+
+
+def nist_selection_exact_embedding(ref, since):
+    path = "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_exact_embedding.certified_rows", data.get("passed"),
+             date=date, problem="nist-candidate-selection", unit="curves", better="higher",
+             label="NIST all-21 census: exact embedding degrees with direct-power certificates",
+             source=f"{path}@{commit}")
+
+
 def koblitz_modular_augmentation(ref, since):
     """Export the recorded scalar for the fixed n=5 augmentation presentation."""
     path = "research/koblitz_modular_ic_20261018/rounds/22/ledger.json"
@@ -230,8 +256,10 @@ def main():
     e2e_runs(a.ref)
     photo_volcano(a.ref)
     nist_factorization(a.ref, a.since)
-    koblitz_modular_augmentation(a.ref, a.since)
+    nist_selection_factor_census(a.ref, a.since)
+    nist_selection_exact_embedding(a.ref, a.since)
 
+    koblitz_modular_augmentation(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
