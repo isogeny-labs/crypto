@@ -1,3 +1,31 @@
+<!-- BEGIN SHARED SESSION LOG -->
+
+## Session log
+
+At the start of every session, read the newest dated Markdown file in
+`docs/session-logs/`.
+
+Write today's log at `docs/session-logs/YYYY-MM-DD.md`, using the current date.
+These paths are relative to the repository or workspace root.
+Create the folder and file if missing. Claude and Codex share this directory.
+
+Do not wait for the user to end the session. Append a timestamped entry after
+every finished piece of work, after every decision, and whenever we switch
+tasks. Preserve previous entries. Record concrete facts from commands and
+logs; distinguish verified results from plans or assumptions.
+
+Every entry has four headings:
+
+- What was done (commands, files, features)
+- Decisions made (and why)
+- Open threads (unfinished, pick up next time)
+- Errors (what went wrong, how it was handled)
+
+Commit project handoffs with the related PR so they survive across sessions.
+Keep entries about this project; do not copy private global logs or chat transcripts.
+
+<!-- END SHARED SESSION LOG -->
+
 Open pull requests ready for review, never as drafts, whatever the runtime
 defaults to, and mark an existing draft ready; only a user request in the task
 makes a draft. Enable auto-merge as you open the PR (`gh pr merge <n> --auto
@@ -77,3 +105,9 @@ transcript accounting traps: [`docs/token-efficiency.md`](docs/token-efficiency.
 Every cross-method ECDLP comparison prices the unpriced native work of
 every arm, rho references included, at 0, 0.1 and 1 GAE per operation and
 ranks two arms only where the order holds across that band (AGENTS.md §5a).
+
+**Resume checkpoints** (owner, 2026-10-24): before any experiment run, fill
+`.resume/RESUME.md` (`scripts/checkpoint.sh init`) so a fresh session could
+resume the effort from it alone. The hooks push it to S3 with the specs,
+leads and unpushed work, and refuse run launchers until that succeeds.
+AGENTS.md, "Resume checkpoints in S3 before every run".

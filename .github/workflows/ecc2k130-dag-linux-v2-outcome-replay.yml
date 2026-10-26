@@ -1,6 +1,9 @@
 name: ECC2K-130 DAG Linux v2 first-outcome successor replay
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - 'research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929/**'
       - 'research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/**'
@@ -10,7 +13,7 @@ permissions:
   contents: read
 jobs:
   archive-only-replay:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-dag-linux-v2-outcome-replay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-dag-linux-v2-outcome-replay.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4

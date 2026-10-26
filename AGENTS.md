@@ -1,4 +1,50 @@
+<!-- BEGIN SHARED SESSION LOG -->
+
+## Session log
+
+At the start of every session, read the newest dated Markdown file in
+`docs/session-logs/`.
+
+Write today's log at `docs/session-logs/YYYY-MM-DD.md`, using the current date.
+These paths are relative to the repository or workspace root.
+Create the folder and file if missing. Claude and Codex share this directory.
+
+Do not wait for the user to end the session. Append a timestamped entry after
+every finished piece of work, after every decision, and whenever we switch
+tasks. Preserve previous entries. Record concrete facts from commands and
+logs; distinguish verified results from plans or assumptions.
+
+Every entry has four headings:
+
+- What was done (commands, files, features)
+- Decisions made (and why)
+- Open threads (unfinished, pick up next time)
+- Errors (what went wrong, how it was handled)
+
+Commit project handoffs with the related PR so they survive across sessions.
+Keep entries about this project; do not copy private global logs or chat transcripts.
+
+<!-- END SHARED SESSION LOG -->
+
 # Agent instructions
+
+## Literature first
+
+Owner instruction (2026-10-19): check relevant literature before doing any work.
+For every task, complete this review before choosing an approach, editing files,
+implementing, running experiments, or making recommendations.
+
+- Start with this repository's references, research notes and prior results, then
+  check relevant papers, standards and official documentation for current methods,
+  limitations and known negative results.
+- Read the primary sources that matter. Verify their assumptions, parameters and
+  conclusions rather than relying on memory, abstracts or search snippets.
+- Briefly record the sources checked, with links or repository paths, and explain
+  how they inform the work in the task notes, report or PR. Check novelty claims
+  against that prior work and reuse established methods where appropriate.
+- If relevant sources are inaccessible or no relevant work is found, state the
+  search scope and evidence gaps before proceeding. Never invent citations or
+  treat an unsuccessful search as proof that no prior work exists.
 
 ## Standing workflow rules (from the owner)
 
@@ -125,6 +171,9 @@ baseline. Every such improvement is a success and is reported as one.**
   `RESEARCH_ECC2K130_IC_FEASIBILITY.md`
 - Faster checkouts (blobless clone, sparse profiles, cloud-session
   settings): [docs/sparse-checkout.md](docs/sparse-checkout.md)
+- Experiment design and records: `controlled-experiment` (claims, controls,
+  confounders), `experiment-protocol` and `review-run` (pointers to the
+  canonical schemas in crypto-autoresearcher), `queue-experiment` (§9b)
 
 For small-prime or pinned GF(2^83) elliptic-curve surface searches, quartic
 subgroup transfers, genus-2+ Jacobian transfers, hyperelliptic covers, Mumford
@@ -311,6 +360,55 @@ specific hypotheses, not a universal verdict. Preserve negative searches
 within their exact bounds and run authorized feasible experiments under the
 existing evidence, review, and benchmark rules.
 
+## Resume checkpoints in S3 before every run
+
+A session can end at any moment (token or usage limits, a crash, a reclaimed
+container), and a worktree that only it knew about is then lost. So **before
+any experiment run starts, the leads, the spec and everything needed to
+resume the effort are checked into S3**, and kept current while it runs.
+
+- `scripts/checkpoint.sh init` writes `.resume/RESUME.md` (gitignored). Fill
+  every section for a reader who has none of this conversation: goal, the
+  lead or hypothesis and where it came from, the spec or protocol path with
+  frozen inputs, the current state with measured numbers and where raw output
+  lives, next steps with exact commands, every run in flight (command, host,
+  instance id or pid, log and output paths, how to collect it), and the stop
+  and success conditions. The gate rejects missing or empty sections and
+  leftover `TODO(checkpoint)` markers.
+- `scripts/checkpoint.sh push` uploads one checkpoint to
+  `s3://setec-astronomy-artifacts/checkpoints/<repo>/<branch>/<stamp>/`:
+  `RESUME.md`, the spec, leads, protocol and plan files the branch changed, a
+  git bundle of unpushed commits, a patch of uncommitted changes, untracked
+  files (large ones listed, not copied) and `meta.json`. Earlier checkpoints
+  are never overwritten. Push again whenever a run starts or finishes,
+  results arrive, or the plan changes.
+- **Claude Code enforces this** (`.claude/hooks/checkpoint-hook.sh`): writing
+  a spec, leads, protocol or plan file, or `RESUME.md`, pushes a checkpoint,
+  and run launchers (`scripts/run_*`, sweeps, benchmarks, `nohup`, background
+  commands, `cargo run --release`, `expspec run`, `sage-run`, cloud launches)
+  are refused until `RESUME.md` is complete and the push succeeded. A command
+  that is not an experiment run may opt out with `CHECKPOINT_SKIP=<reason>`.
+  **Other runtimes (Codex)** run `scripts/checkpoint.sh gate` before
+  launching and do not launch if it fails.
+- Claude Code sessions have no AWS credentials, so the script works from a
+  token (tried first; an AWS profile is only a fallback). The token is a
+  presigned POST policy that can only write under `checkpoints/`, plus a
+  presigned link to an index of recent checkpoints, so push, `list`, `share`
+  and `restore` all work without credentials. A job on the owner's Mac
+  re-mints it every 15 minutes (7-day lifetime) into
+  `~/.config/checkpoint/upload-token`, where the script finds it; a session
+  elsewhere is given it as `CHECKPOINT_UPLOAD_TOKEN`. The bucket host is in
+  this repo's sandbox network allowlist (`.claude/settings.json`). It is a bearer credential: never
+  commit it or put it in a PR, report or task card.
+- To resume: `scripts/checkpoint.sh list` shows the latest checkpoint per
+  branch (from the index, up to 15 minutes behind);
+  `scripts/checkpoint.sh restore <repo>/<branch>[/<stamp>]` rebuilds the
+  worktree next to this checkout and puts `RESUME.md` in it. `share` prints a
+  presigned URL that `restore <url>` accepts anywhere.
+
+A checkpoint is a safety net, not the record: the spec, protocol and results
+still land in a PR under the rules above.
+
 ## Research searches must leave visual reports
 
 Every experiment run (ICMS or ecbench session, autolab or tournament round,
@@ -479,6 +577,15 @@ in aburan28/crypto-autoresearcher.
   The director's assessment says only whether the run executed as specified
   and the relay was verbatim. What the numbers mean is decided by the
   frontier or core tier under the measurement rules below.
+- **Subagent roster and pins.** The pins live in `.claude/agents/`; the tier
+  decides the model, never the reverse. `executor-mechanical` is Haiku 5.5
+  (effort low); `experiment-director` and `idea-generator` are Sonnet 5.5;
+  `idea-synthesist` is Opus 5.5 (effort high); the independent reviewers
+  `red-team` and `validator` inherit the session model at effort `xhigh`;
+  their breakthrough siblings `red-team-breakthrough` and
+  `validator-breakthrough` are Opus 5.5 at effort `max`. A claimed break,
+  closure, or contradiction is reviewed only by the breakthrough siblings, in
+  their own sessions.
 
 ## Default workflow: open the PR, check in, and land it
 
@@ -520,13 +627,24 @@ follows the PR until it lands, under the check-in and merge rules below.
 another approval to merge a completed, passing PR unless a policy or reviewer
 requires explicit authorization for that merge, and it follows these rules:
 
+- **The merge set is three checks.** A pull request merges when `gate`
+  (validation-gate), `size` (large-files), and `artifacts` have passed on the
+  current head. Those are the only workflows that run on `pull_request`,
+  besides the pull-request review and the autofix label queue. Rust lint, the
+  workspace compile, ecbench, CodeQL, Lean, the release build, and the
+  research workflows run after the change is on `main` (a push, usually
+  limited to the paths that workflow names) or on their existing schedule.
+  CodeQL runs weekly. `workflow_dispatch` runs one of them now. Do not wait
+  on a pull request for a check that did not run, and do not put
+  `pull_request` back on those workflows to chase a green box.
 - Apply merge authorization to PRs created or maintained for the current user
   task, not unrelated PRs. An explicit instruction to leave a PR open, keep it
   as a draft, wait for review, or avoid merging overrides this default.
-- Check the current PR head: all required and applicable CI checks must have
-  completed successfully. Pending, cancelled, timed-out, or failed checks are
-  not a pass. A skipped job counts as inapplicable only when its conditions or
-  path filters justify that status; required checks must still be satisfied.
+- Check the current PR head: the merge set above must have completed
+  successfully. Pending, cancelled, timed-out, or failed checks in that set
+  are not a pass. A skipped job counts as inapplicable only when its
+  conditions or path filters justify that status; a required check must still
+  be satisfied.
 - **Checks that never start do not block** (owner, 2026-10-23). A check that
   no branch-protection rule or ruleset requires, and that has been queued for
   24 hours or more without starting (no runner picked it up), does not hold
@@ -1139,6 +1257,25 @@ $E status last; $E logs -f last; $E fetch last
   `benchmarks/` rule and the research-visuals rule. Its provenance is the
   fetched `job.json`, `host.txt` and `rusage.txt` in
   `~/.cache/ephemeral/runs/<id>/`.
+
+### 9b. Protocol-bound jobs on the queue, and what a restore means
+
+Owner request, 2026-10-22; design in
+[`taskq/deploy/spot-checkpoint/README.md`](taskq/deploy/spot-checkpoint/README.md),
+submission in the `queue-experiment` skill. Every job a queue runs binds a
+frozen `experiment.protocol/v1` (`experiment-protocol` skill; the schemas and
+checker are canonical in aburan28/crypto-autoresearcher) and lands as one
+`experiment.export/v1` beside its raw records, one row per execution with the
+isolation level it earned and its checkpoint history. The protocol's
+`measurement_class` picks the pool: a job whose clock or counter is read
+against an A/A interval goes to an isolated pool and is never resumed (an
+interrupted row is abandoned and a new row runs); a throughput, search or
+training job goes to Spot capacity and checkpoints under the application
+manifest contract or, where a program cannot save itself, a CRIU image. After
+a restore, counted units stay valid and wall and CPU time do not
+(`wall_valid: false`, `resumed > 0`); the export checker refuses a resumed row
+with a valid clock. A `review-run` record by another runner is the second
+reading of an export and an input to the validation gate, never a row.
 
 ### 10. Performance work starts from a clean, recorded baseline
 

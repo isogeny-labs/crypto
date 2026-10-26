@@ -109,6 +109,12 @@ pub struct Session {
     /// a session only under the rules it was graded with.
     #[serde(default = "grading_v1")]
     pub grading_version: u32,
+    /// The versions of the counted-work definitions the session was made
+    /// under (`record::current_accounting_versions`).  Empty on a session
+    /// written before they were recorded, and then not written at all, so
+    /// such a session reads and re-serialises byte for byte as before.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub accounting_versions: BTreeMap<String, u32>,
     /// SHA-256 of the sorted `k=v` lines of the child environment.
     pub child_env_sha256: String,
     pub child_env: BTreeMap<String, String>,
@@ -660,6 +666,7 @@ fn execute_session(
         runner_cpus,
         ticks_per_second: hz,
         grading_version: GRADING_VERSION,
+        accounting_versions: crate::cryptanalysis::ecbench::record::current_accounting_versions(),
         child_env_sha256: sha256_hex(env_lines.join("\n").as_bytes()),
         child_env: env.clone(),
         started_unix_ms: started,
@@ -960,7 +967,7 @@ fn assemble(
         timing: &reaped.timing,
         hz: ctx.hz,
     });
-    Record {
+    let mut record = Record {
         schema: RECORD_SCHEMA.into(),
         record_id: String::new(),
         session_id: session_id.into(),
@@ -1053,7 +1060,14 @@ fn assemble(
         },
         env_class_id: capsule.env_class_id.clone(),
         binary_sha256: capsule.build.binary_sha256.clone(),
+        work: None,
+    };
+    // The record's work in bitop/v1, derived from what it carries; a record
+    // that cannot be priced (no report) carries none.
+    if report.is_some() {
+        record.work = crate::cryptanalysis::ecbench::work::price_record(&record).ok();
     }
+    record
 }
 
 /// Read a session directory's records.
