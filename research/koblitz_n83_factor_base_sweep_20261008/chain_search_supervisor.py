@@ -60,6 +60,8 @@ def strategy_name(config: dict) -> str:
     kernel = config.get("product_kernel", "schoolbook")
     if kernel == "karatsuba" and encoding == "coordinate_trie":
         return "chain-s3-karatsuba"
+    if kernel == "shallow_karatsuba" and encoding == "coordinate_trie":
+        return "chain-s3-shallow-karatsuba"
     if kernel != "schoolbook":
         raise ValueError("unsupported chained-S3 product kernel and domain")
     if encoding == "coordinate_trie":
@@ -452,13 +454,15 @@ def run(panel: Path, fixtures: Path, columns: int, policy: str, seed: int, summa
         memory_mib: int, binary: Path, output_dir: Path,
         image: str = "python:3.11-slim", checkout: Path | None = None,
         orbit_domain: bool = False, ordered_first_pair: bool = False,
-        karatsuba: bool = False) -> dict:
+        karatsuba: bool = False, shallow_karatsuba: bool = False) -> dict:
     if columns not in SIZES or policy not in POLICIES or seed not in SEEDS:
         raise ValueError("search selection is outside the retained primary panel")
     if ordered_first_pair and not orbit_domain:
         raise ValueError("first-pair order requires the Frobenius-orbit domain")
-    if karatsuba and orbit_domain:
+    if (karatsuba or shallow_karatsuba) and orbit_domain:
         raise ValueError("Karatsuba search currently requires coordinate trie domain")
+    if karatsuba and shallow_karatsuba:
+        raise ValueError("choose one chained-S3 product kernel")
     if summands not in (5, 6) or not 0 <= max_trials <= 1000:
         raise ValueError("search arity or trial cap is unsupported")
     if (not 0 < max_variables <= 2**31 - 1 or
@@ -523,7 +527,8 @@ def run(panel: Path, fixtures: Path, columns: int, policy: str, seed: int, summa
         "seed": seed, "summands": summands, "max_trials": max_trials,
         "domain_encoding": ("frobenius_orbit_phase_ordered_first_pair" if ordered_first_pair else
                             "frobenius_orbit_phase" if orbit_domain else "coordinate_trie"),
-        "product_kernel": "karatsuba" if karatsuba else "schoolbook",
+        "product_kernel": ("shallow_karatsuba" if shallow_karatsuba else
+                           "karatsuba" if karatsuba else "schoolbook"),
         "max_variables": max_variables, "max_domain_clauses": max_domain_clauses,
         "max_models": max_models, "conflict_budget": conflict_budget,
         "wall_seconds": wall_seconds, "worker_wall_seconds": math.ceil(wall_seconds),
@@ -551,6 +556,7 @@ def run(panel: Path, fixtures: Path, columns: int, policy: str, seed: int, summa
         "--env", "ICV1_FROZEN_SOURCE_DIR=/source", image_id,
         "/worker", ("primary-ordered-orbit-chain-cold" if ordered_first_pair else
                     "primary-orbit-chain-cold" if orbit_domain else
+                    "primary-chain-cold-shallow-karatsuba" if shallow_karatsuba else
                     "primary-chain-cold-karatsuba" if karatsuba else "primary-chain-cold"),
         "/panel", "/fixtures", str(columns), policy, str(seed),
         str(summands), str(max_trials), str(max_variables), str(max_domain_clauses),
@@ -698,6 +704,7 @@ def main() -> int:
     parser.add_argument("--orbit-domain", action="store_true")
     parser.add_argument("--ordered-first-pair", action="store_true")
     parser.add_argument("--karatsuba", action="store_true")
+    parser.add_argument("--shallow-karatsuba", action="store_true")
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
     outer = run(args.panel, args.fixtures, args.columns, args.policy, args.seed, args.summands,
@@ -705,7 +712,7 @@ def main() -> int:
                 args.max_models, args.conflict_budget, args.wall_seconds,
                 args.memory_mib, args.binary, args.output_dir, args.image,
         orbit_domain=args.orbit_domain, ordered_first_pair=args.ordered_first_pair,
-        karatsuba=args.karatsuba)
+        karatsuba=args.karatsuba, shallow_karatsuba=args.shallow_karatsuba)
     print(json.dumps(outer, sort_keys=True))
     return 1 if outer["status"].startswith("PRODUCER_FAILURE") else 0
 

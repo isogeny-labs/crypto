@@ -3732,6 +3732,8 @@ pub enum DecompositionStrategy {
     /// The finite coordinate domain and original-curve witness checks are
     /// identical to `ChainedS3`.
     ChainedS3Karatsuba,
+    /// Chained S3 with one-level split Karatsuba and direct field reduction.
+    ChainedS3ShallowKaratsuba,
     /// The same chained-S3 solver with an exact representative-and-Frobenius-
     /// phase domain for an ambient-basis signed-orbit base. This can avoid a
     /// large explicit-coordinate trie, but still requires the same complete
@@ -8477,6 +8479,25 @@ pub fn sat_decompose_chained_s3_karatsuba(
     )
 }
 
+pub fn sat_decompose_chained_s3_shallow_karatsuba(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        false,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::ShallowKaratsuba,
+    )
+}
+
 /// Use one signed-Frobenius representative per column to constrain the same
 /// chained-S3 solver. The representative closure must equal the factor-base
 /// x-set exactly; a missing or extra coordinate is inconclusive. Accepted
@@ -9826,6 +9847,7 @@ fn koblitz_index_calculus_dlp_observed(
         opts.strategy,
         DecompositionStrategy::ChainedS3
             | DecompositionStrategy::ChainedS3Karatsuba
+            | DecompositionStrategy::ChainedS3ShallowKaratsuba
             | DecompositionStrategy::ChainedS3FrobeniusOrbit
             | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
     ) && (!(5..=6).contains(&opts.m)
@@ -10112,6 +10134,16 @@ fn koblitz_index_calculus_dlp_observed(
                 }
                 DecompositionStrategy::ChainedS3Karatsuba => {
                     let (idxs, stats) = sat_decompose_chained_s3_karatsuba(
+                        kc,
+                        fb,
+                        target,
+                        opts.m,
+                        opts.chain_s3_limits,
+                    );
+                    RelationAttemptOutcome::ChainedS3(idxs, stats)
+                }
+                DecompositionStrategy::ChainedS3ShallowKaratsuba => {
+                    let (idxs, stats) = sat_decompose_chained_s3_shallow_karatsuba(
                         kc,
                         fb,
                         target,
@@ -11894,6 +11926,16 @@ fn decompose_once(
         DecompositionStrategy::ChainedS3Karatsuba => {
             let (points, stats) =
                 sat_decompose_chained_s3_karatsuba(kc, fb, target, opts.m, opts.chain_s3_limits);
+            PdpAttempt::chained(points, stats)
+        }
+        DecompositionStrategy::ChainedS3ShallowKaratsuba => {
+            let (points, stats) = sat_decompose_chained_s3_shallow_karatsuba(
+                kc,
+                fb,
+                target,
+                opts.m,
+                opts.chain_s3_limits,
+            );
             PdpAttempt::chained(points, stats)
         }
         DecompositionStrategy::ChainedS3FrobeniusOrbit => {
@@ -15964,6 +16006,39 @@ mod tests {
         let opts = KoblitzIcOptions {
             m: 5,
             strategy: DecompositionStrategy::ChainedS3Karatsuba,
+            max_trials: 16,
+            extra_relations: 1,
+            allow_direct_relation: false,
+            chain_s3_limits: ChainS3Limits {
+                max_variables: 2_000,
+                max_domain_clauses: 10_000,
+                max_models: 128,
+                conflict_budget: 500_000,
+            },
+            ..KoblitzIcOptions::default()
+        };
+        let report = koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+        assert_eq!(report.log, Some(known), "{report:?}");
+        assert!(report.sat_calls > 0);
+        assert!(report.independent_relations > 0);
+        assert!(report.linear_solve_attempts > 0);
+        assert_eq!(report.sat_invalid_models, 0);
+        assert_eq!(report.verification_failures, 0);
+        assert!(!report.direct_relation);
+    }
+
+    #[test]
+    fn chained_s3_shallow_karatsuba_strategy_feeds_verified_relation_rank_and_target_solve() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let BinaryPoint::Affine { x, .. } = kc.generator() else {
+            panic!("generator is affine");
+        };
+        let fb = build_explicit_frobenius_orbit_factor_base(&kc, std::slice::from_ref(x)).unwrap();
+        let known = BigUint::from(3u32) % &kc.subgroup_order;
+        let target = kc.mul(kc.generator(), &known);
+        let opts = KoblitzIcOptions {
+            m: 5,
+            strategy: DecompositionStrategy::ChainedS3ShallowKaratsuba,
             max_trials: 16,
             extra_relations: 1,
             allow_direct_relation: false,

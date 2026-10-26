@@ -26,6 +26,7 @@ pub enum ChainBuildError {
 pub enum ChainProductKernel {
     Schoolbook,
     Karatsuba,
+    ShallowKaratsuba,
 }
 
 /// Worst-case SAT variable count for the schoolbook circuit, before a
@@ -177,6 +178,9 @@ impl Circuit {
         if self.product_kernel == ChainProductKernel::Karatsuba {
             return self.product_karatsuba(left, right);
         }
+        if self.product_kernel == ChainProductKernel::ShallowKaratsuba {
+            return self.product_shallow_karatsuba(left, right);
+        }
         let mut rows = vec![Vec::new(); self.n];
         for (i, &a) in left.iter().enumerate() {
             for (j, &b) in right.iter().enumerate() {
@@ -276,6 +280,60 @@ impl Circuit {
             }
             for &output in &self.reductions[degree] {
                 rows[output].push(wire);
+            }
+        }
+        let output = self.block();
+        for (bit, mut row) in rows.into_iter().enumerate() {
+            row.push(output[bit]);
+            self.xors.push((row, false));
+        }
+        output
+    }
+
+    fn product_shallow_karatsuba(&mut self, left: &[u32], right: &[u32]) -> Vec<u32> {
+        // A=A0+x^h A1, B=B0+x^h B1, with h=ceil(n/2).  Form only
+        // L=A0 B0, H=A1 B1, and M=(A0+A1)(B0+B1).  Each AND gate is
+        // routed directly to the reduced output; no coefficient wires for
+        // L, H, or M are introduced into the SAT instance.
+        let half = self.n.div_ceil(2);
+        let high = self.n - half;
+        let mut rows = vec![Vec::new(); self.n];
+        let mut left_mix = Vec::with_capacity(half);
+        let mut right_mix = Vec::with_capacity(half);
+        for i in 0..half {
+            left_mix.push(self.xor_terms(vec![left[i], left.get(i + half).copied().unwrap_or(0)]));
+            right_mix
+                .push(self.xor_terms(vec![right[i], right.get(i + half).copied().unwrap_or(0)]));
+        }
+        for i in 0..half {
+            for j in 0..half {
+                let gate = self.wire();
+                self.ands.push((gate, left[i], right[j]));
+                for &degree in &[i + j, i + j + half] {
+                    for &bit in &self.reductions[degree] {
+                        rows[bit].push(gate);
+                    }
+                }
+            }
+        }
+        for i in 0..high {
+            for j in 0..high {
+                let gate = self.wire();
+                self.ands.push((gate, left[i + half], right[j + half]));
+                for &degree in &[i + j + half, i + j + 2 * half] {
+                    for &bit in &self.reductions[degree] {
+                        rows[bit].push(gate);
+                    }
+                }
+            }
+        }
+        for i in 0..half {
+            for j in 0..half {
+                let gate = self.wire();
+                self.ands.push((gate, left_mix[i], right_mix[j]));
+                for &bit in &self.reductions[i + j + half] {
+                    rows[bit].push(gate);
+                }
             }
         }
         let output = self.block();
@@ -944,6 +1002,7 @@ mod tests {
                 for kernel in [
                     ChainProductKernel::Schoolbook,
                     ChainProductKernel::Karatsuba,
+                    ChainProductKernel::ShallowKaratsuba,
                 ] {
                     let mut circuit = Circuit::new_with_kernel(&irr, kernel);
                     let x = circuit.block();
@@ -993,22 +1052,27 @@ mod tests {
         let left = F2mElement::from_biguint(&left_bits, n);
         let right = F2mElement::from_biguint(&right_bits, n);
         let expected = left.mul(&right, &irr).to_biguint();
-        let mut circuit = Circuit::new_with_kernel(&irr, ChainProductKernel::Karatsuba);
-        let x = circuit.block();
-        let y = circuit.block();
-        let z = circuit.product(&x, &y);
-        assert!(circuit.ands.len() < (n as usize) * (n as usize));
-        for (bit, &wire) in x.iter().enumerate() {
-            circuit.units.push((wire, left_bits.bit(bit as u64)));
-        }
-        for (bit, &wire) in y.iter().enumerate() {
-            circuit.units.push((wire, right_bits.bit(bit as u64)));
-        }
-        let mut solver = circuit.finish();
-        assert_eq!(solver.solve(), SolveResult::Sat);
-        let model = solver.model();
-        for (bit, &wire) in z.iter().enumerate() {
-            assert_eq!(model[wire as usize - 1], expected.bit(bit as u64));
+        for kernel in [
+            ChainProductKernel::Karatsuba,
+            ChainProductKernel::ShallowKaratsuba,
+        ] {
+            let mut circuit = Circuit::new_with_kernel(&irr, kernel);
+            let x = circuit.block();
+            let y = circuit.block();
+            let z = circuit.product(&x, &y);
+            assert!(circuit.ands.len() < (n as usize) * (n as usize));
+            for (bit, &wire) in x.iter().enumerate() {
+                circuit.units.push((wire, left_bits.bit(bit as u64)));
+            }
+            for (bit, &wire) in y.iter().enumerate() {
+                circuit.units.push((wire, right_bits.bit(bit as u64)));
+            }
+            let mut solver = circuit.finish();
+            assert_eq!(solver.solve(), SolveResult::Sat);
+            let model = solver.model();
+            for (bit, &wire) in z.iter().enumerate() {
+                assert_eq!(model[wire as usize - 1], expected.bit(bit as u64));
+            }
         }
     }
 
@@ -1022,6 +1086,7 @@ mod tests {
         for kernel in [
             ChainProductKernel::Schoolbook,
             ChainProductKernel::Karatsuba,
+            ChainProductKernel::ShallowKaratsuba,
         ] {
             let mut circuit = Circuit::new_with_kernel(&irr, kernel);
             let x = circuit.block();
@@ -1031,11 +1096,12 @@ mod tests {
             counts.push((circuit.ands.len(), circuit.next - 1, circuit.xors.len()));
         }
         println!(
-            "N83 single S3 schoolbook={:?} karatsuba={:?}",
-            counts[0], counts[1]
+            "N83 single S3 schoolbook={:?} karatsuba={:?} shallow={:?}",
+            counts[0], counts[1], counts[2]
         );
         assert_eq!(counts[0].0, 3 * 83 * 83);
         assert!(counts[1].0 < counts[0].0);
+        assert_eq!(counts[2].0, 3 * (2 * 42 * 42 + 41 * 41));
     }
 
     #[test]
@@ -1058,18 +1124,34 @@ mod tests {
             ChainProductKernel::Karatsuba,
         )
         .expect("Karatsuba capacity");
+        let shallow = ChainedS3Encoding::build_with_kernel(
+            5,
+            &irr,
+            &b,
+            Some(&target),
+            0,
+            200_000,
+            ChainProductKernel::ShallowKaratsuba,
+        )
+        .expect("shallow Karatsuba capacity");
         println!(
-            "N83 m5 schoolbook vars={} clauses={} ands={}; karatsuba vars={} clauses={} ands={}",
+            "N83 m5 schoolbook vars={} clauses={} ands={}; karatsuba vars={} clauses={} ands={}; shallow vars={} clauses={} ands={}",
             schoolbook.solver.n_vars(),
             schoolbook.solver.n_clauses(),
             schoolbook.n_and_gates,
             karatsuba.solver.n_vars(),
             karatsuba.solver.n_clauses(),
-            karatsuba.n_and_gates
+            karatsuba.n_and_gates,
+            shallow.solver.n_vars(),
+            shallow.solver.n_clauses(),
+            shallow.n_and_gates,
         );
         assert_eq!(schoolbook.n_and_gates, 4 * 3 * 83 * 83);
         assert!(karatsuba.n_and_gates < schoolbook.n_and_gates);
         assert!(karatsuba.solver.n_clauses() < schoolbook.solver.n_clauses());
+        assert_eq!(shallow.n_and_gates, 12 * (2 * 42 * 42 + 41 * 41));
+        assert!(shallow.solver.n_vars() < schoolbook.solver.n_vars());
+        assert!(shallow.solver.n_clauses() < schoolbook.solver.n_clauses());
         let below = karatsuba.solver.n_vars() - 1;
         assert!(matches!(
             ChainedS3Encoding::build_with_kernel(

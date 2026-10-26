@@ -82,3 +82,26 @@ paired one-target comparison is still required for
 factor-base ranking. The exact configs, outer receipts, build identity and
 worker summary are in
 [`verification/karatsuba-k64-guarded-20261026/`](verification/karatsuba-k64-guarded-20261026/).
+
+## One-level split candidate
+
+The opt-in `ShallowKaratsuba` kernel splits an 83-bit polynomial after bit
+41, with a 42-bit low part and 41-bit high part. It computes the low, high
+and mixed products once, then routes their AND gates directly through the
+pinned field reduction to output XOR rows. For one field product this uses
+`42² + 41² + 42² = 5,209` AND gates, compared with `83² = 6,889` for
+schoolbook. The pre-domain five-summand N83 model has **62,508 AND gates,
+187,607 CNF clauses and 65,567 SAT variables**. Schoolbook has 82,668,
+248,087 and 84,743 respectively; recursive Karatsuba has 22,152, 66,539
+and 95,039. The shallow kernel introduces fewer intermediate XOR wires than
+recursive Karatsuba, though SAT conflict work remains to be measured.
+
+The kernel passes independent field-multiplication controls at degrees 7,
+9 and the pinned degree-83 basis, including operands above bit 64. Its
+distinct full IC strategy passes the checked-scalar, relation-rank and
+recovery control on a degree-7 curve. The guarded worker and supervisor
+bind it as `chain-s3-shallow-karatsuba` and `product_kernel:
+shallow_karatsuba`; existing kernel names and receipts remain distinct.
+The next empirical gate is a source-matched retained K64 comparison under
+the same trial, conflict, memory and wall caps after Docker's metadata store
+is repaired.
