@@ -1,6 +1,11 @@
-# Self-hosted runner labels for actionlint: the ARC scale sets on the isolab
-# EKS cluster (taskq/deploy/eks-karpenter/arc/README.md).
+# Extend older actionlint runner catalogues with this documented GitHub-hosted
+# Intel label: https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+# This validates the exact label without suppressing runner-label diagnostics.
+#
+# Also the ARC scale sets on the isolab EKS cluster
+# (taskq/deploy/eks-karpenter/arc/README.md).
 self-hosted-runner:
   labels:
+    - macos-15-intel
     - crypto-eks-linux
     - crypto-eks-highmem
