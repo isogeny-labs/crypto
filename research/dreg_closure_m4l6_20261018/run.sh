@@ -29,15 +29,29 @@ cgroup_limit() {
 LIMIT=$(cgroup_limit)
 A=$(( LIMIT * 92 / 100 ))
 
+oomkills() { awk '/^oom_kill / {print $2; f=1} END {if (!f) print 0}' /sys/fs/cgroup/memory.events 2>/dev/null || echo 0; }
+
 one() { # name file draw to timeout [extra flags]
   local name=$1 file=$2 k=$3 to=$4 tmo=$5; shift 5
   local out=$RUNS/$name.d$k.jsonl
   if [ -s "$out" ]; then log "$name d$k: done already, skipped"; return; fi
   log "$name d$k: start (to=$to A=$A cols<=1100000)"
   local start; start=$(date +%s)
+  # A3 §11.8: the record is written to .part and kept only once the closure has
+  # ended on its own (or by its timeout, exit 124). Exit 130/143/137 without the
+  # timeout means the host stopped it (Spot loss, job cancel); the .part is
+  # dropped and a resumed run does that closure again from the start. A 137
+  # with a new cgroup oom_kill is the memory outcome and is recorded.
+  local rc=0 oom0; oom0=$(oomkills)
   (cd "$REPO" && prlimit --as=$A timeout "$tmo" /usr/bin/time -v \
-     "$CLOSURE" --to "$to" --max-cols 1100000 --draw "$k" "$@" "$file") > "$out" 2> "$RUNS/$name.d$k.log"
-  log "$name d$k: exit $? after $(( $(date +%s) - start )) s"
+     "$CLOSURE" --to "$to" --max-cols 1100000 --draw "$k" "$@" "$file") > "$out.part" 2> "$RUNS/$name.d$k.log" || rc=$?
+  case $rc in
+    137) if [ "$(oomkills)" -gt "$oom0" ]; then :; else
+           log "$name d$k: interrupted (exit $rc) after $(( $(date +%s) - start )) s, not recorded"; rm -f "$out.part"; return; fi ;;
+    130|143) log "$name d$k: interrupted (exit $rc) after $(( $(date +%s) - start )) s, not recorded"; rm -f "$out.part"; return ;;
+  esac
+  mv "$out.part" "$out"
+  log "$name d$k: exit $rc after $(( $(date +%s) - start )) s"
 }
 
 case $STEP in

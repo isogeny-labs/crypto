@@ -169,6 +169,20 @@ class RoundTrip(unittest.TestCase):
         self.git("commit", "-qm", "move it")
         self.assertEqual(self.art("check", base).returncode, 0)
 
+    def test_check_gate_in_blobless_clone(self):
+        # CI checks out with `filter: blob:none`: a modified file's blob is
+        # not local until asked for, and a partial clone fetches a missing
+        # blob only by its full id, never by an abbreviated one.
+        (self.repo / "tool.py").write_text("x = 2\n" * 1_000)
+        self.git("add", "-A")
+        self.git("commit", "-qm", "edit code")
+        self.git("config", "uploadpack.allowFilter", "true")
+        clone = Path(self.tmp.name).resolve() / "clone"
+        sh(Path(self.tmp.name), "git", "clone", "-q", "--filter=blob:none", "--no-checkout", "--depth", "2",
+           f"file://{self.repo}", str(clone), env=self.env)
+        r = self.art("check", "HEAD^1", "HEAD", check=False, cwd=clone)
+        self.assertEqual(r.returncode, 0, r.stderr)
+
 
 class Policy(unittest.TestCase):
     P = artifacts.DEFAULT_POLICY
@@ -205,6 +219,22 @@ class WorkflowWiringPaths(unittest.TestCase):
             self.dirs,
         )
         self.assertEqual(paths, ["research/scalar_mul_ct_timing_20261022"])
+
+    def test_nested_artifact_does_not_make_sibling_notes_a_reader(self):
+        moved = {"research/notes/index-calculus/reports/run-1/report.pdf"}
+        dirs = wire_workflows.moved_dirs(moved)
+        self.assertEqual(
+            wire_workflows.needed("run: python research/notes/index-calculus/other.py", moved, dirs),
+            [],
+        )
+        self.assertEqual(
+            wire_workflows.needed("run: python research/notes/index-calculus/reports/run-1/verify.py", moved, dirs),
+            ["research/notes/index-calculus/reports/run-1"],
+        )
+        self.assertEqual(
+            wire_workflows.needed("run: ls research/notes/index-calculus/reports/run-1", moved, dirs),
+            ["research/notes/index-calculus/reports/run-1"],
+        )
 
 
 class S3Argv(unittest.TestCase):

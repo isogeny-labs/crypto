@@ -23,6 +23,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_frobenius_factor_base, groebner_decompose, KoblitzCurve,
 };
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_low64;
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 use num_bigint::BigUint;
 use std::io::BufRead;
@@ -160,7 +161,7 @@ fn main() {
         let occurring = system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |a, t| a | t.mask);
+            .fold(0u64, |a, t| a | mask_low64(t.mask));
         if occurring == 0 {
             continue;
         }
