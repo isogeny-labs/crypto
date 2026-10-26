@@ -756,7 +756,7 @@ fn sqrt_mod_p_u64(n: u64, p: u64) -> Option<u64> {
     // General Tonelli–Shanks.  Write p − 1 = Q · 2^S with Q odd.
     let mut q = p - 1;
     let mut s = 0u32;
-    while q % 2 == 0 {
+    while q.is_multiple_of(2) {
         q /= 2;
         s += 1;
     }
@@ -768,7 +768,7 @@ fn sqrt_mod_p_u64(n: u64, p: u64) -> Option<u64> {
     let mut m = s;
     let mut c = pow(z, q);
     let mut t = pow(n, q);
-    let mut r = pow(n, (q + 1) / 2);
+    let mut r = pow(n, q.div_ceil(2));
     loop {
         if t == 1 {
             return Some(r);
