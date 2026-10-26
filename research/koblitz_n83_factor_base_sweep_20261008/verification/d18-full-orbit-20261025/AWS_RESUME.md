@@ -315,3 +315,10 @@ cannot lift that launch denial. No hosted native full-D18 positive/natural
 execution has been started from this handoff. The
 [problem record](../../../../problems/n83-mixed-orbit-factor-base-selection.md)
 tracks these gates and the downstream total-runtime selection obligations.
+
+A subsequent [local attempt 4](native-cadence-replay-20261026/attempt-4/REPORT.md)
+passed the exact fresh S3-input and local capacity gates, then exited in
+1.05 seconds before result generation because the worker binary's compile-time
+`CARGO_MANIFEST_DIR` still named the dirty original checkout. The correction
+is a fresh release build in a clean checkout of frozen source `45ce91d5`,
+with new worker/verifier hashes recorded before the next positive arm.
