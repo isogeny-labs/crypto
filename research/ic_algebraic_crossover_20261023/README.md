@@ -88,20 +88,29 @@ The owner approved publication on 2026-10-26, and the results summary is now
 on [private PR 2550](https://github.com/isogeny-labs/crypto/pull/2550).
 The repository moved with the same ID. Remote head `ac16317e5` and main
 `942caf7e4` are merged locally as `69cf0253e`; all 65 inventoried evidence
-files remain byte-identical. Additional source/evidence delivery remains
-blocked. The managed environment
-has no AWS identity; the prepared CI relay could not receive its input because
-GitHub's binary-upload endpoint rejected the configured credential. No relay
-was dispatched and no S3 upload or readback is claimed. An owner decision on
-the documented Git storage exception is pending. The integrated library gate
-also fails on [unchanged upstream SAT syntax](../../problems/sat-progress-phase-base-syntax.md);
-earlier test passes belong to their recorded frozen sources. There are 31 inspected reports,
+files remain byte-identical. The owner explicitly authorized S3 delivery on
+2026-10-26. The standard artifact tool published all 41 additional files
+(7,508,437 bytes) as 30 content objects in 32 genuine manifests; every file's
+actual remote bytes pass SHA-256 and size readback, with previous bindings
+preserved. The official resume checkpoint also passes actual archive/meta/resume
+readback. [Delivery receipt](pipeline-receipts/artifact-publication-20261026/remote-byte-replay.json).
+No Git storage exception or CI relay was used. Source integration and final-head
+validation/push are still in progress. The earlier integrated library gate fails
+on [unchanged upstream SAT syntax](../../problems/sat-progress-phase-base-syntax.md);
+new main `e8fcadf62` now contains its upstream fix and awaits integration/tests.
+Earlier test passes belong to their recorded frozen sources. There are 31 inspected reports,
 34 pages. The [v2 metadata adapter](curve-identity-adapter.v2.json) preserves
 all 25 v1 identities and adds the two independently checked partial models.
 [Initial publication snapshot](PR_UPDATE_20261026.md),
 [updated published summary](PR_UPDATE_FINAL_20261026.md),
 [publication packet](PUBLISH_REVIEW.md),
 [continuation gates](CONTINUATION_READINESS_20261026.md).
+
+Hydrate the stored study/report bytes with
+`python3 tools/artifacts/artifacts.py pull research/ic_algebraic_crossover_20261023 benchmarks/20261025-ic-algebraic-stage`.
+Use a writable `ARTIFACTS_CACHE` when the default home cache is read-only.
+The completed pending plans are historical inventories, not replacements for
+the real `.artifacts.json` bindings.
 
 ## Measured structural result
 
