@@ -1,5 +1,7 @@
 # ECBench ECDLP performance frontier, 2026-10-13
 
+> **Correction 2026-10-20 (validation sweep B, verdicts 108.1 and 110.1: contradicted).** The n=61 13.9x and N83 18.528x online ratios below compare against a rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster (`benchmarks/20261014-ic-next10-09-equal-advice`) and precomputed rho beats the N83 IC (`benchmarks/20261016-n83-precomputed-rho-control`). The within-IC K1798 vs K1500 comparison stands. The 120/168 replay-all is likewise superseded by 72/168 on current main (sweep A).
+
 **Decision.** The cold, one-target, setup-inclusive frontier is still generic
 rho. None of the measured index-calculus candidates beats its matched rho arm
 in the repository's counted unit. The retained-preprocessing frontier is
@@ -24,8 +26,8 @@ graphs are under [`reports/run-20261013T2025Z/`](reports/run-20261013T2025Z/).
 | Cold one-target Koblitz memory | `rho.signed_frobenius`, bound `ECBND1h46fbc9140ac3` | 1.188x floor [0.954, 1.464], retained memory 0.000706 `sqrt(r)` [0.000130, 0.001369], 72 runs at three sizes | canonical ECBench Pareto point; constant bound only |
 | Best measured Koblitz factor-base arm in the 2026-10-13 suite | `compact-orbit-scan` | at n=17, `S=9.114`, 9.985x matched signed-Frobenius rho; at n=23/a=0, `S=2.996`, 8.360x rho | operation smoke, L0; not a bound |
 | Best Boolean algebraic whole-pipeline arm in the F4/F5/F6 cells | inherited F4 | 7.21x rho-negation / 1.136x setup-heavy strong rho at K13; 3.77x / 1.581x at K19 | `S` is a lower bound; still above rho on every target |
-| Best admitted retained-preprocessing online result | compact-orbit IC, n=61, K=500 | rho/IC 13.9x [9.8, 19.1], 64 unseen targets, isolated x86_64; setup about 28 s excluded; cold IC/rho median 83.4 | admitted online constant-factor win only |
-| Largest newer retained-preprocessing observation | dense five-byte root index, n=83, K=1798 | rho/IC 18.528377 on one public point; IC 63.324125 ms, rho 1,173.29325 ms; complete IC process 339.068 s | exploratory shared-host result; not an ECBench method |
+| Best admitted retained-preprocessing online result | compact-orbit IC, n=61, K=500 | ~~rho/IC 13.9x [9.8, 19.1], 64 unseen targets, isolated x86_64; setup about 28 s excluded; cold IC/rho median 83.4 | admitted online constant-factor win only~~ **Corrected 2026-10-20 by validation sweep (verdict: contradicted)** row 108.1: superseded, against rho with an empty table; Bernstein-Lange rho at equal advice is 53-317x faster online (benchmarks row `20261014-ic-next10-09-equal-advice`); cold IC/rho median 83.4 stands | superseded; not an improvement |
+| Largest newer retained-preprocessing observation | dense five-byte root index, n=83, K=1798 | ~~rho/IC 18.528377 on one public point; IC 63.324125 ms, rho 1,173.29325 ms; complete IC process 339.068 s | exploratory shared-host result; not an ECBench method~~ **Corrected 2026-10-20 by validation sweep (verdict: contradicted)** row 110.1: superseded, empty-table rho on one L0 target; precomputed rho wins every N83 matched pair (benchmarks row `20261016-n83-precomputed-rho-control`) | superseded; not an improvement |
 
 The apparent conflict between the first and last two rows is only a boundary
 change. Cold cost charges reusable preparation; online cost does not.
@@ -176,7 +178,7 @@ capsule is [`HOST.txt`](HOST.txt).
 | factor-base n17 session `ECBS1hb09194fe1d2e` | 30/30 records valid; 8/8 replays identical | `9306d33e1d9d8cf8f5257f221941cfa88214752e3d0da2d70728e150f56b1c21` | current-binary pass |
 | F4/F5/F6 K13 session `ECBS1h2b56c13eeaec` | 48/48 records valid; 7/7 selected replays identical, spanning strong rho, rho-negation, matrix F4, matrix F5, inherited F4, and F6-IC | `0304c4963454b4bbc46e6a37c5844ebe70e1ef2d08f808a4a4414ac97a8cf90e` | representative current-binary pass, not replay-all |
 | root-finder K13 session `ECBS1hfd5bf1885227`, sampled | 224/224 records valid; 8/8 sampled rho replays identical | `4814136e3d51fb35849a4e2c490a12ce269bb50bd86fd052c8744fa695c1d88d` | pass, but sampler did not cover IC arms |
-| same root-finder session, replay-all | 120/168 identical; all root-finder and rho rows pass; all 48 inherited-F4 rows differ in solver phase counts | `6110727aea2810587b08e88de5eb774d960ae29dd8b8d6aaab2b258bc1c8f5b9` | **failed audit preserved** |
+| same root-finder session, replay-all | ~~120/168 identical; all root-finder and rho rows pass; all 48 inherited-F4 rows differ in solver phase counts~~ (2026-10-13 receipt, preserved). **Corrected 2026-10-20 by validation sweep (verdict: contradicted)**: replay of the same session on current main is 72/168 identical, 96 mismatches across all four IC arms (ic-f4-m2, ic-f4-m3, ic-rootfind-m2, ic-rootfind-m3, 24 rows each); open regression under investigation (sweep D, PR #2290); root-finder and rho rows are not claimed to pass. Sweep-A record: `claude/validation-sweep-a-leaderboard-20261019`, `research/validation_sweep_20261019/A-leaderboard/verdicts.jsonl`, row `S:frontier:rootfinder-replay-block` | `6110727aea2810587b08e88de5eb774d960ae29dd8b8d6aaab2b258bc1c8f5b9` | **failed audit preserved** |
 
 The replay-all failure changes no recovered scalar, factor base, trial count,
 charged GAE, or whole-pipeline `S`; for example seq 58 keeps

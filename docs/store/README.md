@@ -151,14 +151,23 @@ reproduces the bytes with `crypto store pull sha256:<digest>`.
   argument vectors are unit-tested, and the whole flow runs end to end
   through the real subprocess boundary against a stand-in `aws` that models
   404s, `If-None-Match` and checksum rejection (`tests/store_cli.rs`). The
-  first push to the real bucket is the first live check; `store status`
-  reports whether the remote answers.
+  first live pushes to the real bucket were made by the repository owner
+  (their `store verify --remote` passed over the entries now in
+  `store/index.json`); the code sessions that built this have no AWS
+  credentials and have not re-run it. `store status` reports whether the
+  remote answers.
 * **No migration of existing large files.** Files already in Git history stay
   there; moving them out is a separate, history-visible decision.
 * **No remote deletion, versioning policy or lifecycle rules.** Those belong
   to the bucket.
-* **No database.** An RDS-backed catalogue of artifacts (and of run yields)
-  is the next step; the index here is its source of truth until then.
+* **No hosted database.** The catalogue is the ecbench database: `ecbench db
+  sql store/index.json | sqlite3 …` loads the index into `store_objects`,
+  `store_tags` and `store_superseded`, and the `store_factor_bases` view joins
+  stored dumps to the factor bases a run used
+  ([`docs/ecbench/README.md`](../ecbench/README.md) §10). The lab browser's
+  Store view (`docs/browser/`) shows the same index. A managed RDS instance
+  needs AWS credentials and provisioning that has not been done; the index
+  stays the source of truth.
 
 ## Factor bases
 

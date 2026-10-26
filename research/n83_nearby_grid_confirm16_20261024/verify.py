@@ -18,23 +18,51 @@ def read(path):
     return json.loads(path.read_text())
 
 
-def launch_gate(folder, event, output, target_file):
+def recorded_output_root(output, stratum, selected_ks):
+    """Recover one frozen runner root before replaying an extracted artifact."""
+    first = protocol.events(stratum, selected_ks)[0]
+    command = read(output / "points" / f"p{first['point_index']:02d}" /
+                   "runs" / first["name"] / "launch.json").get("command")
+    if not isinstance(command, list) or len(command) != 5:
+        raise ValueError("first confirmation launch is incomplete")
+    root = Path(command[0]).parent.parent
+    if (not root.is_absolute() or ".." in root.parts or
+            root.name != output.name or
+            command[0] != str(root / "executed_bins/koblitz_orbit_dlp_fast")):
+        raise ValueError("first confirmation launch has no consistent run root")
+    return root
+
+
+def launch_gate(folder, event, recorded_root):
     launch = read(folder / "launch.json")
     command = launch.get("command")
     if (not isinstance(command, list) or len(command) != 5 or
-            launch.get("rss_cap_bytes") != protocol.RSS_CAP_BYTES):
+            launch.get("rss_cap_bytes") != protocol.RSS_CAP_BYTES or
+            recorded_root is None):
         return False
+    recorded_folder = (recorded_root / "points" /
+                       f"p{event['point_index']:02d}" / "runs" / event["name"])
+    recorded_target = (recorded_root / "points" /
+                       f"p{event['point_index']:02d}" / "target.jsonl")
     if event["kind"] == "rho":
-        return (command == [str(output / "executed_bins/n83_rho_optimization_eval"),
-                            str(target_file), str(event["seed"]),
-                            str(screen.RHO_CONFIG), str(folder / "receipt.json")] and
+        config = Path(command[3])
+        relative_config = screen.RHO_CONFIG.relative_to(screen.ROOT)
+        if (not config.is_absolute() or ".." in config.parts or
+                config.parts[-len(relative_config.parts):] !=
+                relative_config.parts):
+            return False
+        return (command == [str(recorded_root /
+                                "executed_bins/n83_rho_optimization_eval"),
+                            str(recorded_target), str(event["seed"]),
+                            str(config), str(recorded_folder / "receipt.json")] and
                 launch.get("environment_flags") == {} and
                 launch.get("cap_seconds") == protocol.RHO_CAP_SECONDS)
-    return (command == [str(output / "executed_bins/koblitz_orbit_dlp_fast"),
-                        f"construct:83:1:{event['k']}", str(target_file), "29",
-                        str(folder / "targets_result.jsonl")] and
+    return (command == [str(recorded_root /
+                            "executed_bins/koblitz_orbit_dlp_fast"),
+                        f"construct:83:1:{event['k']}", str(recorded_target),
+                        "29", str(recorded_folder / "targets_result.jsonl")] and
             launch.get("environment_flags") ==
-            screen_run.ic_flags(folder, event["k"]) and
+            screen_run.ic_flags(recorded_folder, event["k"]) and
             launch.get("cap_seconds") == protocol.IC_CAP_SECONDS)
 
 
@@ -113,6 +141,10 @@ def verify(output, raw_screen):
     stratum = source.get("stratum")
     selected_ks = choice["selected_ks"]
     schedule = protocol.events(stratum, selected_ks)
+    try:
+        recorded_root = recorded_output_root(output, stratum, selected_ks)
+    except (OSError, ValueError, KeyError, TypeError, IndexError):
+        recorded_root = None
     source_ok = check_source(source, host, output, raw_screen, analysis, choice,
                              stratum, schedule, manifest)
     host_ok = (host.get("schema") == "n83.nearby-grid-confirm16-host/v1" and
@@ -139,8 +171,8 @@ def verify(output, raw_screen):
             elif target_file.read_text() != points[index][0]:
                 raise ValueError("per-point public input differs")
             else:
-                row["launch_verified"] = launch_gate(folder, event, output,
-                                                      target_file)
+                row["launch_verified"] = launch_gate(folder, event,
+                                                      recorded_root)
                 row["resources"] = resource_gate(folder, host)
                 if not row["launch_verified"]:
                     raise ValueError("launch command, flags or cap differs")

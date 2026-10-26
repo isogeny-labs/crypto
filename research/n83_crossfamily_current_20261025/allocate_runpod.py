@@ -21,11 +21,11 @@ from research.n83_crossfamily_current_20261025 import arms, run, source_bundle
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 API_URL = "https://api.runpod.io/graphql"
-GPU_TYPE = "NVIDIA GeForce RTX 3070"
+GPU_TYPES = ("NVIDIA RTX A5000", "Tesla V100-PCIE-16GB")
 IMAGE = "runpod/base:1.0.2-ubuntu2404"
 CAP_SECONDS = 360 * 60
-PRICE_CAP_PER_HOUR = Decimal("0.30")
-TOTAL_CAP_USD = Decimal("5.00")
+PRICE_CAP_PER_HOUR = Decimal("0.20")
+TOTAL_CAP_USD = Decimal("2.50")
 CONTAINER_DISK_GB = 30
 CONTAINER_DISK_USD_PER_GB_MONTH = Decimal("0.10")
 MIN_BILLING_MONTH_HOURS = Decimal(28 * 24)
@@ -88,7 +88,7 @@ def provider_pods(key):
     query = ("query { myself { pods { id name desiredStatus costPerHr "
              "createdAt machineId memoryInGb vcpuCount imageName gpuCount "
              "containerDiskInGb volumeInGb "
-             "podType } } }")
+             "podType machine { gpuTypeId } } } }")
     return graphql(query, key)["myself"]["pods"]
 
 
@@ -100,6 +100,7 @@ def readback(name, key, pods=provider_pods):
             raise ValueError("duplicate named RunPod allocations")
         if (matches and matches[0].get("createdAt") and
                 matches[0].get("machineId") and
+                (matches[0].get("machine") or {}).get("gpuTypeId") and
                 matches[0].get("desiredStatus") == "RUNNING"):
             return matches[0]
         if attempt + 1 < READBACK_ATTEMPTS:
@@ -137,10 +138,10 @@ def arm_guard(output):
     raise ValueError("local RunPod deadline guard did not arm")
 
 
-def mutation(name, terminate_at):
+def mutation(name, terminate_at, gpu_type):
     return (
         "mutation { podFindAndDeployOnDemand(input: { name: " +
-        json.dumps(name) + ", gpuTypeId: " + json.dumps(GPU_TYPE) +
+        json.dumps(name) + ", gpuTypeId: " + json.dumps(gpu_type) +
         ", gpuCount: 1, cloudType: COMMUNITY, minMemoryInGb: 27, "
         "minVcpuCount: 4, imageName: " + json.dumps(IMAGE) +
         ", templateId: \"runpod-ubuntu\", containerDiskInGb: 30, "
@@ -149,10 +150,10 @@ def mutation(name, terminate_at):
         json.dumps(terminate_at) +
         " }) { id name desiredStatus costPerHr machineId memoryInGb "
         "vcpuCount imageName gpuCount containerDiskInGb volumeInGb "
-        "createdAt podType } }")
+        "createdAt podType machine { gpuTypeId } } }")
 
 
-def valid_pod(pod, expected_name):
+def valid_pod(pod, expected_name, expected_gpu_type):
     price = Decimal(str(pod.get("costPerHr")))
     if (pod.get("name") != expected_name or
             pod.get("desiredStatus") != "RUNNING" or
@@ -164,6 +165,7 @@ def valid_pod(pod, expected_name):
             int(pod.get("memoryInGb")) < 27 or
             int(pod.get("vcpuCount")) < 4 or
             int(pod.get("gpuCount")) != 1 or
+            (pod.get("machine") or {}).get("gpuTypeId") != expected_gpu_type or
             int(pod.get("containerDiskInGb")) != CONTAINER_DISK_GB or
             Decimal(str(pod.get("volumeInGb") or 0)) != 0 or
             price <= 0 or price > PRICE_CAP_PER_HOUR or
@@ -211,7 +213,8 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
     terminate_at = iso(started + timedelta(seconds=CAP_SECONDS))
     write(output / "allocation_plan.json", {
         "schema": "n83.crossfamily-current-allocation-plan/v1",
-        "source_head_sha": head, "names": names, "gpu_type": GPU_TYPE,
+        "source_head_sha": head, "names": names,
+        "gpu_types": list(GPU_TYPES),
         "started_utc": iso(started),
         "source_archive_sha256": bundle_proof["source_archive_sha256"],
         "source_manifest_sha256": bundle_proof["source_manifest_sha256"],
@@ -234,7 +237,8 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
             if guard_process.poll() is not None:
                 raise ValueError("local RunPod deadline guard exited")
             try:
-                response = api(mutation(name, terminate_at), key)
+                response = api(mutation(name, terminate_at,
+                                        GPU_TYPES[stratum]), key)
                 raw = response["podFindAndDeployOnDemand"]
                 if not isinstance(raw, dict) or not raw.get("id"):
                     raise ValueError("RunPod mutation returned no Pod ID")
@@ -249,7 +253,7 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
                 except Exception:
                     pass
                 raise
-            price = valid_pod(pod, name)
+            price = valid_pod(pod, name, GPU_TYPES[stratum])
             if pod["id"] != raw["id"]:
                 raise ValueError("RunPod mutation ID and readback differ")
             projected = projected_total(
@@ -269,6 +273,7 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
                       "machine_id": p["machineId"],
                       "desired_status": p["desiredStatus"],
                       "cost_per_hr": p["costPerHr"],
+                      "gpu_type_id": p["machine"]["gpuTypeId"],
                       "image_name": p["imageName"]}
                      for i, p in enumerate(observed)],
             "projected_compute_and_container_disk_usd": str(projected),

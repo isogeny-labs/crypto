@@ -1,0 +1,151 @@
+{
+  "id": "IDC1h8e24e428b32f23f7",
+  "independence": "native issuer plus128 additional checks;universal Lean identity",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound12.lean",
+    "sha256": "930905301f3c8d4fd06d92de7eae5ab205d813fb24f41f613928bf7ee486676c"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610201200,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": "h",
+          "op": "var"
+        },
+        {
+          "args": [
+            {
+              "args": "out",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "c",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "constant-gate-saturation",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "h",
+                  "op": "var"
+                },
+                {
+                  "args": "out",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "a",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": "x",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": "a",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "c",
+                          "op": "var"
+                        },
+                        {
+                          "args": "h",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound12.constant_multiplication_saturation",
+    "variables": [
+      "h",
+      "out",
+      "a",
+      "c",
+      "x"
+    ]
+  },
+  "value_digest": "66d617693e9ce4fe76cb04e2850c0d56bece9d8472219a1cdf8a34f58369cd71"
+}
