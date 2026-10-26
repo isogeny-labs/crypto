@@ -5,6 +5,10 @@ edition = "2021"
 default-run = "crypto"
 description = "Educational comprehensive cryptography library: ECC, RSA, AES, ChaCha20, SHA, KDF, PQC"
 
+[[example]]
+name = "performance_gains_audit"
+path = "examples/performance_gains_audit.rs"
+
 # Frozen S3 source snapshots for matched Linux baseline/candidate builds.
 [[example]]
 name = "s3_pair_baseline_frozen"
