@@ -22,6 +22,7 @@ use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
+use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench_large_prime::binary_explicit_instance;
 use crate::cryptanalysis::gaudry_quartic::Pt4;
 use crate::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, BinCurve, PtB, TowerBasis};
@@ -154,6 +155,28 @@ pub enum CurveSpec {
         p_bits: u32,
         seed: u64,
         max_cofactor_ratio: u64,
+    },
+    /// `hyperelliptic_ic_bench::thread_instance(p, genus)`: the
+    /// hyperelliptic thread's curve `y² = f(x)`, `deg f = 2g + 1`, over
+    /// `F_p` (`p < 256`, `g ∈ {2, 3, 4}`), its generator `D₁` of prime
+    /// order `r`, and `#J` from point counts over `F_{p^k}`, `k < g`, and
+    /// an exponent test (`ecbench::hyper`).  A divisor is two packed
+    /// words.  Unregistered: ICV1 has no hyperelliptic form.
+    HyperellipticThread { p: u64, genus: u32 },
+    /// A hyperelliptic Jacobian given outright: `f` (lowest degree first,
+    /// `deg f = 2g + 1`), `#J`, the prime `r` and a generator `(gu, gv)`
+    /// (`gu` with its leading 1, both lowest degree first).  Checked on
+    /// build (squarefree `f`, `G` reduced, `[r]G = 0`, `r | #J`, `#J` in
+    /// the Hasse–Weil interval and killing eight random divisors); the
+    /// order is otherwise trusted.  What measured children rebuild.
+    HyperellipticExplicit {
+        p: u64,
+        genus: u32,
+        f: Vec<u64>,
+        group_order: u64,
+        r: u64,
+        gu: Vec<u64>,
+        gv: Vec<u64>,
     },
 }
 
@@ -364,6 +387,19 @@ impl CurveSpec {
                 max_cofactor_ratio,
             } => ExtInstance::build_subfield(p_bits, seed, max_cofactor_ratio)
                 .map(|i| Instance::Ext(Box::new(i))),
+            CurveSpec::HyperellipticThread { p, genus } => {
+                HyperInstance::build_thread(p, genus).map(|i| Instance::Hyper(Box::new(i)))
+            }
+            CurveSpec::HyperellipticExplicit {
+                p,
+                genus,
+                ref f,
+                group_order,
+                r,
+                ref gu,
+                ref gv,
+            } => HyperInstance::build_explicit(p, genus, f, group_order, r, gu, gv)
+                .map(|i| Instance::Hyper(Box::new(i))),
         }
     }
 
@@ -407,6 +443,20 @@ impl CurveSpec {
             | Instance::Fp4Torsion(_)
             | Instance::F2m4(_)
             | Instance::Ext(_) => None,
+            // The thread rule and the order's point counts are the slow
+            // part; a child rebuilds from the explicit model.
+            Instance::Hyper(i) => {
+                let (gu, gv) = i.generator_coeffs();
+                Some(CurveSpec::HyperellipticExplicit {
+                    p: i.p,
+                    genus: i.genus,
+                    f: i.f.clone(),
+                    group_order: i.group_order,
+                    r: i.r,
+                    gu,
+                    gv,
+                })
+            }
         }
     }
 
@@ -467,6 +517,12 @@ impl CurveSpec {
             } => format!(
                 "subfield_fp3::generate_subfield_instance({p_bits}, {seed}, false, {max_cofactor_ratio})"
             ),
+            CurveSpec::HyperellipticThread { p, genus } => {
+                format!("hyperelliptic_ic_bench::thread_instance({p}, {genus})")
+            }
+            CurveSpec::HyperellipticExplicit {
+                p, genus, ref f, ..
+            } => format!("HCurve {{ p: {p}, genus: {genus}, f: {f:?} }} (explicit)"),
         }
     }
 }
@@ -487,6 +543,9 @@ pub enum Instance {
     /// A GLS curve over `F_{p²}` or a subfield curve on `E(F_{p³})`
     /// (`ecbench::ext`); a coordinate is one packed word.
     Ext(Box<ExtInstance>),
+    /// A hyperelliptic Jacobian of genus 2 to 4 over `F_p`, `p < 256`
+    /// (`ecbench::hyper`); a divisor is two packed words.
+    Hyper(Box<HyperInstance>),
 }
 
 /// A wide Koblitz curve and the strong reference's arithmetic on it, which
@@ -686,6 +745,7 @@ impl Instance {
             Instance::Fp4Torsion(i) => u128::from(i.r),
             Instance::F2m4(i) => u128::from(i.r),
             Instance::Ext(i) => u128::from(i.r()),
+            Instance::Hyper(i) => u128::from(i.r()),
         }
     }
 
@@ -704,6 +764,25 @@ impl Instance {
                 cofactor: u128::from(i.cofactor()),
                 generator: i.generator_hex(),
                 automorphisms_available: i.automorphisms_available(),
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
+        }
+        if let Instance::Hyper(i) = self {
+            let (icv1, slug) = i.names();
+            return CurveFacts {
+                slug,
+                icv1,
+                family: "hyperelliptic".into(),
+                construction: spec.call(),
+                field_degree: None,
+                field_bits: Some(64 - i.p.leading_zeros()),
+                group_order: u128::from(i.group_order),
+                r: u128::from(i.r),
+                cofactor: u128::from(i.cofactor),
+                generator: i.generator_hex(),
+                automorphisms_available: 2,
                 registered: false,
                 ec1: None,
                 curve_uid: None,
@@ -758,7 +837,9 @@ impl Instance {
                 u128::from(i.generator.y),
                 if i.koblitz.is_some() { 2 * i.n } else { 2 },
             ),
-            Instance::Fp4(_) | Instance::Ext(_) => unreachable!("returned above"),
+            Instance::Fp4(_) | Instance::Ext(_) | Instance::Hyper(_) => {
+                unreachable!("returned above")
+            }
             Instance::Wide(i) => (
                 i.kc.curve_id(),
                 "koblitz",
@@ -867,6 +948,9 @@ impl Instance {
         if let Instance::Ext(i) = self {
             return i.mul_generator_hex(k);
         }
+        if let Instance::Hyper(i) = self {
+            return i.mul_generator_hex(k);
+        }
         match self {
             Instance::Prime(i) => {
                 let p = i.curve.mul(&mut scratch, i.generator_point(), k);
@@ -898,7 +982,7 @@ impl Instance {
                     ]
                 })
             }
-            Instance::Wide(_) | Instance::Fp4(_) | Instance::Ext(_) => {
+            Instance::Wide(_) | Instance::Fp4(_) | Instance::Ext(_) | Instance::Hyper(_) => {
                 unreachable!("returned above")
             }
         }
@@ -920,8 +1004,9 @@ impl Instance {
     ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
-        if let Instance::Fp4(_) = self {
-            // Planted targets only on E(F_{p⁴}): no public-target law yet.
+        if let Instance::Fp4(_) | Instance::Hyper(_) = self {
+            // Planted targets only on E(F_{p⁴}) and on the hyperelliptic
+            // Jacobians: no public-target law yet.
             return None;
         }
         if let Instance::Wide(i) = self {
@@ -969,7 +1054,9 @@ impl Instance {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
                 }
-                Instance::Wide(_) | Instance::Fp4(_) => unreachable!("handled above"),
+                Instance::Wide(_) | Instance::Fp4(_) | Instance::Hyper(_) => {
+                    unreachable!("handled above")
+                }
                 Instance::Ext(i) => {
                     if let Some(t) = i.hash_to_subgroup_hex(h) {
                         return Some((t, counter));
@@ -1497,6 +1584,26 @@ mod tests {
             gy: 1,
         };
         assert!(bad.build().is_err());
+    }
+
+    #[test]
+    fn hyperelliptic_explicit_form_rebuilds_the_same_workload_and_serialises() {
+        let spec = CurveSpec::HyperellipticThread { p: 23, genus: 3 };
+        let (w, inst) = Workload::build(&spec, 3, 1, TargetKind::Planted).unwrap();
+        assert_eq!(w.curve.family, "hyperelliptic");
+        assert!(!w.curve.registered);
+        let ex = CurveSpec::explicit(&inst).unwrap();
+        let text = serde_json::to_string(&ex).unwrap();
+        assert!(text.contains("\"kind\":\"hyperelliptic_explicit\""));
+        let back: CurveSpec = serde_json::from_str(&text).unwrap();
+        assert_eq!(back, ex);
+        let (w2, _) = Workload::build(&back, 3, 1, TargetKind::Planted).unwrap();
+        assert_eq!(w.workload_id, w2.workload_id);
+        assert_eq!(w.planted, w2.planted);
+        assert_eq!(w.curve.icv1, w2.curve.icv1);
+        assert_ne!(model_hash(&w.curve), 0);
+        // No public-target law on a Jacobian yet.
+        assert!(Workload::build(&spec, 3, 1, TargetKind::Public).is_err());
     }
 
     #[test]
