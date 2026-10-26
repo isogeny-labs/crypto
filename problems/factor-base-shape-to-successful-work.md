@@ -4,7 +4,7 @@
 - **Kind:** implementation and measurement gap; formal-proof gap for a regularity claim
 - **Affected work:** [chart-complement screen](../research/factor_base_chart_complements_20261019/README.md), [completed shape study](../research/factor_base_shape_leads_20261018/README.md)
 - **Next action owner:** native factor-base CLI lane; new follow-up remains draft/unfunded
-- **Last updated:** 2026-10-19
+- **Last updated:** 2026-10-26
 
 ## Problem
 
@@ -72,6 +72,23 @@ all phases, matched rho and independent replay under repository rules.
   and verification, or a concrete relevant algebraic certificate.
 
 ## Resolution and history
+
+2026-10-26: the literature/atlas review selects the still-unexamined native
+transfer of the product-profile/linearization-excess prior. The
+[new structural preflight](../research/factor_base_excess_20261026/README.md)
+computes canonical product spans; it does not certify regularity, subgroup
+support or cheap successful solving. The
+[comparison draft](../research/factor_base_excess_20261026/PROTOCOL_DRAFT.md)
+requires matched actual columns, verified successes, independent rank and
+complete pricing. The new draft card remains unrun and zero-funded.
+
+Execution has an additional concrete authorization/policy blocker: current
+AGENTS requires a successful S3 resume checkpoint before an experiment,
+while the user's existing instruction forbids S3 operations. The local gate
+refused before any upload; no new research panel was launched. A checkpoint
+authorization or explicit owner-approved alternative, final runnable native
+protocol and the existing evidence gates would permit testing the lead.
+Resolving the checkpoint conflict would not itself establish an improvement.
 
 2026-10-19: finite chart-union screen supplies a specific candidate and
 cofactor/rank diagnostics. Successful solver work and regularity remain
