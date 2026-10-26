@@ -1608,6 +1608,8 @@ mod tests {
                 declared_alpha: Some(0.5),
                 alpha_agrees_with_declared: Some(true),
                 scaling_claim: true,
+                alpha_in_additions: None,
+                alpha_in_additions_ci95: None,
             },
             constant: Constant {
                 s: Estimate {
