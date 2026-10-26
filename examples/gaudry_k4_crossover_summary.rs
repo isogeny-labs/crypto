@@ -100,11 +100,22 @@ fn main() {
         .iter()
         .map(|(s, r)| row(s, r))
         .collect();
+    // A session killed part-way (a container restart; its directory is
+    // renamed `<name>.attemptN-killed`) still holds its finished records.
+    // They count only for a workload no clean session covers.
     let by = |sess_prefix: &str, arm: &str| -> BTreeMap<String, &Value> {
-        rows.iter()
-            .filter(|r| r["session"].as_str().unwrap().starts_with(sess_prefix) && r["arm"] == arm)
-            .map(|r| (r["workload"].as_str().unwrap().to_string(), r))
-            .collect()
+        let mut out: BTreeMap<String, &Value> = BTreeMap::new();
+        for killed_pass in [true, false] {
+            for r in rows.iter().filter(|r| {
+                let s = r["session"].as_str().unwrap();
+                s.starts_with(sess_prefix)
+                    && r["arm"] == arm
+                    && s.contains(".attempt") == killed_pass
+            }) {
+                out.insert(r["workload"].as_str().unwrap().to_string(), r);
+            }
+        }
+        out
     };
 
     // Part D, with #1883's committed ic-frobenius rows.
