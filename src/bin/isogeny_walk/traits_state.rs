@@ -141,6 +141,7 @@ impl TraitsState {
             .truncate(false)
             .read(true)
             .write(true)
+            .truncate(false)
             .open(dir.join(".traits.lock"))
             .map_err(|e| format!("opening trait lock: {e}"))?;
         #[cfg(unix)]
