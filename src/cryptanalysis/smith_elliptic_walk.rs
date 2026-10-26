@@ -2046,31 +2046,64 @@ mod tests {
 
     #[test]
     fn step_matches_scan_and_keeps_trace() {
-        let p = 11;
-        let k = Fp3::new(p);
-        let tab = Tables::new(&k);
-        let mut rng = sp::SplitMix64(6);
-        let mut moved = 0;
-        for _ in 0..30 {
-            let node = random_full2_start(&k, &mut rng);
-            let n0 = count_ec(&k, &tab, &node.a, &node.b);
-            if let Some((nx, _)) = step(&k, &node, &mut rng) {
-                // the claimed roots are roots, and distinct
-                for r in &nx.roots {
-                    let v = k.add(&k.add(&k.mul(&k.mul(r, r), r), &k.mul(&nx.a, r)), &nx.b);
-                    assert_eq!(v, ZERO);
+        // p = 11 (q = 3 mod 4) and, since 2026-10-25, p = 13 (q = 1 mod 4,
+        // where Tonelli-Shanks iterates and the walk branches).
+        for p in [11u64, 13] {
+            let k = Fp3::new(p);
+            let tab = Tables::new(&k);
+            let mut rng = sp::SplitMix64(6);
+            let mut moved = 0;
+            for _ in 0..30 {
+                let node = random_full2_start(&k, &mut rng);
+                let n0 = count_ec(&k, &tab, &node.a, &node.b);
+                if let Some((nx, _)) = step(&k, &node, &mut rng) {
+                    // the claimed roots are roots, and distinct
+                    for r in &nx.roots {
+                        let v = k.add(&k.add(&k.mul(&k.mul(r, r), r), &k.mul(&nx.a, r)), &nx.b);
+                        assert_eq!(v, ZERO);
+                    }
+                    assert_ne!(nx.roots[0], nx.roots[1]);
+                    assert_eq!(count_ec(&k, &tab, &nx.a, &nx.b), n0);
+                    let mut sc = roots_cubic_scan(&k, &nx.a, &nx.b);
+                    let mut ro = nx.roots.to_vec();
+                    sc.sort();
+                    ro.sort();
+                    assert_eq!(sc, ro);
+                    moved += 1;
                 }
-                assert_ne!(nx.roots[0], nx.roots[1]);
-                assert_eq!(count_ec(&k, &tab, &nx.a, &nx.b), n0);
-                let mut sc = roots_cubic_scan(&k, &nx.a, &nx.b);
-                let mut ro = nx.roots.to_vec();
-                sc.sort();
-                ro.sort();
-                assert_eq!(sc, ro);
-                moved += 1;
+            }
+            assert!(moved > 5, "p = {p}");
+        }
+    }
+
+    #[test]
+    fn admissible_forward_steps_follow_the_sign_of_minus_one() {
+        // prod_i (r_i - r_j)(r_i - r_l) = -(discriminant of the roots), so the
+        // number of i with a square value is 2 when q = 3 mod 4 (a node
+        // has exactly one forward edge besides its dual) and 1 or 3 when
+        // q = 1 mod 4 (a leaf or a branching node).
+        for (p, one_mod_4) in [(11u64, false), (19, false), (13, true), (17, true)] {
+            let k = Fp3::new(p);
+            let mut rng = sp::SplitMix64(p);
+            for _ in 0..200 {
+                let node = random_full2_start(&k, &mut rng);
+                let sq = (0..3)
+                    .filter(|&i| {
+                        let (j, l) = ((i + 1) % 3, (i + 2) % 3);
+                        let v = k.mul(
+                            &k.sub(&node.roots[i], &node.roots[j]),
+                            &k.sub(&node.roots[i], &node.roots[l]),
+                        );
+                        k.chi(&v) == 1
+                    })
+                    .count();
+                if one_mod_4 {
+                    assert!(sq == 1 || sq == 3, "p {p}: {sq}");
+                } else {
+                    assert!(sq == 0 || sq == 2, "p {p}: {sq}");
+                }
             }
         }
-        assert!(moved > 5);
     }
 
     #[test]
@@ -2186,7 +2219,9 @@ mod tests {
     fn walk_censors_isolated_starts_instead_of_panicking() {
         // A random full-2-torsion start whose three 2-neighbours all lack
         // full 2-torsion cannot move (arm B pilot, 2026-10-25, panicked).
-        let k = Fp3::new(61);
+        // Such starts exist only when q = 3 mod 4 (see the sign test above),
+        // so use p = 59.
+        let k = Fp3::new(59);
         let mut isolated = 0;
         for seed in 0u64..300 {
             let mut rng = sp::SplitMix64(seed);
