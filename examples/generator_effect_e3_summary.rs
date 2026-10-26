@@ -16,7 +16,10 @@
 //!   per call plus the system multiplications per call;
 //! - ratios to `kl-mitm3` and to `rho-neg`, paired by target, with 90%
 //!   percentile bootstrap intervals (10 000 resamples, seed 20261019), the
-//!   break-even weight `w*` and the crossover `B*` along `t`.
+//!   break-even weight `w*` and the crossover `B*` along `t`;
+//! - for E3b (`E3b-PROTOCOL.md`), the same `w*` and `B*` for the measured
+//!   grid arm against `kl-mitm3`; sessions without F4 arms (the E3b ladder)
+//!   get only those, and an empty `F4COST.jsonl` is accepted.
 //!
 //! Every number it writes is derived from recorded counts; nothing is rerun.
 use std::collections::BTreeMap;
@@ -139,6 +142,9 @@ fn main() {
     let sizes = read_jsonl(sizes);
     let f4 = read_jsonl(f4cost);
     let mut rng = StdRng::seed_from_u64(20261019);
+    // E3b's additions draw from their own stream, so E3's intervals are
+    // reproduced exactly.
+    let mut rng_b = StdRng::seed_from_u64(20261020);
     let mut curves_out = Vec::new();
     for dir in &args[3..] {
         let recs = read_records(Path::new(dir)).expect("records");
@@ -358,8 +364,22 @@ fn main() {
                 let sk: Vec<f64> = kl.iter().map(|c| c.s(w)).collect();
                 grid_kl.push(json!({"w": w, "grid_over_kl": paired(&mut rng, &sg, &sk)}));
             }
+            // Break-even weight of the grid against kl (E3b-PROTOCOL L4).
+            let gm = |c: &[Cost], f: fn(&Cost) -> f64| mean(&c.iter().map(f).collect::<Vec<_>>());
+            let grid_w_star =
+                (gm(&kl, |c| c.g) - gm(&grid, |c| c.g)) / (gm(&grid, |c| c.u) - gm(&kl, |c| c.u));
+            let grid_w_star_ci = boot(&mut rng_b, grid.len().min(kl.len()), |idx| {
+                let n = idx.len() as f64;
+                let sum = |c: &[Cost], f: fn(&Cost) -> f64| {
+                    idx.iter().map(|&i| f(&c[i])).sum::<f64>() / n
+                };
+                (sum(&kl, |c| c.g) - sum(&grid, |c| c.g))
+                    / (sum(&grid, |c| c.u) - sum(&kl, |c| c.u))
+            });
             let b = size["B"].as_u64().unwrap_or(0);
             rows.push(json!({
+                "grid_w_star_vs_kl": grid_w_star,
+                "grid_w_star_ci90": grid_w_star_ci,
                 "t": t,
                 "B": b,
                 "V": size["V"],
@@ -376,12 +396,11 @@ fn main() {
                 "f4": presentations,
             }));
         }
-        // Crossover along t: where the substituted chain arm over kl
-        // crosses 1, per w, interpolated in log B.
-        let mut crossover = Vec::new();
-        for (i, &w) in WEIGHTS.iter().enumerate() {
-            let pts: Vec<(f64, f64)> = rows
-                .iter()
+        // Crossover along t: where the substituted chain arm (and, for
+        // E3b, the measured grid arm) over kl crosses 1, per w,
+        // interpolated in log B.
+        let chain_pts = |i: usize| -> Vec<(f64, f64)> {
+            rows.iter()
                 .filter_map(|row| {
                     let f = row["f4"]
                         .as_array()?
@@ -392,7 +411,19 @@ fn main() {
                         f["by_w"][i]["over_kl"]["ratio"].as_f64()?,
                     ))
                 })
-                .collect();
+                .collect()
+        };
+        let grid_pts = |i: usize| -> Vec<(f64, f64)> {
+            rows.iter()
+                .filter_map(|row| {
+                    Some((
+                        row["B"].as_f64()?,
+                        row["grid_vs_kl"][i]["grid_over_kl"]["ratio"].as_f64()?,
+                    ))
+                })
+                .collect()
+        };
+        let crossing = |pts: &[(f64, f64)], arm: &str| -> (Value, String) {
             let mut b_star = Value::Null;
             for win in pts.windows(2) {
                 let ((b0, r0), (b1, r1)) = (win[0], win[1]);
@@ -403,12 +434,27 @@ fn main() {
                 }
             }
             let side = if pts.iter().all(|&(_, r)| r < 1.0) {
-                "chain below kl at every t"
+                format!("{arm} below kl at every t")
             } else if pts.iter().all(|&(_, r)| r > 1.0) {
-                "chain above kl at every t"
+                format!("{arm} above kl at every t")
             } else {
-                "crosses"
+                "crosses".to_string()
             };
+            (b_star, side)
+        };
+        let mut crossover_grid = Vec::new();
+        for (i, &w) in WEIGHTS.iter().enumerate() {
+            let pts = grid_pts(i);
+            let (b_star, side) = crossing(&pts, "grid");
+            crossover_grid.push(json!({"w": w, "B_star": b_star, "side": side, "points": pts}));
+        }
+        let mut crossover = Vec::new();
+        for (i, &w) in WEIGHTS.iter().enumerate() {
+            let pts = chain_pts(i);
+            if pts.is_empty() {
+                continue;
+            }
+            let (b_star, side) = crossing(&pts, "chain");
             crossover.push(json!({"w": w, "B_star": b_star, "side": side, "points": pts}));
         }
         curves_out.push(json!({
@@ -418,6 +464,7 @@ fn main() {
             "rho": rho_summary,
             "rows": rows,
             "crossover_chain_vs_kl": crossover,
+            "crossover_grid_vs_kl": crossover_grid,
         }));
     }
     let doc = json!({
