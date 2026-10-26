@@ -16,6 +16,21 @@ pub struct BinaryBackend<'a> {
 
 impl law::Group for BinaryBackend<'_> {
     type Point = FastPoint;
+    fn domain(&self) -> Vec<u64> {
+        vec![
+            u64::from(self.instance.n),
+            self.instance.gf.irr,
+            self.instance.a,
+            self.instance.b,
+            self.instance.group_order,
+            self.instance.r,
+            self.instance.cofactor,
+            u64::from(self.instance.fast.n),
+            self.instance.fast.field.irr,
+            self.instance.fast.a,
+            self.instance.fast.b,
+        ]
+    }
     fn order(&self) -> u64 {
         self.instance.group_order
     }
@@ -23,6 +38,13 @@ impl law::Group for BinaryBackend<'_> {
         FastPoint::INFINITY
     }
     fn contains(&self, point: FastPoint) -> bool {
+        if self.instance.n != self.instance.fast.n
+            || self.instance.gf.irr != self.instance.fast.field.irr
+            || self.instance.a != self.instance.fast.a
+            || self.instance.b != self.instance.fast.b
+        {
+            return false;
+        }
         if point.infinity {
             return point == FastPoint::INFINITY;
         }
@@ -81,7 +103,7 @@ mod tests {
 
     #[test]
     fn binary_adapter_checks_full_query_coverage_and_relation_recovery_against_reference() {
-        let instance = random_binary_instance(7, 202_610_260_001, 16).unwrap();
+        let mut instance = random_binary_instance(7, 202_610_260_001, 16).unwrap();
         let curve = BinaryCurve {
             m: instance.n,
             irreducible: instance.irreducible.clone(),
@@ -173,5 +195,12 @@ mod tests {
         assert!(backend.operations.adds > 0);
         assert!(backend.operations.doubles > 0);
         assert!(!BinaryGroup(&instance.fast).counts_field_ops());
+        drop(backend);
+        instance.a ^= 1;
+        let inconsistent = BinaryBackend {
+            instance: &instance,
+            operations: GroupOps::default(),
+        };
+        assert!(!inconsistent.contains(FastPoint::INFINITY));
     }
 }

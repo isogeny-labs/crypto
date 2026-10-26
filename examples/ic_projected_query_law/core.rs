@@ -6,6 +6,8 @@ use std::fmt::Debug;
 /// Arithmetic, membership checks and their accounting belong to the backend.
 pub trait Group {
     type Point: Copy + Eq + Debug;
+    /// Complete fixed-domain parameters, not a lossy hash or a user label.
+    fn domain(&self) -> Vec<u64>;
     fn order(&self) -> u64;
     fn identity(&self) -> Self::Point;
     fn contains(&self, point: Self::Point) -> bool;
@@ -69,6 +71,7 @@ pub struct Recovered {
 
 #[derive(Clone, Debug)]
 pub struct Law<P> {
+    domain: Vec<u64>,
     generator: P,
     r: u64,
     h: u64,
@@ -161,6 +164,7 @@ impl<P: Copy + Eq + Debug> Law<P> {
         let h_inverse = power_mod(h % r, r - 2, r);
         assert_eq!(times_mod(h, h_inverse, r), 1);
         Ok(Self {
+            domain: group.domain(),
             generator,
             r,
             h,
@@ -182,6 +186,9 @@ impl<P: Copy + Eq + Debug> Law<P> {
         offset: u64,
         kernel_index: usize,
     ) -> Result<Query<P>, Error> {
+        if group.domain() != self.domain || self.r.checked_mul(self.h) != Some(group.order()) {
+            return Err(Error::QueryContextMismatch);
+        }
         if !group.contains(target) || group.mul(target, self.r) != group.identity() {
             return Err(Error::InvalidTarget);
         }
@@ -262,6 +269,9 @@ mod tests {
     struct Cyclic(u64);
     impl Group for Cyclic {
         type Point = u64;
+        fn domain(&self) -> Vec<u64> {
+            vec![self.0]
+        }
         fn order(&self) -> u64 {
             self.0
         }
@@ -406,9 +416,28 @@ mod tests {
         assert_eq!(answer.relation_terms, 0);
     }
 
+    #[test]
+    fn a_certificate_cannot_be_reused_with_a_different_group_domain() {
+        let mut group = Cyclic(35);
+        let law = Law::certify(&mut group, 5, 7, 5, 7).unwrap();
+        let query = law.query(&mut group, 10, 1, 2).unwrap();
+        let mut other = Cyclic(70);
+        assert_eq!(
+            law.query(&mut other, 0, 0, 0),
+            Err(Error::QueryContextMismatch)
+        );
+        assert_eq!(
+            law.recover(&mut other, &query, &[]),
+            Err(Error::QueryContextMismatch)
+        );
+    }
+
     struct NoncyclicKernel;
     impl Group for NoncyclicKernel {
         type Point = (u8, u8, u8);
+        fn domain(&self) -> Vec<u64> {
+            vec![7, 2, 2]
+        }
         fn order(&self) -> u64 {
             28
         }

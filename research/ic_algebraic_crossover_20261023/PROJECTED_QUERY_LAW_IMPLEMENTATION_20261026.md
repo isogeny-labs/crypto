@@ -90,7 +90,10 @@ kernel elements and verifies their annihilation by h. A noncyclic kernel is
 rejected; that implementation limit does not invalidate the mathematical law
 for a noncyclic kernel with a correct general enumeration.
 
-Query construction rejects invalid subgroup targets or out-of-range indices.
+Certificates retain the complete arithmetic-domain parameters, and query
+construction rejects a different domain, invalid subgroup targets or out-of-range indices.
+The binary binding also rejects disagreement between metadata and its actual
+field/curve backend.
 Recovery rechecks the query context, every point and projected logarithm, the
 signed full-curve relation, and finally [d]G=T. Zero projections, repeated points,
 negative signs and verified identity hits stay explicit. There is no unverified
@@ -104,10 +107,12 @@ of the qualified n22/n25 curve records is not replaced by this interface.
 
 ## Source verification and remaining work
 
-Six standalone native tests pass. They check bijective coverage on four small
+Seven standalone native tests pass. They check bijective coverage on four small
 cyclic groups for every target, the missing-kernel control, signed recovery with
 independently looked-up logs, invalid relations/logs/ranges, direct identity hits,
-and rejection of a noncyclic kernel or incompatible order data.
+and rejection of a noncyclic kernel, incompatible order data or reuse with a
+different arithmetic domain. The first six-test receipt is retained with its
+original source hash; the seventh was added after static domain-binding review.
 
 The Cargo source gate adds an independently enumerated small binary curve,
 reference polynomial-basis projections/logs and full query/recovery checks. Its
@@ -119,7 +124,7 @@ is queued, not passed. All raw failures and final statuses are retained in
 
 | Requirement | Status |
 |---|---|
-| Checked abstract query/relation helper | implemented; six standalone tests pass |
+| Checked abstract query/relation helper | implemented; seven standalone tests pass |
 | Binary backend binding | implemented; native Cargo gate pending |
 | Full-curve order/kernel receipts for actual qualified cells | no new run; original receipts unchanged |
 | Uniform bounded sampler and frozen projected-IC protocol | not implemented/frozen |
