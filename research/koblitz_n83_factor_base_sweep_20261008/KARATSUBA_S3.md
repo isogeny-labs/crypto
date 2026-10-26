@@ -48,3 +48,34 @@ conflicts and models under the same cap, verified natural relations and
 incremental rank. The new XOR rows can offset the smaller AND/CNF circuit,
 so solver cost and end-to-end factor-base selection remain open until that
 gate and a fully charged single-target run complete.
+
+## Guarded K64 search diagnostic, 2026-10-26
+
+At source commit `4445c40b49e1b9a66a61722a1a5b149af3052fbe`, a
+source-matched static Linux worker loaded the frozen primary `a=0`
+`public_x_hash`, seed `2026100801`, 64-orbit base and public target fixture.
+The selected base has 10,624 points and 65 matrix columns. The zero-trial
+Karatsuba preflight passed the source, input, replay and 4 GiB/zero-swap
+guards. The selected compressed object was downloaded from its manifest's S3
+URI into an external replay directory before launch.
+
+Two one-query arms used the same worker binary and source, 150,000-variable
+and 3,000,000-domain-clause limits, a 10,000-conflict cap, one CPU, 4 GiB
+memory, zero swap and a 300-second outer wall cap. Karatsuba ended at
+`UNKNOWN_wall_cap` after 301.1 seconds and emitted no final worker summary.
+Schoolbook emitted `UNKNOWN_solver_cap` after 10,000 conflicts, with zero
+models, relations and rank increase, in 163.7 seconds of outer process time.
+Its outer status is `PRODUCER_FAILURE_worker_exit`: Docker returned exit 125
+while waiting for the finished worker because its containerd metadata store
+had become read-only. The container was subsequently reported `dead`, but
+`docker rm -f` failed with the same metadata error. The schoolbook worker
+summary is retained as a diagnostic; it does not pass the outer receipt gate.
+
+These source-matched local runs establish preflight compatibility and an
+inconclusive bounded search comparison. The next operational step is to
+repair Docker's metadata store without disrupting other containers, then
+rerun a short matched pair with progress checkpoints so outer caps retain
+conflict counts. A Tier 1 paired one-target comparison is still required for
+factor-base ranking. The exact configs, outer receipts, build identity and
+worker summary are in
+[`verification/karatsuba-k64-guarded-20261026/`](verification/karatsuba-k64-guarded-20261026/).
