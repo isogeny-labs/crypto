@@ -194,7 +194,11 @@ static void summarize(const fs::path& run, const fs::path& output) {
 }
 int main(int argc, char** argv) {
   try {
-    pari_init(256000000, 2000000); require(argc >= 2, "missing mode"); const std::string mode = argv[1];
+    pari_init(256000000, 2000000);
+    setdefault("nbthreads", "1", d_SILENT);
+    require(mt_nbthreads() == 1, "native PARI thread limit not applied");
+    std::cout << "Native PARI worker limit: 1\n";
+    require(argc >= 2, "missing mode"); const std::string mode = argv[1];
     if (mode == "prepare") { require(argc == 4, "prepare arguments"); prepare(argv[2],argv[3]); }
     else if (mode == "arithmetic") { require(argc == 5, "arithmetic arguments"); check_arithmetic(argv[2],argv[3],argv[4]); }
     else if (mode == "label") { require(argc == 4, "label arguments"); check_label(argv[2],argv[3]); }

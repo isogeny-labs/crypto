@@ -121,3 +121,21 @@ helper and its calls to process_status, retaining all flags, arithmetic,
 certificate logic, inputs, criteria and limits. Preserve001 and retry in
 fresh replay-002 after a new successful source/checkpoint gate. This is a
 source correction, not a scientific rejection or a changed threshold.
+
+## Source amendment2: bound modern preparation threads
+
+Replay-002 built successfully, then the native preparation phase reached
+its300-second watchdog (exit124) after PARI reported repeated worker-stack
+memory warnings under the declared768MiB address cap. No input case was
+completed and no legacy executable or named-order trial ran. This is a
+preparation/runtime failure, not evidence about the period artifact.
+
+The installed PARI2.17.3 manual states that the pthread nbthreads default
+uses the detected core count. Set this modern helper's nbthreads explicitly
+to1 through the documented default API and assert mt_nbthreads()==1 before
+prime checks. Retain the same prime proofs, arithmetic, original cohort,
+legacy binaries/configuration, address caps and watchdogs. The helper
+prints the applied limit. The warnings and timeout do not by themselves
+prove a deadlock cause; the fresh replay-003 tests the bounded preparation.
+Preserve002 and require a new source/checkpoint gate. No post hoc selection
+threshold or legacy RNG/tactic parameter changes.
