@@ -3234,7 +3234,11 @@ pub struct ImageReport {
     pub fibre_max: u64,
     pub kernel_size: u64,
     pub kernel_equals_s: bool,
+    /// Elements with no reducible image after 8 bases.
     pub errors: u64,
+    /// Elements whose first base gave an image the bridge could not reduce.
+    pub first_try_errors: u64,
+    pub error_kinds: BTreeMap<String, u64>,
     pub seconds: f64,
 }
 
@@ -3252,16 +3256,41 @@ pub fn image_structure(
     let mut fib: HashMap<PicKey, u64> = HashMap::new();
     let mut ker: Vec<Mum> = Vec::new();
     let mut errors = 0;
+    let mut first_try_errors = 0;
+    let mut error_kinds: BTreeMap<String, u64> = BTreeMap::new();
     for x in &all {
-        let (im, _) = sm.psi_class_fixed(x, &base, rng);
-        match w1.class_psi(&im) {
-            Ok(c) => {
+        // The class does not depend on the base (T2); a degree-6 image the
+        // bridge cannot reduce (repeated point of multiplicity > 2, say) is
+        // retried with fresh bases and counted.
+        let mut got = None;
+        for attempt in 0..8 {
+            let b = if attempt == 0 {
+                base.clone()
+            } else {
+                sm.random_base(rng)
+            };
+            let (im, _) = sm.psi_class_fixed(x, &b, rng);
+            match w1.class_psi(&im) {
+                Ok(c) => {
+                    got = Some(c);
+                    break;
+                }
+                Err(e) => {
+                    if attempt == 0 {
+                        first_try_errors += 1;
+                    }
+                    *error_kinds.entry(e.chars().take(48).collect()).or_insert(0) += 1;
+                }
+            }
+        }
+        match got {
+            Some(c) => {
                 if w1.c.is_zero(&c) {
                     ker.push(x.clone());
                 }
                 *fib.entry(c.key()).or_insert(0) += 1;
             }
-            Err(_) => errors += 1,
+            None => errors += 1,
         }
     }
     let kernel_equals_s = ker.len() == s.len() && ker.iter().all(|k| s.contains(k));
@@ -3275,6 +3304,8 @@ pub fn image_structure(
         kernel_size: ker.len() as u64,
         kernel_equals_s,
         errors,
+        first_try_errors,
+        error_kinds,
         seconds: t0.elapsed().as_secs_f64(),
     }
 }
