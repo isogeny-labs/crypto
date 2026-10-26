@@ -4,7 +4,7 @@
 - **Kind:** empirical bottleneck, incomplete measurement, resource and tool limits
 - **Affected work:** [algebraic IC pursuit](../research/ic_algebraic_crossover_20261023/README.md), requirements A1--B3, C3 and D1
 - **Next action owner:** current IC campaign
-- **Last updated:** 2026-10-25
+- **Last updated:** 2026-10-26
 
 ## Problem
 
@@ -67,7 +67,12 @@ rho and native-price band at 0, 0.1 and 1 GAE, remains the downstream test.
   45 nonrefuting fixed points and one timeout. Balanced-prefix minima are
   4/4/4/0 on draws 0/3/5/6; all 64 k4 branches refute. These are not global
   subset minima. Independent HKY replay has not run after its queue was interrupted
-  by the workspace restart; no independent word recount or full query price follows. All 44
+  by the workspace restart; no independent word recount or full query price follows.
+  The official restart checkpoint gate now exits 1 because the workspace has
+  neither an upload token nor the fallback AWS profile. AGENTS.md requires a
+  successful S3 checkpoint before a new experiment; no replay was launched.
+  [Continuation readiness](../research/ic_algebraic_crossover_20261023/CONTINUATION_READINESS_20261026.md)
+  records the exact frozen case limits and remaining protocol/launch gates. All 44
   same-input Singular correctness checks agree on 22 small cases; equal-output
   fastest-tool performance comparisons remain open. The prescribed paid launcher
   is blocked by an explicit identity-policy denial; no research VM launched.

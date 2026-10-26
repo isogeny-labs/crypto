@@ -87,9 +87,13 @@ unmeasured.
 The owner approved publication on 2026-10-26, and the results summary is now
 on [private PR 2550](https://github.com/isogeny-labs/crypto/pull/2550).
 The repository moved with the same ID. Source/evidence integration and
-additional artifact-store delivery remain in progress; an authenticated
-metadata relay is being prepared using the repository's documented CI path.
-No upload is inferred from a pending plan. There are 31 inspected reports,
+additional artifact-store delivery remain blocked. The managed environment
+has no AWS identity; the prepared CI relay could not receive its input because
+GitHub's binary-upload endpoint rejected the configured credential. No relay
+was dispatched and no S3 upload or readback is claimed. An owner decision on
+the documented Git storage exception is pending. The integrated library gate
+also fails on [unchanged upstream SAT syntax](../../problems/sat-progress-phase-base-syntax.md);
+earlier test passes belong to their recorded frozen sources. There are 31 inspected reports,
 34 pages. The [v2 metadata adapter](curve-identity-adapter.v2.json) preserves
 all 25 v1 identities and adds the two independently checked partial models.
 [Publication snapshot](PR_UPDATE_20261026.md), [publication packet](PUBLISH_REVIEW.md).
@@ -345,7 +349,7 @@ preserves all generated scripts, package hashes, outputs and statuses.
 | C2: m=14--18 ladder | partial, integration/compute blocked | standalone m16--18 core/order/encoding controls and independent replay pass; full wide stage adapters, eight-target IC/rho ladder and complete prices remain |
 | C3: complete method and full native price | partial | n13/n23 answer replay and ten n13 instruction profiles; construction/split counters, native allocator/physical costs and qualified comparison missing |
 | D1: external/hardware controls | partial | all 44 same-input Singular correctness checks agree on 22 cases; fastest-tool performance and actual hardware comparisons remain |
-| D2: durable evidence and PR | partial, publication blocked | earlier PR is ready/open; new local evidence and inspected PDFs prepared; broader publication approval and artifact-store upload/readback remain |
+| D2: durable evidence and PR | partial, summary published | owner approved publication; PR 2550 summary is updated; source/evidence delivery awaits storage access or an owner exception and integrated-source gates |
 
 [Cost/scaling problem](../../problems/ic-low-degree-complete-cost-and-scaling.md)
 and the four `XP-20261023-*` backlog cards preserve unresolved obligations.

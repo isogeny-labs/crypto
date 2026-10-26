@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Inherited SAT progress-phase syntax](sat-progress-phase-base-syntax.md) | open | integrated release library and example validation for PR #2550 | merge upstream SAT correction, then pass the required tests on the integrated source |
 | [Low-degree decomposition complete cost and scaling](ic-low-degree-complete-cost-and-scaling.md) | investigating | guess minima, larger closure and complete-price IC conclusions | all-branch replay, larger fixed points, native construction/split accounting and matched full-pipeline controls |
 | [Algebraic IC evidence publication](ic-algebraic-evidence-publication.md) | open | remaining source/data delivery after owner approval and the published PR summary | verified artifact upload or an owner-approved storage exception, final-source validation and normal push |
 | [Quartic binary IC wide arithmetic](quartic-binary-ic-wide-scalars.md) | investigating | requested base-field m=16--18 crossover rungs | standalone u32/u128 core/order/encoding checks pass; full stage integration, old-method parity and complete IC/rho ladder remain |

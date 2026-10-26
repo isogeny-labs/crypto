@@ -332,6 +332,32 @@ def nist_factorization(ref, since):
                  problem="nist-skipped-curve-factorization", unit=unit, better=better,
                  label=label, source=source)
 
+def publication_followup(ref, since):
+    """Native retained-profile/scalar diagnostics; no full IC performance index."""
+    path = "research/ic_algebraic_crossover_20261023/pipeline-receipts/publication-followup-audit-v3-20261026/output.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("status") != "native_profile_accounting_and_partial_scalar_checks_pass":
+            continue
+        for arm in data.get("constructor", {}).get("arms", []):
+            emit(f"ic.algebraic.narrow-constructor.{arm['arm']}.ir", arm.get("whole_process_ir"),
+                 date=date, problem=P_IC, unit="simulated_Ir", better="neutral",
+                 label=f"narrow6 {arm['arm']}: simulated whole-process Ir including loader/Valgrind; no native speedup",
+                 source=f"{path}@{commit}")
+        for row in data.get("partial_quartics", []):
+            for field in ("recorded", "missing_registered_executions", "independent_scalar_checks"):
+                emit(f"ic.algebraic.partial-quartic.m{row['m']}.{field}", row.get(field),
+                     date=date, problem=P_IC, unit="count", better="neutral",
+                     label=f"interrupted m{row['m']}: {field}; no completed IC comparison",
+                     source=f"{path}@{commit}")
+            for arm, statuses in row.get("counts", {}).items():
+                for status, value in statuses.items():
+                    emit(f"ic.algebraic.partial-quartic.m{row['m']}.{arm}.{status}", value,
+                         date=date, problem=P_IC, unit="count", better="neutral",
+                         label=f"interrupted m{row['m']} {arm}: {status}; missing/censored costs unknown",
+                         source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -342,6 +368,7 @@ def main():
     algebraic_stage(a.ref, a.since)
     algebraic_audits(a.ref, a.since)
     completed_guess(a.ref, a.since)
+    publication_followup(a.ref, a.since)
     photo_volcano(a.ref)
     nist_factorization(a.ref, a.since)
 

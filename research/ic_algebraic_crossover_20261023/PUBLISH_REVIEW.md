@@ -16,9 +16,9 @@ coordinate-basis adapter failures are retained. Source/metadata integration
 and the additional artifact upload are in progress; no later merged-head
 green verdict or full IC comparison is claimed.
 
-## Proposed title and description
+## Prepared results and source-specific checks
 
-**Research: qualified algebraic IC controls and wide quartic arithmetic**
+**Research: structured S4 controls, balanced guessing and wide quartic core**
 
 The earlier Boolean guessing fixtures did not specify a full curve/subgroup.
 Exact reference/twist checks put 105 of 1,159 target x-values inside the chosen
@@ -37,8 +37,8 @@ Within the registered prefixes of [7,15,23,24], first passing k is 4/4/4/0 on
 draws 0/3/5/6. All 64 k4 branches refute at 23,078,681,663,212 solver words.
 The report charges failed lower-prefix work through first success; the full
 experimental total remains unknown. This is no global subset minimum or
-ordinary-query/full-price result. Independent HKY replay is genuinely queued
-after the supported quartic program, not yet performed.
+ordinary-query/full-price result. Independent HKY replay has not run; its
+dependent queue stopped across the workspace restart.
 
 Add 2,048 separately frozen qualified public hash-to-subgroup queries at
 (m,n,ell)=(3,22,8),(3,25,9),(4,17,6),(4,18,6). All finite-chain counts/witnesses
@@ -102,31 +102,45 @@ manifests; preserved local copies are byte-hashed before integration.
 Additional locally tracked and pending data still require verified upload.
 The managed environment has no AWS identity (current configuration revision
 38; normal STS probe returns NoCredentials). The repository documents a
-separate CI artifact credential, so a bounded manual metadata relay is being
-prepared to test that path. No credentials are read out or copied to artifacts,
-no experiments/builds run through the relay, and no SSM/provisioning denial is
-routed around. The destination remains the configured artifact store.
+separate CI artifact credential. A bounded manual relay was prepared and its
+transport/metadata tests pass, but the normal GitHub binary-upload endpoint
+returned 401 for the configured credential. No relay branch was pushed, no
+workflow was dispatched, and no S3 mutation or readback occurred. No credentials
+were read out or copied to artifacts. No SSM/provisioning denial was routed
+around. The owner was asked whether to use the documented `large-file-ok`
+exception for the remaining unchanged bytes; that decision is pending.
 
-The exact local artifact dry run selects **59 files, 8.9 MB**: 34 earlier tracked
-files plus 19 study and six benchmark pending files. Pending plans are not valid
-uploaded-artifact manifests. Destination: s3://setec-astronomy-artifacts/store.
+After verifying all 24 original-wave files against the remote's real manifests,
+the current remaining inventory is **41 files, 7,508,437 bytes**: ten locally
+tracked files plus 23 study and eight benchmark pending files. The earlier
+59-file/8.9-MB dry run is historical and predates the newer follow-up bundles
+and verified exclusions. Pending plans are not valid uploaded-artifact
+manifests. Destination: s3://setec-astronomy-artifacts/store.
 Upload unchanged bytes and verify remote readback before real generated manifests
 replace Git blobs. No ready AWS identity, upload or readback is claimed. Both
 constructor binaries and complete new raw runs remain in hash-checked local
 bundles. Never split, rename, delete or fabricate evidence to pass a gate.
 
-The final site run has 46 passes and three known base failures (the unrelated
+The prior completed-wave site run has 46 passes and three known base failures (the unrelated
 panel-summary entry and two relative autolab links); the same failure methods
 were reproduced on the base. The initial new browser attempt failed because an
 old local preview server returned empty responses; its raw failure is retained.
 A fresh local static preview serves byte-identical HTML and passes all browser
 checks at 1280/390/320, dark and JavaScript-disabled, with no external requests.
-At 19:22 UTC, PR head 14ea715a952c188e3c80b05cb815690a9816a6c7 still has
-21 first-page pull-request workflows queued, with no current-head pass verdict.
-That remote head incorporates newer main changes than the locally tested base;
-it is not the locally validated final source. Before a normal push, incorporate
-its updates without rebase/force-push and rerun affected checks. Earlier CI disk,
-curve-name and artifact failures are historical and not current-head conclusions.
+The integrated commit `1d71daac7` incorporates PR head `b1ab8a4e5` and main
+`37f761558`; the required full library command exits 101 before tests on an
+unclosed delimiter in unchanged upstream `src/cryptanalysis/sat.rs`. Its blob
+`ca306e19654aeb0f92c9ed79352e20615a182d91` remains identical on freshly fetched
+main `942caf7e4`. The [problem record](../../problems/sat-progress-phase-base-syntax.md)
+links the retained evidence. Do not apply earlier frozen-source passes to this
+merged source or patch unrelated SAT code. A fresh merged dashboard preview
+passes at 1280/390/320, dark and JavaScript-disabled, without script errors or
+external requests. Remote head `ac16317e5` adds another artifact migration and
+still requires forward-only integration; no current-head CI pass is claimed.
+The fresh full-site attempt stops before tests because the real-manifest
+backend-leaderboard source is not hydrated. It does not replace the historical
+46-pass/three-base-failure result. Fifteen new native-follow-up progress series
+export successfully as neutral diagnostics; none adds an IC/rho ratio.
 Do not call the PR green or bypass checks/reviews to merge it.
 
 For the remaining artifact/source delivery: upload and verify
