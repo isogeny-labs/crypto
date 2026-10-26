@@ -19,7 +19,7 @@ concurrency:
 jobs:
   exposed-point-crosslayout:
     if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-e2e-crosslayout-20261016'
-    runs-on: ubuntu-24.04
+    runs-on: main
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
