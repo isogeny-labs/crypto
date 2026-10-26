@@ -29,6 +29,7 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-18 | [Lazy orbit-member index, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)](https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf) | 1.27× | matched | S |
 | 2026-10-20 | [Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6](https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md) | 4.67× | matched | source-specific; see result |
 | 2026-10-21 | [Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md) | 14.4× | matched | source-specific; see result |
+| 2026-10-17 | [n83 K1107/root11 sixteen-point cold factor-base frontier](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md) | 47.1× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
 
 ## Frontier audit and subsequent corrections (implementation result 2026-10-14)
 
@@ -299,6 +300,70 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
 | 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
 
+## Quartic-twist pair index, outside tables A–C
+
+Exact signed four-factor group oracle on the canonical quartic twist. A 12-action pair orbit constructs all physical pair-sum keys from one elliptic addition; the direct-posting candidate is compared with the existing full hash table on identical residuals (class: counted component improvement). Every full signed decomposition set matches; all postings passed a separate group-addition audit and the non-timing A/A records are identical. The query counts below are the same in both arms. Setup and retained allocator-requested bytes improve, but hash CPU, an isolated native-time comparison, a complete polynomial IC pipeline and a matched rho band are absent. No priced row moves. Study: [research/twist_index_calculus_20261020/](../../research/twist_index_calculus_20261020/).
+
+| p | base | residuals | full / tagged setup Fp M | full / tagged setup group ops | full / tagged query Fp M | full / tagged retained requested bytes |
+|--:|--:|--:|:--|:--|:--|:--|
+| 13 | 72 | 7 | 495,864 / 154,922 | 5,112 / 426 | 7,029,782 / 7,029,782 | 1,273,360 / 681,932 |
+| 37 | 624 | 3 | 37,708,944 / 7,796,605 | 388,752 / 32,396 | 226,616,754 / 226,616,754 | 91,007,248 / 47,721,464 |
+
+## Quartic-twist dense same-residual oracle, outside tables A–C
+
+One public target `[271]G` per canonical quartic twist. The reference retains one exact four-factor relation per residual and treats all factor logs as unknown; the candidate retains rank-raising rows from the first residual and fixes the public generator's factor log to 1 (class: counted exact-oracle improvement). A separate point-keyed signed-pair oracle replayed complete first-query counts, selected rows, rank and answer; all subgroup logs were enumerated, and A/A non-timing records match. Counted path totals include model, base, input, eigen/map, full pair table, relation stream and answer checks. These are not polynomial S5, isolated native-time or matched rho results; no priced row moves. Study: [research/twist_index_calculus_20261020/](../../research/twist_index_calculus_20261020/).
+
+| p | base / folded columns | residuals before → after | first-query decompositions / scanned to rank | total Fp M before → after | total group ops before → after |
+|--:|:--|:--|:--|:--|:--|
+| 13 | 72 / 6 | 7 → 1 | 561 / 6 | 8,096,696 → 2,045,670 | 81,076 → 18,609 |
+| 37 | 624 / 52 | 53 → 1 | 53,551 / 115 | 4,048,104,018 → 119,740,945 | 41,702,654 → 1,204,356 |
+
+**Combined tagged-index and dense-row follow-up, p=37.** The same 624-point base, first residual and complete 53,551 signed decompositions reach anchored rank 52 after 115 candidates. The direct-posting tagged table changes setup work, not relation yield. An independent point-keyed auditor replayed all subgroup logs, selected rows and the answer; non-timing A/A, final-source parity and complete full/tagged signed-set checks pass. Counted one-target path totals include model through answer checks inside one producer. The older full-table dense arm uses identical selected rows. The public known-log anchor and dense extraction are generic steps, so the larger one-row/query comparison is not twist-only. Polynomial S5, hash CPU, isolated wall time and matched rho GAE remain unpriced.
+
+| p | full dense → tagged dense Fp M | full dense → tagged dense group ops | tagged table retained requested bytes | tagged hash lookups |
+|--:|:--|:--|--:|--:|
+| 37 | 119,740,945 → 89,828,606 | 1,204,356 → 848,000 | 47,721,464 | 777,503 |
+
+## Quartic-twist mixed-pattern polynomial IC, outside tables A–C
+
+Native S4/S3 polynomial relation finding on the canonical p=37 twist, one public target `[271]G`, 48 signed physical factors and four twist-folded log columns. A scalar-keyed independent audit enumerated all 1,873,633 subgroup logs, replayed complete processed signed sets, rank, factor logs, target and same-process twist24 rho. The k=1 and k=1,2 arms have identical non-timing A/A records. Single-line S5 remained incomplete and is excluded from these restricted-pattern arms. Hash/tree and allocator CPU, peak bytes, calibrated GAE, isolated wall time and same-input external Gröbner controls are missing; no priced IC/rho row moves. [Report](../../research/twist_index_calculus_20261020/MIXED_POLYNOMIAL_REPORT.pdf).
+
+| Enabled patterns | Residuals | Signed relations / rank | Counted IC Fp M / group ops | Same-target twist24 rho Fp M / group ops |
+|:--|--:|:--|:--|:--|
+| 1,2,3 | 7 | 5 / 4 | 455,838,426 / 8,123 | 348,941 / 2,745 |
+| 1,2 | 7 | 5 / 4 | 154,272,224 / 7,619 | 348,941 / 2,745 |
+| 1 | 8 | 4 / 4 | 116,050,118 / 3,936 | 348,941 / 2,745 |
+
+## Quartic-twist native polynomial orbit-thinning grid, outside tables A–C
+
+All 21 preregistered orbit-complete L2 prefix choices on the six frozen p=73/97 one-target streams are shown, including the partial p=73 seed-one cases. The native S4 collector and independent point-keyed/BSGS auditor recover 271 at full anchored rank in each case; first/A/A non-timing records, six full-base source parities, and a mutation rejection were checked. The full/candidate ratio is counted one-target IC Fp multiplications against the same-seed full-base path, with full-base construction and orbit-map work charged. Hash/allocator CPU, calibrated GAE and isolated timing are missing, so these are not priced S or IC/rho speed ratios. [Report](../../research/twist_index_calculus_20261020/K1_THIN_NATIVE_REPORT.pdf).
+
+| p/seed | L2 orbits | Base / folded columns | Residuals | Exact/poly relations | Rank | S4 failures | IC Fp M / group ops | Full/candidate Fp M | Same-target rho Fp M | Audit |
+|:--|--:|:--|--:|:--|--:|--:|:--|--:|--:|:--|
+| 73/0 | 1 | 60 / 5 | 30 | 6/6 | 5 | 0 | 445,445,605 / 10,701 | 1.994× | 496,841 | pass |
+| 73/0 | 2 | 72 / 6 | 20 | 6/6 | 6 | 0 | 593,181,104 / 11,095 | 1.497× | 496,841 | pass |
+| 73/0 | 3 | 84 / 7 | 15 | 7/7 | 7 | 0 | 666,998,170 / 11,760 | 1.332× | 496,841 | pass |
+| 73/0 | 4 | 96 / 8 | 15 | 8/8 | 8 | 0 | 888,203,272 / 9,988 | 1.000× | 496,841 | pass |
+| 73/1 | 1 | 60 / 5 | 45 | 8/6 | 5 | 1 | 667,133,505 / 12,209 | 1.774× | 366,965 | partial |
+| 73/1 | 2 | 72 / 6 | 28 | 9/7 | 6 | 1 | 829,490,482 / 12,141 | 1.427× | 366,965 | partial |
+| 73/1 | 3 | 84 / 7 | 20 | 10/8 | 7 | 1 | 888,451,433 / 12,564 | 1.332× | 366,965 | partial |
+| 73/1 | 4 | 96 / 8 | 20 | 11/9 | 8 | 1 | 1,183,617,228 / 10,891 | 1.000× | 366,965 | partial |
+| 73/2 | 1 | 60 / 5 | 47 | 5/5 | 5 | 0 | 696,092,141 / 12,281 | 3.653× | 481,339 | pass |
+| 73/2 | 2 | 72 / 6 | 45 | 6/6 | 6 | 0 | 1,331,570,891 / 14,074 | 1.910× | 481,339 | pass |
+| 73/2 | 3 | 84 / 7 | 43 | 11/11 | 7 | 0 | 1,907,506,701 / 16,014 | 1.333× | 481,339 | pass |
+| 73/2 | 4 | 96 / 8 | 43 | 15/15 | 8 | 0 | 2,542,727,892 / 15,084 | 1.000× | 481,339 | pass |
+| 97/0 | 1 | 48 / 4 | 310 | 4/4 | 4 | 0 | 4,616,280,829 / 38,187 | 2.998× | 802,322 | pass |
+| 97/0 | 2 | 60 / 5 | 130 | 8/8 | 5 | 0 | 3,870,889,536 / 24,149 | 3.575× | 802,322 | pass |
+| 97/0 | 3 | 72 / 6 | 310 | 16/16 | 6 | 0 | 13,839,508,536 / 53,111 | 1.000× | 802,322 | pass |
+| 97/1 | 1 | 48 / 4 | 302 | 4/4 | 4 | 0 | 4,496,535,068 / 37,541 | 0.745× | 500,318 | pass |
+| 97/1 | 2 | 60 / 5 | 75 | 5/5 | 5 | 0 | 2,233,996,578 / 17,273 | 1.499× | 500,318 | pass |
+| 97/1 | 3 | 72 / 6 | 75 | 6/6 | 6 | 0 | 3,349,559,070 / 17,475 | 1.000× | 500,318 | pass |
+| 97/2 | 1 | 48 / 4 | 182 | 4/4 | 4 | 0 | 2,710,417,878 / 25,189 | 2.471× | 791,504 | pass |
+| 97/2 | 2 | 60 / 5 | 150 | 5/5 | 5 | 0 | 4,465,588,225 / 26,573 | 1.500× | 791,504 | pass |
+| 97/2 | 3 | 72 / 6 | 150 | 6/6 | 6 | 0 | 6,696,848,851 / 28,588 | 1.000× | 791,504 | pass |
+
+A separate exact 24-action cache diagnostic found only 2 same-residual orbit collisions among 142,248 finite signed L2 peels, plus 788 across residuals within the six separate streams. This bounds ideal orbit-cache solver-call reduction on these streams before cache overhead. [Report](../../research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE.pdf).
+
 ## Planner validation, outside tables A–C
 
 `ic plan` / `ic bench --auto` (ic-planner/1) chooses every `ic.pipeline` stage of a prime-field run; here its plan runs against every alternative one change away from it on six prime curves outside its evidence (class: engineering). The plan is the existing best recipe, chosen automatically, so no row above moves. Cells are S(alternative) / S(plan), ecbench `compare`, paired, cluster 95% interval, at w = 0; the band column is the ratio at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). Supplementary curves are `prime_search` curves outside the registry, named by tag. Study: [research/ic_planner_validation_20261020/](../../research/ic_planner_validation_20261020/).
@@ -385,6 +450,81 @@ Owner criterion (2026-10-24): relations come from solving summation-polynomial s
 | 0 | 23 | 8 | 4 | 8 | 41,856 | 0.0461 | 0.000273 | 169 |
 | 1 | 23 | 8 | 2 | 8 | 48,821 | 0.07077 | 0.000359 | 197 |
 | 0 | 41 | 14 | 4 | 4 | 181,803,464 | 478.4 | 0.0131 | 36,440 |
+
+## GHS-weak E0/F_{q^3} (N4 v2): frozen B0 vs double large primes, SGE + block Lanczos; plain and negation-map rho
+
+Copied from `research/quartic_n4v2_20261020/results/summary.json`. Same restrictions as the N4 section: one special GHS-weak family, outside tables A–C, cold one-target cost in F_q-multiplication equivalents. Class: improvement over the frozen N4 B0 (restricted to the GHS-weak family). Headline (pre-registered) arm DL; baseline B0. Arm / B0 on the same instances (w = 0):
+
+- D / B0 at q = 65479: 0.138 [0.137, 0.139] (lower)
+- D / B0 at q = 131071: 0.119 [0.119, 0.12] (lower)
+- D / B0 at q = 262111: 0.11 [0.109, 0.111] (lower)
+- D / B0 at q = 524287: 0.0953 [0.0933, 0.0971] (lower)
+- D / B0 at q = 1048507: 0.0905 [0.0901, 0.0908] (lower)
+- D / B0 at q = 2097091: 0.0812 [0.0809, 0.0817] (lower)
+- DL / B0 at q = 65479: 0.0838 [0.0828, 0.0847] (lower)
+- DL / B0 at q = 131071: 0.0647 [0.0642, 0.0654] (lower)
+- DL / B0 at q = 262111: 0.0607 [0.0604, 0.0609] (lower)
+- DL / B0 at q = 524287: 0.05 [0.0498, 0.0501] (lower)
+- DL / B0 at q = 1048507: 0.0479 [0.0478, 0.0479] (lower)
+- DL / B0 at q = 2097091: 0.0418 [0.0418, 0.0419] (lower)
+- L / B0 at q = 65479: 0.773 [0.764, 0.782] (lower)
+- L / B0 at q = 131071: 0.792 [0.735, 0.89] (lower)
+- L / B0 at q = 262111: 0.762 [0.754, 0.776] (lower)
+- L / B0 at q = 524287: 0.756 [0.751, 0.765] (lower)
+- L / B0 at q = 1048507: 0.778 [0.767, 0.789] (lower)
+- L / B0 at q = 2097091: 0.784 [0.767, 0.816] (lower)
+
+| IC arm | rho | q | IC/rho (w=0) | IC/rho (w=1) | resolved |
+|:--|:--|--:|:--|:--|:--|
+| B0 | plain | 4051 | 0.88 [0.802, 0.974] | 0.728 [0.665, 0.799] | IC lower |
+| B0 | plain | 65479 | 0.271 [0.241, 0.306] | 0.254 [0.228, 0.285] | IC lower |
+| B0 | plain | 1048507 | 0.164 [0.127, 0.221] | 0.144 [0.112, 0.193] | IC lower |
+| B0 | plain | 2097091 | 0.109 [0.0903, 0.142] | 0.0973 [0.0802, 0.13] | IC lower |
+| B0 | neg | 4051 | 1.19 [1.09, 1.3] | 0.51 [0.47, 0.554] | unresolved |
+| B0 | neg | 65479 | 0.403 [0.361, 0.453] | 0.192 [0.173, 0.217] | IC lower |
+| B0 | neg | 2097091 | 0.125 [0.0945, 0.183] | 0.0567 [0.0428, 0.082] | IC lower |
+| DL | plain | 4051 | 0.171 [0.148, 0.198] | 0.17 [0.153, 0.189] | IC lower |
+| DL | plain | 65479 | 0.0227 [0.0202, 0.0256] | 0.0307 [0.0276, 0.0345] | IC lower |
+| DL | plain | 1048507 | 0.00787 [0.0061, 0.0106] | 0.00979 [0.00762, 0.0131] | IC lower |
+| DL | plain | 2097091 | 0.00456 [0.00378, 0.00592] | 0.00579 [0.00477, 0.00772] | IC lower |
+| DL | neg | 4051 | 0.231 [0.199, 0.265] | 0.119 [0.108, 0.132] | IC lower |
+| DL | neg | 65479 | 0.0337 [0.0302, 0.038] | 0.0233 [0.0209, 0.0262] | IC lower |
+| DL | neg | 2097091 | 0.00523 [0.00395, 0.00764] | 0.00337 [0.00255, 0.00488] | IC lower |
+
+Fitted exponents (w = 0):
+
+- B0, full (k 12..22): 1.209 [1.204, 1.214]
+- B0, high (k 17..22): 1.141 [1.139, 1.142]
+- S, full (k 12..22): 1.211 [1.203, 1.218]
+- S, high (k 17..22): 1.108 [1.050, 1.153]
+- L0, full (k 12..22): 1.167 [1.157, 1.175]
+- L0, high (k 17..22): 1.102 [1.046, 1.148]
+- L1, full (k 12..22): 1.142 [1.132, 1.151]
+- L1, high (k 17..22): 1.149 [1.130, 1.165]
+- L, full (k 12..22): 1.212 [1.204, 1.220]
+- L, high (k 17..22): 1.162 [1.138, 1.184]
+- D, full (k 12..22): 1.035 [1.028, 1.042]
+- D, high (k 17..22): 1.008 [1.006, 1.011]
+- DL1, full (k 12..22): 0.938 [0.927, 0.950]
+- DL1, high (k 17..22): 1.017 [1.015, 1.021]
+- DL, full (k 12..22): 0.983 [0.975, 0.993]
+- DL, high (k 17..22): 0.988 [0.986, 0.989]
+- plain, full (k 12..22): 1.504 [1.470, 1.532]
+- plain, high (k 17..22): 1.475 [1.373, 1.573]
+- neg, full (k 12..22): 1.543 [1.494, 1.583]
+- neg, high (k 17..22): 1.640 [1.493, 1.769]
+
+Crossover against negation-map rho:
+
+- B0, M-eq w=0: resolved from q = 16363, interpolated q* = 6371.2 [5383.3, 8267.3]
+- B0, M-eq w=0.1: resolved from q = 16363, interpolated q* = 3952.5 [3516.3, 4757.4]
+- B0, M-eq w=1: resolved from q = 16363, interpolated q* = 894.5 [774.6, 1083.7]
+- B0, wall: resolved from q = 2097091, interpolated q* = 276577.8 [231720.5, 426374.6]
+- DL, M-eq w=0: resolved from q = 991, interpolated q* = 555.4 [388.9, 751.7]
+- DL, M-eq w=0.1: resolved from q = 991, interpolated q* = 456.2 [343.7, 639.0]
+- DL, M-eq w=1: resolved from q = 991, interpolated q* = 276.3 [231.9, 319.4]
+- DL, wall: resolved from q = 8191, interpolated q* = 5704.2 [1495.3, 7612.6]
+
 
 ## N83 Tier 1 one-target cold factor-base holdout
 
@@ -499,12 +639,30 @@ Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two
 | 4 | 5 | -0.232 | [-0.320, -0.082] |
 
 
+## N83 Tier 1 sixteen-point factor-base frontier
+
+Eight exact packed-root configurations ran on sixteen sealed public points across two admitted cloud hosts, one fresh IC process and a same-point rho solve for every candidate-point pair. All 128 pairs passed independent replay. The frozen online and cold selectors both report `BOUNDED_UNKNOWN`; the cold K1107 factor-base size lowers process cost against K1120, while its root11 and root22 layouts remain unresolved.
+
+| Configuration | Actual usable points | Folded columns | Online median ms | Cold mean s | Paired rho/IC median | IC faster / 16 |
+|:--|--:|--:|--:|--:|--:|--:|
+| 1104/r11 | 183,264 | 1,104 | 113.394 | 108.382 | 16.247 | 16/16 |
+| 1104/r22 | 183,264 | 1,104 | 111.651 | 108.112 | 11.334 | 16/16 |
+| 1107/r11 | 183,762 | 1,107 | 79.820 | 104.826 | 18.507 | 16/16 |
+| 1107/r22 | 183,762 | 1,107 | 82.929 | 104.635 | 23.910 | 16/16 |
+| 1112/r11 | 184,592 | 1,112 | 195.899 | 106.596 | 12.457 | 15/16 |
+| 1112/r22 | 184,592 | 1,112 | 191.117 | 106.699 | 15.636 | 16/16 |
+| 1120/r11 | 185,920 | 1,120 | 73.487 | 108.775 | 22.355 | 16/16 |
+| 1120/r22 | 185,920 | 1,120 | 71.913 | 108.966 | 19.394 | 16/16 |
+
+[Frozen 132 IC1 rows](../../research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json) and [provider-bound result and graph](../../research/n83_e2e_finalist_results_20261017/RESULT.md). The online interval excludes reusable preparation; the separate cold column charges it. This Tier 1 wall-time panel is separate from Tables A–C and their operation-unit S rankings.
+
+
 ## Sources
 
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `87999f37f2d5669a…`
+- `docs/ic/progress-timeline.json` — sha256 `9013f0034e9c68e3…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
@@ -529,6 +687,32 @@ Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
+- `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json` — sha256 `02427944511bd86f…`
+- `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json` — sha256 `706bc2efaf2c1a36…`
+- `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json` — sha256 `baddefec00f04f0b…`
+- `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_aa_v1.json` — sha256 `cc75cb1f1142b94e…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_v1.json` — sha256 `c0c3241972033c41…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_v1.json` — sha256 `36f7ae42554bccfb…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_aa_v1.json` — sha256 `09adc53846bc84a2…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_aa_v1.json` — sha256 `c57f5dd8935f064e…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_native_audit_v1.json` — sha256 `ce24ff067aab1408…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_native_audit_v1.json` — sha256 `4a2eda5132b9609a…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_p13_v1.json` — sha256 `05521665d6596151…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_p37_v1.json` — sha256 `4f5903b1e127b149…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_v2.json` — sha256 `80c2a291f23db2be…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_aa_v2.json` — sha256 `c7176b30a8fe8764…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_native_audit_v2.json` — sha256 `4a2eda5132b9609a…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_v1.json` — sha256 `7623e510ffc219c1…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_p37_v3.json` — sha256 `04ca27dc67d3f781…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_audit_p37_v3.json` — sha256 `7d443fc185426a47…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_p37_v1.json` — sha256 `e5d8f52ba26180fd…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_p37_aa_v1.json` — sha256 `c100b1d1e32e41dd…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_audit_p37_v1.json` — sha256 `46f6fd0779b0e18f…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_p37_v1.json` — sha256 `9e7299c74b69844a…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_p37_aa_v1.json` — sha256 `a3bf3faa565f4ebf…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_audit_p37_v1.json` — sha256 `bf5877366f80a65b…`
+- `research/twist_index_calculus_20261020/K1_THIN_NATIVE_VALIDATION.json` — sha256 `469dbe385da11a4d…`
+- `research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE_v1.json` — sha256 `0bb72ba5f0cc6862…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/bitop_ladder_20261019/summary.json` — sha256 `c7f5dd2ed72c77d6…`
 - `research/hec_bitop_20261020/analysis/analysis.json` — sha256 `87615d6925b4ed8e…`
@@ -537,10 +721,99 @@ Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two
 - `research/s5_plain_c4_options_20261019/raw/summary_r13.json` — sha256 `d5ae9560f6cf3cad…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
+- `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
-- `docs/curves/registry.json` — sha256 `595b71600e1f471a…`
+- `research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json` — sha256 `a789512e3192b960…`
+- `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
+- `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
+- `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
+- `docs/curves/registry.json` — sha256 `46d4060fafd71863…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_aa_v1.json` — sha256 `7469d776730297e9…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_audit_v1.json` — sha256 `ed0816775b6c9ae0…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_audit_aa_v1.json` — sha256 `ed0816775b6c9ae0…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j2_v1.json` — sha256 `17156e62b2724a80…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j2_aa_v1.json` — sha256 `1c4a590dd86f9165…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j2_audit_v1.json` — sha256 `e3b5b89ab638767b…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j2_audit_aa_v1.json` — sha256 `e3b5b89ab638767b…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j3_v1.json` — sha256 `a070aa4ebda00cc1…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j3_aa_v1.json` — sha256 `a2f2a2820e26c5ee…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j3_audit_v1.json` — sha256 `3b4619a119976b58…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j3_audit_aa_v1.json` — sha256 `3b4619a119976b58…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j4_v1.json` — sha256 `330e153cbd95c1cf…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j4_aa_v1.json` — sha256 `247b3940b87ee67d…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j4_audit_v1.json` — sha256 `a4dbd337db05130a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j4_audit_aa_v1.json` — sha256 `a4dbd337db05130a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j1_v1.json` — sha256 `ca53eddee71e2835…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j1_aa_v1.json` — sha256 `4ee2db71f6aaaaca…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j1_audit_v1.json` — sha256 `71c39bf3a5fe912c…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j1_audit_aa_v1.json` — sha256 `71c39bf3a5fe912c…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j2_v1.json` — sha256 `a43b1734effe09e0…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j2_aa_v1.json` — sha256 `f524b681975f689a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j2_audit_v1.json` — sha256 `8c7d21edf94f16f1…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j2_audit_aa_v1.json` — sha256 `8c7d21edf94f16f1…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j3_v1.json` — sha256 `e672d4f5872ba6a2…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j3_aa_v1.json` — sha256 `8254b88566d0cf9a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j3_audit_v1.json` — sha256 `9bb81b224a9fe8f7…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j3_audit_aa_v1.json` — sha256 `9bb81b224a9fe8f7…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j4_v1.json` — sha256 `38d0dccd5e286e4a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j4_aa_v1.json` — sha256 `5fde1747a9106bc7…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j4_audit_v1.json` — sha256 `0c91510bf1449e47…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j4_audit_aa_v1.json` — sha256 `0c91510bf1449e47…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j1_v1.json` — sha256 `0b6b4e09f9f7a766…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j1_aa_v1.json` — sha256 `6c254529d4ddf65f…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j1_audit_v1.json` — sha256 `bd9ec176e3725829…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j1_audit_aa_v1.json` — sha256 `bd9ec176e3725829…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j2_v1.json` — sha256 `042c2521c08d60fb…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j2_aa_v1.json` — sha256 `94a6b5242526a1d8…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j2_audit_v1.json` — sha256 `941cbee09aa054d4…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j2_audit_aa_v1.json` — sha256 `941cbee09aa054d4…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j3_v1.json` — sha256 `5f1872813478a1f4…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j3_aa_v1.json` — sha256 `6bb3c406535b795e…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j3_audit_v1.json` — sha256 `1718ce5f95708d7f…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j3_audit_aa_v1.json` — sha256 `1718ce5f95708d7f…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j4_v1.json` — sha256 `04d94cce5f755241…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j4_aa_v1.json` — sha256 `28ea03f8b74337aa…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j4_audit_v1.json` — sha256 `54b8ca3088cd0b35…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j4_audit_aa_v1.json` — sha256 `54b8ca3088cd0b35…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j1_v1.json` — sha256 `9f3ad268a04cf5fc…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j1_aa_v1.json` — sha256 `29063dfceb88714a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j1_audit_v1.json` — sha256 `9711d15221f9f171…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j1_audit_aa_v1.json` — sha256 `9711d15221f9f171…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j2_v1.json` — sha256 `6018dae4ef428b8c…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j2_aa_v1.json` — sha256 `dabac33fd726de17…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j2_audit_v1.json` — sha256 `ddbc153b9507bd27…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j2_audit_aa_v1.json` — sha256 `ddbc153b9507bd27…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j3_v1.json` — sha256 `18460bd93a7a3723…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j3_aa_v1.json` — sha256 `5161404d6d6582c7…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j3_audit_v1.json` — sha256 `36fb81da79ee8630…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j3_audit_aa_v1.json` — sha256 `36fb81da79ee8630…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j1_v1.json` — sha256 `966cfb925b7a41e0…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j1_aa_v1.json` — sha256 `2b00ee85b3fe2129…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j1_audit_v1.json` — sha256 `ab7923b5dfc32544…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j1_audit_aa_v1.json` — sha256 `ab7923b5dfc32544…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j2_v1.json` — sha256 `145810f5c6fab4bd…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j2_aa_v1.json` — sha256 `f30c2d3e8ba4a367…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j2_audit_v1.json` — sha256 `ec659486e159c0fb…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j2_audit_aa_v1.json` — sha256 `ec659486e159c0fb…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j3_v1.json` — sha256 `26dcfa1e961c0c7c…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j3_aa_v1.json` — sha256 `4725bd4127d937ee…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j3_audit_v1.json` — sha256 `2d1275313d2ba021…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j3_audit_aa_v1.json` — sha256 `2d1275313d2ba021…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j1_v1.json` — sha256 `fb0204667176e838…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j1_aa_v1.json` — sha256 `258dc92c9f18a67b…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j1_audit_v1.json` — sha256 `9a20002ef596d598…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j1_audit_aa_v1.json` — sha256 `9a20002ef596d598…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j2_v1.json` — sha256 `47fcde51f1b3e9ce…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j2_aa_v1.json` — sha256 `cd80e740c39d6181…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j2_audit_v1.json` — sha256 `ce37312105445544…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j2_audit_aa_v1.json` — sha256 `ce37312105445544…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_v1.json` — sha256 `6d9f255fe5580695…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_aa_v1.json` — sha256 `8f306ff8388bddaf…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_audit_v1.json` — sha256 `0e21b267b9612dcc…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_audit_aa_v1.json` — sha256 `0e21b267b9612dcc…`

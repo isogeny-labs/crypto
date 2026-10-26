@@ -65,6 +65,12 @@ class BuildTests(unittest.TestCase):
             "browser/browser.js",
             "browser/browser.css",
             "browser/data.json",
+            "backend-leaderboard/index.html",
+            "backend-leaderboard/leaderboard.json",
+            "backend-leaderboard/LEADERBOARD.md",
+            "backend-leaderboard/REPLAY_PLAN.json",
+            "backend-leaderboard/REPRODUCING.md",
+            "backend-leaderboard/reproduction.lock.json",
             "status/index.html",
             "status/style.css",
             "status/walk-forest.svg",
@@ -803,7 +809,7 @@ class BuildTests(unittest.TestCase):
 
     def test_internal_links_resolve(self):
         missing = []
-        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html"):
+        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html", "backend-leaderboard/index.html"):
             page = read(os.path.join(self.out, rel))
             base = os.path.dirname(rel)
             for href in re.findall(r'(?:href|src)="([^"]+)"', page):
@@ -826,6 +832,16 @@ class BuildTests(unittest.TestCase):
                     missing.append("%s -> %s" % (rel, href))
         self.assertEqual(missing, [], "unresolvable internal links: %s" % missing)
 
+    def test_published_assets_do_not_link_to_the_retired_pages_origin(self):
+        # Absolute URLs bypass the internal-link check above. The repository
+        # moved to isogeny-labs, while the old /crypto/ Pages origin returns 404.
+        retired = "aburan28.github.io/crypto"
+        text_assets = (".html", ".js", ".css", ".xml", ".txt")
+        broken = [rel for rel in self.published
+                  if rel.endswith(text_assets)
+                  and retired in read(os.path.join(self.out, rel))]
+        self.assertEqual(broken, [], "retired GitHub Pages links: %s" % broken)
+
     def test_research_evidence_is_linked_absolutely(self):
         # research/ is not part of the site artifact, so a relative
         # ../research/<path> link resolves in the working tree and 404s once
@@ -846,7 +862,7 @@ class BuildTests(unittest.TestCase):
         )
 
     def test_every_page_declares_title_viewport_and_description(self):
-        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html"):
+        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html", "backend-leaderboard/index.html"):
             page = read(os.path.join(self.out, rel))
             self.assertRegex(page, r"<title>[^<]+</title>", rel)
             self.assertIn('name="viewport"', page, rel)
@@ -981,7 +997,7 @@ class WorkflowTests(unittest.TestCase):
 
     def test_site_sources_trigger_the_workflow(self):
         workflow = read(os.path.join(ROOT, ".github", "workflows", "ecc2k130-status.yml"))
-        for path in ('"docs/site/**"', '"scripts/site/**"', '"docs/index-calculus-scoreboard.html"', '"docs/browser/**"', '"scripts/build_lab_browser.py"'):
+        for path in ('"docs/site/**"', '"scripts/site/**"', '"docs/index-calculus-scoreboard.html"', '"docs/browser/**"', '"docs/backend-leaderboard/**"', '"scripts/build_lab_browser.py"'):
             # Once for pull_request, once for push.
             self.assertEqual(workflow.count(path), 2, path)
 
