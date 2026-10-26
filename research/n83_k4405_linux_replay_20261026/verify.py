@@ -33,6 +33,13 @@ def sha(path: Path) -> str:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+def candidate_digest(candidate: dict) -> str:
+    record = {key: value for key, value in candidate.items() if key != "candidate_id"}
+    encoded = json.dumps(record, sort_keys=True, separators=(",", ":"),
+                         ensure_ascii=False).encode()
+    return hashlib.sha256(encoded).hexdigest()[:12]
+
+
 def read(path: Path) -> dict:
     return json.loads(path.read_text())
 
@@ -150,6 +157,7 @@ def verify(output: Path, binary: Path) -> dict:
     candidate = read(CANDIDATE)
     check(prefix["status"] == "PASS_EXACT_BASE_IDENTITY" and
           candidate["candidate_id"] == prefix["current_candidate_id"] and
+          candidate["candidate_id"].endswith("h" + candidate_digest(candidate)) and
           prefix["current_ic_source_sha256"] == run.SOURCE_SHA256 and
           receipt["base_dump_sha256"] == prefix["prefix_ordered_dump_sha256"],
           "ordered K4405 base identity differs")
