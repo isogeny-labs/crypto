@@ -40,8 +40,9 @@ field changes.
   rounds on suite rows and fresh holdouts. Extend a set to ten rounds
   only when its declared 95% interval half-width exceeds 3%.
 - **Reference and unit:** same-process signed-Frobenius rho at the
-  canonical batched policy, priced in the same process-local batched
-  affine-addition unit as IC. Report setup-inclusive cold IC and rho,
+  canonical batched policy (`KIC_RHO_CANON` unset, as rule v8), priced in
+  the same process-local batched affine-addition unit as IC. Report
+  setup-inclusive cold IC and rho,
   target-dependent online intervals separately, the §5a 0/0.1/1 GAE
   band, and the equal-advice rho boundary separately.
 - **Host:** an x86_64 host meeting `REFERENCE_CLASS` in `icprog`, one
