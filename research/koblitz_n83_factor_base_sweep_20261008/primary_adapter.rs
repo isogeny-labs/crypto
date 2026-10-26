@@ -651,6 +651,7 @@ pub(super) fn full_d18_m4_cli(
         false,
         false,
         false,
+        1,
     )
 }
 
@@ -674,6 +675,7 @@ pub(super) fn full_d18_m4_l0_positive_cli(
         false,
         false,
         false,
+        1,
     )
 }
 
@@ -695,6 +697,7 @@ pub(super) fn full_d18_m4_l0_shared_positive_cli(
         false,
         false,
         false,
+        1,
     )
 }
 
@@ -716,6 +719,7 @@ pub(super) fn full_d18_m4_l0_shared_root_pinned_cli(
         false,
         false,
         false,
+        1,
     )
 }
 
@@ -737,6 +741,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_pinned_cli(
         false,
         false,
         false,
+        1,
     )
 }
 
@@ -758,6 +763,7 @@ pub(super) fn full_d18_m4_l0_shared_selector_pinned_cli(
         false,
         false,
         false,
+        1,
     )
 }
 
@@ -781,6 +787,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_cli(
         false,
         false,
         false,
+        1,
     )
 }
 
@@ -804,6 +811,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_natural_cli(
         false,
         false,
         false,
+        1,
     )
 }
 
@@ -827,6 +835,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_natural_1200_cli(
         false,
         false,
         false,
+        1,
     )
 }
 
@@ -851,6 +860,7 @@ pub(super) fn full_d18_m4_l0_xcnf_cli(
         true,
         false,
         false,
+        1,
     )
 }
 
@@ -874,6 +884,7 @@ pub(super) fn full_d18_m4_l0_xcnf_witness_cli(
         true,
         true,
         false,
+        1,
     )
 }
 
@@ -898,6 +909,7 @@ pub(super) fn full_d18_m4_linux_shared_phase_first_cli(
         false,
         false,
         false,
+        1,
     )
 }
 
@@ -924,6 +936,34 @@ pub(super) fn full_d18_m4_l0_ordered_first_pair_cli(
         false,
         false,
         true,
+        1,
+    )
+}
+
+/// Keep the exact first-pair symmetry arm and change only the cadence of
+/// full native XOR elimination after search decisions. Every complete
+/// assignment still receives the full XOR check before SAT is returned.
+pub(super) fn full_d18_m4_l0_ordered_xor_cadence_32_cli(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    let budget = if mode == "natural" { 2_400 } else { 300 };
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        budget,
+        false,
+        false,
+        true,
+        32,
     )
 }
 
@@ -940,6 +980,7 @@ fn full_d18_m4_impl(
     export_xcnf: bool,
     native_xcnf_witness: bool,
     ordered_first_pair: bool,
+    xor_decision_cadence: usize,
 ) -> Result<Value> {
     if !["positive", "natural"].contains(&mode) || output.exists() {
         return Err("full D18 m4 mode or fresh output differs from protocol".into());
@@ -970,6 +1011,9 @@ fn full_d18_m4_impl(
     {
         return Err("ordered first pair differs from the frozen symmetry arm".into());
     }
+    if xor_decision_cadence != 1 && !(ordered_first_pair && xor_decision_cadence == 32) {
+        return Err("XOR cadence differs from the frozen native solver arm".into());
+    }
     if (!l0_diagnostic && budget_seconds != 1_200)
         || (l0_diagnostic
             && budget_seconds != 300
@@ -997,7 +1041,9 @@ fn full_d18_m4_impl(
         return Err("full D18 native XCNF witness differs from the frozen mode".into());
     }
     let root_choice_pinned = choice_pins == "selector_and_phase_zero";
-    let search_policy = if ordered_first_pair {
+    let search_policy = if ordered_first_pair && xor_decision_cadence == 32 {
+        "phase_zero_first_ordered_first_pair_xor_cadence32"
+    } else if ordered_first_pair {
         "phase_zero_first_ordered_first_pair"
     } else if phase_zero_first {
         "phase_zero_first"
@@ -1210,11 +1256,13 @@ fn full_d18_m4_impl(
         enc.solver.set_branch_priority(&priority);
         enc.solver.set_saved_phase_for_vars(&phase_wires, false);
     }
+    enc.solver.set_xor_decision_cadence(xor_decision_cadence);
     let model_ms = model_start.elapsed().as_secs_f64() * 1000.0;
     let shape = json!({
         "variables":enc.solver.n_vars(), "clauses":enc.solver.n_clauses(),
         "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy,
         "ordered_first_pair":ordered_first_pair,
+        "xor_decision_cadence":xor_decision_cadence,
         "xor_rows":enc.solver.n_xors(), "model_ms":model_ms,
         "import_ms":import_ms, "object":row["object"],
         "point_set_blake3":FULL_D18_POINT_SET,
@@ -1362,12 +1410,24 @@ fn full_d18_m4_impl(
     let search_start = Instant::now();
     let answer = enc.solver.solve();
     let search_ms = search_start.elapsed().as_secs_f64() * 1000.0;
+    let limit_reason = if answer != SolveResult::Unknown {
+        "not_applicable"
+    } else {
+        let conflict_cap = enc.solver.conflicts() >= enc.solver.conflict_budget;
+        let wall_cap = started.elapsed() >= Duration::from_secs(budget_seconds);
+        match (conflict_cap, wall_cap) {
+            (true, true) => "conflict_and_wall_cap",
+            (true, false) => "conflict_cap",
+            (false, true) => "wall_cap",
+            (false, false) => "unknown_internal_limit",
+        }
+    };
     full_d18_phase(
         &mut phases,
         started,
         "solver_returned",
         json!({"answer":format!("{answer:?}"), "search_ms":search_ms,
-            "conflicts":enc.solver.conflicts()}),
+            "conflicts":enc.solver.conflicts(),"limit_reason":limit_reason}),
     )?;
     let mut relation = Value::Null;
     let status = match answer {
@@ -1376,7 +1436,7 @@ fn full_d18_m4_impl(
         SolveResult::Unsat => "UNVERIFIED_UNSAT",
         SolveResult::Sat => {
             let xs = enc.decode_summands();
-            if !enc.verify_model() {
+            if !enc.verify_external_assignment(&enc.solver.model()) {
                 "INVALID_MODEL"
             } else if let Some((indices, row)) =
                 full_d18_four_x_lift(&base.curve, fb, &xs, &target)?
@@ -1422,11 +1482,29 @@ fn full_d18_m4_impl(
                 .parse()?,
         )
     };
+    let solver_stats = json!({
+        "decisions":enc.solver.stats.decisions,
+        "conflicts":enc.solver.stats.conflicts,
+        "restarts":enc.solver.stats.restarts,
+        "propagations":enc.solver.stats.propagations,
+        "xor_passes":enc.solver.stats.xor_passes,
+        "xor_propagations":enc.solver.stats.xor_propagations,
+        "xor_conflicts":enc.solver.stats.xor_conflicts,
+        "xor_repivots":enc.solver.stats.xor_repivots,
+        "xor_row_ops":enc.solver.stats.xor_row_ops,
+        "xor_row_scans":enc.solver.stats.xor_row_scans,
+        "clause_visits":enc.solver.stats.clause_visits,
+        "clause_lit_visits":enc.solver.stats.clause_lit_visits,
+        "ns_propagate_clauses":enc.solver.stats.ns_propagate_clauses,
+        "ns_propagate_xors":enc.solver.stats.ns_propagate_xors,
+        "ns_analyze":enc.solver.stats.ns_analyze,
+    });
     let result = json!({
         "schema":if l0_diagnostic {if mode == "positive" {"n83.full-d18-m4-l0-positive/v1"} else {"n83.full-d18-m4-l0-natural/v1"}} else {"n83.full-d18-m4-worker/v1"}, "status":status,
         "mode":mode, "source_commit":source_commit,
         "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy,
         "ordered_first_pair":ordered_first_pair,
+        "xor_decision_cadence":xor_decision_cadence,
         "isolation":isolation,
         "budget_seconds":budget_seconds,
         "source_attestation_mode":source_attestation_mode,
@@ -1440,7 +1518,9 @@ fn full_d18_m4_impl(
         "memory_cgroup_peak_bytes":peak_bytes,
         "shape":shape, "search_ms":search_ms,
         "solver_answer":format!("{answer:?}"),
+        "solver_limit_reason":limit_reason,
         "solver_conflicts":enc.solver.conflicts(),
+        "solver_stats":solver_stats,
         "relation":relation,
         "process_usage":process_usage(),
         "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,

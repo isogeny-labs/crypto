@@ -455,11 +455,17 @@ pub struct Solver {
     /// Maximum total conflicts before giving up. `u64::MAX` means
     /// no limit.
     pub conflict_budget: u64,
-    /// Wall-clock deadline; checked at every conflict alongside the
-    /// conflict budget, and `None` means no limit. A solve that reaches
-    /// it returns [`SolveResult::Unknown`], exactly as an exhausted
-    /// conflict budget does.
+    /// Wall-clock deadline; checked at the start of every solve-loop
+    /// iteration and after conflicts. A single propagation pass can still
+    /// overrun it, so a hard outer process watchdog remains necessary.
+    /// `None` means no deadline.
     pub deadline: Option<std::time::Instant>,
+    /// Run the XOR matrix after every N decision levels, and always at
+    /// level zero or a complete assignment. One preserves the original
+    /// propagation policy. Larger values trade weaker intermediate XOR
+    /// propagation for fewer full-matrix passes without omitting the final
+    /// original XOR check before SAT.
+    xor_decision_cadence: usize,
     /// Set when `add_clause` detects UNSAT (empty clause or
     /// conflict-on-unit).  `solve()` short-circuits to UNSAT when set.
     is_unsat: bool,
@@ -620,6 +626,7 @@ impl Solver {
             conflicts: 0,
             conflict_budget: u64::MAX,
             deadline: None,
+            xor_decision_cadence: 1,
             is_unsat: false,
             xors: Vec::new(),
             epoch: 0,
@@ -784,6 +791,14 @@ impl Solver {
             *k = order_key(a, p);
         }
         self.order.rebuild(self.n_vars, &self.heap_key);
+    }
+
+    /// Choose how often a search decision triggers native XOR elimination.
+    /// A complete assignment and the root level always run the XOR engine,
+    /// so a slower cadence cannot turn an XOR-violating assignment into SAT.
+    pub fn set_xor_decision_cadence(&mut self, cadence: usize) {
+        assert!(cadence > 0, "XOR decision cadence must be positive");
+        self.xor_decision_cadence = cadence;
     }
 
     /// Propagate to fixpoint at the current level without deciding.
@@ -1096,6 +1111,14 @@ impl Solver {
             }
             if self.xors.is_empty() || self.epoch == self.xor_epoch {
                 // Nothing has moved since the last Gauss-Jordan pass.
+                return None;
+            }
+            if self.xor_decision_cadence > 1
+                && self.trail_lim.len() % self.xor_decision_cadence != 0
+                && self.trail.len() != self.n_vars as usize
+            {
+                // CNF is at a fixpoint. A later decision-level boundary,
+                // restart, or complete assignment must still check XOR.
                 return None;
             }
             self.xor_epoch = self.epoch;
@@ -1811,6 +1834,12 @@ impl Solver {
         let mut restart_limit = 100u64 * luby(luby_index);
         let mut pending_conflict = None;
         loop {
+            if self
+                .deadline
+                .is_some_and(|deadline| std::time::Instant::now() >= deadline)
+            {
+                return SolveResult::Unknown;
+            }
             if let Some(conflict_idx) = pending_conflict.take().or_else(|| self.propagate()) {
                 self.conflicts += 1;
                 self.stats.conflicts += 1;
@@ -2552,6 +2581,125 @@ mod tests {
                 let _ = trivially_unsat;
             }
         }
+    }
+
+    #[test]
+    fn deferred_xor_still_checks_a_complete_assignment() {
+        for cadence in [1, 2, 8] {
+            let mut sat = Solver::new(4);
+            sat.set_xor_decision_cadence(cadence);
+            assert!(sat.add_xor(&[1, 2, 3, 4], true));
+            assert_eq!(sat.solve(), SolveResult::Sat);
+            let model = sat.model();
+            assert!(sat.check_xors(&model));
+            assert_eq!(model.iter().filter(|&&value| value).count() % 2, 1);
+
+            let mut unsat = Solver::new(4);
+            unsat.set_xor_decision_cadence(cadence);
+            assert!(unsat.add_xor(&[1, 2, 3, 4], true));
+            // These eight clauses admit only even-parity assignments.
+            for assignment in 0u32..16 {
+                if assignment.count_ones() % 2 == 1 {
+                    let clause = (0..4)
+                        .map(|bit| {
+                            let variable = (bit + 1) as Lit;
+                            if assignment & (1 << bit) != 0 {
+                                -variable
+                            } else {
+                                variable
+                            }
+                        })
+                        .collect();
+                    assert!(unsat.add_clause(clause));
+                }
+            }
+            assert_eq!(unsat.solve(), SolveResult::Unsat);
+        }
+    }
+
+    #[test]
+    fn deferred_xor_mixed_cnf_agrees_with_exhaustive_search() {
+        let mut state = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = || {
+            state ^= state >> 12;
+            state ^= state << 25;
+            state ^= state >> 27;
+            state.wrapping_mul(0x2545_F491_4F6C_DD1D)
+        };
+        for trial in 0..120 {
+            let clauses: Vec<Vec<Lit>> = (0..(3 + next() % 8))
+                .map(|_| {
+                    (0..3)
+                        .map(|_| {
+                            let var = (1 + next() % 6) as Lit;
+                            if next() & 1 == 0 {
+                                var
+                            } else {
+                                -var
+                            }
+                        })
+                        .collect()
+                })
+                .collect();
+            let xors: Vec<(Vec<u32>, bool)> = (0..(2 + next() % 5))
+                .map(|_| {
+                    let mut vars: Vec<u32> = (1..=6).filter(|_| next() & 1 == 0).collect();
+                    if vars.is_empty() {
+                        vars.push((1 + next() % 6) as u32);
+                    }
+                    (vars, next() & 1 == 0)
+                })
+                .collect();
+            let brute_sat = (0u32..64).any(|bits| {
+                clauses.iter().all(|clause| {
+                    clause.iter().any(|&lit| {
+                        let bit = (bits >> var_of(lit)) & 1 != 0;
+                        if lit > 0 {
+                            bit
+                        } else {
+                            !bit
+                        }
+                    })
+                }) && xors.iter().all(|(vars, rhs)| {
+                    vars.iter().filter(|&&v| (bits >> (v - 1)) & 1 != 0).count() % 2
+                        == usize::from(*rhs)
+                })
+            });
+            for cadence in [1, 2, 4, 32] {
+                let mut solver = Solver::new(6);
+                solver.set_xor_decision_cadence(cadence);
+                for clause in &clauses {
+                    solver.add_clause(clause.clone());
+                }
+                for (vars, rhs) in &xors {
+                    solver.add_xor(vars, *rhs);
+                }
+                let answer = solver.solve();
+                assert_eq!(
+                    answer == SolveResult::Sat,
+                    brute_sat,
+                    "mixed CNF/XOR trial {trial}, cadence {cadence}: {answer:?}; clauses={clauses:?}; xors={xors:?}"
+                );
+                if answer == SolveResult::Sat {
+                    let model = solver.model();
+                    assert!(solver.check_xors(&model));
+                    assert!(clauses.iter().all(|clause| clause.iter().any(|&lit| {
+                        if lit > 0 {
+                            model[(lit - 1) as usize]
+                        } else {
+                            !model[(-lit - 1) as usize]
+                        }
+                    })));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn expired_deadline_stops_conflict_free_search() {
+        let mut solver = Solver::new(4);
+        solver.deadline = Some(std::time::Instant::now());
+        assert_eq!(solver.solve(), SolveResult::Unknown);
     }
 
     /// The extended-DIMACS reader must apply CryptoMiniSat's parity
