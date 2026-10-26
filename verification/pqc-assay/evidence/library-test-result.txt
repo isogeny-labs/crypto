@@ -1,0 +1,28 @@
+test zk::stark_v2::tests::rejects_proof_reused_for_another_boundary ... ok
+test zk::stark_v2::tests::rejects_query_count_or_blowup_mismatch ... ok
+test zk::stark_v2::tests::rejects_swapped_queries ... ok
+test zk::stark_v2::tests::rejects_frozen_heart_forged_input ... ok
+test zk::stark_v2::tests::rejects_tampered_fri_final_layer ... ok
+test zk::stark_v2::tests::rejects_trace_with_broken_transition ... ok
+test zk::stark_v2::tests::rejects_truncated_fri ... ok
+test zk::stark_v2::tests::rejects_wrong_public_values ... ok
+test zk::stark_v2::tests::rejects_wrong_air ... ok
+test zk::stark_v2::tests::stark_v2_prove_verify_doubling_fast ... ok
+test zk::stark_v2::tests::stark_v2_prove_verify_doubling_default ... ok
+test prime_hyperelliptic::curve::tests::exhaustive_small_field_group_law_matches_point_count_reference ... ok
+test zk::stark::tests::grinding_fails_at_sized_query_count ... ok
+
+failures:
+
+---- cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version stdout ----
+
+thread 'cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version' panicked at src/cryptanalysis/ecbench/bounds.rs:2301:38:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto/research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/session.json: No such file or directory (os error 2)"
+
+
+failures:
+    cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version
+
+test result: FAILED. 4626 passed; 1 failed; 119 ignored; 0 measured; 0 filtered out; finished in 283.24s
+
+error: test failed, to rerun pass `--lib`

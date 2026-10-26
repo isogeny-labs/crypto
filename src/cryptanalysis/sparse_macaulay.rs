@@ -54,6 +54,7 @@
 //!    but the full reduction now runs on a 65-column block instead of a
 //!    65 000-column one.
 
+use crate::cryptanalysis::pq_groebner_f2::Mask;
 use std::mem::take;
 
 /// Outcome of eliminating the high-degree columns.
@@ -422,7 +423,7 @@ fn sparse_then_dense(
 /// The end of every degree band before the linear boundary, in column
 /// order: the switch points [`eliminate_high_columns_dense_finish_budgeted`]
 /// considers.  Columns are degree-first descending, so each band is a run.
-pub fn band_ends(cols: &[u64]) -> Vec<usize> {
+pub fn band_ends(cols: &[Mask]) -> Vec<usize> {
     let low = low_column_start(cols);
     let mut ends = Vec::new();
     for i in 1..low {
@@ -439,7 +440,7 @@ pub fn band_ends(cols: &[u64]) -> Vec<usize> {
 /// Where [`eliminate_high_columns_dense_finish`] should stop eliminating
 /// sparsely: the end of the leading degree band.  Columns are in
 /// descending, degree-first monomial order, so that band is a prefix.
-pub fn leading_band_end(cols: &[u64]) -> usize {
+pub fn leading_band_end(cols: &[Mask]) -> usize {
     match cols.first() {
         Some(first) => {
             let top = first.count_ones();
@@ -458,7 +459,7 @@ pub fn leading_band_end(cols: &[u64]) -> usize {
 /// the boundary the elimination targets.
 ///
 /// [`cmp_mono`]: super::pq_groebner_f2::cmp_mono
-pub fn low_column_start(cols: &[u64]) -> usize {
+pub fn low_column_start(cols: &[Mask]) -> usize {
     cols.iter()
         .position(|m| m.count_ones() <= 1)
         .unwrap_or(cols.len())

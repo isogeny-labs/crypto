@@ -6,15 +6,8 @@ name: Lean proof gate
 # tools/lean/trusted-native.txt and are reported as TRUST.
 # AGENTS.md "Mathematical results should include Lean proofs".
 on:
-  pull_request:
-    paths:
-      - '**/*.lean'
-      - '**/lakefile.toml'
-      - '**/lakefile.lean'
-      - '**/lean-toolchain'
-      - '**/lake-manifest.json'
-      - 'tools/lean/**'
-      - '.github/workflows/lean-proof-gate.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:

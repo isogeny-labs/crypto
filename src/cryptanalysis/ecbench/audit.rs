@@ -31,8 +31,8 @@ use crate::cryptanalysis::ecbench::canonical::sha256_hex;
 use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
 use crate::cryptanalysis::ecbench::methods::{MethodSpec, PhaseRecord, SolveReport};
 use crate::cryptanalysis::ecbench::record::{
-    check_line_seal, child_main, floor_s, grade_for_version, grading_version_supported,
-    json_roundtrip, ChildInput, GradeInput, Record, CHILD_INPUT_SCHEMA,
+    check_line_seal, child_main, f4_accounting_note, floor_s, grade_for_version,
+    grading_version_supported, json_roundtrip, ChildInput, GradeInput, Record, CHILD_INPUT_SCHEMA,
 };
 use crate::cryptanalysis::ecbench::runner::{read_record_lines, read_session, PlanDoc};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Spec};
@@ -633,6 +633,18 @@ pub fn audit_with(
                     if !counts_ok {
                         diffs.push("phase counts");
                     }
+                    // bitop/v1 counters compare only when the committed
+                    // record has them: one written before they existed
+                    // carries none, and unknown is not a disagreement.
+                    if r.phases.iter().any(|p| !p.work_native.is_empty())
+                        && rep
+                            .phases
+                            .iter()
+                            .map(|p| &p.work_native)
+                            .ne(r.phases.iter().map(|p| &p.work_native))
+                    {
+                        diffs.push("work counters");
+                    }
                     if !phases_ok {
                         diffs.push("phase gae");
                     }
@@ -665,7 +677,30 @@ pub fn audit_with(
                         } else if diffs.is_empty() {
                             "identical".into()
                         } else {
-                            format!("differs in {}", diffs.join(", "))
+                            // A word-XOR solver record whose replay differs in
+                            // counts is named by the accounting it was made
+                            // under, when that can be the reason; the failure
+                            // itself is unchanged.  A difference in pricing
+                            // alone (gae, unpriced) is not an accounting
+                            // difference and gets no note.
+                            let has_bmi2 = host.stable.arch == "x86_64"
+                                && host.stable.features.iter().any(|f| f == "bmi2");
+                            let note = r
+                                .solver
+                                .as_ref()
+                                .filter(|s| s.op_unit.contains("word XOR"))
+                                .filter(|_| diffs.contains(&"phase counts"))
+                                .and_then(|_| {
+                                    f4_accounting_note(
+                                        &session.accounting_versions,
+                                        session.started_unix_ms,
+                                        has_bmi2,
+                                    )
+                                });
+                            match note {
+                                Some(n) => format!("differs in {} ({n})", diffs.join(", ")),
+                                None => format!("differs in {}", diffs.join(", ")),
+                            }
                         },
                     )
                 }
