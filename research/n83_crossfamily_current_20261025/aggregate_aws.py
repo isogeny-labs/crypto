@@ -48,6 +48,8 @@ def aggregate(strata, snapshot, head):
     validated = {
         'schema': 'n83.crossfamily-current-validated/v1',
         'provider': 'aws_ec2_spot',
+        'curve_id': runner.generator.CURVE_ID,
+        'subgroup_order': runner.generator.group.R,
         'source_sha256': runner.SOURCE_SHA256,
         'targets_sha256': runner.TARGETS_SHA256,
         'answers_sha256': runner.ANSWERS_SHA256,

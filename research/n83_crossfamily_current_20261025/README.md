@@ -19,6 +19,11 @@ regenerates the points from the domain
 35,172 earlier distinct public points in the prior inventory, nearby-grid
 screen, and sealed nearby-grid confirmation; it reports zero overlap and zero
 duplicates. Each point belongs to the subgroup of order `8569786107849059`.
+This `a=1` curve is the 53-bit-subgroup diagnostic in the broader N83 sweep.
+The sweep's primary `a=0` curve has subgroup order
+`2417851639230796216685689` and needs its own candidate and measurement
+comparison. The validated row and selector carry this curve ID and subgroup
+order explicitly.
 
 The measured panel compares the current-source K3300 wide3, K3450 wide3,
 K3500 root4, and K3596 root4 candidates on these same 16 points. The fixed panel has two
