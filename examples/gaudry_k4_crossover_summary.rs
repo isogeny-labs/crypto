@@ -177,6 +177,10 @@ fn main() {
             "log2_n": i["log2_n"],
             "log2_r": i["log2_r"],
             "status": i["status"],
+            "ic_session": i["session"],
+            "rho_session": rho.get(w).map(|r| r["session"].clone()),
+            "interrupted_session": i["session"].as_str().unwrap().contains(".attempt")
+                || rho.get(w).is_some_and(|r| r["session"].as_str().unwrap().contains(".attempt")),
             "rho_status": rho.get(w).map(|r| r["status"].clone()),
             "ic_s": s_ic,
             "rho_s": rho_s,
