@@ -627,13 +627,24 @@ follows the PR until it lands, under the check-in and merge rules below.
 another approval to merge a completed, passing PR unless a policy or reviewer
 requires explicit authorization for that merge, and it follows these rules:
 
+- **The merge set is three checks.** A pull request merges when `gate`
+  (validation-gate), `size` (large-files), and `artifacts` have passed on the
+  current head. Those are the only workflows that run on `pull_request`,
+  besides the pull-request review and the autofix label queue. Rust lint, the
+  workspace compile, ecbench, CodeQL, Lean, the release build, and the
+  research workflows run after the change is on `main` (a push, usually
+  limited to the paths that workflow names) or on their existing schedule.
+  CodeQL runs weekly. `workflow_dispatch` runs one of them now. Do not wait
+  on a pull request for a check that did not run, and do not put
+  `pull_request` back on those workflows to chase a green box.
 - Apply merge authorization to PRs created or maintained for the current user
   task, not unrelated PRs. An explicit instruction to leave a PR open, keep it
   as a draft, wait for review, or avoid merging overrides this default.
-- Check the current PR head: all required and applicable CI checks must have
-  completed successfully. Pending, cancelled, timed-out, or failed checks are
-  not a pass. A skipped job counts as inapplicable only when its conditions or
-  path filters justify that status; required checks must still be satisfied.
+- Check the current PR head: the merge set above must have completed
+  successfully. Pending, cancelled, timed-out, or failed checks in that set
+  are not a pass. A skipped job counts as inapplicable only when its
+  conditions or path filters justify that status; a required check must still
+  be satisfied.
 - **Checks that never start do not block** (owner, 2026-10-23). A check that
   no branch-protection rule or ruleset requires, and that has been queued for
   24 hours or more without starting (no runner picked it up), does not hold

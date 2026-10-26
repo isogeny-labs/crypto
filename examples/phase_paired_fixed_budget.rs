@@ -1351,7 +1351,7 @@ fn schedule(inst: &Instance, forms: &[String], reps: u64) -> Vec<Value> {
     for rep in 1..=reps {
         for form in forms {
             for (i, t) in inst.targets.iter().enumerate() {
-                let order = if (i as u64 + rep - 1) % 2 == 0 {
+                let order = if (i as u64 + rep - 1).is_multiple_of(2) {
                     ["A", "B"]
                 } else {
                     ["B", "A"]
@@ -2061,7 +2061,7 @@ fn native_curve_and_space(
             count += if gf.tr(c) == 0 { 2 } else { 0 };
         }
     }
-    assert!(count % 4 == 0, "expected a cofactor-4 curve");
+    assert!(count.is_multiple_of(4), "expected a cofactor-4 curve");
     let r = count / 4;
     let ec = Ec::new(n, modulus, r, 4);
     let (mut v0, mut v1) = (2i128, -1i128);

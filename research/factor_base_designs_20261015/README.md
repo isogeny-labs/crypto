@@ -357,6 +357,16 @@ high-memory Spot node is available. The runner is
 Predictions: K8S-A0 memory-bound near 3450 s, K8S-A11 a timeout at 14 400 s near
 90 GB. No E row exists yet.
 
+### Amendment 14: registered (256 GiB EC2 host, R256-A0 and R256-A11)
+
+Amendment 13's EKS runner could not start: the ARC controller's GitHub token
+cannot reach `isogeny-labs/crypto` (404 on the runner registration call), and
+the owner did not replace it. Amendment 14 registers the same two cells on one
+EC2 `r7i.8xlarge` (256 GiB), run one after the other, with
+`scripts/run_amendment14.sh`, analysis `analyze --amendment14`. Predictions:
+R256-A0 memory-bound near 6100 s, R256-A11 a timeout at 14 400 s near 90 GB.
+Amendment 13 stays registered, with no rows. No R256 row exists yet.
+
 ### Close-out of the prime-field slope line (2026-10-19)
 
 Observations only; no new run. Sources: `runs/analysis-amendment4.txt`,
