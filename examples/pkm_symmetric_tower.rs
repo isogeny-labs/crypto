@@ -86,7 +86,7 @@ fn sqrtm(a: u64, p: u64) -> Option<u64> {
     while powm(z, (p - 1) / 2, p) != p - 1 {
         z += 1;
     }
-    let (mut m, mut c, mut t, mut r) = (s, powm(z, q, p), powm(a, q, p), powm(a, (q + 1) / 2, p));
+    let (mut m, mut c, mut t, mut r) = (s, powm(z, q, p), powm(a, q, p), powm(a, q.div_ceil(2), p));
     while t != 1 {
         let mut i = 0;
         let mut tt = t;
@@ -134,7 +134,7 @@ impl Pol {
     }
     fn c(n: usize, c: u64, p: u64) -> Self {
         let mut f = Self::zero(n);
-        if c % p != 0 {
+        if !c.is_multiple_of(p) {
             f.t.insert(vec![0; n], c % p);
         }
         f
@@ -599,7 +599,7 @@ fn main() {
         let tmax = if m == 2 { tmax2 } else { tmax3 };
         for t in 1..=tmax {
             let mut rng = Rng(0x504B_4D53 ^ ((m as u64) << 32) ^ t as u64);
-            assert!((p - 1) % (1u64 << t) == 0, "2^t must divide p − 1");
+            assert!((p - 1).is_multiple_of(1u64 << t), "2^t must divide p − 1");
             let zeta = loop {
                 let h = 2 + rng.below(p - 2);
                 if powm(h, (p - 1) / 2, p) == p - 1 {

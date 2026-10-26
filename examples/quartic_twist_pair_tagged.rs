@@ -113,7 +113,6 @@ struct Stage {
 }
 
 struct TaggedIndex {
-    params: ActionParams,
     maps: Vec<Vec<SignedIndex>>,
     reps: Vec<Pair>,
     keys: Vec<Key>,
@@ -317,7 +316,6 @@ fn build_tagged(c: &Curve4, base: &[Pt4]) -> TaggedIndex {
     postings.shrink_to_fit();
     reps.shrink_to_fit();
     TaggedIndex {
-        params: par,
         maps,
         reps,
         keys,
