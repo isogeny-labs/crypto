@@ -40,7 +40,7 @@ use crate::cryptanalysis::koblitz_groebner::{matrix_f4_f2, DecompositionSystem, 
 use crate::cryptanalysis::koblitz_index_calculus::{
     absolute_trace_bit, lift_candidate, FrobeniusFactorBase, KoblitzCurve, SatDecompositionStats,
 };
-use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{bit, F2BoolMono, F2BoolPoly, Mask, MASK_BITS};
 use crate::cryptanalysis::wdsat_oracle::AnfRow;
 use num_bigint::BigUint;
 use std::collections::HashMap;
@@ -564,8 +564,8 @@ fn build_rows(
     equations
 }
 
-fn model_to_u64(model: &[bool]) -> Option<u64> {
-    if model.len() > 64 {
+fn model_to_u64(model: &[bool]) -> Option<Mask> {
+    if model.len() > MASK_BITS {
         return None;
     }
     Some(
@@ -573,7 +573,7 @@ fn model_to_u64(model: &[bool]) -> Option<u64> {
             .iter()
             .enumerate()
             .filter(|(_, b)| **b)
-            .fold(0u64, |acc, (i, _)| acc | (1u64 << i)),
+            .fold(0 as Mask, |acc, (i, _)| acc | bit(i as u32)),
     )
 }
 
@@ -748,6 +748,10 @@ pub fn rows_satisfied(rows: &[AnfRow], model: &[bool]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     fn row(monos: &[&[u32]], constant: bool) -> AnfRow {
         AnfRow {
