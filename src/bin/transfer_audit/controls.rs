@@ -30,16 +30,22 @@ use crypto_lib::cryptanalysis::hyperelliptic_index_calculus::{
 };
 use crypto_lib::cryptanalysis::jacobian_transfer::cost::CostModel;
 
-use crate::certificate::round3;
-use crate::cost::{classify, price_jacobian_route, ConstructionCost, Route};
-use crate::ctx::Ctx;
+use crate::certificate::{round3, Evidence, LeadClass, TransferType, Verdict};
+use crate::cost::{log2_rho_with_class, price_jacobian_route, ConstructionCost, Route};
+use crate::ctx::{judge, Ctx, Judgement, Spec};
 use crate::ghs::subfield_order;
 use crate::spec::{random_binary_point, Instance};
+use crate::verdict::MapBasis;
 
-pub fn synthetic_ghs_control(model: &CostModel) -> Value {
-    let (log2_genus, field_bits, source_bits, log2_r) = (2.0f64, 40.0f64, 160.0f64, 158.0f64);
-    let reference = model.log2_rho_elliptic(log2_r, source_bits);
-    let baseline = reference - 0.5; // negation
+/// A synthetic descent priced like a certificate and judged by the same
+/// [`judge`] function `Ctx::finish` uses (the production path), twice: as
+/// the tool would record it (no map, no subgroup certificate), and with the
+/// map and the subgroup granted as a counterfactual.
+fn synthetic_judgements(
+    model: &CostModel,
+    (log2_genus, field_bits, source_bits, log2_r): (f64, f64, f64, f64),
+) -> (Spec, Judgement, Judgement) {
+    let baseline = log2_rho_with_class(model, log2_r, source_bits, 2);
     let rt = Route {
         log2_genus,
         field_bits,
@@ -51,23 +57,57 @@ pub fn synthetic_ghs_control(model: &CostModel) -> Value {
         ),
         transfer_eval_override: None,
         baseline_log2: baseline,
-        reference_no_aut_log2: reference,
+        reference_no_aut_log2: model.log2_rho_elliptic(log2_r, source_bits),
+        image_class: 2,
     };
-    let t = price_jacobian_route(model, &rt);
-    let class = classify(model, true, t.log2_cost_ratio.map(|r| -r));
+    let costs = price_jacobian_route(model, &rt);
+    let mut spec = Spec::new(
+        TransferType::GhsWeilDescent,
+        "control:synthetic_formula_advantage",
+        "synthetic GHS instance (formulas only)",
+        costs,
+    );
+    // No map and no subgroup certificate: the defaults of `Spec::new`; the
+    // route may carry the subgroup.
+    spec.carried = true;
+    let as_recorded = judge(model, &spec);
+    let mut granted = spec.clone();
+    granted.subgroup.status = Evidence::Verified;
+    granted.map_basis = MapBasis::Executed;
+    let counterfactual = judge(model, &granted);
+    (spec, as_recorded, counterfactual)
+}
+
+/// F10, positive control, through the production decision path.
+pub fn synthetic_ghs_control(model: &CostModel) -> Value {
+    let (spec, j, jg) = synthetic_judgements(model, (2.0, 40.0, 160.0, 158.0));
+    let pass = j.lead == LeadClass::FormulaAdvantage
+        && j.verdict == Verdict::NoWeaknessFoundInScope
+        && jg.verdict == Verdict::SourceTransferWeak;
     json!({
         "schema": "transfer-audit/control/v1",
         "id": "control:synthetic_formula_advantage",
         "protocol": "F10",
+        "path": "Spec -> ctx::judge, the function Ctx::finish uses for every certificate (verdict::decide, cost::classify, route evaluation)",
         "description": "synthetic GHS instance: genus 4 over F_(2^40) carrying a 158-bit subgroup of a curve over a 160-bit field; no curve, no map, formulas only",
-        "costs": t,
-        "lead_class": class,
+        "costs": spec.costs,
+        "lead_class": j.lead,
+        "verdict": j.verdict,
+        "verdict_basis": j.basis,
+        "evaluation": j.evaluation,
         "expected_lead_class": "formula_advantage",
-        "pass": class == crate::certificate::LeadClass::FormulaAdvantage,
-        "note": "shows the classifier can flag a lead; the lead is not a weakness (no map, no subgroup certificate)",
+        "expected_verdict": "no weakness found in scope",
+        "counterfactual_with_map_and_subgroup_granted": {
+            "note": "the same priced route with the map executed and the subgroup verified, inputs that do not exist for this synthetic instance: shows the decision rule and the margin turn the lead into a weakness verdict once the missing ingredients are supplied",
+            "lead_class": jg.lead,
+            "verdict": jg.verdict,
+            "verdict_basis": jg.basis,
+            "expected_verdict": "source-transfer-weak",
+        },
+        "pass": pass,
+        "note": "shows the classifier flags a lead and the verdict rule withholds a weakness verdict without a map and a subgroup certificate; the lead is not a weakness",
     })
 }
-
 /// Build the instance of a subgroup contained in `E(F_(2^l))`: the largest
 /// prime `r' > n/l` of `#E(F_(2^l))` other than the instance's own `r`, with
 /// a generator found as a seeded point times the cofactor and required to
@@ -249,4 +289,40 @@ pub fn hec_ic_control(plan: &[(u32, &[u64])], id: &str, post_hoc: bool) -> Value
         "all_rows_ic_above_modelled_source_rho": all_above,
         "pass": all_above && summary.iter().all(|s| s["pass"] == json!(true)),
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::certificate::RouteStatus;
+
+    /// F10 goes through `judge`, the production decision function: the
+    /// recorded certificate has a `formula_advantage` lead and the verdict
+    /// `no weakness found in scope` (no map, no subgroup certificate), and
+    /// granting those two ingredients turns the same price into a weakness.
+    #[test]
+    fn f10_runs_the_production_decision_path() {
+        let v = synthetic_ghs_control(&CostModel::default());
+        assert_eq!(v["pass"], true, "{v}");
+        assert_eq!(v["lead_class"], "formula_advantage");
+        assert_eq!(v["verdict"], "no weakness found in scope");
+        assert_eq!(v["evaluation"]["status"], "not_evaluable");
+        assert_eq!(
+            v["counterfactual_with_map_and_subgroup_granted"]["verdict"],
+            "source-transfer-weak"
+        );
+        assert!(v["path"].as_str().unwrap().contains("ctx::judge"));
+    }
+
+    /// The control can fail: a route over a field where index calculus loses
+    /// to rho is not flagged, even with the map and subgroup granted.
+    #[test]
+    fn f10_negative_control_is_not_flagged() {
+        let m = CostModel::default();
+        let (_, j, jg) = synthetic_judgements(&m, (2.0, 80.0, 160.0, 158.0));
+        assert_ne!(j.lead, LeadClass::FormulaAdvantage);
+        assert_eq!(j.verdict, Verdict::NoWeaknessFoundInScope);
+        assert_eq!(jg.verdict, Verdict::NoWeaknessFoundInScope);
+        assert_eq!(jg.evaluation.status, RouteStatus::Excluded);
+    }
 }

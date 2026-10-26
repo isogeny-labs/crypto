@@ -372,6 +372,16 @@ def nist_selection_factor_census(ref, since):
                  label=f"NIST all-21 census: complete {family} records", source=source)
 
 
+def nist_selection_exact_embedding(ref, since):
+    path = "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_exact_embedding.certified_rows", data.get("passed"),
+             date=date, problem="nist-candidate-selection", unit="curves", better="higher",
+             label="NIST all-21 census: exact embedding degrees with direct-power certificates",
+             source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -386,6 +396,7 @@ def main():
     photo_volcano(a.ref)
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
+    nist_selection_exact_embedding(a.ref, a.since)
 
 
 if __name__ == "__main__":
