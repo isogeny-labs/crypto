@@ -81,6 +81,9 @@ pub enum FrobeniusOrbitRootEncoding {
 /// The exact selector and phase wires allocated for one orbit-domain block.
 /// Selectors follow the sorted representative order used during installation.
 #[derive(Clone, Debug)]
+/// SAT wires allocated for one exact Frobenius-orbit x-domain. Selectors
+/// follow the sorted representative order used by the domain builder.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FrobeniusOrbitChoiceWires {
     pub selectors: Vec<u32>,
     pub phase: Vec<u32>,
@@ -566,7 +569,8 @@ impl ChainedS3Encoding {
         Ok(required)
     }
 
-    /// Available only after an exact Frobenius-orbit domain is installed.
+    /// Return exact selector/phase wires after an orbit-domain installation.
+    /// Coordinate-only domains have no such wires.
     pub fn orbit_choice_wires(&self) -> Option<&[FrobeniusOrbitChoiceWires]> {
         (!self.orbit_choice_wires.is_empty()).then_some(&self.orbit_choice_wires)
     }
@@ -623,6 +627,43 @@ impl ChainedS3Encoding {
     /// then re-evaluate the chain over the original binary field.
     pub fn verify_external_assignment(&self, model: &[bool]) -> bool {
         self.solver.check_original_assignment(model) && self.verify_field_assignment(model)
+
+    /// Fix one named x-coordinate block: summands `0..m`, intermediate
+    /// outputs `m..2m-2`, and the final target at `2m-2`. The target is
+    /// fixed by `build`, so this only checks that its value agrees.
+    pub fn pin_x_block(
+        &mut self,
+        block_index: usize,
+        value: &F2mElement,
+    ) -> Result<(), ChainBuildError> {
+        if value.m_value() != self.n || block_index >= self.blocks.len() {
+            return Err(ChainBuildError::Unsupported);
+        }
+        if block_index == self.blocks.len() - 1 {
+            return if self.target_x.as_ref() == Some(value) {
+                Ok(())
+            } else {
+                Err(ChainBuildError::Unsupported)
+            };
+        }
+        let bits = value.to_biguint();
+        for (bit, &wire) in self.blocks[block_index].iter().enumerate() {
+            self.solver.add_clause(vec![if bits.bit(bit as u64) {
+                wire as Lit
+            } else {
+                -(wire as Lit)
+            }]);
+        }
+        Ok(())
+    }
+
+    /// Decode every x block of a SAT model in the same named order.
+    pub fn decode_x_blocks(&self) -> Vec<F2mElement> {
+        let model = self.solver.model();
+        self.blocks
+            .iter()
+            .map(|block| self.decode_block(block, &model))
+            .collect()
     }
 
     /// Re-evaluate every active S3 over the original field and each
@@ -850,7 +891,9 @@ mod tests {
     use super::*;
     use crate::binary_ecc::BinaryPoint;
     use crate::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
-    use crate::cryptanalysis::sat::SolveResult;
+    use crate::cryptanalysis::sat::{RootPropagationResult, SolveResult, SolverProgress};
+    use std::sync::Arc;
+    use std::time::Instant;
 
     #[test]
     fn first_pair_lex_constraint_keeps_exactly_one_swap_orientation() {
@@ -1054,9 +1097,199 @@ mod tests {
 
     #[test]
     fn source_bound_covers_degree_83_without_constructing_a_model() {
+        assert_eq!(chain_s3_max_variables(83, 4), Some(63_578));
         assert_eq!(chain_s3_max_variables(83, 5), Some(84_743));
         assert_eq!(chain_s3_max_variables(83, 6), Some(105_908));
         assert_eq!(chain_s3_max_variables(83, 7), None);
+    }
+
+    #[test]
+    fn named_complete_witness_pins_all_four_summand_chain_blocks() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let generator = kc.generator();
+        let xs: Vec<_> = (1..=4u32)
+            .map(
+                |multiple| match kc.mul(generator, &BigUint::from(multiple)) {
+                    BinaryPoint::Affine { x, .. } => x,
+                    BinaryPoint::Infinity => panic!("complete witness must be affine"),
+                },
+            )
+            .collect();
+        let expected = vec![
+            xs[0].clone(),
+            xs[0].clone(),
+            xs[0].clone(),
+            xs[0].clone(),
+            xs[1].clone(),
+            xs[2].clone(),
+            xs[3].clone(),
+        ];
+        let mut enc = ChainedS3Encoding::build(
+            4,
+            &kc.curve.irreducible,
+            &kc.curve.b,
+            Some(&xs[3]),
+            0,
+            2_000,
+        )
+        .unwrap();
+        let clauses_before_target = enc.solver.n_clauses();
+        enc.pin_x_block(6, &xs[3]).unwrap();
+        assert_eq!(enc.solver.n_clauses(), clauses_before_target);
+        assert_eq!(
+            enc.pin_x_block(6, &xs[2]),
+            Err(ChainBuildError::Unsupported)
+        );
+        assert_eq!(
+            enc.pin_x_block(7, &xs[3]),
+            Err(ChainBuildError::Unsupported)
+        );
+        for (block, value) in expected.iter().enumerate() {
+            enc.pin_x_block(block, value).unwrap();
+        }
+        assert_eq!(enc.solver.propagate_root(), RootPropagationResult::Fixpoint);
+        assert_eq!(enc.solver.solve(), SolveResult::Sat);
+        assert!(enc.verify_model());
+        assert_eq!(enc.decode_x_blocks(), expected);
+    }
+
+    #[test]
+    fn orbit_choice_observer_preserves_small_chain_group_lift_and_records_overhead() {
+        fn affine_x(point: &BinaryPoint) -> F2mElement {
+            match point {
+                BinaryPoint::Affine { x, .. } => x.clone(),
+                BinaryPoint::Infinity => panic!("small control point is infinity"),
+            }
+        }
+
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let generator = kc.generator();
+        let p = kc.mul(generator, &BigUint::from(1u32));
+        let q = kc.mul(generator, &BigUint::from(2u32));
+        let three = kc.mul(generator, &BigUint::from(3u32));
+        let target = kc.mul(generator, &BigUint::from(5u32));
+        let (xp, xq, x3, xt) = (
+            affine_x(&p),
+            affine_x(&q),
+            affine_x(&three),
+            affine_x(&target),
+        );
+        assert_ne!(xp, xq);
+        let expected = vec![
+            xp.clone(),
+            xp.clone(),
+            xp.clone(),
+            xq.clone(),
+            xq.clone(),
+            x3,
+            xt.clone(),
+        ];
+        let representatives = vec![xp.to_biguint(), xq.to_biguint()];
+        let mut sorted_representatives = representatives.clone();
+        sorted_representatives.sort_unstable();
+
+        let make = || {
+            let mut enc = ChainedS3Encoding::build(
+                4,
+                &kc.curve.irreducible,
+                &kc.curve.b,
+                Some(&xt),
+                0,
+                2_000,
+            )
+            .unwrap();
+            enc.constrain_frobenius_orbit_summands(&representatives, 2_000, 10_000)
+                .unwrap();
+            for (block, x) in expected.iter().enumerate() {
+                enc.pin_x_block(block, x).unwrap();
+            }
+            let handles = enc.orbit_choice_wires().unwrap().to_vec();
+            assert_eq!(handles.len(), 4);
+            for (slot, x) in expected[..4].iter().enumerate() {
+                let index = sorted_representatives
+                    .binary_search(&x.to_biguint())
+                    .unwrap();
+                assert_eq!(handles[slot].selectors.len(), 2);
+                assert_eq!(handles[slot].phase.len(), 3);
+                assert!(enc
+                    .solver
+                    .add_clause(vec![handles[slot].selectors[index] as Lit]));
+                for &wire in &handles[slot].phase {
+                    assert!(enc.solver.add_clause(vec![-(wire as Lit)]));
+                }
+            }
+            enc
+        };
+
+        let run = |mut enc: ChainedS3Encoding, observed: bool, contradiction: bool| {
+            if contradiction {
+                let wrong = if xp.to_biguint().bit(0) { -1 } else { 1 };
+                enc.solver.add_clause(vec![wrong]);
+            }
+            let progress = observed.then(|| Arc::new(SolverProgress::default()));
+            if let Some(progress) = &progress {
+                enc.solver.set_progress_observer(Arc::clone(progress));
+            }
+            let result = enc.solver.solve();
+            let model = if result == SolveResult::Sat {
+                assert!(!contradiction);
+                assert!(enc.verify_model());
+                assert_eq!(enc.decode_x_blocks(), expected);
+                let mut lifted_sum = BinaryPoint::Infinity;
+                for x in enc.decode_summands() {
+                    let lifted = if x == xp {
+                        &p
+                    } else if x == xq {
+                        &q
+                    } else {
+                        panic!("decoded x was not in the checked lift table")
+                    };
+                    lifted_sum = kc.add(&lifted_sum, lifted);
+                }
+                assert_eq!(lifted_sum, target);
+                Some(enc.solver.model())
+            } else {
+                assert_eq!(result, SolveResult::Unsat);
+                None
+            };
+            if let Some(progress) = progress {
+                let snapshot = progress.snapshot();
+                assert_eq!(snapshot.xor_passes, enc.solver.stats.xor_passes);
+                assert_eq!(snapshot.xor_nanoseconds, enc.solver.stats.ns_propagate_xors);
+                assert_eq!(snapshot.xor_row_scans, enc.solver.stats.xor_row_scans);
+                assert_eq!(snapshot.xor_repivots, enc.solver.stats.xor_repivots);
+                assert_eq!(snapshot.xor_row_ops, enc.solver.stats.xor_row_ops);
+            }
+            (result, model)
+        };
+
+        for contradiction in [false, true] {
+            assert_eq!(
+                run(make(), false, contradiction),
+                run(make(), true, contradiction)
+            );
+        }
+
+        // One-thread, release-mode descriptive overhead control. Preparation
+        // is outside each timed interval; both arms verify every answer.
+        for repetition in 0..20 {
+            let order = if repetition % 2 == 0 { [0, 1] } else { [1, 0] };
+            let mut elapsed = [0u128; 2];
+            for arm in order {
+                let cases: Vec<_> = (0..100).map(|_| make()).collect();
+                let start = Instant::now();
+                for enc in cases {
+                    assert_eq!(run(enc, arm == 1, false).0, SolveResult::Sat);
+                }
+                elapsed[arm] = start.elapsed().as_nanos();
+            }
+            println!(
+                "{{\"schema\":\"n83.selector-small-observer-overhead/v1\",\"repetition\":{repetition},\"order\":\"{}\",\"direct_ns\":{},\"observed_ns\":{}}}",
+                if repetition % 2 == 0 { "AB" } else { "BA" },
+                elapsed[0],
+                elapsed[1],
+            );
+        }
     }
 
     #[test]
@@ -1247,6 +1480,14 @@ mod tests {
 
     #[test]
     fn frobenius_orbit_preflight_caps_before_mutation_and_counts_n83() {
+        assert_eq!(
+            frobenius_orbit_domain_size(83, 4, 2_001),
+            Some(FrobeniusOrbitDomainSize {
+                variables: 21_012,
+                clauses: 697_808,
+                xor_rows: 2_656,
+            })
+        );
         assert_eq!(
             frobenius_orbit_domain_size(83, 5, 2_001),
             Some(FrobeniusOrbitDomainSize {

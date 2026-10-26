@@ -192,6 +192,18 @@ Module: `cryptanalysis::solinas_correlations`.
 Verdict: no measurable scalar-output bit correlation from the
 Solinas reduction structure at `10⁶` samples.
 
+### Correction 2026-10-22 to 5.1
+
+The z-scores behind the recorded null result used a standard error too large by
+about `sqrt(3)` (maximum |z| 2.46 at `N = 10^6`). Recalibrated on the same seed,
+the maximum is 4.26, still below the 6.11 multiple-comparison threshold, so the
+null verdict stands. The statement above that "all correlations are within the
+`3σ` envelope" cannot hold for 131,072 pairs under any null (about 350 exceed 3σ
+by chance) and is superseded by this correction; the experiment is bit pairs of
+a random 512-bit input and its Solinas reduction, not scalar versus `k·G`
+coordinates. Details: `research/solinas_correlation_recalibration_20261022/`
+and the correction in `research/notes/cm-isogeny/RESEARCH_P256.md`.
+
 ### 5.2  Embedding-degree probe
 
 ```
@@ -427,6 +439,19 @@ have found **no structural weakness in `b`**:
 Verdict: the "NIST-rigged" hypothesis is **unfalsifiable in
 finite probes**, but every measurable property of P-256 falls
 within the expected distribution for a random curve of its size.
+
+**Update 2026-10-16: the seed is explained.** The P-256 seed is block
+1842 of `(int)(drand48() * 256)` output after `srand48(871696354)`
+(1997-08-16 01:52:34 UTC); all the NIST prime-curve seeds come from
+the same procedure (Anthropic Frontier Red Team and F. Valsorda,
+2026-10-16; reproduced in `research/nist_seed_provenance_20261016/` and
+`src/cryptanalysis/nist_seed_provenance.rs`). The "NIST-rigged"
+hypothesis is therefore no longer unfalsifiable on the seed side. The
+generator's remaining freedom was the start time and which accepted
+candidate to publish, about 30 bits, too little to target any weak
+class rarer than about one curve in 2^30. Still unexplained: how `G`
+was chosen (irrelevant to ECDLP in a prime-order group) and why about
+half the valid candidates in each run were skipped.
 
 ---
 

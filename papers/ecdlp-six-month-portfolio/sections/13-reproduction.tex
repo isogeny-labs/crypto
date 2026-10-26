@@ -1,0 +1,91 @@
+\section{Reproduction, coverage, and deliverable status}\label{app:reproduction}
+
+\subsection{Companion artifacts}
+
+The paper directory contains editable LaTeX, the built PDF, vector
+figures with PNG browsing copies, their recorded input data, a pinned
+source register, compact review receipts and a compressed catalogue.
+The catalogue contains repository and branch manifests, commit
+metadata, tracked-file inventory, document and study indexes, literal
+ledger status fields, parsing failures and topic-tag definitions.
+The tags are overlapping textual classifications; they are not
+scientific judgements or independent experiment labels.
+
+The separate downloaded volcano archive remains linked through its
+original Drive identity and SHA-256. The paper does not copy its
+executables or raw solver tree into a new experiment, and no downloaded
+binary was executed for the archive check. The byte-manifest receipt
+states exactly which entries were verified.
+
+\subsection{Fresh checks and their limits}
+
+\begin{enumerate}
+\item Git trees and snapshot-reachable histories are enumerated at the
+recorded pins. All current captured heads are listed separately, with
+their own metadata union. A post-snapshot open branch never becomes
+landed evidence merely by being fetched.
+\item All nineteen frontier \file{records.jsonl} hashes match their
+session metadata. Fresh counting reproduces 4,848 total and 3,232
+non-warm-up executions, including their unsuccessful outcomes. Stored
+replay receipts are inspected, not rerun by a new Rust binary here.
+\item The volcano archive contains 35,290 tar members and 29,409
+manifested regular files. All manifested file hashes match, with no
+missing entries or unmanifested extra regular files. This is integrity
+verification rather than mathematical validation.
+The expanded pass also checks all 79,462 manifest entries of the later
+7,937-vertex archive and all 125 entries of the separate original-C
+full-point-order archive, against their published outer hashes. Their
+receipts are separate and neither archive's programs are executed.
+\item The cryptanalysis native library builds with GCC 14.2.0 and CMake
+4.4, Release configuration, CUDA and cuPQC disabled. Fifteen of seventeen
+configured tests pass initially; the use-case test is missing its sparse
+files and the coordinator test is denied local sockets. After restoring
+those tracked files and enabling network access for the test process,
+both failed tests pass. Initial and rerun logs are retained. The GPU
+test in this CPU-only build is not a hardware GPU measurement.
+\item The paper's own check builds the PDF, checks citations and source
+keys, confirms figure inputs and named counts, and checks for unresolved
+references and overfull boxes. Rendering and page inspection assess the
+delivered PDF, not the truth of its cited experiments.
+\end{enumerate}
+
+\subsection{Requirement-to-evidence coverage}
+
+\begin{longtable}{@{}p{4.2cm}p{3cm}p{6.2cm}@{}}\toprule
+Requested assessment & Status & Evidence or remaining gap \\\midrule\endhead
+Map crypto, cryptanalysis, autoresearcher and related projects & Complete
+as an accessible repository inventory & Nineteen pinned trees and current
+branch manifests; private or uncommitted material is not inferred \\
+Measure six months of recorded work & Complete for the defined metadata
+metrics & Exact window, pins, counting rules and catalogues; not a measure
+of labour, money or global historical rank \\
+Explain fields, implementations and experiments & Expanded
+synthesis with selective deep audit & Main technical chapters plus
+4,075 directory records and source register; not every run independently
+re-executed \\
+Show concrete progress & Complete at the stated boundaries & Held-out
+IC configuration changes, solver and GPU stages, complete toy pipelines,
+structural discovery, native validation and archive checks \\
+Distinguish proofs from hypotheses & Scoped proof map; broader review open &
+Central source statements and missing bridges named; fresh Lean builds
+and full independent semantic review remain open \\
+Cover isogenies and graphs & Expanded summaries and three checked
+deliveries & Exact graph/measurement populations and outcomes;
+private packets and larger unfinished campaigns remain explicit \\
+Review everything in every branch and external archive & Partial &
+All captured branch commit metadata is indexed; only 94 pinned files have
+full reading receipts, with 50 earlier focused sources and 305,223 entries
+without reading receipts. Branch content and raw replay remain selective;
+the 51-GB mirror and private packets are unavailable. See
+Appendix~\ref{app:reading}. \\\bottomrule
+\end{longtable}
+
+\subsection{Before external submission}
+
+This is an anonymised research draft and retrospective, not a
+peer-reviewed paper or an external submission. Before submission, resolve
+or explicitly maintain the open-branch addendum, independently review
+the load-bearing source claims and proof fidelity, verify the literature
+and priority statements against primary publications, and rebuild from
+the chosen submission pins. A successful manuscript build is not
+clearance for a security or novelty claim.

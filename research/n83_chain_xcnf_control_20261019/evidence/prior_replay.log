@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/tmp/n83_chain_xcnf_20261019/research/koblitz_n83_factor_base_sweep_20261008/verification/known-witness-first-pattern-replay-20261014/replay.py", line 192, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/Volumes/SSD990-2/tmp/n83_chain_xcnf_20261019/research/koblitz_n83_factor_base_sweep_20261008/verification/known-witness-first-pattern-replay-20261014/replay.py", line 181, in main
+    raw = (json.dumps(replay(), sort_keys=True, indent=2) + "\n").encode()
+                      ~~~~~~^^
+  File "/Volumes/SSD990-2/tmp/n83_chain_xcnf_20261019/research/koblitz_n83_factor_base_sweep_20261008/verification/known-witness-first-pattern-replay-20261014/replay.py", line 73, in replay
+    require(digest(raw) == expected, f"pinned file differs: {relative}")
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/SSD990-2/tmp/n83_chain_xcnf_20261019/research/koblitz_n83_factor_base_sweep_20261008/verification/known-witness-first-pattern-replay-20261014/replay.py", line 43, in require
+    raise ValueError(message)
+ValueError: pinned file differs: src/cryptanalysis/koblitz_large_prime.rs

@@ -179,8 +179,13 @@ device-roundtrip: fold2k_k23 fold2k_k41 $(FOLD_PLANS)
 	cd ../.. && $(CARGO) run --release --quiet --example load_fold_table -- \
 	  $(addprefix gpu/ecc2k/,$(DEVICE_TABLES))
 
+# 256-thread blocks measured +12-14% over 128 on the RTX PRO 6000 (sm_120);
+# other parts keep the header's 128 until measured.
+ifeq ($(ARCH),sm_120)
+R2K_BLOCK_FLAG ?= -DR2K_BLOCK=256
+endif
 bench: bench2k.cu $(HDRS) kernels2k.cuh curve_ecc2k95.h
-	$(NVCC) $(NVCCFLAGS) -DGPU_ECC2K_CURVE_HEADER='"curve_ecc2k95.h"' -o $@ $<
+	$(NVCC) $(NVCCFLAGS) $(R2K_BLOCK_FLAG) -DGPU_ECC2K_CURVE_HEADER='"curve_ecc2k95.h"' -o $@ $<
 
 clean:
 	rm -f $(GEN) $(TESTS) $(FOLD_PLANS) $(FOLD_TABLES) $(DEVICE_TABLES) bench \
