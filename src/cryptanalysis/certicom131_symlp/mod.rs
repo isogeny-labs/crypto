@@ -18,3 +18,4 @@ pub mod gf2w;
 pub mod planted;
 pub mod relgraph;
 pub mod sym2;
+pub mod sym2p;

@@ -74,6 +74,21 @@ pub trait SymCurve: Sync + Send {
         }
     }
 
+    /// `acc[i] ← acc[i] + jumps[i]` for every lane, one batched inversion
+    /// for the whole slice: the step of an adding walk (Pollard rho's
+    /// reference cost on the same field code).  Lanes whose sum is
+    /// undefined here (equal abscissae) are left unchanged and counted.
+    fn add_batch(&self, acc: &mut [Pt<Self::E>], jumps: &[Pt<Self::E>]) -> usize {
+        let mut skipped = 0;
+        for (a, j) in acc.iter_mut().zip(jumps) {
+            match self.add(a, j) {
+                Some(s) if a.x != j.x => *a = s,
+                _ => skipped += 1,
+            }
+        }
+        skipped
+    }
+
     /// `[k]P` (`None` for the point at infinity).
     fn mul(&self, p: &Pt<Self::E>, k: &BigUint) -> Option<Pt<Self::E>> {
         let mut acc: Option<Pt<Self::E>> = None;
@@ -248,6 +263,26 @@ impl SymCurve for BinaryW {
                 return if rng.gen() { self.neg(&p) } else { p };
             }
         }
+    }
+
+    fn add_batch(&self, acc: &mut [Pt<W3>], jumps: &[Pt<W3>]) -> usize {
+        let f = &self.f;
+        let mut den: Vec<W3> = acc.iter().zip(jumps).map(|(a, j)| gf2w::xor(a.x, j.x)).collect();
+        let mut scratch = Vec::with_capacity(den.len());
+        f.batch_inv(&mut den, &mut scratch);
+        let mut skipped = 0;
+        for ((a, j), inv) in acc.iter_mut().zip(jumps).zip(den.iter()) {
+            if gf2w::is_zero(inv) {
+                skipped += 1;
+                continue;
+            }
+            let dx = gf2w::xor(a.x, j.x);
+            let lam = f.mul(&gf2w::xor(a.y, j.y), inv);
+            let x3 = gf2w::xor(gf2w::xor(gf2w::xor(f.sqr(&lam), lam), dx), self.a);
+            let y3 = gf2w::xor(gf2w::xor(f.mul(&lam, &gf2w::xor(a.x, x3)), x3), a.y);
+            *a = Pt { x: x3, y: y3 };
+        }
+        skipped
     }
 
     fn plus_minus_keys(&self, t: &Pt<W3>, ps: &[Pt<W3>], out: &mut Vec<[Key; 2]>) {
@@ -463,6 +498,40 @@ impl SymCurve for PrimeW {
         }
     }
 
+    fn add_batch(&self, acc: &mut [Pt<E3>], jumps: &[Pt<E3>]) -> usize {
+        let mut f = self.c.field.clone();
+        let den: Vec<E3> = acc.iter().zip(jumps).map(|(a, j)| f.sub(j.x, a.x)).collect();
+        let mut prefix = Vec::with_capacity(den.len());
+        let mut prod = f.one();
+        for d in &den {
+            prefix.push(prod);
+            if !f.is_zero(*d) {
+                prod = f.mul(prod, *d);
+            }
+        }
+        let mut inv = f.inv(prod).expect("nonzero product");
+        let mut skipped = 0;
+        for i in (0..den.len()).rev() {
+            if f.is_zero(den[i]) {
+                skipped += 1;
+                continue;
+            }
+            let di = f.mul(inv, prefix[i]);
+            inv = f.mul(inv, den[i]);
+            let (a, j) = (acc[i], jumps[i]);
+            let dy = f.sub(j.y, a.y);
+            let lam = f.mul(dy, di);
+            let l2 = f.sqr(lam);
+            let sx = f.add(a.x, j.x);
+            let x3 = f.sub(l2, sx);
+            let dx = f.sub(a.x, x3);
+            let t = f.mul(lam, dx);
+            let y3 = f.sub(t, a.y);
+            acc[i] = Pt { x: x3, y: y3 };
+        }
+        skipped
+    }
+
     fn plus_minus_keys(&self, t: &Pt<E3>, ps: &[Pt<E3>], out: &mut Vec<[Key; 2]>) {
         let mut f = self.c.field.clone();
         out.clear();
@@ -556,6 +625,21 @@ mod tests {
     fn published_eccp_131_points_are_in_the_subgroup() {
         let (c, g, q) = PrimeW::eccp_131();
         check_curve(&c, &g, &q);
+    }
+
+    fn check_add_batch<C: SymCurve>(c: &C, seed: u64) {
+        let mut rng = StdRng::seed_from_u64(seed);
+        let mut acc: Vec<Pt<C::E>> = (0..33).map(|_| c.random_point(&mut rng)).collect();
+        let jumps: Vec<Pt<C::E>> = (0..33).map(|_| c.random_point(&mut rng)).collect();
+        let want: Vec<Pt<C::E>> = acc.iter().zip(&jumps).map(|(a, j)| c.add(a, j).unwrap()).collect();
+        assert_eq!(c.add_batch(&mut acc, &jumps), 0);
+        assert_eq!(acc, want);
+    }
+
+    #[test]
+    fn batched_walk_step_equals_single_additions() {
+        check_add_batch(&BinaryW::ecc2_131().0, 7);
+        check_add_batch(&PrimeW::eccp_131().0, 8);
     }
 
     #[test]
