@@ -1608,6 +1608,8 @@ mod tests {
                 declared_alpha: Some(0.5),
                 alpha_agrees_with_declared: Some(true),
                 scaling_claim: true,
+                alpha_in_additions: None,
+                alpha_in_additions_ci95: None,
             },
             constant: Constant {
                 s: Estimate {
@@ -1913,7 +1915,7 @@ mod tests {
         assert_eq!(version_of_schema(FRONTIER_SCHEMA), Some(2));
         assert_eq!(version_of_schema("x"), None);
         let b = fake("b", "rho.negation", &flat(1.0, 0.05, &FOUR), 0.0, false);
-        let one = build_version(&[b.clone()], &default_axes(), 1).unwrap();
+        let one = build_version(std::slice::from_ref(&b), &default_axes(), 1).unwrap();
         assert_eq!(one.schema, FRONTIER_SCHEMA_V1);
         let text = serde_json::to_string(&one).unwrap();
         assert!(
