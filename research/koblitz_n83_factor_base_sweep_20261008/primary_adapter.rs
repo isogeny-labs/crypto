@@ -12,7 +12,7 @@ use crypto_lib::binary_ecc::curve::point_neg;
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
 use crypto_lib::cryptanalysis::binary_semaev_chain_sat::{
     chain_s3_max_variables, finite_domain_clause_count, frobenius_orbit_domain_size,
-    ChainedS3Encoding,
+    frobenius_orbit_domain_size_with_encoding, ChainedS3Encoding, FrobeniusOrbitRootEncoding,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_explicit_frobenius_point_factor_base, build_union_s4_encoding,
@@ -21,6 +21,8 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     SatDecompositionOptions,
 };
 use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
+use crypto_lib::cryptanalysis::sat::{to_dimacs_xor, SolveResult};
+use crypto_lib::hash::sha256;
 use crypto_lib::cryptanalysis::sat::{
     RootPropagationResult, SolveResult, SolverProgress, SolverStats,
 };
@@ -368,6 +370,1195 @@ fn load_panel_selected(
 
 fn load_panel(root: &Path, columns: usize) -> Result<(PrimaryBase, Value, String)> {
     load_panel_selected(root, columns, "public_x_hash", SEEDS[0])
+}
+
+const FULL_D18_MANIFEST: &[u8] =
+    include_bytes!("verification/d18-full-orbit-20261025/manifest.json");
+const FULL_D18_REPLAY: &[u8] = include_bytes!("verification/d18-full-orbit-20261025/replay.json");
+const FULL_D18_CUSTODY: &[u8] =
+    include_bytes!("verification/d18-full-orbit-20261025/s3-independent-audit.json");
+const FULL_D18_OBJECT: &str = "c295da8898cfad29a053621c768ca059eea4263f89f5ca78b4f98af43c383f3f";
+const FULL_D18_SHA256: &str = "eaef94ef45b3d2d4cd2ec2f40c1173b4cdb2a437b7e618a858c73fb1caf3902b";
+const FULL_D18_POINT_SET: &str = "31aa8e1c1340f4db4898144af59f6f34c87fa63e0d88b175b854f58ce9008a7d";
+const FULL_D18_PUBLIC_CORPUS_SHA256: &str =
+    "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd";
+
+fn sha256_hex(bytes: &[u8]) -> String {
+    sha256::sha256(bytes)
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
+}
+
+fn full_d18_phase(file: &mut fs::File, started: Instant, phase: &str, detail: Value) -> Result<()> {
+    writeln!(
+        file,
+        "{}",
+        json!({
+            "schema":"n83.full-d18-m4-phase/v1", "phase":phase,
+            "elapsed_process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+            "detail":detail,
+        })
+    )?;
+    file.sync_all()?;
+    Ok(())
+}
+
+fn full_d18_load(root: &Path) -> Result<(PrimaryBase, Value)> {
+    let manifest_bytes = fs::read(root.join("manifest.json"))?;
+    if manifest_bytes != FULL_D18_MANIFEST {
+        return Err("full D18 producer manifest differs from committed evidence".into());
+    }
+    let manifest: Value = serde_json::from_slice(&manifest_bytes)?;
+    let replay: Value = serde_json::from_slice(FULL_D18_REPLAY)?;
+    let custody: Value = serde_json::from_slice(FULL_D18_CUSTODY)?;
+    let object = format!("objects/{FULL_D18_OBJECT}.jsonl.gz");
+    if manifest["schema"] != "n83.direct-subgroup-orbit-export/v1"
+        || manifest["study"] != STUDY
+        || manifest["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
+        || manifest["policy"] != "direct_subgroup_x_d18_full"
+        || manifest["source_commit"] != "5bac5f1d9221b908f743520aa9039dd48d175f0e"
+        || manifest["columns"] != 32_643
+        || manifest["points"] != 5_418_738
+        || manifest["object"] != object
+        || manifest["compressed_blake3"] != FULL_D18_OBJECT
+        || manifest["compressed_sha256"] != FULL_D18_SHA256
+        || manifest["point_set_blake3"] != FULL_D18_POINT_SET
+        || manifest["bytes"] != 160_747_529u64
+        || manifest["selected_best_total_runtime"] != Value::Null
+        || replay["status"] != "PASS"
+        || replay["points_checked"] != 5_418_738
+        || replay["point_set_blake3"] != FULL_D18_POINT_SET
+        || replay["compressed_sha256"] != FULL_D18_SHA256
+        || custody["status"] != "PASS_FULL_OBJECT_AND_MANIFEST"
+        || custody["source_commit"] != manifest["source_commit"]
+        || custody["fresh_get"]["sha256"] != FULL_D18_SHA256
+        || custody["fresh_get"]["blake3"] != FULL_D18_OBJECT
+        || custody["point_set_blake3"] != FULL_D18_POINT_SET
+    {
+        return Err("full D18 archive, generic replay or S3 custody binding differs".into());
+    }
+    let compressed = fs::read(root.join(&object))?;
+    let actual_sha = sha256_hex(&compressed);
+    if compressed.len() != 160_747_529 || actual_sha != FULL_D18_SHA256 {
+        return Err("full D18 archive length or SHA-256 differs".into());
+    }
+    let row = json!({
+        "a":0, "columns":32_643, "points":5_418_738,
+        "policy":"direct_subgroup_x_d18_full", "seed":0,
+        "object":object, "compressed_blake3":FULL_D18_OBJECT,
+        "plain_blake3":manifest["plain_blake3"],
+        "point_set_blake3":FULL_D18_POINT_SET,
+    });
+    let base = from_record(&row, &load_object(root, &row)?)?;
+    Ok((base, row))
+}
+
+pub(super) fn check_full_d18_export(root: &Path) -> Result<Value> {
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
+    let started = Instant::now();
+    let (base, row) = full_d18_load(root)?;
+    Ok(json!({
+        "schema":"n83.primary-full-d18-adapter/v1", "status":"PASS",
+        "curve_id":"icv1-f2m83-tm6151469093347-debefd74",
+        "source_commit":source_commit,
+        "source_attestation_mode":source_attestation_mode,
+        "binary_sha256":binary_sha256,
+        "policy":row["policy"], "object":row["object"],
+        "point_set_blake3":FULL_D18_POINT_SET,
+        "orbit_columns":base.factor_base.signed_orbits.len(),
+        "points":base.factor_base.points.len(),
+        "frobenius_orbits":base.factor_base.orbits.len(),
+        "import_elapsed_ms_informational_L0":started.elapsed().as_secs_f64()*1000.0,
+        "solver_stage_executed":false,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null,
+    }))
+}
+
+fn full_d18_four_x_lift(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    xs: &[F2mElement],
+    target: &BinaryPoint,
+) -> Result<Option<([usize; 4], Vec<BigUint>)>> {
+    if xs.len() != 4 {
+        return Err("full D18 SAT model has the wrong summand count".into());
+    }
+    let mut choices: [Vec<usize>; 4] = std::array::from_fn(|_| Vec::new());
+    for (index, point) in fb.points.iter().enumerate() {
+        if let BinaryPoint::Affine { x, .. } = point {
+            for (slot, wanted) in xs.iter().enumerate() {
+                if x == wanted {
+                    choices[slot].push(index);
+                    if choices[slot].len() > 2 {
+                        return Err("full D18 x-coordinate has more than two stored lifts".into());
+                    }
+                }
+            }
+        }
+    }
+    if choices.iter().any(Vec::is_empty) {
+        return Ok(None);
+    }
+    for &a in &choices[0] {
+        for &b in &choices[1] {
+            for &c in &choices[2] {
+                for &d in &choices[3] {
+                    let indices = [a, b, c, d];
+                    let sum = indices.iter().fold(BinaryPoint::Infinity, |acc, &index| {
+                        kc.add(&acc, &fb.points[index])
+                    });
+                    if sum == *target {
+                        return Ok(Some((
+                            indices,
+                            checked_primary_relation_row(kc, fb, &indices, target)?,
+                        )));
+                    }
+                }
+            }
+        }
+    }
+    Ok(None)
+}
+
+/// Construct the exact first natural-query circuit from the archived full
+/// base without starting a SAT search. This L0 capacity diagnostic has no
+/// cgroup claim or relation/rank inference.
+pub(super) fn full_d18_m4_model_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_model_impl(
+        root,
+        fixture_root,
+        output,
+        FrobeniusOrbitRootEncoding::PerRepresentative,
+    )
+}
+
+pub(super) fn full_d18_m4_shared_model_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_model_impl(
+        root,
+        fixture_root,
+        output,
+        FrobeniusOrbitRootEncoding::SharedBits,
+    )
+}
+
+fn full_d18_m4_model_impl(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+    encoding: FrobeniusOrbitRootEncoding,
+) -> Result<Value> {
+    if output.exists() {
+        return Err("full D18 model output already exists".into());
+    }
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
+    let started = Instant::now();
+    let (base, row) = full_d18_load(root)?;
+    let import_ms = started.elapsed().as_secs_f64() * 1000.0;
+    if sha256_hex(&fs::read(fixture_root.join("probe-corpus.json"))?)
+        != FULL_D18_PUBLIC_CORPUS_SHA256
+    {
+        return Err("full D18 model public corpus differs".into());
+    }
+    let (target, corpus_hash) = public_target(fixture_root, &base.curve)?;
+    if point_json(words(&target))
+        != json!(["1834913121178197242856238", "8797964190732846213981377"])
+    {
+        return Err("full D18 model target differs".into());
+    }
+    let BinaryPoint::Affine { x: target_x, .. } = &target else {
+        return Err("full D18 model target is identity".into());
+    };
+    let representatives: Vec<BigUint> = base
+        .factor_base
+        .signed_orbits
+        .iter()
+        .map(|orbit| match &base.factor_base.points[orbit[0]] {
+            BinaryPoint::Affine { x, .. } => Ok(x.to_biguint()),
+            BinaryPoint::Infinity => Err("full D18 model representative is infinity".into()),
+        })
+        .collect::<Result<_>>()?;
+    let size = frobenius_orbit_domain_size_with_encoding(83, 4, &representatives, encoding)
+        .ok_or("full D18 model domain size overflow")?;
+    let required_variables = chain_s3_max_variables(83, 4)
+        .ok_or("full D18 model chain size overflow")?
+        .checked_add(size.variables)
+        .ok_or("full D18 model total size overflow")?;
+    let expected_clauses = match encoding {
+        FrobeniusOrbitRootEncoding::PerRepresentative => 11_238_656,
+        FrobeniusOrbitRootEncoding::SharedBits => 2_621_168,
+    };
+    if required_variables != 329_726 || size.clauses != expected_clauses {
+        return Err("full D18 model preflight differs from frozen protocol".into());
+    }
+    let encoding_name = match encoding {
+        FrobeniusOrbitRootEncoding::PerRepresentative => "per_representative",
+        FrobeniusOrbitRootEncoding::SharedBits => "shared_root_bits",
+    };
+    let preflight = json!({
+        "schema":"n83.full-d18-m4-model-preflight/v1", "status":"PASS_INPUTS",
+        "source_commit":source_commit, "source_attestation_mode":source_attestation_mode,
+        "binary_sha256":binary_sha256, "object":row["object"],
+        "point_set_blake3":FULL_D18_POINT_SET,
+        "public_corpus_blake3":corpus_hash, "target":point_json(words(&target)),
+        "orbit_columns":representatives.len(),
+        "required_max_variables":required_variables,
+        "required_domain_clauses":size.clauses,
+        "root_encoding":encoding_name,
+        "import_ms":import_ms,
+        "isolation":"L0_shared_host_no_hard_cgroup",
+        "solver_search_executed":false,
+        "selected_best_total_runtime":Value::Null,
+    });
+    let preflight_path = std::path::PathBuf::from(format!("{}.preflight.json", output.display()));
+    write_new_json(&preflight_path, &preflight)?;
+    let model_start = Instant::now();
+    let mut enc = ChainedS3Encoding::build(
+        4,
+        &base.curve.curve.irreducible,
+        &base.curve.curve.b,
+        Some(target_x),
+        0,
+        400_000,
+    )
+    .map_err(|_| "full D18 model circuit construction failed")?;
+    enc.constrain_frobenius_orbit_summands_with_encoding(
+        &representatives,
+        encoding,
+        400_000,
+        12_000_000,
+    )
+    .map_err(|_| "full D18 model domain installation failed")?;
+    let result = json!({
+        "schema":"n83.full-d18-m4-model/v1", "status":"PASS_MODEL_CONSTRUCTION_ONLY",
+        "preflight":preflight,
+        "sat_variables":enc.solver.n_vars(),
+        "sat_clauses":enc.solver.n_clauses(),
+        "sat_xor_rows":enc.solver.n_xors(),
+        "sat_and_gates":enc.n_and_gates,
+        "sat_s3_nodes":enc.n_s3_nodes,
+        "model_ms":model_start.elapsed().as_secs_f64()*1000.0,
+        "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+        "process_usage":process_usage(),
+        "solver_search_executed":false,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null,
+    });
+    write_new_json(output, &result)?;
+    Ok(result)
+}
+
+/// One frozen four-summand D18 access gate. The supervisor owns an
+/// independent wall cap; this worker requires its hard 32-GiB, zero-swap
+/// cgroup before importing or constructing the full factor base.
+pub(super) fn full_d18_m4_cli(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        false,
+        FrobeniusOrbitRootEncoding::PerRepresentative,
+        "none",
+        false,
+        1_200,
+        false,
+        false,
+        false,
+        1,
+    )
+}
+
+/// Local, positive-control-only SAT diagnostic. This shares the frozen model
+/// and verifier, but makes no hard-cgroup or capacity-worker claim.
+pub(super) fn full_d18_m4_l0_positive_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::PerRepresentative,
+        "none",
+        false,
+        300,
+        false,
+        false,
+        false,
+        1,
+    )
+}
+
+pub(super) fn full_d18_m4_l0_shared_positive_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        false,
+        300,
+        false,
+        false,
+        false,
+        1,
+    )
+}
+
+pub(super) fn full_d18_m4_l0_shared_root_pinned_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "selector_and_phase_zero",
+        false,
+        300,
+        false,
+        false,
+        false,
+        1,
+    )
+}
+
+pub(super) fn full_d18_m4_l0_shared_phase_pinned_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "phase_zero",
+        false,
+        300,
+        false,
+        false,
+        false,
+        1,
+    )
+}
+
+pub(super) fn full_d18_m4_l0_shared_selector_pinned_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "selector",
+        false,
+        300,
+        false,
+        false,
+        false,
+        1,
+    )
+}
+
+/// Search the unchanged free-choice planted formula with Frobenius phase
+/// wires prioritized and initially false. No selector or phase is pinned.
+pub(super) fn full_d18_m4_l0_shared_phase_first_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        300,
+        false,
+        false,
+        false,
+        1,
+    )
+}
+
+/// Bounded local screening of the frozen public target, using the exact
+/// phase-priority policy that passed the free-choice planted control.
+pub(super) fn full_d18_m4_l0_shared_phase_first_natural_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "natural",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        300,
+        false,
+        false,
+        false,
+        1,
+    )
+}
+
+/// Longer local screen of the same public target and free-choice model.
+/// It stays an L0 shared-host diagnostic, with no hard-memory claim.
+pub(super) fn full_d18_m4_l0_shared_phase_first_natural_1200_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "natural",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        1_200,
+        false,
+        false,
+        false,
+        1,
+    )
+}
+
+/// Export the same full-D18 shared-root formula as CryptoMiniSat XCNF.
+/// This source-bound arm performs no native relation search.
+pub(super) fn full_d18_m4_l0_xcnf_cli(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        300,
+        true,
+        false,
+        false,
+        1,
+    )
+}
+
+/// Export the unchanged constructed full-D18 XCNF and save one native SAT
+/// assignment so an independent verifier can test every exported constraint.
+pub(super) fn full_d18_m4_l0_xcnf_witness_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        300,
+        true,
+        true,
+        false,
+        1,
+    )
+}
+
+/// Source-bound Linux access gate for the free-choice shared-root circuit.
+/// The worker requires an exact 8-GiB zero-swap cgroup before importing S3.
+pub(super) fn full_d18_m4_linux_shared_phase_first_cli(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        false,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        1_200,
+        false,
+        false,
+        false,
+        1,
+    )
+}
+
+/// Exact S3 first-pair symmetry arm. The first two summands share one domain
+/// and their S3 node is exchangeable; lex ordering removes one duplicate
+/// orientation without pinning an orbit selector or Frobenius phase.
+pub(super) fn full_d18_m4_l0_ordered_first_pair_cli(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    let budget = if mode == "natural" { 2_400 } else { 300 };
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        budget,
+        false,
+        false,
+        true,
+        1,
+    )
+}
+
+/// Keep the exact first-pair symmetry arm and change only the cadence of
+/// full native XOR elimination after search decisions. Every complete
+/// assignment still receives the full XOR check before SAT is returned.
+pub(super) fn full_d18_m4_l0_ordered_xor_cadence_32_cli(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    let budget = if mode == "natural" { 2_400 } else { 300 };
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        budget,
+        false,
+        false,
+        true,
+        32,
+    )
+}
+
+fn full_d18_m4_impl(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+    l0_diagnostic: bool,
+    encoding: FrobeniusOrbitRootEncoding,
+    choice_pins: &'static str,
+    phase_zero_first: bool,
+    budget_seconds: u64,
+    export_xcnf: bool,
+    native_xcnf_witness: bool,
+    ordered_first_pair: bool,
+    xor_decision_cadence: usize,
+) -> Result<Value> {
+    if !["positive", "natural"].contains(&mode) || output.exists() {
+        return Err("full D18 m4 mode or fresh output differs from protocol".into());
+    }
+    if l0_diagnostic && mode != "positive" && !phase_zero_first {
+        return Err("L0 natural screening requires the phase-first policy".into());
+    }
+    if !["none", "phase_zero", "selector", "selector_and_phase_zero"].contains(&choice_pins) {
+        return Err("unsupported planted choice-pin policy".into());
+    }
+    if choice_pins != "none"
+        && (!l0_diagnostic || encoding != FrobeniusOrbitRootEncoding::SharedBits)
+    {
+        return Err("root-choice pins require the L0 shared-root planted control".into());
+    }
+    if phase_zero_first
+        && (encoding != FrobeniusOrbitRootEncoding::SharedBits || choice_pins != "none")
+    {
+        return Err("phase-first policy requires the free-choice shared-root mode".into());
+    }
+    if ordered_first_pair
+        && (!l0_diagnostic
+            || encoding != FrobeniusOrbitRootEncoding::SharedBits
+            || !phase_zero_first
+            || choice_pins != "none"
+            || export_xcnf
+            || native_xcnf_witness)
+    {
+        return Err("ordered first pair differs from the frozen symmetry arm".into());
+    }
+    if xor_decision_cadence != 1 && !(ordered_first_pair && xor_decision_cadence == 32) {
+        return Err("XOR cadence differs from the frozen native solver arm".into());
+    }
+    if (!l0_diagnostic && budget_seconds != 1_200)
+        || (l0_diagnostic
+            && budget_seconds != 300
+            && !(budget_seconds == 1_200
+                && mode == "natural"
+                && encoding == FrobeniusOrbitRootEncoding::SharedBits
+                && phase_zero_first)
+            && !(budget_seconds == 2_400 && mode == "natural" && ordered_first_pair))
+    {
+        return Err("full D18 m4 wall budget differs from a frozen mode".into());
+    }
+    if export_xcnf
+        && (!l0_diagnostic
+            || budget_seconds != 300
+            || encoding != FrobeniusOrbitRootEncoding::SharedBits
+            || !phase_zero_first
+            || choice_pins != "none"
+            || output.with_extension("xcnf").exists())
+    {
+        return Err("full D18 XCNF export differs from the frozen mode".into());
+    }
+    if native_xcnf_witness
+        && (!export_xcnf || mode != "positive" || output.with_extension("model.bin").exists())
+    {
+        return Err("full D18 native XCNF witness differs from the frozen mode".into());
+    }
+    let root_choice_pinned = choice_pins == "selector_and_phase_zero";
+    let search_policy = if ordered_first_pair && xor_decision_cadence == 32 {
+        "phase_zero_first_ordered_first_pair_xor_cadence32"
+    } else if ordered_first_pair {
+        "phase_zero_first_ordered_first_pair"
+    } else if phase_zero_first {
+        "phase_zero_first"
+    } else {
+        "default"
+    };
+    let hard_memory_mib = if phase_zero_first { 8_192 } else { 32_768 };
+    let isolation = if l0_diagnostic {
+        "L0_shared_host_no_hard_cgroup"
+    } else if phase_zero_first {
+        "hard_8GiB_cgroup_zero_swap"
+    } else {
+        "hard_32GiB_cgroup_zero_swap"
+    };
+    let memory_limit_bytes = if l0_diagnostic {
+        None
+    } else {
+        Some(checked_cgroup_memory_limit(hard_memory_mib)?)
+    };
+    let encoding_name = match encoding {
+        FrobeniusOrbitRootEncoding::PerRepresentative => "per_representative",
+        FrobeniusOrbitRootEncoding::SharedBits => "shared_root_bits",
+    };
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
+    let started = Instant::now();
+    let phase_path = std::path::PathBuf::from(format!("{}.phases.jsonl", output.display()));
+    let mut phases = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&phase_path)?;
+    full_d18_phase(
+        &mut phases,
+        started,
+        "started",
+        json!({"mode":mode, "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy, "source_commit":source_commit, "binary_sha256":binary_sha256}),
+    )?;
+    let cap_path = std::path::PathBuf::from(format!("{}.cap.json", output.display()));
+    let cap_mode = mode.to_owned();
+    std::thread::spawn(move || {
+        std::thread::sleep(Duration::from_secs(budget_seconds));
+        let cap = json!({
+            "schema":"n83.full-d18-m4-cap/v1", "status":"UNKNOWN_wall_cap",
+            "mode":cap_mode, "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy, "budget_seconds":budget_seconds,
+            "isolation":isolation,
+            "elapsed_process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+            "selected_best_total_runtime":Value::Null,
+        });
+        if write_new_json(&cap_path, &cap).is_err() {
+            std::process::exit(125);
+        }
+        std::process::exit(124);
+    });
+    let import_start = Instant::now();
+    let (base, row) = full_d18_load(root)?;
+    let import_ms = import_start.elapsed().as_secs_f64() * 1000.0;
+    full_d18_phase(
+        &mut phases,
+        started,
+        "import_checked",
+        json!({"import_ms":import_ms, "object":row["object"],
+            "point_set_blake3":FULL_D18_POINT_SET}),
+    )?;
+    if sha256_hex(&fs::read(fixture_root.join("probe-corpus.json"))?)
+        != FULL_D18_PUBLIC_CORPUS_SHA256
+    {
+        return Err("full D18 public corpus differs from frozen fixture".into());
+    }
+    let (public, corpus_hash) = public_target(fixture_root, &base.curve)?;
+    if point_json(words(&public))
+        != json!(["1834913121178197242856238", "8797964190732846213981377"])
+    {
+        return Err("full D18 public target point differs".into());
+    }
+    let fb = &base.factor_base;
+    let representatives: Vec<BigUint> = fb
+        .signed_orbits
+        .iter()
+        .map(|orbit| match &fb.points[orbit[0]] {
+            BinaryPoint::Affine { x, .. } => Ok(x.to_biguint()),
+            BinaryPoint::Infinity => Err("full D18 representative is infinity".into()),
+        })
+        .collect::<Result<_>>()?;
+    let mut planted = None;
+    let target = if mode == "positive" {
+        let indices: [usize; 4] = std::array::from_fn(|column| fb.signed_orbits[column][0]);
+        let mut sum = BinaryPoint::Infinity;
+        let mut partial = Vec::with_capacity(4);
+        for &index in &indices {
+            sum = base.curve.add(&sum, &fb.points[index]);
+            partial.push(sum.clone());
+        }
+        if partial
+            .iter()
+            .any(|point| !matches!(point, BinaryPoint::Affine { .. }))
+        {
+            return Err("full D18 positive control has an identity intermediate".into());
+        }
+        let row = checked_primary_relation_row(&base.curve, fb, &indices, &sum)?;
+        let changed = base.curve.add(&sum, base.curve.generator());
+        if checked_primary_relation_row(&base.curve, fb, &indices, &changed).is_ok() {
+            return Err("full D18 changed-target control passed unexpectedly".into());
+        }
+        planted = Some((indices, partial, row));
+        sum
+    } else {
+        public.clone()
+    };
+    let BinaryPoint::Affine { x: target_x, .. } = &target else {
+        return Err("full D18 target is identity".into());
+    };
+    let model_start = Instant::now();
+    let mut enc = ChainedS3Encoding::build(
+        4,
+        &base.curve.curve.irreducible,
+        &base.curve.curve.b,
+        Some(target_x),
+        0,
+        400_000,
+    )
+    .map_err(|_| "full D18 m4 circuit construction failed")?;
+    enc.constrain_frobenius_orbit_summands_with_encoding(
+        &representatives,
+        encoding,
+        400_000,
+        12_000_000,
+    )
+    .map_err(|_| "full D18 m4 domain installation failed")?;
+    if ordered_first_pair {
+        enc.order_first_pair(400_000)
+            .map_err(|_| "full D18 first-pair ordering failed")?;
+    }
+    if choice_pins != "none" {
+        let (indices, _, _) = planted
+            .as_ref()
+            .ok_or("root-pinned control has no witness")?;
+        let handles = enc
+            .orbit_choice_wires()
+            .ok_or("root-pinned control lacks choice wires")?
+            .to_vec();
+        if handles.len() != 4 {
+            return Err("root-pinned control choice blocks differ".into());
+        }
+        let mut sorted_representatives = representatives.clone();
+        sorted_representatives.sort_unstable();
+        for (block, &index) in indices.iter().enumerate() {
+            let BinaryPoint::Affine { x, .. } = &fb.points[index] else {
+                return Err("root-pinned control point is infinity".into());
+            };
+            let column = sorted_representatives
+                .binary_search(&x.to_biguint())
+                .map_err(|_| "root-pinned control representative missing")?;
+            if fb.signed_orbit_of[index].1 != 0 {
+                return Err("root-pinned control representative has nonzero phase".into());
+            }
+            if ["selector", "selector_and_phase_zero"].contains(&choice_pins) {
+                if !enc
+                    .solver
+                    .add_clause(vec![handles[block].selectors[column] as i32])
+                {
+                    return Err("root-pinned control selector contradicted model".into());
+                }
+            }
+            if ["phase_zero", "selector_and_phase_zero"].contains(&choice_pins) {
+                for &wire in &handles[block].phase {
+                    if !enc.solver.add_clause(vec![-(wire as i32)]) {
+                        return Err("root-pinned control phase contradicted model".into());
+                    }
+                }
+            }
+        }
+    }
+    if let Some((indices, partial, _)) = &planted {
+        // The documented chained-S3 layout allocates four summand blocks,
+        // two intermediate blocks, then the target, each of 83 x bits.
+        let points: Vec<_> = indices
+            .iter()
+            .map(|&index| &fb.points[index])
+            .chain(partial[1..3].iter())
+            .chain(std::iter::once(&target))
+            .collect();
+        for (block, point) in points.iter().enumerate() {
+            let BinaryPoint::Affine { x, .. } = point else {
+                return Err("full D18 positive pin is identity".into());
+            };
+            let x = x.to_biguint();
+            for bit in 0..83usize {
+                let wire = (block * 83 + bit + 1) as i32;
+                if !enc
+                    .solver
+                    .add_clause(vec![if x.bit(bit as u64) { wire } else { -wire }])
+                {
+                    return Err("full D18 positive pin contradicted the model".into());
+                }
+            }
+        }
+    }
+    if phase_zero_first {
+        let phase_wires: Vec<u32> = enc
+            .orbit_choice_wires()
+            .ok_or("phase-first control lacks choice wires")?
+            .iter()
+            .flat_map(|handles| handles.phase.iter().copied())
+            .collect();
+        if phase_wires.len() != 28 {
+            return Err("phase-first control phase-wire count differs".into());
+        }
+        let mut priority: Vec<u32> = (1..=(4 * 83)).collect();
+        priority.extend_from_slice(&phase_wires);
+        enc.solver.set_branch_priority(&priority);
+        enc.solver.set_saved_phase_for_vars(&phase_wires, false);
+    }
+    enc.solver.set_xor_decision_cadence(xor_decision_cadence);
+    let model_ms = model_start.elapsed().as_secs_f64() * 1000.0;
+    let shape = json!({
+        "variables":enc.solver.n_vars(), "clauses":enc.solver.n_clauses(),
+        "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy,
+        "ordered_first_pair":ordered_first_pair,
+        "xor_decision_cadence":xor_decision_cadence,
+        "xor_rows":enc.solver.n_xors(), "model_ms":model_ms,
+        "import_ms":import_ms, "object":row["object"],
+        "point_set_blake3":FULL_D18_POINT_SET,
+    });
+    let shape_path = std::path::PathBuf::from(format!("{}.shape.json", output.display()));
+    write_new_json(&shape_path, &shape)?;
+    full_d18_phase(&mut phases, started, "model_constructed", shape.clone())?;
+    if export_xcnf {
+        let export_start = Instant::now();
+        let xcnf = to_dimacs_xor(&enc.solver);
+        if xcnf.len() > 400_000_000 {
+            return Err("full D18 XCNF exceeds the frozen output cap".into());
+        }
+        let xcnf_path = output.with_extension("xcnf");
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&xcnf_path)?;
+        file.write_all(xcnf.as_bytes())?;
+        file.sync_all()?;
+        let xcnf_sha256 = sha256_hex(xcnf.as_bytes());
+        let export_ms = export_start.elapsed().as_secs_f64() * 1000.0;
+        full_d18_phase(
+            &mut phases,
+            started,
+            "xcnf_exported",
+            json!({"xcnf_sha256":xcnf_sha256,"xcnf_bytes":xcnf.len(),"export_ms":export_ms}),
+        )?;
+        if native_xcnf_witness {
+            enc.solver.conflict_budget = 100_000;
+            enc.solver.deadline = Some(started + Duration::from_secs(budget_seconds));
+            let search_start = Instant::now();
+            let answer = enc.solver.solve();
+            let search_ms = search_start.elapsed().as_secs_f64() * 1000.0;
+            full_d18_phase(
+                &mut phases,
+                started,
+                "solver_returned",
+                json!({"answer":format!("{answer:?}"),"search_ms":search_ms,
+                    "conflicts":enc.solver.conflicts()}),
+            )?;
+            if answer != SolveResult::Sat {
+                return Err("constructed full D18 XCNF witness did not return SAT".into());
+            }
+            let model = enc.solver.model();
+            if !enc.verify_external_assignment(&model) {
+                return Err("native XCNF witness fails original clauses, XOR or field".into());
+            }
+            let xs = enc
+                .decode_summands_assignment(&model)
+                .ok_or("native XCNF witness summands missing")?;
+            let (indices, relation_row) = full_d18_four_x_lift(&base.curve, fb, &xs, &target)?
+                .ok_or("native XCNF witness lacks a checked group lift")?;
+            let (planted_indices, _, planted_row) = planted
+                .as_ref()
+                .ok_or("native XCNF witness lacks constructed relation")?;
+            if &indices != planted_indices || &relation_row != planted_row {
+                return Err("native XCNF witness differs from constructed relation".into());
+            }
+            let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
+            if rank.insert(relation_row.clone()) != 1 {
+                return Err("native XCNF witness row failed rank-one insertion".into());
+            }
+            let changed = base.curve.add(&target, base.curve.generator());
+            if checked_primary_relation_row(&base.curve, fb, &indices, &changed).is_ok() {
+                return Err("native XCNF witness accepted altered target".into());
+            }
+            let mut packed = vec![0u8; model.len().div_ceil(8)];
+            for (index, &value) in model.iter().enumerate() {
+                if value {
+                    packed[index / 8] |= 1 << (index % 8);
+                }
+            }
+            let model_path = output.with_extension("model.bin");
+            let mut model_file = OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&model_path)?;
+            model_file.write_all(&packed)?;
+            model_file.sync_all()?;
+            let model_sha256 = sha256_hex(&packed);
+            full_d18_phase(
+                &mut phases,
+                started,
+                "native_model_verified",
+                json!({"model_sha256":model_sha256,"model_bits":model.len(),
+                    "indices":indices,"rank_after_insert":1}),
+            )?;
+            let result = json!({
+                "schema":"n83.full-d18-m4-l0-xcnf-native-witness/v1",
+                "status":"PASS_NATIVE_XCNF_WITNESS", "mode":mode,
+                "source_commit":source_commit,
+                "source_attestation_mode":source_attestation_mode,
+                "binary_sha256":binary_sha256,
+                "isolation":isolation, "budget_seconds":budget_seconds,
+                "curve_a":0, "summands":4, "identity_mask":0,
+                "root_encoding":encoding_name,"choice_pin_policy":choice_pins,
+                "search_policy":search_policy,"target":point_json(words(&target)),
+                "object":row["object"],"point_set_blake3":FULL_D18_POINT_SET,
+                "public_corpus_blake3":corpus_hash,
+                "shape":shape,"xcnf_sha256":xcnf_sha256,"xcnf_bytes":xcnf.len(),
+                "xcnf_path":xcnf_path.to_string_lossy(),"export_ms":export_ms,
+                "model_encoding":"bit i of byte i/8 is variable i+1, low bit first",
+                "model_bits":model.len(),"model_bytes":packed.len(),
+                "model_sha256":model_sha256,
+                "model_path":model_path.to_string_lossy(),
+                "solver_answer":"Sat","solver_search_executed":true,
+                "solver_conflicts":enc.solver.conflicts(),"search_ms":search_ms,
+                "relation_indices":indices,
+                "relation_row_decimal_blake3":blake3::hash(&serde_json::to_vec(
+                    &relation_row.iter().map(ToString::to_string).collect::<Vec<_>>())?)
+                    .to_hex().to_string(),
+                "rank_after_insert":1,"altered_target_rejected":true,
+                "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+                "process_usage":process_usage(),
+                "total_index_calculus_runtime_ms":Value::Null,
+                "selected_best_total_runtime":Value::Null,
+            });
+            write_new_json(output, &result)?;
+            return Ok(result);
+        }
+        let result = json!({
+            "schema":"n83.full-d18-m4-l0-xcnf-export/v1",
+            "status":"PASS_XCNF_EXPORT_ONLY", "mode":mode,
+            "source_commit":source_commit, "source_attestation_mode":source_attestation_mode,
+            "binary_sha256":binary_sha256, "isolation":isolation,
+            "budget_seconds":budget_seconds, "curve_a":0,
+            "summands":4, "identity_mask":0,
+            "root_encoding":encoding_name, "choice_pin_policy":choice_pins,
+            "search_policy":search_policy, "target":point_json(words(&target)),
+            "object":row["object"], "point_set_blake3":FULL_D18_POINT_SET,
+            "shape":shape, "xcnf_sha256":xcnf_sha256,
+            "xcnf_bytes":xcnf.len(), "xcnf_path":xcnf_path.to_string_lossy(),
+            "export_ms":export_ms,
+            "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+            "process_usage":process_usage(), "solver_search_executed":false,
+            "total_index_calculus_runtime_ms":Value::Null,
+            "selected_best_total_runtime":Value::Null,
+        });
+        write_new_json(output, &result)?;
+        return Ok(result);
+    }
+    enc.solver.conflict_budget = 100_000;
+    enc.solver.deadline = Some(started + Duration::from_secs(budget_seconds));
+    let search_start = Instant::now();
+    let answer = enc.solver.solve();
+    let search_ms = search_start.elapsed().as_secs_f64() * 1000.0;
+    let limit_reason = if answer != SolveResult::Unknown {
+        "not_applicable"
+    } else {
+        let conflict_cap = enc.solver.conflicts() >= enc.solver.conflict_budget;
+        let wall_cap = started.elapsed() >= Duration::from_secs(budget_seconds);
+        match (conflict_cap, wall_cap) {
+            (true, true) => "conflict_and_wall_cap",
+            (true, false) => "conflict_cap",
+            (false, true) => "wall_cap",
+            (false, false) => "unknown_internal_limit",
+        }
+    };
+    full_d18_phase(
+        &mut phases,
+        started,
+        "solver_returned",
+        json!({"answer":format!("{answer:?}"), "search_ms":search_ms,
+            "conflicts":enc.solver.conflicts(),"limit_reason":limit_reason}),
+    )?;
+    let mut relation = Value::Null;
+    let status = match answer {
+        SolveResult::Unknown => "UNKNOWN_search_cap",
+        SolveResult::Unsat if mode == "positive" => "INVALID_POSITIVE_CONTROL",
+        SolveResult::Unsat => "UNVERIFIED_UNSAT",
+        SolveResult::Sat => {
+            let xs = enc.decode_summands();
+            if !enc.verify_external_assignment(&enc.solver.model()) {
+                "INVALID_MODEL"
+            } else if let Some((indices, row)) =
+                full_d18_four_x_lift(&base.curve, fb, &xs, &target)?
+            {
+                let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
+                let rank_after_insert = rank.insert(row.clone());
+                let changed = base.curve.add(&target, base.curve.generator());
+                let tamper_rejected =
+                    checked_primary_relation_row(&base.curve, fb, &indices, &changed).is_err();
+                relation = json!({
+                    "indices":indices,
+                    "row_decimal_blake3":blake3::hash(&serde_json::to_vec(
+                        &row.iter().map(ToString::to_string).collect::<Vec<_>>())?)
+                        .to_hex().to_string(),
+                    "rank_after_insert":rank_after_insert,
+                    "tamper_rejected":tamper_rejected,
+                    "matches_planted_row":planted.as_ref().map(|(_, _, expected)| expected == &row),
+                });
+                if rank_after_insert != 1 || !tamper_rejected {
+                    "INVALID_RELATION"
+                } else if mode == "positive"
+                    && planted
+                        .as_ref()
+                        .is_some_and(|(_, _, expected)| expected != &row)
+                {
+                    "INVALID_POSITIVE_CONTROL"
+                } else if mode == "positive" {
+                    "PASS_CONSTRUCTED_CONTROL"
+                } else {
+                    "PENDING_INDEPENDENT_NATURAL_REPLAY"
+                }
+            } else {
+                "MODEL_GROUP_REJECTED"
+            }
+        }
+    };
+    let peak_bytes: Option<u64> = if l0_diagnostic {
+        None
+    } else {
+        Some(
+            fs::read_to_string("/sys/fs/cgroup/memory.peak")?
+                .trim()
+                .parse()?,
+        )
+    };
+    let solver_stats = json!({
+        "decisions":enc.solver.stats.decisions,
+        "conflicts":enc.solver.stats.conflicts,
+        "restarts":enc.solver.stats.restarts,
+        "propagations":enc.solver.stats.propagations,
+        "xor_passes":enc.solver.stats.xor_passes,
+        "xor_propagations":enc.solver.stats.xor_propagations,
+        "xor_conflicts":enc.solver.stats.xor_conflicts,
+        "xor_repivots":enc.solver.stats.xor_repivots,
+        "xor_row_ops":enc.solver.stats.xor_row_ops,
+        "xor_row_scans":enc.solver.stats.xor_row_scans,
+        "clause_visits":enc.solver.stats.clause_visits,
+        "clause_lit_visits":enc.solver.stats.clause_lit_visits,
+        "ns_propagate_clauses":enc.solver.stats.ns_propagate_clauses,
+        "ns_propagate_xors":enc.solver.stats.ns_propagate_xors,
+        "ns_analyze":enc.solver.stats.ns_analyze,
+    });
+    let result = json!({
+        "schema":if l0_diagnostic {if mode == "positive" {"n83.full-d18-m4-l0-positive/v1"} else {"n83.full-d18-m4-l0-natural/v1"}} else {"n83.full-d18-m4-worker/v1"}, "status":status,
+        "mode":mode, "source_commit":source_commit,
+        "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy,
+        "ordered_first_pair":ordered_first_pair,
+        "xor_decision_cadence":xor_decision_cadence,
+        "isolation":isolation,
+        "budget_seconds":budget_seconds,
+        "source_attestation_mode":source_attestation_mode,
+        "binary_sha256":binary_sha256,
+        "phase_file":phase_path.to_string_lossy(),
+        "curve_a":0, "summands":4, "identity_mask":0,
+        "object":row["object"], "point_set_blake3":FULL_D18_POINT_SET,
+        "public_corpus_blake3":corpus_hash,
+        "target":point_json(words(&target)),
+        "memory_cgroup_limit_bytes":memory_limit_bytes,
+        "memory_cgroup_peak_bytes":peak_bytes,
+        "shape":shape, "search_ms":search_ms,
+        "solver_answer":format!("{answer:?}"),
+        "solver_limit_reason":limit_reason,
+        "solver_conflicts":enc.solver.conflicts(),
+        "solver_stats":solver_stats,
+        "relation":relation,
+        "process_usage":process_usage(),
+        "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null,
+    });
+    write_new_json(output, &result)?;
+    Ok(result)
 }
 
 pub(super) fn check_panel(root: &Path, columns: usize) -> Result<Value> {
@@ -2588,6 +3779,10 @@ mod tests {
                 BinaryPoint::Infinity => panic!("primary point is infinity"),
             })
             .collect();
+        let lifted = full_d18_four_x_lift(kc, fb, &xs, &target)
+            .unwrap()
+            .expect("four stored x coordinates must lift to the original group target");
+        assert_eq!(lifted.1, relation);
         let (lifted_indices, lifted_row) = checked_four_x_lift(kc, fb, &xs, &target)
             .unwrap()
             .expect("constructed four-point target has a stored group lift");

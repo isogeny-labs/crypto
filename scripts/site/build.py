@@ -78,6 +78,7 @@ PAGES = (
     ("docs/site/assets/rho-gpu-host.js", "assets/rho-gpu-host.js"),
     ("docs/site/assets/rho-gpu.wgsl", "assets/rho-gpu.wgsl"),
     ("docs/index-calculus-scoreboard.html", "scoreboard/index.html"),
+    ("docs/ic/algebraic-crossover-closure-ratios.svg", "scoreboard/ic/algebraic-crossover-closure-ratios.svg"),
     # Evidence linked from the scoreboard with ../ecc2k130/benchmarks/...
     # must be copied at that same site-relative path or the published links 404.
     ("ecc2k130/benchmarks/g7-12b-batch32-split/RESULTS.md", "ecc2k130/benchmarks/g7-12b-batch32-split/RESULTS.md"),
