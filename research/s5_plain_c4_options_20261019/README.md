@@ -136,7 +136,8 @@ The benchmarks row's `VALIDATION.json`
   headline numbers, the rho means and the band values are recomputed from
   the raw records with jq, which shares no code with the Rust summary that
   produced them. All 17 match.
-- **Rho reference** (`rho_reference.json`, `curve_info.json`). It was
+- **Rho reference** (`rho_reference.json`, `curve_info.json`;
+  figure [`figures/validation_rho_band.svg`](figures/validation_rho_band.svg)). It was
   **chosen after the measurement, to meet the gate**: the study registered
   no rho reference, because it measures one stage. §11.16's thread reference
   is plain r-adding rho (S ≈ 1.3). This uses the stricter one:
@@ -224,9 +225,22 @@ cargo run --release --example gaudry_quartic_c4_options -- --generic 4,5,6,7 \
 cargo run --release --example gaudry_quartic_c4_options_summary -- raw/s5_p269_seed1_r13.json - raw/summary_r13.json
 cargo run --release --example gaudry_quartic_c4_options_summary -- raw/s5_p269_seed1.json raw/generic_d4-7.json raw/summary.json
 MPLCONFIGDIR=$TMPDIR python3 figures/plot.py
+# validation (run from the repository root)
+cargo run --release --example gaudry_quartic_c4_options -- --p 269 --seed 1 --rho 20 \
+    --json research/s5_plain_c4_options_20261019/validation/rho_reference.json
+cargo run --release --example gaudry_quartic_curve_info -- 269 1 \
+    > research/s5_plain_c4_options_20261019/validation/curve_info.json
+SOURCE_COMMIT=<build commit> BIN=target/release/examples/gaudry_quartic_c4_options \
+    bash research/s5_plain_c4_options_20261019/validation/replay.sh \
+    > research/s5_plain_c4_options_20261019/validation/replay-certificate.json
+bash research/s5_plain_c4_options_20261019/validation/validate.sh \
+    > research/s5_plain_c4_options_20261019/validation/validator-report.json
+python3 scripts/validation_gate.py evidence benchmarks/20261019-s5-plain-c4-options
+MPLCONFIGDIR=$TMPDIR python3 research/s5_plain_c4_options_20261019/figures/plot_validation.py
 ```
 
 `raw/generic_d4-6.json` is the first pilot of the generic panel (identical
-counts to the `d ≤ 6` rows of `generic_d4-7.json`). Run report:
-[`reports/run-20261019T1851Z/`](reports/run-20261019T1851Z/run_report.pdf).
+counts to the `d ≤ 6` rows of `generic_d4-7.json`). Run reports:
+[`reports/run-20261019T1851Z/`](reports/run-20261019T1851Z/run_report.pdf) (the measurement),
+[`reports/run-20261021T0501Z/`](reports/run-20261021T0501Z/run_report.pdf) (rho reference and replay).
 Report PDF: [`REPORT.pdf`](REPORT.pdf).
