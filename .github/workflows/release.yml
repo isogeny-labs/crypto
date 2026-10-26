@@ -32,7 +32,7 @@ env:
 
 jobs:
   scope:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: read
@@ -73,7 +73,7 @@ jobs:
         run: node .github/scripts/ci-scope.mjs
 
   meta:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       tag: ${{ steps.v.outputs.tag }}
@@ -108,25 +108,15 @@ jobs:
           # musl omitted: redis → native-tls → openssl-sys needs a musl-built
           # libssl (vendored openssl in Cargo.toml). That edit is held by
           # another task; restore x86_64-unknown-linux-musl here when it lands.
-          - {target: aarch64-apple-darwin,      os: macos-latest}
-          - {target: x86_64-pc-windows-msvc,    os: windows-latest}
-    runs-on: ${{ matrix.os }}
-    # Windows needs more than Linux: run 40259290676 (PR #2588 head 7f5ca198d)
-    # cancelled this leg at the old 25-minute pull-request cap while its release
-    # build was still running (23m51s in), against 16m33s for Linux gnu in that
-    # run. Release no longer runs on pull requests, so what matters now is push
-    # and workflow_dispatch: 60 minutes for Windows (an estimate, about 1.5x the
-    # ratio-scaled build time; measure it with a dispatch run), 45 for the rest.
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || (matrix.os == 'windows-latest' && 60 || 45) }}
+    runs-on: ubuntu-latest
+    # The Windows and macOS legs were removed on 2026-10-26 (ubuntu-latest only).
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 45 }}
     steps:
       - name: Require successful scope classification
         if: needs.scope.result != 'success' || needs.meta.result != 'success'
         run: |
           echo '::error::CI scope or release metadata failed; refusing to skip validation.'
           exit 1
-      - name: Enable long Git paths on Windows
-        if: runner.os == 'Windows' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
-        run: git config --global core.longpaths true
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         uses: actions/checkout@v4
         with:
@@ -302,18 +292,11 @@ jobs:
         include:
           - {target: x86_64-unknown-linux-gnu,  os: ubuntu-latest}
           - {target: x86_64-unknown-linux-musl, os: ubuntu-latest}
-          - {target: aarch64-apple-darwin,      os: macos-latest}
-          - {target: x86_64-pc-windows-msvc,    os: windows-latest}
-    runs-on: ${{ matrix.os }}
-    # Measured in run 40259290676 (PR #2588 head 7f5ca198d), now that the
-    # builds really run: Linux gnu took 36m25s (step 9 23m37s, soft-hash step
-    # 10m07s), musl 24m37s, macOS 23m36s. Windows was cancelled at the old
-    # 45-minute cap with step 9 still compiling isogeny_algos (41m42s in; its
-    # first two cargo commands alone took 29m19s against 14m54s on Linux gnu,
-    # about 2x). By that ratio the whole Windows leg needs roughly 70 minutes, so
-    # it gets 120 (an estimate: tighten it after a dispatch run). The other
-    # platforms keep their caps.
-    timeout-minutes: ${{ matrix.os == 'windows-latest' && 120 || ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 50) }}
+    runs-on: ubuntu-latest
+    # Measured in run 40259290676 (PR #2588 head 7f5ca198d): Linux gnu took
+    # 36m25s (step 9 23m37s, soft-hash step 10m07s), musl 24m37s. The Windows
+    # and macOS legs were removed on 2026-10-26 (ubuntu-latest only).
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 50 }}
     steps:
       # Keep Cargo output outside the package tree while it is fingerprinted.
       # `runner.temp` is not available in job-level `env`, so set it per job.
@@ -325,9 +308,6 @@ jobs:
         run: |
           echo '::error::CI scope or release metadata failed; refusing to skip validation.'
           exit 1
-      - name: Enable long Git paths on Windows
-        if: runner.os == 'Windows' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
-        run: git config --global core.longpaths true
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.93.1
@@ -429,9 +409,7 @@ jobs:
         include:
           - {target: x86_64-unknown-linux-gnu,  os: ubuntu-latest}
           - {target: x86_64-unknown-linux-musl, os: ubuntu-latest}
-          - {target: aarch64-apple-darwin,      os: macos-latest}
-          - {target: x86_64-pc-windows-msvc,    os: windows-latest}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 30 }}
     steps:
       - name: Keep Cargo output outside the package tree
@@ -531,7 +509,7 @@ jobs:
   native:
     if: always() && !cancelled()
     needs: [meta, scope]
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 45 }}
     steps:
       - name: Require successful scope classification
@@ -592,7 +570,7 @@ jobs:
     # ubuntu-latest, which is now Ubuntu 26.04, and run 40259290676 failed here
     # with "Unable to locate package cuda-nvcc-12-8". Without this job
     # the `release` job never runs. docs/RELEASES.md describes the pin.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 60 }}
     steps:
       - name: Require successful scope classification
@@ -657,7 +635,7 @@ jobs:
           if-no-files-found: error
 
   release-assets:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -673,7 +651,7 @@ jobs:
     # can be started from any branch, and a release tagged `-main.` that
     # was not built from main would still become /releases/latest.
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: write
@@ -706,16 +684,10 @@ jobs:
           | Artifact | Contents |
           | --- | --- |
           | `crypto-*-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `ecdlp-audit`, `factor-base-sweep` — glibc |
-          | `crypto-*-aarch64-apple-darwin.tar.gz` | same eight executables — Apple silicon |
-          | `crypto-*-x86_64-pc-windows-msvc.zip` | same eight executables (`.exe`) |
           | `isogeny-*-x86_64-unknown-linux-gnu.tar.gz` | dedicated `isogeny` executable, README, BUILD.json — glibc |
           | `isogeny-*-x86_64-unknown-linux-musl.tar.gz` | dedicated tool — static |
-          | `isogeny-*-aarch64-apple-darwin.tar.gz` | dedicated tool — Apple silicon |
-          | `isogeny-*-x86_64-pc-windows-msvc.zip` | dedicated `isogeny.exe` tool |
           | `isogeny-algos-*-x86_64-unknown-linux-gnu.tar.gz` | `isogeny-algos` (point counting, isogenies, Vélu/√élu, chains, BMSS, duals, CSIDH, paths, KLPT, Richelot, Φ_ℓ), USAGE.md, BUILD.json — glibc |
           | `isogeny-algos-*-x86_64-unknown-linux-musl.tar.gz` | `isogeny-algos` — static |
-          | `isogeny-algos-*-aarch64-apple-darwin.tar.gz` | `isogeny-algos` — Apple silicon |
-          | `isogeny-algos-*-x86_64-pc-windows-msvc.zip` | `isogeny-algos.exe` |
           | `ecc2k130-cpu-*.tar.gz` | ECC2K-130 client, CPU (`-march=x86-64-v3`) |
           | `ecc2k130-cuda-*.tar.gz` | ECC2K-130 client, CUDA fatbinary (sm_80–sm_120) |
 

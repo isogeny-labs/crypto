@@ -1,5 +1,6 @@
 """Check budgeted allocation, provider identity and cleanup gates offline."""
 
+import io
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -40,7 +41,7 @@ class FakeProvider:
         pod = {
             "id": f"pod{stratum}", "name": name,
             "desiredStatus": "RUNNING",
-            "costPerHr": 0.16 if stratum == 0 else 0.19,
+            "costPerHr": 0.34,
             "createdAt": "2026-10-25T02:00:00Z",
             "machineId": "machine0" if self.duplicate_machine else f"machine{stratum}",
             "memoryInGb": 27, "vcpuCount": 4,
@@ -83,7 +84,7 @@ class AllocateTests(unittest.TestCase):
             snapshot = json.loads(snapshot_path.read_text())
             self.assertEqual(len({p["machine_id"] for p in snapshot["pods"]}), 2)
             self.assertEqual(snapshot['projected_compute_and_container_disk_usd'],
-                             '2.16')
+                             '4.14')
             self.assertEqual([p['gpu_type_id'] for p in snapshot['pods']],
                              list(subject.GPU_TYPES))
             for stratum in range(2):
@@ -142,6 +143,16 @@ class AllocateTests(unittest.TestCase):
             self.assertEqual(set(provider.terminated), {"pod0", "pod1"})
             failure = json.loads((output / "allocation_failure.json").read_text())
             self.assertEqual(failure["status"], "UNRESOLVED_PROVIDER_MUTATION")
+            self.assertEqual(failure["error_detail"],
+                             "response lost after provider mutation")
+
+    def test_provider_error_retains_reason_without_api_key(self):
+        response = io.BytesIO(json.dumps({"errors": [{"message":
+            "No qualifying host for fixture-key"}]}).encode())
+        with patch.object(subject.url_request, "urlopen", return_value=response):
+            with self.assertRaisesRegex(ValueError, "No qualifying host") as caught:
+                subject.graphql("query { myself { id } }", "fixture-key")
+        self.assertNotIn("fixture-key", str(caught.exception))
 
 
 if __name__ == "__main__":
