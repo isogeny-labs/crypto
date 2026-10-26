@@ -155,6 +155,7 @@ fn main() -> Result<()> {
     let mut checks = vec![];
     let mut replay_count = 0usize;
     let mut accepted_count = 0usize;
+    let mut failure_reasons = BTreeMap::<String, usize>::new();
     for (cell, row) in cells.iter().zip(rows.as_array().unwrap()) {
         for (k, v) in cell.as_object().unwrap() {
             if row[k] != *v {
@@ -171,6 +172,9 @@ fn main() -> Result<()> {
             cell["task"]["target"].to_string(),
         ));
         if row["status"] == "not-started-global-cap" {
+            *failure_reasons
+                .entry("not-started-global-cap".into())
+                .or_default() += 1;
             continue;
         }
         count[1] += 1;
@@ -239,6 +243,26 @@ fn main() -> Result<()> {
                 .entry(workload.into())
                 .or_default()
                 .insert(arm.into(), raw.unwrap());
+        } else {
+            let reason = if row["exit_code"] == 124 {
+                "hard-timeout"
+            } else if row["exit_code"] != 0 {
+                "worker-process-failed-or-killed"
+            } else if result.as_ref().is_some_and(|r| r["timed_out"] == true) {
+                "cooperative-budget"
+            } else if result
+                .as_ref()
+                .is_some_and(|r| r["complete_projection"] != true)
+            {
+                "solver-undetermined"
+            } else if !basic {
+                "projection-or-signed-y-mismatch"
+            } else if !roots {
+                "finite-root-coverage-failed"
+            } else {
+                "raw-instruction-total-missing"
+            };
+            *failure_reasons.entry(reason.into()).or_default() += 1;
         }
         checks.push(json!({"index":row["index"],"projection_and_signed_y_matched":basic,"complete_independent_finite_root_count_matched":roots,"Ir":raw,"accepted_after_replay":accepted}));
     }
@@ -329,7 +353,7 @@ fn main() -> Result<()> {
         distributions.push(json!({"candidate":candidate,"control":control,"requested_pairs":configs.len(),"accepted_pairs":n,"fewer_instruction_pairs":ps.iter().filter(|r|r["fewer"]==true).count(),"ratio_min":ratios.first(),"ratio_median":median,"ratio_max":ratios.last(),"descriptive_only":true}));
     }
     fs::create_dir_all(out)?;
-    let result = json!({"schema":"twist.incidence-cost-independent-audit/v1","requested_cells":cells.len(),"accepted_cells":accepted_count,"configurations":configs.len(),"distinct_fixture_target_pairs":targets.len(),"independent_PARI_positive_and_negative_checks_each":replay_count,"by_arm":by_arm.iter().map(|(arm,c)|json!({"arm":arm,"requested":c[0],"attempted":c[1],"accepted":c[2]})).collect::<Vec<_>>(),"AA":aa,"comparisons":paired,"distributions":distributions,"plan_sha256":sha(&a[1])?,"records_sha256":sha(run.join("RECORDS.json"))?,"frontier_admission_sha256":sha(&a[4])?,"CAS_receipt_sha256":sha(format!("{prefix}.json"))?,"unit":"Callgrind simulated guest instructions Ir","certifies_complete_Fp_answers_not_algebraic_closure_bases":true,"full_600_cost_grid_complete":false,"complete_IC_cost_or_fastest_or_novelty_claim":false});
+    let result = json!({"schema":"twist.incidence-cost-independent-audit/v1","requested_cells":cells.len(),"accepted_cells":accepted_count,"configurations":configs.len(),"distinct_fixture_target_pairs":targets.len(),"independent_PARI_positive_and_negative_checks_each":replay_count,"by_arm":by_arm.iter().map(|(arm,c)|json!({"arm":arm,"requested":c[0],"attempted":c[1],"accepted":c[2]})).collect::<Vec<_>>(),"failure_reasons":failure_reasons,"AA":aa,"comparisons":paired,"distributions":distributions,"plan_sha256":sha(&a[1])?,"records_sha256":sha(run.join("RECORDS.json"))?,"frontier_admission_sha256":sha(&a[4])?,"CAS_receipt_sha256":sha(format!("{prefix}.json"))?,"unit":"Callgrind simulated guest instructions Ir","certifies_complete_Fp_answers_not_algebraic_closure_bases":true,"full_600_cost_grid_complete":false,"complete_IC_cost_or_fastest_or_novelty_claim":false});
     fs::write(
         out.join("AUDIT.json"),
         serde_json::to_string_pretty(&result)? + "\n",

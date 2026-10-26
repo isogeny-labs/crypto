@@ -8,10 +8,12 @@ for(const s of ['json','stdout','stderr'])if(fs.existsSync(prefix+'.'+s))throw E
 fs.mkdirSync(prefix.slice(0,prefix.lastIndexOf('/')),{recursive:true});
 const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 const started=new Date().toISOString();
+const toolRoot=process.env.TWIST_PROOF_TOOL_ROOT||'/workspace/shared/twist-tools-20261023';
+const lean=toolRoot+'/lean/bin/lean';
 const native=args[0]==='--native';
-const program=native?args[1]:'/workspace/shared/twist-tools-20261023/lean/bin/lean';
+const program=native?args[1]:lean;
 const argv=['-c','0',program,...(native?args.slice(2):['-j1','-M3072',...args])];
-const child=spawn('/usr/bin/taskset',argv,{cwd,env:{...process.env,PATH:'/workspace/shared/twist-tools-20261023/lean/bin:'+process.env.PATH,LEAN_PATH:leanPath,MIMALLOC_ARENA_RESERVE:'65536'},stdio:['ignore',fs.openSync(prefix+'.stdout','wx'),fs.openSync(prefix+'.stderr','wx')]});
+const child=spawn('/usr/bin/taskset',argv,{cwd,env:{...process.env,PATH:toolRoot+'/lean/bin:'+process.env.PATH,LEAN_PATH:leanPath,MIMALLOC_ARENA_RESERVE:'65536'},stdio:['ignore',fs.openSync(prefix+'.stdout','wx'),fs.openSync(prefix+'.stderr','wx')]});
 let peak=0,limit=null;
 const poll=setInterval(()=>{
  try{const s=fs.readFileSync('/proc/'+child.pid+'/status','utf8');const m=s.match(/^VmRSS:\s+(\d+)/m);if(m){peak=Math.max(peak,Number(m[1]));if(peak>4194304){limit='sampled-resident-memory';child.kill('SIGKILL');}}}catch{}
@@ -20,5 +22,5 @@ const deadline=setTimeout(()=>{limit='600-second-deadline';child.kill('SIGKILL')
 const [code,signal]=await new Promise((resolve,reject)=>{child.on('error',reject);child.on('exit',(c,s)=>resolve([c,s]));});
 clearInterval(poll);clearTimeout(deadline);
 const source=args.find(a=>a.endsWith('.lean'));
-fs.writeFileSync(prefix+'.json',JSON.stringify({schema:'twist.lean-shard-transport/v2',cwd,argv,started_utc:started,finished_utc:new Date().toISOString(),exit_code:code,signal,resource_limit_fired:limit,peak_sampled_rss_kib:peak,rss_sampling_ms:25,resident_guard_kib:4194304,lean_managed_memory_mib:native?null:3072,timeout_s:600,cpu_affinity:[0],threads:1,virtual_address_limit:false,wrapper_sha256:hash(new URL(import.meta.url)),lean_sha256:hash('/workspace/shared/twist-tools-20261023/lean/bin/lean'),program_sha256:hash(program),native_compiled_auditor:native,source_path:source,source_sha256:source?hash(source.startsWith('/')?source:cwd+'/'+source):null,stdout_sha256:hash(prefix+'.stdout'),stderr_sha256:hash(prefix+'.stderr'),performance_claim:false},null,2)+'\n');
+fs.writeFileSync(prefix+'.json',JSON.stringify({schema:'twist.lean-shard-transport/v2',cwd,argv,started_utc:started,finished_utc:new Date().toISOString(),exit_code:code,signal,resource_limit_fired:limit,peak_sampled_rss_kib:peak,rss_sampling_ms:25,resident_guard_kib:4194304,lean_managed_memory_mib:native?null:3072,timeout_s:600,cpu_affinity:[0],threads:1,virtual_address_limit:false,wrapper_sha256:hash(new URL(import.meta.url)),lean_sha256:hash(lean),program_sha256:hash(program),native_compiled_auditor:native,source_path:source,source_sha256:source?hash(source.startsWith('/')?source:cwd+'/'+source):null,stdout_sha256:hash(prefix+'.stdout'),stderr_sha256:hash(prefix+'.stderr'),performance_claim:false},null,2)+'\n');
 process.exitCode=code===0&&!limit?0:1;
