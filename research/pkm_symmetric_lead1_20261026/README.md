@@ -11,7 +11,23 @@ construction as PR #2632.
 
 ## Verdict
 
-__VERDICT__
+**m = 3:** the symmetric tower's D is **6 at N = 18**, the same as at N = 15. The
+sequence over N = 6, 9, 12, 15, 18 is **4, 5, 5, 6, 6**. That is still exactly a staircase
+that steps up every second cell, so the next step would come at N = 21. The N = 18 cell
+cannot tell the two readings apart: "D bounded at 6" and "D rises by one every 6 in N"
+both predict 6 there. **Lead 1 stays open.** The discriminating cell is N = 21, where the
+two readings predict 6 and 7. It needs more than this container's 13 GB.
+
+**m = 4 (new):** S₅ written in the e_k is now in the instrument and passes its planted
+check. At N = 12 the symmetric system runs in 13 ms where the plain chain takes 158 s, with
+5.9× narrower matrices and a last productive degree one lower (5 against 6). Its D is 8 at
+N = 12 and 16. That is just the degree of S₅(e), its input, so D cannot rank the two arms
+at m = 4.
+
+Cost still grows with N in both families. From N = 15 to 18 (m = 3) the widest matrix
+grows 3.1× and the time 39×. Nothing here prices a pipeline.
+
+![D and last productive degree, widest matrix and time per system against N; recorded rows only](d_vs_n.svg)
 
 ## m = 3: does D stay at 6?
 
@@ -21,7 +37,7 @@ __VERDICT__
 | 9 | 5 | 3 | 248 | 4 ms |
 | 12 | 5 | 3 | 1,224 | 0.4 s |
 | 15 | 6 | 4 | 10,532 | 50 s |
-__N18ROW__
+| **18** | **6** | 3 | 33,153 | 1,941 s (one target, alone on the host) |
 
 Rows N = 6–15 reproduce PR #2632 exactly: same D, widths and field-operation counts.
 
@@ -75,4 +91,20 @@ Both random targets give identical D, widths and field-operation counts in every
 
 ## Reading
 
-__READING__
+Constant-factor gains in the decomposition oracle's F4 stage are now measured at both m = 3
+and m = 4: about 10× narrower matrices at m = 3 and 5.9× at m = 4. The per-system time gain
+is 20–50× at m = 3 for N = 12–15 (PR #2632), and about 12,000× at m = 4, N = 12. Both m = 4 arms
+were timed under the same contention. For m = 4 this is
+the larger effect. The plain chain needs m − 2 = 2 extra partial-sum unknowns and an S₃
+chain, while the symmetric system has none, and it sees each unordered summand set once
+instead of m! = 24 times.
+
+None of this is an index-calculus improvement until it is priced end to end: relations per
+second against a matched rho, with the §5a band. The next measurements are:
+
+1. **m = 3, N = 21 symmetric.** It decides lead 1's next step (6 against 7). It needs a host
+   with about 32 GB or more.
+2. **m = 4, N = 20 symmetric** against the recorded plain D ≥ 8.
+3. **Price the m = 4 symmetric oracle** inside the PKM decomposition pipeline at N = 12–16.
+   Whether a 12,000× per-system gain moves the pipeline depends on the share of time the F4
+   stage takes there. That share has not been measured.

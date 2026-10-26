@@ -16,3 +16,8 @@ exit=137
 m=4 t=5 symmetric exit=134
 NOTE (operator): the m=3 N=18 cell above was killed by the kernel OOM killer (exit 137) after 92 CPU-min, ~8.5+ GB, because the concurrent m=4 cells pushed the 15 GB container over. Operator error. The m=4 t=5 (N=20) cell aborted under its 6 GB cap (exit 134). Rerunning m=3 t=6 alone with --t-min 6 (targets differ from a t<=7 sweep because earlier cells consume the RNG), cap 13 GB.
 2026-10-26T19:11:01Z start m=3 t=6 alone
+
+real	32m24.097s
+user	107m2.096s
+sys	0m40.037s
+m=3 t=6 rerun exit=0
