@@ -1,6 +1,6 @@
 # Algebraic decomposition and quartic IC pursuit
 
-Owner-requested campaign, begun 2026-10-23; evidence snapshot 2026-10-25.
+Owner-requested campaign, begun 2026-10-23; evidence snapshot 2026-10-26.
 **The campaign is partial.** The finite results below do not establish a
 bounded degree law, global guess minimum, complete-price IC improvement or
 measured rho crossover. [PROTOCOL.md](PROTOCOL.md) preserves the original
@@ -31,9 +31,9 @@ The [wide-core report](reports/run-wide-core-audit-20261025/report.pdf)
 checks standalone m=16/17/18 arithmetic, exact group orders, high scalar and
 coordinate bits, serialization and independent replays at extension degrees
 64/68/72. The completed wide-core wave passed 4,634 library tests, zero
-failures, 119 ignored, on its frozen source. The later narrow-constructor
-port described below has a separate full library gate queued; that earlier
-pass is not a verdict on the new source. This is
+failures, 119 ignored, on its frozen source. The narrow-constructor
+port described below separately passed 4,635 library tests, zero failures,
+119 ignored, on its recorded source. Later merged-source checks remain separate. This is
 not full wider ecbench/IC support. [Protocol](WIDE_GROUP_AUDIT_PROTOCOL.md),
 [reproduction](verify-wide-core.sh), [remaining integration](../../problems/quartic-binary-ic-wide-scalars.md).
 
@@ -45,14 +45,26 @@ native runtime and complete-IC pricing remain missing. The
 the finite-field specialization/irreducibility bridge is not formalized.
 Identity IDC1h0e27b483c3989bcd certifies only the integer expansion.
 
-A separate [narrow-constructor comparison](NARROW_CONSTRUCTOR_EXCLUSION_PROTOCOL.md)
-now has its old executable and seven even/odd field/product controls preserved.
-The baseline narrow6 profile records 8,774,220 simulated whole-process Ir.
-Commit c754e7111 ports the proved candidate exclusion to the narrow backend
-and adds frozen-model regression controls. Its build, full release library
-gate and candidate comparison are actually queued behind m14's resource lock;
-none has passed yet. This candidate is not a new IC performance result.
-The current m14/15 program keeps its original frozen binary unchanged.
+The separate [narrow-constructor comparison](reports/run-narrow-constructor-20261026/report.pdf)
+records 8,774,220 versus 570,927 simulated whole-process Ir with identical
+stdout and seven identical even/odd field/product controls. Source c754e7111
+passes 4,635 library tests, its affected example tests and scoped clippy.
+This remains instruction attribution with missing native A/A/A-B/external
+performance qualification. [Native audit](pipeline-receipts/publication-followup-audit-v3-20261026/output.json),
+[reproduction](verify-publication-followup.sh), [protocol](NARROW_CONSTRUCTOR_EXCLUSION_PROTOCOL.md).
+
+The [interrupted quartic report](reports/run-partial-quartics-20261026/report.pdf)
+preserves m14's 17/24 records (11 successful rho answers, five IC timeouts,
+one interrupted/crashed IC attempt) and m15's 15/24 records (ten successful
+rho answers, five IC timeouts). Seven/nine registered executions are missing.
+The m14 original audit reproduces all 11 successful records but fails the
+complete-session gate. A new BinaryCurve audit verifies all 11/ten scalars
+against their exact recorded generators and targets. Legacy coordinates are
+packed tower elements and require the explicit polynomial-basis conversion;
+two initial verifier failures are preserved. Both factories' generators agree
+after conversion on these two checked models. No complete IC cost or IC/rho
+ratio is available. [Small complete raw archive](evidence/runs-partial-quartics-complete-20261026.tar.xz),
+[independent partial replay](verify-publication-followup.sh), [audit protocol](FOLLOWUP_PUBLICATION_AUDIT_PROTOCOL.md).
 
 The [versioned curve-identity adapter](curve-identity-adapter.v1.json)
 binds all 18 reference/twist, four qualified-query and three wide-core models
@@ -65,14 +77,22 @@ unchanged. [Metadata reproduction](adapt-curve-identities.py).
 The original 116-attempt balanced campaign ended at 17:53:53 UTC on
 2026-10-25. With eight earlier draw-0/k3 branches, all 124 attempts are
 accounted for: 78 refute, 45 saturate without refuting and one times out.
-The supported capped L0 m14 quartic diagnostic started at 17:54:16 UTC; m15
-and the independent 124-case HKY replay wait in real identity-guarded queues.
-Original L2 full-panel specs and larger-host shards remain unchanged and
-unexecuted. The USD 100 extra-cloud
-ceiling includes replay; no additional VM has launched. Raw bundles and
-oversized inspected PDFs are local pending verified artifact-store upload.
-The [publication packet](PUBLISH_REVIEW.md) and pending plans distinguish
-these prepared bytes from uploaded or published evidence.
+The m14/m15 continuation and dependent HKY queue stopped across the
+workspace restart; no research runner is currently live. The independent
+124-branch HKY program has not run. Original L2 full-panel specs and larger
+host shards remain unchanged and unexecuted. The USD 100 extra-cloud ceiling
+includes replay; no additional VM has launched and workspace billing is
+unmeasured.
+
+The owner approved publication on 2026-10-26, and the results summary is now
+on [private PR 2550](https://github.com/isogeny-labs/crypto/pull/2550).
+The repository moved with the same ID. Source/evidence integration and
+additional artifact-store delivery remain in progress; an authenticated
+metadata relay is being prepared using the repository's documented CI path.
+No upload is inferred from a pending plan. There are 31 inspected reports,
+34 pages. The [v2 metadata adapter](curve-identity-adapter.v2.json) preserves
+all 25 v1 identities and adds the two independently checked partial models.
+[Publication snapshot](PR_UPDATE_20261026.md), [publication packet](PUBLISH_REVIEW.md).
 
 ## Measured structural result
 
@@ -200,7 +220,7 @@ is unknown. It does not affect the zero-guess minimum on that draw.
 These are minima within this registered balanced-prefix family at degree
 four, not over arbitrary variable subsets or orderings. Native raw accounting
 and the prefix summary reproduce byte-identically from the complete archive;
-independent HKY verdict replay is queued after m14/15 and has not run.
+independent HKY verdict replay has not run; its queue was interrupted by the workspace restart.
 Independent word recount, construction, splitting/lifting, verification and
 physical conversion remain open. [Summary](pipeline-receipts/guess-completion-20261025-01/summary.json),
 [reproduction](verify-completed-guess.sh), [replay protocol](COMPLETED_GUESS_REPLAY_PROTOCOL.md).
@@ -318,10 +338,10 @@ preserves all generated scripts, package hashes, outputs and statuses.
 | A1: independent structural replay | partial | exact original fixtures and small equations/roots checked; upstream large fall-degree panel not fully replayed |
 | A2: native structured bases and symmetric formulation | verified, finite pilot | Rust implementations, all four families, identity/splitting/repeated-root controls; limits in PIPELINE.md |
 | A3: combine formulations and closure | verified, finite stage panel | three matched panels above; no whole-query performance conclusion |
-| B1: ell=8 minimum guesses | partial | all 124 registered attempts terminated; balanced-prefix minima 4/4/4/0; one retained timeout; independent HKY replay queued, arbitrary sets, ordinary-query interpretation and full prices remain |
+| B1: ell=8 minimum guesses | partial | all 124 registered attempts terminated; balanced-prefix minima 4/4/4/0; one retained timeout; independent HKY replay unexecuted after restart, arbitrary sets, ordinary-query interpretation and full prices remain |
 | B2: ell=9 and four summands | partial | 2,048 additional qualified queries, independently recounted points and D2/D3 controls; original 1,152 fixtures preserved; larger guessing/degree-four shards unexecuted |
 | B3: N=58/60/100 continuation | partial | degree-two/three nonrefuting fixed points on three fixtures; all degree-four results resource-capped; independent large fixed-point certificates remain |
-| C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified and identically replayed records; separate capped L0 m14 running and m15 queued; original L2 full panels outstanding |
+| C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified and identically replayed records; additional m14/m15 runs interrupted; 11/ten rho answers independently verified, no completed IC; original L2 full panels outstanding |
 | C2: m=14--18 ladder | partial, integration/compute blocked | standalone m16--18 core/order/encoding controls and independent replay pass; full wide stage adapters, eight-target IC/rho ladder and complete prices remain |
 | C3: complete method and full native price | partial | n13/n23 answer replay and ten n13 instruction profiles; construction/split counters, native allocator/physical costs and qualified comparison missing |
 | D1: external/hardware controls | partial | all 44 same-input Singular correctness checks agree on 22 cases; fastest-tool performance and actual hardware comparisons remain |

@@ -29,10 +29,6 @@ if [ "$mode" = partial ]; then
   cmp "$scratch/actual.json" "$scratch/expected.json"
 else
   read -r hash relative < <(jq -r '.archives[] | select(.kind == "binaries") | [.sha256,.path] | @tsv' "$study/wide-raw-archives.json")
-  # Older archive indexes use the singular kind `binary`.
-  if [ -z "${relative:-}" ]; then
-    read -r hash relative < <(jq -r '.archives[] | select(.kind == "binary") | [.sha256,.path] | @tsv' "$study/wide-raw-archives.json")
-  fi
   actual=$(sha256sum "$study/$relative")
   test "${actual%% *}" = "$hash"
   tar -xJf "$study/$relative" -C "$scratch/bin"

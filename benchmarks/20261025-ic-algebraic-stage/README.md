@@ -49,3 +49,11 @@ within the registered family; all 64 k4 branches cost 23,078,681,663,212
 solver words. Failed-prefix work is charged in the report, and the censored
 experiment total remains unknown. Independent HKY replay is queued, not
 complete. The new browsing copies remain unadmitted.
+
+The 2026-10-26 additions preserve the completed narrow constructor comparison
+(8,774,220/570,927 simulated whole-process Ir; seven identical field controls,
+4,635 library passes) and the interrupted m14/m15 diagnostic status. All 11/ten
+successful rho answers independently verify; every IC attempt is timed out
+or interrupted. These browsing copies remain unadmitted and no full IC/rho
+ratio is available. The new native verifier retains its initial coordinate
+encoding failures and the corrected, repeated audit.

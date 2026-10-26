@@ -66,8 +66,8 @@ rho and native-price band at 0, 0.1 and 1 GAE, remains the downstream test.
   ended; with eight earlier k3 cases the 124 attempts contain 78 refutations,
   45 nonrefuting fixed points and one timeout. Balanced-prefix minima are
   4/4/4/0 on draws 0/3/5/6; all 64 k4 branches refute. These are not global
-  subset minima. Independent HKY replay is queued after the m14/15 quartic
-  diagnostic; no independent word recount or full query price follows. All 44
+  subset minima. Independent HKY replay has not run after its queue was interrupted
+  by the workspace restart; no independent word recount or full query price follows. All 44
   same-input Singular correctness checks agree on 22 small cases; equal-output
   fastest-tool performance comparisons remain open. The prescribed paid launcher
   is blocked by an explicit identity-policy denial; no research VM launched.

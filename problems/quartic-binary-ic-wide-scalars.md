@@ -91,3 +91,11 @@ pass before editing. Commit c754e7111 ports the already proved exclusion to
 the narrow constructor; its new library gate and candidate profile/parity
 checks are queued behind the real m14 resource lock. This source remains
 unverified until those receipts exist. The active quartic binary is unchanged.
+
+2026-10-26: the narrow constructor port now passes 4,635 library tests, its
+affected example tests and all seven field/product controls. Native raw
+profile totals are 8,774,220/570,927 Ir, with the same attribution limits.
+The m14/m15 diagnostics are interrupted, retaining 17/24 and 15/24 records;
+all 11/ten successful rho answers independently verify after decoding the
+legacy tower coordinates. No recorded IC attempt completes. Original
+L2/full-wide requirements and independent HKY remain open; no runner is live.

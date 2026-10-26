@@ -1,14 +1,20 @@
 # Concrete publication packet for existing private PR 2550
 
-Destination: https://github.com/aburan28/crypto/pull/2550, existing ready PR;
+Destination: https://github.com/isogeny-labs/crypto/pull/2550, existing ready PR;
 normal forward-only update of its current branch. The campaign remains partial.
-This packet covers the completed local wave through commit
-4d0bfe24276aac6ffc4b9c56afcd70429cd8e617: code, native evidence, reproduction
-scripts and inspected reports below. Pending artifacts are not uploaded or
-published. A later narrow-constructor comparison is separately in progress:
-its source is committed on the integration branch, while build/tests and
-candidate data await m14’s resource lock. Do not apply the earlier full-test
-pass to that changed source or publish it as verified.
+Owner publication authorization was received on 2026-10-26. The updated
+results summary was published and read back equal at 14:55:43 UTC; see
+PR_UPDATE_20261026.md. Repository ID 1221029056 is unchanged by the move to
+isogeny-labs. The earlier approval-review restriction is resolved.
+
+This packet includes the completed wave through 4d0bfe242 and the now-checked
+narrow constructor c754e7111. Its full library gate passed 4,635 tests,
+zero failures, 119 ignored; all seven field controls agree. The corrected
+native follow-up audit verifies 11/ten successful rho scalars from the
+interrupted m14/m15 sessions and repeats byte-identically. Two initial
+coordinate-basis adapter failures are retained. Source/metadata integration
+and the additional artifact upload are in progress; no later merged-head
+green verdict or full IC comparison is claimed.
 
 ## Proposed title and description
 
@@ -61,7 +67,7 @@ replays; N=58/60/100 D4 outcomes remain resource-capped. Singular agrees on all
 n13 profiles reproduce answers/counters. Solver prices at n13/n23 are pinned
 rates; the earlier wall-pricing explanation has an explicit correction.
 
-All new reports are source linked and visually inspected: 29 reports, 32 pages
+All new reports are source linked and visually inspected: 31 reports, 34 pages
 in the inspection registry. Performance browsing copies remain unadmitted.
 No new complete-price IC/rho, degree-law, asymptotic or measured-crossover claim.
 A versioned metadata adapter preserves all 25 source curve records and supplies
@@ -78,20 +84,28 @@ HKY checks. The wide raw/binary verifier and Lean-linked certificate replay pass
 Dashboard browser checks pass at 1280/390/320, dark and JavaScript-disabled,
 with no script errors or external requests.
 
-The separate capped L0 m14 diagnostic started at 17:54:16 UTC and is running;
-m15 waits behind it, followed by the independent HKY replay. These do not replace
-the original unexecuted L2 panels. Cloud runs remain access-blocked. No extra VM
-has launched; USD 100 total extra-cloud authorization includes replay. Current
-workspace billing is unmeasured. Larger requirements remain open in the README.
+The additional m14 run hit its outer timeout and retains an interrupted
+17/24-record session. Its 11 successful rho records replay; five IC attempts
+time out and one is interrupted. m15 retains 15/24 records, with ten successful
+rho answers and five IC timeouts. It stopped before its final metadata.
+Both runs and the dependent HKY queue are no longer live after the workspace
+restart. These do not replace the unexecuted L2 panels. Full wide adapters,
+larger D4 and independent 124-branch HKY replay remain open. No extra VM has
+launched; the USD 100 cap includes replay and workspace billing is unmeasured.
 
 ## Publication and access gates
 
-Automatic approval review rejected the earlier broad PR update because the
-research/infrastructure payload lacked explicit approval for that destination.
-The repository was verified private. Only a narrower correction of an already
-published pricing sentence was subsequently accepted. This broader packet has
-not been approved; the compute-budget reply does not resolve that rejection.
-No alternate tool/account/push route is used to bypass it.
+The earlier automatic review refusal is resolved by explicit owner approval.
+The PR title/results description are published. The old remote head's commit
+b1ab8a4e5 migrated 24 files in this study/benchmark scope into real artifact
+manifests; preserved local copies are byte-hashed before integration.
+Additional locally tracked and pending data still require verified upload.
+The managed environment has no AWS identity (current configuration revision
+38; normal STS probe returns NoCredentials). The repository documents a
+separate CI artifact credential, so a bounded manual metadata relay is being
+prepared to test that path. No credentials are read out or copied to artifacts,
+no experiments/builds run through the relay, and no SSM/provisioning denial is
+routed around. The destination remains the configured artifact store.
 
 The exact local artifact dry run selects **59 files, 8.9 MB**: 34 earlier tracked
 files plus 19 study and six benchmark pending files. Pending plans are not valid
@@ -115,7 +129,7 @@ its updates without rebase/force-push and rerun affected checks. Earlier CI disk
 curve-name and artifact failures are historical and not current-head conclusions.
 Do not call the PR green or bypass checks/reviews to merge it.
 
-After explicit publication approval and credential readiness: upload and verify
+For the remaining artifact/source delivery: upload and verify
 the prepared artifact scope with tools/artifacts; commit real manifests and
 hydration instructions; complete the final artifact/source gates; push normally
 to this existing PR; update its title/body to this scope and follow its new head's
