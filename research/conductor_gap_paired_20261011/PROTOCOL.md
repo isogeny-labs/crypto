@@ -1,3 +1,5 @@
+> **PROVISIONAL, legacy Python, NOT FOR MERGE: violates the repo's no-Python rule; kept as labelled historical evidence; matched native re-measurement required before any claim.**
+
 # Protocol: paired conductor-gap smoke test over F_{p^2}, gates G0 and G1
 
 Frozen before any code in this directory was run. Directory name carries the
@@ -392,3 +394,22 @@ is labelled exploratory wherever it appears. It was specified before it was run:
   group-structure-mediated: `E(F_q) ~ Z/n1 x Z/n2` and `n1 = gcd(x - 1, f_pi/f_E)`
   depends on `f_E`) effect on yield, not evidence of a hardness difference, and
   would need the frozen G2 protocol to be followed. A large `p` is a null.
+
+### Amendment 4 (2026-10-26, after all runs; status change, no result changed)
+
+The coordinator withdrew the Python authorisation on which section 1 of this
+protocol relied: `AGENTS.md`, "Implementation language: no Python", bans Python
+for harnesses, solvers, benchmark drivers, certificate verifiers and result
+generation, and the task brief that allowed "pure Python" was wrong. Section 1
+above is left as written because it records what was believed when the runs were
+made; it no longer describes an exception that exists. Consequences:
+
+1. Everything in this directory produced by `*.py` is **legacy Python
+   evidence**, preserved unmodified and labelled as such. Its timings are
+   historical Python timings.
+2. No Python was started or written after the order. The runs that exist are
+   exactly those listed in `README.md`; `summarize.py`, the figures and
+   `report.pdf` were not produced and are not planned in Python.
+3. No claim of any kind rests on this directory until a matched native
+   (Rust) re-measurement exists. `RESULTS_PROVISIONAL.md` records what was
+   measured, with that limit.
