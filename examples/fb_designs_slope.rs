@@ -2380,10 +2380,15 @@ fn group_of(file: &str) -> &str {
     if file.starts_with("L2r-") {
         return "L2r";
     }
+    if file.starts_with("H64-A0-") {
+        return "H64-A0";
+    }
+    if file.starts_with("H64-A11-") {
+        return "H64-A11";
+    }
     match file.get(..3) {
         Some(
-            g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "L1-" | "L2-"
-            | "X1-" | "X2-"),
+            g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "L1-" | "L2-"),
         ) => &g[..2],
         _ => "p1",
     }
@@ -3785,7 +3790,7 @@ mod kernel_capture_tests {
         for text in [
             "",
             "capture_status failed\n",
-            "no kernel OOM lines for X1\n",
+            "no kernel OOM lines for H64-A0\n",
             "[1.0] booted\n",
         ] {
             assert!(!verified_kernel_capture(text));
@@ -3810,12 +3815,12 @@ mod kernel_capture_tests {
     }
 }
 
-/// Amendment 7: X1 (A0, t = 4) and X2 (A11, t = 5) on a 64 GiB host, under
+/// Amendment 12: H64-A0 (A0, t = 4) and H64-A11 (A11, t = 5) on a 64 GiB host, under
 /// Amendment 6's limit rule without the 14.5 GB cap. The pre-flight and the
 /// kernel log beside each cell's rows, the attribution check, identity with
 /// the earlier attempts, R1 and R2, the binding limit of every incomplete
 /// system, and the predictions.
-fn analyze7(dir: &str) {
+fn analyze12(dir: &str) {
     let rows = read_rows(dir);
     let group = |g: &'static str| -> Vec<&Value> {
         rows.iter()
@@ -3828,10 +3833,12 @@ fn analyze7(dir: &str) {
         group("C2"),
         group("L1"),
         group("L2"),
-        group("X1"),
-        group("X2"),
+        group("H64-A0"),
+        group("H64-A11"),
     );
-    println!("Factor-base designs, Amendment 7 (X1, X2 on a 64 GiB host): rows from {dir}");
+    println!(
+        "Factor-base designs, Amendment 12 (H64-A0, H64-A11 on a 64 GiB host): rows from {dir}"
+    );
     println!("(V = min(cgroup_kB − 524288, MemTotal_kB − 524288). A system's limit is attributable only if its");
     println!(" row is a ulimit -v malloc failure or timeout, kernel capture succeeded, and no OOM event was recorded.");
     println!(
@@ -3945,13 +3952,13 @@ fn analyze7(dir: &str) {
     };
 
     let (x1_attr, x1_lim) = cell(
-        "X1: A0 m = 4, t = 4, p1, budget 14400 s + grace 600 s",
-        "X1-A0-m4-t4",
+        "H64-A0: A0 m = 4, t = 4, p1, budget 14400 s + grace 600 s",
+        "H64-A0-m4-t4",
         &x1,
     );
     let a0_c2 = of_arm(&c2, "A0");
     println!(
-        "  identity: {} of {} X1 systems match C2's A0 systems, {} match L1's (cell_seed, target_seed, n_vars, n_eqs, planted_x, x_r, curve, set)",
+        "  identity: {} of {} H64-A0 systems match C2's A0 systems, {} match L1's (cell_seed, target_seed, n_vars, n_eqs, planted_x, x_r, curve, set)",
         same_as(&x1, &a0_c2),
         x1.len(),
         same_as(&x1, &l1)
@@ -3967,13 +3974,13 @@ fn analyze7(dir: &str) {
         );
     }
     let (x2_attr, x2_lim) = cell(
-        "X2: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s",
-        "X2-A11-m4-t5",
+        "H64-A11: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s",
+        "H64-A11-m4-t5",
         &x2,
     );
     let l2r: Vec<&Value> = group("L2r");
     println!(
-        "  identity: {} of {} X2 systems match L2's systems, {} match L2r's",
+        "  identity: {} of {} H64-A11 systems match L2's systems, {} match L2r's",
         same_as(&x2, &l2),
         x2.len(),
         same_as(&x2, &l2r)
@@ -4010,12 +4017,12 @@ fn analyze7(dir: &str) {
     println!();
     println!("════ σ and κ at m = 4, p1");
     let (n0, s0, k0) = show4(
-        "A0 m = 4 p1 (F4 via C1, X1's t = 4 cell)",
+        "A0 m = 4 p1 (F4 via C1, H64-A0's t = 4 cell)",
         4,
         &cells4(a0.into_iter()),
     );
     let (n11, s11, k11) = show4(
-        "A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, X2's t = 5 cell)",
+        "A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, H64-A11's t = 5 cell)",
         4,
         &cells4(a11.into_iter()),
     );
@@ -4040,11 +4047,11 @@ fn analyze7(dir: &str) {
     println!("════ R1: does A11's constant factor survive at m = 4, t = 4?");
     let a11_t4 = of_arm(&c2, "A11");
     if x1.len() < 2 {
-        println!("  R1: NOT DECIDED (X1 has {} of 2 rows)", x1.len());
+        println!("  R1: NOT DECIDED (H64-A0 has {} of 2 rows)", x1.len());
     } else if done(&x1) && done(&a11_t4) {
         let (x, y) = (mean_ops(&a11_t4), mean_ops(&x1));
         println!(
-            "  A11 t = 4 (C2) mean field_ops {x:.0} (log₂ {:.3}); A0 t = 4 (X1) mean field_ops {y:.0} (log₂ {:.3})",
+            "  A11 t = 4 (C2) mean field_ops {x:.0} (log₂ {:.3}); A0 t = 4 (H64-A0) mean field_ops {y:.0} (log₂ {:.3})",
             x.log2(),
             y.log2()
         );
@@ -4063,7 +4070,7 @@ fn analyze7(dir: &str) {
             binding(&x1_lim)
         );
     } else {
-        println!("  R1: NOT DECIDED (comparison incomplete or limit attribution unverified; see X1 above)");
+        println!("  R1: NOT DECIDED (comparison incomplete or limit attribution unverified; see H64-A0 above)");
     }
     println!(
         "  A0 m = 4: {n0} completed cells: κ = {} ({}), σ = {} ({})",
@@ -4076,10 +4083,10 @@ fn analyze7(dir: &str) {
     println!();
     println!("════ R2: A11 at m = 4, t = 5");
     if x2.len() < 2 {
-        println!("  R2: NOT DECIDED (X2 has {} of 2 rows)", x2.len());
+        println!("  R2: NOT DECIDED (H64-A11 has {} of 2 rows)", x2.len());
     } else if done(&x2) {
         println!(
-            "  X2 completed: the {n11}-cell series gives κ = {} ({}), σ = {} ({})",
+            "  H64-A11 completed: the {n11}-cell series gives κ = {} ({}), σ = {} ({})",
             fmt_k(k11),
             kappa_verdict(n11, k11, 4),
             fmt_s(s11),
@@ -4096,11 +4103,11 @@ fn analyze7(dir: &str) {
             verdict(n11, s11)
         );
     } else {
-        println!("  R2: NOT DECIDED (a limit is not attributable; see X2 above)");
+        println!("  R2: NOT DECIDED (a limit is not attributable; see H64-A11 above)");
     }
 
     println!();
-    println!("════ Predictions scorecard (Amendment 7)");
+    println!("════ Predictions scorecard (Amendment 12)");
     let score = |rs: &[&Value], lim: &[&str], attr: bool, want: &str| {
         if rs.len() < 2 {
             "not decided"
@@ -4115,12 +4122,12 @@ fn analyze7(dir: &str) {
         }
     };
     println!(
-        "  X1: A0 does not complete; binding limit time (a timeout at 14400 s): limits [{}]  →  {}",
+        "  H64-A0: A0 does not complete; binding limit time (a timeout at 14400 s): limits [{}]  →  {}",
         x1_lim.join(", "),
         score(&x1, &x1_lim, x1_attr, "time")
     );
     println!(
-        "  X2: A11 does not complete; binding limit memory: limits [{}]  →  {}",
+        "  H64-A11: A11 does not complete; binding limit memory: limits [{}]  →  {}",
         x2_lim.join(", "),
         score(&x2, &x2_lim, x2_attr, "memory")
     );
@@ -4190,8 +4197,8 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--amendment7") {
-                analyze7(dir);
+            if args.iter().any(|a| a == "--amendment12") {
+                analyze12(dir);
             } else if args.iter().any(|a| a == "--amendment6") {
                 analyze6(dir);
             } else if args.iter().any(|a| a == "--amendment5") {

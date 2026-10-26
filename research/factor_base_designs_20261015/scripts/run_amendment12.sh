@@ -1,9 +1,9 @@
 #!/bin/sh
-# Amendment 7: run one m = 4 cell (X1 or X2) on a large-memory host.
+# Amendment 12: run one m = 4 cell (H64-A0 or H64-A11) on a large-memory host.
 #
-#   run_amendment7.sh CELL BINARY OUT_DIR
+#   run_amendment12.sh CELL BINARY OUT_DIR
 #
-# CELL is X1 (A0, m = 4, t = 4) or X2 (A11, m = 4, t = 5). BINARY is a release
+# CELL is H64-A0 (A0, m = 4, t = 4) or H64-A11 (A11, m = 4, t = 5). BINARY is a release
 # build of examples/fb_designs_slope.rs; FB_DESIGNS_COMMIT names the commit it
 # was built from. The script needs only sh, coreutils and dmesg: no checkout,
 # no Rust toolchain. Run it as root on an otherwise idle host so dmesg is
@@ -16,11 +16,11 @@ out=$3
 : "${FB_DESIGNS_COMMIT:?set FB_DESIGNS_COMMIT to the commit the binary was built from}"
 
 case $cell in
-X1) arm=A0 t=4 ;;
-X2) arm=A11 t=5 ;;
-*) echo "unknown cell $cell (X1 or X2)" >&2; exit 2 ;;
+H64-A0) arm=A0 t=4 ;;
+H64-A11) arm=A11 t=5 ;;
+*) echo "unknown cell $cell (H64-A0 or H64-A11)" >&2; exit 2 ;;
 esac
-name="$cell-$arm-m4-t$t"
+name="H64-$arm-m4-t$t"
 mkdir -p "$out"
 # A rerun must use a fresh cell directory/prefix, preserving every old receipt.
 for previous in "$out/$name".*; do
@@ -56,7 +56,7 @@ if [ "$cg_kb" != unlimited ] && [ "$cg_kb" -ge "$mem_kb" ]; then
     cg_kb=unlimited
 fi
 
-# V = min(cgroup_kB - 524288, MemTotal_kB - 524288) (Amendment 7).
+# V = min(cgroup_kB - 524288, MemTotal_kB - 524288) (Amendment 12).
 v_kb=$((mem_kb - 524288))
 if [ "$cg_kb" != unlimited ] && [ $((cg_kb - 524288)) -lt "$v_kb" ]; then
     v_kb=$((cg_kb - 524288))
@@ -103,4 +103,4 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 "$bin" run --arms "$arm" --m 4 --t-min "$t" --t-max "$t" \
     --budget 14400 --grace 600 --vmem-kb "$v_kb" \
-    --file "$cell-{arm}-m4-t$t" --out-dir "$out"
+    --file "H64-{arm}-m4-t$t" --out-dir "$out"

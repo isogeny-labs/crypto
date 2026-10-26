@@ -470,10 +470,12 @@ counters. A per-degree progress record would leave partial `max_cols` and
 `field_ops`, but it would change the harness's output and needs its own
 amendment.
 
-### Amendment 7, 2026-10-21: the two m = 4 cells on a 64 GiB host (X1, X2), before any of their rows
+### Amendment 12, 2026-10-21: the two m = 4 cells on a 64 GiB host (H64-A0, H64-A11), before any of their rows
+
+**Numbering note, 2026-10-26 (renames only; changes no rule, threshold, prediction, row or byte of any record).** This amendment was registered and run as “Amendment 7” with cells X1 and X2 (run records `runs/X1-A0-m4-t4.*`, `runs/X2-A11-m4-t5.*`, runner `scripts/run_amendment7.sh`, flag `analyze --amendment7`). `main` meanwhile gained its own Amendments 7 and 8 and its own X1 cell, so on merging `main` it is renumbered **Amendment 12** with cells **H64-A0** (was X1) and **H64-A11** (was X2); files are renamed with `git mv` to `runs/H64-A0-m4-t4.*`, `runs/H64-A11-m4-t5.*`, `scripts/run_amendment12.sh`, flag `--amendment12`. The renamed records are byte-identical inside, so they still name the old cells: the instance logs, `*.dmesg.txt` and `*.preflight.txt` say X1 or X2. The raw outputs remain under the old S3 prefix `s3://crypto-autoresearcher/lab-results/factor-base-designs-a7/fab81e175/`, whose keys are unchanged.
 
 Registered after Amendment 6's run (`reports/run-20261019T1740Z`) and before
-any X1 or X2 row exists. It adds two cells. It changes no existing row,
+any H64-A0 or H64-A11 row exists. It adds two cells. It changes no existing row,
 verdict, threshold or prediction. Instrument, seeds, the completed-cell rule,
 σ, κ, R1 and R2 are unchanged. L1, L2 and L2r stay as recorded. The only
 changes are the host and the memory limit.
@@ -487,7 +489,7 @@ containers.
 
 - **Host.** Two AWS EC2 `r7i.2xlarge` instances (64 GiB, 8 vCPU) in
   us-west-2, Ubuntu 24.04, one per cell, otherwise idle. Each runs
-  `scripts/run_amendment7.sh` as root. The script needs no checkout. The
+  `scripts/run_amendment12.sh` as root. The script needs no checkout. The
   binary is a release build of `examples/fb_designs_slope.rs` at the commit
   that adds this amendment, built in the session container (glibc 2.39, as on
   the AMI). It is stamped through `FB_DESIGNS_COMMIT`, and its sha256 is
@@ -501,11 +503,11 @@ containers.
   `V = min(cgroup_limit_kB − 524288, MemTotal_kB − 524288)` kB. A cgroup
   limit at or above `MemTotal`, or `max`, counts as none. If no cgroup file is
   readable, the script does not run.
-- **X1, A0 m = 4, t = 4, p₁.** The same two planted systems as C2 and L1 (the
+- **H64-A0, A0 m = 4, t = 4, p₁.** The same two planted systems as C2 and L1 (the
   seeds are unchanged, so the systems are identical):
-  `run --arms A0 --m 4 --t-min 4 --t-max 4 --budget 14400 --grace 600 --vmem-kb V --file 'X1-{arm}-m4-t4'`.
-- **X2, A11 m = 4, t = 5, p₁.** The same two planted systems as L2 and L2r:
-  `run --arms A11 --m 4 --t-min 5 --t-max 5 --budget 14400 --grace 600 --vmem-kb V --file 'X2-{arm}-m4-t5'`.
+  `run --arms A0 --m 4 --t-min 4 --t-max 4 --budget 14400 --grace 600 --vmem-kb V --file 'H64-{arm}-m4-t4'`.
+- **H64-A11, A11 m = 4, t = 5, p₁.** The same two planted systems as L2 and L2r:
+  `run --arms A11 --m 4 --t-min 5 --t-max 5 --budget 14400 --grace 600 --vmem-kb V --file 'H64-{arm}-m4-t5'`.
 - One system at a time on each host. Each row records `field_ops`,
   `max_cols`, D, wall time, `ulimit_v_kb` and `peak_rss_kb`. **Attribution**
   is Amendment 6's check: the kernel OOM lines (or "none") go to
@@ -513,17 +515,17 @@ containers.
   is a `ulimit -v` malloc failure or a timeout and the kernel log has no OOM
   kill for it. A system cut off by the 9 h instance cap leaves no row and is
   reported as *not decided (instance cap)*.
-- **Identity.** The analysis checks that X1's systems equal C2's and L1's,
-  and X2's equal L2's and L2r's, on the same fields as Amendment 6.
+- **Identity.** The analysis checks that H64-A0's systems equal C2's and L1's,
+  and H64-A11's equal L2's and L2r's, on the same fields as Amendment 6.
 
 **Decision rules, fixed now.** R1 and R2 as in Amendment 5, with the limit
 "V kB on the X host and 4 h":
-- **R1.** If both X1 systems complete: *survives* if A11's C2 t = 4 mean
-  `field_ops` is below X1's mean, *crossed* otherwise. A0's m = 4 series then
-  gains its third cell, and its σ and κ verdicts are computed. If X1 does not
+- **R1.** If both H64-A0 systems complete: *survives* if A11's C2 t = 4 mean
+  `field_ops` is below H64-A0's mean, *crossed* otherwise. A0's m = 4 series then
+  gains its third cell, and its σ and κ verdicts are computed. If H64-A0 does not
   complete: *A0 not measurable at t = 4 within V kB and 4 h*, with the
   binding limit (memory or time) and the partial values.
-- **R2.** If both X2 systems complete, the cell joins A11's m = 4 series as a
+- **R2.** If both H64-A11 systems complete, the cell joins A11's m = 4 series as a
   fourth point, and σ and κ are recomputed with their verdicts. If not: *A11
   not measurable at m = 4, t = 5 within V kB and 4 h*, with the binding limit,
   and the 3-cell verdicts stand.
@@ -533,13 +535,13 @@ containers.
 
 **Predictions** (from extrapolating each arm's completed cells, made before
 any row):
-- X1: A0's `field_ops` grew ×1750 from t = 2 to t = 3. Another ×1750 step
+- H64-A0: A0's `field_ops` grew ×1750 from t = 2 to t = 3. Another ×1750 step
   puts t = 4 at about 2·10¹⁴. At C2's A11 rate (about 8.4·10⁸ field ops/s),
-  that is about 66 h. So X1 **does not complete**. Its binding limit is
+  that is about 66 h. So H64-A0 **does not complete**. Its binding limit is
   **time** (a timeout at 14400 s) if A0's t = 4 working set fits in 64 GiB.
   We predict it fits: L1 reached 12.9 GB at 540 s.
-- X2: κ = 14.9 bits per base bit puts A11 at t = 5 at about 2·10¹⁶
-  `field_ops`. So X2 **does not complete**. Its binding limit is
+- H64-A11: κ = 14.9 bits per base bit puts A11 at t = 5 at about 2·10¹⁶
+  `field_ops`. So H64-A11 **does not complete**. Its binding limit is
   **memory**: L2 reached 14.0 GB in under 110 s, and resident size growing
   at that rate passes 64 GiB well inside 4 h.
 - Neither outcome would change a recorded verdict.
