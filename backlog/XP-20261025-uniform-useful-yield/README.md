@@ -19,3 +19,5 @@ native600s/iteration3600s after gate approval. No paid compute or arbitrary
 asset upload. Keep all prior frozen science and broader completion holds.
 
 [October26 compile-only implementation/validation](../../research/quadratic_twist_evidence_20261021/reports/uniform-audit-preflight-20261026/README.md) preserves the October25 source/report and adds exact fraction/state/frontier and strict membership checks as unexecuted code. Active required checks gate/size/artifacts are now known, not assumed optional.
+
+The [collection recurrence draft](../../research/quadratic_twist_evidence_20261021/drafts/uniform-collection-20261026/README.md) is now handwritten source only, outside the proof gate. No new checked theorem or probability/actual-state bridge is claimed; checkpoint launch authorization/token and the exact runner remain pending.

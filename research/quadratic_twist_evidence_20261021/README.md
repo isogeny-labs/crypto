@@ -1,3 +1,5 @@
+[Unexecuted collection-recurrence source draft](reports/uniform-collection-draft-20261026/README.md): handwritten Lean source only; no new proof or scientific run.
+
 # Quadratic twists: native experiments and checked point/pairing transfers
 
 [October26 compile-only auditor update](reports/uniform-audit-preflight-20261026/README.md): versioned C++ producer plus independent Rust auditor and backend harness compile, **zero scientific execution**. Checkpoint authorization/access still pending; required merge contexts gate/size/artifacts are now known. Earlier frozen preflight and all scientific evidence stay unchanged.

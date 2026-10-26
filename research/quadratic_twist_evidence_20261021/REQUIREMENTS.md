@@ -73,3 +73,9 @@ iteration above has separate executed evidence, and later queue items remain pen
 
 The original request remains broader than the finite evidence. Closing a native
 implementation gap or passing CI does not settle general ECDLP hardness.
+
+The source-only [uniform collection draft](drafts/uniform-collection-20261026/README.md)
+prepares algebraic first-step/degree statements but is not elaborated or checked.
+It does not add to208public/269audited historical declarations or17identities.
+Actual-state binding, iid probability semantics, native uniform execution and
+the exact runner remain pending behind the unchanged checkpoint launch gate.

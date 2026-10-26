@@ -156,3 +156,15 @@ proof/exact runner remain pending. All old preflight sources are immutable.
 The active public rules endpoint exposes required contexts gate/size/artifacts,
 absent on the checked parent head; legacy protections remain inaccessible.
 This is an additional known merge gate, not permission to bypass it.
+
+### Collection recurrence source draft (2026-10-26)
+
+[Unexecuted source](drafts/uniform-collection-20261026/README.md) now prepares
+first-step recurrence/uniqueness, degree-request factorization and the special
+one-rank inverse-probability case. Multiplicities and call-count comparison
+hypotheses are explicit. It is `.lean.txt` outside all proof-gate projects;
+no elaboration/kernel/axiom or probability-semantic result is claimed. Actual
+subspace bindings and iid expectation bridge remain open. See the new
+[source-only report](reports/uniform-collection-draft-20261026/README.md).
+The pending checkpoint approval/token gate still blocks activation and runs;
+no permission question is repeated. The exact runner remains unimplemented.
