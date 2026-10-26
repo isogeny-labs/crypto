@@ -69,6 +69,17 @@ the width-generic types (`koblitz_strong_rho::{RhoField, RhoScalar}` or
 `claw::ClawGroup`) so the one-word instantiation stays the committed code,
 and dispatch it in `methods::solve_wide`.
 
+A group that is not an elliptic curve over one field (a Jacobian, a curve
+over a tower) follows `ecbench::jacobian`, `plane_quartic` and
+`ghs_cover`. It gets its own `Instance` variant and a `CountedGroup` whose
+element is `Copy`. The two-hex-string encoding and the `hash_to_subgroup`
+target law come with it, and so does its own slug namespace (`jcv1-`,
+`ghs-`; never ICV1, never registered). It is routed in `methods::solve`
+before `parse_hex`. A transfer *into* such a group keeps the source's unit:
+count the target's field multiplications with its arithmetic's counter and
+divide by `c_E`, measured in the run with the same counter
+(`solve_quartic_cover`, `solve_ghs_cover`; docs/ecbench/README.md §7a).
+
 ## A factor base or decomposition oracle
 
 Write it as an `ic_framework` plug-in (`FactorBaseBuilder` or
