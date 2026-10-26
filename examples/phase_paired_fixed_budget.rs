@@ -5,7 +5,8 @@
 //! Protocol: research/phase_paired_native_20261026/PROTOCOL.md
 //! Independent replay: examples/phase_paired_replay.rs
 //!
-//! Subcommands (see `usage()`): `gate`, `run`, `report`, `freeze`.
+//! Subcommands (see `usage()`): `gate`, `run`, `freeze`. Tables and the chart are
+//! rendered by the replay example from verified receipts only.
 //!
 //! The solver is `crypto_lib::cryptanalysis::sat::Solver` (single thread,
 //! native XOR rows, deterministic). It is not CryptoMiniSat; the contrast
@@ -1622,7 +1623,7 @@ fn run_cmd(a: &HashMap<String, String>) -> i32 {
 }
 
 // ---------------------------------------------------------------------------
-// Analysis shared by `gate` and `report`
+// Analysis used by `gate`
 // ---------------------------------------------------------------------------
 
 #[derive(Clone, Debug)]
@@ -1910,307 +1911,6 @@ fn gate_cmd(a: &HashMap<String, String>) -> i32 {
 }
 
 // ---------------------------------------------------------------------------
-// report: tables, decision rule, SVG
-// ---------------------------------------------------------------------------
-
-fn median(v: &mut Vec<f64>) -> f64 {
-    v.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    let n = v.len();
-    if n == 0 {
-        f64::NAN
-    } else if n % 2 == 1 {
-        v[n / 2]
-    } else {
-        (v[n / 2 - 1] + v[n / 2]) / 2.0
-    }
-}
-
-fn per_new(total: f64, rank: usize) -> f64 {
-    if rank == 0 {
-        f64::NAN
-    } else {
-        total / rank as f64
-    }
-}
-
-fn report_cmd(a: &HashMap<String, String>) -> i32 {
-    let inst = instance_from_args(a);
-    let recs = read_jsonl(a.get("receipts").expect("--receipts"));
-    let header = recs
-        .iter()
-        .find(|r| r["type"] == "header")
-        .cloned()
-        .unwrap_or(Value::Null);
-    let atts = parse_attempts(&recs);
-    let scopes = all_scopes(&inst, &atts);
-    let forms: Vec<String> = {
-        let mut f: Vec<String> = scopes.keys().map(|k| k.1.clone()).collect();
-        f.sort();
-        f.dedup();
-        f
-    };
-    let reps: Vec<u64> = {
-        let mut r: Vec<u64> = scopes.keys().map(|k| k.0).collect();
-        r.sort();
-        r.dedup();
-        r
-    };
-    let mut md = String::new();
-    md.push_str("### Per repetition, formulation and arm (every attempt charged)\n\n");
-    md.push_str("| rep | form | arm | attempts | verified | UNSAT | budget | rank | conflicts | CPU s | conflicts / new indep. | CPU s / new indep. | dependent verified |\n");
-    md.push_str("|---|---|---|---|---|---|---|---|---|---|---|---|---|\n");
-    for ((rep, form, arm), sc) in &scopes {
-        md.push_str(&format!(
-            "| {rep} | {form} | {arm} | {} | {} | {} | {} | {}/{} | {} | {:.2} | {:.0} | {:.3} | {} |\n",
-            sc.attempts, sc.verified, sc.unsat, sc.budget + sc.deadline, sc.rank, inst.reps.len(),
-            sc.conflicts, sc.cpu_ns as f64 / 1e9,
-            per_new(sc.conflicts as f64, sc.rank),
-            per_new(sc.cpu_ns as f64 / 1e9, sc.rank), sc.dependent
-        ));
-    }
-    // Ratios B/A per (rep, form)
-    md.push_str("\n### Ratio B / A of cost per newly independent verified relation\n\n");
-    md.push_str("| rep | form | conflicts ratio | CPU ratio | decisions ratio (exploratory) | B below A on conflicts | B below A on CPU |\n|---|---|---|---|---|---|---|\n");
-    let mut verdict_rows: BTreeMap<String, Vec<(f64, f64)>> = BTreeMap::new();
-    for form in &forms {
-        for rep in &reps {
-            let (Some(sa), Some(sb)) = (
-                scopes.get(&(*rep, form.clone(), "A".into())),
-                scopes.get(&(*rep, form.clone(), "B".into())),
-            ) else {
-                continue;
-            };
-            let rc = per_new(sb.conflicts as f64, sb.rank) / per_new(sa.conflicts as f64, sa.rank);
-            let rt = per_new(sb.cpu_ns as f64, sb.rank) / per_new(sa.cpu_ns as f64, sa.rank);
-            let rd = per_new(sb.decisions as f64, sb.rank) / per_new(sa.decisions as f64, sa.rank);
-            verdict_rows.entry(form.clone()).or_default().push((rc, rt));
-            md.push_str(&format!(
-                "| {rep} | {form} | {rc:.3} | {rt:.3} | {rd:.3} | {} | {} |\n",
-                rc < 1.0,
-                rt < 1.0
-            ));
-        }
-    }
-    // Decision rule
-    md.push_str("\n### Decision rule (PROTOCOL.md)\n\n");
-    let mut all_supported = !verdict_rows.is_empty();
-    let all_valid = scopes
-        .values()
-        .all(|s| s.failed_checks == 0 && s.rejected == 0);
-    for (form, rows) in &verdict_rows {
-        let sup = rows.iter().all(|(c, t)| *c < 1.0 && *t < 1.0);
-        let none = rows.iter().all(|(c, t)| *c >= 1.0 && *t >= 1.0);
-        all_supported &= sup;
-        md.push_str(&format!(
-            "- {form}: B below A on both clocks in {}/{} repetitions -> {}\n",
-            rows.iter().filter(|(c, t)| *c < 1.0 && *t < 1.0).count(),
-            rows.len(),
-            if sup {
-                "H1 criterion met"
-            } else if none {
-                "H1 criterion not met (B at or above A on both clocks in every repetition)"
-            } else {
-                "mixed across metrics or repetitions: not met"
-            }
-        ));
-    }
-    md.push_str(&format!(
-        "- all relations passed every check, no rejected tuples: {all_valid}\n- **overall H1: {}**\n",
-        if all_supported && all_valid { "supported" } else { "not supported (H0 not rejected)" }
-    ));
-    // Per-target paired table, summed over reps (median conflicts)
-    md.push_str("\n### Per target, median over repetitions (conflicts; CPU s)\n\n");
-    md.push_str("| form | target | A status | A conflicts | A CPU s | B status | B conflicts | B CPU s | B/A conflicts | B/A CPU |\n|---|---|---|---|---|---|---|---|---|---|\n");
-    for form in &forms {
-        for t in &inst.targets {
-            let pick = |arm: &str| -> Vec<&Att> {
-                atts.iter()
-                    .filter(|x| {
-                        &x.form == form
-                            && x.arm == arm
-                            && x.target_id == t.id
-                            && x.status != "skipped"
-                    })
-                    .collect()
-            };
-            let (pa, pb) = (pick("A"), pick("B"));
-            if pa.is_empty() || pb.is_empty() {
-                continue;
-            }
-            let st = |v: &Vec<&Att>| -> String {
-                let mut s: Vec<String> = v.iter().map(|x| x.status.clone()).collect();
-                s.sort();
-                s.dedup();
-                s.join("/")
-            };
-            let mc = |v: &Vec<&Att>| median(&mut v.iter().map(|x| x.conflicts as f64).collect());
-            let mt = |v: &Vec<&Att>| median(&mut v.iter().map(|x| x.cpu_ns as f64 / 1e9).collect());
-            let both = pa.iter().all(|x| x.status == "verified")
-                && pb.iter().all(|x| x.status == "verified");
-            md.push_str(&format!(
-                "| {form} | {} | {} | {:.0} | {:.3} | {} | {:.0} | {:.3} | {} | {} |\n",
-                t.id,
-                st(&pa),
-                mc(&pa),
-                mt(&pa),
-                st(&pb),
-                mc(&pb),
-                mt(&pb),
-                if both {
-                    format!("{:.2}", mc(&pb) / mc(&pa))
-                } else {
-                    "-".into()
-                },
-                if both {
-                    format!("{:.2}", mt(&pb) / mt(&pa))
-                } else {
-                    "-".into()
-                },
-            ));
-        }
-    }
-    // Rank trajectory
-    md.push_str("\n### Cost charged when each rank was first reached (rep 1 shown per rep, conflicts / CPU s)\n\n");
-    md.push_str("| rep | form | arm | rank 1 | rank 2 | rank 3 | rank 4 | rank 5 |\n|---|---|---|---|---|---|---|---|\n");
-    for ((rep, form, arm), sc) in &scopes {
-        let cells: Vec<String> = (1..=inst.reps.len())
-            .map(|k| match sc.first_hit.get(&k) {
-                Some((att, c, t)) => format!("{att} att, {c}, {:.2}", *t as f64 / 1e9),
-                None => "-".into(),
-            })
-            .collect();
-        md.push_str(&format!(
-            "| {rep} | {form} | {arm} | {} |\n",
-            cells.join(" | ")
-        ));
-    }
-    md.push_str(&format!(
-        "\nHeader: manifest {} ; budget {} conflicts ; branch priority {} ; host {}\n",
-        header["manifest_sha256"],
-        header["conflict_budget"],
-        header["branch_priority"],
-        header["meta"]["cpu_model"]
-    ));
-    if let Some(p) = a.get("tables-out") {
-        fs::write(p, &md).expect("write tables");
-    } else {
-        print!("{md}");
-    }
-    if let Some(p) = a.get("svg-out") {
-        fs::write(p, svg_chart(&inst, &scopes, &forms, &reps)).expect("write svg");
-    }
-    0
-}
-
-/// Hand-written SVG: per formulation, bars of the mean over repetitions of
-/// conflicts and CPU seconds per newly independent relation, dots per repetition.
-fn svg_chart(
-    inst: &Instance,
-    scopes: &BTreeMap<ScopeKey, Scope>,
-    forms: &[String],
-    reps: &[u64],
-) -> String {
-    let _ = inst;
-    let (w, h) = (860.0f64, 420.0f64);
-    let mut s = String::new();
-    s.push_str(&format!(
-        "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {w} {h}\" width=\"{w}\" height=\"{h}\" font-family=\"sans-serif\" font-size=\"12\">\n"
-    ));
-    s.push_str(&format!(
-        "<rect width=\"{w}\" height=\"{h}\" fill=\"#ffffff\"/>\n"
-    ));
-    s.push_str("<text x=\"20\" y=\"24\" font-size=\"15\" font-weight=\"bold\" fill=\"#1a1a1a\">Cost per newly independent verified relation, every attempt charged</text>\n");
-    s.push_str("<text x=\"20\" y=\"42\" fill=\"#555\">Native sat::Solver, n = 13 stage diagnostic. Bars: mean over repetitions. Dots: each repetition. Arm A = representatives only, arm B = Frobenius phases as unknowns.</text>\n");
-    let panels = [("conflicts", 0usize), ("CPU seconds", 1usize)];
-    for (pi, (title, metric)) in panels.iter().enumerate() {
-        let x0 = 70.0 + pi as f64 * 400.0;
-        let (top, bot) = (80.0f64, 340.0f64);
-        let val = |sc: &Scope| -> f64 {
-            if *metric == 0 {
-                per_new(sc.conflicts as f64, sc.rank)
-            } else {
-                per_new(sc.cpu_ns as f64 / 1e9, sc.rank)
-            }
-        };
-        let mut maxv = 0.0f64;
-        for f in forms {
-            for arm in ["A", "B"] {
-                for r in reps {
-                    if let Some(sc) = scopes.get(&(*r, f.clone(), arm.into())) {
-                        let v = val(sc);
-                        if v.is_finite() {
-                            maxv = maxv.max(v);
-                        }
-                    }
-                }
-            }
-        }
-        let maxv = if maxv > 0.0 { maxv * 1.1 } else { 1.0 };
-        s.push_str(&format!("<text x=\"{x0}\" y=\"68\" font-weight=\"bold\" fill=\"#1a1a1a\">{title} per new independent relation</text>\n"));
-        s.push_str(&format!(
-            "<line x1=\"{x0}\" y1=\"{bot}\" x2=\"{}\" y2=\"{bot}\" stroke=\"#888\"/>\n",
-            x0 + 340.0
-        ));
-        s.push_str(&format!(
-            "<line x1=\"{x0}\" y1=\"{top}\" x2=\"{x0}\" y2=\"{bot}\" stroke=\"#888\"/>\n"
-        ));
-        for tick in 0..=4 {
-            let v = maxv * tick as f64 / 4.0;
-            let y = bot - (bot - top) * tick as f64 / 4.0;
-            s.push_str(&format!(
-                "<line x1=\"{}\" y1=\"{y}\" x2=\"{}\" y2=\"{y}\" stroke=\"#e4e4e4\"/>\n",
-                x0,
-                x0 + 340.0
-            ));
-            let label = if *metric == 0 {
-                format!("{:.0}", v)
-            } else {
-                format!("{:.2}", v)
-            };
-            s.push_str(&format!(
-                "<text x=\"{}\" y=\"{}\" text-anchor=\"end\" fill=\"#555\">{label}</text>\n",
-                x0 - 6.0,
-                y + 4.0
-            ));
-        }
-        for (fi, f) in forms.iter().enumerate() {
-            for (ai, arm) in ["A", "B"].iter().enumerate() {
-                let color = if *arm == "A" { "#6b7a8f" } else { "#c2570c" };
-                let bx = x0 + 30.0 + fi as f64 * 170.0 + ai as f64 * 60.0;
-                let vals: Vec<f64> = reps
-                    .iter()
-                    .filter_map(|r| scopes.get(&(*r, f.clone(), arm.to_string())))
-                    .map(val)
-                    .filter(|v| v.is_finite())
-                    .collect();
-                if vals.is_empty() {
-                    continue;
-                }
-                let mean = vals.iter().sum::<f64>() / vals.len() as f64;
-                let y = bot - (bot - top) * mean / maxv;
-                s.push_str(&format!("<rect x=\"{bx}\" y=\"{y}\" width=\"44\" height=\"{}\" fill=\"{color}\" opacity=\"0.85\"/>\n", bot - y));
-                for (di, v) in vals.iter().enumerate() {
-                    let yy = bot - (bot - top) * v / maxv;
-                    s.push_str(&format!(
-                        "<circle cx=\"{}\" cy=\"{yy}\" r=\"3.5\" fill=\"#1a1a1a\"/>\n",
-                        bx + 12.0 + di as f64 * 10.0
-                    ));
-                }
-                s.push_str(&format!("<text x=\"{}\" y=\"{}\" text-anchor=\"middle\" fill=\"#1a1a1a\">{arm}</text>\n", bx + 22.0, bot + 16.0));
-            }
-            s.push_str(&format!(
-                "<text x=\"{}\" y=\"{}\" text-anchor=\"middle\" fill=\"#1a1a1a\">{f}</text>\n",
-                x0 + 30.0 + fi as f64 * 170.0 + 52.0,
-                bot + 34.0
-            ));
-        }
-    }
-    s.push_str("<text x=\"20\" y=\"405\" fill=\"#555\">Historical legacy (CryptoMiniSat via Python, one trial, not comparable in absolute terms): B/A = 1.61 and 1.38 on CPU. Scope: stage diagnostic on a toy field; no S, no rho ratio, no ECDLP speedup.</text>\n");
-    s.push_str("</svg>\n");
-    s
-}
-
-// ---------------------------------------------------------------------------
 // freeze: a new manifest, written natively, refused if the file exists
 // ---------------------------------------------------------------------------
 
@@ -2228,35 +1928,30 @@ fn freeze_cmd(a: &HashMap<String, String>) -> i32 {
         .parse()
         .unwrap();
     let per_set: usize = a.get("per-set").map(|v| v.parse().unwrap()).unwrap_or(4);
-    let (n, modulus, ec_info, basis, mut reps_x): (u32, u64, Option<Instance>, Vec<u64>, Vec<u64>);
-    if let Some(like) = a.get("like") {
+    let (n, modulus, ec, g, r, basis, reps) = if let Some(like) = a.get("like") {
         let inst = Instance::load(like, None).expect("--like manifest");
-        n = inst.n;
-        modulus = unhex(
+        let modulus = unhex(
             serde_json::from_str::<Value>(&fs::read_to_string(like).unwrap()).unwrap()["curve"]
                 ["modulus"]
                 .as_str()
                 .unwrap(),
         );
-        basis = inst.basis.clone();
-        reps_x = inst.reps.iter().map(|p| p.0).collect();
-        ec_info = Some(inst);
+        let ec = Ec::new(inst.n, modulus, inst.r, 4);
+        (
+            inst.n,
+            modulus,
+            ec,
+            inst.g,
+            inst.r,
+            inst.basis.clone(),
+            inst.reps.clone(),
+        )
     } else {
-        n = a.get("n").expect("--n").parse().unwrap();
-        modulus = unhex(a.get("modulus").expect("--modulus 0x..."));
-        let s: usize = a.get("s").expect("--s").parse().unwrap();
-        let fseed: u64 = a
-            .get("factor-seed")
-            .expect("--factor-seed")
-            .parse()
-            .unwrap();
-        ec_info = None;
-        basis = Vec::new();
-        reps_x = Vec::new();
-        let _ = (s, fseed);
-    }
-    let ec_basis_reps = native_curve_and_space(n, modulus, ec_info, basis, &mut reps_x, a);
-    let (ec, g, r, lam_t, basis, reps) = ec_basis_reps;
+        let n: u32 = a.get("n").expect("--n").parse().unwrap();
+        let modulus = unhex(a.get("modulus").expect("--modulus 0x..."));
+        let (ec, g, r, basis, reps) = native_curve_and_space(n, modulus, a);
+        (n, modulus, ec, g, r, basis, reps)
+    };
     let mut rng = SplitMix(tseed.wrapping_mul(10_000).wrapping_add(n as u64 * 10));
     let mut sets = serde_json::Map::new();
     let names = [
@@ -2328,7 +2023,7 @@ fn freeze_cmd(a: &HashMap<String, String>) -> i32 {
         "schema": "phase_paired_native/manifest/v1",
         "curve": {"equation": "y^2 + x*y = x^3 + 1", "n": n, "modulus": hx(modulus),
                    "generator": [hx(g.0), hx(g.1)], "group_order": r * 4,
-                   "odd_subgroup_order": r, "trace_t": lam_t.0,
+                   "odd_subgroup_order": r, "trace_t": -1,
                    "lambda_relation": "pi(P) = [lambda]P on H, lambda^2 - t*lambda + 2 = 0 mod r"},
         "factor_space": {"s": basis.len(), "basis": basis.iter().map(|b| hx(*b)).collect::<Vec<_>>(),
                           "representatives": reps_json,
@@ -2344,22 +2039,16 @@ fn freeze_cmd(a: &HashMap<String, String>) -> i32 {
     0
 }
 
-/// Curve data for freezing: either from an existing instance or derived natively.
+/// Curve data for freezing a fresh field: the curve `y^2 + xy = x^3 + 1` is defined
+/// over `F_2` with Frobenius trace `-1`, so `#E(F_{2^n}) = 2^n + 1 - V_n` with the Lucas
+/// sequence `V_0 = 2, V_1 = -1, V_{k+1} = -V_k - 2 V_{k-1}`; the code counts the points
+/// by enumeration and checks the count against that formula.
 #[allow(clippy::type_complexity)]
 fn native_curve_and_space(
     n: u32,
     modulus: u64,
-    like: Option<Instance>,
-    basis: Vec<u64>,
-    reps_x: &mut Vec<u64>,
     a: &HashMap<String, String>,
-) -> (Ec, (u64, u64), u64, (i64,), Vec<u64>, Vec<(u64, u64)>) {
-    if let Some(inst) = like {
-        let t = -1i64;
-        let reps = inst.reps.clone();
-        let ec = Ec::new(n, modulus, inst.r, 4);
-        return (ec, inst.g, inst.r, (t,), basis, reps);
-    }
+) -> (Ec, (u64, u64), u64, Vec<u64>, Vec<(u64, u64)>) {
     // Count points by exhaustive enumeration of x (n small enough for this).
     let probe = Ec::new(n, modulus, 1, 4);
     let gf = probe.gf.clone();
@@ -2375,7 +2064,17 @@ fn native_curve_and_space(
     assert!(count % 4 == 0, "expected a cofactor-4 curve");
     let r = count / 4;
     let ec = Ec::new(n, modulus, r, 4);
-    let t = ((1u64 << n) + 1) as i64 - count as i64;
+    let (mut v0, mut v1) = (2i128, -1i128);
+    for _ in 1..n {
+        let v2 = -v1 - 2 * v0;
+        v0 = v1;
+        v1 = v2;
+    }
+    assert_eq!(
+        count as i128,
+        (1i128 << n) + 1 - v1,
+        "point count must equal 2^n + 1 - V_n"
+    );
     // generator of the odd subgroup: 4P for the first x with a lift
     let mut g = None;
     for x in 2..(1u64 << n) {
@@ -2438,20 +2137,18 @@ fn native_curve_and_space(
             }
         }
         if valid.len() >= 4 {
-            reps_x.clear();
-            return (ec, g, r, (t,), basis, valid);
+            return (ec, g, r, basis, valid);
         }
     }
 }
 
 fn usage() {
     eprintln!(
-        "usage: phase_paired_fixed_budget <gate|run|report|freeze> [--key value ...]\n\
+        "usage: phase_paired_fixed_budget <gate|run|freeze> [--key value ...]\n\
          gate    [--manifest P] [--sealed witness_sealed.json] [--receipts R.jsonl --rep N]\n\
          run     --out R.jsonl [--manifest P] [--forms subgroup_xor,line_subgroup] [--reps 3]\n\
-                 [--conflict-budget C] [--deadline-secs D] [--cpu-cap S] [--targets a0,b1] [--resume]\n\
+                 [--conflict-budget C] [--deadline-secs D] [--cpu-cap S] [--targets a0,b1] [--arms A] [--resume]\n\
                  [--priority none|core|all]\n\
-         report  --receipts R.jsonl [--manifest P] [--tables-out T.md] [--svg-out F.svg]\n\
          freeze  --out M.json --target-seed S [--like M0.json | --n N --modulus 0x.. --s S --factor-seed F] [--per-set 4]"
     );
 }
@@ -2461,7 +2158,6 @@ fn main() {
     let code = match args.first().map(String::as_str) {
         Some("gate") => gate_cmd(&arg_map(&args[1..])),
         Some("run") => run_cmd(&arg_map(&args[1..])),
-        Some("report") => report_cmd(&arg_map(&args[1..])),
         Some("freeze") => freeze_cmd(&arg_map(&args[1..])),
         _ => {
             usage();

@@ -445,6 +445,48 @@ fn schedule(
     out
 }
 
+/// Per (repetition, formulation, arm) totals, every attempt charged.
+#[derive(Default, Clone, Debug)]
+struct Sc {
+    attempts: u64,
+    verified: u64,
+    unsat: u64,
+    budget: u64,
+    deadline: u64,
+    skipped: u64,
+    rejected: u64,
+    dependent: u64,
+    conflicts: u64,
+    decisions: u64,
+    propagations: u64,
+    word_ops: u64,
+    cpu_ns: u64,
+    wall_ns: u64,
+    rank: usize,
+}
+
+/// One charged attempt, kept for the tables.
+struct AttRow {
+    rep: u64,
+    form: String,
+    arm: String,
+    target: usize,
+    status: String,
+    conflicts: u64,
+    cpu_ns: u64,
+}
+
+type Key = (u64, String, String);
+
+/// Everything `replay` establishes, for the canonical JSON and the tables.
+struct Replayed {
+    json: Value,
+    scopes: BTreeMap<Key, Sc>,
+    rows: Vec<AttRow>,
+    first_hit: BTreeMap<Key, BTreeMap<usize, (u64, u64, u64)>>,
+    targets: Vec<(String, String)>,
+}
+
 fn ratio(num: u64, den: usize) -> Value {
     if den == 0 {
         Value::Null
@@ -455,7 +497,16 @@ fn ratio(num: u64, den: usize) -> Value {
 
 /// Replays receipts text against manifest text. `Ok` carries the canonical
 /// output; its `defects` list is empty exactly when every check passed.
+#[cfg(test)]
 fn replay(manifest_text: &str, receipts_text: &str, sealed: Option<&str>) -> Result<Value, String> {
+    replay_full(manifest_text, receipts_text, sealed).map(|r| r.json)
+}
+
+fn replay_full(
+    manifest_text: &str,
+    receipts_text: &str,
+    sealed: Option<&str>,
+) -> Result<Replayed, String> {
     let w = World::from_manifest(manifest_text)?;
     let recs: Vec<Rec> = receipts_text
         .lines()
@@ -516,7 +567,35 @@ fn replay(manifest_text: &str, receipts_text: &str, sealed: Option<&str>) -> Res
     }
 
     // Per-attempt checks.
-    let atts: Vec<&Rec> = recs.iter().filter(|r| r.s("type") == "attempt").collect();
+    let all_atts: Vec<&Rec> = recs.iter().filter(|r| r.s("type") == "attempt").collect();
+    // A `skipped` receipt is superseded by a later receipt of the same schedule
+    // slot (a capped run resumed with a larger cap); it stays in the file.
+    let slot = |a: &Rec| {
+        (
+            a.u("rep"),
+            a.s("form").to_string(),
+            a.u("pair"),
+            a.u("position"),
+            a.s("arm").to_string(),
+            a.s("target_id").to_string(),
+        )
+    };
+    let mut later_real = std::collections::HashSet::new();
+    let mut keep = vec![true; all_atts.len()];
+    for (i, a) in all_atts.iter().enumerate().rev() {
+        if a.s("status") == "skipped" {
+            keep[i] = !later_real.contains(&slot(a));
+        } else {
+            later_real.insert(slot(a));
+        }
+    }
+    let superseded = keep.iter().filter(|k| !**k).count();
+    let atts: Vec<&Rec> = all_atts
+        .iter()
+        .zip(&keep)
+        .filter(|(_, k)| **k)
+        .map(|(a, _)| *a)
+        .collect();
     let max_rep = atts.iter().map(|a| a.u("rep")).max().unwrap_or(0);
     let expect = schedule(&w, &forms, max_rep);
     let got: Vec<_> = atts
@@ -539,31 +618,15 @@ fn replay(manifest_text: &str, receipts_text: &str, sealed: Option<&str>) -> Res
             expect.len()
         ));
     }
-    let seqs: Vec<u64> = atts.iter().map(|a| a.u("seq")).collect();
-    if seqs != (0..atts.len() as u64).collect::<Vec<_>>() {
+    let seqs: Vec<u64> = all_atts.iter().map(|a| a.u("seq")).collect();
+    if seqs != (0..all_atts.len() as u64).collect::<Vec<_>>() {
         defects.push("seq numbers are not 0..n-1 in order".into());
     }
 
-    #[derive(Default)]
-    struct Sc {
-        attempts: u64,
-        verified: u64,
-        unsat: u64,
-        budget: u64,
-        deadline: u64,
-        skipped: u64,
-        rejected: u64,
-        dependent: u64,
-        conflicts: u64,
-        decisions: u64,
-        propagations: u64,
-        word_ops: u64,
-        cpu_ns: u64,
-        wall_ns: u64,
-        rank: usize,
-    }
     let mut ranks: BTreeMap<(u64, String, String), Rank> = BTreeMap::new();
     let mut sc: BTreeMap<(u64, String, String), Sc> = BTreeMap::new();
+    let mut rows: Vec<AttRow> = Vec::new();
+    let mut first_hit: BTreeMap<Key, BTreeMap<usize, (u64, u64, u64)>> = BTreeMap::new();
     for a in &atts {
         let tid = a.s("target_id");
         let Some(&ti) = by_id.get(tid) else {
@@ -617,6 +680,15 @@ fn replay(manifest_text: &str, receipts_text: &str, sealed: Option<&str>) -> Res
         s.cpu_ns += a.u("total_cpu_ns");
         s.wall_ns += a.u("total_wall_ns");
         s.rejected += a.u("rejected_tuples");
+        rows.push(AttRow {
+            rep: a.u("rep"),
+            form: a.s("form").to_string(),
+            arm: a.s("arm").to_string(),
+            target: ti,
+            status: st.to_string(),
+            conflicts: a.u("conflicts"),
+            cpu_ns: a.u("total_cpu_ns"),
+        });
         if a.u("conflicts") > budget {
             defects.push(format!(
                 "{tag}: {} conflicts exceed the budget {budget}",
@@ -641,6 +713,11 @@ fn replay(manifest_text: &str, receipts_text: &str, sealed: Option<&str>) -> Res
                         });
                         if !rk.insert(&row) {
                             s.dependent += 1;
+                        } else {
+                            first_hit
+                                .entry(key.clone())
+                                .or_default()
+                                .insert(rk.rows.len(), (s.attempts, s.conflicts, s.cpu_ns));
                         }
                         s.rank = rk.rows.len();
                     }
@@ -715,12 +792,13 @@ fn replay(manifest_text: &str, receipts_text: &str, sealed: Option<&str>) -> Res
     let h1 = !per_form.is_empty()
         && per_form.values().all(|v| v.iter().all(|(c, t)| *c && *t))
         && sc.values().all(|s| s.rejected == 0);
-    Ok(json!({
+    let json = json!({
         "schema": "phase_paired_native/replay/v1",
         "manifest_sha256": w.sha,
         "conflict_budget": budget,
         "lambda": w.lam, "r": w.r,
         "receipts": atts.len(),
+        "superseded_skipped": superseded,
         "structural_exhaustive": structural,
         "arm_a_decomposable": ca.iter().filter(|c| **c > 0).count(),
         "arm_b_decomposable": cb.iter().filter(|c| **c > 0).count(),
@@ -728,22 +806,434 @@ fn replay(manifest_text: &str, receipts_text: &str, sealed: Option<&str>) -> Res
         "ratios": ratios,
         "h1_criterion_met_all_forms_all_reps": h1,
         "defects": defects,
-    }))
+    });
+    Ok(Replayed {
+        json,
+        scopes: sc,
+        rows,
+        first_hit,
+        targets: w
+            .targets
+            .iter()
+            .map(|t| (t.0.clone(), t.1.clone()))
+            .collect(),
+    })
+}
+
+// ---------------------------------------------------------------------------
+// Tables and chart, rendered from verified receipts only
+// ---------------------------------------------------------------------------
+
+fn median(v: &mut [f64]) -> f64 {
+    v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    let n = v.len();
+    if n == 0 {
+        f64::NAN
+    } else if n % 2 == 1 {
+        v[n / 2]
+    } else {
+        (v[n / 2 - 1] + v[n / 2]) / 2.0
+    }
+}
+
+fn per_new(total: f64, rank: usize) -> f64 {
+    if rank == 0 {
+        f64::NAN
+    } else {
+        total / rank as f64
+    }
+}
+
+/// Cost per newly independent relation of one scope: (conflicts, CPU s).
+fn costs(s: &Sc) -> (f64, f64) {
+    (
+        per_new(s.conflicts as f64, s.rank),
+        per_new(s.cpu_ns as f64 / 1e9, s.rank),
+    )
+}
+
+fn short(v: f64) -> String {
+    if v >= 1e6 {
+        format!("{:.2}M", v / 1e6)
+    } else if v >= 1e4 {
+        format!("{:.0}k", v / 1e3)
+    } else {
+        format!("{v:.1}")
+    }
+}
+
+fn tables_md(rp: &Replayed, ncols: usize) -> String {
+    let mut md = String::new();
+    let forms: Vec<String> = {
+        let mut f: Vec<String> = rp.scopes.keys().map(|k| k.1.clone()).collect();
+        f.sort();
+        f.dedup();
+        f
+    };
+    let reps: Vec<u64> = {
+        let mut r: Vec<u64> = rp.scopes.keys().map(|k| k.0).collect();
+        r.sort();
+        r.dedup();
+        r
+    };
+    md.push_str("### Per repetition and arm, every attempt charged\n\n");
+    md.push_str("| rep | form | arm | attempts | verified | UNSAT | budget or deadline | rank | conflicts | CPU s | conflicts per new independent | CPU s per new independent | dependent verified |\n");
+    md.push_str("|---|---|---|---|---|---|---|---|---|---|---|---|---|\n");
+    for ((rep, form, arm), s) in &rp.scopes {
+        let (c, t) = costs(s);
+        md.push_str(&format!(
+            "| {rep} | {form} | {arm} | {} | {} | {} | {} | {}/{ncols} | {} | {:.1} | {:.0} | {:.1} | {} |\n",
+            s.attempts,
+            s.verified,
+            s.unsat,
+            s.budget + s.deadline,
+            s.rank,
+            s.conflicts,
+            s.cpu_ns as f64 / 1e9,
+            c,
+            t,
+            s.dependent
+        ));
+    }
+
+    md.push_str("\n### Ratio B / A of cost per newly independent verified relation\n\n");
+    md.push_str("| rep | form | conflicts | CPU | decisions (exploratory) | B below A on conflicts | B below A on CPU |\n|---|---|---|---|---|---|---|\n");
+    let mut by_form: BTreeMap<String, Vec<(f64, f64)>> = BTreeMap::new();
+    for form in &forms {
+        for rep in &reps {
+            let (Some(a), Some(b)) = (
+                rp.scopes.get(&(*rep, form.clone(), "A".to_string())),
+                rp.scopes.get(&(*rep, form.clone(), "B".to_string())),
+            ) else {
+                continue;
+            };
+            if a.rank == 0 || b.rank == 0 {
+                continue;
+            }
+            let (ca, ta) = costs(a);
+            let (cb, tb) = costs(b);
+            let rd = per_new(b.decisions as f64, b.rank) / per_new(a.decisions as f64, a.rank);
+            by_form
+                .entry(form.clone())
+                .or_default()
+                .push((cb / ca, tb / ta));
+            md.push_str(&format!(
+                "| {rep} | {form} | {:.3} | {:.3} | {:.3} | {} | {} |\n",
+                cb / ca,
+                tb / ta,
+                rd,
+                cb / ca < 1.0,
+                tb / ta < 1.0
+            ));
+        }
+        if let Some(v) = by_form.get(form) {
+            let n = v.len() as f64;
+            let (mc, mt) = (
+                v.iter().map(|x| x.0).sum::<f64>() / n,
+                v.iter().map(|x| x.1).sum::<f64>() / n,
+            );
+            let rng = |f: fn(&(f64, f64)) -> f64| {
+                let lo = v.iter().map(f).fold(f64::INFINITY, f64::min);
+                let hi = v.iter().map(f).fold(f64::NEG_INFINITY, f64::max);
+                format!("{lo:.3} to {hi:.3}")
+            };
+            md.push_str(&format!(
+                "| mean | {form} | {mc:.3} (range {}) | {mt:.3} (range {}) | | | |\n",
+                rng(|x| x.0),
+                rng(|x| x.1)
+            ));
+        }
+    }
+
+    md.push_str("\n### Decision rule (PROTOCOL.md)\n\n");
+    let all_clean = rp.scopes.values().all(|s| s.rejected == 0);
+    let mut supported = !by_form.is_empty() && all_clean;
+    for (form, v) in &by_form {
+        let both = v.iter().filter(|x| x.0 < 1.0 && x.1 < 1.0).count();
+        let neither = v.iter().filter(|x| x.0 >= 1.0 && x.1 >= 1.0).count();
+        let verdict = if both == v.len() {
+            "H1 criterion met"
+        } else if neither == v.len() {
+            "H1 not supported (B at or above A on both clocks in every repetition)"
+        } else {
+            "mixed (the clocks or repetitions disagree), counts as not supported"
+        };
+        supported &= both == v.len();
+        md.push_str(&format!(
+            "- {form}: B below A on both clocks in {both} of {} repetitions; at or above on both in {neither}; verdict: {verdict}\n",
+            v.len()
+        ));
+    }
+    md.push_str(&format!(
+        "- every relation passed every check, no rejected tuple: {all_clean}\n- **overall: {}**\n",
+        if supported {
+            "H1 supported"
+        } else {
+            "H1 not supported"
+        }
+    ));
+
+    md.push_str("\n### Where the cost goes, by outcome (conflicts; CPU s)\n\n");
+    md.push_str("| rep | arm | verified (n, conflicts, CPU s) | UNSAT (n, conflicts, CPU s) | budget or deadline (n, conflicts, CPU s) |\n|---|---|---|---|---|\n");
+    for ((rep, _form, arm), _) in &rp.scopes {
+        let sel = |st: &[&str]| -> (u64, u64, f64) {
+            rp.rows
+                .iter()
+                .filter(|r| r.rep == *rep && &r.arm == arm && st.contains(&r.status.as_str()))
+                .fold((0, 0, 0.0), |a, r| {
+                    (a.0 + 1, a.1 + r.conflicts, a.2 + r.cpu_ns as f64 / 1e9)
+                })
+        };
+        let (v, u, b) = (
+            sel(&["verified"]),
+            sel(&["unsat"]),
+            sel(&["budget", "deadline"]),
+        );
+        md.push_str(&format!(
+            "| {rep} | {arm} | {}, {}, {:.1} | {}, {}, {:.1} | {}, {}, {:.1} |\n",
+            v.0, v.1, v.2, u.0, u.1, u.2, b.0, b.1, b.2
+        ));
+    }
+
+    md.push_str("\n### Like for like: the four targets both arms decompose (b0 to b3)\n\n");
+    md.push_str("| rep | A conflicts | B conflicts | B/A conflicts | A CPU s | B CPU s | B/A CPU |\n|---|---|---|---|---|---|---|\n");
+    for rep in &reps {
+        let sum = |arm: &str| -> (f64, f64) {
+            rp.rows
+                .iter()
+                .filter(|r| r.rep == *rep && r.arm == arm && rp.targets[r.target].1 == "b")
+                .fold((0.0, 0.0), |a, r| {
+                    (a.0 + r.conflicts as f64, a.1 + r.cpu_ns as f64 / 1e9)
+                })
+        };
+        let (a, b) = (sum("A"), sum("B"));
+        md.push_str(&format!(
+            "| {rep} | {:.0} | {:.0} | {:.2} | {:.1} | {:.1} | {:.2} |\n",
+            a.0,
+            b.0,
+            b.0 / a.0,
+            a.1,
+            b.1,
+            b.1 / a.1
+        ));
+    }
+
+    md.push_str("\n### Per target, median over repetitions\n\n");
+    md.push_str("| form | target | A status | A conflicts | A CPU s | B status | B conflicts | B CPU s | B/A conflicts | B/A CPU |\n|---|---|---|---|---|---|---|---|---|---|\n");
+    for form in &forms {
+        for (ti, (tid, _)) in rp.targets.iter().enumerate() {
+            let pick = |arm: &str| -> Vec<&AttRow> {
+                rp.rows
+                    .iter()
+                    .filter(|r| &r.form == form && r.arm == arm && r.target == ti)
+                    .collect()
+            };
+            let (pa, pb) = (pick("A"), pick("B"));
+            if pa.is_empty() || pb.is_empty() {
+                continue;
+            }
+            let st = |v: &Vec<&AttRow>| {
+                let mut s: Vec<String> = v.iter().map(|r| r.status.clone()).collect();
+                s.sort();
+                s.dedup();
+                s.join("/")
+            };
+            let mc = |v: &Vec<&AttRow>| {
+                median(&mut v.iter().map(|r| r.conflicts as f64).collect::<Vec<_>>())
+            };
+            let mt = |v: &Vec<&AttRow>| {
+                median(&mut v.iter().map(|r| r.cpu_ns as f64 / 1e9).collect::<Vec<_>>())
+            };
+            let both = pa.iter().all(|r| r.status == "verified")
+                && pb.iter().all(|r| r.status == "verified");
+            md.push_str(&format!(
+                "| {form} | {tid} | {} | {:.0} | {:.1} | {} | {:.0} | {:.1} | {} | {} |\n",
+                st(&pa),
+                mc(&pa),
+                mt(&pa),
+                st(&pb),
+                mc(&pb),
+                mt(&pb),
+                if both {
+                    format!("{:.2}", mc(&pb) / mc(&pa))
+                } else {
+                    "-".into()
+                },
+                if both {
+                    format!("{:.2}", mt(&pb) / mt(&pa))
+                } else {
+                    "-".into()
+                },
+            ));
+        }
+    }
+
+    md.push_str("\n### Cost charged when each rank was first reached (attempts, conflicts, CPU s); depends on the schedule's target order\n\n");
+    md.push_str("| rep | form | arm | rank 1 | rank 2 | rank 3 | rank 4 | rank 5 |\n|---|---|---|---|---|---|---|---|\n");
+    for (key, _) in &rp.scopes {
+        let cells: Vec<String> = (1..=ncols)
+            .map(|k| match rp.first_hit.get(key).and_then(|m| m.get(&k)) {
+                Some((a, c, t)) => format!("{a}, {c}, {:.1}", *t as f64 / 1e9),
+                None => "-".into(),
+            })
+            .collect();
+        md.push_str(&format!(
+            "| {} | {} | {} | {} |\n",
+            key.0,
+            key.1,
+            key.2,
+            cells.join(" | ")
+        ));
+    }
+    md
+}
+
+/// Hand-written SVG, light and dark through CSS variables. Bars: cost per
+/// newly independent relation for arm A and arm B in each repetition, and the
+/// mean. Colours are the first two slots of the validated categorical palette.
+fn svg_chart(rp: &Replayed) -> String {
+    let forms: Vec<String> = {
+        let mut f: Vec<String> = rp.scopes.keys().map(|k| k.1.clone()).collect();
+        f.sort();
+        f.dedup();
+        f
+    };
+    // groups: (label, (conflicts A, B), (CPU A, B))
+    let mut groups: Vec<(String, (f64, f64), (f64, f64))> = Vec::new();
+    for form in &forms {
+        let reps: Vec<u64> = rp
+            .scopes
+            .keys()
+            .filter(|k| &k.1 == form)
+            .map(|k| k.0)
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .collect();
+        let mut acc = (0.0, 0.0, 0.0, 0.0);
+        let mut n = 0.0;
+        for rep in &reps {
+            let (Some(a), Some(b)) = (
+                rp.scopes.get(&(*rep, form.clone(), "A".to_string())),
+                rp.scopes.get(&(*rep, form.clone(), "B".to_string())),
+            ) else {
+                continue;
+            };
+            let (ca, ta) = costs(a);
+            let (cb, tb) = costs(b);
+            groups.push((format!("rep {rep}"), (ca, cb), (ta, tb)));
+            acc = (acc.0 + ca, acc.1 + cb, acc.2 + ta, acc.3 + tb);
+            n += 1.0;
+        }
+        if n > 0.0 {
+            groups.push((
+                "mean".into(),
+                (acc.0 / n, acc.1 / n),
+                (acc.2 / n, acc.3 / n),
+            ));
+        }
+    }
+    let (w, h) = (900.0f64, 470.0f64);
+    let mut s = String::new();
+    s.push_str(&format!(
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {w} {h}\" width=\"{w}\" height=\"{h}\" role=\"img\" aria-labelledby=\"t d\" font-family=\"sans-serif\" font-size=\"12\">\n"
+    ));
+    s.push_str("<title id=\"t\">Cost per newly independent verified relation, arm A against arm B</title>\n");
+    s.push_str("<desc id=\"d\">Grouped bars per repetition and their mean, conflicts and CPU seconds, native sat::Solver, n = 13 stage diagnostic. The same numbers are in tables.md.</desc>\n");
+    s.push_str("<style>\nsvg{--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--grid:#e3e2de;--a:#2a78d6;--b:#eb6834}\n@media (prefers-color-scheme: dark){svg{--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--grid:#3a3935;--a:#3987e5;--b:#d95926}}\n.bg{fill:var(--surface)}.ink{fill:var(--ink)}.ink2{fill:var(--ink2)}.gl{stroke:var(--grid);stroke-width:1}.ax{stroke:var(--ink2);stroke-width:1}.ba{fill:var(--a)}.bb{fill:var(--b)}\n</style>\n");
+    s.push_str(&format!(
+        "<rect class=\"bg\" width=\"{w}\" height=\"{h}\"/>\n"
+    ));
+    s.push_str("<text class=\"ink\" x=\"24\" y=\"28\" font-size=\"16\" font-weight=\"bold\">Cost per newly independent verified relation, every attempt charged</text>\n");
+    s.push_str("<text class=\"ink2\" x=\"24\" y=\"48\">Native sat::Solver (not CryptoMiniSat), n = 13, subgroup_xor, 3 repetitions. Lower is cheaper. Rank cap 5; arm A can reach 4.</text>\n");
+    // legend
+    s.push_str("<rect class=\"ba\" x=\"24\" y=\"64\" width=\"12\" height=\"12\" rx=\"2\"/><text class=\"ink\" x=\"42\" y=\"75\">Arm A: representatives only</text>\n");
+    s.push_str("<rect class=\"bb\" x=\"236\" y=\"64\" width=\"12\" height=\"12\" rx=\"2\"/><text class=\"ink\" x=\"254\" y=\"75\">Arm B: Frobenius phases as solver unknowns</text>\n");
+    let panels = [
+        ("Solver conflicts per new relation", 0usize),
+        ("CPU seconds per new relation", 1usize),
+    ];
+    for (pi, (title, metric)) in panels.iter().enumerate() {
+        let x0 = 70.0 + pi as f64 * 430.0;
+        let (top, bot, width) = (130.0f64, 380.0f64, 370.0f64);
+        let val = |g: &(String, (f64, f64), (f64, f64))| if *metric == 0 { g.1 } else { g.2 };
+        let maxv = groups
+            .iter()
+            .map(|g| val(g).0.max(val(g).1))
+            .fold(0.0f64, f64::max)
+            * 1.12;
+        let maxv = if maxv > 0.0 { maxv } else { 1.0 };
+        s.push_str(&format!(
+            "<text class=\"ink\" x=\"{x0}\" y=\"108\" font-weight=\"bold\">{title}</text>\n"
+        ));
+        for tick in 0..=4 {
+            let v = maxv * tick as f64 / 4.0;
+            let y = bot - (bot - top) * tick as f64 / 4.0;
+            s.push_str(&format!(
+                "<line class=\"gl\" x1=\"{x0}\" y1=\"{y}\" x2=\"{}\" y2=\"{y}\"/>\n",
+                x0 + width
+            ));
+            s.push_str(&format!(
+                "<text class=\"ink2\" x=\"{}\" y=\"{}\" text-anchor=\"end\">{}</text>\n",
+                x0 - 6.0,
+                y + 4.0,
+                short(v)
+            ));
+        }
+        s.push_str(&format!(
+            "<line class=\"ax\" x1=\"{x0}\" y1=\"{bot}\" x2=\"{}\" y2=\"{bot}\"/>\n",
+            x0 + width
+        ));
+        let gw = width / groups.len().max(1) as f64;
+        for (gi, g) in groups.iter().enumerate() {
+            let (va, vb) = val(g);
+            let gx = x0 + gi as f64 * gw;
+            let bw = (gw * 0.34).min(40.0);
+            for (k, (v, cls)) in [(va, "ba"), (vb, "bb")].iter().enumerate() {
+                let bx = gx + gw / 2.0 - bw - 1.0 + k as f64 * (bw + 2.0);
+                let hgt = (bot - top) * v / maxv;
+                s.push_str(&format!(
+                    "<path class=\"{cls}\" d=\"M{bx},{bot} V{} a4,4 0 0 1 4,-4 h{} a4,4 0 0 1 4,4 V{bot} z\"/>\n",
+                    bot - hgt + 4.0,
+                    bw - 8.0
+                ));
+                s.push_str(&format!(
+                    "<text class=\"ink\" x=\"{}\" y=\"{}\" text-anchor=\"middle\" font-size=\"11\">{}</text>\n",
+                    bx + bw / 2.0,
+                    bot - hgt - 5.0,
+                    short(*v)
+                ));
+            }
+            s.push_str(&format!(
+                "<text class=\"ink2\" x=\"{}\" y=\"{}\" text-anchor=\"middle\">{}</text>\n",
+                gx + gw / 2.0,
+                bot + 18.0,
+                g.0
+            ));
+        }
+    }
+    s.push_str("<text class=\"ink2\" x=\"24\" y=\"428\">Historical, not comparable in absolute terms: the legacy Python run with CryptoMiniSat (one trial) read B/A = 1.61 on CPU.</text>\n");
+    s.push_str("<text class=\"ink2\" x=\"24\" y=\"446\">Scope: stage diagnostic on a toy field. No S, no ratio to rho, no ECDLP speedup.</text>\n");
+    s.push_str("</svg>\n");
+    s
 }
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.len() < 2 {
-        eprintln!("usage: phase_paired_replay RECEIPTS.jsonl OUT.json [--manifest M] [--sealed S]");
+        eprintln!("usage: phase_paired_replay RECEIPTS.jsonl OUT.json [--manifest M] [--sealed S] [--tables T.md] [--svg F.svg]");
         std::process::exit(64);
     }
     let mut manifest = DEFAULT_MANIFEST.to_string();
     let mut sealed = None;
+    let mut tables = None;
+    let mut svg = None;
     let mut i = 2;
     while i + 1 < args.len() {
         match args[i].as_str() {
             "--manifest" => manifest = args[i + 1].clone(),
             "--sealed" => sealed = Some(args[i + 1].clone()),
+            "--tables" => tables = Some(args[i + 1].clone()),
+            "--svg" => svg = Some(args[i + 1].clone()),
             _ => {}
         }
         i += 2;
@@ -755,10 +1245,11 @@ fn main() {
     }
     let rtext = fs::read_to_string(&args[0]).expect("receipts");
     let stext = sealed.map(|p| fs::read_to_string(p).expect("sealed"));
-    let out = replay(&mtext, &rtext, stext.as_deref()).unwrap_or_else(|e| {
+    let rp = replay_full(&mtext, &rtext, stext.as_deref()).unwrap_or_else(|e| {
         eprintln!("replay failed: {e}");
         std::process::exit(3);
     });
+    let out = &rp.json;
     let defects = out["defects"].as_array().map(|d| d.len()).unwrap_or(1);
     fs::write(&args[1], serde_json::to_string_pretty(&out).unwrap() + "\n").expect("write");
     println!(
@@ -767,6 +1258,15 @@ fn main() {
     );
     for d in out["defects"].as_array().unwrap() {
         eprintln!("DEFECT {d}");
+    }
+    if defects == 0 {
+        // Tables and chart are rendered from verified receipts only.
+        if let Some(p) = tables {
+            fs::write(p, tables_md(&rp, 5)).expect("write tables");
+        }
+        if let Some(p) = svg {
+            fs::write(p, svg_chart(&rp)).expect("write svg");
+        }
     }
     std::process::exit(if defects == 0 { 0 } else { 2 });
 }
@@ -1012,6 +1512,60 @@ mod tests {
                 .any(|x| x.as_str().unwrap().contains("arm A receipt uses phase")),
             "{d:?}"
         );
+    }
+
+    #[test]
+    fn superseded_skipped_receipts_are_accepted() {
+        let w = World::from_manifest(&manifest_text()).unwrap();
+        let text = synthetic(&w);
+        let mut lines: Vec<Value> = text
+            .lines()
+            .map(|l| serde_json::from_str(l).unwrap())
+            .collect();
+        let n_att = lines.len() - 1; // header + attempts
+        let real: Vec<Value> = lines[lines.len() - 4..].to_vec();
+        for l in lines.iter_mut().rev().take(4) {
+            l["status"] = json!("skipped");
+            let o = l.as_object_mut().unwrap();
+            o.remove("found_points");
+            o.remove("solver_summands");
+        }
+        let orphan_only = lines.clone();
+        for (k, mut r) in real.into_iter().enumerate() {
+            r["seq"] = json!(n_att + k);
+            lines.push(r);
+        }
+        let join = |v: &[Value]| {
+            v.iter()
+                .map(|l| l.to_string())
+                .collect::<Vec<_>>()
+                .join("\n")
+                + "\n"
+        };
+        let out = replay(&manifest_text(), &join(&lines), None).unwrap();
+        assert_eq!(
+            out["defects"].as_array().unwrap().len(),
+            0,
+            "{}",
+            out["defects"]
+        );
+        assert_eq!(out["superseded_skipped"], 4);
+        assert_eq!(out["receipts"], n_att);
+        // Skipped receipts with nothing after them are not superseded and still replay.
+        let out = replay(&manifest_text(), &join(&orphan_only), None).unwrap();
+        assert_eq!(
+            out["defects"].as_array().unwrap().len(),
+            0,
+            "{}",
+            out["defects"]
+        );
+        assert_eq!(out["superseded_skipped"], 0);
+        // A real receipt appended out of the schedule order is a defect.
+        let mut bad = lines.clone();
+        let last = bad.pop().unwrap();
+        bad.insert(1, last);
+        let out = replay(&manifest_text(), &join(&bad), None).unwrap();
+        assert!(!out["defects"].as_array().unwrap().is_empty());
     }
 
     #[test]
