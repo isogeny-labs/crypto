@@ -20,6 +20,7 @@
 //! generators (the recorded generator follows a fixed rule, not the
 //! isogeny), or any change in DLP cost.
 
+pub mod checkpoint;
 pub mod curve;
 pub mod field;
 pub mod kernel;
