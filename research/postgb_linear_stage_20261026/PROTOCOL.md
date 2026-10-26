@@ -61,7 +61,7 @@ across sizes.
 - **Dense arm above δ = 1024:** the `dense` arm (cubic in δ) is not run, so
   for `gaudry-s5` only `sparse` and `fast` are compared. This is fixed here,
   before any session.
-- **Kernel ablation:** a second process runs `sparse` and `fast`, with
+- **Kernel ablation:** a second process (3 rounds) runs `sparse` and `fast`, with
   `ZERO_DIM_LA_SIMD=portable` (no vector kernels). It separates the
   algorithm from the instruction set.
 - **End to end inside an IC run:** `jv_cover --exp dlp --sizes 53,101 --seeds 2
@@ -71,6 +71,12 @@ across sizes.
   against the same-process rho.
 
 ## Measures
+
+- **Units.** The headline unit is wall time, the unit of the existing
+  leaderboard component section "Linear-algebra engine". Each arm's counted
+  multiplications (`lin_muls`, and the fast arm's `FastStats::muls`) are
+  reported beside it. The two arms count differently: the incumbent counts
+  products with non-zero operands, the fast arm every product it performs.
 
 - Per system: `sparse/fast` and `dense/fast`, the ratios of median wall time.
 - Per family: the geometric mean of `sparse/fast` over its systems, with a
@@ -87,11 +93,48 @@ across sizes.
   above 1.
 - **P2.** In `dense`, `sparse/fast` grows with δ (Spearman ρ > 0).
 - **P3.** `fast` gives up (falls back to `dense`) on at most 5% of systems.
-- **P4.** In the `jv_cover` DLP runs, every logarithm is correct. The fast
-  arm's linear stage costs fewer counted multiplications than sparse, and its
-  `S` is at most sparse's.
+- **P4.** In the `jv_cover` DLP runs, every logarithm is correct.
+  - **Counted cost.** The fast arm's counted linear-stage multiplications are
+    within ±25% of sparse's on every system. The gain is in the cost of each
+    multiplication, not in their number. The `jv_cover` `S` is within ±10% of
+    sparse's, because the linear stage is a minor share of a Nagao test.
+  - **Wall time.** The fast arm's linear stage takes less wall time than
+    sparse's on every DLP run (`lin_ms` summed).
+
+  The pilots showed counted counts within about ±20%. Fewer counted
+  multiplications is not predicted.
 - **P5.** The portable `fast` (no vector kernels) still has `sparse/fast` ≥ 1.2 in
   every family, so the algorithm and not only the instruction set is faster.
+
+## Runs (cards)
+
+The executor's background shell is limited to 30 minutes, so the corpus runs
+as several cards. Each card is one invocation of `postgb_la_bench` with a
+family, shape or prime filter, and every card writes
+`runs/<card>.json`. Together the cards cover the corpus above exactly once.
+The ablation and the `jv_cover` DLP runs have their own cards. A card killed
+by the harness is re-run whole; its partial output is never used.
+
+`B = ./target/release/examples/postgb_la_bench`, `J = ./target/release/examples/jv_cover`,
+`R = research/postgb_linear_stage_20261026/runs`; every card first waits for a quiet CPU and records `lscpu` and `df`.
+
+| card | command | pilot estimate |
+|:--|:--|--:|
+| L1 | `B --families jv-nagao,gaudry-s4,gaudry-d4 --per 8 --reps 7 --json R/L1.json` | 5 min |
+| L2 | `B --families dense --shapes n2d8,n2d16,n3d4,n3d6,n3d8,n4d3,n4d4,n5d2,n5d3,n6d2,n7d2,n8d2 --per 8 --reps 7 --json R/L2.json` | 10 min |
+| L3 | `B --families dense --shapes n2d32,n3d10 --per 8 --reps 7 --json R/L3.json` | 12 min |
+| L4 | `B --families dense --shapes n4d5,n5d4,n6d3 --per 8 --reps 7 --json R/L4.json` | 13 min |
+| L5 | `B --families gaudry-s5 --p 101 --per 8 --reps 7 --json R/L5.json` | 10 min |
+| L6 | `B --families gaudry-s5 --p 13 --per 8 --reps 7 --json R/L6.json` | 17 min |
+| A1 | `ZERO_DIM_LA_SIMD=portable B --families jv-nagao,gaudry-s4,gaudry-d4,dense --per 8 --reps 3 --arms sparse,fast --json R/A1.json` | 8 min |
+| A2 | `ZERO_DIM_LA_SIMD=portable B --families gaudry-s5 --per 8 --reps 3 --arms sparse,fast --json R/A2.json` | 12 min |
+| D1 | `JV_LIN=sparse J --exp dlp --sizes 53,101 --seeds 2 --rho-runs 4 --check-every 64 --json R/D1.json` | 10 min |
+| D2 | `JV_LIN=fast J --exp dlp --sizes 53,101 --seeds 2 --rho-runs 4 --check-every 64 --json R/D2.json` | 10 min |
+
+`--per 8` gives 8 random and 4 constructed Nagao systems per `p` (fewer when a
+residual is degenerate), 8 systems per `p` for `gaudry-s4` and `gaudry-d4`, 2
+per `p` for `gaudry-s5` and 3 per shape and prime for `dense`. The ten cards
+run one at a time, on the same host and binaries.
 
 ## Decision rule
 

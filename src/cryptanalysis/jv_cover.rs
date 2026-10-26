@@ -3108,6 +3108,10 @@ pub struct CoverDlpReport {
     pub post_muls: u64,
     pub verify_muls: u64,
     pub oracle_muls: u64,
+    /// Milliseconds in F4 and in the linear stage, summed over the Nagao
+    /// tests (time per test on its own thread, not elapsed wall time).
+    pub f4_ms: f64,
+    pub lin_ms: f64,
     /// `C_cov` as the run paid it, per residual.
     pub c_cov: f64,
     pub unknowns: usize,
@@ -3241,6 +3245,8 @@ pub fn run_cover_dlp(
             rep.residuals += 1;
             rep.weil_muls += cost.weil_muls;
             rep.lin_muls += cost.lin_muls;
+            rep.f4_ms += cost.f4_ms;
+            rep.lin_ms += cost.lin_ms;
             rep.post_muls += cost.post_muls;
             rep.verify_muls += vm;
             if cost.incomplete {

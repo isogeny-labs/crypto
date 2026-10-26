@@ -269,6 +269,7 @@ fn main() {
     let mut max_delta = 1usize << 14;
     let mut arm_list = "dense,sparse,fast".to_string();
     let mut shapes_only: Option<String> = None;
+    let mut primes_only: Option<Vec<u64>> = None;
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -279,11 +280,17 @@ fn main() {
             "--max-delta" => max_delta = args[i + 1].parse().unwrap(),
             "--arms" => arm_list = args[i + 1].clone(),
             "--shapes" => shapes_only = Some(args[i + 1].clone()),
+            "--p" => {
+                primes_only = Some(args[i + 1].split(',').map(|x| x.parse().unwrap()).collect())
+            }
             a => panic!("unknown argument {a}"),
         }
         i += 2;
     }
-    let systems = corpus(&families, per, shapes_only.as_deref());
+    let systems: Vec<Sys> = corpus(&families, per, shapes_only.as_deref())
+        .into_iter()
+        .filter(|s| primes_only.as_ref().is_none_or(|v| v.contains(&s.p)))
+        .collect();
     eprintln!("{} systems", systems.len());
     let mut rows = Vec::new();
     for (si, s) in systems.iter().enumerate() {
@@ -409,6 +416,7 @@ fn main() {
             "per": per,
             "arms": arm_list,
             "shapes": shapes_only,
+            "primes": primes_only,
             "rows": rows,
         });
         std::fs::write(&path, serde_json::to_string_pretty(&doc).unwrap()).unwrap();
