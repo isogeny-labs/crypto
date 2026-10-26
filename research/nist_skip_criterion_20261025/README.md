@@ -1,6 +1,6 @@
 # NIST skipped-curve criterion search
 
-The [report](REPORT.md) and [PDF](REPORT.pdf) give an independently checked
+The [report](REPORT.md) and locally delivered PDF give an independently checked
 two-test empirical separator for all 21 recorded eligible curves, its
 root-convention dependence, and the calibration that prevents treating the
 fit as an established historical explanation. The broader weakness and
@@ -13,6 +13,14 @@ per-member hashes. The PDF, archive and large PNG are delivered in the local
 workspace; their S3 upload remains blocked by unavailable upload credentials.
 See `ARTIFACT_DELIVERY.json` for exact names, sizes, hashes and delivery status.
 No active curve registry, solver or benchmark is changed.
+
+| Requested result | Status |
+| --- | --- |
+| Original four-curve ICV1 and DiSSECT assessment | Preserved in the [earlier study](../curve_candidates_dissect_20261021/README.md) |
+| Exact empirical criterion for the recorded choices | Independently verified on all 21 curves |
+| Historical explanation or applicable vulnerability | Unresolved; see the [selection problem](../../problems/nist-candidate-selection-weakness-hypotheses.md) |
+| Current PDF and full evidence bundle | Built, inspected and delivered locally |
+| Artifact-store delivery | Blocked; see the [upload problem](../../problems/nist-candidate-study-artifact-upload.md) |
 
 ## Reproduce the native checks
 

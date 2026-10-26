@@ -1,0 +1,20 @@
+Repository artifact tool: tools/artifacts/artifacts.py from origin/main c0d223a72.
+Operational upload attempt (no research calculation):
+ARTIFACTS_REMOTE=s3://setec-astronomy-artifacts/store ARTIFACTS_CACHE=/workspace/skip-artifact-cache python3 /tmp/nist-artifacts.py push research/nist_skip_criterion_20261025/REPORT.pdf
+Exit 2: artifacts: `aws` not found; install the AWS CLI or set ARTIFACTS_AWS
+No object upload or remote verification completed; no artifact manifest was created.
+
+New follow-up policy check:
+python3 /tmp/nist-artifacts.py check a1240d3 af266ebc4
+Exit 0: artifacts check: no data files committed
+
+Earlier PR payload policy check, relative to its merge base with main:
+python3 /tmp/nist-artifacts.py check 20e8f44bba1f04e84a151e6f77e8fa752ebf7ad5 185ff32cb338c1c4f0b0ca3ab3d7f8b3a3dd380a
+Exit 1: three data files belong in the store:
+499492 research/curve_candidates_dissect_20261021/REPORT.pdf
+391970 research/curve_candidates_dissect_20261021/evidence/curve-assessment-evidence.zip
+120669 research/curve_candidates_dissect_20261021/hypotheses/HYPOTHESES.pdf
+
+Post-integration check:
+git diff --quiet 185ff32cb338c1c4f0b0ca3ab3d7f8b3a3dd380a HEAD -- research/curve_candidates_dissect_20261021
+Exit 0: earlier frozen study tree remains byte-identical.
