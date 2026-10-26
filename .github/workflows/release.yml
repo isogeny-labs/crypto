@@ -350,6 +350,10 @@ jobs:
           cache-targets: false
       - name: Build and test the dedicated executable
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        # bash (-e) so a failing cargo command fails the step on Windows too; the default
+        # pwsh only reports the last native command, which hid two failing isogeny-cli
+        # commands behind two passing isogeny_algos ones.
+        shell: bash
         env:
           CRYPTO_BUILD_GIT_COMMIT: ${{ github.sha }}
           CRYPTO_BUILD_GIT_DIRTY: "false"

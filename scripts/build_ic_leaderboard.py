@@ -73,11 +73,16 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
-
+    "bitop_ladder": "research/bitop_ladder_20261019/summary.json",
+    "hec_bitop": "research/hec_bitop_20261020/analysis/analysis.json",
+    "hec_round7_rows": "experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json",
+    "hec_round7_fits": "experiments/hyperelliptic_sparse_solve_r7/fits.json",
+    "s5_c4_component": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -230,7 +235,11 @@ def curve_records() -> dict:
     status) from the file's fixed two-space layout, and refuses to build if
     the layout is not the one it expects.
     """
-    lines = (REPO / SOURCES["curves_yaml"]).read_text().splitlines()
+    return parse_curve_records((REPO / SOURCES["curves_yaml"]).read_text().splitlines())
+
+
+def parse_curve_records(lines: list[str]) -> tuple[dict, int]:
+    """Parse the leaderboard fields from curves.yaml: (records by ICV1 slug, total)."""
     if "schema_version: 1" not in lines or "curves:" not in lines:
         raise SystemExit(f"{SOURCES['curves_yaml']}: expected schema_version 1 with a top-level curves map")
     recs, cur, in_icv1, in_refs = [], None, False, False
@@ -245,7 +254,7 @@ def curve_records() -> dict:
             continue
         if cur is None:
             continue
-        if re.fullmatch(r"    [A-Za-z_]+:.*", line):
+        if re.fullmatch(r"    [A-Za-z0-9_]+:.*", line):
             in_icv1 = line == "    icv1_identity:"
             in_refs = False
             m = re.fullmatch(r"    factor_base_refs:(.*)", line)
@@ -266,7 +275,15 @@ def curve_records() -> dict:
             cur["factor_base_refs"].append(m.group(1).strip().strip("'\""))
     if not recs or any(r["factor_base_refs"] is None or r["factor_base_link_status"] is None for r in recs):
         raise SystemExit(f"{SOURCES['curves_yaml']}: every record needs factor_base_refs and factor_base_link_status")
-    return {r["slug"]: r for r in recs if r["slug"]}, len(recs)
+    by_slug = {}
+    for record in recs:
+        slug = record["slug"]
+        if not slug:
+            continue
+        if slug in by_slug:
+            raise SystemExit(f"{SOURCES['curves_yaml']}: duplicate ICV1 slug {slug}")
+        by_slug[slug] = record
+    return by_slug, len(recs)
 
 
 def curve_record(records: dict, slug: str) -> dict:
@@ -281,6 +298,27 @@ def curve_record(records: dict, slug: str) -> dict:
 def ec1_of(c: dict) -> str | None:
     reps = c.get("representations") or []
     return reps[0]["ec1"] if reps else None
+
+
+def preserve_frozen_curve_metadata(board: list[dict], pre_gate: dict[str, str]) -> None:
+    """Retain the old missing-link metadata only for an exact frozen payload.
+
+    The earlier reader missed the digit in icv1_identity, so its board rows
+    recorded no registry link. Current registry links belong in the separate
+    registry overview. No measurement change can use this compatibility path:
+    the complete candidate row must still match its original admission hash.
+    """
+    for row in board:
+        historical = {
+            **row,
+            "curve_record": curve_record({}, row["slug"]),
+            "factor_base": {**row["factor_base"], "refs": [],
+                            "link_status": "no_curves_yaml_record"},
+        }
+        expected = pre_gate.get(gate.board_key(row))
+        if expected is not None and gate.row_digest(stable(historical)) == expected:
+            row["curve_record"] = historical["curve_record"]
+            row["factor_base"] = historical["factor_base"]
 
 
 # ---------------------------------------------------------------------------
@@ -623,7 +661,33 @@ def la_component() -> dict:
         })
     return {"rows": rows, "study": "research/la_engines_20261014/",
             "report": "research/la_engines_20261014/REPORT.pdf",
-            "class": "engineering"}
+            "class": "engineering",
+            # Rule G5 of the 2026-10-16 audit: the R10 ledger re-rated this claim.
+            "annotation_20261019": (
+                "R10 ledger (research/ic_tool_program/ledger/r10-20261019/README.md): "
+                "the 10.40x at 262,144 columns holds at >= 8,192 synthetic columns. "
+                "Below 4,096 the shipped `ic logs` default (CADO-style filter) is the "
+                "slower one (0.40x at 1,024), and the default is unvalidated at the "
+                "sizes real IC matrices have (repair R11).")}
+
+
+NOT_VALIDATED = ("Validation standing: not validated under the 2026-10-19 gate. No replay certificate, "
+                 "validator report or §5a-banded matched-rho reference is filed for this study (no "
+                 "VALIDATION.json), so this is an engineering component, not a validated row, and its "
+                 "benchmarks/README.md row is withheld until it validates.")
+
+
+def lazy_members_component() -> dict:
+    """The lazy orbit-member index of research/ecbench_lazy_orbit_members_20261018:
+    ratios copied from the study's saved ecbench comparisons (figures/ratios.json).
+    A component improvement of the Frobenius-folded pair table's set-up. The
+    ranked tables A-C keep the oracle each row was measured with."""
+    d = load(SOURCES["lazy_members"])
+    if d.get("schema") != "crypto.lazy_orbit_members/v1" or d.get("class") != "engineering":
+        raise SystemExit(f"{SOURCES['lazy_members']}: unexpected schema or class")
+    return {"rows": d["rows"], "unit": d["unit"], "class": d["class"], "note": d["note"],
+            "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
+            "source": SOURCES["lazy_members"], "validation": NOT_VALIDATED}
 
 
 def secs(x: float) -> str:
@@ -677,6 +741,111 @@ def planner_component() -> dict:
             "report": "research/ic_planner_validation_20261020/REPORT.pdf",
             "class": "engineering"}
 
+# Arms and fit ranges the bitop/v1 prime-ladder section shows, in the order
+# research/bitop_ladder_20261019/PROTOCOL.md lists them.  rho-neg-aa is left
+# out: it is rho-neg run again by construction (the study's A/A control).
+BITOP_ARMS = ("rho-neg", "bsgs-neg", "kangaroo", "ic-pair-rule", "ic-pair-b32", "ic-rootfind-m3-rule")
+BITOP_FITS = ("16-26", "16-28", "16-32", "33-40")
+
+
+def bitop_ladder() -> dict:
+    """Index calculus with a per-size base on the 16-40-bit prime ladder in
+    bitop/v1: research/bitop_ladder_20261019, copied from its summary.json
+    (ecbench bound fits and per-curve mean bitop/v1 over rho-neg, both
+    computed there).  A parameter-selection result in its own unit: it moves
+    no row of tables A-C."""
+    sm = load(SOURCES["bitop_ladder"])
+    fits = []
+    for arm in BITOP_ARMS:
+        for rng_key in BITOP_FITS:
+            f = sm["fits"].get(f"{arm}-{rng_key}")
+            if f is None:
+                continue
+            fits.append({
+                "arm": arm, "bits": rng_key, "tier": f["tier"], "sizes": f["sizes"], "runs": f["runs"],
+                "alpha_additions": f["alpha_additions"], "alpha_additions_ci95": f["alpha_additions_ci95"],
+                "alpha_bitops": f["alpha_bitops"], "alpha_bitops_ci95": f["alpha_bitops_ci95"],
+                "ratio_to_floor": f["ratio_to_floor"], "ratio_to_floor_ci95": f["ratio_to_floor_ci95"],
+                "bound_id": f["bound_id"],
+            })
+    gap = sm["gap_to_rho"]
+    return {"fits": fits, "gap_to_rho": {"arms": gap["arms"], "rows": gap["rows"], "note": gap["note"]},
+            "before_arm": "ic-pair-b32", "after_arm": "ic-pair-rule", "unit": sm["unit"],
+            "study": "research/bitop_ladder_20261019/", "source": SOURCES["bitop_ladder"],
+            "protocol": "research/bitop_ladder_20261019/PROTOCOL.md",
+            "class": "parameter selection (base size per size, chosen on a separate train panel in bitop/v1)"}
+
+
+def hec_bitop() -> dict:
+    """The hyperelliptic genus-2/3/4 rows of round seven re-priced in bitop/v1
+    with both arms counted and a full-width rho walk: research/hec_bitop_20261020,
+    copied from its analysis.json (ratios, bootstrap intervals and slopes
+    computed there by examples/hec_bitop_analyse.rs).  The before mark is round
+    seven's renormalised in-situ genus-4 figure and fit, copied from its frozen
+    files.  Not an elliptic curve and a re-pricing (accounting): it moves no row
+    of tables A-C."""
+    an = load(SOURCES["hec_bitop"])
+    if an.get("schema") != "hec-bitop-analysis/v1":
+        raise SystemExit(f"{SOURCES['hec_bitop']}: unexpected schema {an.get('schema')!r}")
+    rows = [{
+        "genus": r["genus"], "p": r["p"], "n": int(r["n"]), "log2_n": r["log2_n"],
+        "ic_runs": r["ic_runs"], "rho_runs": r["rho_runs"], "verified": r["verified"],
+        "ic_over_rho": r["ic_over_rho"], "ic_over_rho_ci95": r["ic_over_rho_ci95"],
+        "excluding_validation": r["ic_over_rho_excluding_validation"],
+        "post_hoc_without_rho_precompute": r["post_hoc_ic_over_rho_without_rho_precompute"],
+        "post_hoc_oracle_doubled": r["post_hoc_ic_over_rho_oracle_doubled"],
+        "in_situ_full_width_rho": r["in_situ_s_ic_over_s_rho"],
+        "rho_precompute_share": r["rho_precompute_share"],
+    } for r in an["rows"]]
+    slopes = [{"genus": int(g), "rows": f["rows"], "slope": f["slope"], "slope_ci95": f["slope_ci95"],
+               "degenerate_resamples": f["degenerate_resamples"]}
+              for g, f in sorted(an["fits"].items(), key=lambda kv: int(kv[0]))]
+    r7 = next(r for r in load(SOURCES["hec_round7_rows"]) if r["genus"] == 4 and r["p"] == 61)
+    r7fit = load(SOURCES["hec_round7_fits"])["4"]["ratio_corr_B"]
+    return {"rows": rows, "slopes": slopes, "unit": an["unit"], "resamples": an["resamples"],
+            "before": {"genus": 4, "p": 61, "n": r7["N"], "ic_over_rho": r7["ratio_corr_B"],
+                       "unit": "in-situ group operations, wall-clock-calibrated linear algebra and oracle, "
+                               "rho renormalised to its ideal, 8-bit rho walk (round seven)",
+                       "slope": r7fit["slope"], "slope_ci95": r7fit["ci95"],
+                       "source": SOURCES["hec_round7_rows"], "fits_source": SOURCES["hec_round7_fits"]},
+            "study": "research/hec_bitop_20261020/", "readme": "research/hec_bitop_20261020/README.md",
+            "source": SOURCES["hec_bitop"], "protocol": "research/hec_bitop_20261020/PROTOCOL.md",
+            "class": "accounting"}
+
+
+def s5_c4_component() -> dict:
+    """The plain-S5 C4 solver-stage improvement, separate from full-pipeline rows."""
+    summary = load(SOURCES["s5_c4_component"])
+    arms = {row.get("arm"): row for row in summary.get("arms", [])}
+    before = arms.get("committed", {})
+    after = arms.get("sparsest+chains+replay", {})
+    if (before.get("n") != 13 or before.get("solves") != 13
+            or after.get("n") != 12 or after.get("solves") != 13
+            or after.get("agree") != 13 or after.get("replays", []).count("Replayed") != 11
+            or after.get("replays", []).count("FellBack") != 1):
+        raise SystemExit("plain-S5 C4 component summary is incomplete or changed")
+    ratio = after["ratio_of_means"]
+    if not after["paired_min"] <= ratio <= after["paired_max"]:
+        raise SystemExit("plain-S5 C4 ratio of means is outside its paired range")
+    return {
+        "before_muls": before["mean"]["total_muls"],
+        "before_n": before["n"],
+        "after_muls": after["mean"]["total_muls"],
+        "after_n": after["n"],
+        "executions": after["solves"],
+        "oracle_equal": after["agree"],
+        "shape_replays": after["replays"].count("Replayed"),
+        "fallbacks": after["replays"].count("FellBack"),
+        "ratio": ratio,
+        "paired_min": after["paired_min"],
+        "paired_max": after["paired_max"],
+        "log2_before": before["log2_mean_c4"],
+        "log2_after": after["log2_mean_c4"],
+        "study": "research/s5_plain_c4_options_20261019/",
+        "report": "research/s5_plain_c4_options_20261019/REPORT.pdf",
+        "source": SOURCES["s5_c4_component"],
+        "class": "engineering",
+    }
 def _jsonl(rel: str) -> list[dict]:
     return [json.loads(x) for x in (REPO / rel).read_text().splitlines() if x.strip()]
 
@@ -1141,6 +1310,7 @@ def build(allow_unvalidated: bool = False) -> dict:
                             "link_status": r["curve_record"]["factor_base_link_status"]}
     # The validation gate (AGENTS.md, owner rule 2026-10-19): a row is validated,
     # frozen as unvalidated (pre-gate), or refused.
+    preserve_frozen_curve_metadata(board, gate.load_pre_gate(gate.PRE_GATE_LEADERBOARD, REPO))
     gate.annotate_board(board, lambda r: gate.row_digest(stable(r)),
                         allow_unvalidated=allow_unvalidated)
     leaders = {}
@@ -1192,6 +1362,7 @@ def build(allow_unvalidated: bool = False) -> dict:
             "aa_controls": n83_holdout["aa_controls"],
         },
         "curve_records": {
+            "current_board_records": {slug: curve_record(records, slug) for slug in sorted(measured)},
             "registry": SOURCES["registry"], "schema": SOURCES["curves_schema"], "yaml": SOURCES["curves_yaml"],
             "yaml_records": n_records,
             "board_curves": len(measured),
@@ -1209,13 +1380,16 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "lazy_members_component": lazy_members_component(),
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
         "planner_component": planner_component(),
-
+        "bitop_prime_ladder": bitop_ladder(),
+        "hyperelliptic_bitop_reprice": hec_bitop(),
+        "s5_c4_component": s5_c4_component(),
         "ghs_weak_n4_component": ghs_weak_n4(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
@@ -1350,6 +1524,76 @@ def rich(s) -> str:
     return re.sub(r"`([^`]+)`", r"<code>\1</code>", esc(s))
 
 
+def bitop_text(b: dict) -> dict:
+    """Prose and labels the bitop/v1 prime-ladder section shares between the Markdown and the page."""
+    for row in b["gap_to_rho"]["rows"]:
+        for arm, v in zip(b["gap_to_rho"]["arms"], row[1:]):
+            if arm.startswith("ic-") and v is not None and v <= 1:
+                raise SystemExit(f"{b['source']}: {arm} at {row[0]} bits is not above rho-neg; "
+                                 "the bitop ladder section's scope line says it is")
+    label = {b["before_arm"]: f"{b['before_arm']} (before: fixed 32-point base)",
+             b["after_arm"]: f"{b['after_arm']} (per-size base)"}
+    return {
+        "title": "Prime ladder in bitop/v1, 16–40 bits: index calculus with a per-size base",
+        "lead": ("The bitop/v1 study fixed every index-calculus base at 32 or 128 abscissae. This study lets "
+                 "the pair-table arm (`ic-pair-rule`) and the m = 3 root-finding arm (`ic-rootfind-m3-rule`) "
+                 "use, per bit size, the base with the smallest mean bitop/v1 cost on a separate train panel, "
+                 "frozen before the hold-out sessions, and measures every arm on 25 deterministic a = −3 "
+                 "prime-order curves from 16 to 40 bits. `ic-pair-b32` keeps the fixed 32-point base as the "
+                 "before mark."),
+        "class": b["class"],
+        "unit": b["unit"],
+        "scope": ("Public synthetic a = −3 prime-order curves and hash-to-subgroup targets; operation counts "
+                  "only, no security claim about any deployed curve. rho-neg is cheaper than every "
+                  "index-calculus arm at every size measured; the gap table is the distance remaining."),
+        "aa": "rho-neg-aa is omitted: it is rho-neg run again by construction (the A/A control), with identical fits.",
+        "fits_note": ("Exponents α of cost ∝ r^α fitted by `ecbench bound fit` in additions and in bitop/v1, "
+                      "and the ratio to the floor, each with its 95% interval, copied from the study's bound files."),
+        "gap_note": ("Per curve, each arm's mean bitop/v1 over rho-neg's (`ecbench work --counted`); "
+                     "— where the arm did not run at that size."),
+        "gap_labels": [label.get(a, a) for a in b["gap_to_rho"]["arms"]],
+    }
+
+
+def fmt_ci(v: float, ci: list, f: str) -> tuple[str, str]:
+    return format(v, f), f"[{format(ci[0], f)}, {format(ci[1], f)}]"
+
+
+
+
+def hec_text(h: dict) -> dict:
+    """Prose the hyperelliptic bitop/v1 section shares between the Markdown and the page."""
+    head = next(r for r in h["rows"] if r["genus"] == 4 and r["p"] == 61)
+    if not head["ic_over_rho_ci95"][1] < 1:
+        raise SystemExit(f"{h['source']}: the genus-4 p = 61 row's upper bound is not below 1; "
+                         "the hyperelliptic section's lead says it is")
+    b = h["before"]
+    v, ci = fmt_ci(head["ic_over_rho"], head["ic_over_rho_ci95"], ".3f")
+    return {
+        "title": "Hyperelliptic Jacobians re-priced in bitop/v1, genus 2–4",
+        "lead": (f"Round seven's 18 fb-walk rows (index calculus seed 20260916 × 5 runs, rho seed 0xC0FFEE × 40 runs "
+                 f"per row) re-priced with both arms counted at the field, mod-N, hash and word level in `{h['unit']}`, "
+                 f"against the full-width rho walk. Genus 4 at p = 61, N = {head['n']:,}: IC/rho {v} {ci} "
+                 f"(95% bootstrap); the preregistered verdict is that the row survives (upper bound below 1). "
+                 f"Before: {b['ic_over_rho']:.2f}× in round seven's in-situ unit, with slope "
+                 f"{b['slope']:.2f} [{b['slope_ci95'][0]:.2f}, {b['slope_ci95'][1]:.2f}]."),
+        "class": h["class"],
+        "unit": h["unit"],
+        "convention": ("bitop/v1 is an accounting convention with frozen gate-equivalent weights, not a physical "
+                       "gate count; the Callgrind check is a relative coverage diagnostic. Known uncounted work "
+                       "(memory movement, generator internals, loop control) is disclosed in the protocol. "
+                       "No algorithm changed: the move from the before figure combines later code changes, "
+                       "the corrected rho walk and the unit."),
+        "scope": ("Toy hyperelliptic Jacobians (p ≤ 251, N ≤ 2^24), operation counts only; not an elliptic curve, "
+                  "and no deployed system is hyperelliptic."),
+        "rows_note": ("Per row: mean bitop/v1 of index calculus over rho's with its 95% bootstrap interval; the same "
+                      "ratio excluding validation; post hoc, without rho's fixed precomputation and with the IC oracle "
+                      "charged twice; and the in-situ ratio against the full-width rho. Every row verified."),
+        "slopes_note": ("Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two-stage "
+                        "bootstrap 95% interval."),
+    }
+
+
 def markdown(doc: dict) -> str:
     fams = doc["families"]
     L = ["# Index-calculus leaderboard", "",
@@ -1401,6 +1645,23 @@ def markdown(doc: dict) -> str:
           f"{replay['current']['correction']} |", "",
           f"[Latest result data](../../{audit['source']}); "
           f"[prior full synthesis](../../{audit['previous_source']}). {audit['reason']}", ""]
+    lz = doc["lazy_members_component"]
+    L += ["## Component improvement: lazy orbit-member index (2026-10-18, engineering)", "",
+          "The Frobenius-folded pair table no longer names `σ^t(P_i)` for every base point at build; "
+          "a hitting probe names its two summands when it happens. Same table, relations, rank and "
+          "recovered logarithm (856/856 run pairs identical); it moves no row of tables A–C, which keep "
+          f"the oracle each was measured with. {lz['unit']}; 95 % intervals; below 1 the numerator is "
+          "cheaper.", "",
+          "| curve | log₂ r | eager ÷ lazy (before ÷ after) | eager ÷ rho-strong (was) | lazy ÷ rho-strong (now) |",
+          "|:--|--:|:--|:--|:--|"]
+    for r in lz["rows"]:
+        def ci(x):
+            return f"{x['ratio']:.3f} [{x['ci95'][0]:.3f}, {x['ci95'][1]:.3f}]"
+        L.append(f"| `{r['curve']}` | {r['log2_r']:.1f} | **{ci(r['eager_over_lazy'])}** | "
+                 f"{ci(r['eager_over_rho_strong'])} | {ci(r['lazy_over_rho_strong'])} |")
+    L += ["", f"[Report]({'../../' + lz['report']}) · [study](../../{lz['study']}) · "
+              f"[data](../../{lz['source']}). Distance to rho is reported, not a gate; no ranking against "
+              "rho is claimed.", "", lz["validation"], ""]
     for code in ("A", "B", "C"):
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
@@ -1491,11 +1752,16 @@ def markdown(doc: dict) -> str:
           f"[`{cr['schema']}`](../../{cr['schema']}), records [`{cr['yaml']}`](../../{cr['yaml']}) "
           f"({cr['yaml_records']} records). {cr['board_curves_in_yaml']} of the {cr['board_curves']} board curves "
           f"have a record there; {cr['board_curves_factor_base_reconciled']} have a reconciled factor base.", "",
+          "The registry overview below uses current links. Frozen measurement rows retain their "
+          "original link metadata; refreshing registry links does not change their validation status.", "",
           "| table | curve | curves.yaml record | factor base (points, recipe) | factor-base source | refs |",
           "|:--|:--|:--|:--|:--|:--|"]
     for code in ("A", "B", "C"):
         for r in (r for r in doc["board"] if r["family"] == code):
-            fb, key = r["factor_base"], r["curve_record"]["curves_yaml_key"]
+            record = cr["current_board_records"][r["slug"]]
+            fb = {**r["factor_base"], "refs": record["factor_base_refs"],
+                  "link_status": record["factor_base_link_status"]}
+            key = record["curves_yaml_key"]
             L.append(f"| {code} | `{r['slug']}` | {('`' + key + '`') if key else 'none'} | "
                      f"{fb['points']:,}, {fb['variant'] or fb['recipe']} | `{fb['source']}` | "
                      + (", ".join(f"`{x}`" for x in fb["refs"]) or f"none ({fb['link_status']})") + " |")
@@ -1718,6 +1984,18 @@ def markdown(doc: dict) -> str:
                  + f" | {' / '.join(f'{x:.2f}' for x in db['band_ratio'])} ({db['verdict']}) | "
                  f"{po['ratio']:.3g} [{po['ci95'][0]:.3g}, {po['ci95'][1]:.3g}] | {r['predicted_plan_over_rho']:.3g} |")
     L.append("")
+    c4 = doc["s5_c4_component"]
+    L += ["## Plain-S₅ C₄ solver stage, outside tables A–C", "",
+          f"On §11.17's same instances, adding sparsest pivots, chain eigensteps and shape replay "
+          f"reduces the plain-S₅ solve's mean C₄ from {c4['before_muls']:.3e} to "
+          f"{c4['after_muls']:.3e} counted Fₚ multiplications ({c4['ratio']:.2f}×; class: "
+          f"{c4['class']}). The committed arm covers {c4['before_n']} solves; the replay arm's "
+          f"mean covers {c4['after_n']} later solves, with {c4['executions']} total outputs "
+          f"oracle-equal. It includes {c4['shape_replays']} shape replays and {c4['fallbacks']} "
+          f"fallback. Paired ratios are {c4['ratio']:.2f}× by ratio of means and "
+          f"[{c4['paired_min']:.2f}, {c4['paired_max']:.2f}] across paired instances. "
+          f"This is a solver-stage change: no full-pipeline row or curve verdict changes. "
+          f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
     L += ["## Large-prime conductor-gap counted diagnostics", "",
           "Copied from native analysis: eight independent one-target workloads per fixed curve; "
           "no transported targets. Counted S has unpriced native work. These observations do "
@@ -1791,6 +2069,47 @@ def markdown(doc: dict) -> str:
           "its target-dependent walk and ends with scalar verification. "
           "This wall-time panel is kept separate from Tables A–C and their "
           "operation-unit S rankings.", ""]
+    b = doc["bitop_prime_ladder"]
+    t = bitop_text(b)
+    L += ["", f"## {t['title']}, outside tables A–C", "",
+          t["lead"], "",
+          f"**Class:** {t['class']}.  **Unit:** `{t['unit']}`.  **Scope:** {t['scope']} "
+          f"Read the [protocol](../../{b['protocol']}) and the [frozen summary](../../{b['source']}).", "",
+          t["fits_note"], "",
+          "| arm | bits | tier | sizes | runs | α additions | 95% | α bitop/v1 | 95% | × floor | 95% |",
+          "|:--|:--|:--|--:|--:|--:|:--|--:|:--|--:|:--|"]
+    for f in b["fits"]:
+        aa, aac = fmt_ci(f["alpha_additions"], f["alpha_additions_ci95"], ".3f")
+        ab, abc = fmt_ci(f["alpha_bitops"], f["alpha_bitops_ci95"], ".3f")
+        rf, rfc = fmt_ci(f["ratio_to_floor"], f["ratio_to_floor_ci95"], ".3g")
+        L.append(f"| {f['arm']} | {f['bits']} | {f['tier']} | {f['sizes']} | {f['runs']:,} | "
+                 f"{aa} | {aac} | {ab} | {abc} | {rf} | {rfc} |")
+    L += ["", t["aa"], "", t["gap_note"], "",
+          "| bits | " + " | ".join(t["gap_labels"]) + " |",
+          "|--:|" + "--:|" * len(t["gap_labels"])]
+    for row in b["gap_to_rho"]["rows"]:
+        L.append(f"| {row[0]} | " + " | ".join(g3(v) for v in row[1:]) + " |")
+    h = doc["hyperelliptic_bitop_reprice"]
+    t = hec_text(h)
+    L += ["", f"## {t['title']}, outside tables A–C", "",
+          t["lead"], "",
+          f"**Class:** {t['class']}.  **Unit:** `{t['unit']}`.  **Scope:** {t['scope']} {t['convention']} "
+          f"Read the [study](../../{h['readme']}), the [protocol](../../{h['protocol']}) and the "
+          f"[frozen analysis](../../{h['source']}); the before mark is from [round seven](../../{h['before']['source']}).", "",
+          t["rows_note"], "",
+          "| g | p | N | IC/rho bitop/v1 | 95% | excl. validation | post hoc: no rho precompute | "
+          "post hoc: IC oracle ×2 | in-situ, full-width rho |",
+          "|--:|--:|--:|--:|:--|--:|--:|--:|--:|"]
+    for r in h["rows"]:
+        v, ci = fmt_ci(r["ic_over_rho"], r["ic_over_rho_ci95"], ".3f")
+        L.append(f"| {r['genus']} | {r['p']} | {r['n']:,} | {v} | {ci} | {r['excluding_validation']:.3f} | "
+                 f"{r['post_hoc_without_rho_precompute']:.3f} | {r['post_hoc_oracle_doubled']:.3f} | "
+                 f"{r['in_situ_full_width_rho']:.3f} |")
+    L += ["", t["slopes_note"], "", "| genus | rows | slope | 95% |", "|--:|--:|--:|:--|"]
+    for f in h["slopes"]:
+        v, ci = fmt_ci(f["slope"], f["slope_ci95"], "+.3f")
+        L.append(f"| {f['genus']} | {f['rows']} | {v} | {ci} |")
+    L.append("")
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
@@ -2017,6 +2336,25 @@ def page(doc: dict, standalone: bool) -> str:
              '</tbody></table></div>'
              f'<p>{esc(audit["reason"])} {gh(audit["source"], "Latest result data")} · '
              f'{gh(audit["previous_source"], "prior full synthesis")}.</p></section>')
+    lz = doc["lazy_members_component"]
+    P.append('<section class="panel" id="lazy-orbit-members"><h2>Component improvement · lazy orbit-member '
+             'index <span class="chip">engineering</span></h2>'
+             '<p>The Frobenius-folded pair table no longer names <code>σ^t(P_i)</code> for every base point at '
+             'build; a hitting probe names its two summands when it happens. Same table, relations, rank and '
+             'recovered logarithm (856/856 run pairs identical). It moves no row of tables A–C. '
+             f'{esc(lz["unit"])}; below 1 the numerator is cheaper.</p>'
+             '<div class="scroll"><table><thead><tr><th>Curve</th><th>log₂ r</th><th>eager ÷ lazy</th>'
+             '<th>eager ÷ rho-strong (was)</th><th>lazy ÷ rho-strong (now)</th></tr></thead><tbody>')
+    for r in lz["rows"]:
+        def ci(x):
+            return f'{x["ratio"]:.3f} [{x["ci95"][0]:.3f}, {x["ci95"][1]:.3f}]'
+        P.append(f'<tr><td><code>{esc(r["curve"])}</code></td><td>{r["log2_r"]:.1f}</td>'
+                 f'<td><b>{ci(r["eager_over_lazy"])}</b></td><td>{ci(r["eager_over_rho_strong"])}</td>'
+                 f'<td>{ci(r["lazy_over_rho_strong"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(lz["report"], "Report")} · {gh(lz["study"], "study")} · {gh(lz["source"], "data")}. '
+             'Distance to rho is reported, not a gate; no ranking against rho is claimed.</p>'
+             f'<p class="muted">{esc(lz["validation"])}</p></section>')
     d = doc["bounded_diagnostics"][0]
     P.append(f'<section class="card" id="bounded-n37-diagnostic"><h2>New n37 counted diagnostic, outside the priced tables</h2>'
              f'<p>On <code>{esc(d["curve"])}</code>, shared-rank K16 has {d["usable_points"]:,} actual usable '
@@ -2236,6 +2574,17 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{po["ratio"]:.3g} <span class="muted">[{po["ci95"][0]:.3g}, {po["ci95"][1]:.3g}]</span></td>'
                  f'<td class="n">{r["predicted_plan_over_rho"]:.3g}</td></tr>')
     P.append('</tbody></table></section>')
+    c4 = doc["s5_c4_component"]
+    P.append('<section class="card" id="s5-c4-solver-component"><h2>Plain-S₅ C₄ solver stage, outside the priced tables</h2>'
+             f'<p>On §11.17&#39;s same instances, sparsest pivots, chain eigensteps and shape replay reduce the '
+             f'plain-S₅ solve from {c4["before_muls"]:.3e} to {c4["after_muls"]:.3e} counted F<sub>p</sub> '
+             f'multiplications ({c4["ratio"]:.2f}×; class: {esc(c4["class"])}). The committed mean covers '
+             f'{c4["before_n"]} solves; the replay arm mean covers {c4["after_n"]} later solves, with '
+             f'{c4["executions"]} total outputs oracle-equal. The replay arm has {c4["shape_replays"]} shape '
+             f'replays and {c4["fallbacks"]} fallback. Paired ratios span [{c4["paired_min"]:.2f}, '
+             f'{c4["paired_max"]:.2f}]. This is a solver-stage change; no full-pipeline row or curve verdict '
+             f'changes. <a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["study"])}">Study</a>; '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
 
     head_cells = ('<th class="n">#</th><th>curve</th><th class="n">log₂ r</th><th>recipe</th>'
                   '<th class="n">m</th><th class="n">|F|</th><th class="n">K</th><th class="n">S, IC</th>'
@@ -2503,7 +2852,8 @@ def page(doc: dict, standalone: bool) -> str:
              f'({cr["yaml_records"]} records), which carries each curve\'s <code>factor_base_refs</code> and '
              f'<code>factor_base_link_status</code>. {cr["board_curves_in_yaml"]} of the {cr["board_curves"]} curves '
              f'on the board have a record there, and {cr["board_curves_factor_base_reconciled"]} have a reconciled '
-             'factor base; each board row shows its own record and the factor base its source file used.</p>')
+             'factor base. This registry overview uses current links. Frozen measurement rows retain '
+             'their original link metadata; registry updates do not change their validation status.</p>')
     for fam in fam_order:
         rows = [c for c in doc["roster"] if c["family"] == fam]
         if not rows:
@@ -2605,6 +2955,61 @@ def page(doc: dict, standalone: bool) -> str:
              'This Tier 1 wall-time panel uses its own unit and sits outside the '
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
+
+    b = doc["bitop_prime_ladder"]
+    t = bitop_text(b)
+    P.append(f'<section class="card" id="bitop-prime-ladder"><h2>{esc(t["title"])}, outside the priced tables</h2>'
+             f'<p>{rich(t["lead"])}</p>'
+             f'<p><strong>Class:</strong> {esc(t["class"])}. <strong>Unit:</strong> <code>{esc(t["unit"])}</code>. '
+             f'<strong>Scope:</strong> {esc(t["scope"])} '
+             f'{gh(b["protocol"], "Protocol")} · {gh(b["source"], "Frozen summary")}.</p>'
+             f'<p>{rich(t["fits_note"])}</p>'
+             '<div class="scroll"><table><thead><tr><th>Arm</th><th>Bits</th><th>Tier</th><th class="n">Sizes</th>'
+             '<th class="n">Runs</th><th class="n">α additions [95%]</th><th class="n">α bitop/v1 [95%]</th>'
+             '<th class="n">× floor [95%]</th></tr></thead><tbody>')
+    for f in b["fits"]:
+        aa, aac = fmt_ci(f["alpha_additions"], f["alpha_additions_ci95"], ".3f")
+        ab, abc = fmt_ci(f["alpha_bitops"], f["alpha_bitops_ci95"], ".3f")
+        rf, rfc = fmt_ci(f["ratio_to_floor"], f["ratio_to_floor_ci95"], ".3g")
+        P.append(f'<tr><td><code>{esc(f["arm"])}</code></td><td>{esc(f["bits"])}</td><td>{esc(f["tier"])}</td>'
+                 f'<td class="n">{f["sizes"]}</td><td class="n">{f["runs"]:,}</td>'
+                 f'<td class="n">{aa} <span class="muted">{aac}</span></td>'
+                 f'<td class="n">{ab} <span class="muted">{abc}</span></td>'
+                 f'<td class="n">{rf} <span class="muted">{rfc}</span></td></tr>')
+    P.append(f'</tbody></table></div><p class="muted">{esc(t["aa"])}</p><p>{rich(t["gap_note"])}</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th>'
+             + "".join(f'<th class="n">{esc(x)}</th>' for x in t["gap_labels"]) + '</tr></thead><tbody>')
+    for row in b["gap_to_rho"]["rows"]:
+        P.append(f'<tr><td class="n">{row[0]}</td>' + "".join(f'<td class="n">{g3(v)}</td>' for v in row[1:]) + '</tr>')
+    h = doc["hyperelliptic_bitop_reprice"]
+    t = hec_text(h)
+    P.append(f'<section class="card" id="hyperelliptic-bitop"><h2>{esc(t["title"])}, outside the priced tables</h2>'
+             f'<p>{rich(t["lead"])}</p>'
+             f'<p><strong>Class:</strong> {esc(t["class"])}. <strong>Unit:</strong> <code>{esc(t["unit"])}</code>. '
+             f'<strong>Scope:</strong> {esc(t["scope"])} {esc(t["convention"])} '
+             f'{gh(h["readme"], "Study")} · {gh(h["protocol"], "Protocol")} · {gh(h["source"], "Frozen analysis")} · '
+             f'{gh(h["before"]["source"], "Round seven (before)")}.</p>'
+             f'<p>{rich(t["rows_note"])}</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">g</th><th class="n">p</th><th class="n">N</th>'
+             '<th class="n">IC/rho bitop/v1 [95%]</th><th class="n">Excl. validation</th>'
+             '<th class="n">Post hoc: no rho precompute</th><th class="n">Post hoc: IC oracle ×2</th>'
+             '<th class="n">In-situ, full-width rho</th></tr></thead><tbody>')
+    for r in h["rows"]:
+        v, ci = fmt_ci(r["ic_over_rho"], r["ic_over_rho_ci95"], ".3f")
+        P.append(f'<tr><td class="n">{r["genus"]}</td><td class="n">{r["p"]}</td><td class="n">{r["n"]:,}</td>'
+                 f'<td class="n">{v} <span class="muted">{ci}</span></td>'
+                 f'<td class="n">{r["excluding_validation"]:.3f}</td>'
+                 f'<td class="n">{r["post_hoc_without_rho_precompute"]:.3f}</td>'
+                 f'<td class="n">{r["post_hoc_oracle_doubled"]:.3f}</td>'
+                 f'<td class="n">{r["in_situ_full_width_rho"]:.3f}</td></tr>')
+    P.append(f'</tbody></table></div><p>{rich(t["slopes_note"])}</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Genus</th><th class="n">Rows</th>'
+             '<th class="n">Slope [95%]</th></tr></thead><tbody>')
+    for f in h["slopes"]:
+        v, ci = fmt_ci(f["slope"], f["slope_ci95"], "+.3f")
+        P.append(f'<tr><td class="n">{f["genus"]}</td><td class="n">{f["rows"]}</td>'
+                 f'<td class="n">{v} <span class="muted">{ci}</span></td></tr>')
+    P.append('</tbody></table></div></section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '
