@@ -1,10 +1,9 @@
+# Jobs default to the GitHub-hosted ubuntu-latest runner (owner decision,
+# 2026-10-26) and opt into the isolab EKS Spot runner scale sets
+# (taskq/deploy/eks-karpenter/arc/README.md) through repository variables.
 self-hosted-runner:
-  # Label reserved by the N83 EC2 capacity workflow.
   labels:
     - crypto-eks-linux
     - crypto-eks-highmem
     - crypto-eks-xmem
     - crypto-eks-xmem1t
-    - main
-    - experiment
-    - n83-ec2-20261024

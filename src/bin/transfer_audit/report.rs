@@ -16,6 +16,7 @@ struct Row {
     solver: String,
     verdict: String,
     lead: String,
+    evaluation: String,
     log2_total: Option<f64>,
     ratio: Option<f64>,
     lower_bound: bool,
@@ -44,15 +45,17 @@ fn read_rows(certs: &Path) -> Result<Vec<Row>, String> {
         let v: Value = serde_json::from_str(&text).map_err(|e| e.to_string())?;
         let curve = v["curve"]["name"].as_str().unwrap_or("?").to_string();
         let registered = v["curve"]["registered"].as_bool().unwrap_or(false);
-        let is_control = v["role"] == "control";
+        let role = v["role"].as_str().unwrap_or("audit").to_string();
         for list in ["candidates", "controls"] {
             for c in v[list].as_array().into_iter().flatten() {
                 let s = |k: &str| c[k].as_str().unwrap_or("-").to_string();
                 rows.push(Row {
                     curve: if list == "controls" {
                         format!("{curve} (control)")
-                    } else if is_control {
+                    } else if role == "control" {
                         format!("{curve} [positive control]")
+                    } else if role == "boundary-control" {
+                        format!("{curve} [boundary control]")
                     } else {
                         curve.clone()
                     },
@@ -63,6 +66,7 @@ fn read_rows(certs: &Path) -> Result<Vec<Row>, String> {
                     solver: s("destination_solver"),
                     verdict: s("verdict"),
                     lead: s("lead_class"),
+                    evaluation: s("evaluation"),
                     log2_total: c["log2_total"].as_f64(),
                     ratio: c["log2_cost_ratio"].as_f64(),
                     lower_bound: c["total_is_lower_bound"].as_bool().unwrap_or(false),
@@ -96,11 +100,11 @@ fn fmt_ratio(r: &Row) -> String {
 
 fn table(rows: &[Row]) -> String {
     let mut s = String::from(
-        "| curve | transfer type | candidate | subgroup | map | log2(route/rho) | lead class | verdict |\n|:--|:--|:--|:--|:--|--:|:--|:--|\n",
+        "| curve | transfer type | candidate | subgroup | map | log2(route/rho) | lead class | evaluation | verdict |\n|:--|:--|:--|:--|:--|--:|:--|:--|:--|\n",
     );
     for r in rows {
         s.push_str(&format!(
-            "| {} | {} | `{}` | {} | {} | {} | {} | {} |\n",
+            "| {} | {} | `{}` | {} | {} | {} | {} | {} | {} |\n",
             r.curve,
             type_label(&r.kind),
             r.id,
@@ -108,6 +112,7 @@ fn table(rows: &[Row]) -> String {
             r.construction,
             fmt_ratio(r),
             r.lead,
+            r.evaluation.replace('_', " "),
             r.verdict
         ));
     }
@@ -119,7 +124,7 @@ fn table(rows: &[Row]) -> String {
 /// rho), and the strongest verdict.
 fn summary_table(rows: &[Row]) -> String {
     let mut s = String::from(
-        "| curve | transfer type | candidates | subgroup statuses | cheapest carried route, log2(route/rho) | verdict |\n|:--|:--|--:|:--|--:|:--|\n",
+        "| curve | transfer type | candidates | subgroup statuses | cheapest carried route, log2(route/rho) | evaluated / excluded / not evaluable | verdict |\n|:--|:--|--:|:--|--:|:--|:--|\n",
     );
     let mut keys: Vec<(&str, &str)> = Vec::new();
     for r in rows {
@@ -155,11 +160,15 @@ fn summary_table(rows: &[Row]) -> String {
         .find(|v| group.iter().any(|r| r.verdict == **v))
         .copied()
         .unwrap_or("no weakness found in scope");
+        let n_eval = |st: &str| group.iter().filter(|r| r.evaluation == st).count();
         s.push_str(&format!(
-            "| {curve} | {} | {} | {} | {best_txt} | {verdict} |\n",
+            "| {curve} | {} | {} | {} | {best_txt} | {} / {} / {} | {verdict} |\n",
             type_label(kind),
             group.len(),
-            statuses.join(", ")
+            statuses.join(", "),
+            n_eval("evaluated"),
+            n_eval("excluded"),
+            n_eval("not_evaluable")
         ));
     }
     s
@@ -167,12 +176,12 @@ fn summary_table(rows: &[Row]) -> String {
 
 fn csv(rows: &[Row]) -> String {
     let mut s = String::from(
-        "curve,transfer_type,candidate,subgroup_status,map_status,carried,destination_solver,log2_total,log2_cost_ratio_to_rho,total_is_lower_bound,lead_class,verdict\n",
+        "curve,transfer_type,candidate,subgroup_status,map_status,carried,destination_solver,log2_total,log2_cost_ratio_to_rho,total_is_lower_bound,lead_class,evaluation,verdict\n",
     );
     for r in rows {
         let f = |x: Option<f64>| x.map_or(String::new(), |v| format!("{v}"));
         s.push_str(&format!(
-            "{},{},{},{},{},{},{},{},{},{},{},{}\n",
+            "{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
             r.curve,
             r.kind,
             r.id,
@@ -184,6 +193,7 @@ fn csv(rows: &[Row]) -> String {
             f(r.ratio),
             r.lower_bound,
             r.lead,
+            r.evaluation,
             r.verdict
         ));
     }
@@ -425,7 +435,7 @@ fn pipeline(rows: &[Row]) -> String {
         &[
             "curve_traits::compute: Δ, d_K, conductor,".into(),
             "volcano levels, subfield, embedding degree".into(),
-            "matched rho: sqrt(pi r/4) / sqrt(class)".into(),
+            "matched rho: sqrt(pi r/(2c)), c = class size (negation incl.)".into(),
         ],
         "#f4f4f4",
         "#888",
@@ -498,6 +508,8 @@ fn pipeline(rows: &[Row]) -> String {
             "verdict (verdict.rs): class-weak | weak representative exists |".into(),
             "  source-transfer-weak | implementation-weak | no weakness".into(),
             "  found in scope; formula leads recorded, never promoted".into(),
+            "evaluation: evaluated | excluded | not evaluable (a field,".into(),
+            "  not a verdict label); margin 8 bits before a weakness verdict".into(),
             "open obligations; references".into(),
         ],
         "#ffffff",
@@ -531,11 +543,12 @@ pub fn build(certs: &Path, out: &Path) -> Result<(), String> {
             r.registered
                 && !r.curve.contains("(control)")
                 && !r.curve.contains("[positive control]")
+                && !r.curve.contains("[boundary control]")
         })
         .collect();
     let pos_controls: Vec<&Row> = rows
         .iter()
-        .filter(|r| r.curve.contains("[positive control]"))
+        .filter(|r| r.curve.contains("control]"))
         .collect();
     let toy: Vec<&Row> = rows.iter().filter(|r| !r.registered).collect();
     fs::write(out.join("RESULTS_TABLE.md"), table(&rows)).map_err(|e| e.to_string())?;
@@ -563,8 +576,8 @@ pub fn build(certs: &Path, out: &Path) -> Result<(), String> {
         out.join("cost_ratio_controls.svg"),
         chart(
             &pos_controls,
-            "Positive controls: registered pairing-friendly curves (mnt/mnt1 k = 3, BLS12-381 k = 12)",
-            "the pairing route is the intended attack on these; the verdict machinery must be able to say so",
+            "Pairing-friendly controls: positive (mnt/mnt1 k = 3, BLS12-381 k = 12) and boundary (BN254, BN318, BLS12-638, BN350, BN446)",
+            "the pairing route is the intended attack on mnt/mnt1; the boundary curves sit on both sides of the 8-bit margin; relative to rho on E, not absolute security",
         ),
     )
     .map_err(|e| e.to_string())?;
