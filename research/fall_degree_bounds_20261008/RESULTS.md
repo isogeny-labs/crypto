@@ -69,14 +69,15 @@ have 4 draws each, and the Semaev cells 3–8.
 
 ---
 
-# Results: E5, E3, E4, E6 (2026-10-12) and E7 (2026-10-19)
+# Results: E5, E3, E4, E6 (2026-10-12), E7 (2026-10-19) and E8 (2026-10-25)
 
 These results come from the native engines and the amendments registered before each run
-(Amendments 2–8 of `PREREGISTRATION.md`).
+(Amendments 2–9 of `PREREGISTRATION.md`).
 - Run reports, graphs and PDFs: [reports/run-20261012/](reports/run-20261012/) (E3–E6) and
-  [reports/run-20261019/](reports/run-20261019/) (E7, the E6 completion).
+  [reports/run-20261019/](reports/run-20261019/) (E7, the E6 completion) and
+  [reports/run-20261025/](reports/run-20261025/) (E8).
 - Lean scoring: [lean/](lean/).
-- Records: `e3/`, `e4/`, `e5/`, `e6/`, `e7/`.
+- Records: `e3/`, `e4/`, `e5/`, `e6/`, `e7/`, `e8/`.
 - Provenance notes, including three in-place rebuilds and one container restart, with why
   none changes a value: `e3/PROVENANCE.md`, `e6/PROVENANCE.md`.
 
@@ -199,6 +200,50 @@ the exact binary that ran E7 (sha256 `24cf10d6…`):
 - **N ≈ 100 is out of reach** of dense degree-4 elimination: 4.1M columns, a ≈ 1 TB
   basis. It needs a sparse or structured method.
 
+## E8: `d_F` against `m` at fixed `(n, ℓ)` (Amendment 9)
+
+Same binary as E7 (sha256 `24cf10d6…`), 4 draws per cell, `cmax = 4`. No cell was
+cut short. `N = (m − 2)·n + m·ℓ`.
+
+| ladder | `m` | `N` | `d_F` per draw | median |
+|:--|--:|--:|:--|--:|
+| (8, 2) | 3 | 14 | 4 4 4 3 | 4 |
+| (8, 2) | 4 | 24 | 4 4 3 4 | 4 |
+| (8, 2) | 5 | 34 | 4 4 4 4 | 4 |
+| (8, 2) | 6 | 44 | 4 4 4 4 (E7) | 4 |
+| (8, 2) | 7 | 54 | 4 4 3 4 | 4 |
+| (6, 2) | 3 | 12 | 4 3 3 4 | 3 |
+| (6, 2) | 4 | 20 | 4 3 3 3 | 3 |
+| (6, 2) | 5 | 28 | 4 4 4 3 | 4 |
+| (6, 2) | 6 | 36 | 4 4 3 4 | 4 |
+| (6, 2) | 7 | 44 | 4 4 4 3 | 4 |
+| (6, 2) | 8 | 52 | 3 3 3 3 | 3 |
+
+- **Reading (Amendment 9), as registered:**
+  - the **(8, 2) ladder is "`d_F` flat in `m`"** (medians 4 4 4 4 4);
+  - the **(6, 2) ladder is "mixed"**: no median reaches 5, but the medians 3 3 4 4 4 3 are
+    not non-decreasing, because `m = 8` drops to 3.
+- **`d_F` does not grow with `m` here.** No draw has `d_F ≥ 5`, up to `m = 8`.
+- **The `m = 8`, `n = 6` drop is a small-field effect, not evidence for anything.** Here
+  the field is `F_{2^6}` and the factor-base span has 4 elements. An 8-summand chain
+  over so few points is refuted at degree 3 in about 2 s on every draw. The registered
+  rule is not adjusted for this: the ladder reads "mixed" as written.
+- **Cost.** The degree-4 closure at (8, 2), `m = 7`, `N = 54` takes 228–339 s per draw,
+  against 728–839 s for the E7 `m = 5` (13, 3) cell at the same `N`. At this one `N`, raising `m`
+  was cheaper than raising `ℓ`; two cells are not a trend.
+- **What this does not test.** `m` here is at most 8 with `n ≤ 8`, so `m ≈ n^{1/3}` (HKYY's
+  regime) is not reached.
+
+## N = 58–60 and N ≈ 100: status
+
+- **`N = 58–60`: not run.** `AWS_SECRET_ACCESS_KEY` and a region are still absent from the
+  environment. `e7/aws_large_tier.sh` is prepared (user-data, no SSH, gate-first, S3
+  upload, self-terminating) but has not been run, and has never been syntax-tested
+  beyond `bash -n`.
+- **`N ≈ 100`: not measured.** The dense degree-4 basis would be ≈ 1 TB.
+  `e8/N100_SCOPING.md` records what a sparse engine would have to do and why fill-in is
+  the unknown that decides it.
+
 ## E6 Part C: satisfiable draws (`m = 3`)
 
 - `d_last = 4` on all 6 satisfiable draws available: 4 from (7, 3) and 2 from (11, 4). The
@@ -225,17 +270,20 @@ it rises with `N` while the Semaev systems stay at 4.
 
 ## Lean and cairn
 
-- **`lean/FallDegree/Verdict.lean`**, kernel `decide` over 206 rows, proves
-  `report rows = ⟨p3a, p3b, p4a, p4b, bounded, semaevSpecific⟩ = all true`. The 206 rows are
-  generated from `e3/`, `e4/`, `e6/` and `e7/` by `examples/fall_degree_lean_data.rs`. Changing one
+- **`lean/FallDegree/Verdict.lean`**, kernel `decide` over 246 rows, proves
+  `report rows = ⟨p3a, p3b, p4a, p4b, bounded, semaevSpecific⟩ = all true`. The 246 rows are
+  generated from `e3/`, `e4/`, `e6/`, `e7/` and `e8/` by `examples/fall_degree_lean_data.rs`. Changing one
   verdict fails the build.
 - **Disclosure.** `Rule.lean` transcribes the prose rules of the pre-registration and
-  Amendments 2–8. The transcription was written after part of the data had been seen. The
+  Amendments 2–9. The transcription was written after part of the data had been seen. The
   prose rules it encodes were not.
 - **E7 in Lean.** E7 rows are kind 4. `e7Bounded = true` and `e7Grows = false` are part of
   the same `decide` theorem. Changing one E7 draw to 5 fails the build.
 - **cairn.** The result objective `sha256:fc828009…` (E3/E4/E6) and its E7 successor
   `sha256:16fc1da8…` (206 rows) are the same theorem, over `Rule.lean` and `Data.lean`.
+  The E8 result objective `sha256:23aabfa4…` (246 rows) adds the ladder readings. Changing
+  three `m = 7` draws to 5 (enough to move the median) fails the build; changing one does
+  not, because the rule uses medians.
   The first E7 attempt returned "unavailable", because `lean` was not on cairn's PATH. It
   is recorded in the log; the retry was accepted. cairn's Lean jail accepted it. `CAIRN_EPOCH_SECONDS=5 cairn --log
   cairn/log.jsonl audit` reports "chain intact".

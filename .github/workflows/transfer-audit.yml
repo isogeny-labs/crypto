@@ -1,0 +1,97 @@
+name: transfer-audit
+on:
+  pull_request:
+    paths:
+      - 'src/bin/transfer_audit.rs'
+      - 'src/bin/transfer_audit/**'
+      - 'research/transfer_audit_20261011/**'
+      - 'src/cryptanalysis/jacobian_transfer/**'
+      - 'src/cryptanalysis/ec_trapdoor.rs'
+      - 'src/cryptanalysis/ghs_screen.rs'
+      - 'src/cryptanalysis/ghs_transport.rs'
+      - 'src/cryptanalysis/ghs_descent.rs'
+      - 'src/cryptanalysis/curve_traits/**'
+      - 'src/cryptanalysis/isogeny_degree_search/**'
+      - 'src/cryptanalysis/sect113r1_audit.rs'
+      - 'src/binary_ecc/**'
+      - 'docs/curves/registry.json'
+      - 'docs/curves/jacobian-transfers.json'
+      - 'docs/curves/covers.json'
+      - 'docs/curves/factor-hints.txt'
+      - 'docs/curves/traits.json'
+      - '.github/workflows/transfer-audit.yml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+  push:
+    branches: [main]
+    paths:
+      - 'src/bin/transfer_audit.rs'
+      - 'src/bin/transfer_audit/**'
+      - 'research/transfer_audit_20261011/**'
+      - '.github/workflows/transfer-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 30 || 45 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/
+            /Cargo.toml
+            /tools/volcano-cli/
+            /isogeny_algos/
+            /Cargo.lock
+            /build.rs
+            /.cargo/
+            /rust-toolchain*
+            /rustfmt.toml
+            /clippy.toml
+            /src/
+            /tests/
+            /examples/
+            /benches/
+            /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
+            /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /docs/curves/registry.json
+            /docs/curves/jacobian-transfers.json
+            /docs/curves/covers.json
+            /docs/curves/factor-hints.txt
+            /docs/curves/traits.json
+            /research/transfer_audit_20261011/
+      - name: Materialize compile-time fixture inputs
+        run: node .github/scripts/ci-scope.mjs --materialize
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - uses: Swatinem/rust-cache@v2
+      - name: Unit tests (certificate, subgroup checker, magic number, pairing, verdict, cost)
+        run: cargo test --release --bin transfer-audit
+      - run: cargo build --release --bin transfer-audit
+      - name: The committed certificates regenerate byte-identically
+        run: ./target/release/transfer-audit check --certs research/transfer_audit_20261011/certificates
+      - name: The report builds from the committed certificates
+        run: ./target/release/transfer-audit report --certs research/transfer_audit_20261011/certificates --out /tmp/transfer-audit-report
+      - name: The committed tables, CSV and figures are current
+        run: |
+          for f in RESULTS_TABLE.md RESULTS_SUMMARY.md cost_ratio.csv cost_ratio.svg cost_ratio_toy.svg cost_ratio_controls.svg pipeline.svg; do
+            diff research/transfer_audit_20261011/$f /tmp/transfer-audit-report/$f
+          done
+      - name: A tampered certificate is rejected
+        run: |
+          cp -r research/transfer_audit_20261011/certificates /tmp/tampered
+          f=$(ls /tmp/tampered/sect113r1/ghs_l_1.json)
+          sed -i '0,/"magic_number": 113,/s//"magic_number": 112,/' "$f"
+          if cmp -s "$f" research/transfer_audit_20261011/certificates/sect113r1/ghs_l_1.json; then
+            echo 'the edit did not apply'; exit 1
+          fi
+          if ./target/release/transfer-audit check --certs /tmp/tampered; then
+            exit 1
+          fi

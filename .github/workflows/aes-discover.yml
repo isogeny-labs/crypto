@@ -14,13 +14,15 @@ permissions:
   contents: read
 jobs:
   native-correctness:
-    runs-on: main
+    runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
-          repository: aburan28/cryptanalysis
+          repository: isogeny-labs/cryptanalysis
+          # The repository is private; the workflow token cannot read it.
+          token: ${{ secrets.CRYPTANALYSIS_READ_TOKEN || github.token }}
           ref: 2fe7393e06e58c1f3504bdbf57255a1fb36017d0
           path: .mirror-reference
           sparse-checkout: tools/aes-discover
