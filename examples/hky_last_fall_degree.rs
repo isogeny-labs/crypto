@@ -185,7 +185,7 @@ impl ArtinSchreier {
                 kernel.push(src);
             } else {
                 basis.push((img, src));
-                basis.sort_by(|a, b| b.0.cmp(&a.0));
+                basis.sort_by_key(|a| std::cmp::Reverse(a.0));
             }
         }
         ArtinSchreier {
@@ -263,7 +263,7 @@ impl Subspace {
             }
             assert!(x != 0, "basis is dependent");
             ech.push((x, c));
-            ech.sort_by(|a, b| b.0.cmp(&a.0));
+            ech.sort_by_key(|a| std::cmp::Reverse(a.0));
         }
         Subspace { basis, ech }
     }
@@ -297,10 +297,8 @@ fn descend(f: &Field, v: &Subspace, x3: u64, b: u64) -> Vec<Vec<u64>> {
     let mut eqs: Vec<HashMap<u64, ()>> = vec![HashMap::new(); n];
     let toggle = |coeff: u64, mono: u64, eqs: &mut Vec<HashMap<u64, ()>>| {
         for (i, eq) in eqs.iter_mut().enumerate() {
-            if coeff >> i & 1 == 1 {
-                if eq.remove(&mono).is_none() {
-                    eq.insert(mono, ());
-                }
+            if coeff >> i & 1 == 1 && eq.remove(&mono).is_none() {
+                eq.insert(mono, ());
             }
         }
     };
@@ -473,6 +471,7 @@ impl Echelon {
 }
 
 struct Ring {
+    #[allow(dead_code)]
     nv: u32,
     monos: Vec<u64>,
     index: HashMap<u64, usize>,
@@ -840,7 +839,7 @@ fn main() {
                 }
                 for key in ["closure_dims", "ideal_dims", "plain_dims"] {
                     for (c, v) in mine[key].as_object().unwrap() {
-                        agree &= rec[key].get(c).map_or(true, |r| r == v);
+                        agree &= rec[key].get(c).is_none_or(|r| r == v);
                     }
                 }
                 println!(

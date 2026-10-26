@@ -132,6 +132,7 @@ pub struct TrialLine {
 /// which serde's tag buffering turns every number into a map and no `f64`
 /// field parses.
 #[derive(Clone, Debug)]
+#[allow(clippy::large_enum_variant)]
 pub enum Line {
     Header(Header),
     Baseline(BaselineLine),

@@ -190,6 +190,7 @@ impl RunState {
             .create(true)
             .read(true)
             .write(true)
+            .truncate(false)
             .open(dir.join(".lock"))
             .map_err(|e| format!("opening ICX state lock: {e}"))?;
         #[cfg(unix)]

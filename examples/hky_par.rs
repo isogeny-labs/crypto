@@ -25,7 +25,9 @@
 //! - `newcells --cells m:n:ell,... --seed S --keep K --cmax C`: fresh draws
 //!   exactly as `dreg_ladder` makes them (as `hky_grid newcells`).
 use crypto_lib::binary_ecc::F2mElement;
-use crypto_lib::cryptanalysis::koblitz_bench::{chained_s3_solution_count, chained_solution_count, ladder_sample};
+use crypto_lib::cryptanalysis::koblitz_bench::{
+    chained_s3_solution_count, chained_solution_count, ladder_sample,
+};
 use crypto_lib::cryptanalysis::koblitz_groebner::{build_decomposition_system, FieldStructure};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
 use rand::rngs::StdRng;
@@ -35,6 +37,7 @@ use serde_json::{json, Value};
 use std::time::Instant;
 
 struct Space {
+    #[allow(dead_code)]
     nv: u32,
     c: u32,
     /// binom[n][k] for n ≤ nv, k ≤ c + 1
@@ -51,7 +54,11 @@ impl Space {
         for n in 0..=nv as usize {
             binom[n][0] = 1;
             for k in 1..=c as usize + 1 {
-                binom[n][k] = if n == 0 { 0 } else { binom[n - 1][k - 1] + binom[n - 1][k] };
+                binom[n][k] = if n == 0 {
+                    0
+                } else {
+                    binom[n - 1][k - 1] + binom[n - 1][k]
+                };
             }
         }
         let mut off = vec![0usize; c as usize + 2];
@@ -74,7 +81,14 @@ impl Space {
             }
         }
         let words = total.div_ceil(64);
-        Space { nv, c, binom, off, monos, words }
+        Space {
+            nv,
+            c,
+            binom,
+            off,
+            monos,
+            words,
+        }
     }
     #[inline]
     fn col(&self, m: u64) -> usize {
@@ -176,14 +190,16 @@ impl Basis {
             tops.swap_remove(i);
             let (w, bit) = (t / 64, 1u64 << (t % 64));
             let pr = &p[..=w];
-            rows.par_iter_mut().zip(tops.par_iter_mut()).for_each(|(r, tp)| {
-                if r[w] & bit != 0 {
-                    for (x, &y) in r.iter_mut().zip(pr) {
-                        *x ^= y;
+            rows.par_iter_mut()
+                .zip(tops.par_iter_mut())
+                .for_each(|(r, tp)| {
+                    if r[w] & bit != 0 {
+                        for (x, &y) in r.iter_mut().zip(pr) {
+                            *x ^= y;
+                        }
+                        *tp = top(r).unwrap_or(usize::MAX);
                     }
-                    *tp = top(r).unwrap_or(usize::MAX);
-                }
-            });
+                });
             // drop rows that became zero
             let mut k = 0;
             while k < rows.len() {
@@ -219,7 +235,11 @@ enum Src {
 fn closure_par(eqs: &[Vec<u64>], nv: u32, c: u32, target: usize) -> (usize, usize, u32) {
     let sp = Space::new(nv, c);
     let total = sp.monos.len();
-    let mut basis = Basis { piv: vec![None; total], mask: vec![0; sp.words], dim: 0 };
+    let mut basis = Basis {
+        piv: vec![None; total],
+        mask: vec![0; sp.words],
+        dim: 0,
+    };
     let chunk: usize = std::env::var("HKY_CHUNK")
         .ok()
         .map_or((1usize << 30) / (8 * sp.words), |v| v.parse().unwrap())
@@ -234,7 +254,12 @@ fn closure_par(eqs: &[Vec<u64>], nv: u32, c: u32, target: usize) -> (usize, usiz
             continue;
         }
         let df = f.iter().map(|m| m.count_ones()).max().unwrap_or(0);
-        srcs.extend(sp.monos.iter().filter(|m| m.count_ones() <= c - df).map(|&m| Src::Mac(k, m)));
+        srcs.extend(
+            sp.monos
+                .iter()
+                .filter(|m| m.count_ones() <= c - df)
+                .map(|&m| Src::Mac(k, m)),
+        );
     }
     let mut plain = None;
     let mut rounds = 0u32;
@@ -271,7 +296,12 @@ fn closure_par(eqs: &[Vec<u64>], nv: u32, c: u32, target: usize) -> (usize, usiz
                 .collect();
             tred += t1.elapsed().as_secs_f64();
             nres += residues.len();
-            new_low.extend(basis.absorb(residues).into_iter().filter(|&t| sp.deg_of_col(t) < c));
+            new_low.extend(
+                basis
+                    .absorb(residues)
+                    .into_iter()
+                    .filter(|&t| sp.deg_of_col(t) < c),
+            );
             if basis.piv[0].is_some() {
                 break;
             }
@@ -289,14 +319,18 @@ fn closure_par(eqs: &[Vec<u64>], nv: u32, c: u32, target: usize) -> (usize, usiz
             return (plain.unwrap(), basis.dim, rounds);
         }
         // next candidates: variable multiples of the new low-degree rows
-        srcs = new_low.iter().flat_map(|&t| (0..nv).map(move |i| Src::Mul(t, i))).collect();
+        srcs = new_low
+            .iter()
+            .flat_map(|&t| (0..nv).map(move |i| Src::Mul(t, i)))
+            .collect();
     }
 }
 
 fn system(m: usize, n: u32, basis: &[F2mElement], x_r: &F2mElement) -> (Vec<Vec<u64>>, u32) {
     let irr = find_irreducible_sparse(n).unwrap();
     let st = FieldStructure::new(n, &irr);
-    let sys = build_decomposition_system(basis, x_r, &F2mElement::one(n), m, &st).expect("system builds");
+    let sys =
+        build_decomposition_system(basis, x_r, &F2mElement::one(n), m, &st).expect("system builds");
     let eqs = sys
         .equations
         .iter()
@@ -334,7 +368,11 @@ fn word(e: &F2mElement) -> u64 {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let get = |k: &str| args.iter().position(|a| a == k).map(|i| args[i + 1].clone());
+    let get = |k: &str| {
+        args.iter()
+            .position(|a| a == k)
+            .map(|i| args[i + 1].clone())
+    };
     let cmax: u32 = get("--cmax").map_or(4, |v| v.parse().unwrap());
     match args.get(1).map(String::as_str) {
         Some("ladder") => {
