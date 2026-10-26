@@ -31,6 +31,9 @@
 | order by solver stage (T_solver, CPU) | FES < CryptoMiniSat (native XOR) < Z3 (And/Xor) < F5B prototype < F4-style prototype |
 | order by total cost (T_core, A, CPU) | FES < CryptoMiniSat (native XOR) < Z3 (And/Xor) < F5B prototype < F4-style prototype |
 | Kendall tau between the two orderings | 1.00 |
+| order by T_core under B (setup amortised) | FES < CryptoMiniSat (native XOR) < Z3 (And/Xor) < F5B prototype < F4-style prototype |
+| order by T_core under C (fully loaded) | FES < CryptoMiniSat (native XOR) < F5B prototype < Z3 (And/Xor) < F4-style prototype |
+| Kendall tau, solver stage vs T_core under B / under C | 1.00 / 0.80 |
 | max/min over engines, solver stage | 365.4x |
 | max/min over engines, total T_core (A) | 2.7x |
 | max/min over engines, m83-definition solver stage (incl. library load) | 567.7x |
@@ -105,3 +108,21 @@
 | Z3 (And/Xor) | 1.718 | 1.858 | 1.858 | 0.8672 | 0.9562 | 2.32 |
 | F4-style prototype | 2.487 | 2.537 | 2.549 | 1.6337 | 1.6686 | 2.32 |
 | F5B prototype | 1.887 | 2.010 | 2.130 | 1.0386 | 1.2093 | 2.32 |
+
+<!-- t9_w2_targets -->
+| Engine | target | outcome | T_core CPU s | solver stage CPU s | f_s | solve wall s | rejected tuples | new independent natural relation | peak RSS MB |
+|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| CryptoMiniSat (native XOR) | 0 | verified | 12.14 | 12.11 | 99.7% | 12.28 | 0 | 1 | 56 |
+| CryptoMiniSat (native XOR) | 1 | verified | 34.14 | 34.10 | 99.9% | 34.51 | 0 | 1 | 113 |
+| CryptoMiniSat (native XOR) | 2 | verified | 32.76 | 32.72 | 99.9% | 33.17 | 0 | 1 | 109 |
+| CryptoMiniSat (native XOR) | 3 | verified | 49.80 | 49.76 | 99.9% | 50.35 | 0 | 1 | 95 |
+| Z3 (And/Xor) | 0 | timeout | 118.01 | 117.98 | 100.0% | 118.91 | None | 0 | 121 |
+| Z3 (And/Xor) | 1 | verified | 42.47 | 42.43 | 99.9% | 42.24 | 0 | 1 | 101 |
+| Z3 (And/Xor) | 2 | verified | 46.34 | 46.31 | 99.9% | 45.72 | 0 | 1 | 115 |
+| Z3 (And/Xor) | 3 | timeout | 118.54 | 118.52 | 100.0% | 118.89 | None | 0 | 131 |
+
+<!-- t10_w2_total -->
+| Engine (W2, 4 natural targets) | verified | timeouts | unsat | new independent relations | T_core CPU s (sum) | f_s | T_core CPU s per new independent relation | T_core CPU s per attempt |
+|:--|--:|--:|--:|--:|--:|--:|--:|--:|
+| CryptoMiniSat (native XOR) | 4/4 | 0 | 0 | 4 (rank 4) | 128.8 | 99.89% | 32.2 | 32.2 |
+| Z3 (And/Xor) | 2/4 | 2 | 0 | 2 (rank 2) | 325.4 | 99.97% | 162.7 | 81.3 |

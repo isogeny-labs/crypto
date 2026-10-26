@@ -157,6 +157,12 @@ def main():
     if template.exists():
         check((HERE / "RESULTS.md").read_text() == analysis.render(template.read_text(), committed),
               "RESULTS.md is not the rendering of RESULTS.template.md from summary.json")
+    if template.exists():      # hand-typed counts in the prose must match what this script computed
+        text = (HERE / "RESULTS.md").read_text()
+        check(f"({notes[0]['cells_checked_against_fes']} cells)" in text, "FES cross-check count in RESULTS.md is stale")
+        check(f"({notes[0]['cells_checked_against_m83_archive']} cells)" in text, "m83 cross-check count in RESULTS.md is stale")
+        check(f"({notes[0]['cells_whose_status_differs_from_m83']} cells over 3 repetitions" in text,
+              "m83 status-difference count in RESULTS.md is stale")
     tabs = analysis.tables(committed)
     check((HERE / "results/tables.md").read_text() ==
           "\n\n".join(f"<!-- {k} -->\n{v}" for k, v in tabs.items()) + "\n", "results/tables.md stale")

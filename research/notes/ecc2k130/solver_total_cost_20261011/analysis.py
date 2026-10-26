@@ -248,6 +248,8 @@ def summarize_w1(children):
             ta = [med(e, "cpu_s.T_A") for e in ENGINES]
             tm = [med(e, "cpu_s.median_solver_stage_m83_definition") for e in ENGINES]
             tss = [med(e, "cpu_s.ss.T") for e in ENGINES]
+            tb = [med(e, "cpu_s.T_B") for e in ENGINES]
+            tcc = [med(e, "cpu_s.T_C") for e in ENGINES]
             gout["ordering"] = {
                 "engines_all_complete": True,
                 "order_by_T_solver": [e for _, e in sorted(zip(ts, ENGINES))],
@@ -258,7 +260,19 @@ def summarize_w1(children):
                 "spread_max_over_min_m83_solver_stage": max(tm) / min(tm),
                 "order_by_T_posthoc_steady_state": [e for _, e in sorted(zip(tss, ENGINES))],
                 "spread_max_over_min_T_posthoc_steady_state": max(tss) / min(tss),
-                "kendall_tau_solver_vs_posthoc": kendall_tau(ts, tss)}
+                "kendall_tau_solver_vs_posthoc": kendall_tau(ts, tss),
+                "order_by_T_core_B": [e for _, e in sorted(zip(tb, ENGINES))],
+                "order_by_T_core_C": [e for _, e in sorted(zip(tcc, ENGINES))],
+                "kendall_tau_solver_vs_B": kendall_tau(ts, tb),
+                "kendall_tau_solver_vs_C": kendall_tau(ts, tcc),
+                "spread_max_over_min_T_core_B": max(tb) / min(tb),
+                "spread_max_over_min_T_core_C": max(tcc) / min(tcc)}
+            for i, e in enumerate(ENGINES):       # ratios to FES (ENGINES[0]) in each accounting
+                gout["ordering"][f"ratio_{e}_solver"] = ts[i] / ts[0]
+                gout["ordering"][f"ratio_{e}_core_A"] = ta[i] / ta[0]
+                gout["ordering"][f"ratio_{e}_posthoc"] = tss[i] / tss[0]
+            gout["ordering"]["ratio_z3_over_cms_solver"] = ts[2] / ts[1]
+            gout["ordering"]["ratio_z3_over_cms_core_A"] = ta[2] / ta[1]
         else:
             gout["ordering"] = {"engines_all_complete": False}
         out["groups"][gname] = gout
@@ -297,11 +311,15 @@ def summarize_w2(children):
             agg[f"{k}.T_C"] = sum(r[f"T_C.{cl}"] for r in rows)
             agg[f"{k}.T_solver"] = sum(r[f"T_solver.{cl}"] for r in rows)
             agg[f"{k}.f_s"] = agg[f"{k}.T_solver"] / agg[f"{k}.T_A"] if agg[f"{k}.T_A"] else float("nan")
+            agg[f"{k}.nonsolver"] = agg[f"{k}.T_A"] - agg[f"{k}.T_solver"]
             agg[f"{k}.stage"] = {s: sum(r["stages"][s][cl] for r in rows) for s in tc.STAGES}
             agg[f"{k}.per_new_independent_A"] = (agg[f"{k}.T_A"] / agg["new_independent"]
                                                  if agg["new_independent"] else None)
             agg[f"{k}.per_attempt_A"] = agg[f"{k}.T_A"] / len(rows) if rows else None
         out["engines"][engine] = agg
+    z, cm = out["engines"]["sat-z3"], out["engines"]["sat-cms-xor"]
+    out["ratio_z3_over_cms_per_relation"] = (z["cpu.per_new_independent_A"] / cm["cpu.per_new_independent_A"]
+                                             if z["cpu.per_new_independent_A"] and cm["cpu.per_new_independent_A"] else None)
     return out
 
 
@@ -360,9 +378,29 @@ FORMATS = {"ms2": f_ms, "ms3": lambda x: f_ms(x, 3), "ms1": lambda x: f_ms(x, 1)
 
 
 def lookup(summary, path):
+    """Dotted/slashed lookup with shorthands: a:<engine>/<key> (W1a median), g:<group>/<engine>/<key>,
+    o:<key> (W1a ordering), w2:<engine>/<key>, m83:<engine> (published median)."""
+    if path.startswith("a:"):
+        engine, key = path[2:].split("/", 1)
+        return summary["w1"]["groups"]["W1a"]["engines"][engine]["median"][key]
+    if path.startswith("g:"):
+        group, engine, key = path[2:].split("/", 2)
+        return summary["w1"]["groups"][group]["engines"][engine]["median"][key]
+    if path.startswith("o:"):
+        return summary["w1"]["groups"]["W1a"]["ordering"][path[2:]]
+    if path.startswith("w2:"):
+        engine, rest = path[3:].split("/", 1)
+        node = summary["w2"]["engines"][engine]
+        for part in rest.split("/"):
+            node = node[int(part)] if isinstance(node, list) else node[part]
+        return node
+    if path.startswith("m83:"):
+        return summary["m83_published_solver_stage_median_wall_s"][path[4:]]
+    if path.startswith("w2r:"):
+        return summary["w2"][path[4:]]
     node = summary
     for part in path.split("/"):
-        node = node[part]
+        node = node[int(part)] if isinstance(node, list) else node[part]
     return node
 
 
@@ -417,6 +455,10 @@ def tables(summary):
     rows = [["order by solver stage (T_solver, CPU)", " < ".join(ENGINE_LABEL[e] for e in o["order_by_T_solver"])],
             ["order by total cost (T_core, A, CPU)", " < ".join(ENGINE_LABEL[e] for e in o["order_by_T_core_A"])],
             ["Kendall tau between the two orderings", f"{o['kendall_tau_solver_vs_core']:.2f}"],
+            ["order by T_core under B (setup amortised)", " < ".join(ENGINE_LABEL[e] for e in o["order_by_T_core_B"])],
+            ["order by T_core under C (fully loaded)", " < ".join(ENGINE_LABEL[e] for e in o["order_by_T_core_C"])],
+            ["Kendall tau, solver stage vs T_core under B / under C",
+             f"{o['kendall_tau_solver_vs_B']:.2f} / {o['kendall_tau_solver_vs_C']:.2f}"],
             ["max/min over engines, solver stage", f_x(o["spread_max_over_min_T_solver"], 1)],
             ["max/min over engines, total T_core (A)", f_x(o["spread_max_over_min_T_core_A"], 1)],
             ["max/min over engines, m83-definition solver stage (incl. library load)",
