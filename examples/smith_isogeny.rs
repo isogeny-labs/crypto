@@ -63,6 +63,7 @@ fn main() {
         "deg8" => deg8(q, ncurves, &out, &name),
         "route-s" => route_s(q, &out, &name, &args),
         "cost" => cost(q, &out, &name, &args),
+        "cost-fit" => cost_fit(&out),
         _ => eprintln!("usage: smith_isogeny verify|deg8|route-s|cost --q Q [--out DIR]"),
     }
 }
@@ -240,4 +241,53 @@ fn cost(q: u64, out: &str, name: &str, args: &[String]) {
         "inv_price_fq_mul": inv_ratio * fq6_mul_units,
         "priced_fq_mul_median": mm[1] + inv_ratio * fq6_mul_units * mi[1],
         "wall_ns_q1_med_q3": mt}));
+}
+
+/// T7 fit: OLS of log2(cost) on log2(q) over the recorded `cost` rows, with a
+/// 95% t-interval on the slope (`out/cost_fit.json`).
+fn cost_fit(out: &str) {
+    let mut pts: Vec<(f64, f64, f64, f64)> = Vec::new(); // (q, priced, mul, wall)
+    for e in std::fs::read_dir(out).unwrap() {
+        let path = e.unwrap().path();
+        let n = path.file_name().unwrap().to_string_lossy().to_string();
+        if !n.starts_with("cost_q") || !n.ends_with(".jsonl") {
+            continue;
+        }
+        for line in std::fs::read_to_string(&path).unwrap().lines() {
+            let v: serde_json::Value = serde_json::from_str(line).unwrap();
+            if v["rec"] == "cost" {
+                pts.push((
+                    v["q"].as_f64().unwrap(),
+                    v["priced_fq_mul_median"].as_f64().unwrap(),
+                    v["fq_mul_q1_med_q3"][1].as_f64().unwrap(),
+                    v["wall_ns_q1_med_q3"][1].as_f64().unwrap(),
+                ));
+            }
+        }
+    }
+    pts.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+    let fit = |ys: Vec<f64>| -> serde_json::Value {
+        let xs: Vec<f64> = pts.iter().map(|p| p.0.log2()).collect();
+        let ys: Vec<f64> = ys.iter().map(|y| y.log2()).collect();
+        let n = xs.len() as f64;
+        let (mx, my) = (xs.iter().sum::<f64>() / n, ys.iter().sum::<f64>() / n);
+        let sxx: f64 = xs.iter().map(|x| (x - mx).powi(2)).sum();
+        let sxy: f64 = xs.iter().zip(&ys).map(|(x, y)| (x - mx) * (y - my)).sum();
+        let b = sxy / sxx;
+        let a = my - b * mx;
+        let rss: f64 = xs.iter().zip(&ys).map(|(x, y)| (y - a - b * x).powi(2)).sum();
+        let se = (rss / (n - 2.0) / sxx).sqrt();
+        // t_{0.975, df} for df = n - 2 (table, df 1..30)
+        let tt = [12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228,
+            2.201, 2.179, 2.160, 2.145, 2.131, 2.120, 2.110, 2.101, 2.093, 2.086];
+        let t = tt[((n as usize).saturating_sub(3)).min(tt.len() - 1)];
+        json!({"n": n, "slope": b, "intercept": a, "slope_lo": b - t * se, "slope_hi": b + t * se, "t": t})
+    };
+    let v = json!({"rec": "cost_fit", "x": "log2 q", "y": "log2 median per psi(D)",
+        "points": pts.iter().map(|p| json!({"q": p.0, "priced": p.1, "mul": p.2, "wall_ns": p.3})).collect::<Vec<_>>(),
+        "priced": fit(pts.iter().map(|p| p.1).collect()),
+        "mul": fit(pts.iter().map(|p| p.2).collect()),
+        "wall": fit(pts.iter().map(|p| p.3).collect())});
+    std::fs::write(format!("{out}/cost_fit.json"), serde_json::to_string_pretty(&v).unwrap()).unwrap();
+    println!("{}", v);
 }
