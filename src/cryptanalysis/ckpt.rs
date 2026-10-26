@@ -150,7 +150,7 @@ impl Ckpt {
     /// Whether a snapshot is due after `units` units of work (calls, walks).
     pub fn due(&self, units: u64) -> bool {
         match self.every_units {
-            Some(n) => n > 0 && units > 0 && units % n == 0,
+            Some(n) => n > 0 && units > 0 && units.is_multiple_of(n),
             None => self.last.get().elapsed() >= self.interval,
         }
     }
