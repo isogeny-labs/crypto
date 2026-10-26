@@ -164,6 +164,20 @@ retry is scheduled after two build-phase service terminations. The shared
 host's queued A/A remains the active path unless a permitted stable host is
 made available. No timing from either reclaimed host enters R13.
 
+### Authorized on-demand check (2026-10-26)
+
+The owner authorized one on-demand replacement. A read-only EC2
+`RunInstances --dry-run` for one `m8i-flex.4xlarge` in `us-east-2a`, with
+the existing AMI, key, instance profile, security group and an 80 GiB
+delete-on-termination root, returned `UnauthorizedOperation`: the
+`coreuser` principal has an explicit identity-policy deny from
+`SpotOnlyEC2Launch`. The account's on-demand standard-vCPU quota is 96,
+so quota is not the observed blocker. No billable launch was submitted.
+The shared-host A/A continues to wait for a qualified quiet preflight.
+If AWS permission changes, repeat the dry-run before the one authorized
+launch, then qualify source, binaries, host class, holdouts, pin and
+isolation on that host before any timed sample; retain the six-hour limit.
+
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
 for this CPU subclass only if every primary size's suite and holdout
