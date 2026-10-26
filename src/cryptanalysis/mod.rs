@@ -110,6 +110,8 @@ pub mod binary_semaev_s4;
 pub mod binary_small_x;
 pub mod binary_torsion_walk;
 pub mod binary_velu;
+pub mod bitop_tally;
+pub mod bitops;
 pub mod bleichenbacher;
 pub mod boolean;
 pub mod boomerang;

@@ -550,12 +550,31 @@ pub struct PhaseCost {
     pub native: std::collections::BTreeMap<String, u64>,
     /// Group-addition equivalents after conversion.
     pub gae: f64,
+    /// Work counted for `bitop/v1` alone (`ecbench::work`), kept apart
+    /// from `native` so the conversion to `gae` and every committed
+    /// record's native counters stay exactly what they were.  Copied to
+    /// `PhaseRecord::work_native`.
+    #[serde(skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub work_native: std::collections::BTreeMap<String, u64>,
 }
 
 impl PhaseCost {
     /// Add `by` to the native counter `name`, creating it at zero.
     pub fn count(&mut self, name: &str, by: u64) {
         *self.native.entry(name.to_string()).or_insert(0) += by;
+    }
+    /// Add `by` to the `bitop/v1`-only counter `name`; a zero leaves the
+    /// map untouched, so a phase that did none of the work carries none.
+    pub fn work(&mut self, name: &str, by: u64) {
+        if by > 0 {
+            *self.work_native.entry(name.to_string()).or_insert(0) += by;
+        }
+    }
+    /// Fold a map of `bitop/v1`-only counters into this phase.
+    pub fn work_all(&mut self, counters: &std::collections::BTreeMap<String, u64>) {
+        for (name, &by) in counters {
+            self.work(name, by);
+        }
     }
     /// Read a native counter, zero when it was never touched.
     pub fn get(&self, name: &str) -> u64 {
@@ -875,6 +894,17 @@ pub struct IncrementalGauss {
     pub row_ops: u64,
     pub dependent: u64,
     pub inconsistent: u64,
+    /// Matrix entries read or compared outside a multiply-subtract: the
+    /// scan of the new row at every pivot, the scan of every column of
+    /// each pivot row used (zeros too), the leftmost-non-zero search,
+    /// the normalisation and non-zero collection passes, the read of
+    /// the pivot column in every stored row, and `pinned`'s row scan.
+    /// `bitop/v1` only (`work_counters`); `row_ops` is unchanged.
+    pub entries_scanned: u64,
+    /// Pivot normalisations, one modular inversion each.
+    pub pivot_inversions: u64,
+    /// `pinned` takes `&self`; its scans are tallied here.
+    pinned_scans: std::cell::Cell<u64>,
 }
 
 impl IncrementalGauss {
@@ -889,6 +919,9 @@ impl IncrementalGauss {
             row_ops: 0,
             dependent: 0,
             inconsistent: 0,
+            entries_scanned: 0,
+            pivot_inversions: 0,
+            pinned_scans: std::cell::Cell::new(0),
         }
     }
 
@@ -904,13 +937,16 @@ impl IncrementalGauss {
     pub fn add_row(&mut self, mut row: Vec<u64>, mut rhs: u64) -> RowStatus {
         let m = self.modulus;
         debug_assert_eq!(row.len(), self.cols);
-        // Reduce against every existing pivot.
+        // Reduce against every existing pivot: one read of the new row
+        // per pivot, and a scan of every column of each pivot row used.
+        self.entries_scanned += self.rows.len() as u64;
         for i in 0..self.rows.len() {
             let pc = self.pivot_of_row[i];
             let f = row[pc];
             if f == 0 {
                 continue;
             }
+            self.entries_scanned += self.cols as u64;
             let pivot = &self.rows[i];
             for j in 0..self.cols {
                 let v = pivot[j];
@@ -923,6 +959,7 @@ impl IncrementalGauss {
             self.row_ops += 1;
         }
         let Some(pc) = (0..self.cols).find(|&j| row[j] != 0) else {
+            self.entries_scanned += self.cols as u64;
             if rhs == 0 {
                 self.dependent += 1;
                 return RowStatus::Dependent;
@@ -930,7 +967,11 @@ impl IncrementalGauss {
             self.inconsistent += 1;
             return RowStatus::Inconsistent;
         };
+        // The leftmost-non-zero search read `pc + 1` entries; the
+        // normalisation and the non-zero collection below read all.
+        self.entries_scanned += pc as u64 + 1 + 2 * self.cols as u64;
         // Normalise.
+        self.pivot_inversions += 1;
         let inv = invmod(row[pc], m).expect("prime modulus");
         for v in row.iter_mut() {
             if *v != 0 {
@@ -942,6 +983,7 @@ impl IncrementalGauss {
         self.row_ops += 1;
         // Eliminate the new pivot column from every existing row.
         let nnz: Vec<usize> = (0..self.cols).filter(|&j| row[j] != 0).collect();
+        self.entries_scanned += self.rows.len() as u64;
         for i in 0..self.rows.len() {
             let f = self.rows[i][pc];
             if f == 0 {
@@ -967,12 +1009,51 @@ impl IncrementalGauss {
     pub fn pinned(&self, col: usize) -> Option<u64> {
         let i = self.row_of_pivot[col]?;
         let row = &self.rows[i];
-        if row.iter().enumerate().all(|(j, &v)| j == col || v == 0) {
+        let mut read = 0u64;
+        let alone = row.iter().enumerate().all(|(j, &v)| {
+            read += 1;
+            j == col || v == 0
+        });
+        self.pinned_scans.set(self.pinned_scans.get() + read);
+        if alone {
             Some(self.rhs[i])
         } else {
             None
         }
     }
+
+    /// The elimination's work beside `row_ops`, for `bitop/v1`:
+    /// `gauss_entries_scanned` (entries read or compared, `pinned`
+    /// included) and `pivot_inversion_steps`, the `2w` steps of the
+    /// binary extended Euclid the convention charges one inversion
+    /// modulo a `w`-bit `r` (`docs/units/BITOPS.md`, `field_inv`).
+    pub fn work_counters(&self) -> std::collections::BTreeMap<String, u64> {
+        let mut out = std::collections::BTreeMap::new();
+        out.insert(
+            "counted:gauss_column_scans_and_pivot_inversions".to_string(),
+            1,
+        );
+        let scanned = self.entries_scanned + self.pinned_scans.get();
+        if scanned > 0 {
+            out.insert("gauss_entries_scanned".to_string(), scanned);
+        }
+        if self.pivot_inversions > 0 {
+            out.insert(
+                "pivot_inversion_steps".to_string(),
+                self.pivot_inversions * pivot_inversion_steps(self.modulus),
+            );
+        }
+        out
+    }
+}
+
+/// Steps of one inversion modulo `m` under the `bitop/v1` convention:
+/// `2w` steps of the binary extended Euclid for a `w`-bit modulus, each
+/// priced as one addition modulo `r` (`docs/units/BITOPS.md`: `field_inv`
+/// is `2b · field_add`, so the steps reprice to exactly one `field_inv`
+/// at `r`'s width).
+pub fn pivot_inversion_steps(m: u64) -> u64 {
+    2 * u64::from(64 - m.leading_zeros())
 }
 
 // ── A counted group ────────────────────────────────────────────────
@@ -4420,6 +4501,20 @@ pub struct FactorBase<E> {
     pub known_logs: Option<Vec<u64>>,
 }
 
+/// Charge the indexes a base builder derives (`ecbench::work`,
+/// `bitop/v1` only): `inserts` hash inserts and probes into `point_index`
+/// and `x_index` (and any lookup that pairs a point with its negative),
+/// `negations` point negations, and the sort of `abscissa_list` at
+/// `⌈log₂(a + 1)⌉` compares an abscissa plus the copy out of the map.
+fn count_index_build<E>(fb: &mut FactorBase<E>, inserts: u64, negations: u64) {
+    let a = fb.abscissa_list.len() as u64;
+    let depth = u64::from(64 - a.leading_zeros());
+    fb.cost.work("index_inserts", inserts);
+    fb.cost.work("index_point_negations", negations);
+    fb.cost.work("index_sort_word_ops", a * depth + a);
+    fb.cost.work("counted:base_index_builds", 1);
+}
+
 impl<E: Copy> FactorBase<E> {
     /// The index of the base point with this group key, if the base
     /// holds it.  The keying is the group's own `key`, so a caller
@@ -4501,6 +4596,10 @@ impl<E: Copy> FactorBase<E> {
         fb.abscissae = fb.x_index.len();
         fb.abscissa_list = fb.x_index.keys().copied().collect();
         fb.abscissa_list.sort_unstable();
+        // Per point: the `point_index` insert, the `x_index` entry, the
+        // negative's key and its lookup.
+        let n = points.len() as u64;
+        count_index_build(&mut fb, 3 * n, n);
         fb.points = points;
         fb.col_of = col_of;
         fb.coef_of = coef_of;
@@ -4554,6 +4653,10 @@ pub fn prime_factor_base(inst: &PrimeInstance, size: usize) -> FactorBase<PrimeP
     }
     fb.abscissa_list = fb.x_index.keys().copied().collect();
     fb.abscissa_list.sort_unstable();
+    // One `x_index` insert an abscissa, one `point_index` insert a point,
+    // and `−P` formed once an abscissa.
+    let (a, n) = (fb.abscissae as u64, fb.points.len() as u64);
+    count_index_build(&mut fb, a + n, a);
     fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
     fb.cost.count("abscissae_scanned", scanned);
     fb.cost.count("legendre_symbols", scanned);
@@ -4613,6 +4716,10 @@ pub fn prime_factor_base_strided(
     }
     fb.abscissa_list = fb.x_index.keys().copied().collect();
     fb.abscissa_list.sort_unstable();
+    // One `x_index` insert an abscissa, one `point_index` insert a point,
+    // and `−P` formed once an abscissa.
+    let (a, n) = (fb.abscissae as u64, fb.points.len() as u64);
+    count_index_build(&mut fb, a + n, a);
     fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
     fb.cost.count("abscissae_scanned", scanned);
     fb.cost.count("legendre_symbols", scanned);
@@ -4666,6 +4773,9 @@ pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> Fact
     }
     fb.abscissa_list = fb.x_index.keys().copied().collect();
     fb.abscissa_list.sort_unstable();
+    // `points_with_x` returns both signs, so no negation is formed here.
+    let (a, n) = (fb.abscissae as u64, fb.points.len() as u64);
+    count_index_build(&mut fb, a + n, 0);
     fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
     fb.cost.count("abscissae_scanned", (1u64 << l) - 1);
     fb.cost.count("as_solves", solves);
@@ -5117,6 +5227,16 @@ pub fn koblitz_factor_base(
     out.abscissae = out.x_index.len();
     out.abscissa_list = out.x_index.keys().copied().collect();
     out.abscissa_list.sort_unstable();
+    // Per point: the key insert, the `x_index` entry, and the negative's
+    // key and lookup; the abscissa fold also probes `x_index` and the
+    // column map once a point.
+    let n = out.points.len() as u64;
+    let fold_probes = if matches!(fold, ColumnFold::Abscissa) {
+        2 * n
+    } else {
+        0
+    };
+    count_index_build(&mut out, 3 * n + fold_probes, n);
     out.columns = match fold {
         ColumnFold::SignedFrobeniusOrbit => fb.signed_orbits.len(),
         ColumnFold::ProjectedSignedFrobeniusOrbit => {
@@ -5350,6 +5470,7 @@ struct PackedPairTable {
     mask: Vec<usize>,
     shift: u32,
     entries: u64,
+    insert_attempts: u64,
 }
 
 impl PackedPairTable {
@@ -5367,8 +5488,10 @@ impl PackedPairTable {
         let count = 1usize << bits;
         let reserve = expected / count + expected / count / 8 + 64;
         let mut pending: Vec<Vec<u64>> = (0..count).map(|_| Vec::with_capacity(reserve)).collect();
+        let mut insert_attempts = 0u64;
         for_each_folded_prime_sum(g, fb, ops, |key, i, j| {
             pending[table_part(key, shift)].push(key << 32 | u64::from(i) << 16 | u64::from(j));
+            insert_attempts += 1;
         })?;
         let mut base = Vec::with_capacity(count);
         let mut mask = Vec::with_capacity(count);
@@ -5407,6 +5530,7 @@ impl PackedPairTable {
             mask,
             shift,
             entries,
+            insert_attempts,
         })
     }
 
@@ -5456,14 +5580,33 @@ pub struct PairTable {
     pub entries: u64,
     pub build_ops: GroupOps,
     pub build_wall_ns: u64,
+    /// Inserts tried during the build, kept or not (`entries` counts only
+    /// the kept ones).  `bitop/v1` only, through [`Self::work_counters`].
+    pub insert_attempts: u64,
+    /// `x_index` reads of a folded build, one per abscissa.
+    pub index_lookups: u64,
 }
 
 impl PairTable {
+    /// The build's work beside its group operations, for `bitop/v1`
+    /// (`ecbench::work`): one hash insert per attempt.
+    pub fn work_counters(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        if self.insert_attempts > 0 {
+            out.insert("table_insert_attempts".to_string(), self.insert_attempts);
+        }
+        if self.index_lookups > 0 {
+            out.insert("lookups".to_string(), self.index_lookups);
+        }
+        out
+    }
+
     pub fn build<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
         let start = Instant::now();
         let n = fb.points.len();
         let mut ops = GroupOps::default();
         let mut map: FastMap<(u32, u32)> = fast_map(n * (n + 1) / 4 + 1);
+        let mut attempts = 0u64;
         for i in 0..n {
             for j in i..n {
                 let s = g.add(&mut ops, fb.points[i], fb.points[j]);
@@ -5471,6 +5614,7 @@ impl PairTable {
                     continue;
                 }
                 map.entry(g.key(&s) >> 1).or_insert((i as u32, j as u32));
+                attempts += 1;
             }
         }
         Self {
@@ -5482,6 +5626,8 @@ impl PairTable {
             packed: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: 0,
         }
     }
 
@@ -5502,6 +5648,7 @@ impl PairTable {
             .collect();
         let a = groups.len();
         let mut map: FastMap<(u32, u32)> = fast_map(a * a + 1);
+        let mut attempts = 0u64;
         for ai in 0..a {
             let i = groups[ai][0];
             for group in groups.iter().skip(ai) {
@@ -5511,6 +5658,7 @@ impl PairTable {
                         continue;
                     }
                     map.entry(g.key(&s) >> 1).or_insert((i as u32, j as u32));
+                    attempts += 1;
                 }
             }
         }
@@ -5523,6 +5671,8 @@ impl PairTable {
             packed: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
         }
     }
 
@@ -5536,9 +5686,12 @@ impl PairTable {
     ) -> Result<Self, String> {
         let start = Instant::now();
         let mut ops = GroupOps::default();
-        let mut map: FastMap<(u32, u32)> = fast_map(fb.abscissa_list.len().pow(2) + 1);
+        let a = fb.abscissa_list.len();
+        let mut attempts = 0u64;
+        let mut map: FastMap<(u32, u32)> = fast_map(a.pow(2) + 1);
         for_each_folded_prime_sum(g, fb, &mut ops, |key, i, j| {
             map.entry(key).or_insert((i, j));
+            attempts += 1;
         })?;
         Ok(Self {
             kind: "negation_folded_prime_batch",
@@ -5549,6 +5702,8 @@ impl PairTable {
             packed: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
         })
     }
 
@@ -5579,6 +5734,8 @@ impl PairTable {
         let mut ops = GroupOps::default();
         if g.p <= u64::from(u32::MAX) && fb.points.len() <= 1 << 16 {
             let packed = PackedPairTable::build(g, fb, &mut ops)?;
+            let insert_attempts = packed.insert_attempts;
+            let index_lookups = fb.abscissa_list.len() as u64;
             return Ok(Self {
                 kind: "negation_folded_prime_blocked",
                 entries: packed.entries,
@@ -5588,6 +5745,8 @@ impl PairTable {
                 packed: Some(packed),
                 build_ops: ops,
                 build_wall_ns: start.elapsed().as_nanos() as u64,
+                insert_attempts,
+                index_lookups,
             });
         }
         Self::build_negation_folded_prime_blocked_maps(g, fb, start, ops)
@@ -5612,6 +5771,7 @@ impl PairTable {
             .map(|_| fast_map(expected / count + expected / count / 8 + 64))
             .collect();
         let mut block: Vec<(u64, u32, u32)> = Vec::with_capacity(TABLE_BLOCK);
+        let mut attempts = 0u64;
         let mut sorted: Vec<(u64, u32, u32)> = vec![(0, 0, 0); TABLE_BLOCK];
         let mut offsets = vec![0usize; count + 1];
         let mut flush = |block: &mut Vec<(u64, u32, u32)>, parts: &mut [FastMap<(u32, u32)>]| {
@@ -5636,6 +5796,7 @@ impl PairTable {
             block.clear();
         };
         for_each_folded_prime_sum(g, fb, &mut ops, |key, i, j| {
+            attempts += 1;
             block.push((key, i, j));
             if block.len() == TABLE_BLOCK {
                 flush(&mut block, &mut parts);
@@ -5651,6 +5812,8 @@ impl PairTable {
             packed: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: fb.abscissa_list.len() as u64,
         })
     }
 
@@ -5751,6 +5914,11 @@ pub struct FrobeniusPairTable {
     pub build_canonicalisations: u64,
     pub build_frobenius_maps: u64,
     pub build_lookups: u64,
+    /// Pair-table inserts tried, kept or not, plus the orbit index's
+    /// `f` inserts.  `bitop/v1` only, through [`Self::work_counters`].
+    pub insert_attempts: u64,
+    /// The orbit-index pass's canonicalisations, one per base point.
+    pub orbit_canonicalisations: u64,
 }
 
 impl FrobeniusPairTable {
@@ -5820,9 +5988,12 @@ impl FrobeniusPairTable {
         // member lies in another orbit of the column.
         let mut orbit_of = vec![0u32; f];
         let mut rep_of_orbit: Vec<usize> = Vec::new();
+        let (mut orbit_canons, mut attempts) = (0u64, 0u64);
         {
             let mut orbit_index: FastMap<u32> = fast_map(f / n + 1);
             for i in 0..f {
+                orbit_canons += 1;
+                attempts += 1;
                 let key = canon.canon(fb.points[i].x);
                 let next = rep_of_orbit.len() as u32;
                 let id = *orbit_index.entry(key).or_insert(next);
@@ -5848,6 +6019,7 @@ impl FrobeniusPairTable {
                 let (key, t_u) = canon.canon_with_shift(u.x);
                 map.entry(key)
                     .or_insert((rep as u32, (j as u32) | (t_u << FROB_INDEX_BITS)));
+                attempts += 1;
             }
         }
         Some(Self {
@@ -5863,7 +6035,45 @@ impl FrobeniusPairTable {
             build_canonicalisations: canons,
             build_frobenius_maps: frob,
             build_lookups: lookups,
+            insert_attempts: attempts,
+            orbit_canonicalisations: orbit_canons,
         })
+    }
+
+    /// The build's work that only `bitop/v1` prices (`ecbench::work`):
+    /// the insert attempts, the orbit pass's canonicalisations, and the
+    /// normal-basis tables [`FrobeniusCanon::new`] built for this table.
+    pub fn work_counters(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        let canon = self.canon.build_work();
+        for (name, v) in [
+            ("table_insert_attempts", self.insert_attempts),
+            ("orbit_canonicalisations", self.orbit_canonicalisations),
+            ("canon_build_word_ops", canon.word_ops),
+            ("canon_build_field_sqrs", canon.field_sqrs),
+        ] {
+            if v > 0 {
+                out.insert(name.to_string(), v);
+            }
+        }
+        out
+    }
+
+    /// The work [`build`](Self::build) counted in its public fields
+    /// (`canonicalisations`, `frobenius_maps`, `lookups`), for an oracle
+    /// whose `setup_native` does not report it.
+    pub fn build_counters(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        for (name, v) in [
+            ("canonicalisations", self.build_canonicalisations),
+            ("frobenius_maps", self.build_frobenius_maps),
+            ("lookups", self.build_lookups),
+        ] {
+            if v > 0 {
+                out.insert(name.to_string(), v);
+            }
+        }
+        out
     }
 
     /// Indices `(i, j)` with `P_i + P_j = target`, if some `⟨σ, −1⟩`-image
@@ -6313,6 +6523,12 @@ pub trait RelationSolver {
     /// The work done and what it is counted in: `row_ops` for an
     /// elimination, matrix-vector products for an iterative method.
     fn work(&self) -> (u64, &'static str);
+    /// Work beside [`work`](Self::work) that only `bitop/v1` prices
+    /// (entry scans, pivot inversions), by `ecbench::work` counter name.
+    /// Kept out of the phase's `native` map so committed records replay.
+    fn work_counters(&self) -> std::collections::BTreeMap<String, u64> {
+        std::collections::BTreeMap::new()
+    }
 }
 
 impl RelationSolver for IncrementalGauss {
@@ -6330,6 +6546,9 @@ impl RelationSolver for IncrementalGauss {
     }
     fn work(&self) -> (u64, &'static str) {
         (self.row_ops, "row_ops")
+    }
+    fn work_counters(&self) -> std::collections::BTreeMap<String, u64> {
+        IncrementalGauss::work_counters(self)
     }
 }
 
@@ -6900,6 +7119,13 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
     let mut lane_requests = Vec::with_capacity(lanes.len());
     let mut lane_outputs = Vec::with_capacity(lanes.len());
     let (mut lane_rounds, mut lane_prepared) = (0u64, 0u64);
+    // `bitop/v1`-only bookkeeping (`PhaseCost::work`): the coefficient
+    // updates modulo `r`, the step hashes, and the random draws of the
+    // target stream, none of which the group-operation ledger sees.
+    let (mut walk_modr_adds, mut walk_mix_hashes, mut rng_draws) = (0u64, 0u64, 0u64);
+    // And the rows: the zeroed vector, the support count, the column-part
+    // key's scan and mixes, the coefficient sums and the target column.
+    let (mut row_build_words, mut row_key_mixes, mut row_build_modr_adds) = (0u64, 0u64, 0u64);
     let striding = matches!(targets, TargetSource::Stride | TargetSource::StrideRenew);
     let (mut stride, mut stride_steps, mut stride_restarts, mut stride_renewals) =
         ((g.identity(), 0u64, 0u64), 0u64, 0u64, 0u64);
@@ -6917,6 +7143,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                 1,
                 &mut scale,
             )[0];
+            rng_draws += 2;
         }
     }
     if targets == TargetSource::StrideRenew {
@@ -6931,6 +7158,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                 1,
                 &mut scale,
             )[0];
+            rng_draws += 2;
         }
     }
     if targets.is_walk() {
@@ -6945,6 +7173,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
             &mut scale,
         );
         walk_jumps += jump_count as u64;
+        rng_draws += 2 * jump_count as u64;
         if !shared_jumps && pool_mode == RestartPool::Eager {
             for _ in 0..pool_count {
                 let off = draw_pool_offset(
@@ -6968,6 +7197,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
             for (index, lane) in lanes.iter_mut().enumerate() {
                 if lane.fresh || lane.segment_steps >= segment_cap {
                     if lane.restarts == 0 {
+                        rng_draws += 2;
                         lane.a = scale_coeff(&mut scale, rng.gen_range(1..r), r);
                         lane.b = rng.gen_range(1..r);
                         let ag = g.mul(&mut rel.group_ops, generator, lane.a);
@@ -6993,9 +7223,11 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                         lane_requests.push((index, lane.point, offset, jump_count + pool_index));
                         lane.a = addmod(lane.a, oa, r);
                         lane.b = addmod(lane.b, ob, r);
+                        walk_modr_adds += 2;
                         for i in (1..jump_count).rev() {
                             lane.permutation.swap(i, rng.gen_range(0..i + 1));
                         }
+                        rng_draws += jump_count as u64 - 1;
                     }
                     lane.fresh = false;
                     lane.restarts += 1;
@@ -7008,6 +7240,8 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                     lane_requests.push((index, lane.point, jump, j));
                     lane.a = addmod(lane.a, aj, r);
                     lane.b = addmod(lane.b, bj, r);
+                    walk_modr_adds += 2;
+                    walk_mix_hashes += 1;
                     lane.segment_steps += 1;
                     walk_steps += 1;
                 }
@@ -7039,6 +7273,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         measurement::mark(measurement::Phase::TargetQuery);
         let (point, a, b, lane_id) = match targets {
             TargetSource::Random | TargetSource::RandomUnguarded => {
+                rng_draws += 2;
                 let a = scale_coeff(&mut scale, rng.gen_range(1..r), r);
                 let b = rng.gen_range(1..r);
                 let ag = g.mul(&mut rel.group_ops, generator, a);
@@ -7056,6 +7291,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                         // The first segment, and every segment of the
                         // unguarded diagnostic, starts from a fresh
                         // `[a]G + [b]Q`.
+                        rng_draws += 2;
                         wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
                         wb = rng.gen_range(1..r);
                         let ag = g.mul(&mut rel.group_ops, generator, wa);
@@ -7088,11 +7324,13 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                         };
                         wa = addmod(wa, oa, r);
                         wb = addmod(wb, ob, r);
+                        walk_modr_adds += 2;
                         // A fresh index map for the segment: Fisher–Yates
                         // over the sixteen jumps, no group operation.
                         for i in (1..jump_count).rev() {
                             jump_perm.swap(i, rng.gen_range(0..i + 1));
                         }
+                        rng_draws += jump_count as u64 - 1;
                     }
                     walk_fresh = false;
                     walk_restarts += 1;
@@ -7109,6 +7347,8 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                     };
                     wa = addmod(wa, aj, r);
                     wb = addmod(wb, bj, r);
+                    walk_modr_adds += 2;
+                    walk_mix_hashes += 1;
                     walk_steps += 1;
                     segment_steps += 1;
                 }
@@ -7121,6 +7361,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
             }
             TargetSource::Stride | TargetSource::StrideRenew => {
                 if walk_fresh {
+                    rng_draws += 2;
                     wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
                     wb = rng.gen_range(1..r);
                     let ag = g.mul(&mut rel.group_ops, generator, wa);
@@ -7133,6 +7374,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                     walk_point = g.add(&mut rel.group_ops, walk_point, sp);
                     wa = addmod(wa, sa, r);
                     wb = addmod(wb, sb, r);
+                    walk_modr_adds += 2;
                     stride_steps += 1;
                 }
                 if g.is_identity(&walk_point) {
@@ -7178,6 +7420,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                     addmod(stride.2, renew_by.2, r),
                 );
                 stride_renewals += 1;
+                walk_modr_adds += 2;
                 if !g.is_identity(&stride.0) {
                     break;
                 }
@@ -7199,12 +7442,14 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                         let c = fb.col_of[i];
                         row[c] = addmod(row[c], fb.coef_of[i], r);
                     }
+                    row_build_modr_adds += summands.len() as u64;
                     (a, b)
                 }
                 Relation::Row { columns, a, b } => {
                     for &(c, coef) in &columns {
                         row[c] = addmod(row[c], coef % r, r);
                     }
+                    row_build_modr_adds += columns.len() as u64;
                     (a, b)
                 }
             };
@@ -7217,6 +7462,10 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                 2 => two_column_rows += 1,
                 _ => {}
             }
+            // The zeroed row, the support count and the key's scan each
+            // touch every column; the key mixes once per non-zero.
+            row_build_words += cols as u64 + 2 * d_col as u64;
+            row_key_mixes += support as u64;
             let repeated = column_parts
                 .insert(column_part_key(&row[..d_col]), ())
                 .is_some();
@@ -7226,6 +7475,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
             // h·a + h·b·d = Σ coef·x  ⇒  Σ coef·x − h·b·d = h·a
             row[d_col] = submod(0, mulmod(h_mod, rb, r), r);
             let rhs = mulmod(h_mod, ra, r);
+            row_build_modr_adds += 1;
             match matrix.add_row(row, rhs) {
                 RowStatus::Inconsistent => {
                     la.count("inconsistent", 1);
@@ -7326,6 +7576,21 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         }
     }
     la.wall_ns = la_ns;
+    // `bitop/v1`-only counters (`ecbench::work`).  A `counted:` marker
+    // says the work its name lists in `known_uncounted` is now counted
+    // here, so a record that carries it leaves that item off the list.
+    rel.work("walk_modr_adds", walk_modr_adds);
+    rel.work("walk_mix_hashes", walk_mix_hashes);
+    rel.work("target_rng_draws", rng_draws);
+    rel.work("counted:walk_bookkeeping", 1);
+    la.work("row_build_words", row_build_words);
+    la.work("row_key_mixes", row_key_mixes);
+    la.work("row_build_modr_adds", row_build_modr_adds);
+    // The target column and the right-hand side.
+    la.work("row_build_modr_muls", 2 * found);
+    la.work("column_part_inserts", found);
+    la.work("counted:relation_row_construction", 1);
+    la.work_all(&matrix.work_counters());
     let (work, work_unit) = matrix.work();
     la.count(work_unit, work);
     la.count("rows", found);

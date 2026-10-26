@@ -71,5 +71,6 @@ pub mod signals;
 pub mod spec;
 pub mod stats;
 pub mod trend;
+pub mod work;
 pub mod wordram_price;
 pub mod workload;
