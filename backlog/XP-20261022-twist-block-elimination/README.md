@@ -1,5 +1,9 @@
 # Frobenius blocks, hybrid elimination and bounded invariant encodings
 
+**2026-10-26: partial / blocked / unfunded.** The 480-cell arity-2/3 sweep has 376 independently certified matched outputs. Cold B8 decomposition and exact signed-row controls pass, but ordinary group MITM is cheaper in every tested configuration. Sign propagation and opt-in linear roots do not reverse that ranking. Full arity-four costs, original campaign and stronger external full-root comparison remain open.
+
+[Audited continuation report](../../research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md) · [Protocols and limits](../../research/twist_routes_1_3_20261021/execution-v3/README.md). Original dated designs and acceptance criteria below are preserved.
+
 **Current status, 2026-10-25: partial / blocked / unfunded.** All four E26 candidates now have a bounded native pilot on 90 frozen workloads, complete affine census, matched ordinary-order controls and independent CAS replay. The 631-cell solver panel retains 388 certified cells and every incomplete/capped cell. Separate and batched instruction diagnostics cover one fixed toy case only. Full counters, root extraction, wider training/heldout and complete costs remain open; E30 remains a separate experiment.
 
 [New bounded E26 results](../../research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). The original full acceptance criteria below are unchanged.

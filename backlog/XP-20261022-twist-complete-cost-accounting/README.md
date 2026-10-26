@@ -1,5 +1,9 @@
 # Complete primitive accounting and a cold one-target replay
 
+**2026-10-26: partial / blocked / unfunded.** Cold construction/F4/Fp-root/sign/exception intervals are measured on twenty B8 configurations with exact signed-row and PARI replay. Ordinary group MITM beats every tested polynomial variant. These Ir diagnostics do not supply calibrated primitive/GAE accounting, matched rho, relation algebra or the original 24-arm/1920-attempt cold replay.
+
+[Audited continuation report](../../research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md) · [Protocols and limits](../../research/twist_routes_1_3_20261021/execution-v3/README.md). Original dated designs and acceptance criteria below are preserved.
+
 **Current status, 2026-10-25: partial / blocked / unfunded.** E26 has separate-worker and batched Callgrind Ir diagnostics on one fixed toy case, independently audited. They expose overhead omitted by row-reduction counts, but do not instrument the original 24 arms or replay the required 1,920-attempt cold grid. Complete primitive accounting, symmetric calibration and matched rho remain unimplemented/unrun.
 
 [New bounded E26 results](../../research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). The original full acceptance criteria below are unchanged.

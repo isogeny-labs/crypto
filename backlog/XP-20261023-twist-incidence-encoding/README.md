@@ -1,5 +1,9 @@
 # Two-box incidence encoding and matched ordinary masks
 
+**2026-10-26: partial / blocked / unfunded.** Independent native/strict PARI checks pass all 600 boxes; full-mask/reduced-U degree reductions are 57/190, with original-270 counts 0/29. All 560 cost processes on the fixed 80-configuration grid were attempted; 414 pass. Product/full/reduced/group completions are 79/16/40/80 per 80. Every completed polynomial comparison loses to group MITM; full/reduced also lose to product. Remaining 520 cost cases, arity-three and external full-root comparison stay open.
+
+[Audited continuation report](../../research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md) · [Protocols and limits](../../research/twist_routes_1_3_20261021/execution-v3/README.md). Original dated designs and acceptance criteria below are preserved.
+
 **E30: partial local pilot, blocked and unfunded.** Routes 1 and 3.
 
 [Source-frozen pilot protocol](../../research/twist_routes_1_3_20261021/execution-v2/INCIDENCE_PROTOCOL_V1.md) · [Results and graph](../../research/twist_routes_1_3_20261021/reports/followup-20261023/E30.md).

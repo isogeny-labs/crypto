@@ -1,5 +1,9 @@
 # Twist route 3: equivalent polynomial encodings and Frobenius symmetry
 
+**2026-10-26: partial / blocked / unfunded.** Broader native and cold finite-decomposition probes retain all matched controls. Helpers/invariants reduce costs against product F4, but ordinary group MITM is cheaper on every completed comparison. Exact signs and opt-in linear roots preserve rows without reversing the ranking. Full pipeline, original solver criteria, matched rho, arity-four/full-grid costs and external full-root comparison remain open.
+
+[Audited continuation report](../../research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md) · [Protocols and limits](../../research/twist_routes_1_3_20261021/execution-v3/README.md). Original dated designs and acceptance criteria below are preserved.
+
 **2026-10-25 update:** E26 now has all four requested candidate prototypes, 90 frozen workloads, independent affine-basis certificates and instruction diagnostics on one fixed toy case. Complete costs, wider training/heldout, production root extraction and E27/E28 remain open. No calibrated IC speedup is established. [E26 report](../../research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.md).
 
 - **Status:** blocked for the full campaign; bounded local panels completed on 2026-10-21–22.

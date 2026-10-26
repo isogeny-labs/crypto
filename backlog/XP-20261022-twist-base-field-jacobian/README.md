@@ -1,5 +1,9 @@
 # Base-field Jacobian arithmetic and independent arbitrary-class replay
 
+**2026-10-26: partial / blocked / unfunded.** The earlier 5855 arbitrary-class PARI replay is preserved. Given-map BSGS recovers all 24 public toy targets but transfer/source Ir ratios are 59.3414 to 289.8055, median 111.8264. This reference uses Fp6/Fp3 charts. Balanced Fp arithmetic, formal chart bridge, discovery/polarization costs and independent-host replay remain open.
+
+[Audited continuation report](../../research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md) · [Protocols and limits](../../research/twist_routes_1_3_20261021/execution-v3/README.md). Original dated designs and acceptance criteria below are preserved.
+
 **Current status, 2026-10-23: partial / blocked / unfunded.** Independent PARI replay passes all 5,855 original divisor classes and both norms. Balanced base-field arithmetic, formal chart bridge and independent-host replay remain open.
 
 [Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/E24.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). Local phase receipts do not complete the original experiment.

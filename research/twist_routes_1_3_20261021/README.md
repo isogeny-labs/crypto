@@ -1,5 +1,9 @@
 # Twist routes 1–3: designs and bounded execution
 
+[2026-10-26 continued experiments and inspected reports](reports/continue-20261026/RESULTS.md) · [protocols, exact audits and reproduction](execution-v3/README.md).
+
+The stronger ordinary control changes the interpretation of the polynomial savings: group meet-in-the-middle is cheaper on every tested completed comparison. Given-map genus-two BSGS loses on all 24 public targets. The 600-box frontier has 57 full-mask and 190 reduced-U degree reductions; actual completed cost pairs for both box encodings exceed direct product membership and group MITM. Explicit signs and an opt-in linear-root shortcut preserve exact rows without reversing the ranking. No calibrated whole-IC, novelty or NIST-size gain is established. The dated reports below remain historical evidence.
+
 [Earlier follow-up results and remaining requirements](reports/followup-20261023/RESULTS.md),
 [PDF](reports/followup-20261023/RESULTS.pdf), and
 [execution/raw publication status](execution-v2/README.md).

@@ -1,5 +1,7 @@
 # Benchmarks
 
+**Unadmitted diagnostic, 2026-10-26:** [Twist controls and full finite-worker probes](20261026-twist-controls/README.md). Ordinary group MITM is cheaper in every completed polynomial comparison; the B8 twenty-configuration control records median group/direct ratio 0.11239 in simulated guest instructions Ir. Given-map transfer BSGS loses all 24 targets. All 560 box-cost cells are retained, including 146 cooperative-budget failures. Intel Xeon Platinum 8573C, managed Linux x86_64, L0; no admitted time, GAE or full IC. [Study and inspected reports](../research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md). This paragraph indexes diagnostic artifacts only; it adds no validated row or leaderboard promotion.
+
 The visual record of every performance measurement and speedup: report PDFs,
 graphs (SVG) and PNG renders, one directory per entry
 (`<YYYYMMDD>-<slug>/`). The study directory linked from each row holds the

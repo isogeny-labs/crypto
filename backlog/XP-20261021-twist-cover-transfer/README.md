@@ -1,5 +1,9 @@
 # Twist route 2: explicit cover, Jacobian subgroup maps and destination solver
 
+**2026-10-26: partial / blocked / unfunded.** The bounded geometry evidence and 24 verified toy transfers remain. Matched generic BSGS finds the given-map transfer prototype more expensive on all 24 targets, median 111.8264 times source Ir. Map discovery, optimized balanced arithmetic, destination IC and full original polarization/formal criteria remain open.
+
+[Audited continuation report](../../research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md) · [Protocols and limits](../../research/twist_routes_1_3_20261021/execution-v3/README.md). Original dated designs and acceptance criteria below are preserved.
+
 - **Status:** blocked for the full campaign; bounded local panels completed on 2026-10-21–22.
 - **Tracker:** [routes 1–3](../../research/notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md).
 - **Blocker:** [missing constraint and solver comparison](../../problems/twist-trace-constraint-and-solver-gap.md).

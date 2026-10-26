@@ -65,6 +65,13 @@ for(const spec of specs){
  if(spec.slug==='sweep')text=text.replace('The geometry admission links the separately hashed strict PARI script, exit, clean-error gate and 566/28 markers.','This basis-worker interval matches complete branch outputs and counters to the earlier independent Singular complete-basis certificates. It has no new full-root or PARI witness replay.');
  text=text.replace('logical name **store:'+publication.expected_store_name+'**. Archive SHA-256: `'+publication.archive.sha256+'`.','logical name is recorded in the manifest.\n\nArchive SHA-256:\n\n```text\n'+publication.archive.sha256+'\n```\n\n');
  if(spec.slug==='frontier')text+='\nClassical summation-polynomial reference: [Semaev (2004)](https://eprint.iacr.org/2004/031). The identity and field lift are standard, with the exact formal scope stated above.\n';
+ if(spec.slug==='frontier'){
+   text=text.replace('| Arm | Requested | Accepted |','| Grid | Boxes | Lower degree |');
+   const start=text.indexOf('Measured instructions are simulated guest instructions Ir');
+   const end=text.indexOf('\n\nRaw bytes',start);
+   if(start<0||end<0)throw Error('frontier cost boilerplate boundary');
+   text=text.slice(0,start)+'This run records finite geometry and maximum generator degrees. It contains no instruction, timing or A/A cost measurement. The separate cost report prices eighty configurations; a degree reduction by itself supplies no measured speedup. All six hundred cases passed the independent finite checks. No confidence interval, independent-host replication or validation-gated benchmark result is claimed.'+text.slice(end);
+ }
  fs.writeFileSync(dir+'/RESULTS.md',text);fs.writeFileSync(dir+'/SOURCES.json',JSON.stringify({audit_path:auditFile,audit_sha256:sha(auditFile),receipt_path:receiptFile,receipt_sha256:sha(receiptFile),protocol_path:v+'/'+spec.protocol,protocol_sha256:sha(v+'/'+spec.protocol),raw_archive_sha256:publication.archive.sha256,plot_data_sha256:sha(dir+'/PLOT_DATA.json'),report_builder:study+'/build-continue-report.mjs',report_builder_sha256:sha(new URL(import.meta.url))},null,2)+'\n');
  reportLinks.push([spec.title,spec.slug+'/RESULTS.md',spec.run]);
 }

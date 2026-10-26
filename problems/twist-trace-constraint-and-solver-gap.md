@@ -4,7 +4,7 @@
 - **Kind:** construction gap, proof-verification gap, implementation gap and missing measurements; these are not a universal impossibility theorem.
 - **Affected work:** [routes 1–3 tracker](../research/notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md), [trace card](../backlog/XP-20261021-twist-trace-factor-base/README.md), [cover card](../backlog/XP-20261021-twist-cover-transfer/README.md), [solver card](../backlog/XP-20261021-twist-symmetry-solver/README.md).
 - **Next action owner:** unassigned research/implementation lane.
-- **Last updated:** 2026-10-25
+- **Last updated:** 2026-10-26
 
 ## Problem
 
@@ -125,3 +125,11 @@ are never used as an affine-solver cost denominator. All full-campaign cards
 remain blocked and unfunded. The next discriminating work is broader paired
 solver-worker costing plus the missing root/construction intervals on a
 frozen training population; these fixed-case probes do not discharge E27.
+
+### 2026-10-26: stronger ordinary controls and priced negative routes
+
+The [continued audited reports](../research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md) retain seven bounded grids. The 480-process solver sweep has 376 matched certified outputs. Cold decomposition, exact signed rows and opt-in linear roots replay; ordinary group MITM remains cheaper in every completed comparison. F4-relative savings are not a gain over this stronger ordinary decomposition.
+
+Given-map genus-two BSGS costs 59.3414–289.8055 times source BSGS in Ir on 24 targets. The 600-box frontier verifies 57 full-mask and 190 reduced-U degree reductions, but the 560-process cost grid has 146 cooperative-budget failures and no completed box cost reduction versus product or group MITM. These are prototype losses, not universal impossibility results. The classical F3 lift has five Lean theorems and IDC1hfab3acdc297476e5; its formal group-sum bridge remains open.
+
+Full E26/E27/E30 criteria, external full-root comparison, calibrated cold relation/recovery and matched rho, balanced Fp Jacobians, polarized graph identification and independent-host replay remain open. Final E28 labels 32–63 remain unopened. All sixteen full-campaign cards retain failing run sentinels and zero funding. Earlier dated evidence is preserved.

@@ -44,3 +44,7 @@ to avoid fetching all Mathlib tags. Failed initial environment/root-path
 commands and interrupted redundant fetch logs are retained; they are not proof
 failures. A cache filesystem error was resolved by a writable XDG cache. The
 passing build and transitive audit were run in this project against its lock.
+
+## 2026-10-26: classical anchored F3 lifting
+
+[TwistPairLift](../lean-v3/README.md) adds five separately audited theorems for the standard discriminant numerator identity and same-field square lifting with nonzero target y. Fresh native axiom audit accepts all five. IDC1hfab3acdc297476e5 supplements the exact proof. The group-sum bridge remains a finite native/PARI check, and no new curve map or IC complexity theorem is claimed. Earlier module receipts and proof boundaries above remain unchanged.

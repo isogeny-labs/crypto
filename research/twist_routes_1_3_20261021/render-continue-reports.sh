@@ -2,9 +2,11 @@
 # Document/graph rendering only; all numerical results come from native audits.
 set -euo pipefail
 root=research/twist_routes_1_3_20261021/reports/continue-20261026
+only=${1:-all}
 dot -Tsvg "$root/CONNECTIONS.dot" -o "$root/CONNECTIONS.svg"
 for report in "$root" "$root"/*/; do
   test -f "$report/RESULTS.md" || continue
+  if [ "$only" != all ] && [ "$(basename -- "$report")" != "$only" ]; then continue; fi
   for svg in "$report"/*.svg; do
     graph=${svg%.svg}
     inkscape "$svg" --export-type=pdf --export-filename="$graph.graph.pdf"
