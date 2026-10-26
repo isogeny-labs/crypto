@@ -3,9 +3,10 @@
 # S_IC  = median_R1(setup_units)/sqrt(r) + mean_R1(ic_online_units)/sqrt(r)
 # S_ref = median_R1(rho_setup_units)/sqrt(r) + mean_R1(rho_online_units)/sqrt(r)
 # xref = S_IC/S_ref ; xfloor = S_IC / sqrt(pi/(4n))
+# a retry file replaces the contended attempt it retried (rule v7 selects one complete, uncontended attempt per run)
 # also: S_ref at the canonical step (rho_online repriced: steps*canonical_step_units) for the §5a/kernel check
 set -eu
-base=research/ic_tool_program/rule/v3/runs
+base=research/ic_tool_program/rule/v7/runs
 for d in $base/k*n*; do
   jq -s '
    def med: sort|if length%2==1 then .[length/2|floor] else (.[length/2-1]+.[length/2])/2 end;
@@ -24,5 +25,5 @@ for d in $base/k*n*; do
     canonical_step_units:(map(.step_prices.canonical_step_units)|med),
     S_ref_canonical_step:($rs + ($ro * ((map(.step_prices.canonical_step_units)|med)/$ups))),
     xref_canonical_step:(($ss+$so)/($rs + ($ro * ((map(.step_prices.canonical_step_units)|med)/$ups))))
-   }' $d/T*-R1.price.json
+   }' $(for f in $d/T*-R1.price.json; do b=${f%.price.json}; if [ -f "$b-retry1.price.json" ]; then echo "$b-retry1.price.json"; else echo "$f"; fi; done)
 done | jq -s .

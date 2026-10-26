@@ -23,5 +23,5 @@ priced at the canonical step the x reference would be 1.7 to 2.0 times larger. W
 IC arm "got a kernel the rho side did not" through lane batching. The gap between measured and canonical step
 cost is rho overhead (look-ahead, distinguished-point handling, cycle checks, memory), not lanes.
 
-The leaderboard text was corrected in this PR (`scripts/build_ic_leaderboard.py`, Table A reference).
+Main re-measured Table A at baseline v7 (rule v7) while this PR was open, so the caveat that had been written into the builder for the v3 figures was dropped in the merge; this file and `rho_lanes/` are the record, and the v7 reference has not been re-checked for the same step-cost gap.
 Slice A's files are left as merged, because sealed audit records are write-once; this file is the correction.

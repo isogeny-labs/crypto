@@ -1,0 +1,222 @@
+# Worked example: research/dreg_closure_m4l6_20261018/PROTOCOL.md (§§1-8, 10)
+# expressed as a crypto.experiment/v1 spec, run on the EC2 spot launcher of
+# PR aburan28/crypto#2228. It is a DRAFT: it documents how the schema maps a
+# real pre-registration, and the values marked CONFIRM must be checked before
+# approval. The prose protocol stays the authority; this file is its
+# machine-readable index and run plan.
+schema: crypto.experiment/v1
+id: EXP-DREG-M4L6-001
+version: 1
+title: MutantXL closure degree at (m, l) = (4, 6) and degree 5 at l = 7, large-memory host
+status: draft
+owner: adam
+created: 2026-10-18
+tags: [dreg, closure, ecc2k130, ic]
+links:
+  protocol: research/dreg_closure_m4l6_20261018/PROTOCOL.md
+  results: research/dreg_closure_m4l6_20261018/RESULTS.md
+  predecessors: [research/dreg_closure_driver_20261016/RESULTS.md]
+  prs: [aburan28/crypto#2228]
+
+question:
+  summary: >-
+    Two explanations survived the driver study: the closure degree rises above 4 at l = 7
+    whatever m, or once m*l >= 21. Degree 5 is unmeasured above N = 25.
+  questions:
+    - {id: Q1, text: "Does m = 4, l = 6 (m*l = 24) refute at degree 4?"}
+    - {id: Q2, text: "Does m = 4, l = 7 refute at degree 4?"}
+    - {id: Q3, text: "Does the closure refute at degree 5 on the committed m = 3, l = 7 draws that did not refute at 4?"}
+  predictions:
+    - {id: P1, about: [Q1], text: A refutes at 4 on every draw (l = 7 survives)., confidence: 0.6}
+    - {id: P2, about: [Q2], text: B does not refute at 4., confidence: 0.6}
+    - {id: P3, about: [Q3], text: C1 refutes at degree 5 on all four draws., confidence: 0.7}
+    - {id: P4, text: Peak RSS within 1.5x of the 3*cols^2/8 projection.}
+
+source:
+  repo: aburan28/crypto
+  ref: claude/dreg-a3-c1-snapshot-20261018         # CONFIRM: branch the host clones
+  # commit: <40-hex>                                 # required at approval
+  allow_drift: true        # draws/ and host records are committed mid-run (§10)
+  frozen:
+    - {path: research/dreg_closure_m4l6_20261018/PROTOCOL.md, sha256: "0000000000000000000000000000000000000000000000000000000000000000"}  # CONFIRM
+    - {path: research/dreg_closure_m4l6_20261018/run.sh, sha256: "0000000000000000000000000000000000000000000000000000000000000000"}      # CONFIRM
+    - {path: research/dreg_closure_m4l6_20261018/pod/boot.sh, sha256: "0000000000000000000000000000000000000000000000000000000000000000"}  # CONFIRM
+
+paths:
+  root: research/dreg_closure_m4l6_20261018
+  out: research/dreg_closure_m4l6_20261018/runs
+  draws: research/dreg_closure_m4l6_20261018/draws
+  collected: research/dreg_closure_m4l6_20261018/collected
+
+env:
+  F4_F2_MAX_ROWS: "50000000"
+  F4_F2_MAX_COLS: "50000000"
+
+resources: {vcpus: 32, memory_gb: 256, disk_gb: 100, arch: x86_64}
+
+# §2. Projected RSS = 3*cols^2/8 bytes. est_hours from §8.
+cells:
+  - {id: a1, params: {m: 4, n: 15, l: 6, degree: 4, cols: 341055, draws: fresh}, priority: 30,
+     requires: {memory_gb: 64, est_hours: 2}, note: "§10: measured on unsat draws 42 and 214 only"}
+  - {id: a2, params: {m: 4, n: 16, l: 6, degree: 4, cols: 395011, draws: fresh}, priority: 20, optional: true,
+     requires: {memory_gb: 89, est_hours: 3}, note: "§10: deferred, no draws"}
+  - {id: b1, params: {m: 4, n: 17, l: 7, degree: 4, cols: 597619, draws: fresh}, optional: true,
+     requires: {memory_gb: 201, est_hours: 16}, note: "§8.4: not run in this budget"}
+  - {id: b2, params: {m: 4, n: 18, l: 7, degree: 4, cols: 679121, draws: fresh}, optional: true,
+     requires: {memory_gb: 260, est_hours: 20}, note: "§8.4: not run in this budget"}
+  - {id: c1, params: {m: 3, n: 19, l: 7, degree: 5, cols: 760099, draws: committed}, priority: 10,
+     requires: {memory_gb: 200, est_hours: 7}, note: "§8.3: draw 0 only"}
+  - {id: c2, params: {m: 3, n: 21, l: 7, degree: 5, cols: 974982, draws: committed}, optional: true,
+     requires: {memory_gb: 420, est_hours: 12}, note: "only on a host with >= 420 GB cgroup limit"}
+  - {id: a1-control, role: control, params: {m: 4, n: 15, l: 6, degree: 4}, priority: 25,
+     note: "first satisfiable draw under --satisfiable; a refutation voids A1"}
+
+checkpoint:
+  resume: rerun_step        # run.sh `one` skips any draw whose output is non-empty
+  transport: http_pull      # boot.sh serves /workspace/out on :8000; aws_spot.py fetch pulls it
+
+# boot.sh runs every host step itself and reports through STATUS tokens; the
+# controller only provisions, polls, collects and tears down. Its tokens are
+# per phase, not per cell, so host steps are scope once.
+steps:
+  - {id: build, title: toolchain + dreg_ladder/dreg_closure, scope: per_host, runs_on: host,
+     status_done: GENERATING, status_failed: [CLONE_FAILED, BUILD_FAILED]}
+  - {id: gen, title: "run.sh gen (A cells; skips committed draws)", scope: once, runs_on: host, needs: [build],
+     status_done: GEN_DONE}
+  - id: commit-draws
+    title: commit the fetched draws so the host's checksum gate opens (§10)
+    scope: once
+    runs_on: controller
+    needs: [gen]
+    gates: {before: [draws-fetched, push-ok]}
+    argv: [git, commit, -m, "dreg m4l6: draws from host {{vars.handle}}", --, "{{paths.draws}}"]
+    timeout_s: 120
+  - {id: push-draws, scope: once, runs_on: controller, needs: [commit-draws],
+     argv: [git, push, origin, "HEAD:claude/dreg-a3-c1-snapshot-20261018"], timeout_s: 300, retry_exit_codes: [128]}
+  - {id: measure, title: "run.sh measure (A1 draws side by side, timeout 14400)", scope: once, runs_on: host,
+     needs: [push-draws], status_done: A_DONE, evidence: true}
+  - {id: deg5-control, title: "run.sh deg5 (C1 draw 0) then control", scope: once, runs_on: host, needs: [measure],
+     status_done: CLOSURE_DONE, evidence: true}
+  - id: score
+    title: copy each cell's run files into runs/ and verify them
+    scope: per_cell
+    runs_on: controller
+    cells: [a1, c1, a1-control]
+    needs: [deg5-control]
+    argv: [go, run, research/dreg_closure_m4l6_20261018/copyruns.go, "{{paths.collected}}/closure/runs", "{{paths.out}}", "{{cell.id}}"]   # CONFIRM: helper not written yet
+    timeout_s: 300
+    on_failure: escalate
+
+gates:
+  - id: draws-fetched
+    kind: wait_until
+    description: the fetched draws verify against their own sha256.txt
+    checks: [{kind: sha256_manifest, path: "{{paths.collected}}/closure/draws/sha256.txt"}]
+    every_s: 1800
+    max_wait_s: 43200
+    on_fail: escalate
+  - id: push-ok
+    kind: human
+    description: pushing to the shared branch is an outward action
+    ask: "Push the draws fetched from {{vars.handle}} to claude/dreg-a3-c1-snapshot-20261018 so the host starts measuring."
+    on_fail: stop
+
+hosts:
+  selection: ordered
+  candidates:
+    - id: ec2-r7i-8xl
+      backend: batch
+      launcher: aws_spot
+      provides: {vcpus: 32, memory_gb: 256, disk_gb: 100, arch: x86_64}
+      timing_valid: false          # §7: shared cloud host, level L0; wall times descriptive
+      preemptible: true
+      est_hourly_usd: 0.9          # CONFIRM with `aws_spot.py prices --types r7i.8xlarge`; 0.9 is the launcher's documented --max-price example
+      cells: [a1, a1-control, c1]
+      config: {instance_type: r7i.8xlarge, region: us-west-2, max_price: 0.9, disk_gb: 100,
+               boot: research/dreg_closure_m4l6_20261018/pod/boot.sh, job: closure}
+      lifecycle:
+        provision:
+          argv: [python3, research/ic_leads_rented_20261018/aws_spot/aws_spot.py, run, --job, closure,
+                 --name, dreg-m4l6, --branch, claude/dreg-a3-c1-snapshot-20261018, --type, r7i.8xlarge,
+                 --max-seconds, "41400", --max-price, "0.9",
+                 --env, "FRESH=4:15:6", --env, TMO4=14400, --env, DEG5_DRAWS=1]
+          timeout_s: 900
+          capture: {handle: {json_key: id}}
+        poll:
+          argv: [python3, research/ic_leads_rented_20261018/aws_spot/aws_spot.py, fetch, "{{vars.handle}}", "{{paths.collected}}"]
+          timeout_s: 900
+        collect:
+          argv: [python3, research/ic_leads_rented_20261018/aws_spot/aws_spot.py, fetch, "{{vars.handle}}", "{{paths.collected}}", --path, closure/]
+          timeout_s: 1800
+        teardown:
+          argv: [python3, research/ic_leads_rented_20261018/aws_spot/aws_spot.py, terminate, "{{vars.handle}}"]
+          timeout_s: 300
+        poll_every_s: 1800
+        lifetime_s: 41400          # §8.5: 11.5 h cap
+    - id: runpod-cpu3m
+      backend: batch
+      launcher: runpod
+      provides: {vcpus: 32, memory_gb: 256, arch: x86_64}
+      timing_valid: false
+      preemptible: false
+      est_hourly_usd: 3.52         # §8: cpu3m, recorded
+      cells: [a1, a1-control, c1]
+      lifecycle:                   # CONFIRM: pod/launch.py verbs
+        provision: {argv: [python3, research/dreg_closure_m4l6_20261018/pod/launch.py, start, closure], timeout_s: 900, capture: {handle: {json_key: id}}}
+        poll: {argv: [python3, research/dreg_closure_m4l6_20261018/pod/launch.py, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 900}
+        collect: {argv: [python3, research/dreg_closure_m4l6_20261018/pod/launch.py, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 1800}
+        teardown: {argv: [python3, research/dreg_closure_m4l6_20261018/pod/launch.py, stop, "{{vars.handle}}"], timeout_s: 300}
+        lifetime_s: 41400
+
+budget:
+  max_cost_usd: 50                 # §8: owner cap, total
+  max_wall_hours: 24
+  max_attempts_per_step: 2
+  escalate_at_fraction: 0.8
+
+metrics:
+  - {id: closure-refuted, kind: boolean, primary: true, description: closure refutes at the built degree,
+     source: {file: "{{paths.out}}/{{cell.id}}.jsonl", path: closure_refuted, line: all}}   # CONFIRM layout
+  - {id: columns, kind: counted, description: Macaulay columns at the built degree, source: {file: "{{paths.out}}/{{cell.id}}.jsonl", path: columns, line: all}}
+  - {id: closure-word-ops, kind: counted, description: counted closure word operations, source: {file: "{{paths.out}}/{{cell.id}}.jsonl", path: closure_word_ops, line: all}}
+  - {id: secs, kind: timing, unit: s, description: wall seconds (descriptive on this host), source: {file: "{{paths.out}}/{{cell.id}}.jsonl", path: secs, line: all}}
+
+outcome:
+  decision_rules:
+    - {id: A-all, about: [Q1], cells: [a1], when: every unsat draw refutes at degree 4, verdict: "'m*l >= 21' refuted; 'l = 7' survives",
+       checks: [{kind: json, json: {file: "{{paths.out}}/{{cell.id}}.jsonl", path: closure_refuted, line: all}, op: all_true}]}
+    - {id: A-none, about: [Q1], cells: [a1], when: no draw refutes (closure saturated), verdict: "'l = 7' refuted; 'm*l' survives"}
+    - {id: A-mixed, about: [Q1], cells: [a1], when: mixed or capped, verdict: inconclusive; name the draws}
+    - {id: C-all, about: [Q3], cells: [c1], when: every draw refutes at degree 5, verdict: degree at l = 7 is exactly 5 for m = 3}
+    - {id: C-none, about: [Q3], cells: [c1], when: no draw refutes, verdict: "degree >= 6 at l = 7; the degree-5 row loses support"}
+  invalidation:
+    - A control draw that refutes voids the cell's reading until explained (§4).
+  censoring:
+    - A process the kernel or prlimit ends for memory is an allocation failure with the degrees it built; not evidence, not re-run (§3).
+    - A process the host's lifetime cap ends is a host loss, not evidence (§8.5).
+    - A cell read on fewer than four draws says so in its row (§8).
+
+reporting:
+  results_file: research/dreg_closure_m4l6_20261018/RESULTS.md
+  sections: [cells run and not run, per-draw table, decision per §4, predictions vs outcome, deviations, cost]
+  required_artifacts:
+    - "{{paths.out}}/{{cell.id}}.jsonl"
+    - research/dreg_closure_m4l6_20261018/RESULTS.md
+  visuals: true
+  progress_every_minutes: 60
+
+agent:
+  executor_model: claude-haiku-5-5
+  director_model: claude-sonnet-5-5
+  autonomy:
+    launch_paid_host: ask
+    spend_without_asking_usd: 0
+    terminate_own_hosts: allowed
+    retry_failed_step: ask
+    git_commit: allowed
+    git_push: ask
+    open_pr: ask
+  escalate_on: [gate_failed, budget_fraction, step_failed, step_censored, host_unavailable, spec_drift, missing_output]
+  instructions: >-
+    No cell result is a cost row or a claim about ECC2K-130; the cost-model consequence is a derived update to
+    RESEARCH_ECC2K130_DESCENT_DEGREE.md in the result PR (§4).

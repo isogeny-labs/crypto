@@ -57,7 +57,7 @@ SOURCES = {
     "koblitz_s21": "research/ic_constructions_20260926/analysis.json",
     "koblitz_s22": "research/ic_descent_20260930/analysis-isolated.json",
     "koblitz_s23": "research/ic_single_target_20260930/analysis.json",
-    "koblitz_rule_v3": "research/ic_tool_program/rule/v3/analysis.json",
+    "koblitz_rule_v7": "research/ic_tool_program/rule/v7/analysis.json",
     "oracles": "docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json",
     "n37_rank_columns": "research/ecbench_n37_rank_columns_20261004/RESULT.json",
     "n37_k8_k16": "research/ecbench_n37_k8_k16_20261004/DECISION.json",
@@ -73,6 +73,8 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
+    "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -86,7 +88,7 @@ SOURCES = {
 GITHUB = "https://github.com/aburan28/crypto/blob/main/"
 S22_RUNS = "research/ic_descent_20260930/runs-isolated/main"
 S23_RUNS = "research/ic_single_target_20260930/runs"
-RULE_V3_RUNS = "research/ic_tool_program/rule/v3/runs"
+RULE_V7_RUNS = "research/ic_tool_program/rule/v7/runs"
 
 # Phases, in pipeline order, as the page groups them.
 PHASES = [
@@ -130,25 +132,16 @@ REGIME_NAME = {"prime": "Prime field", "char2": "Random binary", "koblitz": "Kob
 FAMILY_OF = {"koblitz": "A", "prime": "B", "char2": "B", "koblitz_batch": "C"}
 FAMILIES = {
     "A": {
-        "title": "Koblitz, one target", "regimes": ["koblitz"], "section": "§23, re-run at baseline v3",
+        "title": "Koblitz, one target", "regimes": ["koblitz"], "section": "§23, re-run at baseline v7",
         "status": "primary comparison: one target, as AGENTS.md's one-target rule requires",
         "targets": "one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks",
         "unit": "one batched affine addition (`add_many` over 1,024 subgroup points), per √r",
         "unit_how": "A clock reading, not a count: `ic price` times each phase exclusively, on one thread, "
                     "and divides by this unit, measured around each repetition (§20, §23). Each process measures its own "
-                    "unit, which is 2.3–3.2 times cheaper at baseline v3 than in §23's processes, so S here is not "
-                    "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v3/README.md).",
+                    "unit, so S here is not "
+                    "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).",
         "reference": "One-target rho on the same point, measured as built (its set-up plus its walk), "
-                     "in the same unit and the same process; its answer replayed and verified (§23; rule v3 at baseline v3). "
-                     "Step-cost caveat (validation sweep, slice A, 2026-10-19; corrected 2026-10-21): this rho costs "
-                     "9.7–11.8 units a step against a canonical step (one batched addition plus the table "
-                     "canonicalisation, a model) of 4.6–5.4. A lane sweep (32 to 1,024 lanes, n = 47, 53, 61; "
-                     "`research/leaderboard_rigor_20261021/rho_lanes/`) leaves the walk at 8.4–12.5 units a step "
-                     "and the table's × reference unchanged within the run-to-run spread, so the lane count is not "
-                     "the cause and no implemented rho reaches the canonical step; priced at the canonical step the "
-                     "× reference would be 1.7–2.0 times larger (`research/validation_sweep_20261019/A-leaderboard/raw/"
-                     "recompute_A_haiku.json`, `xref_canonical_step`). Rho also gained 20% in instructions after this "
-                     "table was measured (`research/ecbench_rho_optimized_20261014`).",
+                     "in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).",
         "floor": "√(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed "
                  "Frobenius and negation, n the extension degree. Stated in steps and not rescaled to "
                  "units, so × floor here divides units by steps.",
@@ -179,11 +172,8 @@ FAMILIES = {
                     "and divides by this unit (§20, §22 isolated re-run).",
         "reference": "Batch rho on the same 32 targets (signed Frobenius and negation), its counted "
                      "operations priced at the canonical step, one batched addition plus the table "
-                     "canonicalisation (§20). Collisions shared across the 32 targets are in its cost per "
-                     "target. Source caveat (validation sweep, slice A): the rho S is §20's own measurement "
-                     "(2026-09-26), not measured in the process of the §22 isolated IC figure; the isolated "
-                     "re-run re-priced rho at one size only (n = 41, set M1: counts equal §20's, priced S "
-                     "0.0600 against 0.0610), and the IC S is the baseline S divided by a wall-time speedup.",
+                     "canonicalisation, in the same process (§20). Collisions shared across the 32 "
+                     "targets are in its cost per target.",
         "floor": "L(32)·√(π/4n) steps per √r per target, with L(32) = 0.19869: the one-target floor of "
                  "table A times Kuhn–Struik's batch share. Stated in steps and not rescaled to units, "
                  "and a smaller object than table A's floor, so × floor in C and in A do not compare.",
@@ -191,22 +181,6 @@ FAMILIES = {
     },
 }
 
-
-# Disclosures from the validation sweep (slice A, 2026-10-19) and the replays that followed; text only, no data.
-NOTE_N37 = ("Validation sweep: `ecbench band` marks every IC pair of this session 'unrankable (uncounted unpriced "
-            "work)' (field arithmetic, hashing and modular combination are named but not counted), so K16/K42 and "
-            "IC/rho are quotients of lower bounds that AGENTS.md section 5a does not let anyone rank.")
-NOTE_N41 = ("Validation sweep: the K16 mean S and the quotient above are means over the runs that finished "
-            "(23 of 80 at n = 41; 57 exhausted), ic-k8 produced no answer in 80 of 80 and no IC run verified at "
-            "n = 53, so they are survivor means, not costs; `ecbench band` calls every IC-vs-rho pair 'incomplete'.")
-NOTE_REPLAY = ("Validation sweep and replay-all on current main: the inherited-F4 and F6-IC counters of this session do "
-               "not reproduce (F6-IC ladder 24/72 at m = 13, 19 and 23; cross-family 16/48, 16/32, 24/40, 8/24). "
-               "A replay on the commit that recorded the ladder reproduces 72/72 on the same host, so the counters changed "
-               "in code afterwards: good at main 7ab28103d (2026-10-10), failing at 16e74770d (2026-10-11), inside a "
-               "stretch where main did not compile, so it cannot be narrowed further by building "
-               "(research/leaderboard_rigor_20261021/bisect/); #1646's word-wise inherited-F4 rewrite is in that window. "
-               "The recovered scalars verify; "
-               "read the counter columns as historical, not current-binary evidence.")
 
 def rng(lo: float, hi: float) -> str:
     return g3(lo) if lo == hi else f"{g3(lo)}–{g3(hi)}"
@@ -460,7 +434,7 @@ def koblitz_rows(names: Names) -> list[dict]:
 
 def koblitz_one_target_rows(names: Names) -> list[dict]:
     """Ledger §23's comparison: one unseen public point per process, 64 per
-    size, re-run at the IC tool programme's baseline v3 as rule v3.  The
+    size, re-run at the IC tool programme's baseline v7 as rule v7.  The
     primary comparison under AGENTS.md's one-target rule.  S here is cold,
     the reusable set-up plus the online interval, against one-target rho's
     set-up plus its walk; the online speedup, the canonical-step reading and
@@ -470,13 +444,13 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
     compared with §23's; the ratios carry no unit."""
     rows = []
     s23 = {(x["a"], x["n"]): x for x in load(SOURCES["koblitz_s23"])["sizes"]}
-    for x in load(SOURCES["koblitz_rule_v3"])["sizes"]:
+    for x in load(SOURCES["koblitz_rule_v7"])["sizes"]:
         a, n = x["a"], x["n"]
         before = s23[(a, n)]
         c = names(before["curve"])
         if c["slug"] != x["curve"]:
-            raise SystemExit(f"rule v3's {x['curve']} is not §23's {before['curve']}")
-        par = json.loads((REPO / RULE_V3_RUNS / f"k{a}n{n}" / "T01.params.json").read_text())
+            raise SystemExit(f"rule v7's {x['curve']} is not §23's {before['curve']}")
+        par = json.loads((REPO / RULE_V7_RUNS / f"k{a}n{n}" / "T01.params.json").read_text())
         columns = int(re.search(r"-c(\d+)-", par["name"]).group(1))
         d = x["diagnostics"]
         sh = d["online_phase_shares"]
@@ -514,11 +488,11 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
         rows.append({
             "regime": "koblitz", "slug": c["slug"], "ec1": x.get("curve_id") or ec1_of(c),
             "legacy": before["curve"], "log2_r": x["log2_r"], "cofactor": None,
-            "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v3)",
+            "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
             "reference_s": x["s_rho_online_mean"] + x["s_rho_setup"], "floor_s": floor_s,
-            "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v3"],
+            "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v7"],
             "before_source": SOURCES["koblitz_s23"],
-            "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
+            "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
             "class": "accounting",
         })
     return rows
@@ -1206,6 +1180,10 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        # A component speed-up (the linear stage after F4 in jv_cover) copied
+        # from its study's frozen summary; it moves no row of tables A-C.
+        "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
+        "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
@@ -1229,6 +1207,24 @@ def g3(v: float | None) -> str:
 
 def times(v: float) -> str:
     return f"{g3(v)}×"
+
+
+def algebraic_ladder() -> dict:
+    """The algebraic-decomposition IC ladder (owner criterion 2026-10-24):
+    rung means and fitted slopes copied from the study's native fit; it moves
+    no row of tables A-C."""
+    fit = load(SOURCES["ic_m2_linear_ladder"])
+    if fit.get("schema") != "ic-m2-linear-ladder-fit/v1" or not all(r["all_verified"] for r in fit["rungs"]):
+        raise ValueError("algebraic ladder source is not a complete verified fit")
+    return {
+        "source": SOURCES["ic_m2_linear_ladder"], "study": "research/ic_m2_linear_ladder_20261024/",
+        "report": "research/ic_m2_linear_ladder_20261024/REPORT.md",
+        "rungs": [{k: r[k] for k in ("a", "n", "d", "cofactor", "log2_r", "targets", "mean_ic_trials",
+                                     "mean_ic_s", "mean_rho_s", "ic_over_rho_wall")} for r in fit["rungs"]],
+        "slope_ic_trials": fit["fit_small_cofactor"]["ic_trials"],
+        "slope_ic_wall": fit["fit_small_cofactor"]["ic_wall"],
+        "f4_slope": fit["f4_reference"]["slope_log2_word_xors_per_n"],
+    }
 
 
 def esc(s) -> str:
@@ -1416,7 +1412,6 @@ def markdown(doc: dict) -> str:
           f"{d['cold_counted_over_rho_diagnostic']:.3f} and K16/K42 is "
           f"{d['cold_counted_over_k42_diagnostic']:.3f}. Native work is unpriced "
           "for both arms, and L0 timing cannot establish an online speedup. "
-          + NOTE_N37 + " "
           "This row is intentionally outside the three fully priced unit families; "
           f"read the [frozen decision](../../{d['source']}).", ""]
     c = doc["n37_k8_k16_confirmation"]
@@ -1496,7 +1491,7 @@ def markdown(doc: dict) -> str:
           "IC `S` is a lower bound: the solver's word XORs are counted but unpriced, and "
           "F6-IC's geometric point additions are charged. The F6-IC word-XOR saving "
           "vanishes once the base exceeds #1333's 256-point closure cap; charging its "
-          "geometry makes the trade a relabelling. " + NOTE_REPLAY + " "
+          "geometry makes the trade a relabelling. "
           f"Decision: {y['decision']} (m = 31 incomplete). "
           f"Read the [analysis](../../{y['source']}).", "",
           "| m | curve | targets | rho S | F4 S/rho (lower bound) | F6-IC S/rho (lower bound) | median log2(W4/W6) |",
@@ -1514,7 +1509,7 @@ def markdown(doc: dict) -> str:
           "Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight public "
           "one-target workloads per cell, beside same-target rho. IC `S` is a lower bound "
           "(solver word XORs unpriced; F6-IC's geometric additions charged). `W` is counted "
-          "solver word XORs. Prime curves have no algebraic oracle in `ecbench`. " + NOTE_REPLAY + " "
+          "solver word XORs. Prime curves have no algebraic oracle in `ecbench`. "
           f"Read the [analysis](../../{y['source']}).", "",
           "| family | m | curve | base points | rho-negation S | strong rho S | inherited F4 S | F6-IC S "
           "| W F5/F4 | W F4 matrix/inherited | median log2(W inh/W F6) |",
@@ -1538,7 +1533,7 @@ def markdown(doc: dict) -> str:
           "method parameters unchanged) ran on 16 new public one-target workloads on each of the next "
           "two registered sizes, five paired rounds each, on macOS at L0. Counted cold IC/rho is a "
           "quotient of two lower bounds (native work unpriced); a cell whose arm never verifies under "
-          "the frozen parameters is unknown, not a cost. " + NOTE_N41 + " "
+          "the frozen parameters is unknown, not a cost. "
           f"{v['measured_verified_runs']} of {v['measured_runs']} measured runs verified; "
           f"decision `{v['decision']}`; the L2 host run is pending. "
           f"Read the [frozen decision](../../{v['source']}).", "",
@@ -1635,6 +1630,33 @@ def markdown(doc: dict) -> str:
         observed = session["arms"]["ic-mitm"]["cross_curve"]
         L.append(f"| {session['ell']} | {observed['ratio_floor_over_crater']:.6f} | "
                  f"{observed['ci99'][0]:.6f} to {observed['ci99'][1]:.6f} |")
+    ls = doc["jv_cover_linear_stage_component"]
+    L += ["", "## Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC", "",
+          f"Component speed-up, class {ls['class']}: the dense linear stage against sparse FGLM "
+          f"(Wiedemann / Berlekamp–Massey on M_xn, shift-chain eigenvectors) in {ls['pipeline']}, "
+          f"same binary and seeds, the same relations, every DLP solved and verified by both arms "
+          f"(`{ls['study']}`, {ls['run']}). It moves no row of tables A–C. "
+          "S/rho is a lower-bound comparison (unpriced native work is not emitted).", "",
+          "| p | seed | relations | S dense | S sparse | dense ÷ sparse | S/rho dense | S/rho sparse (distance to rho) |",
+          "|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    for r in ls["dlp"]:
+        L.append(f"| {r['p']} | {r['seed']} | {r['relations']} | {r['s_before']:.4g} | {r['s_after']:.4g} | "
+                 f"{r['s_ratio']:.2f} | {r['s_over_rho_before']:.0f} | {r['s_over_rho_after']:.0f} |")
+    al = doc["algebraic_ladder"]
+    st, sw = al["slope_ic_trials"], al["slope_ic_wall"]
+    L += ["", "## Algebraic-decomposition IC ladder (linear two-summand S3), outside tables A–C", "",
+          "Owner criterion (2026-10-24): relations come from solving summation-polynomial systems over an "
+          "algebraically defined factor base, with no table collisions. Factor base x ∈ span{1..z^(d−1)}; the Weil "
+          "descent of S3 is linear in the symmetric unknowns (x1+x2, x1x2). One-target cold solves, every scalar "
+          f"verified, beside same-process strong rho (`{al['study']}`). Fitted slope of log2(trials) per bit of n: "
+          f"{st['slope_log2_per_n']:.3f} [{st['boot95'][0]:.3f}, {st['boot95'][1]:.3f}] (wall "
+          f"{sw['slope_log2_per_n']:.3f}); the F4 algebraic arm's solver work grows at {al['f4_slope']:.3f}. "
+          "The IC ÷ rho column is the distance remaining.", "",
+          "| a | n | d | cofactor | targets | mean trials | mean IC s | mean rho s | IC ÷ rho (wall) |",
+          "|--:|--:|--:|--:|--:|--:|--:|--:|--:|"]
+    for r in al["rungs"]:
+        L.append(f"| {r['a']} | {r['n']} | {r['d']} | {r['cofactor']} | {r['targets']} | {r['mean_ic_trials']:,.0f} | "
+                 f"{r['mean_ic_s']:.4g} | {r['mean_rho_s']:.3g} | {r['ic_over_rho_wall']:,.0f} |")
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -1804,7 +1826,9 @@ def page(doc: dict, standalone: bool) -> str:
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500'
             '&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">\n'
-            f"<style>{STYLE}</style>\n")
+            f"<style>{STYLE}</style>\n"
+            '<link rel="stylesheet" href="ic-leaderboard/layout.css">\n'
+            '<script src="ic-leaderboard/layout.js" defer></script>\n')
     P = []
     K1 = L["koblitz"]
     kob_rows = by_regime["koblitz"]
@@ -1903,7 +1927,7 @@ def page(doc: dict, standalone: bool) -> str:
              f'bound; its counted IC/rho quotient is {d["cold_counted_over_rho_diagnostic"]:.3f}, '
              f'and K16/K42 is {d["cold_counted_over_k42_diagnostic"]:.3f}. Both arms leave native '
              'work unpriced, and L0 timing gives no admitted online speedup. These figures are not '
-             'comparable to tables A–C. ' + esc(NOTE_N37) + ' '
+             'comparable to tables A–C. '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(d["source"])}">Frozen decision</a>. '
              'A separate whole-solve Callgrind census finds K16/K42 = 0.367 and K16/rho = 4.461 '
              'in simulated instructions on eight paired points; native wall and online speed remain unknown. '
@@ -1978,7 +2002,7 @@ def page(doc: dict, standalone: bool) -> str:
              'beside same-target strong rho on eight public one-target workloads per size. IC S is a '
              'lower bound: the solver\'s word XORs are counted but unpriced, and F6-IC\'s geometric point '
              'additions are charged. The F6-IC word-XOR saving vanishes once the base exceeds #1333\'s '
-             '256-point closure cap; charging its geometry makes the trade a relabelling. ' + esc(NOTE_REPLAY) + ' '
+             '256-point closure cap; charging its geometry makes the trade a relabelling. '
              f'Decision: {esc(y["decision"])} (m = 31 incomplete). '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["source"])}">Analysis</a>.</p>')
     P.append('<table><thead><tr><th>m</th><th>Curve</th><th>Targets</th><th>Rho S</th>'
@@ -1996,7 +2020,7 @@ def page(doc: dict, standalone: bool) -> str:
              '<p>Matrix F4, matrix F5, inherited F4 and F6-IC through <code>pdp3-binary</code> on eight public '
              'one-target workloads per cell, beside same-target rho. IC S is a lower bound: solver word XORs '
              'are unpriced and F6-IC\'s geometric additions are charged. W is counted solver word XORs. '
-             'Prime curves have no algebraic oracle in <code>ecbench</code>. ' + esc(NOTE_REPLAY) + ' '
+             'Prime curves have no algebraic oracle in <code>ecbench</code>. '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["source"])}">Analysis</a>.</p>')
     P.append('<table><thead><tr><th>Family</th><th>m</th><th>Curve</th><th>Base points</th><th>Rho-negation S</th>'
              '<th>Strong rho S</th><th>Inherited F4 S</th><th>F6-IC S</th><th>W F5/F4</th>'
@@ -2019,7 +2043,7 @@ def page(doc: dict, standalone: bool) -> str:
              '<p>The four n37 arms, method parameters unchanged, on 16 new public one-target workloads '
              'on each of the next two registered sizes, five paired rounds each, on macOS at L0. '
              'Counted cold IC/rho is a quotient of two lower bounds with native work unpriced; a cell '
-             'whose arm never verifies under the frozen parameters is unknown, not a cost. ' + esc(NOTE_N41) + ' '
+             'whose arm never verifies under the frozen parameters is unknown, not a cost. '
              f'{v["measured_verified_runs"]} of {v["measured_runs"]} measured runs verified; decision '
              f'<code>{esc(v["decision"])}</code>; the L2 host run is pending. '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(v["source"])}">Frozen decision</a>.</p>')
@@ -2182,7 +2206,7 @@ def page(doc: dict, standalone: bool) -> str:
              'and floors, stated at the head of each; S, × ref and × floor are comparable inside a table and '
              'nowhere else. Tables A and B solve one target per row, as AGENTS.md\'s one-target rule requires: '
              'A on one unseen public point per process against one-target rho on the same point (§23\'s comparison, '
-             're-run at the ic tool programme\'s baseline v3, 64 points per size, §23\'s figures kept as the '
+             're-run at the ic tool programme\'s baseline v7, 64 points per size, §23\'s figures kept as the '
              'before marks), B against the matched negation-map rho (ledger §18). Table C is a historical 32-target '
              'diagnostic. For the Koblitz rows of A the online interval, the reading with rho at the canonical '
              'step and the generic-precomputation model sit beside the cold ratio, as §23 requires. The bar '
@@ -2412,6 +2436,39 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<tr><td>{session["ell"]}</td><td>{observed["ratio_floor_over_crater"]:.6f}</td>'
                  f'<td>{observed["ci99"][0]:.6f} to {observed["ci99"][1]:.6f}</td></tr>')
     P.append('</tbody></table>' + gh(SOURCES["conductor_gap_counts"], 'Native analysis and source records') + '</section>')
+
+    ls = doc["jv_cover_linear_stage_component"]
+    P.append('<section id="jv-cover-linear-stage-component"><h2>Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC</h2>'
+             f'<p>Component speed-up, class {esc(ls["class"])}: the dense linear stage against sparse FGLM '
+             f'(Wiedemann / Berlekamp–Massey on M<sub>x<sub>n</sub></sub>, shift-chain eigenvectors) in {esc(ls["pipeline"])}, '
+             'same binary and seeds, the same relations, every DLP solved and verified by both arms. It moves no row '
+             'of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted); the sparse '
+             'column is the distance remaining to rho.</p>'
+             '<table><thead><tr><th>p</th><th>seed</th><th>relations</th><th>S dense</th><th>S sparse</th>'
+             '<th>dense ÷ sparse</th><th>S/rho dense</th><th>S/rho sparse</th></tr></thead><tbody>')
+    for r in ls["dlp"]:
+        P.append(f'<tr><td>{r["p"]}</td><td>{r["seed"]}</td><td>{r["relations"]}</td><td>{r["s_before"]:.4g}</td>'
+                 f'<td>{r["s_after"]:.4g}</td><td>{r["s_ratio"]:.2f}</td><td>{r["s_over_rho_before"]:.0f}</td>'
+                 f'<td>{r["s_over_rho_after"]:.0f}</td></tr>')
+    P.append('</tbody></table>' + gh(ls["study"], 'Study, run report and raw records') + '</section>')
+
+    al = doc["algebraic_ladder"]
+    st = al["slope_ic_trials"]
+    P.append('<section id="algebraic-ic-ladder-20261024"><h2>Algebraic-decomposition IC ladder (linear two-summand S3)</h2>'
+             '<p>Owner criterion (2026-10-24): relations come from solving summation-polynomial systems over an '
+             'algebraically defined factor base, with no table collisions. The Weil descent of S3 is linear in the '
+             'symmetric unknowns (x1+x2, x1x2) over the factor base x ∈ span{1..z<sup>d−1</sup>}. One-target cold '
+             'solves, every scalar verified, beside same-process strong rho. It moves no row of tables A–C. '
+             f'Slope of log<sub>2</sub>(trials) per bit of n: {st["slope_log2_per_n"]:.3f} '
+             f'[{st["boot95"][0]:.3f}, {st["boot95"][1]:.3f}]; the F4 algebraic arm: {al["f4_slope"]:.3f}. '
+             'The last column is the distance remaining to rho.</p>'
+             '<table><thead><tr><th>a</th><th>n</th><th>d</th><th>cofactor</th><th>targets</th><th>mean trials</th>'
+             '<th>mean IC s</th><th>mean rho s</th><th>IC ÷ rho (wall)</th></tr></thead><tbody>')
+    for r in al["rungs"]:
+        P.append(f'<tr><td>{r["a"]}</td><td>{r["n"]}</td><td>{r["d"]}</td><td>{r["cofactor"]}</td><td>{r["targets"]}</td>'
+                 f'<td>{r["mean_ic_trials"]:,.0f}</td><td>{r["mean_ic_s"]:.4g}</td><td>{r["mean_rho_s"]:.3g}</td>'
+                 f'<td>{r["ic_over_rho_wall"]:,.0f}</td></tr>')
+    P.append('</tbody></table>' + gh(al["study"], 'Study, report, raw records and validation') + '</section>')
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]

@@ -18,23 +18,23 @@ This performance handoff is published beside the curve-by-curve tables. The stan
 
 [Latest result data](../../research/ecbench_rho_optimized_20261014/RESULT.json); [prior full synthesis](../../research/ecbench_frontier_20261013/frontier-data.json). The standing strong-rho method, recovered answers, trajectories, charged GAE and every counter are unchanged. Existing operation ratios and bounds therefore stay fixed. Historical wall ratios remain attached to their measured binaries; this L0 study cannot reprice or promote them.
 
-## Table A: Koblitz, one target (§23, re-run at baseline v3)
+## Table A: Koblitz, one target (§23, re-run at baseline v7)
 
-- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, which is 2.3–3.2 times cheaper at baseline v3 than in §23's processes, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v3/README.md).
-- **Reference:** One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v3 at baseline v3). Step-cost caveat (validation sweep, slice A, 2026-10-19; corrected 2026-10-21): this rho costs 9.7–11.8 units a step against a canonical step (one batched addition plus the table canonicalisation, a model) of 4.6–5.4. A lane sweep (32 to 1,024 lanes, n = 47, 53, 61; `research/leaderboard_rigor_20261021/rho_lanes/`) leaves the walk at 8.4–12.5 units a step and the table's × reference unchanged within the run-to-run spread, so the lane count is not the cause and no implemented rho reaches the canonical step; priced at the canonical step the × reference would be 1.7–2.0 times larger (`research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json`, `xref_canonical_step`). Rho also gained 20% in instructions after this table was measured (`research/ecbench_rho_optimized_20261014`).
+- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).
+- **Reference:** One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).
 - **Floor:** √(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed Frobenius and negation, n the extension degree. Stated in steps and not rescaled to units, so × floor here divides units by steps.
 - **Targets:** one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks
 - **Status:** primary comparison: one target, as AGENTS.md's one-target rule requires
-- **Rho step:** rho's walk as built costs 9.72–11.8 units a step; the canonical step costs 4.6–5.39
+- **Rho step:** rho's walk as built costs 9.4–10.6 units a step; the canonical step costs 4.2–4.92
 
 | curve | log₂ r | recipe | S, IC | S, reference | × reference | S, floor | × floor | ok | validation |
 |:--|--:|:--|--:|--:|--:|--:|--:|:--|:--|
-| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 9.51 | 1.82 | **5.23×** (was 4.95×, §23) | 0.129 | 73.5× | ✓ | unvalidated (pre-gate) |
-| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 11 | 1.8 | **6.12×** (was 1.98×, §23) | 0.117 | 93.8× | ✓ | unvalidated (pre-gate) |
-| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 11.2 | 1.46 | **7.66×** (was 8.04×, §23) | 0.138 | 80.7× | ✓ | unvalidated (pre-gate) |
-| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 17 | 1.28 | **13.2×** (was 14.7×, §23) | 0.122 | 139× | ✓ | unvalidated (pre-gate) |
-| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 16.3 | 1.35 | **12×** (was 15.7×, §23) | 0.115 | 141× | ✓ | unvalidated (pre-gate) |
-| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 24.9 | 1.19 | **21×** (was 31.6×, §23) | 0.113 | 220× | ✓ | unvalidated (pre-gate) |
+| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 6.03 | 1.76 | **3.43×** (was 4.95×, §23) | 0.129 | 46.6× | ✓ | validated |
+| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 6.37 | 1.6 | **3.97×** (was 1.98×, §23) | 0.117 | 54.2× | ✓ | validated |
+| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 6.63 | 1.4 | **4.74×** (was 8.04×, §23) | 0.138 | 47.9× | ✓ | validated |
+| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 8.15 | 1.16 | **7.03×** (was 14.7×, §23) | 0.122 | 66.9× | ✓ | validated |
+| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 7.82 | 1.23 | **6.37×** (was 15.7×, §23) | 0.115 | 67.8× | ✓ | validated |
+| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 12.4 | 1.08 | **11.5×** (was 31.6×, §23) | 0.113 | 109× | ✓ | validated |
 
 ## Table B: Prime and random-binary ladder (§18)
 
@@ -63,7 +63,7 @@ This performance handoff is published beside the curve-by-curve tables. The stan
 ## Table C: Koblitz, 32-target batch (§19–§22)
 
 - **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r, per target.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit (§20, §22 isolated re-run).
-- **Reference:** Batch rho on the same 32 targets (signed Frobenius and negation), its counted operations priced at the canonical step, one batched addition plus the table canonicalisation (§20). Collisions shared across the 32 targets are in its cost per target. Source caveat (validation sweep, slice A): the rho S is §20's own measurement (2026-09-26), not measured in the process of the §22 isolated IC figure; the isolated re-run re-priced rho at one size only (n = 41, set M1: counts equal §20's, priced S 0.0600 against 0.0610), and the IC S is the baseline S divided by a wall-time speedup.
+- **Reference:** Batch rho on the same 32 targets (signed Frobenius and negation), its counted operations priced at the canonical step, one batched addition plus the table canonicalisation, in the same process (§20). Collisions shared across the 32 targets are in its cost per target.
 - **Floor:** L(32)·√(π/4n) steps per √r per target, with L(32) = 0.19869: the one-target floor of table A times Kuhn–Struik's batch share. Stated in steps and not rescaled to units, and a smaller object than table A's floor, so × floor in C and in A do not compare.
 - **Targets:** 32 targets solved together, priced per target
 - **Status:** historical diagnostic under AGENTS.md's one-target rule: 32 targets solved together
@@ -106,12 +106,12 @@ Shares are fractions of each row's own `S`, so they carry no unit; read each row
 
 | table | curve | Reusable set-up | Curve and subgroup | Workflow constructions | Factor base | Pair table | Relations (PDP) | Linear algebra | Descent | Verification |
 |:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| A | `icv1-f2m47-t22705043-f4e44623` | 98.5% | — | — | — | — | — | — | 1.4% | 0.0% |
-| A | `icv1-f2m57-tm747311035-c1f545af` | 99.3% | — | — | — | — | — | — | 0.7% | 0.0% |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | 98.9% | — | — | — | — | — | — | 1.1% | 0.0% |
-| A | `icv1-f2m53-tm56619371-dac20a85` | 99.7% | — | — | — | — | — | — | 0.3% | 0.0% |
-| A | `icv1-f2m59-tm943548413-98844ecc` | 99.7% | — | — | — | — | — | — | 0.3% | 0.0% |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.7% | — | — | — | — | — | — | 0.3% | 0.0% |
+| A | `icv1-f2m47-t22705043-f4e44623` | 99.0% | — | — | — | — | — | — | 1.0% | 0.0% |
+| A | `icv1-f2m57-tm747311035-c1f545af` | 99.1% | — | — | — | — | — | — | 0.9% | 0.0% |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | 98.7% | — | — | — | — | — | — | 1.3% | 0.0% |
+| A | `icv1-f2m53-tm56619371-dac20a85` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
+| A | `icv1-f2m59-tm943548413-98844ecc` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
 | B | `icv1-fp10-t5-192cb216` | — | — | — | 5.3% | — | 93.0% | 0.2% | — | 1.5% |
 | B | `icv1-fp12-t19-d4a315df` | — | — | — | 30.2% | — | 68.1% | 0.4% | — | 1.4% |
 | B | `icv1-fp14-tm43-158b6914` | — | — | — | 12.3% | — | 86.5% | 0.1% | — | 1.1% |
@@ -141,12 +141,12 @@ Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC cur
 
 | table | curve | curves.yaml record | factor base (points, recipe) | factor-base source | refs |
 |:--|:--|:--|:--|:--|:--|
-| A | `icv1-f2m47-t22705043-f4e44623` | none | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m57-tm747311035-c1f545af` | none | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | none | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m53-tm56619371-dac20a85` | none | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m59-tm943548413-98844ecc` | none | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | none | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m47-t22705043-f4e44623` | none | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m57-tm747311035-c1f545af` | none | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | none | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m53-tm56619371-dac20a85` | none | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m59-tm943548413-98844ecc` | none | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | none | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
 | B | `icv1-fp10-t5-192cb216` | none | 10, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
 | B | `icv1-fp12-t19-d4a315df` | none | 32, mitm_m2_negfold_walk | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
 | B | `icv1-fp14-tm43-158b6914` | none | 26, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
@@ -172,7 +172,7 @@ Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC cur
 
 ## Bounded n37 diagnostic outside tables A–C
 
-The separately calibrated `icv1-f2m37-tm534059-32aad96b` shared-rank K16 candidate (`IC1N37Ckb0fb1184PDP3mitmfrobeniuscountedRCsampleLAgaussTDpdpISO0h44f5af6dc772`) has 1,184 usable points and 16 folded columns. Across 40 verified one-target runs, its mean cold counted `S` lower bound is 2.111; its counted IC/rho quotient is 5.034 and K16/K42 is 0.349. Native work is unpriced for both arms, and L0 timing cannot establish an online speedup. Validation sweep: `ecbench band` marks every IC pair of this session 'unrankable (uncounted unpriced work)' (field arithmetic, hashing and modular combination are named but not counted), so K16/K42 and IC/rho are quotients of lower bounds that AGENTS.md section 5a does not let anyone rank. This row is intentionally outside the three fully priced unit families; read the [frozen decision](../../research/ecbench_n37_rank_columns_20261004/RESULT.json).
+The separately calibrated `icv1-f2m37-tm534059-32aad96b` shared-rank K16 candidate (`IC1N37Ckb0fb1184PDP3mitmfrobeniuscountedRCsampleLAgaussTDpdpISO0h44f5af6dc772`) has 1,184 usable points and 16 folded columns. Across 40 verified one-target runs, its mean cold counted `S` lower bound is 2.111; its counted IC/rho quotient is 5.034 and K16/K42 is 0.349. Native work is unpriced for both arms, and L0 timing cannot establish an online speedup. This row is intentionally outside the three fully priced unit families; read the [frozen decision](../../research/ecbench_n37_rank_columns_20261004/RESULT.json).
 
 The untouched 16-target K8/K16 confirmation selected `IC1N37Ckb0fb592PDP3mitmfrobeniuscountedRCsampleLAgaussTDpdpISO0h0eb4fc2e0d54` for the cold implementation route: K16/K8 whole-solve Callgrind Ir is 1.190 [1.158, 1.222], and K8/rho is 3.645 [3.235, 4.136]. All 64 profiles and 320 independent measured replays verified. The unit is simulated whole-solve instructions, not isolated online wall time; K16 remains a target-only candidate. Read the [raw instruction decision](../../research/ecbench_n37_k8_k16_20261004/DECISION.json).
 
@@ -192,7 +192,7 @@ The preregistered one-target workload `f6d79f6dd9f2` on `icv1-f2m9-tm5-4a3ea183`
 
 ## F6-IC E_0 ladder in ecbench, outside tables A–C
 
-#1333's inherited-F4 and F6-IC decomposers ran unmodified in `ic.pipeline` beside same-target strong rho on eight public one-target workloads per size. IC `S` is a lower bound: the solver's word XORs are counted but unpriced, and F6-IC's geometric point additions are charged. The F6-IC word-XOR saving vanishes once the base exceeds #1333's 256-point closure cap; charging its geometry makes the trade a relabelling. Validation sweep and replay-all on current main: the inherited-F4 and F6-IC counters of this session do not reproduce (F6-IC ladder 24/72 at m = 13, 19 and 23; cross-family 16/48, 16/32, 24/40, 8/24). A replay on the commit that recorded the ladder reproduces 72/72 on the same host, so the counters changed in code afterwards: good at main 7ab28103d (2026-10-10), failing at 16e74770d (2026-10-11), inside a stretch where main did not compile, so it cannot be narrowed further by building (research/leaderboard_rigor_20261021/bisect/); #1646's word-wise inherited-F4 rewrite is in that window. The recovered scalars verify; read the counter columns as historical, not current-binary evidence. Decision: not decidable: fewer than six targets completed at some size, or fewer than four sizes (m = 31 incomplete). Read the [analysis](../../research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json).
+#1333's inherited-F4 and F6-IC decomposers ran unmodified in `ic.pipeline` beside same-target strong rho on eight public one-target workloads per size. IC `S` is a lower bound: the solver's word XORs are counted but unpriced, and F6-IC's geometric point additions are charged. The F6-IC word-XOR saving vanishes once the base exceeds #1333's 256-point closure cap; charging its geometry makes the trade a relabelling. Decision: not decidable: fewer than six targets completed at some size, or fewer than four sizes (m = 31 incomplete). Read the [analysis](../../research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json).
 
 | m | curve | targets | rho S | F4 S/rho (lower bound) | F6-IC S/rho (lower bound) | median log2(W4/W6) |
 |--:|:--|--:|--:|--:|--:|--:|
@@ -202,7 +202,7 @@ The preregistered one-target workload `f6d79f6dd9f2` on `icv1-f2m9-tm5-4a3ea183`
 
 ## F4, F5 and F6-IC on Koblitz and generic binary curves, outside tables A–C
 
-Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight public one-target workloads per cell, beside same-target rho. IC `S` is a lower bound (solver word XORs unpriced; F6-IC's geometric additions charged). `W` is counted solver word XORs. Prime curves have no algebraic oracle in `ecbench`. Validation sweep and replay-all on current main: the inherited-F4 and F6-IC counters of this session do not reproduce (F6-IC ladder 24/72 at m = 13, 19 and 23; cross-family 16/48, 16/32, 24/40, 8/24). A replay on the commit that recorded the ladder reproduces 72/72 on the same host, so the counters changed in code afterwards: good at main 7ab28103d (2026-10-10), failing at 16e74770d (2026-10-11), inside a stretch where main did not compile, so it cannot be narrowed further by building (research/leaderboard_rigor_20261021/bisect/); #1646's word-wise inherited-F4 rewrite is in that window. The recovered scalars verify; read the counter columns as historical, not current-binary evidence. Read the [analysis](../../research/f4_f5_f6_cross_family_20261011/ANALYSIS.json).
+Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight public one-target workloads per cell, beside same-target rho. IC `S` is a lower bound (solver word XORs unpriced; F6-IC's geometric additions charged). `W` is counted solver word XORs. Prime curves have no algebraic oracle in `ecbench`. Read the [analysis](../../research/f4_f5_f6_cross_family_20261011/ANALYSIS.json).
 
 | family | m | curve | base points | rho-negation S | strong rho S | inherited F4 S | F6-IC S | W F5/F4 | W F4 matrix/inherited | median log2(W inh/W F6) |
 |:--|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|
@@ -213,7 +213,7 @@ Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight publ
 
 ## n41/n53 shared-rank counted panel, outside tables A–C
 
-The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 control, method parameters unchanged) ran on 16 new public one-target workloads on each of the next two registered sizes, five paired rounds each, on macOS at L0. Counted cold IC/rho is a quotient of two lower bounds (native work unpriced); a cell whose arm never verifies under the frozen parameters is unknown, not a cost. Validation sweep: the K16 mean S and the quotient above are means over the runs that finished (23 of 80 at n = 41; 57 exhausted), ic-k8 produced no answer in 80 of 80 and no IC run verified at n = 53, so they are survivor means, not costs; `ecbench band` calls every IC-vs-rho pair 'incomplete'. 206 of 640 measured runs verified; decision `frozen_parameters_do_not_transfer`; the L2 host run is pending. Read the [frozen decision](../../research/ecbench_n41_n53_shared_rank_20261005/DECISION.json).
+The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 control, method parameters unchanged) ran on 16 new public one-target workloads on each of the next two registered sizes, five paired rounds each, on macOS at L0. Counted cold IC/rho is a quotient of two lower bounds (native work unpriced); a cell whose arm never verifies under the frozen parameters is unknown, not a cost. 206 of 640 measured runs verified; decision `frozen_parameters_do_not_transfer`; the L2 host run is pending. Read the [frozen decision](../../research/ecbench_n41_n53_shared_rank_20261005/DECISION.json).
 
 | curve | log2 r | arm | verified / measured | usable points | columns | mean cold S (lower bound) | counted IC/rho [95%] |
 |:--|--:|:--|--:|--:|--:|--:|:--|
@@ -273,6 +273,31 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 | 8209 | 0.975242 | 0.603463 to 1.450934 |
 | 131101 | 1.127134 | 0.922471 to 1.341694 |
 
+## Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC
+
+Component speed-up, class engineering: the dense linear stage against sparse FGLM (Wiedemann / Berlekamp–Massey on M_xn, shift-chain eigenvectors) in examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve), same binary and seeds, the same relations, every DLP solved and verified by both arms (`research/jv_cover_sparse_fglm_20261018`, run-20261018T2138Z). It moves no row of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).
+
+| p | seed | relations | S dense | S sparse | dense ÷ sparse | S/rho dense | S/rho sparse (distance to rho) |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 53 | 1 | 31 | 937.2 | 731.6 | 1.28 | 851 | 664 |
+| 53 | 2 | 33 | 424.5 | 328.8 | 1.29 | 369 | 286 |
+| 101 | 1 | 53 | 287.8 | 224.4 | 1.28 | 194 | 151 |
+| 101 | 2 | 50 | 466.3 | 365.5 | 1.28 | 373 | 293 |
+
+## Algebraic-decomposition IC ladder (linear two-summand S3), outside tables A–C
+
+Owner criterion (2026-10-24): relations come from solving summation-polynomial systems over an algebraically defined factor base, with no table collisions. Factor base x ∈ span{1..z^(d−1)}; the Weil descent of S3 is linear in the symmetric unknowns (x1+x2, x1x2). One-target cold solves, every scalar verified, beside same-process strong rho (`research/ic_m2_linear_ladder_20261024/`). Fitted slope of log2(trials) per bit of n: 0.647 [0.639, 0.655] (wall 0.717); the F4 algebraic arm's solver work grows at 1.079. The IC ÷ rho column is the distance remaining.
+
+| a | n | d | cofactor | targets | mean trials | mean IC s | mean rho s | IC ÷ rho (wall) |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 0 | 13 | 4 | 4 | 8 | 592 | 0.0004041 | 0.000112 | 4 |
+| 1 | 17 | 6 | 2 | 8 | 3,231 | 0.00377 | 0.000259 | 15 |
+| 0 | 19 | 6 | 4 | 8 | 11,477 | 0.00819 | 0.00017 | 48 |
+| 1 | 19 | 6 | 2 | 8 | 12,077 | 0.007837 | 0.000183 | 43 |
+| 0 | 23 | 8 | 4 | 8 | 41,856 | 0.0461 | 0.000273 | 169 |
+| 1 | 23 | 8 | 2 | 8 | 48,821 | 0.07077 | 0.000359 | 197 |
+| 0 | 41 | 14 | 4 | 4 | 181,803,464 | 478.4 | 0.0131 | 36,440 |
+
 ## N83 Tier 1 one-target cold factor-base holdout
 
 Five sealed public points, one fresh process per IC arm, and a same-point rho solve per point completed on one GitHub-hosted cloud instance. Each of the 25 IC arms and five rho arms passed independent replay. K1152 ran twice per point as the local A/A control. The selected candidate is `null`; the frozen decision is `BOUNDED_UNKNOWN`.
@@ -298,7 +323,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
 - `research/ic_single_target_20260930/analysis.json` — sha256 `109326d7c2882b71…`
-- `research/ic_tool_program/rule/v3/analysis.json` — sha256 `86a6e9163ebb6da7…`
+- `research/ic_tool_program/rule/v7/analysis.json` — sha256 `af81dd9ab2879632…`
 - `docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json` — sha256 `2271c4aa5236e2bd…`
 - `research/ecbench_n37_rank_columns_20261004/RESULT.json` — sha256 `f7b950edc74978cb…`
 - `research/ecbench_n37_k8_k16_20261004/DECISION.json` — sha256 `c4a33ffd9045a479…`
@@ -314,12 +339,14 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
+- `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
+- `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
-- `docs/curves/registry.json` — sha256 `584d070fbec7e21f…`
+- `docs/curves/registry.json` — sha256 `595b71600e1f471a…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`

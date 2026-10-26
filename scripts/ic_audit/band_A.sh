@@ -11,7 +11,7 @@
 # even with the IC side at a lower bound and rho's other uncharged natives (partition hashes) left out; it is not a
 # gate artifact, because the IC counts are not exact.  Needs jq.  Run from the repository root.
 set -euo pipefail
-base=research/ic_tool_program/rule/v3/runs
+base=research/ic_tool_program/rule/v7/runs
 for d in $base/k*n*; do
   jq -s '
     def med: sort | if length % 2 == 1 then .[length / 2 | floor] else (.[length / 2 - 1] + .[length / 2]) / 2 end;

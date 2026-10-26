@@ -41,6 +41,7 @@ Each run prints **one JSON object** on stdout.
 | `modpoly --method cm --ell L --modulus M` | Φ_ℓ modulo any positive integer, including composites and 1 |
 | `modpoly --method cm --ell L --integer` | Signed integer coefficients by CM volcano walks and explicit CRT |
 | `modpoly --method cm --ell L --p P [--j J]` | CM method with the usual prime-field output or evaluation/root extraction |
+| `small-char --field gf2\|gf3\|fp …` | the ℓ-isogeny from a curve over GF(2ⁿ) (`--n`), GF(3ⁿ) (`--n`) or a small prime field (`--p`) to a curve of j-invariant `--jt`, where the large-characteristic methods divide by p: Couveignes' 2-torsion algorithm (`--method couveignes`, default in GF(2ⁿ)) or the p-adic lift (`--method lift`, needs j̃ to be a simple root of Φ_ℓ(j, Y) mod p). The curve is `--coeffs a1,a2,a3,a4,a6`, elements as integers: bit patterns in GF(2ⁿ) (default basis, a1 = 1, a3 = 0), packed base 3 in GF(3ⁿ) |
 | `version` | `{"schema", "tool": {"name", "version"}}`, to pin the version a pipeline ran |
 
 Curves are given as `--p P --a A --b B` (decimal; `a`, `b` may be negative) or by name with
@@ -63,6 +64,9 @@ $B modpoly --ell 5 --p 10007 --j 1234
 $B modpoly --ell 3 --integer
 $B modpoly --method cm --ell 5 --modulus 1000
 $B modpoly --method cm --ell 3 --integer
+$B small-char --field gf2 --n 11 --coeffs 1,1,0,0,2 --jt 1796 --ell 13
+$B small-char --field gf3 --n 5 --coeffs 0,1,0,0,6 --jt 97 --ell 7
+$B small-char --field fp --p 43 --coeffs 0,0,0,1,2 --jt 12 --ell 13
 ```
 
 ### The record
@@ -311,9 +315,13 @@ published order, use `--order`.
 
 ## Limits
 
-- Prime fields with p > 3 only. GF(2ⁿ), GF(3ⁿ) and extension-field curves are in the library
-  (`binary`, `gf3n`, `fpr`) but not in the command line; nor are theta (2,2)-isogenies, radical
-  isogenies, Deuring correspondence, Delfs–Galbraith and endomorphism rings.
+- Prime fields with p > 3, except `small-char` (GF(2ⁿ), GF(3ⁿ), small F_p). Other GF(2ⁿ), GF(3ⁿ)
+  and extension-field operations are in the library (`binary`, `gf3n`, `fpr`) but not in the
+  command line; nor are theta (2,2)-isogenies, radical isogenies, Deuring correspondence,
+  Delfs–Galbraith and endomorphism rings.
+- `small-char --method lift` reaches ℓ ≤ 31 in characteristic 2 and 3 (2-adic and 3-adic
+  precision capped at 126 bits); in GF(2ⁿ) the default Couveignes method has no such limit
+  (ℓ = 127 in 5 s over GF(2¹⁰)).
 - `chain` needs ℓⁿ < 2⁶³; `richelot` p < 2⁶²; `klpt` p ≡ 3 mod 4.
 - p ≤ 512 bits. SEA needs j ∉ {0, 1728}; those curves are counted by CM.
 - `isogenies` for j = 0 or 1728, or for p ≤ ℓ + 1, uses division polynomials and is limited to

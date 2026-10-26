@@ -40,8 +40,15 @@ tools/lean/proof-gate.sh --out receipts          # keep build and audit logs
 `Trusted.lean` is a listed `native_decide`), and `selftest/fail/` must fail
 (a transitive `sorry`, a user axiom, an unlisted `native_decide`, a file with
 no theorems, a build error). CI runs it on every trigger, so the gate stays
-exercised even in a repository with no Lean proofs yet. `LEAN_GATE_TRUSTED`
+exercised even in a repository with no Lean proofs yet. The CI matrix covers
+the repository's pinned toolchain and Lean 4.19, used by the SEA project.
+`LEAN_GATE_TRUSTED`
 points the gate at another trust manifest. The self-test uses its own one.
+
+The audit invocation separates compiler options from program arguments with
+`--`; the auditor accepts both toolchain conventions for forwarding that
+separator. Cache-download failures retain `cache.log` and an `INFRA_cache`
+status under `--out`, while still exiting with infrastructure status 3.
 
 ## What passing does not mean
 

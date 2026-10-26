@@ -158,5 +158,5 @@ board row that depends on them stays out of the validated standing; the sweep ve
 | table | replay | validator | rho reference with the 5a band | standing |
 |:--|:--|:--|:--|:--|
 | B | native re-execution of the ladder, 13 of 13 instances identical | recompute from per-run gae | negation map, band computed for 13 instances | validated: `docs/ic/runs/VALIDATION.json` |
-| A | native replay of sampled runs identical | recompute from the 64 R1 files | **band not available**: the unit is wall-clock and the price files record no per-operation counts for the IC arm | pre-gate, until a counted band exists |
-| C | native replay of sampled runs identical | recompute from the pair files | **band not available**, and the reference is S20's, not measured with the IC figure | pre-gate, until both exist |
+| A | independent replay of the 64 R1 runs per size (rule v7) | recompute from the 64 R1 files (`recompute_A.sh`; a retry file replaces the contended attempt it retried) | validated by main under rule v7: `research/ic_tool_program/rule/v7/VALIDATION.json`; the derived lower-bound band of `band_A.sh` is a cross-check, not gate evidence | validated |
+| C | native replay of sampled runs identical | recompute from the pair files | **band not available**, and the reference is S20's, not measured with the IC figure | pre-gate, until both exist (it fails the gate on main) |
