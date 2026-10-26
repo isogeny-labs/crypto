@@ -4394,6 +4394,7 @@ pub enum ColumnFold {
 /// A materialised factor base with its column map.  Both `P` and `−P`
 /// are entries, so an oracle can name a signed point by index and a
 /// relation row is a sum of `coef_of` over the summands.
+#[derive(Clone)]
 pub struct FactorBase<E> {
     pub points: Vec<E>,
     pub neg_index: Vec<usize>,
@@ -4663,6 +4664,384 @@ pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> Fact
     fb.cost.count("abscissae_scanned", (1u64 << l) - 1);
     fb.cost.count("as_solves", solves);
     fb
+}
+
+// ── LEAD-19: cofactor-projected and subgroup-only bases ────────────
+
+/// Which factor bases the two-summand walk rows run on
+/// (`research/pdp_literature_leads_20261022/leads/LEAD-19.md` §6).  The
+/// random-binary rows build their base from raw points of `E(F_{2^n})`,
+/// and with a cofactor `h` only the table entries whose cofactor classes
+/// cancel can ever match a subgroup target.  `Raw` is every row the
+/// ledger has today; the other two are the arms of that lead.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum BaseArm {
+    /// The base as the scan produced it.
+    Raw,
+    /// Every base point multiplied by the cofactor, one column per
+    /// distinct projected abscissa: the same `|F|`, every point and every
+    /// table entry inside the prime-order subgroup (arm B).
+    Projected,
+    /// Only points of the prime-order subgroup, scanned from a larger
+    /// window down to the raw base's abscissa count (arm C).
+    Subgroup,
+}
+
+impl BaseArm {
+    pub fn parse(s: &str) -> Result<Self, String> {
+        match s.trim() {
+            "raw" => Ok(Self::Raw),
+            "projected" => Ok(Self::Projected),
+            "subgroup" => Ok(Self::Subgroup),
+            other => Err(format!(
+                "unknown base arm `{other}` (expected raw, projected or subgroup)"
+            )),
+        }
+    }
+
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Raw => "raw",
+            Self::Projected => "projected",
+            Self::Subgroup => "subgroup",
+        }
+    }
+}
+
+/// `raw` alone: the configuration serialises exactly as it did before
+/// the arms existed.
+fn base_arms_are_default(arms: &[BaseArm]) -> bool {
+    arms == [BaseArm::Raw]
+}
+
+/// **The cofactor-projected base** (LEAD-19, arm B).  One point `P`
+/// above each abscissa of `fb` is replaced by `Q = [h]P` and `−Q`.
+/// `[h]` kills `E[h]` and is an automorphism of the prime-order
+/// subgroup, so every projected point lies in the subgroup whatever
+/// class `P` had, and every entry of a pair table built on the
+/// projected base is a sum a subgroup target can hit.  One column per
+/// distinct projected abscissa; a projection that lands on the identity
+/// or on an abscissa already taken is dropped and counted.  The scan of
+/// the raw base is still paid (its cost is inherited) and the `[h]P`
+/// multiplications are charged to the base phase on top of it.  `h = 1`
+/// is the identity: the base comes back unchanged at no cost.
+pub fn project_factor_base<G: CountedGroup>(
+    g: &G,
+    fb: &FactorBase<G::Elt>,
+    h: u64,
+    r: u64,
+    abscissa_of: impl Fn(&G::Elt) -> u64,
+) -> FactorBase<G::Elt> {
+    if h <= 1 {
+        return fb.clone();
+    }
+    let start = Instant::now();
+    let mut ops = GroupOps::default();
+    let mut points = Vec::with_capacity(fb.points.len());
+    let mut col_of = Vec::with_capacity(fb.points.len());
+    let mut coef_of = Vec::with_capacity(fb.points.len());
+    let mut taken: FastMap<()> = fast_map(fb.abscissae);
+    let mut columns = 0usize;
+    let (mut identity_drops, mut collisions) = (0u64, 0u64);
+    for x in &fb.abscissa_list {
+        let i = fb.x_index.get(x).expect("every listed abscissa is indexed")[0];
+        let q = g.mul(&mut ops, fb.points[i], h);
+        if g.is_identity(&q) {
+            identity_drops += 1;
+            continue;
+        }
+        if taken.insert(abscissa_of(&q), ()).is_some() {
+            collisions += 1;
+            continue;
+        }
+        let nq = g.neg(q);
+        points.push(q);
+        col_of.push(columns);
+        coef_of.push(1);
+        if g.key(&nq) != g.key(&q) {
+            points.push(nq);
+            col_of.push(columns);
+            coef_of.push(r - 1);
+        }
+        columns += 1;
+    }
+    let mut out = FactorBase::from_column_map(
+        format!("{}, projected by [{h}]", fb.description),
+        points,
+        col_of,
+        coef_of,
+        columns,
+        |p| g.key(p),
+        |p| g.key(&g.neg(*p)),
+        |p| abscissa_of(p),
+    )
+    .expect("a projected base is closed under negation with distinct keys");
+    out.cost = fb.cost.clone();
+    out.cost.group_ops.merge(ops);
+    out.cost.wall_ns += start.elapsed().as_nanos() as u64;
+    out.cost.count("projection_scalar_mults", ops.scalar_mults);
+    out.cost.count("projection_doubles", ops.doubles);
+    out.cost.count("projection_adds", ops.adds);
+    out.cost.count("projection_identity_drops", identity_drops);
+    out.cost.count("projection_abscissa_collisions", collisions);
+    out
+}
+
+/// **The subgroup-only base** (LEAD-19, arm C), binary regime.  The
+/// abscissae of the field are scanned in the subspace scan's own order
+/// (the index is the element: `1, z, z + 1, z², …`), a point is kept
+/// only when it lies in the prime-order subgroup, and the scan stops at
+/// the raw base's abscissa count.  Membership is the trace test
+/// `Tr(x) = Tr(a)` when the cofactor is 2 (Kosters–Yeo, *Notes on
+/// summation polynomials*, Prop. 4.2: the kernel of `P ↦ Tr(x(P) + a)`
+/// is `2E`, which for `h = 2` is the subgroup), one masked parity
+/// counted as a native operation and priced nowhere; otherwise
+/// `[r]P = O`, charged as the scalar multiplication it is.  The window
+/// the scan ended in is recorded as a counter; the base is not a
+/// subspace.  `h = 1` returns the raw base unchanged.
+pub fn binary_subgroup_factor_base(
+    inst: &BinaryInstance,
+    raw: &FactorBase<FastPoint>,
+) -> FactorBase<FastPoint> {
+    let h = inst.cofactor;
+    if h <= 1 {
+        return raw.clone();
+    }
+    let start = Instant::now();
+    let g = BinaryGroup(&inst.fast);
+    let want = raw.abscissae;
+    let trace_test = h == 2;
+    let a_tr = inst.artin_schreier.trace(inst.a);
+    let mut fb = FactorBase::empty(String::new());
+    let mut ops = GroupOps::default();
+    let (mut scanned, mut lifted, mut rejected, mut tests) = (0u64, 0u64, 0u64, 0u64);
+    let mut last = 0u64;
+    let limit = 1u64 << inst.n;
+    let mut x = 1u64;
+    while fb.abscissae < want && x < limit {
+        scanned += 1;
+        let pts = inst.points_with_x(x);
+        if !pts.is_empty() {
+            lifted += 1;
+            tests += 1;
+            let member = if trace_test {
+                inst.artin_schreier.trace(x) == a_tr
+            } else {
+                g.is_identity(&g.mul(&mut ops, pts[0], inst.r))
+            };
+            if member {
+                let col = fb.abscissae;
+                let i = fb.points.len();
+                let mut idxs = Vec::new();
+                for (k, &p) in pts.iter().enumerate() {
+                    fb.points.push(p);
+                    fb.col_of.push(col);
+                    fb.coef_of.push(if k == 0 { 1 } else { inst.r - 1 });
+                    idxs.push(i + k);
+                }
+                if pts.len() == 2 {
+                    fb.neg_index.push(i + 1);
+                    fb.neg_index.push(i);
+                } else {
+                    fb.neg_index.push(i);
+                }
+                fb.x_index.insert(x, idxs);
+                fb.abscissae += 1;
+                last = x;
+            } else {
+                rejected += 1;
+            }
+        }
+        x += 1;
+    }
+    let window = 64 - last.leading_zeros();
+    fb.columns = fb.abscissae;
+    fb.description = format!(
+        "subgroup-only, {} abscissae from a window of dimension {window} ({})",
+        fb.abscissae,
+        if trace_test {
+            "trace test"
+        } else {
+            "[r]P test"
+        }
+    );
+    for (i, p) in fb.points.iter().enumerate() {
+        fb.point_index.insert(p.pack(), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+    fb.cost.group_ops.merge(ops);
+    fb.cost.count("abscissae_scanned", scanned);
+    fb.cost.count("as_solves", scanned);
+    fb.cost.count("subgroup_candidates_lifted", lifted);
+    fb.cost.count("subgroup_candidates_rejected", rejected);
+    fb.cost.count(
+        if trace_test {
+            "subgroup_trace_tests"
+        } else {
+            "subgroup_order_tests"
+        },
+        tests,
+    );
+    fb.cost
+        .count("subgroup_window_dimension", u64::from(window));
+    fb
+}
+
+/// The prime-field counterpart of [`binary_subgroup_factor_base`]: the
+/// smallest abscissae whose points lie in the prime-order subgroup
+/// (`[r]P = O`, charged), as many as the raw base has.  `h = 1` returns
+/// the raw base unchanged, which is what makes a prime-order row the
+/// negative control of the lead.
+pub fn prime_subgroup_factor_base(
+    inst: &PrimeInstance,
+    raw: &FactorBase<PrimePoint>,
+) -> FactorBase<PrimePoint> {
+    let h = inst.cofactor;
+    if h <= 1 {
+        return raw.clone();
+    }
+    let start = Instant::now();
+    let curve = &inst.curve;
+    let want = raw.abscissae;
+    let mut fb = FactorBase::empty(String::new());
+    let mut ops = GroupOps::default();
+    let (mut scanned, mut sqrts, mut lifted, mut rejected) = (0u64, 0u64, 0u64, 0u64);
+    let mut x = 1u64;
+    while fb.abscissae < want && x < curve.p {
+        scanned += 1;
+        let rhs = curve.rhs(x);
+        if curve.legendre(rhs) >= 0 {
+            sqrts += 1;
+            if let Some(y) = curve.sqrt(rhs) {
+                let y = if y == 0 { 0 } else { y.min(curve.p - y) };
+                let p = PrimePoint::affine(x, y);
+                lifted += 1;
+                if curve.is_identity(&curve.mul(&mut ops, p, inst.r)) {
+                    let q = curve.neg(p);
+                    let col = fb.abscissae;
+                    let i = fb.points.len();
+                    fb.points.push(p);
+                    fb.col_of.push(col);
+                    fb.coef_of.push(1);
+                    if q != p {
+                        fb.points.push(q);
+                        fb.col_of.push(col);
+                        fb.coef_of.push(inst.r - 1);
+                        fb.neg_index.push(i + 1);
+                        fb.neg_index.push(i);
+                        fb.x_index.insert(x, vec![i, i + 1]);
+                    } else {
+                        fb.neg_index.push(i);
+                        fb.x_index.insert(x, vec![i]);
+                    }
+                    fb.abscissae += 1;
+                } else {
+                    rejected += 1;
+                }
+            }
+        }
+        x += 1;
+    }
+    fb.columns = fb.abscissae;
+    fb.description = format!(
+        "subgroup-only, smallest {} abscissae with [r]P = O",
+        fb.abscissae
+    );
+    for (i, p) in fb.points.iter().enumerate() {
+        fb.point_index.insert(curve.key(p), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+    fb.cost.group_ops.merge(ops);
+    fb.cost.count("abscissae_scanned", scanned);
+    fb.cost.count("legendre_symbols", scanned);
+    fb.cost.count("sqrt_solves", sqrts);
+    fb.cost.count("subgroup_candidates_lifted", lifted);
+    fb.cost.count("subgroup_candidates_rejected", rejected);
+    fb.cost.count("subgroup_order_tests", lifted);
+    fb
+}
+
+/// **The cofactor-class census of a negation-folded table's
+/// enumeration** (LEAD-19, prediction P1): the classes `[r]P` of the
+/// base points and, over the pairs [`PairTable::build_negation_folded`]
+/// enumerates (the first point above each abscissa with itself and with
+/// every signed point above a later abscissa, the identity sum
+/// `P + (−P)` left out as the build leaves it out: `a²` pairs for `a`
+/// abscissae), how many have class sum zero, which are exactly the
+/// entries a subgroup target can hit.  A diagnostic: nothing here is
+/// charged to any phase.
+pub fn folded_table_class_census<G: CountedGroup>(
+    g: &G,
+    fb: &FactorBase<G::Elt>,
+    r: u64,
+) -> serde_json::Value {
+    let mut ops = GroupOps::default();
+    let classes: Vec<G::Elt> = fb.points.iter().map(|&p| g.mul(&mut ops, p, r)).collect();
+    let mut sizes: BTreeMap<u64, u64> = BTreeMap::new();
+    for c in &classes {
+        *sizes.entry(g.key(c)).or_insert(0) += 1;
+    }
+    let in_subgroup = classes.iter().filter(|c| g.is_identity(c)).count();
+    let groups: Vec<&Vec<usize>> = fb
+        .abscissa_list
+        .iter()
+        .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+        .collect();
+    let (mut pairs, mut zero) = (0u64, 0u64);
+    for (ai, first) in groups.iter().enumerate() {
+        let i = first[0];
+        for group in groups.iter().skip(ai) {
+            for &j in group.iter() {
+                if fb.neg_index[i] == j {
+                    // `P + (−P)`: the table build skips the identity.
+                    continue;
+                }
+                pairs += 1;
+                if g.is_identity(&g.add(&mut ops, classes[i], classes[j])) {
+                    zero += 1;
+                }
+            }
+        }
+    }
+    let mut class_sizes: Vec<u64> = sizes.values().copied().collect();
+    class_sizes.sort_unstable_by(|a, b| b.cmp(a));
+    serde_json::json!({
+        "classes": sizes.len(),
+        "class_sizes": class_sizes,
+        "signed_points": fb.points.len(),
+        "signed_points_in_subgroup": in_subgroup,
+        "folded_pairs": pairs,
+        "folded_pairs_class_zero": zero,
+        "folded_pairs_class_zero_fraction": if pairs > 0 { zero as f64 / pairs as f64 } else { 1.0 },
+    })
+}
+
+/// The record of a LEAD-19 arm's base in the instance's `curve` block.
+fn describe_arm_base<E>(
+    f: &FactorBase<E>,
+    t: &PairTable,
+    exact: ExactCeiling,
+    space: f64,
+    census: serde_json::Value,
+) -> serde_json::Value {
+    serde_json::json!({
+        "description": f.description,
+        "signed_points": f.points.len(),
+        "abscissae": f.abscissae,
+        "columns": f.columns,
+        "negation_folded_table_entries": t.entries,
+        "cofactor_classes": exact.map(|e| e.0),
+        "ceiling_uniform_m2": decomposition_probability_ceiling(f.points.len() as u64, 2, space),
+        "ceiling_exact_m2": exact.map(|e| e.1),
+        "base_group_ops": f.cost.group_ops,
+        "base_native": f.cost.native,
+        "class_census": census,
+    })
 }
 
 /// A base from the repository's Frobenius-invariant constructor, with
@@ -7017,6 +7396,14 @@ pub struct BoundaryConfig {
     /// lazy.  Nothing else about the walk changes with it, which is what
     /// makes the two arms comparable row by row.
     pub eager_restart_pool: bool,
+    /// Which factor bases the two-summand walk rows run on (LEAD-19):
+    /// `raw` is every row as it is; `projected` and `subgroup` add the
+    /// rows `…_walk_projected[_balanced]` and `…_walk_subgroup[_balanced]`
+    /// beside each raw two-summand walk row, and the class census of the
+    /// raw bases.  Left out of the record when it is `raw` alone, so the
+    /// default run's record is what it was.
+    #[serde(skip_serializing_if = "base_arms_are_default")]
+    pub base_arms: Vec<BaseArm>,
 }
 
 impl Default for BoundaryConfig {
@@ -7041,6 +7428,7 @@ impl Default for BoundaryConfig {
             m2_floor_divisor: 4,
             unguarded_targets: false,
             eager_restart_pool: false,
+            base_arms: vec![BaseArm::Raw],
         }
     }
 }
@@ -7199,6 +7587,34 @@ pub fn run_prime_instance(inst: &PrimeInstance, cfg: &BoundaryConfig) -> RegimeI
     let exact_bal_m2 = fb_bal
         .as_ref()
         .and_then(|f| exact_decomposition_ceiling(curve, &f.points, r, 2));
+    // LEAD-19 arms B and C on the prime ladder: on a prime-order curve
+    // (`h = 1`) both are the identity, which is what makes those rows
+    // the lead's negative control.
+    let h = inst.cofactor;
+    let want_projected = cfg.base_arms.contains(&BaseArm::Projected);
+    let want_subgroup = cfg.base_arms.contains(&BaseArm::Subgroup);
+    let extra_arms = want_projected || want_subgroup;
+    let fb_proj = want_projected.then(|| project_factor_base(curve, &fb, h, r, |p| p.x));
+    let fb_proj_bal = fb_bal
+        .as_ref()
+        .filter(|_| want_projected)
+        .map(|f| project_factor_base(curve, f, h, r, |p| p.x));
+    let fb_sub = want_subgroup.then(|| prime_subgroup_factor_base(inst, &fb));
+    let fb_sub_bal = fb_bal
+        .as_ref()
+        .filter(|_| want_subgroup)
+        .map(|f| prime_subgroup_factor_base(inst, f));
+    let folded = |f: &FactorBase<PrimePoint>| PairTable::build_negation_folded(curve, f);
+    let exact_of_base =
+        |f: &FactorBase<PrimePoint>| exact_decomposition_ceiling(curve, &f.points, r, 2);
+    let table_proj = fb_proj.as_ref().map(folded);
+    let table_proj_bal = fb_proj_bal.as_ref().map(folded);
+    let table_sub = fb_sub.as_ref().map(folded);
+    let table_sub_bal = fb_sub_bal.as_ref().map(folded);
+    let exact_proj_m2 = fb_proj.as_ref().and_then(exact_of_base);
+    let exact_proj_bal_m2 = fb_proj_bal.as_ref().and_then(exact_of_base);
+    let exact_sub_m2 = fb_sub.as_ref().and_then(exact_of_base);
+    let exact_sub_bal_m2 = fb_sub_bal.as_ref().and_then(exact_of_base);
 
     let floor_s = generic_floor_s(2.0);
     // The unit's conversion ratios come from the repository, not from
@@ -7263,6 +7679,39 @@ pub fn run_prime_instance(inst: &PrimeInstance, cfg: &BoundaryConfig) -> RegimeI
     }
 
     let space = inst.group_order as f64;
+    if extra_arms {
+        out.curve["factor_base"]["class_census"] = folded_table_class_census(curve, &fb, r);
+        if let Some(f) = &fb_bal {
+            out.curve["factor_base_balanced"]["class_census"] =
+                folded_table_class_census(curve, f, r);
+        }
+        for (key, base, table, exact) in [
+            (
+                "factor_base_projected",
+                &fb_proj,
+                &table_proj,
+                exact_proj_m2,
+            ),
+            (
+                "factor_base_projected_balanced",
+                &fb_proj_bal,
+                &table_proj_bal,
+                exact_proj_bal_m2,
+            ),
+            ("factor_base_subgroup", &fb_sub, &table_sub, exact_sub_m2),
+            (
+                "factor_base_subgroup_balanced",
+                &fb_sub_bal,
+                &table_sub_bal,
+                exact_sub_bal_m2,
+            ),
+        ] {
+            if let (Some(f), Some(t)) = (base, table) {
+                out.curve[key] =
+                    describe_arm_base(f, t, exact, space, folded_table_class_census(curve, f, r));
+            }
+        }
+    }
     for rep in 0..cfg.repeats {
         let seed = cfg.seed.wrapping_add(rep as u64 * 0x9E37);
         let d = rng.gen_range(1..r);
@@ -7300,9 +7749,30 @@ pub fn run_prime_instance(inst: &PrimeInstance, cfg: &BoundaryConfig) -> RegimeI
 
         let random = cfg.random_source();
         let walk = cfg.walk_source();
-        let variants: Vec<(&str, Oracle, TargetSource)> = vec![
-            ("semaev_s3_roots_m2", Oracle::SemaevS3Roots, random),
-            ("direct_subtraction_m2", Oracle::Subtract, random),
+        // Every row names its base and its exact ceiling itself (the
+        // LEAD-19 rows share the loop without a suffix rule).
+        type Row<'a> = (
+            &'static str,
+            Oracle<'a>,
+            TargetSource,
+            &'a FactorBase<PrimePoint>,
+            ExactCeiling,
+        );
+        let variants: Vec<Row> = vec![
+            (
+                "semaev_s3_roots_m2",
+                Oracle::SemaevS3Roots,
+                random,
+                &fb,
+                exact_m2,
+            ),
+            (
+                "direct_subtraction_m2",
+                Oracle::Subtract,
+                random,
+                &fb,
+                exact_m2,
+            ),
             (
                 "mitm_m2",
                 Oracle::Mitm {
@@ -7310,6 +7780,8 @@ pub fn run_prime_instance(inst: &PrimeInstance, cfg: &BoundaryConfig) -> RegimeI
                     m: 2,
                 },
                 random,
+                &fb,
+                exact_m2,
             ),
             (
                 "mitm_m3",
@@ -7318,6 +7790,8 @@ pub fn run_prime_instance(inst: &PrimeInstance, cfg: &BoundaryConfig) -> RegimeI
                     m: 3,
                 },
                 random,
+                &fb,
+                exact_m3,
             ),
             // Round 2: the negation-folded table, then walk targets on it.
             (
@@ -7327,6 +7801,8 @@ pub fn run_prime_instance(inst: &PrimeInstance, cfg: &BoundaryConfig) -> RegimeI
                     m: 2,
                 },
                 random,
+                &fb,
+                exact_m2,
             ),
             (
                 "mitm_m2_negfold_walk",
@@ -7335,6 +7811,8 @@ pub fn run_prime_instance(inst: &PrimeInstance, cfg: &BoundaryConfig) -> RegimeI
                     m: 2,
                 },
                 walk,
+                &fb,
+                exact_m2,
             ),
             (
                 "mitm_m3_negfold",
@@ -7343,6 +7821,8 @@ pub fn run_prime_instance(inst: &PrimeInstance, cfg: &BoundaryConfig) -> RegimeI
                     m: 3,
                 },
                 random,
+                &fb,
+                exact_m3,
             ),
             (
                 "mitm_m3_negfold_walk",
@@ -7351,26 +7831,61 @@ pub fn run_prime_instance(inst: &PrimeInstance, cfg: &BoundaryConfig) -> RegimeI
                     m: 3,
                 },
                 walk,
+                &fb,
+                exact_m3,
             ),
         ];
         let mut variants = variants;
-        if let Some(t) = &table_bal {
+        if let (Some(f), Some(t)) = (&fb_bal, &table_bal) {
             variants.push((
                 "mitm_m2_negfold_walk_balanced",
                 Oracle::Mitm { table: t, m: 2 },
                 walk,
+                f,
+                exact_bal_m2,
             ));
         }
-        for (name, oracle, targets) in variants {
-            let fb = match name.ends_with("_balanced") {
-                true => fb_bal.as_ref().unwrap_or(&fb),
-                false => &fb,
-            };
-            let exact_m2 = if name.ends_with("_balanced") {
-                exact_bal_m2
-            } else {
-                exact_m2
-            };
+        // LEAD-19: the two-summand walk row on the projected (B) and the
+        // subgroup-only (C) base, beside each raw rung.
+        if let (Some(f), Some(t)) = (&fb_proj, &table_proj) {
+            variants.push((
+                "mitm_m2_negfold_walk_projected",
+                Oracle::Mitm { table: t, m: 2 },
+                walk,
+                f,
+                exact_proj_m2,
+            ));
+        }
+        if let (Some(f), Some(t)) = (&fb_sub, &table_sub) {
+            variants.push((
+                "mitm_m2_negfold_walk_subgroup",
+                Oracle::Mitm { table: t, m: 2 },
+                walk,
+                f,
+                exact_sub_m2,
+            ));
+        }
+        if table_bal.is_some() {
+            if let (Some(f), Some(t)) = (&fb_proj_bal, &table_proj_bal) {
+                variants.push((
+                    "mitm_m2_negfold_walk_projected_balanced",
+                    Oracle::Mitm { table: t, m: 2 },
+                    walk,
+                    f,
+                    exact_proj_bal_m2,
+                ));
+            }
+            if let (Some(f), Some(t)) = (&fb_sub_bal, &table_sub_bal) {
+                variants.push((
+                    "mitm_m2_negfold_walk_subgroup_balanced",
+                    Oracle::Mitm { table: t, m: 2 },
+                    walk,
+                    f,
+                    exact_sub_bal_m2,
+                ));
+            }
+        }
+        for (name, oracle, targets, fb, exact) in variants {
             let budget = trial_budget(cfg, fb, oracle.summands(), space);
             let outcome = collect_and_solve(
                 curve,
@@ -7385,11 +7900,6 @@ pub fn run_prime_instance(inst: &PrimeInstance, cfg: &BoundaryConfig) -> RegimeI
                 cfg.restart_pool(),
                 |ops, ctr, point| decompose_prime(curve, fb, &oracle, ops, ctr, point),
             );
-            let exact = if oracle.summands() == 2 {
-                exact_m2
-            } else {
-                exact_m3
-            };
             let mut v = assemble_variant(
                 name,
                 oracle.name(),
@@ -7786,6 +8296,23 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
     let fb_bal = (l_bal != l).then(|| {
         binary_subspace_factor_base(inst, &(0..l_bal).map(|i| 1u64 << i).collect::<Vec<u64>>())
     });
+    // LEAD-19 arms B and C, built from the raw bases before the class
+    // test below is charged, so a projected row carries the scan it
+    // started from and none of the admissibility test it does not need.
+    let h = inst.cofactor;
+    let want_projected = cfg.base_arms.contains(&BaseArm::Projected);
+    let want_subgroup = cfg.base_arms.contains(&BaseArm::Subgroup);
+    let extra_arms = want_projected || want_subgroup;
+    let fb_proj = want_projected.then(|| project_factor_base(&g, &fb, h, r, |p| p.x));
+    let fb_proj_bal = fb_bal
+        .as_ref()
+        .filter(|_| want_projected)
+        .map(|f| project_factor_base(&g, f, h, r, |p| p.x));
+    let fb_sub = want_subgroup.then(|| binary_subgroup_factor_base(inst, &fb));
+    let fb_sub_bal = fb_bal
+        .as_ref()
+        .filter(|_| want_subgroup)
+        .map(|f| binary_subgroup_factor_base(inst, f));
     let mut class_ops = GroupOps::default();
     let admissible: Vec<u32> = [3u32, 2]
         .into_iter()
@@ -7794,6 +8321,12 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
     fb.cost.group_ops.merge(class_ops);
     fb.cost
         .count("admissibility_scalar_mults", class_ops.scalar_mults);
+    if extra_arms {
+        // The additions and doublings behind those multiplications, so
+        // the raw row without its class test (the lead's A′) is exact.
+        fb.cost.count("admissibility_adds", class_ops.adds);
+        fb.cost.count("admissibility_doubles", class_ops.doubles);
+    }
     let table = PairTable::build(&g, &fb);
     let table_neg = PairTable::build_negation_folded(&g, &fb);
     let table_bal = fb_bal
@@ -7802,6 +8335,17 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
     let exact_bal_m2 = fb_bal
         .as_ref()
         .and_then(|f| exact_decomposition_ceiling(&g, &f.points, r, 2));
+    let folded = |f: &FactorBase<FastPoint>| PairTable::build_negation_folded(&g, f);
+    let exact_of_base =
+        |f: &FactorBase<FastPoint>| exact_decomposition_ceiling(&g, &f.points, r, 2);
+    let table_proj = fb_proj.as_ref().map(folded);
+    let table_proj_bal = fb_proj_bal.as_ref().map(folded);
+    let table_sub = fb_sub.as_ref().map(folded);
+    let table_sub_bal = fb_sub_bal.as_ref().map(folded);
+    let exact_proj_m2 = fb_proj.as_ref().and_then(exact_of_base);
+    let exact_proj_bal_m2 = fb_proj_bal.as_ref().and_then(exact_of_base);
+    let exact_sub_m2 = fb_sub.as_ref().and_then(exact_of_base);
+    let exact_sub_bal_m2 = fb_sub_bal.as_ref().and_then(exact_of_base);
     calib.ns_per_lookup = table.calibrate_lookup(1_000_000);
     let census: Vec<(u32, usize)> = admissible
         .iter()
@@ -7863,6 +8407,38 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
             "ceiling_exact_m2": exact_bal_m2.map(|e| e.1),
         });
     }
+    if extra_arms {
+        out.curve["factor_base"]["class_census"] = folded_table_class_census(&g, &fb, r);
+        if let Some(f) = &fb_bal {
+            out.curve["factor_base_balanced"]["class_census"] = folded_table_class_census(&g, f, r);
+        }
+        for (key, base, table, exact) in [
+            (
+                "factor_base_projected",
+                &fb_proj,
+                &table_proj,
+                exact_proj_m2,
+            ),
+            (
+                "factor_base_projected_balanced",
+                &fb_proj_bal,
+                &table_proj_bal,
+                exact_proj_bal_m2,
+            ),
+            ("factor_base_subgroup", &fb_sub, &table_sub, exact_sub_m2),
+            (
+                "factor_base_subgroup_balanced",
+                &fb_sub_bal,
+                &table_sub_bal,
+                exact_sub_bal_m2,
+            ),
+        ] {
+            if let (Some(f), Some(t)) = (base, table) {
+                out.curve[key] =
+                    describe_arm_base(f, t, exact, space, folded_table_class_census(&g, f, r));
+            }
+        }
+    }
     let mut rng = StdRng::seed_from_u64(cfg.seed ^ r ^ 0xC2);
     let mut ops = GroupOps::default();
     for rep in 0..cfg.repeats {
@@ -7888,13 +8464,26 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
 
         let random = cfg.random_source();
         let walk = cfg.walk_source();
-        let mut variants: Vec<(String, Oracle, TargetSource)> = vec![(
+        // Every row names its base and its exact ceiling itself, so the
+        // LEAD-19 rows below share the loop without a suffix rule
+        // deciding which base a name means.
+        let exact_raw = |m: u32| if m == 2 { exact_m2 } else { exact_m3 };
+        type Row<'a> = (
+            String,
+            Oracle<'a>,
+            TargetSource,
+            &'a FactorBase<FastPoint>,
+            ExactCeiling,
+        );
+        let mut variants: Vec<Row> = vec![(
             format!("mitm_m{m_used}"),
             Oracle::Mitm {
                 table: &table,
                 m: m_used,
             },
             random,
+            &fb,
+            exact_raw(m_used),
         )];
         if let Some(o) = &s4 {
             if inst.n <= cfg.s4_max_degree {
@@ -7902,6 +8491,8 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
                     "semaev_s4_pairs_and_solve_m3".into(),
                     Oracle::SemaevS4 { oracle: o },
                     random,
+                    &fb,
+                    exact_m3,
                 ));
             }
         }
@@ -7914,6 +8505,8 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
                 m: m_used,
             },
             random,
+            &fb,
+            exact_raw(m_used),
         ));
         variants.push((
             format!("mitm_m{m_used}_negfold_walk"),
@@ -7922,6 +8515,8 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
                 m: m_used,
             },
             walk,
+            &fb,
+            exact_raw(m_used),
         ));
         if m2_row {
             variants.push((
@@ -7931,6 +8526,8 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
                     m: 2,
                 },
                 random,
+                &fb,
+                exact_m2,
             ));
             variants.push((
                 "mitm_m2_negfold_walk".into(),
@@ -7939,33 +8536,69 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
                     m: 2,
                 },
                 walk,
+                &fb,
+                exact_m2,
             ));
         }
-        if let Some(t) = &table_bal {
+        if let (Some(f), Some(t)) = (&fb_bal, &table_bal) {
             variants.push((
                 "mitm_m2_negfold_walk_balanced".into(),
                 Oracle::Mitm { table: t, m: 2 },
                 walk,
+                f,
+                exact_bal_m2,
             ));
         }
-        for (name, oracle, targets) in variants {
-            let base = if name.ends_with("_balanced") {
-                fb_bal.as_ref().unwrap_or(&fb)
-            } else {
-                &fb
-            };
-            let exact_of = |m: u32| match (name.ends_with("_balanced"), m) {
-                (true, 2) => exact_bal_m2,
-                (_, 2) => exact_m2,
-                _ => exact_m3,
-            };
+        // LEAD-19: the two-summand walk row on the projected (B) and the
+        // subgroup-only (C) base, beside each raw rung that ran it.
+        if m2_row || m_used == 2 {
+            if let (Some(f), Some(t)) = (&fb_proj, &table_proj) {
+                variants.push((
+                    "mitm_m2_negfold_walk_projected".into(),
+                    Oracle::Mitm { table: t, m: 2 },
+                    walk,
+                    f,
+                    exact_proj_m2,
+                ));
+            }
+            if let (Some(f), Some(t)) = (&fb_sub, &table_sub) {
+                variants.push((
+                    "mitm_m2_negfold_walk_subgroup".into(),
+                    Oracle::Mitm { table: t, m: 2 },
+                    walk,
+                    f,
+                    exact_sub_m2,
+                ));
+            }
+        }
+        if table_bal.is_some() {
+            if let (Some(f), Some(t)) = (&fb_proj_bal, &table_proj_bal) {
+                variants.push((
+                    "mitm_m2_negfold_walk_projected_balanced".into(),
+                    Oracle::Mitm { table: t, m: 2 },
+                    walk,
+                    f,
+                    exact_proj_bal_m2,
+                ));
+            }
+            if let (Some(f), Some(t)) = (&fb_sub_bal, &table_sub_bal) {
+                variants.push((
+                    "mitm_m2_negfold_walk_subgroup_balanced".into(),
+                    Oracle::Mitm { table: t, m: 2 },
+                    walk,
+                    f,
+                    exact_sub_bal_m2,
+                ));
+            }
+        }
+        for (name, oracle, targets, base, exact) in variants {
             let v = run_binary_variant(
                 inst,
                 &name,
                 base,
                 &oracle,
                 targets,
-                exact_of(oracle.summands()),
+                exact,
                 target,
                 d,
                 seed,
@@ -10713,6 +11346,237 @@ mod tests {
             assert!(s4.relations.get("s4_pairs") > 0);
             assert!(res.calibration.ns_per_s4_pair.unwrap() > 0.0);
         }
+    }
+
+    /// A random binary instance with cofactor exactly `h`, for the LEAD-19
+    /// arms.  Every binary curve has even order; `h = 2` needs `Tr(a) = 1`,
+    /// so an odd `n` (where `Tr(1) = 1`).
+    fn binary_instance_with_cofactor(n: u32, h: u64) -> BinaryInstance {
+        (1..64u64)
+            .find_map(|seed| random_binary_instance(n, seed, 8).filter(|i| i.cofactor == h))
+            .unwrap_or_else(|| panic!("a binary curve with cofactor {h} within 64 seeds"))
+    }
+
+    #[test]
+    fn lead19_projected_and_subgroup_bases_lie_in_the_subgroup() {
+        let inst = binary_instance_with_cofactor(13, 2);
+        let g = BinaryGroup(&inst.fast);
+        let basis: Vec<u64> = (0..4).map(|i| 1u64 << i).collect();
+        let raw = binary_subspace_factor_base(&inst, &basis);
+        let mut ops = GroupOps::default();
+        let in_subgroup =
+            |p: &FastPoint, ops: &mut GroupOps| g.is_identity(&g.mul(ops, *p, inst.r));
+        assert!(
+            raw.points.iter().any(|p| !in_subgroup(p, &mut ops)),
+            "the raw base should straddle the cofactor classes"
+        );
+        let proj = project_factor_base(&g, &raw, inst.cofactor, inst.r, |p| p.x);
+        assert!(proj.points.iter().all(|p| in_subgroup(p, &mut ops)));
+        assert_eq!(proj.columns, proj.abscissae);
+        assert_eq!(
+            proj.abscissae as u64
+                + proj.cost.get("projection_abscissa_collisions")
+                + proj.cost.get("projection_identity_drops"),
+            raw.abscissae as u64
+        );
+        assert_eq!(
+            proj.cost.get("projection_scalar_mults"),
+            raw.abscissae as u64
+        );
+        // One doubling per abscissa for `h = 2`, on top of the raw scan.
+        assert_eq!(proj.cost.get("projection_doubles"), raw.abscissae as u64);
+        assert_eq!(proj.cost.get("projection_adds"), 0);
+        assert_eq!(proj.cost.get("as_solves"), raw.cost.get("as_solves"));
+        assert_eq!(
+            proj.cost.group_ops.doubles,
+            raw.cost.group_ops.doubles + raw.abscissae as u64
+        );
+        // Every projected point is in the subgroup, so its negative is a
+        // different point and the base is closed under negation.
+        for (i, &j) in proj.neg_index.iter().enumerate() {
+            assert_eq!(proj.points[j], g.neg(proj.points[i]));
+        }
+        let sub = binary_subgroup_factor_base(&inst, &raw);
+        assert_eq!(sub.abscissae, raw.abscissae);
+        assert_eq!(sub.columns, raw.columns);
+        assert!(sub.points.iter().all(|p| in_subgroup(p, &mut ops)));
+        assert!(sub.cost.get("abscissae_scanned") >= raw.abscissae as u64);
+        assert_eq!(
+            sub.cost.get("subgroup_trace_tests"),
+            sub.cost.get("subgroup_candidates_lifted")
+        );
+        // The trace test and `[r]P = O` agree on every lifted candidate
+        // (Kosters–Yeo Prop. 4.2 at `h = 2`).
+        let a_tr = inst.artin_schreier.trace(inst.a);
+        for x in 1..(1u64 << 6) {
+            if let Some(&p) = inst.points_with_x(x).first() {
+                assert_eq!(
+                    inst.artin_schreier.trace(x) == a_tr,
+                    in_subgroup(&p, &mut ops),
+                    "x = {x:#x}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn lead19_projected_table_census_is_entirely_in_the_subgroup() {
+        let inst = binary_instance_with_cofactor(13, 2);
+        let g = BinaryGroup(&inst.fast);
+        let basis: Vec<u64> = (0..4).map(|i| 1u64 << i).collect();
+        let raw = binary_subspace_factor_base(&inst, &basis);
+        let proj = project_factor_base(&g, &raw, inst.cofactor, inst.r, |p| p.x);
+        let raw_census = folded_table_class_census(&g, &raw, inst.r);
+        let proj_census = folded_table_class_census(&g, &proj, inst.r);
+        assert_eq!(raw_census["classes"].as_u64(), Some(2));
+        assert_eq!(
+            raw_census["folded_pairs"].as_u64(),
+            Some((raw.abscissae * raw.abscissae) as u64)
+        );
+        assert!(
+            raw_census["folded_pairs_class_zero_fraction"]
+                .as_f64()
+                .unwrap()
+                < 1.0
+        );
+        assert_eq!(proj_census["classes"].as_u64(), Some(1));
+        assert_eq!(
+            proj_census["folded_pairs_class_zero_fraction"].as_f64(),
+            Some(1.0)
+        );
+        assert_eq!(
+            proj_census["folded_pairs"],
+            proj_census["folded_pairs_class_zero"]
+        );
+        assert_eq!(
+            proj_census["signed_points_in_subgroup"].as_u64(),
+            Some(proj.points.len() as u64)
+        );
+    }
+
+    #[test]
+    fn lead19_arms_on_a_prime_order_curve_are_the_identity() {
+        let inst = find_prime_order_curve(12, 3);
+        assert_eq!(inst.cofactor, 1);
+        let fb = prime_factor_base(&inst, 16);
+        let proj = project_factor_base(&inst.curve, &fb, inst.cofactor, inst.r, |p| p.x);
+        let sub = prime_subgroup_factor_base(&inst, &fb);
+        for f in [&proj, &sub] {
+            assert_eq!(f.points, fb.points);
+            assert_eq!(f.col_of, fb.col_of);
+            assert_eq!(f.coef_of, fb.coef_of);
+            assert_eq!(f.columns, fb.columns);
+            assert_eq!(f.cost.group_ops, fb.cost.group_ops);
+            assert_eq!(f.cost.native, fb.cost.native);
+        }
+        let cfg = BoundaryConfig {
+            repeats: 1,
+            base_arms: vec![BaseArm::Raw, BaseArm::Projected, BaseArm::Subgroup],
+            ..BoundaryConfig::quick()
+        };
+        let res = run_prime_instance(&inst, &cfg);
+        let row = |name: &str| {
+            res.variants
+                .iter()
+                .find(|v| v.name == name)
+                .unwrap_or_else(|| panic!("row {name}"))
+        };
+        let raw = row("mitm_m2_negfold_walk");
+        for name in [
+            "mitm_m2_negfold_walk_projected",
+            "mitm_m2_negfold_walk_subgroup",
+        ] {
+            let v = row(name);
+            assert!(v.verified, "{name}");
+            assert_eq!(v.trials, raw.trials, "{name}");
+            assert_eq!(v.relations_found, raw.relations_found, "{name}");
+            assert_eq!(v.total_gae, raw.total_gae, "{name}");
+            for (a, b) in [
+                (&v.factor_base, &raw.factor_base),
+                (&v.relations, &raw.relations),
+                (&v.linear_algebra, &raw.linear_algebra),
+                (&v.verify, &raw.verify),
+            ] {
+                assert_eq!(a.group_ops, b.group_ops, "{name}");
+                assert_eq!(a.native, b.native, "{name}");
+            }
+        }
+        assert_eq!(
+            res.curve["factor_base"]["class_census"]["classes"].as_u64(),
+            Some(1)
+        );
+    }
+
+    #[test]
+    fn lead19_char2_arms_run_and_verify() {
+        let cfg = BoundaryConfig {
+            repeats: 1,
+            base_arms: vec![BaseArm::Raw, BaseArm::Projected, BaseArm::Subgroup],
+            ..BoundaryConfig::quick()
+        };
+        let inst = binary_instance_with_cofactor(13, 2);
+        let res = run_char2_instance(&inst, &cfg).expect("an admissible summand count");
+        for v in &res.variants {
+            assert!(v.verified, "{} did not verify: {v:?}", v.name);
+        }
+        let has = |name: &str| res.variants.iter().any(|v| v.name == name);
+        let raw_fraction = res.curve["factor_base"]["class_census"]
+            ["folded_pairs_class_zero_fraction"]
+            .as_f64()
+            .expect("the raw base's class census");
+        assert!(raw_fraction < 1.0, "{raw_fraction}");
+        if has("mitm_m2_negfold_walk") {
+            for name in [
+                "mitm_m2_negfold_walk_projected",
+                "mitm_m2_negfold_walk_subgroup",
+            ] {
+                let v = res
+                    .variants
+                    .iter()
+                    .find(|v| v.name == name)
+                    .unwrap_or_else(|| panic!("row {name}"));
+                assert_eq!(
+                    v.cofactor_classes, 1,
+                    "{name}: the base lies in the subgroup"
+                );
+                assert_eq!(v.targets, "walk");
+                assert_eq!(v.table, "negation_folded");
+            }
+            assert_eq!(
+                res.curve["factor_base_projected"]["class_census"]
+                    ["folded_pairs_class_zero_fraction"]
+                    .as_f64(),
+                Some(1.0)
+            );
+            assert_eq!(
+                res.curve["factor_base_subgroup"]["class_census"]
+                    ["folded_pairs_class_zero_fraction"]
+                    .as_f64(),
+                Some(1.0)
+            );
+        }
+        if has("mitm_m2_negfold_walk_balanced") {
+            assert!(has("mitm_m2_negfold_walk_projected_balanced"));
+            assert!(has("mitm_m2_negfold_walk_subgroup_balanced"));
+        }
+        // The default configuration adds nothing.
+        let plain = run_char2_instance(
+            &inst,
+            &BoundaryConfig {
+                repeats: 1,
+                ..BoundaryConfig::quick()
+            },
+        )
+        .expect("an admissible summand count");
+        assert!(plain
+            .variants
+            .iter()
+            .all(|v| !v.name.contains("_projected") && !v.name.contains("_subgroup")));
+        assert!(plain.curve["factor_base"].get("class_census").is_none());
+        assert!(plain
+            .variants
+            .iter()
+            .all(|v| v.factor_base.get("admissibility_adds") == 0));
     }
 
     #[test]
