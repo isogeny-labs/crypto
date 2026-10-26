@@ -4,7 +4,7 @@ use crypto_lib::binary_ecc::{
 };
 use crypto_lib::cryptanalysis::{
     curve_id,
-    gaudry_quartic_bin_wide::{find_bin_curve, TowerBasis},
+    gaudry_quartic_bin_wide::{find_bin_curve, BinCurve, TowerBasis},
 };
 use num_bigint::BigUint;
 use serde_json::{json, Value};
@@ -107,10 +107,13 @@ fn constructor(study: &Path) -> Value {
 fn hex_value(v: &Value) -> u128 {
     u128::from_str_radix(v.as_str().unwrap().trim_start_matches("0x"), 16).unwrap()
 }
-fn point(v: &Value, n: u32) -> BinaryPoint {
+fn point(v: &Value, inst: &BinCurve, basis: &TowerBasis) -> BinaryPoint {
+    let n = 4 * inst.curve.f.f.m;
+    let x = inst.curve.f.unpack(hex_value(&v[0]));
+    let y = inst.curve.f.unpack(hex_value(&v[1]));
     BinaryPoint::Affine {
-        x: F2mElement::from_biguint(&BigUint::from(hex_value(&v[0])), n),
-        y: F2mElement::from_biguint(&BigUint::from(hex_value(&v[1])), n),
+        x: F2mElement::from_biguint(&BigUint::from(basis.coords(&inst.curve.f, &x)), n),
+        y: F2mElement::from_biguint(&BigUint::from(basis.coords(&inst.curve.f, &y)), n),
     }
 }
 fn partial(study: &Path, m: u32) -> Value {
@@ -139,7 +142,7 @@ fn partial(study: &Path, m: u32) -> Value {
         x: F2mElement::from_biguint(&BigUint::from(gx), n),
         y: F2mElement::from_biguint(&BigUint::from(gy), n),
     };
-    let generator = point(&records[0]["workload"]["curve"]["generator"], n);
+    let generator = point(&records[0]["workload"]["curve"]["generator"], &inst, &basis);
     let curve = BinaryCurve {
         m: n,
         irreducible: irr,
@@ -178,7 +181,7 @@ fn partial(study: &Path, m: u32) -> Value {
         );
         assert_eq!(c["r"].as_u64().map(u128::from), Some(inst.r));
         assert_eq!(c["cofactor"].as_u64().map(u128::from), Some(inst.cofactor));
-        assert_eq!(point(&c["generator"], n), generator);
+        assert_eq!(point(&c["generator"], &inst, &basis), generator);
         let arm = record["arm"].as_str().unwrap();
         let status = record["outcome"]["status"].as_str().unwrap();
         *counts
@@ -194,7 +197,7 @@ fn partial(study: &Path, m: u32) -> Value {
             )
             .unwrap();
             assert!(k < curve.order);
-            let target = point(&record["workload"]["target"], n);
+            let target = point(&record["workload"]["target"], &inst, &basis);
             assert!(curve.is_on_curve(&target));
             assert_eq!(scalar_mul(&curve, &generator, &k), target);
             verified.push(record["seq"].clone());
@@ -224,8 +227,8 @@ fn partial(study: &Path, m: u32) -> Value {
         "a_hex":format!("0x{a:x}"),"b_hex":format!("0x{b:x}"),"r_decimal":inst.r.to_string(),"order_decimal":inst.group_order.to_string(),
         "retained_original_audit":retained_audit,"complete_ic_cost":null,"ic_rho_ratio":null,
         "wide_factory_generator_matches_recorded":factory_generator==generator,
-        "recorded_generator":records[0]["workload"]["curve"]["generator"],
-        "wide_factory_generator":[format!("0x{gx:x}"),format!("0x{gy:x}")],
+        "recorded_generator_tower":records[0]["workload"]["curve"]["generator"],
+        "wide_factory_generator_polynomial":[format!("0x{gx:x}"),format!("0x{gy:x}")],
         "status":"partial_session_recorded_successful_answers_independently_verified",
         "scope":"successful scalar answers only; no new walks, counter replay or complete-session qualification"})
 }

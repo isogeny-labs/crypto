@@ -44,3 +44,17 @@ generator and equality verdict explicitly. This corrects object selection;
 it neither supplies factory-generator parity nor changes a recorded target,
 scalar, curve or cost. Full old-method generator parity remains an open
 integration obligation.
+
+## Correction to the first explanation: coordinate bases
+
+The second audit rejected the raw generator as off-curve. Source inspection
+of ecbench/workload.rs shows that these legacy records serialize point
+coordinates in the packed tower basis, whereas the curve identity uses the
+canonical polynomial basis. The first explanation above therefore did not
+establish a generator-factory difference: it compared different coordinate
+bases. Preserve both failed receipts and that superseded interpretation.
+Decode each recorded coordinate with the exact tower field, convert through
+TowerBasis::coords, and only then check BinaryCurve membership, [r]G=O and
+the recovered scalar. Report factory equality only after this conversion.
+The scientific input records are unchanged; the corrected adapter makes
+their existing encoding explicit.
