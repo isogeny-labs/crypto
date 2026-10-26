@@ -55,4 +55,8 @@ obligations remain separate.
 ## Resolution and history
 
 Unresolved. Reported with blob evidence in PR comment 6421864767 on 2026-10-26.
+The later integrated source `69cf0253e` merges PR head `ac16317e5` and main
+`942caf7e4`; the SAT blob remains identical. A fresh source-specific attempt is
+retained under `pipeline-receipts/final-integrated-library-gate-20261026-69cf/`
+in the study, preserving the first failed gate separately.
 No bypass, current-head test pass or merge is claimed.

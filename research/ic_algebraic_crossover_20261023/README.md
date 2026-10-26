@@ -86,8 +86,10 @@ unmeasured.
 
 The owner approved publication on 2026-10-26, and the results summary is now
 on [private PR 2550](https://github.com/isogeny-labs/crypto/pull/2550).
-The repository moved with the same ID. Source/evidence integration and
-additional artifact-store delivery remain blocked. The managed environment
+The repository moved with the same ID. Remote head `ac16317e5` and main
+`942caf7e4` are merged locally as `69cf0253e`; all 65 inventoried evidence
+files remain byte-identical. Additional source/evidence delivery remains
+blocked. The managed environment
 has no AWS identity; the prepared CI relay could not receive its input because
 GitHub's binary-upload endpoint rejected the configured credential. No relay
 was dispatched and no S3 upload or readback is claimed. An owner decision on
@@ -96,7 +98,10 @@ also fails on [unchanged upstream SAT syntax](../../problems/sat-progress-phase-
 earlier test passes belong to their recorded frozen sources. There are 31 inspected reports,
 34 pages. The [v2 metadata adapter](curve-identity-adapter.v2.json) preserves
 all 25 v1 identities and adds the two independently checked partial models.
-[Publication snapshot](PR_UPDATE_20261026.md), [publication packet](PUBLISH_REVIEW.md).
+[Initial publication snapshot](PR_UPDATE_20261026.md),
+[updated published summary](PR_UPDATE_FINAL_20261026.md),
+[publication packet](PUBLISH_REVIEW.md),
+[continuation gates](CONTINUATION_READINESS_20261026.md).
 
 ## Measured structural result
 

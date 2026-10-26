@@ -46,10 +46,13 @@ The USD100 extra-cloud ceiling includes replay; workspace billing is unmeasured.
 
 ## Source validation and publication
 
-The integrated source at `1d71daac7` fails before release library tests on an
+The first integrated source at `1d71daac7` fails before release library tests on an
 unchanged upstream SAT file. Its exact blob and gate receipt are in
 `problems/sat-progress-phase-base-syntax.md`. The earlier 4,635-test pass belongs
-to the frozen constructor source. Do not patch unrelated SAT code or transfer
+to the frozen constructor source. The later merge `69cf0253e` incorporates
+remote `ac16317e5` and main `942caf7e4`; it retains the identical SAT blob.
+A fresh final-source library attempt and post-merge browser receipt are
+preserved separately from the first integration checks. Do not patch unrelated SAT code or transfer
 that pass to an integrated head.
 
 The new dashboard preview passes 1280/390/320, dark and JavaScript-disabled;

@@ -13,8 +13,9 @@ zero failures, 119 ignored; all seven field controls agree. The corrected
 native follow-up audit verifies 11/ten successful rho scalars from the
 interrupted m14/m15 sessions and repeats byte-identically. Two initial
 coordinate-basis adapter failures are retained. Source/metadata integration
-and the additional artifact upload are in progress; no later merged-head
-green verdict or full IC comparison is claimed.
+is committed locally through `69cf0253e`, merging remote `ac16317e5` and main
+`942caf7e4`. The source/evidence push and artifact delivery remain blocked;
+no later merged-head green verdict or full IC comparison is claimed.
 
 ## Prepared results and source-specific checks
 
@@ -135,8 +136,11 @@ main `942caf7e4`. The [problem record](../../problems/sat-progress-phase-base-sy
 links the retained evidence. Do not apply earlier frozen-source passes to this
 merged source or patch unrelated SAT code. A fresh merged dashboard preview
 passes at 1280/390/320, dark and JavaScript-disabled, without script errors or
-external requests. Remote head `ac16317e5` adds another artifact migration and
-still requires forward-only integration; no current-head CI pass is claimed.
+external requests. Remote head `ac16317e5` and main `942caf7e4` are now integrated
+as `69cf0253e`; the only final conflict was the shared log, with both sides
+preserved. A fresh post-merge browser check passes and all 65 inventory hashes
+agree. No current-head CI pass is claimed. The final published summary is
+preserved in PR_UPDATE_FINAL_20261026.md.
 The fresh full-site attempt stops before tests because the real-manifest
 backend-leaderboard source is not hydrated. It does not replace the historical
 46-pass/three-base-failure result. Fifteen new native-follow-up progress series
