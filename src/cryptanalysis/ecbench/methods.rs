@@ -2422,6 +2422,10 @@ fn solve_ic_hyperelliptic(
         online: None,
         online_error: None,
         solver: None,
+        field_ops: None,
+    })
+}
+
 /// The methods that run on a hyperelliptic Jacobian: the generic ones,
 /// which see only [`CountedGroup`] (no IC arm, no endomorphism walk).
 fn is_hyper_generic(id: &str) -> bool {
