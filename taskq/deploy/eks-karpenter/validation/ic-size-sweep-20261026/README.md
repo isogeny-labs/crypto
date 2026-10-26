@@ -4,7 +4,7 @@
 
 | Requirement | Evidence | Status |
 |:--|:--|:--|
-| 20, 24, 28 and 32-bit public synthetic curves, one target each | `n*/input-spec.json`, `n*/session/records.jsonl` | Verified complete |
+| 20, 24, 28 and 32-bit public synthetic curves, one target each | `n*/input-spec.json`, `n*/session/.artifacts.json` (SHA-pinned raw records) | Verified complete |
 | CPU Spot with L2 isolation | `n*/l2-gate.json`, `n*/runner-identity.json`; `cpu-l2-spot` NodePool has `karpenter.sh/capacity-type: spot` | Verified complete for the four jobs |
 | Correctness and independent audit | `n*/audit.json`, `n*/SHA256SUMS`; all four audits passed, 18/18 records L2 per job, 15 exact replays per job | Verified complete |
 | Repeatable Actions dispatch | frozen `../../specs/ic-size-sweep/`, `../../run-ic-sweep`, `../../test-ic-sweep.sh`, `isolab-experiment.yml` | Implemented; Actions dispatch awaits merge to `main` |
@@ -38,8 +38,13 @@ comparison, and L2 gate. SHA-256 verification of every downloaded file passed.
 | 32 | `ic-sweep-n32-20261026-v1` | `icv1-fp32-t74357-b7396dac` | `ba46ec33-e2b2-4536-a909-76f89f1d79b1` | `runs/ic-sweep-n32-20261026-v1/ba46ec33-e2b2-4536-a909-76f89f1d79b1/` |
 
 The bucket for all four prefixes is
-`s3://isolab-results-104186811093-us-east-2/`. The local copy is the
-reviewable source of truth; S3 provides durable originals.
+`s3://isolab-results-104186811093-us-east-2/`. Reviewable JSON receipts
+remain in Git. The large `records.jsonl` files are SHA-pinned in adjacent
+`.artifacts.json` manifests and kept in the repository artifact store at
+`s3://setec-astronomy-artifacts/store`. Run
+`python3 tools/artifacts/artifacts.py pull taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026`
+from the repository root to hydrate them. The original S3 result bucket also
+retains the complete run payloads.
 
 ## CRIU recovery diagnostics
 
@@ -73,6 +78,8 @@ instance. The frozen computation archive has the SHA-256 recorded in
 [`computation-audit.json`](criu/v3/computation-audit.json) verifies all 18
 records and all 15 exact replays; [`restore-result.json`](criu/v3/restore-result.json)
 records a zero CRIU restore exit code.
+The archive and fresh-epoch `records.jsonl` are available through adjacent
+`.artifacts.json` manifests; remote artifact hashes were verified after upload.
 
 The controller then created the distinct fresh Spot Job
 `ic-criu-n32-20261026-v3-epoch-1`. Its [result](criu/v3/benchmark-result.json)
