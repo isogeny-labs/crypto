@@ -109,6 +109,16 @@ Hasse's elliptic bound gives `|t| <= 2*q^(3/2)=128`, so all source orders at
 `q=16` lie in `[3969,4225]`; the audit covers every normalized ordinary
 model in that finite range, but its quartic witness draw is not exhaustive.
 
+**Exclusion from the known direct-cover isogeny closure.** Every `K`-isogeny
+preserves `#E(K)`. The exhaustive normalized ordinary census has zero
+trace-zero class-B models at each of the three orders above. Therefore no
+curve in these 300 classes can reach a direct binary cubic genus-three
+hyperelliptic cover by *any* chain of `K`-isogenies, regardless of walk
+length or kernel degrees. This is stronger than a bounded-walk failure.
+It excludes only that known direct-cover route; it does not exclude the
+different plane-quartic isogeny route certified above or higher-genus GHS
+descents.
+
 The full ordinary `K` cohort has `2(q^3-1)=8190` normalized classes.
 The direct cubic classes have exact counts
 

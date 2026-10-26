@@ -119,7 +119,9 @@ def main():
         families.append({
             "group_order": order, "source_a": expected["a"],
             "source_b_values": values, "normalized_isomorphism_class_count": len(values),
-            "direct_B_count": 0, "selected_prime": expected["r"],
+            "direct_B_count": 0,
+            "outside_direct_B_K_isogeny_closure": True,
+            "selected_prime": expected["r"],
             "cofactor": expected["cofactor"], "trace_t": t,
             "frobenius_polynomial_coefficients": [1, 0, 0, -t, 0, 0, q3],
             "P_at_one": order, "P_derivative_at_one": derivative,
