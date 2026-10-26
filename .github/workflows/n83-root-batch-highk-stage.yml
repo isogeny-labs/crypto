@@ -16,7 +16,7 @@ concurrency:
 jobs:
   k2816-stage:
     if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-root-batch-index-20261018'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4

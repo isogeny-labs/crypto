@@ -56,7 +56,7 @@ defaults:
     shell: bash
 jobs:
   scope:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: read
@@ -175,7 +175,7 @@ jobs:
   harness:
     if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
     needs: scope
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     # Keep the exhaustive scientific audit's existing 300-minute budget in
     # the weekly/manual lane; ordinary PR validation is bounded at 45 minutes.
     timeout-minutes: ${{ (github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 300 }}
@@ -534,7 +534,7 @@ jobs:
   evidence_audit_pr:
     if: (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false'
     needs: [scope, harness]
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 25
     # The whole audit no longer fits one 2-vCPU hosted runner inside the PR
     # cap: a shard of 273 MB of (decompressed) records took 15 min there, and
