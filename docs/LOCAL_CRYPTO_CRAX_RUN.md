@@ -1,7 +1,27 @@
 # Run the crypto and cryptanalysis CLIs locally
 
+Install Rust/Cargo, a C/C++ compiler, CMake, Python 3 and the GitHub CLI.
+Authenticate `gh` for the repositories. The S3 check near the end also needs
+the AWS CLI and an AWS profile with access to the approved bucket.
+
+Until crypto PR #2117 merges, use its PR head for the new crypto commands and
+the merged `main` branch of cryptanalysis:
+
+```sh
+mkdir -p /path/to/cli-work
+cd /path/to/cli-work
+gh repo clone isogeny-labs/crypto
+gh repo clone isogeny-labs/cryptanalysis
+(cd crypto && gh pr checkout 2117)
+(cd cryptanalysis && git switch main && git pull --ff-only)
+```
+
+After #2117 merges, use `git switch main && git pull --ff-only` in `crypto`
+as well. Record `git rev-parse HEAD` in both checkouts beside any acceptance
+results so the binaries can be tied to their exact source revisions.
+
 Use a checkout of this repository for `CRYPTO_REPO` and a checkout of
-`aburan28/cryptanalysis` for `CRAX_REPO`. The latter builds the Rust `crax`
+`isogeny-labs/cryptanalysis` for `CRAX_REPO`. The latter builds the Rust `crax`
 binary and the native C `ca` binary. Rebuild after changing either checkout;
 an executable already in a target directory does not establish which source
 revision produced it.

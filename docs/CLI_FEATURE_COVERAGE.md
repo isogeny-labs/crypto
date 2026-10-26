@@ -66,8 +66,10 @@ These commands do not implement a general full-round AES key-recovery attack.
 
 ## Release status
 
-This grid describes the reviewed PR binaries. The crypto commands above
+This grid describes the reviewed crypto PR binaries. The crypto commands above
 remain on PR #2117 until its exact-head checks and merge gates pass. The
-sibling `crax` release is being repaired through cryptanalysis PRs #1111 and
-#1113. A local test or S3 acceptance receipt does not replace those hosted
-checks or the final merged-revision build.
+sibling `crax` and native `ca` changes merged through cryptanalysis PR #1111
+at `d59afc527a7eee9cee0b9dce0a656dbd73ed813d` (including PR #1113).
+Both were rebuilt from that merge revision and passed local cross-CLI and
+authorized S3 acceptance. Those receipts do not replace the crypto PR's
+applicable checks or its final merged-revision build.
