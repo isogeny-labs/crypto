@@ -15,7 +15,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[4]
 WORKFLOWS = ROOT / ".github" / "workflows"
 DIRECT = re.compile(r"^(\s*runs-on:) (ubuntu-24\.04|ubuntu-latest)(\s*)$", re.M)
-SEALED = {"weak-curve-lean.yml", "weak-curve-conjectures.yml"}
+# ic-dashboard.yml drives a real Chrome; the ARC runner image has none.
+SEALED = {"weak-curve-lean.yml", "weak-curve-conjectures.yml", "ic-dashboard.yml"}
 TRUSTED = (
     "(github.event_name == 'push' || github.event_name == 'schedule' || "
     "github.event_name == 'release' || github.event_name == 'workflow_dispatch' || "
