@@ -84,3 +84,18 @@ names this replay certificate. It also names the validator report, which
 recomputes the 11 headline point estimates exactly from the raw Actions
 records, and the strong-rho reference with the §5a band. Rho is cheaper at 0,
 0.1 and 1 GAE: 34×, 41× and 61×.
+
+## Merged-head replication workflow, attempt 1 failed (2026-10-26)
+
+Workflow `n83-padd-rank-replication.yml` (PR #2590, a copy of the disabled
+`n83-padd-rank.yml`) ran as Actions run 40261215709 at commit `5a18c1ac9`. It
+failed in "Build and test producer and rho worker" after 9.5 minutes, before
+any measurement, with `No space left on device (os error 28)` while compiling
+`crypto` and `isogeny_algos` on the runner (`ic-tests.log` in the 3 KB
+artifact). The panel step was skipped, so there are no timings from this
+attempt. The cause is the runner's disk, not the code: on the same source the
+24 producer tests, 4 rho tests and the release build all pass in a separate
+local container. The repository checkout is much larger than at the first
+panel (10-19), and `validation-gate.yml` and four other workflows already free
+runner disk before checkout. Attempt 2 adds that same step and nothing else
+past the checkout line.
