@@ -42,3 +42,5 @@ leaderboard/scoreboard, progress timeline and curve-map data have no promoted
 change. Size, exact pushed head, current-head CI/review and existing main-branch
 conflicts are checked separately in delivery receipts. Local tests do not
 authorize a merge.
+
+GitHub delivery subsequently confirms an account-level CI blocker: the review and artifact-migration jobs were not started because payments failed or the spending limit needs increasing (empty step lists; exact annotations in delivery-20261026/CI_BLOCKERS_V1.json). Main-branch conflicts remain. No billing setting or merge was performed.

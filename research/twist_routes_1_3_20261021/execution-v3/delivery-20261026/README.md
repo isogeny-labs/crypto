@@ -5,3 +5,7 @@ The scientific/artifact head **8c70f8ab4d9532cdd334ae83cf45fa657a65e8df** was pu
 Local tests and publication pass. Main-branch conflicts and current-head CI/review remain merge holds; no merge or self-approval occurred. The full-PR 10 MiB blob check passes after the incoming artifact-storage commit, whose history was preserved. The historical twelve-file size hold is superseded by the linked passing check; no exception label or history rewrite was applied.
 
 [Observed status](DELIVERY_V1.json) · [prepared description](PR_BODY.md) · [PR update confirmation](PR_UPDATE.json) · [full-PR size check](../checks/full-pr-large-files.stdout). No continuing scientific background job is implied.
+
+## Account-level CI failure
+
+[GitHub annotations](CI_BLOCKERS_V1.json) state: “The job was not started because recent account payments have failed or your spending limit needs to be increased.” Both review and artifact-migration jobs have empty step lists. No code ran in those jobs. Local test success is separate. Billing settings were not changed, and main-branch conflicts remain.

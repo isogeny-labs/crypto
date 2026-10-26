@@ -36,3 +36,4 @@ Full E26 arity-four/full-grid costs; E27 original 24-arm/1,920-attempt calibrate
 
 The PR is regular and open. **Merge remains held for current-head CI/review and existing main-branch conflicts.** Local checks and publication are not merge approval. Actual pushed-head status is verified separately.
 
+GitHub Actions reports that the review and artifact-autofix jobs were not started because recent account payments failed or the spending limit must be increased. Both have empty step lists; this is an account-level CI blocker. Existing main-branch conflicts also remain.
