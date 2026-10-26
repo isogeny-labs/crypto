@@ -83,7 +83,7 @@ keeps both old arms and adds uncached direct signs. That comparison is now
 identical ordered operand/lift/certificate behavior; direct has two fewer cold
 additions than cache in all400 records, while cache has fewer negations. No
 overall cost ranking follows. The next [registered F13 degree-two transfer draft](../../backlog/XP-20261025-cm8-quadratic-transfer/README.md)
-is now [executed](reports/cm8-transfer-20261025/README.md):12arms/72source scalars/196actual addition pairs,3of54 reduced joint gains and0original. Matched rows/ranks are conserved;4matched degree changes favor the source. Actual F13 subgroup scalar transport is kernel checked. A stronger [uniform useful-yield preflight](reports/uniform-yield-preflight-20261025/README.md) now has a preregistered96arm/896target/210policy protocol and compiled producer, but zero scientific executions. Its new checkpoint launch gate lacks upload authorization/token. The [explicit dual draft](../../backlog/XP-20261025-cm8-explicit-dual/README.md) remains queued to check doubling composition and an actual subgroup inverse before replacing enumerative base pullback.
+is now [executed](reports/cm8-transfer-20261025/README.md):12arms/72source scalars/196actual addition pairs,3of54 reduced joint gains and0original. Matched rows/ranks are conserved;4matched degree changes favor the source. Actual F13 subgroup scalar transport is kernel checked. A stronger [uniform useful-yield preflight](reports/uniform-yield-preflight-20261025/README.md) now has a preregistered96arm/896target/210policy protocol and now a [compiled native pair](reports/uniform-audit-preflight-20261026/README.md), but zero scientific executions. Its new checkpoint launch gate lacks upload authorization/token. The [explicit dual draft](../../backlog/XP-20261025-cm8-explicit-dual/README.md) remains queued to check doubling composition and an actual subgroup inverse before replacing enumerative base pullback.
 A non-isomorphic twist comparison still needs an explicit scalar-preserving
 subgroup map or pairing-mediated route before claiming main-DLP benefit;
 base-field rational points must not be silently transported by a generic twist.
@@ -145,3 +145,14 @@ review/ordinary validation can proceed. Do not repeat the permission question
 on unchanged automated checks or treat elapsed time as authorization. This
 real launch gate blocks dependent work only; existing mathematical/proof goals
 and queued dual remain open.
+
+### Independent audit implementation (2026-10-26)
+
+The versioned C++ producer and independent Rust auditor now compile, including
+exact state/fraction/frontier and strict membership code. Backend test harness
+compiles with --no-run; no new runtime verification or scientific result.
+The pending checkpoint authorization/access gate is preserved; Lean recurrence
+proof/exact runner remain pending. All old preflight sources are immutable.
+The active public rules endpoint exposes required contexts gate/size/artifacts,
+absent on the checked parent head; legacy protections remain inaccessible.
+This is an additional known merge gate, not permission to bypass it.

@@ -288,3 +288,9 @@ The [explicit dual draft](../backlog/XP-20261025-cm8-explicit-dual/README.md) mu
 ## New uniform-yield launch gate (2026-10-25)
 
 The [uniform preflight](../research/quadratic_twist_evidence_20261021/reports/uniform-yield-preflight-20261025/README.md) preserves a stronger fixed-sampler hypothesis and compiled producer. None of the planned96arms/896targets/210policy comparisons has run; no new expected-yield/degree/scalar evidence is claimed. Independent audit/proof/runner remain pending. Current main20e8f44 adds an S3 checkpoint gate before any experiment; the upload path lacks user authorization and checkpoint-only token access. A complete local resume/status record is prepared, without upload or gate bypass. The old four-artifact consent is not reused. See the concrete checkpoint upload review; this is an actionable launch/access hold, not a mathematical impossibility or cancellation of independent research.
+
+## Independent uniform audit implementation and required checks (2026-10-26)
+
+[Compile-only update](../research/quadratic_twist_evidence_20261021/reports/uniform-audit-preflight-20261026/README.md): C++v2 and independent Rust auditor compile, including state/fraction/frontier, witness and strict case-membership code. Backend test harness compiles only; no scientific run, replay or control verdict. The faithful Lean recurrence proof and exact runner are pending, and the checkpoint upload approval/token hold is unchanged. All earlier preflight inputs/17identities stay frozen.
+
+The active main rules endpoint now exposes required contexts gate,size,artifacts. None is present in the complete parent-head60b006333 checks/status response; only queued review exists. Legacy protection still403; no check is inferred optional or passed, no conflict/coverage gate bypass.

@@ -3,7 +3,7 @@
   "id": "XP-20261025-uniform-useful-yield",
   "title": "Test exact uniform useful-rank yield and collection degree on all frozen bases",
   "status": "draft",
-  "status_note": "Preregistered protocol and compiled C++ producer only; ZERO scientific executions. New current-main S3 checkpoint gate lacks upload authorization and checkpoint token. Independent uniform audit/Lean recurrence still unimplemented; no Cairn/main-ancestry promotion.",
+  "status_note": "Protocol plus versioned C++ producer and independent Rust auditor compile; ZERO scientific executions or replay/control verdicts. Checkpoint upload authorization/token still absent. Lean recurrence/runner pending; no Cairn/main-ancestry promotion.",
   "created": "2026-10-25",
   "authors": [
     "research reasoning lane"
@@ -23,12 +23,20 @@
         "-Wall",
         "-Wextra",
         "-Werror",
-        "research/quadratic_twist_evidence_20261021/native/uniform-yield.cpp",
+        "research/quadratic_twist_evidence_20261021/native/uniform-yield-v2.cpp",
         "-lcrypto",
         "-lgmpxx",
         "-lgmp",
         "-o",
         "/tmp/quadratic-twist-uniform-yield"
+      ],
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "research/quadratic_twist_evidence_20261021/native/uniform-yield-audit/Cargo.toml"
       ]
     ]
   },
@@ -100,6 +108,7 @@
     ],
     "lead": "crypto-autoresearcher:LEAD-ICE-relation-graph-rank-large-prime",
     "notes": [
+      "research/quadratic_twist_evidence_20261021/reports/uniform-audit-preflight-20261026/README.md",
       "research/quadratic_twist_evidence_20261021/UNIFORM_YIELD_20261025_PROTOCOL.md",
       "research/quadratic_twist_evidence_20261021/reports/uniform-yield-preflight-20261025/README.md",
       "research/quadratic_twist_evidence_20261021/CONTINUATION.md"
