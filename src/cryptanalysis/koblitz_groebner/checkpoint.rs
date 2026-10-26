@@ -82,6 +82,7 @@ fn write_file(
 ) -> io::Result<Entry> {
     let mut options = OpenOptions::new();
     options.write(true).create_new(true);
+    // Owner-only where the platform has Unix permissions.
     #[cfg(unix)]
     options.mode(0o600);
     let file = options.open(dir.join(name))?;
