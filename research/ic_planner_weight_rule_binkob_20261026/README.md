@@ -1,5 +1,11 @@
 # Does the weight-aware base size carry to binary and Koblitz curves? (`ic-planner/3`)
 
+> **2026-10-26, withdrawn.** The Koblitz rule adopted here (0.71·c₀ at w ≥ 0.3) failed its
+> preregistered held-out test at log2 r 36.6–47.2, where it was dearer at every weight, in
+> [`../ic_planner_exhaustive_20261026`](../ic_planner_exhaustive_20261026/README.md) (W3).
+> The binary claim that d₀ is cheapest at every weight also failed out of sample (W2).
+> `ic-planner/4` withdraws both rules. The measurements below are unchanged.
+
 Measured 2026-10-26. The protocol is [`PROTOCOL.md`](PROTOCOL.md), frozen in
 `1fffc5c45`; [`PROTOCOL_AMENDMENT_1.md`](PROTOCOL_AMENDMENT_1.md) was frozen in
 `2f87b17ad`, after Phase A and before Phase B. PDF: [`REPORT.pdf`](REPORT.pdf).

@@ -1,5 +1,10 @@
 # A weight-aware factor-base size for the `ic` planner (`ic-planner/2`)
 
+> **2026-10-26, withdrawn.** The rule adopted here (1.41·N₀ at w = 1) failed its preregistered
+> held-out test in [`../ic_planner_exhaustive_20261026`](../ic_planner_exhaustive_20261026/README.md) (W1).
+> It was cheaper at w = 1 on 4 of 4 new curves, but also at w = 0 on 2 of 4.
+> `ic-planner/4` withdraws it. The measurements below are unchanged.
+
 Measured 2026-10-21. The protocol is [`PROTOCOL.md`](PROTOCOL.md), frozen in
 `7cf06ed6e`; [`PROTOCOL_AMENDMENT_1.md`](PROTOCOL_AMENDMENT_1.md) was frozen in
 `66f1642d1`, after Phase A and before Phase B. PDF: [`REPORT.pdf`](REPORT.pdf).

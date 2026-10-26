@@ -1,5 +1,9 @@
 # Where should the planner route large Koblitz curves?
 
+> **2026-10-26, follow-up.** Re-tested at six sizes (36.6–47.2 bits) in
+> [`../ic_planner_exhaustive_20261026`](../ic_planner_exhaustive_20261026/README.md): the descent costs
+> 1.31–2.04× the pipeline, every interval above 1. The routing is unchanged.
+
 Measured 2026-10-26 under [`PROTOCOL.md`](PROTOCOL.md) (frozen in
 `cd3af7078`, before any session). PDF: [`REPORT.pdf`](REPORT.pdf).
 

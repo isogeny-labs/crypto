@@ -1,5 +1,10 @@
 # The residual collector (large-prime limit) on prime curves
 
+> **2026-10-26, follow-up.** The extrapolated crossing near log2 r ≈ 35 was measured in
+> [`../ic_planner_exhaustive_20261026`](../ic_planner_exhaustive_20261026/README.md). At 36.0 and 36.25
+> bits, res2 and res4 are cheaper than the plan at every band weight, with the intervals below 1. The gain
+> is still generic (16-case null), and res2 is 2.6–24× rho across the band.
+
 Measured 2026-10-26 under [`PROTOCOL.md`](PROTOCOL.md) (frozen in `c77297bda`,
 wording fixed in `4aafbbffa`, both before any session). PDF: [`REPORT.pdf`](REPORT.pdf).
 Atlas lead `LEAD-ICP-residual-partial-relations` and hypothesis `H-PFDR-cb9606`
