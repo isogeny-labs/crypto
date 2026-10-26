@@ -1,0 +1,45 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-bitop-ladder-20261019-2
+experiment_id: bitop_ladder_20261019
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 73b1e2e0841ee2a4fea103f4f0946f12ab6b1a22
+receipt: research/bitop_ladder_20261019/cards/CARD-bitop-ladder-20261019-2.receipt.json
+binds:
+  - {path: research/bitop_ladder_20261019/PROTOCOL.md, sha256: b7334bc8f908dab20efdc417403b8e6c608a4c6a3a47a427ba6652ed81457130}
+  - {path: research/bitop_ladder_20261019/run_sessions.sh, sha256: 31f4061ab352c1d02b597394adbd3095102e916a6b4077fa81a5281d145910e7}
+  - {path: research/bitop_ladder_20261019/specs/train-P35.json, sha256: 709a2ad81020e2cd5097334a5fd696120053d60c7c3edbe469981e40a5b718e0}
+  - {path: research/bitop_ladder_20261019/specs/train-P38.json, sha256: f331a4b4bd5c962a82ef54223707de636c7a2929f69ae72f9998a7452651cb27}
+  - {path: research/bitop_ladder_20261019/specs/train-P39.json, sha256: 8f9a2cb4a248eea8a34b5c6d4a7e9b6eb916dcdc680f246528ab76e6df20a6c7}
+  - {path: research/bitop_ladder_20261019/specs/train-P40.json, sha256: bdfcfd1b2a4cecc9a638d54dc40ebdaa527cf6a1018e23d0fe905d6b9f238dca}
+  - {path: target/release/ecbench, sha256: 372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a}
+must_not_exist:
+  - research/bitop_ladder_20261019/sessions/train-P35
+  - research/bitop_ladder_20261019/sessions/train-P38
+  - research/bitop_ladder_20261019/sessions/train-P39
+  - research/bitop_ladder_20261019/sessions/train-P40
+commands:
+  - id: train-panel
+    cwd: research/bitop_ladder_20261019
+    argv:
+      - ./run_sessions.sh
+      - specs/train-P35.json
+      - specs/train-P38.json
+      - specs/train-P39.json
+      - specs/train-P40.json
+    timeout_seconds: 7000
+    success_exit_codes: [0]
+    stdout: research/bitop_ladder_20261019/cards/CARD-bitop-ladder-20261019-2.run.stdout
+    outputs:
+      - research/bitop_ladder_20261019/sessions/train-P35/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P38/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P39/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P40/verify.json
+bus_address: executor-mechanical-bitop-ladder
+background: true
+write_scope:
+  - research/bitop_ladder_20261019/
+stop_when:
+  - The train-panel command exits with a status other than 0.
+  - Any path listed under must_not_exist already exists before the command starts.
