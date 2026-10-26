@@ -11,6 +11,7 @@ certificate for this study. The complete-cost panel remains blocked.
 | Exact module tests in isolated native review build | 15 passed, 0 failed | [isolated-tests.log](isolated-tests.log) |
 | Same public example source's tests in that build | 4 passed, 0 failed, including random-label paper baseline for m=3 and split m=4 | [isolated-tests.log](isolated-tests.log) |
 | Locked repository release example tests | 4 passed, 0 failed | [release-example-tests.log](release-example-tests.log) |
+| Final locked repository release module tests | 15 passed, 0 failed | [release-module-tests.log](release-module-tests.log) |
 | Strict lint of the changed module, its tests and example in isolated build | Passed; no lint suppression for the reported defects | [isolated-clippy.log](isolated-clippy.log) |
 | Changed-file rustfmt, repository CI toolchain 1.98.0, `skip_children=true` | Passed | [rustfmt.log](rustfmt.log) (empty success log) |
 | Native S3 identity issue plus independent extra seed `(9001,32)` | Accepted, `IDC1h32f0b3e300bbf951` | [identity.json](../identity.json), [generation log](certificate-generation.log) |
@@ -44,10 +45,21 @@ backend. Fixed known-answer fixtures are outside the solver's arguments.
 
 `cargo test --release --locked --lib -- --test-threads=2` was launched against
 the implementation. The new module's 15 tests passed in that release binary;
-the full suite is still running at this entry. The touched example's locked
-release test command has completed with all four tests passing. A final
-targeted release module run is compiling after lint-only cleanup. Its outcome
-and the full-suite status will be appended; no full-suite pass is claimed here.
+the full suite is still running at this entry. The final targeted locked
+release checks have completed: 15 module tests and four example tests pass.
+The full run has reached the end of its other test output with the unchanged
+`jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies`
+still active; no failed test is reported in that implementation run so far.
+No completed full-suite pass is claimed here.
+
+The full run is the real process still running in this workspace, not a
+scheduled future experiment: command above, test executable PID 25856,
+log `/workspace/crypto-setup/final-library-tests.log`, Conductor wrapper
+log `/workspace/crypto-setup/conductor-validation-final.log`. The wrapper's
+following example-test command is harmlessly redundant with the completed
+example receipt. Collect the final exit status and append a receipt before
+calling the full suite passed. The old pre-change run was independently
+still waiting on this same untouched test when terminated.
 
 Strict root lint on the repository's CI Rust 1.98 toolchain was attempted:
 

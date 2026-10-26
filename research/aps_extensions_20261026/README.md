@@ -95,11 +95,14 @@ native comparison interface and correctness checks, not a novelty claim.
 
 ## Evidence and limits
 
-The 15 module tests pass in the isolated native review build. They cover
+The final locked release checks pass 15 module and four fixture-runner tests.
+The separate isolated review build also passes those tests. They cover
 complete solution sets, informative and uninformative relations, every
 encoding's DLP route, label integrity, malformed inputs, covering-family
 coverage (sizes 3–32 and 64), and deadlines. Integration checks and the
 example's tests are recorded in [validation/README.md](validation/README.md).
+The full library suite remains pending on an unchanged isogeny-walk test;
+seven pre-existing strict root lint failures are recorded there separately.
 
 Fixtures are `y^2=x^3+59x+6` over F101 (`n=107`, `G=(78,4)`, public `d=37`),
 `y^2=x^3+166x+158` over F211 (`n=227`, `G=(155,121)`, public `d=73`), and

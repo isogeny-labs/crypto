@@ -30,7 +30,8 @@ stated bounded deliverable, not practical or asymptotic validation.
 - [x] Include coefficient lemmas with pinned core-only Lean and an axiom audit.
 - [x] Add focused CI for the new code and proofs.
 - [x] Locked release example tests: 4 passed; record outcomes in `validation/`.
-- [ ] Finish the final targeted release module and full library checks; record outcomes in `validation/`.
+- [x] Final targeted locked release module tests: 15 passed; receipt in `validation/`.
+- [ ] Finish the full library run, still waiting on an unchanged `jv_isogeny_walk` test; record its actual outcome.
 - [ ] Publish the regular PR, enable auto-merge, inspect applicable CI and address feedback.
 
 ## Follow-up mechanisms retained for implementation
