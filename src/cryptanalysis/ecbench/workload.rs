@@ -15,11 +15,17 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use std::sync::OnceLock;
 
 use crate::binary_ecc::IrreduciblePoly;
 use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128, derive_u64};
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
+use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
+use crate::cryptanalysis::ecbench::ghs_cover::GhsInstance;
+use crate::cryptanalysis::ecbench::jacobian::Genus2Instance;
+use crate::cryptanalysis::ecbench::plane_quartic::QuarticInstance;
+use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench_large_prime::binary_explicit_instance;
 use crate::cryptanalysis::gaudry_quartic::Pt4;
 use crate::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, BinCurve, PtB, TowerBasis};
@@ -133,6 +139,102 @@ pub enum CurveSpec {
     /// `p ≡ 1 (mod 4)`, `p < 2^15`.  Unregistered: ICV1 has no
     /// extension-field form.
     Fp4Translation { p: u64, seed: u64 },
+    /// `gls_fp2::generate_gls_instance(p_bits, seed, max_cofactor)`: the
+    /// GLS twist over `F_{p²} = F_p[s]/(s² − ν)` of a curve over `F_p`,
+    /// `p` of `p_bits ≤ 24` bits, with the verified `ψ` (`ψ² = −1` on the
+    /// subgroup, `A = 4`).  A point is two packed words `c₀ + c₁ p`.
+    GlsFp2 {
+        p_bits: u32,
+        seed: u64,
+        max_cofactor: u64,
+    },
+    /// `subfield_fp3::generate_subfield_instance(p_bits, seed, false,
+    /// max_cofactor_ratio)`: a curve over `F_p` (`j ≠ 0`) on its group
+    /// over `F_{p³} = F_p[s]/(s³ − ν)`, `p ≡ 1 (mod 3)` of `p_bits ≤ 20`
+    /// bits, the prime subgroup outside `E(F_p)`, with the verified
+    /// Frobenius of order 3 on it (`A = 6`).  A point is two packed words
+    /// `c₀ + c₁ p + c₂ p²`.
+    SubfieldFp3 {
+        p_bits: u32,
+        seed: u64,
+        max_cofactor_ratio: u64,
+    },
+    /// `jacobian::Genus2Instance::search(p_bits, seed, max_cofactor)`: the
+    /// Jacobian of an imaginary genus-2 curve `y² = f(x)`, `deg f = 5`,
+    /// over `F_p` (`5 ≤ p_bits ≤ 16`), `#J(F_p) = h·r`.  A class is
+    /// `[deg u·p² + u₁p + u₀, v₁p + v₀]`.  Unregistered: ICV1 names
+    /// elliptic curves only, so the slug is `jcv1-g2-…`.
+    Genus2Search {
+        p_bits: u32,
+        seed: u64,
+        max_cofactor: u64,
+    },
+    /// The same Jacobian given outright (what a measured child rebuilds):
+    /// `f` lowest degree first, `f[5] = 1`; the order is trusted, `G` is
+    /// checked to have order `r`.
+    Genus2Explicit {
+        p: u64,
+        f: [u64; 6],
+        group_order: u64,
+        r: u64,
+        gx: u64,
+        gy: u64,
+    },
+    /// `plane_quartic::QuarticInstance::search(p_bits, seed, max_cofactor)`:
+    /// the Jacobian of a smooth plane quartic (a non-hyperelliptic curve of
+    /// genus 3) over `F_p` (`5 ≤ p_bits ≤ 11`, `p ≥ 29`), `#J(F_p) = h·r`.
+    /// A class is two 120-digit hex strings (a canonical 3×10 echelon form).
+    PlaneQuarticSearch {
+        p_bits: u32,
+        seed: u64,
+        max_cofactor: u64,
+    },
+    /// The same Jacobian given outright: the 15 coefficients of `F` in the
+    /// order `X⁴, X³Y, X³Z, X²Y², …, Z⁴` (`X`-degree descending, then
+    /// `Y`), `X⁴` coefficient 1.
+    PlaneQuarticExplicit {
+        p: u64,
+        f: [u64; 15],
+        group_order: u64,
+        r: u64,
+        generator: [String; 2],
+    },
+    /// `ghs_cover::GhsInstance::search(p, seed)`: `E : y² = x(x − α)(x −
+    /// σα)` over `F_{q³}`, `q = p²`, `α ∉ F_q`, `#E = 4ℓ` with `ℓ` prime,
+    /// whose GHS cover is a genus-3 hyperelliptic curve over `F_q`
+    /// (`jv_cover::generate_spec`; prime `11 ≤ p ≤ 1,600`, `p ≠ 3`).  A
+    /// coordinate is its six base-`p` digits packed in one word.  Its own
+    /// `ghs-…` slug: the tower is not one `F_p`-modulus, so no ICV1 name.
+    GhsFp6Search { p: u64, seed: u64 },
+    /// The same curve given outright: `α`'s six digits (`F_q` coefficient
+    /// of `1, θ, θ²`, each `c₀ + c₁t`), `ℓ` trusted, `G` checked.
+    GhsFp6Explicit {
+        p: u64,
+        alpha: [u64; 6],
+        l: u64,
+        generator: [String; 2],
+    /// `hyperelliptic_ic_bench::thread_instance(p, genus)`: the
+    /// hyperelliptic thread's curve `y² = f(x)`, `deg f = 2g + 1`, over
+    /// `F_p` (`p < 256`, `g ∈ {2, 3, 4}`), its generator `D₁` of prime
+    /// order `r`, and `#J` from point counts over `F_{p^k}`, `k < g`, and
+    /// an exponent test (`ecbench::hyper`).  A divisor is two packed
+    /// words.  Unregistered: ICV1 has no hyperelliptic form.
+    HyperellipticThread { p: u64, genus: u32 },
+    /// A hyperelliptic Jacobian given outright: `f` (lowest degree first,
+    /// `deg f = 2g + 1`), `#J`, the prime `r` and a generator `(gu, gv)`
+    /// (`gu` with its leading 1, both lowest degree first).  Checked on
+    /// build (squarefree `f`, `G` reduced, `[r]G = 0`, `r | #J`, `#J` in
+    /// the Hasse–Weil interval and killing eight random divisors); the
+    /// order is otherwise trusted.  What measured children rebuild.
+    HyperellipticExplicit {
+        p: u64,
+        genus: u32,
+        f: Vec<u64>,
+        group_order: u64,
+        r: u64,
+        gu: Vec<u64>,
+        gv: Vec<u64>,
+    },
 }
 
 impl CurveSpec {
@@ -330,6 +432,69 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 Fp4Instance::build(p, seed).map(|i| Instance::Fp4(Box::new(i)))
             }
+            CurveSpec::GlsFp2 {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => ExtInstance::build_gls(p_bits, seed, max_cofactor)
+                .map(|i| Instance::Ext(Box::new(i))),
+            CurveSpec::SubfieldFp3 {
+                p_bits,
+                seed,
+                max_cofactor_ratio,
+            } => ExtInstance::build_subfield(p_bits, seed, max_cofactor_ratio)
+                .map(|i| Instance::Ext(Box::new(i))),
+            CurveSpec::Genus2Search {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => Genus2Instance::search(p_bits, seed, max_cofactor)
+                .map(|i| Instance::Genus2(Box::new(i))),
+            CurveSpec::Genus2Explicit {
+                p,
+                f,
+                group_order,
+                r,
+                gx,
+                gy,
+            } => Genus2Instance::explicit(p, f, group_order, r, [gx, gy])
+                .map(|i| Instance::Genus2(Box::new(i))),
+            CurveSpec::PlaneQuarticSearch {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => QuarticInstance::search(p_bits, seed, max_cofactor)
+                .map(|i| Instance::Quartic(Box::new(i))),
+            CurveSpec::PlaneQuarticExplicit {
+                p,
+                f,
+                group_order,
+                r,
+                ref generator,
+            } => QuarticInstance::explicit(p, f, group_order, r, generator)
+                .map(|i| Instance::Quartic(Box::new(i))),
+            CurveSpec::GhsFp6Search { p, seed } => {
+                GhsInstance::search(p, seed).map(|i| Instance::Ghs(Box::new(i)))
+            }
+            CurveSpec::GhsFp6Explicit {
+                p,
+                alpha,
+                l,
+                ref generator,
+            } => GhsInstance::explicit(p, alpha, l, generator).map(|i| Instance::Ghs(Box::new(i))),
+            CurveSpec::HyperellipticThread { p, genus } => {
+                HyperInstance::build_thread(p, genus).map(|i| Instance::Hyper(Box::new(i)))
+            }
+            CurveSpec::HyperellipticExplicit {
+                p,
+                genus,
+                ref f,
+                group_order,
+                r,
+                ref gu,
+                ref gv,
+            } => HyperInstance::build_explicit(p, genus, f, group_order, r, gu, gv)
+                .map(|i| Instance::Hyper(Box::new(i))),
         }
     }
 
@@ -367,11 +532,50 @@ impl CurveSpec {
             // certified Frobenius action and endomorphism identity that a
             // generic explicit binary instance intentionally does not claim.
             // The search is the constructor (cheap and deterministic).
+            Instance::Genus2(i) => {
+                let (gx, gy) = super::jacobian::encode_g2(i.p(), &i.generator);
+                Some(CurveSpec::Genus2Explicit {
+                    p: i.p(),
+                    f: i.curve.f(),
+                    group_order: i.group_order,
+                    r: i.r,
+                    gx,
+                    gy,
+                })
+            }
+            Instance::Quartic(i) => Some(CurveSpec::PlaneQuarticExplicit {
+                p: i.jac.p,
+                f: i.jac.f,
+                group_order: i.group_order,
+                r: i.r,
+                generator: i.encode(&i.generator),
+            }),
+            Instance::Ghs(i) => Some(CurveSpec::GhsFp6Explicit {
+                p: i.p,
+                alpha: i.alpha_digits(),
+                l: i.l,
+                generator: i.encode(&i.generator),
+            }),
             Instance::Binary(_)
             | Instance::Wide(_)
             | Instance::Fp4(_)
             | Instance::Fp4Torsion(_)
-            | Instance::F2m4(_) => None,
+            | Instance::F2m4(_)
+            | Instance::Ext(_) => None,
+            // The thread rule and the order's point counts are the slow
+            // part; a child rebuilds from the explicit model.
+            Instance::Hyper(i) => {
+                let (gu, gv) = i.generator_coeffs();
+                Some(CurveSpec::HyperellipticExplicit {
+                    p: i.p,
+                    genus: i.genus,
+                    f: i.f.clone(),
+                    group_order: i.group_order,
+                    r: i.r,
+                    gu,
+                    gv,
+                })
+            }
         }
     }
 
@@ -420,6 +624,44 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }
+            CurveSpec::GlsFp2 {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => format!("gls_fp2::generate_gls_instance({p_bits}, {seed}, {max_cofactor})"),
+            CurveSpec::SubfieldFp3 {
+                p_bits,
+                seed,
+                max_cofactor_ratio,
+            } => format!(
+                "subfield_fp3::generate_subfield_instance({p_bits}, {seed}, false, {max_cofactor_ratio})"
+            ),
+            CurveSpec::Genus2Search {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => format!("jacobian::Genus2Instance::search({p_bits}, {seed}, {max_cofactor})"),
+            CurveSpec::Genus2Explicit { p, f, .. } => {
+                format!("Genus2Curve::new({p}, {f:?}) (explicit)")
+            }
+            CurveSpec::PlaneQuarticSearch {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => format!("plane_quartic::QuarticInstance::search({p_bits}, {seed}, {max_cofactor})"),
+            CurveSpec::PlaneQuarticExplicit { p, f, .. } => {
+                format!("QuarticJacobian::new({p}, {f:?}) (explicit)")
+            }
+            CurveSpec::GhsFp6Search { p, seed } => format!("ghs_cover::GhsInstance::search({p}, {seed})"),
+            CurveSpec::GhsFp6Explicit { p, alpha, .. } => {
+                format!("GHS curve over F_{{{p}^6}}, α = {alpha:?} (explicit)")
+            }
+            CurveSpec::HyperellipticThread { p, genus } => {
+                format!("hyperelliptic_ic_bench::thread_instance({p}, {genus})")
+            }
+            CurveSpec::HyperellipticExplicit {
+                p, genus, ref f, ..
+            } => format!("HCurve {{ p: {p}, genus: {genus}, f: {f:?} }} (explicit)"),
         }
     }
 }
@@ -437,6 +679,19 @@ pub enum Instance {
     /// A curve over `F_{p⁴}` (`ecbench::fp4`); a point is one 64-bit word
     /// per coordinate, four 16-bit limbs.
     Fp4(Box<Fp4Instance>),
+    /// A GLS curve over `F_{p²}` or a subfield curve on `E(F_{p³})`
+    /// (`ecbench::ext`); a coordinate is one packed word.
+    Ext(Box<ExtInstance>),
+    /// The Jacobian of a genus-2 curve (`ecbench::jacobian`).
+    Genus2(Box<Genus2Instance>),
+    /// The Jacobian of a smooth plane quartic (`ecbench::plane_quartic`).
+    Quartic(Box<QuarticInstance>),
+    /// An elliptic curve over `F_{p⁶}` with a genus-3 GHS cover
+    /// (`ecbench::ghs_cover`).
+    Ghs(Box<GhsInstance>),
+    /// A hyperelliptic Jacobian of genus 2 to 4 over `F_p`, `p < 256`
+    /// (`ecbench::hyper`); a divisor is two packed words.
+    Hyper(Box<HyperInstance>),
 }
 
 /// A wide Koblitz curve and the strong reference's arithmetic on it, which
@@ -448,7 +703,7 @@ pub struct WideInstance {
 
 /// The registry's modulus for `K_a` over `F_{2^n}`, if it lists one.
 pub fn registry_koblitz_modulus(a: u8, n: u32) -> Option<IrreduciblePoly> {
-    let entry = registry_curves()?.iter().find(|c| {
+    let entry = registry_curves().iter().find(|c| {
         let p = c.get("params");
         c.get("family").and_then(Value::as_str) == Some("koblitz")
             && p.and_then(|p| p.get("a")).and_then(Value::as_u64) == Some(u64::from(a))
@@ -503,37 +758,100 @@ pub struct CurveFacts {
 
 const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
 
-/// The registry entry of `slug`, if any.
-/// The registry, parsed once per process: it is several megabytes, and
-/// planning a spec looked every workload's curve up in it, which parsed it
-/// again each time (most of a large spec's planning time).
-static REGISTRY_DOC: std::sync::LazyLock<Option<Value>> =
-    std::sync::LazyLock::new(|| serde_json::from_str(REGISTRY).ok());
-
-/// Registry entries by slug, built from [`REGISTRY_DOC`] once.
-static REGISTRY_BY_SLUG: std::sync::LazyLock<std::collections::HashMap<String, usize>> =
-    std::sync::LazyLock::new(|| {
-        registry_curves()
-            .map(|cs| {
-                let mut m = std::collections::HashMap::new();
-                for (i, c) in cs.iter().enumerate() {
-                    if let Some(slug) = c.get("slug").and_then(Value::as_str) {
-                        // The first entry with a slug wins, as the linear search did.
-                        m.entry(slug.to_string()).or_insert(i);
-                    }
-                }
-                m
+/// The registry's curves, parsed once per process, for the lookups that
+/// scan every entry (a wide Koblitz modulus) and as the fallback of
+/// [`registry_entry`]; several megabytes, so nothing on the per-execution
+/// path parses it.
+fn registry_curves() -> &'static [Value] {
+    static CURVES: OnceLock<Vec<Value>> = OnceLock::new();
+    CURVES.get_or_init(|| {
+        serde_json::from_str::<Value>(REGISTRY)
+            .ok()
+            .and_then(|mut doc| doc.get_mut("curves").map(Value::take))
+            .and_then(|curves| match curves {
+                Value::Array(curves) => Some(curves),
+                _ => None,
             })
             .unwrap_or_default()
-    });
-
-fn registry_curves() -> Option<&'static Vec<Value>> {
-    REGISTRY_DOC.as_ref()?.get("curves")?.as_array()
+    })
 }
 
+/// The registry entry of `slug`, parsed from its own text alone.
+///
+/// The document is 4.7 MB and every measured execution is a fresh child
+/// process, so parsing it whole cost 97% of a toy solve's instructions
+/// (callgrind, 2026-10-18: 147.6M of 153M Ir in `ecbench exec`); a
+/// per-process cache cannot help a child.  A slug is a plain `icv1-…`
+/// string that occurs in the document as its own entry's `"slug"` value,
+/// the first key of the entry, so the entry is cut out between the brace
+/// before that key and its string-aware match and parsed on its own.  The
+/// extracted object is checked to carry the slug, and anything the fast
+/// path cannot place falls back to the full parse, so the answer is the
+/// one the full parse gives: the first entry with that slug.
 fn registry_entry(slug: &str) -> Option<Value> {
-    let i = *REGISTRY_BY_SLUG.get(slug)?;
-    registry_curves()?.get(i).cloned()
+    let needle = format!("\"{slug}\"");
+    let mut from = 0;
+    while let Some(pos) = REGISTRY[from..].find(&needle) {
+        let at = from + pos;
+        from = at + needle.len();
+        let Some(entry) = registry_entry_around(at) else {
+            // A slug quoted somewhere the fast path cannot read: the
+            // full parse decides.
+            return registry_curves()
+                .iter()
+                .find(|c| c.get("slug").and_then(Value::as_str) == Some(slug))
+                .cloned();
+        };
+        if entry.get("slug").and_then(Value::as_str) == Some(slug) {
+            return Some(entry);
+        }
+    }
+    None
+}
+
+/// The object whose first key, `"slug"`, has its value at byte `at` of
+/// the registry; `None` when the text around `at` is not that shape.
+fn registry_entry_around(at: usize) -> Option<Value> {
+    let before = REGISTRY[..at].trim_end_matches(|c: char| c == ':' || c.is_whitespace());
+    let key = before.strip_suffix("\"slug\"")?;
+    let open = key.rfind('{')?;
+    if !key[open + 1..].trim().is_empty() {
+        return None;
+    }
+    let close = json_object_end(REGISTRY.as_bytes(), open)?;
+    serde_json::from_str(&REGISTRY[open..=close]).ok()
+}
+
+/// The index of the `}` closing the object that opens at `open`, reading
+/// strings and their escapes so braces inside them do not count.
+fn json_object_end(text: &[u8], open: usize) -> Option<usize> {
+    let mut depth = 0usize;
+    let mut in_string = false;
+    let mut escaped = false;
+    for (i, &b) in text.iter().enumerate().skip(open) {
+        if in_string {
+            if escaped {
+                escaped = false;
+            } else if b == b'\\' {
+                escaped = true;
+            } else if b == b'"' {
+                in_string = false;
+            }
+            continue;
+        }
+        match b {
+            b'"' => in_string = true,
+            b'{' => depth += 1,
+            b'}' => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(i);
+                }
+            }
+            _ => {}
+        }
+    }
+    None
 }
 
 fn parse_hex(s: &str) -> Option<u128> {
@@ -572,10 +890,113 @@ impl Instance {
             Instance::Fp4(i) => u128::from(i.r),
             Instance::Fp4Torsion(i) => u128::from(i.r),
             Instance::F2m4(i) => u128::from(i.r),
+            Instance::Ext(i) => u128::from(i.r()),
+            Instance::Genus2(i) => u128::from(i.r),
+            Instance::Quartic(i) => u128::from(i.r),
+            Instance::Ghs(i) => u128::from(i.l),
+            Instance::Hyper(i) => u128::from(i.r()),
         }
     }
 
     pub fn facts(&self, spec: &CurveSpec) -> CurveFacts {
+        let jac = match self {
+            Instance::Genus2(i) => Some((
+                i.names(),
+                "genus2",
+                i.p(),
+                i.group_order,
+                i.r,
+                i.cofactor,
+                i.encode(&i.generator),
+            )),
+            Instance::Quartic(i) => Some((
+                i.names(),
+                "plane_quartic",
+                i.jac.p,
+                i.group_order,
+                i.r,
+                i.cofactor,
+                i.encode(&i.generator),
+            )),
+            _ => None,
+        };
+        if let Some(((icv1, slug), family, p, order, r, h, generator)) = jac {
+            // A Jacobian's model is not an elliptic curve: it has no ICV1
+            // identity or registry entry (`jacobian` module docs).
+            return CurveFacts {
+                slug,
+                icv1,
+                family: family.into(),
+                construction: spec.call(),
+                field_degree: None,
+                field_bits: Some(64 - p.leading_zeros()),
+                group_order: u128::from(order),
+                r: u128::from(r),
+                cofactor: u128::from(h),
+                generator,
+                automorphisms_available: 2,
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
+        }
+        if let Instance::Ghs(i) = self {
+            let (icv1, slug) = i.names();
+            return CurveFacts {
+                slug,
+                icv1,
+                family: "ghs_fp6".into(),
+                construction: spec.call(),
+                field_degree: Some(6),
+                field_bits: Some(64 - i.p.leading_zeros()),
+                group_order: u128::from(i.group_order()),
+                r: u128::from(i.l),
+                cofactor: 4,
+                generator: i.encode(&i.generator),
+                automorphisms_available: 2,
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
+        }
+        if let Instance::Ext(i) = self {
+            let id = i.id();
+            return CurveFacts {
+                slug: id.slug,
+                icv1: id.icv1,
+                family: "extension".into(),
+                construction: spec.call(),
+                field_degree: None,
+                field_bits: Some(64 - i.p().leading_zeros()),
+                group_order: u128::from(i.group_order()),
+                r: u128::from(i.r()),
+                cofactor: u128::from(i.cofactor()),
+                generator: i.generator_hex(),
+                automorphisms_available: i.automorphisms_available(),
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
+        }
+        if let Instance::Hyper(i) = self {
+            let (icv1, slug) = i.names();
+            return CurveFacts {
+                slug,
+                icv1,
+                family: "hyperelliptic".into(),
+                construction: spec.call(),
+                field_degree: None,
+                field_bits: Some(64 - i.p.leading_zeros()),
+                group_order: u128::from(i.group_order),
+                r: u128::from(i.r),
+                cofactor: u128::from(i.cofactor),
+                generator: i.generator_hex(),
+                automorphisms_available: 2,
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
+        }
         if let Instance::Fp4(i) = self {
             let (icv1, slug) = i.names();
             let g = Fp4Instance::encode(&i.g).unwrap_or_default();
@@ -625,7 +1046,14 @@ impl Instance {
                 u128::from(i.generator.y),
                 if i.koblitz.is_some() { 2 * i.n } else { 2 },
             ),
-            Instance::Fp4(_) => unreachable!("returned above"),
+            Instance::Fp4(_)
+            | Instance::Ext(_)
+            | Instance::Genus2(_)
+            | Instance::Quartic(_)
+            | Instance::Ghs(_)
+            Instance::Fp4(_) | Instance::Ext(_) | Instance::Hyper(_) => {
+                unreachable!("returned above")
+            }
             Instance::Wide(i) => (
                 i.kc.curve_id(),
                 "koblitz",
@@ -731,6 +1159,21 @@ impl Instance {
         if let Instance::Fp4(i) = self {
             return i.mul_generator_hex(k);
         }
+        if let Instance::Ext(i) = self {
+            return i.mul_generator_hex(k);
+        }
+        if let Instance::Genus2(i) = self {
+            return i.mul_generator_hex(k);
+        }
+        if let Instance::Quartic(i) = self {
+            return i.mul_generator_hex(k);
+        }
+        if let Instance::Ghs(i) = self {
+            return i.mul_generator_hex(k);
+        }
+        if let Instance::Hyper(i) = self {
+            return i.mul_generator_hex(k);
+        }
         match self {
             Instance::Prime(i) => {
                 let p = i.curve.mul(&mut scratch, i.generator_point(), k);
@@ -762,7 +1205,15 @@ impl Instance {
                     ]
                 })
             }
-            Instance::Wide(_) | Instance::Fp4(_) => unreachable!("returned above"),
+            Instance::Wide(_)
+            | Instance::Fp4(_)
+            | Instance::Ext(_)
+            | Instance::Genus2(_)
+            | Instance::Quartic(_)
+            | Instance::Ghs(_)
+            Instance::Wide(_) | Instance::Fp4(_) | Instance::Ext(_) | Instance::Hyper(_) => {
+                unreachable!("returned above")
+            }
         }
     }
 }
@@ -782,8 +1233,9 @@ impl Instance {
     ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
-        if let Instance::Fp4(_) = self {
-            // Planted targets only on E(F_{p⁴}): no public-target law yet.
+        if let Instance::Fp4(_) | Instance::Hyper(_) = self {
+            // Planted targets only on E(F_{p⁴}) and on the hyperelliptic
+            // Jacobians: no public-target law yet.
             return None;
         }
         if let Instance::Wide(i) = self {
@@ -831,7 +1283,29 @@ impl Instance {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
                 }
-                Instance::Wide(_) | Instance::Fp4(_) => unreachable!("handled above"),
+                Instance::Wide(_) | Instance::Fp4(_) | Instance::Hyper(_) => {
+                    unreachable!("handled above")
+                }
+                Instance::Ext(i) => {
+                    if let Some(t) = i.hash_to_subgroup_hex(h) {
+                        return Some((t, counter));
+                    }
+                }
+                Instance::Genus2(i) => {
+                    if let Some(t) = i.hash_to_subgroup_hex(h) {
+                        return Some((t, counter));
+                    }
+                }
+                Instance::Quartic(i) => {
+                    if let Some(t) = i.hash_to_subgroup_hex(h) {
+                        return Some((t, counter));
+                    }
+                }
+                Instance::Ghs(i) => {
+                    if let Some(t) = i.hash_to_subgroup_hex(h) {
+                        return Some((t, counter));
+                    }
+                }
                 Instance::Fp4Torsion(i) => {
                     let c = &i.inst.curve;
                     let p = c.f.p;
@@ -1175,6 +1649,29 @@ impl Workload {
 mod tests {
     use super::*;
 
+    /// The slug-targeted extraction answers exactly as the full parse:
+    /// the first entry carrying the slug, or none.
+    #[test]
+    fn registry_entry_matches_the_full_parse() {
+        let all = registry_curves();
+        assert!(all.len() > 100, "the registry is populated");
+        for c in all.iter().step_by(97) {
+            let slug = c.get("slug").and_then(Value::as_str).unwrap();
+            let fast = registry_entry(slug).unwrap_or_else(|| panic!("{slug} not found"));
+            let full = all
+                .iter()
+                .find(|x| x.get("slug").and_then(Value::as_str) == Some(slug))
+                .unwrap();
+            assert_eq!(&fast, full, "{slug}");
+        }
+        assert!(registry_entry("icv1-no-such-curve-00000000").is_none());
+        // A slug that is a prefix of a real one is not that one.
+        let first = all[0].get("slug").and_then(Value::as_str).unwrap();
+        assert!(registry_entry(&first[..first.len() - 1]).is_none());
+        // A string with braces and escaped quotes inside is skipped as text.
+        assert_eq!(json_object_end(br#"{"a":"}\"{","b":{}}"#, 0), Some(18));
+    }
+
     fn public_fixture() -> CurveSpec {
         CurveSpec::PrimePublicFixture {
             p: 343073,
@@ -1334,6 +1831,26 @@ mod tests {
     }
 
     #[test]
+    fn hyperelliptic_explicit_form_rebuilds_the_same_workload_and_serialises() {
+        let spec = CurveSpec::HyperellipticThread { p: 23, genus: 3 };
+        let (w, inst) = Workload::build(&spec, 3, 1, TargetKind::Planted).unwrap();
+        assert_eq!(w.curve.family, "hyperelliptic");
+        assert!(!w.curve.registered);
+        let ex = CurveSpec::explicit(&inst).unwrap();
+        let text = serde_json::to_string(&ex).unwrap();
+        assert!(text.contains("\"kind\":\"hyperelliptic_explicit\""));
+        let back: CurveSpec = serde_json::from_str(&text).unwrap();
+        assert_eq!(back, ex);
+        let (w2, _) = Workload::build(&back, 3, 1, TargetKind::Planted).unwrap();
+        assert_eq!(w.workload_id, w2.workload_id);
+        assert_eq!(w.planted, w2.planted);
+        assert_eq!(w.curve.icv1, w2.curve.icv1);
+        assert_ne!(model_hash(&w.curve), 0);
+        // No public-target law on a Jacobian yet.
+        assert!(Workload::build(&spec, 3, 1, TargetKind::Public).is_err());
+    }
+
+    #[test]
     fn planted_scalars_are_uniform() {
         // Kolmogorov–Smirnov against U(0, 1) for k / r over 20 000 indices,
         // and the mean distance |k − r/2| / r against its 0.25.  The draw
@@ -1420,5 +1937,37 @@ mod tests {
     #[test]
     fn unusable_koblitz_curve_is_refused() {
         assert!(CurveSpec::Koblitz { a: 0, n: 17 }.build().is_err());
+    }
+}
+
+#[cfg(test)]
+mod merged_variant_tests {
+    use super::*;
+    #[test]
+    fn distinct_quartic_constructors_keep_their_metadata_and_generators() {
+        let specs = [
+            CurveSpec::Fp4Translation { p: 29, seed: 1 },
+            CurveSpec::Fp4Torsion {
+                p: 29,
+                seed: 1,
+                max_cofactor: 16,
+            },
+            CurveSpec::F2m4Torsion {
+                m: 4,
+                seed: 1,
+                max_cofactor: 16,
+            },
+        ];
+        for spec in specs {
+            let i = spec.build().unwrap();
+            let facts = i.facts(&spec);
+            assert!(facts.r > 2);
+            assert_eq!(i.mul_generator_hex(1).unwrap(), facts.generator);
+            assert!(i.mul_generator_hex(i.r()).is_none());
+            assert_eq!(
+                serde_json::from_str::<CurveSpec>(&serde_json::to_string(&spec).unwrap()).unwrap(),
+                spec
+            );
+        }
     }
 }
