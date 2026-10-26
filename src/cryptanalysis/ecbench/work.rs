@@ -409,9 +409,58 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         "index_inserts" => HASH,
         "index_point_negations" => Prims(&[(FieldAdd, 1)]),
         "index_sort_word_ops" => Prims(&[(WordOp, 1)]),
+
+        // ── Extension of 2026-10-21 (ic-acct-6; docs/units/BITOPS.md,
+        // "Extensions").  No primitive weight changes; these rules classify
+        // counters that committed records carry and no rule priced.
+        //
+        // `prime-projected-abscissa`: the membership check `[r]P = O` is a
+        // counted double-and-add (`CountedGroup::mul` charges its additions
+        // and doublings to the phase), so the counter is a sub-total of the
+        // phase's group operations.
+        "projected_base_membership_checks_uncharged" => Shape,
+        // The duplicate-abscissa guard: one keyed-set insert of a field
+        // element, a hash probe (the unit prices a keyed-set probe, not
+        // the container the code happens to use).
+        "projected_base_dedup_probes_uncharged" => HASH,
+        // An outcome, and the column map's size: the vectors are memory,
+        // and the indexes derived from them are the `base_index_builds`
+        // item (counted by `index_inserts` where the record carries it).
+        "projected_base_duplicate_points" | "projected_base_column_map_entries_uncharged" => Shape,
+        // `isogeny-tower`'s flag for a supersingular auxiliary curve.
+        "aux_supersingular" => Shape,
+        // `ic.cm_folded_*`: the native backend's own counters
+        // (`research/conductor_gap_cm_orbits_20261015/native/group.hpp`).
+        // Every `mul` and `sq` there increments these, including the
+        // products inside its Jacobian doublings and mixed additions, so
+        // the products and squarings are priced and the group-operation
+        // counts are sub-totals of them.  What the backend does without a
+        // counter (its `power` exponentiations, field additions, hashing,
+        // arithmetic modulo r, elimination, the CM map) is listed in
+        // `known_uncounted`.
+        "native_field_muls_uncharged" => Prims(&[(FieldMul, 1)]),
+        "native_field_sqrs_uncharged" => Prims(&[(FieldSqr, 1)]),
+        "native_group_doubles_uncharged"
+        | "native_group_mixed_uncharged"
+        | "native_scalar_calls_uncharged"
+        | "native_factor_base_scans_uncharged"
+        | "native_queries_uncharged"
+        | "native_hits_uncharged"
+        | "native_rank_uncharged"
+        | "native_rejected_duplicate_columns_uncharged"
+        | "native_pair_table_keys_uncharged"
+        | "native_table_bytes_uncharged" => Shape,
+        // Excluded diagnostics: wall-clock time is not work and is never
+        // priced in the unit.
+        "independent_replay_wall_ns" => Shape,
         _ => return None,
     })
 }
+
+/// The `known_uncounted` item of the `ic.cm_folded_*` native backend
+/// (2026-10-21): the work its counters do not see.
+pub const CM_FOLDED_NATIVE_GAP: &str =
+    "native_backend_exponentiations_field_adds_hashing_modr_elimination_and_cm_map";
 
 /// Counters of the generic methods (rho, BSGS, kangaroo, the claw).
 fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
@@ -562,6 +611,9 @@ fn known_uncounted(
         if method == "ic.large_prime" {
             out.push("large_prime_merge_rebuilds");
         }
+        if method.starts_with("ic.cm_folded_") {
+            out.push(CM_FOLDED_NATIVE_GAP);
+        }
     }
     if let Some(s) = solver.filter(|s| !solver_complete(s)) {
         if let Some(gap) = solver_gap(&s.op_unit) {
@@ -656,9 +708,62 @@ pub fn widths_of(curve: &CurveFacts) -> Result<Widths, String> {
         "fp4" => Field::Fp4 {
             bits: curve.field_bits.ok_or("fp4 curve without field_bits")?,
         },
+        // Extension of 2026-10-21: the two `extension` constructions
+        // (`workload.rs`, `Instance::F2m4` and `Instance::Fp4Torsion`),
+        // whose widths the ICV1 slug names.
+        "extension" => extension_field(curve)?,
         f => return Err(format!("no bitop/v1 field for family `{f}`")),
     };
     Ok(Widths { field, r_bits })
+}
+
+/// The field of an `extension`-family curve (extension of 2026-10-21).
+///
+/// - `icv1-f2m<N>-…` is a curve `y² + xy = x³ + ax² + b` over
+///   `F_{2^N}`, `N = 4m` with `field_bits = m` the tower's base degree
+///   (`gaudry_quartic_bin`): a binary field of degree `N`, priced as every
+///   `F_{2^n}` is, by its degree alone (the convention prices the field, not
+///   the tower the code computes in).
+/// - `icv1-fp<b>k4-…` is a curve over `F_{p⁴}` with `p` of `b` bits
+///   (`field_bits = b`): the `F_{p⁴}` convention.
+///
+/// Anything else, or a slug that disagrees with `field_bits`, has no field.
+fn extension_field(curve: &CurveFacts) -> Result<Field, String> {
+    let bits = curve
+        .field_bits
+        .ok_or("extension curve without field_bits")?;
+    let digits = |s: &str| -> Option<u32> {
+        let d: String = s.chars().take_while(char::is_ascii_digit).collect();
+        d.parse().ok()
+    };
+    if let Some(rest) = curve.slug.strip_prefix("icv1-f2m") {
+        let n = digits(rest).ok_or("extension slug without a degree")?;
+        if n != 4 * bits {
+            return Err(format!(
+                "extension curve {}: degree {n} is not 4 × field_bits {bits}",
+                curve.slug
+            ));
+        }
+        return Ok(Field::Binary { n });
+    }
+    if let Some(rest) = curve.slug.strip_prefix("icv1-fp") {
+        let b = digits(rest).ok_or("extension slug without a width")?;
+        let k = rest
+            .split_once('k')
+            .and_then(|(_, t)| digits(t))
+            .ok_or("extension slug without a degree")?;
+        if k == 4 && b == bits {
+            return Ok(Field::Fp4 { bits });
+        }
+        return Err(format!(
+            "no bitop/v1 field for extension curve {} (p of {b} bits, degree {k})",
+            curve.slug
+        ));
+    }
+    Err(format!(
+        "no bitop/v1 field for extension curve {}",
+        curve.slug
+    ))
 }
 
 fn add_prims(into: &mut BTreeMap<Prim, u128>, prims: &[(Prim, u32)], count: u128) {
@@ -777,6 +882,9 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
                             | "merge_modr_mults"
                             | "row_ops_uncharged"
                             | "lp_merge_ops_uncharged" => "linear_algebra",
+                            "native_field_muls_uncharged" | "native_field_sqrs_uncharged" => {
+                                "native_cold_backend"
+                            }
                             _ => "relations",
                         };
                         let slot = phase_slot(&mut phases, phase);
@@ -1267,6 +1375,175 @@ mod tests {
             }
             .gates(FieldInv)
             .unwrap()
+        );
+    }
+
+    fn price_ic(
+        method: &str,
+        c: &CurveFacts,
+        phases: &[PhaseRecord],
+        counters: &BTreeMap<String, u64>,
+    ) -> WorkBlock {
+        let params = BTreeMap::new();
+        price(&Priceable {
+            method_id: method,
+            method_params: &params,
+            curve: c,
+            phases,
+            counters,
+            solver: None,
+        })
+        .unwrap()
+    }
+
+    /// Extension of 2026-10-21: the projected base's counters.
+    #[test]
+    fn projected_base_counters_price_the_probe_and_nothing_twice() {
+        let c = curve("prime", 24, (1 << 23) + 15, 2);
+        let phases = vec![PhaseRecord {
+            name: "factor_base".into(),
+            adds: 40,
+            doubles: 60,
+            native: [
+                (
+                    "projected_base_membership_checks_uncharged".to_string(),
+                    7u64,
+                ),
+                ("projected_base_dedup_probes_uncharged".into(), 7),
+                ("projected_base_duplicate_points".into(), 2),
+                ("projected_base_column_map_entries_uncharged".into(), 10),
+                ("aux_supersingular".into(), 1),
+            ]
+            .into_iter()
+            .collect(),
+            ..Default::default()
+        }];
+        let w = price_ic("ic.pipeline", &c, &phases, &BTreeMap::new());
+        assert!(w.unpriced.is_empty(), "{:?}", w.unpriced);
+        let p = &w.phases[0].prims;
+        // Only the dedup probes add primitives; the membership checks are
+        // inside the phase's 40 additions and 60 doublings.
+        assert_eq!(p["hash_probe"], 7);
+        assert_eq!(p["group_add"], 40);
+        assert_eq!(p["group_double"], 60);
+        assert_eq!(p.len(), 3);
+    }
+
+    /// Extension of 2026-10-21: the CM-folded native backend.
+    #[test]
+    fn cm_folded_native_products_are_priced_and_the_rest_is_listed() {
+        let c = curve("prime", 30, (1 << 29) + 11, 2);
+        let phases = vec![
+            PhaseRecord {
+                name: "native_cold_backend".into(),
+                wall_ns: Some(5),
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "independent_replay".into(),
+                adds: 3,
+                ..Default::default()
+            },
+        ];
+        let counters: BTreeMap<String, u64> = [
+            ("native_field_muls_uncharged", 1000u64),
+            ("native_field_sqrs_uncharged", 300),
+            ("native_group_doubles_uncharged", 20),
+            ("native_group_mixed_uncharged", 10),
+            ("native_scalar_calls_uncharged", 2),
+            ("native_factor_base_scans_uncharged", 9),
+            ("native_queries_uncharged", 64),
+            ("native_hits_uncharged", 5),
+            ("native_rank_uncharged", 5),
+            ("native_rejected_duplicate_columns_uncharged", 1),
+            ("native_pair_table_keys_uncharged", 100),
+            ("native_table_bytes_uncharged", 4096),
+            ("independent_replay_wall_ns", 123_456_789),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), v))
+        .collect();
+        let w = price_ic("ic.cm_folded_native_v1", &c, &phases, &counters);
+        assert!(w.unpriced.is_empty(), "{:?}", w.unpriced);
+        assert!(!w.complete);
+        assert!(w.known_uncounted.iter().any(|k| k == CM_FOLDED_NATIVE_GAP));
+        let native = w
+            .phases
+            .iter()
+            .find(|p| p.name == "native_cold_backend")
+            .unwrap();
+        assert_eq!(native.prims["field_mul"], 1000);
+        assert_eq!(native.prims["field_sqr"], 300);
+        assert_eq!(native.prims.values().filter(|c| **c > 0).count(), 2);
+        let ws = widths_of(&c).unwrap();
+        let expect = 1000 * ws.gates(FieldMul).unwrap()
+            + 300 * ws.gates(FieldSqr).unwrap()
+            + 3 * ws.gates(GroupAdd).unwrap();
+        // The wall-clock diagnostic adds nothing.
+        assert_eq!(w.bitops, expect.to_string());
+    }
+
+    fn extension_curve(slug: &str, bits: u32) -> CurveFacts {
+        let mut c = curve("prime", bits, 1_000_003, 2);
+        c.family = "extension".into();
+        c.slug = slug.into();
+        c.field_degree = None;
+        c.field_bits = Some(bits);
+        c
+    }
+
+    /// Extension of 2026-10-21: the `extension` family's fields.
+    #[test]
+    fn extension_curves_take_their_field_from_the_slug() {
+        let f2m = extension_curve("icv1-f2m56-tm338854401-5d597dcf", 14);
+        assert_eq!(widths_of(&f2m).unwrap().field, Field::Binary { n: 56 });
+        let fp4 = extension_curve("icv1-fp5k4-tm926-0123abcd", 5);
+        assert_eq!(widths_of(&fp4).unwrap().field, Field::Fp4 { bits: 5 });
+        // A slug that disagrees with field_bits, a degree other than 4 and
+        // an unknown shape have no field.
+        assert!(widths_of(&extension_curve("icv1-f2m56-x", 13)).is_err());
+        assert!(widths_of(&extension_curve("icv1-fp5k2-x", 5)).is_err());
+        assert!(widths_of(&extension_curve("icv1-hec-x", 5)).is_err());
+        // The binary extension's addition is the F_{2^56} affine addition.
+        let b = Widths {
+            field: Field::Binary { n: 56 },
+            r_bits: 55,
+        };
+        let phases = vec![PhaseRecord {
+            name: "setup".into(),
+            adds: 2,
+            ..Default::default()
+        }];
+        let params = BTreeMap::new();
+        let w = price(&Priceable {
+            method_id: "rho.negation",
+            method_params: &params,
+            curve: &f2m,
+            phases: &phases,
+            counters: &BTreeMap::new(),
+            solver: None,
+        })
+        .unwrap();
+        assert_eq!(w.bitops, (2 * b.gates(GroupAdd).unwrap()).to_string());
+    }
+
+    /// Kept unpriced on 2026-10-21: the counter records the enumerated
+    /// set's size, not the subsets summed or their weight, so no fixed
+    /// primitive sum per increment exists.
+    #[test]
+    fn enumerated_abscissae_stay_unpriced() {
+        let c = curve("binary", 23, (1 << 21) + 5, 2);
+        let phases = vec![PhaseRecord {
+            name: "factor_base".into(),
+            native: [("abscissae_enumerated_uncharged".to_string(), 5u64)]
+                .into_iter()
+                .collect(),
+            ..Default::default()
+        }];
+        let w = price_ic("ic.pipeline", &c, &phases, &BTreeMap::new());
+        assert_eq!(
+            w.unpriced,
+            vec!["abscissae_enumerated_uncharged".to_string()]
         );
     }
 
