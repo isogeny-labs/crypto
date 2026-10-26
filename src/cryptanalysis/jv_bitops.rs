@@ -279,7 +279,6 @@ pub fn claim() {
 
 /// `1` once any hook has fired on a thread that did not [`claim`] the
 /// tally (work the reader cannot see), else `0`.
-
 pub fn foreign() -> u64 {
     FOREIGN_SEEN.load(Ordering::SeqCst) as u64
 }
