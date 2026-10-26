@@ -79,3 +79,5 @@ prepares algebraic first-step/degree statements but is not elaborated or checked
 It does not add to208public/269audited historical declarations or17identities.
 Actual-state binding, iid probability semantics, native uniform execution and
 the exact runner remain pending behind the unchanged checkpoint launch gate.
+
+Storage/CI maintenance: [artifact migration review](validation/artifact-migration-review-20261026/README.md) verifies32frozen byte bindings, removes55unrelated newly added loose files while preserving their immutable Git history, and adds read-only input restoration without changing any old verification command. Physical S3 availability/new-head CI remain unverified; no new scientific/Lean result.

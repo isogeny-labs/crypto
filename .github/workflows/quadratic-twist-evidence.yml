@@ -25,12 +25,24 @@ jobs:
             /research/quadratic_twist_evidence_20261021/
             /docs/curves/registry.json
             /docs/curves/sources/quadratic-twist-native-20261021.json
+            /docs/curves/sources/.artifacts.json
+            /tools/artifacts/
             /docs/identity-certificates/schoenhage-10mult.json
             /src/binary_ecc/f2m.rs
             /src/hash/sha256.rs
             /src/cryptanalysis/curve_id.rs
             /src/cryptanalysis/curve_aliases.json
             /src/cryptanalysis/identity_certificate.rs
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          ARTIFACTS_REMOTE: s3://setec-astronomy-artifacts/store
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: >-
+          python3 tools/artifacts/artifacts.py pull --jobs 2
+          research/quadratic_twist_evidence_20261021
+          docs/curves/sources
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: '1.99.1'

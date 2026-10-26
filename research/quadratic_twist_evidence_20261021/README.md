@@ -1,3 +1,5 @@
+[Artifact migration and CI-input maintenance](validation/artifact-migration-review-20261026/README.md): frozen byte bindings preserved; read-only hydration prepared; no new scientific run.
+
 [Unexecuted collection-recurrence source draft](reports/uniform-collection-draft-20261026/README.md): handwritten Lean source only; no new proof or scientific run.
 
 # Quadratic twists: native experiments and checked point/pairing transfers
