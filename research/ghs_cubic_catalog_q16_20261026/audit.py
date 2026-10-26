@@ -84,6 +84,8 @@ def main():
     aE, bE = K.from_integer(32), K.from_integer(306)
     E = EllipticCurve(K, [K.one(), aE, K.zero(), K.zero(), bE])
     assert E.cardinality() == 3974
+    P = E(K.from_integer(307), K.from_integer(2825))
+    assert P != E(0) and 1987 * P == E(0)
     assert bE + bE**16 + bE**256 != 0
     assert bE**16 != bE
     assert math.gcd(1987, 6 - 3*123) == 1
@@ -111,6 +113,7 @@ def main():
         "counts": {"/".join(k): v for k, v in sorted(counts.items())},
         "example": {"order": 3974, "trace": 123, "subgroup_prime": 1987,
                     "source_a": 32, "source_b": 306,
+                    "subgroup_generator_xy": [307, 2825],
                     "curve_points_k_k2_k3": point_counts,
                     "model": catalog["order_3974_model"]},
         "orders": order_rows,

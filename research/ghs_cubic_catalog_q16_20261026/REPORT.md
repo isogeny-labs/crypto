@@ -52,6 +52,10 @@ E/K : y^2 + x*y = x^3 + K.from_integer(32)*x^2 + K.from_integer(306).
 #E(K) = 3974 = 2*1987; 1987 is prime.
 ```
 
+An exact order-1987 source point has encoded coordinates
+`P=(K.from_integer(307), K.from_integer(2825))`. Sage checked
+`P != O` and `[1987]P=O`; primality makes its order exactly 1987.
+
 The nonzero `b=K.from_integer(306)` has nonzero relative trace to `k`,
 and the complete source census has no class-B model of order 3974.
 Consequently this source is outside the entire direct genus-three
