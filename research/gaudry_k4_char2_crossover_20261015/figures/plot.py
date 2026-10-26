@@ -28,8 +28,13 @@ ax.scatter([r["log2_n"] for r in old], [r["ratio_to_rho_theory"] for r in old], 
            label="#1883: dense matrix, m = 6–14 (h = 2–14)")
 E = S["part_e"]["targets"]
 ok = [t for t in E if t["status"] == "verified"]
-ax.scatter([t["log2_n"] for t in ok], [t["ic_over_rho_theory"] for t in ok], s=46, color=BLUE, zorder=3,
-           label="this study: wiedemann, h = 2, ÷ rho theory (0.886)")
+clean = [t for t in ok if not t["interrupted_session"]]
+cut = [t for t in ok if t["interrupted_session"]]
+ax.scatter([t["log2_n"] for t in clean], [t["ic_over_rho_theory"] for t in clean], s=46, color=BLUE, zorder=3,
+           label="this study, clean session: IC ÷ rho theory (0.886)")
+ax.scatter([t["log2_n"] for t in cut], [t["ic_over_rho_theory"] for t in cut], s=60, facecolors="none",
+           edgecolors=BLUE, linewidths=1.8, zorder=3,
+           label="this study, record from an interrupted session (not replayed)")
 meas = [t for t in ok if t.get("ic_over_rho_measured")]
 ax.scatter([t["log2_n"] for t in meas], [t["ic_over_rho_measured"] for t in meas], s=46, marker="x",
            color=ORANGE, zorder=3, label="this study, ÷ the measured rho run on the same target")
@@ -41,11 +46,11 @@ ax.text(ax.get_xlim()[0] + 0.5, 1.08, "rho", fontsize=9)
 c = S["part_e"].get("crossover")
 if c:
     ax.axvline(c["log2_n_star"], color=GREEN, ls="--", lw=1)
-    ax.text(c["log2_n_star"] + 0.3, 6, f"measured crossover\nlog2 n* = {c['log2_n_star']:.1f}", color=GREEN, fontsize=8)
+    ax.text(c["log2_n_star"] + 0.3, 6, f"crossover indicated by the\ninterrupted-session records\nlog2 n* = {c['log2_n_star']:.1f}", color=GREEN, fontsize=8)
 ax.set_yscale("log")
 ax.set_xlabel("log2 group order n")
 ax.set_ylabel("index calculus ÷ rho (S)")
-ax.set_title("k = 4 in characteristic 2: IC against rho, measured")
+ax.set_title("k = 4 in characteristic 2: IC against rho")
 ax.legend(fontsize=8, loc="upper right")
 save(fig, "crossover")
 
