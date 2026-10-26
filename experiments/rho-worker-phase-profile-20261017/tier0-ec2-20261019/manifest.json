@@ -1,0 +1,2643 @@
+{
+  "artifacts": [
+    "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+    "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+    "/home/ec2-user/rho-tier0/rho-worker-source-ec2-64.tar.gz",
+    "/home/ec2-user/rho-tier0/aws-r2-allocation.json",
+    "/home/ec2-user/rho-tier0/worker-plan.json",
+    "/home/ec2-user/rho-tier0/worker_wrapper.py",
+    "/home/ec2-user/rho-tier0/isolated_bench.py",
+    "/home/ec2-user/rho-tier0/host-probe.json"
+  ],
+  "cases": [
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "0",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q00-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "0",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "0",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q00-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "0",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "0",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q00-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "0",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "1",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q01-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "1",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "1",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q01-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "1",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "1",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q01-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "1",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "2",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q02-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "2",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "2",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q02-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "2",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "2",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q02-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "2",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "3",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q03-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "3",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "3",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q03-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "3",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "3",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q03-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "3",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "4",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q04-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "4",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "4",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q04-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "4",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "4",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q04-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "4",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "5",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q05-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "5",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "5",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q05-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "5",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "5",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q05-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "5",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "6",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q06-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "6",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "6",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q06-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "6",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "6",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q06-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "6",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "7",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q07-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "7",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "7",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q07-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "7",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "7",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q07-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "7",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "8",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q08-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "8",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "8",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q08-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "8",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "8",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q08-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "8",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "9",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q09-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "9",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "9",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q09-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "9",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "9",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q09-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "9",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "10",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q10-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "10",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "10",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q10-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "10",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "10",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q10-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "10",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "11",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q11-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "11",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "11",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q11-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "11",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "11",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q11-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "11",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "12",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q12-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "12",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "12",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q12-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "12",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "12",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q12-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "12",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "13",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q13-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "13",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "13",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q13-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "13",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "13",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q13-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "13",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "14",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q14-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "14",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "14",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q14-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "14",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "14",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q14-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "14",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "15",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q15-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "15",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "15",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q15-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "15",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "15",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q15-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "15",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "16",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q16-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "16",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "16",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q16-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "16",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "16",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q16-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "16",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "17",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q17-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "17",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "17",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q17-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "17",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "17",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q17-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "17",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "18",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q18-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "18",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "18",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q18-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "18",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "18",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q18-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "18",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "19",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q19-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "19",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "19",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q19-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "19",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "19",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q19-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "19",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "20",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q20-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "20",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "20",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q20-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "20",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "20",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q20-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "20",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "21",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q21-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "21",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "21",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q21-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "21",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "21",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q21-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "21",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "22",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q22-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "22",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "22",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q22-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "22",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "22",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q22-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "22",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "23",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q23-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "23",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "23",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q23-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "23",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "23",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q23-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "23",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "24",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q24-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "24",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "24",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q24-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "24",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "24",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q24-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "24",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "25",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q25-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "25",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "25",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q25-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "25",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "25",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q25-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "25",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "26",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q26-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "26",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "26",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q26-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "26",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "26",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q26-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "26",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "27",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q27-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "27",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "27",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q27-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "27",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "27",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q27-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "27",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "28",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q28-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "28",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "28",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q28-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "28",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "28",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q28-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "28",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "29",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q29-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "29",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "29",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q29-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "29",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "29",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q29-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "29",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "30",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q30-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "30",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "30",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q30-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "30",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "30",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q30-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "30",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "31",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q31-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "31",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "31",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ],
+      "id": "q31-aa_serial",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "31",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    },
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "31",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q31-aa_batch",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "31",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ]
+    }
+  ],
+  "claim_gate": {
+    "aa_ratio_max": 1.11,
+    "aa_ratio_min": 0.9,
+    "comparison_lower_95_gt": 1.05,
+    "failure_policy": "retain invalid arms and leave aggregate speedup unknown",
+    "host_gate": "all arms pass the frozen Tier 1 counter and topology checks",
+    "max_absolute_peak_rss_delta_kib": 65536,
+    "max_relative_peak_rss_ratio": 1.1
+  },
+  "isolation": {
+    "cgroup": "/sys/fs/cgroup/rho-tier0",
+    "cpus": "23,47",
+    "execution_cpu": 23,
+    "mem_nodes": "1"
+  },
+  "measurement_boundary": "Rust total_charged_ns/1e6: Q-dependent job construction plus full rho lane; fixture loading and independent DP replay outside, both retained in raw output",
+  "measurement_tier": "tier0_physical_host",
+  "pair_fields": [
+    "job_id",
+    "checkin_blake3_time_normalized",
+    "walkers_done",
+    "walk_steps",
+    "distinguished_points",
+    "dead_trails",
+    "units_completed",
+    "checkins",
+    "q_index",
+    "q_hex",
+    "dp_bits",
+    "step_cap",
+    "checkin_every"
+  ],
+  "repetitions": 4,
+  "schema": 1,
+  "timeout_s": 180,
+  "workdir": "/home/ec2-user/rho-tier0/source/target/release/examples",
+  "worker_plan": "/home/ec2-user/rho-tier0/worker-plan.json"
+}

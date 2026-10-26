@@ -20,12 +20,13 @@ on:
 
 jobs:
   frozen-and-replay:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             .github/workflows/ecc2k130-native-m3-chain.yml
