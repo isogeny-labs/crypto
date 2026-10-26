@@ -1,7 +1,7 @@
 # GitHub Actions runners on isolab EKS
 
 This installs the GitHub-supported Actions Runner Controller (ARC) chart version
-`0.15.0` for `aburan28/crypto`. ARC listens for Actions jobs, starts one ephemeral
+`0.15.0` for `isogeny-labs/crypto`. ARC listens for Actions jobs, starts one ephemeral
 runner pod per job, and Karpenter supplies a Spot EC2 node when a pod cannot
 fit. Empty runner nodes are consolidated after five minutes. The runner NodePools are
 separate from the `cpu-spot` Iso Lab measurement pool.
@@ -51,13 +51,28 @@ access on `isolab`. The EKS access entry for this session's role,
 has the cluster-scoped `AmazonEKSClusterAdminPolicy`. Remove this broad access
 after deployment if ongoing administration uses a narrower role.
 
-ARC needs a fine-grained GitHub PAT restricted to `aburan28/crypto` with
+ARC needs a fine-grained GitHub PAT restricted to `isogeny-labs/crypto` with
 Repository permissions → Administration: Read and write. Save it in a local
 0600 file and create a Kubernetes Secret named `arc-github-auth` in
 `arc-runners` with the key `github_token`. Keep the token out of Git, shell
 history and Helm values. A GitHub App with the permissions in GitHub's ARC
 authentication guide can also be used; the Secret then needs the keys
 `github_app_id`, `github_app_installation_id` and `github_app_private_key`.
+
+### Replacing the GitHub credential
+
+If the repository moves or the token expires, the listeners log a 404 or 401 on
+`.../actions/runners/registration-token` and no runner is ever announced.
+`rotate-github-token.sh` tests a new token the way ARC uses it, updates
+`arc-github-auth`, restarts the controller and removes the temporary
+cluster-admin it attached to the caller:
+
+```sh
+ARC_GITHUB_REPO=isogeny-labs/crypto taskq/deploy/eks-karpenter/arc/rotate-github-token.sh
+```
+
+The token needs the repository owner as its resource owner and Administration
+read and write on the repository.
 
 ## Deploy and verify
 
@@ -110,7 +125,7 @@ variable after an accidental reset:
 
 ```sh
 python3 -c 'from pathlib import Path; names=Path("taskq/deploy/eks-karpenter/arc/first-wave-workflows.txt").read_text().splitlines(); print("|"+"|".join(names)+"|", end="")' \
-  | gh variable set CRYPTO_EKS_WORKFLOWS --repo aburan28/crypto
+  | gh variable set CRYPTO_EKS_WORKFLOWS --repo isogeny-labs/crypto
 ```
 
 The routing expression admits `push`, `schedule`, `release`, manual dispatch and
