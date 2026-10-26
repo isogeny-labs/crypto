@@ -10,7 +10,7 @@ Records: [results/run-20261014/](results/run-20261014/) (run `run-20261014`).
 
 ## Verdict
 
-**IC-2LP ADVANCES over the incumbent IC-basic, at the exponent level and at the constant level.**
+**Historical comparison:** IC-2LP advances over IC-basic. **R10 re-rate:** SUPERSEDED as an advance because item 7 is the same code; against the round's tuned 1LP arm, Δ = −0.061, not −0.525. See [`R10 ledger`](../../ic_tool_program/ledger/r10-20261019/README.md).
 
 - Common range q = 2^10 to 2^18 (9 sizes, 3 curves per size, paired on instance, target and walk seed):
   - IC-2LP: **q^1.385** [1.379, 1.391].
@@ -45,7 +45,7 @@ Records: [results/run-20261014/](results/run-20261014/) (run `run-20261014`).
 - Rho (reference only, not part of the verdict) uses a negation map and 64 random multipliers.
   - IC-2LP costs 1.2 to 2.9 times the rho model `sqrt(pi ell / 4)` at 2^16 to 2^20, and 2.58 times at 2^20.
   - Measured rho is cheaper than IC-2LP at 2^19 and 2^20 on these instances.
-  - With IC-2LP's local exponent at 1.46 against rho's 1.5, no crossover is in sight against a negation-map rho.
+  - The original crossover statement is superseded. R10 finds a counted C4/E0-rho ratio of 0.25–0.79 at q = 2^13..2^20, but uncharged work and the missing §5a price mean this is not a beat; a fully priced comparison is still needed.
 
 ![cost, local exponents and paired ratios](cost_vs_q.svg)
 

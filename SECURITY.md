@@ -165,9 +165,13 @@ does not change this conclusion.
   curve)`, which dispatches on `curve.name` to the secp256k1 or P-256
   projective constant-time ladder.  Every other curve (SM2, the GOST
   R 34.10-2012 curves, curve-zoo curves) falls back to the affine
-  `BigUint` ladder `Point::scalar_mul_ct`, as do the SM2, GOST,
-  EC-KCDSA and EC-ElGamal routines, which call it directly.  That
-  ladder's work is uniform in the scalar's bit pattern and length,
+  `BigUint` ladder `Point::scalar_mul_ct`, which the SM2 and GOST
+  routines also call directly.  EC-KCDSA (key derivation and the
+  signer's `k·G`) and EC-ElGamal (key generation, `k·G`, `k·Q` and
+  the plaintext's `m·G` in encryption, `d·C₁` in decryption, and
+  ciphertext scaling) go through `scalar_mul_secret`, so on
+  secp256k1 and P-256 they get the projective constant-time ladders.
+  The affine ladder's work is uniform in the scalar's bit pattern and length,
   but its `num-bigint` field arithmetic is not constant-time at the
   limb level.  The variable-time `Point::scalar_mul` is retained
   only for the ECDSA verifier's `u₁·G + u₂·Q` (both inputs public).

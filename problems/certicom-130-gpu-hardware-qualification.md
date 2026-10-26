@@ -2,7 +2,7 @@
 
 - **Status:** `open`
 - **Kind:** hardware access limit; device correctness unverified
-- **Affected work:** [crypto #2250](https://github.com/isogeny-labs/crypto/pull/2250), [cryptanalysis follow-up #1138](https://github.com/isogeny-labs/cryptanalysis/pull/1138), the historical merged [cryptanalysis #968](https://github.com/isogeny-labs/cryptanalysis/pull/968), and [the shared native workers](../gpu/certicom/README.md)
+- **Affected work:** [crypto #2250](https://github.com/isogeny-labs/crypto/pull/2250), the merged [cryptanalysis follow-up #1138](https://github.com/isogeny-labs/cryptanalysis/pull/1138), the historical merged [cryptanalysis #968](https://github.com/isogeny-labs/cryptanalysis/pull/968), and [the shared native workers](../gpu/certicom/README.md)
 - **Next action owner:** the PR author for hosted CI; the owner for existing physical GPU access
 - **Last updated:** 2026-10-26
 
@@ -68,7 +68,7 @@ durable-store and performance requirements; it is not resolved by this work.
 
 | Requested component in both repositories | Current evidence |
 | --- | --- |
-| CPU rho, BSGS and IC on both exact curves | Verified constructed correctness controls and bounded public-Q runs; full library and release CLI checks pass on this Linux host. |
+| CPU rho, BSGS and IC on both exact curves | Verified constructed correctness controls and bounded public-Q runs. Earlier full-library results remain at their recorded revisions; the current base integration passes focused solver and release CLI checks, while its complete library validation remains open. |
 | NVIDIA CUDA rho, BSGS and IC on both exact curves | Implemented; native compilation and device-source host emulation pass. Physical execution remains unverified. |
 | Apple Metal rho, BSGS and IC on both exact curves | Six native library checks passed through hosted `Apple Paravirtual device`; CLI qualification timed out during compilation. Physical GPU provenance and complete receipts in both repositories remain open. |
 
@@ -95,11 +95,13 @@ and hardware. It does not establish a speedup or practical public-target solve.
   into independent 45-minute jobs. Both phases must pass; a partial receipt
   cannot qualify the whole backend. The user explicitly approved the required
   cryptanalysis follow-up on 2026-10-25, resolving the earlier publication-scope
-  rejection. Follow-up #1138 is now open and ready; #968 and its merged branch
-  remain untouched. Inspect the device identity and retain physical provenance
-  separately from API execution. The user requires these PRs to remain open
-  until qualification and current-head CI/review gates pass, so auto-merge
-  remains disabled despite the repository default.
+  rejection. Follow-up #1138 merged on 2026-10-26 as
+  `ac9146a587620c0b86196349b5999996452f75ad`; its branch and the earlier
+  merged #968 remain untouched and outside PR monitoring. Inspect device
+  identity and retain physical provenance separately from API execution.
+  Neither merge closes this record. The remaining crypto PR must stay open
+  until qualification and current-head CI/review gates pass, with auto-merge
+  disabled under the user's explicit hold.
 - **Inputs and controls:** the exact published instances; full-width random
   arithmetic against independent Rust; constructed known answers; public Q
   with small search budgets; worker identity, malformed-input and timeout
@@ -117,6 +119,15 @@ and hardware. It does not establish a speedup or practical public-target solve.
   a physical execution receipt, or new current-head CI/review feedback.
 
 ## Resolution and history
+
+- 2026-10-26: observed follow-up #1138 merged at 05:22:45 UTC from head
+  `87df3734cc1345548fdcb174a97a541b4c36cd4c`, merge commit
+  `ac9146a587620c0b86196349b5999996452f75ad`. Monitoring and pushes to that
+  deliverable stopped immediately. The merge supplies no new physical GPU
+  or complete Metal CLI evidence. Auto-merge on crypto #2250 was subsequently
+  re-enabled outside this task at 10:53:26 and 14:48:26 UTC; this task disabled
+  it at each permitted cadence and preserved the qualification hold. Those
+  API events do not identify the initiating process.
 
 - 2026-10-26: GitHub now resolves both repositories under `isogeny-labs`;
   the preceding 404 access observation is resolved. At cryptanalysis main
@@ -170,6 +181,45 @@ and hardware. It does not establish a speedup or practical public-target solve.
   These results establish host correctness; they do not close physical gates.
 
 ## Other current-head CI observations
+
+### Base integration control on 2026-10-26
+
+The normal base merge into #2250 uses main
+`e8fcadf62cd0b674c40ebc4e76dfe88e26e71f5c`. Its generated ledger conflicts
+were implementation hashes, not assessment rows. Regeneration changes nine
+source SHA-256 fields compared with that main tree; every other JSON value
+remains unchanged. Two pins bind this task's curve aliases and module exports;
+the other seven source files are byte-identical to incoming main. All 51
+materialized generator inputs match the staged Git blobs. Incoming research,
+benchmark and paper trees remain identical to main, and all 21 shared Certicom
+files still match the merged cryptanalysis source.
+
+The independent verifier fails on the merged sources with six problems:
+registry row count, report registry digest, report model-hash membership,
+graph model-hash membership, the registry's declared catalogue-commit binding,
+and the PDF's embedded v2 coverage marker. An isolated checkout of the exact
+main revision, with its own unmodified ledger and exact tracked inputs,
+reproduces all six and eight additional stale source-artifact digests
+(14 problems total). The verifier and frozen input trees are unchanged from
+that base. No catalogue row, model membership, report, graph, PDF or validation
+gate was changed to clear these failures. The generator's byte-exact freshness
+check passes after regeneration, while this independent semantic gate remains
+failed. This is an inherited gate obstruction, not a verifier pass or a device
+qualification result.
+
+The current merged-source checks pass all 14 focused solver/device-policy
+tests, seven real release `icx` CLI cases on CPU and the same seven through
+explicit host emulation, and all seven real release `ecdlp-nist` integration
+cases. These are host correctness observations. The complete 4,999-test
+library run remains in progress at the recorded validation snapshot, with an
+unchanged imported isogeny-walk test still running. Its six initial missing
+compile inputs and eight subsequent missing-session fixture failures are
+retained separately. All 105 restored inputs match the merged index, and
+18 distinct unchanged fixture controls pass across the retained replays.
+No test, assertion, budget or ignored set was changed; no full-library pass
+is claimed. The [integration receipts](evidence/certicom-base-integration-20261026/README.md)
+separate completed focused checks from the running full suite and failed
+independent semantic gate.
 
 At crypto head `917e2214b132e76c509575095269652c66ff907c`, three additional
 failures and two other cancellations were retained as separate gates:
