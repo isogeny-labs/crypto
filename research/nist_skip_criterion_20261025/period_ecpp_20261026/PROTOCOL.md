@@ -111,3 +111,13 @@ provenance, upload through standard artifact tooling, verify full GET and
 per-member hashes before ignoring raw directories. Add report/recorded-value
 graph/inspected PDF and regular PR. Existing exact-embedding PR2648 remains
 a separate result, with its main-merge conflict delegated under AGENTS.
+
+## Source amendment1: compiler name collision
+
+Replay-001 stopped at strict compilation, before any preparation/control/
+legacy execution. Unqualified status(path) was ambiguous with the C++
+filesystem status API through argument-dependent lookup. Rename only this
+helper and its calls to process_status, retaining all flags, arithmetic,
+certificate logic, inputs, criteria and limits. Preserve001 and retry in
+fresh replay-002 after a new successful source/checkpoint gate. This is a
+source correction, not a scientific rejection or a changed threshold.

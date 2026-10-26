@@ -25,7 +25,7 @@ static std::vector<std::string> fields(const std::string& line, char delimiter) 
     while (std::getline(in, part, delimiter)) out.push_back(part);
     return out;
 }
-static int status(const fs::path& path) {
+static int process_status(const fs::path& path) {
     if (!fs::exists(path)) return -1;
     std::istringstream in(read(path)); int result; std::string extra;
     require(bool(in >> result) && !(in >> extra), "bad process status"); return result;
@@ -74,7 +74,7 @@ static std::vector<Step> parse_certificate(std::string bytes, GEN root) {
 }
 static void admit(const fs::path& directory) {
     GEN n = input_root(directory / "input"); require(isprime(n), "requested root is not independently proved prime");
-    require(status(directory / "prover.status") == 0 && status(directory / "checker.status") == 0, "process failed");
+    require(process_status(directory / "prover.status") == 0 && process_status(directory / "checker.status") == 0, "process failed");
     const auto observed = labels(read(directory / "prover.stdout"));
     require(observed.size() == 1 && observed[0] == "prime", "no unique prime label");
     const auto steps = parse_certificate(read(directory / "certificate.cformat"), n);
@@ -125,7 +125,7 @@ static void prepare(const fs::path& historical, const fs::path& output) {
     std::cout << "All21 exact proved-prime inputs and50 native arithmetic fixtures prepared.\n";
 }
 static void check_arithmetic(const fs::path& actual, const fs::path& expected, const fs::path& exit_file) {
-    require(status(exit_file) == 0, "arithmetic executable failed");
+    require(process_status(exit_file) == 0, "arithmetic executable failed");
     std::istringstream in(read(actual)); std::string line;
     require(bool(std::getline(in, line)) && line == "ABI 4 4 4 4", "incorrect or unsupported32 ABI");
     std::istringstream reference(read(expected)); long count = 0;
@@ -140,7 +140,7 @@ static void check_arithmetic(const fs::path& actual, const fs::path& expected, c
     std::cout << "ABI4/4/4/4 and250 exact native arithmetic comparisons passed.\n";
 }
 static void check_label(const fs::path& directory, const std::string& expected) {
-    const int code = status(directory / "prover.status"); const auto observed = labels(read(directory / "prover.stdout"));
+    const int code = process_status(directory / "prover.status"); const auto observed = labels(read(directory / "prover.stdout"));
     if (expected == "indeterminate") require(code > 0, "missing-catalog process did not fail as expected");
     else require(code == 0 && observed.size() == 1 && observed[0] == expected, "unexpected control classification");
     if (expected == "composite") require(!fs::exists(directory / "certificate.cformat") || !fs::file_size(directory / "certificate.cformat"), "rejected control has unexpected certificate");
@@ -169,11 +169,11 @@ static void summarize(const fs::path& run, const fs::path& output) {
     while (std::getline(in,line)) {
         const auto row = fields(line,'\t'); require(row.size() == 5, "cohort inventory corrupt");
         const fs::path dir = run / "cases" / row[0]; require(equalii(input_root(dir / "input"), signed_integer(row[4])), "cohort input changed");
-        const int prover = status(dir / "prover.status"), checker = status(dir / "checker.status");
+        const int prover = process_status(dir / "prover.status"), checker = process_status(dir / "checker.status");
         std::string result = "INDETERMINATE";
         if (prover == 0 && fs::exists(dir / "prover.stdout")) {
             const auto observed = labels(read(dir / "prover.stdout"));
-            if (observed.size() == 1 && observed[0] == "prime" && status(dir / "admission.status") == 0) result = "ACCEPTED";
+            if (observed.size() == 1 && observed[0] == "prime" && process_status(dir / "admission.status") == 0) result = "ACCEPTED";
             else if (observed.size() == 1 && observed[0] == "composite" && (!fs::exists(dir / "certificate.cformat") || !fs::file_size(dir / "certificate.cformat"))) result = "REJECTED_CLI";
         }
         if (result == "ACCEPTED") ++accepted[row[3]];
