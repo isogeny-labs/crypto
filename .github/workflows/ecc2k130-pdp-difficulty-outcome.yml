@@ -45,6 +45,9 @@ jobs:
       # SOURCE_CHECK.json pin that workflow's exact bytes, so it must stay as it was
       # sealed; editing it makes verify.py and source_preflight.py fail.
       - name: Recompute the scored diagnostic without importing the producer
+        # Independent of the replay above: a failing verify.py must not hide the
+        # score check in the same run (they were separate jobs before the move).
+        if: ${{ !cancelled() }}
         run: |
           python3 research/notes/ecc2k130/pdp_difficulty_features_20261001/check_score.py \
             --choice research/notes/ecc2k130/pdp_difficulty_features_20261001/TRAIN_CHOICE.json \
