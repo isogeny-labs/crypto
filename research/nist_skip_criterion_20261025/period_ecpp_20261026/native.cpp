@@ -66,7 +66,7 @@ static std::vector<Step> parse_certificate(std::string bytes, GEN root) {
                 require(cursor < tokens.size() && !signe(tokens[cursor]), "Pratt chain must terminate"); }
             else { require(h == 1 || h == 3, "unknown N-1 route"); list(); list(); old_order = subis(n, 1); }
         } else if (D == 1) { require(h == 1, "unknown N+1 route"); list(); take(); list(); old_order = addis(n, 1); }
-        else { require(D > 1 && h == -1, "unknown elliptic route"); old_order = take(); require(signe(old_order) > 0, "invalid auxiliary order");
+        else { require(D > 1, "unknown elliptic route"); old_order = take(); require(signe(old_order) > 0, "invalid auxiliary order");
             list(); take(); take(); take(); take(); list(); }
         steps.push_back({n, D});
     }
@@ -164,30 +164,36 @@ static void invalid_fixtures(const fs::path& positive, const fs::path& root) {
 static void summarize(const fs::path& run, const fs::path& output) {
     std::istringstream in(read(run / "cohort.tsv")); std::string line; std::getline(in,line);
     std::ofstream table(output / "cohort.tsv"); require(bool(table), "cannot write cohort result");
-    table << "label\tbits\trole\tprover_exit\tchecker_exit\tclassification\n";
-    std::map<std::string, long> accepted,rejected,unknown; long total = 0;
+    table << "label\tbits\trole\tprover_exit\tchecker_exit\tcli_label\tclassification\n";
+    std::map<std::string, long> accepted,rejected,unknown,cli_prime,cli_composite; long total = 0;
     while (std::getline(in,line)) {
         const auto row = fields(line,'\t'); require(row.size() == 5, "cohort inventory corrupt");
         const fs::path dir = run / "cases" / row[0]; require(equalii(input_root(dir / "input"), signed_integer(row[4])), "cohort input changed");
         const int prover = process_status(dir / "prover.status"), checker = process_status(dir / "checker.status");
-        std::string result = "INDETERMINATE";
+        std::string result = "INDETERMINATE", cli = "UNAVAILABLE";
         if (prover == 0 && fs::exists(dir / "prover.stdout")) {
             const auto observed = labels(read(dir / "prover.stdout"));
+            if (observed.size() == 1) {
+                cli = observed[0];
+                if (cli == "prime") ++cli_prime[row[3]];
+                else if (cli == "composite") ++cli_composite[row[3]];
+            }
             if (observed.size() == 1 && observed[0] == "prime" && process_status(dir / "admission.status") == 0) result = "ACCEPTED";
             else if (observed.size() == 1 && observed[0] == "composite" && (!fs::exists(dir / "certificate.cformat") || !fs::file_size(dir / "certificate.cformat"))) result = "REJECTED_CLI";
         }
         if (result == "ACCEPTED") ++accepted[row[3]];
         else if (result == "REJECTED_CLI") ++rejected[row[3]];
         else ++unknown[row[3]];
-        table << row[1] << '\t' << row[2] << '\t' << row[3] << '\t' << prover << '\t' << checker << '\t' << result << '\n'; ++total;
+        table << row[1] << '\t' << row[2] << '\t' << row[3] << '\t' << prover << '\t' << checker << '\t' << cli << '\t' << result << '\n'; ++total;
     }
     require(total == 21, "missing cohort outcomes");
     std::ofstream summary(output / "summary.json"); require(bool(summary), "cannot write summary");
-    summary << "{\"kind\":\"native-period-ecpp-cohort/v1\",\"rows\":21,\"roles\":{";
+    summary << "{\"kind\":\"native-period-ecpp-cohort/v2\",\"rows\":21,\"roles\":{";
     bool first = true; for (const std::string role : {"published","skipped"}) {
         if (!first) summary << ',';
         first = false;
-        summary << '"' << role << "\":{\"accepted\":" << accepted[role] << ",\"rejected_cli\":" << rejected[role] << ",\"indeterminate\":" << unknown[role] << '}';
+        summary << '"' << role << "\":{\"accepted\":" << accepted[role] << ",\"rejected_cli\":" << rejected[role] << ",\"indeterminate\":" << unknown[role]
+                << ",\"raw_cli_prime_labels\":" << cli_prime[role] << ",\"raw_cli_composite_labels\":" << cli_composite[role] << '}';
     }
     summary << "},\"historical_use_established\":false,\"measured_dlp\":false}\n";
     std::cout << "All21 software outcomes retained, with indeterminate separate.\n";
@@ -203,6 +209,9 @@ int main(int argc, char** argv) {
     else if (mode == "arithmetic") { require(argc == 5, "arithmetic arguments"); check_arithmetic(argv[2],argv[3],argv[4]); }
     else if (mode == "label") { require(argc == 4, "label arguments"); check_label(argv[2],argv[3]); }
     else if (mode == "admit") { require(argc == 3, "admit arguments"); admit(argv[2]); }
+    else if (mode == "parse-only") { require(argc == 3, "parse arguments"); const fs::path directory = argv[2];
+        const auto steps = parse_certificate(read(directory / "certificate.cformat"), input_root(directory / "input"));
+        std::cout << "Complete root/chain grammar parsed: " << steps.size() << " steps; no mathematical admission inferred.\n"; }
     else if (mode == "fixtures") { require(argc == 4, "fixture arguments"); invalid_fixtures(argv[2],argv[3]); }
     else if (mode == "summarize") { require(argc == 4, "summary arguments"); summarize(argv[2],argv[3]); }
     else throw std::runtime_error("unknown mode");

@@ -84,7 +84,7 @@ check_certificate() {
   (ulimit -c 0 && ulimit -v 786432 && cd "$period_directory" && timeout --kill-after=10s 180s "$NIST_ECPP_OUT/bin/qemu-i386-static" -R 268435456 "$NIST_ECPP_OUT/bin/checkcertif" -f certificate.cformat) > "$period_directory/checker.stdout" 2> "$period_directory/checker.stderr"
   period_status=$?
   printf '%s\n' "$period_status" > "$period_directory/checker.status"
-  timeout --kill-after=10s 300s ./bin/native admit "$period_directory" > "$period_directory/admission.stdout" 2> "$period_directory/admission.stderr"
+  (ulimit -c 0 && ulimit -v 786432 && timeout --kill-after=10s 300s ./bin/native admit "$period_directory") > "$period_directory/admission.stdout" 2> "$period_directory/admission.stderr"
   period_status=$?
   set -e
   printf '%s\n' "$period_status" > "$period_directory/admission.status"

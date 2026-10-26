@@ -171,3 +171,37 @@ unconditional srandom(1), at original mod.c:213. The earlier caller-only
 description of default process RNG state was incomplete. No seeding code is
 added or modified: retain this original reset at each modulus initialization.
 That is a documentation correction, not an artifact/configuration retuning.
+
+## Source amendment4: source-faithful CM metadata reader
+
+Replay-004 passed250 arithmetic comparisons, all seven prover/data controls,
+positive checker admissions and three rejecting binding controls. The full21
+provers/checkers then executed: all CLI labels were prime, no composite label.
+The first reader admitted five cases and left16 indeterminate. Thirteen
+reader failures were an incorrect h==-1 assumption for the CM header; other
+cases had explicit zero theorem flags from the unchanged legacy checker.
+
+The original certif.c:531 PrintCertifEcForC prints cert.h as signed metadata.
+The actual ReadCertifCEcm in checkcertif.c:205 skips it with fscanf %*d and
+checks the explicit curve/point/order. Valid outputs include h=-4 and h=12.
+Remove only h==-1 for D>1, keeping bounded integer syntax, recognized D
+route, all root/chain/divisor/sentinel checks, original-process statuses and
+every legacy theorem flag. This corrects our reader's unsupported restriction;
+it does not repair or bypass a failed mathematical checker row. The N-1 and
+N+1 route requirements remain unchanged.
+
+Use fresh validation-005 on exact saved004 inputs/certificates/transcripts,
+with a new source/checkpoint gate, strict build and the three original
+positive/three tampered binding controls. Reparse all21 and attempt all21
+admissions without omitting failures. No prover, legacy checker, data,
+configuration or certificate is changed or rerun. Preserve004 and its
+initial admission failures verbatim. Emit raw CLI labels separately from
+certified admission; none substitutes for the other. This is a validation
+correction on existing data, not a new cohort sample or a tuned selector.
+
+Wrapper audit also found that004's standalone native admission call retained
+its time bound but did not reapply the address-space limit; the legacy
+prover/checker and build/preparation/control phases were capped. Apply the
+declared768MiB limit to every native admission in005 and future launches.
+Preserve the earlier actual envelope and do not present004's admission
+as a capped performance measurement. No timing result is claimed anywhere.
