@@ -29,6 +29,7 @@ including setup and online phases, over the finite declared design grid.
 
 - **Observed:** The [independently replayed hosted 5+1 split panel](../research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-split-panel-20261025/attempt-1/replay-receipt.json) reached 20,000 native conflicts and zero models in each Gray/hash arm. Worker walls were 1,470,249 and 1,223,792 ms respectively on that Linux host; both statuses are `UNKNOWN_search_cap`. The prior 4+2 panel is likewise capped. The [local external-XOR receipt](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/receipt.json) records four first-pattern 5+1/4+2 Gray/hash arms, each ending `INDETERMINATE` at 2,000,001–2,000,002 conflicts with zero models after 119.2–192.5 seconds of L0 process wall. Its [replay](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/replay.json) rebuilds all four formulas from exact archive bytes and checks the raw-output hashes and counters.
 - **Observed capacity and access gates:** The [full-D18 native preflight](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/PREFLIGHT.md) checked the exact 5,418,738-row S3 object, distinct producer and custody manifests, full-object provider checksums, clean source and release binaries. Its local one-minute load remained 55.95–74.19 against the frozen maximum of 24 while cumulative swapouts increased, so the cadence-32 worker was not launched. A [second source-bound preflight](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-2/REPORT.md) at `45ce91d5` again matched both S3 object hashes but sampled load 26.44–66.14 and 390,448 new swapouts; neither worker arm launched. Configured AWS spot and RunPod SSH endpoints were unavailable at bounded checks. The exact two-object read grant is now applied and read back, while PR #2649 GitHub Actions still stop before runner assignment at the account billing gate. These are resource/access conditions, not evidence about solver yield.
+- **Third preflight and runner access:** A [third fresh-GET report](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-3/REPORT.md) again matched the three exact producer/wrapper/object hashes. Its recorded one-minute local load was 114.84, so the worker was not launched. A configured profile reached the deployed `ephemeral` runner in account `104186811093`, but direct HEAD of the original D18 manifest returned `403`. The [exact two-sided access proposal](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-3/ACCESS_PROPOSAL.md) is unapplied pending explicit authorization; it is separate from the already active `rho-gh-snapshot-readonly-20261024` user grant. A no-source On-Demand market smoke then failed at `RunInstances` because the account's `SpotOnlyEC2Launch` v2 identity policy explicitly denies this direct non-Spot launch. The tagged instance readback was empty. No D18 solver job was submitted from this proposal.
 - **Derived or proved:** None of the capped searches proves relation absence or a cost ordering.
 - **Suspected explanation:** The native CDCL backend may be a material solver-stage bottleneck; an XOR-aware backend is a discriminating test, not yet an end-to-end improvement claim.
 - **Missing capability:** A verified natural partial producer across enough independent source equations, graph closure, useful rank and log solving for the full-width subgroup, followed by target descent and matched one-target rho with full cost accounting.
@@ -102,16 +103,30 @@ has the Markdown, SVG, PNG, inspected PDF, host samples, and provider GET
 metadata beside it. This preflight is a capacity result, not a search result.
 
 A read-only check of the repository's `ephemeral` runner returned
-`ParameterNotFound` for `/ephemeral/config` under the available AWS identity
-in both `us-east-1` and `us-west-2`. This establishes only that this local
-identity cannot use those two configured runner endpoints. The runner's
-documented launch path uses Spot capacity; the frozen native solver has no
+`ParameterNotFound` for `/ephemeral/config` under the default AWS identity
+in both `us-east-1` and `us-west-2`. A subsequent check with the configured
+`ecc-challenges-new` profile reached the deployed runner in account
+`104186811093`; direct access to the original source bucket returned `403`.
+The third preflight above preserves the raw access receipts and exact
+cross-account policy proposal. The runner defaults to Spot capacity; this PR
+adds an explicit On-Demand request path. The frozen native solver has no
 application checkpoint, and its wall time would be invalid after an
-interruption. A qualified non-Spot or checkpoint-capable backend remains a
-separate execution requirement. The new main merge also introduced a parser
+interruption. The On-Demand path passed local fake-AWS market checks and
+standalone Rust CLI unit tests. A live market smoke was rejected by the
+account's explicit Spot-only launch policy before instance allocation; an
+authorized non-Spot launch path remains open. The
+new main merge also introduced a parser
 failure in `ecbench/methods.rs`; PR #2649's N83 delimiter repair is pushed,
 but full post-merge Cargo validation remains open. These backend and source
 conditions do not change the frozen positive-then-natural stop rule.
+
+**Hosted exit criterion:** either the account owner authorizes an exact
+non-Spot launch exception or supplies another non-Spot runner, then a
+self-terminating no-source smoke must show an allocated instance, uploaded
+output and termination. The deployed runner also needs the separate exact
+two-object cross-account S3 read grant, with fresh full-object GET receipts.
+The attempted smoke's explicit deny is an access policy, not a solver or
+capacity observation; do not retry the same launch parameters unchanged.
 
 **Next action:** obtain a resource-qualified execution host, verify fresh
 full-object S3 GETs and the exact frozen source/binary identities there, run

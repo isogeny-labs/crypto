@@ -85,9 +85,12 @@ struct RunArgs {
     /// Instance type. GPU types (g*, p*) get the NVIDIA Deep Learning AMI, Graviton types arm64
     #[arg(long = "type", default_value = "c7i.4xlarge")]
     instance_type: String,
-    /// Accepted for compatibility; every launch uses Spot
-    #[arg(long)]
+    /// Request Spot capacity (default)
+    #[arg(long, conflicts_with = "on_demand")]
     spot: bool,
+    /// Request On-Demand capacity for a job without a checkpoint
+    #[arg(long, conflicts_with = "spot")]
+    on_demand: bool,
     /// Restore a prior job's S3 out/ as EPHEMERAL_RESUME_DIR
     #[arg(long, value_name = "ID")]
     resume: Option<String>,
@@ -512,7 +515,7 @@ impl Ctx {
             created: utc_now(),
             owner: owner.clone(),
             instance_type: a.instance_type.clone(),
-            spot: true,
+            spot: !a.on_demand,
             ttl: ttl.clone(),
             deadline,
             disk_gb: a.disk,
@@ -570,7 +573,7 @@ impl Ctx {
             .tags(tag(&managed, "true"))
             .tags(tag("ephemeral:job", &id))
             .build();
-        let market = Some(
+        let market = (!a.on_demand).then(|| {
             InstanceMarketOptionsRequest::builder()
                 .market_type(MarketType::Spot)
                 .spot_options(
@@ -579,8 +582,8 @@ impl Ctx {
                         .instance_interruption_behavior(InstanceInterruptionBehavior::Terminate)
                         .build(),
                 )
-                .build(),
-        );
+                .build()
+        });
 
         std::fs::create_dir_all(cache_dir())?;
         std::fs::write(cache_dir().join("last"), format!("{id}\n"))?;
@@ -662,16 +665,18 @@ impl Ctx {
             }
         }
         let Some(iid) = iid else {
+            let market_label = if a.on_demand { "On-Demand" } else { "Spot" };
             let why = format!(
-                "no Spot capacity for {} in the configured zones; try another type or later",
+                "no {market_label} capacity for {} in the configured zones; try another type or later",
                 a.instance_type
             );
             return Err(self.launch_failed(&id, deadline, &why).await);
         };
 
         eprintln!("ephemeral: job {id}");
+        let market_label = if a.on_demand { "on-demand" } else { "spot" };
         eprintln!(
-            "ephemeral:   {} spot {iid} ({ami_ref}), ttl {ttl} (terminates by {})",
+            "ephemeral:   {} {market_label} {iid} ({ami_ref}), ttl {ttl} (terminates by {})",
             a.instance_type,
             utc_of(deadline)
         );
@@ -1174,7 +1179,8 @@ mod tests {
     #[test]
     fn run_args_need_the_separator() {
         let default_spot = RunArgs::try_parse_from_args(&["--", "echo", "hi"]).unwrap();
-        assert!(!default_spot.spot); // The flag is legacy; the launcher still requests Spot.
+        assert!(!default_spot.spot);
+        assert!(!default_spot.on_demand);
         let resume =
             RunArgs::try_parse_from_args(&["--resume", "previous-job", "--", "echo", "hi"])
                 .unwrap();
@@ -1191,10 +1197,16 @@ mod tests {
         ])
         .unwrap();
         assert!(a.spot);
+        assert!(!a.on_demand);
         assert_eq!(a.paths, ["taskq", "src"]);
         assert_eq!(a.envs, ["A=1"]);
         assert_eq!(a.command, ["echo", "hi"]);
         assert_eq!(a.instance_type, "c7i.4xlarge");
+        let on_demand = RunArgs::try_parse_from_args(&["--on-demand", "--", "echo", "hi"]).unwrap();
+        assert!(on_demand.on_demand);
+        assert!(
+            RunArgs::try_parse_from_args(&["--spot", "--on-demand", "--", "echo", "hi"]).is_err()
+        );
         assert!(RunArgs::try_parse_from_args(&["echo", "hi"]).is_err());
         assert!(RunArgs::try_parse_from_args(&["--toolchain", "go", "--", "x"]).is_err());
     }

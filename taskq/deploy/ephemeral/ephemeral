@@ -18,7 +18,8 @@
 # run options:
 #   --type T          instance type (default c7i.4xlarge). GPU types (g*, p*)
 #                     get the NVIDIA Deep Learning AMI, Graviton types arm64.
-#   --spot            accepted for compatibility; every launch uses Spot
+#   --spot            request Spot capacity (default)
+#   --on-demand       request On-Demand capacity for a job without a checkpoint
 #   --resume ID       restore a prior job's S3 out/ as EPHEMERAL_RESUME_DIR
 #   --ttl SPAN        hard lifetime, e.g. 90m, 6h, 2d (default from config).
 #                     The command is stopped 10 min before it to upload results.
@@ -193,13 +194,14 @@ worktree_patch() {
 # ---- run ------------------------------------------------------------------
 
 cmd_run() {
-    local type=c7i.4xlarge spot=true ttl='' disk=100 toolchain=rust setup='' name='' detach=false
+    local type=c7i.4xlarge spot=true market_choice='' ttl='' disk=100 toolchain=rust setup='' name='' detach=false
     local keep=false out='' ami='' ref='' resume='' source=true untracked=true paths=() artifacts=() envs=()
     local cache=true cargo_dir=.
     while [ $# -gt 0 ]; do
         case $1 in
         --type) type=$2; shift 2 ;;
-        --spot) spot=true; shift ;;
+        --spot) [ "$market_choice" != on-demand ] || die "--spot and --on-demand conflict"; spot=true; market_choice=spot; shift ;;
+        --on-demand) [ "$market_choice" != spot ] || die "--spot and --on-demand conflict"; spot=false; market_choice=on-demand; shift ;;
         --resume) resume=$(resolve_id "$2"); shift 2 ;;
         --ttl) ttl=$2; shift 2 ;;
         --disk) disk=$2; shift 2 ;;
@@ -359,7 +361,10 @@ EOF
 
     local tags
     tags="{Key=Name,Value=ephemeral-$id},{Key=ephemeral:job,Value=$id},{Key=ephemeral:deadline,Value=$deadline},{Key=$(cfg .managed_tag),Value=true},{Key=ephemeral:owner,Value=$owner}"
-    local market=(--instance-market-options 'MarketType=spot,SpotOptions={SpotInstanceType=one-time,InstanceInterruptionBehavior=terminate}')
+    local market=()
+    if $spot; then
+        market=(--instance-market-options 'MarketType=spot,SpotOptions={SpotInstanceType=one-time,InstanceInterruptionBehavior=terminate}')
+    fi
 
     mkdir -p "$CACHE"
     echo "$id" >"$CACHE/last"
@@ -401,10 +406,10 @@ EOF
         *) launch_failed "run-instances failed: $err" ;;
         esac
     done
-    [ -n "$iid" ] || launch_failed "no Spot capacity for $type in the configured zones; try another type or later"
+    [ -n "$iid" ] || launch_failed "no $($spot && echo Spot || echo On-Demand) capacity for $type in the configured zones; try another type or later"
 
     info "job $id"
-    info "  $type$($spot && echo ' spot') $iid ($ami_ref), ttl $ttl (terminates by $(utc_epoch "$deadline"))"
+    info "  $type $($spot && echo spot || echo on-demand) $iid ($ami_ref), ttl $ttl (terminates by $(utc_epoch "$deadline"))"
     info "  ${commit:+source ${commit:0:12}$($patch && echo ' + local patch'), }command: $display"
     info "  s3://$BUCKET/jobs/$id/"
     if $detach; then

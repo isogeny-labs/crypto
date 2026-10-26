@@ -298,11 +298,20 @@ the one public natural arm. Preserve every cap, timeout or infrastructure
 failure with its exact source and input identities.
 
 GitHub Actions on PR #2649 has stopped before runner assignment with an
-account billing or spending-limit annotation. The available local AWS
-identity also returned `ParameterNotFound` for `/ephemeral/config` in
-`us-east-1` and `us-west-2`; this is a limit of that identity and those
-endpoints. The documented `ephemeral` runner uses Spot capacity, while the
-current solver has no application checkpoint. No hosted native full-D18
-positive/natural execution has been started from this handoff. The
+account billing or spending-limit annotation. The default AWS identity
+returned `ParameterNotFound` for `/ephemeral/config` in `us-east-1` and
+`us-west-2`. A configured second profile reached the deployed runner in
+account `104186811093`, but a direct original-manifest HEAD returned `403`.
+The [third preflight and exact two-sided access proposal](native-cadence-replay-20261026/attempt-3/REPORT.md)
+preserve that observation; the proposed bucket and runner-role policies
+remain unapplied. The documented `ephemeral` runner defaults to Spot capacity,
+while the current solver has no application checkpoint. This PR adds an explicit
+`ephemeral run --on-demand` path to both CLIs. Local market selection and Rust
+CLI unit tests passed. A live no-source `t3.small` On-Demand smoke was denied
+at `RunInstances` by the account's `SpotOnlyEC2Launch` v2 identity policy;
+the [attempt-3 receipt](native-cadence-replay-20261026/attempt-3/REPORT.md)
+records the empty tagged instance readback. The exact S3 read grants alone
+cannot lift that launch denial. No hosted native full-D18 positive/natural
+execution has been started from this handoff. The
 [problem record](../../../../problems/n83-mixed-orbit-factor-base-selection.md)
 tracks these gates and the downstream total-runtime selection obligations.
