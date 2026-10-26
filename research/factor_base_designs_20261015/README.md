@@ -109,7 +109,7 @@ size, and the quotients are not a hypothesis test or a fitted law.
 
 | # | design | status | Lean | experiment |
 |:--|:--|:--|:--|:--|
-| 11 | Norm-divisibility chain over a Kummer fibre (prime) | **open: better presentation, no slope change** (§5: replicates on p₂; equals its own shape null; growth per bit no flatter, steeper at `m = 4`; cost-unfavourable on measured `field_ops`; `m = 4`, t ≥ 4 comparison needs > 14 GB, Amendments 5–6) | `chain_sound` (soundness at each root), `pencil_norm_factor` (the `m = 2` norm factorization), `norm_chain_excess` (one more equation than unknown, every `m`) | A11, F1–F4, C1–C4, L1, L2, L2r |
+| 11 | Norm-divisibility chain over a Kummer fibre (prime) | **open: better presentation, no slope change** (§5: replicates on p₂; equals its own shape null; growth per bit no flatter, steeper at `m = 4`; cost-unfavourable on measured `field_ops`; `m = 4`, t ≥ 4 comparison needs > 64 GB, Amendments 5, 6 and 12) | `chain_sound` (soundness at each root), `pencil_norm_factor` (the `m = 2` norm factorization), `norm_chain_excess` (one more equation than unknown, every `m`) | A11, F1–F4, C1–C4, L1, L2, L2r, H64-A0, H64-A11 |
 | 12 | Binary norm chain as an auxiliary-variable solver input (credits `research/nagao_relations/` open item 1) | open | `chain_sound` applies verbatim | E12 |
 | 13 | Algebraic large prime (partial divisibility) | open | — | E13 |
 
@@ -301,7 +301,71 @@ Each row now records the child's peak RSS.
 - **Reading:** this host cannot measure either open `m = 4` cell. Settling
   whether A11's constant factor survives at `m = 4`, `t ≥ 4` needs a host
   with well over 15 GB (the independent lab runner, not reachable from these
-  containers). No recorded verdict changed.
+  containers). No recorded verdict changed. Amendment 12, below, reran both
+  cells on 64 GiB hosts.
+
+### Amendment 12: the two `m = 4` cells on a 64 GiB host (run-20261021T0056Z)
+
+**Numbering note, 2026-10-26 (renames only; changes no rule, threshold, prediction, row or byte of any record).** This amendment was registered and run as “Amendment 7” with cells X1 and X2 (run records `runs/X1-A0-m4-t4.*`, `runs/X2-A11-m4-t5.*`, runner `scripts/run_amendment7.sh`, flag `analyze --amendment7`). `main` meanwhile gained its own Amendments 7 and 8 and its own X1 cell, so on merging `main` it is renumbered **Amendment 12** with cells **H64-A0** (was X1) and **H64-A11** (was X2); files are renamed with `git mv` to `runs/H64-A0-m4-t4.*`, `runs/H64-A11-m4-t5.*`, `scripts/run_amendment12.sh`, flag `--amendment12`. The renamed records are byte-identical inside, so they still name the old cells: the instance logs, `*.dmesg.txt` and `*.preflight.txt` say X1 or X2. The raw outputs remain under the old S3 prefix `s3://crypto-autoresearcher/lab-results/factor-base-designs-a7/fab81e175/`, whose keys are unchanged.
+
+Frozen rows, pre-flight files, kernel-log sentinel files and instance logs are in
+`runs/H64-A0-*` and `runs/H64-A11-*`. The original analysis and
+[historical report](reports/run-20261021T0056Z/REPORT.pdf) are preserved.
+The [2026-10-21 review correction](reports/review-20261021/README.md) supersedes
+their kernel-log attribution and resident-working-set claims.
+
+Both cells ran on AWS EC2 `r7i.2xlarge` hosts (64 GiB, 8 vCPU). Their pre-flight
+records report an unlimited leaf memory cgroup and `ulimit -v` of approximately
+64,250,012 KiB (H64-A0) and 64,250,008 KiB (H64-A11), about 61.27 GiB.
+These are virtual-address-space caps (the Linux records label KiB as `kB`).
+
+- **H64-A0, A0 at `m = 4`, `t = 4`:** both processes reported allocation failure
+  and SIGABRT at 1916 s and 1874 s; observed peak RSS was
+  60,667,848 and 60,713,840 KiB.
+- **H64-A11, A11 at `m = 4`, `t = 5`:** both processes reported allocation failure
+  and SIGABRT at 6011 s and 6024 s; observed peak RSS was
+  62,919,616 and 62,849,712 KiB.
+- **Evidence limit:** the historical runner suppressed kernel-log read errors.
+  Its “no kernel OOM lines” sentinels do not establish successful capture.
+  Strict R1/R2 attribution and the prediction scorecard therefore remain
+  undecided under the registered kernel-log control. The allocation failures,
+  timings and RSS observations remain recorded; no cost comparison is available.
+- **Interpretation:** exhausting a virtual-address-space cap does not prove that
+  the minimum resident working set exceeds 64 GB. Required address space and
+  required resident memory remain distinct and unmeasured. The prior completed
+  cells' recorded verdicts are unchanged.
+
+The repaired `scripts/run_amendment12.sh` requires readable kernel logs before
+starting, retains the before/after captures and errors, preserves a producer's
+failure status, and refuses an existing cell's evidence prefix. `analyze12`
+requires a successful-capture marker and rejects every recorded OOM event,
+including events without a “Killed process” line. The full captured ring is
+retained, so an earlier OOM event can conservatively withhold attribution.
+No new host allocation or experimental execution was made for this correction.
+
+### Amendment 13: registered, not yet run (EKS high-memory runner)
+
+**Numbering note, 2026-10-26 (renames only; changes no rule, threshold, prediction or row).** This amendment was registered as “Amendment 8” with cells E1 and E2, runner `scripts/run_amendment8.sh` and flag `analyze --amendment8`. `main` has its own Amendment 8 and its own E1 cell (twisted Edwards), so on merging `main` it is renumbered **Amendment 13** with cells **K8S-A0** (was E1) and **K8S-A11** (was E2); the runner is `scripts/run_amendment13.sh`, the flag `--amendment13`, the row prefixes `K8S-A0-` and `K8S-A11-`, and the workflow artifact `fb-designs-amendment13-<cell>-<run_id>-<attempt>`. The amendment it builds on, registered as “Amendment 7” with cells X1 and X2, is now Amendment 12 with cells H64-A0 and H64-A11. No E row, K8S row or workflow run exists, so no record or artifact carries an old name.
+
+
+Amendment 13 registers both cells again (K8S-A0, K8S-A11) on the repository's
+`crypto-eks-highmem` GitHub Actions runner (Karpenter Spot node, 120 GiB pod
+limit, so V ≈ 125.3 GB). It is started by hand with
+`.github/workflows/fb-designs-m4-highmem.yml` (`workflow_dispatch`) when a
+high-memory Spot node is available. The runner is
+`scripts/run_amendment13.sh`, and the analysis is `analyze --amendment13`.
+Predictions: K8S-A0 memory-bound near 3450 s, K8S-A11 a timeout at 14 400 s near
+90 GB. No E row exists yet.
+
+### Amendment 14: registered (256 GiB EC2 host, R256-A0 and R256-A11)
+
+Amendment 13's EKS runner could not start: the ARC controller's GitHub token
+cannot reach `isogeny-labs/crypto` (404 on the runner registration call), and
+the owner did not replace it. Amendment 14 registers the same two cells on one
+EC2 `r7i.8xlarge` (256 GiB), run one after the other, with
+`scripts/run_amendment14.sh`, analysis `analyze --amendment14`. Predictions:
+R256-A0 memory-bound near 6100 s, R256-A11 a timeout at 14 400 s near 90 GB.
+Amendment 13 stays registered, with no rows. No R256 row exists yet.
 
 ### Close-out of the prime-field slope line (2026-10-19)
 

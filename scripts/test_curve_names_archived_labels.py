@@ -51,6 +51,59 @@ class ArchivedLabelTests(unittest.TestCase):
         with patch.object(names, "tracked", return_value=[report]):
             self.assertEqual(names.lint(self.resolver, {}, False), [])
 
+    def test_frozen_unregistered_curve_ids_require_exact_path_hash_and_slug(self):
+        cases = {
+            "docs/ic/CERTICOM131_IC_PROGRAM.md": {
+                "icv1-fp30-t49927-d70f5de2",
+                "icv1-fp131-t29529377007934231835-9681b699",
+            },
+            "research/certicom131_ic_program_20261020/README.md": {
+                "icv1-fp30-t49927-d70f5de2",
+                "icv1-fp131-t29529377007934231835-9681b699",
+            },
+            "research/certicom131_ic_program_20261020/pkm_ext/tables/p30.table.md": {
+                "icv1-fp30-t49927-d70f5de2",
+            },
+        }
+        for rel, slugs in cases.items():
+            with self.subTest(path=rel):
+                text = (names.REPO / rel).read_text()
+                for slug in slugs:
+                    self.assertIn(slug, text)
+                    self.assertTrue(names.archived_slug(rel, text, slug))
+                    self.assertFalse(names.archived_slug(rel, text + "\n", slug))
+                    self.assertFalse(names.archived_slug("ordinary/REPORT.md", text, slug))
+                with patch.object(names, "tracked", return_value=[rel]):
+                    self.assertEqual(names.lint(self.resolver, {}, False), [])
+
+
+SESSION_TABLE = "research/ext_endo_rho_20261023/sessions/subfield-fp3.table.md"
+
+
+class ArchivedUnregisteredSlugTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.text = (names.REPO / SESSION_TABLE).read_text()
+
+    def test_only_exact_frozen_session_table_is_allowlisted(self):
+        self.assertTrue(names.archived_unregistered_slug_file(SESSION_TABLE, self.text))
+        self.assertFalse(names.archived_unregistered_slug_file(SESSION_TABLE, self.text + "\n"))
+        self.assertFalse(names.archived_unregistered_slug_file("research/other.md", self.text))
+
+    def test_normal_lint_allows_the_exact_frozen_table(self):
+        resolver = names.Resolver()
+        with patch.object(names, "tracked", return_value=[SESSION_TABLE]):
+            self.assertEqual(names.lint(resolver, {}, False), [])
+
+    def test_original_gls_table_is_allowed_only_at_its_frozen_hash(self):
+        path = "research/ext_endo_rho_20261023/sessions/gls-fp2.table.md"
+        text = (names.REPO / path).read_text()
+        self.assertTrue(names.archived_unregistered_slug_file(path, text))
+        self.assertFalse(names.archived_unregistered_slug_file(path, text + "\n"))
+        resolver = names.Resolver()
+        with patch.object(names, "tracked", return_value=[path]):
+            self.assertEqual(names.lint(resolver, {}, False), [])
+
 
 if __name__ == "__main__":
     unittest.main()

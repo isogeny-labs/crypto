@@ -1840,6 +1840,7 @@ mod counter_tests {
         let d = b.since(&a);
         assert_eq!(d.device, 3);
         assert_eq!(d.local_timer, 4);
+        // device 3 + ipi_other 0 + softirq_work 6
         assert_eq!(d.non_tick(), 3 + 6);
         // Counters that went backwards (a CPU hot-unplugged) saturate.
         assert_eq!(a.since(&b), IrqCounts::default());

@@ -288,7 +288,7 @@ fn main() {
             // A subgroup of non-2-power order d | p - 1 with d near B.
             let mut d_best = 0u64;
             for d in (bsz / 2)..=(bsz * 2) {
-                if (p - 1).is_multiple_of(d)
+                if (p - 1) % d == 0
                     && !d.is_power_of_two()
                     && (d_best == 0 || d.abs_diff(bsz) < d_best.abs_diff(bsz))
                 {

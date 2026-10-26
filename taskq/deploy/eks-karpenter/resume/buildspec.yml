@@ -1,0 +1,12 @@
+version: 0.2
+env:
+  shell: bash
+phases:
+  build:
+    commands:
+      - export PATH="$CODEBUILD_SRC_DIR/bin:$PATH"
+      - export ISOLAB_DEPLOY_DIR="$CODEBUILD_SRC_DIR/deploy" ISOLAB_KUBE_CONTEXT=isolab
+      - chmod +x bin/* deploy/submit-job deploy/remote/verify-build resume/run-controller
+      - resume/run-controller
+artifacts:
+  files: []

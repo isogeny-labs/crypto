@@ -1,0 +1,249 @@
+{
+  "baseline": {
+    "algorithm": "Pollard rho on <G>",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
+    "equivalence_class_reason": "negation only: E is not defined over a proper subfield",
+    "equivalence_class_size": 2,
+    "log2_cost_of_one_group_operation": 14.97,
+    "log2_group_operations": 80.826,
+    "log2_r": 162.0,
+    "log2_total": 95.796,
+    "log2_total_negation_only": 95.796
+  },
+  "candidate": {
+    "id": "ghs:l=1",
+    "label": "GHS descent to Jac(C)/F_(2^1), N = 163 * 1",
+    "transfer_type": "ghs_weil_descent"
+  },
+  "carried": true,
+  "checks": [
+    {
+      "evidence": "ghs_screen::screen_curve (ec_trapdoor) and jacobian_transfer::binary::ghs_magic return the same magic number, type and condition (8)",
+      "name": "screen_agrees_with_ghs_magic",
+      "result": "PASS"
+    },
+    {
+      "evidence": "n = 163 has no divisor d with 1 < d < n: the only tower is F_2 <= F_(2^163), so Weil descent to a proper subfield F_(2^d) does not exist",
+      "name": "no_proper_subfield_for_prime_degree",
+      "result": "PASS"
+    }
+  ],
+  "costs": {
+    "destination_solver": "RhoOnJacobian",
+    "log2_baseline": 95.796,
+    "log2_cost_ratio": 370.152,
+    "log2_total": 465.948,
+    "repo_ratio_log2": -370.152,
+    "rows": [
+      {
+        "formula": "the smooth GHS curve and the norm-conorm map are not implemented in the repository (docs/GHS_TRANSPORT.md, Remaining construction gates)",
+        "log2": null,
+        "phase": "map_construction",
+        "status": "not_evaluated"
+      },
+      {
+        "formula": "g elliptic operations over the source field: log2 g + log2(10 * M(source_bits)); a lower bound, the conorm-norm formulas are not implemented",
+        "log2": 176.97,
+        "phase": "transfer_evaluation",
+        "status": "modeled"
+      },
+      {
+        "formula": "the cheapest destination solver is not index calculus on the Jacobian",
+        "log2": null,
+        "phase": "relation_collection",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "see relation_collection",
+        "log2": null,
+        "phase": "linear_algebra",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "RhoOnJacobian: CostModel::jacobian_destination; phases not split by the model",
+        "log2": 465.948,
+        "phase": "destination_solve_unsplit",
+        "status": "modeled"
+      },
+      {
+        "formula": "the discrete logarithm of the image is the logarithm of the source (homomorphism), so recovery is free; one scalar multiplication on E verifies it: log2(1.5 log2 r) + log2(op)",
+        "log2": 22.894,
+        "phase": "descent_back_mapping",
+        "status": "modeled"
+      }
+    ],
+    "solvers_considered": [
+      [
+        "RhoOnJacobian",
+        465.948
+      ],
+      [
+        "HyperellipticIndexCalculus",
+        9.386190563327115e+50
+      ],
+      [
+        "EngeGaudry",
+        4.345024486262713e+25
+      ]
+    ],
+    "total_is_lower_bound": true,
+    "unit": "log2 bit operations (frozen formula model; measured rows say so)"
+  },
+  "curve": {
+    "family": "binary",
+    "field": {
+      "a": "0x1",
+      "b": "0x20a601907b8c953ca1481eb10512f78744a3205fd",
+      "degree": 163,
+      "kind": "binary",
+      "log2_size": 163,
+      "model": "y^2+xy=x^3+a*x^2+b",
+      "modulus": "0x800000000000000000000000000000000000000c9"
+    },
+    "instance_checks": [
+      {
+        "evidence": "modulus irreducible (Rabin), coefficients canonical, b != 0 (ordinary binary model)",
+        "name": "field_and_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "G affine, y^2+xy = x^3+ax^2+b",
+        "name": "generator_on_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "r passes Miller-Rabin to bases 2..53 (Probable); [r]G = O, G != O, so G has exact order r",
+        "name": "subgroup_order_is_prime_and_annihilates_generator",
+        "result": "PASS"
+      },
+      {
+        "evidence": "#E = cofactor * r = q + 1 - t, Hasse bound holds, two seeded random points are annihilated by #E (evidence for the recorded order, not a point-count proof)",
+        "name": "order_consistency",
+        "result": "PASS"
+      },
+      {
+        "evidence": "curve_traits::compute run live on this instance",
+        "name": "traits_record",
+        "result": "PASS"
+      }
+    ],
+    "name": "B-163",
+    "registered": true,
+    "slug": "icv1-f2m163-tm6224022517221266226059365-31d88d74",
+    "subgroup": {
+      "cofactor": "2",
+      "generator": [
+        "0x3f0eba16286a2d57ea0991168d4994637e8343e36",
+        "0xd51fbc6c71a0094fa2cdd545b11c5c0c797324f1"
+      ],
+      "order": "11692013098647223345629484885752781378513686403174",
+      "r": "5846006549323611672814742442876390689256843201587",
+      "r_log2": 162.0,
+      "trace": "-6224022517221266226059365"
+    }
+  },
+  "evaluation": {
+    "reason": "the priced total is 370.2 bits above the matched baseline (a lower bound: the unpriced phases only add cost)",
+    "status": "excluded"
+  },
+  "executed": null,
+  "invariants": {
+    "a_in_subfield": true,
+    "b_in_subfield": false,
+    "base_degree": 1,
+    "class_wide": {
+      "achievable_magic_numbers": [
+        1,
+        163
+      ],
+      "best_case_destination_can_carry_r": true,
+      "best_case_log2_cost_ratio": 370.152,
+      "best_case_route_log2_total": 465.948,
+      "genus_lower_bound_log2": 162.0,
+      "min_magic_number_at_least_2": 163,
+      "relative_degree": 163,
+      "statement": "every curve over this field, in every isogeny class, has m = 1 or m >= the listed minimum for this tower; the best-case price above is a lower bound on any GHS route through F_(2^l) other than the trace",
+      "window_2_to_6_empty": true
+    },
+    "crosscheck_jacobian_transfers": {
+      "delta_bits": 0.0,
+      "file": "docs/curves/jacobian-transfers.json",
+      "note": "a wiring check of the frozen formulas, not independent validation: this tool calls the repository's cost functions, so agreement shows the inputs were passed through, not that the formulas are right. The repository total is search + transfer + destination; this total also carries construction and one verification, both negligible against the destination at these sizes",
+      "repo_log2_total": 465.948,
+      "reported_total_is_lower_by_class_discount_bits": null,
+      "route_kind": "ghs_weil_descent",
+      "this_log2_total": 465.948,
+      "within_0_002_bits": true
+    },
+    "curve_definition_degree": 163,
+    "genus": "5846006549323611672814739330865132078623730171904",
+    "ghs_type": "II",
+    "log2_genus": 162.0,
+    "magic_number": 163,
+    "min_genus_to_carry_r": 64.0,
+    "mmt_condition_8": true,
+    "orbit_length": 163,
+    "proper_subfield_degrees": [],
+    "relative_degree": 163,
+    "relative_trace_b_zero": false,
+    "trace_a": 1,
+    "weil_bits_per_genus": 2.543
+  },
+  "lead_class": "boundary",
+  "map": {
+    "construction_status": "arithmetic, not executed",
+    "degrees": {
+      "artin_schreier_cover_degree_log2": 163,
+      "relative_degree": 163,
+      "tower": "F_2 <= F_(2^1) <= F_(2^163)"
+    },
+    "destination": "Jac(C)(F_(2^1)), genus 5846006549323611672814739330865132078623730171904",
+    "explicit_formulas": "none implemented",
+    "field_of_definition": "F_(2^1)",
+    "source": "E(F_(2^163))",
+    "type": "GHS conorm-norm map (trace map when m = 1)"
+  },
+  "notes": [
+    "existence follows from the GHS construction (Galbraith-Hess-Smart 2002; Hess 2004, as cited in ec_trapdoor.rs); the repository carries structural data only"
+  ],
+  "obligations": {
+    "computational_advantage": "refuted",
+    "existence": "supported",
+    "explicit_construction": "unknown",
+    "map_correctness": "unknown",
+    "scaling_support": "unknown",
+    "subgroup_preservation": "unknown"
+  },
+  "open_obligations": [
+    "construct the smooth GHS curve C/F_(2^l) and the norm-conorm map E(F_(2^n)) -> Jac(C)(F_(2^l)) (problems/ghs-higher-magic-descent-not-executable.md)",
+    "certify Phi injective on <G>: image of G has order r and the kernel meets <G> trivially"
+  ],
+  "references": [
+    "Maurer-Menezes-Teske, LMS J. Comput. Math. 5 (2002): eq. (5), Thm 5(i), Lemma 6 (as cited in src/cryptanalysis/ec_trapdoor.rs)",
+    "Galbraith-Hess-Smart 2002; Hess, LMS J. Comput. Math. 7 (2004) (as cited in src/cryptanalysis/ghs_descent.rs)",
+    "docs/GHS_TRANSPORT.md; tests/sect113r1_ghs_evidence.rs"
+  ],
+  "schema": "transfer-audit/certificate/v2",
+  "subgroup_preservation": {
+    "antecedents": [
+      {
+        "evidence": "g * 2 log2(2^(l/2) + 1) = 2^162.0 * 2.543 >= log2 r = 162.00",
+        "name": "capacity",
+        "result": "PASS"
+      }
+    ],
+    "argument": "the Jacobian is large enough to hold r, a necessary condition only; injectivity of the norm-conorm map on <G> needs the explicit cover, which does not exist in the repository",
+    "executed": null,
+    "image_order": null,
+    "kernel_meets_subgroup": null,
+    "method": "none",
+    "status": "not_evaluated"
+  },
+  "tool": "transfer-audit/2",
+  "verdict": "no weakness found in scope",
+  "verdict_basis": [
+    "subgroup preservation is NotEvaluated: the transfer is not shown to carry <G>",
+    "the map is not constructed (existence or construction missing)",
+    "priced route costs 2^370.2 times the matched baseline or more"
+  ]
+}

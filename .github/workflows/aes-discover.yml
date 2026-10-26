@@ -1,11 +1,9 @@
 name: AES discovery laboratory
 on:
-  pull_request:
-    paths:
-      - 'tools/aes-discover/**'
-      - 'research/aes_distinguisher_20261017/**'
-      - '.github/workflows/aes-discover.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
+    branches: [main]
     paths:
       - 'tools/aes-discover/**'
       - 'research/aes_distinguisher_20261017/**'
@@ -14,12 +12,15 @@ permissions:
   contents: read
 jobs:
   native-correctness:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|aes-discover.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|aes-discover.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
-          repository: aburan28/cryptanalysis
+          repository: isogeny-labs/cryptanalysis
+          # The repository is private; the workflow token cannot read it.
+          token: ${{ secrets.CRYPTANALYSIS_READ_TOKEN || github.token }}
           ref: 2fe7393e06e58c1f3504bdbf57255a1fb36017d0
           path: .mirror-reference
           sparse-checkout: tools/aes-discover
