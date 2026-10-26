@@ -123,10 +123,18 @@ operations.
 - **Prime curves:** the base becomes `round(m*(w)·N₀)`, with `m*` = 1 up to
   `w = 0.3` and 1.41 at `w = 1` (`research/ic_planner_weight_rule_20261021`).
   A weight above 1 uses the `w = 1` multiplier, marked `extrapolated`.
-- **Other classes** keep their counted-`S` plan and say so.
+- **Koblitz curves:** the orbit columns become `max(1, round(m*(w)·c₀))`, with
+  `m*` = 1 up to `w = 0.1` and 0.71 from `w = 0.3`
+  (`research/ic_planner_weight_rule_binkob_20261026`). The base *shrinks*,
+  because a Koblitz trial's canonicalisation and probes grow with it.
+- **Random binary curves** keep `d₀`: it was cheapest at every measured weight.
+- For log2 r ≥ 36 the Koblitz plan also cites
+  `research/ic_koblitz_descent_routing_20261026`. There the ledger §23 descent,
+  now the `ecbench` method `ic.koblitz_descent`, measured 1.41–1.49× costlier
+  in counted `S`.
 
 A weighted plan is cheaper only at its weight; it is never a ranking across
-the band. The rule set is versioned (`ic-planner/2` since the weight rule);
+the band. The rule set is versioned (`ic-planner/3` since the binary/Koblitz weight rule);
 change a rule and the version changes with it.
 
 ---

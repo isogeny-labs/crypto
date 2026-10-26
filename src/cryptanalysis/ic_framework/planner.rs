@@ -32,7 +32,7 @@ use crate::cryptanalysis::ic_boundary::{BinaryInstance, PrimeInstance};
 
 /// The planner's rule set.  A spec that pins a plan names this version; a
 /// change to any rule or calibration constant changes it.
-pub const PLANNER_VERSION: &str = "ic-planner/2";
+pub const PLANNER_VERSION: &str = "ic-planner/3";
 
 /// What kind of curve the plan is for: the classes the evidence separates.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -305,6 +305,14 @@ const E_WEIGHT_RULE: Evidence = Evidence {
     path: "research/ic_planner_weight_rule_20261021/README.md",
     claim: "prime base ×{0.5–4} on three registered curves: the cheapest multiplier is 1 at w ≤ 0.3 and 1.41 at w = 1 (geometric mean 0.890 of the plan's S_1); held out on four registered curves, S_1(1.41 N₀)/S_1(N₀) 0.759–0.855, interval below 1 on 3 of 4",
 };
+const E_WEIGHT_BINKOB: Evidence = Evidence {
+    path: "research/ic_planner_weight_rule_binkob_20261026/README.md",
+    claim: "base multipliers on three binary and three Koblitz curves: the binary optimum stays at d₀ at every weight 0–1; the Koblitz optimum falls to 0.71·c₀ columns at w ≥ 0.3 (G 0.928, 0.847), and held out on three Koblitz curves 0.71·c₀ costs 0.802–0.880× the plan at w = 1 (3 of 3 intervals below 1) and 0.895–0.928 at w = 0.3 (2 of 3)",
+};
+const E_DESCENT_ROUTING: Evidence = Evidence {
+    path: "research/ic_koblitz_descent_routing_20261026/README.md",
+    claim: "Koblitz log2 r 36.6–44.3: the ledger §23 descent (ic.koblitz_descent, counted) costs 1.409–1.489× this ic.pipeline recipe in counted S, every interval above 1; the pipeline is 9.5–24.0× rho.signed_frobenius_strong",
+};
 const E_FROB_PROTOCOL: Evidence = Evidence {
     path: "research/ecbench_frobenius_orbit_vs_rho_20261014/PROTOCOL.md",
     claim: "chosen orbit columns per curve (lowest S of the counts tried): 1, 1, 2, 3, 1, 2, 8, 90 at n13–n41; model optimum c ∝ (r/n³)^{1/3}",
@@ -319,18 +327,35 @@ const E_FROB_PROTOCOL: Evidence = Evidence {
 const PRIME_WEIGHT_MULTIPLIERS: [(f64, f64); 5] =
     [(0.0, 1.0), (0.03, 1.0), (0.1, 1.0), (0.3, 1.0), (1.0, 1.41)];
 
+/// The Koblitz orbit-column multiplier `m*(w)`
+/// (`research/ic_planner_weight_rule_binkob_20261026`): the base shrinks to
+/// `max(1, round(m* · c₀))` columns once lookups and canonicalisations are
+/// charged. Random binary curves keep `d₀` at every measured weight.
+const KOBLITZ_WEIGHT_MULTIPLIERS: [(f64, f64); 5] = [
+    (0.0, 1.0),
+    (0.03, 1.0),
+    (0.1, 1.0),
+    (0.3, 0.71),
+    (1.0, 0.71),
+];
+
 /// `m*(w)` and how the weight sits against the measured grid.
 fn prime_base_multiplier(w: f64) -> (f64, Support) {
-    let (_, m) = PRIME_WEIGHT_MULTIPLIERS
+    weight_multiplier(&PRIME_WEIGHT_MULTIPLIERS, w)
+}
+
+/// `m*` at the largest measured weight not above `w`, and its support.
+fn weight_multiplier(grid: &[(f64, f64)], w: f64) -> (f64, Support) {
+    let (_, m) = grid
         .iter()
         .rev()
         .find(|(g, _)| *g <= w)
         .copied()
-        .unwrap_or(PRIME_WEIGHT_MULTIPLIERS[0]);
-    let last = PRIME_WEIGHT_MULTIPLIERS[PRIME_WEIGHT_MULTIPLIERS.len() - 1].0;
+        .unwrap_or(grid[0]);
+    let last = grid[grid.len() - 1].0;
     let support = if w > last {
         Support::Extrapolated
-    } else if PRIME_WEIGHT_MULTIPLIERS.iter().any(|(g, _)| *g == w) {
+    } else if grid.iter().any(|(g, _)| *g == w) {
         Support::Measured
     } else {
         Support::Interpolated
@@ -432,7 +457,7 @@ pub fn plan(profile: &CurveProfile, opts: &PlanOptions) -> Plan {
         }
         CurveClass::BinaryRandom => binary_choices(profile, opts, &mut warnings),
         CurveClass::Koblitz => match profile.n {
-            Some(n) if n % 2 == 1 && n < 64 => koblitz_choices(profile, n, &mut warnings),
+            Some(n) if n % 2 == 1 && n < 64 => koblitz_choices(profile, n, opts, &mut warnings),
             _ => {
                 warnings.push(
                     "Koblitz curve with even or wide n: the Frobenius-orbit base needs odd n < 64; \
@@ -451,13 +476,10 @@ pub fn plan(profile: &CurveProfile, opts: &PlanOptions) -> Plan {
         choices.push(linalg_choice(opts.goal));
     }
     if opts.native_weight > 0.0 {
-        if !matches!(
-            profile.class,
-            CurveClass::Prime | CurveClass::PrimeJ0 | CurveClass::PrimeJ1728
-        ) && !choices.is_empty()
-        {
+        if profile.class == CurveClass::BinaryRandom && !choices.is_empty() {
             warnings.push(format!(
-                "native weight {} is not modelled for this class: the counted-S (w = 0) plan is used",
+                "native weight {}: the random-binary subspace dimension stays at its counted optimum, \
+                 which was cheapest at every measured weight 0–1",
                 opts.native_weight
             ));
         }
@@ -626,7 +648,11 @@ fn binary_choices(
                 "subspace of dimension round(log2 #E / 3) = {ideal:.0}: about #E^(1/3) abscissae, the family optimum"
             ),
             support,
-            evidence: vec![E_LADDER],
+            evidence: if opts.native_weight > 0.0 {
+                vec![E_LADDER, E_WEIGHT_BINKOB]
+            } else {
+                vec![E_LADDER]
+            },
         },
         Choice {
             stage: "oracle",
@@ -647,27 +673,64 @@ fn binary_choices(
     ]
 }
 
-fn koblitz_choices(profile: &CurveProfile, n: u32, warnings: &mut Vec<String>) -> Vec<Choice> {
+fn koblitz_choices(
+    profile: &CurveProfile,
+    n: u32,
+    opts: &PlanOptions,
+    warnings: &mut Vec<String>,
+) -> Vec<Choice> {
     let log2_r = profile.log2_r();
-    let columns = (KOBLITZ_COLUMN_KAPPA * (profile.r / f64::from(n).powi(3)).cbrt())
+    let c0 = (KOBLITZ_COLUMN_KAPPA * (profile.r / f64::from(n).powi(3)).cbrt())
         .round()
-        .max(1.0) as u64;
+        .max(1.0);
+    let (m, weight_support) = weight_multiplier(&KOBLITZ_WEIGHT_MULTIPLIERS, opts.native_weight);
+    let columns = (m * c0).round().max(1.0) as u64;
     let support = span_support(log2_r, KOBLITZ_SPAN);
     if support == Support::Extrapolated {
         warnings.push("Koblitz orbit-column rule is calibrated on log2 r 11–39 only".into());
+    }
+    let mut size_support = support;
+    if weight_support == Support::Extrapolated {
+        size_support = Support::Extrapolated;
+        warnings.push(format!(
+            "native weight {} is above the measured grid (0–1): the w = 1 multiplier is used",
+            opts.native_weight
+        ));
+    } else if weight_support == Support::Interpolated && size_support == Support::Measured {
+        size_support = Support::Interpolated;
+    }
+    let mut reason = format!(
+        "one column per signed Frobenius orbit; {c0} columns from c = {KOBLITZ_COLUMN_KAPPA}·(r/n³)^(1/3), \
+         calibrated on the eight chosen counts of the orbit panel; the orbit base beats the subspace base by 2–15×"
+    );
+    let mut fb_evidence = vec![E_FROB_PROTOCOL, E_FROB];
+    if log2_r >= 36.0 {
+        reason += "; the ledger §23 descent measured 1.41–1.49× this recipe at log2 r 36.6–44.3";
+        fb_evidence.push(E_DESCENT_ROUTING);
+    }
+    if m != 1.0 {
+        reason += &format!(
+            "; × {m} = {columns} columns at w = {} GAE per native operation, where the smaller base's \
+             cheaper canonicalisations and table probes outweigh its extra trials",
+            opts.native_weight
+        );
+    }
+    if opts.native_weight > 0.0 {
+        fb_evidence.push(E_WEIGHT_BINKOB);
     }
     let renew = log2_r <= 21.5;
     vec![
         Choice {
             stage: "factor_base",
             value: format!("compact-orbit-scan:columns={columns},raw_x_cap=100000000"),
-            rule: "koblitz.factor-base.frobenius-orbit",
-            reason: format!(
-                "one column per signed Frobenius orbit; {columns} columns from c = {KOBLITZ_COLUMN_KAPPA}·(r/n³)^(1/3), \
-                 calibrated on the eight chosen counts of the orbit panel; the orbit base beats the subspace base by 2–15×"
-            ),
-            support,
-            evidence: vec![E_FROB_PROTOCOL, E_FROB],
+            rule: if m != 1.0 {
+                "koblitz.factor-base.weighted-orbit"
+            } else {
+                "koblitz.factor-base.frobenius-orbit"
+            },
+            reason,
+            support: size_support,
+            evidence: fb_evidence,
         },
         Choice {
             stage: "oracle",
@@ -803,6 +866,8 @@ mod tests {
             E_FROB,
             E_FROB_PROTOCOL,
             E_WEIGHT_RULE,
+            E_WEIGHT_BINKOB,
+            E_DESCENT_ROUTING,
         ] {
             assert!(
                 root.join(e.path).is_file(),
@@ -908,10 +973,67 @@ mod tests {
         let a = plan(&bin, &PlanOptions::default());
         let b = plan(&bin, &at(1.0));
         assert_eq!(a.pipeline_params(), b.pipeline_params());
-        assert!(b
-            .warnings
+        assert!(b.warnings.iter().any(|x| x.contains("counted optimum")));
+        assert!(b.choices[0]
+            .evidence
             .iter()
-            .any(|x| x.contains("not modelled for this class")));
+            .any(|e| e.path == E_WEIGHT_BINKOB.path));
+    }
+
+    fn koblitz(a: u8, n: u32) -> CurveProfile {
+        use num_traits::ToPrimitive;
+        let c = crate::cryptanalysis::koblitz_index_calculus::KoblitzCurve::new(a, n).unwrap();
+        let r = c.subgroup_order.to_f64().unwrap();
+        let order = c.group_order.to_f64().unwrap();
+        CurveProfile {
+            class: CurveClass::Koblitz,
+            p: None,
+            n: Some(n),
+            group_order: order,
+            r,
+            cofactor: (order / r).round() as u64,
+        }
+    }
+
+    fn columns(pl: &Plan) -> u64 {
+        let fb = pl.get("factor_base").unwrap();
+        fb.split("columns=")
+            .nth(1)
+            .unwrap()
+            .split(',')
+            .next()
+            .unwrap()
+            .parse()
+            .unwrap()
+    }
+
+    #[test]
+    fn the_native_weight_shrinks_the_koblitz_base_as_measured() {
+        // Phase A k37 (c0 = 10) and the held-out hk19 (2), hk23 (4), hk39 (6).
+        for ((a, n), c0, c71) in [
+            ((0, 37), 10, 7),
+            ((1, 19), 2, 1),
+            ((1, 23), 4, 3),
+            ((0, 39), 6, 4),
+        ] {
+            let k = koblitz(a, n);
+            assert_eq!(
+                columns(&plan(&k, &PlanOptions::default())),
+                c0,
+                "K_{a}/2^{n}"
+            );
+            for w in [0.0, 0.03, 0.1, 0.29] {
+                assert_eq!(columns(&plan(&k, &at(w))), c0, "K_{a}/2^{n} at w = {w}");
+            }
+            for w in [0.3, 1.0] {
+                let pl = plan(&k, &at(w));
+                assert_eq!(columns(&pl), c71, "K_{a}/2^{n} at w = {w}");
+                assert_eq!(pl.choices[0].rule, "koblitz.factor-base.weighted-orbit");
+            }
+        }
+        let k = koblitz(0, 37);
+        assert_eq!(plan(&k, &at(0.5)).choices[0].support, Support::Interpolated);
+        assert_eq!(plan(&k, &at(3.0)).choices[0].support, Support::Extrapolated);
     }
 
     #[test]
