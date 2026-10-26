@@ -1467,7 +1467,7 @@ build (a path dependency missing from the source archive; then no
 reclaimed the Spot host at about 19:50Z (reason "no Spot capacity"), after
 about 73 min of A0 and before any row. The binary had no way to resume, so
 that work is lost. Instance `i-0d3eaa94…` (one-time Spot request, same binary)
-was launched at about 20:20Z and is superseded by this amendment.
+was launched at 20:11Z and had run R256-A0 for about 20 min with no row when this amendment superseded it; it was terminated.
 
 **The mechanism.**
 - `f4_fp::F4Options::checkpointing(path, every)` (in `src/cryptanalysis/f4_fp.rs`)
