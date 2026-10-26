@@ -528,6 +528,8 @@ impl FpRing {
             }
         }
         self.adds.set(self.adds.get() + d as u64 * p);
+        // bitop/v1: the zero test of each x
+        super::jv_bitops::words(p);
         out
     }
     /// Monic irreducible factors with multiplicities of a non-zero `a`:
@@ -538,6 +540,7 @@ impl FpRing {
         for (sq, mult) in self.squarefree(a) {
             let mut rest = sq;
             for r in self.roots_by_table(&rest) {
+                super::jv_bitops::hook_adds(self.p, 1);
                 let lin = vec![(self.p - r) % self.p, 1];
                 rest = self.exact_div(&rest, &lin);
                 out.push((lin, mult));
@@ -581,6 +584,7 @@ impl FpRing {
         let mut out: Vec<(FpPoly, usize)> = Vec::new();
         let mut rest = sq.into_iter().next().unwrap().0;
         for r in self.roots_by_table(&rest) {
+            super::jv_bitops::hook_adds(self.p, 1);
             let lin = vec![(self.p - r) % self.p, 1];
             rest = self.exact_div(&rest, &lin);
             out.push((lin, 1));
@@ -675,7 +679,10 @@ impl FpRing {
         let mut out: Vec<u64> = self
             .edf(&g, 1, rng)
             .into_iter()
-            .map(|lin| (self.p - lin[0]) % self.p)
+            .map(|lin| {
+                super::jv_bitops::hook_adds(self.p, 1);
+                (self.p - lin[0]) % self.p
+            })
             .collect();
         out.sort_unstable();
         out
@@ -1165,6 +1172,9 @@ pub fn sieve_line(
     }
     flush(&mut pending, ctr, &mut hits, &mut cost);
     cost.muls += ring.muls() - m0;
+    // bitop/v1: the factor-base test of every x, and per root the counter's
+    // tag compare, its increment and the threshold compare
+    super::jv_bitops::words(cost.steps + 3 * cost.lookups);
     if let Some(out) = all_counts {
         out.clear();
         out.resize(p as usize, 0);
@@ -1227,7 +1237,9 @@ pub fn relation_from_hit(
     };
     let mut terms = Vec::with_capacity(setup.m);
     for &x in &roots {
+        super::jv_bitops::probe(1);
         let &idx = by_x.get(&x)?;
+        super::jv_bitops::words(4);
         let a = E2([ring.eval(&line.a0, x), mm(s, ring.eval(&line.a1, x), p)]);
         ring.count(1);
         let bx = peval(fq, &line.b, &fq.from_fp(x));
@@ -1269,6 +1281,15 @@ pub fn verify_rel(jac: &super::jv_cover::Hyp<Fq>, base: &[BaseEl], rel: &SieveRe
 /// columns goes first).  `None` while the rows do not cover their columns.
 pub fn sieve_core(rels: &[SparseRel], ncols: usize) -> Option<super::gaudry_cubic::SquareCore> {
     let mut alive = vec![true; rels.len()];
+    // bitop/v1: one word op per column-count update, per entry test of the
+    // singleton scan and of the victim choice, and per column of each count
+    let alive_entries = |alive: &[bool]| -> u64 {
+        rels.iter()
+            .enumerate()
+            .filter(|(i, _)| alive[*i])
+            .map(|(_, r)| r.cols.len() as u64)
+            .sum()
+    };
     let weights = |alive: &[bool]| -> Vec<usize> {
         let mut w = vec![0usize; ncols];
         for (i, r) in rels.iter().enumerate() {
@@ -1278,11 +1299,13 @@ pub fn sieve_core(rels: &[SparseRel], ncols: usize) -> Option<super::gaudry_cubi
                 }
             }
         }
+        super::jv_bitops::words(alive_entries(alive) + ncols as u64 + rels.len() as u64);
         w
     };
     loop {
         loop {
             let w = weights(&alive);
+            super::jv_bitops::words(alive_entries(&alive));
             let mut dropped = false;
             for (i, r) in rels.iter().enumerate() {
                 if alive[i] && r.cols.iter().any(|&(c, _)| w[c] == 1) {
@@ -1306,6 +1329,7 @@ pub fn sieve_core(rels: &[SparseRel], ncols: usize) -> Option<super::gaudry_cubi
                 columns: (0..ncols).map(|c| w[c] > 0).collect(),
             });
         }
+        super::jv_bitops::words(alive_entries(&alive));
         let victim = (0..rels.len())
             .filter(|&i| alive[i])
             .min_by_key(|&i| rels[i].cols.iter().filter(|&&(c, _)| w[c] == 2).count())?;
@@ -1548,18 +1572,28 @@ pub fn run_cover_sieve_dlp_on(
     m_override: Option<usize>,
     trace: bool,
 ) -> SieveDlpReport {
+    use super::jv_bitops::{enter, Phase};
     let start = Instant::now();
     let spec = spec.clone();
     let p = spec.p;
-    let ctx = Ctx::new(&spec);
+    let ctx = {
+        let _g = enter(Phase::Model);
+        Ctx::new(&spec)
+    };
     let jac = ctx.jac();
     let l = spec.l;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x51E7E);
-    let (c_e, c_j) = unit_costs(&spec, &ctx);
+    let (c_e, c_j) = {
+        let _g = enter(Phase::Harness);
+        unit_costs(&spec, &ctx)
+    };
     ctx.f.reset_muls();
+    let fb_guard = enter(Phase::FactorBase);
     let base = factor_base(&ctx, &mut rng);
     let base_muls = ctx.f.muls();
     let by_x: HashMap<u64, usize> = base.iter().enumerate().map(|(i, b)| (b.x, i)).collect();
+    super::jv_bitops::probes(base.len() as u64, 1);
+    drop(fb_guard);
     let small = base.len();
     let unknowns = small + 1;
     let m_rule = choose_m(p, small, margin);
@@ -1587,6 +1621,7 @@ pub fn run_cover_sieve_dlp_on(
     };
     // ── the residual stream for the descent: R = aG′ + bQ′, R₀ + i·M
     ctx.f.reset_muls();
+    let stream_guard = enter(Phase::Descent);
     let (al, be) = (rng.gen_range(1..l), rng.gen_range(1..l));
     let step = jac.add(
         &jac.mul(&spec.gj, al as u128),
@@ -1596,11 +1631,16 @@ pub fn run_cover_sieve_dlp_on(
     let mut b = rng.gen_range(1..l);
     let mut r = jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128));
     rep.setup_muls = ctx.f.muls() + spec.transfer_muls;
+    drop(stream_guard);
     ctx.f.reset_muls();
     // ── the relation phase: the sieve over the lines, in the run's order of B
-    let setup = sieve_setup(&ctx.f.f, &ctx.cov.hx, &base, m);
+    let setup = {
+        let _g = enter(Phase::Relations);
+        sieve_setup(&ctx.f.f, &ctx.cov.hx, &base, m)
+    };
     rep.table_muls = setup.table_muls;
     let scramble_for = |m: usize| -> u128 {
+        let _g = enter(Phase::Relations);
         let mut s = StdRng::seed_from_u64(seed ^ ((m as u64) << 32));
         let n = b_space(&sieve_setup(&ctx.f.f, &ctx.cov.hx, &base, m));
         coprime_scramble(n, &mut s)
@@ -1611,7 +1651,14 @@ pub fn run_cover_sieve_dlp_on(
     let mut sieve_rows: Vec<SparseRel> = Vec::new();
     let mut sieve_rels: Vec<SieveRel> = Vec::new();
     let mut seen: std::collections::HashSet<Vec<(usize, i8)>> = std::collections::HashSet::new();
-    let threads = rayon::current_num_threads().max(1);
+    // `JV_SIEVE_ROUND_THREADS` fixes the round's plan (how many batches a
+    // round sieves before the core is tried) independently of the pool, so
+    // a run on a one-thread pool sieves the rounds a multi-thread run would
+    let threads = std::env::var("JV_SIEVE_ROUND_THREADS")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .unwrap_or_else(rayon::current_num_threads)
+        .max(1);
     // about 4·10⁶ sieve steps per thread and round
     let chunk: u128 = (4_000_000 / p as u128).max(64);
     // sieve one round of batches; false when every m up to 16 is exhausted
@@ -1619,6 +1666,7 @@ pub fn run_cover_sieve_dlp_on(
                            sieve_rows: &mut Vec<SparseRel>,
                            sieve_rels: &mut Vec<SieveRel>|
      -> bool {
+        let _phase = enter(Phase::Relations);
         if next_k >= space {
             // the lines of this m are exhausted: continue with m + 1 (the rule
             // registered in §11.3), the relations found so far kept
@@ -1671,10 +1719,18 @@ pub fn run_cover_sieve_dlp_on(
             for rel in o.rels {
                 // a relation found twice (or as its negation) is one relation
                 let neg: Vec<(usize, i8)> = rel.terms.iter().map(|&(i, e)| (i, -e)).collect();
-                if seen.contains(&rel.terms) || seen.contains(&neg) {
+                let key_words = rel.terms.len() as u64;
+                super::jv_bitops::words(key_words);
+                super::jv_bitops::probe(key_words);
+                let dup = seen.contains(&rel.terms) || {
+                    super::jv_bitops::probe(key_words);
+                    seen.contains(&neg)
+                };
+                if dup {
                     rep.duplicates += 1;
                     continue;
                 }
+                super::jv_bitops::probe(key_words);
                 seen.insert(rel.terms.clone());
                 rep.per_m.last_mut().unwrap().3 += 1;
                 let cols: Vec<(usize, u64)> = rel
@@ -1699,6 +1755,7 @@ pub fn run_cover_sieve_dlp_on(
     // rows lie inside the core's columns
     let mut descent_rows: Vec<SparseRel> = Vec::new();
     let mut descend_round = |rep: &mut SieveDlpReport, descent_rows: &mut Vec<SparseRel>| {
+        let _phase = enter(Phase::Descent);
         let mut batch: Vec<(u64, u64, Div<E2>, u64)> = Vec::with_capacity(64);
         for _ in 0..64 {
             let idx = rep.descent_residuals + batch.len() as u64;
@@ -1789,6 +1846,7 @@ pub fn run_cover_sieve_dlp_on(
         if sieve_rows.len() < next_attempt {
             continue;
         }
+        let _la = enter(Phase::LinearAlgebra);
         let Some(core) = sieve_core(&sieve_rows, unknowns) else {
             next_attempt = sieve_rows.len() + (small / 20).max(1);
             continue;
@@ -1830,6 +1888,7 @@ pub fn run_cover_sieve_dlp_on(
         let before = la_ops;
         let x = wiedemann_u64(&sel, sel.len(), l, &mut rng, &mut la_ops);
         let dd = x.map(|x| x[k]);
+        let _verify = enter(Phase::Verification);
         let ec = super::jv_cover::EllE::new(&ctx.f, &spec.alpha);
         if dd.is_some_and(|dd| ec.mul(&spec.g, dd) == spec.q) {
             rep.solved = true;
