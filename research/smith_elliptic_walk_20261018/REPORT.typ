@@ -122,11 +122,16 @@ class on a successful walk. At $p = 2053, 8209, 65537$, arm A walks are trapped 
   at the small primes. At $p = 1031$, for example, the mean is $5.95 dot 10^5$ nodes while the
   median successful walk is 291. This flattens the slope.
 - *Post hoc, labelled:* for successful walks at $p equiv 3 med (mod 4)$:
-  - tested nodes scale with exponent 1.07 $[0.95, 1.19]$ and cost with 1.13 $[1.00, 1.26]$;
+  - tested nodes scale with exponent 1.07 $[0.95, 1.19]$, and cost with 1.13 $[1.00, 1.26]$.
+    The rule's label for the cost is `omega(p)`; with the $log p$ growth of the step cost this is
+    $p log p$, that is $tilde(Theta)(p)$;
   - medians are $0.1$–$0.6 p$;
   - $h(p) approx (3 "to" 10) slash p$;
-  - at $p = 262147$ and $1048583$, $pi$ = 0.80 and 0.55, close to Q1's pass given JV (0.78–0.85);
-  - $1 slash (h pi)$ reproduces the mean at $1048583$.
+  - at $p = 262147$ and $1048583$, $pi$ = 0.80 (12/15 hits) and 0.55 (6/11 hits). The second
+    is consistent with Q1's pass given JV (0.78–0.85) within sampling at 11 hits;
+  - a non-circular check (derived): the walk's $h$ with Q1's $pi approx 0.8$ predicts
+    $1 slash (0.8 h)$ = $1.19 dot 10^5$ and $3.24 dot 10^5$ nodes at $p = 262147$ and $1048583$,
+    against $1.19 dot 10^5$ and $4.75 dot 10^5$ observed (ratios 1.00 and 0.68).
 - Arm B, successful walks at $p equiv 3 med (mod 4)$: exponent 0.93 $[0.75, 1.10]$.
 
 *Verdict.* The walk costs $Theta(p)$ nodes at about 2.5 k multiplications each. That is not
@@ -165,12 +170,24 @@ the walk as specified usually never finishes. E1 is supported.
 
 *Not established:*
 
-- whether some other walk policy avoids the traps. Admitting steps through non-full-2-torsion
-  nodes, or testing general (non-JV) $(3,5)$-weakness, are candidates;
+- whether some other walk policy avoids the traps, for example admitting steps through
+  non-full-2-torsion nodes;
+- whether weak or passing curves cluster beyond density $1 slash p$, which is what a cheaper walk
+  would need;
 - why the descended locus passes Smith at $tilde 0.55$;
 - any statement beyond $p approx 2^20$.
 
-*Next step:* test $(3,5)$-weakness beyond the JV-split family. Q1 shows that a passing weak $E$ is
-usually 1–4 steps away in the full graph. The sampled walk is $Theta(p)$ only because it can
-recognise weak nodes solely through the JV cross-ratio test, whose density is about $c slash p$.
-Measure on the Q1 graphs whether a radius-3 search plus a general weakness test reaches $C_2$.
+*Next step:* measure clustering of weak and passing curves in the isogeny graph. General
+$(3,5)$-weak curves are sparse too: $2p^2$ models against about $2p^3$ $K$-classes, so their
+density is about $1 slash p$. At that density the nearest weak node is about $log_2 p$ steps away,
+and a ball of that radius holds about $p$ nodes. A general weakness test plus a short search would
+therefore beat $Theta(p)$ only if weak or passing curves cluster beyond $1 slash p$.
+
+The Q1 data give a first, derived reading. The weak share of the explored components falls from
+0.54 at $p = 7$ to 0.13 at $p = 31$. The global share is $91 slash 686 approx 0.13$ and
+$1886 slash 59582 approx 0.03$ (with $2p^3$ classes), so the explored components are about 4×
+enriched at $p = 31$. The mean distance rises from 1.5 to 3.6.
+
+The discriminating step is to test whether that enrichment persists as $p$ grows, and whether
+$d_2$ grows like $log p$, on larger exhaustive graphs or sampled components. Only then is a
+general weakness test worth building.

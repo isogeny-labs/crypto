@@ -170,15 +170,20 @@ open.
   hypotheses) as a route that needs no walk.
 - **W3a done (2026-10-25,
   [study](../research/smith_elliptic_walk_20261018/REPORT.pdf)):** the
-  elliptic-side walk is short in the graph but `Θ(p)` as a sampled walk,
-  because weak nodes are recognised only by the JV cross-ratio test (density
-  about `c/p`). Its cost does not vanish against `Õ(q)` index calculus.
-  **Next discriminating step:** a test for general (non-JV) `(3,5)`
-  weakness of a given `E`, then on the exhaustive graphs
+  elliptic-side walk is short in the graph at `p <= 31`, but `Θ~(p)` as a
+  sampled walk. JV-weak nodes have density about `c/p`. General `(3,5)`-weak
+  curves are also about `1/p` of all classes (`2p^2` models against `~2p^3`
+  classes), so a general weakness test alone would not obviously help. The
+  walk's cost does not vanish against `Õ(q)` index calculus.
+  **Next discriminating step:** measure whether weak and passing curves
+  cluster in the 2-isogeny graph beyond density `1/p`, and whether the
+  distance to a passing `E` grows like `log p`. In the Q1 graphs
   (`research/smith_elliptic_walk_20261018/data/exhaustive/graph_p*.json`)
-  the share of failing weak `E` that a radius-3 search plus that test
-  brings to a passing `E`, against `C_2`, with the test's cost in `F_p`
-  multiplications. Also open: why the descended locus passes at about 0.55.
+  the explored components are about 4x enriched in weak curves at `p = 31`
+  (derived). Test whether that persists at larger `p`, on larger exhaustive
+  or sampled components. Only if it does is a general weakness test with a
+  short search worth building. Also open: a walk policy that avoids the
+  `p = 1 mod 4` traps, and why the descended locus passes at about 0.55.
 - **Outcomes:** short walks with cheap steps make the extension a practical
   enlargement of Smith's weak set; long or expensive walks bound it as a
   counting fact only.
@@ -207,5 +212,5 @@ open.
   0.53-0.61. Exhaustive closure under elliptic 2-isogenies reaches 74-98% at
   `p <= 31`, at distances of 1.5-3.6 steps. Sampled walks are `Θ(p)` to the
   first pass (post hoc; the frozen `o(p)` label is a censoring artifact) and
-  are trapped at `p = 1 mod 4`. Unresolved; next step is a general
-  `(3,5)`-weakness test.
+  are trapped at `p = 1 mod 4`. Unresolved; next step is to measure whether
+  weak and passing curves cluster beyond `1/p`.

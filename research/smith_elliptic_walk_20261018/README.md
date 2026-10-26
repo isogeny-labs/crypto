@@ -32,10 +32,17 @@ standardized curve, a sub-rho claim, or a key-recovery result.
    walks add amounts set by the caps, and those dominate at the small primes
    and flatten the slope. In a post hoc analysis of successful walks at
    `p ≡ 3 (mod 4)`, where the walk does not branch, tested nodes scale with
-   exponent 1.07 [0.95, 1.19] and cost with 1.13 [1.00, 1.26]. The medians
-   are 0.1–0.6 `p` nodes. The hit rate is `h(p)` ≈ (3–10)/`p`, and
-   `steps ≈ 1/(h·pi)` holds at large `p`. E1 (`Θ~(p)`) is supported for the
-   walks that finish.
+   exponent 1.07 [0.95, 1.19] and cost with 1.13 [1.00, 1.26]. The frozen
+   rule would label that cost interval `omega(p)`, since its lower end is
+   not below 1. Step cost grows like log p, so the cost is about
+   `p log p`, which is `Θ~(p)`. The medians are 0.1–0.6 `p` nodes. The hit
+   rate is `h(p)` ≈ (3–10)/`p`.
+
+   A non-circular check (derived) combines the walk's `h` with Q1's pass
+   rate given JV (`pi` ≈ 0.8). It predicts `1/(h·0.8)` = 1.19e5 and
+   3.24e5 tested nodes at `p` = 262147 and 1048583, against 1.19e5 and
+   4.75e5 observed (ratios 1.00 and 0.68). E1 (`Θ~(p)`) is supported for
+   the walks that finish.
 4. **The walk policy fails when `p ≡ 1 (mod 4)`.** The step rule takes a
    neighbour only if it has full rational 2-torsion. Since
    `∏_i (r_i − r_j)(r_i − r_l) = −disc`, the parity of admissible steps is set
@@ -149,7 +156,8 @@ Fits (`fit.json`; OLS of the log mean on log p, 2,000 bootstrap draws):
   - arm B: undetermined, because 65537 had no success.
 - **Post hoc, labelled**:
   - successful walks, `p ≡ 3 (mod 4)`: arm A nodes 1.07 [0.95, 1.19], arm A
-    cost 1.13 [1.00, 1.26], arm B nodes 0.93 [0.75, 1.10];
+    cost 1.13 [1.00, 1.26] (rule label `omega(p)`: it is `p log p`, so
+    `Θ~(p)`), arm B nodes 0.93 [0.75, 1.10];
   - successful walks, all primes: arm A nodes 0.85 [0.25, 1.53].
 
 ## Amendments / deviations (PROTOCOL.md is unchanged)
