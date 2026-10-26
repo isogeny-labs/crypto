@@ -59,6 +59,21 @@ history and Helm values. A GitHub App with the permissions in GitHub's ARC
 authentication guide can also be used; the Secret then needs the keys
 `github_app_id`, `github_app_installation_id` and `github_app_private_key`.
 
+### Replacing the GitHub credential
+
+If the repository moves or the token expires, the listeners log a 404 or 401 on
+`.../actions/runners/registration-token` and no runner is ever announced.
+`rotate-github-token.sh` tests a new token the way ARC uses it, updates
+`arc-github-auth`, restarts the controller and removes the temporary
+cluster-admin it attached to the caller:
+
+```sh
+ARC_GITHUB_REPO=isogeny-labs/crypto taskq/deploy/eks-karpenter/arc/rotate-github-token.sh
+```
+
+The token needs the repository owner as its resource owner and Administration
+read and write on the repository.
+
 ## Deploy and verify
 
 Use an authorized kubeconfig for `isolab` and an administrator network path to
