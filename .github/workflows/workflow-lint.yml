@@ -7,6 +7,7 @@ on:
       - '.github/workflows/**'
       - '.github/actionlint.yaml'
       - '.github/scripts/run-actionlint.sh'
+      - '.github/actionlint.yaml'
 # A newer push to the same pull request cancels this workflow's run for the older commit.
 # Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
 concurrency:
@@ -28,6 +29,7 @@ jobs:
             /.github/workflows/
             /.github/actionlint.yaml
             /.github/scripts/run-actionlint.sh
+            /.github/actionlint.yaml
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
