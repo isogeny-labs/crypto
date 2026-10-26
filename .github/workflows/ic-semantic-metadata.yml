@@ -41,20 +41,19 @@ jobs:
         run: python -m unittest discover -s docs/curves/ic -p 'test_validate_semantics.py' -v
       # aburan28/cryptanalysis is private: an unauthenticated fetch returns 404.
       # CRYPTANALYSIS_READ_TOKEN (a fine-grained token with contents: read on
-      # that repository) enables the byte comparison; without it the committed
-      # metadata is still validated and the run warns that the mirror was not.
+      # that repository) enables the byte comparison. The gate is fail-closed:
+      # without the token the job errors instead of skipping the mirror check.
       - name: Fetch authoritative cryptanalysis registry for byte comparison
-        id: peer
         shell: bash
         env:
           PEER_TOKEN: ${{ secrets.CRYPTANALYSIS_READ_TOKEN }}
         run: |
           set -euo pipefail
           if [ -z "$PEER_TOKEN" ]; then
-            echo "::warning::CRYPTANALYSIS_READ_TOKEN is not set; the upstream mirror comparison is skipped (aburan28/cryptanalysis is private)"
-            echo "available=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "::error::Configure CRYPTANALYSIS_READ_TOKEN with contents:read access to the private cryptanalysis repository. The upstream mirror gate cannot run anonymously."
+            exit 1
           fi
+          # curl, not gh: the crypto-eks-linux runners do not ship the gh CLI.
           base=cryptanalysis-peer/experiments/ic-candidate-catalog
           mkdir -p "$base/curve-links"
           for file in curves.yaml curves.schema.json curve-links/link.schema.json \
@@ -71,10 +70,5 @@ jobs:
               exit 1
             fi
           done
-          echo "available=true" >> "$GITHUB_OUTPUT"
       - name: Validate committed metadata and upstream mirror
-        if: steps.peer.outputs.available == 'true'
         run: python docs/curves/ic/validate_semantics.py --peer cryptanalysis-peer
-      - name: Validate committed metadata (mirror not compared)
-        if: steps.peer.outputs.available != 'true'
-        run: python docs/curves/ic/validate_semantics.py
