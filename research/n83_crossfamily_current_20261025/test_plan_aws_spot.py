@@ -1,4 +1,4 @@
-"""Check the read-only two-zone Spot budget and host gates."""
+"""Check the read-only two-instance Spot budget and host gates."""
 
 from datetime import datetime, timezone
 import unittest
@@ -12,9 +12,9 @@ BUNDLE = {"source_archive_sha256": "a" * 64,
 
 
 class FakeAws:
-    def __init__(self, quota=64, score_a=6):
+    def __init__(self, quota=64, score_d=9):
         self.quota = quota
-        self.score_a = score_a
+        self.score_d = score_d
 
     def __call__(self, service, operation, *args):
         if (service, operation) == ("sts", "get-caller-identity"):
@@ -36,8 +36,7 @@ class FakeAws:
                 "MapPublicIpOnLaunch": True} for fixed in plan.ZONES]}
         if operation == "get-spot-placement-scores":
             return {"SpotPlacementScores": [
-                {"AvailabilityZoneId": "use1-az6", "Score": 9},
-                {"AvailabilityZoneId": "use1-az1", "Score": self.score_a}]}
+                {"AvailabilityZoneId": "use1-az6", "Score": self.score_d}]}
         if operation == "describe-availability-zones":
             return {"AvailabilityZones": [
                 {"ZoneName": "us-east-1d", "ZoneId": "use1-az6"},
@@ -59,19 +58,19 @@ class FakeAws:
 
 
 class AwsPlanTests(unittest.TestCase):
-    def test_two_distinct_zones_fit_the_bid_cap(self):
+    def test_two_instances_fit_the_bid_cap(self):
         result = plan.provider_plan(BUNDLE, "c" * 40, CLOCK, FakeAws())
-        self.assertEqual(result["projected_at_quotes_usd"], "3.81")
-        self.assertEqual(result["projected_at_bids_usd"], "4.09")
+        self.assertEqual(result["projected_at_quotes_usd"], "3.10")
+        self.assertEqual(result["projected_at_bids_usd"], "3.37")
         self.assertEqual({zone["zone"] for zone in result["zones"]},
-                         {"us-east-1a", "us-east-1d"})
+                         {"us-east-1d"})
         self.assertEqual(result["source_archive_sha256"], "a" * 64)
 
     def test_quota_and_placement_fail_closed(self):
         with self.assertRaisesRegex(ValueError, "quota"):
             plan.provider_plan(BUNDLE, "c" * 40, CLOCK, FakeAws(quota=0))
         with self.assertRaisesRegex(ValueError, "placement score"):
-            plan.provider_plan(BUNDLE, "c" * 40, CLOCK, FakeAws(score_a=1))
+            plan.provider_plan(BUNDLE, "c" * 40, CLOCK, FakeAws(score_d=1))
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only, source-bound AWS Spot plan for two N83 high-K strata."""
+"""Read-only, source-bound AWS Spot plan for two N83 Tier 1 instances."""
 
 import argparse
 from datetime import datetime, timedelta, timezone
@@ -32,8 +32,8 @@ AMI_PARAMETER = (
 ZONES = (
     {"stratum": 0, "zone": "us-east-1d", "subnet_id":
      "subnet-0561480728d2b1ffd", "max_hourly_usd": Decimal("0.27")},
-    {"stratum": 1, "zone": "us-east-1a", "subnet_id":
-     "subnet-04e6765fae0326ef3", "max_hourly_usd": Decimal("0.39")},
+    {"stratum": 1, "zone": "us-east-1d", "subnet_id":
+     "subnet-0561480728d2b1ffd", "max_hourly_usd": Decimal("0.27")},
 )
 
 
@@ -132,6 +132,8 @@ def provider_plan(bundle, head, clock, api=aws):
         raise ValueError("six-hour two-host bid envelope exceeds cap")
     return {"schema": "n83.crossfamily-aws-spot-plan/v1",
             "status": "READY_FOR_SEPARATE_ALLOCATION_APPROVAL",
+            "tier": "cloud_instance_tier1",
+            "placement_model": "two_distinct_instances_same_availability_zone",
             "recorded_utc": clock.isoformat(), "account_id": account,
             "region": REGION, "instance_type": INSTANCE_TYPE,
             "architecture": "arm64", "image_id": image_id,

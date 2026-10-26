@@ -92,27 +92,25 @@ raw receipts, and archives them even when a stage fails. The dispatch output
 and source bundle both belong outside the repository. Stage and collect require
 the configured RunPod key and SSH public-key access to the account's Pods.
 
-### Read-only AWS Spot alternative
+### AWS Spot Tier 1 alternative
 
-`plan_aws_spot.py` checks an exact-source, two-zone Tier 1 alternative before
-any AWS mutation. It requires two `g5g.4xlarge` ARM64 instances, each exposing
-16 vCPUs and 32 GiB RAM, in `us-east-1d` and `us-east-1a`. [Separate zones](https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html)
-establish distinct physical hosts. The six-hour maximum bids are $0.27 and
-$0.39 per hour. At those bids, two 50 GB gp3 root volumes and a $0.05 S3
-allowance, its six-hour projection at the maximum bids is $4.09 under a
-$4.20 allocation cap. A future launch must arm independent deletion guards;
-this projection is not a guaranteed account billing ceiling.
-On 2026-10-26 the AWS API returned G/VT Spot quota 64 vCPUs and a $3.81
-projection at the quoted rates. The two Spot placement scores moved from
-9/7 to 9/4 during preparation; the plan records current scores and requires
-at least 3 in each zone. Prices and scores must be rechecked before
-allocation. The gp3
+`plan_aws_spot.py` checks an exact-source, two-instance Tier 1 alternative
+before any AWS mutation. It requires two separately identified `g5g.4xlarge`
+ARM64 Spot instances, each exposing 16 vCPUs and 32 GiB RAM, in
+`us-east-1d`. This same-zone placement follows the practical cloud-instance
+Tier 1 contract; it does not establish physical host isolation. The six-hour
+maximum bid is $0.27 per instance-hour. At those bids, two 50 GB gp3 root
+volumes and a $0.05 S3 allowance, its six-hour projection is $3.37 under a
+$4.20 allocation cap. This projection is not a guaranteed account billing
+ceiling. On 2026-10-26 the AWS API returned G/VT Spot quota 64 vCPUs, a
+$3.10 projection at quoted rates, and placement score 9 for two units in
+`us-east-1d`. Prices and scores must be rechecked before allocation. The gp3
 rate and meaning of placement scores follow [AWS EBS pricing](https://aws.amazon.com/ebs/pricing/)
 and [AWS Spot placement guidance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-sps-works.html).
 `allocate_aws.py` refreshes this plan from the provider immediately before
 allocation. Its default invocation is read only. The `--execute` option
-stages the exact source in a versioned S3 bucket and requests one Spot host
-per zone, with a fixed bid, encrypted deletion-on-termination root disk,
+stages the exact source in a versioned S3 bucket and requests two Spot
+instances, with a fixed bid, encrypted deletion-on-termination root disk,
 outbound-only security group, host-side shutdown timer, and independently
 running local termination guard. The host checks its IMDSv2 instance identity,
 builds both pinned ARM64 producers, runs the frozen alternating IC/rho schedule,

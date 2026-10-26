@@ -1,4 +1,4 @@
-"""Independent distinct-zone and API-tag admission controls."""
+"""Independent two-instance and API-tag admission controls."""
 
 import json
 import tempfile
@@ -19,7 +19,7 @@ class AwsProviderTest(unittest.TestCase):
                           'instance_ids': ['i-first', 'i-second'],
                           'strata': []}
             strata, instances = [], []
-            for index, zone in enumerate(('us-east-1d', 'us-east-1a')):
+            for index, zone in enumerate(('us-east-1d', 'us-east-1d')):
                 instance_id = controller['instance_ids'][index]
                 results = root / str(index)
                 usage = results / 'points' / f'p{index:02d}' / 'runs' / 'arm'
@@ -53,10 +53,10 @@ class AwsProviderTest(unittest.TestCase):
                         'captured_utc': '2026-10-26T19:11:00+00:00'}
             self.assertEqual(aws_provider.verify(snapshot, strata, head)[
                 'status'], 'PASS_TWO_DISTINCT_CONCURRENT_AWS_SPOT_INSTANCES')
-            instances[1]['availability_zone'] = instances[0]['availability_zone']
+            instances[1]['instance_id'] = 'i-first'
             with self.assertRaises(ValueError):
                 aws_provider.verify(snapshot, strata, head)
-            instances[1]['availability_zone'] = 'us-east-1a'
+            instances[1]['instance_id'] = 'i-second'
             instances[1]['tags']['RunId'] = 'other'
             with self.assertRaises(ValueError):
                 aws_provider.verify(snapshot, strata, head)
