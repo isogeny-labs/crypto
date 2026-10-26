@@ -8,6 +8,7 @@
 //! transfer-audit audit  --curve sect113r1 --out DIR
 //! transfer-audit suite  --out DIR [--measure-ic]
 //! transfer-audit check  --certs DIR
+//! transfer-audit sweep  [--k-max 64]
 //! transfer-audit report --certs DIR --out DIR
 //! ```
 //!
@@ -98,6 +99,19 @@ enum Command {
         #[command(flatten)]
         common: Common,
     },
+    /// Audit every prime-field registry curve with a generator and embedding
+    /// degree at most `--k-max` and print the pairing verdicts: the
+    /// calibration sweep that pins the `class-weak` set (trait records are
+    /// read from the committed `docs/curves/traits.json`).
+    Sweep {
+        #[arg(long, default_value = "docs/curves/registry.json")]
+        registry: PathBuf,
+        #[command(flatten)]
+        common: Common,
+        /// Largest embedding degree swept.
+        #[arg(long, default_value_t = 64)]
+        k_max: u64,
+    },
     /// Build the results table, CSV and SVG figures from the certificates.
     Report {
         #[arg(long)]
@@ -166,6 +180,11 @@ fn run(cli: Cli) -> Result<(), String> {
             registry,
             common,
         } => suite::check_suite(&certs, &registry, &common),
+        Command::Sweep {
+            registry,
+            common,
+            k_max,
+        } => suite::print_sweep(&registry, &common, k_max),
         Command::Report { certs, out } => report::build(&certs, &out),
     }
 }

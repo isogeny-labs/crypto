@@ -8,17 +8,21 @@ separate from the `cpu-spot` Iso Lab measurement pool.
 
 | Scale set / `runs-on` | Pod request | Pod memory limit | Maximum runners |
 | --- | --- | --- | --- |
-| `crypto-eks-linux` | 4 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 11 |
-| `crypto-eks-highmem` | 16 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
+| `crypto-eks-linux` | 2.8 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 7 |
+| `crypto-eks-highmem` | 14 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
 | `crypto-eks-xmem` | 14 CPU, 440 GiB plus Docker sidecar | 480 GiB runner (x2iedn/x2iezn.4xlarge, 512 GiB) | 1 |
 | `crypto-eks-xmem1t` | 30 CPU, 900 GiB plus Docker sidecar | 960 GiB runner (x2iedn/x2iezn.8xlarge, 1 TiB) | 1 |
+| `crypto-isolab-build` | 1.5 CPU, 12 GiB | 16 GiB runner | 1 |
+| `crypto-isolab` | Iso Lab publisher with Docker sidecar | See `isolab-values.yaml` | 1 |
 
-The base NodePool admits x86-64 M/R instances with 8, 16 or 32 vCPUs and caps
-aggregate provisioning at 128 vCPUs and 1 TiB. An additional R-family pool
-admits 16-vCPU nodes and caps at 32 vCPUs and 256 GiB. The pool names and the
+The base NodePool admits x86-64 M/R instances with 8 or 16 vCPUs and caps
+aggregate provisioning at 16 vCPUs and 128 GiB. An additional R-family pool
+admits 16-vCPU nodes and caps at 16 vCPUs and 128 GiB. A separate
+`gha-gates` R-family Spot pool reserves one 16-vCPU / 128-GiB node for
+the high-memory gate runner through `gha.dev/pool=gates`. The pool names and the
 `gha.dev/pool=on-demand` scheduling label are legacy; the Karpenter
 `karpenter.sh/capacity-type=spot` requirement controls the actual EC2 capacity.
-Both ARC scale sets have `minRunners: 0`. With no queued or running jobs, ARC
+All ARC scale sets have `minRunners: 0`. With no queued or running jobs, ARC
 removes its ephemeral runner pods and Karpenter removes empty runner nodes after
 five minutes. The managed system node group has a two-node floor for the ARC and
 cluster controllers. NodePool limits are upper bounds, not spending limits or
@@ -33,9 +37,10 @@ one process and the dense degree-5 Weil-descent closure about 768 GB. It admits
 only Spot x2iedn and x2iezn nodes with 16 or 32 vCPUs and carries its own
 `gha.dev/pool=xmem` taint, so only the two xmem scale sets land there. Its limit
 is 32 vCPUs and 1100 GiB, which is one 1 TiB node or two 512 GiB nodes. The
-runner pools then total at most 64 vCPUs (16 + 16 + 32). Together with the Iso
-Lab pools that total must stay inside the 96-vCPU regional Spot quota, and
-Karpenter fails to launch a node when it would not.
+runner NodePool caps then total 80 vCPUs (16 + 16 + 16 + 32). These are upper
+bounds, not a concurrent allocation: the account also runs the harness and Iso
+Lab worker pools under a 96-vCPU regional Spot quota. Karpenter leaves a
+runner pending when quota or capacity is unavailable.
 The two scale sets differ only in their request, so the request decides the
 node size. Spot prices for these families were not checked when the pool was
 written. Read them before dispatching a long job. Every runner pod template sets
@@ -106,15 +111,47 @@ After deployment, dispatch `eks-arc-smoke.yml` once per pool (the xmem scale set
 checked by their first real job, since a smoke run there costs an x2 node-hour).
 Confirm both jobs pass, `kubectl get nodeclaims` shows a `gha-on-demand` node
 during a run, and GitHub's job log identifies the expected runner name. Check
-that an empty node disappears after the consolidation interval. Linux x64 jobs
-in the existing workflows have opt-in routing expressions; the fallback is the
-original GitHub-hosted label. Add only validated workflow filenames to the
-repository variable `CRYPTO_EKS_WORKFLOWS`, delimited by vertical bars, for
-example `|spotlab.yml|rust-lint.yml|`. Use
-`CRYPTO_EKS_HIGHMEM_WORKFLOWS=|some-large-job.yml|` for the high-memory pool.
-The high-memory list takes precedence. Remove a filename to roll that workflow
-back. The routing script is `route_workflows.py`; it prepares new direct x64
-`runs-on` lines and is idempotent.
+that an empty node disappears after the consolidation interval.
+
+**Routing (owner decision, 2026-10-26).** Every Linux job's `runs-on` falls
+back to GitHub-hosted `ubuntu-latest` and opts into these Spot scale sets per
+workflow. Add only validated workflow filenames to the repository variable
+`CRYPTO_EKS_WORKFLOWS` (Spot `crypto-eks-linux`), delimited by vertical bars,
+for example `|spotlab.yml|rust-lint.yml|`. Use
+`CRYPTO_EKS_HIGHMEM_WORKFLOWS=|some-large-job.yml|` for the Spot high-memory
+pool; it takes precedence. Remove a filename to roll that workflow back to
+`ubuntu-latest`. `route_workflows.py --apply` writes the routing expression
+into any new direct `runs-on: ubuntu-latest` line and is idempotent; it skips
+workflows whose bytes are pinned elsewhere (`SEALED`). Four workflows name a
+scale set directly because they cannot run on a hosted runner:
+`eks-arc-smoke.yml`, `dreg-a3-eks-highmem.yml`, `fb-designs-m4-highmem.yml`
+and the `segment` job of `dreg-ckpt-job.yml` (xmem/xmem1t).
+
+### Turning the Spot runners back on (isogeny-labs/crypto)
+
+The scale sets registered against `aburan28/crypto` before the repository
+moved; their last smoke run passed on 2026-10-20. To bring them up for
+`isogeny-labs/crypto`:
+
+1. From a host with the isolab kubeconfig, rotate the ARC credential to a token
+   (or GitHub App) owned by `isogeny-labs` with Administration read/write on
+   the repository:
+   `ARC_GITHUB_REPO=isogeny-labs/crypto taskq/deploy/eks-karpenter/arc/rotate-github-token.sh`.
+   The value files already name `https://github.com/isogeny-labs/crypto`.
+2. Re-run `deploy.sh` (idempotent) and confirm
+   `kubectl -n arc-runners get autoscalingrunnersets` lists all six sets,
+   including `crypto-isolab-build` and `crypto-isolab` for the Iso Lab workflow.
+3. Dispatch `eks-arc-smoke.yml` with `pool=linux` and `pool=highmem`; confirm
+   the job log names an `arc-runners` pod and `kubectl get nodeclaims` shows a
+   Spot node during the run.
+4. Restore the first-wave rollout (command below) and, for the high-memory
+   jobs, `gh variable set CRYPTO_EKS_HIGHMEM_WORKFLOWS --repo isogeny-labs/crypto --body '|<file>.yml|'`.
+5. If `vars.DREG_CKPT_WATCH` was unset while the runners were down, set it
+   again only after the xmem pool has run one segment.
+
+Self-hosted runner minutes are not billed by GitHub, so routed jobs do not
+draw on the organization's Actions quota; the cost is the Spot EC2, EBS and NAT
+traffic described above, inside the 96-vCPU regional Spot quota.
 
 `first-wave-workflows.txt` records the 391 workflow filenames enabled in the
 initial rollout. It excludes workloads requiring specialized GPU, Sage, Lean,
@@ -143,7 +180,8 @@ experiments before replaying.
 
 ## Security and compatibility
 
-This repository is public. A fork can propose workflow changes that target a
+`isogeny-labs/crypto` is private with forking disabled (2026-10-26), so only
+collaborators can open pull requests. If it is made public again: a fork can propose workflow changes that target a
 self-hosted scale set directly, regardless of the routing expression in the
 base workflow. ARC's Docker sidecar is privileged. Dedicated tainted nodes,
 ephemeral runner pods, a service account without Kubernetes API permissions,
