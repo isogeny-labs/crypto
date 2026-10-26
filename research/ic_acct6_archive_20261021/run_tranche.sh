@@ -17,9 +17,12 @@ bin="$root/target/release/ecbench"
 LOCK=${LOCK:-/tmp/claude-0/-home-user/0175cce0-2ca5-5248-8a75-97acf3a20a50/scratchpad/build.lock}
 [ -x "$bin" ] || { echo "missing $bin" >&2; exit 2; }
 mkdir -p "$here/sessions" "$here/logs"
+# DEADLINE (unix seconds): no session is launched after it (PROTOCOL.md, "First tranche").
+DEADLINE=${DEADLINE:-0}
 status=0
 for name in "$@"; do
   out="$here/sessions/$name"
+  if [ "$DEADLINE" -gt 0 ] && [ "$(date +%s)" -ge "$DEADLINE" ]; then echo "BUDGET SPENT, NOT LAUNCHED $name"; continue; fi
   [ -e "$out" ] && { echo "EXISTS $name"; status=1; continue; }
   echo "START $name $(date -u +%FT%TZ)"
   if ! flock "$LOCK" "$bin" run --spec "$here/specs/$name.json" --out "$out" --cpus 1 \
