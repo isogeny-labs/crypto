@@ -1,0 +1,91 @@
+name: N83 current-source nearby-K same-point Tier 1
+
+on:
+  push:
+    branches: [codex/n83-nearby-k-github-tier1-20261021]
+    paths:
+      - .github/workflows/n83-nearby-k-github-tier1.yml
+      - research/n83_nearby_k_github_tier1_20261021/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n83-nearby-k-github-tier1-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  same-point-five-rounds:
+    if: github.repository == 'aburan28/crypto'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 170
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pinned Rust and freeze the public fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.1 --profile minimal
+          export PYTHONDONTWRITEBYTECODE=1
+          python3 -m research.n83_nearby_k_github_tier1_20261021.run --preflight \
+            | tee "$RUNNER_TEMP/n83-nearby-k-preflight.json"
+          python3 -m unittest \
+            research.n83_nearby_k_github_tier1_20261021.test_gates -v \
+            > "$RUNNER_TEMP/n83-nearby-k-gates-test.log" 2>&1
+          rustc +1.99.1 --version | tee "$RUNNER_TEMP/n83-nearby-k-rustc.txt"
+
+      - name: Test and build the exact IC and rho producers
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-nearby-k-target"
+          export CARGO_BUILD_JOBS=2
+          export RUST_TEST_THREADS=1
+          cargo +1.99.1 test --release --locked --lib > \
+            "$RUNNER_TEMP/n83-nearby-k-libtest.log" 2>&1
+          cargo +1.99.1 test --release --locked --example koblitz_orbit_dlp_fast > \
+            "$RUNNER_TEMP/n83-nearby-k-ic-test.log" 2>&1
+          cargo +1.99.1 test --release --locked --example n83_rho_optimization_eval > \
+            "$RUNNER_TEMP/n83-nearby-k-rho-test.log" 2>&1
+          cargo +1.99.1 build --release --locked \
+            --example koblitz_orbit_dlp_fast \
+            --example n83_rho_optimization_eval > \
+            "$RUNNER_TEMP/n83-nearby-k-build.log" 2>&1
+
+      - name: Run five alternating same-point IC and rho rounds
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          python3 -m research.n83_nearby_k_github_tier1_20261021.run \
+            --binary "$RUNNER_TEMP/n83-nearby-k-target/release/examples/koblitz_orbit_dlp_fast" \
+            --rho-binary "$RUNNER_TEMP/n83-nearby-k-target/release/examples/n83_rho_optimization_eval" \
+            --output "$RUNNER_TEMP/n83-nearby-k-results" \
+            | tee "$RUNNER_TEMP/n83-nearby-k-run.log"
+
+      - name: Independently replay every child and the Tier 1 noise gate
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          if [ -f "$RUNNER_TEMP/n83-nearby-k-results/source.json" ]; then
+            python3 -m research.n83_nearby_k_github_tier1_20261021.verify \
+              "$RUNNER_TEMP/n83-nearby-k-results" \
+              | tee "$RUNNER_TEMP/n83-nearby-k-verify.log"
+          fi
+
+      - name: Preserve raw child receipts and bounded failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-nearby-k-tier1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/n83-nearby-k-results/
+            ${{ runner.temp }}/n83-nearby-k-*.log
+            ${{ runner.temp }}/n83-nearby-k-*.json
+            ${{ runner.temp }}/n83-nearby-k-rustc.txt
+          if-no-files-found: warn
+          retention-days: 14
