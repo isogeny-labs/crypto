@@ -109,25 +109,10 @@ fn verify(q: u64, ncurves: usize, out: &str, name: &str, args: &[String]) {
     let deg6 = arg(args, "--deg6").map(|s| s == "1").unwrap_or(true);
     let mut found = 0;
     let mut idx = 0u64;
-    // T1(f): twist relation on maps with lc(s) a non-square (k = 1 only)
-    let (mut tw_agree, mut tw_disagree, mut tw_na, mut tw_maps) = (0u64, 0u64, 0u64, 0u64);
     while found < ncurves {
         let f = si::random_curve7(q, SEED, idx);
         let mut rng = SplitMix64(SEED ^ (idx << 8) ^ q);
         idx += 1;
-        if let Some(co) = analyze_curve(&f, q, &mut rng.clone()) {
-            let h = h_point_count(&f, q) as i64;
-            for s in co.subgroups.iter().filter(|s| s.trig_rational()) {
-                for m in s.maps.iter().filter(|m| m.valid() && m.alpha_chi == -1) {
-                    tw_maps += 1;
-                    match (h != q as i64 + 1).then(|| x_point_count(&f, &m.map, q)).flatten() {
-                        None => tw_na += 1,
-                        Some(x) if x as i64 == 2 * (q as i64 + 1) - h => tw_agree += 1,
-                        Some(_) => tw_disagree += 1,
-                    }
-                }
-            }
-        }
         let sds = si::smith_data_with_subgroups(&f, q, &mut rng);
         let Some((sd, sg)) = sds.iter().find(|(s, _)| s.rational()).cloned() else {
             continue;
@@ -166,17 +151,31 @@ fn verify(q: u64, ncurves: usize, out: &str, name: &str, args: &[String]) {
         row["seconds"] = json!(t0.elapsed().as_secs_f64());
         emit(out, name, row);
     }
-    emit(out, name, json!({"rec": "scan", "q": q, "curves_scanned": idx, "curves_used": found,
-        "t1f_twist_maps": tw_maps, "t1f_agree": tw_agree, "t1f_disagree": tw_disagree,
-        "t1f_not_applicable": tw_na}));
+    emit(out, name, json!({"rec": "scan", "q": q, "curves_scanned": idx, "curves_used": found}));
 }
 
 fn deg8(q: u64, ncurves: usize, out: &str, name: &str) {
     let mut found = 0;
     let mut idx = 0u64;
+    // T1(f): twist relation N_1(X) = 2(q + 1) - N_1(H) on maps with lc(s) a
+    // non-square (x_point_count exists for deg F = 8 and k = 1 only)
+    let (mut tw_agree, mut tw_disagree, mut tw_na, mut tw_maps) = (0u64, 0u64, 0u64, 0u64);
     while found < ncurves {
         let (f, mut rng) = random_curve(q, SEED, idx);
         idx += 1;
+        if let Some(co) = analyze_curve(&f, q, &mut rng.clone()) {
+            let h = h_point_count(&f, q) as i64;
+            for s in co.subgroups.iter().filter(|s| s.trig_rational()) {
+                for m in s.maps.iter().filter(|m| m.valid() && m.alpha_chi == -1) {
+                    tw_maps += 1;
+                    match (h != q as i64 + 1).then(|| x_point_count(&f, &m.map, q)).flatten() {
+                        None => tw_na += 1,
+                        Some(x) if x as i64 == 2 * (q as i64 + 1) - h => tw_agree += 1,
+                        Some(_) => tw_disagree += 1,
+                    }
+                }
+            }
+        }
         let sds = si::smith_data_with_subgroups(&f, q, &mut rng);
         let Some((sd, _)) = sds.iter().find(|(s, _)| s.rational()).cloned() else {
             continue;
@@ -187,7 +186,9 @@ fn deg8(q: u64, ncurves: usize, out: &str, name: &str) {
         emit(out, name, json!({"rec": "curve_deg8", "q": q, "index": idx - 1, "scanned": idx,
             "f": f, "t1": cr, "t1_pass": cr.pass()}));
     }
-    emit(out, name, json!({"rec": "scan", "q": q, "curves_scanned": idx, "curves_used": found}));
+    emit(out, name, json!({"rec": "scan", "q": q, "curves_scanned": idx, "curves_used": found,
+        "t1f_twist_maps": tw_maps, "t1f_agree": tw_agree, "t1f_disagree": tw_disagree,
+        "t1f_not_applicable": tw_na}));
 }
 
 fn cost(q: u64, out: &str, name: &str, args: &[String]) {

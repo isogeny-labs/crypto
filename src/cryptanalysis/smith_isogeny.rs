@@ -453,18 +453,24 @@ impl Fld {
             r >>= 1u32;
             s += 1;
         }
-        // non-residue
-        let mut zc = self.z();
-        if self.d == 1 {
-            zc = self.c(2);
-        }
-        let mut cnt = 0u64;
-        let mut nr = zc;
-        while self.is_square(&nr) {
-            cnt += 1;
-            nr = self.add(&self.mul(&zc, &zc), &self.c(cnt + 1));
-            nr = self.add(&nr, &self.scale(&zc, cnt));
-        }
+        // Non-residue: the first non-square in the enumeration of F_{p^d} by
+        // base-p digit vectors.  (The earlier search along the line
+        // z^2 + cnt z + cnt + 1 never terminates when that line holds only
+        // squares, e.g. p = 17, m = x^2 + 3x + 4.)
+        let mut idx = 2u64;
+        let nr = loop {
+            let mut cs = vec![0u64; self.d];
+            let mut t = idx;
+            for c in cs.iter_mut() {
+                *c = t % self.p;
+                t /= self.p;
+            }
+            let cand = self.from_u64s(&cs);
+            if !self.is_zero(&cand) && !self.is_square(&cand) {
+                break cand;
+            }
+            idx += 1;
+        };
         let mut m = s;
         let mut c = self.pow_big(&nr, &r);
         let mut t = self.pow_big(a, &r);
