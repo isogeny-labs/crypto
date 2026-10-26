@@ -1,14 +1,14 @@
 {
   "baseline": {
     "algorithm": "Pollard rho on <G>",
-    "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
     "equivalence_class_reason": "negation and the 2^1-Frobenius: E is defined over F_(2^1), so classes have size 2*35/1 = 70 (upper bound on the speedup)",
     "equivalence_class_size": 70,
     "log2_cost_of_one_group_operation": 11.452,
-    "log2_group_operations": 1.412,
+    "log2_group_operations": 1.912,
     "log2_r": 9.301,
-    "log2_total": 12.864,
-    "log2_total_without_automorphisms": 15.929
+    "log2_total": 13.364,
+    "log2_total_negation_only": 15.929
   },
   "candidate": {
     "id": "pairing:tate_mov_frey_ruck",
@@ -30,8 +30,8 @@
   ],
   "costs": {
     "destination_solver": "RhoInSubgroupOfFqk",
-    "log2_baseline": 12.864,
-    "log2_cost_ratio": 8.255,
+    "log2_baseline": 13.364,
+    "log2_cost_ratio": 7.755,
     "log2_total": 21.119,
     "repo_ratio_log2": -5.19,
     "rows": [
@@ -142,6 +142,10 @@
       "trace": "-30173"
     }
   },
+  "evaluation": {
+    "reason": "the priced total is 7.8 bits above the matched baseline",
+    "status": "excluded"
+  },
   "executed": null,
   "invariants": {
     "class_invariant": "the embedding degree depends only on q and r, which every curve of the isogeny class shares",
@@ -153,9 +157,9 @@
     "log2_ic_in_fqk_L13_favourable": 40.742,
     "log2_rho_in_subgroup_of_fqk": 17.631,
     "price_band": {
-      "conservative_log2_cost_ratio": 8.255,
+      "conservative_log2_cost_ratio": 7.755,
       "conservative_log2_total": 21.119,
-      "favourable_log2_cost_ratio": 8.255,
+      "favourable_log2_cost_ratio": 7.755,
       "favourable_log2_total": 21.119,
       "reading": "robustly above the matched rho: even the attacker-favourable price exceeds it"
     },
@@ -174,7 +178,9 @@
     "source": "E(F_q)[r]",
     "type": "e_r(G, -): <G> -> mu_r subset F_(q^k)^*"
   },
-  "notes": [],
+  "notes": [
+    "reading of the verdict: it is relative. It compares the conservative price of a discrete logarithm in F_(q^k) (2^21.1 operations: generic NFS constant, o(1) dropped, weighted by the field-multiplication cost) with the matched rho on <G> (2^13.4). `class-weak` means the first is below the second by at least the 8-bit model margin, i.e. a conservative pairing price below rho under this model; it does not say the curve is weak at any absolute security level, and `no weakness found in scope` does not say it is strong"
+  ],
   "obligations": {
     "computational_advantage": "refuted",
     "existence": "supported",
@@ -191,7 +197,7 @@
     "Menezes-Okamoto-Vanstone 1993; Frey-Ruck 1994 (as cited in src/cryptanalysis/mov_attack.rs)",
     "src/cryptanalysis/curve_traits (embedding degree record)"
   ],
-  "schema": "transfer-audit/certificate/v1",
+  "schema": "transfer-audit/certificate/v2",
   "subgroup_preservation": {
     "antecedents": [
       {
@@ -222,9 +228,9 @@
     "method": "arithmetic: Frey-Ruck non-degeneracy of the Tate pairing at k = ord_r(q)",
     "status": "arithmetic"
   },
-  "tool": "transfer-audit/1",
+  "tool": "transfer-audit/2",
   "verdict": "no weakness found in scope",
   "verdict_basis": [
-    "priced route costs 2^8.3 times the matched baseline or more"
+    "priced route costs 2^7.8 times the matched baseline or more"
   ]
 }

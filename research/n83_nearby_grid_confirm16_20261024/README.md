@@ -1,5 +1,9 @@
 # N83 independent 16-point confirmation fixture
 
+The completed confirmation is reported in [RESULT.md](RESULT.md), with its
+independently replayed aggregate and artifact custody receipt under
+`results/40175406203/`.
+
 These 16 public N83 points were sealed before the result of the
 K1102–K1120 Tier 1 screen at GitHub run 40136901841 was inspected. Each
 point has its own canonical, one-target workload ID. The deterministic
@@ -13,8 +17,8 @@ the **first admitted** run of the exact screen protocol and workload,
 breaking ties by ascending K, and add K1107. Deduplicate the union. If no
 screen run passes its complete Tier 1 gate, candidate selection remains
 unknown. The selector independently replays a raw screen output directory
-before applying the rule. No confirmation timings or factor-base choice are
-present here.
+before applying the rule. The fixture and selector used no confirmation
+timings; the measured result is linked above.
 
 Run every selected candidate on all 16 points as separate one-target IC
 and same-point rho pairs with alternating order, independent scalar replay,
