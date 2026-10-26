@@ -2,7 +2,7 @@
 
 - **Status:** `open`
 - **Kind:** implementation gap (counted-work definition changed after the recording); not a proved obstruction
-- **Affected work:** replay of `research/ecbench_rootfind_engine_20261012/sessions/claim-n13` (96 problems, all in the `ic-f4-m2`/`ic-f4-m3` arms; all 72 rho rows reproduce); `research/validation_sweep_20261019/D-known-issues/` item 1
+- **Affected work:** replay of `research/ecbench_rootfind_engine_20261012/sessions/claim-n13` (96 problems: 48 in the `ic-f4-m2`/`ic-f4-m3` arms, which this record is about, and 48 in the `ic-rootfind-m2`/`ic-rootfind-m3` arms, which differ only in `phase counts` and are a separate drift, see below; all 72 rho rows reproduce); `research/validation_sweep_20261019/D-known-issues/` item 1
 - **Next action owner:** unassigned
 - **Last updated:** 2026-10-23
 
@@ -18,6 +18,10 @@ We cannot replay `claim-n13` on current `main` because the session was recorded 
 - **Derived:** lazy and eager accounting charge different word counts by construction (the unit test shows 12 vs 4 on a small chain), so no single charge reproduces both the pre-#2043 non-BMI2 record and post-#2043 sessions.
 - **Suspected explanation:** the item-1 BMI2-off patch worked at `2245b75` because switching BMI2 off also switched eager to lazy there; since #2043 it switches eager Bmi2 to eager Runs and the charge no longer moves.
 - **What this evidence does not establish:** Apple/aarch64 hardware was not run on `main`; the portable path was exercised on x86 by forcing it. History for `src/` was fetched shallow-since 2026-10-12 only.
+
+## Second drift in the same session (found 2026-10-26, not investigated)
+
+Replaying `claim-n13` on `main` (`a04862cf3`, x86-64, release build) gives the 96 problems as 24 + 24 + 24 + 24 by arm: `ic-f4-m2` and `ic-f4-m3` differ in `total_gae, phase counts, phase gae, unpriced, determinism or automorphisms` (the accounting drift above); `ic-rootfind-m2` and `ic-rootfind-m3` differ in **`phase counts` only**, with total and phase gae identical. The root-finder rows replayed 168/168 at the recording commit `2245b75` (x86 receipts in `research/validation_sweep_20261019/D-known-issues/item1_cross_isa_20261020/`), so something changed in them after it. Which phase's counts differ, and which commit changed them, is not established; it is not the F4 specialisation accounting and the accounting-version note correctly does not apply to these rows.
 
 ## What would unblock it
 

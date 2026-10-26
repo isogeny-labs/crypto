@@ -56,14 +56,25 @@ pub fn current_accounting_versions() -> BTreeMap<String, u32> {
     )])
 }
 
+/// When inherited-F4 specialisation became eager on every host (`#2043`,
+/// 2026-10-17T17:19:59Z), in Unix milliseconds.  Before it a host without BMI2
+/// charged the lazy rewrite, which counts differently.
+pub const F4_EAGER_EVERYWHERE_UNIX_MS: u128 = 1_792_257_599_000;
+
 /// What to add to a failed replay of an inherited-F4 record, given the
-/// accounting versions its session recorded; `None` when the session was made
-/// under the version this binary charges, so the difference is something else.
+/// accounting versions its session recorded; `None` when the accounting
+/// cannot be the reason, so the difference is something else and is left
+/// unattributed.
 ///
-/// A session without the field predates it.  That is stated as what it is
-/// (unrecorded), with the one change known to matter, and not guessed to be
-/// a particular version.
-pub fn f4_accounting_note(recorded: &BTreeMap<String, u32>) -> Option<String> {
+/// A session without the field predates it, and is not assigned a version.
+/// The one change known to have moved the counts is `#2043`: it is named only
+/// when it can apply, that is when the session started before it and its host
+/// had no BMI2 (a BMI2 x86-64 host was eager before it as it is now).
+pub fn f4_accounting_note(
+    recorded: &BTreeMap<String, u32>,
+    started_unix_ms: u128,
+    recorded_host_has_bmi2: bool,
+) -> Option<String> {
     let current = crate::cryptanalysis::inherited_f4::INHERITED_F4_ACCOUNTING_VERSION;
     match recorded.get(F4_ACCOUNTING_KEY) {
         Some(&v) if v == current => None,
@@ -71,11 +82,12 @@ pub fn f4_accounting_note(recorded: &BTreeMap<String, u32>) -> Option<String> {
             "recorded under inherited-F4 accounting v{v}, this binary charges v{current}: \
              the counts are different definitions, not a disagreement"
         )),
+        None if recorded_host_has_bmi2 || started_unix_ms >= F4_EAGER_EVERYWHERE_UNIX_MS => None,
         None => Some(format!(
-            "session predates inherited-F4 accounting versions (this binary charges v{current}); \
-             until #2043 (2026-10-17) specialisation was charged lazily on hosts without BMI2 and \
-             eagerly elsewhere, so an earlier record can differ for that reason, and for any later \
-             change recorded only by binary hash"
+            "recorded before #2043 (2026-10-17) on a host without BMI2, where inherited-F4 \
+             specialisation was charged lazily; this binary charges it eagerly on every host \
+             (accounting v{current}), so a count difference here is expected, and later changes \
+             recorded only by binary hash can add to it"
         )),
     }
 }
@@ -1926,12 +1938,27 @@ mod grade_tests {
             current_accounting_versions().get(F4_ACCOUNTING_KEY),
             Some(&NOW)
         );
-        assert_eq!(f4_accounting_note(&current_accounting_versions()), None);
+        let (before, after) = (F4_EAGER_EVERYWHERE_UNIX_MS - 1, F4_EAGER_EVERYWHERE_UNIX_MS);
+        // Same version: the accounting is not the reason.
+        assert_eq!(
+            f4_accounting_note(&current_accounting_versions(), before, false),
+            None
+        );
+        // A different recorded version is named, whatever the host.
         let older = BTreeMap::from([(F4_ACCOUNTING_KEY.to_string(), NOW + 1)]);
-        let note = f4_accounting_note(&older).expect("a different version is named");
+        let note = f4_accounting_note(&older, after, true).expect("a different version is named");
         assert!(note.contains(&format!("v{}", NOW + 1)) && note.contains(&format!("v{NOW}")));
-        let unrecorded = f4_accounting_note(&BTreeMap::new()).expect("an unrecorded one is said");
-        assert!(unrecorded.contains("predates") && unrecorded.contains("#2043"));
+        // No version recorded: named only when #2043 can apply, that is before
+        // it and on a host without BMI2.
+        let none = BTreeMap::new();
+        let note = f4_accounting_note(&none, before, false).expect("pre-#2043 without BMI2");
+        assert!(note.contains("#2043") && note.contains("without BMI2"));
+        assert_eq!(
+            f4_accounting_note(&none, before, true),
+            None,
+            "BMI2 hosts were eager"
+        );
+        assert_eq!(f4_accounting_note(&none, after, false), None, "after #2043");
     }
 
     /// A session written before the field existed reads with no versions and

@@ -665,14 +665,26 @@ pub fn audit_with(
                         } else if diffs.is_empty() {
                             "identical".into()
                         } else {
-                            // A word-XOR solver record that fails to replay is
-                            // named by the accounting version it was made
-                            // under; the failure itself is unchanged.
+                            // A word-XOR solver record whose replay differs in
+                            // counts is named by the accounting it was made
+                            // under, when that can be the reason; the failure
+                            // itself is unchanged.  A difference in pricing
+                            // alone (gae, unpriced) is not an accounting
+                            // difference and gets no note.
+                            let has_bmi2 = host.stable.arch == "x86_64"
+                                && host.stable.features.iter().any(|f| f == "bmi2");
                             let note = r
                                 .solver
                                 .as_ref()
                                 .filter(|s| s.op_unit.contains("word XOR"))
-                                .and_then(|_| f4_accounting_note(&session.accounting_versions));
+                                .filter(|_| diffs.contains(&"phase counts"))
+                                .and_then(|_| {
+                                    f4_accounting_note(
+                                        &session.accounting_versions,
+                                        session.started_unix_ms,
+                                        has_bmi2,
+                                    )
+                                });
                             match note {
                                 Some(n) => format!("differs in {} ({n})", diffs.join(", ")),
                                 None => format!("differs in {}", diffs.join(", ")),
