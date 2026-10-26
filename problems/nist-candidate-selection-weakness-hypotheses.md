@@ -32,11 +32,11 @@ decision log.
   conductor 3 and a fully split 3-division polynomial, unlike its three
   skipped counterparts. Exact values and scope are in the linked report.
 - **Observed:** the [native factorization follow-up](../research/nist_skip_criterion_20261025/factor_followup_20261026/REPORT.md)
-  has proved p239 index 2491 `n+1`, P-384's discriminant magnitude and
-  P-521 `n-1` completely. This raises admitted full factorizations to 83/84.
-  The all-21 search can now use complete `n-1` and discriminant features;
-  its best structural conjunction still has three tests. P-521 `n+1`
-  retains a 125-digit composite and the full `n+1` family stays disabled.
+  has proved all four requested integers, including P-521 `n+1`, completely.
+  There are 84/84 complete records and 1,127 features per row in the replay.
+  All four complete-factor families are admitted over all 21 controls.
+  The shortest structural conjunction still has three tests; generation
+  features retain the two-test fit. Neither establishes historical use.
 - **Observed:** an [exact native SEA-feature replay](../research/nist_skip_criterion_20261025/sea_replay_20261026/REPORT.md)
   matches all 21 recorded bounds. A uniform preference for a larger bound
   fails on P-256 (published191, skipped211); the reverse fails on P-224
@@ -103,7 +103,10 @@ root-convention counterexample and remaining evidence obligations are retained
 in the linked report. An exact fit does not resolve the selection explanation
 or establish a vulnerability. Unresolved.
 
-2026-10-26 follow-up: three of the four remaining factorization targets
-passed independent native prime/product proofs. The unchanged full-21
-search replay has 1,118 features per row and retains the existing fits.
-Factor completion and the historical explanation remain separate obligations.
+2026-10-26 follow-up: all four remaining factorization targets passed
+independent native prime/product proofs. The unchanged full-21 search replay
+has 1,127 features per row and retains the existing conjunction lengths.
+Generation-family as-good calibration is 1,973/4,480 for an exact fit of
+at most two tests; the earlier 15-family union remains frozen separately.
+The [factorization obstruction](nist-p521-nplus1-composite-cofactor.md) is
+resolved. The historical explanation and applicable attacks remain unproved.

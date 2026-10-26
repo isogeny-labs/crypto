@@ -22,7 +22,7 @@ from reportlab.platypus import Image, KeepTogether, PageBreak, Paragraph, Simple
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'reports'
 REPO_PATH = 'research/nist_skip_criterion_20261025/factor_followup_20261026'
-REPO_URL = 'https://github.com/isogeny-labs/crypto/blob/codex/curve-candidate-assessment-20261021/'
+REPO_URL = 'https://github.com/isogeny-labs/crypto/blob/codex/nist-skip-criterion-20261025/'
 INK = '#17384B'
 GOLD = '#B27C3C'
 plt.rcParams.update({'font.family': 'DejaVu Sans', 'font.size': 10})
@@ -78,7 +78,7 @@ if "--documents-only" not in sys.argv:
     bar = fig.colorbar(im, ax=ax, fraction=.035, pad=.025)
     bar.set_label('Native recorded size / field bits (permille, rounded down)')
     fig.get_layout_engine().set(rect=(0, .045, 1, .955))
-    fig.text(.5, .012, 'P = published; S = skipped. All 21 rows retained. NA = incomplete; no numeric substitution.',
+    fig.text(.5, .012, 'P = published; S = skipped. All 21 rows retained; all 84 factorizations proved complete.',
              ha='center', fontsize=8)
     save_plot(fig, OUT / 'cohort-factor-bits')
 
@@ -180,9 +180,9 @@ def inline(text, source):
     return re.sub(r'\*\*([^*]+)\*\*', r'<b>\1</b>', text)
 
 
-def story_from(source):
+def story_from(source, content=None):
     story = []
-    for block in source.read_text().split('\n\n'):
+    for block in (source.read_text() if content is None else content).split('\n\n'):
         block = block.strip()
         if not block:
             continue
@@ -233,7 +233,13 @@ def render(source, attachments=()):
     doc = SimpleDocTemplate(str(output), pagesize=(595.276, 841.89), leftMargin=38, rightMargin=38,
                             topMargin=38, bottomMargin=40, title=source.read_text().splitlines()[0].lstrip('# '),
                             author='Native curve study')
-    doc.build(story_from(source), onFirstPage=footer, onLaterPages=footer)
+    story = story_from(source)
+    if source == ROOT / 'REPORT.md':
+        factors = ROOT / 'results/completed-targets-hex.md'
+        sections = factors.read_text().split('\n## ')
+        story.extend(story_from(factors, '\n## '.join(sections[:3])))
+        story.extend([PageBreak(), *story_from(factors, '## ' + '\n## '.join(sections[3:]))])
+    doc.build(story, onFirstPage=footer, onLaterPages=footer)
     if attachments:
         pdf = fitz.open(output)
         for file in attachments:
@@ -249,9 +255,13 @@ render(ROOT / 'REPORT.md', [ROOT / 'evidence/closed-runs.tar.xz', ROOT / 'result
                             ROOT / 'evidence/backend-progress-001-delivery.json',
                             ROOT / 'results/completed-targets-hex.md', ROOT / 'results/curve-13-plus.json',
                             ROOT / 'results/curve-19-disc.json', ROOT / 'results/curve-20-minus.json',
-                            ROOT / 'results/p521-plus-partial.json',
+                            ROOT / 'results/curve-20-plus.json',
                             ROOT / 'evidence/backend-manifest-002.json',
                             ROOT / 'evidence/backend-progress-002-delivery.json',
+                            ROOT / 'evidence/final-native-003.tar.zst',
+                            ROOT / 'evidence/final-manifest-003.json',
+                            ROOT / 'evidence/final-native-003-delivery.json',
+                            ROOT / 'evidence/success-cleanup-audit.json',
                             ROOT.parent / 'sea_replay_20261026/results/coverage.tsv',
                             ROOT.parent / 'sea_replay_20261026/evidence/replay-001.tar.xz'])
 for source in sorted(OUT.glob('run-*/REPORT.md')):
