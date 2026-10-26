@@ -1,7 +1,7 @@
 # Four-target factorization follow-up
 
-Three requested targets have proved complete factorizations. P-521 `n+1`
-still contains a 125-digit composite. Start with the [report](REPORT.md),
+All four requested targets have independently proved complete factorizations.
+The all-21 comparison now has 84/84 complete records. Start with the [report](REPORT.md),
 [coverage record](results/factor-summary.json),
 [hexadecimal factors](results/completed-targets-hex.md) and
 [21-curve comparison](results/cohort-factor-bits.tsv).
@@ -11,7 +11,7 @@ still contains a 125-digit composite. Start with the [report](REPORT.md),
 | p239 index 2491, `n+1` | Complete, largest prime 131 bits | [proof](results/curve-13-plus.json) |
 | P-384 Frobenius discriminant magnitude | Complete, largest prime 265 bits | [proof](results/curve-19-disc.json) |
 | P-521 `n-1` | Complete, largest prime 391 bits | [proof](results/curve-20-minus.json) |
-| P-521 `n+1` | Partial, largest prime unknown | [partial record](results/p521-plus-partial.json) |
+| P-521 `n+1` | Complete, largest prime 270 bits | [proof](results/curve-20-plus.json) |
 
 All inputs are the exact rows in [historical.tsv](../inputs/historical.tsv).
 Indices, bit lengths, exponents and counts are decimal. Raw native factor
@@ -25,12 +25,17 @@ independent native `../native/verify_factor_hint.cpp` recomputes the original
 target and proves all factors before a result is admitted. Its acceptance
 records are preserved even when it rejects a partial factorization.
 
-The cohort has 83 complete factorizations out of 84. Complete `n-1`, twist
-and discriminant families are now available across all 21 rows. Complete
-`n+1` remains unavailable to the all-21 search. Unknowns stay `NA` in the
-descriptive table; no control is omitted. The unchanged search replay on
-1,118 features retains a three-test structural separator and a two-test
-generation separator. Neither is established as the historical selector.
+Complete `n-1`, `n+1`, twist and discriminant families are available across
+all 21 rows. The unchanged search replay on 1,127 features retains a
+three-test structural separator and a two-test generation separator. Neither
+is established as the historical selector. The earlier partial record and
+83-record raw round remain frozen; no unknown was encoded numerically or
+silently excluded. See [the final replay protocol](FULL84_REPLAY_PROTOCOL.md).
+
+The separate [SEA feature replay](../sea_replay_20261026/REPORT.md) matches
+all 21 recorded coverage values and supplies exact P-256/P-224
+counterexamples to uniform preferences for larger or smaller bounds.
+It adds no p-value, point-counting cost or historical-selection claim.
 
 ## Native methods and evidence
 
@@ -84,3 +89,21 @@ artifact tool, then unpack each archive into this follow-up directory.
 The run reports' `runs/...` references are extracted archive locations.
 New active raw directories remain visible to checkpoints until archived;
 only the proved immutable closed records are ignored in Git.
+
+The immutable `backend-progress-002.tar.zst` is a running snapshot, taken during
+GNFS014 filtering with no active siever children. It includes the pool whose
+native filter reported17,831,805 raw and14,715,396 unique relations. Its
+`runs/backend-manifest-002.json`, [21-file manifest](evidence/backend-manifest-002.json)
+and [full readback receipt](evidence/backend-progress-002-delivery.json) bind
+that exact resume copy. Unpack with `tar --zstd -xf`. It records progress at
+16:08 UTC, before completion, and remains unchanged.
+
+The final `final-native-003.tar.zst` contains all surviving GNFS014 records,
+the independent full-target admission015, the full84 replay016 and its
+223-file [manifest](evidence/final-manifest-003.json). Its full-object GET,
+internal manifest and every listed file hash [verified](evidence/final-native-003-delivery.json).
+The pinned YAFU success cleanup deleted final relation/matrix scratch before
+the launcher regained control; [the source audit](evidence/success-cleanup-audit.json)
+records this retention gap. The final 26,716,780-relation pool is not retained;
+snapshot002 is the last retained pool. The complete factorization is certified
+by independent primality and exact-product checks, without a full GNFS replay.
