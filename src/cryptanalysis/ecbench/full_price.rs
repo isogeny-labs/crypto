@@ -202,13 +202,45 @@ fn price(counter: &str, count: u64, units: &BTreeMap<String, f64>) -> Option<f64
 /// reports keep their group-operation phases and gain a `natives` phase.
 pub fn reprice(rep: &mut SolveReport, family: &str, slug: &str) -> Result<(), String> {
     let units = row(slug)?;
+    let by_counter = reprice_with(rep, family, &units);
+    let table_sha = sha256_hex(FULL_PRICES.as_bytes());
+    if let Value::Object(d) = &mut rep.detail {
+        d.insert(
+            "full_pricing".into(),
+            json!({
+                "table": "src/cryptanalysis/ecbench/full_prices.json",
+                "table_sha256": table_sha,
+                "units": units,
+                "gae_by_counter": by_counter,
+            }),
+        );
+    } else {
+        let old = std::mem::take(&mut rep.detail);
+        rep.detail = json!({"base": old, "full_pricing": {
+            "table": "src/cryptanalysis/ecbench/full_prices.json",
+            "table_sha256": table_sha,
+            "units": units,
+            "gae_by_counter": by_counter,
+        }});
+    }
+    Ok(())
+}
+
+/// Reprice a report with any table holding every unit of [`UNITS`] as a
+/// ratio to one affine addition, and return the charge by counter.  The
+/// caller records where `units` came from.
+pub(crate) fn reprice_with(
+    rep: &mut SolveReport,
+    family: &str,
+    units: &BTreeMap<String, f64>,
+) -> BTreeMap<String, f64> {
     let mut by_counter: BTreeMap<String, f64> = BTreeMap::new();
     let mut unknown: Vec<String> = Vec::new();
     let mut charge = |name: &str, count: u64, by: &mut BTreeMap<String, f64>| -> f64 {
         if count == 0 {
             return 0.0;
         }
-        match price(name, count, &units) {
+        match price(name, count, units) {
             Some(g) => {
                 *by.entry(name.to_string()).or_default() += g;
                 g
@@ -265,27 +297,7 @@ pub fn reprice(rep: &mut SolveReport, family: &str, slug: &str) -> Result<(), St
     kept.sort();
     kept.dedup();
     rep.unpriced = kept;
-    let table_sha = sha256_hex(FULL_PRICES.as_bytes());
-    if let Value::Object(d) = &mut rep.detail {
-        d.insert(
-            "full_pricing".into(),
-            json!({
-                "table": "src/cryptanalysis/ecbench/full_prices.json",
-                "table_sha256": table_sha,
-                "units": units,
-                "gae_by_counter": by_counter,
-            }),
-        );
-    } else {
-        let old = std::mem::take(&mut rep.detail);
-        rep.detail = json!({"base": old, "full_pricing": {
-            "table": "src/cryptanalysis/ecbench/full_prices.json",
-            "table_sha256": table_sha,
-            "units": units,
-            "gae_by_counter": by_counter,
-        }});
-    }
-    Ok(())
+    by_counter
 }
 
 fn median(mut v: Vec<f64>) -> f64 {

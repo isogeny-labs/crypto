@@ -14,7 +14,8 @@ use std::env;
 use std::fs;
 
 use crypto_lib::cryptanalysis::jv_cover::{
-    run_cover_ccov, run_cover_dlp, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
+    run_cover_ccov_mode, run_cover_dlp, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
+    StopMode,
 };
 use crypto_lib::cryptanalysis::jv_rho_strong::{run_strong_rho, StrongOpts, StrongRun};
 use crypto_lib::cryptanalysis::jv_sieve::{run_cover_sieve_dlp, SieveDlpReport};
@@ -47,6 +48,8 @@ fn main() {
     let mut oracle_base = 40usize;
     let mut rho_ref = 1.3f64;
     let mut stop = 0usize;
+    // `--stop hilbert` or `--stop hilbert:N`: the Hilbert rule, N pairs per step (default 1)
+    let mut hilbert: Option<usize> = None;
     let mut margin = 1.25f64;
     let mut m_override = 0usize;
     let mut trace = false;
@@ -80,7 +83,18 @@ fn main() {
             "--rho-runs" => rho_runs = next(&mut i).parse().expect("--rho-runs"),
             "--check-every" => check_every = next(&mut i).parse().expect("--check-every"),
             "--rho-ref" => rho_ref = next(&mut i).parse().expect("--rho-ref"),
-            "--stop" => stop = next(&mut i).parse().expect("--stop"),
+            "--stop" => {
+                let v = next(&mut i);
+                match v.strip_prefix("hilbert") {
+                    Some(rest) => {
+                        hilbert = Some(
+                            rest.strip_prefix(':')
+                                .map_or(1, |c| c.parse().expect("--stop hilbert:N")),
+                        )
+                    }
+                    None => stop = v.parse().expect("--stop"),
+                }
+            }
             "--margin" => margin = next(&mut i).parse().expect("--margin"),
             "--m" => m_override = next(&mut i).parse().expect("--m"),
             "--trace" => trace = true,
@@ -132,7 +146,12 @@ fn main() {
         for seed in first_seed..first_seed + seeds {
             match exp.as_str() {
                 "ccov" => {
-                    let r = run_cover_ccov(
+                    let mode = match (hilbert, stop) {
+                        (Some(c), _) => StopMode::Hilbert(c),
+                        (None, 0) => StopMode::Full,
+                        (None, k) => StopMode::Staircase(k),
+                    };
+                    let r = run_cover_ccov_mode(
                         p,
                         seed,
                         residuals,
@@ -140,12 +159,12 @@ fn main() {
                         max_degree,
                         budget,
                         oracle_base,
-                        (stop > 0).then_some(stop),
+                        mode,
                         trace,
                     );
                     println!(
-                        "p={:>5} seed={} l=2^{:.1} |F|={:>4} c_add E {:.0} J {:.0} stop {:?} ({} stopped) trace {} ({} replayed, {} mismatches) | random {} decomposable {} (1/720 = {:.5}) | planted {}/{} | oracle {} mismatches {} unverified {} incomplete {} timed out {} | C_cov {:.3e} [{:.2e}, {:.2e}] = weil {:.0} + f4 {:.3e} + lin {:.3e} + post {:.0} | delta {:.0} F4 degree {:.1} rows {:.0} cols {:.0} {:.1} ms + lin {:.1} ms = {:.1} ms | decomposable C_cov {:.3e} | {:.0} s",
-                        r.p, r.seed, r.bits, r.base, r.c_add_e, r.c_add_j, r.stop_staircase, r.stopped, r.trace, r.replayed, r.trace_mismatches, r.random_residuals, r.random_decomposable,
+                        "p={:>5} seed={} l=2^{:.1} |F|={:>4} c_add E {:.0} J {:.0} stop {:?} ({} stopped; hilbert {} applied, {} fallbacks) trace {} ({} replayed, {} mismatches) | random {} decomposable {} (1/720 = {:.5}) | planted {}/{} | oracle {} mismatches {} unverified {} incomplete {} timed out {} | C_cov {:.3e} [{:.2e}, {:.2e}] = weil {:.0} + f4 {:.3e} + lin {:.3e} + post {:.0} | delta {:.0} F4 degree {:.1} rows {:.0} cols {:.0} {:.1} ms + lin {:.1} ms = {:.1} ms | decomposable C_cov {:.3e} | {:.0} s",
+                        r.p, r.seed, r.bits, r.base, r.c_add_e, r.c_add_j, r.stop_staircase, r.stopped, r.hilbert_applied, r.hilbert_fallbacks, r.trace, r.replayed, r.trace_mismatches, r.random_residuals, r.random_decomposable,
                         r.expected_rate, r.planted_found, r.constructed_residuals, r.oracle_checked, r.mismatches,
                         r.unverified, r.incomplete, r.timed_out, r.c_cov.mean, r.c_cov.min as f64, r.c_cov.max as f64,
                         r.weil_muls.mean, r.f4_muls.mean, r.lin_muls.mean, r.post_muls.mean, r.delta.mean,

@@ -108,3 +108,16 @@ below rho.
 | `raw/callgrind.json` | Callgrind instruction totals and counted bitops of the six diagnostic runs |
 | `analysis/` | `analysis.json` and `tables.md` from `examples/ic_acct4_analyse.rs` |
 | `figures/` | SVG/PNG and `plots.py` (plots recorded values only) |
+
+## Canonical history
+
+The policy-adjusted genus-4 point is a reclassification of the existing study,
+not a new measurement. The canonical timeline and benchmark index retain the
+original 0.114 total-work ratio and its 95% interval, and add 0.131701 (0.132
+rounded) under the self-check policy; no interval is claimed for that adjusted
+point estimate.
+
+The existing genus-4 `p = 61` variants graph was checked and left unchanged:
+it already plots 0.114 total-work and 0.132 excluding-validation values. The
+new self-check-policy graph remains limited to the five re-run genus-2/3 rows;
+no new genus-4 run is inferred.

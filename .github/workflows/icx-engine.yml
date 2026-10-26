@@ -147,7 +147,7 @@ jobs:
 
   gpu-fes-cuda:
     name: GPU FES CUDA compile-check
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|icx-engine.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|icx-engine.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     env:
       CUDA_PKG_VERSION: 12-8
@@ -161,7 +161,8 @@ jobs:
       - name: Install nvcc (compiler + CUDA headers only)
         run: |
           distro="ubuntu$(lsb_release -rs | tr -d .)"
-          curl -fsSL -o /tmp/cuda-keyring.deb \
+          curl -fsSL --retry 3 --retry-all-errors --connect-timeout 15 --max-time 90 \
+            -o /tmp/cuda-keyring.deb \
             "https://developer.download.nvidia.com/compute/cuda/repos/$distro/x86_64/cuda-keyring_1.1-1_all.deb"
           sudo dpkg -i /tmp/cuda-keyring.deb
           sudo apt-get update -qq
