@@ -23,9 +23,9 @@ use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
 use crate::cryptanalysis::ecbench::ghs_cover::GhsInstance;
+use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench::jacobian::Genus2Instance;
 use crate::cryptanalysis::ecbench::plane_quartic::QuarticInstance;
-use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench_large_prime::binary_explicit_instance;
 use crate::cryptanalysis::gaudry_quartic::Pt4;
 use crate::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, BinCurve, PtB, TowerBasis};
@@ -213,6 +213,7 @@ pub enum CurveSpec {
         alpha: [u64; 6],
         l: u64,
         generator: [String; 2],
+    },
     /// `hyperelliptic_ic_bench::thread_instance(p, genus)`: the
     /// hyperelliptic thread's curve `y² = f(x)`, `deg f = 2g + 1`, over
     /// `F_p` (`p < 256`, `g ∈ {2, 3, 4}`), its generator `D₁` of prime
@@ -1051,7 +1052,7 @@ impl Instance {
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            Instance::Fp4(_) | Instance::Ext(_) | Instance::Hyper(_) => {
+            | Instance::Hyper(_) => {
                 unreachable!("returned above")
             }
             Instance::Wide(i) => (
@@ -1211,7 +1212,7 @@ impl Instance {
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            Instance::Wide(_) | Instance::Fp4(_) | Instance::Ext(_) | Instance::Hyper(_) => {
+            | Instance::Hyper(_) => {
                 unreachable!("returned above")
             }
         }
