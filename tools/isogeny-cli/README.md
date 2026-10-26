@@ -1,5 +1,10 @@
 # isogeny
 
+`isogeny class plan|build|resume|status|verify|vertex|solve` adds disk-backed
+ordinary prime-field class enumeration from exact curve JSON. See the
+[class-command contract](../volcano-cli/README.md) for supported inputs,
+finite degree sets, completeness certificates, checkpoints and DLP scope.
+
 `isogeny` is one executable for catalogue-wide prime-degree screening, bounded
 isogeny construction, and independent exact verification. Its algorithms and standard
 curve data are compiled into the binary. Running it requires no checkout, Cargo,
@@ -112,6 +117,47 @@ and, after passing independent replay, `replay.json` and `curves.json`. The exac
 verifier checks the kernel, codomain, rational-map identity, standard subgroup,
 and 20 fresh public scalar-transport cases. Failed runs retain their construction
 records. The tool never promotes its results into the canonical catalogue automatically.
+
+## Compare constructor performance
+
+The ReleaseMe archive also packages `isogeny-perf`, a separate native executable
+for reproducible constructor measurements. It does not need Cargo or a checkout
+at runtime. Use the source SHA from the archive's `BUILD.json` as `--revision`:
+
+```sh
+isogeny-perf --help
+isogeny-perf --out ./bmss-counts.jsonl --revision <40-character-source-sha> \
+  --bits 192,224,256,511 --ells 7,31,101
+isogeny-perf compare baseline.jsonl candidate.jsonl comparison.json
+```
+
+This first performance series covers all eight BMSS methods on fixed public
+supersingular fixtures. Field widths do not identify the published NIST curves.
+Each constructor must reproduce the independent Kohel kernel and exact map;
+the tool records complete inputs, binary and output hashes, and field-call
+counts. The output file must be fresh. Interrupted output lacks a PASS terminal
+receipt and cannot be accepted by `compare`.
+
+For two retained binaries, the native campaign executes five A/A pairs followed
+by five interleaved A/B pairs:
+
+```sh
+isogeny-perf campaign ./baseline ./candidate BASE_SHA HEAD_SHA ./fresh-campaign
+```
+
+This form checks repeatable counts and exact outputs without collecting wall
+samples. On Linux, append the repository's native `isolated-bench` executable
+and its reserved CPU list to collect timing samples and isolation receipts:
+
+```sh
+isogeny-perf campaign ./baseline ./candidate BASE_SHA HEAD_SHA ./fresh-campaign \
+  ./isolated-bench 3
+```
+
+Reserve SMT siblings together. Interference, missing isolation receipts and
+failed commands remain censored; macOS counts do not establish wall-time
+speedups. See the frozen [performance protocol](../../research/isogeny_performance_20261014/PROTOCOL.md)
+and [algorithm inventory](../../research/isogeny_performance_20261014/INVENTORY.md).
 
 ## Maintainer build and checks
 

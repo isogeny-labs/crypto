@@ -1,0 +1,213 @@
+name: Weil-descent closure, resumable job (EKS extra-high-memory)
+# Runs one long closure on the crypto-eks-xmem (512 GiB) or crypto-eks-xmem1t (1 TiB)
+# Spot runner with native checkpoints (src/cryptanalysis/closure_checkpoint.rs):
+#
+#   job=c1-deg5   PROTOCOL.md §11.3: C1 (m=3, (19,7)), first unsatisfiable draw,
+#                 degree 5, which failed to allocate at 169 GB on the 184 GB host.
+#
+# One run is one SEGMENT of at most segment_hours. It restores the newest valid
+# checkpoint generation from S3, runs the closure, copies each new generation to
+# S3 while it runs, and on the segment deadline, a Spot drain or a cancel sends
+# the closure SIGTERM so it saves. A segment that stopped with state saved starts
+# the next one (workflow_dispatch of this workflow, at most max_segments in all).
+# A segment cut short by the node disappearing starts nothing itself: the
+# watchdog job below finds the job unfinished and none running and dispatches it.
+# The loss is then at most the checkpoint interval (DREG_CKPT_SECONDS) plus the
+# time to the elimination's next word boundary, never the whole run.
+#
+# Needs, from the cluster owner (arc/README.md "Checkpoints in S3"): the xmem scale
+# sets deployed, and an IAM role on the runner pods that can read and write
+# s3://$CKPT_BUCKET/dreg/*. The first step fails with that message if it is missing.
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Which long job
+        type: choice
+        options: [c1-deg5]
+        default: c1-deg5
+      pool:
+        description: Runner pool (xmem is 512 GiB, xmem1t is 1 TiB)
+        type: choice
+        options: [xmem, xmem1t]
+        default: xmem
+      segment_hours:
+        description: Hours this segment may run before it saves and stops (job limit is 120)
+        type: string
+        default: "96"
+      segment:
+        description: Segment number (set by the workflow when it chains itself)
+        type: string
+        default: "1"
+  schedule:
+    - cron: "17 */2 * * *"
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: dreg-ckpt-job-${{ inputs.job || 'c1-deg5' }}
+  cancel-in-progress: false
+env:
+  RESULTS_BRANCH: results/dreg-ckpt
+  D: research/dreg_closure_m4l6_20261018
+  SCALE: research/dreg_closure_scale_20261016
+  DREG_CKPT_SECONDS: "3600"
+  CKPT_SYNC_SECONDS: "120"
+  MAX_SEGMENTS: "40"
+jobs:
+  watchdog:
+    # Only on the schedule, and only while the owner has set DREG_CKPT_WATCH to a
+    # job name; remove the variable to stop automatic restarts.
+    if: github.event_name == 'schedule' && github.ref == 'refs/heads/main' && vars.DREG_CKPT_WATCH != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Dispatch the job again if it is unfinished and not running
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB: ${{ vars.DREG_CKPT_WATCH }}
+          POOL: ${{ vars.DREG_CKPT_POOL || 'xmem' }}
+        run: |
+          set -euo pipefail
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          hdr=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json")
+          wf=dreg-ckpt-job.yml
+          active=0
+          for st in queued in_progress; do
+            n=$(curl -fsS "${hdr[@]}" "$api/actions/workflows/$wf/runs?status=$st&per_page=1" | jq .total_count)
+            active=$((active + n))
+          done
+          if [ "$active" != 0 ]; then echo "a segment is queued or running; nothing to do"; exit 0; fi
+          state=$(curl -fsS "${hdr[@]}" "$api/contents/ckpt-state/$JOB.json?ref=$RESULTS_BRANCH" 2>/dev/null | jq -r '.content // empty' | base64 -d 2>/dev/null || true)
+          if [ -n "$state" ] && [ "$(jq -r .done <<<"$state")" = true ]; then echo "$JOB is done"; exit 0; fi
+          [ -n "$state" ] || state='{}'
+          segment=$(( $(jq -r '.segments // 0' <<<"$state") + 1 ))
+          if [ "$segment" -gt "$MAX_SEGMENTS" ]; then echo "::error::$JOB used $MAX_SEGMENTS segments without finishing; not restarting"; exit 1; fi
+          echo "dispatching $JOB segment $segment"
+          curl -fsS -X POST "${hdr[@]}" "$api/actions/workflows/$wf/dispatches" \
+            -d "{\"ref\":\"main\",\"inputs\":{\"job\":\"$JOB\",\"pool\":\"$POOL\",\"segment_hours\":\"96\",\"segment\":\"$segment\"}}"
+  segment:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ${{ inputs.pool == 'xmem1t' && 'crypto-eks-xmem1t' || 'crypto-eks-xmem' }}
+    # GitHub ends any job at 5 days (7200 min); the segment deadline is shorter.
+    timeout-minutes: 7200
+    env:
+      JOB: ${{ inputs.job }}
+      POOL: ${{ inputs.pool }}
+      SEGMENT_HOURS: ${{ inputs.segment_hours }}
+      SEGMENT: ${{ inputs.segment }}
+    steps:
+      - name: Inputs
+        run: |
+          set -euo pipefail
+          [[ "$SEGMENT_HOURS" =~ ^[0-9]+$ && "$SEGMENT_HOURS" -ge 1 && "$SEGMENT_HOURS" -le 118 ]] || { echo "::error::segment_hours must be 1..118"; exit 1; }
+          [[ "$SEGMENT" =~ ^[0-9]+$ ]] || { echo "::error::segment must be a number"; exit 1; }
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 1
+      - name: Host, tools and S3 access
+        env:
+          CKPT_BUCKET: ${{ vars.CKPT_BUCKET }}
+        run: |
+          set -euo pipefail
+          printf 'runner=%s commit=%s job=%s segment=%s\n' "$RUNNER_NAME" "$GITHUB_SHA" "$JOB" "$SEGMENT"
+          test "$(uname -m)" = x86_64
+          memory_bytes=$(cat /sys/fs/cgroup/memory.max)
+          printf 'memory_bytes=%s nproc=%s\n' "$memory_bytes" "$(nproc)"
+          # C1 needs a host limit of at least 280 GB (PROTOCOL.md §11.3).
+          test "$memory_bytes" -ge 280000000000
+          # Two generations of the state are on local disk at once, plus the build.
+          df -BG --output=avail "$RUNNER_TEMP" | tail -1
+          if [ ! -x /usr/bin/time ] || ! command -v pkill >/dev/null || ! command -v setsid >/dev/null; then
+            sudo apt-get update -q && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends time procps util-linux
+          fi
+          if ! command -v aws >/dev/null; then
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "$RUNNER_TEMP/awscli.zip"
+            unzip -q "$RUNNER_TEMP/awscli.zip" -d "$RUNNER_TEMP/awscli" && sudo "$RUNNER_TEMP/awscli/aws/install"
+          fi
+          test -n "$CKPT_BUCKET" || { echo "::error::repository variable CKPT_BUCKET is not set (see taskq/deploy/eks-karpenter/arc/README.md, Checkpoints in S3)"; exit 1; }
+          aws sts get-caller-identity >/dev/null || { echo "::error::no AWS identity on this runner pod; the xmem service account needs the checkpoint IAM role (arc/README.md)"; exit 1; }
+          probe="s3://$CKPT_BUCKET/dreg/$JOB/probe-$GITHUB_RUN_ID"
+          echo ok | aws s3 cp - "$probe" >/dev/null && aws s3 rm "$probe" >/dev/null \
+            || { echo "::error::cannot write s3://$CKPT_BUCKET/dreg/; check the IAM role policy"; exit 1; }
+      - name: Build dreg_closure (release)
+        run: cargo build --locked --release --example dreg_closure
+      - name: Run the segment
+        id: seg
+        env:
+          CKPT_BUCKET: ${{ vars.CKPT_BUCKET }}
+        run: |
+          set -uo pipefail
+          job=$JOB
+          work="$RUNNER_TEMP/$job"; mkdir -p "$work"
+          limit=$(cat /sys/fs/cgroup/memory.max)
+          as=$(( limit * 92 / 100 ))
+          export F4_F2_MAX_ROWS=50000000 F4_F2_MAX_COLS=50000000 RAYON_NUM_THREADS="$(nproc)"
+          case $job in
+            c1-deg5)
+              f="$SCALE/m3-19-7.jsonl"
+              k=$(grep -v '"satisfiable"' "$f" | grep -o '"draw":[0-9]*' | cut -d: -f2 | head -1)
+              cmd=(prlimit --as="$as" target/release/examples/dreg_closure --to 5 --max-cols 1100000 --draw "$k" "$f") ;;
+          esac
+          echo "draw=$k as=$as"
+          rc=0
+          scripts/ckpt-segment.sh "s3://$CKPT_BUCKET/dreg/$job" "$work" $(( SEGMENT_HOURS * 3600 )) -- \
+            bash -c 'exec "$@" > "$0/result.jsonl.part" 2> "$0/closure.log"' "$work" "${cmd[@]}" || rc=$?
+          echo "rc=$rc"
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          echo "work=$work" >> "$GITHUB_OUTPUT"
+          tail -n 30 "$work/closure.log" || true
+          exit 0
+      - name: Record the segment on the results branch
+        if: always()
+        env:
+          RC: ${{ steps.seg.outputs.rc }}
+          WORK: ${{ steps.seg.outputs.work }}
+        run: |
+          set -euo pipefail
+          job=$JOB
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          keep="$RUNNER_TEMP/ckpt-record"; rm -rf "$keep"; mkdir -p "$keep"
+          cp "$WORK/closure.log" "$keep/segment-$SEGMENT.log" 2>/dev/null || true
+          [ "${RC:-}" = 0 ] && cp "$WORK/result.jsonl.part" "$keep/result.jsonl"
+          segments=$SEGMENT
+          done=false; [ "${RC:-}" = 0 ] && done=true
+          printf '{"job":"%s","segments":%s,"done":%s,"last_exit":"%s","run":"%s","runner":"%s"}\n' \
+            "$job" "$segments" "$done" "${RC:-none}" "$GITHUB_RUN_ID" "$RUNNER_NAME" > "$keep/state.json"
+          git fetch origin "$RESULTS_BRANCH" 2>/dev/null && git checkout -f -B "$RESULTS_BRANCH" "origin/$RESULTS_BRANCH" || git checkout -f --orphan "$RESULTS_BRANCH"
+          git rm -rfq . 2>/dev/null || true
+          mkdir -p "ckpt-state" "ckpt-runs/$job"
+          cp "$keep/state.json" "ckpt-state/$job.json"
+          cp -a "$keep/." "ckpt-runs/$job/"; rm -f "ckpt-runs/$job/state.json"
+          git add ckpt-state ckpt-runs
+          git commit -qm "$job segment $segments: exit ${RC:-none}" || true
+          git push -q origin "HEAD:refs/heads/$RESULTS_BRANCH"
+      - name: Start the next segment
+        if: steps.seg.outputs.rc == '75'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          next=$(( SEGMENT + 1 ))
+          if [ "$next" -gt "$MAX_SEGMENTS" ]; then echo "::error::$MAX_SEGMENTS segments used; not chaining"; exit 1; fi
+          curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/dreg-ckpt-job.yml/dispatches" \
+            -d "{\"ref\":\"main\",\"inputs\":{\"job\":\"$JOB\",\"pool\":\"$POOL\",\"segment_hours\":\"$SEGMENT_HOURS\",\"segment\":\"$next\"}}"
+      - name: Fail on a real error
+        if: steps.seg.outputs.rc != '0' && steps.seg.outputs.rc != '75'
+        env:
+          RC: ${{ steps.seg.outputs.rc }}
+        run: |
+          echo "::error::the closure exited $RC; the checkpoint is left in S3 as it is"
+          exit 1
+      - name: Upload records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dreg-ckpt-${{ inputs.job }}-${{ inputs.segment }}-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/${{ inputs.job }}/closure.log
+            ${{ runner.temp }}/${{ inputs.job }}/result.jsonl.part
+          retention-days: 90
+          if-no-files-found: warn
