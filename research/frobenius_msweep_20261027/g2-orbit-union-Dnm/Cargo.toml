@@ -1,0 +1,20 @@
+[package]
+name = "g2-orbit-union-dnm"
+version = "0.1.0"
+edition = "2021"
+description = "Cell G2: per-slot-shift orbit-union bases priced against the exact class count D(n,m), exact enumeration on toy Koblitz curves"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "g2dnm"
+path = "src/main.rs"
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+debug = false
+
+[workspace]
