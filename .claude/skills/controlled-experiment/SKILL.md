@@ -160,6 +160,12 @@ revealed about the target.
 
 ## 4. Run
 
+- Route supported x86 experiments through the shared
+  [isolab-eks](../isolab-eks/SKILL.md) skill by default (AGENTS.md §9a).
+  Preserve this protocol's controls and workload in the request; use its AWS
+  authentication, L2/S3 verification and separate CRIU/EBS recovery contract.
+  A missing supported workload or image is a reported integration gap, not
+  permission to substitute the deployment's validation fixture.
 - Native code per `AGENTS.md` (Rust), with the seed for every row derived as
   the protocol says and recorded in the output.
 - Emit raw per-sample rows (JSON lines or CSV), not just summaries, so the

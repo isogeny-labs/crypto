@@ -7,7 +7,7 @@ name: Lean proof gate
 # AGENTS.md "Mathematical results should include Lean proofs".
 on:
   # Not a pull-request check. The merge set is gate, size, and artifacts.
-  # This runs when the matching change is on main, or on its schedule.
+  # This runs when the matching change reaches main, or on demand.
   push:
     branches: [main]
     paths:
@@ -18,8 +18,6 @@ on:
       - '**/lake-manifest.json'
       - 'tools/lean/**'
       - '.github/workflows/lean-proof-gate.yml'
-  schedule:
-    - cron: '17 6 * * 1'
   workflow_dispatch:
 
 permissions:
