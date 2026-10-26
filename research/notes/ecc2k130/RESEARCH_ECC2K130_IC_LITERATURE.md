@@ -279,16 +279,50 @@ Generic `2^{n/2}` is `2^65.5`; the rho reference is `2^60.8`.
   of the formulas at `ω = log₂ 7` are `n = 1144` (Kousidis–Wiemers) and
   `n = 1876` (Petit–Quisquater).
 
-## Addendum, 2026-10-26: the `openai/math` release of 2026-10-26
+## Addendum, 2026-10-26: `openai/math` updates since the 2026-10-07 review
 
 Read at `openai/math` commit `7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a`
-(2026-10-26T14:18:03-07:00; 721 manuscripts, 373 families).  Its
-`history.md` lists two new manuscripts (local smoothing for the wave
-equation, family 079; the ETH disproof, family 378), new and repaired Lean
-formalizations, and no withdrawal touching this note.  Only 378 and the Lean
-scope of 107 bear on index calculus.  Nothing below was built or run here:
-the Lean libraries were not compiled and the corpus proofs were not checked.
+(2026-10-26T14:18:03-07:00; 721 manuscripts in 373 families; 751 preprint
+directories).  The repository has seven commits.  Two of them carry content
+after the initial release `adc7f12` (2026-10-06):
 
+- `3014888` (2026-10-07): withdrawals, revised editions and Lean additions.
+- `42907c9` (2026-10-26): new manuscripts, new Lean and verification data.
+
+Both diffs were read file by file (`git diff --name-status`).  Nothing below
+was built or run here: the Lean libraries were not compiled and no corpus
+proof was checked.
+
+### The 2026-10-07 update (`3014888`)
+
+- **Withdrawn**: three Hodge/K3 manuscripts (split abelian eightfolds,
+  Kuga–Satake for K3, rational Hodge for products of K3).  None is cited
+  in this repository.
+- **Revised editions** of 14 manuscripts, plus 13 citation-only updates.
+  Among the revised and citation-updated manuscripts, those on elliptic
+  curves concern their arithmetic over `ℚ`:
+  - BSD from low Selmer corank, and the two-primary BSD formula
+  - the Selmer converse at every prime, and the pointwise 2-converse
+  - Goldfeld's density conjecture, and the mean analytic rank of twists
+  - modularity at the prime 2 (Fontaine–Mazur, and unrestricted pro-modularity)
+  - the `p`-adic section conjecture
+  - Milne's rationality conjecture, and the rational Hodge conjecture for CM
+    abelian varieties
+
+  Rank, Sha and modularity over `ℚ` give no algorithm for ECDLP in
+  `E(F_{2^n})`, and nothing in this repository depends on them.
+- **No family this note uses moved.**  No file of family 107 (matrix
+  multiplication), 142 (deterministic polynomial factorization over prime
+  fields) or 279 (exact quantum factoring) changed in either update.
+
+### The 2026-10-26 update (`42907c9`)
+
+- **New**: local smoothing for the wave equation (family 079), which is not
+  relevant here, and the ETH disproof (378).
+- **New Lean**: about 40,000 Lean files (most in algebraic geometry, number
+  theory and algorithms), a formalization of the Hodge conjecture for CM
+  abelian varieties, and restored C++/checker data for mutually unbiased
+  bases in dimension six.
 - **Family 378, "The Exponential Time Hypothesis is False".**  It counts the
   satisfying assignments of a `k`-CNF deterministically in
   `(n+m)^{O_k(1)} 2^{n/(log n)^{1/2+o(1)}}` time and polynomial space
@@ -309,39 +343,52 @@ the Lean libraries were not compiled and the corpus proofs were not checked.
     is not a constant-locality map, so the appendix corollary does not
     apply directly.
   - What it changes is the asymptotic floor for SAT-based decomposition
-    (the CDCL SAT line of this note's scope, and `research/sat_factor_base_review_20260908/`): no
-    `2^{Ω(n)}` lower bound on the SAT step may be assumed any more.  No
-    cost row here quotes such a bound.
-- **Family 107 now has a Lean scope (`lean/docs/107.md`).**  Two claims
-  matter for the `ω` table in the 2026-10-07 addendum:
-  - **`ω(ℂ) ≤ 9/4` is claimed formalized** in the arithmetic-operation
-    model.  The characteristic-0 proof that the table marked "nobody here
-    has verified" now has a claimed machine proof.  Not checked here: the
-    Lean was not built, and the Comparator statement
-    (`ComparatorChallenges/MatrixMultiplication.lean`, `complex_omega_le_nine_quarters`)
-    was not compared with the paper.
-  - **Over every field, only `ω(F) < 2.371054886006746` is claimed
-    formalized**, characteristic 2 included (`MatrixFields.lean`,
-    `omega_lt_source_constant`).  That is `2.8·10^-4` below the published
-    `2.371339`, so it changes no row materially.
-  - **Contrarian reading.**  The corpus formalized `9/4` over `ℂ` and only
-    `2.3711` over every field.  The family summary says the `2.258` bound
-    holds "outside finitely many positive characteristics" and gives no
-    every-field `9/4`.  The 2026-10-07 review found a single
-    characteristic-dependent step in `9/4` (root-of-unity separation) and
-    called the characteristic-2 bound conditional.  The authors' own
-    choice not to state or formalize `9/4` over every field is evidence
-    that the transfer may need more than that step.  The `9/4` row stays
-    **conditional**, and the condition is now the transfer, not the
-    characteristic-0 proof.
-  - `src/cryptanalysis/matmul_exponent.rs` still tags `CORPUS_FAMILY_107`
-    `ProofStatus::Unverified`.  That remains accurate for this repository,
-    which has checked no proof.  Adding a "formalized upstream, not
-    rebuilt" status and the `2.3711` every-field row is an open code change,
-    not made here.
-- **No other family moved.**  `history.md` records no withdrawal or repair
-  in families 107, 142 (deterministic polynomial factorization over prime
-  fields) or 279 (exact quantum factoring) since 2026-10-07.
+    (the CDCL SAT line of this note's scope, and
+    `research/sat_factor_base_review_20260908/`): no `2^{Ω(n)}` lower bound
+    on the SAT step may be assumed any more.  No cost row in this repository
+    assumes ETH (`grep -w ETH` finds only unrelated uses).
+
+### Correction to the 2026-10-07 addendum: family 107 was already formalized
+
+`lean/docs/107.md` and its Comparator statements date from the initial
+release `adc7f12` (2026-10-06), before the 2026-10-07 review.  Neither
+update changed them.  The 2026-10-07 addendum calls the characteristic-0
+proof one that "nobody here has verified".  That is still true, but it
+omitted that the corpus claims a Lean proof:
+
+- **`ω(ℂ) ≤ 9/4`** in the arithmetic-operation model.  Comparator statement:
+  `ComparatorChallenges/MatrixMultiplication.lean`,
+  `complex_omega_le_nine_quarters`.
+- **`ω(F) < 2.371054886006746` over every field**, characteristic 2
+  included.  Comparator statement: `MatrixFields.lean`,
+  `omega_lt_source_constant`.  This is `2.8·10^-4` below the published
+  `2.371339` and changes no row materially.
+
+Neither statement was compared with its paper here, and the Lean was not
+built.
+
+The characteristic-2 status of `9/4` is unchanged: **conditional**.
+- The main paper (`Matrix-Multiplication-Nine-Fourths-October-2-2026`)
+  states its theorem over `ℂ` only.  Its one field-dependent step found here
+  is the primitive `L`-th root of unity, `L = 5M`, which the 2026-10-07
+  review handled.
+- Its detecting-characters lemma (Appendix A) is proved in Strassen's
+  asymptotic-spectrum framework.  The tools it names are finite-dimensional
+  separation, compactness and a fixed-point theorem, none of which depends
+  on the field on its face.
+- The corpus formalized `9/4` only over `ℂ`.  It states no every-field
+  `9/4`, and says `2.258` holds "outside finitely many positive
+  characteristics".  That is an **unexplained gap, not evidence** against
+  characteristic 2: it may be a scope choice.
+- Closing the gap would need the shared-leg entropy inequality and the
+  detecting-characters lemma checked over `F_{2^k}`.  Neither was attempted
+  here.
+
+`src/cryptanalysis/matmul_exponent.rs` still tags `CORPUS_FAMILY_107` as
+`ProofStatus::Unverified`.  That is accurate for this repository, which
+built no proof.  Two code changes are left open:
+- a "formalized upstream, not rebuilt" status;
+- a `2.3711` every-field row.
 
 ## Honest limits
 
