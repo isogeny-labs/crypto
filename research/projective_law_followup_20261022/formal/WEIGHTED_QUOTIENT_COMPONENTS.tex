@@ -32,10 +32,11 @@ Lean source & Verified scope\\
 \texttt{WeightedOverlapEquality.lean} & Canonical transition sends affine $x$ to $1/z$ and $y$ to $w/z^3$.\\
 \texttt{WeightedOverlapMapEquality.lean} & Full map equality follows if the canonical transition preserves each $K$-scalar.\\
 \texttt{WeightedOverlapScalar.lean} & Both chart maps and common-localization maps preserve $K$-scalars; the canonical overlap transition equals the separately presented overlap-ring map unconditionally.\\
+\texttt{WeightedOverlapScheme.lean} & The induced Spec isomorphism equals the overlap transition morphism used in the separately glued two-chart scheme.\\
 \bottomrule
 \end{tabular}
 \section*{Open boundary}
-Scheme-level smoothness, identification of the weighted-Proj overlap morphism with the separately glued curve, local-stalk transport, the Picard-class identity, and Rust-to-Lean semantics bridge remain open. Pointwise Jacobian and common-ring identities do not alone close those obligations.
+Scheme-level smoothness, identification of the actual weighted-Proj chart embeddings with those of the separately glued scheme, local-stalk transport, the Picard-class identity, and Rust-to-Lean semantics bridge remain open. Equality of the induced Spec transition alone does not close those obligations.
 \section*{Replay evidence}
 All nineteen new source files compiled with Lean 4.34.1 and Mathlib commit \texttt{d13f23b} (full revision in the companion Markdown), exit status 0. Axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; none lists \texttt{sorryAx}. Source SHA-256 values, in dependency order, are:
 \begin{quote}\scriptsize\ttfamily
@@ -59,5 +60,11 @@ ba604cbd287f179804be77598c72e78b41c9a968feadea63a1bef6bd70603eed\\
 06eecf27628466109d71494edb50c279798fe987090a93b43c2c3bab5e1ea720\\
 dbd8e1a5489ee6fd158e2541b2576ea4cc2bde9edc86ead716553b74399d5925
 \end{quote}
-The exact theorem boundaries and replay prerequisites are in \texttt{WEIGHTED\_QUOTIENT\_COMPONENTS.md}. The full four-lead results and matched-rho prices remain in \texttt{research/four\_followups\_review\_20261022/}.
+The exact theorem boundaries and replay prerequisites are in the companion Markdown. The full four-lead results and matched-rho prices remain in the four-follow-ups review packet.
+The twentieth source, \texttt{WeightedOverlapScheme.lean}, has the following SHA-256 (join the two lines):
+\begin{quote}\scriptsize\ttfamily
+b96ce6ec13d38c842f9b5dc05415a06b4\\
+ca1e79f91149386a0820c9a8ce8cea4
+\end{quote}
+It and its two prerequisite scheme modules compiled on the migrated host under the same pins, exit status 0; the two new theorem axiom audits list only the three standard axioms above.
 \end{document}

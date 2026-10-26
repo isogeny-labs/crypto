@@ -562,8 +562,11 @@ canonical equivalence through `Away(XZ)`; its affine generator images match the 
 formulas. `WeightedOverlapScalar.projTransition_scalar` proves preservation of
 every base-field scalar, and `projTransition_eq_separate` therefore proves
 unconditional equality with the separately presented overlap-ring transition.
-Identifying the weighted-Proj overlap morphism with the separately glued curve
-and transporting local stalks remain open.
+`WeightedOverlapScheme.projTransitionSpecIso_hom_eq_glue` further checks that
+the induced Spec morphism is the transition morphism used in the separately
+glued two-chart scheme. The actual weighted-Proj overlap embeddings have
+not been identified with those of the glued scheme; global scheme
+identification and transport of local stalks remain open.
 Identifying that chart stalk with the chosen projective completion's
 infinity stalk remains open. The [infinity-chart packet](formal/INFINITY_CHART.md)
 now proves the chart equation `w²=z(1+a3z²+a2z³+a1z⁴+a0z⁵)` for

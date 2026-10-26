@@ -348,6 +348,12 @@ coefficients. Its [four-row CSV](common22-completion-bridge.csv),
 [PDF](COMMON22_COMPLETION_BRIDGE.pdf) carry the compiler and axiom audit.
 Projective completion, properness, smoothness, divisor/`Pic⁰` transport,
 and Rust semantics remain separate obligations.
+`WeightedOverlapScheme.lean` now checks that the Spec isomorphism induced by
+the canonical weighted overlap-ring transition is the transition morphism
+used by the separately glued two-chart scheme. This is an equality of
+principal-open overlap morphisms under the chosen chart identifications;
+identifying the glued scheme itself with weighted Proj and transporting
+its local stalks remain open.
 The [bounded weighted-Proj attempt](WEIGHTED_PROJ_HEAD.md) records the
 specific quotient-grading and `D₊(Z)` chart-isomorphism obligations, available
 pinned APIs, and three failed/timed-out compiler commands. Its
