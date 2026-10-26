@@ -22,6 +22,10 @@
    "path": "research/ic_rho_reference_20260923/analysis.json",
    "sha256": "6fd61dd71a33b8095a00a84582b8a7d2eb08ed2f5bf7145b6e470e4acdf0ae1a"
   },
+  "progress_timeline": {
+   "path": "docs/ic/progress-timeline.json",
+   "sha256": "87999f37f2d5669a4f23fb73dda00766b6778dbc335fb84e2784fd9717a1b882"
+  },
   "koblitz_s20": {
    "path": "research/ic_exponent_20260926/analysis.json",
    "sha256": "744fd51ea01f10466fad482e536a8319348b6b4f9cbf719e454835573e935a0f"
@@ -253,6 +257,214 @@
    "rho_step_units_as_built": null
   }
  },
+ "progress": {
+  "source": "docs/ic/progress-timeline.json",
+  "updated": "2026-10-21",
+  "series_id": "ec-cold",
+  "label": "Elliptic curve, whole method, cold, one target",
+  "points": [
+   {
+    "anchor": "#ic-tournament-round-0007",
+    "class": "engineering",
+    "date": "2026-09-16",
+    "detail": "0.7376 of the worker rho's instructions, 95% 0.7066-0.7644. That rho named Frobenius classes by squaring; the control of 2026-09-23 showed it was not a matched reference.",
+    "label": "Tournament round 0007, five Koblitz cells",
+    "reference": "unmatched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0007/REPORT.md",
+    "value": 0.7376
+   },
+   {
+    "anchor": "#ic-tournament-round-0019",
+    "class": "engineering",
+    "date": "2026-09-21",
+    "detail": "0.6751 [0.6298, 0.7265] of the worker rho's instructions on all eight cells; replicated by round 0020 at 0.6629. Same unmatched reference.",
+    "label": "Tournament round 0019, eight cells, strict win promoted",
+    "reference": "unmatched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0019/REPORT.md",
+    "value": 0.6751
+   },
+   {
+    "anchor": "#ic-triple-counted-20260923",
+    "class": "accounting",
+    "date": "2026-09-23",
+    "detail": "The IC arm is above that rho at every cell measured, 1.19x (n59a0) to 2.88x (n43a1). Triple collector with counted sizing, five cells. Class accounting: what the ratios were counted against changed.",
+    "label": "Control: rho given the IC arm's orbit naming",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_triple_counted_20260923/RESULTS.md",
+    "value": 1.192
+   },
+   {
+    "anchor": "#ic-tournament-round-0024",
+    "class": "accounting",
+    "date": "2026-09-28",
+    "detail": "Six of eight panel cells 0.61-0.82 of the matched rho; the strict gate fails at n23a1 (1.126); the whole twelve-cell panel reads 1.380 [0.847, 2.387]. Best cell plotted.",
+    "label": "Tournament round 0024, matched rho, best cell n17a1",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md",
+    "value": 0.609
+   },
+   {
+    "anchor": "#ic-tournament-round-0025",
+    "class": "accounting",
+    "date": "2026-09-29",
+    "detail": "The matched walk run in the IC arm's own single-word arithmetic. Above rho in instructions at every one of twelve cells: 1.36-2.56x on the panel, up to 13.7x past the crossing. The line was stopped on 2026-09-29.",
+    "label": "Tournament round 0025, lean rho, best cell n19a0",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md",
+    "value": 1.356
+   },
+   {
+    "anchor": "#koblitz-descent-20260930",
+    "class": "accounting",
+    "date": "2026-10-01",
+    "detail": "Ledger section 23: with the reusable set-up charged, the method is 4.9-31.6x slower than rho cold across six sizes 2^36.6-2^47.2; 2.0x at 2^38.0 where both arms pay a slow curve construction. Online only it is 8.8-17.5x faster (see the online series).",
+    "label": "Koblitz descent, one target cold, best size 2^38.0",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#koblitz-descent-20260930",
+    "value": 2
+   },
+   {
+    "anchor": "#disjoint-cold-v2-outcome-20261001",
+    "class": "accounting",
+    "date": "2026-10-01",
+    "detail": "Six cells timing-eligible on reserved cores, every paired compact/rho CPU interval above one; the closest, n41/L1,024, reads 1.314 [1.288, 1.359] and would need 23.9% less CPU to match rho. Isolated CPU time, not a counted unit; S unset.",
+    "label": "Orbit-disjoint cold CPU panel, closest cell n41/L1,024",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#disjoint-cold-v2-outcome-20261001",
+    "unit": "isolated CPU time",
+    "value": 1.314
+   },
+   {
+    "anchor": "#lab-ecbench-all",
+    "class": "accounting",
+    "date": "2026-10-03",
+    "detail": "Every ic.pipeline configuration run cold through ecbench against the strong signed-Frobenius rho on the same targets, every phase charged in one unit: 4.30x at r = 2^16 (orbit base, Frobenius MITM m = 2), 129x at r = 2^21; on prime curves 7.70x at 18 bits rising to 40.5x at 24 bits. The reference is 18.5x its floor at this size because its fixed setup dominates, so the ratio flatters the candidate. No method changed; a baseline, not a round.",
+    "label": "ecbench baseline, every candidate: best cell icv1-f2m17-tm101-00378d4e (r = 2^16)",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_all_candidates_20261003/README.md",
+    "unit": "S",
+    "value": 4.3
+   },
+   {
+    "anchor": "#n61-compact-orbit-hosted-20261003",
+    "class": "accounting",
+    "date": "2026-10-03",
+    "detail": "Cold IC/rho median 74.8 (95% 70.0-80.0) against strong rho rung 3 on 256 public one-target workloads, a pinned reserved core on a hosted AMD EPYC 7763 runner with 0 contended samples: the IC process spends a median 22.0 s on reusable setup against rho's 0.30 s. Online only, IC is 14.67x faster (online series). Same-runner replay 256/256; PENDING_INDEPENDENT_VALIDATION.",
+    "label": "n61 compact orbit, one target cold, 256 workloads, hosted isolated",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md",
+    "unit": "isolated wall time",
+    "value": 74.8
+   },
+   {
+    "anchor": "#lab-pair-claw",
+    "class": "accounting",
+    "date": "2026-10-04",
+    "detail": "The four-point signed-Frobenius pair claw with a known-log orbit base (the PR's IC1 PDP4qtable LAnone candidate), run cold through ecbench against the strong signed-Frobenius rho on the same 48 Koblitz targets: 1.85x to 2.96x per curve at its cost-minimising table, 2.20x [1.90, 2.55] pooled; 32.6x [25.3, 41.0] at the PR's own n=83 shape. Flat in r, as a generic method must be. n = 83 itself is not measured.",
+    "label": "Pair claw of cryptanalysis#175, ported into ecbench: best cell icv1-f2m43-tm998717-e2e742b0 (r = 2^32.1)",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_pair_claw_20261003/README.md",
+    "unit": "S",
+    "value": 1.85
+   },
+   {
+    "anchor": "#ic-tool-programme-20261001",
+    "class": "accounting",
+    "date": "2026-10-07",
+    "detail": "Ledger section 23's single-target comparison re-run at the ic tool programme's baseline v3 (main's 995ea207): six sizes 2^36.6-2^47.2, 64 public points and four A/A repeats a size, 408/408 rows checked, every logarithm section 23's. With the reusable set-up charged the index calculus costs 5.2-21.0x rho cold on the same point (section 23: 2.0-31.6x): 5.23x [4.80, 5.72] at 2^36.6, where section 23 read 4.95x. Rho is still faster at every size, and the cold ratio grows as r^0.18. Online only it is 10.2-26.5x faster (online series). It re-measures and changes no algorithm.",
+    "label": "Rule v3: the Koblitz descent at baseline v3, one target cold, closest size 2^36.6",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v3/README.md",
+    "value": 5.226
+   },
+   {
+    "anchor": "#lab-ecbench-all",
+    "class": "accounting",
+    "date": "2026-10-15",
+    "detail": "Orbit factor base (compact-orbit-scan, mitm-frobenius-counted m = 2) with every native priced, paired against the fully priced signed-Frobenius rho on 16 targets x 3 rounds per curve: 1.566 [0.992, 2.347] at the best cell (interval reaches 1; rho-frob heavy-tailed there), 2.96 at n = 13, 3.85 at r = 2^21, 18.2 at r = 2^39; never below 1. Slope of ln ratio 0.165 [0.117, 0.213] per ln r with ln n fitted (model 1/6): constant-only.",
+    "label": "Frobenius-orbit IC, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_frobenius_orbit_vs_rho_20261014/README.md",
+    "unit": "S",
+    "value": 1.566
+   },
+   {
+    "date": "2026-10-15",
+    "value": 68183174.19,
+    "reference": "matched",
+    "unit": "F_p multiplications",
+    "label": "Joux-Vitse (n - 1)-decomposition at n = 5, E(F_{p^5}), complete DLP at p = 31 (ell = 2^24.8), F4 trace replay",
+    "detail": "Native complete DLPs paired with rho on the same target in F_p multiplications: 6.8e7x at p = 31 (6,688 trials, 19 relations), 4.5e7x and 1.8e8x at p = 11; one trial 5.9-9.2e9 flat in p over a 12-rung ladder (p = 11-241), about 25p trials per relation; every trial agrees with a meet-in-the-middle oracle and every answer verified; parity extrapolated at q = 2^58.2 (group 2^291). A reproduction of a published route; no ecbench session (no F_{p^k} instance on main).",
+    "class": "accounting",
+    "anchor": "#rho-parity-ledger",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+   },
+   {
+    "date": "2026-10-20",
+    "value": 1236267.0,
+    "reference": "matched",
+    "unit": "F_p multiplications",
+    "label": "k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)",
+    "detail": "Native complete DLPs paired with rho on the same target: 1.24e6x (p = 61), 1.94e6x (p = 41), 3.39e6x and 5.77e6x (p = 31), 5.2e6x (p = 71), all verified; a sixth arm (p = 41, six-point base) stopped at its 10-hour cap at >= 1.5e7x. Rho's unpriced walk work priced at 0, 0.1, 1 GAE: rho ahead at every weight (4.1e5x best at 1 GAE). Trace replay cuts the test 1.74-1.77x (5.85e7 to 3.3e7). Extrapolated parity n = 2^227 (2^233 without replay). Engineering; no ecbench session (no F_{p^k} instance on main).",
+    "class": "engineering",
+    "anchor": "#rho-parity-ledger",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+   },
+   {
+    "date": "2026-10-16",
+    "value": 55.3677736032,
+    "reference": "matched",
+    "unit": "Tier 1 cloud-instance cold IC / same-point rho online wall",
+    "label": "n83 K1120 five-point cold factor-base holdout, selected ID null",
+    "detail": "On five sealed public points, 25/25 IC and 5/5 same-point rho arms replayed. K1120 mean cold process 119.826 s divided by mean rho online 2.164 s gives 55.368. K1120 saves 2.645 s [2.085, 3.205] against K1152; its 0.401 s advantage over K1104 has interval [-0.236, 1.038], so the frozen selection remains BOUNDED_UNKNOWN. Tier 1 GitHub cloud instance, A/A and topology gates passed.",
+    "class": "engineering",
+    "anchor": "#n83-tier1-cold-20261016",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/n83_e2e_holdout_20261016/RESULT.md"
+   },
+   {
+    "date": "2026-10-17",
+    "value": 19.2149791956,
+    "reference": "matched",
+    "unit": "quotient of incomplete cold GAE lower bounds; diagnostic",
+    "label": "Volcano projected-base control/pilot; best bounded IC cell",
+    "detail": "Projected size-16 MITM on icv1-fp57-t536870914-6cabb0c9, two public one-target attempts, one round, L0/debug. Both IC and rho have unpriced work. The ratio is a quotient of incomplete lower bounds, not a direction-of-cost or speedup claim. Full graph-wide completion and exact representations remain open.",
+    "class": "accounting",
+    "anchor": "#lab-volcano-ic",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json"
+   },
+   {
+    "date": "2026-10-18",
+    "value": 1.272,
+    "reference": "matched",
+    "unit": "S",
+    "label": "Lazy orbit-member index, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)",
+    "detail": "The frozen Frobenius-orbit IC with its pair table's orbit-member index resolved on a hit instead of built for every base point (same table, relations, rank and logarithms: 856/856 run pairs identical). Paired against the fully priced signed-Frobenius rho on 32 targets x 3 rounds per curve: 1.272 [0.770, 1.803] at the best cell (interval includes 1), was 1.566 [0.992, 2.347] with the eager table on other seeds. Against rho-strong the lazy arm is cheaper at n = 13, 17, 19, 29, a tie at n = 31 (0.985 [0.908, 1.062], was 1.221) and above it at n = 23, 37, 41. Eager / lazy 1.12-1.44x on seven curves, 1.014x at n = 41. L0, counts only.",
+    "class": "engineering",
+    "anchor": "#lazy-orbit-members-20261018",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf"
+   },
+   {
+    "anchor": "#ic-tool-programme-20261001",
+    "class": "accounting",
+    "date": "2026-10-20",
+    "detail": "Rule v8: ledger section 23's six sizes (2^36.6-2^47.2, 64 public points and four A/A repeats a size, 408/408 rows checked in each of two runs of one binary) against a matched rho, the signed-Frobenius walk with its canonicalisation batched 16 lanes at a time by GFNI and funnel shifts; the control run, the same binary with rho as at rule v7, reads 3.59-11.56x. With the reusable set-up charged the index calculus costs 4.67-18.07x rho cold: 4.669x [4.34, 5.07] at 2^36.6, 18.07x [15.98, 20.58] at 2^47.2. Rho is still faster at every size. The two rho arms take identical walks on 64/64 targets a size; the index calculus's own online time is the same in both runs (0.976-1.033). The distance to rho is larger than rule v7 reported because rho was unmatched, not because the index calculus slowed; the ln-ln slope is 0.168 (t interval 0.128-0.208; rule v3: 0.176), not distinguishable from v3's. No curve with log2 r >= 50 is runnable by this single-word pipeline. Class: accounting (a corrected reference); the batched rho kernel is engineering; no advance.",
+    "label": "Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md",
+    "value": 4.669
+   },
+   {
+    "anchor": "#lab-planner-validation",
+    "class": "engineering",
+    "date": "2026-10-21",
+    "detail": "ic plan / ic bench --auto (ic-planner/1) checked on six prime curves outside its evidence, each plan against every alternative one change away from it (ecbench, 24 verified runs per arm and curve, audits OK). Best cold one-target cell on a registered curve: icv1-fp24-tm5099-a6f137c6 (log2 r 24.00), S(plan)/S(rho.negation) 14.39 [11.63, 18.45], planner prediction 12.23. Rho is cheaper on all six curves (12.6-25.8x). At w = 0 every alternative costs more than the plan; the doubled base is not separated across the band (below 1 at w = 1). Tooling validation: the plan is the existing best recipe chosen automatically; no advance, no leaderboard row moves.",
+    "label": "Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md",
+    "value": 14.39
+   }
+  ]
+ },
  "leaders": {
   "prime": {
    "slug": "icv1-fp12-t19-d4a315df",
@@ -345,7 +557,9 @@
      "ratio_rho": 6.33838293956,
      "ratio_floor": 25.7824480373,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 655.494435667,
+     "log2_total_gae": 9.35643972359
     },
     {
      "variant": "mitm_m3_negfold",
@@ -368,7 +582,9 @@
      "ratio_rho": 6.63378272683,
      "ratio_floor": 26.9840367923,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 686.043697,
+     "log2_total_gae": 9.4221566604
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -391,7 +607,9 @@
      "ratio_rho": 7.19090324255,
      "ratio_floor": 29.2502190164,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 743.659243667,
+     "log2_total_gae": 9.53849789701
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -414,7 +632,9 @@
      "ratio_rho": 7.29910011604,
      "ratio_floor": 29.690328157,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 754.848603667,
+     "log2_total_gae": 9.56004350886
     },
     {
      "variant": "mitm_m3",
@@ -437,7 +657,9 @@
      "ratio_rho": 9.10920577276,
      "ratio_floor": 37.0532400355,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 942.043697,
+     "log2_total_gae": 9.87965017104
     },
     {
      "variant": "mitm_m2_negfold",
@@ -460,7 +682,9 @@
      "ratio_rho": 10.1902970475,
      "ratio_floor": 41.450762224,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1053.846553,
+     "log2_total_gae": 10.041449101
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -483,7 +707,9 @@
      "ratio_rho": 10.5892773699,
      "ratio_floor": 43.0736823798,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1095.107768,
+     "log2_total_gae": 10.096857135
     },
     {
      "variant": "mitm_m2",
@@ -506,7 +732,9 @@
      "ratio_rho": 12.6657200935,
      "ratio_floor": 51.5199654672,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1309.846553,
+     "log2_total_gae": 10.3551820963
     },
     {
      "variant": "direct_subtraction_m2",
@@ -529,7 +757,9 @@
      "ratio_rho": 14.0324304496,
      "ratio_floor": 57.07929173,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1451.18718233,
+     "log2_total_gae": 10.503017903
     }
    ],
    "best": {
@@ -553,7 +783,9 @@
     "ratio_rho": 6.33838293956,
     "ratio_floor": 25.7824480373,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 655.494435667,
+    "log2_total_gae": 9.35643972359
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -578,8 +810,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 103.416666667,
+   "reference_log2_total_gae": 6.69232489941,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -614,7 +857,9 @@
      "ratio_rho": 5.4703789656,
      "ratio_floor": 17.6228097349,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 973.955388333,
+     "log2_total_gae": 9.92771188148
     },
     {
      "variant": "mitm_m2_negfold_walk_balanced",
@@ -637,7 +882,9 @@
      "ratio_rho": 5.80452929558,
      "ratio_floor": 18.6992740394,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1033.44807,
+     "log2_total_gae": 10.0132501809
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -660,7 +907,9 @@
      "ratio_rho": 6.01094177018,
      "ratio_floor": 19.3642312187,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1070.198091,
+     "log2_total_gae": 10.0636621453
     },
     {
      "variant": "mitm_m3_negfold",
@@ -683,7 +932,9 @@
      "ratio_rho": 6.15834085467,
      "ratio_floor": 19.8390769355,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1096.44126967,
+     "log2_total_gae": 10.0986128215
     },
     {
      "variant": "mitm_m3",
@@ -706,7 +957,9 @@
      "ratio_rho": 7.59620652282,
      "ratio_floor": 24.4711569529,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1352.44126967,
+     "log2_total_gae": 10.4013502304
     },
     {
      "variant": "mitm_m2_negfold",
@@ -729,7 +982,9 @@
      "ratio_rho": 18.0667145986,
      "ratio_floor": 58.2018678979,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3216.62797833,
+     "log2_total_gae": 11.6513333743
     },
     {
      "variant": "mitm_m2",
@@ -752,7 +1007,9 @@
      "ratio_rho": 19.5045802668,
      "ratio_floor": 62.8339479154,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3472.62797833,
+     "log2_total_gae": 11.7618121481
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -775,7 +1032,9 @@
      "ratio_rho": 26.2641992586,
      "ratio_floor": 84.6100405997,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 4676.12180967,
+     "log2_total_gae": 12.1910967962
     },
     {
      "variant": "direct_subtraction_m2",
@@ -798,7 +1057,9 @@
      "ratio_rho": 32.023267986,
      "ratio_floor": 103.162863552,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 5701.47600433,
+     "log2_total_gae": 12.4771197388
     }
    ],
    "best": {
@@ -822,7 +1083,9 @@
     "ratio_rho": 5.4703789656,
     "ratio_floor": 17.6228097349,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 973.955388333,
+    "log2_total_gae": 9.92771188148
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -847,8 +1110,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 178.041666667,
+   "reference_log2_total_gae": 7.47607110096,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -883,7 +1157,9 @@
      "ratio_rho": 6.42943611579,
      "ratio_floor": 14.7534905172,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1665.75974033,
+     "log2_total_gae": 10.7019646143
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -906,7 +1182,9 @@
      "ratio_rho": 7.71007709746,
      "ratio_floor": 17.6921501817,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1997.55247467,
+     "log2_total_gae": 10.9640176872
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -929,7 +1207,9 @@
      "ratio_rho": 8.46569170794,
      "ratio_floor": 19.4260429819,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 2193.31962667,
+     "log2_total_gae": 11.0989003521
     },
     {
      "variant": "mitm_m3_negfold",
@@ -952,7 +1232,9 @@
      "ratio_rho": 9.74813275523,
      "ratio_floor": 22.3688332187,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 2525.578728,
+     "log2_total_gae": 11.3023982992
     },
     {
      "variant": "mitm_m3",
@@ -975,7 +1257,9 @@
      "ratio_rho": 13.7005290241,
      "ratio_floor": 31.4383130025,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3549.578728,
+     "log2_total_gae": 11.7934320971
     },
     {
      "variant": "mitm_m2_negfold",
@@ -998,7 +1282,9 @@
      "ratio_rho": 27.5965858578,
      "ratio_floor": 63.3252995175,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 7149.81545267,
+     "log2_total_gae": 12.8036902889
     },
     {
      "variant": "mitm_m2",
@@ -1021,7 +1307,9 @@
      "ratio_rho": 31.5489821267,
      "ratio_floor": 72.3947793013,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 8173.81545267,
+     "log2_total_gae": 12.9967939554
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -1044,7 +1332,9 @@
      "ratio_rho": 48.966961643,
      "ratio_floor": 112.363447003,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 12686.5236457,
+     "log2_total_gae": 13.6310091764
     },
     {
      "variant": "direct_subtraction_m2",
@@ -1067,7 +1357,9 @@
      "ratio_rho": 59.5344605854,
      "ratio_floor": 136.612462411,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 15424.3864967,
+     "log2_total_gae": 13.912925487
     }
    ],
    "best": {
@@ -1091,7 +1383,9 @@
     "ratio_rho": 6.42943611579,
     "ratio_floor": 14.7534905172,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 1665.75974033,
+    "log2_total_gae": 10.7019646143
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -1116,8 +1410,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 259.083333333,
+   "reference_log2_total_gae": 8.01727240062,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -1152,7 +1457,9 @@
      "ratio_rho": 6.71459717554,
      "ratio_floor": 13.1833060656,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 2978.763172,
+     "log2_total_gae": 11.5404977106
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -1175,7 +1482,9 @@
      "ratio_rho": 12.9292345622,
      "ratio_floor": 25.3850010614,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 5735.73168267,
+     "log2_total_gae": 12.4857618211
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -1198,7 +1507,9 @@
      "ratio_rho": 13.7252611049,
      "ratio_floor": 26.947903686,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 6088.86895767,
+     "log2_total_gae": 12.5719585488
     },
     {
      "variant": "mitm_m3_negfold",
@@ -1221,7 +1532,9 @@
      "ratio_rho": 17.0713844914,
      "ratio_floor": 33.5176155517,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 7573.292945,
+     "log2_total_gae": 12.8867050198
     },
     {
      "variant": "mitm_m3",
@@ -1244,7 +1557,9 @@
      "ratio_rho": 26.3044078783,
      "ratio_floor": 51.6455493709,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 11669.292945,
+     "log2_total_gae": 13.5104295288
     },
     {
      "variant": "mitm_m2_negfold",
@@ -1267,7 +1582,9 @@
      "ratio_rho": 45.3532763069,
      "ratio_floor": 89.0457174128,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 20119.8472017,
+     "log2_total_gae": 14.2963317283
     },
     {
      "variant": "mitm_m2",
@@ -1290,7 +1607,9 @@
      "ratio_rho": 54.5862996938,
      "ratio_floor": 107.173651232,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 24215.8472017,
+     "log2_total_gae": 14.5636638567
     },
     {
      "variant": "direct_subtraction_m2",
@@ -1313,7 +1632,9 @@
      "ratio_rho": 132.562150188,
      "ratio_floor": 260.26987963,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 58807.883877,
+     "log2_total_gae": 15.8437219575
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -1336,7 +1657,9 @@
      "ratio_rho": 348.821832188,
      "ratio_floor": 684.869822551,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 154746.085304,
+     "log2_total_gae": 17.2395433877
     }
    ],
    "best": {
@@ -1360,7 +1683,9 @@
     "ratio_rho": 6.71459717554,
     "ratio_floor": 13.1833060656,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 2978.763172,
+    "log2_total_gae": 11.5404977106
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -1385,8 +1710,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 443.625,
+   "reference_log2_total_gae": 8.79319685906,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -1421,7 +1757,9 @@
      "ratio_rho": 5.81942836101,
      "ratio_floor": 9.49386483879,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 4303.95222533,
+     "log2_total_gae": 12.0714463485
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -1444,7 +1782,9 @@
      "ratio_rho": 8.92566692777,
      "ratio_floor": 14.5614088105,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 6601.27449867,
+     "log2_total_gae": 12.6885288751
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -1467,7 +1807,9 @@
      "ratio_rho": 12.9830036579,
      "ratio_floor": 21.1805824014,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 9602.013122,
+     "log2_total_gae": 13.2291211922
     },
     {
      "variant": "mitm_m3_negfold",
@@ -1490,7 +1832,9 @@
      "ratio_rho": 16.6921913343,
      "ratio_floor": 27.2317826701,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 12345.2665077,
+     "log2_total_gae": 13.591670361
     },
     {
      "variant": "mitm_m3",
@@ -1513,7 +1857,9 @@
      "ratio_rho": 22.2304448554,
      "ratio_floor": 36.2669364877,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 16441.2665077,
+     "log2_total_gae": 14.0050338169
     },
     {
      "variant": "mitm_m2_negfold",
@@ -1536,7 +1882,9 @@
      "ratio_rho": 76.6896976397,
      "ratio_floor": 125.112223873,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 56718.4222127,
+     "log2_total_gae": 15.7915297799
     },
     {
      "variant": "mitm_m2",
@@ -1559,7 +1907,9 @@
      "ratio_rho": 82.2279511608,
      "ratio_floor": 134.147377691,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 60814.4222127,
+     "log2_total_gae": 15.8921258806
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -1582,7 +1932,9 @@
      "ratio_rho": 209.007221319,
      "ratio_floor": 340.976155463,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 154578.257434,
+     "log2_total_gae": 17.2379778823
     },
     {
      "variant": "direct_subtraction_m2",
@@ -1605,7 +1957,9 @@
      "ratio_rho": 253.923354686,
      "ratio_floor": 414.252716805,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 187797.48107,
+     "log2_total_gae": 17.5188181867
     }
    ],
    "best": {
@@ -1629,7 +1983,9 @@
     "ratio_rho": 5.81942836101,
     "ratio_floor": 9.49386483879,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 4303.95222533,
+    "log2_total_gae": 12.0714463485
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -1654,8 +2010,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 739.583333333,
+   "reference_log2_total_gae": 9.53056890345,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -1690,7 +2057,9 @@
      "ratio_rho": 8.30003980861,
      "ratio_floor": 12.0994653284,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 10971.960957,
+     "log2_total_gae": 13.4215337731
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -1713,7 +2082,9 @@
      "ratio_rho": 15.3252118232,
      "ratio_floor": 22.3404794895,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 20258.6529293,
+     "log2_total_gae": 14.3062506269
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -1736,7 +2107,9 @@
      "ratio_rho": 18.1360588673,
      "ratio_floor": 26.4380196384,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 23974.3584843,
+     "log2_total_gae": 14.5492045911
     },
     {
      "variant": "mitm_m3_negfold",
@@ -1759,7 +2132,9 @@
      "ratio_rho": 22.4228929902,
      "ratio_floor": 32.6871945863,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 29641.1959587,
+     "log2_total_gae": 14.855316038
     },
     {
      "variant": "mitm_m3",
@@ -1782,7 +2157,9 @@
      "ratio_rho": 34.8170176829,
      "ratio_floor": 50.7548527486,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 46025.1959587,
+     "log2_total_gae": 15.4901362436
     },
     {
      "variant": "mitm_m2_negfold",
@@ -1805,7 +2182,9 @@
      "ratio_rho": 85.4540152581,
      "ratio_floor": 124.571438045,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 112963.087003,
+     "log2_total_gae": 16.785491894
     },
     {
      "variant": "mitm_m2",
@@ -1828,7 +2207,9 @@
      "ratio_rho": 97.8481399508,
      "ratio_floor": 142.639096208,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 129347.087003,
+     "log2_total_gae": 16.9808880382
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -1851,7 +2232,9 @@
      "ratio_rho": 328.918687394,
      "ratio_floor": 479.484477878,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 434803.094844,
+     "log2_total_gae": 18.7300026837
     },
     {
      "variant": "direct_subtraction_m2",
@@ -1874,7 +2257,9 @@
      "ratio_rho": 406.180436373,
      "ratio_floor": 592.113558526,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 536936.688515,
+     "log2_total_gae": 19.0343924611
     }
    ],
    "best": {
@@ -1898,7 +2283,9 @@
     "ratio_rho": 8.30003980861,
     "ratio_floor": 12.0994653284,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 10971.960957,
+    "log2_total_gae": 13.4215337731
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -1923,8 +2310,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 1321.91666667,
+   "reference_log2_total_gae": 10.3684155172,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -1959,7 +2357,9 @@
      "ratio_rho": 10.5013292937,
      "ratio_floor": 14.4096529965,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 23168.9953097,
+     "log2_total_gae": 14.4999078647
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -1982,7 +2382,9 @@
      "ratio_rho": 32.3030944744,
      "ratio_floor": 44.32547243,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 71270.0481463,
+     "log2_total_gae": 16.1210082785
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -2005,7 +2407,9 @@
      "ratio_rho": 33.8860028345,
      "ratio_floor": 46.4974984237,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 74762.4056703,
+     "log2_total_gae": 16.1900253718
     },
     {
      "variant": "mitm_m3_negfold",
@@ -2028,7 +2432,9 @@
      "ratio_rho": 39.5901240409,
      "ratio_floor": 54.3245463083,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 87347.3607537,
+     "log2_total_gae": 16.4144764916
     },
     {
      "variant": "mitm_m3",
@@ -2051,7 +2457,9 @@
      "ratio_rho": 69.2942656057,
      "ratio_floor": 95.0838026401,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 152883.360754,
+     "log2_total_gae": 17.2220718722
     },
     {
      "variant": "mitm_m2_negfold",
@@ -2074,7 +2482,9 @@
      "ratio_rho": 114.697861411,
      "ratio_floor": 157.385444846,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 253056.935815,
+     "log2_total_gae": 17.9491024909
     },
     {
      "variant": "mitm_m2",
@@ -2097,7 +2507,9 @@
      "ratio_rho": 144.402002975,
      "ratio_floor": 198.144701177,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 318592.935815,
+     "log2_total_gae": 18.2813547527
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -2120,7 +2532,9 @@
      "ratio_rho": 631.133833716,
      "ratio_floor": 866.025555794,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1392465.31788,
+     "log2_total_gae": 20.4092099641
     },
     {
      "variant": "direct_subtraction_m2",
@@ -2143,7 +2557,9 @@
      "ratio_rho": 797.955439935,
      "ratio_floor": 1094.93385785,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1760522.4375,
+     "log2_total_gae": 20.7475721835
     }
    ],
    "best": {
@@ -2167,7 +2583,9 @@
     "ratio_rho": 10.5013292937,
     "ratio_floor": 14.4096529965,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 23168.9953097,
+    "log2_total_gae": 14.4999078647
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -2192,8 +2610,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 2206.29166667,
+   "reference_log2_total_gae": 11.1074078092,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -2228,7 +2657,9 @@
      "ratio_rho": 13.4551392317,
      "ratio_floor": 15.7585571249,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 46179.1591047,
+     "log2_total_gae": 15.4949542823
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -2251,7 +2682,9 @@
      "ratio_rho": 23.937931735,
      "ratio_floor": 28.0359242816,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 82156.976542,
+     "log2_total_gae": 16.3260954696
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -2274,7 +2707,9 @@
      "ratio_rho": 30.5117271648,
      "ratio_floor": 35.7351036825,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 104718.790274,
+     "log2_total_gae": 16.6761608107
     },
     {
      "variant": "mitm_m3_negfold",
@@ -2297,7 +2732,9 @@
      "ratio_rho": 35.6437936519,
      "ratio_floor": 41.7457410689,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 122332.470129,
+     "log2_total_gae": 16.9004478569
     },
     {
      "variant": "mitm_m3",
@@ -2320,7 +2757,9 @@
      "ratio_rho": 54.7389010939,
      "ratio_floor": 64.1097862304,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 187868.470129,
+     "log2_total_gae": 17.5193634347
     },
     {
      "variant": "mitm_m2_negfold",
@@ -2343,7 +2782,9 @@
      "ratio_rho": 239.383410805,
      "ratio_floor": 280.36403704,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 821583.814502,
+     "log2_total_gae": 19.6480482348
     },
     {
      "variant": "mitm_m2",
@@ -2366,7 +2807,9 @@
      "ratio_rho": 258.478518247,
      "ratio_floor": 302.728082202,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 887119.814502,
+     "log2_total_gae": 19.7587694427
     },
     {
      "variant": "direct_subtraction_m2",
@@ -2389,7 +2832,9 @@
      "ratio_rho": 1962.11936434,
      "ratio_floor": 2298.01933346,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 6734157.16836,
+     "log2_total_gae": 22.6830659619
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -2412,7 +2857,9 @@
      "ratio_rho": 4922.18464752,
      "ratio_floor": 5764.8253661,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 16893347.8923,
+     "log2_total_gae": 24.0099519313
     }
    ],
    "best": {
@@ -2436,7 +2883,9 @@
     "ratio_rho": 13.4551392317,
     "ratio_floor": 15.7585571249,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 46179.1591047,
+    "log2_total_gae": 15.4949542823
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -2461,8 +2910,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 3432.08333333,
+   "reference_log2_total_gae": 11.7448688675,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "char2",
@@ -2497,7 +2957,9 @@
      "ratio_rho": 13.0691610083,
      "ratio_floor": 29.6921080126,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3361.497121,
+     "log2_total_gae": 11.7148881986
     },
     {
      "variant": "mitm_m2_negfold_walk_balanced",
@@ -2520,7 +2982,9 @@
      "ratio_rho": 15.1357733135,
      "ratio_floor": 34.3872889616,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3893.04702767,
+     "log2_total_gae": 11.9266840571
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -2543,7 +3007,9 @@
      "ratio_rho": 26.3775334068,
      "ratio_floor": 59.9276855281,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 6784.521405,
+     "log2_total_gae": 12.728031333
     },
     {
      "variant": "mitm_m3_negfold",
@@ -2566,7 +3032,9 @@
      "ratio_rho": 33.3861824474,
      "ratio_floor": 75.8507860398,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 8587.20434367,
+     "log2_total_gae": 13.0679728076
     },
     {
      "variant": "mitm_m3",
@@ -2589,7 +3057,9 @@
      "ratio_rho": 34.2609597032,
      "ratio_floor": 77.8382113037,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 8812.20434367,
+     "log2_total_gae": 13.1052872343
     },
     {
      "variant": "mitm_m2_negfold",
@@ -2612,7 +3082,9 @@
      "ratio_rho": 97.4741984682,
      "ratio_floor": 221.453728172,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 25071.176131,
+     "log2_total_gae": 14.6137420566
     },
     {
      "variant": "semaev_s4_pairs_and_solve_m3",
@@ -2635,7 +3107,9 @@
      "ratio_rho": 677.440361764,
      "ratio_floor": 1539.09132965,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 174243.306382,
+     "log2_total_gae": 17.41074371
     }
    ],
    "best": {
@@ -2659,7 +3133,9 @@
     "ratio_rho": 13.0691610083,
     "ratio_floor": 29.6921080126,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 3361.497121,
+    "log2_total_gae": 11.7148881986
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -2684,8 +3160,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 257.208333333,
+   "reference_log2_total_gae": 8.0067935753,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "char2",
@@ -2720,7 +3207,9 @@
      "ratio_rho": 10.6210696509,
      "ratio_floor": 24.039779727,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3853.678105,
+     "log2_total_gae": 11.912020354
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -2743,7 +3232,9 @@
      "ratio_rho": 17.3842790565,
      "ratio_floor": 39.3476601668,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 6307.59591767,
+     "log2_total_gae": 12.6228745246
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -2766,7 +3257,9 @@
      "ratio_rho": 29.3949930345,
      "ratio_floor": 66.5327674945,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 10665.483306,
+     "log2_total_gae": 13.3806617224
     },
     {
      "variant": "mitm_m3_negfold",
@@ -2789,7 +3282,9 @@
      "ratio_rho": 37.0504255664,
      "ratio_floor": 83.8601100157,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 13443.1294097,
+     "log2_total_gae": 13.7145814
     },
     {
      "variant": "mitm_m3",
@@ -2812,7 +3307,9 @@
      "ratio_rho": 39.8726579963,
      "ratio_floor": 90.2479643641,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 14467.1294097,
+     "log2_total_gae": 13.820491068
     },
     {
      "variant": "mitm_m2_negfold",
@@ -2835,7 +3332,9 @@
      "ratio_rho": 112.65632581,
      "ratio_floor": 254.986865386,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 40875.4702147,
+     "log2_total_gae": 15.3189477064
     },
     {
      "variant": "semaev_s4_pairs_and_solve_m3",
@@ -2858,7 +3357,9 @@
      "ratio_rho": 1358.14149747,
      "ratio_floor": 3074.02394585,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 492779.006667,
+     "log2_total_gae": 18.9105812702
     }
    ],
    "best": {
@@ -2882,7 +3383,9 @@
     "ratio_rho": 10.6210696509,
     "ratio_floor": 24.039779727,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 3853.678105,
+    "log2_total_gae": 11.912020354
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -2907,8 +3410,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 362.833333333,
+   "reference_log2_total_gae": 8.50316319147,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "char2",
@@ -2943,7 +3457,9 @@
      "ratio_rho": 17.9863625497,
      "ratio_floor": 27.5218755217,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 24960.5746283,
+     "log2_total_gae": 14.607363527
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -2966,7 +3482,9 @@
      "ratio_rho": 18.3968008063,
      "ratio_floor": 28.1499085983,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 25530.160319,
+     "log2_total_gae": 14.6399149769
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -2989,7 +3507,9 @@
      "ratio_rho": 47.8123035564,
      "ratio_floor": 73.1601102362,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 66351.5242603,
+     "log2_total_gae": 16.0178419878
     },
     {
      "variant": "mitm_m3_negfold",
@@ -3012,7 +3532,9 @@
      "ratio_rho": 57.0390005455,
      "ratio_floor": 87.2783626239,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 79155.873007,
+     "log2_total_gae": 16.2724087753
     },
     {
      "variant": "mitm_m3",
@@ -3035,7 +3557,9 @@
      "ratio_rho": 59.7203192268,
      "ratio_floor": 91.3811887944,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 82876.873007,
+     "log2_total_gae": 16.3386819499
     },
     {
      "variant": "mitm_m2_negfold",
@@ -3058,7 +3582,9 @@
      "ratio_rho": 410.911197196,
      "ratio_floor": 628.7567477,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 570242.013908,
+     "log2_total_gae": 19.1212148115
     },
     {
      "variant": "semaev_s4_pairs_and_solve_m3",
@@ -3081,7 +3607,9 @@
      "ratio_rho": 6283.44735657,
      "ratio_floor": 9614.63194778,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 8719854.06907,
+     "log2_total_gae": 23.0558725603
     }
    ],
    "best": {
@@ -3105,7 +3633,9 @@
     "ratio_rho": 17.9863625497,
     "ratio_floor": 27.5218755217,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 24960.5746283,
+    "log2_total_gae": 14.607363527
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -3130,8 +3660,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 1387.75,
+   "reference_log2_total_gae": 10.4385319778,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "char2",
@@ -3166,7 +3707,9 @@
      "ratio_rho": 23.0252484646,
      "ratio_floor": 30.7374595764,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 39451.8444733,
+     "log2_total_gae": 15.267805131
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -3189,7 +3732,9 @@
      "ratio_rho": 32.1470255287,
      "ratio_floor": 42.9145378914,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 55081.2493247,
+     "log2_total_gae": 15.7492736619
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -3212,7 +3757,9 @@
      "ratio_rho": 67.0937072514,
      "ratio_floor": 89.5664651631,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 114959.476233,
+     "log2_total_gae": 16.8107658683
     },
     {
      "variant": "mitm_m3_negfold",
@@ -3235,7 +3782,9 @@
      "ratio_rho": 75.1278244897,
      "ratio_floor": 100.291576522,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 128725.266611,
+     "log2_total_gae": 16.9739357326
     },
     {
      "variant": "mitm_m3",
@@ -3258,7 +3807,9 @@
      "ratio_rho": 86.0819609616,
      "ratio_floor": 114.914755399,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 147494.266611,
+     "log2_total_gae": 17.1702993496
     },
     {
      "variant": "mitm_m2_negfold",
@@ -3281,7 +3832,9 @@
      "ratio_rho": 579.625382968,
      "ratio_floor": 773.768491831,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 993139.791601,
+     "log2_total_gae": 19.9216372762
     },
     {
      "variant": "semaev_s4_pairs_and_solve_m3",
@@ -3304,7 +3857,9 @@
      "ratio_rho": 15491.5670405,
      "ratio_floor": 20680.4029244,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 26543509.1599,
+     "log2_total_gae": 24.6618557777
     }
    ],
    "best": {
@@ -3328,7 +3883,9 @@
     "ratio_rho": 23.0252484646,
     "ratio_floor": 30.7374595764,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 39451.8444733,
+    "log2_total_gae": 15.267805131
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -3353,8 +3910,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 1713.41666667,
+   "reference_log2_total_gae": 10.7426603116,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "char2",
@@ -3389,7 +3957,9 @@
      "ratio_rho": 38.2107763087,
      "ratio_floor": 41.6703628679,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 174655.090044,
+     "log2_total_gae": 17.4141491628
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -3412,7 +3982,9 @@
      "ratio_rho": 43.1421342165,
      "ratio_floor": 47.0482037103,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 197195.505148,
+     "log2_total_gae": 17.5892671419
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -3435,7 +4007,9 @@
      "ratio_rho": 175.211955466,
      "ratio_floor": 191.075567376,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 800864.646443,
+     "log2_total_gae": 19.6111989088
     },
     {
      "variant": "mitm_m3_negfold",
@@ -3458,7 +4032,9 @@
      "ratio_rho": 198.070223424,
      "ratio_floor": 216.003412669,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 905345.979565,
+     "log2_total_gae": 19.7881097005
     },
     {
      "variant": "mitm_m3",
@@ -3481,7 +4057,9 @@
      "ratio_rho": 213.202912576,
      "ratio_floor": 232.506208713,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 974514.979565,
+     "log2_total_gae": 19.8943248362
     },
     {
      "variant": "mitm_m2_negfold",
@@ -3504,7 +4082,9 @@
      "ratio_rho": 1701.71195065,
      "ratio_floor": 1855.78418788,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 7778241.70775,
+     "log2_total_gae": 22.8910126363
     },
     {
      "variant": "semaev_s4_pairs_and_solve_m3",
@@ -3527,7 +4107,9 @@
      "ratio_rho": 119465.415276,
      "ratio_floor": 130281.760426,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 546056502.326,
+     "log2_total_gae": 29.0244749985
     }
    ],
    "best": {
@@ -3551,7 +4133,9 @@
     "ratio_rho": 38.2107763087,
     "ratio_floor": 41.6703628679,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 174655.090044,
+    "log2_total_gae": 17.4141491628
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -3576,8 +4160,19 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 4570.83333333,
+   "reference_log2_total_gae": 12.1582414995,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "koblitz",
@@ -3692,7 +4287,15 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -3808,7 +4411,15 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -3924,7 +4535,15 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4040,7 +4659,15 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4156,7 +4783,15 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4272,7 +4907,15 @@
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4404,8 +5047,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4537,8 +5189,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4670,8 +5331,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4803,8 +5473,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4936,8 +5615,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -5069,8 +5757,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -5202,8 +5899,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -5335,8 +6041,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -5468,8 +6183,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   }
  ],

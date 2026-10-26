@@ -90,7 +90,7 @@ ARCHIVED_LABELS = {
         },
     },
     "docs/index-calculus-scoreboard.html": {
-        "sha256": "2bb7fb8d2e1cf44ed7078ef76785d278d704b6eb083dd7c7ce6367dbc6ee8af7",
+        "sha256": "3f50052881c11ffb20d39d5cb1f1692034228ee1c2b13dfb35e10fbe3169873e",
         "labels": {},
         "slugs": {"icv1-fp30-t49927-d70f5de2"},
     },

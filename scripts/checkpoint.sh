@@ -280,7 +280,8 @@ cmd_push() {
   if git rev-parse --verify -q HEAD >/dev/null; then
     unpushed="$(git rev-list --count HEAD --not --remotes)"
     if [ "$unpushed" -gt 0 ]; then
-      git bundle create -q "$stage/branch.bundle" HEAD --not --remotes
+      git bundle create -q "$stage/branch.bundle" HEAD --not --remotes \
+        || die "failed to bundle unpushed commits; nothing was checkpointed"
     fi
     git diff --binary HEAD > "$stage/worktree.patch"
     [ -s "$stage/worktree.patch" ] || rm -f "$stage/worktree.patch"
