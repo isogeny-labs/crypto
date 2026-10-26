@@ -424,3 +424,18 @@ Sources: [fall degree PR 2214](https://github.com/aburan28/crypto/pull/2214),
 [guessing PR 2429](https://github.com/aburan28/crypto/pull/2429),
 [cryptanalysis structured bases](https://github.com/aburan28/cryptanalysis/tree/claude/cryptanalysis-repo-setup-p59kek/experiments/pdp-degree-heuristics),
 [historical quartic study](../gaudry_quartic_d4_char2_20261015/README.md).
+
+## 2026-10-26 native independent replay continuation
+
+The old Python-orchestrated batch is stopped after four actual900s caps, with
+complete immutable evidence. The native Rust controller passes11tests, strict
+all-target lint and release build. Its new122-tuple/244-child protocol froze
+before new data; original science executable, inputs, caps and order remain
+fixed. The first actual native child hky/d0-k1-b1 started22:35:44UTC after quiet
+S3 checkpoint and actual archive/meta/resume/Git-bundle readback. This running
+launch snapshot does not establish a completed independent replay or full cost.
+See [native transition and launch](NATIVE_HKY_CONTINUATION_20261026.md), the
+[frozen protocol](protocol-hky-native-resume-20261026.json) and
+[current publication packet](PUBLISH_REVIEW.md). Four legacy caps remain
+separate, with no retry or prospective import. Existing figures and leaderboard
+values stay unchanged: no new performance or degree-law result is admitted.

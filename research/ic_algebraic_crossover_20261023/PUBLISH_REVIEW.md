@@ -25,9 +25,11 @@ and public source9a4a9f72694ebc7340da0a7f0acaf4a5e2d318dd share full tree
 
 [The transition record](NATIVE_HKY_CONTINUATION_20261026.md) links source gates,
 unchanged scientific instrument, actual archive receipts and the prospectively
-frozen122-tuple/244-child continuation. At protocol publication the new batch
-has not launched: its frozen execution worktree and quiet official checkpoint/
-actual readback are required first. Legacy caps are never retried or imported
+frozen122-tuple/244-child continuation. Its first native child started
+at22:35:44UTC after a quiet official checkpoint and actual archive/meta/resume/
+source-bundle readback. The linked launch receipt records actual running
+processes from frozen78006ffa1200 source; no completed replay or final export
+is asserted. Legacy caps are never retried or imported
 as prospective rows. All clocks remain invalid for speed inference; unknown
 original/independent costs stay unknown.
 

@@ -64,6 +64,17 @@ Its final export is atomic and write-once. Raw records will be in
 `pipeline-receipts/completed-guess-hky-native-resume-20261026`; the final export
 will be `exports/hky-native-resume-20261026/export.json` after244closed outcomes.
 
+Launch update: first actual native child `hky/d0-k1-b1` started at22:35:44UTC
+from dedicated frozen source `78006ffa1200db52d5d199c661c8addae0c6820c`.
+Public equivalent `c77e5bf6222b1c943421595d232b0dae9a0f434f` has identical
+full tree `e5fef382b04feea7ee484d8c3695917d267c9849`. Runner72258/PGID72254
+and the first scientific child were live at the22:36:30observation. The
+[launch receipt](pipeline-receipts/native-hky-launch-20261026/launch.json) binds
+the quiet prelaunch checkpoint223431Z and actual archive/meta/resume/source-bundle
+GET/hash verification with bundle-verify exit0. Before-case checkpoints223541Z
+and223544Z also passed. This snapshot is not a completed replay or final export;
+subsequent per-child records determine progress.
+
 The original producer census remains78refutations/45nonrefuting fixed points/
 one timeout, with registered-prefix minima4/4/4/0 only. No general subset
 minimum, stacked GP/closure gain, complete projected-query price, independent
