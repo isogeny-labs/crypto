@@ -112,14 +112,12 @@ jobs:
           - {target: x86_64-pc-windows-msvc,    os: windows-latest}
     runs-on: ${{ matrix.os }}
     # Windows needs more than Linux: run 40259290676 (PR #2588 head 7f5ca198d)
-    # cancelled this leg at the 25-minute pull-request cap while its release
-    # build was still running (23m51s in), against 16m33s for Linux gnu in that run.
-    # Pull requests and the merge queue keep the 25-minute cap and run
-    # only a type-check on Windows (WINDOWS_PR_CHECK_ONLY); the full build, smoke
-    # test and archive run on push and workflow_dispatch with 60 minutes.
+    # cancelled this leg at the old 25-minute pull-request cap while its release
+    # build was still running (23m51s in), against 16m33s for Linux gnu in that
+    # run. Release no longer runs on pull requests, so what matters now is push
+    # and workflow_dispatch: 60 minutes for Windows (an estimate, about 1.5x the
+    # ratio-scaled build time; measure it with a dispatch run), 45 for the rest.
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || (matrix.os == 'windows-latest' && 60 || 45) }}
-    env:
-      WINDOWS_PR_CHECK_ONLY: ${{ matrix.os == 'windows-latest' && (github.event_name == 'pull_request' || github.event_name == 'merge_group') }}
     steps:
       - name: Require successful scope classification
         if: needs.scope.result != 'success' || needs.meta.result != 'success'
@@ -168,7 +166,7 @@ jobs:
         with:
           key: release-${{ matrix.target }}
       - name: Build release binaries with source provenance
-        if: env.WINDOWS_PR_CHECK_ONLY != 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         env:
           CRYPTO_BUILD_GIT_COMMIT: ${{ github.sha }}
           CRYPTO_BUILD_GIT_DIRTY: "false"
@@ -180,23 +178,8 @@ jobs:
           --bin curve_standards --bin hyperelliptic-cover --bin ecdlp-audit
           --bin factor-base-sweep
           --target ${{ matrix.target }}
-      # Pull-request and merge-queue stand-in for the build above on Windows: it
-      # compiles every cfg(windows) path (the getrusage break of #889 was one)
-      # without code generation, which is most of the build's time. UNVERIFIED on
-      # a Windows runner: dispatch this workflow to measure it and the full leg.
-      - name: Type-check the Windows build (pull requests and merge queue)
-        if: env.WINDOWS_PR_CHECK_ONLY == 'true' && needs.scope.outputs.release_rust != 'false'
-        env:
-          CRYPTO_BUILD_GIT_COMMIT: ${{ github.sha }}
-          CRYPTO_BUILD_GIT_DIRTY: "false"
-        run: >-
-          cargo check --locked --release
-          --bin crypto --bin ic --bin ecbench --bin curve_cover_check
-          --bin curve_standards --bin hyperelliptic-cover --bin ecdlp-audit
-          --bin factor-base-sweep
-          --target ${{ matrix.target }}
       - name: Smoke-test the binaries
-        if: env.WINDOWS_PR_CHECK_ONLY != 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         # Every target in the matrix is native to its runner, so the
         # binaries must start here.
         shell: bash
@@ -222,7 +205,7 @@ jobs:
             > ecbench-host-smoke.json
           grep -Fq '"git_commit": "'"$GITHUB_SHA"'"' ecbench-host-smoke.json
       - name: Stage the archive
-        if: env.WINDOWS_PR_CHECK_ONLY != 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         shell: bash
         run: |
           name="crypto-${{ needs.meta.outputs.tag }}-${{ matrix.target }}"
@@ -303,7 +286,7 @@ jobs:
             tar czf "$name.tar.gz" "$name"
           fi
           rm -rf "$name"
-      - if: env.WINDOWS_PR_CHECK_ONLY != 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
+      - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         uses: actions/upload-artifact@v4
         with:
           name: rust-${{ matrix.target }}
@@ -324,17 +307,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     # Measured in run 40259290676 (PR #2588 head 7f5ca198d), now that the
     # builds really run: Linux gnu took 36m25s (step 9 23m37s, soft-hash step
-    # 10m07s), musl 24m37s, macOS 23m36s. Windows was cancelled at the 45-minute
-    # cap with step 9 still compiling isogeny_algos (41m42s in; its first two cargo
-    # commands alone took 29m19s against 14m54s on Linux gnu, about 2x). By that
-    # ratio the whole Windows leg needs roughly 70 minutes, so it gets 120 on push
-    # and workflow_dispatch (an estimate: tighten it after a dispatch run) and only
-    # a type-check, inside 25 minutes, on pull requests and in the merge queue.
-    # Linux and macOS keep 45 on pull requests (the named exception in
-    # .github/scripts/check-pr-budgets.py) and 50 otherwise.
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && (matrix.os == 'windows-latest' && 25 || 45) || (matrix.os == 'windows-latest' && 120 || 50) }}
-    env:
-      WINDOWS_PR_CHECK_ONLY: ${{ matrix.os == 'windows-latest' && (github.event_name == 'pull_request' || github.event_name == 'merge_group') }}
+    # 10m07s), musl 24m37s, macOS 23m36s. Windows was cancelled at the old
+    # 45-minute cap with step 9 still compiling isogeny_algos (41m42s in; its
+    # first two cargo commands alone took 29m19s against 14m54s on Linux gnu,
+    # about 2x). By that ratio the whole Windows leg needs roughly 70 minutes, so
+    # it gets 120 (an estimate: tighten it after a dispatch run). The other
+    # platforms keep their caps.
+    timeout-minutes: ${{ matrix.os == 'windows-latest' && 120 || ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 50) }}
     steps:
       # Keep Cargo output outside the package tree while it is fingerprinted.
       # `runner.temp` is not available in job-level `env`, so set it per job.
@@ -364,7 +343,7 @@ jobs:
           workspaces: tools/isogeny-cli
           cache-targets: false
       - name: Build and test the dedicated executable
-        if: env.WINDOWS_PR_CHECK_ONLY != 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         # bash (-e) so a failing cargo command fails the step on Windows too; the default
         # pwsh only reports the last native command, which hid two failing isogeny-cli
         # commands behind two passing isogeny_algos ones.
@@ -377,20 +356,8 @@ jobs:
           cargo test --locked --release --manifest-path tools/isogeny-cli/Cargo.toml --target ${{ matrix.target }}
           cargo build --locked --release --manifest-path isogeny_algos/Cargo.toml --target ${{ matrix.target }} --bin isogeny-perf
           cargo test --locked --release --manifest-path isogeny_algos/Cargo.toml --target ${{ matrix.target }} --bin isogeny-perf
-      # Pull-request and merge-queue stand-in for the step above on Windows: it
-      # type-checks the same crates, tests included, without code generation.
-      # UNVERIFIED on a Windows runner; dispatch this workflow to measure it.
-      - name: Type-check the Windows build (pull requests and merge queue)
-        if: env.WINDOWS_PR_CHECK_ONLY == 'true' && needs.scope.outputs.release_rust != 'false'
-        shell: bash
-        env:
-          CRYPTO_BUILD_GIT_COMMIT: ${{ github.sha }}
-          CRYPTO_BUILD_GIT_DIRTY: "false"
-        run: |
-          cargo check --locked --release --manifest-path tools/isogeny-cli/Cargo.toml --target ${{ matrix.target }} --bins --tests
-          cargo check --locked --release --manifest-path isogeny_algos/Cargo.toml --target ${{ matrix.target }} --bin isogeny-perf
       - name: Check the portable receipt-hash fallback
-        if: env.WINDOWS_PR_CHECK_ONLY != 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         env:
           RUSTFLAGS: '--cfg sha2_256_backend="soft"'
           CARGO_TARGET_DIR: ${{ runner.temp }}/isogeny-software-hash
@@ -398,7 +365,7 @@ jobs:
           CRYPTO_BUILD_GIT_DIRTY: "false"
         run: cargo test --locked --release --manifest-path tools/isogeny-cli/Cargo.toml --target ${{ matrix.target }} --bin isogeny receipt_hashes_match_the_independent_reference_at_padding_boundaries
       - name: Test the installed executable without a checkout
-        if: env.WINDOWS_PR_CHECK_ONLY != 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         shell: bash
         run: |
           ext=""
@@ -425,7 +392,7 @@ jobs:
           "./isogeny$ext" search --curve P-521 --ell 7 --out p521-7 --timeout 180 > wide-result.json
           grep -Fq '"degree_coverage": "COMPLETE"' wide-result.json
       - name: Stage the dedicated tool archive
-        if: env.WINDOWS_PR_CHECK_ONLY != 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         shell: bash
         run: |
           name="isogeny-${{ needs.meta.outputs.tag }}-${{ matrix.target }}"
@@ -447,7 +414,7 @@ jobs:
           fi
           rm -rf "$name"
       - uses: actions/upload-artifact@v4
-        if: env.WINDOWS_PR_CHECK_ONLY != 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false')
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         with:
           name: isogeny-${{ matrix.target }}
           path: dist/*

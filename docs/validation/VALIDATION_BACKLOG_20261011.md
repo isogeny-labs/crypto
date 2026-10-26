@@ -11,6 +11,17 @@ Corrected 2026-10-26 after an independent review of #2588 and the first CI run o
 its head (section 6 lists every correction). The Release row and section 3.3 had
 called the Windows work "fixed"; the CI run shows it is not confirmed.
 
+Workflow triggers also changed under this document the same day. `02f2bb3a4c`
+("Run only the merge set on pull requests", merged to `main` at 11:54 PDT) made
+pull requests run only the gate, size and artifact checks and moved "the research
+workflows, Rust builds, ecbench, CodeQL, and the release dry run" to pushes to
+`main` and their schedules; `release.yml`, `rust-lint.yml`, `ic-e2e-benchmark.yml`,
+`boolean-f5-support-aware.yml` and `ecc2k130-pdp-difficulty-outcome.yml` were
+checked here and are push/dispatch-only now. Statements below about what a pull
+request triggers describe `main` at `71dd7db5c` unless they say otherwise. After the
+change none of these checks runs on a pull request, so the fixes in the follow-up
+branch are first exercised on `main` or by `workflow_dispatch`.
+
 ## 1. Status of the named classes
 
 | Class | Workflow | On `main` today | First failing step and error | Root cause | In this PR |
@@ -18,11 +29,11 @@ called the Windows work "fixed"; the CI run shows it is not confirmed.
 | Koblitz stage audits | `koblitz-stage*.yml` (119 files) | Not running. All 119 files are `workflow_dispatch`-only (**local**). Four of four sampled (stages 43, 99, 100, 145) are `disabled_manually`, last updated 2026-10-09 22:05-22:07 PDT (**API**) | None found. The recorded stage-100 outcomes are success ([38007448729](https://github.com/isogeny-labs/crypto/actions/runs/38007448729), [38007636058](https://github.com/isogeny-labs/crypto/actions/runs/38007636058), [38007861947](https://github.com/isogeny-labs/crypto/actions/runs/38007861947), 2026-10-10 00:04-00:10Z) and cancelled ([38025808784](https://github.com/isogeny-labs/crypto/actions/runs/38025808784), 04:56Z) | Runner starvation, section 2; no defect in the audits was observed | Nothing. The re-enable step in #1624's test plan has not been done (needs a repo admin) |
 | Point-decomposition validation | `ecc2k130-pdp-difficulty-outcome.yml` and `ecc2k130-pdp-difficulty-protocol.yml` | **Red** since 2026-10-08: [37797691034](https://github.com/isogeny-labs/crypto/actions/runs/37797691034); latest [40251433888](https://github.com/isogeny-labs/crypto/actions/runs/40251433888) (replay) and [40251434039](https://github.com/isogeny-labs/crypto/actions/runs/40251434039) (input freeze). Last green [36819153570](https://github.com/isogeny-labs/crypto/actions/runs/36819153570) (2026-10-01) | `verify.py` line 191: `AssertionError: .github/workflows/ecc2k130-pdp-difficulty-protocol.yml`; the freeze job fails identically at `source_preflight.py` line 28 (**log**) | The sealed `SOURCE_LOCK.json` pins that workflow file's bytes (sha256 `2a1aed2f...`). PR #1116 (merge `761f509e8`, 2026-10-08) added an `outcome` job to the file; then the runner-routing script (`c1897c2c7`, 10-20) and the org-runner PRs (`09379b70e`, `b94618d7a`, 10-25) rewrote its `runs-on` (**log + local**) | **Fixed.** File restored to the pinned bytes; the `check_score.py` recompute moved into the unpinned outcome workflow; the file added to the router's `SEALED` list |
 | Boolean F5 correctness | `boolean-f5-graded-batch.yml` | Not running: retired to `workflow_dispatch` on 2026-10-11 (comment in the file). Last run [38186739539](https://github.com/isogeny-labs/crypto/actions/runs/38186739539), cancelled, 2026-10-12 | Step "Mathematical and native verifier tests": `error: cannot update the lock file /home/runner/work/crypto/crypto/research/boolean_f5_graded_batch_20261002/Cargo.lock because --locked was passed to prevent this` ([38038835875](https://github.com/isogeny-labs/crypto/actions/runs/38038835875), **log**; the other four failing runs in the brief were not re-read) | The study's lock is stale against the root `crypto` path dependency. Reproduced today: `cargo metadata --locked --manifest-path research/boolean_f5_graded_batch_20261002/Cargo.toml` exits 101 with the same message (**local**). The F5 tests themselves never ran, so this says nothing about F5 correctness | **Not fixed**, section 3.5 |
-| Boolean F5 support-aware batch | `boolean-f5-support-aware.yml` (runs `correctness` on push and PR; the qualified phases are `workflow_dispatch`-only) | **Red** on 2026-10-26: [40251433848](https://github.com/isogeny-labs/crypto/actions/runs/40251433848) (push, `8bdcd6d0`, 00:52Z) failed on the lock in 3 minutes. The five runs listed from 05:19Z to 10:46Z (for example [40310005070](https://github.com/isogeny-labs/crypto/actions/runs/40310005070)) end in 3-4 s with no step and no retrievable log, so they never reached a runner; why was not determined, and the lock cannot be the reason. The earlier runs 464-468 were not read | Step "Mathematical and native verifier tests": `error: cannot update the lock file /home/runner/work/crypto/crypto/research/boolean_f5_support_aware_20261002/Cargo.lock because --locked was passed to prevent this` (**log**) | The `volcano-cli` entry in the study's lock lacks `libc`, while `tools/volcano-cli/Cargo.toml` has `libc = "0.2"`. Reproduced: `cargo metadata --locked --manifest-path research/boolean_f5_support_aware_20261002/Cargo.toml` exits 101 with the same message (**local**). The lock is not sealed (section 3.5) | **Fixed in the follow-up PR**: lock regenerated by cargo, one line; `--locked` passes (**local**); CI not seen |
-| End-to-end benchmark replays | `ic-e2e-benchmark.yml` | Green on every PR head seen: [39197463074](https://github.com/isogeny-labs/crypto/actions/runs/39197463074), [39197392208](https://github.com/isogeny-labs/crypto/actions/runs/39197392208), [39197037341](https://github.com/isogeny-labs/crypto/actions/runs/39197037341), [39195494664](https://github.com/isogeny-labs/crypto/actions/runs/39195494664), [39194714471](https://github.com/isogeny-labs/crypto/actions/runs/39194714471) (2026-10-19); earlier [38047256939](https://github.com/isogeny-labs/crypto/actions/runs/38047256939), [38041236113](https://github.com/isogeny-labs/crypto/actions/runs/38041236113), [38145202544](https://github.com/isogeny-labs/crypto/actions/runs/38145202544). **It never runs on a push to `main`**: triggers are `merge_group`, `pull_request` path filters and `workflow_dispatch` | None | n/a | Nothing |
+| Boolean F5 support-aware batch | `boolean-f5-support-aware.yml` (`correctness` ran on push and PR and now runs on push to `main` only; the qualified phases are `workflow_dispatch`-only) | **Red** on 2026-10-26: [40251433848](https://github.com/isogeny-labs/crypto/actions/runs/40251433848) (push, `8bdcd6d0`, 00:52Z) failed on the lock in 3 minutes. The five runs listed from 05:19Z to 10:46Z (for example [40310005070](https://github.com/isogeny-labs/crypto/actions/runs/40310005070)) end in 3-4 s with no step and no retrievable log, so they never reached a runner; why was not determined, and the lock cannot be the reason. The earlier runs 464-468 were not read | Step "Mathematical and native verifier tests": `error: cannot update the lock file /home/runner/work/crypto/crypto/research/boolean_f5_support_aware_20261002/Cargo.lock because --locked was passed to prevent this` (**log**) | The `volcano-cli` entry in the study's lock lacks `libc`, while `tools/volcano-cli/Cargo.toml` has `libc = "0.2"`. Reproduced: `cargo metadata --locked --manifest-path research/boolean_f5_support_aware_20261002/Cargo.toml` exits 101 with the same message (**local**). The lock is not sealed (section 3.5) | **Fixed in the follow-up PR**: lock regenerated by cargo, one line; `--locked` passes (**local**); CI not seen |
+| End-to-end benchmark replays | `ic-e2e-benchmark.yml` | Green on every PR head seen: [39197463074](https://github.com/isogeny-labs/crypto/actions/runs/39197463074), [39197392208](https://github.com/isogeny-labs/crypto/actions/runs/39197392208), [39197037341](https://github.com/isogeny-labs/crypto/actions/runs/39197037341), [39195494664](https://github.com/isogeny-labs/crypto/actions/runs/39195494664), [39194714471](https://github.com/isogeny-labs/crypto/actions/runs/39194714471) (2026-10-19); earlier [38047256939](https://github.com/isogeny-labs/crypto/actions/runs/38047256939), [38041236113](https://github.com/isogeny-labs/crypto/actions/runs/38041236113), [38145202544](https://github.com/isogeny-labs/crypto/actions/runs/38145202544). At `71dd7db5c` it **never ran on a push to `main`**: its triggers were `merge_group`, `pull_request` path filters and `workflow_dispatch`. Since `02f2bb3a4c` it is the other way round (push to `main` and `workflow_dispatch` only) | None | n/a | Nothing |
 | Solver evidence replay | `ecc2k130-m83-solver-matrix.yml` | Retired to `workflow_dispatch` 2026-10-11. Last success [36514128401](https://github.com/isogeny-labs/crypto/actions/runs/36514128401) (2026-09-29) | None | n/a. Re-run locally today with the workflow's own two steps: `{"verified_files": 131, ... "original_runner_hash_matched": true}`, and `summarize.py` leaves `validated_summary.json` unchanged (**local**) | Nothing |
 | Rust lint | `rust-lint.yml` | **Red**: [40251944571](https://github.com/isogeny-labs/crypto/actions/runs/40251944571) (`57d03de2`), [40251434049](https://github.com/isogeny-labs/crypto/actions/runs/40251434049) (`8bdcd6d0`). The run on `71dd7db5c` ([40253272287](https://github.com/isogeny-labs/crypto/actions/runs/40253272287)) was queued at survey time | Step "Clippy" in job `clippy (crypto)`: `error: could not compile `crypto` (lib) due to 1 previous error` and `(lib test) due to 21 previous errors`, e.g. ``manual implementation of `.is_multiple_of()` --> src/cryptanalysis/modular_polynomial.rs:403:28`` (**log**) | New code since #1656 breaks `-D warnings` under the pinned 1.98. The failing lib unit hid every dependent unit from the log, so CI was reporting 21 of at least 62 error sites (**local**, section 3.2) | **Fixed.** 62 sites in 27 Rust files; `cargo clippy --all-targets --keep-going -- -D warnings` now exits 0 locally |
-| Release | `release.yml` | **Red**: five of 17 jobs fail in the latest completed non-cancelled runs [40242226163](https://github.com/isogeny-labs/crypto/actions/runs/40242226163) (`8cadd931`), [40240050587](https://github.com/isogeny-labs/crypto/actions/runs/40240050587), [40238021451](https://github.com/isogeny-labs/crypto/actions/runs/40238021451) (the same five job names failed in 40240050587, whose error text was not re-read; 40238021451 was not inspected) | `isogeny` on Linux gnu, musl and macOS, step "Build and test the dedicated executable": `error: cannot update the lock file .../tools/isogeny-cli/Cargo.lock because --locked was passed to prevent this`. `rust (x86_64-pc-windows-msvc)`, step "Build release binaries with source provenance": ``src\bin\ic\sweep\trial.rs:594:39 ... not found in `libc` `` (**log**) | (a) `tools/volcano-cli` gained a `libc` dependency and the `isogeny-cli` lock was not regenerated; the lock diff is exactly one line. (b) `trial.rs` (2026-10-24) calls `libc::getrusage`, which does not exist on Windows. (c) The Windows `isogeny` leg also hit (a) but reported success, section 3.3 | **Linux and macOS confirmed, Windows not.** (a) and (b) are fixed: in [40259290676](https://github.com/isogeny-labs/crypto/actions/runs/40259290676) on the PR head `7f5ca198d` the Linux gnu, musl and macOS `isogeny` legs and `rust` on Linux and macOS pass (**log**). (c) is fixed in the sense that a failing command now fails the step, but both Windows legs were cancelled at their time caps (`isogeny` at 45m15s, `rust` at the 25-minute PR cap), so neither has been seen to pass; `cuda` failed on an unrelated runner-image change. Section 3.3. Follow-up PR: Windows type-checks only on PRs, full build with 120/60-minute caps on push and dispatch, `cuda` pin restored |
+| Release | `release.yml` | **Red**: five of 17 jobs fail in the latest completed non-cancelled runs [40242226163](https://github.com/isogeny-labs/crypto/actions/runs/40242226163) (`8cadd931`), [40240050587](https://github.com/isogeny-labs/crypto/actions/runs/40240050587), [40238021451](https://github.com/isogeny-labs/crypto/actions/runs/40238021451) (the same five job names failed in 40240050587, whose error text was not re-read; 40238021451 was not inspected) | `isogeny` on Linux gnu, musl and macOS, step "Build and test the dedicated executable": `error: cannot update the lock file .../tools/isogeny-cli/Cargo.lock because --locked was passed to prevent this`. `rust (x86_64-pc-windows-msvc)`, step "Build release binaries with source provenance": ``src\bin\ic\sweep\trial.rs:594:39 ... not found in `libc` `` (**log**) | (a) `tools/volcano-cli` gained a `libc` dependency and the `isogeny-cli` lock was not regenerated; the lock diff is exactly one line. (b) `trial.rs` (2026-10-24) calls `libc::getrusage`, which does not exist on Windows. (c) The Windows `isogeny` leg also hit (a) but reported success, section 3.3 | **Linux and macOS confirmed, Windows not.** (a) and (b) are fixed: in [40259290676](https://github.com/isogeny-labs/crypto/actions/runs/40259290676) on the PR head `7f5ca198d` the Linux gnu, musl and macOS `isogeny` legs and `rust` on Linux and macOS pass (**log**). (c) is fixed in the sense that a failing command now fails the step, but both Windows legs were cancelled at their time caps (`isogeny` at 45m15s, `rust` at the 25-minute PR cap), so neither has been seen to pass; `cuda` failed on an unrelated runner-image change. Section 3.3. Follow-up PR: Windows caps raised to 60 (`rust`) and 120 (`isogeny`) minutes for push and dispatch, `cuda` pin restored; the 25-minute PR cap that cancelled `rust (windows)` no longer applies because Release no longer runs on PRs |
 | `ic-semantic-metadata` | `ic-semantic-metadata.yml` | **Red**: [40251433841](https://github.com/isogeny-labs/crypto/actions/runs/40251433841) (`8bdcd6d0`); no success found among the 60 runs listed on 2026-10-11 | Step "Fetch authoritative cryptanalysis registry for byte comparison": `curl: (22) The requested URL returned error: 404` (**log**) | **Not confirmed.** The token secret is set (the step passed its empty-token guard) and all five mirrored files exist on `aburan28/cryptanalysis` `main` (the validators landed 2026-10-11 09:30 PDT; **local**). GitHub answers 404 to a token with no access to a private repository, so the leading hypothesis is that `CRYPTANALYSIS_READ_TOKEN` does not cover that repository (an owner move would do it). **Inferred** | **Not fixed**; the step now names the failing file and HTTP status, section 3.4 |
 
 The 2026-10-10 Rust lint failures in the brief (for example run 38047256805: a
@@ -117,8 +128,9 @@ merge base `ac14190f1` agree): `examples/ghs3_vs_rho_analyze.rs`,
 `examples/special_prime_curve_constructions.rs` and
 `src/cryptanalysis/modular_polynomial.rs` (**local**: `rustfmt --edition 2021
 --check` on each file as it was at those commits). The `rustfmt (changed files)`
-job in `rust-lint.yml` fails any changed `.rs` file that is not clean, so touching
-these seven for the lint fixes required reformatting them. That churn is rustfmt's
+job in `rust-lint.yml` failed any changed `.rs` file that was not clean (it ran on
+pull requests then and no longer does), so touching these seven for the lint fixes
+required reformatting them. That churn is rustfmt's
 output and nothing else: for each of the seven, formatting the base file with
 rustfmt and diffing against the PR head leaves only the lint rewrites. Of the 293
 changed lines (removed plus added) in those seven files, rustfmt alone changes
@@ -201,18 +213,17 @@ cannot finish inside the PR cap (it took 9m32s in the 2026-10-22 main push run a
 rewrite turned the pin into `ubuntu-latest`, which is now Ubuntu 26.04 (the job
 log's runner image). While it fails, the `release` job (which needs it) never runs.
 
-Follow-up PR (`claude/ci-followups-20261026`):
+Follow-up PR (`claude/ci-followups-20261026`). Merging current `main` into it
+showed that `02f2bb3a4c` had removed the `pull_request` and `merge_group` triggers
+from `release.yml`, so there is no PR-time Windows leg left to slim, and the
+25-minute PR cap that cancelled `rust (windows)` and the 45-minute `isogeny`
+named exception in `check-pr-budgets.py` no longer apply to this workflow (the
+exception is now unused; it is left in place). Only push and `workflow_dispatch`
+matter:
 
-- Pull requests and the merge queue keep their 25-minute caps for Windows
-  (`isogeny` was 45 for every leg and stays 45 for Linux and macOS, the named
-  exception in `check-pr-budgets.py`) and run only `cargo check --locked
-  --release` there, tests included for `isogeny-cli`. That keeps the
-  `cfg(windows)` paths compiled on every PR (the `getrusage` break of #889 and this
-  PR's `trial.rs` were both caught only by a Windows build) without code
-  generation.
-- Push and `workflow_dispatch` build, test and stage for real: `rust` Windows gets
-  60 minutes (45 for the others), `isogeny` Windows 120 (50 for the others).
-  These are estimates with margin, not measurements.
+- `rust` Windows gets 60 minutes and `isogeny` Windows 120 (the others keep 45 and
+  50). These are estimates with margin, not measurements: roughly 36 and 70
+  minutes by the Linux-scaled figures above.
 - `cuda` is pinned to `ubuntu-24.04` again.
 - The soft-hash step still rebuilds its dependencies, and a shared target
   directory would not avoid that: the step sets `RUSTFLAGS` to `--cfg
@@ -228,14 +239,18 @@ Follow-up PR (`claude/ci-followups-20261026`):
   scripts/build_cover_transfer_assessments.mjs --write`); its other changed hashes
   are files that had already drifted on `main`.
 
-**Not verified.** No Windows build, `cargo check` or workflow run was possible
-here. Whether the type-check lanes fit in 25 minutes, whether the full legs fit in
-60 and 120, and whether `cuda` passes on `ubuntu-24.04` again are all open. To
-confirm: `gh workflow run release.yml --ref claude/ci-followups-20261026` runs the
-full legs and publishes nothing (the `release` job requires `refs/heads/main`),
-and its Windows step times replace the estimates above. Main's push runs cannot be
-relied on for this: all 100 most recent completed `Release` push runs on `main`
-ended `cancelled`.
+A consequence to watch, not fixed here: with Release only on pushes to `main`, a
+Windows leg of about 70 minutes runs while merges land minutes apart. All 100 most
+recent completed `Release` push runs on `main` ended `cancelled`, and a run only
+publishes if every leg completes, so the rolling release may rarely publish. Whether
+a queued run is superseded or an in-progress one is cancelled was not determined.
+
+**Not verified.** No Windows build or workflow run was possible here. Whether the
+full legs fit in 60 and 120 minutes and whether `cuda` passes on `ubuntu-24.04`
+again are open. To confirm: `gh workflow run release.yml --ref
+claude/ci-followups-20261026` runs the full legs and publishes nothing (the
+`release` job requires `refs/heads/main`), and its Windows step times replace the
+estimates above. Main's push runs cannot be relied on for this (see above).
 
 ### 3.4 `ic-semantic-metadata` (not fixed, diagnostic added)
 
@@ -278,8 +293,8 @@ latter with a review note). It was regenerated by cargo (`cargo metadata
 --offline`), the diff is the one line `+ "libc"`, and `cargo metadata --locked`
 fails before and passes after (**local**). The study's sources are unchanged and
 `BUILD_LOCK_REVIEW_20261026.md` records the refresh. The workflow was not edited:
-only its `correctness` job runs on push and PR, and the qualified phases stay
-`workflow_dispatch`-only. The study's tests were not re-run and CI has not seen
+only its `correctness` job runs on push (and ran on PRs until `02f2bb3a4c`), and
+the qualified phases stay `workflow_dispatch`-only. The study's tests were not re-run and CI has not seen
 the new lock.
 
 **Third stale lock, not touched.** `research/full_volcano_classes_20261017/generator/Cargo.lock`
@@ -307,8 +322,9 @@ holds on every host. Checked (**local**): a standalone program built from the
 exact lines of `trial.rs` returns the same value as the pre-change function on
 Linux (66 and 66 MiB) and prints no warning; built with the Unix cfg switched off
 it returns `None`, prints the warning once for two calls, arms nothing, and stays
-silent for a limit of 0. The real `ic` binary was not rebuilt (shared disk fell
-below the 1.5 GB floor), only rustfmt-checked; a Windows build was not run.
+silent for a limit of 0. `cargo check --release --locked --bin ic` passes and the
+touched files are rustfmt-clean; the `ic` binary was not built or tested, and a
+Windows build was not run.
 
 ### 3.7 PDP outcome workflow (described, one line changed)
 
@@ -391,16 +407,16 @@ exemplars are `research/notes/ecc2k130/m83_solver_matrix_20260927/` and
 
 ## 5. Not verified
 
-- Windows, everywhere. No Windows build, `cargo check` or workflow run was possible
-  in this worktree. In #2588's CI run both Windows legs were cancelled at their
-  time caps (section 3.3), so the `trial.rs` gate and the `shell: bash` change have
-  not been seen to build or pass on Windows. The follow-up's type-check lanes, its
-  60- and 120-minute estimates and the `ubuntu-24.04` pin for `cuda` are likewise
-  untested. A `workflow_dispatch` run of `release.yml` on the follow-up branch is
-  the check; `main` push runs are mostly cancelled by newer pushes.
+- Windows, everywhere. No Windows build or workflow run was possible in this
+  worktree. In #2588's CI run both Windows legs were cancelled at their time caps
+  (section 3.3), so the `trial.rs` gate and the `shell: bash` change have not been
+  seen to build or pass on Windows. The follow-up's 60- and 120-minute estimates
+  and the `ubuntu-24.04` pin for `cuda` are likewise untested. A
+  `workflow_dispatch` run of `release.yml` on the follow-up branch is the check;
+  `main` push runs are mostly cancelled by newer pushes.
 - The follow-up's Rust edits (the `--max-rss-mb` warning, a comment in
-  `isolation.rs`) were checked with `rustfmt` and a standalone program only; the
-  `ic` binary was not rebuilt (shared disk).
+  `isolation.rs`) were checked with `rustfmt`, `cargo check --release --bin ic` and
+  a standalone program; the `ic` tests were not run.
 - CI on the regenerated support-aware lock, and why its latest runs end in 3 s.
 - The 1.98 toolchain: lints were checked with 1.97.
 - `CRYPTANALYSIS_READ_TOKEN` scope and the `ic-semantic-metadata` fix.
@@ -424,7 +440,8 @@ found these errors in the text and the workflow (each rechecked before editing):
    Section 3.2.
 3. "Five other places" with `large_enum_variant` allows. Ten in nine linted files
    at the merge base. Section 3.2.
-4. `ic-e2e-benchmark.yml` also triggers on `merge_group`. Section 1.
+4. `ic-e2e-benchmark.yml` also triggered on `merge_group` at `71dd7db5c`
+   (it has since moved to push-only). Section 1.
 5. The swap-quotient `FROZEN.json` omits the root `Cargo.lock` only; it pins a
    sibling study's. Section 4.
 6. The support-aware F5 workflow had the same stale-lock failure and was missing

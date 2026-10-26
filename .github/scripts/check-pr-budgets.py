@@ -85,7 +85,7 @@ NAMED_BUDGET_EXCEPTIONS = {
     (".github/workflows/release.yml", "isogeny"): {
         "timeout": 45,
         # The workflow's pull_request budget expression evaluates to 45.
-        "reason": "Release isogeny matrix, Linux gnu/musl/macOS legs: 36m25s/24m37s/23m36s in run 40259290676 (build, test and soft-hash check); the Windows legs only type-check on PRs and are capped at 25 minutes",
+        "reason": "Release isogeny matrix (x86_64-pc-windows-msvc, windows-latest); cancelled at the 25-minute cap on 22 PRs while main's push run took 24.9 minutes (2026-10-22)",
     },
     (".github/workflows/ic-producer.yml", "archived-producer"): {
         "timeout": 45,

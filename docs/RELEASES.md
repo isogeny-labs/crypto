@@ -139,13 +139,14 @@ as a dry run and stop short of publishing. Merge-queue runs use the same
 local-diff classifier, so records-only package changes cannot silently skip
 the corresponding archive lane.
 
-The Windows legs of `rust` and `isogeny` only type-check (`cargo check
---locked --release`) on pull requests and in the merge queue, inside the
-25-minute budget; a real Windows build of `isogeny` takes over an hour. Push and
-`workflow_dispatch` runs build, test and stage them for real, with caps of 60 and
-120 minutes (estimates; see `docs/validation/VALIDATION_BACKLOG_20261011.md`,
-section 3.3). `gh workflow run release.yml --ref <branch>` exercises the full
-Windows legs without publishing, because the `release` job requires `main`.
+Since `02f2bb3a4c` (pull requests run only the merge set) the dry run above
+runs on pushes to `main` and on `workflow_dispatch`, not on pull requests. A real
+Windows build of `isogeny` is estimated at over an hour (Linux gnu needs 36
+minutes; no Windows run has finished), so the Windows legs have caps of 60
+(`rust`) and 120 (`isogeny`) minutes; both are estimates (see
+`docs/validation/VALIDATION_BACKLOG_20261011.md`, section 3.3).
+`gh workflow run release.yml --ref <branch>` exercises the full legs without
+publishing, because the `release` job requires `refs/heads/main`.
 
 The `release` job requires all four build jobs, so a failure publishes
 nothing rather than a partial set. The matrix is `fail-fast: false`, so one
