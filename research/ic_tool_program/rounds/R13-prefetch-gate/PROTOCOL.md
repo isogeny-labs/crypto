@@ -73,6 +73,20 @@ correction made before timed work, not a change to the candidate, panel,
 acceptance threshold, or measurement protocol. The corrected native pin must
 still pass all 90 rows before A/A starts.
 
+### Pre-timing SMT isolation addendum (2026-10-26)
+
+The first A/A launch produced no timed process. `isolated_bench` refused the
+first row five times because CPU 2 shares a physical core with CPU 18 on the
+Xeon 6975P-C host; its refusal log is retained in `runs/aa/refusals.log`.
+The native runner now accepts `ICPROG_BENCH_CPUS` for timed isolation calls.
+For this host R13 sets it to `2,18`, reserving both logical siblings of one
+physical core. `RAYON_NUM_THREADS=1` and the one-process-per-target protocol
+are unchanged. The isolation tool's per-process receipt must record that CPU
+set and a clean run. The untimed pin and both `ic` binaries are unchanged.
+No timed A/A, suite, or holdout record preceded this addendum. A future host
+uses its actual `thread_siblings_list`; a missing or changed topology stops
+the run until its CPU set and manifest are recorded.
+
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
 for this CPU subclass only if every primary size's suite and holdout

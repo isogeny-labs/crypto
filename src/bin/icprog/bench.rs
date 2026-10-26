@@ -125,6 +125,13 @@ impl Bench {
         log_dir: &Path,
         capture: bool,
     ) -> Result<(), String> {
+        // Reserve the whole physical core on SMT hosts. The default remains
+        // the programme's historical CPU 2; a round may declare its sibling
+        // set before timing (e.g. 2,18) and the isolation receipt records it.
+        let cpus = std::env::var("ICPROG_BENCH_CPUS")
+            .ok()
+            .filter(|s| !s.trim().is_empty())
+            .unwrap_or_else(|| CPUS.to_string());
         let rec = runs::record_path(out);
         let label = out
             .strip_prefix(log_dir)
@@ -147,7 +154,7 @@ impl Bench {
                 Stdio::null()
             };
             Command::new(&self.isolate)
-                .args(["run", "--wait", "--cpus", CPUS, "--out"])
+                .args(["run", "--wait", "--cpus", &cpus, "--out"])
                 .arg(&rec)
                 .args(["--label", &label, "--"])
                 .args(cmd)
