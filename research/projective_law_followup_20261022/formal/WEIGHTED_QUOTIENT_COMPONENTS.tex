@@ -3,12 +3,12 @@
 \usepackage[T1]{fontenc}
 \usepackage{booktabs}
 \usepackage{hyperref}
-\title{Weighted quotient components and localization map}
+\title{Weighted quotient grading and degree-zero chart ring}
 \author{Pinned formal proof packet}
 \date{26 October 2026}
 \begin{document}
 \maketitle
-\noindent This packet reports algebraic proof progress for the weight $(1,3,1)$ sextic. It does not report a new collector run or change any cost ratio. The separate SVG graph is \texttt{weighted-quotient-components.svg}; machine-readable statuses are in \texttt{weighted-quotient-components.csv}.
+\noindent This packet reports a checked coordinate-ring equivalence for the weight $(1,3,1)$ sextic. It does not report a new collector run or change any cost ratio. The separate SVG graph is \texttt{weighted-quotient-components.svg}; machine-readable statuses are in \texttt{weighted-quotient-components.csv}.
 \section*{Checked statements}
 \begin{tabular}{p{0.48\linewidth}p{0.42\linewidth}}
 \toprule
@@ -16,16 +16,22 @@ Lean source & Verified scope\\
 \midrule
 \texttt{WeightedProjDegreeZeroScratch.lean} & Finite homogeneous lifts and componentwise quotient equality.\\
 \texttt{WeightedRingComponent.lean} & Descended additive degree projections; orthogonality, finite reconstruction, separation, direct sums, and degree of homogeneous products.\\
-\texttt{WeightedChartRouteTorsion.lean} & A generic map from homogeneous localization away from $f$ to a target where $f=1$, assuming an existing graded ring; power-torsion fractions vanish.\\
+\texttt{WeightedRingGraded.lean} & Degree submodules form an internal direct sum and a \texttt{GradedRing} instance.\\
+\texttt{WeightedChartKernelRec.lean} & Homogeneous elements of $(Z-1)$ are killed by a power of $Z$ in a nonnegative graded ring.\\
+\texttt{WeightedChartRoute.lean} & Generic map from homogeneous localization, with injectivity and surjectivity criteria.\\
+\texttt{WeightedChartIso.lean} & Ring equivalence between degree-zero localization away from $Z$ and the affine quotient $K[x,y]/(y^2-f(x))$.\\
 \bottomrule
 \end{tabular}
 \section*{Open boundary}
-The weighted quotient has no packaged \texttt{GradedRing} instance in this packet. The implication that a homogeneous element in $(Z-1)$ is killed by some power of $Z$ is still a proposed degree-by-degree telescoping proof. The degree-zero chart isomorphism, projective completion, Picard-class identity, and Rust-to-Lean semantics bridge remain open.
+The \texttt{Proj} scheme isomorphism, infinity-chart cover and gluing, projective completion comparison, Picard-class identity, and Rust-to-Lean semantics bridge remain open. The checked equivalence concerns coordinate rings.
 \section*{Replay evidence}
-Both new source files compiled with Lean 4.34.1 and Mathlib commit \texttt{d13f23b723b8a846827a245b89c10fc7d3f11612}, exit status 0. Axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; none lists \texttt{sorryAx}. Source SHA-256 values, in the table order for the two new files, are:
+All five new source files compiled with Lean 4.34.1 and Mathlib commit \texttt{d13f23b723b8a846827a245b89c10fc7d3f11612}, exit status 0. Axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; none lists \texttt{sorryAx}. Source SHA-256 values, in dependency order, are:
 \begin{quote}\small\ttfamily
 4f775fb6ac97fb2d478c2e550a955351df0ab730a5e344712ca5f4930cfb61b5\\
-08d6ac2fc7c6e79df0c63f41cbafd303a5b614615c05ffe613f656dc2d9ce474
+b810dd4a6024bc77a7b8de1916c217caf8e1a0de2d555448c73a5d2515ff865c\\
+f02b2f827ca8123f3daabbf19b15d25f9f7793ab7693e8a795bec5572a9d4010\\
+ed6c4bc5b88acefa45fa00ed6ee83655b580e41e8f1d4fa0186777b821abab89\\
+fbcb3cae7cc4c9d7f0722da5f546892bb4cde848eb072580486be3c7a9ecd433
 \end{quote}
 The exact theorem boundaries and replay prerequisites are in \texttt{WEIGHTED\_QUOTIENT\_COMPONENTS.md}. The full four-lead results and matched-rho prices remain in \texttt{research/four\_followups\_review\_20261022/}.
 \end{document}

@@ -47,3 +47,48 @@ theorem awayToOne_mk {d : ι} (hf : f ∈ 𝒜 d) (h : g f = 1)
     (Localization.awayLift_mk g f x (1 : B) (by simpa [h]) n)
 #print axioms WeightedChartRoute.awayToOne_mk
 end WeightedChartRoute
+namespace WeightedChartRoute
+open DirectSum
+variable {A σ B : Type*} [CommRing A] [CommRing B] [SetLike σ A]
+  [AddSubgroupClass σ A]
+variable (𝒜 : ℕ → σ) [GradedRing 𝒜] (g : A →+* B) {f : A}
+
+theorem awayToOne_surjective (hf : f ∈ 𝒜 1) (h : g f = 1)
+    (hg : Function.Surjective g) :
+    Function.Surjective (awayToOne 𝒜 g h) := by
+  intro b
+  obtain ⟨a, rfl⟩ := hg b
+  classical
+  let s : Finset ℕ := (decompose 𝒜 a).support
+  let t : ℕ → HomogeneousLocalization.Away 𝒜 f := fun i =>
+    HomogeneousLocalization.Away.mk 𝒜 hf i (decompose 𝒜 a i : A)
+      (by simpa using (decompose 𝒜 a i).property)
+  refine ⟨∑ i ∈ s, t i, ?_⟩
+  rw [map_sum]
+  simp only [t, awayToOne_mk]
+  rw [← map_sum]
+  congr 1
+  exact DirectSum.sum_support_decompose 𝒜 a
+#print axioms WeightedChartRoute.awayToOne_surjective
+end WeightedChartRoute
+namespace WeightedChartRoute
+variable {A σ B : Type*} [CommRing A] [CommRing B] [SetLike σ A]
+  [AddSubgroupClass σ A]
+variable (𝒜 : ℕ → σ) [GradedRing 𝒜] (g : A →+* B) {f : A}
+
+theorem awayToOne_injective (hf : f ∈ 𝒜 1) (h : g f = 1)
+    (hker : ∀ (n : ℕ) (a : A), a ∈ 𝒜 (n • (1 : ℕ)) →
+      g a = 0 → ∃ k : ℕ, f ^ k * a = 0) :
+    Function.Injective (awayToOne 𝒜 g h) := by
+  have hzero (x : HomogeneousLocalization.Away 𝒜 f)
+      (hx : awayToOne 𝒜 g h x = 0) : x = 0 := by
+    obtain ⟨n, a, ha, rfl⟩ :=
+      HomogeneousLocalization.Away.mk_surjective 𝒜 hf x
+    have hga : g a = 0 := by simpa only [awayToOne_mk] using hx
+    exact away_mk_eq_zero_of_torsion 𝒜 hf n a ha (hker n a ha hga)
+  intro x y hxy
+  apply sub_eq_zero.mp
+  apply hzero
+  rw [map_sub, hxy, sub_self]
+#print axioms WeightedChartRoute.awayToOne_injective
+end WeightedChartRoute

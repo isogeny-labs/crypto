@@ -548,8 +548,9 @@ The conditional valuation theorems are formalized for an abstract DVR, and
 the [domain/DVR packet](formal/DOMAIN_DVR.md) constructs a DVR with
 `w` as local parameter at the origin of the explicit infinity chart.
 The [weighted quotient component packet](formal/WEIGHTED_QUOTIENT_COMPONENTS.md)
-kernel-checks finite degree projections and a generic degree-zero localization
-map; the quotient `GradedRing` instance and the chart isomorphism remain open.
+kernel-checks the quotient `GradedRing` instance and a ring equivalence from
+degree-zero localization away from `Z` to the affine quotient. The `Proj`
+scheme comparison and global completion remain open.
 Identifying that chart stalk with the chosen projective completion's
 infinity stalk remains open. The [infinity-chart packet](formal/INFINITY_CHART.md)
 now proves the chart equation `w²=z(1+a3z²+a2z³+a1z⁴+a0z⁵)` for
