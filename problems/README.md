@@ -74,6 +74,7 @@ Keep resolved and superseded records in the index.
 
 | [ECDLP portfolio exhaustive-reading coverage](ecdlp-portfolio-reading-coverage.md) | open | certifying the owner's request to read all six-month portfolio sources and artifacts | complete acknowledged source coverage, branch/history reconciliation and access to named missing raw evidence; indexing and hashing remain separate |
 | [claim-n13 replay fails on accounting-version drift](ecbench-claim-n13-replay-accounting-version-drift.md) | open | replaying the Apple-recorded `claim-n13` inherited-F4 arms on `main` (BMI2 and portable paths already agree) | owner decision on the specialisation accounting identity (lazy vs eager) plus a method-identity field for it |
+| [Quotient target-calibration checkpoint gate](quotient-target-calibration-checkpoint-gate.md) | open | first native certified-anchor target frame and 32-point challenge | explicit same-branch checkpoint upload authorization, configured AWS access, successful gate, then frozen execution record |
 
 ## Add or update a problem
 

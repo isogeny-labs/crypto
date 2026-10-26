@@ -523,6 +523,10 @@ fn validation_reference(
 
 fn main() {
     let a: Vec<_> = std::env::args_os().skip(1).map(PathBuf::from).collect();
+    if a.is_empty() || matches!(a[0].to_str(), Some("--help" | "help")) {
+        println!("quotient-target-calibration commands:\n  preflight PUBLIC CONTROLS FRESH_DIAGNOSTICS\n  calibrate PUBLIC CONTROLS SOURCE_MANIFEST FRESH_DIRECTORY\n  evaluate MATRIX COORDINATE_INPUTS FRESH_PREDICTIONS\n  validate PUBLIC MATRIX COORDINATE_INPUTS PREDICTIONS FRESH_REPORT\nNew experiments require a frozen protocol and a successful repository checkpoint gate.");
+        return;
+    }
     let command = a
         .first()
         .and_then(|s| s.to_str())
