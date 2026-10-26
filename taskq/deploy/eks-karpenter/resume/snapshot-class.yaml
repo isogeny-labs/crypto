@@ -1,0 +1,10 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: isolab-ebs-checkpoints
+  labels:
+    app.kubernetes.io/part-of: isolab
+driver: ebs.csi.aws.com
+# Checkpoints survive deletion of their Kubernetes API objects. Explicitly
+# remove the EBS snapshot only after the retention/recovery decision is made.
+deletionPolicy: Retain
