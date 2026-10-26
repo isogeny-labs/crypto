@@ -1,0 +1,92 @@
+# Frozen 2026-10-24T05:44:50Z (before any timed training or evaluation row)
+repository HEAD  8559b6b673aad8cab5bac33ff56b81653134dcd4
+ce1692d5bbe95912cabffbe4976c0933731f109b2ed112c500a870ce92024bcc  PROTOCOL.md
+09bf8672086103d8f5b82e1bf2fec60efe82b2d68de2974449e682a6b5e550f8  training/grid.json
+ecb95dd8c656468352f645a59119890b7ff6b7dd4ae276adf3ea33c81459f751  src/bin/ic_rule_v4.rs
+60a1d58e7a03dd5f5465a7772219ceaa6b2953d9b887c9d7f3e72877f6d77a81  src/cryptanalysis/koblitz_index_calculus.rs
+c0c2bf33144ec3f25db836a0fca158c6d5f6d6ed4a6b23f7d3cd12c4f3d67e15  src/bin/ic/price.rs
+383bb2692e3839f84fc429517ec65a9ea9c636b83319ee16962fe69f0207595a  src/bin/ic/workflow.rs
+9c5c8b2bebe818a16075c608acff1f3431653a69dd4ab7f55b45784a8742d93c  ic-lever
+d2314f3649814ae175463009b076abf5b820fa073cf88d013861f448a61b8668  ic_rule_v4
+1bc76f0a599ceaa7a379255d838307a55229085574244534e1ebcffa4f09b410  isolated_bench
+8dcf455e726c32f42b777ac3ec3b9dad7cf9b730df4df61cff98340fbe2329dc  koblitz_rho_fixture
+
+# Amendment A1 2026-10-24T05:50:16Z (after the training grid began; no selection or evaluation row yet)
+f74073efa3cd7ebd6ef3c5449097efff37fc5bcc3e6bfee25d98734bfe22a0bf  PROTOCOL.md
+a366f277108c06463137a9fa41927b602c136e0dd266c72f705bdc39cb88d7bd  training/grid.json
+44b3d587533f94cabeccf8453c5364c1ec320ec340e79b4f76718e7482b70656  src/bin/ic_rule_v4.rs
+
+# Note 2026-10-24T06:05:40Z: harness rebuilt for amendment A1 (train --confirm, select --final) and the analysis' secondary cold_least_repetition; test-only edit of the lib (the harvest test no longer demands relations at n = 41); ic-lever is unchanged (built from the lib before the test edit)
+44b3d587533f94cabeccf8453c5364c1ec320ec340e79b4f76718e7482b70656  src/bin/ic_rule_v4.rs
+e8c1d35aaac23deb1f600699f054be9138850d307cca5d13bbb8d9cd22e48498  src/cryptanalysis/koblitz_index_calculus.rs
+d30f3d8a49cc9c2c34fa09b1b1f310bbde07cd4b6fa9800986fbc2d193e62757  ic_rule_v4
+
+# Stage-1 candidates 2026-10-24T06:51:11Z (before the confirmation runs)
+fee863f1d1a366e460205e7a1dfefb43a578a85d20bfedc07205e771112750c8  training/stage1.json
+
+# recipe selected 2026-10-24T07:02:31Z (before the first evaluation row)
+500f196c21f142249e87db5117e36797c332be90ec1e37fedd4b9a3cf5f67e48  recipe.json
+fee863f1d1a366e460205e7a1dfefb43a578a85d20bfedc07205e771112750c8  training/stage1.json
+b10d06bda0be64625c8e9a28132dbf0b90853ae1df3759c6b88d5e475e55d2f7  training/summary.json
+
+# Amendment A2 2026-10-24T07:05:56Z (after the confirmation stage; no evaluation row yet)
+d984e0d3ab4f49342f84dd1350d4f376c8de4128e240a1514f19b3c84e2fb4b4  PROTOCOL.md
+0db762cdd83baad4362070c2620b69070552326db3ca77162676b172a8850d14  src/bin/ic_rule_v4.rs
+bd3a9577c9b68e8b1d20ad6f47d046379741c4c6f33a6ee33d4945a2ba47d40c  ic_rule_v4
+
+# Amendment A3 2026-10-24T07:06:54Z (A2 taken no size; knob-by-knob gate; no evaluation row yet)
+a7ab5f6f6c9574966203ac316715c05b89eaf6e14d728091472b6c0f97faf520  PROTOCOL.md
+178385c92479e8a8ac2e5db68ceeb220e891c17039c3a97c15202e559e76492e  src/bin/ic_rule_v4.rs
+068cc03427ce40258623fe01555038e4986570605f76acfaba29da80aa247489  ic_rule_v4
+
+# Amendment A4 2026-10-24T07:07:41Z (argmin of A2's fit, lever off; no evaluation row yet)
+be4b4000c82cc6af544981acc436689e641a8436cc30819169415011b8b0c904  PROTOCOL.md
+5c81c385d10e45acc2be87479aeef2fef999fec728e2089d93400c8d1082fa5f  recipe.json
+37e1ff0542cf2b034276990280df97c1a1ba7ef5dd5b401359406cc3a506da2d  training/model.json
+e54716b4d2d5a81fbb584f7c25f7ddb26d7b4437d835bdfccd1fe875d378b2da  src/bin/ic_rule_v4.rs
+8311444aafad85dc7ecabb4af908a30455baaafb1bf9ab5d39eada328910e8cc  ic_rule_v4
+
+# Editorial note on the lever's status 2026-10-24T07:07:50Z (no evaluation row yet)
+771948ca820390491d52a71c667ba3b5c0dfb60e9571df7075fffd6fd2a16afd  PROTOCOL.md
+
+# Harness with the training-only 'lever' subcommand added 2026-10-24T07:08:42Z (run/analyse/replay code unchanged; no evaluation row yet)
+d1831d86c767e6970ee6f447aed134d0952628f9477ea5c6502aec0b61ed947e  src/bin/ic_rule_v4.rs
+36c0856e99333af7ad85efa850ff0732fd6502cd346104a694f610877870f472  ic_rule_v4
+
+# Amendment A5 2026-10-24T07:19:48Z (four retries and holes; no evaluation row yet)
+640f3229cb56fc26f50aed0c83cf661fda1b0f133925e1c4a9366d132c32f4fb  PROTOCOL.md
+2c372e57b61f4e0e781f4fbec8e81835112795c22b8a592d02639cb810d53219  src/bin/ic_rule_v4.rs
+7b355a903695735bde581c31848329645eb923bb5d7855690c24988933928d96  ic_rule_v4
+
+# Amendment A6 2026-10-24T07:28:51Z (positive control replaced after 5 pairs of n = 47)
+bc61a54fbdce4a19b946a6225054359d502f7159c82066d453f1898ea6a54cca  PROTOCOL.md
+16dfce0e542a7839c2d0a48d6d25fdd7346c4a8b8f745e0dd22ab94acecf7b54  src/bin/ic_rule_v4.rs
+285e1d1708bba5aabf3853a86c9a057e0d8e74a6f9a19b90ebf81bbe48c2be27  ic_rule_v4
+
+# Amendment A7 2026-10-24T08:17:30Z (A/A gate: interval only; made during the evaluation, after the A/As of n = 47 and 57 were read)
+8e0bc56a8f3367e0bc29609ad81b348a44d920b2713309cbc6c57ae8f78ec673  PROTOCOL.md
+c8d75849c1b8bc9381970a8513265c44aecc0d1927fd7945df498d5d6f5f4574  src/bin/ic_rule_v4.rs
+6000c53780c7668df91481c4eb08bceb1458feaed8c17e1f6d745a81d263b003  ic_rule_v4
+
+# Amendment A8 2026-10-24T09:26:48Z (--max-other-cpu 3.2 for the rest of the panel; neighbours' unlocked jobs)
+e500cee90b406b64407b9bebe6bc3485991de4ce52ac28f99729d457e9182005  PROTOCOL.md
+3c53041fa7d7975af6ce4f158cd17ad886bff0cb3c63e5dc79498090f89c277b  src/bin/ic_rule_v4.rs
+9aaa0a90667dea17142a12c65bae1d450ae854ff7d2ae08281501181e5b5a52c  ic_rule_v4
+
+# After the panel 2026-10-24T10:45:18Z: the four source files were formatted with rustfmt (no change of meaning; the timed binaries are the ones listed above) and the tree rebuilt (release: ic, ic_rule_v4, icprog)
+ebf23e02a52ce88ed3e72930d71b604b8df097e17189d3e5826f504b6afa6ca3  src/bin/ic_rule_v4.rs
+1d7fbbcc403f93e2d7c9086cd918cb80681d9677ecbf5158cf875aa6fc4f73a9  src/cryptanalysis/koblitz_index_calculus.rs
+fd77e71d27e69ed21eff3ab1d57883d704dbe673344743d88364e4dc305f55e7  src/bin/ic/price.rs
+fa29e84a09af1ed15e46516a48460068a0ee81de8b15c41f6398add398c6b52c  src/bin/ic/workflow.rs
+e500cee90b406b64407b9bebe6bc3485991de4ce52ac28f99729d457e9182005  PROTOCOL.md
+42ead59efcf426928af9cfcbe0ebaf61c09099739b59da98778012830cabde5a  analysis.json
+5c81c385d10e45acc2be87479aeef2fef999fec728e2089d93400c8d1082fa5f  recipe.json
+cb0dc493369a1b02e43a60d4919ec4f1d40149ce46940a05d97d9098c99b72ec  replay-certificate.json
+b13106b02e6f6c7810f9f4f242b79f503a312eaf12a6ad070897a23433dae5c4  runs.tar.xz
+35ff1f060dca9f2afa74a624597ee49347da5bddc08d3c7120f06dd6cbaddf8a  training/raw.tar.xz
+
+# Editorial after the panel 2026-10-24T10:45:28Z: PROTOCOL.md arm-order sentence names lev, not pos
+71db9b601195da77dd50f081d80d0c44a292bc866fb9331773c0c2b82b0f6f26  PROTOCOL.md
+
+# Editorial 2026-10-24 (coordinator, after CI names check): retired curve name k0n61 -> icv1-f2m61-t158598901-ab42b6c5 at two places; no rule, arm, count or decision changed
+9ca338957cd045c73398bc6f82a4aa4aea746f628a7999e3476f649a11e7e843  PROTOCOL.md

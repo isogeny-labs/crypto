@@ -1,0 +1,64 @@
+diff --git a/src/bin/ecbench/pdp3_koblitz.rs b/src/bin/ecbench/pdp3_koblitz.rs
+index 53a9bbf6d..b75367de1 100644
+--- a/src/bin/ecbench/pdp3_koblitz.rs
++++ b/src/bin/ecbench/pdp3_koblitz.rs
+@@ -562,9 +562,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
+         params: &Params,
+         ops: &mut GroupOps,
+     ) -> Result<(), String> {
+-        if let Some((k, _)) =
+-            std::env::vars().find(|(k, _)| TUNING_PREFIXES.iter().any(|p| k.starts_with(p)))
+-        {
++        // `KIC_F4_NODE_DUMP*` only appends diagnostics to a file; it does not
++        // change the search (cross-host probe, research/inherited_f4_replay_determinism_20261018).
++        if let Some((k, _)) = std::env::vars().find(|(k, _)| {
++            !k.starts_with("KIC_F4_NODE_DUMP") && TUNING_PREFIXES.iter().any(|p| k.starts_with(p))
++        }) {
+             return Err(format!(
+                 "pdp3-koblitz refuses to run with the solver override `{k}` set: it would \
+                  change the search without changing the method's identity"
+diff --git a/src/cryptanalysis/koblitz_groebner.rs b/src/cryptanalysis/koblitz_groebner.rs
+index 613266cba..4e584ab83 100644
+--- a/src/cryptanalysis/koblitz_groebner.rs
++++ b/src/cryptanalysis/koblitz_groebner.rs
+@@ -5195,6 +5195,40 @@ fn dump_node_system(system: &[F2BoolPoly], n_vars: usize, engine: SolverEngine)
+     else {
+         return;
+     };
++    // Cross-host probe (research/inherited_f4_replay_determinism_20261018):
++    // `KIC_F4_NODE_DUMP_COMPACT=1` writes a node index, the word-op counters
++    // at node entry, and a hash of the system instead of the system, so two
++    // hosts' dumps can be diffed for the first node whose preceding work
++    // charged a different number of words.
++    if std::env::var("KIC_F4_NODE_DUMP_COMPACT").as_deref() == Ok("1") {
++        thread_local! {
++            static NODE_INDEX: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
++        }
++        let index = NODE_INDEX.with(|c| {
++            let i = c.get();
++            c.set(i + 1);
++            i
++        });
++        let text = serde_json::to_string(system).unwrap_or_default();
++        let mut h: u64 = 0xcbf29ce484222325;
++        for b in text.bytes() {
++            h = (h ^ u64::from(b)).wrapping_mul(0x100000001b3);
++        }
++        let terms: usize = system.iter().map(|p| p.terms.len()).sum();
++        let line = serde_json::json!({
++            "i": index,
++            "pid": std::process::id(),
++            "n_vars": n_vars,
++            "engine": format!("{engine:?}"),
++            "polys": system.len(),
++            "terms": terms,
++            "h": format!("{h:016x}"),
++            "w_thread": f4_word_ops_thread(),
++            "w_total": f4_word_ops_total(),
++        });
++        let _ = writeln!(file, "{line}");
++        return;
++    }
+     let line = serde_json::json!({
+         "n_vars": n_vars,
+         "engine": format!("{engine:?}"),

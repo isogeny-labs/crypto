@@ -97,6 +97,32 @@ are present. Never commit a PDF you have not inspected or present an older
 PDF as current. If no renderer can be installed, commit the complete source
 and graphs and state the exact blocker in the report and the PR.
 
+## Isogeny volcanoes: the standard diagram
+
+Draw every ℓ-isogeny volcano — a walk's result, or measurements placed on
+its curves — with `tools/volcano-diagram/volcano_diagram.py`
+(`volcano-diagram/v2` input, documented in its README). Don't hand-roll a
+new layout. That gives every volcano figure the same reading, a heat map of
+the volcano:
+- **Strata:** each level is a shaded band labelled `Level i · crater/floor`,
+  with its curve count (and how many were measured) and its conductor
+  relative to the crater, ℓ^i.
+- **Rings:** each level is an elliptical ring in perspective, wider going
+  down. Every vertex sits at the angle of the curves below it, under its
+  parent.
+- **Panels:** one per metric, normally mean operations beside mean time.
+  Each panel has one observed-range YlOrRd colour bar, shared by every
+  level, with its min, mid and max printed.
+- **Marks:** unmeasured vertices are small and grey, unverified edges
+  dashed, and the root ringed blue. The title says what was measured and
+  how many seeds or instances per curve; the subtitle carries the run id,
+  and a footnote states anything the colours leave out.
+
+Save the input as `<name>.diagram.json` beside the SVG and PNG. Map each
+short vertex label to its full curve id in the report. If a figure needs
+something the renderer lacks, extend the renderer and its schema version
+rather than forking it.
+
 ## Deliverables for each search round
 
 1. Write a dated Markdown report in the relevant `research/` or `docs/`
@@ -147,7 +173,17 @@ and graphs and state the exact blocker in the report and the PR.
 ## Reports in S3
 
 Once a report is on `main`, `.github/workflows/reports-s3.yml` copies it to
-`s3://crypto-autoresearcher/reports/crypto/<repository path>` with a per-push
-manifest (`docs/reports-s3.md`). It takes everything under
-`docs/ic/measurement/reports/` and `research/**/reports/` and every PDF under
-`research/`, so keep reports at those paths. Sessions never upload to S3.
+`s3://setec-astronomy-artifacts/reports/crypto/<repository path>` (region
+`us-east-2`) with a per-push manifest (`docs/reports-s3.md`). It takes
+everything under `docs/ic/measurement/reports/` and `research/**/reports/` and
+every PDF under `research/`, so keep reports at those paths.
+
+Sessions never upload, overwrite or delete in that prefix; the workflow is the
+only writer. To read a published report, list or copy it down and check it
+against the manifest's SHA-256:
+
+```sh
+aws s3 ls s3://setec-astronomy-artifacts/reports/crypto/<repository path> --region us-east-2
+aws s3 cp s3://setec-astronomy-artifacts/reports/crypto/<repository path> . --region us-east-2
+aws s3 presign s3://setec-astronomy-artifacts/reports/crypto/<repository path> --expires-in 604800 --region us-east-2
+```
