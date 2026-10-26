@@ -25,3 +25,39 @@ individually verified. A random sample of rows was read against its
 sources for meaning. The
 rows are summaries, not re-measurements; the paper's text cites the
 primary files directly.
+
+## Companion repositories
+
+`companion.tsv` has the same columns with a leading `repo` column; paths are
+relative to that repository at these commits (default branches, 24 October
+2026):
+
+| repo | commit | visibility |
+|---|---|---|
+| crypto-autoresearcher | ab0609ebee | public |
+| cryptanalysis | c5aa7b39bf | private |
+| ecc-challenges | 86f8a57a5e | public |
+| ml-cryptanalysis | 58494969fd (branch csd-milestone-1) | private |
+| cryptanalysis-rl | 24d90557b2 | private |
+| ecbench | 0657f29b3d | public |
+| isogeny-labs | d613806737 | public |
+| isolab | eb3f285cc1 | private |
+| ecdlp-prime-field-smallness | 4f20be9b36 | private |
+| crypto-lean | 148f5dc389 | public |
+
+Coverage units: in crypto-autoresearcher every `experiments/*` directory,
+every `ledger/evidence` and `ledger/corrections` record, every knowledge
+finding, technique, open problem, frontier and lead, every `research/` and
+`analysis/` entry, and one counted row each for the process and literature
+record directories; in cryptanalysis every entry of `experiments/`,
+`research/`, `ecc2k130/`, `suite/`, `challenges/`, `reports/`, `benchmarks/`,
+`docs/` and every other top-level entry; in the smaller repositories every
+top-level entry. `../tools/companion.py --check <repo> <units>` reports units
+with no row (0 for every repository at these commits). Rows for
+crypto-autoresearcher specifications, evidence and corrections were extracted
+from the records by script; the rest were written by readers. Of 2,531
+numbers in reader-written headlines, 87.6% appear literally at the pinned
+commit; the numbers used in the paper's text were read from source.
+Out of scope: the local 48 GB Autolab byte mirror (not on GitHub), conductor,
+cairn, poltergeist and progress-metrics (infrastructure), ghs-trapdoor
+(two files), and the WDSat and cado-nfs forks (third-party engines).
