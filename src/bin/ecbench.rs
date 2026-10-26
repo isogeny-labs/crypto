@@ -262,7 +262,11 @@ enum Cmd {
         resamples: usize,
         #[arg(long, default_value_t = 20261002)]
         seed: u64,
-        /// Save to <dir>/comparisons/<a>__<b>.json.
+        /// Price each run at this many GAE per unpriced native operation
+        /// (AGENTS.md §5a) before pairing; default is the recorded S.
+        #[arg(long)]
+        weight: Option<f64>,
+        /// Save to <dir>/comparisons/<a>__<b>.json (weighted names include their identity).
         #[arg(long)]
         save: bool,
         #[arg(long)]
@@ -658,7 +662,8 @@ enum ClaimCmd {
 enum DbCmd {
     /// Print the schema.
     Schema,
-    /// Print SQL for session directories, comparison files and factor-base dumps.
+    /// Print SQL for session directories, comparison files, factor-base dumps and
+    /// the store index (`store/index.json`). A `store:NAME` path is fetched first.
     Sql {
         #[arg(required = true)]
         paths: Vec<PathBuf>,
@@ -1183,11 +1188,12 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             b_dir,
             resamples,
             seed,
+            weight,
             save,
             json,
             allow_interrupted,
         } => {
-            let c = compare::compare_with(
+            let c = compare::compare_weighted_with(
                 &dir,
                 &a,
                 b_dir.as_deref(),
@@ -1197,11 +1203,16 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     seed,
                     allow_interrupted,
                 },
+                weight,
             )?;
             if save {
                 let d = dir.join("comparisons");
                 std::fs::create_dir_all(&d).map_err(|e| e.to_string())?;
-                let f = d.join(format!("{a}__{b}.json"));
+                let suffix = c
+                    .pricing_weight
+                    .map(|_| format!("__{}", c.comparison_id))
+                    .unwrap_or_default();
+                let f = d.join(format!("{a}__{b}{suffix}.json"));
                 std::fs::write(
                     &f,
                     serde_json::to_string_pretty(&c).map_err(|e| e.to_string())? + "\n",
@@ -1213,6 +1224,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 print_json(&c)?;
             } else {
                 println!("{}", c.verdict);
+                if let Some(weight) = c.pricing_weight {
+                    println!("pricing weight: {weight} GAE per native operation");
+                }
                 if let Some(q) = &c.quality {
                     println!(
                         "measurement quality: {} / 100; paired attempts {}, verified {}, admitted {}; levels {:?}; p95 foreign busy {}%, p95 run queue {}%",
@@ -1446,7 +1460,13 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         Cmd::Db { cmd } => match cmd {
             DbCmd::Schema => print!("{}", db::SCHEMA_SQL),
             DbCmd::Sql { paths } => {
-                let refs: Vec<&Path> = paths.iter().map(|p| p.as_path()).collect();
+                // `store:NAME` and `sha256:DIGEST` fetch (and verify) the
+                // object first, so stored factor-base dumps load as they are.
+                let resolved: Vec<PathBuf> = paths
+                    .iter()
+                    .map(|p| crypto_lib::store::resolve_path(p))
+                    .collect::<Result<_, _>>()?;
+                let refs: Vec<&Path> = resolved.iter().map(|p| p.as_path()).collect();
                 print!("{}", db::sql(&refs)?);
             }
         },

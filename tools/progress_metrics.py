@@ -284,6 +284,29 @@ def completed_guess(ref, since):
                  source=f"{path}@{commit}")
 
 
+def photo_volcano(ref):
+    path = 'research/photo_volcano_restart_20261017/reports/completion_20261025/completion.json'
+    txt = show(ref, path)
+    if not txt:
+        return
+    data = json.loads(txt)
+    for metric, keys, unit in [
+        ('graph.curves', ('graph', 'curves'), 'curves'),
+        ('rho.verified', ('native_verified', 'rho'), 'cases'),
+        ('bsgs.verified', ('native_verified', 'bsgs'), 'cases'),
+        ('rho.counted_replays', ('field_replay_verified', 'rho'), 'cases'),
+        ('bsgs.counted_replays', ('field_replay_verified', 'bsgs'), 'cases'),
+        ('regularity.certified', ('regularity_certified_systems',), 'systems'),
+        ('ic.random_recoveries', ('IC_random_corpus_recoveries',), 'cases'),
+    ]:
+        value = data
+        for key in keys:
+            value = value.get(key) if isinstance(value, dict) else None
+        emit('photo_volcano.' + metric, value, date=data.get('snapshot_date'),
+             problem=P_IC, unit=unit, better='higher',
+             label='Photographed selected 2-volcano: ' + metric,
+             source=path + '@' + ref)
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -294,7 +317,9 @@ def main():
     algebraic_stage(a.ref, a.since)
     algebraic_audits(a.ref, a.since)
     completed_guess(a.ref, a.since)
+    photo_volcano(a.ref)
 
 
 if __name__ == "__main__":
     main()
+

@@ -23,6 +23,7 @@ which is how CI keeps new workflows honest.
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import re
 import sys
 from pathlib import Path
@@ -31,7 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import artifacts  # noqa: E402
 
 STEP_NAME = "Pull store data this workflow reads (tools/artifacts)"
-PATH_RE = re.compile(r"(?<![A-Za-z0-9_./-])((?:[A-Za-z0-9_+-][A-Za-z0-9_.+-]*/)+[A-Za-z0-9_.+*-]*)")
+PATH_RE = re.compile(r"(?<![A-Za-z0-9_./*-])((?:[A-Za-z0-9_+*-][A-Za-z0-9_.+*-]*/)+[A-Za-z0-9_.+*-]*)")
 
 
 def moved_paths(root: Path) -> set[str]:
@@ -42,15 +43,46 @@ def moved_paths(root: Path) -> set[str]:
     return out
 
 
+def moved_dirs(moved: set[str]) -> set[str]:
+    """Directories specific enough to identify a moved-data subtree."""
+    return {
+        parent
+        for p in moved
+        for n in range(1, p.count("/") + 1)
+        if (parent := p.rsplit("/", n)[0]).count("/") >= 1
+    }
+
+
 def needed(text: str, moved: set[str], dirs: set[str]) -> list[str]:
     """Paths the workflow names that are, or contain, moved files; minimal cover."""
     found = set()
+    # YAML comments name paths without reading them.
+    text = "\n".join(line for line in text.split("\n") if not line.lstrip().startswith("#"))
     for m in PATH_RE.finditer(text):
-        p = m.group(1).split("*", 1)[0].rstrip("/.")
-        while p and p not in moved and p not in dirs:
-            p = p.rsplit("/", 1)[0] if "/" in p else ""
-        if p:
-            found.add(p)
+        raw = m.group(1)
+        head = raw.split("*", 1)[0]
+        p = head.rstrip("/.")
+        if "*" not in raw:
+            if p not in moved and p not in dirs:
+                # A workflow can name a script or input nested in the same
+                # study directory as moved data. Pull that subtree, while
+                # leaving unrelated sibling research paths alone.
+                while p and p not in dirs:
+                    p = p.rsplit("/", 1)[0] if "/" in p else ""
+            if p:
+                found.add(p)
+            continue
+        # A glob names the files it matches: walk up to the directory holding
+        # the moved files only when some moved file matches the whole pattern
+        # (`*` spans `/`, as fnmatch does). A plain path that merely sits
+        # beside moved data (research/other_study/scripts next to a moved
+        # research/x/) names none.
+        pat = raw + "*" if raw.endswith("/") else raw
+        if any(fnmatch.fnmatchcase(x, pat) or fnmatch.fnmatchcase(x, pat + "/*") for x in moved):
+            while p and p not in dirs:
+                p = p.rsplit("/", 1)[0] if "/" in p else ""
+            if p:
+                found.add(p)
     return sorted(p for p in found if not any(p.startswith(q + "/") for q in found))
 
 
@@ -135,7 +167,10 @@ def main() -> int:
     args = ap.parse_args()
     root = artifacts.repo_root()
     moved = moved_paths(root)
-    dirs = {p.rsplit("/", n)[0] for p in moved for n in range(1, p.count("/") + 1)}
+    # Keep matching paths specific to a data subtree. Treating a top-level
+    # directory such as `research/` as a hit would make every workflow that
+    # mentions any research path pull the entire store.
+    dirs = moved_dirs(moved)
     files = [Path(w) for w in args.workflows] or sorted((root / ".github/workflows").glob("*.y*ml"))
     missing = 0
     for f in files:
