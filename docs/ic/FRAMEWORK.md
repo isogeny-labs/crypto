@@ -108,8 +108,20 @@ same studies and says which to run: on every class measured so far rho is
 cheaper, so the verdict says so. A class with no measured recipe (extension
 fields, even-degree or wide Koblitz curves) gets the rho reference and no
 index-calculus plan. A plan is a hypothesis until a paired session confirms it
-on the curve (`research/ic_planner_validation_20261020`). The rule set is
-versioned (`ic-planner/1`); change a rule and the version changes with it.
+on the curve (`research/ic_planner_validation_20261020`).
+
+`--native-weight w` (on `ic plan` and `ic bench --auto`, default 0) plans for
+the AGENTS.md §5a weight `w`, in GAE per unpriced native operation. The
+operations are lookups, guard probes, Legendre symbols, square roots and row
+operations.
+- **Prime curves:** the base becomes `round(m*(w)·N₀)`, with `m*` = 1 up to
+  `w = 0.3` and 1.41 at `w = 1` (`research/ic_planner_weight_rule_20261021`).
+  A weight above 1 uses the `w = 1` multiplier, marked `extrapolated`.
+- **Other classes** keep their counted-`S` plan and say so.
+
+A weighted plan is cheaper only at its weight; it is never a ranking across
+the band. The rule set is versioned (`ic-planner/2` since the weight rule);
+change a rule and the version changes with it.
 
 ---
 

@@ -32,7 +32,7 @@ use crate::cryptanalysis::ic_boundary::{BinaryInstance, PrimeInstance};
 
 /// The planner's rule set.  A spec that pins a plan names this version; a
 /// change to any rule or calibration constant changes it.
-pub const PLANNER_VERSION: &str = "ic-planner/1";
+pub const PLANNER_VERSION: &str = "ic-planner/2";
 
 /// What kind of curve the plan is for: the classes the evidence separates.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -149,6 +149,10 @@ pub struct PlanOptions {
     pub goal: Goal,
     /// Memory the pair table may take; the base is shrunk to fit.
     pub max_table_bytes: f64,
+    /// The AGENTS.md §5a weight the plan is chosen for: GAE charged per
+    /// unpriced native operation (lookups, guard probes, Legendre symbols,
+    /// square roots, row operations). 0 plans for counted `S`.
+    pub native_weight: f64,
 }
 
 impl Default for PlanOptions {
@@ -156,6 +160,7 @@ impl Default for PlanOptions {
         Self {
             goal: Goal::OneTarget,
             max_table_bytes: 8.0 * (1u64 << 30) as f64,
+            native_weight: 0.0,
         }
     }
 }
@@ -211,6 +216,8 @@ pub struct Plan {
     pub planner: &'static str,
     pub profile: CurveProfile,
     pub goal: Goal,
+    /// The §5a weight the plan was chosen for (`PlanOptions::native_weight`).
+    pub native_weight: f64,
     /// Empty when the class has no recipe.
     pub choices: Vec<Choice>,
     pub rho: RhoOutlook,
@@ -294,12 +301,42 @@ const E_FROB: Evidence = Evidence {
     path: "research/ecbench_frobenius_orbit_vs_rho_20261014/README.md",
     claim: "Koblitz n13–n41: compact-orbit-scan + mitm-frobenius-counted:m=2 is 1.57–18.2× rho-frob; orbit ÷ subspace-negfold 0.065–0.511; stride-renew ÷ walk 0.40–0.75 for log2 r ≤ 21 and about 1 above",
 };
+const E_WEIGHT_RULE: Evidence = Evidence {
+    path: "research/ic_planner_weight_rule_20261021/README.md",
+    claim: "prime base ×{0.5–4} on three registered curves: the cheapest multiplier is 1 at w ≤ 0.3 and 1.41 at w = 1 (geometric mean 0.890 of the plan's S_1); held out on four registered curves, S_1(1.41 N₀)/S_1(N₀) 0.759–0.855, interval below 1 on 3 of 4",
+};
 const E_FROB_PROTOCOL: Evidence = Evidence {
     path: "research/ecbench_frobenius_orbit_vs_rho_20261014/PROTOCOL.md",
     claim: "chosen orbit columns per curve (lowest S of the counts tried): 1, 1, 2, 3, 1, 2, 8, 90 at n13–n41; model optimum c ∝ (r/n³)^{1/3}",
 };
 
 // ── Rules ──────────────────────────────────────────────────────────
+
+/// The prime base multiplier `m*(w)` at each measured §5a weight
+/// (`research/ic_planner_weight_rule_20261021`, Phase A): the base is
+/// `round(m* · #E^{1/3}/2)` abscissae, with `m*` read at the largest
+/// measured weight not above the requested one.
+const PRIME_WEIGHT_MULTIPLIERS: [(f64, f64); 5] =
+    [(0.0, 1.0), (0.03, 1.0), (0.1, 1.0), (0.3, 1.0), (1.0, 1.41)];
+
+/// `m*(w)` and how the weight sits against the measured grid.
+fn prime_base_multiplier(w: f64) -> (f64, Support) {
+    let (_, m) = PRIME_WEIGHT_MULTIPLIERS
+        .iter()
+        .rev()
+        .find(|(g, _)| *g <= w)
+        .copied()
+        .unwrap_or(PRIME_WEIGHT_MULTIPLIERS[0]);
+    let last = PRIME_WEIGHT_MULTIPLIERS[PRIME_WEIGHT_MULTIPLIERS.len() - 1].0;
+    let support = if w > last {
+        Support::Extrapolated
+    } else if PRIME_WEIGHT_MULTIPLIERS.iter().any(|(g, _)| *g == w) {
+        Support::Measured
+    } else {
+        Support::Interpolated
+    };
+    (m, support)
+}
 
 /// Measured log2 r span of the prime base-size rule: the Table B ladder
 /// (9.7–23.4 bits), the 20-bit holdout and the 32-bit sessions.
@@ -413,6 +450,23 @@ pub fn plan(profile: &CurveProfile, opts: &PlanOptions) -> Plan {
     if !choices.is_empty() {
         choices.push(linalg_choice(opts.goal));
     }
+    if opts.native_weight > 0.0 {
+        if !matches!(
+            profile.class,
+            CurveClass::Prime | CurveClass::PrimeJ0 | CurveClass::PrimeJ1728
+        ) && !choices.is_empty()
+        {
+            warnings.push(format!(
+                "native weight {} is not modelled for this class: the counted-S (w = 0) plan is used",
+                opts.native_weight
+            ));
+        }
+        warnings.push(
+            "the rho outlook is in counted S (w = 0); the plan is cheaper only at the declared weight, \
+             never a ranking across the §5a band"
+                .into(),
+        );
+    }
     let rho = rho_outlook(profile, !choices.is_empty(), opts.goal);
     let verdict = match (choices.is_empty(), rho.ic_over_rho) {
         (true, _) => format!("run `{}`: no index-calculus recipe applies", rho.reference),
@@ -431,6 +485,7 @@ pub fn plan(profile: &CurveProfile, opts: &PlanOptions) -> Plan {
         planner: PLANNER_VERSION,
         profile: profile.clone(),
         goal: opts.goal,
+        native_weight: opts.native_weight,
         choices,
         rho,
         verdict,
@@ -446,14 +501,33 @@ fn prime_choices(
     let log2_r = profile.log2_r();
     // The family optimum: about #E^{1/3} signed points, so half that in
     // abscissae, capped so the table fits the memory budget.
-    let ideal = (profile.group_order.cbrt() / 2.0).round().max(4.0);
+    let optimum = (profile.group_order.cbrt() / 2.0).round().max(4.0);
+    let (m, weight_support) = prime_base_multiplier(opts.native_weight);
+    let ideal = (m * optimum).round().max(4.0);
     let per_entry = table_bytes_per_entry(profile.p);
     let cap = (opts.max_table_bytes / per_entry).sqrt().floor().max(4.0);
     let abscissae = ideal.min(cap) as u64;
     let mut size_support = span_support(log2_r, PRIME_SIZE_SPAN);
     let mut size_reason = format!(
-        "about #E^(1/3)/2 = {ideal:.0} abscissae, the family optimum that balances the |F|²/4-addition table against the relation trials"
+        "about #E^(1/3)/2 = {optimum:.0} abscissae, the family optimum that balances the |F|²/4-addition table against the relation trials"
     );
+    if m != 1.0 {
+        size_reason += &format!(
+            "; × {m} = {ideal:.0} at w = {} GAE per native operation, where the larger base's fewer trials \
+             (one lookup and one guard probe each) outweigh its table",
+            opts.native_weight
+        );
+    }
+    if weight_support == Support::Interpolated && size_support == Support::Measured {
+        size_support = Support::Interpolated;
+    }
+    if weight_support == Support::Extrapolated {
+        size_support = Support::Extrapolated;
+        warnings.push(format!(
+            "native weight {} is above the measured grid (0–1): the w = 1 multiplier is used",
+            opts.native_weight
+        ));
+    }
     if abscissae < ideal as u64 {
         size_reason += &format!(
             "; capped at {abscissae} so the table fits {:.1} GiB (above the optimum's cost)",
@@ -468,6 +542,9 @@ fn prime_choices(
         size_reason += "; the CM fold is not used: with the pair table it moves S by at most 1.13×";
     }
     let mut fb_evidence = vec![E_LADDER, E_HOLDOUT20, E_BLOCKED32];
+    if opts.native_weight > 0.0 {
+        fb_evidence.push(E_WEIGHT_RULE);
+    }
     if profile.class != CurveClass::Prime {
         fb_evidence.push(E_GLV);
     }
@@ -498,7 +575,11 @@ fn prime_choices(
         Choice {
             stage: "factor_base",
             value: format!("prime-abscissa:size={abscissae}"),
-            rule: "prime.factor-base.family-optimum",
+            rule: if m != 1.0 {
+                "prime.factor-base.weighted-optimum"
+            } else {
+                "prime.factor-base.family-optimum"
+            },
             reason: size_reason,
             support: size_support,
             evidence: fb_evidence,
@@ -721,6 +802,7 @@ mod tests {
             E_GLV,
             E_FROB,
             E_FROB_PROTOCOL,
+            E_WEIGHT_RULE,
         ] {
             assert!(
                 root.join(e.path).is_file(),
@@ -746,6 +828,90 @@ mod tests {
         assert_eq!(pl.get("targets"), Some("walk"));
         let x = pl.rho.ic_over_rho.unwrap();
         assert!((x - 32.955).abs() < 0.01 && pl.rho.support == Support::Measured);
+    }
+
+    fn size(pl: &Plan) -> u64 {
+        pl.get("factor_base")
+            .unwrap()
+            .trim_start_matches("prime-abscissa:size=")
+            .parse()
+            .unwrap()
+    }
+
+    fn at(w: f64) -> PlanOptions {
+        PlanOptions {
+            native_weight: w,
+            ..PlanOptions::default()
+        }
+    }
+
+    #[test]
+    fn the_native_weight_scales_the_prime_base_as_measured() {
+        // icv1-fp24-tm5099-a6f137c6: N₀ = 128; Phase A ran 180 as m141.
+        let r24 = CurveProfile {
+            group_order: 16_782_299.0,
+            r: 16_782_299.0,
+            ..prime(24.0, 16_777_199)
+        };
+        let base = plan(&r24, &PlanOptions::default());
+        assert_eq!(size(&base), 128);
+        assert_eq!(base.choices[0].rule, "prime.factor-base.family-optimum");
+        for w in [0.0, 0.03, 0.1, 0.3, 0.99] {
+            assert_eq!(size(&plan(&r24, &at(w))), 128, "w = {w}");
+        }
+        // Between measured weights the size is read off the grid, no better
+        // than interpolated.
+        assert_eq!(
+            plan(&r24, &at(0.5)).choices[0].support,
+            Support::Interpolated
+        );
+        let w1 = plan(&r24, &at(1.0));
+        assert_eq!(size(&w1), 180);
+        assert_eq!(w1.choices[0].rule, "prime.factor-base.weighted-optimum");
+        assert!(w1.choices[0]
+            .evidence
+            .iter()
+            .any(|e| e.path == E_WEIGHT_RULE.path));
+        assert_eq!(w1.native_weight, 1.0);
+        // The held-out h29 curve: N₀ = 342 and v2-m141 = 482.
+        let h29 = CurveProfile {
+            group_order: 320_091_991.0,
+            r: 320_091_991.0,
+            ..prime(28.25, 320_092_037)
+        };
+        assert_eq!(size(&plan(&h29, &PlanOptions::default())), 342);
+        assert_eq!(size(&plan(&h29, &at(1.0))), 482);
+        // Above the grid: the w = 1 multiplier, extrapolated and said so.
+        let w4 = plan(&r24, &at(4.0));
+        assert_eq!(size(&w4), 180);
+        assert_eq!(w4.choices[0].support, Support::Extrapolated);
+        assert!(w4
+            .warnings
+            .iter()
+            .any(|x| x.contains("above the measured grid")));
+        // The other choices do not move with the weight.
+        for stage in ["oracle", "linalg", "targets"] {
+            assert_eq!(w1.get(stage), base.get(stage), "{stage}");
+        }
+    }
+
+    #[test]
+    fn the_native_weight_leaves_other_classes_at_their_counted_plan() {
+        let bin = CurveProfile {
+            class: CurveClass::BinaryRandom,
+            p: None,
+            n: Some(17),
+            group_order: 2f64.powi(17),
+            r: 2f64.powi(16),
+            cofactor: 2,
+        };
+        let a = plan(&bin, &PlanOptions::default());
+        let b = plan(&bin, &at(1.0));
+        assert_eq!(a.pipeline_params(), b.pipeline_params());
+        assert!(b
+            .warnings
+            .iter()
+            .any(|x| x.contains("not modelled for this class")));
     }
 
     #[test]
