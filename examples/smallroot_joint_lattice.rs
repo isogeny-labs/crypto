@@ -91,7 +91,7 @@ fn mul(f: &Pol, g: &Pol, p: u64) -> Pol {
 }
 fn konst(c: u64, p: u64) -> Pol {
     let mut h = HashMap::new();
-    if c % p != 0 {
+    if !c.is_multiple_of(p) {
         h.insert([0; NV], c % p);
     }
     h
