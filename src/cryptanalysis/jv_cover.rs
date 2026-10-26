@@ -110,6 +110,7 @@ impl Fq {
         self.mul(a, a)
     }
     pub fn conj(&self, a: &E2) -> E2 {
+        super::jv_bitops::hook_adds(self.p, 1);
         E2([a.0[0], (self.p - a.0[1]) % self.p])
     }
     pub fn pow(&self, a: &E2, mut e: u128) -> E2 {
@@ -131,6 +132,7 @@ impl Fq {
         *a == E2::ZERO || self.pow(a, self.order() / 2) == E2::ONE
     }
     pub fn random(&self, rng: &mut StdRng) -> E2 {
+        super::jv_bitops::rng_words(2);
         E2([rng.gen_range(0..self.p), rng.gen_range(0..self.p)])
     }
     /// Tonelli–Shanks in `F_{p²}^×`.
@@ -189,6 +191,7 @@ impl Fld for Fq {
         E2([sm(a.0[0], b.0[0], self.p), sm(a.0[1], b.0[1], self.p)])
     }
     fn neg(&self, a: &E2) -> E2 {
+        super::jv_bitops::hook_adds(self.p, 2);
         E2([(self.p - a.0[0]) % self.p, (self.p - a.0[1]) % self.p])
     }
     fn mul(&self, a: &E2, b: &E2) -> E2 {
@@ -211,6 +214,7 @@ impl Fld for Fq {
             p,
         );
         let ni = inv_mod(norm, p);
+        super::jv_bitops::hook_adds(p, 1);
         E2([mm(a.0[0], ni, p), mm((p - a.0[1]) % p, ni, p)])
     }
 }
@@ -1333,6 +1337,27 @@ fn trace_cache() -> &'static Mutex<HashMap<u64, TraceEntry>> {
     CACHE.get_or_init(|| Mutex::new(HashMap::new()))
 }
 
+thread_local! {
+    static TRACE_SCOPE: Cell<u64> = const { Cell::new(0) };
+}
+
+/// Key traces recorded and replayed on this thread by `scope` as well as
+/// `p` (`0`, the default, is the process-wide cache keyed by `p` alone).  A
+/// study that runs each instance on its own thread gives each run its own
+/// scope, so every run starts with no recorded trace (cold) and runs side by
+/// side do not share one.
+pub fn set_trace_scope(scope: u64) {
+    TRACE_SCOPE.with(|c| c.set(scope));
+}
+
+fn trace_key(p: u64) -> u64 {
+    p.wrapping_add(
+        TRACE_SCOPE
+            .with(Cell::get)
+            .wrapping_mul(0x9E37_79B9_7F4A_7C15),
+    )
+}
+
 /// Forget the recorded traces (tests).
 pub fn clear_traces() {
     trace_cache().lock().unwrap().clear();
@@ -1377,25 +1402,26 @@ pub fn solve_zero_dim_mode(
     mode: LinMode,
 ) -> (Vec<Vec<u64>>, ZeroDimStats) {
     let mut st = ZeroDimStats::default();
+    let key = trace_key(p);
     let r = if !trace {
         f4_fp::f4(input, n, p, opts)
     } else {
         let have = trace_cache()
             .lock()
             .unwrap()
-            .get(&p)
+            .get(&key)
             .map(|e| e.trace.clone());
         match have {
             Some(t) => {
                 // a diverging replay finishes as a full run inside the engine
                 let r = f4_fp::f4_replay(input, n, p, opts, &t);
                 let mut cache = trace_cache().lock().unwrap();
-                if let Some(e) = cache.get_mut(&p) {
+                if let Some(e) = cache.get_mut(&key) {
                     if Arc::ptr_eq(&e.trace, &t) {
                         if r.trace_mismatch {
                             e.diverged += 1;
                             if e.diverged >= 3 && e.diverged > e.held {
-                                cache.remove(&p);
+                                cache.remove(&key);
                             }
                         } else {
                             e.held += 1;
@@ -1415,7 +1441,7 @@ pub fn solve_zero_dim_mode(
                     trace_cache()
                         .lock()
                         .unwrap()
-                        .entry(p)
+                        .entry(key)
                         .or_insert_with(|| TraceEntry {
                             trace: Arc::new(t),
                             held: 0,
@@ -1744,6 +1770,7 @@ pub fn solve_zero_dim_mode(
                 z[free] = 1;
                 for (ri, &pc) in piv.iter().enumerate() {
                     z[pc] = (p - a[ri][free]) % p;
+                    super::jv_bitops::hook_adds(p, 1);
                 }
                 let w1 = z[chain_of[one_idx]];
                 if w1 == 0 {
@@ -1828,6 +1855,7 @@ pub fn solve_zero_dim_mode(
                 w[free] = 1;
                 for (ri, &pc) in piv.iter().enumerate() {
                     w[pc] = (p - a[ri][free]) % p;
+                    super::jv_bitops::hook_adds(p, 1);
                 }
                 let Some(kk) = w.iter().position(|&x| x != 0) else {
                     continue;
@@ -2353,6 +2381,7 @@ pub fn nagao_decompose(
         let mut options: Vec<(usize, Vec<i8>)> = Vec::with_capacity(6);
         for &x in &roots {
             let xe = f.from_fp(x);
+            super::jv_bitops::probe(1);
             let Some(&i) = by_x.get(&x) else {
                 continue 'sol;
             };

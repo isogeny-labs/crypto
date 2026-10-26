@@ -74,8 +74,26 @@ pub type Poly = Vec<(Vec<u32>, u64)>;
 /// loops.
 static FIELD_OPS: AtomicU64 = AtomicU64::new(0);
 
+thread_local! {
+    /// The same count, on the thread that did the work.
+    static FIELD_OPS_THREAD: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// `F4_FP_THREAD_OPS=1`: [`field_ops_total`] and every report read this
+/// thread's count instead of the process-wide one.  For a study that runs
+/// several solves side by side, each confined to one thread (a one-thread
+/// pool per run), so that no run's count takes in another's.
+fn thread_ops_mode() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_THREAD_OPS").as_deref() == Ok("1"))
+}
+
 fn field_ops_now() -> u64 {
-    FIELD_OPS.load(AtomicOrdering::Relaxed)
+    if thread_ops_mode() {
+        FIELD_OPS_THREAD.with(|c| c.get())
+    } else {
+        FIELD_OPS.load(AtomicOrdering::Relaxed)
+    }
 }
 
 /// The process-wide row-reduction counter, for callers that run several
@@ -88,6 +106,10 @@ pub fn field_ops_total() -> u64 {
 #[inline]
 fn count_ops(n: usize) {
     FIELD_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
+    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n as u64));
+    // bitop/v1 (`jv_bitops`, off unless a study turns it on): one row
+    // operation is a multiply-subtract
+    super::jv_bitops::row_ops(n as u64);
 }
 
 #[inline]
@@ -96,6 +118,7 @@ fn mulmod(a: u64, b: u64, p: u64) -> u64 {
 }
 
 fn invmod(a: u64, p: u64) -> u64 {
+    super::jv_bitops::charge(super::jv_bitops::Kind::FieldInv, 1);
     // p prime, a != 0
     if (2..1 << 32).contains(&p) {
         // the same powers, each product reduced by Barrett's method
@@ -200,6 +223,7 @@ fn total_degree(m: &[u32]) -> u32 {
 /// Scale `f` (non-empty, coefficients below `p`) to be monic.
 fn scale_monic(f: &mut Poly, p: u64) {
     let inv = invmod(f[0].1, p);
+    super::jv_bitops::charge(super::jv_bitops::Kind::FieldMul, f.len() as u64);
     if (2..1 << 32).contains(&p) {
         let fp = Barrett::new(p);
         for (_, c) in f.iter_mut() {
@@ -234,13 +258,18 @@ fn normalise_owned(mut out: Poly, p: u64, ord: Ordering) -> Poly {
     // The sort need not keep equal monomials in their order: they are
     // adjacent either way, and merged by a sum that has no order.
     out.sort_unstable_by(|(a, _), (b, _)| cmp_monomial(b, a, ord));
+    let mut merges = 0u64;
+    let scanned = out.len() as u64;
     out.dedup_by(|later, kept| {
         let same = later.0 == kept.0;
         if same {
             kept.1 = (kept.1 + later.1) % p;
+            merges += 1;
         }
         same
     });
+    super::jv_bitops::words(super::jv_bitops::sort_cost(scanned as usize) + scanned);
+    super::jv_bitops::charge(super::jv_bitops::Kind::FieldAdd, merges);
     // drop the sums that cancelled
     out.retain(|(_, c)| *c != 0);
     if !out.is_empty() {
@@ -1035,6 +1064,17 @@ fn gm_update<K: PartialEq>(
     lcmf: impl Fn(&K, &K) -> K,
     coprime: impl Fn(&K, &K) -> bool,
 ) -> Vec<(usize, K)> {
+    // bitop/v1: criterion B tests every held pair (a divisibility and two
+    // lcm compares, a packed monomial being two words each), every alive
+    // element gets a divisibility, coprimality and lcm, and criteria M/F
+    // compare candidate pairs (charged at the quadratic bound)
+    super::jv_bitops::words(
+        if gm {
+            6 * (pairs.len() + above.len()) as u64
+        } else {
+            0
+        } + 6 * k as u64,
+    );
     if gm {
         // Criterion B: an old pair (g1, g2) whose lcm `h` divides is covered
         // by (g1, h) and (h, g2) unless one of those has the same lcm.  Pairs
@@ -1066,6 +1106,7 @@ fn gm_update<K: PartialEq>(
     }
     let mut kept = vec![true; cand.len()];
     if gm {
+        super::jv_bitops::words(2 * (cand.len() * cand.len()) as u64);
         // Criteria M and F: drop (h, g1) when another pair (h, g2) still
         // standing has an lcm dividing its own; of several with equal lcms
         // the last one stays.  A coprime pair is never dropped here (it may
@@ -1153,7 +1194,9 @@ fn rref32(
         if c % 32 == 0 && deadline.is_some_and(|d| Instant::now() > d) {
             return None;
         }
-        let Some(r) = (pr..rows.len()).find(|&r| rows[r][c] != 0) else {
+        let found = (pr..rows.len()).find(|&r| rows[r][c] != 0);
+        super::jv_bitops::words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
+        let Some(r) = found else {
             continue;
         };
         rows.swap(pr, r);
@@ -1738,7 +1781,9 @@ fn rref(rows: &mut Vec<Vec<u64>>, fp: Barrett, deadline: Option<Instant>) -> Opt
         if c % 32 == 0 && deadline.is_some_and(|d| Instant::now() > d) {
             return None;
         }
-        let Some(r) = (pr..rows.len()).find(|&r| rows[r][c] != 0) else {
+        let found = (pr..rows.len()).find(|&r| rows[r][c] != 0);
+        super::jv_bitops::words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
+        let Some(r) = found else {
             continue;
         };
         rows.swap(pr, r);
@@ -2238,6 +2283,25 @@ fn f4_with_arithmetic(
         max_rows = max_rows.max(sparse.len());
         max_cols = max_cols.max(n_cols);
         steps += 1;
+        // bitop/v1 (`jv_bitops`, off unless a study turns it on): symbolic
+        // preprocessing and the matrix build, charged per entry of this
+        // step's matrix (the monomial product, two words; the monomial-set
+        // probe and the column-index probe), per column (the done-set probe,
+        // the reducer search over the basis at its bound, the column sort),
+        // and the pair rows' scans over the reducer columns
+        if super::jv_bitops::enabled() {
+            let entries: u64 = sparse.iter().map(|r| r.len() as u64).sum();
+            let nc = n_cols as u64;
+            super::jv_bitops::probes(2 * entries + nc, 2);
+            super::jv_bitops::words(
+                2 * entries + super::jv_bitops::sort_cost(n_cols) + nc * basis.len() as u64,
+            );
+            let scans: u64 = sparse[..n_pair_rows]
+                .iter()
+                .map(|r| r.first().map_or(0, |e| nc - e.0 as u64))
+                .sum();
+            super::jv_bitops::words(scans);
+        }
         // The reducer rows of symbolic preprocessing have distinct leading
         // columns, none of them an lcm: they are already an echelon form.
         // Reduce each pair row by them alone, column by column, then take
@@ -2828,6 +2892,8 @@ fn reduce_skipping_vecs(f: &Poly, basis: &[Poly], skip: usize, p: u64, ord: Orde
                     0
                 });
                 *v = (*v + mulmod(neg, *gc, p)) % p;
+                super::jv_bitops::row_ops(1);
+                super::jv_bitops::probes(1, 2);
             }
         } else {
             out.push((mono, c));
@@ -3068,6 +3134,8 @@ fn reduce_skipping_packed(
                 Some(fp) if gc < p => fp.reduce(*v + neg * gc),
                 _ => (*v + mulmod(neg, gc, p)) % p,
             };
+            super::jv_bitops::row_ops(1);
+            super::jv_bitops::probes(1, 2);
         }
     }
     // popped in decreasing order: already leading-first
