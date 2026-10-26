@@ -21,6 +21,16 @@ from two match arms while preserving their full variant sets. No arithmetic,
 search, measurement, or result logic is intentionally changed. The touched
 workload file's imports are sorted as Rustfmt requests.
 
+The first compile after those syntax repairs exposed two `E0119` errors:
+`FrobeniusOrbitChoiceWires` had two stacked derive attributes that each
+generated `Clone` and `Debug`. The redundant `#[derive(Clone, Debug)]` was
+removed; the existing `#[derive(Clone, Debug, PartialEq, Eq)]` remains. That
+compile also reported 40 missing `include_str!`/`include_bytes!` inputs caused
+by the sparse checkout. All 32 unique inputs are tracked at the base commit
+(about 96 MB total) and were hydrated unchanged. The mixed compiler log is
+[preserved](04-sparse-and-derive.log); its missing-file errors are checkout
+artifacts, while `E0119` is a real source error.
+
 Relevant prior sources were the three original repository files and their
 adjacent constructors, plus the official Rust Reference on
 [function bodies](https://doc.rust-lang.org/reference/items/functions.html),
@@ -36,8 +46,8 @@ Local validation so far:
   parsing. This checks syntax, not types or tests.
 - `rustfmt --check --edition 2021` passed on all three touched source files.
 - `git diff --check` passed.
-- The complete release-library test is pending an exclusive turn on the shared
-  Cargo target; another session is currently building there.
+- The complete release-library test is being rerun after the derive repair and
+  tracked fixture hydration. A parser sweep alone is not a test pass.
 
 A successful parse is only the first gate. The library test, affected tests,
 and any new compiler errors must be checked before calling the branch green.
