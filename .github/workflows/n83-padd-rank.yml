@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   paired-panel:
-    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/claude/n83-padd-rank-20261019'
+    if: (github.repository == 'aburan28/crypto' || github.repository == 'isogeny-labs/crypto') && github.ref == 'refs/heads/claude/n83-padd-rank-20261019'
     runs-on: ubuntu-24.04
     timeout-minutes: 330
     steps:
