@@ -119,7 +119,7 @@ use rayon::prelude::*;
 
 use crate::cryptanalysis::fx_hash::{FxMap, FxSet};
 use crate::cryptanalysis::pq_groebner_f2::{
-    cmp_mono, mono_key, sort_masks_descending, F2BoolMono, F2BoolPoly,
+    bit, cmp_mono, mono_key, sort_masks_descending, F2BoolMono, F2BoolPoly, Mask,
 };
 
 /// What one F4 run cost, and how far it got.
@@ -222,7 +222,7 @@ enum PairKind {
 struct Pair {
     kind: PairKind,
     /// The lcm of the two leading monomials (critical pairs only).
-    lcm: u64,
+    lcm: Mask,
     /// Selection degree: `deg lcm`, or `deg LM(g) + 1` for a field pair.
     deg: u32,
 }
@@ -251,7 +251,7 @@ impl Row {
 /// The columns of one matrix: monomials in descending order, so the
 /// first set bit of a row is its leading monomial.
 struct Columns {
-    monos: Vec<u64>,
+    monos: Vec<Mask>,
     index: ColumnIndex,
 }
 
@@ -259,7 +259,7 @@ struct Columns {
 /// masks span at most [`DENSE_INDEX_VARS`] variables, a hash map beyond.
 enum ColumnIndex {
     Dense(Vec<u32>),
-    Hashed(FxMap<u64, usize>),
+    Hashed(FxMap<Mask, usize>),
 }
 
 /// Variables up to which [`Columns`] indexes by array: `4 · 2^22` bytes at
@@ -273,11 +273,11 @@ const DENSE_INDEX_VARS: u32 = 22;
 enum MonomialSeen {
     Bitmap {
         bits: Vec<u64>,
-        limit: u64,
-        overflow: FxSet<u64>,
-        values: Vec<u64>,
+        limit: Mask,
+        overflow: FxSet<Mask>,
+        values: Vec<Mask>,
     },
-    Hashed(FxSet<u64>),
+    Hashed(FxSet<Mask>),
 }
 
 impl MonomialSeen {
@@ -290,7 +290,7 @@ impl MonomialSeen {
 
     fn with_bitmap(n_vars: usize, enabled: bool) -> Self {
         if enabled && n_vars <= DENSE_INDEX_VARS as usize {
-            let limit = 1u64 << n_vars;
+            let limit: Mask = 1 << n_vars;
             Self::Bitmap {
                 bits: vec![0; (limit as usize).div_ceil(64)],
                 limit,
@@ -303,7 +303,7 @@ impl MonomialSeen {
     }
 
     #[inline]
-    fn insert(&mut self, mask: u64) -> bool {
+    fn insert(&mut self, mask: Mask) -> bool {
         match self {
             Self::Bitmap {
                 bits,
@@ -330,7 +330,7 @@ impl MonomialSeen {
     }
 
     #[inline]
-    fn contains(&self, mask: &u64) -> bool {
+    fn contains(&self, mask: &Mask) -> bool {
         match self {
             Self::Bitmap {
                 bits,
@@ -348,13 +348,13 @@ impl MonomialSeen {
         }
     }
 
-    fn extend(&mut self, values: impl IntoIterator<Item = u64>) {
+    fn extend(&mut self, values: impl IntoIterator<Item = Mask>) {
         for mask in values {
             self.insert(mask);
         }
     }
 
-    fn into_values(self) -> Vec<u64> {
+    fn into_values(self) -> Vec<Mask> {
         match self {
             Self::Bitmap { values, .. } => values,
             Self::Hashed(set) => set.into_iter().collect(),
@@ -363,12 +363,12 @@ impl MonomialSeen {
 }
 
 impl Columns {
-    fn from_monomials(set: impl IntoIterator<Item = u64>) -> Self {
-        let mut monos: Vec<u64> = set.into_iter().collect();
+    fn from_monomials(set: impl IntoIterator<Item = Mask>) -> Self {
+        let mut monos: Vec<Mask> = set.into_iter().collect();
         sort_masks_descending(&mut monos);
         monos.dedup();
-        let span = monos.iter().fold(0u64, |acc, &m| acc | m);
-        let bits = u64::BITS - span.leading_zeros();
+        let span = monos.iter().fold(0 as Mask, |acc, &m| acc | m);
+        let bits = Mask::BITS - span.leading_zeros();
         let index = if bits <= DENSE_INDEX_VARS {
             let mut at = vec![NONE; 1usize << bits];
             for (i, &m) in monos.iter().enumerate() {
@@ -382,7 +382,7 @@ impl Columns {
     }
 
     #[inline]
-    fn column(&self, m: u64) -> usize {
+    fn column(&self, m: Mask) -> usize {
         match &self.index {
             ColumnIndex::Dense(at) => {
                 let c = at[m as usize];
@@ -1284,7 +1284,7 @@ fn degree(p: &F2BoolPoly) -> u32 {
 struct State {
     n_vars: usize,
     polys: Vec<F2BoolPoly>,
-    lm: Vec<u64>,
+    lm: Vec<Mask>,
     active: Vec<bool>,
     pairs: Vec<Pair>,
     pair_select_scratch: PairSelectScratch,
@@ -1344,14 +1344,14 @@ fn dense_pair_select_enabled() -> bool {
 
 /// The current direct Becker–Weispfenning UPDATE selection.
 fn select_new_pairs_quadratic(
-    lh: u64,
-    lm: &[u64],
+    lh: Mask,
+    lm: &[Mask],
     active: &[usize],
     st: &mut F4Stats,
-) -> Vec<(usize, u64)> {
+) -> Vec<(usize, Mask)> {
     st.pair_quadratic_select_calls += 1;
     st.pair_candidate_visits += active.len() as u64;
-    let mut candidates: Vec<(usize, u64)> = active.iter().map(|&g| (g, lh | lm[g])).collect();
+    let mut candidates: Vec<(usize, Mask)> = active.iter().map(|&g| (g, lh | lm[g])).collect();
     let mut kept = Vec::with_capacity(candidates.len());
     while let Some((g1, l1)) = candidates.pop() {
         let coprime = lh & lm[g1] == 0;
@@ -1377,12 +1377,12 @@ fn select_new_pairs_quadratic(
 /// Exact dense-domain equivalent of [`select_new_pairs_quadratic`].
 fn select_new_pairs_dense(
     n_vars: usize,
-    lh: u64,
-    lm: &[u64],
+    lh: Mask,
+    lm: &[Mask],
     active: &[usize],
     scratch: &mut PairSelectScratch,
     st: &mut F4Stats,
-) -> Vec<(usize, u64)> {
+) -> Vec<(usize, Mask)> {
     debug_assert!(n_vars <= 20);
     st.pair_dense_select_calls += 1;
     st.pair_candidate_visits += active.len() as u64;
@@ -1455,7 +1455,7 @@ fn select_new_pairs_dense(
         if lh & lm[g] == 0 {
             st.pairs_product_skipped += 1;
         } else if dense.survivor[lcm] == g as u32 {
-            selected.push((g, lcm as u64));
+            selected.push((g, lcm as Mask));
         }
     }
     selected
@@ -1556,7 +1556,7 @@ impl State {
     /// The active element with the fewest terms whose leading monomial
     /// divides `m` (the first such on a tie).  Tests every active element,
     /// which the caller counts as `active.len()` divisor tests.
-    fn reducer_among(&self, m: u64, active: &[usize]) -> Option<usize> {
+    fn reducer_among(&self, m: Mask, active: &[usize]) -> Option<usize> {
         let mut best: Option<usize> = None;
         for &g in active {
             if self.lm[g] & !m == 0
@@ -1666,10 +1666,10 @@ pub fn groebner_basis_f4(
         // The rows the step reduces: both halves of every critical pair
         // (their common leading monomial is the lcm, which one half will
         // pivot and the other lose), and every field product.
-        let mut seen_rows: FxSet<(u64, usize)> = FxSet::default();
-        let mut half_keys: Vec<(u64, usize)> = Vec::new();
-        let mut field_keys: Vec<(u64, usize)> = Vec::new();
-        let mut lcm_columns: FxSet<u64> = FxSet::default();
+        let mut seen_rows: FxSet<(Mask, usize)> = FxSet::default();
+        let mut half_keys: Vec<(Mask, usize)> = Vec::new();
+        let mut field_keys: Vec<(Mask, usize)> = Vec::new();
+        let mut lcm_columns: FxSet<Mask> = FxSet::default();
         for p in &selected {
             match p.kind {
                 PairKind::Critical(i, j) => {
@@ -1686,7 +1686,7 @@ pub fn groebner_basis_f4(
                     st.field_pairs_reduced += 1;
                     // A field multiplier lies inside `LM(g)` and a half's is
                     // disjoint from it, so the two kinds of key never meet.
-                    let mult = 1u64 << v;
+                    let mult: Mask = bit(v);
                     if seen_rows.insert((mult, g)) {
                         field_keys.push((mult, g));
                     }
@@ -1695,8 +1695,8 @@ pub fn groebner_basis_f4(
         }
         // The products are independent of one another; form them in
         // parallel when there are enough, in the order they were listed.
-        let product = |&(mult, g): &(u64, usize)| s.polys[g].mul_mono(F2BoolMono::from_mask(mult));
-        let products = |keys: &[(u64, usize)]| -> Vec<F2BoolPoly> {
+        let product = |&(mult, g): &(Mask, usize)| s.polys[g].mul_mono(F2BoolMono::from_mask(mult));
+        let products = |keys: &[(Mask, usize)]| -> Vec<F2BoolPoly> {
             let terms: usize = keys.iter().map(|&(_, g)| s.polys[g].terms.len()).sum();
             if keys.len() > 1
                 && terms >= PAR_PRODUCT_TERMS
@@ -1727,11 +1727,11 @@ pub fn groebner_basis_f4(
             && rayon::current_num_threads() > 1;
         // (The S-rows carry many times more terms than distinct monomials,
         // so each share of them is deduplicated into a set of its own.)
-        let mut queue: Vec<u64> = if par_terms {
+        let mut queue: Vec<Mask> = if par_terms {
             half_rows
                 .par_iter()
                 .chain(field_rows.par_iter())
-                .fold(FxSet::default, |mut seen: FxSet<u64>, p| {
+                .fold(FxSet::default, |mut seen: FxSet<Mask>, p| {
                     seen.extend(p.terms.iter().map(|t| t.mask));
                     seen
                 })
@@ -1765,7 +1765,7 @@ pub fn groebner_basis_f4(
         // order of examination — a monomial's reducer depends only on the
         // monomial — and a large level's lookups, products and membership
         // tests are independent of one another, so they run in parallel.
-        let reducer_row = |m: u64| {
+        let reducer_row = |m: Mask| {
             s.reducer_among(m, &active)
                 .map(|g| s.polys[g].mul_mono(F2BoolMono::from_mask(m & !s.lm[g])))
         };
@@ -1789,7 +1789,7 @@ pub fn groebner_basis_f4(
                 frontier.iter().map(|&m| reducer_row(m)).collect()
             };
             // a reducer leads with its monomial, already examined
-            let unseen = |r: &F2BoolPoly| -> Vec<u64> {
+            let unseen = |r: &F2BoolPoly| -> Vec<Mask> {
                 debug_assert!(r.lt().is_some_and(|t| examined.contains(&t.mask)));
                 r.terms[1..]
                     .iter()
@@ -1797,7 +1797,7 @@ pub fn groebner_basis_f4(
                     .filter(|t| !examined.contains(t))
                     .collect()
             };
-            let mut next: Vec<u64> = if parallel {
+            let mut next: Vec<Mask> = if parallel {
                 rows.par_iter().flatten().flat_map_iter(unseen).collect()
             } else {
                 rows.iter().flatten().flat_map(unseen).collect()
@@ -1924,10 +1924,10 @@ fn interreduce(mut elements: Vec<F2BoolPoly>, n_vars: usize, st: &mut F4Stats) -
             minimal.push(p);
         }
     }
-    let lms: Vec<u64> = minimal.iter().map(|p| p.lt().unwrap().mask).collect();
+    let lms: Vec<Mask> = minimal.iter().map(|p| p.lt().unwrap().mask).collect();
     let mut examined = MonomialSeen::new(n_vars);
     examined.extend(lms.iter().copied());
-    let mut queue: Vec<u64> = Vec::new();
+    let mut queue: Vec<Mask> = Vec::new();
     for p in &minimal {
         for t in &p.terms[1..] {
             if examined.insert(t.mask) {
@@ -1994,7 +1994,7 @@ fn interreduce(mut elements: Vec<F2BoolPoly>, n_vars: usize, st: &mut F4Stats) -
         }
     }
     st.eliminate_ns += t.elapsed().as_nanos() as u64;
-    let lm_set: HashSet<u64> = lms.iter().copied().collect();
+    let lm_set: HashSet<Mask> = lms.iter().copied().collect();
     let mut out: Vec<F2BoolPoly> = rows
         .iter()
         .filter(|(lead, _)| lm_set.contains(&cols.monos[*lead]))
@@ -2022,7 +2022,7 @@ pub fn solutions_from_reduced_basis(
     n_vars: usize,
     max_free: usize,
     tests: &mut u64,
-) -> Option<Vec<u64>> {
+) -> Option<Vec<Mask>> {
     if gb.iter().any(is_one) {
         return Some(Vec::new());
     }
@@ -2042,17 +2042,17 @@ pub fn solutions_from_reduced_basis(
         .collect();
     let mut out = Vec::new();
     for a in 0u64..(1u64 << free.len()) {
-        let mut point = 0u64;
-        for (bit, &v) in free.iter().enumerate() {
-            if (a >> bit) & 1 == 1 {
-                point |= 1u64 << v;
+        let mut point: Mask = 0;
+        for (i, &v) in free.iter().enumerate() {
+            if (a >> i) & 1 == 1 {
+                point |= bit(v as u32);
             }
         }
         for &(v, k) in &pivots {
             // The tail involves free variables and the constant only.
             *tests += gb[k].terms.len() as u64;
             if gb[k].eval(point) == 1 {
-                point |= 1u64 << v;
+                point |= bit(v as u32);
             }
         }
         let mut ok = true;
@@ -2073,6 +2073,10 @@ pub fn solutions_from_reduced_basis(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use crate::cryptanalysis::pq_groebner_f2::{groebner_basis_f2, reduce, spoly};
     use rand::rngs::StdRng;
     use rand::{Rng, SeedableRng};
@@ -2094,8 +2098,15 @@ mod tests {
                 })
                 .collect::<Vec<_>>();
             for &m in &masks {
-                assert_eq!(bitmap.insert(m), hashed.insert(m), "n_vars={n_vars}");
-                assert_eq!(bitmap.contains(&m), hashed.contains(&m));
+                assert_eq!(
+                    bitmap.insert(mask_from64(m)),
+                    hashed.insert(mask_from64(m)),
+                    "n_vars={n_vars}"
+                );
+                assert_eq!(
+                    bitmap.contains(&mask_from64(m)),
+                    hashed.contains(&mask_from64(m))
+                );
             }
             let mut actual = bitmap.into_values();
             let mut expected = hashed.into_values();
@@ -2280,7 +2291,13 @@ mod tests {
     }
 
     fn poly(masks: &[u64], n: usize) -> F2BoolPoly {
-        F2BoolPoly::from_monos(masks.iter().map(|&m| F2BoolMono::from_mask(m)).collect(), n)
+        F2BoolPoly::from_monos(
+            masks
+                .iter()
+                .map(|&m| F2BoolMono::from_mask(mask_from64(m)))
+                .collect(),
+            n,
+        )
     }
 
     #[test]
@@ -2291,18 +2308,18 @@ mod tests {
             let mut scratch = PairSelectScratch::default();
             for round in 0..256 {
                 let count = rng.gen_range(0..96usize);
-                let lm: Vec<u64> = (0..count)
+                let lm: Vec<Mask> = (0..count)
                     .map(|index| {
-                        if index > 0 && index % 7 == 0 {
+                        mask_from64(if index > 0 && index % 7 == 0 {
                             // Duplicate LCM groups and leaders are deliberate.
                             rng.gen::<u64>() & cap
                         } else {
                             (rng.gen::<u64>() & cap).max(1)
-                        }
+                        })
                     })
                     .collect();
                 let active: Vec<usize> = (0..count).filter(|_| rng.gen_ratio(3, 4)).collect();
-                let lh = (rng.gen::<u64>() & cap).max(1);
+                let lh = mask_from64((rng.gen::<u64>() & cap).max(1));
                 let mut quadratic_stats = F4Stats::default();
                 let mut dense_stats = F4Stats::default();
                 let quadratic = select_new_pairs_quadratic(lh, &lm, &active, &mut quadratic_stats);
@@ -2375,13 +2392,14 @@ mod tests {
 
     fn brute_force(eqs: &[F2BoolPoly], n: usize) -> Vec<u64> {
         (0u64..1 << n)
-            .filter(|v| eqs.iter().all(|e| e.eval(*v) == 0))
+            .filter(|v| eqs.iter().all(|e| e.eval(mask_from64(*v)) == 0))
             .collect()
     }
 
     fn standard_monomials(gb: &[F2BoolPoly], n: usize) -> u64 {
-        let lms: Vec<u64> = gb.iter().filter_map(|p| p.lt()).map(|m| m.mask).collect();
+        let lms: Vec<Mask> = gb.iter().filter_map(|p| p.lt()).map(|m| m.mask).collect();
         (0u64..1 << n)
+            .map(mask_from64)
             .filter(|&m| !lms.iter().any(|&l| l & !m == 0))
             .count() as u64
     }
@@ -2442,7 +2460,7 @@ mod tests {
     fn the_field_pairs_close_the_toy_ideal() {
         let g = poly(&[3, 1, 2], 2);
         let (gb, st) = groebner_basis_f4(vec![g.clone()], 2, None);
-        let mut lts: Vec<u64> = gb.iter().map(|p| p.lt().unwrap().mask).collect();
+        let mut lts: Vec<Mask> = gb.iter().map(|p| p.lt().unwrap().mask).collect();
         lts.sort();
         assert_eq!(lts, vec![1, 2]);
         assert!(gb.iter().all(|p| p.terms.len() == 1), "{gb:?}");
@@ -2488,7 +2506,7 @@ mod tests {
             let mut tests = 0;
             let mut got = solutions_from_reduced_basis(&gb, n, 24, &mut tests).unwrap();
             got.sort_unstable();
-            assert_eq!(got, sols, "trial {trial}: extraction");
+            assert_eq!(masks_low64(&got), sols, "trial {trial}: extraction");
             // Every generator lies in the ideal the basis generates.
             for e in &eqs {
                 assert!(
@@ -2549,7 +2567,10 @@ mod tests {
             if sols > 0 {
                 consistent += 1;
                 let free = (0..9)
-                    .filter(|&v| !gb.iter().any(|g| g.lt().unwrap().mask == 1u64 << v))
+                    .filter(|&v| {
+                        !gb.iter()
+                            .any(|g| g.lt().unwrap().mask == mask_from64(1u64 << v))
+                    })
                     .count() as u64;
                 assert!(free < sols, "{free} free variables for {sols} solutions");
             }

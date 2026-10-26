@@ -454,7 +454,7 @@ pub mod agreeing_gluing {
 
 /// Solving-degree bounds for the descended chained systems (lead L4).
 pub mod degree_bounds {
-    use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+    use crate::cryptanalysis::pq_groebner_f2::{F2BoolPoly, Mask};
 
     /// Caminata–Gorla bound for one system, as Steiner states it
     /// (ToSC 2024(1), arXiv 2310.03637v2, Corollary 2.9): if `(F^hom)` is
@@ -482,7 +482,7 @@ pub mod degree_bounds {
         let occurring = system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |acc, t| acc | t.mask);
+            .fold(0 as Mask, |acc, t| acc | t.mask);
         let mut degrees: Vec<u32> = system
             .iter()
             .map(|p| {

@@ -30,7 +30,7 @@
 
 use super::inherited_f4::{CloseFlow, ClosureSink, InheritCost, ReducedBasis, RoundJob, RoundView};
 use super::koblitz_bench::ClosureDegree;
-use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crate::cryptanalysis::pq_groebner_f2::{mask_from64, masks_to_words_checked, F2BoolPoly, Mask};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
@@ -495,7 +495,12 @@ impl Store {
                     ] {
                         put_u64(w, n)?;
                     }
-                    put_words(w, view.columns)?;
+                    put_words(
+                        w,
+                        &masks_to_words_checked(view.columns).ok_or_else(|| {
+                            invalid("checkpoint stores 64-bit monomial masks; a column needs more")
+                        })?,
+                    )?;
                     for &p in view.pending {
                         w.write_all(&p.to_le_bytes())?;
                     }
@@ -525,7 +530,12 @@ impl Store {
                     ] {
                         put_u64(w, n)?;
                     }
-                    put_words(w, view.columns)?;
+                    put_words(
+                        w,
+                        &masks_to_words_checked(view.columns).ok_or_else(|| {
+                            invalid("checkpoint stores 64-bit monomial masks; a column needs more")
+                        })?,
+                    )?;
                     let bits: Vec<u8> = view.was_pivot.iter().map(|&b| b as u8).collect();
                     w.write_all(&bits)?;
                     for row in view.matrix {
@@ -601,7 +611,10 @@ impl Store {
         if words != ncols.div_ceil(64).max(1) {
             return Err(invalid("checkpoint layout is inconsistent"));
         }
-        let columns = get_words(&mut r, ncols)?;
+        let columns: Vec<Mask> = get_words(&mut r, ncols)?
+            .into_iter()
+            .map(mask_from64)
+            .collect();
         match kind {
             KIND_BETWEEN => {
                 let mut pending = Vec::with_capacity(npend);

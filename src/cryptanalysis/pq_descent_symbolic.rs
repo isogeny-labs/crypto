@@ -34,7 +34,9 @@
 //! dimension the truth table can still reach.
 
 use crate::cryptanalysis::fx_hash::MaskMap;
-use crate::cryptanalysis::pq_groebner_f2::{mono_key, F2BoolMono, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{
+    bit, key_mask, mask_from64, mono_key, F2BoolMono, F2BoolPoly, Mask, MonoKey,
+};
 use crate::cryptanalysis::semaev_decomp::Gf2;
 
 /// The most boolean variables a system may have: one bit of a
@@ -75,13 +77,13 @@ impl FieldBoolPoly {
         let mut p = Self::default();
         for (k, &e) in basis.iter().enumerate() {
             if e != 0 {
-                p.terms.insert(1u64 << (offset + k as u32), e);
+                p.terms.insert(bit(offset + k as u32), e);
             }
         }
         p
     }
 
-    fn add_term(&mut self, mask: u64, coeff: u64) {
+    fn add_term(&mut self, mask: Mask, coeff: u64) {
         if coeff == 0 {
             return;
         }
@@ -144,7 +146,7 @@ impl FieldBoolPoly {
     pub fn eval(&self, point: u64) -> u64 {
         self.terms
             .iter()
-            .filter(|(&m, _)| point & m == m)
+            .filter(|(&m, _)| mask_from64(point) & m == m)
             .fold(0u64, |acc, (_, &c)| acc ^ c)
     }
 
@@ -156,7 +158,7 @@ impl FieldBoolPoly {
     /// its masks are distinct, being keys of one map — and is taken as is,
     /// instead of `n` separate sorts of about half the terms each.
     pub fn split(&self, n: u32, n_vars: usize) -> Vec<F2BoolPoly> {
-        let mut keyed: Vec<(u128, u64)> = self
+        let mut keyed: Vec<(MonoKey, u64)> = self
             .terms
             .iter()
             .map(|(&m, &c)| (mono_key(F2BoolMono::from_mask(m)), c))
@@ -164,7 +166,7 @@ impl FieldBoolPoly {
         keyed.sort_unstable_by_key(|a| std::cmp::Reverse(a.0));
         let mut monos: Vec<Vec<F2BoolMono>> = (0..n).map(|_| Vec::new()).collect();
         for &(key, c) in &keyed {
-            let m = F2BoolMono::from_mask(!(key as u64));
+            let m = F2BoolMono::from_mask(key_mask(key));
             let mut bits = c;
             while bits != 0 {
                 let j = bits.trailing_zeros();
@@ -461,6 +463,10 @@ mod tests {
     use crate::cryptanalysis::ic_boundary::random_binary_instance;
     use crate::cryptanalysis::ic_descent_degrees::curve_of;
     use crate::cryptanalysis::pq_descent::{weil_descend_s3, weil_descend_s4};
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use rand::rngs::StdRng;
     use rand::{Rng, SeedableRng};
 
@@ -469,7 +475,7 @@ mod tests {
     }
 
     fn sorted_masks(p: &F2BoolPoly) -> Vec<u64> {
-        let mut v: Vec<u64> = p.terms.iter().map(|t| t.mask).collect();
+        let mut v: Vec<u64> = p.terms.iter().map(|t| mask_low64(t.mask)).collect();
         v.sort_unstable();
         v
     }
@@ -572,7 +578,7 @@ mod tests {
             let direct = semaev_s3_word(gf, inst.b, xs[0], xs[1], x_r);
             for (j, eq) in sys.equations.iter().enumerate() {
                 assert_eq!(
-                    eq.eval(v) as u64,
+                    eq.eval(mask_from64(v)) as u64,
                     (direct >> j) & 1,
                     "equation {j} at {v:#x}"
                 );
@@ -592,7 +598,7 @@ mod tests {
             let direct = semaev_s4_word(gf, inst.b, xs[0], xs[1], xs[2], x_r);
             for (j, eq) in sys.equations.iter().enumerate() {
                 assert_eq!(
-                    eq.eval(v) as u64,
+                    eq.eval(mask_from64(v)) as u64,
                     (direct >> j) & 1,
                     "S4 equation {j} at {v:#x}"
                 );

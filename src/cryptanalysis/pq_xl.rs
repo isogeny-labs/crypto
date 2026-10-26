@@ -55,7 +55,7 @@
 //! - **G. Bard**, *Algebraic Cryptanalysis*, Springer 2009 — chapter
 //!   14 for an XL exposition specialised to `F_2`.
 
-use crate::cryptanalysis::pq_groebner_f2::{cmp_mono, F2BoolMono, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{cmp_mono, mask_from64, F2BoolMono, F2BoolPoly};
 use std::cmp::Ordering;
 
 // ── Sparse F_2 rows ────────────────────────────────────────────────
@@ -115,7 +115,7 @@ fn enumerate_monomials(n_vars: usize, max_deg: u32) -> Vec<F2BoolMono> {
     assert!(n_vars <= 32, "XL capped at 32 variables");
     let total = 1u64 << n_vars;
     let mut out: Vec<F2BoolMono> = (0..total)
-        .map(F2BoolMono::from_mask)
+        .map(|m| F2BoolMono::from_mask(mask_from64(m)))
         .filter(|m| m.degree() <= max_deg)
         .collect();
     out.sort_by(|a, b| cmp_mono(*b, *a));
@@ -306,6 +306,10 @@ pub fn boolean_xl_solve(polys: Vec<F2BoolPoly>, n_vars: usize) -> Vec<u64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use crate::cryptanalysis::pq_groebner_f2::{groebner_basis_f2, solve_system_f2};
 
     /// Sparse row XOR cancellation: `[0, 2, 5]` XOR `[0, 2, 7]` = `[5, 7]`.
