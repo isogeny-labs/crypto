@@ -40,6 +40,58 @@ pub const RECORD_SCHEMA: &str = "ecbench.record/v1";
 /// A session is regraded under the version it was graded with
 /// ([`grade_for_version`]); [`grade_v2`] is frozen.
 pub const GRADING_VERSION: u32 = 3;
+
+/// The key under which a session records the version of the inherited-F4
+/// word-operation accounting it was made under.
+pub const F4_ACCOUNTING_KEY: &str = "inherited_f4_specialise";
+
+/// The versions of the counted-work definitions this binary charges, recorded
+/// in every new session.  A method's identity hashes its configuration, not
+/// the code, so a change to what a unit counts is otherwise visible only as
+/// a different binary hash and, on replay, as bare count differences.
+pub fn current_accounting_versions() -> BTreeMap<String, u32> {
+    BTreeMap::from([(
+        F4_ACCOUNTING_KEY.to_string(),
+        crate::cryptanalysis::inherited_f4::INHERITED_F4_ACCOUNTING_VERSION,
+    )])
+}
+
+/// When inherited-F4 specialisation became eager on every host (`#2043`,
+/// 2026-10-17T17:19:59Z), in Unix milliseconds.  Before it a host without BMI2
+/// charged the lazy rewrite, which counts differently.
+pub const F4_EAGER_EVERYWHERE_UNIX_MS: u128 = 1_792_257_599_000;
+
+/// What to add to a failed replay of an inherited-F4 record, given the
+/// accounting versions its session recorded; `None` when the accounting
+/// cannot be the reason, so the difference is something else and is left
+/// unattributed.
+///
+/// A session without the field predates it, and is not assigned a version.
+/// The one change known to have moved the counts is `#2043`: it is named only
+/// when it can apply, that is when the session started before it and its host
+/// had no BMI2 (a BMI2 x86-64 host was eager before it as it is now).
+pub fn f4_accounting_note(
+    recorded: &BTreeMap<String, u32>,
+    started_unix_ms: u128,
+    recorded_host_has_bmi2: bool,
+) -> Option<String> {
+    let current = crate::cryptanalysis::inherited_f4::INHERITED_F4_ACCOUNTING_VERSION;
+    match recorded.get(F4_ACCOUNTING_KEY) {
+        Some(&v) if v == current => None,
+        Some(&v) => Some(format!(
+            "recorded under inherited-F4 accounting v{v}, this binary charges v{current}: \
+             the counts are different definitions, not a disagreement"
+        )),
+        None if recorded_host_has_bmi2 || started_unix_ms >= F4_EAGER_EVERYWHERE_UNIX_MS => None,
+        None => Some(format!(
+            "recorded before #2043 (2026-10-17) on a host without BMI2, where inherited-F4 \
+             specialisation was charged lazily; this binary charges it eagerly on every host \
+             (accounting v{current}), so a count difference here is expected, and later changes \
+             recorded only by binary hash can add to it"
+        )),
+    }
+}
+
 pub const CHILD_INPUT_SCHEMA: &str = "ecbench.child_input/v1";
 pub const CHILD_OUTPUT_SCHEMA: &str = "ecbench.child_output/v1";
 
@@ -1884,6 +1936,54 @@ mod grade_tests {
             assert_eq!(g.level, r.isolation.level, "seq {}", r.seq);
             assert_eq!(g.blockers, r.isolation.blockers, "seq {}", r.seq);
         }
+    }
+
+    /// A failed replay names the accounting version, and only when it can
+    /// matter: not when the session was made under the version charged now.
+    #[test]
+    fn f4_accounting_note_names_the_version_only_when_it_differs() {
+        use crate::cryptanalysis::inherited_f4::INHERITED_F4_ACCOUNTING_VERSION as NOW;
+        assert_eq!(
+            current_accounting_versions().get(F4_ACCOUNTING_KEY),
+            Some(&NOW)
+        );
+        let (before, after) = (F4_EAGER_EVERYWHERE_UNIX_MS - 1, F4_EAGER_EVERYWHERE_UNIX_MS);
+        // Same version: the accounting is not the reason.
+        assert_eq!(
+            f4_accounting_note(&current_accounting_versions(), before, false),
+            None
+        );
+        // A different recorded version is named, whatever the host.
+        let older = BTreeMap::from([(F4_ACCOUNTING_KEY.to_string(), NOW + 1)]);
+        let note = f4_accounting_note(&older, after, true).expect("a different version is named");
+        assert!(note.contains(&format!("v{}", NOW + 1)) && note.contains(&format!("v{NOW}")));
+        // No version recorded: named only when #2043 can apply, that is before
+        // it and on a host without BMI2.
+        let none = BTreeMap::new();
+        let note = f4_accounting_note(&none, before, false).expect("pre-#2043 without BMI2");
+        assert!(note.contains("#2043") && note.contains("without BMI2"));
+        assert_eq!(
+            f4_accounting_note(&none, before, true),
+            None,
+            "BMI2 hosts were eager"
+        );
+        assert_eq!(f4_accounting_note(&none, after, false), None, "after #2043");
+    }
+
+    /// A session written before the field existed reads with no versions and
+    /// is written back without the key, so it is byte for byte what it was.
+    #[test]
+    fn a_committed_session_without_versions_round_trips_without_the_key() {
+        use crate::cryptanalysis::ecbench::runner::read_session;
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/ecbench_rootfind_engine_20261012/sessions/claim-n13");
+        if !dir.join("session.json").exists() {
+            return; // a sparse checkout without the evidence
+        }
+        let session = read_session(&dir).unwrap();
+        assert!(session.accounting_versions.is_empty());
+        let text = serde_json::to_string(&session).unwrap();
+        assert!(!text.contains("accounting_versions"));
     }
 }
 

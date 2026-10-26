@@ -2815,7 +2815,7 @@ pub(crate) fn build_inherited_macaulay_support_local(
     quadratic_generators: bool,
 ) -> Option<(Vec<u64>, Vec<Vec<u64>>)> {
     use std::sync::atomic::Ordering::Relaxed;
-    let profiling = F4_SUPPORT_LOCAL_PROFILE_ENABLED.load(Relaxed);
+    let profiling = F4_SUPPORT_LOCAL_PROFILE_ENABLED.with(std::cell::Cell::get);
     if profiling {
         support_local_counters::CALLS.fetch_add(1, Relaxed);
     }
@@ -3586,8 +3586,12 @@ static F4_SUPPORT_LOCAL_STREAM: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
 static F4_SUPPORT_LOCAL_BITMAP_COLUMNS: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
-static F4_SUPPORT_LOCAL_PROFILE_ENABLED: std::sync::atomic::AtomicBool =
-    std::sync::atomic::AtomicBool::new(false);
+thread_local! {
+    // The profile API is for a single-threaded solve. A process-global flag
+    // also counted unrelated solves running on other test/worker threads.
+    static F4_SUPPORT_LOCAL_PROFILE_ENABLED: std::cell::Cell<bool> =
+        std::cell::Cell::new(false);
+}
 static F4_INHERITED_BASIS_PROFILE_ENABLED: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
 mod inherited_basis_counters {
@@ -3814,7 +3818,7 @@ pub fn set_f4_support_local_bitmap_columns(enabled: bool) {
 
 /// Enable nested support-local build timers before a single-threaded solve.
 pub fn set_f4_support_local_profile(enabled: bool) {
-    F4_SUPPORT_LOCAL_PROFILE_ENABLED.store(enabled, std::sync::atomic::Ordering::Relaxed);
+    F4_SUPPORT_LOCAL_PROFILE_ENABLED.with(|flag| flag.set(enabled));
 }
 
 pub fn support_local_build_profile_reset() {
@@ -4367,8 +4371,12 @@ fn legacy_rref_kernel() -> bool {
 /// (`gf2_elim_bench` has it 1.5–4.5× faster on the oracle's own Macaulay
 /// matrices); smaller ones stay on the column-at-a-time kernel, where a
 /// table would cost more to build than it saves.
+pub(crate) fn rref_uses_four_russians(rows: usize, n_cols: usize) -> bool {
+    !legacy_rref_kernel() && !suffix_kernel_forced() && rows >= 128 && n_cols >= 256
+}
+
 pub(crate) fn rref_f2_counted(matrix: &mut [Vec<u64>], n_cols: usize, word_ops: &mut u64) -> usize {
-    if !legacy_rref_kernel() && !suffix_kernel_forced() && matrix.len() >= 128 && n_cols >= 256 {
+    if rref_uses_four_russians(matrix.len(), n_cols) {
         return crate::cryptanalysis::gf2_elim::rref_counted(matrix, n_cols, word_ops);
     }
     rref_f2_legacy_counted(matrix, n_cols, word_ops)
@@ -7200,6 +7208,13 @@ mod tests {
         let original = build_inherited_macaulay_support_local(&polys, n_vars, 3, mask, false);
         set_f4_support_local_profile(true);
         support_local_build_profile_reset();
+        let other_polys = polys.clone();
+        std::thread::spawn(move || {
+            build_inherited_macaulay_support_local(&other_polys, n_vars, 3, mask, false)
+        })
+        .join()
+        .unwrap();
+        assert_eq!(support_local_build_profile().calls, 0);
         let profiled = build_inherited_macaulay_support_local(&polys, n_vars, 3, mask, false);
         assert_eq!(original, profiled);
         let p = support_local_build_profile();

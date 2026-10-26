@@ -18,12 +18,24 @@
 //! `--max-cols` columns (`C(N,≤D)`): the dense basis costs about the cube
 //! of that.  Degrees not built are unmeasured, never refutations.
 //!
+//! `--checkpoint-dir DIR` (or `DREG_CKPT_DIR`) makes the dense scan resumable:
+//! its state is saved between closure rounds, every `DREG_CKPT_SECONDS`
+//! (default 900) and on SIGTERM/SIGINT, in `manifest-sha256-v1` generations.
+//! A run started again on the same directory continues from the newest valid
+//! generation, and a stop exits with status 143 after saving.  One directory
+//! belongs to one draw.  The `secs` of a resumed degree sums the compute of
+//! every segment, so it is not a cold measurement; the line records
+//! `checkpoint_segments`.  Only the dense scan checkpoints (not `--sparse`).
+//!
 //! `--satisfiable` is the soundness control: it replays the committed
 //! *satisfiable* draws instead, builds every degree from 3 to 5 that fits
 //! the cap, and records whether XL or the closure ever refutes.  Either
 //! refuting a system with a solution is an instrument failure.
 
 use crypto_lib::binary_ecc::F2mElement;
+use crypto_lib::cryptanalysis::closure_checkpoint::{
+    closure_refutation_scan_checkpointed, ScanEnd, Store,
+};
 use crypto_lib::cryptanalysis::koblitz_bench::{
     closure_refutation_scan, sparse_closure_refutes, ClosureDegree,
 };
@@ -92,6 +104,26 @@ fn specialise(p: &F2BoolPoly, fixes: &[(usize, bool)]) -> F2BoolPoly {
     }
 }
 
+/// The closure scan of one degree range, resumable when a store is given.
+/// A requested stop exits with 143 after the state is saved.
+fn scan_range(
+    store: &mut Option<Store>,
+    sys: &[F2BoolPoly],
+    n_vars: usize,
+    d_min: u32,
+    d_max: u32,
+) -> Vec<ClosureDegree> {
+    let Some(store) = store else {
+        return closure_refutation_scan(sys, n_vars, d_min, d_max);
+    };
+    match closure_refutation_scan_checkpointed(sys, n_vars, d_min, d_max, store)
+        .expect("checkpointed scan")
+    {
+        ScanEnd::Done(v) => v,
+        ScanEnd::Interrupted => std::process::exit(143),
+    }
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let flag = |name: &str| {
@@ -100,6 +132,24 @@ fn main() {
             .and_then(|i| args.get(i + 1))
             .cloned()
     };
+    let mut store = flag("--checkpoint-dir")
+        .map(|d| {
+            let secs = std::env::var("DREG_CKPT_SECONDS")
+                .ok()
+                .and_then(|s| s.parse().ok());
+            Store::open(
+                std::path::Path::new(&d),
+                std::time::Duration::from_secs(secs.unwrap_or(900)),
+            )
+        })
+        .map(|r| r.expect("--checkpoint-dir"))
+        .or_else(|| Store::from_env().expect("DREG_CKPT_DIR"));
+    if let Some(store) = store.as_mut() {
+        Store::install_signal_handlers();
+        let env_num = |name: &str| std::env::var(name).ok().and_then(|s| s.parse().ok());
+        store.stop_after_rounds = env_num("DREG_CKPT_STOP_AFTER_ROUNDS").map(|n| n as u32);
+        store.stop_after_words = env_num("DREG_CKPT_STOP_AFTER_WORDS");
+    }
     let max_cols: f64 = flag("--max-cols").map_or(70_000.0, |v| v.parse().expect("--max-cols"));
     let satisfiable = args.iter().any(|a| a == "--satisfiable");
     // `--to D`: scan to degree D whatever the committed outcome, for fresh
@@ -129,6 +179,7 @@ fn main() {
             .collect()
     });
     let valued = [
+        "--checkpoint-dir",
         "--max-cols",
         "--to",
         "--draw",
@@ -217,16 +268,19 @@ fn main() {
                 );
                 continue;
             }
+            let ck = store.as_ref().map_or(String::new(), |s| {
+                format!(r#","checkpoint_segments":{}"#, s.segments())
+            });
             if satisfiable {
                 let mut scan = Vec::new();
                 for d in (3..=to.unwrap_or(5))
                     .take_while(|&d| monomials_up_to(sys.n_vars as u64, d) <= max_cols)
                 {
-                    scan.extend(closure_refutation_scan(&sys.equations, sys.n_vars, d, d));
+                    scan.extend(scan_range(&mut store, &sys.equations, sys.n_vars, d, d));
                 }
                 let unsound = scan.iter().any(|d| d.xl_refuted || d.closure_refuted);
                 println!(
-                    r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"solutions":{},"refuted_satisfiable":{unsound},"measured_to":{},"max_cols":{max_cols},"scan":[{}]}}"#,
+                    r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"solutions":{},"refuted_satisfiable":{unsound}{ck},"measured_to":{},"max_cols":{max_cols},"scan":[{}]}}"#,
                     v["cell"].as_str().unwrap_or(""),
                     v["draw"],
                     sys.n_vars,
@@ -247,7 +301,7 @@ fn main() {
                 .unwrap_or(2);
             let mut scan = Vec::new();
             for d in 3..=top {
-                let one = closure_refutation_scan(&sys.equations, sys.n_vars, d, d);
+                let one = scan_range(&mut store, &sys.equations, sys.n_vars, d, d);
                 let Some(step) = one.into_iter().next() else {
                     break;
                 };
@@ -273,7 +327,7 @@ fn main() {
             let show = |x: Option<u32>| x.map_or("null".to_string(), |d| d.to_string());
             let measured_to = scan.last().map(|d| d.degree).unwrap_or(2);
             println!(
-                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"fixed":{fixed_json},"xl_degree":{},"closure_degree":{},"measured_to":{measured_to},"max_cols":{max_cols},"scan":[{}]}}"#,
+                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"fixed":{fixed_json},"xl_degree":{},"closure_degree":{},"measured_to":{measured_to}{ck},"max_cols":{max_cols},"scan":[{}]}}"#,
                 v["cell"].as_str().unwrap_or(""),
                 v["draw"],
                 sys.n_vars,

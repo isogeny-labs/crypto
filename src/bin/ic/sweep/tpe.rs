@@ -669,7 +669,7 @@ mod tests {
             value,
             rungs_done: rungs,
         };
-        let mut v = vec![
+        let mut v = [
             mk(State::Failed, 0.0, 0),
             mk(State::Pruned, 1.0, 1),
             mk(State::Complete, 9.0, 3),

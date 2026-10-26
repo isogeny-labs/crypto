@@ -26,8 +26,10 @@ use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::{self as fp4, Fp4Group, Fp4Instance, K4Base, K4Params};
 use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
-    bsgs_interleaved, bsgs_negation, bsgs_textbook, kangaroo, GenericOutcome,
+    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, kangaroo, GenericOutcome,
 };
+use crate::cryptanalysis::ecbench::hyper::HyperInstance;
+use crate::cryptanalysis::ecbench::hyper_ic::{self, HyperIcParams};
 use crate::cryptanalysis::ecbench::wordram_price;
 use crate::cryptanalysis::ecbench::workload::{CurveFacts, Instance, WideInstance};
 use crate::cryptanalysis::ecbench_large_prime::{
@@ -148,7 +150,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
         },
         ParamDecl {
             name: "solver",
@@ -256,6 +258,39 @@ const IC_COUNTED_PARAMS: &[ParamDecl] = &[
         name: "solver_budget_seconds",
         default: Some("0"),
         help: "per-call solver wall budget",
+    },
+];
+
+const HYPER_IC_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "fb_size",
+        default: None,
+        help: "factor-base cap: `all` (every degree-1 place, m ≈ p/2 columns after the ± fold) or N (the first N places by x, Gaudry's reduced base)",
+    },
+    ParamDecl {
+        name: "large_primes",
+        default: None,
+        help: "0 (full relations only) or 1 (single large primes: keep a candidate with one place outside a truncated base and combine pairs sharing it)",
+    },
+    ParamDecl {
+        name: "extra_relations",
+        default: None,
+        help: "rows collected beyond the m + 1 unknowns before the first solve (the thread uses 8); each further round adds m/4 + 8",
+    },
+    ParamDecl {
+        name: "branches",
+        default: None,
+        help: "factor-base places the walk steps by, drawn by a seeded shuffle (the thread uses 64; capped at m)",
+    },
+    ParamDecl {
+        name: "d_step_in",
+        default: None,
+        help: "one step in d_step_in adds D₁, one adds D₂, the rest add a place (the thread uses 4; at least 2)",
+    },
+    ParamDecl {
+        name: "max_trials",
+        default: Some("200000"),
+        help: "relation trials before the run counts as exhausted",
     },
 ];
 
@@ -424,6 +459,18 @@ pub fn registry() -> &'static [MethodDecl] {
             params: &[],
         },
         MethodDecl {
+            id: "bsgs.negation_table",
+            family: "bsgs",
+            summary: "bsgs.negation with the baby table's half-width m given (m + 1 classes, giant stride 2m + 1): the equal-memory comparator for a known-log base",
+            entry: "ecbench::generic::bsgs_negation_table",
+            applies: Applies::Any,
+            params: &[ParamDecl {
+                name: "baby",
+                default: Some("0"),
+                help: "baby table half-width m (table entries m + 1); 0 means ceil(sqrt(r)/2), which is bsgs.negation",
+            }],
+        },
+        MethodDecl {
             id: "kangaroo.vow",
             family: "kangaroo",
             summary: "van Oorschot–Wiener tame/wild kangaroo on [0, r), distinguished points; mean about 2√r",
@@ -499,6 +546,14 @@ pub fn registry() -> &'static [MethodDecl] {
                 ParamDecl { name: "query_limit", default: Some("1000000000"), help: "injective point query cap below r" },
                 ParamDecl { name: "seconds", default: Some("1800"), help: "cold wall watchdog; failures are censored" },
             ],
+        },
+        MethodDecl {
+            id: "ic.hyperelliptic",
+            family: "ic",
+            summary: "the hyperelliptic thread's index calculus (ADH/Gaudry) on a genus 2-4 Jacobian (hyperelliptic_thread / hyperelliptic_explicit only): degree-1 places folded by ±, the factor-base walk (start D₁ + D₂, then one Cantor addition a trial), u split by gcd(u, x^p − x) and Cantor–Zassenhaus, Markowitz sparse elimination mod r, up to 4 solve rounds; expected ≈ (m + 1 + extra)·g! trials, so S ≈ (p/2)·g!/√r with the full base, plus uncharged F_p work O(g² log p) a trial and the elimination's mulmods mod r",
+            entry: "ecbench::hyper_ic::solve",
+            applies: Applies::Any,
+            params: HYPER_IC_PARAMS,
         },
         MethodDecl {
             id: "ic.pipeline",
@@ -1289,6 +1344,15 @@ fn solve_generic<G: CountedGroup>(
             let o = bsgs_negation(g, gen, target, r);
             generic(o, t.elapsed().as_nanos() as u64, 2)
         }
+        "bsgs.negation_table" => {
+            let baby = param_u64(m, "baby")?;
+            let o = if baby == 0 {
+                bsgs_negation(g, gen, target, r)
+            } else {
+                bsgs_negation_table(g, gen, target, r, baby)
+            };
+            generic(o, t.elapsed().as_nanos() as u64, 2)
+        }
         "kangaroo.vow" => {
             let o = kangaroo(g, gen, target, r, seed, cap()?);
             generic(o, t.elapsed().as_nanos() as u64, 1)
@@ -1356,6 +1420,17 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         ));
     }
     match inst {
+        Instance::Hyper(h) => {
+            if is_hyper_generic(m.id.as_str()) {
+                Ok(())
+            } else if m.id == HYPER_IC {
+                hyper_ic_params(m)?;
+                hyper_ic_cyclic(h)
+            } else {
+                Err(hyper_refusal(m.id.as_str(), h))
+            }
+        }
+        _ if id == HYPER_IC => Err(hyper_ic_refusal(curve)),
         Instance::Wide(wi) => match id {
             "rho.signed_frobenius_strong"
             | "rho.signed_frobenius_strong_legacy"
@@ -1487,6 +1562,12 @@ fn solve_inner(
     }
     if let Instance::Ext(i) = inst {
         return solve_ext(m, i, tx, ty, seed);
+    }
+    if let Instance::Hyper(i) = inst {
+        return solve_hyper(m, i, curve, tx, ty, seed);
+    }
+    if m.id == HYPER_IC {
+        return Err(hyper_ic_refusal(curve));
     }
     if m.id == "rho.frobenius_orbit" || m.id == "rho.gls" {
         return Err(format!(
@@ -1654,10 +1735,206 @@ fn solve_inner(
             };
             solve_generic(m, &i.curve, i.generator, target, i.r, seed)
         }
-        (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::Ext(_), _) => {
+        (Instance::Wide(_), _)
+        | (Instance::Fp4(_), _)
+        | (Instance::Ext(_), _)
+        | (Instance::Hyper(_), _) => {
             unreachable!("returned above")
         }
     }
+}
+
+/// The methods that run on a hyperelliptic Jacobian: the generic ones,
+/// which see only [`CountedGroup`] (no IC arm, no endomorphism walk).
+fn is_hyper_generic(id: &str) -> bool {
+    matches!(
+        id,
+        "rho.plain"
+            | "rho.negation"
+            | "rho.frozen_reference"
+            | "bsgs.textbook"
+            | "bsgs.interleaved"
+            | "bsgs.negation"
+            | "kangaroo.vow"
+    )
+}
+
+fn hyper_refusal(id: &str, h: &HyperInstance) -> String {
+    format!(
+        "`{id}` has no hyperelliptic-Jacobian implementation; on a genus-{} Jacobian over F_{} only rho.plain, rho.negation, rho.frozen_reference, bsgs.*, kangaroo.vow and ic.hyperelliptic run",
+        h.genus, h.p
+    )
+}
+
+/// The index calculus that runs on a hyperelliptic Jacobian, and only there.
+const HYPER_IC: &str = "ic.hyperelliptic";
+
+fn hyper_ic_refusal(curve: &CurveFacts) -> String {
+    format!(
+        "`{HYPER_IC}` runs on hyperelliptic Jacobians (hyperelliptic_thread, hyperelliptic_explicit) only; {} is {}",
+        curve.slug, curve.family
+    )
+}
+
+/// Relations mod `r` need a cyclic `r`-part (see `ecbench::hyper_ic`).
+fn hyper_ic_cyclic(h: &HyperInstance) -> Result<(), String> {
+    if (h.group_order / h.r).is_multiple_of(h.r) {
+        return Err(format!(
+            "`{HYPER_IC}` needs r ∥ #J; r² divides #J = {} (r = {})",
+            h.group_order, h.r
+        ));
+    }
+    Ok(())
+}
+
+fn hyper_ic_params(m: &ResolvedMethod) -> Result<HyperIcParams, String> {
+    let fb_size = match m.params["fb_size"].as_str() {
+        "all" => usize::MAX,
+        _ => match param_u64(m, "fb_size")? {
+            0 => return Err("parameter `fb_size` must be `all` or at least 1".into()),
+            n => usize::try_from(n).map_err(|_| "fb_size does not fit usize")?,
+        },
+    };
+    let large_primes = match m.params["large_primes"].as_str() {
+        "0" => false,
+        "1" => true,
+        other => return Err(format!("parameter `large_primes` is 0 or 1, not `{other}`")),
+    };
+    let branches = param_u64(m, "branches")?;
+    let d_step_in = param_u64(m, "d_step_in")?;
+    if branches == 0 || d_step_in < 2 {
+        return Err("`ic.hyperelliptic` needs branches ≥ 1 and d_step_in ≥ 2".into());
+    }
+    Ok(HyperIcParams {
+        fb_size,
+        large_primes,
+        extra_relations: usize::try_from(param_u64(m, "extra_relations")?)
+            .map_err(|_| "extra_relations does not fit usize")?,
+        branches: usize::try_from(branches).map_err(|_| "branches does not fit usize")?,
+        d_step_in,
+        max_trials: param_u64(m, "max_trials")?,
+    })
+}
+
+/// A hyperelliptic Jacobian (`ecbench::hyper`): a generic method on the
+/// Cantor group, one composition-and-reduction per group operation, or
+/// the thread's index calculus (`ic.hyperelliptic`).
+fn solve_hyper(
+    m: &ResolvedMethod,
+    i: &HyperInstance,
+    curve: &CurveFacts,
+    w0: u64,
+    w1: u64,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    if m.id == HYPER_IC {
+        let target = i.decode(w0, w1)?;
+        return solve_hyper_ic(m, i, curve, target, seed);
+    }
+    if !is_hyper_generic(m.id.as_str()) {
+        return Err(hyper_refusal(m.id.as_str(), i));
+    }
+    let target = i.decode(w0, w1)?;
+    solve_generic(m, &i.curve, i.generator, target, i.r, seed)
+}
+
+/// `ic.hyperelliptic`: phases `factor_base`, `walk_setup`, `relations`,
+/// `linear_algebra`, each with its group ledger (Cantor additions, the
+/// only charged work) and its exact native counts, all `*_uncharged`.
+fn solve_hyper_ic(
+    m: &ResolvedMethod,
+    i: &HyperInstance,
+    curve: &CurveFacts,
+    target: crate::cryptanalysis::hyperelliptic_word::HDiv,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let params = hyper_ic_params(m)?;
+    hyper_ic_cyclic(i)?;
+    let t = Instant::now();
+    let out = hyper_ic::solve(
+        &i.curve,
+        i.generator,
+        target,
+        i.r,
+        i.group_order,
+        seed,
+        &params,
+    )?;
+    let wall = t.elapsed().as_nanos() as u64;
+    let phases: Vec<PhaseRecord> = out
+        .phases
+        .iter()
+        .map(|(name, ops, native, wall_ns)| PhaseRecord {
+            wall_ns: Some(*wall_ns),
+            native: native.clone(),
+            ..ops_phase(name, *ops)
+        })
+        .collect();
+    let total_gae = phases.iter().map(|p| p.gae).sum();
+    let mut keys: Vec<u64> = out.columns.iter().map(|d| i.curve.key_of(d)).collect();
+    keys.sort_unstable();
+    let bytes: Vec<u8> = keys.iter().flat_map(|k| k.to_be_bytes()).collect();
+    let points_sha256 = sha256_hex(&bytes);
+    let family = "hyperelliptic-degree1-places";
+    let columns = out.columns.len() as u64;
+    let (fb_id, fb_sha256) = short_id(
+        "FB1",
+        &json!({
+            "schema": "ecbench.factor_base/v1",
+            "curve": curve.slug,
+            "family": family,
+            "params": {"fb_size": m.params["fb_size"]},
+            "columns": columns,
+            "signed_points": out.signed_points,
+            "points_sha256": points_sha256,
+        }),
+    )?;
+    let factor_base = FactorBaseFacts {
+        fb_id,
+        fb_sha256,
+        family: family.into(),
+        params: [("fb_size".to_string(), m.params["fb_size"].clone())]
+            .into_iter()
+            .collect(),
+        description: format!(
+            "degree-1 places (x, y ≤ (p−1)/2) of y² = f(x) over F_{} in increasing x, one column per ± pair, cap {}",
+            i.p, m.params["fb_size"]
+        ),
+        signed_points: out.signed_points,
+        abscissae: columns,
+        columns,
+        dimension: None,
+        points_sha256,
+    };
+    let detail = json!({
+        "genus": i.genus,
+        "p": i.p,
+        "r": i.r,
+        "group_order": i.group_order,
+        "rounds_allowed": hyper_ic::ROUNDS,
+        "oracle": "deg ≤ 2 closed form; deg ≥ 3 gcd(u, x^p − x), Cantor–Zassenhaus shifts b = 0, 1, …",
+        "linear_algebra": "Markowitz sparse elimination mod r (the thread's sparse_solve_for_k)",
+    });
+    Ok(SolveReport {
+        recovered: out.recovered.map(u128::from),
+        exhausted: out.exhausted,
+        phases,
+        total_gae,
+        // The factor base is folded by the hyperelliptic involution.
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&out.counters),
+        counters: out.counters,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns: wall,
+        factor_base: Some(factor_base),
+        detail,
+        online: None,
+        online_error: None,
+        solver: None,
+        // HCurve does not tally the field work inside a Cantor step.
+        field_ops: None,
+    })
 }
 
 /// A GLS or subfield curve (`ecbench::ext`): the endomorphism-orbit rho
@@ -1854,6 +2131,7 @@ fn solve_large_prime(
         max_trials: param_u64(m, "max_trials")?,
         max_states: param_u64(m, "max_states")?,
         seed,
+        large_prime_graph: Default::default(),
     };
     // The method returns an algebraic candidate; ecbench's runner verifies it.
     let report = large_prime::solve_candidate(inst, target, config)?;
@@ -2541,8 +2819,10 @@ fn solve_ic_prime(
     let kummer = PrimeKummerBase { instance: inst };
     let isogeny = PrimeIsogenyBase { instance: inst };
     let cm_orbit = CmOrbitBase { instance: inst };
+    let known_log = crate::cryptanalysis::ic_framework::plugins::KnownLogBase;
     let base: &dyn FactorBaseBuilder<_> = match fb_name.as_str() {
         "prime-abscissa" => &abscissa,
+        "known-log" => &known_log,
         "prime-projected-abscissa" => &projected,
         "glv-orbit" => &orbit,
         "prime-kummer" => &kummer,
@@ -2563,7 +2843,28 @@ fn solve_ic_prime(
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    // `pkm-semaev` writes its system on the base's own tower, so it reads
+    // the tower from the `prime-kummer` spec and runs on no other base.
+    let mut pkm = match or_name.as_str() {
+        "pkm-semaev" => {
+            if fb_name != "prime-kummer" {
+                return Err(format!(
+                    "oracle `pkm-semaev` needs the prime-kummer base, whose tower it solves on, not `{fb_name}`"
+                ));
+            }
+            let t = spec.factor_base_params.u64("t")? as u32;
+            let g = spec.factor_base_params.u64_or("g", 1)?;
+            let budget = (spec.solver_budget_seconds > 0)
+                .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));
+            Some(
+                crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle::new(ms, t, g)
+                    .with_budget(budget),
+            )
+        }
+        _ => None,
+    };
     let oracle: &mut dyn DecompositionOracle<_> = match or_name.as_str() {
+        "pkm-semaev" => pkm.as_mut().expect("built above"),
         "subtract" => &mut subtract,
         "mitm" => &mut mitm,
         "mitm-prime-batch" => &mut prime_batch,
@@ -2908,6 +3209,7 @@ fn solve_ic_binary(
         "mitm" => Box::new(MitmOracle::new(ms)),
         "mitm-frobenius" => Box::new(FrobeniusMitmOracle::new(ms, inst)),
         "mitm-frobenius-counted" => Box::new(FrobeniusMitmOracle::new_counted(ms, inst)),
+        "mitm-frobenius-lazy-counted" => Box::new(FrobeniusMitmOracle::new_lazy_counted(ms, inst)),
         "mitm-fiber" => Box::new(FiberMitmOracle::new(ms)),
         "mitm-frobenius-fiber" => Box::new(FiberFrobeniusMitmOracle::new(ms, inst)),
         "rootfind-mitm" => Box::new(RootfindMitmOracle::new(ms)),
@@ -3252,6 +3554,9 @@ pub fn dump_factor_base(
     if let Instance::Ext(_) = &inst {
         return Err("no factor-base plug-in runs on a gls_fp2 or subfield_fp3 curve".into());
     }
+    if let Instance::Hyper(_) = &inst {
+        return Err("no factor-base plug-in runs on a hyperelliptic Jacobian".into());
+    }
     if let Instance::Fp4Torsion(_) | Instance::F2m4(_) = &inst {
         return Err("factor-base dumps cover prime and binary curves".into());
     }
@@ -3355,7 +3660,8 @@ pub fn dump_factor_base(
         | Instance::Fp4(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
-        | Instance::Ext(_) => unreachable!("returned above"),
+        | Instance::Ext(_)
+        | Instance::Hyper(_) => unreachable!("returned above"),
     }
 }
 
@@ -3654,6 +3960,82 @@ mod tests {
         assert!(rep.field_ops.is_none(), "unknown is not zero");
         let v = serde_json::to_value(&rep).unwrap();
         assert!(v.get("field_ops").is_none(), "absent, not null");
+    }
+
+    /// `pkm-semaev` solves the ECDLP end to end on a prime curve: F4 on the
+    /// Kummer-tower Semaev system decides every target, the grid reference
+    /// on the same seed issues the same queries and finds the same
+    /// relations, every F4 refutation is grid-checked with no disagreement,
+    /// and F4's multiply-adds are on the record as unpriced solver work.
+    #[test]
+    fn pkm_semaev_solves_on_a_prime_curve_and_matches_the_grid() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+        // a_minus_3_prime_order_curves 12 3 20261019 3: 8 | p − 1.
+        let spec = CurveSpec::PrimeExplicit {
+            p: 2393,
+            a: 2390,
+            b: 1614,
+            group_order: 2377,
+            r: 2377,
+            gx: 0,
+            gy: 80,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Prime(prime) = &inst else {
+            unreachable!()
+        };
+        let mut scratch = GroupOps::default();
+        let target = prime.curve.mul(&mut scratch, prime.generator_point(), 1234);
+        let coords = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+        let run = |base: &str, oracle: &str| {
+            let m = resolve(&MethodSpec {
+                id: "ic.pipeline".into(),
+                params: [
+                    ("factor_base".to_string(), base.to_string()),
+                    ("oracle".to_string(), oracle.to_string()),
+                ]
+                .into_iter()
+                .collect(),
+            })
+            .unwrap();
+            solve(&m, &inst, &facts, &coords, 5)
+        };
+        let f4 = run("prime-kummer:t=2", "pkm-semaev:m=3,crosscheck=1").unwrap();
+        let grid = run("prime-kummer:t=2", "pkm-semaev:m=3,engine=exhaustive").unwrap();
+        assert_eq!(f4.recovered, Some(1234));
+        assert_eq!(grid.recovered, f4.recovered);
+        for key in ["targets_tried", "relations_found", "matrix_rank"] {
+            assert_eq!(f4.counters[key], grid.counters[key], "{key}");
+        }
+        let rel = f4.phases.iter().find(|p| p.name == "relations").unwrap();
+        assert_eq!(
+            rel.native
+                .get("pkm_crosscheck_disagreements")
+                .copied()
+                .unwrap_or(0),
+            0
+        );
+        let solver = f4.solver.as_ref().expect("the F4 block");
+        assert!(solver.ops > 0);
+        assert!(
+            f4.unpriced
+                .iter()
+                .any(|u| u.starts_with("solver_F_p_multiply-adds")),
+            "{:?}",
+            f4.unpriced
+        );
+        assert!(f4
+            .unpriced
+            .contains(&"pkm_system_fp_mults_uncharged".to_string()));
+        assert!(grid
+            .unpriced
+            .contains(&"pkm_grid_fp_mults_uncharged".to_string()));
+        // Every hit is re-added: at least one addition per relation in
+        // the relations phase beyond the target draws.
+        assert!(rel.adds >= f4.counters["relations_found"]);
+        let err = run("prime-abscissa:size=8", "pkm-semaev:m=3").unwrap_err();
+        assert!(err.contains("prime-kummer"), "{err}");
     }
 
     /// `rootfind-subtract` is `subtract`'s search on `prime_fast`'s

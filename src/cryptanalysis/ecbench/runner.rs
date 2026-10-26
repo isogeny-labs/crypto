@@ -109,6 +109,12 @@ pub struct Session {
     /// a session only under the rules it was graded with.
     #[serde(default = "grading_v1")]
     pub grading_version: u32,
+    /// The versions of the counted-work definitions the session was made
+    /// under (`record::current_accounting_versions`).  Empty on a session
+    /// written before they were recorded, and then not written at all, so
+    /// such a session reads and re-serialises byte for byte as before.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub accounting_versions: BTreeMap<String, u32>,
     /// SHA-256 of the sorted `k=v` lines of the child environment.
     pub child_env_sha256: String,
     pub child_env: BTreeMap<String, String>,
@@ -660,6 +666,7 @@ fn execute_session(
         runner_cpus,
         ticks_per_second: hz,
         grading_version: GRADING_VERSION,
+        accounting_versions: crate::cryptanalysis::ecbench::record::current_accounting_versions(),
         child_env_sha256: sha256_hex(env_lines.join("\n").as_bytes()),
         child_env: env.clone(),
         started_unix_ms: started,
@@ -1404,7 +1411,7 @@ mod robustness_tests {
         let d = tmp("spawn");
         let out = d.join("session");
         let opts = options(&d.join("lock"), "/nonexistent/ecbench", false);
-        let err = run_session(SPEC, &out, opts, |_| {}).err().expect("stops");
+        let err = run_session(SPEC, &out, opts, |_| {}).expect_err("stops");
         assert!(err.contains("cannot exec"), "{err}");
         let session = read_session(&out).unwrap();
         assert_eq!(session.status, "interrupted");
