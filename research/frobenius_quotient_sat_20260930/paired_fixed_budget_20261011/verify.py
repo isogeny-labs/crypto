@@ -31,33 +31,39 @@ def main(argv=None):
     ap.add_argument("--out", required=True)
     ap.add_argument("--no-regen", action="store_true",
                     help="skip regenerating the manifest (about 6 s)")
+    ap.add_argument("--manifest", default=pc.MANIFEST)
+    ap.add_argument("--sealed", default=pc.SEALED)
+    ap.add_argument("--manifest-sha", default=pc.MANIFEST_SHA)
     a = ap.parse_args(argv)
     problems, notes = [], []
     hdr, atts = load_attempts(a.receipts)
     base = os.path.dirname(os.path.abspath(__file__))
 
     # manifest
-    msha = pc.sha256_file(pc.MANIFEST)
+    msha = pc.sha256_file(a.manifest)
     if hdr["manifest_sha256"] != msha:
         problems.append("header manifest_sha256 differs from manifest.json")
-    if open(pc.MANIFEST_SHA).read().split()[0] != msha:
-        problems.append("manifest.sha256 differs from manifest.json")
+    with open(a.manifest_sha) as fh:
+        if fh.read().split()[0] != msha:
+            problems.append("manifest sha256 file differs from the manifest")
     if not a.no_regen:
         import freeze_targets as ft
         mbytes, sbytes = ft.build_artifacts()
         if pc.sha256_bytes(mbytes) != msha:
             problems.append("regenerating the manifest gives different bytes")
-        if open(pc.SEALED, "rb").read() != sbytes:
-            problems.append("regenerating the sealed file gives different bytes")
+        with open(a.sealed, "rb") as fh:
+            if fh.read() != sbytes:
+                problems.append("regenerating the sealed file gives different bytes")
     # sources
     drift = [s for s, h in hdr["source_sha256"].items()
              if pc.sha256_file(os.path.join(base, s)) != h]
     if drift:
         notes.append("source drift since the run: " + ", ".join(drift))
 
-    manifest = pc.load_manifest()
+    manifest = pc.load_manifest(a.manifest)
     ctx = pc.Ctx(manifest)
-    sealed = json.load(open(pc.SEALED))
+    with open(a.sealed) as fh:
+        sealed = json.load(fh)
     targets = pc.target_list(manifest)
     forms = hdr["forms"]
 

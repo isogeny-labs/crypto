@@ -181,3 +181,26 @@ clarifications.
    harness to larger fields.
 8. **Disk.** The worktree is a sparse checkout (cone mode) of the harness
    directories only; the full tree did not fit beside the other workers.
+
+---
+
+## Addendum 2 2026-10-26 (after the run)
+
+The registered text and addendum 1 are unchanged. Facts since addendum 1:
+
+1. The manifest was frozen before any solver run (commit `54dcf4ddb`, SHA-256
+   `8cb7f7989e5ea35656b34e7ba8bf7104e0c081277b8dbbd6b0f7507369b01231`); the harness
+   code was committed (`2ea85cfb0`) before the run and was not edited afterwards except
+   that `verify.py` gained path arguments and `summarize.py` was added; neither is in the
+   receipts' hashed source list.
+2. The run executed exactly as registered: `python3 run_paired.py --out
+   results/paired_n13.jsonl --budget 120 --forms subgroup_xor,line_subgroup --cpu-cap 4500`.
+   All 48 attempts ran, the CPU cap was not reached, there were 0 timeouts, 0 skipped
+   attempts and 0 rejected tuples.
+3. Both forms fit, so the "if two forms do not fit" fallback was not used.
+4. The coordinator then directed that no further Python research compute be run, citing
+   `AGENTS.md` "Implementation language: no Python". The optional n = 19 block was
+   therefore not run, no `report.pdf` was built, and no repeat trial was taken. One
+   `verify.py` pass and one `summarize.py --no-pdf` pass over the finished receipts were
+   run as the wind-down. The results are labelled provisional and not for merge, and a
+   matched native re-measurement is required before any claim.
