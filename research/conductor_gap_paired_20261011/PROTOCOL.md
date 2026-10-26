@@ -361,3 +361,34 @@ trial ran:
 6. **Shared curves.** The lower-conductor curve of a pair appears in its pair,
    C-iso and C-same comparisons; those comparisons share that curve and are not
    independent. The pair family for Holm correction is the pair comparisons only.
+
+### Amendment 3 (2026-10-26, after the main trials and the replay; exploratory, post hoc)
+
+Observation that motivates it: in `analysis.json` mean relations per run differ
+between the two curves of a comparison by amounts as large for the
+same-conductor controls (for example P2-same 12.2 against 14.9) as for the pairs
+(P2-pair 12.2 against 14.3). Relation yield is a property of the specific point
+set, not only of the conductor. This amendment adds one **exploratory** analysis
+that is **not** part of any gate or of the frozen decision rules of section 6, and
+is labelled exploratory wherever it appears. It was specified before it was run:
+
+- **Exact yield per curve.** For every trial-eligible (`j` not in `F_p`) certified
+  curve of every group that has an independently verified pair, with the full
+  factor base: `y = #{R in <G>, R != O : R = +-P1 +-P2 for some P1, P2 in F} / (r-1)`,
+  the probability that a uniformly random non-identity element of the prime
+  subgroup decomposes (no sampling). Normalised yield `z = y / |F|^2`
+  (the quantity that removes the leading dependence on the base size).
+- **Question.** Within a group (same `q`, `t`, `N`, `r`) do curves with different
+  certified `f_E` differ in `z` more than curves with the same `f_E`?
+- **Statistic and test.** Within each group with at least two distinct `f_E`:
+  `B = sum over groups of sum over f_E classes of n_{g,f} (mean_{g,f} - mean_g)^2`
+  (between-conductor sum of squares); null by permuting the `f_E` labels among the
+  curves of each group (20 000 permutations, fixed seed); one-sided
+  `p = P(B_perm >= B_obs)`. Companion: the mean absolute difference of `z` over
+  curve pairs with different `f_E` minus over pairs with the same `f_E`, same null.
+  The same two statistics are computed for `y` and, as a calibration, for the
+  null label "curve index parity" (a label with no meaning).
+- **Reading.** A small `p` would be a lead about a conductor-related (or a
+  group-structure-mediated: `E(F_q) ~ Z/n1 x Z/n2` and `n1 = gcd(x - 1, f_pi/f_E)`
+  depends on `f_E`) effect on yield, not evidence of a hardness difference, and
+  would need the frozen G2 protocol to be followed. A large `p` is a null.
