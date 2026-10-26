@@ -1,8 +1,8 @@
 # Quartic-extension genus-five cover — toy reproduction (in progress)
 
-Status: work in progress. The full results report, PDF and `benchmarks/` entry are
-not written yet. The attack sweep for q = 2003–8009 was still running when this
-was committed; `results/attack.jsonl` holds the rows completed so far.
+Status: the attack sweep is complete (`results/attack.jsonl`: 90 runs, q = 61–8009,
+3 seeds, full and iota arms; 90/90 solved, every invariant check passed). The full
+results report, PDF and `benchmarks/` entry are not written yet.
 
 Toy fields only (q prime, 17 ≤ q ≤ 8009; subgroup orders r < 2^62).
 Native Rust in `src/`, no dependencies. `plots.py` and `summarize.py` only lay out
