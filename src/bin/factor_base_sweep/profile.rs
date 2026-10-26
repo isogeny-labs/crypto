@@ -3,6 +3,7 @@ use super::model::Result;
 use crypto_lib::binary_ecc::{F2mElement, IrreduciblePoly};
 use crypto_lib::cryptanalysis::ecbench::canonical::sha256_hex;
 use num_bigint::BigUint;
+use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -33,6 +34,157 @@ pub struct Report {
     pub predicted_solving_degree: Option<u32>,
     pub certified_degree_of_regularity: Option<u32>,
     pub total_cost_winner: Option<String>,
+}
+
+// Struct field order is part of this identity's wire format. Do not hash a
+// serde_json::Map: its key order depends on the preserve_order feature.
+#[derive(Serialize)]
+struct SubspaceIdentity<'a> {
+    schema: &'static str,
+    field_degree: u32,
+    modulus_low_terms: &'a [u32],
+    basis_hex: &'a [String],
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ConstructRequest {
+    pub schema: String,
+    pub field_degree: u32,
+    pub modulus_low_terms: Vec<u32>,
+    pub dimension: u32,
+    pub generator_hex: String,
+    pub seed: u64,
+    pub max_power: u32,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Construction {
+    pub schema: &'static str,
+    pub request: ConstructRequest,
+    pub generator_hex: String,
+    pub scale_hex: String,
+    pub kernel_basis_hex: Vec<String>,
+    pub selector_hex: String,
+    pub sampling_attempts: u32,
+    pub constraint_rank: usize,
+    pub profile: Report,
+    pub scope: &'static str,
+}
+
+/// Standard GF(2) nullspace construction; sample coefficients by XOR, not integer addition.
+fn kernel(mut rows: Vec<BigUint>, n: u32) -> (Vec<BigUint>, usize) {
+    let mut pivots = Vec::new();
+    for col in 0..n {
+        let r = pivots.len();
+        let Some(p) = (r..rows.len()).find(|i| rows[*i].bit(u64::from(col))) else {
+            continue;
+        };
+        rows.swap(r, p);
+        let pivot = rows[r].clone();
+        for (i, row) in rows.iter_mut().enumerate() {
+            if i != r && row.bit(u64::from(col)) {
+                *row ^= &pivot;
+            }
+        }
+        pivots.push(col);
+    }
+    let mut basis = Vec::new();
+    for free in (0..n).filter(|p| !pivots.contains(p)) {
+        let mut v = BigUint::from(1u8) << free as usize;
+        for (r, p) in pivots.iter().enumerate() {
+            if rows[r].bit(u64::from(free)) {
+                v ^= BigUint::from(1u8) << *p as usize;
+            }
+        }
+        basis.push(v);
+    }
+    (basis, pivots.len())
+}
+
+pub fn construct(r: &ConstructRequest) -> Result<Construction> {
+    if r.schema != "factor_base_construct_request/v1"
+        || r.dimension == 0
+        || r.dimension > 64
+        || r.dimension >= r.field_degree
+    {
+        return Err("construction needs schema factor_base_construct_request/v1 and 1..=64 dimensions strictly below the field degree".into());
+    }
+    let field_request = Request {
+        schema: "factor_base_profile_request/v1".into(),
+        field_degree: r.field_degree,
+        modulus_low_terms: r.modulus_low_terms.clone(),
+        basis_hex: vec!["1".into()],
+        max_power: r.max_power,
+    };
+    let f = checked_field(&field_request)?;
+    let g = parse_hex(&r.generator_hex)?;
+    if g == BigUint::default() || g.bits() > u64::from(r.field_degree) {
+        return Err("progression generator must be a nonzero in-field element".into());
+    }
+    let g = F2mElement::from_biguint(&g, r.field_degree);
+    let mut powers = vec![F2mElement::one(r.field_degree)];
+    for j in 1..r.dimension as usize {
+        powers.push(powers[j - 1].mul(&g, &f));
+    }
+    if canonical_basis(powers.clone(), r.field_degree).len() != r.dimension as usize {
+        return Err("progression powers are not independent at the requested dimension".into());
+    }
+    eprintln!(
+        "[construct] building trace constraints: degree={}, dimension={}",
+        r.field_degree, r.dimension
+    );
+    let rows = powers
+        .iter()
+        .map(|p| {
+            let mut row = BigUint::default();
+            for bit in 0..r.field_degree {
+                if F2mElement::from_bit_positions(&[bit], r.field_degree)
+                    .mul(p, &f)
+                    .trace(&f)
+                    != 0
+                {
+                    row.set_bit(u64::from(bit), true);
+                }
+            }
+            row
+        })
+        .collect();
+    let (kernel_basis, constraint_rank) = kernel(rows, r.field_degree);
+    if kernel_basis.is_empty() {
+        return Err("trace constraint kernel contains no nonzero scale".into());
+    }
+    let mut rng = StdRng::seed_from_u64(r.seed);
+    for sampling_attempts in 1..=256 {
+        let mut c = BigUint::default();
+        let mut selector = BigUint::default();
+        for (j, v) in kernel_basis.iter().enumerate() {
+            if rng.gen::<bool>() {
+                c ^= v;
+                selector.set_bit(j as u64, true);
+            }
+        }
+        if c == BigUint::default() {
+            continue;
+        }
+        let scale = F2mElement::from_biguint(&c, r.field_degree);
+        let columns: Vec<_> = powers.iter().map(|p| scale.mul(p, &f)).collect();
+        if columns.iter().any(|x| x.trace(&f) != 0) {
+            return Err("internal error: sampled scale violates a trace constraint".into());
+        }
+        let request = Request {
+            basis_hex: hex_basis(&columns),
+            ..field_request
+        };
+        let profile = compute(&request)?;
+        eprintln!("[construct] trace-zero progression ready: kernel_dimension={}, draw={sampling_attempts}", kernel_basis.len());
+        return Ok(Construction { schema: "factor_base_construction/v1", request:r.clone(),
+            generator_hex:format!("0x{:x}",g.to_biguint()), scale_hex:format!("0x{c:x}"),
+            kernel_basis_hex:kernel_basis.iter().map(|x|format!("0x{x:x}")).collect(),
+            selector_hex:format!("0x{selector:x}"), sampling_attempts, constraint_rank, profile,
+            scope:"standard trace-constrained abscissa-subspace construction only; seeded pseudorandom nonzero kernel coefficients are XORed (not a claim of uniform coverage of the entire kernel from 64-bit seeds); no point inventory, subgroup support, measured solver cost, regularity or speed claim; profile multiplication counter excludes construction and other setup work" });
+    }
+    Err("bounded kernel sampling produced no nonzero scale in 256 draws".into())
 }
 
 fn parse_hex(s: &str) -> Result<BigUint> {
@@ -166,12 +318,19 @@ pub fn compute(r: &Request) -> Result<Report> {
     if basis.len() != r.basis_hex.len() {
         return Err("basis entries must be linearly independent over GF(2)".into());
     }
-    let identity = serde_json::json!({"field_degree":r.field_degree,
-        "modulus_low_terms":f.low_terms,"basis_hex":hex_basis(&basis)});
-    let subspace_id = format!(
-        "FSP1h{}",
-        sha256_hex(&serde_json::to_vec(&identity).map_err(|e| e.to_string())?)
-    );
+    let canonical_hex = hex_basis(&basis);
+    let subspace_id = {
+        let identity = SubspaceIdentity {
+            schema: "field_subspace/v1",
+            field_degree: r.field_degree,
+            modulus_low_terms: &f.low_terms,
+            basis_hex: &canonical_hex,
+        };
+        format!(
+            "FSP1h{}",
+            sha256_hex(&serde_json::to_vec(&identity).map_err(|e| e.to_string())?)
+        )
+    };
     let frobenius_stable = canonical_basis(
         basis
             .iter()
@@ -211,7 +370,7 @@ pub fn compute(r: &Request) -> Result<Report> {
     Ok(Report {
         schema: "factor_base_profile/v1",
         request: r.clone(),
-        canonical_basis_hex: hex_basis(&basis),
+        canonical_basis_hex: canonical_hex,
         subspace_id,
         linearization_excess_m2: dimensions.get(1).map(|d| i64::from(r.field_degree) - basis.len() as i64 - *d as i64),
         sum_product_dimensions: dimensions.iter().sum(),
@@ -252,6 +411,11 @@ mod tests {
             ]
         );
         assert_eq!(r.product_field_multiplications, 10);
+        let wire = r#"{"schema":"field_subspace/v1","field_degree":3,"modulus_low_terms":[0,1],"basis_hex":["0x1","0x2"]}"#;
+        assert_eq!(
+            r.subspace_id,
+            format!("FSP1h{}", sha256_hex(wire.as_bytes()))
+        );
         assert!(r.predicted_solving_degree.is_none());
     }
     #[test]
@@ -356,5 +520,83 @@ mod tests {
         let mut r = request();
         r.max_power = 1;
         assert_eq!(compute(&r).unwrap().linearization_excess_m2, None);
+    }
+    fn construction_request() -> ConstructRequest {
+        ConstructRequest {
+            schema: "factor_base_construct_request/v1".into(),
+            field_degree: 3,
+            modulus_low_terms: vec![0, 1],
+            dimension: 2,
+            generator_hex: "0x2".into(),
+            seed: 42,
+            max_power: 3,
+        }
+    }
+    #[test]
+    fn kernel_construction_reproduces_and_its_selector_rebuilds_the_scale() {
+        let r = construction_request();
+        let a = construct(&r).unwrap();
+        let b = construct(&r).unwrap();
+        assert_eq!(
+            serde_json::to_value(&a).unwrap(),
+            serde_json::to_value(&b).unwrap()
+        );
+        assert_eq!(a.constraint_rank, 2);
+        assert_eq!(a.kernel_basis_hex.len(), 1);
+        let selector = parse_hex(&a.selector_hex).unwrap();
+        let mut scale = BigUint::default();
+        for (j, v) in a.kernel_basis_hex.iter().enumerate() {
+            if selector.bit(j as u64) {
+                scale ^= parse_hex(v).unwrap();
+            }
+        }
+        assert_eq!(scale, parse_hex(&a.scale_hex).unwrap());
+        assert_ne!(scale, BigUint::default());
+        let f = checked_field(&a.profile.request).unwrap();
+        for value in &a.profile.request.basis_hex {
+            // Direct Frobenius sum, separate from the cached trace implementation used by construction.
+            let mut x = F2mElement::from_biguint(&parse_hex(value).unwrap(), r.field_degree);
+            let mut t = F2mElement::zero(r.field_degree);
+            for _ in 0..r.field_degree {
+                t.add_assign(&x);
+                x = x.square(&f);
+            }
+            assert!(t.is_zero());
+        }
+    }
+    #[test]
+    fn wide_kernel_construction_keeps_trace_and_progression_dimensions() {
+        let r = ConstructRequest {
+            field_degree: 131,
+            modulus_low_terms: vec![0, 2, 3, 8],
+            dimension: 12,
+            max_power: 5,
+            ..construction_request()
+        };
+        let a = construct(&r).unwrap();
+        assert_eq!(a.constraint_rank, 12);
+        assert_eq!(a.kernel_basis_hex.len(), 119);
+        assert_eq!(a.profile.product_dimensions, [12, 23, 34, 45, 56]);
+        assert_eq!(a.profile.linearization_excess_m2, Some(96));
+        let f = checked_field(&a.profile.request).unwrap();
+        assert!(a
+            .profile
+            .request
+            .basis_hex
+            .iter()
+            .all(|x| F2mElement::from_biguint(&parse_hex(x).unwrap(), 131).trace(&f) == 0));
+        assert!(a.profile.predicted_solving_degree.is_none());
+    }
+    #[test]
+    fn construction_rejects_full_dimension_dependent_powers_and_out_of_field_generator() {
+        let mut r = construction_request();
+        r.dimension = 3;
+        assert!(construct(&r).is_err());
+        let mut r = construction_request();
+        r.generator_hex = "1".into();
+        assert!(construct(&r).unwrap_err().contains("independent"));
+        let mut r = construction_request();
+        r.generator_hex = "8".into();
+        assert!(construct(&r).unwrap_err().contains("in-field"));
     }
 }
