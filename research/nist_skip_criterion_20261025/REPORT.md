@@ -195,8 +195,9 @@ Cargo and Conductor remain unavailable locally; actual attempts are retained.
 There are no Rust-library edits. The repository transfer was resolved to
 `isogeny-labs/crypto`, preserving the original repository ID and PR 2378.
 The latest artifact policy requires the PDF, raw archive and large PNG in
-the S3 artifact store. This workspace has neither an upload credential nor
-the AWS CLI. Those files are delivered locally and bound separately by
+the S3 artifact store. The first upload attempt lacked the AWS CLI. After a
+temporary client was installed, its identity and artifact-tool checks could
+not locate AWS credentials. Those files are delivered locally and bound by
 `ARTIFACT_DELIVERY.json`; uploading them remains blocked. The PR carries the
 report source, native code, truth tables, calibration summaries and SVGs.
 No nonexistent remote object is represented as available.

@@ -9,18 +9,21 @@
 ## Problem
 
 The PDF and raw-evidence files cannot yet be delivered to the repository's
-S3 artifact store because this runtime has neither the AWS CLI nor configured
-upload credentials. The requested PDF and complete evidence bundle exist and
+S3 artifact store because this runtime has no usable upload credentials.
+The requested PDF and complete evidence bundle exist and
 are verified in the local workspace. Their exact hashes and sizes are in the
 study's [delivery record](../research/nist_skip_criterion_20261025/ARTIFACT_DELIVERY.json).
 
 ## Evidence and uncertainty
 
-- **Observed:** the repository artifact tool exits 2 with
+- **Observed:** the initial repository artifact-tool attempt exited 2 with
   `artifacts: aws not found; install the AWS CLI or set ARTIFACTS_AWS`.
   The [recorded check](../research/nist_skip_criterion_20261025/validation/artifact-store-checks.txt)
-  retains the actual command and result. No AWS credential profile, ambient
-  credential or checkpoint upload token is configured here.
+  retains the actual command and result. A temporary AWS CLI was subsequently
+  installed; the identity check exited 255 because it could not locate
+  credentials. The artifact-tool attempt with an explicit remote also failed.
+  No AWS credential profile, ambient credential or checkpoint upload token
+  is configured here.
 - **Observed:** the follow-up commit passes the artifact policy. Three
   earlier frozen PDF/ZIP additions in this PR exceed the new policy and
   still require migration. They remain byte-identical to the prior PR head.
@@ -60,5 +63,6 @@ scientific conclusions and their remaining evidence obligations are unchanged.
 ## Resolution and history
 
 2026-10-26: repository transfer resolved to `isogeny-labs/crypto`. Source and
-summary publication is possible; the attempted artifact upload cannot start.
-Local PDF and evidence delivery is verified. Unresolved.
+summaries were published. Installing a temporary AWS client resolved the
+tooling gap; the identity and artifact checks then confirmed unavailable
+credentials. Local PDF and evidence delivery is verified. Unresolved.

@@ -2,14 +2,14 @@
   "kind": "nist-skip-artifact-delivery/v1",
   "repository": "isogeny-labs/crypto",
   "pull_request": 2378,
-  "status": "local delivery verified; S3 upload blocked",
-  "reason": "No AWS CLI, AWS credential profile, ambient AWS credentials or checkpoint upload token is configured in this runtime.",
+  "status": "local delivery verified; S3 upload blocked by unavailable credentials",
+  "reason": "A temporary AWS CLI was installed. Standard AWS identity and artifact-tool checks could not locate credentials; no upload or remote-object verification completed.",
   "artifacts": {
     "REPORT.pdf": {
-      "bytes": 710795,
-      "sha256": "f19164a92a905908985f12f91d3777a806eb1f5247cea5206b2cca03c8d2e720",
+      "bytes": 710832,
+      "sha256": "54b90bfbb62f8f3597eee45f03fec17628018dc941d19f4db542eb1729a5af92",
       "local_delivery_path": "/workspace/nist-skipped-curve-criterion.pdf",
-      "planned_s3_object": "s3://setec-astronomy-artifacts/store/sha256/f1/f19164a92a905908985f12f91d3777a806eb1f5247cea5206b2cca03c8d2e720",
+      "planned_s3_object": "s3://setec-astronomy-artifacts/store/sha256/54/54b90bfbb62f8f3597eee45f03fec17628018dc941d19f4db542eb1729a5af92",
       "uploaded": false,
       "remote_object_verified": false
     },
@@ -29,5 +29,6 @@
       "uploaded": false,
       "remote_object_verified": false
     }
-  }
+  },
+  "credential_checks": "validation/artifact-store-checks.txt"
 }
