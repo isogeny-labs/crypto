@@ -20,12 +20,21 @@ use std::{
     path::Path,
 };
 
+mod state;
+
 type Result<T> = std::result::Result<T, String>;
 const SCHEMA: &str = "ordinary-isogeny-class/v1";
+// The previous CLI changed only in progress/custody plumbing. Its vertex
+// expansion and graph verification are identical, so existing databases can
+// still advance under this binary.
+const PRE_PROGRESS_SOURCE_SHA256: &str =
+    "d3c77f50dc2e737de38561203ce3693f7899fe3db502b8e863c7ac69e5818bed";
 const HELP: &str = "isogeny-class: finite-degree, complete-vertex isogeny classes
   plan   --curve curve.json [--degrees auto|2,3,5]
   build  --curve curve.json --out fresh.sqlite [--degrees auto|2,3,5] [--steps all|10000]
-  resume --input graph.sqlite [--steps all|10000]
+         [--verbose] [--progress-every SEC] [--state-s3-uri s3://BUCKET/PREFIX] [--sync-every SEC]
+  resume --input graph.sqlite [--steps all|10000] [--verbose] [--progress-every SEC]
+         [--state-s3-uri s3://BUCKET/PREFIX] [--sync-every SEC]
   status --input graph.sqlite
   vertex --input graph.sqlite --id ID       exact models, kernels and rational maps
   verify --input graph.sqlite
@@ -35,6 +44,8 @@ All degrees must be primes <=31 different from p. Auto includes conductor primes
 and a Minkowski generating set on the surface. Prime fields below 2^61 only;
 ordinary D_K<-4, |D_K|<=10^7. Other inputs fail explicitly.
 Every expansion is one SQLite transaction. Resume retains all prior expansions.
+Live progress goes to stderr; an S3 snapshot is published only after a committed
+SQLite snapshot upload, with LATEST.json pointing at its verified object.
 Default 10000 expansions is a PARTIAL checkpoint, never a completeness claim.
 Use --steps all to exhaust the frontier. Exit 3 means partial; 0 means complete
 for build/resume/verify, and a verified logarithm for solve. Plan/status exit 0
@@ -519,8 +530,20 @@ fn create(path: &Path, p: &Plan) -> Result<Connection> {
     Ok(db)
 }
 
+#[cfg(test)]
 fn expand(db: &mut Connection, p: &Plan, steps: u64) -> Result<()> {
-    if p.source_code_sha256 != hash(include_bytes!("lib.rs")) {
+    expand_with_progress(db, p, steps, None)
+}
+
+fn expand_with_progress(
+    db: &mut Connection,
+    p: &Plan,
+    steps: u64,
+    mut progress: Option<&mut dyn FnMut(&Connection) -> Result<()>>,
+) -> Result<()> {
+    if p.source_code_sha256 != hash(include_bytes!("lib.rs"))
+        && p.source_code_sha256 != PRE_PROGRESS_SOURCE_SHA256
+    {
         return Err(
             "source code differs from frozen plan; replay/migrate explicitly before resuming"
                 .into(),
@@ -569,6 +592,9 @@ fn expand(db: &mut Connection, p: &Plan, steps: u64) -> Result<()> {
         tx.execute("UPDATE nodes SET expanded=1 WHERE id=?", [id])
             .map_err(err)?;
         tx.commit().map_err(err)?;
+        if let Some(report) = progress.as_mut() {
+            report(db)?;
+        }
     }
     Ok(())
 }
@@ -854,20 +880,26 @@ fn replay(db: &mut Connection, p: &Plan) -> Result<Value> {
 struct Options(BTreeMap<String, String>);
 impl Options {
     fn parse(args: &[String], allowed: &[&str]) -> Result<Self> {
-        if args.len() % 2 != 0 {
-            return Err("every option requires a value".into());
-        }
         let mut map = BTreeMap::new();
-        for pair in args.chunks(2) {
-            let name = pair[0]
+        let mut index = 0;
+        while index < args.len() {
+            let name = args[index]
                 .strip_prefix("--")
                 .ok_or("expected --option value")?;
             if !allowed.contains(&name) {
                 return Err(format!("unknown option --{name}"));
             }
-            if map.insert(name.into(), pair[1].clone()).is_some() {
+            let value = if name == "verbose" {
+                "true".into()
+            } else {
+                args.get(index + 1)
+                    .ok_or_else(|| format!("--{name} requires a value"))?
+                    .clone()
+            };
+            if map.insert(name.into(), value).is_some() {
                 return Err(format!("duplicate option --{name}"));
             }
+            index += if name == "verbose" { 1 } else { 2 };
         }
         Ok(Self(map))
     }
@@ -972,7 +1004,16 @@ pub fn run(args: &[String]) -> Result<(Value, i32)> {
             let o = Options::parse(
                 &args[1..],
                 if command == "build" {
-                    &["curve", "degrees", "out", "steps"]
+                    &[
+                        "curve",
+                        "degrees",
+                        "out",
+                        "steps",
+                        "verbose",
+                        "progress-every",
+                        "state-s3-uri",
+                        "sync-every",
+                    ]
                 } else {
                     &["curve", "degrees"]
                 },
@@ -985,13 +1026,16 @@ pub fn run(args: &[String]) -> Result<(Value, i32)> {
             }
             let steps = o.steps()?;
             let path = Path::new(o.need("out")?);
+            let mut custody = state::Custody::build(path, &p, &o)?;
             let mut db = create(path, &p)?;
-            expand(&mut db, &p, steps)?;
+            custody.start(&db, &p)?;
+            expand_with_progress(&mut db, &p, steps, Some(&mut |db| custody.progress(db, &p)))?;
             let (n, expanded, _) = counts(&db)?;
             if n == expanded && n == p.expected_vertices {
                 replay(&mut db, &p)?;
             }
             let s = summary(&db, &p)?;
+            custody.finish(&db, &p, &s)?;
             let code = if s["vertex_class_complete"] == true {
                 0
             } else {
@@ -1001,7 +1045,14 @@ pub fn run(args: &[String]) -> Result<(Value, i32)> {
         }
         "resume" | "status" | "verify" | "solve" | "vertex" => {
             let allowed: &[&str] = match command {
-                "resume" => &["input", "steps"],
+                "resume" => &[
+                    "input",
+                    "steps",
+                    "verbose",
+                    "progress-every",
+                    "state-s3-uri",
+                    "sync-every",
+                ],
                 "vertex" => &["input", "id"],
                 "solve" => &[
                     "input", "vertex", "px", "py", "qx", "qy", "order", "max-baby",
@@ -1009,8 +1060,18 @@ pub fn run(args: &[String]) -> Result<(Value, i32)> {
                 _ => &["input"],
             };
             let o = Options::parse(&args[1..], allowed)?;
-            let mut db = open(Path::new(o.need("input")?))?;
+            let path = Path::new(o.need("input")?);
+            let mut custody = if command == "resume" {
+                Some(state::Custody::resume(path, &o)?)
+            } else {
+                None
+            };
+            let mut db = open(path)?;
             let p = load(&db)?;
+            if let Some(custody) = custody.as_mut() {
+                custody.validate_plan(&db, &p)?;
+                custody.start(&db, &p)?;
+            }
             if command == "vertex" {
                 return Ok((describe_vertex(&db, &p, o.number("id")?)?, 0));
             }
@@ -1021,7 +1082,12 @@ pub fn run(args: &[String]) -> Result<(Value, i32)> {
                 let steps = o.steps()?;
                 db.execute("DELETE FROM metadata WHERE key='verification'", [])
                     .map_err(err)?;
-                expand(&mut db, &p, steps)?;
+                expand_with_progress(
+                    &mut db,
+                    &p,
+                    steps,
+                    Some(&mut |db| custody.as_mut().expect("resume state").progress(db, &p)),
+                )?;
                 let (n, expanded, _) = counts(&db)?;
                 if n == expanded && n == p.expected_vertices {
                     replay(&mut db, &p)?;
@@ -1031,6 +1097,9 @@ pub fn run(args: &[String]) -> Result<(Value, i32)> {
                 replay(&mut db, &p)?;
             }
             let s = summary(&db, &p)?;
+            if let Some(custody) = custody.as_mut() {
+                custody.finish(&db, &p, &s)?;
+            }
             let code = if command == "status" || s["vertex_class_complete"] == true {
                 0
             } else {
@@ -1137,6 +1206,38 @@ mod tests {
         db.execute("UPDATE edges SET u=0 WHERE source=0", [])
             .unwrap();
         assert!(replay(&mut db, &p).is_err());
+    }
+    #[test]
+    fn expansion_callback_runs_after_each_committed_vertex() {
+        let (mut db, plan) = database(control(67, -3375));
+        let mut callbacks = 0;
+        let interrupted = expand_with_progress(
+            &mut db,
+            &plan,
+            u64::MAX,
+            Some(&mut |connection| {
+                callbacks += 1;
+                assert_eq!(counts(connection).unwrap().1, callbacks);
+                if callbacks == 2 {
+                    return Err("stop after committed vertex".into());
+                }
+                Ok(())
+            }),
+        );
+        assert_eq!(interrupted.unwrap_err(), "stop after committed vertex");
+        assert_eq!(counts(&db).unwrap().1, 2);
+        expand(&mut db, &plan, u64::MAX).unwrap();
+        assert_eq!(summary(&db, &plan).unwrap()["vertex_class_complete"], true);
+        replay(&mut db, &plan).unwrap();
+    }
+    #[test]
+    fn pre_progress_database_remains_resumable() {
+        let (mut db, mut plan) = database(control(67, -3375));
+        plan.source_code_sha256 = PRE_PROGRESS_SOURCE_SHA256.into();
+        expand(&mut db, &plan, 2).unwrap();
+        assert_eq!(counts(&db).unwrap().1, 2);
+        expand(&mut db, &plan, u64::MAX).unwrap();
+        assert_eq!(summary(&db, &plan).unwrap()["vertex_class_complete"], true);
     }
     #[test]
     fn finite_component_is_not_a_complete_class() {

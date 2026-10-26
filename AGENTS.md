@@ -13,6 +13,15 @@
   holding queue. Ready for review invites review; it does not authorize a
   merge. All validation, evidence, review, and merge gates below still apply.
   Use a draft only when the user explicitly asks for one.
+- **Enable auto-merge when you open the PR** (owner, 2026-10-24):
+  `gh pr merge <n> --auto --merge`. It is the default for every PR whose base
+  is `main`, not an optional extra, and it does not replace the check-in and
+  merge rules below. GitHub offers auto-merge only when the base is the
+  repository's default branch: a PR stacked on a feature branch cannot
+  auto-merge, so retarget it to `main` once its parent lands and enable
+  auto-merge then, or merge the stack bottom-up. If the user asks to keep a PR
+  open or wait for review, disable auto-merge (`gh pr merge <n>
+  --disable-auto`).
 - **Verify before pushing:** run `cargo test --release --lib`, the touched
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
@@ -302,6 +311,55 @@ specific hypotheses, not a universal verdict. Preserve negative searches
 within their exact bounds and run authorized feasible experiments under the
 existing evidence, review, and benchmark rules.
 
+## Resume checkpoints in S3 before every run
+
+A session can end at any moment (token or usage limits, a crash, a reclaimed
+container), and a worktree that only it knew about is then lost. So **before
+any experiment run starts, the leads, the spec and everything needed to
+resume the effort are checked into S3**, and kept current while it runs.
+
+- `scripts/checkpoint.sh init` writes `.resume/RESUME.md` (gitignored). Fill
+  every section for a reader who has none of this conversation: goal, the
+  lead or hypothesis and where it came from, the spec or protocol path with
+  frozen inputs, the current state with measured numbers and where raw output
+  lives, next steps with exact commands, every run in flight (command, host,
+  instance id or pid, log and output paths, how to collect it), and the stop
+  and success conditions. The gate rejects missing or empty sections and
+  leftover `TODO(checkpoint)` markers.
+- `scripts/checkpoint.sh push` uploads one checkpoint to
+  `s3://setec-astronomy-artifacts/checkpoints/<repo>/<branch>/<stamp>/`:
+  `RESUME.md`, the spec, leads, protocol and plan files the branch changed, a
+  git bundle of unpushed commits, a patch of uncommitted changes, untracked
+  files (large ones listed, not copied) and `meta.json`. Earlier checkpoints
+  are never overwritten. Push again whenever a run starts or finishes,
+  results arrive, or the plan changes.
+- **Claude Code enforces this** (`.claude/hooks/checkpoint-hook.sh`): writing
+  a spec, leads, protocol or plan file, or `RESUME.md`, pushes a checkpoint,
+  and run launchers (`scripts/run_*`, sweeps, benchmarks, `nohup`, background
+  commands, `cargo run --release`, `expspec run`, `sage-run`, cloud launches)
+  are refused until `RESUME.md` is complete and the push succeeded. A command
+  that is not an experiment run may opt out with `CHECKPOINT_SKIP=<reason>`.
+  **Other runtimes (Codex)** run `scripts/checkpoint.sh gate` before
+  launching and do not launch if it fails.
+- Claude Code sessions have no AWS credentials, so the script works from a
+  token (tried first; an AWS profile is only a fallback). The token is a
+  presigned POST policy that can only write under `checkpoints/`, plus a
+  presigned link to an index of recent checkpoints, so push, `list`, `share`
+  and `restore` all work without credentials. A job on the owner's Mac
+  re-mints it every 15 minutes (7-day lifetime) into
+  `~/.config/checkpoint/upload-token`, where the script finds it; a session
+  elsewhere is given it as `CHECKPOINT_UPLOAD_TOKEN`. The bucket host is in
+  this repo's sandbox network allowlist (`.claude/settings.json`). It is a bearer credential: never
+  commit it or put it in a PR, report or task card.
+- To resume: `scripts/checkpoint.sh list` shows the latest checkpoint per
+  branch (from the index, up to 15 minutes behind);
+  `scripts/checkpoint.sh restore <repo>/<branch>[/<stamp>]` rebuilds the
+  worktree next to this checkout and puts `RESUME.md` in it. `share` prints a
+  presigned URL that `restore <url>` accepts anywhere.
+
+A checkpoint is a safety net, not the record: the spec, protocol and results
+still land in a PR under the rules above.
+
 ## Research searches must leave visual reports
 
 Every experiment run (ICMS or ecbench session, autolab or tournament round,
@@ -562,9 +620,10 @@ requires explicit authorization for that merge, and it follows these rules:
 - If a documentation-only change legitimately triggers no CI, verify the
   workflow filters, inspect the diff, and run any relevant local validation.
   State that no CI applied; do not claim that nonexistent checks passed.
-- Merge using the repository's permitted merge method and an expected-head-SHA
-  guard where supported. Confirm that GitHub reports the PR as merged, then
-  record the merge commit and validation outcome on the PR.
+- Auto-merge is already enabled when the PR was opened, so merge with the
+  repository's permitted merge method and an expected-head-SHA guard where
+  supported. Confirm that GitHub reports the PR as merged, then record the
+  merge commit and validation outcome on the PR.
 - If access, required external review, a persistent CI failure, or another
   concrete gate prevents merging, report that blocker precisely on the PR
   rather than asking the user to repeat the authorization already given.
@@ -1177,6 +1236,14 @@ conditions both sides ran under.  Before changing code for speed:
   tool's reach. Expect ±5–10% residual wall noise on cloud containers and
   CI runners, and measure it with an A/A run. Fix the thread count
   explicitly (`RAYON_NUM_THREADS=1`), and report the pinned CPUs.
+- **Profile to find the cost, then measure the change.** Before tuning a CPU
+  loop or a CUDA kernel, find where the time goes with `tools/profile.sh`
+  (the [profile skill](.agents/skills/profile/SKILL.md)). It covers `perf`
+  sampling, Callgrind, top-down, `nsys`, `ncu` and `nvidia-smi`, and records
+  the host, the tool versions and the binary hash. Profilers perturb what
+  they observe (ncu replays each launch at locked clocks), so a profile
+  explains a cost but never establishes a speedup. The measurement below
+  does.
 - **Measure the noise floor, then interleave.** Run the baseline against a
   copy of itself (A/A) to see the spread, then alternate baseline and
   candidate (ABAB…, at least five rounds) and report median and minimum.
@@ -1274,6 +1341,15 @@ Historical autolab, tournament and ICMS evidence keeps its own protocols.
 
 ### 13. Large files go through the store
 
+Data files follow the artifact-store policy (owner, 2026-10-24): any non-code
+file over 1 MiB, and any data-suffixed file (`.jsonl`, `.gz`, `.npy`, logs,
+archives) over 64 KiB, lives in `s3://setec-astronomy-artifacts` with a
+`.artifacts.json` manifest in its directory, moved with `tools/artifacts`
+(`artifacts.py push`, `pull`, `status`, `verify`) instead of `git add`. See
+[docs/artifacts.md](docs/artifacts.md). The rest of this section describes
+`crypto store`, which stays for named single-file references (`store:NAME`);
+both share one object layout and cache.
+
 A factor base, relation table or raw evidence file too big for Git is pushed
 with `crypto store push` (or `ecbench store push`) and referred to by name,
 not by a local path or a one-off bucket URL: `store:<name>`, accepted
@@ -1286,7 +1362,9 @@ SHA-256; a name is not repointed without `--replace`, which keeps the old
 digest as superseded. Never delete remote objects from an agent session.
 See [docs/store/README.md](docs/store/README.md).
 
-"Too big for Git" means over 10 MiB (owner, 2026-10-22): every blob committed
+"Too big for Git" means over 10 MiB (owner, 2026-10-22); for data files the
+thresholds above now apply first, and the 10 MiB limit still covers anything the
+artifact policy does not select. Every blob committed
 stays in every future clone. The `large-files` workflow
 (`scripts/check-large-files.sh`) fails a PR that adds or modifies such a file,
 except generated text that git delta-compresses well (`docs/browser/data.json`,
@@ -1323,9 +1401,12 @@ manifest or verifier names individual run records by repository path (the
 records stay committed as loose files. Only the part nothing names goes in the
 archive; say in the README which part is which.
 
-This applies to new run trees. Never re-pack, compress or move a committed
-tree, or rewrite history to slim one: committed evidence stays as it was
-written. A tree too big for Git even compressed goes through the store (§13).
+This applies to new run trees. Never re-pack or compress a committed tree, or
+rewrite history to slim one: committed evidence stays as it was written. The
+one exception (owner, 2026-10-24): data files move out of Git to
+`s3://setec-astronomy-artifacts` ([docs/artifacts.md](docs/artifacts.md)); a
+moved file keeps its path and bytes (checked by hash) and history is not
+rewritten. A tree too big for Git even compressed goes through the store (§13).
 Checkouts that do not need a research tree leave it off disk instead
 ([docs/sparse-checkout.md](docs/sparse-checkout.md)).
 
@@ -1522,3 +1603,16 @@ those files, it will tell you who and what to do about it. Read `.conductor/WORK
 and the active task card. Report scope expansion before editing outside the reserved paths.
 Do not publish chat transcripts or secrets as task metadata.
 <!-- conductor:end -->
+
+## Progress metrics (daily lab report)
+
+`tools/progress_metrics.py` exports this repo's progress KPIs as JSONL for the lab-wide daily
+report (`/Volumes/SSD990-2/progress-metrics`). It reads committed state at `origin/<default>` and
+prints one sample per line (`metric, value, date, problem, unit, better, kind, label, source`).
+
+- When a PR adds or changes a benchmark, leaderboard, result file or ledger source that carries a
+  number worth tracking day over day, extend the exporter in the same PR. Keep metric ids stable;
+  a renamed id is a new series.
+- Never emit estimates. If a source is missing, emit nothing for it.
+- `python3 tools/progress_metrics.py --since 2026-10-01` must run in under a minute, stdlib only,
+  no builds, and never read the working tree.
