@@ -26,3 +26,10 @@ $(BUILD)/cpu-accounting: tests/cpu_accounting.cpp $(HEADERS) | $(BUILD)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@
 $(BUILD)/fake-child: tests/fake_child.cpp | $(BUILD)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+.PHONY: guard-qualification
+guard-qualification: $(BUILD)/guard-qualification $(BUILD)/guard-worker
+$(BUILD)/guard-qualification: tests/guard_qualification.cpp $(HEADERS) | $(BUILD)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@
+$(BUILD)/guard-worker: tests/guard_worker.cpp $(HEADERS) | $(BUILD)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@

@@ -86,3 +86,25 @@ UC San Diego dissertation, chapter3, was identified as an alternative primary
 source; this session's fulltext retrieval returned429, so the full chapter and
 the Algorithm3/Lemma7 assumptions remain unread. No byte equivalence between
 paper versions, novelty or theorem applicability is asserted.
+
+Guard qualification continuation TASK-20261026-6374dd adds only controlled native
+test drivers/workers and a compile-only `guard-qualification` Makefile target.
+Production source remains pinned to86ddd19f67e08160c22a0d8ba9a32a92321d18ad. The
+sealed five-class plan uses the unchanged production1800-second watchdog and
+exact8GiB worker cap; it never invokes a scientific envelope or algorithm. Raw
+records under `spec/checks/TASK-20261026-6374dd/` are individually content-bound
+by the programme owner-source manifest, including failures and not_started cases.
+An exact parent-authorized immutable cache subset permits at most one read-only
+fadvise pass; advice is not reclamation proof. Q4 still requires measured12GiB
+visible enclosing headroom, excluding the worker cap, and effective zero swap.
+The final programme qualification-results/report state actual class outcomes;
+source presence or a partial run is not full guard or scientific readiness.
+
+Initial qualification outcomes: Q1/Q2/Q5 passed; Q3 failed because the new fixture's
+generic orphan cleanup consumed the competitor status before its dedicated wait4
+receipt, despite retained genuine1800.071s watchdog/lock/tree-cleanup observations.
+Q4 was infrastructure_not_started: measured visible enclosing headroom was
+12439695360bytes, below12884901888 required, after the single authorized cache pass;
+no OOM worker was launched. All five original rows/raw records and initial source/
+runtime/seal are frozen under the task check directory. No full guard qualification
+or scientific readiness is established; any repair/replay requires separate admission.
