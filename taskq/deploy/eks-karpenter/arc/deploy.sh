@@ -40,6 +40,12 @@ helm upgrade --install crypto-eks-xmem "$chart/gha-runner-scale-set" \
 helm upgrade --install crypto-eks-xmem1t "$chart/gha-runner-scale-set" \
   --version "$version" --namespace arc-runners --atomic --wait --timeout 10m \
   -f xmem1t-values.yaml
+helm upgrade --install crypto-isolab-build "$chart/gha-runner-scale-set" \
+  --version "$version" --namespace arc-runners --atomic --wait --timeout 10m \
+  -f isolab-build-values.yaml
+helm upgrade --install crypto-isolab "$chart/gha-runner-scale-set" \
+  --version "$version" --namespace arc-runners --atomic --wait --timeout 10m \
+  -f isolab-values.yaml
 
 kubectl -n arc-runners get autoscalingrunnersets,pods
 echo "ARC installed. Run the manual ARC smoke workflow before setting CRYPTO_EKS_WORKFLOWS."
