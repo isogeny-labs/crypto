@@ -52,6 +52,29 @@ def check_arm(output, mode, identity, obj, group):
         raise ValueError(f"{mode} SAT shape differs")
     result_path = path / "result.json"
     if not result_path.exists():
+        cap_path = path / "result.json.cap.json"
+        if (not positive and not supervisor["outer_cap_reached"]
+                and supervisor["exit_code"] == 124 and cap_path.exists()):
+            cap = read(cap_path)
+            if (cap["schema"] != "n83.full-d18-m4-cap/v1"
+                    or cap["status"] != "UNKNOWN_wall_cap"
+                    or cap["mode"] != mode
+                    or cap["budget_seconds"] != 2_400
+                    or cap["root_encoding"] != "shared_root_bits"
+                    or cap["root_choice_pinned"] is not False
+                    or cap["choice_pin_policy"] != "none"
+                    or cap["search_policy"] != "phase_zero_first_ordered_first_pair"
+                    or cap["isolation"] != "L0_shared_host_no_hard_cgroup"
+                    or cap["elapsed_process_wall_ms"] < 2_400_000
+                    or cap["selected_best_total_runtime"] is not None
+                    or names != ["started", "import_checked", "model_constructed"]):
+                raise ValueError("internal wall-cap receipt differs")
+            return {"status": "UNKNOWN_wall_cap", "phases": names,
+                    "import_ms": shape["import_ms"], "model_ms": shape["model_ms"],
+                    "search_ms": None,
+                    "supervisor_wall_seconds": supervisor["elapsed_wall_seconds"],
+                    "maximum_resident_set_bytes": supervisor["maximum_resident_set_bytes"],
+                    "relation": None, "cap_receipt": cap}
         if positive or not supervisor["outer_cap_reached"] or supervisor["exit_code"] != -9:
             raise ValueError(f"{mode} missing result has no verified watchdog")
         return {"status": "OUTER_WATCHDOG_CENSORED",
@@ -121,23 +144,29 @@ def audit(source, binary, base, output):
     natural = (check_arm(output, "natural", identity, obj, group)
                if (output / "natural").exists() else None)
     summary = read(output / "summary.json")
+    legacy_wall_cap_misclassified = (natural is not None
+                                     and natural["status"] == "UNKNOWN_wall_cap"
+                                     and summary["natural_status"] == "PRODUCER_FAILURE")
     if (summary["source_commit"] != identity["source_commit"]
             or summary["binary_sha256"] != identity["binary_sha256"]
             or summary["positive_status"] != "PASS_CONSTRUCTED_CONTROL"
             or summary["natural_search_executed"] != (natural is not None)
-            or summary["natural_status"] != (None if natural is None else natural["status"])
+            or (summary["natural_status"] != (None if natural is None else natural["status"])
+                and not legacy_wall_cap_misclassified)
             or summary["selected_best_total_runtime"] is not None):
         raise ValueError("run summary differs from independently checked arms")
     status = ("PASS_CONSTRUCTED_ONLY" if natural is None else
               "PASS_REPLAYED_NATURAL_RELATION" if natural["relation"] else
               "PASS_CENSORED_NATURAL" if natural["status"] in
-              ("UNKNOWN_search_cap", "OUTER_WATCHDOG_CENSORED") else
+              ("UNKNOWN_search_cap", "UNKNOWN_wall_cap", "OUTER_WATCHDOG_CENSORED") else
               "PASS_RECORDED_NONRELATION_TERMINAL")
     return {"schema": "n83.d18-ordered-first-pair-independent-audit/v1",
             "status": status, "source_commit": identity["source_commit"],
             "binary_sha256": identity["binary_sha256"],
             "object_sha256": run.witness_run.OBJECT_SHA,
             "positive": positive, "natural": natural,
+            "reported_natural_status": summary["natural_status"],
+            "legacy_wall_cap_misclassified": legacy_wall_cap_misclassified,
             "negative_controls": negative,
             "selected_best_total_runtime": None}
 

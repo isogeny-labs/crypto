@@ -81,6 +81,21 @@ def run_arm(source, binary, base, output, identity, mode):
                   and result["relation"]["tamper_rejected"] else "POSITIVE_GATE_FAILED")
     elif timed_out:
         status = "OUTER_WATCHDOG_CENSORED"
+    elif code == 124 and result is None and Path(str(result_path) + ".cap.json").exists():
+        cap = json.loads(Path(str(result_path) + ".cap.json").read_text())
+        if (cap["schema"] != "n83.full-d18-m4-cap/v1"
+                or cap["status"] != "UNKNOWN_wall_cap"
+                or cap["mode"] != mode
+                or cap["budget_seconds"] != (300 if positive else 2_400)
+                or cap["root_encoding"] != "shared_root_bits"
+                or cap["root_choice_pinned"] is not False
+                or cap["choice_pin_policy"] != "none"
+                or cap["search_policy"] != "phase_zero_first_ordered_first_pair"
+                or cap["isolation"] != "L0_shared_host_no_hard_cgroup"
+                or cap["elapsed_process_wall_ms"] < cap["budget_seconds"] * 1_000
+                or cap["selected_best_total_runtime"] is not None):
+            raise ValueError(f"{mode} internal wall-cap receipt differs")
+        status = "UNKNOWN_wall_cap"
     elif code == 0 and result is not None:
         status = result["status"]
     else:
