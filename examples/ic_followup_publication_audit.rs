@@ -135,10 +135,11 @@ fn partial(study: &Path, m: u32) -> Value {
     let b = basis.coords(&inst.curve.f, &inst.curve.b);
     let gx = basis.coords(&inst.curve.f, &inst.generator.x);
     let gy = basis.coords(&inst.curve.f, &inst.generator.y);
-    let generator = BinaryPoint::Affine {
+    let factory_generator = BinaryPoint::Affine {
         x: F2mElement::from_biguint(&BigUint::from(gx), n),
         y: F2mElement::from_biguint(&BigUint::from(gy), n),
     };
+    let generator = point(&records[0]["workload"]["curve"]["generator"], n);
     let curve = BinaryCurve {
         m: n,
         irreducible: irr,
@@ -222,6 +223,9 @@ fn partial(study: &Path, m: u32) -> Value {
         "icv1":id.icv1,"curve_name":id.slug,"polynomial_modulus_hex":format!("0x{:x}",basis.modulus),
         "a_hex":format!("0x{a:x}"),"b_hex":format!("0x{b:x}"),"r_decimal":inst.r.to_string(),"order_decimal":inst.group_order.to_string(),
         "retained_original_audit":retained_audit,"complete_ic_cost":null,"ic_rho_ratio":null,
+        "wide_factory_generator_matches_recorded":factory_generator==generator,
+        "recorded_generator":records[0]["workload"]["curve"]["generator"],
+        "wide_factory_generator":[format!("0x{gx:x}"),format!("0x{gy:x}")],
         "status":"partial_session_recorded_successful_answers_independently_verified",
         "scope":"successful scalar answers only; no new walks, counter replay or complete-session qualification"})
 }

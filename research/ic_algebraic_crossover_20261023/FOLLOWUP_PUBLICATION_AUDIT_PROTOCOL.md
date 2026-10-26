@@ -31,3 +31,16 @@ complete deterministic raw archives, and explicit pending-artifact plans.
 The old L2 ladder, full wide stage integration, larger D4 cells and independent
 124-branch HKY replay remain open. No extra VM or automatic publication/claim
 promotion is performed by this audit.
+
+## Amendment after the first audit
+
+The first audit failed on the assumption that the old and wide factories pick
+the same generator. The reconstructed curve identity, order, r and cofactor
+already agree, but the generator samples differ. Preserve that failed receipt.
+Use the generator actually recorded in each original session, require all
+records to agree on it, check it is nonzero/on-curve and [r]G=O, then verify
+each original scalar against that exact G. Record the separate factory
+generator and equality verdict explicitly. This corrects object selection;
+it neither supplies factory-generator parity nor changes a recorded target,
+scalar, curve or cost. Full old-method generator parity remains an open
+integration obligation.
