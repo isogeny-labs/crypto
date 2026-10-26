@@ -157,8 +157,16 @@ python3 reports/plot.py && python3 reports/diagram.py   # layout only
 typst compile REPORT.typ
 ```
 
-Route S instance files are stored gzipped (`data/route_s_q*.jsonl.gz`);
-`gunzip -k` them before `summarize`. Run ids: start rows of each JSONL file
+Route S per-instance records (`data/route_s_q*.jsonl.gz`, 6.4 MB) are not in
+Git: the artifact-store policy (AGENTS.md §13) sends them to
+`s3://setec-astronomy-artifacts`, and the push failed on this host (AWS token
+invalid). Their SHA-256 and sizes are in `data/route_s_records.sha256`; the
+files are kept in the worktree that produced them and can be pushed with
+`python3 tools/artifacts/artifacts.py push research/smith_isogeny_divisor_map_20261018/data`.
+`data/summary.json` holds every total quoted here, and the runs are
+deterministic (seed 20261018), so the commands above regenerate them
+(`gunzip -k` before `summarize`). The two report PDFs are on the policy's keep
+list, as other studies' report PDFs are. Run ids: start rows of each JSONL file
 (commit and arguments); runs 2026-10-26T02:49Z to about 05:10Z UTC. q = 13 hit
 the first run's 1 h cap at 53 173 of 56 784 instances; it was rerun with a
 2 h cap and completed (the recorded file is the complete rerun).
