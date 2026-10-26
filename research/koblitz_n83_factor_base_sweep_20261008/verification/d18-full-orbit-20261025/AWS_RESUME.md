@@ -204,3 +204,53 @@ panels and this PR's XOR panels ended at their stated bounds without a
 checked natural relation; none supplies a yield estimate for this larger
 base. `selected_best_total_runtime` remains `null` until the full comparison
 is measured and independently replayed.
+
+## Ordered D18 and native XOR cadence continuation
+
+The [ordered first-pair result](ordered-first-pair-20261025/RESULT.md) used
+the complete D18 base at committed source `c2d39e4948a3`. Its constructed
+four-point relation independently replayed, while the first public natural
+query reached its 2,400-second internal wall cap. The raw initial supervisor
+mislabel and corrected independent censor are retained. This arm supplies no
+measured natural yield.
+
+The opt-in [cadence-32 protocol](xor-cadence-20261025/PROTOCOL.md) changes
+the native XOR elimination schedule while retaining the ordered formula and
+base. The 120-case exhaustive mixed CNF/XOR differential, full release
+library suite, touched example, and N83/boundary Python suites passed. A
+source-bound attempt at `00b3d3929e49` fetched the exact D18 S3 object and
+wrapper again. The 300-second constructed worker reached its internal cap
+before `import_checked` on a saturated shared Mac: 303.192 seconds of
+supervisor wall, 31.21 seconds of process CPU, one-minute host load 100.8
+before and 173.8 after. Natural search was skipped. The
+[raw receipt and independent audit](xor-cadence-20261025/RESULT.md) classify
+`CAPACITY_CENSORED_BEFORE_MODEL` and reject an altered cap. Commit
+`7544cd49b84e` adds the audit and future cap classification; build a fresh
+release binary from the chosen clean PR commit before repeating. Do not
+compare cadence wall time from that capacity-censored attempt.
+
+On an authorized, resource-qualified host, fetch the immutable
+`d18-full-direct-subgroup-v1/a0` object and wrapper using the exact keys and
+full-object checksum checks above. The local input layout needs
+`objects/c295da8898cfad29a053621c768ca059eea4263f89f5ca78b4f98af43c383f3f.jsonl.gz`,
+`s3-manifest.json`, the bound producer `manifest.json`, and the two
+`*-get-metadata.json` provider responses. From a clean checkout with pinned
+`blake3==1.0.8`, build `cargo build --release --example
+koblitz_n83_factor_base_export`, then invoke
+`xor-cadence-20261025/run.py --source SOURCE --binary BINARY --base BASE
+--output FRESH_OUTPUT`. The supervisor permits natural search only after
+independent positive group replay and changed-target/row rejection. Run
+`xor-cadence-20261025/audit.py` against the same four paths and retain all
+raw receipts. A natural relation still needs useful-rank, factor-base log,
+unseen-target descent, fully charged cold runtime and same-target rho gates.
+
+The hosted GitHub AWS principal stopped at `AccessDenied` for the full-D18
+manifest, and its [exact two-object read proposal](linux-phase-first-20261025/attempt-1/IAM_READ_PROPOSAL.md)
+remains unapplied. Read-only inspection on 2026-10-25 found the existing
+`n83-online-screen-ssm-20261019` profile has only its separate artifact put,
+while `n83-xor-panel-20261025` reads only the earlier XOR-panel input prefix.
+Neither profile grants this D18 object read. Apply the reviewed exact-object
+permission only after explicit authorization; do not route this experiment
+through a broader or unrelated role. The local SSH endpoints named
+`awsspot` and `runpod` were unavailable at this inspection and are not a
+completed hosted run.
