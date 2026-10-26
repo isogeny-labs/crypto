@@ -92,6 +92,12 @@ pub fn sources(fixtures: &[Fixture]) -> Result<Vec<Source>> {
 }
 pub fn main(args: &[String]) -> Result<()> {
     let command = args.first().ok_or("missing follow-up command")?;
+    if command == "transfer-cost-worker" {
+        return divisors::cost_worker(
+            Path::new(args.get(1).ok_or("input")?),
+            Path::new(args.get(2).ok_or("output")?),
+        );
+    }
     if command == "decomposition-worker" {
         return block::decomposition_worker(
             Path::new(args.get(1).ok_or("input")?),
@@ -253,7 +259,9 @@ fn adjudicate(prefix: &Path, out: &Path) -> Result<Vec<Value>> {
     let marker = marker
         || text.contains("ALL_HIGHER_TORSION_CONSTRUCTION_DONE")
         || text.contains("ALL_INCIDENCE_REPLAY_OK")
-        || text.contains("ALL_BLOCK_REPLAY_OK");
+        || text.contains("ALL_BLOCK_REPLAY_OK")
+        || text.contains("ALL_DECOMPOSITION_REPLAY_OK")
+        || text.contains("ALL_TRANSFER_COST_REPLAY_OK");
     let hashes_match =
         meta["stdout_sha256"] == digest(&stdout) && meta["stderr_sha256"] == digest(&stderr);
     let script = meta["argv"]

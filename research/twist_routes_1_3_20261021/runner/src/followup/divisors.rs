@@ -477,6 +477,73 @@ fn bsgs(h: &Chart, g: &Div, q: &Div, n: u64) -> Option<u64> {
     }
     None
 }
+
+fn source_bsgs(e: Quad, g: P, q: P, n: u64) -> Option<u64> {
+    let mut m = 1;
+    while m * m < n {
+        m += 1;
+    }
+    let mut table = BTreeMap::new();
+    let mut x = None;
+    for j in 0..m {
+        table.entry(x).or_insert(j);
+        x = e.pa(x, g);
+    }
+    let step = e.pn(e.pm(g, m as u128));
+    let mut x = q;
+    for i in 0..=m {
+        if let Some(j) = table.get(&x) {
+            let scalar = (i * m + j) % n;
+            if e.pm(g, scalar as u128) == q {
+                return Some(scalar);
+            }
+        }
+        x = e.pa(x, step);
+    }
+    None
+}
+
+/// Price the existing explicit transfer with generic BSGS, with public maps given.
+/// The input contains no known scalar or old destination point.
+pub fn cost_worker(input: &Path, out: &Path) -> Result<()> {
+    let task: Value = serde_json::from_slice(&fs::read(input)?)?;
+    let f: Fixture = serde_json::from_value(task["fixture"].clone())?;
+    let target: P = serde_json::from_value(task["target"].clone())?;
+    let arm = task["arm"].as_str().ok_or("arm")?;
+    let e = f.curve();
+    let g = f.group();
+    assert!(e.on(target));
+    assert!(prime(f.order) && f.order % 3 != 0);
+    let before = reference_calls();
+    let (scalar, details) = match arm {
+        "source-bsgs" => (
+            source_bsgs(e, g, target, f.order).ok_or("source BSGS failed")?,
+            json!({"destination_constructed":false}),
+        ),
+        "transfer-bsgs" => {
+            let model = Three::new(&f, &task["constructor"]);
+            let h = &model.h;
+            let jg = model.pull(g);
+            let jq = model.pull(target);
+            assert_ne!(jg, Div::zero());
+            assert_eq!(h.scalar(&jg, f.order as u128), Div::zero());
+            let scalar = bsgs(h, &jg, &jq, f.order).ok_or("destination BSGS failed")?;
+            let norm = fp_point(h.k, model.map.norm(h, &jq));
+            let recovered = e.pm(norm, inv(3, f.order) as u128);
+            assert_eq!(recovered, target);
+            (
+                scalar,
+                json!({"destination_constructed":true,"generator":jg,"target":jq,"norm":norm,"source_point_recovered_by_inverse_three":recovered,"chart_root":h.root,"chart_scale":h.lambda}),
+            )
+        }
+        _ => return Err("unknown transfer cost arm".into()),
+    };
+    assert_eq!(e.pm(g, scalar as u128), target);
+    write_json(
+        out,
+        &json!({"schema":"twist.transfer-cost-worker/v1","fixture":f.id,"label":task["label"],"arm":arm,"source_scalar":scalar,"source_scalar_verified":true,"target":target,"details":details,"reference_calls_unpriced":reference_calls()-before,"given_public_map_parameters":true,"map_discovery_and_constructor_search_priced":false,"full_IC_or_fastest_reference_comparison":false,"wall_time_admitted":false}),
+    )
+}
 pub fn transfer(fixtures: &[Fixture], input: &Path, out: &Path) -> Result<Vec<Value>> {
     let index: Vec<String> = serde_json::from_slice(&fs::read(input)?)?;
     let mut rows = vec![];
