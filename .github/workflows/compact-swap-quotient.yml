@@ -1,13 +1,7 @@
 name: Compact-orbit S3 swap quotient against strong rho
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/compact-swap-quotient.yml'
-      - 'research/notes/ecc2k130/compact_swap_quotient_20260929/**'
-      - 'research/notes/ecc2k130/compact_frozen_source_replay_20260929/**'
-      - 'research/notes/ecc2k130/compact_orbit_point_panel_20260929/run_panel.py'
-      - 'research/notes/ecc2k130/compact_orbit_point_panel_20260929/verify_panel.py'
-      - 'research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/verify_rank.py'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
