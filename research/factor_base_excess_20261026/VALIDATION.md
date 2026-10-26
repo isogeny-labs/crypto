@@ -61,6 +61,11 @@ a point-decomposition experiment or evidence of a wide-field solver.
 - `cargo check --locked --all-targets` failed in unchanged
   `examples/r6_1_direct_s5.rs:1178`: `FactorBase` initializer lacks `known_logs`.
   Both attempts/logs are retained; the inherited example was not edited.
+- The production admission gate reports 22 existing benchmark/archive
+  problems. Benchmark rows, freezes, verdict trees and gate source are exact
+  pinned base; this change adds no admitted result. The local artifact check
+  passes for the published source/metadata/report only, not the withheld raw
+  archive. Exact outputs and scope proof: [GATE_STATUS.json](validation/GATE_STATUS.json).
 - Full repository naming stopped on an off-cone tracked skill file. An
   optional whole-repository metadata inventory was terminated after lazy
   fetches triggered Git auto-repacking; no global naming pass is claimed.
