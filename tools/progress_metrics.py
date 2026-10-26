@@ -234,6 +234,13 @@ def nist_selection_period_ecpp(ref, since):
         emit("nist.selection_period_ecpp.retained_rows", data.get("rows"),
              date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
              label="Period ECPP trial: original cohort rows retained, including indeterminate",
+def nist_selection_exact_embedding(ref, since):
+    path = "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_exact_embedding.certified_rows", data.get("passed"),
+             date=date, problem="nist-candidate-selection", unit="curves", better="higher",
+             label="NIST all-21 census: exact embedding degrees with direct-power certificates",
              source=f"{path}@{commit}")
 
 
@@ -248,6 +255,7 @@ def main():
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
     nist_selection_period_ecpp(a.ref, a.since)
+    nist_selection_exact_embedding(a.ref, a.since)
 
 
 if __name__ == "__main__":

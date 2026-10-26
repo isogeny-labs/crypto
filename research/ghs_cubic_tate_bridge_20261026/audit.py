@@ -86,6 +86,19 @@ def main():
     assert class_counts == {"A": 2 * (q - 1),
                             "B": 2 * (q * q - 1),
                             "C": 2 * (q - 1) * (q * q - 1)}
+    # Two elliptic curves over K are K-isogenous exactly when they have the
+    # same trace, equivalently the same group order. This is a structural
+    # isogeny-closure census, not an attack-cost or isogeny-walk census.
+    direct_B_orders = sorted({x["order"] for x in rows if x["direct_class"] == "B"})
+    direct_B_order_set = set(direct_B_orders)
+    closure = [x for x in rows if x["order"] in direct_B_order_set]
+    outside = [x for x in rows if x["order"] not in direct_B_order_set]
+    closure_classes = Counter(x["direct_class"] for x in closure)
+    outside_classes = Counter(x["direct_class"] for x in outside)
+    assert len(direct_B_orders) == 36
+    assert len(closure) == 2608 and len(outside) == 5582
+    assert closure_classes == {"A": 10, "B": 510, "C": 2088}
+    assert outside_classes == {"A": 20, "C": 5562}
 
     witnesses = {x["group_order"]: x for x in raw["witnesses"]}
     checks = {x["group_order"]: x for x in replay["checked"]}
@@ -97,6 +110,7 @@ def main():
         assert len(group) == expected["models"]
         assert all(x["a"] == expected["a"] and x["direct_class"] == "C"
                    for x in group)
+        assert order not in direct_B_order_set
         assert all(x["largest_prime_subgroup"] == expected["r"]
                    and x["cofactor"] == expected["cofactor"] for x in group)
         assert order == expected["r"] * expected["cofactor"]
@@ -119,7 +133,9 @@ def main():
         families.append({
             "group_order": order, "source_a": expected["a"],
             "source_b_values": values, "normalized_isomorphism_class_count": len(values),
-            "direct_B_count": 0, "selected_prime": expected["r"],
+            "direct_B_count": 0,
+            "outside_direct_B_K_isogeny_closure": True,
+            "selected_prime": expected["r"],
             "cofactor": expected["cofactor"], "trace_t": t,
             "frobenius_polynomial_coefficients": [1, 0, 0, -t, 0, 0, q3],
             "P_at_one": order, "P_derivative_at_one": derivative,
@@ -140,6 +156,15 @@ def main():
         "field_order": q3, "base_field_order": q,
         "source_normal_forms_checked": len(rows),
         "direct_class_counts": dict(sorted(class_counts.items())),
+        "direct_B_isogeny_closure": {
+            "criterion": "source order belongs to the direct-B order set",
+            "direct_B_source_orders": direct_B_orders,
+            "isogeny_class_count": len(direct_B_orders),
+            "normalized_models_in_closure": len(closure),
+            "class_counts_in_closure": dict(sorted(closure_classes.items())),
+            "normalized_models_outside_closure": len(outside),
+            "class_counts_outside_closure": dict(sorted(outside_classes.items())),
+        },
         "family_count": len(families), "eligible_normal_form_count": 300,
         "raw_sha256": digest(RAW), "replay_sha256": digest(REPLAY),
         "prior_work_sha256": digest(PRIOR),
@@ -149,6 +174,8 @@ def main():
     }
     (HERE / "certificate.json").write_text(json.dumps(out, indent=2, sort_keys=True) + "\n")
     print(json.dumps({"verified": len(rows), "class_counts": out["direct_class_counts"],
+                      "direct_B_isogeny_closure": len(closure),
+                      "outside_direct_B_isogeny_closure": len(outside),
                       "eligible_normal_forms": 300,
                       "orders": [f["group_order"] for f in families]}))
 

@@ -59,6 +59,14 @@ decision log.
 - **Derived or proved:** primality and product checks certify the recorded
   factorizations; generator and Hasse checks certify the six prime full
   orders. These are computational checks, without Lean formalization.
+- **Observed:** the [exact embedding-degree test](../research/nist_skip_criterion_20261025/exact_embedding_20261026/REPORT.md)
+  computed and separately certified all21 minimal degrees. None of ten
+  published curves has maximal degree; two skipped curves do. The fixed
+  modern RFC7748 bound accepts ten published and ten skipped curves,
+  rejecting only skipped p239 index1562. Published/skipped P-256 both have
+  `(n-1)/k=0x3`, precluding separation by a filter of that normalized degree
+  and their common field alone. These are exact counterexamples to those
+  filters, not historical attribution or a practical pairing attack.
 - **Suspected explanation:** unknown. Deliberate weak-curve selection,
   deliberate avoidance of weak candidates, a family-wide unpublished
   method, and engineering or bookkeeping filters remain distinct hypotheses.

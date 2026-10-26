@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Prepare direct Linux x64 workflow jobs for opt-in ARC routing.
 
-The repository variables are empty by default, so edited jobs continue to use
-their original GitHub-hosted labels until a tested workflow is explicitly added.
+The repository variables are empty by default, so edited jobs run on
+`ubuntu-latest` until a tested workflow is explicitly added to
+`CRYPTO_EKS_WORKFLOWS` (Spot `crypto-eks-linux`) or
+`CRYPTO_EKS_HIGHMEM_WORKFLOWS` (Spot `crypto-eks-highmem`).
 """
 
 from __future__ import annotations
@@ -23,6 +25,9 @@ SEALED = {
     "weak-curve-conjectures.yml",
     "ic-dashboard.yml",
     "ecc2k130-pdp-difficulty-protocol.yml",
+    # docs/curves/cover-transfer-assessments.json pins both by SHA-256.
+    "release.yml",
+    "curve-covers.yml",
 }
 TRUSTED = (
     "(github.event_name == 'push' || github.event_name == 'schedule' || "
