@@ -65,6 +65,52 @@ pub use super::groebner_f4::Ordering;
 /// non-zero coefficients, sorted with the leading term first.
 pub type Poly = Vec<(Vec<u32>, u64)>;
 
+/// Optional, read-only observations of the regular F4/solve path. Degrees
+/// describe this run, never a certified degree of regularity.
+#[derive(Clone, Debug, serde::Serialize)]
+pub struct F4Progress {
+    pub event: &'static str,
+    pub variables: usize,
+    pub step: usize,
+    pub degree: u32,
+    pub rows: usize,
+    pub columns: usize,
+    pub productive_degree: u32,
+    pub field_multiplications: u64,
+    pub elapsed_ms: f64,
+}
+
+thread_local! {
+    static OBSERVER: std::cell::RefCell<Option<std::sync::mpsc::Sender<F4Progress>>> = const { std::cell::RefCell::new(None) };
+}
+
+/// Observe this thread's F4 calls, including substitution-tree calls. The
+/// previous observer is restored on return or unwind; arithmetic is unchanged.
+pub fn observe_progress<T>(
+    sender: std::sync::mpsc::Sender<F4Progress>,
+    f: impl FnOnce() -> T,
+) -> T {
+    struct Restore(Option<std::sync::mpsc::Sender<F4Progress>>);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            OBSERVER.with(|slot| {
+                slot.replace(self.0.take());
+            });
+        }
+    }
+    let previous = OBSERVER.with(|slot| slot.replace(Some(sender)));
+    let _restore = Restore(previous);
+    f()
+}
+
+fn notify_progress(progress: F4Progress) {
+    OBSERVER.with(|slot| {
+        if let Some(sender) = slot.borrow().as_ref() {
+            let _ = sender.send(progress);
+        }
+    });
+}
+
 // ── Field arithmetic ───────────────────────────────────────────────
 
 /// Process-wide count of `F_p` multiplications spent in row reduction
@@ -1887,10 +1933,34 @@ fn rref(rows: &mut Vec<Vec<u64>>, fp: Barrett, deadline: Option<Instant>) -> Opt
 
 /// Degree-bounded F4.
 pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
-    if let Some(chunk) = opts.stop_hilbert {
-        return f4_hilbert_guarded(input, n_vars, p, opts, chunk);
-    }
-    f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), TraceMode::Off)
+    notify_progress(F4Progress {
+        event: "begin",
+        variables: n_vars,
+        step: 0,
+        degree: 0,
+        rows: input.len(),
+        columns: 0,
+        productive_degree: 0,
+        field_multiplications: 0,
+        elapsed_ms: 0.0,
+    });
+    let report = if let Some(chunk) = opts.stop_hilbert {
+        f4_hilbert_guarded(input, n_vars, p, opts, chunk)
+    } else {
+        f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), TraceMode::Off)
+    };
+    notify_progress(F4Progress {
+        event: "complete",
+        variables: n_vars,
+        step: report.steps,
+        degree: report.degree_reached,
+        rows: report.max_rows,
+        columns: report.max_cols,
+        productive_degree: report.solving_degree_max,
+        field_multiplications: report.field_ops,
+        elapsed_ms: report.ms,
+    });
+    report
 }
 
 /// The Hilbert function `prod_i (1 + t + ... + t^(d_i - 1))` of a complete
@@ -2492,6 +2562,17 @@ fn f4_with_arithmetic(
         }
         max_rows = max_rows.max(sparse.len());
         max_cols = max_cols.max(n_cols);
+        notify_progress(F4Progress {
+            event: "matrix",
+            variables: n_vars,
+            step: steps,
+            degree: d,
+            rows: sparse.len(),
+            columns: n_cols,
+            productive_degree: learned.0,
+            field_multiplications: field_ops_now() - ops0,
+            elapsed_ms: t0.elapsed().as_secs_f64() * 1000.0,
+        });
         steps += 1;
         // The reducer rows of symbolic preprocessing have distinct leading
         // columns, none of them an lcm: they are already an echelon form.
@@ -4478,6 +4559,54 @@ mod degree_bound_solve_tests {
             matches!(s.verdict, Verdict::Inconsistent),
             "{:?}",
             s.verdict
+        );
+    }
+}
+
+#[cfg(test)]
+mod progress_observer_tests {
+    use super::*;
+    #[test]
+    fn observing_and_nested_observers_preserve_the_basis_and_restore_scope() {
+        let input = vec![
+            normalise(&[(vec![2, 0], 1), (vec![0, 1], 4)], 5, Ordering::Grevlex),
+            normalise(&[(vec![1, 1], 1), (vec![0, 0], 4)], 5, Ordering::Grevlex),
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 8);
+        let reference = f4(&input, 2, 5, &opts);
+        let (outer, outer_rx) = std::sync::mpsc::channel();
+        let (inner, inner_rx) = std::sync::mpsc::channel();
+        let observed = observe_progress(outer, || {
+            observe_progress(inner, || {
+                let _ = f4(&input, 2, 5, &opts);
+            });
+            f4(&input, 2, 5, &opts)
+        });
+        assert_eq!(reference.basis, observed.basis);
+        assert_eq!(reference.solving_degree_max, observed.solving_degree_max);
+        assert_eq!(reference.degree_reached, observed.degree_reached);
+        for events in [
+            outer_rx.into_iter().collect::<Vec<_>>(),
+            inner_rx.into_iter().collect::<Vec<_>>(),
+        ] {
+            assert_eq!(events.first().unwrap().event, "begin");
+            assert_eq!(events.last().unwrap().event, "complete");
+            assert!(events.iter().any(|e| e.event == "matrix"));
+        }
+        let _ = f4(&input, 2, 5, &opts);
+    }
+    #[test]
+    fn observer_is_restored_after_unwind() {
+        let (tx, rx) = std::sync::mpsc::channel();
+        let result =
+            std::panic::catch_unwind(|| observe_progress(tx, || panic!("observer scope control")));
+        assert!(result.is_err());
+        assert!(rx.recv().is_err());
+        let _ = f4(
+            &[normalise(&[(vec![1], 1)], 3, Ordering::Grevlex)],
+            1,
+            3,
+            &F4Options::new(Ordering::Grevlex, 2),
         );
     }
 }
