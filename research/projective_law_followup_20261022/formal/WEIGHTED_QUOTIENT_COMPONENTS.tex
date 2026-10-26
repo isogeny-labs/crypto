@@ -22,12 +22,15 @@ Lean source & Verified scope\\
 \texttt{WeightedChartIso.lean} & Ring equivalence between degree-zero localization away from $Z$ and the affine quotient $K[x,y]/(y^2-f(x))$.\\
 \texttt{WeightedProjSchemeChart.lean} & Scheme isomorphism $D_+(Z) \cong \mathrm{Spec}(K[x,y]/(y^2-f(x)))$.\\
 \texttt{WeightedProjCover.lean} & $D_+(X)\cup D_+(Z)=\mathrm{Proj}$; both basic opens are affine.\\
+\texttt{WeightedChartDehomog.lean} & Generic equivalence between degree-zero localization at a degree-one element and quotient by that element minus one.\\
+\texttt{WeightedInfinityOrdinary.lean} and \texttt{WeightedProjInfinityChart.lean} & Quotient at $X=1$ and scheme isomorphism between $D_+(X)$ and the explicit infinity chart.\\
+\texttt{WeightedProjProper.lean} and \texttt{WeightedProjBase.lean} & Degree-zero subring is $K$; weighted $\mathrm{Proj}$ is proper over $\mathrm{Spec}(K)$.\\
 \bottomrule
 \end{tabular}
 \section*{Open boundary}
-Identifying $D_+(X)$ with the explicit infinity chart and its stalk, projective completion comparison, Picard-class identity, and Rust-to-Lean semantics bridge remain open. The two-open cover and the $Z$ chart are checked.
+Smoothness under explicit hypotheses, overlap comparison with the separately glued curve, local-stalk transport, the Picard-class identity, and Rust-to-Lean semantics bridge remain open. Both chart scheme isomorphisms, their cover, and properness over $K$ are checked.
 \section*{Replay evidence}
-All seven new source files compiled with Lean 4.34.1 and Mathlib commit \texttt{d13f23b723b8a846827a245b89c10fc7d3f11612}, exit status 0. Axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; none lists \texttt{sorryAx}. Source SHA-256 values, in dependency order, are:
+All twelve new source files compiled with Lean 4.34.1 and Mathlib commit \texttt{d13f23b723b8a846827a245b89c10fc7d3f11612}, exit status 0. Axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; none lists \texttt{sorryAx}. Source SHA-256 values, in dependency order, are:
 \begin{quote}\small\ttfamily
 4f775fb6ac97fb2d478c2e550a955351df0ab730a5e344712ca5f4930cfb61b5\\
 b810dd4a6024bc77a7b8de1916c217caf8e1a0de2d555448c73a5d2515ff865c\\
@@ -35,7 +38,12 @@ f02b2f827ca8123f3daabbf19b15d25f9f7793ab7693e8a795bec5572a9d4010\\
 ed6c4bc5b88acefa45fa00ed6ee83655b580e41e8f1d4fa0186777b821abab89\\
 fbcb3cae7cc4c9d7f0722da5f546892bb4cde848eb072580486be3c7a9ecd433\\
 ffa7dd90d349648f22ab4d86cb18d557f6fb1b93bf5bd78febd116d4e95afd29\\
-58dd0a75dbc7544cdd127314a0ffea33d6551766ddc0cc0dc2774f4861f243a0
+58dd0a75dbc7544cdd127314a0ffea33d6551766ddc0cc0dc2774f4861f243a0\\
+19745cadc9e00fdb5e052e872c0a3739fe9856390ea10c65aa8a441f8836367d\\
+2ce21319bf69de82a24d99e8d118ce6eedb132134eecf17b03c2f0b627c52441\\
+95e0e583514cb3f65ca14040079f7a5be68970e38e15e313265af0bdf3c3e17c\\
+d0861dc892c5d7f047ae08d95948e59b68e1df37958475fca59f129649644ef8\\
+59109ab636ff9331997cfcb06a1190c5a245ff8385e783a7d2de5761e714c157
 \end{quote}
 The exact theorem boundaries and replay prerequisites are in \texttt{WEIGHTED\_QUOTIENT\_COMPONENTS.md}. The full four-lead results and matched-rho prices remain in \texttt{research/four\_followups\_review\_20261022/}.
 \end{document}
