@@ -18,7 +18,7 @@ concurrency:
 jobs:
   size:
     if: github.event_name == 'pull_request'
-    runs-on: main
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: read
