@@ -699,11 +699,11 @@ mod tests {
         // x0 = 1, x3 = 1, x1 = 1, x2 = 0: x0x1 + x2 = 1 ≠ 0.  Build the
         // system from a chosen point instead.
         let point = [true, false, true, true, false];
-        let mono = |m: u64| F2BoolMono::from_mask(m);
-        let eval = |m: u64| (0..5).all(|i| m >> i & 1 == 0 || point[i]);
+        let mono = |m: Mask| F2BoolMono::from_mask(m);
+        let eval = |m: Mask| (0..5).all(|i| m >> i & 1 == 0 || point[i]);
         let mut sys = Vec::new();
         for masks in [
-            vec![0b00011u64, 0b00100],
+            vec![0b00011 as Mask, 0b00100],
             vec![0b00110, 0b01001, 0b10000],
             vec![0b11000, 0b00101],
         ] {
