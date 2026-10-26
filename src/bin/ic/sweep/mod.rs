@@ -116,7 +116,8 @@ pub struct RunArgs {
     /// Per-trial wall-clock safety net, seconds (0 for none).
     #[arg(long, default_value_t = 900)]
     pub timeout_seconds: u64,
-    /// Per-trial peak-memory safety net, MiB (0 for none).
+    /// Per-trial peak-memory safety net, MiB (0 for none).  Needs
+    /// `getrusage`, so it is ignored (with a warning) on Windows.
     #[arg(long, default_value_t = 8192)]
     pub max_rss_mb: u64,
     /// The append-only study file; created, or resumed if it exists.
@@ -249,6 +250,9 @@ fn run(a: RunArgs, json_only: bool) -> Result<Value, String> {
         binary_blake3: crate::binary_hash(),
     };
     let mut store = Store::open(&a.store, &header)?;
+    // Each trial runs in a child whose stderr this process captures, so say it
+    // here, where the operator reads it, if the memory net cannot work.
+    trial::warn_if_rss_net_unavailable(a.max_rss_mb);
     let exe = std::env::current_exe().map_err(|e| format!("cannot find this executable: {e}"))?;
     let eval = ProcessEvaluator {
         exe,
