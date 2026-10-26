@@ -134,6 +134,29 @@ already implicit in the known binary cover classification; the new audited
 claim here is the 300-class, class-C-only *isogeny-transfer eligibility*
 certificate, not direct-cover eligibility.
 
+### Exact bound for the known direct-cover route, including all isogenies
+
+Two elliptic curves over the same finite field `K` are `K`-isogenous if and
+only if they have the same trace, equivalently the same `#E(K)`
+([Tate](https://pazuki.perso.math.cnrs.fr/index_fichiers/Tate66.pdf)).
+Let `S_B` be the set of source orders attained by at least one normalized
+class-B model. Exhausting all 8190 ordinary models gives `|S_B|=36` and
+
+```text
+#{E : #E(K) in S_B} = 2608 = 510 direct B + 2088 class C + 10 class A,
+#{E : #E(K) not in S_B} = 5582 = 5562 class C + 20 class A.
+```
+
+Thus **at most 2608 of the 8190 normalized ordinary GF(4096) classes**
+can enter the known direct binary cubic genus-three hyperelliptic-cover
+family through an arbitrary `K`-isogeny. The other **5582 are
+rigorously outside that entire route**, not just beyond a tested walk
+radius. The certificate gives all 36 qualifying orders and the exact
+partition. This is a bound on structural eligibility; the number of
+curves for which the *complete* attack beats rho is between 0 and 2608.
+Other GHS variants, the plane-quartic route above, and higher-genus
+descents are outside this exclusion theorem.
+
 ## Checked scope and next gate
 
 `sage -python audit.py` independently replayed all 8190 source orders using
