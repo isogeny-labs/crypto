@@ -52,9 +52,9 @@ fn primes(mut n: u64) -> Vec<u64> {
     let mut out = Vec::new();
     let mut d = 2;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             out.push(d);
-            while n % d == 0 {
+            while n.is_multiple_of(d) {
                 n /= d;
             }
         }
@@ -184,7 +184,7 @@ impl TwoIsogeny {
         let kernel = (1..degree)
             .map(|k| source.scalar_mul(&t, &k.into()))
             .collect::<Vec<_>>();
-        if kernel.iter().any(|p| *p == Pt::Inf) || {
+        if kernel.contains(&Pt::Inf) || {
             let mut unique = kernel.iter().map(key).collect::<Vec<_>>();
             unique.sort_unstable();
             unique.dedup();
@@ -492,19 +492,17 @@ fn attack(
     let (mapped, map_cost) = phase(|| Ok((d.map(p)?, d.map(q)?)))?;
     let (gp, gq) = mapped;
     if gp.is_identity()
-        || gp
+        || !gp
             .try_scalar_mul(&r.into(), &d.curve)
             .map_err(|e| e.to_string())?
             .is_identity()
-            == false
     {
         return Err("generator image fails prime-order gate".into());
     }
-    if gq
+    if !gq
         .try_scalar_mul(&r.into(), &d.curve)
         .map_err(|e| e.to_string())?
         .is_identity()
-        == false
     {
         return Err("target image fails prime-order gate".into());
     }
@@ -535,8 +533,8 @@ fn attack(
     })?;
     let (answer, descent_cost) = phase(|| {
         let mut cur = gq.clone();
-        let mut jac_adds = 0u64;
         let mut smooth = 0u64;
+        // One Jacobian addition per earlier offset.
         for offset in 0..descent_limit.min(r) {
             if let Some(roots) = fb.split(d, &cur)? {
                 smooth += 1;
@@ -549,13 +547,12 @@ fn attack(
                         % r;
                     if d.source.scalar_mul(p, &scalar.into()) == *q {
                         return Ok(
-                            json!({"scalar":scalar,"offset":offset,"smooth":smooth,"jacobian_additions":jac_adds}),
+                            json!({"scalar":scalar,"offset":offset,"smooth":smooth,"jacobian_additions":offset}),
                         );
                     }
                 }
             }
             cur = cur.try_add(&gp, &d.curve).map_err(|e| e.to_string())?;
-            jac_adds += 1;
         }
         Err("individual descent exhausted trial cap or matrix span".into())
     })?;
@@ -610,7 +607,7 @@ fn run() -> Result<Value, String> {
     };
     let (d, construction_cost) = phase(|| QuadraticDescent::construct(&descent_input))?;
     let r = *primes(order).last().ok_or("no prime factor")?;
-    if r < 11 || order / r % r == 0 {
+    if r < 11 || (order / r).is_multiple_of(r) {
         return Err(format!("largest prime factor {r} is too small or repeated"));
     }
     let p = all

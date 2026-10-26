@@ -135,7 +135,6 @@ pub struct TrialLine {
 // boxing the baseline would add an allocation per line for no saving.
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
-#[allow(clippy::large_enum_variant)]
 pub enum Line {
     Header(Header),
     Baseline(BaselineLine),
