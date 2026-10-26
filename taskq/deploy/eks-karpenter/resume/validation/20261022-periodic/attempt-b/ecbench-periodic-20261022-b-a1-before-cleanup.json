@@ -1,0 +1,58 @@
+{
+  "apiVersion": "v1",
+  "kind": "PersistentVolumeClaim",
+  "metadata": {
+    "annotations": {
+      "isolab.dev/recovery-request": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55",
+      "karpenter.sh/do-not-disrupt": "true",
+      "pv.kubernetes.io/bind-completed": "yes",
+      "pv.kubernetes.io/bound-by-controller": "yes",
+      "volume.beta.kubernetes.io/storage-provisioner": "ebs.csi.aws.com",
+      "volume.kubernetes.io/selected-node": "ip-10-84-183-168.us-east-2.compute.internal",
+      "volume.kubernetes.io/storage-provisioner": "ebs.csi.aws.com"
+    },
+    "creationTimestamp": "2026-10-22T05:43:10Z",
+    "finalizers": [
+      "kubernetes.io/pvc-protection"
+    ],
+    "labels": {
+      "isolab.dev/recovery-run": "ecbench-periodic-20261022-b"
+    },
+    "name": "ecbench-periodic-20261022-b-a1",
+    "namespace": "isolab-recovery-system",
+    "resourceVersion": "1283736",
+    "uid": "cc8571f9-9308-4c4a-a63d-54d93b51d42b"
+  },
+  "spec": {
+    "accessModes": [
+      "ReadWriteOnce"
+    ],
+    "dataSource": {
+      "apiGroup": "snapshot.storage.k8s.io",
+      "kind": "VolumeSnapshot",
+      "name": "ecbench-periodic-20261022-b-g2"
+    },
+    "dataSourceRef": {
+      "apiGroup": "snapshot.storage.k8s.io",
+      "kind": "VolumeSnapshot",
+      "name": "ecbench-periodic-20261022-b-g2"
+    },
+    "resources": {
+      "requests": {
+        "storage": "8Gi"
+      }
+    },
+    "storageClassName": "gp3",
+    "volumeMode": "Filesystem",
+    "volumeName": "pvc-cc8571f9-9308-4c4a-a63d-54d93b51d42b"
+  },
+  "status": {
+    "accessModes": [
+      "ReadWriteOnce"
+    ],
+    "capacity": {
+      "storage": "8Gi"
+    },
+    "phase": "Bound"
+  }
+}
