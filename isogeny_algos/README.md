@@ -134,6 +134,13 @@ cargo run --release --bin report -- results/run-v2.jsonl > results/run-v2.md
 
 `ISOGENY_NO_ADX=1` disables the assembly multiplier; `ISOGENY_ADX4=1` enables it for 256-bit fields.
 
+## Counted benchmarks and the frontier: isobench
+
+`isobench` measures nine isogeny problems in counted units with independent checkers, sealed
+and replayable records, fitted bounds and a frontier of undominated methods:
+[`docs/isobench/README.md`](docs/isobench/README.md), current frontier
+[`docs/isobench/FRONTIER.md`](docs/isobench/FRONTIER.md).
+
 ## Results (single thread, 4-vCPU Xeon @ 2.1 GHz VM, shared host, no pinning: expect noise)
 
 | file | content |

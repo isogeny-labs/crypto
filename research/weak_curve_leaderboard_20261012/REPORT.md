@@ -95,7 +95,7 @@ entry, rather than a completed attack comparison.
 
 ## Genus-128 binary GHS cost-stage audit
 
-**Historical prices below.** The [2026-10-19 refresh](reports/review-refresh-20261019/REPORT.md) reconciles the current measured-operation model: the two totals are 74.834885 and 74.879405 log2 modeled bit operations. The table below preserves the earlier quadratic-price results. The [previous receipt](reports/review-refresh-20261019/previous-audit.json) retains those values; the [current receipt](ghs_genus128_cost_audit.json) and website mirrors use the refreshed model.
+The [2026-10-19 refresh](reports/review-refresh-20261019/REPORT.md) reconciles the measured-operation model used in the current table: 74.834885 and 74.879405 log2 modeled bit operations. The [previous receipt](reports/review-refresh-20261019/previous-audit.json) retains the earlier quadratic-price results; the [current receipt](ghs_genus128_cost_audit.json) and website mirrors use the refreshed model.
 
 The exact-invariant `GF(4)` routes for `c2pnb176w1` and `c2pnb272w1` have
 magic number eight, Type II, and projected genus 128. An [independent
@@ -113,14 +113,17 @@ The [run report](reports/run-20261015T0854Z/REPORT.md),
 The [later source-lock refresh](reports/run-20261015T0929Z/REPORT.md)
 updates the registry hashes and dependent site exports while preserving the
 same model prices.
+The measured Jacobian group-operation counts that #1983 put in the transfer
+registry's cost model replace the earlier `10 g²` price; smoothness, relation
+queries and the bound-15 optimum are unchanged.
 The [cover-source alignment](reports/run-20261015T0950Z/REPORT.md) updates
 the decomposition index's covers-inventory digest after the clean-runner
 validator exposed a third upstream source change.
 
 | Source curve | Nominal half-split base | Model smoothness | Model relation queries | Model total log2 bit cost | Registry cost |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `c2pnb176w1` | 48,921,052 places | `2^-26.328277` | `2^51.872229` | 71.336033 | 71.336 |
-| `c2pnb272w1` | 48,921,052 places | `2^-26.328277` | `2^51.872229` | 71.773568 | 71.774 |
+| `c2pnb176w1` | 48,921,052 places | `2^-26.328277` | `2^51.872229` | 74.834885 | 74.835 |
+| `c2pnb272w1` | 48,921,052 places | `2^-26.328277` | `2^51.872229` | 74.879405 | 74.879 |
 
 The smoothness numerator is exactly
 `1374288545819365998587940548442445318355469588992205247403709040067002`

@@ -88,10 +88,10 @@ pub fn binary_coordinates(point: &BinaryPoint) -> Option<Coordinates> {
         }),
     }
 }
-/// Every curve `ic inspect --curve` knows: the two ECC2K challenge curves
-/// and every SECG curve in the standards database.
+/// Every curve `ic inspect --curve` knows: the ECCp-131 and ECC2K challenge
+/// curves, plus every SECG curve in the standards database.
 pub fn names() -> Vec<&'static str> {
-    let mut v = vec!["ecc2k-130", "ecc2k-95"];
+    let mut v = vec!["ecc2k-130", "ecc2k-95", "eccp-131"];
     v.extend(secg_names());
     v
 }
@@ -127,6 +127,29 @@ fn secg_parameters(name: &str) -> Option<Parameters> {
 }
 pub fn named(name: &str) -> Result<Parameters, String> {
     let profile = match name.to_ascii_lowercase().as_str() {
+        // Exact public parameters are inspected here; the missing full-size
+        // relation pipeline is tracked in problems/eccp131-full-parameter-index-calculus.md.
+        "eccp-131" | "eccp131" => {
+            let c = CurveParams::eccp131();
+            Parameters {
+                schema_version: 1,
+                name: c.name.into(),
+                field: Field::Prime { modulus: hex(&c.p) },
+                a: hex(&c.a),
+                b: hex(&c.b),
+                subgroup_order: hex(&c.n),
+                cofactor: c.h.to_string(),
+                generator: Some(Coordinates {
+                    x: hex(&c.gx),
+                    y: hex(&c.gy),
+                }),
+                point: Some(Coordinates {
+                    x: "0x03AA6F004FC62E2DA1ED0BFB62C3FFB568".into(),
+                    y: "0x009C21C284BA8A445BB2701BF55E3A67ED".into(),
+                }),
+                fixture: None,
+            }
+        }
         "ecc2k-130" => Parameters {
             schema_version: 1,
             name: "ECC2K-130".into(),

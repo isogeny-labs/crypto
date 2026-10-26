@@ -53,10 +53,10 @@ jobs:
           python3 validate_decomposition_properties.py
       - name: Verify WeakCurves artifact hashes
         working-directory: .
-        run: sha256sum -c research/weak_curve_leaderboard_20261012/ARTIFACTS.sha256
+        run: python3 scripts/check_artifact_manifest.py research/weak_curve_leaderboard_20261012/ARTIFACTS.sha256
       - name: Verify P-192 research artifact hashes
         working-directory: research/p192_extension_cover_20261012
-        run: sha256sum -c ARTIFACTS.sha256
+        run: python3 ../../scripts/check_artifact_manifest.py ARTIFACTS.sha256
       - name: Verify P-192 divisor-support custody and nonspeciality receipt
         working-directory: .
         run: |
@@ -81,7 +81,7 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/verify_line_full_selected_tangencies.py
           python3 -B research/p192_extension_cover_20261012/verify_line_full_residual_discriminant.py
           cd research/p192_extension_cover_20261012
-          sha256sum -c ARTIFACTS.sha256
+          python3 ../../scripts/check_artifact_manifest.py ARTIFACTS.sha256
   lean-proof:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 90 || 25 }}

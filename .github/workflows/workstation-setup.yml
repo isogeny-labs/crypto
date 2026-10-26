@@ -43,6 +43,8 @@ jobs:
           python-version: '3.12'
       - name: Check shell syntax and diagnostics
         run: |
+          # The self-hosted runner images lack shellcheck; hosted ones have it.
+          command -v shellcheck >/dev/null || python -m pip install --quiet shellcheck-py==0.11.0.1
           bash -n .claude/hooks/session-start.sh scripts/cairn-node.sh scripts/setup-workstation.sh
           shellcheck -S warning .claude/hooks/session-start.sh scripts/cairn-node.sh scripts/setup-workstation.sh
       - name: Exercise native Linux installer transactions
