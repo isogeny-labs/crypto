@@ -200,6 +200,46 @@ When either arm is incomplete, its `bitop/v1` total is a lower bound, as
 still goes through the band. For the same reason `--unit` and `--weight`
 exclude each other.
 
+## Extensions
+
+An extension classifies counters, or names a field, that the convention had
+no rule for. It never changes a primitive's weight, so
+`docs/units/bitop-v1.vectors.json` and every figure priced before it are
+unchanged; it can only turn an unpriced counter or an unpriceable record into
+a priced one. Each is dated, and its tests are in
+`src/cryptanalysis/ecbench/work.rs`.
+
+### 2026-10-21 (ic-acct-6)
+
+| counter or family | rule | why |
+|---|---|---|
+| `projected_base_membership_checks_uncharged` | not work (sub-total) | the `[r]P = O` check is `CountedGroup::mul`, whose additions and doublings the phase already charges |
+| `projected_base_dedup_probes_uncharged` | `hash_probe` | the duplicate-abscissa guard: one keyed-set insert of a field element (the unit prices a keyed-set probe, not the container) |
+| `projected_base_duplicate_points` | not work (outcome) | |
+| `projected_base_column_map_entries_uncharged` | not work (size) | the column map's vectors are memory; the indexes derived from them are the `base_index_builds` item |
+| `aux_supersingular` | not work (flag) | |
+| `native_field_muls_uncharged`, `native_field_sqrs_uncharged` (`ic.cm_folded_*`) | `field_mul`, `field_sqr` | the native backend (`research/conductor_gap_cm_orbits_20261015/native/group.hpp`) increments them in every `mul` and `sq`, those inside its Jacobian doublings and mixed additions included |
+| `native_group_doubles_uncharged`, `native_group_mixed_uncharged`, `native_scalar_calls_uncharged`, `native_factor_base_scans_uncharged` | not work (sub-totals) | their products are the two counters above |
+| `native_queries_uncharged`, `native_hits_uncharged`, `native_rank_uncharged`, `native_rejected_duplicate_columns_uncharged`, `native_pair_table_keys_uncharged` | not work (outcomes and sizes) | the probes and inserts behind them are in the item below |
+| `native_table_bytes_uncharged` | not work (memory) | |
+| `independent_replay_wall_ns` | excluded diagnostic | wall-clock time is not work and is never priced |
+| `ic.cm_folded_*` | `known_uncounted` item `native_backend_exponentiations_field_adds_hashing_modr_elimination_and_cm_map` | the backend's `power` exponentiations (inversions, square roots, the reciprocal modulo `r`), field additions, hash inserts and probes, arithmetic modulo `r`, elimination and the CM map are done with no counter; the records stay incomplete and say so |
+| family `extension`, slug `icv1-f2m<N>-…` | `F_{2^N}` | `gaudry_quartic_bin`'s `y² + xy = x³ + ax² + b` over `F_{2^{4m}}`, `N = 4m`, `field_bits = m`; a binary field is priced by its degree, whatever tower the code computes in |
+| family `extension`, slug `icv1-fp<b>k4-…` | `F_{p⁴}`, `p` of `b` bits | the `F_{p⁴}` convention above |
+
+Left unpriced on purpose:
+
+- `abscissae_enumerated_uncharged`: the counter is the size of the enumerated
+  weight set, not the number of subsets summed nor their weight, so one
+  increment has no fixed primitive sum.
+- `solver_conflicts`: a CDCL conflict is not a fixed number of primitives.
+
+Work that was never counted stays listed: the five index-calculus items
+(`gauss_column_scans_and_pivot_inversions`, `relation_row_construction`,
+`walk_bookkeeping`, `table_insert_attempts`, `base_index_builds`) and the
+solver gaps leave a record only when a re-run on an instrumented binary
+counts them.
+
 ## Changing the convention
 
 A committed figure must reprice to the same integer forever, so these formulas
