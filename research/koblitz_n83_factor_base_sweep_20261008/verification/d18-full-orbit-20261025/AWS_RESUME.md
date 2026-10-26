@@ -234,14 +234,27 @@ On an authorized, resource-qualified host, fetch the immutable
 full-object checksum checks above. The local input layout needs
 `objects/c295da8898cfad29a053621c768ca059eea4263f89f5ca78b4f98af43c383f3f.jsonl.gz`,
 `s3-manifest.json`, the bound producer `manifest.json`, and the two
-`*-get-metadata.json` provider responses. From a clean checkout with pinned
-`blake3==1.0.8`, build `cargo build --release --example
-koblitz_n83_factor_base_export`, then invoke
-`xor-cadence-20261025/run.py --source SOURCE --binary BINARY --base BASE
---output FRESH_OUTPUT`. The supervisor permits natural search only after
-independent positive group replay and changed-target/row rejection. Run
-`xor-cadence-20261025/audit.py` against the same four paths and retain all
-raw receipts. A natural relation still needs useful-rank, factor-base log,
+`*-get-metadata.json` provider responses. The earlier Python supervisor and
+auditor are historical evidence paths. New comparisons use the native
+[frozen continuation](native-cadence-replay-20261026/PROTOCOL.md). From a
+clean source checkout, build both
+`cargo build --release --example koblitz_n83_factor_base_export --example n83_d18_native_relation_replay`.
+Record the source revision and SHA-256 of each release binary before timing.
+The producer `manifest.json` has SHA-256
+`1d3650eabc4662d8f2597498d7ac92b7cd0a4134ac5f8155aaa49c7af3407dce`;
+the distinct S3 custody `s3-manifest.json` has SHA-256
+`1b93351febd47dac4de8c5dd39dbf58564d0057a044054baf448d978f6c0d616`.
+
+After the addendum's host preflight, invoke the worker subcommand
+`primary-full-d18-m4-l0-ordered-xor-cadence32 positive BASE FIXTURE RESULT`.
+Keep stdout, stderr, `/usr/bin/time -l`, the exit code in `RESULT.exit.txt`,
+and all phase/result/cap files. Wrap the worker's 300-second internal cap
+with `gtimeout --kill-after=5s 310s`. Run
+`n83_d18_native_relation_replay BASE RESULT WORKER_BINARY FIXTURE RECEIPT`
+against a terminal result, or pass `RESULT.cap.json` for an internal cap.
+Only a passing constructed relation and native replay authorize one
+`natural` call with the worker's 2,400-second internal and 2,410-second outer
+caps. A natural relation still needs useful-rank, factor-base log,
 unseen-target descent, fully charged cold runtime and same-target rho gates.
 
 The hosted GitHub AWS principal stopped at `AccessDenied` for the full-D18

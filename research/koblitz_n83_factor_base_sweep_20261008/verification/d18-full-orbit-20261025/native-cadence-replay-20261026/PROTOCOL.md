@@ -6,8 +6,11 @@ primary `icv1-f2m83-tm6151469093347-debefd74` Koblitz `a=0` subgroup,
 order `2417851639230796216685689`, with the exact full-D18 S3 generation.
 The complete object is 160,747,529 bytes, SHA-256
 `eaef94ef45b3d2d4cd2ec2f40c1173b4cdb2a437b7e618a858c73fb1caf3902b`;
-the manifest SHA-256 is
-`1b93351febd47dac4de8c5dd39dbf58564d0057a044054baf448d978f6c0d616`.
+the committed producer manifest SHA-256 is
+`1d3650eabc4662d8f2597498d7ac92b7cd0a4134ac5f8155aaa49c7af3407dce`.
+The distinct S3 custody wrapper `s3-manifest.json` has SHA-256
+`1b93351febd47dac4de8c5dd39dbf58564d0057a044054baf448d978f6c0d616`
+and binds that producer manifest to the object key, hash, size and curve.
 The source tree and native worker/verifier binary hashes must be recorded before
 timing. Fetch both S3 objects freshly with provider GET receipts and verify full
 local hashes. Use the same `pilot-01` constructed target and first public

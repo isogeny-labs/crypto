@@ -24,7 +24,10 @@ const COLUMNS: usize = 32_643;
 const OBJECT: &str =
     "objects/c295da8898cfad29a053621c768ca059eea4263f89f5ca78b4f98af43c383f3f.jsonl.gz";
 const OBJECT_SHA256: &str = "eaef94ef45b3d2d4cd2ec2f40c1173b4cdb2a437b7e618a858c73fb1caf3902b";
-const MANIFEST_SHA256: &str = "1b93351febd47dac4de8c5dd39dbf58564d0057a044054baf448d978f6c0d616";
+const PRODUCER_MANIFEST_SHA256: &str =
+    "1d3650eabc4662d8f2597498d7ac92b7cd0a4134ac5f8155aaa49c7af3407dce";
+const S3_MANIFEST_SHA256: &str = "1b93351febd47dac4de8c5dd39dbf58564d0057a044054baf448d978f6c0d616";
+const S3_OBJECT_KEY: &str = "factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/d18-full-direct-subgroup-v1/a0/objects/c295da8898cfad29a053621c768ca059eea4263f89f5ca78b4f98af43c383f3f.jsonl.gz";
 const POINT_SET: &str = "31aa8e1c1340f4db4898144af59f6f34c87fa63e0d88b175b854f58ce9008a7d";
 const CORPUS_SHA256: &str = "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd";
 const CORPUS_BLAKE3: &str = "831eaa7be2387634fd610f6706103b2af9b4e274f0db59923c0280af3cbed74b";
@@ -111,7 +114,8 @@ fn audit_cap(path: &Path, cap: &Value, binary_sha: &str, receipt: &Path) -> Resu
         "schema":"n83.d18-native-cap-audit/v1","status":classification,
         "mode":mode,"worker_source_commit":first["source_commit"],
         "worker_binary_sha256":binary_sha,"verifier_binary_sha256":verifier_sha,
-        "manifest_sha256":MANIFEST_SHA256,"object_sha256":OBJECT_SHA256,
+        "producer_manifest_sha256":PRODUCER_MANIFEST_SHA256,
+        "s3_manifest_sha256":S3_MANIFEST_SHA256,"object_sha256":OBJECT_SHA256,
         "worker_exit_code":124,"worker_status":"UNKNOWN_wall_cap",
         "phase_count":phases.len(),"selected_best_total_runtime":Value::Null
     });
@@ -220,7 +224,8 @@ fn replay(base: &Path, worker: &Path, binary: &Path, fixture: &Path, receipt: &P
     }
     let manifest_bytes = fs::read(base.join("manifest.json"))?;
     if manifest_bytes != FROZEN_MANIFEST
-        || hex::encode(crypto_lib::hash::sha256::sha256(&manifest_bytes)) != MANIFEST_SHA256
+        || hex::encode(crypto_lib::hash::sha256::sha256(&manifest_bytes))
+            != PRODUCER_MANIFEST_SHA256
     {
         return Err("manifest differs from frozen D18 generation".into());
     }
@@ -232,6 +237,26 @@ fn replay(base: &Path, worker: &Path, binary: &Path, fixture: &Path, receipt: &P
         || manifest["points"] != POINTS
     {
         return Err("manifest identity differs".into());
+    }
+    let s3_manifest_bytes = fs::read(base.join("s3-manifest.json"))?;
+    if hex::encode(crypto_lib::hash::sha256::sha256(&s3_manifest_bytes)) != S3_MANIFEST_SHA256 {
+        return Err("S3 custody manifest differs from frozen generation".into());
+    }
+    let s3_manifest: Value = serde_json::from_slice(&s3_manifest_bytes)?;
+    if s3_manifest["schema"] != "n83.d18-full-s3-manifest/v1"
+        || s3_manifest["curve_id"] != CURVE
+        || s3_manifest["producer_manifest_sha256"] != PRODUCER_MANIFEST_SHA256
+        || s3_manifest["object_key"] != S3_OBJECT_KEY
+        || s3_manifest["compressed_sha256"] != OBJECT_SHA256
+        || s3_manifest["fresh_get_sha256"] != OBJECT_SHA256
+        || s3_manifest["compressed_bytes"] != 160_747_529u64
+        || s3_manifest["points"] != POINTS
+        || s3_manifest["columns"] != COLUMNS
+        || s3_manifest["policy"] != "direct_subgroup_x_d18_full"
+        || s3_manifest["status"] != "PASS_FULL_REPLAY_AND_FRESH_S3_CUSTODY"
+        || !s3_manifest["selected_best_total_runtime"].is_null()
+    {
+        return Err("S3 custody manifest identity differs".into());
     }
     let (object_sha, object_bytes) = sha256_file(&base.join(OBJECT))?;
     if object_sha != OBJECT_SHA256 || object_bytes != 160_747_529 {
@@ -466,7 +491,8 @@ fn replay(base: &Path, worker: &Path, binary: &Path, fixture: &Path, receipt: &P
         "status":"PASS_NATIVE_GROUP_ROW_REPLAY",
         "mode":mode,"worker_source_commit":result["source_commit"],
         "worker_binary_sha256":binary_sha,"verifier_binary_sha256":verifier_sha,
-        "manifest_sha256":MANIFEST_SHA256,"object_sha256":OBJECT_SHA256,
+        "producer_manifest_sha256":PRODUCER_MANIFEST_SHA256,
+        "s3_manifest_sha256":S3_MANIFEST_SHA256,"object_sha256":OBJECT_SHA256,
         "point_set_blake3":POINT_SET,"relation_indices":selected,
         "row_decimal_blake3":relation["row_decimal_blake3"],
         "original_group_sum_checked":true,"signed_orbit_row_checked":true,
@@ -503,6 +529,13 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn producer_manifest_is_distinct_from_s3_custody_wrapper() {
+        let producer_sha = hex::encode(crypto_lib::hash::sha256::sha256(FROZEN_MANIFEST));
+        assert_eq!(producer_sha, PRODUCER_MANIFEST_SHA256);
+        assert_ne!(producer_sha, S3_MANIFEST_SHA256);
+    }
 
     #[test]
     fn generic_group_replay_rejects_changed_target_and_row_digest() {
