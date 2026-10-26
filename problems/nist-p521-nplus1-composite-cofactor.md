@@ -2,7 +2,7 @@
 
 - **Status:** `resolved`
 - **Kind:** completed integer factorization and full-cohort comparison replay
-- **Affected work:** [four-target follow-up](../research/nist_skip_criterion_20261025/factor_followup_20261026/REPORT.md)
+- **Affected work:** [four-target follow-up](../research/nist_skip_criterion_20261025/factor_followup_20261026/REPORT.md), [PR 2635](https://github.com/isogeny-labs/crypto/pull/2635)
 - **Next action owner:** none for this computation
 - **Last updated:** 2026-10-26
 
