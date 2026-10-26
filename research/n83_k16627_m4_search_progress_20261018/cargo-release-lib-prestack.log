@@ -1,7 +1,7 @@
-    Finished `release` profile [optimized] target(s) in 0.46s
-     Running unittests src/lib.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-planted/release/deps/crypto_lib-e89b2f0dbc9b5389)
+    Finished `release` profile [optimized] target(s) in 0.38s
+     Running unittests src/lib.rs (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-progress/release/deps/crypto_lib-e89b2f0dbc9b5389)
 
-running 4336 tests
+running 4337 tests
 test asymmetric::ec_elgamal::tests::decrypt_large_message_bounded ... ignored, slow: 1M-entry BSGS table; run with --ignored
 test asymmetric::ec_elgamal::tests::checked_encrypt_rejects_invalid_public_key_and_plaintext_collision ... ok
 test asymmetric::ec_elgamal::tests::decrypt_rejects_invalid_ciphertext_points ... ok
@@ -71,7 +71,6 @@ test binary_ecc::curve::tests::double_stays_on_curve ... ok
 test binary_ecc::curve::tests::inconsistent_declared_order_keeps_the_scalar_subgroup_check ... ok
 test binary_ecc::curve::tests::is_in_4e_edge_cases ... ok
 test binary_ecc::curve::tests::is_in_4e_matches_scalar_check_on_every_point_small_odd_m ... ok
-test asymmetric::ec_elgamal::tests::encrypt_decrypt_roundtrip_one has been running for over 60 seconds
 test binary_ecc::curve::tests::is_in_4e_matches_scalar_check_on_random_coset_points_ecc2k130_sect233k1 ... ok
 test binary_ecc::curve::tests::is_in_4e_on_library_koblitz_cofactor4_generators ... ok
 test binary_ecc::curve::tests::legacy_binary_generators_are_on_curve ... ok
@@ -110,11 +109,11 @@ test binary_ecc::hyperelliptic::tests::bsgs_finds_small_dlp ... ok
 test binary_ecc::hyperelliptic::tests::checked_curve_constructor_binds_field_degree_and_smoothness_errors ... ok
 test binary_ecc::hyperelliptic::tests::checked_divisor_api_rejects_malformed_public_pairs_without_debug_asserts ... ok
 test binary_ecc::hyperelliptic::tests::double_equals_self_add ... ok
-test asymmetric::ec_elgamal::tests::encrypt_decrypt_roundtrip_one ... ok
+test binary_ecc::hyperelliptic::tests::exhaustive_f8_reduced_domain_has_closure_inverses_and_scalar_consistency ... ok
 test binary_ecc::hyperelliptic::tests::explicit_f8_cubic_cover_map_holds_on_every_affine_pair ... ok
 test binary_ecc::hyperelliptic::tests::identity_is_identity ... ok
 test binary_ecc::hyperelliptic::tests::neg_then_add_is_identity ... ok
-test binary_ecc::hyperelliptic::tests::exhaustive_f8_reduced_domain_has_closure_inverses_and_scalar_consistency ... ok
+test binary_ecc::hyperelliptic::tests::nontrivial_shared_support_divisors_cover_both_cantor_gcd_branches ... ok
 test binary_ecc::hyperelliptic::tests::ramified_origin_has_a_valid_mumford_pair_and_order_two ... ok
 test binary_ecc::hyperelliptic::tests::scalar_mul_distributes_over_zero ... ok
 test binary_ecc::poly_f2m::tests::add_is_xor ... ok
@@ -161,21 +160,21 @@ test bls12_381::g2::tests::subgroup_check_on_generator ... ignored
 test bls12_381::pairing::tests::pairing_bilinear_in_g1 ... ignored
 test bls12_381::pairing::tests::pairing_bilinear_in_g2 ... ignored
 test bls12_381::pairing::tests::pairing_nonzero ... ignored
-test binary_ecc::hyperelliptic::tests::nontrivial_shared_support_divisors_cover_both_cantor_gcd_branches ... ok
 test bls12_381::pairing::tests::pairing_with_infinity_is_one ... ok
+test asymmetric::ec_elgamal::tests::encrypt_decrypt_roundtrip_one ... ok
 test bls12_381::signature::tests::aggregate_is_sum ... ok
 test bls12_381::signature::tests::aggregate_verify_three_messages ... ignored
 test bls12_381::signature::tests::expand_message_xmd_basic ... ok
 test bls12_381::signature::tests::hash_to_field_deterministic ... ok
 test bls12_381::signature::tests::aggregate_same_message_collapses_to_sum_of_sks ... ok
-test bls12_381::signature::tests::hash_to_g2_deterministic_and_distinct ... ok
 test bls12_381::signature::tests::hash_to_g2_on_curve ... ok
-test bls12_381::signature::tests::keygen_in_range_and_pk_on_curve ... ok
 test bls12_381::signature::tests::keygen_deterministic ... ok
-test bls12_381::signature::tests::sign_is_sk_times_hashed_msg ... ok
+test bls12_381::signature::tests::keygen_in_range_and_pk_on_curve ... ok
+test bls12_381::signature::tests::hash_to_g2_deterministic_and_distinct ... ok
+test bls12_381::signature::tests::sign_tampered_msg_differs ... ok
 test bls12_381::signature::tests::sign_verify_roundtrip ... ignored
 test bls12_381::signature::tests::sswu_output_on_iso_curve ... ok
-test bls12_381::signature::tests::sign_tampered_msg_differs ... ok
+test bls12_381::signature::tests::sign_is_sk_times_hashed_msg ... ok
 test build_provenance::tests::dirty_flag_is_strict ... ok
 test cryptanalysis::aes::algebraic::tests::quadratic_equations_actually_vanish ... ok
 test cryptanalysis::aes::algebraic::tests::sbox4_has_many_quadratic_equations ... ok
@@ -186,7 +185,7 @@ test cryptanalysis::aes::boomerang::tests::bct_origin ... ok
 test cryptanalysis::aes::boomerang::tests::random_fixed_delta_does_not_return ... ok
 test cryptanalysis::aes::boomerang::tests::realised_delta_always_returns ... ok
 test cryptanalysis::aes::cache_timing::tests::bernstein_recovers_high_nibbles_no_noise ... ok
-test bls12_381::signature::tests::verify_rejects_infinity_sig_and_pk ... ok
+test cryptanalysis::aes::cache_timing::tests::bernstein_recovers_with_noise ... ok
 test cryptanalysis::aes::cache_timing::tests::demo_bernstein_cache_attack ... ignored
 test cryptanalysis::aes::cache_timing::tests::timing_reflects_cache_line_collisions ... ok
 test cryptanalysis::aes::dfa::tests::candidate_enum_returns_reasonable_count ... ok
@@ -226,22 +225,21 @@ test cryptanalysis::aes::impossible::tests::four_round_no_one_active_byte ... ok
 test cryptanalysis::aes::impossible::tests::three_round_not_impossible ... ok
 test cryptanalysis::aes::impossible::tests::true_key_never_contradicts ... ok
 test cryptanalysis::aes::impossible::tests::wrong_key_eventually_contradicts ... ignored, slow: scans 2^20 pairs to see a handful of contradictions
-test cryptanalysis::aes::cache_timing::tests::bernstein_recovers_with_noise ... ok
-test cryptanalysis::aes::linear::tests::aes_max_linear_bias_is_sixteen ... ok
 test cryptanalysis::aes::linear::tests::aes_max_correlation ... ok
-test cryptanalysis::aes::linear::tests::lat_origin ... ok
+test cryptanalysis::aes::linear::tests::aes_max_linear_bias_is_sixteen ... ok
 test cryptanalysis::aes::linear::tests::lat_entries_even ... ok
+test cryptanalysis::aes::linear::tests::lat_origin ... ok
 test cryptanalysis::aes::linear::tests::one_round_byte_recovery ... ok
+test cryptanalysis::aes::linear::tests::single_bit_majority_vote_converges ... ok
 test cryptanalysis::aes::milp::tests::branch_number_constraint ... ok
 test cryptanalysis::aes::milp::tests::classical_bounds ... ok
 test cryptanalysis::aes::milp::tests::invalid_trail_rejected ... ok
 test cryptanalysis::aes::milp::tests::shift_rows_permutes_activity ... ok
-test cryptanalysis::aes::linear::tests::single_bit_majority_vote_converges ... ok
 test cryptanalysis::aes::milp::tests::two_round_trail_achieves_five ... ok
 test cryptanalysis::aes::mitm::tests::delta_set_has_uniform_multiset_at_active_byte ... ok
+test cryptanalysis::aes::mitm::tests::mitm_two_round_recovers_key_bytes ... ok
 test cryptanalysis::aes::mitm::tests::one_round_multiset_uniform_at_affected_position ... ok
 test cryptanalysis::aes::mixture::tests::algebraic_identity_breaks_at_two_rounds ... ok
-test cryptanalysis::aes::mitm::tests::mitm_two_round_recovers_key_bytes ... ok
 test cryptanalysis::aes::mixture::tests::algebraic_identity_one_round ... ok
 test cryptanalysis::aes::mixture::tests::column_confined_subspace_distinguisher ... ok
 test cryptanalysis::aes::mixture::tests::pairwise_equality_one_round_only ... ok
@@ -251,10 +249,10 @@ test cryptanalysis::aes::quantum_grover::tests::aes_128_cost_matches_published .
 test cryptanalysis::aes::quantum_grover::tests::aes_256_cost_double_iterations ... ok
 test cryptanalysis::aes::quantum_grover::tests::grover_iteration_count_at_128 ... ok
 test cryptanalysis::aes::reduced::tests::key_schedule_inverts ... ok
-test cryptanalysis::aes::reduced::tests::round_trip_at_various_round_counts ... ok
 test cryptanalysis::aes::reduced::tests::matches_production_aes128 ... ok
-test cryptanalysis::aes::related_differential::tests::classify_permutation_at_another_diagonal_is_mixed ... ok
+test cryptanalysis::aes::reduced::tests::round_trip_at_various_round_counts ... ok
 test cryptanalysis::aes::related_differential::tests::classify_disjoint_values_is_independent ... ok
+test cryptanalysis::aes::related_differential::tests::classify_permutation_at_another_diagonal_is_mixed ... ok
 test cryptanalysis::aes::related_differential::tests::classify_rotation_is_shifted ... ok
 test cryptanalysis::aes::related_differential::tests::classify_same_diagonal_permutation_is_exchanged ... ok
 test cryptanalysis::aes::related_differential::tests::mix_columns_family_is_pairwise_shifted ... ok
@@ -265,16 +263,17 @@ test cryptanalysis::aes::related_key::tests::aes256_key_schedule_has_slower_diff
 test cryptanalysis::aes::related_key::tests::format_key_schedule_diff_renders ... ok
 test cryptanalysis::aes::related_key::tests::local_collision_four_round_decays ... ok
 test cryptanalysis::aes::related_key::tests::local_collision_one_round_perfect ... ok
-test cryptanalysis::aes::related_key::tests::related_key_avalanche_one_round_has_bias ... ok
 test cryptanalysis::aes::related_key::tests::related_key_avalanche_full_aes_approaches_ideal ... ok
+test cryptanalysis::aes::related_key::tests::related_key_avalanche_one_round_has_bias ... ok
 test cryptanalysis::aes::related_key::tests::related_key_boomerang_degenerate_zero_diff ... ok
+test cryptanalysis::aes::related_key::tests::related_key_boomerang_runs_end_to_end ... ok
 test cryptanalysis::aes::related_key::tests::single_byte_delta_diffuses_through_aes128_schedule ... ok
 test cryptanalysis::aes::related_key::tests::zero_delta_key_schedule_difference_is_zero ... ok
-test cryptanalysis::aes::related_key::tests::related_key_boomerang_runs_end_to_end ... ok
 test cryptanalysis::aes::slide::tests::genuine_aes_no_slid_pair_at_256 ... ok
 test cryptanalysis::aes::slide::tests::slide_comparison_runs ... ok
 test cryptanalysis::aes::slide::tests::slide_report_renders ... ok
 test cryptanalysis::aes::slide::tests::symmetric_aes_is_deterministic ... ok
+test cryptanalysis::aes::small_scale::tests::brute_force_key_recovery_works ... ok
 test cryptanalysis::aes::small_scale::tests::gf16_inv_round_trips ... ok
 test cryptanalysis::aes::small_scale::tests::sbox4_is_bijective ... ok
 test cryptanalysis::aes::small_scale::tests::small_aes_round_trips ... ok
@@ -286,30 +285,30 @@ test cryptanalysis::aes::truncated_diff::tests::active_bytes_is_popcount ... ok
 test cryptanalysis::aes::truncated_diff::tests::demo_4_round_truncated_trail ... ignored
 test cryptanalysis::aes::truncated_diff::tests::mc_branch_number_5_holds ... ok
 test cryptanalysis::aes::truncated_diff::tests::minimum_active_sboxes_4_rounds_is_at_least_5 ... ok
-test cryptanalysis::aes::small_scale::tests::brute_force_key_recovery_works ... ok
+test cryptanalysis::aes::truncated_diff::tests::render_full_column_active_pattern ... ok
 test cryptanalysis::aes::truncated_diff::tests::shift_rows_fixes_first_column_first_row ... ok
 test cryptanalysis::aes::truncated_diff::tests::trail_diagram_renders_input_plus_rounds ... ok
 test cryptanalysis::aes::visualize::tests::active_pattern_distinguishes_zero_from_nonzero ... ok
 test cryptanalysis::aes::visualize::tests::boomerang_diagram_has_all_arrows ... ok
-test cryptanalysis::aes::truncated_diff::tests::render_full_column_active_pattern ... ok
 test cryptanalysis::aes::visualize::tests::heatmap_4bit_renders_full_table ... ok
-test cryptanalysis::aes::visualize::tests::recovery_progress_renders_percent ... ok
 test cryptanalysis::aes::visualize::tests::histogram_handles_uniform_data ... ok
-test cryptanalysis::aes::visualize::tests::round_bars_zero_max_does_not_panic ... ok
+test cryptanalysis::aes::visualize::tests::recovery_progress_renders_percent ... ok
 test cryptanalysis::aes::visualize::tests::round_bars_normalize_to_max ... ok
+test cryptanalysis::aes::visualize::tests::round_bars_zero_max_does_not_panic ... ok
 test cryptanalysis::aes::visualize::tests::state_grid_renders_16_bytes ... ok
-test cryptanalysis::aes::visualize::tests::trail_renders_multi_round ... ok
 test cryptanalysis::aes::visualize::tests::summary_8bit_lists_top_entries ... ok
+test cryptanalysis::aes::visualize::tests::trail_renders_multi_round ... ok
 test cryptanalysis::aes::yoyo::tests::exchange_round_trips ... ok
 test cryptanalysis::aes::yoyo::tests::one_round_yoyo_always_preserves_structure ... ok
 test cryptanalysis::aes::yoyo::tests::three_round_yoyo_loses_structure ... ok
+test cryptanalysis::aes::yoyo::tests::two_round_yoyo_also_preserves_structure ... ok
 test cryptanalysis::aes::zero_correlation::tests::demo_zero_correlation_pairs ... ignored
 test cryptanalysis::aes::zero_correlation::tests::distinguisher_filters_correct_key ... ok
 test cryptanalysis::aes::zero_correlation::tests::find_zero_correlation_pair_works ... ok
 test cryptanalysis::aes::zero_correlation::tests::inner_product_smoke ... ok
-test cryptanalysis::aes::yoyo::tests::two_round_yoyo_also_preserves_structure ... ok
-test cryptanalysis::aes::zero_correlation::tests::trivial_correlation_is_one ... ok
 test cryptanalysis::aes::zero_correlation::tests::many_zero_correlation_pairs_exist ... ok
+test cryptanalysis::aes::zero_correlation::tests::trivial_correlation_is_one ... ok
+test cryptanalysis::ai_schoof::tests::ai_schoof_end_to_end_toy ... ok
 test cryptanalysis::ai_schoof::tests::count_points_satisfies_hasse ... ok
 test cryptanalysis::ai_schoof::tests::net_output_in_unit_interval ... ok
 test cryptanalysis::ai_schoof::tests::sgd_reduces_loss ... ok
@@ -325,11 +324,11 @@ test cryptanalysis::algebra_cache::tests::the_env_opt_out_reads_only_falsey_valu
 test cryptanalysis::algebra_cache::tests::the_oversize_warning_is_once_per_layer ... ok
 test cryptanalysis::aut_folded_rho::tests::apply_aut_canonicalises ... ok
 test cryptanalysis::aut_folded_rho::tests::aut_group_axioms ... ok
-test cryptanalysis::ai_schoof::tests::ai_schoof_end_to_end_toy ... ok
+test cryptanalysis::aut_folded_rho::tests::canonical_form_matches_applying_each_automorphism ... ok
 test cryptanalysis::aut_folded_rho::tests::canonicalisation_invariant_on_orbit ... ok
 test cryptanalysis::aut_folded_rho::tests::empirical_speedup_versus_unfolded_rho ... ignored, experimental: ~30 s of repeated rho runs; --ignored to opt in
 test cryptanalysis::aut_folded_rho::tests::exponent_updates_match_the_textbook_form ... ok
-test cryptanalysis::aut_folded_rho::tests::canonical_form_matches_applying_each_automorphism ... ok
+test bls12_381::signature::tests::verify_rejects_infinity_sig_and_pk ... ok
 test cryptanalysis::aut_folded_rho::tests::folded_rho_matches_the_original_walk ... ok
 test cryptanalysis::aut_folded_rho::tests::folded_rho_recovers_planted_dlp ... ok
 test cryptanalysis::aut_folded_rho::tests::integer_action_matches_point_action ... ok
@@ -603,10 +602,10 @@ test cryptanalysis::curve_traits::subfield::tests::the_twist_of_a_koblitz_curve_
 test cryptanalysis::curve_traits::tests::a_small_koblitz_curve ... ok
 test cryptanalysis::curve_traits::tests::coordinate_models_keep_exact_fields_and_available_order_certificates ... ok
 test cryptanalysis::curve_traits::tests::ecc2k_130_conductor_is_exact ... ok
-test cryptanalysis::boomerang::tests::boomerang_trail_pair_search_finds_pair ... ok
-test cryptanalysis::curve_traits::tests::every_registry_entry_parses_with_its_order_identity ... ok
-test cryptanalysis::curve_traits::tests::extension_registry_preserves_field_and_subgroup_records ... ok
 test cryptanalysis::curve_traits::tests::endomorphism_rings_from_contained_orders ... ok
+test cryptanalysis::curve_traits::tests::every_registry_entry_parses_with_its_order_identity ... ok
+test cryptanalysis::boomerang::tests::boomerang_trail_pair_search_finds_pair ... ok
+test cryptanalysis::curve_traits::tests::extension_registry_preserves_field_and_subgroup_records ... ok
 test cryptanalysis::curve_traits::tests::the_gf2_18_twist_groups_with_koblitz_by_cm_not_by_descent ... ok
 test cryptanalysis::curve_traits::torsion::tests::division_polynomials_have_the_expected_degrees ... ok
 test cryptanalysis::curve_traits::tests::registered_montgomery_and_edwards_generators_certify ... ok
@@ -786,7 +785,6 @@ test cryptanalysis::ecbench::claim::tests::print_identity_inputs ... ignored
 test cryptanalysis::ecbench::claim::tests::wall_record_class_requires_both_recorded_levels_and_the_l2_floor ... ok
 test cryptanalysis::ecbench::claw::tests::claw_is_deterministic_in_seed ... ok
 test cryptanalysis::ecbench::claw::tests::claw_recovers_planted_logs_on_koblitz_curves ... ok
-test cryptanalysis::ecbench::claw::tests::wide_claw_recovers_planted_logs has been running for over 60 seconds
 test cryptanalysis::ecbench::claw::tests::wide_claw_recovers_planted_logs ... ok
 test cryptanalysis::ecbench::compare::tests::identical_arms_give_a_unit_ratio_and_a_point_interval ... ok
 test cryptanalysis::ecbench::compare::tests::ratio_of_sums_is_the_totals_ratio ... ok
@@ -1038,7 +1036,7 @@ test cryptanalysis::ffd_harness::tests::quad_monomial_index_round_trip ... ok
 test cryptanalysis::ffd_harness::tests::subspace_descent_matches_field_evaluation ... ok
 test cryptanalysis::fghr_full::tests::the_d3_oracle_agrees_with_the_s3_oracle_and_the_pair_table ... ok
 test cryptanalysis::fghr_full::tests::the_instance_is_a_non_subfield_curve_with_a_folding_translation ... ok
-test cryptanalysis::cyclotomic_factor_base::tests::membership_systems_find_planted_decompositions ... ok
+test cryptanalysis::fghr_line::rank_tests::the_d3_oracle_lets_the_six_fold_arm_reach_full_rank ... ok
 test cryptanalysis::fghr_line::tests::the_d3_and_s3_oracles_agree_with_the_pair_table ... ok
 test cryptanalysis::fghr_line::tests::the_s4_in_y_is_invariant_under_even_sign_changes ... ok
 test cryptanalysis::fghr_line::tests::the_y_line_base_folds_twelve_to_a_column ... ok
@@ -1074,10 +1072,10 @@ test cryptanalysis::gaudry_cubic::tests::gaudry_and_rho_recover_the_planted_loga
 test cryptanalysis::gaudry_cubic::tests::groebner_solve_agrees_with_the_meet_in_the_middle_oracle ... ok
 test cryptanalysis::gaudry_cubic::tests::instance3_has_prime_order_and_known_answer ... ok
 test cryptanalysis::gaudry_cubic::tests::large_prime_elimination_cancels_every_large_prime ... ok
-test cryptanalysis::fghr_line::rank_tests::the_d3_oracle_lets_the_six_fold_arm_reach_full_rank ... ok
+test cryptanalysis::gaudry_cubic::tests::sparse_and_large_prime_runs_recover_the_logarithm ... ok
 test cryptanalysis::gaudry_cubic::tests::square_core_is_square_and_free_of_singletons ... ok
 test cryptanalysis::gaudry_cubic::tests::symbolic_s4_vanishes_on_sums_and_symmetrisation_is_exact ... ok
-test cryptanalysis::gaudry_cubic::tests::sparse_and_large_prime_runs_recover_the_logarithm ... ok
+test cryptanalysis::gaudry_cubic::tests::the_border_check_sends_only_the_residuals_no_degree_solves_to_the_fallback ... ok
 test cryptanalysis::gaudry_cubic::tests::the_lazy_elimination_reads_the_same_normal_forms ... ok
 test cryptanalysis::gaudry_cubic::tests::the_merge_cap_bounds_depth_and_charges_what_it_discards ... ok
 test cryptanalysis::gaudry_cubic::tests::the_pair_only_variant_recovers_the_logarithm_without_a_macaulay_step ... ok
@@ -1088,9 +1086,9 @@ test cryptanalysis::gaudry_cubic::tests::wiedemann_wide_prime_orders ... ok
 test cryptanalysis::gaudry_quartic::tests::fp4_is_a_field ... ok
 test cryptanalysis::gaudry_quartic::tests::k4_linear_algebra_and_rho_recover_the_planted_logarithm ... ok
 test cryptanalysis::gaudry_quartic::tests::s5_vanishes_on_four_point_sums_and_is_symmetric ... ok
-test cryptanalysis::gaudry_cubic::tests::the_border_check_sends_only_the_residuals_no_degree_solves_to_the_fallback ... ok
-test cryptanalysis::gaudry_quartic::tests::the_solver_finds_planted_roots_of_quadrics ... ok
 test cryptanalysis::gaudry_quartic::tests::the_solver_finds_planted_roots_of_cubics ... ok
+test cryptanalysis::gaudry_quartic::tests::the_solver_finds_planted_roots_of_quadrics ... ok
+test cryptanalysis::gaudry_quartic::tests::u16_kernels_match_the_reference_routines ... ok
 test cryptanalysis::gaudry_quartic_d4::tests::s5_in_y_lies_in_the_span_of_the_d4_invariants ... ok
 test cryptanalysis::gaudry_quartic_d4::tests::y_coordinate_negates_under_the_two_torsion_translation ... ok
 test cryptanalysis::genus2_fp::tests::genus2_add_matches_existing_implementations ... ok
@@ -1099,18 +1097,18 @@ test cryptanalysis::genus2_fp::tests::genus2_divisor_validation ... ok
 test cryptanalysis::genus2_fp::tests::genus2_enumeration_equals_l1 ... ok
 test cryptanalysis::genus2_fp::tests::genus2_enumeration_matches_naive_search ... ok
 test cryptanalysis::genus2_fp::tests::genus2_group_laws ... ok
-test cryptanalysis::gaudry_quartic::tests::u16_kernels_match_the_reference_routines ... ok
-test cryptanalysis::genus2_fp::tests::genus2_point_counts_by_naive_search ... ok
 test cryptanalysis::genus2_fp::tests::genus2_l1_matches_prime_hyperelliptic ... ok
+test cryptanalysis::genus2_fp::tests::genus2_point_counts_by_naive_search ... ok
 test cryptanalysis::genus2_fp::tests::genus2_random_is_roughly_uniform ... ok
-test cryptanalysis::gf2_elim::tests::branchless_strip_matches_conditional_clear ... ok
 test cryptanalysis::genus2_fp::tests::genus2_zeta_action ... ok
+test cryptanalysis::gf2_elim::tests::branchless_strip_matches_conditional_clear ... ok
+test cryptanalysis::gf2_elim::tests::echelon_has_the_rank_and_row_space ... ok
 test cryptanalysis::gf2_elim::tests::prefix_echelon_carries_exact_sidecar_transform_across_word_boundary ... ok
 test cryptanalysis::gf2_elim::tests::rank_deficient_and_structured_matrices ... ok
-test cryptanalysis::gf2_elim::tests::echelon_has_the_rank_and_row_space ... ok
+test cryptanalysis::gf2_elim::tests::reused_tables_preserve_rows_rank_and_counted_xors ... ok
 test cryptanalysis::gf2_elim::tests::reverse_tile_width_preserves_the_counted_work ... ok
 test cryptanalysis::gf2_elim::tests::row_basis_rank_matches_echelon_on_varied_matrices ... ok
-test cryptanalysis::gf2_elim::tests::reused_tables_preserve_rows_rank_and_counted_xors ... ok
+test cryptanalysis::gf2_elim::tests::rref_matches_the_textbook_elimination ... ok
 test cryptanalysis::gf2_elim::tests::word_aligned_prefix_then_resume_matches_fresh_echelon ... ok
 test cryptanalysis::gf3m::tests::curve_law_small_fields ... ok
 test cryptanalysis::gf3m::tests::curve_rejects_singular_a4_zero ... ok
@@ -1142,14 +1140,14 @@ test cryptanalysis::gls_fp2::tests::fp2_arithmetic_is_a_field ... ok
 test cryptanalysis::gls_fp2::tests::the_line_base_folds_four_to_one_and_recovers_the_logarithm ... ok
 test cryptanalysis::gls_fp2::tests::the_line_is_psi_stable_and_the_other_line_is_empty ... ok
 test cryptanalysis::glv_gaudry::tests::block_and_vanilla_elimination_agree_on_the_orbit_system ... ok
-test cryptanalysis::gf2_elim::tests::rref_matches_the_textbook_elimination ... ok
+test cryptanalysis::glv_gaudry::tests::block_aware_f4_solves_the_orbit_system_like_plain_f4 ... ok
 test cryptanalysis::glv_gaudry::tests::canonical_form_is_orbit_invariant_and_unit_correct ... ok
 test cryptanalysis::glv_gaudry::tests::canonical_generation_saves_pair_solver_calls ... ok
 test cryptanalysis::glv_gaudry::tests::function_first_system_is_witnessed_by_harness_decompositions ... ok
 test cryptanalysis::glv_gaudry::tests::invariant_generators_match_the_hand_count ... ok
 test cryptanalysis::glv_gaudry::tests::j0_instance_has_order_three_automorphism ... ok
 test cryptanalysis::glv_gaudry::tests::orbit_base_is_a_three_to_one_quotient ... ok
-test cryptanalysis::glv_gaudry::tests::block_aware_f4_solves_the_orbit_system_like_plain_f4 ... ok
+test cryptanalysis::cyclotomic_factor_base::tests::membership_systems_find_planted_decompositions ... ok
 test cryptanalysis::glv_gaudry::tests::s4_is_psi_invariant_on_j0 ... ok
 test cryptanalysis::glv_gaudry::tests::veronese_system_is_witnessed_by_harness_triples ... ok
 test cryptanalysis::glv_invariant_base::tests::a_folded_base_recovers_the_planted_logarithm ... ok
@@ -1214,8 +1212,8 @@ test cryptanalysis::hwcost::tests::overlapping_transfers_take_a_max_and_serial_o
 test cryptanalysis::hwcost::tests::scaling_interpolates_and_flags_extrapolation ... ok
 test cryptanalysis::hwcost::tests::unpriced_operation_is_an_error ... ok
 test cryptanalysis::hwcost::tests::working_set_outside_cache_turns_memory_bound ... ok
-test cryptanalysis::hyperelliptic_ic_bench::tests::distinguished_points_cost_about_a_third_of_floyd ... ok
 test cryptanalysis::glv_gaudry::tests::quotient_pipeline_recovers_the_logarithm ... ok
+test cryptanalysis::hyperelliptic_ic_bench::tests::distinguished_points_cost_about_a_third_of_floyd ... ok
 test cryptanalysis::hyperelliptic_ic_bench::tests::head_to_head_scores_both_sides ... ok
 test cryptanalysis::hyperelliptic_ic_bench::tests::rho_solves_the_same_instance ... ok
 test cryptanalysis::hyperelliptic_ic_bench::tests::the_unit_tracks_wall_clock ... ignored, wall-clock cost calibration requires an isolated CPU
@@ -1234,17 +1232,17 @@ test cryptanalysis::hyperelliptic_index_calculus::tests::large_primes_solve_with
 test cryptanalysis::hyperelliptic_index_calculus::tests::rank_deficient_rows_are_recovered_by_collecting_more ... ok
 test cryptanalysis::hyperelliptic_index_calculus::tests::solves_a_genus_three_dlp ... ok
 test cryptanalysis::hyperelliptic_index_calculus::tests::solves_a_toy_jacobian_dlp ... ok
-test cryptanalysis::hyperelliptic_index_calculus::tests::gcd_oracle_agrees_with_the_scan_on_every_monic_quartic ... ok
-test cryptanalysis::hyperelliptic_index_calculus::tests::sparse_solve_matches_dense_on_planted_systems ... ok
 test cryptanalysis::hyperelliptic_index_calculus::tests::sparse_solve_agrees_with_dense_and_is_cheaper ... ok
+test cryptanalysis::hyperelliptic_index_calculus::tests::sparse_solve_matches_dense_on_planted_systems ... ok
 test cryptanalysis::hyperelliptic_index_calculus::tests::splitting_agrees_with_reconstruction ... ok
+test cryptanalysis::hyperelliptic_index_calculus::tests::the_discriminant_filter_never_rejects_a_split_polynomial ... ok
 test cryptanalysis::hyperelliptic_index_calculus::tests::the_smoothness_oracle_is_charged ... ok
-test cryptanalysis::hyperelliptic_index_calculus::tests::truncated_factor_base_still_solves_or_reports_why ... ok
+test cryptanalysis::hyperelliptic_index_calculus::tests::gcd_oracle_agrees_with_the_scan_on_every_monic_quartic ... ok
 test cryptanalysis::hyperelliptic_index_calculus::tests::walk_solves_and_costs_far_less_than_redrawing ... ok
 test cryptanalysis::ic_boundary::tests::a_point_and_its_negative_share_one_representative ... ok
 test cryptanalysis::ic_boundary::tests::a_shared_jump_table_lets_walk_segments_merge_and_pin_by_a_repeated_row ... ok
 test cryptanalysis::ic_boundary::tests::a_walk_restart_costs_one_addition_and_still_does_not_merge ... ok
-test cryptanalysis::hyperelliptic_index_calculus::tests::the_discriminant_filter_never_rejects_a_split_polynomial ... ok
+test cryptanalysis::hyperelliptic_index_calculus::tests::truncated_factor_base_still_solves_or_reports_why ... ok
 test cryptanalysis::ic_boundary::tests::artin_schreier_solver_and_point_count_agree_with_the_general_code ... ok
 test cryptanalysis::ic_boundary::tests::batch_rho_per_target_cost_falls_as_the_batch_law_says ... ok
 test cryptanalysis::ic_boundary::tests::batch_rho_recovers_every_target_on_a_koblitz_curve ... ok
@@ -1300,7 +1298,7 @@ test cryptanalysis::ic_engine::tests::small_koblitz_analogue_is_attack_regime ..
 test cryptanalysis::ic_framework::fiber::tests::a_scaled_fiber_is_the_image_of_multiplication_by_d ... ok
 test cryptanalysis::ic_framework::fiber::tests::fiber_build_parameters_are_checked ... ok
 test cryptanalysis::ic_framework::fiber::tests::the_cofactor_fiber_of_a_koblitz_curve_is_its_rational_torsion ... ok
-test cryptanalysis::ic_framework::fiber::tests::the_combined_descent_names_a_lift ... ok
+test cryptanalysis::ic_descent_degrees::tests::the_subspace_dimension_cap_is_the_monomial_mask ... ok
 test cryptanalysis::ic_framework::fiber::tests::the_coset_closure_builds_the_same_fiber_for_fewer_additions ... ok
 test cryptanalysis::ic_framework::fiber::tests::the_fiber_closed_table_finds_every_lift_the_plain_table_finds ... ok
 test cryptanalysis::ic_framework::large_prime::tests::end_to_end_large_prime_runs_recover_the_planted_logarithm ... ok
@@ -1315,11 +1313,11 @@ test cryptanalysis::ic_framework::plugins::tests::divisor_indices_reject_a_missi
 test cryptanalysis::ic_framework::plugins::tests::the_comma_form_is_refused_before_the_plugin_sees_it ... ok
 test cryptanalysis::ic_framework::plugins::tests::trace_zero_factor_base_is_an_executable_policy ... ok
 test cryptanalysis::ic_framework::prime_tower::tests::mestre_orders_agree_with_point_counting ... ok
-test cryptanalysis::ic_framework::prime_tower::tests::supersingular_aux_curves_have_p_plus_one_points ... ok
+test cryptanalysis::ic_framework::fiber::tests::the_combined_descent_names_a_lift ... ok
 test cryptanalysis::ic_framework::prime_tower::tests::the_base_holds_exactly_the_tower_points ... ok
 test cryptanalysis::ic_framework::prime_tower::tests::the_isogeny_base_holds_exactly_the_tower_points_that_lift ... ok
 test cryptanalysis::ic_framework::prime_tower::tests::the_isogeny_tower_has_exactly_two_to_the_t_roots ... ok
-test cryptanalysis::ic_descent_degrees::tests::the_subspace_dimension_cap_is_the_monomial_mask ... ok
+test cryptanalysis::ic_framework::prime_tower::tests::supersingular_aux_curves_have_p_plus_one_points ... ok
 test cryptanalysis::ic_framework::prime_tower::tests::the_supersingular_tower_has_exactly_two_to_the_t_roots ... ok
 test cryptanalysis::ic_framework::prime_tower::tests::the_tower_is_the_two_power_roots_of_unity ... ok
 test cryptanalysis::ic_framework::residual::tests::residual_collector_recovers_the_planted_logarithm ... ok
@@ -1327,8 +1325,8 @@ test cryptanalysis::ic_framework::rootfind::tests::binary_rootfind_oracles_agree
 test cryptanalysis::ic_framework::rootfind::tests::prime_rootfind_oracles_agree_with_mitm_on_an_abscissa_base ... ok
 test cryptanalysis::ic_framework::shared_rank::tests::shared_rank_recovers_point_only_targets_with_full_point_replay ... ok
 test cryptanalysis::ic_framework::shared_rank::tests::small_koblitz_rank_is_target_blind_and_point_checked ... ok
-test cryptanalysis::ic_framework::prime_tower::tests::the_supersingular_base_holds_exactly_the_tower_points_that_lift ... ok
 test cryptanalysis::ic_framework::solvers::tests::every_engine_agrees_on_descent_systems ... ok
+test cryptanalysis::ic_framework::prime_tower::tests::the_supersingular_base_holds_exactly_the_tower_points_that_lift ... ok
 test cryptanalysis::ic_framework::solvers::tests::every_solver_finds_the_same_solution_set ... ok
 test cryptanalysis::ic_framework::solvers::tests::every_solver_refutes_an_unsatisfiable_system ... ok
 test cryptanalysis::ic_framework::solvers::tests::fes_finds_exactly_the_solutions_at_every_size ... ok
@@ -1483,24 +1481,24 @@ test cryptanalysis::isogeny_walk::record::tests::p256_ec1_matches_the_registry .
 test cryptanalysis::isogeny_walk::record::tests::yaml_quotes_what_would_misparse ... ok
 test cryptanalysis::isogeny_walk::store::tests::locations_and_segments ... ok
 test cryptanalysis::isogeny_walk::tests::a_short_p224_walk_reverifies_from_its_records ... ok
+test cryptanalysis::isogeny_degree_search::profile::tests::target_variation_explains_the_on_curve_spread ... ok
 test cryptanalysis::isogeny_walk::tests::detectors_class_audits_and_queued_shards_agree ... ok
 test cryptanalysis::isogeny_walk::tests::p256_root_counts_match_the_splitting_of_ell ... ok
-test cryptanalysis::isogeny_walk::tests::rational_torsion_kernels_agree_with_phi_and_elkies ... ok
 test cryptanalysis::isogeny_walk::tests::verifier_rejects_a_perturbed_and_a_mixed_kernel ... ok
-test cryptanalysis::isogeny_degree_search::profile::tests::target_variation_explains_the_on_curve_spread ... ok
+test cryptanalysis::isogeny_walk::tests::rational_torsion_kernels_agree_with_phi_and_elkies ... ok
 test cryptanalysis::j0_twists::tests::factorise_60 ... ok
 test cryptanalysis::j0_twists::tests::factorise_one ... ok
 test cryptanalysis::j0_twists::tests::factorise_prime ... ok
 test cryptanalysis::j0_twists::tests::primitive_root_of_known_prime ... ok
 test cryptanalysis::j0_twists::tests::rejects_non_one_mod_six ... ok
 test cryptanalysis::j0_twists::tests::sixth_power_returns_to_b ... ok
-test cryptanalysis::j0_twists::tests::enumerate_twists_p65353 ... ok
+test cryptanalysis::j0_twists::tests::vulnerability_flag_runs ... ok
 test cryptanalysis::jacobian_transfer::binary::tests::cyclotomic_degrees_match_known_factorisations ... ok
 test cryptanalysis::jacobian_transfer::binary::tests::divisor_counts_are_binomial_for_distinct_factors ... ok
 test cryptanalysis::jacobian_transfer::binary::tests::f2_rank_counts_independent_rows ... ok
 test cryptanalysis::jacobian_transfer::binary::tests::full_unit_factor_counts_divisors_of_the_cofactor ... ok
 test cryptanalysis::jacobian_transfer::binary::tests::isogeny_extension_for_oakley_group_three_is_hopeless_at_small_magic ... ok
-test cryptanalysis::jacobian_transfer::binary::tests::mmt_condition_8_matches_the_relative_trace_of_b ... ok
+test cryptanalysis::j0_twists::tests::enumerate_twists_p65353 ... ok
 test cryptanalysis::jacobian_transfer::binary::tests::no_extension_rows_when_direct_magic_is_already_minimal ... ok
 test cryptanalysis::jacobian_transfer::cost::tests::factorial_term_confines_index_calculus_to_small_genus ... ok
 test cryptanalysis::jacobian_transfer::cost::tests::genus_one_jacobian_is_the_elliptic_curve ... ok
@@ -1511,7 +1509,7 @@ test cryptanalysis::jacobian_transfer::cost::tests::rho_reference_scales_as_half
 test cryptanalysis::jacobian_transfer::cost::tests::same_field_genus_two_cover_never_beats_rho ... ok
 test cryptanalysis::jacobian_transfer::cost::tests::smooth_counts_are_exact_on_small_fields ... ok
 test cryptanalysis::jacobian_transfer::cost::tests::smoothness_ic_on_genus_sixty_four_over_gf16 ... ok
-test cryptanalysis::j0_twists::tests::vulnerability_flag_runs ... ok
+test cryptanalysis::jacobian_transfer::binary::tests::mmt_condition_8_matches_the_relative_trace_of_b ... ok
 test cryptanalysis::jacobian_transfer::tests::every_registry_entry_parses ... ok
 test cryptanalysis::jacobian_transfer::tests::extension_curves_get_both_extension_routes ... ok
 test cryptanalysis::jacobian_transfer::tests::ghs_genus_floor_matches_the_odd_characteristic_study ... ok
@@ -1523,11 +1521,11 @@ test cryptanalysis::jacobian_transfer::tests::trace_of_a_decides_whether_the_des
 test cryptanalysis::jacobian_transfer::tests::unrecorded_subgroups_fall_back_to_the_largest_prime ... ok
 test cryptanalysis::jv_cover::tests::charpoly_satisfies_cayley_hamilton_and_has_the_right_roots ... ok
 test cryptanalysis::jv_cover::tests::cover_map_lands_on_the_curve ... ok
+test cryptanalysis::jacobian_transfer::tests::the_whole_registry_builds_and_round_trips has been running for over 60 seconds
 test cryptanalysis::jv_cover::tests::distinguished_point_rho_finds_the_planted_logarithm ... ok
 test cryptanalysis::jv_cover::tests::instance_transfers_the_dlp ... ok
 test cryptanalysis::jv_cover::tests::jacobian_group_law ... ok
 test cryptanalysis::jv_cover::tests::jacobian_scalar_beyond_u128 ... ok
-test cryptanalysis::jacobian_transfer::tests::the_whole_registry_builds_and_round_trips has been running for over 60 seconds
 test cryptanalysis::jacobian_transfer::tests::the_whole_registry_builds_and_round_trips ... ok
 test cryptanalysis::jv_cover::tests::polynomial_gcd_and_division ... ok
 test cryptanalysis::jv_cover::tests::nagao_finds_planted_six_sums_and_agrees_with_the_oracle ... ok
@@ -1553,23 +1551,23 @@ test cryptanalysis::jv_isogeny_walk::tests::two_edges_match_the_old_neighbours_a
 test cryptanalysis::jv_quartic::tests::cprime_report_is_consistent ... ok
 test cryptanalysis::jv_quartic::tests::symmetrised_s4_vanishes_on_three_point_sums ... ok
 test cryptanalysis::jv_quartic::tests::the_method_recovers_the_planted_logarithm ... ok
-test cryptanalysis::jv_isogeny_walk::tests::a_short_walk_reaches_a_weak_curve_at_p7 ... ok
+test cryptanalysis::jv_quartic::tests::the_test_finds_planted_triples_and_agrees_with_the_oracle ... ok
 test cryptanalysis::jv_quintic::tests::fp5_is_a_field_with_a_norm_inverse ... ok
 test cryptanalysis::jv_quintic::tests::prime_order_instances_and_the_oracle_find_planted_quadruples ... ok
-test cryptanalysis::jv_quartic::tests::the_test_finds_planted_triples_and_agrees_with_the_oracle ... ok
+test cryptanalysis::jv_isogeny_walk::tests::a_short_walk_reaches_a_weak_curve_at_p7 ... ok
 test cryptanalysis::jv_quintic_edwards::tests::census_counts_eight_and_sixteen_per_quadruple ... ok
 test cryptanalysis::jv_quintic_edwards::tests::edwards_group_law_and_torsion ... ok
 test cryptanalysis::jv_quintic_edwards::tests::instances_base_and_oracle ... ok
 test cryptanalysis::jv_quintic_edwards::tests::q4_has_order_four_and_swaps_the_coordinates ... ok
 test cryptanalysis::jv_quintic_edwards::tests::s3_is_symmetric_and_vanishes_on_sums ... ok
 test cryptanalysis::jv_quintic_edwards::tests::s5_vanishes_on_four_point_sums_and_the_symmetrisation_reproduces_it ... ok
-test cryptanalysis::jv_quintic_edwards::tests::saturated_four_point_test_agrees_with_the_oracle ... ok
+test cryptanalysis::jv_quintic::tests::s5_vanishes_on_four_point_sums_and_the_symmetrisation_reproduces_it ... ok
 test cryptanalysis::jv_quintic_edwards::tests::saturation_finds_every_translate ... ok
 test cryptanalysis::jv_quintic_edwards::tests::the_other_two_torsion_needs_a_square_root_of_d ... ok
 test cryptanalysis::jv_sieve::tests::end_to_end_at_p101_solves_the_logarithm ... ignored
 test cryptanalysis::jv_sieve::tests::factoring_recovers_a_planted_product ... ok
 test cryptanalysis::jv_sieve::tests::frobenius_edf_splits_like_cantor_zassenhaus ... ok
-test cryptanalysis::jv_quintic::tests::s5_vanishes_on_four_point_sums_and_the_symmetrisation_reproduces_it ... ok
+test cryptanalysis::jv_quintic_edwards::tests::saturated_four_point_test_agrees_with_the_oracle ... ok
 test cryptanalysis::jv_sieve::tests::m_rule_matches_the_registration ... ok
 test cryptanalysis::jv_sieve::tests::probe_enumeration_breakdown ... ignored
 test cryptanalysis::jv_sieve::tests::relations_sum_to_zero_in_the_jacobian ... ok
@@ -1597,14 +1595,14 @@ test cryptanalysis::koblitz_bench::tests::degree_reporting_controls_always_have_
 test cryptanalysis::koblitz_bench::tests::degree_reporting_does_not_infer_sat_from_density ... ok
 test cryptanalysis::koblitz_bench::tests::budgeted_dense_finish_matches_the_sparse_path ... ok
 test cryptanalysis::koblitz_bench::tests::eq_var_ratio_flags_the_underdetermined_systems ... ok
-test cryptanalysis::koblitz_bench::tests::f5_rows_keep_the_sparse_refutation ... ok
+test cryptanalysis::koblitz_bench::tests::dense_finish_keeps_the_high_rank_and_the_linear_span ... ok
 test cryptanalysis::koblitz_bench::tests::fall_degree_varies_with_the_target_draw ... ok
 test cryptanalysis::koblitz_bench::tests::find_and_refute_costs_are_reported_separately ... ok
 test cryptanalysis::koblitz_bench::tests::json_round_trips_as_valid_json ... ok
 test cryptanalysis::koblitz_bench::tests::ladder_draw_separates_satisfiable_from_refuted ... ok
 test cryptanalysis::koblitz_bench::tests::ladder_measure_m_builds_the_m4_chain ... ok
 test cryptanalysis::koblitz_bench::tests::ladder_refutation_profile_matches_the_eliminator ... ok
-test cryptanalysis::koblitz_bench::tests::dense_finish_keeps_the_high_rank_and_the_linear_span ... ok
+test cryptanalysis::koblitz_bench::tests::f5_rows_keep_the_sparse_refutation ... ok
 test cryptanalysis::koblitz_bench::tests::profiles_are_deterministic_and_structural ... ok
 test cryptanalysis::koblitz_bench::tests::random_subspace_basis_is_independent_and_of_the_asked_dimension ... ok
 test cryptanalysis::koblitz_bench::tests::replayed_samples_measure_as_the_sequential_draws ... ok
@@ -1617,11 +1615,11 @@ test cryptanalysis::koblitz_factor_base_search::tests::greedy_prune_scores_are_e
 test cryptanalysis::koblitz_factor_base_search::tests::only_linear_subspace_candidates_are_priced_and_they_rank_first ... ok
 test cryptanalysis::koblitz_factor_base_search::tests::over_cap_specs_skip_without_materialising ... ok
 test cryptanalysis::koblitz_factor_base_search::tests::pruned_specs_round_trip_and_never_raise_expected_trials ... ok
-test cryptanalysis::koblitz_bench::tests::measuring_from_a_higher_degree_skips_only_non_resolving_degrees ... ok
 test cryptanalysis::koblitz_factor_base_search::tests::search_ranks_a_solvable_base_first_where_the_legacy_one_fails ... ok
 test cryptanalysis::koblitz_factor_base_search::tests::solve_cost_ranking_prefers_the_base_the_oracle_is_cheapest_over ... ok
-test cryptanalysis::koblitz_factor_base_search::tests::the_prior_review_numbers_reproduce ... ok
 test cryptanalysis::koblitz_factor_base_search::tests::solve_cost_scoring_picks_a_cheaper_base_than_expected_trials ... ok
+test cryptanalysis::koblitz_factor_base_search::tests::the_prior_review_numbers_reproduce ... ok
+test cryptanalysis::koblitz_factor_base_search::tests::trace_zero_is_the_divisibility_test_on_every_candidate ... ok
 test cryptanalysis::koblitz_fast::tests::batched_additions_equal_individual_ones ... ok
 test cryptanalysis::koblitz_fast::tests::canon_many_is_canon_elementwise ... ok
 test cryptanalysis::koblitz_fast::tests::every_degree_the_pipeline_reaches_has_a_normal_element ... ok
@@ -1631,12 +1629,12 @@ test cryptanalysis::koblitz_fast::tests::lazy_batched_additions_equal_eager_ones
 test cryptanalysis::koblitz_fast::tests::least_rotation_matches_exhaustive_scan ... ok
 test cryptanalysis::koblitz_fast::tests::matches_the_general_arithmetic_on_random_points ... ok
 test cryptanalysis::koblitz_fast::tests::pairwise_additions_equal_individual_ones ... ok
-test cryptanalysis::koblitz_factor_base_search::tests::trace_zero_is_the_divisibility_test_on_every_candidate ... ok
+test cryptanalysis::koblitz_fast::tests::projective_ladder_matches_affine_double_and_add ... ok
 test cryptanalysis::koblitz_fast::tests::refuses_fields_wider_than_a_word ... ok
 test cryptanalysis::koblitz_fast::tests::the_change_of_basis_is_a_bijection_and_turns_squaring_into_a_rotation ... ok
 test cryptanalysis::koblitz_fast::tests::the_laned_point_keys_equal_scalar_canonicalisation ... ok
 test cryptanalysis::koblitz_fast::tests::the_least_rotation_is_constant_on_a_frobenius_orbit ... ok
-test cryptanalysis::koblitz_fast::tests::projective_ladder_matches_affine_double_and_add ... ok
+test cryptanalysis::koblitz_bench::tests::measuring_from_a_higher_degree_skips_only_non_resolving_degrees ... ok
 test cryptanalysis::koblitz_fast_arith::tests::artin_schreier_root_matches_slow ... ok
 test cryptanalysis::koblitz_fast_arith::tests::batch_add_matches_single_add ... ok
 test cryptanalysis::koblitz_fast_arith::tests::batch_double_matches_double ... ok
@@ -1658,8 +1656,8 @@ test cryptanalysis::koblitz_fast_arith::wide_tests::wide_s3_roots_zero_the_scala
 test cryptanalysis::koblitz_groebner::reference_equivalence_tests::active_suffix_rref_matches_full_width_gauss_jordan ... ok
 test cryptanalysis::koblitz_groebner::reference_equivalence_tests::add_matches_the_old_merge_on_boundary_masks ... ok
 test cryptanalysis::koblitz_fast_arith::wide_tests::wide_points_with_x_match_general_lift ... ok
-test cryptanalysis::koblitz_groebner::reference_equivalence_tests::deserialised_templates_match_the_old_chain_on_any_fields ... ok
 test cryptanalysis::koblitz_groebner::reference_equivalence_tests::long_operands_match_the_old_code_on_either_side ... ok
+test cryptanalysis::koblitz_groebner::reference_equivalence_tests::deserialised_templates_match_the_old_chain_on_any_fields ... ok
 test cryptanalysis::koblitz_groebner::reference_equivalence_tests::mul_matches_the_old_code_across_the_pair_bound ... ok
 test cryptanalysis::koblitz_groebner::reference_equivalence_tests::mul_matches_the_old_code_with_rows_in_blocks ... ok
 test cryptanalysis::koblitz_groebner::reference_equivalence_tests::short_operands_match_the_old_code ... ok
@@ -1837,7 +1835,7 @@ test cryptanalysis::koblitz_index_calculus::tests::query_accounting_collection_p
 test cryptanalysis::koblitz_index_calculus::tests::query_accounting_descent_preserves_success_and_terminal_failures ... ok
 test cryptanalysis::koblitz_index_calculus::tests::query_accounting_unsupported_and_incomplete_are_retained ... ok
 test cryptanalysis::koblitz_index_calculus::tests::query_accounting_windowed_walk_retains_partitioned_and_identity_queries ... ok
-test cryptanalysis::koblitz_index_calculus::tests::radix_sort_orders_entries_by_key_stably ... ok
+test cryptanalysis::koblitz_index_calculus::tests::naming_a_window_s_indices_finds_what_the_window_finds ... ok
 test cryptanalysis::koblitz_index_calculus::tests::reciprocal_saturation_preserves_projection_and_contains_the_base ... ok
 test cryptanalysis::koblitz_index_calculus::tests::relation_rows_are_consistent_with_the_orbit_logs ... ok
 test cryptanalysis::koblitz_index_calculus::tests::relation_scalar_sampler_covers_full_m83_order_reproducibly ... ok
@@ -1847,7 +1845,7 @@ test cryptanalysis::koblitz_index_calculus::tests::rho_escapes_fruitless_cycles_
 test cryptanalysis::koblitz_index_calculus::tests::rho_preparation_preserves_walk_and_charges ... ok
 test cryptanalysis::koblitz_index_calculus::tests::rho_recovers_logs_at_degree_41 ... ignored, a few seconds per target in release; the degree-41 rung of the ledger
 test cryptanalysis::koblitz_index_calculus::tests::rho_step_count_tracks_the_birthday_bound ... ok
-test cryptanalysis::koblitz_index_calculus::tests::rho_walk_timing_stops_before_collision_verification_progress ... ok
+test cryptanalysis::koblitz_index_calculus::tests::radix_sort_orders_entries_by_key_stably ... ok
 test cryptanalysis::koblitz_index_calculus::tests::sat_handles_the_cubic_chained_system ... ok
 test cryptanalysis::koblitz_index_calculus::tests::sat_refutes_undecomposable_targets ... ok
 test cryptanalysis::koblitz_index_calculus::tests::selected_explicit_orbit_base_has_four_relation_columns ... ok
@@ -1856,9 +1854,9 @@ test cryptanalysis::koblitz_index_calculus::tests::selecting_a_base_reports_what
 test cryptanalysis::koblitz_index_calculus::tests::single_word_rho_walk_matches_the_reference_step_for_step ... ok
 test cryptanalysis::koblitz_index_calculus::tests::solves_the_dlp_by_enumeration_too ... ok
 test cryptanalysis::koblitz_index_calculus::tests::solves_the_dlp_on_k0_over_f512 ... ok
-test cryptanalysis::koblitz_index_calculus::tests::solves_the_dlp_on_k1_over_f512 ... ok
+test cryptanalysis::koblitz_index_calculus::tests::rho_walk_timing_stops_before_collision_verification_progress ... ok
 test cryptanalysis::koblitz_index_calculus::tests::solves_the_dlp_with_the_sat_oracle ... ok
-test cryptanalysis::koblitz_index_calculus::tests::sparse_and_dense_linear_algebra_certify_the_same_log_table ... ok
+test cryptanalysis::koblitz_index_calculus::tests::solves_the_dlp_on_k1_over_f512 ... ok
 test cryptanalysis::koblitz_index_calculus::tests::sparse_and_exhaustive_irreducible_searches_agree_up_to_the_old_cap ... ok
 test cryptanalysis::koblitz_index_calculus::tests::speedup_model_tracks_the_predicted_factors ... ok
 test cryptanalysis::koblitz_index_calculus::tests::subgroup_orbit_base_precomputes_logs_and_descends ... ok
@@ -1866,7 +1864,7 @@ test cryptanalysis::koblitz_index_calculus::tests::subgroup_orbit_bases_are_repr
 test cryptanalysis::koblitz_index_calculus::tests::subgroup_orbit_bases_decompose_far_more_often_than_a_subspace_union ... ok
 test cryptanalysis::koblitz_index_calculus::tests::subgroup_sizes_by_degree ... ignored
 test cryptanalysis::koblitz_index_calculus::tests::subspace_is_closed_under_squaring ... ok
-test cryptanalysis::koblitz_index_calculus::tests::symmetry_breaking_changes_no_sat_verdict ... ok
+test cryptanalysis::koblitz_index_calculus::tests::sparse_and_dense_linear_algebra_certify_the_same_log_table ... ok
 test cryptanalysis::koblitz_index_calculus::tests::the_cofactor_class_decides_which_m_can_decompose ... ok
 test cryptanalysis::koblitz_index_calculus::tests::the_compact_table_answers_exactly_as_the_full_one ... ok
 test cryptanalysis::koblitz_index_calculus::tests::the_compact_table_decomposes_at_every_summand_count ... ok
@@ -1876,7 +1874,7 @@ test cryptanalysis::koblitz_index_calculus::tests::the_fold_is_exactly_two_n_and
 test cryptanalysis::koblitz_index_calculus::tests::the_folded_table_answers_exactly_as_the_full_one ... ok
 test cryptanalysis::koblitz_index_calculus::tests::the_folded_table_answers_the_degenerate_key_too ... ok
 test cryptanalysis::koblitz_index_calculus::tests::the_folded_table_decomposes_at_every_summand_count ... ok
-test cryptanalysis::koblitz_index_calculus::tests::naming_a_window_s_indices_finds_what_the_window_finds ... ok
+test cryptanalysis::koblitz_index_calculus::tests::symmetry_breaking_changes_no_sat_verdict ... ok
 test cryptanalysis::koblitz_index_calculus::tests::the_n59_standard_subspace_matches_the_phase_b_factor_base ... ok
 test cryptanalysis::koblitz_index_calculus::tests::the_orbit_tag_really_names_a_summand_of_the_key ... ok
 test cryptanalysis::koblitz_index_calculus::tests::the_partitioned_fold_build_stores_the_two_pass_table ... ok
@@ -1943,7 +1941,6 @@ test cryptanalysis::koblitz_rotated_chain::tests::exact_public_n83_target_matche
 test cryptanalysis::koblitz_rotated_chain::tests::n83_rotated_slots_partition_every_coordinate ... ok
 test cryptanalysis::koblitz_rotated_chain::tests::planted_chain_has_a_replayable_complete_model ... ok
 test cryptanalysis::koblitz_rotated_chain::tests::type2_onb_field_laws_are_exhaustive_at_n3 ... ok
-test cryptanalysis::koblitz_index_calculus::tests::the_u64_factorisation_matches_trial_division has been running for over 60 seconds
 test cryptanalysis::koblitz_sixsum_extract::tests::non_decomposable_targets_yield_no_relation ... ok
 test cryptanalysis::koblitz_sixsum_extract::tests::planted_targets_are_recovered_by_every_kernel ... ok
 test cryptanalysis::koblitz_sixsum_extract::tests::random_targets_yield_verified_relations_at_a_small_rung ... ok
@@ -1980,6 +1977,7 @@ test cryptanalysis::koblitz_sparse_la::wide_tests::sparse_rows_pick_the_width_an
 test cryptanalysis::koblitz_sparse_la::wide_tests::the_u64_and_wide_paths_agree_modulo_a_61_bit_prime ... ok
 test cryptanalysis::koblitz_sparse_la::wide_tests::the_u64_pipeline_passes_the_wide_checks_modulo_a_61_bit_prime ... ok
 test cryptanalysis::koblitz_sparse_la::wide_tests::wide_arithmetic_agrees_with_big_integers ... ok
+test cryptanalysis::koblitz_index_calculus::tests::the_u64_factorisation_matches_trial_division has been running for over 60 seconds
 test cryptanalysis::koblitz_sparse_la::wide_tests::wide_pipeline_solves_planted_systems_modulo_190_and_191_bit_primes ... ok
 test cryptanalysis::koblitz_sparse_la::wide_tests::wide_pipeline_solves_planted_systems_modulo_a_127_bit_prime ... ok
 test cryptanalysis::koblitz_sparse_la::wide_tests::wide_pipeline_solves_planted_systems_modulo_a_250_bit_prime ... ok
@@ -2285,7 +2283,6 @@ test cryptanalysis::p192_cm_norm_sieve::tests::symbolic_p192_sqrt_discriminant_i
 test cryptanalysis::p192_cm_relation_search::tests::exact_boundary_counts_match_frozen_values_in_both_orders ... ok
 test cryptanalysis::p192_cm_relation_search::tests::fabricated_calibration_is_rejected ... ok
 test cryptanalysis::koblitz_sym_s4::tests::symmetric_solver_agrees_with_chain_and_brute_force has been running for over 60 seconds
-test cryptanalysis::p192_cm_relation_search::tests::full_exact_search_reaches_frozen_relation_inventory has been running for over 60 seconds
 test cryptanalysis::p192_cm_relation_search::tests::full_exact_search_reaches_frozen_relation_inventory ... ok
 test cryptanalysis::p192_cm_relation_search::tests::generator_roots_forms_and_controls_replay ... ok
 test cryptanalysis::p192_cm_relation_search::tests::hnf_controls_reject_alpha_and_root_mutations ... ok
@@ -2406,8 +2403,7 @@ test cryptanalysis::pdp_split::tests::non_interreduced_basis_still_yields_points
 test cryptanalysis::pdp_split::tests::plans_agree_with_exhaustive_m3 has been running for over 60 seconds
 test cryptanalysis::pdp_split::tests::plans_agree_with_exhaustive_m3 ... ok
 test cryptanalysis::pdp_split::tests::plans_agree_with_exhaustive_m4 ... ignored, slow: about two minutes in release
-test cryptanalysis::pdp_split::tests::slot_systems_agree_with_exhaustive has been running for over 60 seconds
-test cryptanalysis::koblitz_sym_s4::tests::symmetric_solver_agrees_with_chain_and_brute_force ... ok
+test cryptanalysis::pdp_split::tests::slot_systems_agree_with_exhaustive ... ok
 test cryptanalysis::pdp_split::tests::unsupported_plans_are_refused ... ok
 test cryptanalysis::petit_quisquater::tests::debug_scalar_mul_correctness ... ignored
 test cryptanalysis::petit_quisquater::tests::debug_scan_curves_for_prime_subgroup ... ignored
@@ -2616,16 +2612,16 @@ test cryptanalysis::quantum_estimator::tests::karatsuba_scaling_is_subquadratic 
 test cryptanalysis::quantum_estimator::tests::pa_costs_more_than_pd ... ok
 test cryptanalysis::quantum_estimator::tests::print_resource_table ... ok
 test cryptanalysis::quantum_estimator::tests::toffoli_synchronises_qubits ... ok
-test cryptanalysis::pdp_split::tests::slot_systems_agree_with_exhaustive ... ok
-test cryptanalysis::quartic_folds::rho_tests::folded_walks_take_the_steps_their_classes_predict ... ok
 test cryptanalysis::quartic_folds::log_tests::fold_coefficients_match_true_logarithms ... ok
+test cryptanalysis::quartic_folds::rho_tests::folded_walks_take_the_steps_their_classes_predict ... ok
+test cryptanalysis::quartic_folds::tests::both_arms_recover_the_logarithm_and_every_walk_is_correct ... ok
 test cryptanalysis::quartic_folds::tests::psi_columns_are_orbits_of_three_with_verified_coefficients ... ok
 test cryptanalysis::quartic_folds::tests::translation_columns_pair_p_and_p_plus_t ... ok
 test cryptanalysis::quasi_subfield::tests::census_is_self_consistent_at_n7 ... ok
-test cryptanalysis::quartic_folds::tests::both_arms_recover_the_logarithm_and_every_walk_is_correct ... ok
+test cryptanalysis::quasi_subfield::tests::census_witnesses_really_have_that_many_roots ... ok
 test cryptanalysis::quasi_subfield::tests::divisibility_is_exact_past_the_word_width ... ok
 test cryptanalysis::quasi_subfield::tests::divisibility_test_matches_brute_force ... ok
-test cryptanalysis::quasi_subfield::tests::census_witnesses_really_have_that_many_roots ... ok
+test cryptanalysis::quasi_subfield::tests::divisor_prediction_matches_the_exhaustive_census ... ok
 test cryptanalysis::quasi_subfield::tests::f2_131_admits_no_non_trivial_stable_subspace ... ok
 test cryptanalysis::quasi_subfield::tests::f2_73_does_admit_intermediate_stable_subspaces ... ok
 test cryptanalysis::quasi_subfield::tests::kernel_dimension_counts_the_roots ... ok
@@ -2694,6 +2690,7 @@ test cryptanalysis::sat::tests::lazy_clause_conflict_backjumps_and_preserves_the
 test cryptanalysis::sat::tests::lazy_theory_clause_past_the_variables_panics - should panic ... ok
 test cryptanalysis::sat::tests::lazy_trigger_past_the_variables_panics_after_add_vars - should panic ... ok
 test cryptanalysis::sat::tests::luby_sequence_starts_correctly ... ok
+test cryptanalysis::sat::tests::optional_progress_observer_preserves_sat_and_unsat_search ... ok
 test cryptanalysis::sat::tests::parse_dimacs_xor_reads_parity_convention ... ok
 test cryptanalysis::sat::tests::pigeonhole_3_into_2_is_unsat ... ok
 test cryptanalysis::sat::tests::pigeonhole_5_into_4_is_unsat ... ok
@@ -2740,12 +2737,12 @@ test cryptanalysis::semaev_corpus::tests::corpus_shape_is_as_shipped ... ok
 test cryptanalysis::semaev_corpus::tests::mislabelled_instance_is_actually_satisfiable ... ok
 test cryptanalysis::semaev_decomp::reference_994784af::decompose_matches_994784af ... ok
 test cryptanalysis::semaev_decomp::reference_994784af::general_quartic_matches_994784af_even_for_unreduced_b ... ok
-test cryptanalysis::quasi_subfield::tests::divisor_prediction_matches_the_exhaustive_census ... ok
 test cryptanalysis::semaev_decomp::reference_994784af::quartic_route_matches_994784af_at_wide_fields ... ok
+test cryptanalysis::semaev_decomp::reference_994784af::quartic_route_matches_994784af_on_every_quartic_of_tiny_fields ... ok
 test cryptanalysis::semaev_decomp::reference_994784af::subspace_oracle_matches_994784af ... ok
 test cryptanalysis::semaev_decomp::tests::batch_inversion_matches_elementwise ... ok
 test cryptanalysis::semaev_decomp::tests::clmul_path_matches_independent_reference ... ok
-test cryptanalysis::semaev_decomp::reference_994784af::quartic_route_matches_994784af_on_every_quartic_of_tiny_fields ... ok
+test cryptanalysis::semaev_decomp::tests::decomposition_agrees_with_enumeration_on_random_targets ... ok
 test cryptanalysis::semaev_decomp::tests::decomposition_agrees_with_exhaustive_search ... ok
 test cryptanalysis::semaev_decomp::tests::dispatched_and_portable_pair_loops_agree ... ok
 test cryptanalysis::semaev_decomp::tests::field_arithmetic_matches_the_general_implementation ... ok
@@ -2756,7 +2753,7 @@ test cryptanalysis::semaev_decomp::tests::general_quartic_agrees_with_the_b_equa
 test cryptanalysis::semaev_decomp::tests::general_quartic_matches_its_term_by_term_formula ... ok
 test cryptanalysis::semaev_decomp::tests::general_s4_vanishes_on_point_sums_of_a_random_curve ... ok
 test cryptanalysis::semaev_decomp::tests::gf2_matches_b072fcf5_code_exhaustively_at_small_widths ... ok
-test cryptanalysis::semaev_decomp::tests::decomposition_agrees_with_enumeration_on_random_targets ... ok
+test cryptanalysis::semaev_decomp::tests::gf2_matches_b072fcf5_code_on_every_operation ... ok
 test cryptanalysis::semaev_decomp::tests::itoh_tsujii_inverse_is_correct ... ok
 test cryptanalysis::semaev_decomp::tests::itoh_tsujii_inverse_roundtrips_at_every_width ... ok
 test cryptanalysis::semaev_decomp::tests::quartic_matches_the_symmetrised_form ... ok
@@ -2823,12 +2820,13 @@ test cryptanalysis::shor::tests::shor_factors_15 ... ok
 test cryptanalysis::shor::tests::shor_factors_21 ... ok
 test cryptanalysis::shor::tests::shor_order_finds_period_15_a7 ... ok
 test cryptanalysis::shor::tests::shor_rejects_even ... ok
-test cryptanalysis::semaev_decomp::tests::gf2_matches_b072fcf5_code_on_every_operation ... ok
+test cryptanalysis::sig_fp_tower::tests::every_variant_computes_the_same_ideal has been running for over 60 seconds
 test cryptanalysis::sig_fp_tower::tests::every_variant_computes_the_same_ideal ... ok
+test cryptanalysis::sig_fp_tower::tests::long_towers_with_one_generator_match_f4 has been running for over 60 seconds
+test cryptanalysis::koblitz_sym_s4::tests::symmetric_solver_agrees_with_chain_and_brute_force ... ok
 test cryptanalysis::sig_fp_tower::tests::refutes_exactly_the_empty_kummer_systems ... ok
 test cryptanalysis::sig_fp_tower::tests::signatures_order_like_mono_keys_when_square_free ... ok
 test cryptanalysis::sig_fp_tower::tests::the_basis_matches_f4_on_general_towers ... ok
-test cryptanalysis::sig_fp_tower::tests::long_towers_with_one_generator_match_f4 has been running for over 60 seconds
 test cryptanalysis::sig_fp_tower::tests::the_basis_matches_f4_on_random_systems ... ok
 test cryptanalysis::signal_ratchet::tests::anomaly_audit_passes ... ok
 test cryptanalysis::signal_ratchet::tests::demo_multi_seed_stability_check ... ignored
@@ -2840,25 +2838,25 @@ test cryptanalysis::signal_ratchet::tests::kdf_rk_deterministic_and_separates ..
 test cryptanalysis::signature_corpus::tests::analyzer_clean_corpus_no_false_positives ... ok
 test cryptanalysis::signature_corpus::tests::analyzer_detects_hnp_recoverable_bias ... ok
 test cryptanalysis::signature_corpus::tests::analyzer_detects_repeated_k_recovery ... ok
-test cryptanalysis::signature_corpus::tests::analyzer_mixed_corpus_isolates_bad_key ... ok
+test cryptanalysis::sig_fp_tower::tests::long_towers_with_one_generator_match_f4 ... ok
 test cryptanalysis::signature_corpus::tests::empty_corpus_emits_only_info ... ok
 test cryptanalysis::signature_corpus::tests::malformed_records_reported_not_panic ... ok
 test cryptanalysis::smith_kernel_coverage::tests::cycle_type_of_known_factorisation ... ok
 test cryptanalysis::smith_kernel_coverage::tests::lagrangian_counts ... ok
 test cryptanalysis::smith_kernel_coverage::tests::matching_criterion_agrees_with_group_action ... ok
 test cryptanalysis::smith_kernel_coverage::tests::reproduces_smith_lemma1_and_constant ... ok
-test cryptanalysis::smith_kernel_coverage::tests::small_prime_point_counts_validate ... ok
+test cryptanalysis::signature_corpus::tests::analyzer_mixed_corpus_isolates_bad_key ... ok
 test cryptanalysis::smith_kernel_coverage::tests::stable_lagrangian_implies_g_gstar ... ok
 test cryptanalysis::smith_prop24::tests::clopper_pearson_reference_values ... ok
 test cryptanalysis::smith_prop24::tests::eq7_is_the_norm ... ok
 test cryptanalysis::smith_prop24::tests::example1_positive_control ... ok
 test cryptanalysis::smith_prop24::tests::factorisation_matches_reference ... ok
 test cryptanalysis::smith_prop24::tests::field_helpers ... ok
-test cryptanalysis::smith_prop24::tests::lemma1_counts_and_descent_rank ... ok
+test cryptanalysis::smith_kernel_coverage::tests::small_prime_point_counts_validate ... ok
 test cryptanalysis::smith_prop24::tests::model_independence_and_twist ... ok
-test cryptanalysis::smith_prop24::tests::normal_form_brute_force ... ok
+test cryptanalysis::smith_prop24::tests::lemma1_counts_and_descent_rank ... ok
 test cryptanalysis::smith_prop24::tests::predictions_reproduce_smith ... ok
-test cryptanalysis::smith_prop24::tests::prop2_brute_force_lines_and_lambdas ... ok
+test cryptanalysis::smith_prop24::tests::normal_form_brute_force ... ok
 test cryptanalysis::smith_prop24::tests::prop4_against_point_count_of_x ... ok
 test cryptanalysis::smt_oracle::tests::blocking_assertion_excludes_exactly_that_model ... ok
 test cryptanalysis::smt_oracle::tests::bool_script_has_one_assertion_per_nontrivial_row ... ok
@@ -2873,7 +2871,7 @@ test cryptanalysis::smt_oracle::tests::verdict_follows_first_status_line ... ok
 test cryptanalysis::smt_oracle::tests::z3_round_trip_bool ... ok
 test cryptanalysis::smt_oracle::tests::z3_round_trip_bv1 ... ok
 test cryptanalysis::solinas_correlations::tests::solinas_correlation_z_distribution ... ok
-test cryptanalysis::solinas_correlations::tests::solinas_micro_bit_correlations ... ok
+test cryptanalysis::smith_prop24::tests::prop2_brute_force_lines_and_lambdas ... ok
 test cryptanalysis::solinas_correlations::tests::solinas_reduce_matches_direct_reduction ... ok
 test cryptanalysis::statistical::tests::all_zeros_fails_monobit ... ok
 test cryptanalysis::statistical::tests::alternating_bits_fails_runs_test ... ok
@@ -2901,24 +2899,24 @@ test cryptanalysis::tls12_kdf::tests::key_schedule_deterministic ... ok
 test cryptanalysis::tls12_kdf::tests::p_sha256_deterministic ... ok
 test cryptanalysis::tls12_kdf::tests::p_sha256_truncates_to_exact_length ... ok
 test cryptanalysis::tls12_kdf::tests::slice_aes128_gcm_keys_works ... ok
-test cryptanalysis::tls13_kdf::tests::anomaly_audit_passes ... ok
+test cryptanalysis::solinas_correlations::tests::solinas_micro_bit_correlations ... ok
 test cryptanalysis::tls13_kdf::tests::demo_multi_seed_stability_check ... ignored
 test cryptanalysis::tls13_kdf::tests::demo_tls13_anomaly_audit ... ignored
 test cryptanalysis::tls13_kdf::tests::hkdf_expand_label_deterministic ... ok
 test cryptanalysis::tls13_kdf::tests::hkdf_expand_label_separates_labels ... ok
 test cryptanalysis::tls13_kdf::tests::key_schedule_different_dhe_different_keys ... ok
 test cryptanalysis::tls13_kdf::tests::key_schedule_is_deterministic ... ok
-test cryptanalysis::two_sylow_search::tests::arms_agree_on_p192_draws_and_found_points_certify ... ok
+test cryptanalysis::tls13_kdf::tests::anomaly_audit_passes ... ok
 test cryptanalysis::two_sylow_search::tests::fast_jacobi_matches_binary_and_euler_at_p192 ... ok
-test cryptanalysis::two_sylow_search::tests::halving_depth_matches_exhaustive_group_structure ... ok
+test cryptanalysis::two_sylow_search::tests::arms_agree_on_p192_draws_and_found_points_certify ... ok
 test cryptanalysis::two_sylow_search::tests::isqrt_chain_matches_biguint_at_p192 ... ok
 test cryptanalysis::two_sylow_search::tests::small_prime_tower_has_exactly_the_roots_v ... ok
 test cryptanalysis::two_sylow_search::tests::supersingular_control_has_depth_63_at_p192 ... ok
 test cryptanalysis::two_sylow_search::tests::tower_on_a_found_p192_curve_has_two_to_the_t_roots ... ok
+test cryptanalysis::two_sylow_search::tests::halving_depth_matches_exhaustive_group_structure ... ok
 test cryptanalysis::two_sylow_search::tests::z2xz8_family_forces_depth_three_and_agrees_with_exhaustion ... ok
-test cryptanalysis::visual_demos::tests::aggregate_runs_all_demos ... ok
 test cryptanalysis::visual_demos::tests::demo_all_visualizations ... ignored
-test cryptanalysis::visual_demos::tests::every_demo_returns_non_empty_output ... ok
+test cryptanalysis::visual_demos::tests::aggregate_runs_all_demos ... ok
 test cryptanalysis::visual_demos::tests::pollard_rho_demo_has_data ... ok
 test cryptanalysis::visualize::tests::birthday_curve_renders_for_known_bits ... ok
 test cryptanalysis::visualize::tests::joux_tree_renders ... ok
@@ -2927,7 +2925,7 @@ test cryptanalysis::visualize::tests::path_trajectory_renders_simple_line ... ok
 test cryptanalysis::visualize::tests::signed_bars_show_both_directions ... ok
 test cryptanalysis::wdsat_oracle::tests::anf_row_round_trips_a_quadratic ... ok
 test cryptanalysis::wdsat_oracle::tests::capacity_reads_header_and_degrees ... ok
-test cryptanalysis::wdsat_oracle::tests::mock_child_exit_and_empty_output_are_not_refutations ... ok
+test cryptanalysis::visual_demos::tests::every_demo_returns_non_empty_output ... ok
 test cryptanalysis::wdsat_oracle::tests::parse_model_reads_first_bitstring ... ok
 test cryptanalysis::wdsat_oracle::tests::validate_anf_accepts_a_satisfying_model ... ok
 test cryptanalysis::wdsat_oracle::tests::wdsat_agrees_with_native_sat_on_prime_degree ... ignored, requires WDSAT_BINARY pointing at a capacity-sufficient wdsat_solver
@@ -2942,11 +2940,11 @@ test cryptanalysis::wide_gf2m::tests::mul_matches_the_library_at_the_width_limit
 test cryptanalysis::wide_gf2m::tests::mul_matches_the_library_field_on_both_kernels ... ok
 test cryptanalysis::wide_groebner::tests::degree_runs_merge_to_ascending_order ... ok
 test cryptanalysis::wide_groebner::tests::finds_planted_decompositions_on_small_curves ... ok
+test cryptanalysis::wdsat_oracle::tests::mock_child_exit_and_empty_output_are_not_refutations ... ok
 test cryptanalysis::wide_groebner::tests::indexed_coordinates_match_curve_lift_reference ... ok
-test cryptanalysis::wide_groebner::tests::n83_three_summand_block_and_cofactor_bridge_replay ... ok
 test cryptanalysis::wide_groebner::tests::substitution_and_arithmetic_agree_with_evaluation ... ok
 test cryptanalysis::wide_groebner::tests::the_order_test_refuses_only_definite_violations ... ok
-test cryptanalysis::wide_groebner::tests::the_suffix_recursion_finds_planted_decompositions ... ok
+test cryptanalysis::wide_groebner::tests::n83_three_summand_block_and_cofactor_bridge_replay ... ok
 test cryptanalysis::wide_groebner::tests::two_word_field_table_matches_legacy_and_reference ... ok
 test cryptanalysis::wide_groebner::tests::wide_system_matches_the_64_bit_builder ... ok
 test cryptanalysis::wide_sixsum::tests::exact_linear_consequence_replays ... ok
@@ -2957,9 +2955,9 @@ test cryptanalysis::wide_sixsum::tests::source_code_substitution_preserves_evalu
 test cryptanalysis::wide_sixsum::tests::word_boundaries_and_boolean_cancellation ... ok
 test cryptopals::challenge10::tests::cbc_round_trips_and_decrypts ... ok
 test cryptopals::challenge11::tests::always_detects_correctly ... ok
-test cryptopals::challenge12::tests::recovers_secret ... ok
+test cryptanalysis::wide_groebner::tests::the_suffix_recursion_finds_planted_decompositions ... ok
 test cryptopals::challenge13::tests::forges_admin ... ok
-test cryptopals::challenge14::tests::recovers_secret_with_prefix ... ok
+test cryptopals::challenge12::tests::recovers_secret ... ok
 test cryptopals::challenge15::tests::validates_padding ... ok
 test cryptopals::challenge16::tests::flips_in_admin_true ... ok
 test cryptopals::challenge17::tests::padding_oracle_recovers_one_string ... ok
@@ -2990,11 +2988,11 @@ test cryptopals::challenge39::tests::rsa_round_trip ... ok
 test cryptopals::challenge3::tests::recovers_known_plaintext ... ok
 test cryptopals::challenge40::tests::recovers_via_crt ... ok
 test cryptopals::challenge41::tests::recovers_unpadded ... ok
-test cryptopals::challenge42::tests::forges_e3_signature ... ok
+test cryptopals::challenge14::tests::recovers_secret_with_prefix ... ok
 test cryptopals::challenge43::tests::k_to_x_formula_works ... ok
 test cryptopals::challenge44::tests::k_from_repeated_works ... ok
 test cryptopals::challenge45::tests::malicious_g_breaks_dsa ... ok
-test cryptopals::challenge46::tests::parity_oracle_recovers ... ok
+test cryptopals::challenge42::tests::forges_e3_signature ... ok
 test cryptopals::challenge47::tests::conformance_check_works ... ok
 test cryptopals::challenge48::tests::structurally_identical_to_47 ... ok
 test cryptopals::challenge49::tests::cbc_mac_matches_textbook ... ok
@@ -3003,28 +3001,28 @@ test cryptopals::challenge49::tests::part2_attack_works ... ok
 test cryptopals::challenge4::tests::finds_xored_line ... ok
 test cryptopals::challenge50::tests::forgery_matches_target_tag ... ok
 test cryptopals::challenge50::tests::forgery_starts_with_prefix ... ok
-test cryptopals::challenge51::tests::crime_cbc_recovers_full_cookie ... ok
-test cryptanalysis::sig_fp_tower::tests::long_towers_with_one_generator_match_f4 ... ok
+test cryptopals::challenge46::tests::parity_oracle_recovers ... ok
+test cryptopals::challenge51::tests::crime_stream_recovers_full_cookie ... ok
 test cryptopals::challenge51::tests::stream_oracle_leaks_first_byte ... ok
 test cryptopals::challenge52::tests::block_collision_works_in_16_bits ... ok
-test cryptopals::challenge51::tests::crime_stream_recovers_full_cookie ... ok
+test cryptopals::challenge52::tests::cascade_attack_finds_collision ... ok
 test cryptopals::challenge52::tests::joux_pairs_collide ... ok
 test cryptopals::challenge53::tests::expandable_message_hashes_consistently ... ok
-test cryptopals::challenge52::tests::cascade_attack_finds_collision ... ok
-test cryptopals::challenge54::tests::diamond_root_matches ... ok
 test cryptopals::challenge53::tests::second_preimage_attack_lands ... ok
+test cryptopals::challenge54::tests::diamond_root_matches ... ok
+test cryptopals::challenge54::tests::forgery_matches_commitment ... ok
 test cryptopals::challenge55::tests::differential_words_match ... ok
 test cryptopals::challenge55::tests::finds_real_collision ... ignored
 test cryptopals::challenge55::tests::round1_modification_satisfies_conditions ... ok
 test cryptopals::challenge56::tests::decoded_cookie_round_trips ... ok
 test cryptopals::challenge56::tests::recovers_one_byte_with_large_budget ... ignored
 test cryptopals::challenge56::tests::z16_has_a_bias ... ok
-test cryptopals::challenge54::tests::forgery_matches_commitment ... ok
+test cryptopals::challenge57::tests::attack_recovers_full_key ... ok
 test cryptopals::challenge57::tests::element_actually_has_target_order ... ok
 test cryptopals::challenge58::tests::kangaroo_40_bit_range ... ignored
 test cryptopals::challenge58::tests::kangaroo_small_range_finds_log ... ok
 test cryptopals::challenge59::tests::generator_lands_on_infinity_at_order ... ok
-test cryptopals::challenge57::tests::attack_recovers_full_key ... ok
+test cryptopals::challenge51::tests::crime_cbc_recovers_full_cookie ... ok
 test cryptopals::challenge5::tests::matches_known_ct ... ok
 test cryptopals::challenge60::tests::base_point_times_order_is_zero ... ok
 test cryptopals::challenge60::tests::collect_some_twist_residues ... ignored
@@ -3160,8 +3158,8 @@ test ecc::ec_kcdsa::tests::ec_kcdsa_reject_wrong_r_length ... ok
 test ecc::ec_kcdsa::tests::ec_kcdsa_secp256k1_roundtrip ... ok
 test ecc::ec_kcdsa::tests::ec_kcdsa_sign_rejects_order_multiple_private_key ... ok
 test ecc::ec_kcdsa::tests::ec_kcdsa_sign_rejects_zero_private_key ... ok
+test cryptopals::challenge59::tests::invalid_curve_attack_recovers_key ... ok
 test ecc::ec_kcdsa::tests::ec_kcdsa_wrong_cert_fails ... ok
-test ecc::ec_kcdsa::tests::ec_kcdsa_wrong_key_fails ... ok
 test ecc::ec_kcdsa::tests::ec_kcdsa_wrong_message_fails ... ok
 test ecc::ecdh::tests::ecdh_p256_known_answer ... ok
 test ecc::ecdh::tests::rejects_invalid_peer_public_key ... ok
@@ -3191,7 +3189,7 @@ test ecc::ed448::tests::ed448_roundtrip ... ok
 test ecc::ed448::tests::rfc8032_ed448_empty ... ok
 test ecc::ed448::tests::rfc8032_ed448_one_octet_with_context ... ok
 test ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path ... ok
-test cryptopals::challenge59::tests::invalid_curve_attack_recovers_key ... ok
+test ecc::ec_kcdsa::tests::ec_kcdsa_wrong_key_fails ... ok
 test ecc::endo_generic_chain_set::tests::omega_trace_and_norm ... ok
 test ecc::endo_generic_chain_set::tests::tampered_sets_are_refused ... ok
 test ecc::endo_generic_field::tests::arithmetic_matches_biguint_at_four_and_six_limbs ... ok
@@ -3247,8 +3245,8 @@ test ecc::p256_point::tests::scalar_mul_ct_matches_textbook_full_size_scalars ..
 test ecc::point::tests::double_then_add ... ok
 test ecc::point::tests::jacobian_scalar_mul_matches_affine_double_and_add ... ok
 test ecc::point::tests::ladder_matches_double_and_add ... ok
-test ecc::point::tests::ladder_matches_double_and_add_p256 ... ok
 test ecc::gost_3410_2012::tests::gost_512_wrong_key_fails ... ok
+test ecc::point::tests::ladder_matches_double_and_add_p256 ... ok
 test ecc::point::tests::neg_point ... ok
 test ecc::point::tests::scalar_mul_one ... ok
 test ecc::point::tests::scalar_mul_vartime_matches_scalar_mul ... ok
@@ -3298,8 +3296,8 @@ test ecc::secp256k1_point::tests::scalar_mul_ct_matches_textbook_small_scalars .
 test ecc::point::vartime_differential::point_vartime_matches_constant_time ... ok
 test ecc::sm2::tests::sm2_generator_is_on_curve ... ok
 test ecc::sm2::tests::sm2_public_key_test_vector ... ok
-test ecc::sm2::tests::sm2_rejects_invalid_public_inputs ... ok
 test ecc::sm2::tests::sm2_encrypt_decrypt_roundtrip ... ok
+test ecc::sm2::tests::sm2_rejects_invalid_public_inputs ... ok
 test ecc::sm2::tests::sm2_sign_verify_roundtrip ... ok
 test ecc::sm2::tests::sm2_tampered_ciphertext_rejected ... ok
 test ecc::sm2::tests::sm2_wrong_key_fails ... ok
@@ -3567,20 +3565,20 @@ test kdf::hkdf::tests::hmac_sha256_rfc4231_tc3 ... ok
 test kdf::hkdf::tests::hmac_sha256_rfc4231_tc4 ... ok
 test kdf::hkdf::tests::hmac_sha256_rfc4231_tc6 ... ok
 test kdf::hkdf::tests::hmac_verify_rejects_wrong_length ... ok
-test ecc::sm2::tests::sm2_wrong_message_fails ... ok
 test kdf::hmac_drbg::tests::deterministic ... ok
 test kdf::hmac_drbg::tests::different_seeds ... ok
 test kdf::hmac_drbg::tests::forward_ratchet_after_generate ... ok
 test kdf::hmac_drbg::tests::matches_rfc6979_drbg_structure ... ok
 test kdf::hmac_drbg::tests::personalization_domain_separates ... ok
-test kdf::hotp::tests::hotp_respects_digit_count ... ok
 test kdf::hmac_drbg::tests::reseed_changes_output ... ok
+test kdf::hotp::tests::hotp_respects_digit_count ... ok
 test kdf::hotp::tests::hotp_sha1_rfc4226_vectors ... ok
 test kdf::hotp::tests::totp_now_runs ... ok
 test kdf::hotp::tests::totp_sha1_rfc6238_vectors ... ok
 test kdf::hotp::tests::totp_sha256_rfc6238_vectors ... ok
 test kdf::hotp::tests::totp_sha512_rfc6238_vectors ... ok
 test kdf::hotp::tests::totp_step_changes_counter ... ok
+test kdf::pbkdf2::tests::pbkdf2_c4096_32 ... ok
 test kdf::pbkdf2::tests::pbkdf2_deterministic ... ok
 test kdf::pbkdf2::tests::pbkdf2_different_passwords ... ok
 test kdf::pbkdf2::tests::pbkdf2_different_salts ... ok
@@ -3594,10 +3592,10 @@ test kdf::scrypt::tests::scrypt_rejects_non_power_of_two_n ... ok
 test kdf::scrypt::tests::scrypt_rejects_rp_too_large ... ok
 test kdf::scrypt::tests::scrypt_rejects_zero_r_or_p ... ok
 test kdf::scrypt::tests::scrypt_rfc7914_tv1 ... ok
-test kdf::pbkdf2::tests::pbkdf2_c4096_32 ... ok
+test kdf::scrypt::tests::scrypt_rfc7914_tv2 ... ok
 test pqc::bike::tests::bike_decapsulate_rejects_noncanonical_padding_bits_without_panicking ... ok
 test pqc::bike::tests::bike_decapsulate_rejects_truncated_storage_without_panicking ... ok
-test kdf::scrypt::tests::scrypt_rfc7914_tv2 ... ok
+test ecc::sm2::tests::sm2_wrong_message_fails ... ok
 test pqc::bike::tests::r2poly_add_is_xor ... ok
 test pqc::bike::tests::sparse_sample_weight ... ok
 test pqc::classic_mceliece::tests::classic_mceliece_kem_shared_secret_matches ... ok
@@ -4349,5 +4347,5 @@ test zk::stark_v2::tests::stark_v2_prove_verify_doubling_default ... ok
 test zk::stark_v2::tests::stark_v2_prove_verify_doubling_fast ... ok
 test zk::bulletproofs::tests::range_verify_rejects_invalid_commitment_point ... ok
 
-test result: ok. 4219 passed; 0 failed; 117 ignored; 0 measured; 0 filtered out; finished in 1839.26s
+test result: ok. 4220 passed; 0 failed; 117 ignored; 0 measured; 0 filtered out; finished in 1808.27s
 
