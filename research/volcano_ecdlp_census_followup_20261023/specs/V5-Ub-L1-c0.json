@@ -1,0 +1,78 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "volcano census follow-up V5 Ub level 1 chunk 0",
+  "description": "Volcano ECDLP census follow-up Phase B (research/volcano_ecdlp_census_followup_20261023/PLAN.md). Known-answer synthetic curves, planted_shared targets; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 66678169,
+        "a": 3164830,
+        "b": 14037671,
+        "group_order": 66662692,
+        "r": 16665673,
+        "gx": 62607801,
+        "gy": 42516761
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261123,
+    "target_kind": "planted_shared"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain"
+      }
+    },
+    {
+      "name": "bsgs",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.textbook"
+      }
+    },
+    {
+      "name": "bsgs-neg",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.negation"
+      }
+    },
+    {
+      "name": "ic",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 63,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261023,
+    "isolation_required": "L2",
+    "timeout_seconds": 600
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h4a2922ce6920",
+  "label": "isogeny volcano: rho and IC on every curve",
+  "spec_id": "ECS1hbdf7d171f4b3",
+  "spec_sha256": "bdf7d171f4b3cee87d28cf139a253a5d3000e15e2a48bdc99717f301b4444375",
+  "env_class_id": "ECBENV2ha20a995299c2",
+  "host_sha256": "14b1bd1be125825db5d555d444367c01d39ea37eb0b948d51b258f0ae60f77f2",
+  "plan_sha256": "3a07eefd319abaa5d0195295bb1db4f413a78f62aa80c51360b224aa7b94150d",
+  "binary_sha256": "7da27ec3f0dadbae565181b0faa74582eb94a8f36cf6fe806eecc7b4b1fa7a9f",
+  "git_commit": "de8cd615ce7f0eeb1469c3e6d19257f8be945667",
+  "git_dirty": false,
+  "options": {
+    "cpus": "inherit",
+    "lock_path": "/tmp/crypto-bench-g3.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": {
+    "run_cpu": 3,
+    "reserved": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "node": 0,
+    "request": "inherit",
+    "unreserved_siblings": [],
+    "observed": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "preflight": {
+    "quiet": false,
+    "reasons": [
+      "CPU 3 was busy 1.740s of the 2.0s settle",
+      "PSI cpu some avg10 50.85 > 5.00"
+    ],
+    "settle_seconds": 2.0,
+    "reserved_busy_seconds": {
+      "0": 0.07,
+      "1": 0.04,
+      "2": 0.12,
+      "3": 1.74
+    },
+    "before": {
+      "unix_ms": 1792251967355,
+      "loadavg": [
+        4.56884765625,
+        4.39013671875,
+        4.16748046875
+      ],
+      "psi_cpu_some_avg10": 47.72,
+      "psi_cpu_some_total_us": 20742120233,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 255695,
+          "idle": 2163822,
+          "steal": 10621
+        },
+        "1": {
+          "busy": 292642,
+          "idle": 2113261,
+          "steal": 10534
+        },
+        "2": {
+          "busy": 231005,
+          "idle": 2170067,
+          "steal": 10220
+        },
+        "3": {
+          "busy": 2347148,
+          "idle": 45797,
+          "steal": 25857
+        }
+      }
+    },
+    "after": {
+      "unix_ms": 1792251969355,
+      "loadavg": [
+        4.56884765625,
+        4.39013671875,
+        4.16748046875
+      ],
+      "psi_cpu_some_avg10": 50.85,
+      "psi_cpu_some_total_us": 20743912871,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 255702,
+          "idle": 2164018,
+          "steal": 10634
+        },
+        "1": {
+          "busy": 292646,
+          "idle": 2113446,
+          "steal": 10548
+        },
+        "2": {
+          "busy": 231017,
+          "idle": 2170254,
+          "steal": 10235
+        },
+        "3": {
+          "busy": 2347322,
+          "idle": 45797,
+          "steal": 25883
+        }
+      }
+    }
+  },
+  "eviction": {
+    "moved_count": 0,
+    "failed_user_threads": 55,
+    "failed_kernel_threads": 71
+  },
+  "runner_on_run_cpu": false,
+  "runner_cpus": [
+    0,
+    1,
+    2
+  ],
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792251969407,
+  "finished_unix_ms": 1792254751744,
+  "status": "complete",
+  "executions_planned": 8192,
+  "records_written": 8192,
+  "records_sha256": "aefc074b6af90ac2256c7cedec2bba94e1e02204a214860f3e25bf0f86ee6e16",
+  "status_counts": {
+    "verified": 8192
+  }
+}
