@@ -791,7 +791,7 @@ fn cmd_fit() {
     for (si, n) in names.iter().enumerate() {
         if let Some(f) = fit_series(&series[n], 0xF17 + si as u64) {
             fj.push(format!(
-                "\"{}\":{{\"intercept\":{},\"slope\":{},\"se\":{},\"ci_lo\":{},\"ci_hi\":{},\"n_k\":{},\"ks\":{}}}",
+                "\"{}\":{{\"intercept\":{},\"slope\":{},\"se\":{},\"ci_lo\":{},\"ci_hi\":{},\"n_k\":{},\"ks\":[{}]}}",
                 n,
                 f.a,
                 f.b,
@@ -799,7 +799,7 @@ fn cmd_fit() {
                 f.lo,
                 f.hi,
                 f.n_k,
-                format!("[{}]", f.ks.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(","))
+                f.ks.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",")
             ));
             fits.insert(n.clone(), f);
         }
