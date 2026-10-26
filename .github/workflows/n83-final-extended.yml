@@ -1,0 +1,112 @@
+name: N83 extended batched-root Tier 1 finalist holdout
+
+on:
+  push:
+    branches: [codex/n83-final-extended-20261018]
+    paths:
+      - research/n83_final_extended_20261018/dispatch.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n83-final-extended-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  final-extended-stratum:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-final-extended-20261018'
+    strategy:
+      fail-fast: false
+      matrix:
+        stratum: [0, 1]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Replay sealed points choice and dispatch
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          mkdir -p "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}"
+          python3 research/n83_final_extended_20261018/generate_fresh.py > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/fixture-check.json"
+          python3 research/n83_final_extended_20261018/audit_fresh.py > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/exclusion-check.json"
+          python3 -m research.n83_final_extended_20261018.test_arms > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/arms-test.json"
+          python3 -m research.n83_final_extended_20261018.test_preflight > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/preflight-test.json"
+          python3 -m research.n83_final_extended_20261018.test_select > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/selector-test.json"
+          python3 -m research.n83_final_extended_20261018.test_provider_jobs > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/provider-test.json"
+          python3 research/n83_final_extended_20261018/check_dispatch.py > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/dispatch-check.json"
+          mkdir -p "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/k3300-pilot"
+          tar -xzf research/n83_final_extended_20261018/pilots/k3300.tar.gz \
+            -C "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/k3300-pilot"
+          python3 -m research.n83_final_extended_20261018.verify_mid \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/k3300-pilot/n83-k3300-current-pilot-20261018" > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/k3300-pilot-check.json"
+          python3 research/n83_final_extended_20261018/run.py \
+            --preflight --stratum "${{ matrix.stratum }}" \
+            --validated research/n83_final_extended_20261018/upstream_validated.json \
+            --selection research/n83_final_extended_20261018/upstream_selection.json > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/schedule-preflight.json"
+          rustc --version > "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/rustc-version.txt"
+          cargo --version > "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/cargo-version.txt"
+
+      - name: Build and test exact IC and same-point rho producers
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}-target"
+          export CARGO_BUILD_JOBS=2
+          cargo test --release --locked --example koblitz_orbit_dlp_fast > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/ic-example-tests.log" 2>&1
+          cargo test --release --locked --example n83_rho_optimization_eval > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/rho-example-tests.log" 2>&1
+          cargo build --release --locked --example koblitz_orbit_dlp_fast > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/ic-build.log" 2>&1
+          cargo build --release --locked --example n83_rho_optimization_eval > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/rho-build.log" 2>&1
+
+      - name: Run selected extended factor bases with calibrated same-point rho
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}-target"
+          python3 research/n83_final_extended_20261018/run.py \
+            --stratum "${{ matrix.stratum }}" \
+            --validated research/n83_final_extended_20261018/upstream_validated.json \
+            --selection research/n83_final_extended_20261018/upstream_selection.json \
+            --binary "$CARGO_TARGET_DIR/release/examples/koblitz_orbit_dlp_fast" \
+            --rho-binary "$CARGO_TARGET_DIR/release/examples/n83_rho_optimization_eval" \
+            --output "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/results" \
+            2>&1 | tee "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/run.log"
+
+      - name: Independently replay bases relations scalars and resources
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/results" ]; then
+            python3 research/n83_final_extended_20261018/verify.py \
+              "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/results" \
+              --stratum "${{ matrix.stratum }}" \
+              --validated research/n83_final_extended_20261018/upstream_validated.json \
+              --selection research/n83_final_extended_20261018/upstream_selection.json \
+              2>&1 | tee "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/verify.log"
+          fi
+
+      - name: Preserve all raw receipts and failed pairs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-final-extended-stratum-${{ matrix.stratum }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-final-extended-stratum-${{ matrix.stratum }}/
+          if-no-files-found: error
+          retention-days: 14
