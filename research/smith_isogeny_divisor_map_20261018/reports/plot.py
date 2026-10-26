@@ -12,12 +12,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 D = os.path.join(HERE, "..", "data")
 S = json.load(open(os.path.join(D, "summary.json")))
 CF = json.load(open(os.path.join(D, "cost_fit.json")))
-plt.rcParams.update({"font.size": 8, "svg.fonttype": "none"})
+plt.rcParams.update({"font.size": 8, "svg.fonttype": "path"})
 C_PASS, C_SKIP, C_FAIL = "#2a6fbb", "#b9cde6", "#d1495b"
 
 
-def save(fig, name):
-    fig.tight_layout()
+def save(fig, name, rect=None):
+    fig.tight_layout(rect=rect)
     fig.savefig(os.path.join(HERE, name + ".svg"))
     fig.savefig(os.path.join(HERE, name + ".png"), dpi=150)
     plt.close(fig)
@@ -40,11 +40,14 @@ for ax, eng, title in zip(axes, ["w1", "deg6"], ["W1 canonical keys (reduce_deg6
     for i in y:
         ax.text(ps[i] + sk[i] + fl[i] + 8, i, f"{ps[i]}/{fl[i]}/{sk[i]}", va="center", fontsize=6.5)
     ax.set_title(title, fontsize=8)
-    ax.set_xlabel("check instances (pass/fail/skip), q ∈ {7,…,23}, 6 curves per q")
+    ax.set_xlabel("check instances (labels: pass/fail/skip)")
     ax.invert_yaxis()
 axes[0].set_yticks(range(len(checks)), labels)
-axes[0].legend(loc="lower right", fontsize=6.5)
-save(fig, "verify_tallies")
+h, l = axes[0].get_legend_handles_labels()
+fig.legend(h, l, loc="lower center", ncol=3, fontsize=6.5, frameon=False)
+fig.subplots_adjust(bottom=0.2)
+fig.suptitle("T2–T6 summed over q ∈ {7, 11, 13, 17, 19, 23}, 6 curves per q (32 with a plane quartic)", fontsize=8)
+save(fig, "verify_tallies", rect=(0, 0.07, 1, 1))
 
 # Figure 2: Route S funnel per q
 R = S["route_s"]

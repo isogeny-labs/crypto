@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-plt.rcParams.update({"font.size": 7, "svg.fonttype": "none"})
+plt.rcParams.update({"font.size": 7, "svg.fonttype": "path"})
 boxes = [
     ("E0/F_{q³}:\nQ = kG planted,\nG of prime order ℓ", "smith_route_s::\nroute_s"),
     ("H/F_q: w² = h(z),\ndeg 7 (JV m=3,\nr=5, split arm)", "build/fwd/frc +\nCantor: φ =\n(1+Fr+Fr²)∘π0*"),
