@@ -37,6 +37,12 @@ decision log.
   The all-21 search can now use complete `n-1` and discriminant features;
   its best structural conjunction still has three tests. P-521 `n+1`
   retains a 125-digit composite and the full `n+1` family stays disabled.
+- **Observed:** an [exact native SEA-feature replay](../research/nist_skip_criterion_20261025/sea_replay_20261026/REPORT.md)
+  matches all 21 recorded bounds. A uniform preference for a larger bound
+  fails on P-256 (published191, skipped211); the reverse fails on P-224
+  (published257, skipped139/179/233). The proxy includes ramified primes
+  and omits Atkin information. No new p-value, measured SEA cost or
+  historical interpretation is admitted.
 - **Derived or proved:** primality and product checks certify the recorded
   factorizations; generator and Hasse checks certify the six prime full
   orders. These are computational checks, without Lean formalization.

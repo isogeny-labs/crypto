@@ -68,6 +68,26 @@ a common skipped-curve weakness. Auxiliary-input and twist attacks require
 their actual protocol preconditions; factoring these integers is not an
 ordinary-input ECDLP attack.
 
+An [exact native replay of the recorded SEA coverage feature](../sea_replay_20261026/REPORT.md)
+matches all 21 values, with fixed arithmetic controls and byte-identical
+fresh-process outputs. The metric includes ramified primes, omits 2 and
+ignores Atkin information; it is a coverage proxy, not measured SEA cost.
+A uniform preference for larger bounds fails on P-256: published 191 versus
+skipped 211. The reverse preference fails on P-224: published 257 versus
+skipped 139, 179 and 233. These are exact counterexamples for this metric;
+no new unusualness claim or p-value is admitted.
+
+The earlier PDF and raw archive remain byte-identical. Six existing study
+payloads were subsequently uploaded, remotely verified and downloaded for
+SHA-256 checking; the [delivery record](../ARTIFACT_DELIVERY.json) documents
+the resolved upload obstruction. This report adds a dated comparison and
+separate run reports. The initial fit and calibration graphs remain frozen;
+the new coverage and full-cohort trait graphs show the changed evidence.
+Canonical attack-cost and IC leaderboard figures receive no new verified
+attack or performance value and remain unchanged.
+
+![Replayed SEA coverage values, with every control retained](../sea_replay_20261026/reports/coverage.svg)
+
 ## Updated comparison
 
 The unchanged feature and rule-search programs were replayed over all 21
@@ -151,6 +171,14 @@ full S3 GET and all 108 member hashes. A four-thread continuation reuses
 that pool and tries native filtering with an adaptive threshold. It remains
 an active factoring attempt, not a complete result.
 
+The later [running-progress snapshot002](reports/run-yafu-nfs-014-progress-002/REPORT.md)
+preserves the native pool whose filter reported 17,831,805 raw relations
+and 14,715,396 unique relations after duplicate removal. Its full S3 GET,
+internal manifest and all 21 listed file hashes
+[verified](evidence/backend-progress-002-delivery.json). This is an immutable
+resume copy of an active run, without a final exit status or factorization
+result. The previous snapshot and closed archives remain unchanged.
+
 The local host has a four-core CPU quota and 16 GiB memory. Configured
 thread limits are not measured CPU accounting. Backend timing diagnostics
 are preserved but are not performance comparisons or cost estimates.
@@ -179,12 +207,3 @@ passes its nine methods using fake execution boundaries; no named cohort
 order has executed. A real frozen cohort trial and its admission remain pending.
 It remains an untested software hypothesis for this cohort, without an
 original-caller link or an explanation established by this factorization work.
-
-The earlier PDF and raw archive remain byte-identical. Six existing study
-payloads were subsequently uploaded, remotely verified and downloaded for
-SHA-256 checking; the [delivery record](../ARTIFACT_DELIVERY.json) documents
-the resolved upload obstruction. This report adds a dated comparison and
-separate run reports. The initial fit and calibration graphs remain frozen;
-the new coverage and full-cohort trait graphs show the changed evidence.
-Canonical attack-cost and IC leaderboard figures receive no new verified
-attack or performance value and remain unchanged.

@@ -4,6 +4,7 @@ import html
 import json
 import posixpath
 import re
+import sys
 from pathlib import Path
 
 import fitz
@@ -35,74 +36,75 @@ def save_plot(fig, target):
     p.write_text('\n'.join(line.rstrip() for line in p.read_text().splitlines()) + '\n')
 
 
-coverage = json.loads((ROOT / 'results/factor-summary.json').read_text())
-families = ['minus', 'plus', 'twist', 'disc']
-fig, ax = plt.subplots(figsize=(8, 2.6), layout='constrained')
-values = [coverage['complete_by_family'][name] for name in families]
-ax.barh(['n-1', 'n+1', 'Twist', 'Discriminant'], values, color=[INK, GOLD, INK, INK], height=.6)
-for y, value in enumerate(values):
-    ax.text(value + .2, y, str(value) + ' / 21', va='center')
-ax.invert_yaxis()
-ax.set_xlim(0, 24)
-ax.set_xticks([0, 7, 14, 21])
-ax.set_xlabel('Proved complete factorizations (21 curves per family)')
-ax.set_title('Native coverage: ' + str(coverage['complete_and_proven']) + ' of 84 targets proved complete',
-             loc='left', weight='bold')
-ax.spines[['top', 'right', 'left']].set_visible(False)
-save_plot(fig, OUT / 'factor-coverage')
+if "--documents-only" not in sys.argv:
+    coverage = json.loads((ROOT / 'results/factor-summary.json').read_text())
+    families = ['minus', 'plus', 'twist', 'disc']
+    fig, ax = plt.subplots(figsize=(8, 2.6), layout='constrained')
+    values = [coverage['complete_by_family'][name] for name in families]
+    ax.barh(['n-1', 'n+1', 'Twist', 'Discriminant'], values, color=[INK, GOLD, INK, INK], height=.6)
+    for y, value in enumerate(values):
+        ax.text(value + .2, y, str(value) + ' / 21', va='center')
+    ax.invert_yaxis()
+    ax.set_xlim(0, 24)
+    ax.set_xticks([0, 7, 14, 21])
+    ax.set_xlabel('Proved complete factorizations (21 curves per family)')
+    ax.set_title('Native coverage: ' + str(coverage['complete_and_proven']) + ' of 84 targets proved complete',
+                 loc='left', weight='bold')
+    ax.spines[['top', 'right', 'left']].set_visible(False)
+    save_plot(fig, OUT / 'factor-coverage')
 
-rows = list(csv.DictReader((ROOT / 'results/cohort-factor-bits.tsv').open(), delimiter='\t'))
-labels = list(dict.fromkeys(row['label'] for row in rows))
-by_key = {(row['label'], row['target']): row for row in rows}
-matrix = [[float(by_key[label, kind]['largest_per_field_permille'])
-           if by_key[label, kind]['complete'] == 'true' else float('nan')
-           for kind in families] for label in labels]
-fig, ax = plt.subplots(figsize=(8, 6.8), layout='constrained')
-cmap = plt.colormaps['Blues'].copy()
-cmap.set_bad('#E8E8E8')
-im = ax.imshow(np.ma.masked_invalid(matrix), cmap=cmap, vmin=0, vmax=1050, aspect='auto')
-ax.set_xticks(range(4), ['n-1', 'n+1', 'Twist', '|t²-4p|'])
-ax.set_yticks(range(len(labels)), [label + ('  P' if by_key[label, 'minus']['role'] == 'published' else '  S')
-                                 for label in labels], fontsize=9)
-for i, label in enumerate(labels):
-    for j, kind in enumerate(families):
-        row = by_key[label, kind]
-        text = row['largest_prime_bits']
-        color = 'white' if row['complete'] == 'true' and int(row['largest_per_field_permille']) > 650 else INK
-        ax.text(j, i, text, ha='center', va='center', fontsize=10, color=color)
-ax.set_title('Largest proved prime factor in each integer (bits)', loc='left', weight='bold', pad=12)
-ax.tick_params(length=0)
-ax.spines[:].set_visible(False)
-bar = fig.colorbar(im, ax=ax, fraction=.035, pad=.025)
-bar.set_label('Native recorded size / field bits (permille, rounded down)')
-fig.get_layout_engine().set(rect=(0, .045, 1, .955))
-fig.text(.5, .012, 'P = published; S = skipped. All 21 rows retained. NA = incomplete; no numeric substitution.',
-         ha='center', fontsize=8)
-save_plot(fig, OUT / 'cohort-factor-bits')
+    rows = list(csv.DictReader((ROOT / 'results/cohort-factor-bits.tsv').open(), delimiter='\t'))
+    labels = list(dict.fromkeys(row['label'] for row in rows))
+    by_key = {(row['label'], row['target']): row for row in rows}
+    matrix = [[float(by_key[label, kind]['largest_per_field_permille'])
+               if by_key[label, kind]['complete'] == 'true' else float('nan')
+               for kind in families] for label in labels]
+    fig, ax = plt.subplots(figsize=(8, 6.8), layout='constrained')
+    cmap = plt.colormaps['Blues'].copy()
+    cmap.set_bad('#E8E8E8')
+    im = ax.imshow(np.ma.masked_invalid(matrix), cmap=cmap, vmin=0, vmax=1050, aspect='auto')
+    ax.set_xticks(range(4), ['n-1', 'n+1', 'Twist', '|t²-4p|'])
+    ax.set_yticks(range(len(labels)), [label + ('  P' if by_key[label, 'minus']['role'] == 'published' else '  S')
+                                     for label in labels], fontsize=9)
+    for i, label in enumerate(labels):
+        for j, kind in enumerate(families):
+            row = by_key[label, kind]
+            text = row['largest_prime_bits']
+            color = 'white' if row['complete'] == 'true' and int(row['largest_per_field_permille']) > 650 else INK
+            ax.text(j, i, text, ha='center', va='center', fontsize=10, color=color)
+    ax.set_title('Largest proved prime factor in each integer (bits)', loc='left', weight='bold', pad=12)
+    ax.tick_params(length=0)
+    ax.spines[:].set_visible(False)
+    bar = fig.colorbar(im, ax=ax, fraction=.035, pad=.025)
+    bar.set_label('Native recorded size / field bits (permille, rounded down)')
+    fig.get_layout_engine().set(rect=(0, .045, 1, .955))
+    fig.text(.5, .012, 'P = published; S = skipped. All 21 rows retained. NA = incomplete; no numeric substitution.',
+             ha='center', fontsize=8)
+    save_plot(fig, OUT / 'cohort-factor-bits')
 
-baseline = json.loads((ROOT.parent / 'results/extended-generation.json').read_text())
-updated = json.loads((ROOT / 'results/full21-generation-summary.json').read_text())
-calibration_values = [baseline['short_rule_search_as_good_count'], updated['short_rule_search_as_good_count']]
-fig, ax = plt.subplots(figsize=(8, 2.5), layout='constrained')
-ax.barh(['Initial 1,100 features', 'Updated 1,118 features'], calibration_values,
-        color=['#798B96', INK], height=.55)
-for i, value in enumerate(calibration_values):
-    ax.text(value + 35, i, str(value) + ' / 4,480', va='center')
-ax.invert_yaxis()
-ax.set_xlim(0, 4480)
-ax.set_xlabel('Enumerated grouped label assignments admitting an exact 1–2-test fit')
-ax.set_title('Generation-family calibration on all 21 curves', loc='left', weight='bold')
-ax.spines[['top', 'right', 'left']].set_visible(False)
-save_plot(fig, OUT / 'generation-calibration')
-(OUT / 'graph-source.json').write_text(json.dumps({
-    'kind': 'recorded-native-values-only/v1',
-    'factor_coverage_source': '../results/factor-summary.json',
-    'factor_bits_source': '../results/cohort-factor-bits.tsv',
-    'generation_calibration_sources': ['../../results/extended-generation.json', '../results/full21-generation-summary.json'],
-    'generation_calibration_recorded_counts': calibration_values,
-    'population': 'All 21 curves; all 4,480 grouped label assignments',
-    'uncertainty': 'Exact finite counts; exchangeability is a model assumption, not evidence of historical use'
-}, indent=2) + '\n')
+    baseline = json.loads((ROOT.parent / 'results/extended-generation.json').read_text())
+    updated = json.loads((ROOT / 'results/full21-generation-summary.json').read_text())
+    calibration_values = [baseline['short_rule_search_as_good_count'], updated['short_rule_search_as_good_count']]
+    fig, ax = plt.subplots(figsize=(8, 2.5), layout='constrained')
+    ax.barh([f"Initial {baseline['features_per_row']:,} features", f"Updated {updated['features_per_row']:,} features"], calibration_values,
+            color=['#798B96', INK], height=.55)
+    for i, value in enumerate(calibration_values):
+        ax.text(value + 35, i, str(value) + ' / 4,480', va='center')
+    ax.invert_yaxis()
+    ax.set_xlim(0, 4480)
+    ax.set_xlabel('Enumerated grouped label assignments admitting an exact 1–2-test fit')
+    ax.set_title('Generation-family calibration on all 21 curves', loc='left', weight='bold')
+    ax.spines[['top', 'right', 'left']].set_visible(False)
+    save_plot(fig, OUT / 'generation-calibration')
+    (OUT / 'graph-source.json').write_text(json.dumps({
+        'kind': 'recorded-native-values-only/v1',
+        'factor_coverage_source': '../results/factor-summary.json',
+        'factor_bits_source': '../results/cohort-factor-bits.tsv',
+        'generation_calibration_sources': ['../../results/extended-generation.json', '../results/full21-generation-summary.json'],
+        'generation_calibration_recorded_counts': calibration_values,
+        'population': 'All 21 curves; all 4,480 grouped label assignments',
+        'uncertainty': 'Exact finite counts; exchangeability is a model assumption, not evidence of historical use'
+    }, indent=2) + '\n')
 
 
 def run_visual(spec_path):
@@ -235,7 +237,7 @@ def render(source, attachments=()):
     if attachments:
         pdf = fitz.open(output)
         for file in attachments:
-            pdf.embfile_add(file.name, file.read_bytes(), filename=file.name, desc=str(file.relative_to(ROOT)))
+            pdf.embfile_add(file.name, file.read_bytes(), filename=file.name, desc=posixpath.relpath(file, ROOT))
         temp = output.with_name('REPORT-attached.pdf')
         pdf.save(temp, deflate=True)
         pdf.close()
@@ -247,7 +249,11 @@ render(ROOT / 'REPORT.md', [ROOT / 'evidence/closed-runs.tar.xz', ROOT / 'result
                             ROOT / 'evidence/backend-progress-001-delivery.json',
                             ROOT / 'results/completed-targets-hex.md', ROOT / 'results/curve-13-plus.json',
                             ROOT / 'results/curve-19-disc.json', ROOT / 'results/curve-20-minus.json',
-                            ROOT / 'results/p521-plus-partial.json'])
+                            ROOT / 'results/p521-plus-partial.json',
+                            ROOT / 'evidence/backend-manifest-002.json',
+                            ROOT / 'evidence/backend-progress-002-delivery.json',
+                            ROOT.parent / 'sea_replay_20261026/results/coverage.tsv',
+                            ROOT.parent / 'sea_replay_20261026/evidence/replay-001.tar.xz'])
 for source in sorted(OUT.glob('run-*/REPORT.md')):
     if not source.with_suffix('.pdf').exists():
         render(source)

@@ -32,6 +32,11 @@ descriptive table; no control is omitted. The unchanged search replay on
 1,118 features retains a three-test structural separator and a two-test
 generation separator. Neither is established as the historical selector.
 
+The separate [SEA feature replay](../sea_replay_20261026/REPORT.md) matches
+all 21 recorded coverage values and supplies exact P-256/P-224
+counterexamples to uniform preferences for larger or smaller bounds.
+It adds no p-value, point-counting cost or historical-selection claim.
+
 ## Native methods and evidence
 
 [FACTORING_PROTOCOL.md](FACTORING_PROTOCOL.md) specifies follow-on methods,
@@ -84,3 +89,12 @@ artifact tool, then unpack each archive into this follow-up directory.
 The run reports' `runs/...` references are extracted archive locations.
 New active raw directories remain visible to checkpoints until archived;
 only the proved immutable closed records are ignored in Git.
+
+The later `backend-progress-002.tar.zst` is a running snapshot, taken during
+GNFS014 filtering with no active siever children. It includes the pool whose
+native filter reported17,831,805 raw and14,715,396 unique relations. Its
+`runs/backend-manifest-002.json`, [21-file manifest](evidence/backend-manifest-002.json)
+and [full readback receipt](evidence/backend-progress-002-delivery.json) bind
+that exact resume copy. Unpack with `tar --zstd -xf`. It is not a closed run
+or a complete factorization. The active014 directory remains unignored;
+a future final archive must preserve its later work separately.

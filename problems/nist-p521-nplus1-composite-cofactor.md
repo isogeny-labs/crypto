@@ -32,6 +32,11 @@ stays unavailable across the cohort rather than dropping this control.
   passed a full S3 download and all 108 member hashes. Run014 reuses that
   pool with four threads and adaptive filtering. A running job or relation
   pool is not a complete factorization.
+- **Observed:** [snapshot002](../research/nist_skip_criterion_20261025/factor_followup_20261026/evidence/backend-progress-002-delivery.json)
+  preserves the running pool whose native filter reported17,831,805 raw
+  and14,715,396 unique relations. A full S3 GET, internal manifest and all
+  21 listed file hashes verified. This remains an active-run snapshot,
+  without a final factorization result or exit status.
 - **Derived or proved:** the partial product and known primes are checked;
   the remaining integer is composite. No complete prime factorization of
   this residual is admitted.

@@ -23,6 +23,7 @@ No active curve registry, solver or benchmark is changed.
 | Current PDF and full evidence bundle | Built, inspected and delivered locally |
 | Artifact-store delivery | Upload and full-object read-back verified; see the [delivery record](ARTIFACT_DELIVERY.json) |
 | Four remaining factorizations | Three independently proved complete; P-521 `n+1` remains incomplete; see the [follow-up](factor_followup_20261026/README.md) |
+| Exact SEA coverage replay | All21 values match; uniform larger/smaller preferences have counterexamples; see the [replay](sea_replay_20261026/README.md) |
 
 ## Reproduce the native checks
 
