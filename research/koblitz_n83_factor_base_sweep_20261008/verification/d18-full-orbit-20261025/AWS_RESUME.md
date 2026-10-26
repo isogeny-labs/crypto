@@ -334,5 +334,21 @@ was held. The [exit-policy amendment](native-cadence-replay-20261026/EXIT_POLICY
 uses `time -p` with an explicit terminal exit-0 gate for a fresh rerun.
 Attempt 6 has a newly verified full-object GET, but its current host load
 remains above the frozen launch maximum; no attempt-6 worker was launched
-at this handoff update. The verifier's terminal path also needs an explicit
-exit-code check in code; its cap path already checks exit 124.
+at this handoff update. The verifier's terminal path now explicitly requires
+exit 0; its five focused tests pass, and it rejects attempt 5's actual exit 1.
+
+Two subsequent [no-source Spot capacity smokes](native-cadence-replay-20261026/spot-capacity-smoke-20261026/REPORT.md)
+ran through the deployed `ephemeral` account: `t3.small` and `c7i.2xlarge`
+each executed a marker command, uploaded the expected S3 output with exit 0,
+and reached EC2 `terminated` state. The larger host reported 8 logical CPUs
+and 15 GiB memory, above the constructed worker's 4,769,202,176-byte peak
+RSS. This establishes a live Spot admission and cleanup route in that account,
+not endurance under a 2,400-second solver query. The runner's original-D18
+manifest read still returned `403` at the last exact check; the reviewed
+two-sided bucket/runner-role grant is unapplied pending authorization.
+On-Demand remains denied by `SpotOnlyEC2Launch`, and a Spot interruption would
+censor the current no-checkpoint worker. The [Linux Spot protocol](native-cadence-replay-20261026/LINUX_SPOT_PROTOCOL.md)
+is now frozen as a plan; no Linux cryptographic arm has run. Before a hosted
+timing run, get/read back the exact S3 permission, verify both original S3
+objects on the worker, seal the per-job source/binary/host launch lock, then
+apply the positive exit-0 and separate replay gates before natural.
