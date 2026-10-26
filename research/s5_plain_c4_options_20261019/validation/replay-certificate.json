@@ -7,7 +7,7 @@
   "source_commit": "ca88b39179601525bf52d1a7ccac0580dc470aa5",
   "binary": "target/release/examples/gaudry_quartic_c4_options",
   "rustc": "rustc 1.93.1 (01f6ddf75 2026-02-11) (Homebrew)",
-  "compared": "every counted phase of every solve (wall times excluded), the solver decomposition set, the oracle set and their agreement",
+  "compared": "S5 runs: every counted phase of every solve (wall times excluded), the solver decomposition set, the oracle set and their agreement. Rho reference: group and subgroup order, and every run's steps, group operations, F_p multiplications, look-aheads, restarts and verified logarithm.",
   "runs": [
     {
       "run": "s5_p269_seed1_r13",
@@ -41,6 +41,15 @@
       "committed": "research/s5_plain_c4_options_20261019/raw/generic_d4-7.json",
       "replay": "research/s5_plain_c4_options_20261019/validation/replay/generic_d4-7.json",
       "solves": 12,
+      "identical": true,
+      "scalars_verified": true,
+      "group_replay": true
+    },
+    {
+      "run": "rho_reference",
+      "committed": "research/s5_plain_c4_options_20261019/validation/rho_reference.json",
+      "replay": "research/s5_plain_c4_options_20261019/validation/replay/rho_reference.json",
+      "solves": 20,
       "identical": true,
       "scalars_verified": true,
       "group_replay": true

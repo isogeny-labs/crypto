@@ -35,6 +35,9 @@ run s5_p269_seed1 --p 269 --seed 1 --residuals 4 \
 run s5_p269_seed1_constructed4_replay --p 269 --seed 1 --residuals 4 --constructed 4 \
   --arms sparsest+chains+replay
 run generic_d4-7 --generic 4,5,6,7 --arms committed,sparsest,sparsest+chains
+if [ ! -s "$OUT/rho_reference.json" ]; then
+  "$BIN" --p 269 --seed 1 --rho 20 --json "$OUT/rho_reference.json" > "$OUT/rho_reference.log" 2>&1
+fi
 
 # Per-solve comparison: everything the run records except wall time.
 KEYS='{index: .index, arm: .arm, s: (.solve | del(.build_ms, .echelon_ms, .nf_ms, .charpoly_ms, .eigen_ms, .total_ms)), q: .solver_quadruples, agree: .agree}'
@@ -66,8 +69,24 @@ cmp_generic() {
     group_replay: ($a == $b)
   }'
 }
-runs=$( { cmp_s5 s5_p269_seed1_r13; cmp_s5 s5_p269_seed1; cmp_s5 s5_p269_seed1_constructed4_replay; cmp_generic; } | jq -s .)
-commit=$(git rev-parse HEAD)
+# The rho reference: every run's counts and the recovered, verified logarithm.
+cmp_rho() {
+  local a b
+  a=$(jq -c '{group_order, subgroup_order, cofactor, setup_fp_muls, runs: [.runs[] | {seed, steps, group_ops, fp_muls, fruitless_lookaheads, restarts, verified}]}' "$S/validation/rho_reference.json")
+  b=$(jq -c '{group_order, subgroup_order, cofactor, setup_fp_muls, runs: [.runs[] | {seed, steps, group_ops, fp_muls, fruitless_lookaheads, restarts, verified}]}' "$OUT/rho_reference.json")
+  jq -n --argjson a "$a" --argjson b "$b" '{
+    run: "rho_reference",
+    committed: "research/s5_plain_c4_options_20261019/validation/rho_reference.json",
+    replay: "research/s5_plain_c4_options_20261019/validation/replay/rho_reference.json",
+    solves: ($a.runs | length),
+    identical: ($a == $b),
+    scalars_verified: (($a == $b) and ($b.runs | all(.verified))),
+    group_replay: ($a == $b)
+  }'
+}
+runs=$( { cmp_s5 s5_p269_seed1_r13; cmp_s5 s5_p269_seed1; cmp_s5 s5_p269_seed1_constructed4_replay; cmp_generic; cmp_rho; } | jq -s .)
+# The commit the replay binary was built from (default: HEAD).
+commit=${SOURCE_COMMIT:-$(git rev-parse HEAD)}
 jq -n --argjson runs "$runs" --arg commit "$commit" --arg bin "$BIN" --arg rustc "$(rustc --version)" '{
   schema: "s5-plain-c4-replay/v1",
   status: (if ($runs | all(.identical and .scalars_verified)) then "verified" else "failed" end),
@@ -77,6 +96,6 @@ jq -n --argjson runs "$runs" --arg commit "$commit" --arg bin "$BIN" --arg rustc
   source_commit: $commit,
   binary: $bin,
   rustc: $rustc,
-  compared: "every counted phase of every solve (wall times excluded), the solver decomposition set, the oracle set and their agreement",
+  compared: "S5 runs: every counted phase of every solve (wall times excluded), the solver decomposition set, the oracle set and their agreement. Rho reference: group and subgroup order, and every run'"'"'s steps, group operations, F_p multiplications, look-aheads, restarts and verified logarithm.",
   runs: $runs
 }'

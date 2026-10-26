@@ -158,6 +158,61 @@ Four random planted equations of degree `d` in four unknowns, as
 The chain step's saving grows with `d`\; `S₅` sits on the generic trend,
 as §11.17 found for the committed solver.
 
+== Validation (benchmarks gate, `docs/VALIDATION_GATE.md`)
+<validation-benchmarks-gate-docsvalidation_gate.md>
+The benchmarks row's `VALIDATION.json`
+(`benchmarks/20261019-s5-plain-c4-options/`) pins three artifacts, all
+in #link("validation/")[`validation/`]:
+
+- #strong[Replay certificate] (`replay-certificate.json`, `replay.sh`).
+  Every recorded run was re-run from a fresh release build of the
+  committed source (`ca88b3917`) as new processes. That covers the
+  13-residual run, the 4-arm ablation, the constructed replay check, the
+  generic panel and the 20 rho runs. jq, not the runner, compared each
+  replay with the committed records: every counted phase, the
+  decomposition and oracle sets and their agreement, and each rho run's
+  counts and verified logarithm. #strong[All 91 solves are identical.]
+  Independence means a new build, new processes and a separate
+  comparator on the same host. It was not a second machine.
+- #strong[Validator report] (`validator-report.json`, `validate.sh`).
+  The row's headline numbers, the rho means and the band values are
+  recomputed from the raw records with jq, which shares no code with the
+  Rust summary that produced them. All 17 match.
+- #strong[Rho reference] (`rho_reference.json`, `curve_info.json`). It
+  was #strong[chosen after the measurement, to meet the gate]: the study
+  registered no rho reference, because it measures one stage. §11.16's
+  thread reference is plain r-adding rho (S ≈ 1.3). This uses the
+  stricter one:
+  - #strong[What ran:] a one-target #strong[negation-map] rho on
+    §11.17's own curve, counted in the same unit (`F_p` multiplications)
+    by the same runner and `Fp4` counters as `C₄`.
+  - #strong[Subgroup:]
+    `#E(F_{269⁴}) = 5,236,052,031 = 189 · 27,703,979`. The runs are in
+    the prime subgroup of order `ℓ = 27,703,979` (2^24.72).
+  - #strong[Result:] 20 solves, all logarithms verified, mean
+    `7.736·10⁵` `F_p` multiplications. The mean S of 1.47 includes the
+    walk's 32 precomputed multipliers, a large share at this size.
+  - #strong[Strongest symmetry:] `j(E) ∉ F_{p²}` and `a, b ≠ 0`, so no
+    Frobenius fold applies and there are no extra automorphisms.
+    Negation is the strongest symmetry this curve has.
+  - #strong[Same binary:] the `C₄` records come from the original build.
+    The `ca88b3917` build that ran rho reproduced every `C₄` count
+    exactly.
+- #strong[§5a band.] Rho's unpriced native work is counted from its
+  records: per step one table lookup, one insert and one partition hash,
+  and per walk attempt one canonicalisation and one hash. That is
+  `5·steps + 2·look-aheads`, a mean of 25,931 operations per run. Priced
+  at w group-addition equivalents of 97 `F_p` multiplications each, rho
+  costs `7.74·10⁵`, `1.03·10⁶` and `3.29·10⁶` at w = 0, 0.1 and 1. The
+  IC side is a lower bound: one measured decomposition,
+  `C₄ = 8.69·10¹⁰`, without the other decompositions, the linear algebra
+  or any unpriced work, whose counters this solver does not emit. Rho is
+  cheaper at every point of the band, by `2.6·10⁴×` even at w = 1.
+
+This row is a solver-stage improvement. The rho reference measures the
+distance remaining, not a comparison the row claims to win: at `p = 269`
+a single plain-`S₅` decomposition costs about `10⁵×` a whole rho solve.
+
 == What changed in the cost model
 <what-changed-in-the-cost-model>
 - `extension_measured_solve_mults`: `(4, 1.227e12)` → `(4, 8.69e10)`,

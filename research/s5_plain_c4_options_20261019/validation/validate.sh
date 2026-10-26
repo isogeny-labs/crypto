@@ -44,8 +44,19 @@ recompute=$(jq -n --slurpfile r13 "$R13" --slurpfile r4 "$R4" --slurpfile con "$
       solves_oracle_equal: ($all | map(select(.agree)) | length),
       solves_total: ($all | length),
       constructed_planted_found: ([$con[0].residuals[] | . as $r | .arms[] | select(.solver_quadruples | index([$r.planted])) ] | length),
-      rho_mean_fp_muls: $rho[0].mean_fp_muls,
-      rho_runs_verified: ($rho[0].runs | map(select(.verified)) | length)
+      rho_mean_fp_muls: ($rho[0].runs | mean(.fp_muls)),
+      rho_runs_verified: ($rho[0].runs | map(select(.verified)) | length),
+      fp_muls_per_add: $r13[0].fp_muls_per_add,
+      # Unpriced native operations of a rho run: per step one table lookup,
+      # one insert and one partition hash; per walk attempt (steps plus
+      # look-aheads) one canonicalisation and one hash.
+      rho_native_ops_mean: ($rho[0].runs | mean(5 * .steps + 2 * .fruitless_lookaheads))
+    }
+  | . + {
+      band_ic_lower_bound: .replay_mean_c4,
+      band_rho_w0: .rho_mean_fp_muls,
+      band_rho_w01: (.rho_mean_fp_muls + 0.1 * .fp_muls_per_add * .rho_native_ops_mean),
+      band_rho_w1: (.rho_mean_fp_muls + 1 * .fp_muls_per_add * .rho_native_ops_mean)
     }')
 
 claim() { # name claimed recomputed-key rel_tol
@@ -64,6 +75,12 @@ $(claim sparsest_ratio_of_means 3.93 sparsest_ratio_of_means 2e-3)
 $(claim solves_oracle_equal 59 solves_oracle_equal 0)
 $(claim solves_total 59 solves_total 0)
 $(claim constructed_planted_found 4 constructed_planted_found 0)
+$(claim rho_mean_fp_muls 773556.2 rho_mean_fp_muls 1e-9)
+$(claim rho_runs_verified 20 rho_runs_verified 0)
+$(claim band_ic_lower_bound 86897990971.75 band_ic_lower_bound 1e-9)
+$(claim band_rho_w0 773556.2 band_rho_w0 1e-9)
+$(claim band_rho_w01 1025086.9 band_rho_w01 1e-9)
+$(claim band_rho_w1 3288863.2 band_rho_w1 1e-9)
 EOF
 )
 
