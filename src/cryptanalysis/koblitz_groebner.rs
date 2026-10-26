@@ -5934,11 +5934,10 @@ pub fn gate_first_skips_thread() -> (u64, u64) {
 /// (`research/ic_improve_20261015/05-linear-harvest/`), with the gate
 /// widened in round 3 item 02
 /// (`research/ic_improve3_20261015/02-harvest-gate/`): the default is
-/// [`LINEAR_HARVEST_DEFAULT`] — root only, in solves with fewer than
-/// 0.961 non-zero generators per occurring variable (item 05's gate) **or**
-/// whose root basis has rank ≥ 331 (item 02's frozen size gate, which adds
-/// the large cells where the rebuild is amortised and leaves out the small
-/// over-determined (13,4) m3 system, where it is not).
+/// [`LINEAR_HARVEST_DEFAULT`] — root only, in solves whose root basis has
+/// rank ≥ 331 (item 02's size gate; repair R8 dropped the gpv half, which
+/// regressed against off at the small m = 2 cells; `KIC_LINEAR_HARVEST=r3`
+/// restores item 02's `gpv OR rank` default, [`LINEAR_HARVEST_R3`]).
 /// **Opt out with `KIC_LINEAR_HARVEST=0`**, which restores the
 /// pre-harvest engine exactly (identical counters); `KIC_LINEAR_HARVEST=gpv`
 /// restores item 05's gpv-only gate ([`LINEAR_HARVEST_GPV`]); `every`
@@ -5967,22 +5966,41 @@ pub struct LinearHarvest {
 }
 
 /// The default harvest (also `KIC_LINEAR_HARVEST=1`): root only, gated on
-/// generators per occurring variable `< 0.961` (item 05's frozen θ =
-/// 0.9607) **or** root basis rank `≥ 331` (round 3 item 02's frozen θ), as
-/// `parse_linear_harvest("root,gpv=0.9607,rank=331")` stores it.
+/// root basis rank `>= 331` alone (round 3 item 02's size gate), as
+/// `parse_linear_harvest("root,gpv=0,rank=331")` stores it.
+///
+/// **Repair R8 (2026-10-26).** Round 3 item 02 shipped `gpv < 0.9607 OR rank
+/// >= 331` ([`LINEAR_HARVEST_R3`]).  Against harvest off, the gpv half
+/// regresses at (17,9) m2 and (19,10) m2 (rank < 331), in two paired data
+/// sets: `research/ic_improve3_20261015/02-harvest-gate/runs/fit_test.jsonl`
+/// line 78 (production CPU off/default 0.873 [0.783, 0.974]) and
+/// `research/ic_r8_harvest_default_20261026/` (production word operations
+/// 0.843 and 0.852, CIs excluding 1).  Every cell where the default wins
+/// has rank >= 331, so dropping the gpv half keeps the measured wins and
+/// makes the default counter-identical to off where it lost.
 pub const LINEAR_HARVEST_DEFAULT: LinearHarvest = LinearHarvest {
     max_vars: u32::MAX,
     root_only: true,
     min_free: 0,
-    gpv_below_milli: 961,
+    gpv_below_milli: 0,
     or_occ_at_least: u32::MAX,
     or_rank_at_least: 331,
+};
+
+/// The default shipped by round 3 item 02 (`KIC_LINEAR_HARVEST=r3`):
+/// `gpv < 0.9607 OR rank >= 331`, as
+/// `parse_linear_harvest("root,gpv=0.9607,rank=331")` stores it.  Kept as the
+/// same-binary control for repair R8.
+pub const LINEAR_HARVEST_R3: LinearHarvest = LinearHarvest {
+    gpv_below_milli: 961,
+    ..LINEAR_HARVEST_DEFAULT
 };
 
 /// Item 05's default before round 3 item 02 (`KIC_LINEAR_HARVEST=gpv`):
 /// root only, gated on generators per occurring variable `< 0.961` alone,
 /// as `parse_linear_harvest("root,gpv=0.9607")` stores it.
 pub const LINEAR_HARVEST_GPV: LinearHarvest = LinearHarvest {
+    gpv_below_milli: 961,
     or_rank_at_least: u32::MAX,
     ..LINEAR_HARVEST_DEFAULT
 };
@@ -6022,6 +6040,9 @@ pub fn parse_linear_harvest(spec: &str) -> Option<LinearHarvest> {
     }
     if spec == "gpv" {
         return Some(LINEAR_HARVEST_GPV);
+    }
+    if spec == "r3" {
+        return Some(LINEAR_HARVEST_R3);
     }
     let mut h = LINEAR_HARVEST_EVERY_NODE;
     if spec == "every" {
@@ -8597,6 +8618,7 @@ mod tests {
                 None,
                 Some(LINEAR_HARVEST_DEFAULT),
                 Some(LINEAR_HARVEST_GPV),
+                Some(LINEAR_HARVEST_R3),
                 Some(LINEAR_HARVEST_EVERY_NODE),
                 parse_linear_harvest("root"),
                 parse_linear_harvest("k=2"),
@@ -8626,8 +8648,13 @@ mod tests {
         assert_eq!(parse_linear_harvest("0"), None);
         assert_eq!(parse_linear_harvest("1"), Some(LINEAR_HARVEST_DEFAULT));
         assert_eq!(
-            parse_linear_harvest("root,gpv=0.9607,rank=331"),
+            parse_linear_harvest("root,gpv=0,rank=331"),
             Some(LINEAR_HARVEST_DEFAULT)
+        );
+        assert_eq!(parse_linear_harvest("r3"), Some(LINEAR_HARVEST_R3));
+        assert_eq!(
+            parse_linear_harvest("root,gpv=0.9607,rank=331"),
+            Some(LINEAR_HARVEST_R3)
         );
         assert_eq!(parse_linear_harvest("gpv"), Some(LINEAR_HARVEST_GPV));
         assert_eq!(
