@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   artifacts:
-    runs-on: main
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|artifacts.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|artifacts.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 10
     permissions:
       contents: read
@@ -38,6 +38,8 @@ jobs:
             /tools/artifacts/
             /.artifacts/
             /.github/workflows/
+            /.gitmodules
+            /verification/pqc-assay/
       - name: Tool tests
         run: python3 -m unittest tools/artifacts/test_artifacts.py
       - name: No added or modified file that belongs in the store

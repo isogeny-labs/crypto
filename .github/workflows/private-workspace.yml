@@ -1,14 +1,7 @@
 name: Private workspace startup
 on:
-  pull_request:
-    paths:
-      - '.claude/hooks/session-start.sh'
-      - 'scripts/private-workspace.sh'
-      - 'scripts/test-private-workspace.sh'
-      - 'scripts/test-private-workspace-native.sh'
-      - 'scripts/setup-cloud-environment.sh'
-      - 'scripts/setup-workstation.sh'
-      - '.github/workflows/private-workspace.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -29,7 +22,7 @@ concurrency:
 
 jobs:
   private-startup:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|private-workspace.yml|') && 'experiment' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|private-workspace.yml|') && 'main' || 'main' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|private-workspace.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|private-workspace.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     # Syntax check and offline contract tests; about one second locally.
     timeout-minutes: 10
     steps:
