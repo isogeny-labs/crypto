@@ -577,6 +577,15 @@ in aburan28/crypto-autoresearcher.
   The director's assessment says only whether the run executed as specified
   and the relay was verbatim. What the numbers mean is decided by the
   frontier or core tier under the measurement rules below.
+- **Subagent roster and pins.** The pins live in `.claude/agents/`; the tier
+  decides the model, never the reverse. `executor-mechanical` is Haiku 5.5
+  (effort low); `experiment-director` and `idea-generator` are Sonnet 5.5;
+  `idea-synthesist` is Opus 5.5 (effort high); the independent reviewers
+  `red-team` and `validator` inherit the session model at effort `xhigh`;
+  their breakthrough siblings `red-team-breakthrough` and
+  `validator-breakthrough` are Opus 5.5 at effort `max`. A claimed break,
+  closure, or contradiction is reviewed only by the breakthrough siblings, in
+  their own sessions.
 
 ## Default workflow: open the PR, check in, and land it
 
