@@ -1,15 +1,12 @@
 name: isogeny-performance
 
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   # Run the research campaign on its feature branch even while an unrelated
   # benchmark-index conflict prevents pull_request workflows from starting.
   push:
     branches: ['codex/isogeny-performance-20261014']
-    paths:
-      - 'isogeny_algos/**'
-      - 'research/isogeny_performance_20261014/**'
-      - '.github/workflows/isogeny-performance.yml'
-  pull_request:
     paths:
       - 'isogeny_algos/**'
       - 'research/isogeny_performance_20261014/**'
@@ -40,7 +37,7 @@ jobs:
         # Pull requests run the exact-output smoke on three CPUs; the Intel
         # macOS runner needs about 25 minutes just to build the three binaries,
         # so it joins the full campaign on push and workflow_dispatch only.
-        runner: ${{ fromJSON(github.event_name == 'pull_request' && '["main","ubuntu-24.04-arm","macos-15"]' || '["main","ubuntu-24.04-arm","macos-15","macos-15-intel"]') }}
+        runner: ${{ fromJSON(github.event_name == 'pull_request' && '["ubuntu-latest","ubuntu-24.04-arm","macos-15"]' || '["ubuntu-latest","ubuntu-24.04-arm","macos-15","macos-15-intel"]') }}
     runs-on: ${{ matrix.runner }}
     # Pull requests: build the frozen binaries and check exact outputs and
     # repeatable counts within the routine 25 minute budget. The twenty-run

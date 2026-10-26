@@ -131,6 +131,9 @@ pub struct TrialLine {
 /// enum: the workspace enables serde_json's `arbitrary_precision`, under
 /// which serde's tag buffering turns every number into a map and no `f64`
 /// field parses.
+// A `Line` lives for one parse or one write and is moved straight into a `Vec`;
+// boxing the baseline would add an allocation per line for no saving.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum Line {
     Header(Header),
