@@ -22,6 +22,10 @@
    "path": "research/ic_rho_reference_20260923/analysis.json",
    "sha256": "6fd61dd71a33b8095a00a84582b8a7d2eb08ed2f5bf7145b6e470e4acdf0ae1a"
   },
+  "progress_timeline": {
+   "path": "docs/ic/progress-timeline.json",
+   "sha256": "87999f37f2d5669a4f23fb73dda00766b6778dbc335fb84e2784fd9717a1b882"
+  },
   "koblitz_s20": {
    "path": "research/ic_exponent_20260926/analysis.json",
    "sha256": "744fd51ea01f10466fad482e536a8319348b6b4f9cbf719e454835573e935a0f"
@@ -102,9 +106,17 @@
    "path": "research/la_engines_20261014/summary.json",
    "sha256": "b34650a95c5f106c8302dc5311194d8e1ffb798dff59b2669cda59818712f533"
   },
+  "lazy_members": {
+   "path": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
+   "sha256": "c86743775097e0e17e264d878021e30ce34c9231d572c1b16a679526d208b372"
+  },
   "jv_cover_sparse_fglm": {
    "path": "research/jv_cover_sparse_fglm_20261018/summary.json",
    "sha256": "4217cb1de3458ee8227da4283028fce724aed83505f1d48bb9d9dc7c0637ad5b"
+  },
+  "ic_m2_linear_ladder": {
+   "path": "research/ic_m2_linear_ladder_20261024/fit.json",
+   "sha256": "f69558da047b752ad3a3952ad6680d73fa6984e92b66561717db29e6f8475203"
   },
   "pair_table_setup": {
    "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
@@ -113,6 +125,34 @@
   "planner_validation": {
    "path": "research/ic_planner_validation_20261020/analysis/summary.json",
    "sha256": "c8fb751cea39e55ebd1b322245c95a958ae8b47d393c6b6918abddcd2d4234fc"
+  },
+  "bitop_ladder": {
+   "path": "research/bitop_ladder_20261019/summary.json",
+   "sha256": "c7f5dd2ed72c77d6cca26fc4dfedb2407cdbbfa51c1cdc8079bfba9b8aac638f"
+  },
+  "hec_bitop": {
+   "path": "research/hec_bitop_20261020/analysis/analysis.json",
+   "sha256": "87615d6925b4ed8ecf997b88c84699726feed5c17402f838c126e626e79ab4d9"
+  },
+  "hec_round7_rows": {
+   "path": "experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json",
+   "sha256": "4772cf301a4597008d8c34655bcc111b990ce7900f52ff69672990667eb10d3a"
+  },
+  "hec_round7_fits": {
+   "path": "experiments/hyperelliptic_sparse_solve_r7/fits.json",
+   "sha256": "4953de656e198a89739de987fc405e66ebe7e331218b9465c7447c6faac7f87f"
+  },
+  "s5_c4_component": {
+   "path": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
+   "sha256": "d5ae9560f6cf3cad63430c9dd47962c8723b6cd02d5c4fca7d6bc2ae25e818b4"
+  },
+  "ghs_weak_n4": {
+   "path": "research/quartic_n4_20261019/results/summary_all.json",
+   "sha256": "fd5598a2860d965c8b47ca9163cb1ff101150c3b04690ea208d05d8c87b067e7"
+  },
+  "ghs_weak_n4_primary": {
+   "path": "research/quartic_n4_20261019/results/summary_primary.json",
+   "sha256": "1742d1a6b54f5874325862c7977992e8746c7b46fe7bf57201d1f95e1a3534ac"
   },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -217,6 +257,214 @@
    "rho_step_units_as_built": null
   }
  },
+ "progress": {
+  "source": "docs/ic/progress-timeline.json",
+  "updated": "2026-10-21",
+  "series_id": "ec-cold",
+  "label": "Elliptic curve, whole method, cold, one target",
+  "points": [
+   {
+    "anchor": "#ic-tournament-round-0007",
+    "class": "engineering",
+    "date": "2026-09-16",
+    "detail": "0.7376 of the worker rho's instructions, 95% 0.7066-0.7644. That rho named Frobenius classes by squaring; the control of 2026-09-23 showed it was not a matched reference.",
+    "label": "Tournament round 0007, five Koblitz cells",
+    "reference": "unmatched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0007/REPORT.md",
+    "value": 0.7376
+   },
+   {
+    "anchor": "#ic-tournament-round-0019",
+    "class": "engineering",
+    "date": "2026-09-21",
+    "detail": "0.6751 [0.6298, 0.7265] of the worker rho's instructions on all eight cells; replicated by round 0020 at 0.6629. Same unmatched reference.",
+    "label": "Tournament round 0019, eight cells, strict win promoted",
+    "reference": "unmatched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0019/REPORT.md",
+    "value": 0.6751
+   },
+   {
+    "anchor": "#ic-triple-counted-20260923",
+    "class": "accounting",
+    "date": "2026-09-23",
+    "detail": "The IC arm is above that rho at every cell measured, 1.19x (n59a0) to 2.88x (n43a1). Triple collector with counted sizing, five cells. Class accounting: what the ratios were counted against changed.",
+    "label": "Control: rho given the IC arm's orbit naming",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_triple_counted_20260923/RESULTS.md",
+    "value": 1.192
+   },
+   {
+    "anchor": "#ic-tournament-round-0024",
+    "class": "accounting",
+    "date": "2026-09-28",
+    "detail": "Six of eight panel cells 0.61-0.82 of the matched rho; the strict gate fails at n23a1 (1.126); the whole twelve-cell panel reads 1.380 [0.847, 2.387]. Best cell plotted.",
+    "label": "Tournament round 0024, matched rho, best cell n17a1",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md",
+    "value": 0.609
+   },
+   {
+    "anchor": "#ic-tournament-round-0025",
+    "class": "accounting",
+    "date": "2026-09-29",
+    "detail": "The matched walk run in the IC arm's own single-word arithmetic. Above rho in instructions at every one of twelve cells: 1.36-2.56x on the panel, up to 13.7x past the crossing. The line was stopped on 2026-09-29.",
+    "label": "Tournament round 0025, lean rho, best cell n19a0",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md",
+    "value": 1.356
+   },
+   {
+    "anchor": "#koblitz-descent-20260930",
+    "class": "accounting",
+    "date": "2026-10-01",
+    "detail": "Ledger section 23: with the reusable set-up charged, the method is 4.9-31.6x slower than rho cold across six sizes 2^36.6-2^47.2; 2.0x at 2^38.0 where both arms pay a slow curve construction. Online only it is 8.8-17.5x faster (see the online series).",
+    "label": "Koblitz descent, one target cold, best size 2^38.0",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#koblitz-descent-20260930",
+    "value": 2
+   },
+   {
+    "anchor": "#disjoint-cold-v2-outcome-20261001",
+    "class": "accounting",
+    "date": "2026-10-01",
+    "detail": "Six cells timing-eligible on reserved cores, every paired compact/rho CPU interval above one; the closest, n41/L1,024, reads 1.314 [1.288, 1.359] and would need 23.9% less CPU to match rho. Isolated CPU time, not a counted unit; S unset.",
+    "label": "Orbit-disjoint cold CPU panel, closest cell n41/L1,024",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#disjoint-cold-v2-outcome-20261001",
+    "unit": "isolated CPU time",
+    "value": 1.314
+   },
+   {
+    "anchor": "#lab-ecbench-all",
+    "class": "accounting",
+    "date": "2026-10-03",
+    "detail": "Every ic.pipeline configuration run cold through ecbench against the strong signed-Frobenius rho on the same targets, every phase charged in one unit: 4.30x at r = 2^16 (orbit base, Frobenius MITM m = 2), 129x at r = 2^21; on prime curves 7.70x at 18 bits rising to 40.5x at 24 bits. The reference is 18.5x its floor at this size because its fixed setup dominates, so the ratio flatters the candidate. No method changed; a baseline, not a round.",
+    "label": "ecbench baseline, every candidate: best cell icv1-f2m17-tm101-00378d4e (r = 2^16)",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_all_candidates_20261003/README.md",
+    "unit": "S",
+    "value": 4.3
+   },
+   {
+    "anchor": "#n61-compact-orbit-hosted-20261003",
+    "class": "accounting",
+    "date": "2026-10-03",
+    "detail": "Cold IC/rho median 74.8 (95% 70.0-80.0) against strong rho rung 3 on 256 public one-target workloads, a pinned reserved core on a hosted AMD EPYC 7763 runner with 0 contended samples: the IC process spends a median 22.0 s on reusable setup against rho's 0.30 s. Online only, IC is 14.67x faster (online series). Same-runner replay 256/256; PENDING_INDEPENDENT_VALIDATION.",
+    "label": "n61 compact orbit, one target cold, 256 workloads, hosted isolated",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md",
+    "unit": "isolated wall time",
+    "value": 74.8
+   },
+   {
+    "anchor": "#lab-pair-claw",
+    "class": "accounting",
+    "date": "2026-10-04",
+    "detail": "The four-point signed-Frobenius pair claw with a known-log orbit base (the PR's IC1 PDP4qtable LAnone candidate), run cold through ecbench against the strong signed-Frobenius rho on the same 48 Koblitz targets: 1.85x to 2.96x per curve at its cost-minimising table, 2.20x [1.90, 2.55] pooled; 32.6x [25.3, 41.0] at the PR's own n=83 shape. Flat in r, as a generic method must be. n = 83 itself is not measured.",
+    "label": "Pair claw of cryptanalysis#175, ported into ecbench: best cell icv1-f2m43-tm998717-e2e742b0 (r = 2^32.1)",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_pair_claw_20261003/README.md",
+    "unit": "S",
+    "value": 1.85
+   },
+   {
+    "anchor": "#ic-tool-programme-20261001",
+    "class": "accounting",
+    "date": "2026-10-07",
+    "detail": "Ledger section 23's single-target comparison re-run at the ic tool programme's baseline v3 (main's 995ea207): six sizes 2^36.6-2^47.2, 64 public points and four A/A repeats a size, 408/408 rows checked, every logarithm section 23's. With the reusable set-up charged the index calculus costs 5.2-21.0x rho cold on the same point (section 23: 2.0-31.6x): 5.23x [4.80, 5.72] at 2^36.6, where section 23 read 4.95x. Rho is still faster at every size, and the cold ratio grows as r^0.18. Online only it is 10.2-26.5x faster (online series). It re-measures and changes no algorithm.",
+    "label": "Rule v3: the Koblitz descent at baseline v3, one target cold, closest size 2^36.6",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v3/README.md",
+    "value": 5.226
+   },
+   {
+    "anchor": "#lab-ecbench-all",
+    "class": "accounting",
+    "date": "2026-10-15",
+    "detail": "Orbit factor base (compact-orbit-scan, mitm-frobenius-counted m = 2) with every native priced, paired against the fully priced signed-Frobenius rho on 16 targets x 3 rounds per curve: 1.566 [0.992, 2.347] at the best cell (interval reaches 1; rho-frob heavy-tailed there), 2.96 at n = 13, 3.85 at r = 2^21, 18.2 at r = 2^39; never below 1. Slope of ln ratio 0.165 [0.117, 0.213] per ln r with ln n fitted (model 1/6): constant-only.",
+    "label": "Frobenius-orbit IC, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_frobenius_orbit_vs_rho_20261014/README.md",
+    "unit": "S",
+    "value": 1.566
+   },
+   {
+    "date": "2026-10-15",
+    "value": 68183174.19,
+    "reference": "matched",
+    "unit": "F_p multiplications",
+    "label": "Joux-Vitse (n - 1)-decomposition at n = 5, E(F_{p^5}), complete DLP at p = 31 (ell = 2^24.8), F4 trace replay",
+    "detail": "Native complete DLPs paired with rho on the same target in F_p multiplications: 6.8e7x at p = 31 (6,688 trials, 19 relations), 4.5e7x and 1.8e8x at p = 11; one trial 5.9-9.2e9 flat in p over a 12-rung ladder (p = 11-241), about 25p trials per relation; every trial agrees with a meet-in-the-middle oracle and every answer verified; parity extrapolated at q = 2^58.2 (group 2^291). A reproduction of a published route; no ecbench session (no F_{p^k} instance on main).",
+    "class": "accounting",
+    "anchor": "#rho-parity-ledger",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+   },
+   {
+    "date": "2026-10-20",
+    "value": 1236267.0,
+    "reference": "matched",
+    "unit": "F_p multiplications",
+    "label": "k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)",
+    "detail": "Native complete DLPs paired with rho on the same target: 1.24e6x (p = 61), 1.94e6x (p = 41), 3.39e6x and 5.77e6x (p = 31), 5.2e6x (p = 71), all verified; a sixth arm (p = 41, six-point base) stopped at its 10-hour cap at >= 1.5e7x. Rho's unpriced walk work priced at 0, 0.1, 1 GAE: rho ahead at every weight (4.1e5x best at 1 GAE). Trace replay cuts the test 1.74-1.77x (5.85e7 to 3.3e7). Extrapolated parity n = 2^227 (2^233 without replay). Engineering; no ecbench session (no F_{p^k} instance on main).",
+    "class": "engineering",
+    "anchor": "#rho-parity-ledger",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+   },
+   {
+    "date": "2026-10-16",
+    "value": 55.3677736032,
+    "reference": "matched",
+    "unit": "Tier 1 cloud-instance cold IC / same-point rho online wall",
+    "label": "n83 K1120 five-point cold factor-base holdout, selected ID null",
+    "detail": "On five sealed public points, 25/25 IC and 5/5 same-point rho arms replayed. K1120 mean cold process 119.826 s divided by mean rho online 2.164 s gives 55.368. K1120 saves 2.645 s [2.085, 3.205] against K1152; its 0.401 s advantage over K1104 has interval [-0.236, 1.038], so the frozen selection remains BOUNDED_UNKNOWN. Tier 1 GitHub cloud instance, A/A and topology gates passed.",
+    "class": "engineering",
+    "anchor": "#n83-tier1-cold-20261016",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/n83_e2e_holdout_20261016/RESULT.md"
+   },
+   {
+    "date": "2026-10-17",
+    "value": 19.2149791956,
+    "reference": "matched",
+    "unit": "quotient of incomplete cold GAE lower bounds; diagnostic",
+    "label": "Volcano projected-base control/pilot; best bounded IC cell",
+    "detail": "Projected size-16 MITM on icv1-fp57-t536870914-6cabb0c9, two public one-target attempts, one round, L0/debug. Both IC and rho have unpriced work. The ratio is a quotient of incomplete lower bounds, not a direction-of-cost or speedup claim. Full graph-wide completion and exact representations remain open.",
+    "class": "accounting",
+    "anchor": "#lab-volcano-ic",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json"
+   },
+   {
+    "date": "2026-10-18",
+    "value": 1.272,
+    "reference": "matched",
+    "unit": "S",
+    "label": "Lazy orbit-member index, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)",
+    "detail": "The frozen Frobenius-orbit IC with its pair table's orbit-member index resolved on a hit instead of built for every base point (same table, relations, rank and logarithms: 856/856 run pairs identical). Paired against the fully priced signed-Frobenius rho on 32 targets x 3 rounds per curve: 1.272 [0.770, 1.803] at the best cell (interval includes 1), was 1.566 [0.992, 2.347] with the eager table on other seeds. Against rho-strong the lazy arm is cheaper at n = 13, 17, 19, 29, a tie at n = 31 (0.985 [0.908, 1.062], was 1.221) and above it at n = 23, 37, 41. Eager / lazy 1.12-1.44x on seven curves, 1.014x at n = 41. L0, counts only.",
+    "class": "engineering",
+    "anchor": "#lazy-orbit-members-20261018",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf"
+   },
+   {
+    "anchor": "#ic-tool-programme-20261001",
+    "class": "accounting",
+    "date": "2026-10-20",
+    "detail": "Rule v8: ledger section 23's six sizes (2^36.6-2^47.2, 64 public points and four A/A repeats a size, 408/408 rows checked in each of two runs of one binary) against a matched rho, the signed-Frobenius walk with its canonicalisation batched 16 lanes at a time by GFNI and funnel shifts; the control run, the same binary with rho as at rule v7, reads 3.59-11.56x. With the reusable set-up charged the index calculus costs 4.67-18.07x rho cold: 4.669x [4.34, 5.07] at 2^36.6, 18.07x [15.98, 20.58] at 2^47.2. Rho is still faster at every size. The two rho arms take identical walks on 64/64 targets a size; the index calculus's own online time is the same in both runs (0.976-1.033). The distance to rho is larger than rule v7 reported because rho was unmatched, not because the index calculus slowed; the ln-ln slope is 0.168 (t interval 0.128-0.208; rule v3: 0.176), not distinguishable from v3's. No curve with log2 r >= 50 is runnable by this single-word pipeline. Class: accounting (a corrected reference); the batched rho kernel is engineering; no advance.",
+    "label": "Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md",
+    "value": 4.669
+   },
+   {
+    "anchor": "#lab-planner-validation",
+    "class": "engineering",
+    "date": "2026-10-21",
+    "detail": "ic plan / ic bench --auto (ic-planner/1) checked on six prime curves outside its evidence, each plan against every alternative one change away from it (ecbench, 24 verified runs per arm and curve, audits OK). Best cold one-target cell on a registered curve: icv1-fp24-tm5099-a6f137c6 (log2 r 24.00), S(plan)/S(rho.negation) 14.39 [11.63, 18.45], planner prediction 12.23. Rho is cheaper on all six curves (12.6-25.8x). At w = 0 every alternative costs more than the plan; the doubled base is not separated across the band (below 1 at w = 1). Tooling validation: the plan is the existing best recipe chosen automatically; no advance, no leaderboard row moves.",
+    "label": "Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md",
+    "value": 14.39
+   }
+  ]
+ },
  "leaders": {
   "prime": {
    "slug": "icv1-fp12-t19-d4a315df",
@@ -309,7 +557,9 @@
      "ratio_rho": 6.33838293956,
      "ratio_floor": 25.7824480373,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 655.494435667,
+     "log2_total_gae": 9.35643972359
     },
     {
      "variant": "mitm_m3_negfold",
@@ -332,7 +582,9 @@
      "ratio_rho": 6.63378272683,
      "ratio_floor": 26.9840367923,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 686.043697,
+     "log2_total_gae": 9.4221566604
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -355,7 +607,9 @@
      "ratio_rho": 7.19090324255,
      "ratio_floor": 29.2502190164,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 743.659243667,
+     "log2_total_gae": 9.53849789701
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -378,7 +632,9 @@
      "ratio_rho": 7.29910011604,
      "ratio_floor": 29.690328157,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 754.848603667,
+     "log2_total_gae": 9.56004350886
     },
     {
      "variant": "mitm_m3",
@@ -401,7 +657,9 @@
      "ratio_rho": 9.10920577276,
      "ratio_floor": 37.0532400355,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 942.043697,
+     "log2_total_gae": 9.87965017104
     },
     {
      "variant": "mitm_m2_negfold",
@@ -424,7 +682,9 @@
      "ratio_rho": 10.1902970475,
      "ratio_floor": 41.450762224,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1053.846553,
+     "log2_total_gae": 10.041449101
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -447,7 +707,9 @@
      "ratio_rho": 10.5892773699,
      "ratio_floor": 43.0736823798,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1095.107768,
+     "log2_total_gae": 10.096857135
     },
     {
      "variant": "mitm_m2",
@@ -470,7 +732,9 @@
      "ratio_rho": 12.6657200935,
      "ratio_floor": 51.5199654672,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1309.846553,
+     "log2_total_gae": 10.3551820963
     },
     {
      "variant": "direct_subtraction_m2",
@@ -493,7 +757,9 @@
      "ratio_rho": 14.0324304496,
      "ratio_floor": 57.07929173,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1451.18718233,
+     "log2_total_gae": 10.503017903
     }
    ],
    "best": {
@@ -517,7 +783,9 @@
     "ratio_rho": 6.33838293956,
     "ratio_floor": 25.7824480373,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 655.494435667,
+    "log2_total_gae": 9.35643972359
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -527,9 +795,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_fp10_t5_192cb216",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 10,
@@ -537,13 +805,24 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 103.416666667,
+   "reference_log2_total_gae": 6.69232489941,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -578,7 +857,9 @@
      "ratio_rho": 5.4703789656,
      "ratio_floor": 17.6228097349,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 973.955388333,
+     "log2_total_gae": 9.92771188148
     },
     {
      "variant": "mitm_m2_negfold_walk_balanced",
@@ -601,7 +882,9 @@
      "ratio_rho": 5.80452929558,
      "ratio_floor": 18.6992740394,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1033.44807,
+     "log2_total_gae": 10.0132501809
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -624,7 +907,9 @@
      "ratio_rho": 6.01094177018,
      "ratio_floor": 19.3642312187,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1070.198091,
+     "log2_total_gae": 10.0636621453
     },
     {
      "variant": "mitm_m3_negfold",
@@ -647,7 +932,9 @@
      "ratio_rho": 6.15834085467,
      "ratio_floor": 19.8390769355,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1096.44126967,
+     "log2_total_gae": 10.0986128215
     },
     {
      "variant": "mitm_m3",
@@ -670,7 +957,9 @@
      "ratio_rho": 7.59620652282,
      "ratio_floor": 24.4711569529,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1352.44126967,
+     "log2_total_gae": 10.4013502304
     },
     {
      "variant": "mitm_m2_negfold",
@@ -693,7 +982,9 @@
      "ratio_rho": 18.0667145986,
      "ratio_floor": 58.2018678979,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3216.62797833,
+     "log2_total_gae": 11.6513333743
     },
     {
      "variant": "mitm_m2",
@@ -716,7 +1007,9 @@
      "ratio_rho": 19.5045802668,
      "ratio_floor": 62.8339479154,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3472.62797833,
+     "log2_total_gae": 11.7618121481
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -739,7 +1032,9 @@
      "ratio_rho": 26.2641992586,
      "ratio_floor": 84.6100405997,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 4676.12180967,
+     "log2_total_gae": 12.1910967962
     },
     {
      "variant": "direct_subtraction_m2",
@@ -762,7 +1057,9 @@
      "ratio_rho": 32.023267986,
      "ratio_floor": 103.162863552,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 5701.47600433,
+     "log2_total_gae": 12.4771197388
     }
    ],
    "best": {
@@ -786,7 +1083,9 @@
     "ratio_rho": 5.4703789656,
     "ratio_floor": 17.6228097349,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 973.955388333,
+    "log2_total_gae": 9.92771188148
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -796,9 +1095,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_fp12_t19_d4a315df",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 32,
@@ -806,13 +1105,24 @@
     "variant": "mitm_m2_negfold_walk",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 178.041666667,
+   "reference_log2_total_gae": 7.47607110096,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -847,7 +1157,9 @@
      "ratio_rho": 6.42943611579,
      "ratio_floor": 14.7534905172,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1665.75974033,
+     "log2_total_gae": 10.7019646143
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -870,7 +1182,9 @@
      "ratio_rho": 7.71007709746,
      "ratio_floor": 17.6921501817,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1997.55247467,
+     "log2_total_gae": 10.9640176872
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -893,7 +1207,9 @@
      "ratio_rho": 8.46569170794,
      "ratio_floor": 19.4260429819,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 2193.31962667,
+     "log2_total_gae": 11.0989003521
     },
     {
      "variant": "mitm_m3_negfold",
@@ -916,7 +1232,9 @@
      "ratio_rho": 9.74813275523,
      "ratio_floor": 22.3688332187,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 2525.578728,
+     "log2_total_gae": 11.3023982992
     },
     {
      "variant": "mitm_m3",
@@ -939,7 +1257,9 @@
      "ratio_rho": 13.7005290241,
      "ratio_floor": 31.4383130025,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3549.578728,
+     "log2_total_gae": 11.7934320971
     },
     {
      "variant": "mitm_m2_negfold",
@@ -962,7 +1282,9 @@
      "ratio_rho": 27.5965858578,
      "ratio_floor": 63.3252995175,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 7149.81545267,
+     "log2_total_gae": 12.8036902889
     },
     {
      "variant": "mitm_m2",
@@ -985,7 +1307,9 @@
      "ratio_rho": 31.5489821267,
      "ratio_floor": 72.3947793013,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 8173.81545267,
+     "log2_total_gae": 12.9967939554
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -1008,7 +1332,9 @@
      "ratio_rho": 48.966961643,
      "ratio_floor": 112.363447003,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 12686.5236457,
+     "log2_total_gae": 13.6310091764
     },
     {
      "variant": "direct_subtraction_m2",
@@ -1031,7 +1357,9 @@
      "ratio_rho": 59.5344605854,
      "ratio_floor": 136.612462411,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 15424.3864967,
+     "log2_total_gae": 13.912925487
     }
    ],
    "best": {
@@ -1055,7 +1383,9 @@
     "ratio_rho": 6.42943611579,
     "ratio_floor": 14.7534905172,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 1665.75974033,
+    "log2_total_gae": 10.7019646143
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -1065,9 +1395,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_fp14_tm43_158b6914",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 26,
@@ -1075,13 +1405,24 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 259.083333333,
+   "reference_log2_total_gae": 8.01727240062,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -1116,7 +1457,9 @@
      "ratio_rho": 6.71459717554,
      "ratio_floor": 13.1833060656,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 2978.763172,
+     "log2_total_gae": 11.5404977106
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -1139,7 +1482,9 @@
      "ratio_rho": 12.9292345622,
      "ratio_floor": 25.3850010614,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 5735.73168267,
+     "log2_total_gae": 12.4857618211
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -1162,7 +1507,9 @@
      "ratio_rho": 13.7252611049,
      "ratio_floor": 26.947903686,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 6088.86895767,
+     "log2_total_gae": 12.5719585488
     },
     {
      "variant": "mitm_m3_negfold",
@@ -1185,7 +1532,9 @@
      "ratio_rho": 17.0713844914,
      "ratio_floor": 33.5176155517,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 7573.292945,
+     "log2_total_gae": 12.8867050198
     },
     {
      "variant": "mitm_m3",
@@ -1208,7 +1557,9 @@
      "ratio_rho": 26.3044078783,
      "ratio_floor": 51.6455493709,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 11669.292945,
+     "log2_total_gae": 13.5104295288
     },
     {
      "variant": "mitm_m2_negfold",
@@ -1231,7 +1582,9 @@
      "ratio_rho": 45.3532763069,
      "ratio_floor": 89.0457174128,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 20119.8472017,
+     "log2_total_gae": 14.2963317283
     },
     {
      "variant": "mitm_m2",
@@ -1254,7 +1607,9 @@
      "ratio_rho": 54.5862996938,
      "ratio_floor": 107.173651232,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 24215.8472017,
+     "log2_total_gae": 14.5636638567
     },
     {
      "variant": "direct_subtraction_m2",
@@ -1277,7 +1632,9 @@
      "ratio_rho": 132.562150188,
      "ratio_floor": 260.26987963,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 58807.883877,
+     "log2_total_gae": 15.8437219575
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -1300,7 +1657,9 @@
      "ratio_rho": 348.821832188,
      "ratio_floor": 684.869822551,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 154746.085304,
+     "log2_total_gae": 17.2395433877
     }
    ],
    "best": {
@@ -1324,7 +1683,9 @@
     "ratio_rho": 6.71459717554,
     "ratio_floor": 13.1833060656,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 2978.763172,
+    "log2_total_gae": 11.5404977106
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -1334,9 +1695,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_fp16_t351_d433f24e",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 40,
@@ -1344,13 +1705,24 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 443.625,
+   "reference_log2_total_gae": 8.79319685906,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -1385,7 +1757,9 @@
      "ratio_rho": 5.81942836101,
      "ratio_floor": 9.49386483879,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 4303.95222533,
+     "log2_total_gae": 12.0714463485
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -1408,7 +1782,9 @@
      "ratio_rho": 8.92566692777,
      "ratio_floor": 14.5614088105,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 6601.27449867,
+     "log2_total_gae": 12.6885288751
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -1431,7 +1807,9 @@
      "ratio_rho": 12.9830036579,
      "ratio_floor": 21.1805824014,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 9602.013122,
+     "log2_total_gae": 13.2291211922
     },
     {
      "variant": "mitm_m3_negfold",
@@ -1454,7 +1832,9 @@
      "ratio_rho": 16.6921913343,
      "ratio_floor": 27.2317826701,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 12345.2665077,
+     "log2_total_gae": 13.591670361
     },
     {
      "variant": "mitm_m3",
@@ -1477,7 +1857,9 @@
      "ratio_rho": 22.2304448554,
      "ratio_floor": 36.2669364877,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 16441.2665077,
+     "log2_total_gae": 14.0050338169
     },
     {
      "variant": "mitm_m2_negfold",
@@ -1500,7 +1882,9 @@
      "ratio_rho": 76.6896976397,
      "ratio_floor": 125.112223873,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 56718.4222127,
+     "log2_total_gae": 15.7915297799
     },
     {
      "variant": "mitm_m2",
@@ -1523,7 +1907,9 @@
      "ratio_rho": 82.2279511608,
      "ratio_floor": 134.147377691,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 60814.4222127,
+     "log2_total_gae": 15.8921258806
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -1546,7 +1932,9 @@
      "ratio_rho": 209.007221319,
      "ratio_floor": 340.976155463,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 154578.257434,
+     "log2_total_gae": 17.2379778823
     },
     {
      "variant": "direct_subtraction_m2",
@@ -1569,7 +1957,9 @@
      "ratio_rho": 253.923354686,
      "ratio_floor": 414.252716805,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 187797.48107,
+     "log2_total_gae": 17.5188181867
     }
    ],
    "best": {
@@ -1593,7 +1983,9 @@
     "ratio_rho": 5.81942836101,
     "ratio_floor": 9.49386483879,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 4303.95222533,
+    "log2_total_gae": 12.0714463485
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -1603,9 +1995,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_fp18_t175_45770ebc",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 64,
@@ -1613,13 +2005,24 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 739.583333333,
+   "reference_log2_total_gae": 9.53056890345,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -1654,7 +2057,9 @@
      "ratio_rho": 8.30003980861,
      "ratio_floor": 12.0994653284,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 10971.960957,
+     "log2_total_gae": 13.4215337731
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -1677,7 +2082,9 @@
      "ratio_rho": 15.3252118232,
      "ratio_floor": 22.3404794895,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 20258.6529293,
+     "log2_total_gae": 14.3062506269
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -1700,7 +2107,9 @@
      "ratio_rho": 18.1360588673,
      "ratio_floor": 26.4380196384,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 23974.3584843,
+     "log2_total_gae": 14.5492045911
     },
     {
      "variant": "mitm_m3_negfold",
@@ -1723,7 +2132,9 @@
      "ratio_rho": 22.4228929902,
      "ratio_floor": 32.6871945863,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 29641.1959587,
+     "log2_total_gae": 14.855316038
     },
     {
      "variant": "mitm_m3",
@@ -1746,7 +2157,9 @@
      "ratio_rho": 34.8170176829,
      "ratio_floor": 50.7548527486,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 46025.1959587,
+     "log2_total_gae": 15.4901362436
     },
     {
      "variant": "mitm_m2_negfold",
@@ -1769,7 +2182,9 @@
      "ratio_rho": 85.4540152581,
      "ratio_floor": 124.571438045,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 112963.087003,
+     "log2_total_gae": 16.785491894
     },
     {
      "variant": "mitm_m2",
@@ -1792,7 +2207,9 @@
      "ratio_rho": 97.8481399508,
      "ratio_floor": 142.639096208,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 129347.087003,
+     "log2_total_gae": 16.9808880382
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -1815,7 +2232,9 @@
      "ratio_rho": 328.918687394,
      "ratio_floor": 479.484477878,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 434803.094844,
+     "log2_total_gae": 18.7300026837
     },
     {
      "variant": "direct_subtraction_m2",
@@ -1838,7 +2257,9 @@
      "ratio_rho": 406.180436373,
      "ratio_floor": 592.113558526,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 536936.688515,
+     "log2_total_gae": 19.0343924611
     }
    ],
    "best": {
@@ -1862,7 +2283,9 @@
     "ratio_rho": 8.30003980861,
     "ratio_floor": 12.0994653284,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 10971.960957,
+    "log2_total_gae": 13.4215337731
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -1872,9 +2295,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_fp20_t1293_3c2999ba",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 102,
@@ -1882,13 +2305,24 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 1321.91666667,
+   "reference_log2_total_gae": 10.3684155172,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -1923,7 +2357,9 @@
      "ratio_rho": 10.5013292937,
      "ratio_floor": 14.4096529965,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 23168.9953097,
+     "log2_total_gae": 14.4999078647
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -1946,7 +2382,9 @@
      "ratio_rho": 32.3030944744,
      "ratio_floor": 44.32547243,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 71270.0481463,
+     "log2_total_gae": 16.1210082785
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -1969,7 +2407,9 @@
      "ratio_rho": 33.8860028345,
      "ratio_floor": 46.4974984237,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 74762.4056703,
+     "log2_total_gae": 16.1900253718
     },
     {
      "variant": "mitm_m3_negfold",
@@ -1992,7 +2432,9 @@
      "ratio_rho": 39.5901240409,
      "ratio_floor": 54.3245463083,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 87347.3607537,
+     "log2_total_gae": 16.4144764916
     },
     {
      "variant": "mitm_m3",
@@ -2015,7 +2457,9 @@
      "ratio_rho": 69.2942656057,
      "ratio_floor": 95.0838026401,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 152883.360754,
+     "log2_total_gae": 17.2220718722
     },
     {
      "variant": "mitm_m2_negfold",
@@ -2038,7 +2482,9 @@
      "ratio_rho": 114.697861411,
      "ratio_floor": 157.385444846,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 253056.935815,
+     "log2_total_gae": 17.9491024909
     },
     {
      "variant": "mitm_m2",
@@ -2061,7 +2507,9 @@
      "ratio_rho": 144.402002975,
      "ratio_floor": 198.144701177,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 318592.935815,
+     "log2_total_gae": 18.2813547527
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -2084,7 +2532,9 @@
      "ratio_rho": 631.133833716,
      "ratio_floor": 866.025555794,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1392465.31788,
+     "log2_total_gae": 20.4092099641
     },
     {
      "variant": "direct_subtraction_m2",
@@ -2107,7 +2557,9 @@
      "ratio_rho": 797.955439935,
      "ratio_floor": 1094.93385785,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 1760522.4375,
+     "log2_total_gae": 20.7475721835
     }
    ],
    "best": {
@@ -2131,7 +2583,9 @@
     "ratio_rho": 10.5013292937,
     "ratio_floor": 14.4096529965,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 23168.9953097,
+    "log2_total_gae": 14.4999078647
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -2141,9 +2595,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_fp22_tm1267_a5acaf6d",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 148,
@@ -2151,13 +2605,24 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 2206.29166667,
+   "reference_log2_total_gae": 11.1074078092,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "prime",
@@ -2192,7 +2657,9 @@
      "ratio_rho": 13.4551392317,
      "ratio_floor": 15.7585571249,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 46179.1591047,
+     "log2_total_gae": 15.4949542823
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -2215,7 +2682,9 @@
      "ratio_rho": 23.937931735,
      "ratio_floor": 28.0359242816,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 82156.976542,
+     "log2_total_gae": 16.3260954696
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -2238,7 +2707,9 @@
      "ratio_rho": 30.5117271648,
      "ratio_floor": 35.7351036825,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 104718.790274,
+     "log2_total_gae": 16.6761608107
     },
     {
      "variant": "mitm_m3_negfold",
@@ -2261,7 +2732,9 @@
      "ratio_rho": 35.6437936519,
      "ratio_floor": 41.7457410689,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 122332.470129,
+     "log2_total_gae": 16.9004478569
     },
     {
      "variant": "mitm_m3",
@@ -2284,7 +2757,9 @@
      "ratio_rho": 54.7389010939,
      "ratio_floor": 64.1097862304,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 187868.470129,
+     "log2_total_gae": 17.5193634347
     },
     {
      "variant": "mitm_m2_negfold",
@@ -2307,7 +2782,9 @@
      "ratio_rho": 239.383410805,
      "ratio_floor": 280.36403704,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 821583.814502,
+     "log2_total_gae": 19.6480482348
     },
     {
      "variant": "mitm_m2",
@@ -2330,7 +2807,9 @@
      "ratio_rho": 258.478518247,
      "ratio_floor": 302.728082202,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 887119.814502,
+     "log2_total_gae": 19.7587694427
     },
     {
      "variant": "direct_subtraction_m2",
@@ -2353,7 +2832,9 @@
      "ratio_rho": 1962.11936434,
      "ratio_floor": 2298.01933346,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 6734157.16836,
+     "log2_total_gae": 22.6830659619
     },
     {
      "variant": "semaev_s3_roots_m2",
@@ -2376,7 +2857,9 @@
      "ratio_rho": 4922.18464752,
      "ratio_floor": 5764.8253661,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 16893347.8923,
+     "log2_total_gae": 24.0099519313
     }
    ],
    "best": {
@@ -2400,7 +2883,9 @@
     "ratio_rho": 13.4551392317,
     "ratio_floor": 15.7585571249,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 46179.1591047,
+    "log2_total_gae": 15.4949542823
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -2410,9 +2895,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_fp24_t1577_77336155",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 222,
@@ -2420,13 +2905,24 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 3432.08333333,
+   "reference_log2_total_gae": 11.7448688675,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "char2",
@@ -2461,7 +2957,9 @@
      "ratio_rho": 13.0691610083,
      "ratio_floor": 29.6921080126,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3361.497121,
+     "log2_total_gae": 11.7148881986
     },
     {
      "variant": "mitm_m2_negfold_walk_balanced",
@@ -2484,7 +2982,9 @@
      "ratio_rho": 15.1357733135,
      "ratio_floor": 34.3872889616,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3893.04702767,
+     "log2_total_gae": 11.9266840571
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -2507,7 +3007,9 @@
      "ratio_rho": 26.3775334068,
      "ratio_floor": 59.9276855281,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 6784.521405,
+     "log2_total_gae": 12.728031333
     },
     {
      "variant": "mitm_m3_negfold",
@@ -2530,7 +3032,9 @@
      "ratio_rho": 33.3861824474,
      "ratio_floor": 75.8507860398,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 8587.20434367,
+     "log2_total_gae": 13.0679728076
     },
     {
      "variant": "mitm_m3",
@@ -2553,7 +3057,9 @@
      "ratio_rho": 34.2609597032,
      "ratio_floor": 77.8382113037,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 8812.20434367,
+     "log2_total_gae": 13.1052872343
     },
     {
      "variant": "mitm_m2_negfold",
@@ -2576,7 +3082,9 @@
      "ratio_rho": 97.4741984682,
      "ratio_floor": 221.453728172,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 25071.176131,
+     "log2_total_gae": 14.6137420566
     },
     {
      "variant": "semaev_s4_pairs_and_solve_m3",
@@ -2599,7 +3107,9 @@
      "ratio_rho": 677.440361764,
      "ratio_floor": 1539.09132965,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 174243.306382,
+     "log2_total_gae": 17.41074371
     }
    ],
    "best": {
@@ -2623,7 +3133,9 @@
     "ratio_rho": 13.0691610083,
     "ratio_floor": 29.6921080126,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 3361.497121,
+    "log2_total_gae": 11.7148881986
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -2633,9 +3145,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_f2m15_t131_ed7256f0",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 30,
@@ -2643,13 +3155,24 @@
     "variant": "mitm_m2_negfold_walk",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 257.208333333,
+   "reference_log2_total_gae": 8.0067935753,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "char2",
@@ -2684,7 +3207,9 @@
      "ratio_rho": 10.6210696509,
      "ratio_floor": 24.039779727,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 3853.678105,
+     "log2_total_gae": 11.912020354
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -2707,7 +3232,9 @@
      "ratio_rho": 17.3842790565,
      "ratio_floor": 39.3476601668,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 6307.59591767,
+     "log2_total_gae": 12.6228745246
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -2730,7 +3257,9 @@
      "ratio_rho": 29.3949930345,
      "ratio_floor": 66.5327674945,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 10665.483306,
+     "log2_total_gae": 13.3806617224
     },
     {
      "variant": "mitm_m3_negfold",
@@ -2753,7 +3282,9 @@
      "ratio_rho": 37.0504255664,
      "ratio_floor": 83.8601100157,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 13443.1294097,
+     "log2_total_gae": 13.7145814
     },
     {
      "variant": "mitm_m3",
@@ -2776,7 +3307,9 @@
      "ratio_rho": 39.8726579963,
      "ratio_floor": 90.2479643641,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 14467.1294097,
+     "log2_total_gae": 13.820491068
     },
     {
      "variant": "mitm_m2_negfold",
@@ -2799,7 +3332,9 @@
      "ratio_rho": 112.65632581,
      "ratio_floor": 254.986865386,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 40875.4702147,
+     "log2_total_gae": 15.3189477064
     },
     {
      "variant": "semaev_s4_pairs_and_solve_m3",
@@ -2822,7 +3357,9 @@
      "ratio_rho": 1358.14149747,
      "ratio_floor": 3074.02394585,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 492779.006667,
+     "log2_total_gae": 18.9105812702
     }
    ],
    "best": {
@@ -2846,7 +3383,9 @@
     "ratio_rho": 10.6210696509,
     "ratio_floor": 24.039779727,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 3853.678105,
+    "log2_total_gae": 11.912020354
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -2856,9 +3395,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_f2m18_t393_d2c04152",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 30,
@@ -2866,13 +3405,24 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 362.833333333,
+   "reference_log2_total_gae": 8.50316319147,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "char2",
@@ -2907,7 +3457,9 @@
      "ratio_rho": 17.9863625497,
      "ratio_floor": 27.5218755217,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 24960.5746283,
+     "log2_total_gae": 14.607363527
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -2930,7 +3482,9 @@
      "ratio_rho": 18.3968008063,
      "ratio_floor": 28.1499085983,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 25530.160319,
+     "log2_total_gae": 14.6399149769
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -2953,7 +3507,9 @@
      "ratio_rho": 47.8123035564,
      "ratio_floor": 73.1601102362,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 66351.5242603,
+     "log2_total_gae": 16.0178419878
     },
     {
      "variant": "mitm_m3_negfold",
@@ -2976,7 +3532,9 @@
      "ratio_rho": 57.0390005455,
      "ratio_floor": 87.2783626239,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 79155.873007,
+     "log2_total_gae": 16.2724087753
     },
     {
      "variant": "mitm_m3",
@@ -2999,7 +3557,9 @@
      "ratio_rho": 59.7203192268,
      "ratio_floor": 91.3811887944,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 82876.873007,
+     "log2_total_gae": 16.3386819499
     },
     {
      "variant": "mitm_m2_negfold",
@@ -3022,7 +3582,9 @@
      "ratio_rho": 410.911197196,
      "ratio_floor": 628.7567477,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 570242.013908,
+     "log2_total_gae": 19.1212148115
     },
     {
      "variant": "semaev_s4_pairs_and_solve_m3",
@@ -3045,7 +3607,9 @@
      "ratio_rho": 6283.44735657,
      "ratio_floor": 9614.63194778,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 8719854.06907,
+     "log2_total_gae": 23.0558725603
     }
    ],
    "best": {
@@ -3069,7 +3633,9 @@
     "ratio_rho": 17.9863625497,
     "ratio_floor": 27.5218755217,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 24960.5746283,
+    "log2_total_gae": 14.607363527
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -3079,9 +3645,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_f2m21_t2591_de54d72e",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 62,
@@ -3089,13 +3655,24 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 1387.75,
+   "reference_log2_total_gae": 10.4385319778,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "char2",
@@ -3130,7 +3707,9 @@
      "ratio_rho": 23.0252484646,
      "ratio_floor": 30.7374595764,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 39451.8444733,
+     "log2_total_gae": 15.267805131
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -3153,7 +3732,9 @@
      "ratio_rho": 32.1470255287,
      "ratio_floor": 42.9145378914,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 55081.2493247,
+     "log2_total_gae": 15.7492736619
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -3176,7 +3757,9 @@
      "ratio_rho": 67.0937072514,
      "ratio_floor": 89.5664651631,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 114959.476233,
+     "log2_total_gae": 16.8107658683
     },
     {
      "variant": "mitm_m3_negfold",
@@ -3199,7 +3782,9 @@
      "ratio_rho": 75.1278244897,
      "ratio_floor": 100.291576522,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 128725.266611,
+     "log2_total_gae": 16.9739357326
     },
     {
      "variant": "mitm_m3",
@@ -3222,7 +3807,9 @@
      "ratio_rho": 86.0819609616,
      "ratio_floor": 114.914755399,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 147494.266611,
+     "log2_total_gae": 17.1702993496
     },
     {
      "variant": "mitm_m2_negfold",
@@ -3245,7 +3832,9 @@
      "ratio_rho": 579.625382968,
      "ratio_floor": 773.768491831,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 993139.791601,
+     "log2_total_gae": 19.9216372762
     },
     {
      "variant": "semaev_s4_pairs_and_solve_m3",
@@ -3268,7 +3857,9 @@
      "ratio_rho": 15491.5670405,
      "ratio_floor": 20680.4029244,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 26543509.1599,
+     "log2_total_gae": 24.6618557777
     }
    ],
    "best": {
@@ -3292,7 +3883,9 @@
     "ratio_rho": 23.0252484646,
     "ratio_floor": 30.7374595764,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 39451.8444733,
+    "log2_total_gae": 15.267805131
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -3302,9 +3895,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_f2m24_tm3047_2d0c0e8c",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 134,
@@ -3312,13 +3905,24 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 1713.41666667,
+   "reference_log2_total_gae": 10.7426603116,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "char2",
@@ -3353,7 +3957,9 @@
      "ratio_rho": 38.2107763087,
      "ratio_floor": 41.6703628679,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 174655.090044,
+     "log2_total_gae": 17.4141491628
     },
     {
      "variant": "mitm_m2_negfold_walk",
@@ -3376,7 +3982,9 @@
      "ratio_rho": 43.1421342165,
      "ratio_floor": 47.0482037103,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 197195.505148,
+     "log2_total_gae": 17.5892671419
     },
     {
      "variant": "mitm_m3_negfold_walk",
@@ -3399,7 +4007,9 @@
      "ratio_rho": 175.211955466,
      "ratio_floor": 191.075567376,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 800864.646443,
+     "log2_total_gae": 19.6111989088
     },
     {
      "variant": "mitm_m3_negfold",
@@ -3422,7 +4032,9 @@
      "ratio_rho": 198.070223424,
      "ratio_floor": 216.003412669,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 905345.979565,
+     "log2_total_gae": 19.7881097005
     },
     {
      "variant": "mitm_m3",
@@ -3445,7 +4057,9 @@
      "ratio_rho": 213.202912576,
      "ratio_floor": 232.506208713,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 974514.979565,
+     "log2_total_gae": 19.8943248362
     },
     {
      "variant": "mitm_m2_negfold",
@@ -3468,7 +4082,9 @@
      "ratio_rho": 1701.71195065,
      "ratio_floor": 1855.78418788,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 7778241.70775,
+     "log2_total_gae": 22.8910126363
     },
     {
      "variant": "semaev_s4_pairs_and_solve_m3",
@@ -3491,7 +4107,9 @@
      "ratio_rho": 119465.415276,
      "ratio_floor": 130281.760426,
      "verified": true,
-     "repetitions": 3
+     "repetitions": 3,
+     "mean_total_gae": 546056502.326,
+     "log2_total_gae": 29.0244749985
     }
    ],
    "best": {
@@ -3515,7 +4133,9 @@
     "ratio_rho": 38.2107763087,
     "ratio_floor": 41.6703628679,
     "verified": true,
-    "repetitions": 3
+    "repetitions": 3,
+    "mean_total_gae": 174655.090044,
+    "log2_total_gae": 17.4141491628
    },
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
@@ -3525,9 +4145,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_f2m27_t12543_569dca8b",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 254,
@@ -3535,13 +4155,24 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "docs/ic/runs",
-    "reasons": []
-   }
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": true,
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": "partial"
+    }
+   },
+   "reference_mean_total_gae": 4570.83333333,
+   "reference_log2_total_gae": 12.1582414995,
+   "operation_unit": "GAE, counted group-addition equivalents"
   },
   {
    "regime": "koblitz",
@@ -3641,9 +4272,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_f2m47_t22705043_f4e44623",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 5264,
@@ -3651,12 +4282,20 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v7/analysis.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -3757,9 +4396,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_f2m57_tm747311035_c1f545af",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 7296,
@@ -3767,12 +4406,20 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v7/analysis.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -3873,9 +4520,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_f2m41_tm2308219_7f48b14a",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 6560,
@@ -3883,12 +4530,20 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v7/analysis.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -3989,9 +4644,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_f2m53_tm56619371_dac20a85",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 27984,
@@ -3999,12 +4654,20 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v7/analysis.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4105,9 +4768,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_f2m59_tm943548413_98844ecc",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 30208,
@@ -4115,12 +4778,20 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v7/analysis.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4221,9 +4892,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": null,
+    "curves_yaml_key": "icv1_f2m61_t158598901_ab42b6c5",
     "factor_base_refs": [],
-    "factor_base_link_status": "no_curves_yaml_record"
+    "factor_base_link_status": "not_reconciled"
    },
    "factor_base": {
     "points": 39040,
@@ -4231,12 +4902,20 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v7/analysis.json",
     "refs": [],
-    "link_status": "no_curves_yaml_record"
+    "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
     "evidence_dir": "research/ic_tool_program/rule/v7",
-    "reasons": []
+    "reasons": [],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4368,8 +5047,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4501,8 +5189,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4634,8 +5331,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4767,8 +5473,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -4900,8 +5615,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -5033,8 +5757,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -5166,8 +5899,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -5299,8 +6041,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   },
   {
@@ -5432,8 +6183,17 @@
     "status": "unvalidated (pre-gate)",
     "evidence_dir": "research/ic_descent_20260930",
     "reasons": [
-     "VALIDATION.json is missing"
-    ]
+     "VALIDATION.json is missing",
+     "sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True (recognized, not passing)"
+    ],
+    "sweep": {
+     "verdict": "validated_with_caveats",
+     "pricing_ok": false,
+     "rho_reference_ok": "partial",
+     "replay_ok": true,
+     "recomputed_ok": true,
+     "protocol_frozen_ok": true
+    }
    }
   }
  ],
@@ -8304,12 +9064,206 @@
   ]
  },
  "curve_records": {
+  "current_board_records": {
+   "icv1-f2m15-t131-ed7256f0": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m15_t131_ed7256f0",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m18-t393-d2c04152": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m18_t393_d2c04152",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m19-tm797-9c54981b": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m19_tm797_9c54981b",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m21-t2591-de54d72e": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m21_t2591_de54d72e",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m23-tm5197-1f85e9e1": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m23_tm5197_1f85e9e1",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m24-tm3047-2d0c0e8c": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m24_tm3047_2d0c0e8c",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m27-t12543-569dca8b": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m27_t12543_569dca8b",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m37-tm534059-32aad96b": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m37_tm534059_32aad96b",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m41-tm2308219-7f48b14a": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m41_tm2308219_7f48b14a",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m43-tm998717-e2e742b0": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m43_tm998717_e2e742b0",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m45-tm6236725-40939294": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m45_tm6236725_40939294",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m47-t22705043-f4e44623": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m47_t22705043_f4e44623",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m53-tm56619371-dac20a85": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m53_tm56619371_dac20a85",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m57-tm747311035-c1f545af": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m57_tm747311035_c1f545af",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m59-tm943548413-98844ecc": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m59_tm943548413_98844ecc",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-f2m61-t158598901-ab42b6c5": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_f2m61_t158598901_ab42b6c5",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-fp10-t5-192cb216": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_fp10_t5_192cb216",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-fp12-t19-d4a315df": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_fp12_t19_d4a315df",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-fp14-tm43-158b6914": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_fp14_tm43_158b6914",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-fp16-t351-d433f24e": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_fp16_t351_d433f24e",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-fp18-t175-45770ebc": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_fp18_t175_45770ebc",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-fp20-t1293-3c2999ba": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_fp20_t1293_3c2999ba",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-fp22-tm1267-a5acaf6d": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_fp22_tm1267_a5acaf6d",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   },
+   "icv1-fp24-t1577-77336155": {
+    "registry": "docs/curves/registry.json",
+    "schema": "docs/curves/ic/curves.schema.json",
+    "curves_yaml": "docs/curves/ic/curves.yaml",
+    "curves_yaml_key": "icv1_fp24_t1577_77336155",
+    "factor_base_refs": [],
+    "factor_base_link_status": "not_reconciled"
+   }
+  },
   "registry": "docs/curves/registry.json",
   "schema": "docs/curves/ic/curves.schema.json",
   "yaml": "docs/curves/ic/curves.yaml",
   "yaml_records": 27,
   "board_curves": 24,
-  "board_curves_in_yaml": 0,
+  "board_curves_in_yaml": 24,
   "board_curves_factor_base_reconciled": 0
  },
  "exponents": {
@@ -8622,8 +9576,8 @@
     "K_0/F_2^13"
    ],
    "on_board": false,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "toy13_kb1",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m13-tm181-25e736d2",
@@ -8803,8 +9757,8 @@
     "K_1/2^19"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m19_tm797_9c54981b",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m21-t2795-26779965",
@@ -8864,8 +9818,8 @@
     "K_1/F_2^23"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m23_tm5197_1f85e9e1",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m23-tm5197-a023238e",
@@ -9080,8 +10034,8 @@
     "K_0/F_2^37"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m37_tm534059_32aad96b",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m39-t1481485-829ef1d1",
@@ -9122,8 +10076,8 @@
     "K_0/F_2^41"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m41_tm2308219_7f48b14a",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m43-tm998717-e2e742b0",
@@ -9143,8 +10097,8 @@
     "K_1/F_2^43"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m43_tm998717_e2e742b0",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m45-tm6236725-40939294",
@@ -9164,8 +10118,8 @@
     "K_1/F_2^45"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m45_tm6236725_40939294",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m47-t22705043-f4e44623",
@@ -9185,8 +10139,8 @@
     "K_1/F_2^47"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m47_t22705043_f4e44623",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m53-tm56619371-dac20a85",
@@ -9206,8 +10160,8 @@
     "K_0/F_2^53"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m53_tm56619371_dac20a85",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m57-tm747311035-c1f545af",
@@ -9227,8 +10181,8 @@
     "K_0/F_2^57"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m57_tm747311035_c1f545af",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m59-tm943548413-98844ecc",
@@ -9248,8 +10202,8 @@
     "K_1/F_2^59"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m59_tm943548413_98844ecc",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m61-t158598901-ab42b6c5",
@@ -9269,8 +10223,8 @@
     "K_0/F_2^61"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m61_t158598901_ab42b6c5",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m67-tm19346764963-82c84cca",
@@ -9521,8 +10475,8 @@
     "K_0/2^131"
    ],
    "on_board": false,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "ecc2k130_pb",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m137-t574016314927011818501-11ceb4d6",
@@ -9966,8 +10920,8 @@
     "random-binary-n15-b524b"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m15_t131_ed7256f0",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m15-t5-d9fb183e",
@@ -10254,8 +11208,8 @@
     "random-binary-n18-b6507"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m18_t393_d2c04152",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m19-t121-4ae443c4",
@@ -10452,8 +11406,8 @@
     "random-binary-n21-b1b6f3b"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m21_t2591_de54d72e",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m21-t2845-e2683765",
@@ -10632,8 +11586,8 @@
     "random-binary-n24-b5fc9da"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m24_tm3047_2d0c0e8c",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m25-t4775-4830dca7",
@@ -10686,8 +11640,8 @@
     "random-binary-n27-b845462"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_f2m27_t12543_569dca8b",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-f2m27-t20811-3d0fd5a1",
@@ -11834,8 +12788,8 @@
     "bench-10bit"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_fp10_t5_192cb216",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-fp12-tm53-6c9ff4bb",
@@ -11870,8 +12824,8 @@
     "bench-12bit"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_fp12_t19_d4a315df",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-fp14-tm31-68b86b70",
@@ -11938,8 +12892,8 @@
     "bench-14bit"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_fp14_tm43_158b6914",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-fp16-t177-f6096508",
@@ -12212,8 +13166,8 @@
     "bench-16bit"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_fp16_t351_d433f24e",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-fp17-t121-95219f0d",
@@ -12336,8 +13290,8 @@
     "bench-18bit"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_fp18_t175_45770ebc",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-fp19-t241-08557336",
@@ -12744,8 +13698,8 @@
     "bench-20bit"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_fp20_t1293_3c2999ba",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-fp20-t383-4f71b2c3",
@@ -13302,8 +14256,8 @@
     "generated-22bit-3290411"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_fp22_tm1267_a5acaf6d",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-fp22-t966-b09b18a0",
@@ -43766,8 +44720,8 @@
     "generated-24bit-10935329"
    ],
    "on_board": true,
-   "curves_yaml_key": null,
-   "factor_base_link_status": "no_curves_yaml_record"
+   "curves_yaml_key": "icv1_fp24_t1577_77336155",
+   "factor_base_link_status": "not_reconciled"
   },
   {
    "slug": "icv1-fp24-t2705-27cbb01b",
@@ -234691,7 +235645,339 @@
   ],
   "study": "research/la_engines_20261014/",
   "report": "research/la_engines_20261014/REPORT.pdf",
-  "class": "engineering"
+  "class": "engineering",
+  "annotation_20261019": "R10 ledger (research/ic_tool_program/ledger/r10-20261019/README.md): the 10.40x at 262,144 columns holds at >= 8,192 synthetic columns. Below 4,096 the shipped `ic logs` default (CADO-style filter) is the slower one (0.40x at 1,024), and the default is unvalidated at the sizes real IC matrices have (repair R11)."
+ },
+ "lazy_members_component": {
+  "rows": [
+   {
+    "session": "a0-n13",
+    "session_id": "ECBS1hbd6dafc7363a",
+    "curve": "icv1-f2m13-t181-515ee569",
+    "a": 0,
+    "n": 13,
+    "log2_r": 10.9679467058,
+    "eager_over_lazy": {
+     "ratio": 1.27263566377,
+     "ci95": [
+      1.26745401371,
+      1.27754780876
+     ],
+     "pairs": 96
+    },
+    "eager_over_rho_strong": {
+     "ratio": 0.409444396466,
+     "ci95": [
+      0.400221130231,
+      0.418522530001
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_strong": {
+     "ratio": 0.321729469104,
+     "ci95": [
+      0.313613889773,
+      0.329908739306
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_frob": {
+     "ratio": 1.91221454665,
+     "ci95": [
+      1.29123467816,
+      2.50519541622
+     ],
+     "pairs": 96
+    }
+   },
+   {
+    "session": "a1-n29",
+    "session_id": "ECBS1h807488a20506",
+    "curve": "icv1-f2m29-tm40309-30c52b96",
+    "a": 1,
+    "n": 29,
+    "log2_r": 15.373714814,
+    "eager_over_lazy": {
+     "ratio": 1.44098387417,
+     "ci95": [
+      1.42740159053,
+      1.45463624006
+     ],
+     "pairs": 96
+    },
+    "eager_over_rho_strong": {
+     "ratio": 0.577365563885,
+     "ci95": [
+      0.561900928107,
+      0.593387895982
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_strong": {
+     "ratio": 0.40067454899,
+     "ci95": [
+      0.386957494111,
+      0.415165308205
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_frob": {
+     "ratio": 1.27178703384,
+     "ci95": [
+      0.770347633998,
+      1.8031556263
+     ],
+     "pairs": 96
+    }
+   },
+   {
+    "session": "a1-n17",
+    "session_id": "ECBS1h2a2479247f55",
+    "curve": "icv1-f2m17-tm101-00378d4e",
+    "a": 1,
+    "n": 17,
+    "log2_r": 16.0011222661,
+    "eager_over_lazy": {
+     "ratio": 1.13183097654,
+     "ci95": [
+      1.11588953288,
+      1.15081080008
+     ],
+     "pairs": 96
+    },
+    "eager_over_rho_strong": {
+     "ratio": 0.718565550016,
+     "ci95": [
+      0.642013190101,
+      0.805649003988
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_strong": {
+     "ratio": 0.634870015852,
+     "ci95": [
+      0.557920281103,
+      0.721733610238
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_frob": {
+     "ratio": 1.74761486567,
+     "ci95": [
+      1.30527943587,
+      2.34981937802
+     ],
+     "pairs": 96
+    }
+   },
+   {
+    "session": "a0-n19",
+    "session_id": "ECBS1h5149dde01d5c",
+    "curve": "icv1-f2m19-t797-b6cf2467",
+    "a": 0,
+    "n": 19,
+    "log2_r": 16.9978079645,
+    "eager_over_lazy": {
+     "ratio": 1.29539288864,
+     "ci95": [
+      1.28309058308,
+      1.30788957679
+     ],
+     "pairs": 96
+    },
+    "eager_over_rho_strong": {
+     "ratio": 0.745397322038,
+     "ci95": [
+      0.716339924851,
+      0.776574972745
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_strong": {
+     "ratio": 0.575421811077,
+     "ci95": [
+      0.548627137543,
+      0.604873903326
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_frob": {
+     "ratio": 2.01093144891,
+     "ci95": [
+      1.5989028331,
+      2.445589871
+     ],
+     "pairs": 96
+    }
+   },
+   {
+    "session": "a0-n31",
+    "session_id": "ECBS1h9649ebbe0eac",
+    "curve": "icv1-f2m31-tm90707-c95f16f5",
+    "a": 0,
+    "n": 31,
+    "log2_r": 20.4570291167,
+    "eager_over_lazy": {
+     "ratio": 1.2398305513,
+     "ci95": [
+      1.22334354987,
+      1.25883714901
+     ],
+     "pairs": 96
+    },
+    "eager_over_rho_strong": {
+     "ratio": 1.22069397096,
+     "ci95": [
+      1.14186803853,
+      1.29958947689
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_strong": {
+     "ratio": 0.98456516471,
+     "ci95": [
+      0.908486336757,
+      1.06216519629
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_frob": {
+     "ratio": 2.6455320358,
+     "ci95": [
+      1.99653621726,
+      3.36081216117
+     ],
+     "pairs": 96
+    }
+   },
+   {
+    "session": "a0-n23",
+    "session_id": "ECBS1h7daf91450aa7",
+    "curve": "icv1-f2m23-t5197-69e76b73",
+    "a": 0,
+    "n": 23,
+    "log2_r": 20.9991061013,
+    "eager_over_lazy": {
+     "ratio": 1.20250987002,
+     "ci95": [
+      1.18851359154,
+      1.21654632292
+     ],
+     "pairs": 96
+    },
+    "eager_over_rho_strong": {
+     "ratio": 1.34227105569,
+     "ci95": [
+      1.24954425964,
+      1.44942749532
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_strong": {
+     "ratio": 1.11622456427,
+     "ci95": [
+      1.02848470018,
+      1.21787503149
+     ],
+     "pairs": 96
+    },
+    "lazy_over_rho_frob": {
+     "ratio": 2.88130384753,
+     "ci95": [
+      2.4799873781,
+      3.33334132107
+     ],
+     "pairs": 96
+    }
+   },
+   {
+    "session": "a0-n37",
+    "session_id": "ECBS1h74c2d8ce9372",
+    "curve": "icv1-f2m37-tm534059-32aad96b",
+    "a": 0,
+    "n": 37,
+    "log2_r": 27.7808370855,
+    "eager_over_lazy": {
+     "ratio": 1.11565112162,
+     "ci95": [
+      1.10632887096,
+      1.1266621141
+     ],
+     "pairs": 48
+    },
+    "eager_over_rho_strong": {
+     "ratio": 4.25958123295,
+     "ci95": [
+      3.77399313945,
+      4.82279148356
+     ],
+     "pairs": 48
+    },
+    "lazy_over_rho_strong": {
+     "ratio": 3.81802263307,
+     "ci95": [
+      3.36700643034,
+      4.34526427306
+     ],
+     "pairs": 48
+    },
+    "lazy_over_rho_frob": {
+     "ratio": 4.74630638455,
+     "ci95": [
+      3.98776812126,
+      5.7096185105
+     ],
+     "pairs": 48
+    }
+   },
+   {
+    "session": "a0-n41",
+    "session_id": "ECBS1h81fbae75c542",
+    "curve": "icv1-f2m41-tm2308219-7f48b14a",
+    "a": 0,
+    "n": 41,
+    "log2_r": 39.0000015143,
+    "eager_over_lazy": {
+     "ratio": 1.0139794322,
+     "ci95": [
+      1.01273454582,
+      1.01536821113
+     ],
+     "pairs": 16
+    },
+    "eager_over_rho_strong": {
+     "ratio": 16.0895886535,
+     "ci95": [
+      11.7063305861,
+      22.2653095102
+     ],
+     "pairs": 16
+    },
+    "lazy_over_rho_strong": {
+     "ratio": 15.8677662904,
+     "ci95": [
+      11.5245887993,
+      21.9789287637
+     ],
+     "pairs": 16
+    },
+    "lazy_over_rho_frob": {
+     "ratio": 13.9833496431,
+     "ci95": [
+      10.0503206563,
+      21.405131533
+     ],
+     "pairs": 16
+    }
+   }
+  ],
+  "unit": "ecbench.gae, paired by target, cluster-bootstrap 95% CI",
+  "class": "engineering",
+  "note": "Copied from sessions/*/comparisons; ratio = cost of the numerator arm over the denominator arm, <1 means the numerator is cheaper.",
+  "study": "research/ecbench_lazy_orbit_members_20261018/",
+  "report": "research/ecbench_lazy_orbit_members_20261018/REPORT.pdf",
+  "source": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates."
  },
  "jv_cover_linear_stage_component": {
   "study": "research/jv_cover_sparse_fglm_20261018",
@@ -234934,6 +236220,116 @@
     "s_over_rho_l1a": 303.746850733
    }
   ]
+ },
+ "algebraic_ladder": {
+  "source": "research/ic_m2_linear_ladder_20261024/fit.json",
+  "study": "research/ic_m2_linear_ladder_20261024/",
+  "report": "research/ic_m2_linear_ladder_20261024/REPORT.md",
+  "rungs": [
+   {
+    "a": 0,
+    "n": 13,
+    "d": 4,
+    "cofactor": "4",
+    "log2_r": 10.9679467058,
+    "targets": 8,
+    "mean_ic_trials": 591.625,
+    "mean_ic_s": 0.00040408775,
+    "mean_rho_s": 0.000111808625,
+    "ic_over_rho_wall": 3.61410177435
+   },
+   {
+    "a": 1,
+    "n": 17,
+    "d": 6,
+    "cofactor": "2",
+    "log2_r": 16.0011222661,
+    "targets": 8,
+    "mean_ic_trials": 3230.625,
+    "mean_ic_s": 0.00377013925,
+    "mean_rho_s": 0.000258828,
+    "ic_over_rho_wall": 14.5661955044
+   },
+   {
+    "a": 0,
+    "n": 19,
+    "d": 6,
+    "cofactor": "4",
+    "log2_r": 16.9978079645,
+    "targets": 8,
+    "mean_ic_trials": 11476.75,
+    "mean_ic_s": 0.008189665625,
+    "mean_rho_s": 0.000169509375,
+    "ic_over_rho_wall": 48.3139391258
+   },
+   {
+    "a": 1,
+    "n": 19,
+    "d": 6,
+    "cofactor": "2",
+    "log2_r": 18.002194205,
+    "targets": 8,
+    "mean_ic_trials": 12076.875,
+    "mean_ic_s": 0.007836684375,
+    "mean_rho_s": 0.000183492375,
+    "ic_over_rho_wall": 42.7085015113
+   },
+   {
+    "a": 0,
+    "n": 23,
+    "d": 8,
+    "cofactor": "4",
+    "log2_r": 20.9991061013,
+    "targets": 8,
+    "mean_ic_trials": 41855.5,
+    "mean_ic_s": 0.04609912625,
+    "mean_rho_s": 0.00027292525,
+    "ic_over_rho_wall": 168.907516802
+   },
+   {
+    "a": 1,
+    "n": 23,
+    "d": 8,
+    "cofactor": "2",
+    "log2_r": 22.000893689,
+    "targets": 8,
+    "mean_ic_trials": 48821.125,
+    "mean_ic_s": 0.0707728785,
+    "mean_rho_s": 0.00035873875,
+    "ic_over_rho_wall": 197.282502936
+   },
+   {
+    "a": 0,
+    "n": 41,
+    "d": 14,
+    "cofactor": "4",
+    "log2_r": 39.0000015143,
+    "targets": 4,
+    "mean_ic_trials": 181803464.25,
+    "mean_ic_s": 478.378530734,
+    "mean_rho_s": 0.0131277305,
+    "ic_over_rho_wall": 36440.3070839
+   }
+  ],
+  "slope_ic_trials": {
+   "boot95": [
+    0.638679584541,
+    0.654544469455
+   ],
+   "intercept": 0.867000408935,
+   "rungs": 7,
+   "slope_log2_per_n": 0.646514012862
+  },
+  "slope_ic_wall": {
+   "boot95": [
+    0.710000396901,
+    0.723987515461
+   ],
+   "intercept": -20.5329320785,
+   "rungs": 7,
+   "slope_log2_per_n": 0.716909846095
+  },
+  "f4_slope": 1.07904930561
  },
  "pair_table_component": {
   "schema": "ic_oracle_setup_blocked.result/v1",
@@ -235791,6 +237187,1930 @@
   "study": "research/ic_planner_validation_20261020/",
   "report": "research/ic_planner_validation_20261020/REPORT.pdf",
   "class": "engineering"
+ },
+ "bitop_prime_ladder": {
+  "fits": [
+   {
+    "arm": "rho-neg",
+    "bits": "16-26",
+    "tier": "toy",
+    "sizes": 11,
+    "runs": 880,
+    "alpha_additions": 0.412769633907,
+    "alpha_additions_ci95": [
+     0.388269025726,
+     0.447153819814
+    ],
+    "alpha_bitops": 0.547569719336,
+    "alpha_bitops_ci95": [
+     0.528036998056,
+     0.57585784653
+    ],
+    "ratio_to_floor": 1.46602002946,
+    "ratio_to_floor_ci95": [
+     1.30362336439,
+     1.65946262746
+    ],
+    "bound_id": "ECBND1h955234ecf4fd"
+   },
+   {
+    "arm": "rho-neg",
+    "bits": "16-32",
+    "tier": "toy",
+    "sizes": 17,
+    "runs": 1360,
+    "alpha_additions": 0.439692432776,
+    "alpha_additions_ci95": [
+     0.41839181246,
+     0.461565419058
+    ],
+    "alpha_bitops": 0.559489993039,
+    "alpha_bitops_ci95": [
+     0.543239713149,
+     0.575671018543
+    ],
+    "ratio_to_floor": 1.32829522653,
+    "ratio_to_floor_ci95": [
+     1.19409320625,
+     1.48060670452
+    ],
+    "bound_id": "ECBND1h3fa1f7c64fb6"
+   },
+   {
+    "arm": "rho-neg",
+    "bits": "33-40",
+    "tier": "medium",
+    "sizes": 8,
+    "runs": 640,
+    "alpha_additions": 0.504323122597,
+    "alpha_additions_ci95": [
+     0.449079670334,
+     0.574865073688
+    ],
+    "alpha_bitops": 0.582085711394,
+    "alpha_bitops_ci95": [
+     0.527205415975,
+     0.650533404549
+    ],
+    "ratio_to_floor": 1.04847665099,
+    "ratio_to_floor_ci95": [
+     0.981132872457,
+     1.11585694026
+    ],
+    "bound_id": "ECBND1h0b2e17edf289"
+   },
+   {
+    "arm": "bsgs-neg",
+    "bits": "16-26",
+    "tier": "toy",
+    "sizes": 11,
+    "runs": 880,
+    "alpha_additions": 0.491517860831,
+    "alpha_additions_ci95": [
+     0.479205223782,
+     0.506852489547
+    ],
+    "alpha_bitops": 0.626317946261,
+    "alpha_bitops_ci95": [
+     0.609439715292,
+     0.646693158062
+    ],
+    "ratio_to_floor": 1.17340150968,
+    "ratio_to_floor_ci95": [
+     1.14274703783,
+     1.20389204128
+    ],
+    "bound_id": "ECBND1he674257c7cf1"
+   },
+   {
+    "arm": "bsgs-neg",
+    "bits": "16-32",
+    "tier": "toy",
+    "sizes": 17,
+    "runs": 1360,
+    "alpha_additions": 0.495296093643,
+    "alpha_additions_ci95": [
+     0.488993039643,
+     0.501388902087
+    ],
+    "alpha_bitops": 0.615093653906,
+    "alpha_bitops_ci95": [
+     0.605701051227,
+     0.623250816679
+    ],
+    "ratio_to_floor": 1.16607108533,
+    "ratio_to_floor_ci95": [
+     1.14329186587,
+     1.19183816202
+    ],
+    "bound_id": "ECBND1h20800462b4d7"
+   },
+   {
+    "arm": "bsgs-neg",
+    "bits": "33-40",
+    "tier": "medium",
+    "sizes": 8,
+    "runs": 640,
+    "alpha_additions": 0.49657714399,
+    "alpha_additions_ci95": [
+     0.475477987921,
+     0.519617136996
+    ],
+    "alpha_bitops": 0.574339732788,
+    "alpha_bitops_ci95": [
+     0.551973762742,
+     0.59895631254
+    ],
+    "ratio_to_floor": 1.14689834469,
+    "ratio_to_floor_ci95": [
+     1.11411922689,
+     1.1801636239
+    ],
+    "bound_id": "ECBND1hc671214a4bce"
+   },
+   {
+    "arm": "kangaroo",
+    "bits": "16-26",
+    "tier": "toy",
+    "sizes": 11,
+    "runs": 880,
+    "alpha_additions": 0.526169482443,
+    "alpha_additions_ci95": [
+     0.46244756163,
+     0.578081031258
+    ],
+    "alpha_bitops": 0.660969567873,
+    "alpha_bitops_ci95": [
+     0.601041531987,
+     0.711218799462
+    ],
+    "ratio_to_floor": 2.78892875534,
+    "ratio_to_floor_ci95": [
+     2.4894993189,
+     3.1211189286
+    ],
+    "bound_id": "ECBND1h08cd56a70221"
+   },
+   {
+    "arm": "kangaroo",
+    "bits": "16-32",
+    "tier": "toy",
+    "sizes": 17,
+    "runs": 1360,
+    "alpha_additions": 0.485309050916,
+    "alpha_additions_ci95": [
+     0.462703985349,
+     0.505294380798
+    ],
+    "alpha_bitops": 0.605106611179,
+    "alpha_bitops_ci95": [
+     0.578018696576,
+     0.628548101737
+    ],
+    "ratio_to_floor": 2.61428287157,
+    "ratio_to_floor_ci95": [
+     2.40136085661,
+     2.88290743023
+    ],
+    "bound_id": "ECBND1h5a8d995746c0"
+   },
+   {
+    "arm": "kangaroo",
+    "bits": "33-40",
+    "tier": "medium",
+    "sizes": 8,
+    "runs": 640,
+    "alpha_additions": 0.491348944781,
+    "alpha_additions_ci95": [
+     0.401334669468,
+     0.576004902353
+    ],
+    "alpha_bitops": 0.569111533578,
+    "alpha_bitops_ci95": [
+     0.478377610775,
+     0.654321450439
+    ],
+    "ratio_to_floor": 2.6006285239,
+    "ratio_to_floor_ci95": [
+     2.27270209685,
+     2.94187627554
+    ],
+    "bound_id": "ECBND1h7020831f73d6"
+   },
+   {
+    "arm": "ic-pair-rule",
+    "bits": "16-26",
+    "tier": "toy",
+    "sizes": 11,
+    "runs": 880,
+    "alpha_additions": 0.558183210541,
+    "alpha_additions_ci95": [
+     0.529600187217,
+     0.588496758973
+    ],
+    "alpha_bitops": 0.692983295971,
+    "alpha_bitops_ci95": [
+     0.671860503596,
+     0.714792185616
+    ],
+    "ratio_to_floor": 14.9277415789,
+    "ratio_to_floor_ci95": [
+     13.7040483186,
+     16.2716201226
+    ],
+    "bound_id": "ECBND1h71d5967b81fe"
+   },
+   {
+    "arm": "ic-pair-rule",
+    "bits": "16-28",
+    "tier": "toy",
+    "sizes": 13,
+    "runs": 1040,
+    "alpha_additions": 0.572559652911,
+    "alpha_additions_ci95": [
+     0.549021406387,
+     0.599719207729
+    ],
+    "alpha_bitops": 0.701902652307,
+    "alpha_bitops_ci95": [
+     0.686180505178,
+     0.721451249684
+    ],
+    "ratio_to_floor": 16.1053632494,
+    "ratio_to_floor_ci95": [
+     14.3755946673,
+     18.0581463742
+    ],
+    "bound_id": "ECBND1h3659e1f72071"
+   },
+   {
+    "arm": "ic-pair-rule",
+    "bits": "16-32",
+    "tier": "toy",
+    "sizes": 17,
+    "runs": 1360,
+    "alpha_additions": 0.595306619217,
+    "alpha_additions_ci95": [
+     0.575805804181,
+     0.616727500822
+    ],
+    "alpha_bitops": 0.71510417948,
+    "alpha_bitops_ci95": [
+     0.702925960327,
+     0.729075881231
+    ],
+    "ratio_to_floor": 19.5537992267,
+    "ratio_to_floor_ci95": [
+     16.4273788404,
+     22.9674380543
+    ],
+    "bound_id": "ECBND1h050a8f714c76"
+   },
+   {
+    "arm": "ic-pair-rule",
+    "bits": "33-40",
+    "tier": "medium",
+    "sizes": 8,
+    "runs": 640,
+    "alpha_additions": 0.646221794881,
+    "alpha_additions_ci95": [
+     0.628904175506,
+     0.658553743696
+    ],
+    "alpha_bitops": 0.723984383678,
+    "alpha_bitops_ci95": [
+     0.707079915632,
+     0.736329158314
+    ],
+    "ratio_to_floor": 59.8451272546,
+    "ratio_to_floor_ci95": [
+     50.2736210749,
+     70.0578474457
+    ],
+    "bound_id": "ECBND1h06f15b921d25"
+   },
+   {
+    "arm": "ic-pair-b32",
+    "bits": "16-26",
+    "tier": "toy",
+    "sizes": 11,
+    "runs": 880,
+    "alpha_additions": 0.792360708671,
+    "alpha_additions_ci95": [
+     0.696320359974,
+     0.888060300529
+    ],
+    "alpha_bitops": 0.9271607941,
+    "alpha_bitops_ci95": [
+     0.839747976769,
+     1.01475197866
+    ],
+    "ratio_to_floor": 33.8369259057,
+    "ratio_to_floor_ci95": [
+     19.4054424509,
+     50.8564988062
+    ],
+    "bound_id": "ECBND1heedbb8c159c9"
+   },
+   {
+    "arm": "ic-pair-b32",
+    "bits": "16-28",
+    "tier": "toy",
+    "sizes": 13,
+    "runs": 1040,
+    "alpha_additions": 0.837545389112,
+    "alpha_additions_ci95": [
+     0.763989932102,
+     0.920984493684
+    ],
+    "alpha_bitops": 0.966888388508,
+    "alpha_bitops_ci95": [
+     0.902427076294,
+     1.04170612449
+    ],
+    "ratio_to_floor": 54.5548790521,
+    "ratio_to_floor_ci95": [
+     28.0179814141,
+     87.1974175755
+    ],
+    "bound_id": "ECBND1h7012123462e5"
+   },
+   {
+    "arm": "ic-rootfind-m3-rule",
+    "bits": "16-28",
+    "tier": "toy",
+    "sizes": 13,
+    "runs": 1040,
+    "alpha_additions": 0.643900579419,
+    "alpha_additions_ci95": [
+     0.628752658797,
+     0.66292982594
+    ],
+    "alpha_bitops": 0.773243578815,
+    "alpha_bitops_ci95": [
+     0.763551666847,
+     0.784377348952
+    ],
+    "ratio_to_floor": 39.7521571289,
+    "ratio_to_floor_ci95": [
+     32.0453966197,
+     48.4760286652
+    ],
+    "bound_id": "ECBND1h702e0306cf0d"
+   }
+  ],
+  "gap_to_rho": {
+   "arms": [
+    "rho-neg",
+    "bsgs-neg",
+    "kangaroo",
+    "ic-pair-rule",
+    "ic-pair-b32",
+    "ic-rootfind-m3-rule"
+   ],
+   "rows": [
+    [
+     16,
+     1.0,
+     0.557858967802,
+     1.23058958788,
+     6.23085677751,
+     6.49448961928,
+     10.1152603698
+    ],
+    [
+     17,
+     1.0,
+     0.660303332016,
+     1.45486031524,
+     7.562459716,
+     6.87374642028,
+     13.6511365912
+    ],
+    [
+     18,
+     1.0,
+     0.68912371331,
+     1.40077368407,
+     7.3362942752,
+     7.60404969808,
+     14.4098046177
+    ],
+    [
+     19,
+     1.0,
+     0.868261380797,
+     2.41914478273,
+     9.45190911146,
+     10.1049812704,
+     18.5980208028
+    ],
+    [
+     20,
+     1.0,
+     0.792213136652,
+     2.04983316887,
+     9.42941456412,
+     11.6982541652,
+     20.9816510299
+    ],
+    [
+     21,
+     1.0,
+     0.808359875364,
+     1.39095586809,
+     9.43213523966,
+     14.1071226172,
+     21.5244150778
+    ],
+    [
+     22,
+     1.0,
+     0.853258630469,
+     1.9435892311,
+     10.5330869828,
+     18.9015364234,
+     24.2595744499
+    ],
+    [
+     23,
+     1.0,
+     0.97169597849,
+     1.89660455003,
+     11.8383517904,
+     27.8752381522,
+     32.7442062391
+    ],
+    [
+     24,
+     1.0,
+     0.96020963319,
+     2.07292121807,
+     14.0766133407,
+     42.6870516119,
+     36.4650098781
+    ],
+    [
+     25,
+     1.0,
+     0.933627994527,
+     3.3454612712,
+     15.1411084934,
+     60.4757438926,
+     41.0417208087
+    ],
+    [
+     26,
+     1.0,
+     0.997397183857,
+     2.70555434811,
+     17.2220621542,
+     84.7169349245,
+     47.8000737292
+    ],
+    [
+     27,
+     1.0,
+     1.09631732581,
+     2.06805749006,
+     19.7203684638,
+     127.225957601,
+     59.064266206
+    ],
+    [
+     28,
+     1.0,
+     1.06214276209,
+     2.33477768313,
+     23.02757554,
+     192.719731584,
+     69.7109451746
+    ],
+    [
+     29,
+     1.0,
+     1.01773311672,
+     1.95855166053,
+     22.8465635944,
+     null,
+     null
+    ],
+    [
+     30,
+     1.0,
+     1.18605758469,
+     2.34023461643,
+     28.9074874116,
+     null,
+     null
+    ],
+    [
+     31,
+     1.0,
+     1.04641027167,
+     2.19600216178,
+     29.6662059557,
+     null,
+     null
+    ],
+    [
+     32,
+     1.0,
+     1.03354442136,
+     1.93873847937,
+     32.1083156847,
+     null,
+     null
+    ],
+    [
+     33,
+     1.0,
+     1.02979796586,
+     2.40783557086,
+     36.98864878,
+     null,
+     null
+    ],
+    [
+     34,
+     1.0,
+     1.09275922378,
+     2.15990334543,
+     42.6718432084,
+     null,
+     null
+    ],
+    [
+     35,
+     1.0,
+     1.21099736187,
+     3.54517050721,
+     52.4882392372,
+     null,
+     null
+    ],
+    [
+     36,
+     1.0,
+     1.19766839664,
+     2.14471171183,
+     58.6770368783,
+     null,
+     null
+    ],
+    [
+     37,
+     1.0,
+     1.04234539245,
+     2.62966674178,
+     51.4467961888,
+     null,
+     null
+    ],
+    [
+     38,
+     1.0,
+     1.13577845371,
+     2.03938972002,
+     67.2691777699,
+     null,
+     null
+    ],
+    [
+     39,
+     1.0,
+     1.03725717605,
+     2.65532627173,
+     69.513841807,
+     null,
+     null
+    ],
+    [
+     40,
+     1.0,
+     1.03646527745,
+     2.28644690982,
+     78.2607808828,
+     null,
+     null
+    ]
+   ],
+   "note": "mean bitop/v1 per arm over mean bitop/v1 of rho-neg, per curve, from analysis/work.jsonl (ecbench work --counted)"
+  },
+  "before_arm": "ic-pair-b32",
+  "after_arm": "ic-pair-rule",
+  "unit": "bitop/v1",
+  "study": "research/bitop_ladder_20261019/",
+  "source": "research/bitop_ladder_20261019/summary.json",
+  "protocol": "research/bitop_ladder_20261019/PROTOCOL.md",
+  "class": "parameter selection (base size per size, chosen on a separate train panel in bitop/v1)"
+ },
+ "hyperelliptic_bitop_reprice": {
+  "rows": [
+   {
+    "genus": 2,
+    "p": 41,
+    "n": 1321,
+    "log2_n": 10.3674147512,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.20713058474,
+    "ic_over_rho_ci95": [
+     0.164287166648,
+     0.279188336151
+    ],
+    "excluding_validation": 0.243308086725,
+    "post_hoc_without_rho_precompute": 1.67670952905,
+    "post_hoc_oracle_doubled": 0.212987789768,
+    "in_situ_full_width_rho": 0.177692599732,
+    "rho_precompute_share": 0.876466029953
+   },
+   {
+    "genus": 2,
+    "p": 61,
+    "n": 1399,
+    "log2_n": 10.4501802472,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.221341263613,
+    "ic_over_rho_ci95": [
+     0.198042884069,
+     0.244393329927
+    ],
+    "excluding_validation": 0.267610426179,
+    "post_hoc_without_rho_precompute": 1.95148925668,
+    "post_hoc_oracle_doubled": 0.22717014072,
+    "in_situ_full_width_rho": 0.188637709414,
+    "rho_precompute_share": 0.886578282276
+   },
+   {
+    "genus": 2,
+    "p": 101,
+    "n": 4663,
+    "log2_n": 12.1870427143,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.298713465515,
+    "ic_over_rho_ci95": [
+     0.28097305506,
+     0.319684957521
+    ],
+    "excluding_validation": 0.406309236034,
+    "post_hoc_without_rho_precompute": 1.99624767383,
+    "post_hoc_oracle_doubled": 0.306574804591,
+    "in_situ_full_width_rho": 0.242838910865,
+    "rho_precompute_share": 0.850362522932
+   },
+   {
+    "genus": 2,
+    "p": 151,
+    "n": 7949,
+    "log2_n": 12.9565576626,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.42987575218,
+    "ic_over_rho_ci95": [
+     0.392946029243,
+     0.466291288287
+    ],
+    "excluding_validation": 0.629593770519,
+    "post_hoc_without_rho_precompute": 2.43897889734,
+    "post_hoc_oracle_doubled": 0.441281129076,
+    "in_situ_full_width_rho": 0.345427114001,
+    "rho_precompute_share": 0.823747654131
+   },
+   {
+    "genus": 2,
+    "p": 211,
+    "n": 11813,
+    "log2_n": 13.528087774,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.555803412728,
+    "ic_over_rho_ci95": [
+     0.518126382983,
+     0.595726971854
+    ],
+    "excluding_validation": 0.888525196079,
+    "post_hoc_without_rho_precompute": 2.28790187609,
+    "post_hoc_oracle_doubled": 0.569110027902,
+    "in_situ_full_width_rho": 0.356749078073,
+    "rho_precompute_share": 0.757068509565
+   },
+   {
+    "genus": 2,
+    "p": 251,
+    "n": 61667,
+    "log2_n": 15.9122110428,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.523782390508,
+    "ic_over_rho_ci95": [
+     0.467421631614,
+     0.586564462512
+    ],
+    "excluding_validation": 0.861334680822,
+    "post_hoc_without_rho_precompute": 1.63857265616,
+    "post_hoc_oracle_doubled": 0.535126440079,
+    "in_situ_full_width_rho": 0.316764638603,
+    "rho_precompute_share": 0.680342285379
+   },
+   {
+    "genus": 3,
+    "p": 23,
+    "n": 6299,
+    "log2_n": 12.6209070959,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.199514240063,
+    "ic_over_rho_ci95": [
+     0.170282293302,
+     0.238553552409
+    ],
+    "excluding_validation": 0.226221655139,
+    "post_hoc_without_rho_precompute": 1.10238911195,
+    "post_hoc_oracle_doubled": 0.230707662028,
+    "in_situ_full_width_rho": 0.244453177575,
+    "rho_precompute_share": 0.8190164998
+   },
+   {
+    "genus": 3,
+    "p": 31,
+    "n": 7333,
+    "log2_n": 12.840187824,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.256705224582,
+    "ic_over_rho_ci95": [
+     0.222889390743,
+     0.289747648049
+    ],
+    "excluding_validation": 0.299011650545,
+    "post_hoc_without_rho_precompute": 1.38237816766,
+    "post_hoc_oracle_doubled": 0.302270817055,
+    "in_situ_full_width_rho": 0.331877385662,
+    "rho_precompute_share": 0.814301736972
+   },
+   {
+    "genus": 3,
+    "p": 41,
+    "n": 6679,
+    "log2_n": 12.7054163989,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.305205767608,
+    "ic_over_rho_ci95": [
+     0.266643981668,
+     0.345531068977
+    ],
+    "excluding_validation": 0.367725956176,
+    "post_hoc_without_rho_precompute": 1.72941630395,
+    "post_hoc_oracle_doubled": 0.353857133586,
+    "in_situ_full_width_rho": 0.366557462652,
+    "rho_precompute_share": 0.823520937722
+   },
+   {
+    "genus": 3,
+    "p": 61,
+    "n": 124459,
+    "log2_n": 16.9253110341,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.301360831808,
+    "ic_over_rho_ci95": [
+     0.269666379068,
+     0.333412281511
+    ],
+    "excluding_validation": 0.371184267123,
+    "post_hoc_without_rho_precompute": 0.733171049957,
+    "post_hoc_oracle_doubled": 0.352143172767,
+    "in_situ_full_width_rho": 0.351607422759,
+    "rho_precompute_share": 0.588962450406
+   },
+   {
+    "genus": 3,
+    "p": 101,
+    "n": 364747,
+    "log2_n": 18.4765365866,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.357188430546,
+    "ic_over_rho_ci95": [
+     0.317951418656,
+     0.407791264814
+    ],
+    "excluding_validation": 0.463053538592,
+    "post_hoc_without_rho_precompute": 0.685507851455,
+    "post_hoc_oracle_doubled": 0.409325286212,
+    "in_situ_full_width_rho": 0.338631984862,
+    "rho_precompute_share": 0.478943341366
+   },
+   {
+    "genus": 3,
+    "p": 151,
+    "n": 1180351,
+    "log2_n": 20.1707845057,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.430866820767,
+    "ic_over_rho_ci95": [
+     0.369848624656,
+     0.505009874263
+    ],
+    "excluding_validation": 0.590447746955,
+    "post_hoc_without_rho_precompute": 0.679881416909,
+    "post_hoc_oracle_doubled": 0.49222948632,
+    "in_situ_full_width_rho": 0.340070365653,
+    "rho_precompute_share": 0.366261806764
+   },
+   {
+    "genus": 3,
+    "p": 211,
+    "n": 4620611,
+    "log2_n": 22.1396522063,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.454044332898,
+    "ic_over_rho_ci95": [
+     0.401197217873,
+     0.520758721261
+    ],
+    "excluding_validation": 0.639866401472,
+    "post_hoc_without_rho_precompute": 0.620683722754,
+    "post_hoc_oracle_doubled": 0.514558245265,
+    "in_situ_full_width_rho": 0.323589962625,
+    "rho_precompute_share": 0.268477138593
+   },
+   {
+    "genus": 4,
+    "p": 17,
+    "n": 5639,
+    "log2_n": 12.4612236276,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.766689179065,
+    "ic_over_rho_ci95": [
+     0.595277152878,
+     0.976211213689
+    ],
+    "excluding_validation": 0.799046120433,
+    "post_hoc_without_rho_precompute": 4.42804622505,
+    "post_hoc_oracle_doubled": 0.873613859779,
+    "in_situ_full_width_rho": 1.22276533225,
+    "rho_precompute_share": 0.826856103099
+   },
+   {
+    "genus": 4,
+    "p": 23,
+    "n": 30223,
+    "log2_n": 14.8833592522,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.535478234541,
+    "ic_over_rho_ci95": [
+     0.466836479691,
+     0.605884996598
+    ],
+    "excluding_validation": 0.560784936341,
+    "post_hoc_without_rho_precompute": 2.05231647746,
+    "post_hoc_oracle_doubled": 0.619753456755,
+    "in_situ_full_width_rho": 0.865040127153,
+    "rho_precompute_share": 0.739085935126
+   },
+   {
+    "genus": 4,
+    "p": 31,
+    "n": 239753,
+    "log2_n": 17.8711893421,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.384919012775,
+    "ic_over_rho_ci95": [
+     0.340225647931,
+     0.436564510461
+    ],
+    "excluding_validation": 0.405217532147,
+    "post_hoc_without_rho_precompute": 0.840804641071,
+    "post_hoc_oracle_doubled": 0.457670603661,
+    "in_situ_full_width_rho": 0.612079727765,
+    "rho_precompute_share": 0.542201607874
+   },
+   {
+    "genus": 4,
+    "p": 41,
+    "n": 333041,
+    "log2_n": 18.3453402699,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.437024188026,
+    "ic_over_rho_ci95": [
+     0.375379708061,
+     0.498031591937
+    ],
+    "excluding_validation": 0.47266170874,
+    "post_hoc_without_rho_precompute": 0.908610833412,
+    "post_hoc_oracle_doubled": 0.50788121415,
+    "in_situ_full_width_rho": 0.616292932746,
+    "rho_precompute_share": 0.519019395372
+   },
+   {
+    "genus": 4,
+    "p": 61,
+    "n": 16790591,
+    "log2_n": 24.0011496758,
+    "ic_runs": 5,
+    "rho_runs": 40,
+    "verified": true,
+    "ic_over_rho": 0.114376500262,
+    "ic_over_rho_ci95": [
+     0.0959799313909,
+     0.137567094763
+    ],
+    "excluding_validation": 0.131701295185,
+    "post_hoc_without_rho_precompute": 0.133674847559,
+    "post_hoc_oracle_doubled": 0.134167816635,
+    "in_situ_full_width_rho": 0.131778165727,
+    "rho_precompute_share": 0.144367827225
+   }
+  ],
+  "slopes": [
+   {
+    "genus": 2,
+    "rows": 6,
+    "slope": 0.269373900984,
+    "slope_ci95": [
+     0.13805994127,
+     0.522774785606
+    ],
+    "degenerate_resamples": 0
+   },
+   {
+    "genus": 3,
+    "rows": 7,
+    "slope": 0.0951189437087,
+    "slope_ci95": [
+     0.0497422177924,
+     0.148101101492
+    ],
+    "degenerate_resamples": 0
+   },
+   {
+    "genus": 4,
+    "rows": 5,
+    "slope": -0.231991312406,
+    "slope_ci95": [
+     -0.320065246456,
+     -0.0815644717462
+    ],
+    "degenerate_resamples": 2
+   }
+  ],
+  "unit": "bitop/v1",
+  "resamples": 2000,
+  "before": {
+   "genus": 4,
+   "p": 61,
+   "n": 16790591,
+   "ic_over_rho": 0.241817865806,
+   "unit": "in-situ group operations, wall-clock-calibrated linear algebra and oracle, rho renormalised to its ideal, 8-bit rho walk (round seven)",
+   "slope": -0.2908,
+   "slope_ci95": [
+    -0.421,
+    -0.16
+   ],
+   "source": "experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json",
+   "fits_source": "experiments/hyperelliptic_sparse_solve_r7/fits.json"
+  },
+  "study": "research/hec_bitop_20261020/",
+  "readme": "research/hec_bitop_20261020/README.md",
+  "source": "research/hec_bitop_20261020/analysis/analysis.json",
+  "protocol": "research/hec_bitop_20261020/PROTOCOL.md",
+  "class": "accounting"
+ },
+ "s5_c4_component": {
+  "before_muls": 1209304470030.0,
+  "before_n": 13,
+  "after_muls": 86897990971.8,
+  "after_n": 12,
+  "executions": 13,
+  "oracle_equal": 13,
+  "shape_replays": 11,
+  "fallbacks": 1,
+  "ratio": 13.8994230329,
+  "paired_min": 7.23994452363,
+  "paired_max": 15.368766373,
+  "log2_before": 40.1373146604,
+  "log2_after": 36.3386037721,
+  "study": "research/s5_plain_c4_options_20261019/",
+  "report": "research/s5_plain_c4_options_20261019/REPORT.pdf",
+  "source": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
+  "class": "engineering"
+ },
+ "ghs_weak_n4_component": {
+  "rows": [
+   {
+    "arm": "A0",
+    "q": 223,
+    "units_ok": 3,
+    "units": 3,
+    "rho_runs": 90,
+    "ic_meq": [
+     2147893.0,
+     2322535.0,
+     3894312.0
+    ],
+    "rho_meq": [
+     200137.1,
+     216204.9,
+     360815.0
+    ],
+    "ratio": [
+     10.73211,
+     10.74229,
+     10.7931
+    ],
+    "ratio_lo": [
+     9.69659,
+     9.72092,
+     9.80974
+    ],
+    "ratio_hi": [
+     11.93659,
+     11.94011,
+     12.00431
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "A0",
+    "q": 499,
+    "units_ok": 3,
+    "units": 3,
+    "rho_runs": 90,
+    "ic_meq": [
+     8543699.0,
+     9431239.0,
+     17419100.0
+    ],
+    "rho_meq": [
+     586925.8,
+     640595.6,
+     1123624.0
+    ],
+    "ratio": [
+     14.55669,
+     14.72261,
+     15.50261
+    ],
+    "ratio_lo": [
+     13.42201,
+     13.56898,
+     14.27138
+    ],
+    "ratio_hi": [
+     15.81085,
+     15.99419,
+     16.88216
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "A0",
+    "q": 991,
+    "units_ok": 2,
+    "units": 3,
+    "rho_runs": 90,
+    "ic_meq": [
+     30895630.0,
+     34366910.0,
+     65608510.0
+    ],
+    "rho_meq": [
+     1449640.0,
+     1589067.0,
+     2843916.0
+    ],
+    "ratio": [
+     21.31262,
+     21.6271,
+     23.06978
+    ],
+    "ratio_lo": [
+     19.305,
+     19.58218,
+     20.85098
+    ],
+    "ratio_hi": [
+     23.66034,
+     24.01346,
+     25.66874
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "A0",
+    "q": 2011,
+    "units_ok": 1,
+    "units": 3,
+    "rho_runs": 90,
+    "ic_meq": [
+     125741000.0,
+     140574100.0,
+     274071600.0
+    ],
+    "rho_meq": [
+     4507881.0,
+     4951890.0,
+     8947976.0
+    ],
+    "ratio": [
+     27.8936,
+     28.38797,
+     30.62945
+    ],
+    "ratio_lo": [
+     25.08025,
+     25.52078,
+     27.51642
+    ],
+    "ratio_hi": [
+     31.11364,
+     31.67068,
+     34.19883
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "A0",
+    "q": 4051,
+    "units_ok": 1,
+    "units": 3,
+    "rho_runs": 90,
+    "ic_meq": [
+     502917300.0,
+     563876000.0,
+     1112504000.0
+    ],
+    "rho_meq": [
+     13400260.0,
+     14733090.0,
+     26728540.0
+    ],
+    "ratio": [
+     37.53042,
+     38.27277,
+     41.62234
+    ],
+    "ratio_lo": [
+     33.96292,
+     34.63274,
+     37.65407
+    ],
+    "ratio_hi": [
+     41.93117,
+     42.76355,
+     46.52082
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "A0r",
+    "q": 223,
+    "units_ok": 3,
+    "units": 3,
+    "rho_runs": 90,
+    "ic_meq": [
+     2039856.0,
+     2214064.0,
+     3781932.0
+    ],
+    "rho_meq": [
+     199660.7,
+     215688.5,
+     359938.9
+    ],
+    "ratio": [
+     10.21661,
+     10.2651,
+     10.50715
+    ],
+    "ratio_lo": [
+     9.33108,
+     9.37746,
+     9.58989
+    ],
+    "ratio_hi": [
+     11.26184,
+     11.31928,
+     11.67524
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "A0r",
+    "q": 499,
+    "units_ok": 3,
+    "units": 3,
+    "rho_runs": 90,
+    "ic_meq": [
+     8487663.0,
+     9370480.0,
+     17315830.0
+    ],
+    "rho_meq": [
+     583855.7,
+     637239.9,
+     1117697.0
+    ],
+    "ratio": [
+     14.53726,
+     14.70479,
+     15.49241
+    ],
+    "ratio_lo": [
+     13.35489,
+     13.51297,
+     14.24217
+    ],
+    "ratio_hi": [
+     15.81673,
+     16.00833,
+     16.88062
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "A0r",
+    "q": 991,
+    "units_ok": 3,
+    "units": 3,
+    "rho_runs": 90,
+    "ic_meq": [
+     31174640.0,
+     34775320.0,
+     67181360.0
+    ],
+    "rho_meq": [
+     1503255.0,
+     1647880.0,
+     2949508.0
+    ],
+    "ratio": [
+     20.7381,
+     21.10306,
+     22.77714
+    ],
+    "ratio_lo": [
+     18.79318,
+     19.11674,
+     20.59758
+    ],
+    "ratio_hi": [
+     22.91143,
+     23.32906,
+     25.25029
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "A0r",
+    "q": 2011,
+    "units_ok": 3,
+    "units": 3,
+    "rho_runs": 90,
+    "ic_meq": [
+     224224500.0,
+     248864200.0,
+     470621100.0
+    ],
+    "rho_meq": [
+     4492962.0,
+     4935497.0,
+     8918321.0
+    ],
+    "ratio": [
+     49.90572,
+     50.42332,
+     52.77015
+    ],
+    "ratio_lo": [
+     25.87068,
+     26.34043,
+     28.46907
+    ],
+    "ratio_hi": [
+     91.7919,
+     92.31352,
+     94.67806
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "A0r",
+    "q": 4051,
+    "units_ok": 3,
+    "units": 3,
+    "rho_runs": 90,
+    "ic_meq": [
+     503017100.0,
+     563711400.0,
+     1109960000.0
+    ],
+    "rho_meq": [
+     13342200.0,
+     14669240.0,
+     26612670.0
+    ],
+    "ratio": [
+     37.70122,
+     38.42812,
+     41.70796
+    ],
+    "ratio_lo": [
+     34.12675,
+     34.78286,
+     37.74242
+    ],
+    "ratio_hi": [
+     42.21562,
+     43.03255,
+     46.72005
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "B0",
+    "q": 223,
+    "units_ok": 5,
+    "units": 5,
+    "rho_runs": 150,
+    "ic_meq": [
+     859225.4,
+     881581.0,
+     1082781.0
+    ],
+    "rho_meq": [
+     203587.7,
+     220021.5,
+     367925.2
+    ],
+    "ratio": [
+     4.22042,
+     4.00679,
+     2.94294
+    ],
+    "ratio_lo": [
+     3.55048,
+     3.38056,
+     2.54775
+    ],
+    "ratio_hi": [
+     4.91765,
+     4.66507,
+     3.36423
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "B0",
+    "q": 499,
+    "units_ok": 5,
+    "units": 5,
+    "rho_runs": 150,
+    "ic_meq": [
+     1591094.0,
+     1650093.0,
+     2181088.0
+    ],
+    "rho_meq": [
+     578219.1,
+     630993.9,
+     1105967.0
+    ],
+    "ratio": [
+     2.75171,
+     2.61507,
+     1.97211
+    ],
+    "ratio_lo": [
+     2.24028,
+     2.14431,
+     1.69167
+    ],
+    "ratio_hi": [
+     3.1925,
+     3.02187,
+     2.22056
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "B0",
+    "q": 991,
+    "units_ok": 5,
+    "units": 5,
+    "rho_runs": 150,
+    "ic_meq": [
+     2544892.0,
+     2680081.0,
+     3896779.0
+    ],
+    "rho_meq": [
+     1507468.0,
+     1652652.0,
+     2959308.0
+    ],
+    "ratio": [
+     1.68819,
+     1.62169,
+     1.31679
+    ],
+    "ratio_lo": [
+     1.48992,
+     1.43578,
+     1.18761
+    ],
+    "ratio_hi": [
+     1.90869,
+     1.82655,
+     1.45422
+    ],
+    "resolved": "rho lower"
+   },
+   {
+    "arm": "B0",
+    "q": 2011,
+    "units_ok": 5,
+    "units": 5,
+    "rho_runs": 150,
+    "ic_meq": [
+     4842934.0,
+     5160022.0,
+     8013814.0
+    ],
+    "rho_meq": [
+     4482036.0,
+     4923466.0,
+     8896331.0
+    ],
+    "ratio": [
+     1.08052,
+     1.04805,
+     0.9008
+    ],
+    "ratio_lo": [
+     0.96579,
+     0.94048,
+     0.82182
+    ],
+    "ratio_hi": [
+     1.2126,
+     1.17039,
+     0.99162
+    ],
+    "resolved": "unresolved"
+   },
+   {
+    "arm": "B0",
+    "q": 4051,
+    "units_ok": 5,
+    "units": 5,
+    "rho_runs": 150,
+    "ic_meq": [
+     9535376.0,
+     10277360.0,
+     16955190.0
+    ],
+    "rho_meq": [
+     12977680.0,
+     14268180.0,
+     25882610.0
+    ],
+    "ratio": [
+     0.73475,
+     0.7203,
+     0.65508
+    ],
+    "ratio_lo": [
+     0.66191,
+     0.64989,
+     0.59641
+    ],
+    "ratio_hi": [
+     0.81643,
+     0.79873,
+     0.72082
+    ],
+    "resolved": "IC lower"
+   },
+   {
+    "arm": "B0",
+    "q": 8191,
+    "units_ok": 5,
+    "units": 5,
+    "rho_runs": 120,
+    "ic_meq": [
+     19115760.0,
+     20847190.0,
+     36430060.0
+    ],
+    "rho_meq": [
+     40036650.0,
+     44031840.0,
+     79988570.0
+    ],
+    "ratio": [
+     0.47746,
+     0.47346,
+     0.45544
+    ],
+    "ratio_lo": [
+     0.43841,
+     0.43473,
+     0.41835
+    ],
+    "ratio_hi": [
+     0.52205,
+     0.51757,
+     0.49803
+    ],
+    "resolved": "IC lower"
+   },
+   {
+    "arm": "B0",
+    "q": 16363,
+    "units_ok": 5,
+    "units": 5,
+    "rho_runs": 120,
+    "ic_meq": [
+     42629630.0,
+     46633000.0,
+     82663370.0
+    ],
+    "rho_meq": [
+     111157900.0,
+     122264600.0,
+     222225100.0
+    ],
+    "ratio": [
+     0.38351,
+     0.38141,
+     0.37198
+    ],
+    "ratio_lo": [
+     0.34743,
+     0.3463,
+     0.33956
+    ],
+    "ratio_hi": [
+     0.42502,
+     0.42182,
+     0.40968
+    ],
+    "resolved": "IC lower"
+   },
+   {
+    "arm": "B0",
+    "q": 32719,
+    "units_ok": 5,
+    "units": 5,
+    "rho_runs": 80,
+    "ic_meq": [
+     92198900.0,
+     101471600.0,
+     184925500.0
+    ],
+    "rho_meq": [
+     276139900.0,
+     303743400.0,
+     552174700.0
+    ],
+    "ratio": [
+     0.33388,
+     0.33407,
+     0.3349
+    ],
+    "ratio_lo": [
+     0.30169,
+     0.30183,
+     0.30246
+    ],
+    "ratio_hi": [
+     0.37355,
+     0.37368,
+     0.3747
+    ],
+    "resolved": "IC lower"
+   },
+   {
+    "arm": "B0",
+    "q": 65479,
+    "units_ok": 5,
+    "units": 5,
+    "rho_runs": 80,
+    "ic_meq": [
+     200403000.0,
+     221879500.0,
+     415168700.0
+    ],
+    "rho_meq": [
+     903843800.0,
+     994217300.0,
+     1807578000.0
+    ],
+    "ratio": [
+     0.22172,
+     0.22317,
+     0.22968
+    ],
+    "ratio_lo": [
+     0.19712,
+     0.19846,
+     0.20431
+    ],
+    "ratio_hi": [
+     0.24947,
+     0.25114,
+     0.25831
+    ],
+    "resolved": "IC lower"
+   },
+   {
+    "arm": "B0",
+    "q": 131071,
+    "units_ok": 3,
+    "units": 3,
+    "rho_runs": 24,
+    "ic_meq": [
+     456671200.0,
+     520295300.0,
+     1092913000.0
+    ],
+    "rho_meq": [
+     2449675000.0,
+     2694632000.0,
+     4899239000.0
+    ],
+    "ratio": [
+     0.18642,
+     0.19309,
+     0.22308
+    ],
+    "ratio_lo": [
+     0.11696,
+     0.12101,
+     0.13958
+    ],
+    "ratio_hi": [
+     0.29115,
+     0.30173,
+     0.34935
+    ],
+    "resolved": "IC lower"
+   },
+   {
+    "arm": "B0",
+    "q": 262111,
+    "units_ok": 3,
+    "units": 3,
+    "rho_runs": 18,
+    "ic_meq": [
+     765472300.0,
+     870306800.0,
+     1813817000.0
+    ],
+    "rho_meq": [
+     6281876000.0,
+     6910051000.0,
+     12563630000.0
+    ],
+    "ratio": [
+     0.12185,
+     0.12595,
+     0.14437
+    ],
+    "ratio_lo": [
+     0.09865,
+     0.10194,
+     0.11678
+    ],
+    "ratio_hi": [
+     0.1565,
+     0.16176,
+     0.18548
+    ],
+    "resolved": "IC lower"
+   }
+  ],
+  "fits": {
+   "all_sizes": [
+    {
+     "fit": "A0",
+     "sizes": 5,
+     "ic_exp_w0": [
+      1.8893,
+      1.8684,
+      1.9025
+     ],
+     "rho_exp_w0": [
+      1.4511,
+      1.4099,
+      1.4892
+     ],
+     "gap_w0": [
+      -0.4382,
+      -0.4834,
+      -0.3951
+     ],
+     "ic_exp_w1": [
+      1.9546,
+      1.9429,
+      1.9617
+     ],
+     "rho_exp_w1": [
+      1.4846,
+      1.442,
+      1.5253
+     ],
+     "gap_w1": [
+      -0.47,
+      -0.5129,
+      -0.428
+     ]
+    },
+    {
+     "fit": "A0r",
+     "sizes": 5,
+     "ic_exp_w0": [
+      1.9855,
+      1.8941,
+      2.0721
+     ],
+     "rho_exp_w0": [
+      1.4509,
+      1.4075,
+      1.4923
+     ],
+     "gap_w0": [
+      -0.5345,
+      -0.626,
+      -0.4218
+     ],
+     "ic_exp_w1": [
+      2.0384,
+      1.9572,
+      2.1226
+     ],
+     "rho_exp_w1": [
+      1.4844,
+      1.4392,
+      1.5285
+     ],
+     "gap_w1": [
+      -0.5539,
+      -0.6429,
+      -0.4451
+     ]
+    },
+    {
+     "fit": "B0",
+     "sizes": 11,
+     "ic_exp_w0": [
+      0.9982,
+      0.9708,
+      1.0233
+     ],
+     "rho_exp_w0": [
+      1.4856,
+      1.4641,
+      1.5051
+     ],
+     "gap_w0": [
+      0.4874,
+      0.4548,
+      0.5209
+     ],
+     "ic_exp_w1": [
+      1.0859,
+      1.0606,
+      1.1103
+     ],
+     "rho_exp_w1": [
+      1.4955,
+      1.4739,
+      1.5156
+     ],
+     "gap_w1": [
+      0.4096,
+      0.3779,
+      0.4428
+     ]
+    }
+   ],
+   "all_sizes_phase_exponents": [
+    {
+     "phase_exponents": {
+      "fb": 1.0923,
+      "relations": 1.9564,
+      "linear_algebra": 1.977,
+      "descent": -0.0038,
+      "verify": 0.2119
+     },
+     "arm": "A0"
+    },
+    {
+     "phase_exponents": {
+      "fb": 1.1634,
+      "relations": 2.0275,
+      "linear_algebra": 2.0629,
+      "descent": 0.0453,
+      "verify": 0.1925
+     },
+     "arm": "A0r"
+    },
+    {
+     "phase_exponents": {
+      "fb": 0.6733,
+      "relations": 1.0749,
+      "linear_algebra": 1.15,
+      "log_recovery": 0.8714,
+      "descent": 0.3944,
+      "verify": 0.1322
+     },
+     "arm": "B0"
+    }
+   ],
+   "primary_range": [
+    {
+     "fit": "B0",
+     "sizes": 7,
+     "ic_exp_w0": [
+      1.0828,
+      1.0401,
+      1.1285
+     ],
+     "rho_exp_w0": [
+      1.485,
+      1.4366,
+      1.525
+     ],
+     "gap_w0": [
+      0.4022,
+      0.3354,
+      0.4682
+     ],
+     "ic_exp_w1": [
+      1.1539,
+      1.1137,
+      1.2009
+     ],
+     "rho_exp_w1": [
+      1.4856,
+      1.4372,
+      1.5256
+     ],
+     "gap_w1": [
+      0.3316,
+      0.2656,
+      0.398
+     ]
+    }
+   ],
+   "primary_range_phase_exponents": [
+    {
+     "phase_exponents": {
+      "fb": 0.6918,
+      "relations": 1.1108,
+      "linear_algebra": 1.1259,
+      "log_recovery": 0.7796,
+      "descent": 0.4758,
+      "verify": 0.0953
+     },
+     "arm": "B0"
+    }
+   ]
+  },
+  "class": "advance (restricted to the GHS-weak family)",
+  "baseline_arm": "A0r",
+  "study": "research/quartic_n4_20261019/",
+  "report": "research/quartic_n4_20261019/README.md"
  },
  "phases": [
   {

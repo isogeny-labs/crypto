@@ -17,6 +17,7 @@ use crypto_lib::cryptanalysis::koblitz_isogeny_cost::{
     factor_base_basis, field_for, geometric_basis,
 };
 use crypto_lib::cryptanalysis::polynomial_reuse::build_decomposition_system_reusing;
+use crypto_lib::cryptanalysis::pq_groebner_f2::Mask;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use std::collections::{BTreeMap, HashSet};
@@ -109,8 +110,8 @@ fn main() {
             mono_union += u.len();
             // rank of the quadratic parts: n_eqs - rank = linear equations
             // obtainable by linear algebra alone (degree falls at degree 2)
-            let quads: Vec<u64> = {
-                let mut q: Vec<u64> = u.iter().copied().filter(|m| m.count_ones() >= 2).collect();
+            let quads: Vec<Mask> = {
+                let mut q: Vec<Mask> = u.iter().copied().filter(|m| m.count_ones() >= 2).collect();
                 q.sort_unstable();
                 q
             };

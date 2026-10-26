@@ -587,19 +587,24 @@ pub fn run_trial(config: &TrialConfig) -> TrialRecord {
 }
 
 /// This process's peak resident memory in MiB.  `ru_maxrss` is bytes on
-/// macOS and KiB elsewhere.
+/// macOS and KiB on Linux.  `0` means the measurement is unavailable: the
+/// libc `getrusage` binding exists only on Unix, so the Windows release
+/// build cannot call it (the same gating `experiment.rs` uses).
 fn peak_rss_mb() -> u64 {
-    // SAFETY: `rusage` is plain old data and `getrusage` only writes to it.
-    let mut usage: libc::rusage = unsafe { std::mem::zeroed() };
-    if unsafe { libc::getrusage(libc::RUSAGE_SELF, &mut usage) } != 0 {
-        return 0;
+    #[cfg(any(target_os = "macos", target_os = "linux"))]
+    {
+        // SAFETY: `rusage` is plain old data and `getrusage` only writes to it.
+        let mut usage: libc::rusage = unsafe { std::mem::zeroed() };
+        if unsafe { libc::getrusage(libc::RUSAGE_SELF, &mut usage) } == 0 {
+            let raw = usage.ru_maxrss.max(0) as u64;
+            return if cfg!(target_os = "macos") {
+                raw / (1024 * 1024)
+            } else {
+                raw / 1024
+            };
+        }
     }
-    let raw = usage.ru_maxrss.max(0) as u64;
-    if cfg!(target_os = "macos") {
-        raw / (1024 * 1024)
-    } else {
-        raw / 1024
-    }
+    0
 }
 
 fn envelope(record: &TrialRecord) -> Value {

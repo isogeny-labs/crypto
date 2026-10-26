@@ -25,7 +25,6 @@
 #[allow(dead_code)]
 #[path = "../pdp_speedup/arms.rs"]
 mod arms;
-#[allow(dead_code)]
 #[path = "../pdp_speedup/bitslice.rs"]
 mod bitslice;
 #[allow(dead_code)]

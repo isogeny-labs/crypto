@@ -184,8 +184,10 @@ state_hash() {
     git diff --binary HEAD 2>/dev/null || true
     [ -f .resume/RESUME.md ] && cat .resume/RESUME.md
     git ls-files --others --exclude-standard | grep -Ev "$EXCLUDE_RE" | grep -v '^\.resume/' | while IFS= read -r f; do
-      [ -f "$f" ] && stat -f '%N %z %m' "$f" 2>/dev/null || stat -c '%n %s %Y' "$f" 2>/dev/null || true
-    done
+      # GNU `stat -c` first: BSD/macOS `stat` rejects -c and falls through to -f,
+      # but GNU `stat -f` means filesystem status and succeeds with the wrong output.
+      [ -f "$f" ] && { stat -c '%n %s %Y' "$f" 2>/dev/null || stat -f '%N %z %m' "$f" 2>/dev/null; } || true
+    done || true  # the greps above exit 1 when nothing is untracked; that is not an error
   } | shasum -a 256 | cut -d' ' -f1
 }
 
@@ -278,7 +280,8 @@ cmd_push() {
   if git rev-parse --verify -q HEAD >/dev/null; then
     unpushed="$(git rev-list --count HEAD --not --remotes)"
     if [ "$unpushed" -gt 0 ]; then
-      git bundle create -q "$stage/branch.bundle" HEAD --not --remotes
+      git bundle create -q "$stage/branch.bundle" HEAD --not --remotes \
+        || die "failed to bundle unpushed commits; nothing was checkpointed"
     fi
     git diff --binary HEAD > "$stage/worktree.patch"
     [ -s "$stage/worktree.patch" ] || rm -f "$stage/worktree.patch"
@@ -288,7 +291,7 @@ cmd_push() {
   : > "$stage/untracked.list"; : > "$stage/skipped-untracked.txt"
   while IFS= read -r f; do
     [ -f "$f" ] || continue
-    sz="$(stat -f %z "$f" 2>/dev/null || stat -c %s "$f")"
+    sz="$(stat -c %s "$f" 2>/dev/null || stat -f %z "$f")"  # GNU first: see state_hash
     if [ "$sz" -gt "$maxb" ] || [ $((total + sz)) -gt "$capb" ]; then
       printf '%s\t%s bytes\n' "$f" "$sz" >> "$stage/skipped-untracked.txt"
     else
