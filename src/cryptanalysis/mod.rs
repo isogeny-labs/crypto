@@ -219,6 +219,7 @@ pub mod jacobian_transfer;
 pub mod joux_vitse;
 pub mod joux_vitse_edwards;
 pub mod jv_cover;
+pub mod zero_dim_la;
 pub mod jv_isogeny_walk;
 pub mod jv_quartic;
 pub mod jv_quintic;

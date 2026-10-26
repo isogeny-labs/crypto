@@ -1458,7 +1458,41 @@ pub fn solve_zero_dim_mode(
         st.incomplete = true;
         return (Vec::new(), st);
     }
-    let lms: Vec<&Vec<u32>> = r.basis.iter().map(|g| &g[0].0).collect();
+    let sols = linear_stage_from_basis(&r.basis, input, n, p, rng, mode, &mut st, t_lin);
+    (sols, st)
+}
+
+/// The linear stage of [`solve_zero_dim_mode`] alone: from a Gröbner basis
+/// (monic, grevlex, as `f4_fp` returns it) of a zero-dimensional ideal to its
+/// `F_p`-rational solutions, each checked against `input`. It draws one `u64`
+/// from `rng`, as the solver always did. `t_lin` is when the stage's clock
+/// starts; the stage writes `delta`, `lin_muls`, `lin_ms`, `lin_fallback`,
+/// `nonseparating`, `incomplete` and `inconsistent` into `st`.
+#[allow(clippy::too_many_arguments)]
+pub fn linear_stage_from_basis(
+    basis: &[f4_fp::Poly],
+    input: &[f4_fp::Poly],
+    n: usize,
+    p: u64,
+    rng: &mut StdRng,
+    mode: LinMode,
+    st: &mut ZeroDimStats,
+    t_lin: Instant,
+) -> Vec<Vec<u64>> {
+    if mode == LinMode::Fast {
+        let mut fs = super::zero_dim_la::FastStats::default();
+        if let Some(sols) = super::zero_dim_la::fast_stage(basis, input, n, p, rng, &mut fs) {
+            st.delta = fs.delta;
+            st.lin_muls = fs.muls();
+            st.lin_ms = t_lin.elapsed().as_secs_f64() * 1e3;
+            return sols;
+        }
+        st.lin_fallback += 1;
+        let sols = linear_stage_from_basis(basis, input, n, p, rng, LinMode::Dense, st, t_lin);
+        st.lin_muls += fs.muls();
+        return sols;
+    }
+    let lms: Vec<&Vec<u32>> = basis.iter().map(|g| &g[0].0).collect();
     // the smallest pure power of each variable
     let mut cap = vec![u32::MAX; n];
     for lm in &lms {
@@ -1468,7 +1502,7 @@ pub fn solve_zero_dim_mode(
     }
     if cap.contains(&u32::MAX) {
         st.incomplete = true;
-        return (Vec::new(), st);
+        return Vec::new();
     }
     // standard monomials by pruned depth-first search
     let mut std_mons: Vec<Vec<u32>> = Vec::new();
@@ -1502,13 +1536,13 @@ pub fn solve_zero_dim_mode(
     let mut mono = vec![0u32; n];
     if !walk(0, &mut mono, &cap, &lms, &mut std_mons) {
         st.incomplete = true;
-        return (Vec::new(), st);
+        return Vec::new();
     }
     let delta = std_mons.len();
     st.delta = delta;
     if delta == 0 {
         st.inconsistent = true;
-        return (Vec::new(), st);
+        return Vec::new();
     }
     // Monomials packed eight bits per variable; divisibility by the guard-bit
     // trick (exponents stay below 128).
@@ -1533,8 +1567,7 @@ pub fn solve_zero_dim_mode(
         .enumerate()
         .map(|(i, m)| (pack(m), i))
         .collect();
-    let bas: Vec<(u64, Vec<(u64, u64)>)> = r
-        .basis
+    let bas: Vec<(u64, Vec<(u64, u64)>)> = basis
         .iter()
         .map(|g| {
             (
@@ -1612,7 +1645,7 @@ pub fn solve_zero_dim_mode(
                     nf_mono(xb, delta, p, &index, &bas, &divides_p, &mut memo, &mut cnt)
                 else {
                     st.incomplete = true;
-                    return (Vec::new(), st);
+                    return Vec::new();
                 };
                 target.push(None);
                 nz.push(
@@ -1791,7 +1824,7 @@ pub fn solve_zero_dim_mode(
                     nf_mono(xb, delta, p, &index, &bas, &divides_p, &mut memo, &mut cnt)
                 else {
                     st.incomplete = true;
-                    return (Vec::new(), st);
+                    return Vec::new();
                 };
                 for (k, &c) in col.iter().enumerate() {
                     mi[k][j] = c;
@@ -1875,7 +1908,7 @@ pub fn solve_zero_dim_mode(
     sols.dedup();
     st.lin_muls = cnt;
     st.lin_ms = t_lin.elapsed().as_secs_f64() * 1e3;
-    (sols, st)
+    sols
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -1883,6 +1916,9 @@ pub enum LinMode {
     Dense,
     Sparse,
     L1a,
+    /// `zero_dim_la::fast_stage` (transposed Krylov and the rational read-out),
+    /// with the dense stage when it gives up.
+    Fast,
 }
 
 /// `JV_LIN=dense|l1a|sparse` (default sparse), read once.
@@ -1891,6 +1927,7 @@ fn lin_mode() -> LinMode {
     *MODE.get_or_init(|| match std::env::var("JV_LIN").as_deref() {
         Ok("dense") => LinMode::Dense,
         Ok("l1a") => LinMode::L1a,
+        Ok("fast") => LinMode::Fast,
         _ => LinMode::Sparse,
     })
 }
@@ -1900,6 +1937,7 @@ pub fn lin_mode_name() -> &'static str {
         LinMode::Dense => "dense",
         LinMode::L1a => "l1a",
         LinMode::Sparse => "sparse",
+        LinMode::Fast => "fast",
     }
 }
 
@@ -3362,6 +3400,45 @@ pub struct StudySystem {
     pub modes: Vec<StudyMode>,
 }
 
+/// The Weil-restricted Nagao systems of `run_stop_study`'s jobs: `random`
+/// residuals `aG + bQ` and `constructed` ones with a planted six-point
+/// decomposition, each as its six quadrics in six unknowns over `F_p`, with
+/// `true` on the constructed ones. Degenerate residuals are skipped. This is
+/// the corpus input of `research/postgb_linear_stage_20261027`.
+pub fn nagao_systems(
+    p: u64,
+    seed: u64,
+    random: usize,
+    constructed: usize,
+) -> Vec<(Vec<f4_fp::Poly>, bool)> {
+    let spec = generate_spec(p, seed);
+    let ctx = Ctx::new(&spec);
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xC0C0);
+    let base = factor_base(&ctx, &mut rng);
+    let jac = ctx.jac();
+    let mut jobs: Vec<(Div<E2>, bool)> = Vec::new();
+    for _ in 0..random {
+        let a = rng.gen_range(0..spec.l);
+        let b = rng.gen_range(1..spec.l);
+        jobs.push((
+            jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128)),
+            false,
+        ));
+    }
+    for _ in 0..constructed {
+        jobs.push((planted(&jac, &base, &mut rng).0, true));
+    }
+    jobs.into_iter()
+        .filter(|(r, _)| r.u.len() == 4)
+        .map(|(r, pl)| {
+            let mut v = r.v.clone();
+            v.resize(3, E2::ZERO);
+            let forms = weil_forms(&ctx.f.f, &ctx.cov.hx, &r.u, &v);
+            (forms.polys(&ctx.reim, p), pl)
+        })
+        .collect()
+}
+
 pub fn run_stop_study(
     p: u64,
     seed: u64,
@@ -3820,7 +3897,7 @@ mod tests {
                         }
                     }
                     let mut outs = Vec::new();
-                    for mode in [LinMode::Dense, LinMode::Sparse, LinMode::L1a] {
+                    for mode in [LinMode::Dense, LinMode::Sparse, LinMode::L1a, LinMode::Fast] {
                         let mut r = StdRng::seed_from_u64(5 + trial as u64);
                         let (sols, st) =
                             solve_zero_dim_mode(&sys, n, p, &opts, &mut r, false, mode);
@@ -3833,6 +3910,7 @@ mod tests {
                     }
                     assert_eq!(outs[0].0, outs[1].0, "sparse p={p} n={n} trial={trial}");
                     assert_eq!(outs[0].0, outs[2].0, "l1a p={p} n={n} trial={trial}");
+                    assert_eq!(outs[0].0, outs[3].0, "fast p={p} n={n} trial={trial}");
                     if planted.len() == 1 {
                         assert!(outs[1].0.contains(&planted[0]), "planted lost p={p} n={n}");
                     }
