@@ -2,3 +2,17 @@
 binary: target/release/examples/pkm_symmetric_tower built from 9b4817d69 (main's abf176922 differs only by clippy rewrites: div_ceil, is_multiple_of; same behaviour)
 2026-10-26T18:43:49Z building m=4 variant of the example at nice 19 while N=18 runs (timing of concurrent rows perturbed; D and widths are not)
 2026-10-26T19:03:43Z m=4 cells (concurrent with the m=3 N=18 run; ms perturbed): t=3 both arms, then symmetric t=4,5
+m=4 t=3 plain-chain,symmetric exit=0
+m=4 t=4 symmetric exit=0
+memory allocation of 396576 bytes failed
+stack backtrace:
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+/bin/bash: line 1:   518 Killed                  RAYON_NUM_THREADS=4 timeout 7200 /home/user/crypto/target/release/examples/pkm_symmetric_tower --p 786433 --m 3 --t-max-m3 7 --random 2 --budget 7200 --arms symmetric
+
+real	36m42.634s
+user	92m44.062s
+sys	1m10.898s
+exit=137
+m=4 t=5 symmetric exit=134
+NOTE (operator): the m=3 N=18 cell above was killed by the kernel OOM killer (exit 137) after 92 CPU-min, ~8.5+ GB, because the concurrent m=4 cells pushed the 15 GB container over. Operator error. The m=4 t=5 (N=20) cell aborted under its 6 GB cap (exit 134). Rerunning m=3 t=6 alone with --t-min 6 (targets differ from a t<=7 sweep because earlier cells consume the RNG), cap 13 GB.
+2026-10-26T19:11:01Z start m=3 t=6 alone
