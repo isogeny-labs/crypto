@@ -8,6 +8,12 @@ native projective-divisor recovery, and records repeated native stage runs.
 It does not complete the native elliptic-to-Jacobian transfer or qualify
 an end-to-end performance result. All historical Sage evidence is unchanged.
 
+2026-10-26 continuation: compute is online, but the mandatory S3 checkpoint
+gate fails and no compatible isolated-runner connection is configured. The
+[cold-comparison requirements](../native_end_to_end/REQUIREMENTS.md) and
+[observed access record](../native_end_to_end/ACCESS_STATUS.md) describe the
+remaining native-map and execution prerequisites. No new benchmark has run.
+
 | Requested requirement | Status | Evidence and remaining gap |
 | --- | --- | --- |
 | Prove or disprove one extra step after preparation | Partial | Explicit rational three-torsion lift with exact polynomial checks; 27 prepared native replays. Level-nine neighbor labels and obstruction divisors remain uncomputed. |

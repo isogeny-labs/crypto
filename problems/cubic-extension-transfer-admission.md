@@ -108,6 +108,12 @@ independent replay. No diagnostic substitutes for these requirements.
 
 ## Resolution and history
 
+The 2026-10-26 benchmark continuation restored compute access and prepared
+[explicit cold-transfer acceptance requirements](../research/cubic_extension_transfer_20261025/native_end_to_end/REQUIREMENTS.md).
+The [observed access record](../research/cubic_extension_transfer_20261025/native_end_to_end/ACCESS_STATUS.md)
+retains the failed mandatory checkpoint gate, absent runner connection and
+missing native-map stages. No new measurement or release-test pass is claimed.
+
 Unresolved. The 2026-10-25 PR preserves existing evidence and names the
 publication and admission gaps. No requested research criterion is weakened
 or replaced by this problem record.
