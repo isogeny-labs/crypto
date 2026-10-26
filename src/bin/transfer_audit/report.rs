@@ -114,6 +114,57 @@ fn table(rows: &[Row]) -> String {
     s
 }
 
+/// One row per curve and transfer type: the subgroup statuses seen, the
+/// cheapest carried route (log2 route/rho; positive means it costs more than
+/// rho), and the strongest verdict.
+fn summary_table(rows: &[Row]) -> String {
+    let mut s = String::from(
+        "| curve | transfer type | candidates | subgroup statuses | cheapest carried route, log2(route/rho) | verdict |\n|:--|:--|--:|:--|--:|:--|\n",
+    );
+    let mut keys: Vec<(&str, &str)> = Vec::new();
+    for r in rows {
+        let k = (r.curve.as_str(), r.kind.as_str());
+        if !keys.contains(&k) {
+            keys.push(k);
+        }
+    }
+    for (curve, kind) in keys {
+        let group: Vec<&Row> = rows
+            .iter()
+            .filter(|r| r.curve == curve && r.kind == kind)
+            .collect();
+        let mut statuses: Vec<&str> = group.iter().map(|r| r.subgroup.as_str()).collect();
+        statuses.sort_unstable();
+        statuses.dedup();
+        let best = group
+            .iter()
+            .filter(|r| r.carried)
+            .filter_map(|r| r.ratio.map(|x| (x, r.lower_bound, r.id.as_str())))
+            .min_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
+        let best_txt = match best {
+            Some((x, lb, id)) => format!("{}{x:.1} (`{id}`)", if lb { ">= " } else { "" }),
+            None => "no carried route".to_string(),
+        };
+        let verdict = [
+            "class-weak",
+            "source-transfer-weak",
+            "weak representative exists",
+            "implementation-weak",
+        ]
+        .iter()
+        .find(|v| group.iter().any(|r| r.verdict == **v))
+        .copied()
+        .unwrap_or("no weakness found in scope");
+        s.push_str(&format!(
+            "| {curve} | {} | {} | {} | {best_txt} | {verdict} |\n",
+            type_label(kind),
+            group.len(),
+            statuses.join(", ")
+        ));
+    }
+    s
+}
+
 fn csv(rows: &[Row]) -> String {
     let mut s = String::from(
         "curve,transfer_type,candidate,subgroup_status,map_status,carried,destination_solver,log2_total,log2_cost_ratio_to_rho,total_is_lower_bound,lead_class,verdict\n",
@@ -167,10 +218,10 @@ fn marker(x: f64, y: f64, status: &str, fill: &str) -> String {
 
 fn chart(rows: &[&Row], title: &str, subtitle: &str) -> String {
     let left = 330.0;
-    let right_pad = 40.0;
+    let right_pad = 130.0;
     let plot_w = 640.0;
     let row_h = 17.0;
-    let top = 92.0;
+    let top = 116.0;
     let ratios: Vec<f64> = rows
         .iter()
         .filter(|r| r.carried)
@@ -208,7 +259,7 @@ fn chart(rows: &[&Row], title: &str, subtitle: &str) -> String {
         ("pairing_transfer", "pairing"),
     ] {
         s.push_str(&format!(
-            "<rect x=\"{lx}\" y=\"54\" width=\"10\" height=\"10\" fill=\"{}\"/><text x=\"{}\" y=\"63\" fill=\"#222\">{name}</text>\n",
+            "<rect x=\"{lx}\" y=\"52\" width=\"10\" height=\"10\" fill=\"{}\"/><text x=\"{}\" y=\"61\" fill=\"#222\">{name}</text>\n",
             colour(k),
             lx + 14.0
         ));
@@ -318,7 +369,7 @@ fn count(rows: &[Row], kind: &str, status: &str) -> usize {
 }
 
 fn pipeline(rows: &[Row]) -> String {
-    let w = 1000.0;
+    let w = 1180.0;
     let h = 470.0;
     let mut s = format!(
         "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{w}\" height=\"{h}\" viewBox=\"0 0 {w} {h}\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"12\">\n<title>transfer-audit pipeline</title>\n<rect width=\"100%\" height=\"100%\" fill=\"#ffffff\"/>\n<defs><marker id=\"a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0 0 L8 4 L0 8 Z\" fill=\"#444\"/></marker></defs>\n<text x=\"16\" y=\"24\" font-size=\"15\" font-weight=\"bold\" fill=\"#111\">transfer-audit: from a curve to a certified, priced verdict</text>\n<text x=\"16\" y=\"42\" fill=\"#444\">counts are subgroup-preservation statuses over the audited curves in this run (toys included); every box is a module of src/bin/transfer_audit/</text>\n"
@@ -368,7 +419,7 @@ fn pipeline(rows: &[Row]) -> String {
     s.push_str(&boxx(
         262.0,
         70.0,
-        250.0,
+        330.0,
         86.0,
         "2. repository traits + baseline",
         &[
@@ -414,26 +465,26 @@ fn pipeline(rows: &[Row]) -> String {
         let lines = vec![
             format!("{file}: {what}"),
             format!(
-                "verified {} · arithmetic {} · refuted {} · not evaluated {}",
+                "verified {} | arithmetic {} | refuted {} | other {}",
                 count(rows, kind, "verified"),
                 count(rows, kind, "arithmetic"),
                 count(rows, kind, "refuted"),
                 count(rows, kind, "not_evaluated") + count(rows, kind, "not_applicable")
             ),
         ];
-        s.push_str(&boxx(262.0, y, 250.0, 54.0, title, &lines, "#ffffff", col));
+        s.push_str(&boxx(262.0, y, 330.0, 54.0, title, &lines, "#ffffff", col));
         s.push_str(&arrow(
-            387.0,
+            427.0,
             if i == 0 { 156.0 } else { y - 8.0 },
-            387.0,
+            427.0,
             y,
         ));
     }
-    s.push_str(&arrow(512.0, 300.0, 560.0, 300.0));
+    s.push_str(&arrow(592.0, 300.0, 640.0, 300.0));
     s.push_str(&boxx(
-        560.0,
+        640.0,
         190.0,
-        420.0,
+        524.0,
         240.0,
         "3. certificate per candidate (certificate.rs)",
         &[
@@ -453,9 +504,9 @@ fn pipeline(rows: &[Row]) -> String {
         "#111",
     ));
     s.push_str(&boxx(
-        560.0,
+        640.0,
         70.0,
-        420.0,
+        524.0,
         86.0,
         "controls (controls.rs)",
         &[
@@ -466,7 +517,7 @@ fn pipeline(rows: &[Row]) -> String {
         "#fff8e1",
         "#b58900",
     ));
-    s.push_str(&arrow(770.0, 156.0, 770.0, 190.0));
+    s.push_str(&arrow(902.0, 156.0, 902.0, 190.0));
     s.push_str("</svg>\n");
     s
 }
@@ -488,6 +539,7 @@ pub fn build(certs: &Path, out: &Path) -> Result<(), String> {
         .collect();
     let toy: Vec<&Row> = rows.iter().filter(|r| !r.registered).collect();
     fs::write(out.join("RESULTS_TABLE.md"), table(&rows)).map_err(|e| e.to_string())?;
+    fs::write(out.join("RESULTS_SUMMARY.md"), summary_table(&rows)).map_err(|e| e.to_string())?;
     fs::write(out.join("cost_ratio.csv"), csv(&rows)).map_err(|e| e.to_string())?;
     fs::write(
         out.join("cost_ratio.svg"),
@@ -523,7 +575,7 @@ pub fn build(certs: &Path, out: &Path) -> Result<(), String> {
         .map(|r| r.id.as_str())
         .collect();
     println!(
-        "report: {} rows -> RESULTS_TABLE.md, cost_ratio.csv, cost_ratio.svg, cost_ratio_toy.svg, cost_ratio_controls.svg, pipeline.svg{}",
+        "report: {} rows -> RESULTS_TABLE.md, RESULTS_SUMMARY.md, cost_ratio.csv, cost_ratio.svg, cost_ratio_toy.svg, cost_ratio_controls.svg, pipeline.svg{}",
         rows.len(),
         if bad.is_empty() { String::new() } else { format!("; cross-check failures: {bad:?}") }
     );
