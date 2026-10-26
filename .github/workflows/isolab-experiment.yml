@@ -1,6 +1,7 @@
 name: Iso Lab experiment
 on:
   pull_request:
+    branches: [main]
     paths:
       - taskq/deploy/eks-karpenter/**
       - .github/workflows/isolab-experiment.yml
