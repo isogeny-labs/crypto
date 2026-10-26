@@ -279,6 +279,70 @@ Generic `2^{n/2}` is `2^65.5`; the rho reference is `2^60.8`.
   of the formulas at `ω = log₂ 7` are `n = 1144` (Kousidis–Wiemers) and
   `n = 1876` (Petit–Quisquater).
 
+## Addendum, 2026-10-26: the `openai/math` release of 2026-10-26
+
+Read at `openai/math` commit `7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a`
+(2026-10-26T14:18:03-07:00; 721 manuscripts, 373 families).  Its
+`history.md` lists two new manuscripts (local smoothing for the wave
+equation, family 079; the ETH disproof, family 378), new and repaired Lean
+formalizations, and no withdrawal touching this note.  Only 378 and the Lean
+scope of 107 bear on index calculus.  Nothing below was built or run here:
+the Lean libraries were not compiled and the corpus proofs were not checked.
+
+- **Family 378, "The Exponential Time Hypothesis is False".**  It counts the
+  satisfying assignments of a `k`-CNF deterministically in
+  `(n+m)^{O_k(1)} 2^{n/(log n)^{1/2+o(1)}}` time and polynomial space
+  (Lean scope, `lean/docs/378.md`: `2^{O_k(n (log log n)^2/√log n)}`).
+  Its appendix applies it to inverting Boolean maps of constant output
+  locality.  For relation finding it is **galactic**:
+  - The overview's cost (eq. `overview-three-costs`) includes a factor
+    `2^{2n/r}` with `r = Θ(√log n/(log log n)^2)`, and its parameter bounds
+    hold only "for sufficiently large `n`".  That one factor beats the
+    `2^{0.386 n}` of PPSZ on 3-SAT only when `r > 5.2`.  With the hidden
+    constant set to 1 and natural logarithms, `r > 5.2` needs
+    `log n ≈ 10^6`, that is `n ≈ e^{10^6}` variables.  The SAT encodings of
+    point decomposition have thousands of variables.  This is arithmetic on
+    the paper's stated bounds, not a measurement.
+  - Encoding a whole ECDLP as CNF does not help either: Tseitin variables
+    grow with circuit size, not with the 131 scalar bits, so `2^{N/√log N}`
+    with `N = poly(131)` is far above `2^{65.5}`.  EC scalar multiplication
+    is not a constant-locality map, so the appendix corollary does not
+    apply directly.
+  - What it changes is the asymptotic floor for SAT-based decomposition
+    (the CDCL SAT line of this note's scope, and `research/sat_factor_base_review_20260908/`): no
+    `2^{Ω(n)}` lower bound on the SAT step may be assumed any more.  No
+    cost row here quotes such a bound.
+- **Family 107 now has a Lean scope (`lean/docs/107.md`).**  Two claims
+  matter for the `ω` table in the 2026-10-07 addendum:
+  - **`ω(ℂ) ≤ 9/4` is claimed formalized** in the arithmetic-operation
+    model.  The characteristic-0 proof that the table marked "nobody here
+    has verified" now has a claimed machine proof.  Not checked here: the
+    Lean was not built, and the Comparator statement
+    (`ComparatorChallenges/MatrixMultiplication.lean`, `complex_omega_le_nine_quarters`)
+    was not compared with the paper.
+  - **Over every field, only `ω(F) < 2.371054886006746` is claimed
+    formalized**, characteristic 2 included (`MatrixFields.lean`,
+    `omega_lt_source_constant`).  That is `2.8·10^-4` below the published
+    `2.371339`, so it changes no row materially.
+  - **Contrarian reading.**  The corpus formalized `9/4` over `ℂ` and only
+    `2.3711` over every field.  The family summary says the `2.258` bound
+    holds "outside finitely many positive characteristics" and gives no
+    every-field `9/4`.  The 2026-10-07 review found a single
+    characteristic-dependent step in `9/4` (root-of-unity separation) and
+    called the characteristic-2 bound conditional.  The authors' own
+    choice not to state or formalize `9/4` over every field is evidence
+    that the transfer may need more than that step.  The `9/4` row stays
+    **conditional**, and the condition is now the transfer, not the
+    characteristic-0 proof.
+  - `src/cryptanalysis/matmul_exponent.rs` still tags `CORPUS_FAMILY_107`
+    `ProofStatus::Unverified`.  That remains accurate for this repository,
+    which has checked no proof.  Adding a "formalized upstream, not
+    rebuilt" status and the `2.3711` every-field row is an open code change,
+    not made here.
+- **No other family moved.**  `history.md` records no withdrawal or repair
+  in families 107, 142 (deterministic polynomial factorization over prime
+  fields) or 279 (exact quantum factoring) since 2026-10-07.
+
 ## Honest limits
 
 - This is a literature survey, not a result. It says what has been
