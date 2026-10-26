@@ -42,7 +42,8 @@ directory moves the files under it that the policy selects.
 Policy (`.artifacts/config.json`, `policy`): a tracked non-code file larger
 than 1 MiB goes to the store; a data-suffixed file (`.jsonl`, `.gz`, `.npy`,
 `.csv`, `.log`, `.part-NNNN`, and the rest of `DATA_EXT`) larger than 64 KiB
-does too. Source, build and config text (`CODE_EXT`) never moves. `policy.keep`
+does too. Source, build and config text (`CODE_EXT`) never moves, and PDFs
+(`GIT_EXT`) stay in Git at any size. `policy.keep`
 lists globs that stay in Git whatever their size: data files that code or CI
 outside the data trees name by path, and generated files regenerated on most
 PRs (`docs/browser/data.json`, the large `docs/curves/` registries,
