@@ -2157,9 +2157,9 @@ mod tests {
         let src = repo().join(CANDIDATES).join("sessions/prime");
         let audit = repo().join(CANDIDATES).join("audit-prime.json");
         let good = fit(
-            &[src.clone()],
+            std::slice::from_ref(&src),
             "rho-neg",
-            &[audit.clone()],
+            std::slice::from_ref(&audit),
             FitOptions::default(),
         )
         .unwrap();
@@ -2167,10 +2167,16 @@ mod tests {
         assert_eq!(good.fit_version(), FIT_VERSION);
         assert!(good.tail.is_some());
         // Zero audits: version 1 admitted it; version 2 does not.
-        assert!(fit(&[src.clone()], "rho-neg", &[], v1())
+        assert!(fit(std::slice::from_ref(&src), "rho-neg", &[], v1())
             .unwrap()
             .admissible());
-        let none = fit(&[src.clone()], "rho-neg", &[], FitOptions::default()).unwrap();
+        let none = fit(
+            std::slice::from_ref(&src),
+            "rho-neg",
+            &[],
+            FitOptions::default(),
+        )
+        .unwrap();
         assert!(!none.admissible());
         assert!(none
             .admissibility
@@ -2179,9 +2185,9 @@ mod tests {
             .any(|r| r.contains("no passing audit")));
         // A free resample count is recorded and is not admissible.
         let few = fit(
-            &[src.clone()],
+            std::slice::from_ref(&src),
             "rho-neg",
-            &[audit.clone()],
+            std::slice::from_ref(&audit),
             FitOptions {
                 resamples: 100,
                 ..Default::default()
@@ -2201,14 +2207,20 @@ mod tests {
             // The audit names the original session id; the copy keeps it.
             vec![audit.clone()]
         };
-        let old = fit(&[interrupted.clone()], "rho-neg", &aud_ok(), v1()).unwrap();
+        let old = fit(
+            std::slice::from_ref(&interrupted),
+            "rho-neg",
+            &aud_ok(),
+            v1(),
+        )
+        .unwrap();
         assert!(
             old.admissible(),
             "version 1 hole: {:?}",
             old.admissibility.reasons
         );
         let new = fit(
-            &[interrupted.clone()],
+            std::slice::from_ref(&interrupted),
             "rho-neg",
             &aud_ok(),
             FitOptions::default(),
@@ -2238,13 +2250,25 @@ mod tests {
             fit_version: version,
             ..Default::default()
         };
-        let old = fit(&[src.clone()], "ic-frob-m2", &[audit.clone()], opts(1)).unwrap();
+        let old = fit(
+            std::slice::from_ref(&src),
+            "ic-frob-m2",
+            std::slice::from_ref(&audit),
+            opts(1),
+        )
+        .unwrap();
         assert!(
             old.admissible(),
             "version 1 hole: {:?}",
             old.admissibility.reasons
         );
-        let new = fit(&[src.clone()], "ic-frob-m2", &[audit.clone()], opts(2)).unwrap();
+        let new = fit(
+            std::slice::from_ref(&src),
+            "ic-frob-m2",
+            std::slice::from_ref(&audit),
+            opts(2),
+        )
+        .unwrap();
         assert!(!new.admissible());
         assert!(new
             .admissibility
@@ -2268,8 +2292,20 @@ mod tests {
             fit_version: version,
             ..Default::default()
         };
-        let old = fit(&[src.clone()], "rho-neg", &[audit.clone()], o(1)).unwrap();
-        let new = fit(&[src.clone()], "rho-neg", &[audit.clone()], o(2)).unwrap();
+        let old = fit(
+            std::slice::from_ref(&src),
+            "rho-neg",
+            std::slice::from_ref(&audit),
+            o(1),
+        )
+        .unwrap();
+        let new = fit(
+            std::slice::from_ref(&src),
+            "rho-neg",
+            std::slice::from_ref(&audit),
+            o(2),
+        )
+        .unwrap();
         assert_eq!(old.constant.ratio_to_floor.ci_method, "within");
         assert_eq!(new.constant.ratio_to_floor.ci_method, "cluster");
         // Same point estimate, a different (workload-clustered) interval.
@@ -2284,7 +2320,13 @@ mod tests {
     fn version_2_sizes_carry_the_axes_and_the_pricing_band() {
         let src = repo().join(CANDIDATES).join("sessions/prime");
         let audit = repo().join(CANDIDATES).join("audit-prime.json");
-        let b = fit(&[src.clone()], "bsgs-neg", &[audit], FitOptions::default()).unwrap();
+        let b = fit(
+            std::slice::from_ref(&src),
+            "bsgs-neg",
+            &[audit],
+            FitOptions::default(),
+        )
+        .unwrap();
         for s in &b.sizes {
             assert!(s.axes.contains_key("memory") && s.axes.contains_key("uncharged"));
             assert_eq!(s.band.len(), BAND_WEIGHTS.len());
