@@ -638,6 +638,8 @@ pub fn registry() -> &'static [MethodDecl] {
                 ParamDecl { name: "seconds", default: Some("1800"), help: "cold wall watchdog; failures are censored" },
             ],
         },
+        // This shares its historical public id with the earlier genus-2 arm.
+        // `decl_for_spec` uses the thread-only required parameters to distinguish them.
         MethodDecl {
             id: "ic.hyperelliptic",
             family: "ic",
@@ -849,9 +851,29 @@ pub fn decl(id: &str) -> Option<&'static MethodDecl> {
     registry().iter().find(|m| m.id == id)
 }
 
+// Both historical genus-2 sessions and the newer hyperelliptic thread used
+// `ic.hyperelliptic`. Their parameter sets and implementations differ, while
+// the method id and resolved parameters are part of committed record hashes.
+// A thread spec must name one of its required, thread-only parameters; an
+// older spec keeps the original declaration and its exact defaults.
+const HYPER_THREAD_ENTRY: &str = "ecbench::hyper_ic::solve";
+const HYPER_GENUS2_ENTRY: &str = "hyperelliptic_index_calculus::hec_index_calculus_dlp";
+
+fn decl_for_spec(spec: &MethodSpec) -> Option<&'static MethodDecl> {
+    if spec.id == HYPER_IC
+        && (spec.params.contains_key("branches") || spec.params.contains_key("d_step_in"))
+    {
+        registry()
+            .iter()
+            .find(|m| m.id == HYPER_IC && m.entry == HYPER_THREAD_ENTRY)
+    } else {
+        decl(&spec.id)
+    }
+}
+
 /// Fill defaults, refuse unknown and missing parameters, hash.
 pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
-    let d = decl(&spec.id).ok_or_else(|| {
+    let d = decl_for_spec(spec).ok_or_else(|| {
         let ids: Vec<&str> = registry().iter().map(|m| m.id).collect();
         format!("unknown method `{}`; known: {}", spec.id, ids.join(", "))
     })?;
@@ -1495,6 +1517,7 @@ fn parse_hex(s: &str) -> Result<u64, String> {
 /// records that `compare` then reports as incomplete.
 pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Result<(), String> {
     let id = full_price::base_of(&m.id).unwrap_or(m.id.as_str());
+    hyper_ic_variant_guard(m, inst, curve)?;
     if id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -1599,6 +1622,7 @@ pub fn solve(
     target: &[String; 2],
     seed: u64,
 ) -> Result<SolveReport, String> {
+    hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
@@ -2412,9 +2436,31 @@ fn hyper_refusal(id: &str, h: &HyperInstance) -> String {
 /// The index calculus that runs on a hyperelliptic Jacobian, and only there.
 const HYPER_IC: &str = "ic.hyperelliptic";
 
+fn hyper_ic_variant_guard(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+) -> Result<(), String> {
+    if m.id != HYPER_IC {
+        return Ok(());
+    }
+    let expected = match inst {
+        Instance::Genus2(_) => HYPER_GENUS2_ENTRY,
+        Instance::Hyper(_) => HYPER_THREAD_ENTRY,
+        _ => return Err(hyper_ic_refusal(curve)),
+    };
+    if m.entry != expected {
+        return Err(format!(
+            "`{HYPER_IC}` parameters select `{}`, but {} requires `{expected}`",
+            m.entry, curve.family
+        ));
+    }
+    Ok(())
+}
+
 fn hyper_ic_refusal(curve: &CurveFacts) -> String {
     format!(
-        "`{HYPER_IC}` runs on hyperelliptic Jacobians (hyperelliptic_thread, hyperelliptic_explicit) only; {} is {}",
+        "`{HYPER_IC}` runs on genus2_* or hyperelliptic_* Jacobians only; {} is {}",
         curve.slug, curve.family
     )
 }
@@ -4339,6 +4385,35 @@ mod tests {
         .unwrap();
         assert_eq!(a.method_id, b.method_id);
         assert!(a.method_id.starts_with("ECM1h"));
+    }
+
+    #[test]
+    fn historical_genus2_method_id_survives_thread_parameter_resolution() {
+        let historical = resolve(&MethodSpec {
+            id: HYPER_IC.into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        // Committed in research/ecbench_jacobians_transfers_20261025/sessions/genus2/plan.json.
+        assert_eq!(historical.method_id, "ECM1ha6ff9c61b9eb");
+        assert_eq!(historical.entry, HYPER_GENUS2_ENTRY);
+
+        let thread = resolve(&MethodSpec {
+            id: HYPER_IC.into(),
+            params: [
+                ("fb_size", "all"),
+                ("large_primes", "0"),
+                ("extra_relations", "8"),
+                ("branches", "64"),
+                ("d_step_in", "4"),
+            ]
+            .into_iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect(),
+        })
+        .unwrap();
+        assert_eq!(thread.entry, HYPER_THREAD_ENTRY);
+        assert_ne!(thread.method_id, historical.method_id);
     }
 
     #[test]
