@@ -26,7 +26,16 @@ cargo run --release --example seed_grind_honest_prior -- 16384 20261024202610242
 cargo run --release --example seed_grind_honest_prior -- --verify research/notes/index-calculus/seed_grind_trapdoor_20261024_run
 ```
 
-The first command creates a *new* output directory and refuses to overwrite an existing one; the displayed path was absent when run. The verification command rederived all 16,384 rows and aggregate values and completed successfully. [Raw observations](../../seed_grind_trapdoor_20261024_run/observations.jsonl): 4,970,702 bytes; BLAKE3 `034878466ddb0598ded498d54fb252599f0366d4abd63ae8993a52932930f00c`, also recorded in [summary.json](../../seed_grind_trapdoor_20261024_run/summary.json). The records contain each index and complete audit, including excluded l=1 rows; the curve coefficients are reproducibly derived from the frozen seed and index. The raw digest covers observations, not this report or PDF. There were no recorded execution failures. The replay is in the same implementation and host; an independent implementation has not yet audited the results.
+The first command creates a *new* output directory and refuses to overwrite an existing one; the displayed path was absent when run. The verification command rederived all 16,384 rows and aggregate values and completed successfully. The [raw-observation artifact manifest](../../seed_grind_trapdoor_20261024_run/.artifacts.json) pins 4,970,702 bytes at SHA-256 `cfa268f40208fce46f04b85aff5d84b8cb0cc8c6c94ae363641b2a146b01ae58`; the run also records BLAKE3 `034878466ddb0598ded498d54fb252599f0366d4abd63ae8993a52932930f00c` in [summary.json](../../seed_grind_trapdoor_20261024_run/summary.json). The records contain each index and complete audit, including excluded l=1 rows; the curve coefficients are reproducibly derived from the frozen seed and index. The raw digest covers observations, not this report or PDF. There were no recorded execution failures. The replay is in the same implementation and host; an independent implementation has not yet audited the results.
+
+The PDF and raw JSONL live in the repository's write-once artifact store. The [PDF artifact manifest](.artifacts.json) pins `report.pdf` at SHA-256 `b855188d39b2a6123aa42a86e3cb9fdbe5737dcb139cdbb5114076440926ef74` (69,926 bytes). From the repository root, hydrate both before reading or replaying them:
+
+On this host, set `AWS_PROFILE=ecc-challenges-new` for an account with bucket access; other readers should use their authorized artifact-store profile.
+
+```sh
+python3 tools/artifacts/artifacts.py pull research/notes/index-calculus/reports/run-20261024T2112Z research/notes/index-calculus/seed_grind_trapdoor_20261024_run
+python3 tools/artifacts/artifacts.py verify research/notes/index-calculus/reports/run-20261024T2112Z research/notes/index-calculus/seed_grind_trapdoor_20261024_run --remote
+```
 
 ## Next discrimination
 

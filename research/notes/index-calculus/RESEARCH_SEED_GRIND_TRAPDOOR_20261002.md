@@ -283,10 +283,13 @@ honest-baseline end-to-end `S` row in §2.
 
 The [run report](reports/run-20261024T2112Z/REPORT.md),
 [figure](reports/run-20261024T2112Z/genus-histogram.svg),
-[PDF](reports/run-20261024T2112Z/report.pdf),
+[PDF artifact manifest](reports/run-20261024T2112Z/.artifacts.json),
 [summary](seed_grind_trapdoor_20261024_run/summary.json), and
-[raw observations](seed_grind_trapdoor_20261024_run/observations.jsonl)
+[raw-observation artifact manifest](seed_grind_trapdoor_20261024_run/.artifacts.json)
 record the frozen protocol, exact inputs, full audit rows, digest and replay.
+Hydrate the PDF and raw observations with
+`python3 tools/artifacts/artifacts.py pull research/notes/index-calculus/reports/run-20261024T2112Z research/notes/index-calculus/seed_grind_trapdoor_20261024_run`;
+the manifests pin their SHA-256 hashes and byte counts.
 The same implementation rederived every observation. The next phase must
 freeze the available seed freedom and detector before testing grind selection;
 its generator, detector error, solver costs and matched rho remain open.
