@@ -1,0 +1,40 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-jv-sieve-prospective-20261023-1
+experiment_id: jv_sieve_prospective_20261023
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: d3d1b5e4266002313f1304f7a4ec2bde8968bda9
+receipt: research/jv_sieve_prospective_20261023/cards/CARD-jv-sieve-prospective-20261023-1.receipt.json
+binds:
+  - {path: research/jv_sieve_prospective_20261023/PROTOCOL.md, sha256: c7fa70a08c8e834a38e4d20f7488bbc62beca34fb2f47e5cd29ad44842d524d5}
+  - {path: research/jv_sieve_prospective_20261023/run.sh, sha256: b0bdcc9c457b393939a5fd38aa61e005c06f2996a1cb8f8934a04f375aa84ebb}
+  - {path: target/release/examples/jv_endo_check, sha256: d2b57c4d9f1b493a7c17845c703ec6fe3b11811cdff9f25a56bdc5301312658c}
+must_not_exist:
+  - research/jv_sieve_prospective_20261023/raw
+commands:
+  - id: build-jv-examples
+    argv: [cargo, build, --release, --example, jv_cover, --example, jv_endo_check]
+    cwd: .
+    timeout_seconds: 7200
+    success_exit_codes: [0]
+    stdout: research/jv_sieve_prospective_20261023/receipts/build-jv-examples.stdout
+    stderr: research/jv_sieve_prospective_20261023/receipts/build-jv-examples.stderr
+  - id: run-jv-sieve-all
+    argv: [bash, research/jv_sieve_prospective_20261023/run.sh, all]
+    cwd: .
+    timeout_seconds: 64800
+    success_exit_codes: [0]
+    stdout: research/jv_sieve_prospective_20261023/receipts/run-jv-sieve-all.stdout
+    stderr: research/jv_sieve_prospective_20261023/receipts/run-jv-sieve-all.stderr
+bus_address: executor-mechanical-jv-sieve-prospective
+background: true
+write_scope:
+  - research/jv_sieve_prospective_20261023/raw/
+  - research/jv_sieve_prospective_20261023/receipts/
+  - research/jv_sieve_prospective_20261023/cards/
+  - target/
+stop_when:
+  - Any command in the card exits with a status other than 0.
+  - The tool exits with status 2 and prints an IMPEDIMENT line.
+notes: The host is shared with another running experiment. Operation counts are the claim; wall time is an observation only.

@@ -1,0 +1,196 @@
+{
+  "arms": [
+    "inv-poly-inline|PACKED_INV_POLY=1",
+    "geo-544x1|THREADS=544 MINBLOCKS=1",
+    "geo-576x1|THREADS=576 MINBLOCKS=1",
+    "phase-popc|TABLE_PHASE_POPC=1",
+    "phase-popc-no-pipe|TABLE_PHASE_POPC=1 TABLE_PIPE_SELECT=0 TABLE_SPLIT_FORWARD=0 TABLE_BATCH_HINTS=0 TABLE_BLOCK_HINTS=0",
+    "no-square-table|PACKED_SQUARE_TABLE=0",
+    "pair-clmul|PACKED_PAIR_CLMUL=1"
+  ],
+  "build": {
+    "base": {
+      "registers": 128,
+      "spillBytes": 0
+    },
+    "inv-poly-inline": {
+      "registers": 128,
+      "spillBytes": 0
+    },
+    "geo-544x1": {
+      "registers": 95,
+      "spillBytes": 8
+    },
+    "geo-576x1": {
+      "registers": 95,
+      "spillBytes": 8
+    },
+    "phase-popc": {
+      "registers": 128,
+      "spillBytes": 0
+    },
+    "phase-popc-no-pipe": {
+      "registers": 128,
+      "spillBytes": 0
+    },
+    "no-square-table": {
+      "registers": 128,
+      "spillBytes": 0
+    },
+    "pair-clmul": {
+      "registers": 127,
+      "spillBytes": 0
+    },
+    "combo1": {
+      "registers": 95,
+      "spillBytes": 8
+    },
+    "combo2": {
+      "registers": 96,
+      "spillBytes": 0
+    },
+    "combo3": {
+      "registers": 96,
+      "spillBytes": 0
+    },
+    "combo4": {
+      "registers": 96,
+      "spillBytes": 8
+    }
+  },
+  "screen": {
+    "base": [
+      {
+        "rateBps": 5.5154,
+        "smClockMHz": 2340,
+        "powerW": 246.48,
+        "tempC": 32
+      },
+      {
+        "rateBps": 5.6611,
+        "smClockMHz": 2407,
+        "powerW": 247.56,
+        "tempC": 42
+      }
+    ],
+    "inv-poly-inline": [
+      {
+        "rateBps": 5.4622,
+        "smClockMHz": 2340,
+        "powerW": 268.26,
+        "tempC": 36
+      },
+      {
+        "rateBps": 5.6104,
+        "smClockMHz": 2407,
+        "powerW": 239.31,
+        "tempC": 43
+      }
+    ],
+    "geo-544x1": [
+      {
+        "rateBps": 5.4966,
+        "smClockMHz": 2362,
+        "powerW": 264.19,
+        "tempC": 38
+      },
+      {
+        "rateBps": 5.6432,
+        "smClockMHz": 2407,
+        "powerW": 254.44,
+        "tempC": 43
+      }
+    ],
+    "geo-576x1": [
+      {
+        "rateBps": 5.8763,
+        "smClockMHz": 2407,
+        "powerW": 269.98,
+        "tempC": 39
+      },
+      {
+        "rateBps": 5.9708,
+        "smClockMHz": 2422,
+        "powerW": 266.16,
+        "tempC": 44
+      }
+    ],
+    "phase-popc": [
+      {
+        "rateBps": 5.5899,
+        "smClockMHz": 2392,
+        "powerW": 259.3,
+        "tempC": 40
+      },
+      {
+        "rateBps": 5.6639,
+        "smClockMHz": 2422,
+        "powerW": 243.32,
+        "tempC": 43
+      }
+    ],
+    "phase-popc-no-pipe": [
+      {
+        "rateBps": 2.2917,
+        "smClockMHz": 2370,
+        "powerW": 247.02,
+        "tempC": 39
+      },
+      {
+        "rateBps": 2.3066,
+        "smClockMHz": 2422,
+        "powerW": 229.52,
+        "tempC": 41
+      }
+    ],
+    "no-square-table": [
+      {
+        "rateBps": 5.6584,
+        "smClockMHz": 2400,
+        "powerW": 247.71,
+        "tempC": 41
+      },
+      {
+        "rateBps": 5.6929,
+        "smClockMHz": 2400,
+        "powerW": 237.03,
+        "tempC": 42
+      }
+    ],
+    "pair-clmul": [
+      {
+        "rateBps": 5.7218,
+        "smClockMHz": 2407,
+        "powerW": 251.38,
+        "tempC": 41
+      },
+      {
+        "rateBps": 5.7469,
+        "smClockMHz": 2422,
+        "powerW": 251.58,
+        "tempC": 42
+      }
+    ]
+  },
+  "star": [
+    "base 5.5883",
+    "1.0600 geo-576x1 5.9235",
+    "1.0261 pair-clmul 5.7344",
+    "1.0156 no-square-table 5.6757",
+    "1.0069 phase-popc 5.6269",
+    "0.9967 geo-544x1 5.5699",
+    "0.9907 inv-poly-inline 5.5363",
+    "0.4114 phase-popc-no-pipe 2.2992"
+  ],
+  "greedy": [
+    "greedy combo1 = base + geo-576x1: 5.819649999999999 B/s vs 5.58825  2392 MHz, 271.03 W, 39",
+    "  keep",
+    "greedy combo2 = combo1 + pair-clmul: 5.7966 B/s vs 5.819649999999999  2362 MHz, 283.82 W, 37",
+    "  drop",
+    "greedy combo3 = combo1 + no-square-table: 5.78165 B/s vs 5.819649999999999  2347 MHz, 282.40 W, 37",
+    "  drop",
+    "greedy combo4 = combo1 + phase-popc: 5.6964500000000005 B/s vs 5.819649999999999  2362 MHz, 295.71 W, 38",
+    "  drop",
+    "greedy result: combo1 (THREADS=576 MINBLOCKS=1) at 5.819649999999999 B/s"
+  ]
+}

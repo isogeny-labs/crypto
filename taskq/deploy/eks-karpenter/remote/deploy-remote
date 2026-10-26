@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+here=$(cd "$(dirname "$0")" && pwd)
+: "${AWS_REGION:?}" "${ISOLAB_CLUSTER:?}" "${ISOLAB_BUCKET:?}" "${ISOLAB_MCP_BIN:?}" "${ISOLAB_REMOTE_RUNTIME:?}" "${ISOLAB_GITHUB_SUBJECT:?}"
+[[ "$ISOLAB_REMOTE_RUNTIME" == /* ]] || { echo 'Runtime directory must be absolute' >&2; exit 2; }
+mkdir -p "$ISOLAB_REMOTE_RUNTIME"
+account=$(aws sts get-caller-identity --query Account --output text)
+oidc="arn:aws:iam::$account:oidc-provider/token.actions.githubusercontent.com"
+aws iam get-open-id-connect-provider --open-id-connect-provider-arn "$oidc" > "$ISOLAB_REMOTE_RUNTIME/oidc-provider.json"
+aws eks describe-cluster --name "$ISOLAB_CLUSTER" --region "$AWS_REGION" > "$ISOLAB_REMOTE_RUNTIME/cluster.json"
+vpc=$(jq -r .cluster.resourcesVpcConfig.vpcId "$ISOLAB_REMOTE_RUNTIME/cluster.json")
+cluster_sg=$(jq -r .cluster.resourcesVpcConfig.clusterSecurityGroupId "$ISOLAB_REMOTE_RUNTIME/cluster.json")
+mapfile -t subnets < <(jq -r '.cluster.resourcesVpcConfig.subnetIds[]' "$ISOLAB_REMOTE_RUNTIME/cluster.json")
+aws ec2 describe-subnets --subnet-ids "${subnets[@]}" --region "$AWS_REGION" > "$ISOLAB_REMOTE_RUNTIME/subnets.json"
+private=$(jq -r '[.Subnets[]|select(.MapPublicIpOnLaunch==false)|.SubnetId]|join(",")' "$ISOLAB_REMOTE_RUNTIME/subnets.json")
+[[ -n "$private" ]] || { echo 'No private subnets found' >&2; exit 2; }
+package=$(mktemp -d "$ISOLAB_REMOTE_RUNTIME/package.XXXXXX")
+mkdir "$package/bin" "$package/remote"
+install -m755 "$ISOLAB_MCP_BIN" "$package/bin/isolab-eks-mcp"
+install -m755 "$here/../submit-job" "$package/bin/submit-job"
+install -m755 "$(command -v kubectl)" "$package/bin/kubectl"
+install -m755 "$here/validate-request" "$here/check-ready" "$here/run-request" "$package/remote/"
+cp "$here/buildspec.yml" "$package/remote/"
+(cd "$package" && sha256sum bin/* remote/* > SHA256SUMS && zip -q -X -r launcher.zip bin remote SHA256SUMS)
+digest=$(sha256sum "$package/launcher.zip" | cut -d ' ' -f1)
+key="inputs/launchers/$digest.zip"
+aws s3 cp "$package/launcher.zip" "s3://$ISOLAB_BUCKET/$key" --only-show-errors
+version=$(aws s3api head-object --bucket "$ISOLAB_BUCKET" --key "$key" --query VersionId --output text)
+[[ -n "$version" && "$version" != None && "$version" != null ]] || { echo 'Launcher source must be versioned' >&2; exit 2; }
+aws cloudformation deploy --region "$AWS_REGION" --stack-name isolab-remote-launcher \
+  --template-file "$here/bridge.yaml" --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset \
+  --parameter-overrides "ClusterName=$ISOLAB_CLUSTER" "ResultsBucket=$ISOLAB_BUCKET" \
+    "VpcId=$vpc" "PrivateSubnets=$private" "ClusterSecurityGroup=$cluster_sg" \
+    "LauncherKey=$key" "LauncherVersion=$version" "GitHubSubject=$ISOLAB_GITHUB_SUBJECT" "GitHubOidcProviderArn=$oidc"
+aws cloudformation describe-stacks --region "$AWS_REGION" --stack-name isolab-remote-launcher \
+  --query 'Stacks[0].Outputs' > "$ISOLAB_REMOTE_RUNTIME/outputs.json"
+kubectl --kubeconfig "${KUBECONFIG:?}" --context "${ISOLAB_KUBE_CONTEXT:?}" apply -f "$here/readiness-rbac.yaml"
+jq -n --arg key "$key" --arg version "$version" --arg sha256 "$digest" \
+  '{launcher_key:$key,launcher_version:$version,launcher_sha256:$sha256}' > "$ISOLAB_REMOTE_RUNTIME/launcher-source.json"
+cat "$ISOLAB_REMOTE_RUNTIME/outputs.json"
