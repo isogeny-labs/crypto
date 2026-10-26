@@ -1,22 +1,7 @@
 name: ECC2K local certification gates
 on:
-  pull_request:
-    paths:
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'build.rs'
-      - '.cargo/**'
-      - 'rust-toolchain*'
-      - 'ecc2k130/**'
-      - 'src/cryptanalysis/ecc2k130_guard.rs'
-      - 'src/bin/ecc2k_guard.rs'
-      - 'src/cryptanalysis/ecc2k130_merge.rs'
-      - 'src/bin/ecc2k_merge.rs'
-      - 'src/cryptanalysis/ecc2k130_pyjson.rs'
-      - 'src/cryptanalysis/ecc2k130_status.rs'
-      - 'src/bin/ecc2k_status.rs'
-      - 'src/hash/sha256.rs'
-      - '.github/workflows/ecc2k130-certification.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:

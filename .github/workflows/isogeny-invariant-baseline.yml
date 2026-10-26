@@ -1,9 +1,7 @@
 name: isogeny-invariant-baseline
 on:
-  pull_request:
-    paths:
-      - 'research/isogeny_invariant_baseline_20260926/**'
-      - '.github/workflows/isogeny-invariant-baseline.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:

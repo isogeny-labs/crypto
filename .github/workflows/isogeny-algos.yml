@@ -5,11 +5,8 @@ name: isogeny_algos
 # computation) and a smoke test of the isogeny-algos command line.
 
 on:
-  pull_request:
-    paths:
-      - 'isogeny_algos/**'
-      - '.github/workflows/isogeny-algos.yml'
-      - 'research/p192_p224_large_degree_isogenies_20261008/PROTOCOL.md'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:

@@ -15,11 +15,11 @@
 use std::collections::BTreeMap;
 use std::fmt::Write as _;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use serde_json::{json, Value};
 
-fn read_jsonl(dir: &PathBuf, name: &str) -> Vec<Value> {
+fn read_jsonl(dir: &Path, name: &str) -> Vec<Value> {
     let p = dir.join("runs").join(name);
     fs::read_to_string(&p)
         .unwrap_or_default()
@@ -56,10 +56,12 @@ fn main() {
     // ── Measured table ────────────────────────────────────────────────
     let mut md = String::new();
     md.push_str("# Measured values\n\n");
-    md.push_str("Single thread, one field implementation per family, fixed seed \
+    md.push_str(
+        "Single thread, one field implementation per family, fixed seed \
 20261025. Step rates are this host's; the index-calculus decomposition step \
 and the Pollard-rho adding-walk step use the same field code in the same \
-process, so their rates compare directly.\n\n");
+process, so their rates compare directly.\n\n",
+    );
 
     md.push_str("## Reference: batched adding-walk (rho) step rate\n\n");
     md.push_str("| family | n | lanes | Msteps/s |\n|---|--:|--:|--:|\n");
@@ -75,11 +77,13 @@ process, so their rates compare directly.\n\n");
     }
 
     md.push_str("\n## Oracle step rate: symmetric vs per-point baseline\n\n");
-    md.push_str("`sym/base` is the per-step speed-up of the symmetric-coordinate \
+    md.push_str(
+        "`sym/base` is the per-step speed-up of the symmetric-coordinate \
 sweep (enumerate `e_1 = x_1 + x_2`, batched inversion) over the per-point \
 baseline (enumerate `x_1`, lift each with its own inversion). `IC/rho step` \
 is the symmetric oracle's step rate over the rho reference for the same \
-family.\n\n");
+family.\n\n",
+    );
     md.push_str("| family | curve | n | base Msteps/s | sym Msteps/s | sym/base | IC/rho step |\n");
     md.push_str("|---|---|--:|--:|--:|--:|--:|\n");
     // Pair base/sym rows by (family, curve, n).
@@ -87,7 +91,10 @@ family.\n\n");
     for r in &rate {
         let key = (s(r, "family").into(), s(r, "variant").into(), u(r, "n"));
         let e = by_key.entry(key).or_insert((0.0, 0.0));
-        if r.get("symmetric").and_then(|x| x.as_bool()).unwrap_or(false) {
+        if r.get("symmetric")
+            .and_then(|x| x.as_bool())
+            .unwrap_or(false)
+        {
             e.1 = f(r, "steps_per_sec");
         } else {
             e.0 = f(r, "steps_per_sec");
@@ -111,10 +118,12 @@ family.\n\n");
     }
 
     md.push_str("\n## Full-subspace decomposition yield (binary calibration)\n\n");
-    md.push_str("A full sweep of `e_1 ∈ V_{l'}` over random targets, with the \
+    md.push_str(
+        "A full sweep of `e_1 ∈ V_{l'}` over random targets, with the \
 0/1/2-large-prime split against the factor base `V_l`. `direct` are relations \
 with both abscissae in `V_l` (zero large primes); they are the only ones a \
-pipeline without a large-prime graph can use.\n\n");
+pipeline without a large-prime graph can use.\n\n",
+    );
     md.push_str("| n | l | l' | decomps/sweep | direct (0 lp) | 1 lp | 2 lp | direct fraction |\n");
     md.push_str("|--:|--:|--:|--:|--:|--:|--:|--:|\n");
     let mut plot_yield = Vec::new();
@@ -155,19 +164,23 @@ pipeline without a large-prime graph can use.\n\n");
     // above rho for m <= 3.
     let mut cm = String::new();
     cm.push_str("# Derived cost model (labelled derived)\n\n");
-    cm.push_str("All rows are computed, not measured. The step counts use the \
+    cm.push_str(
+        "All rows are computed, not measured. The step counts use the \
 balancing factor-base dimension `l = round(n/3)` for the subspace `m = 2` \
 method; the per-step cost is taken from the measured symmetric-oracle rate \
 and the measured rho rate on this host. `r` is the prime-subgroup order \
-(`2^{n-1}` used for the calibration curves, which are not point-counted).\n\n");
-    cm.push_str("steps(IC, m=2) ≈ 2^{2n/3}  (2^{d-1} relations ÷ 2^{2d-n-2} success, d = (n+1)/3)\n\n");
+(`2^{n-1}` used for the calibration curves, which are not point-counted).\n\n",
+    );
+    cm.push_str(
+        "steps(IC, m=2) ≈ 2^{2n/3}  (2^{d-1} relations ÷ 2^{2d-n-2} success, d = (n+1)/3)\n\n",
+    );
     cm.push_str("steps(rho) ≈ sqrt(π·r/4),  r ≈ 2^{n}·(cofactor factor)\n\n");
     cm.push_str("distance(steps) = steps(IC) / steps(rho) ≈ 2^{n/6} · constant\n\n");
     cm.push_str("| curve | n | log2 steps(IC m=2) | log2 steps(rho) | log2 distance (steps) | this matches family optimum Θ(r^{1/6})·rho? |\n");
     cm.push_str("|---|--:|--:|--:|--:|---|\n");
     let rows = [
-        ("ECC2-131", 131u32, 130.0f64),  // r ≈ 2^130 (cofactor 2)
-        ("ECCp-131", 131, 131.0),        // r ≈ 2^131 (cofactor 1)
+        ("ECC2-131", 131u32, 130.0f64), // r ≈ 2^130 (cofactor 2)
+        ("ECCp-131", 131, 131.0),       // r ≈ 2^131 (cofactor 1)
     ];
     let mut plot_dist = Vec::new();
     for (name, n, log2r) in rows {
@@ -181,7 +194,8 @@ and the measured rho rate on this host. `r` is the prime-subgroup order \
         );
         plot_dist.push(json!({"curve": name, "n": n, "ic": ic, "rho": rho_steps, "dist": dist}));
     }
-    cm.push_str("\nThe `m = 2` exponent `2n/3 ≈ 0.667 n` agrees with the merged \
+    cm.push_str(
+        "\nThe `m = 2` exponent `2n/3 ≈ 0.667 n` agrees with the merged \
 algebraic ladder's measured trial slope 0.647 [0.639, 0.655] (PR #2493); the \
 enumeration and the linear solve share the `2^{2n/3}` optimum. What this study \
 adds over that baseline is measured and constant-factor: the symmetric \
@@ -191,7 +205,8 @@ double-large-prime graph recovers full relations from the 2-lp decompositions \
 that dominate the measured yield. Neither changes the `2n/3` vs `n/2` exponent \
 gap, so the distance to rho at n = 131 stays about `2^{n/6} ≈ 2^{22}` in steps \
 before the linear-algebra floor, which the program gates place above rho for \
-m ≤ 3 on both curves.\n");
+m ≤ 3 on both curves.\n",
+    );
     fs::write(dir.join("tables/costmodel.md"), &cm).unwrap();
 
     // ── Plot data ────────────────────────────────────────────────────
@@ -207,5 +222,8 @@ m ≤ 3 on both curves.\n");
     )
     .unwrap();
 
-    eprintln!("wrote tables and figures/plotdata.json under {}", dir.display());
+    eprintln!(
+        "wrote tables and figures/plotdata.json under {}",
+        dir.display()
+    );
 }

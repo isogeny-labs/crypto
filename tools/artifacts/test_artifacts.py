@@ -248,6 +248,15 @@ class Policy(unittest.TestCase):
         self.assertFalse(f("x/.artifacts.json", 5 << 20, self.P))
         self.assertFalse(f("docs/browser/data.json", 30 << 20, {**self.P, "keep": ["docs/browser/data.json"]}))
 
+    def test_the_committed_policy_keeps_every_pdf_in_git(self):
+        # Owner decision (2026-10-26): reports stay in Git at any size; the
+        # large-files gate (10 MiB) still applies.
+        policy = artifacts.Config.load(Path(__file__).resolve().parents[2]).policy
+        f = artifacts.belongs_in_store
+        self.assertFalse(f("research/x_20261026/REPORT.pdf", 900_000, policy))
+        self.assertFalse(f("docs/notes/big.pdf", 5 << 20, policy))
+        self.assertTrue(f("research/x_20261026/figures/plot.png", 900_000, policy))
+
 
 class WorkflowWiringPaths(unittest.TestCase):
     def setUp(self):
