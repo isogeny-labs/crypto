@@ -1225,6 +1225,110 @@ fn main() -> Result<()> {
             write_new_json(output,&receipt)?;
             println!("{receipt}");
         },
+        Some("primary-full-d18-adapter-check")=>{
+            if args.len()!=4 { return Err("primary-full-d18-adapter-check EXPORT_DIR NEW_OUTPUT_JSON".into()); }
+            let receipt=primary_adapter::check_full_d18_export(Path::new(&args[2]))?;
+            write_new_json(Path::new(&args[3]),&receipt)?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-model")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-model BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 construction only; no SAT search)".into()); }
+            let receipt=primary_adapter::full_d18_m4_model_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),
+            )?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-shared-model")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-shared-model BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 construction only; shared-root encoding)".into()); }
+            let receipt=primary_adapter::full_d18_m4_shared_model_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-positive")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-l0-positive BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 positive-control diagnostic; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_positive_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-shared-positive")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-l0-shared-positive BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 positive-control diagnostic; shared-root encoding; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_shared_positive_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-shared-root-pinned")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-l0-shared-root-pinned BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 constructed control with explicit selector and phase pins; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_shared_root_pinned_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-shared-phase-pinned")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-l0-shared-phase-pinned BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 planted control, phase zero fixed, selectors free; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_shared_phase_pinned_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-shared-selector-pinned")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-l0-shared-selector-pinned BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 planted control, selectors fixed, phases free; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_shared_selector_pinned_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-shared-phase-first")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-l0-shared-phase-first BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 planted control, all choices free, phase-zero-first search; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_shared_phase_first_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-shared-phase-first-natural")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-l0-shared-phase-first-natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 public natural screen, all choices free, phase-zero-first search; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_shared_phase_first_natural_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-shared-phase-first-natural-1200")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-l0-shared-phase-first-natural-1200 BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 public natural screen, all choices free, phase-zero-first search; 1200-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_shared_phase_first_natural_1200_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-xcnf")=>{
+            if args.len()!=6 { return Err("primary-full-d18-m4-l0-xcnf positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (source-bound full-D18 XCNF export only; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_xcnf_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-xcnf-witness")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-l0-xcnf-witness BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (source-bound constructed XCNF and native assignment; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_xcnf_witness_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-ordered-first-pair")=>{
+            if args.len()!=6 { return Err("primary-full-d18-m4-l0-ordered-first-pair positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (source-bound exact first-pair symmetry; 300-s positive or 2400-s natural internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_ordered_first_pair_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-ordered-xor-cadence32")=>{
+            if args.len()!=6 { return Err("primary-full-d18-m4-l0-ordered-xor-cadence32 positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (exact first-pair symmetry with native XOR elimination every 32 decision levels; 300-s positive or 2400-s natural internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_ordered_xor_cadence_32_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-linux-shared-phase-first")=>{
+            if args.len()!=6 { return Err("primary-full-d18-m4-linux-shared-phase-first positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (requires hard 8-GiB zero-swap cgroup and 1210-s outer cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_linux_shared_phase_first_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4")=>{
+            if args.len()!=6 { return Err("primary-full-d18-m4 positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (requires hard 32-GiB cgroup and 1210-s outer cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]),
+            )?;
+            println!("{receipt}");
+        },
         Some("primary-sat-build")=>{
             if args.len()!=6 { return Err("primary-sat-build PANEL_DIR K MEMORY_MIB NEW_OUTPUT_JSON (run through the bounded capacity supervisor)".into()); }
             let receipt=primary_adapter::build_capacity_cli(
