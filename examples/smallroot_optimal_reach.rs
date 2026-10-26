@@ -204,7 +204,7 @@ fn val(mut x: u128, p: u128, t: u32) -> u32 {
         return t;
     }
     let mut v = 0;
-    while x % p == 0 {
+    while x.is_multiple_of(p) {
         x /= p;
         v += 1;
     }
@@ -252,7 +252,7 @@ fn exact_gain(f: &Poly, t: u32, m: &[Exp], big: &[Exp], p: u128) -> u32 {
         let mut best: Option<(usize, u32)> = None;
         for (r, row) in rows.iter().enumerate().skip(start) {
             let v = val(row[c], p, t);
-            if v < t && best.map_or(true, |(_, bv)| v < bv) {
+            if v < t && best.is_none_or(|(_, bv)| v < bv) {
                 best = Some((r, v));
             }
         }
