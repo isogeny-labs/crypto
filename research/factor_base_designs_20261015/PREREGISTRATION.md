@@ -1508,13 +1508,17 @@ was launched at 20:11Z and had run R256-A0 for about 20 min with no row when thi
   than that, in which case it loses that step.
 
 **The host.** The same `r7i.8xlarge` in us-west-2, now under a *persistent*
-Spot request valid for 40 h, interruption behaviour terminate. A reclaimed host
-is replaced; the new one downloads the checkpoint and the rows from S3
+Spot request valid for 40 h, interruption behaviour *stop* (AWS does not allow
+*terminate* on a persistent request). A reclaimed host is stopped, keeping its
+disk, and restarted by the request when capacity returns; a systemd service
+re-runs the run script at every boot, so the local checkpoint and rows are
+used where they exist. A replacement on a fresh disk (the 16 h cap per boot
+terminates the instance) downloads the checkpoint and the rows from S3
 (`s3://crypto-autoresearcher/lab-results/factor-base-designs-a14/<commit>-ckpt/state/out`,
-synced from the host every 5 min), reuses the binary built on the first host
-(same sha256, so resumed segments run the same code), and calls
-`scripts/run_amendment15.sh`, which skips a cell that already has its row and
-resumes one that does not. Pre-flight and OOM records are appended, one section
+synced from the host every 5 min) and the binary built on the first host
+(same sha256, so every segment runs the same code). Either way the script
+`scripts/run_amendment15.sh` skips a cell that already has its row and resumes
+one that does not. Pre-flight and OOM records are appended, one section
 per segment. The instance holds temporary credentials (a 36 h federated token)
 that can only read and write that S3 prefix and cancel Spot requests; when both
 cells have rows it uploads, cancels its request and halts.
