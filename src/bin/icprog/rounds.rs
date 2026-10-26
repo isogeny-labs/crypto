@@ -1827,3 +1827,62 @@ pub mod r12 {
         }
     }
 }
+
+// ── R13: gate R12's run prefetch by the frozen stored-pair count ──
+
+pub mod r13 {
+    use super::*;
+
+    pub const SPEC: Spec = Spec {
+        targets: &[(0, 37), (1, 47), (0, 57)],
+        holdouts: &[
+            (242, 175),
+            (242, 176),
+            (243, 177),
+            (243, 178),
+            (244, 179),
+            (244, 180),
+            (245, 181),
+            (245, 182),
+        ],
+        what_this_is: "R13, a stored-pair-count gate on R12's prefetch pass, on v8; one public target per process, cold setup charged",
+        callgrind: &[],
+        callgrind_role: CallgrindRole::CrossCheck,
+        accept: Accept::Above(1.01),
+        resumed_note: "the host R13 resumed on after its spot instance changed",
+        requires: REFERENCE_CLASS,
+    };
+
+    pub fn analyse(c: &Ctx) -> Result<J, String> {
+        speed::analyse(c, &SPEC)
+    }
+
+    pub fn run(
+        c: &Ctx,
+        step: &str,
+        b: &Bench,
+        arms: &[Arm],
+        root: &Path,
+        commits: &[Option<String>],
+    ) -> Result<J, String> {
+        if let Some(done) = speed::run_common(c, &SPEC, step, b, arms) {
+            return done;
+        }
+        match step {
+            "manifest" => speed::manifest(
+                c,
+                b,
+                arms,
+                root,
+                commits,
+                "the host R13 ran on, at the round's start",
+            ),
+            "manifest-resumed" => speed::manifest_resumed(c, &SPEC, b, arms, root),
+            "pin" => pin::pin(&c.programme, &c.runs, &arms[1].binary),
+            "aa" => speed::aa(c, b, arms),
+            other => Err(format!(
+                "unknown step `{other}`; try plan, manifest, pin, aa, compare, holdout, extend or manifest-resumed"
+            )),
+        }
+    }
+}

@@ -6997,8 +6997,14 @@ impl PairSumTable {
             // The bucket entries arrived during the filter pass: read them
             // and send for every admitted key's run before looking any up,
             // so the runs' misses overlap instead of following one another.
-            for &within in &admitted_offsets {
-                self.prefetch_run(keys[within]);
+            // R12's second pass pays at most on tables whose stored runs
+            // outgrow cache. Its frozen panel first benefited at 3,707,880
+            // stored pairs; all smaller measured tables had at most 265,680.
+            // Keep the decision target-independent and fixed for this table.
+            if self.len() >= 1_000_000 {
+                for &within in &admitted_offsets {
+                    self.prefetch_run(keys[within]);
+                }
             }
             for &within in &admitted_offsets {
                 let offset = lo + within;

@@ -125,6 +125,7 @@ enum Round {
     R10,
     R11,
     R12,
+    R13,
 }
 
 #[derive(Clone, Copy, PartialEq, ValueEnum)]
@@ -658,6 +659,7 @@ fn round_dir(round: Round, root: &std::path::Path) -> Result<(PathBuf, PathBuf),
         Round::R10 => "R10-main-head",
         Round::R11 => "R11-build-streams",
         Round::R12 => "R12-admitted-prefetch",
+        Round::R13 => "R13-prefetch-gate",
     };
     let round_dir = programme.join("rounds").join(dir);
     Ok((programme, round_dir))
@@ -702,6 +704,7 @@ fn round_spec(round: Round) -> Option<&'static rounds::Spec> {
         Round::R10 => Some(&rounds::r10::SPEC),
         Round::R11 => Some(&rounds::r11::SPEC),
         Round::R12 => Some(&rounds::r12::SPEC),
+        Round::R13 => Some(&rounds::r13::SPEC),
     }
 }
 
@@ -804,6 +807,7 @@ fn run(round: Round, step: &str, args: RunArgs) -> Result<String, String> {
         Round::R10 => rounds::r10::run(&ctx, step, &b, &arms, &root, &commits)?,
         Round::R11 => rounds::r11::run(&ctx, step, &b, &arms, &root, &commits)?,
         Round::R12 => rounds::r12::run(&ctx, step, &b, &arms, &root, &commits)?,
+        Round::R13 => rounds::r13::run(&ctx, step, &b, &arms, &root, &commits)?,
         Round::R03 => return Err("R03 is complete; its runs are frozen".into()),
     };
     Ok(match doc {
@@ -986,6 +990,7 @@ fn analyse(round: Round, root: PathBuf, runs: Option<PathBuf>) -> Result<String,
         Round::R10 => rounds::r10::analyse(&ctx)?,
         Round::R11 => rounds::r11::analyse(&ctx)?,
         Round::R12 => rounds::r12::analyse(&ctx)?,
+        Round::R13 => rounds::r13::analyse(&ctx)?,
     };
     Ok(json::dumps(&doc, 1))
 }
@@ -1736,7 +1741,8 @@ fn main() -> ExitCode {
             | Round::R09
             | Round::R10
             | Round::R11
-            | Round::R12 => report::r05(&doc),
+            | Round::R12
+            | Round::R13 => report::r05(&doc),
             Round::R03 => Err("R03's tables are in its README, written before icprog".into()),
         }),
         Command::Holdouts {
