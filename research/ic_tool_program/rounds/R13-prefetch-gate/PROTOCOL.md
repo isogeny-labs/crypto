@@ -110,6 +110,25 @@ budget starts at its 2026-10-26 20:43:31 UTC launch; terminate it by
 2026-10-27 02:43:31 UTC. The threshold, targets, rho rule, acceptance
 criterion and conditional extension remain fixed.
 
+### Pre-timing host return (2026-10-26)
+
+The dedicated Spot instance above was reclaimed at 20:50:27 UTC during its
+baseline build. It produced no completed arm binary or timed record. An
+on-demand replacement was explicitly denied by the account's
+`SpotOnlyEC2Launch` IAM policy. The original `m8i-flex.8xlarge` instance
+then released its global benchmark lock and its competing CPU-heavy jobs
+ended. R13 therefore returns, before any timed sample, to that original
+instance (`i-03d5e15a586275e77`, Intel Xeon 6975P-C, current public IP
+to be read from EC2). Both `ic` arms and the corrected native runner had
+already been built and checked there. Recheck the source, SHA-256 identities,
+host feature class, 24 holdouts, 90-row pin, `2,18` SMT topology, and
+machine quietness; then regenerate its final host manifest before A/A.
+All timed suite and holdout samples must come from that one original host.
+The reclaimed instance contributes no measurement and no times are pooled.
+If the lock or CPU contention returns, retain the refusal and stop; do not
+weaken the isolation gate. The frozen candidate, targets, rounds, rho rule,
+acceptance criterion and resource budget are unchanged.
+
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
 for this CPU subclass only if every primary size's suite and holdout
