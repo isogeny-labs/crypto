@@ -321,3 +321,43 @@ the selection run; the same checks are in `tests/`.
    pairs are certified by Method A alone is reported as such and takes no trial
    slot. Fields are processed in descending `p` so that, if the time cap bites,
    the fields the trial-pair rule prefers are reached first.
+
+### Amendment 2 (2026-10-26, after the selection run, before any paired trial)
+
+The selection run is complete (`selection_receipt.json`; 51 independently
+verified pairs, 4 trial pairs by the frozen rule, all in `p = 43`). Before any
+trial ran:
+
+1. **Permutation test is exact.** With 12 seeds the sign-flip null has only
+   `2^12 = 4096` distinct outcomes, so the test enumerates all of them (two-sided,
+   statistic `|mean|`) instead of sampling 20 000 random flips. Same null
+   distribution, no Monte-Carlo error. `analysis.json` states the method.
+2. **How `G` is obtained.** Non-model runs sample `P0` inside the timed setup
+   from `random.Random("<seed>:G")` (rejection on `x` until `x^3 + a x + b` is a
+   square and `[h]P0 != O`), then `G = [h]P0`, `H = [d]G`, `d` from
+   `random.Random("<seed>:S")`, which also yields the attempt scalars
+   `(a_j, b_j)`; both curves of a comparison therefore see the same `d` and
+   scalars. For the C-iso model run `P0` is the image `(u^2 x, u^3 y)` of the
+   original curve's `P0` (regenerated outside the timer), so the model's factor
+   base, `G`, `H`, targets and relations are the exact images of the original's.
+   The timed difference between sampling and mapping is microseconds.
+3. **Receipts are per attempt.** `runs.jsonl` holds, per run, one `run_setup`
+   line, 24 `attempt` lines (target `R`, outcome, system size, observed degree,
+   per-phase CPU and wall seconds, relations, rank increment) and one
+   `run_summary` line. CPU time is `time.process_time`, wall time
+   `time.perf_counter`, both read at every phase boundary; the garbage collector
+   is disabled during a run. Peak RSS (`ru_maxrss`, process-cumulative) is logged
+   after each run. Run total = whole-function CPU, so loop overhead is charged.
+4. **Engines are separate run records** with identical random streams. After the
+   main run, for every `(curve, seed, M)` the relation-set fingerprints of the
+   two engines must be equal (in-base solutions are a property of the curve,
+   seed and `M`, not of the engine); a mismatch fails G1.
+5. **Unit order.** All `(comparison, seed, engine)` units are shuffled with
+   `random.Random(20261026)`; inside a unit the order of the two curves is a coin
+   flip from `random.Random(seed ^ 0x5eed ^ (comparison_index * 7919) ^ engine_bit)`
+   (section 5 gave only `seed ^ 0x5eed`, which would make every comparison with the
+   same seed flip identically; the extra terms make the flips independent), and is
+   recorded as `order_position` in every run line.
+6. **Shared curves.** The lower-conductor curve of a pair appears in its pair,
+   C-iso and C-same comparisons; those comparisons share that curve and are not
+   independent. The pair family for Holm correction is the pair comparisons only.
