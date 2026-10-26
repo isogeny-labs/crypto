@@ -254,3 +254,25 @@ cards and receipts are committed. The order is:
 
 The analysis is `examples/jv_cover_bitop_analyse.rs`. Raw JSON lines go to
 `raw/`, and the analysis to `analysis.json` and `README.md`.
+
+---
+## Deviations log (appended after the runs; the text above is unchanged from commit 9a6e3de35)
+
+1. **Host kill, card 2.** The container restarted, probably from an
+   out-of-memory kill caused by other sessions' compiles, while card 2 was in
+   its second command (R0 at `p = 1511`).
+   - Card 2 has no receipt.
+   - Its first command, R3 at `p = 1511`, had written all 16 of its runs.
+     Each line is written when its run completes, so these are complete
+     records, and they are kept in `raw/rho_1511_R3.jsonl`.
+   - The killed R0 command had written one of its 8 runs. That partial file
+     is set aside in `raw/killed_card2/` and is not used.
+   - All 8 R0 runs were re-run from the start by card 2b, with identical
+     seeds.
+   - Counts are deterministic. The one R0 run the killed attempt completed is
+     compared with its re-run: see the README.
+2. **Four cards concurrently.** Cards 1–4 were launched together, 16 worker
+   threads on a 4-core host shared with other sessions, so wall times are
+   inflated and are descriptive only. No count depends on the schedule.
+   After the restart, measured runs were also serialised under the shared
+   build lock.
