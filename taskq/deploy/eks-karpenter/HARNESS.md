@@ -1,5 +1,13 @@
 # Trigger Iso Lab from a harness or GitHub Actions
 
+For the frozen 20/24/28/32-bit one-target index-calculus panel, see
+[`specs/ic-size-sweep/README.md`](specs/ic-size-sweep/README.md). Dispatch the
+`Iso Lab experiment` workflow on `main` with `size_sweep=true`; each curve size
+gets an independent, uniquely named CPU Spot Job and retained receipt. Set
+`resumable=true` to use the CRIU checkpoint and restore controller. The
+[first live diagnostic and raw audit records](validation/ic-size-sweep-20261026/README.md)
+show the protocol and its limits.
+
 For client installation and authentication, follow [agent access and setup](ACCESS.md).
 It includes Claude Code, Codex and OpenCode examples and the permissions an
 administrator must grant a caller on another machine.
