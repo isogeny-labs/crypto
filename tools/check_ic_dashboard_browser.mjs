@@ -19,7 +19,8 @@ const profile = mkdtempSync(resolve(tmpdir(), 'ic-dashboard-browser-'));
 const child = spawn(chrome, ['--headless=new', '--remote-debugging-port=0',
   '--remote-debugging-address=127.0.0.1', '--no-first-run', '--no-default-browser-check',
   '--disable-background-networking', '--disable-component-update',
-  '--disable-extensions', '--user-data-dir=' + profile, 'about:blank'],
+  '--disable-extensions', '--user-data-dir=' + profile,
+  ...(process.env.CI ? ['--no-sandbox'] : []), 'about:blank'],
   { stdio: ['ignore','ignore','pipe'] });
 let chromeLog = '', socket;
 child.stderr.on('data', bytes => { chromeLog += bytes; });

@@ -23,6 +23,8 @@ listenerTemplate:
 template:
   spec:
     automountServiceAccountToken: false
+    # Spot gives 2 minutes; leave the job's SIGTERM trap time to push records.
+    terminationGracePeriodSeconds: 110
     nodeSelector:
       gha.dev/pool: on-demand
     tolerations:

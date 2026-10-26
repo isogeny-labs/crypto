@@ -123,7 +123,8 @@ use crypto_lib::cryptanalysis::ic_framework::stages::{
 };
 use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
 use crypto_lib::cryptanalysis::koblitz_groebner::{
-    f4_word_ops_thread, FieldStructure, SolveStats, SolverEngine,
+    f4_word_ops_thread, parse_linear_harvest, set_linear_harvest, FieldStructure, LinearHarvest,
+    SolveStats, SolverEngine,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_standard_subspace_factor_base, groebner_decompose, groebner_decompose_f6_ic, point_key,
@@ -473,7 +474,7 @@ fn stats_extra(s: &SolveStats) -> BTreeMap<String, u64> {
     e
 }
 
-/// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N`,
+/// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N[,linear_harvest=H]`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind`,
 /// `pdp3-koblitz:m=3,engine=rootfind-window`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind-negfold`, or
@@ -485,6 +486,12 @@ pub struct Pdp3KoblitzOracle<'i> {
     engine: Pdp3Engine,
     solver: SolverEngine,
     node_budget: usize,
+    /// The root linear-row harvest of `koblitz_groebner` (PR #1862) for
+    /// this arm: `None` leaves the library's process default in force (the
+    /// parameter was not given, so the method's identity and counters are
+    /// those of every earlier session); `Some(None)` switches it off;
+    /// `Some(Some(h))` forces configuration `h`.
+    linear_harvest: Option<Option<LinearHarvest>>,
     frob: Option<FrobeniusFactorBase>,
     index_of: HashMap<(BigUint, BigUint), usize>,
     st: Option<FieldStructure>,
@@ -519,6 +526,7 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             engine: Pdp3Engine::InheritedF4,
             solver: SolverEngine::InheritedF4 { max_degree: 3 },
             node_budget: 0,
+            linear_harvest: None,
             frob: None,
             index_of: HashMap::new(),
             st: None,
@@ -719,6 +727,13 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                  refused under every rootfind* engine",
             ),
             (
+                "linear_harvest",
+                "optional, inherited-f4 and f6-ic only: off (the engine before PR #1862), \
+                 default (the library default now in force), gpv (PR #1862's gate alone) or \
+                 every (every node, no gate). Omitted: the library default, with the \
+                 method's identity unchanged. Refused under every other engine",
+            ),
+            (
                 "dimension",
                 "the base's; copied from koblitz-standard-subspace when omitted",
             ),
@@ -780,6 +795,29 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             self.node_budget = budget
                 .parse()
                 .map_err(|_| format!("node_budget `{budget}` is not a number"))?;
+            self.linear_harvest = match params.get("linear_harvest") {
+                None => None,
+                Some(raw) => {
+                    if !matches!(self.engine, Pdp3Engine::InheritedF4 | Pdp3Engine::F6Ic) {
+                        return Err(format!(
+                            "engine={} does not take linear_harvest (only inherited-f4 and \
+                             f6-ic harvest the root's linear rows)",
+                            self.engine.name()
+                        ));
+                    }
+                    Some(match raw {
+                        "off" => None,
+                        "default" => parse_linear_harvest("1"),
+                        "gpv" => parse_linear_harvest("gpv"),
+                        "every" => parse_linear_harvest("every"),
+                        other => {
+                            return Err(format!(
+                                "linear_harvest `{other}` is not off, default, gpv or every"
+                            ))
+                        }
+                    })
+                }
+            };
             self.scan_window_len = 0;
             self.window_div = 0;
             self.pair_table_points = 0;
@@ -789,7 +827,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             // A root-finding engine has no Groebner search to bound.  A
             // bound it ignored would be a parameter in the method's
             // identity that changes nothing, so it is refused.
-            for key in ["degree", "node_budget"] {
+            for key in ["degree", "node_budget", "linear_harvest"] {
                 if params.get(key).is_some() {
                     return Err(format!(
                         "engine={} performs no Groebner search and takes no `{key}`",
@@ -981,6 +1019,9 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         };
         let before = f4_word_ops_thread();
         let started = Instant::now();
+        // The harvest is a thread-local override, read on the solving
+        // thread; set for this solve and always cleared after it.
+        set_linear_harvest(self.linear_harvest);
         let (indices, stats) = decompose(
             kc,
             frob,
@@ -991,6 +1032,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             self.solver,
             self.node_budget,
         );
+        set_linear_harvest(None);
         let word_xors = f4_word_ops_thread().wrapping_sub(before);
         let wall_ns = started.elapsed().as_nanos() as u64;
         // The gate's point additions are group work: charge them.
