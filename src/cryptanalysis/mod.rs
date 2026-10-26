@@ -191,6 +191,7 @@ pub mod glv_invariant_experiments;
 pub mod gpu_rootfind;
 pub mod groebner_cache;
 pub mod groebner_f4;
+pub mod group_op_count;
 pub mod hash_attacks;
 pub mod hilbert_class_poly;
 pub mod hnp_ecdsa;

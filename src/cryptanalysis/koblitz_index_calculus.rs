@@ -149,6 +149,7 @@ use crate::cryptanalysis::ec_index_calculus::{
     gaussian_eliminate_mod_n, gaussian_eliminate_mod_n_particular, sqrt_mod_p,
 };
 use crate::cryptanalysis::fx_hash::{FxMap, FxSet};
+use crate::cryptanalysis::group_op_count;
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 use crate::cryptanalysis::koblitz_fast::{BatchScratch, FastCurve, FastPoint, FrobeniusCanon};
 use crate::cryptanalysis::koblitz_fast_arith::{pack_fast, FastPoint as ArithFastPoint};
@@ -1229,6 +1230,7 @@ impl KoblitzCurve {
         if !self.frobenius_is_endomorphism {
             return x.clone();
         }
+        group_op_count::count_frobenius_maps(1);
         x.square_k_times(self.k, &self.curve.irreducible)
     }
 
@@ -4513,6 +4515,60 @@ pub struct ProbeBudget {
     pub descent_probes: u64,
 }
 
+impl ProbeBudget {
+    /// The probing volume a workflow run plans, which the pair-table
+    /// builder's tier choice ([`PairSumTable::build_within_for`]) is
+    /// amortised over: the collection's `m = 3` scan (`unit_trials ×
+    /// units × window`, when `scans_summands`) and the descent's floor of
+    /// `r / C(|F| + m − 1, m)` probes for each of `targets`.
+    ///
+    /// Moved here from the `ic` binary's `workflow::probe_budget`, which
+    /// calls it, so that a library caller builds the same tier.
+    #[allow(clippy::too_many_arguments)]
+    pub fn for_run(
+        kc: &KoblitzCurve,
+        points: usize,
+        scans_summands: bool,
+        collection_window: Option<u32>,
+        unit_trials: u64,
+        units: usize,
+        descent_summands: u8,
+        targets: usize,
+    ) -> Self {
+        let points = points as u128;
+        let summands_scanned = if scans_summands {
+            let window = collection_window
+                .map(u128::from)
+                .unwrap_or(points)
+                .min(points);
+            (unit_trials as u128)
+                .saturating_mul(units as u128)
+                .saturating_mul(window)
+                .min(u64::MAX as u128) as u64
+        } else {
+            0
+        };
+        // Multisets of `m` summands from the base: the largest set of
+        // points one probe can hit, and the denominator of the floor.
+        let m = u32::from(descent_summands);
+        let mut reachable = BigUint::from(1u32);
+        for i in 0..m {
+            reachable *= BigUint::from(points + i as u128);
+            reachable /= BigUint::from(i + 1);
+        }
+        let per_target = if reachable.is_zero() {
+            0u64
+        } else {
+            let probes = &kc.subgroup_order / reachable;
+            probes.to_u64_digits().first().copied().unwrap_or(0).max(1)
+        };
+        Self {
+            summands_scanned,
+            descent_probes: per_target.saturating_mul(targets as u64),
+        }
+    }
+}
+
 impl Default for ProbeBudget {
     fn default() -> Self {
         // docs/ic/runs/koblitz-tier-crossover-20260921.json, the
@@ -6174,6 +6230,7 @@ impl PairSumTable {
         if let Some(canon) = canon {
             return canon.canon(p.x) + 1;
         }
+        group_op_count::count_canonicalisations(1);
         let mut x = p.x;
         let mut best = x;
         for _ in 1..curve.n {
@@ -6222,6 +6279,7 @@ impl PairSumTable {
         const LANES: usize = 8;
         let n = self.curve.n;
         let field = &self.curve.field;
+        group_op_count::count_canonicalisations(points.len() as u64);
         out.resize(points.len(), 0);
         for (chunk, keys) in points.chunks(LANES).zip(out.chunks_mut(LANES)) {
             let mut x = [0u64; LANES];
@@ -6347,6 +6405,7 @@ impl PairSumTable {
     /// [`Self::admitted`] for a precomputed `pair_filter_hash(key)`.
     #[inline]
     fn admitted_hash(&self, h: u64) -> bool {
+        group_op_count::count_filter_probes(1);
         let (word, bits) = filter_slot(h, self.present_mask, self.filter_extra);
         self.present[word] & bits == bits
     }
@@ -6379,6 +6438,7 @@ impl PairSumTable {
     /// each already paid for that hash once for the presence filter.
     #[inline]
     fn compact_contains_hash(&self, key: u64, h: u64) -> bool {
+        group_op_count::count_bucket_reads(1);
         let bucket = self.bucket_of_hash(key, h);
         let Some(&lo) = self.bucket_start.get(bucket) else {
             return false;
@@ -6397,6 +6457,7 @@ impl PairSumTable {
     /// The orbits a tagged table offers for this key, as the high halves
     /// of the run's matching words.  `out` is cleared first.
     fn candidate_orbits(&self, key: u64, out: &mut Vec<u32>) {
+        group_op_count::count_bucket_reads(1);
         out.clear();
         let bucket = self.bucket_of(key);
         let Some(&lo) = self.bucket_start.get(bucket) else {
@@ -6441,6 +6502,7 @@ impl PairSumTable {
             rests.clear();
             self.curve
                 .add_many(target, addends, &mut rests, &mut scratch);
+            group_op_count::count_bucket_reads(rests.len() as u64);
             for (offset, rest) in rests.iter().enumerate() {
                 if rest.infinity {
                     continue;
@@ -6591,6 +6653,7 @@ impl PairSumTable {
             rests.clear();
             self.curve
                 .add_many(target, &addends, &mut rests, &mut scratch);
+            group_op_count::count_bucket_reads(rests.len() as u64);
             for (slot, rest) in rests.iter().enumerate() {
                 if rest.infinity {
                     continue;
@@ -6668,6 +6731,7 @@ impl PairSumTable {
     }
 
     fn lookup_admitted(&self, key: u64) -> &[(u64, u32, u32)] {
+        group_op_count::count_bucket_reads(1);
         if self.entries.is_empty() {
             return &[];
         }
@@ -12664,11 +12728,11 @@ fn wide_probe_scalar(rng: &mut StdRng, order: &BigUint, nonzero: bool) -> BigUin
 /// additions, so the arithmetic per probe falls by roughly the run
 /// length while the run stays short enough to keep the trial range
 /// worth parallelising.
-const PROBE_RUN: u64 = 64;
+pub(crate) const PROBE_RUN: u64 = 64;
 
 /// The step a walked run takes between consecutive trials, fixed by the
 /// seed so the sequence is reproducible.
-fn probe_run_stride(seed: u64, r_u64: u64) -> u64 {
+pub(crate) fn probe_run_stride(seed: u64, r_u64: u64) -> u64 {
     StdRng::seed_from_u64(seed ^ 0x5354_5249_4445_5f30).gen_range(1..r_u64.max(2))
 }
 
@@ -12681,7 +12745,7 @@ fn probe_run_stride(seed: u64, r_u64: u64) -> u64 {
 /// A run's scalar may come back as `0`, meaning the probe is the point
 /// at infinity; such a trial decomposes into nothing and reports no
 /// relation, so every reported `a` still satisfies `0 < a < r`.
-fn walked_probe_scalar(seed: u64, trial: u64, r_u64: u64) -> u64 {
+pub(crate) fn walked_probe_scalar(seed: u64, trial: u64, r_u64: u64) -> u64 {
     let r = r_u64.max(2) as u128;
     let anchor = probe_scalar(seed, trial / PROBE_RUN, r_u64) as u128;
     let offset = (trial % PROBE_RUN) as u128 * probe_run_stride(seed, r_u64) as u128;
@@ -14201,7 +14265,7 @@ pub struct IndividualLogSolver<'a> {
 
 /// Walks a walked descent steps together (see
 /// [`IndividualLogSolver::solve_by_walking`]).
-const DESCENT_WALKS: usize = 64;
+pub(crate) const DESCENT_WALKS: usize = 64;
 
 /// What turning a descent relation into `d` needs, as machine words:
 /// `r`, `h mod r`, `λᵏ mod r` for every Frobenius power a column can carry,
