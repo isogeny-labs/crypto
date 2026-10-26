@@ -91,6 +91,7 @@ pub fn profile_of(inst: &Instance) -> CurveProfile {
         | Instance::F2m4(_)
         | Instance::Fp4(_)
         | Instance::Ext(_)
+        | Instance::Hec(_)
         | Instance::Hyper(_) => CurveProfile::other(0.0, 0.0, 0),
     }
 }
