@@ -454,10 +454,12 @@ impl Fld {
             s += 1;
         }
         // Non-residue: the first non-square in the enumeration of F_{p^d} by
-        // base-p digit vectors.  (The earlier search along the line
+        // base-p digit vectors (from `z` on when d >= 2).  (The earlier search along the line
         // z^2 + cnt z + cnt + 1 never terminates when that line holds only
         // squares, e.g. p = 17, m = x^2 + 3x + 4.)
-        let mut idx = 2u64;
+        // Start at the element `z` for d >= 2: every element of F_p is a
+        // square in F_{p^d}, d even, so starting at 2 would cost O(p) tests.
+        let mut idx = if self.d == 1 { 2u64 } else { self.p };
         let nr = loop {
             let mut cs = vec![0u64; self.d];
             let mut t = idx;
