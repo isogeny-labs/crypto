@@ -131,6 +131,31 @@ acceptance criterion and resource budget are unchanged.
 The recurring host-capacity and access obstruction is tracked in
 [`problems/r13-single-target-isolated-host.md`](../../../../problems/r13-single-target-isolated-host.md).
 
+### Pre-timing smaller dedicated-host attempt (2026-10-26)
+
+The shared host's benchmark lock was taken again by a separate validation
+build before any R13 price process started. To avoid changing the isolation
+threshold, attempt one dedicated `m8i-flex.2xlarge` Spot worker in
+`us-east-2a`, with the existing worker AMI, profile, key and security group,
+an 80 GiB delete-on-termination root volume and a six-hour maximum lifetime.
+The 8-vCPU shape is inside the remaining Spot vCPU quota and exceeds R12's
+recorded 16 GB host memory with its nominal 30 GiB. This is a prospective
+host, not an assumption of capacity or feature parity. Before timing, verify
+its exact CPU model, `REFERENCE_CLASS` features, memory, SMT sibling topology,
+disk, source/binary digests, 24 holdouts and 90 pin rows. If any check fails
+or Spot capacity is unavailable, keep the original host process queued and
+record the failure. If all pass, stop that queued process before it can start
+and use only the dedicated host for A/A, suite and holdouts. Never combine
+timing from the two hosts. The frozen candidate, targets, reference, rounds
+and decision threshold are unchanged.
+
+The request launched `i-02003f9ff691df036` at 2026-10-26 21:09:09 UTC;
+terminate by 2026-10-27 03:09:09 UTC or sooner at completion. Its initial
+checks report Intel Xeon 6975P-C, eight logical CPUs, 30 GiB memory, 80 GiB
+root disk, the required instruction features, and CPU 2's sibling CPU 6.
+Use `ICPROG_BENCH_CPUS=2,6` if all remaining source, holdout, pin and
+isolation controls pass. Initial hardware checks are not timed results.
+
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
 for this CPU subclass only if every primary size's suite and holdout
