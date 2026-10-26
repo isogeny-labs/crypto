@@ -59,7 +59,7 @@ jobs:
     # Only on the schedule, and only while the owner has set DREG_CKPT_WATCH to a
     # job name; remove the variable to stop automatic restarts.
     if: github.event_name == 'schedule' && github.ref == 'refs/heads/main' && vars.DREG_CKPT_WATCH != ''
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|dreg-ckpt-job.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|dreg-ckpt-job.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 10
     steps:
       - name: Dispatch the job again if it is unfinished and not running

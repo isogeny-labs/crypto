@@ -1,14 +1,14 @@
 {
   "baseline": {
     "algorithm": "Pollard rho on <G>",
-    "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
     "equivalence_class_reason": "negation and the 2^1-Frobenius: E is defined over F_(2^1), so classes have size 2*35/1 = 70 (upper bound on the speedup)",
     "equivalence_class_size": 70,
     "log2_cost_of_one_group_operation": 11.452,
-    "log2_group_operations": 1.412,
+    "log2_group_operations": 1.912,
     "log2_r": 9.301,
-    "log2_total": 12.864,
-    "log2_total_without_automorphisms": 15.929
+    "log2_total": 13.364,
+    "log2_total_negation_only": 15.929
   },
   "candidate": {
     "id": "isogeny:class_invariants",
@@ -28,17 +28,17 @@
       "result": "PASS"
     },
     {
-      "evidence": "End(E) = O_K is established (status Proved): f_E = 1, so E is on the crater of every volcano and no isogeny can lower f_E; conductor gap g = f_pi / f_E = f_pi (18 bits). Moves go down the volcano, away from the maximal order",
+      "evidence": "End(E) = O_K is proved (trait record status Proved): f_E = 1, so E is on the crater of every volcano and no isogeny can lower f_E; conductor gap g = f_pi / f_E = f_pi (18 bits). Moves go down the volcano, away from the maximal order",
       "name": "end_ring_conductor_f_E",
       "result": "PASS"
     }
   ],
   "costs": {
     "destination_solver": "RhoOnIsogenousCurve",
-    "log2_baseline": 12.864,
-    "log2_cost_ratio": 0.537,
-    "log2_total": 13.401,
-    "repo_ratio_log2": 2.528,
+    "log2_baseline": 13.364,
+    "log2_cost_ratio": 0.399,
+    "log2_total": 13.763,
+    "repo_ratio_log2": 2.166,
     "rows": [
       {
         "formula": "finding a path to a representative with a cheaper destination: no such representative is identified, so the walk is not priced",
@@ -66,7 +66,7 @@
       },
       {
         "formula": "Pollard rho on the same r over the same field: every class member has the same order, so the matched baseline is unchanged (identity path)",
-        "log2": 12.864,
+        "log2": 13.364,
         "phase": "destination_solve_unsplit",
         "status": "modeled"
       },
@@ -80,7 +80,7 @@
     "solvers_considered": [
       [
         "RhoOnIsogenousCurve",
-        12.864
+        13.364
       ]
     ],
     "total_is_lower_bound": true,
@@ -139,6 +139,10 @@
       "trace": "-30173"
     }
   },
+  "evaluation": {
+    "reason": "the price is the identity path (the matched baseline plus one edge, by construction): it says nothing about the representatives that were not searched, and the search for a cheaper one is not priced",
+    "status": "not_evaluable"
+  },
   "executed": null,
   "invariants": {
     "anomalous": false,
@@ -148,6 +152,7 @@
       "lower_bound": null,
       "status": "proved"
     },
+    "end_ring_status": "proved",
     "endomorphism": {
       "conductor": "1",
       "conductor_divides": "1",
@@ -331,7 +336,7 @@
     "C*(E) = min over representatives of (path + transfer + best attack): the identity path gives the baseline, and a priced move adds a transfer term to the same destination cost"
   ],
   "obligations": {
-    "computational_advantage": "refuted",
+    "computational_advantage": "unknown",
     "existence": "supported",
     "explicit_construction": "unknown",
     "map_correctness": "unknown",
@@ -347,7 +352,7 @@
     "docs/endomorphism-rules.md",
     "src/cryptanalysis/curve_traits (Frobenius discriminant, conductor, volcano levels)"
   ],
-  "schema": "transfer-audit/certificate/v1",
+  "schema": "transfer-audit/certificate/v2",
   "subgroup_preservation": {
     "antecedents": [
       {
@@ -363,10 +368,10 @@
     "method": "arithmetic: gcd(deg phi, r) = 1",
     "status": "arithmetic"
   },
-  "tool": "transfer-audit/1",
+  "tool": "transfer-audit/2",
   "verdict": "no weakness found in scope",
   "verdict_basis": [
     "the map is not constructed (existence or construction missing)",
-    "priced route costs 2^0.5 times the matched baseline or more"
+    "priced route costs 2^0.4 times the matched baseline or more"
   ]
 }
