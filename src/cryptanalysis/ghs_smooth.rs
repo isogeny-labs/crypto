@@ -42,6 +42,7 @@
 //!    * `c_1 = 0`: substitute `v = 1/t`, `y = Y·t^{2^r}`:
 //!      `y² + P̃·y = t^{2^r}·P̃ + a·P̃²` with `P̃(t) = t^{2^r}P(1/t)`; genus
 //!      `g = 2^r − 1 = 2^{M−1} − 1`.
+//!
 //!    Both are imaginary models with one rational point at infinity.
 //! 6. **The map.**  For `P = (x_0, y_0) ∈ E(K)`, `x_0 ≠ 0`, the places of `L`
 //!    over `P` are `(v = ν, w' = s_0(P) + Θ(ν))` with `P(ν) = 1/x_0`, so
@@ -254,10 +255,9 @@ impl SmoothCover {
     fn poly_k(&self, p: &F2mPoly) -> Result<F2mPoly, SmoothCoverError> {
         let mut cs = Vec::new();
         for c in &p.coeffs {
-            cs.push(
-                self.project_k(c)
-                    .ok_or(SmoothCoverError::Inconsistent("model coefficient outside k"))?,
-            );
+            cs.push(self.project_k(c).ok_or(SmoothCoverError::Inconsistent(
+                "model coefficient outside k",
+            ))?);
         }
         Ok(F2mPoly::from_coeffs(cs, self.tower.l))
     }
@@ -345,7 +345,9 @@ impl SmoothCover {
             fwd.push(e);
         }
         if back.len() != 1usize << l {
-            return Err(SmoothCoverError::Inconsistent("embedding of k not injective"));
+            return Err(SmoothCoverError::Inconsistent(
+                "embedding of k not injective",
+            ));
         }
 
         // ── the space B = span{β_0 + β_j} ──
@@ -451,9 +453,10 @@ impl SmoothCover {
         let lm = LinearMap::new(nn, |t| t.add(&tower.frobenius(t)));
         let mut theta = Vec::new();
         for aj in &acoef {
-            theta.push(lm.solve(aj).ok_or(SmoothCoverError::NoSolution(
-                "theta + sigma(theta) = A_c",
-            ))?);
+            theta.push(
+                lm.solve(aj)
+                    .ok_or(SmoothCoverError::NoSolution("theta + sigma(theta) = A_c"))?,
+            );
         }
 
         // ── G = a + β_0 P + θ² + θ, reduced mod ℘(k[v]) ──
@@ -512,9 +515,7 @@ impl SmoothCover {
                     .map(|(j, c)| (top - (1usize << j), c.clone()))
                     .collect::<Vec<_>>(),
             );
-            let f = pt
-                .shift(top)
-                .add(&pt.mul(&pt, irr).scalar_mul(a, irr));
+            let f = pt.shift(top).add(&pt.mul(&pt, irr).scalar_mul(a, irr));
             (pt, f, (1u32 << r) - 1, CoverModel::T, one.clone())
         };
         me.genus = genus;
@@ -604,10 +605,8 @@ impl SmoothCover {
                     u_terms.push((top - (1usize << j), self.mul(c, &zi_inv)));
                 }
                 let u = self.mono_poly(&u_terms);
-                let y_t: Vec<(usize, F2mElement)> = y_terms
-                    .iter()
-                    .map(|(e, c)| (top - *e, c.clone()))
-                    .collect();
+                let y_t: Vec<(usize, F2mElement)> =
+                    y_terms.iter().map(|(e, c)| (top - *e, c.clone())).collect();
                 let y = self.mono_poly(&y_t);
                 Ok(MumfordDivisor::try_from_unreduced(&self.curve_big, u, y)?)
             }
@@ -912,7 +911,11 @@ mod tests {
         assert_eq!(cov.magic, m, "magic number");
         let type_i = ghs_type_i(&s.tower, &s.b);
         assert_eq!(cov.c1.is_zero(), type_i, "type I iff c_1 = 0");
-        let expect_g = if type_i { (1u32 << (m - 1)) - 1 } else { 1u32 << (m - 1) };
+        let expect_g = if type_i {
+            (1u32 << (m - 1)) - 1
+        } else {
+            1u32 << (m - 1)
+        };
         assert_eq!(cov.genus, expect_g, "GHS genus");
         Some((cov, s))
     }
@@ -948,7 +951,11 @@ mod tests {
             let jd = jacobian_from_counts(4, g, &counts[..g]);
             // genus check: the L-polynomial from N_1..N_g predicts N_{g+1}, N_{g+2}
             assert_eq!(predicted_count(4, &jd.l_poly, g + 1), counts[g], "N_(g+1)");
-            assert_eq!(predicted_count(4, &jd.l_poly, g + 2), counts[g + 1], "N_(g+2)");
+            assert_eq!(
+                predicted_count(4, &jd.l_poly, g + 2),
+                counts[g + 1],
+                "N_(g+2)"
+            );
             // E(K) embeds: its order divides #J up to the kernel; check the
             // Frobenius relation  pi_E = alpha^n  via the trace of E
             let ne = count_e_points(&s.tower, &s.a, &s.b) as i128;
@@ -956,7 +963,7 @@ mod tests {
             // power sums of alpha^3 from counts of C over F_{4^{3j}} need k up to 3j; for g<=2
             // use p_3 = sum alpha_i^3 directly: pi_E + conj appear in alpha^3
             let p3 = {
-                let mut p = vec![0i128; 4];
+                let mut p = [0i128; 4];
                 for m in 1..=3usize {
                     let mut acc = 0;
                     for i in 1..m {
@@ -982,17 +989,17 @@ mod tests {
     #[test]
     fn image_is_a_homomorphism_into_the_jacobian() {
         let mut tested = 0;
-        for (l, n, a, beta) in [(2u32, 3u32, 0u8, 1u64), (2, 3, 1, 5), (2, 4, 0, 3), (3, 3, 0, 9)] {
+        for (l, n, a, beta) in [
+            (2u32, 3u32, 0u8, 1u64),
+            (2, 3, 1, 5),
+            (2, 4, 0, 3),
+            (3, 3, 0, 9),
+        ] {
             for beta in beta..beta + 40 {
                 let Some((cov, s)) = check_cover(l, n, a, beta) else {
                     continue;
                 };
-                let e = ECurve::new(
-                    s.tower.big_n,
-                    s.tower.irr.clone(),
-                    s.a.clone(),
-                    s.b.clone(),
-                );
+                let e = ECurve::new(s.tower.big_n, s.tower.irr.clone(), s.a.clone(), s.b.clone());
                 let pts = all_points(&s, 400);
                 let mut ok = 0;
                 for i in (0..pts.len().saturating_sub(7)).step_by(3) {
@@ -1068,12 +1075,17 @@ mod tests {
         assert_eq!(cov.genus, 8);
         assert_eq!(cov.model, CoverModel::V);
         // point counts N_1..N_8 over F_4^k (frozen from the first run) and #J
-        let counts: Vec<i128> = (1..=8).map(|k| count_points_extension(&cov.curve_k, k)).collect();
+        let counts: Vec<i128> = (1..=8)
+            .map(|k| count_points_extension(&cov.curve_k, k))
+            .collect();
         assert_eq!(counts, vec![5, 15, 65, 319, 1025, 4761, 16385, 64639]);
         let jd = jacobian_from_counts(4, 8, &counts);
         assert_eq!(jd.order, 67072);
         // the independent genus check: N_9 predicted from N_1..N_8
-        assert_eq!(predicted_count(4, &jd.l_poly, 9), count_points_extension(&cov.curve_k, 9));
+        assert_eq!(
+            predicted_count(4, &jd.l_poly, 9),
+            count_points_extension(&cov.curve_k, 9)
+        );
         // E(K): order 4192 = 2^5 * 131, and 131 | #J
         let ne = count_e_points(&s.tower, &s.a, &s.b);
         assert_eq!(ne, 4192);
@@ -1098,7 +1110,9 @@ mod tests {
             }
             let Ok(f) = cov.image(&g131) else { continue };
             assert!(!f.is_identity());
-            assert!(f.scalar_mul(&BigUint::from(131u32), &cov.curve_k).is_identity());
+            assert!(f
+                .scalar_mul(&BigUint::from(131u32), &cov.curve_k)
+                .is_identity());
             break;
         }
     }

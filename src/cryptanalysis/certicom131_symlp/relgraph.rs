@@ -180,8 +180,8 @@ impl LpGraph {
                 break;
             }
             for &(w, e) in &self.tree[v] {
-                if !prev.contains_key(&w) {
-                    prev.insert(w, (v, e));
+                if let std::collections::hash_map::Entry::Vacant(slot) = prev.entry(w) {
+                    slot.insert((v, e));
                     queue.push_back(w);
                 }
             }
@@ -288,8 +288,8 @@ impl LpGraph {
             };
             let tj = self.lp_coef(edges[j], l);
             let tn = self.lp_coef(edges[j + 1], l);
-            let next = (&self.r - (&coefs[j] * &tj % &self.r) * inv_mod(&tn, &self.r) % &self.r)
-                % &self.r;
+            let next =
+                (&self.r - (&coefs[j] * &tj % &self.r) * inv_mod(&tn, &self.r) % &self.r) % &self.r;
             coefs.push(next);
         }
         let inputs: Vec<(usize, BigUint)> = edges.iter().copied().zip(coefs).collect();
@@ -403,10 +403,9 @@ mod tests {
         fn holds(&self, full: &FullRelation) -> bool {
             let r = &self.r;
             let lhs = (&full.a + &full.b * &self.d) % r;
-            let rhs = full
-                .fb
-                .iter()
-                .fold(BigUint::zero(), |acc, (i, c)| (acc + c * &self.f[*i as usize]) % r);
+            let rhs = full.fb.iter().fold(BigUint::zero(), |acc, (i, c)| {
+                (acc + c * &self.f[*i as usize]) % r
+            });
             lhs == rhs
         }
     }
@@ -480,9 +479,15 @@ mod tests {
         let mut g = LpGraph::new(r);
         // L0 + L1, L1 + L2, L2 + L0 with all signs +: any ±1 combination
         // cancelling L0 and L1 leaves 2·L2.
-        assert!(g.add(w.relation(vec![(0, 1)], vec![(0, 1), (1, 1)], &mut rng)).is_none());
-        assert!(g.add(w.relation(vec![(1, 1)], vec![(1, 1), (2, 1)], &mut rng)).is_none());
-        assert!(g.add(w.relation(vec![(0, -1)], vec![(2, 1), (0, 1)], &mut rng)).is_none());
+        assert!(g
+            .add(w.relation(vec![(0, 1)], vec![(0, 1), (1, 1)], &mut rng))
+            .is_none());
+        assert!(g
+            .add(w.relation(vec![(1, 1)], vec![(1, 1), (2, 1)], &mut rng))
+            .is_none());
+        assert!(g
+            .add(w.relation(vec![(0, -1)], vec![(2, 1), (0, 1)], &mut rng))
+            .is_none());
         assert_eq!(g.stats.odd_cycles, 1);
         // The same triangle with one sign flipped closes.
         let mut g = LpGraph::new(w.r.clone());
