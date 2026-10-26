@@ -9063,7 +9063,7 @@ fn sat_decompose_union_s4(
     }
 }
 
-/// Hard limits for an experimental five- or six-summand chained-S3 SAT
+/// Hard limits for an experimental four- to six-summand chained-S3 SAT
 /// decomposition. The variable cap is checked before any SAT model is built;
 /// the conflict and model caps cover all intermediate-identity patterns.
 #[derive(Clone, Copy, Debug)]
@@ -9149,7 +9149,7 @@ fn sat_decompose_chained_s3_with_domain(
         finite_domain_clause_count, frobenius_orbit_domain_size, ChainBuildError, ChainedS3Encoding,
     };
     let mut stats = ChainS3Stats::default();
-    if !(5..=6).contains(&m)
+    if !(4..=6).contains(&m)
         || limits.max_models == 0
         || limits.conflict_budget == 0
         || !kc.curve.is_on_curve(target)
@@ -9922,7 +9922,7 @@ pub struct KoblitzIcOptions {
     /// Native-XOR/CNF, branching, domain, trace, and conflict controls
     /// for [`DecompositionStrategy::Sat`].
     pub sat_options: SatDecompositionOptions,
-    /// Explicit hard caps for the five- or six-summand chained-S3 path.
+    /// Explicit hard caps for the four- to six-summand chained-S3 path.
     /// Zero defaults keep this experimental strategy closed.
     pub chain_s3_limits: ChainS3Limits,
     /// Path to a WDSat `wdsat_solver` binary for
@@ -10446,7 +10446,7 @@ fn koblitz_index_calculus_dlp_observed(
         DecompositionStrategy::ChainedS3
             | DecompositionStrategy::ChainedS3FrobeniusOrbit
             | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
-    ) && (!(5..=6).contains(&opts.m)
+    ) && (!(4..=6).contains(&opts.m)
         || !fb.uses_ambient_basis()
         || opts.chain_s3_limits.max_variables == 0
         || opts.chain_s3_limits.max_domain_clauses == 0
@@ -16674,13 +16674,13 @@ mod tests {
     }
 
     #[test]
-    fn chained_s3_five_and_six_summands_lift_on_the_original_curve() {
+    fn chained_s3_four_to_six_summands_lift_on_the_original_curve() {
         let kc = KoblitzCurve::new(0, 7).unwrap();
         let BinaryPoint::Affine { x, .. } = kc.generator() else {
             panic!("generator is affine");
         };
         let fb = build_explicit_frobenius_orbit_factor_base(&kc, std::slice::from_ref(x)).unwrap();
-        for m in [5usize, 6] {
+        for m in [4usize, 5, 6] {
             let target = kc.mul(&fb.points[0], &BigUint::from(m as u32));
             let (found, stats) = sat_decompose_chained_s3(
                 &kc,
@@ -16781,7 +16781,7 @@ mod tests {
             max_models: 128,
             conflict_budget: 500_000,
         };
-        for m in [5usize, 6] {
+        for m in [4usize, 5, 6] {
             let target = kc.mul(&fb.points[0], &BigUint::from(m as u32));
             for ordered in [false, true] {
                 let (found, stats) = if ordered {
@@ -16836,39 +16836,42 @@ mod tests {
         let fb = build_explicit_frobenius_orbit_factor_base(&kc, std::slice::from_ref(x)).unwrap();
         let known = BigUint::from(3u32) % &kc.subgroup_order;
         let target = kc.mul(kc.generator(), &known);
-        let opts = KoblitzIcOptions {
-            m: 5,
-            strategy: DecompositionStrategy::ChainedS3,
-            max_trials: 16,
-            extra_relations: 1,
-            allow_direct_relation: false,
-            chain_s3_limits: ChainS3Limits {
-                max_variables: 2_000,
-                max_domain_clauses: 10_000,
-                max_models: 128,
-                conflict_budget: 500_000,
-            },
-            ..KoblitzIcOptions::default()
-        };
-        let report = koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
-        assert_eq!(report.log, Some(known), "{report:?}");
-        assert!(report.sat_calls > 0);
-        assert!(report.independent_relations > 0);
-        assert!(report.linear_solve_attempts > 0);
-        assert_eq!(report.sat_invalid_models, 0);
-        assert_eq!(report.verification_failures, 0);
-        assert!(!report.direct_relation);
+        for m in [4usize, 5] {
+            let opts = KoblitzIcOptions {
+                m,
+                strategy: DecompositionStrategy::ChainedS3,
+                max_trials: 16,
+                extra_relations: 1,
+                allow_direct_relation: false,
+                chain_s3_limits: ChainS3Limits {
+                    max_variables: 2_000,
+                    max_domain_clauses: 10_000,
+                    max_models: 128,
+                    conflict_budget: 500_000,
+                },
+                ..KoblitzIcOptions::default()
+            };
+            let report =
+                koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+            assert_eq!(report.log, Some(known.clone()), "m={m}: {report:?}");
+            assert!(report.sat_calls > 0);
+            assert!(report.independent_relations > 0);
+            assert!(report.linear_solve_attempts > 0);
+            assert_eq!(report.sat_invalid_models, 0);
+            assert_eq!(report.verification_failures, 0);
+            assert!(!report.direct_relation);
 
-        let defaults = KoblitzIcOptions {
-            chain_s3_limits: KoblitzIcOptions::default().chain_s3_limits,
-            ..opts
-        };
-        let capped =
-            koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &defaults).unwrap();
-        assert_eq!(capped.trials, 0);
-        assert_eq!(capped.sat_calls, 0);
-        assert_eq!(capped.sat_unknowns, 1);
-        assert!(capped.log.is_none());
+            let defaults = KoblitzIcOptions {
+                chain_s3_limits: KoblitzIcOptions::default().chain_s3_limits,
+                ..opts
+            };
+            let capped =
+                koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &defaults).unwrap();
+            assert_eq!(capped.trials, 0);
+            assert_eq!(capped.sat_calls, 0);
+            assert_eq!(capped.sat_unknowns, 1);
+            assert!(capped.log.is_none());
+        }
     }
 
     #[test]

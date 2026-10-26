@@ -3,6 +3,10 @@ name: Workstation setup validation
 on:
   pull_request:
     paths:
+      - '.mcp.json'
+      - '.codex/config.toml'
+      - 'scripts/isolab-agent.sh'
+      - 'scripts/test-isolab-agent.sh'
       - '.claude/hooks/session-start.sh'
       - 'scripts/cairn-node.sh'
       - 'scripts/setup-workstation.sh'
@@ -13,6 +17,10 @@ on:
   push:
     branches: [main]
     paths:
+      - '.mcp.json'
+      - '.codex/config.toml'
+      - 'scripts/isolab-agent.sh'
+      - 'scripts/test-isolab-agent.sh'
       - '.claude/hooks/session-start.sh'
       - 'scripts/cairn-node.sh'
       - 'scripts/setup-workstation.sh'
@@ -38,6 +46,10 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /.mcp.json
+            /.codex/config.toml
+            /scripts/isolab-agent.sh
+            /scripts/test-isolab-agent.sh
             /.claude/hooks/session-start.sh
             /scripts/cairn-node.sh
             /scripts/setup-workstation.sh
@@ -55,8 +67,13 @@ jobs:
         run: |
           # The self-hosted runner images lack shellcheck; hosted ones have it.
           command -v shellcheck >/dev/null || python -m pip install --quiet shellcheck-py==0.11.0.1
-          bash -n .claude/hooks/session-start.sh scripts/cairn-node.sh scripts/setup-workstation.sh
-          shellcheck -S warning .claude/hooks/session-start.sh scripts/cairn-node.sh scripts/setup-workstation.sh
+          bash -n .claude/hooks/session-start.sh scripts/cairn-node.sh scripts/setup-workstation.sh scripts/isolab-agent.sh scripts/test-isolab-agent.sh
+          shellcheck -S warning .claude/hooks/session-start.sh scripts/cairn-node.sh scripts/setup-workstation.sh scripts/isolab-agent.sh scripts/test-isolab-agent.sh
+      - name: Check Iso Lab agent connections without submitting work
+        run: |
+          jq -e '.mcpServers.isolab.type == "stdio" and .mcpServers["isolab-eks"].type == "stdio"' .mcp.json
+          python3 -c 'import tomllib; c = tomllib.load(open(".codex/config.toml", "rb")); assert {"isolab", "isolab-eks"} <= c["mcp_servers"].keys()'
+          bash scripts/test-isolab-agent.sh
       - name: Exercise native Linux installer transactions
         run: |
           command -v flock

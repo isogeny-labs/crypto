@@ -150,6 +150,21 @@ pub fn mask_low64(m: Mask) -> u64 {
     m as u64
 }
 
+/// The masks as 64-bit words, for a stored format that keeps one word per
+/// monomial; `None` if any mask needs more than 64 bits, so that a caller
+/// reports the limit instead of truncating.  Always `Some` in the default
+/// build.
+#[cfg(not(feature = "wide-vars"))]
+pub fn masks_to_words_checked(masks: &[Mask]) -> Option<Vec<u64>> {
+    Some(masks.to_vec())
+}
+
+/// See the default-build twin above.
+#[cfg(feature = "wide-vars")]
+pub fn masks_to_words_checked(masks: &[Mask]) -> Option<Vec<u64>> {
+    masks.iter().map(|&m| u64::try_from(m).ok()).collect()
+}
+
 /// A monomial in `F_2[v_0, …, v_{n-1}] / (v_i² − v_i)` represented as a
 /// bitmask: bit `k` is set iff `v_k` divides the monomial.
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, serde::Serialize, serde::Deserialize)]
