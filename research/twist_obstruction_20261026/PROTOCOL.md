@@ -144,3 +144,19 @@ versions are reported. The `dry` and `probe` outputs are scratch and not
 reported. One fact the dry run revealed: the Koblitz p_E on the low-degree
 V is far from ½ (9 of 31 at n = 7, l = 5). This is why the heuristic
 reference uses the measured p_E.
+
+## Amendment 1 (2026-10-26, after the run): formatting only
+
+This amendment changes no experiment parameter and no decision rule.
+
+`src/main.rs` was reformatted with `rustfmt --edition 2021`, as the
+repository's "rustfmt (changed files)" CI check requires. The new sha256 is
+`6bc1ae3d5e849785ead81492816f632a89b03e04422f1c528e9a370f0c3909f4`. The
+reported run, `run-20261026T1456Z`, used the frozen source above (commit
+`ff3bf9d48`).
+
+The equivalence is checked as follows. The reformatted harness was rerun in
+`full` mode. Its `rows.jsonl` with the `seconds*` fields removed is
+byte-identical to the reported run's (sha256 `7686fa84…556f47` for both).
+Its `summary.json`, aside from `run_dir`, is also identical
+(`3d93afd8…aeb43c`). The summarizer had one clippy cast removed.
