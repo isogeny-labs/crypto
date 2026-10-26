@@ -1,0 +1,45 @@
+{
+  "kind": "native-six-curve-diagnostic/v1",
+  "status": "six rows completed",
+  "source_base_commit": "43e01b10e0e5ec6bb74a1cd24f283ef006da586d",
+  "native_backend": "PARI C library 2.17.3",
+  "build": "native/run.sh: C++17, -O2 -Wall -Wextra -Werror, native libpari and libcrypto",
+  "command": "PARI_PREFIX=/workspace/tools/sage_skeleton_env sh native/run.sh",
+  "per_curve_process_timeout_seconds": 90,
+  "pari_random_seed": 1,
+  "pari_stack_bytes": 256000000,
+  "inputs_sha256": "7e044acfde7f6601568e7a35932cb1fdbe3c7e9aff8b8215d365bec9048ea261",
+  "source_sha256": "9b224efefb52affca591e8c2b1712b3084cf1c1855fb8203e667064669500b5e",
+  "outputs": [
+    {
+      "path": "records/curve-0.json",
+      "sha256": "cac78027b8fbb805b696e163d9090b8df1c5b9b5d0f156b99690cf5575dd4dad"
+    },
+    {
+      "path": "records/curve-1.json",
+      "sha256": "006f21bcdb6376ae83e679807341841cd95739bf23e1787e67d0662194420ad1"
+    },
+    {
+      "path": "records/curve-2.json",
+      "sha256": "1fac2450b212a29ca5e50c690ae1a4d8409a3571f22c29097ba2c08de86aabbd"
+    },
+    {
+      "path": "records/curve-3.json",
+      "sha256": "b2ba9ab5204b6c6289e594326600f37426d5f0890ccb92f6479925fc49bd165a"
+    },
+    {
+      "path": "records/curve-4.json",
+      "sha256": "2a1fae260db6daeba261b06ca45471064f4bb49b851b70065422bdf5fedfa752"
+    },
+    {
+      "path": "records/curve-5.json",
+      "sha256": "28a049b57f5c8c5ccc9e9a921eb305d39d3e9af8cf17cd1ba404f37cb5f5545f"
+    }
+  ],
+  "controls": "six valid rows; two adjacent seed controls per row; four fixed input corruption controls",
+  "host_record": "records/environment.txt",
+  "workflow_limits": "records/workflow-checks.txt",
+  "performance_measurement": false,
+  "independent_host_replay": false,
+  "lean_formalization": false
+}
