@@ -553,6 +553,13 @@ isomorphisms to the explicit affine and infinity charts, the cover
 `D₊(X)∪D₊(Z)=Proj`, and properness over the coefficient field. Smoothness,
 comparison of the overlap with the separately glued curve, local-stalk
 transport, and the `Pic⁰` class equation remain open.
+The [same packet](formal/WEIGHTED_QUOTIENT_COMPONENTS.md) also checks
+pointwise Jacobian nonvanishing under stated hypotheses and the chart
+generator identities `x·z=1`, `w·x³=y` in the common overlap ring. These
+bounded facts do not prove global scheme smoothness or equality of the
+overlap morphisms. The common localized overlap rings now have a checked
+canonical equivalence through `Away(XZ)`; comparison to the separately
+defined gluing transition is still open.
 Identifying that chart stalk with the chosen projective completion's
 infinity stalk remains open. The [infinity-chart packet](formal/INFINITY_CHART.md)
 now proves the chart equation `w²=z(1+a3z²+a2z³+a1z⁴+a0z⁵)` for
