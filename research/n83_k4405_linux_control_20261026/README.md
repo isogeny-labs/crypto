@@ -9,9 +9,12 @@ reserved for the later paired Tier 1 comparison.
 The source hash, prior source flags, target and answer sidecar are checked
 before execution. The Linux executable is built from that source and hashed
 in `config.json`; its binary hash is platform-specific. The worker records
-cgroup v2 memory, swap, CPU quota, CPU statistics, memory events, affinity,
-and a 0.5-second time series. It stops at 1,200 seconds, 48 GiB cgroup use,
-or 2 GiB swap use. Admission requires a cgroup limit of at least 56 GiB,
+cgroup v1 or v2 memory, swap, CPU quota, CPU statistics, memory events,
+affinity, and a 0.5-second time series. The v1 path uses the memory+swap
+counter or `memory.stat`'s `total_swap` and rejects a Pod that exposes
+neither. A new cgroup OOM or limit-denial counter marks the receipt
+`CGROUP_OOM`. The wrapper stops at 1,200 seconds, 48 GiB cgroup use, or
+2 GiB swap use. Admission requires a finite cgroup limit of 56–128 GiB,
 at least four effective CPUs, and at most 8 GiB initial cgroup use.
 
 **Run only after an independent provider deletion watchdog is armed and its

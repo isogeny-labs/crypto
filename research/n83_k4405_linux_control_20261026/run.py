@@ -27,7 +27,10 @@ ANSWERS = ROOT / "research/n83_cold_factor_base_20261016/answers.jsonl"
 CAP_SECONDS = 1200
 MEMORY_STOP_BYTES = 48 * 1024**3
 MIN_MEMORY_MAX_BYTES = 56 * 1024**3
+MAX_MEMORY_MAX_BYTES = 128 * 1024**3
 CGROUP = Path("/sys/fs/cgroup")
+CGROUP_V1_CPU = CGROUP / "cpu"
+CGROUP_V1_MEMORY = CGROUP / "memory"
 
 
 def digest(path: Path) -> str:
@@ -40,8 +43,9 @@ def number(path: Path) -> int | None:
     return None if value == "max" else int(value)
 
 
-def snapshot() -> dict:
+def snapshot_v2() -> dict:
     return {
+        "cgroup_interface": "v2",
         "memory_current": number(CGROUP / "memory.current"),
         "memory_peak": number(CGROUP / "memory.peak"),
         "memory_max": number(CGROUP / "memory.max"),
@@ -51,6 +55,53 @@ def snapshot() -> dict:
         "cpu_max": (CGROUP / "cpu.max").read_text().strip(),
         "affinity": sorted(os.sched_getaffinity(0)),
     }
+
+
+def snapshot_v1() -> dict:
+    memory = CGROUP_V1_MEMORY
+    cpu = CGROUP_V1_CPU
+    current = number(memory / "memory.usage_in_bytes")
+    limit = number(memory / "memory.limit_in_bytes")
+    peak = number(memory / "memory.max_usage_in_bytes")
+    memsw = memory / "memory.memsw.usage_in_bytes"
+    if memsw.exists():
+        combined = number(memsw)
+        swap = None if combined is None or current is None else max(0, combined - current)
+    else:
+        stat = dict(line.split(maxsplit=1) for line in (memory / "memory.stat").read_text().splitlines())
+        swap = int(stat["total_swap"]) if "total_swap" in stat else None
+    quota = number(cpu / "cpu.cfs_quota_us")
+    period = number(cpu / "cpu.cfs_period_us")
+    if quota == -1:
+        quota = None
+    oom = dict(line.split(maxsplit=1) for line in (memory / "memory.oom_control").read_text().splitlines())
+    failcnt = number(memory / "memory.failcnt")
+    if failcnt is None or "oom_kill" not in oom or period is None or period <= 0:
+        raise ValueError("cgroup v1 counters incomplete")
+    return {
+        "cgroup_interface": "v1",
+        "memory_current": current,
+        "memory_peak": peak,
+        "memory_max": limit,
+        "memory_swap_current": swap,
+        "memory_events": f"oom {failcnt}\noom_kill {oom['oom_kill']}\n",
+        "cpu_stat": (cpu / "cpu.stat").read_text(),
+        "cpu_max": f"{'max' if quota is None else quota} {period}",
+        "affinity": sorted(os.sched_getaffinity(0)),
+    }
+
+
+def snapshot() -> dict:
+    if (CGROUP / "memory.current").exists():
+        return snapshot_v2()
+    if CGROUP_V1_CPU.is_dir() and CGROUP_V1_MEMORY.is_dir():
+        return snapshot_v1()
+    raise ValueError("supported cgroup memory and CPU controllers unavailable")
+
+
+def oom_count(state: dict) -> int:
+    fields = dict(line.split(maxsplit=1) for line in state["memory_events"].splitlines())
+    return int(fields["oom"]) + int(fields["oom_kill"])
 
 
 def parse_cpu_max(value: str) -> float | None:
@@ -68,8 +119,10 @@ def run(binary: Path, output: Path, *, preflight: bool = False) -> dict:
     if point != answer["point"] or answer["fixture_index"] != 0:
         raise ValueError("earlier public target fixture differs")
     initial = snapshot()
+    oom_count(initial)
     if (initial["memory_max"] is None or
             initial["memory_max"] < MIN_MEMORY_MAX_BYTES or
+            initial["memory_max"] > MAX_MEMORY_MAX_BYTES or
             initial["memory_current"] is None or
             initial["memory_current"] > 8 * 1024**3 or
             initial["memory_swap_current"] is None or
@@ -77,7 +130,7 @@ def run(binary: Path, output: Path, *, preflight: bool = False) -> dict:
             len(initial["affinity"]) < 4 or
             (parse_cpu_max(initial["cpu_max"]) is not None and
              parse_cpu_max(initial["cpu_max"]) < 4)):
-        raise RuntimeError("Linux Pod requires a clean >=56 GiB cgroup and >=4 CPUs")
+        raise RuntimeError("Linux Pod requires a clean 56–128 GiB cgroup and >=4 CPUs")
     flags = dict(source["algorithm_flags"])
     flags.update({"KIC_DUMP_BASE": str(output / "base_dump.jsonl"),
                   "KIC_INDEX_ROOT_THREADS": "4"})
@@ -152,13 +205,25 @@ def run(binary: Path, output: Path, *, preflight: bool = False) -> dict:
             signal.signal(signal.SIGTERM, previous_term)
             signal.signal(signal.SIGINT, previous_int)
     (output / "samples.json").write_text(json.dumps(samples, indent=2) + "\n")
+    try:
+        final = snapshot()
+    except (OSError, ValueError):
+        final = None
     status = stop_reason or ("PASS_PROCESS_EXIT" if child.returncode == 0 else
                              "PRODUCER_FAILURE_EXIT")
+    if final is None:
+        status = "CGROUP_TELEMETRY_FAILURE"
+    else:
+        try:
+            if oom_count(final) > oom_count(initial):
+                status = "CGROUP_OOM"
+        except (KeyError, ValueError):
+            status = "CGROUP_TELEMETRY_FAILURE"
     receipt = {"schema": "n83.k4405-current-source-linux-receipt/v1",
                "status": status, "exit_code": child.returncode,
                "wall_seconds": round(time.monotonic() - started, 3),
                "stopped_utc": datetime.now(timezone.utc).isoformat(),
-               "final_cgroup": snapshot(),
+               "final_cgroup": final,
                "samples_sha256": digest(output / "samples.json"),
                "stdout_sha256": digest(output / "stdout.jsonl"),
                "stderr_sha256": digest(output / "stderr.log"),
