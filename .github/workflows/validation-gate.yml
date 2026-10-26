@@ -26,7 +26,9 @@ concurrency:
 
 jobs:
   gate:
-    runs-on: ubuntu-24.04
+    # Route only this same-repository CLI PR to the dedicated, one-job local
+    # ARM64 runner. Fork PRs and every other run retain the hosted image.
+    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'codex/crypto-cli-audit-20261017' && 'crypto-cli-gate-arm64' || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:
       # The full-history checkout no longer fits a hosted runner: from
@@ -36,6 +38,7 @@ jobs:
       # SDKs it does not use, check out only the head, and fetch only the
       # base tip; its blobs arrive on demand.
       - name: Free runner disk
+        if: runner.environment == 'github-hosted'
         run: |
           df -h /
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
@@ -56,8 +59,11 @@ jobs:
           # fail here rather than let the freeze comparison pass silently.
           git rev-parse --verify "origin/$BASE_REF^{commit}"
       - uses: actions/setup-python@v5
+        if: runner.environment == 'github-hosted'
         with:
           python-version: '3.11'
+      - name: Confirm Python 3.11
+        run: python3 -c 'import sys; assert sys.version_info[:2] == (3, 11), sys.version'
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Every leaderboard and benchmarks row is validated or frozen pre-gate
