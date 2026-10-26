@@ -64,6 +64,7 @@ fn main() {
         "route-s" => route_s(q, &out, &name, &args),
         "cost" => cost(q, &out, &name, &args),
         "cost-fit" => cost_fit(&out),
+        "summarize" => summarize(&out),
         _ => eprintln!("usage: smith_isogeny verify|deg8|route-s|cost --q Q [--out DIR]"),
     }
 }
@@ -290,4 +291,70 @@ fn cost_fit(out: &str) {
         "wall": fit(pts.iter().map(|p| p.3).collect())});
     std::fs::write(format!("{out}/cost_fit.json"), serde_json::to_string_pretty(&v).unwrap()).unwrap();
     println!("{}", v);
+}
+
+/// Totals over the recorded rows (`out/summary.json`): per q and engine the
+/// pass / fail / skip counts of T2-T6, T1 outcomes, image checks, T1(f), and
+/// the Route S funnel.  Reads the JSONL files only; computes nothing new.
+fn summarize(out: &str) {
+    use serde_json::Value;
+    let read = |n: &str| -> Vec<Value> {
+        std::fs::read_to_string(format!("{out}/{n}"))
+            .map(|t| t.lines().map(|l| serde_json::from_str(l).unwrap()).collect())
+            .unwrap_or_default()
+    };
+    let checks = ["t2_well_defined", "t3_homomorphism", "t4_kernel_s", "t4_outside_nonzero",
+        "t5_order_nonzero", "t5_order_annihilated", "t6_group_order"];
+    let mut verify = Vec::new();
+    let mut deg8 = Vec::new();
+    let mut routes = Vec::new();
+    for q in [7u64, 11, 13, 17, 19, 23] {
+        let rows = read(&format!("verify_q{q}.jsonl"));
+        let curves: Vec<&Value> = rows.iter().filter(|r| r["rec"] == "curve").collect();
+        let scan = rows.iter().find(|r| r["rec"] == "scan").cloned().unwrap_or(Value::Null);
+        let mut eng = serde_json::Map::new();
+        for e in ["w1", "deg6"] {
+            let mut m = serde_json::Map::new();
+            for c in checks {
+                let (mut p, mut f, mut s) = (0u64, 0u64, 0u64);
+                for r in &curves {
+                    if let Some(t) = r.get(e).and_then(|x| x.get(c)) {
+                        p += t["pass"].as_u64().unwrap();
+                        f += t["fail"].as_u64().unwrap();
+                        s += t["skip"].as_u64().unwrap();
+                    }
+                }
+                m.insert(c.into(), json!({"pass": p, "fail": f, "skip": s}));
+            }
+            eng.insert(e.into(), Value::Object(m));
+        }
+        let t1_pass = curves.iter().filter(|r| r["t1_pass"] == true).count();
+        let hyper = curves.iter().filter(|r| r["t1"]["fit_error"].as_str().map_or(false, |s| s.contains("hyperelliptic"))).count();
+        let holdout: u64 = curves.iter().map(|r| r["t1"]["holdout_points"].as_u64().unwrap_or(0)).sum();
+        let holdout_fail: u64 = curves.iter().map(|r| r["t1"]["holdout_failures"].as_u64().unwrap_or(0)).sum();
+        let imgs: Vec<&Value> = curves.iter().filter_map(|r| r.get("image")).collect();
+        let img_ok = imgs.iter().filter(|i| i["kernel_equals_s"] == true && i["errors"] == 0
+            && i["fibre_min"] == i["n_s_rational"] && i["fibre_max"] == i["n_s_rational"]
+            && i["n_jac_enumerated"].as_u64() == i["n_jac_lpoly"].as_u64()).count();
+        let img_elems: u64 = imgs.iter().map(|i| i["n_jac_enumerated"].as_u64().unwrap()).sum();
+        let img_retry: u64 = imgs.iter().map(|i| i["first_try_errors"].as_u64().unwrap()).sum();
+        verify.push(json!({"q": q, "curves": curves.len(), "curves_scanned": scan["curves_scanned"],
+            "t1_pass": t1_pass, "x_hyperelliptic": hyper, "holdout_points": holdout,
+            "holdout_failures": holdout_fail, "engines": eng, "image_curves": imgs.len(),
+            "image_ok": img_ok, "image_elements": img_elems, "image_first_try_errors": img_retry}));
+        let d8 = read(&format!("deg8_q{q}.jsonl"));
+        let dc: Vec<&Value> = d8.iter().filter(|r| r["rec"] == "curve_deg8").collect();
+        let ds = d8.iter().find(|r| r["rec"] == "scan").cloned().unwrap_or(Value::Null);
+        deg8.push(json!({"q": q, "curves": dc.len(),
+            "t1_pass": dc.iter().filter(|r| r["t1_pass"] == true).count(),
+            "x_hyperelliptic": dc.iter().filter(|r| r["t1"]["fit_error"].as_str().map_or(false, |s| s.contains("hyperelliptic"))).count(),
+            "t1f": {"maps": ds["t1f_twist_maps"], "agree": ds["t1f_agree"], "disagree": ds["t1f_disagree"], "not_applicable": ds["t1f_not_applicable"]}}));
+        let rs_rows = read(&format!("route_s_q{q}.jsonl"));
+        if let Some(sm) = rs_rows.iter().find(|r| r["rec"] == "summary") {
+            routes.push(sm.clone());
+        }
+    }
+    let v = json!({"verify": verify, "deg8": deg8, "route_s": routes});
+    std::fs::write(format!("{out}/summary.json"), serde_json::to_string_pretty(&v).unwrap()).unwrap();
+    println!("{}", serde_json::to_string_pretty(&v).unwrap());
 }
