@@ -42,11 +42,13 @@ inline std::string cdd_halfspaces(const std::vector<E> &vertices) {
           static_cast<char *>(nullptr));
     _exit(127);
   }
-  int status = 0;
-  while (waitpid(p, &status, 0) < 0)
-    require(errno == EINTR, "wait cdd helper");
+  const auto waited = wait_child_usage(p);
   write(cdd_ipc.archive / (name + ".wait-status"),
-        std::to_string(status) + "\n");
+        waited.reaped ? std::to_string(waited.status) + "\n" : "unavailable\n");
+  write(cdd_ipc.archive / (name + ".cpu-receipt"), wait_usage_fields(waited));
+  require(waited.reaped,
+          "wait cdd helper errno=" + std::to_string(waited.error));
+  const int status = waited.status;
   require(WIFEXITED(status) && WEXITSTATUS(status) == 0, "cdd helper failure");
   return read(out);
 }

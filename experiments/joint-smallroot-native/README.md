@@ -73,9 +73,10 @@ Source-semantic gaps remain: basis/normal-form cross-version comparison has not
 run; Sage integral-point iteration order is replaced with a deterministic lex
 list before the reference M sort; augmented None valuation and zero-leading
 failure timing are classified rather than fully reproducing Sage exceptions;
-per-phase CPU covers the worker while child CPU is available only through
-call-level supervisor cgroup records; formal specialization/height/theorem and
-extraction obligations remain open. `spec/director-request.md` names the smallest
+per-phase CPU receipts separate worker-self and waited-child user/system
+microseconds; individual wait4 receipts are diagnostics, never extra addends.
+Full phase process-tree CPU remains unknown; formal specialization/height/theorem
+and extraction obligations remain open. `spec/director-request.md` names the smallest
 repair checks and forbids treating them as authorized now.
 
 Literature: pinned cuso fb2747d2105a8e48499bf10a3a717cf80c14d079 source and license,

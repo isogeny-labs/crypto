@@ -53,6 +53,7 @@ inline SupervisedExit supervised(const fs::path &delegated,
   require(fs::create_directory(group), "fresh delegated cgroup required");
   bool reaped = false;
   pid_t child = -1;
+  std::optional<WaitUsage> worker_usage;
   auto kill_tree = [&]() {
     try {
       write(group / "cgroup.kill", "1\n");
@@ -110,6 +111,7 @@ inline SupervisedExit supervised(const fs::path &delegated,
       pid_t result = wait4(child, &status, WNOHANG, &usage);
       if (result == child) {
         reaped = true;
+        worker_usage = reaped_usage(child, status, usage);
         break;
       }
       require(result == 0 || errno == EINTR, "wait4 worker");
@@ -120,19 +122,18 @@ inline SupervisedExit supervised(const fs::path &delegated,
         while (wait4(child, &status, 0, &usage) < 0)
           require(errno == EINTR, "wait4 after kill");
         reaped = true;
+        worker_usage = reaped_usage(child, status, usage);
         break;
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+    write(archive / "supervisor-cpu-receipt",
+          wait_usage_fields(*worker_usage, "worker"));
     kill_tree();
-    std::string fields =
-        "wait_status=" + std::to_string(status) +
-        "\ncensored=" + (censored ? "true" : "false") +
-        "\nru_maxrss_kib=" + std::to_string(usage.ru_maxrss) +
-        "\nuser_seconds=" + std::to_string(usage.ru_utime.tv_sec) + "." +
-        std::to_string(usage.ru_utime.tv_usec) +
-        "\nsystem_seconds=" + std::to_string(usage.ru_stime.tv_sec) + "." +
-        std::to_string(usage.ru_stime.tv_usec) + "\n";
+    std::string fields = "wait_status=" + std::to_string(status) +
+                         "\ncensored=" + (censored ? "true" : "false") +
+                         "\nru_maxrss_kib=" + std::to_string(usage.ru_maxrss) +
+                         "\n" + supervisor_cpu_fields(usage);
     for (auto name :
          {"memory.peak", "memory.events", "cpu.stat", "cgroup.events"})
       write(archive / name, read(group / name));
@@ -149,10 +150,12 @@ inline SupervisedExit supervised(const fs::path &delegated,
   } catch (const std::exception &e) {
     kill_tree();
     if (child > 0 && !reaped) {
-      int status;
-      while (waitpid(child, &status, 0) < 0 && errno == EINTR) {
-      }
+      worker_usage = wait_child_usage(child);
+      reaped = worker_usage->reaped;
     }
+    if (worker_usage)
+      write(archive / "supervisor-cpu-receipt",
+            wait_usage_fields(*worker_usage, "worker"));
     write(archive / "supervisor-failure", e.what() + std::string("\n"));
     for (auto name :
          {"memory.peak", "memory.events", "cpu.stat", "cgroup.events"})

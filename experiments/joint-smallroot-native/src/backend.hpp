@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #pragma once
 #include "exact.hpp"
+#include "usage.hpp"
 #include <fcntl.h>
 #include <filesystem>
 #include <fstream>
@@ -60,12 +61,14 @@ struct Backend {
             static_cast<char *>(nullptr));
       _exit(127);
     }
-    int st = 0;
-    while (waitpid(p, &st, 0) < 0) {
-      if (errno != EINTR)
-        throw std::runtime_error("wait Singular");
-    }
-    write(archive / (name + ".wait-status"), std::to_string(st) + "\n");
+    const auto waited = wait_child_usage(p);
+    write(archive / (name + ".wait-status"),
+          waited.reaped ? std::to_string(waited.status) + "\n"
+                        : "unavailable\n");
+    write(archive / (name + ".cpu-receipt"), wait_usage_fields(waited));
+    require(waited.reaped,
+            "wait Singular errno=" + std::to_string(waited.error));
+    const int st = waited.status;
     require(WIFEXITED(st) && WEXITSTATUS(st) == 0, "Singular process failure");
     std::istringstream in(read(out));
     std::string line, codec;

@@ -19,3 +19,10 @@ structural-check: $(BUILD)/structural
 
 $(BUILD)/cdd-helper: src/cdd_helper.cpp | $(BUILD)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(LDFLAGS) -lcddgmp -lgmpxx -lgmp -o $@
+
+.PHONY: cpu-accounting
+cpu-accounting: $(BUILD)/cpu-accounting $(BUILD)/fake-child
+$(BUILD)/cpu-accounting: tests/cpu_accounting.cpp $(HEADERS) | $(BUILD)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@
+$(BUILD)/fake-child: tests/fake_child.cpp | $(BUILD)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@

@@ -84,30 +84,43 @@ struct Archive {
   }
   template <typename F>
   auto phase(const std::string &name, F f) -> decltype(f()) {
-    auto start = std::chrono::steady_clock::now();
-    auto cpu = std::clock();
+    const auto start = std::chrono::steady_clock::now();
+    const auto cpu = std::clock();
+    const auto usage_start = phase_cpu_snapshot();
     std::ofstream log(dir / "phases", std::ios::app);
     log << name << " start monotonic_ns=" << start.time_since_epoch().count()
-        << " cpu_ticks=" << cpu << "\n";
+        << " cpu_ticks="
+        << (cpu == std::clock_t(-1) ? "unavailable" : std::to_string(cpu))
+        << " cpu_semantics=" << cpu_semantics << "\n";
     log.flush();
-    try {
-      auto v = f();
-      auto stop = std::chrono::steady_clock::now();
-      log << name << " stop wall_ns="
+    auto finish = [&](const std::string &outcome) {
+      const auto usage_stop = phase_cpu_snapshot();
+      const auto cpu_stop = std::clock();
+      const auto stop = std::chrono::steady_clock::now();
+      const bool ticks_available = cpu != std::clock_t(-1) &&
+                                   cpu_stop != std::clock_t(-1) &&
+                                   cpu_stop >= cpu;
+      log << name << " " << outcome << " wall_ns="
           << std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start)
                  .count()
-          << " cpu_ticks=" << (std::clock() - cpu)
-          << " CPU_SCOPE=worker_only "
-             "Singular_child_wait_and_cgroup_cpu_stat_separate "
-             "memory=supervisor\n";
+          << " cpu_ticks="
+          << (ticks_available ? std::to_string(cpu_stop - cpu) : "unavailable")
+          << " cpu_ticks_scope=legacy_worker_only clocks_per_sec="
+          << CLOCKS_PER_SEC << " memory=supervisor\n"
+          << phase_cpu_fields(usage_start, usage_stop);
+      log.flush();
+    };
+    try {
+      auto v = f();
+      finish("stop");
       return v;
     } catch (const std::exception &e) {
-      log << name << " failure=" << e.what() << " wall_ns="
-          << std::chrono::duration_cast<std::chrono::nanoseconds>(
-                 std::chrono::steady_clock::now() - start)
-                 .count()
-          << " cpu_ticks=" << (std::clock() - cpu) << "\n";
+      finish("failure=" + std::string(e.what()));
       object("failure-checkpoint", name + "\n" + e.what() + "\n");
+      throw;
+    } catch (...) {
+      finish("failure=nonstandard_exception");
+      object("failure-checkpoint", name + "\nnonstandard_exception\n");
       throw;
     }
   }
