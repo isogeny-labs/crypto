@@ -4,29 +4,10 @@ name: Release
 # major/minor version and patch + run number, giving ReleaseMe a distinct
 # stable version per run so /releases/latest remains the newest main build.
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
-  # Start the dry run for every pull request. The scope job then selects only
-  # affected build/package lanes, including compile-time inputs discovered
-  # recursively; an event-level path list cannot safely anticipate that set.
-  # The `release` job is skipped for pull requests, so nothing is published.
-  pull_request:
-    paths:
-      - '.github/workflows/release.yml'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      # `cargo build --bins` consumes the library and every binary target.
-      # Exercise the cross-platform packaging path whenever any Rust source
-      # changes, including the cover/Jacobian command-line tools.
-      - 'src/**'
-      - 'tests/fixtures/ecbench_manifest_small.json'
-      - 'ecc2k130/Makefile'
-      - 'tools/isogeny-cli/**'
-      - 'tools/volcano-cli/**'
-      - 'isogeny_algos/**'
-      - 'research/p192_p224_large_degree_isogenies_20261009/**'
-      - 'docs/curves/registry.json'
-  merge_group:
   workflow_dispatch:
 
 concurrency:
@@ -130,7 +111,13 @@ jobs:
           - {target: aarch64-apple-darwin,      os: macos-latest}
           - {target: x86_64-pc-windows-msvc,    os: windows-latest}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 45 }}
+    # Windows needs more than Linux: run 40259290676 (PR #2588 head 7f5ca198d)
+    # cancelled this leg at the old 25-minute pull-request cap while its release
+    # build was still running (23m51s in), against 16m33s for Linux gnu in that
+    # run. Release no longer runs on pull requests, so what matters now is push
+    # and workflow_dispatch: 60 minutes for Windows (an estimate, about 1.5x the
+    # ratio-scaled build time; measure it with a dispatch run), 45 for the rest.
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || (matrix.os == 'windows-latest' && 60 || 45) }}
     steps:
       - name: Require successful scope classification
         if: needs.scope.result != 'success' || needs.meta.result != 'success'
@@ -318,8 +305,15 @@ jobs:
           - {target: aarch64-apple-darwin,      os: macos-latest}
           - {target: x86_64-pc-windows-msvc,    os: windows-latest}
     runs-on: ${{ matrix.os }}
-    # Windows compiles both native and software-hash targets before the installed CLI checks.
-    timeout-minutes: ${{ matrix.os == 'windows-latest' && 45 || ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 50) }}
+    # Measured in run 40259290676 (PR #2588 head 7f5ca198d), now that the
+    # builds really run: Linux gnu took 36m25s (step 9 23m37s, soft-hash step
+    # 10m07s), musl 24m37s, macOS 23m36s. Windows was cancelled at the old
+    # 45-minute cap with step 9 still compiling isogeny_algos (41m42s in; its
+    # first two cargo commands alone took 29m19s against 14m54s on Linux gnu,
+    # about 2x). By that ratio the whole Windows leg needs roughly 70 minutes, so
+    # it gets 120 (an estimate: tighten it after a dispatch run). The other
+    # platforms keep their caps.
+    timeout-minutes: ${{ matrix.os == 'windows-latest' && 120 || ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 50) }}
     steps:
       # Keep Cargo output outside the package tree while it is fingerprinted.
       # `runner.temp` is not available in job-level `env`, so set it per job.
@@ -591,10 +585,14 @@ jobs:
   cuda:
     if: always() && !cancelled()
     needs: [meta, scope]
-    # Pinned, not main: the NVIDIA apt repo below is addressed by
+    # Pinned, not ubuntu-latest: the NVIDIA apt repo below is addressed by
     # distro, and the CUDA version is pinned, so letting the runner image
-    # float would eventually 404 the install and block every release.
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|release.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    # float would eventually 404 the install and block every release. That
+    # happened: the standard-runner rewrite (b94618d7a) turned this pin into
+    # ubuntu-latest, which is now Ubuntu 26.04, and run 40259290676 failed here
+    # with "Unable to locate package cuda-nvcc-12-8". Without this job
+    # the `release` job never runs. docs/RELEASES.md describes the pin.
+    runs-on: ubuntu-24.04
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 60 }}
     steps:
       - name: Require successful scope classification

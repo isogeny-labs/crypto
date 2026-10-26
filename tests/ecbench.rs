@@ -2395,4 +2395,246 @@ fn hyperelliptic_ic_and_rho_run_verify_replay_and_price_completely() {
     assert!(lines
         .iter()
         .all(|l| l["work"]["Ok"]["complete"] == true || l["work"]["complete"] == true));
+/// A quartic session the current harness writes, on the smallest curve of
+/// `research/prime_rho_automorphism_20261015/sessions/quartic`.
+const QUARTIC_SPEC: &str = r#"{
+  "schema": "ecbench.spec/v1",
+  "label": "class set-up accounting control",
+  "workloads": {
+    "curves": [{"kind": "prime_explicit", "p": 2395681, "a": 13, "b": 0,
+                "group_order": 2392850, "r": 47857, "gx": 462051, "gy": 856555}],
+    "targets_per_curve": 2,
+    "target_seed": 2026
+  },
+  "arms": [
+    {"name": "rho-quartic", "role": "candidate", "method": {"id": "rho.quartic"}}
+  ],
+  "measurement": {"rounds": 1, "warmup": 0, "seed": 3, "isolation_required": "L0", "timeout_seconds": 60}
+}"#;
+
+/// Rewrite one measured record of `out` with `edit`, reseal it and rehash
+/// the file, so every seal and digest agrees and only a replay can tell.
+fn forge_one_record(
+    out: &Path,
+    edit: impl FnOnce(&mut crypto_lib::cryptanalysis::ecbench::record::Record),
+) {
+    use crypto_lib::cryptanalysis::ecbench::canonical::sha256_hex;
+    use crypto_lib::cryptanalysis::ecbench::record::Record;
+    use crypto_lib::cryptanalysis::ecbench::runner::Session;
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut lines: Vec<String> = text.lines().map(String::from).collect();
+    let i = lines
+        .iter()
+        .position(|l| l.contains("\"warmup\":false") && l.contains("\"status\":\"verified\""))
+        .unwrap();
+    let mut rec: Record = serde_json::from_str(&lines[i]).unwrap();
+    edit(&mut rec);
+    lines[i] = rec.seal();
+    let body = lines.join("\n") + "\n";
+    std::fs::write(out.join("records.jsonl"), &body).unwrap();
+    let mut session: Session =
+        serde_json::from_str(&std::fs::read_to_string(out.join("session.json")).unwrap()).unwrap();
+    session.records_sha256 = Some(sha256_hex(body.as_bytes()));
+    std::fs::write(
+        out.join("session.json"),
+        serde_json::to_string_pretty(&session).unwrap() + "\n",
+    )
+    .unwrap();
+}
+
+/// The pre-2026-10-18 class set-up reconstruction admits only the listed
+/// historical sessions.  Negative controls: a record the current harness
+/// wrote, undercharged by exactly its own class set-up (the error the
+/// reconstruction undoes) and resealed, fails its replay, whether it keeps
+/// `detail.class_setup` or is dressed in the pre-fix shape without it.
+/// Positive control: the same session, untouched, replays exactly.
+#[test]
+fn a_current_record_undercharged_by_its_class_setup_fails_replay() {
+    let dir = scratch("class-setup");
+    std::fs::write(dir.join("spec.json"), QUARTIC_SPEC).unwrap();
+    let clean = dir.join("clean");
+    assert!(run_spec(&dir, &clean, &[]).0);
+    let (ok, stdout, _) = ecbench(&[
+        "verify",
+        "--dir",
+        clean.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "{stdout}");
+    assert!(!stdout.contains("pre-2026-10-18"), "{stdout}");
+
+    for strip_marker in [false, true] {
+        let out = dir.join(format!("forged-{strip_marker}"));
+        copy_dir(&clean, &out);
+        forge_one_record(&out, |rec| {
+            let setup = rec.detail["class_setup"]["gae"]
+                .as_f64()
+                .expect("current records carry it");
+            assert!(setup > 0.0);
+            let total = rec.cost.total_gae.unwrap() - setup;
+            let r = rec.workload.curve.r as f64;
+            let floor = rec.cost.s.unwrap() / rec.boundaries.ratio_to_floor.unwrap();
+            rec.cost.total_gae = Some(total);
+            rec.cost.s = Some(total / r.sqrt());
+            rec.boundaries.ratio_to_floor = Some(total / r.sqrt() / floor);
+            if strip_marker {
+                rec.detail.as_object_mut().unwrap().remove("class_setup");
+            }
+        });
+        let (ok, stdout, _) = ecbench(&[
+            "verify",
+            "--dir",
+            out.to_str().unwrap(),
+            "--replay-all",
+            "--exit-code",
+        ]);
+        assert!(!ok, "strip_marker={strip_marker}: {stdout}");
+        assert!(
+            stdout.contains("differs in total_gae"),
+            "strip_marker={strip_marker}: {stdout}"
+        );
+    }
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn jacobians_and_transfers_verify_and_replay() {
+    // Genus-2 and plane-quartic Jacobians, a GHS curve over F_{p⁶}, and the
+    // isogeny, plane-quartic cover and GHS cover transfers, one session per
+    // family (every arm of a session runs on every curve): every run
+    // verifies, phases sum to the total, and every record replays exactly.
+    let sessions = [
+        (
+            "genus2",
+            r#"{"kind": "genus2_search", "p_bits": 8, "seed": 3, "max_cofactor": 16}"#,
+            vec![
+                ("rho", "rho.negation", "{}"),
+                ("ic-hec", "ic.hyperelliptic", "{}"),
+            ],
+        ),
+        (
+            "plane_quartic",
+            r#"{"kind": "plane_quartic_search", "p_bits": 6, "seed": 1, "max_cofactor": 64}"#,
+            vec![("rho", "rho.plain", "{}"), ("bsgs", "bsgs.textbook", "{}")],
+        ),
+        (
+            "ghs_fp6",
+            r#"{"kind": "ghs_fp6_search", "p": 13, "seed": 1}"#,
+            vec![
+                ("rho", "rho.negation", "{}"),
+                ("ghs", "transfer.ghs_cover", "{}"),
+            ],
+        ),
+        (
+            "prime",
+            r#"{"kind": "prime_search", "bits": 14, "seed": 5}"#,
+            vec![
+                ("rho", "rho.plain", "{}"),
+                ("iso", "transfer.isogeny", r#"{"ell": "3"}"#),
+                ("qcover", "transfer.quartic_cover", "{}"),
+            ],
+        ),
+    ];
+    for (family, curve, arms) in sessions {
+        let dir = scratch(&format!("jacobians-{family}"));
+        let arms: Vec<String> = arms
+            .iter()
+            .enumerate()
+            .map(|(k, (name, id, params))| {
+                let role = if k == 0 { "reference" } else { "candidate" };
+                format!(
+                    r#"{{"name": "{name}", "role": "{role}", "method": {{"id": "{id}", "params": {params}}}}}"#
+                )
+            })
+            .collect();
+        let spec = format!(
+            r#"{{"schema": "ecbench.spec/v1", "label": "{family} test",
+              "workloads": {{"curves": [{curve}], "targets_per_curve": 2, "target_seed": 7}},
+              "arms": [{}],
+              "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 120}}}}"#,
+            arms.join(",")
+        );
+        std::fs::write(dir.join("spec.json"), spec).unwrap();
+        let out = dir.join("s");
+        let (ok, err) = run_spec(&dir, &out, &[]);
+        assert!(ok, "{family}: {err}");
+        let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+        for line in text.lines() {
+            let r: Value = serde_json::from_str(line).unwrap();
+            assert_eq!(r["outcome"]["status"], "verified", "{line}");
+            assert_eq!(r["workload"]["curve"]["family"], family, "{line}");
+            let total = r["cost"]["total_gae"].as_f64().unwrap();
+            let sum: f64 = r["phases"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|p| p["gae"].as_f64().unwrap())
+                .sum();
+            assert!((total - sum).abs() <= 1e-9 * total.max(1.0), "{line}");
+        }
+        let (ok, _, err) = ecbench(&[
+            "verify",
+            "--dir",
+            out.to_str().unwrap(),
+            "--replay-all",
+            "--exit-code",
+        ]);
+        assert!(ok, "{family} replay: {err}");
+    }
+/// `ecbench work` on committed records is frozen byte for byte: the
+/// snapshot in `tests/fixtures/ecbench/work-v1/expected.jsonl` was written
+/// by the binary before `bitop/v2` existed, and `--unit bitop/v1` is the
+/// same output.  `--unit bitop/v2` carries the same gates and adds the
+/// memory term.
+#[test]
+fn work_in_bitop_v1_is_frozen_and_bitop_v2_adds_memory() {
+    let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/ecbench/work-v1");
+    let expected = std::fs::read_to_string(fixture.join("expected.jsonl")).unwrap();
+    let dir = fixture.to_str().unwrap();
+    let (ok, out, err) = ecbench(&["work", dir]);
+    assert!(ok, "{err}");
+    assert_eq!(
+        out, expected,
+        "`ecbench work` output differs from the committed snapshot"
+    );
+    let (ok, out, err) = ecbench(&["work", "--unit", "bitop/v1", dir]);
+    assert!(ok, "{err}");
+    assert_eq!(
+        out, expected,
+        "`ecbench work --unit bitop/v1` differs from the committed snapshot"
+    );
+    let (ok, out, err) = ecbench(&["work", "--unit", "bitop/v2", dir]);
+    assert!(ok, "{err}");
+    assert_eq!(out.lines().count(), expected.lines().count());
+    for (l1, l2) in expected.lines().zip(out.lines()) {
+        let a: Value = serde_json::from_str(l1).unwrap();
+        let b: Value = serde_json::from_str(l2).unwrap();
+        assert_eq!(a["record_id"], b["record_id"]);
+        let (wa, wb) = (&a["work"]["Ok"], &b["work"]["Ok"]);
+        assert_eq!(wa["schema"], "ecbench.work/v1");
+        assert_eq!(wb["schema"], "ecbench.work/v2");
+        assert_eq!(wb["unit"], "bitop/v2");
+        assert_eq!(wa["bitops"], wb["bitops"], "{}", a["record_id"]);
+        assert_eq!(wb["memory_complete"], true, "{}", b["work"]);
+        assert_eq!(wb["memory_unpriced"].as_array().unwrap().len(), 0);
+        let bitops: u128 = wb["bitops"].as_str().unwrap().parse().unwrap();
+        let bits: u128 = wb["memory_bits"].as_str().unwrap().parse().unwrap();
+        assert!(bits > 0);
+        assert_eq!(wb["at"].as_str().unwrap(), (bitops * bits).to_string());
+    }
+    let (ok, _, err) = ecbench(&["work", "--unit", "bitop/v3", dir]);
+    assert!(!ok && err.contains("no unit"), "{err}");
+    // The v2 vectors the binary prints are the committed ones.
+    let (ok, out, err) = ecbench(&["bitop-vectors", "--unit", "bitop/v2"]);
+    assert!(ok, "{err}");
+    let printed: Value = serde_json::from_str(&out).unwrap();
+    let committed: Value = serde_json::from_str(
+        &std::fs::read_to_string(
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("docs/units/bitop-v2.vectors.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(printed, committed);
 }

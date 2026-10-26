@@ -180,15 +180,15 @@ fn exact_order(curve: &Curve4, pt: &Pt4, mut m: u64) -> u64 {
     let mut q = 2u64;
     let mut rest = m;
     while q * q <= rest {
-        while rest % q == 0 {
+        while rest.is_multiple_of(q) {
             rest /= q;
-            while m % q == 0 && curve.mul(pt, m / q).inf {
+            while m.is_multiple_of(q) && curve.mul(pt, m / q).inf {
                 m /= q;
             }
         }
         q += 1;
     }
-    if rest > 1 && m % rest == 0 && curve.mul(pt, m / rest).inf {
+    if rest > 1 && m.is_multiple_of(rest) && curve.mul(pt, m / rest).inf {
         m /= rest;
     }
     m
