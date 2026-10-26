@@ -1,6 +1,6 @@
-# NIST study artifacts lack an upload-capable runtime
+# NIST study artifact delivery
 
-- **Status:** `open`
+- **Status:** `resolved`
 - **Kind:** access/tool limit
 - **Affected work:** [criterion study](../research/nist_skip_criterion_20261025/README.md), [PR 2378](https://github.com/isogeny-labs/crypto/pull/2378)
 - **Next action owner:** unassigned
@@ -8,10 +8,10 @@
 
 ## Problem
 
-The PDF and raw-evidence files cannot yet be delivered to the repository's
-S3 artifact store because this runtime has no usable upload credentials.
-The requested PDF and complete evidence bundle exist and
-are verified in the local workspace. Their exact hashes and sizes are in the
+The initial runtime lacked upload credentials. The six existing PDF,
+evidence and image payloads have now been uploaded unchanged to the
+repository's S3 store, remotely verified and downloaded for SHA-256 checking.
+Their exact hashes and sizes are in the
 study's [delivery record](../research/nist_skip_criterion_20261025/ARTIFACT_DELIVERY.json).
 
 ## Evidence and uncertainty
@@ -22,27 +22,29 @@ study's [delivery record](../research/nist_skip_criterion_20261025/ARTIFACT_DELI
   retains the actual command and result. A temporary AWS CLI was subsequently
   installed; the identity check exited 255 because it could not locate
   credentials. The artifact-tool attempt with an explicit remote also failed.
-  No AWS credential profile, ambient credential or checkpoint upload token
-  is configured here.
-- **Observed:** the follow-up commit passes the artifact policy. Three
-  earlier frozen PDF/ZIP additions in this PR exceed the new policy and
-  still require migration. They remain byte-identical to the prior PR head.
-- **Derived or proved:** local SHA-256, archive integrity and PDF attachment
-  checks pass. Remote upload and read-back verification have not occurred.
+  Those checks describe the initial runtime. The user later supplied access
+  outside the repository, and authenticated checkpoint and artifact uploads
+  passed. No credential values are included in these records.
+- **Observed:** the artifact tool uploaded all six payloads, created six
+  manifests and preserved hydrated copies. The three earlier frozen PDF/ZIP
+  additions were removed from the Git index; their local bytes are unchanged.
+- **Derived or proved:** remote verification reports six hydrated entries and
+  zero problems. Full GET read-back of all six objects matches SHA-256.
+  [Delivery receipts](../research/nist_skip_criterion_20261025/validation/artifact-delivery-20261026/)
+  retain object mappings, upload and verification outputs. The PR artifact
+  policy still runs independently against each published head.
 - **Suspected explanation:** none needed; the missing local capability is observed.
-- **Missing capability:** a configured, upload-capable runtime for
-  `s3://setec-astronomy-artifacts/store`.
-- **What this does not establish:** no evidence object is claimed uploaded.
-  This delivery obstruction does not resolve the historical selection or
+- **Missing capability:** none for these six artifact transfers.
+- **What this does not establish:** this delivery resolution does not resolve the historical selection or
   vulnerability questions.
 
 ## What would unblock it
 
-- [ ] Use `tools/artifacts/artifacts.py push` for the three files named in
+- [x] Use `tools/artifacts/artifacts.py push` for the three files named in
       the new delivery record and the three earlier frozen PDF/ZIP files;
       preserve their bytes and commit the resulting manifests and ignore rules.
-- [ ] Verify the remote objects, hydrate and recheck the payload hashes,
-      update the delivery record, and pass the PR's artifact-policy check.
+- [x] Verify the remote objects, hydrate and recheck the payload hashes,
+      and update the delivery record.
 
 These checks establish artifact availability and policy compliance. The
 scientific conclusions and their remaining evidence obligations are unchanged.
@@ -62,7 +64,8 @@ scientific conclusions and their remaining evidence obligations are unchanged.
 
 ## Resolution and history
 
-2026-10-26: repository transfer resolved to `isogeny-labs/crypto`. Source and
-summaries were published. Installing a temporary AWS client resolved the
-tooling gap; the identity and artifact checks then confirmed unavailable
-credentials. Local PDF and evidence delivery is verified. Unresolved.
+2026-10-26: repository transfer resolved to `isogeny-labs/crypto`. Installing
+the temporary AWS client first exposed unavailable credentials. After the
+user supplied access, all six unchanged payloads were uploaded and their
+full remote bytes verified. Store manifests replace Git payload tracking.
+The original failed checks remain preserved. Resolved for these transfers.
