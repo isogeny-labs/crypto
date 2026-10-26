@@ -4,6 +4,7 @@ on:
   # Not a pull-request check. The merge set is gate, size, and artifacts.
   # This runs when the matching change is on main, or on its schedule.
   push:
+    branches: [main]
     paths:
       - .github/workflows/p192-geometry-collector-lean.yml
       - research/p192_extension_cover_20261012/lean/**
