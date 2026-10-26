@@ -1063,7 +1063,7 @@ mod tests {
             Some((x3, md(lam * (x1 - x3) - y1)))
         };
         let n = super::super::certify::count_prime(p, a as u64, b as u64);
-        if n % l != 0 {
+        if !n.is_multiple_of(l) {
             return None;
         }
         let j = |a: i128, b: i128| {
@@ -1186,12 +1186,12 @@ mod tests {
                     let mut rest = v as u64;
                     let mut ell = 2u64;
                     while rest > 1 {
-                        if rest % ell != 0 {
+                        if !rest.is_multiple_of(ell) {
                             ell += 1;
                             continue;
                         }
                         let mut depth = 0u32;
-                        while rest % ell == 0 {
+                        while rest.is_multiple_of(ell) {
                             rest /= ell;
                             depth += 1;
                         }
@@ -1223,7 +1223,7 @@ mod tests {
                     let mut d = 2u64;
                     while rest > 1 {
                         let mut e = 0;
-                        while rest % d == 0 {
+                        while rest.is_multiple_of(d) {
                             rest /= d;
                             e += 1;
                         }
