@@ -33,6 +33,7 @@ use crate::cryptanalysis::ecbench::methods::expected_s;
 use crate::cryptanalysis::ecbench::record::{floor_s, Record};
 use crate::cryptanalysis::ecbench::runner::{read_records, read_session, PlanDoc};
 use crate::cryptanalysis::ecbench::stats::{bootstrap_ci, cluster_bootstrap_ci, mean};
+use crate::cryptanalysis::ecbench::work::CostBasis;
 
 pub const BOUND_SCHEMA: &str = "ecbench.bound/v1";
 pub const BOUND_PREFIX: &str = "ECBND1h";
@@ -373,6 +374,21 @@ pub struct FitOptions {
     /// Omitted from the record when unset (see `weight`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub param_rule: Option<String>,
+    /// What of each run the fit counts ([`CostBasis`]): every gate (the
+    /// default), the gates a further target pays again, or the search
+    /// phases only.  Needs `unit = bitop/v1`; the domain's unit then names
+    /// the basis (`bitop/v1+per_target`), so the bound never shares an id
+    /// with a total-cost one.  Omitted from the record at the default, so a
+    /// bound fitted before the option existed keeps its id.
+    #[serde(default, skip_serializing_if = "CostBasis::is_total")]
+    pub cost: CostBasis,
+}
+
+/// `bitop/v1`, or `bitop/v1` read on a partial cost basis
+/// (`bitop/v1+per_target`, `bitop/v1+search`; [`CostBasis`]).
+fn is_bitop_unit(unit: &str) -> bool {
+    let base = crate::cryptanalysis::bitops::UNIT;
+    unit == base || unit.strip_prefix(base).is_some_and(|s| s.starts_with('+'))
 }
 
 impl Default for FitOptions {
@@ -385,6 +401,7 @@ impl Default for FitOptions {
             unit: None,
             weight: None,
             param_rule: None,
+            cost: CostBasis::Total,
         }
     }
 }
@@ -739,11 +756,17 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
         );
     }
     match opts.unit.as_deref() {
+        None if !opts.cost.is_total() => {
+            return Err(
+                "--cost per-target and --cost search read the bitop/v1 work block; pass --unit bitop/v1"
+                    .into(),
+            )
+        }
         None => {}
         Some(crate::cryptanalysis::bitops::UNIT) => {
             recs = recs
                 .iter()
-                .map(crate::cryptanalysis::ecbench::work::bitop_view)
+                .map(|r| crate::cryptanalysis::ecbench::work::basis_view(r, opts.cost))
                 .collect::<Result<_, _>>()?;
         }
         Some(u) => return Err(format!("no unit `{u}`; the fitter knows bitop/v1")),
@@ -932,7 +955,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     let (alpha, alpha_ci, log2_c, r2, ci_method) = power_law(&strata, opts.resamples, opts.seed);
     // The same fit in additions, in bitop/v1: each run's gates over one
     // affine addition's gates on its curve.
-    let (alpha_add, alpha_add_ci) = if domain.unit == crate::cryptanalysis::bitops::UNIT {
+    let (alpha_add, alpha_add_ci) = if is_bitop_unit(&domain.unit) {
         let add_strata: Vec<Vec<(f64, f64)>> = sizes
             .iter()
             .map(|row| {
@@ -960,7 +983,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     let scaling_claim = n_sizes >= MIN_SIZES_FOR_SCALING && alpha.is_some();
     let fit = Fit {
         size_parameter: "r".into(),
-        model: if domain.unit == crate::cryptanalysis::bitops::UNIT {
+        model: if is_bitop_unit(&domain.unit) {
             "bitops = C * r^alpha".into()
         } else {
             "gae = C * r^alpha".into()
@@ -1193,7 +1216,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     // In bitop/v1 a bound must account for every gate: a lower bound
     // ranks nothing against a complete one, so it is inadmissible, with
     // what it misses named (docs/units/BITOPS.md).
-    let incomplete_bitops = domain.unit == crate::cryptanalysis::bitops::UNIT && bounded;
+    let incomplete_bitops = is_bitop_unit(&domain.unit) && bounded;
     if incomplete_bitops {
         reasons.push(format!(
             "bitop/v1 pricing is incomplete (missing: {}); a lower bound is not admissible in this unit",
@@ -1440,5 +1463,72 @@ mod tests {
         // The nested `doc_id` is not the sealed field: the top-level one is
         // the first occurrence in the pretty text because keys sort.
         assert!(text.find("\"doc_id\": \"T1h").unwrap() < text.find("nested keys").unwrap());
+    }
+
+    #[test]
+    fn a_cost_basis_is_its_own_domain_and_total_is_unwritten() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let dirs: Vec<PathBuf> = (16..=18)
+            .map(|b| {
+                root.join(format!(
+                    "research/bitop_ladder_20261019/sessions/holdout-P{b}"
+                ))
+            })
+            .collect();
+        let fit = |cost: CostBasis| {
+            let mut b = bound_from_sessions(&FitInputs {
+                dirs: &dirs,
+                arm: "rho-neg",
+                audits: &[],
+                label: Some("cost basis test"),
+                notes: "",
+                root,
+                options: FitOptions {
+                    resamples: 50,
+                    unit: Some(crate::cryptanalysis::bitops::UNIT.into()),
+                    cost,
+                    ..Default::default()
+                },
+            })
+            .unwrap();
+            b.seal().unwrap();
+            b
+        };
+        let total = fit(CostBasis::Total);
+        let per = fit(CostBasis::PerTarget);
+        let search = fit(CostBasis::Search);
+        assert_eq!(total.domain.unit, "bitop/v1");
+        assert_eq!(per.domain.unit, "bitop/v1+per_target");
+        assert_eq!(search.domain.unit, "bitop/v1+search");
+        let ids: BTreeSet<&str> = [&total, &per, &search]
+            .iter()
+            .flat_map(|b| [b.bound_id.as_str(), b.domain_id.as_str()])
+            .collect();
+        assert_eq!(ids.len(), 6);
+        // The default is not written, so a bound fitted before the option
+        // existed re-derives byte for byte.
+        let opts = serde_json::to_value(&total.fit_options).unwrap();
+        assert!(opts.get("cost").is_none(), "{opts}");
+        let opts = serde_json::to_value(&per.fit_options).unwrap();
+        assert_eq!(opts["cost"], "per-target");
+        // Rho's whole run is per target: the two bases count the same gates.
+        assert_eq!(total.fit.alpha, per.fit.alpha);
+        assert!(search.sizes[0].mean_gae.unwrap() < total.sizes[0].mean_gae.unwrap());
+        assert!(search.fit.alpha_in_additions.is_some());
+        // A partial basis needs the bitop/v1 work block.
+        let err = bound_from_sessions(&FitInputs {
+            dirs: &dirs,
+            arm: "rho-neg",
+            audits: &[],
+            label: None,
+            notes: "",
+            root,
+            options: FitOptions {
+                cost: CostBasis::Search,
+                ..Default::default()
+            },
+        })
+        .unwrap_err();
+        assert!(err.contains("--unit bitop/v1"), "{err}");
     }
 }
