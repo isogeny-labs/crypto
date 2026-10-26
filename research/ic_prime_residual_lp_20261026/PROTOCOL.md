@@ -60,9 +60,8 @@ B ∈ {4, 16, 64}, 64 solves each, seed 20261102.
 - **Band and pairing:** `ecbench band --weights 0,0.1,1` per session, and
   `ecbench compare` (at w = 0 and with `--weight 1`) of every `res*` arm
   against `plan`, and of `plan` and the best `res*` against `rho`.
-- **Exponents:** from the six sizes, the fitted ln S on ln r slope of `plan`,
-  of `res16` and of each size's cheapest `res*` arm. The same data must
-  also show a growth exponent below 1/2 + 1/6 for `res16`.
+- **Exponents:** from the six sizes, the fitted slope of ln(total GAE) on
+  ln r for `plan`, for `res16` and for each size's cheapest `res*` arm.
 - **Null:** per (curve, B), the ratio of mean curve-free to mean curve group
   operations, with a bootstrap 95% interval over the 64 solves.
 
@@ -75,8 +74,8 @@ B ∈ {4, 16, 64}, 64 solves each, seed 20261102.
   smallest.
 - P3. `resN0 / plan > 1` at every size from p24 up: at the plan's base the
   direct table wins, as the Koblitz break-even says.
-- P4. The fitted slope of `res16` is about 1/2 in ln r. The plan's is about
-  2/3, i.e. `S ∝ r^{1/6}`.
+- P4. The fitted slope of ln(total GAE) on ln r is about 1/2 for `res16`
+  and about 2/3 for `plan`.
 - P5. Null: every curve-free/curve ratio interval contains 1. The gain is
   generic collision search.
 - P6. Every `res*` arm stays above `rho` in `S`: the distance remaining stays
