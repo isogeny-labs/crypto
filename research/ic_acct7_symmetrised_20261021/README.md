@@ -6,6 +6,15 @@ Section A was run here; section B (the Koblitz exponent ladder,
 This is an accounting change. It is not an improvement and makes no
 security claim (AGENTS.md "Success criterion").
 
+**Report:** [`REPORT.pdf`](REPORT.pdf) (source [`REPORT.typ`](REPORT.typ)).
+**Figures:** [`figures/bitops_per_record.svg`](figures/bitops_per_record.svg)
+(bitop/v1 per counted record, IC vs rho) and
+[`figures/ir_per_gate.svg`](figures/ir_per_gate.svg) (Callgrind Ir per counted
+gate), PNG renders beside them, drawn by [`figures/plots.py`](figures/plots.py)
+from `audit/` and the session's records only.
+
+![bitop/v1 per counted record, IC vs rho](figures/bitops_per_record.svg)
+
 ## What was changed
 
 Commit `fd93ddfe2` ("bitop/v1: make the symmetrised oracle's records complete"):
@@ -81,6 +90,5 @@ records per arm describe this session and support no general ratio.
 ## Not done
 
 - Section B (the exponent ladder) is frozen, not run, as the task scoped.
-- No report PDF or graph (`research-visuals`) and no `benchmarks/` or
-  leaderboard row: this is an accounting proof, not a performance result,
-  and there is no `VALIDATION.json`.
+- No `benchmarks/` or leaderboard row: this is an accounting proof, not a
+  performance result, and there is no `VALIDATION.json`.
