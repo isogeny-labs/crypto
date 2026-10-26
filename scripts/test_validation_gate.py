@@ -271,6 +271,28 @@ class CiCheck(Scratch):
         self.assertEqual(g.check(self.repo), [])
         self.assertTrue(d.is_dir())
 
+    def test_expired_freeze_fails_only_after_its_date(self):
+        r = row()
+        self.tree([self.annotated(r, g.PRE_GATE)], [], lb_pre={g.board_key(r): g.row_digest(r)})
+        p = self.repo / g.PRE_GATE_LEADERBOARD
+        o = json.loads(p.read_text()); o["expires"] = "2026-12-01"; dump(p, o)
+        with unittest.mock.patch.dict("os.environ", {"VALIDATION_GATE_TODAY": "2026-12-01"}):
+            self.assertEqual(g.check(self.repo), [])
+        with unittest.mock.patch.dict("os.environ", {"VALIDATION_GATE_TODAY": "2026-12-02"}):
+            problems = g.check(self.repo)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("expired on 2026-12-01", problems[0])
+
+    def test_expired_freeze_passes_when_every_row_is_validated(self):
+        d = self.evidence("runs/toy")
+        r = row(source="runs/toy/analysis.json")
+        self.tree([self.annotated(r, g.VALIDATED)], [])
+        p = self.repo / g.PRE_GATE_LEADERBOARD
+        o = json.loads(p.read_text()); o["expires"] = "2026-12-01"; dump(p, o)
+        with unittest.mock.patch.dict("os.environ", {"VALIDATION_GATE_TODAY": "2027-01-01"}):
+            self.assertEqual(g.check(self.repo), [])
+        self.assertTrue(d.is_dir())
+
     def test_committed_status_must_match_the_judgement(self):
         r = row()
         self.tree([self.annotated(r, g.VALIDATED)], [],

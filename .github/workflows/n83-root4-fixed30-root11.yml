@@ -19,7 +19,7 @@ concurrency:
 jobs:
   seven-arm-comparison:
     if: github.repository == 'aburan28/crypto'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
