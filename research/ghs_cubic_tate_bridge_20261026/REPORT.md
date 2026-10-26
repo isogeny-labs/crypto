@@ -23,6 +23,10 @@ relation/decomposition and target-descent costs below rho. The overall
 method of transferring through a cubic Weil-restriction isogeny is prior work
 ([Tian](https://arxiv.org/pdf/2012.07173)); direct binary cubic covers are
 prior work ([Joux--Vitse, Appendix A.2](https://www.iacr.org/archive/eurocrypt2012/72370010/72370010.pdf)).
+[Momose--Chao's genus-three weak-cover classification](https://eprint.iacr.org/2009/236.pdf)
+assumes odd characteristic, so it does not classify these binary examples.
+These comparisons delimit the checked literature; they do not prove that no
+other publication identified the same isogeny classes.
 
 ## Isogeny-class and subgroup theorem
 
@@ -128,6 +132,16 @@ partition, primality and coprimality of all selected `r`, matched the prior
 quartic certificates, and wrote `certificate.json`. `lean SimpleRootQ16.lean`
 checks the exact integer products and gcd gates. The geometric Tate theorem
 is cited and proved at the level above; it is not formalized in Lean here.
+
+The parent `results.json` is managed by the repository artifact store. A
+fresh checkout first runs
+`python3 tools/artifacts/artifacts.py pull research/ghs_binary_cubic_isogeny_q16_20261026`.
+On this host that pull returned S3 `HeadObject` 403 on 26 October 2026. For
+the local replay only, the exact bytes were recovered from immutable Git
+commit `c9f7029fe12665b3ea6f2312cbf26de6a2877502`, and
+`artifacts.py verify` matched the manifest SHA-256. The certificate is
+therefore replayed locally, while fresh-checkout artifact retrieval remains
+an external access gate.
 
 To move from this family-level existence result to a vulnerability claim,
 construct an evaluable `k`-isogeny for each relevant source or a bounded

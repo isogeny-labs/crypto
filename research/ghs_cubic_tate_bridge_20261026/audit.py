@@ -51,6 +51,12 @@ def all_trace_sums(field):
 
 
 def main():
+    if not RAW.is_file():
+        raise SystemExit(
+            "missing managed input results.json; run "
+            "python3 tools/artifacts/artifacts.py pull "
+            "research/ghs_binary_cubic_isogeny_q16_20261026"
+        )
     raw = json.loads(RAW.read_text())
     replay = json.loads(REPLAY.read_text())
     prior = json.loads(PRIOR.read_text())
