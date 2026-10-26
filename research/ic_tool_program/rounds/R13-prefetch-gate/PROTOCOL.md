@@ -56,6 +56,23 @@ field changes.
 
 ## Decision and limits
 
+### Pre-timing pin compatibility addendum (2026-10-26)
+
+The first untimed R13 pin against R01 v0 returned `held=false` for all 90
+rows. Every row's sole differing top-level output was `counts`. A field-by-field
+check of all 90 raw pairs showed that the only differences were two additive
+`row_ops` counters at `counts.pass.logs.linear_algebra.filter.row_ops` and
+`counts.pass.logs.linear_algebra.row_ops`, introduced after the v0 archive.
+All counts shared with v0, statuses, recovered scalars, rho counts, and
+verification flags matched. The native pin comparator now omits one of these
+two counters from the *comparison* only when v0 lacks that exact field; if v0
+has it, equality is still required. Raw candidate records retain both. The
+failed strict pin is preserved as `pin-strict-v0.json` beside the corrected
+pin and in the S3 checkpoint. This is a historical schema compatibility
+correction made before timed work, not a change to the candidate, panel,
+acceptance threshold, or measurement protocol. The corrected native pin must
+still pass all 90 rows before A/A starts.
+
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
 for this CPU subclass only if every primary size's suite and holdout

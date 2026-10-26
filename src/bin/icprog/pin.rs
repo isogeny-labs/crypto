@@ -35,6 +35,39 @@ pub fn outputs(rep: &J) -> Vec<(&'static str, J)> {
     ]
 }
 
+/// A v0 record predates the two additive linear-algebra `row_ops` counters.
+/// Project only those absent fields out of the new counts when comparing a
+/// current binary with v0. Every shared count, answer and certificate still
+/// has to match; the unprojected current output remains in the run tree.
+fn remove_if_absent_in_v0(new: &mut J, old: &J, path: &[&str]) {
+    if path.is_empty() || path.iter().try_fold(old, |j, key| j.get(key)).is_some() {
+        return;
+    }
+    let mut node = new;
+    for key in &path[..path.len() - 1] {
+        let J::Obj(fields) = node else { return };
+        let Some((_, child)) = fields.iter_mut().find(|(k, _)| k == key) else {
+            return;
+        };
+        node = child;
+    }
+    if let J::Obj(fields) = node {
+        fields.retain(|(k, _)| k != path[path.len() - 1]);
+    }
+}
+
+fn v0_compatible_outputs(new: &J, old: &J) -> Vec<(&'static str, J)> {
+    let mut out = outputs(new);
+    let old_counts = old.get("counts").unwrap_or(&J::Null);
+    for path in [
+        &["pass", "logs", "linear_algebra", "filter", "row_ops"][..],
+        &["pass", "logs", "linear_algebra", "row_ops"][..],
+    ] {
+        remove_if_absent_in_v0(&mut out[1].1, old_counts, path);
+    }
+    out
+}
+
 /// R01's run tree, extracted beside its archive on first use after its
 /// SHA-256 is checked, as the declared runner did.
 pub fn r01_runs(programme: &Path) -> Result<PathBuf, String> {
@@ -143,7 +176,7 @@ pub fn pin(programme: &Path, runs_dir: &Path, cand: &Path) -> Result<J, String> 
                 .join(&row.id)
                 .join("pin.price.json"),
         )?;
-        let (a, b) = (outputs(&new), outputs(&old));
+        let (a, b) = (v0_compatible_outputs(&new, &old), outputs(&old));
         let mut differs: Vec<&str> = a
             .iter()
             .zip(&b)
@@ -224,5 +257,19 @@ mod tests {
         );
         assert_eq!(outputs(&rep)[2].1, J::Int(5));
         assert_eq!(outputs(&rep)[3].1, J::Null);
+    }
+
+    #[test]
+    fn v0_pin_ignores_only_absent_additive_row_ops() {
+        let old = parse(r#"{"counts":{"pass":{"logs":{"linear_algebra":{"filter":{"rows_in":15},"columns":8}}}}}"#).unwrap();
+        let new = parse(r#"{"counts":{"pass":{"logs":{"linear_algebra":{"filter":{"rows_in":15,"row_ops":88},"columns":8,"row_ops":147}}}}}"#).unwrap();
+        assert_eq!(v0_compatible_outputs(&new, &old), outputs(&old));
+        let changed = parse(r#"{"counts":{"pass":{"logs":{"linear_algebra":{"filter":{"rows_in":16,"row_ops":88},"columns":8,"row_ops":147}}}}}"#).unwrap();
+        assert_ne!(v0_compatible_outputs(&changed, &old), outputs(&old));
+        let old_with_counter = parse(r#"{"counts":{"pass":{"logs":{"linear_algebra":{"filter":{"rows_in":15,"row_ops":87},"columns":8}}}}}"#).unwrap();
+        assert_ne!(
+            v0_compatible_outputs(&new, &old_with_counter),
+            outputs(&old_with_counter)
+        );
     }
 }
