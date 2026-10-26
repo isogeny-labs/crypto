@@ -30,7 +30,7 @@ problems, different algorithms; they are benchmarked per problem, not against ea
 | Problem | Algorithms (module under `src/`) |
 |---|---|
 | kernel → isogeny | Vélu, odd (V1) and any subgroup (V2) `kernel/velu.rs` · Kohel, odd (V1) and even (V2) `kernel/kohel.rs` · x-only Vélu `kernel/xonly.rs` · Montgomery x-only Vélu, affine (V2) and projective (A24:C24) (V3) `kernel/montgomery.rs` · ℓⁿ chains with naive / balanced / cost-model strategies `kernel/chain.rs` (V2) · **√élu with product and remainder trees, Weierstrass `kernel/sqrt_velu.rs` and Montgomery `kernel/sqrt_velu_mont.rs`** · **twisted Edwards and Huff isogenies (Moody–Shumow)** `kernel/models.rs` · **radical 3-, 5- and 7-isogenies (Castryck–Decru–Vercauteren; N = 7 derived here)** `kernel/radical.rs` · **twisted Hessian isogenies** `kernel/hessian.rs` · **Montgomery 2-/4-isogeny 2ᵉ chains with optimal strategies (SIKE formulas)** `kernel/two_power.rs` · **char-2 Vélu and Kohel** `binary.rs` · **general-Weierstrass Vélu, any characteristic (char 3 over GF(3ⁿ))** `weier.rs`, `gf3n.rs` (V3) |
-| (E, Ẽ) → isogeny | Padé on the ℘-series (V1) `find/elkies.rs` · the BMSS family: linear algebra, Stark, Atkin, Atkin + modular composition, Elkies 1992, Elkies 1998, fastElkies, fastElkies′, and σ from Φ's second derivatives (V2) `find/bmss.rs` |
+| (E, Ẽ) → isogeny | Padé on the ℘-series (V1) `find/elkies.rs` · the BMSS family: linear algebra, Stark, Atkin, Atkin + modular composition, Elkies 1992, Elkies 1998, fastElkies, fastElkies′, and σ from Φ's second derivatives (V2) `find/bmss.rs` · **small characteristic (V5): the p-adic lift of Joux–Lercier / Lercier–Sirvent over floating Q_q** `padic.rs`, `find/small_char.rs` · **Couveignes' 2-torsion algorithm in GF(2ⁿ)** `find/p_torsion.rs` |
 | (E, ℓ) → ℓ-isogenies | Φ_ℓ roots + Elkies codomain (V1) · division-polynomial factoring (V1; char 2 V3) · **Φ_ℓ by Hecke operators and Newton's identities; integer Φ_ℓ by CRT, Φ_ℓ mod 2** `find/modpoly.rs` (V3) · **Schoof–Elkies–Atkin point counting with isogeny cycles (t mod ℓᵏ), Atkin primes resolved to t mod ℓ over F_{pʳ} towers, and BSGS recombination** `find/sea.rs`, `fpr.rs` (V3) |
 | (E₁, E₂) → isogeny | Galbraith BFS, GHS, Kohel volcano walk, Couveignes MITM (ordinary), Delfs–Galbraith (V1) · Galbraith–Stolbunov weighted walk, CSIDH action + MITM + ideal orders (V2) `path/*` · **CSIDH-512 with CLMPR batching and a projective tree strategy; relation lattice / class-group structure; paths on binary curves through any neighbour oracle** (V3) `path/csidh.rs`, `path/relation.rs`, `path/graph.rs` |
 | supersingular, endomorphism side (V3) | **B_{p,∞}, O₀, ideals, LLL, Fincke–Pohst** `quat/mod.rs` · **KLPT (ℓ = 2)** `quat/klpt.rs` · **class sets, Brandt matrices, Mestre's graph, Eichler mass formula** `quat/brandt.rs` · **Deuring correspondence ideal ↔ kernel over F_{p⁴}** `quat/deuring.rs` |
@@ -133,6 +133,13 @@ cargo run --release --bin report -- results/run-v2.jsonl > results/run-v2.md
 ```
 
 `ISOGENY_NO_ADX=1` disables the assembly multiplier; `ISOGENY_ADX4=1` enables it for 256-bit fields.
+
+## Counted benchmarks and the frontier: isobench
+
+`isobench` measures nine isogeny problems in counted units with independent checkers, sealed
+and replayable records, fitted bounds and a frontier of undominated methods:
+[`docs/isobench/README.md`](docs/isobench/README.md), current frontier
+[`docs/isobench/FRONTIER.md`](docs/isobench/FRONTIER.md).
 
 ## Results (single thread, 4-vCPU Xeon @ 2.1 GHz VM, shared host, no pinning: expect noise)
 
@@ -281,8 +288,9 @@ e = 24 over F_{p²}: naive 263 µs, balanced 81 µs, cost model 96 µs; GHS / Ga
   the Castryck–Decru digit-guessing recovery for 2ᵃ < 3ᵇ, dimension-8 embeddings exercised on a concrete
   instance, (ℓ,ℓ)-isogenies for odd ℓ, SQIsign2D. The Kani *split decision* is implemented in dimension 2
   (up to 360-bit p) and dimension 4 (arbitrary auxiliary degree via four squares); KLPT output → isogeny at cryptographic size (Deuring here needs u64 p and torsion
-  over F_{p⁴}); Couveignes 1996 p-torsion, Lercier, Lercier–Sirvent for
-  (E, Ẽ) → isogeny in small characteristic; radical isogenies other than N = 3, 5, 7 (N = 13 needs the genus-2 X₁(13)); Jacobi-quartic models;
+  over F_{p⁴}); for (E, Ẽ) → isogeny in small characteristic, Lercier 1996 (paper not reachable),
+  Couveignes' algorithm for p = 3, and the 2-adic method of Caruso–Eid–Lercier (the p-adic lift is
+  limited to ℓ ≤ 31 for p = 2, 3; Couveignes' algorithm covers p = 2 beyond); radical isogenies other than N = 3, 5, 7 (N = 13 needs the genus-2 X₁(13)); Jacobi-quartic models;
   Enge's quasi-linear Φ_ℓ evaluation. Atkin-prime isogeny cycles over F_{pʳ} towers (t mod ℓ,
   verified against BSGS, tower degree ≤ 6) and Sutherland's volcano/CRT Φ_ℓ (verified equal to the
   q-expansion Φ_ℓ) are implemented. The original graph sampler remains available;

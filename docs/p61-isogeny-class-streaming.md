@@ -38,6 +38,13 @@ constructs eighteen lane seeds using degrees 37 and 59. Each lane then follows
 the non-backtracking degree-13 action. A terminal checkpoint retains only the
 current model and predecessor j-invariant for each lane.
 
+The `(0,0)` lane seed is the registered root model, which is intentionally an
+exception to the generic canonical-model rule used after an isogeny step. The
+terminal closure therefore verifies the selected target j-invariant and links
+the Velu codomain directly to the model stored at `x=0`; it does not require
+the generic representative of that isomorphism class to equal the registered
+root coefficient-for-coefficient.
+
 `p61_isogeny_class verify-segment` is a replay path, not a parser-only check. It
 recomputes modular-polynomial roots, enforces the deterministic neighbor rule,
 verifies every kernel with Velu arithmetic, checks the canonical-model link,
@@ -168,7 +175,11 @@ target/release/p61_isogeny_class --threads 8 verify-segment \
 
 Continuation generation and verification both require the immediately prior
 checkpoint. The producer hashes that checkpoint into the next header and
-refuses an absent, malformed, source-mismatched, or noncontiguous predecessor.
+refuses an absent, malformed, digest-mismatched, or noncontiguous predecessor.
+Because the digest binds the complete prior checkpoint, including its source
+identity, an explicitly hash-pinned successor may continue the immutable chain
+without pretending to have the predecessor's source identity. Both source
+commits remain visible in their respective checkpoints and receipts.
 
 ## Admission state
 

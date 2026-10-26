@@ -1,12 +1,12 @@
 # Binary decomposition systems are capped at 64 Boolean unknowns
 
-- **Status:** `open`
+- **Status:** `resolved` (feature `wide-vars`; the default build keeps the 64-unknown cap)
 - **Kind:** implementation gap
 - **Affected work:** [`research/ic_m3_algebraic_vs_mitm_20261014/`](../research/ic_m3_algebraic_vs_mitm_20261014/README.md)
   (the `m = 4` algebraic arms at n ≥ 23); any Gröbner/SAT decomposition of a
   binary summation-polynomial system with more than 64 Weil-descended unknowns
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-15
+- **Last updated:** 2026-10-20
 
 ## Problem
 
@@ -83,3 +83,15 @@ itself say anything about cost.
   - The narrow engines (inherited F4, F6-IC, the SAT encoder) still refuse
     more than 64 unknowns, and the acceptance conditions above remain
     unmet. Status stays `open`.
+
+## Resolution (2026-10-20)
+
+`pq_groebner_f2::Mask` is `u64` by default and `u128` with the Cargo feature
+`wide-vars`; `MAX_VARS` is 128 in that build. `build_decomposition_system`,
+inherited F4, F5/F6-IC and the SAT encoder accept it, and the new tests cover
+a 100-unknown system and the 70-unknown `m = 4`, n = 23, d = 6 decomposition
+(verified in the group). The frozen grid then ran to n = 31 with the three
+arms (`research/ic_m3_algebraic_vs_mitm_20261014/AMENDMENT_2.md`); every
+finished verdict agreed with the floor. The default build is still capped at
+64 unknowns, and `pdp_split`, `crossbred` and the descent modules keep their
+own `u64` limits.

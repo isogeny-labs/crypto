@@ -154,6 +154,30 @@ A record whose counters include one with no `bitop/v1` rule has no total. Its
 `work.complete` is `false` and the unpriced counters are named. An unknown
 cost is never written as zero.
 
+### Self-check work (policy, 2026-10-21)
+
+Every harness charges self-checks the same way, so their totals compare:
+
+- **The domain is checked once, outside counted work.** Curve parameters,
+  the generator and the target are validated when the instance is built. In
+  ecbench this happens in `workload.rs` on scratch counters that are thrown
+  away; it is the same for every arm.
+- **The solution check is algorithm work, charged per target.** A method
+  that verifies its own answer (rho's `[d]G = Q`, index calculus's `verify`
+  phase) pays for it, because a real solver must.
+- **Re-checking operands inside the arithmetic is not algorithm work.** Code
+  that re-validates every input and output of a group operation (the
+  hyperelliptic `checked_*` arithmetic re-runs `HyperellipticCurveP::validate`
+  and `MumfordDivisorP::validate` on each call, 39–59% of all counted gates
+  in `research/hec_bitop_20261020`) is a defensive check of the
+  implementation, which a solver does not need. It is counted, so it can be
+  seen, but outside the headline: a harness reports it as a separate
+  validation subset, and the cost it compares is the total minus that
+  subset (`algorithm_bitops`).
+
+A harness that cannot separate operand re-checks from the algorithm's own
+work says so and reports its total as including them.
+
 ## Relation to the unpriced-work band (AGENTS.md §5a)
 
 §5a requires a comparison in group-addition equivalents to do two things:
