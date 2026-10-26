@@ -108,15 +108,18 @@ fn random_element(n: u32, rng: &mut StdRng) -> F2mElement {
 }
 
 /// Signature of a reduced set, for fixed-point detection.
-fn signature(polys: &[crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly]) -> Vec<Vec<u64>> {
-    let mut s: Vec<Vec<u64>> = polys
+fn signature(
+    polys: &[crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly],
+) -> Vec<Vec<crypto_lib::cryptanalysis::pq_groebner_f2::Mask>> {
+    use crypto_lib::cryptanalysis::pq_groebner_f2::Mask;
+    let mut s: Vec<Vec<Mask>> = polys
         .iter()
         .map(|p| {
-            let mut m: Vec<u64> = p.terms.iter().map(|t| t.mask).collect();
+            let mut m: Vec<Mask> = p.terms.iter().map(|t| t.mask).collect();
             m.sort_unstable();
             m
         })
-        .filter(|m: &Vec<u64>| !m.is_empty())
+        .filter(|m: &Vec<Mask>| !m.is_empty())
         .collect();
     s.sort();
     s

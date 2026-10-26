@@ -16,7 +16,7 @@ concurrency:
 jobs:
   one-shot-cold-three-phase:
     if: github.event.label.name == 'ecc2k130-dag-linux-v2-measure-once'
-    runs-on: main
+    runs-on: ubuntu-latest
     timeout-minutes: 50
     env:
       GH_TOKEN: ${{ github.token }}
@@ -24,7 +24,7 @@ jobs:
       - id: checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           filter: blob:none
       - id: setup
