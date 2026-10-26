@@ -3166,7 +3166,9 @@ fn group_of(file: &str) -> &str {
     if file.starts_with("L2r-") {
         return "L2r";
     }
-    for g in ["H64-A0", "H64-A11", "K8S-A0", "K8S-A11"] {
+    for g in [
+        "H64-A0", "H64-A11", "K8S-A0", "K8S-A11", "R256-A0", "R256-A11",
+    ] {
         if file.starts_with(&format!("{g}-")) {
             return g;
         }
@@ -5436,6 +5438,19 @@ const AMENDMENT13: M4Host = M4Host {
     ),
 };
 
+const AMENDMENT14: M4Host = M4Host {
+    amendment: 14,
+    a0: "R256-A0",
+    a11: "R256-A11",
+    host: "a 256 GiB EC2 host",
+    oom_ext: "oom.txt",
+    a0_prediction: ("A0 does not complete; binding limit memory", "memory"),
+    a11_prediction: (
+        "A11 does not complete; binding limit time (a timeout at 14400 s)",
+        "time",
+    ),
+};
+
 /// The pre-flight and OOM record beside each cell's rows, the attribution
 /// check, identity with the earlier attempts, R1 and R2, the binding limit of
 /// every incomplete system, and the predictions (Amendment 6's limit rule
@@ -6056,7 +6071,9 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--amendment13") {
+            if args.iter().any(|a| a == "--amendment14") {
+                analyze_m4_host(dir, &AMENDMENT14);
+            } else if args.iter().any(|a| a == "--amendment13") {
                 analyze_m4_host(dir, &AMENDMENT13);
             } else if args.iter().any(|a| a == "--amendment12") {
                 analyze_m4_host(dir, &AMENDMENT12);
