@@ -16,6 +16,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      local_runner:
+        description: Use the dedicated local validation runner
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -26,9 +31,9 @@ concurrency:
 
 jobs:
   gate:
-    # Route only this same-repository CLI PR to the dedicated, one-job local
-    # ARM64 runner. Fork PRs and every other run retain the hosted image.
-    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'codex/crypto-cli-audit-20261017' && 'crypto-cli-gate-arm64' || 'ubuntu-24.04' }}
+    # Only the same-repository PR branch named by the repository variable uses
+    # the local runner. A manual dispatch can opt in; fork PRs remain hosted.
+    runs-on: ${{ ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && vars.CRYPTO_VALIDATION_LOCAL_BRANCH != '' && vars.CRYPTO_VALIDATION_LOCAL_BRANCH == github.head_ref) || (github.event_name == 'workflow_dispatch' && inputs.local_runner)) && 'crypto-cli-gate-arm64' || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:
       # The full-history checkout no longer fits a hosted runner: from
@@ -49,9 +54,9 @@ jobs:
           fetch-depth: 1
           filter: blob:none
       - name: Fetch the base tip
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.local_runner)
         env:
-          BASE_REF: ${{ github.base_ref }}
+          BASE_REF: ${{ github.base_ref || 'main' }}
         run: |
           git fetch --no-tags --depth=1 --filter=blob:none origin \
             "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
@@ -67,9 +72,11 @@ jobs:
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Every leaderboard and benchmarks row is validated or frozen pre-gate
+        env:
+          BASE_REF: ${{ github.base_ref || (github.event_name == 'workflow_dispatch' && inputs.local_runner && 'main') || '' }}
         run: |
-          base=""
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            base="--base origin/${{ github.base_ref }}"
+          if [ -n "$BASE_REF" ]; then
+            python3 scripts/validation_gate.py check --base "origin/$BASE_REF"
+          else
+            python3 scripts/validation_gate.py check
           fi
-          python3 scripts/validation_gate.py check $base
