@@ -260,13 +260,49 @@ Only a passing constructed relation and native replay authorize one
 caps. A natural relation still needs useful-rank, factor-base log,
 unseen-target descent, fully charged cold runtime and same-target rho gates.
 
-The hosted GitHub AWS principal stopped at `AccessDenied` for the full-D18
-manifest, and its [exact two-object read proposal](linux-phase-first-20261025/attempt-1/IAM_READ_PROPOSAL.md)
-remains unapplied. Read-only inspection on 2026-10-25 found the existing
+At the 2026-10-25 checkpoint, the hosted GitHub AWS principal stopped at
+`AccessDenied` for the full-D18 manifest, and its [exact two-object read proposal](linux-phase-first-20261025/attempt-1/IAM_READ_PROPOSAL.md)
+was unapplied. Read-only inspection then found the existing
 `n83-online-screen-ssm-20261019` profile has only its separate artifact put,
 while `n83-xor-panel-20261025` reads only the earlier XOR-panel input prefix.
-Neither profile grants this D18 object read. Apply the reviewed exact-object
-permission only after explicit authorization; do not route this experiment
-through a broader or unrelated role. The local SSH endpoints named
-`awsspot` and `runpod` were unavailable at this inspection and are not a
-completed hosted run.
+Neither profile granted this D18 object read. The local SSH endpoints named
+`awsspot` and `runpod` were unavailable at that inspection.
+
+## 2026-10-26 native continuation status
+
+The user subsequently authorized the exact two-object temporary policy
+`N83D18ExactInputRead20261025` on IAM user
+`rho-gh-snapshot-readonly-20261024`. The [live readback receipt](../../../../problems/evidence/n83-d18-exact-read-20261026.json)
+matches the [reviewed proposal](linux-phase-first-20261025/attempt-1/exact-read-policy-proposal.json)
+after canonical JSON sorting. Its sole statement permits `s3:GetObject` on
+the manifest and compressed object named above. Confirm the live grant before
+using that identity, and remove it with a verified absent-policy readback
+after the hosted attempt ends or is cancelled. Other AWS identities need
+their own read authorization; this grant does not make the spot or RunPod SSH
+endpoints available.
+
+The current source handoff is [PR #2649](https://github.com/isogeny-labs/crypto/pull/2649)
+and the [frozen native protocol](native-cadence-replay-20261026/PROTOCOL.md),
+including its [retained-assignment amendment](native-cadence-replay-20261026/ASSIGNMENT_CERTIFICATE_AMENDMENT.md).
+The [second source-bound preflight](native-cadence-replay-20261026/attempt-2/REPORT.md)
+used source `45ce91d503ee0d0acc57e3d8d5cb49108c90ded6`, worker SHA-256
+`11220d8b838bf5cac2985dbcba4ea96e69a64b70dc54044d180cf6a3e8970e49`,
+and separate verifier SHA-256
+`e89578703888568d67f79e5b2645e47b911a30a9d7a8a3d57e795be997296b71`.
+Fresh checksum-enabled S3 GETs matched both full-object hashes. Six selected
+one-minute local loads were 26.44–66.14, exceeding the frozen maximum 24;
+swapouts rose by 390,448. The constructed worker and natural arm were not
+launched. Use a host that passes the frozen load, swap and scratch gates,
+then run the positive arm and its independent assignment/group replay before
+the one public natural arm. Preserve every cap, timeout or infrastructure
+failure with its exact source and input identities.
+
+GitHub Actions on PR #2649 has stopped before runner assignment with an
+account billing or spending-limit annotation. The available local AWS
+identity also returned `ParameterNotFound` for `/ephemeral/config` in
+`us-east-1` and `us-west-2`; this is a limit of that identity and those
+endpoints. The documented `ephemeral` runner uses Spot capacity, while the
+current solver has no application checkpoint. No hosted native full-D18
+positive/natural execution has been started from this handoff. The
+[problem record](../../../../problems/n83-mixed-orbit-factor-base-selection.md)
+tracks these gates and the downstream total-runtime selection obligations.
