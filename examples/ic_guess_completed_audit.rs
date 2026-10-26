@@ -8,7 +8,10 @@ use crypto_lib::cryptanalysis::{
 use num_bigint::BigUint;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-use std::{collections::BTreeSet, path::Path};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    path::Path,
+};
 #[allow(dead_code)]
 #[path = "ic_algebraic_followup/hky.rs"]
 mod hky;
@@ -190,6 +193,166 @@ fn replay(study: &Path, draw: u64, k: usize, branch: u64) -> Value {
         "producer_solver_words":original["solver_word_ops"],"independent_solver_words":null,"status":"independent_hky_verdict_agrees_or_producer_was_censored",
         "scope":"Finite original Boolean branch; subgroup/query-law qualification and complete price unchanged"})
 }
+fn replay_record_valid(v: &Value, original: &Value, draw: u64, k: usize, branch: u64) -> bool {
+    let Some(cols) = v["full_columns"].as_u64() else {
+        return false;
+    };
+    let Some(rank) = v["closure_rank"].as_u64() else {
+        return false;
+    };
+    let Some(plain) = v["plain_rank"].as_u64() else {
+        return false;
+    };
+    let Some(active) = v["active_variables"].as_u64().filter(|n| *n <= 128) else {
+        return false;
+    };
+    let old = original["verdict"].as_str().unwrap();
+    let verdict = if rank == cols {
+        "refuted"
+    } else {
+        "saturated_not_refuted"
+    };
+    v["schema"] == "ic-balanced-guess-hky-replay/v1"
+        && v["draw"] == draw
+        && v["guesses"] == k
+        && v["branch"] == branch
+        && v["guessed_variables"] == json!(ORDER[..k])
+        && v["input_sha256"] == "95ee147e1221ce4ef6c98bdd0b808398a01362343ffaa66debc217d6eeff5a9b"
+        && v["equation_builders_agree"] == true
+        && cols > 0
+        && cols == columns(active as usize, 4) as u64
+        && v["hky_rounds"].as_u64().is_some()
+        && plain <= rank
+        && rank <= cols
+        && v["hky_verdict"] == verdict
+        && (old == "unknown" || old == verdict)
+        && v["producer_verdict"] == old
+        && v["producer_row_sha256"] == original["rows_sha256"]
+        && v["producer_solver_words"] == original["solver_word_ops"]
+        && v["independent_solver_words"].is_null()
+        && v["status"] == "independent_hky_verdict_agrees_or_producer_was_censored"
+}
+
+fn replay_summary(study: &Path, run: &Path) -> Value {
+    let producer = source(study);
+    let originals = producer["attempts"].as_array().unwrap();
+    let mut rows = vec![];
+    let mut valid = BTreeMap::new();
+    let mut classes = BTreeMap::<String, usize>::new();
+    let mut terminated = 0;
+    for arm in ["hky", "hky-aa"] {
+        for draw in [0u64, 3, 5, 6] {
+            for k in 0..=4usize {
+                for branch in 0..(1u64 << k) {
+                    let folder = run.join(arm).join(format!("d{draw}-k{k}-b{branch}"));
+                    let status_path = folder.join("status.json");
+                    let mut class = "unexecuted";
+                    let mut exit_code = Value::Null;
+                    let mut replay = Value::Null;
+                    if status_path.exists() {
+                        let status = read(&status_path);
+                        exit_code = status["exit_code"].clone();
+                        if folder.join("ended.txt").exists() {
+                            terminated += 1;
+                        }
+                        class = if exit_code == 124 {
+                            "timeout"
+                        } else {
+                            "nonzero_or_incomplete"
+                        };
+                        if exit_code == 0 && folder.join("ended.txt").exists() {
+                            let raw = std::fs::read(folder.join("output.json")).unwrap_or_default();
+                            if let Ok(v) = serde_json::from_slice::<Value>(&raw) {
+                                let original = originals
+                                    .iter()
+                                    .find(|a| {
+                                        a["draw"] == draw
+                                            && a["guesses"] == k
+                                            && a["branch"] == branch
+                                    })
+                                    .unwrap();
+                                if replay_record_valid(&v, original, draw, k, branch) {
+                                    class = "verified";
+                                    valid.insert((arm, draw, k, branch), v.clone());
+                                } else {
+                                    class = "invalid_replay_output";
+                                }
+                                replay = v;
+                            } else {
+                                class = "invalid_replay_output";
+                            }
+                        }
+                    } else if folder.join("started.txt").exists() {
+                        class = "started_without_final_status";
+                    }
+                    *classes.entry(class.to_string()).or_default() += 1;
+                    rows.push(json!({"arm":arm,"draw":draw,"guesses":k,"branch":branch,"classification":class,
+                        "exit_code":exit_code,"replay":replay,"wall_valid":false}));
+                }
+            }
+        }
+    }
+    let mut pairs = 0;
+    let mut mismatches = vec![];
+    for draw in [0u64, 3, 5, 6] {
+        for k in 0..=4usize {
+            for branch in 0..(1u64 << k) {
+                if let (Some(a), Some(b)) = (
+                    valid.get(&("hky", draw, k, branch)),
+                    valid.get(&("hky-aa", draw, k, branch)),
+                ) {
+                    pairs += 1;
+                    let fields = [
+                        "hky_verdict",
+                        "active_variables",
+                        "full_columns",
+                        "plain_rank",
+                        "closure_rank",
+                        "equation_builders_agree",
+                    ];
+                    let differences: Vec<_> = fields
+                        .into_iter()
+                        .filter(|field| a[*field] != b[*field])
+                        .collect();
+                    if !differences.is_empty() {
+                        mismatches.push(
+                            json!({"draw":draw,"guesses":k,"branch":branch,"fields":differences}),
+                        );
+                    }
+                }
+            }
+        }
+    }
+    let mut minima = vec![];
+    for arm in ["hky", "hky-aa"] {
+        for draw in [0u64, 3, 5, 6] {
+            let all_valid = (0..=4usize)
+                .all(|k| (0..1u64 << k).all(|branch| valid.contains_key(&(arm, draw, k, branch))));
+            let minimum = if all_valid {
+                (0..=4usize).find(|&k| {
+                    (0..1u64 << k)
+                        .all(|branch| valid[&(arm, draw, k, branch)]["hky_verdict"] == "refuted")
+                })
+            } else {
+                None
+            };
+            minima.push(json!({"arm":arm,"draw":draw,"all_31_cases_verified":all_valid,"registered_prefix_minimum":minimum}));
+        }
+    }
+    let status = if valid.len() == 248 && pairs == 124 && mismatches.is_empty() {
+        "all_248_native_replays_and_124_aa_rank_verdict_pairs_pass"
+    } else if terminated == 248 {
+        "complete_with_caps_errors_or_aa_mismatches"
+    } else {
+        "partial_incomplete"
+    };
+    json!({"schema":"ic-completed-guess-independent-replay-summary/v1","planned":248,"terminated":terminated,
+        "verified":valid.len(),"classifications":classes,"aa_rank_verdict_pairs_checked":pairs,"aa_mismatches":mismatches,
+        "registered_prefix_minima":minima,"rows":rows,"status":status,
+        "independent_solver_words":null,"original_producer_timeout_and_cost_unchanged":true,
+        "scope":"Exact original Boolean branch replay and deterministic rank/verdict repetition only. No independent word recount, general minimum, subgroup-query cost or IC speed claim; every wall clock is invalid."})
+}
+
 fn main() {
     let a: Vec<_> = std::env::args().skip(1).collect();
     let v = match a.first().map(String::as_str) {
@@ -200,7 +363,10 @@ fn main() {
             a[3].parse().unwrap(),
             a[4].parse().unwrap(),
         ),
-        _ => panic!("summary STUDY | case STUDY DRAW K BRANCH"),
+        Some("replay-summary") if a.len() == 3 => {
+            replay_summary(Path::new(&a[1]), Path::new(&a[2]))
+        }
+        _ => panic!("summary STUDY | case STUDY DRAW K BRANCH | replay-summary STUDY RUN"),
     };
     println!("{v}");
 }
@@ -213,5 +379,24 @@ mod tests {
         assert_eq!(specialised(&p, &[0], 1), (vec![vec![], vec![0]], 0));
         assert_eq!(specialised(&p, &[0], 0), (vec![vec![0, 1], vec![2]], 2));
         assert_eq!(columns(42, 4), 124314);
+    }
+    #[test]
+    fn replay_validation_rejects_bad_rank_and_invented_cost_but_keeps_censoring() {
+        let original =
+            json!({"verdict":"unknown","rows_sha256":"frozen-row","solver_word_ops":null});
+        let mut v = json!({"schema":"ic-balanced-guess-hky-replay/v1","draw":6,"guesses":1,"branch":1,
+            "input_sha256":"95ee147e1221ce4ef6c98bdd0b808398a01362343ffaa66debc217d6eeff5a9b",
+            "equation_builders_agree":true,"active_variables":4,"guessed_variables":[7],"hky_rounds":2,"full_columns":16,"plain_rank":2,"closure_rank":16,"hky_verdict":"refuted",
+            "producer_verdict":"unknown","producer_row_sha256":"frozen-row","producer_solver_words":null,
+            "independent_solver_words":null,"status":"independent_hky_verdict_agrees_or_producer_was_censored"});
+        assert!(replay_record_valid(&v, &original, 6, 1, 1));
+        v["closure_rank"] = json!(17);
+        assert!(!replay_record_valid(&v, &original, 6, 1, 1));
+        v["closure_rank"] = json!(16);
+        v["independent_solver_words"] = json!(0);
+        assert!(!replay_record_valid(&v, &original, 6, 1, 1));
+        v["independent_solver_words"] = Value::Null;
+        v["producer_solver_words"] = json!(0);
+        assert!(!replay_record_valid(&v, &original, 6, 1, 1));
     }
 }
