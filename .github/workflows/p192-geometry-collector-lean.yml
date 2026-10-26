@@ -1,11 +1,9 @@
 name: P-192 geometry collector Lean proofs
 
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
-    paths:
-      - .github/workflows/p192-geometry-collector-lean.yml
-      - research/p192_extension_cover_20261012/lean/**
-  pull_request:
     paths:
       - .github/workflows/p192-geometry-collector-lean.yml
       - research/p192_extension_cover_20261012/lean/**

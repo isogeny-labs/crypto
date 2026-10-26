@@ -1,6 +1,9 @@
 name: IC autolab integration
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - 'Cargo.lock'
       - 'build.rs'
@@ -22,7 +25,7 @@ env:
   PYTHONDONTWRITEBYTECODE: '1'
 concurrency:
   group: ic-autolab-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 jobs:
   linux-integration-controls:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-autolab.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-autolab.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}

@@ -20,32 +20,11 @@ name: perf history
 # or at https://github.com/aburan28/crypto/blob/perf-history/docs/perf/HISTORY.md
 
 on:
-  merge_group:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
-      - 'src/**'
-      - 'examples/perfbench/**'
-      - 'examples/perfindex/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'scripts/perf/perfhistory.py'
-      - 'scripts/perf/perfindex.py'
-      - 'docs/perf/ecbench-children.json'
-      - 'docs/perf/ic-factor-base-j0.spec.json'
-      - 'docs/perf/weights.json'
-      - 'docs/perf/fingerprints.json'
-      - 'docs/perf/groebner-groups.json'
-      - 'docs/perf/f4-f5-allocation-history.json'
-      - 'tools/groebner-history/**'
-      - 'scripts/perf/render_groebner_history.py'
-      - 'scripts/perf/groebner-render-requirements.txt'
-      - '.github/workflows/perf-history.yml'
-  pull_request:
-    paths:
-      - 'build.rs'
-      - '.cargo/**'
-      - 'rust-toolchain*'
       - 'src/**'
       - 'examples/perfbench/**'
       - 'examples/perfindex/**'

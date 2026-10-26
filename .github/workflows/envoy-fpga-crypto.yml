@@ -1,10 +1,8 @@
 name: Envoy FPGA crypto
 
 on:
-  pull_request:
-    paths:
-      - integrations/envoy-fpga-crypto/**
-      - .github/workflows/envoy-fpga-crypto.yml
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     paths:
       - integrations/envoy-fpga-crypto/**
