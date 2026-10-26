@@ -141,7 +141,7 @@ jobs:
       - name: Native shape, polynomial and progress comparison unit tests
         run: cargo test --locked --release --bin factor-base-sweep
       - name: Actual CLI witnesses, caps, interruption, resume and corruption
-        run: cargo test --locked --release --test factor_base_sweep_cli -- --test-threads=1
+        run: cargo test --locked --release --test factor_base_sweep_cli --test factor_base_profile_cli -- --test-threads=1
       - name: Independent native shape audit tests and strict lint
         env:
           CARGO_TARGET_DIR: ${{ github.workspace }}/target
