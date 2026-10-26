@@ -287,7 +287,31 @@ let page = readFileSync(PAGE, 'utf8');
 const oldFront = between(page, START, END);
 const historical = section(oldFront, 'lab-best');
 const progressRaw = readFileSync(resolve(ROOT,'docs/ic/progress-timeline.json'));
+// GHS-weak E0/F_{q^3} plane-quartic panel: rendered from the committed frozen
+// summaries only (no arithmetic beyond formatting).
+function ghsWeakPanel() {
+  const read = rel => readFileSync(resolve(ROOT, rel), 'utf8').split('\n').filter(Boolean).map(line => JSON.parse(line));
+  const allRel = 'research/quartic_n4_20261019/results/summary_all.json';
+  const primRel = 'research/quartic_n4_20261019/results/summary_primary.json';
+  const all = read(allRel), prim = read(primRel);
+  const rows = all.filter(r => r.arm && r.q !== undefined && r.arm !== 'A0');
+  const fits = [...all.filter(r => r.fit), ...prim.filter(r => r.fit)];
+  const g3 = v => Number(v).toPrecision(3);
+  const cell = (r, i) => `${g3(r.ratio[i])} [${g3(r.ratio_lo[i])}, ${g3(r.ratio_hi[i])}]`;
+  const gh = rel => `https://github.com/aburan28/crypto/blob/main/${rel}`;
+  const body = rows.map(r => `<tr><td>${escape(r.arm)}</td><td class="n">${r.q}</td><td class="n">${r.units_ok}/${r.units}</td><td class="n">${r.rho_runs}</td><td>${cell(r,0)}</td><td>${cell(r,1)}</td><td>${cell(r,2)}</td><td>${escape(r.resolved)}</td></tr>`).join('');
+  const fitRows = fits.map((f, i) => `<tr><td>${escape(f.fit)}</td><td>${i < all.filter(r => r.fit).length ? 'all sizes' : 'primary range q &ge; 4051'}</td><td class="n">${f.sizes}</td><td>${g3(f.ic_exp_w0[0])} [${g3(f.ic_exp_w0[1])}, ${g3(f.ic_exp_w0[2])}]</td><td>${g3(f.rho_exp_w0[0])} [${g3(f.rho_exp_w0[1])}, ${g3(f.rho_exp_w0[2])}]</td><td>${g3(f.gap_w0[0])} [${g3(f.gap_w0[1])}, ${g3(f.gap_w0[2])}]</td></tr>`).join('');
+  const big = rows.filter(r => r.arm === 'B0').at(-1);
+  return `<section class="dash-section" id="ghs-weak-n4-20261019" aria-labelledby="ghs-weak-n4-title" data-collapse="open">
+<div class="dash-section-head"><div><p class="dash-kicker">GHS-weak family E0/F<sub>q<sup>3</sup></sub> with 4 | #E0(K) / plane-quartic index calculus / one target cold</p><h2 id="ghs-weak-n4-title">Below matched rho on one special family, with a smaller exponent.</h2><p class="panel-summary">IC/rho reads ${cell(big,0)} at q = ${big.q} (w = 0), down from above 1 at small q; all IC units verified and the order holds across 0, 0.1 and 1 GAE per unpriced operation for q &ge; 4051. Restricted to this GHS-weak family; not generic curves, not prime-order E/F<sub>q<sup>3</sup></sub>, not a standard curve.</p></div><span class="status good">Advance · special family only</span></div>
+<p class="dash-section-intro">Relation collection with a reduced factor base and one large prime, Lanczos modulo ell, and descent by canonical Pic<sup>0</sup> arithmetic, with no subgroup enumeration. The reference is a matched plain Pollard rho (no negation map) on the same E0(K) subgroup, in F<sub>q</sub>-multiplication equivalents, one cold target, shared 4-core VM with L0 isolation. Arm A0r (all rational points as the factor base) is the baseline for the improvement. Intervals are 95% bootstrap.</p>
+<div class="scroll"><table><caption>IC over matched rho, from the frozen summary.</caption><thead><tr><th>arm</th><th>q</th><th>units ok</th><th>rho runs</th><th>IC/rho, w = 0</th><th>w = 0.1</th><th>w = 1</th><th>resolved</th></tr></thead><tbody>${body}</tbody></table></div>
+<div class="scroll"><table><caption>Fitted cost exponents.</caption><thead><tr><th>arm</th><th>range</th><th>sizes</th><th>IC exponent (w = 0)</th><th>rho exponent (w = 0)</th><th>gap rho &minus; IC</th></tr></thead><tbody>${fitRows}</tbody></table></div>
+<p><a href="${gh('research/quartic_n4_20261019/README.md')}">Report</a> &middot; <a href="${gh(allRel)}">Frozen summary, all sizes</a> &middot; <a href="${gh(primRel)}">primary range</a> &middot; <a href="ic-leaderboard.html#ghs-weak-n4-20261019">Leaderboard section</a></p>
+</section>`;
+}
 const retainedPanels = [
+  ['ghs-weak-n4-20261019','GHS-weak family: plane-quartic index calculus against matched rho · 19 October 2026'],
   ['conductor-gap-native-20261015','Conductor-gap native controls: paired solves and generic recurrence · 15 October 2026'],
   ['cold-compact-orbit-20261003','Historical compact-orbit cold-cost panel'],
   ['full-rank-compact-orbit-20261003','Historical compact-orbit full-rank panel'],
@@ -305,7 +329,7 @@ const retainedPanels = [
   ['lab-progress','Research progress over time · separate regimes and references'],
   ['lab-currency','How new results update this dashboard']
 ].map(([id,label])=>{
-  let html = section(oldFront,id);
+  let html = id === 'ghs-weak-n4-20261019' ? ghsWeakPanel() : section(oldFront,id);
   if (id === 'conductor-gap-native-20261015') {
     html = readFileSync(resolve(ROOT,'research/conductor_gap_cm_orbits_20261015/native/dashboard_panel.html'),'utf8').trimEnd();
     assert.ok(html.includes(`id="${id}"`), 'Native conductor panel source lost its identity');
