@@ -39,7 +39,7 @@ and [match alternatives](https://doc.rust-lang.org/stable/reference/expressions/
 The reference confirms the required block, variant, and or-pattern delimiters;
 the repository context determines the preserved fields and variant sets.
 
-Runtime logs numbered 05–11 are stored as deterministic, lossless gzip files
+Runtime logs numbered 05–12 are stored as deterministic, lossless gzip files
 so the exact test output remains intact without generated whitespace in the
 patch. [The raw-log manifest](raw-log-manifest.json) records each uncompressed
 SHA-256 and byte count; `gzip -dc FILE.log.gz` reads a log.
@@ -102,8 +102,12 @@ path. After hydrating the tracked blob unchanged (SHA-256
 `683f92d0e56f5606f78b6c685f747a7b67106a7b5e5883e81869c8d6199d7336`),
 all seven passed individually on the same binary. The
 [recheck summary](11-cryptopro-fixture-recheck-summary.json) links the exact
-outputs. These combined runs cover every nonignored test except the named
-long case, but no single unqualified full-suite pass is claimed.
+outputs. The separately bounded long `jv_isogeny_walk` case then passed on
+the same binary in 185.91 seconds with exit code 0; its
+[raw output](12-long-jv-exact.log.gz) is losslessly preserved with SHA-256
+`cf57bcb58d5f388c600c90bfe0cd16e1c20c3e6c26147d207c58ebec0f37a2f2`.
+These combined runs cover every nonignored library test, but no single
+unqualified full-suite pass is claimed.
 
 For this routing decision, the relevant repository sources are the historical
 genus-2 [spec](../../research/ecbench_jacobians_transfers_20261025/specs/genus2.json)
@@ -117,6 +121,6 @@ underlying Gaudry/ADH algorithm, historical measurements, and the note's
 Gaudry paper's IACR PDF was inaccessible through this host (HTTP 403), so this
 report makes no new claim about its algorithm or novelty.
 
-A successful parse, the affected tests, and the combined broad run are limited
-gates. The skipped long case and hosted CI remain open before an unqualified
+A successful parse, the affected tests, and the combined broad and exact runs
+are limited gates. Hosted current-head CI remains open before an unqualified
 green verdict.
