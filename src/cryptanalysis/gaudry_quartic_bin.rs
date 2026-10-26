@@ -2447,7 +2447,7 @@ fn is_prime(n: u128) -> bool {
         }
         acc
     };
-    if n % 2 == 0 {
+    if n.is_multiple_of(2) {
         return false;
     }
     let s = (n - 1).trailing_zeros();
@@ -2680,7 +2680,7 @@ impl TowerBasis {
 /// The coefficient of base point `i` of [`TLineBase`] modulo `r`: the
 /// points of a column come as `P, −P, P + T, −(P + T)`.
 pub fn t_line_coef(i: usize, r: u128) -> u128 {
-    if i % 2 == 0 {
+    if i.is_multiple_of(2) {
         1
     } else {
         r - 1

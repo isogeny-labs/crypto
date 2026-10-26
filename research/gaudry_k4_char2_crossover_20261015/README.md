@@ -125,7 +125,7 @@ at every size reachable here.
 | D1 | dense arm reproduces #1883 to the last digit | **not met as registered**: the spec's measurement seed (202610150201) differs from #1883's (202610150002), so the arms are fresh samples (`S` 72.99, 72.27 against 71.43, 73.42). The purpose is met more strongly by W8: this branch's binary replays all 24 of B2's and all 3 of B3's committed records exactly. The pilot, which reused the seed, matched both `m = 10` values exactly |
 | D2 | sparse below dense at `m = 12`, ≥ 2× at `m = 14` | **held** (1.29–1.45×; 5.3–5.4× unpaired) |
 | D3 | trials within `[1.00, 1.10]×` | **held** (1.0000–1.0040) |
-| E1 | all runs verify; replays reproduce | verified: all finished runs; replays: see the audit table |
+| E1 | all runs verify; replays reproduce | all finished runs verify; **replays not done** for this study's sessions (see Audits) |
 | E2 | IC ÷ rho theory in `[1.5, 8]` (`m = 15`), `[0.7, 4]` (16), `[0.4, 2]` (17), `[0.2, 1]` (18) | held at 15 (3.61, 3.67); *indicated* at 16 (1.67) and 17 (0.96); 18 not run |
 | E3 | at `m = 18`, IC below rho's theory and the measured run | **not tested** |
 | E4 | `wiedemann` ≤ 5 % of IC at `m = 18` | not tested; 1.4 % at `m = 17` (interrupted) |
@@ -144,12 +144,29 @@ at every size reachable here.
 
 ## Audits
 
-`ecbench verify` on the committed sessions (`audits/`): integrity checks
-(hashes, record consistency, environment class) and, only where a
-receipt says so, replays (re-execution requiring identical counts). A replay of the `m = 17` rho runs costs about 7 hours and
-of the `m = 15` IC runs about 3 hours; the replay audits and the relaunched sessions
-were killed within minutes on Oct 26. The receipts that exist are the evidence;
-absence of a receipt means not replayed.
+`ecbench verify` receipts are in `audits/`. Integrity audits (`--replay 0`:
+hashes, record consistency, environment class) of every session with
+records; replay audits (`--replay-all`: re-execute each run and require
+identical counts) only where a receipt says so.
+
+| session | records | integrity | replayed |
+|:--|--:|:--|:--|
+| `d-ladder` | 18 | OK | **no**: stopped at 04:24 after 2 h without a result |
+| `e-m15` | 6 | OK | **no**: stopped after 38 min (needs about 3 h) |
+| `e-m17-rho` | 2 | OK | **no**: stopped after 38 min (needs about 7 h) |
+| `f-lp` | 15 | OK | **no**: not started |
+| `e-m16.attempt3-killed` | 3 of 4 | fails `session_complete`, `record_count` only | no |
+| `e-m17-ic.attempt1-killed` | 1 of 2 | fails `session_complete`, `record_count` only | no |
+| `d-m14.attempt3-killed` | 2 of 3 | fails `session_complete`, `record_count` only | no |
+| #1883 `char2-ladder` (this binary) | 24 | OK | **yes: 24/24 reproduced** |
+| #1883 `char2-m14` (this binary) | 3 | OK | **yes: 3/3 reproduced** |
+
+So none of this study's own sessions has been replayed. The two replayed
+sessions are #1883's, re-executed with this branch's binary (the widening
+changes no committed count); the equivalence tests pin `ic_wide` to the
+one-word code. The replay audits of this study's sessions are the first
+thing to run on a host that does not restart (`ecbench verify --dir
+research/gaudry_k4_char2_crossover_20261015/sessions/<s> --replay-all`).
 
 ## Scope
 

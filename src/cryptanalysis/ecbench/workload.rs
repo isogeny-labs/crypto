@@ -445,7 +445,7 @@ impl Instance {
             Instance::Binary(i) => u128::from(i.r),
             Instance::Wide(i) => i.kc.r,
             Instance::Fp4(i) => u128::from(i.r),
-            Instance::F2m4(i) => u128::from(i.r),
+            Instance::F2m4(i) => i.r,
         }
     }
 
@@ -536,11 +536,11 @@ impl Instance {
                     "extension",
                     None,
                     Some(f.f.m),
-                    u128::from(i.group_order),
-                    u128::from(i.r),
-                    u128::from(i.cofactor),
-                    u128::from(f.pack(&i.generator.x)),
-                    u128::from(f.pack(&i.generator.y)),
+                    i.group_order,
+                    i.r,
+                    i.cofactor,
+                    f.pack(&i.generator.x),
+                    f.pack(&i.generator.y),
                     2,
                 )
             }

@@ -35,8 +35,8 @@ use crate::cryptanalysis::gaudry_quartic_bin::{
     t_line_coef, BinCurve, BinD4Oracle, BinRelation, CurveB, PtB, TLineBase,
 };
 use crate::cryptanalysis::ic_boundary::{
-    generic_floor_ops, price_phase, Calibration, CountedGroup, GroupOps, OracleCounters,
-    PhaseCost, RhoResult,
+    generic_floor_ops, price_phase, Calibration, CountedGroup, GroupOps, OracleCounters, PhaseCost,
+    RhoResult,
 };
 use crate::cryptanalysis::ic_framework::linalg::Wiedemann;
 use crate::cryptanalysis::ic_framework::stages::{
@@ -72,12 +72,7 @@ fn mix(v: u64) -> u64 {
 }
 
 /// `[k]p` by `CountedGroup::mul`'s double-and-add, for a scalar of any width.
-pub fn mul_s<G: CountedGroup, S: RhoScalar>(
-    g: &G,
-    ops: &mut GroupOps,
-    p: G::Elt,
-    k: S,
-) -> G::Elt {
+pub fn mul_s<G: CountedGroup, S: RhoScalar>(g: &G, ops: &mut GroupOps, p: G::Elt, k: S) -> G::Elt {
     ops.scalar_mults += 1;
     if k == S::zero() || g.is_identity(&p) {
         return g.identity();
@@ -159,7 +154,12 @@ fn canon<G: CountedGroup, S: RhoScalar>(
     tally.canonicalisations += 1;
     let n = g.neg(p);
     if g.key(&n) < g.key(&p) {
-        (n, S::sub_mod(S::zero(), a, r), S::sub_mod(S::zero(), b, r), true)
+        (
+            n,
+            S::sub_mod(S::zero(), a, r),
+            S::sub_mod(S::zero(), b, r),
+            true,
+        )
     } else {
         (p, a, b, false)
     }
@@ -187,7 +187,11 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
         _ => 16,
     };
     let dp_bits = (bits / 4).min(40);
-    let dp_mask = if dp_bits == 0 { 0 } else { (1u64 << dp_bits) - 1 };
+    let dp_mask = if dp_bits == 0 {
+        0
+    } else {
+        (1u64 << dp_bits) - 1
+    };
     let log = usize::BITS - 1 - jump_count.max(2).leading_zeros();
     let coefficient_bits = (3 * log).clamp(6, 12);
     let walk_cap = (1u64 << dp_bits) * 20 + 64;
@@ -209,7 +213,10 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
             )
         })
         .collect();
-    let (mut ta, mut tb) = (gen_below(&mut rng, S::one(), r2), gen_below(&mut rng, S::one(), r2));
+    let (mut ta, mut tb) = (
+        gen_below(&mut rng, S::one(), r2),
+        gen_below(&mut rng, S::one(), r2),
+    );
     let mut stride = joint_mul_s(g, &mut ops, generator, target, gq, ta, tb);
     while g.is_identity(&stride) {
         ta = gen_below(&mut rng, S::one(), r2);
@@ -810,16 +817,13 @@ mod tests {
                 assert_eq!(a.walks, b.walks);
                 assert_eq!(a.counters, b.counters);
                 // The u128 instantiation walks the same values too.
-                let (w, dw) = rho_negation::<CurveB, u128>(
-                    c,
-                    inst.generator,
-                    q,
-                    u128::from(r),
-                    s,
-                    1 << 40,
-                );
+                let (w, dw) =
+                    rho_negation::<CurveB, u128>(c, inst.generator, q, u128::from(r), s, 1 << 40);
                 assert_eq!(dw, Some(u128::from(d)));
-                assert_eq!(w.counters.get("walk_operations"), b.counters.get("walk_operations"));
+                assert_eq!(
+                    w.counters.get("walk_operations"),
+                    b.counters.get("walk_operations")
+                );
             }
         }
     }
@@ -847,8 +851,16 @@ mod tests {
     #[test]
     fn run_f2m4_is_the_one_word_pipeline() {
         for (oracle, lp, permille) in [
-            ("gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1", 0u8, 1000u64),
-            ("gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1", 2, 500),
+            (
+                "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1",
+                0u8,
+                1000u64,
+            ),
+            (
+                "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1",
+                2,
+                500,
+            ),
         ] {
             let inst = find_bin_curve(6, 1, 16).unwrap();
             let c = &inst.curve;
@@ -905,13 +917,16 @@ mod tests {
                 one.decomposition.cost.native,
                 wide.report.decomposition.cost.native
             );
-            assert_eq!(one.linear_algebra.cost.native, wide.report.linear_algebra.cost.native);
+            assert_eq!(
+                one.linear_algebra.cost.native,
+                wide.report.linear_algebra.cost.native
+            );
             // And at u128, the same counts.
             let mut o3 = BinD4Oracle::new(&inst, 11, sp.seed, opts);
             o3.lp.max_large = lp;
             o3.lp.small_permille = permille;
-            let w128 = run_f2m4::<u128>(&ctx, &inst, &sp, &mut o3, inst.r, inst.cofactor, &calib)
-                .unwrap();
+            let w128 =
+                run_f2m4::<u128>(&ctx, &inst, &sp, &mut o3, inst.r, inst.cofactor, &calib).unwrap();
             assert_eq!(w128.recovered, Some(u128::from(d)));
             assert_eq!(w128.report.total_gae, one.total_gae);
         }

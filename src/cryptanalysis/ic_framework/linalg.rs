@@ -471,7 +471,8 @@ impl<S: RhoScalar> Wiedemann<S> {
                 } else {
                     u128::from(next()) | (u128::from(next()) << 64)
                 };
-                S::from_biguint(&num_bigint::BigUint::from(1 + w % (m128 - 1))).expect("below the modulus")
+                S::from_biguint(&num_bigint::BigUint::from(1 + w % (m128 - 1)))
+                    .expect("below the modulus")
             })
             .collect();
         // y = Rᵀ D (R x)
@@ -497,7 +498,9 @@ impl<S: RhoScalar> Wiedemann<S> {
         };
         let dot = |x: &[S], y: &[S], ops: &mut u64| -> S {
             *ops += n as u64;
-            x.iter().zip(y).fold(S::zero(), |acc, (&p, &q)| add(acc, mul(p, q)))
+            x.iter()
+                .zip(y)
+                .fold(S::zero(), |acc, (&p, &q)| add(acc, mul(p, q)))
         };
         let mut b = vec![S::zero(); n];
         for ((row, &di), &ai) in r.iter().zip(&d).zip(&a) {
@@ -820,7 +823,10 @@ mod tests {
                 }
             }
             let (p, d) = (pinned.expect("pins"), dense_pin.expect("dense pins"));
-            assert!(p >= d, "seed {seed}: Wiedemann cannot pin before the row space allows");
+            assert!(
+                p >= d,
+                "seed {seed}: Wiedemann cannot pin before the row space allows"
+            );
             assert!(p <= d + 16, "seed {seed}: pinned at {p}, dense at {d}");
         }
     }

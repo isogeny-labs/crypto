@@ -2222,7 +2222,6 @@ fn bin_oracle<'a>(
     Ok(oracle)
 }
 
-
 /// `F_q` multiplications in one lift (`lift_x`) of a random abscissa
 /// that lifts, averaged over 32.
 fn f2m4_lift_muls(inst: &BinCurve) -> f64 {
