@@ -145,3 +145,58 @@ spec:
         reasons: [Drifted]
       - nodes: "100%"
         reasons: [Empty]
+---
+# Extra-high-memory runners for single processes that need more than the
+# 120 GiB highmem pod (msolve N=21 at >= 256 GB, a degree-5 dense closure at
+# about 768 GB). Memory-optimised x2iedn/x2iezn only, 16 or 32 vCPU (512 GiB
+# or 1 TiB), Spot only; one node at a time, inside the 64-vCPU lab cap.
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: gha-xmem
+spec:
+  template:
+    metadata:
+      labels:
+        gha.dev/pool: xmem
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: gha
+      taints:
+        - key: gha.dev/workload
+          value: runner
+          effect: NoSchedule
+        - key: gha.dev/pool
+          value: xmem
+          effect: NoSchedule
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: [amd64]
+        - key: kubernetes.io/os
+          operator: In
+          values: [linux]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: [spot]
+        - key: karpenter.k8s.aws/instance-family
+          operator: In
+          values: [x2iedn, x2iezn]
+        - key: karpenter.k8s.aws/instance-cpu
+          operator: In
+          values: ["16", "32"]
+      expireAfter: Never
+      terminationGracePeriod: 6h
+  limits:
+    cpu: "32"
+    memory: 1100Gi
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 5m
+    budgets:
+      - nodes: "0"
+        reasons: [Drifted]
+      - nodes: "100%"
+        reasons: [Empty]

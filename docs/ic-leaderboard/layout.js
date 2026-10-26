@@ -35,7 +35,7 @@
     return section;
   };
 
-  const libraryURL = 'https://aburan28.github.io/crypto/browser/#curves';
+  const libraryURL = 'https://isogeny-labs.github.io/crypto/browser/#curves';
   const originalSections = Array.from(root.querySelectorAll(':scope > section'));
   const footer = root.querySelector(':scope > footer');
   const nav = root.querySelector('.site-nav');
