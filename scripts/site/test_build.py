@@ -832,6 +832,16 @@ class BuildTests(unittest.TestCase):
                     missing.append("%s -> %s" % (rel, href))
         self.assertEqual(missing, [], "unresolvable internal links: %s" % missing)
 
+    def test_published_assets_do_not_link_to_the_retired_pages_origin(self):
+        # Absolute URLs bypass the internal-link check above. The repository
+        # moved to isogeny-labs, while the old /crypto/ Pages origin returns 404.
+        retired = "aburan28.github.io/crypto"
+        text_assets = (".html", ".js", ".css", ".xml", ".txt")
+        broken = [rel for rel in self.published
+                  if rel.endswith(text_assets)
+                  and retired in read(os.path.join(self.out, rel))]
+        self.assertEqual(broken, [], "retired GitHub Pages links: %s" % broken)
+
     def test_research_evidence_is_linked_absolutely(self):
         # research/ is not part of the site artifact, so a relative
         # ../research/<path> link resolves in the working tree and 404s once
