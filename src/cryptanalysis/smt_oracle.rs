@@ -40,7 +40,7 @@ use crate::cryptanalysis::koblitz_groebner::{matrix_f4_f2, DecompositionSystem, 
 use crate::cryptanalysis::koblitz_index_calculus::{
     absolute_trace_bit, lift_candidate, FrobeniusFactorBase, KoblitzCurve, SatDecompositionStats,
 };
-use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{bit, F2BoolMono, F2BoolPoly, Mask, MASK_BITS};
 use crate::cryptanalysis::wdsat_oracle::AnfRow;
 use num_bigint::BigUint;
 use std::collections::HashMap;
@@ -48,7 +48,10 @@ use std::fmt::Write as _;
 use std::fs;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
+
+static NEXT_SCRIPT_ID: AtomicU64 = AtomicU64::new(0);
 
 /// How the Boolean system is written in SMT-LIB 2.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -406,7 +409,11 @@ pub fn run_smt(script: &str, round: usize, options: &SmtSolveOptions) -> Result<
         None => {
             let dir = options.work_dir.clone().unwrap_or_else(std::env::temp_dir);
             fs::create_dir_all(&dir).map_err(|e| format!("create work dir: {e}"))?;
-            dir.join(format!("smt-pdp-{}-{round}.smt2", std::process::id()))
+            let script_id = NEXT_SCRIPT_ID.fetch_add(1, Ordering::Relaxed);
+            dir.join(format!(
+                "smt-pdp-{}-{script_id}-{round}.smt2",
+                std::process::id()
+            ))
         }
     };
     fs::write(&path, script).map_err(|e| format!("write script {}: {e}", path.display()))?;
@@ -557,8 +564,8 @@ fn build_rows(
     equations
 }
 
-fn model_to_u64(model: &[bool]) -> Option<u64> {
-    if model.len() > 64 {
+fn model_to_u64(model: &[bool]) -> Option<Mask> {
+    if model.len() > MASK_BITS {
         return None;
     }
     Some(
@@ -566,7 +573,7 @@ fn model_to_u64(model: &[bool]) -> Option<u64> {
             .iter()
             .enumerate()
             .filter(|(_, b)| **b)
-            .fold(0u64, |acc, (i, _)| acc | (1u64 << i)),
+            .fold(0 as Mask, |acc, (i, _)| acc | bit(i as u32)),
     )
 }
 
@@ -741,6 +748,10 @@ pub fn rows_satisfied(rows: &[AnfRow], model: &[bool]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     fn row(monos: &[&[u32]], constant: bool) -> AnfRow {
         AnfRow {

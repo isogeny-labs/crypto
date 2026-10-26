@@ -1,0 +1,151 @@
+name: N83 fresh cold EC2 shared-binary retry
+
+on:
+  push:
+    branches: [codex/n83-shared-binary-retry-20261024]
+    paths:
+      - .github/workflows/n83-fresh-cold-ec2-shared-binary-retry.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n83-fresh-cold-finalists-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  shared-binary-build:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-shared-binary-retry-20261024'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replay the frozen dispatch and test/build once
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-shared-build-target"
+          export CARGO_BUILD_JOBS=2
+          python3 research/n83_fresh_cold_finalists_20261019/check_dispatch.py
+          python3 research/n83_fresh_cold_finalists_20261019/audit_fresh.py
+          python3 -m research.n83_fresh_cold_finalists_20261019.test_arms
+          python3 -m research.n83_fresh_cold_finalists_20261019.test_preflight
+          python3 -m research.n83_fresh_cold_finalists_20261019.test_select
+          python3 -m research.n83_fresh_cold_finalists_20261019.test_provider_jobs
+          cargo test --release --locked --example koblitz_orbit_dlp_fast
+          cargo test --release --locked --example n83_rho_optimization_eval
+          cargo build --release --locked --example koblitz_orbit_dlp_fast
+          cargo build --release --locked --example n83_rho_optimization_eval
+          mkdir -p "$RUNNER_TEMP/n83-shared-binaries"
+          cp "$CARGO_TARGET_DIR/release/examples/koblitz_orbit_dlp_fast" "$RUNNER_TEMP/n83-shared-binaries/"
+          cp "$CARGO_TARGET_DIR/release/examples/n83_rho_optimization_eval" "$RUNNER_TEMP/n83-shared-binaries/"
+          cd "$RUNNER_TEMP/n83-shared-binaries"
+          sha256sum koblitz_orbit_dlp_fast n83_rho_optimization_eval > SHA256SUMS
+          tar -czf "$GITHUB_WORKSPACE/n83-shared-binaries.tar.gz" SHA256SUMS koblitz_orbit_dlp_fast n83_rho_optimization_eval
+      - name: Publish the single build
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-shared-binaries
+          path: n83-shared-binaries.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+
+  fresh-cold-finalists-stratum:
+    needs: shared-binary-build
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-shared-binary-retry-20261024'
+    strategy:
+      fail-fast: false
+      matrix:
+        stratum: [0, 1]
+    runs-on: [self-hosted, Linux, X64, n83-ec2-20261024]
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Replay sealed points choice and dispatch
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          mkdir -p "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}"
+          python3 research/n83_fresh_cold_finalists_20261019/generate_fresh.py > \
+            "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/fixture-check.json"
+          python3 research/n83_fresh_cold_finalists_20261019/audit_fresh.py > \
+            "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/exclusion-check.json"
+          python3 -m research.n83_fresh_cold_finalists_20261019.test_arms > \
+            "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/arms-test.json"
+          python3 -m research.n83_fresh_cold_finalists_20261019.test_preflight > \
+            "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/preflight-test.json"
+          python3 -m research.n83_fresh_cold_finalists_20261019.test_select > \
+            "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/selector-test.json"
+          python3 -m research.n83_fresh_cold_finalists_20261019.test_provider_jobs > \
+            "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/provider-test.json"
+          python3 research/n83_fresh_cold_finalists_20261019/check_dispatch.py > \
+            "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/dispatch-check.json"
+          mkdir -p "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/k3300-pilot"
+          tar -xzf research/n83_final_extended_20261018/pilots/k3300.tar.gz \
+            -C "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/k3300-pilot"
+          python3 -m research.n83_fresh_cold_finalists_20261019.verify_mid \
+            "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/k3300-pilot/n83-k3300-current-pilot-20261018" > \
+            "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/k3300-pilot-check.json"
+          python3 research/n83_fresh_cold_finalists_20261019/run.py \
+            --preflight --stratum "${{ matrix.stratum }}" \
+            --validated research/n83_fresh_cold_finalists_20261019/upstream_validated.json \
+            --selection research/n83_fresh_cold_finalists_20261019/upstream_selection.json > \
+            "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/schedule-preflight.json"
+          rustc --version > "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/rustc-version.txt"
+          cargo --version > "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/cargo-version.txt"
+
+      - name: Download the one shared build
+        uses: actions/download-artifact@v4
+        with:
+          name: n83-shared-binaries
+          path: n83-shared-binary-artifact
+
+      - name: Verify the shared executable hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/n83-shared-binaries"
+          tar -xzf "$GITHUB_WORKSPACE/n83-shared-binary-artifact/n83-shared-binaries.tar.gz" -C "$RUNNER_TEMP/n83-shared-binaries"
+          cd "$RUNNER_TEMP/n83-shared-binaries"
+          sha256sum -c SHA256SUMS
+          cp SHA256SUMS "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/shared-binary-sha256sums.txt"
+
+      - name: Run selected extended factor bases with calibrated same-point rho
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}-target"
+          python3 research/n83_fresh_cold_finalists_20261019/run.py \
+            --stratum "${{ matrix.stratum }}" \
+            --validated research/n83_fresh_cold_finalists_20261019/upstream_validated.json \
+            --selection research/n83_fresh_cold_finalists_20261019/upstream_selection.json \
+            --binary "$RUNNER_TEMP/n83-shared-binaries/koblitz_orbit_dlp_fast" \
+            --rho-binary "$RUNNER_TEMP/n83-shared-binaries/n83_rho_optimization_eval" \
+            --output "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/results" \
+            2>&1 | tee "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/run.log"
+
+      - name: Independently replay bases relations scalars and resources
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/results" ]; then
+            python3 research/n83_fresh_cold_finalists_20261019/verify.py \
+              "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/results" \
+              --stratum "${{ matrix.stratum }}" \
+              --validated research/n83_fresh_cold_finalists_20261019/upstream_validated.json \
+              --selection research/n83_fresh_cold_finalists_20261019/upstream_selection.json \
+              2>&1 | tee "$RUNNER_TEMP/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/verify.log"
+          fi
+
+      - name: Preserve all raw receipts and failed pairs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-fresh-cold-finalists-stratum-${{ matrix.stratum }}/
+          if-no-files-found: error
+          retention-days: 14
