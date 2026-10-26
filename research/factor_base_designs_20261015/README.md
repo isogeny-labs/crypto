@@ -367,6 +367,18 @@ EC2 `r7i.8xlarge` (256 GiB), run one after the other, with
 R256-A0 memory-bound near 6100 s, R256-A11 a timeout at 14 400 s near 90 GB.
 Amendment 13 stays registered, with no rows. No R256 row exists yet.
 
+### Amendment 15: registered (checkpointed R256 run)
+
+Amendment 14's first attempts produced no row: two failed builds and a Spot
+reclaim that destroyed about 73 min of R256-A0. Amendment 15 adds checkpoint and
+resume to the F4 engine (`F4Options::checkpointing`, off by default), a
+`--checkpoint-every` flag to the study binary, a persistent Spot request that
+replaces a reclaimed host and resumes from S3, and a self-test that must pass
+before any cell runs. It changes no cell, seed, rule or prediction; see
+PREREGISTRATION.md, Amendment 15. Evidence that a resumed system gives the
+uninterrupted row: `tests/f4_checkpoint_resume.rs` and, on the host,
+`scripts/selftest_checkpoint.sh` (its output goes to the run's report).
+
 ### Close-out of the prime-field slope line (2026-10-19)
 
 Observations only; no new run. Sources: `runs/analysis-amendment4.txt`,

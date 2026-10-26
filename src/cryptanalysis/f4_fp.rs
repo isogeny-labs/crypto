@@ -454,6 +454,15 @@ pub struct F4Options {
     pub max_pairs_per_step: Option<usize>,
     /// Collect per-step diagnostics for explicit research runs. Disabled by default.
     pub capture_run_log: bool,
+    /// Write the run's state to this file (and resume from it if it already
+    /// holds a checkpoint of this very run), at the top of a step once the
+    /// given time has passed since the last write.  `None` (the default)
+    /// leaves the run untouched.  See [`F4Options::checkpointing`].
+    pub checkpoint: Option<(std::path::PathBuf, Duration)>,
+    /// Test hook for [`F4Options::checkpointing`]: stop (reported as
+    /// `timed_out`) right after writing the checkpoint of the first step
+    /// whose number is at least this.
+    pub checkpoint_stop_after: Option<usize>,
 }
 
 impl F4Options {
@@ -468,7 +477,27 @@ impl F4Options {
             hilbert_expect: None,
             max_pairs_per_step: None,
             capture_run_log: false,
+            checkpoint: None,
+            checkpoint_stop_after: None,
         }
+    }
+    /// Checkpoint the run to `path` and resume from it.
+    ///
+    /// At the top of a step, when `every` has passed since the last write, the
+    /// state that survives a step (basis, liveness flags, pending and
+    /// over-the-bound pairs, the step counters, the field operations and the
+    /// time spent so far) is written atomically to `path`; the previous file
+    /// is kept as `path.prev`.  A later call with the same input and options
+    /// that finds a valid checkpoint continues from it: the counted field
+    /// operations, the steps and the matrix sizes are those of an
+    /// uninterrupted run, and the deadline counts the time already spent.  A
+    /// checkpoint of another system is refused.  A step in flight when the
+    /// process dies is redone.  The `ms` of the report is the run's total.
+    /// Not combined with traces, the Hilbert or staircase stops, or the run
+    /// log.
+    pub fn checkpointing(mut self, path: std::path::PathBuf, every: Duration) -> Self {
+        self.checkpoint = Some((path, every));
+        self
     }
     /// Block-aware reduction by the given `Z/3`-weights.
     pub fn with_weights(mut self, weights: Vec<u8>) -> Self {
@@ -507,6 +536,369 @@ impl F4Options {
     pub fn capturing_run_log(mut self) -> Self {
         self.capture_run_log = true;
         self
+    }
+}
+
+// ── Checkpoint and resume ──────────────────────────────────────────
+
+/// The time a checkpoint at `path` (or its `.prev`) has already spent, or
+/// `None` when there is none.  Only the header is read: the run itself
+/// verifies the whole file before it resumes, and reports the time it
+/// resumed with in `F4Report::resumed_ms`.
+pub fn checkpoint_elapsed(path: &std::path::Path) -> Option<Duration> {
+    ckpt::header_elapsed(path)
+}
+
+/// On-disk state of a run between two steps; see [`F4Options::checkpointing`].
+mod ckpt {
+    use super::*;
+    use std::fs::File;
+    use std::io::{self, BufReader, BufWriter, Read, Write};
+    use std::path::{Path, PathBuf};
+
+    const MAGIC: &[u8; 8] = b"F4CKPT01";
+
+    #[inline]
+    fn mix(h: u64, v: u64) -> u64 {
+        (h ^ v)
+            .wrapping_mul(0x9E37_79B9_7F4A_7C15)
+            .rotate_left(29)
+            .wrapping_add(0x6A09_E667_F3BC_C909)
+    }
+
+    /// Writer that folds every value into a running hash.
+    struct W<T: Write> {
+        w: BufWriter<T>,
+        h: u64,
+    }
+    impl<T: Write> W<T> {
+        fn u64(&mut self, v: u64) -> io::Result<()> {
+            self.h = mix(self.h, v);
+            self.w.write_all(&v.to_le_bytes())
+        }
+        fn u32(&mut self, v: u32) -> io::Result<()> {
+            self.h = mix(self.h, v as u64);
+            self.w.write_all(&v.to_le_bytes())
+        }
+        fn poly(&mut self, f: &Poly) -> io::Result<()> {
+            self.u64(f.len() as u64)?;
+            for (e, c) in f {
+                for &x in e {
+                    self.u32(x)?;
+                }
+                self.u64(*c)?;
+            }
+            Ok(())
+        }
+        fn pairs(&mut self, ps: &[Pair]) -> io::Result<()> {
+            self.u64(ps.len() as u64)?;
+            for pr in ps {
+                self.u64(pr.i as u64)?;
+                self.u64(pr.j as u64)?;
+                for &x in &pr.lcm {
+                    self.u32(x)?;
+                }
+                self.u64(pr.lcm_p as u64)?;
+                self.u64((pr.lcm_p >> 64) as u64)?;
+                self.u32(pr.degree)?;
+            }
+            Ok(())
+        }
+    }
+
+    struct R<T: Read> {
+        r: BufReader<T>,
+        h: u64,
+    }
+    impl<T: Read> R<T> {
+        fn raw8(&mut self) -> io::Result<u64> {
+            let mut b = [0u8; 8];
+            self.r.read_exact(&mut b)?;
+            Ok(u64::from_le_bytes(b))
+        }
+        fn u64(&mut self) -> io::Result<u64> {
+            let v = self.raw8()?;
+            self.h = mix(self.h, v);
+            Ok(v)
+        }
+        fn u32(&mut self) -> io::Result<u32> {
+            let mut b = [0u8; 4];
+            self.r.read_exact(&mut b)?;
+            let v = u32::from_le_bytes(b);
+            self.h = mix(self.h, v as u64);
+            Ok(v)
+        }
+        /// A length, bounded so a corrupt file cannot ask for absurd memory.
+        fn len(&mut self) -> io::Result<usize> {
+            let v = self.u64()?;
+            if v > 1 << 40 {
+                return Err(io::Error::new(io::ErrorKind::InvalidData, "absurd length"));
+            }
+            Ok(v as usize)
+        }
+        fn poly(&mut self, n: usize) -> io::Result<Poly> {
+            let len = self.len()?;
+            let mut f = Poly::with_capacity(len.min(1 << 20));
+            for _ in 0..len {
+                let mut e = Vec::with_capacity(n);
+                for _ in 0..n {
+                    e.push(self.u32()?);
+                }
+                f.push((e, self.u64()?));
+            }
+            Ok(f)
+        }
+        fn pairs(&mut self, n: usize) -> io::Result<Vec<Pair>> {
+            let len = self.len()?;
+            let mut ps = Vec::with_capacity(len.min(1 << 20));
+            for _ in 0..len {
+                let i = self.u64()? as usize;
+                let j = self.u64()? as usize;
+                let mut lcm = Vec::with_capacity(n);
+                for _ in 0..n {
+                    lcm.push(self.u32()?);
+                }
+                let lo = self.u64()? as u128;
+                let hi = self.u64()? as u128;
+                ps.push(Pair {
+                    i,
+                    j,
+                    lcm,
+                    lcm_p: lo | hi << 64,
+                    degree: self.u32()?,
+                });
+            }
+            Ok(ps)
+        }
+    }
+
+    pub(super) struct Snap<'a> {
+        pub fingerprint: u64,
+        pub n_vars: usize,
+        pub elapsed: Duration,
+        pub field_ops: u64,
+        pub basis: &'a [Poly],
+        pub alive: &'a [bool],
+        pub pairs: &'a [Pair],
+        pub above: &'a [Pair],
+        pub pairs_above_bound: usize,
+        pub steps: usize,
+        pub max_rows: usize,
+        pub max_cols: usize,
+        pub degree_reached: u32,
+        pub solving_degree: u32,
+        pub learned: (u32, usize, usize),
+        pub blocked_steps: usize,
+    }
+
+    pub(super) struct Loaded {
+        pub elapsed: Duration,
+        pub field_ops: u64,
+        pub basis: Vec<Poly>,
+        pub alive: Vec<bool>,
+        pub pairs: Vec<Pair>,
+        pub above: Vec<Pair>,
+        pub pairs_above_bound: usize,
+        pub steps: usize,
+        pub max_rows: usize,
+        pub max_cols: usize,
+        pub degree_reached: u32,
+        pub solving_degree: u32,
+        pub learned: (u32, usize, usize),
+        pub blocked_steps: usize,
+    }
+
+    fn sibling(path: &Path, ext: &str) -> PathBuf {
+        let mut s = path.as_os_str().to_owned();
+        s.push(ext);
+        PathBuf::from(s)
+    }
+
+    /// Identity of a run: the system, the field and every option that
+    /// changes the steps.  A checkpoint of another identity is refused.
+    pub(super) fn fingerprint(
+        input: &[Poly],
+        n_vars: usize,
+        p: u64,
+        opts: &F4Options,
+        mode: u8,
+        gm: bool,
+        packed: bool,
+    ) -> u64 {
+        let mut h = 0x4634_434B_5054u64;
+        for v in [
+            n_vars as u64,
+            p,
+            opts.max_degree as u64,
+            mode as u64,
+            gm as u64,
+            packed as u64,
+        ] {
+            h = mix(h, v);
+        }
+        for b in format!(
+            "{:?}|{:?}|{:?}",
+            opts.order, opts.max_pairs_per_step, opts.weights
+        )
+        .bytes()
+        {
+            h = mix(h, b as u64);
+        }
+        h = mix(h, input.len() as u64);
+        for f in input {
+            h = mix(h, f.len() as u64);
+            for (e, c) in f {
+                for &x in e {
+                    h = mix(h, x as u64);
+                }
+                h = mix(h, *c);
+            }
+        }
+        h
+    }
+
+    /// Write atomically: a temporary file, synced, then renamed over `path`
+    /// (the file it replaces becomes `path.prev`).  Returns the size.
+    pub(super) fn save(path: &Path, s: &Snap) -> io::Result<u64> {
+        let tmp = sibling(path, ".tmp");
+        let mut w = W {
+            w: BufWriter::with_capacity(1 << 20, File::create(&tmp)?),
+            h: 0,
+        };
+        w.w.write_all(MAGIC)?;
+        w.u64(s.fingerprint)?;
+        w.u64(s.n_vars as u64)?;
+        w.u64(s.elapsed.as_nanos() as u64)?;
+        w.u64(s.field_ops)?;
+        w.u64(s.steps as u64)?;
+        w.u64(s.max_rows as u64)?;
+        w.u64(s.max_cols as u64)?;
+        w.u32(s.degree_reached)?;
+        w.u32(s.solving_degree)?;
+        w.u32(s.learned.0)?;
+        w.u64(s.learned.1 as u64)?;
+        w.u64(s.learned.2 as u64)?;
+        w.u64(s.pairs_above_bound as u64)?;
+        w.u64(s.blocked_steps as u64)?;
+        w.u64(s.basis.len() as u64)?;
+        for (f, &a) in s.basis.iter().zip(s.alive) {
+            w.u32(a as u32)?;
+            w.poly(f)?;
+        }
+        w.pairs(s.pairs)?;
+        w.pairs(s.above)?;
+        let h = w.h;
+        w.w.write_all(&h.to_le_bytes())?;
+        w.w.flush()?;
+        let file = w.w.into_inner().map_err(|e| e.into_error())?;
+        file.sync_all()?;
+        let bytes = file.metadata()?.len();
+        drop(file);
+        if path.exists() {
+            std::fs::rename(path, sibling(path, ".prev"))?;
+        }
+        std::fs::rename(&tmp, path)?;
+        Ok(bytes)
+    }
+
+    fn read_one(path: &Path, want: Option<u64>) -> io::Result<Loaded> {
+        let bad = |m: &str| io::Error::new(io::ErrorKind::InvalidData, m.to_string());
+        let mut r = R {
+            r: BufReader::with_capacity(1 << 20, File::open(path)?),
+            h: 0,
+        };
+        let mut magic = [0u8; 8];
+        r.r.read_exact(&mut magic)?;
+        if &magic != MAGIC {
+            return Err(bad("not a checkpoint"));
+        }
+        let fp = r.u64()?;
+        if want.is_some_and(|w| w != fp) {
+            return Err(bad("checkpoint of another system or options"));
+        }
+        let n = r.u64()? as usize;
+        if n == 0 || n > 4096 {
+            return Err(bad("absurd variable count"));
+        }
+        let elapsed = Duration::from_nanos(r.u64()?);
+        let field_ops = r.u64()?;
+        let steps = r.u64()? as usize;
+        let max_rows = r.u64()? as usize;
+        let max_cols = r.u64()? as usize;
+        let degree_reached = r.u32()?;
+        let solving_degree = r.u32()?;
+        let l0 = r.u32()?;
+        let l1 = r.u64()? as usize;
+        let l2 = r.u64()? as usize;
+        let pairs_above_bound = r.u64()? as usize;
+        let blocked_steps = r.u64()? as usize;
+        let nb = r.len()?;
+        let mut basis = Vec::with_capacity(nb.min(1 << 20));
+        let mut alive = Vec::with_capacity(nb.min(1 << 20));
+        for _ in 0..nb {
+            alive.push(r.u32()? != 0);
+            basis.push(r.poly(n)?);
+        }
+        let pairs = r.pairs(n)?;
+        let above = r.pairs(n)?;
+        let h = r.h;
+        if r.raw8()? != h {
+            return Err(bad("checksum mismatch"));
+        }
+        let mut extra = [0u8; 1];
+        if r.r.read(&mut extra)? != 0 {
+            return Err(bad("trailing bytes"));
+        }
+        Ok(Loaded {
+            elapsed,
+            field_ops,
+            basis,
+            alive,
+            pairs,
+            above,
+            pairs_above_bound,
+            steps,
+            max_rows,
+            max_cols,
+            degree_reached,
+            solving_degree,
+            learned: (l0, l1, l2),
+            blocked_steps,
+        })
+    }
+
+    /// The elapsed time in the header of `path`, else of `path.prev`.
+    pub(super) fn header_elapsed(path: &Path) -> Option<Duration> {
+        for p in [path.to_path_buf(), sibling(path, ".prev")] {
+            let Ok(f) = File::open(&p) else { continue };
+            let mut r = R {
+                r: BufReader::new(f),
+                h: 0,
+            };
+            let mut magic = [0u8; 8];
+            if r.r.read_exact(&mut magic).is_err() || &magic != MAGIC {
+                continue;
+            }
+            if let (Ok(_fp), Ok(_n), Ok(ns)) = (r.u64(), r.u64(), r.u64()) {
+                return Some(Duration::from_nanos(ns));
+            }
+        }
+        None
+    }
+
+    /// The newest valid checkpoint: `path`, else `path.prev`.  A file that
+    /// exists but fails to read is reported on stderr, not skipped silently.
+    pub(super) fn load_best(path: &Path, want: Option<u64>) -> Option<Loaded> {
+        for p in [path.to_path_buf(), sibling(path, ".prev")] {
+            if !p.exists() {
+                continue;
+            }
+            match read_one(&p, want) {
+                Ok(l) => return Some(l),
+                Err(e) => eprintln!("f4: checkpoint {} refused: {e}", p.display()),
+            }
+        }
+        None
     }
 }
 
@@ -754,6 +1146,9 @@ pub struct F4Report {
     pub hilbert: HilbertStop,
     /// Multiplications of the regularity check (inside `field_ops`).
     pub hilbert_check_ops: u64,
+    /// Milliseconds of the run (inside `ms`) that a resumed checkpoint had
+    /// already spent; 0 when the run did not resume.
+    pub resumed_ms: f64,
 }
 
 /// What [`F4Options::stopping_by_hilbert`] did.
@@ -2120,7 +2515,20 @@ fn f4_with_arithmetic(
 ) -> F4Report {
     let t0 = Instant::now();
     let ops0 = field_ops_now();
+    // Time and field operations spent before a resumed checkpoint.
+    let carried = std::cell::Cell::new(Duration::ZERO);
+    let ops_carry = std::cell::Cell::new(0u64);
     let mut blocked_steps = 0usize;
+    if opts.checkpoint.is_some() {
+        assert!(
+            matches!(trace, TraceMode::Off)
+                && opts.hilbert_expect.is_none()
+                && opts.stop_hilbert.is_none()
+                && opts.stop_staircase.is_none()
+                && !opts.capture_run_log,
+            "checkpointing is not combined with traces, the Hilbert or staircase stops, or the run log"
+        );
+    }
     let debug = std::env::var("F4_DEBUG").is_ok();
     if debug {
         eprintln!(
@@ -2186,15 +2594,16 @@ fn f4_with_arithmetic(
             steps,
             max_rows: mr,
             max_cols: mc,
-            ms: t0.elapsed().as_secs_f64() * 1e3,
+            ms: (t0.elapsed() + carried.get()).as_secs_f64() * 1e3,
             timed_out: to,
             pairs_above_bound: pab,
             staircase_at_stop: None,
-            field_ops: field_ops_now() - ops0,
+            field_ops: ops_carry.get() + (field_ops_now() - ops0),
             blocked_steps: bs,
             trace_mismatch: false,
             hilbert: HilbertStop::Off,
             hilbert_check_ops: 0,
+            resumed_ms: carried.get().as_secs_f64() * 1e3,
         }
     };
 
@@ -2325,6 +2734,49 @@ fn f4_with_arithmetic(
     let mut hilbert_violated = false;
     RUN_LOG.with(|l| *l.borrow_mut() = RunLog::default());
 
+    let ck_fp = opts
+        .checkpoint
+        .as_ref()
+        .map(|_| ckpt::fingerprint(input, n_vars, p, opts, mode, gm, packed.is_some()));
+    let mut resumed_opts: Option<F4Options> = None;
+    if let (Some((path, _)), Some(fp)) = (&opts.checkpoint, ck_fp) {
+        if let Some(l) = ckpt::load_best(path, Some(fp)) {
+            eprintln!(
+                "f4: resumed {} at step {}, {:.1} s of the budget already spent, {} basis elements, {} pairs",
+                path.display(),
+                l.steps,
+                l.elapsed.as_secs_f64(),
+                l.basis.len(),
+                l.pairs.len()
+            );
+            basis = l.basis;
+            alive = l.alive;
+            pairs = l.pairs;
+            above = l.above;
+            pairs_above_bound = l.pairs_above_bound;
+            steps = l.steps;
+            max_rows = l.max_rows;
+            max_cols = l.max_cols;
+            degree_reached = l.degree_reached;
+            solving_degree = l.solving_degree;
+            learned = l.learned;
+            blocked_steps = l.blocked_steps;
+            lm_packed = packed
+                .as_ref()
+                .map(|_| basis.iter().map(|f| pack(&f[0].0)).collect());
+            carried.set(l.elapsed);
+            ops_carry.set(l.field_ops);
+            // the deadline counts the time already spent
+            let mut o = opts.clone();
+            o.deadline = opts
+                .deadline
+                .map(|d| d.checked_sub(l.elapsed).unwrap_or_else(Instant::now));
+            resumed_opts = Some(o);
+        }
+    }
+    let opts = resumed_opts.as_ref().unwrap_or(opts);
+    let mut last_ckpt = Instant::now();
+
     loop {
         if let (Some(h), false) = (&opts.hilbert_expect, hilbert_violated) {
             while let Some(d) = pairs.iter().map(|pr| pr.degree).min() {
@@ -2393,6 +2845,55 @@ fn f4_with_arithmetic(
         }
         if debug {
             eprintln!("f4: {} pairs pending, basis {}", pairs.len(), basis.len());
+        }
+        if let (Some((path, every)), Some(fp)) = (&opts.checkpoint, ck_fp) {
+            let stop = opts.checkpoint_stop_after.is_some_and(|k| steps >= k);
+            if stop || last_ckpt.elapsed() >= *every {
+                let tw = Instant::now();
+                let snap = ckpt::Snap {
+                    fingerprint: fp,
+                    n_vars,
+                    elapsed: t0.elapsed() + carried.get(),
+                    field_ops: ops_carry.get() + (field_ops_now() - ops0),
+                    basis: &basis,
+                    alive: &alive,
+                    pairs: &pairs,
+                    above: &above,
+                    pairs_above_bound,
+                    steps,
+                    max_rows,
+                    max_cols,
+                    degree_reached,
+                    solving_degree,
+                    learned,
+                    blocked_steps,
+                };
+                match ckpt::save(path, &snap) {
+                    Ok(bytes) => eprintln!(
+                        "f4: checkpoint {} at step {steps}: {bytes} bytes in {:.1} s",
+                        path.display(),
+                        tw.elapsed().as_secs_f64()
+                    ),
+                    Err(e) => eprintln!("f4: CHECKPOINT WRITE FAILED {}: {e}", path.display()),
+                }
+                last_ckpt = Instant::now();
+                if stop {
+                    return report(
+                        &basis,
+                        &alive,
+                        false,
+                        degree_reached,
+                        solving_degree,
+                        steps,
+                        max_rows,
+                        max_cols,
+                        true,
+                        pairs_above_bound,
+                        learned,
+                        blocked_steps,
+                    );
+                }
+            }
         }
         if let Some(d) = opts.deadline {
             if Instant::now() > d {
@@ -3039,11 +3540,11 @@ fn f4_with_arithmetic(
         steps,
         max_rows,
         max_cols,
-        ms: t0.elapsed().as_secs_f64() * 1e3,
+        ms: (t0.elapsed() + carried.get()).as_secs_f64() * 1e3,
         timed_out: false,
         pairs_above_bound,
         staircase_at_stop,
-        field_ops: field_ops_now() - ops0,
+        field_ops: ops_carry.get() + (field_ops_now() - ops0),
         blocked_steps,
         trace_mismatch: mismatch,
         hilbert: if opts.hilbert_expect.is_some() {
@@ -3056,6 +3557,7 @@ fn f4_with_arithmetic(
             HilbertStop::Off
         },
         hilbert_check_ops: 0,
+        resumed_ms: carried.get().as_secs_f64() * 1e3,
     }
 }
 

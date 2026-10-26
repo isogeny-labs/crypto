@@ -1452,3 +1452,81 @@ us-west-2 are about $0.76 to $1.07 per hour, below the approved cost. A Spot
 reclaim ends the instance and leaves the unfinished cell *not decided* (see
 "Failure of the host"); a system's row is written when that system ends, so
 rows already pushed stay. This note was committed before any R256 row exists.
+
+### Amendment 15, 2026-10-26: checkpointed F4 and an auto-resuming host for the R256 cells, before any R256 row
+
+Registered after Amendment 14 and before any R256 row exists. It changes no
+cell, seed, instrument, limit, decision rule, prediction or counted quantity.
+It changes how the two Amendment 14 cells are run, because the way Amendment
+14 ran them lost work.
+
+**What happened to the first attempts** (no attempt produced a row; recorded
+here and not removed). Instance `i-0acb1955…` and `i-086260fb…` failed in the
+build (a path dependency missing from the source archive; then no
+`libssl-dev`). Instance `i-0f4703b6…` built and ran R256-A0 from 18:37Z; AWS
+reclaimed the Spot host at about 19:50Z (reason "no Spot capacity"), after
+about 73 min of A0 and before any row. The binary had no way to resume, so
+that work is lost. Instance `i-0d3eaa94…` (one-time Spot request, same binary)
+was launched at about 20:20Z and is superseded by this amendment.
+
+**The mechanism.**
+- `f4_fp::F4Options::checkpointing(path, every)` (in `src/cryptanalysis/f4_fp.rs`)
+  writes, at the top of a step once `every` has passed since the last write,
+  the state that survives a step: the basis and its liveness flags, the pending
+  and over-the-bound pairs, the step counters, the field operations and the
+  time spent so far. The write is atomic (temporary file, sync, rename; the
+  previous file is kept as `.prev`) and carries a checksum and the identity of
+  the run (system, field, options). A later call with the same system finds
+  the file, verifies it in full, refuses another system's, falls back to
+  `.prev` if the newest file is corrupt, and continues from it. A step in
+  flight when the process dies is redone. Options are unchanged when
+  `checkpointing` is not called.
+- The study binary (`run --checkpoint-every SECONDS`) gives each child system a
+  checkpoint path. On resume the F4 deadline counts the time already spent: the
+  budget of 14 400 s is F4 compute time summed over segments, and downtime
+  between segments is not in it. The parent's hard limit is `budget + grace`
+  minus the time already spent. A row gains `segments` (processes that worked
+  on the system) and `ckpt_carried_s` (time already spent when the last segment
+  started). `time` is the total over segments; `process_wall_s` is the last
+  segment's. `peak_rss_kb` is the maximum over segments; a segment that was
+  killed contributes its peak up to its last 10 s sample, so for it the value
+  is a lower bound.
+- The row of a system that has been killed and resumed is the row of the
+  uninterrupted system for every counted field. This is tested, not argued:
+  `tests/f4_checkpoint_resume.rs` stops and resumes runs of random systems over
+  three primes at several steps, including twice in a row, and compares the
+  basis, `steps`, `max_rows`, `max_cols`, the solving degrees and `field_ops`
+  with the plain run (and mutating the carried field operations makes it fail).
+  On the host, before any cell, `scripts/selftest_checkpoint.sh` runs A0 `m = 3`,
+  `t = 4` plain, then with a checkpoint every second and two `SIGKILL`s, and
+  requires the same counted fields and at least two segments. A failure ends the
+  instance with no cell run.
+- Checkpoint writes cost wall time, which is in `time`, and no field
+  operations. Their cost at this system's size is not known before the run and
+  is reported with the rows. Writing every 600 s bounds what a reclaim loses to
+  about 600 s plus one step's remaining work, unless a single step is longer
+  than that, in which case it loses that step.
+
+**The host.** The same `r7i.8xlarge` in us-west-2, now under a *persistent*
+Spot request valid for 40 h, interruption behaviour terminate. A reclaimed host
+is replaced; the new one downloads the checkpoint and the rows from S3
+(`s3://crypto-autoresearcher/lab-results/factor-base-designs-a14/<commit>-ckpt/state/out`,
+synced from the host every 5 min), reuses the binary built on the first host
+(same sha256, so resumed segments run the same code), and calls
+`scripts/run_amendment15.sh`, which skips a cell that already has its row and
+resumes one that does not. Pre-flight and OOM records are appended, one section
+per segment. The instance holds temporary credentials (a 36 h federated token)
+that can only read and write that S3 prefix and cancel Spot requests; when both
+cells have rows it uploads, cancels its request and halts.
+
+**Amendment 14's "Failure of the host" is replaced for the R256 cells:** a
+reclaim no longer leaves a cell *not decided*. A cell is *not decided* only if
+it has no row when the request expires (40 h), if the self-test fails, or if
+the segments disagree on `V_kB` (the analysis compares the pre-flight
+sections). "A cell's rows all come from one attempt" now reads: a system's row
+comes from one system's chain of segments, resumed from its own checkpoints.
+
+**Unchanged:** the two cells and their commands (plus `--checkpoint-every`),
+the limit rule, the attribution rule, the identity checks, R1, R2 and the
+predictions of Amendment 14 (none of them depends on the number of
+segments). No prediction is made for the number of reclaims.
