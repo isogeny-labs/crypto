@@ -31,6 +31,7 @@ use num_bigint::BigUint;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
+use crate::cryptanalysis::ckpt::{Ckpt, Rd, Wr};
 use crate::cryptanalysis::gaudry_quartic_bin::{
     t_line_coef, BinCurve, BinD4Oracle, BinRelation, CurveB, PtB, TLineBase,
 };
@@ -176,6 +177,26 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
     seed: u64,
     max_steps: u64,
 ) -> (RhoResult, Option<S>) {
+    rho_negation_ckpt(g, generator, target, r, seed, max_steps, None)
+        .expect("a run without a checkpoint has no checkpoint error")
+}
+
+const RHO_MAGIC: &[u8; 4] = b"ECR1";
+
+/// [`rho_negation`] with an optional checkpoint (see `ckpt`).  After its
+/// set-up the walk is a deterministic loop, so a snapshot at a walk
+/// boundary is the loop's counters, its ledger and the distinguished-point
+/// table; the walk's start `[w]·stride` is recomputed on resume.  A resumed
+/// run ends with exactly the counts of an uninterrupted one.
+pub fn rho_negation_ckpt<G: CountedGroup, S: RhoScalar>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: S,
+    seed: u64,
+    max_steps: u64,
+    ckpt: Option<&Ckpt>,
+) -> Result<(RhoResult, Option<S>), String> {
     let start = Instant::now();
     let mut ops = GroupOps::default();
     let mut rng = StdRng::seed_from_u64(seed);
@@ -239,8 +260,120 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
     );
     let mut recent: std::collections::VecDeque<(u64, G::Elt, S, S)> =
         std::collections::VecDeque::with_capacity(window + 1);
+    let mut last_snap_walks = 0u64;
+    if let Some(ck) = ckpt {
+        if let Some(b) = ck.read("snap") {
+            let load = (|| -> Result<(), String> {
+                if b.len() < 4 || &b[..4] != RHO_MAGIC {
+                    return Err("not a checkpoint".into());
+                }
+                let mut rd = Rd::new(&b[4..]);
+                if rd.str()? != ck.key {
+                    return Err("checkpoint of another run".into());
+                }
+                let w = rd.u64()?;
+                if w == 0 {
+                    return Err("empty checkpoint".into());
+                }
+                dps = rd.u64()?;
+                start_adds = rd.u64()?;
+                useless = rd.u64()?;
+                verification_ops = rd.u64()?;
+                let t = [
+                    &mut tally.steps,
+                    &mut tally.look_ahead_adds,
+                    &mut tally.escapes,
+                    &mut tally.cycles_2,
+                    &mut tally.cycles_4,
+                    &mut tally.cycles_other,
+                    &mut tally.abandoned,
+                    &mut tally.capped,
+                    &mut tally.canonicalisations,
+                ];
+                for f in t {
+                    *f = rd.u64()?;
+                }
+                ops = GroupOps {
+                    adds: rd.u64()?,
+                    doubles: rd.u64()?,
+                    scalar_mults: rd.u64()?,
+                    ..GroupOps::default()
+                };
+                table.clear();
+                for _ in 0..rd.varint()? {
+                    let k = rd.u64()?;
+                    let a = rd.u128()?;
+                    let b2 = rd.u128()?;
+                    table.insert(k, (s_of(a), s_of(b2)));
+                }
+                if !rd.at_end() {
+                    return Err("trailing bytes".into());
+                }
+                walks = w;
+                last_snap_walks = w;
+                Ok(())
+            })();
+            if load.is_ok() {
+                // The start of walk `w` is `[w]·stride`, coefficients `w·(ta, tb)`.
+                let mut scratch = GroupOps::default();
+                let ws: S = s_of(u128::from(walks));
+                sx = mul_s(g, &mut scratch, stride, ws);
+                sa = S::mul_mod(ws, ta, r);
+                sb = S::mul_mod(ws, tb, r);
+            } else {
+                // Not ours, or damaged: start over (the counters above are
+                // reset by the fresh values below).
+                dps = 0;
+                start_adds = 0;
+                useless = 0;
+                verification_ops = 0;
+                tally = Tally::default();
+                table.clear();
+                walks = 0;
+                last_snap_walks = 0;
+                ops = setup;
+            }
+        }
+    }
 
     while tally.walk_ops() < max_steps && walks < max_steps {
+        if let Some(ck) = ckpt {
+            if walks > last_snap_walks && ck.due(walks) {
+                let mut w = Wr::default();
+                w.0.extend_from_slice(RHO_MAGIC);
+                w.str(&ck.key);
+                for v in [walks, dps, start_adds, useless, verification_ops] {
+                    w.u64(v);
+                }
+                for v in [
+                    tally.steps,
+                    tally.look_ahead_adds,
+                    tally.escapes,
+                    tally.cycles_2,
+                    tally.cycles_4,
+                    tally.cycles_other,
+                    tally.abandoned,
+                    tally.capped,
+                    tally.canonicalisations,
+                ] {
+                    w.u64(v);
+                }
+                for v in [ops.adds, ops.doubles, ops.scalar_mults] {
+                    w.u64(v);
+                }
+                let mut entries: Vec<_> = table.iter().collect();
+                entries.sort_by_key(|(k, _)| **k);
+                w.varint(entries.len() as u64);
+                for (k, (a, b2)) in entries {
+                    w.u64(*k);
+                    w.u128(a.to_u128());
+                    w.u128(b2.to_u128());
+                }
+                ck.write_atomic("snap", &w.0)?;
+                last_snap_walks = walks;
+                ck.snapshotted()?;
+            }
+        }
         walks += 1;
         if walks > 1 {
             sx = g.add(&mut ops, sx, stride);
@@ -411,7 +544,10 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
         recovered: recovered.and_then(|d| u64::try_from(d.to_u128()).ok()),
         counters,
     };
-    (res, recovered)
+    if let Some(ck) = ckpt {
+        ck.remove_all();
+    }
+    Ok((res, recovered))
 }
 
 // ── The k = 4 pipeline ──────────────────────────────────────────────────
@@ -437,6 +573,157 @@ pub fn run_f2m4<S: RhoScalar>(
     r: S,
     h: S,
     calib: &Calibration,
+) -> Result<WideRun<S>, String> {
+    run_f2m4_ckpt(ctx, inst, spec, oracle, r, h, calib, None)
+}
+
+// ── Checkpoint log of the oracle's calls ────────────────────────────────
+
+/// One oracle call's effect, as the checkpoint log keeps it: the additions
+/// and the lift failures it charged, and the relations it returned.
+struct CallRec {
+    adds: u64,
+    lift_failures: u64,
+    rels: Vec<BinRelation>,
+}
+
+fn encode_call(w: &mut Wr, adds: u64, lift_failures: u64, rels: &[BinRelation]) {
+    w.varint(adds);
+    w.varint(lift_failures);
+    w.varint(rels.len() as u64);
+    for rel in rels {
+        match rel {
+            BinRelation::Summands(s) => {
+                w.u8(0);
+                w.varint(s.len() as u64);
+                for &i in s {
+                    w.varint(i as u64);
+                }
+            }
+            BinRelation::Row(f) => {
+                w.u8(1);
+                w.varint(f.columns.len() as u64);
+                for &(c, v) in &f.columns {
+                    w.varint(c as u64);
+                    w.u128(v);
+                }
+                w.u128(f.a);
+                w.u128(f.b);
+            }
+        }
+    }
+}
+
+fn decode_call(r: &mut Rd) -> Result<CallRec, String> {
+    let adds = r.varint()?;
+    let lift_failures = r.varint()?;
+    let n = r.varint()? as usize;
+    let mut rels = Vec::with_capacity(n);
+    for _ in 0..n {
+        rels.push(match r.u8()? {
+            0 => {
+                let k = r.varint()? as usize;
+                let mut s = Vec::with_capacity(k);
+                for _ in 0..k {
+                    s.push(r.varint()? as usize);
+                }
+                BinRelation::Summands(s)
+            }
+            _ => {
+                let k = r.varint()? as usize;
+                let mut columns = Vec::with_capacity(k);
+                for _ in 0..k {
+                    let c = r.varint()? as usize;
+                    columns.push((c, r.u128()?));
+                }
+                let a = r.u128()?;
+                let b = r.u128()?;
+                BinRelation::Row(crate::cryptanalysis::gaudry_quartic_bin::LpFull { columns, a, b })
+            }
+        });
+    }
+    Ok(CallRec {
+        adds,
+        lift_failures,
+        rels,
+    })
+}
+
+/// What a snapshot records beyond the log: where the log stood, the
+/// oracle's and the matrix's counters, and two consistency checks.
+struct Snap {
+    calls: u64,
+    log_len: u64,
+    found: u64,
+    rows: u64,
+    oracle: Vec<u8>,
+    matrix: [u64; 7],
+}
+
+const SNAP_MAGIC: &[u8; 4] = b"ECK2";
+
+fn encode_snap(key: &str, s: &Snap) -> Vec<u8> {
+    let mut w = Wr::default();
+    w.0.extend_from_slice(SNAP_MAGIC);
+    w.str(key);
+    for v in [s.calls, s.log_len, s.found, s.rows] {
+        w.u64(v);
+    }
+    w.bytes(&s.oracle);
+    for v in s.matrix {
+        w.u64(v);
+    }
+    w.0
+}
+
+fn decode_snap(key: &str, bytes: &[u8]) -> Result<Snap, String> {
+    if bytes.len() < 4 || &bytes[..4] != SNAP_MAGIC {
+        return Err("not a checkpoint".into());
+    }
+    let mut r = Rd::new(&bytes[4..]);
+    if r.str()? != key {
+        return Err("checkpoint of another run".into());
+    }
+    let (calls, log_len, found, rows) = (r.u64()?, r.u64()?, r.u64()?, r.u64()?);
+    let oracle = r.bytes()?.to_vec();
+    let mut matrix = [0u64; 7];
+    for m in matrix.iter_mut() {
+        *m = r.u64()?;
+    }
+    Ok(Snap {
+        calls,
+        log_len,
+        found,
+        rows,
+        oracle,
+        matrix,
+    })
+}
+
+/// The calls a resumed run replays instead of solving.
+struct Playback {
+    bytes: Vec<u8>,
+    pos: usize,
+    left: u64,
+    snap: Snap,
+}
+
+/// [`run_f2m4`] with an optional checkpoint (see `ckpt`): the oracle's
+/// results are logged per call and a snapshot of the oracle's and the
+/// matrix's counters is written on the checkpoint's schedule; a run that
+/// finds a snapshot replays its walk against the log (no solving) and
+/// continues from the snapshot's state, ending with exactly the counts of
+/// an uninterrupted run.
+#[allow(clippy::too_many_arguments)]
+pub fn run_f2m4_ckpt<S: RhoScalar>(
+    ctx: &InstanceCtx<CurveB>,
+    inst: &BinCurve,
+    spec: &PipelineSpec,
+    oracle: &mut BinD4Oracle,
+    r: S,
+    h: S,
+    calib: &Calibration,
+    ckpt: Option<&Ckpt>,
 ) -> Result<WideRun<S>, String> {
     let started = Instant::now();
     if spec.targets != Targets::Walk {
@@ -515,7 +802,69 @@ pub fn run_f2m4<S: RhoScalar>(
         .collect();
     let walk_jumps = jump_count as u64;
 
+    // Checkpoint state: the log of the oracle's calls, and a playback of an
+    // earlier run's log when a snapshot is found.
+    let mut calls_done = 0u64;
+    let mut last_snap_calls = 0u64;
+    let mut log_buf = Wr::default();
+    let mut log_len = 0u64;
+    let mut log_file: Option<std::fs::File> = None;
+    let mut pb: Option<Playback> = None;
+    if let Some(ck) = ckpt {
+        let snap = ck.read("snap").and_then(|b| decode_snap(&ck.key, &b).ok());
+        let log = ck.read("log");
+        match (snap, log) {
+            (Some(snap), Some(log)) if log.len() as u64 >= snap.log_len && snap.calls > 0 => {
+                let bytes = log[..snap.log_len as usize].to_vec();
+                let f = std::fs::OpenOptions::new()
+                    .write(true)
+                    .open(ck.path("log"))
+                    .map_err(|e| e.to_string())?;
+                f.set_len(snap.log_len).map_err(|e| e.to_string())?;
+                log_len = snap.log_len;
+                log_file = Some(
+                    std::fs::OpenOptions::new()
+                        .append(true)
+                        .open(ck.path("log"))
+                        .map_err(|e| e.to_string())?,
+                );
+                last_snap_calls = snap.calls;
+                pb = Some(Playback {
+                    bytes,
+                    pos: 0,
+                    left: snap.calls,
+                    snap,
+                });
+            }
+            _ => {
+                log_file = Some(std::fs::File::create(ck.path("log")).map_err(|e| e.to_string())?);
+            }
+        }
+    }
+
     while trials < max_trials {
+        // A snapshot, between calls: every call so far is fully processed.
+        if let (Some(ck), None) = (ckpt, &pb) {
+            if calls_done > last_snap_calls && ck.due(calls_done) {
+                use std::io::Write as _;
+                let f = log_file.as_mut().expect("a checkpointed run has a log");
+                f.write_all(&log_buf.0).map_err(|e| e.to_string())?;
+                f.sync_data().map_err(|e| e.to_string())?;
+                log_len += log_buf.0.len() as u64;
+                log_buf.0.clear();
+                let snap = Snap {
+                    calls: calls_done,
+                    log_len,
+                    found,
+                    rows: matrix.rows_stored() as u64,
+                    oracle: oracle.export_state()?,
+                    matrix: matrix.export_counters(),
+                };
+                ck.write_atomic("snap", &encode_snap(&ck.key, &snap))?;
+                last_snap_calls = calls_done;
+                ck.snapshotted()?;
+            }
+        }
         if walk_fresh || segment_steps >= segment_cap {
             if walk_restarts == 0 {
                 wa = gen_below(&mut rng, S::one(), r);
@@ -567,16 +916,61 @@ pub fn run_f2m4<S: RhoScalar>(
             walk_fresh = true;
             continue;
         }
-        let relations = oracle.relations_for(
-            ctx,
-            &fb,
-            &mut rel.group_ops,
-            &mut ctr,
-            point,
-            a.to_u128(),
-            b.to_u128(),
-            |i| t_line_coef(i, r128),
-        );
+        let mut replayed = false;
+        let mut restore = false;
+        let relations = match pb.as_mut() {
+            Some(p) => {
+                let mut rd = Rd::new(&p.bytes[p.pos..]);
+                let rec = decode_call(&mut rd)?;
+                p.pos += rd.pos();
+                p.left -= 1;
+                restore = p.left == 0;
+                rel.group_ops.adds += rec.adds;
+                ctr.lift_failures += rec.lift_failures;
+                replayed = true;
+                rec.rels
+            }
+            None => {
+                let (adds0, lf0) = (rel.group_ops.adds, ctr.lift_failures);
+                let before = rel.group_ops;
+                let rels = oracle.relations_for(
+                    ctx,
+                    &fb,
+                    &mut rel.group_ops,
+                    &mut ctr,
+                    point,
+                    a.to_u128(),
+                    b.to_u128(),
+                    |i| t_line_coef(i, r128),
+                );
+                debug_assert_eq!(rel.group_ops.doubles, before.doubles);
+                debug_assert_eq!(rel.group_ops.scalar_mults, before.scalar_mults);
+                if ckpt.is_some() {
+                    encode_call(
+                        &mut log_buf,
+                        rel.group_ops.adds - adds0,
+                        ctr.lift_failures - lf0,
+                        &rels,
+                    );
+                }
+                rels
+            }
+        };
+        calls_done += 1;
+        if restore {
+            // The last replayed call: the snapshot's state takes over.
+            let p = pb.take().expect("a playback ended here");
+            if found + relations.len() as u64 != p.snap.found
+                || matrix.rows_stored() as u64 + relations.len() as u64 != p.snap.rows
+            {
+                return Err("the checkpoint diverged from the walk it was taken on".into());
+            }
+            oracle.import_state(&p.snap.oracle)?;
+            if oracle.solver_totals().map_or(0, |t| t.calls) != p.snap.calls {
+                return Err("the checkpoint's oracle state disagrees with its call count".into());
+            }
+            matrix.import_counters(p.snap.matrix);
+        }
         if relations.is_empty() {
             continue;
         }
@@ -628,6 +1022,10 @@ pub fn run_f2m4<S: RhoScalar>(
                 sparse.push((d_col, dv));
             }
             matrix.add_sparse(sparse, rhs);
+            // A replayed call's solve attempts are already in the snapshot.
+            if replayed {
+                continue;
+            }
             if let Some(d) = matrix.pinned_value(d_col) {
                 pinned_by_repeated_row = repeated;
                 la_ns += la_start.elapsed().as_nanos() as u64;
@@ -774,6 +1172,9 @@ pub fn run_f2m4<S: RhoScalar>(
         wall_seconds: started.elapsed().as_secs_f64(),
         exhausted: recovered.is_none(),
     };
+    if let Some(ck) = ckpt {
+        ck.remove_all();
+    }
     Ok(WideRun { report, recovered })
 }
 
@@ -930,5 +1331,143 @@ mod tests {
             assert_eq!(w128.recovered, Some(u128::from(d)));
             assert_eq!(w128.report.total_gae, one.total_gae);
         }
+    }
+
+    fn tmp_ckpt_dir(tag: &str) -> std::path::PathBuf {
+        let d =
+            std::env::temp_dir().join(format!("ecbench-ckpt-test-{tag}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).unwrap();
+        d
+    }
+
+    /// **The point of the checkpoints.**  An IC run that is killed twice and
+    /// resumed twice ends with exactly the counts of an uninterrupted run:
+    /// every phase's counters, the ledger, the solver's totals (which carry
+    /// the replay shape's history), the matrix's work, and the answer.
+    #[test]
+    fn a_resumed_ic_run_has_the_counts_of_an_uninterrupted_one() {
+        use crate::cryptanalysis::ckpt::Ckpt;
+        use std::time::Duration;
+        let inst = find_bin_curve(6, 1, 16).unwrap();
+        let c = &inst.curve;
+        let d = 12_345 % (inst.r as u64);
+        let q = target_of(&inst, d);
+        let ctx = InstanceCtx {
+            group: c,
+            generator: inst.generator,
+            target: q,
+            r: 0,
+            cofactor: 0,
+            group_order: 0,
+            name: "test".into(),
+            field_degree: None,
+        };
+        let calib = Calibration {
+            ns_per_add: 1.0,
+            ..Default::default()
+        };
+        let opts = BinOptions {
+            weighted: true,
+            frobenius: true,
+            sparsest: true,
+            replay: true,
+        };
+        let sp = spec("gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1");
+        let run = |ck: Option<&Ckpt>| {
+            let mut o = BinD4Oracle::new(&inst, 11, sp.seed, opts);
+            run_f2m4_ckpt::<u128>(&ctx, &inst, &sp, &mut o, inst.r, inst.cofactor, &calib, ck)
+        };
+        let whole = run(None).unwrap();
+        assert_eq!(whole.recovered, Some(u128::from(d)));
+
+        let dir = tmp_ckpt_dir("ic");
+        let mk = |stop: Option<u64>| {
+            let mut ck = Ckpt::in_dir(&dir, "icresume", Duration::from_secs(3600)).unwrap();
+            ck.every_units = Some(1000);
+            ck.stop_after_snapshots = stop;
+            ck
+        };
+        // Killed after its second snapshot (call 2,000) ...
+        assert_eq!(run(Some(&mk(Some(2)))).err().unwrap(), "simulated crash");
+        assert!(dir.join("icresume.snap").exists());
+        // ... resumed, killed again at the next snapshot (call 3,000) ...
+        assert_eq!(run(Some(&mk(Some(1)))).err().unwrap(), "simulated crash");
+        // ... and resumed to the end.
+        let resumed = run(Some(&mk(None))).unwrap();
+        assert!(
+            !dir.join("icresume.snap").exists(),
+            "a finished run removes its checkpoint"
+        );
+        assert!(!dir.join("icresume.log").exists());
+
+        let (a, b) = (&whole.report, &resumed.report);
+        assert_eq!(resumed.recovered, whole.recovered);
+        assert_eq!(a.total_gae, b.total_gae);
+        assert_eq!(a.s, b.s);
+        assert_eq!(a.decomposition.targets_tried, b.decomposition.targets_tried);
+        assert_eq!(
+            a.decomposition.relations_found,
+            b.decomposition.relations_found
+        );
+        assert_eq!(
+            a.decomposition.cost.group_ops,
+            b.decomposition.cost.group_ops
+        );
+        assert_eq!(a.decomposition.cost.native, b.decomposition.cost.native);
+        assert_eq!(
+            a.decomposition.gae_before_solver,
+            b.decomposition.gae_before_solver
+        );
+        let (sa, sb) = (
+            a.decomposition.solver.as_ref().unwrap(),
+            b.decomposition.solver.as_ref().unwrap(),
+        );
+        assert_eq!((sa.calls, sa.ops, sa.gae), (sb.calls, sb.ops, sb.gae));
+        assert_eq!(sa.extra, sb.extra);
+        assert_eq!(a.linear_algebra.work, b.linear_algebra.work);
+        assert_eq!(a.linear_algebra.rank, b.linear_algebra.rank);
+        assert_eq!(a.linear_algebra.cost.native, b.linear_algebra.cost.native);
+        assert_eq!(a.verify.group_ops, b.verify.group_ops);
+        assert!(b.verified);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// The same for the rho walk: killed twice mid-run, resumed, the same
+    /// ledger, steps, walks, distinguished points and counters.
+    #[test]
+    fn a_resumed_rho_run_has_the_counts_of_an_uninterrupted_one() {
+        use crate::cryptanalysis::ckpt::Ckpt;
+        use std::time::Duration;
+        let inst = find_bin_curve(8, 1, 16).unwrap();
+        let c = &inst.curve;
+        let r = inst.r;
+        let d = 1 + (0xdead_beefu128 % (r - 1));
+        let q = c.mul(&inst.generator, d);
+        let run = |ck: Option<&Ckpt>| {
+            rho_negation_ckpt::<CurveB, u128>(c, inst.generator, q, r, 9, 1 << 40, ck)
+        };
+        let (whole, dw) = run(None).unwrap();
+        assert_eq!(dw, Some(d));
+        let dir = tmp_ckpt_dir("rho");
+        let mk = |stop: Option<u64>| {
+            let mut ck = Ckpt::in_dir(&dir, "rhoresume", Duration::from_secs(3600)).unwrap();
+            ck.every_units = Some(20);
+            ck.stop_after_snapshots = stop;
+            ck
+        };
+        assert_eq!(run(Some(&mk(Some(2)))).err().unwrap(), "simulated crash");
+        assert_eq!(run(Some(&mk(Some(1)))).err().unwrap(), "simulated crash");
+        let (res, dr) = run(Some(&mk(None))).unwrap();
+        assert!(!dir.join("rhoresume.snap").exists());
+        assert_eq!(dr, dw);
+        assert_eq!(whole.group_ops, res.group_ops);
+        assert_eq!(whole.steps, res.steps);
+        assert_eq!(whole.walks, res.walks);
+        assert_eq!(whole.distinguished_points, res.distinguished_points);
+        assert_eq!(whole.counters, res.counters);
+        assert_eq!(whole.gae, res.gae);
+        assert!(whole.walks > 100, "the test must span several snapshots");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

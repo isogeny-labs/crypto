@@ -378,6 +378,34 @@ impl<S: RhoScalar> Wiedemann<S> {
         v
     }
 
+    /// The solve's counters (`row_ops`, attempts, failed attempts, the next
+    /// attempt's row count, the core's size, products), for checkpoints.
+    pub fn export_counters(&self) -> [u64; 7] {
+        let st = self.state.borrow();
+        [
+            st.row_ops,
+            st.attempts,
+            st.failed_attempts,
+            st.next_attempt_rows as u64,
+            st.core_rows as u64,
+            st.core_cols as u64,
+            st.matvecs,
+        ]
+    }
+
+    /// Restore [`export_counters`](Self::export_counters); the solution, if
+    /// any, is not restored (a run with a solution has ended).
+    pub fn import_counters(&self, c: [u64; 7]) {
+        let mut st = self.state.borrow_mut();
+        st.row_ops = c[0];
+        st.attempts = c[1];
+        st.failed_attempts = c[2];
+        st.next_attempt_rows = c[3] as usize;
+        st.core_rows = c[4] as usize;
+        st.core_cols = c[5] as usize;
+        st.matvecs = c[6];
+    }
+
     pub fn rows_stored(&self) -> usize {
         self.rows.len()
     }

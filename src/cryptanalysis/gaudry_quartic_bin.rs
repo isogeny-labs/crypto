@@ -3057,6 +3057,116 @@ impl<'a> BinD4Oracle<'a> {
         rel.into_iter().map(BinRelation::Row).collect()
     }
 
+    /// The state that crosses calls (the solver totals and the replay
+    /// shape), for `ic_wide`'s checkpoints.  Large primes are not covered.
+    pub fn export_state(&self) -> Result<Vec<u8>, String> {
+        use super::ckpt::Wr;
+        if self.lp.enabled() {
+            return Err("checkpoints do not cover large primes".into());
+        }
+        let t = &self.totals;
+        let mut w = Wr::default();
+        for v in [
+            t.calls,
+            t.ops,
+            t.wall_ns,
+            t.peak_bytes,
+            t.budget_exceeded,
+            t.solving_degree_sum,
+            u64::from(t.solving_degree_max),
+            t.calls_with_a_degree,
+        ] {
+            w.u64(v);
+        }
+        w.varint(t.extra.len() as u64);
+        for (k, v) in &t.extra {
+            w.str(k);
+            w.u64(*v);
+        }
+        w.u64(self.trace.replays);
+        w.u64(self.trace.fallbacks);
+        match &self.trace.shape {
+            None => w.u8(0),
+            Some(sh) => {
+                w.u8(1);
+                w.varint(sh.leads.len() as u64);
+                for l in &sh.leads {
+                    match l {
+                        None => w.u8(0),
+                        Some(v) => {
+                            w.u8(1);
+                            w.bytes(v);
+                        }
+                    }
+                }
+                w.u64(sh.rows_built as u64);
+                w.varint(sh.zero_ids.len() as u64);
+                for z in &sh.zero_ids {
+                    w.u64(u64::from(*z));
+                }
+                w.u64(sh.pivots as u64);
+            }
+        }
+        Ok(w.0)
+    }
+
+    /// Restore what [`export_state`](Self::export_state) wrote, onto an
+    /// oracle that has been prepared and has made no call.
+    pub fn import_state(&mut self, bytes: &[u8]) -> Result<(), String> {
+        use super::ckpt::Rd;
+        let mut r = Rd::new(bytes);
+        let t = &mut self.totals;
+        t.calls = r.u64()?;
+        t.ops = r.u64()?;
+        t.wall_ns = r.u64()?;
+        t.peak_bytes = r.u64()?;
+        t.budget_exceeded = r.u64()?;
+        t.solving_degree_sum = r.u64()?;
+        t.solving_degree_max = r.u64()? as u32;
+        t.calls_with_a_degree = r.u64()?;
+        t.extra.clear();
+        for _ in 0..r.varint()? {
+            let k = r.str()?;
+            let v = r.u64()?;
+            t.extra.insert(k, v);
+        }
+        self.trace.replays = r.u64()?;
+        self.trace.fallbacks = r.u64()?;
+        self.trace.shape = match r.u8()? {
+            0 => None,
+            _ => {
+                let n = r.varint()? as usize;
+                let mut leads = Vec::with_capacity(n);
+                for _ in 0..n {
+                    leads.push(match r.u8()? {
+                        0 => None,
+                        _ => Some(r.bytes()?.to_vec()),
+                    });
+                }
+                let rows_built = r.u64()? as usize;
+                let zn = r.varint()? as usize;
+                let mut zero_ids = Vec::with_capacity(zn);
+                for _ in 0..zn {
+                    zero_ids.push(r.u64()? as u32);
+                }
+                let pivots = r.u64()? as usize;
+                Some(ShapeB {
+                    leads,
+                    rows_built,
+                    zero_ids,
+                    pivots,
+                })
+            }
+        };
+        if !r.at_end() {
+            return Err("checkpoint: trailing bytes in the oracle state".into());
+        }
+        if self.totals.calls > 0 {
+            self.totals.shape = Some(self.shape());
+        }
+        Ok(())
+    }
+
     pub fn new(curve: &'a BinCurve, macaulay: u8, seed: u64, opts: BinOptions) -> Self {
         BinD4Oracle {
             curve,

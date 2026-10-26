@@ -2092,7 +2092,21 @@ fn solve_f2m4_wide(
     ty: u128,
     seed: u64,
 ) -> Result<SolveReport, String> {
-    use crate::cryptanalysis::ic_wide::{rho_negation, run_f2m4};
+    use crate::cryptanalysis::ic_wide::{rho_negation_ckpt, run_f2m4_ckpt};
+    // Opt-in checkpoints (`ckpt`): if `./ecbench-ckpt/` exists, the long
+    // runs save their state there and a rerun of the same run continues it.
+    // The key is the method, its parameters, the workload and the seed.
+    let ckpt = crate::cryptanalysis::ckpt::Ckpt::in_dir(
+        std::path::Path::new("ecbench-ckpt"),
+        &sha256_hex(
+            format!(
+                "{}|{:?}|{}|{tx:x}|{ty:x}|{seed}",
+                m.id, m.params, curve.slug
+            )
+            .as_bytes(),
+        )[..40],
+        std::time::Duration::from_secs(if m.id == "rho.negation" { 120 } else { 300 }),
+    );
     let f = &inst.curve.f;
     let target = PtB {
         x: f.unpack(tx),
@@ -2109,7 +2123,15 @@ fn solve_f2m4_wide(
             let t = Instant::now();
             measurement::begin_online(Phase::RhoSolve);
             let (res, d) =
-                rho_negation::<crate::cryptanalysis::gaudry_quartic_bin::CurveB, u128>(&inst.curve, inst.generator, target, r, seed, cap);
+                rho_negation_ckpt::<crate::cryptanalysis::gaudry_quartic_bin::CurveB, u128>(
+                    &inst.curve,
+                    inst.generator,
+                    target,
+                    r,
+                    seed,
+                    cap,
+                    ckpt.as_ref(),
+                )?;
             measurement::end_online();
             let fops = field_ops_of(&inst.curve, &[res.group_ops]);
             let mut rep = rho_report(res, t.elapsed().as_nanos() as u64, fops);
@@ -2152,7 +2174,16 @@ fn solve_f2m4_wide(
                 ..Default::default()
             };
             let t = Instant::now();
-            let run = run_f2m4::<u128>(&ctx, inst, &spec, &mut oracle, r, inst.cofactor, &calib)?;
+            let run = run_f2m4_ckpt::<u128>(
+                &ctx,
+                inst,
+                &spec,
+                &mut oracle,
+                r,
+                inst.cofactor,
+                &calib,
+                ckpt.as_ref(),
+            )?;
             let wall = t.elapsed().as_nanos() as u64;
             let mut scratch = GroupOps::default();
             let base = TLineBase { curve: inst };
