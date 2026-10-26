@@ -1,0 +1,189 @@
+{
+  "schema": "ic-m2-linear-ladder-validator/v1",
+  "status": "pass",
+  "independent": true,
+  "validator": "Validator subagent (Claude Opus 5.5, claude-opus-5-5), Claude Code session_01T8whoYK3hHvhiUvSNkxBJv; did not read or run examples/ic_m2_ladder_fit.rs or examples/ic_m2_ladder_replay.rs; read fit.json only for its claimed numbers",
+  "method": "jq 1.7 programs (no Python, no producer code): per-rung arithmetic means of ic_trials, ic_s, rho_s, rho_group_additions over raw/rung_*.json rows; ic_over_rho_wall = mean(ic_s)/mean(rho_s); ordinary least-squares slope sum((x-xbar)(y-ybar))/sum((x-xbar)^2) of log2(mean) against n over the 7 rungs with cofactor <= 4 (a0n13,a1n17,a0n19,a1n19,a0n23,a1n23,a0n41); F4 slope by the same formula on log2(arms[ic-f4].median_word_xors) against m for per_size entries that carry it (m = 13, 19, 23; m = 31 has none). Row checks: string equality ic_recovered == secret and rho_recovered == secret plus 1 <= secret < r (so secret mod r = secret; all values < 2^53, exact in doubles). f4_analysis.json byte-compared (cmp) with git show origin/main:research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json. Curve orders re-derived with awk from the Koblitz Lucas recurrence V_{k+1} = mu V_k - 2 V_{k-1}, #E = 2^n + 1 - V_n.",
+  "raw_data": [
+    {
+      "path": "raw/rung_a0_n13.json",
+      "sha256": "8f0e5b9cbec2109718bf74352b7061f73fcdbd9ec5d523b780e22bf4f8f0d96b"
+    },
+    {
+      "path": "raw/rung_a1_n17.json",
+      "sha256": "67d1655160e9cdd7643abb516c3896cef741b0c8342dff10ab8cb205d687e124"
+    },
+    {
+      "path": "raw/rung_a0_n19.json",
+      "sha256": "ac593b1f75717eed3006442c975d4a9bb1c84de8629bb340ae2affb42b66a09c"
+    },
+    {
+      "path": "raw/rung_a1_n19.json",
+      "sha256": "46f41f101c49cddf29c2a14ffdd37c26e48832f58b422143fcae359f7d0c0457"
+    },
+    {
+      "path": "raw/rung_a0_n23.json",
+      "sha256": "a1b9b31fd19a8ec1b97b587607ca699ee49058fb6f2687c088b276660036bed4"
+    },
+    {
+      "path": "raw/rung_a1_n23.json",
+      "sha256": "0703be566c2f446948cd88daccb0a15fd3c776ee35d9e085e8fdb743c3558c63"
+    },
+    {
+      "path": "raw/rung_a0_n41.json",
+      "sha256": "80ca601517eac7192b2f4dfb39b16e1a9806dccb6532ed9256bf5a6eaa681cfa"
+    },
+    {
+      "path": "f4_analysis.json",
+      "sha256": "69ca54385c62a50e2a1b8fcb5245459dd8550966221f5ba94fcdf3437c1bada6"
+    }
+  ],
+  "headline": [
+    {
+      "name": "slope_ic_trials_per_n",
+      "claimed": 0.6465140128624682,
+      "recomputed": 0.6465140128624682,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "slope_ic_wall_per_n",
+      "claimed": 0.7169098460947894,
+      "recomputed": 0.7169098460947894,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "slope_rho_group_additions_per_n",
+      "claimed": 0.3771251181745112,
+      "recomputed": 0.3771251181745112,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "slope_rho_wall_per_n",
+      "claimed": 0.25024926803658676,
+      "recomputed": 0.25024926803658676,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "f4_slope_log2_word_xors_per_n",
+      "claimed": 1.079049305610248,
+      "recomputed": 1.079049305610248,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a0n41.mean_ic_trials",
+      "claimed": 181803464.25,
+      "recomputed": 181803464.25,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a0n41.mean_ic_s",
+      "claimed": 478.37853073425,
+      "recomputed": 478.37853073425,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a0n41.mean_rho_s",
+      "claimed": 0.0131277305,
+      "recomputed": 0.0131277305,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a0n41.ic_over_rho_wall",
+      "claimed": 36440.307083867236,
+      "recomputed": 36440.307083867236,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a0n23.mean_ic_trials",
+      "claimed": 41855.5,
+      "recomputed": 41855.5,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a0n23.mean_ic_s",
+      "claimed": 0.04609912624999999,
+      "recomputed": 0.04609912624999999,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a0n23.mean_rho_s",
+      "claimed": 0.00027292524999999996,
+      "recomputed": 0.00027292524999999996,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a0n23.ic_over_rho_wall",
+      "claimed": 168.90751680176166,
+      "recomputed": 168.90751680176166,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a0n13.ic_over_rho_wall",
+      "claimed": 3.614101774348803,
+      "recomputed": 3.614101774348803,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a1n17.ic_over_rho_wall",
+      "claimed": 14.566195504350379,
+      "recomputed": 14.566195504350379,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a0n19.ic_over_rho_wall",
+      "claimed": 48.31393912578581,
+      "recomputed": 48.31393912578581,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a1n19.ic_over_rho_wall",
+      "claimed": 42.708501511302586,
+      "recomputed": 42.708501511302586,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "a1n23.ic_over_rho_wall",
+      "claimed": 197.2825029356321,
+      "recomputed": 197.2825029356321,
+      "rel_tol": 1E-9
+    }
+  ],
+  "checks": {
+    "all_headlines_within_rel_tol": true,
+    "rows_checked": 52,
+    "all_ic_verified_true": true,
+    "all_rho_verified_true": true,
+    "ic_recovered_eq_secret_mod_r": true,
+    "rho_recovered_eq_secret_mod_r": true,
+    "secrets_in_1_to_r_minus_1": true,
+    "row_failures": [],
+    "small_cofactor_rungs": [
+      "a0n13",
+      "a1n17",
+      "a0n19",
+      "a1n19",
+      "a0n23",
+      "a1n23",
+      "a0n41"
+    ],
+    "f4_analysis_byte_identical_to_origin_main": true,
+    "origin_main_revision": "172f84c7b0143ff5b4a26d6d21ffed3bf0f0cf3b",
+    "f4_points_used_m": [
+      13,
+      19,
+      23
+    ],
+    "rungs_match_protocol": "seed 20261024 on every rung; 8 targets (4 at n = 41); d = floor((n+1)/3) = 4,6,6,6,8,8,14; cofactors 4,2,4,2,4,2,4",
+    "curve_orders_consistent": "h*r equals #E from the Lucas recurrence on all 7 rungs; a=0 n=37: #E = 137439487532 = 596 * 230603167, matching PROTOCOL h = 596",
+    "protocol_frozen_before_runs": "PROTOCOL.md sha256 0e35eb5a... equals its blob in commit 995b187c1 (2026-10-24T07:53:48Z, local branch exp/n83-padd-k1107-20261024); first rung started 07:53:55Z (run.log)",
+    "producer_source_matches_frozen_commit": "item 3 reviews examples/ic_m2_linear.rs blob 3f97a61e, identical in 995b187c1 (frozen) and e80d9914c (HEAD). The working-tree copy now carries uncommitted post-run edits (+/-120 lines, with ic_m2_ladder_fit.rs and ic_m2_ladder_replay.rs); those edits are not validated and did not produce these runs",
+    "binary_sha256_matches_record": "/home/user/bin/ic_m2_linear sha256 20748d6e... equals raw/binary.sha256; that it was built from 995b187c1 is not independently established (mtime equals commit time)",
+    "secret_isolation": "t_secret is used only to build the target point and in the two verification comparisons (lines 485-486, 605-613); IC and rho receive only the point",
+    "log_json_consistent_n41": "trials, relations and K in rung_a0_n41.log equal the JSON rows",
+    "wallclock_consistent_n41": "sum(ic_s + rho_s) = 1913.57 s vs run.log 07:55:36Z to 08:27:29Z = 1913 s",
+    "method_algebraic": true,
+    "n37_stop_consistent_with_protocol": "consistent with the stated cofactor limitation and with the frozen code; no time limit was pre-stated (see notes)",
+    "committed_snapshot": "all 8 raw_data files plus fit.json, PROTOCOL.md, raw/run.log, raw/operator-notes.txt, raw/rung_a0_n37.log and raw/binary.sha256 are byte-identical to commit e80d9914c on claude/ic-m2-linear-ladder-20261024 (in sync with origin)"
+  },
+  "notes": "Item 3 (owner criterion): holds. The factor base is {P : x(P) in V minus 0}, V = F2-span{1..z^(d-1)}. Each trial (a Frobenius conjugate of a random-walk anchor with known log) builds the n x (3d-1) F2 Weil-descent system of S3 = p^2 + xR p + xR^2 s^2 + b in the symmetric coordinates (s,p) in V x span{1..z^(2d-2)}, solves it by Gaussian elimination, enumerates the affine solution set, splits each (s,p) by the linear system x1^2 + s x1 = p over F2[z]_{<d}, keeps x1, x2 in V, fixes signs and re-verifies the relation by group addition. col_of_x is a dense membership/index array over V, not a table of previously seen points; there are no collisions. Linear algebra mod r is union-find with signed offsets, which is valid here because every relation has at most 2 terms. Caveats: (i) m = 2 makes the descent F2-linear, so there is no Groebner/F4 step and its cost is polynomial per trial, but the trial count is about 2^(n-d+1) ~ 2^(2n/3), so the exponent is above rho; measured trials slope 0.6465/n vs rho additions 0.3771/n, and IC/rho wall rises from 3.6 (n = 13) to 36,440 (n = 41). (ii) Kernel enumeration is capped at 2^12 (completeness-losing only). (iii) Relations only link factor-base points whose cofactor components cancel; classes are anchored by the E(F2) point x = 1 and by 2-torsion classes, so applicability depends on h. (iv) Trial generation uses Koblitz Frobenius conjugates, as the F4 arm also does. n = 37 (h = 596): PROTOCOL lists it as a moderate-cofactor check rung but states no time limit or stopping rule for it. Its stated limit is that large cofactors fragment the relation graph (named for N83, h ~ 1.1e9). From the frozen code: a relation e1 P1 + e2 P2 = R with R in <G> forces e1 c1 + e2 c2 = 0 in Z/596, so edges stay inside the ~299 classes {+-c}, about 6.9 of K ~ 2048 columns each. Off the 2-torsion classes every relation is balanced, so a root is determined only via a known anchor (x = 1 gives the order-4 class; 2-torsion classes via unbalanced cycles). That leaves max(determined, largest component) at a few dozen columns, far below 0.9K = 1843, so the while-loop cannot terminate. The operator stop at 99 s (rc = 143, no rows) is therefore consistent with the code and with the stated limit in substance. It is a post-hoc stop, not a pre-registered one. It is not a measurement and must be reported as not applicable as built, not as negative evidence; it does not enter the cofactor <= 4 fit by the protocol's own rung rule. Limitations: (a) Validated first from the working tree, then confirmed byte-identical to commit e80d9914c; the raw_data sha256 pins bind this report to those bytes. (b) The protocol improvement rule compares the IC trials slope (13 <= n <= 41) with the F4 log2 word-XOR slope (n = 13, 19, 23), which is a cross-unit comparison over different n ranges. Like-for-like checks, not headlines: IC trials slope over n <= 23 = 0.6270; IC counted ic_gauss_xors slope = 0.8477 (n <= 23) and 0.7795 (13..41). Both stay below the F4 1.0790, so the direction holds, but the F4 arm was measured in a separate 2026-10-05 session. (c) fit.json bootstrap intervals were not recomputed (resampling-dependent; not headlines). (d) Wall times are L0, from one shared container. (e) The n = 41 rung has 4 targets. (f) No planted-fault negative control: soundness rests on per-relation group re-verification and per-target scalar verification against the secret. (g) A pass means the receipt is admissible. It does not by itself establish a leaderboard improvement; that also needs the replay certificate and the matched rho reference with the 5a band."
+}

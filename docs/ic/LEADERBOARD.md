@@ -18,58 +18,23 @@ This performance handoff is published beside the curve-by-curve tables. The stan
 
 [Latest result data](../../research/ecbench_rho_optimized_20261014/RESULT.json); [prior full synthesis](../../research/ecbench_frontier_20261013/frontier-data.json). The standing strong-rho method, recovered answers, trajectories, charged GAE and every counter are unchanged. Existing operation ratios and bounds therefore stay fixed. Historical wall ratios remain attached to their measured binaries; this L0 study cannot reprice or promote them.
 
-## Component improvement: lazy orbit-member index (2026-10-18, engineering)
+## Table A: Koblitz, one target (§23, re-run at baseline v7)
 
-The Frobenius-folded pair table no longer names `σ^t(P_i)` for every base point at build; a hitting probe names its two summands when it happens. Same table, relations, rank and recovered logarithm (856/856 run pairs identical); it moves no row of tables A–C, which keep the oracle each was measured with. ecbench.gae, paired by target, cluster-bootstrap 95% CI; 95 % intervals; below 1 the numerator is cheaper.
-
-| curve | log₂ r | eager ÷ lazy (before ÷ after) | eager ÷ rho-strong (was) | lazy ÷ rho-strong (now) |
-|:--|--:|:--|:--|:--|
-| `icv1-f2m13-t181-515ee569` | 11.0 | **1.273 [1.267, 1.278]** | 0.409 [0.400, 0.419] | 0.322 [0.314, 0.330] |
-| `icv1-f2m29-tm40309-30c52b96` | 15.4 | **1.441 [1.427, 1.455]** | 0.577 [0.562, 0.593] | 0.401 [0.387, 0.415] |
-| `icv1-f2m17-tm101-00378d4e` | 16.0 | **1.132 [1.116, 1.151]** | 0.719 [0.642, 0.806] | 0.635 [0.558, 0.722] |
-| `icv1-f2m19-t797-b6cf2467` | 17.0 | **1.295 [1.283, 1.308]** | 0.745 [0.716, 0.777] | 0.575 [0.549, 0.605] |
-| `icv1-f2m31-tm90707-c95f16f5` | 20.5 | **1.240 [1.223, 1.259]** | 1.221 [1.142, 1.300] | 0.985 [0.908, 1.062] |
-| `icv1-f2m23-t5197-69e76b73` | 21.0 | **1.203 [1.189, 1.217]** | 1.342 [1.250, 1.449] | 1.116 [1.028, 1.218] |
-| `icv1-f2m37-tm534059-32aad96b` | 27.8 | **1.116 [1.106, 1.127]** | 4.260 [3.774, 4.823] | 3.818 [3.367, 4.345] |
-| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | **1.014 [1.013, 1.015]** | 16.090 [11.706, 22.265] | 15.868 [11.525, 21.979] |
-
-[Report](../../research/ecbench_lazy_orbit_members_20261018/REPORT.pdf) · [study](../../research/ecbench_lazy_orbit_members_20261018/) · [data](../../research/ecbench_lazy_orbit_members_20261018/figures/ratios.json). Distance to rho is reported, not a gate; no ranking against rho is claimed.
-
-Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
-
-## Component tuning: two orbit columns under the lazy oracle (2026-10-18, engineering)
-
-Does `columns = 2` beat the per-curve column count frozen on 2026-10-14 now that the member-index set-up is gone? One cell of five: it is cheaper at n17 a1 and dearer at the other four, so the frozen counts stay the better choice on four of five curves. The n17 gain is a tuning result on these seeds and needs fresh seeds before it is a rule. It moves no row of tables A–C. ecbench.gae, paired by target, cluster-bootstrap 95% CI; 95 % intervals; below 1 the numerator is cheaper.
-
-| curve | log₂ r | frozen c | frozen ÷ c=2 | frozen ÷ rho-strong | c=2 ÷ rho-strong | frozen ÷ rho-frob | c=2 ÷ rho-frob |
-|:--|--:|--:|:--|:--|:--|:--|:--|
-| `icv1-f2m13-t181-515ee569` | 11.0 | 1 | **0.637 [0.630, 0.645]** | 0.325 [0.319, 0.330] | 0.510 [0.503, 0.516] | 2.430 [2.315, 2.538] | 3.816 [3.644, 3.974] |
-| `icv1-f2m17-tm101-00378d4e` | 16.0 | 1 | **1.176 [1.063, 1.297]** | 0.602 [0.545, 0.665] | 0.512 [0.490, 0.535] | 2.152 [1.592, 2.752] | 1.830 [1.397, 2.255] |
-| `icv1-f2m23-t5197-69e76b73` | 21.0 | 3 | **0.778 [0.695, 0.874]** | 1.091 [1.009, 1.176] | 1.403 [1.236, 1.578] | 2.775 [2.252, 3.408] | 3.569 [2.848, 4.497] |
-| `icv1-f2m29-tm40309-30c52b96` | 15.4 | 1 | **0.644 [0.625, 0.665]** | 0.396 [0.381, 0.411] | 0.615 [0.602, 0.627] | 1.287 [0.971, 1.686] | 1.998 [1.511, 2.612] |
-| `icv1-f2m37-tm534059-32aad96b` | 27.8 | 8 | **0.246 [0.200, 0.309]** | 3.798 [3.266, 4.403] | 15.422 [12.280, 18.614] | 4.538 [3.752, 5.497] | 18.426 [14.428, 23.225] |
-
-[Report](../../research/ecbench_lazy_columns2_20261018/REPORT.pdf) · [study](../../research/ecbench_lazy_columns2_20261018/) · [data](../../research/ecbench_lazy_columns2_20261018/figures/ratios.json). Distance to rho is reported, not a gate; no ranking against rho is claimed (§5a band not applied).
-
-Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
-
-## Table A: Koblitz, one target (§23, re-run at baseline v3)
-
-- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, which is 2.3–3.2 times cheaper at baseline v3 than in §23's processes, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v3/README.md).
-- **Reference:** One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v3 at baseline v3).
+- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).
+- **Reference:** One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).
 - **Floor:** √(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed Frobenius and negation, n the extension degree. Stated in steps and not rescaled to units, so × floor here divides units by steps.
 - **Targets:** one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks
 - **Status:** primary comparison: one target, as AGENTS.md's one-target rule requires
-- **Rho step:** rho's walk as built costs 9.72–11.8 units a step; the canonical step costs 4.6–5.39
+- **Rho step:** rho's walk as built costs 9.4–10.6 units a step; the canonical step costs 4.2–4.92
 
 | curve | log₂ r | recipe | S, IC | S, reference | × reference | S, floor | × floor | ok | validation |
 |:--|--:|:--|--:|--:|--:|--:|--:|:--|:--|
-| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 9.51 | 1.82 | **5.23×** (was 4.95×, §23) | 0.129 | 73.5× | ✓ | unvalidated (pre-gate) |
-| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 11 | 1.8 | **6.12×** (was 1.98×, §23) | 0.117 | 93.8× | ✓ | unvalidated (pre-gate) |
-| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 11.2 | 1.46 | **7.66×** (was 8.04×, §23) | 0.138 | 80.7× | ✓ | unvalidated (pre-gate) |
-| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 17 | 1.28 | **13.2×** (was 14.7×, §23) | 0.122 | 139× | ✓ | unvalidated (pre-gate) |
-| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 16.3 | 1.35 | **12×** (was 15.7×, §23) | 0.115 | 141× | ✓ | unvalidated (pre-gate) |
-| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 24.9 | 1.19 | **21×** (was 31.6×, §23) | 0.113 | 220× | ✓ | unvalidated (pre-gate) |
+| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 6.03 | 1.76 | **3.43×** (was 4.95×, §23) | 0.129 | 46.6× | ✓ | validated |
+| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 6.37 | 1.6 | **3.97×** (was 1.98×, §23) | 0.117 | 54.2× | ✓ | validated |
+| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 6.63 | 1.4 | **4.74×** (was 8.04×, §23) | 0.138 | 47.9× | ✓ | validated |
+| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 8.15 | 1.16 | **7.03×** (was 14.7×, §23) | 0.122 | 66.9× | ✓ | validated |
+| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 7.82 | 1.23 | **6.37×** (was 15.7×, §23) | 0.115 | 67.8× | ✓ | validated |
+| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 12.4 | 1.08 | **11.5×** (was 31.6×, §23) | 0.113 | 109× | ✓ | validated |
 
 ## Table B: Prime and random-binary ladder (§18)
 
@@ -81,19 +46,19 @@ Validation standing: not validated under the 2026-10-19 gate. No replay certific
 
 | regime | curve | log₂ r | recipe | S, IC | S, reference | × reference | S, floor | × floor | ok | validation |
 |:--|:--|--:|:--|--:|--:|--:|--:|--:|:--|:--|
-| Prime field | `icv1-fp10-t5-192cb216` | 9.7 | folded, walked, base at the family optimum, m = 2 | 22.8 | 3.6 | **6.34×** | 0.886 | 25.8× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp12-t19-d4a315df` | 11.9 | folded table, walked targets, m = 2 | 15.6 | 2.85 | **5.47×** | 0.886 | 17.6× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp14-tm43-158b6914` | 14.0 | folded, walked, base at the family optimum, m = 2 | 13.1 | 2.03 | **6.43×** | 0.886 | 14.8× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp16-t351-d433f24e` | 16.0 | folded, walked, base at the family optimum, m = 2 | 11.7 | 1.74 | **6.71×** | 0.886 | 13.2× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp18-t175-45770ebc` | 18.0 | folded, walked, base at the family optimum, m = 2 | 8.41 | 1.45 | **5.82×** | 0.886 | 9.49× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp20-t1293-3c2999ba` | 20.0 | folded, walked, base at the family optimum, m = 2 | 10.7 | 1.29 | **8.3×** | 0.886 | 12.1× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp22-tm1267-a5acaf6d` | 21.7 | folded, walked, base at the family optimum, m = 2 | 12.8 | 1.22 | **10.5×** | 0.886 | 14.4× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp24-t1577-77336155` | 23.4 | folded, walked, base at the family optimum, m = 2 | 14 | 1.04 | **13.5×** | 0.886 | 15.8× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m15-t131-ed7256f0` | 14.0 | folded table, walked targets, m = 2 | 26.3 | 2.01 | **13.1×** | 0.886 | 29.7× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m18-t393-d2c04152` | 15.0 | folded, walked, base at the family optimum, m = 2 | 21.3 | 2.01 | **10.6×** | 0.886 | 24× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m21-t2591-de54d72e` | 20.0 | folded, walked, base at the family optimum, m = 2 | 24.4 | 1.36 | **18×** | 0.886 | 27.5× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m24-tm3047-2d0c0e8c` | 21.0 | folded, walked, base at the family optimum, m = 2 | 27.2 | 1.18 | **23×** | 0.886 | 30.7× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m27-t12543-569dca8b` | 24.4 | folded, walked, base at the family optimum, m = 2 | 36.9 | 0.966 | **38.2×** | 0.886 | 41.7× | ✓ | unvalidated (pre-gate) |
+| Prime field | `icv1-fp10-t5-192cb216` | 9.7 | folded, walked, base at the family optimum, m = 2 | 22.8 | 3.6 | **6.34×** | 0.886 | 25.8× | ✓ | validated |
+| Prime field | `icv1-fp12-t19-d4a315df` | 11.9 | folded table, walked targets, m = 2 | 15.6 | 2.85 | **5.47×** | 0.886 | 17.6× | ✓ | validated |
+| Prime field | `icv1-fp14-tm43-158b6914` | 14.0 | folded, walked, base at the family optimum, m = 2 | 13.1 | 2.03 | **6.43×** | 0.886 | 14.8× | ✓ | validated |
+| Prime field | `icv1-fp16-t351-d433f24e` | 16.0 | folded, walked, base at the family optimum, m = 2 | 11.7 | 1.74 | **6.71×** | 0.886 | 13.2× | ✓ | validated |
+| Prime field | `icv1-fp18-t175-45770ebc` | 18.0 | folded, walked, base at the family optimum, m = 2 | 8.41 | 1.45 | **5.82×** | 0.886 | 9.49× | ✓ | validated |
+| Prime field | `icv1-fp20-t1293-3c2999ba` | 20.0 | folded, walked, base at the family optimum, m = 2 | 10.7 | 1.29 | **8.3×** | 0.886 | 12.1× | ✓ | validated |
+| Prime field | `icv1-fp22-tm1267-a5acaf6d` | 21.7 | folded, walked, base at the family optimum, m = 2 | 12.8 | 1.22 | **10.5×** | 0.886 | 14.4× | ✓ | validated |
+| Prime field | `icv1-fp24-t1577-77336155` | 23.4 | folded, walked, base at the family optimum, m = 2 | 14 | 1.04 | **13.5×** | 0.886 | 15.8× | ✓ | validated |
+| Random binary | `icv1-f2m15-t131-ed7256f0` | 14.0 | folded table, walked targets, m = 2 | 26.3 | 2.01 | **13.1×** | 0.886 | 29.7× | ✓ | validated |
+| Random binary | `icv1-f2m18-t393-d2c04152` | 15.0 | folded, walked, base at the family optimum, m = 2 | 21.3 | 2.01 | **10.6×** | 0.886 | 24× | ✓ | validated |
+| Random binary | `icv1-f2m21-t2591-de54d72e` | 20.0 | folded, walked, base at the family optimum, m = 2 | 24.4 | 1.36 | **18×** | 0.886 | 27.5× | ✓ | validated |
+| Random binary | `icv1-f2m24-tm3047-2d0c0e8c` | 21.0 | folded, walked, base at the family optimum, m = 2 | 27.2 | 1.18 | **23×** | 0.886 | 30.7× | ✓ | validated |
+| Random binary | `icv1-f2m27-t12543-569dca8b` | 24.4 | folded, walked, base at the family optimum, m = 2 | 36.9 | 0.966 | **38.2×** | 0.886 | 41.7× | ✓ | validated |
 
 ## Table C: Koblitz, 32-target batch (§19–§22)
 
@@ -141,12 +106,12 @@ Shares are fractions of each row's own `S`, so they carry no unit; read each row
 
 | table | curve | Reusable set-up | Curve and subgroup | Workflow constructions | Factor base | Pair table | Relations (PDP) | Linear algebra | Descent | Verification |
 |:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| A | `icv1-f2m47-t22705043-f4e44623` | 98.5% | — | — | — | — | — | — | 1.4% | 0.0% |
-| A | `icv1-f2m57-tm747311035-c1f545af` | 99.3% | — | — | — | — | — | — | 0.7% | 0.0% |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | 98.9% | — | — | — | — | — | — | 1.1% | 0.0% |
-| A | `icv1-f2m53-tm56619371-dac20a85` | 99.7% | — | — | — | — | — | — | 0.3% | 0.0% |
-| A | `icv1-f2m59-tm943548413-98844ecc` | 99.7% | — | — | — | — | — | — | 0.3% | 0.0% |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.7% | — | — | — | — | — | — | 0.3% | 0.0% |
+| A | `icv1-f2m47-t22705043-f4e44623` | 99.0% | — | — | — | — | — | — | 1.0% | 0.0% |
+| A | `icv1-f2m57-tm747311035-c1f545af` | 99.1% | — | — | — | — | — | — | 0.9% | 0.0% |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | 98.7% | — | — | — | — | — | — | 1.3% | 0.0% |
+| A | `icv1-f2m53-tm56619371-dac20a85` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
+| A | `icv1-f2m59-tm943548413-98844ecc` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
 | B | `icv1-fp10-t5-192cb216` | — | — | — | 5.3% | — | 93.0% | 0.2% | — | 1.5% |
 | B | `icv1-fp12-t19-d4a315df` | — | — | — | 30.2% | — | 68.1% | 0.4% | — | 1.4% |
 | B | `icv1-fp14-tm43-158b6914` | — | — | — | 12.3% | — | 86.5% | 0.1% | — | 1.1% |
@@ -176,12 +141,12 @@ Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC cur
 
 | table | curve | curves.yaml record | factor base (points, recipe) | factor-base source | refs |
 |:--|:--|:--|:--|:--|:--|
-| A | `icv1-f2m47-t22705043-f4e44623` | none | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m57-tm747311035-c1f545af` | none | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | none | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m53-tm56619371-dac20a85` | none | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m59-tm943548413-98844ecc` | none | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | none | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v3/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m47-t22705043-f4e44623` | none | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m57-tm747311035-c1f545af` | none | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | none | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m53-tm56619371-dac20a85` | none | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m59-tm943548413-98844ecc` | none | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | none | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
 | B | `icv1-fp10-t5-192cb216` | none | 10, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
 | B | `icv1-fp12-t19-d4a315df` | none | 32, mitm_m2_negfold_walk | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
 | B | `icv1-fp14-tm43-158b6914` | none | 26, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
@@ -319,6 +284,20 @@ Component speed-up, class engineering: the dense linear stage against sparse FGL
 | 101 | 1 | 53 | 287.8 | 224.4 | 1.28 | 194 | 151 |
 | 101 | 2 | 50 | 466.3 | 365.5 | 1.28 | 373 | 293 |
 
+## Algebraic-decomposition IC ladder (linear two-summand S3), outside tables A–C
+
+Owner criterion (2026-10-24): relations come from solving summation-polynomial systems over an algebraically defined factor base, with no table collisions. Factor base x ∈ span{1..z^(d−1)}; the Weil descent of S3 is linear in the symmetric unknowns (x1+x2, x1x2). One-target cold solves, every scalar verified, beside same-process strong rho (`research/ic_m2_linear_ladder_20261024/`). Fitted slope of log2(trials) per bit of n: 0.647 [0.639, 0.655] (wall 0.717); the F4 algebraic arm's solver work grows at 1.079. The IC ÷ rho column is the distance remaining.
+
+| a | n | d | cofactor | targets | mean trials | mean IC s | mean rho s | IC ÷ rho (wall) |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 0 | 13 | 4 | 4 | 8 | 592 | 0.0004041 | 0.000112 | 4 |
+| 1 | 17 | 6 | 2 | 8 | 3,231 | 0.00377 | 0.000259 | 15 |
+| 0 | 19 | 6 | 4 | 8 | 11,477 | 0.00819 | 0.00017 | 48 |
+| 1 | 19 | 6 | 2 | 8 | 12,077 | 0.007837 | 0.000183 | 43 |
+| 0 | 23 | 8 | 4 | 8 | 41,856 | 0.0461 | 0.000273 | 169 |
+| 1 | 23 | 8 | 2 | 8 | 48,821 | 0.07077 | 0.000359 | 197 |
+| 0 | 41 | 14 | 4 | 4 | 181,803,464 | 478.4 | 0.0131 | 36,440 |
+
 ## N83 Tier 1 one-target cold factor-base holdout
 
 Five sealed public points, one fresh process per IC arm, and a same-point rho solve per point completed on one GitHub-hosted cloud instance. Each of the 25 IC arms and five rho arms passed independent replay. K1152 ran twice per point as the local A/A control. The selected candidate is `null`; the frozen decision is `BOUNDED_UNKNOWN`.
@@ -344,7 +323,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
 - `research/ic_single_target_20260930/analysis.json` — sha256 `109326d7c2882b71…`
-- `research/ic_tool_program/rule/v3/analysis.json` — sha256 `86a6e9163ebb6da7…`
+- `research/ic_tool_program/rule/v7/analysis.json` — sha256 `af81dd9ab2879632…`
 - `docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json` — sha256 `2271c4aa5236e2bd…`
 - `research/ecbench_n37_rank_columns_20261004/RESULT.json` — sha256 `f7b950edc74978cb…`
 - `research/ecbench_n37_k8_k16_20261004/DECISION.json` — sha256 `c4a33ffd9045a479…`
@@ -360,15 +339,14 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
-- `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
-- `research/ecbench_lazy_columns2_20261018/figures/ratios.json` — sha256 `e97bc0f02c39695a…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
+- `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
-- `docs/curves/registry.json` — sha256 `2d1c9747484edcad…`
+- `docs/curves/registry.json` — sha256 `595b71600e1f471a…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
