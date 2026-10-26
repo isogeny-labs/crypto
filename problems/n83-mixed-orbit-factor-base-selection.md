@@ -60,7 +60,6 @@ Unresolved. The 2026-10-25 XOR bridge and local pilot are a solver-backend
 probe. The 2026-10-26 native D18 input preflight passed while the capacity
 gate failed before worker launch. Merging this record does not complete the
 selection criterion.
-probe. Merging this record does not complete the selection criterion.
 
 ### 2026-10-26 full-D18 solver-gate update
 
