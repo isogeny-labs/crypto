@@ -78,8 +78,6 @@ pub enum FrobeniusOrbitRootEncoding {
     SharedBits,
 }
 
-/// The exact selector and phase wires allocated for one orbit-domain block.
-/// Selectors follow the sorted representative order used during installation.
 /// SAT wires allocated for one exact Frobenius-orbit x-domain. Selectors
 /// follow the sorted representative order used by the domain builder.
 #[derive(Clone, Debug, PartialEq, Eq)]
