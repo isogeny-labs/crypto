@@ -11,7 +11,23 @@ pre-registered hypotheses)
 *On index calculus algorithms for subfield curves*, SAC 2020
 (ePrint 2020/1315).
 
-**Modular and low-genus carrier follow-up (2026-10-24):**
+**Modular and low-genus carrier follow-up (2026-10-26):**
+[Round22](research/koblitz_modular_ic_20261018/rounds/22/REPORT.md)
+solves the complete integral equivariant norm-zero recovery system:all eight
+Smith factors are1,the least scalar is1,and the full kernel has rank24.
+A small exact certificate uses only M1 and M3=7I,with22 both-sign order11
+fixtures checked. The inherited augmentation metric has Smith diagonal1,1,1,5.
+This concerns augmentation targets;the regular-target denominator5 below
+remains valid. The genus-one Tate base,complete base divisors,generic degree16
+QR model and degree8-by2 trace tower are checked. Proper lifted divisors,
+complete prescribed RR and the integral level77 modular-factor map remain open.
+The four Q40 node187 scalar points are excluded by a coupled valuation/descent
+argument under explicit proper/pole bridges;an explicit polynomial membership
+certificate and whole saturation remain open. Arbitrary modular-divisor reverse
+evaluation and ordinary460/367 fibers/images are still required. No new IC rank
+or efficiency assessment is supplied. See the [proof map](research/koblitz_modular_ic_20261018/rounds/22/PROOF_MAP.md)
+for the separation between Lean statements,native certificates and written geometry.
+
 [Round21](research/koblitz_modular_ic_20261018/rounds/21/REPORT.md)
 proves the characteristic2 five-root obstruction. Combined with actual
 trace-zero descent and a written valuative/formal-group bridge,it excludes

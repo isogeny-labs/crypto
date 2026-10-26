@@ -801,6 +801,8 @@ impl Solver {
         if let Some(progress) = &self.progress {
             progress.phase.store(phase as u8, Ordering::Relaxed);
         }
+    }
+
     /// **The whole run in `bitop/v1` word operations**: encoding,
     /// propagation over clauses and parity rows, conflict analysis and
     /// minimisation, branching heap, backjumps, restarts, clause-database

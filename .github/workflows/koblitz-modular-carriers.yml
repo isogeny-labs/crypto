@@ -24,6 +24,12 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/koblitz_modular_ic_20261018
       - uses: dtolnay/rust-toolchain@stable
       - name: Native tests and exact evidence replay
         shell: bash
@@ -206,6 +212,15 @@ jobs:
           (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
           # Validation logs are published in the artifact store; see round21/RELEASE.md.
           # Replay uses the committed raw archive; the complete Lean gate below is retained.
+          "$round/REPLAY.sh"
+          git fetch --no-tags origin 69f67409f5fe6b525c23b000edea047dd38fcf83
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" 69f67409f5fe6b525c23b000edea047dd38fcf83
+      - name: Replay round 22 complete augmentation recovery and coupled source bindings
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/22
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
           "$round/REPLAY.sh"
           research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-sources "$round"
       - name: Install pinned Lean

@@ -209,6 +209,18 @@ def nist_factorization(ref, since):
                  problem="nist-skipped-curve-factorization", unit=unit, better=better,
                  label=label, source=source)
 
+def koblitz_modular_augmentation(ref, since):
+    """Export the recorded scalar for the fixed n=5 augmentation presentation."""
+    path = "research/koblitz_modular_ic_20261018/rounds/22/ledger.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        value = record.get("native", {}).get("recovery", {}).get("augmentation_target_least_scalar")
+        emit("koblitz_modular.n5_augmentation_recovery_scalar", value, date=date,
+             problem=P_IC, unit="integer scalar", better="lower",
+             label="Exact equivariant recovery scalar on the n=5 augmentation targets; no cost claim",
+             source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -218,6 +230,7 @@ def main():
     e2e_runs(a.ref)
     photo_volcano(a.ref)
     nist_factorization(a.ref, a.since)
+    koblitz_modular_augmentation(a.ref, a.since)
 
 
 if __name__ == "__main__":

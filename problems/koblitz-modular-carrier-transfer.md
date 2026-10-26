@@ -953,3 +953,39 @@ See [receipt](../research/koblitz_modular_ic_20261018/rounds/21/ARTIFACT_PUBLICA
 and [download command](../research/koblitz_modular_ic_20261018/rounds/21/RELEASE.md).
 Only the artifact access/publication gap is closed;all mathematical
 acceptance criteria above remain open as previously recorded.
+
+## Round22: exact augmentation recovery and actual pole supports
+
+[Round22](../research/koblitz_modular_ic_20261018/rounds/22/REPORT.md)
+solves the complete integral equivariant recovery system after replacing
+regular target cycles by their trace-zero factors. The8-by32 Smith lattice
+has eight invariant factors1 and a24-column integral kernel basis;the least
+recovery scalar is1. A small exact certificate uses M1 and M3=7I only.
+Native CM and independent integer products,source bindings and22 both-sign
+order11 fixtures pass. The inherited polarization has Smith1,1,1,5 and its
+actual weighted Gram is retained. This does not contradict the regular-
+target denominator5 theorem or construct the final polarized quotient.
+
+The actual Tate/QR curve has a checked genus-one base,complete base divisors,
+a generic degree16 QR model,an irreducible plane projection,a smooth
+registered incidence open and an exact degree8-by2 trace tower. The degree5
+supersingular exceptional support of1+c must be included in proper nu
+geometry. Full lifted normalization/divisors,complete prescribed RR and a
+nonconstant descended map acting nontrivially on order11 remain open.
+Bounded normalization/place/integral-basis failures are retained and do not
+prove nonexistence. The smaller trace-subfield attempt is separately recorded.
+
+All four old node187 scalar points are excluded by simultaneous ordinary
+Miller valuations and complete coefficient descent under explicit written
+DVR/proper/pole bridges. The source binding checks80 conjugated functions
+and every required product/descent gate. No explicit polynomial separator
+or verified h-power ideal membership has been extracted;full saturation
+and the proper polarized quotient embedding remain separate obligations.
+
+The next decisive steps remain normalized lifted branches and complete RR,
+source-bound polynomial membership for node187,and an arbitrary modular-
+divisor reverse evaluator with complete ordinary460/367 fibers/images.
+The n3 and same-field n5 controls do not establish the F2 modular-factor
+acceptance test. Exact proof/test counts and failure receipts are in
+[VALIDATION.md](../research/koblitz_modular_ic_20261018/rounds/22/VALIDATION.md).
+No new relation rank or IC efficiency assessment is supplied.

@@ -1,26 +1,30 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [21](rounds/21/README.md), with its
-[report](rounds/21/REPORT.md), [PDF](rounds/21/report.pdf),
-[descent geometry](rounds/21/THETA.md), [saturation](rounds/21/SATURATION.md),
-[map status](rounds/21/CM.md), [proof map](rounds/21/PROOF_MAP.md)
-and [ledger](rounds/21/ledger.json).
+The current round is [22](rounds/22/README.md), with its
+[report](rounds/22/REPORT.md),[PDF](rounds/22/report.pdf),
+[exact recovery](rounds/22/RECOVERY.md),[coupled divisors](rounds/22/SATURATION.md),
+[proper geometry](rounds/22/CM.md),[proof map](rounds/22/PROOF_MAP.md),
+[validation](rounds/22/VALIDATION.md) and [ledger](rounds/22/ledger.json).
 
-Five nineteenth roots cannot sum to zero in characteristic two. With the
-actual trace-zero descent and written valuative/formal-group bridge this
-excludes the old Q34 scalar points.32 coupled norms and1330 pure-source
-resultants still leave four complete scalar models on node187. Whole
-saturation and complete coupled product divisors/arcs remain open.
+The complete integral equivariant recovery calculation succeeds on the
+actual norm-zero targets:least scalar1,eight Smith factors1 and kernel
+rank24. A small two-map certificate B1 M1+B3*(7I)=I passes22 both-sign
+order11 fixtures. The inherited polarization retains determinant5.
+R21's denominator5 theorem still applies to regular target cycles.
 
-The actual averaged CM recovery is equivariant and satisfies A*Phi=5I.
-A norm/fixed-vector obstruction modulo5 makes denominator5 sharp in this
-CM presentation;the proper source immersion still descends. Full theta
-kernel actions/rational trivialization,243 final quotient sections and
-the integral level77 factor/divisor evaluator remain open. The proof map
-records206 named Lean statements and the explicit native/written limits.
-Earlier relation ranks and costs stay frozen;no IC assessment is supplied.
+The genus-one Tate base,complete base coordinate/denominator divisors,
+generic QR model and degree8-by2 trace tower are checked. Proper normalized
+lifted divisors,complete prescribed RR and the integral level77 factor map
+remain open. A simultaneous valuation/descent argument excludes the four
+old node187 scalar points under explicit geometric bridges;polynomial
+separator/membership extraction and full saturation remain open. The
+arbitrary modular-divisor reverse evaluator and ordinary460/367 fibers/images
+are still required. Earlier relation ranks and costs stay frozen.
 
 Earlier evidence stays frozen:
+
+- [Round21](rounds/21/README.md):five-root obstruction,regular-target
+  sharp denominator5,and four complete Q40 necessary-system models on node187.
 
 - [Round 20](rounds/20/README.md):integral split recovery,proper source equations,canonical Pic2 match,2952 sections and the524288-case controlled-pole null.
 
