@@ -68,7 +68,7 @@ durable-store and performance requirements; it is not resolved by this work.
 
 | Requested component in both repositories | Current evidence |
 | --- | --- |
-| CPU rho, BSGS and IC on both exact curves | Verified constructed correctness controls and bounded public-Q runs. Earlier full-library results remain at their recorded revisions; the current base integration passes focused solver and release CLI checks, while its complete library validation remains open. |
+| CPU rho, BSGS and IC on both exact curves | Verified constructed correctness controls and bounded public-Q runs. The crypto base integration passes the complete release library (4,878 passed, 0 failed, 121 existing ignored), all 14 focused solver/device-policy checks, and real CPU/emulator CLI checks. Suite results remain tied to its recorded merged source. |
 | NVIDIA CUDA rho, BSGS and IC on both exact curves | Implemented; native compilation and device-source host emulation pass. Physical execution remains unverified. |
 | Apple Metal rho, BSGS and IC on both exact curves | Six native library checks passed through hosted `Apple Paravirtual device`; CLI qualification timed out during compilation. Physical GPU provenance and complete receipts in both repositories remain open. |
 
@@ -210,16 +210,20 @@ qualification result.
 The current merged-source checks pass all 14 focused solver/device-policy
 tests, seven real release `icx` CLI cases on CPU and the same seven through
 explicit host emulation, and all seven real release `ecdlp-nist` integration
-cases. These are host correctness observations. The complete 4,999-test
-library run remains in progress at the recorded validation snapshot, with an
-unchanged imported isogeny-walk test still running. Its six initial missing
-compile inputs and eight subsequent missing-session fixture failures are
-retained separately. All 105 restored inputs match the merged index, and
-18 distinct unchanged fixture controls pass across the retained replays.
-No test, assertion, budget or ignored set was changed; no full-library pass
-is claimed. The [integration receipts](evidence/certicom-base-integration-20261026/README.md)
-separate completed focused checks from the running full suite and failed
-independent semantic gate.
+cases. These are host correctness observations. The complete clean-input
+release-library rerun against code commit
+`c3f3c1a2b4314e42c728c517c4b9e4dda176fcea` ended at
+2026-10-26T18:58:03.931Z with 4,878 passed, 0 failed and 121 existing ignored
+(all 4,999 registered tests accounted for; none filtered out). The earlier
+six missing-include compile errors and full 4,870-pass/eight-missing-fixture
+failure run remain retained separately. All 105 restored inputs match the
+merged index, and 18 distinct unchanged fixture controls passed across the
+retained replays before the complete rerun. No test, assertion, budget or
+ignored set changed; the long imported isogeny-walk test completed normally.
+The [integration receipts](evidence/certicom-base-integration-20261026/README.md)
+preserve earlier partial and failed snapshots alongside the completed host
+result. This library pass does not discharge the failed independent semantic
+gate, current-head CI/review or physical GPU requirements.
 
 At crypto head `917e2214b132e76c509575095269652c66ff907c`, three additional
 failures and two other cancellations were retained as separate gates:

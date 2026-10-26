@@ -2,7 +2,7 @@
 
 This is source integration and host correctness evidence for existing crypto
 PR #2250. It is not a physical GPU receipt, benchmark, public-challenge solve,
-or completed full-library qualification.
+or physical-device qualification.
 
 The normal merge combines task parent
 `4f0a505dc69d15989e341332cfb03f5e28f55037` with observed main
@@ -36,10 +36,17 @@ The receipts record these distinct observations:
 - `validation-status.json` is a timestamped snapshot: 14 focused host
   solver/device-policy checks, 14 real CPU/emulator `icx` CLI executions,
   and seven actual release NIST integration cases pass. Eighteen distinct
-  fixture controls pass across the recorded replays. The complete library
-  run is still running, not passed. Its earlier compile-input and session
+  fixture controls pass across the recorded replays. At that earlier snapshot
+  the complete library run was still running, not passed. Its compile-input and session
   fixture failures remain disclosed; nested child-test result lines are
   not a complete full-library result.
+- `host-validation-completed-20261026.json` supersedes the earlier running
+  state with the complete clean-input result against code commit
+  `c3f3c1a2b4314e42c728c517c4b9e4dda176fcea`: 4,878 passed, 0 failed,
+  121 existing ignored, no filtering, exit 0. All 14 task checks passed.
+  It records the full local log's byte count and SHA-256 without claiming a
+  durable remote raw-log upload. The earlier full result of 4,870 passed,
+  eight missing-fixture failures and 121 ignored remains disclosed.
 
 The official independent checker was invoked identically in the merged
 checkout and exact-base control:
@@ -52,11 +59,14 @@ The original full-suite command is `cargo test --release --lib`, with
 network/loopback enabled. Its command receipt and complete stdout/stderr
 remain under the explicitly named `/tmp` paths in the snapshot. Those paths
 are ephemeral local observations, not durable uploaded artifacts. The
-running test's module is byte-identical to the pinned base; this establishes
+formerly long-running test's module is byte-identical to the pinned base; this establishes
 source identity, not a separate completed execution on main. No timeout,
-cancellation, ignore, narrower substitute or full-pass claim was applied.
+cancellation, ignore or narrower substitute was applied. The complete rerun
+finished normally at 2026-10-26T18:58:03.931Z; its host-suite pass is distinct
+from the still-failed semantic gate and original physical requirements.
 
 Current-head applicable CI/review, the failed independent semantic gate,
-complete library validation and original physical GPU requirements remain
-open. Keep PR #2250 open with auto-merge off. No new PR, paid resource,
+and original physical GPU requirements remain open. Complete host-library
+validation is now established for the recorded code commit. Keep PR #2250
+open with auto-merge off. No new PR, paid resource,
 billing change or merged-branch update is authorized by these receipts.
