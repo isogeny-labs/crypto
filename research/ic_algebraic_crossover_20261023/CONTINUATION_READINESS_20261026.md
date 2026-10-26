@@ -69,3 +69,32 @@ or read back. The owner storage-exception decision remains pending. Do not add
 the exception label, push oversized data, split/delete raw evidence or fabricate
 manifests. Keep the completed bytes and source commits intact while resolving
 access. The broader research campaign and final-head delivery remain incomplete.
+
+
+## Current update: S3 authorization and source recovery
+
+The owner explicitly authorized the configured S3 checkpoint/artifact uploads.
+All41 owned evidence files are delivered with actual remote-byte verification,
+30 content objects and32 real manifests; no Git exception or relay is needed.
+The official checkpoint and readback pass. A restricted token outside Git also
+passes the official POST gate, without storing the supplied root credential pair.
+A fresh quiet source-bound checkpoint is still required after protocol freeze.
+The earlier failed gate above is historical, not a current access prohibition.
+
+Source d3c9f02c7 merges the upstream SAT fix. The complete library command was
+attempted with all tracked fixtures present:4,869named passes,121ignores,one
+unfinished unchanged JV test at the2,700-second outer watchdog. Its timeout is
+retained and is not a pass. Own recovery examples have separate pending gates.
+
+The new prospective draft is protocol-hky-restart-20261026.json, validated by the
+canonical checker. Both hky and hky-aa execute every124case:248real fresh
+processes, not invented control rows. A/A checks determinism only. Native Rust
+analysis, Bash checkpointed execution and a metadata-only export adapter are
+committed; tests/build/clippy, actual source/binary pins, protocol freeze/commit
+and final S3 checkpoint must precede any fresh case. No new case has run yet.
+
+The artifact policy also found115duplicate data blobs reintroduced by inherited
+migration history. All136,231,547bytes match main's genuine bindings and actual
+S3 GET/SHA256 checks. Only duplicate Git tracking is removed, preserving physical
+files and old history; no new S3 writes or data changes. Receipt directory:
+pipeline-receipts/inherited-artifact-reconciliation-20261026/.

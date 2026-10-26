@@ -96,61 +96,53 @@ launched; the USD 100 cap includes replay and workspace billing is unmeasured.
 
 ## Publication and access gates
 
-The earlier automatic review refusal is resolved by explicit owner approval.
-The PR title/results description are published. The old remote head's commit
-b1ab8a4e5 migrated 24 files in this study/benchmark scope into real artifact
-manifests; preserved local copies are byte-hashed before integration.
-Additional locally tracked and pending data still require verified upload.
-The managed environment has no AWS identity (current configuration revision
-38; normal STS probe returns NoCredentials). The repository documents a
-separate CI artifact credential. A bounded manual relay was prepared and its
-transport/metadata tests pass, but the normal GitHub binary-upload endpoint
-returned 401 for the configured credential. No relay branch was pushed, no
-workflow was dispatched, and no S3 mutation or readback occurred. No credentials
-were read out or copied to artifacts. No SSM/provisioning denial was routed
-around. The owner was asked whether to use the documented `large-file-ok`
-exception for the remaining unchanged bytes; that decision is pending.
+Publication to the existing private PR was explicitly approved. The owner also
+explicitly authorized the configured S3 checkpoint and artifact writes after the
+first automatic-review refusal. That refusal is resolved; no Git storage
+exception is required or applied. Managed credential bindings remain absent,
+but owner-provided credentials authenticated through the normal CLI in a hidden
+in-memory session. Their values are never stored in source, argv, logs or Git.
+A documented narrowly scoped three-day checkpoint token is installed privately
+outside the repository; only its selector path is used by the native runner.
 
-After verifying all 24 original-wave files against the remote's real manifests,
-the current remaining inventory is **41 files, 7,508,437 bytes**: ten locally
-tracked files plus 23 study and eight benchmark pending files. The earlier
-59-file/8.9-MB dry run is historical and predates the newer follow-up bundles
-and verified exclusions. Pending plans are not valid uploaded-artifact
-manifests. Destination: s3://setec-astronomy-artifacts/store.
-Upload unchanged bytes and verify remote readback before real generated manifests
-replace Git blobs. No ready AWS identity, upload or readback is claimed. Both
-constructor binaries and complete new raw runs remain in hash-checked local
-bundles. Never split, rename, delete or fabricate evidence to pass a gate.
+The actual remaining inventory is now delivered: **41 files, 7,508,437 bytes**,
+30 unique content objects, 30 uploads and 11 already-stored aliases, in 32 real
+artifact manifests. Every file's actual S3 GET/size/SHA-256 readback passes and
+all previous bindings are preserved. The earlier 24-file remote migration remains
+intact. [Actual-byte receipt](pipeline-receipts/artifact-publication-20261026/remote-byte-replay.json).
+The completed PENDING plans are historical inventories, not substitute manifests.
+Original local bytes remain available. No evidence was split, renamed or deleted
+to evade storage policy; no CI relay was dispatched.
 
-The prior completed-wave site run has 46 passes and three known base failures (the unrelated
-panel-summary entry and two relative autolab links); the same failure methods
-were reproduced on the base. The initial new browser attempt failed because an
-old local preview server returned empty responses; its raw failure is retained.
-A fresh local static preview serves byte-identical HTML and passes all browser
-checks at 1280/390/320, dark and JavaScript-disabled, with no external requests.
-The integrated commit `1d71daac7` incorporates PR head `b1ab8a4e5` and main
-`37f761558`; the required full library command exits 101 before tests on an
-unclosed delimiter in unchanged upstream `src/cryptanalysis/sat.rs`. Its blob
-`ca306e19654aeb0f92c9ed79352e20615a182d91` remains identical on freshly fetched
-main `942caf7e4`. The [problem record](../../problems/sat-progress-phase-base-syntax.md)
-links the retained evidence. Do not apply earlier frozen-source passes to this
-merged source or patch unrelated SAT code. A fresh merged dashboard preview
-passes at 1280/390/320, dark and JavaScript-disabled, without script errors or
-external requests. Remote head `ac16317e5` and main `942caf7e4` are now integrated
-as `69cf0253e`; the only final conflict was the shared log, with both sides
-preserved. A fresh post-merge browser check passes and all 65 inventory hashes
-agree. No current-head CI pass is claimed. The final published summary is
-preserved in PR_UPDATE_FINAL_20261026.md.
-The fresh full-site attempt stops before tests because the real-manifest
-backend-leaderboard source is not hydrated. It does not replace the historical
-46-pass/three-base-failure result. Fifteen new native-follow-up progress series
-export successfully as neutral diagnostics; none adds an IC/rho ratio.
-Do not call the PR green or bypass checks/reviews to merge it.
+The official S3 checkpoint also passes actual archive/meta/resume readback:
+9,388,007 archive bytes, 567 members, matching separately downloaded metadata.
+The restricted token subsequently passed the official upload gate. Changes to
+source/protocol still require a fresh quiet checkpoint before any experiment.
+The initial token gate overlapped a local metadata commit, so it proves transport
+only and is not used as a final source-bound launch checkpoint.
 
-For the remaining artifact/source delivery: upload and verify
-the prepared artifact scope with tools/artifacts; commit real manifests and
-hydration instructions; complete the final artifact/source gates; push normally
-to this existing PR; update its title/body to this scope and follow its new head's
-checks/reviews. Paid allocation still requires the prescribed runner, current
-prices, a commitment journal and the existing cap. Publication does not complete
-the broader research campaign.
+Local commit d3c9f02c7 merges main e8fcadf62, which fixes the earlier unchanged
+SAT syntax and canonical-progress JSON. The first post-fix library attempt
+found four omitted Git-tracked include_str fixtures; those were materialized.
+The fresh release command timed out after 2,700 seconds including compilation.
+Test discovery confirms 4,869 named passes, 121 ignores and one unfinished
+unchanged prime-field JV end-to-end test. It is not a full-suite pass; see the
+separate runtime problem record. The new native recovery analysis
+and runner are committed as a draft; tests/build/clippy, binary pins and protocol
+freeze remain required before its 248 fresh cases. No new research case has run.
+
+The hydrated site suite executes 51 tests: 49 pass; two inherited generated-data
+errors remain (cover-report/registry digest and missing n83 canonical history
+row). The own partial-chart copy/link error is fixed. Main's history table also
+lacks that row; the working curve registry equals main. No unrelated science
+or ranking is patched to obtain green. Browser/generator/panel-index, six Lean
+and source-bound metadata checks passed on their recorded sources; post-merge
+presentation checks will be refreshed for final delivery.
+
+Next: complete native gates, commit real metadata and current reproduction
+instructions, inspect the actual PR head and push normally to the existing PR;
+follow actual-head CI/review without claiming a merge. The old PR body snapshot
+is historical and will be updated around final delivery. Paid allocation still
+requires the prescribed runner and the existing **USD100 total** extra-cloud cap
+including replay. No additional VM launched and no prior provisioning denial was
+retried. The larger research programme remains incomplete.

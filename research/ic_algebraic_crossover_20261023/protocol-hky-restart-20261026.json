@@ -37,7 +37,7 @@
       "description": "Independent HKY replay of every original (draw,k,branch) case.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "a214e78d76e6096c9768d5e899fd06386ba62ea6",
         "build": [
           [
             "cargo",
@@ -47,7 +47,7 @@
             "ic_guess_completed_audit"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "7b3bacada4f9a734790e3b55a2dd7883c872a5e34f70229864d5e25c818c8aeb",
         "flags": {},
         "env": {
           "RAYON_NUM_THREADS": "1",
@@ -68,7 +68,7 @@
       "description": "Second fresh process on the identical frozen case; tests determinism, not timing noise.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "a214e78d76e6096c9768d5e899fd06386ba62ea6",
         "build": [
           [
             "cargo",
@@ -78,7 +78,7 @@
             "ic_guess_completed_audit"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "7b3bacada4f9a734790e3b55a2dd7883c872a5e34f70229864d5e25c818c8aeb",
         "flags": {},
         "env": {
           "RAYON_NUM_THREADS": "1",
@@ -432,6 +432,15 @@
       "research/ic_algebraic_crossover_20261023/pipeline-receipts/completed-guess-hky-restart-20261026"
     ],
     "checkpoint_token_selector_only": "CHECKPOINT_TOKEN_FILE=/workspace/.ic-private-checkpoint/upload-token; never token values in records",
-    "additional_counted_work": "A second fresh-process full census checks determinism only; no native-time performance claim."
+    "additional_counted_work": "A second fresh-process full census checks determinism only; no native-time performance claim.",
+    "orchestration_sha256": {
+      "hky-restart-records.py": "8339467f7504df473c0de0df7b32a91c442acd28d0a3c0335e91a07611677c06",
+      "run-hky-restart-20261026.sh": "26c6012732bf9399f9526a0bb306a9f8b2e955e1412b66063fc69f9b3a10b780"
+    },
+    "protocol_tools_commit": "6a69b2d02ecd53f1649bcf56e23e4ffe91d953ad",
+    "build_receipt": "pipeline-receipts/hky-restart-build-20261026/status.json",
+    "strict_clippy_base_failure": "five unchanged library warnings retained, no own-example diagnostics; default warning severity completed without suppression of those warnings",
+    "binary_archive": "evidence/binary-hky-restart-20261026.tar.xz",
+    "source_gate_scope": "Own auditor6tests and20otherexampletargets35tests pass; global4991commandtimedout on unchangedJVtest after4869passes/121ignores. Strictclippy5unchangedbasewarnings retained; ownexamplediagnostics0."
   }
 }

@@ -79,7 +79,8 @@ The original 116-attempt balanced campaign ended at 17:53:53 UTC on
 accounted for: 78 refute, 45 saturate without refuting and one times out.
 The m14/m15 continuation and dependent HKY queue stopped across the
 workspace restart; no research runner is currently live. The independent
-124-branch HKY program has not run. Original L2 full-panel specs and larger
+HKY recovery is prepared as two real124-case arms (248fresh processes); its
+auditor6tests and20otherexampletargets35tests pass. No fresh case has run yet. Original L2 full-panel specs and larger
 host shards remain unchanged and unexecuted. The USD 100 extra-cloud ceiling
 includes replay; no additional VM has launched and workspace billing is
 unmeasured.
@@ -97,7 +98,10 @@ readback. [Delivery receipt](pipeline-receipts/artifact-publication-20261026/rem
 No Git storage exception or CI relay was used. Source integration and final-head
 validation/push are still in progress. The earlier integrated library gate fails
 on [unchanged upstream SAT syntax](../../problems/sat-progress-phase-base-syntax.md);
-new main `e8fcadf62` now contains its upstream fix and awaits integration/tests.
+main `e8fcadf62` is incorporated in `d3c9f02c7` and fixes that syntax. The full
+release command reached its 2,700-second watchdog with 4,869 named passes,
+121 ignores and one unfinished unchanged JV test; it is not a full-suite pass.
+[Runtime record](../../problems/jv-nonweak-end-to-end-library-watchdog.md).
 Earlier test passes belong to their recorded frozen sources. There are 31 inspected reports,
 34 pages. The [v2 metadata adapter](curve-identity-adapter.v2.json) preserves
 all 25 v1 identities and adds the two independently checked partial models.

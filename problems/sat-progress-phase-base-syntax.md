@@ -1,6 +1,6 @@
 # Inherited SAT progress-phase syntax blocks integrated validation
 
-- **Status:** open
+- **Status:** investigating
 - **Kind:** implementation gap in the base branch
 - **Affected work:** [algebraic IC publication](../research/ic_algebraic_crossover_20261023/PUBLISH_REVIEW.md), PR #2550
 - **Next action owner:** upstream SAT implementation maintainer
@@ -8,9 +8,10 @@
 
 ## Problem
 
-The integrated source cannot compile the required release library suite because
-the unchanged base file `src/cryptanalysis/sat.rs` has an unclosed delimiter.
-No library tests execute on this integrated source.
+Earlier integrated sources could not compile because unchanged base SAT code
+had an unclosed delimiter. Main e8fcadf62 now fixes that syntax, incorporated by
+merge d3c9f02c7. The current source compiles and is running the required4,991-test
+suite; final suite/example results are pending.
 
 ## Evidence and uncertainty
 
@@ -34,7 +35,7 @@ No library tests execute on this integrated source.
 
 ## What would unblock it
 
-- [ ] Incorporate the upstream SAT correction by a normal base merge.
+- [x] Incorporate the upstream SAT correction by a normal base merge.
 - [ ] Run the release library suite and affected example tests on the new
   integrated source, retaining all outcomes and addressing task-caused failures.
 
@@ -60,3 +61,9 @@ The later integrated source `69cf0253e` merges PR head `ac16317e5` and main
 retained under `pipeline-receipts/final-integrated-library-gate-20261026-69cf/`
 in the study, preserving the first failed gate separately.
 No bypass, current-head test pass or merge is claimed.
+
+On2026-10-26, main e8fcadf62 supplies SAT blob
+`f1bac71439f5835e94c8d8f12071b86600a9a73f`, merged as d3c9f02c7.
+The first post-fix attempt stopped on four omitted tracked fixture files; those
+were materialized and the unchanged library tree now runs4,991tests. Both failed
+receipts remain preserved. Do not call the full gate green before completion.

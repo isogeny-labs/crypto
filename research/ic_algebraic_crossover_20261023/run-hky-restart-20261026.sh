@@ -16,6 +16,8 @@ python3 "$ic_meta" guard
 if [[ ${1:-} == --resume ]]; then test -d "$ic_run"; else test ! -e "$ic_run"; mkdir -p "$ic_run"; fi
 exec 9>"$ic_run/.batch.lock"
 flock -n 9 || { echo 'This batch already has a live owner.' >&2; exit 1; }
+printf '%s\n' "$BASHPID" > "$ic_run/runner.pid"
+ps -o pgid= -p "$BASHPID" > "$ic_run/runner.pgid"
 if [[ ${1:-} == --resume ]]; then python3 "$ic_meta" restore; fi
 date -u +%FT%TZ > "$ic_run/runner-started-$(date -u +%Y%m%dT%H%M%SZ).txt"
 python3 "$ic_meta" host

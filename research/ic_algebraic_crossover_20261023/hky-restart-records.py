@@ -29,11 +29,14 @@ def guard():
     assert p['freeze']['status'] == 'frozen', 'draft protocol: no research launch'
     errors = protocol_tool.schema_errors(p,'experiment.protocol/v1') or protocol_tool.lint_protocol(p,STUDY)
     assert not errors, errors
+    assert subprocess.check_output(['git','-C',str(ROOT.parent/'crypto-autoresearcher'),'rev-parse','HEAD'],text=True).strip() == p['extensions']['protocol_tools_commit'], 'protocol checker revision changed'
     assert p['arms'][0]['instrument']['binary_sha256'] == sha(p['extensions']['frozen_binary_path']), 'binary changed'
     assert p['arms'][1]['instrument'] == p['arms'][0]['instrument'], 'A/A instrument changed'
     assert sha(STUDY/'inputs/guess-ell8.jsonl') == p['extensions']['input_sha256'], 'inputs changed'
     assert sha(STUDY/'pipeline-receipts/guess-completion-20261025-01/receipt.json') == p['extensions']['producer_receipt_sha256'], 'producer changed'
     assert sha(ROOT/'examples/ic_guess_completed_audit.rs') == p['analysis_plan']['script']['sha256'], 'analysis changed'
+    for filename, expected in p['extensions']['orchestration_sha256'].items():
+        assert sha(STUDY/filename) == expected, 'orchestration changed: '+filename
     return p
 
 def host():
