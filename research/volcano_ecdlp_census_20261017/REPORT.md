@@ -2,6 +2,21 @@
 
 Study `research/volcano_ecdlp_census_20261017/`; plan `PLAN.md`, analysis plan `ANALYSIS_PLAN.md` (frozen after data collection and before inspection), amendments `AMENDMENTS.md` (A1, A2). Every number below is read from `analysis/results.json` (written by `analysis/analyze.py`, 10,000 bootstrap or permutation replicates, seeds 20261022 and 20261023). **Status: observed, not established.** No speedup is claimed. Independent validation (`VALIDATION.json`) has not happened yet; this report is the analysis, not its validation.
 
+## Erratum E-CS (2026-10-24): the `rho.cubic` class set-up
+
+The frozen binary (`ac4bc5b2…`) left the `rho.cubic` class set-up (57 GAE
+per solve) out of each `rho-cubic` record's total. Corrected with ecbench
+`compare`, the V3 crater positive control is 0.599 [0.573, 0.627] (D),
+0.611 [0.584, 0.640] (N) and 0.596 [0.583, 0.609] (ctl), against
+0.572 / 0.584 / 0.569 as recorded. It still passes its gate (upper bound
+below 0.85). It sits 3–6% above 1/√3 rather than on it, because the set-up
+is a fixed cost the asymptotic prediction leaves out. IC / `rho-cubic` on
+the crater (A3/F1) is 81.1× (D) and 80.9× (N) at 0 GAE, against 85.0× and
+84.7×, with rho ahead across the band. These supersede 0.5733 and 84.9×
+wherever they are quoted, the `benchmarks/README.md` row included.
+Sessions, analysis and figures are unchanged. See
+[`../class_setup_impact_20261024/`](../class_setup_impact_20261024/README.md).
+
 ## Erratum (A3, after independent validation)
 
 The independent validator recomputed every number here (192 of 192 agree) and found two material reporting errors and six minor ones in the first version of this text; only wording changes, no estimand, margin, test, threshold or number. Corrected in place below and recorded in `AMENDMENTS.md` A3.

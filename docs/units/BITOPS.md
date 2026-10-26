@@ -200,14 +200,199 @@ When either arm is incomplete, its `bitop/v1` total is a lower bound, as
 still goes through the band. For the same reason `--unit` and `--weight`
 exclude each other.
 
+## Extensions
+
+An extension classifies counters, or names a field, that the convention had
+no rule for. It never changes a primitive's weight, so
+`docs/units/bitop-v1.vectors.json` and every figure priced before it are
+unchanged; it can only turn an unpriced counter or an unpriceable record into
+a priced one. Each is dated, and its tests are in
+`src/cryptanalysis/ecbench/work.rs`.
+
+### 2026-10-21 (ic-acct-6)
+
+| counter or family | rule | why |
+|---|---|---|
+| `projected_base_membership_checks_uncharged` | not work (sub-total) | the `[r]P = O` check is `CountedGroup::mul`, whose additions and doublings the phase already charges |
+| `projected_base_dedup_probes_uncharged` | `hash_probe` | the duplicate-abscissa guard: one keyed-set insert of a field element (the unit prices a keyed-set probe, not the container) |
+| `projected_base_duplicate_points` | not work (outcome) | |
+| `projected_base_column_map_entries_uncharged` | not work (size) | the column map's vectors are memory; the indexes derived from them are the `base_index_builds` item |
+| `aux_supersingular` | not work (flag) | |
+| `native_field_muls_uncharged`, `native_field_sqrs_uncharged` (`ic.cm_folded_*`) | `field_mul`, `field_sqr` | the native backend (`research/conductor_gap_cm_orbits_20261015/native/group.hpp`) increments them in every `mul` and `sq`, those inside its Jacobian doublings and mixed additions included |
+| `native_group_doubles_uncharged`, `native_group_mixed_uncharged`, `native_scalar_calls_uncharged`, `native_factor_base_scans_uncharged` | not work (sub-totals) | their products are the two counters above |
+| `native_queries_uncharged`, `native_hits_uncharged`, `native_rank_uncharged`, `native_rejected_duplicate_columns_uncharged`, `native_pair_table_keys_uncharged` | not work (outcomes and sizes) | the probes and inserts behind them are in the item below |
+| `native_table_bytes_uncharged` | not work (memory) | |
+| `independent_replay_wall_ns` | excluded diagnostic | wall-clock time is not work and is never priced |
+| `ic.cm_folded_*` | `known_uncounted` item `native_backend_exponentiations_field_adds_hashing_modr_elimination_and_cm_map` | the backend's `power` exponentiations (inversions, square roots, the reciprocal modulo `r`), field additions, hash inserts and probes, arithmetic modulo `r`, elimination and the CM map are done with no counter; the records stay incomplete and say so |
+| family `extension`, slug `icv1-f2m<N>-…` | `F_{2^N}` | `gaudry_quartic_bin`'s `y² + xy = x³ + ax² + b` over `F_{2^{4m}}`, `N = 4m`, `field_bits = m`; a binary field is priced by its degree, whatever tower the code computes in |
+| family `extension`, slug `icv1-fp<b>k4-…` | `F_{p⁴}`, `p` of `b` bits | the `F_{p⁴}` convention above |
+
+Left unpriced on purpose:
+
+- `abscissae_enumerated_uncharged`: the counter is the size of the enumerated
+  weight set, not the number of subsets summed nor their weight, so one
+  increment has no fixed primitive sum.
+- `solver_conflicts`: a CDCL conflict is not a fixed number of primitives.
+
+Work that was never counted stays listed: the five index-calculus items
+(`gauss_column_scans_and_pivot_inversions`, `relation_row_construction`,
+`walk_bookkeeping`, `table_insert_attempts`, `base_index_builds`) and the
+solver gaps leave a record only when a re-run on an instrumented binary
+counts them.
+
 ## Changing the convention
 
 A committed figure must reprice to the same integer forever, so these formulas
 and their weights are frozen. A different convention gets a new name:
 
-- `bitop/v2` for Karatsuba products;
+- Karatsuba products;
 - a trinomial-aware reduction;
-- a memory-cost model.
+- a memory-cost model: that one is `bitop/v2`, below.
 
 Every record keeps its primitive counts, not only its total, so any later
 version re-prices the whole history without re-running it.
+
+## `bitop/v2`: memory
+
+`bitop/v2` is `bitop/v1` plus a declared memory term.  A table-based method
+trades gates for memory, and a unit that counts gates alone can flatter it;
+`bitop/v2` makes the trade visible without touching the gate figure.  It is
+frozen as this section states it; the entry widths are in
+`docs/units/bitop-v2.vectors.json`, which the test
+`committed_v2_vectors_are_frozen` holds to the implementation
+(`src/cryptanalysis/bitops.rs`, `src/cryptanalysis/ecbench/work.rs`).
+`bitop/v1` is untouched: every v1 figure, vector and committed record
+reprices exactly as before.
+
+A record priced in `bitop/v2` reports four figures:
+
+- `bitops`: the `bitop/v1` gate total of the same record, the same integer.
+- `memory_bits`: the bits of the structures the method holds, computed from
+  fields committed records already carry.
+- `at = bitops × memory_bits`: an area–time product, an exact integer.
+- `memory_complete` with `memory_unpriced`: whether every structure the
+  rule names has its field, and which are missing.  A missing field makes
+  `memory_bits` and `at` lower bounds; it is never charged zero silently.
+
+Throughout, `κ` is the bits of a field element (`element_bits()`: `b` for
+`F_p`, `n` for `F_{2^n}`, `4b` for `F_{p⁴}`) and `w` the bits of `r`
+(`max(1, r_bits)`, as the gate formulas take it).
+
+### Entry widths
+
+Every stored structure is charged as a count of entries times a declared
+width.  The widths are what an implementation would store with no packing
+or compression; they are conventions, like the gate weights, not measured
+footprints.
+
+| structure | one entry holds | bits |
+|---|---|---|
+| distinguished-point table (rho, kangaroo, the claw, the strong Koblitz rho) | an affine point and its two coefficients modulo `r` | `2κ + 2w` |
+| BSGS baby-step table | a point key and its index | `κ + w` |
+| factor-base point | an affine point | `2κ` |
+| relation-matrix entry | one coefficient modulo `r` | `w` |
+| oracle table entry (pair, orbit, fiber and auxiliary BSGS tables) | a field-element key and an index | `κ + w` |
+| solver peak | a byte | `8` |
+
+A kangaroo stores a distance where rho stores two coefficients; the
+distinguished-point width is a declared upper bound for it, the same for
+every walk.  Walk state in flight (the lanes of the strong rho, the
+coefficient pair of each walk) is left out: it is a constant number of
+entries, and no record counts it.
+
+### Which fields a record kind is read from
+
+**Generic methods** (`rho.*`, `bsgs.*`, `kangaroo.*`, `claw.*`).  The entry
+count is the first of `counters.inserts_uncharged`,
+`counters.table_inserts_uncharged`, `counters.table_entries`,
+`counters.distinguished_points` the record carries, the reading the bound
+fitter's memory axis already uses (`bounds::MEMORY_COUNTERS`).  A method whose
+id starts with `bsgs` is charged the baby-step width; every other generic
+method the distinguished-point width.  A record carrying none of the four
+reports `memory_unpriced = ["table_entries"]`.
+
+**Index calculus** (`ic.*`).  The sum of:
+
+- *factor base*: `factor_base.signed_points · 2κ`.  Without a
+  `factor_base` block: `factor_base.signed_points` is unpriced.
+- *relation matrix*: `rows · columns · w`, with `rows` =
+  `counters.matrix_rows`, else the `linear_algebra` phase's native `rows`;
+  `columns` = `factor_base.columns + 1` (the target column), else the
+  `linear_algebra` phase's native `columns` (which already counts it).  This
+  is the **dense** size and is declared as an upper bound: the matrices are
+  sparse (two or three non-zeros a row for the pipeline's decompositions)
+  and the elimination the records count works on that sparsity.  A missing
+  source is unpriced as `matrix_rows` or `factor_base.columns`.
+- *oracle tables*: where a phase carries the marker
+  `counted:table_insert_attempts`, `Σ table_insert_attempts · (κ + w)` over
+  the phases' `work_native` maps (zero for an oracle without a table; an
+  attempt is kept or not, so attempts bound the entries kept from above).
+  Without the marker, `Σ (pair_table_entries + fiber_table_entries +
+  aux_bsgs_table_entries) · (κ + w)` over phase natives and counters where
+  any of them is present; else `table_insert_attempts` is unpriced.
+- *solver*: `8 · solver.peak_bytes` when the record has a solver block
+  with `peak_bytes > 0`; a solver block with `peak_bytes = 0` leaves
+  `solver.peak_bytes` unpriced (the engine did not measure it); a record
+  with no solver block (a table oracle) has no solver term.
+- *native backend table*: `8 · counters.native_table_bytes_uncharged` where
+  the counter is present (the `ic.cm_folded_native_v1` backends declare
+  their table size this way).
+- `ic.k4_gaudry` keeps its oracle table in no counter: it is charged no
+  table term and lists `oracle_table_entries` unpriced in place of the
+  oracle-table rule.
+
+`memory_bits` is the **sum** of the terms, not their maximum: the base and
+the oracle's tables live through the relation search, the matrix is built
+beside them and the solver runs inside it, so the sum is the declared size
+of what is held at the pipeline's widest point.  It is declared, not
+measured: `time.max_rss_kib` is the whole process and never enters.
+
+### Records that cannot be priced completely
+
+Each of these is reported with `memory_complete = false` and the missing
+fields named; its `memory_bits` and `at` are lower bounds:
+
+- index-calculus records written before 2026-10-16, whose phases carry no
+  `work_native` and so no `counted:table_insert_attempts` marker and no
+  `*_table_entries` native (`table_insert_attempts`);
+- records with a solver block whose `peak_bytes` is `0` (the
+  `d4-macaulay`, SAT, `fghr` and `line-s4` engines; `solver.peak_bytes`);
+- `ic.k4_gaudry` (no `factor_base` block, no `matrix_rows`, no oracle table
+  size);
+- index-calculus records with no `factor_base` block, the native backends
+  among them (`factor_base.signed_points`, `factor_base.columns`,
+  `matrix_rows`; their `native_table_bytes_uncharged` is charged);
+- generic records carrying none of the four memory counters.
+
+The `extension` family has no `bitop/v1` field and therefore no price in
+either unit: `ecbench work` reports the same error for it under
+`bitop/v2` as under `bitop/v1`.
+
+There is no per-phase memory figure: the structures are held across
+phases, and the fields a record carries do not say when each was
+allocated or freed.  The per-structure terms are reported instead
+(`memory_terms`).
+
+### Ranking in `bitop/v2`
+
+Two arms rank in `bitop/v2` only where
+
+- both records are complete in gates (`complete`) and in memory
+  (`memory_complete`), and
+- the order is the same in `bitops` and in `at`.
+
+Where the two orders disagree, the arms trade gates for memory and
+`bitop/v2` ranks neither; the comparison reports both figures.  A lower
+bound in either figure ranks nothing against a complete one, as in
+`bitop/v1`.
+
+### Where it is emitted
+
+`ecbench work --unit bitop/v2` writes one `ecbench.work/v2` line per record
+(`bitops` identical to the `bitop/v1` line, then `memory_bits`,
+`memory_terms`, `at`, `memory_complete`, `memory_unpriced`);
+`ecbench bitop-vectors --unit bitop/v2` prints the frozen entry widths;
+`ecbench bound fit --unit bitop/v2` fits the same gate totals as
+`bitop/v1` and marks a record incomplete in memory as a lower bound.
+Without `--unit`, or with `--unit bitop/v1`, every command's output is the
+`bitop/v1` output, byte for byte.
