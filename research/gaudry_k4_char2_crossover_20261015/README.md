@@ -1,4 +1,4 @@
-# `k = 4` in characteristic 2 past one word: a sparse matrix and `u128` orders; IC reaches rho's cost near `m ≈ 17` (indicated, not established)
+# `k = 4` in characteristic 2 past one word: a sparse matrix and `u128` orders; IC is 3.6× rho at `m = 15` (clean sessions); the `m = 16–17` records are from interrupted sessions and `m = 18` did not complete
 
 2026-10-15 to 2026-10-26. Protocol: [`PROTOCOL.md`](PROTOCOL.md), registered
 (commit `e403626cb`) before any claim run. Every run, pilots and failures
@@ -66,6 +66,11 @@ reaches 5 % near `m = 19`.
 ![row_ops against columns](figures/la_scaling.svg)
 
 ## Result 2: IC against rho, `h = 2`, `m = 15–17`
+
+**The headline is the `m = 15` row.** The `m = 16` and `m = 17` rows come
+from sessions that were killed before finishing and were not replayed; they
+are shown in italics as *interrupted, not audited to completion* and carry no
+claim.
 
 Cofactor 2 at every size, so `r = 2^59, 2^63, 2^67` and the ratio carries
 the same `√h` throughout. `S` is group-addition equivalents ÷ `√r`; rho's

@@ -4,7 +4,7 @@
 #show figure.caption: it => it.body
 #show table: set text(size: 8.3pt)
 
-= $k = 4$ in characteristic 2 past one word: a sparse matrix and $u 128$ orders; IC reaches rho's cost near $m approx 17$ (indicated, not established)
+= $k = 4$ in characteristic 2 past one word: a sparse matrix and $u 128$ orders; IC is 3.6× rho at $m = 15$ (clean sessions); the $m = 16$–17 records are from interrupted sessions and $m = 18$ did not complete
 
 2026-10-15 to 2026-10-26. `research/gaudry_k4_char2_crossover_20261015/`. Protocol registered (commit `e403626cb`) before any claim run; binary sha256 `c143cf62…` for every claim session. Stacked on #1883. *Class: engineering* (Parts D and F) and a *comparison against rho on non-standard curves* (Part E).
 
