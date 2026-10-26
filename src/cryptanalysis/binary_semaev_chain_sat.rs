@@ -627,6 +627,7 @@ impl ChainedS3Encoding {
     /// then re-evaluate the chain over the original binary field.
     pub fn verify_external_assignment(&self, model: &[bool]) -> bool {
         self.solver.check_original_assignment(model) && self.verify_field_assignment(model)
+    }
 
     /// Fix one named x-coordinate block: summands `0..m`, intermediate
     /// outputs `m..2m-2`, and the final target at `2m-2`. The target is
