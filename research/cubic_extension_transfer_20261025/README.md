@@ -1,4 +1,12 @@
-# Cubic-extension transfer: frozen Sage evidence
+# Cubic-extension transfer: frozen evidence and native follow-up
+
+The [native follow-up](native_followup/README.md) adds an explicit rational
+three-torsion action with exact polynomial certificates, a geometric
+chart-availability argument, native projective-divisor recovery, and 58
+repeated native stage/control runs. The universal extra-step claim and
+complete native transfer remain open. Strict timing qualification is blocked
+by missing PSI and incomplete CPU reservation. The sections below preserve
+the scope of the original historical import.
 
 This PR preserves the completed study requested by the owner. It imports the
 existing SageMath 10.6 source snapshot, recorded results, and compact exact
@@ -66,8 +74,10 @@ file against PUBLICATION.json before replay. Do not execute new research
 comparisons with this historical Python path: a native implementation and
 the repository's matched validation protocol are still required.
 
-Conductor, Cargo/Rust, and Lean/Lake are not available in this task
-environment. A later read-only CLI check with permitted proxy access verified
+At the historical-import stage, Conductor, Cargo/Rust, and Lean/Lake were
+not available. The follow-up installed Rust and passed standalone native tests;
+the root release test is still unavailable in this partial import checkout
+because Cargo.toml is absent. Conductor and Lean/Lake remain unavailable. A later read-only CLI check with permitted proxy access verified
 the GitHub login; the earlier authentication warning was caused by blocked
 network access. No repository-wide native test run is claimed. Existing Sage execution records are
 preserved; repository-wide release tests and formal proof checks are not
@@ -86,6 +96,6 @@ admitted row.
 | Complete toy transfer | Recorded complete | Ten source answers; one automatic two-step example |
 | Universal extra-step bound | Open | Bounded searches do not decide it |
 | Universal exceptional-chart coverage | Partial | Generic tangent chart and bounded retries remain |
-| Native matched performance result | Not established | Port, isolation, strongest rho, native pricing and replay missing |
+| Native matched performance result | Partial diagnostics | 58 native stage/control runs; full native transfer, qualified isolation, external comparison, native pricing and cross-host replay missing |
 | Lean formalization | Blocked / not verified | No Lean/Lake toolchain; central structural bridges remain unformalized |
-| Repository release tests | Blocked locally | No Cargo/Rust or authenticated CLI checkout; CI pending |
+| Repository release tests | Blocked locally | Rust installed; partial checkout has no root Cargo.toml; CI pending |

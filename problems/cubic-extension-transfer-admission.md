@@ -26,13 +26,15 @@ does not settle those research questions.
 - **Missing access:** no observed-ready S3 credentials; five original files
   await upload and readback. The publication manifest does not claim remote
   availability.
-- **Missing tools:** conductor is not installed; Cargo/Rust and Lean/Lake are
-  absent. The initial CLI authentication warning was caused by a sandbox
-  network denial: a later permitted-proxy read verified the GitHub login as
-  aburan28. CLI access is available; this does not supply a Cargo toolchain or
-  establish a repository release test run.
-- **Missing implementation:** native replacement and complete geometric
-  exception coverage.
+- **Tool status:** Rust 1.99.1 is now installed and standalone native tests
+  pass. The root release-test command was attempted but the partial import
+  checkout has no Cargo.toml. Conductor and Lean/Lake remain unavailable.
+  CLI access is available; the earlier authentication warning was caused by
+  sandbox network denial. No root release-test pass is claimed.
+- **Missing implementation:** native forward construction and complete inverse
+  map. Native obstruction evaluation, source controls, target-stage adapters
+  and projective divisor recovery are now implemented, but do not constitute
+  a complete elliptic-to-Jacobian transfer.
 - **Missing validation:** isolated matched operation-cost runs, the strongest
   applicable rho fold, external solver comparison, cross-host replay, and
   faithful Lean bridges for the structural statements.
@@ -67,6 +69,42 @@ For the conjecture, a finite all-negative center plus all eligible neighbors
 must have every target order independently certified before it is reported
 as a counterexample. Otherwise an actual structural proof is needed; more
 bounded negative searches are not a proof.
+
+
+## Native follow-up evidence
+
+See [the follow-up](../research/cubic_extension_transfer_20261025/native_followup/README.md)
+and its source-linked report. All historical source/evidence bytes are preserved.
+
+- Exact polynomial calculations give a rational three-torsion translation
+  matrix with order three and a factored discriminant; the existing Rust
+  checker replays six C++-issued identity records with extra points and
+  false-identity controls. No Lean geometric proof is claimed.
+- All 232 nonzero torsion actions across 29 saved fixtures match the prior
+  construction. The native evaluator reproduces 27 prepared coverage counts.
+- A geometric argument bounds bad representative classes by 5*p^2+7*p+6
+  under the stated N1/N2 and prime-order hypotheses. It gives common-multiplier
+  availability for p>=19, but not totality of the current forward formulas
+  or inverter. Native recovery checks all 2,492 rational effective degree-three
+  divisors on the three declared test curves; it starts from support coordinates.
+- Fifty native solver/control runs plus eight A/A repeats all recover correct
+  answers. A separate FLINT implementation checks all source scalar relations.
+  Target points are synthetic with the same known answer; no native forward
+  map was executed. No qualified wall times: PSI is absent and system threads
+  could not all be moved off the selected CPU. Strict preflight refusal and
+  limited diagnostic receipts are retained.
+
+The next mathematical exit criterion is a certified character relation for
+labelled neighboring obstruction functions, or a source/target-order-certified
+counterexample. The exact remaining calculation is level-nine label transport
+and modular divisors modulo two, including arithmetic constants. The rational
+three-torsion action removes one interpolation dependency; it does not settle
+that relation. The next implementation exit criterion is a native forward map
+and complete generic inversion on the geometrically guaranteed domain, with
+all additional poles counted. The next measurement exit criterion is a host
+with PSI/full reservation, then a frozen cold one-target comparison including
+every transfer phase, strongest references, pricing, external comparison and
+independent replay. No diagnostic substitutes for these requirements.
 
 ## Resolution and history
 
