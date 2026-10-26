@@ -117,7 +117,7 @@ def provider_plan(bundle, head, clock, api=aws):
                 not subnet["MapPublicIpOnLaunch"]):
             raise ValueError(f"approved subnet differs in {fixed['zone']}")
         score = scores.get(zone_ids.get(fixed["zone"]))
-        if score is None or score < 5:
+        if score is None or score < 3:
             raise ValueError(f"Spot placement score is too low in {fixed['zone']}")
         price, quote_time = latest_quote(history, fixed["zone"], clock)
         if price > fixed["max_hourly_usd"]:

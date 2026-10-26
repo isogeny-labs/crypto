@@ -102,9 +102,11 @@ $0.39 per hour. At those bids, two 50 GB gp3 root volumes and a $0.05 S3
 allowance, its six-hour projection at the maximum bids is $4.09 under a
 $4.20 allocation cap. A future launch must arm independent deletion guards;
 this projection is not a guaranteed account billing ceiling.
-On 2026-10-26 the AWS API returned Spot placement scores 9 and 7, G/VT Spot
-quota 64 vCPUs, and a $3.81 projection at the quoted rates. These values
-are time dependent; the plan must recheck them before allocation. The gp3
+On 2026-10-26 the AWS API returned G/VT Spot quota 64 vCPUs and a $3.81
+projection at the quoted rates. The two Spot placement scores moved from
+9/7 to 9/4 during preparation; the plan records current scores and requires
+at least 3 in each zone. Prices and scores must be rechecked before
+allocation. The gp3
 rate and meaning of placement scores follow [AWS EBS pricing](https://aws.amazon.com/ebs/pricing/)
 and [AWS Spot placement guidance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-sps-works.html).
 The current module writes only a read-only plan. AWS launch, host binding,
