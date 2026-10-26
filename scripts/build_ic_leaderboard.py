@@ -2785,7 +2785,7 @@ def page(doc: dict, standalone: bool) -> str:
     online_hi = max(r["best"]["online_speedup"] for r in kob_rows)
     cold = [r["best"]["ratio_rho"] for r in kob_rows if not r["best"]["construction_artefact"]]
     model = [r["best"]["ic_online_over_precomputation_model"] for r in kob_rows]
-    site = "https://aburan28.github.io/crypto/"
+    site = "https://isogeny-labs.github.io/crypto/"
     nav = [("Overview", site), ("Scoreboard", site + "scoreboard/"),
            ("Leaderboard", None), ("Where things stand", site + "scoreboard/ic-current-state.html"),
            ("Algorithm lab", site + "scoreboard/algorithm-lab.html"), ("Campaign status", site + "status/"),
@@ -3738,7 +3738,7 @@ def page(doc: dict, standalone: bool) -> str:
              'here was measured for this page, and nothing is a speedup. Records kept in other units, wall-clock '
              'panels and batched producers awaiting independent replay, are in '
              '<a href="https://github.com/aburan28/crypto/blob/main/docs/ic/BOUNDARY_TARGETS.md">docs/ic/BOUNDARY_TARGETS.md</a>; the canonical page is the '
-             '<a href="https://aburan28.github.io/crypto/scoreboard/">index-calculus scoreboard</a>. No IC pipeline has been priced '
+             '<a href="https://isogeny-labs.github.io/crypto/scoreboard/">index-calculus scoreboard</a>. No IC pipeline has been priced '
              'end to end on ECC2K-130 or on the m = 83 confidence gate (AGENTS.md §8a).</p>'
              f'<p>Current through ledger §{LEDGER_COVERED_THROUGH}; latest frontier audit '
              f'{esc(doc["latest_frontier_audit"]["date"])}. Built by '

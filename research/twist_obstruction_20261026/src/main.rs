@@ -167,21 +167,33 @@ fn f2(u: u32) -> F2 {
     F2 { u, v: 0 }
 }
 fn add2(a: F2, b: F2) -> F2 {
-    F2 { u: a.u ^ b.u, v: a.v ^ b.v }
+    F2 {
+        u: a.u ^ b.u,
+        v: a.v ^ b.v,
+    }
 }
 fn mul2(f: &Fq, a: F2, b: F2) -> F2 {
     let uu = f.mul(a.u, b.u);
     let vv = f.mul(a.v, b.v);
     let m = f.mul(a.u ^ a.v, b.u ^ b.v);
-    F2 { u: uu ^ vv, v: m ^ uu }
+    F2 {
+        u: uu ^ vv,
+        v: m ^ uu,
+    }
 }
 fn inv2(f: &Fq, a: F2) -> F2 {
     let nrm = f.sq(a.u) ^ f.mul(a.u, a.v) ^ f.sq(a.v);
     let ni = f.inv(nrm);
-    F2 { u: f.mul(a.u ^ a.v, ni), v: f.mul(a.v, ni) }
+    F2 {
+        u: f.mul(a.u ^ a.v, ni),
+        v: f.mul(a.v, ni),
+    }
 }
 fn sigma2(a: F2) -> F2 {
-    F2 { u: a.u ^ a.v, v: a.v }
+    F2 {
+        u: a.u ^ a.v,
+        v: a.v,
+    }
 }
 
 // -------------------------------------------------------------- curve ----
@@ -192,7 +204,11 @@ struct Pt {
     y: F2,
     inf: bool,
 }
-const O: Pt = Pt { x: ZERO, y: ZERO, inf: true };
+const O: Pt = Pt {
+    x: ZERO,
+    y: ZERO,
+    inf: true,
+};
 
 struct Curve {
     a: u32,
@@ -213,7 +229,11 @@ impl Curve {
         if p.inf {
             return *p;
         }
-        Pt { x: p.x, y: add2(p.y, p.x), inf: false }
+        Pt {
+            x: p.x,
+            y: add2(p.y, p.x),
+            inf: false,
+        }
     }
     fn add(&self, f: &Fq, p: &Pt, q: &Pt) -> Pt {
         if p.inf {
@@ -230,12 +250,23 @@ impl Curve {
             let lam = add2(p.x, mul2(f, p.y, inv2(f, p.x)));
             let x3 = add2(add2(mul2(f, lam, lam), lam), f2(self.a));
             let y3 = add2(mul2(f, p.x, p.x), mul2(f, add2(lam, f2(1)), x3));
-            return Pt { x: x3, y: y3, inf: false };
+            return Pt {
+                x: x3,
+                y: y3,
+                inf: false,
+            };
         }
         let lam = mul2(f, add2(p.y, q.y), inv2(f, add2(p.x, q.x)));
-        let x3 = add2(add2(add2(add2(mul2(f, lam, lam), lam), p.x), q.x), f2(self.a));
+        let x3 = add2(
+            add2(add2(add2(mul2(f, lam, lam), lam), p.x), q.x),
+            f2(self.a),
+        );
         let y3 = add2(add2(mul2(f, lam, add2(p.x, x3)), x3), p.y);
-        Pt { x: x3, y: y3, inf: false }
+        Pt {
+            x: x3,
+            y: y3,
+            inf: false,
+        }
     }
     fn sub(&self, f: &Fq, p: &Pt, q: &Pt) -> Pt {
         self.add(f, p, &self.neg(q))
@@ -244,10 +275,18 @@ impl Curve {
         if p.inf {
             return *p;
         }
-        Pt { x: sigma2(p.x), y: sigma2(p.y), inf: false }
+        Pt {
+            x: sigma2(p.x),
+            y: sigma2(p.y),
+            inf: false,
+        }
     }
     fn two_torsion(&self, f: &Fq) -> Pt {
-        Pt { x: ZERO, y: f2(f.sqrt(self.b)), inf: false }
+        Pt {
+            x: ZERO,
+            y: f2(f.sqrt(self.b)),
+            inf: false,
+        }
     }
     /// Trace type of x != 0 on this curve: 0 if x lifts to E(F_q), 1 if it
     /// lifts to the sigma = -1 part (the embedded twist).
@@ -263,7 +302,14 @@ impl Curve {
         let w = x ^ self.a ^ f.mul(self.b, f.inv(f.sq(x)));
         let t = f.tr(w);
         let h = f.ht(w);
-        let p = Pt { x: f2(x), y: F2 { u: f.mul(x, h), v: f.mul(x, t) }, inf: false };
+        let p = Pt {
+            x: f2(x),
+            y: F2 {
+                u: f.mul(x, h),
+                v: f.mul(x, t),
+            },
+            inf: false,
+        };
         debug_assert!(self.on_curve(f, &p));
         p
     }
@@ -329,7 +375,11 @@ fn census(f: &Fq, c: &Curve) -> String {
             let yp = f.mul(x, f.ht(w));
             for y in [yp, yp ^ x] {
                 // phi(x, y) = (x, y + s x)
-                let img = Pt { x: f2(x), y: F2 { u: y, v: x }, inf: false };
+                let img = Pt {
+                    x: f2(x),
+                    y: F2 { u: y, v: x },
+                    inf: false,
+                };
                 if c.on_curve(f, &img) && c.parity(&img) == -1 {
                     phi_ok += 1;
                 }
@@ -465,10 +515,17 @@ impl<'a> Ctx<'a> {
     /// S_4 = Res_X(S_3(x1, x2, X), S_3(x3, x4, X)) for two quadratics in X.
     fn s4(&self, x1: u32, x2: u32, x3: u32, x4: u32) -> u32 {
         let f = self.f;
-        let quad = |u: u32, v: u32| (f.sq(u) ^ f.sq(v), f.mul(u, v), f.mul(f.sq(u), f.sq(v)) ^ self.c.b);
+        let quad = |u: u32, v: u32| {
+            (
+                f.sq(u) ^ f.sq(v),
+                f.mul(u, v),
+                f.mul(f.sq(u), f.sq(v)) ^ self.c.b,
+            )
+        };
         let (a2, a1, a0) = quad(x1, x2);
         let (b2, b1, b0) = quad(x3, x4);
-        f.sq(f.mul(a2, b0) ^ f.mul(a0, b2)) ^ f.mul(f.mul(a2, b1) ^ f.mul(a1, b2), f.mul(a1, b0) ^ f.mul(a0, b1))
+        f.sq(f.mul(a2, b0) ^ f.mul(a0, b2))
+            ^ f.mul(f.mul(a2, b1) ^ f.mul(a1, b2), f.mul(a1, b0) ^ f.mul(a0, b1))
     }
     fn poly_roots(&self, xr: u32, m: usize) -> BTreeSet<Key> {
         let big = 1u32 << self.l;
@@ -614,7 +671,10 @@ fn run_decomp_target(
     poly: bool,
 ) {
     // Arm on E_a, and the same x(R) on the twist model E_{a+1}.
-    let cb = Curve { a: ca.a ^ 1, b: ca.b };
+    let cb = Curve {
+        a: ca.a ^ 1,
+        b: ca.b,
+    };
     let ctx_a = Ctx::new(f, ca, l);
     let ctx_b = Ctx::new(f, &cb, l);
     let rb = cb.lift(f, r.x.u);
@@ -628,7 +688,9 @@ fn run_decomp_target(
     let ka: BTreeSet<Key> = sa.keys().cloned().collect();
     let kb: BTreeSet<Key> = sb.keys().cloned().collect();
     let v_nonzero = (1u32 << l) - 1;
-    let p_e = (1..1u32 << l).filter(|&x| ca.parity(&ctx_a.lifts[x as usize]) == 1).count();
+    let p_e = (1..1u32 << l)
+        .filter(|&x| ca.parity(&ctx_a.lifts[x as usize]) == 1)
+        .count();
     let mut poly_part = String::from("\"poly_checked\":false");
     if poly {
         let pr = ctx_a.poly_roots(r.x.u, m);
@@ -658,13 +720,61 @@ fn main() {
 
     // (n, irreducible poly, l for m=2, l for m=3, targets, planted, poly-checked)
     let plans: Vec<Plan> = match mode {
-        "dry" => vec![Plan { n: 7, poly: 0x83, l2: 5, l3: 4, targets: 4, planted: 2, poly_check: 2 }],
-        "probe" => vec![Plan { n: 19, poly: 0x80027, l2: 11, l3: 9, targets: 1, planted: 1, poly_check: 1 }],
+        "dry" => vec![Plan {
+            n: 7,
+            poly: 0x83,
+            l2: 5,
+            l3: 4,
+            targets: 4,
+            planted: 2,
+            poly_check: 2,
+        }],
+        "probe" => vec![Plan {
+            n: 19,
+            poly: 0x80027,
+            l2: 11,
+            l3: 9,
+            targets: 1,
+            planted: 1,
+            poly_check: 1,
+        }],
         "full" => vec![
-            Plan { n: 11, poly: 0x805, l2: 7, l3: 6, targets: 60, planted: 10, poly_check: 10 },
-            Plan { n: 13, poly: 0x201B, l2: 8, l3: 7, targets: 60, planted: 10, poly_check: 6 },
-            Plan { n: 17, poly: 0x20009, l2: 10, l3: 8, targets: 40, planted: 8, poly_check: 3 },
-            Plan { n: 19, poly: 0x80027, l2: 11, l3: 9, targets: 30, planted: 6, poly_check: 2 },
+            Plan {
+                n: 11,
+                poly: 0x805,
+                l2: 7,
+                l3: 6,
+                targets: 60,
+                planted: 10,
+                poly_check: 10,
+            },
+            Plan {
+                n: 13,
+                poly: 0x201B,
+                l2: 8,
+                l3: 7,
+                targets: 60,
+                planted: 10,
+                poly_check: 6,
+            },
+            Plan {
+                n: 17,
+                poly: 0x20009,
+                l2: 10,
+                l3: 8,
+                targets: 40,
+                planted: 8,
+                poly_check: 3,
+            },
+            Plan {
+                n: 19,
+                poly: 0x80027,
+                l2: 11,
+                l3: 9,
+                targets: 30,
+                planted: 6,
+                poly_check: 2,
+            },
         ],
         _ => panic!("mode: dry | probe | full"),
     };
@@ -686,7 +796,10 @@ fn main() {
         let f = Fq::new(n, poly);
         let mut curves = vec![Curve { a: 0, b: 1 }];
         for _ in 0..random_curves {
-            curves.push(Curve { a: rng.below(1 << n) as u32, b: 1 + rng.below((1 << n) - 1) as u32 });
+            curves.push(Curve {
+                a: rng.below(1 << n) as u32,
+                b: 1 + rng.below((1 << n) - 1) as u32,
+            });
         }
         for c in &curves {
             let row = census(&f, c);
@@ -701,7 +814,10 @@ fn main() {
         for i in 0..random_curves {
             curves.push((
                 format!("rand{}", i),
-                Curve { a: rng.below(1 << p.n) as u32, b: 1 + rng.below((1 << p.n) - 1) as u32 },
+                Curve {
+                    a: rng.below(1 << p.n) as u32,
+                    b: 1 + rng.below((1 << p.n) - 1) as u32,
+                },
             ));
         }
         for (id, c) in &curves {
@@ -725,12 +841,28 @@ fn main() {
                         if c.parity(&r) != 1 {
                             continue;
                         }
-                        run_decomp_target(&mut rows, &f, id, c, l, m, "C1_planted_xR_in_V", r, false);
+                        run_decomp_target(
+                            &mut rows,
+                            &f,
+                            id,
+                            c,
+                            l,
+                            m,
+                            "C1_planted_xR_in_V",
+                            r,
+                            false,
+                        );
                         done += 1;
                     }
                 }
             }
-            eprintln!("n={} curve={} done, {} rows, {:.1}s", p.n, id, rows.len(), t_all.elapsed().as_secs_f64());
+            eprintln!(
+                "n={} curve={} done, {} rows, {:.1}s",
+                p.n,
+                id,
+                rows.len(),
+                t_all.elapsed().as_secs_f64()
+            );
         }
         // Arm C2 (m = 3): constructed curves with sqrt(b) = v1 v2, v1, v2
         // off-parity in V, and targets with x(R + T) in V.
@@ -740,7 +872,10 @@ fn main() {
             let v1 = 1 + rng.below((1u64 << l) - 1) as u32;
             let v2 = 1 + rng.below((1u64 << l) - 1) as u32;
             let b = f.sq(f.mul(v1, v2));
-            let mut c = Curve { a: rng.below(1 << p.n) as u32, b };
+            let mut c = Curve {
+                a: rng.below(1 << p.n) as u32,
+                b,
+            };
             let (t1, t2) = (c.trace_type(&f, v1), c.trace_type(&f, v2));
             if t1 != t2 {
                 continue;
@@ -763,7 +898,17 @@ fn main() {
                 continue;
             }
             let _ = ctx;
-            run_decomp_target(&mut rows, &f, &format!("c2_{}", made), &c, l, 3, "C2_planted_T_pairs", r, false);
+            run_decomp_target(
+                &mut rows,
+                &f,
+                &format!("c2_{}", made),
+                &c,
+                l,
+                3,
+                "C2_planted_T_pairs",
+                r,
+                false,
+            );
             made += 1;
         }
     }
@@ -777,8 +922,15 @@ fn main() {
     writeln!(
         meta,
         "{{\"mode\":\"{}\",\"seed\":\"0x{:x}\",\"rows\":{},\"seconds\":{:.2}}}",
-        mode, seed, rows.len(), t_all.elapsed().as_secs_f64()
+        mode,
+        seed,
+        rows.len(),
+        t_all.elapsed().as_secs_f64()
     )
     .unwrap();
-    eprintln!("wrote {} rows in {:.1}s", rows.len(), t_all.elapsed().as_secs_f64());
+    eprintln!(
+        "wrote {} rows in {:.1}s",
+        rows.len(),
+        t_all.elapsed().as_secs_f64()
+    );
 }
