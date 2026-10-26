@@ -178,7 +178,7 @@ class DriverTests(unittest.TestCase):
         kw = mc.search_kwargs(args)
         self.assertEqual((kw["curve"], kw["packed"], kw["dpWeight"], kw["cpuThreads"],
                           kw["walksTarget"], kw["loadMax"]),
-                         (131, True, 32, 32, 6160384, 2000000))
+                         (131, True, 32, 32, 1540096, 2000000))
         # -1 leaves the image's ECC_CPU_THREADS in charge.
         kw = mc.search_kwargs(mc.parse_args(["--run-id-base", "8000"]))
         self.assertNotIn("cpuThreads", kw)

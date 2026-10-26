@@ -1,5 +1,8 @@
 # Support-aware exact Boolean F5 batch continuation
 
+The [2026-10-19 build-lock review](BUILD_LOCK_REVIEW_20261019.md) explains the
+current dependency lock and preserves the original lockfile.
+
 This is the frozen [protocol](PROTOCOL.md) and native development implementation
 for the next bounded experiment
 after the [rejected graded batch discovery](https://github.com/aburan28/crypto/pull/1236).

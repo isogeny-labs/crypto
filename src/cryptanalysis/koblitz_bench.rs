@@ -1185,6 +1185,84 @@ pub fn chained_s3_solution_count(
     count
 }
 
+/// [`chained_s3_solution_count`] in `O(4^ℓ · n)` instead of `O(2^{2ℓ+n})`:
+/// each link `S₃(a, c, d) = (a+d)²c² + (ad)c + (ad)² + b` is a quadratic in
+/// `c`, solved by one Artin–Schreier echelon lookup, and the closing
+/// summand is tested for membership of `span(basis)` by reduction against
+/// an echelon basis.  Exactly the same count
+/// (`fast_chained_s3_count_matches_the_reference`); `b` must be non-zero.
+pub fn chained_s3_solution_count_fast(
+    basis: &[F2mElement],
+    x_r: &F2mElement,
+    b: &F2mElement,
+    irr: &crate::binary_ecc::IrreduciblePoly,
+) -> u64 {
+    use crate::cryptanalysis::ic_boundary::ArtinSchreier;
+    use crate::cryptanalysis::semaev_decomp::Gf2;
+    let gf = Gf2::new(irr);
+    let ash = ArtinSchreier::new(&gf);
+    let n = irr.degree;
+    let word = |e: &F2mElement| e.raw_bits().first().copied().unwrap_or(0);
+    let words: Vec<u64> = basis.iter().map(word).collect();
+    let (xr, bb) = (word(x_r), word(b));
+    assert!(bb != 0, "b = 0 is not an elliptic curve");
+    // Echelon form of the basis: membership is reduction to zero.
+    let mut ech: Vec<u64> = Vec::new();
+    for &w in &words {
+        let mut v = w;
+        for &e in &ech {
+            v = v.min(v ^ e);
+        }
+        if v != 0 {
+            ech.push(v);
+            ech.sort_unstable_by(|a, b| b.cmp(a));
+        }
+    }
+    let in_span = |x: u64| ech.iter().fold(x, |v, &e| v.min(v ^ e)) == 0;
+    let span: Vec<u64> = (0..1u64 << words.len())
+        .map(|c| {
+            (0..words.len())
+                .filter(|t| (c >> t) & 1 == 1)
+                .fold(0, |acc, t| acc ^ words[t])
+        })
+        .collect();
+    // Every c with (a+d)²c² + (ad)c + (ad)² + b = 0, at most two.
+    let roots = |a: u64, d: u64| -> ([u64; 2], usize) {
+        let (lead, mid) = (gf.sqr(a ^ d), gf.mul(a, d));
+        let tail = gf.sqr(mid) ^ bb;
+        if lead == 0 {
+            // a = d, so mid = a² is zero only at a = 0, where tail = b ≠ 0.
+            return if mid == 0 {
+                ([0, 0], 0)
+            } else {
+                ([gf.mul(tail, gf.inv(mid)), 0], 1)
+            };
+        }
+        if mid == 0 {
+            // lead·c² = tail: the unique square root.
+            return ([gf.sqr_k(gf.mul(tail, gf.inv(lead)), n - 1), 0], 1);
+        }
+        // c = (mid/lead)·z with z² + z = tail·lead/mid².
+        let scale = gf.mul(mid, gf.inv(lead));
+        let rhs = gf.mul(gf.mul(tail, lead), gf.inv(gf.sqr(mid)));
+        match ash.solve(rhs) {
+            Some(z) => ([gf.mul(scale, z), gf.mul(scale, z ^ 1)], 2),
+            None => ([0, 0], 0),
+        }
+    };
+    let mut count = 0u64;
+    for &x1 in &span {
+        for &x2 in &span {
+            let (us, k) = roots(x1, x2);
+            for &u in &us[..k] {
+                let (x3s, j) = roots(u, xr);
+                count += x3s[..j].iter().filter(|&&x3| in_span(x3)).count() as u64;
+            }
+        }
+    }
+    count
+}
+
 /// **Exact** number of Boolean solutions of the chained system
 /// [`build_decomposition_system`] builds for any `m ≥ 3`: tuples
 /// `(x₁, …, x_m, e₁, …, e_{m−2})` with `x_i ∈ span(basis)`, `e_i ∈
@@ -1383,17 +1461,37 @@ pub fn ladder_measure_m(
     d_max: u32,
     ffd_max: u32,
 ) -> Option<LadderDraw> {
+    ladder_measure_mb(m, n, basis, x_r, &F2mElement::one(n), d_min, d_max, ffd_max)
+}
+
+/// [`ladder_measure_m`] on the curve `y² + xy = x³ + ax² + b` for any
+/// `b ≠ 0`.  Over `F_{2^n}` the summation polynomials depend on `b` alone
+/// (`S₃(a, c, d) = (a+c)²d² + acd + (ac)² + b`), so this is the
+/// decomposition system of every random binary curve with that `b`, both
+/// values of `a` and both quadratic twists; `b = 1` is the Koblitz system
+/// [`ladder_measure_m`] measures.  At `m = 3` the solution count is
+/// [`chained_s3_solution_count_fast`], equal to the exhaustive count by test.
+#[allow(clippy::too_many_arguments)]
+pub fn ladder_measure_mb(
+    m: usize,
+    n: u32,
+    basis: &[F2mElement],
+    x_r: &F2mElement,
+    b: &F2mElement,
+    d_min: u32,
+    d_max: u32,
+    ffd_max: u32,
+) -> Option<LadderDraw> {
     use crate::cryptanalysis::koblitz_groebner::solving_degree_from;
     use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
     let started = Instant::now();
     let irr = find_irreducible_sparse(n)?;
     let st = FieldStructure::new(n, &irr);
-    let b = F2mElement::one(n);
-    let sys = build_decomposition_system(basis, x_r, &b, m, &st)?;
+    let sys = build_decomposition_system(basis, x_r, b, m, &st)?;
     let solutions = if m == 3 {
-        chained_s3_solution_count(basis, x_r, &b, &irr)
+        chained_s3_solution_count_fast(basis, x_r, b, &irr)
     } else {
-        chained_solution_count(m, basis, x_r, &b, &irr)
+        chained_solution_count(m, basis, x_r, b, &irr)
     };
     let word = |e: &F2mElement| e.raw_bits().first().copied().unwrap_or(0);
     let mut ffd = None;
@@ -1502,7 +1600,11 @@ pub fn closure_refutation_scan(
     let (mut xl_done, mut closure_done) = (false, false);
     for degree in d_min..=d_max {
         let started = Instant::now();
-        let Some((xl, _)) = ReducedBasis::from_system(system, n_vars, degree) else {
+        // The plain basis is read and dropped before the closure is built,
+        // so the two dense matrices are never held at once.
+        let Some((xl_refuted, xl_rank)) = ReducedBasis::from_system(system, n_vars, degree)
+            .map(|(xl, _)| (xl.is_refuted(), xl.rank()))
+        else {
             break;
         };
         let Some((closed, cost)) =
@@ -1512,23 +1614,219 @@ pub fn closure_refutation_scan(
         };
         out.push(ClosureDegree {
             degree,
-            xl_refuted: xl.is_refuted(),
+            xl_refuted,
             closure_refuted: closed.is_refuted(),
             saturated: closed.is_refuted() || closed.pending_falls() == 0,
-            xl_rank: xl.rank(),
+            xl_rank,
             closure_rank: closed.rank(),
             columns: closed.columns(),
             closure_products: cost.closure_products,
             closure_word_ops: cost.word_ops(),
             secs: started.elapsed().as_secs_f64(),
         });
-        xl_done |= xl.is_refuted();
+        xl_done |= xl_refuted;
         closure_done |= closed.is_refuted();
         if xl_done && closure_done {
             break;
         }
     }
     out
+}
+
+/// Outcome of [`sparse_closure_refutes`] at one degree.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SparseClosure {
+    pub degree: u32,
+    /// `1` entered the saturated row space.
+    pub refuted: bool,
+    /// The worklist emptied: every fall was multiplied out (or `1` fell).
+    pub saturated: bool,
+    /// Rows in the echelon basis when the scan stopped.
+    pub rank: usize,
+    /// Falls found (basis rows whose leading monomial has degree < `degree`).
+    pub falls: u64,
+    /// Fall-times-monomial products inserted.
+    pub products: u64,
+    /// Largest number of nonzeros any stored row reached.
+    pub max_weight: usize,
+}
+
+/// MutantXL's fixed-degree closure on a **sparse** echelon basis: the same
+/// question [`closure_refutation_scan`] asks of the dense
+/// [`ReducedBasis::from_system_closed_full`], without the dense matrix.
+///
+/// Rows are sorted monomial masks, leading monomial first, in an order that
+/// ranks higher total degree first (ties by mask).  Every Macaulay row of
+/// degree `≤ degree` is inserted, reduced by leading term against the
+/// stored pivots.  A stored row whose leading monomial has degree below
+/// `degree` is a **fall**.
+///
+/// - Because stored leading monomials are distinct, a combination of
+///   stored rows has the smallest participating leading monomial (no
+///   cancellation of the lead). So the stored falls span the row space's
+///   intersection with degree `< degree` exactly. This is the
+///   fall space the dense closure multiplies out.
+/// - Each fall `f` is multiplied by every monomial `t` with
+///   `1 ≤ deg t ≤ degree − deg f` over the occurring variables, and each
+///   product is inserted in turn, until no fall is left unprocessed.
+/// - The scan stops at `1` (a stored row equal to the constant) or when
+///   `max_entries` total stored nonzeros would be exceeded. On a cap it
+///   returns `None`, which is unmeasured, never a refutation.
+///
+/// Every product lies in the ideal, so a refutation is sound. The
+/// saturated span equals the dense closure's, so the two agree on
+/// refutation, which `sparse_closure_matches_the_dense_closure` checks.
+///
+/// [`ReducedBasis::from_system_closed_full`]: crate::cryptanalysis::inherited_f4::ReducedBasis::from_system_closed_full
+pub fn sparse_closure_refutes(
+    system: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    max_entries: usize,
+) -> Option<SparseClosure> {
+    use crate::cryptanalysis::koblitz_groebner::build_macaulay_sparse;
+    use std::cmp::Ordering;
+    use std::collections::HashMap;
+
+    // Higher degree first; ties by mask.  Rows are ascending in this order,
+    // so the leading monomial is row[0].
+    let cmp = |a: &u64, b: &u64| -> Ordering { b.count_ones().cmp(&a.count_ones()).then(a.cmp(b)) };
+    let xor = |a: &[u64], b: &[u64]| -> Vec<u64> {
+        let mut out = Vec::with_capacity(a.len() + b.len());
+        let (mut i, mut j) = (0, 0);
+        while i < a.len() && j < b.len() {
+            match cmp(&a[i], &b[j]) {
+                Ordering::Less => {
+                    out.push(a[i]);
+                    i += 1;
+                }
+                Ordering::Greater => {
+                    out.push(b[j]);
+                    j += 1;
+                }
+                Ordering::Equal => {
+                    i += 1;
+                    j += 1;
+                }
+            }
+        }
+        out.extend_from_slice(&a[i..]);
+        out.extend_from_slice(&b[j..]);
+        out
+    };
+    let occurring = system
+        .iter()
+        .flat_map(|p| p.terms.iter())
+        .fold(0u64, |acc, t| acc | t.mask);
+    let vars: Vec<u64> = (0..64)
+        .filter(|i| occurring >> i & 1 == 1)
+        .map(|i| 1u64 << i)
+        .collect();
+    // Monomials of degree 1..=k over the occurring variables.
+    let monomials_up_to = |k: u32| -> Vec<u64> {
+        let mut out = Vec::new();
+        let mut frontier = vec![(0u64, 0usize)];
+        for _ in 0..k {
+            let mut next = Vec::new();
+            for &(m, start) in &frontier {
+                for (i, &v) in vars.iter().enumerate().skip(start) {
+                    next.push((m | v, i + 1));
+                }
+            }
+            out.extend(next.iter().map(|&(m, _)| m));
+            frontier = next;
+        }
+        out
+    };
+
+    let (cols, rows) = build_macaulay_sparse(system, n_vars, degree)?;
+    let mut pivots: HashMap<u64, Vec<u64>> = HashMap::new();
+    let mut entries = 0usize;
+    let mut out = SparseClosure {
+        degree,
+        refuted: false,
+        saturated: false,
+        rank: 0,
+        falls: 0,
+        products: 0,
+        max_weight: 0,
+    };
+    let mut queue: Vec<Vec<u64>> = Vec::new();
+
+    // Insert one row; a new fall goes on the queue.  `false` on the cap.
+    let mut insert = |mut row: Vec<u64>,
+                      pivots: &mut HashMap<u64, Vec<u64>>,
+                      queue: &mut Vec<Vec<u64>>,
+                      out: &mut SparseClosure|
+     -> bool {
+        row.sort_unstable_by(cmp);
+        // Boolean products can repeat a monomial; equal pairs cancel.
+        let mut dedup: Vec<u64> = Vec::with_capacity(row.len());
+        for m in row {
+            if dedup.last() == Some(&m) {
+                dedup.pop();
+            } else {
+                dedup.push(m);
+            }
+        }
+        let mut row = dedup;
+        while let Some(&lead) = row.first() {
+            match pivots.get(&lead) {
+                Some(p) => row = xor(&row, p),
+                None => break,
+            }
+        }
+        let Some(&lead) = row.first() else {
+            return true;
+        };
+        entries += row.len();
+        if entries > max_entries {
+            return false;
+        }
+        out.max_weight = out.max_weight.max(row.len());
+        out.rank += 1;
+        if lead == 0 {
+            out.refuted = true;
+        }
+        if lead.count_ones() < degree {
+            out.falls += 1;
+            queue.push(row.clone());
+        }
+        pivots.insert(lead, row);
+        true
+    };
+
+    for r in rows {
+        let row: Vec<u64> = r.iter().map(|&c| cols[c as usize]).collect();
+        if !insert(row, &mut pivots, &mut queue, &mut out) {
+            return None;
+        }
+        if out.refuted {
+            out.saturated = true;
+            return Some(out);
+        }
+    }
+    let mut multipliers: HashMap<u32, Vec<u64>> = HashMap::new();
+    while let Some(fall) = queue.pop() {
+        let room = degree - fall[0].count_ones();
+        let ts = multipliers
+            .entry(room)
+            .or_insert_with(|| monomials_up_to(room))
+            .clone();
+        for t in ts {
+            out.products += 1;
+            let product: Vec<u64> = fall.iter().map(|&m| m | t).collect();
+            if !insert(product, &mut pivots, &mut queue, &mut out) {
+                return None;
+            }
+            if out.refuted {
+                out.saturated = true;
+                return Some(out);
+            }
+        }
+    }
+    out.saturated = true;
+    Some(out)
 }
 
 /// The infeasible null object for a ladder cell: same unknowns, degree and
@@ -1864,6 +2162,40 @@ mod tests {
         );
     }
 
+    /// The fast `m = 3` count equals the reference count, for `b = 1` and
+    /// random `b`, on satisfiable and unsatisfiable draws.
+    #[test]
+    fn fast_chained_s3_count_matches_the_reference() {
+        use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+        let mut rng = StdRng::seed_from_u64(0xFA57_C0);
+        let (mut sat, mut unsat) = (0usize, 0usize);
+        for (n, ell) in [(5u32, 2usize), (7, 2), (7, 3), (9, 3), (11, 4), (13, 4)] {
+            let irr = find_irreducible_sparse(n).unwrap();
+            for t in 0..8 {
+                let bw = if t % 2 == 0 {
+                    1
+                } else {
+                    (rng.gen::<u64>() & ((1u64 << n) - 1)) | 2
+                };
+                let b = F2mElement::from_biguint(&BigUint::from(bw), n);
+                let basis = random_subspace_basis(n, ell, &mut rng);
+                let x_r = F2mElement::from_biguint(
+                    &BigUint::from(rng.gen::<u64>() & ((1u64 << n) - 1)),
+                    n,
+                );
+                let slow = chained_s3_solution_count(&basis, &x_r, &b, &irr);
+                let fast = chained_s3_solution_count_fast(&basis, &x_r, &b, &irr);
+                assert_eq!(fast, slow, "n={n} ℓ={ell} b={bw:#x}");
+                if slow == 0 {
+                    unsat += 1
+                } else {
+                    sat += 1
+                }
+            }
+        }
+        assert!(sat > 0 && unsat > 0, "{sat} sat, {unsat} unsat");
+    }
+
     /// The `m = 4` chain's exact count is what an exhaustive evaluation of
     /// the built system gives: two intermediate points, `2n + 4ℓ` unknowns,
     /// satisfiable and unsatisfiable draws both.
@@ -2005,6 +2337,60 @@ mod tests {
     /// On unsatisfiable chained draws the closure never refutes later than
     /// XL, saturates, and the plain basis refutes exactly where the
     /// repository's XL engine does.
+    #[test]
+    fn sparse_closure_matches_the_dense_closure() {
+        use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+        // The constructed control: closure refutes at 3, not at 2.
+        let n = 9;
+        let x = |i: usize| F2BoolMono { mask: 1u64 << i };
+        let mono = |m: u64| F2BoolMono { mask: m };
+        let poly = |terms: Vec<F2BoolMono>| F2BoolPoly { terms, n_vars: n };
+        let t3 = |a: usize, b: usize, c: usize| mono((1 << a) | (1 << b) | (1 << c));
+        let f1 = poly(vec![t3(0, 1, 2), t3(3, 4, 5)]);
+        let f2 = poly(vec![t3(0, 1, 2), t3(3, 4, 5), x(6), F2BoolMono::one()]);
+        let f3 = poly(vec![
+            t3(6, 7, 8),
+            mono((1 << 7) | (1 << 8)),
+            F2BoolMono::one(),
+        ]);
+        let control = vec![f1, f2, f3];
+        for d in 3..=4u32 {
+            let dense = closure_refutation_scan(&control, n, d, d);
+            let sparse = sparse_closure_refutes(&control, n, d, usize::MAX).unwrap();
+            assert_eq!(sparse.refuted, dense[0].closure_refuted, "control at {d}");
+            assert!(sparse.saturated);
+        }
+        // Chained draws, satisfiable and not: same refutation at every degree.
+        let mut checked = (0, 0);
+        for (m, n, ell, seed) in [(3usize, 5u32, 2usize, 11u64), (3, 7, 2, 12), (4, 4, 1, 13)] {
+            let mut rng = StdRng::seed_from_u64(seed);
+            for _ in 0..6 {
+                let (basis, x_r) = ladder_sample(n, ell, &mut rng);
+                let irr = find_irreducible_sparse(n).unwrap();
+                let st = FieldStructure::new(n, &irr);
+                let b = F2mElement::one(n);
+                let sys = build_decomposition_system(&basis, &x_r, &b, m, &st).unwrap();
+                for d in 3..=4u32 {
+                    let dense = closure_refutation_scan(&sys.equations, sys.n_vars, d, d);
+                    let sparse =
+                        sparse_closure_refutes(&sys.equations, sys.n_vars, d, usize::MAX).unwrap();
+                    assert!(sparse.saturated && dense[0].saturated);
+                    assert_eq!(
+                        sparse.refuted, dense[0].closure_refuted,
+                        "m={m} n={n} ell={ell} seed={seed} degree {d}"
+                    );
+                    if sparse.refuted {
+                        checked.0 += 1;
+                    } else {
+                        checked.1 += 1;
+                    }
+                }
+            }
+        }
+        // Both outcomes occur, so the agreement is not vacuous.
+        assert!(checked.0 > 0 && checked.1 > 0, "{checked:?}");
+    }
+
     #[test]
     fn closure_scan_is_never_above_xl_on_chained_draws() {
         use crate::cryptanalysis::koblitz_groebner::solving_degree;

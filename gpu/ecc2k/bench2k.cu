@@ -17,6 +17,10 @@
 #include <vector>
 
 #include "kernels2k.cuh"
+
+#ifndef SELFTEST_W
+#define SELFTEST_W 8
+#endif
 #include "rho2k_host.hpp"
 
 #define CU(call) do { \
@@ -161,7 +165,9 @@ static void selftest() {
     h.Q = Koblitz::mul(h.P, sk);
     h.build();
 
-    const uint32_t T = 256, W = 8, nw = T * W, dpcap = 1 << 14;
+    /* SELFTEST_W picks the batch width the walk check below runs at, so each
+     * width `rho --w` offers can be held to the host stepper bit for bit. */
+    const uint32_t T = 256, W = SELFTEST_W, nw = T * W, dpcap = 1 << 14;
     rho2k_ctx hc{}, dc{};
     std::vector<uint32_t> hX(F2M_WORDS * nw), hY(F2M_WORDS * nw), hS(nw), hR(nw),
         hW(nw);
@@ -222,8 +228,8 @@ static void selftest() {
     CU(cudaMemcpy(&gcount, d_cnt, 4, cudaMemcpyDeviceToHost));
     CHECK(gcount == hcount, "dp count: device %u vs host %u", gcount, hcount);
     if (!failures)
-        printf("  rho: %u class walks x %u steps identical to the host, %u DPs\n",
-               nw, iters, gcount);
+        printf("  rho: %u class walks (W = %u) x %u steps identical to the host, %u DPs\n",
+               nw, W, iters, gcount);
 
     /* device DPs must replay on the host to the same class */
     std::vector<rho2k_dp> gdp(gcount < dpcap ? gcount : dpcap);
@@ -321,11 +327,14 @@ static void bench_field() {
 
 /* ---------------------------------------------------------------- */
 struct RhoOpts {
-    uint32_t threads = 0, iters = 256, w = 8, dp = 0;
+    /* w = 0 and an empty variant mean "the measured default for this device":
+     * W = 4 with the register variant on compute capability 12.0 (the RTX PRO
+     * 6000, ecc2k130/benchmarks/ecc2k-geometry), W = 8 lowmem elsewhere. */
+    uint32_t threads = 0, iters = 256, w = 0, dp = 0;
     /* tau^k tables for the inversion: fewer instructions, more table traffic.
      * Off by default because only the instruction side has been measured. */
     uint32_t frob = 0;
-    std::string variant = "lowmem";
+    std::string variant;
 };
 
 template <int W>
@@ -339,6 +348,15 @@ static void launch(const RhoOpts &o, rho2k_ctx &dc, uint32_t blocks, size_t smem
 }
 
 static void bench_rho(RhoOpts o) {
+    {
+        int dev = 0, major = 0, minor = 0;
+        CU(cudaGetDevice(&dev));
+        CU(cudaDeviceGetAttribute(&major, cudaDevAttrComputeCapabilityMajor, dev));
+        CU(cudaDeviceGetAttribute(&minor, cudaDevAttrComputeCapabilityMinor, dev));
+        const bool pro6000 = major == 12 && minor == 0;
+        if (!o.w) o.w = pro6000 ? 4 : 8;
+        if (o.variant.empty()) o.variant = pro6000 ? "reg" : "lowmem";
+    }
     if (!o.threads) o.threads = (uint32_t)g_sms * 2048 / o.w;
     o.threads = (o.threads + R2K_BLOCK - 1) / R2K_BLOCK * R2K_BLOCK;
     if (!o.dp) o.dp = (uint32_t)(F2M_M / 2 - 3.5 * sqrt(F2M_M / 4.0));
@@ -387,15 +405,19 @@ static void bench_rho(RhoOpts o) {
     CU(cudaDeviceSynchronize());
 
     Timer tm;
-    if (W == 8) launch<8>(o, dc, blocks, smem);
+    if (W == 2) launch<2>(o, dc, blocks, smem);
+    else if (W == 4) launch<4>(o, dc, blocks, smem);
+    else if (W == 8) launch<8>(o, dc, blocks, smem);
     else if (W == 16) launch<16>(o, dc, blocks, smem);
     else if (W == 32) launch<32>(o, dc, blocks, smem);
-    else { fprintf(stderr, "unsupported --w %u (use 8, 16 or 32)\n", W); exit(1); }
+    else { fprintf(stderr, "unsupported --w %u (use 2, 4, 8, 16 or 32)\n", W); exit(1); }
     CU(cudaGetLastError());
     CU(cudaDeviceSynchronize());
 
     tm.start();
-    if (W == 8) launch<8>(o, dc, blocks, smem);
+    if (W == 2) launch<2>(o, dc, blocks, smem);
+    else if (W == 4) launch<4>(o, dc, blocks, smem);
+    else if (W == 8) launch<8>(o, dc, blocks, smem);
     else if (W == 16) launch<16>(o, dc, blocks, smem);
     else launch<32>(o, dc, blocks, smem);
     double t = tm.stop();

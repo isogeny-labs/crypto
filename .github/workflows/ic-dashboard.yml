@@ -27,6 +27,8 @@ concurrency:
 
 jobs:
   overview:
+    # Not routed to crypto-eks: the browser check needs Chrome and its system
+    # libraries, and that runner image has no browser and no apt-get install.
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -34,10 +36,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install Chrome for dashboard rendering
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@2e1d749697dd1612b833dba4a722266286fbefcd
+        with:
+          install-dependencies: true
       - name: Check frozen evidence pins and generated overview
         run: node tools/render_ic_dashboard.mjs --check
       - name: Check actual desktop and mobile rendering
         env:
+          IC_DASHBOARD_CHROME: ${{ steps.setup-chrome.outputs.chrome-path }}
           IC_DASHBOARD_SCREENSHOTS: /tmp/ic-dashboard-screenshots
         run: node tools/check_ic_dashboard_browser.mjs
       - uses: actions/upload-artifact@v4

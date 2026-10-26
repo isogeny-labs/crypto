@@ -40,6 +40,17 @@ class ArchivedLabelTests(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn("K_1 / 2^19", problems[0])
 
+    def test_archived_raw_metric_keys_require_exact_path_hash_and_label(self):
+        report = "benchmarks/20261017-volcano-ecdlp-census/VALIDATOR_REPORT.md"
+        text = (names.REPO / report).read_text()
+        slug = "icv1-fp26-tm6998-a41c0795"
+        self.assertTrue(names.archived_slug(report, text, slug))
+        self.assertFalse(names.archived_slug(report, text + "\n", slug))
+        self.assertFalse(names.archived_slug("ordinary/REPORT.md", text, slug))
+        self.assertFalse(names.archived_slug(report, text, "icv1-fp26-tm6998-00000000"))
+        with patch.object(names, "tracked", return_value=[report]):
+            self.assertEqual(names.lint(self.resolver, {}, False), [])
+
 
 if __name__ == "__main__":
     unittest.main()
