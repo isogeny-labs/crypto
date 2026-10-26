@@ -128,6 +128,8 @@ The reclaimed instance contributes no measurement and no times are pooled.
 If the lock or CPU contention returns, retain the refusal and stop; do not
 weaken the isolation gate. The frozen candidate, targets, rounds, rho rule,
 acceptance criterion and resource budget are unchanged.
+The recurring host-capacity and access obstruction is tracked in
+[`problems/r13-single-target-isolated-host.md`](../../../../problems/r13-single-target-isolated-host.md).
 
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
