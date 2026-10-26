@@ -685,7 +685,6 @@ fn run_cmd(
         prior_rho,
         managed.then_some(&mut on_repeat),
     )?;
-    drop(on_repeat);
     drop(heartbeat);
     let mut result_value = serde_json::to_value(&result).map_err(|e| e.to_string())?;
     let mut reports = prior_reports;

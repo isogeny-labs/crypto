@@ -1,0 +1,43 @@
+name: Factor-base chart census
+
+on:
+  pull_request:
+    paths:
+      - 'research/factor_base_chart_complements_20261019/**'
+      - '.github/workflows/factor-base-chart-screen.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/factor_base_chart_complements_20261019/**'
+      - '.github/workflows/factor-base-chart-screen.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: research/factor_base_chart_complements_20261019
+      - uses: dtolnay/rust-toolchain@1.98
+        with:
+          components: clippy,rustfmt
+      - name: Check standalone native screen
+        run: |
+          set -euo pipefail
+          manifest=research/factor_base_chart_complements_20261019/screen/Cargo.toml
+          cargo fmt --manifest-path "$manifest" -- --check
+          cargo test --locked --release --manifest-path "$manifest"
+          cargo clippy --locked --release --manifest-path "$manifest" --all-targets -- -D warnings
+          cargo build --locked --release --manifest-path "$manifest"
+      - name: Replay complete finite census
+        run: |
+          set -euo pipefail
+          study=research/factor_base_chart_complements_20261019
+          (cd "$study" && sha256sum -c SOURCE_SHA256SUMS && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs/SHA256SUMS)
+          "$study/screen/target/release/factor-base-chart-screen" screen "$study" "$RUNNER_TEMP/chart-census.json"
+          cmp "$study/runs/census.json" "$RUNNER_TEMP/chart-census.json"
