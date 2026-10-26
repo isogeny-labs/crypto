@@ -18,6 +18,7 @@ on:
       - 'docs/curves/jacobian-transfers.json'
       - 'docs/curves/covers.json'
       - 'docs/curves/factor-hints.txt'
+      - 'docs/curves/traits.json'
       - '.github/workflows/transfer-audit.yml'
       - 'Cargo.toml'
       - 'Cargo.lock'
@@ -63,6 +64,7 @@ jobs:
             /docs/curves/jacobian-transfers.json
             /docs/curves/covers.json
             /docs/curves/factor-hints.txt
+            /docs/curves/traits.json
             /research/transfer_audit_20261011/
       - name: Materialize compile-time fixture inputs
         run: node .github/scripts/ci-scope.mjs --materialize
@@ -77,8 +79,11 @@ jobs:
         run: ./target/release/transfer-audit check --certs research/transfer_audit_20261011/certificates
       - name: The report builds from the committed certificates
         run: ./target/release/transfer-audit report --certs research/transfer_audit_20261011/certificates --out /tmp/transfer-audit-report
-      - name: The committed table is current
-        run: diff research/transfer_audit_20261011/RESULTS_TABLE.md /tmp/transfer-audit-report/RESULTS_TABLE.md
+      - name: The committed tables, CSV and figures are current
+        run: |
+          for f in RESULTS_TABLE.md RESULTS_SUMMARY.md cost_ratio.csv cost_ratio.svg cost_ratio_toy.svg cost_ratio_controls.svg pipeline.svg; do
+            diff research/transfer_audit_20261011/$f /tmp/transfer-audit-report/$f
+          done
       - name: A tampered certificate is rejected
         run: |
           cp -r research/transfer_audit_20261011/certificates /tmp/tampered
