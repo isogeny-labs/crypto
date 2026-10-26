@@ -7,8 +7,8 @@
 
 The user requested continued work toward a useful factor base. The current
 lead atlas points to linearization excess as an unexamined transfer question.
-This change implements exact native structural profiling inside the existing
-`factor-base-sweep` CLI. It does not substitute a score for successful solving.
+This change adds native kernel-based progression construction and exact
+profiling to `factor-base-sweep`; a score does not establish successful solving.
 
 #image("method.svg", width: 100%)
 
@@ -19,12 +19,13 @@ V, V^(2), ... through the requested power, their dimensions, a basis-invariant
 subspace identity and the two-summand expression
 `e = n - dim(V) - dim(V^(2))`.
 
-The field modulus is checked for irreducibility. Invalid, truncated and
-dependent inputs are rejected. Output is write-once. Wide field structure
-through degree 571 is supported; wide point decomposition is not added.
-The sum of product dimensions is not proof of independent symmetric variables
-or valid summand splitting. Product multiplication counts omit other work.
-Predicted degree, certified regularity and total-cost winner remain null.
+The modulus is checked for irreducibility; invalid/dependent inputs are
+rejected and output is write-once. `construct` solves trace constraints,
+XOR-samples a scale and records the kernel/mask/derivation. Seeded draws do
+not imply uniform coverage of the entire kernel. Field structure through
+degree 571 is supported, not wide point decomposition. Product dimensions
+do not prove valid splitting; partial counters cannot rank whole methods.
+Predicted degree, regularity and cost winner remain null.
 
 == Why this lead, and what is already known
 The sibling PDP study reports a low-error empirical two-summand degree fit
@@ -78,10 +79,7 @@ owner-approved alternative. The broader goal remains open.
 - Current atlas: `LEAD-ICE-linearization-excess-fb-prior`.
 - Sibling source: `cryptanalysis:experiments/pdp-degree-heuristics/README.md`.
 - Primary theorem: arXiv 1501.00602v2, pp. 1–3; DOI 10.1017/S0305004117000044.
-- Conservation scope: `crypto-autoresearcher:knowledge/findings/KN-FIND-007.md`.
-- Prior native null: `research/dreg_closure_specialise_20261017/RESULTS.md`.
-- Correctness/command outcomes: `VALIDATION.md` and its linked receipts.
+- Full source assumptions and correctness outcomes: `LITERATURE.md`, `VALIDATION.md`.
 
-No new measured solver result changes the canonical scoreboard, leaderboard,
-browser, benchmark copies or old sealed research. No new Lean proof or
-identity certificate is claimed for the cited existing mathematics.
+Canonical dashboards and sealed research are unchanged: no new measured
+solver result, Lean proof or identity certificate is claimed.

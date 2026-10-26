@@ -76,8 +76,9 @@ all phases, matched rho and independent replay under repository rules.
 2026-10-26: the literature/atlas review selects the still-unexamined native
 transfer of the product-profile/linearization-excess prior. The
 [new structural preflight](../research/factor_base_excess_20261026/README.md)
-computes canonical product spans; it does not certify regularity, subgroup
-support or cheap successful solving. The
+computes canonical product spans and adds the known trace-constraint kernel
+constructor with recorded XOR coefficients; neither certifies regularity,
+subgroup support or cheap successful solving. The
 [comparison draft](../research/factor_base_excess_20261026/PROTOCOL_DRAFT.md)
 requires matched actual columns, verified successes, independent rank and
 complete pricing. The new draft card remains unrun and zero-funded.

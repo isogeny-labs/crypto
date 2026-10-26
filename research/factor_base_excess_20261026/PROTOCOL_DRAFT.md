@@ -34,6 +34,12 @@ XOR-sampled trace-constrained progression references. No whole-field scan
 or rejection loop without a frozen finite bound. Candidate construction,
 failed candidates, exact inventories and all subgroup-control searches are
 charged. Trace constraints are not assumed to improve subgroup support.
+The existing bounded first-hit `tracezero-gp` constructor is not the proposed
+kernel sampler. The new native `tracezero-gp-kernel` implementation records
+the nullspace, selected mask and nonzero scale, with at most256 coefficient
+draws. Validate that implementation and freeze its exact source and
+derivation before an experiment; the finite seeded panel is not claimed to
+sample the entire scale kernel uniformly.
 
 Compute exact product profiles without point-log information. Within each
 cell, compare top-excess and median-excess candidates to random controls.
@@ -89,6 +95,13 @@ nulls, low-rank cases and worse costs. A lower degree with higher total cost
 is not a win. A null result rejects this finite transfer test, not all
 structured bases. Neither a sub-rho nor a degree-of-regularity conclusion is
 an acceptance target.
+
+Smaller verified improvements still count as engineering successes under
+the standing success criterion; 20% prioritizes a follow-up, not whether a
+real improvement counts. No rho win is required for such a stage result.
+A zero-rank arm has no finite cost-per-independent-relation estimate;
+retain it rather than dividing by zero or discarding the cell. Unequal or
+missing completions preclude an unqualified speed comparison.
 
 Proposed ceilings: one worker/thread, 2GiB address-space limit, 60seconds per
 candidate, degree cap4, one million matrix cells, two-hour total panel cap.

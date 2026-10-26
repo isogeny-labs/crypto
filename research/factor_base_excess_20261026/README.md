@@ -1,4 +1,4 @@
-# Native factor-base structure screening
+# Native factor-base construction and structure screening
 
 Status: implementation and correctness validation; **no new research panel run**.
 The requested goal of finding a factor base with lower verified decomposition
@@ -20,10 +20,24 @@ The new direct native command computes the exact product-space dimensions
 factor-base-sweep profile --input profile.json --out structure.json
 ```
 
-An editable [input example](profile-example.json) is included. It specifies a
+`factor-base-sweep construct --input construct.json --out construction.json`
+also builds a trace-zero geometric progression natively. It solves the
+linear trace constraints for the scale, XORs seeded pseudorandom kernel
+coefficients and records the scale, generator, entire kernel basis and
+selected coefficient mask. This ports the known kernel method; it does not
+claim uniform coverage of the whole kernel from a finite set of 64-bit seeds.
+The bounded m=2 sweep accepts this distinct `tracezero-gp-kernel` shape in an
+explicit plan. Old `tracezero-gp` behavior and default preset grids are
+unchanged. Neither constructor guarantees useful subgroup points.
+
+Editable [profile](profile-example.json) and
+[construction](construct-example.json) examples are included. Each specifies a
 field, not a curve, target, subgroup or factor-base point inventory. The
 profile can describe fields through degree 571; this does **not** extend the
 sweeper's bounded solver to degree 83, degree 131, or more summands.
+Use this change's built executable for `profile`. The previously installed
+oracle-study executable is preserved; its archival `compare-leads` command
+is not replaced or claimed integrated into current main by this addition.
 
 The command validates the modulus with Rabin's irreducibility criterion,
 rejects zero/dependent/out-of-field columns, emits canonical bases for every
@@ -87,8 +101,10 @@ that AWS access is unavailable. Checkpoint authorization or an explicit
 owner-approved alternative is required before the new experiment can run.
 
 The implementation/tests can be reviewed independently of that execution
-decision. The proposed comparison and the broader factor-base goal remain
-pending; no result is silently substituted for them.
+decision. The raw software-check archive also awaits permitted artifact-store
+publication: it exceeds the 64KiB archive threshold and remains unchanged
+locally, with hashes in the validation receipt. The proposed comparison and
+the broader factor-base goal remain pending; no result is substituted for them.
 
 ## Visual and validation
 
