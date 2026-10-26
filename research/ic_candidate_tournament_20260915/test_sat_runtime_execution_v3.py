@@ -13,7 +13,8 @@ from unittest.mock import patch
 from oracle import InvalidEvidence
 from sat_runtime_bundle import CHILD_SCRIPTS, DIRECTORY
 from sat_runtime_execution_v3 import (
-    EXECUTION_POLICY, audit_execution, claim_execution, execute, register,
+    EXECUTION_POLICY, audit_execution, claim_execution, execute, frozen_environment,
+    register,
 )
 
 HERE = Path(__file__).resolve().parent
@@ -21,6 +22,24 @@ ROOT = HERE.parents[1]
 
 
 class SatRuntimeExecutionV3Tests(unittest.TestCase):
+    def test_loader_path_survives_without_python_environment_injection(self):
+        environment = {
+            'PATH': '/usr/bin',
+            'LD_LIBRARY_PATH': '/opt/hostedtoolcache/Python/3.12/lib',
+            'PYTHONPATH': '/unregistered/modules',
+            'PYTHONHOME': '/another/interpreter',
+            'LD_PRELOAD': '/unregistered/library.so',
+        }
+        with patch.dict(os.environ, environment, clear=True):
+            self.assertEqual(frozen_environment(), {
+                'PATH': environment['PATH'],
+                'LD_LIBRARY_PATH': environment['LD_LIBRARY_PATH'],
+                'PYTHONDONTWRITEBYTECODE': '1',
+                'PYTHONNOUSERSITE': '1',
+            })
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertNotIn('LD_LIBRARY_PATH', frozen_environment())
+
     def fixture(self, temporary, contents):
         root = Path(temporary)/'repository'
         directory = root/DIRECTORY
