@@ -116,6 +116,14 @@ path = "src/bin/jacobian_certificate.rs"
 name = "jacobian_transfers"
 path = "src/bin/jacobian_transfers.rs"
 
+# `transfer-audit` — enumerate candidate transfers (GHS descent, isogeny moves,
+# covers, pairings) of one curve's discrete logarithm, certify subgroup
+# preservation, price each in four phases against the matched rho, and emit a
+# verdict (research/transfer_audit_20261011).
+[[bin]]
+name = "transfer-audit"
+path = "src/bin/transfer_audit.rs"
+
 # `cryptopro-b-glv-bench` — GLV-2 with the degree-175 isogeny-chain
 # endomorphism against width-w NAF on GOST CryptoPro-B, same Jacobian
 # arithmetic in both arms (research/cryptopro_b_glv_chain_20261005).
