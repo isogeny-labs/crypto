@@ -11,6 +11,12 @@ and isolates it. Every run is still graded by ecbench from its own observations.
 
 ## Submit a spec to isolab
 
+For client installation and project MCP registration, start with
+[`docs/ISOLAB_AGENTS.md`](../../../docs/ISOLAB_AGENTS.md). The `isolab` connection
+below uses the existing NATS hub. The separate `isolab-eks` connection exposes
+`isolab_k8s_*` for the existing EKS deployment: its ecbench L2 workflow does not
+accept legacy `isolab.job/v1` documents or establish the NATS strict tier.
+
 1. Build `ecbench` for the worker's architecture (Linux x86-64 or arm64), from a
    committed, clean tree. The binary's SHA-256 is its identity.
 2. Write the job:
