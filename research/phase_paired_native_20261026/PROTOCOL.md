@@ -306,3 +306,40 @@ Other calibration observations, all on non-frozen targets:
 ## Addenda
 
 (none yet)
+
+### Addendum 1, 2026-10-26, after repetitions 1 to 3 ran and before the last four attempts
+
+Everything above is unchanged. Facts, then two decisions.
+
+Facts. Repetition 1 ran alone and the gate passed (`results/gate_rep1.txt`:
+arm A 4 verified and 8 UNSAT, rank 4; arm B 12 verified, rank 5; exhaustive
+pair matching and the sealed brute force agree; no `budget` or `deadline`).
+Repetitions 2 and 3 then ran with `run --resume --reps 3`. The run stopped at
+the 6,600 s attempt-CPU cap at 6,751 s, before repetition 3 pair 10: the four
+attempts of targets `c2` and `c3` of repetition 3 are written as `skipped`
+receipts (seq 68 to 71). Separately, two arm B attempts of repetition 2 (`a2`
+and `a3`) ended at the 400 s wall-clock backstop with 1,224,382 and 1,344,608
+conflicts, below the 3,000,000 budget, status `deadline`. That is the case the
+stop conditions name ("any `deadline` status stops the analysis"). Timing was
+read after the gate passed, and the numbers above were read before this
+addendum.
+
+Decision 1 (deadline). The stop condition fired and is reported as fired.
+Discarding the other 70 attempts would not remove the defect, so the analysis
+continues as a clearly flagged deviation: those two attempts are charged what
+they consumed (conflicts and CPU), which is a lower bound on what arm B would
+have cost with the budget binding, so repetition 2's arm B cost is understated.
+The tables carry the bound: arm B's conflicts in repetition 2 cannot exceed its
+charged total plus `2 x (3,000,000 - conflicts used)`. A `deadline` attempt is
+never read as a failure to decompose; it is unresolved.
+
+Decision 2 (cap). The four skipped attempts are run, so that the preregistered
+three complete repetitions exist: `run --resume --reps 3 --cpu-cap 8000`, same
+binary, same budget, same seeds, nothing else changed. They are appended after
+the skipped receipts; the skipped receipts stay in the file, marked superseded
+by the later receipts of the same slot, and the replay checks that
+correspondence. This choice was made after the first 68 attempts were read, so
+it is not blind to the results; the alternative, analysing a repetition of 10
+attempts per arm, was rejected because a partial repetition is not comparable
+with a full one. The cost is about 12 further CPU minutes, which takes the
+session past the nominal 90-minute figure (stated in the results).
