@@ -1,7 +1,7 @@
 {
   "baseline": {
     "equivalence_class_size": 2,
-    "log2_total": 92.07,
+    "log2_total": 92.57,
     "reason": "negation only"
   },
   "candidates": [
@@ -10,11 +10,12 @@
       "construction_status": "not applicable",
       "crosscheck_within_0_002_bits": null,
       "destination_solver": null,
+      "evaluation": "excluded",
       "file": "control-mnt1/ghs.json",
       "id": "ghs",
       "label": "Weil/GHS descent (binary fields)",
       "lead_class": "not_carried",
-      "log2_baseline": 92.07,
+      "log2_baseline": 92.57,
       "log2_cost_ratio": null,
       "log2_total": null,
       "repo_ratio_log2": null,
@@ -28,14 +29,15 @@
       "construction_status": "not evaluated",
       "crosscheck_within_0_002_bits": null,
       "destination_solver": "RhoOnIsogenousCurve",
+      "evaluation": "not_evaluable",
       "file": "control-mnt1/isogeny_class_invariants.json",
       "id": "isogeny:class_invariants",
       "label": "isogeny moves: class invariants, volcano structure and the identity-path comparison",
       "lead_class": "boundary",
-      "log2_baseline": 92.07,
+      "log2_baseline": 92.57,
       "log2_cost_ratio": 0.0,
-      "log2_total": 92.07,
-      "repo_ratio_log2": 0.5,
+      "log2_total": 92.57,
+      "repo_ratio_log2": 0.0,
       "subgroup_status": "arithmetic",
       "total_is_lower_bound": true,
       "transfer_type": "isogeny_move",
@@ -46,12 +48,13 @@
       "construction_status": "arithmetic, not executed",
       "crosscheck_within_0_002_bits": true,
       "destination_solver": "RhoOnJacobian",
+      "evaluation": "excluded",
       "file": "control-mnt1/cover_prime_g2_deg2.json",
       "id": "cover:prime_g2_deg2",
       "label": "same-field genus-2 cover H -> E of degree 2 over F_p, v^2 = F(u^2 + c)",
       "lead_class": "boundary",
-      "log2_baseline": 92.07,
-      "log2_cost_ratio": 4.542,
+      "log2_baseline": 92.57,
+      "log2_cost_ratio": 4.042,
       "log2_total": 96.612,
       "repo_ratio_log2": -4.042,
       "subgroup_status": "arithmetic",
@@ -64,12 +67,13 @@
       "construction_status": "not evaluated",
       "crosscheck_within_0_002_bits": null,
       "destination_solver": "RhoOnJacobian",
+      "evaluation": "not_evaluable",
       "file": "control-mnt1/cover_genus_sweep.json",
       "id": "cover:genus_sweep",
       "label": "hypothetical genus-g covers over the curve's own field, g = 2..8 (pricing check)",
       "lead_class": "not_carried",
-      "log2_baseline": 92.07,
-      "log2_cost_ratio": 4.542,
+      "log2_baseline": 92.57,
+      "log2_cost_ratio": 4.042,
       "log2_total": 96.612,
       "repo_ratio_log2": -4.042,
       "subgroup_status": "not_evaluated",
@@ -82,12 +86,13 @@
       "construction_status": "not evaluated",
       "crosscheck_within_0_002_bits": null,
       "destination_solver": "IndexCalculusInFqk_L13_conservative",
+      "evaluation": "evaluated",
       "file": "control-mnt1/pairing_tate_mov_frey_ruck.json",
       "id": "pairing:tate_mov_frey_ruck",
       "label": "Tate/Weil pairing into F_(q^k)^*, k = embedding degree of r",
       "lead_class": "formula_advantage",
-      "log2_baseline": 92.07,
-      "log2_cost_ratio": -14.127,
+      "log2_baseline": 92.57,
+      "log2_cost_ratio": -14.627,
       "log2_total": 77.943,
       "repo_ratio_log2": 14.627,
       "subgroup_status": "arithmetic",
@@ -96,7 +101,7 @@
       "verdict": "class-weak"
     }
   ],
-  "certificate_schema": "transfer-audit/certificate/v1",
+  "certificate_schema": "transfer-audit/certificate/v2",
   "controls": [],
   "curve": {
     "cofactor": "15337",
@@ -114,8 +119,18 @@
     "factor_hints_loaded": 3461,
     "seed": 20261011
   },
+  "evaluation": {
+    "evaluated": 1,
+    "excluded": 2,
+    "not_evaluable": 2,
+    "not_evaluable_candidates": [
+      "isogeny:class_invariants",
+      "cover:genus_sweep"
+    ],
+    "reading": "`no weakness found in scope` is the verdict of all three kinds of candidate. Evaluated: priced and compared with the matched baseline. Excluded: cannot yield a weakness (the subgroup is not carried, or the priced total, a lower bound where phases are unpriced, is not below the baseline). Not evaluable: the route may exist but its map or price could not be constructed far enough to decide, so the verdict is vacuous for it."
+  },
   "role": "control",
-  "schema": "transfer-audit/summary/v1",
+  "schema": "transfer-audit/summary/v2",
   "scope": [
     "A. Weil/GHS descent: every divisor l of n with l < n (binary fields); trace branch executed, m >= 2 not constructible in the repository",
     "B. isogeny moves: class invariants and local volcano data for l <= 31, GHS isogeny-extension heuristic, explicit degree-5 replay for sect113r1; no destination representative with a cheaper attack identified",
@@ -123,6 +138,6 @@
     "D. pairing: embedding degree exact or lower-bounded, L[1/3] price with the smallest published constant and o(1) dropped",
     "not covered: (2,2)-gluing, non-GHS descents, Weil restriction of non-rational maps, quantum attacks, implementation attacks, multi-target and amortized settings"
   ],
-  "tool": "transfer-audit/1",
+  "tool": "transfer-audit/2",
   "verdict": "class-weak"
 }
