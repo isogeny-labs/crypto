@@ -1,0 +1,12 @@
+card_id: CARD-hec-bitop-20261020-1
+relay_verbatim: true
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+  - "check-relay against research/hec_bitop_20261020/cards/CARD-hec-bitop-20261020-1.executor-return.txt: relay_verbatim true, missing_lines empty, verify_findings empty, status completed. This supersedes the earlier false result, which came from checking a truncated summary."
+  - "The dispatch added a 7200000 ms background-timeout line to the relayed card text; this is the standing practice since this repository's bitop ladder study (Deviation 1 there), per the coordinator. It does not change any argv or value; the card's timeout_seconds is 7000 and the receipt shows timed_out false."
+  - "Receipt research/hec_bitop_20261020/cards/CARD-hec-bitop-20261020-1.receipt.json (sha256 a43c4f5c82c31a3de7607da320c65c6dea0ab16626456e24576f8b37b960c852): status completed, commit a3c81b2aec01ac06d9e28b79da470fdbf0fb450b, one command primary-rows argv [./run.sh] in research/hec_bitop_20261020, exit 0, attempts 1, 155.758 s, succeeded true, stderr empty, dirty_after empty."
+  - "Disk matches receipt: stdout sha256 74c52676b9f2b1622f4c367bbebf9f8e18092080397f683b9cd0036883454365 (DONE g2, DONE g4, DONE g3); raw/g2.jsonl 5519cb603f2c15077ae2fb162839f254b6c2d45f861e10b5f6875b2a4ae565ad, raw/g3.jsonl 0a095b9a927f6bac975910b88f2d1d972f43c891d7b35d21d93d852c54a199ce, raw/g4.jsonl d83e59362c45c50b2972dfcebc60840f72bd8d859715069cccd9f35339cd3186; binary sha256 a2569d32123f2954bf089918ab77ddbbd38d62c5a037d46199d74ae1f8126dce unchanged."
+  - "Only the card's argv ran and the run wrote only inside write_scope (raw/, cards/). Commit 1d814d8fd also holds coordinator-side analysis/ and examples/hec_bitop_analyse.rs, which are not part of the card."
+interpretation: not_assessed
