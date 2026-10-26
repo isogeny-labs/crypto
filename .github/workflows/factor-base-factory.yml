@@ -1,11 +1,8 @@
 name: Factor-base factory
 
 on:
-  pull_request:
-    paths:
-      - 'tools/factor-base/**'
-      - 'docs/ic/FACTOR_BASE_FACTORY.md'
-      - '.github/workflows/factor-base-factory.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
