@@ -279,5 +279,39 @@ by the unit tests.
 
 ## Amendments
 
-(none yet; any change after this commit is appended here with the date and the
-reason, before the affected run.)
+Each amendment is committed before the run it affects.
+
+### Amendment 1 (2026-10-26, before the selection run)
+
+Context: after freezing section 3, the certification code was developed and
+tested on every supported group with `p <= 23` (981 curves, about 30 ms per
+curve, 0 failures, and for 55 groups at `p = 11..19` the certified `f_E`
+distribution equalled the class-number prediction). Those were code tests, not
+the selection run; the same checks are in `tests/`.
+
+1. **Selection scope (replaces "stop when 6 distinct groups are certified").**
+   Certification costs far less than the 20 CPU-minute cap, and ordering by
+   estimated cost would bias the six groups toward the smallest field. The
+   selection run therefore certifies **every eligible group with `t > 0`** for all
+   seven fields, subject to the unchanged 20 CPU-minute total and 90 s per-curve
+   caps (groups not reached are recorded as `not_reached`). Groups with `t < 0`
+   are the quadratic-twist mirrors of `t > 0` groups (same `f_E`, same class
+   count); their class counts are checked, but they are not separately certified
+   and no trial pair uses them. The pair rule and the trial-pair rule
+   (section 3) are unchanged and are applied to the certified groups.
+2. **"Independently verified" made operational (a clarification of section 4,
+   not a change).** A pair is independently verified iff both curves are
+   certified, `f_E1 != f_E2`, the group-level class-number check holds for their
+   group, and there is a prime `l` at which Method B is **decisive for both
+   curves** (the exact `n1` data of the curve and its twist leave exactly one
+   `v_l(f_E)`), Method B's two values differ, and their order agrees with
+   Method A. A pair certified by Method A alone is reported but does not count
+   toward G0.
+3. **Edge file granularity.** `isogeny_edges.jsonl` stores every edge expanded
+   during the walks of the trial-pair groups, and for all other certified groups
+   the start-vertex edges and the descending path edges, de-duplicated by
+   `(l, from j, kernel polynomial)`; counts of all expanded edges are in the
+   receipt. Reason: the full edge set would be tens of megabytes.
+4. **`curves.jsonl` scope.** Every curve of every group with `f_pi > 1` that was
+   processed or skipped (with its reason). Curves with `f_pi = 1`, supersingular
+   curves and `t < 0` mirrors are counted per field in the receipt, not listed.
