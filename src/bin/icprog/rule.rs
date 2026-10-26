@@ -35,6 +35,8 @@ use super::suite::{self, Row};
 /// §23's sizes, `(a, n)` in the order of `r`.
 pub const SIZES: [(u8, u32); 6] = [(1, 47), (0, 57), (0, 41), (0, 53), (1, 59), (0, 61)];
 const TARGET_SEED_BASE: i128 = 23000;
+mod matched;
+
 const BOOT: usize = 10_000;
 const BOOT_SEED: u128 = 2_309_300;
 const BL_PRODUCT: f64 = 1.93 * 1.21;
@@ -80,6 +82,14 @@ pub struct Constants {
     pub reference_check: bool,
     /// Whether the comparison's runs are frozen.
     pub frozen: bool,
+    /// Whether its claims carry the ledger's newer `vs_rho` stage fields
+    /// (`e2b865e4`, 2026-10-13); the comparisons before it reproduce
+    /// their frozen claims without them.
+    pub stage_fields: bool,
+    /// Whether the pin accepts counters the earlier comparison's output
+    /// lacks (main added `row_ops` and others after 2026-09-30): every
+    /// counter it had must still match exactly.
+    pub pin_allows_added_counters: bool,
 }
 
 const S23_IC_SOURCES: &[&str] = &[
@@ -126,6 +136,8 @@ pub const S23: Constants = Constants {
     earlier: None,
     reference_check: false,
     frozen: true,
+    stage_fields: false,
+    pin_allows_added_counters: false,
 };
 
 /// The rule's comparison at baseline v2 (`research/ic_tool_program/rule/v2`):
@@ -151,6 +163,8 @@ pub const V2: Constants = Constants {
     )),
     reference_check: true,
     frozen: false,
+    stage_fields: false,
+    pin_allows_added_counters: false,
 };
 
 /// The rule's comparison at baseline v3 (`research/ic_tool_program/rule/v3`):
@@ -176,6 +190,80 @@ pub const V3: Constants = Constants {
     )),
     reference_check: true,
     frozen: false,
+    stage_fields: false,
+    pin_allows_added_counters: false,
+};
+
+/// The rule's comparison at baseline v6 (`research/ic_tool_program/rule/v6`):
+/// rule v3's protocol on v6's binary, v4 (main's `92246530`, R10) with R06's
+/// scan key and R08's folding subtraction.  The arms' sources are still
+/// §23's list; main's drift and the two rounds changed seven of its nine.
+pub const V6: Constants = Constants {
+    ic_sources: S23_IC_SOURCES,
+    rho_sources: S23_RHO_SOURCES,
+    input_law: S23_INPUT_LAW,
+    non_claims: S23_NON_CLAIMS,
+    isolation: "isolated_bench (src/bin/isolated_bench.rs) run --wait --cpus 2, uncontended",
+    process: S23_PROCESS,
+    what_this_is: "The rule's comparison at baseline v6: §23's figures, from the checked rows.",
+    curve_ids: S23_CURVE_IDS,
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v6",
+    },
+    earlier: Some((
+        "research/ic_single_target_20260930/claims",
+        "research/ic_single_target_20260930/runs",
+    )),
+    reference_check: true,
+    frozen: false,
+    stage_fields: true,
+    pin_allows_added_counters: false,
+};
+
+/// The rule's comparison at baseline v7 (`research/ic_tool_program/rule/v7`):
+/// rule v6's protocol on v7's binary, v6 with R11's streamed pair-table
+/// build.  The arms' sources are still §23's list.
+pub const V7: Constants = Constants {
+    what_this_is: "The rule's comparison at baseline v7: §23's figures, from the checked rows.",
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v7",
+    },
+    ..V6
+};
+
+/// The rule's comparison at baseline v8 (`research/ic_tool_program/rule/v8`):
+/// rule v7's protocol on v8's index calculus (R12) with the matched rho:
+/// the signed-Frobenius walk's canonicalisation batched sixteen lanes at a
+/// time by GFNI and funnel shifts, as the index calculus's scan key is
+/// (`FrobeniusCanon::frobenius_reps`).  The walks are the same walks; only
+/// the time a step takes changes.
+pub const V8: Constants = Constants {
+    what_this_is:
+        "The rule's comparison at baseline v8, rho matched: §23's figures, from the checked rows.",
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v8",
+    },
+    pin_allows_added_counters: true,
+    process: "one process: the index calculus, then rho with its canonicalisation batched \
+              (the default), both rebuilt each repetition",
+    ..V6
+};
+
+/// Rule v8's same-binary control: the rho arm of rule v7, whose
+/// canonicalisation reads per-point tables (`KIC_RHO_CANON=scalar`).
+pub const V8C: Constants = Constants {
+    what_this_is: "The rule's comparison at baseline v8, rho as at rule v7: §23's figures, from the checked rows.",
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v8c",
+    },
+    pin_allows_added_counters: true,
+    process: "one process: the index calculus, then rho with its canonicalisation by per-point \
+              tables (KIC_RHO_CANON=scalar, as rule v7), both rebuilt each repetition",
+    ..V6
 };
 
 /// Where a comparison lives and what it writes.
@@ -617,7 +705,7 @@ impl Comparison {
         };
         let target_hash = rep.at("target")?.at("sha256")?.clone();
         let curve = rep.at("curve")?;
-        Ok(J::Obj(vec![
+        let fields: Vec<(String, J)> = vec![
             ("n".into(), J::Int(n.into())),
             ("a".into(), J::Int(a.into())),
             ("log2_r".into(), rep.at("log2_r")?.clone()),
@@ -662,7 +750,18 @@ impl Comparison {
                 "ic_online_phases_not_entered".into(),
                 m.at("ic_online_phases_not_entered")?.clone(),
             ),
+            ("rho_online_phase_ms".into(), rho_online_phase_ms(m)?),
+            (
+                "ic_online_interval".into(),
+                J::Str(interval(rep.at("online_interval")?, "ic")?),
+            ),
+            (
+                "rho_online_interval".into(),
+                J::Str(interval(rep.at("online_interval")?, "rho")?),
+            ),
             ("online_interval".into(), rep.at("online_interval")?.clone()),
+            ("operation_accounting".into(), operation_accounting(rep)?),
+            ("record_class".into(), J::Str(record_class(m)?.into())),
             ("same_resource_envelope".into(), J::Bool(true)),
             ("independent_validation".into(), J::Bool(independent)),
             (
@@ -790,7 +889,23 @@ impl Comparison {
             ),
             ("report".into(), J::Str(self.rel(report_path))),
             ("attempts".into(), J::Arr(tried)),
-        ]))
+        ];
+        // The ledger's newer stage fields (e2b865e4, 2026-10-13) are written
+        // only by the comparisons declared after it, so the earlier ones
+        // still reproduce their frozen claims byte for byte.
+        const NEWER: [&str; 5] = [
+            "rho_online_phase_ms",
+            "ic_online_interval",
+            "rho_online_interval",
+            "operation_accounting",
+            "record_class",
+        ];
+        Ok(J::Obj(
+            fields
+                .into_iter()
+                .filter(|(key, _)| self.constants.stage_fields || !NEWER.contains(&key.as_str()))
+                .collect(),
+        ))
     }
 }
 
@@ -1125,6 +1240,94 @@ fn py_median(mut v: Vec<J>) -> Result<J, String> {
     }))
 }
 
+/// Rho's online phases in the ledger's names (`rho_online_phase_fields`):
+/// the walk with its collision, and the recovery check, in milliseconds
+/// from the run's medians.
+fn rho_online_phase_ms(m: &J) -> Result<J, String> {
+    let ns = m.at("rho_online_phases_ns")?;
+    let ms = |key: &str| -> Result<J, String> {
+        let v = ns
+            .at(key)?
+            .as_f64()
+            .ok_or(format!("{key} is not a number"))?;
+        Ok(J::Float(v / 1e6))
+    };
+    Ok(J::Obj(vec![
+        ("walk_and_collision_ms".into(), ms("rho_solve")?),
+        ("recovery_check_ms".into(), ms("recovery_check")?),
+    ]))
+}
+
+/// One arm's online interval as the ledger states it: from its start event
+/// to its stop event, as the run recorded them.
+fn interval(online: &J, arm: &str) -> Result<String, String> {
+    let event = |which: &str| -> Result<String, String> {
+        let key = format!("{arm}_{which}_event");
+        Ok(online
+            .at(&key)?
+            .as_str()
+            .ok_or(format!("{key} is not a string"))?
+            .to_string())
+    };
+    Ok(format!("{} -> {}", event("start")?, event("stop")?))
+}
+
+/// The ledger's operation accounting: each arm's online native counter,
+/// kept distinct (`operation_accounting_contract`).  The index calculus
+/// counts its descent's trials, rho its walk steps; they are different
+/// operations, so no operation ratio is a speedup.
+fn operation_accounting(rep: &J) -> Result<J, String> {
+    let int = |v: &J, what: &str| v.as_i128().ok_or(format!("{what} is not an integer"));
+    let ic = int(
+        rep.at("counts")?
+            .at("pass")?
+            .at("descent")?
+            .at("trials_total")?,
+        "descent trials_total",
+    )?;
+    let rho = int(rep.at("rho_counts")?.at("steps")?, "rho steps")?;
+    Ok(J::Obj(vec![
+        (
+            "comparison_status".into(),
+            J::Str("native_counters_only".into()),
+        ),
+        ("ic_online_operations".into(), J::Int(ic)),
+        ("rho_online_operations".into(), J::Int(rho)),
+        (
+            "operation_units".into(),
+            J::Obj(vec![
+                ("ic".into(), J::Str("descent trials".into())),
+                ("rho".into(), J::Str("walk steps".into())),
+            ]),
+        ),
+        ("ops_speedup_online".into(), J::Null),
+        (
+            "unit_assumption".into(),
+            J::Str(
+                "IC descent trials and rho walk steps are distinct native counters; \
+                 the speedup is the online wall time, both arms timed in one process"
+                    .into(),
+            ),
+        ),
+    ]))
+}
+
+/// The ledger's record class.  Every row is a checked answer timed on an
+/// isolated core with both arms in one process; it is controlled when the
+/// index calculus's five exclusive target phases all have a cost, and
+/// exploratory otherwise (`controlled_cpu_speedup_requires`).
+fn record_class(m: &J) -> Result<&'static str, String> {
+    let skipped = m
+        .at("ic_online_phases_not_entered")?
+        .as_arr()
+        .ok_or("ic_online_phases_not_entered is not a list")?;
+    Ok(if skipped.is_empty() {
+        "verified_answer_controlled_wall"
+    } else {
+        "verified_answer_exploratory_wall"
+    })
+}
+
 /// `round(x, 2)`: the correctly rounded decimal, read back.
 fn round2(x: f64) -> f64 {
     format!("{x:.2}").parse().expect("a decimal")
@@ -1160,6 +1363,29 @@ fn fit(points: &[(f64, f64)]) -> J {
         ),
         ("points".into(), J::Int(k as i128)),
     ])
+}
+
+/// Whether `new` holds every value `old` holds, at the same place and equal;
+/// the keys only `new` has are appended to `added` (by path).
+fn superset(new: &J, old: &J, path: &str, added: &mut Vec<String>) -> bool {
+    match (new, old) {
+        (J::Obj(n), J::Obj(o)) => {
+            let mut ok = true;
+            for (k, v) in o {
+                match n.iter().find(|(k2, _)| k2 == k) {
+                    Some((_, w)) => ok &= superset(w, v, &format!("{path}.{k}"), added),
+                    None => ok = false,
+                }
+            }
+            for (k, _) in n {
+                if !o.iter().any(|(k2, _)| k2 == k) {
+                    added.push(format!("{path}.{k}"));
+                }
+            }
+            ok
+        }
+        _ => json::py_eq(new, old),
+    }
 }
 
 /// A checked row, with its target and run.
@@ -1983,10 +2209,17 @@ impl Comparison {
                     .join(format!("k{a}n{n}/T01-R1.price.json")),
             )?;
             let (x, y) = (pin::outputs(&new), pin::outputs(&old));
+            let mut added = Vec::new();
             let mut differs: Vec<&str> = x
                 .iter()
                 .zip(&y)
-                .filter(|((_, p), (_, q))| !json::py_eq(p, q))
+                .filter(|((k, p), (_, q))| {
+                    if *k == "counts" && self.constants.pin_allows_added_counters {
+                        // `q` is the earlier output: every counter it has must match.
+                        return !superset(p, q, "counts", &mut added);
+                    }
+                    !json::py_eq(p, q)
+                })
                 .map(|((k, _), _)| *k)
                 .collect();
             differs.sort_unstable();
@@ -1995,6 +2228,10 @@ impl Comparison {
                 ("row", J::Str(format!("{slug}/T01"))),
                 ("slug", J::Str(slug.clone())),
                 ("equal", J::Bool(differs.is_empty())),
+                (
+                    "counters_added_since_the_earlier_output",
+                    J::Arr(added.iter().cloned().map(J::Str).collect()),
+                ),
                 (
                     "differs_in",
                     J::Arr(differs.iter().map(|k| J::Str((*k).into())).collect()),

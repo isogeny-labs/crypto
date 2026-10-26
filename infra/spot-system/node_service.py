@@ -48,10 +48,14 @@ def run(root, binary_dir, project):
             if exists != '1':
                 subprocess.run(['createdb', '-h', '/run/spot-postgresql', 'conductor'], env=env, check=True)
             # Bootstrap stores local credentials itself. Never print its token output.
-            with (root / 'bootstrap.log').open('ab') as out:
-                subprocess.run([str(binary_dir / 'conductord'), 'bootstrap', '--org', 'spot',
-                    '--project', 'experiments', '--principal', 'ec2-user', '--repo', str(project),
-                    '--endpoint', 'http://127.0.0.1:8080'], env=env, check=True, stdout=out, stderr=out)
+            # An explicitly imported database retains its original projects and
+            # client credentials. Re-bootstrap would replace the client's local
+            # authentication after the durable home mount becomes available.
+            if not (root / 'conductor-imported.json').exists():
+                with (root / 'bootstrap.log').open('ab') as out:
+                    subprocess.run([str(binary_dir / 'conductord'), 'bootstrap', '--org', 'spot',
+                        '--project', 'experiments', '--principal', 'ec2-user', '--repo', str(project),
+                        '--endpoint', 'http://127.0.0.1:8080'], env=env, check=True, stdout=out, stderr=out)
             for queue in ['queue', 'running', 'done']:
                 (root / 'agent/jobs' / queue).mkdir(parents=True, exist_ok=True)
             cairn_env = dict(env, CAIRN_DATA=str(root / 'cairn'), CAIRN_KEY=str(root / 'cairn.key'),
