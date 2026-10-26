@@ -11,6 +11,12 @@ and isolates it. Every run is still graded by ecbench from its own observations.
 
 ## Submit a spec to isolab
 
+For client installation and project MCP registration, start with
+[`docs/ISOLAB_AGENTS.md`](../../../docs/ISOLAB_AGENTS.md). The `isolab` connection
+below uses the existing NATS hub. The separate `isolab-eks` connection exposes
+`isolab_k8s_*` for the existing EKS deployment: its ecbench L2 workflow does not
+accept legacy `isolab.job/v1` documents or establish the NATS strict tier.
+
 1. Build `ecbench` for the worker's architecture (Linux x86-64 or arm64), from a
    committed, clean tree. The binary's SHA-256 is its identity.
 2. Write the job:
@@ -70,6 +76,15 @@ machine can therefore check them:
   does. To confirm a wall-clock result, rerun the spec as a new session on a host
   of the same class (`env_class_id`) at the required level and compare the two
   intervals.
+
+## Under Claude Code
+
+The `isolab-job`, fetch and `ecbench verify --replay` commands above may run
+as a command card: `experiment-director` writes it from the frozen spec or
+session path, the main session relays it verbatim to `executor-mechanical`,
+and `experiment-director` assesses the returned text against the receipt on
+disk (AGENTS.md "Model tiers"). Comparing levels, blockers and
+disagreements stays with the reasoning tier.
 
 ## When results disagree
 

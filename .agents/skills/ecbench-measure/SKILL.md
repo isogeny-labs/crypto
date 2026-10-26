@@ -44,6 +44,20 @@ Copy `docs/ecbench/specs/smoke-prime.json` and edit it. Rules:
 - `isolation_required: L2` (default) is what a wall-clock figure needs. Operation
   counts need no level.
 
+## 2a. Under Claude Code: card, relay, assess
+
+Once the spec is frozen, steps 3 and 4 go through the model tiers (AGENTS.md
+"Model tiers"). The main session dispatches `experiment-director` in compile
+mode to write the task card (build, `ecbench run`, `ecbench verify`: exact
+argv, spec sha256, `OUT_DIR` as `must_not_exist`, timeouts, stop conditions;
+`python3 tools/task_card.py lint` must print `CARD OK`), relays the text
+`python3 tools/task_card.py prompt <card>` prints verbatim to
+`executor-mechanical`, which runs it with `tools/task_card.py run`, then dispatches `experiment-director` in
+assess mode with the executor's returned text. Only an assessment of
+`executed_as_specified` with a verbatim relay goes on to step 5. The
+measurement, audit, compare, tabulate and land steps stay as written; compare,
+the §5a band and the decision stay with the reasoning tier.
+
 ## 3. Run
 
 ```bash
@@ -159,6 +173,11 @@ Per AGENTS.md, open or update a PR in this task:
 - the spec, the session directory under `research/<topic>_<date>/sessions/`, the
   audit receipt, the saved comparisons, and a README with the hypothesis, the
   host (`ecbench host`), the levels earned, the table and the decision;
+- `protocol.json` frozen before the run (`experiment-protocol`: the spec is
+  the instrument, the protocol names its claims, controls, seeds and what
+  counts) and `export.json` built from the session with
+  `experiment_protocol.py from-ecbench` and checked with `check-export
+  --verify-files`, beside the session, never inside it;
 - the scoreboard and the thread's note in the same PR when the round measures an
   IC variant (§7). Mark extrapolations as such;
 - failures, timeouts and regressions included;

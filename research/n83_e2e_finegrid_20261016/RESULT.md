@@ -33,3 +33,9 @@ analysis exactly as parsed JSON. `ic1_rows_38978215742.json` binds the raw artif
 The next screen compares root11 and root22 at K1107 and K1112. The sealed
 sixteen-point fixture in `research/n83_e2e_final_holdout_20261016` is reserved
 for candidate selection after the exposed-point screens are complete.
+
+The [two-page report](reports/run-20261016T2329Z/report.pdf) and
+[complete observation graph](reports/run-20261016T2329Z/observations.svg)
+retain the exposed-point and accounting qualifications. The report directory
+contains exact receipt copies and archive-member provenance;
+[benchmark browsing copies](../../benchmarks/20261016-n83-finegrid/) use the same bytes.

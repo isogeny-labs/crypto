@@ -1,0 +1,42 @@
+{
+  "run": {
+    "source_head": "39ebf63386db3f04cc55caf2864e9f5e5bc130e4",
+    "started_utc": "2026-10-19T00:58:21.932829+00:00",
+    "argv": [
+      "/workspace/toolchains/rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+      "test",
+      "--release",
+      "--lib",
+      "--locked",
+      "--",
+      "--test-threads=1"
+    ],
+    "target_dir": "/workspace/volcano_validation_39eb_20261019/target",
+    "scope": "Required current-head release library validation, serial tests, unchanged assertions/ignores/limits; isolated new target preserves frozen old dependency caches. Timed campaign remains cleanly stopped.",
+    "finished_utc": "2026-10-19T01:41:05.621331+00:00",
+    "exit_code": 0
+  },
+  "source_head": "39ebf63386db3f04cc55caf2864e9f5e5bc130e4",
+  "result_lines": [
+    "test result: ok. 4396 passed; 0 failed; 118 ignored; 0 measured; 0 filtered out; finished in 1511.46s"
+  ],
+  "source_scope": "Library validation of imported head; not frozen-worker binary equivalence, independent solver replay, performance qualification or completion of the original experiment.",
+  "log_sha256": "af2b387600a39a6fc619cbe3bd0fa29450784e6283b07b9920f1c35a0e07157c",
+  "environment": {
+    "rustc": "/workspace/toolchains/rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "cargo_target": "/workspace/volcano_validation_39eb_20261019/target",
+    "build_jobs": 2,
+    "rayon_threads": 1,
+    "test_threads": 1,
+    "openssl_lib": "/usr/lib/x86_64-linux-gnu",
+    "openssl_include": "/usr/include",
+    "timed_worker": "Clean stop remains in place; no heavy overlap authorized",
+    "source_head": "39ebf63386db3f04cc55caf2864e9f5e5bc130e4"
+  },
+  "test_binary": {
+    "path": "/workspace/volcano_validation_39eb_20261019/target/release/deps/crypto_lib-565bcb20cb4d5bb4",
+    "bytes": 103389344,
+    "sha256": "71fcd94896f23ce4b0a2fa50c22813d4db5969afbb7035e49856dfc0db081aad"
+  }
+}
