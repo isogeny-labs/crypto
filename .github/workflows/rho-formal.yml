@@ -6,13 +6,8 @@ name: Strong rho formal checks
 #   perf-ipc the perf IPC tool parses perf output (selftest) and either counts
 #            or reports the runner's missing PMU as "unsupported".
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/rho-formal.yml'
-      - 'research/rho_assurance_20261016/lean/**'
-      - 'research/rho_assurance_20261016/tla/**'
-      - 'src/cryptanalysis/koblitz_strong_rho.rs'
-      - 'tools/perf_ipc.sh'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
