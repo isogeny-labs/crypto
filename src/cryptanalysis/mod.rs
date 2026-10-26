@@ -330,6 +330,7 @@ pub mod sig_fp_tower;
 pub mod signal_ratchet;
 pub mod signature_corpus;
 pub mod smith_isogeny;
+pub mod smith_route_s;
 pub mod smith_kernel_coverage;
 pub mod smith_prop24;
 pub mod smt_oracle;

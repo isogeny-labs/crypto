@@ -60,9 +60,8 @@ use super::smith_prop24::{
     tractable_subgroups, El, Ext, MapOutcome, Poly, SplitMix64, Weierstrass,
 };
 use num_bigint::BigUint;
-use num_traits::{One, Zero};
 use std::cell::Cell;
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap};
 
 // ---------------------------------------------------------------------------
 // F_p helpers (u64, p < 2^31).
@@ -240,6 +239,7 @@ fn pxgcd(a: &[u64], b: &[u64], p: u64) -> (Poly, Poly, Poly) {
         (r0, s0, t0)
     }
 }
+#[allow(dead_code)]
 fn peval(a: &[u64], x: u64, p: u64) -> u64 {
     a.iter().rev().fold(0, |r, &c| ad(md(r, x, p), c, p))
 }
@@ -290,7 +290,9 @@ pub fn irreducible_poly(p: u64, d: usize, rng: &mut SplitMix64) -> Poly {
         return vec![0, 1];
     }
     let x: Poly = vec![0, 1];
-    let primes: Vec<usize> = (2..=d).filter(|r| d % r == 0 && (2..*r).all(|s| r % s != 0)).collect();
+    let primes: Vec<usize> = (2..=d)
+        .filter(|r| d % r == 0 && (2..*r).all(|s| r % s != 0))
+        .collect();
     loop {
         let mut f: Poly = (0..d).map(|_| rng.below(p)).collect();
         f.push(1);
@@ -382,7 +384,8 @@ impl Fld {
     }
     pub fn mul(&self, a: &El, b: &El) -> El {
         let d = self.d as u64;
-        self.mul_units.set(self.mul_units.get() + d * d + d * (d - 1));
+        self.mul_units
+            .set(self.mul_units.get() + d * d + d * (d - 1));
         self.e.mul(a, b)
     }
     pub fn inv(&self, a: &El) -> El {
@@ -809,11 +812,7 @@ pub struct PsiPoint {
 fn normalize_proj(k: &Fld, v: &[El; 3]) -> Option<[El; 3]> {
     let i = (0..3).find(|&i| !k.is_zero(&v[i]))?;
     let li = k.inv(&v[i]);
-    Some([
-        k.mul(&v[0], &li),
-        k.mul(&v[1], &li),
-        k.mul(&v[2], &li),
-    ])
+    Some([k.mul(&v[0], &li), k.mul(&v[1], &li), k.mul(&v[2], &li)])
 }
 
 impl SmithData {
@@ -821,12 +820,12 @@ impl SmithData {
     /// coordinates in `k`.  `k` must contain `F_{p^{2j}}` for the degree `j`
     /// of the field of definition of `P`.
     pub fn psi_point(&self, k: &Fld, x0: &El, y0: &El) -> Result<Vec<PsiPoint>, Degenerate> {
-        let sigma = self.sigma.as_ref().expect("rational isogeny needs lc(s) square");
+        let sigma = self
+            .sigma
+            .as_ref()
+            .expect("rational isogeny needs lc(s) square");
         let p = self.p;
-        let dx = k.add(
-            &k.add(&k.mul(x0, x0), &k.scale(x0, self.d1)),
-            &k.c(self.d0),
-        );
+        let dx = k.add(&k.add(&k.mul(x0, x0), &k.scale(x0, self.d1)), &k.c(self.d0));
         if k.is_zero(&dx) {
             return Err(Degenerate::OverInfinity);
         }
@@ -899,10 +898,7 @@ impl SmithData {
                 b[0] = k.add(&b[0], &k.mul(&w, &k.mul(&xs[j], &xs[l])));
             }
             let w = k.mul(&b[2], &b[2]);
-            let inner = k.add(
-                &k.add(&k.mul(&d4t, &k.mul(&w, &w)), &k.mul(&d2t, &w)),
-                &d0t,
-            );
+            let inner = k.add(&k.add(&k.mul(&d4t, &k.mul(&w, &w)), &k.mul(&d2t, &w)), &d0t);
             // Prop. 3: (d4 w^2 + d2 w + d0)^2 = 64 s w
             let lhs = k.mul(&inner, &inner);
             let rhs = k.scale(&k.mul(&st, &w), 64);
@@ -917,7 +913,10 @@ impl SmithData {
             let mut eta = [k.zero(), k.zero(), k.zero()];
             for i in 0..3 {
                 let xk = xs[i];
-                let dk = k.add(&k.add(&k.mul(&xk, &xk), &k.scale(&xk, self.d1)), &k.c(self.d0));
+                let dk = k.add(
+                    &k.add(&k.mul(&xk, &xk), &k.scale(&xk, self.d1)),
+                    &k.c(self.d0),
+                );
                 let c = k.mul(&k.mul(&dk, &dinv[i]), &k.inv(&ys[i]));
                 let mut pw_ = k.one();
                 for slot in eta.iter_mut() {
@@ -963,7 +962,10 @@ impl Hyp {
     pub fn new(f: &[u64], p: u64) -> Hyp {
         let mut f = f.to_vec();
         ptrim(&mut f);
-        assert_eq!(pdeg(&f), 7, "Hyp is the imaginary model deg F = 7");
+        assert!(
+            pdeg(&f) == 7 || pdeg(&f) == 8,
+            "Hyp: genus 3 needs deg F in {{7, 8}} (Cantor only for 7)"
+        );
         Hyp { p, f }
     }
     pub fn zero(&self) -> Mum {
@@ -987,6 +989,11 @@ impl Hyp {
     }
     /// Cantor addition (composition and reduction).
     pub fn add(&self, a: &Mum, b: &Mum) -> Mum {
+        assert_eq!(
+            pdeg(&self.f),
+            7,
+            "Cantor needs the imaginary model deg F = 7"
+        );
         let p = self.p;
         let (d1, e1, e2) = pxgcd(&a.u, &b.u, p);
         let (d, c1, c2) = pxgcd(&d1, &padd(&a.v, &b.v, p), p);
@@ -1032,7 +1039,7 @@ impl Hyp {
         let mut u: Poly = vec![1];
         let mut v: Poly = Vec::new();
         for &j in shape {
-            let mut r;
+            let r;
             let mut tries = 0;
             loop {
                 tries += 1;
@@ -1236,7 +1243,10 @@ pub fn closed_pt_from(k: &Fld, kap: &[El; 3]) -> ClosedPt {
             break;
         }
     }
-    assert!(found, "no generator of the residue field among kappa_1 + lambda kappa_2");
+    assert!(
+        found,
+        "no generator of the residue field among kappa_1 + lambda kappa_2"
+    );
     // mu = prod (Z - c^{p^i})
     let mut mu: Vec<El> = vec![k.one()];
     let mut ci = c;
@@ -1392,11 +1402,7 @@ impl Smith {
     }
     /// As [`Self::psi_class`] with random generic bases until it works;
     /// returns the base used.
-    pub fn psi_class_auto(
-        &self,
-        x: &Mum,
-        rng: &mut SplitMix64,
-    ) -> (PsiImage, Mum) {
+    pub fn psi_class_auto(&self, x: &Mum, rng: &mut SplitMix64) -> (PsiImage, Mum) {
         for _ in 0..2000 {
             let a = self.h.random_generic3(rng);
             if let Ok(im) = self.psi_class(x, &a, rng) {
@@ -1456,10 +1462,7 @@ impl Form {
             }
         }
         c.retain(|_, v| *v != 0);
-        Form {
-            d: self.d + o.d,
-            c,
-        }
+        Form { d: self.d + o.d, c }
     }
     /// `f(M (x, y, w)^T)`: the form in the new coordinates.
     pub fn subst(&self, m: &[[u64; 3]; 3], p: u64) -> Form {
@@ -1544,9 +1547,21 @@ impl Form {
 
 fn mat3_inv(m: &[[u64; 3]; 3], p: u64) -> Option<[[u64; 3]; 3]> {
     let det = |a: &[[u64; 3]; 3]| -> u64 {
-        let t1 = md(a[0][0], sb(md(a[1][1], a[2][2], p), md(a[1][2], a[2][1], p), p), p);
-        let t2 = md(a[0][1], sb(md(a[1][0], a[2][2], p), md(a[1][2], a[2][0], p), p), p);
-        let t3 = md(a[0][2], sb(md(a[1][0], a[2][1], p), md(a[1][1], a[2][0], p), p), p);
+        let t1 = md(
+            a[0][0],
+            sb(md(a[1][1], a[2][2], p), md(a[1][2], a[2][1], p), p),
+            p,
+        );
+        let t2 = md(
+            a[0][1],
+            sb(md(a[1][0], a[2][2], p), md(a[1][2], a[2][0], p), p),
+            p,
+        );
+        let t3 = md(
+            a[0][2],
+            sb(md(a[1][0], a[2][1], p), md(a[1][1], a[2][0], p), p),
+            p,
+        );
         ad(sb(t1, t2, p), t3, p)
     };
     let d = det(m);
@@ -1567,6 +1582,7 @@ fn mat3_inv(m: &[[u64; 3]; 3], p: u64) -> Option<[[u64; 3]; 3]> {
     Some(r)
 }
 
+#[allow(dead_code)]
 fn mat3_vec(m: &[[u64; 3]; 3], v: &[u64; 3], p: u64) -> [u64; 3] {
     let mut r = [0u64; 3];
     for i in 0..3 {
@@ -1633,7 +1649,11 @@ pub fn res_y(a: &[Poly], b: &[Poly], p: u64) -> Poly {
 pub fn cond_rows(cp: &ClosedPt, mons: &[[u8; 3]], p: u64) -> Vec<Vec<u64>> {
     let m = cp.degree();
     let mut pws: [Vec<Poly>; 3] = [vec![vec![1]], vec![vec![1]], vec![vec![1]]];
-    let maxd = mons.iter().map(|x| x.iter().map(|&e| e as usize).sum::<usize>()).max().unwrap_or(0);
+    let maxd = mons
+        .iter()
+        .map(|x| x.iter().map(|&e| e as usize).sum::<usize>())
+        .max()
+        .unwrap_or(0);
     for a in 0..3 {
         for e in 1..=maxd {
             let nx = prem(&pmul(&pws[a][e - 1], &cp.co[a], p), &cp.mu, p);
@@ -1836,10 +1856,7 @@ impl Quartic {
                 if c == 0 {
                     continue;
                 }
-                let t = fld.mul(
-                    &fld.pow_u64(x, mo[0] as u64),
-                    &fld.pow_u64(z, mo[2] as u64),
-                );
+                let t = fld.mul(&fld.pow_u64(x, mo[0] as u64), &fld.pow_u64(z, mo[2] as u64));
                 out[mo[1] as usize] = fld.add(&out[mo[1] as usize], &fld.scale(&t, c));
             }
             out
@@ -2117,7 +2134,6 @@ pub fn div_max_mult(d: &Div) -> u32 {
     d.values().copied().max().unwrap_or(0)
 }
 
-
 impl Pic {
     pub fn new(q: Quartic, seed: u64) -> Result<Pic, PicErr> {
         let p = q.p;
@@ -2169,11 +2185,7 @@ impl Pic {
         // Omega: residual of a random rational line through P0
         let mut pic = pic;
         for _ in 0..400 {
-            let qq = [
-                pic.rnd(p),
-                pic.rnd(p),
-                pic.rnd(p),
-            ];
+            let qq = [pic.rnd(p), pic.rnd(p), pic.rnd(p)];
             let l = cross(&ptn, &qq, p);
             if l == [0, 0, 0] {
                 continue;
@@ -2208,87 +2220,91 @@ impl Pic {
     }
 
     /// Conditions "g vanishes to order >= 2 along C at the closed point".
-    fn tangent_rows(&self, cp: &ClosedPt, mons: &[[u8; 3]]) -> Vec<Vec<u64>> {
-        let p = self.q.p;
-        let mu = &cp.mu;
-        let m = cp.degree();
-        let n: Vec<Poly> = (0..3)
-            .map(|v| eval_form_ring(&self.q.f.deriv(v, p), &cp.co, mu, p))
-            .collect();
-        let crs = |a: &[Poly], b: &[Poly]| -> Vec<Poly> {
-            (0..3)
-                .map(|i| {
-                    let (j, k) = ((i + 1) % 3, (i + 2) % 3);
-                    psub(
-                        &ring_mul(&a[j], &b[k], mu, p),
-                        &ring_mul(&a[k], &b[j], mu, p),
-                        p,
-                    )
-                })
-                .collect()
-        };
-        let mut tvec: Option<Vec<Poly>> = None;
-        for e in 0..3 {
-            let mut ev: Vec<Poly> = vec![Vec::new(); 3];
-            ev[e] = vec![1];
-            let t = crs(&n, &ev);
-            if t.iter().any(|x| !x.is_empty()) {
-                let c = crs(&t, &cp.co);
-                if c.iter().any(|x| !x.is_empty()) {
-                    tvec = Some(t);
-                    break;
-                }
-            }
-        }
-        let t = tvec.expect("no tangent direction at a smooth point");
-        // value of D_t mon = sum_v t_v * d mon/dX_v at P
-        let vals: Vec<Poly> = mons
-            .iter()
-            .map(|mo| {
-                let mut acc: Poly = Vec::new();
-                for v in 0..3 {
-                    if mo[v] == 0 {
-                        continue;
-                    }
-                    let mut term: Poly = vec![mo[v] as u64 % p];
-                    for w in 0..3 {
-                        let e = if w == v { mo[w] - 1 } else { mo[w] };
-                        for _ in 0..e {
-                            term = ring_mul(&term, &cp.co[w], mu, p);
-                        }
-                    }
-                    term = ring_mul(&term, &t[v], mu, p);
-                    acc = padd(&acc, &term, p);
-                }
-                prem(&acc, mu, p)
-            })
-            .collect();
-        (0..m)
-            .map(|t_| vals.iter().map(|v| *v.get(t_).unwrap_or(&0)).collect())
-            .collect()
-    }
-
     /// Vanishing conditions of a divisor with multiplicities up to 2.
     pub fn rows_for(&self, dv: &Div, mons: &[[u8; 3]]) -> Result<Vec<Vec<u64>>, PicErr> {
-        let p = self.q.p;
-        let mut rows = Vec::new();
-        for (cp, &mult) in dv {
-            rows.extend(cond_rows(cp, mons, p));
-            match mult {
-                1 => {}
-                2 => rows.extend(self.tangent_rows(cp, mons)),
-                _ => return Err(PicErr::NonReduced),
+        rows_on(&self.q, dv, mons)
+    }
+}
+
+/// Conditions "g vanishes to order >= 2 along C at the closed point".
+pub fn tangent_rows_on(quartic: &Quartic, cp: &ClosedPt, mons: &[[u8; 3]]) -> Vec<Vec<u64>> {
+    let p = quartic.p;
+    let mu = &cp.mu;
+    let m = cp.degree();
+    let n: Vec<Poly> = (0..3)
+        .map(|v| eval_form_ring(&quartic.f.deriv(v, p), &cp.co, mu, p))
+        .collect();
+    let crs = |a: &[Poly], b: &[Poly]| -> Vec<Poly> {
+        (0..3)
+            .map(|i| {
+                let (j, k) = ((i + 1) % 3, (i + 2) % 3);
+                psub(
+                    &ring_mul(&a[j], &b[k], mu, p),
+                    &ring_mul(&a[k], &b[j], mu, p),
+                    p,
+                )
+            })
+            .collect()
+    };
+    let mut tvec: Option<Vec<Poly>> = None;
+    for e in 0..3 {
+        let mut ev: Vec<Poly> = vec![Vec::new(); 3];
+        ev[e] = vec![1];
+        let t = crs(&n, &ev);
+        if t.iter().any(|x| !x.is_empty()) {
+            let c = crs(&t, &cp.co);
+            if c.iter().any(|x| !x.is_empty()) {
+                tvec = Some(t);
+                break;
             }
         }
-        Ok(rows)
     }
+    let t = tvec.expect("no tangent direction at a smooth point");
+    // value of D_t mon = sum_v t_v * d mon/dX_v at P
+    let vals: Vec<Poly> = mons
+        .iter()
+        .map(|mo| {
+            let mut acc: Poly = Vec::new();
+            for v in 0..3 {
+                if mo[v] == 0 {
+                    continue;
+                }
+                let mut term: Poly = vec![mo[v] as u64 % p];
+                for w in 0..3 {
+                    let e = if w == v { mo[w] - 1 } else { mo[w] };
+                    for _ in 0..e {
+                        term = ring_mul(&term, &cp.co[w], mu, p);
+                    }
+                }
+                term = ring_mul(&term, &t[v], mu, p);
+                acc = padd(&acc, &term, p);
+            }
+            prem(&acc, mu, p)
+        })
+        .collect();
+    (0..m)
+        .map(|t_| vals.iter().map(|v| *v.get(t_).unwrap_or(&0)).collect())
+        .collect()
+}
 
+/// Vanishing conditions on `C` of a divisor with multiplicities up to 2.
+pub fn rows_on(quartic: &Quartic, dv: &Div, mons: &[[u8; 3]]) -> Result<Vec<Vec<u64>>, PicErr> {
+    let p = quartic.p;
+    let mut rows = Vec::new();
+    for (cp, &mult) in dv {
+        rows.extend(cond_rows(cp, mons, p));
+        match mult {
+            1 => {}
+            2 => rows.extend(tangent_rows_on(quartic, cp, mons)),
+            _ => return Err(PicErr::NonReduced),
+        }
+    }
+    Ok(rows)
+}
+
+impl Pic {
     /// The residual of `V(g) cap C` after removing `known` (with multiplicities).
-    pub fn intersect_residual(
-        &self,
-        g: &Form,
-        known: &[(&ClosedPt, u32)],
-    ) -> Result<Div, PicErr> {
+    pub fn intersect_residual(&self, g: &Form, known: &[(&ClosedPt, u32)]) -> Result<Div, PicErr> {
         let p = self.q.p;
         self.n_intersections.set(self.n_intersections.get() + 1);
         let d = g.d;
@@ -2408,7 +2424,9 @@ impl Pic {
     pub fn finish(&self, a: Div) -> Result<Div, PicErr> {
         let p = self.q.p;
         if div_degree(&a) != 3 || div_max_mult(&a) > 2 {
-            return Err(PicErr::Other("finish: need a divisor of degree 3, multiplicities <= 2".into()));
+            return Err(PicErr::Other(
+                "finish: need a divisor of degree 3, multiplicities <= 2".into(),
+            ));
         }
         let mons1 = monomials(1);
         let ns = nullspace(&self.rows_for(&a, &mons1)?, 3, p);
@@ -2419,7 +2437,9 @@ impl Pic {
         let kn: Vec<(&ClosedPt, u32)> = a.iter().map(|(c, &m)| (c, m)).collect();
         let q = self.intersect_residual(&ell, &kn)?;
         if div_degree(&q) != 1 {
-            return Err(PicErr::Other("finish: residual of a line is not a point".into()));
+            return Err(PicErr::Other(
+                "finish: residual of a line is not a point".into(),
+            ));
         }
         Ok(q)
     }
@@ -2456,7 +2476,9 @@ impl Pic {
     pub fn canon6(&self, e: &Div) -> Result<Div, PicErr> {
         let p = self.q.p;
         if div_degree(e) != 6 || div_max_mult(e) > 2 {
-            return Err(PicErr::Other("canon6 needs a divisor of degree 6, multiplicities <= 2".into()));
+            return Err(PicErr::Other(
+                "canon6 needs a divisor of degree 6, multiplicities <= 2".into(),
+            ));
         }
         let mons3 = monomials(3);
         let rows = self.rows_for(e, &mons3)?;
@@ -2493,7 +2515,10 @@ impl Pic {
             };
             let ns2 = nullspace(&rows2, 10, p);
             if ns2.is_empty() || ns2.len() > 2 {
-                return Err(PicErr::Other(format!("cubics through R + Omega: dim {}", ns2.len())));
+                return Err(PicErr::Other(format!(
+                    "cubics through R + Omega: dim {}",
+                    ns2.len()
+                )));
             }
             let h = Form::from_coeffs(3, &self.random_combo(&ns2));
             let kn2: Vec<(&ClosedPt, u32)> = ro.iter().map(|(c, &m)| (c, m)).collect();
@@ -2560,7 +2585,10 @@ impl Pic {
         rows.push(trow);
         let ns = nullspace(&rows, 6, p);
         if ns.len() != 1 {
-            return Err(PicErr::Other(format!("conic through a + 2P0: dim {}", ns.len())));
+            return Err(PicErr::Other(format!(
+                "conic through a + 2P0: dim {}",
+                ns.len()
+            )));
         }
         let qf = Form::from_coeffs(2, &ns[0]);
         let mut kn: Vec<(&ClosedPt, u32)> = a.iter().map(|(c, &m)| (c, m)).collect();
@@ -2668,6 +2696,681 @@ impl Pic {
         Err(PicErr::Other("random_elem failed".into()))
     }
 }
+// ---------------------------------------------------------------------------
+// W3b verification layer: instances, the rational points of `S`, the bridge
+// to W1's canonical `Pic^0` keys (`super::plane_quartic_pic`), and the
+// protocol's checks T1-T6 against two independent equivalence engines.
+//
+// Which `Pic^0` arithmetic is used: W1's `PlaneQuartic` is the arithmetic
+// (group law, scalar multiples, canonical keys, the T8 discrete log).  The
+// branch's own adjoint-reduction `Pic` above is kept only as the protocol's
+// independent second engine (T9) for T2-T6.
+
+use super::plane_quartic_pic::{Gen, PicClass, PicKey, PlaneQuartic};
+use super::smith_prop24::Subgroup;
+
+/// Protocol §3 sampling for the imaginary model: monic squarefree `F` of
+/// degree 7, `random_curve`-style stream (seed, curve index).
+pub fn random_curve7(p: u64, seed: u64, index: u64) -> Poly {
+    let mut rng = SplitMix64(seed ^ index.wrapping_mul(0xD1B5_4A32_D192_ED03));
+    rng.next_u64();
+    loop {
+        let mut f: Poly = (0..7).map(|_| rng.below(p)).collect();
+        f.push(1);
+        if pdeg(&pgcd(&f, &pderiv(&f, p), p)) == 0 {
+            return f;
+        }
+    }
+}
+
+/// As [`smith_data_for_curve`], keeping the subgroup each map belongs to.
+pub fn smith_data_with_subgroups(
+    f: &[u64],
+    p: u64,
+    rng: &mut SplitMix64,
+) -> Vec<(SmithData, Subgroup)> {
+    let Some(w) = Weierstrass::new(f, p, rng) else {
+        return Vec::new();
+    };
+    let mut out = Vec::new();
+    for sg in tractable_subgroups(&w, rng) {
+        let so = analyze_subgroup(&w.f, &sg, p);
+        if !so.trig_rational() {
+            continue;
+        }
+        for m in &so.maps {
+            if let Some(sd) = SmithData::from_map(&w.f, p, &so.label, m) {
+                out.push((sd, sg.clone()));
+            }
+        }
+    }
+    out
+}
+
+/// `F_q`-rational points of the tractable subgroup `S` on the imaginary
+/// model (`deg F = 7`): the `F_2`-span of the Galois orbits of its pairs,
+/// each orbit the class `[div(u) - deg(u) inf]` with `u` the product of the
+/// pair polynomials over the orbit (`v = 0`).  Valid for `deg F = 7` only:
+/// the pair containing `inf` is Frobenius-fixed, so orbit sums span
+/// `S(F_q)`; do not reuse for degree-8 models.  Distinct reduced elements,
+/// zero included.
+pub fn subgroup_rational_elements(h: &Hyp, sg: &Subgroup) -> Vec<Mum> {
+    assert_eq!(pdeg(&h.f), 7, "S(F_q) by orbit sums needs deg F = 7");
+    let mut gens: Vec<Mum> = Vec::new();
+    for pr in &sg.pairs {
+        let k = &pr.k;
+        let q = super::smith_prop24::pair_quadratic(pr);
+        // A(x) = c + b x + a x^2 (a = 0 when one point is at infinity)
+        let mut a: Vec<El> = vec![q[2], q[1], q[0]];
+        while a.len() > 1 && k.is_zero(a.last().unwrap()) {
+            a.pop();
+        }
+        let li = k.inv(a.last().unwrap());
+        let a: Vec<El> = a.iter().map(|c| k.mul(c, &li)).collect();
+        let mut orbit: Vec<Vec<El>> = vec![a.clone()];
+        loop {
+            let nx: Vec<El> = orbit.last().unwrap().iter().map(|c| k.frob(c)).collect();
+            if nx == orbit[0] {
+                break;
+            }
+            orbit.push(nx);
+            assert!(orbit.len() <= 8);
+        }
+        let mut prod: Vec<El> = vec![k.one()];
+        for o in &orbit {
+            let mut r = vec![k.zero(); prod.len() + o.len() - 1];
+            for (i, x) in prod.iter().enumerate() {
+                for (j, y) in o.iter().enumerate() {
+                    r[i + j] = k.add(&r[i + j], &k.mul(x, y));
+                }
+            }
+            prod = r;
+        }
+        let mut u: Poly = prod
+            .iter()
+            .map(|e| {
+                assert!(e[1..].iter().all(|&c| c == 0), "orbit product not over F_p");
+                e[0]
+            })
+            .collect();
+        ptrim(&mut u);
+        gens.push(h.add(&Mum { u, v: Vec::new() }, &h.zero()));
+    }
+    let mut elems: Vec<Mum> = vec![h.zero()];
+    for g in &gens {
+        let new: Vec<Mum> = elems.iter().map(|e| h.add(e, g)).collect();
+        for n in new {
+            if !elems.contains(&n) {
+                elems.push(n);
+            }
+        }
+    }
+    elems
+}
+
+/// All of `J_H(F_q)` by enumeration of reduced Mumford pairs (toy `q` only).
+pub fn enumerate_jacobian(h: &Hyp) -> Vec<Mum> {
+    let p = h.p;
+    let mut out = Vec::new();
+    for d in 0..=3usize {
+        let nu = p.pow(d as u32);
+        for uc in 0..nu {
+            let mut u: Poly = (0..d).map(|i| (uc / p.pow(i as u32)) % p).collect();
+            u.push(1);
+            let fm = prem(&h.f, &u, p);
+            for vc in 0..nu {
+                let mut v: Poly = (0..d).map(|i| (vc / p.pow(i as u32)) % p).collect();
+                ptrim(&mut v);
+                if prem(&pmul(&v, &v, p), &u, p) == fm {
+                    out.push(Mum { u: u.clone(), v });
+                }
+            }
+        }
+    }
+    out
+}
+
+/// W1's `Pic^0(C)` on the fitted quartic, and the bridge from effective
+/// divisors (closed points) to canonical classes.
+pub struct W1Bridge {
+    pub c: PlaneQuartic,
+    pub quartic: Quartic,
+    /// Degree-6 divisors whose cubic space was not 4-dimensional, or where
+    /// W1's reduction panicked (never expected; counted, not fatal).
+    pub bad_cubic_space: Cell<u64>,
+}
+
+impl W1Bridge {
+    pub fn new(q: &Quartic) -> Result<W1Bridge, String> {
+        let p = q.p;
+        let coef = q.f.coeffs();
+        let mut f = [0u32; 15];
+        for (i, &c) in coef.iter().enumerate() {
+            f[i] = c as u32;
+        }
+        let pts = q.rational_points();
+        let p0 = pts.first().ok_or("no rational point on C")?;
+        let lead = p0.iter().position(|&x| x != 0).unwrap();
+        let li = inv(p0[lead], p);
+        let p0n = [0, 1, 2].map(|i| md(p0[i], li, p) as u32);
+        let c = PlaneQuartic::new(p as u32, f, p0n).map_err(|e| format!("W1: {:?}", e))?;
+        Ok(W1Bridge {
+            c,
+            quartic: q.clone(),
+            bad_cubic_space: Cell::new(0),
+        })
+    }
+
+    /// `[Z - 2 D_inf]` for an effective divisor `Z` of degree 6
+    /// (multiplicities <= 2), through the 4 cubics containing it.
+    pub fn class_eff6(&self, z: &Div) -> Result<PicClass, String> {
+        let p = self.quartic.p;
+        if div_degree(z) != 6 {
+            return Err("class_eff6: degree != 6".into());
+        }
+        let rows = rows_on(&self.quartic, z, &monomials(3)).map_err(|e| format!("{:?}", e))?;
+        let ns = nullspace(&rows, 10, p);
+        if ns.len() != 4 {
+            self.bad_cubic_space.set(self.bad_cubic_space.get() + 1);
+            return Err(format!("cubics through Z6: dim {}", ns.len()));
+        }
+        let gen = Gen {
+            k: 3,
+            rows: ns
+                .iter()
+                .map(|r| r.iter().map(|&x| x as u32).collect())
+                .collect(),
+        };
+        std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| self.c.reduce_deg6(&gen))).map_err(
+            |_| {
+                self.bad_cubic_space.set(self.bad_cubic_space.get() + 1);
+                "W1 reduce_deg6 panicked".to_string()
+            },
+        )
+    }
+
+    /// `Psi(x) = [plus] - [minus]` as a canonical class.
+    pub fn class_psi(&self, im: &PsiImage) -> Result<PicClass, String> {
+        let a = self.class_eff6(&im.plus)?;
+        let b = self.class_eff6(&im.minus)?;
+        Ok(self.c.sub(&a, &b))
+    }
+}
+
+impl Smith {
+    /// `Psi_A(x)` with a fixed base `A`, falling back to fresh random bases
+    /// when `x + A` is degenerate for `A`; returns the image and whether a
+    /// fallback was used.
+    pub fn psi_class_fixed(&self, x: &Mum, base: &Mum, rng: &mut SplitMix64) -> (PsiImage, u32) {
+        if let Ok(im) = self.psi_class(x, base, rng) {
+            return (im, 0);
+        }
+        let (im, _) = self.psi_class_auto(x, rng);
+        (im, 1)
+    }
+
+    /// A random generic degree-3 base `A` for which `psi(A)` is defined.
+    pub fn random_base(&self, rng: &mut SplitMix64) -> Mum {
+        loop {
+            let a = self.h.random_generic3(rng);
+            if self.psi_effective(&a, rng).is_ok() {
+                return a;
+            }
+        }
+    }
+
+    pub fn mul_big(&self, n: u128, a: &Mum) -> Mum {
+        let mut r = self.h.zero();
+        let mut b = a.clone();
+        let mut n = n;
+        while n > 0 {
+            if n & 1 == 1 {
+                r = self.h.add(&r, &b);
+            }
+            b = self.h.add(&b, &b);
+            n >>= 1;
+        }
+        r
+    }
+}
+
+/// A linear-equivalence engine on `C`: classes, addition, scalar multiples.
+pub trait PicEngine {
+    type C: Clone + std::fmt::Debug;
+    fn name(&self) -> &'static str;
+    fn psi(&self, im: &PsiImage) -> Result<Self::C, String>;
+    fn add(&self, a: &Self::C, b: &Self::C) -> Result<Self::C, String>;
+    fn mul(&self, n: u128, a: &Self::C) -> Result<Self::C, String>;
+    fn is_zero(&self, a: &Self::C) -> bool;
+    fn same(&self, a: &Self::C, b: &Self::C) -> bool;
+}
+
+impl PicEngine for W1Bridge {
+    type C = PicClass;
+    fn name(&self) -> &'static str {
+        "w1_canonical"
+    }
+    fn psi(&self, im: &PsiImage) -> Result<PicClass, String> {
+        self.class_psi(im)
+    }
+    fn add(&self, a: &PicClass, b: &PicClass) -> Result<PicClass, String> {
+        Ok(self.c.add(a, b))
+    }
+    fn mul(&self, n: u128, a: &PicClass) -> Result<PicClass, String> {
+        Ok(self.c.mul_scalar(a, n))
+    }
+    fn is_zero(&self, a: &PicClass) -> bool {
+        self.c.is_zero(a)
+    }
+    fn same(&self, a: &PicClass, b: &PicClass) -> bool {
+        a.key() == b.key()
+    }
+}
+
+impl PicEngine for Pic {
+    type C = Div;
+    fn name(&self) -> &'static str {
+        "deg6_adjoint"
+    }
+    fn psi(&self, im: &PsiImage) -> Result<Div, String> {
+        self.class_of_diff(&im.plus, &im.minus)
+            .map_err(|e| format!("{:?}", e))
+    }
+    fn add(&self, a: &Div, b: &Div) -> Result<Div, String> {
+        Pic::add(self, a, b).map_err(|e| format!("{:?}", e))
+    }
+    fn mul(&self, n: u128, a: &Div) -> Result<Div, String> {
+        Pic::mul(self, n as u64, a).map_err(|e| format!("{:?}", e))
+    }
+    fn is_zero(&self, a: &Div) -> bool {
+        Pic::is_zero(self, a)
+    }
+    fn same(&self, a: &Div, b: &Div) -> bool {
+        a == b
+    }
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize)]
+pub struct Tally {
+    pub pass: u64,
+    pub fail: u64,
+    /// The engine could not decide (error / exceptional class): not a pass.
+    pub skip: u64,
+}
+
+impl Tally {
+    fn rec(&mut self, r: Result<bool, String>, errs: &mut BTreeMap<String, u64>) {
+        match r {
+            Ok(true) => self.pass += 1,
+            Ok(false) => self.fail += 1,
+            Err(e) => {
+                self.skip += 1;
+                let key: String = e.chars().take(48).collect();
+                *errs.entry(key).or_insert(0) += 1;
+            }
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize)]
+pub struct EngineReport {
+    pub engine: String,
+    pub t2_well_defined: Tally,
+    pub t3_homomorphism: Tally,
+    pub t4_kernel_s: Tally,
+    pub t4_outside_nonzero: Tally,
+    pub t5_order_nonzero: Tally,
+    pub t5_order_annihilated: Tally,
+    pub t6_group_order: Tally,
+    pub errors: BTreeMap<String, u64>,
+    pub seconds: f64,
+}
+
+impl EngineReport {
+    pub fn total_fail(&self) -> u64 {
+        [
+            &self.t2_well_defined,
+            &self.t3_homomorphism,
+            &self.t4_kernel_s,
+            &self.t4_outside_nonzero,
+            &self.t5_order_nonzero,
+            &self.t5_order_annihilated,
+            &self.t6_group_order,
+        ]
+        .iter()
+        .map(|t| t.fail)
+        .sum()
+    }
+}
+
+/// The images of one curve's random sample, shared by both engines.
+pub struct Sample {
+    pub n_jac: u128,
+    /// T2: `(Psi_A(x), Psi_A'(x))`.
+    pub t2: Vec<(PsiImage, PsiImage)>,
+    /// T3: `(Psi(x), Psi(y), Psi(x + y))`.
+    pub t3: Vec<(PsiImage, PsiImage, PsiImage)>,
+    /// T4: images of the nonzero elements of `S(F_q)`.
+    pub t4_s: Vec<PsiImage>,
+    /// T4: images of random `x` outside `S(F_q)`.
+    pub t4_out: Vec<PsiImage>,
+    /// T5: `(ell, Psi(G))`, `G` of order `ell` (checked on `H`).
+    pub t5: Vec<(u64, PsiImage)>,
+    pub n_s_rational: usize,
+    pub base_fallbacks: u64,
+}
+
+pub fn odd_prime_factors(mut n: u128) -> Vec<u64> {
+    let mut v = Vec::new();
+    while n % 2 == 0 && n > 0 {
+        n /= 2;
+    }
+    let mut d = 3u128;
+    while d * d <= n {
+        if n % d == 0 {
+            v.push(d as u64);
+            while n % d == 0 {
+                n /= d;
+            }
+        }
+        d += 2;
+    }
+    if n > 1 {
+        v.push(n as u64);
+    }
+    v
+}
+
+impl Smith {
+    /// Draw the protocol's sample for one curve: `sizes = (T2 count, T3
+    /// count, T4 outside count, T5 elements per ell)`.
+    pub fn draw_sample(
+        &self,
+        sg: &Subgroup,
+        n_jac: u128,
+        sizes: (usize, usize, usize, usize),
+        rng: &mut SplitMix64,
+    ) -> Sample {
+        let (n2, n3, n4, n5) = sizes;
+        let a = self.random_base(rng);
+        let a2 = self.random_base(rng);
+        let mut fb = 0u64;
+        let mut img = |x: &Mum, base: &Mum, rng: &mut SplitMix64| {
+            let (im, f) = self.psi_class_fixed(x, base, rng);
+            fb += f as u64;
+            im
+        };
+        let mut t2 = Vec::new();
+        for _ in 0..n2 {
+            let x = self.h.random_class(rng);
+            let i1 = img(&x, &a, rng);
+            let i2 = img(&x, &a2, rng);
+            t2.push((i1, i2));
+        }
+        let mut t3 = Vec::new();
+        for _ in 0..n3 {
+            let x = self.h.random_class(rng);
+            let y = self.h.random_class(rng);
+            let xy = self.h.add(&x, &y);
+            t3.push((img(&x, &a, rng), img(&y, &a, rng), img(&xy, &a, rng)));
+        }
+        let s = subgroup_rational_elements(&self.h, sg);
+        let mut t4_s = Vec::new();
+        for d in s.iter().filter(|d| **d != self.h.zero()) {
+            t4_s.push(img(d, &a, rng));
+        }
+        let mut t4_out = Vec::new();
+        while t4_out.len() < n4 {
+            let x = self.h.random_class(rng);
+            if s.contains(&x) {
+                continue;
+            }
+            t4_out.push(img(&x, &a, rng));
+        }
+        let mut t5 = Vec::new();
+        for ell in odd_prime_factors(n_jac) {
+            let mut cof = n_jac;
+            while cof % ell as u128 == 0 {
+                cof /= ell as u128;
+            }
+            let mut got = 0;
+            let mut tries = 0;
+            while got < n5 && tries < 50 * n5 {
+                tries += 1;
+                let mut g = self.mul_big(cof, &self.h.random_class(rng));
+                if g == self.h.zero() {
+                    continue;
+                }
+                loop {
+                    let lg = self.mul_big(ell as u128, &g);
+                    if lg == self.h.zero() {
+                        break;
+                    }
+                    g = lg;
+                }
+                t5.push((ell, img(&g, &a, rng)));
+                got += 1;
+            }
+        }
+        Sample {
+            n_jac,
+            t2,
+            t3,
+            t4_s,
+            t4_out,
+            t5,
+            n_s_rational: s.len(),
+            base_fallbacks: fb,
+        }
+    }
+}
+
+/// Run T2-T6 of the protocol on one engine.
+pub fn run_engine<E: PicEngine>(e: &E, s: &Sample) -> EngineReport {
+    let t0 = std::time::Instant::now();
+    let mut r = EngineReport {
+        engine: e.name().into(),
+        ..Default::default()
+    };
+    let mut errs = BTreeMap::new();
+    let mut annihilate: Vec<E::C> = Vec::new();
+    for (i1, i2) in &s.t2 {
+        let res = (|| {
+            let a = e.psi(i1)?;
+            let b = e.psi(i2)?;
+            annihilate.push(a.clone());
+            Ok(e.same(&a, &b))
+        })();
+        r.t2_well_defined.rec(res, &mut errs);
+    }
+    for (ix, iy, ixy) in &s.t3 {
+        let res = (|| {
+            let a = e.psi(ix)?;
+            let b = e.psi(iy)?;
+            let c = e.psi(ixy)?;
+            let ab = e.add(&a, &b)?;
+            Ok(e.same(&ab, &c))
+        })();
+        r.t3_homomorphism.rec(res, &mut errs);
+    }
+    for im in &s.t4_s {
+        r.t4_kernel_s
+            .rec(e.psi(im).map(|c| e.is_zero(&c)), &mut errs);
+    }
+    for im in &s.t4_out {
+        r.t4_outside_nonzero
+            .rec(e.psi(im).map(|c| !e.is_zero(&c)), &mut errs);
+    }
+    for (ell, im) in &s.t5 {
+        match e.psi(im) {
+            Ok(c) => {
+                r.t5_order_nonzero.rec(Ok(!e.is_zero(&c)), &mut errs);
+                r.t5_order_annihilated
+                    .rec(e.mul(*ell as u128, &c).map(|z| e.is_zero(&z)), &mut errs);
+            }
+            Err(er) => {
+                r.t5_order_nonzero.rec(Err(er.clone()), &mut errs);
+                r.t5_order_annihilated.rec(Err(er), &mut errs);
+            }
+        }
+    }
+    for a in &annihilate {
+        r.t6_group_order
+            .rec(e.mul(s.n_jac, a).map(|z| e.is_zero(&z)), &mut errs);
+    }
+    r.errors = errs;
+    r.seconds = t0.elapsed().as_secs_f64();
+    r
+}
+
+/// Class-level structure at toy `q` (W1 keys): `Psi` on all of `J_H(F_q)`.
+#[derive(Clone, Debug, Default, serde::Serialize)]
+pub struct ImageReport {
+    pub n_jac_enumerated: u64,
+    pub n_jac_lpoly: u128,
+    pub n_s_rational: u64,
+    pub distinct_images: u64,
+    pub fibre_min: u64,
+    pub fibre_max: u64,
+    pub kernel_size: u64,
+    pub kernel_equals_s: bool,
+    pub errors: u64,
+    pub seconds: f64,
+}
+
+pub fn image_structure(
+    sm: &Smith,
+    w1: &W1Bridge,
+    sg: &Subgroup,
+    n_jac: u128,
+    rng: &mut SplitMix64,
+) -> ImageReport {
+    let t0 = std::time::Instant::now();
+    let all = enumerate_jacobian(&sm.h);
+    let s = subgroup_rational_elements(&sm.h, sg);
+    let base = sm.random_base(rng);
+    let mut fib: HashMap<PicKey, u64> = HashMap::new();
+    let mut ker: Vec<Mum> = Vec::new();
+    let mut errors = 0;
+    for x in &all {
+        let (im, _) = sm.psi_class_fixed(x, &base, rng);
+        match w1.class_psi(&im) {
+            Ok(c) => {
+                if w1.c.is_zero(&c) {
+                    ker.push(x.clone());
+                }
+                *fib.entry(c.key()).or_insert(0) += 1;
+            }
+            Err(_) => errors += 1,
+        }
+    }
+    let kernel_equals_s = ker.len() == s.len() && ker.iter().all(|k| s.contains(k));
+    ImageReport {
+        n_jac_enumerated: all.len() as u64,
+        n_jac_lpoly: n_jac,
+        n_s_rational: s.len() as u64,
+        distinct_images: fib.len() as u64,
+        fibre_min: fib.values().copied().min().unwrap_or(0),
+        fibre_max: fib.values().copied().max().unwrap_or(0),
+        kernel_size: ker.len() as u64,
+        kernel_equals_s,
+        errors,
+        seconds: t0.elapsed().as_secs_f64(),
+    }
+}
+
+/// T1 for one `(H, S, g)`: the fitted quartic and its checks.
+#[derive(Clone, Debug, Default, serde::Serialize)]
+pub struct CurveReport {
+    pub nullity: usize,
+    pub divisors_used: usize,
+    pub holdout_points: usize,
+    pub holdout_failures: usize,
+    pub smooth_frames: Option<usize>,
+    pub w1_smooth: bool,
+    pub counts_h: [u64; 3],
+    pub counts_c: [u64; 3],
+    pub lpoly_equal: bool,
+    pub n_jac: i128,
+    pub fit_error: Option<String>,
+    pub seconds: f64,
+}
+
+impl CurveReport {
+    pub fn pass(&self) -> bool {
+        self.fit_error.is_none()
+            && self.nullity == 1
+            && self.holdout_failures == 0
+            && self.smooth_frames.is_some()
+            && self.w1_smooth
+            && self.counts_h == self.counts_c
+            && self.lpoly_equal
+    }
+}
+
+impl Smith {
+    pub fn t1_curve(&self, rng: &mut SplitMix64) -> (CurveReport, Option<Quartic>) {
+        let t0 = std::time::Instant::now();
+        let mut r = CurveReport::default();
+        let p = self.sd.p;
+        r.counts_h = [1, 2, 3].map(|k| h_count_ext(&self.sd.f, p, k));
+        let (q, st) = match self.fit_quartic(rng, 40) {
+            Ok(x) => x,
+            Err((e, st)) => {
+                r.nullity = st.nullity;
+                r.fit_error = Some(e);
+                r.seconds = t0.elapsed().as_secs_f64();
+                return (r, None);
+            }
+        };
+        r.nullity = st.nullity;
+        r.divisors_used = st.divisors_used;
+        r.holdout_points = st.holdout_points;
+        r.holdout_failures = st.holdout_failures;
+        r.smooth_frames = q.certify_smooth(rng, 60);
+        r.w1_smooth = W1Bridge::new(&q).is_ok();
+        r.counts_c = [1, 2, 3].map(|k| q.count_points(k));
+        let (lh, nh) = lpoly_from_counts(p, r.counts_h);
+        let (lc, _) = lpoly_from_counts(p, r.counts_c);
+        r.lpoly_equal = lh == lc;
+        r.n_jac = nh;
+        r.seconds = t0.elapsed().as_secs_f64();
+        (r, Some(q))
+    }
+}
+
+/// Calibration for T7: time of one inversion in `F_{q^d}` divided by the
+/// time of one multiplication there, and the multiplication time in ns.
+pub fn inv_mul_ratio(q: u64, d: usize) -> (f64, f64) {
+    let k = Fld::new(q, d, 0xCA1B);
+    let mut rng = SplitMix64(q ^ 0xCA1B);
+    let xs: Vec<El> = (0..256)
+        .map(|_| {
+            let cs: Vec<u64> = (0..d).map(|_| 1 + rng.below(q - 1)).collect();
+            k.from_u64s(&cs)
+        })
+        .collect();
+    let reps = 200;
+    let t = std::time::Instant::now();
+    let mut acc = k.one();
+    for _ in 0..reps {
+        for x in &xs {
+            acc = k.mul(&acc, x);
+        }
+    }
+    let tm = t.elapsed().as_nanos() as f64 / (reps * xs.len()) as f64;
+    let t = std::time::Instant::now();
+    let mut acc2 = k.zero();
+    for _ in 0..reps / 10 {
+        for x in &xs {
+            acc2 = k.add(&acc2, &k.inv(x));
+        }
+    }
+    let ti = t.elapsed().as_nanos() as f64 / ((reps / 10) * xs.len()) as f64;
+    std::hint::black_box((acc, acc2));
+    (ti / tm, tm)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2728,7 +3431,8 @@ mod tests {
         let mut ok = 0;
         let mut note = |e: PicErr| *errs.entry(format!("{:?}", e)).or_insert(0) += 1;
         for _ in 0..6 {
-            let (Ok(a), Ok(b), Ok(c)) = (pic.random_elem(), pic.random_elem(), pic.random_elem()) else {
+            let (Ok(a), Ok(b), Ok(c)) = (pic.random_elem(), pic.random_elem(), pic.random_elem())
+            else {
                 continue;
             };
             let ab = pic.add(&a, &b);
@@ -2773,7 +3477,11 @@ mod tests {
             }
         }
         println!("assoc ok {ok}, errors {:?}", errs);
-        println!("intersections {} frames {}", pic.n_intersections.get(), pic.n_frames.get());
+        println!(
+            "intersections {} frames {}",
+            pic.n_intersections.get(),
+            pic.n_frames.get()
+        );
         assert!(ok >= 2);
     }
 
@@ -2783,28 +3491,130 @@ mod tests {
         let mut n = 0;
         for t in 0..60u64 {
             let l = [1 + t, 2 * t + 3, 5 + t * t];
-            let Ok(sec) = pic.intersect_residual(&Form::from_coeffs(1, &l), &[]) else { continue };
+            let Ok(sec) = pic.intersect_residual(&Form::from_coeffs(1, &l), &[]) else {
+                continue;
+            };
             let cps: Vec<&ClosedPt> = sec.keys().collect();
             let degs: Vec<usize> = cps.iter().map(|c| c.degree()).collect();
             // find subset of degree 3
             let mut chosen = Div::new();
             for mask in 1u32..(1 << cps.len()) {
-                let d: usize = (0..cps.len()).filter(|i| mask >> i & 1 == 1).map(|i| degs[i]).sum();
+                let d: usize = (0..cps.len())
+                    .filter(|i| mask >> i & 1 == 1)
+                    .map(|i| degs[i])
+                    .sum();
                 if d == 3 {
-                    for i in 0..cps.len() { if mask >> i & 1 == 1 { chosen.insert(cps[i].clone(), 1); } }
+                    for i in 0..cps.len() {
+                        if mask >> i & 1 == 1 {
+                            chosen.insert(cps[i].clone(), 1);
+                        }
+                    }
                     break;
                 }
             }
-            if chosen.is_empty() { continue; }
+            if chosen.is_empty() {
+                continue;
+            }
             n += 1;
             let e = div_add(&chosen, &pic.omega);
             let r = pic.canon6(&e);
-            println!("line {:?} degs {:?}: canon6 -> {:?}", l, degs, r.as_ref().map(|d| div_degree(d)));
+            println!(
+                "line {:?} degs {:?}: canon6 -> {:?}",
+                l,
+                degs,
+                r.as_ref().map(|d| div_degree(d))
+            );
             if let Ok(a) = &r {
                 // a should equal chosen's class: canon6(a + omega) == canon6(chosen + omega)
                 println!("   same as chosen? {}", a == &chosen);
             }
-            if n >= 6 { break; }
+            if n >= 6 {
+                break;
+            }
+        }
+    }
+    fn print_engine(r: &EngineReport) {
+        println!(
+            "{}: T2 {:?} T3 {:?} T4S {:?} T4out {:?} T5nz {:?} T5ann {:?} T6 {:?} err {:?} ({:.1}s)",
+            r.engine,
+            r.t2_well_defined,
+            r.t3_homomorphism,
+            r.t4_kernel_s,
+            r.t4_outside_nonzero,
+            r.t5_order_nonzero,
+            r.t5_order_annihilated,
+            r.t6_group_order,
+            r.errors,
+            r.seconds
+        );
+    }
+
+    #[test]
+    fn w3b_example1_psi_w1_and_deg6() {
+        let (f, p) = example1();
+        let mut rng = SplitMix64(1);
+        let (sd, sg) = smith_data_with_subgroups(&f, p, &mut rng)
+            .into_iter()
+            .find(|(s, _)| (s.n1, s.n0, s.d1, s.d0) == (16, 22, 32, 18))
+            .expect("Example 1 map");
+        let sm = Smith::new(sd);
+        let mut rng = SplitMix64(7);
+        let (cr, q) = sm.t1_curve(&mut rng);
+        println!("T1 {:?}", cr);
+        assert!(cr.pass());
+        let q = q.unwrap();
+        let w1 = W1Bridge::new(&q).expect("W1 curve");
+        let s = sm.draw_sample(&sg, cr.n_jac as u128, (6, 6, 12, 2), &mut rng);
+        println!(
+            "#S(F_p) = {}, fallbacks {}",
+            s.n_s_rational, s.base_fallbacks
+        );
+        let rw = run_engine(&w1, &s);
+        print_engine(&rw);
+        assert_eq!(rw.total_fail(), 0);
+        assert_eq!(rw.t3_homomorphism.pass, 6);
+        assert_eq!(rw.t4_kernel_s.pass as usize, s.n_s_rational - 1);
+        assert_eq!(rw.t5_order_annihilated.pass as usize, s.t5.len());
+        let pic = Pic::new(q.clone(), 99).expect("pic");
+        let rd = run_engine(&pic, &s);
+        print_engine(&rd);
+        assert_eq!(rd.total_fail(), 0);
+    }
+
+    #[test]
+    fn w3b_toy_q7_image_is_j_mod_s() {
+        let p = 7;
+        let mut idx = 0;
+        loop {
+            let f = random_curve7(p, 20261018, idx);
+            idx += 1;
+            let mut rng = SplitMix64(idx);
+            let Some((sd, sg)) = smith_data_with_subgroups(&f, p, &mut rng)
+                .into_iter()
+                .find(|(s, _)| s.rational())
+            else {
+                continue;
+            };
+            let sm = Smith::new(sd);
+            let mut rng = SplitMix64(3);
+            let (cr, q) = sm.t1_curve(&mut rng);
+            println!("curve {:?} T1 {:?}", sm.sd.f, cr);
+            let Some(q) = q else { continue };
+            if !cr.pass() {
+                continue;
+            }
+            let w1 = W1Bridge::new(&q).expect("W1");
+            let ir = image_structure(&sm, &w1, &sg, cr.n_jac as u128, &mut rng);
+            println!("{:?}", ir);
+            assert_eq!(ir.n_jac_enumerated as i128, cr.n_jac);
+            assert_eq!(ir.errors, 0);
+            assert!(ir.kernel_equals_s);
+            assert_eq!(ir.distinct_images * ir.n_s_rational, ir.n_jac_enumerated);
+            assert_eq!(
+                (ir.fibre_min, ir.fibre_max),
+                (ir.n_s_rational, ir.n_s_rational)
+            );
+            return;
         }
     }
 }
