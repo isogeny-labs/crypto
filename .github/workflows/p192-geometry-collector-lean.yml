@@ -13,13 +13,17 @@ on:
 
 jobs:
   pencil-and-four-cell:
-    runs-on: experiment
+    runs-on: ubuntu-latest
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 45 || 25 }}
     defaults:
       run:
         working-directory: research/p192_extension_cover_20261012/lean
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The full tree (144k files) leaves the runner too little disk to
+          # unpack the Lean toolchain; the package needs only its own directory.
+          sparse-checkout: research/p192_extension_cover_20261012/lean
       - name: Build the pencil and four-cell theorems
         uses: leanprover/lean-action@v1
         with:

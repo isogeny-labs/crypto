@@ -13,6 +13,10 @@ The registered rules of `PREREGISTRATION.md` that are integer statements:
   every unsatisfiable draw has `d_F ≤ 4` and every satisfiable draw has
   `d_last ≤ 4`; "Semaev-specific" (Part D′) if every control shape has
   median `d_last ≥ 5`.
+- **Amendment 9 reading** (E8, exploratory): per ladder at fixed `(n, ℓ)`, with the
+  median `d_F` of each `m` (E7's `m = 6` draws join the `(8, 2)` ladder): "flat" if all
+  medians `≤ 4`, non-decreasing in `m`, and last − first `≤ 1`; "grows" if some median
+  `≥ 5` or last − first `≥ 2`; otherwise "mixed".
 - **Amendment 7/8 reading** (E7, exploratory): "bounded through m = 6" if
   every E7 draw has `d_F ≤ 4`; "grows" if some E7 cell has median `d_F ≥ 5`.
 
@@ -25,7 +29,7 @@ namespace FallDegree
 
 /-- One measured draw: `kind` 0 = E3 (m = 2), 1 = E4/extension/Part A/B
 (unsat, ladder), 2 = Part C (sat), 3 = Part D′ control, 4 = E7 (unsat,
-`m ≥ 5`, new draws). `value` is `d_F`
+`m ≥ 5`, new draws), 5 = E8 (unsat, `d_F` against `m`). `value` is `d_F`
 or `d_last`; `none` = censored above `cap`. `dstar` is the ladder's plain
 `D*` where recorded (a lower bound when `dstarAtLeast`). -/
 structure Row where
@@ -111,6 +115,25 @@ def e7Bounded (rs : List Row) : Bool :=
 def e7Grows (rs : List Row) : Bool :=
   (keys (e7 rs)).any fun k => decide (5 ≤ medianOf (e7 rs) k)
 
+/-- the E8 ladder at `(n, ℓ)`: E8 draws, plus E7's draws of that shape -/
+def ladderRows (rs : List Row) (n ell : Nat) : List Row :=
+  rs.filter fun r => (r.kind == 5 || r.kind == 4) && r.n == n && r.ell == ell
+
+def ladderMedians (rs : List Row) (n ell : Nat) : List Nat :=
+  let l := ladderRows rs n ell
+  (isort (l.map (·.m)).eraseDups).map fun m =>
+    lowerMedian ((l.filter (·.m == m)).map (·.v))
+
+def spread (ms : List Nat) : Nat := ms.getLast?.getD 0 - ms.head?.getD 0
+
+def ladderFlat (rs : List Row) (n ell : Nat) : Bool :=
+  let ms := ladderMedians rs n ell
+  !ms.isEmpty && ms.all (fun x => decide (x ≤ 4)) && nondecreasing ms && decide (spread ms ≤ 1)
+
+def ladderGrows (rs : List Row) (n ell : Nat) : Bool :=
+  let ms := ladderMedians rs n ell
+  ms.any (fun x => decide (5 ≤ x)) || decide (spread ms ≥ 2)
+
 structure Report where
   p3a : Bool
   p3b : Bool
@@ -120,12 +143,18 @@ structure Report where
   semaevSpecific : Bool
   e7Bounded : Bool
   e7Grows : Bool
+  e8Flat82 : Bool
+  e8Grows82 : Bool
+  e8Flat62 : Bool
+  e8Grows62 : Bool
   deriving DecidableEq, Repr
 
 def report (rs : List Row) : Report :=
   { p3a := p3a rs, p3b := p3b rs, p4a := p4a rs, p4b := p4b rs,
     bounded := boundedAtToySize rs, semaevSpecific := semaevSpecific rs,
-    e7Bounded := e7Bounded rs, e7Grows := e7Grows rs }
+    e7Bounded := e7Bounded rs, e7Grows := e7Grows rs,
+    e8Flat82 := ladderFlat rs 8 2, e8Grows82 := ladderGrows rs 8 2,
+    e8Flat62 := ladderFlat rs 6 2, e8Grows62 := ladderGrows rs 6 2 }
 
 -- sanity on hand-made rows
 private def r0 (n v : Nat) : Row := { kind := 0, m := 2, n, ell := n / 2, shape := n, value := some v, cap := 6, dstar := none, dstarAtLeast := false }
