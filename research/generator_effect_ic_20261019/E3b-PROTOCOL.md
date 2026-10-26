@@ -179,3 +179,17 @@ were rerun from the start with the same frozen specs, the same binary
 number of the interrupted sessions enters any table. The interrupted `sem-full-t3`
 target 0 is a replicate of the rerun's, and `E3b.md` says whether the counts
 agree.
+
+**2026-10-26 (D2): the rerun of the two `t = 3` F4 sessions was interrupted
+too, and Part F at `t = 3` is not reported.** The pair started after D1
+(`sem-chain-t3` `ECBS1h345b571362e6`, `sem-full-t3` `ECBS1hb680db5cb1a8`, same
+frozen specs and binary, fresh directories) ended with the host session before
+any F4 call finished. Each had written only its `rho-neg` record, and both
+stayed marked `running`. Their directories are kept outside the repository and
+no number of theirs is used. The wall time of the `t = 2` solves (4–20× E3's
+capped time per F4 call, on a shared and heavily loaded host) puts a `t = 3`
+chain solve of target 0 at about 46–220 h against the spec's 72 h timeout, so a
+third attempt inside a host session is not expected to finish. L1–L6 and the
+`t = 2` part of F1 and F2 are unaffected. F1 and F2 at `t = 3` are **not
+tested**. `t = 3` is left to a follow-up that launches the runs detached.
+
