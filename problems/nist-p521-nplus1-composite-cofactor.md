@@ -1,60 +1,59 @@
-# P-521 n+1 retains a composite cofactor
+# P-521 n+1 composite cofactor: resolved
 
-- **Status:** `investigating`
-- **Kind:** incomplete integer factorization; no impossibility claim
-- **Affected work:** [four-target follow-up](../research/nist_skip_criterion_20261025/factor_followup_20261026/REPORT.md), [PR 2378](https://github.com/isogeny-labs/crypto/pull/2378)
-- **Next action owner:** active study author
+- **Status:** `resolved`
+- **Kind:** completed integer factorization and full-cohort comparison replay
+- **Affected work:** [four-target follow-up](../research/nist_skip_criterion_20261025/factor_followup_20261026/REPORT.md), [PR 2635](https://github.com/isogeny-labs/crypto/pull/2635)
+- **Next action owner:** none for this computation
 - **Last updated:** 2026-10-26
 
-## Problem
+## Original problem
 
-The requested published P-521 `n+1` factorization is not yet complete.
-The full original target has an exact verified partial product with proved
-prime factors and this remaining **composite**, written in decimal:
+The requested published P-521 `n+1` factorization retained a 125-digit,
+414-bit composite. Its [historical partial record](../research/nist_skip_criterion_20261025/factor_followup_20261026/results/p521-plus-partial.json)
+kept prime/composite flags separate. At that point the all-21 census had
+83/84 complete factorizations; the complete `n+1` family stayed disabled
+globally and unknowns stayed `NA`. No control was dropped.
 
-`36267274398750192082087714560485501370968815968939229615728908768222975800577003985527583945002884540942812611007064014452869`.
+## Resolution evidence
 
-It has 125 decimal digits and 414 bits. Those sizes describe a composite,
-not a largest prime factor. The [partial record](../research/nist_skip_criterion_20261025/factor_followup_20261026/results/p521-plus-partial.json)
-keeps every prime/composite flag. The native comparison retains all 21
-curves and uses `NA` for the unknown value. The complete `n+1` feature family
-stays unavailable across the cohort rather than dropping this control.
+- Native GNFS014 completed on 26 October at 17:32:47 UTC, exit zero,
+  proposing two factors of the exact residual. All earlier bounded failures
+  and progress snapshots remain in the [run index](../research/nist_skip_criterion_20261025/factor_followup_20261026/results/run-index.json).
+- Separate native admission015 recomputed the full original target, proved
+  every prime and checked its complete product. The [canonical record](../research/nist_skip_criterion_20261025/factor_followup_20261026/results/curve-20-plus.json)
+  has seven distinct primes, nine factors counting multiplicity, largest
+  prime 270 bits and square-part root 15. The former composite splits into
+  primes of 145 and 270 bits. Counts and bit lengths here are decimal;
+  the [native hexadecimal listing](../research/nist_skip_criterion_20261025/factor_followup_20261026/results/completed-targets-hex.md)
+  gives all exact integers.
+- Native replay016 repeated prime/product checks across all 84 records,
+  admitted all four complete-factor families over all 21 curves, emitted
+  1,127 features per row, and replayed the unchanged three search families
+  over all 4,480 grouped label assignments. Every native stage exited zero.
+- The [final archive readback](../research/nist_skip_criterion_20261025/factor_followup_20261026/evidence/final-native-003-delivery.json)
+  verified the full S3 object, internal manifest and all 223 listed file
+  hashes. The backend deleted final relation/matrix scratch on success,
+  as disclosed in the [source audit](../research/nist_skip_criterion_20261025/factor_followup_20261026/evidence/success-cleanup-audit.json).
+  The last retained pool is snapshot002; a full independent GNFS replay is
+  not claimed. Mathematical completeness rests on the independent native
+  prime/product proof, without independent-host or Lean validation.
 
-## Evidence and uncertainty
+## Exit criteria
 
-- **Observed:** the other three requested targets have independent native
-  prime/product proofs. There are 83 complete target factorizations out of 84.
-- **Observed:** native ECM and P-1/P+1 attempts did not finish this residual.
-  Failed input admissions, bounded attempts and actual statuses remain in
-  the [run index](../research/nist_skip_criterion_20261025/factor_followup_20261026/results/run-index.json).
-- **Observed:** GNFS saved 2,313,299 merged relations before a requested stop.
-  The [closed progress archive](../research/nist_skip_criterion_20261025/factor_followup_20261026/evidence/backend-progress-001-delivery.json)
-  passed a full S3 download and all 108 member hashes. Run014 reuses that
-  pool with four threads and adaptive filtering. A running job or relation
-  pool is not a complete factorization.
-- **Derived or proved:** the partial product and known primes are checked;
-  the remaining integer is composite. No complete prime factorization of
-  this residual is admitted.
-- **Missing result:** a proper split followed by prime proofs for every
-  resulting cofactor and equality to the original target.
-- **What this does not establish:** bounded failure does not prove
-  infeasibility, curve weakness, security or a historical selection cause.
+- [x] Split the exact composite and prove every terminal prime using the
+  independent native verifier, checking the full original row20 `n+1` product.
+- [x] Admit the complete record, regenerate all21 complete-factor families
+  and replay the unchanged search/calibration without omitted controls.
 
-## What would unblock it
+These steps complete the requested factorization/comparison computation.
+The shortest structural conjunction still uses three tests; generation
+features retain a two-test empirical fit. The
+[historical selection and weakness problem](nist-candidate-selection-weakness-hypotheses.md)
+remains unresolved. No DLP experiment was requested or added.
 
-- [ ] Split the exact composite and prove every terminal prime using the
-  independent native verifier, with its full original row20 `n+1` product.
-- [ ] Admit the resulting complete record, regenerate all21 complete-factor
-  families and replay the unchanged search/calibration without omitted controls.
+## History
 
-Those steps complete the requested factorization/comparison computation.
-The [historical selection problem](nist-candidate-selection-weakness-hypotheses.md)
-and any applicable DLP mechanism remain separate obligations.
-
-## Next discriminating step
-
-Collect the actual native GNFS continuation, retain all failures and progress,
-and verify any proposed divisors independently. The declared protocol fixes
-local four-core/16-GiB resources and per-attempt watchdogs, not a proof of
-infeasibility or a promised finish time. Preserve a closed, hash-verified
-checkpoint before any further continuation. No DLP run is requested.
+26 October: initially recorded the incomplete composite and preserved ECM,
+P-1/P+1, failed input admissions and GNFS progress. Later the full native
+proof and all84 replay met both exit criteria. The former partial evidence
+and its unknown labels remain frozen in the historical raw rounds.

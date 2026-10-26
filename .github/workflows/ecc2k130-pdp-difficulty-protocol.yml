@@ -1,10 +1,8 @@
 name: ECC2K-130 PDP difficulty input freeze
 
 on:
-  pull_request:
-    paths:
-      - "research/notes/ecc2k130/pdp_difficulty_features_20261001/**"
-      - ".github/workflows/ecc2k130-pdp-difficulty-protocol.yml"
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:

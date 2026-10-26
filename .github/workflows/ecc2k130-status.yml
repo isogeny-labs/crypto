@@ -4,6 +4,8 @@
 name: ECC2K-130 status pages
 
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   schedule:
     # Every 10 minutes. scripts/rho_status/render.py sizes history.json from
     # this interval, and test_rho_status.py pins the two together.
@@ -14,34 +16,6 @@ on:
         description: "Read the original rho-dp endpoint and secret reference; do not publish Pages"
         type: boolean
         default: false
-  pull_request:
-    paths:
-      - ".github/workflows/ecc2k130-status.yml"
-      - "scripts/rho_status/**"
-      - "scripts/site/**"
-      - "docs/ecc2k130-status/**"
-      - "docs/site/**"
-      - "docs/index-calculus-scoreboard.html"
-      # The panel index is generated from the scoreboard and pinned by
-      # scripts/site/test_build.py; an edit to either side must rerun it.
-      - "docs/ic-current-state.html"
-      - "docs/browser/**"
-      - "docs/backend-leaderboard/**"
-      - "scripts/build_lab_browser.py"
-      - "docs/ic/progress-timeline.json"
-      - "docs/ic-leaderboard.html"
-      - "docs/ic-leaderboard/**"
-      - "docs/ic-measurement.html"
-      - "scripts/rho_gpu_emulate.mjs"
-      - "docs/algorithm-lab.html"
-      - "docs/algorithm-lab/**"
-      - "docs/performance-gains.html"
-      - "docs/performance-gains/**"
-      # Documents the published pages cite and scripts/site/test_build.py pins
-      # them to; an edit there must rerun the pins, not wait for the next
-      # site change to find out.
-      - "ecc2k130/LAMBDA-PROJECTIVE.md"
-      - "ecc2k130/aws/README.md"
   push:
     branches: [main]
     paths:

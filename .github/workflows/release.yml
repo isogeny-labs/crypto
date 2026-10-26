@@ -4,29 +4,10 @@ name: Release
 # major/minor version and patch + run number, giving ReleaseMe a distinct
 # stable version per run so /releases/latest remains the newest main build.
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
-  # Start the dry run for every pull request. The scope job then selects only
-  # affected build/package lanes, including compile-time inputs discovered
-  # recursively; an event-level path list cannot safely anticipate that set.
-  # The `release` job is skipped for pull requests, so nothing is published.
-  pull_request:
-    paths:
-      - '.github/workflows/release.yml'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      # `cargo build --bins` consumes the library and every binary target.
-      # Exercise the cross-platform packaging path whenever any Rust source
-      # changes, including the cover/Jacobian command-line tools.
-      - 'src/**'
-      - 'tests/fixtures/ecbench_manifest_small.json'
-      - 'ecc2k130/Makefile'
-      - 'tools/isogeny-cli/**'
-      - 'tools/volcano-cli/**'
-      - 'isogeny_algos/**'
-      - 'research/p192_p224_large_degree_isogenies_20261009/**'
-      - 'docs/curves/registry.json'
-  merge_group:
   workflow_dispatch:
 
 concurrency:
