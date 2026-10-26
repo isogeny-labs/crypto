@@ -63,7 +63,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   audit:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|transfer-audit.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|transfer-audit.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     # The first PR run took 14 min 5 s on a cold cache (run 40263665257: 12 min 56 s
     # in the unit-test step, which compiles the library; the checks are seconds).
     # 25 is the routine PR budget enforced by .github/scripts/check-pr-budgets.py.

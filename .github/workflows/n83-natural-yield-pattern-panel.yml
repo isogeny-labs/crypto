@@ -20,7 +20,7 @@ concurrency:
 jobs:
   build-worker:
     if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-aws-handoff-20261025'
-    runs-on: ubuntu-24.04-arm
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-natural-yield-pattern-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-natural-yield-pattern-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     steps:
       - name: Check out pinned pattern worker source
@@ -69,7 +69,7 @@ jobs:
   solve-stratum:
     needs: build-worker
     if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-aws-handoff-20261025'
-    runs-on: ubuntu-24.04-arm
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-natural-yield-pattern-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-natural-yield-pattern-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 55
     strategy:
       fail-fast: false
