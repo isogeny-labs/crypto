@@ -43,7 +43,10 @@ fn main() {
                 );
             }
             // The README's claim: the minimum over B stays at or above log2(2) = 1.
-            assert!(min.0 >= 1.0 - 1e-9, "bound below 2√N at m={m}, log s={log_s}");
+            assert!(
+                min.0 >= 1.0 - 1e-9,
+                "bound below 2√N at m={m}, log s={log_s}"
+            );
             println!(
                 "{{\"kind\":\"min\",\"log_n\":{log_n},\"m\":{m},\"log_s\":{log_s},\"log_b\":{:.1},\"log2_cost_over_sqrt_n\":{:.6}}}",
                 min.1, min.0

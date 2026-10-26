@@ -1,9 +1,10 @@
 # Coefficient-labelled factor bases are generic: a 2√N lower bound
 
 2026-10-26 · item 3 of the 2026-10-26 triage (`docs/session-logs/2026-10-26.md`) ·
-**class: derivation (no measurement, no leaderboard row).** Graph `bound.svg`
-(`plot.py`; it evaluates the closed-form bound below, nothing measured) · PDF
-`report.pdf`.
+**class: derivation (no measurement, no leaderboard row).** Graph `bound.svg`:
+[`examples/labelled_base_bound.rs`](../../examples/labelled_base_bound.rs) evaluates the
+closed-form bound below natively and writes `bound.jsonl`, and `plot.py` only lays those records
+out. Nothing is measured. PDF `report.pdf`. **Lean formalization: open** (see "Formalization").
 
 ## The idea examined
 
@@ -44,9 +45,12 @@ Total cost `C ≥ B·N/s + (m!·N/B^m)·max(1, s^m/(m!·N))`.
 > the labelled base loses to rho by a factor of at least 2.3. It is a constant
 > factor, but it holds for every structure.
 
-The bound is loose. Evaluated at `N = 2^60` (`bound.svg`), the model's minimum over
-`B` is about `2^11·√N` for `m = 2` and higher for `m = 3, 4`, whatever the size of
-`S`. Enumerating decompositions over a large `S` is the expensive part.
+The bound is loose. Evaluated at `N = 2^60` (`bound.jsonl`, `bound.svg`), the model's minimum over
+`B` is `2^10.92·√N` for `m = 2`, `2^15.81·√N` for `m = 3` and `2^18.72·√N` for `m = 4`,
+whatever the size of `S` (`log2 s` = 40, 50, 60 give the same minimum). The evaluator asserts
+that the minimum is at least `2√N` in every cell. Enumerating decompositions over a large `S` is the expensive part.
+
+![log2(cost/√N) of the cost model against log2 B, N = 2^60; bound.jsonl from the native evaluator](bound.svg)
 
 **The other regime: labels without structure.** A labelled base can also skip the
 structured oracle altogether. For example, label `B = N^{1/4}` random points,
@@ -73,9 +77,32 @@ oracle's output, and without structure it is generic.
   enumerating would need `L` itself to be structured. A structured `L` of labelled
   points is the same problem one level down.
 
+## Formalization
+
+**Status: open. Not formalized, not built.** AGENTS.md ("Mathematical results should include
+Lean proofs") asks for a Lean 4 theorem. This container has no Lean toolchain, and installing one
+(elan, plus the Mathlib cache) was not permitted in this session. No `.lean` file is committed,
+because an unbuilt file would only be a claim.
+
+Proof map, for whoever formalizes it:
+
+| report statement | intended Lean statement | status |
+|:--|:--|:--|
+| Bound, both cases | `theorem labelled_base_lower (N s B : ℝ) (m : ℕ) (hN : 0 < N) (hB : 0 < B) (hBs : B ≤ s) (hm : 1 ≤ m) : 2 * Real.sqrt N ≤ B * N / s + ((m.factorial : ℝ) * N / B ^ m) * max 1 (s ^ m / ((m.factorial : ℝ) * N))` | open (no toolchain) |
+
+Proof sketch for the Lean proof. It handles both cases at once, because only `max ≥` its second
+argument is used. Let `x = B·N/s` and `y = (m!N/B^m)·max(…)`. Then `y ≥ s^m/B^m`, so
+`x·y ≥ N·(s/B)^{m−1} ≥ N`, since `s/B ≥ 1`. Then `(x+y)² ≥ 4xy ≥ 4N` and `x + y ≥ 0` give
+`x + y ≥ 2√N`. Dependencies: Mathlib `Real.sqrt`, `Real.sqrt_le_sqrt`, `one_le_pow_of_le`
+(or `one_le_pow₀`), `le_max_right`.
+
+What the theorem would not cover: the cost model itself (the bullets under "Model"). That an
+attack must pay `N/s` per useful label, and at least one operation per returned decomposition,
+are modelling assumptions. They are not theorems about elliptic curves.
+
 ## Verdict for the triage
 
-Item 3 is **closed by derivation**. With a structured oracle, no setting of `S`,
+Item 3 is **closed by derivation** (written proof above; Lean formalization open). With a structured oracle, no setting of `S`,
 `B` or `m` gets a labelled-base attack below `2√N` (in practice far above it).
 Without structure the attack is generic and bounded by `√N`. The single-dependency stopping it relies on is
 already in the baseline. Nothing here is a measured result; the bound is exact

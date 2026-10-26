@@ -1,12 +1,12 @@
 """Lay out recorded rows: D and last productive degree, widest matrix, time per system vs N.
-Sources: this directory (rows.jsonl, rows_n18.jsonl: m = 3 symmetric; rows_m4.jsonl: m = 4) and
+Sources: this directory (rows.jsonl, rows_n18.jsonl: m = 3 symmetric; rows_m4_uncontended.jsonl: m = 4, timed alone) and
 ../pkm_symmetric_tower_20261026/rows_m3.jsonl (m = 3 plain chain, PR #2632). Nothing is computed here."""
 import json, os
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-files = ["rows.jsonl", "rows_n18.jsonl", "rows_m4.jsonl", "../pkm_symmetric_tower_20261026/rows_m3.jsonl"]
+files = ["rows.jsonl", "rows_n18.jsonl", "rows_m4_uncontended.jsonl", "../pkm_symmetric_tower_20261026/rows_m3.jsonl"]
 raw = [json.loads(l) for f in files if os.path.exists(f) for l in open(f) if l.strip()]
 seen, rows = set(), []
 for r in raw:
@@ -38,5 +38,5 @@ axes[1].set_yscale("log"); axes[2].set_yscale("log")
 for a in axes:
     a.set_xlabel("N = m·t (tower unknowns)"); a.grid(alpha=.3)
 axes[0].legend(fontsize=6); axes[1].legend(fontsize=6)
-fig.suptitle("Symmetric vs plain Kummer PKM tower, f4_fp, p = 786433 (recorded rows; times of m = 4 cells measured under contention)", fontsize=9)
+fig.suptitle("Symmetric vs plain Kummer PKM tower, f4_fp, p = 786433 (recorded rows; m = 4 times from the run timed alone)", fontsize=9)
 fig.tight_layout(); fig.savefig("d_vs_n.svg"); fig.savefig("d_vs_n.png", dpi=150)
