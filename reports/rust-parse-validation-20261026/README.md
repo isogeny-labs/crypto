@@ -43,6 +43,11 @@ Runtime logs numbered 05–11 are stored as deterministic, lossless gzip files
 so the exact test output remains intact without generated whitespace in the
 patch. [The raw-log manifest](raw-log-manifest.json) records each uncompressed
 SHA-256 and byte count; `gzip -dc FILE.log.gz` reads a log.
+The 79,877-byte `10-broader-run-before-fixture-recheck.log.gz` is held by the
+repository artifact store; its tracked [pointer](.artifacts.json) preserves the
+gzip SHA-256 and size. Run
+`python3 tools/artifacts/artifacts.py pull reports/rust-parse-validation-20261026`
+to hydrate it before reading or decompressing it.
 
 Local validation so far:
 
