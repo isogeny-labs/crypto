@@ -8,6 +8,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
+ARTIFACT_MIGRATION_PARENT = "ced161f948f0aac06de2354e757e92b5735bedcb"
 PRIOR_AUDIT = ROOT / "research/n83_highk_online_tiebreak_20261020/fresh_exclusion_audit.json"
 PRIOR_AUDIT_SHA256 = "82919779c004b8ed6b703bbfa5d4bd24b2b24f38e8fa3b4e8fb1b10f78b42b9e"
 EXTRA = (
@@ -66,7 +67,25 @@ def point_rows(blob: bytes) -> list[tuple[int, int]]:
 
 
 def verified_git_points(rev: str, path: str, sha256: str) -> list[tuple[int, int]]:
-    blob = subprocess.check_output(["git", "show", f"{rev}:{path}"], cwd=ROOT)
+    try:
+        blob = subprocess.check_output(["git", "show", f"{rev}:{path}"],
+                                       cwd=ROOT, stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError:
+        if rev != "HEAD":
+            raise
+        manifest_path = ROOT / Path(path).parent / ".artifacts.json"
+        if not manifest_path.is_file():
+            raise ValueError(f"sealed fixture is absent: {rev}:{path}") from None
+        manifest = json.loads(manifest_path.read_text())
+        entry = manifest.get("files", {}).get(Path(path).name)
+        if (manifest.get("schema") != "artifacts.manifest/v1" or
+                not isinstance(entry, dict) or entry.get("sha256") != sha256 or
+                not isinstance(entry.get("bytes"), int)):
+            raise ValueError(f"artifact manifest differs: {path}") from None
+        blob = subprocess.check_output(
+            ["git", "show", f"{ARTIFACT_MIGRATION_PARENT}:{path}"], cwd=ROOT)
+        if len(blob) != entry["bytes"]:
+            raise ValueError(f"artifact size differs: {path}")
     if digest(blob) != sha256:
         raise ValueError(f"sealed fixture differs: {rev}:{path}")
     return point_rows(blob)
