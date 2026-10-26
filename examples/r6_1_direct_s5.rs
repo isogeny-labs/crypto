@@ -1189,6 +1189,7 @@ impl FixedBase {
             point_index: self.fb.point_index.clone(),
             cost: self.fb.cost.clone(),
             subspace_basis: self.fb.subspace_basis.clone(),
+            known_logs: self.fb.known_logs.clone(),
         }
     }
 }
