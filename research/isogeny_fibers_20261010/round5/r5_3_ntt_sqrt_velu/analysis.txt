@@ -1,0 +1,116 @@
+Round-4 reproduction: rational rows matched 87 (same p and codomain j: 87, same Karatsuba sqrt-elu M and I: 0, same find M and I: 87); generic Karatsuba rows matched 16 (same p and j: 16, same ladder M and I: 16)
+
+Fits: log2(cost) = log2_constant + exponent * log2(ell), OLS, 95% t-interval
+  rational_find (cofactor ladder)                                                      all ell                exponent -0.013 [-0.027, 0.002]  log2 c 9.77  n=29 r2=0.1073
+  velu_1pt (codomain + 1 image)                                                        ell >= 2^10            exponent 0.995 [0.993, 0.997]  log2 c 2.67  n=20 r2=1.0000
+  sqrtvelu_karatsuba_1pt                                                               ell >= 2^10            exponent 0.855 [0.844, 0.866]  log2 c 4.24  n=29 r2=0.9989
+  sqrtvelu_karatsuba_1pt                                                               2^16 <= ell <= 2^24.0  exponent 0.822 [0.805, 0.838]  log2 c 4.93  n=17 r2=0.9987
+  sqrtvelu_ntt_1pt                                                                     ell >= 2^10            exponent 0.846 [0.832, 0.860]  log2 c 4.38  n=29 r2=0.9982
+  sqrtvelu_ntt_1pt                                                                     2^16 <= ell <= 2^24.0  exponent 0.798 [0.775, 0.820]  log2 c 5.36  n=17 r2=0.9973
+  sqrtvelu_ntt_1pt                                                                     ell >= 2^20            exponent 0.745 [0.686, 0.804]  log2 c 6.53  n=9 r2=0.9922
+  sqrtvelu_karatsuba_marginal_per_extra_point                                          ell >= 2^10            exponent 0.856 [0.844, 0.868]  log2 c 2.95  n=29 r2=0.9987
+  sqrtvelu_ntt_marginal_per_extra_point                                                ell >= 2^10            exponent 0.846 [0.831, 0.861]  log2 c 3.10  n=29 r2=0.9980
+  sqrtvelu_karatsuba_1pt_wall_s_contended                                              ell >= 2^16            exponent 0.760 [0.740, 0.779]  log2 c -20.34  n=17 r2=0.9978
+  sqrtvelu_ntt_1pt_wall_s_contended                                                    ell >= 2^16            exponent 0.749 [0.715, 0.784]  log2 c -20.12  n=17 r2=0.9932
+  sqrtvelu_ntt_1pt: k in cost = c sqrt(ell) (log2 ell)^k (slope reported as exponent)  2^16 <= ell <= 2^24.0  exponent 4.097 [3.858, 4.336]  log2 c -6.35  n=17 r2=0.9889
+  round4_generic_find_expected (Karatsuba)                                             31 <= ell <= 433       exponent 2.605 [2.578, 2.631]  log2 c 9.38  n=74 r2=0.9981
+  generic_find_expected, Karatsuba arm (this run)                                      ell >= 30              exponent 2.587 [2.550, 2.625]  log2 c 9.52  n=20 r2=0.9992
+  generic_find_expected, NTT arm                                                       ell >= 30              exponent 2.582 [2.544, 2.620]  log2 c 9.55  n=20 r2=0.9991
+  generic_find_expected, NTT arm                                                       ell >= 256             exponent 2.554 [2.352, 2.756]  log2 c 9.81  n=8 r2=0.9937
+  generic_ladder_per_attempt, NTT arm                                                  ell >= 30              exponent 2.583 [2.545, 2.621]  log2 c 8.55  n=20 r2=0.9991
+  generic_minpoly, NTT arm                                                             ell >= 30              exponent 2.461 [2.420, 2.503]  log2 c 1.31  n=20 r2=0.9988
+  generic_ext_setup (Ben-Or), NTT arm                                                  ell >= 30              exponent 2.984 [2.607, 3.362]  log2 c 3.42  n=20 r2=0.9389
+  F_p^k product (vs ell), Karatsuba arm                                                ell >= 30              exponent 1.577 [1.540, 1.613]  log2 c 0.24  n=20 r2=0.9978
+  F_p^k product (vs ell), NTT arm                                                      ell >= 128             exponent 1.573 [1.484, 1.662]  log2 c 0.27  n=12 r2=0.9936
+  generic_find NTT: k in cost = c ell^2 (log2 ell)^k (slope reported as exponent)      ell >= 256             exponent 3.413 [2.205, 4.620]  log2 c 3.99  n=8 r2=0.8884
+  round4_generic_eval_per_point_from_h (M; +1 I)                                       ell >= 30              exponent 0.960 [0.956, 0.963]  log2 c 0.35  n=74 r2=0.9998
+
+Local sqrt-elu exponents over 4-octave windows (Karatsuba | NTT):
+  log2 ell 10.0..14.0: 0.925 [0.859, 0.992] | 0.925 [0.859, 0.992]
+  log2 ell 11.0..15.0: 0.904 [0.834, 0.973] | 0.904 [0.834, 0.973]
+  log2 ell 12.0..16.0: 0.842 [0.812, 0.872] | 0.842 [0.812, 0.872]
+  log2 ell 13.0..17.0: 0.879 [0.848, 0.909] | 0.879 [0.848, 0.909]
+  log2 ell 14.0..18.0: 0.863 [0.836, 0.890] | 0.863 [0.836, 0.890]
+  log2 ell 15.0..19.0: 0.875 [0.840, 0.909] | 0.875 [0.840, 0.909]
+  log2 ell 16.0..20.0: 0.838 [0.791, 0.884] | 0.837 [0.790, 0.884]
+  log2 ell 17.0..21.0: 0.836 [0.789, 0.883] | 0.831 [0.784, 0.878]
+  log2 ell 18.0..22.0: 0.807 [0.757, 0.856] | 0.792 [0.739, 0.845]
+  log2 ell 19.0..23.0: 0.821 [0.777, 0.865] | 0.784 [0.733, 0.835]
+  log2 ell 20.0..24.0: 0.799 [0.752, 0.847] | 0.745 [0.686, 0.804]
+
+sqrt-elu at the top (ell = 16777259): Karatsuba 2.4455e7 Meq, NTT 2.2099e7 Meq (ratio 1.11)
+
+Derived (extrapolated) crossover: smallest ell with find+evaluate >= g * sqrt(pi r / 4) F_p mults
+  g=6 M/op, r=2^64: rho = 2^34.41 M, ell_max = 2^33
+    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =    31.90  (crossover inside the possible range)
+    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =    35.88  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =    36.42  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =    37.44  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =    40.94  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =     9.58  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =     9.61  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =     9.59  (crossover inside the possible range)
+    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =     9.66  (crossover inside the possible range)
+  g=6 M/op, r=2^128: rho = 2^66.41 M, ell_max = 2^65
+    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =    64.07  (crossover inside the possible range)
+    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =    74.83  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =    76.54  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =    80.40  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =    99.80  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =    21.49  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =    21.74  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =    22.77  (crossover inside the possible range)
+    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =    24.48  (crossover inside the possible range)
+  g=6 M/op, r=2^256: rho = 2^130.41 M, ell_max = 2^129
+    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =   128.40  (crossover inside the possible range)
+    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =   152.72  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =   156.79  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =   166.32  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =   223.16  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =    45.67  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =    46.41  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =    49.56  (crossover inside the possible range)
+    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =    55.39  (crossover inside the possible range)
+  g=12 M/op, r=2^64: rho = 2^35.41 M, ell_max = 2^33
+    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =    32.91  (crossover inside the possible range)
+    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =    37.10  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =    37.67  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =    38.78  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =    42.70  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =     9.97  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =    10.00  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =    10.02  (crossover inside the possible range)
+    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =    10.12  (crossover inside the possible range)
+  g=12 M/op, r=2^128: rho = 2^67.41 M, ell_max = 2^65
+    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =    65.07  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =    76.04  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =    77.80  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =    81.74  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =   101.69  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =    21.87  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =    22.13  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =    23.20  (crossover inside the possible range)
+    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =    24.97  (crossover inside the possible range)
+  g=12 M/op, r=2^256: rho = 2^131.41 M, ell_max = 2^129
+    rational kernel, Velu (fit ell>=2^10)                                        log2 ell* =   129.41  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                log2 ell* =   153.93  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^16)                                log2 ell* =   158.04  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (fit ell>=2^20)                                log2 ell* =   167.66  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)     log2 ell* =   225.11  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    generic kernel, round-4 Karatsuba fit (31..433, central)                     log2 ell* =    46.06  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, central)                                  log2 ell* =    46.80  (crossover inside the possible range)
+    generic kernel, NTT fit (ell>=256, exponent at CI low end)                   log2 ell* =    49.99  (crossover inside the possible range)
+    generic kernel, NTT model l^2 log l (calibrated at top)                      log2 ell* =    55.89  (crossover inside the possible range)
+
+Derived: kernel over F_(p^k), r = 2^128, g = 6 (find(k) + sqrt-elu NTT model(ell) x m(k))
+  k=1    m(k)=1       find(k)=2^11.0 M  log2 ell* = 99.8
+  k=2    m(k)=5       find(k)=2^16.8 M  log2 ell* = 95.4
+  k=4    m(k)=19      find(k)=2^19.0 M  log2 ell* = 91.8
+  k=8    m(k)=71      find(k)=2^21.3 M  log2 ell* = 88.2
+  k=16   m(k)=271     find(k)=2^23.8 M  log2 ell* = 84.6
+  k=32   m(k)=799     find(k)=2^26.3 M  log2 ell* = 81.7
+  k=64   m(k)=2367    find(k)=2^28.8 M  log2 ell* = 78.8
+  k=128  m(k)=7039    find(k)=2^31.3 M  log2 ell* = 75.8
+  k=256  m(k)=20991   find(k)=2^33.9 M  log2 ell* = 72.9
+
+rational find: max 979 Meq per kernel point (61-bit p)

@@ -108,3 +108,15 @@ comparison.
 Unresolved. Classifying every tuple, including an explicit `unknown`, fulfills
 the assessment inventory but does not supply the certificates required to
 resolve this problem.
+
+- 2026-10-26 (additive): [`transfer-audit`](../research/transfer_audit_20261011/RESULTS.md) executes the
+  generator path of the binary genus-3 cover for four registered curves (sect113r1, ECC2K-130, K-163,
+  B-163) and four toy Koblitz curves: `phi^*(G)` has exact order `r` in `Jac(H)(F_q)` by Cantor
+  arithmetic (`[r]phi^*(G) = O`, `phi^*(G) != O`, `r` prime), with additivity on 4 sample pairs,
+  scalar equivariance on 3 scalars and the `[3]` push-pull witness
+  (`certificates/*/cover_binary_g3_deg3.json`, status `verified`). This is image-order and kernel
+  evidence for those four EC1 generators only; the order of `<G>` is the registry's claimed order
+  validated by `[r]G = O`, primality of `r` and two annihilated random points, not a point-count
+  proof; the arbitrary-class norm and recovery remain open, and the 129 other binary and all 530
+  prime bindings are untouched. Still unresolved.
+

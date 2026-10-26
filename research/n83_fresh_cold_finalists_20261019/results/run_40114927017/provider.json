@@ -1,0 +1,30 @@
+{
+  "schema": "n83.fresh-cold-spot-provider/v1",
+  "github_run_id": 40114927017,
+  "github_head_sha": "8455179d125b5b451377ac9a9c38426fb714e9b1",
+  "region": "us-west-2",
+  "instance_type": "m7i.2xlarge",
+  "market": "spot",
+  "ami_id": "ami-08cf17e3856f70154",
+  "root_volume": {"size_gib": 80, "type": "gp3", "encrypted": true, "delete_on_termination": true},
+  "network": {"security_group_id": "sg-0b2f3064f779e3a15", "ingress_rules": 0, "imds_tokens": "required"},
+  "user_data_sha256": "c46b242f5fd9c75c191386cdaf7547257f5777933a5897ed7ac87c867a83a089",
+  "auto_shutdown_after_hours": 7,
+  "post_job_shutdown_grace_seconds": 120,
+  "instance_initiated_shutdown_behavior": "terminate",
+  "shared_build_job_id": 120934135300,
+  "shared_binary_artifact": {
+    "artifact_id": 12569745417,
+    "zip_sha256": "e206bbc5354f149b06da6bc3d345b3aa9099e37513755aaa1fc7e3472f30e973",
+    "tar_sha256": "e621abbc3ad2e29886f74856a44c9d83525484abbe900b03bd1629fc196da364",
+    "ic_binary_sha256": "4be33ac0a9ce5bc1d9f0206c5ccb58e24bbac1e75d40f43a40ffbaf7e827026e",
+    "rho_binary_sha256": "4ed1335f55240ff98470caf0096b9c0cbb3da0a01b157ce88bc83cf886f761e9",
+    "matches_run_40069229461_executable_hashes": true
+  },
+  "instances": [
+    {"runner_slot": 0, "assigned_stratum": 1, "github_runner_id": 7024, "github_runner_name": "n83-40114927017-s0", "github_job_id": 120939399908, "instance_id": "i-0fae831508d98881a", "availability_zone": "us-west-2d", "launch_time": "2026-10-24T17:20:25Z", "state_at_record": "running", "ssm_at_record": "Online", "visible_cpus": 8, "mem_total_kib": 32309416, "disk_free_bytes_at_preflight": 78176059392, "preflight_status": "PASS_CAPACITY_PREFLIGHT", "source_receipt_present": true},
+    {"runner_slot": 1, "assigned_stratum": 0, "github_runner_id": 7025, "github_runner_name": "n83-40114927017-s1", "github_job_id": 120939399949, "instance_id": "i-07b2a7084ba8a2237", "availability_zone": "us-west-2c", "launch_time": "2026-10-24T17:20:38Z", "state_at_record": "running", "ssm_at_record": "Online", "visible_cpus": 8, "mem_total_kib": 32309416, "disk_free_bytes_at_preflight": 78176067584, "preflight_status": "PASS_CAPACITY_PREFLIGHT", "source_receipt_present": true}
+  ],
+  "run_state_at_record": "strata_in_progress",
+  "selected_best_total_runtime": null
+}
