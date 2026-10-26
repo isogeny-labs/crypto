@@ -12,6 +12,8 @@ separate from the `cpu-spot` Iso Lab measurement pool.
 | `crypto-eks-highmem` | 14 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
 | `crypto-eks-xmem` | 14 CPU, 440 GiB plus Docker sidecar | 480 GiB runner (x2iedn/x2iezn.4xlarge, 512 GiB) | 1 |
 | `crypto-eks-xmem1t` | 30 CPU, 900 GiB plus Docker sidecar | 960 GiB runner (x2iedn/x2iezn.8xlarge, 1 TiB) | 1 |
+| `crypto-isolab-build` | 1.5 CPU, 12 GiB | 16 GiB runner | 1 |
+| `crypto-isolab` | Iso Lab publisher with Docker sidecar | See `isolab-values.yaml` | 1 |
 
 The base NodePool admits x86-64 M/R instances with 8 or 16 vCPUs and caps
 aggregate provisioning at 16 vCPUs and 128 GiB. An additional R-family pool
@@ -137,7 +139,8 @@ moved; their last smoke run passed on 2026-10-20. To bring them up for
    `ARC_GITHUB_REPO=isogeny-labs/crypto taskq/deploy/eks-karpenter/arc/rotate-github-token.sh`.
    The value files already name `https://github.com/isogeny-labs/crypto`.
 2. Re-run `deploy.sh` (idempotent) and confirm
-   `kubectl -n arc-runners get autoscalingrunnersets` lists all four sets.
+   `kubectl -n arc-runners get autoscalingrunnersets` lists all six sets,
+   including `crypto-isolab-build` and `crypto-isolab` for the Iso Lab workflow.
 3. Dispatch `eks-arc-smoke.yml` with `pool=linux` and `pool=highmem`; confirm
    the job log names an `arc-runners` pod and `kubectl get nodeclaims` shows a
    Spot node during the run.
