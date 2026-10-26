@@ -54,7 +54,7 @@
 //!   F4's column scans), and one 64-bit RNG draw.
 
 use std::cell::Cell;
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use serde::Serialize;
 
@@ -63,7 +63,10 @@ use crate::prime_hyperelliptic::ops::KINDS;
 pub use crate::prime_hyperelliptic::ops::{Kind, OpTally};
 
 static ENABLED: AtomicBool = AtomicBool::new(false);
-static FOREIGN: AtomicU64 = AtomicU64::new(0);
+/// Set once any hook fires on a thread that did not [`claim`] the tally.
+/// A flag written only on its first change, so threads that are not
+/// counted (other tests, other pools) never contend on a shared line.
+static FOREIGN_SEEN: AtomicBool = AtomicBool::new(false);
 
 /// Number of phases.
 pub const PHASES: usize = 15;
@@ -274,10 +277,11 @@ pub fn claim() {
     OWNER.with(|o| o.set(true));
 }
 
-/// Hook calls that fired on a thread that did not [`claim`] the tally
-/// (work the reader cannot see).
+/// `1` once any hook has fired on a thread that did not [`claim`] the
+/// tally (work the reader cannot see), else `0`.
+
 pub fn foreign() -> u64 {
-    FOREIGN.load(Ordering::SeqCst)
+    FOREIGN_SEEN.load(Ordering::SeqCst) as u64
 }
 
 /// Operations on a modulus that is neither `p` nor `ℓ` (this thread), by
@@ -292,13 +296,20 @@ pub fn set_moduli(p: u64, l: u64) {
     MODR_N.with(|c| c.set(l));
 }
 
+#[cold]
+fn mark_foreign() {
+    if !FOREIGN_SEEN.load(Ordering::Relaxed) {
+        FOREIGN_SEEN.store(true, Ordering::Relaxed);
+    }
+}
+
 #[inline]
 fn bump(kind: Kind, n: u64) {
     if n == 0 {
         return;
     }
     if !OWNER.with(Cell::get) {
-        FOREIGN.fetch_add(n, Ordering::Relaxed);
+        mark_foreign();
         return;
     }
     let phase = PHASE.with(Cell::get);
@@ -396,7 +407,7 @@ fn slow(m: u64, field: Kind, modr: Kind, n: u64) {
                 let phase = PHASE.with(Cell::get);
                 OTHER.with(|c| c[phase].set(c[phase].get() + n));
             } else {
-                FOREIGN.fetch_add(n, Ordering::Relaxed);
+                mark_foreign();
             }
         }
     }
