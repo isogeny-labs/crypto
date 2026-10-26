@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::Args;
 use crypto_lib::cryptanalysis::ecbench_large_prime::{
-    import_family, load_manifest_with_source, solve, SolveConfig,
+    import_family, load_manifest_with_source, solve, LargePrimeGraph, SolveConfig,
 };
 use serde_json::{json, Value};
 
@@ -38,6 +38,12 @@ pub struct LargePrimeArgs {
     /// Deterministic relation-search seed.
     #[arg(long, default_value_t = 7)]
     pub seed: u64,
+    /// How large-prime partial relations are combined: `online` (default,
+    /// the original streaming elimination), `filter` (batch hypergraph
+    /// filter, plain columns), `orbit` (filter with Frobenius-orbit
+    /// vertices and +-lambda^k coefficients) or `orbit-absorb`.
+    #[arg(long, default_value = "online")]
+    pub graph: String,
 }
 
 pub fn run(args: LargePrimeArgs) -> Result<Value, String> {
@@ -87,6 +93,17 @@ pub fn run(args: LargePrimeArgs) -> Result<Value, String> {
             .parse::<u32>()
             .map_err(|_| format!("--summands must be an integer or n-1, not `{value}`"))?,
     };
+    let graph = match args.graph.as_str() {
+        "online" => LargePrimeGraph::Online,
+        "filter" => LargePrimeGraph::Filter,
+        "orbit" => LargePrimeGraph::FilterOrbit,
+        "orbit-absorb" => LargePrimeGraph::FilterOrbitAbsorb,
+        other => {
+            return Err(format!(
+                "--graph must be online, filter, orbit or orbit-absorb, not `{other}`"
+            ))
+        }
+    };
     let config = SolveConfig {
         small_dimension: args.small_dimension.unwrap_or(imported.small_dimension),
         envelope_dimension: args
@@ -97,6 +114,7 @@ pub fn run(args: LargePrimeArgs) -> Result<Value, String> {
         max_trials: args.max_trials,
         max_states: args.max_states,
         seed: args.seed,
+        large_prime_graph: graph,
     };
     // `expected` is deliberately read only after the target-only solver call.
     let report = solve(&imported.instance, imported.target, config)?;
