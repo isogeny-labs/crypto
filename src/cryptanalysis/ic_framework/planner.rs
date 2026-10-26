@@ -32,7 +32,7 @@ use crate::cryptanalysis::ic_boundary::{BinaryInstance, PrimeInstance};
 
 /// The planner's rule set.  A spec that pins a plan names this version; a
 /// change to any rule or calibration constant changes it.
-pub const PLANNER_VERSION: &str = "ic-planner/3";
+pub const PLANNER_VERSION: &str = "ic-planner/4";
 
 /// What kind of curve the plan is for: the classes the evidence separates.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -309,6 +309,10 @@ const E_WEIGHT_BINKOB: Evidence = Evidence {
     path: "research/ic_planner_weight_rule_binkob_20261026/README.md",
     claim: "base multipliers on three binary and three Koblitz curves: the binary optimum stays at d₀ at every weight 0–1; the Koblitz optimum falls to 0.71·c₀ columns at w ≥ 0.3 (G 0.928, 0.847), and held out on three Koblitz curves 0.71·c₀ costs 0.802–0.880× the plan at w = 1 (3 of 3 intervals below 1) and 0.895–0.928 at w = 0.3 (2 of 3)",
 };
+const E_EXHAUSTIVE: Evidence = Evidence {
+    path: "research/ic_planner_exhaustive_20261026/README.md",
+    claim: "held out, preregistered: prime 1.41·N₀ costs 0.82–0.91× N₀ at w = 1 on 4 of 4 curves (15.7–36.3 bits) but also 0.93–0.97× at w = 0 on two, failing W1; binary d₀ + 1 costs 0.73× d₀ at w = 1 on hb19, failing W2; Koblitz 0.71·c₀ costs 1.06–1.17× c₀ at w = 1 on six curves (36.6–47.2 bits), failing W3; all three weight rules are withdrawn",
+};
 const E_DESCENT_ROUTING: Evidence = Evidence {
     path: "research/ic_koblitz_descent_routing_20261026/README.md",
     claim: "Koblitz log2 r 36.6–44.3: the ledger §23 descent (ic.koblitz_descent, counted) costs 1.409–1.489× this ic.pipeline recipe in counted S, every interval above 1; the pipeline is 9.5–24.0× rho.signed_frobenius_strong",
@@ -320,24 +324,21 @@ const E_FROB_PROTOCOL: Evidence = Evidence {
 
 // ── Rules ──────────────────────────────────────────────────────────
 
-/// The prime base multiplier `m*(w)` at each measured §5a weight
-/// (`research/ic_planner_weight_rule_20261021`, Phase A): the base is
+/// The prime base multiplier `m*(w)` at each §5a weight: the base is
 /// `round(m* · #E^{1/3}/2)` abscissae, with `m*` read at the largest
-/// measured weight not above the requested one.
+/// grid weight not above the requested one. `ic-planner/3` took 1.41 at
+/// w = 1 (`research/ic_planner_weight_rule_20261021`); that rule failed its
+/// preregistered hold-out (`research/ic_planner_exhaustive_20261026`, W1)
+/// and is withdrawn, so every weight keeps the counted optimum.
 const PRIME_WEIGHT_MULTIPLIERS: [(f64, f64); 5] =
-    [(0.0, 1.0), (0.03, 1.0), (0.1, 1.0), (0.3, 1.0), (1.0, 1.41)];
+    [(0.0, 1.0), (0.03, 1.0), (0.1, 1.0), (0.3, 1.0), (1.0, 1.0)];
 
-/// The Koblitz orbit-column multiplier `m*(w)`
-/// (`research/ic_planner_weight_rule_binkob_20261026`): the base shrinks to
-/// `max(1, round(m* · c₀))` columns once lookups and canonicalisations are
-/// charged. Random binary curves keep `d₀` at every measured weight.
-const KOBLITZ_WEIGHT_MULTIPLIERS: [(f64, f64); 5] = [
-    (0.0, 1.0),
-    (0.03, 1.0),
-    (0.1, 1.0),
-    (0.3, 0.71),
-    (1.0, 0.71),
-];
+/// The Koblitz orbit-column multiplier `m*(w)`. `ic-planner/3` shrank the
+/// base to 0.71·c₀ at w ≥ 0.3 (`research/ic_planner_weight_rule_binkob_20261026`);
+/// held out at log2 r 36.6–47.2 it was dearer at every weight
+/// (`research/ic_planner_exhaustive_20261026`, W3) and is withdrawn.
+const KOBLITZ_WEIGHT_MULTIPLIERS: [(f64, f64); 5] =
+    [(0.0, 1.0), (0.03, 1.0), (0.1, 1.0), (0.3, 1.0), (1.0, 1.0)];
 
 /// `m*(w)` and how the weight sits against the measured grid.
 fn prime_base_multiplier(w: f64) -> (f64, Support) {
@@ -476,12 +477,25 @@ pub fn plan(profile: &CurveProfile, opts: &PlanOptions) -> Plan {
         choices.push(linalg_choice(opts.goal));
     }
     if opts.native_weight > 0.0 {
-        if profile.class == CurveClass::BinaryRandom && !choices.is_empty() {
-            warnings.push(format!(
-                "native weight {}: the random-binary subspace dimension stays at its counted optimum, \
-                 which was cheapest at every measured weight 0–1",
-                opts.native_weight
-            ));
+        if !choices.is_empty() {
+            let family = match profile.class {
+                CurveClass::BinaryRandom => Some(
+                    "the random-binary subspace dimension stays at its counted optimum d₀; it is not \
+                     optimal at every weight (held out, d₀ + 1 cost 0.73× d₀ at w = 1 on one of four curves)",
+                ),
+                CurveClass::Koblitz => Some(
+                    "the Koblitz orbit columns stay at c₀: the 0.71·c₀ rule was withdrawn after it cost \
+                     1.06–1.17× c₀ at w = 1 on six held-out curves",
+                ),
+                CurveClass::Other => None,
+                _ => Some(
+                    "the prime base stays at N₀: the 1.41·N₀ rule was withdrawn after its preregistered \
+                     hold-out failed (it was cheaper at w = 1 on four of four curves, but also at w = 0 on two)",
+                ),
+            };
+            if let Some(f) = family {
+                warnings.push(format!("native weight {}: {f}", opts.native_weight));
+            }
         }
         warnings.push(
             "the rho outlook is in counted S (w = 0); the plan is cheaper only at the declared weight, \
@@ -566,6 +580,7 @@ fn prime_choices(
     let mut fb_evidence = vec![E_LADDER, E_HOLDOUT20, E_BLOCKED32];
     if opts.native_weight > 0.0 {
         fb_evidence.push(E_WEIGHT_RULE);
+        fb_evidence.push(E_EXHAUSTIVE);
     }
     if profile.class != CurveClass::Prime {
         fb_evidence.push(E_GLV);
@@ -649,7 +664,7 @@ fn binary_choices(
             ),
             support,
             evidence: if opts.native_weight > 0.0 {
-                vec![E_LADDER, E_WEIGHT_BINKOB]
+                vec![E_LADDER, E_WEIGHT_BINKOB, E_EXHAUSTIVE]
             } else {
                 vec![E_LADDER]
             },
@@ -717,6 +732,7 @@ fn koblitz_choices(
     }
     if opts.native_weight > 0.0 {
         fb_evidence.push(E_WEIGHT_BINKOB);
+        fb_evidence.push(E_EXHAUSTIVE);
     }
     let renew = log2_r <= 21.5;
     vec![
@@ -868,6 +884,7 @@ mod tests {
             E_WEIGHT_RULE,
             E_WEIGHT_BINKOB,
             E_DESCENT_ROUTING,
+            E_EXHAUSTIVE,
         ] {
             assert!(
                 root.join(e.path).is_file(),
@@ -911,8 +928,8 @@ mod tests {
     }
 
     #[test]
-    fn the_native_weight_scales_the_prime_base_as_measured() {
-        // icv1-fp24-tm5099-a6f137c6: N₀ = 128; Phase A ran 180 as m141.
+    fn the_withdrawn_prime_weight_rule_keeps_the_counted_base() {
+        // icv1-fp24-tm5099-a6f137c6: N₀ = 128 (ic-planner/3 took 180 at w = 1).
         let r24 = CurveProfile {
             group_order: 16_782_299.0,
             r: 16_782_299.0,
@@ -921,43 +938,34 @@ mod tests {
         let base = plan(&r24, &PlanOptions::default());
         assert_eq!(size(&base), 128);
         assert_eq!(base.choices[0].rule, "prime.factor-base.family-optimum");
-        for w in [0.0, 0.03, 0.1, 0.3, 0.99] {
-            assert_eq!(size(&plan(&r24, &at(w))), 128, "w = {w}");
+        for w in [0.0, 0.03, 0.1, 0.3, 0.5, 0.99, 1.0, 4.0] {
+            let pl = plan(&r24, &at(w));
+            assert_eq!(size(&pl), 128, "w = {w}");
+            assert_eq!(pl.choices[0].rule, "prime.factor-base.family-optimum");
         }
-        // Between measured weights the size is read off the grid, no better
-        // than interpolated.
+        // Between grid weights the size is no better than interpolated;
+        // above the grid it is extrapolated and says so.
         assert_eq!(
             plan(&r24, &at(0.5)).choices[0].support,
             Support::Interpolated
         );
-        let w1 = plan(&r24, &at(1.0));
-        assert_eq!(size(&w1), 180);
-        assert_eq!(w1.choices[0].rule, "prime.factor-base.weighted-optimum");
-        assert!(w1.choices[0]
-            .evidence
-            .iter()
-            .any(|e| e.path == E_WEIGHT_RULE.path));
-        assert_eq!(w1.native_weight, 1.0);
-        // The held-out h29 curve: N₀ = 342 and v2-m141 = 482.
-        let h29 = CurveProfile {
-            group_order: 320_091_991.0,
-            r: 320_091_991.0,
-            ..prime(28.25, 320_092_037)
-        };
-        assert_eq!(size(&plan(&h29, &PlanOptions::default())), 342);
-        assert_eq!(size(&plan(&h29, &at(1.0))), 482);
-        // Above the grid: the w = 1 multiplier, extrapolated and said so.
         let w4 = plan(&r24, &at(4.0));
-        assert_eq!(size(&w4), 180);
         assert_eq!(w4.choices[0].support, Support::Extrapolated);
         assert!(w4
             .warnings
             .iter()
             .any(|x| x.contains("above the measured grid")));
-        // The other choices do not move with the weight.
-        for stage in ["oracle", "linalg", "targets"] {
-            assert_eq!(w1.get(stage), base.get(stage), "{stage}");
-        }
+        let w1 = plan(&r24, &at(1.0));
+        assert!(w1
+            .warnings
+            .iter()
+            .any(|x| x.contains("1.41·N₀ rule was withdrawn")));
+        assert!(w1.choices[0]
+            .evidence
+            .iter()
+            .any(|e| e.path == E_EXHAUSTIVE.path));
+        assert_eq!(w1.native_weight, 1.0);
+        assert_eq!(w1.pipeline_params(), base.pipeline_params());
     }
 
     #[test]
@@ -973,7 +981,7 @@ mod tests {
         let a = plan(&bin, &PlanOptions::default());
         let b = plan(&bin, &at(1.0));
         assert_eq!(a.pipeline_params(), b.pipeline_params());
-        assert!(b.warnings.iter().any(|x| x.contains("counted optimum")));
+        assert!(b.warnings.iter().any(|x| x.contains("counted optimum d₀")));
         assert!(b.choices[0]
             .evidence
             .iter()
@@ -1008,32 +1016,29 @@ mod tests {
     }
 
     #[test]
-    fn the_native_weight_shrinks_the_koblitz_base_as_measured() {
-        // Phase A k37 (c0 = 10) and the held-out hk19 (2), hk23 (4), hk39 (6).
-        for ((a, n), c0, c71) in [
-            ((0, 37), 10, 7),
-            ((1, 19), 2, 1),
-            ((1, 23), 4, 3),
-            ((0, 39), 6, 4),
-        ] {
+    fn the_withdrawn_koblitz_weight_rule_keeps_c0_columns() {
+        // Phase A k37 (c0 = 10), the binkob holdouts hk19 (2), hk23 (4),
+        // hk39 (6): every weight keeps c₀.
+        for ((a, n), c0) in [((0, 37), 10), ((1, 19), 2), ((1, 23), 4), ((0, 39), 6)] {
             let k = koblitz(a, n);
             assert_eq!(
                 columns(&plan(&k, &PlanOptions::default())),
                 c0,
                 "K_{a}/2^{n}"
             );
-            for w in [0.0, 0.03, 0.1, 0.29] {
-                assert_eq!(columns(&plan(&k, &at(w))), c0, "K_{a}/2^{n} at w = {w}");
-            }
-            for w in [0.3, 1.0] {
+            for w in [0.0, 0.03, 0.1, 0.3, 1.0] {
                 let pl = plan(&k, &at(w));
-                assert_eq!(columns(&pl), c71, "K_{a}/2^{n} at w = {w}");
-                assert_eq!(pl.choices[0].rule, "koblitz.factor-base.weighted-orbit");
+                assert_eq!(columns(&pl), c0, "K_{a}/2^{n} at w = {w}");
+                assert_eq!(pl.choices[0].rule, "koblitz.factor-base.frobenius-orbit");
             }
         }
         let k = koblitz(0, 37);
         assert_eq!(plan(&k, &at(0.5)).choices[0].support, Support::Interpolated);
         assert_eq!(plan(&k, &at(3.0)).choices[0].support, Support::Extrapolated);
+        assert!(plan(&k, &at(1.0))
+            .warnings
+            .iter()
+            .any(|x| x.contains("0.71·c₀ rule was withdrawn")));
     }
 
     #[test]

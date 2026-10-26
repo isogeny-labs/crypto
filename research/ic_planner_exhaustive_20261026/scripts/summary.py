@@ -133,6 +133,32 @@ def main():
     P["K2"] = {"rows": k2, "held": all(all(x[2] < y[2] for x, y in zip(v, v[1:])) for v in k2.values()),
                "spearman_like_increasing_pairs": {a: sum(x[2] < y[2] for x, y in zip(v, v[1:])) for a, v in k2.items()}}
 
+    # Per-curve tables for the README and figures (all from compare --save).
+    out["tables"] = {
+        "R": {s: {"log2_r": out["sessions"][s]["log2_r"],
+                  "over_plan": {b: {w: cmp(s, "plan", b, w) for w in ("0", "0.1", "0.3", "1")}
+                                for b in ("res2", "res4", "res8", "m141")},
+                  "over_rho": {b: {w: cmp(s, "rho", b, w) for w in ("0", "1")}
+                               for b in ("plan", "res2", "res4")}} for s in R},
+        "B": {s: {"log2_r": out["sessions"][s]["log2_r"],
+                  "over_plan": {b: {w: cmp(s, "plan", b, w) for w in ("0", "0.1", "0.3", "1")}
+                                for b in ("dm1", "dp1")},
+                  "plan_over_rho": {w: cmp(s, "rho", "plan", w) for w in ("0", "1")}} for s in B},
+        "K": {s: {"log2_r": out["sessions"][s]["log2_r"],
+                  "p71_over_pipeline": {w: cmp(s, "pipeline", "pipeline71", w) for w in ("0", "0.1", "0.3", "1")},
+                  "descent_over_pipeline": cmp(s, "pipeline", "descent", 0),
+                  "pipeline_over_rho": {w: cmp(s, "rho", "pipeline", w) for w in ("0", "1")},
+                  "descent_over_rho": cmp(s, "rho", "descent", 0)} for s in K},
+    }
+    # The ten-size residual ladder: the earlier study's res4/plan (w = 0, 0.1, 1) and this study's.
+    early = json.loads((EARLIER_R / "summary.json").read_text())
+    out["tables"]["res4_ladder"] = (
+        [{"source": "ic_prime_residual_lp_20261026", "tag": r["tag"], "log2_r": r["log2_r"],
+          "res4_over_plan": r["res4_over_plan"]} for r in early["rows"]]
+        + [{"source": "ic_planner_exhaustive_20261026", "tag": s, "log2_r": out["sessions"][s]["log2_r"],
+            "res4_over_plan": {w: out["tables"]["R"][s]["over_plan"]["res4"][w] for w in ("0", "0.1", "1")}}
+           for s in R])
+
     P["all_verified"] = all(v[0] == v[1] for s in out["sessions"].values() for v in s["verified"].values())
     (ROOT / "analysis" / "summary.json").write_text(json.dumps(out, indent=1) + "\n")
     for k, v in P.items():

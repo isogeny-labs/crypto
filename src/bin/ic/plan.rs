@@ -40,7 +40,7 @@ pub struct PlanArgs {
     #[arg(long, default_value_t = 8.0)]
     pub max_table_gib: f64,
     /// Plan for this AGENTS.md §5a weight: GAE charged per unpriced native
-    /// operation (0 = counted S; the prime base grows at 1).
+    /// operation (0 = counted S; since ic-planner/4 no weight changes the base).
     #[arg(long, default_value_t = 0.0)]
     pub native_weight: f64,
     /// Also print the plan as an ecbench spec arm of this name.

@@ -120,21 +120,26 @@ on the curve (`research/ic_planner_validation_20261020`).
 the AGENTS.md §5a weight `w`, in GAE per unpriced native operation. The
 operations are lookups, guard probes, Legendre symbols, square roots and row
 operations.
-- **Prime curves:** the base becomes `round(m*(w)·N₀)`, with `m*` = 1 up to
-  `w = 0.3` and 1.41 at `w = 1` (`research/ic_planner_weight_rule_20261021`).
-  A weight above 1 uses the `w = 1` multiplier, marked `extrapolated`.
-- **Koblitz curves:** the orbit columns become `max(1, round(m*(w)·c₀))`, with
-  `m*` = 1 up to `w = 0.1` and 0.71 from `w = 0.3`
-  (`research/ic_planner_weight_rule_binkob_20261026`). The base *shrinks*,
-  because a Koblitz trial's canonicalisation and probes grow with it.
-- **Random binary curves** keep `d₀`: it was cheapest at every measured weight.
+- **No weight rule is in force.** Since `ic-planner/4` the factor base is the
+  counted optimum at every weight: N₀ on prime curves, c₀ orbit columns on
+  Koblitz curves, d₀ on random binary curves. A declared weight adds a warning
+  and the evidence for that weight.
+- **What was withdrawn.** `ic-planner/3` scaled the prime base by 1.41 at
+  `w = 1` (`research/ic_planner_weight_rule_20261021`). It shrank the Koblitz
+  base to 0.71·c₀ at `w ≥ 0.3` (`research/ic_planner_weight_rule_binkob_20261026`).
+  Both failed their preregistered hold-outs in
+  `research/ic_planner_exhaustive_20261026`, and its decision rule withdraws them:
+  - **Prime:** 1.41·N₀ was cheaper at `w = 1` on 4 of 4 curves, but also at
+    `w = 0` on 2 of 4.
+  - **Koblitz:** at log2 r 36.6–47.2, 0.71·c₀ cost 1.06–1.17× c₀ at `w = 1`.
+  - **Binary:** d₀ + 1 beat d₀ at `w = 1` on one of four held-out curves.
 - For log2 r ≥ 36 the Koblitz plan also cites
   `research/ic_koblitz_descent_routing_20261026`. There the ledger §23 descent,
   now the `ecbench` method `ic.koblitz_descent`, measured 1.41–1.49× costlier
   in counted `S`.
 
 A weighted plan is cheaper only at its weight; it is never a ranking across
-the band. The rule set is versioned (`ic-planner/3` since the binary/Koblitz weight rule);
+the band. The rule set is versioned (`ic-planner/4` since the weight rules were withdrawn);
 change a rule and the version changes with it.
 
 ---
