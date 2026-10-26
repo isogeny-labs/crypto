@@ -65,6 +65,12 @@ class BuildTests(unittest.TestCase):
             "browser/browser.js",
             "browser/browser.css",
             "browser/data.json",
+            "backend-leaderboard/index.html",
+            "backend-leaderboard/leaderboard.json",
+            "backend-leaderboard/LEADERBOARD.md",
+            "backend-leaderboard/REPLAY_PLAN.json",
+            "backend-leaderboard/REPRODUCING.md",
+            "backend-leaderboard/reproduction.lock.json",
             "status/index.html",
             "status/style.css",
             "status/walk-forest.svg",
@@ -150,6 +156,39 @@ class BuildTests(unittest.TestCase):
                 anchor = re.escape(point["anchor"])
                 self.assertRegex(rows, rf'<tr><td>{point["date"]}</td>.*?href="{anchor}".*?</tr>', f"no table row for the {point['date']} point anchored at {point['anchor']} in series {series['id']}")
         self.assertGreaterEqual(timeline["updated"], newest, "progress-timeline.json `updated` is older than its newest point")
+
+    def test_leaderboard_absolute_operations_and_history_match_frozen_sources(self):
+        import json
+        import math
+        import statistics
+
+        def source(path):
+            return json.loads(read(os.path.join(ROOT, path)))
+
+        board = source("docs/ic/leaderboard.json")
+        round5 = source("docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json")
+        matched = source("research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json")
+        timeline = source("docs/ic/progress-timeline.json")
+        canonical_points = next(s["points"] for s in timeline["series"] if s["id"] == "ec-cold")
+        self.assertEqual(len(board["progress"]["points"]), len(canonical_points))
+        for shown, original in zip(board["progress"]["points"], canonical_points):
+            self.assertEqual({k: v for k, v in shown.items() if k != "value"},
+                             {k: v for k, v in original.items() if k != "value"})
+            self.assertTrue(math.isclose(shown["value"], original["value"], rel_tol=1e-6))
+        instances = {i["curve"]["name"]: i for i in round5["ledger"]["instances"]}
+        references = {i["instance"]: i for i in matched["instances"]}
+        for row in board["board"]:
+            if row["family"] != "B":
+                self.assertNotIn("reference_log2_total_gae", row)
+                self.assertNotIn("log2_total_gae", row["best"])
+                continue
+            inst = instances[row["legacy"]]
+            rho = statistics.fmean(run["gae"] for run in references[row["legacy"]]["matched_reference"]["per_run"])
+            self.assertTrue(math.isclose(row["reference_log2_total_gae"], math.log2(rho), rel_tol=1e-10))
+            for recipe in row["recipes"]:
+                ic = statistics.fmean(v["total_gae"] for v in inst["variants"] if v["name"] == recipe["variant"])
+                self.assertTrue(math.isclose(recipe["log2_total_gae"], math.log2(ic), rel_tol=1e-10))
+                self.assertTrue(math.isclose(ic / rho, recipe["ratio_rho"], rel_tol=1e-9))
 
     def test_scoreboard_panels_close_and_sit_at_the_top_level(self):
         # An unclosed <section> once swallowed every later panel into one
@@ -770,7 +809,7 @@ class BuildTests(unittest.TestCase):
 
     def test_internal_links_resolve(self):
         missing = []
-        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html"):
+        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html", "backend-leaderboard/index.html"):
             page = read(os.path.join(self.out, rel))
             base = os.path.dirname(rel)
             for href in re.findall(r'(?:href|src)="([^"]+)"', page):
@@ -813,7 +852,7 @@ class BuildTests(unittest.TestCase):
         )
 
     def test_every_page_declares_title_viewport_and_description(self):
-        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html"):
+        for rel in ("index.html", "404.html", "status/index.html", "scoreboard/index.html", "scoreboard/ic-leaderboard.html", "scoreboard/ic-measurement.html", "scoreboard/performance-gains.html", "scoreboard/algorithm-lab.html", "browser/index.html", "backend-leaderboard/index.html"):
             page = read(os.path.join(self.out, rel))
             self.assertRegex(page, r"<title>[^<]+</title>", rel)
             self.assertIn('name="viewport"', page, rel)
@@ -894,6 +933,17 @@ class BuildTests(unittest.TestCase):
                 self.assertNotIn(f["recorded_curve"], slugs, f["fb_id"])
                 self.assertEqual(f["registration_status"], "pending")
             self.assertRegex(f["points_sha256"] or "", r"^[a-f0-9]{64}$", f["fb_id"])
+        store_index = json.loads(read(os.path.join(ROOT, "store", "index.json")))
+        self.assertEqual({o["name"] for o in data["store"]["objects"]}, set(store_index["entries"]), "every stored file and no other")
+        for o in data["store"]["objects"]:
+            self.assertRegex(o["sha256"], r"^[a-f0-9]{64}$", o["name"])
+            self.assertEqual(o["sha256"], store_index["entries"][o["name"]]["sha256"], o["name"])
+            self.assertTrue(o["curve"] is None or o["curve"] in slugs, o["name"])
+            self.assertTrue(o["fb_id"] is None or o["fb_id"] in fbs, o["name"])
+        for c in data["curves"]:
+            for n in c["store_objects"]:
+                self.assertEqual(next(o for o in data["store"]["objects"] if o["name"] == n)["curve"], c["slug"], n)
+        self.assertEqual(data["counts"]["store_objects"], len(data["store"]["objects"]))
         for k in data["candidates"]:
             self.assertTrue(k["slug"] is None or k["slug"] in slugs, k["candidate_id"])
             for path in k["where"]:
@@ -937,7 +987,7 @@ class WorkflowTests(unittest.TestCase):
 
     def test_site_sources_trigger_the_workflow(self):
         workflow = read(os.path.join(ROOT, ".github", "workflows", "ecc2k130-status.yml"))
-        for path in ('"docs/site/**"', '"scripts/site/**"', '"docs/index-calculus-scoreboard.html"', '"docs/browser/**"', '"scripts/build_lab_browser.py"'):
+        for path in ('"docs/site/**"', '"scripts/site/**"', '"docs/index-calculus-scoreboard.html"', '"docs/browser/**"', '"docs/backend-leaderboard/**"', '"scripts/build_lab_browser.py"'):
             # Once for pull_request, once for push.
             self.assertEqual(workflow.count(path), 2, path)
 

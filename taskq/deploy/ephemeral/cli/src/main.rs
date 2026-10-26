@@ -85,9 +85,12 @@ struct RunArgs {
     /// Instance type. GPU types (g*, p*) get the NVIDIA Deep Learning AMI, Graviton types arm64
     #[arg(long = "type", default_value = "c7i.4xlarge")]
     instance_type: String,
-    /// Spot capacity; an interruption ends the job as `interrupted`
+    /// Accepted for compatibility; every launch uses Spot
     #[arg(long)]
     spot: bool,
+    /// Restore a prior job's S3 out/ as EPHEMERAL_RESUME_DIR
+    #[arg(long, value_name = "ID")]
+    resume: Option<String>,
     /// Hard lifetime, e.g. 90m, 6h, 2d (default from config). The command stops 10 min before it
     #[arg(long)]
     ttl: Option<String>,
@@ -380,6 +383,17 @@ impl Ctx {
             }
         }
         let cargo_dir = job::check_cargo_dir(&a.cargo_dir)?;
+        let resume_job = match &a.resume {
+            Some(id) => {
+                let resolved = resolve_id(id)?;
+                self.cloud
+                    .get(&self.bucket, &format!("jobs/{resolved}/job.json"), None)
+                    .await
+                    .with_context(|| format!("resume job {resolved} is missing or unreadable"))?;
+                resolved
+            }
+            None => String::new(),
+        };
 
         let ttl = match &a.ttl {
             Some(t) => t.clone(),
@@ -498,7 +512,7 @@ impl Ctx {
             created: utc_now(),
             owner: owner.clone(),
             instance_type: a.instance_type.clone(),
-            spot: a.spot,
+            spot: true,
             ttl: ttl.clone(),
             deadline,
             disk_gb: a.disk,
@@ -520,6 +534,7 @@ impl Ctx {
                 .collect(),
             cache: !a.no_cache,
             cargo_dir,
+            resume_job,
         };
         let runner = match std::env::var("EPHEMERAL_RUNNER") {
             Ok(p) => std::fs::read_to_string(&p)
@@ -555,7 +570,7 @@ impl Ctx {
             .tags(tag(&managed, "true"))
             .tags(tag("ephemeral:job", &id))
             .build();
-        let market = a.spot.then(|| {
+        let market = Some(
             InstanceMarketOptionsRequest::builder()
                 .market_type(MarketType::Spot)
                 .spot_options(
@@ -564,8 +579,8 @@ impl Ctx {
                         .instance_interruption_behavior(InstanceInterruptionBehavior::Terminate)
                         .build(),
                 )
-                .build()
-        });
+                .build(),
+        );
 
         std::fs::create_dir_all(cache_dir())?;
         std::fs::write(cache_dir().join("last"), format!("{id}\n"))?;
@@ -648,7 +663,7 @@ impl Ctx {
         }
         let Some(iid) = iid else {
             let why = format!(
-                "no zone could launch {} (reasons above); try another type, --spot or not, or later",
+                "no Spot capacity for {} in the configured zones; try another type or later",
                 a.instance_type
             );
             return Err(self.launch_failed(&id, deadline, &why).await);
@@ -656,9 +671,8 @@ impl Ctx {
 
         eprintln!("ephemeral: job {id}");
         eprintln!(
-            "ephemeral:   {}{} {iid} ({ami_ref}), ttl {ttl} (terminates by {})",
+            "ephemeral:   {} spot {iid} ({ami_ref}), ttl {ttl} (terminates by {})",
             a.instance_type,
-            if a.spot { " spot" } else { "" },
             utc_of(deadline)
         );
         let source = if commit.is_empty() {
@@ -1159,6 +1173,12 @@ mod tests {
 
     #[test]
     fn run_args_need_the_separator() {
+        let default_spot = RunArgs::try_parse_from_args(&["--", "echo", "hi"]).unwrap();
+        assert!(!default_spot.spot); // The flag is legacy; the launcher still requests Spot.
+        let resume =
+            RunArgs::try_parse_from_args(&["--resume", "previous-job", "--", "echo", "hi"])
+                .unwrap();
+        assert_eq!(resume.resume.as_deref(), Some("previous-job"));
         let a = RunArgs::try_parse_from_args(&[
             "--spot",
             "--paths",
