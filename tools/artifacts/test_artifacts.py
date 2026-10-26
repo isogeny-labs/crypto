@@ -169,6 +169,56 @@ class RoundTrip(unittest.TestCase):
         self.git("commit", "-qm", "move it")
         self.assertEqual(self.art("check", base).returncode, 0)
 
+    def test_migrate_selects_changed_data_and_replays_remote(self):
+        base = self.git("rev-parse", "HEAD").strip()
+        payload = os.urandom(100_000)
+        (self.repo / "new.jsonl").write_bytes(payload)
+        (self.repo / "code.py").write_text("x = 1\n")
+        self.git("add", "-A")
+        self.git("commit", "-qm", "new files")
+        dry = self.art("migrate", base, "--dry-run").stdout
+        self.assertIn("new.jsonl", dry)
+        self.assertNotIn("research/r1/runs/a.jsonl", dry)
+        self.art("migrate", base)
+        digest = hashlib.sha256(payload).hexdigest()
+        self.assertEqual((self.remote / "sha256" / digest[:2] / digest).read_bytes(), payload)
+        staged = self.git("diff", "--cached", "--name-status")
+        self.assertIn("D\tnew.jsonl", staged)
+        self.assertIn("A\t.artifacts.json", staged)
+        self.assertIn("A\t.gitignore", staged)
+        self.assertNotIn("research/r1/runs/a.jsonl", staged)
+
+    def test_migrate_refuses_same_size_corrupt_remote_before_staging(self):
+        base = self.git("rev-parse", "HEAD").strip()
+        payload = os.urandom(100_000)
+        (self.repo / "new.jsonl").write_bytes(payload)
+        self.git("add", "-A")
+        self.git("commit", "-qm", "new data")
+        digest = hashlib.sha256(payload).hexdigest()
+        obj = self.remote / "sha256" / digest[:2] / digest
+        obj.parent.mkdir(parents=True)
+        obj.write_bytes(b"x" * len(payload))
+        result = self.art("migrate", base, check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("remote byte replay failed", result.stderr)
+        self.assertIn("D\tnew.jsonl", self.git("diff", "--cached", "--name-status"))
+        # A failed replay can leave a staged migration for inspection, but
+        # the workflow's commit step must not run after the nonzero exit.
+
+    def test_migrate_from_sparse_checkout_fetches_changed_blob(self):
+        base = self.git("rev-parse", "HEAD").strip()
+        payload = os.urandom(100_000)
+        path = self.repo / "research/r1/runs/new.jsonl"
+        path.write_bytes(payload)
+        self.git("add", "-A")
+        self.git("commit", "-qm", "new data")
+        self.git("sparse-checkout", "set", "--no-cone", "/*", "!/research/")
+        self.assertFalse(path.exists())
+        self.art("migrate", base)
+        digest = hashlib.sha256(payload).hexdigest()
+        self.assertEqual((self.remote / "sha256" / digest[:2] / digest).read_bytes(), payload)
+        self.assertIn("D\tresearch/r1/runs/new.jsonl", self.git("diff", "--cached", "--name-status"))
+
     def test_check_gate_in_blobless_clone(self):
         # CI checks out with `filter: blob:none`: a modified file's blob is
         # not local until asked for, and a partial clone fetches a missing

@@ -1,0 +1,152 @@
+R5.3 reproduction (descending ladder, Auto): 20 rows with the same ell, 20 with the same p and the same counted ladder Meq
+ladder rows 20; ascending reached the crater in 19
+
+Projected find, local exponents over 2-octave windows (karatsuba | auto | ntt):
+  log2 ell  5.0.. 7.0: 2.575 [2.438, 2.712] | 2.575 [2.438, 2.712] | 2.186 [1.771, 2.601]
+  log2 ell  6.0.. 8.0: 2.548 [2.402, 2.693] | 2.548 [2.402, 2.693] | 1.843 [1.490, 2.197]
+  log2 ell  7.0.. 9.0: 2.563 [2.420, 2.706] | 2.563 [2.420, 2.706] | 2.091 [1.646, 2.535]
+  log2 ell  8.0..10.0: 2.571 [2.424, 2.718] | 2.555 [2.404, 2.707] | 2.331 [1.919, 2.743]
+  log2 ell  9.0..11.0: 2.550 [2.403, 2.698] | 2.449 [2.263, 2.635] | 2.057 [1.665, 2.450]
+  log2 ell 10.0..12.0: 2.542 [2.399, 2.686] | 2.269 [1.973, 2.564] | 2.035 [1.642, 2.428]
+  log2 ell 11.0..13.0: 2.569 [2.424, 2.713] | 2.112 [1.745, 2.480] | 2.040 [1.646, 2.435]
+  log2 ell 12.0..14.0: 2.564 [2.422, 2.707] | 2.027 [1.631, 2.423] | 2.027 [1.631, 2.422]
+  log2 ell 13.0..15.0: 2.553 [2.410, 2.697] | 2.018 [1.622, 2.414] | 2.018 [1.622, 2.414]
+  log2 ell 14.0..16.0: 2.553 [2.405, 2.702] | 1.748 [1.409, 2.086] | 1.748 [1.409, 2.086]
+
+Projection / measured (desc, Auto, expected find): 37:1.0015 41:1.0027 47:1.0044 59:1.0044 67:1.0039 79:1.0015 97:1.0028 109:1.0021 131:1.0026 157:1.0010 181:1.0019 223:1.0020 257:1.0012 307:1.0010 367:1.0009 431:1.0009 521:1.0011 613:1.0010 727:1.0006 863:1.0007
+
+Phi rows 23; ascending reached the crater in 20; library Elkies succeeded in both directions in 23
+
+Fits: log2(cost) = log2_constant + exponent * log2(ell), OLS, 95% t-interval
+  ladder find expected, desc, Auto (measured)                        ell >= 30  exponent 2.582 [2.544, 2.620]  log2 c 9.55  n=20 r2=0.9991
+  ladder find expected, desc, Auto (measured)                        ell >= 256 exponent 2.554 [2.352, 2.756]  log2 c 9.81  n=8 r2=0.9937
+  ladder find expected, asc, Auto (measured)                         ell >= 30  exponent 2.587 [2.547, 2.628]  log2 c 9.51  n=19 r2=0.9991
+  ladder find expected, asc, Auto (measured)                         ell >= 256 exponent 2.554 [2.352, 2.756]  log2 c 9.81  n=8 r2=0.9937
+  projected find expected, karatsuba                                 ell >= 30  exponent 2.583 [2.573, 2.594]  log2 c 9.56  n=45 r2=0.9998
+  projected find expected, karatsuba                                 ell >= 2^10 exponent 2.579 [2.553, 2.605]  log2 c 9.62  n=25 r2=0.9995
+  projected find expected, auto                                      ell >= 30  exponent 2.332 [2.287, 2.376]  log2 c 11.51  n=45 r2=0.9962
+  projected find expected, auto                                      ell >= 2^10 exponent 2.088 [2.020, 2.155]  log2 c 14.75  n=25 r2=0.9944
+  projected find expected, ntt                                       ell >= 30  exponent 2.116 [2.087, 2.144]  log2 c 14.40  n=45 r2=0.9980
+  projected find expected, ntt                                       ell >= 2^10 exponent 2.047 [1.978, 2.116]  log2 c 15.32  n=25 r2=0.9939
+  projected find expected, auto                                      ell >= 2^13 exponent 1.919 [1.724, 2.115]  log2 c 17.23  n=13 r2=0.9770
+  projected find expected, ntt                                       ell >= 2^13 exponent 1.919 [1.724, 2.115]  log2 c 17.23  n=13 r2=0.9770
+  psi route find, desc (measured)                                    all        exponent 3.565 [3.302, 3.828]  log2 c 10.50  n=9 r2=0.9932
+  psi route find, asc (measured)                                     all        exponent 3.439 [3.087, 3.791]  log2 c 10.24  n=8 r2=0.9896
+  psi route find, desc (measured)                                    ell >= 50  exponent 3.741 [3.283, 4.199]  log2 c 9.34  n=6 r2=0.9922
+  psi route find, asc (measured)                                     ell >= 50  exponent 3.535 [2.735, 4.334]  log2 c 9.62  n=6 r2=0.9740
+  psi_ell by recurrences (measured)                                  all        exponent 2.817 [2.724, 2.911]  log2 c 3.10  n=9 r2=0.9986
+  Phi route counted (eval + roots), desc                             all        exponent 1.884 [1.804, 1.964]  log2 c 8.88  n=23 r2=0.9913
+  Phi route counted (eval + roots), asc                              all        exponent 1.748 [1.659, 1.836]  log2 c 8.17  n=20 r2=0.9896
+  library Phi_ell mod p (q-series), SECONDS contended                ell >= 20  exponent 4.600 [4.515, 4.684]  log2 c -22.22  n=19 r2=0.9987
+
+Ascending vs descending at equal ell (counted Meq):
+  ladder (a), expected find, Auto: desc exponent 2.582 [2.544, 2.620] | asc 2.587 [2.547, 2.628] (disjoint: false); level at log2 ell = 7.52: desc 28.971 [28.916, 29.026] | asc 28.973 [28.918, 29.028] (disjoint: false); paired asc/desc = 1.001 [1.001, 1.002] over n=19
+  ladder (a), realised repeated finds (mean per ell): desc exponent 2.531 [2.137, 2.925] | asc 3.082 [2.377, 3.787] (disjoint: false); level at log2 ell = 6.40: desc 25.769 [25.550, 25.989] | asc 26.002 [25.480, 26.524] (disjoint: false); paired asc/desc = 1.175 [0.754, 1.831] over n=10
+  psi (b), find: desc exponent 3.565 [3.302, 3.828] | asc 3.439 [3.087, 3.791] (disjoint: false); level at log2 ell = 6.15: desc 32.403 [32.239, 32.566] | asc 31.404 [31.189, 31.619] (disjoint: true); paired asc/desc = 0.501 [0.457, 0.548] over n=8
+  Phi (c), counted eval + roots: desc exponent 1.884 [1.804, 1.964] | asc 1.748 [1.659, 1.836] (disjoint: false); level at log2 ell = 5.66: desc 19.532 [19.463, 19.601] | asc 18.057 [17.982, 18.132] (disjoint: true); paired asc/desc = 0.360 [0.347, 0.373] over n=20
+
+Falsifier 1 (generic exponent < 2 with NTT): measured Auto desc ell>=256 2.554 [2.352, 2.756] below 2: false; projected auto ell>=2^13 1.919 [1.724, 2.115] below 2: false; projected ntt ell>=2^13 1.919 [1.724, 2.115] below 2: false
+
+Derived (extrapolated) crossover: smallest ell with find+evaluate >= g * sqrt(pi r / 4) F_p mults
+  g=6 M/op, r=2^64: rho = 2^34.41 M, ell_max = 2^33
+    [R5.3] rational kernel, Velu (fit ell>=2^10)                                         log2 ell* =   31.90  (crossover inside the possible range)
+    [R5.3] rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                 log2 ell* =   35.88  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^16)                                 log2 ell* =   36.42  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^20)                                 log2 ell* =   37.44  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)      log2 ell* =   40.94  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] generic kernel, NTT fit (ell>=256, central)                                   log2 ell* =    9.61  (crossover inside the possible range)
+    generic (a) ladder desc, measured Auto fit ell>=256                                  log2 ell* =    9.61  (inside the possible range)
+    generic (a) ladder asc, measured Auto fit ell>=256                                   log2 ell* =    9.61  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^10                                    log2 ell* =    9.38  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13                                    log2 ell* =    8.92  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13, exponent at CI low end            log2 ell* =    8.11  (inside the possible range)
+    generic (a') ladder, projected NTT fit ell>=2^13                                     log2 ell* =    8.92  (inside the possible range)
+    generic (a') ladder, model l^2 log l calibrated at top projected Auto                log2 ell* =    9.72  (inside the possible range)
+    generic (b) psi + CZ desc, measured fit                                              log2 ell* =    6.69  (inside the possible range)
+    generic (b) psi + gcd asc, measured fit                                              log2 ell* =    7.01  (inside the possible range)
+    generic (c) Phi eval+roots desc, LOWER BOUND (Phi_ell mod p not counted)             log2 ell* =   13.52  (inside the possible range)
+  g=6 M/op, r=2^128: rho = 2^66.41 M, ell_max = 2^65
+    [R5.3] rational kernel, Velu (fit ell>=2^10)                                         log2 ell* =   64.07  (crossover inside the possible range)
+    [R5.3] rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                 log2 ell* =   74.83  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^16)                                 log2 ell* =   76.54  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^20)                                 log2 ell* =   80.40  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)      log2 ell* =   99.80  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] generic kernel, NTT fit (ell>=256, central)                                   log2 ell* =   21.74  (crossover inside the possible range)
+    generic (a) ladder desc, measured Auto fit ell>=256                                  log2 ell* =   21.74  (inside the possible range)
+    generic (a) ladder asc, measured Auto fit ell>=256                                   log2 ell* =   21.74  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^10                                    log2 ell* =   24.23  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13                                    log2 ell* =   25.07  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13, exponent at CI low end            log2 ell* =   26.10  (inside the possible range)
+    generic (a') ladder, projected NTT fit ell>=2^13                                     log2 ell* =   25.07  (inside the possible range)
+    generic (a') ladder, model l^2 log l calibrated at top projected Auto                log2 ell* =   24.55  (inside the possible range)
+    generic (b) psi + CZ desc, measured fit                                              log2 ell* =   15.38  (inside the possible range)
+    generic (b) psi + gcd asc, measured fit                                              log2 ell* =   16.02  (inside the possible range)
+    generic (c) Phi eval+roots desc, LOWER BOUND (Phi_ell mod p not counted)             log2 ell* =   29.98  (inside the possible range)
+  g=6 M/op, r=2^256: rho = 2^130.41 M, ell_max = 2^129
+    [R5.3] rational kernel, Velu (fit ell>=2^10)                                         log2 ell* =  128.40  (crossover inside the possible range)
+    [R5.3] rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                 log2 ell* =  152.72  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^16)                                 log2 ell* =  156.79  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^20)                                 log2 ell* =  166.32  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)      log2 ell* =  223.16  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] generic kernel, NTT fit (ell>=256, central)                                   log2 ell* =   46.41  (crossover inside the possible range)
+    generic (a) ladder desc, measured Auto fit ell>=256                                  log2 ell* =   46.41  (inside the possible range)
+    generic (a) ladder asc, measured Auto fit ell>=256                                   log2 ell* =   46.41  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^10                                    log2 ell* =   54.41  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13                                    log2 ell* =   57.89  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13, exponent at CI low end            log2 ell* =   62.64  (inside the possible range)
+    generic (a') ladder, projected NTT fit ell>=2^13                                     log2 ell* =   57.89  (inside the possible range)
+    generic (a') ladder, model l^2 log l calibrated at top projected Auto                log2 ell* =   55.47  (inside the possible range)
+    generic (b) psi + CZ desc, measured fit                                              log2 ell* =   33.05  (inside the possible range)
+    generic (b) psi + gcd asc, measured fit                                              log2 ell* =   34.34  (inside the possible range)
+    generic (c) Phi eval+roots desc, LOWER BOUND (Phi_ell mod p not counted)             log2 ell* =   63.42  (inside the possible range)
+  g=12 M/op, r=2^64: rho = 2^35.41 M, ell_max = 2^33
+    [R5.3] rational kernel, Velu (fit ell>=2^10)                                         log2 ell* =   32.91  (crossover inside the possible range)
+    [R5.3] rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                 log2 ell* =   37.10  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^16)                                 log2 ell* =   37.67  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^20)                                 log2 ell* =   38.78  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)      log2 ell* =   42.70  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] generic kernel, NTT fit (ell>=256, central)                                   log2 ell* =   10.00  (crossover inside the possible range)
+    generic (a) ladder desc, measured Auto fit ell>=256                                  log2 ell* =   10.00  (inside the possible range)
+    generic (a) ladder asc, measured Auto fit ell>=256                                   log2 ell* =   10.00  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^10                                    log2 ell* =    9.86  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13                                    log2 ell* =    9.44  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13, exponent at CI low end            log2 ell* =    8.69  (inside the possible range)
+    generic (a') ladder, projected NTT fit ell>=2^13                                     log2 ell* =    9.44  (inside the possible range)
+    generic (a') ladder, model l^2 log l calibrated at top projected Auto                log2 ell* =   10.19  (inside the possible range)
+    generic (b) psi + CZ desc, measured fit                                              log2 ell* =    6.97  (inside the possible range)
+    generic (b) psi + gcd asc, measured fit                                              log2 ell* =    7.30  (inside the possible range)
+    generic (c) Phi eval+roots desc, LOWER BOUND (Phi_ell mod p not counted)             log2 ell* =   14.05  (inside the possible range)
+  g=12 M/op, r=2^128: rho = 2^67.41 M, ell_max = 2^65
+    [R5.3] rational kernel, Velu (fit ell>=2^10)                                         log2 ell* =   65.07  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                 log2 ell* =   76.04  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^16)                                 log2 ell* =   77.80  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^20)                                 log2 ell* =   81.74  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)      log2 ell* =  101.69  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] generic kernel, NTT fit (ell>=256, central)                                   log2 ell* =   22.13  (crossover inside the possible range)
+    generic (a) ladder desc, measured Auto fit ell>=256                                  log2 ell* =   22.13  (inside the possible range)
+    generic (a) ladder asc, measured Auto fit ell>=256                                   log2 ell* =   22.14  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^10                                    log2 ell* =   24.71  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13                                    log2 ell* =   25.59  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13, exponent at CI low end            log2 ell* =   26.68  (inside the possible range)
+    generic (a') ladder, projected NTT fit ell>=2^13                                     log2 ell* =   25.59  (inside the possible range)
+    generic (a') ladder, model l^2 log l calibrated at top projected Auto                log2 ell* =   25.04  (inside the possible range)
+    generic (b) psi + CZ desc, measured fit                                              log2 ell* =   15.66  (inside the possible range)
+    generic (b) psi + gcd asc, measured fit                                              log2 ell* =   16.31  (inside the possible range)
+    generic (c) Phi eval+roots desc, LOWER BOUND (Phi_ell mod p not counted)             log2 ell* =   30.51  (inside the possible range)
+  g=12 M/op, r=2^256: rho = 2^131.41 M, ell_max = 2^129
+    [R5.3] rational kernel, Velu (fit ell>=2^10)                                         log2 ell* =  129.41  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu Karatsuba (fit ell>=2^16, this run)                 log2 ell* =  153.93  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^16)                                 log2 ell* =  158.04  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (fit ell>=2^20)                                 log2 ell* =  167.66  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] rational kernel, sqrt-elu NTT (model sqrt(l) log^2 l, calibrated at top)      log2 ell* =  225.11  (beyond ell_max = 2 sqrt(p): no vertical gap that large exists)
+    [R5.3] generic kernel, NTT fit (ell>=256, central)                                   log2 ell* =   46.80  (crossover inside the possible range)
+    generic (a) ladder desc, measured Auto fit ell>=256                                  log2 ell* =   46.80  (inside the possible range)
+    generic (a) ladder asc, measured Auto fit ell>=256                                   log2 ell* =   46.80  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^10                                    log2 ell* =   54.88  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13                                    log2 ell* =   58.41  (inside the possible range)
+    generic (a') ladder, projected Auto fit ell>=2^13, exponent at CI low end            log2 ell* =   63.22  (inside the possible range)
+    generic (a') ladder, projected NTT fit ell>=2^13                                     log2 ell* =   58.41  (inside the possible range)
+    generic (a') ladder, model l^2 log l calibrated at top projected Auto                log2 ell* =   55.96  (inside the possible range)
+    generic (b) psi + CZ desc, measured fit                                              log2 ell* =   33.33  (inside the possible range)
+    generic (b) psi + gcd asc, measured fit                                              log2 ell* =   34.63  (inside the possible range)
+    generic (c) Phi eval+roots desc, LOWER BOUND (Phi_ell mod p not counted)             log2 ell* =   63.95  (inside the possible range)

@@ -95,6 +95,7 @@
 pub mod aes;
 pub mod ai_schoof;
 pub mod algebra_cache;
+pub mod aps_single_relation;
 pub mod aut_folded_rho;
 pub mod auto_attack;
 pub mod avalanche;
@@ -188,6 +189,8 @@ pub mod gf3m;
 pub mod ghs_class_coverage;
 pub mod ghs_descent;
 pub mod ghs_full_attack;
+pub mod ghs_generalized;
+pub mod ghs_quadratic;
 pub mod ghs_screen;
 pub mod ghs_smooth;
 pub mod ghs_transport;
