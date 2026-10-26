@@ -51,6 +51,32 @@ class ArchivedLabelTests(unittest.TestCase):
         with patch.object(names, "tracked", return_value=[report]):
             self.assertEqual(names.lint(self.resolver, {}, False), [])
 
+    def test_frozen_unregistered_curve_ids_require_exact_path_hash_and_slug(self):
+        cases = {
+            "docs/ic/CERTICOM131_IC_PROGRAM.md": {
+                "icv1-fp30-t49927-d70f5de2",
+                "icv1-fp131-t29529377007934231835-9681b699",
+            },
+            "docs/index-calculus-scoreboard.html": {"icv1-fp30-t49927-d70f5de2"},
+            "research/certicom131_ic_program_20261020/README.md": {
+                "icv1-fp30-t49927-d70f5de2",
+                "icv1-fp131-t29529377007934231835-9681b699",
+            },
+            "research/certicom131_ic_program_20261020/pkm_ext/tables/p30.table.md": {
+                "icv1-fp30-t49927-d70f5de2",
+            },
+        }
+        for rel, slugs in cases.items():
+            with self.subTest(path=rel):
+                text = (names.REPO / rel).read_text()
+                for slug in slugs:
+                    self.assertIn(slug, text)
+                    self.assertTrue(names.archived_slug(rel, text, slug))
+                    self.assertFalse(names.archived_slug(rel, text + "\n", slug))
+                    self.assertFalse(names.archived_slug("ordinary/REPORT.md", text, slug))
+                with patch.object(names, "tracked", return_value=[rel]):
+                    self.assertEqual(names.lint(self.resolver, {}, False), [])
+
 
 if __name__ == "__main__":
     unittest.main()
