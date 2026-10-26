@@ -350,6 +350,7 @@ pub mod tls13_kdf;
 pub mod two_sylow_search;
 pub mod visual_demos;
 pub mod visualize;
+pub mod volcano;
 pub mod wdsat_oracle;
 pub mod weil_charts;
 pub mod wide_gf2m;
