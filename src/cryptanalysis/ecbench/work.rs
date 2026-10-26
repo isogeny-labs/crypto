@@ -656,6 +656,12 @@ pub fn widths_of(curve: &CurveFacts) -> Result<Widths, String> {
         "fp4" => Field::Fp4 {
             bits: curve.field_bits.ok_or("fp4 curve without field_bits")?,
         },
+        // A Jacobian over F_p: its records count F_p primitives directly.
+        "hyperelliptic" => Field::Prime {
+            bits: curve
+                .field_bits
+                .ok_or("hyperelliptic curve without field_bits")?,
+        },
         f => return Err(format!("no bitop/v1 field for family `{f}`")),
     };
     Ok(Widths { field, r_bits })
@@ -677,10 +683,51 @@ pub struct Priceable<'a> {
     pub solver: Option<&'a SolverStats>,
 }
 
+/// Whether a method counts its own `bitop/v1` primitives (`ecbench::hec`).
+fn is_hec(method: &str) -> bool {
+    method.starts_with("hec.")
+}
+
+/// The primitives a `hec.*` record counts, by name: exactly the kinds of
+/// `prime_hyperelliptic::ops`.
+fn hec_prim(name: &str) -> Option<Prim> {
+    use crate::prime_hyperelliptic::ops::Kind;
+    Kind::ALL
+        .iter()
+        .map(|k| k.prim())
+        .find(|p| p.name() == name)
+}
+
+/// Counters of a `hec.*` record (`ecbench::hec`).  The phases' natives are
+/// primitive counts, priced one to one; everything else is shape: group
+/// operations already inside those primitives, outcomes, and the
+/// validation subset (`validation_<prim>`), which is inside the phase counts
+/// and reported beside them, never added again.
+fn hec_shape(counter: &str) -> bool {
+    matches!(
+        counter,
+        "rng_words"
+            | "jacobian_ops"
+            | "precompute_ops"
+            | "walk_ops"
+            | "restarts"
+            | "fruitless_ops"
+            | "factor_base_size"
+            | "trials"
+            | "smooth_trials"
+            | "relations"
+            | "solve_row_ops"
+            | "smoothness_field_ops"
+    ) || counter
+        .strip_prefix("validation_")
+        .is_some_and(|p| hec_prim(p).is_some())
+}
+
 /// Price a record in `bitop/v1`.
 pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
     let widths = widths_of(x.curve)?;
     let method = x.method_id;
+    let hec = is_hec(method);
     let ic = is_ic(method);
     let strong = method.starts_with("rho.signed_frobenius_strong");
     let mut unpriced: Vec<String> = Vec::new();
@@ -692,6 +739,25 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
             continue;
         }
         let mut prims: BTreeMap<Prim, u128> = BTreeMap::new();
+        if hec {
+            // Counted primitives, one to one.  Its `gae` is Jacobian group
+            // operations whose field work is already in these counts.
+            for (name, &count) in p.native.iter().chain(p.work_native.iter()) {
+                if count == 0 {
+                    continue;
+                }
+                match hec_prim(name) {
+                    Some(prim) => *prims.entry(prim).or_default() += count as u128,
+                    None if hec_shape(name) => {}
+                    None => push_unique(&mut unpriced, name),
+                }
+            }
+            if p.adds + p.doubles + p.scalar_mults > 0 {
+                push_unique(&mut unpriced, "hec_elliptic_group_operations");
+            }
+            phases.push((p.name.clone(), prims));
+            continue;
+        }
         if gae_carries_group_ops(method) && p.adds + p.doubles == 0 {
             let ops = p.gae.round() as u128;
             let doubles = if p.name == "search" {
@@ -750,7 +816,13 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
         phases.push((p.name.clone(), prims));
     }
 
-    if ic {
+    if hec {
+        for (name, &count) in x.counters {
+            if count != 0 && !hec_shape(name) {
+                push_unique(&mut unpriced, name);
+            }
+        }
+    } else if ic {
         // ic.k4_gaudry keeps its linear algebra and oracle in top-level
         // counters only; every other IC counter repeats a phase native or is
         // a shape figure.

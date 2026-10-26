@@ -2086,3 +2086,88 @@ fn field_operations_are_counted_bounded_and_judged() {
     assert!(!kv["statement"].as_str().unwrap().contains("field_"));
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn hyperelliptic_ic_and_rho_run_verify_replay_and_price_completely() {
+    // A genus-2 Jacobian over F_41 (r = 1321): both hec methods, a planted
+    // target, two rounds; every run verifies in the runner, replays exactly,
+    // and `work` prices it with nothing missing.
+    let dir = scratch("hec");
+    let spec = dir.join("spec.json");
+    std::fs::write(
+        &spec,
+        r#"{
+  "schema":"ecbench.spec/v1",
+  "label":"hec integration",
+  "workloads":{"curves":[{"kind":"hec_thread","p":41,"genus":2}],"targets_per_curve":1,"target_seed":5},
+  "arms":[
+    {"name":"rho","role":"reference","method":{"id":"hec.rho_full_width"}},
+    {"name":"ic","role":"candidate","method":{"id":"hec.ic_fb_walk","params":{"branches":"64","d_step_in":"4","extra_relations":"8"}}}
+  ],
+  "measurement":{"rounds":2,"warmup":0,"seed":17,"isolation_required":"L0","timeout_seconds":120}
+}"#,
+    )
+    .unwrap();
+    let records = |out: &Path| -> Vec<Value> {
+        std::fs::read_to_string(out.join("records.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect()
+    };
+    let (a, b) = (dir.join("a"), dir.join("b"));
+    for out in [&a, &b] {
+        let (ok, err) = run_spec(&dir, out, &[]);
+        assert!(ok, "{err}");
+    }
+    let (ra, rb) = (records(&a), records(&b));
+    assert_eq!(ra.len(), 4);
+    for (x, y) in ra.iter().zip(&rb) {
+        assert_eq!(x["outcome"]["status"], "verified", "{x}");
+        assert_eq!(x["workload"]["curve"]["family"], "hyperelliptic");
+        // Two sessions of one spec: the same seeds give the same counts.
+        assert_eq!(x["algorithm_seed"], y["algorithm_seed"]);
+        for key in ["phases", "counters"] {
+            let strip = |v: &Value| {
+                let mut v = v[key].clone();
+                if let Some(ps) = v.as_array_mut() {
+                    for p in ps {
+                        p["wall_ns"] = Value::Null;
+                    }
+                }
+                v
+            };
+            assert_eq!(strip(x), strip(y), "{key}");
+        }
+        assert_eq!(x["work"]["complete"], true, "{}", x["work"]);
+        assert_eq!(x["work"]["bitops"], y["work"]["bitops"]);
+    }
+    let receipt = dir.join("audit.json");
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        a.to_str().unwrap(),
+        "--replay-all",
+        "--out",
+        receipt.to_str().unwrap(),
+        "--exit-code",
+    ]);
+    assert!(ok, "{err}");
+    let audit: Value = serde_json::from_str(&std::fs::read_to_string(receipt).unwrap()).unwrap();
+    assert_eq!(audit["replays"].as_array().unwrap().len(), 4);
+    assert!(audit["replays"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|r| r["reproduced"] == true));
+    let (ok, out, err) = ecbench(&["work", "--counted", a.to_str().unwrap()]);
+    assert!(ok, "{err}");
+    let lines: Vec<Value> = out
+        .lines()
+        .map(|l| serde_json::from_str(l).unwrap())
+        .collect();
+    assert_eq!(lines.len(), 4);
+    assert!(lines
+        .iter()
+        .all(|l| l["work"]["Ok"]["complete"] == true || l["work"]["complete"] == true));
+}
