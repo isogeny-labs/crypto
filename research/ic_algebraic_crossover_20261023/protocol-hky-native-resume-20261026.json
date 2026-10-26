@@ -1,0 +1,634 @@
+{
+  "amendments": [
+    {
+      "changes": [
+        "New prospective122tuple/244child continuation; four actual legacy caps excluded without retry.",
+        "Native Rust orchestration/schema/export/manifest verification, fixed source/binary pins and complete numeric Cartesian export mapping.",
+        "Scientific instrument, inputs, analysis source, metrics, caps, ordinal order, sentinel seed and unknown-cost rules are unchanged."
+      ],
+      "filed": "2026-10-26",
+      "filed_before_affected_data": true,
+      "id": "native-orchestration-continuation",
+      "reason": "Replace the relevant legacy Python execution path and correct restore-manifest ordering before further research executions, preserving all existing evidence.",
+      "supersedes_fields": [
+        "protocol_id",
+        "sample_size.instances",
+        "extensions.orchestration_sha256",
+        "analysis_plan.inputs",
+        "execution.queue"
+      ]
+    }
+  ],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "pipeline-receipts/completed-guess-hky-native-resume-20261026/{hky,hky-aa}/d*-k*-b*/*"
+    ],
+    "outputs": [
+      "Native replay-summary JSON, complete experiment.export/v1 and raw archive"
+    ],
+    "script": {
+      "path": "../../examples/ic_guess_completed_audit.rs",
+      "sha256": "36406b33587c32648d19d3cc9f70bbd794613f2eb8414f70e2fa82b97430c65a"
+    }
+  },
+  "arms": [
+    {
+      "description": "Independent HKY replay of every original (draw,k,branch) case.",
+      "id": "hky",
+      "instrument": {
+        "binary_sha256": "7b3bacada4f9a734790e3b55a2dd7883c872a5e34f70229864d5e25c818c8aeb",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--example",
+            "ic_guess_completed_audit"
+          ]
+        ],
+        "commit": "a214e78d76e6096c9768d5e899fd06386ba62ea6",
+        "env": {
+          "HKY_CHUNK": "1024",
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "address_space_bytes": 8589934592,
+        "degree_cap": 4,
+        "per_child_timeout_seconds": 900
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Second fresh process on the identical frozen case; tests determinism, not timing noise.",
+      "id": "hky-aa",
+      "instrument": {
+        "binary_sha256": "7b3bacada4f9a734790e3b55a2dd7883c872a5e34f70229864d5e25c818c8aeb",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--example",
+            "ic_guess_completed_audit"
+          ]
+        ],
+        "commit": "a214e78d76e6096c9768d5e899fd06386ba62ea6",
+        "env": {
+          "HKY_CHUNK": "1024",
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "address_space_bytes": 8589934592,
+        "degree_cap": 4,
+        "per_child_timeout_seconds": 900
+      },
+      "role": "control_aa",
+      "same_instrument_as": "hky"
+    }
+  ],
+  "authors": [
+    "Codex"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [],
+      "id": "C-replay",
+      "text": "For uncensored producer rows among these 122 remaining tuples, independently built equations and bounded HKY verdicts agree on the exact original Boolean branches. A result for a producer-censored row never repairs its unknown original cost."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [],
+      "id": "C-aa",
+      "text": "Fresh processes preserve the full-column count, plain/closure ranks and verdict on successfully completed matched pairs in the 122-tuple continuation. Caps cannot establish pair equality."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": "C-aa-pair",
+      "not_applicable_reason": null,
+      "present": true
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "No claim about typical curves, a null population, degree growth or performance. The entire previously registered branch census is checked; nonrefuting fixed points and caps remain distinct from solutions.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Exact finite replay, not an empirical detector/population claim: all source fixtures have certified zero Boolean roots, every invocation rebuilds equations twice, uncensored producer verdicts are asserted, and the native unit suite checks positive algebraic and fail-closed parsing controls before execution. No detector-power generalization is made.",
+      "present": false
+    }
+  },
+  "created": "2026-10-26",
+  "decision_rule": {
+    "comparison_ids": [
+      "C-case-validation"
+    ],
+    "effect_size_measure": "Not applicable: exact finite replication, no cost or population effect estimate.",
+    "interval": "none_exact",
+    "multiple_comparison_correction": "none",
+    "statistic": "Native verified/capped/error counts, exact rank/verdict equality and registered-prefix minima.",
+    "text": "Native fail-closed analysis retains all244registered continuation statuses. Full finite replay success requires all244outputs to validate and all122A/A rank/verdict pairs to agree. Caps/errors remain inconclusive. The original248 registration and its four legacy caps are separate historical evidence. Only complete registered-prefix families can have minima, never arbitrary subsets.",
+    "threshold": "Exact finite equality and complete case coverage; no significance threshold.",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": 30,
+      "interval_seconds": 900,
+      "policy": "application",
+      "restore_validation": "manifest_sha256"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "address_space_bytes": 8589934592,
+      "cpus": 1,
+      "extra_cloud_budget_usd": 100,
+      "extra_vm": false,
+      "per_child_timeout_seconds": 900,
+      "scope": "One local native-controller batch, no extra VM. The original scientific executable, single-thread settings,8GiB address-space cap and900-second per-child watchdog remain unchanged."
+    },
+    "queue": "native blocking flock /tmp/crypto-bench.lock per scientific child",
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 250000
+  },
+  "extensions": {
+    "additional_counted_work": "244fresh native-controller children plus four preserved historical caps, reported separately. A/A checks determinism only. All clock values remain invalid for performance inference; independent word cost and the producer-censored original cost remain unknown.",
+    "binary_archive": "evidence/binary-hky-restart-20261026.tar.xz",
+    "build_receipt": "pipeline-receipts/hky-restart-build-20261026/status.json",
+    "checkpoint_token_selector_only": "CHECKPOINT_TOKEN_FILE=/workspace/.ic-private-checkpoint/upload-token; never token values in records",
+    "frozen_binary_path": "/workspace/ic-frozen-20261026/ic_guess_completed_audit-restart",
+    "input_sha256": "95ee147e1221ce4ef6c98bdd0b808398a01362343ffaa66debc217d6eeff5a9b",
+    "native_aggregate_command": [
+      "ic_guess_completed_audit-restart",
+      "replay-summary",
+      "research/ic_algebraic_crossover_20261023",
+      "research/ic_algebraic_crossover_20261023/pipeline-receipts/completed-guess-hky-native-resume-20261026"
+    ],
+    "native_resume": {
+      "binary_sha256": "210c351e12132bc6c7b251a0bed2e52bb8a65733fa63b386875b3ac1eb456c30",
+      "caps": {
+        "address_space_bytes": 8589934592,
+        "hky_chunk": 1024,
+        "outer_seconds": 250000,
+        "per_child_seconds": 900,
+        "threads": 1
+      },
+      "expected_new_processes": 244,
+      "export_directory": "exports/hky-native-resume-20261026",
+      "export_schema": {
+        "path": "/workspace/crypto-autoresearcher/schemas/experiment-export.v1.json",
+        "sha256": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757"
+      },
+      "identical_source_tree": "58262348a13e076c12531ff63f3c6df404edc776",
+      "instances": [
+        "d0-k1-b1",
+        "d0-k2-b0",
+        "d0-k2-b1",
+        "d0-k2-b2",
+        "d0-k2-b3",
+        "d0-k3-b0",
+        "d0-k3-b1",
+        "d0-k3-b2",
+        "d0-k3-b3",
+        "d0-k3-b4",
+        "d0-k3-b5",
+        "d0-k3-b6",
+        "d0-k3-b7",
+        "d0-k4-b0",
+        "d0-k4-b1",
+        "d0-k4-b2",
+        "d0-k4-b3",
+        "d0-k4-b4",
+        "d0-k4-b5",
+        "d0-k4-b6",
+        "d0-k4-b7",
+        "d0-k4-b8",
+        "d0-k4-b9",
+        "d0-k4-b10",
+        "d0-k4-b11",
+        "d0-k4-b12",
+        "d0-k4-b13",
+        "d0-k4-b14",
+        "d0-k4-b15",
+        "d3-k0-b0",
+        "d3-k1-b0",
+        "d3-k1-b1",
+        "d3-k2-b0",
+        "d3-k2-b1",
+        "d3-k2-b2",
+        "d3-k2-b3",
+        "d3-k3-b0",
+        "d3-k3-b1",
+        "d3-k3-b2",
+        "d3-k3-b3",
+        "d3-k3-b4",
+        "d3-k3-b5",
+        "d3-k3-b6",
+        "d3-k3-b7",
+        "d3-k4-b0",
+        "d3-k4-b1",
+        "d3-k4-b2",
+        "d3-k4-b3",
+        "d3-k4-b4",
+        "d3-k4-b5",
+        "d3-k4-b6",
+        "d3-k4-b7",
+        "d3-k4-b8",
+        "d3-k4-b9",
+        "d3-k4-b10",
+        "d3-k4-b11",
+        "d3-k4-b12",
+        "d3-k4-b13",
+        "d3-k4-b14",
+        "d3-k4-b15",
+        "d5-k0-b0",
+        "d5-k1-b0",
+        "d5-k1-b1",
+        "d5-k2-b0",
+        "d5-k2-b1",
+        "d5-k2-b2",
+        "d5-k2-b3",
+        "d5-k3-b0",
+        "d5-k3-b1",
+        "d5-k3-b2",
+        "d5-k3-b3",
+        "d5-k3-b4",
+        "d5-k3-b5",
+        "d5-k3-b6",
+        "d5-k3-b7",
+        "d5-k4-b0",
+        "d5-k4-b1",
+        "d5-k4-b2",
+        "d5-k4-b3",
+        "d5-k4-b4",
+        "d5-k4-b5",
+        "d5-k4-b6",
+        "d5-k4-b7",
+        "d5-k4-b8",
+        "d5-k4-b9",
+        "d5-k4-b10",
+        "d5-k4-b11",
+        "d5-k4-b12",
+        "d5-k4-b13",
+        "d5-k4-b14",
+        "d5-k4-b15",
+        "d6-k0-b0",
+        "d6-k1-b0",
+        "d6-k1-b1",
+        "d6-k2-b0",
+        "d6-k2-b1",
+        "d6-k2-b2",
+        "d6-k2-b3",
+        "d6-k3-b0",
+        "d6-k3-b1",
+        "d6-k3-b2",
+        "d6-k3-b3",
+        "d6-k3-b4",
+        "d6-k3-b5",
+        "d6-k3-b6",
+        "d6-k3-b7",
+        "d6-k4-b0",
+        "d6-k4-b1",
+        "d6-k4-b2",
+        "d6-k4-b3",
+        "d6-k4-b4",
+        "d6-k4-b5",
+        "d6-k4-b6",
+        "d6-k4-b7",
+        "d6-k4-b8",
+        "d6-k4-b9",
+        "d6-k4-b10",
+        "d6-k4-b11",
+        "d6-k4-b12",
+        "d6-k4-b13",
+        "d6-k4-b14",
+        "d6-k4-b15"
+      ],
+      "legacy_archive": {
+        "actual_s3_get_receipt": "pipeline-receipts/legacy-hky-partial-20261026/remote-byte-replay.json",
+        "bytes": 18132,
+        "path": "evidence/runs-hky-legacy-orchestration-20261026.tar.xz",
+        "sha256": "2f6d57ccdaf1738a8a1a7895559505a02a9f66abb948d09a221472ade95e812c"
+      },
+      "local_build_source_commit": "254f207427ab82a44db502b40f5b407cf1f39b58",
+      "native_bootstrap": {
+        "actual_s3_get_receipt": "pipeline-receipts/native-hky-bootstrap-20261026/remote-byte-replay.json",
+        "bytes": 2136948,
+        "path": "evidence/binary-hky-native-resume-20261026.tar.xz",
+        "sha256": "4612354c71f3ab8eaad55afa5303fba05d2698ad41d2aa8fcbb533d435a1e9f0"
+      },
+      "original_protocol_sha256": "32fbd8c1e4d6b6d1f7dcde2cd06084a28551ad4954922621193846b862277f31",
+      "pause_request_path": "/workspace/ic-hky-native-pause-request",
+      "protocol_schema": {
+        "path": "/workspace/crypto-autoresearcher/schemas/experiment-protocol.v1.json",
+        "sha256": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443"
+      },
+      "public_source_commit": "9a4a9f72694ebc7340da0a7f0acaf4a5e2d318dd",
+      "run_directory": "pipeline-receipts/completed-guess-hky-native-resume-20261026",
+      "source_sha256": {
+        "research/ic_algebraic_crossover_20261023/run-hky-restart-20261026.sh": "9eaee8d8c08197f6727ce686c629e2b5e76e5155ac230355e9585d74eb912e61",
+        "tools/ic-hky-replay-records/Cargo.lock": "1009cf3614083e727f544552dc5d803287ac657ad9bb0efca9a5690f51d3566a",
+        "tools/ic-hky-replay-records/Cargo.toml": "04bffe905c2e36495852f97b16bb5c707aa701b27752d8ef2f01cc1aafff7a83",
+        "tools/ic-hky-replay-records/src/lib.rs": "39195e4b90282a5edd63266033177be08b369e3db201d2f840c3d723fab9be7b",
+        "tools/ic-hky-replay-records/src/main.rs": "674d9c7cda41fa42d50f2b2bdaf2019c7d610009a60359ffbc0864370d5e93f8",
+        "tools/ic-hky-replay-records/src/records.rs": "18848f26e9ff0d9ab2054c4a4ccf2c3a2bffb61c1ec0b396eea2630894631900"
+      },
+      "source_validation": "pipeline-receipts/native-hky-controller-source-20261026;11native tests, strict all-target Clippy0, release build0; unchanged scientific executable with its historical source-gate limitations retained"
+    },
+    "producer_receipt_sha256": "7ab26771310ecf2e09c7cbe82f5f335620e3cb27c7f15b3808df92afe617e15a",
+    "protocol_tools_commit": "6a69b2d02ecd53f1649bcf56e23e4ffe91d953ad",
+    "recovery_of": "protocol-hky-restart-20261026.json; paused after exactly four actual900s legacy child timeouts, before a fifth child started",
+    "source_gate_scope": "Own auditor6tests and20otherexampletargets35tests pass; global4991commandtimedout on unchangedJVtest after4869passes/121ignores. Strictclippy5unchangedbasewarnings retained; ownexamplediagnostics0.",
+    "strict_clippy_base_failure": "five unchanged library warnings retained, no own-example diagnostics; default warning severity completed without suppression of those warnings"
+  },
+  "freeze": {
+    "commit": "254f207427ab82a44db502b40f5b407cf1f39b58",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-10-26T22:30:09Z",
+    "protocol_sha256": "05626629bc13ad13a06bdd105917b29b25600b79bfcbdb8f6d6e01c8e089be7b",
+    "status": "frozen"
+  },
+  "hypotheses": [],
+  "inadmissible": [
+    "Dropping any cap/failure or changing inputs, prefixes, limits, source, binary, ordering or primary checks after data.",
+    "Claiming an independent solver-word recount, full query/DLP price, arbitrary-subset minimum, degree law, timing gain or subgroup-security conclusion.",
+    "Retrospectively applying this freeze to original producer executions; manufacturing old queue completion markers; treating a parent disappearance as success."
+  ],
+  "invalidation_rules": [
+    "Missing/malformed output, wrong source/hash/tuple, builder disagreement, verdict disagreement with an uncensored source row, impossible ranks or invented independent words are invalid.",
+    "Every wall/CPU clock is invalid for performance inference. A/A primary rank/verdict disagreement is retained as a mismatch.",
+    "A producer timeout remains unknown in its original receipt regardless of a fresh independent classification."
+  ],
+  "links": {
+    "legacy_protocol": "protocol-hky-restart-20261026.json",
+    "native_controller": "../../tools/ic-hky-replay-records/README.md",
+    "note": "Prospective native continuation after a controlled pause of the legacy orchestration. Four actual legacy timeouts remain in their immutable capsule. No legacy outcome is retrospectively registered as new data.",
+    "original_input": "inputs/guess-ell8.jsonl",
+    "original_producer": "pipeline-receipts/guess-completion-20261025-01/receipt.json",
+    "original_protocol": "COMPLETED_GUESS_REPLAY_PROTOCOL.md"
+  },
+  "literature": [
+    {
+      "claim": "Original exact Boolean fixtures, bounded degree-four closure and the complete124-case branch census; original cost/timeouts stay unchanged.",
+      "provenance": "internal",
+      "ref": "PROTOCOL.md and COMPLETED_GUESS_REPLAY_PROTOCOL.md",
+      "verified_by": "Source reviewed before this recovery design,2026-10-26"
+    },
+    {
+      "claim": "Low/fall-degree observations do not establish a solving-degree or complete IC cost law.",
+      "provenance": "internal",
+      "ref": "Huang--Kosters--Yang--Yeo arXiv:1505.02532; Kosters--Yeo arXiv:1503.08001, as reviewed in PROTOCOL.md",
+      "verified_by": "Original source/literature review recorded in PROTOCOL.md"
+    },
+    {
+      "claim": "Frozen schema, complete Cartesian export, A/A meaning and checkpoint clocks.",
+      "provenance": "internal",
+      "ref": "isogeny-labs/crypto-autoresearcher docs/experiment-protocol.md and .claude/skills/experiment-protocol/SKILL.md",
+      "verified_by": "Canonical sources read2026-10-26"
+    }
+  ],
+  "measurement": {
+    "clock": "none",
+    "counters": [
+      "closure_rank",
+      "full_columns",
+      "plain_rank",
+      "hky_rounds"
+    ],
+    "isolation_required": "none",
+    "order": "alternate",
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "source_commit",
+      "threads",
+      "argv",
+      "resource_caps",
+      "load_and_psi",
+      "process_exit",
+      "raw_hashes",
+      "checkpoint_history"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Exact native closure rank for the completed degree-four closure; no value is imputed on a cap/failure.",
+        "id": "closure_rank",
+        "kind": "exact",
+        "name": "closure rank",
+        "resolution": "1",
+        "source": "output.json closure_rank",
+        "uncertainty": "none_exact",
+        "unit": "count"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Exact native full-column count for the completed degree-four closure; no value is imputed on a cap/failure.",
+        "id": "full_columns",
+        "kind": "exact",
+        "name": "full-column count",
+        "resolution": "1",
+        "source": "output.json full_columns",
+        "uncertainty": "none_exact",
+        "unit": "count"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Exact native plain input rank for the completed degree-four closure; no value is imputed on a cap/failure.",
+        "id": "plain_rank",
+        "kind": "exact",
+        "name": "plain input rank",
+        "resolution": "1",
+        "source": "output.json plain_rank",
+        "uncertainty": "none_exact",
+        "unit": "count"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Exact native HKY closure rounds for the completed degree-four closure; no value is imputed on a cap/failure.",
+        "id": "hky_rounds",
+        "kind": "exact",
+        "name": "HKY closure rounds",
+        "resolution": "1",
+        "source": "output.json hky_rounds",
+        "uncertainty": "none_exact",
+        "unit": "count"
+      }
+    ]
+  },
+  "protocol_id": "IC-balanced-guess-HKY-native-continuation-20261026",
+  "question": "Do the remaining 122 frozen Boolean branch tuples independently replay through the unchanged HKY engine, and do their fresh-process A/A repetitions preserve exact closure ranks and verdicts under the original caps?",
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Alternate the first arm by case ordinal. Rank/verdict are exact; no timing comparison or cache-based benefit is inferred.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "An exact deterministic verifier whose analysis and equality rules are frozen before fresh executions; no discretionary arm selection or statistical analysis.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Original draw/k/branch census order, excluding exactly d0-k0-b0 and d0-k1-b0 because both arms already executed under the historical protocol. The remaining122tuples receive both arms. Selection is by prior execution, not outcome; no legacy timeout is retried."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "nonce": null,
+      "note": "The engine draws no target/algorithm randomness; all inputs and branch assignments already exist and are hash-pinned. Seed0 is a metadata sentinel, never a new draw.",
+      "seeds": [
+        0
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [
+      "Retained verified/capped/invalid outcomes by arm and draw; original producer unknowns shown separately."
+    ],
+    "report_dir": "reports/run-completed-hky-native-resume-20261026",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 122,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "min_attainable_two_sided_p": null,
+      "note": "Census of the fixed cases, not a population sample or significance test. Alpha is a required unused schema field. A/A assesses determinism only.",
+      "passes": true,
+      "rank_test_n": null,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 219600,
+      "fixed_seconds": null,
+      "measured_on": "Unmeasured cap-sum upper bound244x900s, not a runtime forecast. Checkpoint, lock and kill-grace overhead is additional; historical producer runtimes are not HKY estimates.",
+      "per_sample_seconds": 900,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Both arms on all122remaining tuples =244fresh child executions; no outcome-based stopping. Keep the four legacy caps separately. Retain every new cap and never retry it. Stop on checkpoint, hash or restore failure."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Whole local batch outer watchdog250000s; per child900s with30s kill grace and8GiB address-space cap."
+    }
+  ],
+  "study_dir": "research/ic_algebraic_crossover_20261023",
+  "variable_ledger": {
+    "aa_not_applicable": null,
+    "comparisons": [
+      {
+        "arms": [
+          "hky",
+          "hky-aa"
+        ],
+        "design": "aa",
+        "differs_in": [
+          "process_layout"
+        ],
+        "id": "C-aa-pair"
+      },
+      {
+        "arms": [
+          "hky",
+          "hky-aa"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "C-case-validation",
+        "threshold": "Every244registered native child validates and every122A/A primary rank/verdict pair is exactly equal; caps are inconclusive, and there is no cost or statistical inference."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Source JSONL hash and producer receipt hash pinned; two independent equation builders must agree.",
+        "name": "equations_inputs_and_branches",
+        "treatment": "fixed",
+        "value": "draws0,3,5,6; k0..4; every2^k branch; prefix[7,15,23,24]"
+      },
+      {
+        "how": "Binary SHA, build commit, Rust source SHA, toolchain and single-thread environment guarded before every case.",
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "one source-bound frozen native executable"
+      },
+      {
+        "how": "Fresh OS process for every arm/case; operating-system ASLR is not seeded or used for selection.",
+        "name": "process_layout",
+        "treatment": "randomized"
+      },
+      {
+        "how": "Case census order draw/k/branch; interleave both arms per case, alternate which arm starts by case ordinal.",
+        "name": "case_and_arm_order",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Record CPU/kernel, CPU affinity, PSI/load and resource metadata; take the shared busy lock per native child. No clock is an experimental metric.",
+        "name": "host_and_load",
+        "treatment": "measured"
+      },
+      {
+        "how": "Same limits and binary on both arms; no timeout retry.",
+        "name": "resource_limits",
+        "treatment": "fixed",
+        "value": "1thread,8GiB,900s perchild"
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          "hky",
+          "hky-aa"
+        ],
+        "name": "process_repetition"
+      }
+    ]
+  },
+  "version": 1
+}
