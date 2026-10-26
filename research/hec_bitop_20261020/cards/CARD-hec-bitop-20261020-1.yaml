@@ -1,0 +1,30 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-hec-bitop-20261020-1
+experiment_id: hec_bitop_20261020
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: a3c81b2aec01ac06d9e28b79da470fdbf0fb450b
+receipt: research/hec_bitop_20261020/cards/CARD-hec-bitop-20261020-1.receipt.json
+binds:
+  - {path: research/hec_bitop_20261020/PROTOCOL.md, sha256: a3ac31462b822e788ae32f96e0f8227fc201163f35535047c77f8815d0ed0f61}
+  - {path: research/hec_bitop_20261020/run.sh, sha256: fd9937b6eb62b39616a393718e1c9f8fa8f44a9ab3fc0ed89f824155082dc564}
+  - {path: target/release/examples/hyperelliptic_ic_vs_rho_bitops, sha256: a2569d32123f2954bf089918ab77ddbbd38d62c5a037d46199d74ae1f8126dce}
+must_not_exist: [research/hec_bitop_20261020/raw]
+commands:
+  - id: primary-rows
+    argv: [./run.sh]
+    cwd: research/hec_bitop_20261020
+    timeout_seconds: 7000
+    success_exit_codes: [0]
+    stdout: research/hec_bitop_20261020/cards/CARD-hec-bitop-20261020-1.run.stdout
+    outputs:
+      - research/hec_bitop_20261020/raw/g2.jsonl
+      - research/hec_bitop_20261020/raw/g3.jsonl
+      - research/hec_bitop_20261020/raw/g4.jsonl
+bus_address: executor-mechanical-hec-bitop
+background: true
+write_scope: [research/hec_bitop_20261020/]
+stop_when:
+  - The run command exits with status 2.
+notes: The command runs three genus processes in parallel under run.sh, which writes the raw directory itself; the expected stdout is the three lines DONE g2, DONE g3 and DONE g4 in completion order.
