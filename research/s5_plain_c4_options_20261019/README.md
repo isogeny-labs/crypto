@@ -117,6 +117,48 @@ scaling panel (committed counts reproduce §11.17's: `2.30·10⁸`, `3.66·10⁹
 The chain step's saving grows with `d`; `S₅` sits on the generic trend, as
 §11.17 found for the committed solver.
 
+## Validation (benchmarks gate, `docs/VALIDATION_GATE.md`)
+
+The benchmarks row's `VALIDATION.json`
+(`benchmarks/20261019-s5-plain-c4-options/`) pins three artifacts, all in
+[`validation/`](validation/):
+
+- **Replay certificate** (`replay-certificate.json`, `replay.sh`). Every
+  recorded run (the 13-residual run, the 4-arm ablation, the constructed
+  replay check and the generic panel) was re-run from a fresh release build
+  of the committed source, and each replayed solve was compared with the
+  committed record by jq. The comparison covers every counted phase, the
+  decomposition set, the oracle set and their agreement. Independence: a
+  new build, new processes and a separate comparator, on the same host. It
+  was not a second machine.
+- **Validator report** (`validator-report.json`, `validate.sh`). The row's
+  headline numbers are recomputed from the raw per-solve JSON with jq, which
+  shares no code with the Rust summary that produced them. All 11 match.
+- **Rho reference** (`rho_reference.json`, `curve_info.json`). This is a
+  one-target **negation-map** Pollard rho on §11.17's own curve, run by the
+  same runner binary and counted in the same unit (`F_p` multiplications)
+  with the same counters as `C₄`.
+  - **Subgroup.** `#E(F_{269⁴}) = 5,236,052,031 = 189 · 27,703,979`. The
+    runs are in the prime subgroup of order `ℓ = 27,703,979` (2^24.72).
+  - **Result.** 20 solves, all logarithms verified, mean `7.736·10⁵` `F_p`
+    multiplications (mean S 1.47, which includes the walk's 32 precomputed
+    multipliers, a large share at this size).
+  - **Strongest available symmetry.** `j(E) ∉ F_{p²}` and `a, b ≠ 0`, so no
+    Frobenius fold applies and there are no extra automorphisms. Negation is
+    the strongest symmetry this curve has.
+- **GAE band (§5a).** The IC side is one measured decomposition
+  (`C₄ = 8.69·10¹⁰`), a deliberately loose lower bound on any one-target IC
+  run. It omits the other decompositions, the linear algebra and every
+  unpriced operation. The rho side adds an over-generous allowance for
+  unpriced native work: 10 operations per counted `F_p` multiplication plus
+  1,000 per walk step, giving `7.7·10⁵`, `2.1·10⁶` and `1.4·10⁷` at 0, 0.1
+  and 1 GAE. Rho is cheaper at every point of the band, by more than
+  `6,000×` even at 1 GAE.
+
+This row is a solver-stage improvement. The rho reference measures the
+distance remaining, not a comparison the row claims to win: at `p = 269` a
+single plain-`S₅` decomposition costs about `10⁵×` a whole rho solve.
+
 ## What changed in the cost model
 
 - `extension_measured_solve_mults`: `(4, 1.227e12)` → `(4, 8.69e10)`, i.e.
