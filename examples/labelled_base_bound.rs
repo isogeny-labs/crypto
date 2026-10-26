@@ -4,7 +4,8 @@
 //!
 //! `C(B) = B·N/s + (m!·N/B^m)·max(1, s^m/(m!·N))`, reported as
 //! `log2(C/√N)` for `m ∈ {2,3,4}`, `log2 s ∈ {40,50,60}`, `log2 B ∈ [0, log2 s]`
-//! in steps of 0.1, at `N = 2^60` (override with `--log-n`).
+//! in steps of 0.1, at `N = 2^60` (override with `--log-n`): one `curve` record per
+//! `(m, s)` and one `min` record with the minimum over `B`.
 //!
 //! Std only: `rustc -O --edition 2021 examples/labelled_base_bound.rs`.
 
@@ -32,16 +33,20 @@ fn main() {
         for log_s in [40.0f64, 50.0, 60.0] {
             let steps = (log_s * 10.0).round() as u32;
             let mut min = (f64::INFINITY, 0.0);
+            let mut ys = Vec::new();
             for k in 0..=steps {
                 let log_b = f64::from(k) / 10.0;
                 let y = log2_cost_over_sqrt_n(log_n, m, log_s, log_b);
                 if y < min.0 {
                     min = (y, log_b);
                 }
-                println!(
-                    "{{\"kind\":\"point\",\"log_n\":{log_n},\"m\":{m},\"log_s\":{log_s},\"log_b\":{log_b:.1},\"log2_cost_over_sqrt_n\":{y:.6}}}"
-                );
+                ys.push(format!("{y:.4}"));
             }
+            // One record per (m, s): log2(C/√N) at log2 B = 0, 0.1, …, log2 s.
+            println!(
+                "{{\"kind\":\"curve\",\"log_n\":{log_n},\"m\":{m},\"log_s\":{log_s},\"log_b_step\":0.1,\"log2_cost_over_sqrt_n\":[{}]}}",
+                ys.join(",")
+            );
             // The README's claim: the minimum over B stays at or above log2(2) = 1.
             assert!(
                 min.0 >= 1.0 - 1e-9,

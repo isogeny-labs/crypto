@@ -7,13 +7,14 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 recs = [json.loads(l) for l in open("bound.jsonl") if l.strip()]
-pts = [r for r in recs if r["kind"] == "point"]
-log_n = pts[0]["log_n"]
+curves = [r for r in recs if r["kind"] == "curve"]
+log_n = curves[0]["log_n"]
 fig, ax = plt.subplots(figsize=(8, 4.3))
 for m in (2, 3, 4):
     for logs, ls in ((40, ":"), (50, "--"), (60, "-")):
-        sel = [r for r in pts if r["m"] == m and r["log_s"] == logs]
-        ax.plot([r["log_b"] for r in sel], [r["log2_cost_over_sqrt_n"] for r in sel], ls=ls, label=f"m={m}, s=2^{logs}")
+        c = next(r for r in curves if r["m"] == m and r["log_s"] == logs)
+        ys = c["log2_cost_over_sqrt_n"]
+        ax.plot([k * c["log_b_step"] for k in range(len(ys))], ys, ls=ls, label=f"m={m}, s=2^{logs}")
 ax.axhline(1.0, color="#b33", lw=1); ax.text(1, 1.3, "2√N (the bound)", color="#b33", fontsize=8)
 ax.axhline(math.log2(0.886), color="#555", lw=1, ls="-."); ax.text(1, -1.9, "rho 0.886√N", color="#555", fontsize=8)
 ax.set_xlabel("log2 B (labelled base size)"); ax.set_ylabel("log2 (cost / √N)")
