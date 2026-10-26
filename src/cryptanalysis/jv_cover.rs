@@ -3221,6 +3221,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn nagao_finds_planted_six_sums_and_agrees_with_the_oracle() {
         let (_, ctx, base, by_x, mut rng) = small_ctx(53, 2);
         let jac = ctx.jac();
@@ -3310,6 +3314,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn the_solver_loses_no_rational_solution_at_small_p() {
         // p = 53: a Krylov minimal polynomial of one vector loses a root with
         // probability 1/p, a non-separating form likewise.  Plant many sums.
@@ -3360,6 +3368,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn stopped_f4_agrees_with_the_full_solver_and_the_oracle() {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let jac = ctx.jac();
@@ -3418,6 +3430,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn replayed_f4_agrees_with_the_full_solver_and_the_oracle() {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let traced = Ctx::with_trace(&spec, true);
