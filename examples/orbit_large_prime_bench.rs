@@ -505,65 +505,40 @@ fn summarize(args: &[String]) -> Result<(), String> {
             .ok();
         }
     }
-    // ---- Table D/E: paired differences, orbit minus plain, per series and cap.
+    // ---- Tables D/E: paired differences against the plain arm, per series and cap.
     let mut agg_md = String::new();
-    writeln!(md, "\n### Table D. Paired per-seed differences, orbit (iii) minus plain double large prime (ii)\n").ok();
+    writeln!(md, "\n### Table D. Paired per-seed differences against the plain double large prime arm (ii)\n").ok();
     writeln!(md, "Counters are deterministic given the seed (the repeats agree exactly, see Integrity), so a nonzero counter difference is a property of the arm, not of timing. CPU differences are percent of the plain arm's online CPU.\n").ok();
-    writeln!(md, "| series | n | cap | seed | d complete | d indep | d rank | d online CPU % | d CPU per indep % |").ok();
-    writeln!(md, "|---|---|---|---|---|---|---|---|---|").ok();
+    writeln!(md, "| series | n | cap | treatment | seed | d complete | d indep | d rank | d online CPU % | d CPU per indep % |").ok();
+    writeln!(md, "|---|---|---|---|---|---|---|---|---|---|").ok();
     writeln!(
         agg_md,
         "\n### Table E. Aggregate of the paired differences\n"
     )
     .ok();
-    writeln!(agg_md, "Mean +/- 95% Student-t half-width over S seeds; signs = in how many seeds orbit exceeded / equalled / fell below plain. Timing control = mean |relative change| of online CPU between repeats of the same cell (plain and orbit arms pooled). CPU verdict: `within noise` if |mean d CPU %| is at most the t half-width or at most the timing control.\n").ok();
-    writeln!(agg_md, "| series | n | cap | S | d complete | signs | d indep | signs | d rank | d CPU per indep % | d online CPU % | timing control % | CPU verdict |").ok();
+    writeln!(agg_md, "Mean +/- 95% Student-t half-width over S seeds; signs = in how many seeds the treatment exceeded / equalled / fell below plain. Timing control = mean |relative change| of online CPU between repeats of the same cell (plain and orbit arms pooled). A CPU difference is `within noise` if |mean| is at most its t half-width or at most the timing control, else `outside noise`. Treatment `dlp_orbit` is arm (iii); `dlp_orbit_absorb` is the secondary arm (iv).\n").ok();
+    writeln!(agg_md, "| series | n | cap | treatment | S | d complete | signs | d indep | signs | d rank | d CPU per indep % | verdict (CPU per indep) | d online CPU % | verdict (online CPU) | timing control % |").ok();
     writeln!(
         agg_md,
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|"
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"
     )
     .ok();
     let mut chart_rows: Vec<(u32, f64, f64, f64, f64, f64)> = Vec::new();
+    let verdict = |m: f64, half: f64, control: f64| -> &'static str {
+        if m.is_nan() {
+            "n/a"
+        } else if half.is_nan() {
+            "S=1"
+        } else if m.abs() <= half || (!control.is_nan() && m.abs() <= control) {
+            "within noise"
+        } else {
+            "outside noise"
+        }
+    };
     for (series, n, trials) in &series_n {
-        let (mut dc, mut di, mut dr, mut dcpu, mut dper) = (vec![], vec![], vec![], vec![], vec![]);
+        // Timing control: repeats of the same cell (plain and orbit arms).
         let mut control = Vec::new();
         for s in seeds_of(series, *n, *trials) {
-            let (Some(base), Some(orb)) = (
-                get(series, *n, *trials, "dlp", s),
-                get(series, *n, *trials, "dlp_orbit", s),
-            ) else {
-                continue;
-            };
-            let d_complete = orb.cell.complete as f64 - base.cell.complete as f64;
-            let d_indep = orb.cell.independent as f64 - base.cell.independent as f64;
-            let d_rank = orb.cell.rank as f64 - base.cell.rank as f64;
-            let d_cpu = 100.0 * (orb.online_cpu - base.online_cpu) / base.online_cpu;
-            let d_per = match (orb.cpu_per_verified(), base.cpu_per_verified()) {
-                (Some(o), Some(b)) => 100.0 * (o - b) / b,
-                _ => f64::NAN,
-            };
-            writeln!(
-                md,
-                "| {} | {} | {} | {} | {} | {} | {} | {} | {} |",
-                series,
-                n,
-                trials,
-                s,
-                sg(d_complete, 0),
-                sg(d_indep, 0),
-                sg(d_rank, 0),
-                sg(d_cpu, 2),
-                sg(d_per, 2)
-            )
-            .ok();
-            dc.push(d_complete);
-            di.push(d_indep);
-            dr.push(d_rank);
-            dcpu.push(d_cpu);
-            if !d_per.is_nan() {
-                dper.push(d_per);
-            }
-            // Timing control from repeats of the same cell.
             for arm in ["dlp", "dlp_orbit"] {
                 let reps: Vec<&Cell> = cells
                     .iter()
@@ -575,9 +550,8 @@ fn summarize(args: &[String]) -> Result<(), String> {
                             && c.seed == s
                     })
                     .collect();
-                if reps.len() >= 2 {
-                    let first = reps.iter().find(|c| c.rep == 1).copied().unwrap_or(reps[0]);
-                    for other in reps.iter().filter(|c| c.rep != first.rep) {
+                if let Some(first) = reps.iter().find(|c| c.rep == 1).copied() {
+                    for other in reps.iter().filter(|c| c.rep != 1) {
                         control.push(
                             100.0
                                 * ((other.online_cpu - first.online_cpu) / first.online_cpu).abs(),
@@ -586,56 +560,79 @@ fn summarize(args: &[String]) -> Result<(), String> {
                 }
             }
         }
-        if dc.is_empty() {
-            continue;
-        }
         let control_mean = if control.is_empty() {
             f64::NAN
         } else {
             mean(&control)
         };
-        let (m_cpu, h_cpu) = ci(&dcpu);
-        let verdict = if h_cpu.is_nan() {
-            "S=1".to_string()
-        } else if m_cpu.abs() <= h_cpu || (!control_mean.is_nan() && m_cpu.abs() <= control_mean) {
-            "within noise".to_string()
-        } else {
-            "outside noise".to_string()
-        };
-        let (m_per, h_per) = ci(&dper);
-        writeln!(
-            agg_md,
-            "| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} +/- {} | {} +/- {} | {} | {} |",
-            series,
-            n,
-            trials,
-            dc.len(),
-            pm(&dc, 1),
-            signs(&dc),
-            pm(&di, 1),
-            signs(&di),
-            pm(&dr, 1),
-            sg(m_per, 1),
-            fx(h_per, 1),
-            sg(m_cpu, 1),
-            fx(h_cpu, 1),
-            fx(control_mean, 1),
-            verdict
-        )
-        .ok();
-        if series == "primary" {
-            chart_rows.push((
-                *n,
-                m_cpu,
-                if h_cpu.is_nan() { 0.0 } else { h_cpu },
-                if control_mean.is_nan() {
-                    0.0
-                } else {
-                    control_mean
-                },
-                mean(&di),
-                ci(&di).1,
-            ));
+        for treat in ["dlp_orbit", "dlp_orbit_absorb"] {
+            let (mut dc, mut di, mut dr, mut dcpu, mut dper) =
+                (vec![], vec![], vec![], vec![], vec![]);
+            for s in seeds_of(series, *n, *trials) {
+                let (Some(base), Some(orb)) = (
+                    get(series, *n, *trials, "dlp", s),
+                    get(series, *n, *trials, treat, s),
+                ) else {
+                    continue;
+                };
+                let d_complete = orb.cell.complete as f64 - base.cell.complete as f64;
+                let d_indep = orb.cell.independent as f64 - base.cell.independent as f64;
+                let d_rank = orb.cell.rank as f64 - base.cell.rank as f64;
+                let d_cpu = 100.0 * (orb.online_cpu - base.online_cpu) / base.online_cpu;
+                let d_per = match (orb.cpu_per_verified(), base.cpu_per_verified()) {
+                    (Some(o), Some(b)) => 100.0 * (o - b) / b,
+                    _ => f64::NAN,
+                };
+                writeln!(
+                    md,
+                    "| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
+                    series,
+                    n,
+                    trials,
+                    treat,
+                    s,
+                    sg(d_complete, 0),
+                    sg(d_indep, 0),
+                    sg(d_rank, 0),
+                    sg(d_cpu, 2),
+                    sg(d_per, 2)
+                )
+                .ok();
+                dc.push(d_complete);
+                di.push(d_indep);
+                dr.push(d_rank);
+                dcpu.push(d_cpu);
+                if !d_per.is_nan() {
+                    dper.push(d_per);
+                }
+            }
+            if dc.is_empty() {
+                continue;
+            }
+            let (m_cpu, h_cpu) = ci(&dcpu);
+            let (m_per, h_per) = if dper.is_empty() {
+                (f64::NAN, f64::NAN)
+            } else {
+                ci(&dper)
+            };
+            writeln!(agg_md, "| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} +/- {} (n={}) | {} | {} +/- {} | {} | {} |",
+                series, n, trials, treat, dc.len(), pm(&dc, 1), signs(&dc), pm(&di, 1), signs(&di), pm(&dr, 1),
+                sg(m_per, 1), fx(h_per, 1), dper.len(), verdict(m_per, h_per, control_mean),
+                sg(m_cpu, 1), fx(h_cpu, 1), verdict(m_cpu, h_cpu, control_mean), fx(control_mean, 1)).ok();
+            if series == "primary" && treat == "dlp_orbit" {
+                chart_rows.push((
+                    *n,
+                    m_cpu,
+                    if h_cpu.is_nan() { 0.0 } else { h_cpu },
+                    if control_mean.is_nan() {
+                        0.0
+                    } else {
+                        control_mean
+                    },
+                    mean(&di),
+                    ci(&di).1,
+                ));
+            }
         }
     }
     md.push_str(&agg_md);
