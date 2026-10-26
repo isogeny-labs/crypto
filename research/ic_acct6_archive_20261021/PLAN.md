@@ -18,8 +18,8 @@ archive (a proxy for whether a re-run prices complete).
 | re-runnable unchanged | 337 | 22013 | 48.58 |
 |   of which feed the leaderboard | 17 | 1383 | 12.73 |
 | not re-runnable unchanged | 59 | 693 | 22.98 |
-| re-run in this study's first tranche | 0 | 0 | -0.00 |
-| re-runnable, still to run | 337 | 22013 | 48.58 |
+| re-run in this study's first tranche | 2 | 520 | 0.00 |
+| re-runnable, still to run | 335 | 21493 | 48.57 |
 
 All hours: 71.55.
 
@@ -27,8 +27,8 @@ All hours: 71.55.
 
 | # | session | leaderboard | incomplete / counted | hours | seen | rerun | re-run as |
 |--:|:--|:--|--:|--:|--:|:--|:--|
-| 1 | `research/ecbench_n37_rank_columns_20261004/sessions/mac_arm64_l0_01` | yes | 280 / 320 | 0.002 | 0/6 | ok |  |
-| 2 | `research/ecbench_n37_k8_k16_20261004/sessions/mac_arm64_l0_01` | yes | 240 / 320 | 0.001 | 0/2 | ok |  |
+| 1 | `research/ecbench_n37_rank_columns_20261004/sessions/mac_arm64_l0_01` | yes | 280 / 320 | 0.002 | 0/6 | ok | `research/ic_acct6_archive_20261021/sessions/p001-mac_arm64_l0_01` |
+| 2 | `research/ecbench_n37_k8_k16_20261004/sessions/mac_arm64_l0_01` | yes | 240 / 320 | 0.001 | 0/2 | ok | `research/ic_acct6_archive_20261021/sessions/p002-mac_arm64_l0_01` |
 | 3 | `research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01` | yes | 240 / 320 | 0.001 | 0/2 | ok |  |
 | 4 | `research/ecbench_n37_online_ir_20261004/sessions/mac_arm64_l0_01` | yes | 240 / 320 | 0.001 | 0/2 | ok |  |
 | 5 | `research/f6_ic_ecbench_ladder_20261005/sessions/n13` | yes | 48 / 72 | 0.003 | 0/2 | ok |  |
