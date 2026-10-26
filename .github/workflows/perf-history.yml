@@ -250,6 +250,8 @@ jobs:
           cargo test --release --example perfindex
       - name: Build perfbench and ecbench
         run: cargo build --release --example perfbench --bin ecbench
+      - name: Audit frozen performance-gains dashboard
+        run: cargo run --release --example performance_gains_audit --quiet
       - name: Check kernel fingerprints
         # A kernel's fingerprint is the work it does; if a change moves it, the
         # change is not a speed-up and the index must not be read across it.

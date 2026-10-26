@@ -14,6 +14,7 @@ on:
     paths:
       - '**/*.md'
       - '**/*.html'
+      - '**/*.sha256'
       - 'docs/curves/**'
       - 'scripts/curve_id.py'
       - 'scripts/check_curve_names.py'
@@ -49,6 +50,7 @@ jobs:
             **/*audit*.json
             **/*SHA256SUMS*
             **/*.sha256
+            /research/ext_endo_rho_20261023/FROZEN_OUTPUTS.sha256
             /scripts/
             /docs/curves/registry.json
             /src/cryptanalysis/curve_id.rs

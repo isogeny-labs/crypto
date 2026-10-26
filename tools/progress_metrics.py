@@ -7,6 +7,10 @@ Sources (all committed, read at --ref unless noted):
   docs/perf/history.json          on branch origin/perf-history: chained Ir performance index per push
   benchmarks/README.md            append-only benchmark entries (one row per study)
   docs/ic/ci/runs/*.json          ic e2e history records
+  research/nist_skipped_curve_dissection_20261021/factorization/progress.json
+                                certified factorization status and recorded raw relation counts
+  research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json
+                                proved complete integer records in the all-21 selection census
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -184,6 +188,43 @@ def photo_volcano(ref):
              label='Photographed selected 2-volcano: ' + metric,
              source=path + '@' + ref)
 
+def nist_factorization(ref, since):
+    path = "research/nist_skipped_curve_dissection_20261021/factorization/progress.json"
+    txt = show(ref, path)
+    if not txt:
+        return
+    data = json.loads(txt)
+    for row in data.get("observations", []):
+        date = row.get("date")
+        if not date or date < since:
+            continue
+        source = f"{path}: {row.get('source', '')}"
+        for field, better, unit, label in (
+            ("complete_targets", "higher", "count", "NIST timeout integers completely prime-certified"),
+            ("resolved_timeout_fields", "higher", "count", "NIST timeout fields resolved"),
+            ("largest_residual_bits", "lower", "bits", "Remaining skipped-P256 cofactor size"),
+            ("main_raw_relation_lines", "neutral", "lines", "Skipped-P256 raw relation lines; no dedup/rank claim"),
+            ("filter_unique_relations", "neutral", "relations", "Native unique relations, including generated free relations"),
+            ("filter_singleton_survivors", "neutral", "relations", "Native relations surviving singleton removal; no rank claim"),
+        ):
+            emit(f"nist.factorization.{field}", row.get(field), date=date,
+                 problem="nist-skipped-curve-factorization", unit=unit, better=better,
+                 label=label, source=source)
+
+def nist_selection_factor_census(ref, since):
+    path = "research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        source = f"{path}@{commit}"
+        emit("nist.selection_factor_census.complete_targets", data.get("complete_and_proven"),
+             date=date, problem="nist-candidate-selection", unit="integers", better="higher",
+             label="NIST all-21 census: proved complete factorization records", source=source)
+        for family, count in (data.get("complete_by_family") or {}).items():
+            emit(f"nist.selection_factor_census.{family}.complete_targets", count,
+                 date=date, problem="nist-candidate-selection", unit="integers", better="higher",
+                 label=f"NIST all-21 census: complete {family} records", source=source)
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -192,6 +233,8 @@ def main():
     benchmarks(a.ref, a.since)
     e2e_runs(a.ref)
     photo_volcano(a.ref)
+    nist_factorization(a.ref, a.since)
+    nist_selection_factor_census(a.ref, a.since)
 
 
 if __name__ == "__main__":
