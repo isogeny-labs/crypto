@@ -1,6 +1,9 @@
 name: Conductor-gap native controls
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - 'research/conductor_gap_cm_orbits_20261015/**'
       - 'research/conductor_gap_followups_20261016/**'
@@ -46,7 +49,7 @@ jobs:
         with:
           toolchain: '1.98'
       - uses: Swatinem/rust-cache@v2
-      - run: sudo apt-get update && sudo apt-get install -y pari-gp
+      - run: sudo apt-get update && sudo apt-get install -y pari-gp zstd
       - name: Public fixture and CM map tests
         run: |
           cargo test --release --lib cm_orbit

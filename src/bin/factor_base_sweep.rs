@@ -7,6 +7,8 @@ mod engine;
 mod model;
 #[path = "factor_base_sweep/polynomials.rs"]
 mod polynomials;
+#[path = "factor_base_sweep/profile.rs"]
+mod profile;
 #[path = "factor_base_sweep/run.rs"]
 mod run;
 #[path = "factor_base_sweep/shapes.rs"]
@@ -61,6 +63,20 @@ impl Tuning {
 }
 #[derive(Subcommand)]
 enum Action {
+    /// Construct a trace-zero geometric progression by XOR-sampling its constraint kernel.
+    Construct {
+        #[arg(long)]
+        input: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Compute exact subspace product dimensions; does not run a solver or predict regularity.
+    Profile {
+        #[arg(long)]
+        input: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// Launch or resume a bounded sweep. Human progress is streamed to stderr.
     Run {
         #[arg(long)]
@@ -112,6 +128,18 @@ enum Action {
 }
 fn dispatch() -> Result<()> {
     match Cli::parse().command {
+        Action::Construct { input, out } => {
+            let request = model::read(&input)?;
+            let report = profile::construct(&request)?;
+            model::write_new(&out, &report)?;
+            println!("{}", out.display());
+        }
+        Action::Profile { input, out } => {
+            let request = model::read(&input)?;
+            let report = profile::compute(&request)?;
+            model::write_new(&out, &report)?;
+            println!("{}", out.display());
+        }
         Action::Run {
             out,
             plan,

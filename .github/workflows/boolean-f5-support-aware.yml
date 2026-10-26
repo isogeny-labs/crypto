@@ -1,21 +1,12 @@
 name: Boolean F5 support-aware batch
 
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
       - 'tools/isolated_bench.py'
-      - 'research/boolean_f5_support_aware_20261002/**'
-      - 'src/cryptanalysis/gf2_elim.rs'
-      - '.github/workflows/boolean-f5-support-aware.yml'
-  pull_request:
-    paths:
-      - 'tools/isolated_bench.py'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'build.rs'
-      - '.cargo/**'
-      - 'rust-toolchain*'
       - 'research/boolean_f5_support_aware_20261002/**'
       - 'src/cryptanalysis/gf2_elim.rs'
       - '.github/workflows/boolean-f5-support-aware.yml'
