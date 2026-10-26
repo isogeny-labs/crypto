@@ -2195,7 +2195,9 @@ mod tests {
             ),
         ] {
             let random = search == RelationSearch::Random;
-            let row = bitop_row(search, la, oracle, RhoVariant::default());
+            // The full-width walk the hec study counted; the default is now
+            // the collide-first walk, whose cycle window is not yet charged.
+            let row = bitop_row(search, la, oracle, RhoVariant::DistinguishedPointsFullWidth);
             assert_eq!(row.rho_variant, RhoVariant::DistinguishedPointsFullWidth);
             let ic = &row.ic_bitop_phases;
             let rho = &row.rho_bitop_phases;
