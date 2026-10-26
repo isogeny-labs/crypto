@@ -18,7 +18,7 @@ concurrency:
 jobs:
   same-point-19-base-grid:
     if: github.repository == 'aburan28/crypto'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4

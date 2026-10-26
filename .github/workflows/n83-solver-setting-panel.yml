@@ -19,7 +19,7 @@ concurrency:
 jobs:
   solve-setting-stratum:
     if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-aws-handoff-20261025'
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     timeout-minutes: 80
     strategy:
       fail-fast: false
