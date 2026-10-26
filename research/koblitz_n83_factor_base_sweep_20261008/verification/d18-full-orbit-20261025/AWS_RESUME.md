@@ -352,3 +352,16 @@ is now frozen as a plan; no Linux cryptographic arm has run. Before a hosted
 timing run, get/read back the exact S3 permission, verify both original S3
 objects on the worker, seal the per-job source/binary/host launch lock, then
 apply the positive exit-0 and separate replay gates before natural.
+
+A subsequent [build-only `c7i.2xlarge` Spot check](native-cadence-replay-20261026/linux-build-smoke-20261026/REPORT.md)
+allocated and self-terminated its host, but stopped before Cargo: the runner
+could not fetch the private GitHub source over HTTPS without noninteractive
+authentication. The raw child error, status and EC2 termination are retained;
+no binary, D18 GET or cryptographic arm resulted. Do not retry the unchanged
+`--ref 45ce91d5` path. The earlier approved 17,757,116-byte source archive
+was freshly fetched with its full-object checksum and correct SHA-256, but
+freezes `54cbef1a` and lacks portable Git metadata; it cannot supply the
+frozen `45ce91d5` cadence source. A reviewed exact-source delivery route
+must pass before the Linux build, independently of the still-unapplied
+two-sided original-D18 object read proposal. The temporary user IAM grant
+remains active pending completion or cancellation of the hosted attempt.
