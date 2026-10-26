@@ -583,6 +583,13 @@ pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<
     let m = task["arity"].as_u64().ok_or("arity")? as usize;
     let arm = task["arm"].as_str().ok_or("arm")?;
     let lift_method = task["lift_method"].as_str().unwrap_or("search");
+    let linear_roots = std::env::var("F4_FP_LINEAR_ROOTS").is_ok_and(|v| v == "1");
+    if let Some(wanted) = task["linear_roots"].as_bool() {
+        assert_eq!(
+            linear_roots, wanted,
+            "root policy environment differs from task"
+        );
+    }
     if !["search", "propagate"].contains(&lift_method) {
         return Err("unknown lifting method".into());
     }
@@ -725,7 +732,7 @@ pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<
     let canonical = tuples.keys().cloned().collect::<Vec<_>>();
     write_json(
         out,
-        &json!({"schema":"twist.decomposition-worker/v1","workload":task["workload"],"arm":arm,"lift_method":lift_method,"base":xs,"target":target,"branches":branches,"canonical_projected_tuples":canonical,"signed_witnesses":witnesses,"exceptional_candidates_enumerated":exceptional_candidates,"invalid_signed_lifts":invalid_lifts,"complete_projection":complete,"construction_roots_signs_dedup_and_source_verification_included":true,"complete_IC_cost":false,"wall_time_admitted":false}),
+        &json!({"schema":"twist.decomposition-worker/v1","workload":task["workload"],"arm":arm,"lift_method":lift_method,"linear_roots":linear_roots,"base":xs,"target":target,"branches":branches,"canonical_projected_tuples":canonical,"signed_witnesses":witnesses,"exceptional_candidates_enumerated":exceptional_candidates,"invalid_signed_lifts":invalid_lifts,"complete_projection":complete,"construction_roots_signs_dedup_and_source_verification_included":true,"complete_IC_cost":false,"wall_time_admitted":false}),
     )
 }
 fn suffix(p: &Path, s: &str) -> PathBuf {

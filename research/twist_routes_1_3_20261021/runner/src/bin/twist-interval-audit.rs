@@ -142,6 +142,9 @@ fn main() -> Result<()> {
                     matched &= r["signed_witnesses"] == truth["witnesses"]
                         && r["lift_method"] == row["task"]["lift_method"];
                 }
+                if plan["root_policy_checked"] == true {
+                    matched &= r["linear_roots"] == row["task"]["linear_roots"];
+                }
                 let branches = r["branches"].as_array().ok_or("branches")?;
                 let wanted = match row["task"]["arm"].as_str().unwrap() {
                     "direct-chain" => 1,

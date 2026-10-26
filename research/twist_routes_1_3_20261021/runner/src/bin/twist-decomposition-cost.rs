@@ -161,6 +161,34 @@ fn incidence_plan(fixtures: &Path, frontier: &Path) -> Result<Value> {
         json!({"schema":"twist.incidence-cost-plan/v1","kind":"incidence","requested":cells.len(),"cells":cells,"solver_budget_ms":2500,"hard_timeout_s":4,"global_budget_s":2100,"target_label":0,"new_targets_opened":false,"selected_grid":"all ten fixtures; H=K in {8,16}; every lambda in {1,2,3,H}; no degree/outcome selection","full_600_cost_grid_complete":false,"fixtures_sha256":sha(fixtures)?,"frontier_rows_sha256":sha(frontier.join("ROWS.json"))?}),
     )
 }
+fn linear_plan(fixtures: &Path, census: &Path) -> Result<Value> {
+    let mut plan = controls(fixtures, census)?;
+    for cell in plan["cells"].as_array_mut().unwrap() {
+        let linear = cell["task"]["lift_method"] == "propagate";
+        cell["task"]["lift_method"] = json!("search");
+        cell["task"]["linear_roots"] = json!(linear);
+        cell["arm"] = json!(cell["arm"]
+            .as_str()
+            .unwrap()
+            .replace("propagate", "linear-roots"));
+    }
+    for pair in plan["AA_pairs"].as_array_mut().unwrap() {
+        for arm in pair.as_array_mut().unwrap() {
+            *arm = json!(arm.as_str().unwrap().replace("propagate", "linear-roots"));
+        }
+    }
+    for pair in plan["comparisons"].as_array_mut().unwrap() {
+        for key in ["candidate", "control"] {
+            pair[key] = json!(pair[key]
+                .as_str()
+                .unwrap()
+                .replace("propagate", "linear-roots"));
+        }
+    }
+    plan["schema"] = json!("twist.linear-root-plan/v1");
+    plan["root_policy_checked"] = json!(true);
+    Ok(plan)
+}
 fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
     if out.exists() {
         return Err("fresh output required".into());
@@ -226,6 +254,14 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
             .args(&args)
             .env("VALGRIND_LIB", &lib)
             .env("F4_FP_GM", "1")
+            .env(
+                "F4_FP_LINEAR_ROOTS",
+                if cell["task"]["linear_roots"] == true {
+                    "1"
+                } else {
+                    "0"
+                },
+            )
             .env("RAYON_NUM_THREADS", "1")
             .env("OMP_NUM_THREADS", "1")
             .env("OPENBLAS_NUM_THREADS", "1")
@@ -349,6 +385,10 @@ fn main() -> Result<()> {
         Some("plan-incidence") if a.len()==5 => {
             if Path::new(&a[4]).exists(){return Err("fresh plan required".into());}
             write(&a[4],&incidence_plan(Path::new(&a[2]),Path::new(&a[3]))?)
+        }
+        Some("plan-linear") if a.len()==5=>{
+            if Path::new(&a[4]).exists(){return Err("fresh plan required".into());}
+            write(&a[4],&linear_plan(Path::new(&a[2]),Path::new(&a[3]))?)
         }
         Some("run") if a.len() == 5 => run(Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4])),
         _ => {
