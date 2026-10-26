@@ -29,7 +29,8 @@ for i in 1 2; do
     "$bin" run $args --checkpoint-every 1 --file resumed --out-dir "$d" > "$d/resumed.$i.stdout" 2>&1 &
     pid=$!
     sleep "$kill_after"
-    pkill -9 -f "$bin" || true
+    # by exact process name: `pkill -f "$bin"` would also match this script's own command line
+    pkill -9 -x "$(basename "$bin" | cut -c1-15)" || true
     wait "$pid" 2>/dev/null || true
     echo "selftest: kill $i done; checkpoint files: $(ls "$d" | grep -c 'ckpt' || true)"
 done
