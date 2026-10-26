@@ -315,3 +315,9 @@ the selection run; the same checks are in `tests/`.
 4. **`curves.jsonl` scope.** Every curve of every group with `f_pi > 1` that was
    processed or skipped (with its reason). Curves with `f_pi = 1`, supersingular
    curves and `t < 0` mirrors are counted per field in the receipt, not listed.
+5. **Pair rule applied among independently verified candidates.** The
+   deterministic pair rule of section 3 is applied to the independently verified
+   candidate pairs of a group (item 2). A group whose only distinct-conductor
+   pairs are certified by Method A alone is reported as such and takes no trial
+   slot. Fields are processed in descending `p` so that, if the time cap bites,
+   the fields the trial-pair rule prefers are reached first.
