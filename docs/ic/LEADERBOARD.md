@@ -72,19 +72,19 @@ This performance handoff is published beside the curve-by-curve tables. The stan
 
 | regime | curve | log₂ r | recipe | |F| | columns | IC operations | rho operations | S, IC | S, reference | IC / rho | S, floor | × floor | ok | validation |
 |:--|:--|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|:--|
-| Prime field | `icv1-fp10-t5-192cb216` | 9.7 | folded, walked, base at the family optimum, m = 2 | 10 | 5 | 2^9.36 GAE | 2^6.69 GAE | 22.8 | 3.6 | **6.34×** | 0.886 | 25.8× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp12-t19-d4a315df` | 11.9 | folded table, walked targets, m = 2 | 32 | 16 | 2^9.93 GAE | 2^7.48 GAE | 15.6 | 2.85 | **5.47×** | 0.886 | 17.6× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp14-tm43-158b6914` | 14.0 | folded, walked, base at the family optimum, m = 2 | 26 | 13 | 2^10.70 GAE | 2^8.02 GAE | 13.1 | 2.03 | **6.43×** | 0.886 | 14.8× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp16-t351-d433f24e` | 16.0 | folded, walked, base at the family optimum, m = 2 | 40 | 20 | 2^11.54 GAE | 2^8.79 GAE | 11.7 | 1.74 | **6.71×** | 0.886 | 13.2× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp18-t175-45770ebc` | 18.0 | folded, walked, base at the family optimum, m = 2 | 64 | 32 | 2^12.07 GAE | 2^9.53 GAE | 8.41 | 1.45 | **5.82×** | 0.886 | 9.49× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp20-t1293-3c2999ba` | 20.0 | folded, walked, base at the family optimum, m = 2 | 102 | 51 | 2^13.42 GAE | 2^10.37 GAE | 10.7 | 1.29 | **8.3×** | 0.886 | 12.1× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp22-tm1267-a5acaf6d` | 21.7 | folded, walked, base at the family optimum, m = 2 | 148 | 74 | 2^14.50 GAE | 2^11.11 GAE | 12.8 | 1.22 | **10.5×** | 0.886 | 14.4× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp24-t1577-77336155` | 23.4 | folded, walked, base at the family optimum, m = 2 | 222 | 111 | 2^15.49 GAE | 2^11.74 GAE | 14 | 1.04 | **13.5×** | 0.886 | 15.8× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m15-t131-ed7256f0` | 14.0 | folded table, walked targets, m = 2 | 30 | 15 | 2^11.71 GAE | 2^8.01 GAE | 26.3 | 2.01 | **13.1×** | 0.886 | 29.7× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m18-t393-d2c04152` | 15.0 | folded, walked, base at the family optimum, m = 2 | 30 | 15 | 2^11.91 GAE | 2^8.50 GAE | 21.3 | 2.01 | **10.6×** | 0.886 | 24× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m21-t2591-de54d72e` | 20.0 | folded, walked, base at the family optimum, m = 2 | 62 | 31 | 2^14.61 GAE | 2^10.44 GAE | 24.4 | 1.36 | **18×** | 0.886 | 27.5× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m24-tm3047-2d0c0e8c` | 21.0 | folded, walked, base at the family optimum, m = 2 | 134 | 67 | 2^15.27 GAE | 2^10.74 GAE | 27.2 | 1.18 | **23×** | 0.886 | 30.7× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m27-t12543-569dca8b` | 24.4 | folded, walked, base at the family optimum, m = 2 | 254 | 127 | 2^17.41 GAE | 2^12.16 GAE | 36.9 | 0.966 | **38.2×** | 0.886 | 41.7× | ✓ | unvalidated (pre-gate) |
+| Prime field | `icv1-fp10-t5-192cb216` | 9.7 | folded, walked, base at the family optimum, m = 2 | 10 | 5 | 2^9.36 GAE | 2^6.69 GAE | 22.8 | 3.6 | **6.34×** | 0.886 | 25.8× | ✓ | validated |
+| Prime field | `icv1-fp12-t19-d4a315df` | 11.9 | folded table, walked targets, m = 2 | 32 | 16 | 2^9.93 GAE | 2^7.48 GAE | 15.6 | 2.85 | **5.47×** | 0.886 | 17.6× | ✓ | validated |
+| Prime field | `icv1-fp14-tm43-158b6914` | 14.0 | folded, walked, base at the family optimum, m = 2 | 26 | 13 | 2^10.70 GAE | 2^8.02 GAE | 13.1 | 2.03 | **6.43×** | 0.886 | 14.8× | ✓ | validated |
+| Prime field | `icv1-fp16-t351-d433f24e` | 16.0 | folded, walked, base at the family optimum, m = 2 | 40 | 20 | 2^11.54 GAE | 2^8.79 GAE | 11.7 | 1.74 | **6.71×** | 0.886 | 13.2× | ✓ | validated |
+| Prime field | `icv1-fp18-t175-45770ebc` | 18.0 | folded, walked, base at the family optimum, m = 2 | 64 | 32 | 2^12.07 GAE | 2^9.53 GAE | 8.41 | 1.45 | **5.82×** | 0.886 | 9.49× | ✓ | validated |
+| Prime field | `icv1-fp20-t1293-3c2999ba` | 20.0 | folded, walked, base at the family optimum, m = 2 | 102 | 51 | 2^13.42 GAE | 2^10.37 GAE | 10.7 | 1.29 | **8.3×** | 0.886 | 12.1× | ✓ | validated |
+| Prime field | `icv1-fp22-tm1267-a5acaf6d` | 21.7 | folded, walked, base at the family optimum, m = 2 | 148 | 74 | 2^14.50 GAE | 2^11.11 GAE | 12.8 | 1.22 | **10.5×** | 0.886 | 14.4× | ✓ | validated |
+| Prime field | `icv1-fp24-t1577-77336155` | 23.4 | folded, walked, base at the family optimum, m = 2 | 222 | 111 | 2^15.49 GAE | 2^11.74 GAE | 14 | 1.04 | **13.5×** | 0.886 | 15.8× | ✓ | validated |
+| Random binary | `icv1-f2m15-t131-ed7256f0` | 14.0 | folded table, walked targets, m = 2 | 30 | 15 | 2^11.71 GAE | 2^8.01 GAE | 26.3 | 2.01 | **13.1×** | 0.886 | 29.7× | ✓ | validated |
+| Random binary | `icv1-f2m18-t393-d2c04152` | 15.0 | folded, walked, base at the family optimum, m = 2 | 30 | 15 | 2^11.91 GAE | 2^8.50 GAE | 21.3 | 2.01 | **10.6×** | 0.886 | 24× | ✓ | validated |
+| Random binary | `icv1-f2m21-t2591-de54d72e` | 20.0 | folded, walked, base at the family optimum, m = 2 | 62 | 31 | 2^14.61 GAE | 2^10.44 GAE | 24.4 | 1.36 | **18×** | 0.886 | 27.5× | ✓ | validated |
+| Random binary | `icv1-f2m24-tm3047-2d0c0e8c` | 21.0 | folded, walked, base at the family optimum, m = 2 | 134 | 67 | 2^15.27 GAE | 2^10.74 GAE | 27.2 | 1.18 | **23×** | 0.886 | 30.7× | ✓ | validated |
+| Random binary | `icv1-f2m27-t12543-569dca8b` | 24.4 | folded, walked, base at the family optimum, m = 2 | 254 | 127 | 2^17.41 GAE | 2^12.16 GAE | 36.9 | 0.966 | **38.2×** | 0.886 | 41.7× | ✓ | validated |
 
 ## Table C: Koblitz, 32-target batch (§19–§22)
 

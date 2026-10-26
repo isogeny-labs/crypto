@@ -341,6 +341,7 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
                 "log2_ic_gae": best.get("log2_total_gae"),
                 "log2_rho_gae": row.get("reference_log2_total_gae"),
                 "operation_unit": row.get("operation_unit"),
+                "validation_status": (row.get("validation") or {}).get("status"),
                 "ratio_rho": best.get("ratio_rho"),
                 "ratio_floor": best.get("ratio_floor"),
                 "verified": best.get("verified"),

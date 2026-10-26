@@ -187,7 +187,7 @@
   function curvesView(q) {
     var head = el("div", null, [
       el("h1", { text: "Curves" }),
-      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. The lowest cold one-target ratio in the ranked leaderboard subset identifies a base and recipe for each measured curve; later studies also appear in the progress timeline. IC/rho = 1.0× is parity; larger means IC costs more. Absolute 2^x GAE is shown only for counted whole-pipeline rows. Cover certificates are available for " + DATA.counts.cover_assessed + "; the other " + DATA.counts.cover_unassessed + " models remain unassessed in the frozen cover catalog. Search by identity and filter by field or measurement. Click a slug for its full record. Volcano conductors require a certified endomorphism order; missing order data is not a conductor assignment." }),
+      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. For curves with a cold one-target row, the lowest ratio in the ranked leaderboard subset identifies a base and recipe; pre-gate rows are labelled. Batch-only rows remain visible in each curve's detail. Later studies also appear in the progress timeline. IC/rho = 1.0× is parity; larger means IC costs more. Absolute 2^x GAE is shown only for counted whole-pipeline rows. Cover certificates are available for " + DATA.counts.cover_assessed + "; the other " + DATA.counts.cover_unassessed + " models remain unassessed in the frozen cover catalog. Search by identity and filter by field or measurement. Click a slug for its full record. Volcano conductors require a certified endomorphism order; missing order data is not a conductor assignment." }),
       el("p", { class: "note" }, ["Progress by merge date: ", link("../scoreboard/#lab-progress", "full IC/rho timeline"), "."])
     ]);
     var f = el("form", { class: "filters" });
@@ -297,7 +297,8 @@
         } },
         { key: "base", label: "Ranked factor base", sort: function (c) { var b = bestRow(c); return b ? b.best_base_points : null; }, cell: function (c) {
           var b = bestRow(c);
-          return tdText(b ? "|F|=" + b.best_base_points + " · " + b.best_recipe : "–", "wrap");
+          return tdText(b ? "|F|=" + b.best_base_points + " · " + b.best_recipe +
+            (b.validation_status === "validated" ? "" : " · " + (b.validation_status || "validation unknown")) : "–", "wrap");
         } },
         { key: "ic_ops", label: "IC operations", numeric: true, sort: function (c) { var b = bestRow(c); return b ? b.log2_ic_gae : null; }, cell: function (c) { var b = bestRow(c); return opsCell(b && b.log2_ic_gae); } },
         { key: "rho_ops", label: "rho operations", numeric: true, sort: function (c) { var b = bestRow(c); return b ? b.log2_rho_gae : null; }, cell: function (c) { var b = bestRow(c); return opsCell(b && b.log2_rho_gae); } },
@@ -401,7 +402,7 @@
 
     view.appendChild(el("h2", { text: "On the leaderboard" }));
     if (c.leaderboard.length) {
-      view.appendChild(el("p", { class: "note" }, ["Ranked factor base is the base of the lowest verified cold one-target IC/rho row in this leaderboard subset. Later studies are retained in the timeline. 1.0× is parity. GAE counts are available only where the frozen whole-pipeline record counted them. See ", link("../scoreboard/#lab-progress", "progress over time"), "."]));
+      view.appendChild(el("p", { class: "note" }, ["Ranked factor base is the base of the lowest verified cold one-target IC/rho row in this leaderboard subset; the validation column distinguishes fully validated and pre-gate evidence. Later studies are retained in the timeline. 1.0× is parity. GAE counts are available only where the frozen whole-pipeline record counted them. See ", link("../scoreboard/#lab-progress", "progress over time"), "."]));
       view.appendChild(table([
         { key: "regime", label: "Regime" },
         { key: "log2_r", label: "log₂ r", numeric: true, digits: 2 },
@@ -413,6 +414,7 @@
         { key: "best_s", label: "S", numeric: true, digits: 3 },
         { key: "ratio_rho", label: "IC / rho", numeric: true, cell: function (b) { return ratioCell(b.ratio_rho); } },
         { key: "ratio_floor", label: "IC / floor", numeric: true, cell: function (b) { return ratioCell(b.ratio_floor); } },
+        { key: "validation_status", label: "Validation" },
         { key: "reference", label: "Reference", cell: function (b) { return tdText(fmt(b.reference), "wrap"); } },
         { key: "best_base_source", label: "Frozen source", cell: function (b) { return el("td", null, [repoLink(b.best_base_source, "record")]); } }
       ], c.leaderboard));
