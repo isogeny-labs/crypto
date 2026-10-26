@@ -43,6 +43,19 @@ decision log.
   (published257, skipped139/179/233). The proxy includes ramified primes
   and omits Atkin information. No new p-value, measured SEA cost or
   historical interpretation is admitted.
+- **Observed:** [exact embedding degrees](https://github.com/isogeny-labs/crypto/pull/2648)
+  were certified for all21 orders. Maximal degree accepts0/10 published and
+  2/11 skipped; the modern RFC7748 bound accepts10/10 published and10/11
+  skipped. Opposite-label P256 orders and several P224 orders share
+  embedding index0x3. These fixed criteria do not explain all skips.
+- **Observed:** the [period ECPP artifact trial](../research/nist_skip_criterion_20261025/period_ecpp_20261026/REPORT.md)
+  executed all21 known-prime orders with one fixed full-catalog configuration.
+  All21 raw CLI labels were prime, with no composite label. Corrected saved
+  certificate admission accepts3 published and6 skipped, retaining7 published
+  and5 skipped as indeterminate because of actual failed legacy theorem rows.
+  All three originally supplied skipped P224 curves pass admission. The
+  twelve unknowns are not weak/composite/rejected labels. This configuration
+  cannot provide a universal rejection explanation; historical use is unknown.
 - **Derived or proved:** primality and product checks certify the recorded
   factorizations; generator and Hasse checks certify the six prime full
   orders. These are computational checks, without Lean formalization.
@@ -82,8 +95,13 @@ about historical choices. Group-order-dependent RNG schedules and an
 unrecovered old SEA implementation remain outside the tested finite family.
 
 The 21-curve diagnostic, short-rule calibration and 52,520-model generation
-search ran. No attack, explicit map or new historical holdout campaign has
-been scheduled. For the vulnerability tracks, the original explicit-map and
+search, full84 factorization replay, exact-degree checks and fixed period-ECPP
+trial ran. The ECPP source mirror is not authenticated as the original
+generator's bytes, and no original caller/acceptance record links it to those
+choices. Further artifact/configuration variants are untested; this bounded
+negative trial does not exclude all certificate or historical resource filters.
+No attack, explicit map or new historical holdout campaign has been scheduled.
+For the vulnerability tracks, the original explicit-map and
 auxiliary-input obligations remain. New runs retain their own protocol,
 limits, failures and exact witness obligations.
 
@@ -110,3 +128,12 @@ Generation-family as-good calibration is 1,973/4,480 for an exact fit of
 at most two tests; the earlier 15-family union remains frozen separately.
 The [factorization obstruction](nist-p521-nplus1-composite-cofactor.md) is
 resolved. The historical explanation and applicable attacks remain unproved.
+
+2026-10-26 continuation: all21 embedding degrees were checked exactly, and
+all21 period ECPP prover/checker pairs actually ran. Six admitted skipped
+certificates contradict the fixed artifact's reject-all-skips hypothesis.
+The native CM metadata reader was corrected from original source and every
+saved packet revalidated without a legacy rerun. Twelve genuine failed
+theorem transcripts remain indeterminate. All failed preparation/runtime
+attempts and the initial restrictive-reader results are retained. This is
+additional negative evidence, not completion of the historical selector goal.
