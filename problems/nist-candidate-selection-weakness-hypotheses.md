@@ -31,6 +31,12 @@ decision log.
   `n-1` than its skipped counterpart. Published P-224 has Frobenius-order
   conductor 3 and a fully split 3-division polynomial, unlike its three
   skipped counterparts. Exact values and scope are in the linked report.
+- **Observed:** the [native factorization follow-up](../research/nist_skip_criterion_20261025/factor_followup_20261026/REPORT.md)
+  has proved p239 index 2491 `n+1`, P-384's discriminant magnitude and
+  P-521 `n-1` completely. This raises admitted full factorizations to 83/84.
+  The all-21 search can now use complete `n-1` and discriminant features;
+  its best structural conjunction still has three tests. P-521 `n+1`
+  retains a 125-digit composite and the full `n+1` family stays disabled.
 - **Derived or proved:** primality and product checks certify the recorded
   factorizations; generator and Hasse checks certify the six prime full
   orders. These are computational checks, without Lean formalization.
@@ -90,3 +96,8 @@ orders are fully factored and proved. The raw records, finite search scope,
 root-convention counterexample and remaining evidence obligations are retained
 in the linked report. An exact fit does not resolve the selection explanation
 or establish a vulnerability. Unresolved.
+
+2026-10-26 follow-up: three of the four remaining factorization targets
+passed independent native prime/product proofs. The unchanged full-21
+search replay has 1,118 features per row and retains the existing fits.
+Factor completion and the historical explanation remain separate obligations.

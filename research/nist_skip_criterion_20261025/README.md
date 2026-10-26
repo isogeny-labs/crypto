@@ -10,7 +10,8 @@ Start with [the truth table](results/criterion-truth-table.tsv),
 [calibration](results/calibration-union.json), and the [RNG-model verdict](results/rng-models.json).
 The raw evidence is packed in `evidence/runs.tar.xz` with
 per-member hashes. The PDF, archive and large PNG are delivered in the local
-workspace; their S3 upload remains blocked by unavailable upload credentials.
+workspace and stored in S3. Every uploaded object was downloaded and SHA-256
+checked without changing the frozen payload bytes.
 See `ARTIFACT_DELIVERY.json` for exact names, sizes, hashes and delivery status.
 No active curve registry, solver or benchmark is changed.
 
@@ -20,7 +21,8 @@ No active curve registry, solver or benchmark is changed.
 | Exact empirical criterion for the recorded choices | Independently verified on all 21 curves |
 | Historical explanation or applicable vulnerability | Unresolved; see the [selection problem](../../problems/nist-candidate-selection-weakness-hypotheses.md) |
 | Current PDF and full evidence bundle | Built, inspected and delivered locally |
-| Artifact-store delivery | Blocked; see the [upload problem](../../problems/nist-candidate-study-artifact-upload.md) |
+| Artifact-store delivery | Upload and full-object read-back verified; see the [delivery record](ARTIFACT_DELIVERY.json) |
+| Four remaining factorizations | Three independently proved complete; P-521 `n+1` remains incomplete; see the [follow-up](factor_followup_20261026/README.md) |
 
 ## Reproduce the native checks
 
@@ -61,9 +63,10 @@ python3 reports/render.py
 ```
 
 The first command checks tracked sources and records. The archive commands
-also need the locally delivered archive; it cannot yet be hydrated from the
-repository's artifact store. `ARTIFACT_DELIVERY.json` binds the delivered
-binary files separately. Do not treat a planned object key as an uploaded object.
+also need the hydrated archive. Run the repository artifact tool's `pull`
+command for this directory when starting from a fresh checkout.
+`ARTIFACT_DELIVERY.json` binds the delivered binary files separately and links
+the upload, remote verification and full-object read-back records.
 
 The last command only plots recorded counts and renders `REPORT.md`, using
 matplotlib, ReportLab, PyMuPDF and DejaVu fonts. The PDF embeds the raw archive,
@@ -81,4 +84,5 @@ tar --sort=name --mtime='2026-10-25 00:00:00Z' --owner=0 --group=0 \
 
 This is a frozen study. Exact models and witnesses are held in its parameter
 tables and raw archive; it does not introduce new active catalogue aliases.
-See the report for workflow limits and the pending artifact-store upload.
+The report retains its original workflow status. The dated delivery update
+records the later artifact-store upload; the follow-up records new research.
