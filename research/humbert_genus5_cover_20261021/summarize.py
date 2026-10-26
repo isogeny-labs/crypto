@@ -52,3 +52,18 @@ for p in ps:
     f = lambda key: med([a[key] / b[key] for a, b in pr if b[key] > 0])
     print("| %d | %.2f | %.2f | %.2f | %.2f |" % (p, f("unknowns"), med([(a["rel_candidates"] + a["quad_candidates"]) / (b["rel_candidates"] + b["quad_candidates"]) for a, b in pr]),
           f("t_linear_algebra") if all(b["t_linear_algebra"] > 0 for _, b in pr) else float("nan"), f("t_ic_total")))
+
+# CSV of the same medians for the Typst report (layout only)
+with open(os.path.join(HERE, "results", "summary.csv"), "w") as f:
+    f.write("q,log2r,arm,runs,unknowns,relations,t_rel,t_la,t_desc,t_ic,rho_meas,rho_exp,ratio_meas,ratio_exp,ratio_exp_lo,ratio_exp_hi\n")
+    for p in ps:
+        for arm in ["full", "iota"]:
+            v = by[(p, arm)]
+            if not v:
+                continue
+            ex = [d["t_ic_total"] / rho_exp(d) for d in v]
+            f.write("%d,%.1f,%s,%d,%d,%d,%.3f,%.3f,%.3f,%.2f,%.3f,%.3f,%.1f,%.2f,%.2f,%.2f\n" % (
+                p, med([math.log2(d["r"]) for d in v]), arm, len(v), med([d["unknowns"] for d in v]), med([d["relations"] for d in v]),
+                med([d["t_relations"] for d in v]), med([d["t_linear_algebra"] for d in v]), med([d["t_descent"] for d in v]),
+                med([d["t_ic_total"] for d in v]), med([d["rho_seconds"] for d in v]), med([rho_exp(d) for d in v]),
+                med([d["ic_over_rho_time"] for d in v]), med(ex), min(ex), max(ex)))
