@@ -8,6 +8,15 @@
    "source": "https://github.com/aburan28/crypto/blob/main/research/conductor_gap_cm_orbits_20261015/REPORT.md",
    "status": "All 500 primary and 265 replication attempts verified; L0; native work incompletely priced",
    "value": null
+  },
+  {
+   "anchor": "#m4-narrow-engines-wide-vars-20261020",
+   "date": "2026-10-20",
+   "label": "m = 4 decomposition-phase cost of the narrow F4, F6-IC and SAT engines in a wide-vars build, against the pair-table floor",
+   "reason_not_plotted": "A stage measurement of the decomposition phase (cost per relation against the MITM pair-table floor) with no complete cold one-target IC/rho ratio, so there is no value to plot. The floor stays 10^3-10^5 times cheaper per relation on these cells; not an improvement over the baseline.",
+   "source": "https://github.com/aburan28/crypto/blob/main/research/ic_m3_algebraic_vs_mitm_20261014/amendment-2/ANALYSIS.md",
+   "status": "F4 and F6-IC finish n = 23 and n = 29 (70 and 90 unknowns), n = 31 censored; slope 0.644 / 0.645 on n = 11-29 against 0.298 for the floor on the same cells; SAT undetermined",
+   "value": null
   }
  ],
  "question": "Verified index-calculus cost over matched Pollard rho (IC / rho), by date landed on main. Below 1 means index calculus is cheaper. The barrier is rho's own cost, 1.",
@@ -156,6 +165,17 @@
      "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
     },
     {
+     "date": "2026-10-20",
+     "value": 1236267.0,
+     "reference": "matched",
+     "unit": "F_p multiplications",
+     "label": "k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)",
+     "detail": "Native complete DLPs paired with rho on the same target: 1.24e6x (p = 61), 1.94e6x (p = 41), 3.39e6x and 5.77e6x (p = 31), 5.2e6x (p = 71), all verified; a sixth arm (p = 41, six-point base) stopped at its 10-hour cap at >= 1.5e7x. Rho's unpriced walk work priced at 0, 0.1, 1 GAE: rho ahead at every weight (4.1e5x best at 1 GAE). Trace replay cuts the test 1.74-1.77x (5.85e7 to 3.3e7). Extrapolated parity n = 2^227 (2^233 without replay). Engineering; no ecbench session (no F_{p^k} instance on main).",
+     "class": "engineering",
+     "anchor": "#rho-parity-ledger",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+    },
+    {
      "date": "2026-10-16",
      "value": 55.36777360324759,
      "reference": "matched",
@@ -176,6 +196,37 @@
      "class": "accounting",
      "anchor": "#lab-volcano-ic",
      "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json"
+    },
+    {
+     "date": "2026-10-18",
+     "value": 1.272,
+     "reference": "matched",
+     "unit": "S",
+     "label": "Lazy orbit-member index, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)",
+     "detail": "The frozen Frobenius-orbit IC with its pair table's orbit-member index resolved on a hit instead of built for every base point (same table, relations, rank and logarithms: 856/856 run pairs identical). Paired against the fully priced signed-Frobenius rho on 32 targets x 3 rounds per curve: 1.272 [0.770, 1.803] at the best cell (interval includes 1), was 1.566 [0.992, 2.347] with the eager table on other seeds. Against rho-strong the lazy arm is cheaper at n = 13, 17, 19, 29, a tie at n = 31 (0.985 [0.908, 1.062], was 1.221) and above it at n = 23, 37, 41. Eager / lazy 1.12-1.44x on seven curves, 1.014x at n = 41. L0, counts only.",
+     "class": "engineering",
+     "anchor": "#lazy-orbit-members-20261018",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf"
+    },
+    {
+     "anchor": "#ic-tool-programme-20261001",
+     "class": "accounting",
+     "date": "2026-10-20",
+     "detail": "Rule v8: ledger section 23's six sizes (2^36.6-2^47.2, 64 public points and four A/A repeats a size, 408/408 rows checked in each of two runs of one binary) against a matched rho, the signed-Frobenius walk with its canonicalisation batched 16 lanes at a time by GFNI and funnel shifts; the control run, the same binary with rho as at rule v7, reads 3.59-11.56x. With the reusable set-up charged the index calculus costs 4.67-18.07x rho cold: 4.669x [4.34, 5.07] at 2^36.6, 18.07x [15.98, 20.58] at 2^47.2. Rho is still faster at every size. The two rho arms take identical walks on 64/64 targets a size; the index calculus's own online time is the same in both runs (0.976-1.033). The distance to rho is larger than rule v7 reported because rho was unmatched, not because the index calculus slowed; the ln-ln slope is 0.168 (t interval 0.128-0.208; rule v3: 0.176), not distinguishable from v3's. No curve with log2 r >= 50 is runnable by this single-word pipeline. Class: accounting (a corrected reference); the batched rho kernel is engineering; no advance.",
+     "label": "Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md",
+     "value": 4.669
+    },
+    {
+     "anchor": "#lab-planner-validation",
+     "class": "engineering",
+     "date": "2026-10-21",
+     "detail": "ic plan / ic bench --auto (ic-planner/1) checked on six prime curves outside its evidence, each plan against every alternative one change away from it (ecbench, 24 verified runs per arm and curve, audits OK). Best cold one-target cell on a registered curve: icv1-fp24-tm5099-a6f137c6 (log2 r 24.00), S(plan)/S(rho.negation) 14.39 [11.63, 18.45], planner prediction 12.23. Rho is cheaper on all six curves (12.6-25.8x). At w = 0 every alternative costs more than the plan; the doubled base is not separated across the band (below 1 at w = 1). Tooling validation: the plan is the existing best recipe chosen automatically; no advance, no leaderboard row moves.",
+     "label": "Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md",
+     "value": 14.39
     }
    ],
    "role": "emphasis"
@@ -403,6 +454,17 @@
      "class": "engineering",
      "anchor": "#rootfinding-buffers-20261014",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
+    },
+    {
+     "date": "2026-10-20",
+     "value": 158.9,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "PKM Kummer tower (t=12) + rootfind-mitm, 30-bit prime curve icv1-fp30-t49927-d70f5de2",
+     "detail": "IC / rho-negation S ratio 158.9 [121.6, 221.4] at w = 0 (175x at w = 0.1, 247x at w = 1) over 24 matched measured pairs on eight public targets, session ECBS1hfb8f08d66f01, audit OK (160 records verified, 120 replays reproduced). Extends the registered 20-28 bit ladder (140.6x at 28 bits): the gap grew. L0, operation counts only; native field work unpriced. Class: measurement; not an improvement.",
+     "class": "accounting",
+     "anchor": "#lab-ecbench-all",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/certicom131_ic_program_20261020/README.md"
     }
    ],
    "role": "context"
@@ -750,16 +812,6 @@
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#genus-crossover",
      "value": 0.24
-    },
-    {
-     "anchor": "#genus-crossover",
-     "class": "accounting",
-     "date": "2026-10-20",
-     "detail": "Re-priced in bitop/v1 (an accounting convention, not a physical gate count) with both arms counted at the field, mod-N, hash and word level against a full-width rho walk, on round seven's 18 rows: genus 4, p = 61, N = 16,790,591 reads 0.114 [0.096, 0.138] (95% bootstrap; was 0.24 in-situ against an 8-bit walk). Genus-4 slope of log2(IC/rho) on log2 N: -0.232 [-0.320, -0.082] (round seven in-situ -0.29 [-0.42, -0.16]). No algorithm change.",
-     "label": "bitop/v1 re-pricing: both arms counted, full-width rho",
-     "reference": "matched",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/hec_bitop_20261020/README.md",
-     "value": 0.114
     }
    ],
    "role": "context"
@@ -879,9 +931,9 @@
     {
      "date": "2026-10-17",
      "value": 0.252,
-     "reference": "matched",
-     "label": "Genus-3 GHS IC-2LP rebuilt baseline at q = 2^14 (04b)",
-     "detail": "Rebuilt IC-2LP baseline (kappa = 2, tree-cycle elimination + Lanczos) against rho on the same Jac(C)[ell] at q = 2^14: 0.252x with rho renormalised to sqrt(pi/2) (0.162x raw; rho walks 0.49-3.48 steps per sqrt(ell), n = 4). Cost exponent over 2^14-2^20: 1.383 (99% [1.382, 1.384]) against rho's 3/2 and GTTD's 4/3; relation phase 1.332, linear algebra 1.447. Retuning the factor base gives 1.373; structured Gaussian elimination before Lanczos gives 1.419 while cheaper by 9-22%. The original study this follows up is not in the repository; this is a rebuild. Toy sizes; not an ECDLP crossover, since rho on E0(F_q^3) is not measured.",
+     "reference": "unmatched",
+     "label": "Genus-3 GHS IC-2LP rebuild at q = 2^14 (04b; rho reference unmatched to the R10 E0 track)",
+     "detail": "Historical rebuild: 0.252x against rho on Jac(C)[ell] at q = 2^14 (0.162x raw; rho walks 0.49-3.48 steps per sqrt(ell), n = 4). R10 marks this reference MEASURED-UNMATCHED to the pinned E0 rho track; this value is not a matched E0-rho crossover. Cost exponent over 2^14-2^20: 1.383 (99% [1.382, 1.384]) against rho's 3/2 and GTTD's 4/3; relation phase 1.332, linear algebra 1.447. Retuning the factor base gives 1.373; structured Gaussian elimination before Lanczos gives 1.419 while cheaper by 9-22%. The original study this follows up is not in the repository; this is a rebuild. Toy sizes; not an ECDLP crossover, since rho on E0(F_q^3) is not measured.",
      "class": "engineering",
      "anchor": "#genus-crossover",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ic_improve_20261014/04b-genus3-2lp-rebalance/README.md"
@@ -928,5 +980,5 @@
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-20"
+ "updated": "2026-10-21"
 }

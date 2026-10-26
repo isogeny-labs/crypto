@@ -1,0 +1,402 @@
+{
+  "job": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"job\":{\"created_at\":\"2026-10-19T19:22:31Z\",\"job_name\":\"ecbench-real-20261019-1922\",\"state\":\"succeeded\",\"status\":{\"completionTime\":\"2026-10-19T19:23:14Z\",\"conditions\":[{\"lastProbeTime\":\"2026-10-19T19:23:14Z\",\"lastTransitionTime\":\"2026-10-19T19:23:14Z\",\"message\":\"Reached expected number of succeeded pods\",\"reason\":\"CompletionsReached\",\"status\":\"True\",\"type\":\"SuccessCriteriaMet\"},{\"lastProbeTime\":\"2026-10-19T19:23:14Z\",\"lastTransitionTime\":\"2026-10-19T19:23:14Z\",\"message\":\"Reached expected number of succeeded pods\",\"reason\":\"CompletionsReached\",\"status\":\"True\",\"type\":\"Complete\"}],\"ready\":0,\"startTime\":\"2026-10-19T19:22:31Z\",\"succeeded\":1,\"terminating\":0,\"uncountedTerminatedPods\":{}},\"uid\":\"57b5a5ec-d11e-40f0-8742-67cedfdf87b0\"},\"pods\":[{\"name\":\"ecbench-real-20261019-1922-7mzcp\",\"node\":\"ip-10-84-69-3.us-east-2.compute.internal\",\"status\":{\"allocatedResources\":{\"cpu\":\"2\",\"ephemeral-storage\":\"10Gi\",\"memory\":\"4Gi\"},\"conditions\":[{\"lastProbeTime\":null,\"lastTransitionTime\":\"2026-10-19T19:23:13Z\",\"observedGeneration\":1,\"status\":\"False\",\"type\":\"PodReadyToStartContainers\"},{\"lastProbeTime\":null,\"lastTransitionTime\":\"2026-10-19T19:22:58Z\",\"observedGeneration\":1,\"reason\":\"PodCompleted\",\"status\":\"True\",\"type\":\"Initialized\"},{\"lastProbeTime\":null,\"lastTransitionTime\":\"2026-10-19T19:23:12Z\",\"observedGeneration\":1,\"reason\":\"PodCompleted\",\"status\":\"False\",\"type\":\"Ready\"},{\"lastProbeTime\":null,\"lastTransitionTime\":\"2026-10-19T19:23:12Z\",\"observedGeneration\":1,\"reason\":\"PodCompleted\",\"status\":\"False\",\"type\":\"ContainersReady\"},{\"lastProbeTime\":null,\"lastTransitionTime\":\"2026-10-19T19:22:58Z\",\"observedGeneration\":1,\"status\":\"True\",\"type\":\"PodScheduled\"}],\"containerStatuses\":[{\"allocatedResources\":{\"cpu\":\"2\",\"ephemeral-storage\":\"10Gi\",\"memory\":\"4Gi\"},\"containerID\":\"containerd://1203e118e256af799c227b8e0c53ab8a3eb283b14a31ed8374f329b92dffa3ad\",\"image\":\"sha256:50f0ef614828bc267a28a10061a12e3d8280eb1cd92f207a9ea1aa9c18ea8f24\",\"imageID\":\"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581\",\"lastState\":{},\"name\":\"task\",\"ready\":false,\"resources\":{\"limits\":{\"cpu\":\"2\",\"ephemeral-storage\":\"10Gi\",\"memory\":\"4Gi\"},\"requests\":{\"cpu\":\"2\",\"ephemeral-storage\":\"10Gi\",\"memory\":\"4Gi\"}},\"restartCount\":0,\"started\":false,\"state\":{\"terminated\":{\"containerID\":\"containerd://1203e118e256af799c227b8e0c53ab8a3eb283b14a31ed8374f329b92dffa3ad\",\"exitCode\":0,\"finishedAt\":\"2026-10-19T19:23:09Z\",\"reason\":\"Completed\",\"startedAt\":\"2026-10-19T19:23:03Z\"}},\"user\":{\"linux\":{\"gid\":1000,\"supplementalGroups\":[1000],\"uid\":1000}},\"volumeMounts\":[{\"mountPath\":\"/work\",\"name\":\"work\"},{\"mountPath\":\"/tmp\",\"name\":\"tmp\"},{\"mountPath\":\"/var/run/secrets/eks.amazonaws.com/serviceaccount\",\"name\":\"aws-iam-token\",\"readOnly\":true,\"recursiveReadOnly\":\"Disabled\"}]}],\"hostIP\":\"10.84.69.3\",\"hostIPs\":[{\"ip\":\"10.84.69.3\"}],\"observedGeneration\":1,\"phase\":\"Succeeded\",\"podIP\":\"10.84.77.231\",\"podIPs\":[{\"ip\":\"10.84.77.231\"}],\"qosClass\":\"Guaranteed\",\"resources\":{\"limits\":{\"memory\":\"4Gi\"},\"requests\":{\"cpu\":\"1999m\",\"memory\":\"4Gi\"}},\"startTime\":\"2026-10-19T19:22:58Z\"},\"uid\":\"5319a3b0-ba85-44cc-be19-02d123364899\"}]}"
+      }
+    ],
+    "structuredContent": {
+      "job": {
+        "created_at": "2026-10-19T19:22:31Z",
+        "job_name": "ecbench-real-20261019-1922",
+        "state": "succeeded",
+        "status": {
+          "completionTime": "2026-10-19T19:23:14Z",
+          "conditions": [
+            {
+              "lastProbeTime": "2026-10-19T19:23:14Z",
+              "lastTransitionTime": "2026-10-19T19:23:14Z",
+              "message": "Reached expected number of succeeded pods",
+              "reason": "CompletionsReached",
+              "status": "True",
+              "type": "SuccessCriteriaMet"
+            },
+            {
+              "lastProbeTime": "2026-10-19T19:23:14Z",
+              "lastTransitionTime": "2026-10-19T19:23:14Z",
+              "message": "Reached expected number of succeeded pods",
+              "reason": "CompletionsReached",
+              "status": "True",
+              "type": "Complete"
+            }
+          ],
+          "ready": 0,
+          "startTime": "2026-10-19T19:22:31Z",
+          "succeeded": 1,
+          "terminating": 0,
+          "uncountedTerminatedPods": {}
+        },
+        "uid": "57b5a5ec-d11e-40f0-8742-67cedfdf87b0"
+      },
+      "pods": [
+        {
+          "name": "ecbench-real-20261019-1922-7mzcp",
+          "node": "ip-10-84-69-3.us-east-2.compute.internal",
+          "status": {
+            "allocatedResources": {
+              "cpu": "2",
+              "ephemeral-storage": "10Gi",
+              "memory": "4Gi"
+            },
+            "conditions": [
+              {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-19T19:23:13Z",
+                "observedGeneration": 1,
+                "status": "False",
+                "type": "PodReadyToStartContainers"
+              },
+              {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-19T19:22:58Z",
+                "observedGeneration": 1,
+                "reason": "PodCompleted",
+                "status": "True",
+                "type": "Initialized"
+              },
+              {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-19T19:23:12Z",
+                "observedGeneration": 1,
+                "reason": "PodCompleted",
+                "status": "False",
+                "type": "Ready"
+              },
+              {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-19T19:23:12Z",
+                "observedGeneration": 1,
+                "reason": "PodCompleted",
+                "status": "False",
+                "type": "ContainersReady"
+              },
+              {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-19T19:22:58Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+              }
+            ],
+            "containerStatuses": [
+              {
+                "allocatedResources": {
+                  "cpu": "2",
+                  "ephemeral-storage": "10Gi",
+                  "memory": "4Gi"
+                },
+                "containerID": "containerd://1203e118e256af799c227b8e0c53ab8a3eb283b14a31ed8374f329b92dffa3ad",
+                "image": "sha256:50f0ef614828bc267a28a10061a12e3d8280eb1cd92f207a9ea1aa9c18ea8f24",
+                "imageID": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+                "lastState": {},
+                "name": "task",
+                "ready": false,
+                "resources": {
+                  "limits": {
+                    "cpu": "2",
+                    "ephemeral-storage": "10Gi",
+                    "memory": "4Gi"
+                  },
+                  "requests": {
+                    "cpu": "2",
+                    "ephemeral-storage": "10Gi",
+                    "memory": "4Gi"
+                  }
+                },
+                "restartCount": 0,
+                "started": false,
+                "state": {
+                  "terminated": {
+                    "containerID": "containerd://1203e118e256af799c227b8e0c53ab8a3eb283b14a31ed8374f329b92dffa3ad",
+                    "exitCode": 0,
+                    "finishedAt": "2026-10-19T19:23:09Z",
+                    "reason": "Completed",
+                    "startedAt": "2026-10-19T19:23:03Z"
+                  }
+                },
+                "user": {
+                  "linux": {
+                    "gid": 1000,
+                    "supplementalGroups": [
+                      1000
+                    ],
+                    "uid": 1000
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/work",
+                    "name": "work"
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp"
+                  },
+                  {
+                    "mountPath": "/var/run/secrets/eks.amazonaws.com/serviceaccount",
+                    "name": "aws-iam-token",
+                    "readOnly": true,
+                    "recursiveReadOnly": "Disabled"
+                  }
+                ]
+              }
+            ],
+            "hostIP": "10.84.69.3",
+            "hostIPs": [
+              {
+                "ip": "10.84.69.3"
+              }
+            ],
+            "observedGeneration": 1,
+            "phase": "Succeeded",
+            "podIP": "10.84.77.231",
+            "podIPs": [
+              {
+                "ip": "10.84.77.231"
+              }
+            ],
+            "qosClass": "Guaranteed",
+            "resources": {
+              "limits": {
+                "memory": "4Gi"
+              },
+              "requests": {
+                "cpu": "1999m",
+                "memory": "4Gi"
+              }
+            },
+            "startTime": "2026-10-19T19:22:58Z"
+          },
+          "uid": "5319a3b0-ba85-44cc-be19-02d123364899"
+        }
+      ]
+    },
+    "isError": false
+  },
+  "s3": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"next_token\":null,\"objects\":[{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"f9573a7d0d1c118000336b2319b3b1dd\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/SHA256SUMS\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":1318,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"52d6e84c2714aa810046e7c35bfedb04\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/audit.json\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":7921,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"30cb12df38e664f717cbb8c8300b9313\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/audit.stderr\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":149,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"52d6e84c2714aa810046e7c35bfedb04\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/audit.stdout\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":7921,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"461c9c73f1099cffa9ccff10b1cd9c66\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/binary.sha256\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":89,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"addeea32ca5dbfbe7cbf3d7e250ee680\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/build-info.json\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":288,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"1a77e40fdf85cf9cf8938f6f5c478532\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/input-spec.json\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":1391,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"1eb0617af3b694969027c239889fd080\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/job-exit.json\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":160,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"9dc1210778091ad0051bf5caea679fd1\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/process-status.txt\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":1425,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"d41d8cd98f00b204e9800998ecf8427e\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/run-summary.json\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":0,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"a0e8f0f5cf0b53c5ee5e3ef768b696a9\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/run.stderr\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":6000,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"dde10fdf3b041fab9ee464734bbfb0aa\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/runner-identity.json\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":193,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"67d11cbaf7b9a0343e7439bc0dfcf1ed\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/session/host.json\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":3353,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"d40f59660054e983ed4c2fcb9efb3774\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/session/plan.json\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":17034,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"d049bc6efdf5ef41554fa1494277490a\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/session/records.jsonl\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":343851,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"d619a0da59895b02c911ee0522003336\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/session/session.json\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":3199,\"StorageClass\":\"STANDARD\"},{\"ChecksumAlgorithm\":[\"CRC64NVME\"],\"ChecksumType\":\"FULL_OBJECT\",\"ETag\":\"\\\"1a77e40fdf85cf9cf8938f6f5c478532\\\"\",\"Key\":\"runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/session/spec.json\",\"LastModified\":\"2026-10-19T19:23:10+00:00\",\"Size\":1391,\"StorageClass\":\"STANDARD\"}],\"results_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/ecbench-real-20261019-1922/\"}"
+      }
+    ],
+    "structuredContent": {
+      "next_token": null,
+      "objects": [
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"f9573a7d0d1c118000336b2319b3b1dd\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/SHA256SUMS",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 1318,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"52d6e84c2714aa810046e7c35bfedb04\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/audit.json",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 7921,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"30cb12df38e664f717cbb8c8300b9313\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/audit.stderr",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 149,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"52d6e84c2714aa810046e7c35bfedb04\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/audit.stdout",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 7921,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"461c9c73f1099cffa9ccff10b1cd9c66\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/binary.sha256",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 89,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"addeea32ca5dbfbe7cbf3d7e250ee680\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/build-info.json",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 288,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"1a77e40fdf85cf9cf8938f6f5c478532\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/input-spec.json",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 1391,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"1eb0617af3b694969027c239889fd080\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/job-exit.json",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 160,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"9dc1210778091ad0051bf5caea679fd1\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/process-status.txt",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 1425,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"d41d8cd98f00b204e9800998ecf8427e\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/run-summary.json",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 0,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"a0e8f0f5cf0b53c5ee5e3ef768b696a9\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/run.stderr",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 6000,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"dde10fdf3b041fab9ee464734bbfb0aa\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/runner-identity.json",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 193,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"67d11cbaf7b9a0343e7439bc0dfcf1ed\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/session/host.json",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 3353,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"d40f59660054e983ed4c2fcb9efb3774\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/session/plan.json",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 17034,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"d049bc6efdf5ef41554fa1494277490a\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/session/records.jsonl",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 343851,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"d619a0da59895b02c911ee0522003336\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/session/session.json",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 3199,
+          "StorageClass": "STANDARD"
+        },
+        {
+          "ChecksumAlgorithm": [
+            "CRC64NVME"
+          ],
+          "ChecksumType": "FULL_OBJECT",
+          "ETag": "\"1a77e40fdf85cf9cf8938f6f5c478532\"",
+          "Key": "runs/ecbench-real-20261019-1922/5319a3b0-ba85-44cc-be19-02d123364899/session/spec.json",
+          "LastModified": "2026-10-19T19:23:10+00:00",
+          "Size": 1391,
+          "StorageClass": "STANDARD"
+        }
+      ],
+      "results_uri": "s3://isolab-results-104186811093-us-east-2/runs/ecbench-real-20261019-1922/"
+    },
+    "isError": false
+  },
+  "validation": {
+    "objects_downloaded": 17,
+    "payload_sha256_matches": 16,
+    "job_exit_code": 0,
+    "records_verified": 72,
+    "measured_replays_reproduced": 54,
+    "host_replay_ok": true,
+    "host_replay_count": 54,
+    "source": "Downloaded SHA256SUMS, audit.json and independently generated host-replay.json",
+    "grades": {
+      "L0": 72
+    }
+  }
+}

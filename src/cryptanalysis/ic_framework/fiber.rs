@@ -26,6 +26,7 @@
 //! added and compared with the lift they claim — so the relation loop
 //! sees exact decompositions as it does from the blind oracles.
 
+use crate::cryptanalysis::pq_groebner_f2::mask_low64;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::time::Duration;
 
@@ -989,7 +990,7 @@ impl<'i> FiberDescentOracle<'i> {
             return None;
         };
         for v in solutions {
-            let xs = sys.lift(v);
+            let xs = sys.lift(mask_low64(v));
             // The combined system names the lift it found; the plain one
             // is checked against every lift it was asked about.
             let candidates: Vec<FastPoint> = if self.mode == FiberMode::Combined {
@@ -1005,7 +1006,7 @@ impl<'i> FiberDescentOracle<'i> {
                     .extra
                     .entry("bitop_field_adds".to_string())
                     .or_insert(0) += all_targets.len() as u64;
-                targets_by_x(sys.lift_target(v))
+                targets_by_x(sys.lift_target(mask_low64(v)))
             } else {
                 all_targets.to_vec()
             };
@@ -1210,6 +1211,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FiberDescentOracle<'_> {
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::{binary_subspace_factor_base, koblitz_instance};
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     #[test]
     fn the_cofactor_fiber_of_a_koblitz_curve_is_its_rational_torsion() {
@@ -1304,8 +1309,8 @@ mod tests {
         };
         let mut found = false;
         for v in sols {
-            let abs = sys.lift(v);
-            let x = sys.lift_target(v);
+            let abs = sys.lift(mask_low64(v));
+            let x = sys.lift_target(mask_low64(v));
             let targets: Vec<FastPoint> = all.iter().copied().filter(|t| t.x == x).collect();
             assert!(
                 !targets.is_empty(),
