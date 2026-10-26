@@ -78,5 +78,33 @@ class ArchivedLabelTests(unittest.TestCase):
                     self.assertEqual(names.lint(self.resolver, {}, False), [])
 
 
+SESSION_TABLE = "research/ext_endo_rho_20261023/sessions/subfield-fp3.table.md"
+
+
+class ArchivedUnregisteredSlugTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.text = (names.REPO / SESSION_TABLE).read_text()
+
+    def test_only_exact_frozen_session_table_is_allowlisted(self):
+        self.assertTrue(names.archived_unregistered_slug_file(SESSION_TABLE, self.text))
+        self.assertFalse(names.archived_unregistered_slug_file(SESSION_TABLE, self.text + "\n"))
+        self.assertFalse(names.archived_unregistered_slug_file("research/other.md", self.text))
+
+    def test_normal_lint_allows_the_exact_frozen_table(self):
+        resolver = names.Resolver()
+        with patch.object(names, "tracked", return_value=[SESSION_TABLE]):
+            self.assertEqual(names.lint(resolver, {}, False), [])
+
+    def test_original_gls_table_is_allowed_only_at_its_frozen_hash(self):
+        path = "research/ext_endo_rho_20261023/sessions/gls-fp2.table.md"
+        text = (names.REPO / path).read_text()
+        self.assertTrue(names.archived_unregistered_slug_file(path, text))
+        self.assertFalse(names.archived_unregistered_slug_file(path, text + "\n"))
+        resolver = names.Resolver()
+        with patch.object(names, "tracked", return_value=[path]):
+            self.assertEqual(names.lint(resolver, {}, False), [])
+
+
 if __name__ == "__main__":
     unittest.main()
