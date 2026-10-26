@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   hash-only:
-    runs-on: main
+    runs-on: ubuntu-latest
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 360 }}
     steps:
       - uses: actions/checkout@v4
@@ -73,7 +73,7 @@ jobs:
   outcome:
     if: github.event.action == 'labeled' && github.event.label.name == 'run-n53-rotation-once' && github.event.pull_request.head.repo.full_name == github.repository
     needs: hash-only
-    runs-on: main
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     concurrency:
       group: n53-target-cyclic-${{ github.event.pull_request.number }}

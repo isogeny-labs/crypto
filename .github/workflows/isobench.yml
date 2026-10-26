@@ -28,7 +28,7 @@ concurrency:
 
 jobs:
   isobench:
-    runs-on: main
+    runs-on: ubuntu-latest
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     env:
       CARGO_TERM_COLOR: always
