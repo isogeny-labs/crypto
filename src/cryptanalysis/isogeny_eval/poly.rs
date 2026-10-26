@@ -1,5 +1,5 @@
-//! Dense polynomials over [`PrimeField`]: Karatsuba multiplication, power
-//! series inversion (Newton), remainder by a monic divisor with a cached
+//! Dense polynomials over [`PrimeField`]: Karatsuba or three-prime NTT
+//! multiplication, power series inversion (Newton), remainder by a monic divisor with a cached
 //! reversed inverse, balanced products, and product / remainder trees for
 //! multipoint evaluation.
 //!
@@ -10,11 +10,15 @@
 //! vector is the zero polynomial.
 //!
 //! Every coefficient product is counted as one `M` (schoolbook products are
-//! counted in bulk), matching the round-4 unit.  Asymptotically the
-//! multiplication is Karatsuba (`O(n^{1.585})`); an NTT/FFT multiplication is
-//! not implemented (follow-up).
+//! counted in bulk), matching the round-4 unit.  [`mul`] follows the field's
+//! [`PolyMul`]: Karatsuba (`O(n^{1.585})`, the round-4 arithmetic), or the
+//! three-prime NTT of [`super::ntt`] (`O(n log n)` word multiplications,
+//! counted as described there) from [`NTT_THRESHOLD`] coefficients on.
+//! Everything else here (Newton reciprocal, remainders, product and
+//! remainder trees) goes through [`mul`].
 
-use super::counted_fp::{OpCounter, PrimeField};
+use super::counted_fp::{OpCounter, PolyMul, PrimeField};
+use super::ntt::{mul_ntt, ntt_mul_cost, NTT_WORD_COST_IN_M};
 
 /// Below this length of the shorter operand, [`mul`] uses the schoolbook
 /// product (the round-4 threshold).
@@ -23,6 +27,55 @@ pub const KARATSUBA_THRESHOLD: usize = 24;
 /// Below this degree of divisor or quotient, [`MonicDivisor::rem`] uses
 /// classical long division instead of a Newton reciprocal.
 pub const NEWTON_DIVISION_THRESHOLD: usize = 32;
+
+/// With [`PolyMul::Auto`], [`mul`] considers the NTT only when the shorter
+/// operand has at least this many coefficients, and then takes whichever of
+/// Karatsuba and NTT has the smaller counted cost for that exact shape
+/// ([`karatsuba_cost`] against [`ntt_mul_cost`], `W` at one `M`).  Measured
+/// (`research/isogeny_fibers_20261010/round5/r5_3_ntt_sqrt_velu`,
+/// `threshold.json`): for balanced products the NTT count first wins at
+/// length 512 (ratio 0.92; 1.27 at 256), for `8n × n` at `n = 768`, and
+/// for the `2n × n` shapes of Newton iteration only from `n ≈ 2048`
+/// (power-of-two padding), so a single length threshold would be wrong for
+/// some shape; the per-shape comparison is exact for the counted unit.  In
+/// contended wall time this implementation's NTT is slower per counted unit
+/// than the lazily reduced schoolbook products (wall crossover near 4096,
+/// same file).
+pub const NTT_THRESHOLD: usize = 256;
+
+/// The exact number of `M` [`mul_karatsuba`] counts for operand lengths
+/// `la`, `lb` (it mirrors the recursion; memoised on the operand shapes,
+/// of which a balanced recursion has `O(log n)`).
+pub fn karatsuba_cost(la: usize, lb: usize) -> u64 {
+    fn go(la: usize, lb: usize, memo: &mut std::collections::HashMap<(usize, usize), u64>) -> u64 {
+        if la == 0 || lb == 0 {
+            return 0;
+        }
+        let (la, lb) = if la >= lb { (la, lb) } else { (lb, la) };
+        if lb <= KARATSUBA_THRESHOLD {
+            return (la * lb) as u64;
+        }
+        if let Some(&c) = memo.get(&(la, lb)) {
+            return c;
+        }
+        let c = if la >= 2 * lb {
+            let full = la / lb;
+            let rest = la % lb;
+            full as u64 * go(lb, lb, memo) + go(rest, lb, memo)
+        } else {
+            let m = la / 2;
+            if lb <= m {
+                go(m, lb, memo) + go(la - m, lb, memo)
+            } else {
+                // z0 = a0·b0, z2 = a1·b1, z1 = (a0 + a1)(b0 + b1).
+                go(m, m, memo) + go(la - m, lb - m, memo) + go(la - m, m.max(lb - m), memo)
+            }
+        };
+        memo.insert((la, lb), c);
+        c
+    }
+    go(la, lb, &mut std::collections::HashMap::new())
+}
 
 /// Drop trailing zero coefficients.
 pub fn trim(a: &mut Vec<u64>) {
@@ -92,9 +145,35 @@ pub fn mul_schoolbook<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> 
     acc.into_iter().map(|v| (v % p) as u64).collect()
 }
 
-/// `a·b` by Karatsuba (schoolbook below [`KARATSUBA_THRESHOLD`]).  The
-/// result has length `len(a) + len(b) − 1` (empty if either is empty).
+/// `a·b` by the field's [`PolyMul`] choice: Karatsuba
+/// ([`mul_karatsuba`]) or the NTT ([`mul_ntt`]; under [`PolyMul::Auto`]
+/// only when the shorter operand has at least [`NTT_THRESHOLD`]
+/// coefficients and the NTT's counted cost is the smaller one for this
+/// shape).  The result has length
+/// `len(a) + len(b) − 1` (empty if either is empty) and does not depend on
+/// the choice; the counts do.
 pub fn mul<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> Vec<u64> {
+    let use_ntt = match f.poly_mul() {
+        PolyMul::Karatsuba => false,
+        PolyMul::Ntt => true,
+        PolyMul::Auto => {
+            a.len().min(b.len()) >= NTT_THRESHOLD && {
+                let (w, m) = ntt_mul_cost(a.len(), b.len(), std::ptr::eq(a, b));
+                w * NTT_WORD_COST_IN_M + m <= karatsuba_cost(a.len(), b.len())
+            }
+        }
+    };
+    if use_ntt {
+        mul_ntt(f, a, b)
+    } else {
+        mul_karatsuba(f, a, b)
+    }
+}
+
+/// `a·b` by Karatsuba (schoolbook below [`KARATSUBA_THRESHOLD`]),
+/// whatever the field's [`PolyMul`].  The result has length
+/// `len(a) + len(b) − 1` (empty if either is empty).
+pub fn mul_karatsuba<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> Vec<u64> {
     if a.is_empty() || b.is_empty() {
         return Vec::new();
     }
@@ -106,7 +185,7 @@ pub fn mul<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> Vec<u64> {
     if a.len() >= 2 * b.len() {
         // Unbalanced: chunks of `a` against `b`.
         for (k, chunk) in a.chunks(b.len()).enumerate() {
-            let part = mul(f, chunk, b);
+            let part = mul_karatsuba(f, chunk, b);
             add_into(f, &mut out, &part, k * b.len());
         }
         return out;
@@ -114,16 +193,16 @@ pub fn mul<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> Vec<u64> {
     let m = a.len() / 2;
     let (a0, a1) = a.split_at(m);
     if b.len() <= m {
-        let z0 = mul(f, a0, b);
-        let z1 = mul(f, a1, b);
+        let z0 = mul_karatsuba(f, a0, b);
+        let z1 = mul_karatsuba(f, a1, b);
         add_into(f, &mut out, &z0, 0);
         add_into(f, &mut out, &z1, m);
         return out;
     }
     let (b0, b1) = b.split_at(m);
-    let z0 = mul(f, a0, b0);
-    let z2 = mul(f, a1, b1);
-    let z1 = mul(f, &add(f, a0, a1), &add(f, b0, b1));
+    let z0 = mul_karatsuba(f, a0, b0);
+    let z2 = mul_karatsuba(f, a1, b1);
+    let z1 = mul_karatsuba(f, &add(f, a0, a1), &add(f, b0, b1));
     let mut mid = sub(f, &sub(f, &z1, &z0), &z2);
     trim(&mut mid);
     add_into(f, &mut out, &z0, 0);
@@ -228,7 +307,7 @@ impl MonicDivisor {
     }
 }
 
-/// The product of `factors` by a balanced binary tree (Karatsuba at each
+/// The product of `factors` by a balanced binary tree ([`mul`] at each
 /// node).  The empty product is `[1]`.
 pub fn product<C: OpCounter>(f: &PrimeField<C>, factors: Vec<Vec<u64>>) -> Vec<u64> {
     let mut cur = factors;

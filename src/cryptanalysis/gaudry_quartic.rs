@@ -2450,6 +2450,103 @@ pub fn solve_s5_subspace(
     Some(out)
 }
 
+/// Solver options the `D₄` oracle uses ([`crate::cryptanalysis::gaudry_quartic_d4::D4Options`]),
+/// applied to the plain system.  All off is [`solve_s5_subspace`] /
+/// [`solve_system4`], operation for operation.  There is no `weighted`:
+/// the plain `S₅` has no `σ₄ = π²` to substitute.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct PlainOptions {
+    /// The eigen step along the chains of `e₁` ([`solve_along_chains`]).
+    pub chains: bool,
+    /// The elimination's pivot in each column is the sparsest candidate.
+    pub sparsest: bool,
+}
+
+/// [`solve_system4_traced`] with [`PlainOptions`].  A replay that does not
+/// match runs the full solve as well, both charged in `st`; with options
+/// on, a replay tops up a rank shortfall from the held rows, as the `D₄`
+/// oracle's does.
+#[allow(clippy::too_many_arguments)]
+pub fn solve_system4_with(
+    comps: &[HashMap<[u8; 4], u64>],
+    opts: PlainOptions,
+    equation_degree: u8,
+    macaulay_degree: u8,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    debug: bool,
+    replay: Option<&ShapeTrace>,
+    record: Option<&mut ShapeTrace>,
+) -> Option<Vec<[u64; 4]>> {
+    let top_up = opts != PlainOptions::default();
+    let run = |rng: &mut StdRng,
+               st: &mut QuarticSolve,
+               replay: Option<&ShapeTrace>,
+               record: Option<&mut ShapeTrace>| {
+        solve_system_w_inner::<4>(
+            comps,
+            &[1; 4],
+            opts.chains,
+            opts.sparsest,
+            top_up,
+            equation_degree,
+            macaulay_degree,
+            p,
+            rng,
+            st,
+            debug,
+            replay,
+            record,
+        )
+    };
+    let mut outcome = ReplayOutcome::Recorded;
+    if let Some(t) = replay {
+        match run(rng, st, Some(t), None) {
+            Ok(sols) => {
+                st.replay = ReplayOutcome::Replayed;
+                return sols;
+            }
+            Err(()) => outcome = ReplayOutcome::FellBack,
+        }
+    }
+    let r = run(rng, st, None, record).unwrap_or(None);
+    st.replay = outcome;
+    r
+}
+
+/// [`solve_s5_subspace`] with [`PlainOptions`] and an optional shape trace
+/// ([`solve_system4_with`]).
+#[allow(clippy::too_many_arguments)]
+pub fn solve_s5_subspace_with(
+    curve: &Curve4,
+    pre: &SymmetrisedS5,
+    x_r: &E4,
+    opts: PlainOptions,
+    replay: Option<&ShapeTrace>,
+    record: Option<&mut ShapeTrace>,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    debug: bool,
+) -> Option<Vec<[u64; 4]>> {
+    let f = &curve.f;
+    let before = f.muls();
+    let comps = pre.weil_restrict(f, x_r);
+    st.weil_muls += f.muls() - before;
+    let es = solve_system4_with(&comps, opts, 8, 29, f.p, rng, st, debug, replay, record)?;
+    let mut out = Vec::new();
+    for e in es {
+        let mut sm_ = 0u64;
+        if let Some(x) = split_quartic(&e, f.p, rng, &mut sm_) {
+            out.push(x);
+        }
+        st.split_muls += sm_;
+    }
+    st.close();
+    out.sort_unstable();
+    Some(out)
+}
+
 // ── The independent check ─────────────────────────────────────────────────
 
 /// The subspace factor base: one point per `x ∈ F_p` whose right-hand side
@@ -3087,6 +3184,73 @@ mod tests {
     #[test]
     fn the_solver_finds_planted_roots_of_cubics() {
         planted(3, 7);
+    }
+
+    /// [`PlainOptions`] all off is [`solve_system4`], count for count; each
+    /// option on returns the same solutions, and a replay of the first
+    /// system's shape on a second system of the same support does too.
+    #[test]
+    fn plain_options_keep_the_solutions_and_off_is_the_committed_solve() {
+        let p = 269u64;
+        let system = |seed: u64| {
+            let mut rng = StdRng::seed_from_u64(seed);
+            let root: [u64; 4] = core::array::from_fn(|_| rng.gen_range(0..p));
+            let comps: Vec<HashMap<[u8; 4], u64>> = (0..4)
+                .map(|_| {
+                    let mut c: HashMap<[u8; 4], u64> = exponents4(3)
+                        .iter()
+                        .map(|m| (*m, rng.gen_range(1..p)))
+                        .collect();
+                    let mut dummy = 0u64;
+                    let v = eval4(&c, &root, p, &mut dummy);
+                    let e = c.entry([0, 0, 0, 0]).or_insert(0);
+                    *e = sm(*e, v, p);
+                    c
+                })
+                .collect();
+            (comps, root)
+        };
+        let (comps, root) = system(11);
+        let solve = |opts: PlainOptions,
+                     comps: &[HashMap<[u8; 4], u64>],
+                     replay: Option<&ShapeTrace>,
+                     record: Option<&mut ShapeTrace>| {
+            let mut st = QuarticSolve::default();
+            let mut rng = StdRng::seed_from_u64(5);
+            let s = solve_system4_with(
+                comps, opts, 3, 9, p, &mut rng, &mut st, false, replay, record,
+            )
+            .expect("closes");
+            (s, st)
+        };
+        let mut rng = StdRng::seed_from_u64(5);
+        let mut st0 = QuarticSolve::default();
+        let base = solve_system4(&comps, 3, 9, p, &mut rng, &mut st0, false).expect("closes");
+        assert!(base.contains(&root));
+        let (off, st_off) = solve(PlainOptions::default(), &comps, None, None);
+        assert_eq!(off, base);
+        assert_eq!(st_off.total_muls, st0.total_muls);
+        assert_eq!(st_off.echelon_muls, st0.echelon_muls);
+        for (chains, sparsest) in [(false, true), (true, false), (true, true)] {
+            let opts = PlainOptions { chains, sparsest };
+            let (s, st) = solve(opts, &comps, None, None);
+            assert_eq!(s, base, "{opts:?}");
+            if sparsest {
+                assert!(st.echelon_muls < st0.echelon_muls, "{opts:?}");
+            }
+        }
+        let opts = PlainOptions {
+            chains: true,
+            sparsest: true,
+        };
+        let mut shape = ShapeTrace::default();
+        let _ = solve(opts, &comps, None, Some(&mut shape));
+        let (comps2, root2) = system(12);
+        let (full, _) = solve(opts, &comps2, None, None);
+        let (replayed, st_r) = solve(opts, &comps2, Some(&shape), None);
+        assert!(full.contains(&root2));
+        assert_eq!(replayed, full);
+        assert_ne!(st_r.replay, ReplayOutcome::Recorded);
     }
 
     /// §11.18's pipeline end to end at a toy size: a prime-order curve,
