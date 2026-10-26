@@ -346,14 +346,20 @@ fn support_of(name: &str, n: usize) -> Vec<[f64; 3]> {
         "univariate-d2" => univariate(2, 1_000_003, &mut rng),
         _ => semaev_s3(n, 1_000_003, &mut rng),
     };
-    f.support().iter().map(|e| [e[0] as f64, e[1] as f64, e[2] as f64]).collect()
+    f.support()
+        .iter()
+        .map(|e| [e[0] as f64, e[1] as f64, e[2] as f64])
+        .collect()
 }
 
 /// Reach of region `R = { x ≥ 0 : a_j·x ≤ 1 }` (scaled by `scale`, lattice
 /// points) with bound direction `w` (`Σ w = 1`), via the translate count.
 fn region_reach(n: usize, sup: &[[f64; 3]], a: &[[f64; 3]], w: &[f64; 3], scale: f64) -> f64 {
     let dot = |u: &[f64; 3], v: &[f64; 3]| u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
-    let h: Vec<f64> = a.iter().map(|r| sup.iter().map(|v| dot(r, v)).fold(0.0, f64::max)).collect();
+    let h: Vec<f64> = a
+        .iter()
+        .map(|r| sup.iter().map(|v| dot(r, v)).fold(0.0, f64::max))
+        .collect();
     // `scale` is a lattice-point budget: the region is dilated so that its
     // bounding box holds about that many points (the ratio is scale-free).
     let mut mx = [1.0f64; 3];
@@ -430,7 +436,15 @@ fn unpack(n: usize, k: usize, th: &[f64]) -> (Vec<[f64; 3]>, [f64; 3]) {
     (a, w)
 }
 
-fn run_optimize(name: &str, n: usize, k: usize, seed: u64, restarts: usize, iters: usize, scale: f64) {
+fn run_optimize(
+    name: &str,
+    n: usize,
+    k: usize,
+    seed: u64,
+    restarts: usize,
+    iters: usize,
+    scale: f64,
+) {
     let sup = support_of(name, n);
     let mut rng = SplitMix(seed);
     let dim = k * n + n - 1;
@@ -489,7 +503,11 @@ fn bm_bound(name: &str, n: usize) -> (f64, f64) {
             for j in i + 1..pts.len() {
                 for l in j + 1..pts.len() {
                     let (u, v) = (sub(&pts[j], &pts[i]), sub(&pts[l], &pts[i]));
-                    let nrm = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+                    let nrm = [
+                        u[1] * v[2] - u[2] * v[1],
+                        u[2] * v[0] - u[0] * v[2],
+                        u[0] * v[1] - u[1] * v[0],
+                    ];
                     if dot(&nrm, &nrm) < 1e-12 {
                         continue;
                     }
@@ -521,22 +539,37 @@ fn bm_bound(name: &str, n: usize) -> (f64, f64) {
             }
         }
     }
-    let k = if n == 3 { 120.0 } else { 1200.0 };
-    let maxc = pts.iter().map(|p| p[0].max(p[1]).max(p[2])).fold(0.0, f64::max);
-    let lim = (k * maxc) as i64;
-    let mut count = 0u64;
-    let z_lim = if n == 3 { lim } else { 0 };
-    for x in 0..=lim {
-        for y in 0..=lim {
-            for z in 0..=z_lim {
-                let q = [x as f64 / k, y as f64 / k, z as f64 / k];
-                if planes.iter().all(|(nr, c)| dot(nr, &q) <= c + 1e-12) {
-                    count += 1;
+    // `N` is a lattice polytope, so `L(k) = #(kN ∩ Z^n)` is its Ehrhart
+    // polynomial with constant term 1, and the leading coefficient (the
+    // volume) is exact from finite differences: `6V = Δ³L`, `2V = Δ²L`.
+    let maxc = pts
+        .iter()
+        .map(|p| p[0].max(p[1]).max(p[2]))
+        .fold(0.0, f64::max);
+    let count = |k: i64| -> i64 {
+        let lim = k * maxc as i64;
+        let z_lim = if n == 3 { lim } else { 0 };
+        let mut c = 0;
+        for x in 0..=lim {
+            for y in 0..=lim {
+                for z in 0..=z_lim {
+                    let q = [x as f64, y as f64, z as f64];
+                    if planes
+                        .iter()
+                        .all(|(nr, cc)| dot(nr, &q) <= k as f64 * cc + 1e-9)
+                    {
+                        c += 1;
+                    }
                 }
             }
         }
-    }
-    let vol = count as f64 / k.powi(n as i32);
+        c
+    };
+    let vol = if n == 3 {
+        (count(3) - 3 * count(2) + 3 * count(1) - 1) as f64 / 6.0
+    } else {
+        (count(2) - 2 * count(1) + 1) as f64 / 2.0
+    };
     let fact: f64 = (1..=n).map(|i| i as f64).product();
     (vol, (fact * vol).powf(-1.0 / n as f64))
 }
