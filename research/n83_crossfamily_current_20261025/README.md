@@ -92,6 +92,31 @@ raw receipts, and archives them even when a stage fails. The dispatch output
 and source bundle both belong outside the repository. Stage and collect require
 the configured RunPod key and SSH public-key access to the account's Pods.
 
+### Read-only AWS Spot alternative
+
+`plan_aws_spot.py` checks an exact-source, two-zone Tier 1 alternative before
+any AWS mutation. It requires two `g5g.4xlarge` ARM64 instances, each exposing
+16 vCPUs and 32 GiB RAM, in `us-east-1d` and `us-east-1a`. [Separate zones](https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html)
+establish distinct physical hosts. The six-hour maximum bids are $0.27 and
+$0.39 per hour. At those bids, two 50 GB gp3 root volumes and a $0.05 S3
+allowance, its six-hour projection at the maximum bids is $4.09 under a
+$4.20 allocation cap. A future launch must arm independent deletion guards;
+this projection is not a guaranteed account billing ceiling.
+On 2026-10-26 the AWS API returned Spot placement scores 9 and 7, G/VT Spot
+quota 64 vCPUs, and a $3.81 projection at the quoted rates. These values
+are time dependent; the plan must recheck them before allocation. The gp3
+rate and meaning of placement scores follow [AWS EBS pricing](https://aws.amazon.com/ebs/pricing/)
+and [AWS Spot placement guidance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-sps-works.html).
+The current module writes only a read-only plan. AWS launch, host binding,
+raw collection and independent replay still require an adapter and separate
+spend approval; no AWS high-K allocation is implied by this plan.
+
+```sh
+python3 -m research.n83_crossfamily_current_20261025.plan_aws_spot \
+  --source-bundle /absolute/path/outside/repository/n83-source-bundle \
+  --output /absolute/path/outside/repository/n83-aws-plan.json
+```
+
 Replay the sealed preparation in a full checkout with Python `blake3==1.0.8`
 installed and the archived K3596 dump available:
 
