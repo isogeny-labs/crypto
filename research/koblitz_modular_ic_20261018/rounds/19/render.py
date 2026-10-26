@@ -1,0 +1,59 @@
+"""Layout only: display exact counts already recorded by the native experiments."""
+from pathlib import Path
+import json
+import re
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch
+import typst
+r=Path(__file__).resolve().parent
+maps=[json.loads((r/f'runs/cm23-controlled-poles-q{i}.json').read_text()) for i in range(5)]
+summary=json.loads((r/'runs/cm24-controlled-pole-summary.json').read_text())
+fig=plt.figure(figsize=(11,6.7),facecolor='#f8fafc')
+ax=fig.add_axes([.075,.51,.86,.33])
+xs=list(range(5))
+for sign,color,offset in [(0,'#217a92',-.17),(1,'#d98732',.17)]:
+ vals=[d['records'][sign]['pointwise_valid_x'] for d in maps]
+ ax.bar([x+offset for x in xs],vals,width=.31,color=color,label=f'a = {sign}')
+ for x,v in zip(xs,vals):ax.text(x+offset,v*1.15,str(v),ha='center',va='bottom',fontsize=9)
+ax.set_yscale('log');ax.set_ylim(1,8000);ax.set_xticks(xs,['1','b','c','1+c','b+(1+c)c'])
+ax.set_ylabel('pointwise valid x forms (count; log scale)',fontsize=10)
+ax.set_xlabel('denominator q in x=N/q², y=M/q³',fontsize=10)
+ax.legend(frameon=False,loc='upper right');ax.spines[['top','right']].set_visible(False)
+fig.text(.055,.955,'Round 19 · controlled poles and mixed-section obstructions',fontsize=16,weight='bold',color='#14364d')
+fig.text(.055,.905,'335,544,320 numerator/sign cases · only 64 constants survive · no IC cost assessment',fontsize=10.5,color='#486173')
+canvas=fig.add_axes([0,0,1,1],frameon=False);canvas.set_axis_off()
+def box(x,w,title,body,color):
+ canvas.add_patch(FancyBboxPatch((x,.145),w,.225,boxstyle='round,pad=0.012',facecolor=color,edgecolor='#b3c3cf'))
+ canvas.text(x+.012,.338,title,fontsize=11,weight='bold',color='#14364d',va='top')
+ canvas.text(x+.012,.29,body,fontsize=10,color='#294656',va='top',linespacing=1.55)
+box(.06,.265,'G25 · correct polarization','41 mixed F2 sections\n3 × 105² H on graphs 0 / 2\n48 kernel noninvariance probes','#dff0e6')
+box(.365,.265,'G24 → G25 · scalar cover','Primitive orbit obstruction\nExplicit positive orbit divisor\nPic2 / kernel actions open','#fff0da')
+box(.67,.265,'Q29–32 · coupled elimination','4 Q28 + 4 Q30 excluded\n266 source resultants\n4 Q32 models unclassified','#e9e3f3')
+fig.text(.06,.065,'Evidence: CM23/24, G22–25, Q29–32 · 79 new named Lean results with explicit proof limits',fontsize=9.5,color='#486173')
+fig.savefig(r/'routes.svg',bbox_inches='tight');fig.savefig(r/'routes.png',dpi=150,bbox_inches='tight');plt.close(fig)
+p=r/'routes.svg';p.write_text('\n'.join(s.rstrip() for s in p.read_text().splitlines())+'\n')
+def txt(s):return json.dumps(s,ensure_ascii=False)
+lines=(r/'REPORT.md').read_text().splitlines();out=['#set page(paper: "a4", margin: (x: 16mm, y: 14mm), numbering: "1")','#set text(font: "DejaVu Sans", size: 10.5pt)','#set par(leading: 0.38em)','#set heading(numbering: none)'];i=0;insert=False
+while i<len(lines):
+ line=lines[i]
+ if not line:i+=1;continue
+ if line.startswith('#'):
+  n=len(line)-len(line.lstrip('#'));title=line[n:].strip()
+  if n==2:out.append('#pagebreak()')
+  out.append(f'#heading(level:{n})[#text({txt(title)})]');i+=1;continue
+ if line.startswith('|'):
+  rows=[]
+  while i<len(lines) and lines[i].startswith('|'):
+   row=[x.strip() for x in lines[i].strip('|').split('|')]
+   if not all(set(x)<=set('-: ') for x in row):rows.append(row)
+   i+=1
+  out.append('#text(size:8.5pt)[#table(columns:'+str(len(rows[0]))+',inset:3pt,stroke:0.35pt + rgb("cbd5e1"),'+','.join('[#text('+txt(x)+')]' for row in rows for x in row)+')]');continue
+ para=[]
+ while i<len(lines) and lines[i] and not lines[i].startswith(('#','|')):para.append(lines[i]);i+=1
+ p=re.sub(r'\[([^\]]+)\]\(([^)]+)\)',r'\1 (\2)',' '.join(para));out.append('#text('+txt(p)+')\n')
+ if not insert and p.startswith('The new evidence'):
+  out.append('#image("routes.svg",width:100%)');insert=True
+out.append('#heading(level:2)[Evidence and sources]\n#text("Companion files: CM.md, THETA.md, SATURATION.md, PROOF_MAP.md, SOURCES.md, ledger.json, VALIDATION.md and REPLAY.sh. Primary sources read: Moonen, The cohomology of line bundles, 9.11–9.14 (Riemann–Roch and isogeny pullback); Moonen, The theta group of a line bundle, 8.10–8.12 (descent and the arbitrary-field caveat). Native arithmetic, written geometric bridges and kernel-checked implications are distinguished throughout.")')
+(r/'report.typ').write_text('\n\n'.join(out)+'\n');typst.compile(str(r/'report.typ'),output=str(r/'report.pdf'),root=str(r))
