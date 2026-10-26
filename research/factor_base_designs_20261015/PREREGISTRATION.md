@@ -544,17 +544,20 @@ any row):
   at that rate passes 64 GiB well inside 4 h.
 - Neither outcome would change a recorded verdict.
 
-### Amendment 8, 2026-10-21: the two m = 4 cells on the EKS high-memory runner (E1, E2), before any of their rows
+### Amendment 13, 2026-10-21: the two m = 4 cells on the EKS high-memory runner (K8S-A0, K8S-A11), before any of their rows
 
-Registered after Amendment 7's run (`reports/run-20261021T0056Z`) and before
-any E1 or E2 row exists. It adds two cells. It changes no existing row,
+**Numbering note, 2026-10-26 (renames only; changes no rule, threshold, prediction or row).** This amendment was registered as “Amendment 8” with cells E1 and E2, runner `scripts/run_amendment8.sh` and flag `analyze --amendment8`. `main` has its own Amendment 8 and its own E1 cell (twisted Edwards), so on merging `main` it is renumbered **Amendment 13** with cells **K8S-A0** (was E1) and **K8S-A11** (was E2); the runner is `scripts/run_amendment13.sh`, the flag `--amendment13`, the row prefixes `K8S-A0-` and `K8S-A11-`, and the workflow artifact `fb-designs-amendment13-<cell>-<run_id>-<attempt>`. The amendment it builds on, registered as “Amendment 7” with cells X1 and X2, is now Amendment 12 with cells H64-A0 and H64-A11. No E row, K8S row or workflow run exists, so no record or artifact carries an old name.
+
+
+Registered after Amendment 12's run (`reports/run-20261021T0056Z`) and before
+any K8S-A0 or K8S-A11 row exists. It adds two cells. It changes no existing row,
 verdict, threshold or prediction. Instrument, seeds, the completed-cell rule,
-σ, κ, R1 and R2 are unchanged. Amendment 7's limit rule and analysis carry
+σ, κ, R1 and R2 are unchanged. Amendment 12's limit rule and analysis carry
 over. The changes are the host, the memory limit, the attribution record and
 how the run is started. The run waits for capacity: it is dispatched by hand
 when the EKS cluster can place a high-memory Spot node.
 
-**Why.** Amendment 7 left both open m = 4 cells *not measurable within
+**Why.** Amendment 12 left both open m = 4 cells *not measurable within
 64 GB*. Both cells were memory-bound in both systems: A0 at t = 4 was stopped
 at 1874–1916 s, and A11 at t = 5 at 6011–6024 s. The repository's EKS cluster
 runs a high-memory GitHub Actions runner with nearly twice that memory. The
@@ -575,7 +578,7 @@ set up in a PR and run there when a Spot instance is available.
   - refuse to run if the pod's `memory.max` is below 112 GiB;
   - build `cargo build --locked --release --example fb_designs_slope` with
     the image's toolchain;
-  - run `scripts/run_amendment8.sh CELL BINARY OUT`;
+  - run `scripts/run_amendment13.sh CELL BINARY OUT`;
   - upload `OUT` as a workflow artifact, kept for 90 days.
 
   Rows are committed by hand from the artifact, together with the run id and
@@ -591,19 +594,19 @@ set up in a PR and run there when a Spot instance is available.
   - the kernel version, the DMI product name and the CPU model.
 
   Operation counts depend only on code, seed and system, so E rows are
-  comparable with C2's, X1's and X2's on `field_ops`, D and `max_cols`. Wall
+  comparable with C2's, H64-A0's and H64-A11's on `field_ops`, D and `max_cols`. Wall
   times are descriptive only.
 - **Limit.** `V = min(cgroup_limit_kB − 524288, MemTotal_kB − 524288)` kB, as
   in Amendments 6 and 7. With the 120 GiB pod limit this is
   125 829 120 − 524 288 = **125 304 832 kB**, unless the pre-flight reads a
   different value. In that case the formula is used and the value recorded.
-- **E1, A0 m = 4, t = 4, p₁.** The same two planted systems as C2, L1 and X1:
-  `run --arms A0 --m 4 --t-min 4 --t-max 4 --budget 14400 --grace 600 --vmem-kb V --file 'E1-{arm}-m4-t4'`.
-- **E2, A11 m = 4, t = 5, p₁.** The same two planted systems as L2, L2r and
-  X2:
-  `run --arms A11 --m 4 --t-min 5 --t-max 5 --budget 14400 --grace 600 --vmem-kb V --file 'E2-{arm}-m4-t5'`.
+- **K8S-A0, A0 m = 4, t = 4, p₁.** The same two planted systems as C2, L1 and H64-A0:
+  `run --arms A0 --m 4 --t-min 4 --t-max 4 --budget 14400 --grace 600 --vmem-kb V --file 'K8S-{arm}-m4-t4'`.
+- **K8S-A11, A11 m = 4, t = 5, p₁.** The same two planted systems as L2, L2r and
+  H64-A11:
+  `run --arms A11 --m 4 --t-min 5 --t-max 5 --budget 14400 --grace 600 --vmem-kb V --file 'K8S-{arm}-m4-t5'`.
 - **Attribution.** A pod normally cannot read the kernel log, so
-  `run_amendment8.sh` records the job cgroup's OOM-kill counter
+  `run_amendment13.sh` records the job cgroup's OOM-kill counter
   (`memory.events`, or `memory.oom_control` under cgroup v1). It reads the
   counter before and after the run. For a readable kernel log, the runner
   takes a non-mutating pre-run snapshot and records only new OOM lines from a
@@ -620,17 +623,17 @@ set up in a PR and run there when a Spot instance is available.
   job timeout, may leave no artifact. That attempt is recorded in the report
   with its run id and is *not decided*. The cell is then re-dispatched whole,
   and the systems are deterministic. A cell's rows all come from one attempt.
-- **Identity.** `analyze --amendment8` checks that E1's systems equal C2's,
-  L1's and X1's, and E2's equal L2's, L2r's and X2's.
+- **Identity.** `analyze --amendment13` checks that K8S-A0's systems equal C2's,
+  L1's and H64-A0's, and K8S-A11's equal L2's, L2r's and H64-A11's.
 
-**Decision rules, fixed now.** These are Amendment 7's rules with the limit
+**Decision rules, fixed now.** These are Amendment 12's rules with the limit
 "V kB on the EKS high-memory runner and 4 h":
-- **R1.** If both E1 systems complete: *survives* if A11's C2 t = 4 mean
-  `field_ops` is below E1's mean, *crossed* otherwise. A0's m = 4 series then
-  gains its third cell, and its σ and κ verdicts are computed. If E1 does not
+- **R1.** If both K8S-A0 systems complete: *survives* if A11's C2 t = 4 mean
+  `field_ops` is below K8S-A0's mean, *crossed* otherwise. A0's m = 4 series then
+  gains its third cell, and its σ and κ verdicts are computed. If K8S-A0 does not
   complete: *A0 not measurable at t = 4 within V kB and 4 h*, with the
   binding limit and the partial values.
-- **R2.** If both E2 systems complete, the cell joins A11's m = 4 series as a
+- **R2.** If both K8S-A11 systems complete, the cell joins A11's m = 4 series as a
   fourth point, and σ and κ are recomputed with their verdicts. If not: *A11
   not measurable at m = 4, t = 5 within V kB and 4 h*, with the binding limit,
   and the 3-cell verdicts stand.
@@ -640,12 +643,12 @@ set up in a PR and run there when a Spot instance is available.
 **Predictions** (made before any row). Each comes from a power law
 peak RSS ∝ (wall time)^β fitted through each cell's two measured stops. Those
 stops are on different hosts, so the fit is a rough guide:
-- E1: L1 reached 12.9 GB at 528 s and X1 60.7 GB at 1895 s (means of the two
-  systems), so β ≈ 1.22. That reaches 125 GB at about 3450 s. So E1
+- K8S-A0: L1 reached 12.9 GB at 528 s and H64-A0 60.7 GB at 1895 s (means of the two
+  systems), so β ≈ 1.22. That reaches 125 GB at about 3450 s. So K8S-A0
   **does not complete** and its binding limit is **memory**, near 3450 s.
-- E2: L2r reached 13.3 GB at 131 s and X2 62.9 GB at 6018 s, so β ≈ 0.41.
+- K8S-A11: L2r reached 13.3 GB at 131 s and H64-A11 62.9 GB at 6018 s, so β ≈ 0.41.
   That reaches 125 GB only at about 33 000 s, and gives about 90 GB at
-  14 400 s. So E2 **does not complete** and its binding limit is **time**, a
+  14 400 s. So K8S-A11 **does not complete** and its binding limit is **time**, a
   timeout at 14 400 s with peak RSS around 90 GB.
-- Neither outcome would change a recorded verdict. An E2 timeout would be
+- Neither outcome would change a recorded verdict. An K8S-A11 timeout would be
   the first time-bound m = 4 stop in this study.

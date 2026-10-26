@@ -1,5 +1,5 @@
-name: Factor-base designs m = 4 (EKS high-memory, Amendment 8)
-# Runs research/factor_base_designs_20261015 PREREGISTRATION.md Amendment 8:
+name: Factor-base designs m = 4 (EKS high-memory, Amendment 13)
+# Runs research/factor_base_designs_20261015 PREREGISTRATION.md Amendment 13:
 # the two open m = 4 cells, one at a time, on the crypto-eks-highmem ARC
 # runner (Karpenter Spot node, 16 CPU, 120 GiB pod memory limit). Dispatch
 # by hand when a high-memory Spot node can be had; the jobs wait in the queue
@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       cells:
-        description: Cells to run (E1 = A0 m=4 t=4, E2 = A11 m=4 t=5)
+        description: Cells to run (K8S-A0 = A0 m=4 t=4, K8S-A11 = A11 m=4 t=5)
         type: choice
-        options: [both, E1, E2]
+        options: [both, K8S-A0, K8S-A11]
         default: both
 permissions:
   contents: read
@@ -25,7 +25,7 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
-        cell: ${{ fromJSON(inputs.cells == 'both' && '["E1","E2"]' || format('["{0}"]', inputs.cells)) }}
+        cell: ${{ fromJSON(inputs.cells == 'both' && '["K8S-A0","K8S-A11"]' || format('["{0}"]', inputs.cells)) }}
     runs-on: crypto-eks-highmem
     # Two systems at 14400 s + 600 s grace each, plus the build.
     timeout-minutes: 540
@@ -38,7 +38,7 @@ jobs:
           test "$(uname -m)" = x86_64
           memory_bytes=$(cat /sys/fs/cgroup/memory.max)
           printf 'memory_bytes=%s cpu_quota=%s\n' "$memory_bytes" "$(cat /sys/fs/cgroup/cpu.max)"
-          # Amendment 8 needs the 120 GiB pod; refuse anything smaller.
+          # Amendment 13 needs the 120 GiB pod; refuse anything smaller.
           test "$memory_bytes" -ge $((112 * 1024 * 1024 * 1024))
           rustc --version
           cargo --version
@@ -52,13 +52,13 @@ jobs:
           FB_DESIGNS_COMMIT: ${{ github.sha }}
         run: |
           set -eu
-          sh research/factor_base_designs_20261015/scripts/run_amendment8.sh \
+          sh research/factor_base_designs_20261015/scripts/run_amendment13.sh \
             "${{ matrix.cell }}" target/release/examples/fb_designs_slope "$RUNNER_TEMP/out"
       - name: Upload rows and logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: fb-designs-amendment8-${{ matrix.cell }}-${{ github.run_id }}-${{ github.run_attempt }}
+          name: fb-designs-amendment13-${{ matrix.cell }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/out/
           retention-days: 90
           if-no-files-found: warn

@@ -1,11 +1,11 @@
 #!/bin/sh
-# Amendment 8: run one m = 4 cell (E1 or E2) on the EKS high-memory runner.
+# Amendment 13: run one m = 4 cell (K8S-A0 or K8S-A11) on the EKS high-memory runner.
 #
-#   run_amendment8.sh CELL BINARY OUT_DIR
+#   run_amendment13.sh CELL BINARY OUT_DIR
 #
-# CELL is E1 (A0, m = 4, t = 4) or E2 (A11, m = 4, t = 5). BINARY is a release
+# CELL is K8S-A0 (A0, m = 4, t = 4) or K8S-A11 (A11, m = 4, t = 5). BINARY is a release
 # build of examples/fb_designs_slope.rs; FB_DESIGNS_COMMIT names the commit it
-# was built from. Amendment 7's script with two changes for a container: the
+# was built from. Amendment 12's script with two changes for a container: the
 # kernel log is usually unreadable there, so attribution also reads the job
 # cgroup's own OOM-kill counter (memory.events) before and after the run; and
 # the toolchain versions are recorded in the pre-flight.
@@ -17,11 +17,11 @@ out=$3
 : "${FB_DESIGNS_COMMIT:?set FB_DESIGNS_COMMIT to the commit the binary was built from}"
 
 case $cell in
-E1) arm=A0 t=4 ;;
-E2) arm=A11 t=5 ;;
-*) echo "unknown cell $cell (E1 or E2)" >&2; exit 2 ;;
+K8S-A0) arm=A0 t=4 ;;
+K8S-A11) arm=A11 t=5 ;;
+*) echo "unknown cell $cell (K8S-A0 or K8S-A11)" >&2; exit 2 ;;
 esac
-name="$cell-$arm-m4-t$t"
+name="K8S-$arm-m4-t$t"
 mkdir -p "$out"
 pre="$out/$name.preflight.txt"
 
@@ -53,7 +53,7 @@ if [ "$cg_kb" != unlimited ] && [ "$cg_kb" -ge "$mem_kb" ]; then
     cg_kb=unlimited
 fi
 
-# V = min(cgroup_kB - 524288, MemTotal_kB - 524288) (Amendments 6-8).
+# V = min(cgroup_kB - 524288, MemTotal_kB - 524288) (Amendments 6, 12 and 13).
 v_kb=$((mem_kb - 524288))
 if [ "$cg_kb" != unlimited ] && [ $((cg_kb - 524288)) -lt "$v_kb" ]; then
     v_kb=$((cg_kb - 524288))
@@ -104,7 +104,7 @@ fi
 # Do not clear the node-wide kernel ring buffer; use a read-only delta below.
 "$bin" run --arms "$arm" --m 4 --t-min "$t" --t-max "$t" \
     --budget 14400 --grace 600 --vmem-kb "$v_kb" \
-    --file "$cell-{arm}-m4-t$t" --out-dir "$out"
+    --file "K8S-{arm}-m4-t$t" --out-dir "$out"
 
 # Attribution: the job cgroup's OOM-kill counter, and the kernel log if
 # this host lets the job read it.

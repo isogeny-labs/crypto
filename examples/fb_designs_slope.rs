@@ -2380,10 +2380,14 @@ fn group_of(file: &str) -> &str {
     if file.starts_with("L2r-") {
         return "L2r";
     }
+    for g in ["H64-A0", "H64-A11", "K8S-A0", "K8S-A11"] {
+        if file.starts_with(&format!("{g}-")) {
+            return g;
+        }
+    }
     match file.get(..3) {
         Some(
-            g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "L1-" | "L2-"
-            | "X1-" | "X2-" | "E1-" | "E2-"),
+            g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "L1-" | "L2-"),
         ) => &g[..2],
         _ => "p1",
     }
@@ -3785,7 +3789,7 @@ mod kernel_capture_tests {
         for text in [
             "",
             "capture_status failed\n",
-            "no kernel OOM lines for X1\n",
+            "no kernel OOM lines for H64-A0\n",
             "[1.0] booted\n",
         ] {
             assert!(!verified_kernel_capture(text));
@@ -3810,8 +3814,8 @@ mod kernel_capture_tests {
     }
 }
 
-/// One re-run of the two open m = 4 cells on a larger host: Amendment 7 (X1,
-/// X2 on a 64 GiB EC2 host) and Amendment 8 (E1, E2 on the EKS high-memory
+/// One re-run of the two open m = 4 cells on a larger host: Amendment 12 (H64-A0,
+/// H64-A11 on a 64 GiB EC2 host) and Amendment 13 (K8S-A0, K8S-A11 on the EKS high-memory
 /// runner).
 struct M4Host {
     amendment: u32,
@@ -3828,10 +3832,10 @@ struct M4Host {
     a11_prediction: (&'static str, &'static str),
 }
 
-const AMENDMENT7: M4Host = M4Host {
-    amendment: 7,
-    a0: "X1",
-    a11: "X2",
+const AMENDMENT12: M4Host = M4Host {
+    amendment: 12,
+    a0: "H64-A0",
+    a11: "H64-A11",
     host: "a 64 GiB host",
     oom_ext: "dmesg.txt",
     a0_prediction: (
@@ -3841,10 +3845,10 @@ const AMENDMENT7: M4Host = M4Host {
     a11_prediction: ("A11 does not complete; binding limit memory", "memory"),
 };
 
-const AMENDMENT8: M4Host = M4Host {
-    amendment: 8,
-    a0: "E1",
-    a11: "E2",
+const AMENDMENT13: M4Host = M4Host {
+    amendment: 13,
+    a0: "K8S-A0",
+    a11: "K8S-A11",
     host: "the EKS high-memory runner",
     oom_ext: "oom.txt",
     a0_prediction: ("A0 does not complete; binding limit memory", "memory"),
@@ -3951,7 +3955,7 @@ fn analyze_m4_host(dir: &str, sp: &M4Host) {
             (Some(b), Some(a)) => Some(a.saturating_sub(b)),
             _ => None,
         };
-        // Amendment 7 records a verified dmesg sentinel. Amendment 8 records
+        // Amendment 12 records a verified dmesg sentinel. Amendment 13 records
         // the job cgroup counters even when the node kernel log is unreadable.
         let capture_ok = if ext == "oom.txt" {
             cgroup.is_some()
@@ -4047,15 +4051,15 @@ fn analyze_m4_host(dir: &str, sp: &M4Host) {
         sp.a0,
         same_as(&e0, &l1)
     );
-    // Amendment 8 onward: the 64 GiB attempt (Amendment 7) is a prior one too.
-    let (x1, x2) = if sp.amendment >= 8 {
-        (group("X1"), group("X2"))
+    // Amendment 13 onward: the 64 GiB attempt (Amendment 12) is a prior one too.
+    let (x1, x2) = if sp.amendment >= 13 {
+        (group("H64-A0"), group("H64-A11"))
     } else {
         (Vec::new(), Vec::new())
     };
-    if sp.amendment >= 8 {
+    if sp.amendment >= 13 {
         println!(
-            "  identity: {} of {} {} systems match X1's",
+            "  identity: {} of {} {} systems match H64-A0's",
             same_as(&e0, &x1),
             e0.len(),
             sp.a0
@@ -4087,9 +4091,9 @@ fn analyze_m4_host(dir: &str, sp: &M4Host) {
         sp.a11,
         same_as(&e11, &l2r)
     );
-    if sp.amendment >= 8 {
+    if sp.amendment >= 13 {
         println!(
-            "  identity: {} of {} {} systems match X2's",
+            "  identity: {} of {} {} systems match H64-A11's",
             same_as(&e11, &x2),
             e11.len(),
             sp.a11
@@ -4322,10 +4326,10 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--amendment8") {
-                analyze_m4_host(dir, &AMENDMENT8);
-            } else if args.iter().any(|a| a == "--amendment7") {
-                analyze_m4_host(dir, &AMENDMENT7);
+            if args.iter().any(|a| a == "--amendment13") {
+                analyze_m4_host(dir, &AMENDMENT13);
+            } else if args.iter().any(|a| a == "--amendment12") {
+                analyze_m4_host(dir, &AMENDMENT12);
             } else if args.iter().any(|a| a == "--amendment6") {
                 analyze6(dir);
             } else if args.iter().any(|a| a == "--amendment5") {
