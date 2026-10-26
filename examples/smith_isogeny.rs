@@ -56,8 +56,10 @@ fn main() {
         .unwrap_or_else(|| "research/smith_isogeny_divisor_map_20261018/data".into());
     let ncurves: usize = arg(&args, "--curves").map(|s| s.parse().unwrap()).unwrap_or(6);
     let name = format!("{}_q{}", cmd.replace('-', "_"), q);
-    emit(&out, &name, json!({"rec": "start", "cmd": cmd, "q": q, "seed": SEED,
+    if !matches!(cmd.as_str(), "cost-fit" | "summarize") {
+        emit(&out, &name, json!({"rec": "start", "cmd": cmd, "q": q, "seed": SEED,
         "git_head": git_head(), "args": args}));
+    }
     match cmd.as_str() {
         "verify" => verify(q, ncurves, &out, &name, &args),
         "deg8" => deg8(q, ncurves, &out, &name),
