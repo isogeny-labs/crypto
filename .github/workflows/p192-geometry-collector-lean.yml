@@ -13,13 +13,17 @@ on:
 
 jobs:
   pencil-and-four-cell:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 45 || 25 }}
     defaults:
       run:
         working-directory: research/p192_extension_cover_20261012/lean
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The full tree (144k files) leaves the runner too little disk to
+          # unpack the Lean toolchain; the package needs only its own directory.
+          sparse-checkout: research/p192_extension_cover_20261012/lean
       - name: Build the pencil and four-cell theorems
         uses: leanprover/lean-action@v1
         with:

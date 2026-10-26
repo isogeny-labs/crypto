@@ -19,12 +19,15 @@ on:
       - 'scripts/build_ic_leaderboard.py'
       - 'scripts/check_ic_leaderboard_paths.py'
       - 'scripts/test_check_ic_leaderboard_paths.py'
+      - 'scripts/test_build_ic_leaderboard.py'
       - 'scripts/curve_id.py'
       - 'docs/ic-leaderboard.html'
       - 'docs/ic/LEADERBOARD.md'
       - 'docs/ic/leaderboard.json'
       - 'research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md'
       - 'docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json'
+      - 'research/ic_validation_gate_20261024/B/replay-certificate.json'
+      - 'research/ic_validation_gate_20261024/B/validator-report.docs-ic-runs.json'
       - 'research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json'
       - 'research/ic_rho_reference_20260923/analysis.json'
       - 'research/ic_exponent_20260926/analysis.json'
@@ -37,8 +40,11 @@ on:
       - 'docs/curves/ic/curves.schema.json'
       - 'research/ic_descent_20260930/runs-isolated/main/**'
       - 'research/ic_single_target_20260930/runs/**'
-      - 'research/ic_tool_program/rule/v3/analysis.json'
-      - 'research/ic_tool_program/rule/v3/runs/**'
+      - 'research/ic_tool_program/rule/v7/analysis.json'
+      - 'research/ic_tool_program/rule/v7/replay-certificate.json'
+      - 'research/ic_tool_program/rule/v7/validator-report.json'
+      - 'research/ic_tool_program/rule/v7/runs/**'
+      - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/jv_sieve_strong_rho_20261019/summary.json'
       - 'research/jv_sieve_strong_rho_20261019/review-20261020/**'
       - 'research/ecbench_n37_rank_columns_20261004/RESULT.json'
@@ -59,9 +65,13 @@ on:
       - 'research/ecbench_rho_optimized_20261014/RESULT.json'
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/la_engines_20261014/summary.json'
+      - 'research/ecbench_lazy_orbit_members_20261018/figures/ratios.json'
+      - 'research/jv_cover_sparse_fglm_20261018/summary.json'
+      - 'research/ic_m2_linear_ladder_20261024/fit.json'
       - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
       - 'research/ic_planner_validation_20261020/analysis/summary.json'
       - 'research/ic_planner_validation_20261020/specs/*.json'
+      - 'research/s5_plain_c4_options_20261019/raw/summary_r13.json'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
       - 'docs/browser/**'
@@ -69,6 +79,9 @@ on:
       - 'research/full_volcano_graphwide_ic_*/execution/campaigns/**'
       - 'research/ic_candidate_tournament_20260915/runs/**'
       - 'docs/ic/**'
+      - 'scripts/validation_gate.py'
+      - 'research/**/VALIDATION.json'
+      - 'research/validation_sweep_20261019/**'
       - 'research/notes/ecc2k130/**'
   push:
     branches: [main]
@@ -76,12 +89,15 @@ on:
       - 'scripts/build_ic_leaderboard.py'
       - 'scripts/check_ic_leaderboard_paths.py'
       - 'scripts/test_check_ic_leaderboard_paths.py'
+      - 'scripts/test_build_ic_leaderboard.py'
       - 'scripts/curve_id.py'
       - 'docs/ic-leaderboard.html'
       - 'docs/ic/LEADERBOARD.md'
       - 'docs/ic/leaderboard.json'
       - 'research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md'
       - 'docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json'
+      - 'research/ic_validation_gate_20261024/B/replay-certificate.json'
+      - 'research/ic_validation_gate_20261024/B/validator-report.docs-ic-runs.json'
       - 'research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json'
       - 'research/ic_rho_reference_20260923/analysis.json'
       - 'research/ic_exponent_20260926/analysis.json'
@@ -94,8 +110,11 @@ on:
       - 'docs/curves/ic/curves.schema.json'
       - 'research/ic_descent_20260930/runs-isolated/main/**'
       - 'research/ic_single_target_20260930/runs/**'
-      - 'research/ic_tool_program/rule/v3/analysis.json'
-      - 'research/ic_tool_program/rule/v3/runs/**'
+      - 'research/ic_tool_program/rule/v7/analysis.json'
+      - 'research/ic_tool_program/rule/v7/replay-certificate.json'
+      - 'research/ic_tool_program/rule/v7/validator-report.json'
+      - 'research/ic_tool_program/rule/v7/runs/**'
+      - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/jv_sieve_strong_rho_20261019/summary.json'
       - 'research/jv_sieve_strong_rho_20261019/review-20261020/**'
       - 'research/ecbench_n37_rank_columns_20261004/RESULT.json'
@@ -116,9 +135,13 @@ on:
       - 'research/ecbench_rho_optimized_20261014/RESULT.json'
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/la_engines_20261014/summary.json'
+      - 'research/ecbench_lazy_orbit_members_20261018/figures/ratios.json'
+      - 'research/jv_cover_sparse_fglm_20261018/summary.json'
+      - 'research/ic_m2_linear_ladder_20261024/fit.json'
       - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
       - 'research/ic_planner_validation_20261020/analysis/summary.json'
       - 'research/ic_planner_validation_20261020/specs/*.json'
+      - 'research/s5_plain_c4_options_20261019/raw/summary_r13.json'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
       - 'docs/browser/**'
@@ -126,6 +149,9 @@ on:
       - 'research/full_volcano_graphwide_ic_*/execution/campaigns/**'
       - 'research/ic_candidate_tournament_20260915/runs/**'
       - 'docs/ic/**'
+      - 'scripts/validation_gate.py'
+      - 'research/**/VALIDATION.json'
+      - 'research/validation_sweep_20261019/**'
       - 'research/notes/ecc2k130/**'
   workflow_dispatch:
 
@@ -140,7 +166,7 @@ concurrency:
 
 jobs:
   current:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-leaderboard.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-leaderboard.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -149,6 +175,8 @@ jobs:
           python-version: '3.11'
       - name: The path check's own tests
         run: python3 scripts/test_check_ic_leaderboard_paths.py
+      - name: Curve-record parser tests
+        run: python3 scripts/test_build_ic_leaderboard.py
       - name: This workflow's path filter covers every file the builder reads
         run: python3 scripts/check_ic_leaderboard_paths.py
       - name: The leaderboard is current with its sources and the ledger

@@ -78,10 +78,10 @@ use crate::cryptanalysis::fx_hash::{FxMap as HashMap, MaskMap};
 use crate::cryptanalysis::koblitz_groebner::{
     all_variable_mask, build_inherited_macaulay, build_inherited_macaulay_support_local,
     echelon_f2_counted, macaulay_columns, macaulay_rows_monos_with_mask, monomials_up_to_mask,
-    pack_rows, rref_f2_counted,
+    pack_rows, rref_f2_counted, rref_uses_four_russians,
 };
 use crate::cryptanalysis::pq_groebner_f2::{
-    cmp_mono, sort_masks_descending, F2BoolMono, F2BoolPoly,
+    bit, cmp_mono, mask_fold64, sort_masks_descending, F2BoolMono, F2BoolPoly, Mask,
 };
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -133,7 +133,7 @@ pub fn macaulay_shape(
     let occurring = system
         .iter()
         .flat_map(|p| p.terms.iter())
-        .fold(0u64, |acc, t| acc | t.mask)
+        .fold(0 as Mask, |acc, t| acc | t.mask)
         & all_variable_mask(n_vars);
     let (columns, mut matrix) = if support_local {
         build_inherited_macaulay_support_local(&system, n_vars, degree, occurring, quadratic)?
@@ -210,7 +210,7 @@ pub fn root_replay_counts() -> (u64, u64, u64) {
     )
 }
 
-fn root_shape_key(columns: &[u64], rows: usize, degree: u32, support_local: bool) -> u64 {
+fn root_shape_key(columns: &[Mask], rows: usize, degree: u32, support_local: bool) -> u64 {
     use std::hash::{Hash, Hasher};
     let mut h = std::collections::hash_map::DefaultHasher::new();
     columns.hash(&mut h);
@@ -253,7 +253,7 @@ fn dependent_rows(matrix: &[Vec<u64>], word_ops: &mut u64) -> Vec<u32> {
 /// Apply root shape replay to a freshly built root: record its dependent
 /// rows, or drop the recorded ones.
 fn replay_root(
-    columns: &[u64],
+    columns: &[Mask],
     matrix: &mut Vec<Vec<u64>>,
     degree: u32,
     support_local: bool,
@@ -297,7 +297,7 @@ fn root_rref() -> bool {
 struct RootMatrix {
     system: Rc<Vec<F2BoolPoly>>,
     generator_degrees: Rc<Vec<u32>>,
-    columns: Vec<u64>,
+    columns: Vec<Mask>,
     matrix: Vec<Vec<u64>>,
 }
 
@@ -317,7 +317,7 @@ impl RootMatrix {
         let occurring = system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |acc, t| acc | t.mask)
+            .fold(0 as Mask, |acc, t| acc | t.mask)
             & all_variable_mask(n_vars);
         let (columns, matrix) = if support_local {
             build_inherited_macaulay_support_local(
@@ -380,6 +380,7 @@ pub struct LaneStats {
 /// The bit-sliced Gauss–Jordan kernel of [`ReducedBasis::from_systems_lanes`].
 mod lanes {
     use super::{LaneStats, RootMatrix};
+    use crate::cryptanalysis::pq_groebner_f2::Mask;
 
     /// A lane word: one bit per instance.
     pub(super) trait Lane:
@@ -439,7 +440,7 @@ mod lanes {
         // Union layout: every lane's columns are in descending monomial
         // order, so their merge is too; a lane's leading column stays its
         // leading column.
-        let mut union: Vec<u64> = active
+        let mut union: Vec<Mask> = active
             .iter()
             .flat_map(|&l| roots[l].as_ref().expect("active").columns.iter().copied())
             .collect();
@@ -578,6 +579,27 @@ fn leading_column(row: &[u64]) -> Option<usize> {
         .map(|(i, &w)| i * 64 + w.trailing_zeros() as usize)
 }
 
+/// The version of the word-operation accounting below, recorded in every new
+/// ecbench session (`accounting_versions`) so that an audit names a
+/// cross-version replay instead of reporting bare count differences.
+///
+/// - **1** (never recorded; what a session without the field was made
+///   under, up to `#2043`, 2026-10-17): specialisation was eager through
+///   `pext`/`pdep` on a BMI2 x86-64 host and lazy everywhere else, and the
+///   two charge different counts by construction.
+/// - **2** (since `#2043`): specialisation is eager on every host (`pext` /
+///   `pdep`, or shift runs without BMI2), and every eager path charges
+///   identical counts
+///   (`rewrite_paths_charge_identical_work_and_build_identical_rows`).
+///
+/// Bump this whenever a change alters any [`InheritCost`] field for any
+/// input; `inherited_f4_accounting_version_pins_the_charge` fails then, on
+/// purpose, so the bump cannot be forgotten.  The lazy rewrite
+/// (`KIC_F4_EAGER=0`, `KIC_F4_REWRITE=scatter`) stays reachable only as a
+/// same-binary control and charges a different count; `ecbench` refuses to
+/// run with those overrides set.
+pub const INHERITED_F4_ACCOUNTING_VERSION: u32 = 2;
+
 /// Work counters for one basis operation, all in 64-bit word operations.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct InheritCost {
@@ -609,6 +631,103 @@ impl InheritCost {
         self.displaced_rows += other.displaced_rows;
         self.completion_rows += other.completion_rows;
         self.closure_products += other.closure_products;
+    }
+}
+
+/// What a [`ClosureSink`] asks of the closure.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CloseFlow {
+    Continue,
+    Stop,
+}
+
+/// Where [`ReducedBasis::close_with`] offers its resumable states: between
+/// rounds, and at every word boundary of a round's elimination.  A sink that
+/// answers [`CloseFlow::Stop`] ends the closure at that state, which it has
+/// saved if it wants it back.
+pub trait ClosureSink {
+    /// A round has been absorbed and the closure has more to do; `done`
+    /// rounds are finished.  The basis is readable by
+    /// [`ReducedBasis::closure_view`].
+    fn after_round(&mut self, basis: &ReducedBasis, cost: &InheritCost, done: u32) -> CloseFlow;
+    /// A word boundary of the elimination inside round `done + 1`.
+    fn in_round(&mut self, view: &RoundView<'_>, cost: &InheritCost, done: u32) -> CloseFlow;
+}
+
+/// The sink that never stops and keeps nothing: plain `close`.
+struct NoSink;
+impl ClosureSink for NoSink {
+    fn after_round(&mut self, _: &ReducedBasis, _: &InheritCost, _: u32) -> CloseFlow {
+        CloseFlow::Continue
+    }
+    fn in_round(&mut self, _: &RoundView<'_>, _: &InheritCost, _: u32) -> CloseFlow {
+        CloseFlow::Continue
+    }
+}
+
+/// One closure round caught in the middle of its elimination: the matrix of
+/// the basis rows and the round's products, partly reduced.  Together with
+/// the layout, the pivot bits the basis had, and the elimination's position
+/// it is everything the round still needs; the rest of the basis is rebuilt
+/// from the finished matrix.
+#[derive(Debug)]
+pub struct RoundView<'a> {
+    pub degree: u32,
+    pub n_vars: usize,
+    pub support_local: bool,
+    pub min_fall_degree: u32,
+    pub closure_rounds: u32,
+    pub columns: &'a [Mask],
+    /// Whether each column led a row of the basis before this round.
+    pub was_pivot: &'a [bool],
+    pub matrix: &'a [Vec<u64>],
+    /// Pivot rows found so far, and the packed word the elimination is at.
+    pub pivot_row: usize,
+    pub word: usize,
+}
+
+/// A round to continue: the owned form of a [`RoundView`].
+#[derive(Debug)]
+pub struct RoundJob {
+    matrix: Vec<Vec<u64>>,
+    was_pivot: Vec<bool>,
+    /// Where the elimination continues; `None` for a round not yet started.
+    resume: Option<(usize, usize)>,
+}
+
+/// How [`ReducedBasis::close_with`] ended.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct CloseEnd {
+    /// Rounds finished.
+    pub rounds: u32,
+    /// The sink stopped the closure (mid-round, or between rounds).
+    pub stopped: bool,
+}
+
+/// The state of a closure between two rounds, as a checkpoint holds it:
+/// everything [`ReducedBasis::from_closure_state`] needs besides the system
+/// itself, which the caller rebuilds from its inputs.  Rows are in the
+/// current layout, `words` words each, in the order `pending` indexes.
+#[derive(Debug)]
+pub struct ClosureView<'a> {
+    pub degree: u32,
+    pub n_vars: usize,
+    pub support_local: bool,
+    pub min_fall_degree: u32,
+    pub closure_rounds: u32,
+    pub words: usize,
+    pub columns: &'a [Mask],
+    pub pending: &'a [u32],
+    rows: &'a [LazyRow],
+}
+
+impl ClosureView<'_> {
+    pub fn n_rows(&self) -> usize {
+        self.rows.len()
+    }
+    /// Row `r`, all `words` words of it.
+    pub fn row(&self, r: usize) -> &[u64] {
+        &self.rows[r].data
     }
 }
 
@@ -923,6 +1042,10 @@ enum EagerMode {
 /// the same in every mode; the specialisation word count charges every
 /// kept row's rewrite, identically in both eager modes.
 fn eager_mode() -> EagerMode {
+    #[cfg(test)]
+    if let Some((mode, _)) = rewrite_path_override::get() {
+        return mode;
+    }
     static MODE: std::sync::OnceLock<EagerMode> = std::sync::OnceLock::new();
     *MODE.get_or_init(|| {
         let var = std::env::var("KIC_F4_EAGER");
@@ -937,9 +1060,35 @@ fn eager_mode() -> EagerMode {
     })
 }
 
+/// Test-only, per-thread choice of the rewrite path, so one process can run
+/// the BMI2 path and the portable path (what every aarch64 host runs) on the
+/// same input and compare images and charged work.
+#[cfg(test)]
+mod rewrite_path_override {
+    use super::EagerMode;
+    use std::cell::Cell;
+    thread_local! {
+        static PATH: Cell<Option<(EagerMode, bool)>> = const { Cell::new(None) };
+    }
+    pub(super) fn get() -> Option<(EagerMode, bool)> {
+        PATH.with(Cell::get)
+    }
+    /// Run `f` with `eager_mode()` and `wordwise_rewrite()` forced.
+    pub(super) fn with<T>(mode: EagerMode, wordwise: bool, f: impl FnOnce() -> T) -> T {
+        let old = PATH.with(|p| p.replace(Some((mode, wordwise))));
+        let out = f();
+        PATH.with(|p| p.set(old));
+        out
+    }
+}
+
 /// Whether the word-wise rewrite is used: `pext`/`pdep` need BMI2, and
 /// `KIC_F4_REWRITE=scatter` keeps the bit scatter as a same-binary control.
 fn wordwise_rewrite() -> bool {
+    #[cfg(test)]
+    if let Some((_, wordwise)) = rewrite_path_override::get() {
+        return wordwise;
+    }
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ENABLED.get_or_init(|| {
         if std::env::var("KIC_F4_REWRITE").as_deref() == Ok("scatter") {
@@ -1056,7 +1205,7 @@ pub struct ChildSystem {
 /// Its comparisons are `cmp_mono`'s popcounts, and the baseline x86-64
 /// target has no `popcnt` instruction, so where the CPU has one the same
 /// merge runs compiled with it; the layout is identical either way.
-fn fold_layout(columns: &[u64], bit: u64, new_columns: &mut Vec<u64>, map: &mut [u32]) {
+fn fold_layout(columns: &[Mask], bit: Mask, new_columns: &mut Vec<Mask>, map: &mut [u32]) {
     #[cfg(target_arch = "x86_64")]
     {
         if std::arch::is_x86_feature_detected!("popcnt") {
@@ -1070,16 +1219,16 @@ fn fold_layout(columns: &[u64], bit: u64, new_columns: &mut Vec<u64>, map: &mut 
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "popcnt")]
 unsafe fn fold_layout_popcnt(
-    columns: &[u64],
-    bit: u64,
-    new_columns: &mut Vec<u64>,
+    columns: &[Mask],
+    bit: Mask,
+    new_columns: &mut Vec<Mask>,
     map: &mut [u32],
 ) {
     fold_layout_body(columns, bit, new_columns, map)
 }
 
 #[inline(always)]
-fn fold_layout_body(columns: &[u64], bit: u64, new_columns: &mut Vec<u64>, map: &mut [u32]) {
+fn fold_layout_body(columns: &[Mask], bit: Mask, new_columns: &mut Vec<Mask>, map: &mut [u32]) {
     let n_old = columns.len();
     let (mut i, mut j) = (0usize, 0usize);
     let next_keep = |i: &mut usize| -> Option<usize> {
@@ -1356,7 +1505,7 @@ struct CompletionBatch {
     /// Per id: the monomial, its column in the layout the batch was
     /// gathered against (`DELETED` if absent), and whether a kept row
     /// holds it.
-    monos: Vec<u64>,
+    monos: Vec<Mask>,
     old_column: Vec<u32>,
     used: Vec<bool>,
     /// One parity bit per id, zero between rows.
@@ -1370,7 +1519,7 @@ struct CompletionBatch {
 impl CompletionBatch {
     /// Gather the row with terms `monos` (repeats cancelling in pairs)
     /// against the layout `index`; kept only if something survives.
-    fn push_row(&mut self, monos: impl ExactSizeIterator<Item = u64>, index: &MaskMap<usize>) {
+    fn push_row(&mut self, monos: impl ExactSizeIterator<Item = Mask>, index: &MaskMap<usize>) {
         self.scratch.clear();
         let len = monos.len();
         self.scratch.reserve(len);
@@ -1411,7 +1560,7 @@ impl CompletionBatch {
     /// Grow `basis`'s layout by the monomials the kept rows hold and it
     /// lacks, and return every used id's column in the new layout.
     fn place(&self, basis: &mut ReducedBasis) -> Vec<u32> {
-        let mut missing: Vec<u64> = (0..self.monos.len())
+        let mut missing: Vec<Mask> = (0..self.monos.len())
             .filter(|&i| self.used[i] && self.old_column[i] == DELETED)
             .map(|i| self.monos[i])
             .collect();
@@ -1472,9 +1621,9 @@ fn xor_words(dst: &mut [u64], src: &[u64]) {
 /// differ only inside `t` meet and cancel.  Order does not matter to any
 /// caller (each packs the row by column or collects it into a set), so the
 /// parity is taken with a small hash table rather than by sorting.
-fn odd_terms(monos: impl ExactSizeIterator<Item = u64>) -> Vec<u64> {
+fn odd_terms(monos: impl ExactSizeIterator<Item = Mask>) -> Vec<Mask> {
     let len = monos.len();
-    let mut keys: Vec<u64> = Vec::with_capacity(len);
+    let mut keys: Vec<Mask> = Vec::with_capacity(len);
     let mut odd: Vec<bool> = Vec::with_capacity(len);
     ODD_SLOTS.with(|state| {
         let mut state = state.borrow_mut();
@@ -1491,7 +1640,8 @@ fn odd_terms(monos: impl ExactSizeIterator<Item = u64>) -> Vec<u64> {
         }
         let live = u64::from(*stamp) << 32;
         for m in monos {
-            let mut s = (m.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> (64 - bits)) as usize;
+            let mut s =
+                (mask_fold64(m).wrapping_mul(0x9E37_79B9_7F4A_7C15) >> (64 - bits)) as usize;
             loop {
                 let slot = slots[s];
                 if slot & !0xFFFF_FFFF != live {
@@ -1544,9 +1694,9 @@ pub struct ReducedBasis {
     /// Degree of each generator when the basis was last completed.
     generator_degrees: Rc<Vec<u32>>,
     /// Variables specialised away on the path from the root.
-    assigned: u64,
+    assigned: Mask,
     /// Column monomials of the current layout, in descending order.
-    columns: Vec<u64>,
+    columns: Vec<Mask>,
     /// Monomial → column, built only when a row has to be packed from
     /// monomials (completion), which most levels never do.
     column_index: Option<MaskMap<usize>>,
@@ -1682,7 +1832,7 @@ impl ReducedBasis {
         n_vars: usize,
         degree: u32,
         support_local: bool,
-        columns: Vec<u64>,
+        columns: Vec<Mask>,
         rows: Vec<Vec<u64>>,
     ) -> Self {
         let mut out = Self {
@@ -1980,6 +2130,40 @@ impl ReducedBasis {
         support_local: bool,
         min_fall_degree: u32,
     ) -> Option<(Self, InheritCost)> {
+        let (mut basis, mut cost) = Self::seed_closure(
+            system,
+            n_vars,
+            degree,
+            rounds,
+            support_local,
+            min_fall_degree,
+        )?;
+        basis.close(&mut cost);
+        Some((basis, cost))
+    }
+
+    /// Full MutantXL at fixed degree, stopped before its first round: the
+    /// root basis with the falls seeded and nothing multiplied out.  The
+    /// first state a closure checkpoint can hold; [`ReducedBasis::close_with`]
+    /// continues it.  [`ReducedBasis::from_system_closed_full`] is this plus
+    /// `close`, so the two reach the same basis.
+    pub fn seed_closure_full(
+        system: &[F2BoolPoly],
+        n_vars: usize,
+        degree: u32,
+        rounds: u32,
+    ) -> Option<(Self, InheritCost)> {
+        Self::seed_closure(system, n_vars, degree, rounds, false, 1)
+    }
+
+    fn seed_closure(
+        system: &[F2BoolPoly],
+        n_vars: usize,
+        degree: u32,
+        rounds: u32,
+        support_local: bool,
+        min_fall_degree: u32,
+    ) -> Option<(Self, InheritCost)> {
         let (mut basis, mut cost) = Self::from_system_with(system, n_vars, degree, support_local)?;
         if rounds == 0 || degree < min_fall_degree + 1 || basis.rows.is_empty() || basis.refuted {
             return Some((basis, cost));
@@ -1990,7 +2174,7 @@ impl ReducedBasis {
             .system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |acc, t| acc | t.mask)
+            .fold(0 as Mask, |acc, t| acc | t.mask)
             & all_variable_mask(n_vars);
         // Full MutantXL seeds every fall: a fall of the degree-`degree−1`
         // space times a monomial of degree two or more is not in general a
@@ -2006,7 +2190,7 @@ impl ReducedBasis {
         } else {
             Vec::new()
         };
-        let mut lower_leading: std::collections::HashSet<u64> = std::collections::HashSet::new();
+        let mut lower_leading: std::collections::HashSet<Mask> = std::collections::HashSet::new();
         if !lower.is_empty() {
             let columns = macaulay_columns(&lower)?;
             let mut matrix = pack_rows(&lower, &columns);
@@ -2023,7 +2207,6 @@ impl ReducedBasis {
                 basis.pending.push(r as u32);
             }
         }
-        basis.close(&mut cost);
         Some((basis, cost))
     }
 
@@ -2034,7 +2217,7 @@ impl ReducedBasis {
     }
 
     /// Variables specialised away since the root, as a mask.
-    pub fn assigned(&self) -> u64 {
+    pub fn assigned(&self) -> Mask {
         self.assigned
     }
 
@@ -2051,6 +2234,141 @@ impl ReducedBasis {
     /// Whether the row space contains the constant `1`.
     pub fn is_refuted(&self) -> bool {
         self.refuted
+    }
+
+    /// The closure's state if it is between rounds: not refuted, every row
+    /// materialised in the current layout from its first word.  That holds
+    /// right after the seeding ([`ReducedBasis::seed_closure_full`]) and
+    /// after every absorbed round, which are the only points a checkpoint is
+    /// taken; anywhere else this is `None`.
+    pub fn closure_view(&self) -> Option<ClosureView<'_>> {
+        let epoch = self.epoch();
+        if self.refuted
+            || self.closure_rounds == 0
+            || self
+                .rows
+                .iter()
+                .any(|r| r.version != epoch || r.start != 0 || r.data.len() != self.words)
+        {
+            return None;
+        }
+        Some(ClosureView {
+            degree: self.degree,
+            n_vars: self.n_vars,
+            support_local: self.support_local,
+            min_fall_degree: self.min_fall_degree,
+            closure_rounds: self.closure_rounds,
+            words: self.words,
+            columns: &self.columns,
+            pending: &self.pending,
+            rows: &self.rows,
+        })
+    }
+
+    /// The basis a [`ClosureView`] described, rebuilt from `system` (the
+    /// same system, which the caller checks by digest) and the saved
+    /// parts.  It is a root-like basis, with no layout history: every row is
+    /// in the one layout, so `close_with` continues exactly as the
+    /// uninterrupted closure would.  `None` if the parts do not fit
+    /// (a row of the wrong length, rows without distinct leading columns,
+    /// a pending index out of range).
+    #[allow(clippy::too_many_arguments)]
+    pub fn from_closure_state(
+        system: &[F2BoolPoly],
+        n_vars: usize,
+        degree: u32,
+        support_local: bool,
+        min_fall_degree: u32,
+        closure_rounds: u32,
+        columns: Vec<Mask>,
+        rows: Vec<Vec<u64>>,
+        pending: Vec<u32>,
+    ) -> Option<Self> {
+        let words = columns.len().div_ceil(64).max(1);
+        if rows.iter().any(|r| r.len() != words)
+            || pending.iter().any(|&p| p as usize >= rows.len())
+        {
+            return None;
+        }
+        let system = Rc::new(system.to_vec());
+        let generator_degrees = Rc::new(system.iter().map(poly_degree).collect());
+        let mut out = Self::assemble(
+            system,
+            generator_degrees,
+            n_vars,
+            degree,
+            support_local,
+            columns,
+            Vec::new(),
+        );
+        out.closure_rounds = closure_rounds;
+        out.min_fall_degree = min_fall_degree;
+        for row in rows {
+            let c = leading_column(&row)?;
+            if out.pivot_of[c].is_some() {
+                return None;
+            }
+            out.pivot_of[c] = Some(out.rows.len() as u32);
+            out.pivot_col.push(c as u32);
+            out.rows.push(LazyRow {
+                version: 0,
+                start: 0,
+                lead: (c / 64) as u32,
+                data: row.into(),
+            });
+        }
+        out.pending = pending;
+        Some(out)
+    }
+
+    /// A closure caught in the middle of a round's elimination
+    /// ([`RoundView`]), rebuilt from `system` and the saved parts: a shell
+    /// basis holding the layout, and the job to hand to
+    /// [`ReducedBasis::close_with`] as `resume`.  `None` if the parts do not
+    /// fit (a row of the wrong length, a position outside the matrix).
+    #[allow(clippy::too_many_arguments)]
+    pub fn from_round_state(
+        system: &[F2BoolPoly],
+        n_vars: usize,
+        degree: u32,
+        support_local: bool,
+        min_fall_degree: u32,
+        closure_rounds: u32,
+        columns: Vec<Mask>,
+        was_pivot: Vec<bool>,
+        matrix: Vec<Vec<u64>>,
+        pivot_row: usize,
+        word: usize,
+    ) -> Option<(Self, RoundJob)> {
+        let words = columns.len().div_ceil(64).max(1);
+        if was_pivot.len() != columns.len()
+            || matrix.iter().any(|r| r.len() != words)
+            || pivot_row > matrix.len()
+            || word > words
+        {
+            return None;
+        }
+        let system = Rc::new(system.to_vec());
+        let generator_degrees = Rc::new(system.iter().map(poly_degree).collect());
+        let mut out = Self::assemble(
+            system,
+            generator_degrees,
+            n_vars,
+            degree,
+            support_local,
+            columns,
+            Vec::new(),
+        );
+        out.closure_rounds = closure_rounds;
+        out.min_fall_degree = min_fall_degree;
+        Some((
+            out,
+            RoundJob {
+                matrix,
+                was_pivot,
+                resume: Some((pivot_row, word)),
+            },
+        ))
     }
 
     /// Degree falls queued for closure and not yet multiplied out: `0`
@@ -2467,7 +2785,7 @@ impl ReducedBasis {
 
     /// Adopt a new column layout: record the step, remap every pivot
     /// column and rebuild the pivot index.  Rows are left where they are.
-    fn adopt_layout(&mut self, columns: Vec<u64>, map: Vec<u32>) {
+    fn adopt_layout(&mut self, columns: Vec<Mask>, map: Vec<u32>) {
         let step = LayoutStep {
             map: Rc::new(map),
             to_here: RefCell::new(HashMap::default()),
@@ -2544,7 +2862,7 @@ impl ReducedBasis {
         child: &ChildSystem,
     ) -> (Self, InheritCost) {
         let mut cost = InheritCost::default();
-        let bit = 1u64 << var;
+        let bit = bit(var);
         if self.refuted {
             let mut out = self.clone();
             out.system = child.system.clone();
@@ -2567,7 +2885,7 @@ impl ReducedBasis {
         // lists and the old → new map falls out of the merge.
         let n_old = self.columns.len();
         let mut map: Vec<u32> = vec![DELETED; n_old];
-        let mut new_columns: Vec<u64> = Vec::with_capacity(n_old);
+        let mut new_columns: Vec<Mask> = Vec::with_capacity(n_old);
         if value {
             fold_layout(&self.columns, bit, &mut new_columns, &mut map);
         } else {
@@ -2669,7 +2987,7 @@ impl ReducedBasis {
                 .system
                 .iter()
                 .flat_map(|p| p.terms.iter())
-                .fold(0u64, |acc, t| acc | t.mask)
+                .fold(0 as Mask, |acc, t| acc | t.mask)
                 & all_variable_mask(out.n_vars);
             let mut batch = CompletionBatch::default();
             {
@@ -2680,7 +2998,7 @@ impl ReducedBasis {
                     let old_gap = self.degree - old_degree;
                     let new_gap = self.degree - new_degree;
                     let mask = if self.support_local {
-                        multiplier_mask & p.terms.iter().fold(0u64, |acc, t| acc | t.mask)
+                        multiplier_mask & p.terms.iter().fold(0 as Mask, |acc, t| acc | t.mask)
                     } else {
                         multiplier_mask
                     };
@@ -2767,76 +3085,128 @@ impl ReducedBasis {
     /// the ideal, so the tail stays sound.  Each product is charged one
     /// word read per word of `q` and one written per word of the product.
     pub fn close(&mut self, cost: &mut InheritCost) {
+        self.close_with(cost, 0, None, &mut NoSink);
+    }
+
+    /// [`ReducedBasis::close`] from round `first_round`, offering `sink` its
+    /// resumable states: between rounds (when the closure has more to do) and
+    /// at each word boundary of a round's elimination.  `resume` continues a
+    /// round that a stop left in its elimination
+    /// ([`ReducedBasis::from_round_state`]).  A sink answering
+    /// [`CloseFlow::Stop`] ends the call there, the basis left mid-round and
+    /// not to be used again.  With a sink that always continues this is
+    /// `close`, round for round, charging the same work.
+    pub fn close_with(
+        &mut self,
+        cost: &mut InheritCost,
+        first_round: u32,
+        mut resume: Option<RoundJob>,
+        sink: &mut dyn ClosureSink,
+    ) -> CloseEnd {
         if self.closure_rounds == 0 || self.refuted {
             self.pending.clear();
-            return;
+            return CloseEnd {
+                rounds: first_round,
+                stopped: false,
+            };
         }
+        let mut done = first_round;
         let multipliers = self
             .system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |acc, t| acc | t.mask)
+            .fold(0 as Mask, |acc, t| acc | t.mask)
             & all_variable_mask(self.n_vars);
-        for _ in 0..self.closure_rounds {
-            let work = std::mem::take(&mut self.pending);
-            if work.is_empty() {
-                break;
-            }
-            let mut products: Vec<Vec<u64>> = Vec::new();
-            let mut read_words = 0u64;
-            for r in work {
-                let r = r as usize;
-                if !self.is_fall(r) {
-                    continue;
-                }
-                let gap = self.degree - self.columns[self.pivot_col[r] as usize].count_ones();
-                let q = self.current_row(r, cost);
-                let mut q_monos: Vec<u64> = Vec::new();
-                for (i, &word) in q.live().iter().enumerate() {
-                    let base = (q.lead as usize + i) * 64;
-                    let mut bits = word;
-                    while bits != 0 {
-                        let b = bits.trailing_zeros() as usize;
-                        bits &= bits - 1;
-                        q_monos.push(self.columns[base + b]);
+        for _ in first_round..self.closure_rounds {
+            let mut job = match resume.take() {
+                Some(job) => job,
+                None => {
+                    let work = std::mem::take(&mut self.pending);
+                    if work.is_empty() {
+                        break;
                     }
-                }
-                for t in monomials_up_to_mask(multipliers, gap) {
-                    if t == 0 {
-                        continue;
-                    }
-                    let product = odd_terms(q_monos.iter().map(|&m| m | t));
-                    if !product.is_empty() {
-                        products.push(product);
-                        read_words += q.live().len() as u64;
-                    }
-                }
-            }
-            if products.is_empty() {
-                break;
-            }
-            self.extend_columns(&products);
-            let words = self.words;
-            cost.specialise_word_ops += read_words + (products.len() * words) as u64;
-            cost.closure_products += products.len() as u64;
-            let packed: Vec<Vec<u64>> = {
-                let index = self.column_index();
-                products
-                    .iter()
-                    .map(|monos| {
-                        let mut row = vec![0u64; words];
-                        for m in monos {
-                            let c = index[m];
-                            row[c / 64] |= 1u64 << (c % 64);
+                    let mut products: Vec<Vec<Mask>> = Vec::new();
+                    let mut read_words = 0u64;
+                    for r in work {
+                        let r = r as usize;
+                        if !self.is_fall(r) {
+                            continue;
                         }
-                        row
-                    })
-                    .collect()
+                        let gap =
+                            self.degree - self.columns[self.pivot_col[r] as usize].count_ones();
+                        let q = self.current_row(r, cost);
+                        let mut q_monos: Vec<Mask> = Vec::new();
+                        for (i, &word) in q.live().iter().enumerate() {
+                            let base = (q.lead as usize + i) * 64;
+                            let mut bits = word;
+                            while bits != 0 {
+                                let b = bits.trailing_zeros() as usize;
+                                bits &= bits - 1;
+                                q_monos.push(self.columns[base + b]);
+                            }
+                        }
+                        for t in monomials_up_to_mask(multipliers, gap) {
+                            if t == 0 {
+                                continue;
+                            }
+                            let product = odd_terms(q_monos.iter().map(|&m| m | t));
+                            if !product.is_empty() {
+                                products.push(product);
+                                read_words += q.live().len() as u64;
+                            }
+                        }
+                    }
+                    if products.is_empty() {
+                        break;
+                    }
+                    self.extend_columns(&products);
+                    let words = self.words;
+                    cost.specialise_word_ops += read_words + (products.len() * words) as u64;
+                    cost.closure_products += products.len() as u64;
+                    let packed: Vec<Vec<u64>> = {
+                        let index = self.column_index();
+                        products
+                            .iter()
+                            .map(|monos| {
+                                let mut row = vec![0u64; words];
+                                for m in monos {
+                                    let c = index[m];
+                                    row[c / 64] |= 1u64 << (c % 64);
+                                }
+                                row
+                            })
+                            .collect()
+                    };
+                    match self.absorb_begin(packed, cost) {
+                        Some(job) => job,
+                        None => {
+                            done += 1;
+                            continue;
+                        }
+                    }
+                }
             };
-            self.absorb(packed, cost);
+            let Some(rank) = self.absorb_eliminate(&mut job, cost, done, sink) else {
+                return CloseEnd {
+                    rounds: done,
+                    stopped: true,
+                };
+            };
+            self.absorb_finish(job, rank);
+            done += 1;
             if self.refuted {
                 break;
             }
+            if !self.pending.is_empty() && sink.after_round(self, cost, done) == CloseFlow::Stop {
+                return CloseEnd {
+                    rounds: done,
+                    stopped: true,
+                };
+            }
+        }
+        CloseEnd {
+            rounds: done,
+            stopped: false,
         }
     }
 
@@ -2848,9 +3218,14 @@ impl ReducedBasis {
     /// enough that the Four Russians kernel reduces it for a fraction of
     /// that.  Rows whose pivot column is new and whose leading degree is a
     /// fall's are queued for closure.
-    fn absorb(&mut self, batch: Vec<Vec<u64>>, cost: &mut InheritCost) {
+    ///
+    /// Three steps so that a closure can stop inside the elimination:
+    /// [`absorb_begin`](Self::absorb_begin) builds the matrix,
+    /// [`absorb_eliminate`](Self::absorb_eliminate) reduces it (resumably),
+    /// [`absorb_finish`](Self::absorb_finish) rebuilds the basis from it.
+    fn absorb_begin(&mut self, batch: Vec<Vec<u64>>, cost: &mut InheritCost) -> Option<RoundJob> {
         if batch.is_empty() {
-            return;
+            return None;
         }
         self.materialise_all(cost);
         let was_pivot: Vec<bool> = self.pivot_of.iter().map(Option::is_some).collect();
@@ -2865,7 +3240,81 @@ impl ReducedBasis {
             })
             .collect();
         matrix.extend(batch);
-        let rank = rref_f2_counted(&mut matrix, self.columns.len(), &mut cost.reduce_word_ops);
+        Some(RoundJob {
+            matrix,
+            was_pivot,
+            resume: None,
+        })
+    }
+
+    /// Reduce the round's matrix to reduced row echelon form, offering the
+    /// sink every word boundary when the Four Russians kernel runs.  Returns
+    /// the rank, or `None` if the sink stopped it (the job then holds the
+    /// partly reduced matrix and where it stopped).
+    fn absorb_eliminate(
+        &mut self,
+        job: &mut RoundJob,
+        cost: &mut InheritCost,
+        done: u32,
+        sink: &mut dyn ClosureSink,
+    ) -> Option<usize> {
+        let n_cols = self.columns.len();
+        if !rref_uses_four_russians(job.matrix.len(), n_cols) {
+            // Small matrices take the other kernels and finish in moments.
+            return Some(rref_f2_counted(
+                &mut job.matrix,
+                n_cols,
+                &mut cost.reduce_word_ops,
+            ));
+        }
+        let (columns, was_pivot) = (&self.columns, &job.was_pivot);
+        let (degree, n_vars, support_local) = (self.degree, self.n_vars, self.support_local);
+        let (min_fall_degree, closure_rounds) = (self.min_fall_degree, self.closure_rounds);
+        let base = *cost;
+        let mut ops = cost.reduce_word_ops;
+        let mut position = job.resume;
+        let end = {
+            let mut hook = |matrix: &[Vec<u64>], pivot_row: usize, word: usize, ops_now: u64| {
+                let mut at = base;
+                at.reduce_word_ops = ops_now;
+                let view = RoundView {
+                    degree,
+                    n_vars,
+                    support_local,
+                    min_fall_degree,
+                    closure_rounds,
+                    columns,
+                    was_pivot,
+                    matrix,
+                    pivot_row,
+                    word,
+                };
+                sink.in_round(&view, &at, done) == CloseFlow::Stop
+            };
+            crate::cryptanalysis::gf2_elim::rref_resumable(
+                &mut job.matrix,
+                n_cols,
+                &mut ops,
+                position.take(),
+                Some(&mut hook),
+            )
+        };
+        cost.reduce_word_ops = ops;
+        match end {
+            crate::cryptanalysis::gf2_elim::ElimEnd::Done(rank) => Some(rank),
+            crate::cryptanalysis::gf2_elim::ElimEnd::Stopped { pivot_row, word } => {
+                job.resume = Some((pivot_row, word));
+                None
+            }
+        }
+    }
+
+    fn absorb_finish(&mut self, job: RoundJob, rank: usize) {
+        let RoundJob {
+            mut matrix,
+            was_pivot,
+            ..
+        } = job;
         matrix.truncate(rank);
         let epoch = self.epoch();
         self.rows.clear();
@@ -2894,13 +3343,13 @@ impl ReducedBasis {
     /// Add any monomials of `rows_monos` missing from the layout, keeping
     /// the descending column order.  A layout step like any other: rows
     /// are not touched.
-    fn extend_columns(&mut self, rows_monos: &[Vec<u64>]) {
+    fn extend_columns(&mut self, rows_monos: &[Vec<Mask>]) {
         let index = self.column_index();
         // The products share most of their new monomials, so collect each
         // distinct one once as it is first met and key only those into the
         // layout's order.
         let mut seen: MaskMap<()> = MaskMap::default();
-        let mut missing: Vec<u64> = Vec::new();
+        let mut missing: Vec<Mask> = Vec::new();
         for &m in rows_monos.iter().flatten() {
             if !index.contains_key(&m) && seen.insert(m, ()).is_none() {
                 missing.push(m);
@@ -2918,7 +3367,7 @@ impl ReducedBasis {
     /// of each.  The layout is already in descending order, so the new one
     /// is a merge of two sorted lists and the old → new map falls out of
     /// the merge, as in `fold_layout`.
-    fn insert_columns(&mut self, missing: &[u64]) -> Vec<u32> {
+    fn insert_columns(&mut self, missing: &[Mask]) -> Vec<u32> {
         let old = &self.columns;
         let mut columns = Vec::with_capacity(old.len() + missing.len());
         let mut map = vec![0u32; old.len()];
@@ -3027,6 +3476,10 @@ pub fn substitute(p: &F2BoolPoly, var: u32, value: bool) -> F2BoolPoly {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     /// A random column layout, random fold and delete steps composed into
     /// one map, random rows: the segment plan rewrites every row exactly as
@@ -3066,7 +3519,7 @@ mod tests {
                     continue;
                 }
                 used |= 1 << var;
-                let bit = 1u64 << var;
+                let bit = bit(var);
                 let mut map = vec![DELETED; layout.len()];
                 let mut new_layout = Vec::with_capacity(layout.len());
                 if next() % 2 == 0 {
@@ -3142,7 +3595,7 @@ mod tests {
 
     /// The sort-and-count parity the completion rows used before
     /// [`odd_terms`] and [`CompletionBatch`].
-    fn odd_by_sort(mut monos: Vec<u64>) -> Vec<u64> {
+    fn odd_by_sort(mut monos: Vec<Mask>) -> Vec<Mask> {
         monos.sort_unstable();
         let mut out = Vec::new();
         let mut i = 0;
@@ -3173,8 +3626,8 @@ mod tests {
             let len = (xorshift(&mut seed) % 90) as usize;
             // a small alphabet, so repeats of every multiplicity occur
             let alphabet = 1 + xorshift(&mut seed) % 40;
-            let monos: Vec<u64> = (0..len)
-                .map(|_| (xorshift(&mut seed) % alphabet) << (round % 7))
+            let monos: Vec<Mask> = (0..len)
+                .map(|_| mask_from64((xorshift(&mut seed) % alphabet) << (round % 7)))
                 .collect();
             let mut got = odd_terms(monos.iter().copied());
             got.sort_unstable();
@@ -3209,25 +3662,25 @@ mod tests {
             };
             // products of random monomials by random multipliers, some
             // cancelling, some reaching outside the layout
-            let products: Vec<Vec<u64>> = (0..12)
+            let products: Vec<Vec<Mask>> = (0..12)
                 .map(|_| {
                     let t = xorshift(&mut seed) & (0b111 << (xorshift(&mut seed) % 9));
                     (0..(xorshift(&mut seed) % 16))
-                        .map(|_| (xorshift(&mut seed) & 0xfff) | t)
+                        .map(|_| mask_from64((xorshift(&mut seed) & 0xfff) | t))
                         .collect()
                 })
                 .collect();
 
             // reference: cancel each row, extend by sorting, pack by index
             let mut reference = basis.clone();
-            let kept: Vec<Vec<u64>> = products
+            let kept: Vec<Vec<Mask>> = products
                 .iter()
                 .map(|p| odd_by_sort(p.clone()))
                 .filter(|r| !r.is_empty())
                 .collect();
-            let old: std::collections::HashSet<u64> = reference.columns.iter().copied().collect();
+            let old: std::collections::HashSet<Mask> = reference.columns.iter().copied().collect();
             let mut want_columns = reference.columns.clone();
-            let mut added: Vec<u64> = kept
+            let mut added: Vec<Mask> = kept
                 .iter()
                 .flatten()
                 .copied()
@@ -3255,7 +3708,7 @@ mod tests {
             let columns = batch.place(&mut out);
             assert_eq!(out.columns, want_columns);
             for (ids, want) in batch.rows.iter().zip(&kept) {
-                let mut got: Vec<u64> = ids
+                let mut got: Vec<Mask> = ids
                     .iter()
                     .map(|&id| out.columns[columns[id as usize] as usize])
                     .collect();
@@ -3279,7 +3732,7 @@ mod tests {
             for _ in 0..d {
                 mask |= 1u64 << (next() % n_vars as u64);
             }
-            monos.push(F2BoolMono::from_mask(mask));
+            monos.push(F2BoolMono::from_mask(mask_from64(mask)));
         }
         F2BoolPoly::from_monos(monos, n_vars)
     }
@@ -3292,7 +3745,7 @@ mod tests {
 
     /// RREF of a list of polynomials, as a canonical set.
     fn rref_polys(polys: &[F2BoolPoly], n_vars: usize) -> Vec<F2BoolPoly> {
-        let rows_monos: Vec<Vec<u64>> = polys
+        let rows_monos: Vec<Vec<Mask>> = polys
             .iter()
             .filter(|p| !p.is_zero())
             .map(|p| p.terms.iter().map(|t| t.mask).collect())
@@ -3326,7 +3779,7 @@ mod tests {
         system: &[F2BoolPoly],
         n_vars: usize,
         degree: u32,
-        mask: u64,
+        mask: Mask,
     ) -> Vec<F2BoolPoly> {
         use crate::cryptanalysis::koblitz_groebner::macaulay_rows_monos_with_mask;
         let rows = macaulay_rows_monos_with_mask(system, n_vars, degree, mask, None).unwrap();
@@ -3375,7 +3828,7 @@ mod tests {
             .any(|p| p.terms.len() == 1 && p.terms[0].mask == 0)
     }
 
-    fn occurring(system: &[F2BoolPoly]) -> u64 {
+    fn occurring(system: &[F2BoolPoly]) -> Mask {
         system
             .iter()
             .flat_map(|p| p.terms.iter())
@@ -3397,7 +3850,7 @@ mod tests {
         basis: &ReducedBasis,
         system: &[F2BoolPoly],
         n_vars: usize,
-        assigned: u64,
+        assigned: Mask,
         what: &str,
     ) {
         let rows = rref_polys(&basis_polys(basis), n_vars);
@@ -3447,6 +3900,169 @@ mod tests {
                 )
             })
             .collect()
+    }
+
+    /// Every rewrite path charges the same work and builds the same rows.
+    ///
+    /// The BMI2 host path (`pext`/`pdep`, eager through the step plan) and
+    /// the portable one that every aarch64 host runs (shift runs, and the
+    /// bit scatter for rows from older layouts) are forced in turn, in the
+    /// same process, on the same random specialisation chains.  Counted
+    /// work is part of a method's recorded identity, so a session recorded
+    /// on one path must replay on the other: every counter of
+    /// [`InheritCost`], at every step, and every row's words must match
+    /// exactly.  The lazy modes (`Off`) are compared pairwise the same way.
+    #[test]
+    fn rewrite_paths_charge_identical_work_and_build_identical_rows() {
+        type Print = Vec<(u32, u32, u32, u32, Vec<u64>)>;
+        fn print(b: &ReducedBasis) -> Print {
+            b.rows
+                .iter()
+                .zip(&b.pivot_col)
+                .map(|(r, &pc)| (pc, r.version, r.start, r.lead, r.live().to_vec()))
+                .collect()
+        }
+        // One chain of specialisations under a forced path: the cost and
+        // the rows after every step, and the cost of reading the tail.
+        fn chain(
+            mode: EagerMode,
+            wordwise: bool,
+            system: &[F2BoolPoly],
+            n_vars: usize,
+            degree: u32,
+            steps: &[(u32, bool)],
+        ) -> Vec<(InheritCost, Print)> {
+            rewrite_path_override::with(mode, wordwise, || {
+                let (mut basis, root_cost) =
+                    ReducedBasis::from_system(system, n_vars, degree).unwrap();
+                let mut out = vec![(root_cost, print(&basis))];
+                for &(v, value) in steps {
+                    let (next, cost) = basis.specialise(v, value);
+                    basis = next;
+                    out.push((cost, print(&basis)));
+                    let mut tail_cost = InheritCost::default();
+                    let _ = basis.linear_tail(&mut tail_cost);
+                    out.push((tail_cost, print(&basis)));
+                }
+                out
+            })
+        }
+        let have_bmi2 = cfg!(target_arch = "x86_64") && {
+            #[cfg(target_arch = "x86_64")]
+            let b = std::arch::is_x86_feature_detected!("bmi2");
+            #[cfg(not(target_arch = "x86_64"))]
+            let b = false;
+            b
+        };
+        // (host path, portable path) pairs; the BMI2 ones need the CPU.
+        let mut pairs = vec![(EagerMode::Runs, EagerMode::Runs, false, false)];
+        pairs.push((EagerMode::Off, EagerMode::Off, false, false));
+        if have_bmi2 {
+            pairs.push((EagerMode::Bmi2, EagerMode::Runs, true, false));
+            pairs.push((EagerMode::Off, EagerMode::Off, true, false));
+        }
+        let mut seed = 0x0bad_5eed_1234_5678u64;
+        let mut compared = 0usize;
+        for trial in 0..60 {
+            let n_vars = 6 + trial % 5;
+            let m = 3 + trial % 4;
+            let system: Vec<F2BoolPoly> = (0..m)
+                .map(|k| random_poly(n_vars, if k % 4 == 3 { 1 } else { 2 }, 5 + k, &mut seed))
+                .filter(|p| poly_degree(p) >= 1)
+                .collect();
+            if system.is_empty() {
+                continue;
+            }
+            let degree = 2 + (trial % 2) as u32;
+            let steps: Vec<(u32, bool)> = (0..3)
+                .map(|i| ((xorshift(&mut seed) % n_vars as u64) as u32 + i) % n_vars as u32)
+                .zip([false, true, true])
+                .map(|(v, b)| (v, b ^ (trial % 2 == 0)))
+                .collect();
+            // distinct variables only
+            let mut steps_d: Vec<(u32, bool)> = Vec::new();
+            for st in steps {
+                if steps_d.iter().all(|&(v, _)| v != st.0) {
+                    steps_d.push(st);
+                }
+            }
+            for &(mode_a, mode_b, wordwise_a, wordwise_b) in &pairs {
+                let a = chain(mode_a, wordwise_a, &system, n_vars, degree, &steps_d);
+                let b = chain(mode_b, wordwise_b, &system, n_vars, degree, &steps_d);
+                assert_eq!(a.len(), b.len());
+                for (i, ((ca, pa), (cb, pb))) in a.iter().zip(&b).enumerate() {
+                    assert_eq!(
+                        ca, cb,
+                        "trial {trial} step {i}: charged work differs ({mode_a:?}/{wordwise_a} vs {mode_b:?}/{wordwise_b})"
+                    );
+                    assert_eq!(
+                        pa, pb,
+                        "trial {trial} step {i}: rows differ ({mode_a:?}/{wordwise_a} vs {mode_b:?}/{wordwise_b})"
+                    );
+                    compared += 1;
+                }
+            }
+        }
+        assert!(compared > 100, "too few comparisons: {compared}");
+    }
+
+    /// The charge itself is pinned, so changing what is counted cannot pass
+    /// unnoticed: if this fails, the accounting changed.  Bump
+    /// [`INHERITED_F4_ACCOUNTING_VERSION`], then update the figures below in
+    /// the same change.  The portable eager path is forced, which every host
+    /// can run and which charges what the BMI2 path charges (the test above).
+    #[test]
+    fn inherited_f4_accounting_version_pins_the_charge() {
+        let mut seed = 0x5eed_acc0_0057_0001u64;
+        let mut total = InheritCost::default();
+        let mut chains = 0usize;
+        for trial in 0..40 {
+            let n_vars = 6 + trial % 5;
+            let m = 3 + trial % 4;
+            let system: Vec<F2BoolPoly> = (0..m)
+                .map(|k| random_poly(n_vars, if k % 4 == 3 { 1 } else { 2 }, 5 + k, &mut seed))
+                .filter(|p| poly_degree(p) >= 1)
+                .collect();
+            if system.is_empty() {
+                continue;
+            }
+            let degree = 2 + (trial % 2) as u32;
+            rewrite_path_override::with(EagerMode::Runs, false, || {
+                let (mut basis, root) = ReducedBasis::from_system(&system, n_vars, degree).unwrap();
+                total.add(root);
+                let mut used = Vec::new();
+                for i in 0..3u32 {
+                    let v = ((xorshift(&mut seed) % n_vars as u64) as u32 + i) % n_vars as u32;
+                    if used.contains(&v) {
+                        continue;
+                    }
+                    used.push(v);
+                    let (next, cost) = basis.specialise(v, (i + trial as u32).is_multiple_of(2));
+                    basis = next;
+                    total.add(cost);
+                    let mut tail = InheritCost::default();
+                    let _ = basis.linear_tail(&mut tail);
+                    total.add(tail);
+                }
+            });
+            chains += 1;
+        }
+        assert!(chains > 30, "too few chains: {chains}");
+        let got = (
+            total.reduce_word_ops,
+            total.rref_word_ops,
+            total.specialise_word_ops,
+            total.displaced_rows,
+            total.completion_rows,
+            total.closure_products,
+        );
+        assert_eq!(
+            got,
+            (9944, 0, 8581, 914, 287, 0),
+            "the inherited-F4 charge changed: bump INHERITED_F4_ACCOUNTING_VERSION (now {}) and \
+             update this pin",
+            INHERITED_F4_ACCOUNTING_VERSION
+        );
     }
 
     #[test]
@@ -3584,7 +4200,7 @@ mod tests {
     /// Every point of `F_2^n_vars` on which the whole system vanishes.
     fn variety(system: &[F2BoolPoly], n_vars: usize) -> Vec<u64> {
         (0..1u64 << n_vars)
-            .filter(|&x| system.iter().all(|p| p.eval(x) == 0))
+            .filter(|&x| system.iter().all(|p| p.eval(mask_from64(x)) == 0))
             .collect()
     }
 
@@ -3595,14 +4211,14 @@ mod tests {
         basis: &ReducedBasis,
         system: &[F2BoolPoly],
         n_vars: usize,
-        assigned: u64,
+        assigned: Mask,
         what: &str,
     ) {
         let rows = basis_polys(basis);
         let roots = variety(system, n_vars);
         for p in &rows {
             assert!(
-                roots.iter().all(|&x| p.eval(x) == 0),
+                roots.iter().all(|&x| p.eval(mask_from64(x)) == 0),
                 "{what}: a closed row does not vanish on the variety"
             );
         }
