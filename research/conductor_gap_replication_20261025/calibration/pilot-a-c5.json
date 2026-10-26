@@ -1,0 +1,86 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation",
+        "params": {}
+      },
+      "name": "rho-neg-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "rho.plain",
+        "params": {}
+      },
+      "name": "rho-plain",
+      "role": "baseline"
+    },
+    {
+      "name": "bsgs-neg",
+      "role": "control",
+      "method": {
+        "id": "bsgs.negation",
+        "params": {}
+      }
+    }
+  ],
+  "description": "Frozen conductor-gap replication; independent one-target solves, no shared setup; see PROTOCOL.md",
+  "label": "Excluded runtime calibration: pilot-a-c5",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026102521,
+    "timeout_seconds": 120,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 2540404243,
+        "b": 533110408,
+        "group_order": 16983183908,
+        "gx": 7596591682,
+        "gy": 16593825801,
+        "kind": "prime_explicit",
+        "p": 16983164089,
+        "r": 4245795977
+      },
+      {
+        "a": 6594654930,
+        "b": 10844516344,
+        "group_order": 16983183908,
+        "gx": 843986064,
+        "gy": 929904734,
+        "kind": "prime_explicit",
+        "p": 16983164089,
+        "r": 4245795977
+      },
+      {
+        "a": 14206235232,
+        "b": 11334992988,
+        "group_order": 16983183908,
+        "gx": 9083694616,
+        "gy": 8160824467,
+        "kind": "prime_explicit",
+        "p": 16983164089,
+        "r": 4245795977
+      },
+      {
+        "a": 8901155371,
+        "b": 12731078923,
+        "group_order": 16983183908,
+        "gx": 15834228004,
+        "gy": 8949661330,
+        "kind": "prime_explicit",
+        "p": 16983164089,
+        "r": 4245795977
+      }
+    ],
+    "target_kind": "planted_shared",
+    "target_seed": 2026102520,
+    "targets_per_curve": 4
+  }
+}

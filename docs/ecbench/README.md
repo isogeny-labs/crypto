@@ -641,6 +641,14 @@ counted `S` is incomplete. A full runtime comparison still requires
 matched L2/L3 runs and the A/A noise gate in §8; the Mac's L0 timings
 remain descriptive.
 
+The native `ic.pipeline` factor base
+`cm-scalar-orbit:columns=C,length=L,abs_d=19|43,mode=scalar|velu|recurrence`
+constructs the same CM scalar orbit through three explicit implementations.
+`recurrence` uses `P[k+2]=P[k+1]-[(abs_d+1)/4]P[k]` after one scalar
+multiplication. It requires cofactor-one prime-order curves. The new mode
+retains sign operations as `cm_recurrence_negations_uncharged` and charges
+group work normally. `scalar` and `velu` retain their frozen behavior.
+
 ## 8. Statistics
 
 - **The mean, not the median.** The floor `√(πr/2A)` is an expected

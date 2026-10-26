@@ -25,6 +25,12 @@ cargo build --release --bin curve_traits
 Every query reads the committed `traits.json`; nothing is recomputed.
 `--json` gives machine-readable output.
 
+The CLI uses compact JSON when the pretty encoding exceeds 64 MiB, keeping
+the complete catalogue below GitHub's blob limit. `build` and `check` use
+the same encoding. `curve_traits format` re-encodes an existing report and
+refuses to write if any parsed JSON value would change; it does not rerun
+factoring or alter the recorded budget.
+
 ## What each record holds
 
 All of it is derived from the registry's model and recorded order

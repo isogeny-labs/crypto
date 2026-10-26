@@ -297,7 +297,7 @@ impl FactorBaseBuilder<PrimeCurve> for CmOrbitBase<'_> {
             ("columns", "unknown seed logs"),
             ("length", "distinct abscissae per seed"),
             ("abs_d", "19 or 43"),
-            ("mode", "velu or scalar"),
+            ("mode", "velu, scalar, or recurrence"),
         ]
     }
     fn build(
@@ -323,8 +323,8 @@ impl FactorBaseBuilder<PrimeCurve> for CmOrbitBase<'_> {
         if columns == 0 || length == 0 || columns.checked_mul(length).is_none_or(|n| n > 16384) {
             return Err("CM orbit requires 1..16384 abscissae".into());
         }
-        if mode != "scalar" && mode != "velu" {
-            return Err("CM orbit mode must be scalar or velu".into());
+        if !matches!(mode, "scalar" | "velu" | "recurrence") {
+            return Err("CM orbit mode must be scalar, velu, or recurrence".into());
         }
         let started = Instant::now();
         let c = &self.instance.curve;
@@ -370,7 +370,21 @@ impl FactorBaseBuilder<PrimeCurve> for CmOrbitBase<'_> {
                 }
             };
             let mut coef = 1;
+            // The recurrence uses unfurled points; sign normalization applies
+            // to the recorded base, never to its two-state group recurrence.
+            let mut previous = point;
+            let mut current = point;
+            let mut raw_coef = 1;
             for level in 0..length {
+                if mode == "recurrence" {
+                    point = current;
+                    coef = raw_coef;
+                    if point.y > p - point.y {
+                        point = c.neg(point);
+                        coef = r - coef;
+                        fb.cost.count("cm_recurrence_negations_uncharged", 1);
+                    }
+                }
                 if !seen.insert(point.x) {
                     return Err("CM orbit repeats an abscissa across seeds or levels".into());
                 }
@@ -387,7 +401,19 @@ impl FactorBaseBuilder<PrimeCurve> for CmOrbitBase<'_> {
                 fb.point_index.insert(c.key(&c.neg(point)), i + 1);
                 fb.abscissa_list.push(point.x);
                 if level + 1 < length {
-                    point = if let Some(m) = &map {
+                    point = if mode == "recurrence" {
+                        let next = if level == 0 {
+                            c.mul(ops, current, lambda)
+                        } else {
+                            let scaled = c.mul(ops, previous, degree);
+                            fb.cost.count("cm_recurrence_negations_uncharged", 1);
+                            c.add(ops, current, c.neg(scaled))
+                        };
+                        previous = current;
+                        current = next;
+                        raw_coef = mul(raw_coef, lambda, r);
+                        next
+                    } else if let Some(m) = &map {
                         m.apply(c, point, &mut extra)?
                     } else {
                         c.mul(ops, point, lambda)
@@ -396,7 +422,7 @@ impl FactorBaseBuilder<PrimeCurve> for CmOrbitBase<'_> {
                     if point.infinity {
                         return Err("CM orbit reached infinity".into());
                     }
-                    if point.y > p - point.y {
+                    if mode != "recurrence" && point.y > p - point.y {
                         point = c.neg(point);
                         coef = r - coef;
                     }
@@ -485,6 +511,13 @@ mod tests {
         assert_eq!(a.points, b.points);
         assert_eq!(a.col_of, b.col_of);
         assert_eq!(a.coef_of, b.coef_of);
+        p.set("mode", "recurrence");
+        let recurrence = CmOrbitBase { instance: &i }
+            .build(&ctx, &p, &mut GroupOps::default())
+            .unwrap();
+        assert_eq!(b.points, recurrence.points);
+        assert_eq!(b.col_of, recurrence.col_of);
+        assert_eq!(b.coef_of, recurrence.coef_of);
         assert_eq!(a.points.len(), 128);
         assert_eq!(a.columns, 4);
     }
