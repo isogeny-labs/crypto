@@ -8,8 +8,10 @@
   - proved obstruction for the pipeline as stated (characteristic 2),
     unchanged;
   - for the odd-characteristic alternative, no characteristic obstruction
-    remains. It is an implementation gap: Smith's Props. 2 and 4 and the
-    trigonal construction are not implemented.
+    remains and the implementation gap is closed at toy size (Props. 2 and 4,
+    the trigonal construction as an explicit `psi`, end-to-end solves; W3b,
+    2026-10-25). What is open is empirical: the pipeline's cost at growing
+    `q` against matched rho.
 - **Affected work:**
   - [weak isogeny classes study, 2026-10-13](../research/weak_isogeny_classes_20261013/REPORT.md),
     section "Where the leads meet";
@@ -131,19 +133,17 @@ pipeline beats rho on the source curve.
 
 ## Next discriminating step
 
-- **Action:** implement Smith's Props. 2 and 4 natively (shared with
-  `smith-kernel-isogeny-class-walk.md`). Apply them to the three tractable
-  subgroups of each Joux–Vitse `H` in
-  `research/odd_char_descent_genus3_20261014/results/run-20261014T1800Z/jv_family.csv`.
-- **Controls:** random genus-3 hyperelliptic curves of the same cycle type
-  `(3,3,1,1)`, to see whether the family's success rate differs from
-  Smith's 1/4 per subgroup.
-- **Outcomes:**
-  - If some subgroup passes and the quotient is a smooth quartic with a
-    matching `L`, add the family as the third arm of the coverage study.
-  - If every subgroup fails on every instance, record that as a bounded
-    negative for this family. Types 1 and 2 remain the direct route to
-    plane quartics.
+- **Done (2026-10-25):** the step recorded on 2026-10-14 (native Props. 2
+  and 4 on the Joux–Vitse family, quotient a smooth plane quartic with
+  `L_X = L_H`) ran as part of W3b, together with an explicit `psi` and
+  end-to-end toy solves.
+- **Action now:** W2b: replace the brute-force dlog in `J_X(F_q)` by an
+  index calculus on the quartic (W1 canonical keys, W2a relations) and
+  measure the pipeline's end-to-end cost at growing `q` against matched rho
+  on `E0(F_{q^3})`.
+- **Outcomes:** a crossover estimate with an interval, or "no crossover in
+  range"; either is recorded here. The instances where `X` is hyperelliptic
+  (19% of the Prop. 4 passes at q = 7, falling to 4% at q = 23, in W3b) are outside this route.
 - **Recheck trigger:** a cited char-2 or char-3 trigonal analogue; access to
   Diem 2003.
 

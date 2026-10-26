@@ -95,9 +95,10 @@ its skip reason).])
 
 Every DLP attempt whose quotient X is a smooth plane quartic ended with the planted k recovered and verified on E0; the
 others are skips with the recorded reason "images lie on a conic: X hyperelliptic" (Smith's quotient is then a
-hyperelliptic Jacobian and there is no plane quartic for this route). Props. 2 and 4 pass per instance at the rate in the
-table; this family has three rational tractable subgroups per H (cycle type (3,3,1,1)), so the per-instance rate is not
-comparable with Smith's 18.6% for one random curve (Theorem 2) and no such comparison is drawn. The DLP stage is brute
+hyperelliptic Jacobian and there is no plane quartic for this route). Props. 2 and 4 pass per instance at 67.9% (q = 7), 82.5%
+(11), 78.6% (13), 77.9% (17), 76.8% (19) and 75.8% (23) (table), against 18.6% predicted by Smith's Theorem 2 for a
+random genus-3 curve. Not like for like: every H here has cycle type (3,3,1,1) and three rational tractable subgroups,
+where a random curve has about one; at q ≥ 17 the instances are the first in order, not a sample. The DLP stage is brute
 force on canonical keys; nothing here is an index calculus or a cost comparison with rho (that is W2b).
 
 = T7: cost of ψ per divisor

@@ -97,9 +97,14 @@ recovered the planted scalar and passed the check k′G = Q on E0; on each of
 them #J_X(F_q) = #J_H(F_q) = #E0(F_{q³}), φ(G) ≠ 0 with ℓφ(G) = 0, and
 Ψ(φG) ≠ 0 with ℓΨ(φG) = 0. The only skip reason is "X hyperelliptic". Every
 descended h was a squarefree degree-7 F_q polynomial; every instance has a
-trigonal map passing Prop. 2. Props. 2 and 4 pass per instance at 68% (q = 7)
-to 83% (q = 11); this family has three rational tractable subgroups per H,
-so this is not compared with Smith's 18.6% for one random curve. The DLP stage
+trigonal map passing Prop. 2. Props. 2 and 4 pass per instance (some rational
+tractable subgroup with a rational trigonal map and lc(s) a square) at
+67.9% (q = 7), 82.5% (11), 78.6% (13), 77.9% (17), 76.8% (19) and 75.8% (23),
+against the 18.6% that Smith's Theorem 2 predicts for a random genus-3 curve.
+The comparison is not like for like: every H of this family has cycle type
+(3,3,1,1) on its Weierstrass points and so three rational tractable subgroups
+(`odd_char_descent_genus3_20261014`), where a random curve has about one; and
+at q ≥ 17 the instances are the first ones in order, not a sample. The DLP stage
 is brute force; nothing here is an index calculus or a cost comparison with
 rho (that is W2b).
 
@@ -163,9 +168,12 @@ Git: the artifact-store policy (AGENTS.md §13) sends them to
 invalid). Their SHA-256 and sizes are in `data/route_s_records.sha256`; the
 files are kept in the worktree that produced them and can be pushed with
 `python3 tools/artifacts/artifacts.py push research/smith_isogeny_divisor_map_20261018/data`.
-`data/summary.json` holds every total quoted here, and the runs are
-deterministic (seed 20261018), so the commands above regenerate them
-(`gunzip -k` before `summarize`). The two report PDFs are on the policy's keep
+A backup copy is in `/Users/adamburan/pq-work/w3b-route-s-records/` on the
+producing host. `data/summary.json` holds every total quoted here. Exactly
+reproducible from the seed (20261018): `verify`, `deg8`, Route S at
+q = 7, 11, 13 (complete runs) and the T7 operation counts. Not exactly
+reproducible: the q = 17, 19, 23 Route S rows (how far a 1 h cap gets depends
+on host load) and all wall times. `gunzip -k` the records before `summarize`. The two report PDFs are on the policy's keep
 list, as other studies' report PDFs are. Run ids: start rows of each JSONL file
 (commit and arguments); runs 2026-10-26T02:49Z to about 05:10Z UTC. q = 13 hit
 the first run's 1 h cap at 53 173 of 56 784 instances; it was rerun with a
