@@ -206,6 +206,22 @@ class WorkflowWiringPaths(unittest.TestCase):
         )
         self.assertEqual(paths, ["research/scalar_mul_ct_timing_20261022"])
 
+    def test_nested_artifact_does_not_make_sibling_notes_a_reader(self):
+        moved = {"research/notes/index-calculus/reports/run-1/report.pdf"}
+        dirs = wire_workflows.moved_dirs(moved)
+        self.assertEqual(
+            wire_workflows.needed("run: python research/notes/index-calculus/other.py", moved, dirs),
+            [],
+        )
+        self.assertEqual(
+            wire_workflows.needed("run: python research/notes/index-calculus/reports/run-1/verify.py", moved, dirs),
+            ["research/notes/index-calculus/reports/run-1"],
+        )
+        self.assertEqual(
+            wire_workflows.needed("run: ls research/notes/index-calculus/reports/run-1", moved, dirs),
+            ["research/notes/index-calculus/reports/run-1"],
+        )
+
 
 class S3Argv(unittest.TestCase):
     def setUp(self):
