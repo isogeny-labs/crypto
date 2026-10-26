@@ -3635,7 +3635,7 @@ mod tests {
                         continue;
                     }
                     used.push(v);
-                    let (next, cost) = basis.specialise(v, (i + trial as u32) % 2 == 0);
+                    let (next, cost) = basis.specialise(v, (i + trial as u32).is_multiple_of(2));
                     basis = next;
                     total.add(cost);
                     let mut tail = InheritCost::default();
