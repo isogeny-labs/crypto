@@ -3728,6 +3728,10 @@ pub enum DecompositionStrategy {
     /// is lifted and checked in the original curve group. Resource caps
     /// are supplied separately through `KoblitzIcOptions::chain_s3_limits`.
     ChainedS3,
+    /// Chained S3 with an opt-in Karatsuba field-product SAT circuit.
+    /// The finite coordinate domain and original-curve witness checks are
+    /// identical to `ChainedS3`.
+    ChainedS3Karatsuba,
     /// The same chained-S3 solver with an exact representative-and-Frobenius-
     /// phase domain for an ambient-basis signed-orbit base. This can avoid a
     /// large explicit-coordinate trie, but still requires the same complete
@@ -8400,7 +8404,7 @@ fn sat_decompose_union_s4(
 }
 
 /// Hard limits for an experimental five- or six-summand chained-S3 SAT
-/// decomposition. The variable cap is checked before any SAT model is built;
+/// decomposition. The variable cap is checked before a SAT solver is built;
 /// the conflict and model caps cover all intermediate-identity patterns.
 #[derive(Clone, Copy, Debug)]
 pub struct ChainS3Limits {
@@ -8442,7 +8446,35 @@ pub fn sat_decompose_chained_s3(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, false, false)
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        false,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
+}
+
+pub fn sat_decompose_chained_s3_karatsuba(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        false,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Karatsuba,
+    )
 }
 
 /// Use one signed-Frobenius representative per column to constrain the same
@@ -8456,7 +8488,16 @@ pub fn sat_decompose_chained_s3_frobenius_orbit(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, true, false)
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        true,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
 }
 
 /// An opt-in symmetry arm for the same exact signed-Frobenius domain.
@@ -8469,7 +8510,16 @@ pub fn sat_decompose_chained_s3_frobenius_orbit_ordered(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, true, true)
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        true,
+        true,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
 }
 
 fn sat_decompose_chained_s3_with_domain(
@@ -8480,6 +8530,7 @@ fn sat_decompose_chained_s3_with_domain(
     limits: ChainS3Limits,
     frobenius_orbits: bool,
     order_first_pair: bool,
+    kernel: crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
     use crate::cryptanalysis::binary_semaev_chain_sat::{
         finite_domain_clause_count, frobenius_orbit_domain_size, ChainBuildError, ChainedS3Encoding,
@@ -8571,13 +8622,14 @@ fn sat_decompose_chained_s3_with_domain(
             stats.exhausted = true;
             return (None, stats);
         }
-        let mut enc = match ChainedS3Encoding::build(
+        let mut enc = match ChainedS3Encoding::build_with_kernel(
             m,
             &kc.curve.irreducible,
             &kc.curve.b,
             target_x,
             identity_mask,
             limits.max_variables,
+            kernel,
         ) {
             Ok(enc) => enc,
             Err(
@@ -9773,6 +9825,7 @@ fn koblitz_index_calculus_dlp_observed(
     if matches!(
         opts.strategy,
         DecompositionStrategy::ChainedS3
+            | DecompositionStrategy::ChainedS3Karatsuba
             | DecompositionStrategy::ChainedS3FrobeniusOrbit
             | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
     ) && (!(5..=6).contains(&opts.m)
@@ -10055,6 +10108,16 @@ fn koblitz_index_calculus_dlp_observed(
                 DecompositionStrategy::ChainedS3 => {
                     let (idxs, stats) =
                         sat_decompose_chained_s3(kc, fb, target, opts.m, opts.chain_s3_limits);
+                    RelationAttemptOutcome::ChainedS3(idxs, stats)
+                }
+                DecompositionStrategy::ChainedS3Karatsuba => {
+                    let (idxs, stats) = sat_decompose_chained_s3_karatsuba(
+                        kc,
+                        fb,
+                        target,
+                        opts.m,
+                        opts.chain_s3_limits,
+                    );
                     RelationAttemptOutcome::ChainedS3(idxs, stats)
                 }
                 DecompositionStrategy::ChainedS3FrobeniusOrbit => {
@@ -11826,6 +11889,11 @@ fn decompose_once(
         DecompositionStrategy::ChainedS3 => {
             let (points, stats) =
                 sat_decompose_chained_s3(kc, fb, target, opts.m, opts.chain_s3_limits);
+            PdpAttempt::chained(points, stats)
+        }
+        DecompositionStrategy::ChainedS3Karatsuba => {
+            let (points, stats) =
+                sat_decompose_chained_s3_karatsuba(kc, fb, target, opts.m, opts.chain_s3_limits);
             PdpAttempt::chained(points, stats)
         }
         DecompositionStrategy::ChainedS3FrobeniusOrbit => {
@@ -15882,6 +15950,39 @@ mod tests {
         assert_eq!(capped.sat_calls, 0);
         assert_eq!(capped.sat_unknowns, 1);
         assert!(capped.log.is_none());
+    }
+
+    #[test]
+    fn chained_s3_karatsuba_strategy_feeds_verified_relation_rank_and_target_solve() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let BinaryPoint::Affine { x, .. } = kc.generator() else {
+            panic!("generator is affine");
+        };
+        let fb = build_explicit_frobenius_orbit_factor_base(&kc, std::slice::from_ref(x)).unwrap();
+        let known = BigUint::from(3u32) % &kc.subgroup_order;
+        let target = kc.mul(kc.generator(), &known);
+        let opts = KoblitzIcOptions {
+            m: 5,
+            strategy: DecompositionStrategy::ChainedS3Karatsuba,
+            max_trials: 16,
+            extra_relations: 1,
+            allow_direct_relation: false,
+            chain_s3_limits: ChainS3Limits {
+                max_variables: 2_000,
+                max_domain_clauses: 10_000,
+                max_models: 128,
+                conflict_budget: 500_000,
+            },
+            ..KoblitzIcOptions::default()
+        };
+        let report = koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+        assert_eq!(report.log, Some(known), "{report:?}");
+        assert!(report.sat_calls > 0);
+        assert!(report.independent_relations > 0);
+        assert!(report.linear_solve_attempts > 0);
+        assert_eq!(report.sat_invalid_models, 0);
+        assert_eq!(report.verification_failures, 0);
+        assert!(!report.direct_relation);
     }
 
     #[test]

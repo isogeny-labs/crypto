@@ -1014,6 +1014,7 @@ pub(super) fn run_chain_cli(
     run_dir: &Path,
     frobenius_orbits: bool,
     order_first_pair: bool,
+    karatsuba: bool,
 ) -> Result<Value> {
     if ![64, 256, 600].contains(&columns) && !V2_SIZES.contains(&columns)
         || !fixture_root.join("probe-corpus.json").is_file()
@@ -1040,6 +1041,7 @@ pub(super) fn run_chain_cli(
         || memory_mib < 128
         || memory_mib > 65536
         || (order_first_pair && !frobenius_orbits)
+        || (karatsuba && frobenius_orbits)
     {
         return Err(
             "primary chained-S3 search caps or base selection outside supported domain".into(),
@@ -1056,11 +1058,12 @@ pub(super) fn run_chain_cli(
         source_commit,
         source_attestation_mode,
     };
-    let strategy = match (frobenius_orbits, order_first_pair) {
-        (false, false) => "chain-s3",
-        (true, false) => "orbit-chain-s3",
-        (true, true) => "ordered-orbit-chain-s3",
-        (false, true) => unreachable!("checked above"),
+    let strategy = match (frobenius_orbits, order_first_pair, karatsuba) {
+        (false, false, false) => "chain-s3",
+        (false, false, true) => "chain-s3-karatsuba",
+        (true, false, false) => "orbit-chain-s3",
+        (true, true, false) => "ordered-orbit-chain-s3",
+        _ => unreachable!("checked above"),
     };
     run_with_config(
         root,
@@ -1099,6 +1102,9 @@ fn run_with_config(
             )
         }
         "chain-s3" if chain.is_some() && (5..=6).contains(&m) => DecompositionStrategy::ChainedS3,
+        "chain-s3-karatsuba" if chain.is_some() && (5..=6).contains(&m) => {
+            DecompositionStrategy::ChainedS3Karatsuba
+        }
         "orbit-chain-s3" if chain.is_some() && (5..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3FrobeniusOrbit
         }

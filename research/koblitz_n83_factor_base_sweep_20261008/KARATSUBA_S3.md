@@ -16,6 +16,19 @@ through degree `2*83-2`. The SAT solver receives native XOR constraints for
 each new linear wire and the same three-clause encoding for each AND gate.
 The selected kernel is explicit in `ChainedS3Encoding::build_with_kernel`.
 The caller's variable cap is checked before the SAT solver is constructed.
+The generic IC driver exposes a separate `ChainedS3Karatsuba` strategy, and
+the guarded primary worker names it `chain-s3-karatsuba`. The outer search
+supervisor selects the corresponding worker command with `--karatsuba` and
+keeps the source, base, target, caps and product kernel in its frozen config.
+
+A shared-host degree-7 checked-scalar control completed in 93.55 seconds for
+the Karatsuba strategy and 2.41 seconds for schoolbook in consecutive test
+invocations. Other Rust jobs were active, and these correctness-test times
+have no Tier 1 isolation receipts; they are a diagnostic reason to measure
+SAT conflict work before promoting the smaller circuit. A screened variant
+that moved intermediate XOR gates to CNF instead built 545,531 clauses and
+143,975 variables for the same N83 pre-domain model, so it was dropped before
+retained-base search.
 
 Focused tests compare both kernels against independent field multiplication
 for degree 7 and 9 inputs, including a deliberately wrong product bit, and
