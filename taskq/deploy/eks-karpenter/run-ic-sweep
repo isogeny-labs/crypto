@@ -10,7 +10,7 @@ build=$2
 : "${ISOLAB_SWEEP_INSTANCE_TYPE:?}" "${ISOLAB_SWEEP_SECONDS:?}" "${ISOLAB_SWEEP_RESUMABLE:?}"
 : "${ISOLAB_SWEEP_CHECKPOINT_SECONDS:?}" "${ISOLAB_SWEEP_MAX_RESTORES:?}"
 [[ "$source_revision" =~ ^[a-f0-9]{40}$ && -f "$build" ]]
-[[ "$ISOLAB_SWEEP_SECONDS" =~ ^[1-9][0-9]{0,3}$ && "$ISOLAB_SWEEP_SECONDS" -le 1200 ]]
+[[ "$ISOLAB_SWEEP_SECONDS" =~ ^[1-9][0-9]{0,3}$ && "$ISOLAB_SWEEP_SECONDS" -le 1800 ]]
 [[ "$ISOLAB_SWEEP_RESUMABLE" == true || "$ISOLAB_SWEEP_RESUMABLE" == false ]]
 if [[ "$ISOLAB_SWEEP_RESUMABLE" == true ]]; then
   [[ "$ISOLAB_SWEEP_SECONDS" -ge 180 && "$ISOLAB_SWEEP_INSTANCE_TYPE" == c8a.2xlarge ]]

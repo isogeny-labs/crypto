@@ -43,7 +43,7 @@ export PATH="$work/fakebin:$PATH" FAKE_SPEC_DIR="$here/specs/ic-size-sweep"
 export GH_TOKEN=fake GITHUB_REPOSITORY=example/crypto GITHUB_RUN_ID=123456789 GITHUB_RUN_ATTEMPT=1
 export GITHUB_SHA=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa GITHUB_SERVER_URL=https://github.example.test
 export GITHUB_API_URL=https://api.github.example.test ISOLAB_SWEEP_INSTANCE_TYPE=c8a.2xlarge
-export ISOLAB_SWEEP_SECONDS=900 ISOLAB_SWEEP_RESUMABLE=false ISOLAB_SWEEP_CHECKPOINT_SECONDS=120 ISOLAB_SWEEP_MAX_RESTORES=2
+export ISOLAB_SWEEP_SECONDS=1800 ISOLAB_SWEEP_RESUMABLE=false ISOLAB_SWEEP_CHECKPOINT_SECONDS=120 ISOLAB_SWEEP_MAX_RESTORES=2
 build="$work/build.json"
 jq -n '{image_uri:"example.invalid@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",source_revision:"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",ecbench_sha256:"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}' > "$build"
 export RUNNER_TEMP="$work/success" GITHUB_STEP_SUMMARY="$work/success-summary.md"
