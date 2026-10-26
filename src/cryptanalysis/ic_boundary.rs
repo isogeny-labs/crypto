@@ -4423,7 +4423,7 @@ impl<E: Copy> FactorBase<E> {
         self.point_index.get(&key).copied()
     }
 
-    fn empty(description: String) -> Self {
+    pub fn empty(description: String) -> Self {
         Self {
             points: Vec::new(),
             neg_index: Vec::new(),
