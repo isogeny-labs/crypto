@@ -62,6 +62,10 @@ def strategy_name(config: dict) -> str:
         return "chain-s3-karatsuba"
     if kernel == "shallow_karatsuba" and encoding == "coordinate_trie":
         return "chain-s3-shallow-karatsuba"
+    if kernel == "shallow_karatsuba" and encoding == "frobenius_orbit_phase":
+        return "orbit-chain-s3-shallow-karatsuba"
+    if kernel == "shallow_karatsuba" and encoding == "frobenius_orbit_phase_ordered_first_pair":
+        return "ordered-orbit-chain-s3-shallow-karatsuba"
     if kernel != "schoolbook":
         raise ValueError("unsupported chained-S3 product kernel and domain")
     if encoding == "coordinate_trie":
@@ -459,8 +463,8 @@ def run(panel: Path, fixtures: Path, columns: int, policy: str, seed: int, summa
         raise ValueError("search selection is outside the retained primary panel")
     if ordered_first_pair and not orbit_domain:
         raise ValueError("first-pair order requires the Frobenius-orbit domain")
-    if (karatsuba or shallow_karatsuba) and orbit_domain:
-        raise ValueError("Karatsuba search currently requires coordinate trie domain")
+    if karatsuba and orbit_domain:
+        raise ValueError("recursive Karatsuba search currently requires coordinate trie domain")
     if karatsuba and shallow_karatsuba:
         raise ValueError("choose one chained-S3 product kernel")
     if summands not in (5, 6) or not 0 <= max_trials <= 1000:
@@ -542,6 +546,15 @@ def run(panel: Path, fixtures: Path, columns: int, policy: str, seed: int, summa
     }
     write_new_json(output_dir / "config.json", config)
     config_hash = sha256_file(output_dir / "config.json")
+    if ordered_first_pair:
+        worker_mode = ("primary-ordered-orbit-chain-cold-shallow-karatsuba"
+                       if shallow_karatsuba else "primary-ordered-orbit-chain-cold")
+    elif orbit_domain:
+        worker_mode = ("primary-orbit-chain-cold-shallow-karatsuba"
+                       if shallow_karatsuba else "primary-orbit-chain-cold")
+    else:
+        worker_mode = ("primary-chain-cold-shallow-karatsuba" if shallow_karatsuba else
+                       "primary-chain-cold-karatsuba" if karatsuba else "primary-chain-cold")
     command = [
         "docker", "run", "--rm", "--pull", "never", "--name", config["container_name"],
         "--network", "none", "--memory", f"{memory_mib}m",
@@ -554,10 +567,7 @@ def run(panel: Path, fixtures: Path, columns: int, policy: str, seed: int, summa
         "--mount", f"type=bind,src={source_dir},dst=/source,readonly",
         "--mount", f"type=bind,src={output_dir},dst=/out",
         "--env", "ICV1_FROZEN_SOURCE_DIR=/source", image_id,
-        "/worker", ("primary-ordered-orbit-chain-cold" if ordered_first_pair else
-                    "primary-orbit-chain-cold" if orbit_domain else
-                    "primary-chain-cold-shallow-karatsuba" if shallow_karatsuba else
-                    "primary-chain-cold-karatsuba" if karatsuba else "primary-chain-cold"),
+        "/worker", worker_mode,
         "/panel", "/fixtures", str(columns), policy, str(seed),
         str(summands), str(max_trials), str(max_variables), str(max_domain_clauses),
         str(max_models), str(conflict_budget), str(config["worker_wall_seconds"]),

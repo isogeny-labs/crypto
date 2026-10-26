@@ -208,8 +208,15 @@ class ChainSearchGuardTests(unittest.TestCase):
         worker_config, worker = receipts(shallow_config, "UNKNOWN_solver_cap")
         self.assertEqual(worker_config["strategy"], "chain-s3-shallow-karatsuba")
         self.assertIsNone(guard.receipt_error(worker, worker_config, shallow_config))
-        with self.assertRaises(ValueError):
-            guard.strategy_name(dict(shallow_config, domain_encoding="frobenius_orbit_phase"))
+        shallow_orbit = dict(shallow_config, domain_encoding="frobenius_orbit_phase")
+        worker_config, worker = receipts(shallow_orbit, "UNKNOWN_solver_cap")
+        self.assertEqual(worker_config["strategy"], "orbit-chain-s3-shallow-karatsuba")
+        self.assertIsNone(guard.receipt_error(worker, worker_config, shallow_orbit))
+        shallow_ordered = dict(
+            shallow_config, domain_encoding="frobenius_orbit_phase_ordered_first_pair")
+        worker_config, worker = receipts(shallow_ordered, "UNKNOWN_solver_cap")
+        self.assertEqual(worker_config["strategy"], "ordered-orbit-chain-s3-shallow-karatsuba")
+        self.assertIsNone(guard.receipt_error(worker, worker_config, shallow_ordered))
 
     def test_relation_replay_checks_phase_sign_and_canonical_residue(self):
         self.assertEqual((guard.PRIMARY_FROBENIUS_LAMBDA**2 +

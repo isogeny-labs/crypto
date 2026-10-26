@@ -1263,7 +1263,7 @@ fn main() -> Result<()> {
             )?;
             println!("{summary}");
         },
-        Some("primary-chain-cold") | Some("primary-chain-cold-karatsuba") | Some("primary-chain-cold-shallow-karatsuba") | Some("primary-orbit-chain-cold") | Some("primary-ordered-orbit-chain-cold")=>{
+        Some("primary-chain-cold") | Some("primary-chain-cold-karatsuba") | Some("primary-chain-cold-shallow-karatsuba") | Some("primary-orbit-chain-cold") | Some("primary-orbit-chain-cold-shallow-karatsuba") | Some("primary-ordered-orbit-chain-cold") | Some("primary-ordered-orbit-chain-cold-shallow-karatsuba")=>{
             if args.len()!=16 { return Err("primary-[ordered-orbit-]chain-cold PANEL_DIR FIXTURE_DIR K POLICY SEED M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR (requires verified hard cgroup memory and external wall caps)".into()); }
             let summary=primary_adapter::run_chain_cli(
                 Path::new(&args[2]),Path::new(&args[3]),args[4].parse()?,&args[5],args[6].parse()?,
@@ -1271,10 +1271,10 @@ fn main() -> Result<()> {
                     max_variables:args[9].parse()?, max_domain_clauses:args[10].parse()?,
                     max_models:args[11].parse()?, conflict_budget:args[12].parse()?,
                 },args[13].parse()?,args[14].parse()?,Path::new(&args[15]),
-                args[1]=="primary-orbit-chain-cold" || args[1]=="primary-ordered-orbit-chain-cold",
-                args[1]=="primary-ordered-orbit-chain-cold",
+                args[1]=="primary-orbit-chain-cold" || args[1]=="primary-ordered-orbit-chain-cold" || args[1]=="primary-orbit-chain-cold-shallow-karatsuba" || args[1]=="primary-ordered-orbit-chain-cold-shallow-karatsuba",
+                args[1]=="primary-ordered-orbit-chain-cold" || args[1]=="primary-ordered-orbit-chain-cold-shallow-karatsuba",
                 args[1]=="primary-chain-cold-karatsuba",
-                args[1]=="primary-chain-cold-shallow-karatsuba",
+                args[1]=="primary-chain-cold-shallow-karatsuba" || args[1]=="primary-orbit-chain-cold-shallow-karatsuba" || args[1]=="primary-ordered-orbit-chain-cold-shallow-karatsuba",
             )?;
             println!("{summary}");
         },

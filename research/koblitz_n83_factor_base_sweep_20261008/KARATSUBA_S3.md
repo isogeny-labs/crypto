@@ -105,3 +105,16 @@ shallow_karatsuba`; existing kernel names and receipts remain distinct.
 The next empirical gate is a source-matched retained K64 comparison under
 the same trial, conflict, memory and wall caps after Docker's metadata store
 is repaired.
+
+The same shallow product circuit is also available with the exact
+signed-Frobenius representative-and-phase domain, both unordered and with
+the first pair ordered. These guarded strategies are recorded separately as
+`orbit-chain-s3-shallow-karatsuba` and
+`ordered-orbit-chain-s3-shallow-karatsuba`. The domain replay, full
+original-curve witness check, and matrix-rank logic are shared with the
+schoolbook orbit solver. Degree-7 controls exercise checked five-summand
+target recovery through both new strategies. The pre-existing orbit-domain
+control covers five- and six-summand schoolbook decomposition; shallow
+six-summand solving remains a separate measurement.
+This admits a source-matched K1,182/K2,048 comparison after the small-base
+capacity gate, without forcing those larger bases into a coordinate trie.
