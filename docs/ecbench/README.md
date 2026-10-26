@@ -367,6 +367,35 @@ L3 needs a lab host, which `isolab` prepares (§9).
 
 ## 7. The unit, and what each method is charged
 
+> **Every record is also priced in `bitop/v1`** (`docs/units/BITOPS.md`):
+> two-input gates per primitive, under frozen formulas, with nothing left
+> unpriced or converted by a host. It is the unit in which methods,
+> repositories and curve families compare.
+>
+> - `ecbench work <sessions…>` prices committed records from their own counts.
+>   `--summary` gives one line per method configuration.
+> - New records carry a `work` block. It holds:
+>   - the total and per-phase gates, and the primitive counts;
+>   - the ratio to the floor in additions;
+>   - the reusable/per-target split;
+>   - `complete`.
+> - `ecbench bound fit --unit bitop/v1` fits an arm in gates, and also in
+>   additions: gates over one addition's gates at each size, where generic
+>   methods have exponent ½. An incomplete pricing is inadmissible in this
+>   unit.
+> - `ecbench audit-ir --spec S --seq N… --out D` replays executions under
+>   Callgrind and sets instructions beside counted gates. An arm far above
+>   same-curve rho's ratio is doing work its counters miss.
+> - `ecbench amortize` compares an arm with batch rho (Kuhn–Struik) per curve
+>   and reports the window of target counts in which the arm costs less.
+>
+> Counters added for `bitop/v1` live in `PhaseRecord.work_native` and in the
+> solver block's `bitop_*` keys. A replay of a committed record ignores
+> both, so committed sessions replay exactly.
+> `research/bitop_unit_20261016/` is the first study in the unit.
+> The group-addition unit below is unchanged, and every committed figure in it
+> stands as recorded.
+
 ```
 S = total group-addition equivalents / √r
 ```
@@ -395,6 +424,7 @@ default; the ids are:
 | `ic.pipeline`, `ic.pipeline_counted` | ic | the index-calculus pipeline (factor base, oracle, relations, linear algebra, verification), and the same with the relation charge rebuilt from counted work |
 | `ic.large_prime`, `ic.shared_rank` | ic | the large-prime variation and the shared-rank adapter on binary curves |
 | `ic.k4_gaudry` | ic | Gaudry's k = 4 index calculus on `E(F_{p⁴})`, `fp4_translation` curves only |
+| `ic.hyperelliptic` | ic | the hyperelliptic thread's index calculus (ADH/Gaudry: degree-1 places folded by ±, factor-base walk, sparse elimination mod `r`, optional single large primes) on a genus 2–4 Jacobian, `hyperelliptic_*` curves only |
 | `ic.cm_folded_native_v1`, `ic.cm_folded_recurrence_v1`, `ic.cm_folded_native_d43_v1` | ic | the CM scalar-orbit signed MITM2 controls with a native backend, prime curves only |
 
 | family | charged | counted, not charged (`*_uncharged`) |
@@ -410,6 +440,42 @@ default; the ids are:
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
 | `ic.large_prime` | cofactor projection, exact combination-table group additions, target probes, and relation witness checks; the external runner verifies the returned scalar | combination states, MITM lookups, large-prime merge operations, and modular row operations; the record is therefore a lower bound, not a speed claim |
+| `rho.plain`, `rho.negation`, `rho.frozen_reference`, `bsgs.*`, `kangaroo.vow` on a hyperelliptic Jacobian | as on a curve: one Cantor composition-and-reduction (`hyperelliptic_word::HCurve`) is one addition or one doubling, whatever its degree; the walk's set-up, starts, steps, look-ahead, escapes and internal verification as `rho.*` | as `rho.*` (`canonicalisations_uncharged`, …) and `bsgs.*`; the `F_p` work inside a Cantor step is neither charged nor tallied (`counts_field_ops` is `false`) |
+| `ic.hyperelliptic` | every Cantor addition on `HCurve`: the walk start `D₁ + D₂` (phase `walk_setup`, 1 GAE) and one addition per relation trial (phase `relations`); the factor base (`factor_base`) and the elimination (`linear_algebra`) are phases with no group operation. No internal verification: the runner verifies the returned `k` | every other operation, exactly: `F_p` multiplications building the factor base (`factor_base_fp_muls_uncharged`) and in the smoothness oracle — splitting `u`, evaluating `v` at its roots, inversions and square roots included (`oracle_fp_muls_uncharged`); column lookups and `±` canonicalisations per root; the walk's random draws (`step_draws_uncharged`); multiplications and inversions mod `r` in the Markowitz elimination (`linalg_mulmods_uncharged`, `linalg_inversions_uncharged`); with `large_primes = 1`, partial-table lookups and the combination's mulmods. The record is a lower bound at `w = 0` |
+
+**Hyperelliptic Jacobians** (`ecbench::hyper`, family `hyperelliptic`).
+`{"kind": "hyperelliptic_thread", "p": 41, "genus": 2}` builds the
+hyperelliptic index-calculus thread's instance
+(`hyperelliptic_ic_bench::thread_instance(p, genus)`: `y² = f(x)`,
+`deg f = 2g + 1`, `g ∈ {2, 3, 4}`, `p < 256`, its first `c` and its
+generator `D₁` of prime order `r`), so the generic arms run on the very
+Jacobians the thread's IC is compared on. `#J = h·r` comes from the
+L-polynomial: its first `g − 1` coefficients from point counts over
+`F_{p^k}`, `k < g`, leave one unknown, and of the multiples of `r` in that
+window and the Hasse–Weil interval exactly one must kill 32 random
+divisors, or the build fails (`HCurve::jacobian_order`). Measured children
+rebuild from `hyperelliptic_explicit` (`f`, `#J`, `r`, the generator's
+`gu`/`gv`), so they repeat neither the thread search nor the counts. A
+divisor is two hex words: word 0 is `deg u` (bits 0–7) and the non-leading
+coefficients of `u` (bytes 1–4), word 1 the coefficients of `v` (bytes
+0–3). The group key, which the distinguished points, the jump partition,
+the BSGS tables and the `{D, −D}` choice all read, is injective:
+`Σ_{e<deg} p^{2e}` plus the base-`p` index of `(u, v)` among degree-`deg`
+pairs. The name keeps ICV1's shape with a `hyp` tag
+(`icv1-hypg<g>p<p>-n<#J>-<8 hex>`) and is never registered; targets are
+planted only (no public-target law), and every IC method but
+`ic.hyperelliptic` and every endomorphism walk is refused at plan time.
+`ic.hyperelliptic` (`ecbench::hyper_ic`) is the thread's index calculus
+(`hyperelliptic_index_calculus`, `RelationSearch::FactorBaseWalk`, sparse
+solve) run on the counted Cantor group with every search parameter required
+(`fb_size`, `large_primes`, `extra_relations`, `branches`, `d_step_in`); on a
+run that solves in its first round its trials, relations and group
+operations equal the thread's `hec_index_calculus_dlp` with the same seed
+(tested), and where the rows leave `k` free it keeps walking instead of
+restarting from the seed as the thread does. It refuses an instance with
+`r² | #J`, where relations mod `r` need not have a solution.
+`A = 2`: the hyperelliptic involution is the negation; a curve with more
+automorphisms is not detected.
 
 `rho.multitarget_pooled` is registered `applies: prime_only` (single-word
 prime-field curves, the only instance family it implements): the planner
@@ -1081,7 +1147,9 @@ FROM method_by_curve ORDER BY curve_slug, mean_s;
   `GF((t² + 19ℓ²)/4)` of prime order `q + 1 − t` whose endomorphism
   conductor is 1 at the crater and the prime `ℓ` at the floor, certified
   without computing an isogeny; it is the construction behind
-  `research/conductor_gap_cm_pairs_20261010/`.
+  `research/conductor_gap_cm_pairs_20261010/`. `hyperelliptic_thread`
+  and `hyperelliptic_explicit` build genus 2–4 Jacobians over `F_p`,
+  `p < 256` (§7, "Hyperelliptic Jacobians").
 - **A factor base or oracle:** add it to `ic_framework` as a plug-in;
   `ic.pipeline` reaches it through its name. Dump it with `ecbench fb` to
   store its points.

@@ -46,7 +46,7 @@ jobs:
         with:
           toolchain: '1.98'
       - uses: Swatinem/rust-cache@v2
-      - run: sudo apt-get update && sudo apt-get install -y pari-gp
+      - run: sudo apt-get update && sudo apt-get install -y pari-gp zstd
       - name: Public fixture and CM map tests
         run: |
           cargo test --release --lib cm_orbit
