@@ -15,7 +15,7 @@ use crate::controls::{
     hec_ic_control, subfield_subgroup_instance, synthetic_ghs_control, EXTENDED_PLAN, PROTOCOL_PLAN,
 };
 use crate::ctx::Ctx;
-use crate::spec::{load_registered, toy_koblitz, Instance};
+use crate::spec::{load_registered, load_registered_from, toy_koblitz, Instance};
 use crate::{cover, ghs, isogeny, pairing, Common};
 
 /// Registered curves of the protocol (names resolved by the registry's
@@ -29,20 +29,68 @@ const REGISTERED: [(&str, &str); 6] = [
     ("secp256k1", "secp256k1"),
 ];
 
-/// Registered pairing-friendly curves audited as end-to-end controls: the
-/// MNT k = 3 example (a curve designed so that the pairing route is the
-/// attack) and BLS12-381 (k = 12, where the formula band straddles rho).
-/// `(lookup, display name, directory)`.
-const CONTROL_CURVES: [(&str, &str, &str, bool); 2] = [
+/// Registered pairing-friendly curves audited as end-to-end controls.
+///
+/// Positive controls (role `control`): the MNT k = 3 example (a curve designed
+/// so that the pairing route is the attack; `class-weak` is expected) and
+/// BLS12-381 (k = 12, where the formula band straddles rho; no weakness).
+///
+/// Boundary controls (role `boundary-control`), added with the margin rule of
+/// Amendment 3: they sit on both sides of the two lines that decided a
+/// verdict.  BN254 is the deployed k = 12 curve the review named (price above
+/// rho); BN318 read `class-weak` on a -3-bit sign before the margin (inside
+/// the margin: no weakness); BLS12-638 is just inside the 8-bit margin; BN350
+/// is the smallest curve past it; BN446 is the registry curve nearest to
+/// BN462 (the review's other example; there is no BN462 in the registry).
+///
+/// `(lookup, display name, directory, trait record read from the committed
+/// docs/curves/traits.json, role)`.
+const CONTROL_CURVES: [(&str, &str, &str, bool, &str); 7] = [
     // The live curve_traits::compute of mnt/mnt1 takes about six minutes (not
     // in this tool's code), so its trait record is read from the committed
     // docs/curves/traits.json, with order and trace checked against the instance.
-    ("mnt/mnt1", "mnt/mnt1", "control-mnt1", true),
+    ("mnt/mnt1", "mnt/mnt1", "control-mnt1", true, "control"),
     (
         "icv1-fp381-tm15132376222941642751-961de9ba",
         "BLS12-381",
         "control-bls12-381",
         false,
+        "control",
+    ),
+    (
+        "bn/bn254",
+        "BN254",
+        "boundary-bn254",
+        false,
+        "boundary-control",
+    ),
+    (
+        "bn/bn318",
+        "BN318",
+        "boundary-bn318",
+        false,
+        "boundary-control",
+    ),
+    (
+        "bls/BLS12-638",
+        "BLS12-638",
+        "boundary-bls12-638",
+        false,
+        "boundary-control",
+    ),
+    (
+        "bn/bn350",
+        "BN350",
+        "boundary-bn350",
+        false,
+        "boundary-control",
+    ),
+    (
+        "bn/bn446",
+        "BN446",
+        "boundary-bn446",
+        false,
+        "boundary-control",
     ),
 ];
 
@@ -128,7 +176,12 @@ fn annotate(env: &Env, slug: &str, cert: &mut Value) {
             .as_array()
             .and_then(|a| a.iter().find(|c| c["slug"] == slug));
         if let Some(curve) = curve {
-            let mine = cert["costs"]["log2_total"].as_f64();
+            // The cross-check compares the frozen formulas, so it uses the total
+            // without any equivalence-class discount this tool adds on top
+            // (Amendment 3); the two coincide when no discount applies.
+            let frozen = cert["costs"]["log2_total_frozen_model"].as_f64();
+            let reported = cert["costs"]["log2_total"].as_f64();
+            let mine = frozen.or(reported);
             let route = if let Some(l) = id
                 .strip_prefix("ghs:l=")
                 .and_then(|s| s.parse::<u64>().ok())
@@ -160,9 +213,10 @@ fn annotate(env: &Env, slug: &str, cert: &mut Value) {
                         "route_kind": route["kind"],
                         "repo_log2_total": theirs,
                         "this_log2_total": mine,
+                        "reported_total_is_lower_by_class_discount_bits": frozen.zip(reported).map(|(f, r)| ((f - r) * 1000.0).round() / 1000.0),
                         "delta_bits": (delta * 1000.0).round() / 1000.0,
                         "within_0_002_bits": delta.abs() <= 0.002,
-                        "note": "the repository total is search + transfer + destination; this total also carries construction and one verification, both negligible against the destination at these sizes",
+                        "note": "a wiring check of the frozen formulas, not independent validation: this tool calls the repository's cost functions, so agreement shows the inputs were passed through, not that the formulas are right. The repository total is search + transfer + destination; this total also carries construction and one verification, both negligible against the destination at these sizes",
                     });
                 }
             }
@@ -257,6 +311,7 @@ pub fn audit_instance(
             "label": v["candidate"]["label"],
             "verdict": v["verdict"],
             "lead_class": v["lead_class"],
+            "evaluation": v["evaluation"]["status"],
             "subgroup_status": v["subgroup_preservation"]["status"],
             "carried": v["carried"],
             "construction_status": v["map"]["construction_status"],
@@ -293,8 +348,14 @@ pub fn audit_instance(
         }
     }
     let base = &ctx.base;
+    let count_status = |s: &str| rows.iter().filter(|r| r["evaluation"] == s).count();
+    let not_evaluable: Vec<Value> = rows
+        .iter()
+        .filter(|r| r["evaluation"] == "not_evaluable")
+        .map(|r| r["id"].clone())
+        .collect();
     let summary = json!({
-        "schema": "transfer-audit/summary/v1",
+        "schema": "transfer-audit/summary/v2",
         "directory": dir,
         "role": role,
         "tool": TOOL,
@@ -321,6 +382,13 @@ pub fn audit_instance(
             "D. pairing: embedding degree exact or lower-bounded, L[1/3] price with the smallest published constant and o(1) dropped",
             "not covered: (2,2)-gluing, non-GHS descents, Weil restriction of non-rational maps, quantum attacks, implementation attacks, multi-target and amortized settings",
         ],
+        "evaluation": {
+            "evaluated": count_status("evaluated"),
+            "excluded": count_status("excluded"),
+            "not_evaluable": count_status("not_evaluable"),
+            "not_evaluable_candidates": not_evaluable,
+            "reading": "`no weakness found in scope` is the verdict of all three kinds of candidate. Evaluated: priced and compared with the matched baseline. Excluded: cannot yield a weakness (the subgroup is not carried, or the priced total, a lower bound where phases are unpriced, is not below the baseline). Not evaluable: the route may exist but its map or price could not be constructed far enough to decide, so the verdict is vacuous for it.",
+        },
         "candidates": rows,
         "controls": control_rows,
         "environment": {
@@ -365,10 +433,10 @@ pub fn build_suite(
     for (name, inst) in toy_instances()? {
         jobs.push((name, inst, true, "audit", false));
     }
-    for (lookup, display, dir, committed) in CONTROL_CURVES {
+    for (lookup, display, dir, committed, role) in CONTROL_CURVES {
         let mut inst = load_registered(&registry_text, lookup)?;
         inst.name = display.to_string();
-        jobs.push((dir.to_string(), inst, false, "control", committed));
+        jobs.push((dir.to_string(), inst, false, role, committed));
     }
     for (dir, inst, controls, role, committed) in jobs {
         let t0 = Instant::now();
@@ -483,7 +551,7 @@ fn print_table(files: &[(String, String)]) {
         );
         for c in v["candidates"].as_array().into_iter().flatten() {
             println!(
-                "  {:<34} subgroup={:<13} log2(route/rho)={:<11} {}",
+                "  {:<34} subgroup={:<13} log2(route/rho)={:<11} {} [{}]",
                 c["id"].as_str().unwrap_or("?"),
                 c["subgroup_status"].as_str().unwrap_or("?"),
                 if c["carried"].as_bool() == Some(false) {
@@ -494,6 +562,7 @@ fn print_table(files: &[(String, String)]) {
                         .map_or("-".into(), |x| format!("{x:.1}"))
                 },
                 c["verdict"].as_str().unwrap_or("?"),
+                c["evaluation"].as_str().unwrap_or("?"),
             );
         }
     }
@@ -535,6 +604,145 @@ pub fn check_suite(certs: &Path, registry: &Path, common: &Common) -> Result<(),
     } else {
         Err(format!("check failed:\n  {}", bad.join("\n  ")))
     }
+}
+
+// ── Registry sweep (pairing calibration) ─────────────────────────────
+
+/// One curve of [`sweep_registry`].
+pub struct SweepRow {
+    pub slug: String,
+    pub alias: String,
+    pub embedding_degree: u64,
+    pub field_bits: f64,
+    pub log2_r: f64,
+    /// `log2(route/rho)` at the conservative end of the price band.
+    pub conservative_ratio: Option<f64>,
+    /// The same at the attacker-favourable end.
+    pub favourable_ratio: Option<f64>,
+    pub lead: String,
+    /// The curve's verdict: the strongest over every candidate.
+    pub verdict: String,
+    /// The pairing candidate's evaluation status.
+    pub evaluation: String,
+}
+
+/// Audit every prime-field registry curve that has a generator and whose
+/// committed trait record gives an embedding degree of at most `k_max`:
+/// the curves for which the pairing route is not out of reach by size alone.
+/// The trait records are read from `docs/curves/traits.json` (`env.traits`),
+/// which `curve-traits check` keeps equal to the live computation; the
+/// verdicts are those `audit --curve` gives, without its minutes-long live
+/// trait computation for `mnt/mnt1`.
+pub fn sweep_registry(env: &Env, registry: &Value, k_max: u64) -> Result<Vec<SweepRow>, String> {
+    let traits = env
+        .traits
+        .as_ref()
+        .and_then(|t| t["curves"].as_array())
+        .ok_or("the sweep needs docs/curves/traits.json")?;
+    let reg = registry["curves"]
+        .as_array()
+        .ok_or("registry has no curves")?;
+    let with_generator: std::collections::BTreeMap<&str, &Value> = reg
+        .iter()
+        .filter(|c| {
+            c["representations"]
+                .as_array()
+                .is_some_and(|r| !r.is_empty())
+        })
+        .filter_map(|c| c["slug"].as_str().map(|s| (s, c)))
+        .collect();
+    let mut chosen: Vec<(&str, u64)> = traits
+        .iter()
+        .filter(|t| t["family"] == "prime")
+        .filter_map(|t| {
+            let k: u64 = t["embedding"]["degree"].as_str()?.parse().ok()?;
+            let slug = t["slug"].as_str()?;
+            (k <= k_max && with_generator.contains_key(slug)).then_some((slug, k))
+        })
+        .collect();
+    chosen.sort_unstable();
+    let mut rows = Vec::new();
+    for (slug, k) in chosen {
+        let inst = load_registered_from(registry, slug)?;
+        let run = audit_instance(env, &sanitize(slug), &inst, false, "audit", true)
+            .map_err(|e| format!("{slug}: {e}"))?;
+        let cand = run.summary["candidates"]
+            .as_array()
+            .and_then(|a| a.iter().find(|c| c["id"] == "pairing:tate_mov_frey_ruck"))
+            .ok_or_else(|| format!("{slug}: no pairing candidate"))?;
+        let favourable_ratio = run
+            .files
+            .iter()
+            .find(|(p, _)| p.ends_with("pairing_tate_mov_frey_ruck.json"))
+            .and_then(|(_, c)| serde_json::from_str::<Value>(c).ok())
+            .and_then(|v| v["invariants"]["price_band"]["favourable_log2_cost_ratio"].as_f64());
+        let alias = with_generator[slug]["aliases"][0]
+            .as_str()
+            .unwrap_or(slug)
+            .to_string();
+        rows.push(SweepRow {
+            slug: slug.to_string(),
+            alias,
+            embedding_degree: k,
+            field_bits: inst.field_bits(),
+            log2_r: inst.log2_r(),
+            conservative_ratio: cand["log2_cost_ratio"].as_f64(),
+            favourable_ratio,
+            lead: cand["lead_class"].as_str().unwrap_or("?").to_string(),
+            verdict: run.summary["verdict"].as_str().unwrap_or("?").to_string(),
+            evaluation: cand["evaluation"].as_str().unwrap_or("?").to_string(),
+        });
+    }
+    rows.sort_by(|a, b| {
+        a.field_bits
+            .partial_cmp(&b.field_bits)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| a.slug.cmp(&b.slug))
+    });
+    Ok(rows)
+}
+
+/// `transfer-audit sweep`: print [`sweep_registry`] as a table.
+pub fn print_sweep(registry: &Path, common: &Common, k_max: u64) -> Result<(), String> {
+    let env = build_env(common)?;
+    let text = fs::read_to_string(registry)
+        .map_err(|e| format!("cannot read {}: {e}", registry.display()))?;
+    let doc: Value = serde_json::from_str(&text).map_err(|e| format!("registry JSON: {e}"))?;
+    let rows = sweep_registry(&env, &doc, k_max)?;
+    println!(
+        "# prime-field registry curves with a generator and embedding degree <= {k_max}: {} curves; trait records from {}",
+        rows.len(),
+        common.traits.display()
+    );
+    println!("# ratio = log2(pairing route / matched rho); verdict = the curve's strongest verdict; margin {} bits", env.model.advantage_margin_bits);
+    println!("alias\tk\tfield_bits\tlog2_r\tconservative_ratio\tfavourable_ratio\tlead_class\tverdict\tpairing_evaluation");
+    let f = |x: Option<f64>| x.map_or("-".to_string(), |v| format!("{v:.1}"));
+    for r in &rows {
+        println!(
+            "{}\t{}\t{:.0}\t{:.1}\t{}\t{}\t{}\t{}\t{}",
+            r.alias,
+            r.embedding_degree,
+            r.field_bits,
+            r.log2_r,
+            f(r.conservative_ratio),
+            f(r.favourable_ratio),
+            r.lead,
+            r.verdict,
+            r.evaluation
+        );
+    }
+    let weak: Vec<&str> = rows
+        .iter()
+        .filter(|r| r.verdict == "class-weak")
+        .map(|r| r.alias.as_str())
+        .collect();
+    println!(
+        "# class-weak: {} of {}: {}",
+        weak.len(),
+        rows.len(),
+        weak.join(" ")
+    );
+    Ok(())
 }
 
 #[cfg(test)]
@@ -679,5 +887,107 @@ mod tests {
             .files
             .iter()
             .any(|(p, _)| p.ends_with("ghs_proper_subfield.json")));
+    }
+
+    /// Slugs of the registry curves the sweep audits, and the subset whose
+    /// verdict is `class-weak` after the margin rule (Amendment 3).  Both
+    /// are measured by this test's own sweep and pinned: a registry change
+    /// that adds a pairing-friendly curve, or a model change that moves a
+    /// curve across the margin, fails here and needs a human reading of the
+    /// new row before the pin is updated.
+    const PINNED_SWEPT: usize = 29;
+    const PINNED_CLASS_WEAK: &[&str] = &[
+        "icv1-fp170-tm52213820118540299389901413-869d5d3c", // mnt/mnt1, the positive control
+        "icv1-fp350-t35917316178020966140770026648761406645010658995732487-6e1654f7", // bn/bn350, -13.3 bits
+        "icv1-fp382-t2353932232174051770881173201777159236219815696568919523335-b80e1e2a", // bn/bn382
+        "icv1-fp384-t6277101735386680763835754795021643429033562911502587034007-3daf17f4", // other/Fp384BN
+        "icv1-fp414-t154267229207681125708793071161652324726038701923943665681563655-ebea0e02", // bn/bn414
+        "icv1-fp446-t10109980000181489923001201093401906549415298505746886291297633566727-278b8869", // bn/bn446, -44.5 bits
+        "icv1-fp478-t662567649291894123450065105820326672097321614256273183056335502227537927-6422afbf", // bn/bn478
+        "icv1-fp510-t43422033463993573283847164979847511362503473044959842495500254821277109321735-ee4a65f3", // bn/bn510
+        "icv1-fp512-t115792089237316195423570985008687840101103879741288409693302319863988063823175-9e4bc1d2", // other/Fp512BN
+        "icv1-fp542-t2845711812853053972806387468884004947678235462567670984735634579507964130977906695-f8fcf71f", // bn/bn542
+        "icv1-fp574-t186496302581962721809830439849867378820456264884631045871326327118225203759963374092295-5d71cb14", // bn/bn574
+        "icv1-fp606-t12222215858006915839141401255556695821975177558367937484927312121315564820050836996405726215-9acd5f3a", // bn/bn606
+        "icv1-fp638-t800995136978371572363525747477255032258950408689114271367829691469194143147501961435441086332935-2ce55ebd", // bn/bn638, -112.6 bits
+    ];
+
+    /// The calibration test of finding 2: the pairing verdict over the whole
+    /// registry list.  Before the margin, 15 of the 29 swept curves read
+    /// `class-weak` (the review counted 34 swept curves and 14 verdicts;
+    /// the difference in the count is unexplained), among them BN318 on a
+    /// -2.987-bit formula difference.  Now a weakness verdict needs the
+    /// conservative price to be at least the model margin below rho on E.
+    #[test]
+    fn registry_sweep_pins_the_class_weak_set() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let read = |rel: &str| fs::read_to_string(root.join(rel)).unwrap();
+        let registry: Value = serde_json::from_str(&read("docs/curves/registry.json")).unwrap();
+        let traits: Value = serde_json::from_str(&read("docs/curves/traits.json")).unwrap();
+        let hints = read_hints(&read("docs/curves/factor-hints.txt")).unwrap();
+        let mut e = env();
+        e.fx = Factoring::new(1 << 18, hints);
+        e.traits = Some(traits);
+        let margin = e.model.advantage_margin_bits;
+        let rows = sweep_registry(&e, &registry, 64).unwrap();
+        assert_eq!(
+            rows.len(),
+            PINNED_SWEPT,
+            "swept curves changed: {:#?}",
+            rows.iter().map(|r| &r.alias).collect::<Vec<_>>()
+        );
+        let mut weak: Vec<&str> = rows
+            .iter()
+            .filter(|r| r.verdict == "class-weak")
+            .map(|r| r.slug.as_str())
+            .collect();
+        weak.sort_unstable();
+        let mut pinned: Vec<&str> = PINNED_CLASS_WEAK.to_vec();
+        pinned.sort_unstable();
+        assert_eq!(weak, pinned, "the class-weak set moved");
+        for r in &rows {
+            let ratio = r.conservative_ratio.expect("every swept curve is priced");
+            // Only the pairing candidate can be weak on a prime-field curve,
+            // and it is weak exactly when it is past the margin.
+            assert_eq!(
+                r.verdict == "class-weak",
+                ratio <= -margin,
+                "{}: ratio {ratio}, verdict {}",
+                r.alias,
+                r.verdict
+            );
+            // A price below rho by less than the margin stays a recorded lead.
+            if ratio < 0.0 && ratio > -margin {
+                assert_eq!(r.lead, "formula_marginal", "{}", r.alias);
+                assert_eq!(r.verdict, "no weakness found in scope", "{}", r.alias);
+            }
+        }
+        // Named boundary and positive controls.
+        let verdict_of = |alias: &str| {
+            rows.iter()
+                .find(|r| r.alias == alias)
+                .unwrap_or_else(|| panic!("{alias} is not in the sweep"))
+                .verdict
+                .as_str()
+        };
+        assert_eq!(verdict_of("mnt/mnt1"), "class-weak", "positive control");
+        assert_eq!(verdict_of("bn/bn254"), "no weakness found in scope");
+        assert_eq!(verdict_of("bls/BLS12-381"), "no weakness found in scope");
+        assert_eq!(
+            verdict_of("bn/bn318"),
+            "no weakness found in scope",
+            "the old flip"
+        );
+        assert_eq!(verdict_of("bls/BLS12-638"), "no weakness found in scope");
+        assert_eq!(
+            verdict_of("bn/bn350"),
+            "class-weak",
+            "smallest past the margin"
+        );
+        assert_eq!(
+            verdict_of("bn/bn446"),
+            "class-weak",
+            "relative to rho on E, not absolute security"
+        );
     }
 }

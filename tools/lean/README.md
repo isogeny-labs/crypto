@@ -10,6 +10,17 @@ and weekly.
 | Lake project (directory with `lakefile.toml` / `lakefile.lean`) | `lake exe cache get` if it uses Mathlib, then `lake build`, then an audit of every module the project built |
 | standalone `.lean` file outside any Lake project | `lean -o` against the core library under its directory's `lean-toolchain`, then an audit of that module |
 
+The retained first attempt at
+`research/isogeny_world_frontier_20261016/replay-optimization-v1/implementation-01/Newton.failed.lean`
+is one explicit negative control. It stays in `--list` and its source SHA-256
+is pinned in `proof-gate.sh`. The gate compiles it with the repository's pinned
+Lean toolchain and accepts only exit status 1 with its single recorded
+`lean.unknownIdentifier` error for `Int.mul_two`. A changed file, successful
+compile, timeout, or different diagnostic fails the target. The corrected
+`proof/Newton.lean` remains a separate positive target subject to the normal
+build and axiom audit. `PASS_expected_failure` certifies only that the frozen
+historical failure reproduced; it is not a theorem proof.
+
 The audit, [`AuditAxioms.lean`](AuditAxioms.lean), imports the modules and
 collects each theorem's **transitive** axioms. Only `propext`,
 `Classical.choice` and `Quot.sound` are accepted. A grep cannot do this

@@ -16,6 +16,10 @@ end-to-end protocol. The current 5+1 and 4+2 mixed-orbit searches expose
 bounded, first-identity-pattern SAT instances; a capped search leaves the
 relation-yield question open.
 
+There is no verified complete cold IC baseline on this primary `a=0` 81-bit
+subgroup. The verified K1107/root11 cold comparison is on the separate
+diagnostic `a=1` 53-bit subgroup and cannot supply this arm's baseline.
+
 The affected curve is `icv1-f2m83-tm6151469093347-debefd74`, with the
 primary-arm K=600 base and cross-stream Gray/hash residual pools. The
 requested selection criterion is minimum total index-calculus runtime,
@@ -56,3 +60,14 @@ Unresolved. The 2026-10-25 XOR bridge and local pilot are a solver-backend
 probe. The 2026-10-26 native D18 input preflight passed while the capacity
 gate failed before worker launch. Merging this record does not complete the
 selection criterion.
+probe. Merging this record does not complete the selection criterion.
+
+### 2026-10-26 full-D18 solver-gate update
+
+The [ordered full-D18 run](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261025T2339Z-ordered-d18/REPORT.md) used the exact frozen 32,643-column, 5,418,738-point generation. Its constructed positive returned independently checked rank-one rows `[0,166,332,498]`; its single natural public target reached the internal 2,400-second wall cap after checked import/model construction and yielded no terminal solver result. The independent audit status is `PASS_CENSORED_NATURAL`. This is a resource-bounded observation, not evidence of a zero relation rate.
+
+The separate [native XOR cadence-32 attempt](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261026T0121Z-cadence32/REPORT.md) ended at its 300-second internal cap before `import_checked` on a saturated shared host. The natural arm was skipped. Its independent audit status is `CAPACITY_CENSORED_BEFORE_MODEL`; it does not compare solver cadences. The native kernel's 120-case exhaustive mixed CNF/XOR differential check covers cadences 1, 2, 4 and 32, while a full-D18 constructed control under cadence 32 is still open. The [combined result](../research/koblitz_n83_factor_base_sweep_20261008/reports/d18-solver-gates-20261026/RESULT.md) preserves these separate gates.
+
+An inspected AWS execution principal lacked S3 read access to the exact full-D18 generation. The exact-object IAM proposal is unapplied; automatic approval review rejected that persistent grant pending explicit authorization. A separately approved source-archive upload does not authorize the grant or a model-artifact upload. This is an access condition, not a mathematical or solver result.
+
+**Next discriminating step:** run the committed native D18 positive and natural pair on a host with recorded memory limit, CPU isolation and fresh provider-checked GET of the exact object/wrapper. Require a clean source and binary identity, positive original-field and original-CNF/XOR independent replay, then preserve the natural terminal result or explicit censoring with charged resource use. If the positive reaches a verified model, launch the natural arm; if it caps before import, change host capacity before solver interpretation; if a natural model fails group replay, block or repair the encoding and rerun. A checked natural partial advances only the first gate: independent multi-equation yield, closure, rank/logs, unseen-target descent, matched rho and finite-grid coverage remain required for total-runtime selection.
