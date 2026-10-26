@@ -49,6 +49,7 @@ def main():
                              if any(s["direct_class"] == "B" for s in rows)}
 
     counts = collections.Counter()
+    outside_mt = collections.Counter()
     order_rows = []
     for n, rows in sorted(by_order.items()):
         t = 4097 - n
@@ -64,6 +65,8 @@ def main():
             counts[("catalog_yes" if catalog_yes else "catalog_zero",
                     "direct" if direct else "outside_direct",
                     "simple" if simple else "non_simple")] += 1
+            if catalog_yes and n % 8 in (4, 6):
+                outside_mt[(s["direct_class"], "simple" if simple else "non_simple")] += 1
         order_rows.append({"order": n, "trace": t, "source_models": len(rows),
                            "catalog_label": catalog_row["label"],
                            "catalog_has_jacobian": int(catalog_yes),
@@ -77,6 +80,10 @@ def main():
         ("catalog_zero", "outside_direct", "simple"): 48,
     }
     assert dict(counts) == expected
+    assert dict(outside_mt) == {("C", "simple"): 3852,
+                                ("C", "non_simple"): 180,
+                                ("A", "simple"): 12,
+                                ("A", "non_simple"): 4}
     assert [x["order"] for x in order_rows if not x["catalog_has_jacobian"]] == [3972, 4222]
 
     # A cataloged class outside every direct-B isogeny class, selected before replay.
@@ -111,6 +118,7 @@ def main():
         "catalog_positive_orders": sum(x["catalog_has_jacobian"] for x in order_rows),
         "catalog_positive_models": sum(x["source_models"] for x in order_rows if x["catalog_has_jacobian"]),
         "counts": {"/".join(k): v for k, v in sorted(counts.items())},
+        "outside_menezes_teske_X": {"/".join(k): v for k, v in sorted(outside_mt.items())},
         "example": {"order": 3974, "trace": 123, "subgroup_prime": 1987,
                     "source_a": 32, "source_b": 306,
                     "subgroup_generator_xy": [307, 2825],

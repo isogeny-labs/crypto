@@ -16,3 +16,6 @@ example : 2156 + 452 = 2608 := by decide
 example : 5302 + 232 = 5534 := by decide
 example : 5302 + 232 + 48 = 5582 := by decide
 example : 2156 + 452 + 5302 + 232 = 8142 := by decide
+example : 3852 + 180 = 4032 := by decide
+example : 12 + 4 = 16 := by decide
+example : 4032 + 16 = 4048 := by decide

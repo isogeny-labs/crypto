@@ -25,6 +25,19 @@ new contribution within this project is the exhaustive cross-index join,
 the exact partition, and a replayed class outside the earlier 300-source
 quartic screen. Publication novelty has not been established.
 
+**Outside the published cubic weak-set congruence.**
+[Menezes--Teske, Section 7](https://cacr.uwaterloo.ca/techreports/2004/corr2004-25.pdf)
+define their non-subfield isogeny-walk set `X` by source order congruent to
+`0` or `2` modulo `8`. Among our catalog-positive models with order
+congruent to `4` or `6` modulo `8` are **4032 class-C non-subfield
+models**; **3852** of them also pass the largest-prime simple-root gate.
+There are another 16 class-A models in these residues, 12 of which pass
+the gate. This residue partition was noticed after the initial frozen
+catalog join and independently recomputed in the final audit. It gives
+a finite, exact family beyond that published *direct-cover walk set*;
+it does not show that the older authors claimed impossibility for other
+transfers. Nor does it imply an advantage over rho.
+
 | Category | normalized source models |
 | :--- | ---: |
 | Catalog Jacobian and direct-B order, simple-root gate | 2156 |
@@ -59,7 +72,8 @@ An exact order-1987 source point has encoded coordinates
 The nonzero `b=K.from_integer(306)` has nonzero relative trace to `k`,
 and the complete source census has no class-B model of order 3974.
 Consequently this source is outside the entire direct genus-three
-hyperelliptic-cover isogeny closure. Its selected subgroup has order
+hyperelliptic-cover isogeny closure. Its group order is `6` modulo `8`,
+also outside the Menezes--Teske set `X`. Its selected subgroup has order
 `r=1987`; `t=4097-3974=123`, `P(X)=X^6-123X^3+4096`, and
 `gcd(r,P'(1))=gcd(1987,-363)=1`.
 
