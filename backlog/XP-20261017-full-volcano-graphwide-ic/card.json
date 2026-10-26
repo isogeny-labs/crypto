@@ -1,0 +1,118 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261017-full-volcano-graphwide-ic",
+  "title": "Full graph-wide direct and finite-field elliptic index-calculus measurements",
+  "created": "2026-10-17",
+  "authors": [
+    "volcano graph-wide IC workstream"
+  ],
+  "status": "blocked",
+  "status_note": "Design costed 2026-10-18 (PROTOCOL.md DRAFT, not frozen): 24,823 vertices x 12 arms x 8 targets x 5 rounds = 11,915,040 measured records in 256 resumable shards. Sizing probes: Plan A ~14,700 core-h (97% on the 45-bit three class), Plan B ~3,600 core-h; peak RAM <=0.35 GB/slot; disk ~119 GB. Bounded survey checkpoint: 2,935 vertices, all 51 strata (30,270 verified, 14,626 exhausted, 2,064 timeouts, all from the 3 s watchdog on three). Blocked on driver/ecbench code gaps G1-G8 and decisions D1-D3 (rounds on three, baseline arm, representation registration); finite-field IC for the actual embedding degrees stays unsupported.",
+  "blocked_on": [
+    "problem:problems/full-volcano-class-storage-and-execution.md",
+    "note:code gaps G1-G8 in PROTOCOL.md section 11 (full-mode gate, shard selection, --cpus/--lock passthrough, registration, split rounds, native analysis, shard verifier, resume convention)",
+    "note:owner decisions D1-D3 in PROTOCOL.md section 9"
+  ],
+  "links": {
+    "lead": "research/full_volcano_graphwide_ic_20261017/README.md",
+    "notes": [
+      "research/full_volcano_graphwide_ic_20261017/PROTOCOL.md",
+      "research/full_volcano_graphwide_ic_20261017/evidence/inventory.json"
+    ],
+    "prs": [
+      2001
+    ]
+  },
+  "question": "How do complete cold index-calculus costs and relation yields vary across every vertex and conductor stratum, on exact matched subgroup targets?",
+  "decision_value": "The full coverage ledger will distinguish variation by model and conductor from missing or censored runs, determine whether a factor-base or oracle change improves the verified IC baseline, and identify implementation limits of finite-field routes without inferring results for unrun vertices.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "4b7bb2c774b395b17145066a6e47a97544e77268"
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": "abee07ee7337d04a7e734333669ca1bacd6c763a",
+    "branch": null,
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--bin",
+        "ecbench",
+        "--bin",
+        "volcano-ic-driver",
+        "--bin",
+        "volcano-ic-summarize"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 32,
+    "ram_gb": 16,
+    "disk_gb": 160,
+    "gpu": null,
+    "est_core_hours": 14728,
+    "est_wall_hours": 736,
+    "notes": "Derived from L0 sizing probes (PROTOCOL.md section 10; README cost table). Whole campaign on one host: 32 single-threaded shard slots. Plan A (registered) 14,728 core-h: two 197 + three 14,268 + mixed 263; wall 460 h ideal, 736 h if SMT yields ~20 effective threads, 920 h on 16 slots. Plan B (decision D1) 3,580 core-h, 112-224 h. Peak RAM <=0.35 GB per slot (bsgs on three 171 MB). Disk ~100 GB raw sessions + 6.5 GB binary copies + ~12 GB archives = ~119 GB (110 GiB); 128 GiB fits with ~16% headroom, 160 GB recorded for 30%. Per shard (1/256): ~57.5 core-h (A) or ~14 (B), ~0.43 GB. Code commit is the probe source; repin to a merged commit after G1-G8 land."
+  },
+  "run": {
+    "argv": [
+      "target/release/volcano-ic-driver",
+      "run",
+      "{out}/campaign",
+      "24823",
+      "345600",
+      "1073741824"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 360000
+  },
+  "shards": {
+    "count": 256,
+    "scheme": "seed_range",
+    "params": {
+      "seed_lo": "0",
+      "range_size": "1",
+      "seed_hi": "256",
+      "argv_note": "Shard k = {shard} = {seed_lo} holds the vertices whose global queue ordinal is k mod 256 (PROTOCOL.md section 3). Pre-step, once per shard, from the repository root: target/release/volcano-ic-driver plan {out}/campaign <inputs> target/release/ecbench full freeze, which needs the shard selector of gap G2 (today plan takes the whole queue) and run refuses mode full until gap G1. run args are positional: CAMPAIGN MAX_JOBS MAX_SECONDS MAX_BYTES (driver.rs main). Slot pinning is taskset -c <slot>; the driver must pass --cpus none and a per-shard --lock (gap G3). After the shard finishes: pack per AGENTS.md section 13a and push off-host before the slot takes the next shard."
+    },
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": "campaign/ledger.sqlite",
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "Per shard: sealed ecbench.record/v1 sessions (one per vertex, 576 records), ecbench audit receipts, volcano-exhaustion-replay/v1 receipts, ledger.sqlite; aggregated with volcano-ic-summarize (summary v2) plus the native analysis of gap G6",
+    "verify": [],
+    "land": "research/full_volcano_graphwide_ic_20261017"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "notes": "Not published, leased or scheduled. The separate bounded survey is real local execution and does not imply this card launched. run.argv is the real driver CLI; it refuses mode full until gap G1 lands, and per-shard planning needs gap G2. resume_flag is null because the driver resumes by re-invoking the identical argv (gap G8). outputs.verify needs a per-shard verifier binary (gap G7).",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261017-full-volcano-graphwide-ic/shard-{k}"
+    ],
+    "ttl_s": 86400,
+    "env": {
+      "name": "crypto-full-volcano-graphwide-ic",
+      "recipe": "Linux image built at code.commit (repinned after gaps G1-G8 land) with the code.build command; the driver needs Unix flock/signals and git in the working tree (plan records git rev-parse HEAD and git diff). Inputs: the three certified *-workloads.jsonl files (sha256 in evidence/inventory.json) from the study Drive archive."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 1024,
+      "timeout_s": 360000,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261017-full-volcano-graphwide-ic"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Costed draft (Plan A ~14,700 core-h, Plan B ~3,600 core-h) but not runnable until gaps G1-G8 land and D1-D3 are decided; a reviewer sets funding against the 131072-1000000 seed-card range then."
+    }
+  },
+  "owner_hint": "Native ecbench / ordinary-volcano workstream"
+}

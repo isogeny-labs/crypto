@@ -4,7 +4,7 @@
   "use strict";
   var REPO = "https://github.com/aburan28/crypto/blob/main/";
   var DATA = null;
-  var byId = { curve: {}, method: {}, fb: {}, candidate: {}, round: {}, session: {} };
+  var byId = { curve: {}, method: {}, fb: {}, candidate: {}, round: {}, session: {}, store: {} };
   var view = document.getElementById("view");
   var loading = document.getElementById("loading");
 
@@ -151,7 +151,7 @@
   function curvesView(q) {
     var head = el("div", null, [
       el("h1", { text: "Curves" }),
-      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. Search by name or identity, filter by family, field, trace, order, subgroup and what has been measured on it. Click a slug for its full record and everything that cites it. A conductor is not an invariant of a curve over a finite field; the endomorphism discriminant (−7 for every Koblitz curve) is the nearest thing recorded." })
+      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. Search by name or identity, filter by family, field, trace, order, subgroup and what has been measured on it. Click a slug for its full record and everything that cites it. This catalog filters the recorded endomorphism discriminant. Volcano conductors require a certified endomorphism order; missing order data is not a conductor assignment." })
     ]);
     var f = el("form", { class: "filters" });
     function input(name, label, type, extra) {
@@ -387,6 +387,11 @@
       view.appendChild(table(fbColumns(), c.factor_bases.map(function (id) { return byId.fb[id]; }).filter(Boolean)));
     } else view.appendChild(el("p", { class: "note", text: "No ecbench factor base recorded on this curve." }));
 
+    view.appendChild(el("h2", { text: "Stored files" }));
+    if (c.store_objects.length) {
+      view.appendChild(table(storeColumns(), c.store_objects.map(function (n) { return byId.store[n]; }).filter(Boolean), { sortKey: "name" }));
+    } else view.appendChild(el("p", { class: "note", text: "No file in the object store is named for this curve." }));
+
     view.appendChild(el("h2", { text: "Tournament cells" }));
     if (c.tournament_cells.length) {
       view.appendChild(table([
@@ -446,12 +451,16 @@
   }
 
   /* ---------- factor bases ---------- */
+  function recordedCurveCell(slug) {
+    if (!slug) return tdText("–");
+    return byId.curve[slug] ? tdLink("#curve/" + slug, slug) : tdText(slug + " (registration pending)");
+  }
   function fbColumns() {
     return [
       { key: "fb_id", label: "Factor base", cell: function (f) { return tdLink("#fb/" + f.fb_id, f.fb_id); } },
       { key: "family", label: "Family" },
       { key: "params", label: "Parameters", cell: function (f) { return tdText(paramsText(f.params), "mono"); } },
-      { key: "curve", label: "Curve", cell: function (f) { return f.curve ? tdLink("#curve/" + f.curve, f.curve) : tdText("–"); } },
+      { key: "curve", label: "Curve", cell: function (f) { return recordedCurveCell(f.curve || f.recorded_curve); } },
       { key: "signed_points", label: "Signed points", numeric: true },
       { key: "abscissae", label: "Abscissae", numeric: true },
       { key: "columns", label: "Columns", numeric: true },
@@ -472,13 +481,52 @@
     view.appendChild(el("h1", { text: f.fb_id }));
     view.appendChild(el("dl", { class: "facts" }, [
       fact("Family", f.family), fact("Parameters", paramsText(f.params), true), fact("Description", f.description),
-      fact("Curve", f.curve ? link("#curve/" + f.curve, f.curve) : null, true),
+      fact("Curve", f.curve ? link("#curve/" + f.curve, f.curve) : (f.recorded_curve ? f.recorded_curve + " (registration pending)" : null), true),
       fact("Signed points", f.signed_points), fact("Abscissae", f.abscissae), fact("Columns", f.columns), fact("Dimension", f.dimension),
       fact("Points SHA-256", f.points_sha256, true), fact("Record SHA-256", f.fb_sha256, true)
     ]));
+    var held = DATA.store.objects.filter(function (o) { return o.fb_id === f.fb_id; });
+    if (held.length) {
+      view.appendChild(el("h2", { text: "Stored file" }));
+      view.appendChild(table(storeColumns(), held, { sortKey: "name" }));
+    }
     view.appendChild(el("h2", { text: "Used by" }));
     view.appendChild(el("ul", { class: "plain" }, f.methods.map(function (m) { var mm = byId.method[m]; return el("li", null, [link("#method/" + m, m), mm ? " · " + mm.method + " " + paramsText(mm.params) : ""]); })
       .concat(f.sessions.map(function (s) { var ss = byId.session[s]; return el("li", null, [link("#session/" + s, s), ss ? " · " + ss.label : ""]); }))));
+  }
+
+  /* ---------- object store ---------- */
+  function mib(bytes) { return bytes >= 1048576 ? (bytes / 1048576).toFixed(1) + " MiB" : (bytes / 1024).toFixed(1) + " KiB"; }
+  function storeColumns() {
+    return [
+      { key: "name", label: "Name", cell: function (o) { return tdLink("#store-object/" + o.name, o.name); } },
+      { key: "kind", label: "Kind" },
+      { key: "bytes", label: "Size", numeric: true, cell: function (o) { return tdText(mib(o.bytes), "n"); } },
+      { key: "sha256", label: "SHA-256", cell: function (o) { return tdText(o.sha256.slice(0, 16) + "…", "mono"); } },
+      { key: "tags", label: "Tags", sort: function (o) { return o.tags.join(","); }, cell: function (o) { return tdText(o.tags.join(", "), "wrap"); } }
+    ];
+  }
+  function storeView() {
+    var total = DATA.store.objects.reduce(function (a, o) { return a + o.bytes; }, 0);
+    view.appendChild(el("h1", { text: "Object store" }));
+    view.appendChild(el("p", { class: "lede", text: "Files too large for Git that the repository names by content: " + DATA.store.objects.length + " objects, " + mib(total) + ", held in " + DATA.store.remote + " under their SHA-256 and indexed in store/index.json. Fetch one with `ecbench store pull NAME` (or use `store:NAME` wherever a command takes a path); the cache re-hashes it before use." }));
+    view.appendChild(table(storeColumns(), DATA.store.objects, { sortKey: "name" }));
+    view.appendChild(el("p", { class: "note" }, ["How it works: ", repoLink("docs/store/README.md"), "."]));
+  }
+  function storeDetail(name) {
+    var o = byId.store[name];
+    if (!o) { view.appendChild(el("p", { class: "note", text: "No stored file " + name + "." })); return; }
+    view.appendChild(el("p", { class: "crumbs" }, [link("#store", "Object store"), " / " + o.name]));
+    view.appendChild(el("h1", { text: o.name }));
+    view.appendChild(el("dl", { class: "facts" }, [
+      fact("Kind", o.kind), fact("Size", mib(o.bytes) + " (" + o.bytes + " bytes)"), fact("SHA-256", o.sha256, true),
+      fact("Remote object", DATA.store.remote + "/sha256/" + o.sha256.slice(0, 2) + "/" + o.sha256, true),
+      fact("Fetch", "ecbench store pull " + o.name, true),
+      fact("Description", o.description), fact("Provenance", o.provenance), fact("Tags", o.tags.join(", ")),
+      fact("Curve", o.curve ? link("#curve/" + o.curve, o.curve) : (o.recorded_curve ? o.recorded_curve + " (registration pending)" : null), true),
+      fact("Factor base", o.fb_id ? link("#fb/" + o.fb_id, o.fb_id) : o.recorded_fb_id, true),
+      fact("Superseded digests", o.superseded.map(function (x) { return x.sha256 + " (" + x.bytes + " bytes)"; }).join("; "), true)
+    ]));
   }
 
   /* ---------- candidates ---------- */
@@ -609,7 +657,7 @@
       return { slug: slug, r_bits: c ? c.r_bits : null, arms: ref.length, best: best === Infinity ? null : best };
     });
     view.appendChild(table([
-      { key: "slug", label: "Curve", cell: function (r) { return tdLink("#curve/" + r.slug, r.slug); } },
+      { key: "slug", label: "Curve", cell: function (r) { return recordedCurveCell(r.slug); } },
       { key: "r_bits", label: "log₂ r", numeric: true, digits: 2 },
       { key: "arms", label: "Arms measured", numeric: true },
       { key: "best", label: "Lowest mean S", numeric: true, digits: 3 }
@@ -664,7 +712,7 @@
       count.textContent = rows.length + " of " + DATA.yields.length + " runs" + (meanYield === null ? "" : " · mean yield over " + verified.length + " verified: " + (100 * meanYield).toFixed(3) + " %");
       while (holder.firstChild) holder.removeChild(holder.firstChild);
       holder.appendChild(table([
-        { key: "curve", label: "Curve", cell: function (y) { return tdLink("#curve/" + y.curve, y.curve); } },
+        { key: "curve", label: "Curve", cell: function (y) { return recordedCurveCell(y.curve); } },
         { key: "target_index", label: "Target", numeric: true, cell: function (y) { return tdText(y.target_index === null ? "–" : "#" + y.target_index, "n"); } },
         { key: "fb_id", label: "Factor base", cell: function (y) { return y.fb_id ? el("td", null, [link("#fb/" + y.fb_id, y.fb_id, "mono"), " ", chip(y.fb_family || "")]) : tdText("–"); } },
         { key: "fb_columns", label: "Cols", numeric: true },
@@ -720,7 +768,7 @@
     while (view.firstChild) view.removeChild(view.firstChild);
     Array.prototype.forEach.call(document.querySelectorAll(".views a"), function (a) {
       var v = a.getAttribute("data-view");
-      var active = h.view === v || (h.view === "curve" && v === "curves") || (h.view === "method" && v === "methods") || (h.view === "fb" && v === "factor-bases") || (h.view === "candidate" && v === "candidates") || (h.view === "round" && v === "rounds") || (h.view === "session" && v === "sessions") || (h.view === "yield" && v === "yield");
+      var active = h.view === v || (h.view === "curve" && v === "curves") || (h.view === "method" && v === "methods") || (h.view === "fb" && v === "factor-bases") || (h.view === "candidate" && v === "candidates") || (h.view === "round" && v === "rounds") || (h.view === "session" && v === "sessions") || (h.view === "yield" && v === "yield") || (h.view === "store-object" && v === "store");
       if (active) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
     switch (h.view) {
@@ -736,6 +784,8 @@
       case "sessions": sessionsView(); break;
       case "session": sessionDetail(h.id); break;
       case "yield": yieldView(h.q); break;
+      case "store": storeView(); break;
+      case "store-object": storeDetail(h.id); break;
       case "vocabulary": vocabularyView(); break;
       default: curvesView(h.q);
     }
@@ -753,6 +803,7 @@
     d.candidates.forEach(function (k) { byId.candidate[k.candidate_id] = k; });
     d.rounds.forEach(function (r) { byId.round[r.round] = r; });
     d.sessions.forEach(function (s) { byId.session[s.session_id] = s; });
+    d.store.objects.forEach(function (o) { byId.store[o.name] = o; });
     loading.hidden = true;
     view.hidden = false;
     window.addEventListener("hashchange", route);

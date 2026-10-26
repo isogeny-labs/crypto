@@ -1,5 +1,30 @@
 # Curves
 
+**Start here for testing:** the [curve testbed](testbed/README.md) highlights
+recommended curves with standardized shapes, proved orders and exactly counted
+multi-level isogeny classes; the 61-bit Koblitz, binary and prime trio and a 61-bit large-prime-conductor-gap set are featured.
+
+The [SEC 2 v1.0/v2.0 curve inventory](../../research/sec2_curve_inventory_20261012/REPORT.md)
+lists all 33 historical SECG names, identifies the 20 retained in 2010, and
+links each exact curve to the complete trait, cover, and transfer-screening
+records. Its [PDF](../../research/sec2_curve_inventory_20261012/REPORT.pdf)
+and [machine-readable source crosscheck](../../research/sec2_curve_inventory_20261012/inventory.json)
+preserve version and evidence status.
+
+The [weak-curve family catalogue](weak-families/README.md) organizes 21
+published or verified families and structural conditions, with their recognition
+rules, construction domains and evidence. Its [searchable browser](weak-families/index.html)
+indexes 814 exact models and the complete 294-class ordinary p7 oracle.
+Model membership, class support, subgroup compatibility and measured cost
+have separate labels; [canonical JSON](weak-families/catalog.json) retains
+the source attribution and completeness boundary for each family.
+
+The [certified property browser](weak-families/properties.html) adds independently
+checked torsion, Frobenius conductor depth, exact or bounded ordinary 2-volcano
+levels, and three fields of definition for those 814 models. Its
+[property sidecar](weak-families/properties.json) retains the original family
+labels and records the arithmetic witnesses and selected-subgroup unknowns.
+
 [CM Jacobian certificates](JACOBIAN_CERTIFICATES.md) check principal
 polarizations on elliptic squares using exact Hermitian arithmetic and all
 ideal classes. The [versioned JSON](jacobian-certificates.json) and
@@ -13,11 +38,55 @@ same-field cover certificates to each supported catalog model in
 the verified genus, map degree and field assumptions. Descent and DLP
 advantage remain unmeasured.
 
+[Jacobian transfer discovery](JACOBIAN_TRANSFERS.md) enumerates, for every
+registered curve, the known routes into a Jacobian (GHS descent per field
+factorisation, its isogeny extension, same-field covers, extension-field
+decomposition and cover descent), computes what is exact about each and
+prices the rest with one frozen formula cost model against Pollard rho, in
+[`jacobian-transfers.json`](jacobian-transfers.json). Rows are formulas and
+leads; `jacobian_transfers check` fails CI when a registered curve is
+unscreened.
+
 The [hyperelliptic infrastructure guide](HYPERELLIPTIC_INFRASTRUCTURE.md)
 documents the standalone construction, verification, arithmetic, and catalog
 commands; the one-infinity arithmetic boundary; bounded binary transfer; and
 the additive evidence schema. In particular, the prime even-sextic cover does
 not use the odd-degree one-infinity Jacobian implementation.
+
+For the exact polynomial-basis F8 genus-three fixture with `a=1`, `b=3`, the
+[machine-readable order certificate](fixed-f8-genus3-order-certificate.json)
+and its [implementation-separated native replay](../../src/bin/ecdlp_audit/fixed_f8_order.rs)
+derive `#Jac(H)(GF(8))=486` from exhaustive extension point counts. This is an
+order certificate only, not an independent check of the divisor arithmetic or
+transfer map.
+
+The current [cover-transfer assessment](cover-transfer-assessments.json),
+validated by its [v2 schema](cover-transfer-assessment.schema.json), classifies
+all 2,100 HC1/CV1 map rows (2,098 distinct cover models) and all 664 linked EC1
+representations. The map population is 160 binary cubic covers and 1,940
+odd-characteristic quadratic covers: 586 direct prime-field, 30
+normalized-target prime-field, and 1,324 extension-field covers. The EC1
+population is 134 binary and 530 odd-characteristic representations.
+Classification is not blanket support:
+the ledger assigns every declared claim an explicit `supported`, `refuted`,
+`unknown`, or `not_applicable` result and retains each unmet obligation. Its
+[source-linked report](../../research/cover_transfer_assessment_20261013/README.md)
+records the typed graph, costs, controls, exploration boundary, and open
+obligations. The current source constructor accepts all 2,100 inputs. The
+published `v0.1.0-main.1371` executable was directly replayed against its
+bundled 592-row registry; comparison of its pinned allowlist with the current
+profiles statically places 746 inputs inside and 1,354 outside its syntactic
+domain. No 2,100-command archived-binary batch receipt exists, so it is not a
+catalog-wide packaged artifact. Neither the catalog nor the assessment is a
+Jacobian index-calculus solver.
+
+The proposed
+[comprehensive private-key recovery audit](../../research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md)
+places this cover ledger inside a wider program without weakening its claim
+boundaries. Cover existence, arithmetic, subgroup transfer, destination
+solving, and measured advantage remain separately gated; the
+[planning mock](../ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json) is explicitly
+non-authoritative.
 
 [IC curve records and cross-repo links](ic/README.md), including
 [typed links](ic/curve-links/README.md), retain the exact EC1 representations,
@@ -44,8 +113,10 @@ registry equals the one a thread's `curve_ids.json` carries; the builder fails i
 | [`registry.json`](registry.json) | every curve named anywhere in the repository: slug, ICV1, parameters, every legacy spelling that denotes it, and its EC1 representations |
 | [`sources/specs.txt`](sources/specs.txt) | the constructor calls whose curves no tracked record states in full |
 | [`sources/generated.json`](sources/generated.json) | those curves rebuilt: model, subgroup, generator, legacy handle, ICV1 computed in Rust |
-| [`TRAITS.md`](TRAITS.md) | size-independent traits of every registered curve (CM field, conductor, subfield of definition, volcano depths, cofactors, embedding degree) and how to group curves or find similar ones with `curve_traits` |
-| [`traits.json`](traits.json) | those traits, one record per registry curve, each value with its status; built by `cargo run --release --bin curve_traits -- build` |
+| [`TRAITS.md`](TRAITS.md) | size-independent traits of every registered curve (CM field, conductor, subfield of definition, volcano depths and levels, `End(E)`, cofactors, embedding degree, DiSSECT families) and how to group curves or find similar ones with `curve_traits` |
+| [`traits.json`](traits.json) | those traits, one record per registry curve and per source curve, each value with its status, plus volcano levels, `End(E)` and the DiSSECT families; built by `cargo run --release --bin curve_traits -- build` |
+| [`trait-sources.json`](trait-sources.json) | the curves outside the registry that `curve_traits` also records (isogeny-walk route files, the IC crosswalk) |
+| [`factor-hints.txt`](factor-hints.txt) | primes PARI/GP found in composites the trait build's rho budget leaves, re-checked and used as trial divisors; regenerated by [`factor-hints.gp`](factor-hints.gp) |
 
 ## Two identities, and which to use
 
