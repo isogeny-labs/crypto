@@ -1497,6 +1497,7 @@ mod wide {
         indexed83_id31: bool,
         indexed83_four_id31: bool,
         indexed83_four_relative_base: Option<usize>,
+        indexed83_four_fingerprint8: Option<Vec<u8>>,
     }
 
     impl RootTable128 {
@@ -1544,6 +1545,7 @@ mod wide {
                 indexed83_id31,
                 indexed83_four_id31: false,
                 indexed83_four_relative_base: None,
+                indexed83_four_fingerprint8: None,
             }
         }
 
@@ -1564,7 +1566,26 @@ mod wide {
             id31: bool,
             relative_base: Option<usize>,
         ) -> Self {
+            let fingerprint8 = std::env::var("KIC_INDEXED4_FINGERPRINT8").as_deref() == Ok("1");
+            Self::with_capacity_indexed83_four_layout_fp8(
+                entries,
+                id31,
+                relative_base,
+                fingerprint8,
+            )
+        }
+
+        fn with_capacity_indexed83_four_layout_fp8(
+            entries: usize,
+            id31: bool,
+            relative_base: Option<usize>,
+            fingerprint8: bool,
+        ) -> Self {
             assert!(!id31 || relative_base.is_none());
+            assert!(
+                !fingerprint8 || relative_base.is_some(),
+                "byte fingerprint sidecar requires relative four-byte slots"
+            );
             let slots = entries
                 .checked_mul(2)
                 .expect("four-byte indexed root table request exceeds usize")
@@ -1580,6 +1601,7 @@ mod wide {
                 indexed83_id31: false,
                 indexed83_four_id31: id31,
                 indexed83_four_relative_base: relative_base,
+                indexed83_four_fingerprint8: fingerprint8.then(|| vec![0u8; slots]),
             }
         }
 
@@ -1767,6 +1789,7 @@ mod wide {
                 indexed83_id31: false,
                 indexed83_four_id31: false,
                 indexed83_four_relative_base: None,
+                indexed83_four_fingerprint8: None,
             }
         }
 
@@ -1812,6 +1835,12 @@ mod wide {
             }
         }
 
+        fn fingerprint_sidecar_bytes(&self) -> usize {
+            self.indexed83_four_fingerprint8
+                .as_ref()
+                .map_or(0, Vec::len)
+        }
+
         fn insert_indexed83<F>(
             &mut self,
             key: u128,
@@ -1833,6 +1862,7 @@ mod wide {
                 let RootSlots128::Indexed83Four(slots) = &mut self.slots else {
                     unreachable!();
                 };
+                let fingerprints = &mut self.indexed83_four_fingerprint8;
                 loop {
                     let existing = slots[slot];
                     if existing == 0 {
@@ -1848,6 +1878,9 @@ mod wide {
                         } else {
                             Self::indexed83_four_encode(state_index, root_selector, fingerprint)
                         };
+                        if let Some(bytes) = fingerprints.as_mut() {
+                            bytes[slot] = fingerprint as u8;
+                        }
                         self.len += 1;
                         assert!(
                             self.len < slots.len(),
@@ -1865,9 +1898,12 @@ mod wide {
                     } else {
                         Self::indexed83_four_decode(existing)
                     };
-                    if (id31
-                        || old_fingerprint
-                            == (fingerprint & if relative_base.is_some() { 1 } else { 3 }))
+                    if fingerprints
+                        .as_ref()
+                        .is_none_or(|bytes| bytes[slot] == fingerprint as u8)
+                        && (id31
+                            || old_fingerprint
+                                == (fingerprint & if relative_base.is_some() { 1 } else { 3 }))
                         && key_of(old_state, old_root) == key
                     {
                         return;
@@ -1943,7 +1979,7 @@ mod wide {
                 let id31 = self.indexed83_four_id31;
                 let relative_base = self.indexed83_four_relative_base;
                 let mask = slots.len() - 1;
-                let fingerprint = Self::indexed83_fingerprint(key) & 3;
+                let fingerprint = Self::indexed83_fingerprint(key);
                 let mut slot = self.slot(key);
                 loop {
                     let existing = slots[slot];
@@ -1958,9 +1994,13 @@ mod wide {
                         } else {
                             Self::indexed83_four_decode(existing)
                         };
-                    if (id31
-                        || old_fingerprint
-                            == (fingerprint & if relative_base.is_some() { 1 } else { 3 }))
+                    if self
+                        .indexed83_four_fingerprint8
+                        .as_ref()
+                        .is_none_or(|bytes| bytes[slot] == fingerprint as u8)
+                        && (id31
+                            || old_fingerprint
+                                == (fingerprint & if relative_base.is_some() { 1 } else { 3 }))
                         && key_of(state_index, root_selector) == key
                     {
                         return Some((state_index, root_selector));
@@ -2848,6 +2888,80 @@ mod wide {
             assert_eq!(
                 table.get_indexed83(u128::MAX, |state, root| keys[2 * (state - base) + root]),
                 None
+            );
+        }
+
+        #[test]
+        fn indexed_four_byte_byte_fingerprint_filters_without_changing_exact_keys() {
+            use std::cell::Cell;
+            use std::collections::HashMap;
+
+            let base = 1usize << 31;
+            let mut reference =
+                RootTable128::with_capacity_indexed83_four_layout_fp8(64, false, Some(base), false);
+            let mut filtered =
+                RootTable128::with_capacity_indexed83_four_layout_fp8(64, false, Some(base), true);
+            reference.bloom = None;
+            filtered.bloom = None;
+            assert_eq!(filtered.fingerprint_sidecar_bytes(), 128);
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                let witness = |state: usize, selector: usize| keys[2 * (state - base) + selector];
+                reference.insert_indexed83(key, base + i / 2, i % 2, witness);
+                filtered.insert_indexed83(key, base + i / 2, i % 2, witness);
+            }
+            for (i, &key) in keys.iter().enumerate() {
+                let witness = |state: usize, selector: usize| keys[2 * (state - base) + selector];
+                assert_eq!(
+                    filtered.get_indexed83(key, witness),
+                    reference.get_indexed83(key, witness)
+                );
+                assert_eq!(
+                    filtered.get_indexed83(key, witness),
+                    Some((base + i / 2, i % 2))
+                );
+            }
+            assert_eq!(filtered.len, reference.len);
+
+            let mut seen = HashMap::new();
+            let mut pair = None;
+            for i in 1..10_000u64 {
+                let key = (mix_root_bloom(i) as u128) << 19 | i as u128;
+                let fingerprint = RootTable128::indexed83_fingerprint(key);
+                let signature = (filtered.slot(key), fingerprint & 1);
+                if let Some(&(prior, prior_fingerprint)) = seen.get(&signature) {
+                    if prior_fingerprint as u8 != fingerprint as u8 {
+                        pair = Some((prior, key));
+                        break;
+                    }
+                } else {
+                    seen.insert(signature, (key, fingerprint));
+                }
+            }
+            let (first, second) = pair.expect("same slot and bit, different byte");
+            let mut collided =
+                RootTable128::with_capacity_indexed83_four_layout_fp8(64, false, Some(base), true);
+            collided.bloom = None;
+            collided.insert_indexed83(first, base, 0, |_, _| first);
+            let exact_checks = Cell::new(0);
+            collided.insert_indexed83(second, base + 1, 0, |_, _| {
+                exact_checks.set(exact_checks.get() + 1);
+                first
+            });
+            assert_eq!(exact_checks.get(), 0);
+            assert_eq!(collided.len, 2);
+            assert_eq!(collided.get_indexed83(first, |_, _| first), Some((base, 0)));
+            assert_eq!(
+                collided.get_indexed83(second, |state, _| {
+                    if state == base {
+                        first
+                    } else {
+                        second
+                    }
+                }),
+                Some((base + 1, 0))
             );
         }
 
@@ -5173,6 +5287,7 @@ mod wide {
                     "primary_table_allocated_bytes": index.table.layout_receipt().2,
                     "overflow_table_allocated_bytes": index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
                     "root_table_allocated_bytes": index.table.layout_receipt().2 + index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
+                    "root_fingerprint_sidecar_bytes": index.table.fingerprint_sidecar_bytes() + index.overflow_table.as_ref().map_or(0, RootTable128::fingerprint_sidecar_bytes),
                     "root_table_layout": index.table.layout_receipt().0,
                     "root_slot_state_id_bits": if index.indexed4_fixed32 || index.indexed5_id31 { 31 } else if index.indexed4_split30 || index.indexed5_id30 { 30 } else { 29 },
                     "indexed5_split_at": if index.indexed4_split30 { None } else { index.split_at },
@@ -5503,6 +5618,13 @@ mod wide {
             "target_threads":target_threads,
             "scope":"public synthetic Koblitz fixtures; shared-factor-log DLP with every stage timed in one process; no external points or key recovery",
         });
+        summary["root_fingerprint_sidecar_bytes"] = json!(
+            index.table.fingerprint_sidecar_bytes()
+                + index
+                    .overflow_table
+                    .as_ref()
+                    .map_or(0, RootTable128::fingerprint_sidecar_bytes)
+        );
         summary["primary_table_entries"] = json!(index.table.len);
         summary["overflow_table_entries"] =
             json!(index.overflow_table.as_ref().map_or(0, |table| table.len));

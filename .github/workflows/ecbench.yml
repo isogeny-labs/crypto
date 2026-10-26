@@ -3,13 +3,14 @@ name: ecbench
 #
 # Unit and integration tests run on every change.  Then a real session
 # runs on Linux as root, so the paths a laptop cannot exercise are
-# exercised here: whole-core reservation, eviction, pinning between fork
+# exercised here: inherited-cpuset reservation, eviction, pinning between fork
 # and exec, the kernel's tick, steal and PSI counters, and the grading
 # that reads them.  The job requires every measured child to report the
 # run CPU as its whole affinity mask and to start and finish on it, and
 # the audit's replays to reproduce exactly.  A hosted runner is a shared
 # VM, so its records are expected to stop at L1 (steal and frequency are
-# outside a guest's control); the job checks the machinery, never the
+# outside a guest's control); some hosted cpusets contain no whole nonzero
+# core and grade lower. The job checks the machinery, never the
 # numbers.
 #
 # PRs validate every historical session hash/seal/answer without rerunning
@@ -299,7 +300,7 @@ jobs:
         run: |
           sudo git config --global --add safe.directory "$GITHUB_WORKSPACE"
           sudo ./target/release/ecbench run --spec docs/ecbench/specs/smoke-prime.json \
-            --out "$RUNNER_TEMP/prime" --allow-busy --settle 1 --quiet
+            --out "$RUNNER_TEMP/prime" --cpus inherit --allow-busy --settle 1 --quiet
           sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/prime"
       - name: Pinning took effect in every measured child
         run: |
