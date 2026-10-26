@@ -12,7 +12,7 @@ permissions:
 jobs:
   smoke:
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.pool == 'highmem' && 'crypto-eks-highmem' || 'crypto-eks-linux' }}
     timeout-minutes: 20
     steps:
       - name: Runner and Docker readiness

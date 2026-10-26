@@ -108,13 +108,44 @@ Confirm both jobs pass, `kubectl get nodeclaims` shows a `gha-on-demand` node
 during a run, and GitHub's job log identifies the expected runner name. Check
 that an empty node disappears after the consolidation interval.
 
-**Workflow routing is retired (owner decision, 2026-10-26).** Every job in
-`.github/workflows/` runs on GitHub-hosted `ubuntu-latest` only, so no workflow
-routes to these scale sets any more. The `CRYPTO_EKS_WORKFLOWS` and
-`CRYPTO_EKS_HIGHMEM_WORKFLOWS` repository variables no longer affect any job,
-the routing script `route_workflows.py` was removed, and `eks-arc-smoke.yml`
-itself runs on `ubuntu-latest` (so its pool memory checks no longer exercise
-the scale sets). The text below records the earlier rollout.
+**Routing (owner decision, 2026-10-26).** Every Linux job's `runs-on` falls
+back to GitHub-hosted `ubuntu-latest` and opts into these Spot scale sets per
+workflow. Add only validated workflow filenames to the repository variable
+`CRYPTO_EKS_WORKFLOWS` (Spot `crypto-eks-linux`), delimited by vertical bars,
+for example `|spotlab.yml|rust-lint.yml|`. Use
+`CRYPTO_EKS_HIGHMEM_WORKFLOWS=|some-large-job.yml|` for the Spot high-memory
+pool; it takes precedence. Remove a filename to roll that workflow back to
+`ubuntu-latest`. `route_workflows.py --apply` writes the routing expression
+into any new direct `runs-on: ubuntu-latest` line and is idempotent; it skips
+workflows whose bytes are pinned elsewhere (`SEALED`). Four workflows name a
+scale set directly because they cannot run on a hosted runner:
+`eks-arc-smoke.yml`, `dreg-a3-eks-highmem.yml`, `fb-designs-m4-highmem.yml`
+and the `segment` job of `dreg-ckpt-job.yml` (xmem/xmem1t).
+
+### Turning the Spot runners back on (isogeny-labs/crypto)
+
+The scale sets registered against `aburan28/crypto` before the repository
+moved; their last smoke run passed on 2026-10-20. To bring them up for
+`isogeny-labs/crypto`:
+
+1. From a host with the isolab kubeconfig, rotate the ARC credential to a token
+   (or GitHub App) owned by `isogeny-labs` with Administration read/write on
+   the repository:
+   `ARC_GITHUB_REPO=isogeny-labs/crypto taskq/deploy/eks-karpenter/arc/rotate-github-token.sh`.
+   The value files already name `https://github.com/isogeny-labs/crypto`.
+2. Re-run `deploy.sh` (idempotent) and confirm
+   `kubectl -n arc-runners get autoscalingrunnersets` lists all four sets.
+3. Dispatch `eks-arc-smoke.yml` with `pool=linux` and `pool=highmem`; confirm
+   the job log names an `arc-runners` pod and `kubectl get nodeclaims` shows a
+   Spot node during the run.
+4. Restore the first-wave rollout (command below) and, for the high-memory
+   jobs, `gh variable set CRYPTO_EKS_HIGHMEM_WORKFLOWS --repo isogeny-labs/crypto --body '|<file>.yml|'`.
+5. If `vars.DREG_CKPT_WATCH` was unset while the runners were down, set it
+   again only after the xmem pool has run one segment.
+
+Self-hosted runner minutes are not billed by GitHub, so routed jobs do not
+draw on the organization's Actions quota; the cost is the Spot EC2, EBS and NAT
+traffic described above, inside the 96-vCPU regional Spot quota.
 
 `first-wave-workflows.txt` records the 391 workflow filenames enabled in the
 initial rollout. It excludes workloads requiring specialized GPU, Sage, Lean,
@@ -143,7 +174,8 @@ experiments before replaying.
 
 ## Security and compatibility
 
-This repository is public. A fork can propose workflow changes that target a
+`isogeny-labs/crypto` is private with forking disabled (2026-10-26), so only
+collaborators can open pull requests. If it is made public again: a fork can propose workflow changes that target a
 self-hosted scale set directly, regardless of the routing expression in the
 base workflow. ARC's Docker sidecar is privileged. Dedicated tainted nodes,
 ephemeral runner pods, a service account without Kubernetes API permissions,

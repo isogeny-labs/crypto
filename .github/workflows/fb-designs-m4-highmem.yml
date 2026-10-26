@@ -26,7 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         cell: ${{ fromJSON(inputs.cells == 'both' && '["K8S-A0","K8S-A11"]' || format('["{0}"]', inputs.cells)) }}
-    runs-on: ubuntu-latest
+    runs-on: crypto-eks-highmem
     # Two systems at 14400 s + 600 s grace each, plus the build.
     timeout-minutes: 540
     steps:
