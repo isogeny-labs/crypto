@@ -61,7 +61,11 @@ CARGO_TARGET_DIR=/path/to/build-cache cargo test --offline --locked --release \
   --example koblitz_orbit_dlp_fast
 ```
 
-`run_index_stage.py` is the bounded full K5500 index diagnostic. It freezes
+`run_index_stage.py` is the bounded full K5500 index diagnostic. On the
+current source it accepts `--layout monolithic` (the default) or
+`--layout split`, which uses the relative-ID design in
+[`n83_k5500_split4_20261025`](../n83_k5500_split4_20261025/README.md).
+It freezes
 the source SHA-256, public fixture, flag set, 5,500-column base hash, expected
 state count, slot layout and allocation size; it writes launch and completion
 receipts even for timeout or process failure. Build the example on the target
