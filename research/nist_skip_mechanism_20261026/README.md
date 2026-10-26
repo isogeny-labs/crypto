@@ -95,6 +95,14 @@ the freeze evidence are in its `links` block. Tool outcomes (crypto-autoresearch
 Under the protocol rules, the in-sample predictions (H2, B2) are calibration only. The one decisive
 out-of-sample prediction is B1, whose statistic was amended after the data.
 
+## Artifact store
+
+`report.pdf` and `mechanism.png` live in the artifact store (`.artifacts.json`). The stored
+`report.pdf` (sha256 `fd908b3c…`) is the **previous** version: it predates the review fixes and
+still gives B1 as an Irwin–Hall tail (0.83) and omits PC1/PC2. `report.typ` is current. Uploading the
+rebuilt PDF needs the AWS CLI and store credentials, which this container lacks
+(`tools/artifacts/artifacts.py push`: "`aws` not found"). `mechanism.png` is unchanged.
+
 ## Reproduce
 
 ```
