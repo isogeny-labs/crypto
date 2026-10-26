@@ -17,20 +17,23 @@ those at the head of each table; see FAMILIES.
 
 Every curve is named by its ICV1 slug (docs/curves/ICV1.md) through the
 curve registry.  Every number is read from a frozen file named in
-`SOURCES`; the only arithmetic here is averaging the repetitions a report
-already holds, dividing a phase's operations by sqrt(r) to express it in S,
-and taking a phase's share of its row's total.
+`SOURCES`; operation exponents are log2 of frozen total GAE counts.  The
+other arithmetic averages recorded repetitions, divides operations by
+sqrt(r) to express S, and takes a phase's share of its row's total.
 """
 from __future__ import annotations
 
 import argparse
+import difflib
 import hashlib
 import html
 import json
 import math
 import re
 import statistics
+import subprocess
 import sys
+from itertools import islice
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -53,6 +56,7 @@ SOURCES = {
     "round5": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho": "research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho_analysis": "research/ic_rho_reference_20260923/analysis.json",
+    "progress_timeline": "docs/ic/progress-timeline.json",
     "koblitz_s20": "research/ic_exponent_20260926/analysis.json",
     "koblitz_s21": "research/ic_constructions_20260926/analysis.json",
     "koblitz_s22": "research/ic_descent_20260930/analysis-isolated.json",
@@ -374,6 +378,74 @@ def ladder_rows(names: Names) -> list[dict]:
             "class": "accounting",
         })
     return rows
+
+
+def attach_display_operation_costs(board: list[dict], names: Names) -> None:
+    """Add direct counted totals after the gate hashes the frozen leaderboard rows.
+
+    These display fields cannot change a pre-gate measurement identity.
+    The ladder's total_gae and matched rho's per-run gae both charge setup.
+    """
+    by_slug = {r["slug"]: r for r in board if r["regime"] in ("prime", "char2")}
+    refs = {x["instance"]: x for x in load(SOURCES["matched_rho"])["instances"]}
+    for inst in load(SOURCES["round5"])["ledger"]["instances"]:
+        if inst["regime"] not in ("prime", "char2"):
+            continue
+        row = by_slug[names(inst["curve"]["name"])["slug"]]
+        ref_runs = refs[inst["curve"]["name"]]["matched_reference"]["per_run"]
+        rho_gae = statistics.fmean(run["gae"] for run in ref_runs)
+        row["reference_mean_total_gae"] = rho_gae
+        row["reference_log2_total_gae"] = math.log2(rho_gae)
+        row["operation_unit"] = "GAE, counted group-addition equivalents"
+        variants: dict[str, list] = {}
+        for v in inst["variants"]:
+            variants.setdefault(v["name"], []).append(v)
+        for recipe in row["recipes"]:
+            total_gae = statistics.fmean(v["total_gae"] for v in variants[recipe["variant"]])
+            if not math.isclose(total_gae / rho_gae, recipe["ratio_rho"], rel_tol=1e-9):
+                raise SystemExit(f"counted operation quotient disagrees with S on {row['slug']}: {recipe['variant']}")
+            recipe["mean_total_gae"] = total_gae
+            recipe["log2_total_gae"] = math.log2(total_gae)
+
+
+def require_materialized_gate_inputs(board: list[dict]) -> None:
+    """Do not demote validated rows because their certificates are sparse-excluded.
+
+    The validation gate reads ordinary files.  In a sparse worktree, a pinned
+    certificate can be tracked at HEAD but absent on disk, which otherwise
+    makes the generated page disagree with a complete CI checkout.
+    """
+    raw = subprocess.check_output(["git", "ls-files", "-t", "-z"], cwd=REPO)
+    sparse = {item[2:].decode("utf-8", "surrogateescape")
+              for item in raw.split(b"\0") if item.startswith(b"S ")}
+    needed = {gate.PRE_GATE_LEADERBOARD, gate.SWEEPS["leaderboard"]}
+    for row in board:
+        evidence = REPO / gate.board_evidence_dir(row)
+        manifest = evidence / gate.MANIFEST
+        needed.add(str(manifest.relative_to(REPO)))
+        if not manifest.is_file():
+            continue
+        document = json.loads(manifest.read_text())
+        for key in ("replay_certificate", "validator_report"):
+            spec = document.get(key)
+            if not isinstance(spec, dict) or not isinstance(spec.get("path"), str):
+                continue
+            path = (evidence / spec["path"]).resolve()
+            if not path.is_relative_to(REPO):
+                continue  # validation_gate reports the invalid path
+            needed.add(str(path.relative_to(REPO)))
+            if key == "validator_report" and path.is_file():
+                report = json.loads(path.read_text())
+                for item in report.get("raw_data", []):
+                    name = item.get("path") if isinstance(item, dict) else item
+                    if isinstance(name, str):
+                        raw_path = (evidence / name).resolve()
+                        if raw_path.is_relative_to(REPO):
+                            needed.add(str(raw_path.relative_to(REPO)))
+    missing = sorted(needed & sparse)
+    if missing:
+        raise SystemExit("leaderboard validation inputs are sparse-excluded; hydrate these "
+                         "committed paths before generating:\n" + "\n".join(missing))
 
 
 # ---------------------------------------------------------------------------
@@ -1297,6 +1369,8 @@ def build(allow_unvalidated: bool = False) -> dict:
         "fully_priced_cold_speedup": None,
     }
     ladder, kob, kob1 = ladder_rows(names), koblitz_rows(names), koblitz_one_target_rows(names)
+    timeline = load(SOURCES["progress_timeline"])
+    progress = next(series for series in timeline["series"] if series["id"] == "ec-cold")
     board = ladder + kob1 + kob
     for r in board:
         r["family"] = FAMILY_OF[r["regime"]]
@@ -1308,11 +1382,13 @@ def build(allow_unvalidated: bool = False) -> dict:
                             "variant": r["best"].get("variant"), "source": r["source"],
                             "refs": r["curve_record"]["factor_base_refs"],
                             "link_status": r["curve_record"]["factor_base_link_status"]}
+    require_materialized_gate_inputs(board)
     # The validation gate (AGENTS.md, owner rule 2026-10-19): a row is validated,
     # frozen as unvalidated (pre-gate), or refused.
     preserve_frozen_curve_metadata(board, gate.load_pre_gate(gate.PRE_GATE_LEADERBOARD, REPO))
     gate.annotate_board(board, lambda r: gate.row_digest(stable(r)),
                         allow_unvalidated=allow_unvalidated)
+    attach_display_operation_costs(board, names)
     leaders = {}
     for regime in ("prime", "char2", "koblitz", "koblitz_batch"):
         rows = [r for r in board if r["regime"] == regime]
@@ -1341,6 +1417,9 @@ def build(allow_unvalidated: bool = False) -> dict:
         "validation_gate": {"rule": "AGENTS.md, Validation gate (owner, 2026-10-19)",
                             "schema": gate.SCHEMA, "status_counts": gate.status_counts(board)},
         "families": families(board),
+        "progress": {"source": SOURCES["progress_timeline"], "updated": timeline["updated"],
+                     "series_id": progress["id"], "label": progress["label"],
+                     "points": progress["points"]},
         "leaders": leaders, "board": board, "oracles": oracle_rows(names),
         "bounded_diagnostics": [bounded_diagnostic],
         "jv_sieve_weak_class": jv_sieve_table(),
@@ -1597,21 +1676,35 @@ def hec_text(h: dict) -> dict:
 def markdown(doc: dict) -> str:
     fams = doc["families"]
     L = ["# Index-calculus leaderboard", "",
-         "Generated by `scripts/build_ic_leaderboard.py` from frozen evidence; the page is "
+         "Generated by `scripts/build_ic_leaderboard.py` from the frozen ranked evidence subset; the page is "
          "[`docs/ic-leaderboard.html`](../ic-leaderboard.html).  Curves are named by ICV1 slug "
          "([`docs/curves/ICV1.md`](../curves/ICV1.md)).  No row of tables A–C is below its reference; the GHS-weak section is a special family outside them and is below its matched rho.", "",
          "**There is no single unit on this page.**  The board is three tables, A, B and C.  Each is "
          "priced in its own unit, against its own reference and floor, stated at its head.  `S`, "
          "`× reference` and `× floor` are comparable within a table and nowhere else.  The same slug "
          "can appear in two tables with different `S`, because the unit, the reference and the number "
-         "of targets differ.", ""]
+         "of targets differ. Cold IC / rho is a cost ratio: **1.0× is parity**, greater than 1.0× "
+         "means IC costs more. `2^x` GAE appears only where frozen whole-pipeline counted "
+         "group-addition equivalents exist; a dash is not zero operations.", "",
+         "## Progress over time", "",
+         "The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows the "
+         "cold one-target result points by merge date. Points use different curves and sometimes "
+         "different cost units; they are not a single fixed-workload speed curve. The reference "
+         "quality and unit must travel with each point. Source: "
+         f"[`{doc['progress']['source']}`](../../{doc['progress']['source']}).", "",
+         "| Landed | Result | IC / rho (1.0× parity) | Reference | Unit |",
+         "|:--|:--|--:|:--|:--|"]
+    for point in doc["progress"]["points"]:
+        L.append(f"| {point['date']} | [{point['label']}]({point['source']}) | "
+                 f"{times(point['value'])} | {point['reference']} | {point.get('unit') or 'source-specific; see result'} |")
+    L.append("")
     audit = doc["latest_frontier_audit"]
     cold = audit["cold"]
     admitted = audit["admitted_online"]
     exploratory = audit["exploratory_online"]
     replay = audit["replay_block"]
     rho = audit["rho_optimization"]
-    L += [f"## Latest frontier audit ({audit['date']})", "",
+    L += [f"## Frontier audit and subsequent corrections (implementation result {audit['date']})", "",
           "This performance handoff is published beside the curve-by-curve tables. The standing rho "
           "implementation improved, while its mathematical work and every ranked IC row stayed fixed.", "",
           "| boundary | observed result | leaderboard treatment |",
@@ -1672,17 +1765,29 @@ def markdown(doc: dict) -> str:
               f"- **Floor:** {f['floor']}",
               f"- **Targets:** {f['targets']}",
               f"- **Status:** {f['status']}"]
+        if code == "A":
+            L.append("- **Online reading:** The archived online-only ratios compare IC after its reusable "
+                     "set-up with rho as built in that experiment. They do not establish an equal-advice "
+                     "online advantage. Later retained-setup claims were superseded by "
+                     "equal-advice rho controls; see the frontier audit above. The cold rows remain the "
+                     "ranked comparison.")
         steps = step_line(f)
         if steps:
             L.append(f"- **Rho step:** {steps}")
-        head = (["regime"] if multi else []) + ["curve", "log₂ r", "recipe", "S, IC", "S, reference",
-                                                "× reference", "S, floor", "× floor", "ok", "validation"]
-        align = (([":--"] if multi else []) + [":--", "--:", ":--", "--:", "--:", "--:", "--:", "--:", ":--", ":--"])
+        head = (["regime"] if multi else []) + ["curve", "log₂ r", "recipe", "|F|", "columns",
+                                                "IC operations", "rho operations", "S, IC", "S, reference",
+                                                "IC / rho", "S, floor", "× floor", "ok", "validation"]
+        align = (([":--"] if multi else []) + [":--", "--:", ":--", "--:", "--:", "--:", "--:", "--:",
+                                                 "--:", "--:", "--:", "--:", ":--", ":--"])
         L += ["", "| " + " | ".join(head) + " |", "|" + "|".join(align) + "|"]
         for r in rows:
             b = r["best"]
             cells = ([REGIME_NAME[r["regime"]]] if multi else []) + [
-                f"`{r['slug']}`", f"{r['log2_r']:.1f}", b["label"], g3(b["s"]), g3(r["reference_s"]),
+                f"`{r['slug']}`", f"{r['log2_r']:.1f}", b["label"], str(b["base_points"]),
+                str(b["columns"]),
+                (f"2^{b['log2_total_gae']:.2f} GAE" if "log2_total_gae" in b else "—"),
+                (f"2^{r['reference_log2_total_gae']:.2f} GAE" if "reference_log2_total_gae" in r else "—"),
+                g3(b["s"]), g3(r["reference_s"]),
                 f"**{times(b['ratio_rho'])}**" + (f" (was {times(b['ratio_rho_section23'])}, §23)"
                                                    if "ratio_rho_section23" in b else ""),
                 g3(r["floor_s"]), times(b["ratio_floor"]),
@@ -2264,15 +2369,20 @@ def page(doc: dict, standalone: bool) -> str:
     P.append('<header>'
              '<span class="eyebrow">ECDLP · index calculus · whole pipeline · accounting view, no new measurement</span>'
              '<h1>Index Calculus Leaderboard</h1>'
-             '<p class="verdict">Every curve this repository has priced end to end, with the best index-calculus '
-             'recipe measured on it, against Pollard rho on the same curve and the same point. <strong>The units '
+             '<p class="verdict">Every curve in this ranked frozen evidence subset, with the lowest cold '
+             'one-target index-calculus recipe on it, against Pollard rho on the same curve and point. '
+             'Later studies remain visible in the progress timeline. <strong>The units '
              'differ between the three tables below, and so do the references and the floors: S and the ratios '
-             'are comparable inside a table and nowhere else.</strong> <strong>Cold, set-up included, no row of tables A–C is '
-             'below its reference.</strong> (The GHS-weak section below, a special family outside those tables, is below its matched rho.) On one unseen point of a Koblitz curve (table A) '
-             f'the index calculus\'s online interval is {g3(online_lo)}–{g3(online_hi)}× faster than rho once '
-             'its reusable set-up exists, but the set-up is paid first: cold it is '
-             f'{g3(min(cold))}–{g3(max(cold))}× slower, and a generic walk given the same precomputation would be '
-             f'{g3(min(model))}–{g3(max(model))}× faster online again (a model). Prime and random-binary curves (table B), '
+             'are comparable inside a table and nowhere else.</strong> <strong>Cold, set-up included, no row '
+             'of tables A–C is below its reference.</strong> The GHS-weak section below is a special '
+             'family outside those tables with a different matched-rho result. On one unseen point of a '
+             'Koblitz curve (table A), cold IC is '
+             f'{g3(min(cold))}–{g3(max(cold))}× slower. Its archived {g3(online_lo)}–{g3(online_hi)}× '
+             'online-only ratios compare IC after reusable set-up with rho as built, without an equal-advice '
+             'control. They are phase diagnostics, not an online speedup claim; later '
+             'retained-setup claims were superseded by equal-advice rho controls. The frozen generic-walk '
+             f'model is {g3(min(model))}–{g3(max(model))}× faster online with the same precomputation. '
+             'Prime and random-binary curves (table B), '
              f'one target each: {times(L["prime"]["ratio_rho"])} to {times(L["prime"]["largest"]["ratio_rho"])} and '
              f'{times(L["char2"]["ratio_rho"])} to {times(L["char2"]["largest"]["ratio_rho"])}.</p>'
              '<dl class="facts">')
@@ -2281,8 +2391,9 @@ def page(doc: dict, standalone: bool) -> str:
         return f'<br>× {esc(f["ref_short"])}, in {esc(f["unit_short"])} (table {code})'
 
     P.append(f'<div class="fact"><dt>Koblitz · one point, cold</dt><dd>{times(K1["ratio_rho"])}</dd>'
-             f'<p>at log₂ r = {K1["log2_r"]:.1f}, <span class="slug">{esc(K1["slug"])}</span>; online alone '
-             f'{times(K1["online_speedup"])} faster than rho; largest size {times(K1["largest"]["ratio_rho"])} cold'
+             f'<p>at log₂ r = {K1["log2_r"]:.1f}, <span class="slug">{esc(K1["slug"])}</span>; '
+             f'archived online-only ratio {times(K1["online_speedup"])} against rho as built, without '
+             f'equal-advice control; largest size {times(K1["largest"]["ratio_rho"])} cold'
              f'{unit_ref("A")}</p></div>')
     for g in ("prime", "char2"):
         ld = L[g]
@@ -2293,14 +2404,38 @@ def page(doc: dict, standalone: bool) -> str:
                  f'{unit_ref("B")}</p></div>')
     P.append(f'<div class="fact"><dt>Curves</dt><dd>{len({r["slug"] for r in board})} priced</dd>'
              f'<p>of {len(doc["roster"])} named in the repository; every one by its ICV1 slug</p></div></dl></header>')
+    P.append(f'<section class="panel" id="lookup"><h2>Find a curve, base, and rho gap</h2>'
+             '<p><a href="#board">Browse the ranked curve tables</a> or '
+             f'<a href="{site}browser/#curves">search every registered curve</a>. Each ranked row names '
+             'the lowest cold one-target recipe in this ranked subset, its factor-base size and source, and its '
+             '<strong>IC / matched rho cost ratio</strong>. <strong>1.0× is parity</strong>; above 1.0× '
+             'means IC costs more. Counted total work appears as 2<sup>x</sup> GAE for the prime and '
+             'random-binary ladder. Koblitz rows have a different timing unit; their counted operation '
+             'total is unavailable, so the operation cells are blank. Historical 32-target batch rows '
+             'remain diagnostics.</p></section>')
+    P.append('<section class="panel" id="progress"><h2>Progress over time</h2>'
+             f'<p>The <a href="{site}scoreboard/#lab-progress">full progress chart</a> uses the '
+             'canonical merge-date timeline. These cold one-target points span different curves and '
+             'cost units; read the reference quality and source before treating a move as progress. '
+             f'Frozen data: {gh(doc["progress"]["source"], "progress-timeline.json")} '
+             f'(updated {esc(doc["progress"]["updated"])}). The horizontal boundary is IC / rho = 1.0×.</p>'
+             '<div class="scroll"><table><thead><tr><th>Landed</th><th>Result</th>'
+             '<th class="n">IC / rho</th><th>Reference</th><th>Unit / status</th></tr></thead><tbody>')
+    for point in doc["progress"]["points"]:
+        P.append(f'<tr><td>{esc(point["date"])}</td>'
+                 f'<td><a href="{esc(point["source"])}">{esc(point["label"])}</a></td>'
+                 f'<td class="n"><span class="ratio">{times(point["value"])}</span></td>'
+                 f'<td>{esc(point["reference"])}</td>'
+                 f'<td>{esc(point.get("unit") or "source-specific; see result")}</td></tr>')
+    P.append('</tbody></table></div></section>')
     audit = doc["latest_frontier_audit"]
     acold = audit["cold"]
     admitted = audit["admitted_online"]
     exploratory = audit["exploratory_online"]
     replay = audit["replay_block"]
     rho = audit["rho_optimization"]
-    P.append(f'<section class="panel" id="frontier-audit"><h2>Latest frontier audit · '
-             f'{esc(audit["date"])} <span class="chip">implementation</span></h2>'
+    P.append(f'<section class="panel" id="frontier-audit"><h2>Frontier audit and subsequent corrections · '
+             f'implementation result {esc(audit["date"])} <span class="chip">accounting</span></h2>'
              '<p>The standing rho implementation improved while its mathematical work and every ranked IC '
              'row stayed fixed. Cold, retained-setup online, exploratory and failed-replay evidence remain separate.</p>'
              '<div class="scroll"><table><thead><tr><th>Boundary</th><th>Observed result</th>'
@@ -2588,9 +2723,10 @@ def page(doc: dict, standalone: bool) -> str:
 
     head_cells = ('<th class="n">#</th><th>curve</th><th class="n">log₂ r</th><th>recipe</th>'
                   '<th class="n">m</th><th class="n">|F|</th><th class="n">K</th><th class="n">S, IC</th>'
-                  '<th class="n">S, ref</th><th class="n">× ref</th><th class="n">S, floor</th>'
+                  '<th class="n">IC ops</th><th class="n">rho ops</th>'
+                  '<th class="n">S, ref</th><th class="n">IC / rho</th><th class="n">S, floor</th>'
                   '<th class="n">× floor</th><th>phases</th><th>ok</th><th>validation</th>')
-    ncols = 15
+    ncols = 17
 
     def board_rows(g: str) -> None:
         for i, r in enumerate(by_regime[g], 1):
@@ -2598,8 +2734,10 @@ def page(doc: dict, standalone: bool) -> str:
             ci = (f'<br><span class="muted">[{g3(b["ratio_rho_ci"][0])}, {g3(b["ratio_rho_ci"][1])}]</span>'
                   if "ratio_rho_ci" in b else "")
             if "online_speedup" in b:
-                ci += (f'<br><span class="muted">online {g3(b["online_speedup"])}× faster '
+                ci += (f'<br><span class="muted">archived online-only rho/IC '
+                       f'{g3(b["online_speedup"])}× '
                        f'[{g3(b["online_speedup_ci"][0])}, {g3(b["online_speedup_ci"][1])}]; '
+                       'rho as built, without equal-advice control; '
                        f'{g3(b["online_speedup_canonical_step"])}× at the canonical step</span>'
                        f'<br><span class="muted">model: {g3(b["ic_online_over_precomputation_model"])}× slower online '
                        f'than a generic walk with the same set-up; break-even {g3(b["break_even_targets"])} targets</span>')
@@ -2608,7 +2746,7 @@ def page(doc: dict, standalone: bool) -> str:
                            f'without it {times(b["cold_ratio_without_curve_construction"])}</span>')
             if "ratio_rho_section23" in b:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section23"])} cold, '
-                       f'{g3(b["online_speedup_section23"])}× faster online (§23, at v0)</span>')
+                       f'{g3(b["online_speedup_section23"])}× online-only ratio (§23, at v0)</span>')
             if "ratio_rho_section21" in b:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section21"])} (§21)</span>'
                        f'<br><span class="muted">derived one-target cold estimate: {times(b["one_target_cold_ratio_section20"])} '
@@ -2618,6 +2756,8 @@ def page(doc: dict, standalone: bool) -> str:
                      f'<td><span class="slug">{esc(r["slug"])}</span>{record_cell(r)}</td><td class="n">{r["log2_r"]:.1f}</td>'
                      f'<td class="recipe">{esc(b["label"])}</td><td class="n">{b["m"]}</td><td class="n">{b["base_points"]:,}</td>'
                      f'<td class="n">{b["columns"]:,}</td><td class="n">{g3(b["s"])}</td>'
+                     f'<td class="n">{("2<sup>" + format(b["log2_total_gae"], ".2f") + "</sup> GAE") if "log2_total_gae" in b else "—"}</td>'
+                     f'<td class="n">{("2<sup>" + format(r["reference_log2_total_gae"], ".2f") + "</sup> GAE") if "reference_log2_total_gae" in r else "—"}</td>'
                      f'<td class="n">{g3(r["reference_s"])}</td><td class="n"><span class="ratio">{times(b["ratio_rho"])}</span>{ci}</td>'
                      f'<td class="n">{g3(r["floor_s"])}</td><td class="n">{times(b["ratio_floor"])}</td><td>{phase_bar(b["phases_s"], b["s"])}</td>'
                      f'<td>{"✓" if b["verified"] else "✗"}</td>'
@@ -2628,7 +2768,19 @@ def page(doc: dict, standalone: bool) -> str:
         f = doc["families"][code]
         defs = [("Unit", f"{f['unit']}. {f['unit_how']}"), ("Reference", f["reference"]),
                 ("Floor", f["floor"]), ("Targets", f["targets"]), ("Status", f["status"])]
+        if code == "A":
+            defs.append(("Absolute operations", "Unavailable in these frozen timing rows; the cold "
+                         "IC/rho ratio uses each matched timing reference. A dash means no counted "
+                         "whole-pipeline operation total, not zero."))
+            defs.append(("Online reading", "The archived online-only ratios compare IC after its reusable "
+                         "set-up with rho as built in that experiment. They do not establish an equal-advice "
+                         "online advantage. Later retained-setup claims were superseded by equal-advice "
+                         "rho controls; see the frontier audit. The cold rows remain the ranked comparison."))
         steps = step_line(f)
+        if code == "B":
+            defs.append(("Absolute operations", "2^x GAE is log2 of the frozen mean total counted "
+                         "group-addition equivalents for IC and matched rho, including setup. "
+                         "These values are not wall-clock exponents."))
         if steps:
             defs.append(("Rho step", steps))
         return ('<dl class="defs">' + "".join(
@@ -2655,8 +2807,9 @@ def page(doc: dict, standalone: bool) -> str:
              'A on one unseen public point per process against one-target rho on the same point (§23\'s comparison, '
              're-run at the ic tool programme\'s baseline v7, 64 points per size, §23\'s figures kept as the '
              'before marks), B against the matched negation-map rho (ledger §18). Table C is a historical 32-target '
-             'diagnostic. For the Koblitz rows of A the online interval, the reading with rho at the canonical '
-             'step and the generic-precomputation model sit beside the cold ratio, as §23 requires. The bar '
+             'diagnostic. For the Koblitz rows of A the archived online-only ratio, the reading with rho at the canonical '
+             'step and the generic-precomputation model sit beside the cold ratio as phase diagnostics; '
+             'there is no equal-advice online speedup claim. The bar '
              'splits S into phases. A walked-target row on the ladder is resolved to about a factor 1.8 either '
              'way at three repetitions (ledger §13.7).</p>'
              f'<div class="scroll">{ratio_chart(board)}</div>'
@@ -3080,6 +3233,11 @@ def main() -> int:
                  if not p.exists() or p.read_text() != t]
         for s in stale:
             print(f"{s} is stale; run scripts/build_ic_leaderboard.py", file=sys.stderr)
+            actual = (REPO / s).read_text().splitlines() if (REPO / s).exists() else []
+            expected = outs[REPO / s].splitlines()
+            for line in islice(difflib.unified_diff(actual, expected, fromfile=f"{s} (committed)",
+                                                   tofile=f"{s} (generated)", n=1), 24):
+                print(line, file=sys.stderr)
         return 1 if stale else 0
     for p, t in outs.items():
         p.write_text(t)
