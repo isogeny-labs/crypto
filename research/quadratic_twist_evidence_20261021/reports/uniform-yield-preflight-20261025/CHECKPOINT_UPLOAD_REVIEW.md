@@ -48,3 +48,7 @@ After authorization/access, use the exact unmodified gate. Do not fabricate a
 `.resume/.last-push`, use a skip flag, weaken the rule or count local staging as
 a successful S3 checkpoint. The uniform experiment remains unexecuted until
 that gate succeeds and its independent audit/proof implementation is ready.
+
+## Concrete initial preview
+
+[Manifest](checkpoint-preview/MANIFEST.json) and [archive](checkpoint-preview/checkpoint.tar.gz) are a **local preview only**, bound to published parent88e6846d4cae5e68840f579d2c02a8be7381297d. Four proposed objects total10,789bytes. There is no unpushed bundle, patch or untracked payload. Metadata is restamped for the actual authorized head/time; no object has been uploaded and this preview does not satisfy the gate. The approval proposal is branch-scoped checkpoint writes, not permission inferred from a matching hash.
