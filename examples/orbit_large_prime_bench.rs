@@ -148,7 +148,7 @@ fn cell(args: &[String]) -> Result<(), String> {
     // arms can be shown to have seen the same relation stream.
     let options = SolveOptions {
         stream_digest: graph.uses_filter(),
-        trajectory: (!cutoffs.is_empty()).then(|| TrajectoryRequest { cutoffs }),
+        trajectory: (!cutoffs.is_empty()).then_some(TrajectoryRequest { cutoffs }),
         ..Default::default()
     };
     let report = solve_with_options(&inst, target, config, options)?;
