@@ -2102,6 +2102,7 @@ fn solve_large_prime(
         max_trials: param_u64(m, "max_trials")?,
         max_states: param_u64(m, "max_states")?,
         seed,
+        large_prime_graph: Default::default(),
     };
     // The method returns an algebraic candidate; ecbench's runner verifies it.
     let report = large_prime::solve_candidate(inst, target, config)?;
