@@ -25,9 +25,10 @@ standardized curve, a sub-rho claim, or a key-recovery result.
    with 3-isogenies added. Passing is not constant on components: of the
    components with at least 2 weak curves, 38–75% are mixed at each `p`. So the
    walk is **not killed by invariance**, and E2 holds (`D_E` < `C_2` < 1).
-3. **Q2: the sampled walk costs `Θ(p)`, not `o(p)`.** The frozen fit outputs
-   the label `o(p)` for arm A: cost exponent −0.14, 95% interval [−0.80, 0.95].
-   **We do not take that label as evidence.** It comes from the frozen
+3. **Q2, frozen verdict: `o(p)`; a labelled post hoc analysis disputes it and
+   indicates `Θ~(p)`.** The frozen fit outputs the label `o(p)` for arm A: cost
+   exponent −0.14, 95% interval [−0.80, 0.95]. That is the registered result.
+   **We do not take that label as evidence** of a sub-linear walk. It comes from the frozen
    estimator `(total steps)/(successes)`. In that estimator, right-censored
    walks add amounts set by the caps, and those dominate at the small primes
    and flatten the slope. In a post hoc analysis of successful walks at
