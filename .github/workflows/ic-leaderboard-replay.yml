@@ -1,0 +1,38 @@
+name: ic-leaderboard-replay
+
+# Daily replay of every session the IC leaderboard cites, against docs/ic/validation/replay-plan.json
+# (docs/VALIDATION_GATE.md, "Keeping the board rigorous and current").  Unlike audit-runs-daily, which draws a
+# nonce sample of all sessions, this lane is the fixed list the board depends on, and it compares each outcome
+# with what the plan says: new drift, healed drift and a cited session missing from the plan all fail.  A hosted
+# runner is a shared VM; the replay checks counts and answers, never wall time.
+
+on:
+  schedule:
+    - cron: '23 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ic-leaderboard-replay-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release --bin ecbench
+      - name: The plan covers every complete session the board cites
+        run: bash scripts/ic_audit/check_plan_coverage.sh
+      - name: Replay the plan
+        run: bash scripts/ic_audit/replay_plan.sh ./target/release/ecbench "$RUNNER_TEMP/ic-replay"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ic-leaderboard-replay-receipts
+          path: ${{ runner.temp }}/ic-replay

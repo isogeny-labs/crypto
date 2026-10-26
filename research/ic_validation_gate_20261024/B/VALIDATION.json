@@ -1,0 +1,59 @@
+{
+ "schema": "validation-gate/v1",
+ "rows": [
+  "icv1-fp10-t5-192cb216",
+  "icv1-fp12-t19-d4a315df",
+  "icv1-fp14-tm43-158b6914",
+  "icv1-fp16-t351-d433f24e",
+  "icv1-fp18-t175-45770ebc",
+  "icv1-fp20-t1293-3c2999ba",
+  "icv1-fp22-tm1267-a5acaf6d",
+  "icv1-fp24-t1577-77336155",
+  "icv1-f2m15-t131-ed7256f0",
+  "icv1-f2m18-t393-d2c04152",
+  "icv1-f2m21-t2591-de54d72e",
+  "icv1-f2m24-tm3047-2d0c0e8c",
+  "icv1-f2m27-t12543-569dca8b"
+ ],
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "e40c9e79cf6d40cc783d60a20e9d74b064abf0385e67a63bcd2e7f29434f21f8"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "45bceb094fb74ffa51f474b1fa6e4471d9be383dbc0eb6ffda6a8b14d3296c6d"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "Matched Pollard rho on the same instance, one target: the negation-map r-adding walk (A = 2), counted in GAE, verified [d]G = Q (ledger section 18; leaderboard Table B 'Reference'). Negation is the only automorphism of prime-field and random-binary curves (re-pricing record 'exclusions': negation only).",
+  "unit": "group-addition equivalents (GAE) per sqrt(r)",
+  "binary_or_process": "current `ic boundary` run, one process per regime, writes the IC variants, the frozen plain walk and the matched negation walk into one ledger (replay binary blake3 98e06480a3d765992ae68a38dc8eca66fe23c8d7b040acfb47f48ec0e7b5df36). The archive recorded IC in binary ae6dd73f... and the matched rho by a later `ic rho --reprice` in another binary; the replay reproduces both exactly, and the unit is a count, so the binary identity does not enter the number.",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 15.153495939467295,
+    "rho": 2.854977431628913
+   },
+   "0.1": {
+    "ic": 15.805604053969944,
+    "rho": 3.0347748636091008
+   },
+   "1": {
+    "ic": 21.674577084493787,
+    "rho": 4.652951751430787
+   }
+  },
+  "gae_band_basis": "for each weight, the passing row with the smallest IC/rho ratio (its S_IC(w) and S_rho(w), GAE per sqrt r); all 13 rows are in rho-reference.json",
+  "gae_band_rows": "rho-reference.json",
+  "order_holds_across_band": true,
+  "band_formula": "S(w) = mean over runs of [G - C + w (U + n_C)] / sqrt r : G total GAE, C and n_C the GAE and count of calibration-priced native counters, U the arm's unpriced counts (rho: canonicalisations_uncharged). Conservative extension also charges IC pair-table inserts and rho one table operation per walk step.",
+  "smallest_ratio_in_extended_band": 4.053910644168524,
+  "caveats": [
+   "recipe = minimum over 9 recipes on the same 3 planted targets (selection in IC's favour; the gap to rho is the distance remaining)",
+   "one planted target per instance, 3 repetitions; 24 rho runs per instance"
+  ]
+ }
+}

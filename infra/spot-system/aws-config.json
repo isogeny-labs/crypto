@@ -5,7 +5,7 @@
     "WorkRoot": "/srv/experiments/spot-worker",
     "NodeProject": "/srv/experiments/spot-worker/work",
     "LifecycleEnabled": "true",
-    "Cutover": "false",
+    "Cutover": "true",
     "PreserveHostKeys": "false",
     "IdleSeconds": "1800"
   },
@@ -16,5 +16,5 @@
     "minimum_vcpus_during_migration": 64,
     "vcpus_for_legacy_plus_rebalance_overlap": 96
   },
-  "phase": "compute-enabled-protected-original"
+  "phase": "automatic-failover-armed-source-protected"
 }

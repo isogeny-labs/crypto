@@ -1,0 +1,19 @@
+card_id: CARD-chart-complements-20261019-1
+relay_verbatim: true
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+- 'CARD-chart-complements-20261019-1.receipt.json records the one exact argv at pinned commit 6811c867f8b86aa3880d48aa8ddaa5f37efed89c:
+  one native attempt, exit 0, no timeout.'
+- assess-recorded-receipt.stdout confirms all 70 input bindings, card hash, declared census output hash, stdout/stderr
+  hashes, command sequence and observed dirty paths within the specified write scope.
+- Canonical CLI check-relay failed after execution because its lint treats the now-existing output argv as an unbound
+  input; exact command, exit 1 and output are retained in check-relay-cli.json. The canonical tool, card and census
+  were not edited.
+- The unchanged canonical check_relay function returned relay_verbatim true, no missing lines and no verify findings;
+  exact fallback command/source/output are retained in assessment-commands.txt, assess-recorded-receipt.py and assess-recorded-receipt.stdout.
+- Parent reports an initial process-launch failure before command, receipt or output creation and a repository-root
+  clarification. This was outside the native run; the actual receipt records one native attempt. Parent retains
+  the refusal and clarification separately.
+interpretation: not_assessed

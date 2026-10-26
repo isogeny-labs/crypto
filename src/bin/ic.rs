@@ -15,6 +15,8 @@ mod fixed;
 mod large_prime;
 #[path = "ic/params.rs"]
 mod params;
+#[path = "ic/plan.rs"]
+mod plan;
 #[path = "ic/price.rs"]
 mod price;
 #[path = "ic/prime.rs"]
@@ -23,6 +25,8 @@ mod prime;
 mod progress;
 #[path = "ic/rho.rs"]
 mod rho;
+#[path = "ic/sweep/mod.rs"]
+mod sweep;
 #[path = "ic/workflow.rs"]
 mod workflow;
 
@@ -91,6 +95,8 @@ enum Action {
     Corpus(corpus::CorpusArgs),
     /// Measure the degree a Weil-descent system actually reaches, against the degree a semi-regular system of the same shape would, with the operation count, wall time and peak footprint beside it.
     Descent(descent::DescentArgs),
+    /// The configuration the measured evidence says to run on a curve: every pipeline stage with its rule, reason and sources, and the expected gap to the matched rho.
+    Plan(plan::PlanArgs),
     /// Run index-calculus configurations end to end and compare them: plug a factor base, a target source, a decomposition oracle, a polynomial solver and a relation matrix together, and see every stage's cost in one unit.
     Bench(bench::BenchArgs),
     /// Price every decomposition oracle on R and on R − P + Q pairwise: does a solver charge the same for a swapped target?
@@ -105,6 +111,15 @@ enum Action {
     /// Measure the exact pair-sum yield of a small-x factor base on a
     /// prime-field curve (NIST P-192, or toy primes where hits are common).
     Prime(prime::PrimeArgs),
+    /// Search index-calculus configurations with an Optuna-style sweeper: a
+    /// typed conditional space, a TPE sampler, median pruning over a ladder
+    /// of sizes, and an append-only resumable store.  The objective is the
+    /// §5a-banded S against a frozen baseline, projected to the target size.
+    Sweep(sweep::SweepArgs),
+    /// Run one pipeline configuration and print one scored, classified
+    /// record: the unit `ic sweep` optimises over.  The score is a function
+    /// of operation counts alone.
+    SweepTrial(sweep::trial::TrialArgs),
 }
 #[derive(Args)]
 #[group(required = true, multiple = false)]
@@ -153,12 +168,15 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Boundary(args)) => boundary::run(args.clone(), cli.json),
         Some(Action::Corpus(args)) => corpus::run(args.clone()),
         Some(Action::Descent(args)) => descent::run(args.clone(), cli.json),
+        Some(Action::Plan(args)) => plan::run(args.clone(), cli.json),
         Some(Action::Bench(args)) => bench::run(args.clone(), cli.json),
         Some(Action::Swap(args)) => boundary::swap(args.clone(), cli.json),
         Some(Action::Rho(args)) => rho::run(args.clone(), cli.json),
         Some(Action::Price(args)) => price::run(args.clone(), cli.json),
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
         Some(Action::Prime(args)) => prime::run(args.clone()),
+        Some(Action::Sweep(args)) => sweep::run_sweep(args.clone(), cli.json),
+        Some(Action::SweepTrial(args)) => sweep::trial::run(args.clone()),
         Some(Action::Run(args)) => experiment::run(args.clone(), cli.json),
         None => {
             if let Some(name) = &cli.profile {
@@ -238,6 +256,7 @@ fn linear_algebra_summary(la: &Value) -> String {
 
 fn display(report: &Value) {
     match report["operation"].as_str() {
+        Some("plan") => plan::display(report),
         Some("inspect") => {
             println!(
                 "Curve: {}\nInspection: {}",

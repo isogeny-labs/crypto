@@ -110,6 +110,7 @@ impl Fq {
         self.mul(a, a)
     }
     pub fn conj(&self, a: &E2) -> E2 {
+        super::jv_bitops::hook_adds(self.p, 1);
         E2([a.0[0], (self.p - a.0[1]) % self.p])
     }
     pub fn pow(&self, a: &E2, mut e: u128) -> E2 {
@@ -131,6 +132,7 @@ impl Fq {
         *a == E2::ZERO || self.pow(a, self.order() / 2) == E2::ONE
     }
     pub fn random(&self, rng: &mut StdRng) -> E2 {
+        super::jv_bitops::rng_words(2);
         E2([rng.gen_range(0..self.p), rng.gen_range(0..self.p)])
     }
     /// Tonelli–Shanks in `F_{p²}^×`.
@@ -189,6 +191,7 @@ impl Fld for Fq {
         E2([sm(a.0[0], b.0[0], self.p), sm(a.0[1], b.0[1], self.p)])
     }
     fn neg(&self, a: &E2) -> E2 {
+        super::jv_bitops::hook_adds(self.p, 2);
         E2([(self.p - a.0[0]) % self.p, (self.p - a.0[1]) % self.p])
     }
     fn mul(&self, a: &E2, b: &E2) -> E2 {
@@ -211,6 +214,7 @@ impl Fld for Fq {
             p,
         );
         let ni = inv_mod(norm, p);
+        super::jv_bitops::hook_adds(p, 1);
         E2([mm(a.0[0], ni, p), mm((p - a.0[1]) % p, ni, p)])
     }
 }
@@ -1308,6 +1312,12 @@ pub struct ZeroDimStats {
     pub lin_ms: f64,
     /// F4 stopped early at this staircase (`F4Options::stop_staircase`).
     pub stopped_at: Option<usize>,
+    /// The Hilbert rule ran (`F4Options::stopping_by_hilbert`), or its
+    /// certificate failed and the plain run was done (a fallback).
+    pub hilbert_applied: bool,
+    pub hilbert_fallback: bool,
+    /// Multiplications of the regularity check (inside `f4_muls`).
+    pub hilbert_check_muls: u64,
     /// F4 replayed a recorded trace (the useful rows of an earlier system
     /// of the same shape) instead of selecting pairs.
     pub replayed: bool,
@@ -1331,6 +1341,27 @@ pub struct TraceEntry {
 fn trace_cache() -> &'static Mutex<HashMap<u64, TraceEntry>> {
     static CACHE: OnceLock<Mutex<HashMap<u64, TraceEntry>>> = OnceLock::new();
     CACHE.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+thread_local! {
+    static TRACE_SCOPE: Cell<u64> = const { Cell::new(0) };
+}
+
+/// Key traces recorded and replayed on this thread by `scope` as well as
+/// `p` (`0`, the default, is the process-wide cache keyed by `p` alone).  A
+/// study that runs each instance on its own thread gives each run its own
+/// scope, so every run starts with no recorded trace (cold) and runs side by
+/// side do not share one.
+pub fn set_trace_scope(scope: u64) {
+    TRACE_SCOPE.with(|c| c.set(scope));
+}
+
+fn trace_key(p: u64) -> u64 {
+    p.wrapping_add(
+        TRACE_SCOPE
+            .with(Cell::get)
+            .wrapping_mul(0x9E37_79B9_7F4A_7C15),
+    )
 }
 
 /// Forget the recorded traces (tests).
@@ -1377,25 +1408,26 @@ pub fn solve_zero_dim_mode(
     mode: LinMode,
 ) -> (Vec<Vec<u64>>, ZeroDimStats) {
     let mut st = ZeroDimStats::default();
+    let key = trace_key(p);
     let r = if !trace {
         f4_fp::f4(input, n, p, opts)
     } else {
         let have = trace_cache()
             .lock()
             .unwrap()
-            .get(&p)
+            .get(&key)
             .map(|e| e.trace.clone());
         match have {
             Some(t) => {
                 // a diverging replay finishes as a full run inside the engine
                 let r = f4_fp::f4_replay(input, n, p, opts, &t);
                 let mut cache = trace_cache().lock().unwrap();
-                if let Some(e) = cache.get_mut(&p) {
+                if let Some(e) = cache.get_mut(&key) {
                     if Arc::ptr_eq(&e.trace, &t) {
                         if r.trace_mismatch {
                             e.diverged += 1;
                             if e.diverged >= 3 && e.diverged > e.held {
-                                cache.remove(&p);
+                                cache.remove(&key);
                             }
                         } else {
                             e.held += 1;
@@ -1415,7 +1447,7 @@ pub fn solve_zero_dim_mode(
                     trace_cache()
                         .lock()
                         .unwrap()
-                        .entry(p)
+                        .entry(key)
                         .or_insert_with(|| TraceEntry {
                             trace: Arc::new(t),
                             held: 0,
@@ -1434,6 +1466,12 @@ pub fn solve_zero_dim_mode(
     st.max_cols = r.max_cols;
     st.f4_ms = r.ms;
     st.stopped_at = r.staircase_at_stop;
+    st.hilbert_applied = r.hilbert == f4_fp::HilbertStop::Applied;
+    st.hilbert_fallback = matches!(
+        r.hilbert,
+        f4_fp::HilbertStop::CheckFailed | f4_fp::HilbertStop::Violated
+    );
+    st.hilbert_check_muls = r.hilbert_check_ops;
     if r.timed_out {
         st.timed_out = true;
         return (Vec::new(), st);
@@ -1744,6 +1782,7 @@ pub fn solve_zero_dim_mode(
                 z[free] = 1;
                 for (ri, &pc) in piv.iter().enumerate() {
                     z[pc] = (p - a[ri][free]) % p;
+                    super::jv_bitops::hook_adds(p, 1);
                 }
                 let w1 = z[chain_of[one_idx]];
                 if w1 == 0 {
@@ -1828,6 +1867,7 @@ pub fn solve_zero_dim_mode(
                 w[free] = 1;
                 for (ri, &pc) in piv.iter().enumerate() {
                     w[pc] = (p - a[ri][free]) % p;
+                    super::jv_bitops::hook_adds(p, 1);
                 }
                 let Some(kk) = w.iter().position(|&x| x != 0) else {
                     continue;
@@ -2203,6 +2243,9 @@ pub fn verify_dec(jac: &Hyp<Fq>, base: &[BaseEl], r: &Div<E2>, d: &Dec6) -> bool
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct NagaoCost {
+    pub hilbert_applied: bool,
+    pub hilbert_fallback: bool,
+    pub hilbert_check_muls: u64,
     pub weil_muls: u64,
     pub f4_muls: u64,
     pub lin_muls: u64,
@@ -2254,6 +2297,25 @@ pub fn jv_options_stopped(max_degree: u32, budget_secs: f64, staircase: usize) -
     jv_options(max_degree, budget_secs).stopping_below(staircase)
 }
 
+/// How a Nagao system's F4 may stop early.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum StopMode {
+    /// Run to the certified basis.
+    Full,
+    /// At this many standard monomials (`F4Options::stop_staircase`).
+    Staircase(usize),
+    /// The Hilbert rule with this many pairs per step (`F4Options::stopping_by_hilbert`).
+    Hilbert(usize),
+}
+
+pub fn opts_for_mode(max_degree: u32, budget_secs: f64, mode: StopMode) -> F4Options {
+    match mode {
+        StopMode::Full => jv_options(max_degree, budget_secs),
+        StopMode::Staircase(k) => jv_options_stopped(max_degree, budget_secs, k),
+        StopMode::Hilbert(c) => jv_options(max_degree, budget_secs).stopping_by_hilbert(c),
+    }
+}
+
 pub(crate) fn opts_for(max_degree: u32, budget_secs: f64, stop: Option<usize>) -> F4Options {
     match stop {
         Some(k) => jv_options_stopped(max_degree, budget_secs, k),
@@ -2301,6 +2363,9 @@ pub fn nagao_decompose(
     cost.nonseparating = st.nonseparating;
     cost.lin_fallback = st.lin_fallback;
     cost.stopped_at = st.stopped_at;
+    cost.hilbert_applied = st.hilbert_applied;
+    cost.hilbert_fallback = st.hilbert_fallback;
+    cost.hilbert_check_muls = st.hilbert_check_muls;
     cost.replayed = st.replayed;
     cost.trace_mismatch = st.trace_mismatch;
     cost.fp_solutions = sols.len();
@@ -2353,6 +2418,7 @@ pub fn nagao_decompose(
         let mut options: Vec<(usize, Vec<i8>)> = Vec::with_capacity(6);
         for &x in &roots {
             let xe = f.from_fp(x);
+            super::jv_bitops::probe(1);
             let Some(&i) = by_x.get(&x) else {
                 continue 'sol;
             };
@@ -2753,6 +2819,10 @@ pub struct CcovReport {
     pub c_add_j: f64,
     pub max_degree: u32,
     pub budget_secs: f64,
+    /// Hilbert rule (`StopMode::Hilbert`): systems it ran on, and systems whose
+    /// leading forms were not certified regular (plain run, counted in full).
+    pub hilbert_applied: usize,
+    pub hilbert_fallbacks: usize,
     /// F4 stopped at this staircase, or run to a certified basis.
     pub stop_staircase: Option<usize>,
     pub stopped: usize,
@@ -2791,7 +2861,7 @@ pub struct CcovReport {
 }
 
 /// A random six-sum and the decomposition it plants.
-fn planted(jac: &Hyp<Fq>, base: &[BaseEl], rng: &mut StdRng) -> (Div<E2>, Dec6) {
+pub(crate) fn planted(jac: &Hyp<Fq>, base: &[BaseEl], rng: &mut StdRng) -> (Div<E2>, Dec6) {
     let mut idx: Vec<usize> = Vec::new();
     while idx.len() < 6 {
         let i = rng.gen_range(0..base.len());
@@ -2832,6 +2902,37 @@ pub fn run_cover_ccov(
     stop: Option<usize>,
     trace: bool,
 ) -> CcovReport {
+    let mode = stop.map_or(StopMode::Full, StopMode::Staircase);
+    run_cover_ccov_mode(
+        p,
+        seed,
+        random,
+        constructed,
+        max_degree,
+        budget_secs,
+        oracle_up_to_base,
+        mode,
+        trace,
+    )
+}
+
+/// [`run_cover_ccov`] with any [`StopMode`].
+#[allow(clippy::too_many_arguments)]
+pub fn run_cover_ccov_mode(
+    p: u64,
+    seed: u64,
+    random: usize,
+    constructed: usize,
+    max_degree: u32,
+    budget_secs: f64,
+    oracle_up_to_base: usize,
+    mode: StopMode,
+    trace: bool,
+) -> CcovReport {
+    let stop = match mode {
+        StopMode::Staircase(k) => Some(k),
+        _ => None,
+    };
     let start = Instant::now();
     let spec = generate_spec(p, seed);
     let ctx = Ctx::with_trace(&spec, trace);
@@ -2879,7 +2980,7 @@ pub fn run_cover_ccov(
         .map(|(k, (r, want))| {
             let mut lrng =
                 StdRng::seed_from_u64(seed ^ (k as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
-            let opts = opts_for(max_degree, budget_secs, stop);
+            let opts = opts_for_mode(max_degree, budget_secs, mode);
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, r, &opts, &mut lrng);
             let verified = found.iter().all(|d| verify_dec(&jac, &base, r, d));
             let planted_ok = want.as_ref().map(|w| found.contains(w));
@@ -2913,6 +3014,12 @@ pub fn run_cover_ccov(
         rep.lin_fallback += cost.lin_fallback;
         if cost.stopped_at.is_some() {
             rep.stopped += 1;
+        }
+        if cost.hilbert_applied {
+            rep.hilbert_applied += 1;
+        }
+        if cost.hilbert_fallback {
+            rep.hilbert_fallbacks += 1;
         }
         if cost.replayed {
             rep.replayed += 1;
@@ -3078,6 +3185,10 @@ pub fn run_cover_dlp(
     let mut next_attempt = unknowns;
     let mut la_ops = 0u64;
     let cap = 400 * (unknowns as u64) * 720;
+    // Opt-in, read-only: JV_LP_LOG=1 prints one `LPLOG {json}` line per decomposition
+    // (its six factor-base indices and abscissae).  Used by the large-prime
+    // feasibility study; nothing below depends on it.
+    let lp_log = std::env::var("JV_LP_LOG").is_ok();
     'collect: while rep.residuals < cap {
         let mut batch: Vec<(u64, u64, Div<E2>, u64)> = Vec::with_capacity(64);
         for _ in 0..64 {
@@ -3152,6 +3263,17 @@ pub fn run_cover_dlp(
             for d in decs {
                 any = true;
                 rep.decompositions += 1;
+                if lp_log {
+                    eprintln!(
+                        "LPLOG {{\"p\":{},\"seed\":{},\"residual\":{},\"base\":{},\"idx\":{:?},\"x\":{:?}}}",
+                        p,
+                        seed,
+                        rep.residuals,
+                        small,
+                        d.terms.iter().map(|t| t.0).collect::<Vec<_>>(),
+                        d.terms.iter().map(|t| base[t.0].x).collect::<Vec<_>>()
+                    );
+                }
                 let mut cols: Vec<(usize, u64)> = d
                     .terms
                     .iter()
@@ -3253,6 +3375,153 @@ pub fn run_cover_dlp(
         360.0 * p as f64 * rep.c_cov / (rep.rho_s_mean * sqrt_l * c_e) + rep.r;
     rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
     rep
+}
+
+// ── EXPERIMENT: early-stop study (research/f4_early_stop_20261018) ─────────
+
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct StudyMode {
+    pub name: String,
+    pub f4_muls: u64,
+    pub same_found: bool,
+    pub same_fp_solutions: bool,
+    pub stopped: bool,
+    pub hilbert_applied: bool,
+    pub hilbert_fallback: bool,
+    pub check_muls: u64,
+    pub dropped_pairs: usize,
+    /// matrix rows built over all steps (pairs plus reducers)
+    pub all_rows: usize,
+    /// (degree, pairs, pair rows, ops, new polys, staircase after)
+    pub steps: Vec<(u32, usize, usize, u64, usize, usize)>,
+}
+
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct StudySystem {
+    pub k: usize,
+    pub planted: bool,
+    pub top_hash: u64,
+    pub top_muls: u64,
+    pub top_staircase: Option<usize>,
+    pub modes: Vec<StudyMode>,
+}
+
+pub fn run_stop_study(
+    p: u64,
+    seed: u64,
+    random: usize,
+    constructed: usize,
+    chunks: &[usize],
+) -> Vec<StudySystem> {
+    use std::hash::{Hash, Hasher};
+    let spec = generate_spec(p, seed);
+    let ctx = Ctx::new(&spec);
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xC0C0);
+    let base = factor_base(&ctx, &mut rng);
+    let by_x: HashMap<u64, usize> = base.iter().enumerate().map(|(i, b)| (b.x, i)).collect();
+    let jac = ctx.jac();
+    let mut jobs: Vec<(Div<E2>, bool)> = Vec::new();
+    for _ in 0..random {
+        let a = rng.gen_range(0..spec.l);
+        let b = rng.gen_range(1..spec.l);
+        jobs.push((
+            jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128)),
+            false,
+        ));
+    }
+    for _ in 0..constructed {
+        jobs.push((planted(&jac, &base, &mut rng).0, true));
+    }
+    let mut modes: Vec<(String, F4Options)> = Vec::new();
+    modes.push(("full".into(), jv_options(24, 300.0)));
+    modes.push(("stop64".into(), jv_options_stopped(24, 300.0, 64)));
+    for &c in chunks {
+        let mut o = jv_options_stopped(24, 300.0, 64);
+        o.max_pairs_per_step = Some(c);
+        modes.push((format!("stop64_chunk{c}"), o));
+    }
+    modes.push((
+        "hilbert".into(),
+        jv_options(24, 300.0).stopping_by_hilbert(usize::MAX),
+    ));
+    for &c in chunks {
+        modes.push((
+            format!("hilbert_chunk{c}"),
+            jv_options(24, 300.0).stopping_by_hilbert(c),
+        ));
+    }
+    for (_, opts) in &mut modes {
+        *opts = opts.clone().capturing_run_log();
+    }
+    let mut out = Vec::new();
+    for (k, (r, pl)) in jobs.iter().enumerate() {
+        if r.u.len() != 4 {
+            continue;
+        }
+        let mut v = r.v.clone();
+        v.resize(3, E2::ZERO);
+        let forms = weil_forms(&ctx.f.f, &ctx.cov.hx, &r.u, &v);
+        let polys = forms.polys(&ctx.reim, p);
+        let top: Vec<f4_fp::Poly> = polys
+            .iter()
+            .map(|f| {
+                let t: Vec<(Vec<u32>, u64)> = f
+                    .iter()
+                    .filter(|(e, _)| e.iter().sum::<u32>() == 2)
+                    .cloned()
+                    .collect();
+                f4_fp::normalise(&t, p, F4Ordering::Grevlex)
+            })
+            .filter(|f| !f.is_empty())
+            .collect();
+        let mut h = std::collections::hash_map::DefaultHasher::new();
+        top.hash(&mut h);
+        let top_hash = h.finish();
+        let _ = f4_fp::take_run_log();
+        let rep = f4_fp::f4(&top, 6, p, &jv_options_stopped(24, 300.0, 64));
+        let _ = f4_fp::take_run_log();
+        let mut sys = StudySystem {
+            k,
+            planted: *pl,
+            top_hash,
+            top_muls: rep.field_ops,
+            top_staircase: rep.staircase_at_stop,
+            modes: Vec::new(),
+        };
+        let mut ref_found = None;
+        let mut ref_fp = 0usize;
+        for (name, opts) in &modes {
+            let _ = f4_fp::take_run_log();
+            let mut lrng =
+                StdRng::seed_from_u64(seed ^ (k as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            let (found, cost) = nagao_decompose(&ctx, &base, &by_x, r, opts, &mut lrng);
+            let log = f4_fp::take_run_log();
+            if ref_found.is_none() {
+                ref_found = Some(found.clone());
+                ref_fp = cost.fp_solutions;
+            }
+            sys.modes.push(StudyMode {
+                name: name.clone(),
+                f4_muls: cost.f4_muls,
+                same_found: Some(&found) == ref_found.as_ref(),
+                same_fp_solutions: cost.fp_solutions == ref_fp,
+                stopped: cost.stopped_at.is_some(),
+                hilbert_applied: cost.hilbert_applied,
+                hilbert_fallback: cost.hilbert_fallback,
+                check_muls: cost.hilbert_check_muls,
+                all_rows: log.steps.iter().map(|s| s.all_rows).sum(),
+                dropped_pairs: log.dropped_pairs,
+                steps: log
+                    .steps
+                    .iter()
+                    .map(|s| (s.degree, s.pairs, s.rows, s.ops, s.new_polys, s.staircase))
+                    .collect(),
+            });
+        }
+        out.push(sys);
+    }
+    let _ = &by_x;
+    out
 }
 
 #[cfg(test)]
@@ -3509,6 +3778,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn nagao_finds_planted_six_sums_and_agrees_with_the_oracle() {
         let (_, ctx, base, by_x, mut rng) = small_ctx(53, 2);
         let jac = ctx.jac();
@@ -3681,6 +3954,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn the_solver_loses_no_rational_solution_at_small_p() {
         // p = 53: a Krylov minimal polynomial of one vector loses a root with
         // probability 1/p, a non-separating form likewise.  Plant many sums.
@@ -3731,6 +4008,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn stopped_f4_agrees_with_the_full_solver_and_the_oracle() {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let jac = ctx.jac();
@@ -3763,10 +4044,10 @@ mod tests {
             // "no dearer" by the F4 degree and matrix, which are per-run
             // facts; `f4_muls` is a difference of the process-wide counter and
             // interleaves with other tests' F4 runs under `cargo test`'s
-            // parallelism.  Since `f4_fp` applies the Gebauer–Möller criteria
-            // the full run no longer reduces redundant pairs past the basis
-            // either, so the stop saves nothing on these systems; it must
-            // still never cost more.
+            // parallelism.  The stop skips the degree-8 step, which holds the
+            // few remaining pairs (research/f4_early_stop_20261018 measured
+            // about 5% of the F4 multiplications at p = 101); it must never
+            // cost more.
             if cb.degree_reached <= ca.degree_reached && cb.max_rows <= ca.max_rows {
                 cheaper += 1;
             }
@@ -3783,6 +4064,49 @@ mod tests {
     }
 
     #[test]
+    fn hilbert_stop_agrees_with_the_full_solver_and_the_oracle() {
+        let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
+        let jac = ctx.jac();
+        let t = table3(&jac, &base);
+        let full = jv_options(24, 120.0);
+        let hil = jv_options(24, 120.0).stopping_by_hilbert(1);
+        let (mut applied, mut fallbacks, mut n) = (0, 0, 0);
+        for k in 0..40 {
+            let r = if k % 2 == 0 {
+                planted(&jac, &base, &mut rng).0
+            } else {
+                let a = rng.gen_range(0..spec.l);
+                jac.add(&jac.mul(&spec.gj, a as u128), &spec.qj)
+            };
+            let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &full, &mut rng);
+            let (fb, cb) = nagao_decompose(&ctx, &base, &by_x, &r, &hil, &mut rng);
+            if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
+                continue;
+            }
+            n += 1;
+            let oracle = mitm6(&jac, &t, &r);
+            assert_eq!(fa, oracle, "full solver vs oracle, residual {k}");
+            assert_eq!(fb, oracle, "Hilbert-stopped solver vs oracle, residual {k}");
+            assert_eq!(
+                ca.fp_solutions, cb.fp_solutions,
+                "F_p solutions, residual {k}"
+            );
+            assert_eq!(ca.delta, cb.delta, "staircase, residual {k}");
+            assert!(
+                cb.hilbert_applied != cb.hilbert_fallback,
+                "exactly one path"
+            );
+            applied += cb.hilbert_applied as usize;
+            fallbacks += cb.hilbert_fallback as usize;
+        }
+        assert!(n >= 30, "{n}");
+        assert!(
+            applied >= n - 3,
+            "applied {applied} fallbacks {fallbacks} of {n}"
+        );
+    }
+
+    #[test]
     fn distinguished_point_rho_finds_the_planted_logarithm() {
         // p = 53: l ≈ 2^32, sqrt l ≈ 6.5·10⁴ steps; three runs, two walkers
         let spec = generate_spec(53, 1);
@@ -3794,6 +4118,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn replayed_f4_agrees_with_the_full_solver_and_the_oracle() {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let traced = Ctx::with_trace(&spec, true);

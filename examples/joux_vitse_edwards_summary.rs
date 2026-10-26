@@ -136,6 +136,11 @@ fn main() {
             // 8·C(|F|, 4)/n on average — an expectation, not a bound
             let floor_trials = n / (8.0 * choose(base, 4));
             let relations = rs.iter().filter(|r| r["kind"] == "relation").count() as f64;
+            // An arm that ended at its wall-time cap has an `ic` row but no
+            // logarithm: it is incomplete (a lower bound on a solve), not a
+            // failed check.
+            let capped = ic.as_ref().is_some_and(|i| i["wall_capped"] == true);
+            let ic = if capped { None } else { ic };
             let row = match &ic {
                 Some(ic) => {
                     checks_failed += (u(&ic["oracle_disagree"]) + u(&ic["relations_unverified"]))
@@ -181,12 +186,22 @@ fn main() {
                         "agg": ic["agg"], "oracle_disagree": ic["oracle_disagree"],
                     })
                 }
-                None => json!({
-                    "file": name, "p": setup["p"], "seed": setup["seed"], "n": setup["n"],
-                    "base_points": base, "complete": false, "relations_recorded": relations,
-                    "census_trials_per_relation": floor_trials,
-                    "rho_group_ops": rho["group_ops"], "rho_verified": rho["verified"],
-                }),
+                None => {
+                    let capped_row = rs.iter().rev().find(|r| r["kind"] == "ic").cloned();
+                    json!({
+                        "file": name, "p": setup["p"], "seed": setup["seed"], "n": setup["n"],
+                        "log2_n": setup["log2_n"],
+                        "base_points": base, "complete": false, "wall_capped": capped,
+                        "relations_recorded": relations,
+                        "unknowns": capped_row.as_ref().map(|c| c["unknowns"].clone()),
+                        "trials": capped_row.as_ref().map(|c| c["trials"].clone()),
+                        "cost_to_cap_online_muls": capped_row.as_ref().map(|c| c["online_muls"].clone()),
+                        "lower_bound_ic_over_rho": capped_row.as_ref().map(|c| u(&c["online_muls"]) / u(&rho["fp_muls"])),
+                        "census_trials_per_relation": floor_trials,
+                        "rho_group_ops": rho["group_ops"], "rho_fp_muls": rho["fp_muls"],
+                        "rho_verified": rho["verified"],
+                    })
+                }
             };
             dlp_out.push(row);
         }
