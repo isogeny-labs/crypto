@@ -316,3 +316,21 @@ record. Changes, all about running and none about analysis:
 
 Everything else of amendment 5 stands: jobs, specs, binary, analysis,
 predictions X1–X10, audit scope.
+
+## Amendment 5b (2026-10-26, runtime only; no extension record had been analysed)
+
+The extension queue stopped after 2026-10-21T04:00Z (the last completed job is
+`xmain-c2-p509-t0`; the container was restarted, and `xmain-c3-p509-t0`, running at
+the time, was lost). 47 extension sessions were complete and committed (20
+rho-only, 27 plain-arm), none failed. The 72 h start window of amendment 5a ended
+on 2026-10-23T06:08Z while nothing was running, so it did not bound anything the
+runner did. **No extension index-calculus record had been analysed** (only job
+counts were looked at). The container has four CPUs again.
+
+Change: the remaining jobs of `jobs_ext2.txt` (same order, same specs, same binary,
+same analysis and predictions X1–X10) are run by the same resumable
+`run_queue5.sh` with a start window of **48 h from the relaunch** in place of the
+lapsed one. The half-written `xmain-c3-p509-t0` is moved to
+`sessions-interrupted/` by the runner and run again. The job set is unchanged: if
+the window or another interruption leaves jobs unrun, they are listed as not run
+with the reason.
