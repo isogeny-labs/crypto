@@ -12,6 +12,15 @@ sums for both arms. The port is faithful. This is an accounting port, not an
 improvement: no IC cost changed. Protocol: [`PROTOCOL.md`](PROTOCOL.md),
 frozen before the session ran.
 
+**Report:** [`REPORT.pdf`](REPORT.pdf) (source [`REPORT.typ`](REPORT.typ)).
+**Figures:** [`figures/phases_ecbench_vs_study.svg`](figures/phases_ecbench_vs_study.svg)
+(per-phase `bitop/v1` of each arm, ecbench vs the study's committed counts) and
+[`figures/runs_ecbench_vs_study.svg`](figures/runs_ecbench_vs_study.svg)
+(per-run totals, all 45 on `y = x`), PNG renders beside them, drawn by
+[`figures/plots.py`](figures/plots.py) from `analysis/equivalence.md` only.
+
+![Per-phase bitop/v1, ecbench vs the study](figures/phases_ecbench_vs_study.svg)
+
 ## What was ported
 
 | piece | where | what |
@@ -68,3 +77,6 @@ coverage limits (`research/hec_bitop_20261020/PROTOCOL.md`), not a new result.
 - **Counting conventions.** The conventions are the study's: one word
   operation per RNG draw, memory movement uncounted, and validation inside
   the total.
+- **Validation gate.** No `VALIDATION.json` (replay certificate, validator
+  report), so no IC leaderboard or `benchmarks/` row. No `ecbench audit-ir`
+  instruction audit was run on these records.
