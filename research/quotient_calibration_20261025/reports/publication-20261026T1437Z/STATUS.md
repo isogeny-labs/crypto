@@ -12,6 +12,7 @@ target-calibration or inversion experiment ran.
 | Destination | `s3://setec-astronomy-artifacts/store/sha256/ae/ae5e8b6973db769db3ccef01fb81ba5837702a26221206134091a8bdff3bad2a` |
 | Manifest | [Generated artifact manifest](../run-20261025T1845Z/.artifacts.json) |
 | Operation receipt | [STATUS.json](STATUS.json) |
+| Delivery validation | [VALIDATION.md](VALIDATION.md) |
 
 ## Verification
 
