@@ -1787,11 +1787,21 @@ mod tests {
     fn fixture_records_reprice_to_their_committed_blocks() {
         let dir =
             std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/ecbench/work-v1");
-        let records = crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap();
-        assert_eq!(records.len(), 4);
-        for r in &records {
+        let lines = crate::cryptanalysis::ecbench::runner::read_record_lines(&dir).unwrap();
+        assert_eq!(lines.len(), 4);
+        for (line, r) in &lines {
             let committed = r.work.as_ref().expect("fixture carries a work block");
-            assert_eq!(&price_record(r).unwrap(), committed, "{}", r.record_id);
+            // `read_record_lines` parses floats with the legacy decimal path,
+            // one ulp off the written text for some values, so compare with
+            // the line as written: under `arbitrary_precision` a `Value`
+            // keeps each number's decimal token, and the comparison is exact.
+            let written: serde_json::Value = serde_json::from_str(line).unwrap();
+            assert_eq!(
+                serde_json::to_value(price_record(r).unwrap()).unwrap(),
+                written["work"],
+                "{}",
+                r.record_id
+            );
             let v2 = price_record_v2(r).unwrap();
             assert_eq!(v2.bitops, committed.bitops, "{}", r.record_id);
             assert!(
