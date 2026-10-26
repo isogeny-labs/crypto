@@ -115,7 +115,9 @@
 //!   complexity of index calculus algorithms in elliptic curves over
 //!   binary fields*, EUROCRYPT 2012 — the systems this is applied to.
 
-use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{
+    bit, low_bits, mask_from64, mask_low64, F2BoolMono, F2BoolPoly, Mask, MASK_BITS,
+};
 
 /// Parameters of one crossbred run.
 #[derive(Clone, Copy, Debug)]
@@ -197,18 +199,14 @@ impl CrossbredSystem {
     }
 
     /// Mask of the enumerated variables.
-    fn enum_mask(&self) -> u64 {
+    fn enum_mask(&self) -> Mask {
         mask_of(self.enumerated)
     }
 }
 
-/// Bitmask of the low `k` bits, safe at `k = 64`.
-fn mask_of(k: usize) -> u64 {
-    if k >= 64 {
-        u64::MAX
-    } else {
-        (1u64 << k) - 1
-    }
+/// Bitmask of the low `k` bits, safe at `k` = the mask width.
+fn mask_of(k: usize) -> Mask {
+    low_bits(k)
 }
 
 /// Bit length of `x`: the depth factor of a sort of `x` entries.
@@ -227,7 +225,7 @@ const MAP_PROBE_WORD_OPS: u64 = 2;
 
 /// Degree of a Boolean monomial in the variables that are *not*
 /// enumerated.
-fn specialised_degree(mask: u64, enum_mask: u64) -> u32 {
+fn specialised_degree(mask: Mask, enum_mask: Mask) -> u32 {
     (mask & !enum_mask).count_ones()
 }
 
@@ -239,18 +237,18 @@ fn specialised_degree(mask: u64, enum_mask: u64) -> u32 {
 /// subsets by size.  Kept local to this module rather than shared with
 /// `koblitz_groebner`, which has its own copy, because the two want
 /// different orderings.
-fn monomials_up_to(n_vars: usize, deg: u32, ops: &mut u64) -> Vec<u64> {
-    let mut out = vec![0u64];
-    let mut level = vec![0u64];
+fn monomials_up_to(n_vars: usize, deg: u32, ops: &mut u64) -> Vec<Mask> {
+    let mut out: Vec<Mask> = vec![0];
+    let mut level: Vec<Mask> = vec![0];
     for _ in 0..deg {
         let mut next = Vec::new();
         for &m in &level {
             // The leading-zero count, then an OR and a store per child
             // (counted with the copy into `out` below).
             *ops += 1;
-            let top = 64 - m.leading_zeros();
+            let top = MASK_BITS as u32 - m.leading_zeros();
             for v in top..n_vars as u32 {
-                next.push(m | (1u64 << v));
+                next.push(m | bit(v));
             }
         }
         // Each child: built, then copied into `out`.
@@ -271,11 +269,11 @@ fn shift_row_ops(l: usize) -> u64 {
 }
 
 /// One Macaulay row, as the set of monomials it contains.
-fn shift_row(p: &F2BoolPoly, mult: u64) -> Vec<u64> {
+fn shift_row(p: &F2BoolPoly, mult: Mask) -> Vec<Mask> {
     // Multiplying by a monomial is a union of masks in the Boolean
     // ring, so two distinct terms can collide — and colliding means
     // cancelling, in characteristic 2.  Keep the odd multiplicities.
-    let mut all: Vec<u64> = p.terms.iter().map(|t| t.mask | mult).collect();
+    let mut all: Vec<Mask> = p.terms.iter().map(|t| t.mask | mult).collect();
     all.sort_unstable();
     let mut row = Vec::with_capacity(all.len());
     let mut i = 0;
@@ -324,7 +322,7 @@ pub fn extract_crossbred_counted(
     let enum_mask = mask_of(params.enumerated);
 
     // 1. Macaulay rows: every product `p · m` with `deg(p·m) ≤ D`.
-    let mut rows_monos: Vec<Vec<u64>> = Vec::new();
+    let mut rows_monos: Vec<Vec<Mask>> = Vec::new();
     for p in system {
         // The degree scan: a popcount a term.
         *ops += p.terms.len() as u64;
@@ -364,7 +362,7 @@ pub fn extract_crossbred_counted(
     // 2. Columns, bad ones first.  Within each group the order is
     //    irrelevant to the kernel; it is fixed only so the run is
     //    reproducible.
-    let mut cols: Vec<u64> = rows_monos.iter().flatten().copied().collect();
+    let mut cols: Vec<Mask> = rows_monos.iter().flatten().copied().collect();
     let entries = cols.len();
     cols.sort_unstable();
     cols.dedup();
@@ -376,7 +374,7 @@ pub fn extract_crossbred_counted(
         .iter()
         .filter(|&&m| specialised_degree(m, enum_mask) > params.target_degree)
         .count();
-    let index: std::collections::HashMap<u64, usize> =
+    let index: std::collections::HashMap<Mask, usize> =
         cols.iter().enumerate().map(|(i, m)| (*m, i)).collect();
     // The copy, its sort and dedup pass; the keyed sort, whose key (a
     // masked popcount, two words) is computed per comparison; the bad
@@ -454,7 +452,7 @@ pub fn extract_crossbred_counted(
     //    monomials (the bad ones cancelled by construction).
     let mut polys = Vec::new();
     for row in aug.iter().skip(pivot_row) {
-        let mut acc: Vec<u64> = Vec::new();
+        let mut acc: Vec<Mask> = Vec::new();
         // A bit test a Macaulay row.
         *ops += n_rows as u64;
         for r in 0..n_rows {
@@ -718,7 +716,7 @@ pub fn solve_crossbred(
     ops += words as u64;
     if !n_points.is_multiple_of(64) {
         let last = n_points / 64;
-        alive[last] = mask_of(n_points % 64);
+        alive[last] = mask_low64(mask_of(n_points % 64));
         for w in alive.iter_mut().skip(last + 1) {
             *w = 0;
         }
@@ -777,7 +775,7 @@ pub fn solve_crossbred(
                 ops += 1;
                 if original.iter().all(|p| {
                     ops += p.terms.len() as u64;
-                    p.eval(full) == 0
+                    p.eval(mask_from64(full)) == 0
                 }) {
                     stats.verified += 1;
                     // The duplicate scan.
@@ -973,6 +971,10 @@ pub fn format_sweep(cells: &[SweepCell]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     use crate::cryptanalysis::koblitz_groebner::{build_decomposition_system, FieldStructure};
     use crate::cryptanalysis::koblitz_index_calculus::{build_frobenius_factor_base, KoblitzCurve};
@@ -981,13 +983,16 @@ mod tests {
     /// path is compared with.
     fn brute_force(system: &[F2BoolPoly], n_vars: usize) -> Vec<u64> {
         (0..(1u64 << n_vars))
-            .filter(|&p| system.iter().all(|q| q.eval(p) == 0))
+            .filter(|&p| system.iter().all(|q| q.eval(mask_from64(p)) == 0))
             .collect()
     }
 
     fn poly(monos: &[u64], n_vars: usize) -> F2BoolPoly {
         F2BoolPoly::from_monos(
-            monos.iter().map(|&m| F2BoolMono::from_mask(m)).collect(),
+            monos
+                .iter()
+                .map(|&m| F2BoolMono::from_mask(mask_from64(m)))
+                .collect(),
             n_vars,
         )
     }
@@ -1066,7 +1071,11 @@ mod tests {
                 }
                 // …and it is in the ideal.
                 for &r in &roots {
-                    assert_eq!(p.eval(r), 0, "k={k}: crossbred polynomial misses a root");
+                    assert_eq!(
+                        p.eval(mask_from64(r)),
+                        0,
+                        "k={k}: crossbred polynomial misses a root"
+                    );
                 }
             }
         }
@@ -1290,7 +1299,7 @@ mod tests {
             // Soundness: everything returned is a root.
             for &r in &got {
                 assert!(
-                    sys.equations.iter().all(|p| p.eval(r) == 0),
+                    sys.equations.iter().all(|p| p.eval(mask_from64(r)) == 0),
                     "({a},{b},{c}): crossbred returned a non-root"
                 );
             }
@@ -1305,7 +1314,7 @@ mod tests {
             );
             for r in &f4 {
                 assert!(
-                    got.contains(r),
+                    got.contains(&mask_low64(*r)),
                     "({a},{b},{c}): crossbred missed a root F4 found ({r:#x})"
                 );
             }

@@ -43,7 +43,9 @@ use crate::cryptanalysis::fx_hash::MaskMap;
 use crate::cryptanalysis::koblitz_groebner::{
     macaulay_rows_monos_with_mask, monomials_up_to_mask, rref_f2_counted,
 };
-use crate::cryptanalysis::pq_groebner_f2::{sort_masks_descending, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{
+    bit, sort_masks_descending, F2BoolPoly, Mask, MASK_BITS,
+};
 use rayon::prelude::*;
 use std::collections::BTreeSet;
 use std::time::Instant;
@@ -145,10 +147,10 @@ impl PeReport {
 /// Dense layout and basis.
 struct Engine {
     degree: u32,
-    columns: Vec<u64>,
+    columns: Vec<Mask>,
     index: MaskMap<u32>,
     words: usize,
-    vars: Vec<u64>,
+    vars: Vec<Mask>,
     /// `times[v][c]`: column of `columns[c] · vars[v]`, or `u32::MAX` when
     /// that monomial has degree `> D` (never needed: only rows of leading
     /// degree `< D` are multiplied, and a row's every monomial has degree
@@ -178,10 +180,10 @@ impl Engine {
         let occurring = system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |acc, t| acc | t.mask);
-        let vars: Vec<u64> = (0..64)
-            .filter(|i| occurring >> i & 1 == 1)
-            .map(|i| 1u64 << i)
+            .fold(0 as Mask, |acc, t| acc | t.mask);
+        let vars: Vec<Mask> = (0..MASK_BITS as u32)
+            .filter(|&i| occurring >> i & 1 == 1)
+            .map(bit)
             .collect();
         // Count before materialising.
         let n = vars.len() as u64;
@@ -241,7 +243,7 @@ impl Engine {
         })
     }
 
-    fn pack(&self, monos: &[u64]) -> Vec<u64> {
+    fn pack(&self, monos: &[Mask]) -> Vec<u64> {
         let mut row = vec![0u64; self.words];
         for m in monos {
             let c = self.index[m] as usize;
@@ -467,7 +469,7 @@ pub fn pe_closure_with(
         PeMode::Partial { .. } => "partial",
     };
     let mut e = Engine::new(system, degree, max_cols, label)?;
-    let occurring = e.vars.iter().fold(0u64, |a, v| a | v);
+    let occurring = e.vars.iter().fold(0 as Mask, |a, v| a | v);
     let seed_degree = match mode {
         PeMode::Full => degree,
         PeMode::Partial { .. } => opts.seed_degree.unwrap_or(degree.saturating_sub(1)).max(
@@ -697,11 +699,11 @@ mod tests {
         // x0 = 1, x3 = 1, x1 = 1, x2 = 0: x0x1 + x2 = 1 ≠ 0.  Build the
         // system from a chosen point instead.
         let point = [true, false, true, true, false];
-        let mono = |m: u64| F2BoolMono::from_mask(m);
-        let eval = |m: u64| (0..5).all(|i| m >> i & 1 == 0 || point[i]);
+        let mono = |m: Mask| F2BoolMono::from_mask(m);
+        let eval = |m: Mask| (0..5).all(|i| m >> i & 1 == 0 || point[i]);
         let mut sys = Vec::new();
         for masks in [
-            vec![0b00011u64, 0b00100],
+            vec![0b00011 as Mask, 0b00100],
             vec![0b00110, 0b01001, 0b10000],
             vec![0b11000, 0b00101],
         ] {
