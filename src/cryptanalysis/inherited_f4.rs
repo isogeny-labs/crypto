@@ -578,6 +578,27 @@ fn leading_column(row: &[u64]) -> Option<usize> {
         .map(|(i, &w)| i * 64 + w.trailing_zeros() as usize)
 }
 
+/// The version of the word-operation accounting below, recorded in every new
+/// ecbench session (`accounting_versions`) so that an audit names a
+/// cross-version replay instead of reporting bare count differences.
+///
+/// - **1** (never recorded; what a session without the field was made
+///   under, up to `#2043`, 2026-10-17): specialisation was eager through
+///   `pext`/`pdep` on a BMI2 x86-64 host and lazy everywhere else, and the
+///   two charge different counts by construction.
+/// - **2** (since `#2043`): specialisation is eager on every host (`pext` /
+///   `pdep`, or shift runs without BMI2), and every eager path charges
+///   identical counts
+///   (`rewrite_paths_charge_identical_work_and_build_identical_rows`).
+///
+/// Bump this whenever a change alters any [`InheritCost`] field for any
+/// input; `inherited_f4_accounting_version_pins_the_charge` fails then, on
+/// purpose, so the bump cannot be forgotten.  The lazy rewrite
+/// (`KIC_F4_EAGER=0`, `KIC_F4_REWRITE=scatter`) stays reachable only as a
+/// same-binary control and charges a different count; `ecbench` refuses to
+/// run with those overrides set.
+pub const INHERITED_F4_ACCOUNTING_VERSION: u32 = 2;
+
 /// Work counters for one basis operation, all in 64-bit word operations.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct InheritCost {
@@ -3977,6 +3998,65 @@ mod tests {
             }
         }
         assert!(compared > 100, "too few comparisons: {compared}");
+    }
+
+    /// The charge itself is pinned, so changing what is counted cannot pass
+    /// unnoticed: if this fails, the accounting changed.  Bump
+    /// [`INHERITED_F4_ACCOUNTING_VERSION`], then update the figures below in
+    /// the same change.  The portable eager path is forced, which every host
+    /// can run and which charges what the BMI2 path charges (the test above).
+    #[test]
+    fn inherited_f4_accounting_version_pins_the_charge() {
+        let mut seed = 0x5eed_acc0_0057_0001u64;
+        let mut total = InheritCost::default();
+        let mut chains = 0usize;
+        for trial in 0..40 {
+            let n_vars = 6 + trial % 5;
+            let m = 3 + trial % 4;
+            let system: Vec<F2BoolPoly> = (0..m)
+                .map(|k| random_poly(n_vars, if k % 4 == 3 { 1 } else { 2 }, 5 + k, &mut seed))
+                .filter(|p| poly_degree(p) >= 1)
+                .collect();
+            if system.is_empty() {
+                continue;
+            }
+            let degree = 2 + (trial % 2) as u32;
+            rewrite_path_override::with(EagerMode::Runs, false, || {
+                let (mut basis, root) = ReducedBasis::from_system(&system, n_vars, degree).unwrap();
+                total.add(root);
+                let mut used = Vec::new();
+                for i in 0..3u32 {
+                    let v = ((xorshift(&mut seed) % n_vars as u64) as u32 + i) % n_vars as u32;
+                    if used.contains(&v) {
+                        continue;
+                    }
+                    used.push(v);
+                    let (next, cost) = basis.specialise(v, (i + trial as u32).is_multiple_of(2));
+                    basis = next;
+                    total.add(cost);
+                    let mut tail = InheritCost::default();
+                    let _ = basis.linear_tail(&mut tail);
+                    total.add(tail);
+                }
+            });
+            chains += 1;
+        }
+        assert!(chains > 30, "too few chains: {chains}");
+        let got = (
+            total.reduce_word_ops,
+            total.rref_word_ops,
+            total.specialise_word_ops,
+            total.displaced_rows,
+            total.completion_rows,
+            total.closure_products,
+        );
+        assert_eq!(
+            got,
+            (9944, 0, 8581, 914, 287, 0),
+            "the inherited-F4 charge changed: bump INHERITED_F4_ACCOUNTING_VERSION (now {}) and \
+             update this pin",
+            INHERITED_F4_ACCOUNTING_VERSION
+        );
     }
 
     #[test]
