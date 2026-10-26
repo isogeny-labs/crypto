@@ -89,11 +89,9 @@ ARCHIVED_LABELS = {
             "icv1-fp131-t29529377007934231835-9681b699",
         },
     },
-    "docs/index-calculus-scoreboard.html": {
-        "sha256": "2bb7fb8d2e1cf44ed7078ef76785d278d704b6eb083dd7c7ce6367dbc6ee8af7",
-        "labels": {},
-        "slugs": {"icv1-fp30-t49927-d70f5de2"},
-    },
+    # The scoreboard page is no longer listed: it changes with every dashboard
+    # update, so a byte pin on it went stale, and its one unregistered slug
+    # (the fp30 curve) is now in the registry and resolves there.
     "research/certicom131_ic_program_20261020/README.md": {
         "sha256": "ea6d90006f2bf0d208609c19de030eec1e653bed54288ffbb9efce9b9264c02c",
         "labels": {},

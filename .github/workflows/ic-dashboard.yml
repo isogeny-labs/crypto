@@ -1,12 +1,8 @@
 name: IC dashboard presentation
 
 on:
-  pull_request:
-    paths:
-      - 'docs/index-calculus-scoreboard.html'
-      - 'docs/ic/dashboard-overview*'
-      - 'tools/*ic_dashboard*.mjs'
-      - '.github/workflows/ic-dashboard.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -43,10 +39,6 @@ jobs:
           install-dependencies: true
       - name: Check frozen evidence pins and generated overview
         run: node tools/render_ic_dashboard.mjs --check
-      - uses: browser-actions/setup-chrome@v2
-        id: setup-chrome
-        with:
-          install-dependencies: true
       - name: Check actual desktop and mobile rendering
         env:
           IC_DASHBOARD_CHROME: ${{ steps.setup-chrome.outputs.chrome-path }}

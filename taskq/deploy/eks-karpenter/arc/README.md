@@ -1,7 +1,7 @@
 # GitHub Actions runners on isolab EKS
 
 This installs the GitHub-supported Actions Runner Controller (ARC) chart version
-`0.15.0` for `aburan28/crypto`. ARC listens for Actions jobs, starts one ephemeral
+`0.15.0` for `isogeny-labs/crypto`. ARC listens for Actions jobs, starts one ephemeral
 runner pod per job, and Karpenter supplies a Spot EC2 node when a pod cannot
 fit. Empty runner nodes are consolidated after five minutes. The runner NodePools are
 separate from the `cpu-spot` Iso Lab measurement pool.
@@ -51,13 +51,28 @@ access on `isolab`. The EKS access entry for this session's role,
 has the cluster-scoped `AmazonEKSClusterAdminPolicy`. Remove this broad access
 after deployment if ongoing administration uses a narrower role.
 
-ARC needs a fine-grained GitHub PAT restricted to `aburan28/crypto` with
+ARC needs a fine-grained GitHub PAT restricted to `isogeny-labs/crypto` with
 Repository permissions → Administration: Read and write. Save it in a local
 0600 file and create a Kubernetes Secret named `arc-github-auth` in
 `arc-runners` with the key `github_token`. Keep the token out of Git, shell
 history and Helm values. A GitHub App with the permissions in GitHub's ARC
 authentication guide can also be used; the Secret then needs the keys
 `github_app_id`, `github_app_installation_id` and `github_app_private_key`.
+
+### Replacing the GitHub credential
+
+If the repository moves or the token expires, the listeners log a 404 or 401 on
+`.../actions/runners/registration-token` and no runner is ever announced.
+`rotate-github-token.sh` tests a new token the way ARC uses it, updates
+`arc-github-auth`, restarts the controller and removes the temporary
+cluster-admin it attached to the caller:
+
+```sh
+ARC_GITHUB_REPO=isogeny-labs/crypto taskq/deploy/eks-karpenter/arc/rotate-github-token.sh
+```
+
+The token needs the repository owner as its resource owner and Administration
+read and write on the repository.
 
 ## Deploy and verify
 
@@ -91,15 +106,46 @@ After deployment, dispatch `eks-arc-smoke.yml` once per pool (the xmem scale set
 checked by their first real job, since a smoke run there costs an x2 node-hour).
 Confirm both jobs pass, `kubectl get nodeclaims` shows a `gha-on-demand` node
 during a run, and GitHub's job log identifies the expected runner name. Check
-that an empty node disappears after the consolidation interval. Linux x64 jobs
-in the existing workflows have opt-in routing expressions; the fallback is the
-original GitHub-hosted label. Add only validated workflow filenames to the
-repository variable `CRYPTO_EKS_WORKFLOWS`, delimited by vertical bars, for
-example `|spotlab.yml|rust-lint.yml|`. Use
-`CRYPTO_EKS_HIGHMEM_WORKFLOWS=|some-large-job.yml|` for the high-memory pool.
-The high-memory list takes precedence. Remove a filename to roll that workflow
-back. The routing script is `route_workflows.py`; it prepares new direct x64
-`runs-on` lines and is idempotent.
+that an empty node disappears after the consolidation interval.
+
+**Routing (owner decision, 2026-10-26).** Every Linux job's `runs-on` falls
+back to GitHub-hosted `ubuntu-latest` and opts into these Spot scale sets per
+workflow. Add only validated workflow filenames to the repository variable
+`CRYPTO_EKS_WORKFLOWS` (Spot `crypto-eks-linux`), delimited by vertical bars,
+for example `|spotlab.yml|rust-lint.yml|`. Use
+`CRYPTO_EKS_HIGHMEM_WORKFLOWS=|some-large-job.yml|` for the Spot high-memory
+pool; it takes precedence. Remove a filename to roll that workflow back to
+`ubuntu-latest`. `route_workflows.py --apply` writes the routing expression
+into any new direct `runs-on: ubuntu-latest` line and is idempotent; it skips
+workflows whose bytes are pinned elsewhere (`SEALED`). Four workflows name a
+scale set directly because they cannot run on a hosted runner:
+`eks-arc-smoke.yml`, `dreg-a3-eks-highmem.yml`, `fb-designs-m4-highmem.yml`
+and the `segment` job of `dreg-ckpt-job.yml` (xmem/xmem1t).
+
+### Turning the Spot runners back on (isogeny-labs/crypto)
+
+The scale sets registered against `aburan28/crypto` before the repository
+moved; their last smoke run passed on 2026-10-20. To bring them up for
+`isogeny-labs/crypto`:
+
+1. From a host with the isolab kubeconfig, rotate the ARC credential to a token
+   (or GitHub App) owned by `isogeny-labs` with Administration read/write on
+   the repository:
+   `ARC_GITHUB_REPO=isogeny-labs/crypto taskq/deploy/eks-karpenter/arc/rotate-github-token.sh`.
+   The value files already name `https://github.com/isogeny-labs/crypto`.
+2. Re-run `deploy.sh` (idempotent) and confirm
+   `kubectl -n arc-runners get autoscalingrunnersets` lists all four sets.
+3. Dispatch `eks-arc-smoke.yml` with `pool=linux` and `pool=highmem`; confirm
+   the job log names an `arc-runners` pod and `kubectl get nodeclaims` shows a
+   Spot node during the run.
+4. Restore the first-wave rollout (command below) and, for the high-memory
+   jobs, `gh variable set CRYPTO_EKS_HIGHMEM_WORKFLOWS --repo isogeny-labs/crypto --body '|<file>.yml|'`.
+5. If `vars.DREG_CKPT_WATCH` was unset while the runners were down, set it
+   again only after the xmem pool has run one segment.
+
+Self-hosted runner minutes are not billed by GitHub, so routed jobs do not
+draw on the organization's Actions quota; the cost is the Spot EC2, EBS and NAT
+traffic described above, inside the 96-vCPU regional Spot quota.
 
 `first-wave-workflows.txt` records the 391 workflow filenames enabled in the
 initial rollout. It excludes workloads requiring specialized GPU, Sage, Lean,
@@ -110,7 +156,7 @@ variable after an accidental reset:
 
 ```sh
 python3 -c 'from pathlib import Path; names=Path("taskq/deploy/eks-karpenter/arc/first-wave-workflows.txt").read_text().splitlines(); print("|"+"|".join(names)+"|", end="")' \
-  | gh variable set CRYPTO_EKS_WORKFLOWS --repo aburan28/crypto
+  | gh variable set CRYPTO_EKS_WORKFLOWS --repo isogeny-labs/crypto
 ```
 
 The routing expression admits `push`, `schedule`, `release`, manual dispatch and
@@ -128,7 +174,8 @@ experiments before replaying.
 
 ## Security and compatibility
 
-This repository is public. A fork can propose workflow changes that target a
+`isogeny-labs/crypto` is private with forking disabled (2026-10-26), so only
+collaborators can open pull requests. If it is made public again: a fork can propose workflow changes that target a
 self-hosted scale set directly, regardless of the routing expression in the
 base workflow. ARC's Docker sidecar is privileged. Dedicated tainted nodes,
 ephemeral runner pods, a service account without Kubernetes API permissions,

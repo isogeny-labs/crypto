@@ -343,6 +343,30 @@ including events without a “Killed process” line. The full captured ring is
 retained, so an earlier OOM event can conservatively withhold attribution.
 No new host allocation or experimental execution was made for this correction.
 
+### Amendment 13: registered, not yet run (EKS high-memory runner)
+
+**Numbering note, 2026-10-26 (renames only; changes no rule, threshold, prediction or row).** This amendment was registered as “Amendment 8” with cells E1 and E2, runner `scripts/run_amendment8.sh` and flag `analyze --amendment8`. `main` has its own Amendment 8 and its own E1 cell (twisted Edwards), so on merging `main` it is renumbered **Amendment 13** with cells **K8S-A0** (was E1) and **K8S-A11** (was E2); the runner is `scripts/run_amendment13.sh`, the flag `--amendment13`, the row prefixes `K8S-A0-` and `K8S-A11-`, and the workflow artifact `fb-designs-amendment13-<cell>-<run_id>-<attempt>`. The amendment it builds on, registered as “Amendment 7” with cells X1 and X2, is now Amendment 12 with cells H64-A0 and H64-A11. No E row, K8S row or workflow run exists, so no record or artifact carries an old name.
+
+
+Amendment 13 registers both cells again (K8S-A0, K8S-A11) on the repository's
+`crypto-eks-highmem` GitHub Actions runner (Karpenter Spot node, 120 GiB pod
+limit, so V ≈ 125.3 GB). It is started by hand with
+`.github/workflows/fb-designs-m4-highmem.yml` (`workflow_dispatch`) when a
+high-memory Spot node is available. The runner is
+`scripts/run_amendment13.sh`, and the analysis is `analyze --amendment13`.
+Predictions: K8S-A0 memory-bound near 3450 s, K8S-A11 a timeout at 14 400 s near
+90 GB. No E row exists yet.
+
+### Amendment 14: registered (256 GiB EC2 host, R256-A0 and R256-A11)
+
+Amendment 13's EKS runner could not start: the ARC controller's GitHub token
+cannot reach `isogeny-labs/crypto` (404 on the runner registration call), and
+the owner did not replace it. Amendment 14 registers the same two cells on one
+EC2 `r7i.8xlarge` (256 GiB), run one after the other, with
+`scripts/run_amendment14.sh`, analysis `analyze --amendment14`. Predictions:
+R256-A0 memory-bound near 6100 s, R256-A11 a timeout at 14 400 s near 90 GB.
+Amendment 13 stays registered, with no rows. No R256 row exists yet.
+
 ### Close-out of the prime-field slope line (2026-10-19)
 
 Observations only; no new run. Sources: `runs/analysis-amendment4.txt`,

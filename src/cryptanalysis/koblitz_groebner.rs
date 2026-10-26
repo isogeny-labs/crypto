@@ -3591,7 +3591,7 @@ thread_local! {
     // The profile API is for a single-threaded solve. A process-global flag
     // also counted unrelated solves running on other test/worker threads.
     static F4_SUPPORT_LOCAL_PROFILE_ENABLED: std::cell::Cell<bool> =
-        std::cell::Cell::new(false);
+        const { std::cell::Cell::new(false) };
 }
 static F4_INHERITED_BASIS_PROFILE_ENABLED: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
@@ -4978,7 +4978,7 @@ fn charge_system_scans(system: &[F2BoolPoly], per_poly: u64, per_term: u64) {
 
 /// `equations` all vanish at `point`, charging (`bitop/v1`) one
 /// AND-and-compare a term evaluated.
-fn vanish_at(equations: &[F2BoolPoly], point: u64) -> bool {
+fn vanish_at(equations: &[F2BoolPoly], point: Mask) -> bool {
     let mut terms = 0u64;
     let ok = equations.iter().all(|e| {
         terms += e.terms.len() as u64;
