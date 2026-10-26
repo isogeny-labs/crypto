@@ -1,0 +1,73 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261026-conductor-gap-size-confirmation",
+  "title": "Construct broader-gap fixtures and qualify a high-confidence crater comparison",
+  "created": "2026-10-26",
+  "authors": ["conductor-gap research workstream"],
+  "status": "blocked",
+  "status_note": "Parameter certificates and a precision objective do not supply exact models, transported targets, a larger-size pilot or an executable confirmation driver. No solver campaign is launched or funded.",
+  "blocked_on": [
+    "problem:problems/conductor-gap-crater-sampling-and-size.md",
+    "problem:problems/conductor-gap-upper-floor-and-cost.md",
+    "note:Construct and independently certify all selected curve models, orders, conductor strata and explicit generator/target maps; implement the resumable native pilot driver and freeze the confirmation count from the disjoint pilot.",
+    "hw:Establish execution feasibility under available local resources without paid provisioning; the provisional million-solve allocation is not an accepted runtime estimate."
+  ],
+  "links": {
+    "lead": "research/conductor_gap_size_ladder_20261026/REPORT.md",
+    "notes": [
+      "research/conductor_gap_size_ladder_20261026/PROTOCOL.md",
+      "research/conductor_gap_size_ladder_20261026/AMENDMENT-v2.md"
+    ],
+    "prs": [2560, 2430]
+  },
+  "question": "Can four broader native-size rungs support a replayed crater comparison excluding average differences beyond five percent with nominal ninety-nine percent simultaneous confidence?",
+  "decision_value": "A disjoint larger-size pilot determines whether the class, target and seed allocation can support the precision objective and available execution envelope. Confirmation may establish scoped equivalence, a difference or an inconclusive result; none settles cryptographic-size hardness or endomorphism-sensitive algebraic methods.",
+  "protocol": {"path": null, "blob": null},
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/conductor-gap-size-ladder-20261026",
+    "build": [["cargo", "build", "--release", "--example", "conductor_gap_confirmation"]]
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 8,
+    "disk_gb": 32,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "The named future driver is unimplemented. Runtime and storage must be measured and recorded before ready promotion. The inherited ninety-minute local guard is a stop limit, not an estimate or evidence that the complete pilot fits. No paid allocation is authorized by this card."
+  },
+  "run": {
+    "argv": ["target/release/examples/conductor_gap_confirmation", "--phase", "pilot", "--out", "{out}"],
+    "env": {"RAYON_NUM_THREADS": "1"},
+    "timeout_per_shard_s": 5400
+  },
+  "shards": {"count": 1, "scheme": "single", "params": {}, "stop": "all"},
+  "checkpoint": {"file": null, "resume_flag": null},
+  "outputs": {
+    "result_schema": "conductor-gap.confirmation-bundle/v1",
+    "verify": [],
+    "land": "research/conductor_gap_size_confirmation"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unassigned",
+    "tasks": ["XP-20261026-conductor-gap-size-confirmation"],
+    "ttl_s": 86400,
+    "env": {
+      "name": "conductor-gap-confirmation-not-provisioned",
+      "recipe": "A reviewed native driver, pinned inputs, independent verifier and runnable protocol are prerequisites; this blocked card creates no environment."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 8192,
+      "timeout_s": 5400,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261026-conductor-gap-size-confirmation"
+    },
+    "notes": "Not published, leased or running. Execution and resource sizing remain blocked; upper 110/158/254-bit parameter checks are not substituted for full solves.",
+    "funding": {"units": 0, "rationale": "No paid resources or reward are allocated; this is a blocked local planning record."}
+  },
+  "owner_hint": "conductor-gap research workstream"
+}

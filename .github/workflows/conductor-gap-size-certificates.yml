@@ -1,0 +1,37 @@
+name: conductor-gap-size-certificates
+
+on:
+  pull_request:
+    paths:
+      - research/conductor_gap_size_ladder_20261026/**
+      - .github/workflows/conductor-gap-size-certificates.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  retained-parameter-certificates:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+      - name: Install native certificate-checker dependency
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libgmp-dev
+      - name: Check input hashes and native controls
+        run: |
+          sha256sum -c research/conductor_gap_size_ladder_20261026/INPUTS.sha256
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror research/conductor_gap_size_ladder_20261026/feasibility.cpp -lgmpxx -lgmp -o "$RUNNER_TEMP/size-plan"
+          "$RUNNER_TEMP/size-plan" --self-test
+      - name: Independently verify retained certificates without searching or solving
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror research/conductor_gap_size_ladder_20261026/verify.cpp -lgmpxx -lgmp -o "$RUNNER_TEMP/size-verify"
+          "$RUNNER_TEMP/size-verify" research/conductor_gap_size_ladder_20261026/results-v2/candidates.csv "$RUNNER_TEMP/parameter-verification.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conductor-gap-parameter-verification
+          path: ${{ runner.temp }}/parameter-verification.json
+          if-no-files-found: error
