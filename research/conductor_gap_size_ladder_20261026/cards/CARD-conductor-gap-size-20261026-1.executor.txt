@@ -1,0 +1,34 @@
+card: CARD-conductor-gap-size-20261026-1 (sha256 8e1bdb2a2acb5ec53804686737570d59117b9c262afa79b4211396a544aa5626)
+commit: ee0f5489b8a946ccb6ea870c56b7fea6e8300993
+receipt: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.receipt.json sha256 b793e9ec200992a8c9585a1e0b0bffd2ad143c0a2ac831f38cbbf8043c2adaa2
+status: stopped at command 2
+command 1 (self-test): ["target/conductor-gap-size-plan", "--self-test"] exit 0 (0.002 s) succeeded
+  stdout sha256 53f99bbe60562de8387557469d6692911e1bfc93ccb1c3debc6da73b91a26806; last 1 lines:
+    Native primality, Pocklington, integer bounds and planning controls passed
+command 2 (search): ["target/conductor-gap-size-plan", "research/conductor_gap_crater_design_20261025/design.json", "research/conductor_gap_size_ladder_20261026/results"] exit 3 (15.032 s) FAILED
+  stdout sha256 d90c6406ee92c951d767137c3edd5307cbc94df395a2d17a85d274f95343ab54; last 1 lines:
+    Parameter candidates retained: 131; complete cells: 19/22; ECDLP solves: 0; explicit models: 0
+  stderr last 20 lines:
+    native bits=40 d=43 accepted=8 candidates=446
+    native bits=40 d=67 accepted=8 candidates=264
+    native bits=47 d=11 accepted=8 candidates=10116
+    native bits=47 d=19 accepted=8 candidates=5690
+    native bits=47 d=43 accepted=8 candidates=1693
+    native bits=47 d=67 accepted=8 candidates=1210
+    native bits=54 d=11 accepted=8 candidates=61030
+    native bits=54 d=19 accepted=8 candidates=16655
+    native bits=54 d=43 accepted=8 candidates=6133
+    native bits=54 d=67 accepted=8 candidates=5273
+    native bits=61 d=11 accepted=8 candidates=271875
+    native bits=61 d=19 accepted=8 candidates=57783
+    native bits=61 d=43 accepted=8 candidates=26969
+    native bits=61 d=67 accepted=8 candidates=12245
+    upper bits=112 d=19 accepted=0 candidates=3000000
+    upper bits=112 d=43 accepted=1 candidates=587
+    upper bits=160 d=19 accepted=0 candidates=3000000
+    upper bits=160 d=43 accepted=1 candidates=46563
+    upper bits=256 d=19 accepted=0 candidates=3000000
+    upper bits=256 d=43 accepted=1 candidates=488609
+  output research/conductor_gap_size_ladder_20261026/results/candidates.csv: 3321de58940fd19ee26bdbe7fdf71d13f144cdd5a6e06de8193fc52c4acfd8e1
+  output research/conductor_gap_size_ladder_20261026/results/design.json: c3712e26979d6d68722466035c09d6c778d5d8cafacc64dce455e2bcf64c76bb
+not run: 1 command(s) after the stop

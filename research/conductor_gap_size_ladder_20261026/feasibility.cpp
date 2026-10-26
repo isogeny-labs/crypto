@@ -130,6 +130,10 @@ void controls() {
     require(witness(Z(97), Z(2), 5) != 0, "Pocklington positive control");
     require(witness(Z(91), Z(3), 2) == 0 && witness(Z(97), Z(2), 2) == 0,
             "Pocklington composite/insufficient-factor controls");
+    require(witness(Z(15), Z(7), 1) == 0, "composite with sufficiently large known factor");
+    for (unsigned residue = 1; residue < 5; ++residue)
+        require((1216 * residue * residue + 1) % 5 == 0 ||
+                (304 * residue * residue + 1) % 5 == 0, "D19 upper-family obstruction");
     double z = normal_quantile(1 - .01 / 4 / 2);
     require(std::abs(z - 3.023341439739154) < 1e-10, "multiplicity critical value");
     require(equivalence_power(1, .005, z) > .999 &&
@@ -140,15 +144,17 @@ void controls() {
 int main(int argc, char** argv) {
     try {
         if (argc == 2 && std::string(argv[1]) == "--self-test") { controls(); return 0; }
-        require(argc == 3, "usage: size-plan MODEL.json NEW_RESULTS_DIR");
-        std::ifstream model(argv[1]);
+        bool completion = argc == 5 && std::string(argv[1]) == "--complete-v2";
+        require(argc == 3 || completion, "usage: size-plan MODEL.json NEW_RESULTS_DIR; or --complete-v2 MODEL.json OLD_CSV NEW_DIR");
+        std::string model_path = argv[completion ? 2 : 1];
+        std::ifstream model(model_path);
         require(bool(model), "planning model unavailable");
         std::ostringstream buffer;
         buffer << model.rdbuf();
         double tau = number(buffer.str(), "truncated_between_class_variance");
         double seed = number(buffer.str(), "average_seed_component");
         double target = number(buffer.str(), "average_target_component_truncated");
-        std::filesystem::path out(argv[2]);
+        std::filesystem::path out(argv[completion ? 4 : 2]);
         require(std::filesystem::create_directory(out), "results path must not exist");
         std::ofstream csv(out / "candidates.csv");
         csv << "kind,field_bits,abs_d,depth,p,t,ell,r,cofactor,ell_factor_exponent,ell_witness,p_witness,r_witness\n";
@@ -157,7 +163,42 @@ int main(int argc, char** argv) {
         struct Cell { std::string kind; unsigned bits, d, accepted; U examined; bool complete; std::string stop; };
         std::vector<Cell> cells;
         auto expired = [&] { return Clock::now() - started > std::chrono::seconds(900); };
-        for (unsigned b : {40, 47, 54, 61}) for (unsigned d : {11, 19, 43, 67}) {
+        if (completion) {
+            std::ifstream retained(argv[3]);
+            require(bool(retained), "v1 CSV unavailable");
+            std::string line;
+            std::getline(retained, line);
+            require(line == "kind,field_bits,abs_d,depth,p,t,ell,r,cofactor,ell_factor_exponent,ell_witness,p_witness,r_witness", "v1 CSV schema");
+            while (std::getline(retained, line)) {
+                std::istringstream row(line);
+                std::vector<std::string> fields;
+                std::string token;
+                while (std::getline(row, token, ',')) fields.push_back(token);
+                require(fields.size() == 13, "v1 CSV columns");
+                Candidate c{fields[0], unsigned(std::stoul(fields[1])), unsigned(std::stoul(fields[2])),
+                    unsigned(std::stoul(fields[3])), unsigned(std::stoul(fields[8])),
+                    unsigned(std::stoul(fields[9])), unsigned(std::stoul(fields[10])),
+                    unsigned(std::stoul(fields[11])), unsigned(std::stoul(fields[12])),
+                    Z(fields[4]), Z(fields[5]), Z(fields[6]), Z(fields[7])};
+                require(c.kind == "native" || (c.kind == "upper" && c.d == 43), "unexpected v1 family");
+                candidates.push_back(c); emit(csv, c);
+            }
+            require(candidates.size() == 131, "v1 retained count");
+            for (unsigned b : {40, 47, 54, 61}) for (unsigned d : {11, 19, 43, 67}) {
+                unsigned n = std::count_if(candidates.begin(), candidates.end(), [&](const Candidate& c) {
+                    return c.kind == "native" && c.field_bits == b && c.d == d;
+                });
+                require(n == 8, "v1 native cell count");
+                cells.push_back({"native", b, d, n, 0, true, "reused-v1-certificate"});
+            }
+            for (unsigned b : {112, 160, 256}) {
+                require(std::count_if(candidates.begin(), candidates.end(), [&](const Candidate& c) {
+                    return c.kind == "upper" && c.field_bits == b && c.d == 43;
+                }) == 1, "v1 upper cell count");
+                cells.push_back({"upper", b, 43, 1, 0, true, "reused-v1-certificate"});
+            }
+        }
+        if (!completion) for (unsigned b : {40, 47, 54, 61}) for (unsigned d : {11, 19, 43, 67}) {
             Wide low = Wide(1) << (b - 1), high = Wide(1) << b, c = d * 64;
             U ell = root((high - 1) / c), examined = 0;
             unsigned accepted = 0;
@@ -198,7 +239,8 @@ int main(int argc, char** argv) {
             std::cerr << "native bits=" << b << " d=" << d << " accepted=" << accepted
                       << " candidates=" << examined << '\n';
         }
-        for (unsigned b : {112, 160, 256}) for (unsigned d : {19, 43}) {
+        std::vector<unsigned> upper_d = completion ? std::vector<unsigned>{67} : std::vector<unsigned>{19, 43};
+        for (unsigned b : {112, 160, 256}) for (unsigned d : upper_d) {
             Z high = Z(1) << b, low = high / 2, quotient = (high - 2) / (d * 64);
             Z ell_max;
             mpz_sqrt(ell_max.get_mpz_t(), quotient.get_mpz_t());
@@ -232,7 +274,7 @@ int main(int argc, char** argv) {
         std::ofstream json(out / "design.json");
         json << std::setprecision(17)
              << "{\n\"schema\":\"conductor-gap.size-ladder/v1\",\"solver_measurements_added\":0,"
-             << "\"curve_models_constructed\":0,\"source_model\":\"" << argv[1] << "\",\n\"cells\":[";
+             << "\"curve_models_constructed\":0,\"source_model\":\"" << model_path << "\",\n\"cells\":[";
         for (size_t i = 0; i < cells.size(); ++i) {
             auto& c = cells[i]; if (i) json << ',';
             json << "{\"kind\":\"" << c.kind << "\",\"field_bits\":" << c.bits

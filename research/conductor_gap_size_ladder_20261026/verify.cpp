@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
                 ++native;
             } else {
                 check(fields[0] == "upper" && (b == 112 || b == 160 || b == 256), "upper size cell");
-                check((d == 19 || d == 43) && t == -2 && h == 4, "upper family");
+                check((d == 43 || d == 67) && t == -2 && h == 4, "amended upper family");
                 check(mpz_sizeinbase(r.get_mpz_t(), 2) == b - 2, "upper subgroup size");
                 pocklington(ell, Z(2), std::stoul(fields[9]), Z(fields[10]));
                 pocklington(p, ell, 2, Z(fields[11]));
