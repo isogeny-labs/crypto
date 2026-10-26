@@ -150,6 +150,8 @@ smooth `p − 1` lead) is unaffected.
 | PKM cost at P-224 tower depth | open (not attempted; needs its own protocol) |
 | hypothesis 4 | not testable |
 
+**Later evidence (2026-10-22):** the "class number of `D_K`" row above is no longer open in the sense of "no estimate": `research/p224_class_number_20261022/` gives `h(D_K) ≈ 3.5185 × 10^32 = 2^108.117` for P-224 (GRH-conditional interval 2^108.10 to 2^108.14, with a named assumed constant; heuristic and proved parts labelled there), and the exact 2-rank 6 with Rédei 4-rank 0, so `h = 64·m` with `m` odd. The exact value of `h` is still not computed. The frozen rows above are unchanged.
+
 # Reproduce
 
 ```bash

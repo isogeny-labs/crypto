@@ -120,6 +120,7 @@ pub mod challenge_ladder;
 pub mod cheon_attack;
 pub mod cheon_counted;
 pub mod cipher_registry;
+pub mod class_number_estimate;
 pub mod cm_canonical_lift;
 pub mod coleman_integration;
 pub mod coordinate_descent;
