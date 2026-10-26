@@ -217,6 +217,27 @@ pub fn run(args: &[String]) {
         });
     }
     let mut js: Vec<String> = Vec::new();
+    // protocol calibration rule: a rho arm is not used at a size whose mean steps/sqrt(ell) is outside
+    // [1.0, 1.5] (plain) or [0.75, 1.15] (neg). N4V2_NOCALIBRULE=1 keeps every size (sensitivity).
+    let mut rho_all = rho.clone();
+    if std::env::var("N4V2_NOCALIBRULE").is_err() {
+        println!("## rho calibration rule (PROTOCOL): sizes excluded\n");
+        for (arm, m) in rho.iter_mut() {
+            let (lo, hi) = if arm == "neg" { (0.75, 1.15) } else { (1.0, 1.5) };
+            let bad: Vec<u64> = m.iter().filter(|(_, rs)| {
+                let c = rs.iter().map(|r| r.steps / r.sqrt_ell).sum::<f64>() / rs.len() as f64;
+                c < lo || c > hi
+            }).map(|(q, _)| *q).collect();
+            for q in &bad {
+                let rs = &m[q];
+                let c = rs.iter().map(|r| r.steps / r.sqrt_ell).sum::<f64>() / rs.len() as f64;
+                println!("- rho-{} at q = {}: steps/sqrt(ell) = {:.3} over {} runs, outside [{}, {}]: not used", arm, q, c, rs.len(), lo, hi);
+                js.push(format!("{{\"kind\":\"rho_excluded\",\"arm\":\"{}\",\"q\":{},\"calib\":{:.4},\"runs\":{}}}", arm, q, c, rs.len()));
+                m.remove(q);
+            }
+        }
+        println!();
+    }
     let nb = 2000;
     // ---------------------------------------------------------------- per size tables
     println!("## Cold single-target cost per arm and size (successful units; M-eq at w = 0)\n");
@@ -265,7 +286,7 @@ pub fn run(args: &[String]) {
     println!("|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|");
     let mut calib: BTreeMap<String, f64> = BTreeMap::new();
     for arm in RHO_ARMS {
-        let Some(m) = rho.get(arm) else { continue };
+        let Some(m) = rho_all.get(arm) else { continue };
         let all: Vec<f64> = m.values().flatten().filter(|r| kof(r.sqrt_ell as u64) > 0).map(|r| r.steps / r.sqrt_ell).collect();
         let c = mean(&all);
         calib.insert(arm.to_string(), c);
@@ -548,6 +569,25 @@ pub fn run(args: &[String]) {
             println!("\nrho-neg / rho-plain M-eq (w = 0), geometric mean over {} sizes k >= 12: {:.3} [{:.3}, {:.3}]", qs.len(), pt, pct(&bs, 0.025), pct(&bs, 0.975));
             js.push(format!("{{\"kind\":\"neg_over_plain\",\"sizes\":{},\"ratio\":{:.4},\"lo\":{:.4},\"hi\":{:.4}}}", qs.len(), pt, pct(&bs, 0.025), pct(&bs, 0.975)));
         }
+    }
+    // P3 / P4 checks from recorded phase means and statistics (per size, means over successful units)
+    println!("\n## P3 / P4 checks (means over successful units)\n");
+    println!("| q | S/B0 relations mul | S/B0 relations wall | SGE cols / active cols (L1) | L1 LA / S LA (M-eq) | L LA / L1 LA (M-eq) | L LA / S LA (M-eq) | DL1 LA / D LA | DL LA / D LA |");
+    println!("|--:|--:|--:|--:|--:|--:|--:|--:|--:|");
+    let mean_of = |arm: &str, q: u64, f: &dyn Fn(&Unit) -> f64| -> f64 {
+        ic.get(arm).and_then(|m| m.get(&q)).map(|us| { let v: Vec<f64> = us.iter().filter(|u| u.ok).map(|u| f(u)).collect(); if v.is_empty() { f64::NAN } else { mean(&v) } }).unwrap_or(f64::NAN)
+    };
+    for &q in sizes.keys() {
+        let relmul = |arm: &str| mean_of(arm, q, &|u: &Unit| *u.stats.get("__relmul").unwrap_or(&f64::NAN));
+        let _ = relmul;
+        let rw_s = mean_of("S", q, &|u: &Unit| u.phw[1]);
+        let rw_b = mean_of("B0", q, &|u: &Unit| u.phw[1]);
+        let rm_s = mean_of("S", q, &|u: &Unit| u.ph[1]);
+        let rm_b = mean_of("B0", q, &|u: &Unit| u.ph[1]);
+        let sge = mean_of("L1", q, &|u: &Unit| u.stats.get("sge_cols").copied().unwrap_or(f64::NAN) / u.stats.get("cols_active").copied().unwrap_or(f64::NAN));
+        let la = |a: &str| mean_of(a, q, &|u: &Unit| u.ph[3]);
+        println!("| {} | {:.4} | {:.3} | {:.3} | {:.3} | {:.3} | {:.3} | {:.3} | {:.3} |", q, rm_s / rm_b, rw_s / rw_b, sge, la("L1") / la("S"), la("L") / la("L1"), la("L") / la("S"), la("DL1") / la("D"), la("DL") / la("D"));
+        js.push(format!("{{\"kind\":\"p3p4\",\"q\":{},\"s_b0_rel_meq\":{:.5},\"s_b0_rel_wall\":{:.4},\"sge_frac\":{:.4},\"l1_s_la\":{:.4},\"l_l1_la\":{:.4},\"l_s_la\":{:.4},\"dl1_d_la\":{:.4},\"dl_d_la\":{:.4}}}", q, rm_s / rm_b, rw_s / rw_b, sge, la("L1") / la("S"), la("L") / la("L1"), la("L") / la("S"), la("DL1") / la("D"), la("DL") / la("D")));
     }
     // phase exponents per arm (full range)
     println!("\n## Phase exponents (full range, fits of phase means)\n");

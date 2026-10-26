@@ -119,6 +119,67 @@ fn calib_cmd(q: u64, seed: u64) {
     println!("{{\"rec\":\"calib\",\"q\":{},\"seed\":{},\"r_inv\":{:.4},\"r_lmul\":{:.4},\"mul_ns_median\":{:.3},\"mul_ns_min\":{:.3},\"load1\":{:.2}}}", q, seed, r_inv, r_l, ns_med, ns_min, load1());
 }
 
+/// N4's `check` homomorphism and Jacobian-order tests with overflow-safe (a + b) mod ell, for
+/// ell close to 2^64 (k = 22), where N4's check computes (a + b) % ell in u64 and overflows.
+fn homcheck_cmd(q: u64, seed: u64) {
+    let inst = Inst::search(q, seed, 200000).expect("no instance");
+    println!("instance q={} order={} ell={} tries={}", q, inst.order, inst.ell, inst.tries);
+    let p0 = pic::first_rational_point_canonical(q as u32, &inst.f).expect("no point");
+    let cv = pic::PlaneQuartic::new(q as u32, inst.f, p0).expect("pic new");
+    let mut rng = Rng::new(seed ^ 77);
+    let mut bshift: Option<pic::PicClass> = None;
+    let (mut trip, mut fails, mut tries) = (0, 0, 0);
+    while trip < 8 && tries < 600 {
+        tries += 1;
+        let a = rng.below(inst.ell - 1) + 1;
+        let b = rng.below(inst.ell - 1) + 1;
+        let c = ((a as u128 + b as u128) % inst.ell as u128) as u64;
+        if c == 0 {
+            continue;
+        }
+        let mut cls = Vec::new();
+        for n in [a, b, c] {
+            let p = inst.ec.mul(&inst.g, n as u128);
+            match inst.transfer_cubics(&p) {
+                Some(rows) => cls.push(cv.reduce_deg6(&pic::Gen { k: 3, rows })),
+                None => break,
+            }
+        }
+        if cls.len() < 3 {
+            continue;
+        }
+        let bsh = cv.sub(&cv.add(&cls[0], &cls[1]), &cls[2]);
+        match &bshift {
+            None => bshift = Some(bsh),
+            Some(b0) => {
+                if *b0 != bsh {
+                    fails += 1;
+                }
+            }
+        }
+        trip += 1;
+    }
+    println!("hom triples {} failures {}", trip, fails);
+    let curve = ic::Curve::new(q, &inst.f);
+    let mut r2 = Rng::new(seed ^ 99);
+    let pts: Vec<[u32; 3]> = ic2::sample_points2(&curve, 200, &mut r2).iter().map(|p| [p[0] as u32, p[1] as u32, p[2] as u32]).collect();
+    let mut bad = 0;
+    for _ in 0..10 {
+        let mut x = cv.zero();
+        for _ in 0..5 {
+            let p = pts[rng.below(pts.len() as u64) as usize];
+            x = cv.add(&x, &cv.point_class(p));
+        }
+        if cv.mul_scalar(&x, inst.order) != cv.zero() {
+            bad += 1;
+        }
+    }
+    println!("#Jac * x != 0 failures: {}", bad);
+    if trip >= 3 && fails == 0 && bad == 0 {
+        println!("HOMCHECK OK");
+    }
+}
+
 fn flat_cnt(prefix: &str, c: &Cnt, out: &mut Vec<String>) {
     out.push(format!("\"{p}.mul\":{},\"{p}.inv\":{},\"{p}.add\":{},\"{p}.lmul\":{},\"{p}.ladd\":{},\"{p}.hash\":{},\"{p}.cmp\":{}", c.mul, c.inv, c.add, c.lmul, c.ladd, c.hash, c.cmp, p = prefix));
 }
@@ -304,6 +365,7 @@ fn main() {
             a.get(8).map(|s| s.parse().unwrap()).unwrap_or(4),
         ),
         Some("rho") => rho_cmd(a[2].parse().unwrap(), a[3].parse().unwrap(), a[4].parse().unwrap(), a[5].parse().unwrap(), &a[6]),
+        Some("homcheck") => homcheck_cmd(a[2].parse().unwrap(), a[3].parse().unwrap()),
         Some("calib") => calib_cmd(a[2].parse().unwrap(), a[3].parse().unwrap()),
         Some("instances") => instances_cmd(&a[2..]),
         Some("qlist") => qlist(a[2].parse().unwrap(), a[3].parse().unwrap()),

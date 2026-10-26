@@ -59,7 +59,7 @@ for a in ["plain", "neg"]:
     if s: ax.loglog([r["q"] for r in s], [r["wall_s"] for r in s], "o--", ms=3, color=RHC[a], label=f"rho-{a}")
 ax.set_xlabel("q"); ax.set_ylabel("wall seconds per cold solve (single thread, shared host, L0)")
 ax.grid(True, which="both", alpha=.3); ax.legend(fontsize=7, ncol=2)
-ax.set_title("Wall time (practicality note; host load average 70-150)\n" + cap, fontsize=8.5)
+ax.set_title("Wall time (practicality note; shared host, L0, load not controlled)\n" + cap, fontsize=8.5)
 save(fig, "wall_vs_q")
 
 # 4. phase shares

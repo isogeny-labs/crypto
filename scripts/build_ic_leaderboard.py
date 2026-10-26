@@ -74,6 +74,7 @@ SOURCES = {
     "la_engines": "research/la_engines_20261014/summary.json",
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
+    "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -646,6 +647,61 @@ def ghs_weak_n4() -> dict:
             "report": "research/quartic_n4_20261019/README.md"}
 
 
+def ghs_weak_n4v2() -> dict:
+    """N4 v2 (research/quartic_n4v2_20261020): the same GHS-weak family over q = 2^8..2^22, frozen
+    B0 against four changes (sorted bucketing S, SGE + block Lanczos L, double large primes D, both
+    DL) and against plain and negation-map rho. Copied from the frozen summary (computed there);
+    restricted to one special family, outside tables A-C."""
+    recs = _jsonl(SOURCES["ghs_weak_n4v2"])
+    arms = ("B0", "DL")
+    rows = [r for r in recs if r.get("kind") == "ratio" and r["ic"] in arms]
+    fits = [r for r in recs if r.get("kind") == "fit" and r["range"] in ("full", "high")]
+    paired = [r for r in recs if r.get("kind") == "paired" and r["ref"] == "B0" and r["arm"] in ("L", "D", "DL")]
+    cross = [r for r in recs if r.get("kind") == "crossover" and r["ic"] in ("B0", "DL") and r["rho"] == "neg"]
+    return {"rows": rows, "fits": fits, "paired": paired, "crossovers": cross,
+            "class": "improvement over the frozen N4 B0 (restricted to the GHS-weak family)",
+            "baseline_arm": "B0", "headline_arm": "DL", "study": "research/quartic_n4v2_20261020/",
+            "report": "research/quartic_n4v2_20261020/README.md"}
+
+
+def _ci(v, lo, hi, i):
+    return f"{v[i]:.3g} [{lo[i]:.3g}, {hi[i]:.3g}]"
+
+
+def ghs2_md(g: dict) -> list[str]:
+    L = ["", "## GHS-weak E0/F_{q^3} (N4 v2): frozen B0 vs double large primes, SGE + block Lanczos; plain and negation-map rho", "",
+         "Copied from `" + SOURCES["ghs_weak_n4v2"] + "`. Same restrictions as the N4 section: one special GHS-weak "
+         "family, outside tables A–C, cold one-target cost in F_q-multiplication equivalents. Class: " + g["class"] +
+         ". Headline (pre-registered) arm DL; baseline B0. Arm / B0 on the same instances (w = 0):", ""]
+    for r in sorted(g["paired"], key=lambda r: (r["arm"], r["q"])):
+        if r["q"] >= 65479:
+            L.append(f"- {r['arm']} / B0 at q = {r['q']}: {_ci(r['ratio'], r['lo'], r['hi'], 0)} ({r['resolved']})")
+    L += ["", "| IC arm | rho | q | IC/rho (w=0) | IC/rho (w=1) | resolved |", "|:--|:--|--:|:--|:--|:--|"]
+    for r in g["rows"]:
+        if r["ic"] in ("B0", "DL") and r["q"] in (4051, 65479, 1048507, 2097091, 4194271):
+            L.append(f"| {r['ic']} | {r['rho']} | {r['q']} | {_ci(r['ratio'], r['lo'], r['hi'], 0)} | {_ci(r['ratio'], r['lo'], r['hi'], 2)} | {r['resolved']} |")
+    L += ["", "Fitted exponents (w = 0):", ""]
+    for f in g["fits"]:
+        L.append(f"- {f['arm']}, {f['range']} (k {f['k0']}..{f['k1']}): {f['e'][0]:.3f} [{f['lo'][0]:.3f}, {f['hi'][0]:.3f}]")
+    L += ["", "Crossover against negation-map rho:", ""]
+    for c in g["crossovers"]:
+        L.append(f"- {c['ic']}, {c['measure']}: resolved from q = {c['resolved_q']}, interpolated q* = {c['qstar']} [{c['qstar_lo']}, {c['qstar_hi']}]")
+    L.append("")
+    return L
+
+
+def ghs2_html(g: dict) -> str:
+    md = ghs2_md(g)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    tr = [x for x in md if x.startswith("| ") and not x.startswith("| IC arm")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip())}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="ghs-weak-n4v2-20261020"><h2>GHS-weak E0/F<sub>q<sup>3</sup></sub> (N4 v2): frozen B0 vs '
+            'double large primes and SGE + block Lanczos; plain and negation-map rho</h2>' + body +
+            '<div class="scroll"><table><thead><tr><th>IC arm</th><th>rho</th><th>q</th><th>IC/rho (w=0)</th>'
+            '<th>IC/rho (w=1)</th><th>resolved</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+            gh(SOURCES["ghs_weak_n4v2"], "Frozen summary") + '</section>')
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1099,6 +1155,7 @@ def build() -> dict:
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
         "ghs_weak_n4_component": ghs_weak_n4(),
+        "ghs_weak_n4v2_component": ghs_weak_n4v2(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1469,6 +1526,7 @@ def markdown(doc: dict) -> str:
         L.append(f"| {session['ell']} | {observed['ratio_floor_over_crater']:.6f} | "
                  f"{observed['ci99'][0]:.6f} to {observed['ci99'][1]:.6f} |")
     L += ghs_md(doc["ghs_weak_n4_component"])
+    L += ghs2_md(doc["ghs_weak_n4v2_component"])
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -2123,6 +2181,7 @@ def page(doc: dict, standalone: bool) -> str:
     P.append('</tbody></table>' + gh(SOURCES["conductor_gap_counts"], 'Native analysis and source records') + '</section>')
 
     P.append(ghs_html(doc["ghs_weak_n4_component"]))
+    P.append(ghs2_html(doc["ghs_weak_n4v2_component"]))
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]
