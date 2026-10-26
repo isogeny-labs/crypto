@@ -109,14 +109,41 @@ at least 3 in each zone. Prices and scores must be rechecked before
 allocation. The gp3
 rate and meaning of placement scores follow [AWS EBS pricing](https://aws.amazon.com/ebs/pricing/)
 and [AWS Spot placement guidance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-sps-works.html).
-The current module writes only a read-only plan. AWS launch, host binding,
-raw collection and independent replay still require an adapter and separate
-spend approval; no AWS high-K allocation is implied by this plan.
+`allocate_aws.py` refreshes this plan from the provider immediately before
+allocation. Its default invocation is read only. The `--execute` option
+stages the exact source in a versioned S3 bucket and requests one Spot host
+per zone, with a fixed bid, encrypted deletion-on-termination root disk,
+outbound-only security group, host-side shutdown timer, and independently
+running local termination guard. The host checks its IMDSv2 instance identity,
+builds both pinned ARM64 producers, runs the frozen alternating IC/rho schedule,
+and uploads raw results and a status archive. `collect_aws.py` downloads exact
+S3 object versions and checks archive bytes; `aggregate_aws.py` replays both
+strata, binds the EC2 API snapshot to the host receipts, and applies the sealed
+selector. Missing, partial, noisy, or failed pairs remain bounded unknown.
+An allocation requires separate spend approval. The bid projection is not a
+guaranteed account billing ceiling if both deletion guards fail.
 
 ```sh
 python3 -m research.n83_crossfamily_current_20261025.plan_aws_spot \
   --source-bundle /absolute/path/outside/repository/n83-source-bundle \
   --output /absolute/path/outside/repository/n83-aws-plan.json
+# Use a dedicated Python environment with requirements-aws-control.txt.
+python3 -m research.n83_crossfamily_current_20261025.allocate_aws \
+  --plan /absolute/path/outside/repository/n83-aws-plan.json \
+  --source-bundle /absolute/path/outside/repository/n83-source-bundle \
+  --output /absolute/path/outside/repository/n83-aws-allocation
+# After separate approval, add --execute to allocate two Spot hosts.
+python3 -m research.n83_crossfamily_current_20261025.collect_aws \
+  --controller-receipt /absolute/path/outside/repository/n83-aws-allocation/allocation.json \
+  --output /absolute/path/outside/repository/n83-aws-collected
+python3 -m research.n83_crossfamily_current_20261025.aggregate_aws \
+  --snapshot /absolute/path/outside/repository/n83-aws-collected/provider_snapshot.json \
+  --stratum0 /absolute/path/outside/repository/n83-aws-collected/stratum0/results \
+  --stratum1 /absolute/path/outside/repository/n83-aws-collected/stratum1/results \
+  --archive0 /absolute/path/outside/repository/n83-aws-collected/stratum0.raw_results.tar.gz \
+  --archive1 /absolute/path/outside/repository/n83-aws-collected/stratum1.raw_results.tar.gz \
+  --head-sha "$(git rev-parse HEAD)" \
+  --output /absolute/path/outside/repository/n83-aws-replay
 ```
 
 Replay the sealed preparation in a full checkout with Python `blake3==1.0.8`
