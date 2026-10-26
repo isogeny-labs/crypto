@@ -26,7 +26,7 @@ template:
     # Spot gives 2 minutes; leave the job's SIGTERM trap time to push records.
     terminationGracePeriodSeconds: 110
     nodeSelector:
-      gha.dev/pool: on-demand
+      gha.dev/pool: gates
     tolerations:
       - key: gha.dev/workload
         operator: Equal
@@ -38,7 +38,8 @@ template:
         command: ["/home/runner/run.sh"]
         resources:
           requests:
-            cpu: "16"
+            # Leave room for kube/system reservations and the Docker sidecar.
+            cpu: "14"
             memory: 112Gi
             ephemeral-storage: 20Gi
           limits:

@@ -13,10 +13,10 @@ name: "CodeQL Advanced"
 
 on:
   # Not a pull-request check. The merge set is gate, size, and artifacts.
-  # This runs when the matching change is on main, or on its schedule.
+  # This runs when the matching change reaches main, or on demand.
+  push:
+    branches: [main]
   workflow_dispatch:
-  schedule:
-    - cron: '41 2 * * 3'
 
 concurrency:
   group: codeql-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
