@@ -1704,5 +1704,94 @@ mod tests {
             "the solver is inside the phase"
         );
         assert!(report.s > 0.0 && report.s.is_finite());
+
+        // `bitop/v1` completeness.  The base's phase and the oracle's
+        // set-up each carry what `bitop_tally` saw as `tally_*` counters,
+        // every one of them nonzero (the subspace's XORs and set probes,
+        // the lifts' products, squarings and inversions, the Artin–
+        // Schreier squarings, the frame's inversions; the set-up repeats
+        // the base and adds the membership probes), the set-up carries
+        // the marker, `native` carries none of it, and every solve set
+        // `bitop_complete`.
+        use crate::cryptanalysis::bitop_tally::WORK_NATIVE_KEYS;
+        use std::collections::BTreeMap;
+        for (phase, cost) in [
+            ("factor_base", &report.factor_base.cost),
+            ("oracle_setup", &report.decomposition.setup),
+        ] {
+            for key in WORK_NATIVE_KEYS {
+                assert!(
+                    cost.work_native.get(key).copied().unwrap_or(0) > 0,
+                    "{phase}: {key} is zero"
+                );
+                assert!(
+                    !cost.native.contains_key(key),
+                    "{phase}: {key} leaked into native"
+                );
+            }
+        }
+        assert_eq!(
+            report
+                .decomposition
+                .setup
+                .work_native
+                .get("counted:table_insert_attempts"),
+            Some(&1)
+        );
+        assert_eq!(solver.extra.get("bitop_complete"), Some(&1));
+        // Priced as `ecbench work` prices a record, the run is complete:
+        // nothing unpriced, nothing known uncounted.
+        use crate::cryptanalysis::ecbench::methods::{phase_of, SolverStats};
+        use crate::cryptanalysis::ecbench::work::{price, Priceable};
+        use crate::cryptanalysis::ecbench::workload::CurveFacts;
+        let phases = vec![
+            phase_of("factor_base", &report.factor_base.cost),
+            phase_of("oracle_setup", &report.decomposition.setup),
+            phase_of("relations", &report.decomposition.cost),
+            phase_of("linear_algebra", &report.linear_algebra.cost),
+            phase_of("verify", &report.verify),
+        ];
+        let stats = SolverStats::from_report(solver, oracle.last_system().as_ref());
+        let curve = CurveFacts {
+            slug: inst.name.clone(),
+            icv1: String::new(),
+            family: "koblitz".into(),
+            construction: String::new(),
+            field_degree: Some(inst.n),
+            field_bits: None,
+            group_order: u128::from(inst.group_order),
+            r: u128::from(inst.r),
+            cofactor: u128::from(inst.cofactor),
+            generator: [String::new(), String::new()],
+            automorphisms_available: 2 * inst.n,
+            registered: false,
+            ec1: None,
+            curve_uid: None,
+        };
+        let params = BTreeMap::new();
+        let counters = BTreeMap::new();
+        let work = price(&Priceable {
+            method_id: "ic.pipeline",
+            method_params: &params,
+            curve: &curve,
+            phases: &phases,
+            counters: &counters,
+            solver: Some(&stats),
+        })
+        .expect("the record prices");
+        assert!(work.unpriced.is_empty(), "unpriced: {:?}", work.unpriced);
+        assert!(
+            work.known_uncounted.is_empty(),
+            "known_uncounted: {:?}",
+            work.known_uncounted
+        );
+        assert!(work.complete);
+        let setup = work
+            .phases
+            .iter()
+            .find(|p| p.name == "oracle_setup")
+            .expect("the set-up phase is priced");
+        assert!(setup.prims.get("field_inv").copied().unwrap_or(0) > 0);
+        assert!(setup.prims.get("hash_probe").copied().unwrap_or(0) > 0);
     }
 }

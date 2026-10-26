@@ -150,6 +150,17 @@ scans, read-back, the splitting tree's substitutions and scans, and the
 `F_{2^n}` operations of the summation-polynomial build and of each lift.
 Across calls the flag holds only while every call set it.
 
+A phase with no solver block to carry those keys — a base builder, an
+oracle's `prepare` — reports what the same tally saw as the `work_native`
+counters `tally_word_ops`, `tally_hash_probes`, `tally_field_adds`,
+`tally_field_muls`, `tally_field_sqrs` and `tally_field_invs`, priced at one
+primitive each (`Tally::add_work_native`). The `koblitz-symmetrised` base
+(its subspace, lifts and Frobenius-orbit view) and the `symmetrised` oracle's
+set-up (the rebuilt `F_u`, the membership check, the field tables and the
+generator's system, in the `oracle_setup` phase) are charged this way, so a
+record of that oracle is complete; its engine reports no memory figure, and
+`peak_bytes` stays 0, reported and never priced.
+
 A record whose counters include one with no `bitop/v1` rule has no total. Its
 `work.complete` is `false` and the unpriced counters are named. An unknown
 cost is never written as zero.

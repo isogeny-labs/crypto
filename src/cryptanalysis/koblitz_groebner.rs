@@ -261,6 +261,8 @@ impl FieldSum {
 
     /// The known field element `b`, as [`SymElement::constant`] lifts it.
     fn constant(b: &F2mElement, st: &FieldStructure) -> Self {
+        // `bitop/v1`: the mask and the zero test, one word
+        bitop_tally::word_ops(1);
         let bits = b.raw_bits().first().copied().unwrap_or(0) & coordinate_bits(st);
         Self(if bits == 0 {
             Vec::new()
@@ -475,6 +477,8 @@ pub fn poly_mul(p: &F2BoolPoly, q: &F2BoolPoly) -> F2BoolPoly {
 impl SymElement {
     /// The zero element.
     pub fn zero(n: u32, n_vars: usize) -> Self {
+        // `bitop/v1`: one empty coordinate written per bit of the field
+        bitop_tally::word_ops(u64::from(n));
         Self {
             coords: (0..n).map(|_| F2BoolPoly::zero(n_vars)).collect(),
         }
@@ -482,6 +486,8 @@ impl SymElement {
 
     /// A known field element, lifted to a constant symbolic one.
     pub fn constant(v: &F2mElement, n: u32, n_vars: usize) -> Self {
+        // `bitop/v1`: one bit test and coordinate written per bit
+        bitop_tally::word_ops(u64::from(n));
         let bits = v.raw_bits().first().copied().unwrap_or(0);
         let coords = (0..n)
             .map(|k| {
@@ -512,6 +518,15 @@ impl SymElement {
                 }
             }
         }
+        // `bitop/v1`: one bit test per basis element and coordinate, then
+        // each coordinate's `from_monos`
+        bitop_tally::word_ops(
+            (basis.len() * n as usize) as u64
+                + coords
+                    .iter()
+                    .map(|ms| bitop_tally::poly::from_monos(ms.len()))
+                    .sum::<u64>(),
+        );
         Self {
             coords: coords
                 .into_iter()
