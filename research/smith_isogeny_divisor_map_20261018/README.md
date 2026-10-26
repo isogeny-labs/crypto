@@ -173,8 +173,8 @@ producing host. `data/summary.json` holds every total quoted here. Exactly
 reproducible from the seed (20261018): `verify`, `deg8`, Route S at
 q = 7, 11, 13 (complete runs) and the T7 operation counts. Not exactly
 reproducible: the q = 17, 19, 23 Route S rows (how far a 1 h cap gets depends
-on host load) and all wall times. `gunzip -k` the records before `summarize`. The two report PDFs are on the policy's keep
-list, as other studies' report PDFs are. Run ids: start rows of each JSONL file
+on host load) and all wall times. `gunzip -k` the records before `summarize`. The two report PDFs are in the artifact store
+(`.artifacts.json` beside each; `artifacts.py pull` hydrates them). Run ids: start rows of each JSONL file
 (commit and arguments); runs 2026-10-26T02:49Z to about 05:10Z UTC. q = 13 hit
 the first run's 1 h cap at 53 173 of 56 784 instances; it was rerun with a
 2 h cap and completed (the recorded file is the complete rerun).
