@@ -437,6 +437,7 @@ fn method_record(
             .unwrap_or("incremental-gauss"),
     );
     let algebraic = oracle == "descent-algebraic";
+    let pkm = oracle == "pkm-semaev";
     let manifest = id_sha256(&imp.json())?;
     Ok(json!({
         "isogeny": "none",
@@ -454,14 +455,14 @@ fn method_record(
         "point_decomposition": {
             "summands": summands,
             "solver": solver_code,
-            "summation_polynomial": if algebraic { "Semaev summation polynomial, Weil-descended over the base subspace" } else { "none: exact table lookup of point sums" },
-            "encoding": if algebraic { format!("boolean system for solver {solver}") } else { format!("pair table ({oracle})") },
-            "equation_order": if algebraic { "solver default" } else { "not applicable" },
-            "monomial_order": if algebraic { "solver default" } else { "not applicable" },
-            "internal_matrix_kernel": if algebraic { "solver default" } else { "not applicable" },
+            "summation_polynomial": if pkm { "Semaev summation polynomial S_(m+1) over F_p, each x_i on the base's Kummer tower (x/g)^(2^t) = 1 (PKM)" } else if algebraic { "Semaev summation polynomial, Weil-descended over the base subspace" } else { "none: exact table lookup of point sums" },
+            "encoding": if pkm { format!("F_p system in the tower quotient ring ({oracle}:{oparams})") } else if algebraic { format!("boolean system for solver {solver}") } else { format!("pair table ({oracle})") },
+            "equation_order": if pkm { "summation equations, then towers" } else if algebraic { "solver default" } else { "not applicable" },
+            "monomial_order": if pkm { "grevlex, tower variables first" } else if algebraic { "solver default" } else { "not applicable" },
+            "internal_matrix_kernel": if pkm { "f4_fp_tower Faugère–Lachartre elimination" } else if algebraic { "solver default" } else { "not applicable" },
             "limits": format!("max_trials={}, solver_budget_seconds={}", p.get("max_trials").map(String::as_str).unwrap_or("?"), p.get("solver_budget_seconds").map(String::as_str).unwrap_or("0")),
             "cache_policy": "tables built per run (cold)",
-            "source_sha256": imp.sha("ic_plugins"),
+            "source_sha256": if pkm { sha256_hex(include_bytes!("../ic_framework/pkm_semaev.rs")) } else { imp.sha("ic_plugins") },
         },
         "relation_collection": {
             "collector": collector,
