@@ -1,5 +1,12 @@
 # The weak-class cover row re-priced in `bitop/v1`, both arms executed
 
+**Report:** [`REPORT.pdf`](REPORT.pdf) (source [`REPORT.typ`](REPORT.typ)).
+**Figures:** [`figures/ratio_vs_rho.svg`](figures/ratio_vs_rho.svg) (IC/rho per
+row with 95% CI and the §5a band) and
+[`figures/ic_phases_primary.svg`](figures/ic_phases_primary.svg) (IC bitops by
+phase at the primary row), PNG renders beside them, drawn by
+[`figures/plots.py`](figures/plots.py) from `analysis.json` only.
+
 **Question** (PROTOCOL.md, frozen before any run in commit `9a6e3de35`): does
 the scoreboard row "Whole method from a curve that is not weak (section 18):
 p = 1,511 (subgroup 2^61.4), 4 seeds" (`0.010×`) stay below Pollard rho? Here
@@ -16,6 +23,8 @@ Class: **accounting** (a re-measurement, not an improvement). The distance
 remaining to rho is that the IC arm costs about 1% of the strong rho at
 `ℓ = 2^61.4`, on the weak class only. The weak class has full rational
 2-torsion and a genus-3 cover, and it never contains prime-order curves.
+
+![IC/rho per row, 95% CI and §5a band, log scale](figures/ratio_vs_rho.svg)
 
 ## Table (`analysis.json`, `examples/jv_cover_bitop_analyse.rs`)
 
@@ -53,6 +62,8 @@ run solved and verified:
 | factor base | 1.3e09 | <0.1% |
 | verification | 1.1e08 | <0.1% |
 | unattributed | 0 | 0 |
+
+![IC bitops by phase, p = 1511, moves = 8](figures/ic_phases_primary.svg)
 
 For rho R3 at `p = 1511`, the walk is 8.33e14, collision detection 6.9e11,
 precomputation 3.1e10 and verification 5.6e7.
@@ -144,6 +155,25 @@ bounds them rather than counting them instruction by instruction. It is in
 bound in the sense of BITOPS.md. The comparison is a measured ratio under
 the convention.
 
+## Validation gate
+
+This row is **not** added to the IC leaderboard or to `benchmarks/README.md`.
+The validation gate (`docs/VALIDATION_GATE.md`) needs a `VALIDATION.json` in
+this directory naming three artifacts, and two are missing:
+
+- **replay certificate:** missing. No independent replay of the recorded IC
+  and rho runs with scalars verified has been made.
+- **validator report:** missing. No independent recompute of the headline
+  ratios from `raw/` has been made.
+- **matched rho reference:** present in substance (R3, the strong rho named
+  by PROTOCOL.md, executed on the same curves in the same unit and process,
+  with the §5a band at 0, 0.1 and 1 GAE), but not yet recorded in a
+  `VALIDATION.json`.
+
+Until those exist, the study stays a research record. Separately, no
+`ecbench audit-ir` instruction audit was run, so neither arm is an admitted
+`bitop/v1` bound.
+
 ## Files and runtimes
 
 | path | content |
@@ -153,6 +183,8 @@ the convention.
 | `raw/killed_card2/` | the killed attempt's partial R0 file and the killed command's streams, not used |
 | `cards/` | task cards 1, 2, 2b, 3 and 4 with receipts (card 2 has none: it was killed) |
 | `analysis.json` | the analysis output |
+| `figures/` | SVG/PNG figures and `plots.py` (plots recorded values only) |
+| `REPORT.typ`, `REPORT.pdf` | the visual report (Typst) |
 
 Wall times are descriptive, since up to 16 workers ran on a shared 4-core
 host:
