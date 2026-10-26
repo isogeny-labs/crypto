@@ -4,6 +4,17 @@ Protocol: [`PROTOCOL.md`](PROTOCOL.md) (frozen before any re-run). Generated
 tables: [`BEFORE_AFTER.md`](BEFORE_AFTER.md), [`PLAN.md`](PLAN.md),
 [`TRANCHE.md`](TRANCHE.md), all from `examples/ic_acct6_archive.rs`.
 
+**Report:** [`REPORT.pdf`](REPORT.pdf) (source [`REPORT.typ`](REPORT.typ)).
+**Figures** (SVG, PNG renders beside them), drawn by
+[`figures/plots.py`](figures/plots.py) from the committed breakdowns,
+`plan.json` and `TRANCHE.md` only:
+[`before_after_totals`](figures/before_after_totals.svg) (archive status before/after phase A),
+[`before_after_categories`](figures/before_after_categories.svg) (what the new rules changed),
+[`rerun_plan`](figures/rerun_plan.svg) (the re-run plan by status) and
+[`tranche1`](figures/tranche1.svg) (the two re-run sessions).
+
+![Re-run plan by status](figures/rerun_plan.svg)
+
 ## Phase A: rules (no runs)
 
 `docs/units/BITOPS.md`, "Extensions", 2026-10-21. No primitive weight
@@ -53,3 +64,8 @@ when its method's code writes every `counted:` marker. Two changes follow:
   incomplete records, about 2.0 hours.
 - Instrument `ic.shared_rank`'s rank, row, walk and table paths before
   re-running its sessions, which include four of the leaderboard's first five.
+
+### Validation gate
+
+No `VALIDATION.json`, so no IC leaderboard or `benchmarks/` row: this is
+accounting, not a performance result.
