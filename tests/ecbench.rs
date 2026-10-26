@@ -1381,6 +1381,17 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
         "--quiet",
     ]);
     assert!(ok, "run failed: {err}");
+    // A fit-v2 bound is admissible only with a passing audit of each session.
+    let receipt = dir.join("s0.audit.json");
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        &s(&session),
+        "--exit-code",
+        "--out",
+        &s(&receipt),
+    ]);
+    assert!(ok, "verify: {err}");
 
     // Bounds of three arms, sealed, re-derivable, and refused when touched.
     let records = dir.join("records");
@@ -1393,6 +1404,8 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
             "fit",
             "--dir",
             &s(&session),
+            "--audit",
+            &s(&receipt),
             "--arm",
             arm,
             "--root",
@@ -1460,7 +1473,7 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
     ]);
     assert!(ok, "frontier build: {err}");
     let f = read_json(&fjson);
-    assert_eq!(f["schema"], "ecbench.frontier/v1");
+    assert_eq!(f["schema"], "ecbench.frontier/v2");
     assert_eq!(f["domains"].as_array().unwrap().len(), 1);
     let d = &f["domains"][0];
     assert_eq!(d["entries"].as_array().unwrap().len(), 3);
@@ -1554,7 +1567,7 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
         &s(&challenge),
         "--candidate",
         r#"{"id":"bsgs.negation"}"#,
-        "--epoch",
+        "--legacy-epoch",
         "1",
         "--out",
         &s(&spec1),
@@ -1579,12 +1592,14 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
     let (ok, _, err) = ecbench(&[
         "challenge",
         "verdict",
+        "--procedure",
+        "1",
+        "--epoch",
+        "1",
         "--challenge",
         &s(&challenge),
         "--dir",
         &s(&s1),
-        "--epoch",
-        "1",
         "--replay-all",
         "--bounds",
         &s(&records),
@@ -1628,7 +1643,7 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
             &s(&challenge),
             "--candidate",
             r#"{"id":"rho.plain"}"#,
-            "--epoch",
+            "--legacy-epoch",
             "2",
             "--out",
             &s(&spec2),
@@ -1656,12 +1671,14 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
     let (ok, _, err) = ecbench(&[
         "challenge",
         "verdict",
+        "--procedure",
+        "1",
+        "--epoch",
+        "2",
         "--challenge",
         &s(&challenge),
         "--dir",
         &s(&s2),
-        "--epoch",
-        "2",
         "--replay-all",
         "--root",
         &s(&dir),
@@ -1683,12 +1700,14 @@ fn bounds_a_frontier_and_challenge_verdicts_round_trip() {
     let (ok, _, err) = ecbench(&[
         "challenge",
         "verdict",
+        "--procedure",
+        "1",
+        "--epoch",
+        "3",
         "--challenge",
         &s(&challenge),
         "--dir",
         &s(&s2),
-        "--epoch",
-        "3",
         "--root",
         &s(&dir),
         "--out",
@@ -1809,12 +1828,15 @@ fn field_operations_are_counted_bounded_and_judged() {
         records += 1;
     }
     assert_eq!(records, 16);
+    let receipt = dir.join("audit.json");
     let (ok, _, err) = ecbench(&[
         "verify",
         "--dir",
         &s(&session),
         "--replay-all",
         "--exit-code",
+        "--out",
+        &s(&receipt),
     ]);
     assert!(ok, "replay: {err}");
 
@@ -1830,6 +1852,8 @@ fn field_operations_are_counted_bounded_and_judged() {
             "fit",
             "--dir",
             &s(&session),
+            "--audit",
+            &s(&receipt),
             "--arm",
             arm,
             "--root",
@@ -1891,7 +1915,9 @@ fn field_operations_are_counted_bounded_and_judged() {
     }
     let page = std::fs::read_to_string(&fmd).unwrap();
     assert!(page.contains("| field muls (/√r) | field sqrs (/√r) | field invs (/√r) |"));
-    assert!(page.contains("the primitive level"));
+    assert!(page.contains(
+        "the modular multiplications, squarings and inversions behind the group operations"
+    ));
     let (ok, _, err) = ecbench(&[
         "frontier",
         "build",
@@ -1964,7 +1990,7 @@ fn field_operations_are_counted_bounded_and_judged() {
         &s(&challenge),
         "--candidate",
         r#"{"id":"bsgs.negation"}"#,
-        "--epoch",
+        "--legacy-epoch",
         "1",
         "--out",
         &s(&spec1),
@@ -1989,12 +2015,14 @@ fn field_operations_are_counted_bounded_and_judged() {
     let (_, _, err) = ecbench(&[
         "challenge",
         "verdict",
+        "--procedure",
+        "1",
+        "--epoch",
+        "1",
         "--challenge",
         &s(&challenge),
         "--dir",
         &s(&s1),
-        "--epoch",
-        "1",
         "--replay-all",
         "--bounds",
         &s(&records_dir),
@@ -2144,7 +2172,7 @@ fn field_operations_are_counted_bounded_and_judged() {
         &s(&kchallenge),
         "--candidate",
         r#"{"id":"bsgs.negation"}"#,
-        "--epoch",
+        "--legacy-epoch",
         "1",
         "--out",
         &s(&kspec1),
@@ -2168,12 +2196,14 @@ fn field_operations_are_counted_bounded_and_judged() {
     let (_, _, err) = ecbench(&[
         "challenge",
         "verdict",
+        "--procedure",
+        "1",
+        "--epoch",
+        "1",
         "--challenge",
         &s(&kchallenge),
         "--dir",
         &s(&k1),
-        "--epoch",
-        "1",
         "--replay-all",
         "--root",
         &s(&dir),
