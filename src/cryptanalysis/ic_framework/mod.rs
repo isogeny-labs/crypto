@@ -381,6 +381,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     let mut prep_cost = PhaseCost::default();
     prep_cost.group_ops.merge(prep_ops);
     prep_cost.native = oracle.setup_native();
+    prep_cost.work_native = oracle.setup_work_native();
     prep_cost.wall_ns = prep_started.elapsed().as_nanos() as u64;
 
     // ── Stages 3 and 4: relations, then the matrix ─────────────────
@@ -400,8 +401,18 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     } else {
         spec.linalg.as_str()
     };
+    // The loop's unknowns are the logs of `[h]P_v` (its rows read
+    // `Σ c·x − h·b·d = h·a`), so on a cofactor-`h` curve a known column
+    // log `s` enters as `h·s`; at `h = 1` this is the identity.
     let mut matrix: Box<dyn RelationSolver> = match &fb.known_logs {
-        Some(logs) => Box::new(KnownLogSolver::new(logs.clone(), ctx.r)),
+        Some(logs) => {
+            let h = ctx.cofactor % ctx.r;
+            let scaled = logs
+                .iter()
+                .map(|&s| ((s as u128 * h as u128) % ctx.r as u128) as u64)
+                .collect();
+            Box::new(KnownLogSolver::new(scaled, ctx.r))
+        }
         None => matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?,
     };
     let source = match spec.targets {
@@ -499,6 +510,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     for (name, value) in oracle.relation_counters() {
         outcome.relations.count(&name, value);
     }
+    outcome.relations.work_all(&oracle.relation_work_native());
     // Kept opt-in so the previously recorded full-rank sessions retain
     // byte-identical replay and charging. A checked run cannot claim a
     // verified full-rank solution solely from the target-point check.
@@ -506,6 +518,12 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         measurement::mark(measurement::Phase::RecoveryCheck);
         outcome.verified =
             check_full_rank_base_columns(ctx, &fb, matrix.as_ref(), &mut outcome.verify);
+        // The check's `pinned` scans: the matrix's totals replace the
+        // ones the relation loop recorded.
+        outcome
+            .linear_algebra
+            .work_native
+            .extend(matrix.work_counters());
     }
     measurement::end_online();
 
@@ -859,6 +877,51 @@ mod tests {
         assert_eq!(report.linear_algebra.cost.group_ops.adds, 0);
     }
 
+    /// **On a cofactor-16 curve** (E2's ladder, research/
+    /// generator_effect_ic_20261019) the random known-log base still
+    /// recovers the planted logarithm: the relation loop works in logs of
+    /// `[h]P`, and the solver is handed `h·s`, not `s`.
+    #[test]
+    fn known_log_random_scalars_recover_logs_on_a_cofactor_curve() {
+        use super::plugins::KnownLogBase;
+        use crate::cryptanalysis::ic_boundary::{PrimeCurve, PrimeInstance};
+        let inst = PrimeInstance {
+            name: "e2-h16".into(),
+            curve: PrimeCurve {
+                p: 8996849,
+                a: 8996846,
+                b: 4841786,
+            },
+            group_order: 8992336,
+            r: 562021,
+            cofactor: 16,
+            generator: (4890799, 2220468),
+        };
+        let mut scratch = GroupOps::default();
+        let g = inst.generator_point();
+        assert!(CountedGroup::mul(&inst.curve, &mut scratch, g, inst.r).infinity);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let mut spec = known_log_spec(208);
+        spec.factor_base_params.set("scalars", "random");
+        for seed in [11, 12, 13] {
+            spec.seed = seed;
+            let mut oracle = MitmOracle::new(2);
+            let report = run_pipeline(
+                &ctx,
+                &spec,
+                &KnownLogBase,
+                &mut oracle,
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .expect("the configuration should run");
+            assert!(report.verified, "seed {seed}: not recovered");
+            assert_eq!(report.recovered, Some(planted));
+            assert_eq!(report.linear_algebra.cost.get("row_ops"), 0);
+        }
+    }
+
     /// The base is a function of `G` and `B` alone: the same `G` gives the
     /// same point set, another `G` another one.
     #[test]
@@ -949,6 +1012,63 @@ mod tests {
         assert!(report.s > 0.0 && report.s.is_finite());
         assert!(report.factor_base.columns > 0);
         assert!(report.decomposition.relations_found >= report.linear_algebra.rank);
+        // Every stage marks the work it now counts for `bitop/v1`, and
+        // counts some: the base's indexes, the table's inserts, the walk's
+        // bookkeeping, the rows and the elimination's scans.
+        let marks = [
+            (
+                &report.factor_base.cost,
+                "counted:base_index_builds",
+                "index_inserts",
+            ),
+            (
+                &report.decomposition.setup,
+                "counted:table_insert_attempts",
+                "table_insert_attempts",
+            ),
+            (
+                &report.decomposition.cost,
+                "counted:walk_bookkeeping",
+                "walk_modr_adds",
+            ),
+            (
+                &report.linear_algebra.cost,
+                "counted:relation_row_construction",
+                "row_build_words",
+            ),
+            (
+                &report.linear_algebra.cost,
+                "counted:gauss_column_scans_and_pivot_inversions",
+                "gauss_entries_scanned",
+            ),
+            (
+                &report.linear_algebra.cost,
+                "counted:gauss_column_scans_and_pivot_inversions",
+                "pivot_inversion_steps",
+            ),
+        ];
+        for (phase, marker, counter) in marks {
+            assert_eq!(phase.work_native.get(marker), Some(&1), "{marker}");
+            assert!(
+                phase.work_native.get(counter).copied().unwrap_or(0) > 0,
+                "{counter}"
+            );
+            // `native` never carries them: committed records replay.
+            assert!(
+                !phase.native.contains_key(counter),
+                "{counter} leaked into native"
+            );
+        }
+        let la = &report.linear_algebra.cost.work_native;
+        assert_eq!(
+            la["pivot_inversion_steps"],
+            report.linear_algebra.rank
+                * crate::cryptanalysis::ic_boundary::pivot_inversion_steps(ctx.r)
+        );
+        assert_eq!(
+            la["row_build_modr_muls"],
+            2 * report.decomposition.relations_found
+        );
     }
 
     /// **The stride reaches the walk's answer without the walk's jump

@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|taskq.yml|') && 'experiment' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|taskq.yml|') && 'main' || 'main' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|taskq.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|taskq.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
     timeout-minutes: 15
     permissions:
       contents: read
@@ -28,6 +28,8 @@ jobs:
           --health-timeout 2s --health-retries 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: taskq
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -37,6 +39,10 @@ jobs:
         env:
           TASKQ_TEST_REDIS_URL: redis://127.0.0.1:6379/0
         run: python -m pytest -q taskq/tests
+      - name: Checkpoint supervisor regression checks
+        run: |
+          bash -n taskq/deploy/spot-checkpoint/checkpoint-hook.sh
+          bash taskq/deploy/spot-checkpoint/test-checkpoint-hook.sh
       - uses: azure/setup-helm@v4
       - name: Helm chart renders and lints
         run: |
@@ -47,7 +53,7 @@ jobs:
       - name: Worker image builds
         run: docker build -f taskq/deploy/Dockerfile taskq
   terraform:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|taskq.yml|') && 'experiment' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|taskq.yml|') && 'main' || 'main' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|taskq.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|taskq.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
     timeout-minutes: 15
     permissions:
       contents: read
@@ -90,7 +96,7 @@ jobs:
           terraform validate
           terraform test
   ephemeral-cli:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|taskq.yml|') && 'experiment' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|taskq.yml|') && 'main' || 'main' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|taskq.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|taskq.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
     timeout-minutes: 20
     permissions:
       contents: read

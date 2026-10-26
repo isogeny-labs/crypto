@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   artifacts:
-    runs-on: main
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: read
@@ -38,6 +38,8 @@ jobs:
             /tools/artifacts/
             /.artifacts/
             /.github/workflows/
+            /.gitmodules
+            /verification/pqc-assay/
       - name: Tool tests
         run: python3 -m unittest tools/artifacts/test_artifacts.py
       - name: No added or modified file that belongs in the store

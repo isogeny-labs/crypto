@@ -30,10 +30,9 @@ use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
 use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
-    DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KnownLogBase,
-    KoblitzClosureBase, KoblitzOrbitBase, KoblitzSymmetrisedBase, KoblitzTraceZeroBase,
-    MitmOracle, PrimeAbscissaBase, PrimeBatchMitmOracle, RootfindSubtractOracle,
-    SubtractOracle, SymmetrisedOracle,
+    DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KnownLogBase, KoblitzClosureBase,
+    KoblitzOrbitBase, KoblitzSymmetrisedBase, KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase,
+    PrimeBatchMitmOracle, RootfindSubtractOracle, SubtractOracle, SymmetrisedOracle,
 };
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
     solver_by_name, solver_registry, validate_solver_params,
