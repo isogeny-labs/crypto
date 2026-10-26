@@ -139,3 +139,35 @@ prints the applied limit. The warnings and timeout do not by themselves
 prove a deadlock cause; the fresh replay-003 tests the bounded preparation.
 Preserve002 and require a new source/checkpoint gate. No post hoc selection
 threshold or legacy RNG/tactic parameter changes.
+
+## Source amendment3: user-mode execution backend
+
+Replay-003 built and completed all21 prime-input preparations with the
+explicit PARI thread limit. Direct execution of the unchanged ELF32 arithmetic
+helper then returned2, no ABI marker, and a shell syntax error. The native
+control checker rejected it. No prover/checker or named-order trial ran.
+This is failed direct execution, not a mathematical rejection.
+
+For fresh replay-004 use the public multiarch/qemu-user-static v7.2.0-1
+release's x86_64_qemu-i386-static.tar.gz asset92010813. Downloaded bytes
+SHA25697121586b9e39809167d229b1964025d1c53b941d9eacb760541e54cf7cd6f70;
+extracted static x86-64 emulator SHA25634f4268e06b87af48f434282caf9a03b162d98f10a1bd7125f92729cd82b41ca.
+The API publishes no digest for this older asset: these are locally computed
+reproduction bindings from the HTTPS release download, not an independently
+verified publisher checksum. Its embedded version string is7.2.0; record
+and check actual --version after the new gate. This is a64-bit user-mode
+translator under the same filesystem/network sandbox, without Docker,
+kernel configuration changes or disabling protections.
+
+Invoke the same legacy bytes through qemu-i386-static -R268435456, reserving
+256MiB of guest virtual space inside the unchanged768MiB host address cap.
+Keep original inputs, data, flags, modern PARI proofs, all controls and
+watchdogs. Re-run the full prerequisite controls before any named input.
+This fixes a new execution configuration; it does not imply equivalence to
+the sibling full-VM runtime or to1997 timing. Preserve003 unchanged.
+
+An expanded source audit also found the linked Bigmod BmInit routine's
+unconditional srandom(1), at original mod.c:213. The earlier caller-only
+description of default process RNG state was incomplete. No seeding code is
+added or modified: retain this original reset at each modulus initialization.
+That is a documentation correction, not an artifact/configuration retuning.
