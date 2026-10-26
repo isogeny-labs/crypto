@@ -104,6 +104,25 @@ const RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
     help: "step budget as a multiple of √r before the run counts as exhausted",
 }];
 
+/// `rho.negation_batched`: the unbatched walk's budget, plus the lockstep width.
+const RHO_BATCHED_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "cap_multiple",
+        default: Some("64"),
+        help: "step budget as a multiple of √r before the run counts as exhausted",
+    },
+    ParamDecl {
+        name: "walks",
+        default: Some("256"),
+        help: "walks advanced in lockstep; one Montgomery batch inversion per round",
+    },
+    ParamDecl {
+        name: "dp_bits",
+        default: Some("0"),
+        help: "distinguished-point bits; 0 takes bits(r)/4 as the unbatched walk does",
+    },
+];
+
 // Keep the defaults of the frozen `ic.pipeline_counted` sessions. The
 // existing `ic.pipeline` declaration below retains main's newer options.
 const IC_COUNTED_PARAMS: &[ParamDecl] = &[
@@ -171,6 +190,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())",
             applies: Applies::Any,
             params: RHO_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.negation_batched",
+            family: "rho",
+            summary: "negation-map r-adding walk with distinguished points, many walks in lockstep with Montgomery batched inversion (one F_q^4 inversion per round, 3(n-1) extra multiplications), canonicalisation counted; priced in F_q operations at the curve's fq_muls_per_add; curves over F_(2^m)^4 only (one-word and u128 orders)",
+            entry: "ic_wide::rho_negation_batched",
+            applies: Applies::Any,
+            params: RHO_BATCHED_PARAMS,
         },
         MethodDecl {
             id: "rho.cubic",
@@ -444,7 +471,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
     use std::f64::consts::PI;
     match id {
         "rho.frozen_reference" | "rho.plain" => Some((PI / 2.0).sqrt()),
-        "rho.negation" => Some((PI / 4.0).sqrt()),
+        "rho.negation" | "rho.negation_batched" => Some((PI / 4.0).sqrt()),
         "rho.cubic" => Some((PI / 12.0).sqrt()),
         "rho.quartic" => Some((PI / 8.0).sqrt()),
         "rho.signed_frobenius"
@@ -983,12 +1010,20 @@ pub fn solve(
     // The phase clock: the methods open and close the online window, the
     // session turns it into exclusive phase times.
     let session = measurement::Session::begin().ok();
+    if m.id == "rho.negation_batched" && !matches!(inst, Instance::F2m4(_)) {
+        return Err(format!(
+            "`rho.negation_batched` runs on curves over F_(2^m)^4 only; {} is {}",
+            curve.slug, curve.family
+        ));
+    }
     let mut rep = if let Instance::Wide(wi) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         solve_wide(m, wi, tx, ty, seed)?
     } else if let Instance::F2m4(i) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
-        if u64::try_from(i.r).is_err() {
+        if m.id == "rho.negation_batched" {
+            solve_f2m4_rho_batched(m, i, tx, ty, seed)?
+        } else if u64::try_from(i.r).is_err() {
             // `m ≥ 16` with a small cofactor: the subgroup order needs two
             // words; the u128 implementations (`ic_wide`, `rho_wide`).
             solve_f2m4_wide(m, i, curve, tx, ty, seed)?
@@ -2175,6 +2210,162 @@ fn solve_f2m4_wide(
     }
 }
 
+/// `rho.negation_batched` on a curve over `F_{(2^m)^4}`, one word or `u128`.
+///
+/// Pricing, in the unit `ic.pipeline` uses on this curve: every `F_q`
+/// operation the `Gf2q` counter sees (multiplication, squaring and
+/// inversion one each: set-up, the Montgomery batches, the batched
+/// addition formula, the unbatched starts, escapes and special cases, and
+/// the verification) divided by `fq_muls_per_add(curve)`.  The native work
+/// with no `F_q` multiplication in it (canonicalisation, hashing, table
+/// inserts and queries, coefficient arithmetic mod `r`) is reported as
+/// `*_uncharged` counters, so the total is a lower bound until a pricing
+/// step prices them.
+fn solve_f2m4_rho_batched(
+    m: &ResolvedMethod,
+    inst: &BinCurve,
+    tx: u128,
+    ty: u128,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use crate::cryptanalysis::ic_wide::{rho_negation_batched, BatchedRhoParams};
+    let c = &inst.curve;
+    let f = &c.f;
+    let target = PtB {
+        x: f.unpack(tx),
+        y: f.unpack(ty),
+        inf: false,
+    };
+    let par = BatchedRhoParams {
+        walks: param_u64(m, "walks")?.max(1) as usize,
+        dp_bits: u32::try_from(param_u64(m, "dp_bits")?).map_err(|_| "dp_bits too large")?,
+    };
+    let multiple = param_u64(m, "cap_multiple")? as f64;
+    let cap = (crate::cryptanalysis::ic_boundary::generic_floor_ops(inst.r as f64, 1.0) * multiple)
+        as u64
+        + 4096;
+    let per_add = fq_muls_per_add(c) as f64;
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let (res, recovered) = if let Ok(r64) = u64::try_from(inst.r) {
+        let (res, d) = rho_negation_batched::<u64>(c, inst.generator, target, r64, seed, cap, par);
+        (res, d.map(u128::from))
+    } else {
+        rho_negation_batched::<u128>(c, inst.generator, target, inst.r, seed, cap, par)
+    };
+    measurement::end_online();
+    let wall = t.elapsed().as_nanos() as u64;
+    let g = |fq: u64| fq as f64 / per_add;
+    let walk_fq = res.fq_batch_inversion + res.fq_batched_formula + res.fq_single_ops;
+    let mut counters = BTreeMap::new();
+    for (k, v) in [
+        ("walks_parallel", par.walks as u64),
+        ("rounds", res.rounds),
+        ("walks_started", res.walks_started),
+        ("distinguished_points", res.distinguished_points),
+        ("useless_collisions", res.useless_collisions),
+        ("steps", res.steps),
+        ("look_ahead_additions", res.look_ahead_adds),
+        ("cycle_escape_doublings", res.escapes),
+        ("cycles_length_2", res.cycles_2),
+        ("cycles_length_4", res.cycles_4),
+        ("cycles_other_length", res.cycles_other),
+        ("walks_abandoned_in_a_cycle", res.abandoned),
+        ("walks_capped", res.capped),
+        ("batched_additions", res.batched_adds),
+        ("unbatched_operations", res.single_ops),
+        ("batch_inversions", res.batch_inversions),
+        ("batch_fq4_multiplications", res.batch_fq4_muls),
+        ("jumps", res.jumps),
+        ("distinguished_point_bits", res.dp_bits as u64),
+        ("setup_additions", res.setup_ops.adds),
+        ("setup_doublings", res.setup_ops.doubles),
+        ("verification_operations", res.verification_ops),
+        ("fq_operations_total", res.fq_total),
+        ("fq_operations_setup", res.fq_setup),
+        ("fq_operations_batch_inversion", res.fq_batch_inversion),
+        ("fq_operations_batched_formula", res.fq_batched_formula),
+        ("fq_operations_unbatched", res.fq_single_ops),
+        ("fq_operations_verification", res.fq_verification),
+        ("fq_muls_per_add", per_add as u64),
+        ("canonicalisations_uncharged", res.canonicalisations),
+        ("canonical_flips", res.canonical_flips),
+        (
+            "canonicalisation_fq_additions_uncharged",
+            res.canon_fq_additions,
+        ),
+        ("hash_evaluations_uncharged", res.hash_evals),
+        (
+            "distinguished_point_table_queries_uncharged",
+            res.table_queries,
+        ),
+        (
+            "distinguished_point_table_inserts_uncharged",
+            res.table_inserts,
+        ),
+        ("scalar_mod_r_operations_uncharged", res.scalar_mod_ops),
+    ] {
+        counters.insert(k.to_string(), v);
+    }
+    let mk = |name: &str, fq: u64, adds: u64, doubles: u64| PhaseRecord {
+        name: name.into(),
+        adds,
+        doubles,
+        scalar_mults: 0,
+        gae: g(fq),
+        wall_ns: None,
+        native: BTreeMap::from([("fq_operations".to_string(), fq)]),
+    };
+    let mut search = mk("search", walk_fq, res.batched_adds + res.single_ops, 0);
+    for (k, v) in [
+        ("canonicalisations", res.canonicalisations),
+        ("hash_evaluations", res.hash_evals),
+        ("table_queries", res.table_queries),
+        ("table_inserts", res.table_inserts),
+        ("scalar_mod_r_operations", res.scalar_mod_ops),
+    ] {
+        search.native.insert(k.to_string(), v);
+    }
+    let phases = vec![
+        mk(
+            "setup",
+            res.fq_setup,
+            res.setup_ops.adds,
+            res.setup_ops.doubles,
+        ),
+        search,
+        mk(
+            "internal_verification",
+            res.fq_verification,
+            res.verification_ops,
+            0,
+        ),
+    ];
+    Ok(SolveReport {
+        recovered,
+        exhausted: recovered.is_none(),
+        phases,
+        total_gae: g(res.fq_total),
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&counters),
+        counters,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns: wall,
+        factor_base: None,
+        detail: json!({
+            "method": "negation-map r-adding walk, distinguished points, lockstep walks with Montgomery batched inversion",
+            "unit": "GAE = F_q operations / fq_muls_per_add",
+            "fq_muls_per_add": per_add,
+            "expected_steps": res.expected_steps,
+        }),
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops: None,
+    })
+}
+
 /// `gaudry-d4-bin`'s parameters, checked, as an oracle on `inst`; shared
 /// by the one-word and the wide pipelines.
 fn bin_oracle<'a>(
@@ -2221,7 +2412,6 @@ fn bin_oracle<'a>(
     oracle.lp.small_permille = small_permille;
     Ok(oracle)
 }
-
 
 /// `F_q` multiplications in one lift (`lift_x`) of a random abscissa
 /// that lifts, averaged over 32.

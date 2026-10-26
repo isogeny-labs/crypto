@@ -32,11 +32,11 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use crate::cryptanalysis::gaudry_quartic_bin::{
-    t_line_coef, BinCurve, BinD4Oracle, BinRelation, CurveB, PtB, TLineBase,
+    t_line_coef, BinCurve, BinD4Oracle, BinRelation, CurveB, Eb, PtB, TLineBase,
 };
 use crate::cryptanalysis::ic_boundary::{
-    generic_floor_ops, price_phase, Calibration, CountedGroup, GroupOps, OracleCounters,
-    PhaseCost, RhoResult,
+    generic_floor_ops, price_phase, Calibration, CountedGroup, GroupOps, OracleCounters, PhaseCost,
+    RhoResult,
 };
 use crate::cryptanalysis::ic_framework::linalg::Wiedemann;
 use crate::cryptanalysis::ic_framework::stages::{
@@ -72,12 +72,7 @@ fn mix(v: u64) -> u64 {
 }
 
 /// `[k]p` by `CountedGroup::mul`'s double-and-add, for a scalar of any width.
-pub fn mul_s<G: CountedGroup, S: RhoScalar>(
-    g: &G,
-    ops: &mut GroupOps,
-    p: G::Elt,
-    k: S,
-) -> G::Elt {
+pub fn mul_s<G: CountedGroup, S: RhoScalar>(g: &G, ops: &mut GroupOps, p: G::Elt, k: S) -> G::Elt {
     ops.scalar_mults += 1;
     if k == S::zero() || g.is_identity(&p) {
         return g.identity();
@@ -159,7 +154,12 @@ fn canon<G: CountedGroup, S: RhoScalar>(
     tally.canonicalisations += 1;
     let n = g.neg(p);
     if g.key(&n) < g.key(&p) {
-        (n, S::sub_mod(S::zero(), a, r), S::sub_mod(S::zero(), b, r), true)
+        (
+            n,
+            S::sub_mod(S::zero(), a, r),
+            S::sub_mod(S::zero(), b, r),
+            true,
+        )
     } else {
         (p, a, b, false)
     }
@@ -187,7 +187,11 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
         _ => 16,
     };
     let dp_bits = (bits / 4).min(40);
-    let dp_mask = if dp_bits == 0 { 0 } else { (1u64 << dp_bits) - 1 };
+    let dp_mask = if dp_bits == 0 {
+        0
+    } else {
+        (1u64 << dp_bits) - 1
+    };
     let log = usize::BITS - 1 - jump_count.max(2).leading_zeros();
     let coefficient_bits = (3 * log).clamp(6, 12);
     let walk_cap = (1u64 << dp_bits) * 20 + 64;
@@ -209,7 +213,10 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
             )
         })
         .collect();
-    let (mut ta, mut tb) = (gen_below(&mut rng, S::one(), r2), gen_below(&mut rng, S::one(), r2));
+    let (mut ta, mut tb) = (
+        gen_below(&mut rng, S::one(), r2),
+        gen_below(&mut rng, S::one(), r2),
+    );
     let mut stride = joint_mul_s(g, &mut ops, generator, target, gq, ta, tb);
     while g.is_identity(&stride) {
         ta = gen_below(&mut rng, S::one(), r2);
@@ -405,6 +412,469 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
         counters,
     };
     (res, recovered)
+}
+
+// ── Rho with the negation map, many walks in lockstep, batched inversion ─
+
+/// Parameters of [`rho_negation_batched`].
+#[derive(Clone, Copy, Debug)]
+pub struct BatchedRhoParams {
+    /// Parallel walks advanced one step per round; one field inversion
+    /// per round.
+    pub walks: usize,
+    /// Distinguished-point bits; 0 takes the unbatched walk's `bits(r)/4`.
+    pub dp_bits: u32,
+}
+
+impl Default for BatchedRhoParams {
+    fn default() -> Self {
+        BatchedRhoParams {
+            walks: 256,
+            dp_bits: 0,
+        }
+    }
+}
+
+/// Everything [`rho_negation_batched`] counted.  `F_q` operations are the
+/// `Gf2q` counter's (a multiplication, a squaring and an inversion are one
+/// each, exactly as `gaudry-d4-bin` and `fq_muls_per_add` count them); the
+/// `*_uncharged` fields are native work with no `F_q` multiplication in it.
+#[derive(Clone, Debug, Default)]
+pub struct BatchedRho {
+    pub rounds: u64,
+    pub walks_started: u64,
+    pub distinguished_points: u64,
+    pub useless_collisions: u64,
+    /// Accepted steps (one affine addition each).
+    pub steps: u64,
+    pub look_ahead_adds: u64,
+    pub escapes: u64,
+    pub cycles_2: u64,
+    pub cycles_4: u64,
+    pub cycles_other: u64,
+    pub abandoned: u64,
+    pub capped: u64,
+    /// Affine additions inside the lockstep batches.
+    pub batched_adds: u64,
+    /// Additions and doublings done outside a batch, each with its own
+    /// inversion (starts, escapes, `x1 = x2` cases, set-up).
+    pub single_ops: u64,
+    pub batch_inversions: u64,
+    /// `F_{q^4}` multiplications spent by Montgomery's trick: `3(n−1)` per batch.
+    pub batch_fq4_muls: u64,
+    // F_q operations, by region; `fq_total` is their sum.
+    pub fq_setup: u64,
+    pub fq_batch_inversion: u64,
+    pub fq_batched_formula: u64,
+    pub fq_single_ops: u64,
+    pub fq_verification: u64,
+    pub fq_total: u64,
+    pub setup_ops: GroupOps,
+    pub verification_ops: u64,
+    // Native work, not F_q multiplications.
+    pub canonicalisations: u64,
+    pub canonical_flips: u64,
+    /// `F_q` additions (XOR) inside canonicalisation, 4 per call.
+    pub canon_fq_additions: u64,
+    pub hash_evals: u64,
+    pub table_queries: u64,
+    pub table_inserts: u64,
+    /// Additions, subtractions and negations of the `(a, b)` coefficients mod `r`.
+    pub scalar_mod_ops: u64,
+    pub jumps: u64,
+    pub dp_bits: u32,
+    pub expected_steps: f64,
+}
+
+struct BWalk<S> {
+    x: PtB,
+    a: S,
+    b: S,
+    tried: usize,
+    j0: usize,
+    len: u64,
+    last_escape: Option<u128>,
+    recent: std::collections::VecDeque<(u128, PtB, S, S)>,
+}
+
+/// Negation-map r-adding walk with distinguished points, `walks` walks in
+/// lockstep, one Montgomery batch inversion per round.  The walk's rules
+/// are those of [`rho_negation`] (jump table, look-ahead, 2- and 4-cycle
+/// escape by doubling, stride starts), with the jump index and the
+/// distinguished-point test read from a hash of the abscissa alone and
+/// the representative of `{P, −P}` the one with the smaller packed
+/// ordinate.  A new method: `rho_negation` itself is unchanged.
+#[allow(clippy::too_many_arguments)]
+pub fn rho_negation_batched<S: RhoScalar>(
+    c: &CurveB,
+    generator: PtB,
+    target: PtB,
+    r: S,
+    seed: u64,
+    max_steps: u64,
+    par: BatchedRhoParams,
+) -> (BatchedRho, Option<S>) {
+    let f = &c.f;
+    let mut recovered: Option<S> = None;
+    let fq = || f.f.muls();
+    let start_count = fq();
+    let mut out = BatchedRho::default();
+    let mut ops = GroupOps::default();
+    let mut rng = StdRng::seed_from_u64(seed);
+    let bits = r.bit_len();
+    let jump_count = match bits {
+        0..=15 => 4usize,
+        16..=22 => 8,
+        _ => 16,
+    };
+    let dp_bits = if par.dp_bits == 0 {
+        (bits / 4).min(40)
+    } else {
+        par.dp_bits.min(40)
+    };
+    let dp_mask = if dp_bits == 0 {
+        0
+    } else {
+        (1u64 << dp_bits) - 1
+    };
+    let log = usize::BITS - 1 - jump_count.max(2).leading_zeros();
+    let coefficient_bits = (3 * log).clamp(6, 12);
+    let walk_cap = (1u64 << dp_bits) * 20 + 64;
+    let window = 16usize;
+    let n_walks = par.walks.max(1);
+
+    let cap_s: S = s_of(1u128 << coefficient_bits);
+    let two: S = s_of(2);
+    let short = (if r < cap_s { r } else { cap_s }).max(two);
+    let r2 = r.max(two);
+    let gq = c.add(&generator, &target);
+    ops.adds += 1;
+    let jumps: Vec<(PtB, S, S)> = (0..jump_count)
+        .map(|_| {
+            let a = gen_below(&mut rng, S::one(), short);
+            let b = gen_below(&mut rng, S::one(), short);
+            (
+                joint_mul_s(c, &mut ops, generator, target, gq, a, b),
+                S::add_mod(a, S::zero(), r),
+                S::add_mod(b, S::zero(), r),
+            )
+        })
+        .collect();
+    let (mut ta, mut tb) = (
+        gen_below(&mut rng, S::one(), r2),
+        gen_below(&mut rng, S::one(), r2),
+    );
+    let mut stride = joint_mul_s(c, &mut ops, generator, target, gq, ta, tb);
+    while c.is_identity(&stride) {
+        ta = gen_below(&mut rng, S::one(), r2);
+        tb = gen_below(&mut rng, S::one(), r2);
+        stride = joint_mul_s(c, &mut ops, generator, target, gq, ta, tb);
+    }
+    out.setup_ops = ops;
+    out.fq_setup = fq() - start_count;
+    out.jumps = jump_count as u64;
+    out.dp_bits = dp_bits;
+    out.expected_steps = generic_floor_ops(r.to_f64(), 2.0);
+
+    // The class representative: the smaller packed ordinate of y and x + y.
+    let canon_b = |out: &mut BatchedRho, p: PtB, a: S, b: S| -> (PtB, S, S, bool) {
+        out.canonicalisations += 1;
+        out.canon_fq_additions += 4;
+        if p.inf {
+            return (p, a, b, false);
+        }
+        let ny = p.x.add(&p.y);
+        if f.pack(&ny) < f.pack(&p.y) {
+            out.canonical_flips += 1;
+            out.scalar_mod_ops += 2;
+            (
+                PtB {
+                    x: p.x,
+                    y: ny,
+                    inf: false,
+                },
+                S::sub_mod(S::zero(), a, r),
+                S::sub_mod(S::zero(), b, r),
+                true,
+            )
+        } else {
+            (p, a, b, false)
+        }
+    };
+    // 64-bit hash of the abscissa: the jump index and the DP test.
+    let hash_x = |out: &mut BatchedRho, p: &PtB| -> u64 {
+        out.hash_evals += 1;
+        mix(crate::cryptanalysis::gaudry_quartic_bin::wide_key(
+            f.pack(&p.x),
+        ))
+    };
+    let index_of = |h: u64| ((h >> 24) % jump_count as u64) as usize;
+
+    let mut table: HashMap<u128, (S, S)> = HashMap::with_capacity(4096);
+    let (mut sx, mut sa, mut sb) = (
+        stride,
+        S::add_mod(ta, S::zero(), r),
+        S::add_mod(tb, S::zero(), r),
+    );
+    let mut first_start = true;
+
+    // A fresh walk from the next stride start, entered; None if it is the identity.
+    let mut next_start = |out: &mut BatchedRho| -> Option<(BWalk<S>, u64)> {
+        loop {
+            out.walks_started += 1;
+            if !first_start {
+                let before = fq();
+                sx = c.add(&sx, &stride);
+                out.fq_single_ops += fq() - before;
+                out.single_ops += 1;
+                sa = S::add_mod(sa, ta, r);
+                sb = S::add_mod(sb, tb, r);
+                out.scalar_mod_ops += 2;
+            }
+            first_start = false;
+            if sx.inf {
+                if out.walks_started > max_steps {
+                    return None;
+                }
+                continue;
+            }
+            let (x, a, b, _) = canon_b(out, sx, sa, sb);
+            let h = hash_x(out, &x);
+            return Some((
+                BWalk {
+                    x,
+                    a,
+                    b,
+                    tried: 0,
+                    j0: index_of(h),
+                    len: 0,
+                    last_escape: None,
+                    recent: std::collections::VecDeque::with_capacity(window + 1),
+                },
+                h,
+            ));
+        }
+    };
+
+    let mut pool: Vec<Option<BWalk<S>>> = Vec::with_capacity(n_walks);
+    for _ in 0..n_walks {
+        pool.push(next_start(&mut out).map(|w| w.0));
+    }
+    let walk_ops = |o: &BatchedRho| o.steps + o.look_ahead_adds + o.escapes;
+
+    'rounds: while walk_ops(&out) < max_steps {
+        out.rounds += 1;
+        // 1. The additions of this round.
+        struct Job {
+            slot: usize,
+            jump: usize,
+            denom: Option<Eb>,
+            sum: Option<PtB>,
+        }
+        let mut jobs: Vec<Job> = Vec::with_capacity(n_walks);
+        for (slot, w) in pool.iter().enumerate() {
+            let Some(w) = w else { continue };
+            let j = (w.j0 + w.tried) % jump_count;
+            let m = &jumps[j].0;
+            let d = w.x.x.add(&m.x);
+            if m.inf || d.is_zero() {
+                jobs.push(Job {
+                    slot,
+                    jump: j,
+                    denom: None,
+                    sum: None,
+                });
+            } else {
+                jobs.push(Job {
+                    slot,
+                    jump: j,
+                    denom: Some(d),
+                    sum: None,
+                });
+            }
+        }
+        if jobs.is_empty() {
+            break;
+        }
+        // 2. Singles (x1 = x2, or the identity as jump): their own inversion.
+        for job in jobs.iter_mut().filter(|j| j.denom.is_none()) {
+            let w = pool[job.slot].as_ref().unwrap();
+            let before = fq();
+            job.sum = Some(c.add(&w.x, &jumps[job.jump].0));
+            out.fq_single_ops += fq() - before;
+            out.single_ops += 1;
+        }
+        // 3. Montgomery's trick over the rest: one inversion, 3(n−1) multiplications.
+        let idx: Vec<usize> = (0..jobs.len())
+            .filter(|&i| jobs[i].denom.is_some())
+            .collect();
+        if !idx.is_empty() {
+            let before = fq();
+            let n = idx.len();
+            let mut pref: Vec<Eb> = Vec::with_capacity(n);
+            for (k, &i) in idx.iter().enumerate() {
+                let d = jobs[i].denom.unwrap();
+                pref.push(if k == 0 { d } else { f.mul(&pref[k - 1], &d) });
+            }
+            let mut acc = f.inv(&pref[n - 1]);
+            let mut invs = vec![Eb::ZERO; n];
+            for k in (1..n).rev() {
+                invs[k] = f.mul(&acc, &pref[k - 1]);
+                acc = f.mul(&acc, &jobs[idx[k]].denom.unwrap());
+            }
+            invs[0] = acc;
+            out.fq_batch_inversion += fq() - before;
+            out.batch_inversions += 1;
+            out.batch_fq4_muls += 3 * (n as u64 - 1);
+            // 4. The addition formula with the inverse supplied.
+            let before = fq();
+            for (k, &i) in idx.iter().enumerate() {
+                let w = pool[jobs[i].slot].as_ref().unwrap();
+                let (p, q) = (&w.x, &jumps[jobs[i].jump].0);
+                let l = f.mul(&p.y.add(&q.y), &invs[k]);
+                let x3 = f.sq(&l).add(&l).add(&p.x).add(&q.x).add(&c.a);
+                let y3 = f.mul(&l, &p.x.add(&x3)).add(&x3).add(&p.y);
+                jobs[i].sum = Some(PtB {
+                    x: x3,
+                    y: y3,
+                    inf: false,
+                });
+            }
+            out.fq_batched_formula += fq() - before;
+            out.batched_adds += n as u64;
+        }
+        // 5. Each walk takes its sum.
+        for job in jobs {
+            let slot = job.slot;
+            let sum = job.sum.unwrap();
+            let mut w = pool[slot].take().unwrap();
+            let (aj, bj) = (jumps[job.jump].1, jumps[job.jump].2);
+            out.scalar_mod_ops += 2;
+            let (y, ya, yb, flipped) = canon_b(
+                &mut out,
+                sum,
+                S::add_mod(w.a, aj, r),
+                S::add_mod(w.b, bj, r),
+            );
+            let hy = if y.inf { 0 } else { hash_x(&mut out, &y) };
+            if flipped && w.tried + 1 < jump_count && !y.inf && index_of(hy) == job.jump {
+                // Wiener–Zuccherato look-ahead: try the next jump from the same point.
+                out.look_ahead_adds += 1;
+                w.tried += 1;
+                pool[slot] = Some(w);
+                continue;
+            }
+            w.x = y;
+            w.a = ya;
+            w.b = yb;
+            w.tried = 0;
+            out.steps += 1;
+            w.len += 1;
+            let mut h = hy;
+            let mut end: Option<Option<(PtB, S, S)>> = None; // Some(None) = dead walk, Some(Some) = DP
+            if w.x.inf {
+                end = Some(None);
+            } else {
+                let kx = f.pack(&w.x.x);
+                if let Some(pos) = w.recent.iter().position(|e| e.0 == kx) {
+                    let cyc = w.recent.len() - pos;
+                    match cyc {
+                        2 => out.cycles_2 += 1,
+                        4 => out.cycles_4 += 1,
+                        _ => out.cycles_other += 1,
+                    }
+                    let (min_key, mp, ma, mb) = w
+                        .recent
+                        .iter()
+                        .skip(pos)
+                        .copied()
+                        .min_by_key(|e| e.0)
+                        .expect("a cycle has members");
+                    if w.last_escape == Some(min_key) {
+                        out.abandoned += 1;
+                        end = Some(None);
+                    } else {
+                        w.last_escape = Some(min_key);
+                        let before = fq();
+                        let d2 = c.add(&mp, &mp);
+                        out.fq_single_ops += fq() - before;
+                        out.single_ops += 1;
+                        out.escapes += 1;
+                        out.scalar_mod_ops += 2;
+                        let (e, ea, eb, _) =
+                            canon_b(&mut out, d2, S::add_mod(ma, ma, r), S::add_mod(mb, mb, r));
+                        w.x = e;
+                        w.a = ea;
+                        w.b = eb;
+                        w.recent.clear();
+                        if w.x.inf {
+                            end = Some(None);
+                        } else {
+                            h = hash_x(&mut out, &w.x);
+                        }
+                    }
+                }
+                if end.is_none() {
+                    w.recent.push_back((f.pack(&w.x.x), w.x, w.a, w.b));
+                    if w.recent.len() > window {
+                        w.recent.pop_front();
+                    }
+                    if h & dp_mask == 0 {
+                        end = Some(Some((w.x, w.a, w.b)));
+                    } else if w.len > walk_cap {
+                        out.capped += 1;
+                        end = Some(None);
+                    } else {
+                        w.j0 = index_of(h);
+                    }
+                }
+            }
+            match end {
+                None => {
+                    pool[slot] = Some(w);
+                }
+                Some(res) => {
+                    if let Some((x, a, b)) = res {
+                        out.distinguished_points += 1;
+                        let key = f.pack(&x.x);
+                        out.table_queries += 1;
+                        match table.get(&key) {
+                            Some(&(a2, b2)) => {
+                                if b2 != b {
+                                    let num = S::sub_mod(a, a2, r);
+                                    let den = S::sub_mod(b2, b, r);
+                                    out.scalar_mod_ops += 2;
+                                    if let Some(inv) = S::inverse_mod(den, r) {
+                                        let d = S::mul_mod(num, inv, r);
+                                        let before = fq();
+                                        let mut vops = GroupOps::default();
+                                        let check = mul_s(c, &mut vops, generator, d);
+                                        out.fq_verification += fq() - before;
+                                        out.verification_ops += vops.adds + vops.doubles;
+                                        if check == target {
+                                            recovered = Some(d);
+                                            break 'rounds;
+                                        }
+                                    }
+                                }
+                                out.useless_collisions += 1;
+                            }
+                            None => {
+                                out.table_inserts += 1;
+                                table.insert(key, (a, b));
+                            }
+                        }
+                    }
+                    if walk_ops(&out) >= max_steps {
+                        break 'rounds;
+                    }
+                    pool[slot] = next_start(&mut out).map(|s| s.0);
+                }
+            }
+        }
+    }
+    out.fq_total = fq() - start_count;
+    (out, recovered)
 }
 
 // ── The k = 4 pipeline ──────────────────────────────────────────────────
@@ -810,18 +1280,118 @@ mod tests {
                 assert_eq!(a.walks, b.walks);
                 assert_eq!(a.counters, b.counters);
                 // The u128 instantiation walks the same values too.
-                let (w, dw) = rho_negation::<CurveB, u128>(
-                    c,
+                let (w, dw) =
+                    rho_negation::<CurveB, u128>(c, inst.generator, q, u128::from(r), s, 1 << 40);
+                assert_eq!(dw, Some(u128::from(d)));
+                assert_eq!(
+                    w.counters.get("walk_operations"),
+                    b.counters.get("walk_operations")
+                );
+            }
+        }
+    }
+
+    fn batched(inst: &BinCurve, d: u64, seed: u64, walks: usize) -> (BatchedRho, Option<u64>) {
+        let q = target_of(inst, d);
+        let par = BatchedRhoParams { walks, dp_bits: 0 };
+        rho_negation_batched::<u64>(
+            &inst.curve,
+            inst.generator,
+            q,
+            inst.r as u64,
+            seed,
+            1 << 40,
+            par,
+        )
+    }
+
+    /// The batched walk recovers the logarithm on small `f2m4` curves,
+    /// m = 6..=10, at both scalar widths, and checks out against the group.
+    #[test]
+    fn rho_negation_batched_recovers_the_logarithm() {
+        for m in 6u32..=10 {
+            let inst = find_bin_curve(m, 1, 16).unwrap();
+            let r = inst.r as u64;
+            for s in 0..3u64 {
+                let d = 1 + (0x9e37_79b9u64.wrapping_mul(s + 3 + m as u64)) % (r - 1);
+                let (res, got) = batched(&inst, d, s, 32);
+                assert_eq!(got, Some(d), "m {m} seed {s}");
+                assert_eq!(
+                    res.fq_total,
+                    res.fq_setup
+                        + res.fq_batch_inversion
+                        + res.fq_batched_formula
+                        + res.fq_single_ops
+                        + res.fq_verification
+                );
+                let q = target_of(&inst, d);
+                let par = BatchedRhoParams {
+                    walks: 32,
+                    dp_bits: 0,
+                };
+                let (res2, got2) = rho_negation_batched::<u128>(
+                    &inst.curve,
                     inst.generator,
                     q,
                     u128::from(r),
                     s,
                     1 << 40,
+                    par,
                 );
-                assert_eq!(dw, Some(u128::from(d)));
-                assert_eq!(w.counters.get("walk_operations"), b.counters.get("walk_operations"));
+                assert_eq!(got2, Some(u128::from(d)));
+                assert_eq!(res.fq_total, res2.fq_total, "u128 walks the same values");
+                assert_eq!(res.steps, res2.steps);
             }
         }
+    }
+
+    /// Same seed, same counts; a different seed, different counts.
+    #[test]
+    fn rho_negation_batched_is_deterministic() {
+        let inst = find_bin_curve(9, 2, 16).unwrap();
+        let d = 1234 % (inst.r as u64);
+        let (a, da) = batched(&inst, d, 5, 64);
+        let (b, db) = batched(&inst, d, 5, 64);
+        assert_eq!(da, db);
+        assert_eq!(format!("{a:?}"), format!("{b:?}"));
+        let (c2, _) = batched(&inst, d, 6, 64);
+        assert_ne!(a.fq_total, c2.fq_total);
+    }
+
+    /// F_q multiplications per walk step: the batched walk is cheaper than
+    /// the unbatched one by about the inversion it amortises, never more
+    /// than the one extra batch of `3(n - 1)` F_{q^4} products per round.
+    #[test]
+    fn rho_negation_batched_cost_per_step_is_in_band() {
+        let inst = find_bin_curve(10, 1, 16).unwrap();
+        let c = &inst.curve;
+        let r = inst.r as u64;
+        let per_add = crate::cryptanalysis::gaudry_quartic_bin::fq_muls_per_add(c) as f64;
+        let (mut ub, mut ub_steps, mut b, mut b_steps) = (0f64, 0f64, 0f64, 0f64);
+        for s in 0..4u64 {
+            let d = 1 + (0x1234_5678u64.wrapping_mul(s + 7)) % (r - 1);
+            let q = target_of(&inst, d);
+            let before = c.f.f.muls();
+            let (u, _) = rho_negation::<CurveB, u64>(c, inst.generator, q, r, s, 1 << 40);
+            ub += (c.f.f.muls() - before) as f64;
+            ub_steps += (u.counters["walk_operations"]) as f64;
+            let (res, got) = batched(&inst, d, s, 64);
+            assert_eq!(got, Some(d));
+            b += (res.fq_batch_inversion + res.fq_batched_formula + res.fq_single_ops) as f64;
+            b_steps += (res.steps + res.look_ahead_adds + res.escapes) as f64;
+        }
+        let (u_per, b_per) = (ub / ub_steps, b / b_steps);
+        eprintln!(
+            "per_add {per_add} unbatched/step {u_per:.2} batched/step {b_per:.2} ratio {:.3}",
+            b_per / u_per
+        );
+        // The unbatched walk pays about one affine addition per step.
+        assert!(
+            u_per > 0.9 * per_add && u_per < 1.1 * per_add,
+            "{u_per} vs {per_add}"
+        );
+        let ratio = b_per / u_per;
+        assert!((0.70..0.98).contains(&ratio), "ratio {ratio}");
     }
 
     fn spec(oracle: &str) -> PipelineSpec {
@@ -847,8 +1417,16 @@ mod tests {
     #[test]
     fn run_f2m4_is_the_one_word_pipeline() {
         for (oracle, lp, permille) in [
-            ("gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1", 0u8, 1000u64),
-            ("gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1", 2, 500),
+            (
+                "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1",
+                0u8,
+                1000u64,
+            ),
+            (
+                "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1",
+                2,
+                500,
+            ),
         ] {
             let inst = find_bin_curve(6, 1, 16).unwrap();
             let c = &inst.curve;
@@ -905,13 +1483,16 @@ mod tests {
                 one.decomposition.cost.native,
                 wide.report.decomposition.cost.native
             );
-            assert_eq!(one.linear_algebra.cost.native, wide.report.linear_algebra.cost.native);
+            assert_eq!(
+                one.linear_algebra.cost.native,
+                wide.report.linear_algebra.cost.native
+            );
             // And at u128, the same counts.
             let mut o3 = BinD4Oracle::new(&inst, 11, sp.seed, opts);
             o3.lp.max_large = lp;
             o3.lp.small_permille = permille;
-            let w128 = run_f2m4::<u128>(&ctx, &inst, &sp, &mut o3, inst.r, inst.cofactor, &calib)
-                .unwrap();
+            let w128 =
+                run_f2m4::<u128>(&ctx, &inst, &sp, &mut o3, inst.r, inst.cofactor, &calib).unwrap();
             assert_eq!(w128.recovered, Some(u128::from(d)));
             assert_eq!(w128.report.total_gae, one.total_gae);
         }
