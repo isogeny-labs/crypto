@@ -1442,3 +1442,13 @@ on different hosts, so the fit is rough:
   of Amendment 12 recorded.)
 - Worst-case wall time is about 11.7 h (A0 about 2 × 6100 s, A11 up to
   2 × 15 000 s).
+
+**Note on the host, 2026-10-26 (changes no cell, limit, rule or prediction).**
+The paragraph above says the instance is "on demand". The account policy
+`SpotOnlyEC2Launch` (updated 2026-10-22) denies on-demand launches, so the
+instance is a **Spot** instance instead: one-time request, interruption
+behaviour terminate, same type and size. Recent Spot prices for the type in
+us-west-2 are about $0.76 to $1.07 per hour, below the approved cost. A Spot
+reclaim ends the instance and leaves the unfinished cell *not decided* (see
+"Failure of the host"); a system's row is written when that system ends, so
+rows already pushed stay. This note was committed before any R256 row exists.
