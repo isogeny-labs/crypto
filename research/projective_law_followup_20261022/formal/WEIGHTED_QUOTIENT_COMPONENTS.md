@@ -1,0 +1,13 @@
+# Weighted quotient components and localization map
+
+This packet records two pinned Lean files extending the ordinary weighted-sextic quotient work. It changes no measured collector, rho control, or cost ratio.
+
+The [one-page PDF](WEIGHTED_QUOTIENT_COMPONENTS.pdf) reports the checked statements and open boundary; the [dependency graph](weighted-quotient-components.svg) shows their order, and the [CSV](weighted-quotient-components.csv) provides one standardized status row per obligation.
+
+`WeightedRingComponent.lean` proves that weighted-degree projection descends from the polynomial ring to `WeightedRing`. The resulting additive projections are orthogonal and idempotent, every quotient element is a finite sum of its projections, and equality is determined componentwise. A finite sum of distinct-degree homogeneous quotient lifts is direct, and products of homogeneous quotient lifts have the summed degree. These are the additive and multiplicative facts needed to package a quotient grading; a `GradedRing` instance is not constructed here.
+
+`WeightedChartRouteTorsion.lean` proves a general map from `HomogeneousLocalization.Away 𝒜 f` into a ring in which `f` maps to `1`. A homogeneous fraction `x/f^n` maps to the image of `x`; if a power of `f` kills `x`, the fraction is zero. This theorem assumes an existing `GradedRing 𝒜`. It does not instantiate that assumption for `WeightedRing` or prove an isomorphism with the affine chart.
+
+The remaining chart-injectivity step is precise: for homogeneous `h` in the weighted quotient, prove that membership in the ideal `(Z−1)` implies `Z^k h = 0` for some `k`. A finite degree-by-degree telescoping argument is indicated by the projection theorems, but is not a checked theorem. Chart surjectivity, the `Proj` cover and infinity chart, identification with the smooth projective completion, the `Pic⁰` class equation, and the Rust-to-Lean semantics bridge remain open.
+
+The two source files have SHA-256 digests `4f775fb6ac97fb2d478c2e550a955351df0ab730a5e344712ca5f4930cfb61b5` and `08d6ac2fc7c6e79df0c63f41cbafd303a5b614615c05ffe613f656dc2d9ce474`, respectively. Both compile with Lean `v4.34.1` and Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612`, exit status 0. Their `#print axioms` audits list only `propext`, `Classical.choice`, and `Quot.sound`; no `sorryAx` occurs. For a direct replay, build the imported `WeightedProjDegreeZeroScratch.lean` as an `.olean` first, then run each source file with the pinned Lean/Mathlib search path used in [WEIGHTED_PROJ_KERNEL.md](WEIGHTED_PROJ_KERNEL.md). This packet records theorem progress, not a completed projective-law proof.

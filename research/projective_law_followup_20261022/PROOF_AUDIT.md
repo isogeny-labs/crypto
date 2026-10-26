@@ -296,6 +296,27 @@ sum class. The ten exact scale identities show that arbitrary nonzero
 input weights give the same normalized pair. This proves only the
 `B≠0,C≠0` branch of the implemented law, not its exceptional paths.
 
+For a smooth curve over an algebraic closure, the finite-zero multiplicity
+step has the following written local argument. Put `g=N-BY` and
+`h=N+BY`, so `gh=u1*u2*U` in the affine coordinate ring. At a point
+`(a,b)` with `b≠0`, the curve equation has nonzero derivative
+`2b` with respect to `Y`, hence `X-a` is a local parameter.
+If `g` vanishes there, `h(a,b)=2Bb≠0` is a unit; therefore the
+order of `g` is exactly the root multiplicity of `a` in
+`u1*u2*U`, including repeated input or residual roots. At a
+Weierstrass point `(a,0)`, squarefreeness gives `F'(a)≠0`, so
+`Y` is a local parameter. A norm root forces `N(a)=0`, and
+`(N²-B²F)'(a)=-B²F'(a)≠0`; thus the product has a simple
+`X`-root. Locally `X-a` has order two in `Y`, making
+`g=-B Y+O(Y²)` have order one. These two cases account for all
+finite zeros of `g` with their multiplicities, conditional on the
+stated smooth local-ring identifications. They do not by themselves
+identify the glued curve with a projective completion, prove the
+returned Mumford reduction in `Pic⁰`, or link Rust execution to Lean.
+The pinned [point-allocation packet](formal/POINT_ALLOCATION.md) proves
+only pointwise allocation; this local multiplicity argument remains
+written mathematics rather than a Lean theorem.
+
 ### Coprime 2+2 degree-one drop (`B≠0,C=0`)
 
 `projective-symbolic-22-drop` checks eleven affine and seven weighted
@@ -522,15 +543,22 @@ identity on affine curve points: outside `y=0`, exactly one conjugate factor
 vanishes at a norm root; at `y=0`, both factors vanish. It also proves that
 `C=0` drops the interpolant degree to at most two and the residual support
 degree to at most one. Thus the infinity pole-order obligation is conditional:
-`6·∞` for `C≠0` and `5·∞` for `C=0` in the smooth monic-quintic model; these
-valuations are not yet formalized. The [infinity-chart packet](formal/INFINITY_CHART.md)
+`6·∞` for `C≠0` and `5·∞` for `C=0` in the smooth monic-quintic model.
+The conditional valuation theorems are formalized for an abstract DVR, and
+the [domain/DVR packet](formal/DOMAIN_DVR.md) constructs a DVR with
+`w` as local parameter at the origin of the explicit infinity chart.
+The [weighted quotient component packet](formal/WEIGHTED_QUOTIENT_COMPONENTS.md)
+kernel-checks finite degree projections and a generic degree-zero localization
+map; the quotient `GradedRing` instance and the chart isomorphism remain open.
+Identifying that chart stalk with the chosen projective completion's
+infinity stalk remains open. The [infinity-chart packet](formal/INFINITY_CHART.md)
 now proves the chart equation `w²=z(1+a3z²+a2z³+a1z⁴+a0z⁵)` for
 `z=1/x,w=y/x³` and the source-style identity
-`z³(N-B y)=-C+n2z+n1z²+n0z³-Bw`. The remaining local theorem is that the
-smooth projective completion has a DVR at infinity with `w` as uniformizer
-and the parenthesized chart factor as a unit. Only with that theorem do the
-written pole orders follow; zero-divisor multiplicities and output reduction
-remain separate obligations. These results do not prove compiled Rust
-field semantics, the returned coordinate formulas, principal-divisor
+`z³(N-B y)=-C+n2z+n1z²+n0z³-Bw`. The remaining geometric theorem
+identifies the explicit chart's proved DVR and parameter with the actual
+projective infinity stalk and transports the overlap identity into its
+fraction field. The finite-zero multiplicity argument above and output
+reduction remain separate, unformalized obligations. These results do not
+prove compiled Rust field semantics, the returned coordinate formulas, principal-divisor
 zero/pole multiplicities, or the `Pic⁰` class equation; the full
 projective-law theorem remains open.
