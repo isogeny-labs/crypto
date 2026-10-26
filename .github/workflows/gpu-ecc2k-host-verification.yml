@@ -50,7 +50,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   host-tests:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|gpu-ecc2k-host-verification.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|gpu-ecc2k-host-verification.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
     # Most of this is one `cargo build --release` to generate the
     # vectors; the C++ itself is seconds.
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
@@ -63,6 +63,8 @@ jobs:
           sparse-checkout: |
             /.github/scripts/
             /Cargo.toml
+            /tools/volcano-cli/
+            /isogeny_algos/
             /Cargo.lock
             /build.rs
             /.cargo/
@@ -91,7 +93,7 @@ jobs:
       # control that must be reported.
       # `make test` ends with the emulation under ThreadSanitizer.  GCC
       # 13's TSan cannot place its shadow memory when 32 bits of mmap
-      # addresses are randomised, as they are on ubuntu-24.04 runners,
+      # addresses are randomised, as they are on main runners,
       # and aborts with "unexpected memory mapping"; 28 is what it
       # expects.
       - name: Let ThreadSanitizer map its shadow memory
@@ -104,7 +106,7 @@ jobs:
   # been compiled with clang; this is the compiler a device build uses,
   # with warnings as errors.  Compile only: no GPU, no driver.
   nvcc-compile:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|gpu-ecc2k-host-verification.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|gpu-ecc2k-host-verification.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
     timeout-minutes: 20
     permissions:
       contents: read
