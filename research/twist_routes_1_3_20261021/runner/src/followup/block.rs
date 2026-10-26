@@ -31,13 +31,13 @@ fn norm(terms: f4::Poly, p: u64) -> f4::Poly {
     }
     sums.into_iter().filter(|(_, c)| *c != 0).collect()
 }
-fn add(a: &f4::Poly, b: &f4::Poly, p: u64) -> f4::Poly {
+pub(super) fn add(a: &f4::Poly, b: &f4::Poly, p: u64) -> f4::Poly {
     norm(a.iter().chain(b).cloned().collect(), p)
 }
 fn scale(a: &f4::Poly, c: u64, p: u64) -> f4::Poly {
     norm(a.iter().map(|(e, v)| (e.clone(), v * c % p)).collect(), p)
 }
-fn mul(a: &f4::Poly, b: &f4::Poly, p: u64) -> f4::Poly {
+pub(super) fn mul(a: &f4::Poly, b: &f4::Poly, p: u64) -> f4::Poly {
     norm(
         a.iter()
             .flat_map(|(e, c)| {
@@ -48,19 +48,19 @@ fn mul(a: &f4::Poly, b: &f4::Poly, p: u64) -> f4::Poly {
         p,
     )
 }
-fn constant(n: usize, c: u64) -> f4::Poly {
+pub(super) fn constant(n: usize, c: u64) -> f4::Poly {
     if c == 0 {
         vec![]
     } else {
         vec![(vec![0; n], c)]
     }
 }
-fn variable(n: usize, i: usize) -> f4::Poly {
+pub(super) fn variable(n: usize, i: usize) -> f4::Poly {
     let mut e = vec![0; n];
     e[i] = 1;
     vec![(e, 1)]
 }
-fn membership(n: usize, i: usize, xs: &[u64], p: u64) -> f4::Poly {
+pub(super) fn membership(n: usize, i: usize, xs: &[u64], p: u64) -> f4::Poly {
     xs.iter().fold(constant(n, 1), |a, x| {
         mul(&a, &add(&variable(n, i), &constant(n, (p - x) % p), p), p)
     })
@@ -462,7 +462,7 @@ pub fn batch_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<()> {
 
 /// Construct the public finite task, solve it, recover signs and deduplicate.
 /// This worker reads no prior basis, expected tuple list or known logarithm.
-fn pair_ys(e: Quad, x: u64, y: u64, target: P) -> Option<[u64; 2]> {
+pub(super) fn pair_ys(e: Quad, x: u64, y: u64, target: P) -> Option<[u64; 2]> {
     let (z, w) = target?;
     if z.1 != 0 || w.1 != 0 || w.0 == 0 {
         return None;
@@ -513,7 +513,7 @@ fn propagated_mask(
     }
     Some(mask)
 }
-fn group_mitm(
+pub(super) fn group_mitm(
     e: Quad,
     xs: &[u64],
     points: &BTreeMap<u64, P>,

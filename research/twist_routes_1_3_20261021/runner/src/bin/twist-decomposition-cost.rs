@@ -123,11 +123,50 @@ fn controls(fixtures: &Path, census: &Path) -> Result<Value> {
         json!({"schema":"twist.decomposition-control-plan/v1","requested":cells.len(),"cells":cells,"target_label":0,"B":8,"strict_signed_witness_equality":true,"global_budget_s":3800,"new_targets_opened":false,"AA_pairs":[["direct-chain","direct-aa"],["direct-chain-propagate","direct-aa-propagate"],["group-mitm","group-aa"]],"comparisons":comparisons,"fixtures_sha256":old["fixtures_sha256"],"census_workloads_sha256":old["census_workloads_sha256"]}),
     )
 }
+fn incidence_plan(fixtures: &Path, frontier: &Path) -> Result<Value> {
+    let f = read(fixtures)?;
+    let rows = read(frontier.join("ROWS.json"))?;
+    let mut cells = vec![];
+    for row in rows
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|r| r["h"] == r["k"] && [8, 16].contains(&r["h"].as_u64().unwrap()))
+    {
+        let expected = frontier.join(format!("{}.json", row["case"].as_str().unwrap()));
+        if sha(&expected)? != row["record_sha256"] {
+            return Err("frontier changed".into());
+        }
+        let truth = read(&expected)?;
+        let fixture = f["fixtures"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|f| f["id"] == row["fixture"])
+            .ok_or("fixture missing")?;
+        for (arm, algorithm) in [
+            ("direct-aa", "direct-product"),
+            ("direct-product", "direct-product"),
+            ("full-mask", "full-mask"),
+            ("reduced-u-aa", "reduced-u"),
+            ("reduced-u", "reduced-u"),
+            ("group-aa", "group-mitm"),
+            ("group-mitm", "group-mitm"),
+        ] {
+            cells.push(json!({"index":cells.len(),"workload":row["case"],"fixture":row["fixture"],"h":row["h"],"k":row["k"],"lambda":row["lambda"],"B":row["B"],"arm":arm,"task":{"case":row["case"],"fixture":fixture,"h":row["h"],"k":row["k"],"lambda":row["lambda"],"target":truth["target"],"arm":algorithm},"expected":expected,"expected_sha256":sha(&expected)?}));
+        }
+    }
+    assert_eq!(cells.len(), 560);
+    Ok(
+        json!({"schema":"twist.incidence-cost-plan/v1","kind":"incidence","requested":cells.len(),"cells":cells,"solver_budget_ms":2500,"hard_timeout_s":4,"global_budget_s":2100,"target_label":0,"new_targets_opened":false,"selected_grid":"all ten fixtures; H=K in {8,16}; every lambda in {1,2,3,H}; no degree/outcome selection","full_600_cost_grid_complete":false,"fixtures_sha256":sha(fixtures)?,"frontier_rows_sha256":sha(frontier.join("ROWS.json"))?}),
+    )
+}
 fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
     if out.exists() {
         return Err("fresh output required".into());
     }
     let plan = read(plan_file)?;
+    let incidence = plan["kind"] == "incidence";
     fs::create_dir_all(out)?;
     let vgroot = "/workspace/shared/twist-tools-20261025-e26/root/usr";
     let vg = format!("{vgroot}/bin/valgrind");
@@ -153,10 +192,17 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
         let trace = dir.join("worker.callgrind");
         let args = vec![
             "followup".into(),
-            "decomposition-worker".into(),
+            if incidence {
+                "incidence-cost-worker".into()
+            } else {
+                "decomposition-worker".into()
+            },
             input.display().to_string(),
             output.display().to_string(),
-            "15000".into(),
+            plan["solver_budget_ms"]
+                .as_u64()
+                .unwrap_or(15000)
+                .to_string(),
         ];
         let status = Command::new("/bin/sh")
             .args([
@@ -166,7 +212,7 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
                 "/usr/bin/timeout",
                 "--signal=TERM",
                 "--kill-after=1s",
-                "18s",
+                &format!("{}s", plan["hard_timeout_s"].as_u64().unwrap_or(18)),
             ])
             .arg(&vg)
             .args([
@@ -196,8 +242,14 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
         let matched = status.success()
             && result.as_ref().is_some_and(|r| {
                 r["complete_projection"] == true
-                    && r["canonical_projected_tuples"] == expected["canonical_projected_tuples"]
-                    && r["base"] == expected["base"]
+                    && if incidence {
+                        r["canonical_pairs"] == expected["canonical_pairs"]
+                            && r["explicit_y_witnesses"] == expected["explicit_y_witnesses"]
+                            && r["U"] == expected["U"]
+                    } else {
+                        r["canonical_projected_tuples"] == expected["canonical_projected_tuples"]
+                            && r["base"] == expected["base"]
+                    }
                     && r["target"] == expected["target"]
                     && (plan["strict_signed_witness_equality"] != true
                         || r["signed_witnesses"] == expected["witnesses"])
@@ -211,10 +263,15 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
                 "E=ellinit([Mod({},{}),Mod({}, {})]);T=[Mod({},{}),Mod({}, {})];\n",
                 f["a"], p, f["b"], p, target[0][0], p, target[1][0], p
             ));
-            for w in r["signed_witnesses"].as_array().unwrap() {
+            let witnesses = if incidence {
+                &r["explicit_y_witnesses"]
+            } else {
+                &r["signed_witnesses"]
+            };
+            for w in witnesses.as_array().unwrap() {
                 let x: Vec<u64> = serde_json::from_value(w["x"].clone())?;
                 let y: Vec<u64> = serde_json::from_value(w["y"].clone())?;
-                let mask = w["sign_mask"].as_u64().unwrap();
+                let mask = w["sign_mask"].as_u64().unwrap_or(0);
                 gp.push_str("S=[0];U=[0];\n");
                 for i in 0..x.len() {
                     let sy = if mask >> i & 1 == 0 {
@@ -258,7 +315,14 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
         records.push(row);
         write(out.join("RECORDS.json"), &json!(records))?;
     }
-    gp.push_str("if(good==0||bad==0,error(\"no replay controls\"));print(\"ALL_DECOMPOSITION_REPLAY_OK \",good,\" \",bad);quit;\n");
+    gp.push_str(&format!(
+        "if(good==0||bad==0,error(\"no replay controls\"));print(\"{} \",good,\" \",bad);quit;\n",
+        if incidence {
+            "ALL_INCIDENCE_COST_REPLAY_OK"
+        } else {
+            "ALL_DECOMPOSITION_REPLAY_OK"
+        }
+    ));
     fs::write(out.join("verify.gp"), gp)?;
     write(out.join("RECORDS.json"), &json!(records))?;
     write(
@@ -281,6 +345,10 @@ fn main() -> Result<()> {
         Some("plan-controls") if a.len() == 5 => {
             if Path::new(&a[4]).exists() { return Err("fresh plan required".into()); }
             write(&a[4], &controls(Path::new(&a[2]), Path::new(&a[3]))?)
+        }
+        Some("plan-incidence") if a.len()==5 => {
+            if Path::new(&a[4]).exists(){return Err("fresh plan required".into());}
+            write(&a[4],&incidence_plan(Path::new(&a[2]),Path::new(&a[3]))?)
         }
         Some("run") if a.len() == 5 => run(Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4])),
         _ => {

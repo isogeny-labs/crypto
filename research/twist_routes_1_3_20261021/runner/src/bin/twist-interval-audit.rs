@@ -299,7 +299,11 @@ fn main() -> Result<()> {
         } else {
             vec![("transfer-bsgs", control)]
         };
+        let mut seen_pairs = BTreeSet::new();
         for (candidate, control) in pairs {
+            if !seen_pairs.insert((candidate, control)) {
+                continue;
+            }
             let p = c.get(candidate).zip(c.get(control));
             let paired = pass && p.is_some();
             comparisons.push(json!({"case":key,"info":case,"candidate":candidate,"control":control,"paired_accepted":paired,"candidate_Ir":c.get(candidate),"control_Ir":c.get(control),"candidate_to_control_ratio":if paired{p.map(|(x,y)|*x as f64/ *y as f64)}else{None},"candidate_uses_fewer_instructions":paired&&p.is_some_and(|(x,y)|x<y)}));
@@ -324,7 +328,11 @@ fn main() -> Result<()> {
         vec![("transfer-bsgs", "source-bsgs")]
     };
     let mut distributions = vec![];
+    let mut seen_pairs = BTreeSet::new();
     for (candidate, control) in pairs {
+        if !seen_pairs.insert((candidate, control)) {
+            continue;
+        }
         let pairs = comparisons
             .iter()
             .filter(|r| {
