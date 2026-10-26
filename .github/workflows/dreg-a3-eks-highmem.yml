@@ -37,7 +37,7 @@ env:
 jobs:
   a3:
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: crypto-eks-highmem
     # gen about 5 h at 16 shards, measure about 3 h (3 closures at once); margin.
     timeout-minutes: 900
     steps:
