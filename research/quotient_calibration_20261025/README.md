@@ -12,16 +12,26 @@ the target. The original Python execution path is replaced by Rust for this
 repository, with the original normal-Weil-function formulas and coefficient
 ordering. This is a correctness replay, with no performance comparison.
 
-The initial delivery was pushed to `aburan28/crypto`; the user has since
-identified `Isogeny-labs/crypto` as the current repository. The local remote
-now points there. Repository/PR identity after that change remains unverified
-because the current GitHub connection cannot access the organization repository.
-See the [repository follow-up](reports/repository-20261025T2314Z/STATUS.md).
+The initial delivery to `aburan28/crypto` is now
+[`isogeny-labs/crypto` PR #2569](https://github.com/isogeny-labs/crypto/pull/2569).
+The unchanged repository ID, `1221029056`, confirms the transfer. GitHub access
+is restored and the approved auto-merge is enabled, subject to the normal
+conflict, CI and review gates.
 
-The user has since approved auto-merge for PR #2569 and the exact raw-log
-archive upload. Both remain blocked by GitHub/AWS access; see the
-[approved publication follow-up](reports/publication-20261025T2144Z/STATUS.md).
-The original run records below preserve their earlier publication state.
+The approved 67,540-byte raw-log archive is published in the artifact store.
+A fresh download into an empty cache reproduced its SHA-256 exactly; see the
+[publication receipt](reports/publication-20261026T1437Z/STATUS.md) and tracked
+[artifact manifest](reports/run-20261025T1845Z/.artifacts.json). To hydrate it
+with configured AWS access, run from the repository root:
+
+```sh
+python3 tools/artifacts/artifacts.py pull \
+  research/quotient_calibration_20261025/reports/run-20261025T1845Z/runs.tar.xz
+```
+
+The [initial approved-publication record](reports/publication-20261025T2144Z/STATUS.md)
+and [repository follow-up](reports/repository-20261025T2314Z/STATUS.md) preserve
+the earlier access failures. Original run records retain their historical state.
 
 Read [PROTOCOL.md](PROTOCOL.md) for the full five-gate experiment: the fixed
 source over F343, its order-373 subgroup, kernel 153, chart transforms,
@@ -68,7 +78,7 @@ does not repeat the historical seed search or kernel census.
 
 | Requirement | Status and evidence |
 | --- | --- |
-| Relocate to the requested repository | This study and native package in `aburan28/crypto`; original work is left intact. |
+| Relocate to the requested repository | This study and native package in `isogeny-labs/crypto`, PR #2569; original work is left intact. |
 | Preserve the case and challenges | Verified exact historical manifest and settings hashes in PROVENANCE.json. |
 | Re-run the source preflight natively | Rust replay checks all frozen source outputs; see the run receipt and report under `reports/`. |
 | Fit and freeze the target matrix | Not implemented/executed here. Nine fitted frame pairs alone are not validation. |

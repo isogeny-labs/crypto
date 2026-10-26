@@ -1,15 +1,15 @@
-# Quotient-calibration raw validation archive is not published
+# Quotient-calibration raw validation archive publication
 
-- **Status:** `open`
-- **Kind:** tool/access limits; upload approval received
+- **Status:** `resolved`
+- **Kind:** tool/access limits; approved publication and readback verified
 - **Affected work:** [relocation validation](../research/quotient_calibration_20261025/reports/run-20261025T1845Z/VALIDATION.md)
-- **Next action owner:** user for restored GitHub and configured AWS access; then the repository operator
-- **Last updated:** 2026-10-25
+- **Next action owner:** none for archive publication; PR CI/review remain separate
+- **Last updated:** 2026-10-26
 
 ## Problem
 
 The complete raw validation-log archive for the relocated source preflight
-has no durable published copy. It is 67,540 bytes, above AGENTS.md section
+initially had no durable published copy. It is 67,540 bytes, above AGENTS.md section
 13's 64 KiB data-file limit, so it cannot be added to Git under that policy.
 
 ## Evidence and uncertainty
@@ -18,24 +18,26 @@ has no durable published copy. It is 67,540 bytes, above AGENTS.md section
   provenance checks, the full root test log and the focused failure/rerun
   logs. Its exact SHA-256, size, contents and intended destination are in
   [ARCHIVE_PUBLICATION.json](../research/quotient_calibration_20261025/reports/run-20261025T1845Z/ARCHIVE_PUBLICATION.json).
-- **Observed:** automatic approval review rejected the attempted
+- **Observed initially:** automatic approval review rejected the attempted
   `tools/artifacts/artifacts.py push` before execution because it would send
   internal research/test logs to S3 without explicit authorization for the
-  specific payload/destination. No retry or alternative upload occurred.
-- **Observed:** the managed environment reports no configured AWS identity
-  or secret bindings, and the AWS CLI is unavailable.
-- **Derived:** repository source, compact receipts and reports can be
-  pushed without this oversized file. That does not establish durable
-  custody of the raw archive.
-- **Suspected explanation:** none needed; the approval/access limits are
-  concrete. No mathematical or performance limitation is inferred.
+  specific payload/destination. Explicit user approval subsequently resolved
+  that requirement; credential-free retries failed before uploading.
+- **Observed on 2026-10-26:** the repository artifact tool uploaded the
+  unchanged archive, verified the remote object, downloaded it into an empty
+  cache, and verified it again. All four operations exited 0. Fresh readback
+  has SHA-256 `ae5e8b6973db769db3ccef01fb81ba5837702a26221206134091a8bdff3bad2a`
+  and size 67,540 bytes. See the
+  [publication receipt](../research/quotient_calibration_20261025/reports/publication-20261026T1437Z/STATUS.md).
+- **Derived:** the raw archive now has verified durable custody under its
+  immutable hash key. This establishes no mathematical or performance result.
 
 ## What would unblock it
 
 - [x] Obtain explicit approval for the exact archived payload and
   `s3://setec-astronomy-artifacts/store` destination.
-- [ ] Configure supported AWS access and the artifact-store CLI.
-- [ ] Upload the unchanged archive through `tools/artifacts`, commit its
+- [x] Configure AWS access for this operation and the artifact-store CLI.
+- [x] Upload the unchanged archive through `tools/artifacts`, commit its
   generated `.artifacts.json` manifest and verify fresh remote readback by
   SHA-256. Do not change bucket permissions or archive contents.
 
@@ -44,13 +46,19 @@ unrelated ecbench test or execute the target-calibration experiment.
 
 ## Next discriminating step
 
-After approval and configured access, hydrate the repository's tracked
-`.artifacts/config.json`, confirm its exact configured remote, and publish
-only this hash-pinned file. Stop on denied authorization, changed bytes,
-upload failure or readback mismatch. A verified upload permits the normal
-artifact manifest update; otherwise retain the explicit unpublished state.
+With separately configured AWS access, readers can hydrate the exact archive
+through the tracked `.artifacts.json` manifest. No additional upload or
+permission change is needed. Target calibration and the unrelated baseline
+test failure remain separate work.
 
 ## Resolution and history
+
+2026-10-26 14:37 UTC: uploaded exactly one approved archive to
+`s3://setec-astronomy-artifacts/store/sha256/ae/ae5e8b6973db769db3ccef01fb81ba5837702a26221206134091a8bdff3bad2a`.
+The write used the repository tool's conditional SHA-256-checked upload.
+Remote verification, fresh-cache hydration and final verification passed.
+The generated manifest is committed with the sanitized publication receipt;
+credentials were used only by the temporary upload process.
 
 2026-10-25 23:14 UTC: user identified `Isogeny-labs/crypto` as the current
 repository; the local Git remote now uses that URL. The GitHub connection
@@ -69,7 +77,6 @@ verification and publishing the manifest/status follow-up. See
 The approval requirement is satisfied; the remaining requirements are
 supported account access, immutable upload and readback verification.
 
-Unresolved. The local archive is retained at
-`/workspace/crypto/research/quotient_calibration_20261025/reports/run-20261025T1845Z/runs.tar.xz`.
-That workspace path is not a durable publication location. The source
-preflight result and GitHub delivery remain separately scoped.
+Resolved for this exact raw-log archive. Historical reports retain the
+initial unpublished state. The source-preflight result, hosted CI and GitHub
+merge remain separately scoped.
