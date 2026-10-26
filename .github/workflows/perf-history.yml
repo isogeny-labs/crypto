@@ -48,9 +48,16 @@ on:
       - 'rust-toolchain*'
       - 'src/**'
       - 'examples/perfbench/**'
+      - 'examples/performance_gains_audit.rs'
       - 'examples/perfindex/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
+      - 'docs/performance-gains.html'
+      - 'docs/performance-gains/**'
+      - 'research/summation_polynomials_20260914/run-01/**'
+      - 'research/summation_polynomials_20260914/confirmation-01/comparison.json'
+      - 'research/gaudry_allocation_20260914/run-01/comparison.json'
+      - 'gpu/macaulay/benchmarks/pipeline-20260914/run-01/summary.json'
       - 'scripts/perf/perfhistory.py'
       - 'scripts/perf/perfindex.py'
       - 'docs/perf/ecbench-children.json'
@@ -271,6 +278,8 @@ jobs:
           cargo test --release --example perfindex
       - name: Build perfbench and ecbench
         run: cargo build --release --example perfbench --bin ecbench
+      - name: Audit frozen performance-gains dashboard
+        run: cargo run --release --example performance_gains_audit --quiet
       - name: Check kernel fingerprints
         # A kernel's fingerprint is the work it does; if a change moves it, the
         # change is not a speed-up and the index must not be read across it.
