@@ -49,6 +49,7 @@
 //! ```
 //! so the verifier reproduces the same `W_x` the signer hashed.
 
+use super::ct::scalar_mul_secret;
 use super::curve::CurveParams;
 use super::point::Point;
 use crate::hash::sha256::sha256;
@@ -83,12 +84,7 @@ pub fn public_key_from_private(x: &BigUint, curve: &CurveParams) -> Option<Point
         return None;
     }
     let x_inv = mod_inverse(x, &curve.n)?;
-    let a = curve.a_fe();
-    Some(
-        curve
-            .generator()
-            .scalar_mul_ct(&x_inv, &a, curve.order_bits()),
-    )
+    Some(scalar_mul_secret(&curve.generator(), &x_inv, curve))
 }
 
 fn z_input(cert_data: &[u8], msg: &[u8]) -> Vec<u8> {
@@ -117,14 +113,13 @@ pub fn sign(
 
     let z = h(&z_input(cert_data, msg));
     let nl = n_byte_len(curve);
-    let a = curve.a_fe();
 
     loop {
         let k = random_scalar(&curve.n);
         if k.is_zero() {
             continue;
         }
-        let kg = curve.generator().scalar_mul_ct(&k, &a, curve.order_bits());
+        let kg = scalar_mul_secret(&curve.generator(), &k, curve);
         let wx = match &kg {
             Point::Affine { x, .. } => x.value.clone(),
             Point::Infinity => continue,
@@ -215,6 +210,30 @@ mod tests {
         let msg = b"hello, EC-KCDSA";
         let sig = sign(msg, &x, cert_data, &curve).expect("valid signing key");
         assert!(verify(msg, &sig, &q, cert_data, &curve));
+    }
+
+    /// Key derivation goes through `scalar_mul_secret` (projective on
+    /// P-256 and secp256k1, the affine ladder on SM2) and returns the same
+    /// `x⁻¹·G` as the variable-time reference; signatures still verify.
+    #[test]
+    fn ec_kcdsa_secret_path_matches_reference() {
+        let x = BigUint::parse_bytes(b"1F2E3D4C5B6A79880123456789ABCDEF", 16).unwrap();
+        for curve in [
+            CurveParams::p256(),
+            CurveParams::secp256k1(),
+            CurveParams::sm2(),
+        ] {
+            let q = public_key_from_private(&x, &curve).unwrap();
+            let x_inv = mod_inverse(&x, &curve.n).unwrap();
+            assert_eq!(
+                q,
+                curve.generator().scalar_mul(&x_inv, &curve.a_fe()),
+                "{}",
+                curve.name
+            );
+            let sig = sign(b"msg", &x, b"cert", &curve).expect("valid signing key");
+            assert!(verify(b"msg", &sig, &q, b"cert", &curve), "{}", curve.name);
+        }
     }
 
     /// **Wrong-message rejection**.

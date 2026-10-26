@@ -447,3 +447,44 @@ Nothing from any E7 cell has been computed, and no E7 draw has been generated.
 - **Still large-host.** (6, 10, 3) N = 58 and (5, 15, 3) N = 60 stay in the large-host tier.
 
 No draw of the (13, 3) m = 5 cell has been generated.
+
+## Amendment 9 (2026-10-25, before any draw of the cells below): E8, `d_F` against `m` at fixed `(n, ℓ)`
+
+**Why.** HKYY's growth requirement is in `m`, not in `N`. E3–E7 mostly raised `N` by raising
+`n` or `ℓ`. E8 holds `(n, ℓ)` fixed and raises `m` alone. `N = (m − 2)·n + m·ℓ`, so the
+(8, 2) ladder runs `N = 14, 24, 34, 44, 54` for `m = 3 … 7`. The (6, 2) ladder runs
+`N = 10 … 52` for `m = 3 … 8`.
+
+**Engine and gate.** The same binary as E7 (`hky_par`, sha256 `24cf10d6…`, which passed the
+Amendment 7 gate); the gate is not rerun.
+
+**Cells.** Draws as in E6 Part B: `ladder_sample` with `cell_seed(20261012, n, ℓ, m)`, keep
+the first 4 draws with no solutions, `cmax = 4` (a draw not refuted by degree 4 is
+`d_F ≥ 5`).
+
+| ladder | `m` values | cells `(m:n:ℓ)` |
+|:--|:--|:--|
+| (8, 2) | 3, 4, 5 | 3:8:2, 4:8:2, 5:8:2 (6:8:2 is E7, not rerun) |
+| (8, 2) | 7 | 7:8:2 (`N = 54`) |
+| (6, 2) | 3 … 8 | 3:6:2, 4:6:2, 5:6:2, 6:6:2, 7:6:2, 8:6:2 (`N = 52`) |
+
+**Reading rule (fixed now; exploratory).** Per ladder, using the median `d_F` of each `m`
+(the E7 (8, 2), m = 6 median is 4):
+
+| reading | condition |
+|:--|:--|
+| **`d_F` flat in `m`** | every median `d_F ≤ 4` and the medians are non-decreasing in `m` with a spread of at most 1 |
+| **`d_F` grows in `m`** | some median `d_F ≥ 5`, or the medians rise by 2 or more across the ladder |
+| **mixed** | otherwise |
+
+- A cell that runs out of memory or time is reported as **not completed**, with any draws
+  that finished. A finished draw is never rerun selectively.
+- A cell with no draw free of solutions in 1000 draws is reported as such.
+
+**Not in this amendment.**
+- `N = 58–60` (large-host tier of Amendment 7) stays **not run**. `AWS_SECRET_ACCESS_KEY`
+  and a region are absent. `e7/aws_large_tier.sh` is prepared but has not been run.
+- `N ≈ 100` needs a sparse closure engine (about 4.1M columns at degree 4). It is scoped
+  in `e8/N100_SCOPING.md` and is not measured.
+
+Nothing from any E8 cell has been computed.

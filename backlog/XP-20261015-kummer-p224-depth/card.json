@@ -5,7 +5,7 @@
   "created": "2026-10-15",
   "authors": ["backlog lane", "coordinator"],
   "status": "draft",
-  "status_note": "Unblocked: the generic-field F4 engine exists on branch claude/f4-generic-field (f4_tower_generic over fp_backend; pkm_tower_pilot --engine generic picks Fp52 at 45 bits and Fp224 at P-224; above 2^63 the wide builder builds the system and --verify checks it exhaustively with BigUint re-checks). research/f4_generic_field_20261015 already measured, at 27*2^40 + 1 and at P-224, m = 2 N <= 18 (N = 20 one target), m = 3 N <= 12 (N = 15 at 27*2^40 + 1), m = 4 N = 8 and 12, all with the recorded p1/p2 D; what this card adds is the second target in those one-target cells and m = 3, N = 15 at P-224 (3.2e12 multiply-adds, about 13 h of one core at the measured 14.5 ns each). Measured cost multiple F (ns per multiply-add against Fp32 at p1, one core): 1.5 at 45 bits (Fp52, AVX-512 IFMA), 30 at P-224. Draft until a PROTOCOL.md is frozen and the engine is merged; the P-224 shard's rows carry p as a string and are verified in-row (--verify), not by pkm_tower_check verify.",
+  "status_note": "Unblocked: the generic-field F4 engine is merged (PR #1942, 3a4a5cec8; f4_tower_generic over fp_backend; pkm_tower_pilot --engine generic picks Fp52 at 45 bits and Fp224 at P-224; above 2^63 the wide builder builds the system and --verify checks it exhaustively with BigUint re-checks). research/f4_generic_field_20261015 already measured, at 27*2^40 + 1 and at P-224, m = 2 N <= 18 (N = 20 one target), m = 3 N <= 12 (N = 15 at 27*2^40 + 1), m = 4 N = 8 and 12, all with the recorded p1/p2 D; what this card adds is the second target in those one-target cells and m = 3, N = 15 at P-224 (3.2e12 multiply-adds, about 13 h of one core at the measured 14.5 ns each). Measured cost multiple F (ns per multiply-add against Fp32 at p1, one core): 1.5 at 45 bits (Fp52, AVX-512 IFMA), 30 at P-224. Draft until a PROTOCOL.md is frozen; the P-224 shard's rows carry p as a string and are verified in-row (--verify), not by pkm_tower_check verify.",
   "blocked_on": [],
   "links": {
     "lead": "docs/ic/factor-base-encyclopedia/README.md §0.1 (Kummer tower, the P-224 shape: v2(p - 1) = 96)",
@@ -20,8 +20,8 @@
   "protocol": {"path": null, "blob": null},
   "code": {
     "repo": "crypto",
-    "commit": null,
-    "branch": "claude/f4-generic-field",
+    "commit": "3a4a5cec8d1e98f3467e6a7ebfc808727c3c2f79",
+    "branch": "main",
     "build": [["cargo", "build", "--release", "--example", "pkm_tower_pilot"]]
   },
   "resources": {

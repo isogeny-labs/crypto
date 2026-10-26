@@ -549,7 +549,7 @@ mod tests {
     }
 
     fn field<'a>(s: &'a str, key: &str) -> Option<&'a str> {
-        s.split(|c| c == ':' || c == ',')
+        s.split([':', ','])
             .find_map(|kv| kv.strip_prefix(&format!("{key}=")))
     }
 
@@ -754,7 +754,7 @@ mod tests {
             .expect("a recorded rung");
         assert!(!rec.rankable && rec.ratio.is_none() && rec.band.is_some());
         assert!(rec.detail.contains("not rankable"), "{}", rec.detail);
-        assert_eq!(rec.op_unit.as_deref().is_some(), true);
+        assert!(rec.op_unit.as_deref().is_some());
         let best = summary.best.expect("a rankable trial completes");
         assert!(!other_unit(&best), "{:?}", best.assignment);
         assert!(
@@ -869,7 +869,7 @@ mod tests {
         .unwrap();
         assert_eq!(summary.usable_rungs, vec![13, 17, 19]);
         assert!(
-            summary.best.map_or(true, |b| !b.projected),
+            summary.best.is_none_or(|b| !b.projected),
             "three rungs are below min_fit, so nothing is projected"
         );
         let _ = std::fs::remove_file(&path);
