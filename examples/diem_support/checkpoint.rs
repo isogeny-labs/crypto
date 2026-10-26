@@ -1,7 +1,6 @@
 //! Durable instance receipts. A record is reusable only with the same source
 //! identity, task grid, payload checksum and key. Arithmetic acceptance remains
 //! the responsibility of the producer and its recorded controls.
-#![allow(dead_code)] // Producer-only write APIs are exercised by this module's tests.
 use crypto_lib::hash::sha256::sha256;
 use serde_json::{json, Value};
 use std::collections::BTreeSet;

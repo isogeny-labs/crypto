@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   scope:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-all-targets.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-all-targets.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: read
@@ -63,7 +63,7 @@ jobs:
   check:
     needs: scope
     if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false')
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-all-targets.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-all-targets.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
       contents: read
@@ -102,4 +102,9 @@ jobs:
       # Warnings stay out of the gate: this job answers "does it compile",
       # and the examples carry dead code on purpose.
       - run: RUSTFLAGS=-Awarnings cargo check --workspace --all-targets
+      # `wide-vars` (128-bit monomial masks, up to 128 Boolean unknowns) is off
+      # by default, so the line above never compiles it, and code that assumes
+      # 64-bit monomials lands without anyone noticing. Type-check the library
+      # and its tests with it on.
+      - run: RUSTFLAGS=-Awarnings cargo check --lib --tests --features wide-vars
       - run: cargo test --manifest-path crates/crypto-analysis-core/Cargo.toml --lib
