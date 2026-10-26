@@ -47,12 +47,50 @@ FROZEN_DIRS = ("results", "runs", "raw", "evidence", "archives")
 # Files whose retired names are the subject, not a use: the spec's table
 # of retired forms, and the tools that recognise them.
 SELF = {"docs/curves/ICV1.md", "docs/curves/README.md", "scripts/check_curve_names.py",
+        "scripts/test_curve_names_archived_labels.py",
         "scripts/build_curve_registry.py", "scripts/curve_id.py",
         "src/cryptanalysis/curve_id.rs", "src/cryptanalysis/curve_aliases.json", "tests/curve_id.rs",
         "examples/curve_id_generated.rs",
         # Generated alias tables: their "also called" column lists the
         # legacy spellings on purpose.
         "docs/ic-leaderboard.html", "docs/ic/LEADERBOARD.md"}
+
+# Exact labels quoted by frozen renderings or independent validator reports.
+# Only these labels at the reviewed artifact hash are retained; ordinary prose
+# remains linted. The groebner-history rendering is frozen in its tool README.
+ARCHIVED_LABELS = {
+    # The imported independent validator quotes literal results.json keys.
+    # Preserve those evidence labels only at this exact report hash; they
+    # are not registrations or permission to cite these models in new prose.
+    "benchmarks/20261017-volcano-ecdlp-census/VALIDATOR_REPORT.md": {
+        "sha256": "96b965a9772e868b8dd71ffdc6b1daf5447a19b6df1080b18c67100bf2577daf",
+        "labels": {},
+        "slugs": {
+            "icv1-fp26-tm6998-a41c0795",
+            "icv1-fp26-tm6998-d53b367d",
+            "icv1-fp26-tm6998-eeb6174a",
+        },
+    },
+    "research/f4_f5_history_20261012/reports/run-20261012T0009Z/REPORT.md": {
+        "sha256": "d481fbfa188cafe6fb1364c4df1b8a7c704bd2867b7d866cc3a39c66c7b85ba9",
+        "labels": {
+            "K_1 / 2^23": "icv1-f2m23-tm5197-1f85e9e1",
+            "K_1 / 2^17": "icv1-f2m17-tm101-00378d4e",
+        },
+    },
+}
+
+
+def archived_label(rel: str, text: str, found: str, replacement: str | None) -> bool:
+    context = ARCHIVED_LABELS.get(rel)
+    return bool(context and hashlib.sha256(text.encode()).hexdigest() == context["sha256"]
+                and context["labels"].get(found) == replacement and replacement is not None)
+
+
+def archived_slug(rel: str, text: str, slug: str) -> bool:
+    context = ARCHIVED_LABELS.get(rel)
+    return bool(context and slug in context.get("slugs", ())
+                and hashlib.sha256(text.encode()).hexdigest() == context["sha256"])
 
 SUB = r"(?:_\{?([01])\}?|<sub>([01])</sub>|&#832([01]);|([₀₁]))"
 DEG = (r"(?:GF\(\s*2(?:\^\{?(\d+)\}?|<sup>(\d+)</sup>)\s*\)"
@@ -203,8 +241,9 @@ def lint(res: Resolver, pins: dict[str, set[str]], fix: bool) -> list[str]:
         text = path.read_text(errors="ignore")
         if exempt(rel, text, pins):
             continue
-        hits = find_retired(text, rel, res)
-        if fix and hits:
+        hits = [hit for hit in find_retired(text, rel, res)
+                if not archived_label(rel, text, hit[2], hit[3])]
+        if fix and hits and rel not in ARCHIVED_LABELS:
             out, last = [], 0
             for a, b, found, repl in hits:
                 if a < last:
@@ -227,7 +266,7 @@ def lint(res: Resolver, pins: dict[str, set[str]], fix: bool) -> list[str]:
             hint = f" (write {repl})" if repl else " (not in the registry)"
             problems.append(f"{rel}:{line}: retired curve name {found!r}{hint}")
         for m in SLUG.finditer(text):
-            if m.group(0) not in res.slugs:
+            if m.group(0) not in res.slugs and not archived_slug(rel, text, m.group(0)):
                 line = text.count("\n", 0, m.start()) + 1
                 problems.append(f"{rel}:{line}: {m.group(0)} is not in docs/curves/registry.json")
     if fix:
@@ -241,6 +280,8 @@ def lint_diff(base: str, res: Resolver) -> list[str]:
         if RETIRED_FILE.search(rel):
             problems.append(f"{rel}: new file named by a retired curve stem; name it by the slug")
     diff = git("diff", "-U0", f"{base}...HEAD", "--", *DIFF_TEXT)
+    archived_text = {rel: (REPO / rel).read_text() for rel in ARCHIVED_LABELS
+                     if (REPO / rel).is_file()}
     rel, line = None, 0
     for raw in diff.splitlines():
         if raw.startswith("+++ "):
@@ -249,6 +290,8 @@ def lint_diff(base: str, res: Resolver) -> list[str]:
             line = int(re.search(r"\+(\d+)", raw).group(1))
         elif raw.startswith("+") and rel and rel not in SELF:
             for _, _, found, repl in find_retired(raw[1:], "added.txt", res):
+                if archived_label(rel, archived_text.get(rel, ""), found, repl):
+                    continue
                 hint = f" (write {repl})" if repl else ""
                 problems.append(f"{rel}:{line}: added line uses retired curve name {found!r}{hint}")
             line += 1

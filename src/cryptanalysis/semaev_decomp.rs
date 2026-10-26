@@ -308,7 +308,7 @@ impl Gf2 {
     /// Only the x86-64 paths ask; elsewhere the tests alone do.
     #[cfg_attr(not(target_arch = "x86_64"), allow(dead_code))]
     #[inline(always)]
-    pub(crate) fn folds(&self) -> bool {
+    pub fn folds(&self) -> bool {
         self.fold_tail != 0
     }
 
@@ -427,7 +427,7 @@ impl Gf2 {
 
     #[inline(always)]
     fn clmul(&self, a: u64, b: u64) -> u128 {
-        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+        #[cfg(target_arch = "x86_64")]
         if self.has_clmul {
             // SAFETY: guarded by the runtime feature detection recorded
             // in `has_clmul` at construction.
@@ -651,8 +651,9 @@ impl Gf2 {
     /// trick in miniature, still with one field inversion.  Same inverses,
     /// same multiplication count, a quarter of the dependent chain.
     ///
-    /// Both passes walk `xs` and `scratch` as zipped chunks, so the loops
-    /// carry no bounds checks and no `Vec` growth checks.
+    /// Both passes walk `xs` and `scratch` as zipped chunks (fixed-width
+    /// arrays in the `pclmulqdq` copy), so the loops carry no bounds
+    /// checks and no `Vec` growth checks.
     pub fn batch_inv(&self, xs: &mut [u64], scratch: &mut Vec<u64>) {
         #[cfg(target_arch = "x86_64")]
         if self.folds() {
@@ -706,14 +707,26 @@ impl Gf2 {
         // longer batch than the last zero-fills, and only its new tail.
         scratch.truncate(xs.len());
         scratch.resize(xs.len(), 0);
-        let mut acc = [shifted(1); LANES];
-        for (xc, pc) in xs.chunks(LANES).zip(scratch.chunks_mut(LANES)) {
-            for ((&x, prefix), a) in xc.iter().zip(pc.iter_mut()).zip(acc.iter_mut()) {
-                *prefix = plain(*a);
-                if x != 0 {
-                    *a = self.fold_shifted(_mm_cvtsi64_si128(x as i64), *a);
-                }
+        // Whole chunks as `[u64; LANES]`, so each lane is a fixed index:
+        // zipping variable-length `chunks` cost 18 instructions an element
+        // in iterator bookkeeping, a fifth of the whole inversion.  The
+        // short tail goes last forward and first backward, as before.
+        let forward = |x: u64, prefix: &mut u64, a: &mut __m128i| {
+            *prefix = plain(*a);
+            if x != 0 {
+                *a = self.fold_shifted(_mm_cvtsi64_si128(x as i64), *a);
             }
+        };
+        let mut acc = [shifted(1); LANES];
+        let (xh, xt) = xs.as_chunks::<LANES>();
+        let (ph, pt) = scratch.as_chunks_mut::<LANES>();
+        for (xc, pc) in xh.iter().zip(ph.iter_mut()) {
+            for l in 0..LANES {
+                forward(xc[l], &mut pc[l], &mut acc[l]);
+            }
+        }
+        for ((&x, prefix), a) in xt.iter().zip(pt.iter_mut()).zip(acc.iter_mut()) {
+            forward(x, prefix, a);
         }
         let [a0, a1, a2, a3] = acc.map(plain);
         let p01 = self.mul(a0, a1);
@@ -727,13 +740,21 @@ impl Gf2 {
             shifted(self.mul(i23, a3)),
             shifted(self.mul(i23, a2)),
         ];
-        for (xc, pc) in xs.chunks_mut(LANES).zip(scratch.chunks(LANES)).rev() {
-            for ((x, &prefix), ia) in xc.iter_mut().zip(pc.iter()).zip(inv_acc.iter_mut()) {
-                if *x != 0 {
-                    let xi = _mm_cvtsi64_si128(*x as i64);
-                    *x = plain(self.fold_shifted(_mm_cvtsi64_si128(prefix as i64), *ia));
-                    *ia = self.fold_shifted(xi, *ia);
-                }
+        let backward = |x: &mut u64, prefix: u64, ia: &mut __m128i| {
+            if *x != 0 {
+                let xi = _mm_cvtsi64_si128(*x as i64);
+                *x = plain(self.fold_shifted(_mm_cvtsi64_si128(prefix as i64), *ia));
+                *ia = self.fold_shifted(xi, *ia);
+            }
+        };
+        let (xh, xt) = xs.as_chunks_mut::<LANES>();
+        let (ph, pt) = scratch.as_chunks::<LANES>();
+        for ((x, &prefix), ia) in xt.iter_mut().zip(pt.iter()).zip(inv_acc.iter_mut()) {
+            backward(x, prefix, ia);
+        }
+        for (xc, pc) in xh.iter_mut().zip(ph.iter()).rev() {
+            for l in 0..LANES {
+                backward(&mut xc[l], pc[l], &mut inv_acc[l]);
             }
         }
     }
@@ -821,6 +842,12 @@ pub struct Gf2_128 {
     /// `red_hi[j][v] = (v · z^{128+8j}) mod irr`, `j < 16`.
     red_hi: Vec<u128>,
     has_clmul: bool,
+    /// The tail `irr − zⁿ` as a word when the two-fold carry-less
+    /// reduction applies (hardware `clmul`, tail degree `d ≤ 63`,
+    /// `2d < n + 2` so the second fold lands below `zⁿ`, and
+    /// `n + d ≤ 129` so the first fold fits one `u128`); zero selects
+    /// the byte-table reduction.
+    fold_tail: u64,
 }
 
 /// `x` times `cur`, reduced: one step of the `z^t mod irr` ladder.
@@ -837,6 +864,23 @@ fn mul_x_128(cur: u128, bits: u128, n: u32) -> u128 {
 impl Gf2_128 {
     /// Build from an irreducible polynomial of degree `64 < n ≤ 127`.
     pub fn new(irr: &IrreduciblePoly) -> Self {
+        #[cfg(target_arch = "x86_64")]
+        let has_clmul = std::arch::is_x86_feature_detected!("pclmulqdq");
+        #[cfg(target_arch = "aarch64")]
+        let has_clmul = std::arch::is_aarch64_feature_detected!("aes");
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "aarch64")))]
+        let has_clmul = false;
+        Self::with_kernels(irr, has_clmul, true)
+    }
+
+    /// The byte-table reduction and the software product only, whatever
+    /// the host supports; the oracle the fold is tested against.
+    #[cfg(test)]
+    pub(crate) fn portable(irr: &IrreduciblePoly) -> Self {
+        Self::with_kernels(irr, false, false)
+    }
+
+    fn with_kernels(irr: &IrreduciblePoly, has_clmul: bool, fold: bool) -> Self {
         let n = irr.degree;
         assert!((64..=127).contains(&n), "Gf2_128 handles 64 < n ≤ 127");
         let mut bits = 1u128 << n;
@@ -894,12 +938,17 @@ impl Gf2_128 {
             }
         }
 
-        #[cfg(target_arch = "x86_64")]
-        let has_clmul = std::arch::is_x86_feature_detected!("pclmulqdq");
-        #[cfg(target_arch = "aarch64")]
-        let has_clmul = std::arch::is_aarch64_feature_detected!("aes");
-        #[cfg(not(any(target_arch = "x86_64", target_arch = "aarch64")))]
-        let has_clmul = false;
+        let tail_degree = irr.low_terms.iter().copied().max().unwrap_or(0);
+        let fold_tail = if fold
+            && has_clmul
+            && tail_degree <= 63
+            && 2 * tail_degree < n + 2
+            && n + tail_degree <= 129
+        {
+            pow as u64
+        } else {
+            0
+        };
 
         Self {
             n,
@@ -909,7 +958,54 @@ impl Gf2_128 {
             red_lo_positions,
             red_hi,
             has_clmul,
+            fold_tail,
         }
+    }
+
+    /// `a·b mod irr` by two carry-less folds instead of the byte tables.
+    ///
+    /// The product has degree `≤ 2n − 2`, so `H = P >> n` has at most
+    /// `n − 1` bits and `H·t` (`t` the tail, `zⁿ ≡ t`) at most
+    /// `n − 1 + d ≤ 128`.  What `H·t` leaves above `zⁿ` has degree
+    /// `≤ d − 2`; folded by `t` once more it has degree `≤ 2d − 2 < n`
+    /// and lands in the field.  Five hardware products in all (three for
+    /// the Karatsuba product, two and a half for the folds) against the
+    /// table's `⌈(128 − n)/8⌉ + 16` dependent lookups.
+    ///
+    /// # Safety
+    ///
+    /// The CPU must support the carry-less multiply (`has_clmul`) and
+    /// the field must fold (`fold_tail ≠ 0`).
+    #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+    #[cfg_attr(target_arch = "x86_64", target_feature(enable = "pclmulqdq"))]
+    #[cfg_attr(target_arch = "aarch64", target_feature(enable = "aes"))]
+    #[inline]
+    unsafe fn mul_fold(&self, a: u128, b: u128) -> u128 {
+        let (hi, lo) = clmul_u128(a, b);
+        self.reduce_fold(lo, hi)
+    }
+
+    /// The two folds of [`Self::mul_fold`] on a product of degree
+    /// `≤ 2n − 2` given as `(lo, hi)`.
+    ///
+    /// # Safety
+    ///
+    /// As for [`Self::mul_fold`].
+    #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+    #[cfg_attr(target_arch = "x86_64", target_feature(enable = "pclmulqdq"))]
+    #[cfg_attr(target_arch = "aarch64", target_feature(enable = "aes"))]
+    #[inline]
+    unsafe fn reduce_fold(&self, lo: u128, hi: u128) -> u128 {
+        let n = self.n;
+        let tail = self.fold_tail;
+        // H = P >> n, at most n − 1 ≤ 126 bits (n ≤ 127 keeps the shift in range).
+        let h = (lo >> n) | (hi << (128 - n));
+        let acc = lo & self.mask;
+        // H·t in one u128: n − 1 + d ≤ 128 bits.
+        let ht = clmul_u64(h as u64, tail) ^ (clmul_u64((h >> 64) as u64, tail) << 64);
+        // Above zⁿ at most d − 1 bits remain; their fold has degree < n.
+        let h1 = (ht >> n) as u64;
+        acc ^ (ht & self.mask) ^ clmul_u64(h1, tail)
     }
 
     /// Fold a 256-bit carry-less product `(hi, lo)` back into the field.
@@ -974,6 +1070,13 @@ impl Gf2_128 {
     /// No early-out on a zero operand (same rationale as the twin).
     #[inline]
     pub fn mul(&self, a: u128, b: u128) -> u128 {
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+        if self.fold_tail != 0 {
+            // SAFETY: `fold_tail` is non-zero only when construction
+            // detected the hardware carry-less multiply and checked the
+            // tail-degree conditions the fold needs.
+            return unsafe { self.mul_fold(a, b) };
+        }
         let (hi, lo) = self.clmul(a, b);
         self.reduce(lo, hi)
     }
@@ -985,6 +1088,13 @@ impl Gf2_128 {
     pub fn sqr(&self, a: u128) -> u128 {
         let lo64 = a as u64;
         let hi64 = (a >> 64) as u64;
+        let lo = (spread32(lo64) as u128) | ((spread32(lo64 >> 32) as u128) << 64);
+        let hi = (spread32(hi64) as u128) | ((spread32(hi64 >> 32) as u128) << 64);
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+        if self.fold_tail != 0 {
+            // SAFETY: as in `mul`; a square has degree ≤ 2n − 2 as well.
+            return unsafe { self.reduce_fold(lo, hi) };
+        }
         let lo = (spread32(lo64) as u128) | ((spread32(lo64 >> 32) as u128) << 64);
         let hi = (spread32(hi64) as u128) | ((spread32(hi64 >> 32) as u128) << 64);
         self.reduce(lo, hi)
@@ -1065,13 +1175,17 @@ impl Gf2_128 {
 #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
 #[inline(always)]
 unsafe fn clmul_u128(a: u128, b: u128) -> (u128, u128) {
+    #[cfg(target_arch = "x86_64")]
+    let clmul = clmul_u64;
+    #[cfg(target_arch = "aarch64")]
+    let clmul = clmul_u64_neon;
     let a0 = a as u64;
     let a1 = (a >> 64) as u64;
     let b0 = b as u64;
     let b1 = (b >> 64) as u64;
-    let z0 = clmul_u64(a0, b0);
-    let z2 = clmul_u64(a1, b1);
-    let z1 = clmul_u64(a0 ^ a1, b0 ^ b1) ^ z0 ^ z2;
+    let z0 = clmul(a0, b0);
+    let z2 = clmul(a1, b1);
+    let z1 = clmul(a0 ^ a1, b0 ^ b1) ^ z0 ^ z2;
     let lo = z0 ^ (z1 << 64);
     let hi = z2 ^ (z1 >> 64);
     (hi, lo)
@@ -2157,10 +2271,6 @@ mod tests {
         }
     }
 
-    /// Itoh-Tsujii inversion: exhaustive inverse law on tiny fields,
-    /// zero maps to zero, and agreement with Fermat `a^(2^n − 2)` on
-    /// random inputs at large `n` (computed independently here, not via
-    /// `inv`, so a chain bug cannot hide).
     #[test]
     fn itoh_tsujii_inverse_is_correct() {
         // Exhaustive at n = 7.
@@ -3852,6 +3962,58 @@ mod wide_tests {
                     "inv vs F2mElement"
                 );
             }
+        }
+    }
+
+    /// The two-fold carry-less reduction reproduces the byte-table
+    /// reduction bit for bit on every sparse modulus the wide twin can
+    /// be asked for, including the squaring path and the degree-127
+    /// edge where the first fold fills the whole word.
+    #[test]
+    fn wide_fold_reduction_matches_table_reduction() {
+        let mut folded_fields = 0;
+        for n in [65u32, 67, 71, 73, 79, 83, 89, 97, 101, 113, 127] {
+            let irr = crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse_wide(n)
+                .expect("sparse irreducible exists");
+            let fast = Gf2_128::new(&irr);
+            let table = Gf2_128::portable(&irr);
+            assert_eq!(table.fold_tail, 0);
+            if fast.fold_tail != 0 {
+                folded_fields += 1;
+                assert_eq!(fast.fold_tail as u128, fast.irr ^ (1u128 << n));
+            }
+            let mut state = 0x9E37_79B9_7F4A_7C15_F39C_C060_5CED_C835u128 ^ (n as u128);
+            let mut step = || {
+                state = state
+                    .wrapping_mul(0x2360_ED05_1FC6_5DA4_4385_DF64_9FCC_F645)
+                    .wrapping_add(0x1442_6950_4088_9634_07E6_F4B7_D32B_4C2Du128);
+                state & fast.mask
+            };
+            for i in 0..2000 {
+                let a = match i % 5 {
+                    0 => fast.mask,
+                    1 => 1u128 << (n - 1),
+                    _ => step(),
+                };
+                let b = match i % 7 {
+                    0 => fast.mask,
+                    1 => 0,
+                    _ => step(),
+                };
+                assert_eq!(fast.mul(a, b), table.mul(a, b), "mul n={n}");
+                assert_eq!(fast.sqr(a), table.sqr(a), "sqr n={n}");
+            }
+            if n == 71 {
+                assert_eq!(
+                    fast.inv(0x1234_5678_9ABC_DEF0_1234),
+                    table.inv(0x1234_5678_9ABC_DEF0_1234)
+                );
+            }
+        }
+        if cfg!(any(target_arch = "x86_64", target_arch = "aarch64"))
+            && Gf2_128::new(&wide_tests_irr()).has_clmul
+        {
+            assert!(folded_fields > 0, "no field folded on a host with clmul");
         }
     }
 
