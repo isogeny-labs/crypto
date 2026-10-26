@@ -81,13 +81,7 @@ def run_arm(source, binary, base, output, identity, mode):
                                or result["solver_stats"]["xor_passes"] < 1
                                or result["selected_best_total_runtime"] is not None):
         raise ValueError(f"{mode} worker result identity or policy differs")
-    if positive:
-        status = ("PASS_CONSTRUCTED_CONTROL" if not timed_out and code == 0
-                  and result is not None
-                  and result["status"] == "PASS_CONSTRUCTED_CONTROL"
-                  and result["relation"]["rank_after_insert"] == 1
-                  and result["relation"]["tamper_rejected"] else "POSITIVE_GATE_FAILED")
-    elif timed_out:
+    if timed_out:
         status = "OUTER_WATCHDOG_CENSORED"
     elif code == 124 and result is None and Path(str(result_path) + ".cap.json").exists():
         cap = json.loads(Path(str(result_path) + ".cap.json").read_text())
@@ -104,6 +98,12 @@ def run_arm(source, binary, base, output, identity, mode):
                 or cap["selected_best_total_runtime"] is not None):
             raise ValueError(f"{mode} internal wall-cap receipt differs")
         status = "UNKNOWN_wall_cap"
+    elif positive:
+        status = ("PASS_CONSTRUCTED_CONTROL" if code == 0
+                  and result is not None
+                  and result["status"] == "PASS_CONSTRUCTED_CONTROL"
+                  and result["relation"]["rank_after_insert"] == 1
+                  and result["relation"]["tamper_rejected"] else "POSITIVE_GATE_FAILED")
     elif code == 0 and result is not None:
         status = result["status"]
     else:

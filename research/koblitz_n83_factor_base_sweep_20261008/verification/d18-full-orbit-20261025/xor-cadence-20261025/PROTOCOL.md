@@ -50,6 +50,11 @@ same-target rho remain separate gates. Keep
 `selected_best_total_runtime` null.
 The Python original-field replay uses pinned `blake3==1.0.8`.
 
+If the positive worker reaches its wall cap before `import_checked`, retain
+the raw cap and supervisor receipts, classify it as capacity censored before
+model construction, and skip natural search. A repeat requires a changed,
+recorded resource condition; the censored arm gives no cadence comparison.
+
 This is an opt-in experimental solver policy. It is not an assumption that
 fewer XOR passes improve wall time or relation yield; the first run checks
 correctness and measures one bounded natural-search interval. The local host

@@ -36,6 +36,35 @@ def check_arm(output, mode, identity, obj, group):
     phases = [json.loads(line) for line in
               (path / "result.json.phases.jsonl").read_text().splitlines()]
     names = [item["phase"] for item in phases]
+    if (positive and names == ["started"]
+            and supervisor["exit_code"] == 124
+            and not supervisor["outer_cap_reached"]
+            and not (path / "result.json").exists()
+            and not (path / "result.json.shape.json").exists()):
+        cap = read(path / "result.json.cap.json")
+        if (phases[0]["detail"]["source_commit"] != identity["source_commit"]
+                or phases[0]["detail"]["binary_sha256"] != identity["binary_sha256"]
+                or phases[0]["detail"]["search_policy"] != "phase_zero_first_ordered_first_pair_xor_cadence32"
+                or cap["schema"] != "n83.full-d18-m4-cap/v1"
+                or cap["status"] != "UNKNOWN_wall_cap"
+                or cap["mode"] != "positive"
+                or cap["budget_seconds"] != 300
+                or cap["root_encoding"] != "shared_root_bits"
+                or cap["root_choice_pinned"] is not False
+                or cap["choice_pin_policy"] != "none"
+                or cap["search_policy"] != "phase_zero_first_ordered_first_pair_xor_cadence32"
+                or cap["isolation"] != "L0_shared_host_no_hard_cgroup"
+                or cap["elapsed_process_wall_ms"] < 300_000
+                or cap["selected_best_total_runtime"] is not None):
+            raise ValueError("positive pre-model cap provenance differs")
+        return {"status": "UNKNOWN_wall_cap_before_import_checked",
+                "phases": names, "import_ms": None, "model_ms": None,
+                "search_ms": None, "solver_stats": None,
+                "supervisor_wall_seconds": supervisor["elapsed_wall_seconds"],
+                "maximum_resident_set_bytes": supervisor["maximum_resident_set_bytes"],
+                "loadavg_before": supervisor["loadavg_before"],
+                "loadavg_after": supervisor["loadavg_after"],
+                "relation": None, "cap_receipt": cap}
     if (names[:3] != ["started", "import_checked", "model_constructed"]
             or phases[0]["detail"]["source_commit"] != identity["source_commit"]
             or phases[0]["detail"]["binary_sha256"] != identity["binary_sha256"]):
@@ -132,6 +161,28 @@ def audit(source, binary, base, output):
     obj = base / "objects" / run.witness_run.OBJECT
     group = prior.group_module()
     positive = check_arm(output, "positive", identity, obj, group)
+    if positive["status"] == "UNKNOWN_wall_cap_before_import_checked":
+        summary = read(output / "summary.json")
+        if (summary["source_commit"] != identity["source_commit"]
+                or summary["binary_sha256"] != identity["binary_sha256"]
+                or summary["positive_status"] not in
+                ("POSITIVE_GATE_FAILED", "UNKNOWN_wall_cap")
+                or summary["natural_status"] is not None
+                or summary["natural_search_executed"] is not False
+                or summary["selected_best_total_runtime"] is not None
+                or (output / "natural").exists()
+                or (output / "positive-independent-gate.json").exists()):
+            raise ValueError("pre-model censor summary differs")
+        return {"schema": "n83.d18-xor-cadence32-independent-audit/v1",
+                "status": "CAPACITY_CENSORED_BEFORE_MODEL",
+                "source_commit": identity["source_commit"],
+                "binary_sha256": identity["binary_sha256"],
+                "object_sha256": run.witness_run.OBJECT_SHA,
+                "positive": positive, "natural": None,
+                "reported_positive_status": summary["positive_status"],
+                "positive_status_corrected_from_raw_cap":
+                summary["positive_status"] == "POSITIVE_GATE_FAILED",
+                "selected_best_total_runtime": None}
     gate = read(output / "positive-independent-gate.json")
     if (gate["schema"] != "n83.d18-xor-cadence32-positive-gate/v1"
             or gate["source_commit"] != identity["source_commit"]
