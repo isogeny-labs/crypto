@@ -15,7 +15,7 @@ permissions:
 jobs:
   prepare:
     if: github.repository == 'aburan28/crypto'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     outputs:
       ready: ${{ steps.dispatch.outputs.ready }}
       screen_run_id: ${{ steps.dispatch.outputs.screen_run_id }}
@@ -65,7 +65,7 @@ jobs:
   confirm-stratum:
     needs: prepare
     if: needs.prepare.outputs.ready == 'true' && github.repository == 'aburan28/crypto'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 300
     strategy:
       fail-fast: false
@@ -211,7 +211,7 @@ jobs:
   aggregate:
     needs: [prepare, confirm-stratum]
     if: always() && needs.prepare.outputs.ready == 'true' && github.repository == 'aburan28/crypto'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
       GH_TOKEN: ${{ github.token }}

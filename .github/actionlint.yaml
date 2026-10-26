@@ -1,10 +1,4 @@
+# Every job runs on the GitHub-hosted ubuntu-latest runner (owner decision,
+# 2026-10-26), so no self-hosted runner labels are declared.
 self-hosted-runner:
-  # Label reserved by the N83 EC2 capacity workflow.
-  labels:
-    - crypto-eks-linux
-    - crypto-eks-highmem
-    - crypto-eks-xmem
-    - crypto-eks-xmem1t
-    - main
-    - experiment
-    - n83-ec2-20261024
+  labels: []

@@ -106,15 +106,15 @@ After deployment, dispatch `eks-arc-smoke.yml` once per pool (the xmem scale set
 checked by their first real job, since a smoke run there costs an x2 node-hour).
 Confirm both jobs pass, `kubectl get nodeclaims` shows a `gha-on-demand` node
 during a run, and GitHub's job log identifies the expected runner name. Check
-that an empty node disappears after the consolidation interval. Linux x64 jobs
-in the existing workflows have opt-in routing expressions; the fallback is the
-original GitHub-hosted label. Add only validated workflow filenames to the
-repository variable `CRYPTO_EKS_WORKFLOWS`, delimited by vertical bars, for
-example `|spotlab.yml|rust-lint.yml|`. Use
-`CRYPTO_EKS_HIGHMEM_WORKFLOWS=|some-large-job.yml|` for the high-memory pool.
-The high-memory list takes precedence. Remove a filename to roll that workflow
-back. The routing script is `route_workflows.py`; it prepares new direct x64
-`runs-on` lines and is idempotent.
+that an empty node disappears after the consolidation interval.
+
+**Workflow routing is retired (owner decision, 2026-10-26).** Every job in
+`.github/workflows/` runs on GitHub-hosted `ubuntu-latest` only, so no workflow
+routes to these scale sets any more. The `CRYPTO_EKS_WORKFLOWS` and
+`CRYPTO_EKS_HIGHMEM_WORKFLOWS` repository variables no longer affect any job,
+the routing script `route_workflows.py` was removed, and `eks-arc-smoke.yml`
+itself runs on `ubuntu-latest` (so its pool memory checks no longer exercise
+the scale sets). The text below records the earlier rollout.
 
 `first-wave-workflows.txt` records the 391 workflow filenames enabled in the
 initial rollout. It excludes workloads requiring specialized GPU, Sage, Lean,

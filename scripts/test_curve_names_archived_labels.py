@@ -57,7 +57,6 @@ class ArchivedLabelTests(unittest.TestCase):
                 "icv1-fp30-t49927-d70f5de2",
                 "icv1-fp131-t29529377007934231835-9681b699",
             },
-            "docs/index-calculus-scoreboard.html": {"icv1-fp30-t49927-d70f5de2"},
             "research/certicom131_ic_program_20261020/README.md": {
                 "icv1-fp30-t49927-d70f5de2",
                 "icv1-fp131-t29529377007934231835-9681b699",

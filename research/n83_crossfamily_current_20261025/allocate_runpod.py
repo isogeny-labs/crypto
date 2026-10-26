@@ -21,11 +21,11 @@ from research.n83_crossfamily_current_20261025 import arms, run, source_bundle
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 API_URL = "https://api.runpod.io/graphql"
-GPU_TYPES = ("NVIDIA RTX A5000", "Tesla V100-PCIE-16GB")
+GPU_TYPES = ("NVIDIA GeForce RTX 4090", "NVIDIA GeForce RTX 4090")
 IMAGE = "runpod/base:1.0.2-ubuntu2404"
 CAP_SECONDS = 360 * 60
-PRICE_CAP_PER_HOUR = Decimal("0.20")
-TOTAL_CAP_USD = Decimal("2.50")
+PRICE_CAP_PER_HOUR = Decimal("0.34")
+TOTAL_CAP_USD = Decimal("4.20")
 CONTAINER_DISK_GB = 30
 CONTAINER_DISK_USD_PER_GB_MONTH = Decimal("0.10")
 MIN_BILLING_MONTH_HOURS = Decimal(28 * 24)
@@ -80,7 +80,12 @@ def graphql(query, key):
     except url_error.HTTPError as error:
         raise ValueError(f"RunPod API HTTP {error.code}") from None
     if result.get("errors") or not isinstance(result.get("data"), dict):
-        raise ValueError("RunPod GraphQL response failed")
+        errors = result.get("errors") or []
+        detail = "; ".join(str(item.get("message", "unknown"))
+                           for item in errors if isinstance(item, dict))
+        detail = detail.replace(key, "[redacted]")[:1000]
+        raise ValueError("RunPod GraphQL response failed" +
+                         (": " + detail if detail else ""))
     return result["data"]
 
 
@@ -303,6 +308,7 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
             "status": "UNRESOLVED_PROVIDER_MUTATION" if uncertain or
                       not all(cleanup.values()) else "FAILED_ALLOCATIONS_TERMINATED",
             "error_type": type(error).__name__,
+            "error_detail": str(error).replace(key, "[redacted]")[:1000],
             "allocated_pod_ids": acquired,
             "terminated_and_absent": cleanup,
             "recorded_utc": iso(now()),

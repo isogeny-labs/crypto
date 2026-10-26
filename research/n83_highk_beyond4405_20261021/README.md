@@ -118,8 +118,18 @@ emits a readiness receipt required by the Pod launcher, transfers the archive,
 terminates the Pod with five minutes of budget margin, and confirms absence.
 Its tested failure paths still issue termination when transfer fails or the
 watchdog starts late. A live provider absence receipt is required for
-measured Tier 1 admission. After termination, it writes
-`provider_custody_validation.json` through `verify_provider_custody.py`.
+measured Tier 1 admission.
+`launch_on_pod.sh` also arms `pod_deadline_guard.py` before compilation. The
+Pod's scoped `runpodctl` credentials request deletion at the frozen allocation
+deadline if the external controller stops; its bound readiness receipt and
+error log travel with the raw archive. Neither deletion path changes the
+frozen source, candidates, targets, or measurement interval. The proposed
+charge remains an envelope rather than an account-enforced billing cap if
+both deletion paths lose provider access.
+`verify_provider_custody.py` requires the archived Pod guard receipt to match
+the allocation, deadline and transfer chronology before promoting a result.
+After termination, the controller writes `provider_custody_validation.json`
+through `verify_provider_custody.py`.
 That local gate matches the allocation, watchdog chronology, archive SHA-256,
 embedded allocation and confirmed Pod absence; it returns `BOUNDED_UNKNOWN`
 when any receipt is missing or inconsistent. The Pod-side scientific selector
