@@ -28,7 +28,9 @@ small-system tests must pass before this N83 run.
 First run one constructed control under a 300-second whole-worker cap and
 310-second supervisor. Require native SAT, original field equations, checked
 four-point group sum, signed-orbit row, rank one, altered-target rejection
-and independent original-field replay. Only then run one public natural
+and independent original-field replay. Preserve the
+`positive-independent-gate.json` receipt before launching natural search.
+Only then run one public natural
 query under a 2,400-second whole-worker cap and 2,410-second supervisor,
 with a 100,000-conflict cap in each arm. Preserve raw phase, stdout/stderr,
 exact source/binary/S3 hashes, host load, wall and memory receipts. Record

@@ -1,6 +1,7 @@
 """Bounded full-D18 cadence-32 native XOR positive/natural supervisor."""
 
 import argparse
+import copy
 import importlib.util
 import json
 import os
@@ -16,6 +17,10 @@ SPEC = importlib.util.spec_from_file_location(
     "n83_witness_preflight", HERE.parent / "native-xcnf-witness-20261025/run.py")
 witness_run = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(witness_run)
+PRIOR_SPEC = importlib.util.spec_from_file_location(
+    "n83_prior_group_replay", HERE.parent / "local-extended-natural-20261025/audit.py")
+prior = importlib.util.module_from_spec(PRIOR_SPEC)
+PRIOR_SPEC.loader.exec_module(prior)
 
 
 def save(path, record):
@@ -107,6 +112,32 @@ def run_arm(source, binary, base, output, identity, mode):
             "result_status": None if result is None else result["status"]}
 
 
+def independent_positive_gate(output, base, identity):
+    result = json.loads((output / "positive/result.json").read_text())
+    obj = base / "objects" / witness_run.OBJECT
+    group = prior.group_module()
+    relation = prior.replay_relation(result, obj, group)
+    negative = {}
+    for name in ("changed_target", "changed_row_digest"):
+        altered = copy.deepcopy(result)
+        if name == "changed_target":
+            altered["target"][0] = str(int(altered["target"][0]) ^ 1)
+        else:
+            altered["relation"]["row_decimal_blake3"] = "0" * 64
+        try:
+            prior.replay_relation(altered, obj, group)
+        except AssertionError:
+            negative[name] = "REJECTED"
+        else:
+            raise ValueError(f"constructed {name} control was accepted")
+    gate = {"schema": "n83.d18-xor-cadence32-positive-gate/v1",
+            "source_commit": identity["source_commit"],
+            "binary_sha256": identity["binary_sha256"],
+            "relation": relation, "negative_controls": negative}
+    save(output / "positive-independent-gate.json", gate)
+    return gate
+
+
 def run(args):
     source, binary, base, output = map(lambda value: Path(value).resolve(),
                                        (args.source, args.binary, args.base, args.output))
@@ -117,6 +148,8 @@ def run(args):
     output.mkdir(exist_ok=False)
     save(output / "identity.json", identity)
     positive = run_arm(source, binary, base, output, identity, "positive")
+    if positive["status"] == "PASS_CONSTRUCTED_CONTROL":
+        independent_positive_gate(output, base, identity)
     natural = (run_arm(source, binary, base, output, identity, "natural")
                if positive["status"] == "PASS_CONSTRUCTED_CONTROL" else None)
     summary = {"schema": "n83.d18-xor-cadence32-run/v1",

@@ -132,6 +132,14 @@ def audit(source, binary, base, output):
     obj = base / "objects" / run.witness_run.OBJECT
     group = prior.group_module()
     positive = check_arm(output, "positive", identity, obj, group)
+    gate = read(output / "positive-independent-gate.json")
+    if (gate["schema"] != "n83.d18-xor-cadence32-positive-gate/v1"
+            or gate["source_commit"] != identity["source_commit"]
+            or gate["binary_sha256"] != identity["binary_sha256"]
+            or gate["relation"] != positive["relation"]
+            or gate["negative_controls"] != {"changed_target": "REJECTED",
+                                             "changed_row_digest": "REJECTED"}):
+        raise ValueError("positive independent gate differs")
     result = read(output / "positive/result.json")
     negative = {}
     for name in ("changed_target", "changed_row_digest"):
