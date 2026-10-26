@@ -69,7 +69,7 @@ Each `results/*.log` repeats its command line. Settings shared by every run:
 ## 1. Interpolation (measured)
 
 `results/interpolate.json`. The polynomials were interpolated by F2 linear
-algebra over sampled relations on `K_1/F_{2^29}`. Each was then verified on
+algebra over sampled relations on `icv1-f2m29-tm40309-30c52b96`. Each was then verified on
 200 fresh relations and 200 random tuples at n = 13, 17, 19, 23, 29 and 37,
 covering both a.
 
