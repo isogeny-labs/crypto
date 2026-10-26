@@ -77,12 +77,113 @@ use num_traits::{One, Zero};
 use rand::rngs::StdRng;
 use rand::{RngCore, SeedableRng};
 
+use crate::cryptanalysis::bitops::{Field, Widths};
+use crate::prime_hyperelliptic::ops::{self, Phase, PhaseTally};
 use crate::prime_hyperelliptic::{HyperellipticCurveP, MumfordDivisorP};
 use crate::utils::mod_inverse;
 
 use super::hyperelliptic_index_calculus::{
-    build_factor_base, hec_index_calculus_dlp, HecIndexCalculusParams,
+    build_factor_base, divisor_order_bsgs, hasse_interval, hec_index_calculus_dlp,
+    largest_prime_factor, HecIndexCalculusParams,
 };
+use crate::prime_hyperelliptic::FpPoly;
+
+// ── The thread's curves and instance rule ──────────────────────────────
+
+/// The curve family every round of this thread measures on, as the
+/// frozen examples `hyperelliptic_ic_vs_rho` and
+/// `hyperelliptic_ic_large_prime` define it (they keep their own copies so
+/// their frozen commands stay byte-for-byte as they were):
+///
+/// - genus 2: `y² = x⁵ + 3x³ + 2x² + x + c`,
+/// - genus 3: `y² = x⁷ + x³ + c·x + 1`,
+/// - genus 4: `y² = x⁹ + x³ + c·x + 1`.
+///
+/// Returns `None` for a `c` whose model is not a valid curve (`f` not
+/// squarefree): the instance rule skips those, and `HyperellipticCurveP::
+/// new` now refuses them by panicking, which the frozen examples predate.
+pub fn thread_curve(p: u64, c: u64, genus: u32) -> Option<HyperellipticCurveP> {
+    let p = BigUint::from(p);
+    let one = BigUint::one;
+    let zero = BigUint::zero;
+    let cc = BigUint::from(c) % &p;
+    let coeffs = match genus {
+        2 => vec![
+            cc,
+            one(),
+            BigUint::from(2u32),
+            BigUint::from(3u32),
+            zero(),
+            one(),
+        ],
+        3 => vec![one(), cc, zero(), one(), zero(), zero(), zero(), one()],
+        4 => vec![
+            one(),
+            cc,
+            zero(),
+            one(),
+            zero(),
+            zero(),
+            zero(),
+            zero(),
+            zero(),
+            one(),
+        ],
+        g => panic!("no thread curve for genus {g}"),
+    };
+    HyperellipticCurveP::try_new(p.clone(), FpPoly::from_coeffs(coeffs, p), genus).ok()
+}
+
+fn thread_curve_is_squarefree(curve: &HyperellipticCurveP) -> bool {
+    let p = &curve.p;
+    let d: Vec<BigUint> = curve
+        .f
+        .coeffs
+        .iter()
+        .enumerate()
+        .skip(1)
+        .map(|(i, c)| (c * BigUint::from(i as u64)) % p)
+        .collect();
+    let deriv = FpPoly::from_coeffs(d, p.clone());
+    !deriv.is_zero() && curve.f.gcd(&deriv).degree() == Some(0)
+}
+
+/// The thread's instance rule, unchanged since round three: the first `c`
+/// whose Jacobian has a prime subgroup above 1000 carrying at least a
+/// quarter of the Hasse-Weil lower bound, its generator the first
+/// factor-base place (of the first eight) whose order exposes it.
+/// Returns `(curve, D₁, N, c)`.
+pub fn thread_instance(
+    p: u64,
+    genus: u32,
+) -> Option<(HyperellipticCurveP, MumfordDivisorP, BigUint, u64)> {
+    for c in 1..p.min(60) {
+        let Some(curve) = thread_curve(p, c, genus) else {
+            continue;
+        };
+        if !thread_curve_is_squarefree(&curve) {
+            continue;
+        }
+        let fb = build_factor_base(&curve, usize::MAX);
+        for e in fb.entries.iter().take(8) {
+            let order = match divisor_order_bsgs(&curve, &e.divisor, 200_000) {
+                Some(o) => o,
+                None => continue,
+            };
+            let l = largest_prime_factor(&order);
+            let (lo, _hi) = hasse_interval(&curve)?;
+            if l < BigUint::from(1000u32) || &l * BigUint::from(4u32) < BigUint::from(lo) {
+                continue;
+            }
+            let d1 = e.divisor.scalar_mul(&(&order / &l), &curve);
+            if divisor_order_bsgs(&curve, &d1, 200_000).as_ref() != Some(&l) {
+                continue;
+            }
+            return Some((curve, d1, l, c));
+        }
+    }
+    None
+}
 
 // ── Pollard rho on the Jacobian ────────────────────────────────────────
 
@@ -92,14 +193,17 @@ use super::hyperelliptic_index_calculus::{
 /// index calculus by handicapping its reference.
 const RHO_BRANCHES: usize = 16;
 
-/// Bit length of the rho branch coefficients `a_j, b_j`.
+/// Bit length of the short rho branch coefficients `a_j, b_j`
+/// ([`RhoVariant::DistinguishedPoints`] and the other short-step walks).
 ///
 /// The index-calculus walk builds its steps from short coefficients
-/// because precomputation is its largest term once a trial costs one
-/// operation.  The same trick is available to rho and costs it nothing,
-/// so the reference gets it too: optimising one side's precomputation
-/// and not the other's would be a rigged comparison, and the rigging
-/// would favour the side under study.
+/// because precomputation is its largest term, and it looks for smooth
+/// points, so nothing is lost.  Rho was given the same trick on the
+/// argument that it cost nothing; round twelve measured otherwise.  With
+/// short coefficients a walk's displacement `ΔA + ΔB·k` stays on a small
+/// 2-D set, and at `N ≈ 1.7·10⁷` the walk needed 1.42× the steps of the
+/// full-width walk ([`RhoVariant::DistinguishedPointsFullWidth`], now the
+/// default).
 const RHO_STEP_BITS: u32 = 8;
 
 /// Which rho to run as the reference.
@@ -117,10 +221,79 @@ pub enum RhoVariant {
     /// Distinguished points: store the walk positions whose hash ends
     /// in `theta_bits` zero bits, and stop when one repeats.  One
     /// operation per step, at the price of a table — this is the rho
-    /// anyone attacking a real curve would run, so it is the default
-    /// reference.
-    #[default]
+    /// anyone attacking a real curve would run.  Its branch
+    /// coefficients are `RHO_STEP_BITS` bits, which round twelve showed
+    /// slows the collision at large `N`; kept for the frozen rounds, and
+    /// no longer the default.
     DistinguishedPoints,
+    /// Distinguished points on `±` classes: after every step the
+    /// position is replaced by a canonical representative of `{D, −D}`,
+    /// with `(a, b)` negated alongside, so the walk needs
+    /// `sqrt(πN/4)` steps instead of `sqrt(πN/2)` — the `√2` of the
+    /// negation map (Wiener–Zuccherato 1998; Duursma–Gaudry–Morain
+    /// 1999).  Index calculus folds `±P` in its factor base, so a
+    /// reference without this fold leaves out a cheap automorphism the
+    /// method under study already uses.
+    ///
+    /// Folding makes fruitless two-cycles likely (about `1/(2r)` per
+    /// step); a look-ahead takes the next branch when the folded
+    /// position would select the same branch again.  Every look-ahead
+    /// trial is a counted group operation, reported in
+    /// [`RhoResult::fruitless_ops`].
+    DistinguishedPointsNegation,
+    /// [`Self::DistinguishedPoints`] with the walk hash passed through
+    /// the SplitMix64 finaliser before it picks branches and
+    /// distinguished points (round ten).  `divisor_hash` alone is a
+    /// multiply-accumulate whose low bits depend only on the low bits of
+    /// each coefficient.
+    DistinguishedPointsMixed,
+    /// [`Self::DistinguishedPointsNegation`] with the mixed hash.
+    DistinguishedPointsNegationMixed,
+    /// [`Self::DistinguishedPoints`] with full-width branch coefficients
+    /// `a_j, b_j` uniform in `[0, N)` instead of `RHO_STEP_BITS`-bit ones
+    /// (round twelve).  With short coefficients a walk's displacement
+    /// `ΔA + ΔB·k` concentrates on a small 2-D set, which can delay its
+    /// rho collision at large `N`.  The reference from round twelve to
+    /// round fifteen.
+    DistinguishedPointsFullWidth,
+    /// [`Self::DistinguishedPointsNegation`] on the full-width walk
+    /// (round thirteen).  Carries a passive cycle window (round
+    /// fourteen): it counts steps spent inside a short cycle in
+    /// [`RhoResult::cycle_ops`] and changes nothing else.
+    DistinguishedPointsNegationFullWidth,
+    /// [`Self::DistinguishedPointsNegationFullWidth`] with the cycle
+    /// window active (round fourteen): the first repeat of a hash within
+    /// the last [`CYCLE_WINDOW`] steps triggers the escape step at once,
+    /// instead of waiting for the distinguished-point gap limit (about
+    /// `√N` steps).
+    DistinguishedPointsNegationFullWidthCycleEscape,
+    /// [`Self::DistinguishedPointsNegationFullWidthCycleEscape`] that
+    /// first tries a repeat as a collision and escapes only a degenerate
+    /// one (round fifteen): on small groups a genuine rho cycle fits in
+    /// the window.  The default reference since round fifteen: the
+    /// `±` fold index calculus already uses, at its expected `√2`.
+    #[default]
+    DistinguishedPointsNegationFullWidthCollideFirst,
+}
+
+/// Length of the recent-hash window that spots fruitless cycles
+/// (round fourteen).  The look-ahead removes 2-cycles; 4-, 6-, … cycles
+/// still form, and a walk caught in one sees no distinguished point.
+pub const CYCLE_WINDOW: usize = 32;
+
+/// What the walk does with its recent-hash window.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CycleWindow {
+    /// No window.
+    Off,
+    /// Count steps whose hash repeats one in the window; walk unchanged.
+    Passive,
+    /// Escape on the first repeat.
+    Active,
+    /// On a repeat, solve from the earlier visit's `(a, b)` when that
+    /// collision is non-degenerate; escape only otherwise (round
+    /// fifteen).
+    ActiveCollideFirst,
 }
 
 /// Outcome of one rho run.
@@ -139,6 +312,16 @@ pub struct RhoResult {
     /// Of those, the tortoise/hare steps.
     pub walk_ops: usize,
     pub restarts: usize,
+    /// Of `walk_ops`, the work spent on fruitless cycles: look-ahead
+    /// trials that were discarded and distinguished-point gap escapes.
+    /// Zero for walks that do not fold `±`.
+    pub fruitless_ops: usize,
+    /// Of `walk_ops`, steps the cycle window saw inside a short cycle
+    /// (round fourteen).  Passive window: every step whose hash repeats
+    /// one of the last [`CYCLE_WINDOW`]; active window: the cycle's
+    /// length, charged once when it is detected and escaped.  Zero
+    /// without a window.
+    pub cycle_ops: usize,
     pub wall_ms: f64,
 }
 
@@ -148,6 +331,8 @@ pub struct RhoResult {
 /// equal branches — that is what makes the walk deterministic and the
 /// collision meaningful.
 fn branch_of(d: &MumfordDivisorP) -> usize {
+    // One word per absorbed limb, and one for the branch index.
+    ops::word_op(ops::divisor_hash_words(d) + 1);
     let mut acc: u64 = 0;
     for poly in [&d.u, &d.v] {
         for limb in poly.coeffs.iter().flat_map(|c| c.to_u64_digits()) {
@@ -160,6 +345,7 @@ fn branch_of(d: &MumfordDivisorP) -> usize {
 
 fn rand_below(rng: &mut StdRng, n: &BigUint) -> BigUint {
     let bytes = (n.bits() as usize).div_ceil(8) + 8;
+    ops::rng_word(bytes.div_ceil(8) as u64);
     let mut buf = vec![0u8; bytes];
     rng.fill_bytes(&mut buf);
     BigUint::from_bytes_be(&buf) % n
@@ -184,6 +370,10 @@ pub fn pollard_rho_jacobian(
 }
 
 /// Build the `r`-adding walk's branches, charging their construction.
+///
+/// `full_width` draws `a_j, b_j` uniform in `[0, N)` and charges
+/// `2·(bits(N) + 1)` operations per branch, as for a walk's start point;
+/// otherwise they are `RHO_STEP_BITS`-bit and nonzero.
 fn build_branches(
     curve: &HyperellipticCurveP,
     d1: &MumfordDivisorP,
@@ -191,17 +381,32 @@ fn build_branches(
     n: &BigUint,
     rng: &mut StdRng,
     ops: &mut usize,
+    full_width: bool,
 ) -> Vec<(BigUint, BigUint, MumfordDivisorP)> {
-    let _ = n;
     let step_bound = BigUint::one() << RHO_STEP_BITS;
+    let _phase = ops::enter(Phase::Precompute);
     let mut branch = Vec::with_capacity(RHO_BRANCHES);
     for _ in 0..RHO_BRANCHES {
-        let a = rand_below(rng, &step_bound) + BigUint::one();
-        let b = rand_below(rng, &step_bound) + BigUint::one();
+        let (a, b) = if full_width {
+            // Two wide draws reduced mod N.
+            ops::modr_mul(2);
+            (rand_below(rng, n), rand_below(rng, n))
+        } else {
+            // Two masks and two increments.
+            ops::word_op(4);
+            (
+                rand_below(rng, &step_bound) + BigUint::one(),
+                rand_below(rng, &step_bound) + BigUint::one(),
+            )
+        };
         let r = d1
             .scalar_mul(&a, curve)
             .add(&d2.scalar_mul(&b, curve), curve);
-        *ops += 2 * RHO_STEP_BITS as usize;
+        *ops += if full_width {
+            2 * (n.bits() as usize + 1)
+        } else {
+            2 * RHO_STEP_BITS as usize
+        };
         branch.push((a, b, r));
     }
     branch
@@ -210,6 +415,7 @@ fn build_branches(
 /// Full hash of a divisor, used both for branch selection and for the
 /// distinguished-point predicate.
 fn divisor_hash(d: &MumfordDivisorP) -> u64 {
+    ops::word_op(ops::divisor_hash_words(d));
     let mut acc: u64 = 0;
     for poly in [&d.u, &d.v] {
         for limb in poly.coeffs.iter().flat_map(|c| c.to_u64_digits()) {
@@ -218,6 +424,18 @@ fn divisor_hash(d: &MumfordDivisorP) -> u64 {
         acc = acc.wrapping_mul(0x9e37_79b9_7f4a_7c15).wrapping_add(1);
     }
     acc
+}
+
+/// SplitMix64's output finaliser: a bijection on `u64` whose every output
+/// bit depends on every input bit.
+fn splitmix64_finalise(mut z: u64) -> u64 {
+    // Three shift-XORs and two products, as word operations.
+    ops::word_op(5);
+    z ^= z >> 30;
+    z = z.wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    z ^= z >> 27;
+    z = z.wrapping_mul(0x94d0_49bb_1331_11eb);
+    z ^ (z >> 31)
 }
 
 /// Recover `k` from a collision `a₁ + b₁k ≡ a₂ + b₂k`, or `None` when
@@ -230,12 +448,16 @@ fn solve_collision(
     b2: &BigUint,
     n: &BigUint,
 ) -> Option<BigUint> {
+    ops::modr_add(1);
     let db = (b2 + n - b1) % n;
     if db.is_zero() {
         return None;
     }
+    ops::modr_add(1);
     let da = (a1 + n - a2) % n;
+    ops::modr_inv(1);
     let inv = mod_inverse(&db, n)?;
+    ops::modr_mul(1);
     Some((da * inv) % n)
 }
 
@@ -251,7 +473,102 @@ pub fn pollard_rho_jacobian_with(
 ) -> RhoResult {
     match variant {
         RhoVariant::Floyd => rho_floyd(curve, d1, d2, n, seed, max_steps),
-        RhoVariant::DistinguishedPoints => rho_dp(curve, d1, d2, n, seed, max_steps),
+        RhoVariant::DistinguishedPoints => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            false,
+            false,
+            false,
+            CycleWindow::Off,
+        ),
+        RhoVariant::DistinguishedPointsNegation => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            true,
+            false,
+            false,
+            CycleWindow::Off,
+        ),
+        RhoVariant::DistinguishedPointsMixed => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            false,
+            true,
+            false,
+            CycleWindow::Off,
+        ),
+        RhoVariant::DistinguishedPointsNegationMixed => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            true,
+            true,
+            false,
+            CycleWindow::Off,
+        ),
+        RhoVariant::DistinguishedPointsFullWidth => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            false,
+            false,
+            true,
+            CycleWindow::Off,
+        ),
+        RhoVariant::DistinguishedPointsNegationFullWidth => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            true,
+            false,
+            true,
+            CycleWindow::Passive,
+        ),
+        RhoVariant::DistinguishedPointsNegationFullWidthCycleEscape => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            true,
+            false,
+            true,
+            CycleWindow::Active,
+        ),
+        RhoVariant::DistinguishedPointsNegationFullWidthCollideFirst => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            true,
+            false,
+            true,
+            CycleWindow::ActiveCollideFirst,
+        ),
     }
 }
 
@@ -261,6 +578,26 @@ pub fn pollard_rho_jacobian_with(
 /// expected before the collision — few enough that the table is
 /// negligible, many enough that the walk is not dominated by the
 /// distance to the first one.
+/// Canonical representative of `{D, −D}`: the one whose `v` has its
+/// leading coefficient in `[0, (p−1)/2]`.  `−(u, v) = (u, −v)` because
+/// `deg v < deg u`, so the two `v`s are coefficientwise negatives and
+/// exactly one of them qualifies unless `v = 0`, where `D = −D`.
+/// Returns the representative and whether it is the negation.
+fn fold_negation(d: MumfordDivisorP, curve: &HyperellipticCurveP) -> (MumfordDivisorP, bool) {
+    let lead = match d.v.coeffs.iter().rposition(|c| !c.is_zero()) {
+        Some(i) => d.v.coeffs[i].clone(),
+        None => return (d, false),
+    };
+    let half = (&curve.p - BigUint::one()) >> 1;
+    ops::word_op(1);
+    if lead <= half {
+        (d, false)
+    } else {
+        (d.neg(curve), true)
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
 fn rho_dp(
     curve: &HyperellipticCurveP,
     d1: &MumfordDivisorP,
@@ -268,8 +605,43 @@ fn rho_dp(
     n: &BigUint,
     seed: u64,
     max_steps: usize,
+    negation: bool,
+    mix: bool,
+    full_width: bool,
+    window: CycleWindow,
 ) -> RhoResult {
     let started = Instant::now();
+    // The walk's hash: `divisor_hash`, optionally through SplitMix64's
+    // finaliser (round ten).  Used for branch choice, the
+    // distinguished-point test and the look-ahead alike.
+    let walk_hash = |d: &MumfordDivisorP| {
+        let h = divisor_hash(d);
+        if mix {
+            splitmix64_finalise(h)
+        } else {
+            h
+        }
+    };
+    let mut fruitless_ops = 0usize;
+    let mut cycle_ops = 0usize;
+    // The last `CYCLE_WINDOW` walk hashes, newest last; cleared on every
+    // jump, since a jump starts a new trail.
+    let mut recent: std::collections::VecDeque<(u64, BigUint, BigUint)> =
+        std::collections::VecDeque::with_capacity(CYCLE_WINDOW + 1);
+    // Fold a position and its coefficients together, so that the walk
+    // position is always exactly `a·D₁ + b·D₂`.
+    let fold = |x: MumfordDivisorP, a: BigUint, b: BigUint| {
+        if !negation {
+            return (x, a, b, false);
+        }
+        let (x, flipped) = fold_negation(x, curve);
+        if flipped {
+            ops::modr_add(2);
+            (x, (n - a) % n, (n - b) % n, true)
+        } else {
+            (x, a, b, false)
+        }
+    };
     let mut group_ops = 0usize;
     let mut precompute_ops = 0usize;
     let mut restarts = 0usize;
@@ -277,7 +649,7 @@ fn rho_dp(
     let mut rng = StdRng::seed_from_u64(seed);
 
     let mut branch_ops = 0usize;
-    let branch = build_branches(curve, d1, d2, n, &mut rng, &mut branch_ops);
+    let branch = build_branches(curve, d1, d2, n, &mut rng, &mut branch_ops, full_width);
     group_ops += branch_ops;
     precompute_ops += branch_ops;
 
@@ -304,16 +676,22 @@ fn rho_dp(
     let attempt_cap = (64.0 * expected).min(1e9) as usize + 64;
 
     for _attempt in 0..64u64 {
+        let start_phase = ops::enter(Phase::Precompute);
         let a0 = rand_below(&mut rng, n);
         let b0 = rand_below(&mut rng, n);
+        ops::modr_mul(2);
         let mut x = d1
             .scalar_mul(&a0, curve)
             .add(&d2.scalar_mul(&b0, curve), curve);
         group_ops += 2 * (n.bits() as usize + 1);
         precompute_ops += 2 * (n.bits() as usize + 1);
+        let (x0, a0, b0, _) = fold(x, a0, b0);
+        drop(start_phase);
+        x = x0;
         let (mut a, mut b) = (a0, b0);
         let mut this_attempt = 0usize;
         let mut since_dp = 0usize;
+        recent.clear();
         // A cycle can contain no distinguished point at all, in which
         // case the walk detects nothing however long it runs.  Expected
         // distance to the next one is `2^theta_bits`; well past that,
@@ -322,15 +700,24 @@ fn rho_dp(
         let dp_gap_limit = 32usize << theta_bits;
 
         while steps_left > 0 {
+            let walk_phase = ops::enter(Phase::Walk);
+            // The gap and attempt-cap tests.
+            ops::word_op(2);
             if since_dp >= dp_gap_limit {
                 restarts += 1;
                 since_dp = 0;
+                recent.clear();
+                ops::rng_word(1);
+                ops::word_op(1);
                 let j = (rng.next_u64() as usize) % branch.len();
                 let (aj, bj, rj) = &branch[j];
-                a = (&a + aj) % n;
-                b = (&b + bj) % n;
-                x = x.add(rj, curve);
+                ops::modr_add(2);
+                let (nx, na, nb, _) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
+                (x, a, b) = (nx, na, nb);
                 group_ops += 1;
+                if negation {
+                    fruitless_ops += 1;
+                }
                 steps_left -= 1;
                 this_attempt += 1;
                 continue;
@@ -342,12 +729,20 @@ fn rho_dp(
                 break;
             }
             this_attempt += 1;
-            let h = divisor_hash(&x);
-            since_dp += 1;
-            if (h & mask) == 0 {
-                since_dp = 0;
-                match seen.get(&h) {
-                    Some((pa, pb)) => {
+            drop(walk_phase);
+            // Collision detection: the hash, the distinguished-point
+            // test and, on a distinguished point, one table probe.
+            let oracle_phase = ops::enter(Phase::Oracle);
+            let h = walk_hash(&x);
+            if window != CycleWindow::Off {
+                // Position of `h` in the window, newest last: a repeat
+                // means the walk is going round a cycle of that length.
+                if let Some(i) = recent.iter().rposition(|r| r.0 == h) {
+                    let cycle_len = recent.len() - i;
+                    if window == CycleWindow::ActiveCollideFirst {
+                        // A genuine rho cycle returns to the same point
+                        // with different coefficients: that solves.
+                        let (_, pa, pb) = &recent[i];
                         if let Some(k) = solve_collision(&a, &b, pa, pb, n) {
                             if &d1.scalar_mul(&k, curve) == d2 {
                                 return RhoResult {
@@ -356,6 +751,63 @@ fn rho_dp(
                                     precompute_ops,
                                     walk_ops: group_ops - precompute_ops,
                                     restarts,
+                                    fruitless_ops,
+                                    cycle_ops,
+                                    wall_ms: started.elapsed().as_secs_f64() * 1e3,
+                                };
+                            }
+                        }
+                    }
+                    if window != CycleWindow::Passive {
+                        // Charge the lap just walked, then escape as the
+                        // gap limit would, one random branch step.
+                        cycle_ops += cycle_len;
+                        fruitless_ops += cycle_len + 1;
+                        restarts += 1;
+                        since_dp = 0;
+                        recent.clear();
+                        let j = (rng.next_u64() as usize) % branch.len();
+                        let (aj, bj, rj) = &branch[j];
+                        let (nx, na, nb, _) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
+                        (x, a, b) = (nx, na, nb);
+                        group_ops += 1;
+                        steps_left -= 1;
+                        this_attempt += 1;
+                        continue;
+                    }
+                    cycle_ops += 1;
+                }
+                recent.push_back((h, a.clone(), b.clone()));
+                if recent.len() > CYCLE_WINDOW {
+                    recent.pop_front();
+                }
+            }
+            since_dp += 1;
+            ops::word_op(1);
+            let distinguished = (h & mask) == 0;
+            if distinguished {
+                ops::hash_probe(1);
+            }
+            drop(oracle_phase);
+            if distinguished {
+                since_dp = 0;
+                match seen.get(&h) {
+                    Some((pa, pb)) => {
+                        let solved = {
+                            let _phase = ops::enter(Phase::LinearAlgebra);
+                            solve_collision(&a, &b, pa, pb, n)
+                        };
+                        if let Some(k) = solved {
+                            let _phase = ops::enter(Phase::Verification);
+                            if &d1.scalar_mul(&k, curve) == d2 {
+                                return RhoResult {
+                                    k: Some(k),
+                                    group_ops,
+                                    precompute_ops,
+                                    walk_ops: group_ops - precompute_ops,
+                                    restarts,
+                                    fruitless_ops,
+                                    cycle_ops,
                                     wall_ms: started.elapsed().as_secs_f64() * 1e3,
                                 };
                             }
@@ -371,28 +823,57 @@ fn rho_dp(
                         // wrong direction for a reference to be wrong
                         // in.
                         restarts += 1;
+                        recent.clear();
+                        let _phase = ops::enter(Phase::Walk);
+                        ops::rng_word(1);
+                        ops::word_op(1);
                         let j = (rng.next_u64() as usize) % branch.len();
                         let (aj, bj, rj) = &branch[j];
-                        a = (&a + aj) % n;
-                        b = (&b + bj) % n;
-                        x = x.add(rj, curve);
+                        ops::modr_add(2);
+                        let (nx, na, nb, _) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
+                        (x, a, b) = (nx, na, nb);
                         group_ops += 1;
                         steps_left -= 1;
                         this_attempt += 1;
                         continue;
                     }
                     None => {
+                        // The insert is a second probe.
+                        let _phase = ops::enter(Phase::Oracle);
+                        ops::hash_probe(1);
                         seen.insert(h, (a.clone(), b.clone()));
                     }
                 }
             }
-            let j = (h >> 32) as usize % branch.len();
-            let (aj, bj, rj) = &branch[j];
-            a = (&a + aj) % n;
-            b = (&b + bj) % n;
-            x = x.add(rj, curve);
-            group_ops += 1;
-            steps_left -= 1;
+            let _walk_phase = ops::enter(Phase::Walk);
+            // The branch index.
+            ops::word_op(1);
+            let mut j = (h >> 32) as usize % branch.len();
+            // Look-ahead (folded walk only): a step that lands on the
+            // negation of `x + S_j` and then selects `S_j` again returns
+            // to `x` — a fruitless two-cycle.  Take the next branch
+            // instead.  Each discarded trial is a group operation spent,
+            // and counted.
+            let mut tries = 0usize;
+            let (nx, na, nb) = loop {
+                let (aj, bj, rj) = &branch[j];
+                ops::modr_add(2);
+                let (cx, ca, cb, flipped) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
+                group_ops += 1;
+                tries += 1;
+                if flipped {
+                    // The look-ahead's hash and branch compare.
+                    ops::word_op(2);
+                }
+                let returns = flipped && (walk_hash(&cx) >> 32) as usize % branch.len() == j;
+                if !returns || tries >= branch.len() {
+                    break (cx, ca, cb);
+                }
+                fruitless_ops += 1;
+                j = (j + 1) % branch.len();
+            };
+            (x, a, b) = (nx, na, nb);
+            steps_left = steps_left.saturating_sub(tries);
         }
         if steps_left == 0 {
             break;
@@ -405,6 +886,168 @@ fn rho_dp(
         precompute_ops,
         walk_ops: group_ops - precompute_ops,
         restarts,
+        fruitless_ops,
+        cycle_ops,
+        wall_ms: started.elapsed().as_secs_f64() * 1e3,
+    }
+}
+
+/// Round eleven's control: the plain distinguished-point walk run on the
+/// logarithms themselves, `Z/N`, instead of on the Jacobian.
+///
+/// The position is `x = a + b·k mod N`; the branches add
+/// `s_j = a_j + b_j·k` with `(a_j, b_j)` drawn from the same RNG stream, in
+/// the same order, as [`rho_dp`] draws them; the starts are drawn the same
+/// way; `θ`, the gap limit, the attempt cap and the collision handling are
+/// the same rules.  Only the hash differs: SplitMix64 of `x`, which is an
+/// ideal hash of the group element.  If this walk needs `≈ 1.25·√N` and
+/// the Jacobian walk needs much more, the excess is on the Jacobian side.
+///
+/// `n` must be below `2⁶³`.  `k` is used only to place the walk, exactly
+/// as `D₂ = k·D₁` places the Jacobian walk; the returned `k` is
+/// recovered from a collision and compared against nothing here.
+pub fn rho_dp_integer_model(n: &BigUint, k: &BigUint, seed: u64, max_steps: usize) -> RhoResult {
+    rho_dp_integer_model_width(n, k, seed, max_steps, false)
+}
+
+/// [`rho_dp_integer_model`] with the branch width chosen: `full_width`
+/// mirrors [`RhoVariant::DistinguishedPointsFullWidth`]'s draws and charge
+/// (round twelve).
+pub fn rho_dp_integer_model_width(
+    n: &BigUint,
+    k: &BigUint,
+    seed: u64,
+    max_steps: usize,
+    full_width: bool,
+) -> RhoResult {
+    let started = Instant::now();
+    let nn: u64 = n.to_u64_digits().first().copied().unwrap_or(0);
+    assert!(n.bits() < 63, "integer model needs N < 2^63");
+    let kk: u64 = (k % n).to_u64_digits().first().copied().unwrap_or(0);
+    let mulmod = |a: u64, b: u64| ((a as u128 * b as u128) % nn as u128) as u64;
+    let to64 = |v: &BigUint| v.to_u64_digits().first().copied().unwrap_or(0);
+    let mut rng = StdRng::seed_from_u64(seed);
+    let (mut group_ops, mut precompute_ops, mut restarts) = (0usize, 0usize, 0usize);
+    let mut steps_left = max_steps;
+
+    // Branches: the same draws as `build_branches`, same order.
+    let step_bound = BigUint::one() << RHO_STEP_BITS;
+    let mut branch: Vec<(u64, u64, u64)> = Vec::with_capacity(RHO_BRANCHES);
+    let branch_cost = if full_width {
+        2 * (n.bits() as usize + 1)
+    } else {
+        2 * RHO_STEP_BITS as usize
+    };
+    for _ in 0..RHO_BRANCHES {
+        let (a, b) = if full_width {
+            (
+                to64(&rand_below(&mut rng, n)),
+                to64(&rand_below(&mut rng, n)),
+            )
+        } else {
+            (
+                to64(&(rand_below(&mut rng, &step_bound) + BigUint::one())) % nn,
+                to64(&(rand_below(&mut rng, &step_bound) + BigUint::one())) % nn,
+            )
+        };
+        branch.push((a, b, (a + mulmod(b, kk)) % nn));
+        group_ops += branch_cost;
+        precompute_ops += branch_cost;
+    }
+
+    let root_n = sqrt_big(n).max(2.0);
+    let theta_bits = ((root_n / 32.0).log2().round() as i64).clamp(0, 24) as u32;
+    let mask: u64 = if theta_bits == 0 {
+        0
+    } else {
+        (1u64 << theta_bits) - 1
+    };
+    let mut seen: HashMap<u64, (u64, u64)> = HashMap::new();
+    let expected = 1.25 * root_n + (1u64 << theta_bits) as f64;
+    let attempt_cap = (64.0 * expected).min(1e9) as usize + 64;
+    let add = |x: (u64, u64, u64), s: (u64, u64, u64)| {
+        ((x.0 + s.0) % nn, (x.1 + s.1) % nn, (x.2 + s.2) % nn)
+    };
+
+    for _attempt in 0..64u64 {
+        let a0 = to64(&rand_below(&mut rng, n));
+        let b0 = to64(&rand_below(&mut rng, n));
+        let mut pos = (a0, b0, (a0 + mulmod(b0, kk)) % nn); // (a, b, x)
+        group_ops += 2 * (n.bits() as usize + 1);
+        precompute_ops += 2 * (n.bits() as usize + 1);
+        let (mut this_attempt, mut since_dp) = (0usize, 0usize);
+        let dp_gap_limit = 32usize << theta_bits;
+        while steps_left > 0 {
+            if since_dp >= dp_gap_limit {
+                restarts += 1;
+                since_dp = 0;
+                let j = (rng.next_u64() as usize) % branch.len();
+                pos = add(pos, branch[j]);
+                group_ops += 1;
+                steps_left -= 1;
+                this_attempt += 1;
+                continue;
+            }
+            if this_attempt >= attempt_cap {
+                restarts += 1;
+                break;
+            }
+            this_attempt += 1;
+            let h = splitmix64_finalise(pos.2);
+            since_dp += 1;
+            if (h & mask) == 0 {
+                since_dp = 0;
+                match seen.get(&h) {
+                    Some(&(pa, pb)) => {
+                        let got = solve_collision(
+                            &BigUint::from(pos.0),
+                            &BigUint::from(pos.1),
+                            &BigUint::from(pa),
+                            &BigUint::from(pb),
+                            n,
+                        );
+                        if let Some(kk_found) = got {
+                            return RhoResult {
+                                k: Some(kk_found),
+                                group_ops,
+                                precompute_ops,
+                                walk_ops: group_ops - precompute_ops,
+                                restarts,
+                                fruitless_ops: 0,
+                                cycle_ops: 0,
+                                wall_ms: started.elapsed().as_secs_f64() * 1e3,
+                            };
+                        }
+                        restarts += 1;
+                        let j = (rng.next_u64() as usize) % branch.len();
+                        pos = add(pos, branch[j]);
+                        group_ops += 1;
+                        steps_left -= 1;
+                        this_attempt += 1;
+                        continue;
+                    }
+                    None => {
+                        seen.insert(h, (pos.0, pos.1));
+                    }
+                }
+            }
+            let j = (h >> 32) as usize % branch.len();
+            pos = add(pos, branch[j]);
+            group_ops += 1;
+            steps_left -= 1;
+        }
+        if steps_left == 0 {
+            break;
+        }
+    }
+    RhoResult {
+        k: None,
+        group_ops,
+        precompute_ops,
+        walk_ops: group_ops - precompute_ops,
+        restarts,
+        fruitless_ops: 0,
+        cycle_ops: 0,
         wall_ms: started.elapsed().as_secs_f64() * 1e3,
     }
 }
@@ -426,10 +1069,12 @@ fn rho_floyd(
     for attempt in 0..64u64 {
         let mut rng = StdRng::seed_from_u64(seed ^ (attempt << 32));
 
+        let pre_phase = ops::enter(Phase::Precompute);
         // Precomputed branches R_j = a_j·D₁ + b_j·D₂.  Charged.
         let mut branch: Vec<(BigUint, BigUint, MumfordDivisorP)> = Vec::with_capacity(RHO_BRANCHES);
         let step_bound = BigUint::one() << RHO_STEP_BITS;
         for _ in 0..RHO_BRANCHES {
+            ops::word_op(4);
             let a = rand_below(&mut rng, &step_bound) + BigUint::one();
             let b = rand_below(&mut rng, &step_bound) + BigUint::one();
             let r = d1
@@ -442,6 +1087,7 @@ fn rho_floyd(
 
         let step = |a: &BigUint, b: &BigUint, x: &MumfordDivisorP| {
             let (aj, bj, rj) = &branch[branch_of(x)];
+            ops::modr_add(2);
             ((a + aj) % n, (b + bj) % n, x.add(rj, curve))
         };
 
@@ -449,16 +1095,19 @@ fn rho_floyd(
         // degenerate.
         let a0 = rand_below(&mut rng, n);
         let b0 = rand_below(&mut rng, n);
+        ops::modr_mul(2);
         let x0 = d1
             .scalar_mul(&a0, curve)
             .add(&d2.scalar_mul(&b0, curve), curve);
         group_ops += 2 * (n.bits() as usize + 1);
         precompute_ops += 2 * (n.bits() as usize + 1);
+        drop(pre_phase);
 
         let (mut at, mut bt, mut xt) = (a0.clone(), b0.clone(), x0.clone());
         let (mut ah, mut bh, mut xh) = (a0, b0, x0);
 
         while steps_left > 0 {
+            let walk_phase = ops::enter(Phase::Walk);
             let (na, nb, nx) = step(&at, &bt, &xt);
             at = na;
             bt = nb;
@@ -472,22 +1121,37 @@ fn rho_floyd(
             xh = nx;
             group_ops += 2;
             steps_left = steps_left.saturating_sub(3);
+            drop(walk_phase);
 
-            if xt == xh {
+            // Floyd's collision test: an equality of the two positions.
+            let met = {
+                let _phase = ops::enter(Phase::Oracle);
+                xt == xh
+            };
+            if met {
+                let solve_phase = ops::enter(Phase::LinearAlgebra);
                 // a_t + b_t k ≡ a_h + b_h k  ⟹  k ≡ (a_t − a_h)/(b_h − b_t).
+                ops::modr_add(1);
                 let db = (&bh + n - &bt) % n;
                 if db.is_zero() {
                     restarts += 1;
                     break; // useless collision; new walk
                 }
+                ops::modr_add(1);
                 let da = (&at + n - &ah) % n;
+                ops::modr_inv(1);
                 let k = match mod_inverse(&db, n) {
-                    Some(inv) => (da * inv) % n,
+                    Some(inv) => {
+                        ops::modr_mul(1);
+                        (da * inv) % n
+                    }
                     None => {
                         restarts += 1;
                         break;
                     }
                 };
+                drop(solve_phase);
+                let _verify = ops::enter(Phase::Verification);
                 if &d1.scalar_mul(&k, curve) == d2 {
                     return RhoResult {
                         k: Some(k),
@@ -495,6 +1159,8 @@ fn rho_floyd(
                         precompute_ops,
                         walk_ops: group_ops - precompute_ops,
                         restarts,
+                        fruitless_ops: 0,
+                        cycle_ops: 0,
                         wall_ms: started.elapsed().as_secs_f64() * 1e3,
                     };
                 }
@@ -513,6 +1179,8 @@ fn rho_floyd(
         precompute_ops,
         walk_ops: group_ops - precompute_ops,
         restarts,
+        fruitless_ops: 0,
+        cycle_ops: 0,
         wall_ms: started.elapsed().as_secs_f64() * 1e3,
     }
 }
@@ -639,6 +1307,33 @@ pub struct HeadToHeadRow {
     pub ic_h1_predicted_ops: f64,
     pub ic_h1_predicted_s: f64,
     pub modmuls_per_group_op: f64,
+
+    // ── bitop/v1 primitive counts (added alongside; nothing above uses
+    // them) ─────────────────────────────────────────────────────────────
+    /// Runs behind the sums below.
+    pub ic_runs: usize,
+    pub rho_runs: usize,
+    /// The rho walk that produced the `rho_*` fields.
+    pub rho_variant: RhoVariant,
+    /// Widths every count is priced at: `F_p` primitives and hash probes
+    /// at `bits(p)`, mod-`N` primitives at `bits(N)`.
+    pub bitop_widths: Widths,
+    /// Primitive counts **summed over all** index-calculus runs, by phase
+    /// (see [`crate::prime_hyperelliptic::ops`] for the counting rules).
+    pub ic_bitop_phases: PhaseTally,
+    /// Of those, the work inside the checked arithmetic's validation.
+    pub ic_bitop_validation: PhaseTally,
+    /// The same for rho.
+    pub rho_bitop_phases: PhaseTally,
+    pub rho_bitop_validation: PhaseTally,
+    /// Each run's `bitop/v1` total, in run order.
+    pub ic_bitops_per_run: Vec<u128>,
+    pub rho_bitops_per_run: Vec<u128>,
+    /// Each run's total without the checked arithmetic's operand
+    /// re-validation: the cost the self-check policy compares
+    /// (`docs/units/BITOPS.md`, "Self-check work").
+    pub ic_algorithm_bitops_per_run: Vec<u128>,
+    pub rho_algorithm_bitops_per_run: Vec<u128>,
 }
 
 impl HeadToHeadRow {
@@ -652,6 +1347,33 @@ impl HeadToHeadRow {
     /// nothing about whether the method is any good.
     pub fn ratio_to_floor(&self) -> f64 {
         self.ic_s / self.ic_floor_s
+    }
+
+    /// Mean `bitop/v1` total of one index-calculus run.
+    pub fn ic_bitops_mean(&self) -> f64 {
+        mean_u128(&self.ic_bitops_per_run)
+    }
+
+    /// Mean `bitop/v1` total of one rho run.
+    pub fn rho_bitops_mean(&self) -> f64 {
+        mean_u128(&self.rho_bitops_per_run)
+    }
+}
+
+fn mean_u128(v: &[u128]) -> f64 {
+    if v.is_empty() {
+        return 0.0;
+    }
+    v.iter().map(|&x| x as f64).sum::<f64>() / v.len() as f64
+}
+
+/// The widths a head-to-head row is priced at.
+pub fn bitop_widths(curve: &HyperellipticCurveP, n: &BigUint) -> Widths {
+    Widths {
+        field: Field::Prime {
+            bits: curve.p.bits() as u32,
+        },
+        r_bits: n.bits() as u32,
     }
 }
 
@@ -716,6 +1438,11 @@ pub fn head_to_head(
 ) -> HeadToHeadRow {
     let p_u = curve.p.to_u64_digits().first().copied().unwrap_or(0);
     let (conv, secs_per_group_op) = calibrate(curve, d1, n, 2_000);
+    let widths = bitop_widths(curve, n);
+    let mut ic_bitop_phases = PhaseTally::default();
+    let mut ic_bitop_validation = PhaseTally::default();
+    let mut ic_bitops_per_run = Vec::new();
+    let mut ic_algorithm_bitops_per_run = Vec::new();
 
     let ic_runs = trials.ic.max(1);
     let mut ic_relation_ops = 0f64;
@@ -736,9 +1463,25 @@ pub fn head_to_head(
     for t in 0..ic_runs {
         let mut params = ic_params.clone();
         params.seed = ic_params.seed.wrapping_add(t as u64);
+        let (tally0, valid0) = (ops::snapshot(), ops::snapshot_validation());
         let ic_start = Instant::now();
         let (ic_k, rep) = hec_index_calculus_dlp(curve, d1, d2, n, &params);
         ic_wall_ms += ic_start.elapsed().as_secs_f64() * 1e3;
+        let run = ops::snapshot().since(&tally0);
+        let checks = ops::snapshot_validation().since(&valid0);
+        ic_bitop_validation.add(&checks);
+        let all = run
+            .total()
+            .bitops(&widths)
+            .expect("prime-field primitives all have a bitop/v1 price");
+        ic_bitops_per_run.push(all);
+        ic_algorithm_bitops_per_run.push(
+            all - checks
+                .total()
+                .bitops(&widths)
+                .expect("prime-field primitives all have a bitop/v1 price"),
+        );
+        ic_bitop_phases.add(&run);
         ic_relation_ops += rep.jacobian_ops as f64;
         ic_la_modmuls += rep.solve_row_ops as f64;
         ic_oracle_modmuls += rep.smoothness_field_ops as f64;
@@ -774,7 +1517,12 @@ pub fn head_to_head(
     let mut rho_walk = 0f64;
     let mut rho_wall_ms = 0f64;
     let mut rho_correct = true;
+    let mut rho_bitop_phases = PhaseTally::default();
+    let mut rho_bitop_validation = PhaseTally::default();
+    let mut rho_bitops_per_run = Vec::new();
+    let mut rho_algorithm_bitops_per_run = Vec::new();
     for t in 0..rho_runs {
+        let (tally0, valid0) = (ops::snapshot(), ops::snapshot_validation());
         let r = pollard_rho_jacobian_with(
             curve,
             d1,
@@ -784,6 +1532,21 @@ pub fn head_to_head(
             rho_max_steps,
             rho_variant,
         );
+        let run = ops::snapshot().since(&tally0);
+        let checks = ops::snapshot_validation().since(&valid0);
+        rho_bitop_validation.add(&checks);
+        let all = run
+            .total()
+            .bitops(&widths)
+            .expect("prime-field primitives all have a bitop/v1 price");
+        rho_bitops_per_run.push(all);
+        rho_algorithm_bitops_per_run.push(
+            all - checks
+                .total()
+                .bitops(&widths)
+                .expect("prime-field primitives all have a bitop/v1 price"),
+        );
+        rho_bitop_phases.add(&run);
         rho_ops += r.group_ops as f64;
         rho_pre += r.precompute_ops as f64;
         rho_walk += r.walk_ops as f64;
@@ -878,6 +1641,19 @@ pub fn head_to_head(
         ic_h1_predicted_ops: h1_ops,
         ic_h1_predicted_s: h1_ops / root_n,
         modmuls_per_group_op: conv,
+
+        ic_runs,
+        rho_runs,
+        rho_variant: rho_variant.clone(),
+        bitop_widths: widths,
+        ic_bitop_phases,
+        ic_bitop_validation,
+        rho_bitop_phases,
+        rho_bitop_validation,
+        ic_bitops_per_run,
+        rho_bitops_per_run,
+        ic_algorithm_bitops_per_run,
+        rho_algorithm_bitops_per_run,
     }
 }
 
@@ -952,6 +1728,228 @@ mod tests {
         let r = pollard_rho_jacobian(&curve, &d1, &d2, &n, 1, 1_000_000);
         assert_eq!(r.k, Some(k));
         assert!(r.group_ops > 0);
+    }
+
+    #[test]
+    fn thread_instance_matches_the_frozen_rows() {
+        // `N` for these instances is recorded in round seven's frozen
+        // output (experiments/hyperelliptic_sparse_solve_r7/): the
+        // library copy of the instance rule must pick the same subgroups
+        // the frozen examples did.
+        for (genus, p, n) in [
+            (2u32, 41u64, 1321u64),
+            (3, 23, 6299),
+            (3, 31, 7333),
+            (4, 31, 239753),
+            (4, 61, 16790591),
+        ] {
+            let (_curve, _d1, got, _c) = thread_instance(p, genus).expect("instance");
+            assert_eq!(got, BigUint::from(n), "genus {genus} p {p}");
+        }
+    }
+
+    #[test]
+    fn negation_folded_rho_solves_and_walks_less() {
+        // The folded walk must recover `k` on every seed, keep the plain
+        // walk's result untouched, and on average take fewer walk
+        // operations: ideally `1/√2 ≈ 0.71` of the plain walk's.  The
+        // bound here is loose (0.9) because twenty runs of either walk
+        // are a wide random variable at this size; the registered
+        // measurement is the round-nine sweep, not this test.
+        let (curve, d1, d2, n, k) = instance(251);
+        let (mut plain, mut folded, mut fruitless) = (0usize, 0usize, 0usize);
+        for seed in 0..20u64 {
+            let p = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPoints,
+            );
+            let f = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPointsNegation,
+            );
+            assert_eq!(p.k.as_ref(), Some(&k), "plain seed {seed}");
+            assert_eq!(f.k.as_ref(), Some(&k), "folded seed {seed}");
+            assert_eq!(p.fruitless_ops, 0, "the plain walk folds nothing");
+            assert!(f.fruitless_ops <= f.walk_ops);
+            plain += p.walk_ops;
+            folded += f.walk_ops;
+            fruitless += f.fruitless_ops;
+        }
+        assert!(
+            (folded as f64) < 0.9 * plain as f64,
+            "folded {folded} vs plain {plain} walk ops"
+        );
+        assert!(
+            (fruitless as f64) < 0.15 * folded as f64,
+            "fruitless {fruitless} of {folded}"
+        );
+    }
+
+    #[test]
+    fn mixed_hash_walks_solve_and_mixing_is_a_bijection_on_samples() {
+        // The mixed-hash variants change only the walk's hash, so they
+        // must still recover `k` on every seed.  The finaliser itself must
+        // be injective (it is a bijection on u64); spot-check that no two
+        // of a few thousand inputs collide.
+        let (curve, d1, d2, n, k) = instance(101);
+        for seed in 0..10u64 {
+            for v in [
+                RhoVariant::DistinguishedPointsMixed,
+                RhoVariant::DistinguishedPointsNegationMixed,
+            ] {
+                let r = pollard_rho_jacobian_with(&curve, &d1, &d2, &n, seed, 5_000_000, &v);
+                assert_eq!(r.k.as_ref(), Some(&k), "{v:?} seed {seed}");
+            }
+        }
+        let mut seen = std::collections::HashSet::new();
+        for z in 0..4096u64 {
+            assert!(seen.insert(splitmix64_finalise(z.wrapping_mul(0x1234_5678_9abc_def1))));
+        }
+    }
+
+    #[test]
+    fn integer_model_recovers_k() {
+        for (n, k) in [(1009u64, 777u64), (61667, 20562), (4620611, 1540210)] {
+            for seed in 0..8u64 {
+                let r =
+                    rho_dp_integer_model(&BigUint::from(n), &BigUint::from(k), seed, 50_000_000);
+                assert_eq!(r.k, Some(BigUint::from(k)), "N {n} seed {seed}");
+            }
+        }
+    }
+
+    #[test]
+    fn full_width_branches_solve_on_both_walks() {
+        // Round twelve's arms change only the branch coefficients' width,
+        // so both must still recover `k` on every seed, and the branch
+        // charge must be the full-width one.
+        let (curve, d1, d2, n, k) = instance(101);
+        for seed in 0..10u64 {
+            let r = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPointsFullWidth,
+            );
+            assert_eq!(r.k.as_ref(), Some(&k), "jacobian seed {seed}");
+            assert_eq!(r.precompute_ops % (2 * (n.bits() as usize + 1)), 0);
+            let f = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPointsNegationFullWidth,
+            );
+            assert_eq!(f.k.as_ref(), Some(&k), "folded jacobian seed {seed}");
+            assert!(f.fruitless_ops <= f.walk_ops);
+        }
+        for (nn, kk) in [(61667u64, 20562u64), (4620611, 1540210)] {
+            for seed in 0..8u64 {
+                let r = rho_dp_integer_model_width(
+                    &BigUint::from(nn),
+                    &BigUint::from(kk),
+                    seed,
+                    50_000_000,
+                    true,
+                );
+                assert_eq!(r.k, Some(BigUint::from(kk)), "N {nn} seed {seed}");
+            }
+        }
+    }
+
+    #[test]
+    fn passive_cycle_window_changes_nothing_and_active_solves() {
+        // Round fourteen's instrument must not move the walk: with the
+        // window passive, every count but `cycle_ops` equals the walk with
+        // no window, seed for seed.  The active window must still solve.
+        let (curve, d1, d2, n, k) = instance(101);
+        for seed in 0..10u64 {
+            let off = rho_dp(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                true,
+                false,
+                true,
+                CycleWindow::Off,
+            );
+            let passive = rho_dp(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                true,
+                false,
+                true,
+                CycleWindow::Passive,
+            );
+            assert_eq!(off.k, passive.k, "seed {seed}");
+            assert_eq!(off.walk_ops, passive.walk_ops, "seed {seed}");
+            assert_eq!(off.fruitless_ops, passive.fruitless_ops, "seed {seed}");
+            assert_eq!(off.restarts, passive.restarts, "seed {seed}");
+            assert_eq!(off.cycle_ops, 0);
+            assert!(passive.cycle_ops <= passive.walk_ops);
+            let active = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPointsNegationFullWidthCycleEscape,
+            );
+            assert_eq!(active.k.as_ref(), Some(&k), "active seed {seed}");
+            assert!(active.cycle_ops <= active.fruitless_ops);
+            let first = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPointsNegationFullWidthCollideFirst,
+            );
+            assert_eq!(first.k.as_ref(), Some(&k), "collide-first seed {seed}");
+            assert!(first.cycle_ops <= first.fruitless_ops);
+        }
+    }
+
+    #[test]
+    fn fold_negation_picks_one_of_each_pair() {
+        // `{D, −D}` must map to one representative from either side, and
+        // the flag must say which one was taken.
+        let (curve, d1, _d2, _n, _k) = instance(61);
+        let mut d = d1.clone();
+        for _ in 0..200 {
+            let (a, fa) = fold_negation(d.clone(), &curve);
+            let (b, fb) = fold_negation(d.neg(&curve), &curve);
+            assert_eq!(a, b, "both signs fold to one representative");
+            assert_eq!(a, if fa { d.neg(&curve) } else { d.clone() });
+            if !d.v.is_zero() {
+                assert_ne!(fa, fb, "exactly one side is flipped");
+            }
+            d = d.add(&d1, &curve);
+        }
     }
 
     #[test]
@@ -1105,5 +2103,147 @@ mod tests {
             row.ic_total_group_ops,
             row.ic_floor_ops
         );
+    }
+
+    fn bitop_row(
+        search: RelationSearch,
+        la: LinearAlgebra,
+        oracle: SmoothnessTest,
+        variant: RhoVariant,
+    ) -> HeadToHeadRow {
+        let (curve, d1, d2, n, k) = instance(41);
+        let params = HecIndexCalculusParams {
+            fb_size: usize::MAX,
+            extra_relations: 5,
+            max_trials: 50_000,
+            seed: 20260916,
+            search,
+            linear_algebra: la,
+            smoothness: oracle,
+            large_primes: false,
+        };
+        head_to_head(
+            &curve,
+            &d1,
+            &d2,
+            &n,
+            &params,
+            0xC0FFEE,
+            1_000_000,
+            &k,
+            &HeadToHeadTrials { ic: 2, rho: 3 },
+            &variant,
+        )
+    }
+
+    /// Same seeds, same counts: every phase of both arms, to the unit.
+    #[test]
+    fn bitop_counts_are_deterministic() {
+        for (search, la, oracle) in [
+            (
+                RelationSearch::factor_base_walk(),
+                LinearAlgebra::Sparse,
+                SmoothnessTest::Gcd,
+            ),
+            (
+                RelationSearch::Random,
+                LinearAlgebra::Dense,
+                SmoothnessTest::Scan,
+            ),
+        ] {
+            let a = bitop_row(
+                search.clone(),
+                la.clone(),
+                oracle.clone(),
+                RhoVariant::default(),
+            );
+            let b = bitop_row(search, la, oracle, RhoVariant::default());
+            assert!(a.ic_correct && a.rho_correct);
+            assert_eq!(a.ic_bitop_phases, b.ic_bitop_phases);
+            assert_eq!(a.rho_bitop_phases, b.rho_bitop_phases);
+            assert_eq!(a.ic_bitop_validation, b.ic_bitop_validation);
+            assert_eq!(a.ic_bitops_per_run, b.ic_bitops_per_run);
+            assert_eq!(a.rho_bitops_per_run, b.rho_bitops_per_run);
+            assert_eq!(a.ic_algorithm_bitops_per_run, b.ic_algorithm_bitops_per_run);
+            assert_eq!(
+                a.rho_algorithm_bitops_per_run,
+                b.rho_algorithm_bitops_per_run
+            );
+        }
+    }
+
+    /// Every phase that does work is charged, and nothing leaks out of a
+    /// measured run into `unattributed`.
+    #[test]
+    fn every_phase_is_charged_where_it_should_be() {
+        use crate::prime_hyperelliptic::ops::Kind;
+        for (search, la, oracle) in [
+            (
+                RelationSearch::factor_base_walk(),
+                LinearAlgebra::Sparse,
+                SmoothnessTest::Gcd,
+            ),
+            (
+                RelationSearch::walk(),
+                LinearAlgebra::Sparse,
+                SmoothnessTest::Gcd,
+            ),
+            (
+                RelationSearch::Random,
+                LinearAlgebra::Dense,
+                SmoothnessTest::Scan,
+            ),
+        ] {
+            let random = search == RelationSearch::Random;
+            // The full-width walk the hec study counted; the default is now
+            // the collide-first walk, whose cycle window is not yet charged.
+            let row = bitop_row(search, la, oracle, RhoVariant::DistinguishedPointsFullWidth);
+            assert_eq!(row.rho_variant, RhoVariant::DistinguishedPointsFullWidth);
+            let ic = &row.ic_bitop_phases;
+            let rho = &row.rho_bitop_phases;
+            assert!(ic.phase(Phase::Unattributed).is_zero());
+            assert!(rho.phase(Phase::Unattributed).is_zero());
+            for ph in [
+                Phase::Precompute,
+                Phase::Walk,
+                Phase::Oracle,
+                Phase::LinearAlgebra,
+                Phase::Verification,
+            ] {
+                assert!(!ic.phase(ph).is_zero(), "IC phase {ph:?} uncharged");
+                assert!(!rho.phase(ph).is_zero(), "rho phase {ph:?} uncharged");
+            }
+            // The factor base is built in IC's precompute.
+            let pre = ic.phase(Phase::Precompute);
+            assert!(pre.get(Kind::FieldSqrt) > 0 && pre.get(Kind::HashProbe) > 0);
+            // The walk's bookkeeping mod N (Random draws, walks add).
+            let walk = ic.phase(Phase::Walk);
+            if random {
+                assert!(walk.get(Kind::ModrMul) > 0);
+            } else {
+                assert!(walk.get(Kind::ModrAdd) > 0);
+            }
+            assert!(walk.field_ops() > 0);
+            // The oracle probes the factor base; rho's probes its table.
+            assert!(ic.phase(Phase::Oracle).get(Kind::HashProbe) > 0);
+            assert!(rho.phase(Phase::Oracle).get(Kind::HashProbe) > 0);
+            assert!(rho.phase(Phase::Oracle).field_ops() == 0);
+            // The solve works mod N.
+            let la = ic.phase(Phase::LinearAlgebra);
+            assert!(la.get(Kind::ModrMul) > 0 && la.get(Kind::ModrInv) > 0);
+            let rla = rho.phase(Phase::LinearAlgebra);
+            assert!(rla.get(Kind::ModrInv) >= row.rho_runs as u64);
+            // Rho's walk: two coefficient additions mod N per step.
+            assert!(rho.phase(Phase::Walk).get(Kind::ModrAdd) > 0);
+            // Verification is group arithmetic.
+            assert!(ic.phase(Phase::Verification).field_ops() > 0);
+            assert!(rho.phase(Phase::Verification).field_ops() > 0);
+            // Validation is a strict subset.
+            let (all, val) = (ic.total(), row.ic_bitop_validation.total());
+            for k in Kind::ALL {
+                assert!(val.get(k) <= all.get(k));
+            }
+            assert!(row.ic_bitops_mean() > 0.0 && row.rho_bitops_mean() > 0.0);
+        }
     }
 }
