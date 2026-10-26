@@ -84,7 +84,28 @@ s² + s + 2 ≡ 0 (mod r). So a walk at aG + bQ moves to
 make test         # generate headers, build and run three CPU test suites
 make bench        # CUDA benchmark binary (needs nvcc)
 make bench ARCH=sm_100
+make bench ARCH=sm_120 NVCCFLAGS="-O3 -std=c++17 -arch=sm_120 -DF2M_CLMAD=0"   # software product control
 ```
+
+The device build multiplies with PTX `clmad.lo/hi.u64` when the toolchain
+can emit it (CUDA 13.3 or newer, sm_80 and later; `F2M_CLMAD` in `f2m.cuh`),
+otherwise with the software product the host harness runs. The two form the
+same unreduced product and share the reduction; `./bench selftest` is the
+check that the native path agrees with the host on a device, and the
+`-DF2M_CLMAD=0` build above is its paired control for `./bench field` and
+`./bench rho`. Measured on one RTX PRO 6000 (CUDA 13.3, sm_120): both builds
+pass `selftest`; the native product runs `mul` at 127.3 against 97.3 Gop/s
+(1.31x), `inv` 1.24x and the ECC2K-95 class walk at 1.685 against 1.42
+Gstep/s (1.19x), three repetitions each. Receipts:
+[`ecc2k130/benchmarks/ecc2k-clmad/RESULTS.md`](../../ecc2k130/benchmarks/ecc2k-clmad/RESULTS.md).
+
+Launch geometry was then swept on the same card: 256-thread blocks, the
+register variant and W = 4 run the walk at 2.022 Gstep/s against 1.775 for
+the previous 128-thread, lowmem, W = 8 default, 1.139x with every paired
+repetition above 1, after a device selftest at each width. `make bench
+ARCH=sm_120` and `./bench rho` now use those settings on compute capability
+12.0 and keep the old ones elsewhere. Receipts:
+[`ecc2k130/benchmarks/ecc2k-geometry/RESULTS.md`](../../ecc2k130/benchmarks/ecc2k-geometry/RESULTS.md).
 
 | Suite | Curve | Subgroup | What it covers |
 |---|---|---|---|
