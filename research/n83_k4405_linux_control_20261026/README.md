@@ -7,8 +7,11 @@ from the earlier public N83 target set. The sealed cross-family points are
 reserved for the later paired Tier 1 comparison.
 
 The source hash, prior source flags, target and answer sidecar are checked
-before execution. The Linux executable is built from that source and hashed
-in `config.json`; its binary hash is platform-specific. The worker records
+before execution. The Linux executable is built from that source, copied to
+`output/executed_binary/koblitz_orbit_dlp_fast`, checked byte for byte, and
+launched from that retained copy. `config.json` records its platform-specific
+hash and executed path; `receipt.json` records the retained copy's hash. Copy
+the whole output directory for independent replay. The worker records
 cgroup v1 or v2 memory, swap, CPU quota, CPU statistics, memory events,
 affinity, and a 0.5-second time series. The v1 path uses the memory+swap
 counter or `memory.stat`'s `total_swap` and rejects a Pod that exposes

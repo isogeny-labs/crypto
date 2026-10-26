@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import signal
 import subprocess
 import time
@@ -136,10 +137,11 @@ def run(binary: Path, output: Path, *, preflight: bool = False) -> dict:
                   "KIC_INDEX_ROOT_THREADS": "4"})
     command = [str(binary), "construct:83:1:4405", str(output / "target.jsonl"),
                "29", str(output / "targets_result.jsonl")]
+    binary_sha256 = digest(binary)
     config = {"schema": "n83.k4405-current-source-linux-control/v1",
               "runner_sha256": digest(Path(__file__)),
               "source_sha256": SOURCE_SHA256,
-              "binary_sha256": digest(binary),
+              "binary_sha256": binary_sha256,
               "source_flags_sha256": digest(SOURCE_FLAGS),
               "public_targets_sha256": digest(PUBLIC),
               "answer_sidecar_sha256": digest(ANSWERS),
@@ -153,6 +155,13 @@ def run(binary: Path, output: Path, *, preflight: bool = False) -> dict:
     if preflight:
         return {"status": "PASS_PREFLIGHT", "config": config}
     output.mkdir(parents=True, exist_ok=False)
+    executed_binary = output / "executed_binary" / "koblitz_orbit_dlp_fast"
+    executed_binary.parent.mkdir()
+    shutil.copy2(binary, executed_binary)
+    if digest(executed_binary) != binary_sha256:
+        raise ValueError("retained executable differs from the checked Linux binary")
+    command[0] = str(executed_binary.resolve(strict=True))
+    config["executed_binary"] = str(executed_binary.relative_to(output))
     (output / "target.jsonl").write_text(json.dumps(point, sort_keys=True) + "\n")
     (output / "config.json").write_text(json.dumps(config, indent=2, sort_keys=True) + "\n")
     environment = {key: os.environ[key] for key in ("PATH", "HOME", "TMPDIR", "LANG")
@@ -227,6 +236,7 @@ def run(binary: Path, output: Path, *, preflight: bool = False) -> dict:
                "samples_sha256": digest(output / "samples.json"),
                "stdout_sha256": digest(output / "stdout.jsonl"),
                "stderr_sha256": digest(output / "stderr.log"),
+               "executed_binary_sha256": digest(executed_binary),
                "target_sha256": digest(output / "target.jsonl"),
                "base_dump_sha256": digest(output / "base_dump.jsonl")
                if (output / "base_dump.jsonl").is_file() else None,
