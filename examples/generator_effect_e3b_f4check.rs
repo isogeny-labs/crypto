@@ -132,7 +132,7 @@ fn main() {
                 "f4_muladds_per_call": solver_ops(rec) / calls(rec),
                 "e3_capped_mean_per_call": c_f4,
                 "system_mults_per_call": native(rec, "pkm_system_fp_mults_uncharged") / calls(rec),
-                "crosscheck_disagreements": native(rec, "pkm_crosscheck_disagreements"),
+                "crosscheck_disagreements": native(rec, "pkm_crosscheck_disagreements") + 0.0,
                 "budget_exceeded": rec.solver.as_ref().map_or(0, |s| s.budget_exceeded),
                 "f4_wall_ns_per_call": rec.solver.as_ref().map_or(0.0, |s| s.wall_ns as f64) / calls(rec),
                 "u_measured": u,

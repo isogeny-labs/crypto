@@ -164,4 +164,18 @@ and Part L takes a few hours per curve.
 
 ## Deviations
 
-None yet.
+**2026-10-26 (D1): the two `t = 3` F4 sessions were interrupted and rerun.**
+The host session that launched the seven runs ended while the F4 runs were
+in progress. The three ladder sessions and the two `t = 2` F4 sessions had
+completed (status `complete`). The `sem-chain-t3` session
+(`ECBS1hf02ca1ecbf63`) had written only its `rho-neg` record, and the
+`sem-full-t3` session (`ECBS1hdfef6661171e`) had written `rho-neg` for both
+targets and `sem-full-t3` for target 0 (verified, 389 357 trials, 381 501 F4
+calls) when it ended; both stayed marked `running` with no sealed record
+hash. Their partial directories are kept outside the repository (they would
+not pass the audit of a sealed session) and are listed in `E3b.md`. Both arms
+were rerun from the start with the same frozen specs, the same binary
+(sha256 `b72458fb…`) and the same targets, in fresh session directories. No
+number of the interrupted sessions enters any table. The interrupted `sem-full-t3`
+target 0 is a replicate of the rerun's, and `E3b.md` says whether the counts
+agree.
