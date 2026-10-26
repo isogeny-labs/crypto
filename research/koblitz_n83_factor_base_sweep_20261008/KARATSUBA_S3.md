@@ -118,3 +118,19 @@ control covers five- and six-summand schoolbook decomposition; shallow
 six-summand solving remains a separate measurement.
 This admits a source-matched K1,182/K2,048 comparison after the small-base
 capacity gate, without forcing those larger bases into a coordinate trie.
+
+## Matched high-K circuit result, 2026-10-26
+
+A source-frozen, eight-arm local VM panel paired schoolbook and shallow
+Karatsuba on the exact retained K=1,182 and K=2,048 primary-curve bases,
+first through x86-64 emulation and then with a native ARM64 worker. In the
+native panel, schoolbook completed 5,000 conflicts in 173.087 seconds at
+K=1,182 and 154.245 seconds at K=2,048. Shallow completed that cap in
+208.757 seconds at K=1,182 and reached the 280-second outer wall cap at
+K=2,048. The emulated panel had the same terminal statuses. Every
+completed arm returned zero models, relations and rank increase. Thus the
+smaller shallow circuit did not improve this capped SAT stage, and base
+selection remains open pending natural relation yield and complete
+single-target accounting. The exact inputs, all statuses, native build
+identity and audit are in
+[`verification/localvm-shallow-orbit-20261026/`](verification/localvm-shallow-orbit-20261026/).
