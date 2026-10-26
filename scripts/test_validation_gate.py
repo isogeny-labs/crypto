@@ -222,6 +222,100 @@ class Board(Scratch):
         self.run_board([r], pre_gate={g.board_key(r): g.row_digest(r)}, verdicts=[v])
         self.assertEqual(r["validation"]["status"], g.PRE_GATE)
 
+    # --- the validation sweep's own line shape (row_id, table prefix, its verdict words) ---
+
+    def sweep_line(self, r, verdict, prefix="A:", **kw):
+        v = {"row_id": prefix + r["slug"], "table": prefix[0], "verdict": verdict,
+             "pricing_ok": "not_applicable", "rho_reference_ok": "not_applicable"}
+        v.update(kw)
+        return v
+
+    def frozen(self, r):
+        return {g.board_key(r): g.row_digest(r)}
+
+    def test_row_id_with_table_prefix_reaches_the_board_row(self):
+        for prefix in ("A:", "B:", "C:"):
+            r = row()
+            self.run_board([r], pre_gate=self.frozen(r),
+                           verdicts=[self.sweep_line(r, "contradicted", prefix)], allow=True)
+            self.assertEqual(r["validation"]["status"], g.FAILED, prefix)
+
+    def test_non_board_prefix_is_not_stripped(self):
+        r = row()
+        self.run_board([r], pre_gate=self.frozen(r),
+                       verdicts=[self.sweep_line(r, "contradicted", "S:")])
+        self.assertEqual(r["validation"]["status"], g.PRE_GATE)
+        self.assertIn("S:" + r["slug"], g.load_verdicts("leaderboard", self.repo))
+        self.assertNotIn(r["slug"], g.load_verdicts("leaderboard", self.repo))
+
+    def test_row_key_still_works(self):
+        r = row()
+        self.run_board([r], pre_gate=self.frozen(r), verdicts=[{"row": r["slug"], "verdict": "contradicted"}],
+                       allow=True)
+        self.assertEqual(r["validation"]["status"], g.FAILED)
+
+    def test_contradicted_fails_and_the_builder_refuses(self):
+        r = row()
+        with self.assertRaises(SystemExit) as cm:
+            self.run_board([r], pre_gate=self.frozen(r), verdicts=[self.sweep_line(r, "contradicted")])
+        self.assertIn("contradicted", str(cm.exception))
+
+    def test_caveat_and_unvalidated_words_are_recognized_but_never_pass(self):
+        for word in ("validated_with_caveats", "unvalidated"):
+            r = row()
+            self.run_board([r], pre_gate=self.frozen(r), verdicts=[self.sweep_line(
+                r, word, pricing_ok=False, rho_reference_ok="partial",
+                replay_certificate="c", validator_report="v", rho_reference="r")])
+            self.assertEqual(r["validation"]["status"], g.PRE_GATE, word)
+            self.assertEqual(r["validation"]["sweep"]["verdict"], word)
+            self.assertIs(r["validation"]["sweep"]["pricing_ok"], False)
+            self.assertEqual(r["validation"]["sweep"]["rho_reference_ok"], "partial")
+            self.assertIn("rho_reference_ok=partial", "; ".join(r["validation"]["reasons"]))
+
+    def test_caveated_row_not_in_the_freeze_is_refused_not_promoted(self):
+        r = row()
+        with self.assertRaises(SystemExit):
+            self.run_board([r], pre_gate={}, verdicts=[self.sweep_line(r, "validated_with_caveats")])
+
+    def test_validated_word_without_artifact_pointers_does_not_pass(self):
+        r = row()  # the sweep's own `validated` line carries none of the three artifact keys
+        self.run_board([r], pre_gate=self.frozen(r), verdicts=[self.sweep_line(r, "validated")])
+        self.assertEqual(r["validation"]["status"], g.PRE_GATE)
+        self.assertIn("lacks replay_certificate", "; ".join(r["validation"]["reasons"]))
+
+    def test_validated_with_pointers_passes_only_when_caveats_are_clean(self):
+        art = {"replay_certificate": "c", "validator_report": "v", "rho_reference": "r"}
+        r = row()
+        self.run_board([r], pre_gate=self.frozen(r), verdicts=[self.sweep_line(r, "validated", **art)])
+        self.assertEqual(r["validation"]["status"], g.VALIDATED)
+        for bad in ({"pricing_ok": False}, {"rho_reference_ok": "partial"}, {"replay_ok": False}):
+            r = row()
+            self.run_board([r], pre_gate=self.frozen(r), verdicts=[self.sweep_line(r, "validated", **art, **bad)])
+            self.assertEqual(r["validation"]["status"], g.PRE_GATE, bad)
+
+    def test_unknown_verdict_word_is_an_explicit_error(self):
+        r = row()
+        with self.assertRaises(SystemExit) as cm:
+            self.run_board([r], pre_gate=self.frozen(r), verdicts=[self.sweep_line(r, "probably_fine")])
+        self.assertIn("unrecognized verdict", str(cm.exception))
+        with self.assertRaises(SystemExit):
+            g.load_verdicts("leaderboard", self.repo)
+
+    def test_missing_verdict_or_row_is_an_explicit_error(self):
+        r = row()
+        for line in ({"row_id": "A:" + r["slug"]}, {"verdict": "validated"}):
+            with self.assertRaises(SystemExit):
+                self.run_board([r], pre_gate=self.frozen(r), verdicts=[line])
+
+    def test_failing_verdict_wins_over_manifest_and_over_a_later_passing_line(self):
+        d = self.evidence("ev")
+        r = row(source=self.rel(d) + "/analysis.json")
+        art = {"replay_certificate": "c", "validator_report": "v", "rho_reference": "r"}
+        lines = [self.sweep_line(r, "contradicted"), self.sweep_line(r, "validated", **art)]
+        with self.assertRaises(SystemExit):
+            self.run_board([r], pre_gate={}, verdicts=lines)
+        self.assertEqual(r["validation"]["status"], g.FAILED)
+
 
 class CiCheck(Scratch):
     LINE = "| 2026-10-19 | [`20261019-toy`](20261019-toy/) | toy | headline | host | study |"
