@@ -1,7 +1,9 @@
 name: ECC2K-130 n19 sparse S3 growth gate
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, labeled]
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - 'research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/**'
       - '.github/workflows/ecc2k130-s3-sparse-n19-growth.yml'
@@ -41,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           filter: blob:none
       - uses: actions/setup-python@v5

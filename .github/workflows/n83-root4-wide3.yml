@@ -1,14 +1,12 @@
 name: N83 root4 wide3 source and fixture preflight
 
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [codex/n83-root4-wide3-20261016]
     paths:
       - .github/workflows/n83-root4-wide3.yml
-      - research/n83_root4_wide3_20261016/**
-  pull_request:
-    branches: [main]
-    paths:
       - research/n83_root4_wide3_20261016/**
   workflow_dispatch:
 
