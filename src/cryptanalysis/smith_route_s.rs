@@ -930,6 +930,7 @@ pub struct RouteSRecord {
     pub n_jac: i128,
     /// `#J_H(F_q) = #E0(F_{q^3})` (`L(T) = 1 - t T^3 + q^3 T^6`).
     pub n_jac_equals_order_e0: bool,
+    pub psi_base_retries: u32,
     pub psi_g_nonzero: bool,
     pub psi_g_order_ell: bool,
     pub k_planted: u64,
@@ -1320,16 +1321,28 @@ pub fn route_s(
             }
         };
         let t1b = std::time::Instant::now();
-        let base = sm.random_base(&mut rng);
-        let (ig, _) = sm.psi_class_fixed(&mg, &base, &mut rng);
-        let (iq, _) = sm.psi_class_fixed(&mq, &base, &mut rng);
-        let (pg, pqc) = match (w1.class_psi(&ig), w1.class_psi(&iq)) {
-            (Ok(a), Ok(b)) => (a, b),
-            (Err(e), _) | (_, Err(e)) => {
-                rec.skip_reason = Some(e);
-                run.records.push(rec);
-                continue;
+        // The class does not depend on the base divisor; an image the bridge
+        // cannot reduce (a point of multiplicity > 2) is retried with fresh
+        // bases (counted in `psi_base_retries`).
+        let mut got = None;
+        let mut last_err = String::new();
+        for attempt in 0..8 {
+            let base = sm.random_base(&mut rng);
+            let (ig, _) = sm.psi_class_fixed(&mg, &base, &mut rng);
+            let (iq, _) = sm.psi_class_fixed(&mq, &base, &mut rng);
+            match (w1.class_psi(&ig), w1.class_psi(&iq)) {
+                (Ok(a), Ok(b)) => {
+                    got = Some((a, b));
+                    rec.psi_base_retries = attempt;
+                    break;
+                }
+                (Err(e), _) | (_, Err(e)) => last_err = e,
             }
+        }
+        let Some((pg, pqc)) = got else {
+            rec.skip_reason = Some(last_err);
+            run.records.push(rec);
+            continue;
         };
         rec.psi_g_nonzero = !w1.c.is_zero(&pg);
         rec.psi_g_order_ell = w1.c.is_zero(&w1.c.mul_scalar(&pg, ll as u128));
