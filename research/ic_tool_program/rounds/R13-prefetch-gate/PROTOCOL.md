@@ -156,6 +156,14 @@ root disk, the required instruction features, and CPU 2's sibling CPU 6.
 Use `ICPROG_BENCH_CPUS=2,6` if all remaining source, holdout, pin and
 isolation controls pass. Initial hardware checks are not timed results.
 
+AWS service-terminated this second Spot host at 2026-10-26 21:15:46 UTC,
+while both arm builds were still in progress. The two build SSH sessions
+closed, and no completed arm binary, pin, A/A or price record was collected
+from it. Its 80 GiB root was marked delete-on-termination. No further Spot
+retry is scheduled after two build-phase service terminations. The shared
+host's queued A/A remains the active path unless a permitted stable host is
+made available. No timing from either reclaimed host enters R13.
+
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
 for this CPU subclass only if every primary size's suite and holdout
