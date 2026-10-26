@@ -70,3 +70,8 @@ gain from a single different-load comparison. Do not set
 `selected_best_total_runtime`: natural multi-query yield, graph closure,
 useful rank, full-width logs, unseen-target descent, complete cold cost and
 same-target rho remain separate requirements.
+
+The later, prelaunch [retained assignment amendment](ASSIGNMENT_CERTIFICATE_AMENDMENT.md)
+adds a SAT sidecar and separate native CNF/XOR/field replay to this protocol.
+The prior capacity preflight remains a source-bound record of the earlier
+verifier build; it is not rewritten as an assignment replay result.

@@ -239,6 +239,9 @@ auditor are historical evidence paths. New comparisons use the native
 [frozen continuation](native-cadence-replay-20261026/PROTOCOL.md). From a
 clean source checkout, build both
 `cargo build --release --example koblitz_n83_factor_base_export --example n83_d18_native_relation_replay`.
+The [retained assignment amendment](native-cadence-replay-20261026/ASSIGNMENT_CERTIFICATE_AMENDMENT.md)
+requires `result.model.bin` beside a cadence-32 `result.json` SAT receipt and a separate
+native CNF/XOR, field and group replay before promoting that result.
 Record the source revision and SHA-256 of each release binary before timing.
 The producer `manifest.json` has SHA-256
 `1d3650eabc4662d8f2597498d7ac92b7cd0a4134ac5f8155aaa49c7af3407dce`;

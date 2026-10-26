@@ -4,6 +4,9 @@
 
 use crypto_lib::binary_ecc::curve::{point_add, point_neg, scalar_mul};
 use crypto_lib::binary_ecc::BinaryPoint;
+use crypto_lib::cryptanalysis::binary_semaev_chain_sat::{
+    ChainedS3Encoding, FrobeniusOrbitRootEncoding,
+};
 use crypto_lib::cryptanalysis::koblitz_fast_arith::FastBinaryCurve128;
 use crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
 use crypto_lib::hash::sha256::Sha256;
@@ -145,6 +148,36 @@ fn sha256_file(path: &Path) -> Result<(String, u64)> {
     Ok((hex::encode(digest.finalize()), bytes))
 }
 
+fn unpack_model(bytes: &[u8], bits: usize) -> Result<Vec<bool>> {
+    if bits == 0 || bits > 400_000 || bytes.len() != bits.div_ceil(8) {
+        return Err("model certificate bit or byte count differs".into());
+    }
+    if bits % 8 != 0 && bytes[bits / 8] >> (bits % 8) != 0 {
+        return Err("model certificate has nonzero padding bits".into());
+    }
+    Ok((0..bits)
+        .map(|index| bytes[index / 8] & (1 << (index % 8)) != 0)
+        .collect())
+}
+
+fn read_model_certificate(worker: &Path, result: &Value, variables: usize) -> Result<Vec<bool>> {
+    let certificate = &result["model_certificate"];
+    let expected_path = worker.with_extension("model.bin");
+    if certificate["schema"] != "n83.full-d18-m4-model-certificate/v1"
+        || certificate["encoding"] != "bit i of byte i/8 is variable i+1, low bit first"
+        || certificate["bits"] != variables
+        || certificate["bytes"] != variables.div_ceil(8)
+        || certificate["path"].as_str() != expected_path.to_str()
+    {
+        return Err("worker model certificate metadata differs".into());
+    }
+    let bytes = fs::read(&expected_path)?;
+    if hex::encode(crypto_lib::hash::sha256::sha256(&bytes)) != certificate["sha256"] {
+        return Err("retained worker model SHA-256 differs".into());
+    }
+    unpack_model(&bytes, variables)
+}
+
 fn parse_point(fast: &FastBinaryCurve128, value: &Value) -> Result<BinaryPoint> {
     let pair = value.as_array().ok_or("point is not a coordinate pair")?;
     if pair.len() != 2 {
@@ -214,6 +247,97 @@ fn check_relation(
     let changed = point_add(&kc.curve, target, kc.generator());
     if changed == point_sum || changed == rep_sum {
         return Err("changed-target control was accepted".into());
+    }
+    Ok(())
+}
+
+fn check_assignment(
+    worker: &Path,
+    result: &Value,
+    kc: &KoblitzCurve,
+    fast: &FastBinaryCurve128,
+    target: &BinaryPoint,
+    representatives: &[Value],
+    entries: &[(usize, BinaryPoint, BinaryPoint, BigUint)],
+) -> Result<()> {
+    let variables = result["shape"]["variables"]
+        .as_u64()
+        .ok_or("worker formula variable count absent")? as usize;
+    let model = read_model_certificate(worker, result, variables)?;
+    let BinaryPoint::Affine { x: target_x, .. } = target else {
+        return Err("assignment target is infinity".into());
+    };
+    let representative_x = representatives
+        .iter()
+        .map(|value| match parse_point(fast, value)? {
+            BinaryPoint::Affine { x, .. } => Ok(x.to_biguint()),
+            BinaryPoint::Infinity => Err("assignment representative is infinity".into()),
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let mut enc = ChainedS3Encoding::build(
+        4,
+        &kc.curve.irreducible,
+        &kc.curve.b,
+        Some(target_x),
+        0,
+        400_000,
+    )
+    .map_err(|_| "assignment circuit reconstruction failed")?;
+    enc.constrain_frobenius_orbit_summands_with_encoding(
+        &representative_x,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        400_000,
+        12_000_000,
+    )
+    .map_err(|_| "assignment orbit-domain reconstruction failed")?;
+    enc.order_first_pair(400_000)
+        .map_err(|_| "assignment first-pair ordering failed")?;
+    if result["mode"] == "positive" {
+        let mut sum = BinaryPoint::Infinity;
+        let mut partial = Vec::with_capacity(4);
+        for (_, point, _, _) in entries {
+            sum = point_add(&kc.curve, &sum, point);
+            partial.push(sum.clone());
+        }
+        let points = entries
+            .iter()
+            .map(|(_, point, _, _)| point)
+            .chain(partial[1..3].iter())
+            .chain(std::iter::once(target));
+        for (block, point) in points.enumerate() {
+            let BinaryPoint::Affine { x, .. } = point else {
+                return Err("assignment positive pin is infinity".into());
+            };
+            let x = x.to_biguint();
+            for bit in 0..83usize {
+                let wire = (block * 83 + bit + 1) as i32;
+                if !enc
+                    .solver
+                    .add_clause(vec![if x.bit(bit as u64) { wire } else { -wire }])
+                {
+                    return Err("assignment positive pin contradicts reconstructed formula".into());
+                }
+            }
+        }
+    }
+    if enc.solver.n_vars() as usize != variables
+        || result["shape"]["clauses"] != enc.solver.n_clauses()
+        || result["shape"]["xor_rows"] != enc.solver.n_xors()
+    {
+        return Err("reconstructed assignment formula shape differs".into());
+    }
+    if !enc.verify_external_assignment(&model) {
+        return Err("retained assignment fails original CNF, XOR or field checks".into());
+    }
+    let xs = enc
+        .decode_summands_assignment(&model)
+        .ok_or("retained assignment summands cannot be decoded")?;
+    if xs.len() != entries.len()
+        || xs.iter().zip(entries).any(|(x, (_, point, _, _))| {
+            !matches!(point, BinaryPoint::Affine { x: expected, .. } if x == expected)
+        })
+    {
+        return Err("retained assignment summands differ from checked group row".into());
     }
     Ok(())
 }
@@ -485,20 +609,22 @@ fn replay(base: &Path, worker: &Path, binary: &Path, fixture: &Path, receipt: &P
             .as_str()
             .ok_or("row digest absent")?,
     )?;
+    check_assignment(worker, &result, &kc, &fast, &target, reps, &entries)?;
     let (verifier_sha, _) = sha256_file(&std::env::current_exe()?)?;
     let record = json!({
         "schema":"n83.d18-native-relation-replay/v1",
-        "status":"PASS_NATIVE_GROUP_ROW_REPLAY",
+        "status":"PASS_NATIVE_GROUP_ROW_AND_ASSIGNMENT_REPLAY",
         "mode":mode,"worker_source_commit":result["source_commit"],
         "worker_binary_sha256":binary_sha,"verifier_binary_sha256":verifier_sha,
         "producer_manifest_sha256":PRODUCER_MANIFEST_SHA256,
         "s3_manifest_sha256":S3_MANIFEST_SHA256,"object_sha256":OBJECT_SHA256,
         "point_set_blake3":POINT_SET,"relation_indices":selected,
         "row_decimal_blake3":relation["row_decimal_blake3"],
+        "model_certificate_sha256":result["model_certificate"]["sha256"],
         "original_group_sum_checked":true,"signed_orbit_row_checked":true,
         "changed_target_rejected":true,"rank_after_insert":1,
         "original_cnf_xor_checked_by_worker":true,
-        "independent_assignment_replay":false,
+        "independent_assignment_replay":true,
         "total_index_calculus_runtime_ms":Value::Null,
         "selected_best_total_runtime":Value::Null
     });
@@ -529,6 +655,42 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn retained_model_certificate_rejects_tampering_and_padding() {
+        let directory = std::env::temp_dir().join(format!(
+            "n83-d18-model-certificate-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir(&directory).unwrap();
+        let worker = directory.join("result.json");
+        let model_path = worker.with_extension("model.bin");
+        let bytes = [0b0000_0101u8, 0b0000_0001u8];
+        fs::write(&model_path, bytes).unwrap();
+        let certificate = json!({"model_certificate":{
+            "schema":"n83.full-d18-m4-model-certificate/v1",
+            "encoding":"bit i of byte i/8 is variable i+1, low bit first",
+            "bits":9,"bytes":2,
+            "sha256":hex::encode(crypto_lib::hash::sha256::sha256(&bytes)),
+            "path":model_path.to_string_lossy(),
+        }});
+        assert_eq!(
+            read_model_certificate(&worker, &certificate, 9).unwrap(),
+            vec![true, false, true, false, false, false, false, false, true]
+        );
+        let mut wrong_path = certificate.clone();
+        wrong_path["model_certificate"]["path"] = json!("elsewhere.bin");
+        assert!(read_model_certificate(&worker, &wrong_path, 9).is_err());
+        fs::write(&model_path, [0b0000_0100u8, 0b0000_0001u8]).unwrap();
+        assert!(read_model_certificate(&worker, &certificate, 9).is_err());
+        fs::write(&model_path, [0b0000_0101u8, 0b0000_0011u8]).unwrap();
+        assert!(unpack_model(&fs::read(&model_path).unwrap(), 9).is_err());
+        fs::remove_dir_all(directory).unwrap();
+    }
 
     #[test]
     fn producer_manifest_is_distinct_from_s3_custody_wrapper() {
