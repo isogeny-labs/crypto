@@ -26,6 +26,32 @@ The raw panel archives must be independently replayed before their aggregate
 JSON is passed to this nominator; the nominator's output is not a bridge
 dispatch or a timing result.
 
+## Adaptive nomination after the nearby confirmation
+
+The independently replayed 16-point nearby confirmation admitted all seven
+candidate bases but selected no unique online or cold winner under its frozen
+paired sign-flip rule. `nominate_v2.py` is a separate, versioned response to
+that result. Its rule was written after the nearby confirmation and before any
+timing on the sealed bridge points. It leaves `nominate.py` and its original
+selection requirement intact.
+
+The v2 rule recomputes both panel selectors from admitted rows. From the
+nearby panel it carries the three lowest descriptive online scores, the three
+lowest descriptive cold scores, and fixed K1107. From the current-source
+K3300/K3450/K3500/K3596 panel it carries a uniquely selected candidate when
+one exists; when a metric remains unresolved, it carries the two lowest
+descriptive means for that metric. It adds the fixed K2304, K4300, and K4405
+controls. All candidate manifest hashes and index policies are included in
+the output, with at most fourteen exact candidates. A failed admission,
+source mismatch, changed aggregate, or missing manifest leaves the nomination
+`BOUNDED_UNKNOWN`.
+
+The adaptive shortlist is a dispatch input, not an estimate of bridge
+performance. The 16 bridge targets remain unused; the capacity, resource
+envelope, host allocation, ordering, and final paired analysis still need a
+separate sealed dispatch before a Tier 1 comparison. The high-K panel must
+first complete and independently replay.
+
 The K2304 control has 382,464 usable points and 2,304 folded columns. Its
 [current-source prefix receipt](../n83_k2304_current_source_prefix_20261025/README.md)
 replays the exact historical base from the current K3596 dump. The earlier
