@@ -139,7 +139,7 @@ as a dry run and stop short of publishing. Merge-queue runs use the same
 local-diff classifier, so records-only package changes cannot silently skip
 the corresponding archive lane.
 
-Since `02f2bb3a4c` (pull requests run only the merge set) the dry run above
+Since #2578 (`02f2bb3a4c`: pull requests run only the merge set) the dry run above
 runs on pushes to `main` and on `workflow_dispatch`, not on pull requests. A real
 Windows build of `isogeny` is estimated at over an hour (Linux gnu needs 36
 minutes; no Windows run has finished), so the Windows legs have caps of 60
