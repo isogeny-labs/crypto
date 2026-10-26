@@ -4,6 +4,8 @@
 name: ECC2K-130 status pages
 
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   schedule:
     # Every 10 minutes. scripts/rho_status/render.py sizes history.json from
     # this interval, and test_rho_status.py pins the two together.
@@ -14,33 +16,6 @@ on:
         description: "Read the original rho-dp endpoint and secret reference; do not publish Pages"
         type: boolean
         default: false
-  pull_request:
-    paths:
-      - ".github/workflows/ecc2k130-status.yml"
-      - "scripts/rho_status/**"
-      - "scripts/site/**"
-      - "docs/ecc2k130-status/**"
-      - "docs/site/**"
-      - "docs/index-calculus-scoreboard.html"
-      # The panel index is generated from the scoreboard and pinned by
-      # scripts/site/test_build.py; an edit to either side must rerun it.
-      - "docs/ic-current-state.html"
-      - "docs/browser/**"
-      - "scripts/build_lab_browser.py"
-      - "docs/ic/progress-timeline.json"
-      - "docs/ic-leaderboard.html"
-      - "docs/ic-leaderboard/**"
-      - "docs/ic-measurement.html"
-      - "scripts/rho_gpu_emulate.mjs"
-      - "docs/algorithm-lab.html"
-      - "docs/algorithm-lab/**"
-      - "docs/performance-gains.html"
-      - "docs/performance-gains/**"
-      # Documents the published pages cite and scripts/site/test_build.py pins
-      # them to; an edit there must rerun the pins, not wait for the next
-      # site change to find out.
-      - "ecc2k130/LAMBDA-PROJECTIVE.md"
-      - "ecc2k130/aws/README.md"
   push:
     branches: [main]
     paths:
@@ -54,6 +29,7 @@ on:
       # scripts/site/test_build.py; an edit to either side must rerun it.
       - "docs/ic-current-state.html"
       - "docs/browser/**"
+      - "docs/backend-leaderboard/**"
       - "scripts/build_lab_browser.py"
       - "docs/ic/progress-timeline.json"
       - "docs/ic-leaderboard.html"
@@ -85,7 +61,7 @@ concurrency:
 jobs:
   source-connection-check:
     if: github.event_name == 'workflow_dispatch' && inputs.source_connection_check && github.ref == 'refs/heads/main'
-    runs-on: main
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: read
@@ -114,7 +90,7 @@ jobs:
   # pins the two step lists to each other.
   test:
     if: github.event_name == 'pull_request'
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'experiment' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'main' || 'main' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -138,7 +114,7 @@ jobs:
 
   publish:
     if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && !inputs.source_connection_check
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'experiment' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'main' || 'main' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
     # 35 min so the index-only fallback plus a stretch of hour-chunk
     # backfill (300 s each, resumed next run) plus history merge and Pages
     # deploy still fit. Later runs read the rollup and finish in the old 15.
@@ -238,7 +214,7 @@ jobs:
 
       - name: Merge previous Pages history
         env:
-          PAGES_HISTORY_URL: https://aburan28.github.io/crypto/history.json
+          PAGES_HISTORY_URL: https://isogeny-labs.github.io/crypto/history.json
         run: |
           set -euo pipefail
           set +e
@@ -265,7 +241,7 @@ jobs:
 
       - name: Merge previous DP34 Pages history
         env:
-          PAGES_HISTORY34_URL: https://aburan28.github.io/crypto/history34.json
+          PAGES_HISTORY34_URL: https://isogeny-labs.github.io/crypto/history34.json
         run: |
           set -euo pipefail
           set +e

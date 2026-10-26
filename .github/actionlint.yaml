@@ -1,8 +1,10 @@
-# Extend older actionlint runner catalogues with this documented GitHub-hosted
-# Intel label: https://docs.github.com/en/actions/reference/runners/github-hosted-runners
-# This validates the exact label without suppressing runner-label diagnostics.
 self-hosted-runner:
+  # Label reserved by the N83 EC2 capacity workflow.
   labels:
-    - macos-15-intel
+    - crypto-eks-linux
+    - crypto-eks-highmem
+    - crypto-eks-xmem
+    - crypto-eks-xmem1t
     - main
     - experiment
+    - n83-ec2-20261024

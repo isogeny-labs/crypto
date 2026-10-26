@@ -185,7 +185,7 @@ impl ArtinSchreier {
                 kernel.push(src);
             } else {
                 basis.push((img, src));
-                basis.sort_by_key(|a| std::cmp::Reverse(a.0));
+                basis.sort_by_key(|b| std::cmp::Reverse(b.0));
             }
         }
         ArtinSchreier {
@@ -263,7 +263,7 @@ impl Subspace {
             }
             assert!(x != 0, "basis is dependent");
             ech.push((x, c));
-            ech.sort_by_key(|a| std::cmp::Reverse(a.0));
+            ech.sort_by_key(|b| std::cmp::Reverse(b.0));
         }
         Subspace { basis, ech }
     }
@@ -471,8 +471,6 @@ impl Echelon {
 }
 
 struct Ring {
-    #[allow(dead_code)]
-    nv: u32,
     monos: Vec<u64>,
     index: HashMap<u64, usize>,
     words: usize,
@@ -484,7 +482,6 @@ impl Ring {
         let index = monos.iter().enumerate().map(|(i, &m)| (m, i)).collect();
         let words = monos.len().div_ceil(64);
         Ring {
-            nv,
             monos,
             index,
             words,

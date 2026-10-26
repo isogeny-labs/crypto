@@ -194,7 +194,6 @@ fn add(p1: &Pt, p2: &Pt, a: &BigUint, p: &BigUint) -> Pt {
         None => return p1.clone(),
         Some(v) => v,
     };
-
     let lam = if x1 == x2 {
         if ((y1 + y2) % p).is_zero() {
             return None;
