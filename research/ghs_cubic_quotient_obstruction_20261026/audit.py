@@ -36,7 +36,10 @@ def audit_model(line, k, K, embed):
     assert f0.degree() == 8 and f0[8] == 1
     assert all(f0[i] == 0 for i in range(4, 8))
     assert h0[4] * h0[1] * f0[3] != 0
-    assert HyperellipticCurve(f0, h0).genus() == 3
+    curve = HyperellipticCurve(f0, h0)
+    assert curve.genus() == 3
+    point_counts = [int(n) for n in curve.count_points(3)]
+    assert point_counts == [17, 257, 3728]
 
     R = PolynomialRing(K, "x")
     x = R.gen()
@@ -82,7 +85,8 @@ def audit_model(line, k, K, embed):
     assert len(maps) == 12 and sum(m["identity"] for m in maps) == 1
     assert sum(m["rhs_degree"] == 2 for m in maps) == 3
     assert sum(m["rhs_degree"] == 3 for m in maps) == 8
-    return {"model": line, "branch_roots": [encoded(r) for r in roots],
+    return {"model": line, "point_counts_k_k2_k3": point_counts,
+            "branch_roots": [encoded(r) for r in roots],
             "branch_simple_pole_coefficients": [encoded(v) for v in branch_coeff],
             "branch_set_stabilizer_count": len(maps), "affine_maps": maps,
             "liftable_nonidentity_maps": 0}
@@ -118,7 +122,8 @@ def main():
     }
     (ROOT / "certificate.json").write_text(
         json.dumps(certificate, indent=2, sort_keys=True) + "\n")
-    print(json.dumps({"models": len(rows), "all_branch_points_verified": True,
+    print(json.dumps({"models": len(rows), "point_counts_verified": True,
+                      "all_branch_points_verified": True,
                       "stabilizers": [row["branch_set_stabilizer_count"] for row in rows],
                       "liftable_nonidentity_maps": sum(row["liftable_nonidentity_maps"] for row in rows)},
                      sort_keys=True))

@@ -33,6 +33,12 @@ These curve equations are already in LMFDB.
 The relevant characteristic-two elliptic-quotient families and their
 maps were classified by
 [Nart--Ritzenthaler, Proposition 2.1](https://arxiv.org/pdf/0905.0546).
+The broader genus-three Jacobian existence literature was checked against
+[Borodin--May](https://arxiv.org/pdf/2508.16885): their characteristic-two
+parity screen lists three candidate exclusion residues, of which the first
+two are proved in their cited follow-up. The cubic Weil polynomial here
+has coefficient residues `(s,t,u)=(0,0,1)` modulo two and triggers none
+of them. That screen neither constructs the Jacobian nor supplies a map.
 This audit proves a route-specific obstruction for the four equations,
 not publication novelty of a curve or a vulnerability.
 
@@ -92,7 +98,9 @@ a different involution, so none exists. ∎
 
 ## Finite replay and limitation
 
-Each of the four curves has genus three. The branch roots of the first
+Each of the four curves has genus three and independently recounted
+point counts `(17,257,3728)` over `k`, `k^2`, and `k^3`; these give the
+class Weil polynomial `X^6-123X^3+4096`. The branch roots of the first
 model over the Conway `GF(4096)` basis encode as `0,1609,2915,3370`.
 For all four models, the simple-pole coefficients after Artin--Schreier
 reduction are nonzero at all four roots. For each model, the replay solved

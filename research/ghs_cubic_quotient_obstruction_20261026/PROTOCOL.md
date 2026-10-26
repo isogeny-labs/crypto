@@ -19,7 +19,8 @@ f = x^8 + x^3 + a*x^2 + (a^2+a+1)*x + a^3+a+1,
 a^4+a+1 = 0.
 ```
 
-1. For each of the four models, verify genus 3 and all four branch points
+1. For each of the four models, verify genus 3 and point counts
+   `(17,257,3728)` over `k`, `k^2`, and `k^3`. Verify all four branch points
    over the Conway `GF(4096)` extension. For each root `r` of `h`, check the coefficient of the
    simple pole remaining after Artin--Schreier reduction of `f/h^2` is
    nonzero.
@@ -56,3 +57,10 @@ construct explicit maps for their direct-cover family. The obstruction
 here excludes that degree-two quotient tactic for this particular
 catalog witness, without excluding their other construction or the
 Tate isogeny.
+[Borodin--May](https://arxiv.org/pdf/2508.16885) survey known and
+conjectured genus-three hyperelliptic Jacobian obstructions over small
+finite fields. Their characteristic-two parity screen lists three
+candidate exclusion residues, with proofs cited for the first two; our
+polynomial has coefficient pattern
+`(s,t,u)=(0,0,-123)=(0,0,1) mod 2`, so that obstruction does not apply.
+This is a non-exclusion, not an existence theorem or map construction.
