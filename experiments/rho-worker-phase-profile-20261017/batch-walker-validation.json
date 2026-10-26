@@ -1,0 +1,17 @@
+{
+  "schema": "rho-batch-walker-validation-v1",
+  "status": "local_correctness_only",
+  "source_path": "src/cryptanalysis/pollard_collab/walk.rs",
+  "source_sha256": "27fa001ea275905561fe67551e1667333132d793654d1315762092366515b5f6",
+  "test_command": "cargo test --offline --release --lib",
+  "test_log": "batch-walker-full-test.log",
+  "test_log_sha256": "6fd68513cceae2ad7742cb0b2a9e3854e2f7021ce1e7419c8d5c81ca16cb0610",
+  "passed": 2246,
+  "failed": 0,
+  "ignored": 94,
+  "replay_tests": [
+    "cryptanalysis::pollard_collab::walk::tests::batched_walkers_replay_serial_outcomes_with_lane_refill",
+    "cryptanalysis::pollard_collab::walk::tests::batched_secp256k1_walkers_replay_serial_outcomes"
+  ],
+  "performance_claim": null
+}
