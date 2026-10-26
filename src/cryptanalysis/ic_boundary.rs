@@ -4413,6 +4413,11 @@ pub struct FactorBase<E> {
     pub cost: PhaseCost,
     /// Subspace basis (single words) when the base is a linear subspace.
     pub subspace_basis: Option<Vec<u64>>,
+    /// The logarithm (base the instance generator, modulo `r`) of each
+    /// column's unknown, when the construction fixes them: the
+    /// `known-log` base.  Present, the pipeline skips linear algebra, since
+    /// one verified relation names the target's logarithm directly.
+    pub known_logs: Option<Vec<u64>>,
 }
 
 impl<E: Copy> FactorBase<E> {
@@ -4438,6 +4443,7 @@ impl<E: Copy> FactorBase<E> {
             point_index: fast_map(0),
             cost: PhaseCost::default(),
             subspace_basis: None,
+            known_logs: None,
         }
     }
 
@@ -5733,6 +5739,10 @@ pub struct FrobeniusPairTable {
     canon: FrobeniusCanon,
     /// `member_of[i·n + t]`: the base index of `σ^t(P_i)`.
     member_of: Vec<u32>,
+    /// `true` when `member_of` was left empty at build: a probe hit then
+    /// resolves `σ^t(P)` itself and charges the Frobenius maps and the
+    /// index lookup to the relation phase ([`Self::build_lazy`]).
+    lazy: bool,
     n: u32,
     pub entries: u64,
     pub representatives: u64,
@@ -5750,6 +5760,16 @@ impl FrobeniusPairTable {
         Self::build_filtered(inst, fb, |_, _| true)
     }
 
+    /// [`build`](Self::build) without the orbit-member index.  The eager
+    /// table spends `|F|·(n−1)` Frobenius maps and as many hash lookups
+    /// naming `σ^t(P_i)` for every base point, though only a probe that
+    /// hits reads one.  The lazy table names the two summands of a hit
+    /// when it happens and charges that work then; entries, keys and
+    /// recovered pairs are those of `build`.
+    pub fn build_lazy(inst: &BinaryInstance, fb: &FactorBase<FastPoint>) -> Option<Self> {
+        Self::build_inner(inst, fb, |_, _| true, true)
+    }
+
     /// [`build`](Self::build) over the pairs `keep(rep, j)` admits, where
     /// `rep` is an orbit representative's base index and `j` the other
     /// member's.  The large-prime collector uses this to leave the
@@ -5761,6 +5781,15 @@ impl FrobeniusPairTable {
         fb: &FactorBase<FastPoint>,
         keep: impl Fn(usize, usize) -> bool,
     ) -> Option<Self> {
+        Self::build_inner(inst, fb, keep, false)
+    }
+
+    fn build_inner(
+        inst: &BinaryInstance,
+        fb: &FactorBase<FastPoint>,
+        keep: impl Fn(usize, usize) -> bool,
+        lazy: bool,
+    ) -> Option<Self> {
         let start = Instant::now();
         let g = BinaryGroup(&inst.fast);
         let n = inst.n as usize;
@@ -5769,9 +5798,9 @@ impl FrobeniusPairTable {
             return None;
         }
         let canon = FrobeniusCanon::new(&inst.gf, inst.n)?;
-        let mut member_of = vec![0u32; f * n];
+        let mut member_of = if lazy { Vec::new() } else { vec![0u32; f * n] };
         let (mut frob, mut lookups) = (0u64, 0u64);
-        for i in 0..f {
+        for i in 0..if lazy { 0 } else { f } {
             let mut p = fb.points[i];
             member_of[i * n] = i as u32;
             for t in 1..n {
@@ -5827,6 +5856,7 @@ impl FrobeniusPairTable {
             map,
             canon,
             member_of,
+            lazy,
             n: inst.n,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
@@ -5857,8 +5887,17 @@ impl FrobeniusPairTable {
         // canon = rotl^{t_u}(coords(x_u)) = rotl^{t_r}(coords(x_R)) and the
         // Frobenius is rotl by one, so x_R = σ^t(x_u) with t = t_u − t_r.
         let t = ((t_u + n - t_r) % n) as usize;
-        let i2 = self.member_of[i as usize * n as usize + t] as usize;
-        let j2 = self.member_of[j * n as usize + t] as usize;
+        let (i2, j2) = if self.lazy {
+            (
+                self.resolve_member(g, fb, ctr, i as usize, t)?,
+                self.resolve_member(g, fb, ctr, j, t)?,
+            )
+        } else {
+            (
+                self.member_of[i as usize * n as usize + t] as usize,
+                self.member_of[j * n as usize + t] as usize,
+            )
+        };
         let s = g.add(ops, fb.points[i2], fb.points[j2]);
         if s == target {
             Some((i2, j2))
@@ -5868,6 +5907,26 @@ impl FrobeniusPairTable {
             ctr.frobfold_mismatches += 1;
             None
         }
+    }
+
+    /// The base index of `σ^t(P_idx)` for a lazy table: `t` Frobenius
+    /// maps and one index lookup, both charged to `ctr` (the eager table
+    /// charged one map and one lookup per step of `t` at build).
+    fn resolve_member(
+        &self,
+        g: &BinaryGroup,
+        fb: &FactorBase<FastPoint>,
+        ctr: &mut OracleCounters,
+        idx: usize,
+        t: usize,
+    ) -> Option<usize> {
+        if t == 0 {
+            return Some(idx);
+        }
+        let p = g.0.frobenius_k(fb.points[idx], t as u32);
+        ctr.frobenius_maps += t as u64;
+        ctr.lookups += 1;
+        fb.point_index.get(&p.pack()).copied()
     }
 
     /// The canonical (least normal-basis rotation) name of an abscissa:
@@ -5989,6 +6048,8 @@ pub struct OracleCounters {
     pub unliftable_systems: u64,
     /// Frobenius-orbit canonicalisations of a target abscissa.
     pub canonicalisations: u64,
+    /// Frobenius maps a lazy folded table applied to name a hit's summands.
+    pub frobenius_maps: u64,
     /// Folded-table hits whose recovered pair summed to neither `±R`;
     /// a rotation-direction bug would show here, so it must stay zero.
     pub frobfold_mismatches: u64,
@@ -6272,6 +6333,69 @@ impl RelationSolver for IncrementalGauss {
     }
 }
 
+/// The relation "matrix" of a factor base whose column logarithms are
+/// known (`FactorBase::known_logs`): there is nothing to eliminate.  A row
+/// `Σ cᵥ·xᵥ − h·b·d = h·a` has one unknown, so `d` is read off it
+/// directly, at a handful of word operations that no counter prices and
+/// zero group operations and zero `row_ops`.  The loop's own verification
+/// (`[d]G = target`) still certifies the answer.
+pub struct KnownLogSolver {
+    logs: Vec<u64>,
+    modulus: u64,
+    d: Option<u64>,
+    dependent: u64,
+}
+
+impl KnownLogSolver {
+    pub fn new(logs: Vec<u64>, modulus: u64) -> Self {
+        Self {
+            logs,
+            modulus,
+            d: None,
+            dependent: 0,
+        }
+    }
+}
+
+impl RelationSolver for KnownLogSolver {
+    fn add_row(&mut self, row: Vec<u64>, rhs: u64) -> RowStatus {
+        let m = self.modulus;
+        let d_col = self.logs.len();
+        let mut sum = 0u64;
+        for (c, &x) in self.logs.iter().enumerate() {
+            if row[c] != 0 {
+                sum = addmod(sum, mulmod(row[c], x % m, m), m);
+            }
+        }
+        match invmod(row[d_col], m) {
+            Some(inv) => {
+                self.d = Some(mulmod(submod(rhs, sum, m), inv, m));
+                RowStatus::Independent
+            }
+            None => {
+                self.dependent += 1;
+                RowStatus::Dependent
+            }
+        }
+    }
+    fn pinned(&self, col: usize) -> Option<u64> {
+        if col == self.logs.len() {
+            self.d
+        } else {
+            self.logs.get(col).copied()
+        }
+    }
+    fn rank(&self) -> usize {
+        usize::from(self.d.is_some())
+    }
+    fn dependent(&self) -> u64 {
+        self.dependent
+    }
+    fn work(&self) -> (u64, &'static str) {
+        (0, "row_ops")
+    }
+}
+
 /// How the relation loop draws its targets.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TargetSource {
@@ -6386,7 +6510,46 @@ pub enum CompletionRule {
     FullRank,
 }
 
+/// The coupling hook of the generator-effect study's E0b
+/// (`research/generator_effect_ic_20261019`).  When a run's generator is
+/// `[c]g0`, every coefficient `a` the relation loop draws is replaced by
+/// `a·c⁻¹ mod r`, so `[a·c⁻¹]([c]g0) = [a]g0`: under the same seed the run
+/// presents exactly the `g0` run's points, and its rows carry the `G`-basis
+/// coefficients.  The random stream is consumed as without the hook.
+/// `drawn` records every `(a, a·c⁻¹)` in draw order, which is what the
+/// scalar multiplications by the generator were asked for.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct CoeffScale {
+    pub c_inv: u64,
+    pub drawn: Vec<(u64, u64)>,
+}
+
+impl CoeffScale {
+    /// The hook for generator `[c]g0`; `None` if `c` is not a unit mod `r`.
+    pub fn for_multiplier(c: u64, r: u64) -> Option<Self> {
+        Some(Self {
+            c_inv: invmod(c % r, r)?,
+            drawn: Vec::new(),
+        })
+    }
+
+    fn apply(&mut self, a: u64, r: u64) -> u64 {
+        let scaled = mulmod(a, self.c_inv, r);
+        self.drawn.push((a, scaled));
+        scaled
+    }
+}
+
+/// `a`, or `a·c⁻¹` under a [`CoeffScale`] hook.
+fn scale_coeff(scale: &mut Option<&mut CoeffScale>, a: u64, r: u64) -> u64 {
+    match scale.as_deref_mut() {
+        Some(hook) => hook.apply(a, r),
+        None => a,
+    }
+}
+
 /// Sixteen jumps `[a]G + [b]Q` with their coefficients, charged to `ops`.
+#[allow(clippy::too_many_arguments)]
 fn draw_jumps<G: CountedGroup>(
     g: &G,
     generator: G::Elt,
@@ -6395,10 +6558,11 @@ fn draw_jumps<G: CountedGroup>(
     rng: &mut StdRng,
     ops: &mut GroupOps,
     count: usize,
+    scale: &mut Option<&mut CoeffScale>,
 ) -> Vec<(G::Elt, u64, u64)> {
     (0..count)
         .map(|_| {
-            let aj = rng.gen_range(1..r);
+            let aj = scale_coeff(scale, rng.gen_range(1..r), r);
             let bj = rng.gen_range(1..r);
             let ag = g.mul(ops, generator, aj);
             let bq = g.mul(ops, target, bj);
@@ -6411,6 +6575,7 @@ fn draw_jumps<G: CountedGroup>(
 /// for the report, to the pool's own ledger as well: `walk_pool_ops` is
 /// then the exact number of group additions the offsets cost, which is
 /// what the lazy and the eager arm differ by.
+#[allow(clippy::too_many_arguments)]
 fn draw_pool_offset<G: CountedGroup>(
     g: &G,
     generator: G::Elt,
@@ -6419,9 +6584,10 @@ fn draw_pool_offset<G: CountedGroup>(
     rng: &mut StdRng,
     ops: &mut GroupOps,
     pool_ops: &mut GroupOps,
+    scale: &mut Option<&mut CoeffScale>,
 ) -> (G::Elt, u64, u64) {
     let mut local = GroupOps::default();
-    let drawn = draw_jumps(g, generator, target, r, rng, &mut local, 1);
+    let drawn = draw_jumps(g, generator, target, r, rng, &mut local, 1, scale);
     ops.merge(local);
     pool_ops.merge(local);
     drawn[0]
@@ -6590,6 +6756,33 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
     pool_mode: RestartPool,
     matrix: &mut L,
     completion: CompletionRule,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+) -> PipelineOutcome {
+    collect_and_solve_relations_scaled(
+        g, generator, target, r, h, fb, seed, max_trials, targets, pool_mode, matrix, completion,
+        None, oracle,
+    )
+}
+
+/// [`collect_and_solve_relations`] with the [`CoeffScale`] hook on every
+/// place a coefficient `a` is drawn: random targets, walk starts, jumps and
+/// pool offsets, prime-walk lanes, strides and their renewal step.  `None`
+/// is the plain loop, bit for bit.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
+    mut scale: Option<&mut CoeffScale>,
     mut oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
 ) -> PipelineOutcome {
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
@@ -6714,12 +6907,30 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
     if striding {
         // A stride at the identity would present one point forever.
         while g.is_identity(&stride.0) {
-            stride = draw_jumps(g, generator, target, r, &mut rng, &mut rel.group_ops, 1)[0];
+            stride = draw_jumps(
+                g,
+                generator,
+                target,
+                r,
+                &mut rng,
+                &mut rel.group_ops,
+                1,
+                &mut scale,
+            )[0];
         }
     }
     if targets == TargetSource::StrideRenew {
         while g.is_identity(&renew_by.0) {
-            renew_by = draw_jumps(g, generator, target, r, &mut rng, &mut rel.group_ops, 1)[0];
+            renew_by = draw_jumps(
+                g,
+                generator,
+                target,
+                r,
+                &mut rng,
+                &mut rel.group_ops,
+                1,
+                &mut scale,
+            )[0];
         }
     }
     if targets.is_walk() {
@@ -6731,6 +6942,7 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
             &mut rng,
             &mut rel.group_ops,
             jump_count,
+            &mut scale,
         );
         walk_jumps += jump_count as u64;
         if !shared_jumps && pool_mode == RestartPool::Eager {
@@ -6743,6 +6955,7 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
                     &mut pool_rng,
                     &mut rel.group_ops,
                     &mut pool_ops,
+                    &mut scale,
                 );
                 pool.push(off);
             }
@@ -6755,7 +6968,7 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
             for (index, lane) in lanes.iter_mut().enumerate() {
                 if lane.fresh || lane.segment_steps >= segment_cap {
                     if lane.restarts == 0 {
-                        lane.a = rng.gen_range(1..r);
+                        lane.a = scale_coeff(&mut scale, rng.gen_range(1..r), r);
                         lane.b = rng.gen_range(1..r);
                         let ag = g.mul(&mut rel.group_ops, generator, lane.a);
                         let bq = g.mul(&mut rel.group_ops, target, lane.b);
@@ -6772,6 +6985,7 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
                                 &mut pool_rng,
                                 &mut rel.group_ops,
                                 &mut pool_ops,
+                                &mut scale,
                             );
                             pool.push(off);
                         }
@@ -6825,7 +7039,7 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
         measurement::mark(measurement::Phase::TargetQuery);
         let (point, a, b, lane_id) = match targets {
             TargetSource::Random | TargetSource::RandomUnguarded => {
-                let a = rng.gen_range(1..r);
+                let a = scale_coeff(&mut scale, rng.gen_range(1..r), r);
                 let b = rng.gen_range(1..r);
                 let ag = g.mul(&mut rel.group_ops, generator, a);
                 let bq = g.mul(&mut rel.group_ops, target, b);
@@ -6842,7 +7056,7 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
                         // The first segment, and every segment of the
                         // unguarded diagnostic, starts from a fresh
                         // `[a]G + [b]Q`.
-                        wa = rng.gen_range(1..r);
+                        wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
                         wb = rng.gen_range(1..r);
                         let ag = g.mul(&mut rel.group_ops, generator, wa);
                         let bq = g.mul(&mut rel.group_ops, target, wb);
@@ -6861,6 +7075,7 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
                                 &mut pool_rng,
                                 &mut rel.group_ops,
                                 &mut pool_ops,
+                                &mut scale,
                             );
                             pool.push(off);
                         }
@@ -6906,7 +7121,7 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
             }
             TargetSource::Stride | TargetSource::StrideRenew => {
                 if walk_fresh {
-                    wa = rng.gen_range(1..r);
+                    wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
                     wb = rng.gen_range(1..r);
                     let ag = g.mul(&mut rel.group_ops, generator, wa);
                     let bq = g.mul(&mut rel.group_ops, target, wb);
@@ -7071,6 +7286,9 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
     rel.count("unliftable_systems", ctr.unliftable_systems);
     rel.count("canonicalisations", ctr.canonicalisations);
     rel.count("frobfold_mismatches", ctr.frobfold_mismatches);
+    if ctr.frobenius_maps > 0 {
+        rel.count("frobenius_maps", ctr.frobenius_maps);
+    }
     rel.count("direct_relations_skipped", direct_skipped);
     rel.count("repeated_targets_skipped", repeats_skipped);
     rel.count("target_guard_probes", guard_probes);
@@ -10862,6 +11080,7 @@ mod tests {
                 &mut pool_rng,
                 &mut total_ops,
                 &mut pool_ops,
+                &mut None,
             ));
         }
         let pool_ns = start.elapsed().as_nanos() as u64;
@@ -11323,6 +11542,49 @@ mod tests {
         }
         assert_eq!(ctr.frobfold_mismatches, 0);
         assert!(table.calibrate_canon(10_000) > 0.0);
+    }
+
+    #[test]
+    fn lazy_frobenius_table_returns_the_eager_pairs_and_charges_the_resolution() {
+        let inst = koblitz_instance_best(17).expect("K_a / 2^17");
+        let (frob, desc) = choose_koblitz_base(&inst, 1, 6000).expect("base");
+        let folded =
+            koblitz_factor_base(&inst, &frob, ColumnFold::SignedFrobeniusOrbit, desc).unwrap();
+        let g = BinaryGroup(&inst.fast);
+        let eager = FrobeniusPairTable::build(&inst, &folded).expect("eager table");
+        let lazy = FrobeniusPairTable::build_lazy(&inst, &folded).expect("lazy table");
+        // The same entries and the same additions; the member index alone is gone.
+        assert_eq!(eager.entries, lazy.entries);
+        assert_eq!(eager.representatives, lazy.representatives);
+        assert_eq!(eager.build_ops.adds, lazy.build_ops.adds);
+        assert_eq!(eager.build_canonicalisations, lazy.build_canonicalisations);
+        assert!(eager.build_frobenius_maps > 0 && eager.build_lookups > 0);
+        assert_eq!((lazy.build_frobenius_maps, lazy.build_lookups), (0, 0));
+        let mut ops = GroupOps::default();
+        let (mut ce, mut cl) = (OracleCounters::default(), OracleCounters::default());
+        let mut hits = 0u64;
+        for i in 0..folded.points.len() {
+            for j in i..folded.points.len() {
+                let s = g.add(&mut ops, folded.points[i], folded.points[j]);
+                if s.infinity {
+                    continue;
+                }
+                let a = eager.probe(&g, &folded, &mut ops, &mut ce, s);
+                let b = lazy.probe(&g, &folded, &mut ops, &mut cl, s);
+                assert_eq!(a, b, "pair ({i}, {j})");
+                hits += u64::from(b.is_some());
+            }
+        }
+        assert!(hits > 0);
+        assert_eq!(cl.frobfold_mismatches, 0);
+        assert_eq!(
+            ce.frobenius_maps, 0,
+            "the eager table charges its maps at build"
+        );
+        assert!(cl.frobenius_maps > 0);
+        // Resolution costs at most 2 maps-and-lookups per hit.
+        assert!(cl.lookups <= ce.lookups + 2 * hits);
+        assert!(cl.frobenius_maps <= 2 * hits * (inst.n as u64 - 1));
     }
 
     #[test]
@@ -11855,5 +12117,390 @@ mod tests {
             verified += res.verified as u64;
         }
         assert!(verified >= 990, "{verified} of 1000 walks verified");
+    }
+}
+
+/// E0 of the generator-effect study (`research/generator_effect_ic_20261019`,
+/// PLAN §4): the generator carries no information into the abscissa base
+/// or into the relation stream.  Exact checks, no statistics; a deviation
+/// is a bug.
+#[cfg(test)]
+mod generator_coupling_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_framework::plugins::PrimeAbscissaBase;
+    use crate::cryptanalysis::ic_framework::stages::{FactorBaseBuilder, InstanceCtx, Params};
+
+    /// The six 24-bit `a = −3` prime-order curves of E0: the first six
+    /// printed by `examples/a_minus_3_prime_order_curves.rs 24 8 20261019`
+    /// (c1 and c2 are the dry run's), generator the smallest-abscissa point.
+    const CURVES: [(u64, u64, u64, u64, u64); 6] = [
+        (8582641, 6723661, 8580037, 1, 4004158),
+        (13903607, 5849518, 13902853, 1, 2061011),
+        (16341817, 4523893, 16344179, 0, 8138185),
+        (10774969, 1003143, 10779323, 3, 353342),
+        (15910397, 9754220, 15908297, 0, 6001216),
+        (9559721, 6907412, 9565123, 2, 2072703),
+    ];
+
+    fn instance(i: usize, generator: (u64, u64)) -> PrimeInstance {
+        let (p, b, r, _, _) = CURVES[i];
+        PrimeInstance {
+            name: format!("c{}", i + 1),
+            curve: PrimeCurve { p, a: p - 3, b },
+            group_order: r,
+            r,
+            cofactor: 1,
+            generator,
+        }
+    }
+
+    fn base_size(r: u64) -> usize {
+        (r as f64).cbrt().ceil() as usize
+    }
+
+    /// `g0, [c]g0` for random `c`, and `−g0`, with their multipliers.
+    fn generators(inst: &PrimeInstance, randoms: usize) -> Vec<(u64, PrimePoint)> {
+        let g0 = inst.generator_point();
+        let mut rng = StdRng::seed_from_u64(20261019 ^ inst.r);
+        let mut cs = vec![1u64];
+        cs.extend((0..randoms).map(|_| rng.gen_range(2..inst.r - 1)));
+        cs.push(inst.r - 1);
+        cs.into_iter()
+            .map(|c| {
+                let mut ops = GroupOps::default();
+                (c, inst.curve.mul(&mut ops, g0, c))
+            })
+            .collect()
+    }
+
+    fn base_digest(fb: &FactorBase<PrimePoint>, curve: &PrimeCurve) -> u64 {
+        let mut acc = 0x4530_4144_4947_4553u64;
+        let mut eat = |v: u64| acc = mix(acc ^ v);
+        eat(fb.columns as u64);
+        for (i, p) in fb.points.iter().enumerate() {
+            eat(curve.key(p));
+            eat(fb.neg_index[i] as u64);
+            eat(fb.col_of[i] as u64);
+            eat(fb.coef_of[i]);
+        }
+        for &x in &fb.abscissa_list {
+            eat(x);
+        }
+        eat(u64::from(fb.known_logs.is_some()));
+        acc
+    }
+
+    /// **E0a.** `prime-abscissa:size=B` is the same base, digest for digest,
+    /// under `g0`, `[c]g0` and `−g0`, built directly and through the
+    /// framework's builder with the generator in the instance and context.
+    #[test]
+    fn e0a_abscissa_base_digest_ignores_the_generator() {
+        for i in 0..CURVES.len() {
+            let (_, _, r, gx, gy) = CURVES[i];
+            let size = base_size(r);
+            let reference = {
+                let inst = instance(i, (gx, gy));
+                base_digest(&prime_factor_base(&inst, size), &inst.curve)
+            };
+            let base_inst = instance(i, (gx, gy));
+            for (c, g) in generators(&base_inst, 3) {
+                let inst = instance(i, (g.x, g.y));
+                assert_eq!(inst.generator_point(), g);
+                let direct = base_digest(&prime_factor_base(&inst, size), &inst.curve);
+                let ctx = InstanceCtx {
+                    group: &inst.curve,
+                    generator: g,
+                    target: g,
+                    r,
+                    cofactor: 1,
+                    group_order: r,
+                    name: inst.name.clone(),
+                    field_degree: None,
+                };
+                let mut params = Params::default();
+                params.set("size", size.to_string());
+                let mut ops = GroupOps::default();
+                let built = PrimeAbscissaBase { instance: &inst }
+                    .build(&ctx, &params, &mut ops)
+                    .unwrap();
+                let framework = base_digest(&built, &inst.curve);
+                assert_eq!(direct, reference, "c{} c={c}: direct base differs", i + 1);
+                assert_eq!(
+                    framework,
+                    reference,
+                    "c{} c={c}: framework base differs",
+                    i + 1
+                );
+                println!(
+                    "E0a c{} B={size} c={c} digest={reference:016x} direct=ok framework=ok",
+                    i + 1
+                );
+            }
+        }
+    }
+
+    /// The matrix with every row it was handed.
+    struct Recording {
+        inner: IncrementalGauss,
+        rows: Vec<(Vec<u64>, u64, RowStatus)>,
+    }
+
+    impl RelationSolver for Recording {
+        fn add_row(&mut self, row: Vec<u64>, rhs: u64) -> RowStatus {
+            let status = self.inner.add_row(row.clone(), rhs);
+            self.rows.push((row, rhs, status));
+            status
+        }
+        fn pinned(&self, col: usize) -> Option<u64> {
+            self.inner.pinned(col)
+        }
+        fn rank(&self) -> usize {
+            self.inner.rank()
+        }
+        fn dependent(&self) -> u64 {
+            self.inner.dependent
+        }
+        fn work(&self) -> (u64, &'static str) {
+            (self.inner.row_ops, "row_ops")
+        }
+    }
+
+    struct Coupled {
+        outcome: PipelineOutcome,
+        stream: Vec<(PrimePoint, u64, u64)>,
+        matrix: Recording,
+        hook: CoeffScale,
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn coupled_run(
+        inst: &PrimeInstance,
+        generator: PrimePoint,
+        c: u64,
+        target: PrimePoint,
+        fb: &FactorBase<PrimePoint>,
+        table: &PairTable,
+        source: TargetSource,
+        completion: CompletionRule,
+    ) -> Coupled {
+        let curve = &inst.curve;
+        let mut hook = CoeffScale::for_multiplier(c, inst.r).unwrap();
+        let mut matrix = Recording {
+            inner: IncrementalGauss::new(fb.columns + 1, inst.r),
+            rows: Vec::new(),
+        };
+        let mut stream = Vec::new();
+        let outcome = collect_and_solve_relations_scaled(
+            curve,
+            generator,
+            target,
+            inst.r,
+            1,
+            fb,
+            20261019,
+            4_000_000,
+            source,
+            RestartPool::Lazy,
+            &mut matrix,
+            completion,
+            Some(&mut hook),
+            |ops, ctr, point, a, b| {
+                stream.push((point, a, b));
+                decompose_mitm(curve, fb, table, 2, ops, ctr, point)
+                    .map(|s| vec![Relation::Summands(s)])
+                    .unwrap_or_default()
+            },
+        );
+        Coupled {
+            outcome,
+            stream,
+            matrix,
+            hook,
+        }
+    }
+
+    /// **E0b/E0c** on one curve, one target source, one completion rule:
+    /// the run under `[c]g0` with the `a ↦ a·c⁻¹` hook against the run
+    /// under `g0`, same seed.  Returns the exact GAE difference.
+    #[allow(clippy::too_many_arguments)]
+    fn check_coupling(
+        inst: &PrimeInstance,
+        fb: &FactorBase<PrimePoint>,
+        table: &PairTable,
+        k: u64,
+        source: TargetSource,
+        completion: CompletionRule,
+        gens: &[(u64, PrimePoint)],
+    ) -> Vec<String> {
+        let curve = &inst.curve;
+        let r = inst.r;
+        let g0 = inst.generator_point();
+        let mut setup = GroupOps::default();
+        let q = curve.mul(&mut setup, g0, k);
+        let base = coupled_run(inst, g0, 1, q, fb, table, source, completion);
+        assert!(base.outcome.verified, "{source:?}: base run did not verify");
+        assert_eq!(base.outcome.recovered, Some(k));
+        assert!(base.hook.drawn.iter().all(|&(a, s)| a == s));
+        let mut lines = Vec::new();
+        for &(c, gc) in gens.iter().filter(|(c, _)| *c != 1) {
+            let tag = format!("{} {source:?} {completion:?} c={c}", inst.name);
+            let cinv = invmod(c, r).unwrap();
+            let run = coupled_run(inst, gc, c, q, fb, table, source, completion);
+            // Identical target-point stream, `b` identical, `a` scaled.
+            assert_eq!(run.stream.len(), base.stream.len(), "{tag}: stream length");
+            for (t, (x, y)) in run.stream.iter().zip(&base.stream).enumerate() {
+                assert_eq!(x.0, y.0, "{tag}: target {t} differs");
+                assert_eq!(x.2, y.2, "{tag}: b of target {t}");
+                assert_eq!(x.1, mulmod(y.1, cinv, r), "{tag}: a of target {t}");
+            }
+            // Identical relation rows; the right-hand side `h·a` scales by c⁻¹.
+            assert_eq!(run.matrix.rows.len(), base.matrix.rows.len(), "{tag}: rows");
+            let mut digest = 0u64;
+            for (i, (x, y)) in run.matrix.rows.iter().zip(&base.matrix.rows).enumerate() {
+                assert_eq!(x.0, y.0, "{tag}: row {i}");
+                assert_eq!(x.1, mulmod(y.1, cinv, r), "{tag}: rhs of row {i}");
+                assert_eq!(x.2, y.2, "{tag}: status of row {i}");
+                digest = mix(digest ^ column_part_key(&x.0));
+            }
+            // Factor-base logs, entry by entry: logs₀·c⁻¹.
+            let mut pinned = 0;
+            for col in 0..=fb.columns {
+                let want = base.matrix.pinned(col).map(|x| mulmod(x, cinv, r));
+                assert_eq!(run.matrix.pinned(col), want, "{tag}: log of column {col}");
+                pinned += usize::from(want.is_some());
+            }
+            // k recovered (base gc), verified.
+            assert!(run.outcome.verified, "{tag}: not verified");
+            assert_eq!(run.outcome.recovered, Some(mulmod(k, cinv, r)), "{tag}: k");
+            // Every counter but the group ledger is identical.
+            let (o, b) = (&run.outcome, &base.outcome);
+            assert_eq!(
+                (
+                    o.trials,
+                    o.relations_found,
+                    o.rank,
+                    o.independent,
+                    o.dependent
+                ),
+                (
+                    b.trials,
+                    b.relations_found,
+                    b.rank,
+                    b.independent,
+                    b.dependent
+                ),
+                "{tag}: outcome counts"
+            );
+            // `walk_pool_ops` is the pool offsets' own group ledger, scalar
+            // multiplications by the generator included: it belongs to the
+            // ledger check below, not to the native counters.
+            let natives = |p: &PhaseCost| {
+                let mut n = p.native.clone();
+                n.remove("walk_pool_ops");
+                n
+            };
+            assert_eq!(
+                natives(&o.relations),
+                natives(&b.relations),
+                "{tag}: relation counters"
+            );
+            assert_eq!(
+                o.linear_algebra.native, b.linear_algebra.native,
+                "{tag}: linear-algebra counters"
+            );
+            assert_eq!(o.linear_algebra.group_ops, b.linear_algebra.group_ops);
+            assert_eq!(format!("{:?}", o.counters), format!("{:?}", b.counters));
+            // ΔS is the recomputed scalar-multiplication difference, nothing
+            // else: run + Σ[a]g0 = base + Σ[a·c⁻¹]gc over every draw, and the
+            // same for the verification's [d]G.
+            assert_eq!(run.hook.drawn.len(), base.hook.drawn.len(), "{tag}: draws");
+            let (mut by_g0, mut by_gc) = (GroupOps::default(), GroupOps::default());
+            for (x, y) in run.hook.drawn.iter().zip(&base.hook.drawn) {
+                assert_eq!(x.0, y.0, "{tag}: drawn a");
+                assert_eq!(x.1, mulmod(y.0, cinv, r));
+                curve.mul(&mut by_g0, g0, y.0);
+                curve.mul(&mut by_gc, gc, x.1);
+            }
+            let mut lhs = o.relations.group_ops;
+            lhs.merge(by_g0);
+            let mut rhs = b.relations.group_ops;
+            rhs.merge(by_gc);
+            assert_eq!(
+                lhs, rhs,
+                "{tag}: relation-phase ledger beyond the scalar mults"
+            );
+            let (mut v0, mut vc) = (GroupOps::default(), GroupOps::default());
+            curve.mul(&mut v0, g0, k);
+            curve.mul(&mut vc, gc, mulmod(k, cinv, r));
+            let mut lhs = o.verify.group_ops;
+            lhs.merge(v0);
+            let mut rhs = b.verify.group_ops;
+            rhs.merge(vc);
+            assert_eq!(lhs, rhs, "{tag}: verification ledger");
+            let delta = (o.relations.group_ops.gae() + o.verify.group_ops.gae())
+                - (b.relations.group_ops.gae() + b.verify.group_ops.gae());
+            let predicted = (by_gc.gae() + vc.gae()) - (by_g0.gae() + v0.gae());
+            assert_eq!(delta, predicted, "{tag}: ΔGAE");
+            lines.push(format!(
+                "E0b {tag} targets={} rows={} row_digest={digest:016x} logs_pinned={pinned} \
+                 draws={} k'={} dGAE={delta} predicted={predicted} ok",
+                run.stream.len(),
+                run.matrix.rows.len(),
+                run.hook.drawn.len(),
+                mulmod(k, cinv, r)
+            ));
+        }
+        lines
+    }
+
+    const SOURCES: [TargetSource; 6] = [
+        TargetSource::Random,
+        TargetSource::Walk,
+        TargetSource::Stride,
+        TargetSource::StrideRenew,
+        TargetSource::WalkPrimeFast,
+        TargetSource::WalkPrimeLanes {
+            lanes: 4,
+            batched: true,
+        },
+    ];
+
+    fn sweep(curves: usize, randoms: usize, completions: &[CompletionRule]) {
+        for i in 0..curves {
+            let (_, _, r, gx, gy) = CURVES[i];
+            let inst = instance(i, (gx, gy));
+            let fb = prime_factor_base(&inst, base_size(r));
+            let table = PairTable::build_negation_folded(&inst.curve, &fb);
+            let gens = generators(&inst, randoms);
+            let k = 1 + (0x9E37_79B9 ^ r) % (r - 1);
+            for source in SOURCES {
+                for &completion in completions {
+                    for line in check_coupling(&inst, &fb, &table, k, source, completion, &gens) {
+                        println!("{line}");
+                    }
+                }
+            }
+        }
+    }
+
+    /// **E0b + E0c**, cheap form: curve c1, every target source, one random
+    /// multiplier and `−g0`, the historical completion rule.
+    #[test]
+    fn e0bc_coupled_seeds_rescale_logs_and_nothing_else() {
+        sweep(1, 1, &[CompletionRule::TargetPinned]);
+    }
+
+    /// **E0b + E0c**, full form: six curves, every target source, three
+    /// random multipliers and `−g0`, both completion rules (full rank pins
+    /// every factor-base log).  `cargo test --release --lib
+    /// generator_coupling -- --ignored --nocapture`.
+    #[test]
+    #[ignore]
+    fn e0bc_full_sweep_six_curves() {
+        sweep(
+            CURVES.len(),
+            3,
+            &[CompletionRule::TargetPinned, CompletionRule::FullRank],
+        );
     }
 }

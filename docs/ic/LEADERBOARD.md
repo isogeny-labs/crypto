@@ -137,38 +137,40 @@ Shares are fractions of each row's own `S`, so they carry no unit; read each row
 
 ## Curve records and factor bases
 
-Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC curve records: schema [`docs/curves/ic/curves.schema.json`](../../docs/curves/ic/curves.schema.json), records [`docs/curves/ic/curves.yaml`](../../docs/curves/ic/curves.yaml) (27 records). 0 of the 24 board curves have a record there; 0 have a reconciled factor base.
+Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC curve records: schema [`docs/curves/ic/curves.schema.json`](../../docs/curves/ic/curves.schema.json), records [`docs/curves/ic/curves.yaml`](../../docs/curves/ic/curves.yaml) (27 records). 24 of the 24 board curves have a record there; 0 have a reconciled factor base.
+
+The registry overview below uses current links. Frozen measurement rows retain their original link metadata; refreshing registry links does not change their validation status.
 
 | table | curve | curves.yaml record | factor base (points, recipe) | factor-base source | refs |
 |:--|:--|:--|:--|:--|:--|
-| A | `icv1-f2m47-t22705043-f4e44623` | none | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m57-tm747311035-c1f545af` | none | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | none | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m53-tm56619371-dac20a85` | none | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m59-tm943548413-98844ecc` | none | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | none | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
-| B | `icv1-fp10-t5-192cb216` | none | 10, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-fp12-t19-d4a315df` | none | 32, mitm_m2_negfold_walk | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-fp14-tm43-158b6914` | none | 26, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-fp16-t351-d433f24e` | none | 40, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-fp18-t175-45770ebc` | none | 64, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-fp20-t1293-3c2999ba` | none | 102, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-fp22-tm1267-a5acaf6d` | none | 148, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-fp24-t1577-77336155` | none | 222, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-f2m15-t131-ed7256f0` | none | 30, mitm_m2_negfold_walk | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-f2m18-t393-d2c04152` | none | 30, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-f2m21-t2591-de54d72e` | none | 62, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-f2m24-tm3047-2d0c0e8c` | none | 134, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| B | `icv1-f2m27-t12543-569dca8b` | none | 254, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
-| C | `icv1-f2m19-tm797-9c54981b` | none | 304, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (no_curves_yaml_record) |
-| C | `icv1-f2m23-tm5197-1f85e9e1` | none | 368, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (no_curves_yaml_record) |
-| C | `icv1-f2m45-tm6236725-40939294` | none | 720, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (no_curves_yaml_record) |
-| C | `icv1-f2m37-tm534059-32aad96b` | none | 592, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (no_curves_yaml_record) |
-| C | `icv1-f2m43-tm998717-e2e742b0` | none | 1,376, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (no_curves_yaml_record) |
-| C | `icv1-f2m47-t22705043-f4e44623` | none | 5,264, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (no_curves_yaml_record) |
-| C | `icv1-f2m41-tm2308219-7f48b14a` | none | 6,560, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (no_curves_yaml_record) |
-| C | `icv1-f2m53-tm56619371-dac20a85` | none | 27,984, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (no_curves_yaml_record) |
-| C | `icv1-f2m61-t158598901-ab42b6c5` | none | 39,040, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m47-t22705043-f4e44623` | `icv1_f2m47_t22705043_f4e44623` | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m57-tm747311035-c1f545af` | `icv1_f2m57_tm747311035_c1f545af` | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | `icv1_f2m41_tm2308219_7f48b14a` | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m53-tm56619371-dac20a85` | `icv1_f2m53_tm56619371_dac20a85` | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m59-tm943548413-98844ecc` | `icv1_f2m59_tm943548413_98844ecc` | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | `icv1_f2m61_t158598901_ab42b6c5` | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
+| B | `icv1-fp10-t5-192cb216` | `icv1_fp10_t5_192cb216` | 10, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-fp12-t19-d4a315df` | `icv1_fp12_t19_d4a315df` | 32, mitm_m2_negfold_walk | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-fp14-tm43-158b6914` | `icv1_fp14_tm43_158b6914` | 26, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-fp16-t351-d433f24e` | `icv1_fp16_t351_d433f24e` | 40, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-fp18-t175-45770ebc` | `icv1_fp18_t175_45770ebc` | 64, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-fp20-t1293-3c2999ba` | `icv1_fp20_t1293_3c2999ba` | 102, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-fp22-tm1267-a5acaf6d` | `icv1_fp22_tm1267_a5acaf6d` | 148, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-fp24-t1577-77336155` | `icv1_fp24_t1577_77336155` | 222, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-f2m15-t131-ed7256f0` | `icv1_f2m15_t131_ed7256f0` | 30, mitm_m2_negfold_walk | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-f2m18-t393-d2c04152` | `icv1_f2m18_t393_d2c04152` | 30, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-f2m21-t2591-de54d72e` | `icv1_f2m21_t2591_de54d72e` | 62, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-f2m24-tm3047-2d0c0e8c` | `icv1_f2m24_tm3047_2d0c0e8c` | 134, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| B | `icv1-f2m27-t12543-569dca8b` | `icv1_f2m27_t12543_569dca8b` | 254, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
+| C | `icv1-f2m19-tm797-9c54981b` | `icv1_f2m19_tm797_9c54981b` | 304, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (not_reconciled) |
+| C | `icv1-f2m23-tm5197-1f85e9e1` | `icv1_f2m23_tm5197_1f85e9e1` | 368, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (not_reconciled) |
+| C | `icv1-f2m45-tm6236725-40939294` | `icv1_f2m45_tm6236725_40939294` | 720, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (not_reconciled) |
+| C | `icv1-f2m37-tm534059-32aad96b` | `icv1_f2m37_tm534059_32aad96b` | 592, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (not_reconciled) |
+| C | `icv1-f2m43-tm998717-e2e742b0` | `icv1_f2m43_tm998717_e2e742b0` | 1,376, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (not_reconciled) |
+| C | `icv1-f2m47-t22705043-f4e44623` | `icv1_f2m47_t22705043_f4e44623` | 5,264, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (not_reconciled) |
+| C | `icv1-f2m41-tm2308219-7f48b14a` | `icv1_f2m41_tm2308219_7f48b14a` | 6,560, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (not_reconciled) |
+| C | `icv1-f2m53-tm56619371-dac20a85` | `icv1_f2m53_tm56619371_dac20a85` | 27,984, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (not_reconciled) |
+| C | `icv1-f2m61-t158598901-ab42b6c5` | `icv1_f2m61_t158598901_ab42b6c5` | 39,040, koblitz_collection_m3_aimed | `research/ic_descent_20260930/analysis-isolated.json` | none (not_reconciled) |
 
 ## Bounded n37 diagnostic outside tables A–C
 
@@ -264,6 +266,10 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | c28 (supplementary) | 27.69 | `prime-abscissa:size=300` | 1.47 [1.34, 1.61] | 1.54 [1.44, 1.68] | 413 [395, 425] | 4.15 [3.62, 4.78] | 54.1 [49.8, 58.9] | 1.54 / 1.41 / 0.93 (not separated across the band) | 21.8 [17, 29.8] | 19.3 |
 | c30 (supplementary) | 29.62 | `prime-abscissa:size=469` | 1.36 [1.2, 1.53] | 1.6 [1.52, 1.7] | 637 [616, 651] | 4.81 [4.3, 5.4] | 58.7 [52.1, 64.8] | 1.60 / 1.46 / 0.96 (not separated across the band) | 25.8 [19.9, 35.2] | 24.5 |
 
+## Plain-S₅ C₄ solver stage, outside tables A–C
+
+On §11.17's same instances, adding sparsest pivots, chain eigensteps and shape replay reduces the plain-S₅ solve's mean C₄ from 1.209e+12 to 8.690e+10 counted Fₚ multiplications (13.90×; class: engineering). The committed arm covers 13 solves; the replay arm's mean covers 12 later solves, with 13 total outputs oracle-equal. It includes 11 shape replays and 1 fallback. Paired ratios are 13.90× by ratio of means and [7.24, 15.37] across paired instances. This is a solver-stage change: no full-pipeline row or curve verdict changes. Study: [research/s5_plain_c4_options_20261019/](../../research/s5_plain_c4_options_20261019/); [report](../../research/s5_plain_c4_options_20261019/REPORT.pdf).
+
 ## Large-prime conductor-gap counted diagnostics
 
 Copied from native analysis: eight independent one-target workloads per fixed curve; no transported targets. Counted S has unpriced native work. These observations do not enter tables A–C or change a full-cost ranking.
@@ -343,6 +349,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
+- `research/s5_plain_c4_options_20261019/raw/summary_r13.json` — sha256 `d5ae9560f6cf3cad…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`

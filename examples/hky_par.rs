@@ -37,8 +37,6 @@ use serde_json::{json, Value};
 use std::time::Instant;
 
 struct Space {
-    #[allow(dead_code)]
-    nv: u32,
     c: u32,
     /// binom[n][k] for n ≤ nv, k ≤ c + 1
     binom: Vec<Vec<u64>>,
@@ -82,7 +80,6 @@ impl Space {
         }
         let words = total.div_ceil(64);
         Space {
-            nv,
             c,
             binom,
             off,

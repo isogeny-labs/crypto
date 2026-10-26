@@ -251,10 +251,47 @@ pub enum RhoVariant {
     /// `a_j, b_j` uniform in `[0, N)` instead of `RHO_STEP_BITS`-bit ones
     /// (round twelve).  With short coefficients a walk's displacement
     /// `ΔA + ΔB·k` concentrates on a small 2-D set, which can delay its
-    /// rho collision at large `N`.  The default reference since round
-    /// twelve.
-    #[default]
+    /// rho collision at large `N`.  The reference from round twelve to
+    /// round fifteen.
     DistinguishedPointsFullWidth,
+    /// [`Self::DistinguishedPointsNegation`] on the full-width walk
+    /// (round thirteen).  Carries a passive cycle window (round
+    /// fourteen): it counts steps spent inside a short cycle in
+    /// [`RhoResult::cycle_ops`] and changes nothing else.
+    DistinguishedPointsNegationFullWidth,
+    /// [`Self::DistinguishedPointsNegationFullWidth`] with the cycle
+    /// window active (round fourteen): the first repeat of a hash within
+    /// the last [`CYCLE_WINDOW`] steps triggers the escape step at once,
+    /// instead of waiting for the distinguished-point gap limit (about
+    /// `√N` steps).
+    DistinguishedPointsNegationFullWidthCycleEscape,
+    /// [`Self::DistinguishedPointsNegationFullWidthCycleEscape`] that
+    /// first tries a repeat as a collision and escapes only a degenerate
+    /// one (round fifteen): on small groups a genuine rho cycle fits in
+    /// the window.  The default reference since round fifteen: the
+    /// `±` fold index calculus already uses, at its expected `√2`.
+    #[default]
+    DistinguishedPointsNegationFullWidthCollideFirst,
+}
+
+/// Length of the recent-hash window that spots fruitless cycles
+/// (round fourteen).  The look-ahead removes 2-cycles; 4-, 6-, … cycles
+/// still form, and a walk caught in one sees no distinguished point.
+pub const CYCLE_WINDOW: usize = 32;
+
+/// What the walk does with its recent-hash window.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CycleWindow {
+    /// No window.
+    Off,
+    /// Count steps whose hash repeats one in the window; walk unchanged.
+    Passive,
+    /// Escape on the first repeat.
+    Active,
+    /// On a repeat, solve from the earlier visit's `(a, b)` when that
+    /// collision is non-degenerate; escape only otherwise (round
+    /// fifteen).
+    ActiveCollideFirst,
 }
 
 /// Outcome of one rho run.
@@ -277,6 +314,12 @@ pub struct RhoResult {
     /// trials that were discarded and distinguished-point gap escapes.
     /// Zero for walks that do not fold `±`.
     pub fruitless_ops: usize,
+    /// Of `walk_ops`, steps the cycle window saw inside a short cycle
+    /// (round fourteen).  Passive window: every step whose hash repeats
+    /// one of the last [`CYCLE_WINDOW`]; active window: the cycle's
+    /// length, charged once when it is detected and escaped.  Zero
+    /// without a window.
+    pub cycle_ops: usize,
     pub wall_ms: f64,
 }
 
@@ -413,21 +456,102 @@ pub fn pollard_rho_jacobian_with(
 ) -> RhoResult {
     match variant {
         RhoVariant::Floyd => rho_floyd(curve, d1, d2, n, seed, max_steps),
-        RhoVariant::DistinguishedPoints => {
-            rho_dp(curve, d1, d2, n, seed, max_steps, false, false, false)
-        }
-        RhoVariant::DistinguishedPointsNegation => {
-            rho_dp(curve, d1, d2, n, seed, max_steps, true, false, false)
-        }
-        RhoVariant::DistinguishedPointsMixed => {
-            rho_dp(curve, d1, d2, n, seed, max_steps, false, true, false)
-        }
-        RhoVariant::DistinguishedPointsNegationMixed => {
-            rho_dp(curve, d1, d2, n, seed, max_steps, true, true, false)
-        }
-        RhoVariant::DistinguishedPointsFullWidth => {
-            rho_dp(curve, d1, d2, n, seed, max_steps, false, false, true)
-        }
+        RhoVariant::DistinguishedPoints => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            false,
+            false,
+            false,
+            CycleWindow::Off,
+        ),
+        RhoVariant::DistinguishedPointsNegation => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            true,
+            false,
+            false,
+            CycleWindow::Off,
+        ),
+        RhoVariant::DistinguishedPointsMixed => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            false,
+            true,
+            false,
+            CycleWindow::Off,
+        ),
+        RhoVariant::DistinguishedPointsNegationMixed => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            true,
+            true,
+            false,
+            CycleWindow::Off,
+        ),
+        RhoVariant::DistinguishedPointsFullWidth => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            false,
+            false,
+            true,
+            CycleWindow::Off,
+        ),
+        RhoVariant::DistinguishedPointsNegationFullWidth => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            true,
+            false,
+            true,
+            CycleWindow::Passive,
+        ),
+        RhoVariant::DistinguishedPointsNegationFullWidthCycleEscape => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            true,
+            false,
+            true,
+            CycleWindow::Active,
+        ),
+        RhoVariant::DistinguishedPointsNegationFullWidthCollideFirst => rho_dp(
+            curve,
+            d1,
+            d2,
+            n,
+            seed,
+            max_steps,
+            true,
+            false,
+            true,
+            CycleWindow::ActiveCollideFirst,
+        ),
     }
 }
 
@@ -466,6 +590,7 @@ fn rho_dp(
     negation: bool,
     mix: bool,
     full_width: bool,
+    window: CycleWindow,
 ) -> RhoResult {
     let started = Instant::now();
     // The walk's hash: `divisor_hash`, optionally through SplitMix64's
@@ -480,6 +605,11 @@ fn rho_dp(
         }
     };
     let mut fruitless_ops = 0usize;
+    let mut cycle_ops = 0usize;
+    // The last `CYCLE_WINDOW` walk hashes, newest last; cleared on every
+    // jump, since a jump starts a new trail.
+    let mut recent: std::collections::VecDeque<(u64, BigUint, BigUint)> =
+        std::collections::VecDeque::with_capacity(CYCLE_WINDOW + 1);
     // Fold a position and its coefficients together, so that the walk
     // position is always exactly `a·D₁ + b·D₂`.
     let fold = |x: MumfordDivisorP, a: BigUint, b: BigUint| {
@@ -539,6 +669,7 @@ fn rho_dp(
         let (mut a, mut b) = (a0, b0);
         let mut this_attempt = 0usize;
         let mut since_dp = 0usize;
+        recent.clear();
         // A cycle can contain no distinguished point at all, in which
         // case the walk detects nothing however long it runs.  Expected
         // distance to the next one is `2^theta_bits`; well past that,
@@ -550,6 +681,7 @@ fn rho_dp(
             if since_dp >= dp_gap_limit {
                 restarts += 1;
                 since_dp = 0;
+                recent.clear();
                 let j = (rng.next_u64() as usize) % branch.len();
                 let (aj, bj, rj) = &branch[j];
                 let (nx, na, nb, _) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
@@ -570,6 +702,54 @@ fn rho_dp(
             }
             this_attempt += 1;
             let h = walk_hash(&x);
+            if window != CycleWindow::Off {
+                // Position of `h` in the window, newest last: a repeat
+                // means the walk is going round a cycle of that length.
+                if let Some(i) = recent.iter().rposition(|r| r.0 == h) {
+                    let cycle_len = recent.len() - i;
+                    if window == CycleWindow::ActiveCollideFirst {
+                        // A genuine rho cycle returns to the same point
+                        // with different coefficients: that solves.
+                        let (_, pa, pb) = &recent[i];
+                        if let Some(k) = solve_collision(&a, &b, pa, pb, n) {
+                            if &d1.scalar_mul(&k, curve) == d2 {
+                                return RhoResult {
+                                    k: Some(k),
+                                    group_ops,
+                                    precompute_ops,
+                                    walk_ops: group_ops - precompute_ops,
+                                    restarts,
+                                    fruitless_ops,
+                                    cycle_ops,
+                                    wall_ms: started.elapsed().as_secs_f64() * 1e3,
+                                };
+                            }
+                        }
+                    }
+                    if window != CycleWindow::Passive {
+                        // Charge the lap just walked, then escape as the
+                        // gap limit would, one random branch step.
+                        cycle_ops += cycle_len;
+                        fruitless_ops += cycle_len + 1;
+                        restarts += 1;
+                        since_dp = 0;
+                        recent.clear();
+                        let j = (rng.next_u64() as usize) % branch.len();
+                        let (aj, bj, rj) = &branch[j];
+                        let (nx, na, nb, _) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
+                        (x, a, b) = (nx, na, nb);
+                        group_ops += 1;
+                        steps_left -= 1;
+                        this_attempt += 1;
+                        continue;
+                    }
+                    cycle_ops += 1;
+                }
+                recent.push_back((h, a.clone(), b.clone()));
+                if recent.len() > CYCLE_WINDOW {
+                    recent.pop_front();
+                }
+            }
             since_dp += 1;
             if (h & mask) == 0 {
                 since_dp = 0;
@@ -584,6 +764,7 @@ fn rho_dp(
                                     walk_ops: group_ops - precompute_ops,
                                     restarts,
                                     fruitless_ops,
+                                    cycle_ops,
                                     wall_ms: started.elapsed().as_secs_f64() * 1e3,
                                 };
                             }
@@ -599,6 +780,7 @@ fn rho_dp(
                         // wrong direction for a reference to be wrong
                         // in.
                         restarts += 1;
+                        recent.clear();
                         let j = (rng.next_u64() as usize) % branch.len();
                         let (aj, bj, rj) = &branch[j];
                         let (nx, na, nb, _) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
@@ -647,6 +829,7 @@ fn rho_dp(
         walk_ops: group_ops - precompute_ops,
         restarts,
         fruitless_ops,
+        cycle_ops,
         wall_ms: started.elapsed().as_secs_f64() * 1e3,
     }
 }
@@ -773,6 +956,7 @@ pub fn rho_dp_integer_model_width(
                                 walk_ops: group_ops - precompute_ops,
                                 restarts,
                                 fruitless_ops: 0,
+                                cycle_ops: 0,
                                 wall_ms: started.elapsed().as_secs_f64() * 1e3,
                             };
                         }
@@ -805,6 +989,7 @@ pub fn rho_dp_integer_model_width(
         walk_ops: group_ops - precompute_ops,
         restarts,
         fruitless_ops: 0,
+        cycle_ops: 0,
         wall_ms: started.elapsed().as_secs_f64() * 1e3,
     }
 }
@@ -896,6 +1081,7 @@ fn rho_floyd(
                         walk_ops: group_ops - precompute_ops,
                         restarts,
                         fruitless_ops: 0,
+                        cycle_ops: 0,
                         wall_ms: started.elapsed().as_secs_f64() * 1e3,
                     };
                 }
@@ -915,6 +1101,7 @@ fn rho_floyd(
         walk_ops: group_ops - precompute_ops,
         restarts,
         fruitless_ops: 0,
+        cycle_ops: 0,
         wall_ms: started.elapsed().as_secs_f64() * 1e3,
     }
 }
@@ -1472,6 +1659,17 @@ mod tests {
             );
             assert_eq!(r.k.as_ref(), Some(&k), "jacobian seed {seed}");
             assert_eq!(r.precompute_ops % (2 * (n.bits() as usize + 1)), 0);
+            let f = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPointsNegationFullWidth,
+            );
+            assert_eq!(f.k.as_ref(), Some(&k), "folded jacobian seed {seed}");
+            assert!(f.fruitless_ops <= f.walk_ops);
         }
         for (nn, kk) in [(61667u64, 20562u64), (4620611, 1540210)] {
             for seed in 0..8u64 {
@@ -1484,6 +1682,68 @@ mod tests {
                 );
                 assert_eq!(r.k, Some(BigUint::from(kk)), "N {nn} seed {seed}");
             }
+        }
+    }
+
+    #[test]
+    fn passive_cycle_window_changes_nothing_and_active_solves() {
+        // Round fourteen's instrument must not move the walk: with the
+        // window passive, every count but `cycle_ops` equals the walk with
+        // no window, seed for seed.  The active window must still solve.
+        let (curve, d1, d2, n, k) = instance(101);
+        for seed in 0..10u64 {
+            let off = rho_dp(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                true,
+                false,
+                true,
+                CycleWindow::Off,
+            );
+            let passive = rho_dp(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                true,
+                false,
+                true,
+                CycleWindow::Passive,
+            );
+            assert_eq!(off.k, passive.k, "seed {seed}");
+            assert_eq!(off.walk_ops, passive.walk_ops, "seed {seed}");
+            assert_eq!(off.fruitless_ops, passive.fruitless_ops, "seed {seed}");
+            assert_eq!(off.restarts, passive.restarts, "seed {seed}");
+            assert_eq!(off.cycle_ops, 0);
+            assert!(passive.cycle_ops <= passive.walk_ops);
+            let active = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPointsNegationFullWidthCycleEscape,
+            );
+            assert_eq!(active.k.as_ref(), Some(&k), "active seed {seed}");
+            assert!(active.cycle_ops <= active.fruitless_ops);
+            let first = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPointsNegationFullWidthCollideFirst,
+            );
+            assert_eq!(first.k.as_ref(), Some(&k), "collide-first seed {seed}");
+            assert!(first.cycle_ops <= first.fruitless_ops);
         }
     }
 

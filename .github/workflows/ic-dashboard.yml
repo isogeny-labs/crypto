@@ -43,6 +43,10 @@ jobs:
           install-dependencies: true
       - name: Check frozen evidence pins and generated overview
         run: node tools/render_ic_dashboard.mjs --check
+      - uses: browser-actions/setup-chrome@v2
+        id: setup-chrome
+        with:
+          install-dependencies: true
       - name: Check actual desktop and mobile rendering
         env:
           IC_DASHBOARD_CHROME: ${{ steps.setup-chrome.outputs.chrome-path }}
