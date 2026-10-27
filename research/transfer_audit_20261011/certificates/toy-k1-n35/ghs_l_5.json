@@ -1,0 +1,285 @@
+{
+  "baseline": {
+    "algorithm": "Pollard rho on <G>",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
+    "equivalence_class_reason": "negation and the 2^1-Frobenius: E is defined over F_(2^1), so classes have size 2*35/1 = 70 (upper bound on the speedup)",
+    "equivalence_class_size": 70,
+    "log2_cost_of_one_group_operation": 11.452,
+    "log2_group_operations": 1.912,
+    "log2_r": 9.301,
+    "log2_total": 13.364,
+    "log2_total_negation_only": 15.929
+  },
+  "candidate": {
+    "id": "ghs:l=5",
+    "label": "trace descent E(F_(2^35)) -> E(F_(2^5)), N = 7 * 5",
+    "transfer_type": "ghs_weil_descent"
+  },
+  "carried": false,
+  "checks": [
+    {
+      "evidence": "ghs_screen::screen_curve (ec_trapdoor) and jacobian_transfer::binary::ghs_magic return the same magic number, type and condition (8)",
+      "name": "screen_agrees_with_ghs_magic",
+      "result": "PASS"
+    },
+    {
+      "evidence": "n = 35 has proper subfield degrees [5, 7]",
+      "name": "no_proper_subfield_for_prime_degree",
+      "result": "NOT_APPLICABLE"
+    },
+    {
+      "evidence": "ghs_transport::trace_transport and ghs_descent::trace_map return the same image of G",
+      "name": "trace_transport_agrees_with_trace_map",
+      "result": "PASS"
+    },
+    {
+      "evidence": "Tr(Q) = [d] Tr(G) for the seeded planted scalar d (known-answer fixture); not applicable when Tr(G) = O",
+      "name": "planted_target_transported",
+      "result": "NOT_APPLICABLE"
+    }
+  ],
+  "costs": {
+    "destination_solver": "RhoOnSubfieldCurve",
+    "log2_baseline": 13.364,
+    "log2_cost_ratio": 2.507,
+    "log2_total": 15.872,
+    "repo_ratio_log2": 0.057,
+    "rows": [
+      {
+        "formula": "none: the descent is a Frobenius iteration",
+        "log2": null,
+        "phase": "map_construction",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "n/l Frobenius powers and n/l elliptic additions in the source field: log2(n/l) + log2(10 * M(n))",
+        "log2": 14.259,
+        "phase": "transfer_evaluation",
+        "status": "modeled"
+      },
+      {
+        "formula": "destination is an elliptic curve: rho",
+        "log2": null,
+        "phase": "relation_collection",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "see relation_collection",
+        "log2": null,
+        "phase": "linear_algebra",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "rho on E(F_(2^5)): 0.5 log2 r + log2 sqrt(pi/4) + log2(10 M(5)) - 0.5 log2(10/2) (equivalence class c = 10 of the destination curve, negation included; the model reference sqrt(pi r/4) is the c = 2 case)",
+        "log2": 10.318,
+        "phase": "destination_solve_unsplit",
+        "status": "modeled"
+      },
+      {
+        "formula": "the logarithm is unchanged (homomorphism); one scalar multiplication on E verifies it",
+        "log2": 15.254,
+        "phase": "descent_back_mapping",
+        "status": "modeled"
+      }
+    ],
+    "solvers_considered": [
+      [
+        "RhoOnSubfieldCurve",
+        10.318
+      ]
+    ],
+    "total_is_lower_bound": false,
+    "unit": "log2 bit operations (frozen formula model; measured rows say so)"
+  },
+  "curve": {
+    "family": "binary",
+    "field": {
+      "a": "0x1",
+      "b": "0x1",
+      "degree": 35,
+      "kind": "binary",
+      "log2_size": 35,
+      "model": "y^2+xy=x^3+a*x^2+b",
+      "modulus": "0x800000005"
+    },
+    "instance_checks": [
+      {
+        "evidence": "modulus irreducible (Rabin), coefficients canonical, b != 0 (ordinary binary model)",
+        "name": "field_and_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "G affine, y^2+xy = x^3+ax^2+b",
+        "name": "generator_on_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "r passes Miller-Rabin to bases 2..53 (Proved); [r]G = O, G != O, so G has exact order r",
+        "name": "subgroup_order_is_prime_and_annihilates_generator",
+        "result": "PASS"
+      },
+      {
+        "evidence": "#E = cofactor * r = q + 1 - t, Hasse bound holds, two seeded random points are annihilated by #E (evidence for the recorded order, not a point-count proof)",
+        "name": "order_consistency",
+        "result": "PASS"
+      },
+      {
+        "evidence": "curve_traits::compute run live on this instance",
+        "name": "traits_record",
+        "result": "PASS"
+      }
+    ],
+    "name": "toy-k1-n35",
+    "registered": false,
+    "slug": "unregistered-toy-k1-n35",
+    "subgroup": {
+      "cofactor": "54452882",
+      "generator": [
+        "0x50301e1a1",
+        "0xb2b5e099"
+      ],
+      "order": "34359768542",
+      "r": "631",
+      "r_log2": 9.301,
+      "trace": "-30173"
+    }
+  },
+  "evaluation": {
+    "reason": "the subgroup is not carried (subgroup preservation refuted): the route solves a different problem or does not exist, so there is no attack cost to compare with the baseline",
+    "status": "excluded"
+  },
+  "executed": {
+    "api": "ghs_transport::trace_transport + ghs_descent::trace_map",
+    "base_degree": 5,
+    "generator_image_is_infinity": true,
+    "planted_scalar_bits": 7,
+    "relative_degree": 7,
+    "status": "GeneratorKilledByTrace",
+    "subgroup_report": {
+      "additivity_passed": 4,
+      "additivity_total": 4,
+      "failures": [
+        "phi(G) = O: the kernel meets <G> in all of <G>"
+      ],
+      "image_is_identity": true,
+      "image_order_is_r": false,
+      "kernel_meets_subgroup": true,
+      "map_evaluation_errors": 0,
+      "r_is_prime": true,
+      "scalar_equivariance_passed": 3,
+      "scalar_equivariance_total": 3,
+      "source_generator_order_is_r": true,
+      "status": "refuted"
+    }
+  },
+  "invariants": {
+    "a_in_subfield": true,
+    "b_in_subfield": true,
+    "base_degree": 5,
+    "class_wide": {
+      "achievable_magic_numbers": [
+        1,
+        4,
+        7
+      ],
+      "best_case_destination_can_carry_r": true,
+      "best_case_log2_cost_ratio": 5.853,
+      "best_case_route_log2_total": 19.217,
+      "genus_lower_bound_log2": 2.807,
+      "min_magic_number_at_least_2": 4,
+      "relative_degree": 7,
+      "statement": "every curve over this field, in every isogeny class, has m = 1 or m >= the listed minimum for this tower; the best-case price above is a lower bound on any GHS route through F_(2^l) other than the trace",
+      "window_2_to_6_empty": false
+    },
+    "curve_definition_degree": 1,
+    "genus": "1",
+    "ghs_type": "II",
+    "log2_genus": 0.0,
+    "magic_number": 1,
+    "min_genus_to_carry_r": 2.0,
+    "mmt_condition_8": true,
+    "orbit_length": 1,
+    "proper_subfield_degrees": [
+      5,
+      7
+    ],
+    "relative_degree": 7,
+    "relative_trace_b_zero": false,
+    "trace_a": 1,
+    "weil_bits_per_genus": 5.47
+  },
+  "lead_class": "not_carried",
+  "map": {
+    "construction_status": "executed",
+    "degrees": {
+      "artin_schreier_cover_degree_log2": 1,
+      "relative_degree": 7,
+      "tower": "F_2 <= F_(2^5) <= F_(2^35)"
+    },
+    "destination": "E(F_(2^5))",
+    "explicit_formulas": "Tr_(K/k)(P) = P + sigma(P) + ... + sigma^(n-1)(P)",
+    "field_of_definition": "F_(2^5)",
+    "source": "E(F_(2^35))",
+    "type": "GHS conorm-norm map (trace map when m = 1)"
+  },
+  "notes": [],
+  "obligations": {
+    "computational_advantage": "not_applicable",
+    "existence": "supported",
+    "explicit_construction": "supported",
+    "map_correctness": "supported",
+    "scaling_support": "not_applicable",
+    "subgroup_preservation": "refuted"
+  },
+  "open_obligations": [],
+  "references": [
+    "Maurer-Menezes-Teske, LMS J. Comput. Math. 5 (2002): eq. (5), Thm 5(i), Lemma 6 (as cited in src/cryptanalysis/ec_trapdoor.rs)",
+    "Galbraith-Hess-Smart 2002; Hess, LMS J. Comput. Math. 7 (2004) (as cited in src/cryptanalysis/ghs_descent.rs)",
+    "docs/GHS_TRANSPORT.md; tests/sect113r1_ghs_evidence.rs"
+  ],
+  "schema": "transfer-audit/certificate/v2",
+  "subgroup_preservation": {
+    "antecedents": [
+      {
+        "evidence": "#E(F_(2^5)) = 22, gcd(r, #E) = 1: the image of G lies in E(F_(2^5)), so gcd = 1 forces Tr(G) = O; executed result: Refuted",
+        "name": "arithmetic_prediction_agrees_with_execution",
+        "result": "PASS"
+      }
+    ],
+    "argument": "Tr_(K/k)(G) lies in E(F_(2^5)) of order 22; gcd(r, #E(F_(2^5))) = 1, so the trace kills <G>",
+    "executed": {
+      "api": "ghs_transport::trace_transport + ghs_descent::trace_map",
+      "base_degree": 5,
+      "generator_image_is_infinity": true,
+      "planted_scalar_bits": 7,
+      "relative_degree": 7,
+      "status": "GeneratorKilledByTrace",
+      "subgroup_report": {
+        "additivity_passed": 4,
+        "additivity_total": 4,
+        "failures": [
+          "phi(G) = O: the kernel meets <G> in all of <G>"
+        ],
+        "image_is_identity": true,
+        "image_order_is_r": false,
+        "kernel_meets_subgroup": true,
+        "map_evaluation_errors": 0,
+        "r_is_prime": true,
+        "scalar_equivariance_passed": 3,
+        "scalar_equivariance_total": 3,
+        "source_generator_order_is_r": true,
+        "status": "refuted"
+      }
+    },
+    "image_order": "1",
+    "kernel_meets_subgroup": true,
+    "method": "executed: ghs_transport::trace_transport + generic checker",
+    "status": "refuted"
+  },
+  "tool": "transfer-audit/2",
+  "verdict": "no weakness found in scope",
+  "verdict_basis": [
+    "subgroup preservation is Refuted: the transfer is not shown to carry <G>",
+    "priced route costs 2^2.5 times the matched baseline or more"
+  ]
+}

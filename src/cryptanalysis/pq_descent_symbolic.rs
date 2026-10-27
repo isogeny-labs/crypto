@@ -34,8 +34,100 @@
 //! dimension the truth table can still reach.
 
 use crate::cryptanalysis::fx_hash::MaskMap;
-use crate::cryptanalysis::pq_groebner_f2::{mono_key, F2BoolMono, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{
+    bit, key_mask, mask_from64, mono_key, F2BoolMono, F2BoolPoly, Mask, MonoKey,
+};
 use crate::cryptanalysis::semaev_decomp::Gf2;
+use std::cell::Cell;
+use std::collections::BTreeMap;
+
+// ── The work counters ──────────────────────────────────────────────
+
+/// The `bitop/v1` primitives the descent performs, counted on the calling
+/// thread as it runs (`docs/units/BITOPS.md`; the field is the curve's
+/// `F_{2^n}`).  One count per inner-loop iteration:
+///
+/// - `field_muls`, `field_sqrs`: each `Gf2::mul` and `Gf2::sqr` of a
+///   coefficient;
+/// - `field_adds`: each coefficient XOR (and each zero test of a
+///   coefficient, an `n`-bit compare);
+/// - `hash_probes`: each lookup, insert or remove of a coefficient map
+///   keyed by a monomial;
+/// - `word_ops`: each 64-bit word operation on a monomial mask or a word
+///   copied — the union of two monomials, a map entry copied by a clone,
+///   the key, the sort (`x·lg x` comparisons) and the bit dealing of
+///   [`FieldBoolPoly::split`], and the basis copies.
+///
+/// The counters never steer the computation; reading them with
+/// [`take_descent_work`] resets them.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct DescentWork {
+    pub field_adds: u64,
+    pub field_muls: u64,
+    pub field_sqrs: u64,
+    pub hash_probes: u64,
+    pub word_ops: u64,
+}
+
+thread_local! {
+    static WORK: Cell<DescentWork> = const { Cell::new(DescentWork {
+        field_adds: 0,
+        field_muls: 0,
+        field_sqrs: 0,
+        hash_probes: 0,
+        word_ops: 0,
+    }) };
+}
+
+#[inline]
+fn note(f: impl FnOnce(&mut DescentWork)) {
+    WORK.with(|w| {
+        let mut v = w.get();
+        f(&mut v);
+        w.set(v);
+    });
+}
+
+/// Add `extra` to this thread's descent counters: work a caller does on
+/// the descent's behalf (the slot bases' squarings, say), so that it is
+/// read back with the rest.
+pub fn add_descent_work(extra: DescentWork) {
+    note(|w| {
+        w.field_adds += extra.field_adds;
+        w.field_muls += extra.field_muls;
+        w.field_sqrs += extra.field_sqrs;
+        w.hash_probes += extra.hash_probes;
+        w.word_ops += extra.word_ops;
+    });
+}
+
+/// The descent work counted on this thread since the last call, and
+/// reset to zero.
+pub fn take_descent_work() -> DescentWork {
+    WORK.with(|w| w.replace(DescentWork::default()))
+}
+
+impl DescentWork {
+    /// Add these counts to a solver block's `bitop_*` keys.
+    pub fn charge(&self, extra: &mut BTreeMap<String, u64>) {
+        for (k, v) in [
+            ("bitop_field_adds", self.field_adds),
+            ("bitop_field_muls", self.field_muls),
+            ("bitop_field_sqrs", self.field_sqrs),
+            ("bitop_hash_probes", self.hash_probes),
+            ("bitop_word_ops", self.word_ops),
+        ] {
+            if v != 0 {
+                *extra.entry(k.to_string()).or_insert(0) += v;
+            }
+        }
+    }
+}
+
+/// Bit length of `x`: the depth factor of a sort of `x` entries.
+fn lg(x: usize) -> u64 {
+    (usize::BITS - x.leading_zeros()) as u64
+}
 
 /// The most boolean variables a system may have: one bit of a
 /// [`F2BoolMono`] mask per variable.
@@ -64,7 +156,9 @@ impl FieldBoolPoly {
     /// The constant `c`.
     pub fn constant(c: u64) -> Self {
         let mut p = Self::default();
+        note(|w| w.field_adds += 1);
         if c != 0 {
+            note(|w| w.hash_probes += 1);
             p.terms.insert(0, c);
         }
         p
@@ -73,16 +167,27 @@ impl FieldBoolPoly {
     /// The linear form `Σ_k v_{offset + k} · basis[k]`.
     pub fn linear(offset: u32, basis: &[u64]) -> Self {
         let mut p = Self::default();
+        let inserted = basis.iter().filter(|&&e| e != 0).count() as u64;
+        note(|w| {
+            w.field_adds += basis.len() as u64;
+            w.word_ops += inserted;
+            w.hash_probes += inserted;
+        });
         for (k, &e) in basis.iter().enumerate() {
             if e != 0 {
-                p.terms.insert(1u64 << (offset + k as u32), e);
+                p.terms.insert(bit(offset + k as u32), e);
             }
         }
         p
     }
 
-    fn add_term(&mut self, mask: u64, coeff: u64) {
+    /// Counted: the zero test of `coeff` (a field add), then a probe,
+    /// and when the key is present the XOR (a field add) and its zero
+    /// test (a field add), and the removal (a probe) when it cancels; an
+    /// insertion is a second probe.
+    fn add_term(&mut self, mask: Mask, coeff: u64) {
         if coeff == 0 {
+            note(|w| w.field_adds += 1);
             return;
         }
         match self.terms.get_mut(&mask) {
@@ -90,16 +195,36 @@ impl FieldBoolPoly {
                 *c ^= coeff;
                 if *c == 0 {
                     self.terms.remove(&mask);
+                    note(|w| {
+                        w.field_adds += 3;
+                        w.hash_probes += 2;
+                    });
+                } else {
+                    note(|w| {
+                        w.field_adds += 3;
+                        w.hash_probes += 1;
+                    });
                 }
             }
             None => {
                 self.terms.insert(mask, coeff);
+                note(|w| {
+                    w.field_adds += 1;
+                    w.hash_probes += 2;
+                });
             }
         }
     }
 
+    /// A clone of the map, counted: a word for the key and one for the
+    /// coefficient of every entry.
+    fn counted_clone(&self) -> Self {
+        note(|w| w.word_ops += 2 * self.terms.len() as u64);
+        self.clone()
+    }
+
     pub fn add(&self, other: &Self) -> Self {
-        let mut out = self.clone();
+        let mut out = self.counted_clone();
         for (&m, &c) in &other.terms {
             out.add_term(m, c);
         }
@@ -109,6 +234,13 @@ impl FieldBoolPoly {
     /// `M · N = M ∪ N` in the boolean ring.
     pub fn mul(&self, other: &Self, gf: &Gf2) -> Self {
         let mut out = Self::default();
+        // Per pair of terms: the union (a word op) and the coefficient
+        // product, then `add_term`.
+        let pairs = (self.terms.len() * other.terms.len()) as u64;
+        note(|w| {
+            w.word_ops += pairs;
+            w.field_muls += pairs;
+        });
         for (&ma, &ca) in &self.terms {
             for (&mb, &cb) in &other.terms {
                 out.add_term(ma | mb, gf.mul(ca, cb));
@@ -119,6 +251,11 @@ impl FieldBoolPoly {
 
     /// `(Σ c_M M)² = Σ c_M² M`: the Frobenius on the coefficients.
     pub fn sqr(&self, gf: &Gf2) -> Self {
+        // Per term: the square and an insertion into the new map.
+        note(|w| {
+            w.field_sqrs += self.terms.len() as u64;
+            w.hash_probes += self.terms.len() as u64;
+        });
         Self {
             terms: self.terms.iter().map(|(&m, &c)| (m, gf.sqr(c))).collect(),
         }
@@ -126,6 +263,7 @@ impl FieldBoolPoly {
 
     pub fn scale(&self, c: u64, gf: &Gf2) -> Self {
         let mut out = Self::default();
+        note(|w| w.field_muls += self.terms.len() as u64);
         for (&m, &a) in &self.terms {
             out.add_term(m, gf.mul(a, c));
         }
@@ -144,7 +282,7 @@ impl FieldBoolPoly {
     pub fn eval(&self, point: u64) -> u64 {
         self.terms
             .iter()
-            .filter(|(&m, _)| point & m == m)
+            .filter(|(&m, _)| mask_from64(point) & m == m)
             .fold(0u64, |acc, (_, &c)| acc ^ c)
     }
 
@@ -156,16 +294,23 @@ impl FieldBoolPoly {
     /// its masks are distinct, being keys of one map — and is taken as is,
     /// instead of `n` separate sorts of about half the terms each.
     pub fn split(&self, n: u32, n_vars: usize) -> Vec<F2BoolPoly> {
-        let mut keyed: Vec<(u128, u64)> = self
+        let mut keyed: Vec<(MonoKey, u64)> = self
             .terms
             .iter()
             .map(|(&m, &c)| (mono_key(F2BoolMono::from_mask(m)), c))
             .collect();
         keyed.sort_unstable_by_key(|a| std::cmp::Reverse(a.0));
+        // Per term the key (a popcount and a complement) and its copy,
+        // the sort's comparisons (two-word keys), and per term the mask
+        // and the zero test of the coefficient's bits.
+        let l = keyed.len();
+        note(|w| w.word_ops += 2 * l as u64 + 2 * l as u64 * lg(l) + 2 * l as u64);
+        let mut dealt = 0u64;
         let mut monos: Vec<Vec<F2BoolMono>> = (0..n).map(|_| Vec::new()).collect();
         for &(key, c) in &keyed {
-            let m = F2BoolMono::from_mask(!(key as u64));
+            let m = F2BoolMono::from_mask(key_mask(key));
             let mut bits = c;
+            dealt += u64::from(c.count_ones());
             while bits != 0 {
                 let j = bits.trailing_zeros();
                 if j < n {
@@ -174,6 +319,9 @@ impl FieldBoolPoly {
                 bits &= bits - 1;
             }
         }
+        // Per set bit: the trailing-zero count, the clear, and the store
+        // of the monomial into its equation.
+        note(|w| w.word_ops += 3 * dealt);
         monos
             .into_iter()
             .map(|terms| F2BoolPoly { terms, n_vars })
@@ -233,9 +381,6 @@ pub struct SymbolicDescent {
     /// ranges over the span of `summand_bases[i]`.  Equal to `v_basis`
     /// repeated when the descent is the plain one.
     pub summand_bases: Vec<Vec<u64>>,
-    /// Every summand ranges over `offset + span(its basis)`; 0 for the
-    /// linear descent.
-    pub offset: u64,
     /// Monomials of the polynomial over `F_{2^n}` before it was split
     /// into coordinates: the size of the symbolic object.
     pub field_monomials: usize,
@@ -246,12 +391,24 @@ impl SymbolicDescent {
     /// own summand's span.
     pub fn lift(&self, v: u64) -> Vec<u64> {
         let np = self.n_prime as usize;
+        // A bit test a variable, and a field add a set one.
+        let vars = (self.summands as usize * np).min(64);
+        let set = (v & if vars == 64 {
+            u64::MAX
+        } else {
+            (1u64 << vars) - 1
+        })
+        .count_ones();
+        note(|w| {
+            w.word_ops += vars as u64;
+            w.field_adds += u64::from(set);
+        });
         (0..self.summands as usize)
             .map(|i| {
                 let basis = &self.summand_bases[i];
                 (0..np)
                     .filter(|&k| (v >> (i * np + k)) & 1 == 1)
-                    .fold(self.offset, |acc, k| acc ^ basis[k])
+                    .fold(0u64, |acc, k| acc ^ basis[k])
             })
             .collect()
     }
@@ -268,6 +425,7 @@ pub fn descend(
     summands: u32,
 ) -> Result<SymbolicDescent, String> {
     let bases: Vec<Vec<u64>> = (0..summands).map(|_| v_basis.to_vec()).collect();
+    note(|w| w.word_ops += summands as u64 * v_basis.len() as u64);
     descend_with_bases(gf, b, x_r, &bases)
 }
 
@@ -284,27 +442,15 @@ pub fn descend_with_bases(
     x_r: u64,
     bases: &[Vec<u64>],
 ) -> Result<SymbolicDescent, String> {
-    descend_affine(gf, b, x_r, bases, 0)
-}
-
-/// [`descend_with_bases`] with every summand over the affine subspace
-/// `offset + span(bases[i])`: the linear forms gain the constant
-/// `offset`, so the degree and the unknowns are unchanged.  On a curve
-/// with `Tr(a) = 1`, `offset` of trace 1 over a basis inside `ker Tr`
-/// puts every base point in `2E`.
-pub fn descend_affine(
-    gf: &Gf2,
-    b: u64,
-    x_r: u64,
-    bases: &[Vec<u64>],
-    offset: u64,
-) -> Result<SymbolicDescent, String> {
     let summands = bases.len() as u32;
     let n_prime = bases.first().map_or(0, |v| v.len()) as u32;
     if bases.iter().any(|v| v.len() as u32 != n_prime) {
         return Err("every summand's basis must have the same dimension".into());
     }
     let v_basis = bases.first().cloned().unwrap_or_default();
+    // The copies of the bases (here and into the result): a word an
+    // element.
+    note(|w| w.word_ops += (n_prime as u64) * (1 + summands as u64));
     if !(2..=3).contains(&summands) {
         return Err(format!(
             "the symbolic descent takes 2 or 3 summands, not {summands}"
@@ -318,10 +464,9 @@ pub fn descend_affine(
         ));
     }
     let n_vars = (summands * n_prime) as usize;
-    let x_r = FieldBoolPoly::constant(x_r);
     let poly = match summands {
-        2 => s3_symbolic_poly_affine(gf, b, &x_r, &bases[0], &bases[1], offset),
-        _ => s4_symbolic_poly_affine(gf, b, &x_r, &bases[0], &bases[1], &bases[2], offset),
+        2 => s3_symbolic(gf, b, x_r, &bases[0], &bases[1]),
+        _ => s4_symbolic(gf, b, x_r, &bases[0], &bases[1], &bases[2]),
     };
     Ok(SymbolicDescent {
         n: gf.n,
@@ -331,7 +476,6 @@ pub fn descend_affine(
         equations: poly.split(gf.n, n_vars),
         v_basis,
         summand_bases: bases.to_vec(),
-        offset,
         field_monomials: poly.len(),
     })
 }
@@ -374,6 +518,9 @@ pub fn descend_fiber(
         ));
     }
     let n_vars = n_vars_u32 as usize;
+    // The standard basis built, and the copies of `v_basis` into the
+    // result: a word an element.
+    note(|w| w.word_ops += n as u64 + (n_prime as u64) * (1 + summands as u64));
     let standard: Vec<u64> = (0..n).map(|k| 1u64 << k).collect();
     let x_free = FieldBoolPoly::linear(summands * n_prime, &standard);
     let poly = match summands {
@@ -394,7 +541,6 @@ pub fn descend_fiber(
         equations,
         v_basis: v_basis.to_vec(),
         summand_bases: (0..summands).map(|_| v_basis.to_vec()).collect(),
-        offset: 0,
         field_monomials: poly.len() + g.len(),
     })
 }
@@ -406,6 +552,12 @@ impl SymbolicDescent {
         let base = self.summands * self.n_prime;
         (0..self.n).fold(0u64, |acc, k| acc | (((v >> (base + k)) & 1) << k))
     }
+}
+
+/// `S_3(x_1, x_2, x_R)` with `x_1`, `x_2` linear forms, term for term
+/// the formula [`semaev_s3_word`] evaluates.
+fn s3_symbolic(gf: &Gf2, b: u64, x_r: u64, b1: &[u64], b2: &[u64]) -> FieldBoolPoly {
+    s3_symbolic_poly(gf, b, &FieldBoolPoly::constant(x_r), b1, b2)
 }
 
 /// `S_3(x_1, x_2, X)` with `X` any polynomial in the boolean variables:
@@ -421,33 +573,21 @@ fn s3_symbolic_poly(
     b1: &[u64],
     b2: &[u64],
 ) -> FieldBoolPoly {
-    s3_symbolic_poly_affine(gf, b, x_r, b1, b2, 0)
-}
-
-/// `offset + Σ_k v_{var + k} · basis[k]`.
-fn affine_form(var: u32, basis: &[u64], offset: u64) -> FieldBoolPoly {
-    FieldBoolPoly::linear(var, basis).add(&FieldBoolPoly::constant(offset))
-}
-
-/// `S_3(x_1, x_2, X)` with `x_i = offset + Σ_k v_k b_i[k]`, term for
-/// term the formula [`semaev_s3_word`] evaluates.
-fn s3_symbolic_poly_affine(
-    gf: &Gf2,
-    b: u64,
-    x_r: &FieldBoolPoly,
-    b1: &[u64],
-    b2: &[u64],
-    offset: u64,
-) -> FieldBoolPoly {
     let np = b1.len() as u32;
-    let x1 = affine_form(0, b1, offset);
-    let x2 = affine_form(np, b2, offset);
+    let x1 = FieldBoolPoly::linear(0, b1);
+    let x2 = FieldBoolPoly::linear(np, b2);
     let sum12_sq = x1.add(&x2).sqr(gf);
     let prod12 = x1.mul(&x2, gf);
     let t1 = sum12_sq.mul(&x_r.sqr(gf), gf);
     let t2 = prod12.mul(x_r, gf);
     let t3 = prod12.sqr(gf).add(&FieldBoolPoly::constant(b));
     t1.add(&t2).add(&t3)
+}
+
+/// `S_4(x_1, x_2, x_3, x_R)` with `x_1`, `x_2`, `x_3` linear forms,
+/// term for term the resultant [`semaev_s4_word`] evaluates.
+fn s4_symbolic(gf: &Gf2, b: u64, x_r: u64, b1: &[u64], b2: &[u64], b3: &[u64]) -> FieldBoolPoly {
+    s4_symbolic_poly(gf, b, &FieldBoolPoly::constant(x_r), b1, b2, b3)
 }
 
 /// `S_4(x_1, x_2, x_3, X)` with `X` any polynomial in the boolean
@@ -460,25 +600,11 @@ fn s4_symbolic_poly(
     b2: &[u64],
     b3: &[u64],
 ) -> FieldBoolPoly {
-    s4_symbolic_poly_affine(gf, b, x_r, b1, b2, b3, 0)
-}
-
-/// `S_4(x_1, x_2, x_3, X)` with `x_i = offset + Σ_k v_k b_i[k]`, term
-/// for term the resultant [`semaev_s4_word`] evaluates.
-fn s4_symbolic_poly_affine(
-    gf: &Gf2,
-    b: u64,
-    x_r: &FieldBoolPoly,
-    b1: &[u64],
-    b2: &[u64],
-    b3: &[u64],
-    offset: u64,
-) -> FieldBoolPoly {
     let np = b1.len() as u32;
-    let x1 = affine_form(0, b1, offset);
-    let x2 = affine_form(np, b2, offset);
-    let x3 = affine_form(2 * np, b3, offset);
-    let x4 = x_r.clone();
+    let x1 = FieldBoolPoly::linear(0, b1);
+    let x2 = FieldBoolPoly::linear(np, b2);
+    let x3 = FieldBoolPoly::linear(2 * np, b3);
+    let x4 = x_r.counted_clone();
     let bconst = FieldBoolPoly::constant(b);
     let s3_in_x3 = |p: &FieldBoolPoly, q: &FieldBoolPoly| {
         let a = p.add(q).sqr(gf);
@@ -502,48 +628,19 @@ mod tests {
     use crate::cryptanalysis::ic_boundary::random_binary_instance;
     use crate::cryptanalysis::ic_descent_degrees::curve_of;
     use crate::cryptanalysis::pq_descent::{weil_descend_s3, weil_descend_s4};
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use rand::rngs::StdRng;
     use rand::{Rng, SeedableRng};
-
-    /// **The affine descent's zeros are exactly the affine pairs and
-    /// triples whose summation polynomial vanishes**, by enumeration.
-    #[test]
-    fn the_affine_descent_vanishes_exactly_on_its_affine_decompositions() {
-        let inst = random_binary_instance(11, 5, 1 << 20).expect("a curve at n = 11");
-        let gf = &inst.gf;
-        let mut rng = StdRng::seed_from_u64(17);
-        let basis = standard_basis(4);
-        let offset = 1u64 << 7;
-        for summands in [2u32, 3] {
-            for _ in 0..4 {
-                let x_r = rng.gen::<u64>() & gf.mask;
-                let bases: Vec<Vec<u64>> = (0..summands).map(|_| basis.clone()).collect();
-                let sys = descend_affine(gf, inst.b, x_r, &bases, offset).unwrap();
-                assert_eq!(sys.offset, offset);
-                for v in 0u64..(1u64 << sys.n_vars) {
-                    let xs = sys.lift(v);
-                    assert!(
-                        xs.iter().all(|&x| x & offset == offset),
-                        "lift adds the offset"
-                    );
-                    let word = if summands == 2 {
-                        semaev_s3_word(gf, inst.b, xs[0], xs[1], x_r)
-                    } else {
-                        semaev_s4_word(gf, inst.b, xs[0], xs[1], xs[2], x_r)
-                    };
-                    let zero = sys.equations.iter().all(|e| e.eval(v) == 0);
-                    assert_eq!(zero, word == 0, "summands {summands}, v = {v:#x}");
-                }
-            }
-        }
-    }
 
     fn standard_basis(n_prime: u32) -> Vec<u64> {
         (0..n_prime).map(|k| 1u64 << k).collect()
     }
 
     fn sorted_masks(p: &F2BoolPoly) -> Vec<u64> {
-        let mut v: Vec<u64> = p.terms.iter().map(|t| t.mask).collect();
+        let mut v: Vec<u64> = p.terms.iter().map(|t| mask_low64(t.mask)).collect();
         v.sort_unstable();
         v
     }
@@ -646,7 +743,7 @@ mod tests {
             let direct = semaev_s3_word(gf, inst.b, xs[0], xs[1], x_r);
             for (j, eq) in sys.equations.iter().enumerate() {
                 assert_eq!(
-                    eq.eval(v) as u64,
+                    eq.eval(mask_from64(v)) as u64,
                     (direct >> j) & 1,
                     "equation {j} at {v:#x}"
                 );
@@ -666,7 +763,7 @@ mod tests {
             let direct = semaev_s4_word(gf, inst.b, xs[0], xs[1], xs[2], x_r);
             for (j, eq) in sys.equations.iter().enumerate() {
                 assert_eq!(
-                    eq.eval(v) as u64,
+                    eq.eval(mask_from64(v)) as u64,
                     (direct >> j) & 1,
                     "S4 equation {j} at {v:#x}"
                 );
