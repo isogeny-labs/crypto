@@ -18,6 +18,28 @@ IS_CRYPTANALYSIS = DIRECTORY.name == "ic-candidate-catalog"
 
 
 class SemanticValidatorTests(unittest.TestCase):
+    def test_original_half_trace_format_keeps_its_frozen_identity(self):
+        pdp = {"stage_code": "PDP2ht", "summand_count": 2,
+               "implementation": "experiments/pdp-degree-heuristics/htsolver.py"}
+        errors = []
+        gate.check_pdp_stage(pdp, errors, "half-trace")
+        self.assertEqual(errors, [])
+        for changed in ({"stage_code": "PDP2xl"}, {"summand_count": 3},
+                        {"implementation": "unknown.py"}, {"summand_count": True},
+                        {"solver_family": "ht"}, {"summands": 2}):
+            with self.subTest(changed=changed):
+                errors = []
+                gate.check_pdp_stage({**pdp, **changed}, errors, "half-trace")
+                self.assertTrue(errors)
+
+    def test_explicit_solver_family_still_has_to_match_the_stage(self):
+        pdp = {"stage_code": "PDP3xl", "summands": 3, "solver_family": "xl"}
+        errors = []
+        gate.check_pdp_stage(pdp, errors, "explicit")
+        self.assertEqual(errors, [])
+        gate.check_pdp_stage({**pdp, "solver_family": "ht"}, errors, "explicit")
+        self.assertTrue(errors)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -36,6 +58,39 @@ class SemanticValidatorTests(unittest.TestCase):
 
     def test_committed_metadata_passes(self):
         self.assertEqual(gate.validate(ROOT), [])
+
+    def test_integer_fields_accept_int_or_decimal_string(self):
+        curves = self.data()["curves"]
+        as_int = curves["toy13_kb1"]
+        as_string = copy.deepcopy(as_int)
+        for key in ("r", "cofactor", "curve_order", "trace"):
+            as_string["curve"][key] = str(as_string["curve"][key])
+        self.assertIsInstance(as_int["curve"]["r"], int)
+        for entry in (as_int, as_string):
+            errors = []
+            gate.check_curve_math_metadata(entry, errors, "t")
+            self.assertEqual(errors, [])
+        registry_encoding = next(e for e in curves.values()
+                                 if isinstance(e["curve"].get("subgroup_order"), str))
+        errors = []
+        gate.check_curve_math_metadata(registry_encoding, errors, "t")
+        self.assertEqual(errors, [])
+
+    def test_malformed_integer_strings_and_mismatched_orders_fail(self):
+        entry = copy.deepcopy(self.data()["curves"]["toy13_kb1"])
+        for bad in ("0", "01", "-5", "12.5", "0x10", " 7", True, 2.0):
+            broken = copy.deepcopy(entry)
+            broken["curve"]["r"] = bad
+            errors = []
+            gate.check_curve_math_metadata(broken, errors, "t")
+            self.assertTrue(any("subgroup order must be a positive integer or its decimal string"
+                                in error for error in errors), bad)
+        broken = copy.deepcopy(entry)
+        broken["curve"]["curve_order"] = str(entry["curve"]["curve_order"] + 1)
+        errors = []
+        gate.check_curve_math_metadata(broken, errors, "t")
+        self.assertTrue(any("differs from subgroup order times cofactor" in error for error in errors))
+        self.assertTrue(any("curve order and trace disagree" in error for error in errors))
 
     def test_curve_uid_must_match_exact_preimage(self):
         data = self.data()

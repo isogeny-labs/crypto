@@ -1,0 +1,728 @@
+{
+  "schema": "validation-gate-archive/v1",
+  "rows": [
+    {
+      "directory": "20261020-ic-oracle-setup-blocked",
+      "row": "| 2026-10-20 | [`20261020-ic-oracle-setup-blocked`](20261020-ic-oracle-setup-blocked/) | ecbench `ic.pipeline` oracle set-up (the negation-folded \\|F\\|² pair table), three builders of the same table: `mitm:negation_folded=1` (scalar), `mitm-prime-batch` (batched inversion) and the new `mitm-prime-blocked` (batched, packed cache-sized regions); `prime-abscissa:size=N`, N = 1,024 to 16,384, `incremental-gauss`, on registered `icv1-fp32-t7319-90da43e9` against `rho.negation`; 592 measured runs + 128 warmups (all 720 records verified), audits OK (30 exact replays); an interrupted first session B (27 records) kept | 456/456 executions identical across the builders, so S unchanged and tied across the §5a band; set-up wall blocked/batched 0.47 (N = 1,024) to 0.24 (16,384), blocked/scalar 0.25 to 0.12–0.13 (224 s → 28.2 s at 16,384), at about half the peak RSS (descriptive, L1); gap to rho unchanged, 33.0× at best (N = 1,024); engineering, a component speed-up | 4 vCPU Xeon 2.80 GHz VM, `ecbench run --cpus auto`, IC runs mostly L1 (hypervisor steal), rho L2 | [`research/ic_oracle_setup_blocked_20261020`](../research/ic_oracle_setup_blocked_20261020/README.md) ([PDF](20261020-ic-oracle-setup-blocked/REPORT.pdf)) |",
+      "sha256": "1b0ee0074ad7e9b1fd001974f50a71fba61474ee0398c7eff1d981c5c44b3017",
+      "disposition": "incomplete",
+      "reason": "The run has session audit receipts and sampled exact replays, but no gate-format independent replay certificate, independent headline recomputation, or matched-rho GAE-band validation. Keep the engineering observation in the research archive; it is not an admitted benchmark result.",
+      "provenance": [
+        "research/ic_oracle_setup_blocked_20261020/README.md",
+        "research/ic_oracle_setup_blocked_20261020/RESULT.json"
+      ]
+    },
+    {
+      "directory": "20261019-ic-matched-rho-v8",
+      "row": "| 2026-10-19 | [`20261019-ic-matched-rho-v8`](20261019-ic-matched-rho-v8/) | Rule's single-target comparison at v8, six Table A Koblitz curves (log2 r 36.6 to 47.2), 64 targets a size, 408 rows a run; two runs of one binary: rho with batched GFNI signed-Frobenius canonicalisation (matched) vs rho as at rule v7 (control); cold and online wall time | cold IC/rho with matched rho 4.67 [4.34, 5.07], 5.70, 7.07, 11.75, 10.65, 18.07 [15.98, 20.58] (control 3.59 to 11.56); matched/control 1.30 to 1.58; rho online 1.42 to 1.62× faster; same walks on 64/64 targets; IC online v8/v8c 0.976 to 1.033; slope of ln cold ratio on ln r 0.168 [0.128, 0.208] matched, 0.141 control (v3 0.176); no curve of log2 r ≥ 50 runnable (largest 47.21); class: engineering (rho kernel), accounting (larger distance), no advance | Emerald Rapids container (family 6 model 207), isolated_bench --cpus 2 | [`research/ic_tool_program/rule/v8`](../research/ic_tool_program/rule/v8/) · [report](20261019-ic-matched-rho-v8/report.pdf) |",
+      "sha256": "4e697af126d31b8eff8aa8b8912b1a89fbfc24854fe907ede5aff1b75f0733b1",
+      "disposition": "incomplete",
+      "reason": "The study contains run and replay artifacts, but the gate-format independent headline recomputation and protocol-matched rho reference band have not been recorded. Its inadmissible control remains explicitly qualified.",
+      "provenance": [
+        "research/ic_tool_program/rule/v8/README.md",
+        "research/ic_tool_program/rule/v8/PROTOCOL.md",
+        "research/ic_tool_program/rule/v8/matched.json"
+      ]
+    },
+    {
+      "directory": "20261017-two-sylow-fp64",
+      "row": "| 2026-10-17 | [`20261017-two-sylow-fp64`](20261017-two-sylow-fp64/) | `two_sylow_search` halving search (`Halver::run_draw`, both families, all three search arms) on `fp_backend::Fp64` at 2^63 − 25, baseline vs branch-free `Fp64` (PR #2034) `hwcost` binaries alternated A1 B1 A2 B2; `fp64` kernel as positive and `FpWide<1>` kernel as negative control | neutral within resolution: ratios 0.98–1.02 (pair 1) and 1.02–1.08 (pair 2, where unchanged controls also read high); S1 (no arm > +10%) PASS at 1.083; positive control 0.44, negative control within 4.5%; both binaries compute the same search (gate checksums identical) | Intel Xeon @ 2.10 GHz (family 6 model 207), 4 vCPU KVM, L0, no PMU | [`research/two_sylow_fp64_20261017`](../research/two_sylow_fp64_20261017/) ([run report](../research/two_sylow_fp64_20261017/reports/run-20261017T0018Z/run_report.pdf)) |",
+      "sha256": "9097700ad1a03d64cbd94b56b9b504e732edd404c0c6f27c21cf659ce04eff88",
+      "disposition": "incomplete",
+      "reason": "Raw A/B run samples and reports exist, but independent replay, recomputed headline receipt, and matched-rho GAE-band validation are not recorded in the required gate schema.",
+      "provenance": [
+        "research/two_sylow_fp64_20261017/README.md",
+        "research/two_sylow_fp64_20261017/PROTOCOL.md",
+        "research/two_sylow_fp64_20261017/runs/compare/summary.json"
+      ]
+    },
+    {
+      "directory": "20261014-ic-program-paper",
+      "row": "| 2026-10-14 | [`20261014-ic-program-paper`](20261014-ic-program-paper/) | figures of the index-calculus programme paper (no new measurement): commit activity, root-finding vs Gröbner, Koblitz n=13 loop progression, cold IC/rho gaps, Koblitz online ladder, D4 at k=4 and PKM tower, engine ratios | root finding 383–1,535× (binary vs matrix F4) and 3,021–5,802× (NIST vs Buchberger) per decomposition, 50–105× end to end vs msolve; best complete Koblitz n=13 IC S 38.82 → 22.97, 1.55× strong rho; D4 cuts C4 47.5–48.4×; admitted n=61 online 13.94× [9.81, 19.13] vs rho without a table, retired (preprocessing rho with equal advice 53–317× faster); genus-3 after cubic GHS about q^1.4 vs rho q^1.5, 1.15× a measured negation-map rho at q = 2^20 after round 2, a further 0.44× in rounds 3–4 not yet matched against rho; k=4 over F_(2^m)^4 6.1× rho at n ≈ 2^56, closing as n^(−1/4), crossover extrapolated near 2^68; n=83 online points retired (precomputed rho wins every matched pair); every cold IC arm above matched rho (updated 2026-10-20) | values as recorded in the cited studies | [`papers/ecdlp-index-calculus-program`](../papers/ecdlp-index-calculus-program/) ([paper PDF](20261014-ic-program-paper/paper.pdf)) |",
+      "sha256": "6d9b7d5d5dacbed4fa0e20823fd9ab34004c0dd0d473c8da252c7b3f34f8be17",
+      "disposition": "documentary",
+      "reason": "This is a synthesis of previously committed studies and explicitly reports no new measurement. It is retained as a documentary archive entry, not as an admitted benchmark measurement.",
+      "provenance": [
+        "papers/ecdlp-index-calculus-program/README.md",
+        "papers/ecdlp-index-calculus-program/figures/data.json"
+      ]
+    },
+    {
+      "directory": "20261019-pdp-split-closure-ecbench",
+      "row": "| 2026-10-19 | [`20261019-pdp-split-closure-ecbench`](20261019-pdp-split-closure-ecbench/) | `pdp-split` split/hybrid summation-polynomial oracle in `ic.pipeline` on the standard subspace vs its Frobenius closure (τ-slots), m = 2 on the dimension-9 invariant base, matched strong and signed-Frobenius rho; Koblitz n = 11, 13, 17, 19 | closure 0.35–0.54× standard in XOR-priced S; best F4 arm 36× strong rho (n = 11) and above; pair table 4.18× at n = 17; F4/SAT recorded S is a lower bound | cloud container, Xeon 2.10 GHz, 4 vCPU, L0 counts | [`research/pdp_split_slots_20261012`](../research/pdp_split_slots_20261012/README.md) |",
+      "sha256": "4af350792968d65acddc56e28b60e1b7fbf1eb076315bb853d6cb3fc671ff5e2",
+      "disposition": "censored",
+      "reason": "The study preserves censored n=19 sessions and F4/SAT lower-bound costs; no gate-format independent replay certificate, recomputed headline receipt, or matched-rho GAE-band validation is recorded. Retain its exact summary outside the admitted results table.",
+      "provenance": [
+        "research/pdp_split_slots_20261012/README.md",
+        "research/pdp_split_slots_20261012/ANALYSIS.json",
+        "research/pdp_split_slots_20261012/PROTOCOL.md"
+      ]
+    },
+    {
+      "directory": "20261019-factor-base-designs-ek1",
+      "row": "| 2026-10-19 | [`20261019-factor-base-designs-ek1`](20261019-factor-base-designs-ek1/) | Prime-field factor-base slope close-out (existing operation-count data), E-K1 Koblitz analogue solver-stage field-operation run, and A11 ecbench feasibility review | Stage diagnostics only: prime-field series with ≥3 cells are κ-unfavourable at measured sizes (A0 m=4 inconclusive at 2 cells); E-K1 14/14 series with ≥3 cells κ-unfavourable, 250/250 completed traces replayed, S m=3 inconclusive at both sizes; A11 not measured. No pipeline S or speedup | E-K1: shared Intel Xeon 2.80 GHz VM, 4 cores/15 GB, serialized but not isolated; older prime-field source runs retain their recorded hosts | [`research/factor_base_designs_20261015`](../research/factor_base_designs_20261015/), [`research/a11_pipeline_pricing_20261019`](../research/a11_pipeline_pricing_20261019/) ([E-K1 report](../research/factor_base_designs_20261015/reports/run-20261019T1712Z/REPORT.pdf), [prime-field review](../research/factor_base_designs_20261015/reports/review-20261019T1632Z/REVIEW.pdf)) |",
+      "sha256": "b9cc534a92c895a447933cd97e4c3a56653f80f74deec067f663498d618c463a",
+      "disposition": "incomplete",
+      "reason": "This post-freeze component observation has no complete gate-format independent replay, row-headline recomputation, and protocol-matched strongest-rho reference. Preserve the raw study and figures; do not present the row as an admitted validated result.",
+      "provenance": [
+        "research/factor_base_designs_20261015/README.md",
+        "research/factor_base_designs_20261015/runs/A0-m2.jsonl"
+      ]
+    },
+    {
+      "directory": "20261017-safecurves-trapdoor-slots",
+      "row": "| 2026-10-17 | [`20261017-safecurves-trapdoor-slots`](20261017-safecurves-trapdoor-slots/) | Sextic-twist census and toy search for strong published/twist classes with weak sibling classes; native CM census cross-check and candidate-count grind | Weak sibling rho work factors: 2^28 (secp192k1), 2^55.5 (secp224k1), 2^65.5 (secp256k1). Toy certified pair: 40 scanned primes at 128 bits; 256-bit probe stopped after 12 scans with seven orbits uncertifiable and no certified triple. No deployed-curve weakness beyond census rows, no key recovery, no 256-bit result | SageMath census and native Rust search; candidate counts, not qualified timing | [protocol and source evidence](../research/safecurves_trapdoor_slots_20261017/) ([report](20261017-safecurves-trapdoor-slots/report.pdf)) |",
+      "sha256": "21b29ef72d0aa837af075150ed270794ad073e34ca52973958d53553c7b87153",
+      "disposition": "documentary",
+      "reason": "The retained paper or census record is documentary and has no gate-compliant independent replay, headline recomputation, and protocol-matched rho reference. Preserve its evidence and figures without presenting this row as an admitted validated benchmark.",
+      "provenance": [
+        "research/safecurves_trapdoor_slots_20261017/PROTOCOL.md",
+        "research/safecurves_trapdoor_slots_20261017/round_c/grind_128.json"
+      ]
+    },
+    {
+      "directory": "20261019-adaptive-pair-cells",
+      "row": "| 2026-10-19 | [`20261019-adaptive-pair-cells`](20261019-adaptive-pair-cells/) | Exact binary pair-cell correctness/profile | 1,237 positive-dimensional fixed-grid certificates; adaptive dimension-65 cells; original all-roots unresolved; external comparison: not run (component contract, no matched full solver) | Shared managed host; diagnostic, no qualified isolation | [`report and raw evidence`](../research/autolab_cycle_20261019_v3/REPORT.md) |",
+      "sha256": "00e0211cc3f8d718b2873ba4b9118aeaa8c7edcd780a2433de774e6147df5325",
+      "disposition": "incomplete",
+      "reason": "This post-freeze component observation has no complete gate-format independent replay, row-headline recomputation, and protocol-matched strongest-rho reference. Preserve the raw study and figures; do not present the row as an admitted validated result.",
+      "provenance": [
+        "research/autolab_cycle_20261019_v3/REPORT.md",
+        "research/autolab_cycle_20261019_v3/raw/adaptive-dual-nullspace-pair-cells-n83-20261019-v2/scientific_result.json"
+      ]
+    },
+    {
+      "directory": "20261018-factor-base-shape-leads",
+      "row": "| 2026-10-18 | [`20261018-factor-base-shape-leads`](20261018-factor-base-shape-leads/) | Native shape, exact subgroup support and matched-representation F4 diagnostics | Degree-13 GP bases: 226/214 supported targets vs 144 coordinate (15 vs 16 columns); fresh holdout 15/128 and 17/128 vs 4/128. Solving degree stays 3. Changed bases increase successful F4 work; no total-cost, regularity, runtime or fastest claim. External comparison not run (tools unavailable on PATH). | Shared Linux x86-64 Xeon Platinum 8573C, five visible CPUs, one worker, no qualified timing | [Study](../research/factor_base_shape_leads_20261018/README.md) · [results PDF](20261018-factor-base-shape-leads/RESULTS.pdf) · [screen PDF](20261018-factor-base-shape-leads/SCREEN.pdf) · [follow-up PDF](20261018-factor-base-shape-leads/FOLLOWUP.pdf) |",
+      "sha256": "9419cdcce13596b78b85b053b7cfbf083ced64ef9895a7576807d30e7ed7f78d",
+      "disposition": "incomplete",
+      "reason": "This post-freeze component observation has no complete gate-format independent replay, row-headline recomputation, and protocol-matched strongest-rho reference. Preserve the raw study and figures; do not present the row as an admitted validated result.",
+      "provenance": [
+        "research/factor_base_shape_leads_20261018/README.md",
+        "research/factor_base_shape_leads_20261018/runs.tar.xz.sha256"
+      ]
+    },
+    {
+      "directory": "20261017-rootfinding-paper-synthesis",
+      "row": "| 2026-10-17 | [`20261017-rootfinding-paper-synthesis`](20261017-rootfinding-paper-synthesis/) | Manuscript synthesis of frozen norm-search evidence; no new measurements | Native coordinates 58,176→45,427; subsequent search UNKNOWN; no qualified speedup | Original records: managed Linux x86_64, one-core/4GiB development diagnostics; no fresh timing | [Paper](../papers/norm-rootfinding/), [PDF](20261017-rootfinding-paper-synthesis/norm_rootfinding.pdf) |",
+      "sha256": "8d4c70e687d6d7aaaaef3b1493e94e25d99acdd6deaef680d84dfb02862964a9",
+      "disposition": "documentary",
+      "reason": "The retained paper or census record is documentary and has no gate-compliant independent replay, headline recomputation, and protocol-matched rho reference. Preserve its evidence and figures without presenting this row as an admitted validated benchmark.",
+      "provenance": [
+        "papers/norm-rootfinding/README.md",
+        "papers/norm-rootfinding/data/evidence_map.json"
+      ]
+    },
+    {
+      "directory": "20261017-rootfinding-native-followup",
+      "row": "| 2026-10-17 | [`20261017-rootfinding-native-followup`](20261017-rootfinding-native-followup/) | Native long-XOR controls, actual GF(2^83) affine-cone count profile and changed bounded norm search | Internal variables58,176→45,427 (count only); changed search UNKNOWN,0 verified witnesses, no exact count,61.794 s supervising wall; source-symmetry restoration passed34,816 tiny assignments; no measured speedup | Managed Linux x86_64, CPU0/one-core and4GiB worker budgets, development diagnostics without qualified isolation | [Publication scope](../research/rootfinding_publication_20261017_v2/README.md), [v10 report](../research/autolab_cycle_20261017_v10/REPORT.md), [PDF](20261017-rootfinding-native-followup/research/autolab_cycle_20261017_v10/RESULTS.pdf) |",
+      "sha256": "070ffca2393f6bba0ab6cc13483764042b53cbcd7ac5b589c2a6335ac9a1d66d",
+      "disposition": "documentary",
+      "reason": "The retained paper or census record is documentary and has no gate-compliant independent replay, headline recomputation, and protocol-matched rho reference. Preserve its evidence and figures without presenting this row as an admitted validated benchmark.",
+      "provenance": [
+        "research/rootfinding_publication_20261017_v2/README.md",
+        "research/rootfinding_publication_20261017_v2/PUBLICATION_RECEIPT.json"
+      ]
+    },
+    {
+      "directory": "20261017-ic-a20-build-line-streams",
+      "row": "| 2026-10-17 | [`20261017-ic-a20-build-line-streams`](20261017-ic-a20-build-line-streams/) | the folded build's partition streams written a 64-byte line at a time by non-temporal stores, on A19's candidate; smoke: two isolated processes per arm at 2^44.3 and 2^47.2 (candidate and smoke, no exploration) | **no visible gain**: build 119 / 114 ms against 128 / 108 (2^44.3) and 238 / 220 against 231 / 229 (2^47.2); tests 207 passed; table and logarithms unchanged; not pursued | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate) | [`research/ic_tool_program/explorations/A20-build-line-streams-20261017`](../research/ic_tool_program/explorations/A20-build-line-streams-20261017/) ([PDF](20261017-ic-a20-build-line-streams/report.pdf)) |",
+      "sha256": "ef32a0e52a080361f94d21db3603b31b0780f21767958a1b2f0ae10a39c6ab07",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/explorations/A20-build-line-streams-20261017/README.md",
+        "research/ic_tool_program/explorations/A20-build-line-streams-20261017/SHA256SUMS"
+      ]
+    },
+    {
+      "directory": "20261017-ic-a19-filter-pages-build-parts",
+      "row": "| 2026-10-17 | [`20261017-ic-a19-filter-pages-build-parts`](20261017-ic-a19-filter-pages-build-parts/) | `ic price --single-target` cold time, v8 against v8 with A17's huge-page filter and the folded build's 64 partitions (not 256); `M1`'s two rows at the three target sizes, 6 rounds, alternating, 72 processes (exploration, no round) | v8/a19 **1.067** [1.010, 1.126], 1.014 [0.978, 1.051], **1.054** [1.012, 1.097] at 2^44.3 / 2^44.5 / 2^47.2; build 4.8–9.6% faster at the 2^44 sizes; 2^44.5's collection unmoved again; a round needs each lower end above 1.03, so none; every logarithm equal | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate); none contended | [`research/ic_tool_program/explorations/A19-filter-pages-build-parts-20261017`](../research/ic_tool_program/explorations/A19-filter-pages-build-parts-20261017/) ([PDF](20261017-ic-a19-filter-pages-build-parts/report.pdf)) |",
+      "sha256": "b0f5f6b3c5c3efb559f1472701732b17ca070db2d14bf4fcb8ce516d648fb993",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/explorations/A19-filter-pages-build-parts-20261017/README.md",
+        "research/ic_tool_program/explorations/A19-filter-pages-build-parts-20261017/SHA256SUMS"
+      ]
+    },
+    {
+      "directory": "20261017-ic-a18-wider-base",
+      "row": "| 2026-10-17 | [`20261017-ic-a18-wider-base`](20261017-ic-a18-wider-base/) | `ic price --single-target` cold time at 2^47.2 (`icv1-f2m61-t158598901-ab42b6c5`), the factor base widened from 320 to 400 and 470 signed-Frobenius orbits, on v8 and on A17's huge-page filter; `M1`'s two rows, 6 arms, 4 rounds, 48 processes (exploration, a recipe change, no round) | wider base on v8 1.020 [1.002, 1.037] (400) and 1.023 [0.994, 1.054] (470); nothing beyond A17 on A17; collection −27% but the build ×2.28 for ×2.17 stored pairs; A17 replicates 1.065 [1.040, 1.090]; every logarithm the suite's | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate); none contended | [`research/ic_tool_program/explorations/A18-wider-base-2p47-20261017`](../research/ic_tool_program/explorations/A18-wider-base-2p47-20261017/) ([PDF](20261017-ic-a18-wider-base/report.pdf)) |",
+      "sha256": "55f36a7d562a867182f60bdbcaf94e7027d976b72781fddfb9c3bf1a66338c33",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/explorations/A18-wider-base-2p47-20261017/README.md",
+        "research/ic_tool_program/explorations/A18-wider-base-2p47-20261017/SHA256SUMS"
+      ]
+    },
+    {
+      "directory": "20261017-ic-a17-filter-huge-pages",
+      "row": "| 2026-10-17 | [`20261017-ic-a17-filter-huge-pages`](20261017-ic-a17-filter-huge-pages/) | `ic price --single-target` cold time, v8 against v8 with the presence filter in a fresh 2 MiB-aligned mapping advised `MADV_HUGEPAGE` before it is written, and a same-binary heap control; `M1`'s two rows at the three target sizes, 6 rounds, rotating, 108 processes; stage probes on both, 48 processes (exploration, no round) | v8/a17 1.047 [0.999, 1.098], 0.976 [0.944, 1.009], **1.051** [1.029, 1.075] at 2^44.3 / 2^44.5 / 2^47.2; the copy costs nothing (heap/a17 1.054 at 2^47.2); filter stage 6.43 → 5.32 ns at 2^47.2 (8 MiB filter), no consistent change at the 4 MiB filters; gain at 2^47.2 only, so no round | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate); THP `madvise`; 4 + 2 contended runs excluded | [`research/ic_tool_program/explorations/A17-filter-huge-pages-20261017`](../research/ic_tool_program/explorations/A17-filter-huge-pages-20261017/) ([PDF](20261017-ic-a17-filter-huge-pages/report.pdf)) |",
+      "sha256": "e427e9145e87e12e740456a690aef9a70c82c8acd301d628cec40f10c7625f78",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/explorations/A17-filter-huge-pages-20261017/README.md",
+        "research/ic_tool_program/explorations/A17-filter-huge-pages-20261017/SHA256SUMS"
+      ]
+    },
+    {
+      "directory": "20261017-ic-a16-huge-pages",
+      "row": "| 2026-10-17 | [`20261017-ic-a16-huge-pages`](20261017-ic-a16-huge-pages/) | `ic price --single-target` cold time on v8, one binary, three arms: the folded table's scan arrays left on base pages, the filter alone collapsed onto 2 MiB pages after the build (`MADV_COLLAPSE`), or every scan array collapsed; `M1`'s two rows at the three target sizes, 6 rounds, rotating, 108 processes (exploration, no round) | filter alone 1.017 / 0.981 / **1.046** [1.026, 1.067] at 2^44.3 / 2^44.5 / 2^47.2; every array 0.970 / 0.979 / 1.012 (the build pays for collapsing the stored keys); every logarithm equal | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate); THP `madvise`; 1 contended run excluded | [`research/ic_tool_program/explorations/A16-huge-pages-20261017`](../research/ic_tool_program/explorations/A16-huge-pages-20261017/) ([PDF](20261017-ic-a16-huge-pages/report.pdf)) |",
+      "sha256": "dedfcbc8c62e8061a6d1af17e50242e412b69fdb4ed3b6dd3f30db2c80098576",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/explorations/A16-huge-pages-20261017/README.md",
+        "research/ic_tool_program/explorations/A16-huge-pages-20261017/SHA256SUMS"
+      ]
+    },
+    {
+      "directory": "20261017-ic-a15-filter-slots",
+      "row": "| 2026-10-17 | [`20261017-ic-a15-filter-slots`](20261017-ic-a15-filter-slots/) | `ic price --single-target` cold time, v8 against v8 with each scanned key's filter slot hashed once a block (not twice); `M1`'s two rows at 2^44.3, 2^44.5 and 2^47.2, 6 rounds, alternating, 72 processes (exploration, no round) | **negative**: cold v8/a15 0.958 [0.911, 1.007], 0.964 [0.935, 0.993], 0.983 [0.967, 1.000]; collection 2–6.5% slower; the filter stage is bound by memory, not its hash; every logarithm equal in both arms | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate); 1 contended run excluded | [`research/ic_tool_program/explorations/A15-filter-slots-20261017`](../research/ic_tool_program/explorations/A15-filter-slots-20261017/) ([PDF](20261017-ic-a15-filter-slots/report.pdf)) |",
+      "sha256": "93ce313e50166386ba38bde6ca7b67979cf7b7b3c9d0b5ef9ec7f138b710f6c3",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/explorations/A15-filter-slots-20261017/README.md",
+        "research/ic_tool_program/explorations/A15-filter-slots-20261017/SHA256SUMS"
+      ]
+    },
+    {
+      "directory": "20261017-ic-scan-stages-v8",
+      "row": "| 2026-10-17 | [`20261017-ic-scan-stages-v8`](20261017-ic-scan-stages-v8/) | the collection scan's stages on v8 by R04's probes (ported, `--features scan-probes`), ns a scanned summand; `M1`'s two rows at the three target sizes, 4 rounds, 24 processes (diagnostic) | scan 16.2 / 16.8 / 17.6 ns a summand at 2^44.3 / 2^44.5 / 2^47.2 (v3: 35.2 / 34.8 / 36.4): subtract 4.4, key 4.7–5.1, filter 5.0–6.6, admitted 1.6–2.5; scan 97–99% of collection, collection 56–82% of cold; probe overhead unmeasured | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate); 1 contended run excluded | [`research/ic_tool_program/explorations/scan-stages-v8-20261017`](../research/ic_tool_program/explorations/scan-stages-v8-20261017/) ([PDF](20261017-ic-scan-stages-v8/report.pdf)) |",
+      "sha256": "dd8f2d2e2da30806a05c7231d746ee80d93db5642ac30b18ebd3c894a8d3845e",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/explorations/scan-stages-v8-20261017/README.md",
+        "research/ic_tool_program/explorations/scan-stages-v8-20261017/SHA256SUMS"
+      ]
+    },
+    {
+      "directory": "20261017-ic-a14-prefetch-size-gate",
+      "row": "| 2026-10-17 | [`20261017-ic-a14-prefetch-size-gate`](20261017-ic-a14-prefetch-size-gate/) | `ic price --single-target` cold time, v8 against v8 with R12's run-prefetch pass skipped below 2^20 stored pairs; `M1`'s two rows at 2^27.8, 2^38.0 and 2^44.3, 6 rounds, alternating, 72 processes (exploration, no round) | **no gain, no round declared**: cold v8/gate 0.992 [0.964, 1.022] at 2^27.8, 0.961 [0.854, 1.083] at 2^38.0 (gate skips the pass), 1.011 [0.978, 1.046] at 2^44.3 (same code); collection 1.003 / 1.029 / 1.010; every logarithm equal in both arms; v8 stays the baseline | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate); 7 contended runs excluded | [`research/ic_tool_program/explorations/A14-prefetch-size-gate-20261017`](../research/ic_tool_program/explorations/A14-prefetch-size-gate-20261017/) ([PDF](20261017-ic-a14-prefetch-size-gate/report.pdf)) |",
+      "sha256": "478363e38ee2d0cc7ea07cc01306af8f4f493efd18f5d3c3eb41f2b426da78fc",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/explorations/A14-prefetch-size-gate-20261017/README.md",
+        "research/ic_tool_program/explorations/A14-prefetch-size-gate-20261017/SHA256SUMS"
+      ]
+    },
+    {
+      "directory": "20261017-ic-r12-admitted-prefetch",
+      "row": "| 2026-10-17 | [`20261017-ic-r12-admitted-prefetch`](20261017-ic-r12-admitted-prefetch/) | `ic price --single-target` cold time, v7 against v7 plus R12's second pass prefetching each admitted key's run, on the IC programme's frozen suite (40 rows, 5 rounds, ABAB) and 24 fresh holdouts; pin on 90 rows, own A/A band (222 processes) | **accepted as baseline v8**: every pinned output v0's; cold v7/v8 1.055 [1.036, 1.075], 1.055 [1.038, 1.072], 1.063 [1.053, 1.073] at 2^44.3 / 2^44.5 / 2^47.2 (holdouts 1.065, 1.057, 1.061), every interval above the declared 1.03 but below or at the low end of the prediction; collection 1.08–1.11×; 1–5% slower from 2^24.8 to 2^38.0 (2^27.8: 0.971 [0.950, 0.992]), inside the A/A rule; with R06, R08 and R11 1.90–1.98× over v4 — engineering | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate) | [`research/ic_tool_program/rounds/R12-admitted-prefetch`](../research/ic_tool_program/rounds/R12-admitted-prefetch/) ([PDF](20261017-ic-r12-admitted-prefetch/report.pdf)) |",
+      "sha256": "a38ea71db764af90714b9c1a052f1a93877707cf08ee4c9d3b4b71da05afba89",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/rounds/R12-admitted-prefetch/README.md",
+        "research/ic_tool_program/rounds/R12-admitted-prefetch/analysis.json",
+        "research/ic_tool_program/rounds/R12-admitted-prefetch/runs.tar.xz.sha256"
+      ]
+    },
+    {
+      "directory": "20261016-ic-r11-build-streams",
+      "row": "| 2026-10-16 | [`20261016-ic-r11-build-streams`](20261016-ic-r11-build-streams/) | `ic price --single-target` cold time, v6 (v4 + R06 + R08) against v6 plus R11's streamed pair-table build (each pair into one of 256 partitions on its run's stream, a presence filter per run), on the IC programme's frozen suite (40 rows, 5 rounds, ABAB) and 24 fresh holdouts; pin on 90 rows, own A/A band (224 processes) | **accepted as baseline v7**: every pinned output v0's; cold v6/v7 1.134 [1.107, 1.162], 1.124 [1.100, 1.148], 1.071 [1.049, 1.093] at 2^44.3 / 2^44.5 / 2^47.2 (holdouts 1.126, 1.157, 1.065), every interval above the declared 1.03; build phase 1.50–1.51× faster, collection unchanged; with R06 and R08 1.80–1.86× over v4 (product of paired ratios) — engineering; distance to matched rho not re-measured (rule at v6: 7.90, 7.40, 12.06× cold) | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate) | [`research/ic_tool_program/rounds/R11-build-streams`](../research/ic_tool_program/rounds/R11-build-streams/) ([PDF](20261016-ic-r11-build-streams/report.pdf)) |",
+      "sha256": "b0806bbf239da0d1b3cc3380d763c961ef4cd99804f7e7b03879a09ad684b603",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/rounds/R11-build-streams/README.md",
+        "research/ic_tool_program/rounds/R11-build-streams/analysis.json",
+        "research/ic_tool_program/rounds/R11-build-streams/runs.tar.xz.sha256"
+      ]
+    },
+    {
+      "directory": "20261016-ic-r08-scan-fold",
+      "row": "| 2026-10-16 | [`20261016-ic-r08-scan-fold`](20261016-ic-r08-scan-fold/) | `ic price --single-target` cold time, v5 (v4 + R06's scan key) against v5 plus R08's scan subtraction by carry-less folds (two `vpclmulqdq` folds a product, eight lanes, two inversion chains, coordinate slices), on the IC programme's frozen suite (40 rows, 5 rounds, ABAB; 10 at 2^44.3) and 24 fresh holdouts; pin on 90 rows, own A/A band (220 processes) | **accepted as baseline v6**: every pinned output v0's; cold v5/v6 1.326 [1.297, 1.356], 1.354 [1.316, 1.392], 1.398 [1.370, 1.425] at 2^44.3 / 2^44.5 / 2^47.2 (holdouts 1.319, 1.296, 1.409), every interval above the declared 1.05; collection 1.47–1.53×; with R06 1.59–1.73× over v4 (product of paired ratios); 2^18 / 2^22 read 0.90 / 0.94 inside the A/A rule — engineering, the programme's own lever; distance to matched rho not re-measured (rule at v3: 13.2, 12.0, 21.0× cold) | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate) | [`research/ic_tool_program/rounds/R08-scan-fold`](../research/ic_tool_program/rounds/R08-scan-fold/) ([PDF](20261016-ic-r08-scan-fold/report.pdf)) |",
+      "sha256": "0fc915d4a257575acdcdf6df28cf239a2cbce2c341c447db394fa5c39c9835f0",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/rounds/R08-scan-fold/README.md",
+        "research/ic_tool_program/rounds/R08-scan-fold/analysis.json",
+        "research/ic_tool_program/rounds/R08-scan-fold/runs.tar.xz.sha256"
+      ]
+    },
+    {
+      "directory": "20261016-ic-r06-scan-key",
+      "row": "| 2026-10-16 | [`20261016-ic-r06-scan-key`](20261016-ic-r06-scan-key/) | `ic price --single-target` cold time, v4 (main `92246530`) against v4 plus R06's scan key (GFNI basis change, VBMI2 funnel-shift least rotation), on the IC programme's frozen suite (40 rows, 5 rounds, ABAB; 10 at 2^44.5) and 24 fresh holdouts; pin on 90 rows, own A/A band (223 processes) | **accepted as baseline v5**: every pinned output v0's; cold v4/v5 1.197 [1.167, 1.228], 1.220 [1.197, 1.243], 1.241 [1.223, 1.260] at 2^44.3 / 2^44.5 / 2^47.2 (holdouts 1.174, 1.202, 1.268), every interval above the declared 1.03 and above the prediction; collection 1.26–1.30× — engineering, the programme's own lever; distance to matched rho not re-measured (rule at v3: 13.2, 12.0, 21.0× cold) | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate) | [`research/ic_tool_program/rounds/R06-scan-key`](../research/ic_tool_program/rounds/R06-scan-key/) ([PDF](20261016-ic-r06-scan-key/report.pdf)) |",
+      "sha256": "345d63c85a96f5d1d283907c5b983ea3722eae216c1af953b4deebf75743476a",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/rounds/R06-scan-key/README.md",
+        "research/ic_tool_program/rounds/R06-scan-key/analysis.json",
+        "research/ic_tool_program/rounds/R06-scan-key/runs.tar.xz.sha256"
+      ]
+    },
+    {
+      "directory": "20261016-ic-r10-main-head",
+      "row": "| 2026-10-16 | [`20261016-ic-r10-main-head`](20261016-ic-r10-main-head/) | `ic price --single-target` cold time, v3 (rebuilt from `995ea207`) against main at `92246530`, on the IC programme's frozen suite (40 rows, 5 rounds, ABAB) and 24 fresh holdouts; pin on 90 rows, own A/A band (220 processes), callgrind cross-check | **accepted as baseline v4**: every pinned output v0's; cold v3/main 1.017 [0.990, 1.045], 1.034 [1.012, 1.055], 1.007 [0.992, 1.022] at 2^44.3 / 2^44.5 / 2^47.2 (holdouts 0.992, 1.013, 1.011); no size regresses beyond its A/A band — engineering, credited to main | Emerald Rapids (family 6 model 207), 4 cores, isolated on CPU 2 (`isolated_bench`, PSI gate) | [`research/ic_tool_program/rounds/R10-main-head`](../research/ic_tool_program/rounds/R10-main-head/) ([PDF](20261016-ic-r10-main-head/report.pdf)) |",
+      "sha256": "afdef1015cdd637fdf523c23ee6b25d63ff505a573eec086f7c6b09dc8cba7ed",
+      "disposition": "incomplete",
+      "reason": "The frozen IC stage or pipeline record has no complete gate-format independent scalar replay, recomputation of this exact row, and same-unit strongest-rho reference. Preserve the protocol, analysis, run archive, and figures until a source-bound validator is filed.",
+      "provenance": [
+        "research/ic_tool_program/rounds/R10-main-head/README.md",
+        "research/ic_tool_program/rounds/R10-main-head/analysis.json",
+        "research/ic_tool_program/rounds/R10-main-head/runs.tar.xz.sha256"
+      ]
+    },
+    {
+      "directory": "20261016-n83-prebuilt-factor-base",
+      "row": "| 2026-10-16 | [`20261016-n83-prebuilt-factor-base`](20261016-n83-prebuilt-factor-base/) | three fresh native builds of a retained, signed-Frobenius degree-83 factor-base panel (54 objects, 83,328,324 compressed bytes each), followed by separate generic arithmetic replay of each original manifest against byte-identical reconstructed objects | internal build 59.518, 74.022, 169.555 s (max/min 2.85); outer real 60.07, 74.73, 172.78 s; replay 46.66, 52.15, 31.43 s with 54/54 PASS each. Build and replay are different work, with no speed ratio or admitted end-to-end IC improvement; original timing wrapper exited 1 after completed child due sandboxed `sysctl`, and RSS is missing | shared macOS arm64, L0, unisolated | [`research/n83_prebuilt_factor_base_20261016`](../research/n83_prebuilt_factor_base_20261016/RESULT.md) ([run PDF](20261016-n83-prebuilt-factor-base/RUN_REPORT.pdf), [result PDF](20261016-n83-prebuilt-factor-base/RESULT.pdf), [review PDF](20261016-n83-prebuilt-factor-base/REVIEW.pdf)) |",
+      "sha256": "250dd4fff8e6aa355e5e77804900f9a06591ec51f43136235bf5841c811c05f6",
+      "disposition": "incomplete",
+      "reason": "The retained build and reconstruction observations are not a validated end-to-end IC comparison; a gate-compliant independent metric report and protocol-matched rho reference are missing. Preserve the original timings, hashes, and figures as historical evidence.",
+      "provenance": [
+        "research/n83_prebuilt_factor_base_20261016/PROTOCOL.md",
+        "research/n83_prebuilt_factor_base_20261016/RESULT.md"
+      ]
+    },
+    {
+      "directory": "20261018-pdp-ps3-bitsliced",
+      "row": "| 2026-10-18 | [`20261018-pdp-ps3-bitsliced`](20261018-pdp-ps3-bitsliced/) | Bit-sliced group-law oracle, 64/256/512 lanes; per-target at l = 11 on two CPU hosts, with exact root/digest checks | Reported baseline/arm: 23.8–62.5× on host A and 17.5–50.3× on host B; bs512/scalar 0.935× and 1.117×; isolated 4-thread requirement blocked | Xeon 2.80 GHz and 2.10 GHz (separate hosts, no pooling) | [`study`](../research/pdp_oracle_speedup_20261011/ps3_bitsliced/) ([host A PDF](20261018-pdp-ps3-bitsliced/hostA_report.pdf), [host B PDF](20261018-pdp-ps3-bitsliced/report.pdf)) |",
+      "sha256": "3fb0849fb04b5fe0a211672c82b981df843754d6968c5e22631d5fede552adca",
+      "disposition": "incomplete",
+      "reason": "This post-freeze component observation has no complete gate-format independent replay, row-headline recomputation, and protocol-matched strongest-rho reference. Preserve the raw study and figures; do not present the row as an admitted validated result.",
+      "provenance": [
+        "research/pdp_oracle_speedup_20261011/ps3_bitsliced/README.md",
+        "research/pdp_oracle_speedup_20261011/ps3_bitsliced/raw/ab_summary_excl_contended.md"
+      ]
+    },
+    {
+      "directory": "20261026-n83-d18-solver-gates",
+      "row": "| 2026-10-26 | [`20261026-n83-d18-solver-gates`](20261026-n83-d18-solver-gates/) ([ordered PDF](20261026-n83-d18-solver-gates/ordered-RUN.pdf), [cadence PDF](20261026-n83-d18-solver-gates/cadence32-RUN.pdf), [result PDF](20261026-n83-d18-solver-gates/RESULT.pdf)) | Exact full-D18 N83 base, separate ordered and native XOR cadence-32 solver-gate attempts; one constructed control and one natural query attempted in the ordered run, one constructed attempt in the cadence run | Ordered constructed: 66.994 s import, 1.077 s search, checked rank one; natural censored at 2,400 s worker cap. Cadence-32: 303.192 s supervisor wall, censored before model import. Cold IC and same-target rho missing; no ratio or selection | Shared Apple M4 Pro, L0 exploratory; cadence host saturated | [ordered run](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261025T2339Z-ordered-d18/REPORT.md), [cadence run](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261026T0121Z-cadence32/REPORT.md), [result](../research/koblitz_n83_factor_base_sweep_20261008/reports/d18-solver-gates-20261026/RESULT.md) |",
+      "sha256": "30859bebccbbe1e0a67b696d39a881dca904ecbda88606c262b2bc97227db71c",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261026-n83-d18-solver-gates/.artifacts.json",
+        "benchmarks/20261026-n83-d18-solver-gates/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261026-humbert-genus5-cover",
+      "row": "| 2026-10-26 | [`20261026-humbert-genus5-cover`](20261026-humbert-genus5-cover/) | End-to-end index calculus on the descended genus-5 (twisted Humbert) cover of E / F_{q^4} vs matched Pollard rho on E(F_{q^4})[r], toy fields q = 61–8009 (15 primes), 3 seeds, two arms (full factor base; factor base halved by the F_q-involution iota), 90 runs; phases: relations, linear algebra (dense / scalar Wiedemann), individual-log descent through the explicit transfer | 90/90 logs recovered, all invariant checks pass; rho faster at every q (row medians); median IC / expected-steps rho, iota arm: 780× at q = 61, 1.14× [1.06, 6.60] at q = 4001, 2.37× [1.96, 4.17] at q = 8009; iota vs full on the same instance: unknowns 2.00×, IC time 1.95–10.2× for q ≥ 1009; reproduction and classifier, not an IC-baseline improvement | 4 vCPU Xeon 2.10 GHz shared VM, no isolation; IC and rho paired in one process | [`research/humbert_genus5_cover_20261021`](../research/humbert_genus5_cover_20261021/README.md) ([PDF](20261026-humbert-genus5-cover/REPORT.pdf)) |",
+      "sha256": "2b3844b725a32bcfdad809f179fa704706c8342348855e06e8ae42f2066c2421",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261026-humbert-genus5-cover/.artifacts.json",
+        "benchmarks/20261026-humbert-genus5-cover/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261017-volcano-ecdlp-census",
+      "row": "| 2026-10-22 | [`20261017-volcano-ecdlp-census`](20261017-volcano-ecdlp-census/) | rho (`rho.negation`, `rho.plain`), BSGS (`textbook`, `negation`) and IC (`ic.pipeline`, `prime-abscissa:size=64` + `mitm:negation_folded=1`) on every curve of three whole 26-bit ℓ-volcanoes (V1 ℓ=2, 400 curves; V2 ℓ=3, 378; V3 ℓ=2 j=0 crater, 16), plus 2 isomorphic re-scalings per vertex; instances carried down, up (two floor subtrees), sideways and native by verified Vélu maps (`planted_shared` targets); 79 sessions, 403,168 measured runs, all verified, every audit OK; preregistered plan + frozen analysis | positive control passes (j=0 crater `rho.cubic`/`rho.negation` 0.573 [0.562, 0.585], theory 0.577); no level effect: 33/35 level ratios equivalent (TOST ±5% rho/BSGS, ±10% IC), 2 inconclusive, 0 different; no curve effect beyond the isomorphic-control spread; transport is exact and ≤1.3% of a solve, never faster than solving at source; IC/matched rho 42.4× (V1) and 61.5× (V2) at 0 GAE, 65.1× / 92.7× at 1 GAE, rho ahead across the §5a band; V3 crater vs `rho.cubic` 84.9×; a null result (no volcano-level effect), not an advance; erratum A3 after first validation, residual wording notes R1–R4 in VALIDATOR_REPORT.md | 4 vCPU Xeon VM, `ecbench run --cpus auto`; counts only (wall not admitted: 6–13% of rows at L1) | [`research/volcano_ecdlp_census_20261017`](../research/volcano_ecdlp_census_20261017/REPORT.md) ([PDF](20261017-volcano-ecdlp-census/report.pdf)) |",
+      "sha256": "64e81c50c0c1e29345b3e2fbd5d4301867e6e5581cb1f0d7d5811b7ceb6df4cf",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-volcano-ecdlp-census/SHA256SUMS",
+        "benchmarks/20261017-volcano-ecdlp-census/VALIDATION.json"
+      ]
+    },
+    {
+      "directory": "20261021-n83-k128-split-index",
+      "row": "| 2026-10-21 | [`20261021-n83-k128-split-index`](20261021-n83-k128-split-index/) ([run PDF](20261021-n83-k128-split-index/RUN.pdf), [result PDF](20261021-n83-k128-split-index/RESULT.pdf), [stage chart](20261021-n83-k128-split-index/index_build.svg), [capacity chart](20261021-n83-k128-split-index/capacity.svg)) | Four paired N83 K128 exact-root index stage controls, dual and shared Bloom, with reversed run orders; 21,248-point base, 680,000 states and 1,359,488 roots in every arm; a four-thread control matched serial index digests for both layouts | Monolithic/split index-build seconds: dual A 22.393/15.919, dual B 14.285/15.502, shared A 18.030/28.390, shared B 24.862/14.632; timing direction changes with order; shared Bloom saves 524,288 bytes against dual split filters at K128; calculated K5086/K4549 layout uses 12.5 GiB exact tables, 2.5 GiB less than K5086/K4300; dual wide3 Blooms use 2.5 GiB, 1.5 GiB less than shared | shared macOS host, exploratory stage diagnostic and calculated capacity; four-thread control establishes output identity | [`research/n83_two_tier_root_20261021`](../research/n83_two_tier_root_20261021/RUN.md) |",
+      "sha256": "b0aaf2b0dfd023e1f2646b69441ecae22333e7159c1d7d802667362a40343c56",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261021-n83-k128-split-index/.artifacts.json",
+        "benchmarks/20261021-n83-k128-split-index/.gitattributes"
+      ]
+    },
+    {
+      "directory": "20261019-volcano-tall-layers",
+      "row": "| 2026-10-19 | [`20261019-volcano-tall-layers`](20261019-volcano-tall-layers/) | Pre-registered generic-rho level study across ten tall volcanoes; 14,731 rho.negation solves, 608 sampled curves, 592 positive-control pairs | Tier-a and all-ten pooled comparisons meet the ±5% margin; positive control resolves the plain/negation difference. Three tier-b sessions were interrupted; their verified records were retained. No isogeny-transfer or wall-time claim | L0, operation counts only | [protocol and raw study](../research/volcano_tall_layers_20261018/) ([report](20261019-volcano-tall-layers/report.pdf)) |",
+      "sha256": "4f4058a1d0ef9dd1bafc3ab0d4592f90c4cedcbfe8a84364aa3948c740f5eae8",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261019-volcano-tall-layers/README.md",
+        "benchmarks/20261019-volcano-tall-layers/fig_levels.svg"
+      ]
+    },
+    {
+      "directory": "20261018-volcano-prime-layers",
+      "row": "| 2026-10-18 | [`20261018-volcano-prime-layers`](20261018-volcano-prime-layers/) | rho.plain and rho.negation operation counts on two depth-8 ℓ=2 prime-field volcanoes; 864 verified records, eight exact replays | 14/16 intervals include the null; both exclusions are rho.plain ratios involving the single m5 crater curve. Wide intervals; no tight equivalence or transfer claim | Busy host, L0; counts only | [tables and raw study](../research/volcano_prime_layers_20261018/) ([report](20261018-volcano-prime-layers/report.pdf)) |",
+      "sha256": "12a017b5527161dfbf97c17ec9ef00da0e6130d9eb5cc4ed3de1aca5f6b410f6",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-volcano-prime-layers/README.md",
+        "benchmarks/20261018-volcano-prime-layers/fig_levels.svg"
+      ]
+    },
+    {
+      "directory": "20261018-volcano-koblitz-n83",
+      "row": "| 2026-10-18 | [`20261018-volcano-koblitz-n83`](20261018-volcano-koblitz-n83/) | Native construction and factorisation of Φ₆₄₇₃(X,j₀), followed by level-1 neighbour census on the n=83 Koblitz curve | 8,590 s on 3 threads; 6,474 distinct j-invariants found/expected; 48/48 sampled neighbours have one twist of order N; no n=83 rho/ECbench measurement | Native 3-thread build; structural census, not solver timing | [hashed results and logs](../research/volcano_koblitz_n83_20261018/) ([report](20261018-volcano-koblitz-n83/report.pdf)) |",
+      "sha256": "d192f05be853011213850519e15f6712c1286d97254413b0b308b7d8abafd037",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-volcano-koblitz-n83/README.md",
+        "benchmarks/20261018-volcano-koblitz-n83/fig_levels.svg"
+      ]
+    },
+    {
+      "directory": "20261018-volcano-koblitz-layers",
+      "row": "| 2026-10-18 | [`20261018-volcano-koblitz-layers`](20261018-volcano-koblitz-layers/) | rho.plain and rho.negation counts on crater and level-1 neighbours for Koblitz n=19, 23, 37, 41, 61 | All rho.negation intervals include 1; one of ten rho.plain intervals excludes 1 at n=41. Earlier ±8% claim retracted; intervals are too wide for a tight equality claim. No isogeny maps | L0, deterministic operation counts | [tables and audit logs](../research/volcano_koblitz_layers_20261018/) ([report](20261018-volcano-koblitz-layers/report.pdf)) |",
+      "sha256": "8a1b936a5f0cb42dd6ea30c256495aa3671beff23faed44c586319f3097df0c1",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-volcano-koblitz-layers/README.md",
+        "benchmarks/20261018-volcano-koblitz-layers/fig_layers.svg"
+      ]
+    },
+    {
+      "directory": "20261018-jv-cover-large-prime",
+      "row": "| 2026-10-18 | [`20261018-jv-cover-large-prime`](20261018-jv-cover-large-prime/) | Large-prime variation of the jv_cover decomposition path; measured yields on 576 real decompositions and derived sub-base cost model | For p ≤ 12k, best modelled saving ≤0.56%; the 10% S-saving gate fails by >18×. At p=12k, LA is 0.25% of S; no wall-time or rho comparison is claimed. | Shared box, no isolation; operation counts and model only | [`study`](../research/jv_cover_large_prime_20261018/) ([report PDF](20261018-jv-cover-large-prime/report.pdf)) |",
+      "sha256": "04e2723f21215d71f0d3e10164b99657230775e1e8243e23847c41ea2f94193a",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-jv-cover-large-prime/.artifacts.json",
+        "benchmarks/20261018-jv-cover-large-prime/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261018-n83-k16627-natural-query",
+      "row": "| 2026-10-18 | [`20261018-n83-k16627-natural-query`](20261018-n83-k16627-natural-query/) | retained primary N83 K=16,627 signed-Frobenius base, frozen P2 preflight / A1 selector control / B unpinned m=4 public query / delayed A2 selector control | P2/A1/A2 worker walls 43.737231 / 60.034319 / 68.854539 s; B `UNKNOWN_budget` at 1,790.010187 s, exit 124, no OOM or relation receipt; A1/A2 each returned the same independently replayed constructed rank-one relation; different workloads and delayed A2 give no speed ratio | EC2 m8i.8xlarge spot, one CPU, 4 GiB zero swap, shared host L0 | [`research/n83_k16627_m4_natural_query_20261018`](../research/n83_k16627_m4_natural_query_20261018/RESULT.md) ([run PDF](20261018-n83-k16627-natural-query/RUN_REPORT.pdf), [result PDF](20261018-n83-k16627-natural-query/RESULT.pdf)) |",
+      "sha256": "8e0715bd46bd54d207e83b5c99c4f52171a87a3e933a80234d16c88b6c5fdec7",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-n83-k16627-natural-query/.artifacts.json",
+        "benchmarks/20261018-n83-k16627-natural-query/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261019-isogeny-class-rho-n45",
+      "row": "| 2026-10-19 | [`20261019-isogeny-class-rho-n45`](20261019-isogeny-class-rho-n45/) | replica of the whole-class Pollard rho study on one 46-bit prime-field class (P2, 38 curves, 4,400 solves, all verified); operation counts, null result; wall time unisolated (L0) | pooled mean 1.0097 × √(πn/2); KW p 0.38, ANOVA p 0.67, no curve flagged; planted fold 0.732, planted 4-adding 1.291; replay 220/220 identical; generators family deviated (KW p 1.2e-4) and did not replicate on a fresh seed (p 0.97). Not a speed-up. |",
+      "sha256": "b90d0d9ac160237f228d324bec03342967f8e3bc3d69fba988e857f09b2ab3e7",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261019-isogeny-class-rho-n45/ADDENDUM-generators.md",
+        "benchmarks/20261019-isogeny-class-rho-n45/PROTOCOL.md"
+      ]
+    },
+    {
+      "directory": "20261018-isogeny-class-rho",
+      "row": "| 2026-10-18 | [`20261018-isogeny-class-rho`](20261018-isogeny-class-rho/) | Pollard rho on one ECDLP instance carried by verified isogenies across four whole isogeny classes (prime `F_p` 347,004 curves / 104 measured over 12 End-ring strata through ℓ = 3…61; `j = 0` class 45 curves; binary `F_2^37` 327,080 curves / 40 measured; Koblitz `F_2^41` 708,153 curves / 11 measured through 409- and 1721-isogenies found by the torsion route); 100 paired seeds per curve, 100 or 64 generators per curve, shifted instances, isomorphic / representation controls, planted and structural folds | 85,425 solves, all correct; no curve, stratum, level, degree, kernel field, generator or source left the preregistered band (largest \\|z\\| 3.03 / 2.42 / 3.02 / 2.38 against 3.49 / 3.26 / 3.23 / 2.84; KW p 0.09–0.21); pooled means 1.02 / 1.00 / 1.02 / 1.00 × √(πn/2); planted negation fold 0.63–0.77 (expected 0.71), 4-adding walk 1.27–1.36; `j = 0` automorphism fold 0.439 (expected 0.408); Koblitz Frobenius fold 0.155 (expected 0.156), with negation 0.113 (0.110), 1.7× / 2.2× faster in wall time at 1.9–2.0 µs per step; rho against rho, no IC claim; second-host replay matched iteration/restart/DP/escape counts on all 22,700 rows, with descriptive aggregate ns/iter ratios 0.6120 (P1), 0.6074 (P0), 0.6165 (B1), 0.7503 (K); not a controlled cross-host speed comparison | 4 vCPU Xeon 2.10 GHz, shared, L0; second host: 4 vCPU Xeon 2.10 GHz VM (cross-host wall ratios are descriptive only) | [`research/isogeny-class-rho`](../research/isogeny-class-rho/) ([report PDF](../research/isogeny-class-rho/report.pdf), [run](../research/isogeny-class-rho/runs/run-20261018T0857Z/), [protocol](../research/isogeny-class-rho/PROTOCOL.md)) |",
+      "sha256": "2eb0f6bd20df92b6d34224015c2c1a74380aa5f0b0c320f75e0f4e091ee26760",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-isogeny-class-rho/.artifacts.json",
+        "benchmarks/20261018-isogeny-class-rho/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261019-r5-3-ntt-sqrt-velu",
+      "row": "| 2026-10-19 | [`20261019-r5-3-ntt-sqrt-velu`](20261019-r5-3-ntt-sqrt-velu/) | Counted polynomial / √élu work with Karatsuba vs three-prime NTT; generic kernel finding and derived crossover | NTT √élu 0.798 [0.775, 0.820] over 2^16..2^24 (0.745 [0.686, 0.804] over 2^20..2^24); generic 2.582 vs 2.587; 1.11× counted cost at ℓ=2^24; no 0.5–0.6 exponent reached, and no rational-kernel crossover within ℓ≤2√p in the extrapolated table | Shared contended host; wall crossover ≈3072–4096 coefficients vs count crossover 512; counted unit is stated, not measured | [`research/isogeny_fibers_20261010/round5/r5_3_ntt_sqrt_velu/RESULTS.md`](../research/isogeny_fibers_20261010/round5/r5_3_ntt_sqrt_velu/RESULTS.md) ([PDF](20261019-r5-3-ntt-sqrt-velu/report.pdf)) |",
+      "sha256": "81ed3cb32b6988717856a47562d6fc13bceb50ab11b7ac884ceda62d695141f0",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261019-r5-3-ntt-sqrt-velu/.artifacts.json",
+        "benchmarks/20261019-r5-3-ntt-sqrt-velu/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261019-r6-4-vertical-margin-2",
+      "row": "| 2026-10-19 | [`20261019-r6-4-vertical-margin-2`](20261019-r6-4-vertical-margin-2/) | Counted generic kernel-finding costs: measured 61-bit toy ladder, ψℓ factoring, Φℓ(j,Y) evaluation/root costs; exact per-step projection through ℓ = 2^16 | Measured ladder exponent 2.582 [2.544, 2.620] for ℓ = 37–863; projected NTT fit above 2^13 is 1.919 [1.724, 2.115], with extrapolated crossover shifts. No sub-rho or deployed-curve claim; Φℓ generation and all additions are uncounted, so route rankings are conditional on the restricted cost model; W = 1 M is assumed | Shared, contended 4-vCPU host; arithmetic counts, not qualified wall-time speedup | [research and raw evidence](../research/isogeny_fibers_20261010/round6/r6_4_vertical_margin_2/) ([report](20261019-r6-4-vertical-margin-2/report.pdf)) |",
+      "sha256": "93d98b74072fd492dc9c11b09a6043dd1a3aa810e36675d94408c846e0c3062d",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261019-r6-4-vertical-margin-2/.artifacts.json",
+        "benchmarks/20261019-r6-4-vertical-margin-2/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261018-n83-k16627-selector-only",
+      "row": "| 2026-10-18 | [`20261018-n83-k16627-selector-only`](20261018-n83-k16627-selector-only/) | exact retained N83 K=16,627 signed-Frobenius base, four-summand seven-x-block A1 full-choice / B selector-only / A2 full-choice sequence under one binary | all three arms returned the same checked rank-one relation; A1/B/A2 worker walls 38,614.439768 / 42,786.035270 / 36,311.395725 ms including base import; SAT calls 10.045541 / 6,487.732878 / 17.313917 ms; B had 517 decisions, 222 conflicts and 826 completed XOR passes with phase wires free; C omitted by frozen B-SAT condition; no natural yield, complete IC cost or end-to-end ratio | arm64 Linux container on shared macOS, one CPU, 4 GiB zero swap, no network, L0 | [`research/n83_k16627_m4_selector_only_20261018`](../research/n83_k16627_m4_selector_only_20261018/RUN_REPORT.md) ([run PDF](20261018-n83-k16627-selector-only/RUN_REPORT.pdf), [result PDF](20261018-n83-k16627-selector-only/RESULT.pdf)) |",
+      "sha256": "8c093cfc394495350a2d03863c5f2e09d798b721f73a4f5f1b09e02853810c68",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-n83-k16627-selector-only/.artifacts.json",
+        "benchmarks/20261018-n83-k16627-selector-only/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261018-n83-k16627-selector-positive",
+      "row": "| 2026-10-18 | [`20261018-n83-k16627-selector-positive`](20261018-n83-k16627-selector-positive/) | exact retained N83 K=16,627 signed-Frobenius base, full m=4 orbit-domain model with four known selector and phase-zero choices pinned after seven x blocks | `PASS_SELECTOR_PINNED_WITNESS`: base import 35,356.152683 ms, model 187.394292 ms, root `Fixpoint` in 146.397875 ms, SAT call 8.861792 ms, worker wall 35,821.806933 ms; one checked constructed rank-one relation, exit 0 without OOM, 2,662,318,080-byte peak; no same-source unpinned ratio or complete IC cost | arm64 Linux container on shared macOS, one CPU, 4 GiB zero swap, no network, L0 | [`research/n83_k16627_m4_selector_positive_20261018`](../research/n83_k16627_m4_selector_positive_20261018/RUN_REPORT.md) ([run PDF](20261018-n83-k16627-selector-positive/RUN_REPORT.pdf), [result PDF](20261018-n83-k16627-selector-positive/RESULT.pdf)) |",
+      "sha256": "d03f663d533868e7d7be8c56ac7b648b75f73d2bfb83b8215721b706626679dd",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-n83-k16627-selector-positive/RESULT.pdf",
+        "benchmarks/20261018-n83-k16627-selector-positive/RUN_REPORT.pdf"
+      ]
+    },
+    {
+      "directory": "20261018-n83-k16627-m4-search-progress",
+      "row": "| 2026-10-18 | [`20261018-n83-k16627-m4-search-progress`](20261018-n83-k16627-m4-search-progress/) | exact retained N83 K=16,627 signed-Frobenius base, seven-block m=4 post-root SAT progress under a 1,800-second cap | root `Fixpoint` in 199.977792 ms; SAT entered at 39.623697 s; last of 176 fsynced samples at 1,792.112144 s recorded 322,255 decisions, 360 conflicts, 2 restarts; 175/175 periodic phases `XorPropagation`; `UNKNOWN_wall_cap`, exit 124 without OOM, 2,662,309,888-byte peak; no complete IC cost or speed ratio | arm64 Linux container on shared macOS, one CPU, 4 GiB zero swap, no network, L0 | [`research/n83_k16627_m4_search_progress_20261018`](../research/n83_k16627_m4_search_progress_20261018/RUN_REPORT.md) ([run PDF](20261018-n83-k16627-m4-search-progress/RUN_REPORT.pdf), [result PDF](20261018-n83-k16627-m4-search-progress/RESULT.pdf)) |",
+      "sha256": "753545025458df85479785d94448a799abe0687d12e7ebc5a0634457069be78f",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-n83-k16627-m4-search-progress/.artifacts.json",
+        "benchmarks/20261018-n83-k16627-m4-search-progress/.gitattributes"
+      ]
+    },
+    {
+      "directory": "20261018-n83-k16627-m4-root-phase",
+      "row": "| 2026-10-18 | [`20261018-n83-k16627-m4-root-phase`](20261018-n83-k16627-m4-root-phase/) | exact retained N83 K=16,627 signed-Frobenius base, seven-block four-summand root-propagation and capped SAT control | root `Fixpoint` in 185.023 ms with zero decisions/conflicts; SAT entered at 35.437 s then `UNKNOWN_wall_cap`, exit 124 without OOM, 2,661,863,424-byte peak; post-root conflicts/models/rank unknown, unpinned arm not attempted; no speed ratio or complete IC cost | arm64 Linux container on shared macOS, one CPU, 4 GiB zero swap, no network, L0 | [`research/n83_k16627_m4_root_phase_20261018`](../research/n83_k16627_m4_root_phase_20261018/RUN_REPORT.md) ([run PDF](20261018-n83-k16627-m4-root-phase/RUN_REPORT.pdf), [result PDF](20261018-n83-k16627-m4-root-phase/RESULT.pdf)) |",
+      "sha256": "a03b9111cd206ddda90758ad59ca6c1b56b7c46e30406c10e72f90e52c594695",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-n83-k16627-m4-root-phase/.artifacts.json",
+        "benchmarks/20261018-n83-k16627-m4-root-phase/.gitattributes"
+      ]
+    },
+    {
+      "directory": "20261018-n83-k16627-m4-witness",
+      "row": "| 2026-10-18 | [`20261018-n83-k16627-m4-witness`](20261018-n83-k16627-m4-witness/) | exact retained N83 K=16,627 signed-Frobenius base, full seven-block four-summand witness control under a 1,800-second outer wall cap | group preflight rank 1 and tamper rejection; full orbit model 201,598 variables, 5,915,238 clauses, 3,901 XOR rows; SAT entered at 40.267 s then `UNKNOWN_wall_cap`, exit 124 without OOM, 2,661,351,424-byte peak; conflicts/models/group lift unknown, unpinned arm not attempted; no speed ratio or complete IC cost | arm64 Linux container on shared macOS, one CPU, 4 GiB zero swap, no network, L0 | [`research/n83_k16627_m4_witness_20261018`](../research/n83_k16627_m4_witness_20261018/RUN_REPORT.md) ([run PDF](20261018-n83-k16627-m4-witness/RUN_REPORT.pdf), [result PDF](20261018-n83-k16627-m4-witness/RESULT.pdf)) |",
+      "sha256": "617a33cb0c262c3fa48c53277a91755d63a2e25da8d8422b7bf2fa5eba765637",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-n83-k16627-m4-witness/.artifacts.json",
+        "benchmarks/20261018-n83-k16627-m4-witness/.gitattributes"
+      ]
+    },
+    {
+      "directory": "20261018-n83-k16627-m4-planted",
+      "row": "| 2026-10-18 | [`20261018-n83-k16627-m4-planted`](20261018-n83-k16627-m4-planted/) | exact retained N83 K=16,627 signed-Frobenius base, pinned four-summand SAT positive-control attempt under a 1,800-second outer wall cap | `UNKNOWN_wall_cap`, container exit 124 without OOM, 2,660,335,616-byte cgroup peak; no worker phase/solver/relation receipt, unpinned arm not attempted; no speed ratio or complete IC cost | arm64 Linux container on shared macOS, one CPU, 4 GiB zero swap, no network, L0 | [`research/n83_k16627_m4_planted_20261017`](../research/n83_k16627_m4_planted_20261017/RUN_REPORT.md) ([run PDF](20261018-n83-k16627-m4-planted/RUN_REPORT.pdf), [result PDF](20261018-n83-k16627-m4-planted/RESULT.pdf)) |",
+      "sha256": "1df858fe5fef240d25ad7ad43e05c5c191a06d5def79701de00700fcf1649297",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-n83-k16627-m4-planted/.artifacts.json",
+        "benchmarks/20261018-n83-k16627-m4-planted/.gitattributes"
+      ]
+    },
+    {
+      "directory": "20261017-n83-k16627-m4-capacity",
+      "row": "| 2026-10-17 | [`20261017-n83-k16627-m4-capacity`](20261017-n83-k16627-m4-capacity/) | exact retained N83 K=16,627 signed-Frobenius base, m=4 native orbit-domain model construction and one-variable negative-cap control | full model `PASS_model_construction_only`: 201,598 SAT variables, 5,915,238 clauses, 3,901 XOR rows, 2,661,126,144-byte cgroup peak; full-arm base import 67.294 s and model construction 0.325 s L0; control `UNKNOWN_variable_cap` as frozen. No solver search, relation/rank or speed ratio | arm64 Linux containers on shared macOS, one CPU, 4 GiB zero swap, no network, L0 | [`research/n83_k16627_m4_capacity_20261017`](../research/n83_k16627_m4_capacity_20261017/RUN_REPORT.md) ([run PDF](20261017-n83-k16627-m4-capacity/RUN_REPORT.pdf), [result PDF](20261017-n83-k16627-m4-capacity/RESULT.pdf)) |",
+      "sha256": "e1eb93b6d704fc2fd903a3370fad4e8d75d805ab2ce488a038fcc49ef4586048",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-n83-k16627-m4-capacity/.artifacts.json",
+        "benchmarks/20261017-n83-k16627-m4-capacity/.gitattributes"
+      ]
+    },
+    {
+      "directory": "20261017-n83-k16627-prebuild",
+      "row": "| 2026-10-17 | [`20261017-n83-k16627-prebuild`](20261017-n83-k16627-prebuild/) | two native constructions of one primary GF(2^83) K=16,627 signed-Frobenius base, generic replay of every point and versioned S3 round trip | 16,627 columns, 2,760,082 points, 83,701,045 compressed bytes; first construction 34.164 s L0 internal (peak missing), byte-identical repeat 46.440 s and 507,568,128-byte cgroup peak; generic replay PASS, 31.134 s container wall and 834,940,928-byte peak; S3 download hash PASS. Distinct phases and contended L0 walls; no speed ratio, relation/rank or complete IC gain | arm64 Linux containers on shared macOS, one CPU and 4 GiB zero swap for each run, L0 | [`research/n83_k16627_prebuild_20261017`](../research/n83_k16627_prebuild_20261017/RUN_REPORT.md) ([run PDF](20261017-n83-k16627-prebuild/RUN_REPORT.pdf), [result PDF](20261017-n83-k16627-prebuild/RESULT.pdf)) |",
+      "sha256": "919f2974add6f95053eb8cb97265a2e146ba344cd41de341edfe041518692d20",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-n83-k16627-prebuild/.artifacts.json",
+        "benchmarks/20261017-n83-k16627-prebuild/.gitattributes"
+      ]
+    },
+    {
+      "directory": "20261019-volcano-repaired-7937",
+      "row": "| 2026-10-19 | [`20261019-volcano-repaired-7937`](20261019-volcano-repaired-7937/) | Frozen bounded survey; clean checkpoint | 7,937 vertices / all 51 strata; 126,992 records: 81,666 verified, 39,550 exhausted, 5,776 timeout. 4,117,173 relations / 193,153,057 actual calls. Unqualified clocks; partial population and original full scope open. | Frozen native runner; capsule host observations and separate epochs | [Evidence](../research/full_volcano_graphwide_ic_20261017/execution/publication-20261018T2313Z/README.md), [PDF](20261019-volcano-repaired-7937/report.pdf) |",
+      "sha256": "45e181aae10b0987e09ac1efdd47d529bf7c8d76df5dea4b91a7cb5195ccc598",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261019-volcano-repaired-7937/.artifacts.json",
+        "benchmarks/20261019-volcano-repaired-7937/.gitattributes"
+      ]
+    },
+    {
+      "directory": "20261018-volcano-repaired-6137",
+      "row": "| 2026-10-18 | [`20261018-volcano-repaired-6137`](20261018-volcano-repaired-6137/) | Frozen bounded survey; clean publication pause | 6,137 vertices / all 51 strata; 98,192 accepted records: 63,182 verified, 30,553 exhausted, 4,457 timeout. 3,181,542 relations / 149,275,746 actual calls. Earlier interruptions retained; unqualified clocks, partial distributions and full original scope open. | Frozen release runner, retained capsule host metadata, multiple runtime epochs | [Evidence](../research/full_volcano_graphwide_ic_20261017/execution/publication-20261018T1835Z/README.md), [PDF](20261018-volcano-repaired-6137/report.pdf) |",
+      "sha256": "09c9ca4ae14bca2ee88889f4c92e683a66c04e1e63b06c5b72f0a63c0320aff3",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-volcano-repaired-6137/.artifacts.json",
+        "benchmarks/20261018-volcano-repaired-6137/.gitattributes"
+      ]
+    },
+    {
+      "directory": "20261018-volcano-repaired-5533",
+      "row": "| 2026-10-18 | [`20261018-volcano-repaired-5533`](20261018-volcano-repaired-5533/) | Recovered frozen bounded survey | 5,533 vertices / all51 strata; 88,528 accepted records: 56,959 verified, 27,545 exhausted, 4,024 timeout. 2,870,489 relations / 134,616,948 actual calls. Interrupted attempt retained; unqualified clocks, not full-vertex/matrix completion. | Frozen release runner, retained capsule host metadata, multiple runtime epochs | [Evidence](../research/full_volcano_graphwide_ic_20261017/execution/recovery-20261018T1647Z/README.md), [PDF](20261018-volcano-repaired-5533/report.pdf) |",
+      "sha256": "395b27a3bae34ef47675a0845e3526aa8f51e800bd766a89aed4d39c9515f5b2",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261018-volcano-repaired-5533/.artifacts.json",
+        "benchmarks/20261018-volcano-repaired-5533/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261017-n83-structured-m4",
+      "row": "| 2026-10-17 | [`20261017-n83-structured-m4`](20261017-n83-structured-m4/) | retained 2,001-column signed-Frobenius N83 base, native bounded m=4 chained-S3 queries and unchanged m=5 source-path control; imported 332,166 points | m=4: 8/8 calls `Unknown` at 5,000 conflicts, 40,000 completed conflicts, 784.331 s worker wall, 487,276,544-byte cgroup peak, zero accepted rows and rank 0/2,002 within cap; m=5: 4 completed `Unknown` calls, 20,000 completed conflicts, next call interrupted at 900.062 s worker cap, rank unobserved. Different arities and censored outcomes; no speed ratio or complete IC gain | arm64 Linux containers on shared macOS, one CPU and 4 GiB zero swap per arm, L0; m=5 overlapped an exporter build | [`research/n83_structured_m4_20261017`](../research/n83_structured_m4_20261017/RUN_REPORT.md) ([run PDF](20261017-n83-structured-m4/RUN_REPORT.pdf), [result PDF](20261017-n83-structured-m4/RESULT.pdf)) |",
+      "sha256": "75cfea518169e859e648ffbd8ba38d88c58d25456b50d48a97f91bcbec3c0137",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-n83-structured-m4/.gitattributes",
+        "benchmarks/20261017-n83-structured-m4/IMPORT_REPORT.pdf"
+      ]
+    },
+    {
+      "directory": "20261017-C-full-point-orders",
+      "row": "| 2026-10-17 | [`20261017-C-full-point-orders`](20261017-C-full-point-orders/) | Original C full selected-point-order EC PH and k=1 finite-field PH/relations | 3,738 verified targets per arm; 7,476 primary records and exact separate replay. Largest prime 7. 26,166 setup / 161,336 target equations. No qualified timing or speed claim. | Xeon Platinum 8573C; reserved CPU 4, PSI unavailable; replay contention retained | [Evidence](../research/full_volcano_graphwide_ic_20261017/execution/full_point_order/README.md) |",
+      "sha256": "9b49fa7d75e68f4b4c5d764b7ae6072dc93fd4608b9659191495e701789deb86",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-C-full-point-orders/run-20261017T1909Z-C-full-point-source/.artifacts.json",
+        "benchmarks/20261017-C-full-point-orders/run-20261017T1909Z-C-full-point-source/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261017-volcano-repaired-4037",
+      "row": "| 2026-10-17 | [`20261017-volcano-repaired-4037`](20261017-volcano-repaired-4037/) | Repaired bounded survey checkpoint | 4,037 vertices / all 51 strata; 64,592 records: 41,573 verified, 20,132 exhausted, 2,887 timeout. 2,098,636 relations / 98,188,909 actual calls. Raw clocks unqualified; not full coverage. | Frozen release runner; multiple runtime epochs | [Evidence](../research/full_volcano_graphwide_ic_20261017/execution/checkpoint-4037/README.md), [PDF](20261017-volcano-repaired-4037/report.pdf) |",
+      "sha256": "557cd2ad53f4778fd344447b374a03b95338a88161a2c06e4dcd85d2e17b0e9b",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-volcano-repaired-4037/.artifacts.json",
+        "benchmarks/20261017-volcano-repaired-4037/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261017-n83-k992-tier1",
+      "row": "| 2026-10-17 | [`20261017-n83-k992-tier1`](20261017-n83-k992-tier1/) ([plot PDF](20261017-n83-k992-tier1/panel.pdf), [paired rows](20261017-n83-k992-tier1/paired_rows.csv)) | Three exact N83 root11 factor bases, K992/K1024/K1107, on ten sealed one-target points; 30 independently replayed IC and same-point rho pairs, two admitted cloud strata | K1107 selected for complete cold process: mean 99.562 s, 5.897 s faster than K992 and 3.679 s faster than K1024 on paired points (exact p=0.001953125 each); online size selection `BOUNDED_UNKNOWN`; all 30 rho/IC online ratios exceed one | two concurrent distinct GitHub Actions Tier 1 runner allocations; 10% paired calibration gate passed | [`research/n83_k992_cold_followup_20261017`](../research/n83_k992_cold_followup_20261017/RESULT.md) |",
+      "sha256": "7066d884ca197d8eb8ae69c8bb980c030ba068e9b6f7420967c09e3af016d437",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-n83-k992-tier1/.artifacts.json",
+        "benchmarks/20261017-n83-k992-tier1/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261017-n83-k1000-extension",
+      "row": "| 2026-10-17 | [`20261017-n83-k1000-extension`](20261017-n83-k1000-extension/) ([run PDF](20261017-n83-k1000-extension/RUN.pdf), [results PDF](20261017-n83-k1000-extension/RESULT.pdf), [graph PDF](20261017-n83-k1000-extension/screen.pdf)) | N83 K984/K1000/K1016 root11 factor-base controls on one previously exposed point; three fresh full processes and independent base, relation, scalar and phase replay | K1016 shortest of this extension at 94.452 s cold; K1000 115.501 s and K984 148.974 s; all exceed the prior local K992/root11 75.841 s in a different time interval, so this is a negative diagnostic rather than a paired speedup | shared Apple M4 Pro, L0 exploratory; one process per arm | [`research/n83_k1000_extension_20261017`](../research/n83_k1000_extension_20261017/RESULT.md) |",
+      "sha256": "68d506272f6de8673ac19a2f2114cf38b18eea00df1f4b46b64db68e131f4cca",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-n83-k1000-extension/.artifacts.json",
+        "benchmarks/20261017-n83-k1000-extension/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261017-n83-k992-layout-screen",
+      "row": "| 2026-10-17 | [`20261017-n83-k992-layout-screen`](20261017-n83-k992-layout-screen/) ([run PDF](20261017-n83-k992-layout-screen/RUN.pdf), [results PDF](20261017-n83-k992-layout-screen/RESULT.pdf), [graph PDF](20261017-n83-k992-layout-screen/screen.pdf)) | N83 K928/K960/K992 root11 and K992 root22 factor bases on one previously exposed point; four fresh processes with independent base, relation, scalar and phase replay | K992/root11 full cold process 75.841 s, root22 76.330 s on the same 164,672-point base; K960/root11 77.389 s and 176.344 ms target online versus K992/root11 30.587 ms; K928/root11 98.488 s | shared Apple M4 Pro, L0 exploratory; one process per arm | [`research/n83_k992_layout_screen_20261017`](../research/n83_k992_layout_screen_20261017/RESULT.md) |",
+      "sha256": "eb46d3398d7d2dc7cd9c7acdafb44499d882472f2fd2f7a46292b8104495bc24",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-n83-k992-layout-screen/.artifacts.json",
+        "benchmarks/20261017-n83-k992-layout-screen/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261017-n83-lower-k-screen",
+      "row": "| 2026-10-17 | [`20261017-n83-lower-k-screen`](20261017-n83-lower-k-screen/) ([PDF](20261017-n83-lower-k-screen/screen.pdf)) | N83 current-source root11 factor bases K768–K1107 on one previously exposed point; eight fresh processes with full base, relation, scalar and phase replay | K992, 164,672 usable points and 992 folded columns, had the lowest observed cold process time at 95.223 s; K768's smaller index was offset by 103.980 s rank work and 916.981 ms target lookup | shared Apple M4 Pro, L0 exploratory; one process per arm | [`research/n83_k992_cold_followup_20261017/local_screen`](../research/n83_k992_cold_followup_20261017/local_screen/RESULT.md) |",
+      "sha256": "93317849fd68d8e8a2a84725f85b3fa6447fc6ab7012232217c4890f8907085a",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-n83-lower-k-screen/.artifacts.json",
+        "benchmarks/20261017-n83-lower-k-screen/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261017-n83-finalist",
+      "row": "| 2026-10-17 | [`20261017-n83-finalist`](20261017-n83-finalist/) ([PDF](20261017-n83-finalist/RESULT.pdf)) | N83 four K values and root11/root22 layouts on 16 sealed one-target IC and same-point rho pairs per candidate; 128 IC and 128 rho replays | K1107/root11 cold mean 104.826 s, 3.949 s below K1120/root11 on matched points [3.404, 4.494] s; K1120/root11 online median 73.487 ms and paired rho/IC median 22.355; strict eight-arm online and cold selections `BOUNDED_UNKNOWN` | two distinct four-vCPU GitHub AMD EPYC 9V74 Tier 1 hosts; before/after rho calibration passed | [`research/n83_e2e_finalist_results_20261017`](../research/n83_e2e_finalist_results_20261017/RESULT.md) |",
+      "sha256": "28c105250fefb7d62ff6be1c3409fc30f359bc556ae1fbb9e9b2d18966097bf7",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-n83-finalist/.artifacts.json",
+        "benchmarks/20261017-n83-finalist/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261017-n83-current-source-controls",
+      "row": "| 2026-10-17 | [`20261017-n83-current-source-controls`](20261017-n83-current-source-controls/) | N83 same-source K1248/K1280/K2543/K2816/K3072/K3450/K3500 four-point root-index factor-base controls on one previously exposed public point; full base, relation, scalar and candidate replay | K1280/root11: 212,480 usable points, 1,280 columns, 4.73325 ms one-target online, 146.960 s receipt wall; K2543/root11: 18.983375 ms online, 401.115 s wall; observed K1280 interval 4.01× shorter on this point | shared macOS host, L0 exploratory, one process per arm | [`research/n83_smallk_current_source_20261017/`](../research/n83_smallk_current_source_20261017/) ([run PDF](20261017-n83-current-source-controls/run_report.pdf), [results PDF](20261017-n83-current-source-controls/results_report.pdf)) |",
+      "sha256": "bcf6b2f1fec082a828ac71167995746e6621adb46f4645953f223a8afae5280f",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261017-n83-current-source-controls/.artifacts.json",
+        "benchmarks/20261017-n83-current-source-controls/.gitignore"
+      ]
+    },
+    {
+      "directory": "20261015-u64-rootbatch",
+      "row": "| 2026-10-16 | [`20261015-u64-rootbatch`](20261015-u64-rootbatch/) | matched baseline/candidate whole-process A/B of the Koblitz orbit-DLP fast path u64 pipeline (n ≤ 63): `S3Solver` split into prepare/finish and a new `RootBatch` shares one Itoh–Tsujii inversion per state via Montgomery's trick instead of one per candidate; n=41, 16 public synthetic targets, 3 interleaved reps against `origin/main` `9f7fb66e6b` | engineering: whole-process median 76.4 s → 23.4 s (3.26×; 1.87× min-to-min on a contended shared host), ~~rank stage 2.95×, per-target median 6.09×~~ **Corrected 2026-10-20 by validation sweep (verdict: contradicted; [sweep-B verdicts](https://github.com/aburan28/crypto/blob/claude/validation-sweep-b-benchmarks-20261019/research/validation_sweep_20261019/B-benchmarks/verdicts.jsonl) row 44.2):** those two cells compared the candidate's fastest repetition against the baseline median; true median-vs-median over 3 reps (`raw/s3-*.txt`) is rank stage **2.47×** (30,333 → 12,303 ms) and per-target median **5.00×** (1,298 → 259.5 ms). The whole-process 3.26× median and 1.87× min-to-min stand. Caveats: no A/A control, no frozen protocol, L0 shared host, 3 reps, 11 of 16 targets solved; not a leaderboard or stronger-reference row. ~80× fewer field inversions per solved state; recovered scalars, relations and probe counts identical on every rep (3/3); new batched-vs-scalar equivalence unit test (4,096 inputs incl. exceptional paths) | Apple M4 Pro, 14 cores, shared, no isolation receipt | [`research/u64_root_batch_20261015`](../research/u64_root_batch_20261015/) ([run report PDF](20261015-u64-rootbatch/run-report.pdf)) |",
+      "sha256": "8d4f46c24998214ffcf6e566eea1ba5e3a1aebbfac9885d4737298dcb6e885d1",
+      "disposition": "documentary",
+      "reason": "The 2026-10-19 benchmark sweep verdict is contradicted, so this row is no longer admitted.",
+      "provenance": [
+        "benchmarks/20261015-u64-rootbatch/ab-comparison.png",
+        "benchmarks/20261015-u64-rootbatch/ab-comparison.svg"
+      ]
+    },
+    {
+      "directory": "20261015-ic-linear-algebra-cado",
+      "row": "| 2026-10-15 | [`20261015-ic-linear-algebra-cado`](20261015-ic-linear-algebra-cado/) | the IC linear-algebra step on synthetic m = 3 relation systems (D = 2¹⁰…2¹⁸ columns, 62-bit prime, 3 seeds): `IncrementalGauss`, `StructuredGauss`, filter + block Wiedemann / Lanczos, against CADO-NFS `bwc` on identical matrices and CADO-NFS's own purge + merge-dl + bwc; then a port of CADO-NFS's filter into `koblitz_sparse_la` (`FilterStrategy::Cado`) and its speed-up; real `ic logs` end to end | engine: ours 1.86× faster than CADO `bwc` on the same 65,858-column core at D = 131,072 (4 threads); after the port, D = 262,144: our pipeline 86.57 s → 8.35 s (10.40×, per-seed 9.99–11.06) and 1.93× (1.74–1.96) faster than CADO-NFS (7.83 s vs 14.73 s) in one session; new filter slower below ~4,096 columns (0.40× at 1,024, milliseconds); LA is 0.11–1.9% of real `ic logs` runs; ecbench's `IncrementalGauss` 19.1 s at 8,192 columns; **Annotation 2026-10-19 ([R10 ledger](../research/ic_tool_program/ledger/r10-20261019/README.md)): holds at ≥ 8,192 synthetic columns.** Below 4,096 the shipped `ic logs` default (CADO-style filter) is the slower one (0.40× at 1,024); the default is unvalidated at the sizes real IC matrices have (repair R11) | 4 vCPU Xeon @ 2.80 GHz, shared, L0 | [`research/la_engines_20261014`](../research/la_engines_20261014/) ([results PDF](../research/la_engines_20261014/REPORT.pdf), [run report](../research/la_engines_20261014/reports/run-20261014T1728Z/report.pdf)) |",
+      "sha256": "875aaaebe54a34a73bb1f26bb283eacef3d46f4360753ab77dc131a0e9f3b198",
+      "disposition": "incomplete",
+      "reason": "This admitted row has no gate-format VALIDATION.json and is outside the pre-gate freeze, so it cannot stay on the admitted table.",
+      "provenance": [
+        "benchmarks/20261015-ic-linear-algebra-cado/REPORT.pdf",
+        "benchmarks/20261015-ic-linear-algebra-cado/amend4_density.png"
+      ]
+    },
+    {
+      "directory": "20261014-n71-n83-hosted-single-target",
+      "row": "| 2026-10-14 | [`20261014-n71-n83-hosted-single-target`](20261014-n71-n83-hosted-single-target/) | Koblitz compact-orbit single-target panels, n=71 a=0 and n=83 a=1, K=600 fixed, 16 one-target eval workloads each, paired with strong rho rung 3 on the same public hash-to-curve points | **SUPERSEDED, not an improvement. Corrected 2026-10-20 by validation sweep (verdict: contradicted; [sweep-B verdicts](https://github.com/aburan28/crypto/blob/claude/validation-sweep-b-benchmarks-20261019/research/validation_sweep_20261019/B-benchmarks/verdicts.jsonl) row 104.1).** ~~online speedup rho/IC median **7.29x** (95% CI 4.64–13.38) at n=71 and **12.29x** (3.26–32.21) at n=83~~ (original claim, kept for the record): rho started every process with an empty distinguished-point table while the IC's 760 s setup was excluded. Ratio of mean online times is 4.21x at n=71 (IC slower online on 1 of 16) and 2.80x at n=83 (IC slower online on 4 of 16). Against a precomputed-table rho, precomputed rho is faster by the median paired ratio in every matched comparison (IC/rho 3.74x to 395.53x, all 95% CIs above 1, 1-2 of 16 pairs at K3300 favour IC; see [`20261016-n83-precomputed-rho-control`](20261016-n83-precomputed-rho-control/), row above). Cold end to end the IC is 133.7x slower (n=83). Original annotation follows; **Annotation 2026-10-16 (claim audit): the n=83 12.29x overstates.** It is a median of per-workload ratios; the ratio of mean online times is **2.80x** (rho 5,538 ms / IC 1,976 ms over the 16 workloads), and IC was slower online on 4 of 16. Rho started each process with an **empty** distinguished-point table while the IC's 760 s setup is excluded, so this is not a matched precomputation-rho comparison (a precomputed-rho control is a separate task). Cold, end to end, the IC is **133.7x slower** than rho (median, CI 100.9–175.5). Quote the cold ratio, not 12.29x; cold IC/rho 154.4 and 133.7 (setup paid per process); verify PASS 256/256 files per run, 16/16 claim-checks, 0 contended samples; local contended M4 comparison runs 5.6x / 9.46x, agreement within intervals | AMD EPYC 7763 4 vCPU, `ubuntu-24.04`, reserved core (`tools/isolated_bench.py`), producers pinned, `RAYON_NUM_THREADS=1` | [`research/sat_factor_base_review_20260908/autolab/evidence/20261014-koblitz-n71-n83-hosted-single-target`](../research/sat_factor_base_review_20260908/autolab/evidence/20261014-koblitz-n71-n83-hosted-single-target/) ([report PDF](20261014-n71-n83-hosted-single-target/REPORT.pdf)) |",
+      "sha256": "9cb7a3aaaa2b27d7d078b2d94196d184b919645d2dd69157b370eb3a80fd7ba4",
+      "disposition": "documentary",
+      "reason": "The 2026-10-19 benchmark sweep verdict is contradicted, so this row is no longer admitted.",
+      "provenance": [
+        "benchmarks/20261014-n71-n83-hosted-single-target/REPORT.pdf",
+        "benchmarks/20261014-n71-n83-hosted-single-target/n71-n83-hosted-online-ms.png"
+      ]
+    },
+    {
+      "directory": "20261013-ecbench-frontier",
+      "row": "| 2026-10-13 | [`20261013-ecbench-frontier`](20261013-ecbench-frontier/) | evidence synthesis and current-binary ECBench replay audit across the ten-base catalog, torsion/Frobenius symmetry, F4/F5/F6-IC, native pair/subtraction root finding, and the N83 dense five-byte root index | cold one-target frontier remains signed-Frobenius rho (medium-tier 1.089x floor [0.927, 1.261]); compact orbit is the best measured factor-base arm but 9.985x matched rho at n17; ~~admitted retained-setup online frontier is n61 rho/IC 13.9x [9.8, 19.1], while N83 is exploratory at 18.528x~~ **both SUPERSEDED. Corrected 2026-10-20 by validation sweep (verdict: contradicted; [sweep-B verdicts](https://github.com/aburan28/crypto/blob/claude/validation-sweep-b-benchmarks-20261019/research/validation_sweep_20261019/B-benchmarks/verdicts.jsonl) row 108.1):** both ratios are against rho without a precomputed table; Bernstein-Lange rho at equal advice is 53-317x faster online at n=41/53/61 ([`20261014-ic-next10-09-equal-advice`](20261014-ic-next10-09-equal-advice/)) and precomputed rho wins every N83 matched pair ([`20261016-n83-precomputed-rho-control`](20261016-n83-precomputed-rho-control/)). The cold frontier statement stands; its complete IC process is 339.068 s, reported separately from rho online and not as a matched cold ratio; current replays: factor-base 8/8 and representative F4/F5/F6 7/7 identical, root-finder session 120/168 with 48 inherited-F4 solver-counter mismatches retained at 2026-10-13; **Corrected 2026-10-20 by validation sweep (verdict: contradicted; [sweep-A row S:frontier:rootfinder-replay-block](https://github.com/aburan28/crypto/blob/claude/validation-sweep-a-leaderboard-20261019/research/validation_sweep_20261019/A-leaderboard/verdicts.jsonl)):** replaying the same session on current main gives 72/168 identical with 96 mismatches in all four IC arms (ic-f4-m2, ic-f4-m3, ic-rootfind-m2, ic-rootfind-m3, 24 rows each); this is an open regression under investigation (sweep D, PR #2290), and the root-finder rows are not claimed to pass | source studies span their recorded hosts; current auditor: virtual AMD EPYC 9V74, Linux x86_64, `ECBHW1h7373da65e433`; no new wall benchmark | [`research/ecbench_frontier_20261013`](../research/ecbench_frontier_20261013/) ([report PDF](20261013-ecbench-frontier/REPORT.pdf)) |",
+      "sha256": "a1a9e074f94d5389d33e1cccbf69181d41f3d6c5c0ce7bf4360c0c56df8a3b72",
+      "disposition": "documentary",
+      "reason": "The 2026-10-19 benchmark sweep verdict is contradicted, so this row is no longer admitted.",
+      "provenance": [
+        "benchmarks/20261013-ecbench-frontier/REPORT.pdf",
+        "benchmarks/20261013-ecbench-frontier/cold_ops_gap.png"
+      ]
+    },
+    {
+      "directory": "20261013-n83-dense-root",
+      "row": "| 2026-10-13 | [`20261013-n83-dense-root`](20261013-n83-dense-root/) | opt-in dense packed S3 root table and prefix-base widths K1271/K1500/K1798 on exact N83 Koblitz `a=1`; one public target paired with selected strong rho, then a secondary 64-point panel | K1798 dense: 298,468 actual base points, 8 GiB allocated slots, 169,069.8 mean probes versus K1500 dense 300,021.9; paired difference 130,952.1 probes, 95% bootstrap [52,057.7, 209,990.8]; ~~one-target online 63.324 ms versus same-point rho 1,173.293 ms, exploratory ratio 18.528~~ **SUPERSEDED, not an improvement vs the strongest reference. Corrected 2026-10-20 by validation sweep (verdict: contradicted; [sweep-B verdicts](https://github.com/aburan28/crypto/blob/claude/validation-sweep-b-benchmarks-20261019/research/validation_sweep_20261019/B-benchmarks/verdicts.jsonl) row 110.1):** the rho arm had an empty table, one target, L0 shared Apple M4 Pro; precomputed-table Bernstein-Lange rho wins every matched N83 pair (see [`20261016-n83-precomputed-rho-control`](20261016-n83-precomputed-rho-control/)). The within-IC K1798 vs K1500 counted comparison above (paired difference 130,952.1 probes, bootstrap [52,057.7, 209,990.8]) stands; two K1500 regular 900 s timeouts retained; 256 completed panel rows independently replayed | Apple M4 Pro 14 cores, shared, no host-isolation receipt (exploratory CPU times) | [`research/n83_dense_root_20261013`](../research/n83_dense_root_20261013/) ([result PDF](../research/n83_dense_root_20261013/REPORT.pdf), [primary](../research/n83_dense_root_20261013/reports/run-20261013T0942Z/), [panel](../research/n83_dense_root_20261013/reports/run-20261013T1018Z/)) |",
+      "sha256": "20f46a733a7f80cd338873cc22ba925b0ca20d633e5ad62f1f4049533c667f2c",
+      "disposition": "documentary",
+      "reason": "The 2026-10-19 benchmark sweep verdict is contradicted, so this row is no longer admitted.",
+      "provenance": [
+        "benchmarks/20261013-n83-dense-root/panel.pdf",
+        "benchmarks/20261013-n83-dense-root/panel.png"
+      ]
+    }
+  ]
+}

@@ -352,6 +352,14 @@ pub fn names() -> Vec<&'static str> {
 }
 
 fn prime_curves(v: &mut Vec<CatalogCurve>) {
+    let (curve, _) = crate::ecc::certicom::prime_challenge("eccp-131").unwrap();
+    v.push(CatalogCurve {
+        name: "eccp-131",
+        aliases: &["eccp-130", "eccp131"],
+        family: Family::Prime,
+        standard: "Certicom ECC Challenge",
+        object: CurveObject::Prime(curve),
+    });
     // Core standardized prime curves (src/ecc/curve.rs).
     let core: &[(&str, &[&str], &str, fn() -> CurveParams)] = &[
         (
@@ -675,6 +683,34 @@ fn binary_curves(v: &mut Vec<CatalogCurve>) {
             family: *family,
             standard: std,
             object: CurveObject::Binary(Box::new(ctor())),
+        });
+    }
+    for name in [
+        "ecc2k-130",
+        "ecc2-131",
+        "ecc2k-163",
+        "ecc2-163",
+        "ecc2-191",
+        "ecc2k-238",
+        "ecc2-238",
+        "ecc2k-358",
+        "ecc2-353",
+    ] {
+        let (curve, _) = BinaryCurve::certicom_challenge(name).expect("Certicom curve record");
+        v.push(CatalogCurve {
+            name,
+            aliases: if name == "ecc2-131" {
+                &["ecc2-130"]
+            } else {
+                &[]
+            },
+            family: if name.starts_with("ecc2k") {
+                Family::Koblitz
+            } else {
+                Family::BinaryRandom
+            },
+            standard: "Certicom ECC Challenge",
+            object: CurveObject::Binary(Box::new(curve)),
         });
     }
 }

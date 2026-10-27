@@ -1,0 +1,90 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-fall-degree-e10-20261027-3
+experiment_id: fall_degree_bounds_20261008
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 54267c7c8dba85136fe221a4939127a7090f7beb
+receipt: research/fall_degree_bounds_20261008/e10/launch_receipt3/CARD-fall-degree-e10-20261027-3.receipt.json
+binds:
+  - {path: research/fall_degree_bounds_20261008/PREREGISTRATION.md, sha256: d3e6ece81967e9cb568946a62de90ce04e6d8b7b269d9b06cdc3da80b12046d2}
+  - {path: research/fall_degree_bounds_20261008/e10/run_job.sh, sha256: 3d334bbf64d1af476baa691942f92ee7d96229d8be9dd0e19b3592378c7ff5cd}
+  - {path: research/fall_degree_bounds_20261008/e10/aws_env.sh, sha256: 40bab1d68bf44393d5c5fd9ce9ed3cddf34acf8448123655a043c704602b2ff9}
+  - {path: taskq/deploy/ephemeral/ephemeral, sha256: 4e3484166dd1d7ad828f05396db20a3f855948e05891ab291c37084d7de02b2c}
+  - {path: research/fall_degree_bounds_20261008/e10/source_paths.txt, sha256: 821beb431bb972f1601a343b19ab1440f1cb98336926784fe0368fdf5dc0f7f0}
+  - {path: taskq/deploy/ephemeral/runner.sh, sha256: fd34641e061c77f9b09583f5e79d57bd145242b7e616ca4d57c1c5731c16ccd1}
+must_not_exist: [research/fall_degree_bounds_20261008/e10/launch_receipt3/]
+commands:
+  - id: launch-e9
+    argv:
+      - bash
+      - research/fall_degree_bounds_20261008/e10/aws_env.sh
+      - taskq/deploy/ephemeral/ephemeral
+      - run
+      - --detach
+      - --no-source
+      - --type
+      - m7a.8xlarge
+      - --toolchain
+      - rust
+      - --ttl
+      - 24h
+      - --name
+      - fd-e9-large-20261027-r3
+      - --
+      - set -euo pipefail; mkdir -p "$HOME/fdsrc"; cd "$HOME/fdsrc"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-5296ce8.tgz src.tgz --only-show-errors; echo "dade82a3bf840f556e26beaafd36ba290ba94e74a9be0f6ca71a494230655d91  src.tgz" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 5296ce8a74382f1f872f8f57da52261ef8fbbc34 >"$EPHEMERAL_OUT/source_commit"; research/fall_degree_bounds_20261008/e10/run_job.sh "$EPHEMERAL_OUT" 6:10:3 5:15:3
+    timeout_seconds: 600
+    success_exit_codes: [0]
+    stdout: research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e9.stdout
+    stderr: research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e9.stderr
+  - id: launch-e10-m3-m6
+    argv:
+      - bash
+      - research/fall_degree_bounds_20261008/e10/aws_env.sh
+      - taskq/deploy/ephemeral/ephemeral
+      - run
+      - --detach
+      - --no-source
+      - --type
+      - m7a.4xlarge
+      - --toolchain
+      - rust
+      - --ttl
+      - 24h
+      - --name
+      - fd-e10-m3m6-20261027-r3
+      - --
+      - set -euo pipefail; mkdir -p "$HOME/fdsrc"; cd "$HOME/fdsrc"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-5296ce8.tgz src.tgz --only-show-errors; echo "dade82a3bf840f556e26beaafd36ba290ba94e74a9be0f6ca71a494230655d91  src.tgz" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 5296ce8a74382f1f872f8f57da52261ef8fbbc34 >"$EPHEMERAL_OUT/source_commit"; research/fall_degree_bounds_20261008/e10/run_job.sh "$EPHEMERAL_OUT" 3:21:7 3:24:8 3:27:9 6:12:2
+    timeout_seconds: 600
+    success_exit_codes: [0]
+    stdout: research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e10-m3-m6.stdout
+    stderr: research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e10-m3-m6.stderr
+  - id: launch-e10-m4
+    argv:
+      - bash
+      - research/fall_degree_bounds_20261008/e10/aws_env.sh
+      - taskq/deploy/ephemeral/ephemeral
+      - run
+      - --detach
+      - --no-source
+      - --type
+      - m7a.4xlarge
+      - --toolchain
+      - rust
+      - --ttl
+      - 24h
+      - --name
+      - fd-e10-m4-20261027-r3
+      - --
+      - set -euo pipefail; mkdir -p "$HOME/fdsrc"; cd "$HOME/fdsrc"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-5296ce8.tgz src.tgz --only-show-errors; echo "dade82a3bf840f556e26beaafd36ba290ba94e74a9be0f6ca71a494230655d91  src.tgz" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 5296ce8a74382f1f872f8f57da52261ef8fbbc34 >"$EPHEMERAL_OUT/source_commit"; research/fall_degree_bounds_20261008/e10/run_job.sh "$EPHEMERAL_OUT" 4:12:3 4:16:4 4:20:5
+    timeout_seconds: 600
+    success_exit_codes: [0]
+    stdout: research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e10-m4.stdout
+    stderr: research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e10-m4.stderr
+bus_address: executor-mechanical-fall-degree-e10
+background: false
+write_scope: [research/fall_degree_bounds_20261008/e10/launch_receipt3/]
+stop_when:
+  - A command exits nonzero or reaches its timeout; the tool stops, nothing is retried, and the executor returns the tool output verbatim.
+  - The tool exits 2 (refused to start); return `refused` with the IMPEDIMENT line.
+notes: The source tarball s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-5296ce8.tgz has sha256 dade82a3bf840f556e26beaafd36ba290ba94e74a9be0f6ca71a494230655d91 and each job verifies it before extracting. The three commands start detached jobs and print one job id each into the stdout files under the receipt directory. The executor runs no other command, does not wait for the jobs and does not fetch their outputs.

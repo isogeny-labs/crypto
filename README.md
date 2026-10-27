@@ -5,6 +5,12 @@ plus a substantial **cryptanalysis suite** for studying how those algorithms bre
 Every algorithm is documented with the underlying mathematics, making this a study
 companion as much as a working library.
 
+[Backend performance frontier](docs/backend-leaderboard/index.html) ·
+[Machine-readable leaderboard](docs/backend-leaderboard/leaderboard.json) ·
+[How agents measure and beat an incumbent](docs/ecbench/BACKEND_FRONTIER.md).
+Compare F4, F5, F6-IC, root finding and SAT by exact workload, including cold
+operation time, solver counters and explicit gaps in field-size coverage.
+
 > ## ⚠️ DO NOT USE IN PRODUCTION
 >
 > This library is **not safe** for any real use case where confidentiality,
@@ -231,6 +237,10 @@ Generic attacks over the `HashFunction` / `MerkleDamgardHash` trait:
 CLI:
 
 ```bash
+# Isogeny-volcano tools (docs/volcano/README.md)
+crypto volcano profile --koblitz-n 83 --ell 6473        # conductor, depth, level tables
+crypto volcano koblitz-step --n 131 --ell 263          # ECC2K-130: the 262 level-1 neighbours over F_(2^131)
+
 # Auto-run every applicable hash attack
 crypto cryptanalysis hash-auto --hash md5
 crypto cryptanalysis hash-auto --hash md4
@@ -481,7 +491,7 @@ another's success condition. The doc explains both.
 | `zk::bulletproofs`    | Bulletproofs range proofs                       |
 | `zk::groth16`         | Groth16 zk-SNARK skeleton                       |
 | `zk::plonk`           | PLONK zk-SNARK skeleton                         |
-| `zk::stark` / `stark_v2` | STARK proof system skeleton                   |
+| `zk::stark` / `stark_v2` | STARK-style proof skeletons: **educational, unaudited, not zero-knowledge, no grinding, no stated security level; must not back a research claim**. `stark_v2` is DEEP-ALI: coset LDE, composition polynomial, an out-of-domain sample `z` (the AIR checked at `z`) and degree-bounded FRI on the DEEP quotient; its conjectured soundness (Reed–Solomon proximity conjecture, random-oracle Fiat–Shamir) is `ε ≲ β^(−q) + ε_field + ε_hash`, capped at 128 bits by SHA-256 Merkle commitments, over the BLS12-381 scalar field. `stark` is a spot-check argument, not a STARK (see the module docs) |
 
 ---
 
@@ -587,16 +597,19 @@ that makes adding new attacks cheap.
 | `cryptanalysis::p256_isogeny_cover`   | Isogeny-cover speculation targeting P-256                |
 | `cryptanalysis::solinas_correlations` | Solinas-prime reduction correlations                     |
 
-### Binary-curve Weil descent (GHS / Hess pipeline)
+### Binary-curve Weil descent (GHS / Hess scaffold)
 
-A full Weil-descent attack pipeline on binary-field elliptic curves.  Lifts
-ECDLP on `E/F_{2^n}` to HCDLP on a hyperelliptic Jacobian over `F_{2^{n/m}}`,
-then runs index calculus on the higher-genus Jacobian.
+A bounded structural scaffold for Weil descent on binary-field elliptic
+curves. The only end-to-end path is the toy `m=1` case, where the descended
+Jacobian is the elliptic curve itself and generic bounded search is used.
+The `m=2` construction remains symbolic and lacks a smooth hyperelliptic
+model; higher-genus descent, explicit isogeny lifting, and Jacobian index
+calculus are not implemented.
 
 | Module                                | Role                                                     |
 |---------------------------------------|----------------------------------------------------------|
 | `cryptanalysis::ghs_descent`          | Frey-Rück / GHS cover-curve construction                 |
-| `cryptanalysis::ghs_full_attack`      | End-to-end orchestrator producing structured `AttackReport` |
+| `cryptanalysis::ghs_full_attack`      | Bounded orchestrator producing structured `AttackReport`    |
 | `cryptanalysis::ec_trapdoor`          | EC trapdoor / weak-curve detection                       |
 | `cryptanalysis::ghs_screen`           | Exact all-factorisation GHS structural screen and cover towers |
 | `cryptanalysis::binary_isogeny`       | Vélu-style isogeny computation in characteristic 2       |
@@ -604,11 +617,12 @@ then runs index calculus on the higher-genus Jacobian.
 | `binary_ecc::poly_f2m`                | Polynomial arithmetic over F_{2^m}                        |
 | `prime_hyperelliptic`                 | Hyperelliptic curves over prime fields (Coleman / odd-char descent) |
 
-End-to-end m=1 ECDLP recovery runs on F_{2^6}; m=2 type-II symbolic descent
-demonstrated on F_{2^6} with (n=3, ℓ=2).  See `examples/ghs_attack_demo.rs`
-for three runnable scenarios. The native [`ghs_screen`](docs/GHS_SCREEN.md)
-CLI validates a polynomial-basis field and reports every GHS tower without
-fixed-width genus truncation.
+Toy end-to-end `m=1` ECDLP recovery runs on F_{2^6}; `m=2` type-II symbolic
+descent is demonstrated on F_{2^6} with (n=3, ℓ=2), without a smooth model
+or HCDLP run. See `examples/ghs_attack_demo.rs` for the bounded scenarios. The
+native [`ghs_screen`](docs/GHS_SCREEN.md) CLI validates a polynomial-basis
+field and reports every GHS tower without fixed-width genus truncation; that
+screen is not a higher-genus solver.
 
 ### Auto-attack framework + CLI
 
@@ -686,6 +700,17 @@ A continuously-updated empirical study of cryptanalytic-attack complexity.  Each
 attack is registered as a falsifiable [`Hypothesis`] with a theoretical complexity
 claim; the bench runs it at multiple problem sizes, fits the measured
 exponent by log-log regression, and prints a verdict.
+
+The proposed
+[comprehensive elliptic-curve private-key recovery audit](research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md)
+adds the cross-cutting control plane: exact audit units, a five-lane
+non-overlapping taxonomy, E0–E7 evidence gates, literature and incident
+coverage, common cost accounting, and independent governance. Its
+[machine-readable twin](docs/ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json) is a
+non-authoritative planning mock and cannot promote a claim.
+The dated [execution checkpoint](research/notes/ecdlp-general/RESEARCH_ECDLP_AUDIT_EXECUTION_CHECKPOINT_20261014.md)
+records the native validator, the exact cover/Jacobian evidence boundary, and
+the still-open gates for each of the eight workstreams.
 
 Two scaling regimes are supported:
 
@@ -1050,7 +1075,7 @@ makes every orbit claimable. For points already collected without counters,
 - [`research/nagao_relations/`](research/nagao_relations/README.md) — implemented Riemann–Roch incidence and norm alternatives to summation polynomials, plus function-coefficient search using exact subspace support divisibility; exhaustive toy correctness controls, with no ECDLP speedup claim.
 - [`research/notes/ecc2k130/RESEARCH_ISOGENY_CLASS_SEARCH.md`](research/notes/ecc2k130/RESEARCH_ISOGENY_CLASS_SEARCH.md) — exhaustive search of the ECC2K-130 isogeny class for a curve whose Gröbner solving degree is lower: the class structure derived exactly (`Σ_{f|c} h(O_f) = 2^65.06`, conductor `263 · 146505763881528721`), the 263 vertices a computable isogeny reaches, and the proof that the curve coefficient enters the descended Semaev system *below* the leading form — so the degree of regularity is constant on the whole class (`experiments/isogeny_class_search.json`).
 - [`research/notes/ecc2k130/RESEARCH_ECC2K130_EXTENSION.md`](research/notes/ecc2k130/RESEARCH_ECC2K130_EXTENSION.md) — whether base-changing ECC2K-130 to `F_2^(131e)` buys a cheaper attack: the target group and its automorphisms are invariant under base change, and because 131 is prime every subfield and every Frobenius-stable subspace of `F_2^(131e)` is either too large to enumerate (`2^131` factor base, `2^70.19×` rho) or too small to generate (contained in the subgroup `E(F_2^e)`, so no relation exists), with nothing in between at any `e` (`experiments/ecc2k130_extension_field_boundary.json`).
-- [`research/notes/ecc2k130/RESEARCH_ECC2K130_HYPERELLIPTIC.md`](research/notes/ecc2k130/RESEARCH_ECC2K130_HYPERELLIPTIC.md) — whether ECC2K-130 maps to a hyperelliptic curve of another genus: covers over `F_2^131` exist in every genus and all cost at least `2^131` (`2^70.19×` rho), while over `F_2` the GHS genus is `1`, `2^130 − 1` or `2^130` for *every* curve over `F_2^131` (2 is a primitive root mod 131; corrected 2026-10-13 from `2^129`, see `docs/audits/GHS_MAGIC_NUMBER_MMT_CORRECTION_20261013.md`), and at genus 1 the transfer is exactly the zero map on `⟨G⟩`. The genus that would pay sits in the window `[130, 290…300]`, `2^121.77` away from every GHS descent (corrected 2026-10-06: not from every construction); `⟨G⟩` is `A(F_2)` for a simple 130-dimensional `A` with `#A(F_2) = r` exactly, so any correspondence over `F_2` needs genus `≥ 130` (`experiments/ecc2k130_hyperelliptic_cover_boundary.json`).
+- [`research/notes/ecc2k130/RESEARCH_ECC2K130_HYPERELLIPTIC.md`](research/notes/ecc2k130/RESEARCH_ECC2K130_HYPERELLIPTIC.md) — whether ECC2K-130 maps to a hyperelliptic curve of another genus: covers over `F_2^131` exist in every genus and all cost at least `2^131` (`2^70.19×` rho), while for the ordinary GHS/MMT model descending from `F_2^131` to `F_2`, the attainable magic numbers are `1` and `131`, giving genus `1`, `2^130−1`, or `2^130` (2 is a primitive root mod 131; corrected 2026-10-13 from the plain-orbit `m = 130` / `2^129` branch, see `docs/audits/GHS_MAGIC_NUMBER_MMT_CORRECTION_20261013.md`); on the challenge curve's genus-1 branch the transfer is exactly the zero map on `⟨G⟩`. The genus that would pay sits in the window `[130, 290…300]`; the nearest nontrivial GHS branch is `2^121.77` away (corrected 2026-10-06: not from every construction). `⟨G⟩` is `A(F_2)` for a simple 130-dimensional `A` with `#A(F_2) = r` exactly, so any correspondence over `F_2` needs genus `≥ 130` (`experiments/ecc2k130_hyperelliptic_cover_boundary.json`).
 - [`research/notes/ecc2k130/RESEARCH_ECC2K130_CURVE_CONSTRUCTION.md`](research/notes/ecc2k130/RESEARCH_ECC2K130_CURVE_CONSTRUCTION.md) — whether a curve carrying the ECC2K-130 subgroup can be produced, by four routes in native Rust (`cryptanalysis::curve_construction`): the reduction of the modular curve `X_H(3²·7²·263²)` carries `A` explicitly at genus `508,799,809 ≈ 2^28.92`, a hundred bits below GHS but `2^20.69` above the window; every geometrically cyclic degree-131 cover of a curve of genus ≤ 1 needs genus `≥ 1300`; exhaustive toys over `F_2` find `A_n` is never itself a Jacobian at `n = 3, 5`, while genus-3 curves carry it at `n = 3`; the Klein quartic is the `n = 3` instance and the non-GHS counterexample that corrects the hyperelliptic note (`research/notes/ecc2k130/curve_construction_20261006/`).
 - [`research/notes/ecc2k130/RESEARCH_ECC2K130_DECOMPOSITION.md`](research/notes/ecc2k130/RESEARCH_ECC2K130_DECOMPOSITION.md) — whether an ECC2K-130 point decomposes into a sum of factor-base points, answered in three parts: they **exist** (the yield law `C(|F|,m)/#E` confirmed to within `1.09×` over twelve toy cells, one small-base outlier at `0.57×` aside; `dim V ≥ 45` suffices at `m = 3`), they are **admissible** (the cofactor-4 class histogram measured on the challenge curve admits every `m ≥ 2`, with class parity `= Tr(x(P))` on every sample, and certified `m = 2, 3, 4` witnesses at full size with `S₄ = 0`; a base inside `ker Tr` sits in the index-2 subgroup `2E`, so its sums are spread over `#E/2` and yield **twice** what the law says — measured exhaustively as `0.50×#E` against `1.00×#E` at `n = 13, 17, 19`, worth exactly one bit; and a whole-base yes/no detector **localises its own witness** by swapping a candidate summand for a class-matched base point, measured over eight rungs with zero sub-base queries and both failure modes tracking the `Θ(m/|F|)` collision law, so deciding and localising are the same problem), and they cannot be **found** — `relations × targets × oracle = m·2^131` independently of `dim V`, so the best implicit-base variant is `2^132.58 = 2^71.77×` rho and the best Frobenius-stable one `2^124.99 = 2^64.18×` rho on a materialised base; no table budget from `2^30` to `2^70` entries beats plain BSGS on the same memory, and the oracle would have to beat exhaustive search over its own candidate set by `2^(70.19 + log₂ m)` (`experiments/ecc2k130_point_decomposition.json`).
 - [`research/notes/ecc2k130/RESEARCH_ECC2K130_RR_SOLVER_PANEL.md`](research/notes/ecc2k130/RESEARCH_ECC2K130_RR_SOLVER_PANEL.md) — the Riemann-Roch (Nagao) decomposition solvers run on the **real** ECC2K-130 curve against matched Semaev controls, one factor base, one arity, one budget: at `d = 6` the two RR solvers resolve **32/32** slots and both controls **0/32**; 128 trials, zero errors, **28 independently verified three-summand relations** on the challenge curve, every complete planted run recovering its planted triple; `quadratic-image` is the strongest at full size (`0.827x` the counted field operations of `quadratic-optimized` on the same candidate sequence). It prices an **oracle**, not an attack: at `d in {6,7}` a uniform target decomposes with probability at most `5.4e-36`, against `d = 45` for existence, so no yield, `S` or rho ratio is claimed. Then the null-object control lands: brute-force **pair enumeration** exhausts the same `d = 6` instances in **0.494x** the counted field operations and returns identical solution sets, and the method-ceiling measurement to `d = 8` shows the RR encoding visiting about `|F|^2` candidates where pair enumeration visits `|F|^2/2` — same `Theta(|F|^2)` order, constant near two, in the wrong direction. The correct reading is therefore *the better of two algebraic encodings under one SAT solver*, not a good oracle; and the one route that genuinely exploits the `F_2`-subspace structure rather than re-indexing a search — Weil descent of `S_4` in the V-basis, never run at `n = 131` before — yields a **linear NO-certificate** (poly(`d`), no search) that is available only for `d <= 6`, because the `S_4` value set saturates `F_2^131` at `d = 7` while decompositions start at `d = 45`, measured at `d = 45` itself; the falsification target needs a different exponent and nine rounds produced constants. Batching is priced too and cuts the same way
@@ -1136,3 +1161,88 @@ See [the Gröbner comparison protocol](groebner_compare/README.md) for the bound
 Boolean worker runner, independent basis certificates, learn/apply fallback
 accounting, and immutable diagnostic receipts. These are solver-stage controls;
 no full-DLP speedup or research-state transition is implied.
+
+## Certicom ECC2-131 and ECCp-131
+
+The random binary ECC2-131 and prime-field ECCp-131 challenges are in the
+curve catalog. `ECC2-130` and `ECCp-130` are accepted aliases for these
+published 131-bit names. ECC2K-130 retains its separate Koblitz parameters.
+Both challenge loaders in [`src/ecc/certicom.rs`](src/ecc/certicom.rs)
+return the published generator, subgroup order, cofactor, and target Q from
+[Certicom's parameter list](https://www.certicom.com/en/curves-list).
+
+```sh
+cargo run --release --bin icx -- inspect ECC2-130 --json
+cargo run --release --bin icx -- inspect ECCp-130 --json
+cargo run --release --bin ecdlp-nist -- solve ECCp-130 --secret 42 --interval-bits 8 --method bsgs --json
+```
+
+`ecdlp-nist solve <curve> --challenge` selects the published Q for either
+field. Full-width solving retains the existing feasibility and iteration
+budgets. The tests check both published points on each curve and verify
+`[n]G = [n]Q = O`; interval tests recover planted scalars. This adds parameter
+and arithmetic coverage; it does not establish a full-width challenge solution.
+
+All three requested solvers also share an exact-curve entry point:
+
+```sh
+cargo run --release --bin icx -- solve ECC2-130 --method bsgs --secret 12345 --interval-width 65536 --json
+cargo run --release --bin icx -- solve ECCp-130 --method rho --challenge --max-iterations 16 --max-restarts 0 --json
+cargo run --release --bin icx -- solve ECC2-130 --method index-calculus --challenge --factor-base-size 16 --max-iterations 32 --json
+```
+
+Each method accepts either challenge and aliases. `icx solve` uses the exact
+published field, curve, generator, subgroup order and target; `icx run` remains
+the separate smaller-analogue experiment interface. `--point X,Y` supplies an
+external target and `--secret K` constructs a known-answer target. Scalars,
+coordinates, interval bounds and matrix coefficients retain their full width.
+Unfinished searches report `budget_exhausted`, no scalar, and a nonzero exit.
+BSGS caps its baby table with `--max-table-entries`; rho's iteration limit is
+per restart. IC caps relation and descent queries separately and bounds its
+signed-point table and dense matrix with `--max-table-entries` and
+`--max-matrix-entries`.
+
+The native [solver API](src/cryptanalysis/certicom_dlp/mod.rs) exposes `rho`,
+`bsgs`, and `index_calculus`. IC constructs a cofactor-cleared low-x factor
+base, decomposes public queries into signed pairs, collects verified relations,
+solves their full-width system modulo the subgroup order, checks every base
+log by scalar replay, and descends the target. It requires full matrix rank;
+it never substitutes rho or BSGS for a failed IC stage.
+
+For externally prepared IC work, `--preparation FILE.json` accepts these fields:
+
+| field | contents |
+| --- | --- |
+| `curve` | The exact challenge name or its alias. |
+| `factor_base` | An array of `{ "x": "0x...", "y": "0x..." }` public subgroup points. |
+| `relation_queries` | Integer strings `a` whose points `[a]G` are decomposed to build the relation matrix. |
+| `descent_shifts` | Integer strings `a` for the target queries `Q + [a]G`. |
+| `label` | Optional provenance text retained in the output. |
+
+Integers accept decimal or `0x` hex. Preparation files contain no factor-base
+logs or target log. Points, subgroup membership, duplicate sign orbits, matrix
+rank and scalar replay are checked. See the [functional tests](tests/certicom_solvers.rs)
+for constructed examples on both exact curves: BSGS recovers a scalar above
+`2^100`, rho recovers the special known answer `Q = -G`, and IC learns three
+base logs through a full-rank relation system and performs target descent.
+These are correctness fixtures, not natural-target yield or speed measurements.
+
+The same three methods support portable CPUs, NVIDIA CUDA and Apple Metal.
+CPU execution is the default. Build the matching native worker and select it
+explicitly:
+
+```sh
+make -C gpu/certicom cuda ARCH=sm_80
+target/release/icx solve ECCp-130 --method rho --challenge --max-iterations 16 --max-restarts 0 --backend cuda --gpu-worker gpu/certicom/certicom_cuda --json
+# On a Mac with Metal:
+make -C gpu/certicom metal
+target/release/icx solve ECC2-130 --method bsgs --secret 12345 --interval-width 65536 --backend metal --gpu-worker gpu/certicom/certicom_metal --json
+```
+
+Explicit GPU selection fails if the requested device is unavailable.
+`--backend auto` may choose CPU and reports its choice; `gpu-emulator` is
+explicitly labelled host execution. GPU rho runs parallel full-width walks;
+BSGS batches point generation; IC offloads query generation and decomposition
+while its modular linear algebra and independent verification stay on CPU.
+See [GPU setup and hardware qualification](gpu/certicom/README.md) for build
+requirements, device ordinals, batch/walk budgets, deadlines and tests.

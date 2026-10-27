@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Iso Lab EKS experiment request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "job"
+  ],
+  "properties": {
+    "schema": {
+      "const": "isolab.eks.request/v1"
+    },
+    "job": {
+      "additionalProperties": false,
+      "properties": {
+        "instance_type": {
+          "description": "Optional fixed EC2 type for repeatable hardware, e.g. c8i.2xlarge; must fit the existing Spot NodePool",
+          "type": "string",
+          "default": "c8a.2xlarge",
+          "pattern": "^[a-z][a-z0-9-]*\\.[a-z0-9]+$"
+        },
+        "job_name": {
+          "maxLength": 55,
+          "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$",
+          "type": "string"
+        },
+        "memory": {
+          "default": "4Gi",
+          "pattern": "^[1-9][0-9]*(Mi|Gi)$",
+          "type": "string"
+        },
+        "seconds": {
+          "default": 900,
+          "maximum": 3600,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "spec": {
+          "description": "ecbench.spec/v1 specification; defaults to the supplied 20-bit validation fixture",
+          "type": "object"
+        },
+        "build": {
+          "additionalProperties": false,
+          "description": "Optional per-run image and native build identity; omission retains the deployed image",
+          "properties": {
+            "ecbench_sha256": {
+              "maxLength": 64,
+              "minLength": 64,
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "image_uri": {
+              "maxLength": 129,
+              "pattern": "^104186811093\\.dkr\\.ecr\\.us-east-2\\.amazonaws\\.com/isolab/tasks@sha256:[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "source_revision": {
+              "maxLength": 40,
+              "minLength": 40,
+              "pattern": "^[a-f0-9]{40}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "image_uri",
+            "source_revision",
+            "ecbench_sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "job_name"
+      ],
+      "type": "object"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "harness": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "source_revision": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "run_url": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "workflow_revision": {
+          "type": "string",
+          "maxLength": 2048
+        }
+      }
+    }
+  }
+}

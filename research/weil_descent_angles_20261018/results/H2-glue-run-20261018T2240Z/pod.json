@@ -1,0 +1,25 @@
+{
+ "id": "p22sy8golm3xb0",
+ "name": "h2-glue",
+ "sha": "0bd2a0f5c0b0f0005d57850c12466fa82b414c59",
+ "files": [
+  "examples/n2_routes.rs"
+ ],
+ "cmd": "rustc --edition 2021 -O examples/n2_routes.rs -o n2 && ./n2 \"$OUT\" gluecheck && N2_THREADS=16 ./n2 \"$OUT\" glue",
+ "vcpu": 16,
+ "flavor": "cpu5c,cpu3c",
+ "image": "rust:1-bookworm",
+ "launched_utc": "2026-10-18T22:24:37Z",
+ "cost_per_hr": 0.56,
+ "machine": {
+  "dataCenterId": "EUR-IS-1",
+  "diskThroughputMBps": 3657,
+  "gpuTypeId": "unknown",
+  "location": "IS",
+  "maxDownloadSpeedMbps": 21954,
+  "maxUploadSpeedMbps": 58941,
+  "secureCloud": true,
+  "supportPublicIp": true,
+  "reservedCountVersion": 205571
+ }
+}
