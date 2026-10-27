@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Historical Lean coverage and semantic correspondence](https://github.com/aburan28/crypto-autoresearcher/blob/codex/lean-retrospective-20261018/problems/lean-retrospective-historical-coverage.md) | open | Certifying every past claim across the three repositories | Exact claim-to-proof inventory, remaining formal targets and concrete bridges, independent review and empirical replay |
 | [Certicom 130 CUDA/Metal physical qualification](certicom-130-gpu-hardware-qualification.md) | open | physical rho, BSGS and IC correctness on both exact curves in both repositories | complete hosted Metal library/CLI phases and physical provenance; authorized NVIDIA/Mac receipts; current-head CI/review gates |
 | [GitHub Actions infrastructure](github-actions-infrastructure.md) | open | final-main CI and all-PR merge verification | restore billing, approve required actions, restore EKS runners, then pass final-head checks/reviews |
 | [Matched trace-line C1 2LP measurement](trace-c1-2lp-measurement.md) | open | fully priced algebraic C1 standard/selected comparison | shifted x-line algebraic oracle, full native pricing, admitted Iso Lab image/checkpoint route and independent replay |

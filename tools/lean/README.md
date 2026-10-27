@@ -7,7 +7,7 @@ and weekly.
 
 | target | how it is checked |
 |:--|:--|
-| Lake project (directory with `lakefile.toml` / `lakefile.lean`) | `lake exe cache get` if it uses Mathlib, then `lake build`, then an audit of every module the project built |
+| Lake project (directory with `lakefile.toml` / `lakefile.lean`) | `lake exe cache get` if it uses Mathlib, then `lake build` plus each tracked proof source as an explicit Lake source target, then an audit of every module the project built |
 | standalone `.lean` file outside any Lake project | `lean -o` against the core library under its directory's `lean-toolchain`, then an audit of that module |
 
 The retained first attempt at
@@ -74,3 +74,12 @@ Only add an entry when the study itself records the decision to trust the
 compiler, for example a registered replay. Never add one for a theorem a
 report or paper states as proved. Prefer `decide` or `decide +kernel` when
 they finish in reasonable time.
+
+The gate checks tracked project sources omitted by default targets. Unregistered
+source targets compile directly with the project environment into private
+olean output and receive the same axiom audit; frozen Lakefiles need no edits. `sources.log` records the inventory. Nested projects are
+checked separately; Lake configuration and gate code/fixtures under
+`tools/lean` or `tools/selftest` are explicit exclusions. Untracked files
+are outside repository discovery. The self-test exercises unconfigured true/false and configured
+positive/negative project modules. A green default build alone
+is insufficient.
