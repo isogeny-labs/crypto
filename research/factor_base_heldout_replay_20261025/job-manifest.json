@@ -1,0 +1,173 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "n12-heldout-replay-20261025-v1",
+    "namespace": "isolab",
+    "labels": {
+      "isolab.dev/job": "true"
+    }
+  },
+  "spec": {
+    "backoffLimit": 0,
+    "activeDeadlineSeconds": 3600,
+    "ttlSecondsAfterFinished": 86400,
+    "template": {
+      "metadata": {
+        "labels": {
+          "isolab.dev/job": "true"
+        },
+        "annotations": {
+          "karpenter.sh/do-not-disrupt": "true"
+        }
+      },
+      "spec": {
+        "restartPolicy": "Never",
+        "serviceAccountName": "runner",
+        "automountServiceAccountToken": false,
+        "terminationGracePeriodSeconds": 60,
+        "nodeSelector": {
+          "isolab.dev/pool": "cpu-spot"
+        },
+        "tolerations": [
+          {
+            "key": "isolab.dev/workload",
+            "value": "cpu",
+            "operator": "Equal",
+            "effect": "NoSchedule"
+          }
+        ],
+        "affinity": {
+          "podAntiAffinity": {
+            "requiredDuringSchedulingIgnoredDuringExecution": [
+              {
+                "labelSelector": {
+                  "matchLabels": {
+                    "isolab.dev/job": "true"
+                  }
+                },
+                "topologyKey": "kubernetes.io/hostname"
+              }
+            ]
+          }
+        },
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 1000,
+          "runAsGroup": 1000,
+          "fsGroup": 1000,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "task",
+            "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+            "command": [
+              "/bin/sh",
+              "-ec",
+              "#!/bin/sh\n# Frozen N12 evaluation replay. The bundle hash and selector are fixed in PROTOCOL.md.\nset -eu\ninput_uri='s3://isolab-results-104186811093-us-east-2/inputs/n12-heldout-replay-20261025/7f510189ea3507d5933a965c6e9ec9aec101670a574184a15d026c1d0bc33ed8.tar.gz'\ninput_sha='7f510189ea3507d5933a965c6e9ec9aec101670a574184a15d026c1d0bc33ed8'\nout=${ISOLAB_OUTPUT_DIR:-/work/results}\nmkdir -p \"$out/raw\" \"$out/receipts\" /work/repo\nfinish() {\n    rc=$?\n    trap - EXIT\n    printf '%s\\n' \"$rc\" > \"$out/receipts/job-exit-code.txt\"\n    date -u '+%Y-%m-%dT%H:%M:%SZ' > \"$out/receipts/job-finished-utc.txt\"\n    if ! aws s3 cp \"$out/\" \"$ISOLAB_RESULTS_URI\" --recursive --only-show-errors; then\n        echo 'Results upload failed' >&2\n        exit 90\n    fi\n    exit \"$rc\"\n}\ntrap finish EXIT\nprintf '%s\\n' \"${POD_UID:-unknown}\" > \"$out/receipts/pod-uid.txt\"\nprintf '%s\\n' \"${NODE_NAME:-unknown}\" > \"$out/receipts/node-name.txt\"\nprintf '%s\\n' \"${ISOLAB_JOB_ID:-unknown}\" > \"$out/receipts/job-id.txt\"\nhostname > \"$out/receipts/hostname.txt\"\nuname -a > \"$out/receipts/uname.txt\"\nif [ -r /proc/cpuinfo ]; then sed -n '/^model name\\|^Hardware/p' /proc/cpuinfo | head -n 1 > \"$out/receipts/cpu-model.txt\"; fi\ndate -u '+%Y-%m-%dT%H:%M:%SZ' > \"$out/receipts/job-started-utc.txt\"\naws s3 cp \"$input_uri\" /work/input.tar.gz --only-show-errors\nprintf '%s  %s\\n' \"$input_sha\" /work/input.tar.gz | sha256sum -c - > \"$out/receipts/bundle-hash-check.txt\"\ntar -xzf /work/input.tar.gz -C /work/repo\ncd /work/repo\nsha256sum -c meta/local-sha256sums.txt > \"$out/receipts/member-hash-checks.txt\"\nsha256sum bin/heldout meta/selection.json meta/PROTOCOL.md meta/heldout.rs > \"$out/receipts/key-hashes.txt\"\nprintf 'bits\\texit_code\\trows\\tstarted_utc\\tfinished_utc\\n' > \"$out/receipts/evaluation.tsv\"\noverall=0\nfor bits in 16 20 24 28 32 36 40; do\n    start=$(date -u '+%Y-%m-%dT%H:%M:%SZ')\n    raw=\"$out/raw/evaluation-bits${bits}.jsonl\"\n    if bin/heldout \"$bits\" 1 32 any evaluation > \"$raw\" 2> \"$out/raw/evaluation-bits${bits}.stderr\"; then\n        code=0\n    else\n        code=$?\n        overall=1\n    fi\n    rows=$(wc -l < \"$raw\" | tr -d ' ')\n    [ \"$rows\" -eq 60 ] || overall=1\n    end=$(date -u '+%Y-%m-%dT%H:%M:%SZ')\n    printf '%s\\t%s\\t%s\\t%s\\t%s\\n' \"$bits\" \"$code\" \"$rows\" \"$start\" \"$end\" >> \"$out/receipts/evaluation.tsv\"\n    echo \"bits=$bits exit=$code rows=$rows\"\ndone\nif [ \"$overall\" -ne 0 ]; then exit 1; fi"
+            ],
+            "workingDir": "/work",
+            "env": [
+              {
+                "name": "HOME",
+                "value": "/work"
+              },
+              {
+                "name": "AWS_REGION",
+                "value": "us-east-2"
+              },
+              {
+                "name": "AWS_DEFAULT_REGION",
+                "value": "us-east-2"
+              },
+              {
+                "name": "POD_UID",
+                "valueFrom": {
+                  "fieldRef": {
+                    "fieldPath": "metadata.uid"
+                  }
+                }
+              },
+              {
+                "name": "NODE_NAME",
+                "valueFrom": {
+                  "fieldRef": {
+                    "fieldPath": "spec.nodeName"
+                  }
+                }
+              },
+              {
+                "name": "ISOLAB_JOB_ID",
+                "value": "n12-heldout-replay-20261025-v1"
+              },
+              {
+                "name": "ISOLAB_OUTPUT_DIR",
+                "value": "/work/results"
+              },
+              {
+                "name": "ISOLAB_RESULTS_URI",
+                "value": "s3://isolab-results-104186811093-us-east-2/runs/n12-heldout-replay-20261025-v1/$(POD_UID)/"
+              },
+              {
+                "name": "RAYON_NUM_THREADS",
+                "value": "2"
+              },
+              {
+                "name": "OMP_NUM_THREADS",
+                "value": "2"
+              }
+            ],
+            "resources": {
+              "requests": {
+                "cpu": "2",
+                "memory": "4Gi",
+                "ephemeral-storage": "10Gi"
+              },
+              "limits": {
+                "cpu": "2",
+                "memory": "4Gi",
+                "ephemeral-storage": "10Gi"
+              }
+            },
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "work",
+                "mountPath": "/work"
+              },
+              {
+                "name": "tmp",
+                "mountPath": "/tmp"
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "work",
+            "emptyDir": {
+              "sizeLimit": "8Gi"
+            }
+          },
+          {
+            "name": "tmp",
+            "emptyDir": {
+              "sizeLimit": "1Gi"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
