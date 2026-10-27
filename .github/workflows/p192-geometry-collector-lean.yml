@@ -1,14 +1,10 @@
 name: P-192 geometry collector Lean proofs
 
 on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
-    paths:
-      - .github/workflows/p192-geometry-collector-lean.yml
-      - research/p192_extension_cover_20261012/lean/**
-      - research/p192_extension_cover_20261012/*cross_cubic_anchor*
-      - research/p192_extension_cover_20261012/*residual_point_reuse*
-      - research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/**
-  pull_request:
+    branches: [main]
     paths:
       - .github/workflows/p192-geometry-collector-lean.yml
       - research/p192_extension_cover_20261012/lean/**
@@ -19,7 +15,7 @@ on:
 
 jobs:
   pencil-and-four-cell:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 45 || 35 }}
     defaults:
       run:
@@ -56,7 +52,7 @@ jobs:
           cd ../../..
           sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024/ARTIFACTS.sha256
   residual-endpoint-clique:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -83,7 +79,7 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/analyze_residual_endpoint_combined_rows.py
           sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024-high-degree/ARTIFACTS.sha256
   cross-cubic-anchor-fan:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4

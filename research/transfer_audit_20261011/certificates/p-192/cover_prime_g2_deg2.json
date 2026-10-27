@@ -1,14 +1,14 @@
 {
   "baseline": {
     "algorithm": "Pollard rho on <G>",
-    "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
     "equivalence_class_reason": "negation only",
     "equivalence_class_size": 2,
     "log2_cost_of_one_group_operation": 15.344,
-    "log2_group_operations": 95.326,
+    "log2_group_operations": 95.826,
     "log2_r": 192.0,
-    "log2_total": 110.67,
-    "log2_total_without_automorphisms": 111.17
+    "log2_total": 111.17,
+    "log2_total_negation_only": 111.17
   },
   "candidate": {
     "id": "cover:prime_g2_deg2",
@@ -35,8 +35,8 @@
   ],
   "costs": {
     "destination_solver": "RhoOnJacobian",
-    "log2_baseline": 110.67,
-    "log2_cost_ratio": 4.542,
+    "log2_baseline": 111.17,
+    "log2_cost_ratio": 4.042,
     "log2_total": 115.212,
     "repo_ratio_log2": -4.042,
     "rows": [
@@ -147,6 +147,10 @@
       "trace": "31607402316713927207482677199"
     }
   },
+  "evaluation": {
+    "reason": "the priced total is 4.0 bits above the matched baseline",
+    "status": "excluded"
+  },
   "executed": null,
   "invariants": {
     "c": 0,
@@ -160,8 +164,9 @@
     "crosscheck_jacobian_transfers": {
       "delta_bits": 0.0,
       "file": "docs/curves/jacobian-transfers.json",
-      "note": "the repository total is search + transfer + destination; this total also carries construction and one verification, both negligible against the destination at these sizes",
+      "note": "a wiring check of the frozen formulas, not independent validation: this tool calls the repository's cost functions, so agreement shows the inputs were passed through, not that the formulas are right. The repository total is search + transfer + destination; this total also carries construction and one verification, both negligible against the destination at these sizes",
       "repo_log2_total": 115.212,
+      "reported_total_is_lower_by_class_discount_bits": null,
       "route_kind": "same_field_cover",
       "this_log2_total": 115.212,
       "within_0_002_bits": true
@@ -210,7 +215,7 @@
     "docs/curves/COVERS.md (prime characteristic greater than 3)",
     "crypto-autoresearcher ledger IDEA-20261009-275a14"
   ],
-  "schema": "transfer-audit/certificate/v1",
+  "schema": "transfer-audit/certificate/v2",
   "subgroup_preservation": {
     "antecedents": [
       {
@@ -231,10 +236,10 @@
     "method": "arithmetic: phi_* phi^* = [2] on Pic^0(E) and gcd(2, r) = 1",
     "status": "arithmetic"
   },
-  "tool": "transfer-audit/1",
+  "tool": "transfer-audit/2",
   "verdict": "no weakness found in scope",
   "verdict_basis": [
     "the map is not constructed (existence or construction missing)",
-    "priced route costs 2^4.5 times the matched baseline or more"
+    "priced route costs 2^4.0 times the matched baseline or more"
   ]
 }

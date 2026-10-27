@@ -112,6 +112,7 @@ impl WalkState {
             .truncate(false)
             .read(true)
             .write(true)
+            .truncate(false)
             .open(dir.join(".walk.lock"))
             .map_err(|e| format!("opening walk state lock: {e}"))?;
         #[cfg(unix)]
