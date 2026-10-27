@@ -10,6 +10,13 @@ simple branch when `B` is a unit. Its [diagram](branch-zero-order.svg),
 [gate table](branch-zero-order.csv), and [PDF](BRANCH_ZERO_ORDER.pdf) keep the
 explicit factorization hypothesis and the still-open global `Pic⁰` law visible.
 
+The [finite-branch weighted-Proj stalk packet](FINITE_BRANCH_STALK.md) places
+a rational branch point in the actual `Z` basic open and proves its
+structure-sheaf stalk is isomorphic to the affine branch localization. Its
+[diagram](finite-branch-stalk.svg), [CSV](finite-branch-stalk.csv), and
+[PDF](FINITE_BRANCH_STALK.pdf) separate this local-ring transport from the
+still-open global divisor-class and compiled-law obligations.
+
 The [weighted-Proj head and chart packet](WEIGHTED_PROJ_HEAD_VERIFIED.md)
 checks homogeneity of the proposed sextic and its principal ideal, plus the
 two dehomogenized equations obtained at `Z=1` and `X=1`. Its [CSV](weighted-proj-head-verified.csv),
