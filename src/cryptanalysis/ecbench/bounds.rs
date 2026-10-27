@@ -465,11 +465,11 @@ fn is_legacy_fit(v: &u32) -> bool {
     *v == LEGACY_FIT_VERSION
 }
 
-/// `bitop/v1`, or `bitop/v1` read on a partial cost basis
+/// `bitop/v1` or `bitop/v2`, also read on a partial cost basis
 /// (`bitop/v1+per_target`, `bitop/v1+search`; [`CostBasis`]).
 fn is_bitop_unit(unit: &str) -> bool {
-    let base = crate::cryptanalysis::bitops::UNIT;
-    unit == base || unit.strip_prefix(base).is_some_and(|s| s.starts_with('+'))
+    let base = unit.split_once('+').map_or(unit, |(base, _)| base);
+    crate::cryptanalysis::bitops::is_bitop_unit(base)
 }
 
 impl Default for FitOptions {
@@ -1348,7 +1348,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     };
     // The same fit in additions, in bitop/v1: each run's gates over one
     // affine addition's gates on its curve.
-    let (alpha_add, alpha_add_ci) = if crate::cryptanalysis::bitops::is_bitop_unit(&domain.unit) {
+    let (alpha_add, alpha_add_ci) = if is_bitop_unit(&domain.unit) {
         let add_strata: Vec<Vec<(f64, f64)>> = sizes
             .iter()
             .map(|row| {
@@ -1381,7 +1381,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
         n_sizes >= MIN_SIZES_FOR_SCALING && alpha.is_some() && (!v2 || alpha_ci.is_some());
     let fit = Fit {
         size_parameter: "r".into(),
-        model: if crate::cryptanalysis::bitops::is_bitop_unit(&domain.unit) {
+        model: if is_bitop_unit(&domain.unit) {
             "bitops = C * r^alpha".into()
         } else {
             "gae = C * r^alpha".into()
@@ -1641,7 +1641,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     // every structure held: a lower bound ranks nothing against a complete
     // one, so it is inadmissible, with what it misses named
     // (docs/units/BITOPS.md).
-    let incomplete_bitops = crate::cryptanalysis::bitops::is_bitop_unit(&domain.unit) && bounded;
+    let incomplete_bitops = is_bitop_unit(&domain.unit) && bounded;
     if incomplete_bitops {
         reasons.push(format!(
             "{} pricing is incomplete (missing: {}); a lower bound is not admissible in this unit",
