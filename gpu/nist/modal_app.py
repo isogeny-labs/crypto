@@ -9,7 +9,7 @@ GPU=os.environ.get("NIST_GPU","RTX-PRO-6000")
 ROOT="/root/nist";LOCAL=pathlib.Path(__file__).parent
 image=(modal.Image.from_registry(f"nvidia/cuda:{CUDA}-devel-ubuntu24.04",add_python="3.12")
  .entrypoint([]).apt_install("build-essential","libboost-dev")
-  .add_local_dir(LOCAL,remote_path=ROOT,copy=True,ignore=["bench","test_cpu","test_rho","*.ptx","__pycache__"])
+  .add_local_dir(LOCAL,remote_path=ROOT,copy=True,ignore=["bench","bench-b*","test_cpu","test_rho","test_cpu_b*","test_rho_b*","*.ptx","__pycache__"])
  .run_commands(f"cd {ROOT} && make test"))
 app=modal.App("nist-prime-gpu-arithmetic")
 def sh(cmd,timeout=3600):
@@ -184,46 +184,18 @@ def tune(repeats:int=3):
    if ranked:print(curve,op,{"median_Mop_s":ranked[0][0],"config":ranked[0][1],"samples":ranked[0][2]})
  return {"gpu":info.strip(),"rows":rows}
 
-# Best of P+M and P-M (RHO_BEST2): the same PTX/global-table build with and
-# without it, CPU suites for both, then interleaved rho cells at 256 threads,
-# W = 16/32/64, both curves, `reps` alternating-order repetitions.
-#   modal run modal_app.py::best2_main --iters 2048 --reps 3 --out <file.json>
+# Best of P+M and P-M (RHO_BEST2): best2_ab.sh builds, tests and runs the
+# interleaved cells; this only launches it and saves its raw output.  The
+# rho-walk-leads harness parses the log (`rho_walk_leads gpuab --log`).
+#   modal run modal_app.py::best2_main --iters 2048 --reps 3 --out <file.log>
 @app.function(image=image,gpu=GPU,timeout=4*3600)
 def best2_ab(iters:int=2048,reps:int=3):
- rc,info=sh("nvidia-smi --query-gpu=name,uuid,driver_version,clocks.max.sm,power.limit --format=csv,noheader")
- print(info)
- meta={"gpu":info.strip(),"iters":iters,"reps":reps,"builds":{}}
- for b in (0,1):
-  rc,t=sh(f"make -s -B test BEST2={b}");print(t[-600:])
-  if rc or "ALL PASSED" not in t: raise RuntimeError(f"CPU suite failed for BEST2={b}")
-  rc,log=sh(f"make -B bench ARCH=sm_120 NIST_PTX=1 TABLE_SHARED=0 BEST2={b}")
-  if rc: raise RuntimeError(log[-2000:])
-  sh(f"cp bench bench-b{b}")
-  regs=re.findall(r"Compiling entry function '(\S*k_rhoI\S*)'.*?Used (\d+) registers.*?(\d+) bytes cumulative stack",log,re.S)
-  rc,sha=sh(f"sha256sum bench-b{b}")
-  meta["builds"][b]={"cpu_suite":"ALL PASSED","k_rho":[(n,int(r),int(s)) for n,r,s in regs],"sha256":sha.split()[0]}
-  print("BEST2",b,meta["builds"][b])
- rows=[]
- for rep in range(reps):
-  for W in (16,32,64):
-   order=(0,1) if (rep+W//16)%2==0 else (1,0)
-   for pos,b in enumerate(order):
-    rc,out=sh(f"./bench-b{b} 256 rho {W} {iters}")
-    if rc: raise RuntimeError(out[-800:])
-    rc2,state=sh("nvidia-smi --query-gpu=clocks.sm,power.draw,temperature.gpu --format=csv,noheader,nounits")
-    for curve,nw,thr,blk,ww,gstep,dps in re.findall(
-      r"^(P-(?:256|384)) rho: walks=(\d+) threads/blk=(\d+) blocks=(\d+) W=(\d+)\s+([0-9.]+) Gstep/s\s+\((\d+) DPs",out,re.M):
-     row={"rep":rep,"order":pos,"best2":b,"threads":int(thr),"W":int(ww),"curve":curve,"walks":int(nw),
-          "Gstep_s":float(gstep),"DPs":int(dps),"expected_DPs":int(nw)*iters/2**24,"gpu_state":state.strip()}
-     rows.append(row);print(row)
- return {"meta":meta,"rows":rows}
+ rc,out=sh(f"./best2_ab.sh {iters} {reps}",timeout=4*3600)
+ if rc: raise RuntimeError(out[-2000:])
+ return out
 
 @app.local_entrypoint()
-def best2_main(iters:int=2048,reps:int=3,out:str="best2.json"):
- import json,time
- t0=time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime())
- r=best2_ab.remote(iters,reps)
- r["meta"]["started_utc"]=t0; r["meta"]["finished_utc"]=time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime())
- r["meta"]["commit"]=subprocess.run(["git","rev-parse","HEAD"],capture_output=True,text=True,cwd=LOCAL).stdout.strip()
- pathlib.Path(out).write_text(json.dumps(r,indent=1))
+def best2_main(iters:int=2048,reps:int=3,out:str="best2.log"):
+ commit=subprocess.run(["git","rev-parse","HEAD"],capture_output=True,text=True,cwd=LOCAL).stdout.strip()
+ pathlib.Path(out).write_text(f"COMMIT {commit}\n"+best2_ab.remote(iters,reps))
  print("wrote",out)

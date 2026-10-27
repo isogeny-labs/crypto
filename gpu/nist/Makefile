@@ -13,17 +13,18 @@ endif
 
 .PHONY: all test bench ptx clean
 all: test
-test: test_cpu test_rho
-	./test_cpu
-	./test_rho
-test_cpu: test_cpu.cpp nist_fields.cuh nist_ptx.cuh nist_solinas.cuh
+# Test binaries are named per BEST2 so changing it rebuilds them.
+test: test_cpu_b$(BEST2) test_rho_b$(BEST2)
+	./test_cpu_b$(BEST2)
+	./test_rho_b$(BEST2)
+test_cpu_b$(BEST2): test_cpu.cpp nist_fields.cuh nist_ptx.cuh nist_solinas.cuh
 	$(CXX) $(CXXFLAGS) -o $@ test_cpu.cpp
 # Rho engine: curve/walk/solver headers verified on the CPU (no GPU needed).
-test_rho: test_rho.cpp nist_fields.cuh nist_curve.cuh nist_rho.cuh nist_rho_host.hpp
+test_rho_b$(BEST2): test_rho.cpp nist_fields.cuh nist_curve.cuh nist_rho.cuh nist_rho_host.hpp
 	$(CXX) $(CXXFLAGS) -o $@ test_rho.cpp
 bench: bench.cu nist_fields.cuh nist_ptx.cuh nist_solinas.cuh nist_curve.cuh nist_rho.cuh
 	$(NVCC) $(NVCCFLAGS) -DNIST_PTX=$(NIST_PTX) -o $@ bench.cu
 ptx: bench.cu nist_fields.cuh nist_ptx.cuh nist_solinas.cuh nist_curve.cuh nist_rho.cuh
 	$(NVCC) $(NVCCFLAGS) -DNIST_PTX=$(NIST_PTX) -ptx -o bench.ptx bench.cu
 clean:
-	rm -f test_cpu test_rho bench bench.ptx
+	rm -f test_cpu test_cpu_b* test_rho test_rho_b* bench bench-b* bench.ptx

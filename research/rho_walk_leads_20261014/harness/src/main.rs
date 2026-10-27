@@ -1206,8 +1206,10 @@ fn summary(args: &[String]) {
 
 // ------------------------------------------------------------- gpu A/B
 
-/// gpu/nist RHO_BEST2 A/B: JSON lines with best2, rep, W, curve, Gstep_s,
-/// DPs, expected_DPs (one per cell, both builds).  Per (curve, W): median
+/// gpu/nist RHO_BEST2 A/B: the raw log of `gpu/nist/best2_ab.sh`, where a
+/// `CELL rep= order= best2= W= iters=` line precedes each bench run and its
+/// `P-256 rho: walks=N ... W=W  G Gstep/s  (D DPs, dp_bits=B)` lines; the
+/// expected DP count is walks x iters / 2^B.  Per (curve, W): median
 /// rate per build, the per-repetition paired ratio best2/plain (median, min,
 /// max), the DP ratio observed/expected, and GPU time per solve relative to
 /// the plain kernel, `1 / (iteration speedup x rate ratio)`, at the measured
@@ -1225,19 +1227,31 @@ fn gpuab(args: &[String]) {
     // (curve, W) -> rep -> [plain, best2] rates; DP sums per build
     let mut cells: std::collections::BTreeMap<(String, u32), std::collections::BTreeMap<u32, [f64; 2]>> = Default::default();
     let mut dps: std::collections::BTreeMap<(String, u32, usize), (f64, f64)> = Default::default();
+    // value after `key=` up to the next space, comma or parenthesis
+    let kv = |l: &str, k: &str| -> Option<f64> {
+        let i = l.find(&format!("{k}="))? + k.len() + 1;
+        l[i..].split(|c: char| c == ' ' || c == ',' || c == ')').next()?.parse().ok()
+    };
+    let (mut b, mut r, mut iters) = (0usize, 0u32, 0f64);
     for l in rd.lines() {
         let l = l.unwrap();
-        let (Some(b), Some(w), Some(c), Some(g), Some(r)) =
-            (jget(&l, "best2"), jget(&l, "W"), jget(&l, "curve"), jget(&l, "Gstep_s"), jget(&l, "rep"))
-        else {
+        if l.starts_with("CELL ") {
+            b = kv(&l, "best2").unwrap() as usize;
+            r = kv(&l, "rep").unwrap() as u32;
+            iters = kv(&l, "iters").unwrap();
             continue;
-        };
-        let b: usize = b.parse().unwrap();
-        let key = (c.to_string(), w.parse::<u32>().unwrap());
-        cells.entry(key.clone()).or_default().entry(r.parse().unwrap()).or_insert([f64::NAN; 2])[b] = g.parse().unwrap();
+        }
+        let Some((c, rest)) = l.split_once(" rho: walks=") else { continue };
+        let walks: f64 = rest.split(' ').next().unwrap().parse().unwrap();
+        let w = kv(&l, "W").unwrap() as u32;
+        let toks: Vec<&str> = l.split_whitespace().collect();
+        let g: f64 = toks[toks.iter().position(|t| *t == "Gstep/s").unwrap() - 1].parse().unwrap();
+        let d: f64 = toks[toks.iter().position(|t| *t == "DPs,").unwrap() - 1].trim_start_matches('(').parse().unwrap();
+        let key = (c.to_string(), w);
+        cells.entry(key.clone()).or_default().entry(r).or_insert([f64::NAN; 2])[b] = g;
         let e = dps.entry((key.0, key.1, b)).or_insert((0.0, 0.0));
-        e.0 += jget(&l, "DPs").unwrap().parse::<f64>().unwrap();
-        e.1 += jget(&l, "expected_DPs").unwrap().parse::<f64>().unwrap();
+        e.0 += d;
+        e.1 += walks * iters / 2f64.powf(kv(&l, "dp_bits").unwrap());
     }
     let med = |mut v: Vec<f64>| {
         v.sort_by(|a, b| a.partial_cmp(b).unwrap());
