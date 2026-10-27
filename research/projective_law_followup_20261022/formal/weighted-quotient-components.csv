@@ -39,8 +39,12 @@ squarefree_affine_jacobian_span_bridge,checked,WeightedAffineSquarefreeSmooth.le
 proj_valued_glue_transition,checked,WeightedProjGluedMorphism.lean,forward separate-chart overlap transition is compatible after mapping into actual weighted Proj,remaining Bool cone equations supplied by WeightedProjGlueCone.lean
 global_glued_to_proj_morphism,checked,WeightedProjGlueCone.lean,separately glued two-chart scheme maps into actual weighted Proj and restricts to the intended chart maps,global inverse and isomorphism remain open
 infinity_proj_stalk_chart_localization,checked,WeightedPic0Bridge.lean,actual weighted-Proj stalk at the infinity-chart origin is isomorphic to Localization.AtPrime of the explicit chart ring,principal divisor and Pic0 class equation remain open
+infinity_proj_stalk_dvr,checked,WeightedProjInfinityDVR.lean,actual weighted-Proj infinity stalk is a DVR with transported w uniformizer and z valuation order two,global principal divisor and Pic0 class equation remain open
 affine_genus2_partial_identities,checked,WeightedAffineXPartial.lean,X and Y partial images in the affine coordinate ring,none
-squarefree_affine_ring_smooth,checked,WeightedAffineSquarefreeFinal.lean,affine chart over a perfect field of characteristic other than two and squarefree quintic,full infinity chart and global Proj Smooth remain open
-global_smoothness,open,,weighted Proj under smooth-curve hypotheses,prove full infinity chart Smooth and transport both chart results to global Proj
-overlap_gluing_comparison,open,,D_X and D_Z overlap,construct inverse to the checked glued-to-Proj morphism and transport global local stalks
+squarefree_affine_ring_smooth,checked,WeightedAffineSquarefreeFinal.lean,affine chart over a perfect field of characteristic other than two and squarefree quintic,full infinity ring supplied by WeightedInfinitySquarefreeSmooth.lean; global Proj Smooth remains open
+squarefree_infinity_ring_smooth,checked,WeightedInfinitySquarefreeSmooth.lean,full explicit infinity coordinate ring over a perfect field of characteristic other than two and squarefree quintic,transport chart structure map to actual Proj then prove global Smooth
+conditional_global_proj_smooth,checked,WeightedProjGlobalSmooth.lean,actual weighted Proj structure map is Smooth if both basic-open restrictions equal canonical chart structure maps,two chart-to-structure-map equalities remain unproved
+glued_to_proj_surjective,checked,WeightedProjGlueIso.lean,checked glued-to-Proj morphism is surjective on scheme points,prove open immersion and inverse
+global_smoothness,open,,weighted Proj under smooth-curve hypotheses,prove both actual chart restriction equalities then apply two-open Smooth reduction
+overlap_gluing_comparison,open,,D_X and D_Z overlap,prove checked glued-to-Proj morphism is an open immersion then use surjectivity to obtain isomorphism
 projective_completion_pic0,open,,global geometry,prove cover gluing completion and Pic0 transport
