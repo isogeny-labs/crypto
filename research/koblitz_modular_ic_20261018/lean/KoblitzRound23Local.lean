@@ -1,5 +1,6 @@
 import KoblitzRound22SS
 import Mathlib.RingTheory.Ideal.Colon
+import Mathlib.RingTheory.Ideal.Span
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 
 /-! Structural consequences of the exact source-neighborhood certificates.

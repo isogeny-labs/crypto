@@ -87,3 +87,11 @@ success. Attempt03 replaces GTZ with complete univariate eliminant factorization
 power factors,intersection/length controls and native positive-characteristic
 radical computation. No primary/prime status is inferred merely from lengths.
 This is Z23-factor.sing;all original inputs and caps remain fixed.
+
+## Frozen Lean unit-identity extraction
+
+SS23 compact02 proves that the selected h specializes exactly to U and that
+its literal inverse certificate is exact. SS23-unit.sing extracts the complete
+minpoly multiplier over F2[a,n,l],then its even correction over Q. This yields
+a universal integer-lift identity suitable for independent Lean kernel proof;
+no new search,curve/model or resource increase is involved. CAS cap4GiB/1200s.
