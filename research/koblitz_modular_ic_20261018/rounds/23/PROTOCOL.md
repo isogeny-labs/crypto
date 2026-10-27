@@ -95,3 +95,15 @@ its literal inverse certificate is exact. SS23-unit.sing extracts the complete
 minpoly multiplier over F2[a,n,l],then its even correction over Q. This yields
 a universal integer-lift identity suitable for independent Lean kernel proof;
 no new search,curve/model or resource increase is involved. CAS cap4GiB/1200s.
+
+## Frozen Z23 complete local-algebra components
+
+Factor03 proves the common reduced algebra has dimension4;the lambda
+eliminants are a single irreducible quadratic to powers8(original),7(closure).
+Complete decomposition now uses sat_with_exp with the actual seventh registered
+unit and complementary ideal quotient,with both inclusion/comaximality and
+length checks. Compute each residue radical and its eliminant factorization.
+Explicitly visit all8 original unit indexes:Singular size(ideal) counts nonzero
+entries,so a zero discriminant entry made the earlier loop omit index8.
+Keep that earlier loop's scope defect and every raw record. Do not infer
+normalized ramification from these local algebra lengths. Same4GiB/1200s cap.
