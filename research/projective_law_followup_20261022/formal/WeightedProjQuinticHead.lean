@@ -1,5 +1,6 @@
 import WeightedProjSmoothPoints
 import Common22BranchStalk
+import Common22BranchParameter
 import Mathlib.Tactic.ComputeDegree
 
 /-!
@@ -34,9 +35,28 @@ theorem quintic_coeff_four (a3 a2 a1 a0 : K) :
     (quintic a3 a2 a1 a0).coeff 4 = 0 := by
   simp [quintic]
 
+theorem quintic_derivative_eval_eq_derivativeAt (a3 a2 a1 a0 x : K) :
+    (quintic a3 a2 a1 a0).derivative.eval x =
+      Common22BranchParameter.derivativeAt a3 a2 a1 a0 x := by
+  simp [quintic, Common22BranchParameter.derivativeAt,
+    derivative_add, derivative_mul, derivative_pow]
+  ring
+
+theorem derivativeAt_ne_zero_of_separable (a3 a2 a1 a0 x : K)
+    (hsep : (quintic a3 a2 a1 a0).Separable)
+    (hroot : fAt a3 a2 a1 a0 x = 0) :
+    Common22BranchParameter.derivativeAt a3 a2 a1 a0 x ≠ 0 := by
+  have hr : (quintic a3 a2 a1 a0).eval x = 0 := by
+    rw [quintic_eval_eq_fAt]
+    exact hroot
+  rw [← quintic_derivative_eval_eq_derivativeAt]
+  exact hsep.eval₂_derivative_ne_zero (RingHom.id K) (by simpa using hr)
+
 #print axioms quintic_eval_eq_fAt
 #print axioms quintic_natDegree_le_five
 #print axioms quintic_coeff_five
 #print axioms quintic_coeff_four
+#print axioms quintic_derivative_eval_eq_derivativeAt
+#print axioms derivativeAt_ne_zero_of_separable
 
 end WeightedProjQuinticHead

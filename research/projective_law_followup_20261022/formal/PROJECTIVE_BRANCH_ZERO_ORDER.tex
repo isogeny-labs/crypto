@@ -22,7 +22,7 @@ A second checked theorem composes the separate norm-factor transport with this r
 
 The source-style specialization uses the checked common 2+2 coefficient formulas. Under valid Mumford input congruences, a normalized quintic head, nonzero determinant, a rational simple branch, and a root of the norm support product, it proves the same local order for the proof-side polynomial numerator. Equality of the supplied quintic with the actual curve equation and compiled runtime semantics are still separate obligations.
 
-The actual-quintic specialization proves the weighted-Proj quintic evaluates to the affine branch polynomial and has the required normalized head. It then applies the source-style theorem without a separately supplied quintic or head assumptions. Valid input congruences, nonzero determinant, rational simple branch, and norm-support root remain explicit.
+The actual-quintic specialization proves the weighted-Proj quintic evaluates to the affine branch polynomial and has the required normalized head. A further checked corollary derives the simple-root condition from separability of that quintic. Valid input congruences, nonzero determinant, rational branch root, and norm-support root remain explicit.
 
 \begin{center}
 \setlength{\fboxsep}{9pt}
@@ -35,7 +35,7 @@ $\operatorname{ord}(N-By)=1$
 \end{center}
 
 \section*{Verification and remaining gates}
-Direct Lean 4.34.1 compilation with Mathlib \texttt{d13f23b} exited zero for all five sources. All ten theorem axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; no \texttt{sorryAx}. Source SHA-256 hashes are in the companion CSV and Markdown report; the two new sources are:\par\smallskip\noindent Quintic head: {\scriptsize\texttt{a5e885d3c7f889920c43b024084339f604c3032604a06f16c09b83e235c94f34}}.\par\smallskip\noindent Actual specialization: {\scriptsize\texttt{a1688ab6cfaf82896c3fcab4c8de275b6ae2cf9e306a949b546fd1b0c7805b24}}.
+Direct Lean 4.34.1 compilation with Mathlib \texttt{d13f23b} exited zero for all five sources. All thirteen theorem axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; no \texttt{sorryAx}. Source SHA-256 hashes are in the companion CSV and Markdown report; the updated sources are:\par\smallskip\noindent Quintic head: {\scriptsize\texttt{668bd42e2f25d22dfa128cf910572f76190ec630a56665e8808b42bcf4d643f3}}.\par\smallskip\noindent Actual specialization: {\scriptsize\texttt{c7373682f8ce09e0c2243dfa44c92b9e6467f0b9188fa420aa1c23fbc4e6ca7d}}.
 
 The compiled Rust law has not been shown to equal the mapped polynomial on every branch. Nonbranch multiplicities, the global principal divisor, the $\mathrm{Pic}^0$ class equation, and universal runtime semantics remain open. No frozen 1,260-target row or matched-rho ratio changes.
 \end{document}
