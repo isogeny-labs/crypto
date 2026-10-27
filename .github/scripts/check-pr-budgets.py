@@ -27,14 +27,14 @@ FROZEN_BUDGET_EXCEPTIONS = {
         "job": "proofs",
         "timeout": 60,
         "seal": "research/weak_curve_properties_lean_20261011/EVIDENCE_SHA256.tsv",
-        "seal_sha256": "118adb8dc0f96521b54b947989c4f3f84ecb25491de45563d71aef51efb6feea",
+        "seal_sha256": "bd7de95c3c6fc9060a15cd03a99fe6bea2272ccf815cee59a0d1d02e5606e625",
         "pin_path": "../../.github/workflows/weak-curve-lean.yml",
     },
     ".github/workflows/weak-curve-conjectures.yml": {
         "job": "evidence",
         "timeout": 60,
         "seal": "research/weak_curve_conjectures_20261012/EVIDENCE_SHA256SUMS",
-        "seal_sha256": "ea93a01006f38bbf9c6f08632324795c6607c4ed0c92ac393851cd18f398275d",
+        "seal_sha256": "bd1fbaf84fcb00ca2cf7d2eb7c6691463c6e1d7e5bd00c6744fa1870b1ff711c",
         "pin_path": "../../.github/workflows/weak-curve-conjectures.yml",
     },
 }
