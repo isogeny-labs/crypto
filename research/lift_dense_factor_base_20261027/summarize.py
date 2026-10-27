@@ -108,7 +108,51 @@ S["lines"] = cells
 S["H_A"] = {"failures": ha_fail, "verdict": "pass" if not ha_fail else "FAIL"}
 S["H_B"] = {"failures": hb_fail, "verdict": "pass" if not hb_fail else "FAIL"}
 
+# ---- Amendment 1: H-A' with empirical per-target variance --------------------
+am = run / "lines_amend1" / "rows.jsonl"
+if am.exists():
+    A = [json.loads(x) for x in am.read_text().splitlines()]
+    A = [r for r in A if r["kind"] == "line"]
+    orig = {(r["N"], r["d"], r["curve"], r["line"]): r for r in lines}
+    reproduced = all(
+        r.get("u") is None or (orig[(r["N"], r["d"], r["curve"], r["line"])]["yield_ordered_mean"] == r["yield_ordered_mean"])
+        for r in A)
+    fails, pooled = [], {}
+    for r in A:
+        if r.get("u") is None or r["fb_points"] == 0:
+            continue
+        t = r["targets"]
+        var = max(r["yield_ordered_m2"] - r["yield_ordered_mean"] ** 2, 0.0)
+        se = math.sqrt(var / t) if var > 0 else 1e-12
+        z = (r["yield_ordered_mean"] - r["yield_pred"]) / se
+        r["z_emp"] = z
+        if abs(z) > 4:
+            fails.append((r["N"], r["d"], r["curve"], r["line"], round(z, 2)))
+        key = f"N{r['N']}_d{r['d']}"
+        P = pooled.setdefault(key, {"meas": 0.0, "pred": 0.0, "var": 0.0})
+        P["meas"] += r["yield_ordered_mean"] * t
+        P["pred"] += r["yield_pred"] * t
+        P["var"] += var * t
+    pool_fail = []
+    for key, P in pooled.items():
+        P["ratio"] = P["meas"] / P["pred"]
+        P["z"] = (P["meas"] - P["pred"]) / math.sqrt(P["var"])
+        if abs(P["z"]) > 4:
+            pool_fail.append((key, round(P["z"], 2)))
+    zs = [r["z_emp"] for r in A if "z_emp" in r]
+    S["H_A_prime"] = {"reproduces_confirmatory_means": reproduced, "row_failures": fails,
+                      "pooled": pooled, "pooled_failures": pool_fail,
+                      "z_mean": st.mean(zs), "z_sd": st.pstdev(zs), "rows": len(zs),
+                      "verdict": "pass" if (reproduced and not fails and not pool_fail) else "FAIL"}
+
 # ---- m = 2 yield check on prime n (instrument) -----------------------------
+# post-hoc (not a decision rule): sampled targets exclude O and T, while the
+# identity k(2k+1)/#E includes the k pairs {P, -P} summing to O; removing
+# them gives 2k^2 / (#E - 2).
+for r in ym2:
+    for arm in [r["dense"]] + r["random"]:
+        arm["pred_excl_O"] = 2 * arm["k"] ** 2 / (r["order"] - 2)
+        arm["ratio_excl_O"] = arm["mean"] / arm["pred_excl_O"]
 S["yield_m2"] = ym2
 
 # ---- kmax / counts ----------------------------------------------------------
@@ -181,6 +225,10 @@ if dl.exists():
 
 (run / "summary.json").write_text(json.dumps(S, indent=1, default=str))
 print("H_A", S["H_A"]["verdict"], len(ha_fail), "| H_B", S["H_B"]["verdict"], len(hb_fail))
+if "H_A_prime" in S:
+    h = S["H_A_prime"]
+    print("H_A'", h["verdict"], "reproduced", h["reproduces_confirmatory_means"], "row fails", h["row_failures"],
+          "pooled fails", h["pooled_failures"], "z mean %.2f sd %.2f over %d rows" % (h["z_mean"], h["z_sd"], h["rows"]))
 for n, h in hc.items():
     print("H_C n=%d curves %.3f±%.3f nulls %.3f±%.3f p_perm %.2g p_norm %.2g" % (
         n, h["mean_curve"], h["sd_curve"], h["mean_null"], h["sd_null"], h["p_perm"], h["p_norm"]))
