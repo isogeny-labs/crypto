@@ -225,8 +225,14 @@ unsafe fn dot_avx2(a: &[u32], b: &[u32]) -> (u64, u64) {
         let y = _mm256_loadu_si256(b.as_ptr().add(i).cast());
         let pe = _mm256_mul_epu32(x, y);
         let po = _mm256_mul_epu32(_mm256_srli_epi64(x, 32), _mm256_srli_epi64(y, 32));
-        lo = _mm256_add_epi64(lo, _mm256_add_epi64(_mm256_and_si256(pe, mask), _mm256_and_si256(po, mask)));
-        hi = _mm256_add_epi64(hi, _mm256_add_epi64(_mm256_srli_epi64(pe, 32), _mm256_srli_epi64(po, 32)));
+        lo = _mm256_add_epi64(
+            lo,
+            _mm256_add_epi64(_mm256_and_si256(pe, mask), _mm256_and_si256(po, mask)),
+        );
+        hi = _mm256_add_epi64(
+            hi,
+            _mm256_add_epi64(_mm256_srli_epi64(pe, 32), _mm256_srli_epi64(po, 32)),
+        );
         i += 8;
     }
     let mut lv = [0u64; 4];
@@ -292,14 +298,23 @@ unsafe fn dot4_avx512(r: [&[u32]; 4], w: &[u32]) -> [(u64, u64); 4] {
             let x = _mm512_loadu_si512(r[k].as_ptr().add(i).cast());
             let pe = _mm512_mul_epu32(x, y);
             let po = _mm512_mul_epu32(_mm512_srli_epi64(x, 32), yo);
-            lo[k] = _mm512_add_epi64(lo[k], _mm512_add_epi64(_mm512_and_si512(pe, mask), _mm512_and_si512(po, mask)));
-            hi[k] = _mm512_add_epi64(hi[k], _mm512_add_epi64(_mm512_srli_epi64(pe, 32), _mm512_srli_epi64(po, 32)));
+            lo[k] = _mm512_add_epi64(
+                lo[k],
+                _mm512_add_epi64(_mm512_and_si512(pe, mask), _mm512_and_si512(po, mask)),
+            );
+            hi[k] = _mm512_add_epi64(
+                hi[k],
+                _mm512_add_epi64(_mm512_srli_epi64(pe, 32), _mm512_srli_epi64(po, 32)),
+            );
         }
         i += 16;
     }
     let mut out = [(0u64, 0u64); 4];
     for k in 0..4 {
-        let (mut l, mut h) = (_mm512_reduce_add_epi64(lo[k]) as u64, _mm512_reduce_add_epi64(hi[k]) as u64);
+        let (mut l, mut h) = (
+            _mm512_reduce_add_epi64(lo[k]) as u64,
+            _mm512_reduce_add_epi64(hi[k]) as u64,
+        );
         for j in i..n {
             let pr = r[k][j] as u64 * w[j] as u64;
             l += pr & LO;
@@ -309,7 +324,6 @@ unsafe fn dot4_avx512(r: [&[u32]; 4], w: &[u32]) -> [(u64, u64); 4] {
     }
     out
 }
-
 
 #[inline(always)]
 fn axpy_body(lo: &mut [u64], hi: &mut [u64], c: u32, row: &[u32]) {
@@ -340,11 +354,20 @@ unsafe fn dot_avx512(a: &[u32], b: &[u32]) -> (u64, u64) {
         let y = _mm512_loadu_si512(b.as_ptr().add(i).cast());
         let pe = _mm512_mul_epu32(x, y);
         let po = _mm512_mul_epu32(_mm512_srli_epi64(x, 32), _mm512_srli_epi64(y, 32));
-        lo = _mm512_add_epi64(lo, _mm512_add_epi64(_mm512_and_si512(pe, mask), _mm512_and_si512(po, mask)));
-        hi = _mm512_add_epi64(hi, _mm512_add_epi64(_mm512_srli_epi64(pe, 32), _mm512_srli_epi64(po, 32)));
+        lo = _mm512_add_epi64(
+            lo,
+            _mm512_add_epi64(_mm512_and_si512(pe, mask), _mm512_and_si512(po, mask)),
+        );
+        hi = _mm512_add_epi64(
+            hi,
+            _mm512_add_epi64(_mm512_srli_epi64(pe, 32), _mm512_srli_epi64(po, 32)),
+        );
         i += 16;
     }
-    let (mut l, mut h) = (_mm512_reduce_add_epi64(lo) as u64, _mm512_reduce_add_epi64(hi) as u64);
+    let (mut l, mut h) = (
+        _mm512_reduce_add_epi64(lo) as u64,
+        _mm512_reduce_add_epi64(hi) as u64,
+    );
     while i < n {
         let pr = a[i] as u64 * b[i] as u64;
         l += pr & LO;
@@ -367,8 +390,14 @@ unsafe fn axpy_avx512(lo: &mut [u64], hi: &mut [u64], c: u32, row: &[u32]) {
         let pr = _mm512_mul_epu32(x, cv);
         let l = _mm512_loadu_si512(lo.as_ptr().add(i).cast());
         let h = _mm512_loadu_si512(hi.as_ptr().add(i).cast());
-        _mm512_storeu_si512(lo.as_mut_ptr().add(i).cast(), _mm512_add_epi64(l, _mm512_and_si512(pr, mask)));
-        _mm512_storeu_si512(hi.as_mut_ptr().add(i).cast(), _mm512_add_epi64(h, _mm512_srli_epi64(pr, 32)));
+        _mm512_storeu_si512(
+            lo.as_mut_ptr().add(i).cast(),
+            _mm512_add_epi64(l, _mm512_and_si512(pr, mask)),
+        );
+        _mm512_storeu_si512(
+            hi.as_mut_ptr().add(i).cast(),
+            _mm512_add_epi64(h, _mm512_srli_epi64(pr, 32)),
+        );
         i += 8;
     }
     axpy_body(&mut lo[i..n], &mut hi[i..n], c, &row[i..n]);
@@ -462,7 +491,14 @@ impl Fp {
         #[cfg(target_arch = "x86_64")]
         let v = match simd_level() {
             2 => unsafe { dot4_avx512(r, w) },
-            1 => unsafe { [dot_avx2(r[0], w), dot_avx2(r[1], w), dot_avx2(r[2], w), dot_avx2(r[3], w)] },
+            1 => unsafe {
+                [
+                    dot_avx2(r[0], w),
+                    dot_avx2(r[1], w),
+                    dot_avx2(r[2], w),
+                    dot_avx2(r[3], w),
+                ]
+            },
             _ => dot4_body(r, w),
         };
         #[cfg(not(target_arch = "x86_64"))]
@@ -519,8 +555,16 @@ fn pmul(fp: &Fp, a: &[u32], b: &[u32], muls: &mut u64) -> Vec<u32> {
     let (a0p, b0p) = (pad(a0), pad(b0));
     let z0 = pmul(fp, &a0p, &b0p, muls);
     let z2 = pmul(fp, a1, b1, muls);
-    let sa: Vec<u32> = a0p.iter().zip(a1).map(|(&x, &y)| fp.add(x as u64, y as u64) as u32).collect();
-    let sb: Vec<u32> = b0p.iter().zip(b1).map(|(&x, &y)| fp.add(x as u64, y as u64) as u32).collect();
+    let sa: Vec<u32> = a0p
+        .iter()
+        .zip(a1)
+        .map(|(&x, &y)| fp.add(x as u64, y as u64) as u32)
+        .collect();
+    let sb: Vec<u32> = b0p
+        .iter()
+        .zip(b1)
+        .map(|(&x, &y)| fp.add(x as u64, y as u64) as u32)
+        .collect();
     let z1 = pmul(fp, &sa, &sb, muls);
     let mut out = vec![0u32; 2 * n - 1];
     for (i, &v) in z0.iter().enumerate() {
@@ -942,7 +986,12 @@ fn square_into(fp: &Fp, a: &[u32], out: &mut [u32], ks: &mut KScratch) {
         let c = a[i];
         if c != 0 {
             let row = &a[i + 1..];
-            fp.axpy(&mut lo[2 * i + 1..2 * i + 1 + row.len()], &mut hi[2 * i + 1..2 * i + 1 + row.len()], c, row);
+            fp.axpy(
+                &mut lo[2 * i + 1..2 * i + 1 + row.len()],
+                &mut hi[2 * i + 1..2 * i + 1 + row.len()],
+                c,
+                row,
+            );
             kcount(row.len());
         }
     }
@@ -977,7 +1026,15 @@ impl KScratch {
 }
 
 /// `out[..2n − 1] = a · b` for `a, b` of the same length `n`.
-fn kmul(fp: &Fp, a: &[u32], b: &[u32], out: &mut [u32], w: &mut [u32], lo: &mut [u64], hi: &mut [u64]) {
+fn kmul(
+    fp: &Fp,
+    a: &[u32],
+    b: &[u32],
+    out: &mut [u32],
+    w: &mut [u32],
+    lo: &mut [u64],
+    hi: &mut [u64],
+) {
     let n = a.len();
     debug_assert_eq!(b.len(), n);
     if n == 0 {
@@ -1345,9 +1402,13 @@ fn fast_inner(
                     use rayon::prelude::*;
                     let wr = &w;
                     pool.install(|| {
-                        dvals.par_iter_mut().enumerate().with_min_len(4).for_each(|(c, v)| {
-                            *v = fp.dot(&dmat[c * delta..(c + 1) * delta], wr) as u32;
-                        })
+                        dvals
+                            .par_iter_mut()
+                            .enumerate()
+                            .with_min_len(4)
+                            .for_each(|(c, v)| {
+                                *v = fp.dot(&dmat[c * delta..(c + 1) * delta], wr) as u32;
+                            })
                     });
                     for (&pos, &v) in dense_pos.iter().zip(&dvals) {
                         y[pos] = v;
@@ -1379,7 +1440,9 @@ fn fast_inner(
                 }
                 y[*pos] = fp.red_lohi(lo, hi) as u32;
             }
-            st.krylov_muls += (dense_pos.len() * delta + sparse_cols.iter().map(|c| c.1.len()).sum::<usize>()) as u64;
+            st.krylov_muls += (dense_pos.len() * delta
+                + sparse_cols.iter().map(|c| c.1.len()).sum::<usize>())
+                as u64;
             std::mem::swap(&mut w, &mut y);
         }
         st.krylov_ms += t.elapsed().as_secs_f64() * 1e3;
@@ -1466,7 +1529,11 @@ mod tests {
                 let a: Vec<u32> = (0..n).map(|_| rng.gen_range(0..p) as u32).collect();
                 let b: Vec<u32> = (0..n).map(|_| rng.gen_range(0..p) as u32).collect();
                 let mut m = 0;
-                assert_eq!(pmul(&fp, &a, &b, &mut m), naive_mul(p, &a, &b), "p={p} n={n}");
+                assert_eq!(
+                    pmul(&fp, &a, &b, &mut m),
+                    naive_mul(p, &a, &b),
+                    "p={p} n={n}"
+                );
                 let c: Vec<u32> = (0..n / 2 + 1).map(|_| rng.gen_range(0..p) as u32).collect();
                 assert_eq!(pmul_any(&fp, &a, &c, &mut m), naive_mul(p, &a, &c));
             }
@@ -1527,7 +1594,16 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(13);
         for &p in &[3u64, 101, 65_521, 2_147_483_647, 4_294_967_291] {
             let fp = Fp::new(p);
-            for x in [0u64, 1, p - 1, p, p + 1, u64::MAX, u64::MAX - 1, (p - 1) * (p - 1)] {
+            for x in [
+                0u64,
+                1,
+                p - 1,
+                p,
+                p + 1,
+                u64::MAX,
+                u64::MAX - 1,
+                (p - 1) * (p - 1),
+            ] {
                 assert_eq!(fp.bred(x), x % p, "p={p} x={x}");
             }
             for _ in 0..20_000 {
@@ -1573,7 +1649,9 @@ mod tests {
         let fp = Fp::new(p);
         let mut rng = StdRng::seed_from_u64(1);
         let n = 1024;
-        let rows: Vec<Vec<u32>> = (0..160).map(|_| (0..n).map(|_| rng.gen_range(0..p) as u32).collect()).collect();
+        let rows: Vec<Vec<u32>> = (0..160)
+            .map(|_| (0..n).map(|_| rng.gen_range(0..p) as u32).collect())
+            .collect();
         let w: Vec<u32> = (0..n).map(|_| rng.gen_range(0..p) as u32).collect();
         let reps = 400;
         let t = std::time::Instant::now();
@@ -1593,7 +1671,12 @@ mod tests {
         }
         let e2 = t2.elapsed().as_secs_f64();
         let prods = (reps * 160 * n) as f64;
-        println!("{} dot {:.2} products/ns, dot4 {:.2} products/ns ({acc})", simd_name(), prods / e / 1e9, prods / e2 / 1e9);
+        println!(
+            "{} dot {:.2} products/ns, dot4 {:.2} products/ns ({acc})",
+            simd_name(),
+            prods / e / 1e9,
+            prods / e2 / 1e9
+        );
     }
 
     #[test]
