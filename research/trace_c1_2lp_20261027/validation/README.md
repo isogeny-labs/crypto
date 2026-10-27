@@ -24,6 +24,12 @@ release-profile unoptimised checks and do not qualify performance figures.
   `outcome.recovered` value and reconstruct the exact projected column table
   and small-column boundary from the declared `small_dimension`. The focused
   gates still pass; see [review-fixes.log](review-fixes.log).
+- After merging current `main`, both focused gates still pass and the reviewed
+  trace-line/replay bytes remain unchanged. The targeted zero-weight,
+  hyperelliptic and rule-v8 rechecks also pass on the merged base once the
+  tracked sparse fixtures are materialised. The exact merge audit and the
+  remaining artifact-backed leaderboard publication blocker are recorded in
+  [merge-validation.log](merge-validation.log).
 - The blocked backlog card passes the repository's original native validator
   (`src/bin/backlog/card.rs`, built with the original SHA-1 source and existing
   serde_json/hex rlibs); see [backlog.txt](backlog.txt). This is card validation,
@@ -54,13 +60,14 @@ and VALIDATION.json remain missing. None is represented by a fabricated receipt.
 The protocol's DESIGN.sha256 is a file-integrity manifest only, not a canonical
 experiment-protocol freeze certificate. All complete pipeline costs stay unknown.
 
-## Whole-library and lint gates are not green
+## Retained whole-library and lint history
 
-The complete library suite was invoked with the same unoptimised release
-profile. It was stopped after failures were diagnosed (exit 130), not reported
-as a passing or completed suite. Ten initially failing fixture-dependent tests
-pass on exact rerun after materialising their tracked sessions. The retained
-[fixture rechecks](fixture-rechecks.log) still show:
+The complete library suite on the original source head was invoked with the
+same unoptimised release profile. It was stopped after failures were diagnosed
+(exit 130), not reported as a passing or completed suite. Ten initially failing
+fixture-dependent tests passed on exact rerun after materialising their tracked
+sessions. The retained [fixture rechecks](fixture-rechecks.log) preserve three
+then-current symptoms:
 
 - `weighted_comparison_prices_verified_pairs_and_records_weight_identity`:
   assertion `zero.legacy_comparison_id.is_none()` at compare.rs:2448. This is
@@ -73,9 +80,12 @@ pass on exact rerun after materialising their tracked sessions. The retained
 The strict Clippy check also fails at unchanged zero_dim_la.rs:1191
 (`manual_range_contains`) and sat.rs:1343 (`manual_is_multiple_of`), as
 [clippy.log](clippy.log) and [review-fixes.log](review-fixes.log) record. No lint or test was disabled or changed.
-These limitations block a claim of a green repository gate. They do not erase
-or replace the four passing focused tests and the separately passing replay
-example test. The PR must retain these open validation items.
+After the current-main merge, exact targeted rechecks pass for the zero-weight
+test, all seven hyperelliptic tests, and the rule-v8 test after its six tracked
+parameter directories are materialised; see [merge-validation.log](merge-validation.log).
+The full suite was not rerun, so these targeted results are not represented as
+a completed whole-library green gate. The historical failures remain preserved
+rather than rewritten.
 
 ## Additional completed preflight
 
