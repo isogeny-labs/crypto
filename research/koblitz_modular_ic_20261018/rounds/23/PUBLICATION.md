@@ -31,3 +31,24 @@ is explicitly the inherited exact-computation schema,not a false validator pass.
 Both earlier primary failures and the lost ignored first-host raw logs are
 recorded in FAILURES.md. Their absence is not concealed by the replacement
 replay receipts. No finished G32/G33 or capped global normalization is rerun.
+
+## Separate software-validation package
+
+validation.tar.xz:86,448 bytes;
+SHA25618cbc9d4ba2fd543ae8dad222ab0253c59becda544db37557c19f71da6879365.
+It has29 additional raw files;science and validation together retain84 files.
+validation.json reports two failed full runs and their passing targeted replays;
+it explicitly does not claim a single clean full-suite pass. It does not modify
+the sealed mathematical export or its55-member archive.
+
+For native regeneration on a new checkout,also hydrate and extract Round22's
+own archive first;the exact input circuit and saved closure live there:
+
+```
+python3 tools/artifacts/artifacts.py pull research/koblitz_modular_ic_20261018/rounds/22 research/koblitz_modular_ic_20261018/rounds/23
+(cd research/koblitz_modular_ic_20261018/rounds/22 && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+```
+
+REPLAY_NATIVE.sh requires the configured source-checkpoint transport and native
+Singular4.4.1 (override SINGULAR_BIN for another installation path). Each call
+uses a fresh attempt name and retains the inherited4GiB/1200s limits.
