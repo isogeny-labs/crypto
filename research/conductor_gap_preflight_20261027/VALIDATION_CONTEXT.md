@@ -1,5 +1,18 @@
 # Validation context
 
+## Newer actual-parent integration (6420ed5c, 2026-10-27)
+
+The follow-up locally integrates actual parent source
+`6420ed5c3a26ad2825e437097ecfdc2f8f61d8d3` as merge
+`df3b0ec17a324a14e2f474a97e82021fac9a6cfa`, preserving both log bodies
+and every problem-index link under the documented Copilot fallback.
+Native checks pass; the separate required full library command is running
+with no final result at the retained snapshot. See the separate
+[6420ed5c validation record](checks/parent-6420ed5c-20261027/README.md)
+for actual results and pending checks. Earlier sections retain their original
+543bbd/2efb source scope and are not substituted for this new integration.
+
+
 ## Current-parent follow-up (2026-10-27)
 
 The authoring follow-up locally merges actual parent #2430 source head

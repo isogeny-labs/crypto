@@ -1,0 +1,63 @@
+{
+  "source": "df3b0ec17a324a14e2f474a97e82021fac9a6cfa",
+  "bytes": 1011591,
+  "sha256": "bf8ebc6255d660c4b9d34dc9843958eacc4182ee593f85f50e73284c9abe7ea5",
+  "byte_identical_to_retained": true,
+  "fresh_file": "/workspace/conductor-2684-validation-6420-20261027/pilot-allocation.json",
+  "solver_measurements_launched": 0,
+  "commands": [
+    {
+      "name": "plan",
+      "argv": [
+        "target/release/examples/conductor_gap_confirmation",
+        "plan",
+        "--out",
+        "/workspace/conductor-2684-validation-6420-20261027/pilot-allocation.json"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "matches_expected": true
+    },
+    {
+      "name": "allocation-audit",
+      "argv": [
+        "target/release/examples/conductor_gap_confirmation",
+        "audit",
+        "--plan",
+        "/workspace/conductor-2684-validation-6420-20261027/pilot-allocation.json"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "matches_expected": true
+    },
+    {
+      "name": "readiness",
+      "argv": [
+        "target/release/examples/conductor_gap_confirmation",
+        "preflight",
+        "--plan",
+        "/workspace/conductor-2684-validation-6420-20261027/pilot-allocation.json"
+      ],
+      "exit": 3,
+      "expected_exit": 3,
+      "matches_expected": true
+    },
+    {
+      "name": "backlog-validation",
+      "argv": [
+        "target/release/backlog",
+        "validate",
+        "XP-20261026-conductor-gap-size-confirmation"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "matches_expected": true
+    }
+  ],
+  "native_tests": {
+    "passed": 12,
+    "failed": 0,
+    "ignored": 0,
+    "filtered": 0
+  }
+}
