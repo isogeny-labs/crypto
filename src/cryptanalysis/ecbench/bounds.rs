@@ -2119,6 +2119,55 @@ mod tests {
         assert!(err.contains("--unit bitop/v1"), "{err}");
     }
 
+    /// The stage table of a partial-cost bound is the basis's own phases,
+    /// so its shares sum to one on every basis (a BSGS search fit once
+    /// showed set-up at 101.56%, search at 100% and natives at 4.42%).
+    #[test]
+    fn stage_shares_sum_to_one_on_every_cost_basis() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let dirs: Vec<PathBuf> = (16..=18)
+            .map(|b| {
+                root.join(format!(
+                    "research/bitop_ladder_20261019/sessions/holdout-P{b}"
+                ))
+            })
+            .collect();
+        for arm in ["rho-neg", "bsgs-neg", "kangaroo"] {
+            for cost in [CostBasis::Total, CostBasis::PerTarget, CostBasis::Search] {
+                let b = bound_from_sessions(&FitInputs {
+                    dirs: &dirs,
+                    arm,
+                    audits: &[],
+                    label: Some("stage share test"),
+                    notes: "",
+                    root,
+                    audit_refs: &[],
+                    options: FitOptions {
+                        resamples: 20,
+                        unit: Some(crate::cryptanalysis::bitops::UNIT.into()),
+                        cost,
+                        ..Default::default()
+                    },
+                })
+                .unwrap();
+                let sum: f64 = b.stages.iter().map(|s| s.share_of_gae).sum();
+                assert!(
+                    (sum - 1.0).abs() < 1e-9,
+                    "{arm} {cost:?}: shares sum to {sum}"
+                );
+                for s in &b.stages {
+                    assert!(s.share_of_gae <= 1.0 + 1e-12, "{arm} {cost:?}: {}", s.name);
+                }
+                if cost == CostBasis::Search {
+                    assert!(b.stages.iter().all(|s| s.name == "search"), "{arm}");
+                }
+                if arm == "bsgs-neg" && cost == CostBasis::PerTarget {
+                    assert!(b.stages.iter().all(|s| s.name != "setup"));
+                }
+            }
+        }
+    }
+
     // ── Fit version 2 ──────────────────────────────────────────────
 
     fn repo() -> PathBuf {

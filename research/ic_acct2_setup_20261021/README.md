@@ -23,7 +23,11 @@ rho-neg's mean total at 16 bits, falling to 9.3% at 22, stepping back to
 14.0% at 23 (jump table 8 → 16) and 6.5% at 26.  A share that shrinks with
 r flattens the total's slope; the search phase alone scales as ½.
 Figures: `figures/rho_neg_cost_by_basis.svg`, `figures/alpha_forest.svg`,
-`figures/ic_rho_ratios.svg` (from `make_figures.py`); report
+`figures/ic_rho_ratios.svg`, drawn natively from the committed `analysis/`
+files by `cargo run --release --example ic_acct2_figures --
+research/ic_acct2_setup_20261021` (`examples/ic_acct2_figures.rs`; it reads
+the sealed bounds and the `amortize` reports, recomputes nothing, and renders
+each SVG to its 150 dpi PNG with `rsvg-convert`); report
 [REPORT.pdf](REPORT.pdf) (`REPORT.typ`).
 
 The total reproduces the committed bound
@@ -57,7 +61,16 @@ All six intervals contain 0.5.
 | ic-pair-rule | search | 0.462 [0.367, 0.554] | 0.689 [0.641, 0.737] | 0.496 [0.450, 0.534] | 0.693 [0.637, 0.772] |
 
 Sealed bounds and fit logs: `analysis/bounds/<arm>-<basis>-<lo>-<hi>.json`.
-No fit was refused.
+No fit was refused.  `run.sh` pins `--fit-version 1`, the procedure these
+bounds were fitted with (main's default became version 2, which also
+requires an audit receipt per session).  The 24 per-target and search
+bounds whose stage table changed were refitted after a fix to
+`work::basis_view`: a partial basis now keeps only the phases it counts, so
+`stages[].share_of_gae` sums to 1 (before, e.g. `bsgs-neg-search-16-22`
+listed set-up at 101.56% and search at 100% of the search total).  Their
+fits, sizes and constants are unchanged; only `stages` and `bound_id`
+moved.  The total-basis bounds, and rho-neg's and kangaroo's per-target
+bounds (no reusable phase), re-derive byte for byte.
 
 ## Jump-count check
 

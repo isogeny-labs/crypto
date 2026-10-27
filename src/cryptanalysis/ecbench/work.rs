@@ -1076,8 +1076,11 @@ pub fn bitop_view(
 /// `basis` ([`CostBasis`]): the total, `S` and the ratio to the floor
 /// count only that basis's gates, and the unit names the basis
 /// (`bitop/v1+per_target`, `bitop/v1+search`), so a fit on it is its own
-/// domain.  Phases, counts, identities and timings are unchanged.  The
-/// total basis is the bitop view itself.
+/// domain.  The phases are those the basis counts (the per-target phases,
+/// or the search phases), so a bound's stage table divides the basis's
+/// gates by the basis's total and its shares sum to one.  Counts,
+/// identities and timings are unchanged.  The total basis is the bitop
+/// view itself.
 pub fn basis_view(
     r: &crate::cryptanalysis::ecbench::record::Record,
     basis: CostBasis,
@@ -1090,6 +1093,12 @@ pub fn basis_view(
     let add = w.widths.gates(Prim::GroupAdd).map_err(|e| e.to_string())? as f64;
     let g = basis_bitops(&r.method.id, &r.method.family, w, basis)? as f64;
     v.cost.unit = format!("{}+{suffix}", bitops::UNIT);
+    let (method, family) = (r.method.id.as_str(), r.method.family.as_str());
+    v.phases.retain(|p| match basis {
+        CostBasis::Total => true,
+        CostBasis::PerTarget => !is_reusable_phase(method, &p.name),
+        CostBasis::Search => is_search_phase(family, &p.name),
+    });
     if v.cost.total_gae.is_some() {
         v.cost.total_gae = Some(g);
         let s = g / ((r.workload.curve.r as f64).sqrt() * add);

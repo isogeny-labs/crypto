@@ -29,6 +29,7 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-18 | [Lazy orbit-member index, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)](https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf) | 1.27× | matched | S |
 | 2026-10-20 | [Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6](https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md) | 4.67× | matched | source-specific; see result |
 | 2026-10-21 | [Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md) | 14.4× | matched | source-specific; see result |
+| 2026-10-17 | [n83 K1107/root11 sixteen-point cold factor-base frontier](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md) | 47.1× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
 
 ## Frontier audit and subsequent corrections (implementation result 2026-10-14)
 
@@ -563,12 +564,30 @@ Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two
 | 4 | 5 | -0.232 | [-0.320, -0.082] |
 
 
+## N83 Tier 1 sixteen-point factor-base frontier
+
+Eight exact packed-root configurations ran on sixteen sealed public points across two admitted cloud hosts, one fresh IC process and a same-point rho solve for every candidate-point pair. All 128 pairs passed independent replay. The frozen online and cold selectors both report `BOUNDED_UNKNOWN`; the cold K1107 factor-base size lowers process cost against K1120, while its root11 and root22 layouts remain unresolved.
+
+| Configuration | Actual usable points | Folded columns | Online median ms | Cold mean s | Paired rho/IC median | IC faster / 16 |
+|:--|--:|--:|--:|--:|--:|--:|
+| 1104/r11 | 183,264 | 1,104 | 113.394 | 108.382 | 16.247 | 16/16 |
+| 1104/r22 | 183,264 | 1,104 | 111.651 | 108.112 | 11.334 | 16/16 |
+| 1107/r11 | 183,762 | 1,107 | 79.820 | 104.826 | 18.507 | 16/16 |
+| 1107/r22 | 183,762 | 1,107 | 82.929 | 104.635 | 23.910 | 16/16 |
+| 1112/r11 | 184,592 | 1,112 | 195.899 | 106.596 | 12.457 | 15/16 |
+| 1112/r22 | 184,592 | 1,112 | 191.117 | 106.699 | 15.636 | 16/16 |
+| 1120/r11 | 185,920 | 1,120 | 73.487 | 108.775 | 22.355 | 16/16 |
+| 1120/r22 | 185,920 | 1,120 | 71.913 | 108.966 | 19.394 | 16/16 |
+
+[Frozen 132 IC1 rows](../../research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json) and [provider-bound result and graph](../../research/n83_e2e_finalist_results_20261017/RESULT.md). The online interval excludes reusable preparation; the separate cold column charges it. This Tier 1 wall-time panel is separate from Tables A–C and their operation-unit S rankings.
+
+
 ## Sources
 
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `87999f37f2d5669a…`
+- `docs/ic/progress-timeline.json` — sha256 `d8629b1976feb5eb…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
@@ -631,6 +650,10 @@ Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
+- `research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json` — sha256 `a789512e3192b960…`
+- `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
+- `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
+- `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
 - `docs/curves/registry.json` — sha256 `46d4060fafd71863…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`

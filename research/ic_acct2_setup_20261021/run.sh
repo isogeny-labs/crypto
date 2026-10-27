@@ -22,7 +22,7 @@ for arm in rho-neg bsgs-neg kangaroo ic-pair-rule; do
     for range in 16-22 23-32 16-26 33-40; do
       lo=${range%-*} hi=${range#*-} name="$arm-$cost-$range"
       # shellcheck disable=SC2046
-      "$bin" bound fit $(dirs "$lo" "$hi") --arm "$arm" --unit bitop/v1 --cost "$cost" "${extra[@]}" \
+      "$bin" bound fit $(dirs "$lo" "$hi") --arm "$arm" --unit bitop/v1 --cost "$cost" --fit-version 1 "${extra[@]}" \
         --label "ic_acct2 setup study: $arm, $cost, $lo-$hi bits" \
         --out "$out/bounds/$name.json" >"$out/bounds/$name.log" 2>&1 \
         || echo "FIT REFUSED $name (see $out/bounds/$name.log)"
