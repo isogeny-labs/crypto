@@ -1,0 +1,33 @@
+{
+  "schema": "validation-archive-publication/v1",
+  "status": "not_uploaded_pending_user_approval_and_AWS_access",
+  "filename": "runs.tar.xz",
+  "bytes": 67540,
+  "sha256": "ae5e8b6973db769db3ccef01fb81ba5837702a26221206134091a8bdff3bad2a",
+  "local_workspace_path": "/workspace/crypto/research/quotient_calibration_20261025/reports/run-20261025T1845Z/runs.tar.xz",
+  "local_path_is_durable": false,
+  "source_freeze": "a0cd24e1c7f4381e9ce59cfce760eb5eb8cea3c5",
+  "intended_remote": "s3://setec-astronomy-artifacts/store",
+  "remote_upload_performed": false,
+  "remote_readback_verified": false,
+  "approval_rejection": "Automatic approval review rejected the attempted upload of internal research/test logs because the specific payload and S3 destination were not explicitly authorized.",
+  "access_limit": "AWS CLI and configured AWS identity are unavailable in this environment.",
+  "members": [
+    "runs/artifact-tests.log",
+    "runs/baseline-weighted-comparison.log",
+    "runs/bounds-after-materialization.log",
+    "runs/bounds-missing-session.log",
+    "runs/ci-byte-replay.log",
+    "runs/clippy-final.log",
+    "runs/clippy-initial.log",
+    "runs/input-hashes.log",
+    "runs/native-replay.log",
+    "runs/native-tests-final.log",
+    "runs/native-tests-initial.log",
+    "runs/root-full-library.log",
+    "runs/root-initial-missing-package.log",
+    "runs/root-missing-package-retry.log",
+    "runs/workflow-lint.log"
+  ],
+  "next_action": "After explicit approval and supported AWS setup, publish unchanged bytes using tools/artifacts to the tracked repository-configured remote, commit the generated manifest and verify fresh remote readback."
+}
