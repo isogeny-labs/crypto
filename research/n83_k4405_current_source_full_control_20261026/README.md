@@ -28,7 +28,7 @@ recorded 3,746 immediately free 16 KiB pages and 1,551,744 pages occupied
 by the compressor; the child remained live. The agent sent
 SIGTERM to the child process group to protect concurrent jobs. The
 post-stop `vm.swapusage` reading retained in
-[`manual_abort.json`](evidence-01/manual_abort.json) was above 12 GiB.
+[`manual_abort.json`](evidence-01/manual_abort.json) was `used = 12092.38M`.
 The available telemetry does not isolate which concurrent process caused
 each swapped page, and compressed/swapped pages make child RSS an incomplete
 host-pressure gate.
@@ -39,6 +39,8 @@ output and file hashes are in [`evidence-01`](evidence-01/). Run
 `python3 audit.py` here to check that bundle; it returns
 `PASS_BOUNDED_HOST_SWAP_ABORT_RECEIPT`. A producer summary, base dump,
 relation matrix and target receipt were not emitted before the stop.
+The [source-linked visual report](reports/run-20261026T2210Z/README.md)
+plots the retained resource samples and embeds the graph in a PDF.
 
 The current [`run.py`](run.py) is a revised guard for a later attempt. It
 requires at most 2 GiB host swap at admission and stops if swap crosses
