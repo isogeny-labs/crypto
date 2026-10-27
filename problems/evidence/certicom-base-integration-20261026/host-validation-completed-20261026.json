@@ -1,0 +1,71 @@
+{
+  "observedAt": "2026-10-26T22:57:47.251Z",
+  "scope": "Complete host release-library validation; no physical GPU or performance claim",
+  "testedCodeCommit": "c3f3c1a2b4314e42c728c517c4b9e4dda176fcea",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib"
+  ],
+  "environment": {
+    "networkAndLoopbackEnabled": true,
+    "CARGO_HOME": "/workspace/.cargo-local",
+    "RUSTUP_HOME": "/workspace/.rustup-local",
+    "CARGO_TARGET_DIR": "/workspace/crypto/target",
+    "CARGO_BUILD_JOBS": 2
+  },
+  "started": "2026-10-26T18:39:09.360Z",
+  "ended": "2026-10-26T18:58:03.931Z",
+  "exitStatus": 0,
+  "signal": null,
+  "registered": 4999,
+  "passed": 4878,
+  "failed": 0,
+  "existingIgnored": 121,
+  "measured": 0,
+  "filteredOut": 0,
+  "finalSummary": "test result: ok. 4878 passed; 0 failed; 121 ignored; 0 measured; 0 filtered out; finished in 1134.45s",
+  "focusedTask": {
+    "passed": 14,
+    "failed": 0,
+    "ignored": 0
+  },
+  "log": {
+    "localPath": "/tmp/crypto-certicom-oct26-merged-e8-lib-final.log",
+    "bytes": 427421,
+    "sha256": "ab07ef2da67b58efde3eddb9f61da390a787c117bade9513464aab25bb1126e7",
+    "durableRemoteRawArtifact": null
+  },
+  "priorRun": {
+    "receipt": {
+      "started": "2026-10-26T18:05:45.060Z",
+      "ended": "2026-10-26T18:32:42.132Z",
+      "status": 101,
+      "signal": null,
+      "log": "/tmp/crypto-certicom-oct26-merged-e8-lib-restored.log"
+    },
+    "passed": 4870,
+    "missingFixtureFailures": 8,
+    "existingIgnored": 121,
+    "restoredInputBlobs": 105,
+    "distinctPassingFixtureControlsAcrossReplays": 18
+  },
+  "otherCompletedHostChecks": {
+    "icxCpuCases": 7,
+    "icxExplicitHostEmulatorCases": 7,
+    "nistActualReleaseIntegrationCases": 7,
+    "sourceParityFiles": 21
+  },
+  "openGates": {
+    "independentSemanticVerifier": {
+      "candidateProblems": 6,
+      "pinnedBaseSharedProblems": 6,
+      "pinnedBaseTotalProblems": 14,
+      "status": "failed_on_candidate_and_pinned_base"
+    },
+    "physicalNvidiaAndCompleteMetalQualification": "unverified",
+    "currentPublishedHeadCiAndReviews": "not_satisfied"
+  },
+  "note": "Raw local logs are ephemeral; the SHA256 receipt is not a remote artifact availability claim. Earlier timestamped partial/failed snapshots are preserved."
+}
