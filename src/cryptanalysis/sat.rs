@@ -1340,7 +1340,10 @@ impl Solver {
                 return None;
             }
             if self.xor_decision_cadence > 1
-                && self.trail_lim.len() % self.xor_decision_cadence != 0
+                && !self
+                    .trail_lim
+                    .len()
+                    .is_multiple_of(self.xor_decision_cadence)
                 && self.trail.len() != self.n_vars as usize
             {
                 // CNF is at a fixpoint. A later decision-level boundary,
