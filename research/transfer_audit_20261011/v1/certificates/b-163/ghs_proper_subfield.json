@@ -1,0 +1,162 @@
+{
+  "baseline": {
+    "algorithm": "Pollard rho on <G>",
+    "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+    "equivalence_class_reason": "negation only: E is not defined over a proper subfield",
+    "equivalence_class_size": 2,
+    "log2_cost_of_one_group_operation": 14.97,
+    "log2_group_operations": 80.326,
+    "log2_r": 162.0,
+    "log2_total": 95.296,
+    "log2_total_without_automorphisms": 95.796
+  },
+  "candidate": {
+    "id": "ghs:proper_subfield",
+    "label": "Weil descent to a proper subfield F_(2^d), 1 < d < n",
+    "transfer_type": "ghs_weil_descent"
+  },
+  "carried": false,
+  "checks": [
+    {
+      "evidence": "no curve over F_(2^163), in any isogeny class, has a GHS magic number in 2..=6 for the tower F_2 <= F_(2^163); achievable magic numbers: [1, 163]",
+      "name": "ghs_window_empty_for_tower_over_F2",
+      "result": "PASS"
+    }
+  ],
+  "costs": {
+    "destination_solver": null,
+    "log2_baseline": 95.296,
+    "log2_cost_ratio": null,
+    "log2_total": null,
+    "repo_ratio_log2": null,
+    "rows": [
+      {
+        "formula": "out of scope: no proper subfield, nothing to price",
+        "log2": null,
+        "phase": "destination_solve_unsplit",
+        "status": "not_applicable"
+      }
+    ],
+    "solvers_considered": [],
+    "total_is_lower_bound": false,
+    "unit": "log2 bit operations (frozen formula model; measured rows say so)"
+  },
+  "curve": {
+    "family": "binary",
+    "field": {
+      "a": "0x1",
+      "b": "0x20a601907b8c953ca1481eb10512f78744a3205fd",
+      "degree": 163,
+      "kind": "binary",
+      "log2_size": 163,
+      "model": "y^2+xy=x^3+a*x^2+b",
+      "modulus": "0x800000000000000000000000000000000000000c9"
+    },
+    "instance_checks": [
+      {
+        "evidence": "modulus irreducible (Rabin), coefficients canonical, b != 0 (ordinary binary model)",
+        "name": "field_and_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "G affine, y^2+xy = x^3+ax^2+b",
+        "name": "generator_on_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "r passes Miller-Rabin to bases 2..53 (Probable); [r]G = O, G != O, so G has exact order r",
+        "name": "subgroup_order_is_prime_and_annihilates_generator",
+        "result": "PASS"
+      },
+      {
+        "evidence": "#E = cofactor * r = q + 1 - t, Hasse bound holds, two seeded random points are annihilated by #E (evidence for the recorded order, not a point-count proof)",
+        "name": "order_consistency",
+        "result": "PASS"
+      },
+      {
+        "evidence": "curve_traits::compute run live on this instance",
+        "name": "traits_record",
+        "result": "PASS"
+      }
+    ],
+    "name": "B-163",
+    "registered": true,
+    "slug": "icv1-f2m163-tm6224022517221266226059365-31d88d74",
+    "subgroup": {
+      "cofactor": "2",
+      "generator": [
+        "0x3f0eba16286a2d57ea0991168d4994637e8343e36",
+        "0xd51fbc6c71a0094fa2cdd545b11c5c0c797324f1"
+      ],
+      "order": "11692013098647223345629484885752781378513686403174",
+      "r": "5846006549323611672814742442876390689256843201587",
+      "r_log2": 162.0,
+      "trace": "-6224022517221266226059365"
+    }
+  },
+  "executed": null,
+  "invariants": {
+    "absolute_degree": 163,
+    "achievable_magic_numbers_over_F2": [
+      1,
+      163
+    ],
+    "divisors": [
+      1,
+      163
+    ],
+    "min_magic_number_at_least_2": 163,
+    "window_2_to_6_empty": true
+  },
+  "lead_class": "not_carried",
+  "map": {
+    "construction_status": "out of scope",
+    "degrees": {
+      "proper_subfield_degrees": []
+    },
+    "destination": "none",
+    "explicit_formulas": "none",
+    "field_of_definition": "n/a",
+    "source": "E(F_(2^163))",
+    "type": "GHS conorm-norm map to a Jacobian over a proper subfield"
+  },
+  "notes": [
+    "scope statement, not a security statement: it excludes GHS Weil descent to a proper subfield, nothing else"
+  ],
+  "obligations": {
+    "computational_advantage": "not_applicable",
+    "existence": "not_applicable",
+    "explicit_construction": "not_applicable",
+    "map_correctness": "not_applicable",
+    "scaling_support": "not_applicable",
+    "subgroup_preservation": "not_applicable"
+  },
+  "open_obligations": [],
+  "references": [
+    "Maurer-Menezes-Teske 2002, Thm 5(i) (as cited in ec_trapdoor.rs)",
+    "src/cryptanalysis/isogeny_degree_search/ball.rs (achievable_magic_numbers, ghs_window_is_empty)"
+  ],
+  "schema": "transfer-audit/certificate/v1",
+  "subgroup_preservation": {
+    "antecedents": [
+      {
+        "evidence": "no divisor d of 163 with 1 < d < 163",
+        "name": "n_is_prime",
+        "result": "PASS"
+      }
+    ],
+    "argument": "n = 163 is prime: its only subfields are F_2 and F_(2^163), so there is no descent to a proper subfield; descent to F_2 is the candidate ghs:l=1",
+    "executed": null,
+    "image_order": null,
+    "kernel_meets_subgroup": null,
+    "method": "none",
+    "status": "not_applicable"
+  },
+  "tool": "transfer-audit/1",
+  "verdict": "no weakness found in scope",
+  "verdict_basis": [
+    "subgroup preservation is NotApplicable: the transfer is not shown to carry <G>",
+    "the map is not constructed (existence or construction missing)",
+    "a required cost phase is unpriced"
+  ]
+}
