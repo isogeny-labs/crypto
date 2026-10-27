@@ -19,7 +19,8 @@ const profile = mkdtempSync(resolve(tmpdir(), 'ic-dashboard-browser-'));
 const child = spawn(chrome, ['--headless=new', '--remote-debugging-port=0',
   '--remote-debugging-address=127.0.0.1', '--no-first-run', '--no-default-browser-check',
   '--disable-background-networking', '--disable-component-update',
-  '--disable-extensions', '--user-data-dir=' + profile, 'about:blank'],
+  '--disable-extensions', '--user-data-dir=' + profile,
+  ...(process.env.CI ? ['--no-sandbox'] : []), 'about:blank'],
   { stdio: ['ignore','ignore','pipe'] });
 let chromeLog = '', socket;
 child.stderr.on('data', bytes => { chromeLog += bytes; });
@@ -72,19 +73,14 @@ try {
   await call('Page.enable'); await call('Runtime.enable'); await call('Network.enable');
   await call('Emulation.setDeviceMetricsOverride',{width:1280,height:1000,deviceScaleFactor:1,mobile:false});
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'light'},{name:'prefers-reduced-motion',value:'reduce'}]});
-  const documentPath=resolve(root,'docs/index-calculus-scoreboard.html');
-  const url=pathToFileURL(documentPath).href;
-  async function loadDocument() {
-    if (process.env.IC_DASHBOARD_DOCUMENT_MODE === 'inline') {
-      // Managed Chrome can forbid file: navigation. CDP's document fixture
-      // renders the same local HTML while retaining every check below.
-      const {frameTree}=await call('Page.getFrameTree');
-      await call('Page.setDocumentContent',{frameId:frameTree.frame.id,html:readFileSync(documentPath,'utf8')});
-    } else {
-      await call('Page.navigate',{url});
-    }
+  const url=process.env.IC_DASHBOARD_URL || pathToFileURL(resolve(root,'docs/index-calculus-scoreboard.html')).href;
+  const loopback=process.env.IC_DASHBOARD_URL ? new URL(url) : null;
+  if(loopback) {
+    assert.equal(loopback.protocol,'http:');
+    assert.ok(['127.0.0.1','localhost','[::1]'].includes(loopback.hostname),
+      'IC_DASHBOARD_URL must be a local static preview');
   }
-  await loadDocument();
+  await call('Page.navigate',{url});
   for (let i=0;i<100 && !(await evaluate("document.readyState === 'complete' && !!document.getElementById('evidence-count')?.textContent"));i++) await sleep(50);
   await frame();
   const visible=await evaluate(`Array.from(document.querySelectorAll('#ic-overview [data-measurement-chart]')).map(el=>({height:el.getBoundingClientRect().height,hidden:!!el.closest('[hidden]')}))`);
@@ -97,10 +93,6 @@ try {
   assert.equal(await evaluate("document.getElementById('historical-regimes').open"),false);
   assert.equal(await evaluate("document.getElementById('evidence-library').open"),false);
   await screenshot('desktop-overview');
-  if(await evaluate("!!document.getElementById('ecbench-leads-20261015')")) {
-    await evaluate("document.getElementById('ecbench-leads-20261015').scrollIntoView()");
-    await screenshot('desktop-ecbench-leads');
-  }
   await evaluate("document.getElementById('lab-readiness').scrollIntoView()");
   await screenshot('desktop-readiness-pipeline');
   await evaluate("const q=document.getElementById('evidence-query'); q.value='Frobenius'; q.dispatchEvent(new Event('input')); true");
@@ -134,10 +126,6 @@ try {
       await screenshot('mobile-overview');
       await evaluate("document.getElementById('lab-results').scrollIntoView()");
       await screenshot('mobile-results');
-      if(await evaluate("!!document.getElementById('ecbench-leads-20261015')")) {
-        await evaluate("document.getElementById('ecbench-leads-20261015').scrollIntoView()");
-        await screenshot('mobile-ecbench-leads');
-      }
     }
     assert.ok(await evaluate("document.querySelector('.comparison-plot').scrollWidth <= document.querySelector('.comparison-plot').clientWidth + 1"),'Comparison graph clipped at '+width);
     receipts.push('mobile '+width+': no page overflow; whole comparison graph fits; readiness scrolls within its panel');
@@ -148,16 +136,17 @@ try {
   await screenshot('desktop-dark');
   receipts.push('dark theme rendered');
   await call('Emulation.setScriptExecutionDisabled',{value:true});
-  await loadDocument();
+  await call('Page.navigate',{url});
   for (let i=0;i<100 && !(await evaluate("document.readyState === 'complete'"));i++) await sleep(50);
   assert.equal(await evaluate("document.querySelectorAll('[data-measurement-chart]').length"),2);
   assert.ok(await evaluate("Array.from(document.querySelectorAll('[data-measurement-chart]')).every(el=>el.getBoundingClientRect().height>0)"));
   receipts.push('JavaScript disabled: static measurements, graphs, diagrams and native details remain available');
   assert.equal(errors.length,0,'Browser script errors: '+JSON.stringify(errors));
-  assert.equal(network.filter(url=>/^https?:/.test(url)).length,0,'Dashboard made network requests');
-  const summary={status:'PASS_IC_DASHBOARD_BROWSER',chrome,
-    document_mode:process.env.IC_DASHBOARD_DOCUMENT_MODE === 'inline' ? 'inline' : 'file',checks:receipts,
+  assert.equal(network.filter(url=>/^https?:/.test(url) &&
+    (!loopback || new URL(url).origin!==loopback.origin)).length,0,'Dashboard made external network requests');
+  const summary={status:'PASS_IC_DASHBOARD_BROWSER',chrome,checks:receipts,
     script_errors:errors,external_requests:[],viewport_widths:[1280,390,320],
+    transport:loopback?'local HTTP preview':'local file',
     page_sha256: (await import('node:crypto')).createHash('sha256').update(readFileSync(resolve(root,'docs/index-calculus-scoreboard.html'))).digest('hex')};
   if(output) writeFileSync(resolve(output,'browser-check.json'),JSON.stringify(summary,null,2)+'\n');
   console.log(JSON.stringify(summary,null,2));
