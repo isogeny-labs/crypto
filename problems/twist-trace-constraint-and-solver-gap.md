@@ -158,3 +158,15 @@ regressions also remain. Full-campaign and external/full-IC/rho criteria stay
 open. Next check: independently count all shifts' source/twist character
 overlap and corresponding genus-two points, before claiming that finite
 progression structure supplies unusually cheap useful relations.
+
+The [exact all-shift follow-up](../research/twist_routes_1_3_20261021/reports/overlap-20261027/RESULTS.md)
+now verifies all 27,140 shifts, 27,130 smooth nonzero cases and the classical
+genus-two point-count identity with independent implementations. Three Lean
+theorems and IDC1ha81899274c038263 check its conditional finite sign identity;
+the Legendre/genus/Weil formal bridges remain open. The 20 predeclared c=1,3
+Frobenius polynomials have no matching source/twist elliptic factor. All ten
+known-cover and ten corrupted-polynomial controls pass. This is not a factor
+census of other shifts, a scalar map, or a cost result. The new two-execution
+structured protocol/export binds with zero findings; the earlier cost panel's
+binding error remains preserved. Next discriminate generator order/finite
+prefix effects from the already-dense full-coordinate universe.

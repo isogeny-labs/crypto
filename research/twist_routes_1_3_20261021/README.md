@@ -1,5 +1,12 @@
 # Twist routes 1–3: designs and bounded execution
 
+[2026-10-27 all-shift/genus-two follow-up](reports/overlap-20261027/RESULTS.md)
+· [frozen source, exact replay and artifact reproduction](execution-v5/README.md).
+All 27,140 shifts agree independently. On exactly shifts 1 and 3, no source or
+twist elliptic factor appears in the 20 overlap models, while all ten known
+cover controls pass. Three conditional Lean theorems check the finite counting
+identity; full scalar-transfer and cost claims remain unestablished.
+
 [2026-10-27 twist-derived progression bases and companion costs](reports/progression-20261027/RESULTS.md)
 · [frozen plan, independent replay and artifacts](execution-v4/README.md).
 The new 880-cell panel has 751 accepted outputs, 105 cooperative caps and
