@@ -1,0 +1,20 @@
+{
+  "schema": "n83.d18-k2048-native-negative-controls/v1",
+  "status": "PASS",
+  "cases": [
+    {
+      "mutation": "replace byte zero of copied U compressed object with x",
+      "command": "n83_d18_k2048_native overlap U_TAMPERED D_OBJECT OUTPUT",
+      "exit_code": 1,
+      "error": "compressed archive BLAKE3 differs",
+      "output_created": false
+    },
+    {
+      "mutation": "change copied D manifest policy to altered",
+      "command": "n83_d18_k2048_native custody TAMPERED_RUN OUTPUT",
+      "exit_code": 1,
+      "error": "export/replay/guard identity differs",
+      "output_created": false
+    }
+  ]
+}
