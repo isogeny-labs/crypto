@@ -23,7 +23,11 @@ support model, not an observed relation rate.
 ## Frozen construction and replay
 
 1. Compile `examples/n83_d18_k2048_export.rs` from a clean committed source
-   head. The program verifies its own committed bytes before exporting.
+   head. Use the local `rust:1.93.1-bookworm` Linux arm64 image pinned by
+   image ID
+   `sha256:7c4ae649a84014c467d79319bbf17ce2632ae8b8be123ac2fb2ea5be46823f31`.
+   The program verifies its own committed bytes before exporting. Record the
+   exact Linux binary SHA-256 and image ID in the run receipt.
 2. Run `export` in a new output directory outside Git with a 900-second
    process-wall cap and a 4 GiB memory limit, recording exit status, peak RSS,
    host, source commit, executable hash, and input hashes. Keep the complete
@@ -35,6 +39,13 @@ support model, not an observed relation rate.
 4. After replay passes, store the content-addressed object and manifest in a
    new S3 prefix under the existing N83 factor-base bucket and download both
    for fresh digest checks. The old U object and D K16627 object are immutable.
+
+The execution container has `--cpus=1 --memory=4g --memory-swap=4g
+--network=none` and a read-only bind mount of the committed source. A separate
+writable mount holds the export. A host-side 900-second watchdog stops the
+container and retains its exit and `docker inspect` memory/OOM record. The
+replay uses a fresh container with the same envelope. Compilation is outside
+both measured intervals and may use a larger build envelope.
 
 The U control object's compressed BLAKE3 is
 `82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851`;
