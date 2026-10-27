@@ -25,7 +25,10 @@ jobs:
         with:
           # The full tree (144k files) leaves the runner too little disk to
           # unpack the Lean toolchain; the package needs only its own directory.
-          sparse-checkout: research/p192_extension_cover_20261012/lean
+          sparse-checkout: |
+            research/p192_extension_cover_20261012/lean
+            tools/artifacts
+            .artifacts
       - name: Pull store data this workflow reads (tools/artifacts)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
