@@ -6,7 +6,9 @@ before any measured session, with amendments
 (`42bb4d54fb`). PDF: [`REPORT.pdf`](REPORT.pdf). Numbers come from
 [`analysis/summary.json`](analysis/summary.json), made by
 [`scripts/summary.py`](scripts/summary.py) from the run records in `runs/`.
-Validation: [`validation/`](validation/) and [`VALIDATION.json`](VALIDATION.json).
+Validation: [`validation/`](validation/), an independent replay and recompute
+([`VALIDATION_NOTES.md`](validation/VALIDATION_NOTES.md)); standing in
+[`validation/VALIDATION.json`](validation/VALIDATION.json) once the scalar check is filed.
 
 The owner asked (2026-10-26) for the linear-algebra stage to be sped up until
 it takes the leaderboard's linear-algebra section. The measurement is end to
@@ -136,7 +138,8 @@ same seeds and relations, and the same-process rho.
 
 ![jv_cover DLP](figures/jv_cover_dlp.png)
 
-**Linear stage.** Its wall time inside the IC run falls 4.8–7.2×, and the whole
+**Linear stage.** `lin_ms` here is the stage's time summed across `jv_cover`'s
+4-thread relation pool, unlike the single-threaded corpus bench. Its wall time inside the IC run falls 4.8–7.2×, and the whole
 run is 27–37% shorter at p = 101. At p = 53 the whole run is unchanged, because
 the rho reference runs in the same process and dominates there.
 
@@ -210,6 +213,14 @@ stands beside it.
    localhost:8080), so its hooks let edits through.
 5. **No `CHECKPOINT_UPLOAD_TOKEN`** was set, so the S3 resume checkpoint could not be
    pushed.
+
+The independent validator also found these (none changes a recorded number):
+- **F4 budget.** The bench gives the `dense` family's F4 600 s, not the 900 s
+  that PROTOCOL.md states. This has been so since the freeze, and no system timed out.
+- **Planted points.** The bench checks planted points only in the `dense` family. On the
+  constructed `jv-nagao` systems it checks only that a solution exists.
+- **Activity during R2-A2.** A commit landed during R2-A2's measured run, which can affect
+  its timings but not its counts.
 
 ## Reproduce
 

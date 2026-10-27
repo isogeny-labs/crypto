@@ -1,0 +1,2273 @@
+{
+ "schema": "postgb-la-replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "independence": "replayed by the validator (not the producer) with the pinned binaries; nonce drawn by the validator from /dev/urandom after the snapshot commit; comparison code written by the validator",
+ "scalars_verified": false,
+ "scalar_check_used": "Not independently verified. The pinned jv_cover prints and writes neither the solved logarithm nor the instance (alpha, G, Q, l). The check used is the binary's own: after the linear algebra it tests dd*G == Q on E(F_{p^6}) (EllE::mul) and sets correct = (dd == planted d) (src/cryptanalysis/jv_cover.rs, run_cover_dlp, at the run commit). The replay reproduced solved=true and correct=true, and all four same-process rho runs correct=true, with every deterministic counter equal to the recorded row.",
+ "nonce": "82fe12d03e751ddca56c8de9e43ae80569404e92a7c2ea63e3db3068f79ca68f",
+ "nonce_drawn_utc": "2026-10-27T05:44:53Z",
+ "snapshot_commit": "e9bf8737a38fa4446acec23812eaaf085d8426a6",
+ "sampling": {
+  "procedure": "validation/replay/sample.py: within each family, systems of R2-L1..R2-L6 ordered by sha256(nonce:card:family:label); the first k taken",
+  "k_per_family": {
+   "jv-nagao": 3,
+   "gaudry-s4": 3,
+   "gaudry-d4": 3,
+   "gaudry-s5": 1,
+   "dense": 4
+  },
+  "sampled_systems": [
+   {
+    "card": "R2-L1",
+    "family": "jv-nagao",
+    "label": "p101-0"
+   },
+   {
+    "card": "R2-L1",
+    "family": "jv-nagao",
+    "label": "p1009-11c"
+   },
+   {
+    "card": "R2-L1",
+    "family": "jv-nagao",
+    "label": "p53-8c"
+   },
+   {
+    "card": "R2-L1",
+    "family": "gaudry-s4",
+    "label": "p271-6"
+   },
+   {
+    "card": "R2-L1",
+    "family": "gaudry-s4",
+    "label": "p271-3"
+   },
+   {
+    "card": "R2-L1",
+    "family": "gaudry-s4",
+    "label": "p8191-7"
+   },
+   {
+    "card": "R2-L1",
+    "family": "gaudry-d4",
+    "label": "p97-4"
+   },
+   {
+    "card": "R2-L1",
+    "family": "gaudry-d4",
+    "label": "p97-3"
+   },
+   {
+    "card": "R2-L1",
+    "family": "gaudry-d4",
+    "label": "p1033-0"
+   },
+   {
+    "card": "R2-L6",
+    "family": "gaudry-s5",
+    "label": "p13-0"
+   },
+   {
+    "card": "R2-L4",
+    "family": "dense",
+    "label": "n4-d5-p31-0"
+   },
+   {
+    "card": "R2-L2",
+    "family": "dense",
+    "label": "n4-d3-p31-1"
+   },
+   {
+    "card": "R2-L2",
+    "family": "dense",
+    "label": "n8-d2-p32-2"
+   },
+   {
+    "card": "R2-L3",
+    "family": "dense",
+    "label": "n2-d32-p16-0"
+   }
+  ],
+  "sampled_not_replayed": [],
+  "reached_by": "one postgb_la_bench run per (family, p[, shape]) group with the card's --per 8 and --reps 1; every system of the group is compared, the sampled ones are flagged"
+ },
+ "pins": {
+  "postgb_la_bench": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+  "jv_cover": "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f"
+ },
+ "runs": [
+  {
+   "name": "bench_jv-nagao_101",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "jv-nagao",
+    "--p",
+    "101",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_101.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 14.104,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_101.json": "47e1828ec896f0ddd02b65e79ff203daa32181b37cfab874de3d3daa87af0b72",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_101.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_101.stderr": "6892a8aedab08bc93a1ce213778ddad7148fd212af989b0909a124b226fcac29"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "jv-nagao",
+     "label": "p101-0",
+     "sampled": true,
+     "recorded_card": "R2-L1",
+     "si_recorded": 12,
+     "si_replay": 0,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p101-1",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 13,
+     "si_replay": 1,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p101-2",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 14,
+     "si_replay": 2,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p101-3",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 15,
+     "si_replay": 3,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p101-4",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 16,
+     "si_replay": 4,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p101-5",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 17,
+     "si_replay": 5,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p101-6",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 18,
+     "si_replay": 6,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p101-7",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 19,
+     "si_replay": 7,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p101-8c",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 20,
+     "si_replay": 8,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p101-9c",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 21,
+     "si_replay": 9,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p101-10c",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 22,
+     "si_replay": 10,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p101-11c",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 23,
+     "si_replay": 11,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 3,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "12/12 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 0 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "bench_jv-nagao_1009",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "jv-nagao",
+    "--p",
+    "1009",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_1009.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 13.944,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_1009.json": "f4932e6d4f2dd4864eca19da7c2f8c871598fd08ef7a358ec00af5e4007a9a65",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_1009.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_1009.stderr": "b4eb1d5aa49f3410bb2c75dca8f997a55dd850ea01cb536867b0f1f23aec008f"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "jv-nagao",
+     "label": "p1009-0",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 36,
+     "si_replay": 0,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p1009-1",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 37,
+     "si_replay": 1,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p1009-2",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 38,
+     "si_replay": 2,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p1009-3",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 39,
+     "si_replay": 3,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p1009-4",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 40,
+     "si_replay": 4,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p1009-5",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 41,
+     "si_replay": 5,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p1009-6",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 42,
+     "si_replay": 6,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p1009-7",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 43,
+     "si_replay": 7,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p1009-8c",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 44,
+     "si_replay": 8,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 4,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p1009-9c",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 45,
+     "si_replay": 9,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p1009-10c",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 46,
+     "si_replay": 10,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p1009-11c",
+     "sampled": true,
+     "recorded_card": "R2-L1",
+     "si_recorded": 47,
+     "si_replay": 11,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "12/12 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 0 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "bench_jv-nagao_53",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "jv-nagao",
+    "--p",
+    "53",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_53.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 13.425,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_53.json": "5363e61ba95a0eeb6c89e03a103bb0401daf71a23666af49100e976ae577cb38",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_53.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_jv-nagao_53.stderr": "66e714bf186031c80d453a895c5b223fa9a4f9f0f9513f9a4faf025a09dd2bc0"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "jv-nagao",
+     "label": "p53-0",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 0,
+     "si_replay": 0,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p53-1",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 1,
+     "si_replay": 1,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p53-2",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 2,
+     "si_replay": 2,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p53-3",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 3,
+     "si_replay": 3,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p53-4",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 4,
+     "si_replay": 4,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p53-5",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 5,
+     "si_replay": 5,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p53-6",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 6,
+     "si_replay": 6,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p53-7",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 7,
+     "si_replay": 7,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p53-8c",
+     "sampled": true,
+     "recorded_card": "R2-L1",
+     "si_recorded": 8,
+     "si_replay": 8,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p53-9c",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 9,
+     "si_replay": 9,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p53-10c",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 10,
+     "si_replay": 10,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "jv-nagao",
+     "label": "p53-11c",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 11,
+     "si_replay": 11,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "12/12 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 12 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "bench_gaudry-s4_271",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "gaudry-s4",
+    "--p",
+    "271",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s4_271.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 0.233,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s4_271.json": "0f7d09ce067f654ffa36e7b96905a071dbe40d1d0f633a1e4d1196dc45c9e67b",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s4_271.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s4_271.stderr": "84062a19d8bd3f763f069ea7004f51b6a9c141b2ff86203da9da5ebab49ea474"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "gaudry-s4",
+     "label": "p271-0",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 48,
+     "si_replay": 0,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p271-1",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 49,
+     "si_replay": 1,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p271-2",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 50,
+     "si_replay": 2,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p271-3",
+     "sampled": true,
+     "recorded_card": "R2-L1",
+     "si_recorded": 51,
+     "si_replay": 3,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p271-4",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 52,
+     "si_replay": 4,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p271-5",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 53,
+     "si_replay": 5,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p271-6",
+     "sampled": true,
+     "recorded_card": "R2-L1",
+     "si_recorded": 54,
+     "si_replay": 6,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p271-7",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 55,
+     "si_replay": 7,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "8/8 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 0 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "bench_gaudry-s4_8191",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "gaudry-s4",
+    "--p",
+    "8191",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s4_8191.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 0.262,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s4_8191.json": "78605e2125361446ca60dbfefcdaafd8a5ffdab116ea2fabe1c6a26a0b629d7a",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s4_8191.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s4_8191.stderr": "9e5a2412b8c47dced2c2a8bd4c33ba0550c35fdd2063759bdffcd73cc5c0ff44"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "gaudry-s4",
+     "label": "p8191-0",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 64,
+     "si_replay": 0,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p8191-1",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 65,
+     "si_replay": 1,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p8191-2",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 66,
+     "si_replay": 2,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": true,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p8191-3",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 67,
+     "si_replay": 3,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p8191-4",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 68,
+     "si_replay": 4,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p8191-5",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 69,
+     "si_replay": 5,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": true,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p8191-6",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 70,
+     "si_replay": 6,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s4",
+     "label": "p8191-7",
+     "sampled": true,
+     "recorded_card": "R2-L1",
+     "si_recorded": 71,
+     "si_replay": 7,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 64,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "8/8 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 0 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "bench_gaudry-d4_97",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "gaudry-d4",
+    "--p",
+    "97",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-d4_97.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 132.434,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-d4_97.json": "14dc1ee58963710a0f7b3747e0b505ba03edea0736b6cd2c56145ae4c5ebd84d",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-d4_97.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-d4_97.stderr": "85ebb10e82a2a1dc9bdcbb9205f0bcb36e296cfb12f1b6542682f86c22b54852"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "gaudry-d4",
+     "label": "p97-0",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 72,
+     "si_replay": 0,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p97-1",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 73,
+     "si_replay": 1,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p97-2",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 74,
+     "si_replay": 2,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p97-3",
+     "sampled": true,
+     "recorded_card": "R2-L1",
+     "si_recorded": 75,
+     "si_replay": 3,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p97-4",
+     "sampled": true,
+     "recorded_card": "R2-L1",
+     "si_recorded": 76,
+     "si_replay": 4,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": "minimal polynomial short of delta",
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p97-5",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 77,
+     "si_replay": 5,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p97-6",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 78,
+     "si_replay": 6,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p97-7",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 79,
+     "si_replay": 7,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "8/8 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 0 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "bench_gaudry-d4_1033",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "gaudry-d4",
+    "--p",
+    "1033",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-d4_1033.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 22.0,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-d4_1033.json": "3bac5274858be70eb95b63488a9c9737d430dfd015d8919b46485b564f28d8a4",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-d4_1033.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-d4_1033.stderr": "fcba755847e5c7c31f9d3e43693ce4c9d4a6a8ffca7e55a0e0e9dc6429259cd2"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "gaudry-d4",
+     "label": "p1033-0",
+     "sampled": true,
+     "recorded_card": "R2-L1",
+     "si_recorded": 80,
+     "si_replay": 0,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p1033-1",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 81,
+     "si_replay": 1,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p1033-2",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 82,
+     "si_replay": 2,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p1033-3",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 83,
+     "si_replay": 3,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p1033-4",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 84,
+     "si_replay": 4,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p1033-5",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 85,
+     "si_replay": 5,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p1033-6",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 86,
+     "si_replay": 6,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 4,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-d4",
+     "label": "p1033-7",
+     "sampled": false,
+     "recorded_card": "R2-L1",
+     "si_recorded": 87,
+     "si_replay": 7,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 0,
+     "agree": true,
+     "planted_found": null,
+     "delta": 512,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "8/8 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 0 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "bench_gaudry-s5_13",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "gaudry-s5",
+    "--p",
+    "13",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s5_13.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 393.052,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s5_13.json": "2b06526b478a9bcd8d3335ab5b6edb2474c1b3fb195d495c7db86fba458184e3",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s5_13.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_gaudry-s5_13.stderr": "5100ebfac71c55c491ae275429f3820f0c5d989fbebef3df9a8bfba7d61cf5ce"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "gaudry-s5",
+     "label": "p13-0",
+     "sampled": true,
+     "recorded_card": "R2-L6",
+     "si_recorded": 0,
+     "si_replay": 0,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 4096,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "gaudry-s5",
+     "label": "p13-1",
+     "sampled": false,
+     "recorded_card": "R2-L6",
+     "si_recorded": 1,
+     "si_replay": 1,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": null,
+     "delta": 4096,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "2/2 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 2 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "bench_dense_2147483647_n4d5",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "dense",
+    "--p",
+    "2147483647",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--shapes",
+    "n4d5",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_2147483647_n4d5.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 21.605,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_2147483647_n4d5.json": "bc30e326ae3b67be9aa26b828d4f4167240d6d8a71b0b8a5dd66c64ee922f51d",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_2147483647_n4d5.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_2147483647_n4d5.stderr": "041d52ce838ea6ace0f737440e951725adef3f2f857428ffbeb378907bae80f9"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "dense",
+     "label": "n4-d5-p31-0",
+     "sampled": true,
+     "recorded_card": "R2-L4",
+     "si_recorded": 3,
+     "si_replay": 0,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 4,
+     "agree": true,
+     "planted_found": true,
+     "delta": 625,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "dense",
+     "label": "n4-d5-p31-1",
+     "sampled": false,
+     "recorded_card": "R2-L4",
+     "si_recorded": 4,
+     "si_replay": 1,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": true,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": true,
+     "delta": 625,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "dense",
+     "label": "n4-d5-p31-2",
+     "sampled": false,
+     "recorded_card": "R2-L4",
+     "si_recorded": 5,
+     "si_replay": 2,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": true,
+     "delta": 625,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "3/3 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 0 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "bench_dense_2147483647_n4d3",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "dense",
+    "--p",
+    "2147483647",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--shapes",
+    "n4d3",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_2147483647_n4d3.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 0.103,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_2147483647_n4d3.json": "93f4e528c1c6375868263c7c2879cc25e89de81623f8b4fdef2b076b2a170724",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_2147483647_n4d3.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_2147483647_n4d3.stderr": "c2dfe52eabca5e3fbe77d4872b187f5399da4c7115c186e066f2e1547a15e05e"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "dense",
+     "label": "n4-d3-p31-0",
+     "sampled": false,
+     "recorded_card": "R2-L2",
+     "si_recorded": 48,
+     "si_replay": 0,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": true,
+     "delta": 81,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "dense",
+     "label": "n4-d3-p31-1",
+     "sampled": true,
+     "recorded_card": "R2-L2",
+     "si_recorded": 49,
+     "si_replay": 1,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": true,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": true,
+     "delta": 81,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "dense",
+     "label": "n4-d3-p31-2",
+     "sampled": false,
+     "recorded_card": "R2-L2",
+     "si_recorded": 50,
+     "si_replay": 2,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": true,
+     "delta": 81,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "3/3 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 0 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "bench_dense_4294967291_n8d2",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "dense",
+    "--p",
+    "4294967291",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--shapes",
+    "n8d2",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_4294967291_n8d2.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 3.11,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_4294967291_n8d2.json": "4d218b068b62a53c33d6842b4ce8bc9ba6e27e3fa80ddd228afce1bbbd7613ed",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_4294967291_n8d2.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_4294967291_n8d2.stderr": "2b90973fb53db48225da9f659c7bd090d50c4ae512453a820a58f3a7d3618fe1"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "dense",
+     "label": "n8-d2-p32-0",
+     "sampled": false,
+     "recorded_card": "R2-L2",
+     "si_recorded": 105,
+     "si_replay": 0,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": true,
+     "delta": 256,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "dense",
+     "label": "n8-d2-p32-1",
+     "sampled": false,
+     "recorded_card": "R2-L2",
+     "si_recorded": 106,
+     "si_replay": 1,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": true,
+      "sparse": false,
+      "fast": true
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": true,
+     "delta": 256,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "dense",
+     "label": "n8-d2-p32-2",
+     "sampled": true,
+     "recorded_card": "R2-L2",
+     "si_recorded": 107,
+     "si_replay": 2,
+     "muls_compared_exactly": false,
+     "muls_equal": {
+      "dense": false,
+      "sparse": false,
+      "fast": false
+     },
+     "sols": 2,
+     "agree": true,
+     "planted_found": true,
+     "delta": 256,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "3/3 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 0 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "bench_dense_65521_n2d32",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/postgb_la_bench",
+    "--families",
+    "dense",
+    "--p",
+    "65521",
+    "--per",
+    "8",
+    "--reps",
+    "1",
+    "--shapes",
+    "n2d32",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_65521_n2d32.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {},
+   "binary_sha256": "c5612e2eb33393ca4d446b482685179a8418ff9d52682dd70c53d62f0e5ba1d3",
+   "exit_code": 0,
+   "seconds": 68.566,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_65521_n2d32.json": "3601779f9a8a5260064a3c7dab85f8cbc978aed7831e9b0df73f4a2a780d7e5e",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_65521_n2d32.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/postgb_linear_stage_20261026/validation/replay/out/bench_dense_65521_n2d32.stderr": "dc4bdf83117d286f6448ee5adca5ee0cb854607a7c4ebac587bd3d49d3b6b704"
+   },
+   "skipped": [],
+   "systems": [
+    {
+     "family": "dense",
+     "label": "n2-d32-p16-0",
+     "sampled": true,
+     "recorded_card": "R2-L3",
+     "si_recorded": 0,
+     "si_replay": 0,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": true,
+     "delta": 1024,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "dense",
+     "label": "n2-d32-p16-1",
+     "sampled": false,
+     "recorded_card": "R2-L3",
+     "si_recorded": 1,
+     "si_replay": 1,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": true,
+     "delta": 1024,
+     "fast_gave_up": null,
+     "matched": true
+    },
+    {
+     "family": "dense",
+     "label": "n2-d32-p16-2",
+     "sampled": false,
+     "recorded_card": "R2-L3",
+     "si_recorded": 2,
+     "si_replay": 2,
+     "muls_compared_exactly": true,
+     "muls_equal": {
+      "dense": true,
+      "sparse": true,
+      "fast": true
+     },
+     "sols": 1,
+     "agree": true,
+     "planted_found": true,
+     "delta": 1024,
+     "fast_gave_up": null,
+     "matched": true
+    }
+   ],
+   "matched": "3/3 systems: n, p, delta, arms, per-arm sols, agree, planted_found, gave_up, fallback; muls exact on 3 systems at the card's si",
+   "ok": true
+  },
+  {
+   "name": "dlp_fast_p53_s1",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/jv_cover",
+    "--exp",
+    "dlp",
+    "--sizes",
+    "53",
+    "--seeds",
+    "1",
+    "--rho-runs",
+    "4",
+    "--check-every",
+    "64",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/dlp_fast_p53_s1.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {
+    "JV_LIN": "fast"
+   },
+   "binary_sha256": "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f",
+   "exit_code": 0,
+   "seconds": 292.207,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/dlp_fast_p53_s1.json": "1323a2fd53953396a7ce971c1c9bd45b4cc93cb5156fdc30bea25fce81325ddf",
+    "research/postgb_linear_stage_20261026/validation/replay/out/dlp_fast_p53_s1.stdout": "1a75c4238207d883d507e8383d936c44032de143adceb7bde81f3c7c689a133a",
+    "research/postgb_linear_stage_20261026/validation/replay/out/dlp_fast_p53_s1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "compared_with": "research/postgb_linear_stage_20261026/runs/R2-D2.json p=53 seed=1",
+   "required": {
+    "solved": {
+     "replay": true,
+     "recorded": true,
+     "equal": true
+    },
+    "correct": {
+     "replay": true,
+     "recorded": true,
+     "equal": true
+    },
+    "lin_muls": {
+     "replay": 4593464878,
+     "recorded": 4593464878,
+     "equal": true
+    },
+    "relations": {
+     "replay": 31,
+     "recorded": 31,
+     "equal": true
+    }
+   },
+   "deterministic_fields_compared": 54,
+   "deterministic_fields_differing": {},
+   "timing_fields_not_compared": {
+    "lin_ms": {
+     "replay": 26966.96175799993,
+     "recorded": 12785.308864000026
+    },
+    "wall_ms": {
+     "replay": 292181.541403,
+     "recorded": 247467.850411
+    },
+    "f4_ms": {
+     "replay": 208526.5093820006,
+     "recorded": 103461.36493099964
+    }
+   },
+   "rho_correct": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "matched": "solved, correct, lin_muls, relations and all 54 non-timing fields equal the recorded row",
+   "ok": true
+  },
+  {
+   "name": "dlp_sparse_p53_s1",
+   "argv": [
+    "/tmp/claude-0/-home-user/a7c5a28f-8713-55c7-9cd1-51f299a2e440/scratchpad/pinned/jv_cover",
+    "--exp",
+    "dlp",
+    "--sizes",
+    "53",
+    "--seeds",
+    "1",
+    "--rho-runs",
+    "4",
+    "--check-every",
+    "64",
+    "--json",
+    "research/postgb_linear_stage_20261026/validation/replay/out/dlp_sparse_p53_s1.json"
+   ],
+   "cwd": "/home/user/crypto",
+   "env": {
+    "JV_LIN": "sparse"
+   },
+   "binary_sha256": "afa830fc99087f12978f1e072c16b3f6e164c99b2b15e17fd6a3a7cc92bb050f",
+   "exit_code": 0,
+   "seconds": 275.511,
+   "outputs": {
+    "research/postgb_linear_stage_20261026/validation/replay/out/dlp_sparse_p53_s1.json": "2be9c803ff6deb7edc36d79b922b2ae13a8009e40296ce657c8318774d6faf7c",
+    "research/postgb_linear_stage_20261026/validation/replay/out/dlp_sparse_p53_s1.stdout": "473a7d40f33f7a8eabeefe0fce346e50e3e52ef2c79971ee7a058eb5b376709b",
+    "research/postgb_linear_stage_20261026/validation/replay/out/dlp_sparse_p53_s1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "compared_with": "research/postgb_linear_stage_20261026/runs/R2-D1.json p=53 seed=1",
+   "required": {
+    "solved": {
+     "replay": true,
+     "recorded": true,
+     "equal": true
+    },
+    "correct": {
+     "replay": true,
+     "recorded": true,
+     "equal": true
+    },
+    "lin_muls": {
+     "replay": 4032563426,
+     "recorded": 4032563426,
+     "equal": true
+    },
+    "relations": {
+     "replay": 31,
+     "recorded": 31,
+     "equal": true
+    }
+   },
+   "deterministic_fields_compared": 54,
+   "deterministic_fields_differing": {},
+   "timing_fields_not_compared": {
+    "lin_ms": {
+     "replay": 103599.86927700015,
+     "recorded": 64813.04100699957
+    },
+    "wall_ms": {
+     "replay": 275488.792052,
+     "recorded": 248456.541303
+    },
+    "f4_ms": {
+     "replay": 152673.50593599965,
+     "recorded": 99484.88456899996
+    }
+   },
+   "rho_correct": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "matched": "solved, correct, lin_muls, relations and all 54 non-timing fields equal the recorded row",
+   "ok": true
+  }
+ ]
+}

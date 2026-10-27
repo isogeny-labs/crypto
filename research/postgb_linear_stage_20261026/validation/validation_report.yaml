@@ -1,0 +1,105 @@
+validation_report:
+  id: VAL-20261027-1884a1
+  task_id: null   # dispatched by the main session; no TASK id or review_plan was given
+  snapshot_commit: e9bf8737a38fa4446acec23812eaaf085d8426a6
+  study: research/postgb_linear_stage_20261026
+  run_ids: [R2-L1, R2-L2, R2-L3, R2-L4, R2-L5, R2-L6, R2-A1, R2-A2, R2-D1, R2-D2]
+  beside_only_run_ids: [L1, L2, L3, L4]   # host A; recomputed for the host_a_* blocks, not scored
+  artifact_checks:
+    - All 121 study files are committed. Inputs were read with git show / git archive at the snapshot; the
+      working tree was not read. The committed runs, cards, receipts and summary.json were byte-identical in
+      the working tree at check time.
+    - Ten R2 receipts are completed. Every command exited 0 with one attempt and no timeout. Each card_sha256
+      equals the committed card.
+    - Every card binds postgb_la_bench c5612e2e... and jv_cover afa830fc..., equal to the pinned copies used for
+      the replay. task_card.py refuses a card whose binds do not match.
+    - Receipt output, stdout, stderr and lscpu sha256 equal the committed files. The launcher logs name the
+      committed receipt sha256.
+    - Each card started at the commit that added the previous card's receipt, so the cards ran one at a time.
+      The run timeouts follow amendment 2.
+    - No src/, examples/ or Cargo.* change between the commits of the first and last R2 cards
+      (e370e78..d544b78).
+    - The ten R2 lscpu records are byte-identical (host B). L1-L4 ran on host A. No third host appeared, and
+      nothing is pooled.
+    - Coverage is exactly the protocol corpus, 253 systems, each once, with none dropped; the ablation covers the
+      same 253. Every skipped list is empty.
+  metric_recomputations:
+    - "validator-report.json gives 110 headline numbers at rel_tol 1e-9 with 0 mismatches:
+      the per-family sparse/fast and dense/fast geometric means, minima, maxima and bootstrap CIs;
+      P2 Spearman rho 0.93080369034499 over the 153 dense-family systems; P3 give-up fraction 1/253;
+      the portable-ablation geometric means and portable/SIMD fast ratios; and DLP S, S/rho and lin_ms
+      for each arm and row, with the sparse/fast lin_ms and S ratios."
+    - "Every other leaf of summary.json matches: meta, skipped, gates, the 253 systems entries, the predictions,
+      the DLP rows and the host-A blocks. No underivable number was found."
+    - The DLP oracle_muls, la_muls, total_muls, S, rho S and S/rho were rebuilt from their component counters.
+  control_checks:
+    - "Correctness gate: every arm agrees on every system; every dense-family planted point is found; every
+      constructed jv-nagao system has >= 1 solution (the bench records no planted point for them)."
+    - "Replay (replay-certificate.json): status verified; 82 systems from 12 pinned-bench runs (14 nonce-sampled
+      across all five families) equal their recorded rows; counted muls exact on 17 systems at the card's si;
+      the p97-4 give-up reproduced at a different si; jv_cover p=53 seed=1 under JV_LIN=fast equals R2-D2 on all
+      54 non-timing fields (lin_muls 4593464878, relations 31, correct true), and under JV_LIN=sparse equals R2-D1."
+    - "Counted-mul determinism: 98 systems at equal si in R2-L and R2-A have identical sparse and fast muls."
+  heuristic_validation_checks:
+    - "Not applicable: no heuristic distribution is validated; the predictions P1-P5 were frozen in PROTOCOL.md
+      (544eb84) before any measured session and are scored on host B per amendment 2."
+    - "Scale ladder (inventor-protocol section 6) not applicable: the claimed component speed-up is a measured
+      ratio on the corpus at the sizes claimed, not an extrapolation; nothing beyond the corpus is supported."
+    - "Null-object control (section 3) not applicable: P2 is a performance trend (sparse/fast vs delta), not a
+      bias or correlation in a cryptographic object."
+  cost_model_checks:
+    - "Units declared: wall time (headline), counted multiplications beside it, and a note that the arms count
+      differently. The DLP S is counted multiplications / (c_add_E sqrt l)."
+    - "Memory is not reported alongside time (limitation)."
+    - "Wall time is not a measured bound (AGENTS.md 'Curve identity and measured bounds'); the DLP rows
+      identify the curve by (p, seed, l), not by an EC1 curve UID."
+  proof_architecture_checks: []
+  verdict: passed
+  verdict_scope: >-
+    The R2 records are admissible receipts, and every number in analysis/summary.json is supported by them.
+    This is not an ECDLP claim, a promotion, or a judgement of whether the speed-up matters. It is not
+    gate-complete: replay-certificate.json has scalars_verified false, and the rho reference was not assessed.
+  limitations:
+    - "Scalars not independently verified. The pinned jv_cover outputs neither the solved logarithm nor the
+      instance. The check used is the binary's own (dd*G == Q on E(F_{p^6}), then dd == planted d), replayed.
+      docs/VALIDATION_GATE.md requires scalars_verified true."
+    - "Protocol text vs code: the dense-family F4 budget is 600 s (since the freeze; amendment 1 says 600 s)
+      against 900 s in PROTOCOL.md. No R2 system hit an F4 timeout, so there was no effect."
+    - "Commit afa857a landed during R2-A2's measured run; this can affect its timings, not its counts."
+    - "The binaries' correspondence to source was not checked by rebuild. The snapshot HEAD includes a later
+      main merge that changes f4_fp.rs, jv_cover.rs, the gaudry_* modules and Cargo.toml."
+    - "The DLP lin_ms is summed inside a 4-thread pool, not single-threaded wall time."
+    - "Timing was not replayed. The replay host was loaded by a concurrent cargo build."
+    - "The README cited by amendments 1 and 2 is not in the snapshot and was not validated."
+    - "Post-snapshot commit e6ff48ea72 (05:49:33Z, producer, during this validation) swept a partial copy of
+      validation/replay/ (7 of 14 runs; journal.json and run_replay.log since superseded) into the producer's
+      commit. The same commit changes docs/ic/leaderboard.json, LEADERBOARD.md, ic-leaderboard.html and
+      scripts/build_ic_leaderboard.py, adds benchmarks/20261027-postgb-linear-stage/, and makes fast the
+      JV_LIN default, all before this validation finished and with no VALIDATION.json. It does not change
+      runs/, cards/, analysis/ or the protocol files. Not validated here."
+  artifact_paths:
+    - research/postgb_linear_stage_20261026/validation/validator-report.json     # sha256 62687f322a88414d07686c693bcb004e1ed300ca4da36e15a236cbb9dc2ecf7c
+    - research/postgb_linear_stage_20261026/validation/replay-certificate.json   # sha256 b949534ca936ae3cb66df7f195abe8bdf473ed3a7e448dc19ae7632fb096d7be
+    - research/postgb_linear_stage_20261026/validation/VALIDATION_NOTES.md
+    - research/postgb_linear_stage_20261026/validation/recompute.py
+    - research/postgb_linear_stage_20261026/validation/replay/   # nonce.txt, sample.py/json, run_replay.py, journal.json, check_replay.py, out/
+  review_attestation:
+    joints_owned: []   # no review_plan; whole-task validation as assigned
+    blind_rederivation: false   # recomputed from the producer's raw records, so not a blind re-derivation
+    read_sibling_reports: false
+    producer_scripts_read: "none (scripts/summary.py and scripts/plots.py not read or run)"
+    sources_read:
+      - /home/user/crypto-autoresearcher/docs/agent-runtime-core.md
+      - /home/user/crypto-autoresearcher/agents/validator.md
+      - /home/user/crypto-autoresearcher/AGENTS.md (sections "Review architecture", "Curve identity and measured bounds")
+      - research/postgb_linear_stage_20261026/PROTOCOL.md, PROTOCOL_AMENDMENT_1.md, PROTOCOL_AMENDMENT_2.md
+      - research/postgb_linear_stage_20261026/cards/ (R2-L1 and R2-D2 cards in full; all R2 and L1-L4 receipts and lscpu by script; R2-D2 run.stdout; launcher logs by grep and the R2-L3 head and tail; L4 run.stderr by grep)
+      - research/postgb_linear_stage_20261026/runs/*.json (by script)
+      - research/postgb_linear_stage_20261026/analysis/summary.json (structure; compared by script)
+      - examples/postgb_la_bench.rs (snapshot; at 544eb84; diff 544eb84..4d55b73)
+      - examples/jv_cover.rs (argument parsing and DLP call)
+      - src/cryptanalysis/jv_cover.rs (linear_stage_from_basis, nagao_systems, run_cover_dlp; generate_spec at d544b78; lin_mode in the working tree and at e370e78/d544b78/HEAD)
+      - src/cryptanalysis/zero_dim_la.rs (grep for time budgets)
+      - tools/task_card.py (lint and run_card)
+      - docs/VALIDATION_GATE.md, scripts/validation_gate.py (check functions), scripts/fixtures/validation_gate/positive/, benchmarks/20261017-ic-a15-filter-slots/VALIDATION.json and validator-report.json raw_data
+      - git log / diff metadata for the study, src/, examples/ and Cargo.*
