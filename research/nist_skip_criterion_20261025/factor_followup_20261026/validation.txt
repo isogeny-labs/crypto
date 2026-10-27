@@ -1,0 +1,9 @@
+C++17 native helper: strict build passed with -O2 -Wall -Wextra -Werror.
+Shell launcher: sh -n passed.
+Checkpoint script: bash -n passed.
+Checkpoint regression test executes only an isolated temporary Git fixture, not a research target:
+- state hash is stable and changes with an untracked-file edit;
+- Linux file-size handling permits packaging;
+- unavailable transport still rejects upload;
+- failed Git bundle stops before upload selection.
+No new mathematical target has executed during this preparation.

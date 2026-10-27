@@ -351,6 +351,7 @@ impl FactorBaseBuilder<PrimeCurve> for CmOrbitBase<'_> {
             cost: PhaseCost::default(),
             subspace_basis: None,
             affine_subspace: None,
+            known_logs: None,
         };
         let mut seen = HashSet::new();
         let mut x = 1;
