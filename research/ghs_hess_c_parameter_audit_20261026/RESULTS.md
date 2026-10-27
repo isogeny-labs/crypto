@@ -112,7 +112,10 @@ Magma identities are not represented as fully formal Lean proofs.
 For `q=2^ell`, the exact number of nonzero coefficients `b` in this
 double trace-zero genus-three branch is
 `(q-1)(q+1)(q+2)/2`, less `q-1` for full cubic degree when `ell` is
-even. This is a rigorous upper bound on the number of *measured
+even. The intersection with the direct trace-zero hyperelliptic branch
+is exactly `q^2-1`, so the distinct-factor branch outside it has
+exactly `(q-1)q(q+1)/2` coefficients. This is a rigorous upper bound
+on the number of *measured
 vulnerable* source models **within this normalized Hess branch**.
 It is not a bound on every GHS construction, every isogenous curve,
 or every possible cover attack. Karabina--Menezes--Pomerance--

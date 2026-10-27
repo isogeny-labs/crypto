@@ -52,7 +52,10 @@ where `u,v` are any `k`-basis of `U` and `A,B,C in k`. Then:
 3. `|P_q|=(q-1)(q+1)(q+2)/2`.
 4. Exactly `q^2-1` elements of `P_q` have a repeated projective factor.
    The other `(q-1)q(q+1)/2` have two distinct projective factors.
-5. If `q=2^ell` with odd `ell`, then `P_q` contains no nonzero element
+5. `P_q` meets `U` in exactly the `q^2-1` repeated-factor products.
+   Thus the distinct-factor branch outside the direct trace-zero
+   hyperelliptic branch has exactly `(q-1)q(q+1)/2` coefficients.
+6. If `q=2^ell` with odd `ell`, then `P_q` contains no nonzero element
    of `k`; all `|P_q|` coefficients `b=delta^2` have cubic field of
    definition. If `ell` is even, `P_q` contains every element of `k^*`,
    so exactly `|P_q|-(q-1)` corresponding `b` have cubic field of
@@ -94,12 +97,22 @@ of projective factor lines. There are `q+1` lines in `U`, hence
 quadratic has `q-1` nonzero scalar multiples. This proves (3). Repeated
 lines give `(q+1)(q-1)=q^2-1`, proving (4).
 
+For (5), the trace pairing `Tr_{K/k}(xy)` is nondegenerate on `K`.
+Because `Tr_{K/k}(1)=1`, its restriction to the orthogonal complement
+`U=1^perp` is nondegenerate. In characteristic two,
+`Tr_{K/k}(x^2)=Tr_{K/k}(x)^2=0` for `x in U`, so this restriction is an
+alternating form on the two-dimensional space `U`. Consequently
+`Tr_{K/k}(gamma*beta)=0` for nonzero `gamma,beta in U` if and only if
+they lie on the same projective line. Those products are precisely
+the repeated-factor products. Squaring permutes `U^*`, yielding the
+count and direct-branch distinction.
+
 The finite field `k` is perfect. A binary quadratic with `B=0` is a
 square of a linear form. For `B!=0`, factorisation is equivalent to the
 solvability of `z^2+z=A*C/B^2`; over `k`, this is equivalent to zero
 absolute trace. This proves (1) and (2).
 
-For (5), a product `gamma*beta` in `k^*` implies both
+For (6), a product `gamma*beta` in `k^*` implies both
 `Tr(gamma)=0` and `Tr(1/gamma)=0`. The first two elementary symmetric
 coefficients of the conjugates of `gamma` vanish, so its irreducible
 polynomial is `T^3+c` for some `c in k^*`. If `3` is coprime to `q-1`,

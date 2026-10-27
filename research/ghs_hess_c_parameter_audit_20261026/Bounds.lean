@@ -23,6 +23,9 @@ theorem q16_exact_count : (16-1)*(16+1)*(16+2)/2 = 2295 := by decide
 theorem q8_repeated_factor_count : (8-1)*(8+1) = 63 := by decide
 theorem q8_distinct_factor_count : (8-1)*8*(8+1)/2 = 252 := by decide
 theorem q8_partition : 63 + 252 = 315 := by decide
+theorem q16_direct_intersection_count : 16^2-1 = 255 := by decide
+theorem q16_outside_direct_count : (16-1)*16*(16+1)/2 = 2040 := by decide
+theorem q16_partition : 255+2040 = 2295 := by decide
 theorem q8_source_model_count : 511 = 8^3-1 := by decide
 theorem q8_outside_direct_order_closure : 126 + 189 = 315 := by decide
 theorem q8_outside_mod8_partition : 45 + 144 = 189 := by decide

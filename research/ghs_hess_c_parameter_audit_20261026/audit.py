@@ -45,6 +45,8 @@ assert sum(row['order']%8==4 for row in records)==144
 assert all(row['a2']==0 and row['full_degree_b'] for row in records)
 split=json.loads((root/'split_criterion_receipt.json').read_text())
 assert [r['product_count'] for r in split['records']]==[6,45,315,2295]
+assert [r['direct_branch_intersection_count'] for r in split['records']]==[3,15,63,255]
+assert [r['distinct_factor_outside_direct_count'] for r in split['records']]==[3,30,252,2040]
 assert [r['subfield_product_count'] for r in split['records']]==[0,3,0,15]
 
 sweeps={}

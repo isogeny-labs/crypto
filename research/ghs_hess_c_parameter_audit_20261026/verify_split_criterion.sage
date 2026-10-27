@@ -35,12 +35,18 @@ for ell in (1,2,3,4):
     assert products==splits
     expected=(q-1)*(q+1)*(q+2)//2
     assert len(products)==expected
+    product_direct=products & set(U)
+    assert len(product_direct)==q*q-1
+    assert product_direct==set(U)
+    assert len(products-product_direct)==(q-1)*q*(q+1)//2
     expected_subfield=(q-1) if (q-1)%3==0 else 0
     subfield_nonzero=set(scalar)-{K(0)}
     assert len(products & subfield_nonzero)==expected_subfield
     records.append({'ell':int(ell),'q':int(q),'trace_zero_nonzero':int(len(U)),
                     'product_count':int(len(products)),
                     'formula_count':int(expected),
+                    'direct_branch_intersection_count':int(len(product_direct)),
+                    'distinct_factor_outside_direct_count':int(len(products-product_direct)),
                     'subfield_product_count':int(expected_subfield),
                     'full_degree_product_count':int(len(products)-expected_subfield),
                     'split_criterion_matches':True})
