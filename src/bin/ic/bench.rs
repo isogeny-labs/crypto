@@ -61,6 +61,10 @@ pub struct BenchArgs {
     /// With `--auto`: memory the planned pair table may take, in GiB.
     #[arg(long, default_value_t = 8.0)]
     pub max_table_gib: f64,
+    /// With `--auto`: plan for this AGENTS.md §5a weight (GAE per unpriced
+    /// native operation); 0 plans for counted S.
+    #[arg(long, default_value_t = 0.0)]
+    pub native_weight: f64,
     /// Prime-field instance of this subgroup bit length.
     #[arg(long)]
     pub bits: Option<u32>,
@@ -1004,6 +1008,12 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
     // `--auto`: the instance first, then the planner's stages for it.
     let mut early_instance = None;
     let mut plan_report = Value::Null;
+    if !(args.native_weight.is_finite() && args.native_weight >= 0.0) {
+        return Err(
+            "--native-weight must be a finite number of GAE per native operation, at least 0"
+                .into(),
+        );
+    }
     let (configs, args) = if args.auto {
         if args.sweep.is_some() {
             return Err(
@@ -1021,6 +1031,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             &profile,
             &PlanOptions {
                 max_table_bytes: args.max_table_gib * (1u64 << 30) as f64,
+                native_weight: args.native_weight,
                 ..PlanOptions::default()
             },
         );
