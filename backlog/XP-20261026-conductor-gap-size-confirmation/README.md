@@ -1,7 +1,17 @@
 # Broader conductor gaps and a precise crater comparison
 
-Status: **blocked, not running**. The named driver and independent measurement
-verifier are unimplemented. No paid resource, lab lease or reward is created.
+Status: **blocked, not running**. A native prospective allocation planner and
+auditor now exist, but the measurement executor and independent measurement
+verifier remain unimplemented. No paid resource, lab lease or reward is created.
+
+The [2026-10-27 preflight](../../research/conductor_gap_preflight_20261027/PROTOCOL.md)
+and `examples/conductor_gap_confirmation.rs` provide `plan`, `audit` and
+`preflight` commands. They check 128 classes, 4,096 distinct class/logarithm
+pairs and 32,768 prospective primary invocations with separate seeds and a
+fixed block permutation. There is no solver-execution command; `preflight`
+reports the remaining gates and exits 3. `card.json`'s `run.argv` is still the
+intended future measurement command, which the current example rejects.
+Allocation validity does not make this card ready or freeze confirmation.
 
 The [design study](../../research/conductor_gap_size_ladder_20261026/README.md)
 prepares parameter classes at four native-size rungs and upper structural

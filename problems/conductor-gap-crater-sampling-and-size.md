@@ -4,7 +4,7 @@
 - **Kind:** empirical precision limit; size-coverage gap
 - **Affected work:** [replication](../research/conductor_gap_replication_20261025/README.md), [crater design analysis](../research/conductor_gap_crater_design_20261025/REPORT.md), [broader size design](../research/conductor_gap_size_ladder_20261026/REPORT.md)
 - **Next action owner:** conductor-gap research workstream
-- **Last updated:** 2026-10-26
+- **Last updated:** 2026-10-27
 
 ## Problem
 
@@ -95,6 +95,12 @@ obligations in [the existing problem record](conductor-gap-upper-floor-and-cost.
   run a disjoint pilot under the local execution/task-card rules; use it to
   freeze confirmation. The [blocked backlog card](../backlog/XP-20261026-conductor-gap-size-confirmation/README.md)
   records the unimplemented driver, full replay and resource requirements.
+- **Preparation available:** The [native allocation preflight](../research/conductor_gap_preflight_20261027/PROTOCOL.md)
+  generates and audits the complete prospective pilot allocation, with one
+  shared scalar per class/target across four crater slots, separate walk
+  seeds, fixed block randomization and explicit zero executed solves.
+  Exact models/maps, measurement execution and independent replay remain
+  unimplemented; a passing allocation audit leaves preflight blocked.
 - **Controls:** Same-point generator/target transport, fixed subgroup/method/
   budgets, separate solver seeds, grouped inference, complete retention and
   replay; counted work is primary and L0 timing stays descriptive.
@@ -120,3 +126,13 @@ four rungs = 1,024,000 one-target solves before replays/controls. This is
 not a guaranteed minimum, selected execution budget or launched campaign.
 The complete disjoint pilot would contain 32,768 solves before replays.
 Neither count has been executed; the measured crater verdict is unchanged.
+
+2026-10-27: implemented prospective pilot allocation and corruption checks
+without constructing new curves or invoking a solver. The 128 native classes
+receive 32 distinct public nonzero scalars each (4,096 class/target pairs),
+shared across four prospective crater slots with two separate seeds per slot.
+The allocation has 32,768 prospective primary invocations, plus separately
+pending full replay and controls. No measurement, calibrated power, final
+confirmation count or crater-equivalence conclusion is added. The blocked
+backlog card distinguishes this implemented preparation from its still-missing
+execution mode.
