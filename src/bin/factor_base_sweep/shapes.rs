@@ -55,6 +55,24 @@ pub fn basis(i: &BinaryInstance, shape: &str, dim: u32, seed: u64) -> Result<Vec
             .map(|v| v.cols.iter().map(|x| x.raw_bits()[0]).collect())
             .ok_or_else(|| "inapplicable: requested subfield does not exist".into());
     }
+    if shape == "tracezero-gp-kernel" {
+        let constructed = super::profile::construct(&super::profile::ConstructRequest {
+            schema: "factor_base_construct_request/v1".into(),
+            field_degree: i.n,
+            modulus_low_terms: i.irreducible.low_terms.clone(),
+            dimension: dim,
+            generator_hex: "0x2".into(),
+            seed,
+            max_power: 2,
+        })?;
+        return constructed
+            .profile
+            .request
+            .basis_hex
+            .iter()
+            .map(|s| u64::from_str_radix(s.trim_start_matches("0x"), 16).map_err(|e| e.to_string()))
+            .collect();
+    }
     let mut rng = StdRng::seed_from_u64(seed);
     let mask = (1u64 << i.n) - 1;
     for _ in 0..256 {
@@ -181,6 +199,7 @@ mod tests {
             "random",
             "tracezero",
             "tracezero-gp",
+            "tracezero-gp-kernel",
             "tracezero-frobenius",
         ] {
             let a = basis(&i, shape, 3, 9).unwrap();

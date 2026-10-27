@@ -1,0 +1,18 @@
+{
+  "controls": [
+    {
+      "field": "ContentLength",
+      "file": "s3-head.json",
+      "reason": "provider object checksum, metadata and encryption",
+      "rejected": true
+    },
+    {
+      "field": "point_set_blake3",
+      "file": "s3-manifest-fresh-get.json",
+      "reason": "immutable hash-bound S3 manifest",
+      "rejected": true
+    }
+  ],
+  "schema": "n83.d18-full-custody-tamper/v1",
+  "status": "PASS_REJECTED_TAMPERS"
+}
