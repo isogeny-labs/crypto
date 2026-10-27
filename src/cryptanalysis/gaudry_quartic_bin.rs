@@ -3691,7 +3691,7 @@ mod tests {
         let r1 = f.ref_muls();
         let _ = f.mul(&a, &Eb::ONE);
         let _ = f.mul(&Eb::ZERO, &b);
-        assert_eq!(f.ref_muls(), r1 + 0);
+        assert_eq!(f.ref_muls(), r1);
         let _ = f.mul(&a, &b);
         let _ = f.sq(&a);
         let _ = f.sqrt(&a);

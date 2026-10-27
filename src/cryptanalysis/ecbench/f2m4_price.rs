@@ -992,7 +992,7 @@ fn measure_once(inst: &BinCurve, seed: u64) -> BTreeMap<&'static str, f64> {
     );
     let mut r2 = StdRng::seed_from_u64(seed ^ 1);
     out.insert("rng_draw", ns_per(4_000_000, |_| r2.gen::<u64>()));
-    out.insert("mix_eval", ns_per(8_000_000, |i| mix(i)));
+    out.insert("mix_eval", ns_per(8_000_000, mix));
 
     // Points.
     let mut pts: Vec<PtB> = Vec::with_capacity(256);
@@ -1647,7 +1647,7 @@ mod tests {
         .filter(|(n, _)| rho_rule(n, false).is_some())
         .filter_map(|(n, c)| charge(rho_rule(n, false).unwrap(), n, *c, &u))
         .collect();
-        let a = band_rule_applications(1.0, 50.0, &[ic.clone()]);
+        let a = band_rule_applications(1.0, 50.0, std::slice::from_ref(&ic));
         let b = band_rule_applications(1.0, 50.0, &rho);
         assert_eq!(a["native_rule_applications"], 40.0);
         assert_eq!(b["native_rule_applications"], 40.0);

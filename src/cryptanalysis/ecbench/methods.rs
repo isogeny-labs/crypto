@@ -2813,7 +2813,7 @@ fn solve_f2m4_ic_full_with(
         .unwrap_or(0);
     // The `x_of_t` before each base lift: its counted multiplications.
     let (mut muls, mut rmuls, mut n) = (0u64, 0u64, 0u64);
-    for t in (2..c.f.f.q as u32)
+    for t in (2..c.f.f.q)
         .step_by(((c.f.f.q / 64).max(1)) as usize)
         .take(64)
     {
