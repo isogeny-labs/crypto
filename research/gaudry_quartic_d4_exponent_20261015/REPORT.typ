@@ -6,29 +6,30 @@
 #align(center)[
   #text(size: 14pt, weight: "bold")[`k = 4` index calculus on $E(FF_(p^4))$, measured]\
   #v(2pt)
-  relations $prop p^(0.96)$, Wiedemann $prop p^(2.04)$, rho $prop p^(1.93)$;
-  crossover from the fits $2^(98)$ ($h = 4$), sensitivity $2^(82)$–$2^(127)$\
+  relations $prop p^(1.02)$, Wiedemann $prop p^(1.93)$, rho $prop p^(1.86)$;
+  crossover from the fits $2^(101)$ ($h = 4$), interval $2^(91)$–$2^(117)$\
   #v(2pt)
-  `research/gaudry_quartic_d4_exponent_20261015` · 2026-10-15 · class: measurement
+  `research/gaudry_quartic_d4_exponent_20261015` · 2026-10-15 to 2026-10-27 · class: measurement
 ]
 
-*Summary.* Gaudry/Diem index calculus with FGHR's $D_4$ oracle (PR \#1863) and rho
-with the negation map were run end to end in ecbench on `fp4_torsion` curves for
-12 primes $p = 29 dots 1009$: all 72 planned jobs, 312 records, all verified ($[d]G = Q$), `S` a count.
-Fitted over the rungs, the relation phase grows like $p^(0.96)$ (95 %: 0.65–1.27),
-the linear algebra (Wiedemann, new here) like $p^(2.04)$ (1.85–2.22), and rho like
-$p^(1.93)$ (1.78–2.09), as the analysis says ($q^1$, $q^2$, $q^2$). Index calculus
-still loses to rho at every measured size ($9.1 dot 10^5 times$ at $p = 29$,
-$6.7 dot 10^4 times$ at $p = 1009$). From the measured fits, it meets rho at a group
-of $2^(97.9)$ ($h = 4$; bootstrap $2^(94.6)$–$2^(102.5)$); with the relations slope
-at its interval ends, $2^(82.1)$–$2^(127.4)$. The §11.16 model gave
-$2^(105.4)$–$2^(106.5)$. *This extrapolates 14.5 bits in $p$, 58 bits in group
-size, beyond the top rung.* At that point the relation phase is still 97 % of the
-cost. Double large primes lower the fitted linear-algebra slope to 1.70 (interval
-1.25–2.15, consistent with both the theory's 1.5 and the plain 2.04) but cost
-1.09–2.31× more on paired walks at $p >= 61$, and move the fitted crossover
-later ($2^(128)$). The first 60 jobs gave $2^(100.4)$; the last 12 jobs were run
-afterwards at the owner's request (§Last 12 jobs).
+*Summary.* Gaudry/Diem index calculus with FGHR's $D_4$ oracle (PR \#1863) and rho with the
+negation map were run end to end in ecbench on `fp4_torsion` curves for 12 primes
+$p = 29 dots 1009$: 146 sessions, 740 records, all verified ($[d]G = Q$), all audited (674
+replays reproduced exactly), `S` a count. The plan had three parts: a ladder of 72 jobs (one
+curve per rung), 12 of which ran after the first stop at the owner's request, and an extension
+(amendment 5, frozen with predictions before any extension run) with two more curves per rung up to
+$p = 509$, large primes at higher $p$, and third targets at the top rungs. Fitted with curves as a
+level of the design, the relation phase grows like $p^(1.02)$ (95 %: 0.84–1.19), the linear algebra
+(Wiedemann) like $p^(1.93)$ (1.86–2.02), and rho like $p^(1.86)$ (1.77–1.94) ($q^1, q^2, q^2$ as the
+analysis says). Index calculus still loses to rho at every measured size ($7.2 dot 10^5 times$ at
+$p = 29$, $6.7 dot 10^4 times$ at $p = 1009$). From the fits it meets rho at a group of
+$2^(101.4)$ ($h = 4$; cluster bootstrap $2^(95.1)$–$2^(115.9)$; with the relations slope at its
+interval ends $2^(90.6)$–$2^(116.8)$), against the §11.16 model's $2^(105.4)$–$2^(106.5)$, which lies inside
+both. *This extrapolates 15.4 bits in $p$, 61.5 bits in group size, beyond the top rung.* At that point
+the relation phase is 99 % of the cost. Large primes cut the matrix 3–5 times but cost 1.1–6.4×
+more on paired walks, the penalty growing with $p$, and push the fitted crossover out
+($2^(145)$ for two large primes). The 72-job fit, made before the extension, gave $2^(97.9)$ and
+a wider interval ($2^(82)$–$2^(127)$); both are reported. All ten extension predictions held.
 
 = Method
 
@@ -36,7 +37,8 @@ Protocol `PROTOCOL.md`, registered at `08722a2b7` before any session; amendments
 (1) queue reordered and stop extended to 16 h (runtime, before any IC record);
 (2) audit scope by size; (3) relaunch of 20 jobs after the container's CPU set
 shrank; (4) the 12 jobs that missed the stop run at the owner's request, with a
-corrected count. Code `0bea75038`. Arms (all `fghr-y-line:zero=1`, oracle
+corrected count; (5) the extension below, with (5a) and (5b) two repairs after the container lost
+CPUs and was restarted. Code `0bea75038`. Arms (all `fghr-y-line:zero=1`, oracle
 `gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1`):
 `ic-d4-w` (`linalg=wiedemann`), `ic-d4-lp2`/`ic-d4-lp1` (`large_primes=2`/`1`,
 small base the first $ceil(N^theta)$ columns, $theta = 3/4$, $7/9$), `rho-neg`.
@@ -61,7 +63,7 @@ crossover solves $sum_k A_k p^(beta_k) = overline(S)_"rho" sqrt(p^4 slash h)$.
   targets). The dense elimination is derived from its `row_ops` at the same
   price and is not part of `S`.])
 
-= Results
+= Results (the first 72 jobs)
 
 #table(columns: (auto, auto, auto, auto), stroke: 0.3pt, inset: 4pt,
   [*quantity*], [*$beta$*], [*95 % interval*], [*expected*],
@@ -102,7 +104,7 @@ the extrapolated range ($p <= 2^(34)$).
   the measured range. Blue band: bootstrap; hatched: relations slope at its
   interval ends; orange: the §11.16 model at $h = 4$.])
 
-= Large primes
+= Large primes (the first 72 jobs)
 
 #table(columns: (auto, auto, auto, auto, auto), stroke: 0.3pt, inset: 4pt,
   [*arm*], [*runs (rungs)*], [*lin. alg. $beta$*], [*relations $beta$*], [*crossover $h = 4$*],
@@ -144,7 +146,78 @@ headline because it uses the full planned set.
   [crossover, LP2, $h = 4$], [$2^(123.9)$], [$2^(127.7)$],
 )
 
-= Predictions
+= The extension (amendment 5)
+
+*What ran.* 74 sessions, all completed: the plain arm on two more curves at each of $p = 29 dots 509$
+(40; the curves come from chaining start seeds, `curves.tsv`, because `fp4_torsion(p, seed, 16)`
+returns the first curve at or after the seed and seeds 1–5 mostly give the same curve), 16 rho
+targets on each of those 20 curves, `lp2` at $p = 401, 509, 701$ and `lp1` at $p = 197, 293$ on the original
+curves and targets (10), and a third plain target at $p = 401, 509, 701, 1009$ (4). The container was restarted
+three times and lost CPUs; the resumable runner reran what was in flight (counts unaffected).
+
+*Fits* (a rung is the mean over its curves of each curve's mean over its targets; interval = union of the
+Student-$t$ and a cluster bootstrap over curves, then targets; $p <= 509$: three curves per rung, $p = 701, 1009$: one):
+
+#table(columns: (auto, auto, auto), stroke: 0.3pt, inset: 4pt,
+  [*quantity*], [*72 jobs*], [*extended*],
+  [relations (= total), plain], [0.96 (0.65–1.27)], [*1.02 (0.84–1.19)*],
+  [linear algebra, Wiedemann], [2.04 (1.85–2.22)], [*1.93 (1.86–2.02)*],
+  [dense elimination (derived)], [2.34 (2.12–2.56)], [2.24 (2.05–2.43)],
+  [rho GAE], [1.93 (1.78–2.09)], [*1.86 (1.77–1.94)*],
+  [`lp2` linear algebra / relations], [1.70 / 1.26], [1.72 (1.50–1.93) / 1.36 (1.06–1.66)],
+  [`lp1` linear algebra / relations], [1.62 / 1.49], [1.56 (1.32–1.81) / 1.64 (1.15–2.14)],
+)
+
+The relations interval is 0.35 wide against 0.62.
+
+#table(columns: (auto, auto, auto, auto), stroke: 0.3pt, inset: 4pt,
+  [*crossover (group size)*], [*$h = 2$*], [*$h = 4$*], [*$h = 16$*],
+  [extended fit, point], [$2^(99.4)$], [*$2^(101.4)$* ($p^* = 2^(25.4)$)], [$2^(105.5)$],
+  [cluster bootstrap], [$2^(93.2)$–$2^(113.4)$], [$2^(95.1)$–$2^(115.9)$], [$2^(98.9)$–$2^(120.8)$],
+  [relations slope at 0.84 / 1.19], [$2^(88.9)$–$2^(114.3)$], [*$2^(90.6)$–$2^(116.8)$*], [$2^(94.1)$–$2^(121.8)$],
+  [72-job fit, point; slope band], [$2^(96.0)$; $2^(80.6)$–$2^(124.6)$], [$2^(97.9)$; $2^(82.1)$–$2^(127.4)$], [$2^(102.0)$; $2^(85.2)$–$2^(133.2)$],
+  [§11.16 model (\#1863)], [$2^(103.0)$–$2^(103.7)$], [$2^(105.4)$–$2^(106.5)$], [—],
+)
+
+The top rung is a $2^(39.9)$ group: the crossover is *61.5 bits of group size (15.4 bits of $p$) beyond the
+measurements*, 4.0–5.1 bits earlier than the model, which lies inside the cluster-bootstrap interval and
+the slope band. The interval skews upward (a larger relations slope moves the crossover far out). With
+rho's own fitted power law: $2^(117.9)$ ($2^(107.9)$–$2^(142.7)$). The relation phase is 99 % of the cost at the
+crossover; the linear algebra overtakes it only past $p approx 2^(32.8)$ (group $approx 2^(131)$). With the dense
+elimination priced instead, the cost meets rho at $2^(101.8)$ and is above it again from $p = 2^(41.5)$
+(group $2^(166)$).
+
+#figure(image("figures/ext_crossover.svg", width: 92%),
+  caption: [Extended fit: the fitted phases extrapolated to the crossover with rho. Grey: the measured
+  range. Blue band: cluster bootstrap; hatched: relations slope at its interval ends; dotted orange:
+  the 72-job fit; orange band: the §11.16 model at $h = 4$.])
+
+*The scatter between curves.* $ln("trials per relation")$ varies between curves with a pooled standard
+deviation of 0.73, but the spread falls with $p$: a factor of 14 at $p = 37$, 16 at $p = 53$, 5 at $p = 61$,
+and 1.2–3.1 from $p = 149$ up. The relations slope fitted on each chain of curves alone is 0.96
+(0.65–1.28), 1.14 (0.78–1.51) and 1.23 (0.85–1.62), pooled 1.02. *Limit:* $p = 701$ and $1009$ have one curve
+each, so the scatter between curves is not sampled at the two rungs with the most leverage on the slope.
+
+#figure(image("figures/ext_curves.svg", width: 80%),
+  caption: [Left: $ln("trials per relation")$ per curve. Right: the relations slope on each curve chain
+  alone, with its 95 % $t$-interval; dashed, the pooled fit.])
+
+*Large primes at higher $p$* (paired on the same walk; $S$ over the plain arm's):
+`lp2` at $p = 197, 293, 401, 509, 701$: 1.80/2.31, 1.44/2.28, 2.13/2.58, 2.36/2.38, 2.88/2.91; `lp1` at
+$p = 197, 293$: 3.21/6.36, 2.37/5.15. The linear algebra is 3.1–4.8× cheaper, but the extra trials cost
+more than it saves and the penalty grows with $p$. Fitted crossovers: $2^(145.1)$ ($2^(139)$–$2^(152)$) for `lp2`,
+$2^(245)$ for `lp1` (3,591 of 10,000 replicates do not cross).
+
+#figure(image("figures/ext_slopes.svg", width: 80%),
+  caption: [Fitted exponents with 95 % intervals: the 72-job fit (open) and the extended fit (filled).])
+
+*Predictions X1–X10: all held.* X1 740/740 verified, 674/674 replays reproduced; X2 relations slope 1.02
+in $[0.75, 1.25]$; X3 $t$-interval width 0.35 < 0.50; X4 crossover $2^(101.4)$ in $[2^(88), 2^(108)]$, slope band
+26.2 bits < 38; X5 chain slopes 0.96/1.14/1.23 in $[0.5, 1.5]$; X6 pooled SD 0.73 in $[0.2, 1.0]$; X7 `lp2` ratios
+2.13–2.91 at $p = 401, 509, 701$; X8 `lp1` ratios 2.37–6.36 at $p = 197, 293$; X9 `lp2` linear-algebra slope 1.72
+in $[1.3, 2.0]$ and its crossover ($2^(145.1)$) later than the plain arm's; X10 rho slope 1.86 in $[1.6, 2.4]$.
+
+= Predictions (first 72 jobs)
 
 P1 held: 312/312 verified, 290/290 replays reproduced. P2 held (0.96 ∈ [0.9, 1.3]). P3 held (2.04).
 *P4 not held* (dense elimination 2.34 < 2.4). P5 held (1.93; $S_"rho"$ slope
@@ -164,12 +237,16 @@ recorded, hashes) on the other 11: `main-p1009-t0/t1`, `main-p701-t0/t1`,
 `lp2-p293-t1`. The first 60 sessions were audited on 2026-10-16 and the last 12 on
 2026-10-19, with the same `ecbench` binary.
 
+*Extension.* `ecbench verify` on all 146 sessions: *audit OK on all 146, 740 records, 0 problems*. Full
+replay on 113 (every session with $p <= 197$, every rho-only session, `xmain-c2-p293-t0` and `lp2-p401-t0`):
+*674 replays reproduced exactly*; integrity only on 33.
+
 = Limits
 
-The exponents are fitted over $p = 29 dots 1009$ (groups $2^(19)$–$2^(40)$); the
-crossover is an extrapolation of those fits, not a measurement, and its width is
-set by curve-to-curve scatter in the relation rate. The large-prime fits rest on
-two targets per rung over $p <= 293$. $S$ is a count on one host class;
-wall time is not admitted. No `docs/bounds` domain exists for $FF_(p^4)$ curves,
-so there is no challenge verdict. Study files: `README.md`, `raw/summary.json`,
-`sessions/`, run reports `reports/run-20261015T0457Z/` and `reports/run-20261019T1612Z/`.
+The exponents are fitted over $p = 29 dots 1009$ (groups $2^(19)$–$2^(40)$); the crossover is an extrapolation
+of those fits, not a measurement, and its width is set by the scatter between curves in the relation rate and
+by the leverage of the top rungs, which have one curve each. The large-prime fits rest on two targets per
+rung over $p <= 509$ (`lp2`) and $p <= 293$ (`lp1`). $S$ is a count on one host class; wall time is not
+admitted. No `docs/bounds` domain exists for $FF_(p^4)$ curves, so there is no challenge verdict. Study
+files: `README.md`, `raw/summary-ext.json`, `raw/summary.json`, `sessions/`, run reports
+`reports/run-20261015T0457Z/`, `reports/run-20261019T1612Z/` and `reports/run-20261020T0605Z/`.

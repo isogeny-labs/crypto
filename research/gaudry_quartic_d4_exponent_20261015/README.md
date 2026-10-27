@@ -1,20 +1,152 @@
-# `k = 4` index calculus on `E(F_{p⁴})`, measured: relations `∝ p^{0.96}`, Wiedemann `∝ p^{2.04}`, rho `∝ p^{1.93}`; crossover from the fits `2^{98}` (`h = 4`), sensitivity `2^{82}`–`2^{127}`
+# `k = 4` index calculus on `E(F_{p⁴})`, measured: relations `∝ p^{1.02}`, Wiedemann `∝ p^{1.93}`, rho `∝ p^{1.86}`; crossover from the fits `2^{101}` (`h = 4`), interval `2^{91}`–`2^{117}`
 
-2026-10-15, extended 2026-10-19. Protocol: [`PROTOCOL.md`](PROTOCOL.md),
-registered (commit `08722a2b7`) before any session, with four amendments:
-queue order and a 16 h stop (runtime, before any IC record), audit scope (by
-size), a relaunch after the container's CPU set shrank (infrastructure), and
-(amendment 4) running the 12 jobs that missed the stop, at the owner's
-request, with a correction of an earlier count. Code frozen at `0bea75038`.
-Report: [`REPORT.pdf`](REPORT.pdf). Run reports:
-[`reports/run-20261015T0457Z`](reports/run-20261015T0457Z/) (the first 60 jobs)
-and [`reports/run-20261019T1612Z`](reports/run-20261019T1612Z/) (the last 12).
-Summary: [`raw/summary.json`](raw/summary.json) (all 72 jobs; the fit made
-before the last 12 ran is kept as
-[`raw/summary-60-jobs.json`](raw/summary-60-jobs.json)), written by
-`examples/gaudry_quartic_d4_exponent_fit.rs`. **Class: measurement.** The
-exponents and constants of a known method, measured in ecbench's counted
-unit; nothing here is a new algorithm or a claim about any deployed curve.
+2026-10-15; the 72-job ladder extended 2026-10-19; the further runs of amendment 5
+finished 2026-10-27. Protocol: [`PROTOCOL.md`](PROTOCOL.md), registered (commit
+`08722a2b7`) before any session, with amendments 1–4 (queue order and a 16 h stop, audit
+scope, a relaunch after the CPU set shrank, running the 12 jobs that missed the stop with a
+correction of an earlier count) and **5, 5a, 5b** (the extension: more curves per rung, large
+primes at higher `p`, third targets; frozen before any extension run, with predictions
+X1–X10; then two runtime repairs after the container lost CPUs and was restarted). Code
+frozen at `0bea75038`. Report: [`REPORT.pdf`](REPORT.pdf). Run reports:
+[`run-20261015T0457Z`](reports/run-20261015T0457Z/) (the first 60 jobs),
+[`run-20261019T1612Z`](reports/run-20261019T1612Z/) (the next 12) and
+[`run-20261020T0605Z`](reports/run-20261020T0605Z/) (the extension). Summaries:
+[`raw/summary-ext.json`](raw/summary-ext.json) (everything, with curves as a level of the
+design), [`raw/summary.json`](raw/summary.json) (the frozen 72-job fit) and
+[`raw/summary-60-jobs.json`](raw/summary-60-jobs.json). **Class: measurement.** The exponents
+and constants of a known method, measured in ecbench's counted unit; nothing here is a new
+algorithm or a claim about any deployed curve.
+
+## Result after the extension (amendment 5)
+
+**What ran.** 74 further sessions, all completed, none failed: the plain arm on two more
+curves at each of `p = 29 … 509` (40 sessions, 2 targets each) and 16 rho targets on each of
+those 20 curves (20); `lp2` at `p = 401, 509, 701` and `lp1` at `p = 197, 293`, on the
+original curves and the original targets, so each is paired with a plain run (10); and a third
+plain target at `p = 401, 509, 701, 1009` (4). With the first 72 jobs that is **146 sessions
+and 740 records, all verified**, and the audit passes on all 146 (**674 replays reproduced
+exactly**, 0 problems). The extra curves come from chaining start seeds past each curve's
+instance seed (`curves.tsv`): `fp4_torsion(p, seed, 16)` returns the first curve at or after
+`seed`, so seeds 1–5 give the same curve at most `p`. Their cofactors range from 4 to 16.
+
+**Fits.** `ln cost = c + β ln p` over the 12 rungs; a rung's value is the mean over its curves
+of each curve's mean over its targets; interval = union of the Student-`t` interval and a
+cluster bootstrap (curves, then targets). `p ≤ 509` has three curves per rung; `p = 701` and
+`1009` have one.
+
+| quantity | 72 jobs (one curve per rung) | **extended** |
+|:--|:--|:--|
+| relations phase (= total), plain | 0.96 (0.65–1.27) | **1.02 (0.84–1.19)** |
+| linear algebra, Wiedemann | 2.04 (1.85–2.22) | **1.93 (1.86–2.02)** |
+| dense elimination, same rows (derived) | 2.34 (2.12–2.56) | 2.24 (2.05–2.43) |
+| trials | 0.85 (0.54–1.17) | 0.91 (0.73–1.08) |
+| rho, GAE | 1.93 (1.78–2.09) | **1.86 (1.77–1.94)** |
+| `lp2` linear algebra | 1.70 (1.25–2.15) | 1.72 (1.50–1.93) |
+| `lp2` relations | 1.26 (0.65–1.86) | 1.36 (1.06–1.66) |
+| `lp1` linear algebra | 1.62 (1.11–2.14) | 1.56 (1.32–1.81) |
+| `lp1` relations | 1.49 (0.43–2.55) | 1.64 (1.15–2.14) |
+
+The relations interval is 0.35 wide, against 0.62. Index calculus still loses to rho at every
+measured size: by `7.2·10⁵×` at `p = 29` and `6.7·10⁴×` at `p = 1009`.
+
+![extended phases](figures/ext_phases_vs_p.svg)
+
+**Crossover with rho, from the extended fits** (rho is `S̄_rho · √(p⁴/h)`, `S̄_rho = 1.13`,
+1.08–1.18; group size `p*⁴`):
+
+| | `h = 2` | `h = 4` | `h = 16` |
+|:--|:--|:--|:--|
+| **extended fit** (point) | `2^{99.4}` | **`2^{101.4}`** (`p* = 2^{25.4}`) | `2^{105.5}` |
+| cluster bootstrap | `2^{93.2}`–`2^{113.4}` | `2^{95.1}`–`2^{115.9}` | `2^{98.9}`–`2^{120.8}` |
+| relations slope at its t-interval ends (0.84, 1.19) | `2^{88.9}`–`2^{114.3}` | **`2^{90.6}`–`2^{116.8}`** | `2^{94.1}`–`2^{121.8}` |
+| 72-job fit, point; slope band (0.65, 1.27) | `2^{96.0}`; `2^{80.6}`–`2^{124.6}` | `2^{97.9}`; `2^{82.1}`–`2^{127.4}` | `2^{102.0}`; `2^{85.2}`–`2^{133.2}` |
+| §11.16 model (#1863, φ = 0.73 … 1) | `2^{103.0}`–`2^{103.7}` | `2^{105.4}`–`2^{106.5}` | not computed |
+
+**How far this extrapolates.** The top rung is `p = 1009`, a group of `2^{39.9}`. The
+crossover at `h = 4` lies **15.4 bits further in `p`, 61.5 bits further in group size**. It is
+4.0–5.1 bits of group size earlier than the model, and the model's value lies inside both
+the cluster-bootstrap interval and the relations-slope band: the measurement and the model
+agree within the measured uncertainty. The interval has the cluster bootstrap's upward skew
+(`2^{116}` at the top): a larger relations slope moves the crossover far out, a smaller one
+only a little in. With rho's own fitted power law instead of `√(p⁴/h)` the crossover is
+`2^{117.9}` (`2^{107.9}`–`2^{142.7}`; 209 of 10,000 replicates do not cross).
+
+At the crossover the relations phase is 99 % of the cost (`10^{15.0}` against `10^{12.9}` GAE
+for Wiedemann); the linear algebra overtakes the relations only past `p ≈ 2^{32.8}` (a group of
+about `2^{131}`), and Wiedemann becomes cheaper than the dense elimination past `p ≈ 2^{15.4}`.
+With the dense elimination priced instead, the cost crosses rho at `2^{101.8}` (`h = 4`) and is
+above it again from `p = 2^{41.5}` (group `2^{166}`); at `h = 16`, `2^{106.5}` and above again
+from `p = 2^{37.3}` (group `2^{149}`).
+
+![extended crossover](figures/ext_crossover.svg)
+
+**The scatter between curves, and why it narrowed.** `ln(trials per relation)` varies from
+curve to curve with a pooled standard deviation of **0.73**, but the spread falls with `p`:
+at `p = 37` the three curves differ by a factor of 14 (`3.56` to `6.21`), at `p = 53` and `61`
+by 16 and 5, and from `p = 149` the standard deviation per rung is 0.1–0.6 (at `p = 401`, `4.61`
+to `4.81`). The relations slope fitted on each chain of curves alone is **0.96 (0.65–1.28),
+1.14 (0.78–1.51), 1.23 (0.85–1.62)**, pooled 1.02: three samples of the same exponent that
+agree within their intervals. **Limit:** `p = 701` and `1009` have one curve each, so the
+scatter between curves is not sampled at the two rungs with the most leverage on the slope;
+from `p = 149` up the curves we do have differ by 1.2× to 3.1× (at `p = 293`) within a rung,
+under 1.6× at the other four.
+
+![curves](figures/ext_curves.svg)
+
+**Large primes, higher `p`** (paired on the same walk; `S` of the large-prime arm over the
+plain arm's, and the Wiedemann cost over the large-prime arm's):
+
+| arm | `p` | `S` ratio (two targets) | linear algebra cheaper by |
+|:--|--:|:--|:--|
+| `lp2` | 197 | 1.80, 2.31 | 3.7×, 3.6× |
+| `lp2` | 293 | 1.44, 2.28 | 4.7×, 3.1× |
+| `lp2` | 401 | 2.13, 2.58 | 4.4×, 4.6× |
+| `lp2` | 509 | 2.36, 2.38 | 4.5×, 4.8× |
+| `lp2` | 701 | 2.88, 2.91 | 4.6×, 4.1× |
+| `lp1` | 197 | 3.21, 6.36 | 4.3×, 4.3× |
+| `lp1` | 293 | 2.37, 5.15 | 4.4×, 4.5× |
+
+The matrix gets 3–5 times cheaper, as the analysis says, but the extra trials cost more than
+the matrix saves and the penalty **grows with `p`** (`lp2`: 1.1–1.4 at `p = 61–101`, 2.9 at
+`p = 701`). The fitted crossovers move out to `2^{145.1}` (`2^{139}`–`2^{152}`) for `lp2` and
+`2^{245}` for `lp1` (3,591 of 10,000 replicates do not cross; no interval). Large primes could pay only
+where the linear algebra dominates the cost, which in the plain fit is past `p ≈ 2^{32.8}`,
+beyond any measurement.
+
+![large primes](figures/ext_large_primes.svg)
+
+![slopes](figures/ext_slopes.svg)
+
+**Extension predictions X1–X10 (PROTOCOL.md, amendment 5): all held.**
+
+| | prediction | measured |
+|:--|:--|:--|
+| X1 | all verify; replayed sessions reproduce | 740/740 verified; 674/674 replays reproduced |
+| X2 | relations `β ∈ [0.75, 1.25]` | 1.02 |
+| X3 | its `t`-interval narrower than 0.50 | 0.35 (0.84–1.19) |
+| X4 | `h = 4` crossover in `[2^{88}, 2^{108}]`; slope band under 38 bits | `2^{101.4}`; 26.2 bits |
+| X5 | slope by chain in `[0.5, 1.5]` | 0.96, 1.14, 1.23 |
+| X6 | pooled between-curve SD in `[0.2, 1.0]` | 0.73 |
+| X7 | `lp2` `S` at least the plain arm's at `p = 401, 509, 701` | 2.13–2.91 |
+| X8 | `lp1` `S` at least 1.7× at `p = 197, 293` | 2.37–6.36 |
+| X9 | `lp2` linear-algebra `β ∈ [1.3, 2.0]`; its crossover later than the plain arm's | 1.72; `2^{145.1}` against `2^{101.4}` |
+| X10 | rho `β ∈ [1.6, 2.4]` | 1.86 |
+
+**What went wrong in running it** (counts are unaffected; this is about wall time). The
+container's CPU set fell from four CPUs to one within a minute of the first launch, and
+`ecbench` exits 0 when it cannot pin to a missing CPU, so jobs assigned to the missing CPUs
+ended in two seconds with no session (amendment 5a: the runner now reads the allowed CPUs at
+each job start and retries). The container was restarted three times during the extension
+(between 2026-10-21 and 2026-10-26, on 2026-10-26 at about 14:47Z, and on 2026-10-27 at about
+00:45Z); each restart lost the jobs in flight and nothing else, and the resumable runner reran
+them (amendment 5b and the notes in
+`sessions/LAUNCH5.txt`, `sessions/queue.log`). The first relaunch after a restart skipped one
+lost job because the runner's counter had survived; it was caught within seconds and the runner
+restarted from the top. The half-written sessions are kept in `sessions-interrupted/`, outside
+what any fit reads. The longest jobs (`lp2` at `p = 701`) took 10 and 11 hours.
+
+*The sections below describe the first 72 jobs and the frozen 72-job fit; the extension above
+supersedes their headline numbers and leaves them as the comparison.*
 
 ## What was measured
 
@@ -243,6 +375,12 @@ skips sessions already recorded as passing, and `audits/AUDITS.aborted-1.txt`
 lists the lines from the stopped first run. The first 60 sessions were audited
 by 2026-10-16 and the last 12 on 2026-10-19, with the same `ecbench` binary.
 
+**Extension audit (amendment 5).** `ecbench verify` on all 146 sessions: **audit OK on all
+146, 740 records, 0 problems**, same binary. Full replay on 113 sessions (every session with
+`p ≤ 197`, every rho-only session including the 20 on the new curves, and the spot checks
+`xmain-c2-p293-t0` and `lp2-p401-t0`), **674 replays reproduced exactly**; integrity only on 33.
+Receipts in `audits/`.
+
 ## What did not run, and what was not tried
 
 - **Nothing planned is missing.** 60 of the 72 jobs ran before the 16 h
@@ -272,6 +410,10 @@ cargo build --release --bin ecbench --example gaudry_quartic_d4_exponent_fit
 research/gaudry_quartic_d4_exponent_20261015/make_specs.sh      # specs/ and the original jobs.txt
 DEADLINE=<epoch> research/gaudry_quartic_d4_exponent_20261015/run_queue.sh   # then run_queue2/3.sh (amendments 1, 3)
 research/gaudry_quartic_d4_exponent_20261015/run_queue4.sh                    # the last 12 jobs (amendment 4)
+research/gaudry_quartic_d4_exponent_20261015/make_specs_ext.sh                # the extension's specs and jobs_ext.txt (amendment 5)
+DEADLINE=<epoch> research/gaudry_quartic_d4_exponent_20261015/run_queue5.sh   # the extension, resumable (jobs_ext2.txt)
+target/release/examples/gaudry_quartic_d4_exponent_fit_ext research/gaudry_quartic_d4_exponent_20261015   # raw/summary-ext.json
+python3 research/gaudry_quartic_d4_exponent_20261015/figures/plot_ext.py      # layout only
 research/gaudry_quartic_d4_exponent_20261015/run_audits.sh
 target/release/examples/gaudry_quartic_d4_exponent_fit research/gaudry_quartic_d4_exponent_20261015
 python3 research/gaudry_quartic_d4_exponent_20261015/figures/plot.py   # layout only
@@ -282,5 +424,5 @@ launch and 3 from about 16:30Z, rustc 1.97.0, `ecbench` sha256
 `8627cd29…0aa3` (unchanged for all 72 jobs). The last 12 ran on 2026-10-19
 from 16:12Z to 20:00Z, four at a time, one per CPU. Sessions ran with
 `--allow-busy` (isolation L0–L1); `S` is a count and does not depend on wall
-time, which is not admitted. Conductor tasks `T-1` and `T-2` (local control
-plane).
+time, which is not admitted. Conductor tasks `T-1`, `T-2` and `T-3` (local
+control plane).
