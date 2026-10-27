@@ -65,3 +65,22 @@ candidate would retain its cold cost and status with ratio fields null.
 with `verified`, `failures`, `candidate_wins`, `candidate_losses`, and
 `null_ratios`. Ratios divide sums of cold costs over the named slice.
 The graph and PDF are derived from this grid; they do not overwrite it.
+
+## Post-migration read-only replay (27 October 2026)
+
+On PR head `535725a6d5930ef5a4f8d81830f99faef3a53085`, the three
+manifest-listed analysis artifacts were hydrated without rerunning a target.
+Their SHA-256 digests matched the adjacent manifest:
+`ade965eb24bc7200f3028e1982245bc86a93b62bb82a2bc1ad9045e0a5f89c03`
+(`cost-records.jsonl`),
+`0c72ad221c0ceef573d969d7b7d615e407a95d5ef7546d0d095ed2ff02c2f63d`
+(`replay.jsonl`), and
+`9aca674b7eb3b2cb8f7a03455bb6b86051ff147aebbe98f92bb7795ee28c425b`
+(`target-price.csv`). The independent command
+`python3 research/kummer_differential_collector_20261022/n19-labelled-fallback/validate.py`
+exited zero and printed
+`{"candidate_verified": 1260, "price_grid_rows": 288, "schema": "kummer-n19-independent-validator/v1", "target_price_rows": 45360, "targets": 1260, "valid": true}`.
+An initial invocation stopped before validation because the stored
+`target-price.csv` had not yet been hydrated; no evidence row or trial was
+altered. This replay checks the preserved analysis; it is not a new cohort
+or an independent wall-time measurement.
