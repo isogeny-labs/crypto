@@ -42,14 +42,15 @@
 //! - `newcells --cells m:n:ell,... --seed S --keep K --policies P`: fresh
 //!   draws exactly as `hky_par newcells` makes them (same `cell_seed` and
 //!   `ladder_sample` stream; solutions are counted with
-//!   `chained_s3_solution_count_fast` at `m = 3`, `chained_solution_count`
-//!   at `m ≥ 4`, which return the same counts as `hky_par`'s counters).
+//!   `chained_solution_count_fast`, which returns the same counts as the
+//!   scans it replaced).
 //!
 //! Options: `--budget C` skips a policy whose column count exceeds `C`;
 //! `--draw D` (ladder) runs one draw only.
 use crypto_lib::binary_ecc::F2mElement;
 use crypto_lib::cryptanalysis::koblitz_bench::{
-    chained_s3_solution_count_fast, chained_solution_count, ladder_sample,
+    chained_s3_solution_count_fast, chained_solution_count, chained_solution_count_fast,
+    ladder_sample,
 };
 use crypto_lib::cryptanalysis::koblitz_groebner::{build_decomposition_system, FieldStructure};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
@@ -1004,11 +1005,10 @@ fn main() {
                     drawn += 1;
                     let b1 = F2mElement::one(n);
                     let tc = Instant::now();
-                    let sols = if m == 3 {
-                        chained_s3_solution_count_fast(&basis, &x_r, &b1, &irr)
-                    } else {
-                        chained_solution_count(m, &basis, &x_r, &b1, &irr)
-                    };
+                    // Exact (`fast_chained_count_matches_the_reference`); the
+                    // scan behind `chained_solution_count` is infeasible at
+                    // n ≥ 20 (Amendment 11).
+                    let sols = chained_solution_count_fast(m, &basis, &x_r, &b1, &irr);
                     let count_secs = tc.elapsed().as_secs_f64();
                     if sols > 0 {
                         eprintln!("{cell} draw {draw}: {sols} solutions ({count_secs:.1}s), skipped");
@@ -1030,7 +1030,7 @@ fn main() {
                     o.insert("n_vars".into(), json!(nv));
                     o.insert("n_eqs".into(), json!(eqs.len()));
                     o.insert("solutions".into(), json!(0));
-                    o.insert("counter".into(), json!(if m == 3 { "chained_s3_solution_count_fast" } else { "chained_solution_count" }));
+                    o.insert("counter".into(), json!("chained_solution_count_fast"));
                     o.insert("count_secs".into(), json!(r1(count_secs)));
                     o.insert("secs".into(), json!(r1(t0.elapsed().as_secs_f64())));
                     o.insert("threads".into(), json!(rayon::current_num_threads()));

@@ -573,3 +573,82 @@ Earlier diagonal points, read with E10 but not rerun:
   its own validation, and is registered separately before any `N ≈ 100` draw.
 
 Nothing from any E9 or E10 cell has been computed, and no E9 or E10 draw has been generated.
+
+## Amendment 11 (2026-10-27, after E9 and E10 were read; before any draw below): E12, the exact `d_F` at (3, 21, 7), and ℓ against `m` and `n`
+
+**Why.** E10 read `d_F ≥ 5` on every draw of (3, 21, 7), (3, 24, 8) and (3, 27, 9). Every
+other E9/E10 cell, up to `N = 60`, read `≤ 4`. That includes (4, 20, 5), (5, 15, 3) and
+(6, 12, 2). The censored cells are exactly the cells with `ℓ ≥ 7`, and all of them have
+`m = 3` and sit on the diagonal. Three questions follow:
+1. What is the exact `d_F` there?
+2. At `m = 3` and fixed `N`, is the jump driven by `ℓ` or by `n`?
+3. Does `ℓ = 7` at `m = 4` also censor?
+
+**Hypothesis registered now (H_ℓ):** the median `d_F` of a cell is `≥ 5` iff `ℓ ≥ 7`,
+whatever `m` and `n` are, at the sizes below.
+
+**Route.** Same as Amendment 10: `ephemeral` Spot in the lab account, source shipped as a
+`git archive` of the frozen commit. Counts only; wall time is recorded and not scored.
+
+**E12a: degree 5 at (3, 21, 7).**
+- Engine: `hky_par`, the same closure, `newcells --cells 3:21:7 --seed 20261012 --keep 2
+  --cmax 5`. These are the first two of the four E10 draws: draws 0 and 1, which are
+  regenerated, not copied.
+- Degree `≤ 5` has 974,982 columns, so the basis is ≈ 59 GB by formula and ≈ 100 GB
+  measured-scaled. One 256 GB host.
+- Output: per draw, `d_F = 5`, or `d_F ≥ 6` (the degree-5 closure stops without 1).
+- The degree-4 dimensions must equal E10's record for the same draw. If not, the draw is
+  void.
+- Gate: Amendment 10's gates 0–3 on the exact binary.
+
+**E12b: `m = 3`, ℓ against `n` at about fixed `N`.**
+- Engine: `hky_par newcells`, `cmax = 4`, `keep = 4`, seed 20261012.
+- Cells, below the diagonal (`mℓ < n`, so unsatisfiable draws are common):
+
+| cell | `N` | `ℓ` |
+|:--|--:|--:|
+| 3:30:4 | 42 | 4 |
+| 3:27:5 | 42 | 5 |
+| 3:24:6 | 42 | 6 |
+| 3:24:7 | 45 | 7 |
+
+- Gate: Amendment 10's gates 0–3.
+
+**E12c: ℓ = 7 at `m = 4`, (4, 28, 7), `N = 84`.**
+- Engine: `hky_window` (E11), policy `w1x`, built with `--features wide-vars`.
+  `newcells --cells 4:28:7 --seed 20261012 --keep 4 --policies w1x`.
+- The engine now counts solutions with `chained_solution_count_fast`, because the scan is
+  infeasible at `n = 28`. It is exact.
+- Output per draw:
+  - "`d_F ≤ 3`" if the full degree-3 closure holds 1;
+  - "`d_F = 4` certified" if it does not, and the restricted degree-4 closure reaches 1;
+  - otherwise "inconclusive (`≥ 4`)".
+- The engine cannot certify `d_F ≥ 5`.
+- W(1) has 817,860 columns, so the basis is ≈ 42 GB by formula. One 128 GB host.
+- Gate, on the exact wide build:
+  - unit tests (gate 0);
+  - `ladder --policies w1x` reproduces `e11/validate_final/` (`d_f_le3`, `d_f_window`,
+    `w1x.cols`, `w1x.dim`, degree-2/3 dims) on `B_3-18-6`, `B_4-13-4`, `E7_6-8-2` and
+    `E8_7-8-2`;
+  - `newcells --cells 4:16:4 --keep 4 --policies w1x` reproduces the draws and those
+    fields of `e11/scaling/window_4-16-4.jsonl`. This also checks the counter change
+    at `m = 4`.
+
+**Reading rules (fixed now).**
+
+| part | reading | condition |
+|:--|:--|:--|
+| **E12a** | **"`d_F = 5`"** | both draws read 5 |
+| | **"`d_F ≥ 6`"** | both draws are censored at 5 |
+| | **"split"** | otherwise |
+| **E12b** | **"consistent with H_ℓ"** | 3:30:4, 3:27:5 and 3:24:6 have median `≤ 4`, and 3:24:7 has median `≥ 5` |
+| | **"`n`-driven"** | 3:30:4 and 3:27:5 both have median `≥ 5` |
+| | **"mixed"** | otherwise |
+| **E12c** | **"H_ℓ refuted at `m = 4`"** | at least 2 of the finished draws are "`d_F = 4` certified" |
+| | **"no reading"** | otherwise. An inconclusive draw is not evidence for `≥ 5`. |
+
+- A cell or draw that runs out of time or memory is **not completed**, with whatever
+  finished.
+- A Spot interruption gets one relaunch from scratch on the same archive.
+
+Nothing from any E12 cell has been computed, and no E12 draw has been generated.
