@@ -1,0 +1,21 @@
+[ephemeral 15:49:25] phase: booting
+[ephemeral 15:49:26] phase: setup
+[ephemeral 15:49:26] toolchain preset: rust (baked into the image: 2026-10-16T22:38:40Z)
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+[ephemeral 15:49:28] phase: running (set -euo pipefail; mkdir -p "$HOME/fdsrc"; cd "$HOME/fdsrc"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz src.tgz --only-show-errors; echo "4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  src.tgz" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 371035216942660c4615dfbb88d85a14afaf5c16 >"$EPHEMERAL_OUT/source_commit"; KEEP=2 CMAX=5 research/fall_degree_bounds_20261008/e12/run_par.sh "$EPHEMERAL_OUT" 3:21:7)
+src.tgz: OK
+2026-10-27T15:52:19Z gate 0
+2026-10-27T15:55:25Z gate 1
+2026-10-27T15:56:10Z gates 2-3
+2026-10-27T15:59:47Z gate 5:10:2 reproduces e6/B_5-10-2.rerun.jsonl
+2026-10-27T16:02:29Z gate 3:18:6 reproduces e6/B_3-18-6.jsonl
+2026-10-27T16:02:33Z gate 4:8:2 reproduces e8/E8_4-8-2.jsonl
+2026-10-27T16:03:52Z gate 5:8:2 reproduces e8/E8_5-8-2.jsonl
+2026-10-27T16:03:52Z gate passed
+2026-10-27T16:03:52Z start 3:21:7 keep=2 cmax=5
+[ephemeral 16:06:31] spot interruption notice: asking the command to checkpoint
+[ephemeral 16:06:31] command exited 143
+[ephemeral 16:06:31] phase: uploading
+[ephemeral 16:07:31] phase: interrupted (spot reclaim)
+[ephemeral 16:07:33] phase: interrupted (spot reclaim; resume from this job's outputs)
+[ephemeral 16:07:33] terminating
