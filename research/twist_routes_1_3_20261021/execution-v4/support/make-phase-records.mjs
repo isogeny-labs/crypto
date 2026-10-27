@@ -37,6 +37,7 @@ geometry.randomization.blinding={analysis_labels_masked:false,how:'Exact finite 
 geometry.metrics.primary=[structuredClone(geometry.metrics.secondary[0])];geometry.metrics.secondary=[];
 geometry.measurement.clock='none';geometry.measurement.counters=['exact tuple counts'];
 geometry.execution.measurement_class='search';geometry.execution.timeout_seconds=600;
+geometry.sample_size.preflight_runtime={fixed_seconds:null,per_sample_seconds:null,threads:1,estimated_total_seconds:600,measured_on:'Prospective 600-second watchdog planning envelope, not a measured runtime. Exact finite census has no performance clock claim.'};
 geometry.stopping_rules=[{rule:'Exactly 240 construction records and 7,680 queries, or retain a bounded failure at 600 seconds/4 GiB/64 MiB per file.',kind:'fixed_n',preregistered:true}];
 geometry.decision_rule={text:'Accept only complete independent equality; publish every unsupported base and zero count.',comparison_ids:['finite-verification'],statistic:'Exact per-query counts and finite descriptive totals.',interval:'None: complete finite enumeration, no sampling inference.',multiple_comparison_correction:'none',effect_size_measure:'Exact finite tuple counts, not a speedup.',verdict_vocabulary:['verified finite equality','mismatch','unsupported base','not completed']};
 geometry.analysis_plan.blinded=false;geometry.analysis_plan.outputs=['CONSTRUCTION_CHECKS.json','QUERY_YIELDS.json','AUDIT.json'];
@@ -49,7 +50,7 @@ preflight.variable_ledger.comparisons=[{id:'preflight-preservation',arms:['direc
 preflight.controls.aa.comparison=null;preflight.controls.aa.present=false;preflight.controls.aa.not_applicable_reason='No comparative result from operational preflight; main panel retains both A/A pairs.';
 preflight.metrics.primary=[{id:'attempted-calls',name:'Retained operational calls',unit:'calls',kind:'counted',definition:'One receipt for every fixed preflight attempt; no performance interpretation.',source:'RECORDS.json actual exit and duration receipts',aggregation:'per_row',resolution:'one call',uncertainty:'none_exact'}];preflight.metrics.secondary=[];
 preflight.measurement.clock='none';preflight.measurement.counters=['attempted calls'];
-preflight.sample_size.instances=5;preflight.sample_size.preflight_runtime={fixed_seconds:null,per_sample_seconds:null,threads:1,estimated_total_seconds:null,measured_on:'This separate phase measures operational sizing. The 300-second watchdog is not a runtime observation.'};
+preflight.sample_size.instances=5;preflight.sample_size.preflight_runtime={fixed_seconds:null,per_sample_seconds:null,threads:1,estimated_total_seconds:360,measured_on:'Prospective outer watchdog planning envelope, not measured runtime. This separate phase measures operational sizing; its inner global cap is 300 seconds.'};
 preflight.execution.measurement_class='search';preflight.execution.timeout_seconds=300;
 preflight.stopping_rules=[{rule:'Fixed 60 calls on the smallest p per original field-bit class, curve-orbit, shift 1, both arities, all six arms; 300-second global cap.',kind:'fixed_n',preregistered:true}];
 preflight.randomization.blinding={analysis_labels_masked:false,how:'Primary Ir and labelled scientific outputs are withheld; only operational durations are read for resource sizing. No comparative preflight conclusion.',unmasked_at:null};

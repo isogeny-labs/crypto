@@ -36,3 +36,10 @@ were already filed before preflight. Runtime measurements never select a
 smaller sample or alter the thresholds. The geometry and preflight have
 separate phase records. Existing v1/v2 files and failed development attempts
 remain historical evidence. S3 checkpoint/gate requirements remain intact.
+
+The generic metadata freezer requires a numeric total-runtime estimate even
+for the preflight itself. Before these initial phases, use the prospective
+600-second geometry and 360-second outer-preflight watchdog envelopes as
+planning estimates, explicitly labelled unmeasured. Fixed/per-sample times
+remain null. Only the later cost record uses the actual native preflight
+durations; no watchdog value is presented as a runtime observation.
