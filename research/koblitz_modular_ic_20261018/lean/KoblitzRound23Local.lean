@@ -25,7 +25,7 @@ theorem redundant_equation_of_colon_unit (I : Ideal A) (h q : A)
     (hu : IsUnit h) (hc : h ∈ I.colon {q}) :
     I ⊔ Ideal.span {q} = I := by
   apply sup_eq_left.mpr
-  exact Ideal.span_singleton_le_iff_mem.mpr (mem_of_colon_unit I h q hu hc)
+  exact (Ideal.span_singleton_le_iff_mem I).mpr (mem_of_colon_unit I h q hu hc)
 
 -- Local recovery of the Tate equation from an original cofactored residual.
 theorem tate_equation_of_unit_cofactor (f c : A)
@@ -59,6 +59,48 @@ theorem source_relative_jacobian_factor [CharP A 2]
   rw [hfb,hqr]
   ring
 
+-- The actual F32 fiber and the exact inverse appearing in compact02.
+def ssPoly (a : A) : A := a^5+a^3+1
+def ssL (a n l : A) : A := l^4+(a+1)*l+(a+1)^2
+def ssC (a n l : A) : A := n^4+(a+1)^3*n+(a+1)^4*(l+1)
+def ssU (a n l : A) : A := n^2+(a+1)*n+(a+1)*l^3+(a+1)^2*l
+def ssInv (a n l : A) : A :=
+  (a^4+a)*n^2+(a^4+a^3+a^2+a+1)*n+
+  (a^4+a^3+a^2+a+1)*l^3+a^3*l+a^3
+def ssMultiplier (a n l : A) : A :=
+  l^6+n^2*l^3+a*l^4+a^3*l+a*n^2*l+l^4+a^3+a^2*n+n^3+
+  a*n*l+a*n+n^2+a*l+n*l+a+1
+def ssEven (a n l : A) : A :=
+  a^4*l^6+a^5*n*l^3+a^4*n^2*l^3+a^5*l^4+a^3*l^6+a^4*n^4+
+  2*a^7*l+a^5*n^2*l+2*a^4*n*l^3+2*a^4*l^4+a^2*l^6+2*a^7+
+  a^6*n+a^4*n^3+2*a^6*l+a^5*n*l+a^5*l^2+a^4*l^3+
+  2*a^3*n*l^3+a^2*n^2*l^3+2*a^3*l^4+a*l^6+2*a^6+a^5*n+
+  a^4*n^2+3*a^5*l+2*a^4*n*l+a^3*n^2*l+2*a^4*l^2+a^3*l^3+
+  2*a^2*n*l^3+a*n^2*l^3+2*a^2*l^4+2*a^5+a^4*n+a^3*n^2+
+  a^2*n^3+a*n^4+3*a^4*l+2*a^3*n*l+a^2*n^2*l+a^3*l^2+
+  2*a*n*l^3+a*l^4+2*a^4+2*a^3*n+a^2*n^2+a*n^3+3*a^3*l+
+  2*a^2*n*l+n*l^3+2*a^3+a^2*n+a*n^2+2*a^2*l+a*n*l+2*a^2
+
+theorem ss5_unit_integer_lift (a n l : A) :
+    a^3*l^2*ssL a n l+(a^4+a)*ssC a n l+ssInv a n l*ssU a n l+1=
+      ssPoly a*ssMultiplier a n l+2*ssEven a n l := by
+  unfold ssL ssC ssInv ssU ssPoly ssMultiplier ssEven
+  ring
+
+theorem ss5_explicit_inverse [CharP A 2] (a n l : A)
+    (hq : ssPoly a=0) (hL : ssL a n l=0) (hC : ssC a n l=0) :
+    ssInv a n l*ssU a n l=1 := by
+  have h2 : (2:A)=0 := CharP.cast_eq_zero A 2
+  have hx := ss5_unit_integer_lift a n l
+  simp only [hL,hC,hq,h2,mul_zero,zero_mul,zero_add,add_zero] at hx
+  linear_combination hx-h2
+
+theorem ss5_unit_is_unit [CharP A 2] (a n l : A)
+    (hq : ssPoly a=0) (hL : ssL a n l=0) (hC : ssC a n l=0) :
+    IsUnit (ssU a n l) := by
+  apply isUnit_iff_exists_inv.mpr
+  exact ⟨ssInv a n l, by simpa only [mul_comm] using ss5_explicit_inverse a n l hq hL hC⟩
+
 end KoblitzRound23Local
 #print axioms KoblitzRound23Local.mem_of_unit_mul_mem
 #print axioms KoblitzRound23Local.mem_of_colon_unit
@@ -69,3 +111,6 @@ end KoblitzRound23Local
 #print axioms KoblitzRound23Local.ss5_denominator_value
 #print axioms KoblitzRound23Local.quotient_unit_cancellation
 #print axioms KoblitzRound23Local.source_relative_jacobian_factor
+#print axioms KoblitzRound23Local.ss5_unit_integer_lift
+#print axioms KoblitzRound23Local.ss5_explicit_inverse
+#print axioms KoblitzRound23Local.ss5_unit_is_unit

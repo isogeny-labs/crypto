@@ -107,3 +107,16 @@ Explicitly visit all8 original unit indexes:Singular size(ideal) counts nonzero
 entries,so a zero discriminant entry made the earlier loop omit index8.
 Keep that earlier loop's scope defect and every raw record. Do not infer
 normalized ramification from these local algebra lengths. Same4GiB/1200s cap.
+
+## Frozen Z23 source smoothness bridge
+
+Components04 proves a comaximal split of closure lengths2 and14,both residue
+fields degree2,while original lengths2 and18 differ only on the second support.
+Z23-smooth.sing differentiates every actual saved closure generator before
+specializing,then enumerates3x3 minors containing its exact Tate row over both
+verified residue fields. Retain the first unit minor's rows and column choice.
+This finite complete Jacobian rank test is native,not a guessed new chart.
+Interpret smoothness only after the saved closure's pure-curve/generic-field
+bridge is stated. It can then identify the local DVR and ramification from
+finite fiber lengths. If rank3 fails,proper ramification stays unproved.
+All native calls remain4GiB/1200s;no failed global normalization is repeated.
