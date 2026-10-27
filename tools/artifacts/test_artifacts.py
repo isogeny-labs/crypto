@@ -169,6 +169,70 @@ class RoundTrip(unittest.TestCase):
         self.git("commit", "-qm", "move it")
         self.assertEqual(self.art("check", base).returncode, 0)
 
+    def test_migrate_selects_changed_data_and_replays_remote(self):
+        base = self.git("rev-parse", "HEAD").strip()
+        payload = os.urandom(100_000)
+        (self.repo / "new.jsonl").write_bytes(payload)
+        (self.repo / "code.py").write_text("x = 1\n")
+        self.git("add", "-A")
+        self.git("commit", "-qm", "new files")
+        dry = self.art("migrate", base, "--dry-run").stdout
+        self.assertIn("new.jsonl", dry)
+        self.assertNotIn("research/r1/runs/a.jsonl", dry)
+        self.art("migrate", base)
+        digest = hashlib.sha256(payload).hexdigest()
+        self.assertEqual((self.remote / "sha256" / digest[:2] / digest).read_bytes(), payload)
+        staged = self.git("diff", "--cached", "--name-status")
+        self.assertIn("D\tnew.jsonl", staged)
+        self.assertIn("A\t.artifacts.json", staged)
+        self.assertIn("A\t.gitignore", staged)
+        self.assertNotIn("research/r1/runs/a.jsonl", staged)
+
+    def test_migrate_refuses_same_size_corrupt_remote_before_staging(self):
+        base = self.git("rev-parse", "HEAD").strip()
+        payload = os.urandom(100_000)
+        (self.repo / "new.jsonl").write_bytes(payload)
+        self.git("add", "-A")
+        self.git("commit", "-qm", "new data")
+        digest = hashlib.sha256(payload).hexdigest()
+        obj = self.remote / "sha256" / digest[:2] / digest
+        obj.parent.mkdir(parents=True)
+        obj.write_bytes(b"x" * len(payload))
+        result = self.art("migrate", base, check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("remote byte replay failed", result.stderr)
+        self.assertIn("D\tnew.jsonl", self.git("diff", "--cached", "--name-status"))
+        # A failed replay can leave a staged migration for inspection, but
+        # the workflow's commit step must not run after the nonzero exit.
+
+    def test_migrate_from_sparse_checkout_fetches_changed_blob(self):
+        base = self.git("rev-parse", "HEAD").strip()
+        payload = os.urandom(100_000)
+        path = self.repo / "research/r1/runs/new.jsonl"
+        path.write_bytes(payload)
+        self.git("add", "-A")
+        self.git("commit", "-qm", "new data")
+        self.git("sparse-checkout", "set", "--no-cone", "/*", "!/research/")
+        self.assertFalse(path.exists())
+        self.art("migrate", base)
+        digest = hashlib.sha256(payload).hexdigest()
+        self.assertEqual((self.remote / "sha256" / digest[:2] / digest).read_bytes(), payload)
+        self.assertIn("D\tresearch/r1/runs/new.jsonl", self.git("diff", "--cached", "--name-status"))
+
+    def test_check_gate_in_blobless_clone(self):
+        # CI checks out with `filter: blob:none`: a modified file's blob is
+        # not local until asked for, and a partial clone fetches a missing
+        # blob only by its full id, never by an abbreviated one.
+        (self.repo / "tool.py").write_text("x = 2\n" * 1_000)
+        self.git("add", "-A")
+        self.git("commit", "-qm", "edit code")
+        self.git("config", "uploadpack.allowFilter", "true")
+        clone = Path(self.tmp.name).resolve() / "clone"
+        sh(Path(self.tmp.name), "git", "clone", "-q", "--filter=blob:none", "--no-checkout", "--depth", "2",
+           f"file://{self.repo}", str(clone), env=self.env)
+        r = self.art("check", "HEAD^1", "HEAD", check=False, cwd=clone)
+        self.assertEqual(r.returncode, 0, r.stderr)
+
 
 class Policy(unittest.TestCase):
     P = artifacts.DEFAULT_POLICY
@@ -183,6 +247,15 @@ class Policy(unittest.TestCase):
         self.assertTrue(f("x/fb.tar.part-0001", 100_000, self.P))
         self.assertFalse(f("x/.artifacts.json", 5 << 20, self.P))
         self.assertFalse(f("docs/browser/data.json", 30 << 20, {**self.P, "keep": ["docs/browser/data.json"]}))
+
+    def test_the_committed_policy_keeps_every_pdf_in_git(self):
+        # Owner decision (2026-10-26): reports stay in Git at any size; the
+        # large-files gate (10 MiB) still applies.
+        policy = artifacts.Config.load(Path(__file__).resolve().parents[2]).policy
+        f = artifacts.belongs_in_store
+        self.assertFalse(f("research/x_20261026/REPORT.pdf", 900_000, policy))
+        self.assertFalse(f("docs/notes/big.pdf", 5 << 20, policy))
+        self.assertTrue(f("research/x_20261026/figures/plot.png", 900_000, policy))
 
 
 class WorkflowWiringPaths(unittest.TestCase):
@@ -205,6 +278,22 @@ class WorkflowWiringPaths(unittest.TestCase):
             self.dirs,
         )
         self.assertEqual(paths, ["research/scalar_mul_ct_timing_20261022"])
+
+    def test_nested_artifact_does_not_make_sibling_notes_a_reader(self):
+        moved = {"research/notes/index-calculus/reports/run-1/report.pdf"}
+        dirs = wire_workflows.moved_dirs(moved)
+        self.assertEqual(
+            wire_workflows.needed("run: python research/notes/index-calculus/other.py", moved, dirs),
+            [],
+        )
+        self.assertEqual(
+            wire_workflows.needed("run: python research/notes/index-calculus/reports/run-1/verify.py", moved, dirs),
+            ["research/notes/index-calculus/reports/run-1"],
+        )
+        self.assertEqual(
+            wire_workflows.needed("run: ls research/notes/index-calculus/reports/run-1", moved, dirs),
+            ["research/notes/index-calculus/reports/run-1"],
+        )
 
 
 class S3Argv(unittest.TestCase):
