@@ -327,6 +327,22 @@ class WorkflowSparsePatterns(unittest.TestCase):
         self.assertEqual(wire_workflows.add_sparse_pattern(block, "      "), block)
 
 
+class WorkflowPullStep(unittest.TestCase):
+    WF = "jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n      - run: make\n"
+
+    def test_step_installs_the_aws_cli_when_absent(self):
+        out, _ = wire_workflows.wire(self.WF, ["docs/x"])
+        self.assertIn("if ! command -v aws >/dev/null; then", out)
+        self.assertIn('export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"', out)
+        self.assertTrue(out.endswith("      - run: make\n"))
+
+    def test_rewiring_is_idempotent_and_refreshes_a_stale_step(self):
+        once, _ = wire_workflows.wire(self.WF, ["docs/x"])
+        self.assertEqual(wire_workflows.wire(once, ["docs/x"])[0], once)
+        stale = once.replace("pull --jobs 16 docs/x", "pull docs/old")
+        self.assertEqual(wire_workflows.wire(stale, ["docs/x"])[0], once)
+
+
 class S3Argv(unittest.TestCase):
     def setUp(self):
         cfg = artifacts.Config(root=Path("."), remote="s3://bucket/store", endpoint=None, read_url=None,

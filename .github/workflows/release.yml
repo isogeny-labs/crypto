@@ -73,7 +73,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+        run: |
+          if ! command -v aws >/dev/null; then
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"
+            python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"
+            chmod -R u+x "$RUNNER_TEMP/awscli"
+            "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"
+            export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -101,7 +109,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+        run: |
+          if ! command -v aws >/dev/null; then
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"
+            python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"
+            chmod -R u+x "$RUNNER_TEMP/awscli"
+            "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"
+            export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - id: v
         run: |
           version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
@@ -169,7 +185,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+        run: |
+          if ! command -v aws >/dev/null; then
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"
+            python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"
+            chmod -R u+x "$RUNNER_TEMP/awscli"
+            "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"
+            export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Materialize compile-time inputs without research archives
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         run: node .github/scripts/ci-scope.mjs --materialize
@@ -342,7 +366,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+        run: |
+          if ! command -v aws >/dev/null; then
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"
+            python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"
+            chmod -R u+x "$RUNNER_TEMP/awscli"
+            "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"
+            export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - uses: dtolnay/rust-toolchain@1.93.1
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         with:
@@ -469,7 +501,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+        run: |
+          if ! command -v aws >/dev/null; then
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"
+            python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"
+            chmod -R u+x "$RUNNER_TEMP/awscli"
+            "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"
+            export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       # the crate's own CI toolchain (isogeny-algos.yml); it uses slice APIs newer than 1.93
       - uses: dtolnay/rust-toolchain@1.98
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
@@ -567,7 +607,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+        run: |
+          if ! command -v aws >/dev/null; then
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"
+            python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"
+            chmod -R u+x "$RUNNER_TEMP/awscli"
+            "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"
+            export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Build the ECC2K-130 CPU client
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         run: make -C ecc2k130 cpu MARCH="$ECC_MARCH"
@@ -652,7 +700,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+        run: |
+          if ! command -v aws >/dev/null; then
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"
+            python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"
+            chmod -R u+x "$RUNNER_TEMP/awscli"
+            "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"
+            export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Install nvcc
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_cuda != 'false'
         # Compiler and CUDA headers only, not the full toolkit: ~330 MB
@@ -702,7 +758,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+        run: |
+          if ! command -v aws >/dev/null; then
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"
+            python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"
+            chmod -R u+x "$RUNNER_TEMP/awscli"
+            "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"
+            export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Test binary asset publication
         run: |
           bash -n .github/scripts/publish_release_assets.sh .github/scripts/test_publish_release_assets.sh
@@ -726,7 +790,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+        run: |
+          if ! command -v aws >/dev/null; then
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"
+            python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"
+            chmod -R u+x "$RUNNER_TEMP/awscli"
+            "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"
+            export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - uses: actions/download-artifact@v4
         with:
           path: staging
