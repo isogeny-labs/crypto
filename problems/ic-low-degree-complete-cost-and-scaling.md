@@ -4,7 +4,7 @@
 - **Kind:** empirical bottleneck, incomplete measurement, resource and tool limits
 - **Affected work:** [algebraic IC pursuit](../research/ic_algebraic_crossover_20261023/README.md), requirements A1--B3, C3 and D1
 - **Next action owner:** current IC campaign
-- **Last updated:** 2026-10-26
+- **Last updated:** 2026-10-27
 
 ## Problem
 
@@ -46,8 +46,15 @@ rho and native-price band at 0, 0.1 and 1 GAE, remains the downstream test.
   either chosen model. This strict-G audit is not a universal IC obstruction: a
   [separate cofactor audit](../research/ic_algebraic_crossover_20261023/reports/run-cofactor-projection-20261025/report.pdf)
   verifies three projected relations at nonzero targets and nonempty projected
-  bases on both models. A complete projected target/preimage law, base logs,
-  scalar recovery and cost accounting remain unimplemented.
+  bases on both models. A checked conditional projected-query helper and
+  inverse/recovery identity are now implemented, including supplied complete
+  noncyclic kernels. The bounded supplied-point constructor now also passes
+  actual E0 source conformance:4232distinct points independently check against
+  the curve equation and annihilation, under the existing ambient-order receipt.
+  Its first2116-point input span remains a negative control. Sampler/yield,
+  base-log collection, relation oracle/LA and complete cold cost remain open.
+  The earlier abstract4232-point test remains separate. See the
+  [source implementation record](../research/ic_algebraic_crossover_20261023/PROJECTED_QUERY_LAW_IMPLEMENTATION_20261026.md).
 - **Additional qualified controls:** 2,048 explicit a0/full-degree-b public
   subgroup queries retain every planned draw. Native finite-chain replay
   and independent point arithmetic agree on all rows: 1,591 have Boolean
@@ -66,16 +73,27 @@ rho and native-price band at 0, 0.1 and 1 GAE, remains the downstream test.
   ended; with eight earlier k3 cases the 124 attempts contain 78 refutations,
   45 nonrefuting fixed points and one timeout. Balanced-prefix minima are
   4/4/4/0 on draws 0/3/5/6; all 64 k4 branches refute. These are not global
-  subset minima. Independent HKY replay has not run after its queue was interrupted
-  by the workspace restart; no independent word recount or full query price follows.
-  The official restart checkpoint gate now exits 1 because the workspace has
-  neither an upload token nor the fallback AWS profile. AGENTS.md requires a
-  successful S3 checkpoint before a new experiment; no replay was launched.
-  [Continuation readiness](../research/ic_algebraic_crossover_20261023/CONTINUATION_READINESS_20261026.md)
-  records the exact frozen case limits and remaining protocol/launch gates. All 44
+  subset minima. Four legacy independent replay attempts reached900-second caps.
+  After source gates, a prospectively frozen native244-child continuation
+  actually launched at22:35:44UTC on2026-10-26 following successful S3 checkpoint
+  and actual readback. At the2026-10-27 update its first eight new attempts are
+  also900-second caps, with zero independently verified verdicts. The batch is
+  active; no minimum or independent word recount follows from these caps.
+  [The transition record](../research/ic_algebraic_crossover_20261023/NATIVE_HKY_CONTINUATION_20261026.md)
+  links the unchanged inputs, original scientific binary and separate native
+  protocol. The initial failed checkpoint and stopped legacy batch remain
+  historical evidence; checkpoint access is now working. All44
   same-input Singular correctness checks agree on 22 small cases; equal-output
-  fastest-tool performance comparisons remain open. The prescribed paid launcher
-  is blocked by an explicit identity-policy denial; no research VM launched.
+  fastest-tool performance comparisons remain open. The earlier explicit SSM
+  GetParameter denial has not been retried. Current instructions select EKS
+  Spot for new supported cloud experiments, but its portable launcher rejects
+  the frozen86400-second quartic requests (ordinary maximum3600seconds).
+  Its measurement contract requires five rounds/warmup rather than the frozen
+  one/zero, and the requested256GBclosure job exceeds the128GiBpool cap.
+  Compatible source-bound images/custom closure execution remain missing; no
+  invalid or smaller substitute and no paid job was launched. The
+  [admission receipts](../research/ic_algebraic_crossover_20261023/pipeline-receipts/eks-frozen-workload-admission-20261027/README.md)
+  preserve these resource/contract gaps separately from the earlier access denial.
 - **What this evidence does not establish:** a global minimum over all
   variable subsets, bounded last fall degree, a full IC speedup, or a
   security conclusion at a larger curve.

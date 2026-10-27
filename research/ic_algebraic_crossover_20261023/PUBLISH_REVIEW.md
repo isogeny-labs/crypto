@@ -88,3 +88,92 @@ VM launched; workspace billing is unmeasured. The prescribed launcher/SSM denial
 has not been retried. Larger64/256GiB work and the full wide IC pipeline remain
 outstanding, with no smaller workload substituted for them. No leaderboard
 promotion, bounded-degree law, full-price gain or measured-crossover claim.
+
+## Projected-query source and current-base update
+
+The checked native helper now accepts supplied complete noncyclic kernels up
+to65536elements. On source84ddcb9b0,11Cargo and10bare-core tests pass; default
+Clippy exits0 with seven unchanged library warnings and no own diagnostics.
+Certificate IDC1h08a8b0da9bbd7a55, a separate inverse-missing negative control,
+32issuer/256extra checker points and its exact ring Lean lemma pass on source
+28f2797dc. Five earlier query dependencies also pass with0trusted additions.
+The general finite-group/cardinality/uniformity bridge, sampler, relation
+oracle/log-LA and complete cold price remain open. The original4232test is
+abstract; its later actual-E0 conformance check is reported separately below.
+The source-specific
+[4page report](reports/projected-query-law-source-20261026/report.pdf) and the
+[2page legacy stop report](reports/run-hky-legacy-stop-20261026/report.pdf)
+are inspected; both genuinely stored PDFs pass actual S3GET/hash/size.
+
+The new source files are integrated locally at533437155, but its23:22test/build
+attempt exits101 on an inherited chained-S3 delimiter. Default Clippy exits0,
+scoped Lean succeeds and the dependent certificate check is not run125. Preserve
+each outcome; older-source passes do not imply current-base success. The exact
+unchanged-base blob and failed raw receipts are in
+[the existing SAT obstruction](../../problems/sat-progress-phase-base-syntax.md).
+Upstream fixed it in main8eef1252 and externally merged that base into the
+existing regularPR at562f7075. The new local source974f2e9cd46b is based on that
+public head and preserves upstream history. Its first development gate exits
+101/0/101/1/125 for tests/Clippy/build/Lean/separate checker: an accidentally
+too-low6GiBvirtual-memory limit caused LLVM allocation failure, and Lean failed
+to create a thread. Both failures are retained. The retry removes that artificial
+limit and uses a single-thread Lean invocation; all five terminal exits are0.
+Its12Rust tests, release build, separate certificate check and five-plus-one
+scoped Lean lemmas pass on974f2e9cd46b, with0trusted proof additions. Default
+Clippy exits0 with one unchanged library warning; this is not strict global lint.
+The required full-library gate first exited101 on27tracked compile-time fixtures
+omitted by this sparse checkout. All27were restored with exact Git-blob checks
+(73,935,397bytes, mostly the inherited curve-traits JSON). The failed attempt
+is preserved. The unchanged-source retry serialized with scientific children
+and reached its2700-second watchdog at01:54:02UTC, exit124. It lists5023tests:
+4878named passes,121ignores,23failures and the unchanged nonweak-JV test
+unfinished. Exact runtime-fixture restoration and a fresh same-binary recheck
+make19of23failures pass; four inherited ecbench contract failures remain.
+The library tree is exactly public562f7075's b65dd608474242d7bb415218a399340f5fd0ca8f.
+No library source/assertion/test was changed, skipped or quarantined. This is
+not a full-suite pass. [Contract failures](../../problems/current-base-ecbench-contract-test-mismatches.md)
+and [JV watchdog](../../problems/jv-nonweak-end-to-end-library-watchdog.md)
+remain separate. Raw full log/test discovery are genuinely stored and actual
+S3GET/hash/size verified. These are correctness checks with no admitted timing.
+
+The bounded supplied-point kernel constructor is now integrated at09852bc788265.
+Its ordinary Cargo gate passes16tests (15query/core/reference plus one
+certificate negative control); default Clippy exits0 with one unchanged base
+warning and no own diagnostics. Exact source and library-tree receipts are
+in projected-kernel-current-base-cargo-20261027. The actual E0 source fixture,
+using its existing order receipt, constructs4232distinct kernel points and
+independently checks every point plus36known-target query/recovery cases.
+The initial2116-point span is an explicit failed-input control, with its
+original failed attempt preserved. The inspected
+[one-page source report](reports/projected-kernel-e0-source-20261027/report.pdf)
+also passes genuine S3GET/hash/size. No new point count, unknown logarithm,
+relation oracle, sampled yield or full IC price follows.
+
+The published562f7075head's gate/size/artifacts checks are completed failures.
+The API returns empty step lists and404 BlobNotFound for all three job logs;
+the cause is unknown and no rerun was requested. The
+[exact head/job observation](pipeline-receipts/public-head-ci-20261027/README.md)
+is separate from local gates and does not establish current-head CI success.
+
+The actual native replay has ten new900-second caps and zero verified outputs
+at the01:26UTC snapshot; its driver resumes after the library lock releases,
+with a further child confirmed active at02:00UTC. A genuine
+GNU Time runtime restore supplement has been published and actually read back
+from S3, with metadata in
+[native-hky-runtime-20261027](pipeline-receipts/native-hky-runtime-20261027/).
+The review packet contains its binding; normal feature publication is being
+prepared with the full library limitations above. The three inspected report PDFs are copied byte-for-byte
+into this review checkout with their original verified hashes. The current
+artifact policy explicitly keeps `*.pdf` in Git; these requested reports will
+also be committed directly, preserving their genuine S3 bindings and objects.
+No source/protocol/bin/cap or past evidence was changed.
+
+New cloud submissions must use the supported EKS route, whose maintained
+validator rejects the unmodified86400-second full quartic request. Five-round/
+warmup requirements also differ from the frozen full spec;256GBclosure jobs
+exceed the128GiBpool cap. The
+[admission record](pipeline-receipts/eks-frozen-workload-admission-20261027/README.md)
+preserves inputs, validator output and outstanding image/custom-command gaps.
+No paid job, fixture substitution, implicit cap increase, main-merge action or
+retry of the denied SSM operation was performed. The scientific replay remains
+frozen independently.

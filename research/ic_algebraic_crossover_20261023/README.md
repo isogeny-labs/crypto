@@ -242,7 +242,10 @@ is unknown. It does not affect the zero-guess minimum on that draw.
 These are minima within this registered balanced-prefix family at degree
 four, not over arbitrary variable subsets or orderings. Native raw accounting
 and the prefix summary reproduce byte-identically from the complete archive;
-independent HKY verdict replay has not run; its queue was interrupted by the workspace restart.
+the independent native244-child HKY continuation is now active after a successful
+prospective freeze/checkpoint/readback. Its first ten new attempts cap at900s
+(01:26UTC snapshot), with zero verified verdicts. Four earlier legacy caps stay
+separate; there is no completed independent replay or word recount yet.
 Independent word recount, construction, splitting/lifting, verification and
 physical conversion remain open. [Summary](pipeline-receipts/guess-completion-20261025-01/summary.json),
 [reproduction](verify-completed-guess.sh), [replay protocol](COMPLETED_GUESS_REPLAY_PROTOCOL.md).
@@ -360,14 +363,14 @@ preserves all generated scripts, package hashes, outputs and statuses.
 | A1: independent structural replay | partial | exact original fixtures and small equations/roots checked; upstream large fall-degree panel not fully replayed |
 | A2: native structured bases and symmetric formulation | verified, finite pilot | Rust implementations, all four families, identity/splitting/repeated-root controls; limits in PIPELINE.md |
 | A3: combine formulations and closure | verified, finite stage panel | three matched panels above; no whole-query performance conclusion |
-| B1: ell=8 minimum guesses | partial | all 124 registered attempts terminated; balanced-prefix minima 4/4/4/0; one retained timeout; independent HKY replay unexecuted after restart, arbitrary sets, ordinary-query interpretation and full prices remain |
+| B1: ell=8 minimum guesses | partial | all124producer attempts retained, prefix-only minima4/4/4/0 and one unknown cost; four legacy independent900s caps preserved, remaining244children launched under the new native protocol22:35:44UTC, first child also capped; complete independent ranks/minima, arbitrary subsets and full prices remain |
 | B2: ell=9 and four summands | partial | 2,048 additional qualified queries, independently recounted points and D2/D3 controls; original 1,152 fixtures preserved; larger guessing/degree-four shards unexecuted |
 | B3: N=58/60/100 continuation | partial | degree-two/three nonrefuting fixed points on three fixtures; all degree-four results resource-capped; independent large fixed-point certificates remain |
 | C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified and identically replayed records; additional m14/m15 runs interrupted; 11/ten rho answers independently verified, no completed IC; original L2 full panels outstanding |
 | C2: m=14--18 ladder | partial, integration/compute blocked | standalone m16--18 core/order/encoding controls and independent replay pass; full wide stage adapters, eight-target IC/rho ladder and complete prices remain |
 | C3: complete method and full native price | partial | n13/n23 answer replay and ten n13 instruction profiles; construction/split counters, native allocator/physical costs and qualified comparison missing |
 | D1: external/hardware controls | partial | all 44 same-input Singular correctness checks agree on 22 cases; fastest-tool performance and actual hardware comparisons remain |
-| D2: durable evidence and PR | partial, summary published | owner approved publication; PR 2550 summary is updated; source/evidence delivery awaits storage access or an owner exception and integrated-source gates |
+| D2: durable evidence and PR | partial, source and S3 delivery verified | PR2550 merged; existing regularPR2655 carries source and genuine artifact manifests, all owned/inherited/bootstrap actual-byte readbacks pass, native controller11tests/strict lint/release pass; current-head CI/review, completed native replay/export/report and pending exact PR merge authorization remain |
 
 [Cost/scaling problem](../../problems/ic-low-degree-complete-cost-and-scaling.md)
 and the four `XP-20261023-*` backlog cards preserve unresolved obligations.
@@ -439,3 +442,30 @@ See [native transition and launch](NATIVE_HKY_CONTINUATION_20261026.md), the
 [current publication packet](PUBLISH_REVIEW.md). Four legacy caps remain
 separate, with no retry or prospective import. Existing figures and leaderboard
 values stay unchanged: no new performance or degree-law result is admitted.
+
+The subsequent [projected-query implementation](PROJECTED_QUERY_LAW_IMPLEMENTATION_20261026.md)
+supplies checked full-curve query/supplied-relation recovery and complete
+supplied-kernel validation (including noncyclic kernels) under certified ambient
+order assumptions.11source-bound Cargo tests pass on84ddcb9b0; the residual has
+its own native certificate and exact scoped Lean proof. The
+[source report](reports/projected-query-law-source-20261026/report.pdf) and
+[legacy stop report](reports/run-hky-legacy-stop-20261026/report.pdf) are
+visually inspected and pass genuine S3byte readback. A further bounded
+supplied-point constructor now builds the actual E0 kernel under its previously
+recorded ambient order:4232distinct points independently pass membership and
+annihilation checks, with36known-target query/recovery cases. The first2116-point
+proper span is retained as a negative control. The
+[new one-page source report](reports/projected-kernel-e0-source-20261027/report.pdf)
+is inspected and passes actual S3GET/hash/size. This is source conformance, not
+a new cardinality proof, relation oracle, unknown-log solve, sampler/yield,
+full price or measured gain.
+
+On integrated source09852bc788265, all16touched Cargo tests and default Clippy
+pass (one unchanged library warning); the separate scoped certificate/Lean5+1
+gates pass on identical proof sources. The required full library attempt on
+the identical public-base library tree reaches its2700-second watchdog.
+Exact sparse-input restoration makes19of23failed tests pass; four unchanged
+library contract failures and the unfinished JV test are explicitly tracked.
+This is not a full-suite/hosted-CI pass. All prior source failures and successful
+scoped receipts remain separate, and the native244-case execution checkout is
+unchanged. [Primary-source interpretation and newer repo evidence](LITERATURE_CHECK_20261027.md).

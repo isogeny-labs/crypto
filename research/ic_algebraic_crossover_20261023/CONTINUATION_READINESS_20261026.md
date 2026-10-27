@@ -1,5 +1,13 @@
 # Continuation readiness, 2026-10-26
 
+This file preserves the initial readiness history below. Its former missing-token,
+no-replay and pending-storage statements are superseded by the dated current
+records: [native continuation](NATIVE_HKY_CONTINUATION_20261026.md),
+[publication status](PUBLISH_REVIEW.md) and
+[EKS workload admission](pipeline-receipts/eks-frozen-workload-admission-20261027/README.md).
+The native244-child batch actually launched22:35:44UTC on2026-10-26 after
+successful checkpoint/readback. Broader scientific completion remains open.
+
 The results summary is published in existing private PR 2550, with explicit
 owner authorization. This file records remaining work; it is not a new run,
 frozen protocol, completed export or approval to bypass a failed gate.

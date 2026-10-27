@@ -1,16 +1,17 @@
-# Quartic binary IC lacks wide coefficients, point keys and subgroup scalars
+# Quartic binary IC needs wide pipeline adapters and complete measurements
 
 - **Status:** `investigating`
 - **Kind:** implementation gap; larger-rung measurements outstanding
 - **Affected work:** [quartic ladder C1/C2](../research/ic_algebraic_crossover_20261023/PROTOCOL.md)
 - **Next action owner:** current IC campaign
-- **Last updated:** 2026-10-25
+- **Last updated:** 2026-10-26
 
 ## Problem
 
-The existing characteristic-two quartic path supports base-field degree
-m<=15 and cannot execute the requested m=16,17,18 rungs without widening
-coefficients, loop bounds/sentinels, packed coordinates, order and scalars.
+The registered characteristic-two quartic pipeline supports base-field degree
+m<=15. The separate u32/u128 core has checked arithmetic/order/encoding at
+m=16,17,18, but cannot execute those requested full rungs until the stage,
+relation/linear-algebra and ecbench boundaries also support wide values.
 
 This is a representation limit of the native `gaudry_quartic_bin` and
 `f2m4_torsion` path. Its field is GF((2^m)^4); the proper intermediate field
@@ -52,8 +53,10 @@ nothing about prime-degree binary fields or prime fields.
 
 ## What would unblock it
 
-- [ ] Implement the wider path without truncation, with exact field,
-  curve, subgroup-order, scalar and serialization tests at m=16--18.
+- [x] Supply the standalone wider arithmetic core with exact field,
+  curve, subgroup-order, scalar and serialization controls at m=16--18.
+- [ ] Implement wide factor-base/oracle, relation/linear-algebra and ecbench
+  boundaries without truncation, preserving old method/version refusals.
 - [ ] On every old supported rung used as a control, match field/point
   operations and verified scalar outputs against the original path.
 - [ ] Run the frozen eight-target cold ladder, full pipeline and strongest
@@ -64,10 +67,8 @@ Wider arithmetic only enables measurements; it does not predict their cost.
 
 ## Next discriminating step
 
-- **Action:** retain the completed 24-record smoke/replay, let the actual
-  additional capped L0 m14 run (started 17:54:16 UTC) finish and its m15
-  successor execute,
-  and integrate the verified wide core into a separately versioned full
+- **Action:** retain the completed24-record smoke/replay and interrupted
+  m14/m15 diagnostics, and integrate the verified core into a separately versioned full
   factor-base/oracle/relation/linear-algebra path. Original L2 full panels
   and eight-target wide IC/rho requirements remain open.
 - **Inputs and controls:** frozen `specs/quartic-*.json`, two-target smoke,
@@ -99,3 +100,21 @@ The m14/m15 diagnostics are interrupted, retaining 17/24 and 15/24 records;
 all 11/ten successful rho answers independently verify after decoding the
 legacy tower coordinates. No recorded IC attempt completes. Original
 L2/full-wide requirements and independent HKY remain open; no runner is live.
+
+2026-10-26 source-interface follow-up: the remaining boundary is concrete.
+CountedGroup::key and its scalar multiplication use u64; FactorBase and
+Relation carry corresponding narrow keys/coefficients, and the registered
+workload/method adapters preserve their m<=15 refusal. Wide CurveB::point_key
+already returns u128, with up to73bits needed for m18; subgroup order/scalars
+at m17/18 also exceed64bits. An unchecked cast or removing a plan guard would
+silently collide keys/truncate scalars. Full adapters must preserve complete
+point identity, modular arithmetic and string serialization across every stage.
+New interfaces must separately charge construction/lifts, interpolation,
+unsolved systems, split/sign checks, relation collection, LA and final public
+verification. The original legacy method and its recorded prices remain frozen.
+
+The old quartic queues remain stopped. A separate native244-child Boolean HKY
+continuation actually started22:35:44UTC after quiet S3/archive/bundle readback;
+that is not a quartic wide-pipeline execution. The prescribed-launcher/SSM
+provisioning denial was not retried, no additional VM was launched and the
+USD100 total extra-cloud limit remains. Current workspace billing is unmeasured.

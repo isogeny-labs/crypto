@@ -2,16 +2,18 @@
 
 - **Status:** investigating
 - **Kind:** implementation gap in the base branch
-- **Affected work:** [algebraic IC publication](../research/ic_algebraic_crossover_20261023/PUBLISH_REVIEW.md), PR #2550
+- **Affected work:** [algebraic IC publication](../research/ic_algebraic_crossover_20261023/PUBLISH_REVIEW.md), current PR #2655 (following merged #2550)
 - **Next action owner:** upstream SAT implementation maintainer
 - **Last updated:** 2026-10-26
 
 ## Problem
 
-Earlier integrated sources could not compile because unchanged base SAT code
-had an unclosed delimiter. Main e8fcadf62 now fixes that syntax, incorporated by
-merge d3c9f02c7. The current source compiles and is running the required4,991-test
-suite; final suite/example results are pending.
+Earlier SAT syntax was corrected upstream and its later library gate timed out,
+as recorded below. A different inherited delimiter in
+`binary_semaev_chain_sat.rs` blocks the23:22current-base projected-query build
+at533437155. Upstream main8eef12527 and externally updated PR head562f7075
+already contain its fix. Incorporation and fresh source gates remain required;
+there is no current-base example/library pass from the failed attempt.
 
 ## Evidence and uncertainty
 
@@ -52,6 +54,26 @@ obligations remain separate.
 - **Outcomes:** a changed base permits a fresh compile/test gate; a repeated
   unchanged blob leaves this problem open.
 - **Recheck trigger:** a new upstream SAT revision, at the PR check-in cadence.
+
+## 2026-10-26T23:22:02Z current-base recurrence
+
+The integration receipt at
+`research/ic_algebraic_crossover_20261023/pipeline-receipts/projected-query-integration-source-20261026/`
+retains test/build exits101 for an unclosed impl/function delimiter at lines
+304/628, reported at line1648. Git blob3803524139ef5382d85f835107339d66d5909a6d
+is identical in integration533437155, pre-change mergefd0f39a53 and the then-local
+main03a001c9b. This task added no change to that file. Default Clippy exits0;
+the separate scoped Lean gate passes, while the dependent certificate check
+is not run125 because the release build failed. These mixed outcomes are
+reported individually, not called a successful integration gate.
+
+The actual default-branch file now has blob428cd4d17de548a34bf7aaec25be35fc86b3b6fb
+and a closing brace after verify_external_assignment. Native fetch confirms
+main8eef1252714097e0b8279c0bf55b82ed9e49943d; the existing regularPR has been
+normally updated to562f7075b4a6ad0a2c5de918c5d7e4c0a0d51d24, parentsda951869
+and8eef1252. Continue from that updated head and rerun the affected gates,
+preserving this failed attempt. Do not patch unrelated SAT code, skip tests,
+change frozen scientific source or infer a mathematical obstruction.
 
 ## Resolution and history
 

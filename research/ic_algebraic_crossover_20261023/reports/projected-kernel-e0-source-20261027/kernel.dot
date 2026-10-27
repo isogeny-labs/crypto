@@ -1,0 +1,13 @@
+digraph kernel {
+  graph [rankdir=LR, bgcolor="white", fontname="DejaVu Sans", nodesep=0.2, ranksep=0.3, pad=0.1];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, color="#25475a", fillcolor="#eaf2f6", margin="0.13,0.10"];
+  edge [color="#496674", arrowsize=0.65];
+  low [label="Reference lifts\nx = 0..63"];
+  reject [label="2,116-point span\nRejected as incomplete", fillcolor="#fff0e8", color="#a34818"];
+  both [label="Add explicit\ntrace-one coset"];
+  construct [label="Project by [991]\nAdjoin cosets"];
+  verify [label="4,232 distinct points\nIndependent curve / [4,232] checks", fillcolor="#e7f4ee", color="#246246"];
+  query [label="36 known-target\nquery / recovery checks", fillcolor="#e7f4ee", color="#246246"];
+  low -> reject;
+  low -> both -> construct -> verify -> query;
+}

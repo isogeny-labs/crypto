@@ -2,9 +2,9 @@
 
 - **Status:** open
 - **Kind:** runtime/resource bottleneck; cause unknown
-- **Affected work:** PR2550 final release-library verification
+- **Affected work:** PR2550 historical and PR2655 current release-library verification
 - **Next action owner:** upstream JV/isogeny-walk maintainer
-- **Last updated:** 2026-10-26
+- **Last updated:** 2026-10-27
 
 ## Problem
 
@@ -53,3 +53,13 @@ native executable and does not infer a performance or security result here.
 
 Unresolved. The earlier SAT syntax issue was fixed upstream; this is the actual
 remaining full-library runtime failure, not that superseded parse error.
+
+2026-10-27: a fresh bounded full command at source974f2e9cd46b again exits124
+at2700seconds with this same test unfinished. The current5023-test source has
+4878named passes,121ignores and23named failures before exact runtime-input
+restoration; a follow-up fixes19missing-input failures and identifies
+[four separate inherited contract failures](current-base-ecbench-contract-test-mismatches.md).
+Raw full log, native test-discovery metadata and genuine S3readback are in
+`research/ic_algebraic_crossover_20261023/pipeline-receipts/current-base-library-gate-20261027-attempt-2/`.
+The library source tree equals published562f7075 exactly. No assertion, budget,
+source or test-selection change was used to make this timeout pass.
