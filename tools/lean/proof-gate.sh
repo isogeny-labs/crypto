@@ -8,6 +8,8 @@
 #     targets), then audit every compiled module;
 #   * a standalone .lean file outside any Lake project: compile it with `lean -o`
 #     against the core library, then audit that module.
+# One frozen historical failed source is checked as an expected-failure target
+# by exact source hash and diagnostic; see tools/lean/README.md.
 # The audit (AuditAxioms.lean, next to this script) fails any theorem whose transitive
 # axioms go beyond propext / Classical.choice / Quot.sound: `sorry`,
 # `native_decide` and user axioms all fail. A target with no theorems fails too.
@@ -29,6 +31,12 @@ here=$(cd "$(dirname "$0")" && pwd)
 root=$(git rev-parse --show-toplevel) || exit 3
 audit="$here/AuditAxioms.lean"
 trusted="${LEAN_GATE_TRUSTED:-$root/tools/lean/trusted-native.txt}"
+# This retained first attempt is a negative control, not a claimed proof.
+# Keep the exact source and expected diagnostic pinned so changing either one
+# cannot silently turn an unrelated build failure into a passing target.
+archived_failed='research/isogeny_world_frontier_20261016/replay-optimization-v1/implementation-01/Newton.failed.lean'
+archived_failed_sha256='b439d1edbe04798a56012688254ea7bd120494e4fd10856f4bdc0c07796e9d1c'
+archived_failed_error='error(lean.unknownIdentifier): Unknown constant `Int.mul_two`'
 trust_args=()
 [ -f "$trusted" ] && trust_args=(--trusted "$trusted")
 out=""
@@ -73,12 +81,56 @@ run_target() {
   log="$scratch/$slug"
   mkdir -p "$log"
   status=PASS
+  if [ "$t" = "$archived_failed" ]; then
+    local actual_sha256 pinned rc errors
+    actual_sha256=$(sha256sum "$root/$t" 2>/dev/null | cut -d ' ' -f 1)
+    if [ "$actual_sha256" != "$archived_failed_sha256" ]; then
+      status=FAIL_archive_digest
+      printf 'expected sha256 %s\nactual sha256   %s\n' \
+        "$archived_failed_sha256" "$actual_sha256" > "$log/build.log"
+    else
+      pinned=$(cat "$root/tools/lean/lean-toolchain" 2>/dev/null || true)
+      if [ -z "$pinned" ] || ! command -v timeout >/dev/null; then
+        status=INFRA_archive_toolchain
+        echo 'pinned Lean toolchain or timeout unavailable' > "$log/build.log"
+      else
+        (cd "$(dirname "$root/$t")" && ELAN_TOOLCHAIN="$pinned" timeout 180 \
+          lean -o "$log/negative.olean" "$root/$t") > "$log/build.log" 2>&1
+        rc=$?
+        errors=$(grep -c ' error(' "$log/build.log" || true)
+        if [ "$rc" -eq 124 ]; then
+          status=INFRA_archive_timeout
+        elif [ "$rc" -ne 1 ] || [ "$errors" -ne 1 ] || \
+          ! grep -Fq "$archived_failed_error" "$log/build.log"; then
+          status=FAIL_archive_diagnostic
+        else
+          status=PASS_expected_failure
+        fi
+      fi
+    fi
+    echo "$status" > "$log/status"
+    if [ -n "$out" ]; then
+      mkdir -p "$out/$slug"
+      cp "$log/build.log" "$log/status" "$out/$slug/"
+    fi
+    printf '%-22s %4s thm %3s trusted  %s\n' "$status" 0 0 "$t"
+    if [ "$status" = PASS_expected_failure ]; then return 0; fi
+    head -5 "$log/build.log" | sed 's/^/    /'
+    case "$status" in INFRA_*) return 3 ;; *) return 1 ;; esac
+  fi
   if [ -d "$root/$t" ]; then
     # Lake project. Mathlib projects fetch Mathlib's prebuilt cache first; a
     # failed fetch is an infrastructure error, never evidence about a proof.
     if grep -q '"name": *"mathlib"' "$root/$t/lake-manifest.json" 2>/dev/null; then
-      (cd "$root/$t" && lake exe cache get) > "$log/cache.log" 2>&1 \
-        || { echo "INFRA_cache   $t (lake exe cache get failed)"; return 3; }
+      if ! (cd "$root/$t" && lake exe cache get) > "$log/cache.log" 2>&1; then
+        echo INFRA_cache > "$log/status"
+        if [ -n "$out" ]; then
+          mkdir -p "$out/$slug"
+          cp "$log/cache.log" "$log/status" "$out/$slug/"
+        fi
+        echo "INFRA_cache   $t (lake exe cache get failed)"
+        return 3
+      fi
     fi
     if ! (cd "$root/$t" && lake build) > "$log/build.log" 2>&1; then
       status=FAIL_build
@@ -149,7 +201,7 @@ run_target() {
     toolchain=$(cat "$(dirname "$root/$t")/lean-toolchain" 2>/dev/null || true)
     if ! (cd "$(dirname "$root/$t")" && lean -o "$dir/$mod.olean" "$root/$t") > "$log/build.log" 2>&1; then
       status=FAIL_build
-    elif ! (cd "$(dirname "$root/$t")" && LEAN_PATH="$dir:${LEAN_PATH:-}" lean --run "$audit" -- ${trust_args[@]+"${trust_args[@]}"} "$mod") > "$log/audit.log" 2>&1; then
+    elif ! LEAN_PATH="$dir:${LEAN_PATH:-}" lean --run "$audit" -- "${trust_args[@]}" "$mod" > "$log/audit.log" 2>&1; then
       status=FAIL_audit
     fi
     [ -n "$toolchain" ] && echo "toolchain pin: $toolchain" >> "$log/build.log"

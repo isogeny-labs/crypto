@@ -47,6 +47,12 @@ commands:
   modpoly   --method cm --ell L --modulus M  Phi_l modulo any positive integer
   modpoly   --method cm --ell L --p P [--j J]  CM/explicit CRT, prime-field output
   modpoly   --method cm --ell L --integer     signed integer coefficients via CM
+  small-char --field gf2|gf3|fp (--n N | --p P) --coeffs A1,A2,A3,A4,A6 --jt J --ell L
+             [--method auto|lift|couveignes]
+                                         the l-isogeny from y^2 + a1 xy + a3 y = x^3 + a2 x^2 + a4 x + a6
+                                         to a curve of j-invariant J in small characteristic (Couveignes'
+                                         2-torsion algorithm in GF(2^n), the p-adic lift otherwise);
+                                         elements as integers: bit pattern (gf2), packed base 3 (gf3)
   version                                the tool name and version (JSON)
   help
 
@@ -674,6 +680,53 @@ fn run(args: &[String]) -> Result<Json, Usage> {
                 ("tool", tool_json()),
                 ("result", result),
                 ("checks", Json::Arr(checks)),
+            ]))
+        }
+        "small-char" => {
+            let ell = o.u64("ell", None)?;
+            let field = match o.get("field").ok_or("--field is required (gf2, gf3, fp)")? {
+                "gf2" => api::SmallField::Binary {
+                    n: o.u64("n", None)? as u32,
+                },
+                "gf3" => api::SmallField::Ternary {
+                    n: o.u64("n", None)? as u32,
+                },
+                "fp" => api::SmallField::Prime {
+                    p: o.u64("p", None)?,
+                },
+                other => return Err(format!("unknown --field {other} (gf2, gf3, fp)").into()),
+            };
+            let coeffs: Vec<u64> = o
+                .get("coeffs")
+                .ok_or("--coeffs A1,A2,A3,A4,A6 is required")?
+                .split(',')
+                .map(|t| t.trim().parse::<u64>())
+                .collect::<Result<_, _>>()
+                .map_err(|_| "--coeffs: expected five non-negative integers")?;
+            let curve: [u64; 5] = coeffs
+                .try_into()
+                .map_err(|_| "--coeffs: expected five non-negative integers")?;
+            let jt = o.u64("jt", None)?;
+            let method = o.get("method").unwrap_or("auto");
+            let r = api::small_char_isogeny(field, curve, jt, ell, method, seed)?;
+            let nums = |v: &[u64]| Json::Arr(v.iter().map(|&x| Json::Num(x as i64)).collect());
+            let result = Json::obj(vec![
+                ("field", Json::str(&r.field)),
+                ("curve", nums(&curve)),
+                ("jt", Json::Num(jt as i64)),
+                ("ell", Json::Num(r.ell as i64)),
+                ("method", Json::str(&r.method)),
+                ("kernel", nums(&r.kernel)),
+                ("codomain", nums(&r.codomain)),
+                ("codomain_j", Json::Num(r.codomain_j as i64)),
+                ("detail", Json::str(&r.detail)),
+            ]);
+            Ok(Json::obj(vec![
+                ("schema", Json::str(SCHEMA)),
+                ("command", Json::str("small-char")),
+                ("tool", tool_json()),
+                ("result", result),
+                ("checks", Json::Arr(checks_json("isogeny.", &r.checks))),
             ]))
         }
         "velu" => {
