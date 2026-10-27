@@ -272,6 +272,7 @@ pub fn solve(
                 ("field_squarings".into(), p.counts.s),
                 ("field_inversions".into(), p.counts.i),
             ]),
+            work_native: BTreeMap::new(),
         })
         .collect();
     let unpriced = out
