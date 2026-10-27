@@ -36,9 +36,9 @@
   "hypotheses": [],
   "arms": [
     {
-      "id": "prime",
+      "id": "prime_planted",
       "role": "reference",
-      "description": "prime public synthetic curve systems",
+      "description": "Retained prime planted targets; absolute certificate computation, no causal comparison",
       "instrument": {
         "repo": "crypto",
         "commit": "0c9543a2b5a95266792dadf15a921ac24a779bf0",
@@ -71,7 +71,47 @@
         ],
         "ell_rule": "floor(83/m)",
         "target_kinds": [
-          "planted",
+          "planted"
+        ],
+        "certificate_mode": "proof_assisted_leading_syzygy_first_fall"
+      }
+    },
+    {
+      "id": "prime_natural",
+      "role": "candidate",
+      "description": "Retained prime natural targets; absolute certificate computation, no causal comparison",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c9543a2b5a95266792dadf15a921ac24a779bf0",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_ic_degree_sweep_20261027/Cargo.toml",
+            "--bin",
+            "prime_fall"
+          ]
+        ],
+        "binary_sha256": "638ef803dc993aad93ae3f9d83eaa183649e8dd9e798c7cdc8a1658d0ded2fc1",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "floor(83/m)",
+        "target_kinds": [
           "natural"
         ],
         "certificate_mode": "proof_assisted_leading_syzygy_first_fall"
@@ -116,6 +156,13 @@
           7,
           8,
           9
+        ]
+      },
+      {
+        "name": "target_kind",
+        "levels": [
+          "planted",
+          "natural"
         ]
       }
     ],
@@ -168,7 +215,8 @@
       {
         "id": "C-completion",
         "arms": [
-          "prime"
+          "prime_planted",
+          "prime_natural"
         ],
         "differs_in": [],
         "design": "absolute",
@@ -200,7 +248,7 @@
     }
   },
   "sample_size": {
-    "instances": 16,
+    "instances": 8,
     "replicates": 1,
     "warmups": 0,
     "power": {
@@ -211,7 +259,7 @@
       "rank_test_n": null,
       "min_attainable_two_sided_p": null,
       "passes": true,
-      "note": "One arm,16 exact original inputs; no statistical inference."
+      "note": "Two target-kind arms,8 exact original inputs per arm;16 total. No statistical inference."
     },
     "preflight_runtime": {
       "fixed_seconds": 0.01,
@@ -388,11 +436,11 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": false
+    "status": "frozen",
+    "protocol_sha256": "6e12ffdda6e1610783f0e3d0caea595387737eb798900659f3466d50edcf79b7",
+    "commit": "0c9543a2b5a95266792dadf15a921ac24a779bf0",
+    "frozen_at": "2026-10-27T17:11:20Z",
+    "filed_before_affected_data": true
   },
   "extensions": {
     "detailed_design": "ARGUMENT.md",
