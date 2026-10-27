@@ -30,7 +30,8 @@ hypotheses `N=(x-a)t` and unit `B`. Its [diagram](projective-branch-zero-order.s
 [CSV](projective-branch-zero-order.csv), and [PDF](PROJECTIVE_BRANCH_ZERO_ORDER.pdf)
 also record the checked composition from a supplied polynomial norm identity
 and the proof-side common 2+2 source coefficient model to that local order;
-they keep compiled-law identification and the global
+the actual weighted-Proj quintic's evaluation and normalized head are now
+checked in the same chain. They keep compiled-law identification and the global
 divisor/Pic⁰ equation open.
 
 The [branch norm-factor packet](BRANCH_NORM_FACTOR.md) proves that a polynomial
