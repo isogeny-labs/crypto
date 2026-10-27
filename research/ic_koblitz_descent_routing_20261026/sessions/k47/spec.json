@@ -1,0 +1,53 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Koblitz routing, curve k47: the ledger §23 descent against the planner recipe and the strong rho",
+  "description": "research/ic_koblitz_descent_routing_20261026/PROTOCOL.md",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 47
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261103
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=61,raw_x_cap=100000000",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "targets": "walk"
+        }
+      },
+      "name": "pipeline",
+      "role": "baseline"
+    },
+    {
+      "name": "descent",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_descent"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261104,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}
