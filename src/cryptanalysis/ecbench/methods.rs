@@ -261,6 +261,37 @@ const IC_COUNTED_PARAMS: &[ParamDecl] = &[
     },
 ];
 
+// Historical genus2 requests used this four-parameter numeric contract.
+// Keep it for those exact request shapes; the public registry has one id.
+const LEGACY_HEC_DECL: MethodDecl = MethodDecl {
+    id: "ic.hyperelliptic",
+    family: "ic",
+    summary: "Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (genus2 workloads): factor base of degree-1 places, factor-base walk, smoothness by gcd, sparse elimination mod r; Jacobian group operations charged, field and row operations unpriced",
+    entry: "hyperelliptic_index_calculus::hec_index_calculus_dlp",
+    applies: Applies::Any,
+    params: &[
+        ParamDecl {
+            name: "fb_size",
+            default: Some("0"),
+            help: "cap on the factor base (degree-1 places up to ±); 0 keeps every place",
+        },
+        ParamDecl {
+            name: "extra_relations",
+            default: Some("8"),
+            help: "relations collected beyond the factor-base size",
+        },
+        ParamDecl {
+            name: "max_trials",
+            default: Some("2000000"),
+            help: "relation-search trials before giving up",
+        },
+        ParamDecl {
+            name: "large_primes",
+            default: Some("0"),
+            help: "1 keeps one-large-prime partials and combines pairs",
+        },
+    ],
+};
 const HYPER_IC_PARAMS: &[ParamDecl] = &[
     ParamDecl {
         name: "fb_size",
@@ -537,35 +568,6 @@ pub fn registry() -> &'static [MethodDecl] {
                     name: "cap_multiple",
                     default: Some("64"),
                     help: "the inner rho or kangaroo's step cap, in multiples of √r",
-                },
-            ],
-        },
-        MethodDecl {
-            id: "ic.hyperelliptic",
-            family: "ic",
-            summary: "Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (genus2 workloads): factor base of degree-1 places, factor-base walk, smoothness by gcd, sparse elimination mod r; Jacobian group operations charged, field and row operations unpriced",
-            entry: "hyperelliptic_index_calculus::hec_index_calculus_dlp",
-            applies: Applies::Any,
-            params: &[
-                ParamDecl {
-                    name: "fb_size",
-                    default: Some("0"),
-                    help: "cap on the factor base (degree-1 places up to ±); 0 keeps every place",
-                },
-                ParamDecl {
-                    name: "extra_relations",
-                    default: Some("8"),
-                    help: "relations collected beyond the factor-base size",
-                },
-                ParamDecl {
-                    name: "max_trials",
-                    default: Some("2000000"),
-                    help: "relation-search trials before giving up",
-                },
-                ParamDecl {
-                    name: "large_primes",
-                    default: Some("0"),
-                    help: "1 keeps one-large-prime partials and combines pairs",
                 },
             ],
         },
@@ -851,7 +853,22 @@ pub fn decl(id: &str) -> Option<&'static MethodDecl> {
 
 /// Fill defaults, refuse unknown and missing parameters, hash.
 pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
-    let d = decl(&spec.id).ok_or_else(|| {
+    let legacy_numeric_base = match spec.params.get("fb_size") {
+        None => true,
+        Some(value) => value.parse::<u64>().is_ok(),
+    };
+    let legacy_hec = spec.id == HYPER_IC
+        && legacy_numeric_base
+        && spec
+            .params
+            .keys()
+            .all(|key| LEGACY_HEC_DECL.params.iter().any(|p| p.name == key));
+    let declared = if legacy_hec {
+        Some(&LEGACY_HEC_DECL)
+    } else {
+        decl(&spec.id)
+    };
+    let d = declared.ok_or_else(|| {
         let ids: Vec<&str> = registry().iter().map(|m| m.id).collect();
         format!("unknown method `{}`; known: {}", spec.id, ids.join(", "))
     })?;
@@ -2431,6 +2448,20 @@ fn hyper_ic_cyclic(h: &HyperInstance) -> Result<(), String> {
 }
 
 fn hyper_ic_params(m: &ResolvedMethod) -> Result<HyperIcParams, String> {
+    // A legacy genus2 configuration is not a thread configuration. Refuse it
+    // before indexing the thread-only controls, including for decoded records.
+    for key in [
+        "fb_size",
+        "large_primes",
+        "extra_relations",
+        "branches",
+        "d_step_in",
+        "max_trials",
+    ] {
+        if !m.params.contains_key(key) {
+            return Err(format!("thread `{HYPER_IC}` requires explicit `{key}`"));
+        }
+    }
     let fb_size = match m.params["fb_size"].as_str() {
         "all" => usize::MAX,
         _ => match param_u64(m, "fb_size")? {
@@ -4321,6 +4352,31 @@ pub fn dump_factor_base(
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn registry_ids_cannot_shadow_a_backend_parameter_contract() {
+        let mut ids = std::collections::BTreeSet::new();
+        for method in super::registry() {
+            assert!(ids.insert(method.id), "duplicate method id:{}", method.id);
+        }
+    }
+
+    #[test]
+    fn legacy_numeric_hec_contract_stays_distinct_from_thread_controls() {
+        let legacy = super::resolve(&super::MethodSpec {
+            id: "ic.hyperelliptic".into(),
+            params: std::collections::BTreeMap::new(),
+        })
+        .unwrap();
+        assert_eq!(legacy.params.len(), 4);
+        assert_eq!(legacy.params["fb_size"], "0");
+        assert_eq!(legacy.params["max_trials"], "2000000");
+        assert_eq!(
+            legacy.entry,
+            "hyperelliptic_index_calculus::hec_index_calculus_dlp"
+        );
+        assert!(super::hyper_ic_params(&legacy).is_err());
+    }
+
     use super::*;
 
     #[test]

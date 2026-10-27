@@ -989,3 +989,9 @@ The n3 and same-field n5 controls do not establish the F2 modular-factor
 acceptance test. Exact proof/test counts and failure receipts are in
 [VALIDATION.md](../research/koblitz_modular_ic_20261018/rounds/22/VALIDATION.md).
 No new relation rank or IC efficiency assessment is supplied.
+
+Round22 also certifies the original supersingular SS5 affine incidence fiber,
+keeping nu and every registered unit:four degree20 closed points over F2,
+with both ideal-inclusion lifts,nonzero relative Jacobian and exact Frobenius
+matrix. The full proper normalized branch table remains open;see the Round22
+CM and validation records. No relation-rank or IC cost claim follows.

@@ -47,7 +47,7 @@ def box(x, y, text, color, width=4.2, height=1.15):
     ax.text(x + width/2, y + height/2, text, ha="center", va="center", fontsize=11)
 box(.2, 4.5, "CM augmentation recovery\nExact d = 1; complete Smith certificate", "#167c65")
 box(5.5, 4.5, "Final polarized quotient\nKernel actions / quotient sections open", "#9a4e13")
-box(.2, 2.65, "Tate / QR function field\nComplete base divisors; exact 8 × 2 tower", "#167c65")
+box(.2, 2.65, "Tate / QR function field\nBase divisors / tower; original SS5 fiber checked", "#167c65")
 box(5.5, 2.65, "Proper level-77 construction\nLifted divisors / complete RR / map open", "#9a4e13")
 box(.2, .8, "Node187 coupled valuations\nExcludes four old models under written bridges", "#166784")
 box(5.5, .8, "Polynomial certificate / reverse evaluator\nhᵏ f ∈ I and arbitrary divisors still open", "#9a4e13")

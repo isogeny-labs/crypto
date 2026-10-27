@@ -207,3 +207,39 @@ in publication parent3c87193's unrelated SAT source. The identical brace is
 already present on origin/main baa1951. Restore only that syntax correction
 to make the required full library validation possible;retain the failed log
 and pin the correction. No Koblitz arithmetic dependency changed.
+
+Delivery integration:merge current main baa1951 into the evidence branch,
+preserving both sides of the problem index and progress exporter. The study
+native algorithms,binary elliptic implementation and Lean source bytes are
+unchanged by that merge. Adopt its current CI routing:the carrier workflow
+runs on main push or explicit dispatch;the PR merge set remains gate,size,
+artifacts. This task leaves the ready PR open with auto-merge disabled.
+Seal only committed source files. Record their exact source_revision and
+verify history at that revision in later CI,so unrelated future source or
+AGENTS changes do not silently relabel a frozen scientific source.
+
+Required-software-validation repair:the first complete current-main library
+run exposes four inherited failures beyond missing sparse fixtures. Fix the
+duplicate ic.hyperelliptic registry contract and explicitly priced legacy-ID
+semantics after a clear Conductor scope check,add a uniqueness regression,
+restore the exact runtime fixtures,and validate focused groups before the
+full rerun. Preserve all failures. The scientific arithmetic,inputs,claims,
+4GiB/1200s caps,proof trust and modular-map acceptance criteria are unchanged.
+
+SS5 fiber amendment,registered before this calculation:analyze the already
+identified exceptional support directly in the fixed original incidence
+circuit. Use F32=F2[alpha]/(alpha5+alpha3+1),b=alpha+1,c=1. Keep the original
+nu coordinate and every registered unit. Compare the specialized original
+ideal with the proposed triangular quartics
+L=lambda4+b*lambda+b2 and C=nu4+b3*nu+b4*(lambda+1).
+Retain explicit forward/backward lift matrices and zero residuals,dimension16,
+all unit checks and the relative Jacobian. Compute q=32 Frobenius on the
+16-dimensional quotient;test its fixed-space ranks and fourth-power identity
+to determine closed residue degrees. This is native post-processing of the
+existing fixed function-field model,not a new curve family or timing run.
+Use the same local native Singular backend and4GiB/1200s cap. Do not infer
+proper branch completeness or ramification without the existing explicit
+pure-curve/function-field bridge;retain every failure. If successful,add
+faithful Lean identities for the specialized projections/Jacobian and update
+the proof count from actual audit results. Full lifted pole geometry and RR
+remain separate acceptance criteria.

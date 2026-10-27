@@ -40,3 +40,25 @@ inverses rather than citing software output without a certificate. No novelty,
 IC cost, deployed-curve or end-to-end solver claim is made. The exact source
 manifest, failed attempts, backend package lock and completed test/audit receipts
 are bound by ledger.json and runs.sha256 after validation.
+
+Delivery later integrated main baa1951357b7ca586e902f4a81287ac2ef4855ef in
+4008aeb19e1. The study algorithms,Lean sources and binary elliptic implementation
+were unchanged by that integration. Main's artifact/CI/proof-gate changes are
+adopted. Final source_revision is a committed pre-seal source frame,verified
+against every pin;later CI checks that historical frame rather than assuming
+unrelated future main changes reproduce its bytes. The ready PR remains open
+with auto-merge disabled under this task's original instruction.
+
+The written closed-immersion consequence of the equivariant retraction uses
+Stacks Project Lemma41.7.2 (proper monomorphism iff closed immersion):
+https://stacks.math.columbia.edu/tag/04XV . This applies after the explicitly
+stated CM-morphism/descent interpretation;it is not a new Lean schemes theorem.
+
+SS5 follows the existing complete base support rather than a new search.
+Its source is the exact unchanged polynomial-ring prefix of cm22-incidence.sing
+with residual indexes48,52,238,240,242 and unit indexes0,11,1,1,19,36,64,74
+from cm22-input-circuit.json. The native Singular linalg.lib mat_rk routine
+operates on the constant F32 Frobenius matrix. The finite-reduced-algebra
+residue-degree interpretation is stated in CM.md;it is not a novelty claim
+or a fully formalized schemes theorem. REPLAY_SS5.sh keeps this native
+certificate separate from the incomplete global normalization calculations.

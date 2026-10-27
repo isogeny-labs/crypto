@@ -38,3 +38,21 @@ exit0, normalization timeouts and4GiB failures, incompatible F8-coordinate
 Klein control and interrupted integrated builds. Replayed corrected/matching
 checks separately. Repaired the missing operational shasum256 adapter; rejected
 its earlier incomplete checkpoint hash. No duplicate generator or EKS job.
+
+The shared scope later released. A fresh Conductor check returned clear and
+the current verified entry was appended to docs/session-logs/2026-10-26.md
+at23:25Z,preserving all upstream entries. The earlier pending note above records
+the original ownership conflict rather than an ongoing block.
+
+2026-10-27 update:original SS5 incidence fiber certified with triangular
+quartics,all registered units,Jacobian b^4 and q32 Frobenius:four degree20
+closed points over F2. Full build9095 jobs;transitive audit1088/0failing/
+0trusted,including51 new named declarations;native tests138/0fail/1ignored.
+Corrected focused ecbench242/0fail/1ignored. Full root tests still running.
+One mistaken address-capped full software attempt aborted;the correct
+ordinary software invocation preserves the1200s limit. CAS caps unchanged.
+
+Final validation update00:50UTC:full root suite4896/0fail/121ignored,
+no filtered tests;artifact tool18/18 and workflow parse4/4 pass. Final
+native replay03 and standalone SS5 replay pass byte for byte. Seal and
+publication follow with51 new named Lean statements and1088 audited.

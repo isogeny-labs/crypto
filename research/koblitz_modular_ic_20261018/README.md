@@ -77,3 +77,9 @@ failed-attempt records, proof map, immutable raw archive and replay script.
 
 - [Round 14](rounds/14/README.md): all57 ordinary supports/images, eight closed
   signed divisors and principal/deck nonzero ranks15/15 and18/17.
+
+Round22 also certifies the original supersingular SS5 affine incidence fiber,
+keeping nu and every registered unit:four degree20 closed points over F2,
+with both ideal-inclusion lifts,nonzero relative Jacobian and exact Frobenius
+matrix. The full proper normalized branch table remains open;see the Round22
+CM and validation records. No relation-rank or IC cost claim follows.

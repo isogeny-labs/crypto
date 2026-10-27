@@ -6,7 +6,9 @@
 #let validation = json("validation-summary.json")
 #let repo = "https://github.com/isogeny-labs/crypto/tree/codex/koblitz-r22-integral-recovery/research/koblitz_modular_ic_20261018/rounds/22"
 = Koblitz cover transfers: Round22
-Exact integral recovery and the proper-geometry frontier · 2026-10-26
+Exact integral recovery and the proper-geometry frontier
+
+Started2026-10-26;validation2026-10-27 UTC
 
 Scientific input: #raw("69f67409f5fe6b525c23b000edea047dd38fcf83") \
 Publication parent: #raw("3c87193e7c754e9abefa401b7cd0974d0708b3b1") \
@@ -74,6 +76,12 @@ supports have degree five. The supersingular support of $1+c$ is essential to
 the exceptional $nu$ geometry; the generic lambda projection loses information
 there while the original incidence open is smooth.
 
+The original SS5 fiber now has both ideal-inclusion certificates, dimension 16,
+invertible registered units and Jacobian determinant $b^4 != 0$. Its exact q32
+Frobenius matrix gives four residue fields of degree 4 over F32, hence four
+closed points of degree 20 over F2. This retains original $nu$; the complete
+proper normalized fiber accounting remains a separate geometric bridge.
+
 The generic QR presentation has degree 16. Both lift matrices, the irreducible
 degree-32 plane projection, birational coordinate recovery and the smooth
 registered open are checked separately. All 245 rational circuit gates pass
@@ -95,7 +103,7 @@ after certifying their relationship to this incidence component.
 
 == Why the old node187 models cannot be full arcs under the written bridges
 All four actual programs and five coefficient conjugates are expanded: 80 ordinary
-functions $F_j=P_j(x)+yS_j(x)$, denominator 1, degrees 9 and 8, monic $S_j$.
+functions $F_j=P_j(x)+y S_j(x)$, denominator 1, degrees 9 and 8, monic $S_j$.
 Each has its only pole at infinity, of order 19 and leading coefficient 1.
 The actual gates contain $F_0 F_1$ at node187 and $F_0 F_1 F_2$ at node247.
 
@@ -103,7 +111,7 @@ For an arc with $"ord"(h)=N>0$, the old scalar residues force
 $v_0,v_1>-N$ and $v_0+v_1=-N$, hence both are negative. Proper reduction and
 the complete coefficient descent force the third source point to infinity too,
 so $v_2<0$. But regularity of the actual node247 coordinate requires
-$"ord"(h F_0F_1F_2)=v_2>=0$, a contradiction. The joint leading coefficient
+$"ord"(h F_0 F_1 F_2)=v_2>=0$, a contradiction. The joint leading coefficient
 condition is retained in every conjugate; no separate nineteenth-root argument
 for a single factor replaces it.
 

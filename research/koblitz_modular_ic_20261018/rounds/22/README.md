@@ -5,6 +5,10 @@ factors. The full8-by32 integer system has eight unit Smith invariants and a
 24-column integral kernel basis. A concise recovery uses only M1 and M3=7I;
 all22 both-sign order11 fixtures pass. See [RECOVERY.md](RECOVERY.md).
 
+The original SS5 incidence fiber is also certified:four degree20 closed
+points over F2,all registered units invertible,with native ideal-lift and
+Frobenius certificates. See [CM.md](CM.md).
+
 The [report](REPORT.md),[PDF](report.pdf),[visual](round22.svg),
 [proper-geometry notes](CM.md),[coupled-divisor argument](SATURATION.md),
 [proof map](PROOF_MAP.md),[validation](VALIDATION.md),[sources](SOURCES.md)
@@ -35,3 +39,12 @@ repeats exact native checks and does not silently rerun normalization jobs.
 The complete Lean project is checked by tools/lean/proof-gate.sh. Artifact
 objects live under the user-specified setec-astronomy-artifacts/store prefix;
 the directory manifest pins their hashes and sizes.
+
+With the pinned native Singular4.4.1 backend installed,the exceptional-fiber
+certificate can be replayed separately:
+
+```bash
+SINGULAR=/path/to/Singular ./REPLAY_SS5.sh
+```
+
+This does not repeat any incomplete normalization or place computation.

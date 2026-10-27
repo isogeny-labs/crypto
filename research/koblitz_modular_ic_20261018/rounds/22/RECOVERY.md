@@ -135,7 +135,14 @@ The trace-zero targets therefore retain their inherited polarization.
 
 Under the standard written CM-morphism and Galois-descent bridge,the
 matrix identity gives an integral equivariant retraction on the actual
-trace-zero source presentation. R21's denominator5 theorem remains true
+trace-zero source presentation. As a written geometric consequence,once
+the CM matrices are interpreted as the specified abelian-variety morphisms,
+the map into the four trace-zero targets is a split closed immersion over F2:
+the left inverse makes it a monomorphism on every functor of points,and
+properness of the abelian source makes that proper monomorphism a closed
+immersion. This argument uses the actual fixed map and its recovered
+polarization;it is not a formalized schemes theorem in this Lean project.
+R21's denominator5 theorem remains true
 for regular target cycles. A retraction on their norm-zero subobjects
 need not extend to a retraction on the regular cycles. This result does
 not construct the final105/19 polarized quotient,its243 sections,or a

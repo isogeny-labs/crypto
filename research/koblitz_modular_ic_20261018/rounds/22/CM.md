@@ -131,3 +131,48 @@ correction. Adj_div on this smaller plane also exits14 at the4GiB cap before
 normalized branches. This records a smaller exact model,but still does not
 supply the proper trace places or the quadratic lambda/nu lift. See
 runs/cm22-intermediate-01.log and runs/intermediate-metadata/.
+
+## SS5: exact original incidence fiber
+
+This calculation keeps the original nu coordinate and all eight registered
+unit entries. Over k=F2[alpha]/(alpha^5+alpha^3+1),put b=alpha+1,c=1.
+The source is the unchanged polynomial-ring circuit,not its generic
+nu-elimination formula. Native Singular proves equality of the specialized
+five original residuals with
+
+```
+L=lambda^4+b*lambda+b^2,
+C=nu^4+b^3*nu+b^4*(lambda+1).
+```
+
+Both explicit ideal-inclusion lift matrices have zero residuals. The quotient
+has k-dimension16;every registered unit,lambda and nu is invertible. The
+relative lambda,nu Jacobian is [[b,0],[b^4,b^3]],with determinant b^4 nonzero.
+Thus the specialized original fiber is reduced and finite etale over k.
+This is stronger than factoring the generic lambda projection:at this
+support G=L^4 and H=(z^4+b^2*z+b^3)^2,which are nonreduced projections.
+The Lean SS module proves those universal characteristic2 identities and
+the literal Jacobian determinant;it does not formalize the fiber scheme.
+
+Native q=32 Frobenius on basis lambda^i nu^j,0<=i,j<4 has
+rank(F-I)=12,rank(F^2-I)=8 and F^4=I. For a finite reduced k-algebra,the
+Frobenius fixed-space dimensions count residue fields and their splitting
+under extension. The dimension16,fixed dimensions4 and8,and period4 imply
+four residue fields,each of degree4 over k. They are four degree20 closed
+points over F2,with16 geometric points over the degree5 base support.
+The full matrices,unit ideals,Jacobians and zero products are retained in
+cm22-ss5-fiber-02.log. REPLAY_SS5.sh regenerates the exact script from the
+original circuit prefix plus SS5.sing and compares its output byte for byte.
+The first attempt's missing library helper and matrix/scalar comparison
+errors are retained and are not accepted as a successful certificate.
+
+This certifies the original affine fiber. Interpreting it as the entire
+proper normalized fiber additionally uses the pure-curve/function-field
+bridge,relative unramifiedness and the generic degree16 accounting. That
+bridge has not been extracted as a complete proper chart/transition
+certificate in this round. No full proper branch table,ramification or
+lifted denominator divisor is claimed. At these affine points b,c,lambda,
+nu and all registered units are nonzero;the generic nu denominator's
+vanishing at a1=0 reflects coordinate elimination,not a pole of the
+retained affine nu coordinate. This now supplies a concrete exceptional
+local chart to use in the remaining proper-geometry calculation.

@@ -1046,3 +1046,9 @@ In `koblitz_groebner`:
   (F4)*, J. Pure Appl. Algebra 139 (1999).
 - G. Bard, *Algebraic Cryptanalysis*, Springer 2009, ch. 13 — the
   Boolean-ring representation.
+
+Round22 also certifies the original supersingular SS5 affine incidence fiber,
+keeping nu and every registered unit:four degree20 closed points over F2,
+with both ideal-inclusion lifts,nonzero relative Jacobian and exact Frobenius
+matrix. The full proper normalized branch table remains open;see the Round22
+CM and validation records. No relation-rank or IC cost claim follows.

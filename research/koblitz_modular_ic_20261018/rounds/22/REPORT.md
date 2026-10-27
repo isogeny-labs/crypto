@@ -1,6 +1,7 @@
 # Round22: integral recovery and the proper-geometry frontier
 
-2026-10-26. Scientific input69f6740;publication parent3c87193;Conductor T-409.
+Round began2026-10-26;verification/publication continued2026-10-27 UTC.
+Scientific input69f6740;publication parent3c87193;Conductor T-409.
 This is an exact arithmetic and geometry investigation on public synthetic
 fixtures. No clock,IC cost or efficiency conclusion is admitted. The source,
 proof and raw-data manifests are in ledger.json and runs.sha256;see
@@ -12,7 +13,7 @@ proof and raw-data manifests are in ledger.json and runs.sha256;see
 | Requirement | Status | Evidence and exact remaining gap |
 |---|---|---|
 | Integral equivariant recovery on four norm-zero factors | Verified complete in the stated CM augmentation category | G32 full integer system,Smith transformations/inverses,independent integer replay;G33 two-map recovery. Geometric modular/final-quotient realization remains separate |
-| Proper level77 normalization,pole divisors,complete prescribed RR and factor map | Partial | Exact genus-one base,complete base divisors,generic QR model,degree8-by2 tower,irreducible plane projection and smooth registered open. Lifted branches/divisors and the complete RR basis remain open |
+| Proper level77 normalization,pole divisors,complete prescribed RR and factor map | Partial | Exact genus-one base,complete base divisors,generic QR model,degree8-by2 tower,irreducible plane projection,smooth registered open and original SS5 fiber (four degree20 points). Lifted branches/divisors and the complete RR basis remain open |
 | Focused node187 coupled-divisor investigation | Partial | All four old scalar points excluded by simultaneous valuations under explicit proper/pole bridges;all80 ordinary coefficient conjugates bound to the source. No explicit polynomial separator or h-power membership certificate |
 | Direct relations through an arbitrary-divisor reverse evaluator | Prerequisite open | n3 Klein and same-field n5 regression controls retained. No F2 modular-factor arbitrary-divisor evaluator;ordinary460/367 fibers/images remain open |
 
@@ -84,6 +85,15 @@ exceptional support is essential:the generic nu formula has denominator
 a1² b³ delta0,and the lambda projection loses information at a1=0 even
 though the original incidence open is smooth there. Original nu branches
 must be retained in any proper normalization.
+
+That original SS5 fiber is now computed directly. It is exactly
+lambda^4+b*lambda+b^2=0 and nu^4+b^3*nu+b^4*(lambda+1)=0 over
+F32 with b=alpha+1,c=1,alpha^5+alpha^3+1=0. Both ideal lift products
+vanish,all registered units survive,and the relative Jacobian is b^4.
+The16-dimensional reduced algebra has four degree4 residue fields over
+F32,certified by the complete q32 Frobenius matrix. Thus its four closed
+points have degree20 over F2. This is an original affine-fiber certificate;
+the full proper normalized branch accounting remains a written bridge.
 
 At the frozen4GiB/1200s limits,affine closure normalization timed out;
 degree96 and torically reduced degree72 place computations exhausted the

@@ -168,6 +168,25 @@ fn summary_value(raw: &Path) -> serde_json::Value {
     assert_eq!(exceptional["qSS_hex"], "29");
     assert_eq!(exceptional["qSS_irreducible"], true);
     out["geometry"]["exceptional_base_divisors"] = exceptional;
+    let ss = std::fs::read_to_string(raw.join("cm22-ss5-fiber-02.log")).unwrap();
+    assert!(ss.contains("SS5_FIBER_ALL_CHECKS_PASS"));
+    assert!(!ss.contains("error") && !ss.contains("?") && !ss.contains("failed"));
+    assert!(ss.contains("FROBENIUS_MINUS_I_RANK\n12\n"));
+    assert!(ss.contains("FROBENIUS_SQUARED_MINUS_I_RANK\n8\n"));
+    let input = read(&raw.join("cm22-input-circuit.json"));
+    assert_eq!(input["residuals"], json!([48, 52, 238, 240, 242]));
+    assert_eq!(input["units"], json!([0, 11, 1, 1, 19, 36, 64, 74]));
+    out["geometry"]["SS5_fiber"] = json!({
+        "source":"original unchanged incidence residuals and all registered units",
+        "coefficient_field":"F2[a]/(a^5+a^3+1)","b":"a+1","c":1,
+        "ideal_generators":["lambda^4+b*lambda+b^2","nu^4+b^3*nu+b^4*(lambda+1)"],
+        "both_lift_residuals_zero":true,"dimension":16,"all_registered_units_invertible":true,
+        "lambda_and_nu_units":true,"relative_Jacobian":"b^4",
+        "Frobenius_minus_I_rank":12,"Frobenius_squared_minus_I_rank":8,
+        "Frobenius_fourth_is_identity":true,"residue_degrees_over_F32":[4,4,4,4],
+        "closed_point_degrees_over_F2":[20,20,20,20],
+        "proper_completion_branch_table_certified":false
+    });
     out
 }
 pub fn summary(raw: &Path) {
@@ -235,7 +254,7 @@ pub fn record(round: &Path) {
             }
         }
     }
-    assert_eq!(named, 48);
+    assert_eq!(named, 51);
     for p in [
         "lean/lakefile.toml",
         "lean/lake-manifest.json",
@@ -276,6 +295,8 @@ pub fn record(round: &Path) {
         "SOURCES.md",
         "PROOF_MAP.md",
         "VALIDATION.md",
+        "SS5.sing",
+        "REPLAY_SS5.sh",
     ] {
         let p = round.join(p);
         sources.insert(
@@ -284,6 +305,13 @@ pub fn record(round: &Path) {
         );
     }
     identities(&round, false);
+    let incidence = std::fs::read_to_string(raw.join("cm22-incidence.sing")).unwrap();
+    let prefix = incidence.split("poly unitprod=1;").next().unwrap();
+    let fragment = std::fs::read_to_string(round.join("SS5.sing")).unwrap();
+    assert_eq!(
+        std::fs::read_to_string(raw.join("cm22-ss5-fiber-02.sing")).unwrap(),
+        format!("{prefix}{fragment}")
+    );
     let cache = read(&raw.join("proof-cache-manifest.json"));
     let sig = read(&raw.join("proof-cache-ir-signatures.json"));
     assert_eq!(cache["all_source_destination_hashes_equal"], true);
@@ -321,6 +349,7 @@ pub fn record(round: &Path) {
     assert!(corrected.contains("forwardResidual[1,1]=0") && corrected.contains("bres[1,1]=0"));
     for (name, marker) in [
         ("trace-tower-02", "TRACE_TOWER_RESIDUAL"),
+        ("ss5-fiber-02", "SS5_FIBER_ALL_CHECKS_PASS"),
         (
             "rational-gate-check-01",
             "PASS_ALL_245_RATIONAL_GATE_IDENTITIES",
@@ -370,11 +399,37 @@ pub fn record(round: &Path) {
         assert_eq!(count("failed"), 0);
         json!({"passed":count("passed"),"failed":0,"ignored":count("ignored")})
     };
+    let revision = std::process::Command::new("git")
+        .args(["rev-parse", "HEAD"])
+        .current_dir(repo)
+        .output()
+        .unwrap();
+    assert!(revision.status.success());
+    let source_revision = String::from_utf8(revision.stdout)
+        .unwrap()
+        .trim()
+        .to_owned();
+    for (path, wanted) in &sources {
+        let blob = std::process::Command::new("git")
+            .args(["show", &format!("{source_revision}:{path}")])
+            .current_dir(repo)
+            .output()
+            .unwrap();
+        assert!(
+            blob.status.success(),
+            "source must be committed before sealing:{path}"
+        );
+        assert_eq!(
+            &hex::encode(crate::sha256_impl::sha256(&blob.stdout)),
+            wanted,
+            "uncommitted source:{path}"
+        );
+    }
     let root_counts = test_counts(&root);
     let native_counts = test_counts(&native);
     let mut hashes = BTreeMap::new();
     walk(&raw, &raw, &mut hashes);
-    let ledger = json!({"schema":"koblitz.round22-ledger/v1","date":"2026-10-26","timezone":"America/Los_Angeles","experiment_parent":"69f67409f5fe6b525c23b000edea047dd38fcf83","publication_parent":"3c87193e7c754e9abefa401b7cd0974d0708b3b1","Conductor_task":"T-409","native":summary_value(&raw),"new_named_Lean_theorems":named,"module_named_counts":modules,"audited_project_theorems":audited,"root_library_tests":root_counts,"native_tests":native_counts,"source_sha256":sources,"raw_sha256":hashes,"CAS_attempts":cas,"EKS_inventory":{"jobs":jobs.len(),"active":active,"matching_study":matching,"mutations":0},"requirements":[{"track":"exact norm-zero recovery","status":"verified complete in the CM equivariant augmentation category","open":"geometric final quotient and modular factor interpretation remain separate"},{"track":"proper level77 geometry","status":"partial","verified":"genus-one base,complete base divisors,generic QR tower,birational plane model,smooth registered open","open":"proper normalized charts,all lifted coordinate and denominator divisors,complete prescribed RR basis,map with nonzero order11 action"},{"track":"node187 coupled divisors","status":"partial","verified":"all four models excluded by actual coupled valuation/descent under written DVR and pole bridges","open":"explicit source-bound polynomial separator/membership;full saturation;formal schemes/DVR bridge"},{"track":"direct relations","status":"prerequisite open","open":"arbitrary modular divisor reverse evaluator and complete460/367 fibers/images"}],"retained_failures":["generated Lean sum scope/free variable corrected;all failed files retained","missing Lean imports and Rust string-reference compilation errors corrected","original Singular saturation exponent print used wrong API;no exponent claim","affine closure normalization exits124","degree96 and degree72 plane place computations exit14 at4GiB","generic ideal-subtraction display syntax failed;lift matrices retained and corrected replay required","F8-coordinate Klein fixture fails the wide split-fiber verifier precondition;matching F512-coordinate fixture separately replayed","Conductor repeated claim requests used the four-attempt coordination budget;no fifth claim or duplicate session launched"],"performance_measured":false,"IC_efficiency_verdict":null});
+    let ledger = json!({"schema":"koblitz.round22-ledger/v1","date":"2026-10-26","timezone":"America/Los_Angeles","experiment_parent":"69f67409f5fe6b525c23b000edea047dd38fcf83","publication_parent":"3c87193e7c754e9abefa401b7cd0974d0708b3b1","integration_parent":"baa1951357b7ca586e902f4a81287ac2ef4855ef","source_revision":source_revision,"Conductor_task":"T-409","native":summary_value(&raw),"new_named_Lean_theorems":named,"module_named_counts":modules,"audited_project_theorems":audited,"root_library_tests":root_counts,"native_tests":native_counts,"source_sha256":sources,"raw_sha256":hashes,"CAS_attempts":cas,"EKS_inventory":{"jobs":jobs.len(),"active":active,"matching_study":matching,"mutations":0},"requirements":[{"track":"exact norm-zero recovery","status":"verified complete in the CM equivariant augmentation category","open":"geometric final quotient and modular factor interpretation remain separate"},{"track":"proper level77 geometry","status":"partial","verified":"genus-one base,complete base divisors,generic QR tower,birational plane model,smooth registered open;original SS5 incidence fiber with both ideal lifts and Frobenius residue degrees","open":"proper normalized charts,all lifted coordinate and denominator divisors,complete prescribed RR basis,map with nonzero order11 action"},{"track":"node187 coupled divisors","status":"partial","verified":"all four models excluded by actual coupled valuation/descent under written DVR and pole bridges","open":"explicit source-bound polynomial separator/membership;full saturation;formal schemes/DVR bridge"},{"track":"direct relations","status":"prerequisite open","open":"arbitrary modular divisor reverse evaluator and complete460/367 fibers/images"}],"retained_failures":["generated Lean sum scope/free variable corrected;all failed files retained","missing Lean imports and Rust string-reference compilation errors corrected","original Singular saturation exponent print used wrong API;no exponent claim","affine closure normalization exits124","degree96 and degree72 plane place computations exit14 at4GiB","generic ideal-subtraction display syntax failed;lift matrices retained and corrected replay required","F8-coordinate Klein fixture fails the wide split-fiber verifier precondition;matching F512-coordinate fixture separately replayed","Conductor repeated claim requests used the four-attempt coordination budget;no fifth claim or duplicate session launched"],"performance_measured":false,"IC_efficiency_verdict":null});
     assert!(!round.join("ledger.json").exists());
     round02::save(&round, "ledger.json", &ledger);
     assert!(!round.join("runs.sha256").exists());

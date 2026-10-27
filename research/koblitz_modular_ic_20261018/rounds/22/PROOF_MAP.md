@@ -16,11 +16,13 @@ sorry/admit or trusted native evaluation is allowed.
 | Inherited polarization | KoblitzRound22Polarization: all three declarations | Literal J-transpose-J, determinant5 and actual weighted Gram; no final quotient or principal polarization assertion |
 | Simultaneous node187 contradiction | KoblitzRound22Coupled: both_factors_have_poles, third_pole_contradicts_regular_product, coupled_proper_reduction, no_node187_valuative_model, uncoupled_valuation_control | Universal integer inequalities and additive residue groups. Proper extension, curve selection, valuations of actual Miller functions and coefficient-split geometry are written hypotheses, not a formal scheme implementation |
 | Genus-one substitution and exact tower algebra | KoblitzRound22Base: quadratic_norm_integer_lift, quadratic_norm, base11_integer_lift, base11_rational_equation, linear_coordinate_recovery, char_two_square, char_two_eighth, linearized_decomposition | Universal ring/field identities. Native F2[u,v] arithmetic and Singular source bindings are separate. Complete base divisors use written smooth-curve local-parameter and norm-support arguments |
+| Exceptional SS5 projection identities and Jacobian | KoblitzRound22SS: lambda_fourth_power, trace_square, relative_jacobian_determinant | Universal characteristic2 projection powers and literal determinant. Original-ideal lifts, unit checks and Frobenius residue decomposition are native CAS certificates; no formal proper normalization |
 
-The full intended R22 set has48 named declarations. Report only the observed
-count after the complete project build/audit. Audit counts also include generated
-auxiliary theorems and earlier rounds. A Lean proof of a universal implication
-does not silently discharge its geometric hypotheses.
+The verified R22 set has51 named declarations. The complete project build
+passes9095 jobs;the final transitive audit checks1088 project theorems with0 failing
+and0 trusted native results. Audit counts also include generated auxiliary
+theorems and earlier rounds. A Lean proof of a universal implication does
+not silently discharge its geometric hypotheses.
 
 No declaration asserts a full quotient saturation, polynomial membership
 h^k f in I, proper level77 normalization, complete lifted divisors, a prescribed

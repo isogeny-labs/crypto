@@ -1,17 +1,6 @@
 name: Koblitz modular carrier replay
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'research/koblitz_modular_ic_20261018/**'
-      - 'src/cryptanalysis/curve_construction/weil.rs'
-      - 'src/cryptanalysis/curve_construction/modular.rs'
-      - 'src/cryptanalysis/curve_construction/gf2k.rs'
-      - 'src/cryptanalysis/curve_construction/lpoly.rs'
-      - 'src/binary_ecc/**'
-      - 'src/cryptanalysis/identity_certificate.rs'
-      - 'src/hash/sha256.rs'
-      - '.github/workflows/koblitz-modular-carriers.yml'
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
@@ -223,7 +212,9 @@ jobs:
           round=research/koblitz_modular_ic_20261018/rounds/22
           (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
           "$round/REPLAY.sh"
-          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-sources "$round"
+          source_revision=$(jq -r .source_revision "$round/ledger.json")
+          git fetch --no-tags origin "$source_revision"
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" "$source_revision"
       - name: Install pinned Lean
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
