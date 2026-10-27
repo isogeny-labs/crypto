@@ -15,9 +15,9 @@ poly selector=gcd(ec,de);
 print("BEGIN_Z23_FIBER");
 print("BASE_POINT_SELECTOR");selector;
 if(deg(selector)!=1){ERROR("Z5 selector is not unique");}
-number vv=subst(selector,v,0)/leadcoef(selector);
-number bb=subst(bp,v,vv);
-number cc=subst(cp,v,vv);
+number vv=leadcoef(subst(selector,v,0))/leadcoef(selector);
+number bb=leadcoef(subst(bp,v,vv));
+number cc=leadcoef(subst(cp,v,vv));
 print("SELECTED_V_B_C");vv;bb;cc;
 print("BASE_POINT_AND_DISCRIMINANT_RESIDUALS");subst(ec,v,vv);bb+cc*(1+cc)^3;
 if(subst(ec,v,vv)!=0 || bb+cc*(1+cc)^3!=0){ERROR("wrong Z5 point");}
