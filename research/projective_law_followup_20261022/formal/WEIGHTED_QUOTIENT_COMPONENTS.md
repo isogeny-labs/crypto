@@ -221,14 +221,24 @@ shows that the actual branch localization has maximal ideal `(y)` when
 preimages with the corresponding glued overlap ranges. Each compiled directly
 with pinned Lean 4.34.1 and lists only `propext`, `Classical.choice`, and
 `Quot.sound` in its axiom audit. The branch localization is not yet proved a
-domain or DVR, and the cross-chart equality needed for the global glued-to-Proj
-isomorphism remains open.
+domain or DVR at this stage. `Common22BranchDomain.lean` (`461ac62b2d`,
+SHA-256 `29dec7059cf73856f216ba64f0599f54649d7ff1930df3f4ec1f2dc99701b462`)
+subsequently proves the actual affine and branch-local domains, the branch
+DVR, `ord(y)=1`, and `ord(x-a)=2` at each simple root. `WeightedProjCrossImage.lean`
+(`a553929a3`, SHA-256
+`69e01c7b5c3f7a6db98ea0fbd5a7de35f986bb8d539a31709ded4c9672227596`)
+proves that equal Proj images from opposite charts force both points into
+their corresponding overlap ranges. Both files compiled directly with pinned
+Lean and only the three standard axioms above. Equality of their overlap
+lifts, and thus the unconditional glued-to-Proj isomorphism, remains open.
 All their reported public theorems compiled directly with pinned Lean 4.34.1
 and Mathlib `d13f23b`; axiom audits list only `propext`, `Classical.choice`,
 and `Quot.sound`. The glue files establish open-immersion and isomorphism
-only under explicit injectivity or cross-chart premises. The branch-order
-file assumes a domain and DVR at the actual branch localization. Neither
-conditional result is a completed global Picard-class proof.
+only under explicit injectivity or cross-chart premises. The earlier
+branch-order relation assumes a domain and DVR; the new domain file supplies
+both for simple branch roots and derives the two exact local orders. These
+local results do not establish a global principal divisor or Picard-class
+equation.
 
 The required `RUST_TEST_THREADS=1 cargo test --release --lib --offline --locked`
 was run with these proof-only changes. The [first raw log](validation/release-library-first.log)
