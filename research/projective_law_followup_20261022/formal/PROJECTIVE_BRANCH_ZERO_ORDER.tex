@@ -18,18 +18,20 @@ Let $a$ be a rational simple root of the quintic and $R$ the structure-sheaf sta
 \]
 The proof transports the generic branch zero-order lemma into this actual projective stalk. The underlying DVR criterion is discussed in the \href{https://stacks.math.columbia.edu/tag/00PD}{Stacks Project, Lemma 10.119.7}.
 
+A second checked theorem composes the separate norm-factor transport with this result. If a polynomial norm identity holds at a rational support root and $B$ is a unit in this stalk, then the evaluated polynomial numerator satisfies $\operatorname{ord}(n(x)-By)=1$. A checked corollary replaces the unit premise with the source-style scalar guard $b\ne0$: its image $B$ is a unit. The norm polynomial and its link to the compiled runtime numerator remain explicit inputs.
+
 \begin{center}
 \setlength{\fboxsep}{9pt}
 \fbox{\begin{minipage}{0.88\linewidth}\centering
 Checked actual stalk: $R$ is a DVR and $\operatorname{ord}(y)=1$\par\vspace{5pt}
-Explicit input: $N=(x-a)t$, and $B$ is a unit\par\vspace{5pt}
+Explicit input: $N=(x-a)t$ (or the checked norm route), $b\ne0$\par\vspace{5pt}
 $\Downarrow$ checked local valuation algebra\par\vspace{5pt}
 $\operatorname{ord}(N-By)=1$
 \end{minipage}}
 \end{center}
 
 \section*{Verification and remaining gates}
-Direct Lean 4.34.1 compilation with Mathlib \texttt{d13f23b} exited zero. The theorem axiom audit lists only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; no \texttt{sorryAx}. Lean source SHA-256:\par\smallskip\noindent{\scriptsize\texttt{49005acc564b41341b37296d42de90c48e56ac4f4a4ec4860d7278fc8bc00cca}}.
+Direct Lean 4.34.1 compilation with Mathlib \texttt{d13f23b} exited zero for both sources. All four theorem axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; no \texttt{sorryAx}. Local source SHA-256:\par\smallskip\noindent{\scriptsize\texttt{49005acc564b41341b37296d42de90c48e56ac4f4a4ec4860d7278fc8bc00cca}}.\par\smallskip\noindent Composition source SHA-256: {\scriptsize\texttt{8c136b70da26dc928a3ea1b1646dd4ff40d28240b52ea1b7ae1c561301ff35f5}}.
 
-The compiled Rust law has not been shown to satisfy the numerator factorization or unit hypothesis at every branch. Nonbranch multiplicities, the global principal divisor, the $\mathrm{Pic}^0$ class equation, and universal runtime semantics remain open. No frozen 1,260-target row or matched-rho ratio changes.
+The compiled Rust law has not been shown to equal the mapped polynomial or satisfy the unit hypothesis at every branch. Nonbranch multiplicities, the global principal divisor, the $\mathrm{Pic}^0$ class equation, and universal runtime semantics remain open. No frozen 1,260-target row or matched-rho ratio changes.
 \end{document}
