@@ -27,7 +27,8 @@ pub fn worst_ratio(trial: &Band, baseline: &Band) -> Result<f64, String> {
     }
     let mut worst = f64::NEG_INFINITY;
     for (t, b) in trial.s.iter().zip(&baseline.s) {
-        if *b <= 0.0 || b.is_nan() || !t.is_finite() {
+        // `!(b > 0.0)` is also true for NaN, so a NaN baseline is refused too.
+        if b.is_nan() || *b <= 0.0 || !t.is_finite() {
             return Err(format!(
                 "cannot form a ratio from S = {t} over a baseline S = {b}"
             ));

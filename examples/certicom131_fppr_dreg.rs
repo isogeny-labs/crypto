@@ -97,6 +97,7 @@ struct Measured {
 #[allow(clippy::too_many_arguments)]
 fn measure(
     n: u32,
+    _ell: usize,
     d_max: u32,
     ffd_max: u32,
     pair: bool,

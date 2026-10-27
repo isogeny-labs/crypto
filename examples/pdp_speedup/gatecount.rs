@@ -418,6 +418,7 @@ pub fn cmd_micro(args: &[String]) {
 
 fn micro_run<const N: usize>(args: &[String]) {
     use crate::bskernel::Dispatch;
+    #[cfg(target_arch = "x86_64")]
     use crate::lanes_x86::{W256, W512};
     let l: u32 = arg(args, "--l").expect("--l");
     let iters: usize = arg(args, "--iters").unwrap_or(20_000);
@@ -440,16 +441,18 @@ fn micro_run<const N: usize>(args: &[String]) {
         (8, "stage_c_x8"),
         (9, "stage_a_x8"),
     ] {
-        for (name, lanes, (ns, c)) in [
-            ("u64", 64usize, time::<u64, N>(&f, iters, mode)),
-            ("avx2", 256, time::<W256, N>(&f, iters, mode)),
-            ("avx512", 512, time::<W512, N>(&f, iters, mode)),
-        ] {
+        let print = |name: &str, lanes: usize, (ns, c): (f64, u64)| {
             println!(
                 "{{\"op\":\"{what}\",\"width\":\"{name}\",\"lanes\":{lanes},\"n\":{N},\"ns_per_op\":{ns:.1},\"cycles_at_2.8GHz\":{:.0},\"ns_per_op_per_lane\":{:.4},\"checksum\":\"{c:016x}\"}}",
                 ns * 2.8,
                 ns / lanes as f64
             );
+        };
+        print("u64", 64, time::<u64, N>(&f, iters, mode));
+        #[cfg(target_arch = "x86_64")]
+        {
+            print("avx2", 256, time::<W256, N>(&f, iters, mode));
+            print("avx512", 512, time::<W512, N>(&f, iters, mode));
         }
     }
 }
