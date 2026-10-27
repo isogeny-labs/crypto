@@ -11,7 +11,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 HERE = Path(__file__).resolve().parent
-RUN = HERE.parent / "run1"
+RUN = HERE.parent.parent / "run1"
 A = RUN / "analysis"
 FAM = ["n15l5", "n17l6"]
 TRIPLES = {"n15l5": 32 * 33 * 34 // 6, "n17l6": 64 * 65 * 66 // 6}

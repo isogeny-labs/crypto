@@ -2722,7 +2722,11 @@ mod tests {
                     (0..3)
                         .map(|_| {
                             let v = (next() % vars as u64) as i32 + 1;
-                            if next() & 1 == 1 { v } else { -v }
+                            if next() & 1 == 1 {
+                                v
+                            } else {
+                                -v
+                            }
                         })
                         .collect()
                 })

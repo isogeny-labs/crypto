@@ -139,7 +139,11 @@ fn run_target(f: &Family, base: &[F2mElement], x_r: u64) -> Row {
     for &k in &TEL_K {
         if result == SolveResult::Unknown {
             enc.solver.conflict_budget = k;
-            result = if enc.trivially_unsat { SolveResult::Unsat } else { enc.solver.solve() };
+            result = if enc.trivially_unsat {
+                SolveResult::Unsat
+            } else {
+                enc.solver.solve()
+            };
         }
         let decided = result != SolveResult::Unknown;
         tel.push(telemetry(
@@ -186,7 +190,7 @@ fn run_target(f: &Family, base: &[F2mElement], x_r: u64) -> Row {
 
 fn par_map<T: Sync, R: Send>(items: Vec<T>, f: impl Fn(&T) -> R + Sync) -> Vec<R> {
     use rayon::prelude::*;
-    items.par_iter().map(|x| f(x)).collect()
+    items.par_iter().map(&f).collect()
 }
 
 // ── learner: ridge logistic regression by IRLS ──────────────────────
@@ -200,7 +204,9 @@ struct Model {
 fn solve_linear(mut a: Vec<Vec<f64>>, mut b: Vec<f64>) -> Vec<f64> {
     let d = b.len();
     for i in 0..d {
-        let p = (i..d).max_by(|&r, &s| a[r][i].abs().total_cmp(&a[s][i].abs())).unwrap();
+        let p = (i..d)
+            .max_by(|&r, &s| a[r][i].abs().total_cmp(&a[s][i].abs()))
+            .unwrap();
         a.swap(i, p);
         b.swap(i, p);
         for r in i + 1..d {
@@ -236,7 +242,8 @@ fn fit(xs: &[Vec<f64>], ys: &[bool], lambda: f64) -> Model {
             sd[j] += (x[j] - mean[j]).powi(2) / n;
         }
     }
-    sd.iter_mut().for_each(|s| *s = if *s > 1e-12 { s.sqrt() } else { 1.0 });
+    sd.iter_mut()
+        .for_each(|s| *s = if *s > 1e-12 { s.sqrt() } else { 1.0 });
     let z: Vec<Vec<f64>> = xs
         .iter()
         .map(|x| {
@@ -313,7 +320,12 @@ fn auc(scores: &[f64], ys: &[bool]) -> f64 {
     if pos == 0.0 || neg == 0.0 {
         return f64::NAN;
     }
-    let sum: f64 = ys.iter().zip(&rank).filter(|(y, _)| **y).map(|(_, r)| r).sum();
+    let sum: f64 = ys
+        .iter()
+        .zip(&rank)
+        .filter(|(y, _)| **y)
+        .map(|(_, r)| r)
+        .sum();
     (sum - pos * (pos + 1.0) / 2.0) / (pos * neg)
 }
 
@@ -420,7 +432,10 @@ fn evaluate(
     for q in 1..20 {
         let tau = train_sorted[train_sorted.len() * q / 20];
         let keep: Vec<bool> = scores.iter().map(|&s| s >= tau).collect();
-        let kept_sat = train.iter().filter(|&&i| ys[i] && (keep[i] || rows[i].conflicts <= k)).count();
+        let kept_sat = train
+            .iter()
+            .filter(|&&i| ys[i] && (keep[i] || rows[i].conflicts <= k))
+            .count();
         if kept_sat < 10 {
             continue;
         }
@@ -447,13 +462,28 @@ fn l1_l2(f: &Family, rows: &[Row]) -> serde_json::Value {
     let refs: Vec<&Row> = rows.iter().collect();
     let ys: Vec<bool> = rows.iter().map(|r| r.sat).collect();
     let splits: [(&str, Vec<usize>, Vec<usize>); 2] = [
-        ("even_odd", (0..rows.len()).filter(|i| i % 2 == 0).collect(), (0..rows.len()).filter(|i| i % 2 == 1).collect()),
-        ("aa_mod4", (0..rows.len()).filter(|i| i % 4 == 0 || i % 4 == 3).collect(), (0..rows.len()).filter(|i| i % 4 == 1 || i % 4 == 2).collect()),
+        (
+            "even_odd",
+            (0..rows.len()).filter(|i| i % 2 == 0).collect(),
+            (0..rows.len()).filter(|i| i % 2 == 1).collect(),
+        ),
+        (
+            "aa_mod4",
+            (0..rows.len())
+                .filter(|i| i % 4 == 0 || i % 4 == 3)
+                .collect(),
+            (0..rows.len())
+                .filter(|i| i % 4 == 1 || i % 4 == 2)
+                .collect(),
+        ),
     ];
     let mut out = serde_json::Map::new();
     for (split, train, test) in &splits {
         let mut groups = serde_json::Map::new();
-        for (gi, group) in ["F-x", "F-xx", "F-tel64", "F-tel512"].into_iter().enumerate() {
+        for (gi, group) in ["F-x", "F-xx", "F-tel64", "F-tel512"]
+            .into_iter()
+            .enumerate()
+        {
             let xs: Vec<Vec<f64>> = rows.iter().map(|r| features(group, r, f.n)).collect();
             let k = group_k(group);
             let seed = SEED ^ (f.id << 8) ^ gi as u64;
@@ -503,7 +533,10 @@ fn l1_l2(f: &Family, rows: &[Row]) -> serde_json::Value {
         cuts.dedup();
         let (mut best_c, mut best_g) = (u64::MAX, 1.0);
         for &c in &cuts {
-            let kept = train.iter().filter(|&&i| rows[i].sat && rows[i].conflicts <= c).count();
+            let kept = train
+                .iter()
+                .filter(|&&i| rows[i].sat && rows[i].conflicts <= c)
+                .count();
             if kept < 10 {
                 continue;
             }
@@ -532,7 +565,10 @@ fn transfer(src: &[Row], dst: &[Row], group: &str, nsrc: u32, ndst: u32) -> serd
     let xs: Vec<Vec<f64>> = src.iter().map(|r| features(group, r, nsrc)).collect();
     let ys: Vec<bool> = src.iter().map(|r| r.sat).collect();
     let m = fit(&xs, &ys, 1.0);
-    let sc: Vec<f64> = dst.iter().map(|r| m.score(&features(group, r, ndst))).collect();
+    let sc: Vec<f64> = dst
+        .iter()
+        .map(|r| m.score(&features(group, r, ndst)))
+        .collect();
     let yy: Vec<bool> = dst.iter().map(|r| r.sat).collect();
     let a = auc(&sc, &yy);
     let ci = bootstrap(dst.len(), SEED ^ 0x31, |s| {
@@ -551,13 +587,23 @@ const L3_CAP_MULT: u64 = 10;
 
 fn l3(f: &Family, rows: &[Row]) -> serde_json::Value {
     let l = f.l;
-    let mut unsat_c: Vec<u64> = rows.iter().filter(|r| !r.sat).map(|r| r.conflicts).collect();
+    let mut unsat_c: Vec<u64> = rows
+        .iter()
+        .filter(|r| !r.sat)
+        .map(|r| r.conflicts)
+        .collect();
     unsat_c.sort();
     let cap = L3_CAP_MULT * unsat_c[unsat_c.len() / 2];
     let n_x = 3 * l;
     let n_e = 6 * l - 3;
     // Learned order: mean normalised final VSIDS activity over training refutations.
-    let train_unsat: Vec<u64> = rows.iter().enumerate().filter(|(i, r)| i % 2 == 0 && !r.sat).map(|(_, r)| r.x_r).take(4 * f.l3_targets).collect();
+    let train_unsat: Vec<u64> = rows
+        .iter()
+        .enumerate()
+        .filter(|(i, r)| i % 2 == 0 && !r.sat)
+        .map(|(_, r)| r.x_r)
+        .take(4 * f.l3_targets)
+        .collect();
     let acts: Vec<Vec<f64>> = par_map(train_unsat, |&x| {
         let mut enc = encode(f, x);
         enc.solver.solve();
@@ -582,7 +628,13 @@ fn l3(f: &Family, rows: &[Row]) -> serde_json::Value {
         ("a3_e_vars", (n_x + 1..=n_x + n_e).collect()),
         ("a4_learned_activity", learned.clone()),
     ];
-    let test_unsat: Vec<u64> = rows.iter().enumerate().filter(|(i, r)| i % 2 == 1 && !r.sat).map(|(_, r)| r.x_r).take(f.l3_targets).collect();
+    let test_unsat: Vec<u64> = rows
+        .iter()
+        .enumerate()
+        .filter(|(i, r)| i % 2 == 1 && !r.sat)
+        .map(|(_, r)| r.x_r)
+        .take(f.l3_targets)
+        .collect();
     let span = 1u64 << l;
     let triples = (span * (span + 1) * (span + 2) / 6) as f64;
     let pairs = (span * span) as f64;
@@ -596,11 +648,24 @@ fn l3(f: &Family, rows: &[Row]) -> serde_json::Value {
             }
             enc.solver.conflict_budget = cap;
             let r = enc.solver.solve();
-            assert_ne!(r, SolveResult::Sat, "{} x_r={x:#x}: arm {name} found SAT on an UNSAT target", f.name);
-            (enc.solver.conflicts(), enc.solver.stats.word_ops, r == SolveResult::Unknown)
+            assert_ne!(
+                r,
+                SolveResult::Sat,
+                "{} x_r={x:#x}: arm {name} found SAT on an UNSAT target",
+                f.name
+            );
+            (
+                enc.solver.conflicts(),
+                enc.solver.stats.word_ops,
+                r == SolveResult::Unknown,
+            )
         });
         let capped = res.iter().filter(|r| r.2).count();
-        eprintln!("{} L3 {name}: {} targets, {capped} capped", f.name, res.len());
+        eprintln!(
+            "{} L3 {name}: {} targets, {capped} capped",
+            f.name,
+            res.len()
+        );
         let mut c: Vec<u64> = res.iter().map(|r| r.0).collect();
         c.sort();
         let sum: f64 = c.iter().map(|&v| v as f64).sum();
@@ -662,7 +727,11 @@ fn load_rows(f: &Family, dir: &std::path::Path) -> Vec<Row> {
                     break t;
                 }
             };
-            assert_eq!(x_r, expect, "{}: saved rows do not match the seeded target sequence", f.name);
+            assert_eq!(
+                x_r, expect,
+                "{}: saved rows do not match the seeded target sequence",
+                f.name
+            );
             Row {
                 x_r,
                 sat: v["sat"].as_bool().unwrap(),
@@ -687,9 +756,19 @@ fn write_json(path: std::path::PathBuf, v: &serde_json::Value) {
 /// `l3_<family>.json`, and `transfer.json`.
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let out_dir = std::path::PathBuf::from(args.get(1).expect("usage: pdp_ml_sat_ceiling OUT_DIR [--from-rows DIR]"));
-    let from_rows = args.iter().position(|a| a == "--from-rows").map(|i| std::path::PathBuf::from(&args[i + 1]));
-    assert!(!out_dir.exists(), "refusing to overwrite {}", out_dir.display());
+    let out_dir = std::path::PathBuf::from(
+        args.get(1)
+            .expect("usage: pdp_ml_sat_ceiling OUT_DIR [--from-rows DIR]"),
+    );
+    let from_rows = args
+        .iter()
+        .position(|a| a == "--from-rows")
+        .map(|i| std::path::PathBuf::from(&args[i + 1]));
+    assert!(
+        !out_dir.exists(),
+        "refusing to overwrite {}",
+        out_dir.display()
+    );
     std::fs::create_dir_all(&out_dir).unwrap();
     let mut all_rows = Vec::new();
     for f in families() {
@@ -709,9 +788,27 @@ fn main() {
         };
         let label_secs = t.elapsed().as_secs_f64();
         let sats = rows.iter().filter(|r| r.sat).count();
-        eprintln!("{}: {} targets, {} SAT, {:.1}s", f.name, rows.len(), sats, label_secs);
-        let sat_c: Vec<u64> = { let mut v: Vec<u64> = rows.iter().filter(|r| r.sat).map(|r| r.conflicts).collect(); v.sort(); v };
-        let unsat_c: Vec<u64> = { let mut v: Vec<u64> = rows.iter().filter(|r| !r.sat).map(|r| r.conflicts).collect(); v.sort(); v };
+        eprintln!(
+            "{}: {} targets, {} SAT, {:.1}s",
+            f.name,
+            rows.len(),
+            sats,
+            label_secs
+        );
+        let sat_c: Vec<u64> = {
+            let mut v: Vec<u64> = rows.iter().filter(|r| r.sat).map(|r| r.conflicts).collect();
+            v.sort();
+            v
+        };
+        let unsat_c: Vec<u64> = {
+            let mut v: Vec<u64> = rows
+                .iter()
+                .filter(|r| !r.sat)
+                .map(|r| r.conflicts)
+                .collect();
+            v.sort();
+            v
+        };
         let l12 = l1_l2(&f, &rows);
         write_json(
             out_dir.join(format!("summary_{}.json", f.name)),
