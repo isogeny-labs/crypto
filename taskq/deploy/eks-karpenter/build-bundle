@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Runs only in the unprivileged build job. No AWS identity is needed.
+set -euo pipefail
+[[ $# == 3 ]] || { echo 'Usage: build-bundle SOURCE_DIR COMMIT OUTPUT_DIR' >&2; exit 2; }
+source_dir=$(realpath "$1") revision=$2
+[[ "$revision" =~ ^[a-f0-9]{40}$ ]]
+mkdir -p "$3"
+output=$(realpath "$3")
+[[ $(git -C "$source_dir" rev-parse HEAD) == "$revision" ]]
+[[ -z $(git -C "$source_dir" status --porcelain --untracked-files=no) ]]
+cd "$source_dir"
+# Static musl avoids a newer GitHub runner glibc leaking into the AL2023 image.
+# ecbench does not use Redis TLS; removing that feature avoids native OpenSSL.
+export CARGO_BUILD_JOBS=2
+export CARGO_TARGET_DIR="$source_dir/target"
+export RUSTFLAGS='-C target-cpu=x86-64'
+cargo +1.99.1 build --locked --release --no-default-features \
+  --target x86_64-unknown-linux-musl --bin ecbench
+install -m755 target/x86_64-unknown-linux-musl/release/ecbench "$output/ecbench"
+readelf -h "$output/ecbench" | grep -q 'Advanced Micro Devices X86-64'
+if readelf -l "$output/ecbench" | grep -q INTERP; then
+  echo 'The experiment executable must be statically linked' >&2
+  exit 2
+fi
+digest=$(sha256sum "$output/ecbench" | cut -d' ' -f1)
+jq -n --arg revision "$revision" --arg digest "$digest" \
+  --arg built "$(date -u +%FT%TZ)" --arg rustc "$(rustc +1.99.1 -Vv)" \
+  '{source_repository:"https://github.com/aburan28/crypto",source_revision:$revision,
+    ecbench_sha256:$digest,built_at:$built,architecture:"linux/amd64",
+    target:"x86_64-unknown-linux-musl",default_features:false,rustc:$rustc,
+    rustflags:"-C target-cpu=x86-64"}' > "$output/build-info.json"

@@ -39,6 +39,10 @@ pub struct PlanArgs {
     /// Memory the pair table may take, in GiB; the base shrinks to fit.
     #[arg(long, default_value_t = 8.0)]
     pub max_table_gib: f64,
+    /// Plan for this AGENTS.md §5a weight: GAE charged per unpriced native
+    /// operation (0 = counted S; since ic-planner/4 no weight changes the base).
+    #[arg(long, default_value_t = 0.0)]
+    pub native_weight: f64,
     /// Also print the plan as an ecbench spec arm of this name.
     #[arg(long)]
     pub ecbench_arm: Option<String>,
@@ -91,6 +95,9 @@ pub fn profile_of(inst: &Instance) -> CurveProfile {
         | Instance::F2m4(_)
         | Instance::Fp4(_)
         | Instance::Ext(_)
+        | Instance::Genus2(_)
+        | Instance::Quartic(_)
+        | Instance::Ghs(_)
         | Instance::Hyper(_) => CurveProfile::other(0.0, 0.0, 0),
     }
 }
@@ -99,9 +106,16 @@ pub fn run(args: PlanArgs, _json: bool) -> Result<Value, String> {
     let spec = args.curve_spec()?;
     let inst = spec.build()?;
     let profile = profile_of(&inst);
+    if !(args.native_weight.is_finite() && args.native_weight >= 0.0) {
+        return Err(
+            "--native-weight must be a finite number of GAE per native operation, at least 0"
+                .into(),
+        );
+    }
     let opts = PlanOptions {
         goal: args.goal,
         max_table_bytes: args.max_table_gib * (1u64 << 30) as f64,
+        native_weight: args.native_weight,
     };
     let plan = planner::plan(&profile, &opts);
     let mut report = json!({
@@ -130,8 +144,9 @@ pub fn display(report: &Value) {
         pr["cofactor"]
     );
     println!(
-        "Goal: {}   planner {}",
+        "Goal: {}   native weight {} GAE/op   planner {}",
         plan["goal"].as_str().unwrap_or("?"),
+        plan["native_weight"],
         plan["planner"].as_str().unwrap_or("?")
     );
     for c in plan["choices"].as_array().into_iter().flatten() {

@@ -1,14 +1,14 @@
 {
   "baseline": {
     "algorithm": "Pollard rho on <G>",
-    "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
     "equivalence_class_reason": "negation only",
     "equivalence_class_size": 2,
     "log2_cost_of_one_group_operation": 15.056,
-    "log2_group_operations": 77.014,
+    "log2_group_operations": 77.514,
     "log2_r": 155.376,
-    "log2_total": 92.07,
-    "log2_total_without_automorphisms": 92.57
+    "log2_total": 92.57,
+    "log2_total_negation_only": 92.57
   },
   "candidate": {
     "id": "ghs",
@@ -19,7 +19,7 @@
   "checks": [],
   "costs": {
     "destination_solver": null,
-    "log2_baseline": 92.07,
+    "log2_baseline": 92.57,
     "log2_cost_ratio": null,
     "log2_total": null,
     "repo_ratio_log2": null,
@@ -88,6 +88,10 @@
       "trace": "-52213820118540299389901413"
     }
   },
+  "evaluation": {
+    "reason": "the subgroup is not carried (subgroup preservation not_applicable): the route solves a different problem or does not exist, so there is no attack cost to compare with the baseline",
+    "status": "excluded"
+  },
   "executed": null,
   "invariants": {},
   "lead_class": "not_carried",
@@ -113,7 +117,7 @@
   },
   "open_obligations": [],
   "references": [],
-  "schema": "transfer-audit/certificate/v1",
+  "schema": "transfer-audit/certificate/v2",
   "subgroup_preservation": {
     "antecedents": [
       {
@@ -129,7 +133,7 @@
     "method": "none",
     "status": "not_applicable"
   },
-  "tool": "transfer-audit/1",
+  "tool": "transfer-audit/2",
   "verdict": "no weakness found in scope",
   "verdict_basis": [
     "subgroup preservation is NotApplicable: the transfer is not shown to carry <G>",

@@ -292,10 +292,12 @@ fn pinned_ratios(
     let table = doc.get("instances")?.as_object()?;
     let prefix = format!("{regime}/");
     let row = table.get(&format!("{prefix}{instance}")).or_else(|| {
-        table.iter().find_map(|(key, row)| {
-            let name = key.strip_prefix(&prefix)?;
-            curve_id::same_curve(name, instance).then_some(row)
-        })
+        curve_id::find_same_curve(
+            instance,
+            table
+                .iter()
+                .filter_map(|(key, row)| Some((key.strip_prefix(&prefix)?, row))),
+        )
     })?;
     Some(row.as_object()?.clone())
 }
@@ -4523,7 +4525,7 @@ impl<E: Copy> FactorBase<E> {
         self.point_index.get(&key).copied()
     }
 
-    fn empty(description: String) -> Self {
+    pub fn empty(description: String) -> Self {
         Self {
             points: Vec::new(),
             neg_index: Vec::new(),

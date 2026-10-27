@@ -1,10 +1,19 @@
 name: Bounded bielliptic quartic diagnostic
 
 on:
-  # Not a pull-request check. The merge set is gate, size, and artifacts.
-  # This runs when the matching change is on main, or on its schedule.
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/cryptanalysis/bielliptic_quartic.rs'
+      - '**/bin/quartic_ic.rs'
+      - '**/cryptanalysis/mod.rs'
+      - '**/Cargo.toml'
+      - 'tools/check_bielliptic_quartic.*'
+      - 'research/bielliptic_quartic_20261005/**'
+      - 'experiments/bielliptic-quartic/**'
+      - '.github/workflows/bielliptic-quartic.yml'
   push:
-    branches: [main, claude/cryptanalysis-repo-setup-p59kek]
+    branches: [main]
     paths:
       - '**/cryptanalysis/bielliptic_quartic.rs'
       - '**/bin/quartic_ic.rs'
@@ -24,7 +33,7 @@ concurrency:
 
 jobs:
   replay:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|bielliptic-quartic.yml|') && 'ubuntu-latest' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|bielliptic-quartic.yml|') && 'ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|bielliptic-quartic.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|bielliptic-quartic.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     steps:
       - name: Free hosted runner disk before Rust installation
