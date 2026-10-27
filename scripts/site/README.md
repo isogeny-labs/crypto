@@ -1,7 +1,7 @@
 # GitHub Pages site
 
 `build.py` assembles everything published at
-<https://aburan28.github.io/crypto/>. The
+<https://isogeny-labs.github.io/crypto/>. The
 [`ecc2k130-status`](../../.github/workflows/ecc2k130-status.yml) workflow runs
 it every 3 minutes, after refreshing the campaign snapshot, and uploads the
 result as the Pages artifact.
@@ -36,7 +36,7 @@ so no published page is ever the only copy of a figure.
 Two constraints are worth knowing before moving anything:
 
 - **`/history.json` must stay at the site root.** The publish job fetches the
-  live `https://aburan28.github.io/crypto/history.json` to merge the previous
+  live `https://isogeny-labs.github.io/crypto/history.json` to merge the previous
   snapshots forward, so moving that file discards every published snapshot
   before the move. `test_build.py` pins the URL in the workflow and the file in
   the output together.

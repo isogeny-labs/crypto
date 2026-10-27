@@ -6,19 +6,26 @@
 //! the one number a prime-field index calculus with two-point sums turns on,
 //! the probability that a random group element is a signed sum of two base
 //! points, exactly (from every pair sum) and by Monte Carlo where the yield is
-//! large enough to see.  It runs on NIST P-192 and on toy primes, where the
-//! same count can be checked against brute force and against hits.
+//! large enough to see.  It runs on the exact Certicom ECCp-131 group,
+//! NIST P-192 and small generated primes. ECCp-131 can also run a bounded
+//! scalar-derived relation, rank, and published-target descent probe.
 use clap::{Args, ValueEnum};
 use crypto_lib::cryptanalysis::{
     binary_small_x,
-    prime_small_x::{self, measure, toy_curve, toy_curve_with_cofactor, Curve, Options},
+    prime_small_x::{
+        self, exact_ic_probe_with_arity, measure, toy_curve, toy_curve_with_cofactor, Curve,
+        MontField, Options, PrimeField, Pt,
+    },
     secg_small_x::{measure_secg, Extras},
-    secg_standards::secg,
+    secg_standards::{secg, SecgCurve, SecgField},
     semaev_s3_cost::{s3_cost_binary, s3_cost_prime},
 };
+use crypto_lib::ecc::curve::CurveParams;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::time::Instant;
+
+use super::params;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -29,7 +36,7 @@ pub enum PrimeBase {
 
 #[derive(Args, Clone, Debug, Serialize)]
 pub struct PrimeArgs {
-    /// Any SECG curve of the standards database that `ic list` names
+    /// ECCp-131 or any SECG curve of the standards database that `ic list` names
     /// (`secp192r1` also as `p192`, `nist-p192`; `sect113r1`, `sect163r2`,
     /// `secp160k1`, … up to `secp521r1` and `sect571r1`), or a toy curve:
     /// `toy:<bits>[,<seed>[,<cofactor>]]` over a prime just below `2^bits`
@@ -64,6 +71,16 @@ pub struct PrimeArgs {
     /// to collect `B + 1` relations against Pollard rho on the same machine.
     #[arg(long, default_value_t = 0, value_parser = clap::value_parser!(u64).range(0..=100_000))]
     pub s3_trials: u64,
+    /// Exact ECCp-131 setup candidates `[a]G` tested against the pair-sum base.
+    #[arg(long, default_value_t = 0, value_parser = clap::value_parser!(u64).range(0..=1_000_000))]
+    pub setup_candidates: u64,
+    /// Exact ECCp-131 descent candidates `Q+[a]G`, starting with the published Q.
+    #[arg(long, default_value_t = 0, value_parser = clap::value_parser!(u64).range(0..=1_000_000))]
+    pub target_candidates: u64,
+    /// Signed base points per exact ECCp-131 relation: 2 or 3. The three-point
+    /// path probes the pair table after subtracting one base point.
+    #[arg(long, default_value_t = 2, value_parser = clap::value_parser!(u8).range(2..=3))]
+    pub relation_arity: u8,
 }
 
 pub fn run(args: PrimeArgs) -> Result<Value, String> {
@@ -92,7 +109,54 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
     let raw = args.raw_samples;
     let s3n = args.s3_trials;
     let size = args.size as usize;
-    let report = if matches!(name.as_str(), "secp192r1" | "p192" | "nist-p192" | "p-192") {
+    let mut ic_probe = None;
+    if (args.setup_candidates > 0 || args.target_candidates > 0)
+        && !matches!(name.as_str(), "eccp-131" | "eccp131")
+    {
+        return Err("--setup-candidates and --target-candidates currently require eccp-131".into());
+    }
+    if args.relation_arity == 3 && args.setup_candidates == 0 && args.target_candidates == 0 {
+        return Err("--relation-arity 3 requires setup or target candidates".into());
+    }
+    let report = if matches!(name.as_str(), "eccp-131" | "eccp131") {
+        let params = CurveParams::eccp131();
+        let record = SecgCurve {
+            name: params.name.into(),
+            oid: String::new(),
+            field: SecgField::Prime {
+                p: params.p.clone(),
+            },
+            a: params.a,
+            b: params.b,
+            gx: params.gx,
+            gy: params.gy,
+            order: params.n,
+            cofactor: params.h as u64,
+        };
+        let c = Curve::<MontField<3>>::from_secg(&record)?;
+        let r = measure(&c, &opts)?;
+        if args.setup_candidates > 0 || args.target_candidates > 0 {
+            let g = c.secg_generator(&record)?;
+            let published = params::named("eccp-131")?
+                .point
+                .ok_or("ECCp-131 profile has no published point")?;
+            let q = Pt {
+                x: c.field.embed_big(&params::number(&published.x)?)?,
+                y: c.field.embed_big(&params::number(&published.y)?)?,
+            };
+            ic_probe = Some(exact_ic_probe_with_arity(
+                &c,
+                &g,
+                &q,
+                size,
+                args.setup_candidates,
+                args.target_candidates,
+                args.seed,
+                args.relation_arity,
+            )?);
+        }
+        r
+    } else if matches!(name.as_str(), "secp192r1" | "p192" | "nist-p192" | "p-192") {
         let c = Curve::p192();
         let mut r = measure(&c, &opts)?;
         if raw > 0 {
@@ -152,16 +216,20 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
         "schema_version": 1,
         "operation": "prime",
         "status": "complete",
-        "evidence_scope": "exact_pair_sum_yield_with_monte_carlo",
+        "evidence_scope": if ic_probe.is_some() {
+            "exact_pair_sum_yield_and_bounded_relation_rank_descent"
+        } else { "exact_pair_sum_yield_with_monte_carlo" },
         "arguments": args,
         "report": report,
+        "ic_probe": ic_probe,
         "elapsed_seconds": started.elapsed().as_secs_f64(),
         "limitations": [
-            "Two-point sums only: a relation is a signed sum of two base points of the small-x base.",
+            "The yield report measures two-point sums of the small-x base. --relation-arity 3 tests signed three-point relations separately; the two-point yield is not its success probability.",
             "The yield is exact for the base built. The Monte Carlo rate agrees with it only where the yield is large enough to produce hits; at P-192 it is a null result and bounds the rate from above.",
-            "The cost of deciding a trial by a Semaev S₃ solve is measured only with --s3-trials; linear algebra and descent are not measured: a relation yield is not a discrete logarithm.",
+            "The cost of deciding a trial by a Semaev S₃ solve is measured only with --s3-trials. On ECCp-131, --setup-candidates and --target-candidates separately run and account for a bounded relation, rank, and descent probe; a yield alone is not a discrete logarithm.",
             "The base is capped at 8192 abscissae, and lower where the pair-sum keys would not fit in memory (wide fields).",
-            "With a cofactor h > 1 (every SECG binary curve, secp112r2, secp128r2) each small-x point enters the base as [h]P and targets are [h] times a uniform point, so base and targets lie in the prime-order subgroup and the yield is over that subgroup. --raw-samples measures, by sampling, the share of raw small-x pair sums that lie in the subgroup."
+            "With a cofactor h > 1 (every SECG binary curve, secp112r2, secp128r2) each small-x point enters the base as [h]P and targets are [h] times a uniform point, so base and targets lie in the subgroup. --raw-samples measures, by sampling, the share of raw small-x pair sums that lie in the subgroup.",
+            "The bounded ECCp-131 probe records natural scalar-derived relations and modular rank. Zero relations or an undetermined target logarithm apply only to its enumerated base, seed, and candidate budget."
         ]
     }))
 }
