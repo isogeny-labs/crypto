@@ -71,6 +71,11 @@ experiment was started. A safe checkpoint needs a reviewed, source-only payload;
 all original private journals live outside this checkout and must stay excluded.
 Do not route around the rejection with another tool or destination.
 
+After a clean public-source payload audit, a retry of the same checkpoint gate
+was permitted and actually stopped because no AWS profile or checkpoint upload
+token is configured. The earlier payload rejection is resolved for that audited
+state; see [current launch status](LAUNCH_STATUS.md). Nothing was uploaded.
+
 The current runtime also has no observed ready AWS identity or installed EKS MCP
 connection. The existing commit-building GitHub workflow executes ecbench specs,
 not this standalone collector. A real launch needs a tested-commit custom image,
@@ -93,7 +98,8 @@ Curve identity: original `icv1-fp57-t354478198-afcea726`, exact parameters and
 public point/base encodings in [public_source_case.json](public_source_case.json).
 
 [report.html](report.html), [report.pdf](report.pdf) and the editable SVG describe
-this implementation/control stage. No new graph-wide observation, speed or
+the implementation/control-stage snapshot; the later launch status is linked
+above. No new graph-wide observation, speed or
 regularity result exists, so the original volcano heatmaps, full-graph completion
 gauges, `docs/index-calculus-scoreboard.html`, `docs/ic/progress-timeline.json`,
 and leaderboard/benchmark rows remain unchanged. Unit-test counts are not a new

@@ -7,10 +7,10 @@
     "Codex"
   ],
   "status": "blocked",
-  "status_note": "Native development controls pass; no full-width experiment started. Source-only S3 checkpoint authorization, configured custom-command EKS access, tested image and qualified recovery remain prerequisites.",
+  "status_note": "Native development controls pass; no full-width experiment started. The audited source-only checkpoint gate reached execution but upload access is missing; configured custom-command EKS access, tested image and qualified recovery remain prerequisites.",
   "blocked_on": [
     "problem:problems/photo-volcano-two-sum-ic-recovery.md",
-    "note:Mandatory checkpoint gate upload rejected before execution by automatic approval review",
+    "note:Audited source-only checkpoint gate cannot upload because the configured AWS profile/checkpoint token is missing",
     "hw:Configured Iso Lab custom-command identity and tested-commit image required",
     "note:No native hash-table serialization or qualified CRIU restore is implemented for this workload"
   ],
