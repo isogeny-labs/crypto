@@ -132,3 +132,17 @@ explicitly retrieving the exact missing committed Git objects.
 The exact retained/added identity comparison and successful/failed browser logs
 are retained with the native/transfer evidence. This index refresh does not
 re-run solvers, change measurements or extend the dated transfer assessment.
+
+
+## Remove an obsolete workflow expression inherited from main
+
+The final-head workflow parser job [122491560066](https://github.com/isogeny-labs/crypto/actions/jobs/122491560066)
+parsed all 503 workflow YAML files, then actionlint correctly rejected
+`steps.peer.outputs.available` in `ic-semantic-metadata.yml`: that step ID no
+longer exists. The same three-line fallback is present on main. Remove the
+obsolete duplicate local-validation step. The preceding mandatory
+`validate_semantics.py --peer cryptanalysis-peer`, authenticated fetch and
+registry freshness check all remain intact; a missing token still fails closed.
+This changes no trigger or required-check policy. Conductor is unavailable in
+this runtime (`conductor check`: command not found); the documented absent-binary
+fallback applies, and the change is isolated to this repair branch.
