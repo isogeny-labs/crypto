@@ -7,6 +7,8 @@ mkdir -p audits
 one() {
   local d=$1 job p mode
   job=$(basename "$d"); p=$(echo "$job" | sed -E 's/.*-p([0-9]+).*/\1/')
+  # A session still being written (its log lacks "complete ->") is not audited yet.
+  grep -q "complete ->" "sessions/$job.log" 2>/dev/null || return 0
   # Resumable: a session already recorded as audited without error is skipped.
   grep -qE "^$job [^ ]+ exit 0$" audits/AUDITS.txt 2>/dev/null && return 0
   if [[ $job == rho-* || $job == xrho-* ]] || [ "$p" -le 197 ] || [[ $job == main-p293-t0 || $job == main-p401-t0 || $job == xmain-c2-p293-t0 || $job == lp2-p401-t0 ]]; then
@@ -14,7 +16,7 @@ one() {
   else
     mode=
   fi
-  "$BIN" verify --dir "$d" $mode --out "audits/$job.audit.json" > "audits/$job.audit.log" 2>&1
+  nice -n "${AUDIT_NICE:-0}" "$BIN" verify --dir "$d" $mode --out "audits/$job.audit.json" > "audits/$job.audit.log" 2>&1
   echo "$job ${mode:-integrity} exit $?" >> audits/AUDITS.txt
 }
 export -f one; export BIN
