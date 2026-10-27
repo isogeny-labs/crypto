@@ -100,8 +100,10 @@ models, relations and rank inside the cap on an emulated host. The separate
 confirmed the same installed model counts. Its 600-second natural attempt
 and 180-second short control were wall-censored with unknown final counters.
 Those host/source observations remain separate; natural yield, useful rank
-and a complete cold comparison remain open. K8192 and K16627 are still
-unconstructed in this frontier.
+and a complete cold comparison remain open. The [K16627 primary reconstruction](verification/k16627-primary-20261027/RESULT.md)
+adds a fourth constructed and generically replayed object; its bytes match a
+pre-existing S3 object from 17 October. K8192 remains unconstructed in this
+frontier.
 
 The exporter now has a one-object path for the five added sizes. It accepts
 only the two pinned curve arms, the three public-x policies, the three frozen
