@@ -1,0 +1,2394 @@
+{
+  "binary_sha256": "3a1eb934af1600542cec719d73d075268f7acf33f89dbafca091b1c60f86b359",
+  "closure": false,
+  "closure_variants": [
+    "full"
+  ],
+  "host": {
+    "build": {
+      "binary_path": "/home/user/crypto/target-repl/release/ecbench",
+      "binary_sha256": "3a1eb934af1600542cec719d73d075268f7acf33f89dbafca091b1c60f86b359",
+      "build_env": {},
+      "debug_assertions": false,
+      "git_commit": "e60a0c53b164b908d966ac6780b8cd8fd89be7ab",
+      "git_commit_source": "runtime_worktree",
+      "git_dirty": false,
+      "runtime_git_commit": "e60a0c53b164b908d966ac6780b8cd8fd89be7ab",
+      "runtime_git_dirty": false,
+      "target_arch": "x86_64",
+      "target_os": "linux"
+    },
+    "env_class_id": "ECBENV2ha932978c2a89",
+    "process_affinity": [
+      3
+    ],
+    "stable": {
+      "arch": "x86_64",
+      "cpu_model": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+      "cpu_settings": {
+        "0": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        },
+        "1": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        },
+        "2": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        },
+        "3": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        }
+      },
+      "cpu_signature": "6/85/7",
+      "cpu_vendor": "GenuineIntel",
+      "features": [
+        "adx",
+        "aes",
+        "avx",
+        "avx2",
+        "avx512bw",
+        "avx512dq",
+        "avx512f",
+        "avx512vl",
+        "bmi1",
+        "bmi2",
+        "fma",
+        "pclmulqdq",
+        "popcnt",
+        "sse4.2"
+      ],
+      "flags_sha256": "e28bebf6d58da864dd355505bf305dd3bd502a1e851ac057e69aedb2dcc47735",
+      "kernel_release": "6.18.44-fc-v165",
+      "logical_cpus": 4,
+      "mem_total_kib": 16477356,
+      "microcode": "0x1",
+      "numa_nodes": 1,
+      "os": "linux",
+      "packages": 1,
+      "perf_levels": [],
+      "physical_cores": 4,
+      "rustc_vv": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.0\nLLVM version: 22.1.6",
+      "topology": {
+        "cpus": [
+          {
+            "core_id": 0,
+            "cpu": 0,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              0
+            ]
+          },
+          {
+            "core_id": 1,
+            "cpu": 1,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              1
+            ]
+          },
+          {
+            "core_id": 2,
+            "cpu": 2,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              2
+            ]
+          },
+          {
+            "core_id": 3,
+            "cpu": 3,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              3
+            ]
+          }
+        ],
+        "nodes": [
+          {
+            "cpus": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "distances": [
+              10
+            ],
+            "mem_total_kib": 16477356,
+            "node": 0
+          }
+        ]
+      },
+      "transparent_hugepages": "always [madvise] never",
+      "virtualization": {
+        "cpu_flag": "hypervisor",
+        "systemd_detect_virt_vm": "kvm"
+      }
+    }
+  },
+  "ic_complete": false,
+  "ic_trials": 2000,
+  "instances": {
+    "m14": {
+      "curve": "icv1-f2m56-tm338854401-5d597dcf",
+      "fq_muls_per_add": 179,
+      "group_bits": 56,
+      "in_situ": {
+        "closure_variants": {},
+        "ic_pipeline": {
+          "full_matrix_rank": {
+            "max": 14.0,
+            "median": 10.0,
+            "min": 9.0,
+            "rel_spread": 0.5,
+            "values": [
+              14.0,
+              10.0,
+              9.0
+            ]
+          },
+          "full_matrix_rows": {
+            "max": 14.0,
+            "median": 10.0,
+            "min": 9.0,
+            "rel_spread": 0.5,
+            "values": [
+              14.0,
+              10.0,
+              9.0
+            ]
+          },
+          "full_priced_fme": {
+            "max": 1148945627.0635872,
+            "median": 1148544609.9913602,
+            "min": 1148308263.470874,
+            "rel_spread": 0.0005549315082484363,
+            "values": [
+              1148945627.0635872,
+              1148544609.9913602,
+              1148308263.470874
+            ]
+          },
+          "full_relations_found": {
+            "max": 14.0,
+            "median": 10.0,
+            "min": 9.0,
+            "rel_spread": 0.5,
+            "values": [
+              14.0,
+              10.0,
+              9.0
+            ]
+          },
+          "full_sys_cpu_ns": {
+            "max": 2844210000.0,
+            "median": 2692844000.0,
+            "min": 2403201000.0,
+            "rel_spread": 0.1637707197297727,
+            "values": [
+              2692844000.0,
+              2844210000.0,
+              2403201000.0
+            ]
+          },
+          "full_targets_tried": {
+            "max": 2000.0,
+            "median": 2000.0,
+            "min": 2000.0,
+            "rel_spread": 0.0,
+            "values": [
+              2000.0,
+              2000.0,
+              2000.0
+            ]
+          },
+          "full_unpriced_entries": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "full_user_cpu_ns": {
+            "max": 10086497000.0,
+            "median": 9891845000.0,
+            "min": 8820421000.0,
+            "rel_spread": 0.1279918963550278,
+            "values": [
+              10086497000.0,
+              9891845000.0,
+              8820421000.0
+            ]
+          },
+          "full_wall_ns": {
+            "max": 12932993107.0,
+            "median": 12863187403.0,
+            "min": 11406506333.0,
+            "rel_spread": 0.11867095815178648,
+            "values": [
+              12932993107.0,
+              12863187403.0,
+              11406506333.0
+            ]
+          },
+          "ic_complete": false,
+          "ic_trials_requested": 2000,
+          "legacy_matrix_rank": {
+            "max": 14.0,
+            "median": 10.0,
+            "min": 9.0,
+            "rel_spread": 0.5,
+            "values": [
+              14.0,
+              10.0,
+              9.0
+            ]
+          },
+          "legacy_matrix_rows": {
+            "max": 14.0,
+            "median": 10.0,
+            "min": 9.0,
+            "rel_spread": 0.5,
+            "values": [
+              14.0,
+              10.0,
+              9.0
+            ]
+          },
+          "legacy_priced_fq_ops": {
+            "max": 506419166.0,
+            "median": 506020252.0,
+            "min": 505791543.0,
+            "rel_spread": 0.0012403120181838099,
+            "values": [
+              506419166.0,
+              506020252.0,
+              505791543.0
+            ]
+          },
+          "legacy_relations_found": {
+            "max": 14.0,
+            "median": 10.0,
+            "min": 9.0,
+            "rel_spread": 0.5,
+            "values": [
+              14.0,
+              10.0,
+              9.0
+            ]
+          },
+          "legacy_targets_tried": {
+            "max": 2000.0,
+            "median": 2000.0,
+            "min": 2000.0,
+            "rel_spread": 0.0,
+            "values": [
+              2000.0,
+              2000.0,
+              2000.0
+            ]
+          },
+          "legacy_wall_ns": {
+            "max": 13634746653.0,
+            "median": 12901927007.0,
+            "min": 11136912253.0,
+            "rel_spread": 0.19360165335339352,
+            "values": [
+              11136912253.0,
+              13634746653.0,
+              12901927007.0
+            ]
+          },
+          "ns_per_full_priced_fme": {
+            "max": 11.25640134951681,
+            "median": 11.199554019148426,
+            "min": 9.933313811156177,
+            "rel_spread": 0.11813752012789848,
+            "values": [
+              11.25640134951681,
+              11.199554019148426,
+              9.933313811156177
+            ]
+          },
+          "ns_per_legacy_priced_fq_op": {
+            "max": 26.945061188973916,
+            "median": 25.508388160218804,
+            "min": 21.991490450422646,
+            "rel_spread": 0.1941937964656086,
+            "values": [
+              21.991490450422646,
+              26.945061188973916,
+              25.508388160218804
+            ]
+          },
+          "rayon_threads": 1,
+          "reached_relations": {
+            "max": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "rel_spread": 0.0,
+            "values": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "recovered": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "reps": 3,
+          "spec": {
+            "factor_base": "bin-t-line",
+            "linalg": "wiedemann",
+            "max_cofactor": 16,
+            "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+            "source": "claim sessions e-m15 and d-ladder (ic-wied arm); max_cofactor 16 for m <= 12 (d-ladder) and 2 for m >= 15 (e-m15)"
+          }
+        },
+        "rho_full": null,
+        "rho_negation": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 185.6146443977436,
+            "median": 185.31542623674912,
+            "min": 184.55366765643902,
+            "rel_spread": 0.005725247826638773,
+            "values": [
+              184.55366765643902,
+              185.31542623674912,
+              185.6146443977436
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 188.76686022397345,
+            "median": 188.3479125248509,
+            "min": 187.75579042979234,
+            "rel_spread": 0.005368096628348398,
+            "values": [
+              187.75579042979234,
+              188.3479125248509,
+              188.76686022397345
+            ]
+          },
+          "note": "rho.negation (one walk, an F_q^4 inversion per addition)",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 4.473065075069429,
+            "median": 4.428785227948529,
+            "min": 3.740829028912539,
+            "rel_spread": 0.16533564137091178,
+            "values": [
+              4.473065075069429,
+              3.740829028912539,
+              4.428785227948529
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 4.8606535675205915,
+            "median": 4.770766587661324,
+            "min": 4.618613683206187,
+            "rel_spread": 0.05073396064699431,
+            "values": [
+              4.618613683206187,
+              4.8606535675205915,
+              4.770766587661324
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 825.5205652699879,
+            "median": 822.0473951996461,
+            "min": 693.2333259717315,
+            "rel_spread": 0.16092410251616762,
+            "values": [
+              825.5205652699879,
+              693.2333259717315,
+              822.0473951996461
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 915.4939529489728,
+            "median": 900.562629614268,
+            "min": 867.171462780232,
+            "rel_spread": 0.05365811169561688,
+            "values": [
+              867.171462780232,
+              915.4939529489728,
+              900.562629614268
+            ]
+          },
+          "steps_requested": 25000
+        },
+        "rho_negation_batched": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 143.02476366342364,
+            "median": 142.9305463758537,
+            "min": 142.8729119079726,
+            "rel_spread": 0.0010624163924465452,
+            "values": [
+              143.02476366342364,
+              142.8729119079726,
+              142.9305463758537
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 144.20959066742373,
+            "median": 144.1740498818479,
+            "min": 144.0803077018262,
+            "rel_spread": 0.0008967145315226568,
+            "values": [
+              144.20959066742373,
+              144.0803077018262,
+              144.1740498818479
+            ]
+          },
+          "note": "rho.negation_batched, 256 lockstep walks; 'whole' includes set-up, 'marginal' is the difference of a long and a quarter-length segment",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 5.003979407694735,
+            "median": 4.367059183994967,
+            "min": 4.242043018561041,
+            "rel_spread": 0.17447356608450576,
+            "values": [
+              4.367059183994967,
+              4.242043018561041,
+              5.003979407694735
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 4.803840932600989,
+            "median": 4.341744159259359,
+            "min": 4.227865483540641,
+            "rel_spread": 0.13265992373871288,
+            "values": [
+              4.341744159259359,
+              4.227865483540641,
+              4.803840932600989
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 715.2215107953293,
+            "median": 624.5976076950639,
+            "min": 606.0730385007017,
+            "rel_spread": 0.1747500646014565,
+            "values": [
+              624.5976076950639,
+              606.0730385007017,
+              715.2215107953293
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 692.5892022412779,
+            "median": 626.1211479894699,
+            "min": 609.1521597904658,
+            "rel_spread": 0.13326022083543382,
+            "values": [
+              626.1211479894699,
+              609.1521597904658,
+              692.5892022412779
+            ]
+          },
+          "steps_requested": 100000
+        }
+      },
+      "m": 14,
+      "micro": {
+        "fq4_inv_counted_fq_ops": {
+          "max": 115.98915,
+          "median": 115.98915,
+          "min": 115.98915,
+          "rel_spread": 0.0,
+          "values": [
+            115.98915,
+            115.98915,
+            115.98915
+          ]
+        },
+        "fq4_inv_ns": {
+          "max": 641.98947,
+          "median": 450.26554,
+          "min": 415.68724,
+          "rel_spread": 0.5025972673813768,
+          "values": [
+            641.98947,
+            450.26554,
+            415.68724
+          ]
+        },
+        "fq4_mul_counted_fq_ops": {
+          "max": 24.99858,
+          "median": 24.99858,
+          "min": 24.99858,
+          "rel_spread": 0.0,
+          "values": [
+            24.99858,
+            24.99858,
+            24.99858
+          ]
+        },
+        "fq4_mul_ns": {
+          "max": 121.458295,
+          "median": 92.856425,
+          "min": 78.9238725,
+          "rel_spread": 0.4580665527452732,
+          "values": [
+            121.458295,
+            92.856425,
+            78.9238725
+          ]
+        },
+        "fq4_sq_counted_fq_ops": {
+          "max": 13.0,
+          "median": 13.0,
+          "min": 13.0,
+          "rel_spread": 0.0,
+          "values": [
+            13.0,
+            13.0,
+            13.0
+          ]
+        },
+        "fq4_sq_ns": {
+          "max": 67.803315,
+          "median": 52.6966175,
+          "min": 47.23521,
+          "rel_spread": 0.3903116741790874,
+          "values": [
+            67.803315,
+            52.6966175,
+            47.23521
+          ]
+        },
+        "fq_inv_counted_dependent": {
+          "max": 19.6453556,
+          "median": 19.1087116,
+          "min": 17.073744,
+          "rel_spread": 0.13457796913947861,
+          "values": [
+            19.6453556,
+            19.1087116,
+            17.073744
+          ]
+        },
+        "fq_inv_counted_independent": {
+          "max": 7.501829,
+          "median": 7.346598,
+          "min": 4.3386632,
+          "rel_spread": 0.4305619825666247,
+          "values": [
+            7.346598,
+            7.501829,
+            4.3386632
+          ]
+        },
+        "fq_mul_counted_dependent": {
+          "max": 10.4981382,
+          "median": 10.348676,
+          "min": 9.63357545,
+          "rel_spread": 0.08354331993773884,
+          "values": [
+            9.63357545,
+            10.348676,
+            10.4981382
+          ]
+        },
+        "fq_mul_counted_independent": {
+          "max": 3.3753248,
+          "median": 3.2995193,
+          "min": 3.2744296,
+          "rel_spread": 0.03057875733595499,
+          "values": [
+            3.3753248,
+            3.2995193,
+            3.2744296
+          ]
+        },
+        "fq_mul_uncounted_dependent": {
+          "max": 9.43451215,
+          "median": 8.8316732,
+          "min": 8.40376025,
+          "rel_spread": 0.11671082892876973,
+          "values": [
+            9.43451215,
+            8.40376025,
+            8.8316732
+          ]
+        },
+        "fq_sq_counted_dependent": {
+          "max": 8.8483212,
+          "median": 8.3904709,
+          "min": 8.3825542,
+          "rel_spread": 0.05551142546719295,
+          "values": [
+            8.3825542,
+            8.8483212,
+            8.3904709
+          ]
+        },
+        "group_add_counted_fq_ops": {
+          "max": 178.983425,
+          "median": 178.983425,
+          "min": 178.983425,
+          "rel_spread": 0.0,
+          "values": [
+            178.983425,
+            178.983425,
+            178.983425
+          ]
+        },
+        "group_add_ns": {
+          "max": 1060.0203,
+          "median": 661.353575,
+          "min": 619.30895,
+          "rel_spread": 0.666377814620568,
+          "values": [
+            1060.0203,
+            661.353575,
+            619.30895
+          ]
+        },
+        "group_double_counted_fq_ops": {
+          "max": 191.9842,
+          "median": 191.9842,
+          "min": 191.9842,
+          "rel_spread": 0.0,
+          "values": [
+            191.9842,
+            191.9842,
+            191.9842
+          ]
+        },
+        "group_double_ns": {
+          "max": 1089.20145,
+          "median": 659.076775,
+          "min": 653.229875,
+          "rel_spread": 0.6614882992956321,
+          "values": [
+            1089.20145,
+            659.076775,
+            653.229875
+          ]
+        }
+      },
+      "ns_per_fq_mul_local": null,
+      "ns_per_fq_mul_table": null,
+      "q_bits": 14,
+      "r_bits": 56,
+      "scalar_width_bits": 64
+    },
+    "m15": {
+      "curve": "icv1-f2m60-t212516335-b0271609",
+      "fq_muls_per_add": 159,
+      "group_bits": 60,
+      "in_situ": {
+        "closure_variants": {},
+        "ic_pipeline": {
+          "full_matrix_rank": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "full_matrix_rows": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "full_priced_fme": {
+            "max": 992936440.7586219,
+            "median": 992593969.820016,
+            "min": 992542603.830199,
+            "rel_spread": 0.00039677545945029376,
+            "values": [
+              992936440.7586219,
+              992593969.820016,
+              992542603.830199
+            ]
+          },
+          "full_relations_found": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "full_sys_cpu_ns": {
+            "max": 2439973000.0,
+            "median": 2226878000.0,
+            "min": 2200908000.0,
+            "rel_spread": 0.10735433193915428,
+            "values": [
+              2200908000.0,
+              2439973000.0,
+              2226878000.0
+            ]
+          },
+          "full_targets_tried": {
+            "max": 2000.0,
+            "median": 2000.0,
+            "min": 2000.0,
+            "rel_spread": 0.0,
+            "values": [
+              2000.0,
+              2000.0,
+              2000.0
+            ]
+          },
+          "full_unpriced_entries": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "full_user_cpu_ns": {
+            "max": 8948829000.0,
+            "median": 8677436000.0,
+            "min": 7902728000.0,
+            "rel_spread": 0.12055415908570227,
+            "values": [
+              8677436000.0,
+              8948829000.0,
+              7902728000.0
+            ]
+          },
+          "full_wall_ns": {
+            "max": 11507857236.0,
+            "median": 11011497023.0,
+            "min": 10329561252.0,
+            "rel_spread": 0.10700597580318666,
+            "values": [
+              11011497023.0,
+              11507857236.0,
+              10329561252.0
+            ]
+          },
+          "ic_complete": false,
+          "ic_trials_requested": 2000,
+          "legacy_matrix_rank": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "legacy_matrix_rows": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "legacy_priced_fq_ops": {
+            "max": 521371775.0,
+            "median": 521021485.0,
+            "min": 520976184.0,
+            "rel_spread": 0.0007592604362562899,
+            "values": [
+              521371775.0,
+              521021485.0,
+              520976184.0
+            ]
+          },
+          "legacy_relations_found": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "legacy_targets_tried": {
+            "max": 2000.0,
+            "median": 2000.0,
+            "min": 2000.0,
+            "rel_spread": 0.0,
+            "values": [
+              2000.0,
+              2000.0,
+              2000.0
+            ]
+          },
+          "legacy_wall_ns": {
+            "max": 13069984574.0,
+            "median": 12225158034.0,
+            "min": 11014892682.0,
+            "rel_spread": 0.16810350314363878,
+            "values": [
+              13069984574.0,
+              12225158034.0,
+              11014892682.0
+            ]
+          },
+          "ns_per_full_priced_fme": {
+            "max": 11.593720681263743,
+            "median": 11.089830699120087,
+            "min": 10.407171654031234,
+            "rel_spread": 0.10699433196276428,
+            "values": [
+              11.089830699120087,
+              11.593720681263743,
+              10.407171654031234
+            ]
+          },
+          "ns_per_legacy_priced_fq_op": {
+            "max": 25.068454413359834,
+            "median": 23.463827089587294,
+            "min": 21.14279504569445,
+            "rel_spread": 0.16730686569913836,
+            "values": [
+              25.068454413359834,
+              23.463827089587294,
+              21.14279504569445
+            ]
+          },
+          "rayon_threads": 1,
+          "reached_relations": {
+            "max": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "rel_spread": 0.0,
+            "values": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "recovered": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "reps": 3,
+          "spec": {
+            "factor_base": "bin-t-line",
+            "linalg": "wiedemann",
+            "max_cofactor": 2,
+            "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+            "source": "claim sessions e-m15 and d-ladder (ic-wied arm); max_cofactor 16 for m <= 12 (d-ladder) and 2 for m >= 15 (e-m15)"
+          }
+        },
+        "rho_full": null,
+        "rho_negation": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 164.83365581292497,
+            "median": 164.5363982559744,
+            "min": 164.4384513567174,
+            "rel_spread": 0.0024019272355333067,
+            "values": [
+              164.83365581292497,
+              164.5363982559744,
+              164.4384513567174
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 167.21805383022775,
+            "median": 167.18346991143116,
+            "min": 167.06712130605496,
+            "rel_spread": 0.0009027957384348314,
+            "values": [
+              167.21805383022775,
+              167.18346991143116,
+              167.06712130605496
+            ]
+          },
+          "note": "rho.negation (one walk, an F_q^4 inversion per addition)",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 4.583765148755801,
+            "median": 4.398285609822775,
+            "min": 4.27282172845071,
+            "rel_spread": 0.07069650493152498,
+            "values": [
+              4.27282172845071,
+              4.398285609822775,
+              4.583765148755801
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 4.497499251024631,
+            "median": 4.350614570612556,
+            "min": 4.300217962140655,
+            "rel_spread": 0.0453456139775211,
+            "values": [
+              4.300217962140655,
+              4.350614570612556,
+              4.497499251024631
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 753.7472424442974,
+            "median": 723.6780727413212,
+            "min": 704.3048261374316,
+            "rel_spread": 0.06832100925702493,
+            "values": [
+              704.3048261374316,
+              723.6780727413212,
+              753.7472424442974
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 751.3842529448233,
+            "median": 727.3508401622382,
+            "min": 719.0740786749483,
+            "rel_spread": 0.044421718496493526,
+            "values": [
+              719.0740786749483,
+              727.3508401622382,
+              751.3842529448233
+            ]
+          },
+          "steps_requested": 25000
+        },
+        "rho_negation_batched": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 122.44130464763481,
+            "median": 122.2807433223589,
+            "min": 122.22974107671342,
+            "rel_spread": 0.0017301462615716748,
+            "values": [
+              122.44130464763481,
+              122.22974107671342,
+              122.2807433223589
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 123.43798613765249,
+            "median": 123.32293579874941,
+            "min": 123.28650839486819,
+            "rel_spread": 0.001228301465604831,
+            "values": [
+              123.43798613765249,
+              123.28650839486819,
+              123.32293579874941
+            ]
+          },
+          "note": "rho.negation_batched, 256 lockstep walks; 'whole' includes set-up, 'marginal' is the difference of a long and a quarter-length segment",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 5.045852391948127,
+            "median": 4.839049554982322,
+            "min": 4.798020639049341,
+            "rel_spread": 0.05121496485681101,
+            "values": [
+              4.798020639049341,
+              5.045852391948127,
+              4.839049554982322
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 4.952497889262597,
+            "median": 4.858626359299167,
+            "min": 4.8389037593671675,
+            "rel_spread": 0.023379885896765044,
+            "values": [
+              4.858626359299167,
+              4.952497889262597,
+              4.8389037593671675
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 616.7532313791347,
+            "median": 591.7225765569683,
+            "min": 587.4759067714798,
+            "rel_spread": 0.04947812668904688,
+            "values": [
+              587.4759067714798,
+              616.7532313791347,
+              591.7225765569683
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 610.5761726001402,
+            "median": 599.7390531872037,
+            "min": 596.7478176527643,
+            "rel_spread": 0.02305728612116832,
+            "values": [
+              599.7390531872037,
+              610.5761726001402,
+              596.7478176527643
+            ]
+          },
+          "steps_requested": 100000
+        }
+      },
+      "m": 15,
+      "micro": {
+        "fq4_inv_counted_fq_ops": {
+          "max": 106.99562,
+          "median": 106.99562,
+          "min": 106.99562,
+          "rel_spread": 0.0,
+          "values": [
+            106.99562,
+            106.99562,
+            106.99562
+          ]
+        },
+        "fq4_inv_ns": {
+          "max": 625.96214,
+          "median": 591.35564,
+          "min": 571.16216,
+          "rel_spread": 0.09266839832625931,
+          "values": [
+            625.96214,
+            591.35564,
+            571.16216
+          ]
+        },
+        "fq4_mul_counted_fq_ops": {
+          "max": 21.99936,
+          "median": 21.99936,
+          "min": 21.99936,
+          "rel_spread": 0.0,
+          "values": [
+            21.99936,
+            21.99936,
+            21.99936
+          ]
+        },
+        "fq4_mul_ns": {
+          "max": 130.64376,
+          "median": 121.482905,
+          "min": 75.445185,
+          "rel_spread": 0.4543731893800201,
+          "values": [
+            130.64376,
+            75.445185,
+            121.482905
+          ]
+        },
+        "fq4_sq_counted_fq_ops": {
+          "max": 7.99961,
+          "median": 7.99961,
+          "min": 7.99961,
+          "rel_spread": 0.0,
+          "values": [
+            7.99961,
+            7.99961,
+            7.99961
+          ]
+        },
+        "fq4_sq_ns": {
+          "max": 55.6935625,
+          "median": 53.878585,
+          "min": 52.262465,
+          "rel_spread": 0.0636820269129191,
+          "values": [
+            55.6935625,
+            53.878585,
+            52.262465
+          ]
+        },
+        "fq_inv_counted_dependent": {
+          "max": 23.855155,
+          "median": 21.7144734,
+          "min": 20.9890018,
+          "rel_spread": 0.13199275649945072,
+          "values": [
+            23.855155,
+            20.9890018,
+            21.7144734
+          ]
+        },
+        "fq_inv_counted_independent": {
+          "max": 8.2557644,
+          "median": 7.974367,
+          "min": 4.8132194,
+          "rel_spread": 0.4317013500883518,
+          "values": [
+            7.974367,
+            4.8132194,
+            8.2557644
+          ]
+        },
+        "fq_mul_counted_dependent": {
+          "max": 12.9348885,
+          "median": 11.54610165,
+          "min": 10.35977915,
+          "rel_spread": 0.2230284669284892,
+          "values": [
+            10.35977915,
+            12.9348885,
+            11.54610165
+          ]
+        },
+        "fq_mul_counted_independent": {
+          "max": 6.9569833,
+          "median": 6.84092435,
+          "min": 4.4064018,
+          "rel_spread": 0.3728416467578683,
+          "values": [
+            4.4064018,
+            6.84092435,
+            6.9569833
+          ]
+        },
+        "fq_mul_uncounted_dependent": {
+          "max": 13.0120366,
+          "median": 10.8117355,
+          "min": 10.32355365,
+          "rel_spread": 0.2486634037615886,
+          "values": [
+            10.32355365,
+            13.0120366,
+            10.8117355
+          ]
+        },
+        "fq_sq_counted_dependent": {
+          "max": 13.00260725,
+          "median": 12.09858065,
+          "min": 11.24635815,
+          "rel_spread": 0.14516158141244442,
+          "values": [
+            12.09858065,
+            11.24635815,
+            13.00260725
+          ]
+        },
+        "group_add_counted_fq_ops": {
+          "max": 158.991825,
+          "median": 158.991825,
+          "min": 158.991825,
+          "rel_spread": 0.0,
+          "values": [
+            158.991825,
+            158.991825,
+            158.991825
+          ]
+        },
+        "group_add_ns": {
+          "max": 991.212075,
+          "median": 907.47365,
+          "min": 867.1161,
+          "rel_spread": 0.1367488466469523,
+          "values": [
+            991.212075,
+            907.47365,
+            867.1161
+          ]
+        },
+        "group_double_counted_fq_ops": {
+          "max": 166.993875,
+          "median": 166.993875,
+          "min": 166.993875,
+          "rel_spread": 0.0,
+          "values": [
+            166.993875,
+            166.993875,
+            166.993875
+          ]
+        },
+        "group_double_ns": {
+          "max": 969.64265,
+          "median": 713.168275,
+          "min": 661.37525,
+          "rel_spread": 0.4322505792899999,
+          "values": [
+            969.64265,
+            713.168275,
+            661.37525
+          ]
+        }
+      },
+      "ns_per_fq_mul_local": null,
+      "ns_per_fq_mul_table": null,
+      "q_bits": 15,
+      "r_bits": 59,
+      "scalar_width_bits": 64
+    },
+    "m16": {
+      "curve": "icv1-f2m64-t2270583391-50e5eeb7",
+      "fq_muls_per_add": 179,
+      "group_bits": 64,
+      "in_situ": {
+        "closure_variants": {},
+        "ic_pipeline": {
+          "full_matrix_rank": {
+            "max": 12.0,
+            "median": 11.0,
+            "min": 9.0,
+            "rel_spread": 0.2727272727272727,
+            "values": [
+              11.0,
+              12.0,
+              9.0
+            ]
+          },
+          "full_matrix_rows": {
+            "max": 12.0,
+            "median": 11.0,
+            "min": 9.0,
+            "rel_spread": 0.2727272727272727,
+            "values": [
+              11.0,
+              12.0,
+              9.0
+            ]
+          },
+          "full_priced_fme": {
+            "max": 1019352758.2137522,
+            "median": 1018999659.490431,
+            "min": 1018814701.689326,
+            "rel_spread": 0.0005280242435951033,
+            "values": [
+              1019352758.2137522,
+              1018999659.490431,
+              1018814701.689326
+            ]
+          },
+          "full_relations_found": {
+            "max": 12.0,
+            "median": 11.0,
+            "min": 9.0,
+            "rel_spread": 0.2727272727272727,
+            "values": [
+              11.0,
+              12.0,
+              9.0
+            ]
+          },
+          "full_sys_cpu_ns": {
+            "max": 2343296000.0,
+            "median": 2212838000.0,
+            "min": 2124534000.0,
+            "rel_spread": 0.09886037748809448,
+            "values": [
+              2343296000.0,
+              2124534000.0,
+              2212838000.0
+            ]
+          },
+          "full_targets_tried": {
+            "max": 2000.0,
+            "median": 2000.0,
+            "min": 2000.0,
+            "rel_spread": 0.0,
+            "values": [
+              2000.0,
+              2000.0,
+              2000.0
+            ]
+          },
+          "full_unpriced_entries": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "full_user_cpu_ns": {
+            "max": 10540486000.0,
+            "median": 9831059000.0,
+            "min": 9767963000.0,
+            "rel_spread": 0.07857983560062044,
+            "values": [
+              10540486000.0,
+              9767963000.0,
+              9831059000.0
+            ]
+          },
+          "full_wall_ns": {
+            "max": 13010734118.0,
+            "median": 12206593093.0,
+            "min": 12110085501.0,
+            "rel_spread": 0.07378378308657528,
+            "values": [
+              13010734118.0,
+              12110085501.0,
+              12206593093.0
+            ]
+          },
+          "ic_complete": false,
+          "ic_trials_requested": 2000,
+          "legacy_matrix_rank": {
+            "max": 12.0,
+            "median": 11.0,
+            "min": 9.0,
+            "rel_spread": 0.2727272727272727,
+            "values": [
+              11.0,
+              12.0,
+              9.0
+            ]
+          },
+          "legacy_matrix_rows": {
+            "max": 12.0,
+            "median": 11.0,
+            "min": 9.0,
+            "rel_spread": 0.2727272727272727,
+            "values": [
+              11.0,
+              12.0,
+              9.0
+            ]
+          },
+          "legacy_priced_fq_ops": {
+            "max": 546163851.0,
+            "median": 545820100.0,
+            "min": 545626334.0,
+            "rel_spread": 0.0009847878449327902,
+            "values": [
+              546163851.0,
+              545820100.0,
+              545626334.0
+            ]
+          },
+          "legacy_relations_found": {
+            "max": 12.0,
+            "median": 11.0,
+            "min": 9.0,
+            "rel_spread": 0.2727272727272727,
+            "values": [
+              11.0,
+              12.0,
+              9.0
+            ]
+          },
+          "legacy_targets_tried": {
+            "max": 2000.0,
+            "median": 2000.0,
+            "min": 2000.0,
+            "rel_spread": 0.0,
+            "values": [
+              2000.0,
+              2000.0,
+              2000.0
+            ]
+          },
+          "legacy_wall_ns": {
+            "max": 13627450608.0,
+            "median": 12713668930.0,
+            "min": 11264964728.0,
+            "rel_spread": 0.1858225106385557,
+            "values": [
+              12713668930.0,
+              13627450608.0,
+              11264964728.0
+            ]
+          },
+          "ns_per_full_priced_fme": {
+            "max": 12.763720913257908,
+            "median": 11.981170935951253,
+            "min": 11.884288074302072,
+            "rel_spread": 0.07340124297175071,
+            "values": [
+              12.763720913257908,
+              11.884288074302072,
+              11.981170935951253
+            ]
+          },
+          "ns_per_legacy_priced_fq_op": {
+            "max": 24.966927029620198,
+            "median": 23.27812231937701,
+            "min": 20.64593298753795,
+            "rel_spread": 0.18562468152705752,
+            "values": [
+              23.27812231937701,
+              24.966927029620198,
+              20.64593298753795
+            ]
+          },
+          "rayon_threads": 1,
+          "reached_relations": {
+            "max": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "rel_spread": 0.0,
+            "values": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "recovered": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "reps": 3,
+          "spec": {
+            "factor_base": "bin-t-line",
+            "linalg": "wiedemann",
+            "max_cofactor": 2,
+            "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+            "source": "claim sessions e-m15 and d-ladder (ic-wied arm); max_cofactor 16 for m <= 12 (d-ladder) and 2 for m >= 15 (e-m15)"
+          }
+        },
+        "rho_full": null,
+        "rho_negation": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 185.47640362511052,
+            "median": 185.1647818171788,
+            "min": 184.78447563996696,
+            "rel_spread": 0.003736822836141352,
+            "values": [
+              185.47640362511052,
+              184.78447563996696,
+              185.1647818171788
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 188.49179444674678,
+            "median": 188.4346440397351,
+            "min": 187.9040971419131,
+            "rel_spread": 0.0031188389365904225,
+            "values": [
+              188.49179444674678,
+              187.9040971419131,
+              188.4346440397351
+            ]
+          },
+          "note": "rho.negation (one walk, an F_q^4 inversion per addition)",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 13.16492078819419,
+            "median": 8.229797027357959,
+            "min": 6.42844561657116,
+            "rel_spread": 0.8185469397640374,
+            "values": [
+              13.16492078819419,
+              8.229797027357959,
+              6.42844561657116
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 11.74456253722539,
+            "median": 8.859497698005994,
+            "min": 6.264607263440233,
+            "rel_spread": 0.618540176946886,
+            "values": [
+              11.74456253722539,
+              8.859497698005994,
+              6.264607263440233
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 2441.7821618037137,
+            "median": 1520.7387283236994,
+            "min": 1190.3217300159981,
+            "rel_spread": 0.8229292833011443,
+            "values": [
+              2441.7821618037137,
+              1520.7387283236994,
+              1190.3217300159981
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 2213.7536676336513,
+            "median": 1664.7359160746737,
+            "min": 1180.4690397350994,
+            "rel_spread": 0.6206898150758722,
+            "values": [
+              2213.7536676336513,
+              1664.7359160746737,
+              1180.4690397350994
+            ]
+          },
+          "steps_requested": 25000
+        },
+        "rho_negation_batched": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 143.02303855375203,
+            "median": 142.9776602484643,
+            "min": 142.94657466325097,
+            "rel_spread": 0.0005347960679184581,
+            "values": [
+              142.9776602484643,
+              142.94657466325097,
+              143.02303855375203
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 144.22007761859544,
+            "median": 144.21177332934144,
+            "min": 144.1550811519135,
+            "rel_spread": 0.00045070152860205424,
+            "values": [
+              144.1550811519135,
+              144.21177332934144,
+              144.22007761859544
+            ]
+          },
+          "note": "rho.negation_batched, 256 lockstep walks; 'whole' includes set-up, 'marginal' is the difference of a long and a quarter-length segment",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 9.861756357616953,
+            "median": 8.26124604830684,
+            "min": 8.121015185767586,
+            "rel_spread": 0.21071169671869722,
+            "values": [
+              8.121015185767586,
+              8.26124604830684,
+              9.861756357616953
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 9.719442054452502,
+            "median": 8.04501236149028,
+            "min": 7.810815099593603,
+            "rel_spread": 0.23724350803922686,
+            "values": [
+              7.810815099593603,
+              8.04501236149028,
+              9.719442054452502
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 1410.4583597431588,
+            "median": 1180.9168250557805,
+            "min": 1161.1237501032972,
+            "rel_spread": 0.2111364698594114,
+            "values": [
+              1161.1237501032972,
+              1180.9168250557805,
+              1410.4583597431588
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 1401.7386875025804,
+            "median": 1160.185499106986,
+            "min": 1125.9686845445071,
+            "rel_spread": 0.23769475068455692,
+            "values": [
+              1125.9686845445071,
+              1160.185499106986,
+              1401.7386875025804
+            ]
+          },
+          "steps_requested": 100000
+        }
+      },
+      "m": 16,
+      "micro": {
+        "fq4_inv_counted_fq_ops": {
+          "max": 115.99741,
+          "median": 115.99741,
+          "min": 115.99741,
+          "rel_spread": 0.0,
+          "values": [
+            115.99741,
+            115.99741,
+            115.99741
+          ]
+        },
+        "fq4_inv_ns": {
+          "max": 1220.04372,
+          "median": 788.18717,
+          "min": 584.0538,
+          "rel_spread": 0.8069021473668492,
+          "values": [
+            1220.04372,
+            788.18717,
+            584.0538
+          ]
+        },
+        "fq4_mul_counted_fq_ops": {
+          "max": 24.999625,
+          "median": 24.999625,
+          "min": 24.999625,
+          "rel_spread": 0.0,
+          "values": [
+            24.999625,
+            24.999625,
+            24.999625
+          ]
+        },
+        "fq4_mul_ns": {
+          "max": 249.5553925,
+          "median": 137.39678,
+          "min": 121.6684,
+          "rel_spread": 0.9307859507333432,
+          "values": [
+            249.5553925,
+            121.6684,
+            137.39678
+          ]
+        },
+        "fq4_sq_counted_fq_ops": {
+          "max": 13.0,
+          "median": 13.0,
+          "min": 13.0,
+          "rel_spread": 0.0,
+          "values": [
+            13.0,
+            13.0,
+            13.0
+          ]
+        },
+        "fq4_sq_ns": {
+          "max": 87.9799425,
+          "median": 66.05118,
+          "min": 64.4716325,
+          "rel_spread": 0.3559105227188978,
+          "values": [
+            87.9799425,
+            64.4716325,
+            66.05118
+          ]
+        },
+        "fq_inv_counted_dependent": {
+          "max": 25.4838112,
+          "median": 24.5655076,
+          "min": 23.998071,
+          "rel_spread": 0.060480744961280676,
+          "values": [
+            24.5655076,
+            23.998071,
+            25.4838112
+          ]
+        },
+        "fq_inv_counted_independent": {
+          "max": 8.496034,
+          "median": 6.940297,
+          "min": 4.5570424,
+          "rel_spread": 0.5675537516622127,
+          "values": [
+            8.496034,
+            4.5570424,
+            6.940297
+          ]
+        },
+        "fq_mul_counted_dependent": {
+          "max": 14.89930535,
+          "median": 14.83432915,
+          "min": 14.20816205,
+          "rel_spread": 0.04659080252375283,
+          "values": [
+            14.83432915,
+            14.20816205,
+            14.89930535
+          ]
+        },
+        "fq_mul_counted_independent": {
+          "max": 7.6285644,
+          "median": 6.14504395,
+          "min": 4.9183517,
+          "rel_spread": 0.44104040948315765,
+          "values": [
+            7.6285644,
+            4.9183517,
+            6.14504395
+          ]
+        },
+        "fq_mul_uncounted_dependent": {
+          "max": 16.82861595,
+          "median": 14.72256725,
+          "min": 14.302411,
+          "rel_spread": 0.17158725832955526,
+          "values": [
+            16.82861595,
+            14.72256725,
+            14.302411
+          ]
+        },
+        "fq_sq_counted_dependent": {
+          "max": 14.6687773,
+          "median": 13.86382955,
+          "min": 13.59459895,
+          "rel_spread": 0.07748063737555114,
+          "values": [
+            14.6687773,
+            13.86382955,
+            13.59459895
+          ]
+        },
+        "group_add_counted_fq_ops": {
+          "max": 178.99605,
+          "median": 178.99605,
+          "min": 178.99605,
+          "rel_spread": 0.0,
+          "values": [
+            178.99605,
+            178.99605,
+            178.99605
+          ]
+        },
+        "group_add_ns": {
+          "max": 1781.788325,
+          "median": 1167.217325,
+          "min": 1125.990525,
+          "rel_spread": 0.5618472121290694,
+          "values": [
+            1781.788325,
+            1167.217325,
+            1125.990525
+          ]
+        },
+        "group_double_counted_fq_ops": {
+          "max": 191.994475,
+          "median": 191.994475,
+          "min": 191.994475,
+          "rel_spread": 0.0,
+          "values": [
+            191.994475,
+            191.994475,
+            191.994475
+          ]
+        },
+        "group_double_ns": {
+          "max": 1567.351125,
+          "median": 1388.416675,
+          "min": 1176.362575,
+          "rel_spread": 0.2816075008606475,
+          "values": [
+            1567.351125,
+            1388.416675,
+            1176.362575
+          ]
+        }
+      },
+      "ns_per_fq_mul_local": null,
+      "ns_per_fq_mul_table": null,
+      "q_bits": 16,
+      "r_bits": 63,
+      "scalar_width_bits": 64
+    },
+    "m17": {
+      "curve": "icv1-f2m68-t21557348131-6341760d",
+      "fq_muls_per_add": 161,
+      "group_bits": 68,
+      "in_situ": {
+        "closure_variants": {},
+        "ic_pipeline": {
+          "full_matrix_rank": {
+            "max": 12.0,
+            "median": 12.0,
+            "min": 10.0,
+            "rel_spread": 0.16666666666666666,
+            "values": [
+              12.0,
+              10.0,
+              12.0
+            ]
+          },
+          "full_matrix_rows": {
+            "max": 12.0,
+            "median": 12.0,
+            "min": 10.0,
+            "rel_spread": 0.16666666666666666,
+            "values": [
+              12.0,
+              10.0,
+              12.0
+            ]
+          },
+          "full_priced_fme": {
+            "max": 972262886.3803571,
+            "median": 972196126.8864691,
+            "min": 972096860.7670501,
+            "rel_spread": 0.00017077378598360463,
+            "values": [
+              972262886.3803571,
+              972096860.7670501,
+              972196126.8864691
+            ]
+          },
+          "full_relations_found": {
+            "max": 12.0,
+            "median": 12.0,
+            "min": 10.0,
+            "rel_spread": 0.16666666666666666,
+            "values": [
+              12.0,
+              10.0,
+              12.0
+            ]
+          },
+          "full_sys_cpu_ns": {
+            "max": 2553502000.0,
+            "median": 2411856000.0,
+            "min": 2307275000.0,
+            "rel_spread": 0.10209025746147365,
+            "values": [
+              2553502000.0,
+              2411856000.0,
+              2307275000.0
+            ]
+          },
+          "full_targets_tried": {
+            "max": 2000.0,
+            "median": 2000.0,
+            "min": 2000.0,
+            "rel_spread": 0.0,
+            "values": [
+              2000.0,
+              2000.0,
+              2000.0
+            ]
+          },
+          "full_unpriced_entries": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "full_user_cpu_ns": {
+            "max": 13467954000.0,
+            "median": 13178487000.0,
+            "min": 12927116000.0,
+            "rel_spread": 0.04103946075145045,
+            "values": [
+              13467954000.0,
+              12927116000.0,
+              13178487000.0
+            ]
+          },
+          "full_wall_ns": {
+            "max": 16329153288.0,
+            "median": 15757764090.0,
+            "min": 15571040279.0,
+            "rel_spread": 0.048110442869309385,
+            "values": [
+              16329153288.0,
+              15571040279.0,
+              15757764090.0
+            ]
+          },
+          "ic_complete": false,
+          "ic_trials_requested": 2000,
+          "legacy_matrix_rank": {
+            "max": 12.0,
+            "median": 12.0,
+            "min": 10.0,
+            "rel_spread": 0.16666666666666666,
+            "values": [
+              12.0,
+              10.0,
+              12.0
+            ]
+          },
+          "legacy_matrix_rows": {
+            "max": 12.0,
+            "median": 12.0,
+            "min": 10.0,
+            "rel_spread": 0.16666666666666666,
+            "values": [
+              12.0,
+              10.0,
+              12.0
+            ]
+          },
+          "legacy_priced_fq_ops": {
+            "max": 566344864.0,
+            "median": 566278128.0,
+            "min": 566182586.0,
+            "rel_spread": 0.00028656942935998406,
+            "values": [
+              566344864.0,
+              566182586.0,
+              566278128.0
+            ]
+          },
+          "legacy_relations_found": {
+            "max": 12.0,
+            "median": 12.0,
+            "min": 10.0,
+            "rel_spread": 0.16666666666666666,
+            "values": [
+              12.0,
+              10.0,
+              12.0
+            ]
+          },
+          "legacy_targets_tried": {
+            "max": 2000.0,
+            "median": 2000.0,
+            "min": 2000.0,
+            "rel_spread": 0.0,
+            "values": [
+              2000.0,
+              2000.0,
+              2000.0
+            ]
+          },
+          "legacy_wall_ns": {
+            "max": 16314263661.0,
+            "median": 15344514780.0,
+            "min": 14182637470.0,
+            "rel_spread": 0.13891779711264354,
+            "values": [
+              14182637470.0,
+              15344514780.0,
+              16314263661.0
+            ]
+          },
+          "ns_per_full_priced_fme": {
+            "max": 16.794998057358637,
+            "median": 16.208420970021162,
+            "min": 16.017992555508712,
+            "rel_spread": 0.04793838359005243,
+            "values": [
+              16.794998057358637,
+              16.017992555508712,
+              16.208420970021162
+            ]
+          },
+          "ns_per_legacy_priced_fq_op": {
+            "max": 28.809630558431174,
+            "median": 27.101707398680045,
+            "min": 25.04240502832564,
+            "rel_spread": 0.1390032544698277,
+            "values": [
+              25.04240502832564,
+              27.101707398680045,
+              28.809630558431174
+            ]
+          },
+          "rayon_threads": 1,
+          "reached_relations": {
+            "max": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "rel_spread": 0.0,
+            "values": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "recovered": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "reps": 3,
+          "spec": {
+            "factor_base": "bin-t-line",
+            "linalg": "wiedemann",
+            "max_cofactor": 2,
+            "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+            "source": "claim sessions e-m15 and d-ladder (ic-wied arm); max_cofactor 16 for m <= 12 (d-ladder) and 2 for m >= 15 (e-m15)"
+          }
+        },
+        "rho_full": null,
+        "rho_negation": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 166.799270677938,
+            "median": 166.40668063058098,
+            "min": 166.1443588332416,
+            "rel_spread": 0.003935610290492506,
+            "values": [
+              166.40668063058098,
+              166.1443588332416,
+              166.799270677938
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 169.60628519377278,
+            "median": 169.2684974564705,
+            "min": 169.13589224476306,
+            "rel_spread": 0.0027789751553190713,
+            "values": [
+              169.2684974564705,
+              169.13589224476306,
+              169.60628519377278
+            ]
+          },
+          "note": "rho.negation (one walk, an F_q^4 inversion per addition)",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 15.659275755645458,
+            "median": 13.567677630925171,
+            "min": 12.317848589741466,
+            "rel_spread": 0.24627849045350161,
+            "values": [
+              12.317848589741466,
+              15.659275755645458,
+              13.567677630925171
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 14.00818571251291,
+            "median": 13.680600517878071,
+            "min": 12.460364357107201,
+            "rel_spread": 0.1131398693634089,
+            "values": [
+              12.460364357107201,
+              14.00818571251291,
+              13.680600517878071
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 2601.7003302146395,
+            "median": 2263.0787336316926,
+            "min": 2049.7722963289602,
+            "rel_spread": 0.24388370836748072,
+            "values": [
+              2049.7722963289602,
+              2601.7003302146395,
+              2263.0787336316926
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 2369.286989216213,
+            "median": 2320.3158330573037,
+            "min": 2109.147152487696,
+            "rel_spread": 0.11211397733977897,
+            "values": [
+              2109.147152487696,
+              2369.286989216213,
+              2320.3158330573037
+            ]
+          },
+          "steps_requested": 25000
+        },
+        "rho_negation_batched": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 124.4563296809317,
+            "median": 124.39426799862211,
+            "min": 124.38393066291871,
+            "rel_spread": 0.0005820124928408226,
+            "values": [
+              124.4563296809317,
+              124.38393066291871,
+              124.39426799862211
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 125.59631312609729,
+            "median": 125.47499174304352,
+            "min": 125.43873717670857,
+            "rel_spread": 0.0012558355031527704,
+            "values": [
+              125.47499174304352,
+              125.43873717670857,
+              125.59631312609729
+            ]
+          },
+          "note": "rho.negation_batched, 256 lockstep walks; 'whole' includes set-up, 'marginal' is the difference of a long and a quarter-length segment",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 14.539231287765531,
+            "median": 13.806413197999007,
+            "min": 13.015628362083467,
+            "rel_spread": 0.11035472456400797,
+            "values": [
+              13.015628362083467,
+              14.539231287765531,
+              13.806413197999007
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 14.043331058959488,
+            "median": 13.194673251824138,
+            "min": 12.750998702724953,
+            "rel_spread": 0.09794349064732412,
+            "values": [
+              12.750998702724953,
+              14.043331058959488,
+              13.194673251824138
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 1808.4467363895665,
+            "median": 1717.4386634516018,
+            "min": 1619.8773344359452,
+            "rel_spread": 0.1097968771558026,
+            "values": [
+              1619.8773344359452,
+              1808.4467363895665,
+              1717.4386634516018
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 1761.5777137903276,
+            "median": 1657.2023133326447,
+            "min": 1599.931456939972,
+            "rel_spread": 0.09754165532468032,
+            "values": [
+              1599.931456939972,
+              1761.5777137903276,
+              1657.2023133326447
+            ]
+          },
+          "steps_requested": 100000
+        }
+      },
+      "m": 17,
+      "micro": {
+        "fq4_inv_counted_fq_ops": {
+          "max": 106.99841,
+          "median": 106.99841,
+          "min": 106.99841,
+          "rel_spread": 0.0,
+          "values": [
+            106.99841,
+            106.99841,
+            106.99841
+          ]
+        },
+        "fq4_inv_ns": {
+          "max": 917.7924,
+          "median": 763.19248,
+          "min": 724.23843,
+          "rel_spread": 0.2536109501498233,
+          "values": [
+            763.19248,
+            724.23843,
+            917.7924
+          ]
+        },
+        "fq4_mul_counted_fq_ops": {
+          "max": 21.999835,
+          "median": 21.999835,
+          "min": 21.999835,
+          "rel_spread": 0.0,
+          "values": [
+            21.999835,
+            21.999835,
+            21.999835
+          ]
+        },
+        "fq4_mul_ns": {
+          "max": 284.9105875,
+          "median": 184.1662075,
+          "min": 169.646895,
+          "rel_spread": 0.6258677640413484,
+          "values": [
+            284.9105875,
+            169.646895,
+            184.1662075
+          ]
+        },
+        "fq4_sq_counted_fq_ops": {
+          "max": 9.999885,
+          "median": 9.999885,
+          "min": 9.999885,
+          "rel_spread": 0.0,
+          "values": [
+            9.999885,
+            9.999885,
+            9.999885
+          ]
+        },
+        "fq4_sq_ns": {
+          "max": 105.7284325,
+          "median": 95.6754975,
+          "min": 91.2492125,
+          "rel_spread": 0.15133676205864513,
+          "values": [
+            95.6754975,
+            91.2492125,
+            105.7284325
+          ]
+        },
+        "fq_inv_counted_dependent": {
+          "max": 24.967346,
+          "median": 23.9214646,
+          "min": 23.077306,
+          "rel_spread": 0.07901021244326316,
+          "values": [
+            23.077306,
+            24.967346,
+            23.9214646
+          ]
+        },
+        "fq_inv_counted_independent": {
+          "max": 5.0622372,
+          "median": 4.7881984,
+          "min": 4.6460162,
+          "rel_spread": 0.08692643145279866,
+          "values": [
+            5.0622372,
+            4.6460162,
+            4.7881984
+          ]
+        },
+        "fq_mul_counted_dependent": {
+          "max": 34.202392,
+          "median": 32.4866515,
+          "min": 29.40021005,
+          "rel_spread": 0.14782015776541343,
+          "values": [
+            34.202392,
+            29.40021005,
+            32.4866515
+          ]
+        },
+        "fq_mul_counted_independent": {
+          "max": 5.5365494,
+          "median": 4.8675519,
+          "min": 4.39502215,
+          "rel_spread": 0.23451773570200665,
+          "values": [
+            4.8675519,
+            5.5365494,
+            4.39502215
+          ]
+        },
+        "fq_mul_uncounted_dependent": {
+          "max": 39.0386918,
+          "median": 34.9137331,
+          "min": 31.87395475,
+          "rel_spread": 0.2052125743608896,
+          "values": [
+            31.87395475,
+            39.0386918,
+            34.9137331
+          ]
+        },
+        "fq_sq_counted_dependent": {
+          "max": 35.06612665,
+          "median": 31.3823614,
+          "min": 28.4558851,
+          "rel_spread": 0.21063556899832278,
+          "values": [
+            28.4558851,
+            31.3823614,
+            35.06612665
+          ]
+        },
+        "group_add_counted_fq_ops": {
+          "max": 160.998375,
+          "median": 160.998375,
+          "min": 160.998375,
+          "rel_spread": 0.0,
+          "values": [
+            160.998375,
+            160.998375,
+            160.998375
+          ]
+        },
+        "group_add_ns": {
+          "max": 1952.06705,
+          "median": 1345.7628,
+          "min": 1160.56435,
+          "rel_spread": 0.5881442851593164,
+          "values": [
+            1345.7628,
+            1160.56435,
+            1952.06705
+          ]
+        },
+        "group_double_counted_fq_ops": {
+          "max": 170.998675,
+          "median": 170.998675,
+          "min": 170.998675,
+          "rel_spread": 0.0,
+          "values": [
+            170.998675,
+            170.998675,
+            170.998675
+          ]
+        },
+        "group_double_ns": {
+          "max": 1428.91465,
+          "median": 1371.586625,
+          "min": 1219.3821,
+          "rel_spread": 0.15276654509517393,
+          "values": [
+            1371.586625,
+            1219.3821,
+            1428.91465
+          ]
+        }
+      },
+      "ns_per_fq_mul_local": null,
+      "ns_per_fq_mul_table": null,
+      "q_bits": 17,
+      "r_bits": 67,
+      "scalar_width_bits": 128
+    }
+  },
+  "readout": "ic_counter_readout (targets_tried, relations_found, matrix_rank, matrix_rows); supersedes the `decompositions`/`trials`/`accepted_relations` readout of unit-price-f2m4-m14-17.json, see WITHDRAWN.md there",
+  "repeats": 3,
+  "rho_steps": 100000,
+  "schema": "ecbench.f2m4_unit_price/v1",
+  "seed": 1,
+  "spread": "every statistic carries median, min, max, rel_spread = (max-min)/median and the raw per-repeat values",
+  "supersedes": {
+    "file": "research/gaudry_k4_char2_replication_20261026/unit-price/unit-price-f2m4-m14-17.json",
+    "note": "research/gaudry_k4_char2_replication_20261026/unit-price/WITHDRAWN.md: the old file is kept unedited; its IC decomposition/trial/relation counters read keys no report has and are withdrawn, as is the statement that zero decompositions were found",
+    "withdrawn_fields": [
+      "legacy_decompositions",
+      "legacy_trials",
+      "full_trials",
+      "legacy_accepted_relations"
+    ]
+  },
+  "units": "nanoseconds unless the key says counted_fq_ops"
+}
