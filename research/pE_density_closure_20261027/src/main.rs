@@ -106,7 +106,10 @@ fn fe_slope(pts: &[(u64, f64, f64, f64)]) -> (f64, f64, usize) {
     let b = sxy / sxx;
     let n = pts.len();
     let dof = n - k - 1;
-    let rss: f64 = dem.iter().map(|&(x, y, w)| w * (y - b * x) * (y - b * x)).sum();
+    let rss: f64 = dem
+        .iter()
+        .map(|&(x, y, w)| w * (y - b * x) * (y - b * x))
+        .sum();
     let s2 = rss / dof as f64;
     (b, (s2 / sxx).sqrt(), dof)
 }
@@ -125,13 +128,20 @@ fn main() {
         let r: Value = serde_json::from_str(line).unwrap();
         match r["family"].as_str().unwrap() {
             "census" => {
-                census.insert((u(&r, "n"), u(&r, "a"), u(&r, "b")), r["E_Fq"].as_f64().unwrap());
+                census.insert(
+                    (u(&r, "n"), u(&r, "a"), u(&r, "b")),
+                    r["E_Fq"].as_f64().unwrap(),
+                );
             }
             "decomp" if r["arm"] == "A_random" => {
                 let cm = &r["curve_model"];
                 let (n, l, m, a, b) = (u(&r, "n"), u(&r, "l"), u(&r, "m"), u(&r, "a"), u(&r, "b"));
                 let sol = u(cm, "solutions") as f64;
-                let parts = u(cm, "pure") + u(cm, "pure_with_2tor") + u(cm, "off_O") + u(cm, "off_T") + u(cm, "violation");
+                let parts = u(cm, "pure")
+                    + u(cm, "pure_with_2tor")
+                    + u(cm, "off_O")
+                    + u(cm, "off_T")
+                    + u(cm, "violation");
                 checks.1 += 1;
                 if parts as f64 != sol {
                     checks.0 += 1;
@@ -161,7 +171,8 @@ fn main() {
                     g.contam += 1;
                 } else {
                     g.clean.push(sol);
-                    g.pure_clean.push((u(cm, "pure") + u(cm, "pure_with_2tor")) as f64);
+                    g.pure_clean
+                        .push((u(cm, "pure") + u(cm, "pure_with_2tor")) as f64);
                 }
             }
             _ => {}
@@ -179,7 +190,10 @@ fn main() {
         let p = g.v_e / g.v_nz;
         let (gord, src) = match census.get(&(g.n, g.a, g.b)) {
             Some(&e) => (e, "census"),
-            None => ((1u64 << g.n) as f64 + 1.0, "2^n+1 (Hasse error <= 2^(n/2+1)/2^n)"),
+            None => (
+                (1u64 << g.n) as f64 + 1.0,
+                "2^n+1 (Hasse error <= 2^(n/2+1)/2^n)",
+            ),
         };
         let s = 2.0 * g.v_e + 1.0;
         let pred = choose(s + g.m as f64 - 1.0, g.m) / gord;
@@ -196,14 +210,24 @@ fn main() {
             g.n, g.l, g.m, g.curve, g.a, g.b, g.all.len(), g.clean.len(), g.v_e, p, gord,
             src.split(' ').next().unwrap(), ma, mc, se, vc / mc, pred, ratio, mpm, z
         );
-        cell.entry((g.n, g.l, g.m)).or_default().push((p, mc, se, ratio, mpm));
+        cell.entry((g.n, g.l, g.m))
+            .or_default()
+            .push((p, mc, se, ratio, mpm));
         let gid = g.n * 100 + g.l;
         // weight = 1 / var(log mean) ~ N_clean * mean / fano (delta method)
         let w = g.clean.len() as f64 * mc * mc / vc;
-        fe_pts.entry(g.m).or_default().push((gid, p.ln(), mc.ln(), w));
+        fe_pts
+            .entry(g.m)
+            .or_default()
+            .push((gid, p.ln(), mc.ln(), w));
         // same regression with the recorded totals (outliers included)
         let va = var(&g.all);
-        fe_pts_all.entry(g.m).or_default().push((gid, p.ln(), ma.ln(), g.all.len() as f64 * ma * ma / va));
+        fe_pts_all.entry(g.m).or_default().push((
+            gid,
+            p.ln(),
+            ma.ln(),
+            g.all.len() as f64 * ma * ma / va,
+        ));
         zs.entry(g.l).or_default().push(z);
         jgroups.push(json!({
             "n": g.n, "l": g.l, "m": g.m, "curve": g.curve, "a": g.a, "b": g.b,
@@ -251,8 +275,10 @@ fn main() {
     let pooled_rms = (all_z.iter().map(|z| z * z).sum::<f64>() / all_z.len() as f64).sqrt();
     for (&l, v) in &zs {
         let rms = (v.iter().map(|z| z * z).sum::<f64>() / v.len() as f64).sqrt();
-        jz.push(json!({"l": l, "groups": v.len(), "rms_z": rms, "n_distinct_expected_sd": 1.0,
-            "sigma_p_predicted": 0.5 / ((1u64 << l) as f64 - 1.0).sqrt()}));
+        jz.push(
+            json!({"l": l, "groups": v.len(), "rms_z": rms, "n_distinct_expected_sd": 1.0,
+            "sigma_p_predicted": 0.5 / ((1u64 << l) as f64 - 1.0).sqrt()}),
+        );
     }
 
     // Budget for ECC2K-130: n = 131, l = 44, m = 3, p ~ 1/2.
@@ -260,15 +286,26 @@ fn main() {
     let sigma_p = 0.5 / (2f64.powf(l) - 1.0).sqrt();
     let p0 = 0.5;
     let mut budget = vec![];
-    for (label, log2k) in [("2^10 curves", 10.0f64), ("2^20 curves", 20.0), ("class-size ceiling 2^66", 66.0), ("all 44-dim subspaces of F_2^131 (2^3828)", 3828.0)] {
+    for (label, log2k) in [
+        ("2^10 curves", 10.0f64),
+        ("2^20 curves", 20.0),
+        ("class-size ceiling 2^66", 66.0),
+        ("all 44-dim subspaces of F_2^131 (2^3828)", 3828.0),
+    ] {
         let lnk = log2k * std::f64::consts::LN_2;
         // exact Gaussian upper quantile when representable, else sqrt(2 lnK) asymptotics
-        let z = if log2k <= 66.0 { z_upper((-lnk).exp()) } else { (2.0 * lnk).sqrt() };
+        let z = if log2k <= 66.0 {
+            z_upper((-lnk).exp())
+        } else {
+            (2.0 * lnk).sqrt()
+        };
         let dp = z * sigma_p;
         let gain_m3 = ((p0 + dp) / p0).powi(3) - 1.0;
         let bits_dimv = (p0 / (p0 + dp)).log2().abs(); // dim V saved at fixed |F|
-        budget.push(json!({"candidates": label, "log2_K": log2k, "z_max": z, "delta_p": dp,
-            "relative_yield_gain_fixedV_m3": gain_m3, "dimV_bits_saved_fixed_F": bits_dimv}));
+        budget.push(
+            json!({"candidates": label, "log2_K": log2k, "z_max": z, "delta_p": dp,
+            "relative_yield_gain_fixedV_m3": gain_m3, "dimV_bits_saved_fixed_F": bits_dimv}),
+        );
     }
     let need_dp = 0.01 * p0 / 3.0; // 1% yield gain at m = 3
     let need_z = need_dp / sigma_p;
@@ -288,13 +325,20 @@ fn main() {
             "log2_K_needed_for_1pct_yield": need_ln_k / std::f64::consts::LN_2,
             "adversarial_bound": adversarial },
     });
-    fs::write(format!("{out_dir}/closure.json"), serde_json::to_string_pretty(&out).unwrap()).unwrap();
+    fs::write(
+        format!("{out_dir}/closure.json"),
+        serde_json::to_string_pretty(&out).unwrap(),
+    )
+    .unwrap();
     fs::write(format!("{out_dir}/groups.tsv"), &tsv).unwrap();
     print!("{tsv}");
     println!("{}", serde_json::to_string_pretty(&out["cells"]).unwrap());
     println!("{}", serde_json::to_string_pretty(&out["slopes"]).unwrap());
     println!("{}", serde_json::to_string_pretty(&out["charsum"]).unwrap());
-    println!("{}", serde_json::to_string_pretty(&out["budget_n131_l44_m3"]).unwrap());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&out["budget_n131_l44_m3"]).unwrap()
+    );
     println!("parts-mismatch rows: {} of {}", checks.0, checks.1);
 }
 
@@ -313,7 +357,17 @@ mod tests {
     }
     #[test]
     fn slope_recovers_exponent() {
-        let pts: Vec<(u64, f64, f64, f64)> = (1..6).map(|i| (1u64, (i as f64).ln(), 3.0 * (i as f64).ln() + 2.0, 1.0)).chain((1..6).map(|i| (2u64, (i as f64).ln(), 3.0 * (i as f64).ln() - 1.0 + 0.001 * i as f64, 1.0))).collect();
+        let pts: Vec<(u64, f64, f64, f64)> = (1..6)
+            .map(|i| (1u64, (i as f64).ln(), 3.0 * (i as f64).ln() + 2.0, 1.0))
+            .chain((1..6).map(|i| {
+                (
+                    2u64,
+                    (i as f64).ln(),
+                    3.0 * (i as f64).ln() - 1.0 + 0.001 * i as f64,
+                    1.0,
+                )
+            }))
+            .collect();
         let (b, _, _) = fe_slope(&pts);
         assert!((b - 3.0).abs() < 0.01);
     }

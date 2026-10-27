@@ -72,7 +72,11 @@ pub fn iota_stabiliser_order(m: u32) -> u128 {
 /// of binary weights of the exponents of a monomial (exponent lists are the monomials above).
 pub fn s3_bit_degree() -> u32 {
     let monos: [[u32; 3]; 5] = [[2, 2, 0], [2, 0, 2], [0, 2, 2], [1, 1, 1], [0, 0, 0]];
-    monos.iter().map(|m| m.iter().map(|e| e.count_ones()).sum::<u32>()).max().unwrap()
+    monos
+        .iter()
+        .map(|m| m.iter().map(|e| e.count_ones()).sum::<u32>())
+        .max()
+        .unwrap()
 }
 pub fn s3_total_degree() -> u32 {
     let monos: [[u32; 3]; 5] = [[2, 2, 0], [2, 0, 2], [0, 2, 2], [1, 1, 1], [0, 0, 0]];
@@ -95,7 +99,9 @@ pub fn table() -> String {
                 (19, _) | (23, _) | (31, _) => "toy n",
                 _ => "extrapolated by formula",
             };
-            let ok = orbits_for_unit_yield(n, m).map(|k| k.to_string()).unwrap_or_else(|| "none".into());
+            let ok = orbits_for_unit_yield(n, m)
+                .map(|k| k.to_string())
+                .unwrap_or_else(|| "none".into());
             s.push_str(&format!(
                 "{n}\t{m}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{:.3}\t{:.2}\t{}\t{:.2}\t{:.3e}\t{}\t{}\n",
                 chain_sat_vars(nn, mm),

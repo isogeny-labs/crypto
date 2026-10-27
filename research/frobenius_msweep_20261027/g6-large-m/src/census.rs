@@ -116,7 +116,14 @@ pub fn stats(h: &[u32], ne: u32, t: u128) -> Stats {
     let mu = t as f64 / e;
     let p = nz as f64 / e;
     let disp = (s2 / e - mu * mu) / mu;
-    Stats { ne, mu, p, eff: p / (1.0 - (-mu).exp()), disp, conserved: s1 == t }
+    Stats {
+        ne,
+        mu,
+        p,
+        eff: p / (1.0 - (-mu).exp()),
+        disp,
+        conserved: s1 == t,
+    }
 }
 
 /// Frobenius orbits of size n on the points of E (fixed points excluded), as flat key lists.
@@ -176,7 +183,11 @@ pub fn orbit_fano(h: &[u32], om: &OrbitMap, tamper: bool) -> f64 {
     let (mut s1, mut s2, mut norb) = (0f64, 0f64, 0f64);
     for chunk in om.keys.chunks(n) {
         let k = if tamper {
-            if h[chunk[0] as usize] >= 1 { n as f64 } else { 0.0 }
+            if h[chunk[0] as usize] >= 1 {
+                n as f64
+            } else {
+                0.0
+            }
         } else {
             chunk.iter().filter(|&&k| h[k as usize] >= 1).count() as f64
         };

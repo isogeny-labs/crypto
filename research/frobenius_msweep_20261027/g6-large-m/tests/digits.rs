@@ -79,7 +79,12 @@ fn census_of_a_chain_equals_the_prediction_exactly() {
         let cen = census::histogram_into(&c, &slots, &mut h);
         let st = census::stats(&h, ne, cen.t);
         assert!((st.p - pred.p).abs() < 1e-15, "p {} vs {}", st.p, pred.p);
-        assert!((st.disp - pred.disp).abs() < 1e-9 * pred.disp, "disp {} vs {}", st.disp, pred.disp);
+        assert!(
+            (st.disp - pred.disp).abs() < 1e-9 * pred.disp,
+            "disp {} vs {}",
+            st.disp,
+            pred.disp
+        );
         assert!(st.conserved);
     }
 }
@@ -108,7 +113,9 @@ fn real_ni_chain_instance_at_n19_matches_the_prediction() {
     let mut checked = 0;
     for seed in 0..200u64 {
         let slots = arms::build_normal(&f, &c, Arm::NI, 12, seed);
-        let Some(pred) = digits::predict_slots(&c, &slots, ne) else { continue };
+        let Some(pred) = digits::predict_slots(&c, &slots, ne) else {
+            continue;
+        };
         assert_eq!(pred.l, 7);
         assert_eq!(pred.distinct, 543);
         let mut h = Vec::new();
@@ -126,7 +133,11 @@ fn real_ni_chain_instance_at_n19_matches_the_prediction() {
 #[test]
 fn predicted_ni_vs_generic_ratios_at_the_class_01_cells() {
     // the numbers quoted in PROTOCOL.md 4.4 (UP is ~Poisson-like: eff ~ 1 - mu/2, disp ~ 1)
-    for &(n, m, l, ne_log2) in &[(23u32, 12usize, 11usize, 23.0f64), (23, 14, 9, 23.0), (19, 12, 7, 19.0)] {
+    for &(n, m, l, ne_log2) in &[
+        (23u32, 12usize, 11usize, 23.0f64),
+        (23, 14, 9, 23.0),
+        (19, 12, 7, 19.0),
+    ] {
         let ne = (2f64).powf(ne_log2) as u32; // E ~ 2^n, enough for the printed orders of magnitude
         let pr = digits::predict(l, 0, ne);
         let eff = pr.p / (1.0 - (-pr.mu).exp());

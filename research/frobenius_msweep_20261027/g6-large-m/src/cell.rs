@@ -111,7 +111,10 @@ pub fn enumerate(
 pub fn run_cell(p: &CellParams) -> Result<String, String> {
     let n = p.n as usize;
     if p.m < 2 || p.m >= n {
-        return Err(format!("m={} must satisfy 2 <= m < n={n} (m >= n is a Burnside artefact)", p.m));
+        return Err(format!(
+            "m={} must satisfy 2 <= m < n={n} (m >= n is a Burnside artefact)",
+            p.m
+        ));
     }
     let f = Fq::new(p.n);
     let c = Curve::koblitz(&f, p.a);
@@ -122,7 +125,12 @@ pub fn run_cell(p: &CellParams) -> Result<String, String> {
     let lmax = LMAX;
     let mut meta = String::new();
     writeln!(meta, "cell\t{id}").unwrap();
-    writeln!(meta, "n\t{}\na\t{}\nm\t{}\nE\t{ne}\nseed\t{}\ndraws\t{}", p.n, p.a, p.m, p.seed, p.draws).unwrap();
+    writeln!(
+        meta,
+        "n\t{}\na\t{}\nm\t{}\nE\t{ne}\nseed\t{}\ndraws\t{}",
+        p.n, p.a, p.m, p.seed, p.draws
+    )
+    .unwrap();
     writeln!(meta, "lmin\t{lmin:.4}\nlmax\t{lmax:.4}").unwrap();
 
     // ---- size census (no group sums) ----
@@ -133,20 +141,41 @@ pub fn run_cell(p: &CellParams) -> Result<String, String> {
     for idx in 0..p.draws as u64 {
         let slots = arms::build_normal(&f, &c, Arm::NI, p.m, derive_seed(p.seed, &id, "NI", idx));
         let l = arms::log2_tuples(&arms::sizes(&slots)) - lne;
-        writeln!(sizes_tsv, "NI\t{idx}\t{l:.6}\t{}", (l >= lmin && l <= lmax) as u8).unwrap();
+        writeln!(
+            sizes_tsv,
+            "NI\t{idx}\t{l:.6}\t{}",
+            (l >= lmin && l <= lmax) as u8
+        )
+        .unwrap();
         ni.push((idx, l));
         let ug = arms::build_generic(&f, &c, p.m, derive_seed(p.seed, &id, "U", idx));
         let lu = arms::log2_tuples(&arms::sizes(&ug)) - lne;
-        writeln!(sizes_tsv, "U\t{idx}\t{lu:.6}\t{}", (lu >= lmin && lu <= lmax) as u8).unwrap();
+        writeln!(
+            sizes_tsv,
+            "U\t{idx}\t{lu:.6}\t{}",
+            (lu >= lmin && lu <= lmax) as u8
+        )
+        .unwrap();
         u_feasible += (lu >= lmin && lu <= lmax) as usize;
         for (arm, v) in sec.iter_mut() {
-            let s = arms::build_normal(&f, &c, *arm, p.m, derive_seed(p.seed, &id, arm.name(), idx));
+            let s =
+                arms::build_normal(&f, &c, *arm, p.m, derive_seed(p.seed, &id, arm.name(), idx));
             let l = arms::log2_tuples(&arms::sizes(&s)) - lne;
-            writeln!(sizes_tsv, "{}\t{idx}\t{l:.6}\t{}", arm.name(), (l >= lmin && l <= lmax) as u8).unwrap();
+            writeln!(
+                sizes_tsv,
+                "{}\t{idx}\t{l:.6}\t{}",
+                arm.name(),
+                (l >= lmin && l <= lmax) as u8
+            )
+            .unwrap();
             v.push((idx, l));
         }
     }
-    let feasible_ni: Vec<(u64, f64)> = ni.iter().cloned().filter(|&(_, l)| l >= lmin && l <= lmax).collect();
+    let feasible_ni: Vec<(u64, f64)> = ni
+        .iter()
+        .cloned()
+        .filter(|&(_, l)| l >= lmin && l <= lmax)
+        .collect();
     writeln!(meta, "feasible_NI\t{}", feasible_ni.len()).unwrap();
     writeln!(meta, "feasible_U\t{u_feasible}").unwrap();
     for (arm, v) in &sec {
@@ -162,7 +191,9 @@ pub fn run_cell(p: &CellParams) -> Result<String, String> {
         let mut lt: Vec<f64> = feasible_ni.iter().map(|&(_, l)| l + lne).collect();
         let med_t = median(&mut lt);
         let mut k = p.k;
-        while k > MIN_PAIRS && cell_tuple_units(k) * (2f64).powf(med_t) > (2f64).powf(TUPLE_BUDGET_LOG2) {
+        while k > MIN_PAIRS
+            && cell_tuple_units(k) * (2f64).powf(med_t) > (2f64).powf(TUPLE_BUDGET_LOG2)
+        {
             k -= 1;
         }
         k
@@ -174,8 +205,15 @@ pub fn run_cell(p: &CellParams) -> Result<String, String> {
     if selected.len() < MIN_PAIRS {
         writeln!(meta, "status\tUNMATCHABLE").unwrap();
         std::fs::write(format!("{}/meta_{id}.txt", p.out), &meta).map_err(|e| e.to_string())?;
-        std::fs::write(format!("{}/rows_{id}.tsv", p.out), format!("{ROW_HEADER}\n")).map_err(|e| e.to_string())?;
-        return Ok(format!("{id} UNMATCHABLE feasible_NI={}", feasible_ni.len()));
+        std::fs::write(
+            format!("{}/rows_{id}.tsv", p.out),
+            format!("{ROW_HEADER}\n"),
+        )
+        .map_err(|e| e.to_string())?;
+        return Ok(format!(
+            "{id} UNMATCHABLE feasible_NI={}",
+            feasible_ni.len()
+        ));
     }
 
     // ---- enumeration ----
@@ -196,7 +234,11 @@ pub fn run_cell(p: &CellParams) -> Result<String, String> {
                 if rank < k_ctrl {
                     let d = arms::build_dup(&up);
                     if d == up {
-                        writeln!(skipped, "DUP_NOOP idx={idx} (the duplicated slots have one point each)").unwrap();
+                        writeln!(
+                            skipped,
+                            "DUP_NOOP idx={idx} (the duplicated slots have one point each)"
+                        )
+                        .unwrap();
                     } else if arms::log2_tuples(&arms::sizes(&d)) <= cap {
                         rows.push(enumerate(&c, &om, ne, &d, "DUP", idx, &mut h, &mut rng));
                     } else {
@@ -206,7 +248,13 @@ pub fn run_cell(p: &CellParams) -> Result<String, String> {
             }
         }
         if rank < k_aa {
-            if let Some(u2) = arms::build_matched_generic(&f, &c, p.m, derive_seed(p.seed, &id, "UP2", idx), &prof) {
+            if let Some(u2) = arms::build_matched_generic(
+                &f,
+                &c,
+                p.m,
+                derive_seed(p.seed, &id, "UP2", idx),
+                &prof,
+            ) {
                 rows.push(enumerate(&c, &om, ne, &u2, "UP2", idx, &mut h, &mut rng));
             } else {
                 writeln!(skipped, "UP2_BUILD_FAILED idx={idx}").unwrap();
@@ -226,12 +274,28 @@ pub fn run_cell(p: &CellParams) -> Result<String, String> {
             .collect();
         writeln!(meta, "selected_{}\t{}", arm.name(), pick.len()).unwrap();
         if pick.len() < MIN_PAIRS {
-            writeln!(skipped, "{}_NOT_RUN window has {} draws", arm.name(), pick.len()).unwrap();
+            writeln!(
+                skipped,
+                "{}_NOT_RUN window has {} draws",
+                arm.name(),
+                pick.len()
+            )
+            .unwrap();
             continue;
         }
         for idx in pick {
-            let slots = arms::build_normal(&f, &c, *arm, p.m, derive_seed(p.seed, &id, arm.name(), idx));
-            rows.push(enumerate(&c, &om, ne, &slots, arm.name(), idx, &mut h, &mut rng));
+            let slots =
+                arms::build_normal(&f, &c, *arm, p.m, derive_seed(p.seed, &id, arm.name(), idx));
+            rows.push(enumerate(
+                &c,
+                &om,
+                ne,
+                &slots,
+                arm.name(),
+                idx,
+                &mut h,
+                &mut rng,
+            ));
         }
     }
     // the type-II ONB (single instance) and its profile-matched generic partner
@@ -241,7 +305,13 @@ pub fn run_cell(p: &CellParams) -> Result<String, String> {
         writeln!(meta, "onb_l2mu\t{:.4}", t - lne).unwrap();
         if t <= cap {
             rows.push(enumerate(&c, &om, ne, &slots, "ONB", 0, &mut h, &mut rng));
-            match arms::build_matched_generic(&f, &c, p.m, derive_seed(p.seed, &id, "ONBUP", 0), &sz) {
+            match arms::build_matched_generic(
+                &f,
+                &c,
+                p.m,
+                derive_seed(p.seed, &id, "ONBUP", 0),
+                &sz,
+            ) {
                 Some(up) => rows.push(enumerate(&c, &om, ne, &up, "ONBUP", 0, &mut h, &mut rng)),
                 None => writeln!(skipped, "ONBUP_BUILD_FAILED").unwrap(),
             }
@@ -262,7 +332,11 @@ pub fn run_cell(p: &CellParams) -> Result<String, String> {
     }
     std::fs::write(format!("{}/rows_{id}.tsv", p.out), body).map_err(|e| e.to_string())?;
     std::fs::write(format!("{}/meta_{id}.txt", p.out), &meta).map_err(|e| e.to_string())?;
-    Ok(format!("{id} OK rows={} feasible_NI={}", rows.len(), feasible_ni.len()))
+    Ok(format!(
+        "{id} OK rows={} feasible_NI={}",
+        rows.len(),
+        feasible_ni.len()
+    ))
 }
 
 /// The frozen cell list: (n, a, m).

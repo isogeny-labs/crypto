@@ -62,7 +62,15 @@ pub fn predict(l: usize, a: u32, ne: u32) -> Prediction {
     let tuples = 3f64.powi(l as i32);
     let e = ne as f64;
     let mu = tuples / e;
-    Prediction { l, tuples, distinct, p: distinct as f64 / e, mu, disp: s2 / tuples - mu, size_biased: s2 / tuples }
+    Prediction {
+        l,
+        tuples,
+        distinct,
+        p: distinct as f64 / e,
+        mu,
+        disp: s2 / tuples - mu,
+        size_biased: s2 / tuples,
+    }
 }
 
 /// Upper bound on the norm of a difference of two digit vectors (coefficients in -2..2).

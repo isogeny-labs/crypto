@@ -13,7 +13,15 @@ pub const CHAIN_REL_TOL: f64 = 1e-7; // digit-model cross-check: |measured - pre
 
 /// One-sided 95 percent t critical value, taken at the largest tabulated df not above the actual df (conservative).
 pub fn t_tost(df: usize) -> f64 {
-    let tab = [(7, 1.895), (8, 1.860), (10, 1.812), (15, 1.753), (20, 1.725), (30, 1.697), (60, 1.671)];
+    let tab = [
+        (7, 1.895),
+        (8, 1.860),
+        (10, 1.812),
+        (15, 1.753),
+        (20, 1.725),
+        (30, 1.697),
+        (60, 1.671),
+    ];
     let mut v = 2.365; // df < 7
     for &(d, t) in tab.iter() {
         if df >= d {
@@ -28,7 +36,14 @@ pub fn t_tost(df: usize) -> f64 {
 /// 4.342, 4.053 at df 7, 10, 15, 20, 30, 60, recomputed with a continued-fraction incomplete beta) rounded UP to one decimal; the
 /// code does not compute quantiles. Contrasts need >= 8 pairs, so df >= 7 always.
 pub fn t_diff(df: usize) -> f64 {
-    let tab = [(7, 7.5), (10, 6.0), (15, 5.1), (20, 4.7), (30, 4.4), (60, 4.1)];
+    let tab = [
+        (7, 7.5),
+        (10, 6.0),
+        (15, 5.1),
+        (20, 4.7),
+        (30, 4.4),
+        (60, 4.1),
+    ];
     let mut v = 8.0; // df < 7
     for &(d, t) in tab.iter() {
         if df >= d {
@@ -82,7 +97,11 @@ impl Contrast {
 fn classify(d: f64, se: f64, df: usize) -> Verdict {
     // Degenerate case (PROTOCOL section 8): zero standard error (all pair differences identical) is decided by the margin alone.
     if se == 0.0 {
-        return if d.abs() < DELTA { Verdict::Equivalent } else { Verdict::Different };
+        return if d.abs() < DELTA {
+            Verdict::Equivalent
+        } else {
+            Verdict::Different
+        };
     }
     let (tt, td) = (t_tost(df), t_diff(df));
     if d + tt * se < DELTA && d - tt * se > -DELTA {
@@ -97,7 +116,11 @@ fn classify(d: f64, se: f64, df: usize) -> Verdict {
 fn mean_var(v: &[f64]) -> (f64, f64) {
     let n = v.len() as f64;
     let m = v.iter().sum::<f64>() / n;
-    let var = if v.len() > 1 { v.iter().map(|x| (x - m) * (x - m)).sum::<f64>() / (n - 1.0) } else { 0.0 };
+    let var = if v.len() > 1 {
+        v.iter().map(|x| (x - m) * (x - m)).sum::<f64>() / (n - 1.0)
+    } else {
+        0.0
+    };
     (m, var)
 }
 
@@ -106,24 +129,48 @@ pub fn contrast_paired(x: &[f64], u: &[f64]) -> Contrast {
     assert_eq!(x.len(), u.len());
     let d: Vec<f64> = x.iter().zip(u).map(|(a, b)| a - b).collect();
     if d.len() < 8 {
-        return Contrast { n: d.len(), d: f64::NAN, se: f64::NAN, df: 0, verdict: Verdict::TooFew };
+        return Contrast {
+            n: d.len(),
+            d: f64::NAN,
+            se: f64::NAN,
+            df: 0,
+            verdict: Verdict::TooFew,
+        };
     }
     let (m, var) = mean_var(&d);
     let se = (var / d.len() as f64).sqrt();
     let df = d.len() - 1;
-    Contrast { n: d.len(), d: m, se, df, verdict: classify(m, se, df) }
+    Contrast {
+        n: d.len(),
+        d: m,
+        se,
+        df,
+        verdict: classify(m, se, df),
+    }
 }
 
 /// Welch contrast of ln-values (independent samples); df is the smaller sample size minus one (conservative).
 pub fn contrast_welch(x: &[f64], u: &[f64]) -> Contrast {
     if x.len() < 8 || u.len() < 8 {
-        return Contrast { n: x.len().min(u.len()), d: f64::NAN, se: f64::NAN, df: 0, verdict: Verdict::TooFew };
+        return Contrast {
+            n: x.len().min(u.len()),
+            d: f64::NAN,
+            se: f64::NAN,
+            df: 0,
+            verdict: Verdict::TooFew,
+        };
     }
     let (mx, vx) = mean_var(x);
     let (mu, vu) = mean_var(u);
     let se = (vx / x.len() as f64 + vu / u.len() as f64).sqrt();
     let df = x.len().min(u.len()) - 1;
-    Contrast { n: x.len().min(u.len()), d: mx - mu, se, df, verdict: classify(mx - mu, se, df) }
+    Contrast {
+        n: x.len().min(u.len()),
+        d: mx - mu,
+        se,
+        df,
+        verdict: classify(mx - mu, se, df),
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -207,7 +254,13 @@ pub fn paired_ln(rows: &[R], a: &str, b: &str, stat: &str) -> (Vec<f64>, Vec<f64
 }
 
 /// As `paired_ln`, keeping only pairs whose arm-`a` row passes `keep`.
-pub fn paired_ln_by(rows: &[R], a: &str, b: &str, stat: &str, keep: &dyn Fn(&R) -> bool) -> (Vec<f64>, Vec<f64>, usize) {
+pub fn paired_ln_by(
+    rows: &[R],
+    a: &str,
+    b: &str,
+    stat: &str,
+    keep: &dyn Fn(&R) -> bool,
+) -> (Vec<f64>, Vec<f64>, usize) {
     let (mut xa, mut xb, mut dropped) = (vec![], vec![], 0);
     for ra in rows.iter().filter(|r| r.arm == a && keep(r)) {
         if let Some(rb) = rows.iter().find(|r| r.arm == b && r.idx == ra.idx) {
@@ -261,7 +314,10 @@ pub struct CellResult {
 pub fn cost_per_covered(r: &R, kappa: f64) -> (f64, f64) {
     let q = r.a_len.min(r.b_len) as f64;
     let stored = r.a_len.max(r.b_len) as f64;
-    (q * (1.0 + kappa) / r.p, (r.adds_build as f64 + q + kappa * (q + stored)) / r.p)
+    (
+        q * (1.0 + kappa) / r.p,
+        (r.adds_build as f64 + q + kappa * (q + stored)) / r.p,
+    )
 }
 
 pub fn analyze_cell(id: &str, meta: &str, rows: &[R]) -> CellResult {
@@ -270,9 +326,20 @@ pub fn analyze_cell(id: &str, meta: &str, rows: &[R]) -> CellResult {
     let m: usize = meta_get(meta, "m").unwrap().parse().unwrap();
     let status = meta_get(meta, "status").unwrap_or_else(|| "MISSING".into());
     let mut cr = CellResult {
-        id: id.into(), n, a, m, status: status.clone(), valid: false, void_reasons: vec![],
-        yield_verdict: "NOT_EVALUATED".into(), attempt_verdict: "NOT_EVALUATED".into(), primary: vec![], chain_pairs: 0,
-        stat_pairs: 0, slot_s: f64::NAN, lines: vec![],
+        id: id.into(),
+        n,
+        a,
+        m,
+        status: status.clone(),
+        valid: false,
+        void_reasons: vec![],
+        yield_verdict: "NOT_EVALUATED".into(),
+        attempt_verdict: "NOT_EVALUATED".into(),
+        primary: vec![],
+        chain_pairs: 0,
+        stat_pairs: 0,
+        slot_s: f64::NAN,
+        lines: vec![],
     };
     if status != "OK" {
         cr.yield_verdict = status.clone();
@@ -287,7 +354,10 @@ pub fn analyze_cell(id: &str, meta: &str, rows: &[R]) -> CellResult {
         cr.void_reasons.push("PLANTED_TUPLE_MISSED".into());
     }
     let tmin = TAMPER_MIN_FRACTION * n as f64;
-    if rows.iter().any(|r| r.fano_tamper.is_finite() && r.fano_tamper < tmin) {
+    if rows
+        .iter()
+        .any(|r| r.fano_tamper.is_finite() && r.fano_tamper < tmin)
+    {
         cr.void_reasons.push("ORBIT_DETECTOR_MISSED_TAMPER".into());
     }
     // digit-model cross-check (PROTOCOL section 4.4, claim S6): wherever the instance is an exactly predictable Frobenius chain,
@@ -303,7 +373,11 @@ pub fn analyze_cell(id: &str, meta: &str, rows: &[R]) -> CellResult {
         }
     }
     {
-        let mut v: Vec<f64> = rows.iter().filter(|r| r.arm == "NI").map(|r| r.log2t / m as f64).collect();
+        let mut v: Vec<f64> = rows
+            .iter()
+            .filter(|r| r.arm == "NI")
+            .map(|r| r.log2t / m as f64)
+            .collect();
         if !v.is_empty() {
             v.sort_by(|a, b| a.partial_cmp(b).unwrap());
             cr.slot_s = v[v.len() / 2];
@@ -312,7 +386,13 @@ pub fn analyze_cell(id: &str, meta: &str, rows: &[R]) -> CellResult {
     // positive control (DUP vs UP on disp), A/A (UP2 vs UP on every stat)
     let (xd, ud, _) = paired_ln(rows, "DUP", "UP", "disp");
     let dup = contrast_paired(&xd, &ud);
-    cr.lines.push(format!("{id}\tCONTROL_DUP_vs_UP\tdisp\t{}\t{:.4}\t{:.4}\t{}", dup.n, dup.d, dup.se, dup.verdict.name()));
+    cr.lines.push(format!(
+        "{id}\tCONTROL_DUP_vs_UP\tdisp\t{}\t{:.4}\t{:.4}\t{}",
+        dup.n,
+        dup.d,
+        dup.se,
+        dup.verdict.name()
+    ));
     if dup.verdict == Verdict::TooFew {
         cr.void_reasons.push("POSITIVE_CONTROL_TOO_FEW".into());
     } else if !(dup.verdict == Verdict::Different && dup.d > DUP_MIN_LOG_RATIO) {
@@ -321,14 +401,24 @@ pub fn analyze_cell(id: &str, meta: &str, rows: &[R]) -> CellResult {
     for s in ["eff", "disp", "fano"] {
         let (x, u, _) = paired_ln(rows, "UP2", "UP", s);
         let aa = contrast_paired(&x, &u);
-        cr.lines.push(format!("{id}\tAA_UP2_vs_UP\t{s}\t{}\t{:.4}\t{:.4}\t{}", aa.n, aa.d, aa.se, aa.verdict.name()));
+        cr.lines.push(format!(
+            "{id}\tAA_UP2_vs_UP\t{s}\t{}\t{:.4}\t{:.4}\t{}",
+            aa.n,
+            aa.d,
+            aa.se,
+            aa.verdict.name()
+        ));
         if aa.verdict == Verdict::Different {
             cr.void_reasons.push(format!("AA_DIFFERENT_{s}"));
         }
     }
     // primary: NI vs profile-matched generic, paired. Pairs whose NI instance is an exactly predictable chain are a derived
     // stratum (exact computation, reported, not tested); the statistical claim rests on the non-chain pairs only.
-    let is_chain: std::collections::HashSet<u64> = rows.iter().filter(|r| r.arm == "NI" && r.is_chain()).map(|r| r.idx).collect();
+    let is_chain: std::collections::HashSet<u64> = rows
+        .iter()
+        .filter(|r| r.arm == "NI" && r.is_chain())
+        .map(|r| r.idx)
+        .collect();
     let not_chain = |r: &R| !is_chain.contains(&r.idx);
     for s in ["eff", "disp", "fano"] {
         let (x, u, dropped) = paired_ln_by(rows, "NI", "UP", s, &not_chain);
@@ -350,24 +440,42 @@ pub fn analyze_cell(id: &str, meta: &str, rows: &[R]) -> CellResult {
         }
     }
     // secondary, descriptive: NC and NR against the UP rows inside the same mu window, Welch
-    let med: f64 = meta_get(meta, "window_center").and_then(|s| s.parse().ok()).unwrap_or(0.0);
+    let med: f64 = meta_get(meta, "window_center")
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(0.0);
     for arm in ["NC", "NR"] {
         for s in ["eff", "disp", "fano"] {
-            let x: Vec<f64> = rows.iter().filter(|r| r.arm == arm).filter_map(|r| ln_ok(stat_of(r, s))).collect();
+            let x: Vec<f64> = rows
+                .iter()
+                .filter(|r| r.arm == arm)
+                .filter_map(|r| ln_ok(stat_of(r, s)))
+                .collect();
             let u: Vec<f64> = rows
                 .iter()
                 .filter(|r| r.arm == "UP" && (r.l2mu - med).abs() <= crate::cell::WINDOW_HALF)
                 .filter_map(|r| ln_ok(stat_of(r, s)))
                 .collect();
             let c = contrast_welch(&x, &u);
-            cr.lines.push(format!("{id}\tSECONDARY_{arm}_vs_UPwin\t{s}\t{}\t{:.4}\t{:.4}\t{}", c.n, c.d, c.se, c.verdict.name()));
+            cr.lines.push(format!(
+                "{id}\tSECONDARY_{arm}_vs_UPwin\t{s}\t{}\t{:.4}\t{:.4}\t{}",
+                c.n,
+                c.d,
+                c.se,
+                c.verdict.name()
+            ));
         }
     }
     // single-instance ONB: descriptive
-    if let (Some(o), Some(u)) = (rows.iter().find(|r| r.arm == "ONB"), rows.iter().find(|r| r.arm == "ONBUP")) {
+    if let (Some(o), Some(u)) = (
+        rows.iter().find(|r| r.arm == "ONB"),
+        rows.iter().find(|r| r.arm == "ONBUP"),
+    ) {
         for s in ["eff", "disp", "fano"] {
             if let (Some(a), Some(b)) = (ln_ok(stat_of(o, s)), ln_ok(stat_of(u, s))) {
-                cr.lines.push(format!("{id}\tDESCRIPTIVE_ONB_vs_ONBUP\t{s}\t1\t{:.4}\t-\t-", a - b));
+                cr.lines.push(format!(
+                    "{id}\tDESCRIPTIVE_ONB_vs_ONBUP\t{s}\t1\t{:.4}\t-\t-",
+                    a - b
+                ));
             }
         }
     }
@@ -384,7 +492,12 @@ pub fn analyze_cell(id: &str, meta: &str, rows: &[R]) -> CellResult {
             let (x, u, _) = paired_ln_by(rows, "NI", "UP", st, &|r: &R| is_chain.contains(&r.idx));
             (x.iter().zip(&u).map(|(a, b)| a - b).sum::<f64>() / x.len().max(1) as f64).exp()
         };
-        format!("; CHAIN_DERIVED(pairs {}, eff x{:.3}, disp x{:.3}: exact algebra, not a finding)", cr.chain_pairs, md("eff"), md("disp"))
+        format!(
+            "; CHAIN_DERIVED(pairs {}, eff x{:.3}, disp x{:.3}: exact algebra, not a finding)",
+            cr.chain_pairs,
+            md("eff"),
+            md("disp")
+        )
     } else {
         String::new()
     };
@@ -402,7 +515,11 @@ pub fn analyze_cell(id: &str, meta: &str, rows: &[R]) -> CellResult {
     } else if e.verdict == Verdict::Equivalent && d.verdict == Verdict::Equivalent {
         "NO_CHANGE_WITHIN_DELTA".into()
     } else {
-        format!("UNRESOLVED(MDE eff x{:.3}, disp x{:.3})", e.mde_ratio(), d.mde_ratio())
+        format!(
+            "UNRESOLVED(MDE eff x{:.3}, disp x{:.3})",
+            e.mde_ratio(),
+            d.mde_ratio()
+        )
     };
     cr.yield_verdict = format!("{stat}{chain_note}");
     cr.attempt_verdict = if cr.stat_pairs < 8 {
@@ -423,12 +540,24 @@ fn corr(x: &[f64], y: &[f64]) -> Option<f64> {
     if n < 3 {
         return None;
     }
-    let (mx, my) = (x.iter().sum::<f64>() / n as f64, y.iter().sum::<f64>() / n as f64);
-    let (sxx, syy): (f64, f64) = (x.iter().map(|a| (a - mx) * (a - mx)).sum(), y.iter().map(|a| (a - my) * (a - my)).sum());
+    let (mx, my) = (
+        x.iter().sum::<f64>() / n as f64,
+        y.iter().sum::<f64>() / n as f64,
+    );
+    let (sxx, syy): (f64, f64) = (
+        x.iter().map(|a| (a - mx) * (a - mx)).sum(),
+        y.iter().map(|a| (a - my) * (a - my)).sum(),
+    );
     if sxx == 0.0 || syy == 0.0 {
         return None;
     }
-    Some(x.iter().zip(y).map(|(a, b)| (a - mx) * (b - my)).sum::<f64>() / (sxx * syy).sqrt())
+    Some(
+        x.iter()
+            .zip(y)
+            .map(|(a, b)| (a - mx) * (b - my))
+            .sum::<f64>()
+            / (sxx * syy).sqrt(),
+    )
 }
 
 fn ols(x: &[f64], y: &[f64]) -> Option<(f64, f64)> {
@@ -436,21 +565,43 @@ fn ols(x: &[f64], y: &[f64]) -> Option<(f64, f64)> {
     if n < 4 {
         return None;
     }
-    let (mx, my) = (x.iter().sum::<f64>() / n as f64, y.iter().sum::<f64>() / n as f64);
+    let (mx, my) = (
+        x.iter().sum::<f64>() / n as f64,
+        y.iter().sum::<f64>() / n as f64,
+    );
     let sxx: f64 = x.iter().map(|a| (a - mx) * (a - mx)).sum();
     if sxx == 0.0 {
         return None;
     }
-    let b = x.iter().zip(y).map(|(a, c)| (a - mx) * (c - my)).sum::<f64>() / sxx;
-    let res: f64 = x.iter().zip(y).map(|(a, c)| { let r = c - my - b * (a - mx); r * r }).sum();
+    let b = x
+        .iter()
+        .zip(y)
+        .map(|(a, c)| (a - mx) * (c - my))
+        .sum::<f64>()
+        / sxx;
+    let res: f64 = x
+        .iter()
+        .zip(y)
+        .map(|(a, c)| {
+            let r = c - my - b * (a - mx);
+            r * r
+        })
+        .sum();
     Some((b, (res / (n as f64 - 2.0) / sxx).sqrt()))
 }
 
 pub fn analyze_dir(dir: &str) -> Result<String, String> {
     let mut ids: Vec<String> = vec![];
     for e in std::fs::read_dir(dir).map_err(|e| e.to_string())? {
-        let name = e.map_err(|e| e.to_string())?.file_name().to_string_lossy().to_string();
-        if let Some(id) = name.strip_prefix("meta_").and_then(|s| s.strip_suffix(".txt")) {
+        let name = e
+            .map_err(|e| e.to_string())?
+            .file_name()
+            .to_string_lossy()
+            .to_string();
+        if let Some(id) = name
+            .strip_prefix("meta_")
+            .and_then(|s| s.strip_suffix(".txt"))
+        {
             ids.push(id.to_string());
         }
     }
@@ -458,8 +609,11 @@ pub fn analyze_dir(dir: &str) -> Result<String, String> {
     let expected = crate::cell::cell_list();
     let mut results = vec![];
     for id in &ids {
-        let meta = std::fs::read_to_string(format!("{dir}/meta_{id}.txt")).map_err(|e| e.to_string())?;
-        let rows = parse_rows(&std::fs::read_to_string(format!("{dir}/rows_{id}.tsv")).map_err(|e| e.to_string())?);
+        let meta =
+            std::fs::read_to_string(format!("{dir}/meta_{id}.txt")).map_err(|e| e.to_string())?;
+        let rows = parse_rows(
+            &std::fs::read_to_string(format!("{dir}/rows_{id}.tsv")).map_err(|e| e.to_string())?,
+        );
         results.push(analyze_cell(id, &meta, &rows));
     }
     let mut tsv = String::from("cell\tcontrast\tstat\tN\td_ln\tse\t(PRIMARY rows: ratio, ci90, mde, dropped)\tverdict (last column)\n");
@@ -473,11 +627,26 @@ pub fn analyze_dir(dir: &str) -> Result<String, String> {
             missing.push(id);
         }
     }
-    writeln!(md, "cells present: {} of {}; missing (CELL_NOT_RUN): {}\n", ids.len(), expected.len(),
-        if missing.is_empty() { "none".to_string() } else { missing.join(", ") }).unwrap();
+    writeln!(
+        md,
+        "cells present: {} of {}; missing (CELL_NOT_RUN): {}\n",
+        ids.len(),
+        expected.len(),
+        if missing.is_empty() {
+            "none".to_string()
+        } else {
+            missing.join(", ")
+        }
+    )
+    .unwrap();
     writeln!(md, "## 1. Cell verdicts\n\n| cell | status | valid | yield (eff, disp) | attempts (fano) |\n|:--|:--|:--|:--|:--|").unwrap();
     for r in &results {
-        writeln!(md, "| {} | {} | {} | {} | {} |", r.id, r.status, r.valid, r.yield_verdict, r.attempt_verdict).unwrap();
+        writeln!(
+            md,
+            "| {} | {} | {} | {} | {} |",
+            r.id, r.status, r.valid, r.yield_verdict, r.attempt_verdict
+        )
+        .unwrap();
         for l in &r.lines {
             writeln!(tsv, "{}", l.replace("\t", "\t")).unwrap();
         }
@@ -485,7 +654,8 @@ pub fn analyze_dir(dir: &str) -> Result<String, String> {
     writeln!(md, "\n## 1b. Size census (exact slot sizes only, no group sums): can the design reach the target window?\n").unwrap();
     writeln!(md, "| cell | draws | feasible NI | feasible generic U | selected pairs | median log2 mu of selected | sensitivity flag |\n|:--|--:|--:|--:|--:|--:|:--|").unwrap();
     for id in &ids {
-        let meta = std::fs::read_to_string(format!("{dir}/meta_{id}.txt")).map_err(|e| e.to_string())?;
+        let meta =
+            std::fs::read_to_string(format!("{dir}/meta_{id}.txt")).map_err(|e| e.to_string())?;
         let g = |k: &str| meta_get(&meta, k).unwrap_or_else(|| "-".into());
         let wc = g("window_center");
         let flag = match wc.parse::<f64>() {
@@ -494,16 +664,32 @@ pub fn analyze_dir(dir: &str) -> Result<String, String> {
             Ok(_) => "ok",
             Err(_) => "no enumeration",
         };
-        writeln!(md, "| {id} | {} | {} | {} | {} | {wc} | {flag} |", g("draws"), g("feasible_NI"), g("feasible_U"), g("selected_pairs")).unwrap();
+        writeln!(
+            md,
+            "| {id} | {} | {} | {} | {} | {wc} | {flag} |",
+            g("draws"),
+            g("feasible_NI"),
+            g("feasible_U"),
+            g("selected_pairs")
+        )
+        .unwrap();
     }
     // trend of the primary log-ratio over m, per curve and stat; m is confounded with the mean slot size (PROTOCOL section 4.5)
     writeln!(md, "\n## 2. Trend of ln(NI/UP) over m (valid cells, non-chain pairs only; DESCRIPTIVE, m is confounded with slot size)\n").unwrap();
     writeln!(md, "At fixed n the mean log2 slot size s = log2(T)/m falls as m grows, so a slope over m is a slope over s as well and is not attributable to m. The correlation r(m, s) is printed; where |r| > 0.9 the two are not separable here. Section 2b varies s at fixed m.\n").unwrap();
     for (n, a) in [(23u32, 0u32), (19, 0), (19, 1)] {
-        let cells: Vec<&CellResult> = results.iter().filter(|r| r.valid && r.n == n && r.a == a && r.slot_s.is_finite()).collect();
+        let cells: Vec<&CellResult> = results
+            .iter()
+            .filter(|r| r.valid && r.n == n && r.a == a && r.slot_s.is_finite())
+            .collect();
         let (mx, sx): (Vec<f64>, Vec<f64>) = cells.iter().map(|r| (r.m as f64, r.slot_s)).unzip();
         match corr(&mx, &sx) {
-            Some(r) => writeln!(md, "- n={n} a={a}: r(m, s) = {r:+.3} over {} cells", cells.len()).unwrap(),
+            Some(r) => writeln!(
+                md,
+                "- n={n} a={a}: r(m, s) = {r:+.3} over {} cells",
+                cells.len()
+            )
+            .unwrap(),
             None => writeln!(md, "- n={n} a={a}: fewer than 3 valid cells, no r(m, s)").unwrap(),
         }
         for s in ["eff", "disp", "fano"] {
@@ -523,14 +709,44 @@ pub fn analyze_dir(dir: &str) -> Result<String, String> {
             }
         }
     }
-    writeln!(md, "\n## 2b. Slot-size control: fixed m, n varying (a = 0; valid cells; non-chain pairs)\n").unwrap();
+    writeln!(
+        md,
+        "\n## 2b. Slot-size control: fixed m, n varying (a = 0; valid cells; non-chain pairs)\n"
+    )
+    .unwrap();
     writeln!(md, "| m | n | s = mean log2 slot size | non-chain pairs | chain pairs | ln ratio eff | ln ratio disp | ln ratio fano |\n|--:|--:|--:|--:|--:|--:|--:|--:|").unwrap();
     for m in [9usize, 10] {
-        let mut cs: Vec<&CellResult> = results.iter().filter(|r| r.valid && r.a == 0 && r.m == m).collect();
+        let mut cs: Vec<&CellResult> = results
+            .iter()
+            .filter(|r| r.valid && r.a == 0 && r.m == m)
+            .collect();
         cs.sort_by_key(|r| r.n);
         for r in cs {
-            let g = |st: &str| r.primary.iter().find(|(k, _)| k == st).map_or("-".to_string(), |(_, c)| if c.d.is_finite() { format!("{:+.3}", c.d) } else { "-".into() });
-            writeln!(md, "| {} | {} | {:.2} | {} | {} | {} | {} | {} |", r.m, r.n, r.slot_s, r.stat_pairs, r.chain_pairs, g("eff"), g("disp"), g("fano")).unwrap();
+            let g = |st: &str| {
+                r.primary
+                    .iter()
+                    .find(|(k, _)| k == st)
+                    .map_or("-".to_string(), |(_, c)| {
+                        if c.d.is_finite() {
+                            format!("{:+.3}", c.d)
+                        } else {
+                            "-".into()
+                        }
+                    })
+            };
+            writeln!(
+                md,
+                "| {} | {} | {:.2} | {} | {} | {} | {} | {} |",
+                r.m,
+                r.n,
+                r.slot_s,
+                r.stat_pairs,
+                r.chain_pairs,
+                g("eff"),
+                g("disp"),
+                g("fano")
+            )
+            .unwrap();
         }
     }
     writeln!(md, "\nIf ln(NI/UP) tracks s at fixed m and not m at fixed s, the effect is a slot-size effect (the Frobenius collision mechanism needs equal digits in consecutive slots, probability about 1/|S|^2 per window), not an m effect; nothing here transfers to n = 131 where |S| is 2^8 to 2^9.").unwrap();
@@ -539,16 +755,40 @@ pub fn analyze_dir(dir: &str) -> Result<String, String> {
     writeln!(md, "Not a cost result: NI and UP have identical operation counts (same slot profile), so they differ here only through p. Structurally duplicated tuples are not priced as relations. The cost half of the original question was dropped (PROTOCOL section 9).\n").unwrap();
     writeln!(md, "| cell | arm | rows | amortised kappa=0 | 0.1 | 1 | single-target kappa=0 | 0.1 | 1 |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|").unwrap();
     for id in &ids {
-        let rows = parse_rows(&std::fs::read_to_string(format!("{dir}/rows_{id}.tsv")).map_err(|e| e.to_string())?);
+        let rows = parse_rows(
+            &std::fs::read_to_string(format!("{dir}/rows_{id}.tsv")).map_err(|e| e.to_string())?,
+        );
         let mut by: BTreeMap<String, Vec<&R>> = BTreeMap::new();
         for r in &rows {
             by.entry(r.arm.clone()).or_default().push(r);
         }
         for arm in ["NI", "UP"] {
             if let Some(v) = by.get(arm) {
-                let mean = |k: f64, one: bool| v.iter().map(|r| { let c = cost_per_covered(r, k); if one { c.1 } else { c.0 } }).sum::<f64>() / v.len() as f64;
-                writeln!(md, "| {id} | {arm} | {} | {:.3e} | {:.3e} | {:.3e} | {:.3e} | {:.3e} | {:.3e} |", v.len(),
-                    mean(0.0, false), mean(0.1, false), mean(1.0, false), mean(0.0, true), mean(0.1, true), mean(1.0, true)).unwrap();
+                let mean = |k: f64, one: bool| {
+                    v.iter()
+                        .map(|r| {
+                            let c = cost_per_covered(r, k);
+                            if one {
+                                c.1
+                            } else {
+                                c.0
+                            }
+                        })
+                        .sum::<f64>()
+                        / v.len() as f64
+                };
+                writeln!(
+                    md,
+                    "| {id} | {arm} | {} | {:.3e} | {:.3e} | {:.3e} | {:.3e} | {:.3e} | {:.3e} |",
+                    v.len(),
+                    mean(0.0, false),
+                    mean(0.1, false),
+                    mean(1.0, false),
+                    mean(0.0, true),
+                    mean(0.1, true),
+                    mean(1.0, true)
+                )
+                .unwrap();
             }
         }
     }

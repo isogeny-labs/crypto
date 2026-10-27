@@ -109,7 +109,11 @@ pub fn build_generic(f: &Fq, c: &Curve, m: usize, seed: u64) -> Vec<Vec<Pt>> {
 /// The type-II ONB with the interleaved partition, or None when the construction does not apply.
 pub fn build_onb(f: &Fq, c: &Curve, m: usize) -> Option<Vec<Vec<Pt>>> {
     let basis = normal::type2_onb(f)?;
-    Some(slots_from(c, &basis, &partition_interleaved(f.n as usize, m)))
+    Some(slots_from(
+        c,
+        &basis,
+        &partition_interleaved(f.n as usize, m),
+    ))
 }
 
 pub fn sizes(slots: &[Vec<Pt>]) -> Vec<usize> {
@@ -122,7 +126,13 @@ pub fn log2_tuples(sz: &[usize]) -> f64 {
 
 /// A generic-basis partition whose slot i has exactly profile[i] points (rejection per slot), the slots being
 /// independent coordinate subspaces of dimensions dims(n, m) that together span the field. None if it gives up.
-pub fn build_matched_generic(f: &Fq, c: &Curve, m: usize, seed: u64, profile: &[usize]) -> Option<Vec<Vec<Pt>>> {
+pub fn build_matched_generic(
+    f: &Fq,
+    c: &Curve,
+    m: usize,
+    seed: u64,
+    profile: &[usize],
+) -> Option<Vec<Vec<Pt>>> {
     let n = f.n as usize;
     let d = dims(n, m);
     assert_eq!(profile.len(), m);
