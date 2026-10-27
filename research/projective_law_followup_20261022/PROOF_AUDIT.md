@@ -603,3 +603,18 @@ open. These results do not
 prove compiled Rust field semantics, the returned coordinate formulas, principal-divisor
 zero/pole multiplicities, or the `Pic⁰` class equation; the full
 projective-law theorem remains open.
+
+The later [actual-projective branch zero-order packet](formal/PROJECTIVE_BRANCH_ZERO_ORDER.md)
+transports the affine branch DVR and its local orders through the checked
+weighted-Proj stalk isomorphism. A kernel-checked chain starts with the
+proof-side common 2+2 norm identity and valid Mumford input congruences,
+derives an `X-a` factor of the interpolating polynomial at a rational
+branch root on the norm support, maps that factor into the actual projective
+stalk, and proves local order one for `n(x)-b*y` when the source-style
+determinant `b` is nonzero. The actual weighted-Proj quintic's evaluation,
+degree and head coefficients are checked; separability supplies the simple
+root condition. The packet contains a PDF, graph, standardized gate CSV,
+source hashes, and direct Lean axiom logs. It does not prove that compiled
+Rust execution yields the mapped polynomial on every branch, count all
+nonbranch and infinity orders, or establish the global principal-divisor
+and `Pic⁰` equation. No cohort target or cost ratio changes.
