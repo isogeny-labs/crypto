@@ -1,0 +1,17 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| jcv1-pq-fp6-529ca663 | 9.70 | bsgs | 12/12 | 1.676 | 1.826 | 3.178 | — |
+| jcv1-pq-fp6-529ca663 | 9.70 | rho-plain | 12/12 | 4.185 | 4.185 | 4.185 | — |
+| jcv1-pq-fp6-529ca663 | 9.70 | rho-plain-aa | 12/12 | 4.185 | 4.185 | 4.185 | — |
+| jcv1-pq-fp7-aee0e2be | 14.98 | bsgs | 12/12 | 1.344 | 1.474 | 2.644 | — |
+| jcv1-pq-fp7-aee0e2be | 14.98 | rho-plain | 12/12 | 1.887 | 1.887 | 1.887 | — |
+| jcv1-pq-fp7-aee0e2be | 14.98 | rho-plain-aa | 12/12 | 1.887 | 1.887 | 1.887 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| jcv1-pq-fp6-529ca663 | bsgs vs rho-plain | bsgs < rho-plain |
+| jcv1-pq-fp6-529ca663 | bsgs vs rho-plain-aa | bsgs < rho-plain-aa |
+| jcv1-pq-fp6-529ca663 | rho-plain vs rho-plain-aa | unresolved inside the band |
+| jcv1-pq-fp7-aee0e2be | bsgs vs rho-plain | unresolved inside the band |
+| jcv1-pq-fp7-aee0e2be | bsgs vs rho-plain-aa | unresolved inside the band |
+| jcv1-pq-fp7-aee0e2be | rho-plain vs rho-plain-aa | unresolved inside the band |

@@ -1,0 +1,255 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Index calculus — four diagrams</title>
+<style>
+:root{color-scheme:light;--ink:#192b3b;--muted:#586879;--paper:#f7f6f2;--blue:#2864ad}*{box-sizing:border-box}body{margin:0;background:#e8ebee;color:var(--ink);font-family:system-ui,Arial,sans-serif}header{max-width:1440px;margin:auto;padding:28px 24px 18px}h1{font-size:28px;margin:0 0 9px}header p{color:var(--muted);margin:8px 0;line-height:1.5}nav{display:flex;flex-wrap:wrap;gap:9px;margin:20px 0}a,button{color:var(--blue)}nav a,.download{padding:9px 14px;border:1px solid #c9d2db;border-radius:9px;text-decoration:none;background:white}.paper{max-width:1440px;margin:0 auto 28px;box-shadow:0 8px 36px #192b3b14;background:var(--paper);scroll-margin-top:14px}.paper img,.paper svg{display:block;width:100%;height:auto}.controls{max-width:1440px;margin:0 auto 12px;padding:20px 24px;background:white;border:1px solid #d9dfe5;border-radius:12px;display:flex;flex-wrap:wrap;gap:24px;align-items:center}.controls label{font-size:15px;font-weight:600;display:flex;gap:10px;align-items:center}.controls select{font:inherit;padding:8px;border-radius:7px;border:1px solid #c9d2db}.controls input{width:220px}.controls p{width:100%;margin:0;font-size:14px;color:var(--muted)}.sources{max-width:1440px;margin:0 auto 32px;padding:24px;background:white;border-radius:12px;line-height:1.65}.sources p{margin:4px 0}.downloads{max-width:1440px;margin:0 auto 30px;display:flex;flex-wrap:wrap;gap:12px}.download{font-size:14px}button{font:inherit;cursor:pointer}.no-print{display:block}@page{size:14.4in 9.4in;margin:0}@media print{body{background:white}header,.controls,.sources,.downloads{display:none!important}.paper{margin:0;padding:0;max-width:none;width:14.4in;height:9.4in;box-shadow:none;break-after:page}.paper:last-of-type{break-after:auto}.paper img,.paper svg{width:14.4in;height:9.4in}}
+</style></head><body><header><h1>Index calculus: four editable diagrams</h1><p>A first teaching set for a technical audience new to index calculus. Each figure is also available as an editable SVG and a PNG.</p><nav><a href="#workflow">1 · Shared workflow</a><a href="#smoothness">2 · Relation finding</a><a href="#cover">3 · Covers and subgroups</a><a href="#costs">4 · Cost comparison</a></nav></header>
+<section class="paper" id="workflow"><svg xmlns="http://www.w3.org/2000/svg" width="1440" height="940" viewBox="0 0 1440 940" role="img" aria-labelledby="title1 desc1">
+<title id="title1">One goal, two ways to find relations</title><desc id="desc1">Both methods collect equations, then recover the discrete log with sparse linear algebra.</desc>
+<defs>
+<marker id="a1ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#192b3b"/></marker>
+<marker id="a1blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2864ad"/></marker>
+<marker id="a1green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#087d68"/></marker>
+<marker id="a1purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7555a5"/></marker>
+<marker id="a1muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#586879"/></marker>
+</defs><style>
+text{font-family:DejaVu Sans,Arial,sans-serif;fill:#192b3b} .math{font-family:DejaVu Sans,Arial,sans-serif;font-weight:500}
+</style>
+<rect x="0" y="0" width="1440" height="940" rx="0" fill="#f7f6f2" stroke="none" stroke-width="1.5" />
+<text x="56" y="48" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1.7" >ELLIPTIC CURVES · JACOBIANS · INDEX CALCULUS</text>
+<text x="56" y="101" font-size="36" font-weight="700" text-anchor="start" style="fill:#192b3b"  >One goal, two ways to find relations</text>
+<text x="56" y="140" font-size="20" font-weight="400" text-anchor="start" style="fill:#586879"  >Both methods collect equations, then recover the discrete log with sparse linear algebra.</text>
+<text x="1382" y="48" font-size="15" font-weight="400" text-anchor="end" style="fill:#586879"  >01 / 04</text>
+<rect x="56" y="174" width="1328" height="94" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="84" y="211" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1.4" >THE TARGET</text>
+<text x="84" y="247" font-size="29" font-weight="600" text-anchor="start" style="fill:#192b3b"  >Q = kP</text>
+<text x="337" y="211" font-size="22" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Unknown: k modulo the subgroup order n</text>
+<text x="337" y="246" font-size="19" font-weight="400" text-anchor="start" style="fill:#586879"  >P and Q are points or divisor classes, depending on the group.</text>
+<text x="294" y="309" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="0.7" >1  CHOOSE A FACTOR BASE</text>
+<text x="710" y="309" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="0.7" >2  COLLECT RELATIONS</text>
+<text x="1151" y="309" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="0.7" >3  SAVE EQUATIONS</text>
+<rect x="56" y="334" width="205" height="164" rx="18" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" />
+<text x="78" y="373" font-size="17" font-weight="700" text-anchor="start" style="fill:#2864ad"  >ELLIPTIC</text>
+<text x="78" y="416" font-size="23" font-weight="500" text-anchor="start" style="fill:#2864ad"  >E(𝔽q)</text>
+<text x="78" y="456" font-size="15" font-weight="400" text-anchor="start" style="fill:#586879"  >group elements</text>
+<rect x="286" y="334" width="350" height="164" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="310" y="388" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Selected points Fⱼ</text>
+<text x="310" y="423" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >with restricted coordinates</text>
+<rect x="688" y="334" width="410" height="164" rx="18" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" />
+<text x="712" y="388" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Solve for a point decomposition</text>
+<text x="712" y="423" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >using summation polynomials</text>
+<rect x="1148" y="334" width="236" height="164" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="1170" y="388" font-size="18" font-weight="400" text-anchor="start" style="fill:#192b3b"  >R = Σ eⱼFⱼ</text>
+<text x="1170" y="423" font-size="18" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Check lifts and signs</text>
+<path d="M645 416 L677 416" fill="none" stroke="#586879" stroke-width="2.5" marker-end="url(#a1muted)" />
+<path d="M1107 416 L1137 416" fill="none" stroke="#586879" stroke-width="2.5" marker-end="url(#a1muted)" />
+<rect x="56" y="545" width="205" height="164" rx="18" fill="#eaf6f1" stroke="#087d68" stroke-width="1.5" />
+<text x="78" y="584" font-size="17" font-weight="700" text-anchor="start" style="fill:#087d68"  >HYPERELLIPTIC</text>
+<text x="78" y="627" font-size="23" font-weight="500" text-anchor="start" style="fill:#087d68"  >Jac(C)(𝔽q)</text>
+<text x="78" y="667" font-size="15" font-weight="400" text-anchor="start" style="fill:#586879"  >group elements</text>
+<rect x="286" y="545" width="350" height="164" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="310" y="599" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Selected prime-divisor classes</text>
+<text x="310" y="634" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >often from rational points</text>
+<rect x="688" y="545" width="410" height="164" rx="18" fill="#eaf6f1" stroke="#087d68" stroke-width="1.5" />
+<text x="712" y="599" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Factor a divisor’s polynomial</text>
+<text x="712" y="634" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >and test factor-base membership</text>
+<rect x="1148" y="545" width="236" height="164" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="1170" y="599" font-size="18" font-weight="400" text-anchor="start" style="fill:#192b3b"  >D = Σ eⱼFⱼ</text>
+<text x="1170" y="634" font-size="18" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Merge partial rows</text>
+<path d="M645 627 L677 627" fill="none" stroke="#586879" stroke-width="2.5" marker-end="url(#a1muted)" />
+<path d="M1107 627 L1137 627" fill="none" stroke="#586879" stroke-width="2.5" marker-end="url(#a1muted)" />
+<path d="M1267 506 L1267 528 L1399 528 L1399 753 L1230 753" fill="none" stroke="#2864ad" stroke-width="2" />
+<path d="M1230 753 L1200 753" fill="none" stroke="#2864ad" stroke-width="2.5" marker-end="url(#a1blue)" />
+<path d="M1267 717 L1267 753 L1230 753" fill="none" stroke="#087d68" stroke-width="2" />
+<rect x="286" y="744" width="914" height="114" rx="18" fill="white" stroke="#192b3b" stroke-width="1.5" />
+<text x="314" y="781" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1" >SAME LINEAR-ALGEBRA STAGE</text>
+<text x="314" y="826" font-size="26" font-weight="500" text-anchor="start" style="fill:#192b3b"  >aᵢ + bᵢk = Σ eᵢⱼℓⱼ   (mod n)</text>
+<path d="M860 812 L932 812" fill="none" stroke="#192b3b" stroke-width="2.5" marker-end="url(#a1ink)" />
+<text x="958" y="824" font-size="26" font-weight="600" text-anchor="start" style="fill:#192b3b"  >recover k</text>
+<text x="56" y="791" font-size="17" font-weight="400" text-anchor="start" style="fill:#586879"  >Write R = aP + bQ.</text>
+<text x="56" y="822" font-size="17" font-weight="400" text-anchor="start" style="fill:#586879"  >ℓⱼ: log of Fⱼ to base P.</text>
+<path d="M56 886 L1384 886" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="56" y="918" font-size="15" font-weight="400" text-anchor="start" style="fill:#586879"  >The factor base is chosen in, or projected to, the target prime-order component.  Σ means a group sum.</text>
+</svg></section>
+<section class="paper" id="smoothness"><svg xmlns="http://www.w3.org/2000/svg" width="1440" height="940" viewBox="0 0 1440 940" role="img" aria-labelledby="title2 desc2">
+<title id="title2">Testing smoothness and solving decompositions</title><desc id="desc2">The relation-finding step is where the elliptic and hyperelliptic methods differ most.</desc>
+<defs>
+<marker id="a2ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#192b3b"/></marker>
+<marker id="a2blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2864ad"/></marker>
+<marker id="a2green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#087d68"/></marker>
+<marker id="a2purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7555a5"/></marker>
+<marker id="a2muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#586879"/></marker>
+</defs><style>
+text{font-family:DejaVu Sans,Arial,sans-serif;fill:#192b3b} .math{font-family:DejaVu Sans,Arial,sans-serif;font-weight:500}
+</style>
+<rect x="0" y="0" width="1440" height="940" rx="0" fill="#f7f6f2" stroke="none" stroke-width="1.5" />
+<text x="56" y="48" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1.7" >ELLIPTIC CURVES · JACOBIANS · INDEX CALCULUS</text>
+<text x="56" y="101" font-size="36" font-weight="700" text-anchor="start" style="fill:#192b3b"  >Testing smoothness and solving decompositions</text>
+<text x="56" y="140" font-size="20" font-weight="400" text-anchor="start" style="fill:#586879"  >The relation-finding step is where the elliptic and hyperelliptic methods differ most.</text>
+<text x="1382" y="48" font-size="15" font-weight="400" text-anchor="end" style="fill:#586879"  >02 / 04</text>
+<rect x="56" y="180" width="640" height="616" rx="18" fill="white" stroke="#087d68" stroke-width="1.5" />
+<rect x="744" y="180" width="640" height="616" rx="18" fill="white" stroke="#2864ad" stroke-width="1.5" />
+<text x="84" y="222" font-size="16" font-weight="700" text-anchor="start" style="fill:#087d68" letter-spacing="1" >HYPERELLIPTIC</text>
+<text x="84" y="259" font-size="27" font-weight="650" text-anchor="start" style="fill:#192b3b"  >Test a candidate divisor</text>
+<text x="772" y="222" font-size="16" font-weight="700" text-anchor="start" style="fill:#2864ad" letter-spacing="1" >ELLIPTIC</text>
+<text x="772" y="259" font-size="27" font-weight="650" text-anchor="start" style="fill:#192b3b"  >Search for a decomposition</text>
+<rect x="84" y="286" width="584" height="90" rx="18" fill="#eaf6f1" stroke="none" stroke-width="1.5" />
+<text x="108" y="323" font-size="23" font-weight="400" text-anchor="start" style="fill:#192b3b"  >D is represented by (u(X), v(X))</text>
+<text x="108" y="355" font-size="18" font-weight="400" text-anchor="start" style="fill:#586879"  >Typically deg u ≤ g; g is the genus.</text>
+<path d="M376 386 L376 414" fill="none" stroke="#087d68" stroke-width="2.5" marker-end="url(#a2green)" />
+<text x="376" y="447" font-size="25" font-weight="500" text-anchor="middle" style="fill:#087d68"  >u(X) = (X − r₁)(X − r₂)</text>
+<text x="376" y="479" font-size="17" font-weight="400" text-anchor="middle" style="fill:#586879"  >Example: a divisor with two rational constituents</text>
+<path d="M288 493 L222 531" fill="none" stroke="#087d68" stroke-width="2.5" marker-end="url(#a2green)" />
+<path d="M464 493 L530 531" fill="none" stroke="#087d68" stroke-width="2.5" marker-end="url(#a2green)" />
+<rect x="108" y="543" width="242" height="98" rx="18" fill="#eaf6f1" stroke="none" stroke-width="1.5" />
+<text x="229" y="577" font-size="25" font-weight="600" text-anchor="middle" style="fill:#087d68"  >D₁</text>
+<text x="229" y="611" font-size="21" font-weight="400" text-anchor="middle" style="fill:#192b3b"  >(r₁, v(r₁))</text>
+<rect x="404" y="543" width="242" height="98" rx="18" fill="#eaf6f1" stroke="none" stroke-width="1.5" />
+<text x="525" y="577" font-size="25" font-weight="600" text-anchor="middle" style="fill:#087d68"  >D₂</text>
+<text x="525" y="611" font-size="21" font-weight="400" text-anchor="middle" style="fill:#192b3b"  >(r₂, v(r₂))</text>
+<text x="376" y="683" font-size="28" font-weight="500" text-anchor="middle" style="fill:#087d68"  >[D] = D₁ + D₂</text>
+<text x="84" y="727" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="0.8" >SMOOTH WHEN</text>
+<text x="84" y="758" font-size="17" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Every constituent class belongs to the chosen factor base.</text>
+<rect x="772" y="286" width="584" height="90" rx="18" fill="#edf3fc" stroke="none" stroke-width="1.5" />
+<text x="796" y="323" font-size="25" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Seek R = ε₁P₁ + ··· + εₘPₘ</text>
+<text x="796" y="355" font-size="18" font-weight="400" text-anchor="start" style="fill:#586879"  >Each x(Pᵢ) must lie in a selected set V.</text>
+<path d="M1064 386 L1064 414" fill="none" stroke="#2864ad" stroke-width="2.5" marker-end="url(#a2blue)" />
+<rect x="804" y="429" width="94" height="68" rx="12" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="851" y="471" font-size="23" font-weight="500" text-anchor="middle" style="fill:#2864ad"  >x₁ ?</text>
+<rect x="953" y="429" width="94" height="68" rx="12" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="1000" y="471" font-size="23" font-weight="500" text-anchor="middle" style="fill:#2864ad"  >x₂ ?</text>
+<rect x="1203" y="429" width="94" height="68" rx="12" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="1250" y="471" font-size="23" font-weight="500" text-anchor="middle" style="fill:#2864ad"  >xₘ ?</text>
+<text x="1124" y="470" font-size="28" font-weight="400" text-anchor="start" style="fill:#586879"  >···</text>
+<path d="M1064 508 L1064 536" fill="none" stroke="#2864ad" stroke-width="2.5" marker-end="url(#a2blue)" />
+<text x="1064" y="573" font-size="25" font-weight="500" text-anchor="middle" style="fill:#2864ad"  >Sₘ₊₁(x₁, …, xₘ, x(R)) = 0</text>
+<text x="1064" y="611" font-size="19" font-weight="400" text-anchor="middle" style="fill:#586879"  >Solve the polynomial system with xᵢ ∈ V.</text>
+<path d="M1064 629 L1064 656" fill="none" stroke="#2864ad" stroke-width="2.5" marker-end="url(#a2blue)" />
+<text x="1064" y="690" font-size="20" font-weight="400" text-anchor="middle" style="fill:#192b3b"  >Lift x-coordinates to points,</text>
+<text x="1064" y="722" font-size="20" font-weight="400" text-anchor="middle" style="fill:#192b3b"  >then verify the signed group sum.</text>
+<text x="772" y="766" font-size="17" font-weight="400" text-anchor="start" style="fill:#586879"  >Writing S is easier than solving its constrained roots.</text>
+<rect x="56" y="816" width="1328" height="51" rx="12" fill="#fff4dd" stroke="none" stroke-width="1.5" />
+<text x="720" y="849" font-size="20" font-weight="500" text-anchor="middle" style="fill:#a66a13"  >Fast smoothness testing still needs enough relations over a sufficiently small factor base.</text>
+<path d="M56 886 L1384 886" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="56" y="918" font-size="15" font-weight="400" text-anchor="start" style="fill:#586879"  >Divisor classes use an infinity/base-divisor convention.  The displayed split assumes valid points and factor-base membership.</text>
+</svg></section>
+<section class="paper" id="cover"><svg xmlns="http://www.w3.org/2000/svg" width="1440" height="940" viewBox="0 0 1440 940" role="img" aria-labelledby="title3 desc3">
+<title id="title3">A cover changes the ambient group</title><desc id="desc3">The curve map and its induced pullback point in opposite directions.</desc>
+<defs>
+<marker id="a3ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#192b3b"/></marker>
+<marker id="a3blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2864ad"/></marker>
+<marker id="a3green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#087d68"/></marker>
+<marker id="a3purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7555a5"/></marker>
+<marker id="a3muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#586879"/></marker>
+</defs><style>
+text{font-family:DejaVu Sans,Arial,sans-serif;fill:#192b3b} .math{font-family:DejaVu Sans,Arial,sans-serif;font-weight:500}
+</style>
+<rect x="0" y="0" width="1440" height="940" rx="0" fill="#f7f6f2" stroke="none" stroke-width="1.5" />
+<text x="56" y="48" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1.7" >ELLIPTIC CURVES · JACOBIANS · INDEX CALCULUS</text>
+<text x="56" y="101" font-size="36" font-weight="700" text-anchor="start" style="fill:#192b3b"  >A cover changes the ambient group</text>
+<text x="56" y="140" font-size="20" font-weight="400" text-anchor="start" style="fill:#586879"  >The curve map and its induced pullback point in opposite directions.</text>
+<text x="1382" y="48" font-size="15" font-weight="400" text-anchor="end" style="fill:#586879"  >03 / 04</text>
+<text x="56" y="193" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1.4" >CURVES</text>
+<rect x="56" y="216" width="595" height="160" rx="18" fill="#f1edf8" stroke="#7555a5" stroke-width="1.5" />
+<text x="82" y="254" font-size="23" font-weight="600" text-anchor="start" style="fill:#7555a5"  >Genus-2 hyperelliptic curve C</text>
+<text x="82" y="302" font-size="30" font-weight="500" text-anchor="start" style="fill:#192b3b"  >Y² = X⁶ + aX² + b</text>
+<text x="82" y="343" font-size="18" font-weight="400" text-anchor="start" style="fill:#586879"  >Same field 𝔽p as the challenge curve</text>
+<rect x="925" y="216" width="459" height="160" rx="18" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" />
+<text x="951" y="254" font-size="23" font-weight="600" text-anchor="start" style="fill:#2864ad"  >Elliptic curve E</text>
+<text x="951" y="302" font-size="28" font-weight="500" text-anchor="start" style="fill:#192b3b"  >y² = x³ + ax + b</text>
+<text x="951" y="343" font-size="18" font-weight="400" text-anchor="start" style="fill:#586879"  >The published ECCp-131 curve</text>
+<path d="M669 284 L905 284" fill="none" stroke="#7555a5" stroke-width="2.5" marker-end="url(#a3purple)" />
+<text x="787" y="252" font-size="19" font-weight="500" text-anchor="middle" style="fill:#7555a5"  >degree-2 cover f</text>
+<text x="787" y="327" font-size="20" font-weight="500" text-anchor="middle" style="fill:#7555a5"  >(X,Y) ↦ (X²,Y)</text>
+<text x="56" y="426" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1.4" >GROUPS OF DIVISOR CLASSES</text>
+<rect x="56" y="450" width="739" height="299" rx="18" fill="#f1edf8" stroke="#7555a5" stroke-width="1.5" />
+<text x="84" y="490" font-size="26" font-weight="600" text-anchor="start" style="fill:#7555a5"  >Jac(C)(𝔽p)</text>
+<text x="84" y="525" font-size="20" font-weight="400" text-anchor="start" style="fill:#586879"  >Ambient group size ≈ p²</text>
+<rect x="116" y="552" width="608" height="155" rx="22" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" />
+<text x="420" y="592" font-size="23" font-weight="600" text-anchor="middle" style="fill:#2864ad"  >Embedded elliptic subgroup</text>
+<text x="420" y="635" font-size="29" font-weight="500" text-anchor="middle" style="fill:#192b3b"  >f*(Q) = k f*(P)</text>
+<text x="420" y="674" font-size="21" font-weight="500" text-anchor="middle" style="fill:#2864ad"  >Subgroup order remains n ≈ p</text>
+<rect x="1000" y="493" width="384" height="214" rx="18" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" />
+<text x="1028" y="537" font-size="27" font-weight="600" text-anchor="start" style="fill:#2864ad"  >E(𝔽p)</text>
+<text x="1028" y="583" font-size="30" font-weight="500" text-anchor="start" style="fill:#192b3b"  >Q = kP</text>
+<text x="1028" y="628" font-size="19" font-weight="400" text-anchor="start" style="fill:#586879"  >Challenge subgroup order n</text>
+<text x="1028" y="666" font-size="17" font-weight="400" text-anchor="start" style="fill:#586879"  >For ECCp-131: #E(𝔽p) = n</text>
+<path d="M982 615 L743 615" fill="none" stroke="#2864ad" stroke-width="2.5" marker-end="url(#a3blue)" />
+<text x="866" y="571" font-size="22" font-weight="600" text-anchor="middle" style="fill:#2864ad"  >pullback f*</text>
+<rect x="56" y="775" width="1328" height="91" rx="18" fill="white" stroke="#192b3b" stroke-width="1.5" />
+<text x="84" y="811" font-size="23" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Pushforward after pullback gives multiplication by 2.</text>
+<text x="84" y="846" font-size="20" font-weight="400" text-anchor="start" style="fill:#586879"  >Since n is odd, pullback is injective on the target subgroup. The same unknown k survives.</text>
+<path d="M56 886 L1384 886" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="56" y="918" font-size="15" font-weight="400" text-anchor="start" style="fill:#586879"  >Schematic group regions, not a plot of finite-field points.  A larger ambient group alone supplies no speedup.</text>
+</svg></section>
+<div class="controls"><label>Compare<select id="mode"><option value="field">Same field size</option><option value="group">Same group size</option></select></label><label><span id="sliderName">Field-size bits</span><input id="bits" type="range" min="48" max="160" step="0.1" value="130.2"><output id="bitValue">130.2</output></label><button id="saveCost">Download current cost diagram (SVG)</button><p id="modeExplanation">Fix q. A genus-g Jacobian has order approximately qᵍ, so the compared groups have different sizes.</p></div>
+<section class="paper" id="costs"><svg xmlns="http://www.w3.org/2000/svg" width="1440" height="940" viewBox="0 0 1440 940" role="img" aria-labelledby="title4 desc4">
+<title id="title4">Compare field size and group size separately</title><desc id="desc4">Asymptotic work exponents for representative algorithms; constants and logarithmic factors are omitted.</desc>
+<defs>
+<marker id="a4ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#192b3b"/></marker>
+<marker id="a4blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2864ad"/></marker>
+<marker id="a4green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#087d68"/></marker>
+<marker id="a4purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7555a5"/></marker>
+<marker id="a4muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#586879"/></marker>
+</defs><style>
+text{font-family:DejaVu Sans,Arial,sans-serif;fill:#192b3b} .math{font-family:DejaVu Sans,Arial,sans-serif;font-weight:500}
+</style>
+<rect x="0" y="0" width="1440" height="940" rx="0" fill="#f7f6f2" stroke="none" stroke-width="1.5" />
+<text x="56" y="48" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1.7" >ELLIPTIC CURVES · JACOBIANS · INDEX CALCULUS</text>
+<text x="56" y="101" font-size="36" font-weight="700" text-anchor="start" style="fill:#192b3b"  >Compare field size and group size separately</text>
+<text x="56" y="140" font-size="20" font-weight="400" text-anchor="start" style="fill:#586879"  >Asymptotic work exponents for representative algorithms; constants and logarithmic factors are omitted.</text>
+<text x="1382" y="48" font-size="15" font-weight="400" text-anchor="end" style="fill:#586879"  >04 / 04</text>
+<rect x="56" y="175" width="1328" height="76" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="82" y="207" font-size="13" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1" >COMPARISON</text>
+<text x="82" y="237" font-size="23" font-weight="600" text-anchor="start" style="fill:#192b3b"  id="comparisonLabel">Same field: log₂ q = 130.19</text>
+<circle cx="962" cy="215" r="7" fill="#2864ad" stroke="none"/>
+<text x="980" y="222" font-size="18" font-weight="400" text-anchor="start" style="fill:#586879"  >Pollard rho</text>
+<circle cx="1162" cy="215" r="7" fill="#087d68" stroke="none"/>
+<text x="1180" y="222" font-size="18" font-weight="400" text-anchor="start" style="fill:#586879"  >Index calculus</text>
+<path d="M440.0 278 L440.0 741" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="440.0" y="775" font-size="16" font-weight="400" text-anchor="middle" style="fill:#586879"  >0</text>
+<path d="M610.7692307692307 278 L610.7692307692307 741" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="610.7692307692307" y="775" font-size="16" font-weight="400" text-anchor="middle" style="fill:#586879"  >50</text>
+<path d="M781.5384615384615 278 L781.5384615384615 741" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="781.5384615384615" y="775" font-size="16" font-weight="400" text-anchor="middle" style="fill:#586879"  >100</text>
+<path d="M952.3076923076923 278 L952.3076923076923 741" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="952.3076923076923" y="775" font-size="16" font-weight="400" text-anchor="middle" style="fill:#586879"  >150</text>
+<path d="M1123.076923076923 278 L1123.076923076923 741" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="1123.076923076923" y="775" font-size="16" font-weight="400" text-anchor="middle" style="fill:#586879"  >200</text>
+<path d="M1293.8461538461538 278 L1293.8461538461538 741" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="1293.8461538461538" y="775" font-size="16" font-weight="400" text-anchor="middle" style="fill:#586879"  >250</text>
+<text x="80" y="321" font-size="22" font-weight="600" text-anchor="start" style="fill:#192b3b"  >Elliptic curve</text>
+<text x="80" y="351" font-size="17" font-weight="400" text-anchor="start" style="fill:#586879"  id="orderLabel0">Generic subgroup order ≈ q</text>
+<rect x="440" y="305" width="222.32" height="18" rx="5" fill="#2864ad" stroke="none" stroke-width="1.5" id="rhoBar0"/>
+<text x="674.3201812287053" y="321" font-size="17" font-weight="400" text-anchor="start" style="fill:#2864ad"  id="rhoText0">2^65.1</text>
+<text x="440" y="360" font-size="18" font-weight="400" text-anchor="start" style="fill:#586879"  >No general prime-field IC speedup established</text>
+<text x="80" y="437" font-size="22" font-weight="600" text-anchor="start" style="fill:#192b3b"  >Genus-2 hyperelliptic</text>
+<text x="80" y="467" font-size="17" font-weight="400" text-anchor="start" style="fill:#586879"  id="orderLabel1">Generic subgroup order ≈ q²</text>
+<rect x="440" y="421" width="444.64" height="18" rx="5" fill="#2864ad" stroke="none" stroke-width="1.5" id="rhoBar1"/>
+<text x="896.6403624574107" y="437" font-size="17" font-weight="400" text-anchor="start" style="fill:#2864ad"  id="rhoText1">2^130.2</text>
+<rect x="440" y="456" width="444.64" height="18" rx="5" fill="#087d68" stroke="none" stroke-width="1.5" id="icBar1"/>
+<text x="896.6403624574107" y="472" font-size="17" font-weight="400" text-anchor="start" style="fill:#087d68"  id="icText1">2^130.2</text>
+<text x="80" y="553" font-size="22" font-weight="600" text-anchor="start" style="fill:#192b3b"  >Genus-3 hyperelliptic</text>
+<text x="80" y="583" font-size="17" font-weight="400" text-anchor="start" style="fill:#586879"  id="orderLabel2">Generic subgroup order ≈ q³</text>
+<rect x="440" y="537" width="666.961" height="18" rx="5" fill="#2864ad" stroke="none" stroke-width="1.5" id="rhoBar2"/>
+<text x="1118.9605436861161" y="553" font-size="17" font-weight="400" text-anchor="start" style="fill:#2864ad"  id="rhoText2">2^195.3</text>
+<rect x="440" y="572" width="592.854" height="18" rx="5" fill="#087d68" stroke="none" stroke-width="1.5" id="icBar2"/>
+<text x="1044.853816609881" y="588" font-size="17" font-weight="400" text-anchor="start" style="fill:#087d68"  id="icText2">2^173.6</text>
+<text x="80" y="669" font-size="22" font-weight="600" text-anchor="start" style="fill:#192b3b"  >Genus-3 plane quartic</text>
+<text x="80" y="699" font-size="17" font-weight="400" text-anchor="start" style="fill:#586879"  id="orderLabel3">Generic subgroup order ≈ q³</text>
+<rect x="440" y="653" width="666.961" height="18" rx="5" fill="#2864ad" stroke="none" stroke-width="1.5" id="rhoBar3"/>
+<text x="1118.9605436861161" y="669" font-size="17" font-weight="400" text-anchor="start" style="fill:#2864ad"  id="rhoText3">2^195.3</text>
+<rect x="440" y="688" width="444.64" height="18" rx="5" fill="#087d68" stroke="none" stroke-width="1.5" id="icBar3"/>
+<text x="896.6403624574107" y="704" font-size="17" font-weight="400" text-anchor="start" style="fill:#087d68"  id="icText3">2^130.2</text>
+<text x="885" y="814" font-size="20" font-weight="400" text-anchor="middle" style="fill:#586879"  >Work exponent e, where cost is approximately 2ᵉ</text>
+<rect x="56" y="834" width="1328" height="39" rx="10" fill="#fff4dd" stroke="none" stroke-width="1.5" />
+<text x="720" y="861" font-size="17" font-weight="500" text-anchor="middle" style="fill:#a66a13"  >These rows assume large generic subgroups. A cover of ECCp-131 retains its original order-n subgroup.</text>
+<path d="M56 886 L1384 886" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="56" y="918" font-size="15" font-weight="400" text-anchor="start" style="fill:#586879"  >Fixed small genus and standard algorithmic hypotheses. Field/group operations and constants differ; this is not a timing prediction.</text>
+</svg></section>
+<div class="downloads"><button class="download" onclick="window.print()">Print / save all four as PDF</button><button class="download" data-svg="workflow" data-name="01-workflow.svg">Workflow SVG</button><button class="download" data-svg="smoothness" data-name="02-smoothness.svg">Relation-finding SVG</button><button class="download" data-svg="cover" data-name="03-cover.svg">Cover SVG</button><button class="download" data-svg="costs" data-name="04-costs-current.svg">Cost SVG (current)</button></div>
+<div class="sources"><strong>Scope and references</strong><p>All visual regions are schematic. Curves, groups, divisor classes, and subgroup orders are distinct objects. The cover example uses ECCp-131 over its original prime field, not the binary ECC2K-130 curve.</p><p>The hyperelliptic split illustrates valid rational constituent points and the appropriate infinity/base-divisor convention. A small factor base can still make usable relations scarce.</p><p>Cost exponents are representative fixed-small-genus asymptotic bounds under their standard hypotheses. They omit logarithmic factors and constants and do not predict execution time or prove lower bounds.</p><p><a href="https://eprint.iacr.org/2004/031">Semaev: summation polynomials</a> · <a href="https://arxiv.org/abs/math/0606607">Diem: small-genus index calculus</a> · <a href="https://jtnb.centre-mersenne.org/articles/10.5802/jtnb.815/">Diem: plane-quartic index calculus</a> · <a href="https://www.certicom.com/en/curves-list">Certicom parameters</a></p></div>
+<script>
+const mode=document.getElementById('mode'), bits=document.getElementById('bits');
+function update(){const b=Number(bits.value),sameGroup=mode.value==='group',scale=888/260;document.getElementById('bitValue').textContent=b.toFixed(1);document.getElementById('sliderName').textContent=sameGroup?'Group-size bits':'Field-size bits';document.getElementById('modeExplanation').textContent=sameGroup?'Fix a generic subgroup order N. Its field size is approximately N^(1/g); these are independently parameterized groups, not covers of one challenge.':'Fix q. A genus-g Jacobian has order approximately qᵍ, so the compared groups have different sizes.';document.getElementById('comparisonLabel').textContent=sameGroup?'Same group: log₂ N = '+b.toFixed(1):'Same field: log₂ q = '+b.toFixed(1);const rows=[{g:1,ic:null},{g:2,ic:1},{g:3,ic:4/3},{g:3,ic:1}];rows.forEach((r,i)=>{const qbits=sameGroup?b/r.g:b,rho=r.g*qbits/2,ic=r.ic*qbits;document.getElementById('rhoBar'+i).setAttribute('width',rho*scale);document.getElementById('rhoText'+i).setAttribute('x',440+rho*scale+12);document.getElementById('rhoText'+i).textContent='2^'+rho.toFixed(1);document.getElementById('orderLabel'+i).textContent=sameGroup?'log₂ q ≈ '+qbits.toFixed(1)+'; group order ≈ N':'Generic subgroup order ≈ '+(r.g===1?'q':'q'+(r.g===2?'²':'³'));if(r.ic!==null){document.getElementById('icBar'+i).setAttribute('width',ic*scale);document.getElementById('icText'+i).setAttribute('x',440+ic*scale+12);document.getElementById('icText'+i).textContent='2^'+ic.toFixed(1)}})}
+function saveSVG(section,name){const svg=document.querySelector('#'+section+' svg');const blob=new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+mode.addEventListener('change',update);bits.addEventListener('input',update);document.getElementById('saveCost').addEventListener('click',()=>saveSVG('costs','costs-'+mode.value+'-'+bits.value+'bits.svg'));document.querySelectorAll('[data-svg]').forEach(button=>button.addEventListener('click',()=>saveSVG(button.dataset.svg,button.dataset.name)));update();
+</script></body></html>

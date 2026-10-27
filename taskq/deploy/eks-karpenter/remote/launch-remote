@@ -30,4 +30,8 @@ printf 'Launcher receipts: %s\n' "$uri"
 aws s3 cp "${uri}result.json" "$output/result.json" --only-show-errors || { echo 'No final receipt; inspect the saved build status and CloudWatch logs' >&2; exit 25; }
 cat "$output/result.json"
 [[ "$status" == SUCCEEDED ]] || exit 26
-jq -e '.state=="succeeded" and .exit_code==0' "$output/result.json" >/dev/null
+jq -e --arg digest "$digest" --slurpfile request "$output/request.json" '
+  .state=="succeeded" and .exit_code==0 and .request_sha256==$digest
+  and .job_name==$request[0].job.job_name
+  and (if $request[0].job.build then .build==$request[0].job.build else true end)
+' "$output/result.json" >/dev/null
