@@ -6,7 +6,8 @@
 = The linear stage after F4, end to end, on a corpus of Gröbner bases
 
 2026-10-27 · `research/postgb_linear_stage_20261026` · protocol frozen in `544eb84f95` before any measured session;
-amendments 1 (`4d55b7306e`, harness F4-budget bug, every card re-run as R2) and 2 (`42bb4d54fb`, host change).
+amendments 1 (`4d55b7306e`, harness F4-budget bug, every card re-run as R2), 2 (`42bb4d54fb`, host change) and 3
+(`b8b4a97983`, the fast arm's counter fixed and every count re-measured as R3; the negation-map rho reference).
 253 systems in five families, 7 interleaved rounds per system, single thread. Every arm agreed on every system.
 
 == Question
@@ -39,7 +40,7 @@ staircase, normal forms, $M_(x_n)$, minimal polynomial, roots, coordinates and t
   [P1], [every family sparse/fast ≥ 1.5, interval above 1], [*held*: 7.1–45.5×],
   [P2], [in `dense`, sparse/fast grows with δ], [*held*: Spearman ρ = 0.93 (153 systems)],
   [P3], [fast gives up on ≤ 5%], [*held*: 1 of 253 (`gaudry-d4 p97-4`, $x_n$ not separating)],
-  [P4], [DLP logs correct; counted muls within ±25% on every system; S within ±10%; lower linear-stage wall time], [*failed* on the counted clause (0.76–1.90; outside on 87 systems); the other three held],
+  [P4], [DLP logs correct; counted muls within ±25% on every system; S within ±10%; lower linear-stage wall time], [*failed* on the counted clause (R3: 0.77–2.14; outside on 121 systems); the other three held],
   [P5], [portable fast (no vector kernels) still ≥ 1.2], [*held*: 6.3–11.1×],
 )
 
@@ -47,11 +48,11 @@ staircase, normal forms, $M_(x_n)$, minimal polynomial, roots, coordinates and t
 
 #table(columns: 8, align: (left, right, right, right, right, left, left, left),
   [*family*], [*systems*], [*δ*], [*sparse ms*], [*fast ms*], [*sparse ÷ fast [95%]*], [*dense ÷ fast*], [*counted sparse ÷ fast*],
-  [jv-nagao], [48], [64], [3.05], [0.40], [*7.60 [7.43, 7.77]*], [17.9], [0.82–1.10],
-  [gaudry-s4], [24], [64], [2.21], [0.32], [*7.13 [6.79, 7.48]*], [14.6], [0.84–1.22],
-  [gaudry-d4], [24], [512], [313], [16.5], [*17.8 [13.7, 20.5]*], [109], [0.80–1.36],
-  [gaudry-s5], [4], [4096], [229,741], [4,849], [*45.5 [42.8, 47.2]*], [—], [0.76–0.88],
-  [dense], [153], [32–1024], [104], [4.64], [*20.0 [18.3, 21.8]*], [60.6], [0.92–1.90],
+  [jv-nagao], [48], [64], [3.05], [0.40], [*7.60 [7.43, 7.78]*], [17.9], [0.98–1.32],
+  [gaudry-s4], [24], [64], [2.21], [0.32], [*7.13 [6.80, 7.49]*], [14.6], [1.12–1.54],
+  [gaudry-d4], [24], [512], [313], [16.5], [*17.8 [13.7, 20.5]*], [109], [0.90–1.56],
+  [gaudry-s5], [4], [4096], [229,741], [4,849], [*45.5 [42.8, 47.2]*], [—], [0.77–0.89],
+  [dense], [153], [32–1024], [104], [4.64], [*20.0 [18.3, 21.7]*], [60.6], [0.99–2.14],
 )
 
 The ms columns give each family's median system. The ratio is the geometric mean of the per-system median wall-time
@@ -64,13 +65,12 @@ ratios, with a bootstrap interval over systems.
 #figure(image("figures/per_system.png", width: 62%),
   caption: [Every system: sparse against fast median wall time.])
 
-*Where the gain comes from.* It grows with δ (Spearman ρ = 0.93), and it is in the cost per multiplication, not in
-their number.
+*Where the gain comes from.* It grows with δ (Spearman ρ = 0.93), and most of it is in the cost per multiplication.
 
-- *Counted multiplications:* the arms count differently.
-  - The incumbent counts products with non-zero operands, `fast` every product.
-  - They are within 0.76–1.36× on the IC families, and `fast` does up to 1.90× fewer on small `dense` shapes.
-  - P4's preregistered ±25% fails on that clause.
+- *Counted multiplications:* these are the fixed counts of amendment 3, R3-C.
+  - `fast` does fewer on four families: geometric means of 1.13, 1.26, 1.05 and 1.42.
+  - It does more on `gaudry-s5` (0.83).
+  - P4's preregistered ±25% fails: the range is 0.77–2.14.
 - *Vector kernels:* they are worth 1.0–4.0× (portable ÷ vector `fast`: 1.15, 1.04, 2.16, 4.01, 1.83). The remaining
   6–11× is the algorithm and the arithmetic layout.
 
@@ -84,15 +84,16 @@ their number.
 
 === Inside the index calculus: `jv_cover` DLP, end to end
 
-R2-D1 and R2-D2 ran the same command with the same seeds and relations, `JV_LIN=sparse` against `JV_LIN=fast`, beside
-the same-process rho. Every log was correct.
+R2-D1 and R2-D2 ran the same command with the same seeds and relations, `JV_LIN=sparse` against `JV_LIN=fast`; they
+give the wall time. R3-D1 and R3-D2 re-ran it with the fixed counter, which gives S, and with the negation-map rho in the
+same process, which is the matched reference. Every log was correct.
 
-#table(columns: 7, align: (right, right, right, left, right, left, left),
-  [*p*], [*seed*], [*rel.*], [*lin. stage s*], [*lin ÷*], [*S*], [*S/rho (distance to rho)*],
-  [53], [1], [31], [64.8 → 12.8], [*5.07×*], [731.6 → 754.4], [664 → 685],
-  [53], [2], [33], [29.5 → 6.2], [*4.79×*], [328.8 → 338.6], [286 → 294],
-  [101], [1], [53], [162.0 → 22.6], [*7.16×*], [224.4 → 229.8], [151 → 155],
-  [101], [2], [50], [220.7 → 36.5], [*6.05×*], [365.5 → 374.4], [292 → 300],
+#table(columns: 8, align: (right, right, right, left, right, left, left, left),
+  [*p*], [*seed*], [*rel.*], [*lin. stage s*], [*lin ÷*], [*S*], [*S/rho*], [*S/rho#sub[neg] (distance)*],
+  [53], [1], [31], [64.8 → 12.8], [*5.07×*], [731.6 → 727.1], [664 → 660], [1319 → *1310*],
+  [53], [2], [33], [29.5 → 6.2], [*4.79×*], [328.8 → 326.5], [286 → 284], [510 → *506*],
+  [101], [1], [53], [162.0 → 22.6], [*7.16×*], [224.4 → 220.4], [151 → 149], [326 → *320*],
+  [101], [2], [50], [220.7 → 36.5], [*6.05×*], [365.5 → 359.0], [293 → 287], [262 → *257*],
 )
 
 #figure(image("figures/jv_cover_dlp.png", width: 88%), caption: [`jv_cover` DLP: linear-stage wall time and S/rho.])
@@ -100,12 +101,14 @@ the same-process rho. Every log was correct.
 *Linear stage.* Its wall time inside the IC run falls 4.8–7.2×. The whole run is 27–37% shorter at p = 101 and
 unchanged at p = 53, where the same-process rho dominates.
 
-*Counted S rises 2.4–3.1%.* The fast arm counts every product, about 10–14% more linear-stage multiplications here.
+*Counted S falls 0.6–1.8%.* `fast` does 3–8% fewer linear-stage multiplications. Under R2's formula counter, S had
+appeared to rise about 3%.
 
 *Tables A–C.* No row moves.
 
 *§5a band.* `jv_cover` emits no unpriced native work, so S is the same at 0, 0.1 and 1 GAE per operation. Rho is
-cheaper than both arms across the band. S/rho, 151–685, is the distance remaining.
+cheaper than both arms across the band. Against the negation-map rho, S/rho with `fast` is 257–1310; that is the
+distance remaining.
 
 === Host dependence
 
@@ -136,3 +139,5 @@ this protocol.
   main session run the long cards.
 + Conductor was unreachable all session (its hooks let edits through).
 + No `CHECKPOINT_UPLOAD_TOKEN` was set, so the S3 resume checkpoint could not be pushed.
++ A PR review found the fast arm's root powering charged by a formula (amendment 3). The counter was fixed and every
+  count re-measured in R3-C, R3-D1 and R3-D2; wall time is R2's. The analysis moved from Python to Rust.

@@ -2,13 +2,15 @@
 
 Measured 2026-10-27 under [`PROTOCOL.md`](PROTOCOL.md), frozen in `544eb84f95`
 before any measured session, with amendments
-[1](PROTOCOL_AMENDMENT_1.md) (`4d55b7306e`) and [2](PROTOCOL_AMENDMENT_2.md)
-(`42bb4d54fb`). PDF: [`REPORT.pdf`](REPORT.pdf). Numbers come from
-[`analysis/summary.json`](analysis/summary.json), made by
-[`scripts/summary.py`](scripts/summary.py) from the run records in `runs/`.
-Validation: [`validation/`](validation/), an independent replay and recompute
-([`VALIDATION_NOTES.md`](validation/VALIDATION_NOTES.md)); standing in
-[`validation/VALIDATION.json`](validation/VALIDATION.json) once the scalar check is filed.
+[1](PROTOCOL_AMENDMENT_1.md) (`4d55b7306e`), [2](PROTOCOL_AMENDMENT_2.md)
+(`42bb4d54fb`) and [3](PROTOCOL_AMENDMENT_3.md) (`b8b4a97983`). PDF:
+[`REPORT.pdf`](REPORT.pdf). Numbers come from
+[`analysis/summary.json`](analysis/summary.json), written by the Rust example
+[`examples/postgb_la_summary.rs`](../../examples/postgb_la_summary.rs) from the
+run records in `runs/`: wall time from the R2 cards, counted multiplications and
+S from the R3 cards. Validation lives in [`validation/`](validation/): an
+independent replay, recompute and scalar check, described in
+[`VALIDATION_NOTES.md`](validation/VALIDATION_NOTES.md).
 
 The owner asked (2026-10-26) for the linear-algebra stage to be sped up until
 it takes the leaderboard's linear-algebra section. The measurement is end to
@@ -65,7 +67,7 @@ the protocol).
 | **P1** every family `sparse/fast` ≥ 1.5, interval above 1 | **held**: 7.1–45.5× |
 | **P2** in `dense`, `sparse/fast` grows with δ | **held**: Spearman ρ = 0.93 over 153 systems |
 | **P3** `fast` gives up on ≤ 5% | **held**: 1 of 253 (0.4%), `gaudry-d4 p97-4` |
-| **P4** DLP logs correct, counted multiplications within ±25% on every system, S within ±10%, lower linear-stage wall time on every run | **failed** on the counted clause: sparse/fast counted is 0.76–1.90, outside ±25% on 87 systems (85 `dense`, 2 `gaudry-d4`). The other three clauses held |
+| **P4** DLP logs correct, counted multiplications within ±25% on every system, S within ±10%, lower linear-stage wall time on every run | **failed** on the counted clause: counted sparse ÷ fast (R3) is 0.77–2.14, outside ±25% on 121 systems (102 `dense`, 8 `gaudry-s4`, 7 `jv-nagao`, 4 `gaudry-d4`). The other three clauses held |
 | **P5** portable `fast` (no vector kernels) still ≥ 1.2 | **held**: 6.3–11.1× |
 
 ### 1. The linear stage is 7–46× faster than the incumbent in every family
@@ -76,11 +78,11 @@ bootstrap 95% interval (4,000 resamples) and its range.
 
 | family | systems | δ | sparse ms (median) | fast ms (median) | **sparse ÷ fast** | range | dense ÷ fast | counted sparse ÷ fast |
 |:--|--:|--:|--:|--:|:--|:--|:--|:--|
-| jv-nagao | 48 | 64 | 3.05 | 0.40 | **7.60 [7.43, 7.77]** | 5.80–8.95 | 17.9 [16.9, 19.0] | 0.82–1.10 |
-| gaudry-s4 | 24 | 64 | 2.21 | 0.32 | **7.13 [6.79, 7.48]** | 5.87–8.97 | 14.6 [14.0, 15.1] | 0.84–1.22 |
-| gaudry-d4 | 24 | 512 | 313 | 16.5 | **17.8 [13.7, 20.5]** | 1.06–23.8 | 109 [69, 144] | 0.80–1.36 |
-| gaudry-s5 | 4 | 4096 | 229,741 | 4,849 | **45.5 [42.8, 47.2]** | 41.5–47.4 | (dense not run) | 0.76–0.88 |
-| dense | 153 | 32–1024 | 104 | 4.64 | **20.0 [18.3, 21.8]** | 5.33–43.6 | 60.6 [51.2, 71.7] | 0.92–1.90 |
+| jv-nagao | 48 | 64 | 3.05 | 0.40 | **7.60 [7.43, 7.78]** | 5.80–8.95 | 17.9 [16.9, 19.0] | 0.98–1.32 |
+| gaudry-s4 | 24 | 64 | 2.21 | 0.32 | **7.13 [6.80, 7.49]** | 5.87–8.97 | 14.6 [14.1, 15.0] | 1.12–1.54 |
+| gaudry-d4 | 24 | 512 | 313 | 16.5 | **17.8 [13.7, 20.5]** | 1.06–23.8 | 109 [69, 144] | 0.90–1.56 |
+| gaudry-s5 | 4 | 4096 | 229,741 | 4,849 | **45.5 [42.8, 47.2]** | 41.5–47.4 | (dense not run) | 0.77–0.89 |
+| dense | 153 | 32–1024 | 104 | 4.64 | **20.0 [18.3, 21.7]** | 5.33–43.6 | 60.6 [51.2, 71.8] | 0.99–2.14 |
 
 ![family speed-up](figures/family_speedup.png)
 ![every system](figures/per_system.png)
@@ -91,16 +93,21 @@ bootstrap 95% interval (4,000 resamples) and its range.
 
 ![dense family against δ](figures/dense_vs_delta.png)
 
-**The gain is in the cost per multiplication, not in their number.** The two
-arms count differently:
-- the incumbent counts products with non-zero operands;
-- `fast` counts every product it performs.
+**Most of the gain is in the cost per multiplication.** With amendment 3's fixed
+counter, both arms count the products they execute. The incumbent counts those
+with non-zero operands, and `fast` one per nonzero coefficient times the row it
+scales.
+- **Counted multiplications:** `fast` does fewer on four families: geometric
+  means of 1.13 (`jv-nagao`), 1.26 (`gaudry-s4`), 1.05 (`gaudry-d4`) and 1.42
+  (`dense`). On `gaudry-s5` it does more (0.83).
+- **Wall time:** 7–46× lower, which is far more than the counts explain.
+- **P4:** the counted range, 0.77–2.14, is outside P4's preregistered ±25%, so
+  P4 fails.
 
-Counted, the arms are within 0.76–1.36× on the IC families, and up to 1.90×
-fewer for `fast` on small `dense` shapes. That last range is outside P4's
-preregistered ±25%, so P4 fails. Wall time is the headline unit, as in the
-leaderboard's existing "Linear-algebra engine" section. The counted numbers are
-reported beside it and not ranked.
+Wall time is the headline unit, as in the leaderboard's existing
+"Linear-algebra engine" section. The counted numbers are reported beside it and
+not ranked. The ratios above them in the table, dense ÷ fast, have no
+fixed-counter count, because R3-C ran only `sparse` and `fast`.
 
 **Where `fast` spends its time:**
 - the Krylov pass is the largest phase: 23–90% of the time, 90% at δ = 4096;
@@ -127,14 +134,19 @@ the arithmetic layout.
 
 Cards R2-D1 (`JV_LIN=sparse`) and R2-D2 (`JV_LIN=fast`) ran the same command
 (`--exp dlp --sizes 53,101 --seeds 2 --rho-runs 4 --check-every 64`) with the
-same seeds and relations, and the same-process rho.
+same seeds and relations, and the same-process rho. They give the wall time.
 
-| p | seed | relations | linear-stage s, sparse → fast | **lin ÷** | whole run s, sparse → fast | S sparse → fast | S/rho sparse → fast (distance to rho) |
-|--:|--:|--:|:--|--:|:--|:--|:--|
-| 53 | 1 | 31 | 64.8 → 12.8 | **5.07×** | 248 → 247 | 731.6 → 754.4 | 664 → 685 |
-| 53 | 2 | 33 | 29.5 → 6.2 | **4.79×** | 136 → 136 | 328.8 → 338.6 | 286 → 294 |
-| 101 | 1 | 53 | 162.0 → 22.6 | **7.16×** | 121 → 76 | 224.4 → 229.8 | 151 → 155 |
-| 101 | 2 | 50 | 220.7 → 36.5 | **6.05×** | 164 → 119 | 365.5 → 374.4 | 292 → 300 |
+R3-D1 and R3-D2 re-ran the same command with amendment 3's fixed counter. They
+give the counted S. They also ran the negation-map rho (`rho_e_neg`) in the
+same process, which is the §5a matched reference. Relations, logarithms and the
+plain rho runs are identical to R2's.
+
+| p | seed | relations | linear-stage s, sparse → fast | **lin ÷** | whole run s | S sparse → fast | S/rho | **S/rho (negation map), distance to rho** |
+|--:|--:|--:|:--|--:|:--|:--|:--|:--|
+| 53 | 1 | 31 | 64.8 → 12.8 | **5.07×** | 248 → 247 | 731.6 → 727.1 | 664 → 660 | 1319 → **1310** |
+| 53 | 2 | 33 | 29.5 → 6.2 | **4.79×** | 136 → 136 | 328.8 → 326.5 | 286 → 284 | 510 → **506** |
+| 101 | 1 | 53 | 162.0 → 22.6 | **7.16×** | 121 → 76 | 224.4 → 220.4 | 151 → 149 | 326 → **320** |
+| 101 | 2 | 50 | 220.7 → 36.5 | **6.05×** | 164 → 119 | 365.5 → 359.0 | 293 → 287 | 262 → **257** |
 
 ![jv_cover DLP](figures/jv_cover_dlp.png)
 
@@ -143,12 +155,15 @@ same seeds and relations, and the same-process rho.
 run is 27–37% shorter at p = 101. At p = 53 the whole run is unchanged, because
 the rho reference runs in the same process and dominates there.
 
-**Counted S rises.** S, in counted group operations, rises 2.4–3.1%. The fast
-arm counts every product it performs, about 10–14% more linear-stage
-multiplications here. P4's ±10% bound on S held.
+**Counted S falls.** S, in counted group operations, falls 0.6–1.8%. The fast
+arm does 3–8% fewer linear-stage multiplications here. Under R2's formula
+counter, S had appeared to rise about 3%. P4's ±10% bound on S held.
 
-**Tables A–C.** No row moves: in the counted unit the change is a 3% regression
-of a minor term. S/rho, 151–685, is the distance remaining to rho.
+**Tables A–C.** No row moves: the linear stage is a minor term of S here.
+
+**Distance to rho.** Against the negation-map rho, S/rho with `fast` is
+257–1310. The negation map's mean S over 4 runs is 0.55–1.40, against 1.10–1.48
+for the plain rho.
 
 **§5a band.** `jv_cover` emits no unpriced native work, so S is the same at 0,
 0.1 and 1 GAE per operation. Rho is cheaper than either arm across the band.
@@ -213,6 +228,19 @@ stands beside it.
    localhost:8080), so its hooks let edits through.
 5. **No `CHECKPOINT_UPLOAD_TOKEN`** was set, so the S3 resume checkpoint could not be
    pushed.
+6. **The fast arm's counter and the rho reference** (amendment 3). A PR review
+   found that the fast arm charged its root powering by a formula. The counter
+   was fixed, and every counted figure was re-measured: the corpus counts in
+   R3-C, and S in R3-D1 and R3-D2. Wall time is R2's. The R2 counts stay in the
+   records but are superseded.
+
+   R3-D1 and R3-D2 also run the negation-map rho, the strongest rho on this
+   curve, as the matched reference. The analysis moved from Python to Rust
+   (AGENTS.md, "no Python"), so the bootstrap intervals moved in their last
+   digit.
+
+   The first launches of R3-C and R3-D1 were stopped during their quiet-CPU
+   wait, before any run. They are kept as `cards/*aborted-preflight*`.
 
 The independent validator also found these (none changes a recorded number):
 - **F4 budget.** The bench gives the `dense` family's F4 600 s, not the 900 s
@@ -225,8 +253,8 @@ The independent validator also found these (none changes a recorded number):
 ## Reproduce
 
 ```sh
-cargo build --release --example postgb_la_bench --example jv_cover
-python3 tools/task_card.py run research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.yaml   # … each R2 card
-python3 research/postgb_linear_stage_20261026/scripts/summary.py
-python3 research/postgb_linear_stage_20261026/scripts/plots.py   # needs matplotlib
+cargo build --release --example postgb_la_bench --example jv_cover --example postgb_la_summary
+python3 tools/task_card.py run research/postgb_linear_stage_20261026/cards/CARD-postgb-la-20261026-R2-L1.yaml   # … each R2 and R3 card
+./target/release/examples/postgb_la_summary
+python3 research/postgb_linear_stage_20261026/scripts/plots.py   # lays out summary.json; needs matplotlib
 ```

@@ -29,6 +29,7 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-18 | [Lazy orbit-member index, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)](https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf) | 1.27× | matched | S |
 | 2026-10-20 | [Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6](https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md) | 4.67× | matched | source-specific; see result |
 | 2026-10-21 | [Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md) | 14.4× | matched | source-specific; see result |
+| 2026-10-27 | [Residual collector res2 vs rho.negation, one target cold, best cell icv1-fp36-t454193-44a20818 (r = 2^36.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_exhaustive_20261026/README.md) | 2.59× | matched | S |
 | 2026-10-17 | [n83 K1107/root11 sixteen-point cold factor-base frontier](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md) | 47.1× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
 
 ## Frontier audit and subsequent corrections (implementation result 2026-10-14)
@@ -439,24 +440,24 @@ Component speed-up, class engineering: the dense linear stage against sparse FGL
 
 ## Linear stage after F4 across Gröbner-basis corpora
 
-Component speed-up, class engineering, in median wall time, single thread (host B): from a monic grevlex F4 basis to every checked F_p point, on 253 systems in five families (`research/postgb_linear_stage_20261026/`, [report](research/postgb_linear_stage_20261026/REPORT.pdf)). Leader: `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp–Massey, gcd(f, x^p − x) roots, rational univariate read-out, AVX-512/AVX2 kernels), now the default `JV_LIN`. Incumbent: sparse FGLM (the section above). Every arm returned the same solution set on every system; fast gave up (and fell back to dense) on 1. Counted multiplications differ by 0.76–1.90× and are not ranked. It moves no row of tables A–C. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+Component speed-up, class engineering, in median wall time, single thread (host B): from a monic grevlex F4 basis to every checked F_p point, on 253 systems in five families (`research/postgb_linear_stage_20261026/`, [report](research/postgb_linear_stage_20261026/REPORT.pdf)). Leader: `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp–Massey, gcd(f, x^p − x) roots, rational univariate read-out, AVX-512/AVX2 kernels), now the default `JV_LIN`. Incumbent: sparse FGLM (the section above). Every arm returned the same solution set on every system; fast gave up (and fell back to dense) on 1. Counted multiplications (sparse ÷ fast 0.77–2.14×) are reported, not ranked. It moves no row of tables A–C. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
 | family | systems | δ | sparse ms | fast ms | **sparse ÷ fast** [95%] | dense ÷ fast | portable fast | host A | counted sparse ÷ fast |
 |:--|--:|--:|--:|--:|:--|--:|--:|--:|:--|
-| jv-nagao | 48 | 64 | 3.055 | 0.3953 | **7.60** [7.43, 7.77] | 17.9 | 6.31 | 4.01 | 0.82–1.10 |
-| gaudry-s4 | 24 | 64 | 2.212 | 0.3179 | **7.13** [6.79, 7.48] | 14.6 | 6.75 | 3.79 | 0.84–1.22 |
-| gaudry-d4 | 24 | 512 | 313 | 16.5 | **17.76** [13.69, 20.49] | 109.3 | 8.35 | 8.14 | 0.80–1.36 |
-| gaudry-s5 | 4 | 4096 | 2.297e+05 | 4849 | **45.51** [42.77, 47.19] | — | 9.63 | — | 0.76–0.88 |
-| dense | 153 | 32–1024 | 104.1 | 4.64 | **19.98** [18.33, 21.79] | 60.6 | 11.10 | 8.75 | 0.92–1.90 |
+| dense | 153 | 32–1024 | 104.1 | 4.64 | **19.98** [18.29, 21.71] | 60.6 | 11.10 | 8.75 | 0.99–2.14 |
+| gaudry-d4 | 24 | 512 | 313 | 16.5 | **17.76** [13.72, 20.47] | 109.3 | 8.35 | 8.14 | 0.90–1.56 |
+| gaudry-s4 | 24 | 64 | 2.212 | 0.3179 | **7.13** [6.80, 7.49] | 14.6 | 6.75 | 3.79 | 1.12–1.54 |
+| gaudry-s5 | 4 | 4096 | 2.297e+05 | 4849 | **45.51** [42.77, 47.19] | — | 9.63 | — | 0.77–0.89 |
+| jv-nagao | 48 | 64 | 3.055 | 0.3953 | **7.60** [7.43, 7.78] | 17.9 | 6.31 | 4.01 | 0.98–1.32 |
 
-Inside the IC run (`jv_cover --exp dlp`, same seeds and relations, `JV_LIN=sparse` → `fast`, same-process rho; every log verified). S rises about 3% in the counted unit; S/rho is the distance remaining.
+Inside the IC run (`jv_cover --exp dlp`, same seeds and relations, `JV_LIN=sparse` → `fast`, same-process plain and negation-map rho; every log verified). Counted S changes by -1.8% to -0.6%; S over the negation-map rho, the matched §5a reference, is the distance remaining.
 
-| p | seed | relations | linear stage s | lin ÷ | S | S/rho |
-|---:|---:|---:|:--|--:|:--|:--|
-| 53 | 1 | 31 | 64.8 → 12.8 | **5.07×** | 731.6 → 754.4 | 664 → 685 |
-| 53 | 2 | 33 | 29.5 → 6.2 | **4.79×** | 328.8 → 338.6 | 286 → 294 |
-| 101 | 1 | 53 | 162.0 → 22.6 | **7.16×** | 224.4 → 229.8 | 151 → 155 |
-| 101 | 2 | 50 | 220.7 → 36.5 | **6.05×** | 365.5 → 374.4 | 293 → 300 |
+| p | seed | relations | linear stage s | lin ÷ | S | S/rho | S/rho (negation map) |
+|---:|---:|---:|:--|--:|:--|:--|:--|
+| 53 | 1 | 31 | 64.8 → 12.8 | **5.07×** | 731.6 → 727.1 | 664 → 660 | 1319 → **1310** |
+| 53 | 2 | 33 | 29.5 → 6.2 | **4.79×** | 328.8 → 326.5 | 286 → 284 | 510 → **506** |
+| 101 | 1 | 53 | 162.0 → 22.6 | **7.16×** | 224.4 → 220.4 | 151 → 149 | 326 → **320** |
+| 101 | 2 | 50 | 220.7 → 36.5 | **6.05×** | 365.5 → 359 | 293 → 287 | 262 → **257** |
 
 ## Algebraic-decomposition IC ladder (linear two-summand S3), outside tables A–C
 
@@ -683,7 +684,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `9013f0034e9c68e3…`
+- `docs/ic/progress-timeline.json` — sha256 `56c31e8fafbad00a…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
@@ -706,7 +707,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
-- `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `66f4f1225ac787fa…`
+- `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `25d6e85e59258eb0…`
 - `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json` — sha256 `02427944511bd86f…`

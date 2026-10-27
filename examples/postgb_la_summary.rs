@@ -118,14 +118,13 @@ fn spearman(xs: &[f64], ys: &[f64]) -> f64 {
     num / den
 }
 
-/// Counted sparse ÷ fast per system: the R3-C counts where given, else the row's own.
+/// Counted sparse ÷ fast per system, from R3-C (amendment 3's fixed counter).
+/// The R2 rows' own counts carry the old fast-arm counter, and R3-C runs
+/// no dense arm, so a table without R3 counts reports no counted ratio.
 type Counts = BTreeMap<(String, String), (f64, f64)>;
 
 fn counted(r: &Row, counts: Option<&Counts>) -> Option<f64> {
-    match counts {
-        Some(c) => c.get(&r.key()).map(|(s, f)| s / f.max(1.0)),
-        None => Some(r.muls("sparse")? / r.muls("fast")?.max(1.0)),
-    }
+    counts?.get(&r.key()).map(|(s, f)| s / f.max(1.0))
 }
 
 fn family_table(rows: &[Row], num: &str, den: &str, counts: Option<&Counts>) -> Value {

@@ -1,5 +1,5 @@
 """Lay out analysis/summary.json as SVG + 150 dpi PNG. Plotting only: every
-number comes from summary.json (scripts/summary.py over the run JSONs)."""
+number comes from summary.json (examples/postgb_la_summary.rs over the run JSONs)."""
 import json
 from pathlib import Path
 
@@ -124,10 +124,11 @@ if dl:
     axes[0].bar([i + 0.2 for i in x], [r["lin_ms"][1] for r in dl], 0.4, label="JV_LIN=fast")
     axes[0].set_yscale("log")
     axes[0].set_ylabel("linear-stage wall time (ms, summed)")
-    axes[1].bar([i - 0.2 for i in x], [r["s_over_rho"][0] for r in dl], 0.4, label="sparse")
-    axes[1].bar([i + 0.2 for i in x], [r["s_over_rho"][1] for r in dl], 0.4, label="fast")
+    axes[1].bar([i - 0.2 for i in x], [r["s_over_rho_neg"][0] for r in dl], 0.4, label="sparse")
+    axes[1].bar([i + 0.2 for i in x], [r["s_over_rho_neg"][1] for r in dl], 0.4, label="fast")
     axes[1].axhline(1, color="black", lw=0.8)
-    axes[1].set_ylabel("S / matched rho (distance remaining)")
+    axes[1].set_yscale("log")
+    axes[1].set_ylabel("S / negation-map rho (distance remaining)")
     for a in axes:
         a.set_xticks(list(x))
         a.set_xticklabels(lab, fontsize=6.5)
