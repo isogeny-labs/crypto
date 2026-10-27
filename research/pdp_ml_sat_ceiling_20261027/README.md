@@ -160,7 +160,8 @@ re-solves after `Unknown` without `reset_search()`.
 ## Reproduce
 
     cargo run --release --example pdp_ml_sat_ceiling -- /tmp/pdp-ml-rows          # labels + analysis, about 12 min on 4 cores + L3
+    python3 tools/artifacts/artifacts.py pull research/pdp_ml_sat_ceiling_20261027   # hydrate rows (artifact store, hash-checked)
     cargo run --release --example pdp_ml_sat_ceiling -- /tmp/pdp-ml-an --from-rows research/pdp_ml_sat_ceiling_20261027/run1
 
-Rows: `run1/rows_*.jsonl` (labelled at commit 7dddd8099). Analysis:
+Rows: `run1/rows_*.jsonl`, held in the artifact store (`run1/.artifacts.json`; labelled at commit 7dddd8099). Analysis:
 `run1/analysis/` (commit d673109e7). SHA-256 values are in the run report.
