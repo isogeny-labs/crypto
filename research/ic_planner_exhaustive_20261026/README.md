@@ -214,7 +214,7 @@ Lean core only, `leanprover/lean4:v4.34.1`; the details are in
 - that `ecbench band` adds correctly, which its test
   `exact_sums_reproduce_the_band_means` checks.
 
-## Predictions (PROTOCOL.md), scored by `scripts/summary.py`
+## Predictions (PROTOCOL.md), scored by `examples/ic_planner_exhaustive_summary.rs`
 
 - **R1** (res4/plan < 1 at w = 0, interval below 1, at every new size):
   **held**, 0.078–0.712.
@@ -281,8 +281,10 @@ Engineering and measurement, as the protocol said.
   that added the earlier cards' data. Each commit added only data. Every
   session ran the same three binaries, which the cards bind by sha256.
 - **Null bootstrap.** The protocol does not fix the null intervals' method.
-  `scripts/summary.py` uses Python's seeded resampler with 4,000 resamples;
-  the earlier study used jq's MINSTD with 2,000.
+  The summary uses a seeded resampler with 4,000 resamples (CPython's
+  MT19937 `random.Random(20261107)`, reproduced exactly by the native
+  `examples/ic_planner_exhaustive_summary.rs`); the earlier study used jq's
+  MINSTD with 2,000.
 - **Lean, built locally without lake.** For lack of disk space the local build
   used `lean -o` directly. CI builds with `lake` (the workflow).
 
@@ -302,8 +304,11 @@ Engineering and measurement, as the protocol said.
 - **Derived files:**
   - `analysis/band-*.{txt,json}` and `sessions/*/comparisons/`, from
     `scripts/analyse.sh`;
-  - `analysis/summary.json`, from `scripts/summary.py`;
+  - `analysis/summary.json`, from `scripts/analyse.sh`, whose last step is
+    `cargo run --release --example ic_planner_exhaustive_summary`;
   - `analysis/null-*.json`;
   - `analysis/rebands/`, from `scripts/rebands.sh`;
-  - `lean/Certificates.lean`, from `scripts/lean_certificates.sh`;
+  - `lean/Certificates.lean` and `lean/certificates.json`, from
+    `scripts/lean_certificates.sh`
+    (`cargo run --release --example ic_planner_exhaustive_lean_certs`);
   - the figures, laid out by `scripts/plots.py`.

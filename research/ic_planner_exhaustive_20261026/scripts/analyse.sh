@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # PROTOCOL.md "Measures": the band (exact sums) of every session, the paired
 # comparisons of every named pair, saved under sessions/<S>/comparisons/, then
-# analysis/summary.json (scripts/summary.py, which reads only these outputs and
-# the null JSONs). Re-running it reproduces every derived file.
+# analysis/summary.json (the native examples/ic_planner_exhaustive_summary.rs,
+# which reads only these outputs and the null JSONs). Re-running it reproduces
+# every derived file.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 E=../../target/release/ecbench
@@ -32,4 +33,4 @@ for s in $K; do
   cmp $s rho pipeline 0 1
   cmp $s rho descent 0
 done
-python3 scripts/summary.py
+cargo run --release --example ic_planner_exhaustive_summary

@@ -1,5 +1,5 @@
 """Lay out analysis/summary.json as SVG + 150 dpi PNG. Plotting only: every
-number comes from summary.json (scripts/summary.py over ecbench output)."""
+number comes from summary.json (examples/ic_planner_exhaustive_summary.rs over ecbench output)."""
 import json
 from pathlib import Path
 

@@ -2,8 +2,9 @@ name: Planner-study Lean proofs
 # Builds research/ic_planner_exhaustive_20261026/lean (Band, KeyedInvariance
 # and the generated Certificates; Lean core only, no dependencies). It refuses
 # sorry, admit, native_decide and custom axioms, regenerates Certificates.lean
-# from the committed band sums and requires it to be unchanged, audits every
-# theorem's axioms (AxiomAudit.lean; only propext, Classical.choice and
+# from the committed band sums with the native generator
+# (examples/ic_planner_exhaustive_lean_certs.rs) and requires it unchanged,
+# audits every theorem's axioms (AxiomAudit.lean; only propext, Classical.choice and
 # Quot.sound are allowed), checks the certificate count against
 # certificates.json, and re-checks the environment with leanchecker.
 on:
@@ -12,12 +13,16 @@ on:
       - '.github/workflows/planner-proofs-lean.yml'
       - 'research/ic_planner_exhaustive_20261026/lean/**'
       - 'research/ic_planner_exhaustive_20261026/scripts/lean_certificates.*'
+      - 'examples/ic_planner_exhaustive_lean_certs.rs'
+      - 'src/cryptanalysis/ecc2k130_pyjson.rs'
   push:
     branches: [main]
     paths:
       - '.github/workflows/planner-proofs-lean.yml'
       - 'research/ic_planner_exhaustive_20261026/lean/**'
       - 'research/ic_planner_exhaustive_20261026/scripts/lean_certificates.*'
+      - 'examples/ic_planner_exhaustive_lean_certs.rs'
+      - 'src/cryptanalysis/ecc2k130_pyjson.rs'
   workflow_dispatch:
 
 permissions:
@@ -29,17 +34,35 @@ concurrency:
 jobs:
   lean:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 60 }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 45 || 60 }}
     env:
       LEAN_DIR: research/ic_planner_exhaustive_20261026/lean
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          filter: blob:none
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
-            research/ic_planner_exhaustive_20261026
-            research/ic_planner_weight_rule_20261021/analysis
-            research/ic_planner_weight_rule_binkob_20261026/analysis
+            /Cargo.toml
+            /Cargo.lock
+            /tools/volcano-cli/
+            /isogeny_algos/
+            /build.rs
+            /.github/scripts/
+            /src/
+            /tests/
+            /examples/
+            /benches/
+            /research/ic_planner_exhaustive_20261026/
+            /research/ic_planner_weight_rule_20261021/analysis/
+            /research/ic_planner_weight_rule_binkob_20261026/analysis/
+      - name: Materialize compile-time inputs without research archives
+        run: node .github/scripts/ci-scope.mjs --materialize
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - uses: Swatinem/rust-cache@v2
       - name: Cache the pinned Lean toolchain
         uses: actions/cache@v4
         with:
@@ -67,7 +90,7 @@ jobs:
         run: |
           set -o pipefail
           lake env lean AxiomAudit.lean | tee /tmp/axioms.txt
-          want=$(python3 -c "import json;print(len(json.load(open('certificates.json'))['verdicts']))")
+          want=$(jq '.verdicts | length' certificates.json)
           grep -qx "AXIOM_AUDIT_COUNT|Certificates|$want" /tmp/axioms.txt
           grep -qxE "AXIOM_AUDIT_COUNT\|Band\|[1-9][0-9]*" /tmp/axioms.txt
           grep -qxE "AXIOM_AUDIT_COUNT\|KeyedInvariance\|[1-9][0-9]*" /tmp/axioms.txt
