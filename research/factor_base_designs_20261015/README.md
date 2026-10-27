@@ -400,8 +400,10 @@ checkpoint existed, the F4 engine can snapshot a step's dense row reduction
 (`F4Options::checkpointing_in_step`, `run --checkpoint-in-step-every`; wide
 arithmetic only). Tested for exact equality of every counted field against the
 uninterrupted run (`tests/f4_checkpoint_resume.rs`) and gated on the host by the
-self-test; not yet used at the scale of the m = 4 cells, so its size and time
-there are unmeasured. See PREREGISTRATION.md, Amendment 16.
+self-test. Validated at the scale of A0 m = 4, t = 4 by run V16
+(`reports/run-20261027T1710Z/REPORT.pdf`): killed once inside a step and resumed,
+the row equals R256-A0 target 0 in every counted field; snapshots of 20 to 44 GB
+wrote in 27 to 48 s; +18 % F4 time. See PREREGISTRATION.md, Amendment 16.
 
 ### Close-out of the prime-field slope line (2026-10-19)
 
