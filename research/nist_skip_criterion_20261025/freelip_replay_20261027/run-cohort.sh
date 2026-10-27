@@ -27,11 +27,12 @@ case "$LIP_OUT" in "$LIP_BASE"/runs/*) ;; *) exit 3 ;; esac
 lip_repo=$(git -C "$LIP_BASE" rev-parse --show-toplevel)
 checkpoint() { /tmp/nist-checkpoint-run "$lip_repo/scripts/checkpoint.sh" "$@"; }
 checkpoint gate
+cmp "$LIP_PACKAGE/package.sha256" "$LIP_BASE/package.sha256"
 (cd "$LIP_PACKAGE" && sha256sum -c package.sha256) > /workspace/nist-lip-package-admission.txt
 mkdir -p "$LIP_OUT/source-snapshot" "$LIP_OUT/results"
 cp -R "$LIP_PACKAGE/bin" "$LIP_OUT/"
 cp "$LIP_PACKAGE/inputs/cohort.tsv" "$LIP_OUT/"
-cp "$LIP_BASE/PROTOCOL.md" "$LIP_BASE/protocol.json" "$LIP_BASE/replay.c" "$LIP_BASE/bridge.c" "$LIP_BASE/bridge.h" "$LIP_BASE/summarize.cpp" "$LIP_PACKAGE/package.sha256" "$0" "$LIP_OUT/source-snapshot/"
+cp "$LIP_BASE/PROTOCOL.md" "$LIP_BASE/protocol.json" "$LIP_BASE/PREPARED.json" "$LIP_BASE/replay.c" "$LIP_BASE/bridge.c" "$LIP_BASE/bridge.h" "$LIP_BASE/summarize.cpp" "$LIP_PACKAGE/package.sha256" "$0" "$LIP_OUT/source-snapshot/"
 for lip_version in 1.0 1.1; do
   for lip_method in probprime ordinary; do
     lip_i=0
