@@ -40,7 +40,12 @@ EXPECTED_RUNTIME_BINDINGS = {
         }
     ),
     "add22_weighted": frozenset(
-        {"ProjectiveLawBoundary.runtime_certificate_mapping_total"}
+        {
+            "ProjectiveLawBoundary.runtime_certificate_mapping_total",
+            "ProjectiveLawRuntime.classify22Prelude",
+            "ProjectiveLawRuntime.classifyDistinctU22_ne_sharedZeroQ",
+            "ProjectiveLawRuntime.classifySameU22_ne_zeroSlope",
+        }
     ),
 }
 EXPECTED_PROVED = frozenset(

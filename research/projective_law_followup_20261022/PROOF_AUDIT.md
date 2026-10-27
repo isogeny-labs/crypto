@@ -52,6 +52,18 @@ formula identities.
    `c(v₁+v₂)=0 mod u`. The sum has degree at most one, so it vanishes
    identically: `v₂=-v₁`. The inverse branch has already run. Thus
    `same_u_mixed_zero_slope_delta` is unreachable for valid inputs.
+
+The later `formal/RuntimeSemantics.lean` now checks the ordered initial
+`add22_weighted` branch tree as a Lean function over cross-scaled field
+coordinates. Its two compiled theorems show that `shared_zero_q_delta`
+cannot follow the earlier distinct-support test, and that
+`same_u_mixed_zero_slope_delta` cannot follow the earlier inverse/equal
+tests when the two coefficients of the same-`u` Mumford validity congruence
+are supplied. `formal/runtime-bindings.json` binds that abstraction to the
+exact Rust function fragment hash. This is a conditional branch-selection
+proof over a manually transcribed decision tree; the Rust-to-Lean semantic
+translation and the derivation of the validity coefficients for arbitrary
+runtime states remain open.
 4. In the 2+2 shared-support branch, the recovered points share an
    `x` coordinate on the same curve. Their `y` values are equal or
    opposite after accounting for weights; `shared_y_mismatch` is

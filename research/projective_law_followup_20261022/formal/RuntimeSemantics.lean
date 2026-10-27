@@ -74,6 +74,86 @@ theorem classify12_ne_mismatch_of_valid
 
 end Branch12
 
+section Branch22Prelude
+
+variable {K : Type*} [Field K] [DecidableEq K]
+
+/-- Manual abstraction of the initial, cross-scaled `add22_weighted` exits.
+The `shared` and `nonshared` results leave the later ordinate and C tests
+unclassified. -/
+inductive Branch22Prelude where
+  | sameUInverse | sameUDouble | sameUMixedZeroSlope | sameUMixed
+  | sharedZeroQ | shared | nonshared
+  deriving DecidableEq, Repr
+
+def classifySameU22 (s₁ t₁ s₂ t₂ : K) : Branch22Prelude :=
+  if s₁ = -s₂ ∧ t₁ = -t₂ then .sameUInverse
+  else if s₁ = s₂ ∧ t₁ = t₂ then .sameUDouble
+  else if s₁ - s₂ = 0 then .sameUMixedZeroSlope
+  else .sameUMixed
+
+def classifyDistinctU22 (q₁ r₁ q₂ r₂ : K) : Branch22Prelude :=
+  let dq22 := q₁ - q₂
+  let dr22 := r₁ - r₂
+  let B22 := dq22 * (q₂ * r₁ - q₁ * r₂) - dr22 ^ 2
+  if B22 = 0 then
+    if dq22 = 0 then .sharedZeroQ else .shared
+  else .nonshared
+
+def classify22Prelude (q₁ r₁ s₁ t₁ q₂ r₂ s₂ t₂ : K) : Branch22Prelude :=
+  if q₁ = q₂ ∧ r₁ = r₂ then classifySameU22 s₁ t₁ s₂ t₂
+  else classifyDistinctU22 q₁ r₁ q₂ r₂
+
+/-- The literal distinct-support decision tree cannot emit the zero-q-delta
+error: `B=0`, `dq=0` forces `dr=0`, contrary to the earlier support test. -/
+theorem classifyDistinctU22_ne_sharedZeroQ
+    (q₁ r₁ q₂ r₂ : K) (hU : ¬ (q₁ = q₂ ∧ r₁ = r₂)) :
+    classifyDistinctU22 q₁ r₁ q₂ r₂ ≠ .sharedZeroQ := by
+  have hdistinct : q₁ - q₂ ≠ 0 ∨ r₁ - r₂ ≠ 0 := by
+    by_cases hq : q₁ = q₂
+    · right
+      apply sub_ne_zero.mpr
+      intro hr
+      exact hU ⟨hq, hr⟩
+    · left
+      exact sub_ne_zero.mpr hq
+  dsimp only [classifyDistinctU22]
+  split_ifs with hB hdq
+  · exact False.elim ((ProjectiveLawBoundary.shared_zero_q_delta_unreachable
+        (q₁ - q₂) (r₁ - r₂) q₁ q₂ r₁ r₂ hdistinct hB) hdq)
+  · intro h; cases h
+  · intro h; cases h
+
+/-- The same-support error exit is ruled out by the two validity
+coefficients of `v₂²-v₁² mod u`, under the odd-characteristic precondition.
+These hypotheses are supplied; this theorem does not prove that arbitrary
+Rust inputs satisfy the Mumford validity invariant. -/
+theorem classifySameU22_ne_zeroSlope
+    (s₁ t₁ s₂ t₂ : K) (hodd : (2 : K) ≠ 0)
+    (hx : (t₂ - t₁) * (s₁ + s₂) = 0)
+    (hc : (t₂ - t₁) * (t₂ + t₁) = 0) :
+    classifySameU22 s₁ t₁ s₂ t₂ ≠ .sameUMixedZeroSlope := by
+  unfold classifySameU22
+  split_ifs with hinv heq hk
+  · intro h; cases h
+  · intro h; cases h
+  · have hs : s₁ = s₂ := sub_eq_zero.mp hk
+    by_cases ht : t₁ = t₂
+    · exact False.elim (heq ⟨hs, ht⟩)
+    · have hsum : s₁ + s₂ = 2 * s₁ := by rw [← hs]; ring
+      have hx' : (t₂ - t₁) * (2 * s₁) = 0 := by rw [← hsum]; exact hx
+      have h : s₁ = 0 ∧ t₂ = -t₁ :=
+        ProjectiveLawBoundary.same_u_zero_slope_delta_is_inverse
+          s₁ t₁ t₂ hodd (Ne.symm ht) hx' hc
+      apply False.elim
+      apply hinv
+      constructor
+      · rw [← hs, h.1]; ring
+      · rw [h.2]; simp
+  · intro h; cases h
+
+end Branch22Prelude
+
 section Generic12
 
 variable {R : Type*} [CommRing R]
