@@ -1,5 +1,14 @@
 # ecbench: one harness for every ECDLP method
 
+The experimental `ic.trace_line_2lp` method compares actual embedded subfield
+lines and trace-selected multiplicative shifts on polynomial-basis binary
+instances with N=4d. It runs the exact bounded four-summand MITM/2LP collector,
+retains every accepted relation, and exposes construction, lookup, LP and LA
+work as uncharged counters. Its GAE is a lower bound, not complete C1 cost.
+It does not implement an algebraic Gaudry–Diem trial-cost measurement. Parameters,
+prospective controls, replay and remaining gates are in the
+[trace-line study](../../research/trace_c1_2lp_20261027/README.md).
+
 `ecbench` measures Pollard rho (in its variants), baby-step giant-step,
 the kangaroo, and index calculus **behind one interface, on the same
 single-target workloads, in the same unit, under the same isolation, into
