@@ -4,7 +4,7 @@
 - **Kind:** construction gap, proof-verification gap, implementation gap and missing measurements; these are not a universal impossibility theorem.
 - **Affected work:** [routes 1–3 tracker](../research/notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md), [trace card](../backlog/XP-20261021-twist-trace-factor-base/README.md), [cover card](../backlog/XP-20261021-twist-cover-transfer/README.md), [solver card](../backlog/XP-20261021-twist-symmetry-solver/README.md).
 - **Next action owner:** unassigned research/implementation lane.
-- **Last updated:** 2026-10-26
+- **Last updated:** 2026-10-27
 
 ## Problem
 
@@ -185,3 +185,30 @@ Original failed-run full protocol binding retains the absent-reference gap;
 the successor binds with zero findings. All original full-campaign criteria
 remain open. Concrete next cards price corrected-seed cold costs and certify
 explicit twist-kernel isogenies; neither has run or received funding.
+
+### 2026-10-27: executable twist-torsion isogenies preserve relations
+
+The [v8 report](../research/twist_routes_1_3_20261021/reports/kernel-relations-20261027/RESULTS.md)
+closes a bounded scalar-connection construction gap: on public p827 the full
+rational twist7-torsion supplies8 Galois-stable source kernels,8 explicit
+rational degree7 maps/duals and16 exact generic dual compositions. Both native
+and independent PARI verify every source/destination rational point, public
+scalar transport and576 signed query sets. Same-base matrices remain identical.
+This is known isogeny theory; it does not contradict rational Frobenius
+separation, supply a direct map into the rational twist group or a NIST result.
+
+Ordinary base40 witness rows/rank9 fixes the target; shifted maximal-twist base
+66 rows/rank8 leaves it ambiguous. The [post-v8 nullspace diagnostic](../research/twist_routes_1_3_20261021/reports/relation-rank-20261027/RESULTS.md)
+checks that distinction on all18 systems;9 identifiable/9 ambiguous. Original
+GP export-initialization failure, explicit pre-data field preload amendment,
+unchanged-matrix successful replay and all failed control/metadata attempts
+remain preserved. Four conditional Lean group implications pass; concrete
+curve/map/dual formal bridges remain open.
+
+Remaining exit criterion: a separately frozen complete cold decomposition
+panel on certified source/destination maps must lower solving cost on the same
+output task after discovery, conversion, signs/exceptions, useful relation
+algebra and recovery, against strongest ordinary/group/solver controls. No
+cost panel, new speedup, complete original campaign or independent-host result
+is supplied by this connection. The problem stays open; the kernel card is
+partial, with its cost phase blocked/unfunded rather than unimplemented maps.

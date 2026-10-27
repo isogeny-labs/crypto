@@ -39,9 +39,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         .map(|v| (v["slug"].as_str().unwrap(), v))
         .collect();
     let mut models = BTreeMap::new();
-    for path in ["research/twist_routes_1_3_20261021/execution-v1/registry-additions.json","research/twist_routes_1_3_20261021/execution-v1/runs/isogeny-20261021T2320Z/E14-registry-additions.json","research/twist_routes_1_3_20261021/execution-v1/pairing-fixture/registry-additions.json"] {
-        let v:Value=serde_json::from_slice(&fs::read(root.join(path))?)?;
-        for row in v.as_array().unwrap(){models.insert(row["slug"].as_str().unwrap().to_string(),row.clone());}
+    let mut manifests = vec!["research/twist_routes_1_3_20261021/execution-v1/registry-additions.json".to_string(),"research/twist_routes_1_3_20261021/execution-v1/runs/isogeny-20261021T2320Z/E14-registry-additions.json".to_string(),"research/twist_routes_1_3_20261021/execution-v1/pairing-fixture/registry-additions.json".to_string()];
+    manifests.extend(args.iter().skip(2).cloned());
+    for path in manifests {
+        let v: Value = serde_json::from_slice(&fs::read(root.join(path))?)?;
+        for row in v.as_array().unwrap() {
+            models.insert(row["slug"].as_str().unwrap().to_string(), row.clone());
+        }
     }
     let mut checked = vec![];
     let mut extensions = 0;

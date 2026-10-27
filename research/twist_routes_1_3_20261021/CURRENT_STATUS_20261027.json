@@ -46,16 +46,45 @@
       "remaining": "Concrete Legendre/projective/genus/Weil bridges are not formalized."
     },
     {
-      "requirement": "Novel IC speedup, scalar-preserving twist map, NIST-size benefit and original full campaigns",
+      "requirement": "Novel IC speedup, direct source-to-rational-twist map, NIST-size benefit and original full campaigns",
       "status": "not-established",
       "remaining": "Original full E26/E27/E28/E30 criteria, charged destination solving/relation algebra/recovery, strongest external reference, matched rho, formal map bridges and independent-host replay remain open."
+    },
+    {
+      "requirement": "Twist-torsion-derived source isogenies and scalar/relation transport",
+      "status": "verified-bounded-exact",
+      "kernel_lines": 8,
+      "generic_dual_compositions": 16,
+      "query_cases": 576,
+      "systems": 18,
+      "evidence": "execution-v8/README.md",
+      "remaining": "Known method on one toy curve; no charged representative solving advantage or NIST result."
+    },
+    {
+      "requirement": "Target identifiability in the transported relation systems",
+      "status": "verified-bounded-exact",
+      "systems": 18,
+      "identifiable": 9,
+      "ambiguous": 9,
+      "failed_original_GP_attempt_preserved": true,
+      "evidence": "execution-v9/README.md"
+    },
+    {
+      "requirement": "Conditional dual/injectivity/relation/scalar group implication",
+      "status": "verified-exact-conditional",
+      "Lean_theorems": 4,
+      "evidence": "lean-v5/receipts/frozen-v1/axiom-audit.stdout",
+      "remaining": "Concrete curve/map/dual bridge not formalized."
     }
   ],
   "next_unrun_cards": [
-    "XP-20261027-twist-maximal-seed-cold-cost",
-    "XP-20261027-twist-kernel-isogeny-orbit"
+    "XP-20261027-twist-maximal-seed-cold-cost"
   ],
   "final_E28_labels_opened": false,
   "original_full_campaign_complete": false,
-  "scientific_background_jobs_running": false
+  "scientific_background_jobs_running": false,
+  "updated": "2026-10-27T14:45:51.516Z",
+  "partially_executed_cards": [
+    "XP-20261027-twist-kernel-isogeny-orbit"
+  ]
 }

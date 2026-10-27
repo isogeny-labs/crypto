@@ -205,3 +205,20 @@ bridges. E25/E27 close applicable signature-reference and complete-cost gaps;
 E26/E28 test block elimination and a frozen heldout selector. Every design
 states finite inputs, controls, outputs, resource caps and a decision rule.
 No novelty, new group relation or calibrated speedup is asserted.
+
+### 2026-10-27 — twist torsion supplies verified relation-preserving isogenies
+
+[Executed v8](../../twist_routes_1_3_20261021/reports/kernel-relations-20261027/RESULTS.md):
+all8 cyclic7-kernels from the public p827 twist's C7×C119 group define rational
+source degree7 isogenies. Maps, duals, infinity/poles, all rational points and
+16 generic compositions pass native and independent PARI checks. This is a
+concrete scalar-preserving connection through standard isogeny theory, not
+mixed rational curve/twist relation harvesting. All576 signed query sets and
+18 matrices preserve same-base information exactly.
+
+Ordinary base40 rows/rank9 recovers37; twist progression66 rows/rank8 does not
+fix the target. [Separate unchanged-matrix nullspace check](../../twist_routes_1_3_20261021/reports/relation-rank-20261027/RESULTS.md)
+verifies9 identifiable and9 ambiguous systems, preserving an initial failed
+GP attempt and its explicit field-preload correction. Four conditional Lean
+group implications pass; concrete curve/map bridges, charged solving advantage,
+NIST route and original full campaigns remain open. No performance row moves.

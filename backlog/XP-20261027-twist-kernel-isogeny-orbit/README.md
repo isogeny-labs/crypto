@@ -1,6 +1,22 @@
 # Twist7 torsion to rational elliptic isogeny quotients: explicit maps and charged solver test
 
-Status: **proposed, blocked, unimplemented and unrun**. No lease or funding.
+Status: **map/correctness phase executed; complete charged solver phase blocked
+and unrun**. No lease or funding for that cost phase.
+
+The [v8 report](../../research/twist_routes_1_3_20261021/reports/kernel-relations-20261027/RESULTS.md)
+certifies all8 twist-derived degree7 maps/duals and576 same-base signed query
+sets. All18 matrices preserve their source rows. Ordinary base:40 witness rows,
+rank9,target fixed. Twist progression:66 rows,rank8;
+[independent target/nullspace diagnostic](../../research/twist_routes_1_3_20261021/reports/relation-rank-20261027/RESULTS.md)
+confirms ambiguity on all9 models. Four conditional Lean group theorems pass;
+concrete curve/map formal bridges remain open. This establishes an executable
+connection by standard isogeny theory, not novelty or a solving advantage.
+
+The remaining question is cold cost on those certified maps. Freeze source and
+destination complete decomposition with matched same-base ordinary group and
+strong solver controls, charge discovery/conversion/algebra/recovery, preserve
+caps, and size the full panel before readiness. The original proposal follows
+as acceptance history; its map phase is now discharged by the linked evidence.
 
 Can the p827 twist7-torsion structure supply explicitly certified rational7-isogeny quotients of the source with cheaper complete decomposition?
 
