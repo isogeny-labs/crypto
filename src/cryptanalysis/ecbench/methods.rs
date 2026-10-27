@@ -3904,6 +3904,29 @@ mod tests {
             (band["native_gae_per_operation_1"].as_f64().unwrap() - (counted + ops as f64)).abs()
                 < 1e-6
         );
+        // The comparable band: one unit per rule application, per counter.
+        let ra = &b["band_rule_applications"];
+        let apps = ra["native_rule_applications"].as_f64().unwrap();
+        assert!(apps >= ops as f64 - 1e-9, "{apps} {ops}");
+        let apps_by: f64 = ra["by_counter"]
+            .as_object()
+            .unwrap()
+            .values()
+            .map(|v| v["applications"].as_f64().unwrap())
+            .sum();
+        assert!((apps_by - apps).abs() <= 1e-9 * apps.max(1.0));
+        assert_eq!(
+            ra["native_gae_per_application_0"].as_f64().unwrap(),
+            counted
+        );
+        assert!(
+            (ra["native_gae_per_application_1"].as_f64().unwrap() - (counted + apps)).abs() < 1e-6
+        );
+        assert!(
+            (ra["native_gae_weighted"].as_f64().unwrap() - (counted + native)).abs()
+                <= 1e-9 * rep.total_gae.max(1.0)
+        );
+        assert!(ra["legacy_ic"].as_str().unwrap().contains("no band"));
         assert!(rep.unpriced.is_empty(), "{:?}", rep.unpriced);
         (counted, native, ops)
     }

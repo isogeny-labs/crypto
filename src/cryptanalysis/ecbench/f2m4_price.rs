@@ -380,6 +380,10 @@ pub struct Charge {
     /// Whether the counter is native work priced by a unit (so it counts
     /// toward the band's native operations).
     pub native: bool,
+    /// Rule applications per count: the sum of the rule's multipliers (a
+    /// `walk_steps` count is one key, one mix and two mod-`r` operations,
+    /// four applications; a `row_ops` count is one).
+    pub applications_per_count: f64,
 }
 
 fn charge(rule: Rule, counter: &str, count: u64, u: &BTreeMap<String, f64>) -> Option<Charge> {
@@ -390,6 +394,7 @@ fn charge(rule: Rule, counter: &str, count: u64, u: &BTreeMap<String, f64>) -> O
             count,
             fme: us.iter().map(|(n, k)| k * u[*n] * count as f64).sum(),
             native: true,
+            applications_per_count: us.iter().map(|(_, k)| *k).sum(),
         }),
     }
 }
@@ -476,6 +481,7 @@ fn finish(
         "native_operations": native_ops,
         "by_counter": by_counter,
         "band": band(counted_gae, native_ops),
+        "band_rule_applications": band_rule_applications(counted_gae, per_add, &charges),
         "convention": "a counted F_q multiplication and an affine group operation absorb the F_q additions and loop control of their own formulas; every other native counter has a rule or the record stays a lower bound",
     });
     match &mut rep.detail {
@@ -499,6 +505,63 @@ pub fn band(counted_gae: f64, native_operations: u64) -> Value {
         "native_gae_per_operation_0": counted_gae,
         "native_gae_per_operation_0.1": counted_gae + 0.1 * native_operations as f64,
         "native_gae_per_operation_1": counted_gae + native_operations as f64,
+    })
+}
+
+/// §5a, comparable between the arms: the unit is one *rule application*,
+/// a single priced unit invoked once (a key evaluation, a mix, one
+/// mod-`r` operation, a row operation, a probe), the same on both arms.
+/// A counter that bundles several (`walk_steps`: key, mix and two mod-`r`
+/// operations) counts as the sum of its rule's multipliers, so the result
+/// does not depend on how finely an arm splits its counters.  (The older
+/// [`band`] adds the raw counts and is kept only so old readers parse.)
+///
+/// The record carries, per counter, the count, its applications, its FME
+/// and GAE, so the band is recomputable for any rate or weighting:
+/// `counted_gae + rate * applications`, or `counted_gae + native_gae`
+/// (the weighted point, each application at its measured unit).
+///
+/// A flat rate per application is still blunt: the units span 0.1 to 100+
+/// FME, so the weighted point is the estimate and the 0 / 0.1 / 1 points
+/// bound how wrong a flat rate would be.  Legacy `ic.pipeline` records
+/// (not `*_full`) never counted their unpriced work and have no band; a
+/// record whose `unpriced` list is non-empty is a lower bound at every rate.
+pub fn band_rule_applications(counted_gae: f64, per_add: f64, charges: &[Charge]) -> Value {
+    let mut by: BTreeMap<String, (u64, f64, f64, f64)> = BTreeMap::new();
+    for c in charges {
+        let e = by.entry(c.counter.clone()).or_default();
+        e.0 += c.count;
+        e.1 += c.count as f64 * c.applications_per_count;
+        e.2 += c.fme;
+        e.3 = c.applications_per_count;
+    }
+    let apps: f64 = by.values().map(|e| e.1).sum();
+    let native_gae: f64 = by.values().map(|e| e.2).sum::<f64>() / per_add;
+    let counters: BTreeMap<String, Value> = by
+        .into_iter()
+        .map(|(k, (n, a, f, per))| {
+            (
+                k,
+                json!({
+                    "count": n,
+                    "applications_per_count": per,
+                    "applications": a,
+                    "fme": f,
+                    "gae": f / per_add,
+                    "fme_per_application": if a > 0.0 { f / a } else { 0.0 },
+                }),
+            )
+        })
+        .collect();
+    json!({
+        "unit": "one rule application = one priced unit invoked once; a counter's applications = count x the sum of its rule's multipliers",
+        "native_rule_applications": apps,
+        "native_gae_per_application_0": counted_gae,
+        "native_gae_per_application_0.1": counted_gae + 0.1 * apps,
+        "native_gae_per_application_1": counted_gae + apps,
+        "native_gae_weighted": counted_gae + native_gae,
+        "by_counter": counters,
+        "legacy_ic": "legacy ic.pipeline records never counted their unpriced work and have no band; use ic.pipeline_f2m4_full or its _ref/_refmm variants",
     })
 }
 
@@ -664,6 +727,7 @@ pub fn reprice_ic(
         "large_prime_estimate_replaced": ctx.lp_estimate,
         "by_counter": by_counter,
         "band": band(counted_total, native_ops),
+        "band_rule_applications": band_rule_applications(counted_total, per_add, &charges),
         "convention": "a counted F_q multiplication and an affine group operation absorb the F_q additions and loop control of their own formulas; every other native counter has a rule or the record stays a lower bound",
     });
     match &mut rep.detail {
@@ -1565,6 +1629,34 @@ mod tests {
         ] {
             assert!(base_of(id).is_some());
         }
+    }
+
+    #[test]
+    fn the_rule_application_band_counts_a_bundle_by_its_parts() {
+        let u = row(8, false).unwrap();
+        // IC's one `walk_steps` is a key, a mix and two mod-r operations;
+        // rho's unbatched walk counts those four separately.
+        let ic = charge(ic_rule("walk_steps").unwrap(), "walk_steps", 10, &u).unwrap();
+        let rho: Vec<Charge> = [
+            ("key_evaluations", 10),
+            ("mix_evaluations", 10),
+            ("scalar_mod_op_dummy", 0),
+            ("scalar_mod_r_operations", 20),
+        ]
+        .iter()
+        .filter(|(n, _)| rho_rule(n, false).is_some())
+        .filter_map(|(n, c)| charge(rho_rule(n, false).unwrap(), n, *c, &u))
+        .collect();
+        let a = band_rule_applications(1.0, 50.0, &[ic.clone()]);
+        let b = band_rule_applications(1.0, 50.0, &rho);
+        assert_eq!(a["native_rule_applications"], 40.0);
+        assert_eq!(b["native_rule_applications"], 40.0);
+        assert_eq!(a["native_gae_per_application_1"], 41.0);
+        let w = a["native_gae_weighted"].as_f64().unwrap();
+        assert!((w - b["native_gae_weighted"].as_f64().unwrap()).abs() < 1e-12);
+        assert_eq!(a["by_counter"]["walk_steps"]["applications_per_count"], 4.0);
+        // The old count-based band sees 10 against 40.
+        assert_eq!(ic.count, 10);
     }
 
     #[test]

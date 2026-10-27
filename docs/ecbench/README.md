@@ -539,7 +539,16 @@ Two consequences to read every table with:
   every other counter has a rule in `ecbench/f2m4_price.rs` or the record
   stays a lower bound. `detail.full_pricing` carries the per-counter
   counts and charges, the number of native operations and the §5a band
-  (`counted + {0, 0.1, 1} · native operations`). The index-calculus run
+  (`counted + {0, 0.1, 1} · native operations`; `band`, kept for old
+  readers, adds raw counter counts, so it measures how finely each arm
+  splits its counters, not work). Compare arms with
+  `band_rule_applications`: the unit is one rule application (a priced
+  unit invoked once; `walk_steps` is a key, a mix and two mod-`r`
+  operations, four), with per-counter counts, applications, FME and GAE
+  so any rate or weighting can be recomputed, and the weighted point
+  `counted + native` beside the flat 0 / 0.1 / 1 points. Legacy
+  `ic.pipeline` records never counted their unpriced work and have no
+  band. The index-calculus run
   tallies, without changing any count, the solver's table inversions, the
   matrix elements its non-multiplying passes touch (zero fills, read
   scans, zero entries a dense axpy steps over), monomial hash-map
