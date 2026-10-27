@@ -29,7 +29,7 @@ Weierstrass model is not yet registered under ICV1. Its ICV1 fields are
 therefore `null`. Do not synthesize an ICV1 slug from a translated or
 isomorphic model without a recorded isomorphism and registry support.
 
-The [factor-base browser](https://aburan28.github.io/crypto/browser/#factor-bases)
+The [factor-base browser](https://isogeny-labs.github.io/crypto/browser/#factor-bases)
 is generated from committed ecbench sessions and lists `FB1` summaries.
 It is not a point store. Large bases remain in cryptanalysis's
 [`fb-archive`](https://github.com/aburan28/cryptanalysis/tree/main/experiments/fb-archive):
