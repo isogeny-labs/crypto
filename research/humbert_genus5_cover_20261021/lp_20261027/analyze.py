@@ -80,3 +80,10 @@ ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlabel("q"); ax.set_ylabel("I
 ax.set_title("Distance remaining to matched rho (medians)")
 ax.legend(fontsize=7)
 save(fig, "lp_gap_to_rho")
+
+with open(os.path.join(HERE, "results", "summary_v1.csv"), "w") as f:
+    f.write("q,aa_med,aa_lo,aa_hi,lp50_med,lp50_lo,lp50_hi,lp50_faster,lp35_med,lp35_lo,lp35_hi,lp35_faster,n\n")
+    for q in qs:
+        aa, l5, l3 = summ[q][0], summ[q][1], summ[q][2]
+        f.write("%d,%.3f,%.3f,%.3f,%.2f,%.2f,%.2f,%d,%.2f,%.2f,%.2f,%d,%d\n" % (q, med(aa), min(aa), max(aa), med(l5), min(l5), max(l5), sum(x > 1 for x in l5),
+                med(l3), min(l3), max(l3), sum(x > 1 for x in l3), len(l5)))
