@@ -446,6 +446,8 @@ Against the Amendment 11 rules:
 
 The Lean build passed again on r2 (`run-b2/out/lean/status`: `exit=0`).
 
+**Report:** `reports/run-20261027T1811Z/`. It contains `report.pdf`, `report.html` and the graph `e12b_r2_fall_degree.svg`/`.png`, made by `plot_e12b.py` from the r2 records.
+
 **Cross-check (`hky_crosscheck`, 3:21:7 draw 0).** Both local attempts were lost to container
 restarts (`e10/crosscheck/attempt{1,2}_lost_on_container_restart.*`). Attempt 2 ran about
 2 hours without finishing on the 4-core authoring host. It has no result.
