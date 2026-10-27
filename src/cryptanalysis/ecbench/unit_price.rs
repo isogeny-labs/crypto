@@ -40,6 +40,14 @@ pub struct Opts {
     pub ic_trials: u64,
     /// Steps of the rho walk segments.
     pub rho_steps: u64,
+    /// Run the `ic.pipeline` readout to a complete solve with the claim's
+    /// `max_trials` (50,000,000) instead of `ic_trials` trials, so the
+    /// timed work is dominated by the relation search, as in the claim.
+    pub ic_complete: bool,
+    /// Also time complete solves of the `rho.negation_batched_full` and
+    /// `rho.negation_f2m4_full` arms, reported as ns per full-priced FME,
+    /// the unit of the `ic.pipeline_f2m4_full` readout.
+    pub rho_full: bool,
 }
 
 fn median(mut v: Vec<f64>) -> f64 {
@@ -296,6 +304,13 @@ fn rho_block(
     Value::Object(o)
 }
 
+/// The `ic-wied` arm of the claim sessions (`e-m15`, `d-ladder`).
+const IC_FACTOR_BASE: &str = "bin-t-line";
+const IC_ORACLE: &str =
+    "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1";
+const IC_LINALG: &str = "wiedemann";
+const CLAIM_MAX_TRIALS: u64 = 50_000_000;
+
 fn ic_method(
     id: &str,
     trials: u64,
@@ -303,13 +318,9 @@ fn ic_method(
     resolve(&MethodSpec {
         id: id.into(),
         params: BTreeMap::from([
-            ("factor_base".to_string(), "bin-t-line".to_string()),
-            (
-                "oracle".to_string(),
-                "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1"
-                    .to_string(),
-            ),
-            ("linalg".to_string(), "wiedemann".to_string()),
+            ("factor_base".to_string(), IC_FACTOR_BASE.to_string()),
+            ("oracle".to_string(), IC_ORACLE.to_string()),
+            ("linalg".to_string(), IC_LINALG.to_string()),
             ("max_trials".to_string(), trials.to_string()),
         ]),
     })
@@ -333,29 +344,70 @@ fn ic_once(
         let rep = solve(&m, inst, facts, target, seed)?;
         let wall = t.elapsed().as_nanos() as f64;
         let fq = rep.total_gae * per_add;
-        let (wk, fk, tk) = match tag {
-            "legacy" => ("legacy_wall_ns", "legacy_priced_fq_ops", "legacy_trials"),
-            _ => ("full_wall_ns", "full_priced_fme", "full_trials"),
+        let (wk, fk) = match tag {
+            "legacy" => ("legacy_wall_ns", "legacy_priced_fq_ops"),
+            _ => ("full_wall_ns", "full_priced_fme"),
         };
         o.insert(wk, wall);
         o.insert(fk, fq);
-        let tr = rep
-            .counters
-            .get("trials")
-            .or_else(|| rep.counters.get("walk_trials"))
-            .copied()
-            .unwrap_or(0) as f64;
-        o.insert(tk, tr);
+        // The counters `ic_report` emits (methods.rs): `targets_tried`
+        // (decomposition trials), `relations_found`, `matrix_*`.  The keys
+        // `trials`, `decompositions` and `accepted_relations` that an
+        // earlier version of this readout looked up do not exist, so it
+        // reported zero for all of them.
+        let get = |k: &str| rep.counters.get(k).copied().unwrap_or(0) as f64;
+        let (tk, rk, kk, ak) = match tag {
+            "legacy" => (
+                "legacy_targets_tried",
+                "legacy_relations_found",
+                "legacy_matrix_rank",
+                "legacy_matrix_rows",
+            ),
+            _ => (
+                "full_targets_tried",
+                "full_relations_found",
+                "full_matrix_rank",
+                "full_matrix_rows",
+            ),
+        };
+        o.insert(tk, get("targets_tried"));
+        o.insert(rk, get("relations_found"));
+        o.insert(kk, get("matrix_rank"));
+        o.insert(ak, get("matrix_rows"));
         if tag == "legacy" {
-            for (name, key) in [
-                ("legacy_decompositions", "decompositions"),
-                ("legacy_accepted_relations", "accepted_relations"),
-            ] {
-                o.insert(name, rep.counters.get(key).copied().unwrap_or(0) as f64);
-            }
             o.insert("recovered", if rep.recovered.is_some() { 1.0 } else { 0.0 });
         }
+        if tag == "full" {
+            o.insert("full_unpriced_entries", rep.unpriced.len() as f64);
+        }
     }
+    Ok(o)
+}
+
+/// A complete solve of a `*_full` rho arm on the same curve, one thread:
+/// the wall time over the full-priced FME (`total_gae` times the current
+/// per-addition divisor), the unit the IC readout reports.
+fn rho_full_once(
+    inst: &Instance,
+    facts: &crate::cryptanalysis::ecbench::workload::CurveFacts,
+    b: &BinCurve,
+    target: &[String; 2],
+    id: &str,
+    seed: u64,
+) -> Result<BTreeMap<&'static str, f64>, String> {
+    let m = resolve(&MethodSpec {
+        id: id.into(),
+        params: BTreeMap::new(),
+    })?;
+    let t = Instant::now();
+    let rep = solve(&m, inst, facts, target, seed)?;
+    let wall = t.elapsed().as_nanos() as f64;
+    let fme = rep.total_gae * fq_muls_per_add(&b.curve) as f64;
+    let mut o = BTreeMap::new();
+    o.insert("wall_ns", wall);
+    o.insert("priced_fme", fme);
+    o.insert("recovered", if rep.recovered.is_some() { 1.0 } else { 0.0 });
+    o.insert("unpriced_entries", rep.unpriced.len() as f64);
     Ok(o)
 }
 
@@ -406,19 +458,54 @@ pub fn run(o: &Opts) -> Result<Value, String> {
             "rho.negation (one walk, an F_q^4 inversion per addition)",
         );
         eprintln!("m = {m}: rho unbatched {:.1}s", t0.elapsed().as_secs_f64());
-        let ic = if o.ic_trials > 0 {
-            let d = 0x0123_4567_89ab_cdefu128 % b.r;
-            let q = target_of(b, d);
+        let d = 0x0123_4567_89ab_cdefu128 % b.r;
+        let q = target_of(b, d);
+        let target = {
             let f = &b.curve.f;
-            let target = [
+            [
                 format!("0x{:x}", f.pack(&q.x)),
                 format!("0x{:x}", f.pack(&q.y)),
-            ];
+            ]
+        };
+        let rho_full = if o.rho_full {
+            let mut blk = serde_json::Map::new();
+            for (name, id) in [
+                ("rho_negation_batched_full", "rho.negation_batched_full"),
+                ("rho_negation_f2m4_full", "rho.negation_f2m4_full"),
+            ] {
+                let t0 = Instant::now();
+                let mut acc: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
+                for k in 0..o.reps.min(3) {
+                    for (kk, v) in rho_full_once(&inst, &facts, b, &target, id, 7 + k as u64)? {
+                        acc.entry(kk).or_default().push(v);
+                    }
+                }
+                eprintln!("m = {m}: {id} {:.1}s", t0.elapsed().as_secs_f64());
+                let mut e: serde_json::Map<String, Value> =
+                    acc.iter().map(|(k, v)| (k.to_string(), stat(v))).collect();
+                let r: Vec<f64> = acc["wall_ns"]
+                    .iter()
+                    .zip(&acc["priced_fme"])
+                    .map(|(a, b)| a / b)
+                    .collect();
+                e.insert("ns_per_full_priced_fme".into(), stat(&r));
+                blk.insert(name.into(), Value::Object(e));
+            }
+            Value::Object(blk)
+        } else {
+            Value::Null
+        };
+        let ic = if o.ic_trials > 0 || o.ic_complete {
             let t0 = Instant::now();
             let mut acc: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
-            let ic_reps = o.reps.min(3);
+            let ic_reps = if o.ic_complete { 1 } else { o.reps.min(3) };
+            let ic_max_trials = if o.ic_complete {
+                CLAIM_MAX_TRIALS
+            } else {
+                o.ic_trials
+            };
             for k in 0..ic_reps {
-                for (kk, v) in ic_once(&inst, &facts, b, &target, o.ic_trials, 3 + k as u64)? {
+                for (kk, v) in ic_once(&inst, &facts, b, &target, ic_max_trials, 3 + k as u64)? {
                     acc.entry(kk).or_default().push(v);
                 }
             }
@@ -439,7 +526,22 @@ pub fn run(o: &Opts) -> Result<Value, String> {
                 "ns_per_full_priced_fme".into(),
                 ratio("full_wall_ns", "full_priced_fme"),
             );
-            blk.insert("ic_trials_requested".into(), json!(o.ic_trials));
+            blk.insert("ic_trials_requested".into(), json!(ic_max_trials));
+            blk.insert("ic_complete".into(), json!(o.ic_complete));
+            blk.insert(
+                "spec".into(),
+                json!({
+                    "factor_base": IC_FACTOR_BASE, "oracle": IC_ORACLE, "linalg": IC_LINALG,
+                    "source": "claim sessions e-m15 and d-ladder (ic-wied arm); max_cofactor 16 for m <= 12 (d-ladder) and 2 for m >= 15 (e-m15)",
+                    "max_cofactor": cof,
+                }),
+            );
+            // The relation search was reached only when relations were found.
+            let reached: Vec<f64> = w("legacy_relations_found")
+                .iter()
+                .map(|&r| (r > 0.0) as u8 as f64)
+                .collect();
+            blk.insert("reached_relations".into(), stat(&reached));
             blk.insert("rayon_threads".into(), json!(rayon::current_num_threads()));
             blk.insert("reps".into(), json!(ic_reps));
             Value::Object(blk)
@@ -454,7 +556,7 @@ pub fn run(o: &Opts) -> Result<Value, String> {
                 "fq_muls_per_add": per_add,
                 "curve": facts.slug,
                 "micro": micro,
-                "in_situ": { "rho_negation_batched": rb, "rho_negation": ru, "ic_pipeline": ic },
+                "in_situ": { "rho_negation_batched": rb, "rho_negation": ru, "ic_pipeline": ic, "rho_full": rho_full },
             }),
         );
     }

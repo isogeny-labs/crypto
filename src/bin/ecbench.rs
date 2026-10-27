@@ -235,6 +235,14 @@ enum Cmd {
         /// Steps of the rho walk segments.
         #[arg(long, default_value_t = 200_000)]
         rho_steps: u64,
+        /// Run the ic.pipeline readout to a complete solve with the claim's
+        /// max_trials (50,000,000): the timed work is the relation search.
+        #[arg(long)]
+        ic_complete: bool,
+        /// Also time complete rho.negation_batched_full and
+        /// rho.negation_f2m4_full solves, as ns per full-priced FME.
+        #[arg(long)]
+        rho_full: bool,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -1047,6 +1055,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             reps,
             ic_trials,
             rho_steps,
+            ic_complete,
+            rho_full,
             out,
         } => {
             let doc = crypto_lib::cryptanalysis::ecbench::unit_price::run(
@@ -1056,6 +1066,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     seed,
                     ic_trials,
                     rho_steps,
+                    ic_complete,
+                    rho_full,
                 },
             )?;
             let text = serde_json::to_string_pretty(&doc).map_err(|e| e.to_string())? + "\n";
