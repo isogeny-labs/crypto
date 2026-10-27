@@ -30,9 +30,11 @@ pub mod ecc {
     pub use crate::source_field as field;
     pub use crate::source_point as point;
 }
-#[path = "../../../../src/cryptanalysis/f4_fp.rs"]
+// Frozen baseline at 26efb57a3 (same solver bytes as d475ddb25). The incoming
+// main branch added separate study-specific instrumentation dependencies.
+#[path = "f4_baseline_20261026.rs"]
 pub mod f4_fp;
-#[path = "../../../../src/cryptanalysis/fx_hash.rs"]
+#[path = "fx_hash_baseline_20261026.rs"]
 pub mod fx_hash;
 #[path = "../../../../src/cryptanalysis/groebner_f4.rs"]
 pub mod groebner_f4;

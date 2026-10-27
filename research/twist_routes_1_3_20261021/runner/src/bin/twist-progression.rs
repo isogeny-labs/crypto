@@ -2,7 +2,9 @@
 //! The audit does not import the producer's field, curve, base or solver code.
 #[path = "../../../../../src/hash/sha256.rs"]
 mod source_sha256;
+use rand::seq::SliceRandom;
 use serde_json::{json, Value};
+use std::os::unix::fs::PermissionsExt;
 use std::{
     collections::{BTreeMap, BTreeSet},
     error::Error,
@@ -43,6 +45,63 @@ fn count_ir(s: &str) -> Option<u64> {
         .trim()
         .parse()
         .ok()
+}
+fn preflight_plan(source: &Path, out: &Path) -> Result<()> {
+    if out.exists() {
+        return Err("fresh preflight plan required".into());
+    }
+    let original = read(source)?;
+    let mut representatives = BTreeMap::<u32, u64>::new();
+    for c in original["cells"].as_array().unwrap() {
+        let p = c["task"]["fixture"]["p"].as_u64().unwrap();
+        representatives
+            .entry(p.ilog2())
+            .and_modify(|x| *x = (*x).min(p))
+            .or_insert(p);
+    }
+    let mut cells = vec![];
+    for c in original["cells"].as_array().unwrap() {
+        let p = c["task"]["fixture"]["p"].as_u64().unwrap();
+        if c["family"] == "curve-orbit" && c["shift"] == 1 && representatives[&p.ilog2()] == p {
+            let mut c = c.clone();
+            c["original_index"] = c["index"].clone();
+            c["index"] = json!(cells.len());
+            cells.push(c);
+        }
+    }
+    assert_eq!(cells.len(), 60);
+    write(
+        out,
+        &json!({"schema":"twist.progression-preflight-plan/v1","source_plan_sha256":sha(source)?,"cells":cells,"requested":60,
+        "global_budget_s":300,"solver_budget_ms":2000,"hard_timeout_s":4,"purpose":"operational runtime and code-path preflight only; not part of the 880 comparative cells"}),
+    )
+}
+fn preflight_runtime(run: &Path, out: &Path) -> Result<()> {
+    if out.exists() {
+        return Err("fresh runtime receipt required".into());
+    }
+    let raw = read(run.join("RECORDS.json"))?;
+    let values = raw
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|r| r["operational_elapsed_s_not_admitted_time"].as_f64())
+        .collect::<Vec<_>>();
+    if values.len() != 60 {
+        return Err("preflight did not attempt all 60 cells".into());
+    }
+    let per_sample = values.iter().sum::<f64>() / values.len() as f64;
+    let mut classes = vec![];
+    for c in raw.as_array().unwrap() {
+        classes.push(json!({"fixture":c["fixture"],"arm":c["arm"],"arity":c["arity"],"operational_elapsed_s":c["operational_elapsed_s_not_admitted_time"]}));
+    }
+    write(
+        out,
+        &json!({"schema":"twist.progression-preflight-runtime/v1","calls":60,"fixed_seconds":0,"per_sample_seconds":per_sample,
+        "estimated_880_worker_seconds":880.0*per_sample,"worker_runtime_range_s":[values.iter().copied().reduce(f64::min),values.iter().copied().reduce(f64::max)],
+        "classes":classes,"record_sha256":sha(run.join("RECORDS.json"))?,"performance_time_admitted":false,
+        "note":"L0 operational sizing, including child startup and contention; not IC time, no optimization/seed selection, primary Ir withheld until blinded analysis."}),
+    )
 }
 fn bytes(p: &Path) -> u64 {
     fs::read_dir(p)
@@ -108,6 +167,7 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
     }
     fs::create_dir_all(out)?;
     let plan = read(plan_file)?;
+    let requested = plan["cells"].as_array().ok_or("cells")?.len();
     let started = Instant::now();
     let began = epoch();
     let mut records = vec![];
@@ -135,6 +195,7 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
             "2000".into(),
         ];
         let launch = epoch();
+        let call_started = Instant::now();
         let mut command = Command::new("/bin/sh");
         command
             .args([
@@ -191,6 +252,8 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
         row["signal"] = json!(status.signal());
         row["started_epoch_s"] = json!(launch);
         row["finished_epoch_s"] = json!(epoch());
+        row["operational_elapsed_s_not_admitted_time"] =
+            json!(call_started.elapsed().as_secs_f64());
         row["worker_argv"] = json!(std::iter::once(worker.display().to_string())
             .chain(args)
             .collect::<Vec<_>>());
@@ -216,7 +279,7 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
         write(out.join("RECORDS.json"), &json!(records))?;
         if records.len() % 20 == 0 {
             println!(
-                "{{\"progression_cells_recorded\":{},\"requested\":880}}",
+                "{{\"progression_cells_recorded\":{},\"requested\":{requested}}}",
                 records.len()
             );
         }
@@ -226,7 +289,7 @@ fn run(plan_file: &Path, worker: &Path, out: &Path) -> Result<()> {
         out.join("TRANSPORT.json"),
         &json!({"schema":"twist.progression-transport/v1","started_epoch_s":began,"finished_epoch_s":epoch(),
         "plan_sha256":sha(plan_file)?,"worker_sha256":sha(worker)?,"valgrind_sha256":sha(format!("{vgroot}/bin/valgrind"))?,
-        "raw_bytes":bytes(out),"requested":880,"recorded":records.len(),"wall_time_admitted":false,"unit":"simulated guest instructions Ir"}),
+        "raw_bytes":bytes(out),"requested":requested,"recorded":records.len(),"wall_time_admitted":false,"unit":"simulated guest instructions Ir"}),
     )
 }
 
@@ -484,22 +547,161 @@ fn distribution(mut values: Vec<f64>) -> Value {
     json!({"pairs":n,"fewer":values.iter().filter(|x|**x<1.0).count(),
         "min":values.first(),"median":if n==0{None}else{Some((values[(n-1)/2]+values[n/2])/2.0)},"max":values.last()})
 }
-fn audit(plan_file: &Path, run: &Path, census: &Path, out: &Path) -> Result<()> {
-    if out.exists() {
-        return Err("fresh audit required".into());
+fn analyze_masked(input: &Value) -> Result<Value> {
+    let mut cells = BTreeMap::new();
+    for r in input["cells"].as_array().ok_or("masked cells")? {
+        if r["accepted"] == true {
+            let key = (
+                r["workload"].as_str().ok_or("masked workload")?.to_owned(),
+                r["arm"].as_str().ok_or("masked arm")?.to_owned(),
+            );
+            if cells
+                .insert(key, r["Ir"].as_u64().ok_or("masked Ir")?)
+                .is_some()
+            {
+                return Err("duplicate masked cell".into());
+            }
+        }
     }
+    let mut ratios = BTreeMap::<(String, String), Vec<f64>>::new();
+    let mut rows = vec![];
+    for p in input["pairs"].as_array().ok_or("masked pairs")? {
+        let w = p["workload"].as_str().unwrap().to_owned();
+        let c = p["candidate"].as_str().unwrap().to_owned();
+        let b = p["control"].as_str().unwrap().to_owned();
+        let ratio = if p["admitted"] == true {
+            Some(
+                *cells
+                    .get(&(w.clone(), c.clone()))
+                    .ok_or("masked candidate missing")? as f64
+                    / *cells
+                        .get(&(w.clone(), b.clone()))
+                        .ok_or("masked control missing")? as f64,
+            )
+        } else {
+            None
+        };
+        if let Some(r) = ratio {
+            ratios.entry((c.clone(), b.clone())).or_default().push(r);
+        }
+        rows.push(json!({"workload":w,"candidate":c,"control":b,"ratio":ratio}));
+    }
+    Ok(
+        json!({"schema":"twist.masked-cost-analysis/v1","rows":rows,"distributions":ratios.into_iter().map(|((candidate,control),r)|json!({"candidate":candidate,"control":control,"ratio":distribution(r)})).collect::<Vec<_>>(),"algorithm_and_fixture_labels_present":false}),
+    )
+}
+fn blind(audit: &Path, plan_file: &Path, key_dir: &Path, out: &Path) -> Result<()> {
+    if key_dir.exists() || out.exists() {
+        return Err("fresh blind key/output required".into());
+    }
+    fs::create_dir_all(key_dir)?;
     fs::create_dir_all(out)?;
     let plan = read(plan_file)?;
-    let transport = read(run.join("TRANSPORT.json"))?;
-    let raw = read(run.join("RECORDS.json"))?;
-    if transport["plan_sha256"] != sha(plan_file)? || raw.as_array().unwrap().len() != 880 {
-        return Err("transport/plan mismatch".into());
+    let checks = read(audit.join("COST_CHECKS.json"))?;
+    let pairs = read(audit.join("COMPARISONS.json"))?;
+    let mut arm_names = plan["cells"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|c| c["arm"].as_str().unwrap().to_owned())
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .collect::<Vec<_>>();
+    let mut workload_names = plan["cells"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|c| c["workload"].as_str().unwrap().to_owned())
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .collect::<Vec<_>>();
+    arm_names.shuffle(&mut rand::rngs::OsRng);
+    workload_names.shuffle(&mut rand::rngs::OsRng);
+    let arms = arm_names
+        .into_iter()
+        .enumerate()
+        .map(|(i, n)| (n, format!("arm-{i:02}")))
+        .collect::<BTreeMap<_, _>>();
+    let workloads = workload_names
+        .into_iter()
+        .enumerate()
+        .map(|(i, n)| (n, format!("workload-{i:03}")))
+        .collect::<BTreeMap<_, _>>();
+    let cells=plan["cells"].as_array().unwrap().iter().zip(checks.as_array().unwrap()).map(|(c,r)|json!({"workload":workloads[c["workload"].as_str().unwrap()],"arm":arms[c["arm"].as_str().unwrap()],"accepted":r["accepted"],"Ir":r["Ir"]})).collect::<Vec<_>>();
+    let pairs=pairs.as_array().unwrap().iter().map(|r|json!({"workload":workloads[r["workload"].as_str().unwrap()],"candidate":arms[r["candidate"].as_str().unwrap()],"control":arms[r["control"].as_str().unwrap()],"admitted":!r["ratio"].is_null()})).collect::<Vec<_>>();
+    let input = json!({"cells":cells,"pairs":pairs});
+    write(
+        key_dir.join("KEY.json"),
+        &json!({"arms":arms,"workloads":workloads,"audit_sha256":sha(audit.join("AUDIT.json"))?}),
+    )?;
+    fs::set_permissions(key_dir, fs::Permissions::from_mode(0o700))?;
+    fs::set_permissions(key_dir.join("KEY.json"), fs::Permissions::from_mode(0o600))?;
+    write(out.join("MASKED_INPUT.json"), &input)?;
+    write(out.join("MASKED_ANALYSIS.json"), &analyze_masked(&input)?)?;
+    write(
+        out.join("RECEIPT.json"),
+        &json!({"schema":"twist.masked-analysis-receipt/v1","key_sha256":sha(key_dir.join("KEY.json"))?,
+        "input_sha256":sha(out.join("MASKED_INPUT.json"))?,"analysis_sha256":sha(out.join("MASKED_ANALYSIS.json"))?,"created_epoch_s":epoch(),
+        "instructions_to_analyst":"Inspect only MASKED_ANALYSIS.json before unmask. Withhold original audit, plan, raw outputs and key. Numerical signatures may still suggest methods."}),
+    )
+}
+fn unmask(audit: &Path, key_dir: &Path, out: &Path) -> Result<()> {
+    if out.join("UNMASKING.json").exists() {
+        return Err("fresh unmasking required".into());
     }
+    let key = read(key_dir.join("KEY.json"))?;
+    let receipt = read(out.join("RECEIPT.json"))?;
+    let original = read(audit.join("AUDIT.json"))?;
+    if receipt["key_sha256"] != sha(key_dir.join("KEY.json"))?
+        || key["audit_sha256"] != sha(audit.join("AUDIT.json"))?
+        || receipt["input_sha256"] != sha(out.join("MASKED_INPUT.json"))?
+        || receipt["analysis_sha256"] != sha(out.join("MASKED_ANALYSIS.json"))?
+    {
+        return Err("blind hash gate".into());
+    }
+    let input = read(out.join("MASKED_INPUT.json"))?;
+    let masked = read(out.join("MASKED_ANALYSIS.json"))?;
+    if analyze_masked(&input)? != masked {
+        return Err("masked analysis replay differs".into());
+    }
+    let decoder = key["arms"]
+        .as_object()
+        .unwrap()
+        .iter()
+        .map(|(a, b)| (b.as_str().unwrap().to_owned(), a.clone()))
+        .collect::<BTreeMap<_, _>>();
+    if masked["distributions"].as_array().unwrap().len()
+        != original["ratio_distributions"].as_array().unwrap().len()
+    {
+        return Err("blind distribution coverage".into());
+    }
+    for row in masked["distributions"].as_array().unwrap() {
+        let name = format!(
+            "{}/{}",
+            decoder[row["candidate"].as_str().unwrap()],
+            decoder[row["control"].as_str().unwrap()]
+        );
+        let found = original["ratio_distributions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|r| r["comparison"] == name)
+            .ok_or("unmasked comparison missing")?;
+        if found["ratio"] != row["ratio"] {
+            return Err("unmasked counts differ".into());
+        }
+    }
+    write(
+        out.join("UNMASKING.json"),
+        &json!({"schema":"twist.unmasking/v1","key":key,"key_sha256":receipt["key_sha256"],"all_primary_distributions_equal":true,
+        "unmasked_epoch_s":epoch(),"independent_analyst_or_host":false,"numerical_signature_blinding_limit":true}),
+    )
+}
+type ExactRows = BTreeMap<String, (Vec<u64>, BTreeMap<Vec<u64>, u64>)>;
+fn geometry_checks(plan: &Value, census: &Path) -> Result<(Vec<Value>, Vec<Value>, ExactRows)> {
     let geometry = read(census.join("ROWS.json"))?;
     let mut geo_checks = vec![];
     let mut yield_rows = vec![];
-    let mut gp = String::from("default(parisizemax,4000000000);good=0;bad=0;\n");
-    let mut positive = 0usize;
     let mut exact = BTreeMap::<String, (Vec<u64>, BTreeMap<Vec<u64>, u64>)>::new();
     for row in geometry.as_array().unwrap() {
         let f = &row["fixture"];
@@ -607,6 +809,63 @@ fn audit(plan_file: &Path, run: &Path, census: &Path, out: &Path) -> Result<()> 
     if geo_checks.len() != 240 || yield_rows.len() != 7680 {
         return Err("geometry coverage".into());
     }
+    Ok((geo_checks, yield_rows, exact))
+}
+fn audit_geometry(plan_file: &Path, census: &Path, out: &Path) -> Result<()> {
+    if out.exists() {
+        return Err("fresh geometry audit required".into());
+    }
+    fs::create_dir_all(out)?;
+    let plan = read(plan_file)?;
+    let (checks, yields, _) = geometry_checks(&plan, census)?;
+    let mut by_constructor = vec![];
+    for family in ["twist-orbit", "curve-orbit", "field-ap", "uniform"] {
+        for shift in [0, 1, 3] {
+            for size in [8, 16] {
+                for arity in [2, 3] {
+                    let rows = yields
+                        .iter()
+                        .filter(|r| {
+                            r["family"] == family
+                                && r["shift"] == shift
+                                && r["B"] == size
+                                && r["arity"] == arity
+                        })
+                        .collect::<Vec<_>>();
+                    let counts = rows
+                        .iter()
+                        .filter_map(|r| r["relations"].as_u64())
+                        .collect::<Vec<_>>();
+                    by_constructor.push(json!({"family":family,"shift":shift,"B":size,"arity":arity,"requested_queries":rows.len(),"supported_queries":counts.len(),
+            "nonempty_queries":counts.iter().filter(|x|**x>0).count(),"total_tuples":counts.iter().sum::<u64>(),"min":counts.iter().min(),"max":counts.iter().max()}));
+                }
+            }
+        }
+    }
+    write(out.join("CONSTRUCTION_CHECKS.json"), &json!(checks))?;
+    write(out.join("QUERY_YIELDS.json"), &json!(yields))?;
+    write(
+        out.join("AUDIT.json"),
+        &json!({"schema":"twist.progression-geometry-audit/v1","status":"independent-constructions-and-all-finite-query-counts-verified",
+        "construction_records":240,"query_records":7680,"filled_bases":checks.iter().filter(|r|r["filled"]==true).count(),
+        "by_constructor":by_constructor,"plan_sha256":sha(plan_file)?,"census_rows_sha256":sha(census.join("ROWS.json"))?,
+        "performance_measured":false,"population_or_speedup_claim":false,"final_E28_labels_opened":false}),
+    )
+}
+fn audit(plan_file: &Path, run: &Path, census: &Path, out: &Path) -> Result<()> {
+    if out.exists() {
+        return Err("fresh audit required".into());
+    }
+    fs::create_dir_all(out)?;
+    let plan = read(plan_file)?;
+    let transport = read(run.join("TRANSPORT.json"))?;
+    let raw = read(run.join("RECORDS.json"))?;
+    if transport["plan_sha256"] != sha(plan_file)? || raw.as_array().unwrap().len() != 880 {
+        return Err("transport/plan mismatch".into());
+    }
+    let (geo_checks, yield_rows, exact) = geometry_checks(&plan, census)?;
+    let mut gp = String::from("default(parisizemax,4000000000);good=0;bad=0;\n");
+    let mut positive = 0usize;
     let mut accepted = BTreeMap::<(String, String), u64>::new();
     let mut checks = vec![];
     for (cell, row) in plan["cells"]
@@ -929,13 +1188,59 @@ fn admit(out: &Path, receipt_path: &Path) -> Result<()> {
         "accepted_cost_cells":audit["accepted_cells"],"geometry_bases":240,"geometry_queries":7680,"complete_IC_or_novelty_claim":false}),
     )
 }
+fn pari_replay(audit: &Path, out: &Path) -> Result<()> {
+    if out.exists() {
+        return Err("fresh PARI receipt directory required".into());
+    }
+    fs::create_dir_all(out)?;
+    let script = audit.join("verify.gp");
+    let stdout = out.join("pari.stdout");
+    let stderr = out.join("pari.stderr");
+    let root = "/workspace/shared/twist-tools-20261023/cas/root/usr";
+    let gp = format!("{root}/bin/gp");
+    let started = epoch();
+    let args = vec![
+        "--signal=TERM".to_owned(),
+        "--kill-after=1s".into(),
+        "300s".into(),
+        gp.clone(),
+        "-f".into(),
+        "-q".into(),
+        script.display().to_string(),
+    ];
+    let status = Command::new("/usr/bin/timeout")
+        .args(&args)
+        .env(
+            "LD_LIBRARY_PATH",
+            format!("{root}/lib/x86_64-linux-gnu:{root}/lib/x86_64-linux-gnu/singular"),
+        )
+        .stdout(Stdio::from(fs::File::create(&stdout)?))
+        .stderr(Stdio::from(fs::File::create(&stderr)?))
+        .status()?;
+    write(
+        out.join("RECEIPT.json"),
+        &json!({"schema":"twist.PARI-receipt/v1","argv":std::iter::once("/usr/bin/timeout".to_owned()).chain(args).collect::<Vec<_>>(),
+        "started_epoch_s":started,"finished_epoch_s":epoch(),"exit_code":status.code(),"signal":status.signal(),"script_sha256":sha(script)?,"gp_sha256":sha(gp)?,
+        "stdout":stdout,"stderr":stderr,"stdout_sha256":sha(&stdout)?,"stderr_sha256":sha(&stderr)?}),
+    )?;
+    if !status.success() {
+        return Err("PARI process failed; preserve receipt".into());
+    }
+    Ok(())
+}
 fn main() -> Result<()> {
     let a = std::env::args().skip(1).collect::<Vec<_>>();
     match a.first().map(String::as_str){
     Some("plan")if a.len()==3=>plan(Path::new(&a[1]),Path::new(&a[2])),
+    Some("preflight-plan")if a.len()==3=>preflight_plan(Path::new(&a[1]),Path::new(&a[2])),
+    Some("preflight-runtime")if a.len()==3=>preflight_runtime(Path::new(&a[1]),Path::new(&a[2])),
     Some("run")if a.len()==4=>run(Path::new(&a[1]),Path::new(&a[2]),Path::new(&a[3])),
     Some("audit")if a.len()==5=>audit(Path::new(&a[1]),Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
+    Some("audit-geometry")if a.len()==4=>audit_geometry(Path::new(&a[1]),Path::new(&a[2]),Path::new(&a[3])),
+    Some("blind")if a.len()==5=>blind(Path::new(&a[1]),Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
+    Some("unmask")if a.len()==4=>unmask(Path::new(&a[1]),Path::new(&a[2]),Path::new(&a[3])),
     Some("admit")if a.len()==3=>admit(Path::new(&a[1]),Path::new(&a[2])),
+    Some("replay")if a.len()==3=>pari_replay(Path::new(&a[1]),Path::new(&a[2])),
     _=>Err("usage: twist-progression plan PRIOR OUT | run PLAN WORKER OUT | audit PLAN RUN CENSUS OUT | admit AUDIT RECEIPT".into())}
 }
 
@@ -980,5 +1285,26 @@ mod tests {
         let (xs, _) = independent_base(&f, "field-ap", 1, 8).unwrap();
         let rows = all_rows(&f, &xs, 2, &[Some((1, 29)), Some((1, 29))]);
         assert_eq!(rows[0], rows[1]);
+    }
+    #[test]
+    fn masked_analysis_recomputes_pairs_and_retains_missing_comparisons() {
+        let input = json!({"cells":[{"workload":"w0","arm":"a0","accepted":true,"Ir":10},{"workload":"w0","arm":"a1","accepted":true,"Ir":20}],
+            "pairs":[{"workload":"w0","candidate":"a0","control":"a1","admitted":true},{"workload":"w1","candidate":"a0","control":"a1","admitted":false}]});
+        let result = analyze_masked(&input).unwrap();
+        assert_eq!(result["rows"][0]["ratio"], 0.5);
+        assert!(result["rows"][1]["ratio"].is_null());
+        assert_eq!(result["distributions"][0]["ratio"]["pairs"], 1);
+        let mut bad = input;
+        let duplicate = bad["cells"][0].clone();
+        bad["cells"].as_array_mut().unwrap().push(duplicate);
+        assert!(analyze_masked(&bad).is_err());
+    }
+    #[test]
+    fn corrupted_base_transcript_is_rejected() {
+        let f = json!({"p":59,"a":1,"b":13,"d":2,"order":67,"generator":[1,29]});
+        let (_, v) = independent_base(&f, "field-ap", 1, 8).unwrap();
+        let mut bad = v.clone();
+        bad["attempts"][0]["x"] = json!(58);
+        assert!(check_base(&bad, &v).is_err());
     }
 }

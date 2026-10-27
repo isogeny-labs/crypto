@@ -174,7 +174,9 @@ pub fn worker(input: &Path, out: &Path, budget: u64) -> Result<()> {
     }
     task["base"] = provenance["base"].clone();
     task["base_provenance"] = provenance;
-    task["linear_roots"] = json!(true);
+    if task["linear_roots"].is_null() {
+        task["linear_roots"] = json!(true);
+    }
     if task["arm"] == "companion-curve" {
         task["companion"] = json!({"shift":shift,"delta":if family=="twist-orbit" {f.d} else {1}});
     }
@@ -224,5 +226,58 @@ mod tests {
                 }
             }
         }
+    }
+    #[test]
+    fn planted_relations_survive_all_four_complete_worker_paths() {
+        let f = fixture();
+        let e = f.curve();
+        let root =
+            std::env::temp_dir().join(format!("twist-progression-positive-{}", std::process::id()));
+        fs::create_dir(&root).unwrap();
+        let linear = std::env::var("F4_FP_LINEAR_ROOTS").is_ok_and(|v| v == "1");
+        for family in ["twist-orbit", "curve-orbit", "field-ap", "uniform"] {
+            let construction = construct(&f, family, 1, 8).unwrap();
+            assert_eq!(construction["filled"], true);
+            let xs: Vec<u64> = serde_json::from_value(construction["base"].clone()).unwrap();
+            let point = |x: u64| Some((Q(x, 0), Q(sqrt(e.rhs(Q(x, 0)).0, f.p).unwrap(), 0)));
+            for arity in [2, 3] {
+                let mut tuple = vec![xs[0], xs[1]];
+                let pair = e.pa(point(xs[0]), point(xs[1]));
+                if arity == 3 {
+                    tuple.push(
+                        *xs.iter()
+                            .find(|x| e.pa(pair, point(**x)).is_some())
+                            .unwrap(),
+                    );
+                }
+                let target = tuple.iter().fold(None, |s, x| e.pa(s, point(*x)));
+                for arm in [
+                    "direct-chain",
+                    "hybrid-eight",
+                    "group-mitm",
+                    "companion-curve",
+                ] {
+                    if arm == "companion-curve" && !family.ends_with("orbit") {
+                        continue;
+                    }
+                    let name = format!("{family}-{arity}-{arm}");
+                    let input = root.join(format!("{name}.input.json"));
+                    let out = root.join(format!("{name}.output.json"));
+                    write_json(&input,&json!({"fixture":f,"family":family,"shift":1,"B":8,"arity":arity,"target":target,"arm":arm,"linear_roots":linear})).unwrap();
+                    worker(&input, &out, 15000).unwrap();
+                    let result: Value = serde_json::from_slice(&fs::read(out).unwrap()).unwrap();
+                    assert_eq!(result["complete_projection"], true, "{name}");
+                    assert!(
+                        result["signed_witnesses"]
+                            .as_array()
+                            .unwrap()
+                            .iter()
+                            .any(|r| r["x"] == json!(tuple) && r["sign_mask"] == 0),
+                        "planted row missing: {name}"
+                    );
+                }
+            }
+        }
+        fs::remove_dir_all(root).unwrap();
     }
 }

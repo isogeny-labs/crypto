@@ -1,0 +1,510 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-progression-geometry-v3",
+  "version": 3,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v4",
+  "question": "Exactly reproduce 240 target-blind base constructions and 7,680 finite source-group query counts on the original ten public fixtures.",
+  "claims": [
+    {
+      "id": "finite-bases",
+      "text": "The fixed constructors produce the recorded finite sets and every admitted coordinate lifts to the source curve.",
+      "class": "exact_computation",
+      "decided_by": [
+        "finite-verification"
+      ]
+    },
+    {
+      "id": "finite-yields",
+      "text": "The fixed public queries have the recorded complete first-pair-canonical signed tuple counts.",
+      "class": "exact_computation",
+      "decided_by": [
+        "finite-verification"
+      ]
+    },
+    {
+      "id": "general-speedup",
+      "text": "Novelty, population-level twist advantage, NIST-scale benefit and calibrated full IC/rho speedups remain outside this finite diagnostic.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "producer",
+      "role": "baseline",
+      "description": "Target-blind native constructor and complete group-MITM census.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-route-experiments",
+            "--bin",
+            "twist-progression"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    },
+    {
+      "id": "independent",
+      "role": "reference",
+      "description": "Independent square table, Euclidean affine arithmetic and complete signed-tuple exhaustion.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-route-experiments",
+            "--bin",
+            "twist-progression"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    },
+    {
+      "id": "planted-positive",
+      "role": "control_positive",
+      "description": "Known source sums recovered through complete worker paths in correctness tests.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-route-experiments",
+            "--bin",
+            "twist-progression"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    },
+    {
+      "id": "unshifted-twist",
+      "role": "control_negative",
+      "description": "Zero-shift twist construction supplies no nonzero source lifts.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-route-experiments",
+            "--bin",
+            "twist-progression"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact complete finite arithmetic only, with independent implementations and no cost/clock comparison."
+    },
+    "positive": {
+      "present": true,
+      "arm": "planted-positive",
+      "expected_detection": "Recover the planted sign-zero source relation under every applicable constructor/arity/worker path; any miss invalidates the detector.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "unshifted-twist",
+      "null_population": {
+        "description": "The same ten registered toy curves with zero shift; complementary ordinary/random bases retain field, size and target.",
+        "generator": "Exact rules in PROTOCOL_V1.md; no post-outcome seed or fixture selection.",
+        "n": 10,
+        "why_n": "Complete fixed original fixture panel; descriptive finite results only, with no population-equivalence inference.",
+        "matched_on": [
+          "field",
+          "source curve",
+          "source subgroup",
+          "requested B",
+          "constructor rule",
+          "query labels"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "base constructor",
+        "levels": [
+          "twist-orbit",
+          "curve-orbit",
+          "field-ap",
+          "uniform"
+        ]
+      },
+      {
+        "name": "shift",
+        "levels": [
+          0,
+          1,
+          3
+        ]
+      },
+      {
+        "name": "B",
+        "levels": [
+          8,
+          16
+        ]
+      },
+      {
+        "name": "arity",
+        "levels": [
+          2,
+          3
+        ]
+      },
+      {
+        "name": "same-base solver",
+        "levels": [
+          "direct-chain",
+          "hybrid-eight",
+          "companion-curve",
+          "group-mitm"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One pinned native binary, F4 baseline bytes from 26efb57a3, GM=1, linear roots=1, one thread.",
+        "how": "Source/binary hashes must be filled before freeze; every worker receipt reopens them."
+      },
+      {
+        "name": "field, base, target and arity",
+        "treatment": "crossed",
+        "value": "The explicit plan fixes every same-base task; geometry uses labels 0..15 and costs use label zero.",
+        "how": "Full factorial finite grids; final labels 32..63 stay unopened."
+      },
+      {
+        "name": "host and co-tenants",
+        "treatment": "measured",
+        "value": "CPU/kernel/hypervisor/memory and execution tier recorded; native clock excluded.",
+        "how": "Only simulated guest instructions Ir are ranked."
+      },
+      {
+        "name": "layout and environment",
+        "treatment": "measured",
+        "value": "Fresh processes, recorded argv and non-secret overrides; direct/group A/A.",
+        "how": "Five-percent per-task gate; no failed gate is discarded silently."
+      },
+      {
+        "name": "order and warmup",
+        "treatment": "fixed",
+        "value": "Arms grouped within each configuration; fresh cold processes; no warmup subtraction.",
+        "how": "No cache-dependent clock claim; budget/cap selection effects remain explicit."
+      },
+      {
+        "name": "seeds",
+        "treatment": "fixed",
+        "value": "Existing fixture target rule and the written SplitMix64 constructor seed.",
+        "how": "The constructor reads no target."
+      },
+      {
+        "name": "analyst labels",
+        "treatment": "fixed",
+        "value": "Not applicable to exact finite verification; no statistical or comparative conclusion.",
+        "how": "Protocol remains draft; no comparative conclusion can be promoted from this record."
+      },
+      {
+        "name": "interruption",
+        "treatment": "measured",
+        "value": "No automatic measurement retry or row resume.",
+        "how": "Retain failures, incomplete rows and global-cap omissions."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "finite-verification",
+        "arms": [
+          "producer",
+          "independent"
+        ],
+        "differs_in": [
+          "same-base solver"
+        ],
+        "design": "absolute",
+        "threshold": "All 240 constructions and 7,680 exact query counts must agree."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "The metric is cold-process simulated instructions, with within-configuration A/A. Budget-dependent completion and order are disclosed; no native-time inference.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Uniform: SplitMix64 seed 202610260001 xor p xor (b<<16) xor shift. Existing target: 202610210000+label+p*65537, first nonzero source lift."
+    },
+    "instance_sampling": {
+      "rule": "All ten original odd-prime-order toy fixtures; no measured-outcome filtering.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact finite construction/count verification only; no population or performance inference.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 10,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Only exact finite answers and descriptive paired counts are planned. No significance, population-equivalence or scaling test; configurations and labels are correlated."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": "Preflight pending authorized backend. The fixed operational caps are not measured runtime estimates."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "finite-tuples",
+        "name": "Complete first-pair-canonical source tuples",
+        "unit": "tuples per public query",
+        "kind": "exact",
+        "definition": "All valid source signed tuples for the fixed base/target; not relation-matrix rank or independent logs.",
+        "source": "Independent finite affine census and exact output equality",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "exact tuple counts"
+    ],
+    "record": [
+      "source commit",
+      "binary SHA256",
+      "CPU/kernel/hypervisor",
+      "argv",
+      "non-secret environment overrides",
+      "input/output/trace hashes",
+      "actual exit/signal",
+      "resource caps",
+      "A/A gate"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_GiB": 4,
+      "paid_resources_created": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 1,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly 240 construction records and 7,680 queries, or retain a bounded failure at 600 seconds/4 GiB/64 MiB per file.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Accept only complete independent equality; publish every unsupported base and zero count.",
+    "comparison_ids": [
+      "finite-verification"
+    ],
+    "statistic": "Exact per-query counts and finite descriptive totals.",
+    "interval": "None: complete finite enumeration, no sampling inference.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact finite tuple counts, not a speedup.",
+    "verdict_vocabulary": [
+      "verified finite equality",
+      "mismatch",
+      "unsupported base",
+      "not completed"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/twist_routes_1_3_20261021/runner/src/bin/twist-progression.rs",
+      "sha256": "3205eed6169a76bd201d151ed63fd6bf1c3d1452371c8175cdd8af4fab281482"
+    },
+    "inputs": [
+      "PLAN.json",
+      "census/ROWS.json",
+      "cost/RECORDS.json",
+      "raw worker files",
+      "PARI exit/hash receipt"
+    ],
+    "outputs": [
+      "CONSTRUCTION_CHECKS.json",
+      "QUERY_YIELDS.json",
+      "AUDIT.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Planned construction/verification diagram; future graphs use recorded data only."
+    ],
+    "report_dir": "research/twist_routes_1_3_20261021/reports/progression-20261027"
+  },
+  "inadmissible": [
+    "Treating a different factor-base answer set as a same-output speedup",
+    "Dropping timeouts or zero yields",
+    "Claiming a source-to-rational-twist scalar map",
+    "Calling this full IC/rho or NIST evidence",
+    "Changing source/plan after data without an amendment",
+    "Treating pending backend approval as granted"
+  ],
+  "literature": [
+    {
+      "ref": "research/twist_routes_1_3_20261021/EXPERIMENTS.md",
+      "provenance": "internal",
+      "claim": "Existing separation, same-projection controls and original full-campaign obligations.",
+      "verified_by": "Read in this session."
+    },
+    {
+      "ref": "research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md",
+      "provenance": "internal",
+      "claim": "Earlier finite polynomial costs must be compared to ordinary group MITM.",
+      "verified_by": "Prior audited report and source inspected."
+    },
+    {
+      "ref": "https://eprint.iacr.org/2004/031",
+      "provenance": "recalled",
+      "claim": "Semaev summation-polynomial construction is prior art; current primary PDF fetch returned HTTP 403.",
+      "verified_by": null
+    },
+    {
+      "ref": "https://www.iacr.org/archive/eurocrypt2014/84410158/84410158.pdf",
+      "provenance": "recalled",
+      "claim": "Known symmetry/decomposition reference; current primary fetch returned HTTP 403. Novelty review is incomplete.",
+      "verified_by": null
+    }
+  ],
+  "amendments": [
+    {
+      "id": "pre-data-v2",
+      "filed": "2026-10-27",
+      "filed_before_affected_data": true,
+      "reason": "Incoming main adds EKS/checkpoint/artifact requirements and shared-solver hooks.",
+      "changes": [
+        "Retain exact baseline solver/hash-helper bytes.",
+        "Resolve backend, blinding and structured freeze before scientific data.",
+        "Use maintained Setec artifact/checkpoint transport."
+      ]
+    },
+    {
+      "id": "pre-data-local-v3",
+      "filed": "2026-10-27",
+      "filed_before_affected_data": true,
+      "reason": "Record the authorized local fallback after EKS access failure and split exact geometry/preflight from main cost data.",
+      "changes": [
+        "Same scientific workload and thresholds; no EKS or native isolation claim.",
+        "Private-label masked counter analysis before unmasking.",
+        "Separate retained preflight; never pool it into the 880 main cells."
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "original_narrative_protocol": "PROTOCOL_V1.md",
+    "pre_data_amendment": "AMENDMENT_V2.md",
+    "scientific_runs_started": false,
+    "metadata_and_blinding_gaps_remain": true,
+    "original_full_campaign_discharged": false,
+    "backend_choice_pending": false,
+    "backend_authority": "Standing user instructions to pursue and run bounded experiments; no fresh approval required by the default-route skill.",
+    "EKS_access_gap": "CodeBuild BatchGetBuilds denied; no verified custom command image/adapter.",
+    "source_revision": null,
+    "phase": "exact geometry only"
+  }
+}
