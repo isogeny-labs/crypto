@@ -16,6 +16,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      local_runner:
+        description: Use the dedicated local validation runner
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -26,8 +31,8 @@ concurrency:
 
 jobs:
   gate:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|validation-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|validation-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 10
+    runs-on: ${{ (((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && vars.CRYPTO_VALIDATION_LOCAL_BRANCH != '' && vars.CRYPTO_VALIDATION_LOCAL_BRANCH == github.head_ref) || (github.event_name == 'workflow_dispatch' && inputs.local_runner)) && 'crypto-cli-gate-arm64') || ((github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|validation-gate.yml|') && 'crypto-eks-highmem') || ((github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|validation-gate.yml|') && 'crypto-eks-linux') || 'ubuntu-24.04' }}
+    timeout-minutes: 30
     steps:
       # The full-history checkout no longer fits a hosted runner: from
       # 2026-10-23 04:20 UTC every run died with "No space left on device".
@@ -36,6 +41,7 @@ jobs:
       # SDKs it does not use, check out only the head, and fetch only the
       # base tip; its blobs arrive on demand.
       - name: Free runner disk
+        if: runner.environment == 'github-hosted'
         run: |
           df -h /
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
@@ -46,9 +52,9 @@ jobs:
           fetch-depth: 1
           filter: blob:none
       - name: Fetch the base tip
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.local_runner)
         env:
-          BASE_REF: ${{ github.base_ref }}
+          BASE_REF: ${{ github.base_ref || 'main' }}
         run: |
           git fetch --no-tags --depth=1 --filter=blob:none origin \
             "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
@@ -56,14 +62,19 @@ jobs:
           # fail here rather than let the freeze comparison pass silently.
           git rev-parse --verify "origin/$BASE_REF^{commit}"
       - uses: actions/setup-python@v5
+        if: runner.environment == 'github-hosted'
         with:
           python-version: '3.11'
+      - name: Confirm Python 3.11
+        run: python3 -c 'import sys; assert sys.version_info[:2] == (3, 11), sys.version'
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Every leaderboard and benchmarks row is validated or frozen pre-gate
+        env:
+          BASE_REF: ${{ github.base_ref || (github.event_name == 'workflow_dispatch' && inputs.local_runner && 'main') || '' }}
         run: |
-          base=""
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            base="--base origin/${{ github.base_ref }}"
+          if [ -n "$BASE_REF" ]; then
+            python3 scripts/validation_gate.py check --base "origin/$BASE_REF"
+          else
+            python3 scripts/validation_gate.py check
           fi
-          python3 scripts/validation_gate.py check $base
