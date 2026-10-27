@@ -60,9 +60,9 @@ use crate::cryptanalysis::ic_framework::fiber::{
 };
 use crate::cryptanalysis::ic_framework::plugins::{
     BinarySubspaceBase, CompactOrbitScanBase, CyclotomicBase, DescentAlgebraicOracle,
-    FrobeniusMitmOracle, GlvOrbitBase, KoblitzOrbitBase, MitmOracle, OnbWeightBase,
-    PrimeAbscissaBase, PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, RootfindSubtractOracle,
-    SubtractOracle,
+    FrobeniusMitmOracle, GlvOrbitBase, KoblitzOrbitBase, KoblitzSymmetrisedBase, MitmOracle,
+    OnbWeightBase, PrimeAbscissaBase, PrimeBatchMitmOracle, PrimeProjectedAbscissaBase,
+    RootfindSubtractOracle, SubtractOracle, SymmetrisedOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
@@ -3416,7 +3416,7 @@ pub const PRICED_NATIVE: &[(&str, &str)] = &[
     ("target_guard_probes", "ns_per_lookup"),
 ];
 
-fn phase_of(name: &str, p: &PhaseCost) -> PhaseRecord {
+pub(crate) fn phase_of(name: &str, p: &PhaseCost) -> PhaseRecord {
     PhaseRecord {
         name: name.into(),
         adds: p.group_ops.adds,
@@ -3979,13 +3979,23 @@ fn solve_ic_binary(
     target: FastPoint,
     seed: u64,
 ) -> Result<SolveReport, String> {
-    let (spec, fb_name, or_name) = pipeline_spec(m, seed)?;
+    let (mut spec, fb_name, or_name) = pipeline_spec(m, seed)?;
+    // The symmetrised oracle rebuilds F_u from the base's divisor and
+    // checks it point for point; spare the spec naming it twice (as
+    // `ic bench` does).
+    if or_name == "symmetrised" && spec.oracle_params.get("divisor").is_none() {
+        if let Some(d) = spec.factor_base_params.get("divisor") {
+            let d = d.to_string();
+            spec.oracle_params.set("divisor", d);
+        }
+    }
     let g = BinaryGroup(&inst.fast);
     let subspace = BinarySubspaceBase { instance: inst };
     let orbit = KoblitzOrbitBase { instance: inst };
     let compact = CompactOrbitScanBase { instance: inst };
     let cyclotomic = CyclotomicBase { instance: inst };
     let onb_weight = OnbWeightBase { instance: inst };
+    let symmetrised = KoblitzSymmetrisedBase { instance: inst };
     let plugin_base = binary_plugins().and_then(|p| (p.base)(fb_name.as_str(), inst));
     let base: &dyn FactorBaseBuilder<BinaryGroup> = match fb_name.as_str() {
         "binary-subspace" => &subspace,
@@ -3993,6 +4003,7 @@ fn solve_ic_binary(
         "compact-orbit-scan" => &compact,
         "cyclotomic" => &cyclotomic,
         "onb-weight" => &onb_weight,
+        "koblitz-symmetrised" => &symmetrised,
         other => match plugin_base.as_deref() {
             Some(b) => b,
             None => {
@@ -4026,6 +4037,7 @@ fn solve_ic_binary(
         "mitm-frobenius-fiber" => Box::new(FiberFrobeniusMitmOracle::new(ms, inst)),
         "rootfind-mitm" => Box::new(RootfindMitmOracle::new(ms)),
         "rootfind-pairs" => Box::new(RootfindPairsOracle::new(ms)),
+        "symmetrised" => Box::new(SymmetrisedOracle::new(ms, inst)),
         "descent-algebraic" => Box::new(DescentAlgebraicOracle::new(
             ms,
             inst,
@@ -4682,6 +4694,7 @@ pub fn dump_factor_base(
             let compact = CompactOrbitScanBase { instance: i };
             let cyclotomic = CyclotomicBase { instance: i };
             let onb_weight = OnbWeightBase { instance: i };
+            let symmetrised = KoblitzSymmetrisedBase { instance: i };
             let plugin_base = binary_plugins().and_then(|p| (p.base)(name.as_str(), i));
             let base: &dyn FactorBaseBuilder<BinaryGroup> = match name.as_str() {
                 "binary-subspace" => &subspace,
@@ -4689,6 +4702,7 @@ pub fn dump_factor_base(
                 "compact-orbit-scan" => &compact,
                 "cyclotomic" => &cyclotomic,
                 "onb-weight" => &onb_weight,
+                "koblitz-symmetrised" => &symmetrised,
                 other => match plugin_base.as_deref() {
                     Some(b) => b,
                     None => {

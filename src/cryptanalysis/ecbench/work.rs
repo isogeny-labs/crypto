@@ -341,6 +341,10 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         // `known_uncounted` named; the `counted:<item>` marker beside them
         // takes the item off that list for the record that carries it.
         c if c.starts_with("counted:") => Shape,
+        // `tallied:<native>` (`bitop_tally::mark_tallied`): the phase's
+        // `tally_*` counters carry the work of its native `<native>`, which
+        // `price` then leaves unpriced in that phase.  A marker, no work.
+        c if c.starts_with(crate::cryptanalysis::bitop_tally::TALLIED_PREFIX) => Shape,
         // Dense and sparse Gauss: one matrix entry read or compared (a
         // pivot-column read, a zero skipped in a pivot row, the leftmost
         // search, the non-zero collection, `pinned`'s scan; for the sparse
@@ -411,6 +415,17 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         "index_inserts" => HASH,
         "index_point_negations" => Prims(&[(FieldAdd, 1)]),
         "index_sort_word_ops" => Prims(&[(WordOp, 1)]),
+        // What `bitop_tally` saw on the thread during a phase that has no
+        // solver block to carry it (`Tally::add_work_native`): a base
+        // builder's subspace, lifts and orbit view, an oracle's `prepare`
+        // (the symmetrised base rebuild, its membership checks and the
+        // generator's system).  One primitive each, by name.
+        "tally_word_ops" => Prims(&[(WordOp, 1)]),
+        "tally_hash_probes" => HASH,
+        "tally_field_adds" => Prims(&[(FieldAdd, 1)]),
+        "tally_field_muls" => Prims(&[(FieldMul, 1)]),
+        "tally_field_sqrs" => Prims(&[(FieldSqr, 1)]),
+        "tally_field_invs" => Prims(&[(FieldInv, 1)]),
 
         // ── Extension of 2026-10-21 (ic-acct-6; docs/units/BITOPS.md,
         // "Extensions").  No primitive weight changes; these rules classify
@@ -784,6 +799,37 @@ pub struct Priceable<'a> {
     pub solver: Option<&'a SolverStats>,
 }
 
+/// The natives a `koblitz-symmetrised` base's tally carries
+/// (`ic_framework::plugins::KoblitzSymmetrisedBase::build`).
+const SYMMETRISED_BASE_TALLIED: [&str; 2] = ["as_solves", "frobenius_maps"];
+
+/// Whether phase `p`'s tally already carries the work of its native
+/// counter `name`, so that `bitop/v1` prices it once, as the tally.
+///
+/// A phase says so with the marker `tallied:<name>`
+/// (`bitop_tally::mark_tallied`).  Records of the `koblitz-symmetrised`
+/// base written between its tally (commit `fd93ddfe2`) and the marker
+/// carry the tally without the marker: their `factor_base` phase is read
+/// as marked for the same two natives.  A base phase without `tally_*`
+/// counters (every record before `fd93ddfe2`) has no tally, and its
+/// natives are priced as they always were.
+fn tallied(p: &PhaseRecord, name: &str, method_params: &BTreeMap<String, String>) -> bool {
+    use crate::cryptanalysis::bitop_tally::{TALLIED_PREFIX, WORK_NATIVE_KEYS};
+    if p.work_native
+        .contains_key(&format!("{TALLIED_PREFIX}{name}"))
+    {
+        return true;
+    }
+    p.name == "factor_base"
+        && SYMMETRISED_BASE_TALLIED.contains(&name)
+        && method_params
+            .get("factor_base")
+            .is_some_and(|fb| fb.split(':').next() == Some("koblitz-symmetrised"))
+        && WORK_NATIVE_KEYS
+            .iter()
+            .any(|k| p.work_native.contains_key(*k))
+}
+
 /// Price a record in `bitop/v1`.
 pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
     let widths = widths_of(x.curve)?;
@@ -824,6 +870,11 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
         if ic {
             for (name, &count) in p.native.iter().chain(p.work_native.iter()) {
                 if count == 0 {
+                    continue;
+                }
+                // A native counter whose work this phase's tally already
+                // carries is kept for replay but priced once, as the tally.
+                if p.native.contains_key(name) && tallied(p, name, x.method_params) {
                     continue;
                 }
                 match ic_rule(name) {
@@ -1712,6 +1763,221 @@ mod tests {
             .gates(FieldInv)
             .unwrap()
         );
+    }
+
+    /// A record shaped like the symmetrised oracle's: the base and the
+    /// oracle set-up carry their work as `tally_*` counters, every
+    /// pipeline marker is present, and the solver reports `bitop_complete`.
+    /// It prices with nothing unpriced and nothing known uncounted, and
+    /// the tally counters are one primitive each in their own phase.
+    #[test]
+    fn tally_counters_price_a_symmetrised_record_complete() {
+        let c = curve("koblitz", 17, (1 << 16) + 1, 34);
+        let params = BTreeMap::new();
+        let counters = BTreeMap::new();
+        let work = |pairs: &[(&str, u64)]| -> BTreeMap<String, u64> {
+            pairs.iter().map(|(k, v)| (k.to_string(), *v)).collect()
+        };
+        let phases = vec![
+            PhaseRecord {
+                name: "factor_base".into(),
+                work_native: work(&[
+                    ("tally_word_ops", 100),
+                    ("tally_hash_probes", 20),
+                    ("tally_field_adds", 30),
+                    ("tally_field_muls", 40),
+                    ("tally_field_sqrs", 50),
+                    ("tally_field_invs", 6),
+                    ("index_inserts", 9),
+                    ("counted:base_index_builds", 1),
+                ]),
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "oracle_setup".into(),
+                work_native: work(&[
+                    ("tally_word_ops", 7),
+                    ("tally_hash_probes", 3),
+                    ("counted:table_insert_attempts", 1),
+                ]),
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "relations".into(),
+                adds: 12,
+                work_native: work(&[("walk_modr_adds", 4), ("counted:walk_bookkeeping", 1)]),
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "linear_algebra".into(),
+                work_native: work(&[
+                    ("row_build_words", 5),
+                    ("gauss_entries_scanned", 5),
+                    ("counted:relation_row_construction", 1),
+                    ("counted:gauss_column_scans_and_pivot_inversions", 1),
+                ]),
+                ..Default::default()
+            },
+        ];
+        let solver = SolverStats {
+            name: "symmetrised inherited-f4 (cap 3, budget 4096)".into(),
+            calls: 2,
+            ops: 11,
+            op_unit: "word XORs (elimination, specialisation and linear elimination only)".into(),
+            extra: work(&[
+                ("bitop_word_ops", 15),
+                ("bitop_field_muls", 2),
+                ("bitop_complete", 1),
+            ]),
+            ..Default::default()
+        };
+        let w = price(&Priceable {
+            method_id: "ic.pipeline_full",
+            method_params: &params,
+            curve: &c,
+            phases: &phases,
+            counters: &counters,
+            solver: Some(&solver),
+        })
+        .unwrap();
+        assert!(w.unpriced.is_empty(), "{:?}", w.unpriced);
+        assert!(w.known_uncounted.is_empty(), "{:?}", w.known_uncounted);
+        assert!(w.complete);
+        let fb = &w.phases[0].prims;
+        assert_eq!(fb["word_op"], 100);
+        assert_eq!(fb["hash_probe"], 20 + 9);
+        assert_eq!(fb["field_add"], 30);
+        assert_eq!(fb["field_mul"], 40);
+        assert_eq!(fb["field_sqr"], 50);
+        assert_eq!(fb["field_inv"], 6);
+        let setup = &w.phases[1].prims;
+        assert_eq!(setup["word_op"], 7);
+        assert_eq!(setup["hash_probe"], 3);
+        // The solver's own keys go to the relation phase, not the set-up.
+        assert_eq!(w.phases[2].prims["word_op"], 15);
+        assert_eq!(w.phases[2].prims["field_mul"], 2);
+        // Without the solver's flag the record names the Macaulay gap.
+        let mut partial = solver.clone();
+        partial.extra.remove("bitop_complete");
+        let w = price(&Priceable {
+            method_id: "ic.pipeline_full",
+            method_params: &params,
+            curve: &c,
+            phases: &phases,
+            counters: &counters,
+            solver: Some(&partial),
+        })
+        .unwrap();
+        assert_eq!(
+            w.known_uncounted,
+            vec!["solver_macaulay_build_and_summation_polynomials".to_string()]
+        );
+        assert!(!w.complete);
+    }
+
+    /// A symmetrised base's phase: `koblitz_factor_base` counts the
+    /// lifts and orbit walks from the base's size as the natives
+    /// `as_solves` and `frobenius_maps`, and the builder's tally carries
+    /// the same work as `tally_*`.  With the `tallied:` markers the phase
+    /// prices the tally and the index build alone, primitive for
+    /// primitive; without them (a record written before the markers) the
+    /// natives are priced as before.
+    #[test]
+    fn tallied_natives_are_not_priced_twice() {
+        let c = curve("koblitz", 17, (1 << 16) + 1, 34);
+        let work = |pairs: &[(&str, u64)]| -> BTreeMap<String, u64> {
+            pairs.iter().map(|(k, v)| (k.to_string(), *v)).collect()
+        };
+        let native = work(&[
+            ("abscissae_scanned", 511),
+            ("as_solves", 511),
+            ("frobenius_maps", 1022),
+            ("derived_counts", 1),
+        ]);
+        let mut wn = work(&[
+            ("tally_word_ops", 100),
+            ("tally_hash_probes", 20),
+            ("tally_field_adds", 30),
+            ("tally_field_muls", 40),
+            ("tally_field_sqrs", 50),
+            ("tally_field_invs", 6),
+            ("index_inserts", 9),
+            ("index_point_negations", 3),
+            ("index_sort_word_ops", 5),
+            ("counted:base_index_builds", 1),
+        ]);
+        let unmarked = vec![PhaseRecord {
+            name: "factor_base".into(),
+            native: native.clone(),
+            work_native: wn.clone(),
+            ..Default::default()
+        }];
+        crate::cryptanalysis::bitop_tally::mark_tallied(&mut wn, &["as_solves", "frobenius_maps"]);
+        let marked = vec![PhaseRecord {
+            name: "factor_base".into(),
+            native,
+            work_native: wn,
+            ..Default::default()
+        }];
+        let counters = BTreeMap::new();
+        let w = price_ic("ic.pipeline_full", &c, &marked, &counters);
+        assert!(w.unpriced.is_empty(), "{:?}", w.unpriced);
+        let fb = &w.phases[0].prims;
+        let expect: BTreeMap<String, u128> = [
+            ("word_op", 100 + 5),
+            ("hash_probe", 20 + 9),
+            ("field_add", 30 + 3),
+            ("field_mul", 40),
+            ("field_sqr", 50),
+            ("field_inv", 6),
+            ("group_add", 0),
+            ("group_double", 0),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), v))
+        .collect();
+        assert_eq!(fb, &expect, "a tallied native leaked into the price");
+        // The unmarked record still prices the natives: 511 A-S solves
+        // (an inversion, a squaring, two products and the solve each) and
+        // two squarings a Frobenius map.
+        let w = price_ic("ic.pipeline_full", &c, &unmarked, &counters);
+        let fb = &w.phases[0].prims;
+        assert_eq!(fb["as_solve"], 511);
+        assert_eq!(fb["field_inv"], 6 + 511);
+        assert_eq!(fb["field_mul"], 40 + 2 * 511);
+        assert_eq!(fb["field_sqr"], 50 + 511 + 2 * 1022);
+        // A `koblitz-symmetrised` record written before the markers (the
+        // ic-acct-7 session) carries the tally without them: its base phase
+        // prices as the marked one does.
+        let params = BTreeMap::from([(
+            "factor_base".to_string(),
+            "koblitz-symmetrised:divisor=0;1".to_string(),
+        )]);
+        let legacy = price(&Priceable {
+            method_id: "ic.pipeline_full",
+            method_params: &params,
+            curve: &c,
+            phases: &unmarked,
+            counters: &counters,
+            solver: None,
+        })
+        .unwrap();
+        assert_eq!(&legacy.phases[0].prims, &expect);
+        // Without the tally the same base prices its natives.
+        let mut untallied = unmarked.clone();
+        untallied[0]
+            .work_native
+            .retain(|k, _| !k.starts_with("tally_"));
+        let w = price(&Priceable {
+            method_id: "ic.pipeline_full",
+            method_params: &params,
+            curve: &c,
+            phases: &untallied,
+            counters: &counters,
+            solver: None,
+        })
+        .unwrap();
+        assert_eq!(w.phases[0].prims["as_solve"], 511);
     }
 
     fn price_ic(

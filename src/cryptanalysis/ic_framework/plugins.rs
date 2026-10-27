@@ -3188,6 +3188,10 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzSymmetrisedBase<'_> {
             .as_ref()
             .ok_or("this instance is not a Koblitz curve, so it has no 1/(x + 1) frame")?;
         let idx = divisor_indices(params)?;
+        // The subspace, its lifts and its orbit view are charged to the
+        // base's phase in `bitop/v1` alone (`tally_*`, `ecbench::work`):
+        // `koblitz_factor_base` then counts its own indexes.
+        let tally_before = crate::cryptanalysis::bitop_tally::snapshot();
         let fb_u = build_symmetrised_factor_base(kc, &idx).ok_or_else(|| {
             format!(
                 "no symmetrised base for divisor {idx:?}: the subspace must contain 1 \
@@ -3196,6 +3200,7 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzSymmetrisedBase<'_> {
         })?;
         let view = frobenius_view_of_symmetrised(kc, &fb_u)
             .ok_or("the u-frame base has no Frobenius-orbit view; this is a bug")?;
+        let tally = crate::cryptanalysis::bitop_tally::snapshot().since(tally_before);
         let fold = if params.flag("no_fold") {
             ColumnFold::Abscissa
         } else if params.flag("projected") {
@@ -3214,6 +3219,16 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzSymmetrisedBase<'_> {
             ),
         )
         .ok_or_else(|| "the u-frame subspace produced no usable factor base".to_string())?;
+        tally.add_work_native(&mut fb.cost.work_native);
+        // `koblitz_factor_base` also counts this base's Artin–Schreier
+        // lifts and orbit walks from its size, as the native `as_solves`
+        // and `frobenius_maps`.  The tally above already holds that work,
+        // so those natives stay in the record (replay compares `native`)
+        // but are marked so that `bitop/v1` does not price them twice.
+        crate::cryptanalysis::bitop_tally::mark_tallied(
+            &mut fb.cost.work_native,
+            &["as_solves", "frobenius_maps"],
+        );
         // The base is the subspace V of the u-frame, so a frozen copy
         // carries its dimension and basis (single words, as the
         // x-frame bases do) rather than only a description.
@@ -3247,6 +3262,15 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzSymmetrisedBase<'_> {
 /// its group additions are charged to `ops` exactly as the
 /// `descent-algebraic` oracle's are.
 ///
+/// In `bitop/v1` the record is complete: every solve carries the whole
+/// call (the system's build, the engine's matrices, the lifts) as
+/// `bitop_*` keys with `bitop_complete = 1`, and `prepare` — the rebuild
+/// of `F_u`, the point-for-point membership check, the field tables and
+/// the generator's system — is charged to the `oracle_setup` phase as
+/// `tally_*` counters with the `counted:table_insert_attempts` marker
+/// (it builds no table).  `peak_bytes` stays 0: the engine reports no
+/// memory, and memory is reported, never priced.
+///
 /// ## Parameters
 ///
 /// `m` (2 or 3), `divisor` (the base's; copied from the factor base
@@ -3265,6 +3289,8 @@ pub struct SymmetrisedOracle<'i> {
     node_budget: usize,
     shape: Option<SystemShape>,
     totals: SolverTotals,
+    /// What `prepare` tallied, for the `oracle_setup` phase.
+    setup_tally: crate::cryptanalysis::bitop_tally::Tally,
     /// Solves whose root lifted in the `u`-frame but whose abscissae
     /// did not re-lift through the framework's sign resolution; must
     /// stay zero, and is reported so that it can be seen to.
@@ -3285,6 +3311,7 @@ impl<'i> SymmetrisedOracle<'i> {
             node_budget: 4096,
             shape: None,
             totals: SolverTotals::default(),
+            setup_tally: Default::default(),
             unliftable: 0,
             unbuildable: 0,
         }
@@ -3348,10 +3375,15 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
             .as_ref()
             .ok_or("symmetrised needs a Koblitz instance")?;
         let idx = divisor_indices(params)?;
+        // Everything below is set-up work `bitop/v1` prices from
+        // `setup_work_native`; nothing of it is in `native`, so committed
+        // records replay unchanged.
+        let tally_before = crate::cryptanalysis::bitop_tally::snapshot();
         let fb_u = build_symmetrised_factor_base(kc, &idx)
             .ok_or_else(|| format!("no symmetrised base for divisor {idx:?}"))?;
         // The base the runner built must be this F_u, point for point:
         // a mismatched divisor would make every relation a lie.
+        crate::cryptanalysis::bitop_tally::word_ops(1);
         if fb_u.points.len() != fb.points.len() {
             return Err(format!(
                 "symmetrised needs the koblitz-symmetrised base with the same divisor: \
@@ -3361,6 +3393,9 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
             ));
         }
         for p in &fb_u.points {
+            // The packed lift (two words) and one probe of the base's index.
+            crate::cryptanalysis::bitop_tally::word_ops(2);
+            crate::cryptanalysis::bitop_tally::hash_probes(1);
             let key = self.instance.fast.lift(p).pack();
             if fb.index_of_key(key).is_none() {
                 return Err(
@@ -3382,6 +3417,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
             }
         };
         self.node_budget = params.u64_or("node_budget", 4096)? as usize;
+        // The structure constants: one product of basis monomials per
+        // entry of the `n × n` table, and a word to store it.
+        crate::cryptanalysis::bitop_tally::field_ops(0, u64::from(kc.n) * u64::from(kc.n), 0, 0);
+        crate::cryptanalysis::bitop_tally::word_ops(u64::from(kc.n) * u64::from(kc.n));
         let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
         // Every system on one base has the same shape; build one for the
         // generator so the report's degree columns come from a real
@@ -3396,13 +3435,14 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
                 )
             },
         )?;
-        self.shape = Some(
-            BooleanSystem {
-                equations: sys.equations,
-                n_vars: sys.n_vars,
-            }
-            .shape(),
-        );
+        let system = BooleanSystem {
+            equations: sys.equations,
+            n_vars: sys.n_vars,
+        };
+        let shape = system.shape();
+        crate::cryptanalysis::bitop_tally::word_ops(system.shape_word_ops(&shape));
+        self.shape = Some(shape);
+        self.setup_tally = crate::cryptanalysis::bitop_tally::snapshot().since(tally_before);
         self.totals = SolverTotals {
             solver: format!(
                 "symmetrised {} (cap {}, budget {})",
@@ -3420,6 +3460,14 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
         self.fb_u = Some(fb_u);
         self.st = Some(st);
         Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        // No table: nothing is inserted.  The set-up's own work is the
+        // tally `prepare` took.
+        let mut out = BTreeMap::new();
+        self.setup_tally.add_work_native(&mut out);
+        table_counted(out)
     }
 
     fn decompose(
@@ -3469,6 +3517,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
             // runner prices both arms by the same rule.
             op_unit: "word XORs (elimination, specialisation and linear elimination only)".into(),
             wall_ns,
+            // The engine reports no memory figure; reported, never priced.
             peak_bytes: 0,
             degree_reached: Some(out.built_degree),
             solving_degree: None,

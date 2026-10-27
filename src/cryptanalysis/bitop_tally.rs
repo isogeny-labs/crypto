@@ -73,6 +73,54 @@ impl Tally {
         put("bitop_field_invs", self.field_invs);
         put("bitop_complete", 1);
     }
+
+    /// Fold this tally into a phase's `work_native` map under the
+    /// [`WORK_NATIVE_KEYS`], which `ecbench::work` prices at one primitive
+    /// each: the way a base builder or an oracle's `prepare`, which has no
+    /// solver block to carry `bitop_*` keys, reports what it tallied.  A
+    /// zero leaves its key out, as `PhaseCost::work` does.
+    pub fn add_work_native(self, into: &mut BTreeMap<String, u64>) {
+        let counts = [
+            self.word_ops,
+            self.hash_probes,
+            self.field_adds,
+            self.field_muls,
+            self.field_sqrs,
+            self.field_invs,
+        ];
+        for (k, v) in WORK_NATIVE_KEYS.iter().zip(counts) {
+            if v > 0 {
+                *into.entry(k.to_string()).or_insert(0) += v;
+            }
+        }
+    }
+}
+
+/// The `work_native` counters of [`Tally::add_work_native`], in the field
+/// order of [`Tally`]: one word operation, hash probe, `F_{2^n}` addition,
+/// product, squaring and inversion each.
+pub const WORK_NATIVE_KEYS: [&str; 6] = [
+    "tally_word_ops",
+    "tally_hash_probes",
+    "tally_field_adds",
+    "tally_field_muls",
+    "tally_field_sqrs",
+    "tally_field_invs",
+];
+
+/// Prefix of the `work_native` marker `tallied:<native>`: the phase's
+/// `tally_*` counters already carry the work its native counter `<native>`
+/// counts, so `ecbench::work` does not price that native counter in that
+/// phase.  The native counter stays in the record, so replay (which
+/// compares `native`) and the GAE pricing are unchanged.
+pub const TALLIED_PREFIX: &str = "tallied:";
+
+/// Mark each of `natives` as carried by this phase's tally
+/// ([`TALLIED_PREFIX`]).
+pub fn mark_tallied(into: &mut BTreeMap<String, u64>, natives: &[&str]) {
+    for n in natives {
+        into.insert(format!("{TALLIED_PREFIX}{n}"), 1);
+    }
 }
 
 thread_local! {
@@ -230,6 +278,13 @@ mod tests {
         d.put_complete(&mut extra, 10);
         assert_eq!(extra["bitop_word_ops"], 15);
         assert_eq!(extra["bitop_complete"], 1);
+        let mut work = BTreeMap::from([("tally_word_ops".to_string(), 1u64)]);
+        d.add_work_native(&mut work);
+        Tally::default().add_work_native(&mut work);
+        assert_eq!(work["tally_word_ops"], 6);
+        assert_eq!(work["tally_hash_probes"], 2);
+        assert_eq!(work["tally_field_invs"], 4);
+        assert_eq!(work.len(), WORK_NATIVE_KEYS.len());
     }
 
     #[test]
