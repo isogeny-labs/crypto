@@ -245,3 +245,32 @@ will be filed beside this protocol. New performance results are also
 copied into `benchmarks/` after the validation gate. Every outcome names
 the next candidate or discriminating control without changing this
 protocol or R12's frozen evidence.
+
+### Second host replacement and run custody (2026-10-27)
+
+The replacement A/A host `i-0250d75e16bbdafb0` was terminated at
+14:02:29 UTC while the native A/A was in flight. Its root EBS volume
+`vol-0da06fe6ad56d7c4d` persists in us-east-2a; snapshot
+`snap-0ac0539f266bbe1a6` was started at 14:14 UTC. Its A/A outcome is
+unknown until the root's separate `runs-host-0250d75e/` tree and
+`/var/tmp/ic-r13/aa-return.log` are recovered. No data from that host
+is combined with a successor's samples.
+
+The spot-system replacement `i-048baef2256adcc25` launched at 14:04:47
+UTC in us-east-2b as `m8i.8xlarge`, Intel Xeon 6975P-C, 32 logical CPUs,
+CPU 2's SMT sibling 18. It is a distinct experimental host. The same
+frozen archive SHA-256
+`55e7a63e0e50924951474d3a61d94d8968ce670066ee19469a5c1978e55ebe9d`
+was restored to new base/candidate source trees, with the same
+Cargo.lock SHA-256
+`c2c0049f265e78432b79c5fe14a7ce6668cd44c3816012256dfcd7b40e5f4f6d`.
+The base/candidate Koblitz source SHA-256 values are respectively
+`07c5b07f15e2a235405994e55c68f3f7257312065844744d8a671f4d24b261cf`
+and `8454042f0bf94c14e70b21d2da0889c3e95133cea8f0c60cdfe7f00c6ab46855`.
+A rebuild is underway. Before this host can run the unchanged schedule,
+record clean source and binary identities, host-class check, all 24
+holdouts, 90 pinned rows, new host manifest, unchanged CPU reservation,
+and quiet isolation preflight in a new `runs-host-048baef2/` tree.
+The snapshot copy, if used to recover the former host, is mounted read-only;
+its raw output is retained separately. An on-demand launch remains denied
+by the account's identity policy at the last dry-run.
