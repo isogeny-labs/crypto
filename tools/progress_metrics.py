@@ -235,6 +235,25 @@ def nist_selection_exact_embedding(ref, since):
              source=f"{path}@{commit}")
 
 
+
+def ghs_ipsec_archive(ref, since):
+    """Export recorded archive counters; no cryptographic computation or estimates."""
+    path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
+    txt = show(ref, path)
+    if not txt:
+        return
+    data = json.loads(txt)
+    date = data.get("snapshot_date_utc")
+    if not date or date < since:
+        return
+    for key in ("discovered", "screened", "expanded"):
+        emit("ghs.ipsec155.archive." + key + "_frobenius_orbits",
+             data.get("counters", {}).get(key), date=date,
+             problem="ghs-ipsec155-isogeny-class", unit="Frobenius orbits",
+             better="higher", label="Historical IPsec GHS archive: " + key + " orbits",
+             source=path + "@" + ref)
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -246,8 +265,8 @@ def main():
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
     nist_selection_exact_embedding(a.ref, a.since)
+    ghs_ipsec_archive(a.ref, a.since)
 
 
 if __name__ == "__main__":
     main()
-
