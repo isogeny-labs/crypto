@@ -152,3 +152,37 @@ pub fn pattern_weight(p: &[u8], xs: &[u64]) -> f64 {
     }
     w
 }
+
+/// Parity-aware null weight. Every target lies in hE, a subset of 2E; a point is in 2E
+/// iff Tr(x) = Tr(a) (halving criterion, tested). A decomposition therefore needs an
+/// EVEN number of "odd" points (Tr(x) != Tr(a)). With A_s even and B_s odd liftable x in
+/// block s and multiplicity mu_s of that block in the pattern, the number of x-tuples
+/// with an even number of odd members is (prod_s P_s(1) + prod_s P_s(-1)) / 2,
+/// P_s(t) = sum_j C(B_s, j) C(A_s, mu_s - j) t^j. This returns twice that number, so it
+/// reduces to 2 * pattern_weight when B = 0 (the factor is absorbed by the per-row
+/// rescaling in stats::pool). `xodd` shorter than `xs` is read as zeros.
+pub fn pattern_weight_parity(p: &[u8], xs: &[u64], xodd: &[u64]) -> f64 {
+    let (mut plus, mut minus) = (1.0, 1.0);
+    let mut i = 0;
+    while i < p.len() {
+        let mut j = i;
+        while j < p.len() && p[j] == p[i] {
+            j += 1;
+        }
+        let mu = (j - i) as u64;
+        let s = p[i] as usize;
+        let x = xs[s];
+        let b = xodd.get(s).copied().unwrap_or(0).min(x);
+        let a = x - b;
+        let (mut p1, mut pm) = (0.0, 0.0);
+        for t in 0..=mu.min(b) {
+            let term = binom_f(b, t) * binom_f(a, mu - t);
+            p1 += term;
+            pm += if t % 2 == 0 { term } else { -term };
+        }
+        plus *= p1;
+        minus *= pm;
+        i = j;
+    }
+    plus + minus
+}

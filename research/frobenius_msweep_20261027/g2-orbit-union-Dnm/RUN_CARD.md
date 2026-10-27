@@ -1,46 +1,69 @@
 # G2 run card (commands for LATER; nothing here has been run)
 
-Preconditions (the gate is not bypassed anywhere in this cell):
+## 0. The token command (what was asked for)
 
-1. Upload token for the resume checkpoint. It must be minted where AWS credentials exist (the owner's machine with the
-   `ecc-challenges-new` profile); this container has none. On that machine, from the repository root:
+The resume-checkpoint upload token must be minted on a machine that has AWS credentials and the `ecc-challenges-new` profile
+(this container has no `aws` CLI, no profile, no `CHECKPOINT_UPLOAD_TOKEN` and no `~/.config/checkpoint/upload-token`).
+AGENTS.md says a job on the owner's Mac re-mints that file every 15 minutes: look there first and copy it over. Otherwise,
+from the repository root on the credentialed machine:
 
-       scripts/checkpoint.sh presign-upload --install      # writes ~/.config/checkpoint/upload-token, 7-day lifetime
+    scripts/checkpoint.sh presign-upload --install        # writes ~/.config/checkpoint/upload-token, default 7 days
 
-   or print it without installing and give it to the session as `CHECKPOINT_UPLOAD_TOKEN`:
+or print it (then hand it to the session as the environment variable `CHECKPOINT_UPLOAD_TOKEN`):
 
-       scripts/checkpoint.sh presign-upload --days 7
+    scripts/checkpoint.sh presign-upload --days 7
 
-   The token is a bearer credential: never commit it or paste it into a PR, report or card.
-2. In this repository: `scripts/checkpoint.sh init`, fill `.resume/RESUME.md` (all seven sections), then
-   `scripts/checkpoint.sh push` and `scripts/checkpoint.sh gate` (must exit 0). `run_cells.sh` calls the gate itself.
-3. Conductor: `conductor check --summary "G2 orbit-union D(n,m) run" --scope path:research/frobenius_msweep_20261027/g2-orbit-union-Dnm`
+The token is a bearer credential: never commit it or paste it into a PR, report or card.
+
+## 1. Preconditions (the gate is not bypassed anywhere in this cell; no CHECKPOINT_SKIP)
+
+1. With the token in place, in the repository: `scripts/checkpoint.sh init`, fill `.resume/RESUME.md` (all seven sections),
+   `scripts/checkpoint.sh push`, then `scripts/checkpoint.sh gate` (must exit 0). `run_cells.sh` calls the gate itself.
+2. Conductor: `conductor check --summary "G2 orbit-union D(n,m) run" --scope path:research/frobenius_msweep_20261027/g2-orbit-union-Dnm`
    (the control plane at localhost:8080 was down during preparation).
+3. Commit the cell directory. `run_cells.sh` refuses a dirty tree under this directory (exit 3) and records the frozen sha
+   (the last commit that touched the directory). The PR that lands the result names that sha.
 
-Run (single entry point; arms = frob, geom, rsub, rset, skew, plain, plainbig, all through the same enumerator):
+## 2. Run
+
+Deviation from the "one command per arm" template, stated: arms are NOT run as separate invocations. The decision rule compares
+frob against frobperm, rsub, rset and skew on the same targets, interleaved per draw with shuffled arm order, and writes one rows file per
+cell; splitting arms across processes would lose the interleaving and collide on file names. The single entry point runs all 8
+arms (frob, frobperm, rsub, rset, skew, geom, plain, plainbig) through the same `Enumerator`:
 
     cd /home/user/crypto/research/frobenius_msweep_20261027/g2-orbit-union-Dnm
-    ./run_cells.sh 3          # 3 parallel cell jobs
+    ./run_cells.sh 3          # 3 parallel cell jobs; the 4th CPU stays free
 
-Expected wall time: 10 to 15 minutes on 3 free cores (single-core upper bound about 28 minutes; allow 30 for contention).
-The script runs the unit tests first, builds, writes `plan.tsv`, `commit.txt`, `binary.sha256`, then one job per cell
-(32 cells, largest first), then `analyze`.
+Steps it performs: gate, clean-tree check, `cargo test --release` (21 tests must pass), `cargo build --release`, then writes
+`plan.tsv`, `cells.txt`, `run_meta.txt` (frozen sha, HEAD, rustc -V, cargo -V, seed, jobs, nproc, uname, load, start/finish UTC),
+`host.txt`, `binary.sha256`; runs the 52 cells (largest estimated first, one process per cell, `xargs -P`), logs each to
+`log_a*_n*_m*_l*.txt`, records failed jobs in `run_meta.txt` and continues, then runs `g2dnm analyze` on whatever was written.
 
-One cell by hand (all seven arms, interleaved by draw, in one file; the decision rule needs frob, rsub, rset and skew
-together, so arms are never split across invocations into one directory):
+Expected wall time: about 18 minutes on 3 free cores (the plan sums to about 3200 s single core, longest cell (17,3,l=6) about
+633 s). The 150 ns per lookup behind it is an assumption uncertain by about 3x, so 6 to 54 minutes; allow one hour. See PROTOCOL section 8.
 
+One cell by hand (all 8 arms in one file; set the target dir and build first):
+
+    cd /home/user/crypto/research/frobenius_msweep_20261027/g2-orbit-union-Dnm
+    export CARGO_TARGET_DIR=${CARGO_TARGET_DIR:-$PWD/target}; cargo build --release
     BIN=$CARGO_TARGET_DIR/release/g2dnm; RUN=reports/run-$(date -u +%Y%m%dT%H%M%SZ); mkdir -p $RUN
-    $BIN run --a 1 --n 13 --m 5 --out $RUN     # default arms: frob,geom,rsub,rset,skew,plain,plainbig; NV=16, NT=48
+    $BIN plan > $RUN/plan.tsv; (cd /home/user/crypto && git rev-parse HEAD) > $RUN/commit.txt; sha256sum $BIN > $RUN/binary.sha256
+    $BIN run --a 1 --n 13 --m 5 --l 3 --out $RUN      # all arms, NV=16, NT=48 (effective nt per row)
     $BIN analyze --dir $RUN
+    # a hand-run cell is only a spot check; it is not the frozen run (no gate, no clean-tree check, no run_meta.txt)
 
 Outputs, all under `research/frobenius_msweep_20261027/g2-orbit-union-Dnm/reports/run-<UTC>/`:
-`rows_a*_n*_m*.tsv` (raw, one row per cell/arm/draw), `log_*.txt`, `plan.tsv`, `commit.txt`, `binary.sha256`,
-`summary.md` (verdict table + per-cell yield tables + A/A), `summary.tsv`, `rho_z.svg` (graph).
+`rows_a*_n*_m*_l*.tsv` (raw, one row per cell/arm/draw, with seed, xs, xodd), `log_*.txt`, `plan.tsv`, `cells.txt`, `run_meta.txt`,
+`host.txt`, `binary.sha256`, `summary.md` (verdict table with the "rho resolved" flag, per-cell yield tables, A/A, l ladder),
+`summary.tsv`, `verdicts.tsv`, `rho_z.svg` (graph).
 
-After the run (required by the research-visuals skill; not done in preparation): render `summary.md` and `rho_z.svg` to a
-PDF and PNG in the same directory following `.claude/skills/research-visuals/SKILL.md`; record host (`nproc`, `uname -a`,
-load) in `host.txt`; delete `target/` if the default target dir was used. No `benchmarks/` row and no leaderboard change
-(not a performance result). Append the session-log entry (docs/session-logs/YYYY-MM-DD.md) with the verdict table.
+Disk: the whole run is under 25 MB. Rows files over 1 MiB, expected for (13,5,3) and (17,5,3) at about 1.1 and 3 MB per curve,
+follow AGENTS.md section 13 (`tools/artifacts`, `.artifacts.json`), not `git add`.
 
-Abort conditions: gate fails; unit tests fail; any cell reports INSTRUMENT_FAIL (record, do not rerun with altered
-parameters); left-table assertion in `Enumerator::new` (raise nothing: report the cell as not run).
+After the run (required by the research-visuals skill; not done in preparation): render `summary.md` and `rho_z.svg` to a PDF and PNG
+in the same directory following `.claude/skills/research-visuals/SKILL.md`; delete `target/` if the default target dir was used. No
+`benchmarks/` row and no leaderboard change (not a performance result, no validation-gate row). Append the session-log entry
+(docs/session-logs/YYYY-MM-DD.md) with the verdict table, naming the frozen sha.
+
+Abort conditions: gate fails; dirty tree; unit tests fail; any cell reports INSTRUMENT_FAIL (record, do not rerun with altered
+parameters); a cell process that panics on the left-table assertion (record it as NOT RUN; raise nothing).

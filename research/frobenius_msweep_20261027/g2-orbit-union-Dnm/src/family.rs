@@ -4,8 +4,11 @@
 //!   rsub     W_k independent random l-dim subspaces               (negative control: linear, no Frobenius tie)
 //!   rset     W_k independent random subsets of size 2^l - 1       (negative control: no structure)
 //!   skew     independent random subspaces, dim l+1 for k < n/3   (positive control: planted size skew)
+//!   frobperm the SAME blocks as frob (same V, same draw), block labels permuted by a random
+//!            permutation of Z/n  (nuisance-matched control: identical union, trace profile,
+//!            overlaps and shape structure; only the diagonal-gauge labelling is destroyed)
 //!   plain    one block V                                          (compact baseline)
-//!   plainbig one block, random subspace of dim l + ceil(log2 n)   (size-matched compact baseline)
+//!   plainbig one block, random subspace of dim l + ceil(log2 n)   (LARGER compact baseline, 1.1-1.9x the union size; NOT size-matched)
 
 use crate::field::Fq;
 use crate::Rng;
@@ -74,6 +77,19 @@ pub fn frob(f: &Fq, rng: &mut Rng, l: usize) -> Family {
     frob_from_v(f, &v, "frob")
 }
 
+/// Same V as `frob` (the rng stream must be seeded identically), labels permuted.
+pub fn frobperm(f: &Fq, rng: &mut Rng, l: usize) -> Family {
+    let n = f.n as usize;
+    let v = span_nonzero(&random_basis(rng, f.n, l));
+    let base = frob_from_v(f, &v, "frobperm");
+    let mut perm: Vec<usize> = (0..n).collect();
+    for i in (1..n).rev() {
+        perm.swap(i, rng.below(i as u64 + 1) as usize);
+    }
+    let blocks = perm.iter().map(|&k| base.blocks[k].clone()).collect();
+    finish("frobperm", f.n, blocks)
+}
+
 pub fn geom(f: &Fq, rng: &mut Rng, l: usize) -> Family {
     let n = f.n;
     // g not in F_2, so (since n is prime) g has degree n and 1,g,..,g^{l-1} are independent.
@@ -134,6 +150,7 @@ pub fn plainbig(f: &Fq, rng: &mut Rng, l: usize) -> Family {
 pub fn build(arm: &str, f: &Fq, rng: &mut Rng, l: usize) -> Family {
     match arm {
         "frob" => frob(f, rng, l),
+        "frobperm" => frobperm(f, rng, l),
         "geom" => geom(f, rng, l),
         "rsub" => rsub(f, rng, l),
         "rset" => rset(f, rng, l),
@@ -144,4 +161,5 @@ pub fn build(arm: &str, f: &Fq, rng: &mut Rng, l: usize) -> Family {
     }
 }
 
-pub const ARMS: [&str; 7] = ["frob", "geom", "rsub", "rset", "skew", "plain", "plainbig"];
+/// Arm order is part of the seed derivation (arm_code); append only.
+pub const ARMS: [&str; 8] = ["frob", "geom", "rsub", "rset", "skew", "plain", "plainbig", "frobperm"];

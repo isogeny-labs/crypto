@@ -43,16 +43,22 @@ pub struct Row {
     pub audit: i32,
     pub ms: f64,
     pub xs: Vec<u64>,
+    /// per block: liftable x with Tr(x) != Tr(a) (not in the image of doubling)
+    pub xodd: Vec<u64>,
+    pub seed: u64,
     pub ycov: Vec<f64>,
     pub yfrac: Vec<f64>,
     pub yrep: Vec<f64>,
 }
 
 pub const HEADER: &str =
-    "a\tn\tm\tl\tarm\tvd\tnt\tnb\tD\torder\tnpts\tnleft\ttotal\tunamb\toverflow\taudit\tms\txs\tycov\tyfrac\tyrep";
+    "a\tn\tm\tl\tarm\tvd\tnt\tnb\tD\torder\tnpts\tnleft\ttotal\tunamb\toverflow\taudit\tms\txs\txodd\tseed\tycov\tyfrac\tyrep";
 
 fn join<T: ToString>(v: &[T]) -> String {
     v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",")
+}
+fn join_f(v: &[f64]) -> String {
+    v.iter().map(|x| format!("{x:.5}")).collect::<Vec<_>>().join(",")
 }
 fn split<T: std::str::FromStr>(s: &str) -> Vec<T>
 where
@@ -67,15 +73,15 @@ where
 impl Row {
     pub fn to_tsv(&self) -> String {
         format!(
-            "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{:.3}\t{}\t{}\t{}\t{}",
+            "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{:.3}\t{}\t{}\t{}\t{}\t{}\t{}",
             self.a, self.n, self.m, self.l, self.arm, self.vd, self.nt, self.nb, self.d, self.order,
             self.npts, self.nleft, self.total, self.unamb, self.overflow, self.audit, self.ms,
-            join(&self.xs), join(&self.ycov), join(&self.yfrac), join(&self.yrep)
+            join(&self.xs), join(&self.xodd), self.seed, join_f(&self.ycov), join_f(&self.yfrac), join_f(&self.yrep)
         )
     }
     pub fn from_tsv(line: &str) -> Row {
         let t: Vec<&str> = line.split('\t').collect();
-        assert_eq!(t.len(), 21, "bad row");
+        assert_eq!(t.len(), 23, "bad row");
         Row {
             a: t[0].parse().unwrap(),
             n: t[1].parse().unwrap(),
@@ -95,9 +101,11 @@ impl Row {
             audit: t[15].parse().unwrap(),
             ms: t[16].parse().unwrap(),
             xs: split(t[17]),
-            ycov: split(t[18]),
-            yfrac: split(t[19]),
-            yrep: split(t[20]),
+            xodd: split(t[18]),
+            seed: t[19].parse().unwrap(),
+            ycov: split(t[20]),
+            yfrac: split(t[21]),
+            yrep: split(t[22]),
         }
     }
 }
@@ -106,20 +114,44 @@ pub fn arm_code(arm: &str) -> u64 {
     ARMS.iter().position(|&a| a == arm).expect("arm") as u64 + 1
 }
 
-/// Targets: R = h * P for uniformly random affine P (h = cofactor), so R lies
-/// in the odd-or-2-power-free subgroup hE; R = O is skipped.
+/// Seed label of an arm's block draw. frobperm uses frob's label so that it draws the
+/// SAME V in the same (cell, draw) and differs from frob only by the label permutation.
+pub fn seed_code(arm: &str) -> u64 {
+    arm_code(if arm == "frobperm" { "frob" } else { arm })
+}
+
+/// Targets: R = h * P for affine P (h = cofactor), so R lies in hE; R = O is skipped.
+/// DISTINCT targets, at most one per Frobenius orbit {R, sigma R, ...}: sigma-conjugate
+/// targets have identical class vectors for the Frobenius arms (Proposition T), so they
+/// would add no independent information. Fewer than `nt` are returned when hE has fewer
+/// orbits (n = 7); the row records the effective nt.
 pub fn make_targets(f: &Fq, c: &Curve, a: u32, nt: usize, seed: u64) -> Vec<crate::curve::P> {
     let pts = c.all_points(f);
-    let mut rng = Rng(seed);
-    let mut out = vec![];
-    while out.len() < nt {
-        let p = pts[rng.below(pts.len() as u64) as usize];
-        let r = c.scalar(f, p, cofactor(a));
-        if r != INF {
-            out.push(r);
+    let h = cofactor(a);
+    let mut seen_orbit = std::collections::HashSet::new();
+    let mut reps: Vec<crate::curve::P> = vec![];
+    for &p in &pts {
+        let r = c.scalar(f, p, h);
+        if r == INF {
+            continue;
+        }
+        let mut orbit_min = r.key();
+        let mut q = r;
+        for _ in 1..f.n {
+            q = c.sigma(f, q);
+            orbit_min = orbit_min.min(q.key());
+        }
+        if seen_orbit.insert(orbit_min) {
+            reps.push(r);
         }
     }
-    out
+    reps.sort_by_key(|r| r.key());
+    let mut rng = Rng(seed);
+    for i in (1..reps.len()).rev() {
+        reps.swap(i, rng.below(i as u64 + 1) as usize);
+    }
+    reps.truncate(nt);
+    reps
 }
 
 pub fn liftable_counts(f: &Fq, c: &Curve, fam: &family::Family) -> Vec<u64> {
@@ -128,6 +160,18 @@ pub fn liftable_counts(f: &Fq, c: &Curve, fam: &family::Family) -> Vec<u64> {
         .map(|b| b.iter().filter(|&&x| c.lift(f, x).is_some()).count() as u64)
         .collect()
 }
+
+/// Per block: liftable x with Tr(x) != Tr(a), i.e. the points outside 2E.
+pub fn odd_counts(f: &Fq, c: &Curve, fam: &family::Family) -> Vec<u64> {
+    let ta = f.tr(c.a);
+    fam.blocks
+        .iter()
+        .map(|b| b.iter().filter(|&&x| c.lift(f, x).is_some() && f.tr(x) != ta).count() as u64)
+        .collect()
+}
+
+/// Number of targets whose gauge identity is re-checked at run time (vd = 0).
+pub const AUDIT_TARGETS: usize = 12;
 
 /// Does count(sigma R, pattern + 1) == count(R, pattern) hold for every pattern?
 pub fn gauge_identity_holds(
@@ -157,6 +201,7 @@ pub fn run_cell(cfg: &Cfg, mut sink: impl FnMut(&Row)) {
     assert_eq!(c.all_points(&f).len() as u64 + 1, order, "point count != Koblitz formula");
     let n = cfg.n as usize;
     let targets = make_targets(&f, &c, cfg.a, cfg.nt, derive_seed(cfg.seed, &[cfg.a as u64, cfg.n as u64, cfg.m as u64, cfg.l as u64, 0x7A12]));
+    let nt_eff = targets.len();
     let pt_union = PatternTable::new(n, cfg.m, true);
     let pt_one = PatternTable::new(1, cfg.m, false);
     for vd in 0..cfg.nv {
@@ -170,7 +215,7 @@ pub fn run_cell(cfg: &Cfg, mut sink: impl FnMut(&Row)) {
             let t0 = Instant::now();
             let mut rng = Rng(derive_seed(
                 cfg.seed,
-                &[cfg.a as u64, cfg.n as u64, cfg.m as u64, cfg.l as u64, arm_code(arm), vd as u64],
+                &[cfg.a as u64, cfg.n as u64, cfg.m as u64, cfg.l as u64, seed_code(arm), vd as u64],
             ));
             let fam = family::build(arm, &f, &mut rng, cfg.l);
             let pt = if fam.nb == 1 { &pt_one } else { &pt_union };
@@ -191,8 +236,8 @@ pub fn run_cell(cfg: &Cfg, mut sink: impl FnMut(&Row)) {
                     yrep[ci] += k.cover[pt.rep[ci]] as f64;
                 }
             }
-            let audit = if vd == 0 && fam.nb == n && matches!(arm.as_str(), "frob" | "geom" | "rsub" | "rset") {
-                targets.iter().take(3).all(|&r| gauge_identity_holds(&e, &c, &f, pt, r)) as i32
+            let audit = if vd == 0 && fam.nb == n && matches!(arm.as_str(), "frob" | "geom" | "rsub" | "rset" | "frobperm") {
+                targets.iter().take(AUDIT_TARGETS).all(|&r| gauge_identity_holds(&e, &c, &f, pt, r)) as i32
             } else {
                 -1
             };
@@ -203,7 +248,7 @@ pub fn run_cell(cfg: &Cfg, mut sink: impl FnMut(&Row)) {
                 l: cfg.l,
                 arm: arm.clone(),
                 vd,
-                nt: cfg.nt,
+                nt: nt_eff,
                 nb: fam.nb,
                 d,
                 order,
@@ -215,6 +260,8 @@ pub fn run_cell(cfg: &Cfg, mut sink: impl FnMut(&Row)) {
                 audit,
                 ms: t0.elapsed().as_secs_f64() * 1e3,
                 xs: liftable_counts(&f, &c, &fam),
+                xodd: odd_counts(&f, &c, &fam),
+                seed: cfg.seed,
                 ycov,
                 yfrac,
                 yrep,

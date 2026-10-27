@@ -3,14 +3,32 @@
 
 use std::collections::BTreeMap;
 
-use crate::combi::{binom_f, pattern_weight, PatternTable};
+use crate::combi::{binom_f, pattern_weight, pattern_weight_parity, PatternTable};
 use crate::runner::Row;
 use crate::Rng;
 
+/// Which independence null the class totals are compared with.
+/// Naive: all blocks get the mean liftable count, no parity (diagnostic; positive control only).
+/// Size:  true per-block liftable counts, no parity (the first-draft null; confounded by the
+///        trace-parity constraint, kept as a diagnostic column only).
+/// Parity: true per-block counts split by the halving class Tr(x) vs Tr(a); the frozen null.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum NullMode {
+    Naive,
+    Size,
+    Parity,
+}
+impl From<bool> for NullMode {
+    fn from(aware: bool) -> NullMode {
+        if aware { NullMode::Parity } else { NullMode::Naive }
+    }
+}
+
 /// Expected pooled class totals over the row's nt targets under the
-/// independence null: nt * 2^m / #E * sum_{patterns in class} prod C(X_k, mu_s).
-pub fn mu_classes(row: &Row, pt: &PatternTable, aware: bool) -> Vec<f64> {
-    let xs: Vec<u64> = if aware || row.xs.len() <= 1 {
+/// independence null: nt * 2^m / #E * sum_{patterns in class} weight(pattern).
+pub fn mu_classes(row: &Row, pt: &PatternTable, mode: impl Into<NullMode>) -> Vec<f64> {
+    let mode: NullMode = mode.into();
+    let xs: Vec<u64> = if mode != NullMode::Naive || row.xs.len() <= 1 {
         row.xs.clone()
     } else {
         let mean = row.xs.iter().sum::<u64>() as f64 / row.xs.len() as f64;
@@ -19,7 +37,15 @@ pub fn mu_classes(row: &Row, pt: &PatternTable, aware: bool) -> Vec<f64> {
     let scale = row.nt as f64 * (1u64 << row.m) as f64 / row.order as f64;
     pt.class_pats
         .iter()
-        .map(|ps| scale * ps.iter().map(|&p| pattern_weight(&pt.pats[p], &xs)).sum::<f64>())
+        .map(|ps| {
+            scale
+                * ps.iter()
+                    .map(|&p| match mode {
+                        NullMode::Parity => pattern_weight_parity(&pt.pats[p], &xs, &row.xodd),
+                        _ => pattern_weight(&pt.pats[p], &xs),
+                    })
+                    .sum::<f64>()
+        })
         .collect()
 }
 
@@ -36,7 +62,7 @@ pub struct Pooled {
 }
 
 /// Pool rows; each row's null is rescaled to that row's observed total.
-pub fn pool(rows: &[&Row], pt: &PatternTable, aware: bool, use_frac: bool) -> Pooled {
+pub fn pool(rows: &[&Row], pt: &PatternTable, aware: impl Into<NullMode> + Copy, use_frac: bool) -> Pooled {
     let d = pt.n_classes();
     let (mut y, mut mu) = (vec![0.0; d], vec![0.0; d]);
     for r in rows {
@@ -66,6 +92,20 @@ pub fn phi(p: &Pooled) -> f64 {
     } else {
         f64::NAN
     }
+}
+
+/// Poisson-de-noised mean squared RELATIVE class deviation: mean_c [((Y_c - mu_c)^2 - Y_c) / mu_c^2].
+/// Scale-free (does not grow with the counts), so it can be compared across l; it also contains
+/// non-replicable V-to-V variance, so only the frob - frobperm difference is read (descriptive).
+pub fn rel_bias(p: &Pooled) -> f64 {
+    let (mut acc, mut k) = (0.0, 0usize);
+    for c in 0..p.y.len() {
+        if p.mu[c] > 0.0 {
+            acc += ((p.y[c] - p.mu[c]).powi(2) - p.y[c]) / (p.mu[c] * p.mu[c]);
+            k += 1;
+        }
+    }
+    if k > 0 { acc / k as f64 } else { f64::NAN }
 }
 
 fn resid(p: &Pooled) -> Vec<f64> {
@@ -100,7 +140,7 @@ pub struct SplitStat {
 }
 
 /// Split-half replicability over nsplit random balanced splits of the V draws.
-pub fn split_stats(rows: &[&Row], pt: &PatternTable, aware: bool, seed: u64, nsplit: usize, nperm: usize) -> SplitStat {
+pub fn split_stats(rows: &[&Row], pt: &PatternTable, aware: impl Into<NullMode> + Copy, seed: u64, nsplit: usize, nperm: usize) -> SplitStat {
     let d = pt.n_classes();
     let all = pool(rows, pt, aware, true);
     let phi_all = phi(&all);
