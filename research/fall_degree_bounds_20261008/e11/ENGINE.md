@@ -82,7 +82,7 @@ only start once the per-row rounds stall.
 Inputs: every committed unsatisfiable draw with a dense reference in `e4/`, `e6/`
 (A, B), `e7/`, `e8/` (`run_validate.sh`; e4 and e6 A through their ladder input
 files, joined on cell and draw). Binary sha256 in `sha256_hky_window`, built at the
-commit in `commit_base`. `compare.py` and `derived.py` produce
+commit in `commit_base`. `fall_degree_e11_tools` `compare` and `derived` produce
 `validation_summary.{txt,json}` and `derived.txt`.
 
 - **112 draws** joined (90 with dense `d_F = 4`, 22 with `d_F = 3`), `m = 3…8`,
@@ -139,7 +139,7 @@ seed 20261012, 4 kept unsatisfiable draws per cell). Solutions counted with
 (same counts as `hky_par`'s counters; the general-`m` fast counter was not used).
 The dense engine `hky_par` (rebuilt at this commit, sha256 `a0181d2e…`, 3
 threads, one process per draw) was then run on the same draws for reference.
-`run_scaling.sh`, `scaling_table.py` → `scaling_table.json`.
+`run_scaling.sh`, `fall_degree_e11_tools` `scaling-table` → `scaling_table.json`.
 
 | cell | `N` | dense `d_F` (per draw) | `w1x` certified | `w1x` cols | dense cols | `w1x` s, median (max) | dense deg-4 s, median | `w1x` peak RSS | dense peak RSS | `w1x` basis |
 |:--|--:|:--|:--|--:|--:|--:|--:|--:|--:|--:|
@@ -177,7 +177,7 @@ threads, one process per draw) was then run on the same draws for reference.
 
 ## 5. Projection to `N ≈ 100` (PROJECTION, not measured)
 
-`project.py` → `projection.json`. Columns are exact counts (`count_columns.py`).
+`fall_degree_e11_tools` `project` → `projection.json`. Columns are exact counts (`fall_degree_e11_tools` `columns`).
 Basis bytes use `cols²/16` (truncated dense rows); the measured `basis_bytes` lies
 between 0.51× and 1.04× of that on all 98 certified local runs (below 1 when `1`
 enters before the space fills). Peak RSS adds the exact-pass state: a `done`
@@ -266,12 +266,17 @@ projected.
 - `../../../examples/hky_window.rs`: the engine (`ladder`, `newcells`, `count`).
 - `run_validate.sh`, `validate/*.jsonl`, `validate.log`: §3 runs (policies
   `w1x,w2x,supp,wpx`); `validate_final/`, `validate_final.log`: the final
-  binary's `w1x` rerun; `diff_rerun.py` compares the two.
-- `compare.py` → `validation_summary.{txt,json}`; `derived.py` → `derived.txt`.
-- `run_scaling.sh`, `scaling/*.jsonl`, `scaling.log`, `maxrss.py`: §4;
-  `scaling_table.py` → `scaling_table.json`; `scaling/recount_3-21-7.jsonl`.
-- `count_columns.py` (exact column counts), `project.py` → `projection.json` (§5).
+  binary's `w1x` rerun; `fall_degree_e11_tools` `diff-rerun` compares the two.
+- `fall_degree_e11_tools` `compare` → `validation_summary.{txt,json}`; `derived` → `derived.txt`.
+- `run_scaling.sh`, `scaling/*.jsonl`, `scaling.log`, `fall_degree_e11_tools` `maxrss`: §4;
+  `scaling-table` → `scaling_table.json`; `scaling/recount_3-21-7.jsonl`.
+- `fall_degree_e11_tools` `columns` (exact column counts), `project` → `projection.json` (§5).
 - `plot.py` → `window_vs_dense.svg`: degree-4 seconds against columns, `w1x`
   (dots) against dense (squares), with the projected N ≈ 100 column counts marked.
   No PDF was produced (no TeX or SVG converter on this host).
 - `commit_base`, `sha256_hky_window` (validation binary), `sha256_hky_window_final`.
+
+
+The helpers that produced these outputs were Python when the study was run. They are now the
+native `examples/fall_degree_e11_tools.rs`, which reproduces every committed output byte for
+byte (`NATIVE_TOOLS.md`).
