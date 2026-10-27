@@ -49,7 +49,7 @@ use crate::cryptanalysis::gaudry_quartic_d4::{
 use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
-    price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with, signed_frobenius_rho_tuned,
+    price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_lanes, rho_walk_with, signed_frobenius_rho_tuned,
     BinaryGroup, BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps,
     NegationClasses, PhaseCost, PointClasses, PrimeInstance, PrimePoint, QuarticClasses,
     RhoBatchResult, RhoResult, RhoWalk,
@@ -208,6 +208,19 @@ const RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
     help: "step budget as a multiple of √r before the run counts as exhausted",
 }];
 
+const LANES_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "cap_multiple",
+        default: Some("64"),
+        help: "step budget as a multiple of √r before the run counts as exhausted",
+    },
+    ParamDecl {
+        name: "lanes",
+        default: Some("32"),
+        help: "walks advanced in lockstep (batch-inversion width)",
+    },
+];
+
 const POOLED_PARAMS: &[ParamDecl] = &[
     ParamDecl {
         name: "cap_multiple",
@@ -326,6 +339,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())",
             applies: Applies::Any,
             params: RHO_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.negation_lanes",
+            family: "rho",
+            summary: "rho.negation's walk (A = 2), each walk unchanged, with `lanes` walks advanced in lockstep so one batch inversion serves a round; groups with a native lane adder only (prime curves below 2^62), refused elsewhere",
+            entry: "ic_boundary::rho_walk_lanes(NegationClasses, RhoWalk::negation())",
+            applies: Applies::Any,
+            params: LANES_PARAMS,
         },
         MethodDecl {
             id: "rho.multitarget_pooled",
@@ -887,7 +908,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
     use std::f64::consts::PI;
     match id {
         "rho.frozen_reference" | "rho.plain" => Some((PI / 2.0).sqrt()),
-        "rho.negation" => Some((PI / 4.0).sqrt()),
+        "rho.negation" | "rho.negation_lanes" => Some((PI / 4.0).sqrt()),
         "rho.cubic" => Some((PI / 12.0).sqrt()),
         "rho.quartic" | "rho.gls" => Some((PI / 8.0).sqrt()),
         "rho.frobenius_orbit" => Some((PI / 12.0).sqrt()),
@@ -1504,6 +1525,24 @@ fn solve_generic<G: CountedGroup>(
                 seed,
                 cap()?,
                 RhoWalk::negation(),
+            );
+            rho(res, t.elapsed().as_nanos() as u64)
+        }
+        "rho.negation_lanes" => {
+            if !g.supports_native_lane_walk() {
+                return Err("`rho.negation_lanes` needs a group with a native lane adder (a prime curve below 2^62)".into());
+            }
+            let lanes = param_u64(m, "lanes")?.clamp(1, 4096) as usize;
+            let res = rho_walk_lanes(
+                g,
+                &NegationClasses { r },
+                gen,
+                target,
+                r,
+                seed,
+                cap()?,
+                RhoWalk::negation(),
+                lanes,
             );
             rho(res, t.elapsed().as_nanos() as u64)
         }

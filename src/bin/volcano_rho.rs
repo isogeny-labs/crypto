@@ -1009,6 +1009,9 @@ struct Args {
     j1728: bool,
     /// `p,a,b`: measure this curve instead of searching for one.
     curve: Option<(u64, u64, u64)>,
+    /// `x,y`: the generator `P` on the root (a point of order `n`), e.g. one
+    /// carried there by an isogeny from another volcano; drawn when absent.
+    generator: Option<(u64, u64)>,
     /// `#E(F_p)` for `--curve`; counted when absent.
     order: Option<u64>,
     /// `native` (this binary's walk) or `ca` (`ca solve --alg rho`).
@@ -1057,6 +1060,7 @@ fn parse_args() -> Args {
         j0: false,
         j1728: false,
         curve: None,
+        generator: None,
         order: None,
         engine: "native".into(),
         walk: "native".into(),
@@ -1158,6 +1162,20 @@ fn parse_args() -> Args {
                 }
                 a.curve = Some((v[0], v[1], v[2]));
             }
+            "--generator" => {
+                let v: Vec<u64> = val
+                    .split(',')
+                    .map(|x| {
+                        x.trim()
+                            .parse()
+                            .unwrap_or_else(|_| die("--generator takes X,Y in decimal"))
+                    })
+                    .collect();
+                if v.len() != 2 {
+                    die("--generator takes X,Y");
+                }
+                a.generator = Some((v[0], v[1]));
+            }
             "--order" => {
                 a.order = Some(
                     val.parse()
@@ -1175,7 +1193,7 @@ fn parse_args() -> Args {
                     "volcano-rho: one ECDLP instance carried to every level of an ell-isogeny volcano,
 Pollard rho measured on each curve.
 
-  your curve:   volcano-rho --curve P,A,B [--order N] [options]
+  your curve:   volcano-rho --curve P,A,B [--order N] [--generator X,Y] [options]
   search one:   volcano-rho [--bits 40] [--depth 3] [--crater any|split|inert|ramified] [--j0|--j1728]
                             [--max-cofactor 64] [options]
 
@@ -1186,7 +1204,8 @@ options: [--ell 3] [--seed 1] [--trials 100] [--per-level 10] [--controls 3]
 
 --curve takes y^2 = x^3 + Ax + B over F_P, P prime < 2^62, in decimal. The
 generator (cofactor times a seeded random point) and the secret k are drawn
-from --seed. --engine ca runs `ca solve --alg rho` from the cryptanalysis
+from --seed; --generator X,Y fixes the generator instead (a point of order n
+on the curve, e.g. one carried there by an isogeny, as volcano-gap does). --engine ca runs `ca solve --alg rho` from the cryptanalysis
 repository on every curve (--ca-arg passes extra options, e.g. --no-negation).
 Writes results.json, trials.csv and instances.jsonl to --out.
 
@@ -1491,10 +1510,18 @@ fn main() {
     // The instance: P of order n, Q = kP.
     let e0 = found.root;
     let cof = found.order / n;
-    let p0 = loop {
-        if let Some(pt) = e0.mul(&f, Some(e0.random_point(&f, &mut rng)), cof) {
-            break pt;
+    let p0 = match args.generator {
+        Some(g) => {
+            if !e0.on(&f, Some(g)) || e0.mul(&f, Some(g), n).is_some() {
+                die("--generator is not a point of order n on the curve");
+            }
+            g
         }
+        None => loop {
+            if let Some(pt) = e0.mul(&f, Some(e0.random_point(&f, &mut rng)), cof) {
+                break pt;
+            }
+        },
     };
     assert!(e0.mul(&f, Some(p0), n).is_none());
     let k_planted = rng.gen_range(1..n);
@@ -1934,6 +1961,7 @@ fn main() {
         "command": std::env::args().collect::<Vec<_>>().join(" "),
         "params": {"bits": args.bits, "ell": ell, "depth": args.depth, "seed": args.seed, "crater": args.crater,
                    "curve": args.curve.map(|(p, a, b)| [p, a, b]), "order": args.order,
+                   "generator": args.generator.map(|(x, y)| [x, y]),
                    "engine": args.engine, "walk": args.walk, "ca": (args.engine == "ca").then_some(&args.ca), "ca_args": args.ca_args,
                    "trials": args.trials, "per_level": args.per_level, "dp_bits": dp_bits,
                    "max_cofactor": args.max_cofactor, "controls": args.controls},

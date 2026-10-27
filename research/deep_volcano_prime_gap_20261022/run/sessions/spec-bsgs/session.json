@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h658495a369ec",
+  "label": "prime conductor gap: BSGS exactness (model 0)",
+  "spec_id": "ECS1ha55be72ab53f",
+  "spec_sha256": "a55be72ab53f93c4efbb5211717ba52008a704a81827cdeeafc988f225a41728",
+  "env_class_id": "ECBENV2h058cf76d2adc",
+  "host_sha256": "df516c8658c24258db8e0c6e52387175b299f72942492f6d7a7b9c9585087dd2",
+  "plan_sha256": "a6535df72b0f43c5bbfe19904b4bbe256f56ea12c31d1ac19597ec6f1926e256",
+  "binary_sha256": "a59c4014ff52100ed10c06b5d27a0572f9474d24c137fd18b24798237024f81f",
+  "git_commit": "f7b4d94ea648e805ea91461a72f0f9b80886f964",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench-spec-bsgs.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792658719480,
+  "finished_unix_ms": 1792659080555,
+  "status": "complete",
+  "executions_planned": 760,
+  "records_written": 760,
+  "records_sha256": "3317ad4ffe616e5b04c274c7408d76400085d608497a4d75a31c742af66857d5",
+  "status_counts": {
+    "verified": 760
+  }
+}

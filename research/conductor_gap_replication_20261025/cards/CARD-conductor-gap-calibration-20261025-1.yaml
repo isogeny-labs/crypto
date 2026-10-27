@@ -1,0 +1,211 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-conductor-gap-calibration-20261025-1
+experiment_id: conductor_gap_replication_20261025
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 45def5ca7a5546113bc2fb47b44c43138323ac1d
+receipt: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.receipt.json
+binds:
+- path: research/conductor_gap_replication_20261025/PROTOCOL.md
+  sha256: a074486e1cc08b35e3fc1b0bdd378c37fa71d356b45cd4bc56321a97ec8d5d38
+- path: research/conductor_gap_replication_20261025/AMENDMENTS.md
+  sha256: f21f94af49801663dbe378f2159811573c89edd48bb30f9fd26ec89f7edd3a04
+- path: research/conductor_gap_replication_20261025/PREFLIGHT-v2.json
+  sha256: 99cf02ab67f110264521097d18e40f78dd84d7d091b6f58ee10c08c07a302b7d
+- path: research/conductor_gap_replication_20261025/calibration/pilot-a-c2.json
+  sha256: 6843db11d9bac560005f76a9d6e88000f6c30443bf92df318b71d8b4b8bb5cda
+- path: research/conductor_gap_replication_20261025/calibration/pilot-a-c5.json
+  sha256: 11cf05557d1b040c273491bceb425826eac2d7ff08147490a4f8e16ce3974933
+- path: research/conductor_gap_replication_20261025/calibration/pilot-b-c0.json
+  sha256: 2c2674793c09f06e686f959ebe03cd48e984738892aa8bb1306a39e38057bb27
+- path: research/conductor_gap_replication_20261025/calibration/pilot-b-c2.json
+  sha256: 637b16660ecfd7c1bb4e77c55ae90ebf3b486432f5ee40333908bc2715afb088
+- path: ./target/release/ecbench
+  sha256: 8f1d99783e7062cee608c18755bc2fd3e433e86e8dde812ba5cbf69a043d90eb
+must_not_exist:
+- research/conductor_gap_replication_20261025/sessions/pilot-a-c2
+- research/conductor_gap_replication_20261025/sessions/pilot-a-c2.audit.json
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.run.stdout
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.run.stderr
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.verify.stdout
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.verify.stderr
+- research/conductor_gap_replication_20261025/sessions/pilot-a-c5
+- research/conductor_gap_replication_20261025/sessions/pilot-a-c5.audit.json
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.run.stdout
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.run.stderr
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.verify.stdout
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.verify.stderr
+- research/conductor_gap_replication_20261025/sessions/pilot-b-c0
+- research/conductor_gap_replication_20261025/sessions/pilot-b-c0.audit.json
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.run.stdout
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.run.stderr
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.verify.stdout
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.verify.stderr
+- research/conductor_gap_replication_20261025/sessions/pilot-b-c2
+- research/conductor_gap_replication_20261025/sessions/pilot-b-c2.audit.json
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.run.stdout
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.run.stderr
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.verify.stdout
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.verify.stderr
+commands:
+- id: pilot-a-c2-run
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --wait
+  - --spec
+  - research/conductor_gap_replication_20261025/calibration/pilot-a-c2.json
+  - --out
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c2
+  - --cpus
+  - none
+  - --allow-busy
+  - --quiet
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.run.stdout
+  stderr: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.run.stderr
+  outputs:
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c2/session.json
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c2/records.jsonl
+- id: pilot-a-c2-verify
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c2
+  - --replay-all
+  - --exit-code
+  - --out
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c2.audit.json
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.verify.stdout
+  stderr: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.verify.stderr
+  outputs:
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c2.audit.json
+- id: pilot-a-c5-run
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --wait
+  - --spec
+  - research/conductor_gap_replication_20261025/calibration/pilot-a-c5.json
+  - --out
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c5
+  - --cpus
+  - none
+  - --allow-busy
+  - --quiet
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.run.stdout
+  stderr: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.run.stderr
+  outputs:
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c5/session.json
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c5/records.jsonl
+- id: pilot-a-c5-verify
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c5
+  - --replay-all
+  - --exit-code
+  - --out
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c5.audit.json
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.verify.stdout
+  stderr: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.verify.stderr
+  outputs:
+  - research/conductor_gap_replication_20261025/sessions/pilot-a-c5.audit.json
+- id: pilot-b-c0-run
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --wait
+  - --spec
+  - research/conductor_gap_replication_20261025/calibration/pilot-b-c0.json
+  - --out
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c0
+  - --cpus
+  - none
+  - --allow-busy
+  - --quiet
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.run.stdout
+  stderr: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.run.stderr
+  outputs:
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c0/session.json
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c0/records.jsonl
+- id: pilot-b-c0-verify
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c0
+  - --replay-all
+  - --exit-code
+  - --out
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c0.audit.json
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.verify.stdout
+  stderr: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.verify.stderr
+  outputs:
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c0.audit.json
+- id: pilot-b-c2-run
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --wait
+  - --spec
+  - research/conductor_gap_replication_20261025/calibration/pilot-b-c2.json
+  - --out
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c2
+  - --cpus
+  - none
+  - --allow-busy
+  - --quiet
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.run.stdout
+  stderr: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.run.stderr
+  outputs:
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c2/session.json
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c2/records.jsonl
+- id: pilot-b-c2-verify
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c2
+  - --replay-all
+  - --exit-code
+  - --out
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c2.audit.json
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.verify.stdout
+  stderr: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.verify.stderr
+  outputs:
+  - research/conductor_gap_replication_20261025/sessions/pilot-b-c2.audit.json
+bus_address: executor-mechanical-conductor-gap-calibration
+background: false
+write_scope:
+- research/conductor_gap_replication_20261025/
+stop_when:
+- Any command exits with a status other than 0.
+- A command is stopped by its 300-second timeout.
+- The tool refuses the pinned commit, a bound digest, or a must_not_exist path.

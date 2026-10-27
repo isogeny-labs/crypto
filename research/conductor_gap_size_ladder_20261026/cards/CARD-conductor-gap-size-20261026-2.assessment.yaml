@@ -1,0 +1,27 @@
+card_id: CARD-conductor-gap-size-20261026-2
+relay_verbatim: true
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.receipt.json (sha256 481bfdd4578d44e9a5b0361908a951dab9af9f1770a96488e95607a02c390449)
+  records all three exact card argv at commit 834cc5015d221c9bac774bd9eb278db624db4d85. Every command exited 0,
+  succeeded once and did not time out.
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.search.stdout reports 134
+  retained parameters and 22/22 complete cells. The verify command ran and wrote results-v2/verification.json, recording
+  128 native classes, six upper classes and 22 complete cells; its model/map/solver verification counts are all
+  zero.
+- All eight bound input digests, three retained output digests and six stdout/stderr digests match research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.yaml
+  and its receipt. Bound sources, protocol, amendment, binaries, v1 CSV and HEAD remain unchanged.
+- The entire 9,915-byte results/candidates.csv, comprising its header and 131 rows, is byte-for-byte identical to
+  the prefix of results-v2/candidates.csv. The identical prefix SHA256 is 3321de58940fd19ee26bdbe7fdf71d13f144cdd5a6e06de8193fc52c4acfd8e1;
+  the new CSV is 10,407 bytes.
+- The prescribed check-relay CLI was attempted but refused post-execution lint because results-v2/candidates.csv
+  and results-v2/verification.json now exist as generated file arguments. This checkout provides unchanged check_relay/assessment_facts
+  functions rather than relay_summary/verify_receipt; their direct read-only checks report relay_verbatim=true,
+  no missing lines or verification findings, and no changed output digests. research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.executor.txt
+  also matches original tool stdout byte-for-byte including the final newline. No tool, card or evidence was changed.
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.receipt.json dirty_before
+  already includes the main-session problem, .github workflow and backlog changes. Comparing dirty_before with dirty_after
+  records no new executor writes outside research/conductor_gap_size_ladder_20261026/.
+interpretation: not_assessed

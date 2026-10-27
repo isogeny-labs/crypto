@@ -11,6 +11,8 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Conductor-gap PR CI capacity and certificate logs](conductor-gap-ci-capacity-and-certificate-logs.md) | investigating | complete merge-gate validation for PR #2560; framework build exhausted disk and certificate failure logs are unavailable | successful final-head checks with unchanged inputs/budgets and retrieved failure evidence or established external/base attribution |
+| [Conductor-gap crater precision and subgroup sizes](conductor-gap-crater-sampling-and-size.md) | investigating | corrected crater equivalence and broader-gap inference; measured subgroups remain 25–32 bits | construct and certify the wider candidate ladder's models/maps, run a disjoint larger-size pilot, and freeze fresh-target/multiple-seed confirmation with calibrated precision and resource feasibility |
 | [Certicom 130 CUDA/Metal physical qualification](certicom-130-gpu-hardware-qualification.md) | open | physical rho, BSGS and IC correctness on both exact curves in both repositories | complete hosted Metal library/CLI phases and physical provenance; authorized NVIDIA/Mac receipts; current-head CI/review gates |
 | [GitHub Actions infrastructure](github-actions-infrastructure.md) | open | final-main CI and all-PR merge verification | restore billing, approve required actions, restore EKS runners, then pass final-head checks/reviews |
 | [Matched trace-line C1 2LP measurement](trace-c1-2lp-measurement.md) | open | fully priced algebraic C1 standard/selected comparison | shifted x-line algebraic oracle, full native pricing, admitted Iso Lab image/checkpoint route and independent replay |

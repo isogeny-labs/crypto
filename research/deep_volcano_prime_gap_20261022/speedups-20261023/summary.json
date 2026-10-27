@@ -1,0 +1,102 @@
+{
+  "schema": "volcano-gap-speedups-summary/v1",
+  "rho": {
+    "session_id": "ECBS1h45f937d2f95a",
+    "unit": "ns per counted group operation (GAE) of the solve; ca: its own internal timer and its own operation count",
+    "serial": {
+      "runs": 576,
+      "verified": 576,
+      "median_ns_per_op": 293.862446685379,
+      "median_solve_ms": 362.088438,
+      "mean_ops_over_sqrt_r": 0.9303300895824488
+    },
+    "lanes": {
+      "runs": 576,
+      "verified": 576,
+      "median_ns_per_op": 119.4361019557163,
+      "median_solve_ms": 154.595293,
+      "mean_ops_over_sqrt_r": 0.9538025695307257
+    },
+    "external": {
+      "tool": "cryptanalysis ca solve --alg rho --threads 1 (aburan28/cryptanalysis 1aa48b5, version 0.1.0)",
+      "runs": 576,
+      "correct": 576,
+      "median_ns_per_op": 45.43872041472215,
+      "median_solve_ms": 58.426,
+      "mean_ops_over_sqrt_r": 0.9763254783434467
+    },
+    "ecbench_compare": {
+      "ops_ratio_lanes_over_serial": 1.0252302706438448,
+      "ops_ci95": [
+        1.0212547192658397,
+        1.0294919561939881
+      ],
+      "ops_pairs": 576,
+      "wall_median_ratio_lanes_over_serial": 0.41931135653769125,
+      "wall_ci95": [
+        0.4172599271488595,
+        0.4214367062342794
+      ],
+      "wall_pairs": 576,
+      "admitted_pairs": 306,
+      "wall_required_level": "L0",
+      "quality_levels": {
+        "L1": 270,
+        "L2": 306
+      }
+    }
+  },
+  "stages": [
+    {
+      "name": "ecbench plan, main spec (4560 runs), 1 CPU",
+      "before_s": 96.644090596,
+      "after_s": 0.308205664,
+      "rounds": 3,
+      "speedup": 313.5701315210093
+    },
+    {
+      "name": "N-isogeny kernel and Vélu set-up, 1 CPU",
+      "before_s": 0.154,
+      "after_s": 0.047,
+      "rounds": 7,
+      "speedup": 3.276595744680851
+    },
+    {
+      "name": "N-isogeny map, one point, 1 CPU",
+      "before_s": 0.0186,
+      "after_s": 0.0188,
+      "rounds": 7,
+      "speedup": 0.9893617021276595
+    },
+    {
+      "name": "N-isogeny map, one point, 4 CPUs (threads)",
+      "before_s": 0.0186,
+      "after_s": 0.0063,
+      "rounds": 7,
+      "speedup": 2.952380952380952
+    },
+    {
+      "name": "volcano-gap construct, whole, 4 CPUs",
+      "before_s": 0.884893836,
+      "after_s": 0.282309114,
+      "rounds": 7,
+      "speedup": 3.134485541263822
+    },
+    {
+      "name": "measurement sessions, 6840 runs (3 sessions → 5, sharded), 4 vCPU",
+      "before_s": 2119.831,
+      "after_s": 733.946,
+      "rounds": 1,
+      "speedup": 2.888265621721489
+    }
+  ],
+  "identity": {
+    "plan_outputs": [
+      "ac5a7b2e999f86bec295a4f0488818488a49b90e2a202d1402abac8a934af878"
+    ],
+    "isogeny_outputs": [
+      "d39a3965ceed99411a33d749c39d98d25e9c9c22aafcccf1cf2ec35cbdd0f62f"
+    ],
+    "sharded_records": "rerun-sharded/compare.sha256 (6840 records identical by arm, workload, target, round, cost, recovered value and counters)"
+  }
+}

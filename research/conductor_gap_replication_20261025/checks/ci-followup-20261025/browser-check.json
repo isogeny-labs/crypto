@@ -1,0 +1,22 @@
+{
+  "status": "PASS_IC_DASHBOARD_BROWSER",
+  "transport": "loopback HTTP; local file URLs blocked by browser policy",
+  "local_document": "http://127.0.0.1:37991/dashboard.html",
+  "chrome": "/tmp/crypto-pursue/ci-followup/chromium-local",
+  "checks": [
+    "replication panel retained and accessible through its fragment link",
+    "desktop: visible graphs, correct readiness, quiet evidence, search, retained fragment links",
+    "mobile 390: no page overflow; whole comparison graph fits; readiness scrolls within its panel",
+    "mobile 320: no page overflow; whole comparison graph fits; readiness scrolls within its panel",
+    "dark theme rendered",
+    "JavaScript disabled: static measurements, graphs, diagrams and native details remain available"
+  ],
+  "script_errors": [],
+  "external_requests": [],
+  "viewport_widths": [
+    1280,
+    390,
+    320
+  ],
+  "page_sha256": "cf99aaeb4ad7fa88b83a423478c0217c83cebbc48a9add0347418641bb2eec6c"
+}
