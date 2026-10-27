@@ -21,7 +21,8 @@ rss_gib = [row["rss_bytes"] / (1024**3) for row in samples if row["rss_bytes"] i
 free_minutes = [x for x, row in zip(minutes, samples) if row["host_free_percent"] is not None]
 free_pct = [row["host_free_percent"] for row in samples if row["host_free_percent"] is not None]
 
-plt.rcParams.update({"font.size": 10, "axes.spines.top": False, "axes.spines.right": False})
+plt.rcParams.update({"font.size": 10, "axes.spines.top": False,
+                     "axes.spines.right": False, "svg.hashsalt": "n83-k4405-20261026"})
 fig, (ax_rss, ax_free) = plt.subplots(2, 1, sharex=True, figsize=(9, 5.5))
 ax_rss.plot(rss_minutes, rss_gib, color="#136fba", linewidth=1.25)
 ax_rss.axhline(24, color="#a74d39", linestyle="--", linewidth=1, label="24 GiB child RSS cap")
@@ -44,7 +45,7 @@ fig.text(0.5, 0.01, "Run evidence-01 · 2026-10-26 · manual SIGTERM after host 
          ha="center", color="#485563", fontsize=9)
 fig.tight_layout(rect=(0, 0.04, 1, 0.96))
 svg = REPORT / "resource_trace.svg"
-fig.savefig(svg)
+fig.savefig(svg, metadata={"Date": None})
 # Matplotlib writes whitespace inside many SVG path strings; strip line ends so
 # the committed vector source passes the repository's whitespace gate.
 svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
