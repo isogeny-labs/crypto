@@ -610,16 +610,6 @@ pub fn registry() -> &'static [MethodDecl] {
                     default: Some("0"),
                     help: "1 keeps one-large-prime partials and combines pairs",
                 },
-                ParamDecl {
-                    name: "branches",
-                    default: Some("64"),
-                    help: "number of factor-base walk branches for hyperelliptic thread workloads",
-                },
-                ParamDecl {
-                    name: "d_step_in",
-                    default: Some("4"),
-                    help: "frequency of start-divisor steps for hyperelliptic thread workloads",
-                },
             ],
         },
         MethodDecl {
@@ -904,7 +894,21 @@ pub fn decl(id: &str) -> Option<&'static MethodDecl> {
 
 /// Fill defaults, refuse unknown and missing parameters, hash.
 pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
-    let d = decl(&spec.id).ok_or_else(|| {
+    // The genus-2 and thread Jacobian implementations retain one historical
+    // method name, but have different parameter contracts. Choose the thread
+    // declaration when its distinguishing parameters are present.
+    let thread_hyper = spec.id == "ic.hyperelliptic"
+        && (spec.params.contains_key("branches")
+            || spec.params.contains_key("d_step_in")
+            || spec.params.get("fb_size").is_some_and(|s| s == "all"));
+    let d = (if thread_hyper {
+        registry()
+            .iter()
+            .find(|m| m.id == spec.id && m.entry == "ecbench::hyper_ic::solve")
+    } else {
+        decl(&spec.id)
+    })
+    .ok_or_else(|| {
         let ids: Vec<&str> = registry().iter().map(|m| m.id).collect();
         format!("unknown method `{}`; known: {}", spec.id, ids.join(", "))
     })?;
