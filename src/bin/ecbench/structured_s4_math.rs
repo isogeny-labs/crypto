@@ -1,7 +1,7 @@
 // Ported from the tested native pursuit instrument at d67f6085; finite controls in that study.
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
 use crypto_lib::cryptanalysis::koblitz_groebner::{FieldStructure, SymElement};
-use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolPoly, Mask};
 use crypto_lib::cryptanalysis::semaev_decomp::Gf2;
 use num_bigint::BigUint;
 use rand::{rngs::StdRng, Rng, SeedableRng};
@@ -204,7 +204,7 @@ pub(super) fn symmetric_values(gf: &Gf2, xs: [u64; 3]) -> [u64; 3] {
         gf.mul(gf.mul(xs[0], xs[1]), xs[2]),
     ]
 }
-pub(super) fn decode(ps: &[Vec<u64>], assignment: u64) -> [u64; 3] {
+pub(super) fn decode(ps: &[Vec<u64>], assignment: Mask) -> [u64; 3] {
     let mut offset = 0;
     std::array::from_fn(|i| {
         let mut x = 0;
