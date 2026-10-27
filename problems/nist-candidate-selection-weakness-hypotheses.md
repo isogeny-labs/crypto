@@ -5,7 +5,7 @@
 - **Affected work:** [selected/skipped comparison and protocol](../research/curve_candidates_dissect_20261021/hypotheses/REPORT.md)
 - **Next action owner:** unassigned
 - **Last updated:** 2026-10-27
-- **Latest search:** [27 October FreeLIP source and full-census replay](../research/nist_skip_criterion_20261025/freelip_replay_20261027/REPORT.md)
+- **Latest search:** [27 October saved ECPP work counts and monotone-budget proof](../research/nist_skip_criterion_20261025/period_work_20261027/REPORT.md)
 
 ## Problem
 
@@ -83,6 +83,17 @@ decision log.
 - **Suspected explanation:** unknown. Deliberate weak-curve selection,
   deliberate avoidance of weak candidates, a family-wide unpublished
   method, and engineering or bookkeeping filters remain distinct hypotheses.
+- **Observed and conditionally proved:** [saved ECPP work analysis](../research/nist_skip_criterion_20261025/period_work_20261027/REPORT.md)
+  retains all21 records and independently checks all210 cells of ten fixed
+  source counts. None of40 single cutoff envelopes separates the labels.
+  Even the conjunction of per-field upper envelopes retains skipped p239
+  indices1562 and2682. Each is no larger componentwise than published
+  indices2185 and3048. Eight axiom-free Lean theorems certify those literal
+  inequalities and the implication for any monotone cost with transitive
+  comparison: accepting2185 under an upper budget also accepts both omissions.
+  This excludes those counter-based budgets, not unrecorded point-counting
+  work or arbitrary acceptance rules. The dominance diagnostic was posthoc;
+  no held-out prediction or historical-use attribution is claimed.
 - **Missing capability:** an explicit applicable attack or retained-witness
   route, its full cost, and a prospective selection-rule test.
 - **What this evidence does not establish:** a trait difference is not an
@@ -166,3 +177,14 @@ paths as a universal skip explanation; a caller feeding incorrect point
 counts, a different implementation/configuration, or another acceptance step
 remains outside the test. A source-derived seven-call mechanism is proposed,
 not historical attribution. The original criterion remains unresolved.
+
+2026-10-27 saved-work follow-up: native extraction and a distinct token scanner
+check ten work features for every row without changing twelve old certificate
+unknowns. All40 declared cutoffs fail, and two same-field omissions dominate
+published controls in the required direction. Lean4.34.1 and the unchanged
+repository axiom auditor check eight conditional-budget theorems with empty
+axiom lists. All failed proof attempts and144 raw archive members are retained.
+Prior sibling FreeLIP prefix reconstruction was found and cited rather than
+repeated or claimed as new. Original-caller, point-count and visit records
+remain the missing bridge. The historical criterion and both weakness
+hypotheses remain unresolved.
