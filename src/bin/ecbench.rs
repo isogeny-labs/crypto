@@ -243,6 +243,11 @@ enum Cmd {
         /// rho.negation_f2m4_full solves, as ns per full-priced FME.
         #[arg(long)]
         rho_full: bool,
+        /// One-thread closure check: complete *_full solves of both arms
+        /// with CPU time against priced FME; a nonempty unpriced list is an
+        /// error. Implies --ic-complete and --rho-full.
+        #[arg(long)]
+        closure: bool,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -1057,6 +1062,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             rho_steps,
             ic_complete,
             rho_full,
+            closure,
             out,
         } => {
             let doc = crypto_lib::cryptanalysis::ecbench::unit_price::run(
@@ -1068,6 +1074,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     rho_steps,
                     ic_complete,
                     rho_full,
+                    closure,
                 },
             )?;
             let text = serde_json::to_string_pretty(&doc).map_err(|e| e.to_string())? + "\n";

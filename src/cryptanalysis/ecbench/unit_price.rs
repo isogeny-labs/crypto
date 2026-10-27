@@ -48,6 +48,46 @@ pub struct Opts {
     /// `rho.negation_f2m4_full` arms, reported as ns per full-priced FME,
     /// the unit of the `ic.pipeline_f2m4_full` readout.
     pub rho_full: bool,
+    /// The one-thread closure check (review 1, issue 5): complete solves of
+    /// the `*_full` arms of both methods (the legacy IC run is skipped),
+    /// with the process CPU time (user and system) of each solve beside its
+    /// full-priced FME and the unit's own F_q multiplication time measured
+    /// on this host.  A nonempty `unpriced` list is an error.  Implies
+    /// `ic_complete` and `rho_full`.
+    pub closure: bool,
+}
+
+/// User and system CPU time of this process, in nanoseconds.
+fn cpu_times_ns() -> (f64, f64) {
+    let mut ru: libc::rusage = unsafe { std::mem::zeroed() };
+    unsafe { libc::getrusage(libc::RUSAGE_SELF, &mut ru) };
+    let tv = |t: libc::timeval| t.tv_sec as f64 * 1e9 + t.tv_usec as f64 * 1e3;
+    (tv(ru.ru_utime), tv(ru.ru_stime))
+}
+
+/// The closure check of one complete solve: measured CPU time against the
+/// priced FME times the nanoseconds of one F_q multiplication, the unit
+/// the FME is defined in.  Well above 1 is work the price does not cover
+/// (a lower bound the pricing hides); well below 1 is overpricing.
+fn closure_of(
+    wall_ns: f64,
+    user_ns: f64,
+    sys_ns: f64,
+    fme: f64,
+    ns_local: f64,
+    ns_table: f64,
+) -> Value {
+    let priced_local = fme * ns_local;
+    json!({
+        "wall_ns": wall_ns, "user_cpu_ns": user_ns, "sys_cpu_ns": sys_ns,
+        "priced_fme": fme,
+        "priced_ns_at_local_fq_mul": priced_local,
+        "priced_ns_at_table_fq_mul": fme * ns_table,
+        "user_over_priced": user_ns / priced_local,
+        "user_plus_sys_over_priced": (user_ns + sys_ns) / priced_local,
+        "wall_over_priced": wall_ns / priced_local,
+        "user_over_priced_at_table_fq_mul": user_ns / (fme * ns_table),
+    })
 }
 
 fn median(mut v: Vec<f64>) -> f64 {
@@ -335,14 +375,32 @@ fn ic_once(
     target: &[String; 2],
     trials: u64,
     seed: u64,
+    closure: bool,
 ) -> Result<BTreeMap<&'static str, f64>, String> {
     let per_add = fq_muls_per_add(&b.curve) as f64;
     let mut o = BTreeMap::new();
-    for (tag, id) in [("legacy", "ic.pipeline"), ("full", "ic.pipeline_f2m4_full")] {
+    let arms: &[(&str, &str)] = if closure {
+        &[("full", "ic.pipeline_f2m4_full")]
+    } else {
+        &[("legacy", "ic.pipeline"), ("full", "ic.pipeline_f2m4_full")]
+    };
+    for &(tag, id) in arms {
         let m = ic_method(id, trials)?;
+        let (u0, s0) = cpu_times_ns();
         let t = Instant::now();
         let rep = solve(&m, inst, facts, target, seed)?;
         let wall = t.elapsed().as_nanos() as f64;
+        let (u1, s1) = cpu_times_ns();
+        if closure && !rep.unpriced.is_empty() {
+            return Err(format!(
+                "ic.pipeline_f2m4_full is a lower bound: unpriced {:?}",
+                rep.unpriced
+            ));
+        }
+        if tag == "full" {
+            o.insert("full_user_cpu_ns", u1 - u0);
+            o.insert("full_sys_cpu_ns", s1 - s0);
+        }
         let fq = rep.total_gae * per_add;
         let (wk, fk) = match tag {
             "legacy" => ("legacy_wall_ns", "legacy_priced_fq_ops"),
@@ -394,17 +452,28 @@ fn rho_full_once(
     target: &[String; 2],
     id: &str,
     seed: u64,
+    closure: bool,
 ) -> Result<BTreeMap<&'static str, f64>, String> {
     let m = resolve(&MethodSpec {
         id: id.into(),
         params: BTreeMap::new(),
     })?;
+    let (u0, s0) = cpu_times_ns();
     let t = Instant::now();
     let rep = solve(&m, inst, facts, target, seed)?;
     let wall = t.elapsed().as_nanos() as f64;
+    let (u1, s1) = cpu_times_ns();
+    if closure && !rep.unpriced.is_empty() {
+        return Err(format!(
+            "{id} is a lower bound: unpriced {:?}",
+            rep.unpriced
+        ));
+    }
     let fme = rep.total_gae * fq_muls_per_add(&b.curve) as f64;
     let mut o = BTreeMap::new();
     o.insert("wall_ns", wall);
+    o.insert("user_cpu_ns", u1 - u0);
+    o.insert("sys_cpu_ns", s1 - s0);
     o.insert("priced_fme", fme);
     o.insert("recovered", if rep.recovered.is_some() { 1.0 } else { 0.0 });
     o.insert("unpriced_entries", rep.unpriced.len() as f64);
@@ -424,6 +493,8 @@ pub fn run(o: &Opts) -> Result<Value, String> {
     let _ = rayon::ThreadPoolBuilder::new()
         .num_threads(1)
         .build_global();
+    let rho_full_on = o.rho_full || o.closure;
+    let ic_complete = o.ic_complete || o.closure;
     let mut per_m = serde_json::Map::new();
     for &m in &o.ms {
         let cof = if m >= 15 { 2 } else { 16 };
@@ -467,7 +538,27 @@ pub fn run(o: &Opts) -> Result<Value, String> {
                 format!("0x{:x}", f.pack(&q.y)),
             ]
         };
-        let rho_full = if o.rho_full {
+        // The unit's own F_q multiplication time: on this host, and in the
+        // committed table row the prices come from.
+        let (ns_local, ns_table) = if o.closure {
+            let wide = u64::try_from(b.r).is_err();
+            let local = crate::cryptanalysis::ecbench::f2m4_price::measure(b, 3)?
+                ["ns_per_fq_mul_median"]
+                .as_f64()
+                .ok_or("no local F_q multiplication time")?;
+            let doc: Value =
+                serde_json::from_str(crate::cryptanalysis::ecbench::f2m4_price::F2M4_PRICES)
+                    .map_err(|e| e.to_string())?;
+            let table = doc["instances"]
+                [crate::cryptanalysis::ecbench::f2m4_price::row_key(m, wide)]
+                ["ns_per_fq_mul_median"]
+                .as_f64()
+                .ok_or("no table row for this m")?;
+            (local, table)
+        } else {
+            (f64::NAN, f64::NAN)
+        };
+        let rho_full = if rho_full_on {
             let mut blk = serde_json::Map::new();
             for (name, id) in [
                 ("rho_negation_batched_full", "rho.negation_batched_full"),
@@ -475,8 +566,11 @@ pub fn run(o: &Opts) -> Result<Value, String> {
             ] {
                 let t0 = Instant::now();
                 let mut acc: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
-                for k in 0..o.reps.min(3) {
-                    for (kk, v) in rho_full_once(&inst, &facts, b, &target, id, 7 + k as u64)? {
+                let nrep = if o.closure { 1 } else { o.reps.min(3) };
+                for k in 0..nrep {
+                    for (kk, v) in
+                        rho_full_once(&inst, &facts, b, &target, id, 7 + k as u64, o.closure)?
+                    {
                         acc.entry(kk).or_default().push(v);
                     }
                 }
@@ -489,23 +583,44 @@ pub fn run(o: &Opts) -> Result<Value, String> {
                     .map(|(a, b)| a / b)
                     .collect();
                 e.insert("ns_per_full_priced_fme".into(), stat(&r));
+                if o.closure {
+                    e.insert(
+                        "closure".into(),
+                        closure_of(
+                            acc["wall_ns"][0],
+                            acc["user_cpu_ns"][0],
+                            acc["sys_cpu_ns"][0],
+                            acc["priced_fme"][0],
+                            ns_local,
+                            ns_table,
+                        ),
+                    );
+                }
                 blk.insert(name.into(), Value::Object(e));
             }
             Value::Object(blk)
         } else {
             Value::Null
         };
-        let ic = if o.ic_trials > 0 || o.ic_complete {
+        let ic = if o.ic_trials > 0 || ic_complete {
             let t0 = Instant::now();
             let mut acc: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
-            let ic_reps = if o.ic_complete { 1 } else { o.reps.min(3) };
-            let ic_max_trials = if o.ic_complete {
+            let ic_reps = if ic_complete { 1 } else { o.reps.min(3) };
+            let ic_max_trials = if ic_complete {
                 CLAIM_MAX_TRIALS
             } else {
                 o.ic_trials
             };
             for k in 0..ic_reps {
-                for (kk, v) in ic_once(&inst, &facts, b, &target, ic_max_trials, 3 + k as u64)? {
+                for (kk, v) in ic_once(
+                    &inst,
+                    &facts,
+                    b,
+                    &target,
+                    ic_max_trials,
+                    3 + k as u64,
+                    o.closure,
+                )? {
                     acc.entry(kk).or_default().push(v);
                 }
             }
@@ -518,16 +633,30 @@ pub fn run(o: &Opts) -> Result<Value, String> {
                 let r: Vec<f64> = w(num).iter().zip(w(den)).map(|(a, b)| a / b).collect();
                 stat(&r)
             };
-            blk.insert(
-                "ns_per_legacy_priced_fq_op".into(),
-                ratio("legacy_wall_ns", "legacy_priced_fq_ops"),
-            );
+            if !o.closure {
+                blk.insert(
+                    "ns_per_legacy_priced_fq_op".into(),
+                    ratio("legacy_wall_ns", "legacy_priced_fq_ops"),
+                );
+            } else {
+                blk.insert(
+                    "closure".into(),
+                    closure_of(
+                        w("full_wall_ns")[0],
+                        w("full_user_cpu_ns")[0],
+                        w("full_sys_cpu_ns")[0],
+                        w("full_priced_fme")[0],
+                        ns_local,
+                        ns_table,
+                    ),
+                );
+            }
             blk.insert(
                 "ns_per_full_priced_fme".into(),
                 ratio("full_wall_ns", "full_priced_fme"),
             );
             blk.insert("ic_trials_requested".into(), json!(ic_max_trials));
-            blk.insert("ic_complete".into(), json!(o.ic_complete));
+            blk.insert("ic_complete".into(), json!(ic_complete));
             blk.insert(
                 "spec".into(),
                 json!({
@@ -537,10 +666,14 @@ pub fn run(o: &Opts) -> Result<Value, String> {
                 }),
             );
             // The relation search was reached only when relations were found.
-            let reached: Vec<f64> = w("legacy_relations_found")
-                .iter()
-                .map(|&r| (r > 0.0) as u8 as f64)
-                .collect();
+            let reached: Vec<f64> = w(if o.closure {
+                "full_relations_found"
+            } else {
+                "legacy_relations_found"
+            })
+            .iter()
+            .map(|&r| (r > 0.0) as u8 as f64)
+            .collect();
             blk.insert("reached_relations".into(), stat(&reached));
             blk.insert("rayon_threads".into(), json!(rayon::current_num_threads()));
             blk.insert("reps".into(), json!(ic_reps));
@@ -554,6 +687,8 @@ pub fn run(o: &Opts) -> Result<Value, String> {
                 "m": m, "q_bits": m, "group_bits": 4 * m,
                 "r_bits": 128 - b.r.leading_zeros(), "scalar_width_bits": if u64::try_from(b.r).is_ok() {64} else {128},
                 "fq_muls_per_add": per_add,
+                "ns_per_fq_mul_local": ns_local,
+                "ns_per_fq_mul_table": ns_table,
                 "curve": facts.slug,
                 "micro": micro,
                 "in_situ": { "rho_negation_batched": rb, "rho_negation": ru, "ic_pipeline": ic, "rho_full": rho_full },
