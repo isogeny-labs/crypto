@@ -220,8 +220,12 @@ The native runner SHA-256 is
 the isolation binary remains
 `03d5b835157361b997c9643b5320bb8df2a778463c9fe50d66bcad133b3ed3df`.
 `icprog host-class r13` passed and all 24 frozen holdouts regenerated
-byte-for-byte. The replacement still owes a fresh 90-row native pin,
-manifest and quiet A/A before a paired schedule.
+byte-for-byte. The replacement's native pin subsequently held all 90/90
+v0 rows with matching names. Its new manifest records clean candidate
+source snapshot `f9e2199be56ac2ef44ba1aa6820bc56bd61883ed`, the
+binary hashes above, Xeon 6975P-C and 32 logical CPUs. The separate run
+tree records the timed CPU reservation `2,18` in `runner-config.json`.
+No timed R13 row existed on this replacement at this control gate.
 
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
