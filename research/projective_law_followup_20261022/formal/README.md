@@ -17,6 +17,13 @@ structure-sheaf stalk is isomorphic to the affine branch localization. Its
 [PDF](FINITE_BRANCH_STALK.pdf) separate this local-ring transport from the
 still-open global divisor-class and compiled-law obligations.
 
+The [simple finite-branch DVR packet](FINITE_BRANCH_DVR.md) uses that stalk
+isomorphism to prove the actual projective stalk is a DVR and that pulled-back
+`y` and `x-a` have local orders one and two when `a` is a rational simple
+root. Its [diagram](finite-branch-dvr.svg), [CSV](finite-branch-dvr.csv), and
+[PDF](FINITE_BRANCH_DVR.pdf) retain the open global divisor, `Pic⁰`, and
+compiled-law gates.
+
 The [weighted-Proj head and chart packet](WEIGHTED_PROJ_HEAD_VERIFIED.md)
 checks homogeneity of the proposed sextic and its principal ideal, plus the
 two dehomogenized equations obtained at `Z=1` and `X=1`. Its [CSV](weighted-proj-head-verified.csv),
