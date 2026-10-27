@@ -1,8 +1,12 @@
 # CUDA release CI and stale N83 history repair — 2026-10-27
 
-PRs #2124 and #2138 are titled as retained N83 factor-base studies. Their only remaining merge delta against main 62c166aaa is the same unrelated deletion of the existing 20261016-isogeny-round5 benchmark row. No N83 source or data change remains in either merge result. Preserving that unrelated row integrates both author histories without changing main's content.
+## Corrected history integration
 
-Each merge was performed normally, with only benchmarks/README.md restored from main. The complete Git tree after each merge equals main 62c166aaa9e96e077c638b4828ef4c2ebac80e6b, before this audit note and the session-log entry are added. The recorded tree proofs below can be checked with git rev-parse. No scientific protocol, source, result, counter, row or evidence file changes.
+An earlier audit treated matching tree hashes as proof that PR histories had been integrated. The review finding was correct: the reviewed one-parent commit did not have either source PR head as an ancestor, so that state did not preserve their histories. The tree comparison alone was insufficient.
+
+The history was then integrated with ordinary merge commits. Commit `ed41a8469649de8dbc336008da8c8b984b00956e` has parents `62c166aaa9e96e077c638b4828ef4c2ebac80e6b` and PR #2124 head `c502f34973924022985f5876786423cfc98b09ce`. Commit `1da1e8ff379a3c854e12e561a4eccb7162668ed2` has parents `ed41a8469649de8dbc336008da8c8b984b00956e` and PR #2138 head `09270bccae13cab796c9bdba2783b4934bb48e98`. Both merge commits have tree `3dd26d063f7e7121aafafaa90afddda4ac1937c7`, equal to the tree of main `62c166aaa9e96e077c638b4828ef4c2ebac80e6b`; their source PR heads are ancestors of the current #2712 head. These ancestry claims are directly checkable with `git rev-list --parents` and `git merge-base --is-ancestor`.
+
+Relative to their shared base `7e271266f86968843a9323e4a074f9a874448eb2`, each source PR changes only the same benchmark README row; no N83 source or data change remains in those diffs. The two source PRs are still open until this integration branch lands on main. No scientific protocol, result, counter, or evidence file was changed by the history merges.
 
 [
   {
