@@ -81,6 +81,25 @@ checks exact matrix identities and a removable projection factor across all
 geometric action identity still lacks a polynomial-ideal certificate, so
 step 2's new-cohort gate remains closed.
 
+Later reconciliation (27 October): the [N18 geometric-embedding packet](../kummer_differential_collector_20261022/n18-geometric-embedding/REPORT.md)
+connected the declared charts to the classical genus-2 Kummer map, and the
+[N19 signed-label fallback packet](../kummer_differential_collector_20261022/n19-labelled-fallback/REPORT.md)
+implemented and checked the zero-output signed reconstruction. N19 then ran
+all 1,260 public targets with fresh same-process rho: 1,260 verified candidate
+and rho solves. Its 36 full-cold cohort cells have candidate/rho ratios
+8.95969168677384–55.935443295511135; the representative ratio is
+14.356667485478237. There were zero winning cohort cells and zero target
+wins across 45,360 target/cell comparisons. The N19
+[price grid](../kummer_differential_collector_20261022/n19-labelled-fallback/results/analysis/price-grid.csv),
+[per-target CSV](../kummer_differential_collector_20261022/n19-labelled-fallback/results/analysis/target-price.csv),
+[graph](../kummer_differential_collector_20261022/n19-labelled-fallback/cost-graph.svg),
+and [PDF](../kummer_differential_collector_20261022/n19-labelled-fallback/REPORT.pdf)
+are the source of this newer comparison. The frozen starting-state table and
+the earlier main four-lead grid describe their original cohort; N19 is a
+separate later arm. Its 1,260-target run invoked the signed fallback zero
+times, so the observed ratio does not measure naturally reached zero-output
+frequency or its cost distribution.
+
 ## Ordered actions
 
 1. **Finish the two independent projective-law proof checks already in flight.**
@@ -100,6 +119,10 @@ step 2's new-cohort gate remains closed.
    count and cost bound is the cohort gate; finite sampling alone stays a
    finite-sample result. If the gate passes, freeze a public known-answer
    protocol and run all 1,260 targets with matched rho and every price cell.
+   **Later status:** N18 supplied the declared-chart geometric bridge and N19
+   completed the full signed-label cohort and 36-cell comparison described
+   above. The all-zero branch was forced in a finite code gate but was not
+   reached naturally in the 1,260-target run.
 3. **Replicate the held-out factor-base result on a separate host.** Use the
    existing 420 evaluation target IDs and frozen `fb1-any-j32` selector without
    retuning. Verify each candidate and rho scalar again, compare all non-wall
