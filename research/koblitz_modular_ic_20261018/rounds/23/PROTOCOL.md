@@ -68,3 +68,12 @@ leave it open with auto-merge disabled. All unfinished original requirements
 remain acceptance criteria,including proper lifted divisors/complete RR,
 nonzero order11 modular action,node187 polynomial membership and arbitrary
 modular-divisor reverse evaluation with ordinary460/367 fibers/images.
+
+## Frozen SS23 compact extraction
+
+After successful chart01,extract its21st colon generator and its three exact
+membership-lift coefficients without a new search. Recheck their polynomial
+identity against the original circuit. Recheck the literal nonzero unit-lift
+entries from chart01 and separate the base derivative from the QR Jacobian.
+Source SS23-compact.sing;native cap4GiB/1200s unchanged. This is a compact
+certificate extraction under SS23,not another global quotient/saturation search.
