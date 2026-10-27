@@ -46,3 +46,13 @@ for j in "${jobs[@]}"; do
   mv "$out.part" "$out"
   rm -f "$tmp"
 done
+# Join with the dense references (native: examples/fall_degree_e11_tools.rs).
+# The committed summaries were made from the repo root with (LC_ALL=C glob order):
+#   T compare --json $S/e11/validation_summary.json $S/e11/validate/*.jsonl >$S/e11/validation_summary.txt
+#   T derived $S/e11/validate/*.jsonl >$S/e11/derived.txt
+#   T diff-rerun $S/e11/validate $S/e11/validate_final >$S/e11/diff_rerun.txt
+# Here the summary of this run's output directory goes to stderr only.
+T=${E11_TOOLS:-target/release/examples/fall_degree_e11_tools}
+if [ -z "$F" ]; then
+  "$T" compare "$O"/*.jsonl >&2
+fi
