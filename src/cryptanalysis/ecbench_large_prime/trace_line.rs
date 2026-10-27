@@ -32,18 +32,22 @@ pub struct Evidence {
 pub fn verify_relations(
     i: &BinaryInstance,
     target: crate::cryptanalysis::koblitz_fast::FastPoint,
+    small_dimension: u32,
     evidence: &Evidence,
     relations: &[super::PartialRelation],
     expected_count: u64,
 ) -> Result<(), String> {
     use crate::binary_ecc::{
-        curve::{point_add, scalar_mul},
+        curve::{point_add, point_neg, scalar_mul},
         BinaryPoint,
     };
     use num_bigint::BigUint;
     let curve = super::general_curve(i);
     if evidence.basis.is_empty() || evidence.basis.len().checked_mul(4) != Some(i.n as usize) {
         return Err("relation replay requires the declared n=4d line".into());
+    }
+    if small_dimension > evidence.basis.len() as u32 {
+        return Err("small_dimension exceeds the declared line dimension".into());
     }
     validate_basis(i, &evidence.basis, evidence.basis.len() as u32)?;
     if relations.len() as u64 != expected_count || evidence.small_columns > evidence.columns.len() {
@@ -67,12 +71,47 @@ pub fn verify_relations(
         .map(point)
         .collect::<Result<Vec<_>, _>>()?;
     let mut expected_atoms = Vec::new();
+    let mut expected_by_key = BTreeMap::new();
     for index in 0..1u64 << evidence.basis.len() {
         let x = expand(&evidence.basis, index);
-        expected_atoms.extend(i.points_with_x(x).into_iter().map(|p| (p.x, p.y)));
+        for raw in i.points_with_x(x) {
+            expected_atoms.push((raw.x, raw.y));
+            let projected = scalar_mul(&curve, &i.fast.lower(raw), &BigUint::from(i.cofactor));
+            if projected == BinaryPoint::Infinity {
+                continue;
+            }
+            let negated = point_neg(&projected);
+            let projected_fast = i.fast.lift(&projected);
+            let negated_fast = i.fast.lift(&negated);
+            let canonical =
+                if (projected_fast.x, projected_fast.y) <= (negated_fast.x, negated_fast.y) {
+                    projected_fast
+                } else {
+                    negated_fast
+                };
+            expected_by_key
+                .entry(canonical.pack())
+                .and_modify(|(small, _)| *small |= index < (1u64 << small_dimension))
+                .or_insert((
+                    index < (1u64 << small_dimension),
+                    (canonical.x, canonical.y),
+                ));
+        }
     }
     if evidence.atoms != expected_atoms {
         return Err("raw atom table does not match the declared line".into());
+    }
+    let expected_small_columns = expected_by_key.values().filter(|(small, _)| *small).count();
+    let expected_columns = expected_by_key
+        .values()
+        .filter(|(small, _)| *small)
+        .chain(expected_by_key.values().filter(|(small, _)| !*small))
+        .map(|(_, point)| *point)
+        .collect::<Vec<_>>();
+    if evidence.small_columns != expected_small_columns || evidence.columns != expected_columns {
+        return Err(
+            "column table or small-column boundary differs from the declared nested base".into(),
+        );
     }
     let q = i.fast.lower(target);
     let mul = |p: &BinaryPoint, n: u64| scalar_mul(&curve, p, &BigUint::from(n));

@@ -59,6 +59,10 @@ fn replay(bytes: &[u8]) -> Result<Value, Box<dyn std::error::Error>> {
         let evidence: Evidence = serde_json::from_value(detail["trace_evidence"].clone())?;
         let params = &row["method"]["params"];
         let d: u32 = params["d"].as_str().ok_or("missing d")?.parse()?;
+        let small_dimension: u32 = params["small_dimension"]
+            .as_str()
+            .ok_or("missing small_dimension")?
+            .parse()?;
         let max_u: u64 = params["max_u"].as_str().ok_or("missing max_u")?.parse()?;
         let line = construct(
             &i,
@@ -74,10 +78,35 @@ fn replay(bytes: &[u8]) -> Result<Value, Box<dyn std::error::Error>> {
         let count = detail["counters"]["accepted_relations"]
             .as_u64()
             .ok_or("missing accepted count")?;
-        verify_relations(&i, target, &evidence, &rows, count)?;
-        if let Some(d) = detail["recovered"].as_u64() {
-            independent_verify(&i, target, d)?;
-            recovered += 1;
+        verify_relations(&i, target, small_dimension, &evidence, &rows, count)?;
+        let outcome = &row["outcome"];
+        let status = outcome["status"].as_str().ok_or("missing outcome status")?;
+        match status {
+            "verified" => {
+                if outcome["matches_target"].as_bool() != Some(true) {
+                    return Err("verified outcome does not record matches_target=true".into());
+                }
+                let outcome_scalar: u64 = outcome["recovered"]
+                    .as_str()
+                    .ok_or("verified outcome is missing its recovered scalar")?
+                    .parse()
+                    .map_err(|_| "verified outcome has a malformed recovered scalar")?;
+                let detail_scalar = detail["recovered"]
+                    .as_u64()
+                    .ok_or("verified outcome is missing detail.recovered")?;
+                if outcome_scalar != detail_scalar {
+                    return Err("outcome.recovered disagrees with detail.recovered".into());
+                }
+                independent_verify(&i, target, outcome_scalar)?;
+                recovered += 1;
+            }
+            "exhausted" if outcome["recovered"].is_null() && detail["recovered"].is_null() => {}
+            "exhausted" => return Err("exhausted outcome contains a recovered scalar".into()),
+            _ => {
+                return Err(
+                    format!("trace-line record has unverified outcome status {status}").into(),
+                )
+            }
         }
         records += 1;
         relations += count;
@@ -124,10 +153,29 @@ mod tests {
         })
         .unwrap();
         let result = solve(&method, &instance, &workload.curve, &workload.target, 23).unwrap();
-        let mut row = json!({"method":{"id":"ic.trace_line_2lp","params":params},"workload":workload,"detail":result.detail});
+        let scalar = result.recovered.unwrap();
+        let mut row = json!({"method":{"id":"ic.trace_line_2lp","params":params},"workload":workload,
+            "outcome":{"status":"verified","recovered":scalar.to_string(),"matches_target":true},
+            "detail":result.detail});
         let receipt = replay(&serde_json::to_vec(&row).unwrap()).unwrap();
         assert_eq!(receipt["records"], 1);
         assert_eq!(receipt["scalars_verified"], 1);
+        let original = row.clone();
+        row["outcome"]["recovered"] = json!((scalar + 1).to_string());
+        assert!(replay(&serde_json::to_vec(&row).unwrap()).is_err());
+        row = original.clone();
+        row["outcome"]["recovered"] = json!("not-a-scalar");
+        assert!(replay(&serde_json::to_vec(&row).unwrap()).is_err());
+        row = original.clone();
+        row["outcome"]["status"] = json!("exhausted");
+        assert!(replay(&serde_json::to_vec(&row).unwrap()).is_err());
+        row = original.clone();
+        row["detail"]["recovered"] = Value::Null;
+        assert!(replay(&serde_json::to_vec(&row).unwrap()).is_err());
+        row = original.clone();
+        row["method"]["params"]["small_dimension"] = json!("1");
+        assert!(replay(&serde_json::to_vec(&row).unwrap()).is_err());
+        row = original;
         row["detail"]["relation_samples"][0]["a"] = json!(1000000);
         assert!(replay(&serde_json::to_vec(&row).unwrap()).is_err());
         assert!(replay(b"").is_err());

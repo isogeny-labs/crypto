@@ -20,6 +20,10 @@ release-profile unoptimised checks and do not qualify performance figures.
   transcripts are rejected.
 - The ecbench method adapter retains all accepted relations and leaves native
   construction work explicitly unpriced. No planted scalar is passed to solve.
+- PR review fixes make replay fail closed on the authoritative
+  `outcome.recovered` value and reconstruct the exact projected column table
+  and small-column boundary from the declared `small_dimension`. The focused
+  gates still pass; see [review-fixes.log](review-fixes.log).
 - The blocked backlog card passes the repository's original native validator
   (`src/bin/backlog/card.rs`, built with the original SHA-1 source and existing
   serde_json/hex rlibs); see [backlog.txt](backlog.txt). This is card validation,
@@ -68,7 +72,7 @@ pass on exact rerun after materialising their tracked sessions. The retained
 
 The strict Clippy check also fails at unchanged zero_dim_la.rs:1191
 (`manual_range_contains`) and sat.rs:1343 (`manual_is_multiple_of`), as
-[clippy.log](clippy.log) records. No lint or test was disabled or changed.
+[clippy.log](clippy.log) and [review-fixes.log](review-fixes.log) record. No lint or test was disabled or changed.
 These limitations block a claim of a green repository gate. They do not erase
 or replace the four passing focused tests and the separately passing replay
 example test. The PR must retain these open validation items.

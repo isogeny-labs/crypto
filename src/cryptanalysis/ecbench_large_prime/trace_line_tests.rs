@@ -94,6 +94,7 @@ fn explicit_bases_recover_and_every_relation_replays_independently() {
         verify_relations(
             &i,
             target,
+            2,
             evidence,
             &report.relation_samples,
             report.counters.accepted_relations,
@@ -102,6 +103,7 @@ fn explicit_bases_recover_and_every_relation_replays_independently() {
         assert!(verify_relations(
             &i,
             target,
+            2,
             evidence,
             &report.relation_samples,
             report.counters.accepted_relations + 1
@@ -112,6 +114,7 @@ fn explicit_bases_recover_and_every_relation_replays_independently() {
         assert!(verify_relations(
             &i,
             target,
+            2,
             evidence,
             &damaged,
             report.counters.accepted_relations
@@ -122,6 +125,7 @@ fn explicit_bases_recover_and_every_relation_replays_independently() {
         assert!(verify_relations(
             &i,
             target,
+            2,
             evidence,
             &damaged,
             report.counters.accepted_relations
