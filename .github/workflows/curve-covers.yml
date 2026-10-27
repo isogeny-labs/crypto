@@ -132,8 +132,22 @@ jobs:
           df -h /
       - uses: actions/checkout@v4
         with:
+          # Retain commit history for the declared catalog snapshot, but
+          # materialize only the assessment's exact source/evidence surface.
           fetch-depth: 0
           filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/*/
+            /.github/workflows/
+            /scripts/
+            /src/
+            /docs/curves/
+            /research/cover_transfer_assessment_20261013/
+            /research/hyperelliptic_cover_infrastructure_20261006/
+            /tools/artifacts/
+            /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
         shell: bash
         working-directory: ${{ github.workspace }}
