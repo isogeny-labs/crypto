@@ -79,8 +79,9 @@ hash-policy K=1,182 object at seed 2026100801, replayed all 196,212 signed
 points and uploaded/downloaded its 5,956,114-byte compressed object with a
 matching BLAKE3 digest. Its exact receipt and resource limits are in
 `verification/two-hour-extension-20261010/REPORT.md`. No single-target cold
-timing claim follows. Other larger K choices, source-pinned relation
-production, natural rank and fully charged cold comparison remain required.
+timing claim follows. Later runs constructed the remaining primary sizes,
+as recorded below. Source-pinned relation production, natural rank and a
+fully charged cold comparison remain required.
 The original versioned S3 destination is
 `s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/`.
 Exact K2048 and K4096 mirrors now have verified fresh round trips in the
@@ -102,8 +103,10 @@ and 180-second short control were wall-censored with unknown final counters.
 Those host/source observations remain separate; natural yield, useful rank
 and a complete cold comparison remain open. The [K16627 primary reconstruction](verification/k16627-primary-20261027/RESULT.md)
 adds a fourth constructed and generically replayed object; its bytes match a
-pre-existing S3 object from 17 October. K8192 remains unconstructed in this
-frontier.
+pre-existing S3 object from 17 October. The [K8192 primary run](verification/k8192-primary-20261027/RESULT.md)
+constructed, generically replayed and published the fifth added-size object.
+All five added primary sizes now have objects under the declared policy and
+seed. Natural yield, useful rank and a complete cold comparison remain open.
 
 The exporter now has a one-object path for the five added sizes. It accepts
 only the two pinned curve arms, the three public-x policies, the three frozen
