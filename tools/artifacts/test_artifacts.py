@@ -153,6 +153,16 @@ class RoundTrip(unittest.TestCase):
         self.assertTrue(diffs, "check never ran git diff --raw")
         self.assertTrue(all("--no-abbrev" in line for line in diffs), diffs)
 
+    def test_pull_into_absent_sparse_directory_preserves_bytes_and_clean_tree(self):
+        self.art("push", "research/r1/runs/a.jsonl")
+        self.git("commit", "-qm", "archive fixture")
+        (self.repo / "research/r1/runs/a.jsonl").unlink()
+        self.git("sparse-checkout", "set", "--no-cone", "/*", "!/research/")
+        self.assertFalse((self.repo / "research").exists())
+        self.art("pull", "research/r1/runs/a.jsonl")
+        self.assertEqual((self.repo / "research/r1/runs/a.jsonl").read_bytes(), self.big)
+        self.assertEqual(self.git("status", "--porcelain"), "")
+
     def test_check_gate(self):
         base = self.git("rev-parse", "HEAD").strip()
         (self.repo / "new.jsonl").write_bytes(os.urandom(100_000))
@@ -296,6 +306,54 @@ class WorkflowWiringPaths(unittest.TestCase):
         )
 
 
+class WorkflowSparsePatterns(unittest.TestCase):
+    """The pull step needs tools/artifacts and the .artifacts config in a sparse checkout."""
+
+    def test_block_list_gets_tools_and_config(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout-cone-mode: false",
+                 "          sparse-checkout: |",
+                 "            /docs/x/"]
+        out = wire_workflows.add_sparse_pattern(block, "      ")
+        self.assertEqual(out[-3:], ["            /docs/x/", "            /tools/artifacts/", "            /.artifacts/"])
+
+    def test_scalar_pattern_becomes_a_list(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout: taskq/deploy/eks-karpenter"]
+        out = wire_workflows.add_sparse_pattern(block, "      ")
+        self.assertEqual(out[2:], ["          sparse-checkout: |",
+                                   "            taskq/deploy/eks-karpenter",
+                                   "            tools/artifacts",
+                                   "            .artifacts"])
+
+    def test_existing_patterns_are_not_duplicated(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout: |",
+                 "            tools/artifacts",
+                 "            .artifacts"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(block, "      "), block)
+
+
+class WorkflowPullStep(unittest.TestCase):
+    WF = "jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n      - run: make\n"
+
+    def test_step_installs_the_aws_cli_when_absent(self):
+        out, _ = wire_workflows.wire(self.WF, ["docs/x"])
+        self.assertIn("if ! command -v aws >/dev/null; then", out)
+        self.assertIn('export ARTIFACTS_AWS="$artifacts_cli_aws"', out)
+        self.assertIn("awscli==1.46.2", out)
+        self.assertTrue(out.endswith("      - run: make\n"))
+
+    def test_rewiring_is_idempotent_and_refreshes_a_stale_step(self):
+        once, _ = wire_workflows.wire(self.WF, ["docs/x"])
+        self.assertEqual(wire_workflows.wire(once, ["docs/x"])[0], once)
+        stale = once.replace("pull --jobs 16 docs/x", "pull docs/old")
+        self.assertEqual(wire_workflows.wire(stale, ["docs/x"])[0], once)
+
+
 class S3Argv(unittest.TestCase):
     def setUp(self):
         cfg = artifacts.Config(root=Path("."), remote="s3://bucket/store", endpoint=None, read_url=None,
@@ -316,6 +374,39 @@ class S3Argv(unittest.TestCase):
         with self.assertRaises(SystemExit):
             artifacts.object_key("../../etc/passwd")
 
+
+class WorkflowBootstrap(unittest.TestCase):
+    def test_sparse_clone_can_load_tool_and_remote_configuration(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            sh(root, "git", "init", "-q", "-b", "main")
+            for name, content in {".github/scripts/scope.py": "", "tools/artifacts/artifacts.py": TOOL.read_text(), ".artifacts/config.json": '{"remote":"file:///test-store"}'}.items():
+                p = root / name
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_text(content)
+            sh(root, "git", "add", ".")
+            sh(root, "git", "-c", "user.name=test", "-c", "user.email=test@example.invalid", "commit", "-qm", "fixture")
+            block = ["      - uses: actions/checkout@v4", "        with:", "          sparse-checkout: .github/scripts"]
+            wired = wire_workflows.add_sparse_pattern(block, "      ")
+            patterns = [line.strip() for line in wired[3:]]
+            sh(root, "git", "sparse-checkout", "set", "--cone", *patterns)
+            self.assertTrue((root / "tools/artifacts/artifacts.py").is_file())
+            self.assertEqual(artifacts.Config.load(root).remote, "file:///test-store")
+
+    def test_conditional_full_checkout_is_preserved(self):
+        block = ["      - uses: actions/checkout@v4", "        with:", "          sparse-checkout: ${{ needs.changes.outputs.full_checkout != 'true' && env.SPARSE_RULES || '' }}", "          sparse-checkout-cone-mode: false"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(block, "      "), block)
+
+    def test_rewiring_refreshes_paths_and_keeps_checkout_condition(self):
+        source = "jobs:\n  test:\n    steps:\n      - uses: actions/checkout@v4\n        if: needs.changes.outputs.run == 'true'\n      - run: make check\n"
+        once, _ = wire_workflows.wire(source, ["data/new"])
+        self.assertEqual(once, wire_workflows.wire(once, ["data/new"])[0])
+        stale = once.replace("pull --jobs 16 data/new", "pull data/old")
+        self.assertEqual(once, wire_workflows.wire(stale, ["data/new"])[0])
+        self.assertEqual(once.count("if: needs.changes.outputs.run == 'true'"), 2)
+        self.assertIn("shell: bash", once)
+        self.assertIn("working-directory: ${{ github.workspace }}", once)
+        self.assertIn('export ARTIFACTS_AWS="$artifacts_cli_aws"', once)
 
 if __name__ == "__main__":
     unittest.main()
