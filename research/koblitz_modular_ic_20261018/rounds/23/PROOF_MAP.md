@@ -19,3 +19,10 @@ No Lean theorem asserts a modular-factor map,full normalized charts,complete RR,
 node187 polynomial membership,complete quotient saturation or an arbitrary-divisor
 reverse evaluator. First-host raw verification receipts were lost at migration;
 the new source-bound replay/audit provides the retained verification status.
+
+The retained second-host build/audit checks15 theorems,0 failing,0 trusted-native.
+Its printed KoblitzRound23Local source SHA256 is
+e6b9032ca95652ec4e06f2f454a9f6e0be44d183f4c70becf44f97352c6c436b,
+which equals the committed module. A separately invoked leanchecker --help
+probe did not return help and was stopped;no independent fresh-checker pass
+is reported. The kernel compilation and transitive axiom audit did complete.

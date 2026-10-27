@@ -4,7 +4,7 @@
 - **Kind:** implementation gap; low-genus existence question; partial formalization
 - **Affected work:** [investigation](../research/koblitz_modular_ic_20261018/REPORT.md), [original construction](../research/notes/ecc2k130/RESEARCH_ECC2K130_CURVE_CONSTRUCTION.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-21
+- **Last updated:** 2026-10-27
 
 ## Problem
 
@@ -995,3 +995,23 @@ keeping nu and every registered unit:four degree20 closed points over F2,
 with both ideal-inclusion lifts,nonzero relative Jacobian and exact Frobenius
 matrix. The full proper normalized branch table remains open;see the Round22
 CM and validation records. No relation-rank or IC cost claim follows.
+
+## Round23: exceptional lifted source geometry
+
+[Round23](../research/koblitz_modular_ic_20261018/rounds/23/REPORT.md) records
+exact original-source neighborhoods at SS5 and regular closure points at Z5.
+Using the written proper-curve/DVR bridge,the complete exceptional fibers are
+four degree20 unramified points above SS5 and two degree10 points of ramification
+1 and7 above Z5. The two final registered polynomial denominator entries have
+orders4 and6 at the ramified Z5 point. The original unsaturated20-dimensional
+fiber and saturated16-dimensional fiber are kept distinct. Native membership,
+unit,component,intersection and Jacobian certificates support the derivation;
+15 new Lean implications/identities expose the remaining geometric bridge.
+
+This narrows the next construction to lifted charts above the five rational
+base supports,including infinity,followed by complete global divisors and a
+prescribed complete Riemann–Roch space. It does not resolve the F2 modular-factor
+map,nonzero order11 action,node187 polynomial membership,full quotient geometry
+or arbitrary-divisor reverse evaluation. A second migration lost earlier
+ignored raw output;literal source certificates survived and missing verification
+receipts were replayed. The failure ledger marks that evidence gap explicitly.
