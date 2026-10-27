@@ -12,7 +12,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 IMAGE = "sha256:7c4ae649a84014c467d79319bbf17ce2632ae8b8be123ac2fb2ea5be46823f31"
-SOURCE_MOUNT = Path("/Volumes/SSD990")
+SOURCE_MOUNT = Path("/Volumes/SSD990/crypto")
+ALT_OBJECTS = Path("/Volumes/SSD990-2/.codex/git-objects/crypto-n83-20261019")
 MAX_SECONDS = 900
 MEMORY_BYTES = 4 * 1024**3
 
@@ -28,6 +29,8 @@ def utc():
 def run(mode, binary, output):
     ROOT.relative_to(SOURCE_MOUNT)
     binary = binary.resolve(strict=True)
+    if not ALT_OBJECTS.is_dir():
+        raise ValueError("pinned Git alternate object store unavailable")
     output = output.resolve()
     if not output.is_dir():
         raise ValueError("output parent must exist outside the repository")
@@ -69,6 +72,7 @@ def run(mode, binary, output):
         "--cpus=1", "--memory=4g", "--memory-swap=4g", "--pids-limit=128",
         "--network=none", "--read-only", "--tmpfs", "/tmp:rw,nosuid,nodev,size=64m",
         "--mount", f"type=bind,src={SOURCE_MOUNT},dst={SOURCE_MOUNT},readonly",
+        "--mount", f"type=bind,src={ALT_OBJECTS},dst={ALT_OBJECTS},readonly",
         "--mount", f"type=bind,src={binary},dst=/runner,readonly",
         "--mount", f"type=bind,src={output},dst=/out",
         "--workdir", str(ROOT), "--entrypoint", "sh", IMAGE,
