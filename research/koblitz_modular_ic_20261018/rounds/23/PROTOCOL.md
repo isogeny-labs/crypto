@@ -77,3 +77,13 @@ identity against the original circuit. Recheck the literal nonzero unit-lift
 entries from chart01 and separate the base derivative from the QR Jacobian.
 Source SS23-compact.sing;native cap4GiB/1200s unchanged. This is a compact
 certificate extraction under SS23,not another global quotient/saturation search.
+
+## Frozen Z23 factor split after GTZ warning
+
+Attempt02 reaches finite lengths20(original),16(closure) and the registered
+unit diagnostics,but the GTZ primary routine repeatedly warns of its documented
+small-characteristic loop. It was stopped with SIGTERM;observed exit0 is not
+success. Attempt03 replaces GTZ with complete univariate eliminant factorization,
+power factors,intersection/length controls and native positive-characteristic
+radical computation. No primary/prime status is inferred merely from lengths.
+This is Z23-factor.sing;all original inputs and caps remain fixed.
