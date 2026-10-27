@@ -1,0 +1,9 @@
+# Validation after host replacement
+
+The original /tmp build and test outputs were lost. The corrected image had already been pushed, so it was recovered by digest rather than rebuilt. Its binary and mathematical source hashes match the frozen protocol. Eight same-driver controls passed as UID 1000, and four standalone Rust tests were rerun successfully.
+
+The root library suite ran on the untouched base source: 4870 passed, 24 failed, 121 ignored. Nineteen failures referred to absent sparse runtime fixtures; those tracked paths were restored from exact HEAD blobs. Nine chain/planner/orbit failures passed their affected-group rechecks (11 tests total including two previously passing cases). Remaining fixture checks are recorded separately. One GPU lock test failed under the parallel suite and is rerun serially. Four other failures are outside this standalone package: three hyperelliptic tests reject parameter `branches`, and the weighted-comparison test asserts that a zero-weight legacy comparison id is absent. No root library implementation was changed in this branch.
+
+Original full output is retained along with serial/affected rechecks; neither partial rechecks nor the standalone tests are represented as a green full-suite run.
+
+Final fixture checks: all 16 ecbench bounds tests pass after restoring the exact audit-prime.json/audit-koblitz.json blobs. The serial ecbench subset had 232 passing, 8 failing and 1 ignored tests before those audit blobs were restored; four of those eight were the now-passing bounds cases. The GPU lock test passed serially. Four reproducible baseline failures remain: weighted-comparison legacy-id handling and the three hyperelliptic parameter-registry tests. The overall root suite is therefore not green. The mathematical experiment package is standalone and no root library source was modified.
