@@ -342,8 +342,47 @@ const HYPER_IC_PARAMS: &[ParamDecl] = &[
 
 /// Every method `ecbench` knows.  Adding one is an entry here and an arm
 /// in [`solve`]; nothing else changes.
+const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "jumps",
+        default: None,
+        help: "jump table size, 1..256",
+    },
+    ParamDecl {
+        name: "walks",
+        default: None,
+        help: "parallel model lanes, 1..64",
+    },
+    ParamDecl {
+        name: "dp_bits",
+        default: None,
+        help: "hashed distinguished-point bits, 0..24",
+    },
+    ParamDecl {
+        name: "cap_multiple",
+        default: None,
+        help: "physical-step budget / sqrt(r)",
+    },
+];
+
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl {
+            id: "rho.plus_model_v1",
+            family: "rho",
+            summary: "counted seeded selection-walk control; hashed predicates, not the CUDA kernel",
+            entry: "ecbench::best2_model::solve(best2=false)",
+            applies: Applies::PrimeOnly,
+            params: BEST2_MODEL_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.best2_model_v1",
+            family: "rho",
+            summary: "counted P+M/P-M model with two full additions, cycle seeks and DP restarts; not GPU cost",
+            entry: "ecbench::best2_model::solve(best2=true)",
+            applies: Applies::PrimeOnly,
+            params: BEST2_MODEL_PARAMS,
+        },
         MethodDecl {
             id: "rho.frozen_reference",
             family: "rho",
@@ -1548,6 +1587,27 @@ fn solve_generic<G: CountedGroup>(
         generic_report(o, wall, a, f)
     };
     let rep = match m.id.as_str() {
+        "rho.plus_model_v1" | "rho.best2_model_v1" => {
+            let jumps = param_u64(m, "jumps")?;
+            let walks = param_u64(m, "walks")?;
+            let dp_bits = param_u64(m, "dp_bits")?;
+            if !(1..=256).contains(&jumps) || !(1..=64).contains(&walks) || dp_bits > 24 {
+                return Err("model requires jumps=1..256, walks=1..64, dp_bits=0..24".into());
+            }
+            let o = super::best2_model::solve(
+                g,
+                gen,
+                target,
+                r,
+                seed,
+                cap()?,
+                jumps as usize,
+                walks as usize,
+                dp_bits as u32,
+                m.id == "rho.best2_model_v1",
+            );
+            generic(o, t.elapsed().as_nanos() as u64, 2)
+        }
         "rho.frozen_reference" => {
             let res = rho_reference(g, gen, target, r, seed, cap()?);
             rho(res, t.elapsed().as_nanos() as u64)
@@ -4938,6 +4998,42 @@ pub fn dump_factor_base(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn best2_model_registry_prime_recovery_and_replay() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+        let spec = CurveSpec::PrimeSearch {
+            bits: 14,
+            seed: 59297,
+        };
+        for id in ["rho.plus_model_v1", "rho.best2_model_v1"] {
+            let params = [
+                ("jumps", "16"),
+                ("walks", "8"),
+                ("dp_bits", "2"),
+                ("cap_multiple", "10000"),
+            ]
+            .into_iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect();
+            let m = resolve(&MethodSpec {
+                id: id.into(),
+                params,
+            })
+            .unwrap();
+            for index in 0..4 {
+                let (w, inst) =
+                    Workload::build(&spec, 20261027, index, TargetKind::Planted).unwrap();
+                let a = solve(&m, &inst, &w.curve, &w.target, index + 1).unwrap();
+                let b = solve(&m, &inst, &w.curve, &w.target, index + 1).unwrap();
+                assert_eq!(a.recovered, w.planted);
+                assert_eq!(a.recovered, b.recovered);
+                assert_eq!(a.counters, b.counters);
+                assert_eq!(a.total_gae, b.total_gae);
+                assert!(a.counters["physical_steps"] > 0);
+            }
+        }
+    }
 
     #[test]
     fn defaults_are_written_before_hashing() {
