@@ -234,6 +234,9 @@ def nist_selection_period_ecpp(ref, since):
         emit("nist.selection_period_ecpp.retained_rows", data.get("rows"),
              date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
              label="Period ECPP trial: original cohort rows retained, including indeterminate",
+             source=f"{path}@{commit}")
+
+
 def nist_selection_exact_embedding(ref, since):
     path = "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json"
     for date, commit, text in file_history(ref, path, since):
