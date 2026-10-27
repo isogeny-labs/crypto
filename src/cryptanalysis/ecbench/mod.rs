@@ -68,6 +68,7 @@ pub mod hyper;
 pub mod hyper_ic;
 pub mod isolab;
 pub mod isolation;
+pub mod known_log;
 pub mod jacobian;
 pub mod koblitz_descent;
 pub mod methods;
