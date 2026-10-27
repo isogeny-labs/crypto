@@ -1,0 +1,460 @@
+#![allow(dead_code)]
+//! Toy reproduction of the quartic-extension genus-five cover family.
+//!
+//!   humbert classify                         binary-pattern table (lead 2)
+//!   humbert verify  <p> <twist> <seed>       zeta / L-polynomial check of C (lead 1)
+//!   humbert attack  <p> <twist> <seed> <arm> end-to-end IC on C vs matched rho (leads 1, 3, 4)
+//!                                            arm = full | iota
+mod classify;
+mod cover;
+mod curve;
+mod field;
+mod la;
+mod poly;
+
+use cover::*;
+use curve::{invr, mulr, pollard_rho, random_point, Rng};
+use field::FieldOps;
+use std::time::Instant;
+
+fn peak_rss_kb() -> u64 {
+    std::fs::read_to_string("/proc/self/status")
+        .ok()
+        .and_then(|s| s.lines().find(|l| l.starts_with("VmHWM:")).map(|l| l.split_whitespace().nth(1).unwrap().parse().unwrap()))
+        .unwrap_or(0)
+}
+
+fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    match args.get(1).map(|s| s.as_str()) {
+        Some("classify") => {
+            for d in [2usize, 3, 4] {
+                for g0 in [1usize, 2, 3] {
+                    for row in classify::enumerate(d, g0) {
+                        println!("{}", classify::row_json(&row));
+                    }
+                }
+            }
+        }
+        Some("verify") => verify(args[2].parse().unwrap(), args[3].parse().unwrap(), args[4].parse().unwrap()),
+        Some("attack") => attack(args[2].parse().unwrap(), args[3].parse().unwrap(), args[4].parse().unwrap(), &args[5]),
+        _ => eprintln!("usage: humbert classify | verify p twist seed | attack p twist seed full|iota"),
+    }
+}
+
+fn poly_mul_i(a: &[i128], b: &[i128]) -> Vec<i128> {
+    let mut c = vec![0i128; a.len() + b.len() - 1];
+    for (i, x) in a.iter().enumerate() {
+        for (j, y) in b.iter().enumerate() {
+            c[i + j] += x * y;
+        }
+    }
+    c
+}
+
+/// Lead 1: point counts N_1..N_5 of the explicit model -> L-polynomial, compared
+/// with L_E(T^4) L_D(T) (E counted by BSGS on E, D counted on its own equation).
+/// Negative control: the same counts compared with a wrong-twist prediction.
+fn verify(p: u64, twist: i32, seed: u64) {
+    let mut rng = Rng(seed);
+    let t0 = Instant::now();
+    let s = Setup::new(p, twist, &mut rng);
+    let counts = count_c(&s, 5, &mut rng);
+    let lc = lpoly_from_counts(p, &counts, 5);
+    let pi = p as i128;
+    let a_e = pi.pow(4) + 1 - s.order as i128;
+    let a_d = pi + 1 - s.d_count as i128;
+    let le4 = {
+        let mut v = vec![0i128; 9];
+        v[0] = 1;
+        v[4] = -a_e;
+        v[8] = pi.pow(4);
+        v
+    };
+    let ld = vec![1, -a_d, pi];
+    let pred = poly_mul_i(&le4, &ld);
+    let ok = pred == lc;
+    // negative control: quadratic twist of E (a_E -> -a_E) with the same D
+    let mut le4t = le4.clone();
+    le4t[4] = a_e;
+    let pred_twist = poly_mul_i(&le4t, &ld);
+    let control_distinguished = pred_twist != lc;
+    // h1 of degree one: E_b: y^2 = eta (x - l0)(x - l1)(x - l2)(x - b), b in F_p, is the
+    // Moebius image x -> 1/(x - b) of the cubic form with roots 1/(l_j - b) and constant
+    // eta prod(b - l_j).  Both orders are counted by brute force over F_{p^4}.
+    let k = s.k();
+    let b = [rng.below(p), 0, 0, 0];
+    let quartic_count = {
+        let mut n: u64 = (1 + k.chi(&s.eta)) as u64;
+        for idx in 0..(p as u64).pow(4) {
+            let x = [idx % p, (idx / p) % p, (idx / p / p) % p, idx / p / p / p];
+            let mut f = s.eta;
+            for j in 0..3 {
+                f = k.mul(&f, &k.sub(&x, &s.lams[j]));
+            }
+            f = k.mul(&f, &k.sub(&x, &b));
+            n += (1 + k.chi(&f)) as u64;
+        }
+        n
+    };
+    let cubic_image_count = {
+        let mut c = s.eta;
+        let mut roots = Vec::new();
+        for j in 0..3 {
+            c = k.mul(&c, &k.sub(&b, &s.lams[j]));
+            roots.push(k.inv(&k.sub(&s.lams[j], &b)));
+        }
+        let mut n: u64 = 1;
+        for idx in 0..(p as u64).pow(4) {
+            let x = [idx % p, (idx / p) % p, (idx / p / p) % p, idx / p / p / p];
+            let mut f = c;
+            for rt in &roots {
+                f = k.mul(&f, &k.sub(&x, rt));
+            }
+            n += (1 + k.chi(&f)) as u64;
+        }
+        n
+    };
+    let jac: i128 = lc.iter().sum();
+    let jac_pred = s.order as i128 * s.d_count as i128;
+    println!(
+        "{{\"kind\":\"verify\",\"p\":{},\"twist\":{},\"seed\":{},\"counts\":{:?},\"lpoly_from_counts\":{:?},\"lpoly_predicted\":{:?},\"match\":{},\"negative_control_twisted_E_distinguished\":{},\"E_order\":{},\"D_order\":{},\"jac_order_from_counts\":{},\"jac_order_predicted\":{},\"r\":{},\"quartic_form_order\":{},\"moebius_cubic_order\":{},\"quartic_form_equivalent\":{},\"seconds\":{:.3}}}",
+        p, twist, seed, counts, lc, pred, ok, control_distinguished, s.order, s.d_count, jac, jac_pred, s.r, quartic_count, cubic_image_count, quartic_count == cubic_image_count, t0.elapsed().as_secs_f64()
+    );
+}
+
+const DENSE_MAX: usize = 1200;
+
+fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
+    let iota = match arm {
+        "full" => false,
+        "iota" => true,
+        _ => panic!("arm must be full or iota"),
+    };
+    let mut rng = Rng(seed);
+    let t_all = Instant::now();
+    // ---- cover construction ------------------------------------------------
+    let t = Instant::now();
+    let s = Setup::new(p, twist, &mut rng);
+    let ce = s.curve();
+    let r = s.r;
+    let cof = s.order / r as u128;
+    let sq = |a: &field::E4| s.sqrt_k4(a);
+    let gen = loop {
+        let pt = ce.mul(&random_point(&ce, &sq, &mut rng), cof);
+        if pt.is_some() {
+            break pt;
+        }
+    };
+    assert!(ce.mul(&gen, r as u128).is_none());
+    let x_true = 1 + rng.below(r - 1);
+    let q = ce.mul(&gen, x_true as u128);
+    eprintln!("[setup] r={} #E={} {:.2}s", r, s.order, t.elapsed().as_secs_f64());
+    let fb = FactorBase::build(&s);
+    let nodes = Nodes::new(&s);
+    eprintln!("[fb] points={}", fb.n_points());
+    let t_setup = t.elapsed().as_secs_f64();
+    let k4_after_setup = s.k().muls.get();
+    let nx = fb.xs.len();
+    let nfb = fb.n_points();
+    // columns
+    let (ncols, inf_col, c_col) = if iota { (nx + 2 - 1, nx + 1 - 1, nx - 1) } else { (nfb + 1 - 1, nfb - 1, usize::MAX) };
+    let to_row = |rel: &Relation| -> Vec<(usize, u64)> {
+        let mut row: Vec<(usize, u64)> = Vec::new();
+        let mut push = |c: Option<usize>, v: u64| {
+            if let Some(c) = c {
+                row.push((c, v));
+            }
+        };
+        for &i in &rel.pts {
+            if iota {
+                let j = i / 2;
+                let yc = if j == 0 { None } else { Some(j - 1) };
+                if i % 2 == 0 {
+                    push(yc, 1);
+                } else {
+                    push(yc, r - 1);
+                    push(Some(c_col), 1);
+                }
+            } else {
+                push(if i == 0 { None } else { Some(i - 1) }, 1);
+            }
+        }
+        let inf = if rel.inf >= 0 { rel.inf as u64 % r } else { r - ((-rel.inf) as u64 % r) };
+        push(Some(inf_col), inf);
+        // merge repeated columns, drop zeros: the canonical form used for de-duplication
+        row.sort();
+        let mut merged: Vec<(usize, u64)> = Vec::new();
+        for (c, v) in row {
+            match merged.last_mut() {
+                Some(last) if last.0 == c => last.1 = (last.1 + v) % r,
+                _ => merged.push((c, v)),
+            }
+        }
+        merged.retain(|e| e.1 != 0);
+        merged
+    };
+    // ---- relation collection + linear algebra -------------------------------
+    let t = Instant::now();
+    let mut st = Stats::default();
+    let mut qst = Stats::default();
+    let mut sym_rows = 0u64;
+    let mut quad_rows = 0u64;
+    let mut dup_found = 0u64;
+    let mut seen: std::collections::HashSet<Vec<(usize, u64)>> = std::collections::HashSet::new();
+    let mut window: Vec<bool> = Vec::new();
+    let mut use_quadrics = false;
+    let mut switch_at_rows = usize::MAX;
+    let mut rows: Vec<Vec<(usize, u64)>> = Vec::new();
+    let mut target = ncols + 5;
+    let mut t_rel = 0.0;
+    let mut t_la = 0.0;
+    let mut la_mulmods = 0u64;
+    let mut la_rounds = 0;
+    let sol;
+    loop {
+        let tr = Instant::now();
+        while rows.len() < target {
+            let rel = if use_quadrics {
+                quadric_relation(&s, &fb, &nodes, &mut rng, &mut qst)
+            } else {
+                hyperplane_relation(&s, &fb, &nodes, &mut rng, &mut st)
+            };
+            let Some(rel) = rel else { continue };
+            let row = to_row(&rel);
+            let mut key = row.clone();
+            key.sort();
+            let fresh = seen.insert(key);
+            if !use_quadrics {
+                window.push(fresh);
+                if window.len() >= 200 {
+                    let dup = window.iter().filter(|f| !**f).count();
+                    if dup * 2 > window.len() {
+                        use_quadrics = true;
+                        switch_at_rows = rows.len();
+                    }
+                    window.clear();
+                }
+            }
+            if !fresh {
+                dup_found += 1;
+                continue;
+            }
+            sym_rows += rel.sym as u64;
+            if use_quadrics {
+                quad_rows += 1;
+            }
+            rows.push(row);
+        }
+        t_rel += tr.elapsed().as_secs_f64();
+        let tl = Instant::now();
+
+        let solve = if ncols <= DENSE_MAX {
+            la::kernel_mod_r(&rows, ncols, r)
+        } else {
+            // two independent Wiedemann solves; a corank > 1 shows up as disagreement
+            let a = la::kernel_wiedemann(&rows, ncols, r, seed ^ 0xA5A5 ^ la_rounds as u64);
+            let b = la::kernel_wiedemann(&rows, ncols, r, seed ^ 0x5A5A ^ (la_rounds as u64) << 8);
+            let same = match (&a.x, &b.x) {
+                (Some(xa), Some(xb)) => {
+                    let ia = invr(xa[inf_col], r);
+                    let ib = invr(xb[inf_col], r);
+                    xa.iter().zip(xb).all(|(u, v)| mulr(*u, ia, r) == mulr(*v, ib, r))
+                }
+                _ => false,
+            };
+            // a column in no relation is an undetermined unknown that Krylov methods
+            // silently set to 0 under every scaling: count it as extra corank
+            let mut used = vec![false; ncols];
+            for row in &rows {
+                for &(c, _) in row {
+                    used[c] = true;
+                }
+            }
+            let empty = used.iter().filter(|u| !**u).count();
+            la::Solve { kernel_dim: if same && empty == 0 { 1 } else { 1 + empty.max(1) }, x: a.x, rank: a.rank, mulmods: a.mulmods + b.mulmods }
+        };
+
+        t_la += tl.elapsed().as_secs_f64();
+        la_mulmods += solve.mulmods;
+        la_rounds += 1;
+        if solve.kernel_dim == 1 {
+            sol = solve;
+            break;
+        }
+        target += (ncols / 20).max(5);
+    }
+    let k4_after_rel = s.k().muls.get();
+    let _ = t;
+    let xv = sol.x.unwrap();
+    let val = |i: usize| -> u64 {
+        if iota {
+            let j = i / 2;
+            let y = if j == 0 { 0 } else { xv[j - 1] };
+            if i % 2 == 0 {
+                y
+            } else {
+                (xv[c_col] + r - y) % r
+            }
+        } else if i == 0 {
+            0
+        } else {
+            xv[i - 1]
+        }
+    };
+    let x_inf = xv[inf_col];
+    // ---- lead 4 checks: iota pairs, X_oo = 4c ------------------------------
+    let c_val = (val(0) + val(1)) % r;
+    let mut iota_pairs_const = true;
+    for j in 0..nx {
+        if (val(2 * j) + val(2 * j + 1)) % r != c_val {
+            iota_pairs_const = false;
+        }
+    }
+    let xinf_eq_4c = x_inf == mulr(4, c_val, r);
+    // ---- transfer + individual logs ----------------------------------------
+    let t = Instant::now();
+    let mut dst = Stats::default();
+    let mut place_degs = Vec::new();
+    let mut push_ok = true;
+    let mut logs = Vec::new();
+    let mut multipliers = Vec::new();
+    for base in [gen, q] {
+        // smallest m with every F_q-place of T(mP) of degree 4 (degree-8 places leave
+        // only 3 free points in the quadric descent: too few candidates at toy q)
+        let mut m = 1u64;
+        let (pt, places) = loop {
+            let mp = ce.mul(&base, m as u128).unwrap();
+            let pl = transfer_places(&s, mp);
+            if pl.iter().all(|z| z.len() == 4) || m == 64 {
+                break (mp, pl);
+            }
+            m += 1;
+        };
+        multipliers.push(m);
+        push_ok &= pushforward_check(&s, &places, pt);
+        let mut lg = (r - mulr(4, x_inf, r)) % r;
+        for z in &places {
+            place_degs.push(z.len());
+            let pts = descend_place(&s, &fb, &nodes, z, &mut rng, &mut dst);
+            let mut lz = mulr(2, x_inf, r);
+            for &i in &pts {
+                lz = (lz + r - val(i)) % r;
+            }
+            lg = (lg + lz) % r;
+        }
+        logs.push(mulr(lg, invr(m % r, r), r));
+    }
+    let t_desc = t.elapsed().as_secs_f64();
+    let k4_after_desc = s.k().muls.get();
+    let (lp, lq) = (logs[0], logs[1]);
+    let tp_nonzero = lp != 0;
+    let x_rec = if tp_nonzero { mulr(lq, invr(lp, r), r) } else { 0 };
+    let solved = x_rec == x_true;
+    let t_ic = t_all.elapsed().as_secs_f64();
+    let rss_ic = peak_rss_kb();
+    // ---- matched rho on E(F_{q^4})[r] --------------------------------------
+    let rho = pollard_rho(&ce, &gen, &q, r, &mut rng);
+    let rho_ok = rho.log == Some(x_true);
+    let sec_per_step = rho.seconds / rho.steps as f64;
+    let expected_rho_steps = (std::f64::consts::PI * r as f64 / 2.0).sqrt();
+    println!(
+        "{{\"kind\":\"attack\",\"p\":{p},\"twist\":{twist},\"seed\":{seed},\"arm\":\"{arm}\",\"E_order\":{},\"r\":{r},\"D_order\":{},\
+\"fb_x\":{nx},\"fb_points\":{nfb},\"unknowns\":{ncols},\
+\"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\
+\"target_multipliers\":{:?},\"place_degrees\":{:?},\"descent_candidates\":{},\"descent_relations\":{},\
+\"pushforward_8P\":{push_ok},\"T_P_nonzero\":{tp_nonzero},\"iota_pairs_constant\":{iota_pairs_const},\"x_inf_eq_4c\":{xinf_eq_4c},\
+\"x_true\":{x_true},\"x_recovered\":{x_rec},\"solved\":{solved},\
+\"t_setup\":{t_setup:.4},\"t_relations\":{t_rel:.4},\"t_linear_algebra\":{t_la:.4},\"t_descent\":{t_desc:.4},\"t_ic_total\":{t_ic:.4},\
+\"k4_muls_relations\":{},\"k4_muls_descent\":{},\"peak_rss_kb\":{rss_ic},\
+\"rho_solved\":{rho_ok},\"rho_steps\":{},\"rho_seconds\":{:.4},\"rho_expected_steps\":{expected_rho_steps:.1},\"rho_expected_steps_negation\":{:.1},\"rho_k4_muls\":{},\
+\"ic_over_rho_time\":{:.4},\"ic_time_in_rho_steps\":{:.1}}}",
+        s.order, s.d_count, st.candidates, st.degenerate, st.symmetric, st.found, st.root_hist, rows.len(), if switch_at_rows == usize::MAX { -1 } else { switch_at_rows as i64 }, qst.candidates, qst.found, if ncols <= DENSE_MAX { "dense" } else { "wiedemann" }, sol.rank, multipliers, place_degs, dst.candidates, dst.found,
+        k4_after_rel - k4_after_setup, k4_after_desc - k4_after_rel,
+        rho.steps, rho.seconds, expected_rho_steps / std::f64::consts::SQRT_2, rho.k4_muls, t_ic / rho.seconds, t_ic / sec_per_step
+    );
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::field::FieldOps;
+
+    #[test]
+    fn sqrt_in_l_of_every_k4_element_sample() {
+        let mut rng = Rng(5);
+        let s = Setup::new(17, -1, &mut rng);
+        for _ in 0..200 {
+            let a = [rng.below(17), rng.below(17), rng.below(17), rng.below(17)];
+            let r = s.l.sqrt(&s.l.emb(&a)).expect("every K4 element is a square in L");
+            assert_eq!(s.l.mul(&r, &r), s.l.emb(&a));
+        }
+    }
+
+    #[test]
+    fn lpoly_of_model_equals_res_e_times_d_p17_both_twists() {
+        for tw in [1, -1] {
+            let mut rng = Rng(9);
+            let s = Setup::new(17, tw, &mut rng);
+            let lc = lpoly_from_counts(17, &count_c(&s, 5, &mut rng), 5);
+            let pi = 17i128;
+            let a_e = pi.pow(4) + 1 - s.order as i128;
+            let a_d = pi + 1 - s.d_count as i128;
+            let mut le4 = vec![0i128; 9];
+            le4[0] = 1;
+            le4[4] = -a_e;
+            le4[8] = pi.pow(4);
+            assert_eq!(poly_mul_i(&le4, &[1, -a_d, pi]), lc);
+        }
+    }
+
+    #[test]
+    fn wiedemann_matches_dense_kernel() {
+        // random corank-1 system: rows orthogonal to a hidden vector
+        let r = 1_000_003u64;
+        let mut rng = Rng(3);
+        let n = 30;
+        let hidden: Vec<u64> = (0..n).map(|_| 1 + rng.below(r - 1)).collect();
+        let mut rows = Vec::new();
+        for _ in 0..(n + 5) {
+            let mut row: Vec<(usize, u64)> = Vec::new();
+            let mut cols: Vec<usize> = Vec::new();
+            while cols.len() < 5 {
+                let c = rng.below(n as u64 - 1) as usize;
+                if !cols.contains(&c) {
+                    cols.push(c);
+                }
+            }
+            let mut acc = 0u64;
+            for &c in &cols {
+                let a = 1 + rng.below(r - 1);
+                acc = (acc + mulr(a, hidden[c], r)) % r;
+                row.push((c, a));
+            }
+            // last column balances the row
+            row.push((n - 1, mulr((r - acc) % r, invr(hidden[n - 1], r), r)));
+            rows.push(row);
+        }
+        let d = la::kernel_mod_r(&rows, n, r);
+        assert_eq!(d.kernel_dim, 1);
+        let w = la::kernel_wiedemann(&rows, n, r, 11);
+        let (xd, xw) = (d.x.unwrap(), w.x.unwrap());
+        let (id, iw) = (invr(xd[0], r), invr(xw[0], r));
+        for c in 0..n {
+            assert_eq!(mulr(xd[c], id, r), mulr(xw[c], iw, r));
+            assert_eq!(mulr(xd[c], id, r), mulr(hidden[c], invr(hidden[0], r), r));
+        }
+    }
+
+    #[test]
+    fn classifier_contains_target_and_kani_rosen_agrees() {
+        let rows = classify::enumerate(4, 1);
+        assert!(rows.iter().all(|r| r.g == r.g_kani_rosen));
+        let t: Vec<_> = rows.iter().filter(|r| r.target).collect();
+        assert_eq!(t.len(), 2);
+        for r in t {
+            assert_eq!((r.m, r.s, r.g, r.e, r.hyperelliptic), (4, 5, 5, 1, false));
+        }
+        assert!(rows.iter().filter(|r| r.conj_distinct).all(|r| r.e >= 1), "no e = 0 family for d = 4, g0 = 1");
+    }
+}
