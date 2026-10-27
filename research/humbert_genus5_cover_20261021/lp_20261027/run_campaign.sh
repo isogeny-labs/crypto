@@ -3,8 +3,8 @@
 # Usage: PRIMES="2003 3001" ./run_campaign.sh
 set -euo pipefail
 cd "$(dirname "$0")"
-BIN=../target/release/humbert
-(cd .. && cargo build --release --quiet)
+BIN=${BIN:-../target/release/humbert}
+[ -n "${BIN_FROZEN:-}" ] || (cd .. && cargo build --release --quiet)
 mkdir -p results
 OUT=results/campaign.jsonl
 ARMS=(iota iota lp:0.5 lp:0.35)
