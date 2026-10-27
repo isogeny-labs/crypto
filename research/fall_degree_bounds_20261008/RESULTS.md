@@ -313,3 +313,90 @@ it rises with `N` while the Semaev systems stay at 4.
   - `N ≈ 100`, which needs a sparse closure engine rather than more RAM;
   - and, more informative than raw `N`, larger `m` at fixed `n`, since HKYY's growth is
     in `m`.
+
+---
+
+# Results: E9 (N = 58–60) and E10 (the balanced diagonal `mℓ = n`), 2026-10-27
+
+Registered in Amendment 10 before any draw.
+- **Engine:** `hky_par` at source commit `5296ce8a7438`. Each instance built it from an S3
+  `git archive`; the binary sha256 was `533f182b…` on all three.
+- **Hosts:** `ephemeral` Spot, lab account, us-east-1. m7a.8xlarge for job A, m7a.4xlarge
+  for jobs B and C. No Spot interruption.
+- **Gates 0–3:** passed on every instance.
+- **Records:** `e9/run-r3/`, `e10/run-r3-B/`, `e10/run-r3-C/`.
+- **Report:** [reports/run-20261027T0517Z/](reports/run-20261027T0517Z/) (`report.pdf`, graph).
+
+## Headline
+
+**The first `d_F > 4` in this study.** On the `m = 3` diagonal, every draw of (21, 7),
+(24, 8) and (27, 9) has a degree-4 closure that stops without 1. The closure reaches 47–95%
+of the degree-≤4 space, so these draws are recorded as `d_F ≥ 5`.
+
+Every other cell up to `N = 60` reads `d_F ≤ 4`. That includes:
+- the `m = 4` diagonal to (20, 5);
+- the `m = 5` point (15, 3);
+- the `m = 6` point (12, 2);
+- the E9 cell (6, 10, 3).
+
+| exp. | cell m:n:ℓ | `N` | `d_F` per draw |
+|:--|:--|--:|:--|
+| E9 | 6:10:3 | 58 | 4 3 4 4 |
+| E9 | 5:15:3 | 60 | 4 4 4 4 |
+| E10 | 4:12:3 | 36 | 4 4 4 4 |
+| E10 | 4:16:4 | 48 | 4 4 4 4 |
+| E10 | 4:20:5 | 60 | 4 4 4 4 |
+| E10 | 6:12:2 | 60 | 3 3 4 4 |
+| E10 | **3:21:7** | 42 | **≥5 ≥5 ≥5 ≥5** |
+| E10 | **3:24:8** | 48 | **≥5 ≥5 ≥5 ≥5** |
+| E10 | **3:27:9** | 54 | **≥5 ≥5 ≥5 ≥5** |
+
+## Registered readings (Amendment 10)
+
+- **E9:** **"`d_F` bounded"**. Every large-host draw has `d_F ≤ 4`. Pooled with E7,
+  every draw with `m ≥ 5`, up to `N = 60`, is `≤ 4`.
+- **E10, `m = 3` diagonal:** **"`d_F` grows on the diagonal"**. With E6 (18, 6), the
+  medians read 4, then ≥5, ≥5, ≥5.
+- **E10, `m = 4`, `5`, `6` diagonals:** **"flat"**.
+- **Cross-`m` at fixed `N`:** **"not rising"** at `N = 48` (`m = 3`: ≥5, `m = 4`: 4) and
+  at `N = 60` (4, 4, 3). At `N = 48` the order is the opposite of "rises with `m`".
+
+**Lean.** `lean/FallDegree/Verdict.lean` (`registered_scoring`) now has 282 rows, adding
+E9 as kind 6 and E10 as kind 7. It states the readings above. Its kernel build runs in
+job E12b, because there is no Lean toolchain on the authoring host. Its status is recorded
+below when that job finishes.
+- **Disclosure:** the Amendment 10 rules were transcribed into `Rule.lean` after the
+  E9/E10 data had been read. The prose rules were not changed.
+
+## What this does and does not show
+
+- **Observed pattern, not registered:** the censored draws are exactly the draws with
+  `ℓ ≥ 7`. All of them have `m = 3`. Every draw with `ℓ ≤ 6`, at any `m` and any `N ≤ 60`,
+  has `d_F ≤ 4`.
+  - So growth tracks the factor-base dimension per summand, not `N` or `m`.
+  - That fits the HKYY conditional, which needs `d_F` to grow along `n' = n^{2/3}`.
+  - The data cannot yet separate an `ℓ` effect from an `n` effect at `m = 3`, or from an
+    `m = 3`-only effect. Amendment 11 (E12b, E12c) tests both.
+- **`≥ 5` is a censored value.** The exact `d_F` (5, 6 or 7?) is not measured. E12a runs
+  the degree-5 closure on two of the (3, 21, 7) draws.
+- **It is not a statement about the first fall degree assumption.** Kousidis–Wiemers
+  measured a first fall degree of 7 at `m = 3` (`m² − m + 1`). A last fall degree of
+  `≥ 5` there is consistent with that and refutes nothing.
+- **Independent checks of (3, 21, 7):**
+  - The E11 subagent's run on its own host and build read `d_F ≥ 5` on the same four
+    draws. Two solution counters agree on 0 solutions (`e11/scaling/`).
+  - That run uses the same closure code.
+  - The separately written round-based engine `hky_crosscheck` is running on draw 0
+    (`e10/crosscheck/`). Its result is added here when it finishes.
+- **Toy size only.** No exponent and no security claim.
+
+## E11: restricted-closure engine (exploratory, not registered)
+
+See `e11/ENGINE.md`.
+- **Soundness:** a degree-4 closure restricted to a monomial subset is a subspace of
+  `V_{F,4}`. Reaching 1 in it therefore certifies `d_F ≤ 4`; it can never certify
+  `d_F ≥ 5`.
+- **Validation:** 0 soundness violations on 124 draws. Policy `w1x` certified all 90
+  committed draws with dense `d_F = 4`, using 11–64% of the dense columns.
+- **N ≈ 100 numbers:** projections only.
+- **Use:** E12c applies it to (4, 28, 7), `N = 84`.
