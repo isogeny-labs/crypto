@@ -38,11 +38,12 @@ Lean source & Verified scope\\
 \texttt{WeightedOverlapEmbedding.lean} & Both localized chart Spec maps into weighted Proj agree with the canonical $D_+(XZ)$ immersion.\\
 \texttt{WeightedProjSmoothness.lean} & Conditional smoothness reduction from the two basic-open restrictions to actual weighted Proj; chart Smooth premises remain open.\\
 \texttt{WeightedProjGlobalGlue.lean} & Both separately defined charts map to actual weighted Proj through their checked chart isomorphisms.\\
+\texttt{WeightedProjChartNaturality.lean} & Both ring and Spec principal-open localization squares commute with the corresponding weighted-Proj affine charts.\\
 \bottomrule
 \end{longtable}
 \section*{Open boundary}
 Scheme-level smoothness, a global isomorphism from weighted Proj to the separately glued scheme, local-stalk transport, the Picard-class identity, and the Rust-to-Lean semantics bridge remain open. The infinity Jacobian certificate establishes coverage of the boundary locus by a nonzero partial; the immersion equalities establish compatibility of both chart localizations with the common weighted-Proj open. Neither alone constructs the remaining global theorems.
-The checked smoothness theorem is conditional on Smooth of both chart restrictions. The checked chart maps do not yet establish scheme-level naturality on the separately glued overlaps, so they do not yield a global isomorphism.
+The checked smoothness theorem is conditional on Smooth of both chart restrictions. The Spec localization squares are checked, but their composition with the chart isomorphism inverses and actual Proj immersions remains open; no global isomorphism follows yet.
 \section*{Replay evidence}
 All nineteen new source files compiled with Lean 4.34.1 and Mathlib commit \texttt{d13f23b} (full revision in the companion Markdown), exit status 0. Axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; none lists \texttt{sorryAx}. Source SHA-256 values, in dependency order, are:
 \begin{quote}\scriptsize\ttfamily
@@ -98,6 +99,14 @@ dbca9302d68e852fd21cc4218a0e3115
 \end{quote}
 Both sources compiled with \texttt{lake env lean} under the same pins and
 their axiom audits list only the three standard axioms above.
+The chart-localization source has SHA-256 (join the two lines):
+\begin{quote}\scriptsize\ttfamily
+6009aa97d1f756c4517a8e9b87eedf90\\
+b23b73a396ebbd399d9e774be11d2d84
+\end{quote}
+Its four ring-map and Spec-map square theorems compiled with
+\texttt{lake env lean} under the same pins; their axiom audits list only
+the three standard axioms above.
 \section*{Repository validation}
 The first \texttt{cargo test --release --lib --offline --locked} run recorded
 4,652 passed, one failed, and 119 ignored. The sole failure was a 2,000-ms

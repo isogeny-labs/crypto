@@ -36,10 +36,12 @@ The two chart Smooth premises have not been established, so global
 smoothness remains open. `WeightedProjGlobalGlue.lean` defines both actual
 chart morphisms into weighted Proj by composing the checked chart
 isomorphisms with the basic-open immersions. The next missing lemma is
-scheme-level naturality between each separately glued principal-open
-embedding and the canonical `D₊(XZ)` immersion. The corresponding ring
-squares are checked, but the global scheme isomorphism and local-stalk
-comparison are still open.
+scheme-level equality after composing each chart isomorphism's inverse with
+the actual `Proj.basicOpen.ι` immersion. `WeightedProjChartNaturality.lean`
+now checks both ring-map and `Spec.map` localization squares for the two
+separately glued principal opens. It has not yet composed those squares with
+the chart isomorphisms and Proj immersions, so the global scheme isomorphism
+and local-stalk comparison remain open.
 
 This identifies both scheme charts, establishes their finite affine cover, proves properness over `K`, and checks the pointwise and ring-global Jacobian facts on their stated loci, overlap-coordinate identities, a canonical overlap-ring equivalence, its images of the two affine generators, scalar preservation, equality of the induced Spec transition with the separately glued scheme's transition, and compatibility of both localized chart embeddings with the actual common weighted-Proj immersion. Scheme-level smoothness, construction of the global comparison with the separately glued curve, local-stalk transport, the `Pic⁰` class equation, and the Rust-to-Lean execution bridge remain open. The finite-zero multiplicity argument in [PROOF_AUDIT.md](../PROOF_AUDIT.md) is written mathematics, not a Lean divisor theorem.
 
@@ -80,6 +82,12 @@ Both `lake env lean WeightedProjSmoothness.lean` and
 `lake env lean WeightedProjGlobalGlue.lean` exited 0 under the pinned Lean
 and Mathlib revisions. Their axiom audits list only `propext`,
 `Classical.choice`, and `Quot.sound`; neither file contains `sorry`.
+
+The chart-localization source `WeightedProjChartNaturality.lean` has SHA-256
+`6009aa97d1f756c4517a8e9b87eedf90b23b73a396ebbd399d9e774be11d2d84`.
+`lake env lean WeightedProjChartNaturality.lean` exited 0 under the same
+pins; `zRingSquare`, `xRingSquare`, `zSpecSquare`, and `xSpecSquare` each
+list only the three standard axioms and contain no `sorry`.
 
 The required `RUST_TEST_THREADS=1 cargo test --release --lib --offline --locked`
 was run with these proof-only changes. The [first raw log](validation/release-library-first.log)
