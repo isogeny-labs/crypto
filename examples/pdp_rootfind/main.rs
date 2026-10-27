@@ -25,7 +25,6 @@
 #[allow(dead_code)]
 #[path = "../pdp_speedup/arms.rs"]
 mod arms;
-#[allow(dead_code)]
 #[path = "../pdp_speedup/bitslice.rs"]
 mod bitslice;
 #[allow(dead_code)]
@@ -50,6 +49,9 @@ mod kernel;
 #[allow(dead_code)]
 #[path = "../pdp_speedup/lanes_x86.rs"]
 mod lanes_x86;
+#[allow(dead_code)]
+#[path = "../pdp_speedup/mitm.rs"]
+mod mitm;
 
 mod analyze;
 mod binrf;

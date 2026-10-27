@@ -78,9 +78,10 @@
 //! [`spot_check_queries`]: `q = 20` at `n = 8` is grindable in a few
 //! hundred attempts (`tests::spot_check_at_q20_is_grindable`).  That
 //! is spot-check soundness, not succinct soundness.  Use
-//! [`super::stark_v2`] (coset LDE, composition polynomial,
-//! degree-bounded FRI) for anything that needs a proof; neither
-//! module is audited, and neither may back a research claim.
+//! [`super::stark_v2`] (coset LDE, composition polynomial, DEEP
+//! out-of-domain sample, degree-bounded FRI) for anything that needs a
+//! proof; neither module is audited, and neither may back a research
+//! claim.
 
 use super::merkle::{merkle_verify, MerkleProof, MerkleTree};
 use super::polynomial::{fr_add, fr_mul, fr_sub};
