@@ -19,7 +19,9 @@ concurrency:
 
 jobs:
   artifacts:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|artifacts.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|artifacts.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    # Keep the merge gate available while the optional EKS pools are offline.
+    # This is ordinary CPU validation; experiment runner selection is separate.
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
