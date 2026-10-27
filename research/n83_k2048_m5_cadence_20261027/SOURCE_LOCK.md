@@ -7,7 +7,8 @@ Its source file SHA-256 is
 `6402da58e23b2b3e8badf7f8794c615d227b52b9550e3cd639ffd258eba77f03`;
 the Darwin arm64 release binary SHA-256 is
 `0fdbb812d25c3bb9ee78f1f8740ee05e7db1d05b52af8e1a80cf59da82d55852`.
-The run will reject any binary or source change against these hashes.
+The independent receipt audit rejects a binary or source change against
+these hashes.
 
 Host `uname -smr`: `Darwin 25.6.0 arm64`; CPU brand: `Apple M4 Pro`.
 Public corpus SHA-256 readback:
