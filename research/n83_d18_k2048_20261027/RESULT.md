@@ -66,3 +66,11 @@ candidate ID, natural yield, final matrix, target logarithm, same-point rho
 and end-to-end timing fields remain null in this construction receipt. The
 prior K16627 U/D m5 panel ended with four `UNKNOWN_budget` natural arms at
 600 seconds each; this smaller base tests a different solver-domain size.
+
+The [native amendment](NATIVE_AMENDMENT_1.md) records a Rust guarded
+export/replay rerun and independent Rust custody and full-row overlap audits.
+Their results match the original construction identities; the original
+Python source snapshots and timing receipts remain historical evidence.
+The [visual report](reports/run-20261027T1915Z/REPORT.md),
+[figure](reports/run-20261027T1915Z/factor_base_overlap.svg), and
+[PDF](reports/run-20261027T1915Z/REPORT.pdf) present the construction result.
