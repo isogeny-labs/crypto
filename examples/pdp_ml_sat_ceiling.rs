@@ -545,8 +545,15 @@ fn transfer(src: &[Row], dst: &[Row], group: &str, nsrc: u32, ndst: u32) -> serd
 
 // ── L3: branching order ─────────────────────────────────────────────
 
+/// Per-solve conflict cap for the L3 arms: `L3_CAP_MULT` × the family's
+/// median default-order refutation (PROTOCOL.md amendment 1).
+const L3_CAP_MULT: u64 = 10;
+
 fn l3(f: &Family, rows: &[Row]) -> serde_json::Value {
     let l = f.l;
+    let mut unsat_c: Vec<u64> = rows.iter().filter(|r| !r.sat).map(|r| r.conflicts).collect();
+    unsat_c.sort();
+    let cap = L3_CAP_MULT * unsat_c[unsat_c.len() / 2];
     let n_x = 3 * l;
     let n_e = 6 * l - 3;
     // Learned order: mean normalised final VSIDS activity over training refutations.
@@ -582,14 +589,18 @@ fn l3(f: &Family, rows: &[Row]) -> serde_json::Value {
     let mut out = serde_json::Map::new();
     let mut a0_sum = 0.0;
     for (name, prio) in &arms {
-        let res: Vec<(u64, u64)> = par_map(test_unsat.clone(), |&x| {
+        let res: Vec<(u64, u64, bool)> = par_map(test_unsat.clone(), |&x| {
             let mut enc = encode(f, x);
             if !prio.is_empty() {
                 enc.solver.set_branch_priority(prio);
             }
-            assert_eq!(enc.solver.solve(), SolveResult::Unsat);
-            (enc.solver.conflicts(), enc.solver.stats.word_ops)
+            enc.solver.conflict_budget = cap;
+            let r = enc.solver.solve();
+            assert_ne!(r, SolveResult::Sat, "{} x_r={x:#x}: arm {name} found SAT on an UNSAT target", f.name);
+            (enc.solver.conflicts(), enc.solver.stats.word_ops, r == SolveResult::Unknown)
         });
+        let capped = res.iter().filter(|r| r.2).count();
+        eprintln!("{} L3 {name}: {} targets, {capped} capped", f.name, res.len());
         let mut c: Vec<u64> = res.iter().map(|r| r.0).collect();
         c.sort();
         let sum: f64 = c.iter().map(|&v| v as f64).sum();
@@ -601,7 +612,9 @@ fn l3(f: &Family, rows: &[Row]) -> serde_json::Value {
         out.insert(
             (*name).into(),
             json!({
-                "targets": c.len(), "median_conflicts": c[c.len() / 2], "sum_conflicts": sum,
+                "targets": c.len(), "capped_at": cap, "capped": capped,
+                "sums_are_lower_bounds": capped > 0,
+                "median_conflicts": c[c.len() / 2], "sum_conflicts": sum,
                 "sum_word_ops": wsum, "ratio_to_a0": sum / a0_sum,
                 "conflicts_per_sorted_triple": sum / nn / triples, "conflicts_per_pair": sum / nn / pairs,
             }),
@@ -613,62 +626,117 @@ fn l3(f: &Family, rows: &[Row]) -> serde_json::Value {
     serde_json::Value::Object(out)
 }
 
+fn label_family(f: &Family) -> Vec<Row> {
+    let mut rng = SplitMix(SEED ^ f.id);
+    let mask = (1u64 << f.n) - 1;
+    let targets: Vec<u64> = (0..f.count)
+        .map(|_| loop {
+            let v = rng.next() & mask;
+            if v != 0 {
+                break v;
+            }
+        })
+        .collect();
+    let base: Vec<F2mElement> = (0..1u64 << f.l).map(|v| elt(v, f.n)).collect();
+    par_map(targets, |&x| run_target(f, &base, x))
+}
+
+/// Rows written by an earlier labelling run, whose labels were already
+/// cross-checked; the target sequence is regenerated and must match.
+fn load_rows(f: &Family, dir: &std::path::Path) -> Vec<Row> {
+    let text = std::fs::read_to_string(dir.join(format!("rows_{}.jsonl", f.name))).unwrap();
+    let mut rng = SplitMix(SEED ^ f.id);
+    let mask = (1u64 << f.n) - 1;
+    let rows: Vec<Row> = text
+        .lines()
+        .map(|line| {
+            let v: serde_json::Value = serde_json::from_str(line).unwrap();
+            let tel = |k: &str| -> [f64; N_TEL] {
+                let a = v[k].as_array().unwrap();
+                std::array::from_fn(|i| a[i].as_f64().unwrap())
+            };
+            let x_r = v["x_r"].as_u64().unwrap();
+            let expect = loop {
+                let t = rng.next() & mask;
+                if t != 0 {
+                    break t;
+                }
+            };
+            assert_eq!(x_r, expect, "{}: saved rows do not match the seeded target sequence", f.name);
+            Row {
+                x_r,
+                sat: v["sat"].as_bool().unwrap(),
+                conflicts: v["conflicts"].as_u64().unwrap(),
+                word_ops: v["word_ops"].as_u64().unwrap(),
+                secs: v["secs"].as_f64().unwrap(),
+                tel: vec![tel("tel64"), tel("tel512")],
+            }
+        })
+        .collect();
+    assert_eq!(rows.len(), f.count, "{}: row count", f.name);
+    rows
+}
+
+fn write_json(path: std::path::PathBuf, v: &serde_json::Value) {
+    std::fs::write(&path, serde_json::to_string_pretty(v).unwrap()).unwrap();
+    eprintln!("wrote {}", path.display());
+}
+
+/// `pdp_ml_sat_ceiling OUT_DIR [--from-rows DIR]`.  Each stage's result is
+/// written as soon as it exists: rows, then `summary_<family>.json` (L1/L2),
+/// `l3_<family>.json`, and `transfer.json`.
 fn main() {
-    let out_dir = std::path::PathBuf::from(std::env::args().nth(1).expect("usage: pdp_ml_sat_ceiling OUT_DIR"));
+    let args: Vec<String> = std::env::args().collect();
+    let out_dir = std::path::PathBuf::from(args.get(1).expect("usage: pdp_ml_sat_ceiling OUT_DIR [--from-rows DIR]"));
+    let from_rows = args.iter().position(|a| a == "--from-rows").map(|i| std::path::PathBuf::from(&args[i + 1]));
     assert!(!out_dir.exists(), "refusing to overwrite {}", out_dir.display());
     std::fs::create_dir_all(&out_dir).unwrap();
-    let mut summary = serde_json::Map::new();
     let mut all_rows = Vec::new();
     for f in families() {
         let t = Instant::now();
-        let mut rng = SplitMix(SEED ^ f.id);
-        let mask = (1u64 << f.n) - 1;
-        let targets: Vec<u64> = (0..f.count)
-            .map(|_| loop {
-                let v = rng.next() & mask;
-                if v != 0 {
-                    break v;
+        let rows = match &from_rows {
+            Some(dir) => load_rows(&f, dir),
+            None => {
+                let rows = label_family(&f);
+                let mut jsonl = String::new();
+                for r in &rows {
+                    jsonl.push_str(&json!({"x_r": r.x_r, "sat": r.sat, "conflicts": r.conflicts, "word_ops": r.word_ops, "secs": r.secs, "tel64": r.tel[0].to_vec(), "tel512": r.tel[1].to_vec()}).to_string());
+                    jsonl.push('\n');
                 }
-            })
-            .collect();
-        let base: Vec<F2mElement> = (0..1u64 << f.l).map(|v| elt(v, f.n)).collect();
-        let rows = par_map(targets, |&x| run_target(&f, &base, x));
+                std::fs::write(out_dir.join(format!("rows_{}.jsonl", f.name)), jsonl).unwrap();
+                rows
+            }
+        };
         let label_secs = t.elapsed().as_secs_f64();
         let sats = rows.iter().filter(|r| r.sat).count();
         eprintln!("{}: {} targets, {} SAT, {:.1}s", f.name, rows.len(), sats, label_secs);
-        let mut jsonl = String::new();
-        for r in &rows {
-            jsonl.push_str(&json!({"x_r": r.x_r, "sat": r.sat, "conflicts": r.conflicts, "word_ops": r.word_ops, "secs": r.secs, "tel64": r.tel[0].to_vec(), "tel512": r.tel[1].to_vec()}).to_string());
-            jsonl.push('\n');
-        }
-        std::fs::write(out_dir.join(format!("rows_{}.jsonl", f.name)), jsonl).unwrap();
         let sat_c: Vec<u64> = { let mut v: Vec<u64> = rows.iter().filter(|r| r.sat).map(|r| r.conflicts).collect(); v.sort(); v };
         let unsat_c: Vec<u64> = { let mut v: Vec<u64> = rows.iter().filter(|r| !r.sat).map(|r| r.conflicts).collect(); v.sort(); v };
         let l12 = l1_l2(&f, &rows);
-        eprintln!("{}: L1/L2 done", f.name);
-        let l3r = l3(&f, &rows);
-        eprintln!("{}: L3 done", f.name);
-        summary.insert(
-            f.name.into(),
-            json!({
+        write_json(
+            out_dir.join(format!("summary_{}.json", f.name)),
+            &json!({
                 "n": f.n, "l": f.l, "targets": rows.len(), "sat": sats,
                 "labels_cross_checked_by_exhaustive_search": rows.len(),
+                "rows_source": from_rows.as_ref().map(|d| d.display().to_string()),
                 "sat_conflicts_median": sat_c.get(sat_c.len() / 2), "unsat_conflicts_median": unsat_c.get(unsat_c.len() / 2),
                 "sat_conflicts_quartiles": [sat_c.get(sat_c.len() / 4), sat_c.get(3 * sat_c.len() / 4)],
                 "unsat_conflicts_quartiles": [unsat_c.get(unsat_c.len() / 4), unsat_c.get(3 * unsat_c.len() / 4)],
+                "unsat_conflicts_min_max": [unsat_c.first(), unsat_c.last()],
                 "label_phase_wall_secs": label_secs,
-                "L1_L2": l12, "L3": l3r,
+                "seed": SEED, "protocol": "research/pdp_ml_sat_ceiling_20261027/PROTOCOL.md",
+                "L1_L2": l12,
             }),
         );
         all_rows.push((f, rows));
     }
     let (f0, r0) = &all_rows[0];
     let (f1, r1) = &all_rows[1];
-    summary.insert(
-        "size_transfer_n15_to_n17".into(),
-        json!([transfer(r0, r1, "F-tel64", f0.n, f1.n), transfer(r0, r1, "F-tel512", f0.n, f1.n)]),
+    write_json(
+        out_dir.join("transfer.json"),
+        &json!({"size_transfer_n15_to_n17": [transfer(r0, r1, "F-tel64", f0.n, f1.n), transfer(r0, r1, "F-tel512", f0.n, f1.n)]}),
     );
-    summary.insert("seed".into(), json!(SEED));
-    summary.insert("protocol".into(), json!("research/pdp_ml_sat_ceiling_20261027/PROTOCOL.md"));
-    std::fs::write(out_dir.join("summary.json"), serde_json::to_string_pretty(&serde_json::Value::Object(summary)).unwrap()).unwrap();
+    for (f, rows) in &all_rows {
+        write_json(out_dir.join(format!("l3_{}.json", f.name)), &l3(f, rows));
+    }
 }

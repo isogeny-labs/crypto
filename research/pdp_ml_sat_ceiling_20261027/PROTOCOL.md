@@ -94,3 +94,17 @@ Nothing about `n = 131`, ECC2K-130 cost, or rho. A gain here is a constant
 on a toy oracle that the product law (`relations × targets × oracle ≈ m·2^n`)
 caps; it is not an index-calculus improvement until carried into an
 end-to-end solve with failed targets and rho charged.
+
+## Amendment 1 (2026-10-27, before any L1/L2/L3 result was seen)
+
+- The first full run was stopped by the session's 2-hour background limit
+  during `n17l6` L3; its L1/L2/L3 results lived only in memory and were never
+  written or read. Its per-target rows (`run1/rows_*.jsonl`, labels
+  cross-checked by exhaustive search on every target) are kept and the
+  analysis is re-run from them (`--from-rows`, which regenerates the seeded
+  target sequence and asserts it matches). The rows were produced after the
+  solver fix in commit "Fix unsound SAT resume after a conflict-budget stop".
+- L3 solves are capped at 10× the family's median default-order refutation
+  conflicts. A capped solve counts at the cap, so a capped arm's sums are
+  lower bounds and its ratio to a0 is a lower bound; the capped count is reported.
+- Each stage's output is written as soon as it exists.
