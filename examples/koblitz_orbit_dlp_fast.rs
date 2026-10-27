@@ -3992,9 +3992,7 @@ mod wide {
             assert!(
                 max_states.checked_mul(2).unwrap()
                     < (1usize
-                        << if indexed5_id31 {
-                            32
-                        } else if indexed4_id31 {
+                        << if indexed5_id31 || indexed4_id31 {
                             32
                         } else if indexed4_table || indexed5_id30 {
                             31
@@ -4050,9 +4048,7 @@ mod wide {
         let root11_request_entries = root_only11.then(|| {
             if indexed4_id31 {
                 indexed5_load80_request(core_states.unwrap_or(max_states))
-            } else if indexed4_table {
-                1usize << 30
-            } else if indexed5_fixed31 {
+            } else if indexed4_table || indexed5_fixed31 {
                 1usize << 30
             } else if indexed5_load75 {
                 max_states

@@ -48,6 +48,10 @@ The 25 example unit tests pass, including boundary encoding, collision
 reconstruction and comparison with real N83 S3 roots. The build used Rust
 1.93.1 on macOS ARM64. This is a local correctness and stage-cost control;
 cross-platform correctness and Tier 1 timing are subsequent gates.
+The measured source is pinned to commit `618fd6590995971981f0e12b4af74bdfda83168f`;
+the later source change only combines identical condition branches for the
+repository's Rust Clippy gate. The independent replay hashes the original
+committed source through Git, preserving the executed version's identity.
 
 ## K128 split-index control
 

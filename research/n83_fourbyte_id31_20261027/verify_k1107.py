@@ -5,6 +5,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import subprocess
 
 from research.n83_fourbyte_id31_20261027 import full_k1107
 from research.n83_indexed5_20261013 import analyze as group
@@ -14,6 +15,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BASE_DUMP_SHA256 = "08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc"
 EXPECTED_SCALAR = 3640978018804724
+EXECUTED_SOURCE_COMMIT = "618fd6590995971981f0e12b4af74bdfda83168f"
 
 
 def sha256(path):
@@ -31,12 +33,18 @@ def one_json(path):
     return json.loads(lines[0])
 
 
+def executed_source_sha256():
+    source = subprocess.check_output(
+        ["git", "show", f"{EXECUTED_SOURCE_COMMIT}:examples/koblitz_orbit_dlp_fast.rs"],
+        cwd=ROOT)
+    return hashlib.sha256(source).hexdigest()
+
+
 def verify(output):
     launch = json.loads((output / "launch.json").read_text())
     receipt = json.loads((output / "receipt.json").read_text())
     checks = {
-        "source_hash": launch["source_sha256"] ==
-            sha256(ROOT / "examples/koblitz_orbit_dlp_fast.rs"),
+        "source_hash": launch["source_sha256"] == executed_source_sha256(),
         "binary_hash": launch["binary_sha256"] ==
             sha256(Path(launch["command"][0])),
         "target_hash": launch["target_sha256"] ==
