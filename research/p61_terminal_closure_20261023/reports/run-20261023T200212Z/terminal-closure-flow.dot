@@ -1,0 +1,28 @@
+digraph terminal_closure {
+  graph [rankdir=LR, bgcolor="transparent", pad="0.25", nodesep="0.42", ranksep="0.65"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, margin="0.14,0.09", color="#334155", fillcolor="#f8fafc", fontcolor="#0f172a"];
+  edge [fontname="Helvetica", fontsize=9, color="#64748b", fontcolor="#475569", arrowsize=0.75];
+
+  seed [label="Registered seed\n(a,b)=(1055,16361)\nx=0", fillcolor="#dbeafe", color="#2563eb"];
+  prefix [label="Immutable prefix checkpoint\nx=19,890,496\nSHA 142b06f9…", fillcolor="#e0f2fe", color="#0284c7"];
+  walk [label="Final degree-13 row action\n3,632 positions × 18 lanes", fillcolor="#f1f5f9"];
+  codomain [label="Velu codomain\nsame j as registered seed\ndifferent coefficient representative", fillcolor="#fef3c7", color="#d97706"];
+  reject [label="Earlier exact-model comparison\nrejects representative mismatch", fillcolor="#fee2e2", color="#dc2626"];
+  link [label="Successor closure\ncheck j, then link codomain\nto stored seed model", fillcolor="#dcfce7", color="#16a34a"];
+  segment [label="Terminal segment\n65,376 nodes + 18 closures\nSHA 1b576b18…", fillcolor="#dcfce7", color="#16a34a"];
+  replay [label="Native replay\nseed 7, two audit points", fillcolor="#ede9fe", color="#7c3aed"];
+  audit [label="Independent structural audit\n65,396 lines\ndense indices + all lanes", fillcolor="#ede9fe", color="#7c3aed"];
+  census [label="Complete census accounting\n358,094,304 vertices", fillcolor="#ccfbf1", color="#0f766e", penwidth=2];
+
+  seed -> prefix [label="certified chain"];
+  prefix -> walk [label="hash-pinned resume"];
+  walk -> codomain [label="terminal action"];
+  codomain -> reject [style=dashed, color="#dc2626", label="old path"];
+  codomain -> link [color="#16a34a", penwidth=2, label="corrected path"];
+  seed -> link [color="#2563eb", label="stored target model"];
+  link -> segment [color="#16a34a"];
+  segment -> replay [label="full reconstruction"];
+  segment -> audit [label="stream every record"];
+  replay -> census [color="#7c3aed"];
+  audit -> census [color="#7c3aed"];
+}
