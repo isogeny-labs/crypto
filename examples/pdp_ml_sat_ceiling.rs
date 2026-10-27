@@ -27,7 +27,6 @@ use crypto_lib::cryptanalysis::sat::{SolveResult, SolverStats};
 use crypto_lib::cryptanalysis::semaev_corpus::CORPUS;
 use crypto_lib::cryptanalysis::semaev_sat::{encode_semaev_s4_with, S4Options, S4SatEncoding};
 use serde_json::json;
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Instant;
 
 const SEED: u64 = 20261027;
@@ -185,26 +184,9 @@ fn run_target(f: &Family, base: &[F2mElement], x_r: u64) -> Row {
     }
 }
 
-fn par_map<T: Send, R: Send>(items: Vec<T>, f: impl Fn(&T) -> R + Sync) -> Vec<R> {
-    let threads = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(1);
-    let next = AtomicUsize::new(0);
-    let mut out: Vec<Option<R>> = (0..items.len()).map(|_| None).collect();
-    let slots: Vec<std::sync::Mutex<&mut Option<R>>> =
-        out.iter_mut().map(std::sync::Mutex::new).collect();
-    std::thread::scope(|scope| {
-        for _ in 0..threads {
-            scope.spawn(|| loop {
-                let i = next.fetch_add(1, Ordering::Relaxed);
-                if i >= items.len() {
-                    break;
-                }
-                let r = f(&items[i]);
-                **slots[i].lock().unwrap() = Some(r);
-            });
-        }
-    });
-    drop(slots);
-    out.into_iter().map(Option::unwrap).collect()
+fn par_map<T: Sync, R: Send>(items: Vec<T>, f: impl Fn(&T) -> R + Sync) -> Vec<R> {
+    use rayon::prelude::*;
+    items.par_iter().map(|x| f(x)).collect()
 }
 
 // ── learner: ridge logistic regression by IRLS ──────────────────────
