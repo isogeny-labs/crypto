@@ -120,3 +120,21 @@ Interpret smoothness only after the saved closure's pure-curve/generic-field
 bridge is stated. It can then identify the local DVR and ramification from
 finite fiber lengths. If rank3 fails,proper ramification stays unproved.
 All native calls remain4GiB/1200s;no failed global normalization is repeated.
+
+## Second-host recovery,2026-10-27
+
+Checkpoint10 restores all9 source commits through021a715657bd. The remote
+PR acquired base merges throughfd85e76f9 while the host was unavailable;its
+research sources are unchanged. Merge the two histories without rewriting.
+The second host lost /var/tmp and its ignored raw runs:the checkpoint helper
+includes source commits but excludes gitignored raw directories. Prior full
+quotient and failure outputs are observed in the session but not durable native
+artifacts;do not claim otherwise or invent their raw logs. The compact literal
+source certificate survived. Re-run only missing verification artifacts and the
+unfinished Z5 regularity check. Preserve this loss in the failure ledger.
+New checkout/results live under /home/ec2-user/crypto-koblitz-r23-recovered.
+REPLAY_NATIVE.sh writes a checkpoint-evidence archive after each native call,
+so the next checkpoint also captures raw results. Each call gates first.
+Corrected Z5 smooth enumeration replaces continue with guarded loop bodies
+and explicitly checks/transposes the Jacobian orientation. Same4GiB/1200s caps.
+No EKS job is active or submitted. Diem remains deadline-expired50/52.

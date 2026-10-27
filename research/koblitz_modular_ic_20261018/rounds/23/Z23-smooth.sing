@@ -8,6 +8,9 @@ ring zz=(2,a),(n,l),lp;
 minpoly=a5+a4+a3+a2+1;
 map sp=r,n,l,a4,a4+a3+1;
 matrix dj=sp(originalJac);
+print("ORIGINAL_JACOBIAN_DIMENSIONS");nrows(dj);ncols(dj);
+if(ncols(dj)!=4 && nrows(dj)==4){dj=transpose(dj);}
+if(ncols(dj)!=4){ERROR("wrong source Jacobian orientation");}
 ideal closedFiber=std(sp(source));
 ideal keepResidue=std(ideal(l2+(a4+a3)*l+(a2+1),n+(a4+a2+1)*l+(a3+a2)));
 ideal vanishResidue=std(ideal(l2+(a4+a3)*l+(a2+1),n+(a4+a2+1)*l+a));
@@ -15,17 +18,17 @@ proc sourceMinor(matrix D,ideal P)
 {
  matrix M[3][3];int i;int j;int omitted;int col;int targetCol;poly d;
  for(i=1;i<=nrows(D);i++){
-  if(i==8){continue;}
   for(j=i+1;j<=nrows(D);j++){
-   if(j==8){continue;}
+   if(i!=8 && j!=8){
    for(omitted=1;omitted<=4;omitted++){
     targetCol=0;
     for(col=1;col<=4;col++){
-     if(col==omitted){continue;}
+     if(col!=omitted){
      targetCol=targetCol+1;
      M[1,targetCol]=reduce(D[8,col],P);
      M[2,targetCol]=reduce(D[i,col],P);
      M[3,targetCol]=reduce(D[j,col],P);
+     }
     }
     d=reduce(det(M),P);
     if(d!=0){
@@ -34,6 +37,7 @@ proc sourceMinor(matrix D,ideal P)
      if(std(P+ideal(d))[1]!=1){ERROR("nonzero residue was not a unit");}
      return(1);
     }
+   }
    }
   }
  }
