@@ -40,6 +40,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -101,6 +102,34 @@ def repo_root() -> Path:
     if p.returncode != 0:
         die("not inside a git repository")
     return Path(p.stdout.strip())
+
+
+_AWS_BOOT_LOCK = threading.Lock()
+_AWS_BOOT: list[list[str]] = []
+
+
+def bootstrap_aws(cfg: "Config") -> list[str] | None:
+    """On a CI runner without the aws CLI (some self-hosted images), install
+    awscli once into the store cache with `pip --target` and return the argv
+    prefix that runs it. Elsewhere, and when ARTIFACTS_AWS names a CLI, None."""
+    if cfg.aws != "aws" or os.environ.get("ARTIFACTS_AWS"):
+        return None
+    if os.environ.get("GITHUB_ACTIONS") != "true" and os.environ.get("ARTIFACTS_BOOTSTRAP_AWS") != "1":
+        return None
+    with _AWS_BOOT_LOCK:
+        if not _AWS_BOOT:
+            target = cfg.cache / "awscli-py"
+            if not (target / "awscli").is_dir():
+                print("artifacts: `aws` not found; installing awscli into the store cache", file=sys.stderr)
+                p = subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "--disable-pip-version-check",
+                                    "--target", str(target), "awscli"], capture_output=True, text=True)
+                if p.returncode != 0:
+                    print(p.stderr[-2000:], file=sys.stderr)
+                    return None
+            code = (f"import sys; sys.path.insert(0, {str(target)!r}); "
+                    "from awscli.clidriver import main; sys.exit(main())")
+            _AWS_BOOT.append([sys.executable, "-c", code])
+        return _AWS_BOOT[0]
 
 
 @dataclass
@@ -320,7 +349,10 @@ class Remote:
         try:
             return subprocess.run(argv, capture_output=True, text=True)
         except FileNotFoundError:
-            die(f"`{argv[0]}` not found; install the AWS CLI or set ARTIFACTS_AWS")
+            boot = bootstrap_aws(self.cfg) if argv[0] == self.cfg.aws else None
+            if boot is None:
+                die(f"`{argv[0]}` not found; install the AWS CLI or set ARTIFACTS_AWS")
+            return subprocess.run([*boot, *argv[1:]], capture_output=True, text=True)
 
     def head(self, digest: str) -> int | None:
         """Size of the stored object, or None when absent."""

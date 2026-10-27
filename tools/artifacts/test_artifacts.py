@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
 
 TOOL = Path(__file__).resolve().parent / "artifacts.py"
@@ -326,6 +327,25 @@ class SparsePattern(unittest.TestCase):
                          ["            tools/artifacts", "            .artifacts"])
         done = wire_workflows.add_sparse_pattern(blk, "      ")
         self.assertEqual(wire_workflows.add_sparse_pattern(done, "      "), done)
+
+
+class AwsBootstrap(unittest.TestCase):
+    """The pip fallback for a missing aws CLI runs only on CI (or when asked) and never
+    overrides a CLI named by ARTIFACTS_AWS."""
+
+    def cfg(self, aws="aws"):
+        return artifacts.Config(root=Path("."), remote="s3://b/p", endpoint=None, read_url=None,
+                                cache=Path(tempfile.gettempdir()) / "unused", aws=aws)
+
+    def test_off_outside_ci(self):
+        env = {k: v for k, v in os.environ.items()
+               if k not in ("GITHUB_ACTIONS", "ARTIFACTS_BOOTSTRAP_AWS", "ARTIFACTS_AWS")}
+        with unittest.mock.patch.dict(os.environ, env, clear=True):
+            self.assertIsNone(artifacts.bootstrap_aws(self.cfg()))
+
+    def test_named_cli_is_respected(self):
+        with unittest.mock.patch.dict(os.environ, {"GITHUB_ACTIONS": "true", "ARTIFACTS_AWS": "/opt/aws"}):
+            self.assertIsNone(artifacts.bootstrap_aws(self.cfg("/opt/aws")))
 
 
 class S3Argv(unittest.TestCase):
