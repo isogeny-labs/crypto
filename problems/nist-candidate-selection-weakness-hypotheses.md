@@ -4,8 +4,8 @@
 - **Kind:** unknown selection cause; missing applicable attack construction and validation
 - **Affected work:** [selected/skipped comparison and protocol](../research/curve_candidates_dissect_20261021/hypotheses/REPORT.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-26
-- **Latest search:** [25–26 October full-census criterion search](../research/nist_skip_criterion_20261025/REPORT.md)
+- **Last updated:** 2026-10-27
+- **Latest search:** [27 October FreeLIP source and full-census replay](../research/nist_skip_criterion_20261025/freelip_replay_20261027/REPORT.md)
 
 ## Problem
 
@@ -59,6 +59,19 @@ decision log.
 - **Derived or proved:** primality and product checks certify the recorded
   factorizations; generator and Hasse checks certify the six prime full
   orders. These are computational checks, without Lean formalization.
+- **Observed:** [recovered FreeLIP 1.0/1.1](../research/nist_skip_criterion_20261025/freelip_replay_20261027/REPORT.md)
+  completed all84 fixed calls (two routines in both versions on all21 original
+  orders). Every configuration accepts all10 published and all11 skipped
+  orders, with no rejection or unknown after source-faithful saved-output
+  validation. The original wrapping outputs and initial observer unknowns
+  remain preserved; no legacy rerun was used for that correction. These
+  routines do not explain the skips when fed the correct group orders.
+- **Proposed source connection:** zprobprime(n,7) performs a base2 test then
+  seven random-base trials, consistent with a possible cause of the published
+  seven-call FreeLIP warmup. Rejection sampling and absent original-caller
+  evidence prevent equating this with seven state advances or claiming that
+  the historical generator used that call. No new base-point reconstruction
+  was executed.
 - **Observed:** the [exact embedding-degree test](../research/nist_skip_criterion_20261025/exact_embedding_20261026/REPORT.md)
   computed and separately certified all21 minimal degrees. None of ten
   published curves has maximal degree; two skipped curves do. The fixed
@@ -145,3 +158,11 @@ saved packet revalidated without a legacy rerun. Twelve genuine failed
 theorem transcripts remain indeterminate. All failed preparation/runtime
 attempts and the initial restrictive-reader results are retained. This is
 additional negative evidence, not completion of the historical selector goal.
+
+2026-10-27: tested actual recovered FreeLIP source because its RNG is linked
+to six published May1997 base points. Both original versions and both routes
+accept the complete census. This excludes these fixed correct-order primality
+paths as a universal skip explanation; a caller feeding incorrect point
+counts, a different implementation/configuration, or another acceptance step
+remains outside the test. A source-derived seven-call mechanism is proposed,
+not historical attribution. The original criterion remains unresolved.
