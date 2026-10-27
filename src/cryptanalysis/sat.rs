@@ -2409,6 +2409,17 @@ impl Solver {
         }
     }
 
+    /// Per-variable VSIDS activity, indexed by `var − 1`.  Read-only;
+    /// for studies that learn a branching order from finished solves.
+    pub fn activities(&self) -> &[f64] {
+        &self.activity
+    }
+
+    /// Variables assigned at decision level zero.
+    pub fn root_fixed_count(&self) -> usize {
+        self.trail_lim.first().copied().unwrap_or(self.trail.len())
+    }
+
     /// Cumulative conflicts across all calls to [`Self::solve`].
     ///
     /// A machine-independent measure of search effort: unlike wall
