@@ -278,6 +278,17 @@ The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 con
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | ic-k16-control | 0/80 | — | — | — | A/A control |
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | K16 / K8 | — | — | — | — | unknown (0 verified pairs) |
 
+## n41 higher-arity extraction and matched rho, outside tables A–C
+
+One public target, three paired measured rounds, L0. B2 and B3 use the same pair-cell stream and verified the same relations; B3 replaces each S4 solve with two S3 chains but charges three point additions per cell. All IC figures are lower bounds because named native work is unpriced. Read the [study](../../research/koblitz_higher_arity_rho_20261013/README.md).
+
+| arm | mean cold S (lower bound) | ratio to strong rho |
+|:--|--:|--:|
+| strong rho | 0.138 | 1.000 |
+| B2 quartic | 0.761 | 5.513 |
+| 4-sum | 5.524 | 40.027 |
+| B3 two-S3 chain | 7.652 | 55.447 |
+
 ## Linear-algebra engine, outside tables A–C
 
 The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime (class: engineering). Whole solve from relation rows to verified logarithms, median of 3 seeds in one session; ratios are per-seed medians [min, max]. `legacy` is the filter tables A–C were measured with; `CADO-style` is `FilterOptions::cado()` (CADO-NFS's purge and merge, ported), the `ic logs` default since #1861; CADO-NFS ran its own purge + merge-dl + bwc on the same matrices (+1 coefficients). Its share of S in every row above is in the phase table, and no row moves. Study: [research/la_engines_20261014/](../../research/la_engines_20261014/).
@@ -705,6 +716,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
+- `research/koblitz_higher_arity_rho_20261013/evidence.json` — sha256 `7d44f251436968db…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
