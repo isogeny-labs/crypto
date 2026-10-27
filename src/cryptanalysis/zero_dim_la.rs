@@ -863,7 +863,6 @@ fn kara_threshold() -> usize {
     })
 }
 
-/// `out[..la + lb − 1] = a · b` by schoolbook, lazily (one reduction per output).
 thread_local! {
     /// Products the polynomial kernels below execute, one per nonzero
     /// coefficient times the row it scales (`school_into`, `square_into`,
@@ -880,6 +879,7 @@ fn kmuls() -> u64 {
     KMULS.with(|c| c.get())
 }
 
+/// `out[..la + lb − 1] = a · b` by schoolbook, lazily (one reduction per output).
 fn school_into(fp: &Fp, a: &[u32], b: &[u32], out: &mut [u32], lo: &mut [u64], hi: &mut [u64]) {
     let len = a.len() + b.len() - 1;
     let (lo, hi) = (&mut lo[..len], &mut hi[..len]);
