@@ -76,6 +76,7 @@ pub mod rootfind;
 pub mod shared_rank;
 pub mod solvers;
 pub mod stages;
+pub mod subspace_select;
 
 use std::time::Instant;
 
