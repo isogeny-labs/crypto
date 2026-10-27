@@ -63,13 +63,17 @@ plane-quotient criterion to prove `RingHom.Smooth` for the full affine chart
 over a perfect field of characteristic other than two with a squarefree
 quintic. `WeightedInfinitySquarefreeSmooth.lean` combines the derivative-open
 and overlap results to prove `RingHom.Smooth` for the full explicit infinity
-coordinate ring under the same hypotheses. Actual weighted-Proj global
-Smooth remains open pending chart-to-structure-map equalities.
+coordinate ring under the same hypotheses.
 `WeightedProjGlobalSmooth.lean` proves the exact conditional global step:
 the actual Proj structure morphism is Smooth if each basic-open restriction
 equals the canonical chart isomorphism followed by the corresponding
-`Spec.map` of the field-to-chart-ring algebra map. Those two equalities are
-still unproved, so this theorem does not close global Smooth.
+`Spec.map` of the field-to-chart-ring algebra map. `WeightedProjChartStructure.lean`
+checks the corresponding chart structure maps. `WeightedProjSmoothFinal.lean`
+proves both required precomposition equalities and applies the two-open
+reduction to establish `Smooth` for the actual weighted-Proj structure map
+over a perfect field of characteristic other than two with a squarefree
+quintic. Its direct pinned Lean compile exited zero and its axiom audit
+lists only `propext`, `Classical.choice`, and `Quot.sound`.
 
 `WeightedAffineRingSmooth.lean` proves a generic plane-quotient criterion:
 if the quotient images of both partial derivatives span the unit ideal,
@@ -85,8 +89,17 @@ infinity-chart origin with `Localization.AtPrime` of the explicit chart ring.
 that the transported `w` germ is a uniformizer and the transported `z` germ
 has valuation order two. These local facts do not establish a global
 principal divisor or equality in `Pic⁰`.
+`Common22FiniteZeroOrder.lean` proves a conditional nonbranch valuation
+identity for the norm factors in a DVR. `Common22BranchStalk.lean` constructs
+an actual finite branch-point stalk and its localization.
+`Common22BranchParameter.lean` proves the branch factor identity and that
+its complementary factor is a unit when the quintic derivative is nonzero.
+`Common22BranchValuation.lean` proves `ord(x-a)=2 ord(y)` in that actual
+localization, explicitly assuming it is a domain and a DVR. The affine
+domain, branch DVR instance, `ord(y)=1`, and global divisor/Picard transport
+are not proved by these files.
 
-This identifies both scheme charts, establishes their finite affine cover and properness over `K`, proves both explicit coordinate-ring structure maps Smooth under the stated hypotheses, constructs a surjective glued-curve-to-Proj morphism, and proves the actual Proj stalk at infinity is a DVR with the stated local orders. Global weighted-Proj Smooth, an open-immersion/inverse theorem for the glued morphism, global divisor-class transport, the `Pic⁰` class equation, and the Rust-to-Lean execution bridge remain open. The finite-zero multiplicity argument in [PROOF_AUDIT.md](../PROOF_AUDIT.md) is written mathematics, not a Lean divisor theorem.
+This identifies both scheme charts, establishes their finite affine cover and properness over `K`, proves the actual weighted-Proj structure map Smooth under the stated hypotheses, constructs a surjective glued-curve-to-Proj morphism, and proves the actual Proj stalk at infinity is a DVR with the stated local orders. An open-immersion/inverse theorem for the glued morphism, global divisor-class transport, the `Pic⁰` class equation, and the Rust-to-Lean execution bridge remain open. The finite-zero multiplicity argument in [PROOF_AUDIT.md](../PROOF_AUDIT.md) is written mathematics, not a Lean divisor theorem.
 
 The new source SHA-256 values, in dependency order, are `4f775fb6ac97fb2d478c2e550a955351df0ab730a5e344712ca5f4930cfb61b5` (`WeightedRingComponent`), `b810dd4a6024bc77a7b8de1916c217caf8e1a0de2d555448c73a5d2515ff865c` (`WeightedRingGraded`), `f02b2f827ca8123f3daabbf19b15d25f9f7793ab7693e8a795bec5572a9d4010` (`WeightedChartKernelRec`), `ed6c4bc5b88acefa45fa00ed6ee83655b580e41e8f1d4fa0186777b821abab89` (`WeightedChartRoute`), `fbcb3cae7cc4c9d7f0722da5f546892bb4cde848eb072580486be3c7a9ecd433` (`WeightedChartIso`), `ffa7dd90d349648f22ab4d86cb18d557f6fb1b93bf5bd78febd116d4e95afd29` (`WeightedProjSchemeChart`), and `58dd0a75dbc7544cdd127314a0ffea33d6551766ddc0cc0dc2774f4861f243a0` (`WeightedProjCover`). The five further files are `19745cadc9e00fdb5e052e872c0a3739fe9856390ea10c65aa8a441f8836367d` (`WeightedChartDehomog`), `2ce21319bf69de82a24d99e8d118ce6eedb132134eecf17b03c2f0b627c52441` (`WeightedInfinityOrdinary`), `95e0e583514cb3f65ca14040079f7a5be68970e38e15e313265af0bdf3c3e17c` (`WeightedProjInfinityChart`), `d0861dc892c5d7f047ae08d95948e59b68e1df37958475fca59f129649644ef8` (`WeightedProjProper`), and `59109ab636ff9331997cfcb06a1190c5a245ff8385e783a7d2de5761e714c157` (`WeightedProjBase`). The bounded follow-ups are `e0618f97117ca6ba52010da028958cdba26dcf2e5909a1d358e8717d9a709ff9` (`WeightedProjSmoothPoints`), `75fff6c37fcced8bf28e33afc5af3d30dee6dcb07a6e2d8caa1520458fbb2162` (`WeightedJacobianIdeal`), and `12c2308c91e42aab0c090afd03d5a86634896c590f76def0b12a1c8a5a33eca2` (`WeightedOverlapScratch`), and `0dec04a522aacdbccd6cfe4c7956a11838ca372eafadc5ddc0fbb86d5a388e75` (`WeightedOverlapFull`), and `ba604cbd287f179804be77598c72e78b41c9a968feadea63a1bef6bd70603eed` (`WeightedOverlapEquality`), and `06eecf27628466109d71494edb50c279798fe987090a93b43c2c3bab5e1ea720` (`WeightedOverlapMapEquality`), and `dbd8e1a5489ee6fd158e2541b2576ea4cc2bde9edc86ead716553b74399d5925` (`WeightedOverlapScalar`). All nineteen compiled with Lean `v4.34.1` and Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612`, exit status 0. Their theorem axiom audits list only `propext`, `Classical.choice`, and `Quot.sound`; no `sorryAx` occurs.
 
@@ -143,8 +156,9 @@ and `WeightedInfinityOpenSmooth.lean`
 Each compiled with `lake env lean` under the same pins; the audited theorems
 use only `propext`, `Classical.choice`, and `Quot.sound`, with no `sorry`.
 The explicit full infinity-ring Smooth theorem is supplied by the later
-`WeightedInfinitySquarefreeSmooth.lean`; global Proj Smooth, global scheme
-isomorphism, and `Pic⁰` conclusions remain open as specified in the CSV.
+`WeightedInfinitySquarefreeSmooth.lean`; `WeightedProjSmoothFinal.lean`
+subsequently closes global Proj Smooth. Global scheme isomorphism and
+`Pic⁰` conclusions remain open as specified in the CSV.
 
 `WeightedAffineRingSmooth.lean` has SHA-256
 `81a29e680f4f3e6a9eaaecc2e53f15308d5e2abca3c90ffa5635185ca231cc56`;
@@ -177,13 +191,29 @@ and `WeightedInfinitySquarefreeSmooth.lean`
 (`6c0fc6dc5eebd8521e8bea995bd1939bce19d2dab718f294a98bf7dce09d5bd0`).
 Their audited DVR/valuation, surjectivity, and infinity-ring Smooth theorems
 list only the three standard axioms. The map from the glued scheme is not yet
-proved an open immersion, and chart Smooth has not yet been transported to
-the actual global weighted-Proj structure map.
+proved an open immersion. The later `WeightedProjSmoothFinal.lean` transports
+chart Smooth to the actual global weighted-Proj structure map.
 `WeightedProjGlobalSmooth.lean`
 (`b982f50703e629b6722d347c31b0256c2a280443d510ffdccc51d0974de32fc9`)
 also compiled directly under the same pins. Its audited conditional global
 Smooth theorem lists only the three standard axioms; its two chart-map
-equalities remain explicit unproved premises.
+equalities are discharged by `WeightedProjSmoothFinal.lean`.
+
+The post-migration checked sources are `Common22FiniteZeroOrder.lean`
+(`ca90cf839`), `WeightedProjGlueOpenImmersion.lean` (`c964d7e18`),
+`Common22BranchStalk.lean` (`686c9fce0`),
+`WeightedProjChartStructure.lean` (`f061f6837`),
+`Common22BranchParameter.lean` (`535a9e998`),
+`WeightedProjGlueInjective.lean` (`e1b00aa48`),
+`Common22BranchValuation.lean` (`cb7b317d0`), and
+`WeightedProjSmoothFinal.lean` (`37e44a178`). The last source has SHA-256
+`9aaf5174d4196aa269b599a7171440cc0e07c5f4d05ab3e019892215ce35cd6c`.
+All their reported public theorems compiled directly with pinned Lean 4.34.1
+and Mathlib `d13f23b`; axiom audits list only `propext`, `Classical.choice`,
+and `Quot.sound`. The glue files establish open-immersion and isomorphism
+only under explicit injectivity or cross-chart premises. The branch-order
+file assumes a domain and DVR at the actual branch localization. Neither
+conditional result is a completed global Picard-class proof.
 
 The required `RUST_TEST_THREADS=1 cargo test --release --lib --offline --locked`
 was run with these proof-only changes. The [first raw log](validation/release-library-first.log)

@@ -45,6 +45,14 @@ squarefree_affine_ring_smooth,checked,WeightedAffineSquarefreeFinal.lean,affine 
 squarefree_infinity_ring_smooth,checked,WeightedInfinitySquarefreeSmooth.lean,full explicit infinity coordinate ring over a perfect field of characteristic other than two and squarefree quintic,transport chart structure map to actual Proj then prove global Smooth
 conditional_global_proj_smooth,checked,WeightedProjGlobalSmooth.lean,actual weighted Proj structure map is Smooth if both basic-open restrictions equal canonical chart structure maps,two chart-to-structure-map equalities remain unproved
 glued_to_proj_surjective,checked,WeightedProjGlueIso.lean,checked glued-to-Proj morphism is surjective on scheme points,prove open immersion and inverse
-global_smoothness,open,,weighted Proj under smooth-curve hypotheses,prove both actual chart restriction equalities then apply two-open Smooth reduction
+conditional_nonbranch_zero_order,checked,Common22FiniteZeroOrder.lean,DVR norm-factor order identity under explicit unit and nonbranch assumptions,construct actual finite stalk and global divisor
+finite_branch_stalk,checked,Common22BranchStalk.lean,actual affine Spec branch point and stalk localization,prove affine domain and branch DVR
+finite_branch_factor_unit,checked,Common22BranchParameter.lean,branch identity and complementary factor unit when quintic derivative nonzero,prove branch DVR and uniformizer
+conditional_finite_branch_order,checked,Common22BranchValuation.lean,ord(x-a)=2 ord(y) at actual branch localization assuming domain and DVR,derive domain and DVR instance then prove ord(y)=1
+proj_chart_structure_maps,checked,WeightedProjChartStructure.lean,both actual Proj chart structure-map identities,supplied to final smoothness theorem
+proj_chart_precomposition,checked,WeightedProjSmoothFinal.lean,both chart precomposition equalities with actual Proj structure map,none for global Smooth
+conditional_glued_open_immersion,checked,WeightedProjGlueOpenImmersion.lean,each chart into Proj is an open immersion; global map if injective,prove cross-chart image equality
+conditional_glued_injectivity,checked,WeightedProjGlueInjective.lean,same-chart injectivity and global injectivity conditional on cross-chart equality,prove cross-chart overlap equality
+global_smoothness,checked,WeightedProjSmoothFinal.lean,actual weighted Proj over a perfect field with 2 nonzero and squarefree quintic,none for scheme Smooth; glued Proj isomorphism and Pic0 remain open
 overlap_gluing_comparison,open,,D_X and D_Z overlap,prove checked glued-to-Proj morphism is an open immersion then use surjectivity to obtain isomorphism
 projective_completion_pic0,open,,global geometry,prove cover gluing completion and Pic0 transport
