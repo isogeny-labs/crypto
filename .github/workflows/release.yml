@@ -795,6 +795,14 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/
+            /docs/curves/
+            /tools/artifacts/
+            /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
         shell: bash
         working-directory: ${{ github.workspace }}
@@ -833,6 +841,14 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/
+            /docs/curves/
+            /tools/artifacts/
+            /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
         shell: bash
         working-directory: ${{ github.workspace }}

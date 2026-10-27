@@ -46,3 +46,11 @@ PR #2165 head 2d0b3a2a997614410ffef4f9dbebfb4ca85f9647 has no remaining file del
 PR #2697 head 0e50ff68ccc2ce897b88212265e340c9b942d3fc now contributes only five artifact-wiring regression tests; the implementation and workflow repairs are already on main. Those tests are retained and all 27 artifact tests pass. The original author history is preserved rather than reconstructing it with cherry-picks.
 
 PR #2694's journal and timestamped session note are retained exactly as an early-day historical observation. The session-log conflict retained both that note and main's subsequent Lean-build entry; no later observation is overwritten. These additional merges alter only artifact tests and journal/session documentation relative to the dry-run source at 9918decb2. CUDA and production source are unchanged.
+
+## Dry-run result and bounded publisher checkouts
+
+The feature-branch Release dry run [40564308149](https://github.com/isogeny-labs/crypto/actions/runs/40564308149), at source 9918decb2, passed its CUDA compile job 122401506011 on the restored Ubuntu 24.04 image. The exact source-tree IDs and hosted job receipt are retained. This establishes compilation, not GPU execution. Other build jobs were still running at this checkpoint.
+
+The same run exposed a separate asset-check failure: checkout spent 4m59s fetching the full source tree, then the five-minute job was cancelled before either bootstrap or the publication test ran. The asset-check and final publisher checkouts now request only `.github/scripts`, the existing curve bootstrap inputs, `tools/artifacts` and `.artifacts`, using blob filtering. Both existing timeouts, all publication/checksum controls and the main-only publication guard are preserved.
+
+All nine existing publication controls pass locally, also in an isolated fixture containing only the two publisher script files. Actionlint, all 501 workflow budgets and generated artifact wiring pass. A fresh hosted dry run is required to verify the bounded checkout; the earlier cancelled job is retained as a failed attempt rather than called successful.
