@@ -274,3 +274,24 @@ and quiet isolation preflight in a new `runs-host-048baef2/` tree.
 The snapshot copy, if used to recover the former host, is mounted read-only;
 its raw output is retained separately. An on-demand launch remains denied
 by the account's identity policy at the last dry-run.
+
+The second replacement's pre-timing controls completed before A/A.
+Clean synthetic source snapshots are base
+`e0c1570149327ceae8c2a915f357acdd1dfe7e43` and candidate
+`574742e00deb26986b03ad4d2e4ac6e194843494`; their `src/` trees
+differ only in the named Koblitz algorithm file. Native binaries built on
+this host with rustc 1.99.1 and frozen Cargo.lock have SHA-256:
+base `87d4dacf96cb369ec64038d9e8866ba2c44dbd4d51b890e0cbfa9651e6d054a5`,
+candidate `d0989e0273b44e6831942e080bc8208de23e37be7e8e8cb243ec53f3692769cf`,
+runner `ca8b91924cfc540c86b1eb74e9ebf61b64eeeed6fa72e99a2c7fcb5c47bdfb6b`,
+isolation `03d5b835157361b997c9643b5320bb8df2a778463c9fe50d66bcad133b3ed3df`.
+`icprog host-class r13` passed; 24/24 frozen holdouts rederived
+byte-for-byte; the untimed pin held all 90/90 v0 rows with agreeing names.
+A fresh `runs-host-048baef2/host.json` records the clean candidate source
+snapshot, CPU model, 32 logical CPUs, and base/candidate binary hashes.
+Its `runner-config.json` fixes CPU 2 and sibling 18, one Rayon thread,
+and unset `KIC_RHO_CANON`. Pre-timing raw records and logs were copied to
+the S3 checkpoint prefix
+`20261027T143531Z-6570479e16fc/worker-runs-host-048baef2/`.
+This is a new host cohort; none of its samples may be pooled with either
+prior host. Its A/A may begin only with the unchanged isolation preflight.
