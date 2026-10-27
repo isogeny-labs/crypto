@@ -29,6 +29,12 @@ and the runnable [`ic_custom_pipeline` example](../../examples/ic_custom_pipelin
 Application-owned registries and matrix factories allow downstream composition
 without editing the CLI's built-in lists.
 
+For one-command structured-base search with live CADO-style progress, exact
+inventories, verified decomposition probes and resumable attempts, see
+[the native factor-base sweeper](factor-base-sweep/README.md). Its live rates
+and ETAs are provisional diagnostics; it does not certify regularity or a
+complete discrete-log speedup.
+
 ```bash
 cargo build --release --bin ic
 

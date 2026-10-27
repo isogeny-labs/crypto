@@ -1,0 +1,263 @@
+{
+  "baseline": {
+    "algorithm": "Pollard rho on <G>",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
+    "equivalence_class_reason": "negation and the 2^1-Frobenius: E is defined over F_(2^1), so classes have size 2*15/1 = 30 (upper bound on the speedup)",
+    "equivalence_class_size": 30,
+    "log2_cost_of_one_group_operation": 9.514,
+    "log2_group_operations": 1.733,
+    "log2_r": 7.721,
+    "log2_total": 11.248,
+    "log2_total_negation_only": 13.201
+  },
+  "candidate": {
+    "id": "cover:binary_g3_deg3",
+    "label": "same-field genus-3 cover H -> E of degree 3 over F_(2^15), v^2+u^2 v = u^7+a u^4+d u",
+    "transfer_type": "genus_cover"
+  },
+  "carried": true,
+  "checks": [
+    {
+      "evidence": "OrdinaryBinaryCover::verify_certificate: d^2 = b, defining-equation substitution, genus 3, degree 3, separable, ramification at infinity and at (0,0)",
+      "name": "cover_certificate_replay",
+      "result": "PASS"
+    },
+    {
+      "evidence": "PullPushCompositionCertificate: formal pushforward of the pullback of [G]-[O] equals [3]G (a typed witness, not a general Jacobian norm)",
+      "name": "pull_push_equals_multiplication_by_three_on_G",
+      "result": "PASS"
+    },
+    {
+      "evidence": "gcd(3, r) = 1: with phi_* phi^* = [3], the pullback is injective on <G> once the exact order of <G> is established (it is: validation)",
+      "name": "degree_coprime_to_r",
+      "result": "PASS"
+    },
+    {
+      "evidence": "T = (0, sqrt b) is on E and 2T = O; it is the branch point of the cover over x = 0 (ramification index 3)",
+      "name": "rational_two_torsion_point",
+      "result": "PASS"
+    }
+  ],
+  "costs": {
+    "destination_solver": "RhoOnJacobian",
+    "log2_baseline": 11.248,
+    "log2_cost_ratio": 5.275,
+    "log2_total": 16.523,
+    "log2_total_frozen_model": 18.335,
+    "repo_ratio_log2": -3.321,
+    "rows": [
+      {
+        "formula": "d = sqrt(b) = b^(2^(n-1)): at most n field multiplications",
+        "log2": 10.099,
+        "phase": "map_construction",
+        "status": "modeled"
+      },
+      {
+        "formula": "g elliptic operations over the source field: log2 g + log2(10 * M(source_bits)); a lower bound, the conorm-norm formulas are not implemented",
+        "log2": 11.099,
+        "phase": "transfer_evaluation",
+        "status": "modeled"
+      },
+      {
+        "formula": "the cheapest destination solver is not index calculus on the Jacobian",
+        "log2": null,
+        "phase": "relation_collection",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "see relation_collection",
+        "log2": null,
+        "phase": "linear_algebra",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "RhoOnJacobian: CostModel::jacobian_destination; phases not split by the model; rho on the image discounted by 1.953 bits = 0.5 log2(c/2) for its equivalence class c = 30 (the map is defined over the subfield that gives E its class, so the class lifts to the image)",
+        "log2": 16.33,
+        "phase": "destination_solve_unsplit",
+        "status": "modeled"
+      },
+      {
+        "formula": "the discrete logarithm of the image is the logarithm of the source (homomorphism), so recovery is free; one scalar multiplication on E verifies it: log2(1.5 log2 r) + log2(op)",
+        "log2": 13.048,
+        "phase": "descent_back_mapping",
+        "status": "modeled"
+      }
+    ],
+    "solvers_considered": [
+      [
+        "RhoOnJacobian",
+        16.33
+      ],
+      [
+        "HyperellipticIndexCalculus",
+        37.796
+      ],
+      [
+        "EngeGaudrySmoothness",
+        34.42
+      ]
+    ],
+    "total_is_lower_bound": false,
+    "unit": "log2 bit operations (frozen formula model; measured rows say so)"
+  },
+  "curve": {
+    "family": "binary",
+    "field": {
+      "a": "0x1",
+      "b": "0x1",
+      "degree": 15,
+      "kind": "binary",
+      "log2_size": 15,
+      "model": "y^2+xy=x^3+a*x^2+b",
+      "modulus": "0x8003"
+    },
+    "instance_checks": [
+      {
+        "evidence": "modulus irreducible (Rabin), coefficients canonical, b != 0 (ordinary binary model)",
+        "name": "field_and_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "G affine, y^2+xy = x^3+ax^2+b",
+        "name": "generator_on_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "r passes Miller-Rabin to bases 2..53 (Proved); [r]G = O, G != O, so G has exact order r",
+        "name": "subgroup_order_is_prime_and_annihilates_generator",
+        "result": "PASS"
+      },
+      {
+        "evidence": "#E = cofactor * r = q + 1 - t, Hasse bound holds, two seeded random points are annihilated by #E (evidence for the recorded order, not a point-count proof)",
+        "name": "order_consistency",
+        "result": "PASS"
+      },
+      {
+        "evidence": "curve_traits::compute run live on this instance",
+        "name": "traits_record",
+        "result": "PASS"
+      }
+    ],
+    "name": "toy-k1-n15",
+    "registered": false,
+    "slug": "unregistered-toy-k1-n15",
+    "subgroup": {
+      "cofactor": "154",
+      "generator": [
+        "0x10a7",
+        "0x5106"
+      ],
+      "order": "32494",
+      "r": "211",
+      "r_log2": 7.721,
+      "trace": "275"
+    }
+  },
+  "evaluation": {
+    "reason": "the priced total is 5.3 bits above the matched baseline",
+    "status": "excluded"
+  },
+  "executed": {
+    "api": "binary_ecc::OrdinaryBinaryCover::{pullback_point_class, pull_push_composition_certificate, subgroup_transfer_status}",
+    "subgroup_report": {
+      "additivity_passed": 4,
+      "additivity_total": 4,
+      "failures": [],
+      "image_is_identity": false,
+      "image_order_is_r": true,
+      "kernel_meets_subgroup": false,
+      "map_evaluation_errors": 0,
+      "r_is_prime": true,
+      "scalar_equivariance_passed": 3,
+      "scalar_equivariance_total": 3,
+      "source_generator_order_is_r": true,
+      "status": "verified"
+    }
+  },
+  "invariants": {
+    "degree": 3,
+    "destination": "Jac(H)(F_q), q = 2^n, genus 3, one rational point at infinity",
+    "genus": 3,
+    "ic_leading_exponent_in_log2_q": 1.333,
+    "rational_two_torsion": {
+      "count": 2,
+      "points": [
+        "O",
+        "(0, sqrt b)"
+      ]
+    },
+    "rho_leading_exponent_in_log2_q": 0.257
+  },
+  "lead_class": "boundary",
+  "map": {
+    "construction_status": "executed",
+    "degrees": {
+      "cover_degree": 3,
+      "genus": 3,
+      "ramification": "index 3 at infinity and at (0,0)"
+    },
+    "destination": "Jac(H)(F_(2^15)), genus 3",
+    "explicit_formulas": "(u,v) -> (u^3, u v + d); pullback of (x,y), x != 0: U = t^3 + x, V = ((y+d)/x) t^2",
+    "field_of_definition": "F_(2^15)",
+    "source": "E(F_(2^15))",
+    "type": "pullback phi^*: E(F_q) -> Jac(H)(F_q), P -> phi^*([P]-[O])"
+  },
+  "notes": [
+    "structure exists and the subgroup is carried (verified), but the destination is a genus-3 Jacobian over the same field: the exponent is (4/3) log2 q against rho's 0.5 log2 r",
+    "rho on the Jacobian image is priced with the same equivalence class as the baseline (c = 30: the cover is defined over the subfield that gives E its Frobenius class, which commutes with phi^*); the total under the frozen model alone, without that discount, is costs.log2_total_frozen_model and is what the cross-check against docs/curves/jacobian-transfers.json compares"
+  ],
+  "obligations": {
+    "computational_advantage": "refuted",
+    "existence": "supported",
+    "explicit_construction": "supported",
+    "map_correctness": "supported",
+    "scaling_support": "unknown",
+    "subgroup_preservation": "supported"
+  },
+  "open_obligations": [
+    "pushforward of an arbitrary Jacobian class is implemented only for one fixed F_8 fixture (problems/binary-cover-arbitrary-jacobian-norm-missing.md); recovery needs only the logarithm of the image, so this does not block the cost row",
+    "no index calculus exists in the repository for a genus-3 binary Jacobian; the destination price is the frozen formula (hyperelliptic_ic_bench measures odd-characteristic Jacobians only)"
+  ],
+  "references": [
+    "docs/curves/COVERS.md (ordinary binary models)",
+    "src/binary_ecc/cover_transfer.rs",
+    "crypto-autoresearcher ledger IDEA-20261009-275a14"
+  ],
+  "schema": "transfer-audit/certificate/v2",
+  "subgroup_preservation": {
+    "antecedents": [
+      {
+        "evidence": "consistency with phi_* phi^* = [3]",
+        "name": "gcd(3,r)=1",
+        "result": "PASS"
+      }
+    ],
+    "argument": "phi^*(G) has exact order r in Jac(H)(F_q) (r prime, phi^*(G) != O, [r]phi^*(G) = O), so phi^* is injective on <G>; additivity and scalar equivariance sampled",
+    "executed": {
+      "planted_scalar_bits": 8,
+      "subgroup_report": {
+        "additivity_passed": 4,
+        "additivity_total": 4,
+        "failures": [],
+        "image_is_identity": false,
+        "image_order_is_r": true,
+        "kernel_meets_subgroup": false,
+        "map_evaluation_errors": 0,
+        "r_is_prime": true,
+        "scalar_equivariance_passed": 3,
+        "scalar_equivariance_total": 3,
+        "source_generator_order_is_r": true,
+        "status": "verified"
+      }
+    },
+    "image_order": "211",
+    "kernel_meets_subgroup": false,
+    "method": "executed: pullback of the generator, Cantor arithmetic in Jac(H), generic checker",
+    "status": "verified"
+  },
+  "tool": "transfer-audit/2",
+  "verdict": "no weakness found in scope",
+  "verdict_basis": [
+    "priced route costs 2^5.3 times the matched baseline or more"
+  ]
+}

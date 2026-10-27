@@ -850,7 +850,7 @@ fn extension_routes(
                     if rb.model.extension_measured_solve_mults.iter().any(|&(kk, _)| kk == k) {
                         "measured"
                     } else {
-                        "degree_cubed_floor"
+                        "degree_cubed_estimate"
                     },
                 ),
             ),
@@ -874,8 +874,8 @@ fn extension_routes(
             enge_gaudry_hypothesis_holds: false,
         },
         vec![
-            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve".into(),
-            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement".into(),
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at the estimate D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system (a dense FGLM-style solve; not a lower bound)".into(),
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; C_3 = 0.876e6 is measured, and C_4 = 8.69e10 is the plain S_5 solve with sparsest pivots, the chain eigen step and shape replay (2026-10-19; 13.9x below the 1.227e12 charged from 2026-10-16), 0.34 bits above D^3; the D_4-symmetric oracle on curves with rational 2-torsion measured about 2^26, so D^3 at other k is an estimate, and a formula advantage here is a lead, not a measurement".into(),
         ],
     ));
     // Descent to a cover over GF(p).  The cheapest genus the literature

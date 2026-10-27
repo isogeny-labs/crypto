@@ -54,8 +54,8 @@ use crypto_lib::cryptanalysis::koblitz_factor_base_search::{
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     koblitz_signed_frobenius_rho_with_progress, point_key, points_with_x, CollectedRelation,
     ColumnCoverage, DecompositionStrategy, FactorBaseLogTable, FactorBaseSelectionCost,
-    FrobeniusFactorBase, KoblitzCurve, KoblitzSignedRhoOptions, PairSumTable, ProbeBudget,
-    ProjectedFactorBase, RelationCollector, RelationWorkUnit,
+    FoldedDuplicates, FrobeniusFactorBase, KoblitzCurve, KoblitzSignedRhoOptions, PairSumTable,
+    ProbeBudget, ProjectedFactorBase, RelationCollector, RelationWorkUnit,
 };
 use crypto_lib::cryptanalysis::koblitz_sparse_la::SparseSolveOptions;
 use num_bigint::BigUint;
@@ -1104,6 +1104,28 @@ pub(crate) fn build_pair_table(
         }
     ));
     table
+}
+
+/// [`build_pair_table`], and with the fold the pairs of base points whose
+/// sums share a key (`PairSumTable::free_relations`).  The same tier and the
+/// same table; `None` for the harvest where the tier is not the partitioned
+/// fold.  Used by `ic price` under `KIC_FREE_RELATIONS=1`.
+pub(crate) fn build_pair_table_harvest(
+    c: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    p: &WorkflowParams,
+) -> Option<(PairSumTable, Option<FoldedDuplicates>)> {
+    let budget = p
+        .pair_table_bytes
+        .map(u128::from)
+        .unwrap_or(PairSumTable::DEFAULT_BYTE_BUDGET);
+    match p.pair_table_tier.unwrap_or(PairTableTier::Auto) {
+        PairTableTier::Auto => {
+            PairSumTable::build_within_for_harvest(c, fb, budget, probe_budget(c, fb, p))
+        }
+        PairTableTier::Folded => PairSumTable::build_folded_within_harvest(c, fb, budget),
+        _ => build_pair_table(c, fb, p).map(|table| (table, None)),
+    }
 }
 
 /// Which representation of the pair table a run should build.
