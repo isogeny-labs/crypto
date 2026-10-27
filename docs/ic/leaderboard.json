@@ -254,6 +254,10 @@
    "path": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
    "sha256": "d5ae9560f6cf3cad63430c9dd47962c8723b6cd02d5c4fca7d6bc2ae25e818b4"
   },
+  "pkm_symmetric_component": {
+   "path": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
+   "sha256": "4360d61a47960810d8994e88cea8ebabf938363f0e3288b45fe98f6bde59278b"
+  },
   "ghs_weak_n4": {
    "path": "research/quartic_n4_20261019/results/summary_all.json",
    "sha256": "fd5598a2860d965c8b47ca9163cb1ff101150c3b04690ea208d05d8c87b067e7"
@@ -306855,6 +306859,73 @@
   "report": "research/s5_plain_c4_options_20261019/REPORT.pdf",
   "source": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
   "class": "engineering"
+ },
+ "pkm_symmetric_component": {
+  "rows": [
+   {
+    "m": 4,
+    "N": 12,
+    "arm": "plain-chain",
+    "D": 7,
+    "last_productive": 6,
+    "max_input_degree": 4,
+    "max_cols": 21619,
+    "field_ops": 110162458158,
+    "s_max": 70.2405
+   },
+   {
+    "m": 4,
+    "N": 12,
+    "arm": "symmetric",
+    "D": 8,
+    "last_productive": 5,
+    "max_input_degree": 8,
+    "max_cols": 3663,
+    "field_ops": 400958,
+    "s_max": 0.0087
+   },
+   {
+    "m": 4,
+    "N": 16,
+    "arm": "symmetric",
+    "D": 8,
+    "last_productive": 6,
+    "max_input_degree": 8,
+    "max_cols": 13926,
+    "field_ops": 10789602691,
+    "s_max": 11.8175
+   }
+  ],
+  "before": {
+   "m": 4,
+   "N": 12,
+   "arm": "plain-chain",
+   "D": 7,
+   "last_productive": 6,
+   "max_input_degree": 4,
+   "max_cols": 21619,
+   "field_ops": 110162458158,
+   "s_max": 70.2405
+  },
+  "after": {
+   "m": 4,
+   "N": 12,
+   "arm": "symmetric",
+   "D": 8,
+   "last_productive": 5,
+   "max_input_degree": 8,
+   "max_cols": 3663,
+   "field_ops": 400958,
+   "s_max": 0.0087
+  },
+  "ops_ratio": 274748.123639,
+  "time_ratio": 8073.62068966,
+  "width_ratio": 5.90199290199,
+  "study": "research/pkm_symmetric_lead1_20261026/",
+  "report": "research/pkm_symmetric_lead1_20261026/README.md",
+  "source": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
+  "class": "solver-stage diagnostic",
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates."
  },
  "ghs_weak_n4_component": {
   "rows": [

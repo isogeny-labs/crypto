@@ -382,6 +382,18 @@ A separate exact 24-action cache diagnostic found only 2 same-residual orbit col
 
 On §11.17's same instances, adding sparsest pivots, chain eigensteps and shape replay reduces the plain-S₅ solve's mean C₄ from 1.209e+12 to 8.690e+10 counted Fₚ multiplications (13.90×; class: engineering). The committed arm covers 13 solves; the replay arm's mean covers 12 later solves, with 13 total outputs oracle-equal. It includes 11 shape replays and 1 fallback. Paired ratios are 13.90× by ratio of means and [7.24, 15.37] across paired instances. This is a solver-stage change: no full-pipeline row or curve verdict changes. Study: [research/s5_plain_c4_options_20261019/](../../research/s5_plain_c4_options_20261019/); [report](../../research/s5_plain_c4_options_20261019/REPORT.pdf).
 
+## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C
+
+Writing the Kummer membership and S₅ in the elementary symmetric functions before expansion (m = 4, N = 12, f4_fp, p = 786433, two random targets, uncontended) reduces the F4 stage from 1.102e+11 to 4.010e+05 counted field operations (2.75e+05×), the widest matrix from 21,619 to 3,663 columns (5.90×) and the time per system from 70.2 s to 0.0087 s (8.07e+03×). Class: solver-stage diagnostic; no pipeline is priced and no curve verdict changes. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+
+| N | arm | D | last productive | widest matrix | field ops | s per system |
+|--:|:--|--:|--:|--:|--:|--:|
+| 12 | plain-chain | 7 | 6 | 21,619 | 1.102e+11 | 70.2 |
+| 12 | symmetric | 8 | 5 | 3,663 | 4.010e+05 | 0.0087 |
+| 16 | symmetric | 8 | 6 | 13,926 | 1.079e+10 | 11.8 |
+
+Study: [research/pkm_symmetric_lead1_20261026/](../../research/pkm_symmetric_lead1_20261026/); source `research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl`.
+
 ## Large-prime conductor-gap counted diagnostics
 
 Copied from native analysis: eight independent one-target workloads per fixed curve; no transported targets. Counted S has unpriced native work. These observations do not enter tables A–C or change a full-cost ranking.
@@ -742,6 +754,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json` — sha256 `4772cf301a459700…`
 - `experiments/hyperelliptic_sparse_solve_r7/fits.json` — sha256 `4953de656e198a89…`
 - `research/s5_plain_c4_options_20261019/raw/summary_r13.json` — sha256 `d5ae9560f6cf3cad…`
+- `research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl` — sha256 `4360d61a47960810…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`

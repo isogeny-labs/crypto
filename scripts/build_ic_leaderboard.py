@@ -114,6 +114,7 @@ SOURCES = {
     "hec_round7_rows": "experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json",
     "hec_round7_fits": "experiments/hyperelliptic_sparse_solve_r7/fits.json",
     "s5_c4_component": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
+    "pkm_symmetric_component": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
     "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
@@ -1215,6 +1216,39 @@ def s5_c4_component() -> dict:
         "source": SOURCES["s5_c4_component"],
         "class": "engineering",
     }
+def pkm_symmetric_component() -> dict:
+    """The symmetric PKM tower's F4 stage against the plain S3-chain tower at m = 4,
+    copied from the uncontended rows of research/pkm_symmetric_lead1_20261026 (f4_fp,
+    p = 786433, two random targets per cell). A solver-stage diagnostic: no pipeline
+    is priced and no row of tables A-C moves."""
+    rows = _jsonl(SOURCES["pkm_symmetric_component"])
+    cells = {}
+    for r in rows:
+        cells.setdefault((r["N"], r["arm"]), []).append(r)
+    out = []
+    for (n, arm), rs in sorted(cells.items()):
+        if len(rs) != 2 or len({(r["D"], r["max_cols"], r["last_productive"]) for r in rs}) != 1:
+            raise SystemExit(f"pkm symmetric component: cell N={n} {arm} is incomplete or its targets disagree")
+        if any(r["timed_out"] or not r["inconsistent"] for r in rs):
+            raise SystemExit(f"pkm symmetric component: cell N={n} {arm} did not finish")
+        out.append({"m": rs[0]["m"], "N": n, "arm": arm, "D": rs[0]["D"],
+                    "last_productive": rs[0]["last_productive"], "max_input_degree": rs[0]["max_input_degree"],
+                    "max_cols": rs[0]["max_cols"], "field_ops": max(r["field_ops"] for r in rs),
+                    "s_max": max(r["ms"] for r in rs) / 1000})
+    by = {(r["N"], r["arm"]): r for r in out}
+    before, after = by.get((12, "plain-chain")), by.get((12, "symmetric"))
+    if not before or not after:
+        raise SystemExit("pkm symmetric component: the N = 12 pair is missing")
+    return {"rows": out, "before": before, "after": after,
+            "ops_ratio": before["field_ops"] / after["field_ops"],
+            "time_ratio": before["s_max"] / after["s_max"],
+            "width_ratio": before["max_cols"] / after["max_cols"],
+            "study": "research/pkm_symmetric_lead1_20261026/",
+            "report": "research/pkm_symmetric_lead1_20261026/README.md",
+            "source": SOURCES["pkm_symmetric_component"],
+            "class": "solver-stage diagnostic", "validation": NOT_VALIDATED}
+
+
 def _jsonl(rel: str) -> list[dict]:
     return [json.loads(x) for x in (REPO / rel).read_text().splitlines() if x.strip()]
 
@@ -1868,6 +1902,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "bitop_prime_ladder": bitop_ladder(),
         "hyperelliptic_bitop_reprice": hec_bitop(),
         "s5_c4_component": s5_c4_component(),
+        "pkm_symmetric_component": pkm_symmetric_component(),
         "ghs_weak_n4_component": ghs_weak_n4(),
         "ghs_weak_n4v2_component": ghs_weak_n4v2(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
@@ -2605,6 +2640,21 @@ def markdown(doc: dict) -> str:
           f"[{c4['paired_min']:.2f}, {c4['paired_max']:.2f}] across paired instances. "
           f"This is a solver-stage change: no full-pipeline row or curve verdict changes. "
           f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
+    pk = doc["pkm_symmetric_component"]
+    L += ["## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C", "",
+          f"Writing the Kummer membership and S₅ in the elementary symmetric functions before expansion "
+          f"(m = 4, N = 12, f4_fp, p = 786433, two random targets, uncontended) reduces the F4 stage from "
+          f"{pk['before']['field_ops']:.3e} to {pk['after']['field_ops']:.3e} counted field operations "
+          f"({pk['ops_ratio']:.3g}×), the widest matrix from {pk['before']['max_cols']:,} to "
+          f"{pk['after']['max_cols']:,} columns ({pk['width_ratio']:.2f}×) and the time per system from "
+          f"{pk['before']['s_max']:.3g} s to {pk['after']['s_max']:.3g} s ({pk['time_ratio']:.3g}×). Class: "
+          f"{pk['class']}; no pipeline is priced and no curve verdict changes. {pk['validation']}", "",
+          "| N | arm | D | last productive | widest matrix | field ops | s per system |",
+          "|--:|:--|--:|--:|--:|--:|--:|"]
+    for r in pk["rows"]:
+        L.append(f"| {r['N']} | {r['arm']} | {r['D']} | {r['last_productive']} | {r['max_cols']:,} | "
+                 f"{r['field_ops']:.3e} | {r['s_max']:.3g} |")
+    L += ["", f"Study: [{pk['study']}](../../{pk['study']}); source `{pk['source']}`.", ""]
     L += ["## Large-prime conductor-gap counted diagnostics", "",
           "Copied from native analysis: eight independent one-target workloads per fixed curve; "
           "no transported targets. Counted S has unpriced native work. These observations do "
@@ -3389,6 +3439,22 @@ def page(doc: dict, standalone: bool) -> str:
              f'{c4["paired_max"]:.2f}]. This is a solver-stage change; no full-pipeline row or curve verdict '
              f'changes. <a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["study"])}">Study</a>; '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
+    pk = doc["pkm_symmetric_component"]
+    P.append('<section class="card" id="pkm-symmetric-component"><h2>Symmetric PKM tower, F4 stage at m = 4, outside the priced tables</h2>'
+             f'<p>Writing the Kummer membership and S<sub>5</sub> in the elementary symmetric functions before expansion '
+             f'(m = 4, N = 12, f4_fp, p = 786433, two random targets, uncontended) reduces the F4 stage from '
+             f'{pk["before"]["field_ops"]:.3e} to {pk["after"]["field_ops"]:.3e} counted field operations '
+             f'({pk["ops_ratio"]:.3g}×), the widest matrix from {pk["before"]["max_cols"]:,} to {pk["after"]["max_cols"]:,} '
+             f'columns and the time per system from {pk["before"]["s_max"]:.3g} s to {pk["after"]["s_max"]:.3g} s '
+             f'({pk["time_ratio"]:.3g}×). Class: {esc(pk["class"])}; no pipeline is priced and no curve verdict changes. '
+             f'{esc(pk["validation"])}</p><table><thead><tr><th class="n">N</th><th>arm</th><th class="n">D</th>'
+             '<th class="n">last productive</th><th class="n">widest matrix</th><th class="n">field ops</th>'
+             '<th class="n">s per system</th></tr></thead><tbody>'
+             + "".join(f'<tr><td class="n">{r["N"]}</td><td>{esc(r["arm"])}</td><td class="n">{r["D"]}</td>'
+                       f'<td class="n">{r["last_productive"]}</td><td class="n">{r["max_cols"]:,}</td>'
+                       f'<td class="n">{r["field_ops"]:.3e}</td><td class="n">{r["s_max"]:.3g}</td></tr>'
+                       for r in pk["rows"])
+             + f'</tbody></table><p><a href="https://github.com/aburan28/crypto/blob/main/{esc(pk["study"])}">Study</a>.</p></section>')
 
     head_cells = ('<th class="n">#</th><th>curve</th><th class="n">log₂ r</th><th>recipe</th>'
                   '<th class="n">m</th><th class="n">|F|</th><th class="n">K</th><th class="n">S, IC</th>'
