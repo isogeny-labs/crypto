@@ -69,3 +69,12 @@ post-publication check logs/status/progress record are preserved exactly in
 publication-checks.tar.xz (a small archive below the64KiB data-store threshold).
 Extract it in this directory to read the ignored hydrated log files. The
 large scientific and validation archives remain in the artifact store.
+
+Ready follow-up PR:https://github.com/isogeny-labs/crypto/pull/2683.
+Observed state:OPEN,isDraft=false,autoMergeRequest=null. GitHub marks the
+required gate,size and artifacts jobs failed before execution,with no job
+steps. All three annotations report failed recent account payments or a
+spending limit requiring attention. No CI pass or merge is claimed,and no
+billing/spending setting is changed. See pr-state.json for observed job URLs
+and the exact reviewed head. Local research/proof validations remain as
+recorded above;local broad policy failures remain explicit.
