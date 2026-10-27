@@ -1,0 +1,21 @@
+{
+  "schema": "n83.k2048-m5-native-negative-controls/v1",
+  "status": "PASS",
+  "cases": [
+    {
+      "mutation": "replace byte zero of copied U compressed object with x",
+      "tool": "n83_k2048_m5_guard",
+      "exit_code": 1,
+      "error": "object SHA-256 differs",
+      "container_allocated": false,
+      "output_created": false
+    },
+    {
+      "mutation": "change fixture zero x coordinate in copied U native worker receipt to 0",
+      "tool": "n83_k2048_m5_audit",
+      "exit_code": 1,
+      "error": "target point differs",
+      "output_created": false
+    }
+  ]
+}
