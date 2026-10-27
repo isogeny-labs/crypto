@@ -72,7 +72,7 @@ _recorded_ (prior evidence), _prepared_ (design only).
 
 Each cell has a frozen PROTOCOL.md with dated amendments, native Rust code,
 unit tests, a RUN\_CARD.md and a README. Each went through two independent
-review rounds and three repair passes. All 148 unit tests pass.
+review rounds and three repair passes. All unit tests pass (G1–G5: 148; G6: 32).
 
 #table(columns: 4, stroke: 0.4pt,
   [cell], [question], [m], [tests],
@@ -81,13 +81,55 @@ review rounds and three repair passes. All 148 unit tests pass.
   [G3], [the never-run C3 census (H-BINSTD-c72284 Stage 2)], [2–3], [38],
   [G4], [ι-stable non-subspace bases, (Z/2)#super[m−1] stabiliser], [2–6], [24],
   [G5], [Proposition T / Σ and sporadic-overlap census], [2–8], [31],
+  [G6], [exact census at large m: normal-basis interleaved vs size-matched partitions; ι quotient], [9–20], [32],
 )
+
+*G6 derived finding (not a measurement).* No code in the repository solves
+a binary chained decomposition at m ≥ 7. G6 is therefore an exact
+meet-in-the-middle census.
+
+Its review turned up a property of the normal-basis interleaved
+("rotated") partition, which is the design used by the existing n = 83,
+m = 10 relation gate:
+- Its slots are exact Frobenius rotations of each other.
+- A decomposition therefore behaves like a Z[τ] digit expansion, and many
+  tuples collide on the same sum.
+- A digit model predicts the fraction of distinct sums. It agrees with the
+  group law exactly at n = 13 and with the real builder at n = 19, m = 12.
+- The prediction is 0.055 for the interleaved design against 0.989 for a
+  size-matched generic partition at n = 23, m = 12, an 18× loss.
+
+If this persists at n = 83, that gate pays for Frobenius-correlated slots.
+Status: _derived_ (exact arithmetic plus unit-scale agreement). The census
+will confirm or refute it.
+
+The ι quotient is an identity, not a lever:
+H#sub[ι]\[R\] = 2#super[k−1] · (H\[R\] + H\[R+T\]).
+
+== Companion notes in this PR
+
+- `research/ic_liftcheck_audit_20261027/` (lead 1, static analysis). The
+  incumbent Koblitz rows use a pair-table m = 3 collection, which has no
+  root, y-recovery or rationality step. Where roots do appear, no step that
+  the twist theorem makes redundant costs more than 1% per relation. Lead
+  closed.
+- `research/pE_density_closure_20261027/` (lead 2, recorded rows
+  re-analysed natively). The yield is C(|S|+m−1, m)/\#E. The slope of log
+  yield on log p#sub[E] is 2.96 ± 0.06 at m = 3 (identity: 3). The spread
+  of 3× across curves is exactly p#sub[E]#super[m]. Choosing a curve in
+  ECC2K-130's class buys about 5·10#super[−5] in yield at n = 131 under a
+  stated heuristic. The atlas change is not applied and awaits review.
 
 == Why nothing was run
 
 The repository requires a resume checkpoint in S3 before any experiment.
-This container has no upload credential, so the runs wait for a session that
-has `CHECKPOINT_UPLOAD_TOKEN`, or for the Iso Lab EKS route.
+The container's ambient AWS identity, IAM user `adam`, is refused
+`PutObject` on the checkpoint bucket. That identity is also outside the Iso
+Lab account. The GitHub route to Iso Lab needs Actions, which is blocked by a
+billing failure. The runs therefore wait for one of:
+- checkpoint write access, or a `CHECKPOINT_UPLOAD_TOKEN`;
+- an identity that can reach Iso Lab EKS;
+- restored Actions billing.
 
 The repository's `main` also did not compile: five broken merge
 resolutions. They are repaired in PR \#2675 and carried on this branch.
@@ -96,8 +138,7 @@ resolutions. They are repaired in PR \#2675 and carried on this branch.
 
 - This report presents no measured result and no change to cost or the
   leaderboard.
-- The prepared cells stop at m = 8 (see the figure). Coverage for m = 9–20
-  still needs a chained encoding at those sizes. The m = 10 rotated chain
-  at n = 83 is the only existing code there.
+- G6 covers m = 9–20 with an exact census, not a solver. Solver behaviour
+  at m ≥ 7 is still unmeasured, and no repository code solves there.
 - The cells' authors expect nulls in most cells. A measured null at m ≥ 3
   that replaces an asserted closure is itself the deliverable.

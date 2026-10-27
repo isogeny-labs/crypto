@@ -25,7 +25,12 @@ Audit of LEAD-ICB-frobenius-search-symmetry:
 | [G3](g3-c3-census/) | the never-run C3 census (H-BINSTD-c72284 Stage 2) | 2–3 | 38 |
 | [G4](g4-iota-stable/) | ι-stable non-subspace bases, (Z/2)^(m−1) stabiliser | 2–6 | 24 |
 | [G5](g5-propT-census/) | Proposition T / Σ and sporadic-overlap census | 2–8 | 31 |
+| [G6](g6-large-m/) | exact census at large m: normal-basis interleaved vs size-matched partitions; ι quotient | 9–20 | 32 |
 
 Each cell went through two independent review rounds and three repair
 passes. Run it from its `RUN_CARD.md` in a session that has the checkpoint
-token. m = 9–20 is still uncovered.
+token.
+
+G6 derived finding: normal-basis interleaved slots, the design of the n = 83, m = 10 gate, are Frobenius rotations of each other. A digit model predicts about 18× fewer distinct sums than a size-matched generic partition at n = 23, m = 12. See [REPORT.pdf](REPORT.pdf).
+
+Companion notes: [lift-check audit](../ic_liftcheck_audit_20261027/) (lead 1, closed) and [p_E closure](../pE_density_closure_20261027/) (lead 2).

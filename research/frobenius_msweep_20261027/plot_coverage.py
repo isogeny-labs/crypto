@@ -48,7 +48,7 @@ ax.legend(handles=[Patch(color=PROOF, label="proved for all m (argument)"),
                    Patch(color=PLAN, label="prepared cell, not yet run")],
           frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.12), ncol=3)
 fig.suptitle("LEAD-ICB-frobenius-search-symmetry: proved, measured and prepared coverage by m\n"
-             "(audit wf_3231c71e-f6b, 2026-10-26; cells G1-G5 prepared 2026-10-27, not run)", fontsize=9, y=1.08)
+             "(audit wf_3231c71e-f6b, 2026-10-26; cells G1-G6 prepared 2026-10-27, not run)", fontsize=9, y=1.08)
 for ext, kw in (("svg", {}), ("png", {"dpi": 150})):
     fig.savefig(here / f"coverage.{ext}", bbox_inches="tight", **kw)
 print("wrote coverage.svg/png")
