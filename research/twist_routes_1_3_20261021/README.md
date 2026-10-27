@@ -1,5 +1,13 @@
 # Twist routes 1–3: designs and bounded execution
 
+[2026-10-27 generator-order results](reports/generators-20261027/RESULTS.md)
+· [exact native/CAS replay](execution-v7/README.md)
+· [preserved failed full-order candidate](execution-v6/README.md).
+The maximal-order rule fills 39/40 nonzero-shift bases versus 35/40 for the
+first-point rule. One twist is C7 x C119, and its original point had order7;
+the maximal point has order119. All120 complete constructions replay. Discovery
+work remains unpriced, and no IC speedup or scalar transfer is established.
+
 [2026-10-27 all-shift/genus-two follow-up](reports/overlap-20261027/RESULTS.md)
 · [frozen source, exact replay and artifact reproduction](execution-v5/README.md).
 All 27,140 shifts agree independently. On exactly shifts 1 and 3, no source or

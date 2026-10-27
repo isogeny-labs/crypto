@@ -170,3 +170,18 @@ census of other shifts, a scalar map, or a cost result. The new two-execution
 structured protocol/export binds with zero findings; the earlier cost panel's
 binding error remains preserved. Next discriminate generator order/finite
 prefix effects from the already-dense full-coordinate universe.
+
+The [generator-order follow-up](../research/twist_routes_1_3_20261021/reports/generators-20261027/RESULTS.md)
+now resolves one finite-construction issue. The original full-order-seed
+candidate fails closed; independent native/CAS evidence shows the p827 twist
+is C7 x C119, so an order833 point is unavailable. A separately frozen
+maximal-order rule retains every fixture and verifies all120 bases, including
+sixty exact archived controls. Nonzero fills change35/40 to39/40. The new
+prototype makes416 order tests on that noncyclic fixture; no primitive cost,
+same-output solver gain, scalar transport or whole-IC improvement follows.
+The p59,shift3,B16 case has14 eligible coordinates and remains underfilled.
+
+Original failed-run full protocol binding retains the absent-reference gap;
+the successor binds with zero findings. All original full-campaign criteria
+remain open. Concrete next cards price corrected-seed cold costs and certify
+explicit twist-kernel isogenies; neither has run or received funding.
