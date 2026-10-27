@@ -652,3 +652,34 @@ whatever `m` and `n` are, at the sizes below.
 - A Spot interruption gets one relaunch from scratch on the same archive.
 
 Nothing from any E12 cell has been computed, and no E12 draw has been generated.
+
+## Amendment 12 (2026-10-27, after E12b r1 and r2 were read; before any draw below): finish E12b cell 3:24:7 On-Demand
+
+**Why.** Both E12b attempts finished 3:30:4, 3:27:5 and 3:24:6, each with all four draws
+at `d_F = 4`. Both were then Spot-reclaimed after draw 0 of 3:24:7, which read `≥ 5`.
+r2 equals r1 on every non-timing field. Amendment 11's one relaunch is used, so 3:24:7 is
+not completed, and the E12b reading cannot be decided (`RESULTS.md`, E12 section).
+The user asked on 2026-10-27 to finish 3:24:7 On-Demand.
+
+**Disclosed before this run:** the 13 r1/r2 draws above, including draw 0 of 3:24:7.
+
+**Run (E12b-OD).**
+- Cell 3:24:7 only (`N = 45`), from scratch: `hky_par newcells`, `cmax = 4`, `keep = 4`,
+  seed 20261012. Same frozen archive `fd-src-371035216942.tgz` (sha256 `4ae808ac…`) and
+  `e12/run_par.sh`, without the Lean step.
+- Host: `ephemeral --on-demand`, m7i.4xlarge or any x86 type with ≥ 16 vCPU and ≥ 32 GB.
+  Counts only; wall time is recorded and not scored.
+- Gates: Amendment 10's gates 0–3 on the exact binary. **Gate 4:** draw 0 must equal the
+  r1/r2 record on every non-timing field; otherwise the run is void.
+- An interruption or failure of any kind ends the run as **not completed**. There is no
+  further relaunch without a new amendment.
+
+**Reading (fixed now).** Amendment 11's E12b rules, with 3:24:7's median taken over the
+four E12b-OD draws and the other three cells as recorded in r2:
+- **"consistent with H_ℓ":** 3:24:7 has median `≥ 5`. The median is `lowerMedian` in
+  `lean/FallDegree/Rule.lean`, the 2nd smallest of 4, with a censored value recorded as the
+  cap plus one. So this needs at least 3 of the 4 draws at `≥ 5`.
+- **"mixed":** otherwise. "`n`-driven" is already excluded.
+
+**Not in scope.** E12a and E12c stay not completed under Amendment 11. Rerunning them
+needs its own amendment.
