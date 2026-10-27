@@ -674,11 +674,11 @@ pub fn solve(
 ) -> Result<HyperIcOutcome, String> {
     if !group_order.is_multiple_of(r) || (group_order / r).is_multiple_of(r) {
         return Err(format!(
-            "ic.hyperelliptic needs r ∥ #J (a cyclic r-part); r = {r}, #J = {group_order}"
+            "ic.hyperelliptic_thread needs r ∥ #J (a cyclic r-part); r = {r}, #J = {group_order}"
         ));
     }
     if params.branches == 0 || params.d_step_in < 2 {
-        return Err("ic.hyperelliptic needs branches ≥ 1 and d_step_in ≥ 2".into());
+        return Err("ic.hyperelliptic_thread needs branches ≥ 1 and d_step_in ≥ 2".into());
     }
     let p = curve.p();
     let f = curve.f_coeffs();
@@ -1106,7 +1106,7 @@ mod tests {
 
     fn method(fb_size: &str, large_primes: &str) -> MethodSpec {
         MethodSpec {
-            id: "ic.hyperelliptic".into(),
+            id: "ic.hyperelliptic_thread".into(),
             params: [
                 ("fb_size", fb_size),
                 ("large_primes", large_primes),

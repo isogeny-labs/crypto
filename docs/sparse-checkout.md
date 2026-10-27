@@ -121,6 +121,14 @@ Pass one whenever you start a session on this repository:
 Sessions started by hand from the web or the app take whatever clone options
 their cloud environment's settings offer; a repository file cannot set them.
 
+## Sibling repositories
+
+`scripts/setup-workstation.sh` clones missing sibling repositories as partial
+clones. Files over `CLONE_BLOB_LIMIT` (default `1m`) remain off disk until a
+command needs them; `git sparse-checkout disable` fetches them all. Set
+`CLONE_FULL=1` to clone every file. The script reports the skipped paths and
+keeps the normal full clone as the fallback when partial-clone setup fails.
+
 ## Off disk is not absent
 
 An excluded file stays in `HEAD` and in the index; `git ls-files` lists it.
@@ -134,6 +142,12 @@ they run, and studies whose verifiers hash their files in place need their
 whole directory.
 
 ## CI
+
+The `large-files` check uses a blobless sparse checkout and rejects changed
+blobs over 10 MiB. It honors the reviewed `.github/large-files-allowed.txt`
+exceptions and the owner/reviewer `large-file-ok` label; unavailable changed
+blobs fail closed. The per-job sparse-checkout lists remain independent of the
+local profiles below.
 
 CI jobs keep their own per-job `sparse-checkout:` lists in
 `.github/workflows/` and are unaffected by the profiles. On 2026-10-16 the
