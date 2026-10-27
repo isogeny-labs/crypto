@@ -1439,3 +1439,20 @@ answer, expose GPU device and contention telemetry, and pass independent
 answer replay under the same record contract. The specific acceptance test
 and remaining device-validation gap are tracked in
 [the GPU matched-workload problem](../../problems/ecbench-gpu-matched-workload-contract.md).
+
+### Seeded P+M / P-M selection model (v1)
+
+`rho.plus_model_v1` and `rho.best2_model_v1` are prime-field diagnostic model
+arms, with required `jumps`, `walks`, `dp_bits`, and `cap_multiple` parameters.
+They charge setup, starts and every group operation (two complete candidate
+additions for BEST2), including cycle-seek steps and escape doublings. Hash,
+canonicalisation, DP/table probes and coefficient work have explicit
+`_uncharged` counters; apply the standard sensitivity band to both arms.
+The runner independently verifies the returned scalar. These arms use hashed
+group keys rather than CUDA coordinate limbs and do not measure the shared
+field inversion or actual GPU solve cost. Existing rho IDs remain unchanged.
+
+The [frozen comparison spec](../../research/nist_best2_small_batch_20261027/ecbench-model.json)
+and [audit/status](../../research/nist_best2_small_batch_20261027/seeded-audit-v1/README.md)
+record the unexecuted integration/session/replay requirements. No model result
+may be multiplied by standalone GPU throughput to claim measured NIST savings.
