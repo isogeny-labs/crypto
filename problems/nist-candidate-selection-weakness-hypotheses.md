@@ -5,7 +5,7 @@
 - **Affected work:** [selected/skipped comparison and protocol](../research/curve_candidates_dissect_20261021/hypotheses/REPORT.md)
 - **Next action owner:** unassigned
 - **Last updated:** 2026-10-27
-- **Latest search:** [27 October saved ECPP work counts and monotone-budget proof](../research/nist_skip_criterion_20261025/period_work_20261027/REPORT.md)
+- **Latest search:** [27 October current-source and historical-record recheck](../research/nist_skip_criterion_20261025/source_check_20261027/REPORT.md)
 
 ## Problem
 
@@ -117,6 +117,14 @@ proving historical use. Neither hypothesis is disproved by failure to find
 a route within the present diagnostic.
 
 ## Next discriminating step
+
+The [latest source check](../research/nist_skip_criterion_20261025/source_check_20261027/REPORT.md)
+found no original decision record in the checked public and connected sources;
+none was supplied. This access gap remains explicit. The prior November-draft
+and broader-cohort reports were retrieved at pinned commits and read without
+recomputing their arithmetic. This does not prove that no archive or criterion
+exists. Eligibility in a reconstructed stream does not establish original
+visitation and rejection.
 
 For the selection question, obtain an original generator/acceptance log,
 additional genuine historical choices outside the fitted dataset, or a
