@@ -1015,3 +1015,8 @@ map,nonzero order11 action,node187 polynomial membership,full quotient geometry
 or arbitrary-divisor reverse evaluation. A second migration lost earlier
 ignored raw output;literal source certificates survived and missing verification
 receipts were replayed. The failure ledger marks that evidence gap explicitly.
+
+Round23 scope clarification:the five rational polar charts do not by themselves
+complete every zero divisor. Additional zero supports of the original functions
+must be enumerated by exact norms and source fibers;see
+[DIVISOR_SCOPE_ADDENDUM.md](../research/koblitz_modular_ic_20261018/rounds/23/DIVISOR_SCOPE_ADDENDUM.md).
