@@ -22,7 +22,9 @@ No active curve registry, solver or benchmark is changed.
 | Historical explanation or applicable vulnerability | Unresolved; see the [selection problem](../../problems/nist-candidate-selection-weakness-hypotheses.md) |
 | Current PDF and full evidence bundle | Built, inspected and delivered locally |
 | Artifact-store delivery | Upload and full-object read-back verified; see the [delivery record](ARTIFACT_DELIVERY.json) |
-| Four remaining factorizations | Three independently proved complete; P-521 `n+1` remains incomplete; see the [follow-up](factor_followup_20261026/README.md) |
+| Four remaining factorizations | All four independently proved complete; 84/84 full records and the all-21 comparison replay verified; see the [follow-up](factor_followup_20261026/README.md) |
+| Exact SEA coverage replay | All21 values match; uniform larger/smaller preferences have counterexamples; see the [replay](sea_replay_20261026/README.md) |
+| Exact embedding-degree criteria | All21 degrees certified; maximal-degree and modern RFC filters fail; see the [new test](exact_embedding_20261026/README.md) |
 
 ## Reproduce the native checks
 

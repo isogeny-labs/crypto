@@ -2,6 +2,7 @@ name: APS single-relation correctness
 
 on:
   pull_request:
+    branches: [main]
     paths:
       - 'src/cryptanalysis/aps_single_relation.rs'
       - 'src/cryptanalysis/f4_fp.rs'
@@ -29,7 +30,7 @@ concurrency:
 
 jobs:
   rust:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|aps-single-relation.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|aps-single-relation.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     env:
       CARGO_BUILD_JOBS: 2
@@ -60,7 +61,7 @@ jobs:
         run: cargo test --release --locked --example aps_single_relation_check
 
   lean:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|aps-single-relation.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|aps-single-relation.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4

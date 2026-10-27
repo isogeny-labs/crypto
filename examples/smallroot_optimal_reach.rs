@@ -204,7 +204,7 @@ fn val(mut x: u128, p: u128, t: u32) -> u32 {
         return t;
     }
     let mut v = 0;
-    while x % p == 0 {
+    while x.is_multiple_of(p) {
         x /= p;
         v += 1;
     }
@@ -252,7 +252,7 @@ fn exact_gain(f: &Poly, t: u32, m: &[Exp], big: &[Exp], p: u128) -> u32 {
         let mut best: Option<(usize, u32)> = None;
         for (r, row) in rows.iter().enumerate().skip(start) {
             let v = val(row[c], p, t);
-            if v < t && best.map_or(true, |(_, bv)| v < bv) {
+            if v < t && best.is_none_or(|(_, bv)| v < bv) {
                 best = Some((r, v));
             }
         }
@@ -581,6 +581,89 @@ fn run_bm() {
     }
 }
 
+/// The weight-order theorem, checked exactly.  For any monomial set `M`
+/// (convex or not) and any weight `w ≥ 0`, every lattice from `(p, f)^t`
+/// on `M` has `E(M) ≤ Σ_{μ∈M} min(t, ⌊<w,μ>/h_N(w)⌋)`, so the
+/// Howgrave-Graham condition needs `h_N(δ) < 1`.  This mode draws random
+/// non-convex `M` (random subsets of a box), computes `E(M)` exactly, and
+/// checks the inequality for random weights; it also reports the exact
+/// scaling `λ* = E / Σ<δ̂,μ>` against `1/h_N(δ̂)` for a random direction `δ̂`.
+fn run_theorem() {
+    let p: u128 = 1_000_003;
+    let mut rng = SplitMix(0x7EE0_2026);
+    let cases: &[(&str, usize, i32, u32)] = &[
+        ("linear", 2, 6, 3),
+        ("univariate-d2", 1, 8, 3),
+        ("s3", 2, 6, 3),
+        ("s3", 3, 4, 2),
+    ];
+    for &(name, n, side, tmax) in cases {
+        let f = match name {
+            "linear" => linear(n, p, &mut rng),
+            "univariate-d2" => univariate(2, p, &mut rng),
+            _ => semaev_s3(n, p, &mut rng),
+        };
+        let sup = f.support();
+        let hn = |w: &[f64; 3]| {
+            sup.iter()
+                .map(|e| w[0] * e[0] as f64 + w[1] * e[1] as f64 + w[2] * e[2] as f64)
+                .fold(0.0, f64::max)
+        };
+        let (mut trials, mut violations, mut worst_ratio, mut worst_lambda) =
+            (0, 0, 0.0f64, 0.0f64);
+        let mut nonzero = 0;
+        for _ in 0..200 {
+            let t = 1 + (rng.below(tmax as u64) as u32);
+            let keep = 0.45 + 0.4 * rng.unit();
+            let m: Vec<Exp> = boxed(n, side)
+                .into_iter()
+                .filter(|_| rng.unit() < keep)
+                .collect();
+            if m.is_empty() {
+                continue;
+            }
+            let big = boxed(n, side + 4);
+            let e = exact_gain(&f, t, &m, &big, p);
+            trials += 1;
+            if e > 0 {
+                nonzero += 1;
+            }
+            for _ in 0..12 {
+                let mut w = [0.0; 3];
+                for wi in w.iter_mut().take(n) {
+                    *wi = rng.unit() + 1e-3;
+                }
+                let h = hn(&w);
+                let bound: u32 = m
+                    .iter()
+                    .map(|mu| {
+                        let x =
+                            (w[0] * mu[0] as f64 + w[1] * mu[1] as f64 + w[2] * mu[2] as f64) / h;
+                        ((x + 1e-9).floor() as u32).min(t)
+                    })
+                    .sum();
+                if e > bound {
+                    violations += 1;
+                }
+                if e > 0 {
+                    worst_ratio = worst_ratio.max(e as f64 / bound.max(1) as f64);
+                    let den: f64 = m
+                        .iter()
+                        .map(|mu| w[0] * mu[0] as f64 + w[1] * mu[1] as f64 + w[2] * mu[2] as f64)
+                        .sum();
+                    // λ* h_N(w) must stay ≤ 1 for the theorem to hold.
+                    worst_lambda = worst_lambda.max(e as f64 / den * h);
+                }
+            }
+        }
+        println!(
+            "{{\"mode\":\"theorem\",\"f\":\"{name}\",\"n\":{n},\"box\":{side},\"trials\":{trials},\"nonzero_gain\":{nonzero},\
+             \"weights_per_trial\":12,\"violations\":{violations},\"max_E_over_bound\":{worst_ratio:.4},\
+             \"max_lambda_times_h\":{worst_lambda:.4}}}"
+        );
+    }
+}
+
 fn main() {
     let mode = std::env::args().nth(1).unwrap_or_else(|| "all".into());
     if mode == "exact" || mode == "all" {
@@ -588,6 +671,9 @@ fn main() {
     }
     if mode == "bm" || mode == "all" {
         run_bm();
+    }
+    if mode == "theorem" {
+        run_theorem();
     }
     if mode == "optimize" || mode == "all" {
         // calibrations: linear n = 2 (expect 1), univariate degree 2 (expect 1/2)

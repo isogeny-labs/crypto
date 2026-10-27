@@ -2,6 +2,7 @@ name: pqc-assay
 
 on:
   push:
+    branches: [main]
     paths:
       - 'src/pqc/fast/ml_dsa.rs'
       - 'src/pqc/ml_dsa.rs'
@@ -11,6 +12,7 @@ on:
       - '.github/workflows/pqc-assay.yml'
       - '.gitmodules'
   pull_request:
+    branches: [main]
     paths:
       - 'src/pqc/fast/ml_dsa.rs'
       - 'src/pqc/ml_dsa.rs'
@@ -19,16 +21,10 @@ on:
       - 'verification/pqc-assay/**'
       - '.github/workflows/pqc-assay.yml'
       - '.gitmodules'
+  # The macOS-only standalone-verify and math-reference jobs (and their
+  # dispatch inputs) were removed on 2026-10-26: every job runs on
+  # ubuntu-latest only, and the upstream proof pipeline targets macOS.
   workflow_dispatch:
-    inputs:
-      math_reference:
-        description: Rebuild the pinned upstream Isabelle reduction proofs (cold build can take hours)
-        type: boolean
-        default: false
-      standalone_verify:
-        description: Run the pinned upstream make verify pipeline (cold build can take hours)
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -39,7 +35,7 @@ concurrency:
 
 jobs:
   standalone-integrity:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|pqc-assay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|pqc-assay.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +51,7 @@ jobs:
           if-no-files-found: warn
 
   rust-reduce:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|pqc-assay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|pqc-assay.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -82,49 +78,3 @@ jobs:
           name: pqc-assay-rust-reduce
           path: verification/pqc-assay/build/*.txt
           if-no-files-found: warn
-
-  standalone-verify:
-    if: github.event_name == 'workflow_dispatch' && inputs.standalone_verify
-    runs-on: macos-15
-    timeout-minutes: 360
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: verification/pqc-assay
-      - name: Check the pinned standalone suite
-        run: verification/pqc-assay/standalone.sh check
-      - uses: actions/cache@v4
-        with:
-          path: |
-            verification/pqc-assay/upstream/.tools
-            ~/.isabelle/Isabelle2025-2/heaps
-          key: assay-standalone-${{ runner.os }}-${{ hashFiles('verification/pqc-assay/toolchain.env') }}
-      - name: Install the upstream toolchain and Isabelle support sessions
-        env:
-          SKIP_PROVERIF: '1'
-        run: verification/pqc-assay/standalone.sh setup
-      - name: Run the upstream proof pipeline with its existing controls
-        run: verification/pqc-assay/standalone.sh make verify
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: pqc-assay-standalone-verify
-          path: verification/pqc-assay/build/standalone-*.txt
-          if-no-files-found: warn
-
-  math-reference:
-    if: github.event_name == 'workflow_dispatch' && inputs.math_reference
-    runs-on: macos-15
-    timeout-minutes: 360
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: verification/pqc-assay
-      - uses: actions/cache@v4
-        with:
-          path: |
-            verification/pqc-assay/.cache
-            ~/.isabelle/Isabelle2025-2/heaps
-          key: assay-math-${{ runner.os }}-${{ hashFiles('verification/pqc-assay/toolchain.env') }}
-      - name: Regenerate the lifts and check the pinned model-to-math proofs
-        run: verification/pqc-assay/verify-math.sh
