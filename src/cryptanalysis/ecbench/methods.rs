@@ -28,6 +28,9 @@ use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
     bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, kangaroo, GenericOutcome,
 };
+use crate::cryptanalysis::ecbench::koblitz_descent::{
+    self as koblitz_descent, DescentParams as KoblitzDescentParams,
+};
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench::hyper_ic::{self, HyperIcParams};
 use crate::cryptanalysis::ecbench::wordram_price;
@@ -44,6 +47,7 @@ use crate::cryptanalysis::gaudry_quartic_d4::{
     fp_muls_per_add, unpack_e4, D4Curve, D4Options, D4Oracle, YLineBase,
 };
 use crate::cryptanalysis::glv_invariant_base::Endomorphism;
+use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
     price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with, signed_frobenius_rho_tuned,
     BinaryGroup, BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps,
@@ -76,6 +80,7 @@ use crate::cryptanalysis::koblitz_strong_rho::{
     RawPoint as StrongPoint, RawPointG, RhoField, RhoScalar, StrongRho, StrongRhoCharges,
     StrongRhoG, StrongRhoParams,
 };
+use num_traits::ToPrimitive;
 use rand::{rngs::StdRng, SeedableRng};
 
 /// A parameter a method reads.  `default: None` means required: a value
@@ -780,8 +785,73 @@ pub fn registry() -> &'static [MethodDecl] {
                 },
             ],
         },
+        MethodDecl {
+            id: "ic.koblitz_descent",
+            family: "ic",
+            summary: "ledger §23 one-target Koblitz index calculus as `ic price --single-target` runs it: subgroup-orbit base, signed-Frobenius pair table, aimed m = 3 windowed collection, sparse logs, walked m = 2 descent; every stage charged by counted point additions and doublings (group_op_count), native work unpriced; S grows with the base and the descent, not as a fixed constant",
+            entry: "ecbench::koblitz_descent::run",
+            applies: Applies::KoblitzOnly,
+            params: KOBLITZ_DESCENT_PARAMS,
+        },
     ]
 }
+
+/// `ic.koblitz_descent`'s parameters: the rule v8 parameter files'
+/// fields.  `rule_v8` takes the file's value at the six §23 sizes
+/// (k0n41, k0n53, k0n57, k0n61, k1n47, k1n59) and is refused at any
+/// other, where the value must be given.
+const KOBLITZ_DESCENT_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "summands",
+        default: Some("3"),
+        help: "collection summands; the §23 recipe's aimed window needs 3",
+    },
+    ParamDecl {
+        name: "descent_summands",
+        default: Some("rule_v8"),
+        help: "summands the walked descent asks for (2..4; rule v8: 2, 3 at k1n47)",
+    },
+    ParamDecl {
+        name: "collection_aim",
+        default: Some("true"),
+        help: "aim each unit's window at the columns still uncovered (ColumnCoverage)",
+    },
+    ParamDecl {
+        name: "collection_window",
+        default: Some("rule_v8"),
+        help: "factor-base summands each m = 3 probe scans",
+    },
+    ParamDecl {
+        name: "factor_base_points",
+        default: Some("rule_v8"),
+        help: "points of the subgroup-orbit factor base",
+    },
+    ParamDecl {
+        name: "unit_trials",
+        default: Some("rule_v8"),
+        help: "walked probes per collection work unit",
+    },
+    ParamDecl {
+        name: "units",
+        default: Some("rule_v8"),
+        help: "units collected before the first solve",
+    },
+    ParamDecl {
+        name: "max_units",
+        default: Some("100000"),
+        help: "units the extension may reach before the run fails",
+    },
+    ParamDecl {
+        name: "max_trials",
+        default: Some("rule_v8"),
+        help: "descent probe cap before an exhausted result",
+    },
+    ParamDecl {
+        name: "seed",
+        default: Some("rule_v8"),
+        help: "seed of the factor base, the probes and the descent walks (`run`: the run's algorithm seed)",
+    },
+];
 
 /// The leading-order expected `S` of a generic method on a curve whose
 /// generic automorphism group has order `a_available`, or `None` when
@@ -1601,8 +1671,30 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             "`{id}` runs on prime-field curves only; {} is {}",
             curve.slug, curve.family
         )),
+        Instance::Binary(i) if id == "ic.koblitz_descent" => koblitz_descent_applicable(m, i),
+        _ if id == "ic.koblitz_descent" => Err(format!(
+            "`ic.koblitz_descent` runs on one-word Koblitz curves only; {} is {}",
+            curve.slug, curve.family
+        )),
         _ => Ok(()),
     }
+}
+
+/// `ic.koblitz_descent` needs a Koblitz instance of odd degree below 64
+/// (its order fits a word by construction), and every `rule_v8` value
+/// to exist at that size.
+fn koblitz_descent_applicable(m: &ResolvedMethod, i: &BinaryInstance) -> Result<(), String> {
+    let kc = i
+        .koblitz
+        .as_ref()
+        .ok_or("`ic.koblitz_descent` needs a Koblitz instance")?;
+    if kc.n.is_multiple_of(2) || kc.n >= 64 || kc.subgroup_order.bits() > 64 {
+        return Err(format!(
+            "`ic.koblitz_descent` needs odd n < 64 and a subgroup order of at most 64 bits; n = {}",
+            kc.n
+        ));
+    }
+    KoblitzDescentParams::from_method(&m.params, kc.n, kc.a, 0).map(|_| ())
 }
 
 /// The refusal of a [`Applies::PrimeOnly`] method on any other instance.
@@ -1731,6 +1823,9 @@ fn solve_inner(
         }
         (Instance::Binary(i), _) if m.id == "ic.shared_rank" => {
             solve_shared_rank(m, i, curve, FastPoint::affine(tx, ty), seed)
+        }
+        (Instance::Binary(i), _) if m.id == "ic.koblitz_descent" => {
+            solve_koblitz_descent(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _)
             if m.id == "ic.cm_folded_native_v1"
@@ -4124,6 +4219,255 @@ fn solve_shared_rank(
         solver: None,
         field_ops: None,
     })
+}
+
+/// `ic.koblitz_descent`: the §23 pipeline on the target, every stage
+/// charged by the point additions and doublings it performed
+/// ([`koblitz_descent`]).  The run's algorithm seed is used only where
+/// `seed = run`; the rule v8 recipe pins its own.
+fn solve_koblitz_descent(
+    m: &ResolvedMethod,
+    inst: &BinaryInstance,
+    curve: &CurveFacts,
+    target: FastPoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    koblitz_descent_applicable(m, inst)?;
+    let kc = inst.koblitz.as_ref().ok_or("not a Koblitz instance")?;
+    let p = KoblitzDescentParams::from_method(&m.params, kc.n, kc.a, seed)?;
+    let q = inst.fast.lower(target);
+    let started = Instant::now();
+    let out = koblitz_descent::run(kc, &q, &p)?;
+    let wall = started.elapsed().as_nanos() as u64;
+    if !out.single_thread {
+        return Err("ic.koblitz_descent did not run on its one counting thread".into());
+    }
+    let phases: Vec<PhaseRecord> = out
+        .phases
+        .iter()
+        .map(|ph| PhaseRecord {
+            name: ph.name.clone(),
+            adds: ph.ops.adds,
+            doubles: ph.ops.doubles,
+            scalar_mults: ph.ops.scalar_mults,
+            gae: ph.ops.gae(),
+            wall_ns: Some(ph.wall_ns),
+            native: koblitz_descent::native_of(&ph.ops),
+            work_native: BTreeMap::new(),
+        })
+        .collect();
+    let total_gae: f64 = phases.iter().map(|p| p.gae).sum();
+    let c = &out.counts;
+    let mut counters: BTreeMap<String, u64> = [
+        ("fb_points", c.fb_points as u64),
+        ("fb_signed_orbits", c.fb_signed_orbits as u64),
+        ("columns", c.columns as u64),
+        ("pair_table_entries", c.pair_table_entries as u64),
+        ("collection_units", c.units as u64),
+        ("collection_units_extended", c.units_extended as u64),
+        ("collection_trials", c.trials),
+        ("summands_scanned", c.summands_scanned),
+        ("relations_collected", c.relations_collected as u64),
+        ("relations_accepted", c.relations_accepted as u64),
+        ("relations_rejected", c.relations_rejected as u64),
+        ("relations_duplicate", c.relations_duplicate as u64),
+        ("solve_attempts", c.solve_attempts as u64),
+        ("descent_trials", c.descent_trials as u64),
+    ]
+    .into_iter()
+    .map(|(k, v)| (k.to_string(), v))
+    .collect();
+    let mut native = OpCounts::default();
+    for ph in &out.phases {
+        native.merge(&ph.ops);
+    }
+    let la_row_ops = c.sparse.as_ref().map_or(0, |r| r.row_ops);
+    for (name, v) in [
+        ("canonicalisations_uncharged", native.canonicalisations),
+        ("pair_filter_probes_uncharged", native.filter_probes),
+        ("pair_bucket_reads_uncharged", native.bucket_reads),
+        ("frobenius_maps_uncharged", native.frobenius_maps),
+        ("la_row_ops_uncharged", la_row_ops),
+        ("fb_abscissae_lifted_uncharged", c.selection.abscissae_drawn),
+        ("fb_rebuilds_uncharged", u64::from(c.selection.rebuilds)),
+    ] {
+        counters.insert(name.into(), v);
+    }
+    let mut unpriced = unpriced_of(&counters);
+    // Counted nowhere in the unit, and not tallied one by one: the field
+    // arithmetic outside the group law (lifts, half-traces, the normal
+    // basis), the projected-orbit maps and hashing, the modular
+    // combination of the descent's relation, and the forward pass of a
+    // vector batch that declined a degenerate block (its lane count is in
+    // `detail.vector_declined_lanes`; it depends on the host's CPU, so it
+    // is not a replayed counter).
+    unpriced.extend([
+        "field_arithmetic_uncharged".into(),
+        "hash_and_allocation_uncharged".into(),
+        "modular_combination_uncharged".into(),
+        "vector_declined_lanes_uncharged".into(),
+    ]);
+    unpriced.sort();
+    unpriced.dedup();
+    let facts = koblitz_descent::factor_base_facts(
+        &curve.slug,
+        kc,
+        &out.factor_base,
+        c.fb_signed_orbits,
+        p.factor_base_points,
+        p.seed,
+    )?;
+    let online = match &out.snapshot {
+        Ok(snap) => koblitz_descent_online(snap),
+        Err(_) => None,
+    };
+    let online_error = match (&out.snapshot, &online) {
+        (Err(e), _) => Some(e.clone()),
+        (Ok(_), None) => Some("the descent's online interval did not close".into()),
+        _ => None,
+    };
+    Ok(SolveReport {
+        recovered: out
+            .recovered
+            .as_ref()
+            .and_then(|d| d.to_u64())
+            .map(u128::from),
+        exhausted: out.recovered.is_none(),
+        phases,
+        total_gae,
+        automorphisms_used: 2 * inst.n,
+        counters,
+        unpriced,
+        deterministic: true,
+        nondeterminism: Vec::new(),
+        solve_wall_ns: wall,
+        factor_base: Some(facts),
+        detail: koblitz_descent::detail_of(&out, &p),
+        online,
+        online_error,
+        solver: None,
+        field_ops: None,
+    })
+}
+
+/// The descent's online window from the session the pipeline ran under:
+/// the five claim phases, which sum to the interval.
+fn koblitz_descent_online(snap: &Snapshot) -> Option<OnlineWindow> {
+    let mut w = online_window("ic", "ic.koblitz_descent", snap)?;
+    w.start_event = "the descent's first target-dependent operation ([a0]G + [b]Q, the walks' start), after the factor base, pair table and every column log are ready".into();
+    w.stop_event = "[d]G = Q checked inside the descent (one-word arithmetic)".into();
+    w.mapping = "one-target descent over a solved log table: building the walks and stepping them by G is target_query, keying each state and probing the pair table is target_PDP, the witness re-check is target_relation_check, combining the column logs into d is target_descent, and the descent's [d]G = Q is target_recovery_check; the relations and logs are target-independent set-up outside the window".into();
+    (w.phases_ns.values().sum::<u64>() == w.wall_ns).then_some(w)
+}
+
+#[cfg(test)]
+mod koblitz_descent_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn method(explicit: bool) -> ResolvedMethod {
+        let params: BTreeMap<String, String> = if explicit {
+            [
+                ("descent_summands", "2"),
+                ("collection_window", "64"),
+                ("factor_base_points", "256"),
+                ("unit_trials", "64"),
+                ("units", "1"),
+                ("max_trials", "100000"),
+                ("seed", "7"),
+            ]
+            .into_iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect()
+        } else {
+            BTreeMap::new()
+        };
+        resolve(&MethodSpec {
+            id: "ic.koblitz_descent".into(),
+            params,
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn the_rule_v8_defaults_are_refused_off_the_six_sizes_and_explicit_values_solve() {
+        let spec = CurveSpec::Koblitz { a: 0, n: 23 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let err = applicable(&method(false), &inst, &facts).unwrap_err();
+        assert!(err.contains("rule_v8"), "{err}");
+        let m = method(true);
+        applicable(&m, &inst, &facts).unwrap();
+        let Instance::Binary(bi) = &inst else {
+            unreachable!()
+        };
+        let target = bi.fast.mul_u64(bi.generator, 777_777 % bi.r);
+        let rep = solve(
+            &m,
+            &inst,
+            &facts,
+            &[format!("0x{:x}", target.x), format!("0x{:x}", target.y)],
+            3,
+        )
+        .unwrap();
+        assert_eq!(rep.recovered, Some(u128::from(777_777 % bi.r)));
+        assert_eq!(rep.automorphisms_used, 46);
+        let names: Vec<&str> = rep.phases.iter().map(|p| p.name.as_str()).collect();
+        assert_eq!(names, koblitz_descent::PHASES);
+        assert_eq!(rep.total_gae, rep.phases.iter().map(|p| p.gae).sum::<f64>());
+        assert!(rep
+            .phases
+            .iter()
+            .all(|p| p.gae == (p.adds + p.doubles) as f64));
+        // Every stage is charged.
+        assert!(rep.phases.iter().all(|p| p.gae > 0.0), "{:?}", rep.phases);
+        for label in [
+            "canonicalisations_uncharged",
+            "pair_filter_probes_uncharged",
+            "la_row_ops_uncharged",
+            "field_arithmetic_uncharged",
+        ] {
+            assert!(rep.unpriced.iter().any(|u| u == label), "{label}");
+        }
+        let online = rep.online.clone().expect("the descent's online window");
+        assert_eq!(online.phases_ns.values().sum::<u64>(), online.wall_ns);
+        assert_eq!(online.phases_ns.len(), 5);
+        // Deterministic in (workload, seed): a second solve counts the same.
+        let again = solve(
+            &m,
+            &inst,
+            &facts,
+            &[format!("0x{:x}", target.x), format!("0x{:x}", target.y)],
+            3,
+        )
+        .unwrap();
+        let ints = |r: &SolveReport| {
+            r.phases
+                .iter()
+                .map(|p| {
+                    (
+                        p.name.clone(),
+                        p.adds,
+                        p.doubles,
+                        p.scalar_mults,
+                        p.native.clone(),
+                    )
+                })
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(ints(&rep), ints(&again));
+        assert_eq!(rep.counters, again.counters);
+        assert_eq!(rep.factor_base, again.factor_base);
+    }
+
+    #[test]
+    fn the_explicit_recipe_applies_at_another_degree() {
+        let spec = CurveSpec::Koblitz { a: 1, n: 17 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        // n = 17 builds, the explicit recipe applies.
+        applicable(&method(true), &inst, &facts).unwrap();
+    }
 }
 
 #[cfg(test)]
