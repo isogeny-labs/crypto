@@ -94,3 +94,5 @@ Resolving the checkpoint conflict would not itself establish an improvement.
 2026-10-19: finite chart-union screen supplies a specific candidate and
 cofactor/rank diagnostics. Successful solver work and regularity remain
 unresolved. This record and its PR do not discharge those obligations.
+
+2026-10-26 storage follow-up: explicit owner S3 approval, verified full archive readback and a verified resume checkpoint remove the earlier authorization/custody blocker for the prepared software validation. See [publication receipt](../research/factor_base_excess_20261026/publication-20261026/README.md). Successful native decomposition/rank/complete-cost transfer remains unresolved; no research panel or old-card dispatch occurred.
