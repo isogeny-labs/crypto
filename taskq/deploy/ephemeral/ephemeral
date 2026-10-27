@@ -196,12 +196,12 @@ worktree_patch() {
 cmd_run() {
     local type=c7i.4xlarge spot=true ttl='' disk=100 toolchain=rust setup='' name='' detach=false
     local keep=false out='' ami='' ref='' resume='' source=true untracked=true paths=() artifacts=() envs=()
-    local cache=true cargo_dir=.
+    local cache=true cargo_dir=. spot_flag=false od_flag=false
     while [ $# -gt 0 ]; do
         case $1 in
         --type) type=$2; shift 2 ;;
-        --spot) spot=true; shift ;;
-        --on-demand) spot=false; shift ;;
+        --spot) spot=true; spot_flag=true; shift ;;
+        --on-demand) spot=false; od_flag=true; shift ;;
         --resume) resume=$(resolve_id "$2"); shift 2 ;;
         --ttl) ttl=$2; shift 2 ;;
         --disk) disk=$2; shift 2 ;;
@@ -226,6 +226,7 @@ cmd_run() {
         esac
     done
     [ $# -gt 0 ] || die "no command: ephemeral run [options] -- CMD"
+    if $spot_flag && $od_flag; then die "--spot and --on-demand contradict each other"; fi
     case $toolchain in none | build | rust) ;; *) die "--toolchain is none, build or rust" ;; esac
     if ! $source && [ -n "$ref" ]; then die "--ref and --no-source contradict each other"; fi
     [[ $disk =~ ^[0-9]+$ ]] || die "--disk wants a number of GB"
