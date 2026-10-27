@@ -1188,7 +1188,7 @@ fn fast_inner(
     rng: &mut StdRng,
     st: &mut FastStats,
 ) -> Option<Vec<Vec<u64>>> {
-    if !(2..=8).contains(&n) || p < 3 || p >= (1u64 << 32) {
+    if !(2..=8).contains(&n) || !(3..(1u64 << 32)).contains(&p) {
         st.gave_up = Some("shape");
         return None;
     }

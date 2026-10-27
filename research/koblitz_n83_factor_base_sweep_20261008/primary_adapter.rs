@@ -21,10 +21,9 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     SatDecompositionOptions,
 };
 use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
-use crypto_lib::cryptanalysis::sat::{to_dimacs_xor, SolveResult};
 use crypto_lib::hash::sha256;
 use crypto_lib::cryptanalysis::sat::{
-    RootPropagationResult, SolveResult, SolverProgress, SolverStats,
+    to_dimacs_xor, RootPropagationResult, SolveResult, SolverProgress, SolverStats,
 };
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
