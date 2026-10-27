@@ -1,0 +1,45 @@
+id: LEAD-ICB-lift-dense-twisted-line
+family: ic-binary
+title: >-
+  Lift-dense (twist-avoiding) factor bases: the twisted subfield line u·F_{2^d} on which every
+  abscissa lifts to E (composite degree, Tr(a) = 0)
+mechanism: >-
+  Relation yield is proportional to |V ∩ L|^m, where L is the set of abscissae lifting to E. If
+  Tr_{N/d}(u) = Tr_{N/d}(√b/u) = 0, the lift condition is the constant Tr(a) on the F_{2^d}-line
+  u·F_{2^d}. With Tr(a) = 0 every abscissa lifts, giving 2^n relations per Gaudry-Diem trial at the
+  same descent shape. With Tr(a) = 1 the whole line lies on the twist.
+disposition: open_next_step
+next_action:
+  step: >-
+    Complete toy solve (relations, linear algebra, log) with both bases on the C1 ladder, timed via
+    isolab-eks against the matched rho; then reprice the c2pnb (208w1, 368w1) and Oakley n = 5
+    lanes with the measured per-trial cost.
+  discriminates: >-
+    The end-to-end time ratio twisted/standard reproduces the 2LP prediction (about 2^-0.5) or not.
+best_measured: >-
+  Per-trial relation yield 1.024x of the 16x prediction on the C1 ladder (pooled), with the counted
+  Macaulay cost ratio 0.961 [0.928, 0.991]; c2pnb208w1/368w1 and Oakley groups 3 and 4 have
+  verified all-lift lines.
+obstruction:
+  kind: theorem
+  statement: >-
+    Prime degree (ECC2K-130): no subfield, so no twisted line. All-lift dimension ≤ N/2 + 1 (Weil).
+    Lift sets repel subspaces, because the Kloosterman 4th moment is pinned
+    (ΣW⁴ = 2q³ − 2q² − 3q). Tr(a) = 1 curves (c2pnb176v1, 272w1, 304w1): the line is all-twist.
+evidence:
+- repo: crypto
+  path: research/lift_dense_factor_base_20261027
+  note: theorem, Lean-proved lift form, c2pnb, prime-degree repulsion
+- repo: crypto
+  path: research/oakley_lift_dense_20261027
+  note: Oakley groups 3 and 4 applicable (n = 5, 32x per trial)
+- repo: crypto
+  path: research/c1_twisted_line_ladder_20261027
+  note: toy ladder yield and counted cost
+- repo: crypto
+  path: research/lift_repulsion_mechanism_20261027
+  note: Kloosterman-moment mechanism for prime-degree repulsion
+areas:
+- BINSTD
+- CERTBIN
+last_reviewed: '2026-10-27'
