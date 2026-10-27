@@ -1,0 +1,34 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "k=4 char-2 replication: m=16 target 3 arm rho-neg",
+  "description": "PROTOCOL.md (research/gaudry_k4_char2_replication_20261026), frozen before data.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "f2m4_torsion",
+        "m": 16,
+        "seed": 1,
+        "max_cofactor": 2
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 2220224682053213313
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_f2m4_refmm"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 2800741031739498886,
+    "isolation_required": "L0",
+    "timeout_seconds": 172800
+  }
+}

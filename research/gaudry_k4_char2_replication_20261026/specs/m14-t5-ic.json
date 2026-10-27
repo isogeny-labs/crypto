@@ -1,0 +1,40 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "k=4 char-2 replication: m=14 target 5 arm ic",
+  "description": "PROTOCOL.md (research/gaudry_k4_char2_replication_20261026), frozen before data.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "f2m4_torsion",
+        "m": 14,
+        "seed": 2,
+        "max_cofactor": 2
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 1852174654910818564
+  },
+  "arms": [
+    {
+      "name": "ic",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_f2m4_refmm",
+        "params": {
+          "factor_base": "bin-t-line",
+          "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "50000000",
+          "linalg": "wiedemann"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 4653527487217115683,
+    "isolation_required": "L0",
+    "timeout_seconds": 172800
+  }
+}

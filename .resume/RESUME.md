@@ -8,3 +8,9 @@
 - **Conductor:** T-3 (local control plane).
 - **S3 checkpoint:** not possible in this container (no upload token, no AWS CLI); this file and every finished session are committed and pushed to git instead.
 - **Session doing the work:** session_01JZkty38GW5FcgAcudQ45ph (parent of the chase sessions).
+
+## Status 2026-10-27 (protocol frozen)
+
+- Step 1 done: d-ladder replay 18/18 reproduced. Step 2 done after four review rounds (`REVIEW-1..3.md`, round-4 verify in the session log of the parent session).
+- Step 3: `PROTOCOL.md`, `specs/` (96, from `make_specs.py`), `jobs.txt` and `run_queue.sh` are frozen in the commit that adds this note. To resume after a restart: `setsid nohup bash research/gaudry_k4_char2_replication_20261026/run_queue.sh &`. It skips `done/` jobs and renames interrupted sessions `.attemptN-killed`.
+- Build the binary first if `target-repl/release/ecbench` is missing: `CARGO_TARGET_DIR=target-repl cargo build --release -j2 --bin ecbench`.
