@@ -53,3 +53,13 @@ Local 4-vCPU shared VM, no isolation (L0); isolab-eks was not reachable from
 this session (no AWS CLI), so this deviates from the default route of AGENTS.md
 §9a. Wall time only; §5a band as in PR #2580 (IC does no group operations, arms
 are not ranked on operation counts).
+
+## Amendment 1 (2026-10-27, after 18 rows, before any analysis was used)
+
+The first campaign run stopped at q = 2003, seed 5, arm lp:0.35 with a panic:
+the iota-pair check computed c from x-index 0, which in a large-prime arm need
+not be in the small base, so its log can be unknown. Fix: c is computed from the
+pinned point (always in the small base). The fix touches only that check; the
+iota arm still reproduces the recorded PR #2580 run at q = 1009 seed 1 exactly.
+The 18 rows are kept as `results/campaign_v1_superseded.*`, and the whole grid is
+rerun with the fixed binary. Predictions and metrics are unchanged.

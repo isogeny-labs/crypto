@@ -445,7 +445,8 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let known = |i: usize| -> bool { !iota || yv[i / 2].is_some() };
     let x_inf = xv[inf_col];
     // ---- lead 4 checks: iota pairs, X_oo = 4c ------------------------------
-    let c_val = (val(0) + val(1)) % r;
+    // c from the pinned point: always in the small base, so its log is known
+    let c_val = (val(2 * pinned) + val(2 * pinned + 1)) % r;
     let mut iota_pairs_const = true;
     for j in (0..nx).filter(|&j| known(2 * j)) {
         if (val(2 * j) + val(2 * j + 1)) % r != c_val {
