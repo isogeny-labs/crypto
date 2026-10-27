@@ -606,6 +606,12 @@ fn dp_trial(c: &Curve, arm: &str, seed: u64, cfg: &DpCfg) -> Rec {
             } else if arm == "pair_table" {
                 let j = s.idx(x, 1, cfg.r);
                 s.wadd(st.w, pairs[i * cfg.r + j], false)
+            } else if arm == "neg_pm_score" {
+                // negation map with best of P + R and P - R (gpu/nist RHO_BEST2)
+                let plus = s.wadd(st.w, s.tab[i], false);
+                let minus = s.wadd(st.w, s.tab[i], true);
+                adds += 1;
+                if s.score(&minus.p) > s.score(&plus.p) { minus } else { plus }
             } else {
                 s.wadd(st.w, s.tab[i], false)
             };
@@ -1056,6 +1062,7 @@ fn predicted(exp: &str, arm: &str) -> Option<f64> {
         ("e1", "pm_coin") | ("e2", "lazy_dp") | ("e2", "pair_table") => Some(1.0),
         ("e2", "lazy_index") => Some(std::f64::consts::FRAC_1_SQRT_2),
         ("e4", "neg_canon") | ("e4", "neg_hashrule") => Some(std::f64::consts::SQRT_2),
+        ("e4", "neg_pm_score") => Some(std::f64::consts::SQRT_2 * k2(2.0)),
         _ => None,
     }
 }

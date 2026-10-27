@@ -5,7 +5,8 @@
  * device kernel's distinguished points are checked against.
  *
  * The coefficient update mirrors rho_phase_b exactly: every non-INF step
- * either adds the table entry's (c_j,d_j) or, on an escape, doubles (a,b);
+ * either adds the table entry's (c_j,d_j) (subtracts them when RHO_BEST2
+ * took P - M, aut bit RHO_AUT_MINUS) or, on an escape, doubles (a,b);
  * a fold then negates both.  So the point and its coefficients never drift,
  * and a distinguished point carries an exact logarithm relation.
  *
@@ -98,6 +99,7 @@ template<class C> struct RhoHost {
     unsigned long long ca=tbl[jj[i]].c, cb=tbl[jj[i]].d; bool escape=(mode[i]==RHO_MODE_ESCAPE);
     int aut; int r=rho_phase_b<C>(wk[i].st,tptr.data(),prm,mode[i],jj[i],den[i],&aut);
     if(escape){ wk[i].a=zn.add(wk[i].a,wk[i].a); wk[i].b=zn.add(wk[i].b,wk[i].b); }
+    else if(aut&RHO_AUT_MINUS){ wk[i].a=zn.sub(wk[i].a,ca); wk[i].b=zn.sub(wk[i].b,cb); }
     else { wk[i].a=zn.add(wk[i].a,ca); wk[i].b=zn.add(wk[i].b,cb); }
     if(aut&1){ wk[i].a=zn.neg(wk[i].a); wk[i].b=zn.neg(wk[i].b); }
     total++;
