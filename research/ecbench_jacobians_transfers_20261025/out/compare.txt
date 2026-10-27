@@ -1,0 +1,60 @@
+== genus2: rho-plain / rho-neg
+ops (ok): rho-plain / rho-neg = 1.1063 [0.875, 1.399] (linearised_t, df 7) over 24 pairs on 8 workloads, 2 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.1063, w=0.1: 1.0231, w=1: 0.6100): unresolved inside the band; wall: admitted ns/GAE rho-plain/rho-neg 0.9772 [0.919, 1.039], bias-corrected 0.9769 [0.886, 1.077] (A/A 1.0003, includes arm A), within noise; end-to-end wall 1.1320 [0.866, 1.479]; ns/GAE of rho-neg is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 70 / 100; paired attempts 24, verified 24, admitted 21; levels {"L1": 3, "L2": 21}; p95 foreign busy 227.21%, p95 run queue 0.97%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-neg: verified 24/24 (0 censored); max/median S 2.41, top run 9% of total; unpriced: canonicalisations_uncharged=20288
+== genus2: bsgs-neg / rho-neg
+ops (ok): bsgs-neg / rho-neg = 0.7374 [0.609, 0.892] (linearised_t, df 7) over 24 pairs on 8 workloads, 2 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.7374, w=0.1: 0.7488, w=1: 0.8053): bsgs-neg < rho-neg at every weight; wall: admitted ns/GAE bsgs-neg/rho-neg 0.9499 [0.897, 1.006], bias-corrected 0.9497 [0.864, 1.044] (A/A 1.0003, includes arm A), within noise; end-to-end wall 0.7537 [0.602, 0.944]; ns/GAE of rho-neg, bsgs-neg is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 63 / 100; paired attempts 24, verified 24, admitted 16; levels {"L1": 8, "L2": 16}; p95 foreign busy 207.68%, p95 run queue 0.88%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-neg: verified 24/24 (0 censored); max/median S 2.41, top run 9% of total; unpriced: canonicalisations_uncharged=20288
+== genus2: ic-hec / rho-neg
+ops (ok): ic-hec / rho-neg = 1.4731 [1.158, 1.874] (linearised_t, df 7) over 24 pairs on 8 workloads, 2 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.4731, w=0.1: 37.5163, w=1: 216.3671): ic-hec > rho-neg at every weight; wall: admitted ns/GAE ic-hec/rho-neg 45.5986 [42.301, 49.153], bias-corrected 45.5851 [41.013, 50.667] (A/A 1.0003, includes arm A), outside noise; end-to-end wall 73.6428 [59.843, 90.625]; ns/GAE of rho-neg, ic-hec is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 70 / 100; paired attempts 24, verified 24, admitted 21; levels {"L1": 3, "L2": 21}; p95 foreign busy 128.33%, p95 run queue 0.88%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-neg: verified 24/24 (0 censored); max/median S 2.41, top run 9% of total; unpriced: canonicalisations_uncharged=20288
+== genus2: rho-neg-aa / rho-neg
+ops (ok): rho-neg-aa / rho-neg = 1.0000 [1.000, 1.000] (linearised_t, df 7) over 24 pairs on 8 workloads, 2 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: admitted ns/GAE rho-neg-aa/rho-neg 1.0003 [0.925, 1.082], an A/A control (nothing to correct); end-to-end wall 1.0003 [0.925, 1.082]; ns/GAE of rho-neg, rho-neg-aa is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 70 / 100; paired attempts 24, verified 24, admitted 21; levels {"L1": 3, "L2": 21}; p95 foreign busy 206.58%, p95 run queue 0.88%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-neg: verified 24/24 (0 censored); max/median S 2.41, top run 9% of total; unpriced: canonicalisations_uncharged=20288
+== quartic: bsgs / rho-plain
+ops (ok): bsgs / rho-plain = 0.4974 [0.378, 0.654] (linearised_t, df 7) over 24 pairs on 8 workloads, 2 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.4974, w=0.1: 0.5435, w=1: 0.9588): bsgs < rho-plain at every weight; wall: admitted ns/GAE bsgs/rho-plain 0.9838 [0.926, 1.045], bias-corrected 1.0097 [0.927, 1.100] (A/A 0.9744, includes arm A), within noise; end-to-end wall 0.6204 [0.489, 0.787]; ns/GAE of bsgs is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 47 / 100; paired attempts 24, verified 24, admitted 5; levels {"L1": 19, "L2": 5}; p95 foreign busy 3.01%, p95 run queue 0.01%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-plain: verified 24/24 (0 censored); max/median S 2.03, top run 9% of total; unpriced: none
+== quartic: rho-plain-aa / rho-plain
+ops (ok): rho-plain-aa / rho-plain = 1.0000 [1.000, 1.000] (linearised_t, df 7) over 24 pairs on 8 workloads, 2 curve(s); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: admitted ns/GAE rho-plain-aa/rho-plain 0.9744 [0.914, 1.039], an A/A control (nothing to correct); end-to-end wall 0.9744 [0.914, 1.039]
+measurement quality: 47 / 100; paired attempts 24, verified 24, admitted 5; levels {"L1": 19, "L2": 5}; p95 foreign busy 3.70%, p95 run queue 0.01%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-plain: verified 24/24 (0 censored); max/median S 2.03, top run 9% of total; unpriced: none
+== ghs: ghs-rho-neg / rho-neg
+ops (ok): ghs-rho-neg / rho-neg = 6.6229 [5.134, 8.543] (linearised_t, df 7) over 24 pairs on 8 workloads, 2 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 6.6229, w=0.1: 6.1657, w=1: 3.9775): ghs-rho-neg > rho-neg at every weight; wall: admitted ns/GAE ghs-rho-neg/rho-neg 0.8837 [0.752, 1.038], bias-corrected 0.8603 [0.683, 1.083] (A/A 1.0272, includes arm A), within noise; end-to-end wall 6.4054 [4.975, 8.247]; ns/GAE of rho-neg, ghs-rho-neg is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 75 / 100; paired attempts 24, verified 24, admitted 24; levels {"L2": 24}; p95 foreign busy 92.46%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-neg: verified 24/24 (0 censored); max/median S 1.89, top run 8% of total; unpriced: canonicalisations_uncharged=48934
+== ghs: rho-neg-aa / rho-neg
+ops (ok): rho-neg-aa / rho-neg = 1.0000 [1.000, 1.000] (linearised_t, df 7) over 24 pairs on 8 workloads, 2 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: admitted ns/GAE rho-neg-aa/rho-neg 1.0272 [0.864, 1.221], an A/A control (nothing to correct); end-to-end wall 1.0272 [0.864, 1.221]; ns/GAE of rho-neg, rho-neg-aa is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 73 / 100; paired attempts 24, verified 24, admitted 23; levels {"L1": 1, "L2": 23}; p95 foreign busy 156.95%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-neg: verified 24/24 (0 censored); max/median S 1.89, top run 8% of total; unpriced: canonicalisations_uncharged=48934
+== prime: rho-plain / rho-neg
+ops (ok): rho-plain / rho-neg = 0.9956 [0.625, 1.587] (linearised_t, df 3) over 12 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.9956, w=0.1: 0.9304, w=1: 0.5851): rho-plain < rho-neg at every weight; wall: admitted ns/GAE rho-plain/rho-neg 0.8421 [0.633, 1.121], bias-corrected 0.9956 [0.721, 1.374] (A/A 0.8459, includes arm A), within noise; end-to-end wall 0.8385 [0.731, 0.962]; ns/GAE of rho-neg is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 40 / 100; paired attempts 12, verified 12, admitted 0; levels {"L1": 12}; p95 foreign busy 92.32%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-neg: verified 12/12 (0 censored); max/median S 1.78, top run 14% of total; unpriced: canonicalisations_uncharged=4350
+== prime: iso3-rho-neg / rho-neg
+ops (ok): iso3-rho-neg / rho-neg = 0.9337 [0.744, 1.172] (linearised_t, df 3) over 12 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.9337, w=0.1: 1.5361, w=1: 4.7223): unresolved inside the band; wall: admitted ns/GAE iso3-rho-neg/rho-neg 1.6401 [1.256, 2.141], bias-corrected 1.9389 [1.428, 2.632] (A/A 0.8459, includes arm A), outside noise; end-to-end wall 1.5314 [1.287, 1.822]; ns/GAE of rho-neg, iso3-rho-neg is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 40 / 100; paired attempts 12, verified 12, admitted 0; levels {"L1": 12}; p95 foreign busy 96.61%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-neg: verified 12/12 (0 censored); max/median S 1.78, top run 14% of total; unpriced: canonicalisations_uncharged=4350
+== prime: qcover-rho-plain / rho-neg
+ops (ok): qcover-rho-plain / rho-neg = 15291.7213 [11064.725, 21133.534] (linearised_t, df 3) over 12 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 15291.7213, w=0.1: 14289.0233, w=1: 8986.0063): qcover-rho-plain > rho-neg at every weight; wall: admitted ns/GAE qcover-rho-plain/rho-neg 0.3230 [0.275, 0.379], bias-corrected 0.3818 [0.304, 0.479] (A/A 0.8459, includes arm A), outside noise; end-to-end wall 4938.9135 [3785.453, 6443.843]; ns/GAE of rho-neg is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 40 / 100; paired attempts 12, verified 12, admitted 0; levels {"L1": 12}; p95 foreign busy 75.56%, p95 run queue 0.01%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-neg: verified 12/12 (0 censored); max/median S 1.78, top run 14% of total; unpriced: canonicalisations_uncharged=4350
+== prime: rho-neg-aa / rho-neg
+ops (ok): rho-neg-aa / rho-neg = 1.0000 [1.000, 1.000] (linearised_t, df 3) over 12 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: admitted ns/GAE rho-neg-aa/rho-neg 0.8459 [0.706, 1.013], an A/A control (nothing to correct); end-to-end wall 0.8459 [0.706, 1.013]; ns/GAE of rho-neg, rho-neg-aa is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 40 / 100; paired attempts 12, verified 12, admitted 0; levels {"L1": 12}; p95 foreign busy 95.60%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm rho-neg: verified 12/12 (0 censored); max/median S 1.78, top run 14% of total; unpriced: canonicalisations_uncharged=4350

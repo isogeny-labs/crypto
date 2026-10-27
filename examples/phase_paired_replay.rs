@@ -431,7 +431,7 @@ fn schedule(
     for rep in 1..=reps {
         for f in forms {
             for (i, t) in w.targets.iter().enumerate() {
-                let order = if (i as u64 + rep - 1) % 2 == 0 {
+                let order = if (i as u64 + rep - 1).is_multiple_of(2) {
                     ["A", "B"]
                 } else {
                     ["B", "A"]
@@ -975,7 +975,7 @@ fn tables_md(rp: &Replayed, ncols: usize) -> String {
 
     md.push_str("\n### Where the cost goes, by outcome (conflicts; CPU s)\n\n");
     md.push_str("| rep | arm | verified (n, conflicts, CPU s) | UNSAT (n, conflicts, CPU s) | budget or deadline (n, conflicts, CPU s) |\n|---|---|---|---|---|\n");
-    for ((rep, _form, arm), _) in &rp.scopes {
+    for (rep, _form, arm) in rp.scopes.keys() {
         let sel = |st: &[&str]| -> (u64, u64, f64) {
             rp.rows
                 .iter()
@@ -1070,7 +1070,7 @@ fn tables_md(rp: &Replayed, ncols: usize) -> String {
 
     md.push_str("\n### Cost charged when each rank was first reached (attempts, conflicts, CPU s); depends on the schedule's target order\n\n");
     md.push_str("| rep | form | arm | rank 1 | rank 2 | rank 3 | rank 4 | rank 5 |\n|---|---|---|---|---|---|---|---|\n");
-    for (key, _) in &rp.scopes {
+    for key in rp.scopes.keys() {
         let cells: Vec<String> = (1..=ncols)
             .map(|k| match rp.first_hit.get(key).and_then(|m| m.get(&k)) {
                 Some((a, c, t)) => format!("{a}, {c}, {:.1}", *t as f64 / 1e9),

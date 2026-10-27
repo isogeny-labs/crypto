@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ecbench-criu-restored
+  namespace: isolab-recovery-system
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: gp3
+  resources:
+    requests: {storage: 4Gi}
+  dataSource:
+    name: ecbench-criu-qualification-v3
+    kind: VolumeSnapshot
+    apiGroup: snapshot.storage.k8s.io
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ecbench-criu-restored
+  namespace: isolab-recovery-system
+  labels: {isolab.dev/recovery-probe: 'true'}
+  annotations: {karpenter.sh/do-not-disrupt: 'true'}
+spec:
+  restartPolicy: Never
+  activeDeadlineSeconds: 900
+  automountServiceAccountToken: false
+  nodeSelector:
+    isolab.dev/pool: cpu-spot
+    node.kubernetes.io/instance-type: c8a.2xlarge
+  tolerations:
+    - {key: isolab.dev/workload, operator: Equal, value: cpu, effect: NoSchedule}
+  containers:
+    - name: supervisor
+      image: 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581
+      command: [/bin/bash, -ec, 'LD_LIBRARY_PATH=/work/tools/lib /work/tools/criu check; sleep 850']
+      securityContext: {privileged: true, runAsUser: 0, runAsGroup: 0}
+      resources:
+        requests: {cpu: '4', memory: 4Gi}
+        limits: {cpu: '4', memory: 4Gi}
+      volumeMounts: [{name: work, mountPath: /work}]
+  volumes:
+    - name: work
+      persistentVolumeClaim: {claimName: ecbench-criu-restored}
