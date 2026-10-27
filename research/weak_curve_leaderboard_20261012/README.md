@@ -6,8 +6,7 @@ and the pinned pairing roster,
 and **36 published odd-characteristic covering cases**. The named roster
 includes Oakley Groups 3 and 4, with exact GHS invariant candidates and
 separate WID1 finding IDs. It adds three exhaustively checked prime-field
-examples and a twenty-eight-criterion
-examples and a twenty-four-criterion
+examples and a thirty-two-criterion
 registry for anomalous, smooth-order, MOV, Frey–Rück, supersingular,
 binary-GHS, odd-characteristic GHS, cubic norm-one, quadratic-torus and
 proper-subfield mechanisms, plus direct extension-field decomposition,
@@ -95,6 +94,12 @@ accepted rank-bearing three-sum targets and zero hits in 64 frozen fresh
 known-scalar queries. This is evidence about the specified reduction and
 collector policy; the registry requires relation rank and complete cost
 before a curve-level weakness verdict.
+The [weighted support theorem](lean/WeightedSupport.lean) extends the same
+criterion to finite seeded query laws with unequal target probabilities. If
+no accepted target has more than \(M\) preimage seeds, the supported accepted
+seed mass is at most \(\binom{B+m-1}{m}M\). This makes sampler concentration
+a checkable input alongside base size, relation yield and rank; the
+[proof map](PROOF_MAP.md) states the exact one-query hypotheses.
 
 The [genus-128 GHS cost audit](ghs_genus128_cost_audit.json) resolves the
 nominal factor-base and relation-query stages behind the two exact-invariant
