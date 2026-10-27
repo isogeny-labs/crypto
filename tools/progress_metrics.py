@@ -7,6 +7,8 @@ Sources (all committed, read at --ref unless noted):
   docs/perf/history.json          on branch origin/perf-history: chained Ir performance index per push
   benchmarks/README.md            append-only benchmark entries (one row per study)
   docs/ic/ci/runs/*.json          ic e2e history records
+  docs/curves/jacobian-transfers.json
+                                exact catalog coverage counts, not attack-performance claims
   research/nist_skipped_curve_dissection_20261021/factorization/progress.json
                                 certified factorization status and recorded raw relation counts
   research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json
@@ -81,6 +83,21 @@ def args():
 
 P_IC = "ecdlp-index-calculus"
 P_PERF = "crypto-performance"
+
+
+def jacobian_catalog(ref, since):
+    path = "docs/curves/jacobian-transfers.json"
+    for date, commit, text in file_history(ref, path, since):
+        summary = json.loads(text).get("summary") or {}
+        source = f"{path}@{commit}"
+        for field, label in (("curves", "screened registry entries"),
+                             ("routes", "enumerated model routes")):
+            emit(f"jacobian.catalog.{field}", summary.get(field), date=date,
+                 problem="jacobian-transfer-catalog", unit="count", better="neutral",
+                 label=f"Jacobian catalog: {label}", source=source)
+        emit("jacobian.catalog.boundary_entries", (summary.get("by_class") or {}).get("boundary"),
+             date=date, problem="jacobian-transfer-catalog", unit="count", better="neutral",
+             label="Jacobian catalog: boundary classifications", source=source)
 
 
 def leaderboard(ref, since):
@@ -269,6 +286,7 @@ def fall_degree(ref):
 
 def main():
     a = args()
+    jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
     perf_history(a.since)
