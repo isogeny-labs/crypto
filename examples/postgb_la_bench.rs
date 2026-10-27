@@ -22,12 +22,12 @@ use std::env;
 use std::time::Instant;
 
 use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, Ordering as F4Ordering, Poly};
-use crypto_lib::cryptanalysis::jv_cover::{
-    self, linear_stage_from_basis, nagao_systems, LinMode, ZeroDimStats,
-};
 use crypto_lib::cryptanalysis::gaudry_cubic::{generate_instance3, SymmetrisedS4};
 use crypto_lib::cryptanalysis::gaudry_quartic::{generate_instance4, SymmetrisedS5};
 use crypto_lib::cryptanalysis::gaudry_quartic_d4::{generate_d4_instance, SymmetrisedD4};
+use crypto_lib::cryptanalysis::jv_cover::{
+    self, linear_stage_from_basis, nagao_systems, LinMode, ZeroDimStats,
+};
 use crypto_lib::cryptanalysis::zero_dim_la::{fast_stage, staircase_size, FastStats};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -160,7 +160,9 @@ fn corpus(families: &str, per: usize, shapes_only: Option<&str>) -> Vec<Sys> {
             let pre = SymmetrisedS4::precompute(&inst.curve);
             let mut rng = StdRng::seed_from_u64(p ^ 0x54);
             for k in 0..per {
-                let r = inst.curve.mul(&inst.curve.g, rng.gen_range(1..inst.curve.n));
+                let r = inst
+                    .curve
+                    .mul(&inst.curve.g, rng.gen_range(1..inst.curve.n));
                 let comps = pre.weil_restrict(&inst.curve.field, &r.x);
                 out.push(Sys {
                     family: "gaudry-s4".into(),
@@ -186,7 +188,9 @@ fn corpus(families: &str, per: usize, shapes_only: Option<&str>) -> Vec<Sys> {
             let mut k = 0;
             while k < per {
                 let x = inst.curve.f.random(&mut rng);
-                let Some(r) = inst.curve.lift_x(&x, &mut rng) else { continue };
+                let Some(r) = inst.curve.lift_x(&x, &mut rng) else {
+                    continue;
+                };
                 let y_r = inst.y_of_x(&r.x);
                 let comps = pre.system(&inst.curve.f, &y_r);
                 out.push(Sys {
@@ -252,7 +256,12 @@ fn corpus(families: &str, per: usize, shapes_only: Option<&str>) -> Vec<Sys> {
         for &(n, d) in shapes.iter().filter(|(n, d)| keep(*n, *d)) {
             for (pi, &p) in primes.iter().enumerate() {
                 for k in 0..per.min(3) {
-                    let (input, pt) = dense_system(n, d, p, 1000 * n as u64 + 10 * d as u64 + k as u64 + 7 * pi as u64);
+                    let (input, pt) = dense_system(
+                        n,
+                        d,
+                        p,
+                        1000 * n as u64 + 10 * d as u64 + k as u64 + 7 * pi as u64,
+                    );
                     out.push(Sys {
                         family: "dense".into(),
                         label: format!("n{n}-d{d}-p{}-{k}", 64 - p.leading_zeros()),
@@ -344,12 +353,23 @@ fn main() {
                 let t = Instant::now();
                 let (sols, muls, fb, gu, fs, d) = match arms[a] {
                     "dense" | "sparse" => {
-                        let mode = if arms[a] == "dense" { LinMode::Dense } else { LinMode::Sparse };
+                        let mode = if arms[a] == "dense" {
+                            LinMode::Dense
+                        } else {
+                            LinMode::Sparse
+                        };
                         let mut st = ZeroDimStats::default();
                         let sols = linear_stage_from_basis(
                             &r.basis, &s.input, s.n, s.p, &mut rng, mode, &mut st, t,
                         );
-                        (sols, st.lin_muls, st.lin_fallback > 0 || st.incomplete, None, None, st.delta)
+                        (
+                            sols,
+                            st.lin_muls,
+                            st.lin_fallback > 0 || st.incomplete,
+                            None,
+                            None,
+                            st.delta,
+                        )
                     }
                     _ => {
                         let mut st = FastStats::default();
@@ -362,7 +382,14 @@ fn main() {
                                 let gu = st.gave_up.map(|x| x.to_string());
                                 let mut st2 = ZeroDimStats::default();
                                 let sols = linear_stage_from_basis(
-                                    &r.basis, &s.input, s.n, s.p, &mut rng, LinMode::Dense, &mut st2, t,
+                                    &r.basis,
+                                    &s.input,
+                                    s.n,
+                                    s.p,
+                                    &mut rng,
+                                    LinMode::Dense,
+                                    &mut st2,
+                                    t,
                                 );
                                 let m = st.muls() + st2.lin_muls;
                                 (sols, m, true, gu, Some(st), st2.delta)
@@ -401,7 +428,11 @@ fn main() {
             .collect();
         let gave_up = res
             .iter()
-            .filter_map(|r| r.gave_up.as_ref().map(|g| format!(" {}-gave-up:{g}", r.arm)))
+            .filter_map(|r| {
+                r.gave_up
+                    .as_ref()
+                    .map(|g| format!(" {}-gave-up:{g}", r.arm))
+            })
             .collect::<String>();
         eprintln!(
             "{:9} {:22} δ={:5} f4={:9.1}ms {} sols={} agree={} planted={:?}{}",
