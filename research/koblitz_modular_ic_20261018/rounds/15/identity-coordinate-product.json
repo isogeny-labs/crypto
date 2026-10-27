@@ -1,0 +1,358 @@
+{
+  "id": "IDC1h162a94136a4f45ea",
+  "independence": "native issuer;128 extra points and source-bound Lean theorem",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound15.lean",
+    "sha256": "3c9f8c746befaf4547bfd3e4a42337e0ba1b3b32a9abc626b66307e91648eb53"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610211503,
+  "statement": {
+    "degree_bound": 5,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "A",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "B",
+                      "op": "var"
+                    },
+                    {
+                      "args": "y",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "C",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "D",
+                      "op": "var"
+                    },
+                    {
+                      "args": "y",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "A",
+                          "op": "var"
+                        },
+                        {
+                          "args": "C",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "B",
+                              "op": "var"
+                            },
+                            {
+                              "args": "D",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "args": "x",
+                                      "op": "var"
+                                    },
+                                    {
+                                      "args": "x",
+                                      "op": "var"
+                                    },
+                                    {
+                                      "args": "x",
+                                      "op": "var"
+                                    }
+                                  ],
+                                  "op": "mul"
+                                },
+                                {
+                                  "args": [
+                                    {
+                                      "args": "x",
+                                      "op": "var"
+                                    },
+                                    {
+                                      "args": "x",
+                                      "op": "var"
+                                    }
+                                  ],
+                                  "op": "mul"
+                                }
+                              ],
+                              "op": "add"
+                            },
+                            {
+                              "args": 1,
+                              "op": "const"
+                            }
+                          ],
+                          "op": "add"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": "A",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "D",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": "B",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "C",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            }
+                          ],
+                          "op": "add"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": "B",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "D",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            },
+                            {
+                              "args": "x",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": "y",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "coordinate-product",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "B",
+              "op": "var"
+            },
+            {
+              "args": "D",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "y",
+                      "op": "var"
+                    },
+                    {
+                      "args": "y",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "y",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "x",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "x",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": 1,
+                      "op": "const"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "source": "KoblitzRound15.coordinate_product_residual",
+    "variables": [
+      "x",
+      "y",
+      "A",
+      "B",
+      "C",
+      "D"
+    ]
+  },
+  "value_digest": "b6db50f9bf36fe7dd5dd7fafcbad6cc971f5c018f6a325a5062b5f394dfe55b9"
+}

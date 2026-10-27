@@ -110,8 +110,9 @@
 //!   [`legacy_orbit_dim_with_a`].
 //! - [`ghs_genus`] returns `2^{m−1}`; [`ghs_genus_with_type`] and
 //!   [`audit_curve`] apply the type-I correction.
-//! - The applicability condition for `Tr_{K/F_2}(a) = 1` (MMT Lemma 6)
-//!   and the descent itself are not checked here.
+//! - The applicability condition for `Tr_{K/F_2}(a) = 1` (MMT Lemma 6) is
+//!   [`mmt_condition_8`], recorded per row in [`DescentRow::descends`]; the
+//!   descent itself is not constructed here.
 
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use num_bigint::BigUint;
@@ -952,6 +953,234 @@ mod tests {
             assert!(tc.row.descends);
             assert!(mmt_condition_8(&tower, &tc.a, &tc.b));
             assert_eq!(tc.row.magic_m, m);
+        }
+    }
+
+    // ---- R5.2 regression: GHS genus rule against an independent reference ----
+    //
+    // Round-5 lead R5.2 (`research/isogeny_fibers_20261010/round5/r5_2_ghs_class/`)
+    // reported that `audit_curve` disagreed with the GHS genus on 1 248 of
+    // 1 500 sampled rows at N = 12 (genus 0 for b in F_2, genus 7 at n = 4,
+    // m one too small).  That comparison ran on a base that predates the
+    // 2026-10-13 MMT correction (`docs/audits/GHS_MAGIC_NUMBER_MMT_CORRECTION_20261013.md`),
+    // so it measured the removed rule.  These tests pin the corrected rule to
+    // R5.2's own formulation, written independently of `mmt_ranks`:
+    //
+    //   c_i = sigma^i(sqrt b);  f = sigma-annihilator of sqrt b (first F_2-dependency);
+    //   m' = deg f;  m = m' + [f(1) != 0];  g = 2^{m-1} - [f(1) != 0].
+
+    /// `(m, genus, type_i)` from the annihilator polynomial of `sqrt b`.
+    fn reference_m_genus(tower: &FieldTower, b: &F2mElement) -> (u32, BigUint, bool) {
+        // Reduced basis kept as (vector, combination of c_0..c_{k-1} that made it).
+        let mut basis: Vec<(BigUint, BigUint)> = Vec::new();
+        let mut cur = tower.sqrt(b);
+        let mut f_degree = tower.n;
+        let mut f_at_one = false;
+        for k in 0..tower.n {
+            let mut v = cur.to_biguint();
+            let mut combo = BigUint::one() << (k as usize);
+            for (bv, bc) in &basis {
+                // Eliminate on the leading bit of `bv`.
+                let lead = bv.bits() - 1;
+                if v.bit(lead) {
+                    v ^= bv;
+                    combo ^= bc;
+                }
+            }
+            if v.is_zero() {
+                // combo encodes f(x) = sum combo_i x^i with deg f = k.
+                f_degree = k;
+                f_at_one = combo.count_ones() % 2 == 1;
+                break;
+            }
+            basis.push((v, combo));
+            // Keep the basis sorted by descending leading bit for stable elimination.
+            basis.sort_by_key(|(bv, _)| std::cmp::Reverse(bv.bits()));
+            cur = tower.frobenius(&cur);
+        }
+        if f_degree == tower.n {
+            // No dependency before x^n - 1: f = x^n - 1, f(1) = 0.
+            f_at_one = false;
+        }
+        // (0,1) in U (type I) iff f(1) != 0, i.e. an odd-size subset sums to zero.
+        let type_i = f_at_one;
+        let m = f_degree + u32::from(type_i);
+        let g = (BigUint::one() << (m as usize - 1)) - BigUint::from(u32::from(type_i));
+        (m, g, type_i)
+    }
+
+    /// The rule removed on 2026-10-13: plain orbit rank, type I iff the
+    /// orbit length of `sqrt b` equals that rank.
+    fn removed_rule_m_genus(tower: &FieldTower, b: &F2mElement) -> (u32, BigUint) {
+        let m = plain_orbit_dim(tower, b);
+        let g = ghs_genus(m);
+        if tower.frobenius_orbit_length(&tower.sqrt(b)) == m {
+            (m, g - BigUint::one())
+        } else {
+            (m, g)
+        }
+    }
+
+    /// Exhaustive over `F_{2^12}`: every `b`, every factorisation, two values
+    /// of `a` (trace 0 and trace 1).  `audit_curve` agrees with the reference
+    /// on `(m, genus, type)` in all `5 * 4095 * 2` rows, never reports genus 0
+    /// for a curve, and never reports an impossible genus 7 at `n = 4`.  The
+    /// removed rule is shown to disagree with the reference on a large share
+    /// of the same rows, which is the discrepancy R5.2 recorded.
+    #[test]
+    fn audit_curve_genus_matches_annihilator_reference_n12() {
+        let irr = f4096_irr();
+        let any = FieldTower::new(12, 2, 6, irr.clone());
+        let a1 = (1u64..)
+            .map(|v| F2mElement::from_biguint(&BigUint::from(v), 12))
+            .find(|a| absolute_trace(&any, a))
+            .unwrap();
+        let a0 = F2mElement::zero(12);
+        let mut rows_checked = 0usize;
+        let mut removed_rule_disagrees = 0usize;
+        for v in 1u64..4096 {
+            let b = F2mElement::from_biguint(&BigUint::from(v), 12);
+            for a in [&a0, &a1] {
+                let rows = audit_curve(12, &irr, a, &b);
+                assert_eq!(rows.len(), 5, "factorisations of 12 with n >= 2");
+                for row in rows {
+                    let tower = FieldTower::new(12, row.n, row.l, irr.clone());
+                    let (m, g, type_i) = reference_m_genus(&tower, &b);
+                    assert_eq!(
+                        (row.magic_m, row.genus.clone(), row.type_i),
+                        (m, g.clone(), type_i),
+                        "b = {v:#x}, (n, l) = ({}, {})",
+                        row.n,
+                        row.l
+                    );
+                    assert!(!row.genus.is_zero(), "b = {v:#x}: genus 0 is not a curve");
+                    if row.n == 4 {
+                        assert_ne!(row.genus, BigUint::from(7u32), "b = {v:#x}");
+                    }
+                    let (old_m, old_g) = removed_rule_m_genus(&tower, &b);
+                    if (old_m, old_g) != (m, g) {
+                        removed_rule_disagrees += 1;
+                    }
+                    rows_checked += 1;
+                }
+            }
+        }
+        assert_eq!(rows_checked, 5 * 4095 * 2);
+        // The removed rule is wrong on a substantial share (R5.2 saw 83 % of
+        // its random sample); the exact count here is a regression lock.
+        assert!(
+            removed_rule_disagrees * 2 > rows_checked,
+            "{removed_rule_disagrees} of {rows_checked}"
+        );
+    }
+
+    /// R5.2's hand-checked cases (N = 12, `(l, n)` as in its notes), asserted
+    /// against `audit_curve` itself.
+    #[test]
+    fn audit_curve_r52_hand_checked_cases_n12() {
+        let irr = f4096_irr();
+        let a = F2mElement::zero(12);
+        let row_for = |b: &F2mElement, n: u32| {
+            audit_curve(12, &irr, &a, b)
+                .into_iter()
+                .find(|r| r.n == n)
+                .unwrap()
+        };
+        // b = 1 (and any b in F_2): m = 1, genus 1 (E descends to itself), at
+        // every factorisation.  The removed rule reported genus 0 here.
+        let one = F2mElement::one(12);
+        for n in [2u32, 3, 4, 6, 12] {
+            let r = row_for(&one, n);
+            assert_eq!(
+                (r.magic_m, r.genus.clone(), r.type_i),
+                (1, BigUint::one(), false),
+                "n = {n}"
+            );
+        }
+        // sqrt b = c + sigma(c) at (l, n) = (4, 3): f = x^2 + x + 1, m' = 2,
+        // m = 3, type I, genus 3.  The removed rule reported (m, g) = (2, 2).
+        let tower = FieldTower::new(12, 3, 4, irr.clone());
+        let c = (2u64..)
+            .map(|v| F2mElement::from_biguint(&BigUint::from(v), 12))
+            .find(|c| tower.frobenius(c) != *c)
+            .unwrap();
+        let sqrt_b = c.add(&tower.frobenius(&c));
+        let b = sqrt_b.square(&irr);
+        assert_eq!(plain_orbit_dim(&tower, &b), 2);
+        let r = row_for(&b, 3);
+        assert_eq!(
+            (r.magic_m, r.genus.clone(), r.type_i),
+            (3, BigUint::from(3u32), true)
+        );
+        assert_eq!(removed_rule_m_genus(&tower, &b), (2, BigUint::from(2u32)));
+        // Generic b: (l, n) = (4, 3) gives (3, 4); (6, 2) gives (2, 2); (3, 4)
+        // gives (4, 8).  Pick the first b of each shape and check the table.
+        let want = [(3u32, 3u32, 4u32), (2, 2, 2), (4, 4, 8)];
+        for (n, m, g) in want {
+            let ok = (2u64..4096).any(|v| {
+                let b = F2mElement::from_biguint(&BigUint::from(v), 12);
+                let r = row_for(&b, n);
+                r.magic_m == m && r.genus == BigUint::from(g) && !r.type_i
+            });
+            assert!(ok, "no generic b with (n, m, g) = ({n}, {m}, {g})");
+        }
+    }
+
+    /// Textbook GHS case: `F_{2^155}` (the Oakley Group 3 field), `l = 31`,
+    /// `n = 5`.  Generic `b`: `m = 5`, genus 16; trace-zero `b` (`sqrt b =
+    /// c + sigma(c)`): `m = 5`, genus 15, type I (the 15/16 dichotomy of
+    /// Gaudry–Hess–Smart 2002 and Menezes–Qu 2001 for `n = 5`, recalled).
+    /// `b = 1` gives genus 1 at every factorisation.
+    #[test]
+    fn audit_curve_textbook_n5_over_f2_155() {
+        let irr = IrreduciblePoly::deg_155_oakley_group3();
+        let tower = FieldTower::new(155, 5, 31, irr.clone());
+        let a = F2mElement::zero(155);
+        let row5 = |b: &F2mElement| {
+            audit_curve(155, &irr, &a, b)
+                .into_iter()
+                .find(|r| r.n == 5)
+                .unwrap()
+        };
+        // Deterministic pseudo-random elements outside k.
+        let mut x = BigUint::from(0x9e37_79b9_7f4a_7c15u64);
+        let mut next = || {
+            x = (&x * BigUint::from(6364136223846793005u64)
+                + BigUint::from(1442695040888963407u64))
+                % (BigUint::one() << 155usize);
+            F2mElement::from_biguint(&x, 155)
+        };
+        let mut seen_generic = 0;
+        let mut seen_trace_zero = 0;
+        for _ in 0..8 {
+            let generic = next();
+            if relative_trace(&tower, &generic).is_zero() || tower.is_in_subfield(&generic, 31) {
+                continue;
+            }
+            let r = row5(&generic);
+            assert_eq!(
+                (r.magic_m, r.genus.clone(), r.type_i),
+                (5, BigUint::from(16u32), false)
+            );
+            assert_eq!(reference_m_genus(&tower, &generic).1, BigUint::from(16u32));
+            seen_generic += 1;
+            let c = next();
+            let sqrt_b = c.add(&tower.frobenius(&c));
+            let tr0 = sqrt_b.square(&irr);
+            if tower.is_in_subfield(&tr0, 31) || tr0.is_zero() {
+                continue;
+            }
+            let r = row5(&tr0);
+            assert_eq!(
+                (r.magic_m, r.genus.clone(), r.type_i),
+                (5, BigUint::from(15u32), true)
+            );
+            seen_trace_zero += 1;
+        }
+        assert!(seen_generic >= 4 && seen_trace_zero >= 4);
+        // b = 1: the curve itself, genus 1, at every factorisation of 155.
+        for r in audit_curve(155, &irr, &a, &F2mElement::one(155)) {
+            assert_eq!((r.magic_m, r.genus, r.type_i), (1, BigUint::one(), false));
         }
     }
 }

@@ -82,6 +82,14 @@
 //!   that unit unpriced, so `S` is a lower bound and the record says so.
 //!   Reductions, splits, propagations and every F6 gate counter ride in the
 //!   totals' `extra` map.
+//! - The whole of each call — the system's instantiation (and, on the
+//!   first call, its template's symbolic `F_{2^n}` build), the solver's
+//!   Macaulay builds, sorts, indexes, packing, pivot searches, read-back
+//!   and tree scans, the lift of each root and the gate's lookups — is
+//!   also reported in `bitop/v1` primitives through the `bitop_*` keys of
+//!   `extra` with `bitop_complete = 1`
+//!   ([`crypto_lib::cryptanalysis::bitop_tally`]), which is what the
+//!   `bitop/v1` work view prices.
 //!
 //! The word-XOR counter is per thread.  `ic.pipeline` decomposes on its
 //! calling thread, and the elimination runs there.
@@ -112,6 +120,7 @@ use num_traits::One;
 
 use crypto_lib::binary_ecc::{BinaryCurve, F2mElement};
 
+use crypto_lib::cryptanalysis::bitop_tally;
 use crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins;
 use crypto_lib::cryptanalysis::ic_boundary::{
     decompose_mitm, koblitz_factor_base, lift_abscissae, BinaryGroup, BinaryInstance, ColumnFold,
@@ -125,6 +134,8 @@ use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
 use crypto_lib::cryptanalysis::koblitz_groebner::{
     build_decomposition_system, f4_word_ops_thread, with_matrix_runtime, FieldStructure,
     MatrixRuntime, SolveStats, SolverEngine,
+    f4_word_ops_thread, parse_linear_harvest, set_linear_harvest, FieldStructure, LinearHarvest,
+    SolveStats, SolverEngine,
 };
 #[path = "../../../tools/generalized-rootfinder/src/solver.rs"]
 #[allow(dead_code)]
@@ -489,7 +500,7 @@ fn stats_extra(s: &SolveStats) -> BTreeMap<String, u64> {
     e
 }
 
-/// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N`,
+/// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N[,linear_harvest=H]`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind`,
 /// `pdp3-koblitz:m=3,engine=rootfind-window`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind-negfold`, or
@@ -504,6 +515,12 @@ pub struct Pdp3KoblitzOracle<'i> {
     generalized_work_budget: u64,
     solver: SolverEngine,
     node_budget: usize,
+    /// The root linear-row harvest of `koblitz_groebner` (PR #1862) for
+    /// this arm: `None` leaves the library's process default in force (the
+    /// parameter was not given, so the method's identity and counters are
+    /// those of every earlier session); `Some(None)` switches it off;
+    /// `Some(Some(h))` forces configuration `h`.
+    linear_harvest: Option<Option<LinearHarvest>>,
     frob: Option<FrobeniusFactorBase>,
     index_of: HashMap<(BigUint, BigUint), usize>,
     st: Option<FieldStructure>,
@@ -541,6 +558,7 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             generalized_work_budget: 0,
             solver: SolverEngine::InheritedF4 { max_degree: 3 },
             node_budget: 0,
+            linear_harvest: None,
             frob: None,
             index_of: HashMap::new(),
             st: None,
@@ -745,6 +763,13 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                  refused under every rootfind* engine",
             ),
             (
+                "linear_harvest",
+                "optional, inherited-f4 and f6-ic only: off (the engine before PR #1862), \
+                 default (the library default now in force), gpv (PR #1862's gate alone) or \
+                 every (every node, no gate). Omitted: the library default, with the \
+                 method's identity unchanged. Refused under every other engine",
+            ),
+            (
                 "dimension",
                 "the base's; copied from koblitz-standard-subspace when omitted",
             ),
@@ -834,6 +859,29 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             self.node_budget = budget
                 .parse()
                 .map_err(|_| format!("node_budget `{budget}` is not a number"))?;
+            self.linear_harvest = match params.get("linear_harvest") {
+                None => None,
+                Some(raw) => {
+                    if !matches!(self.engine, Pdp3Engine::InheritedF4 | Pdp3Engine::F6Ic) {
+                        return Err(format!(
+                            "engine={} does not take linear_harvest (only inherited-f4 and \
+                             f6-ic harvest the root's linear rows)",
+                            self.engine.name()
+                        ));
+                    }
+                    Some(match raw {
+                        "off" => None,
+                        "default" => parse_linear_harvest("1"),
+                        "gpv" => parse_linear_harvest("gpv"),
+                        "every" => parse_linear_harvest("every"),
+                        other => {
+                            return Err(format!(
+                                "linear_harvest `{other}` is not off, default, gpv or every"
+                            ))
+                        }
+                    })
+                }
+            };
             self.scan_window_len = 0;
             self.window_div = 0;
             self.pair_table_points = 0;
@@ -843,7 +891,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             // A root-finding engine has no Groebner search to bound.  A
             // bound it ignored would be a parameter in the method's
             // identity that changes nothing, so it is refused.
-            for key in ["degree", "node_budget"] {
+            for key in ["degree", "node_budget", "linear_harvest"] {
                 if params.get(key).is_some() {
                     return Err(format!(
                         "engine={} performs no Groebner search and takes no `{key}`",
@@ -1090,17 +1138,13 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             _ => groebner_decompose,
         };
         let before = f4_word_ops_thread();
+        let tally_before = bitop_tally::snapshot();
         let started = Instant::now();
+        set_linear_harvest(self.linear_harvest);
         let run = || {
             decompose(
-                kc,
-                frob,
-                &self.index_of,
-                st,
-                &target,
-                self.summands as usize,
-                self.solver,
-                self.node_budget,
+                kc, frob, &self.index_of, st, &target,
+                self.summands as usize, self.solver, self.node_budget,
             )
         };
         let run = || {
@@ -1122,10 +1166,29 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         } else {
             run()
         };
+        set_linear_harvest(None);
         let word_xors = f4_word_ops_thread().wrapping_sub(before);
         let wall_ns = started.elapsed().as_nanos() as u64;
         // The gate's point additions are group work: charge them.
         ops.adds += stats.geometric_group_additions;
+        // The whole call in `bitop/v1` primitives: the engine's word XORs
+        // (`ops`), everything else `bitop_tally` saw on this thread — the
+        // system's instantiation from its template (and the template's
+        // symbolic `F_{2^n}` build on the first call), the solver's
+        // Macaulay builds, column sorts and indexes, packing, pivot
+        // searches, read-back and splitting-tree scans, and the lift of
+        // each root (`F_{2^n}` operations and base lookups) — and the
+        // F6 gate's lookups, a hash probe each, and support checks, a
+        // word operation a coordinate.  The gate's point additions are
+        // group work, charged to `ops.adds` above, not here.
+        let mut tally = bitop_tally::snapshot().since(tally_before);
+        tally.hash_probes += stats.geometric_residual_lookups
+            + stats.geometric_fast_residual_lookups
+            + stats.geometric_pair_index_lookups;
+        tally.word_ops += (stats.geometric_support_checks + stats.geometric_partial_support_checks)
+            * u64::from(frob.ell);
+        let mut extra = stats_extra(&stats);
+        tally.put_complete(&mut extra, word_xors);
         let cost = SolverCost {
             ops: word_xors,
             op_unit: WORD_XOR_UNIT.into(),
@@ -1134,7 +1197,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             degree_reached: Some(stats.max_degree_built),
             solving_degree: None,
             timed_out: stats.exhausted,
-            extra: stats_extra(&stats),
+            extra,
         };
         self.totals.absorb(shape, Some(&cost), stats.exhausted);
         let indices = indices?;
@@ -1147,6 +1210,22 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                 None
             }
         }
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        // The full pair-sum table inserts every unordered pair once; the
+        // negation-folded PairTable counts its own attempts; the algebraic
+        // engines build no table.
+        let mut c = match (&self.pair, &self.pair_neg) {
+            (Some(_), _) => {
+                let f = self.pair_table_points as u64;
+                BTreeMap::from([("table_insert_attempts".to_string(), f * (f + 1) / 2)])
+            }
+            (None, Some(t)) => t.work_counters(),
+            (None, None) => BTreeMap::new(),
+        };
+        c.insert("counted:table_insert_attempts".to_string(), 1);
+        c
     }
 
     fn setup_native(&self) -> BTreeMap<String, u64> {

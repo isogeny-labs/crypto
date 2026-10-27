@@ -81,3 +81,10 @@ record verifies and measured replay reproduces. Some short reference/table
 clocks remain below L2, and native work is partly priced. This establishes
 a bounded F4/F5 branch wall improvement, not a complete-cost resolution or
 a transfer of qualification to the earlier rational-lane study.
+
+## 2026-10-19 generalized all-roots conditional-cell follow-up
+
+The [new cycle](../research/autolab_cycle_20261019_v3/REPORT.md) proves exact fixed-sum pair recovery and adaptive empty affine cells of dimension65 on GF(2^83), d18. These are conditional first-S3 components. They do not resolve the full339-coordinate hard root set, its2^101 outer (p,s) grid, all requested field families, or the matched full all-roots F4/F5/F6 performance gate. No speed ratio is inferred from cells or timeouts. Existing unrelated pipeline evidence and exit criteria above remain unchanged.
+
+Next discriminating experiment: [draft union/residual card](../backlog/XP-20261019-adaptive-pair-cell-union/README.md). Construct an exact disjoint union/residual partition, independently compare every small literal-S3 root, and freeze state/output/work caps before another changed hard solve. Unblock original completeness only with full ordered original tuples and a coverage certificate; unblock speed claims only with the unchanged20-input genuine-matched-baseline gate. Native component tests pass; legacy sparse Python-suite validation remains incomplete as documented in [validation](../research/autolab_cycle_20261019_v3/VALIDATION.md). This record remains open.
+
