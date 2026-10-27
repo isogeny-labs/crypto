@@ -32,3 +32,9 @@ Source checked: [NVIDIA Ubuntu 24.04 package index](https://developer.download.n
 ## Queue cleanup
 
 Four old main runs held concurrency groups while their remaining jobs waited for unavailable runner labels. Immediately before cancellation, each run was checked against the latest main SHA and every unfinished job had status `queued`, an empty runner name and zero steps. Completed jobs and artifacts remain retained. No running research process was stopped. Current Release and Rust lint jobs started afterward; that observation exposed the real CUDA install failure above.
+
+## Match the original half-trace candidate format
+
+The mirrored IC metadata validator now supports the exact original format emitted by cryptanalysis's half-trace candidate producer: `summand_count: 2` plus its exact `htsolver.py` implementation path. This fixes a real cryptanalysis CI failure without rewriting ten frozen content-addressed candidates. Modern explicit solver-family records still must match their stage codes. New controls reject a changed stage, arity, implementation, Boolean arity, or incomplete mixed format.
+
+Both validator and test copies are byte-identical across the two repair branches. Crypto's test run passes 11 controls with 2 existing cryptanalysis-only skips; cryptanalysis passes all 37 catalog tests, and the cross-repository metadata check reports zero errors. The initial crypto diagnostic was missing a local sparse registry fixture; restoring tracked docs/curves made it pass. These checks establish metadata consistency only.
