@@ -11,7 +11,7 @@ records `PASS`.
 
 | Item | Exact result |
 | --- | --- |
-| Curve | `icv1-f2m83-tm6151469093347-debefd74`; subgroup order `2417851639230796216685689` |
+| Curve | `EC1N83Ckb0h252dacc102a4` (canonical record: `research/ecdlp_surfaces_n83_20261012/runs/run-20261012T0331Z/identities/curve_record_a0.json`); legacy slug `icv1-f2m83-tm6151469093347-debefd74`; subgroup order `2417851639230796216685689` |
 | Factor-base policy | `direct_subgroup_x_d18_prefix2048`; first 2,048 rows of the fully hashed 16,627-row sorted census selection |
 | Columns / point records | 2,048 / 339,968 |
 | Producer source commit | `a1e6b778dcee8f4ec72f359df7ce3728b302b78a` |
@@ -50,6 +50,15 @@ intersection is **zero points and zero signed-Frobenius orbits**. Thus the
 matched K2048 comparison changes the entire base point set while preserving
 its count and curve; the overlap result is a structural identity, not a
 relation-yield or runtime preference.
+
+At commit `9e3a23f0e3607fa6ead297367b8d0c5c1905ae1a`, the full macOS
+`cargo test --release --lib --locked` run finished with 4,898 passed, four
+failed and 122 ignored in 912.75 seconds. The retained
+[exact-head log](evidence/lib-test-postmerge.log.gz) identifies two GPU bench
+tests that invoke absent `/bin/true` on macOS and two `jv_cover` assertions.
+No library source, `Cargo.toml`, or `Cargo.lock` differs from the parent
+branch in this study. These inherited suite failures are separate from the
+K2048 exporter, whose touched example test and Linux export/replay passed.
 
 The next measurement is a source-pinned U/D K2048 importer and a frozen,
 same-point natural-query panel with independent relation/rank replay. The
