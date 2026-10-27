@@ -1,3 +1,4 @@
+// Superseded 2026-10-20 (validation sweep B, 104.1): the 7.29x and 12.29x online speedups below used an empty-table rho and are not improvements; see README.md in this directory.
 #set page(width: 21cm, height: 29.7cm, margin: 1.8cm)
 #set text(size: 10pt)
 

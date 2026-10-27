@@ -32,11 +32,12 @@ def validate(allocation_path: Path, archive_dir: Path) -> dict:
     try:
         started = read(archive_dir / "watchdog_started.json")
         ready = read(archive_dir / "watchdog_ready.json")
+        pod_guard = read(archive_dir / "pod_deadline_guard.json")
         transfer = read(archive_dir / "watchdog_transfer.json")
         absent = read(archive_dir / "provider_post_terminate.json")
         embedded = read(archive_dir / "results" / "runpod_allocation.json")
         timestamps = [runpod_runner.timestamp(value["recorded_utc"])
-                      for value in (started, ready, transfer, absent)]
+                      for value in (started, ready, pod_guard, transfer, absent)]
         created = runpod_runner.timestamp(receipt["created_utc"])
         deadline = runpod_runner.timestamp(receipt["stop_after_utc"])
         retire_at = deadline - timedelta(minutes=5)
@@ -57,7 +58,14 @@ def validate(allocation_path: Path, archive_dir: Path) -> dict:
                 retire_at),
             "chronology_and_margin": (
                 created <= timestamps[0] <= timestamps[1] <= timestamps[2]
-                <= timestamps[3] <= retire_at),
+                <= timestamps[3] <= timestamps[4] <= retire_at),
+            "pod_guard_armed": (
+                pod_guard.get("schema") == "n83.fixed31-pod-deadline-guard/v1"
+                and pod_guard.get("status") == "ARMED"
+                and pod_guard.get("pod_id") == pod_id
+                and pod_guard.get("allocation_sha256") == allocation_hash
+                and runpod_runner.timestamp(pod_guard["stop_after_utc"]) ==
+                deadline),
             "transfer_and_absence": (
                 transfer.get("reason") == "PRODUCER_DONE" and
                 transfer.get("spool_succeeded") is True and
@@ -70,16 +78,22 @@ def validate(allocation_path: Path, archive_dir: Path) -> dict:
         if result["checks"]["archive_sha256"]:
             with tarfile.open(archive_dir / "raw_results.tar.gz", "r:gz") as tar:
                 members = {item.name: item for item in tar.getmembers()}
-                required = ("watchdog_ready.json", "results/source.json",
+                required = ("watchdog_ready.json", "pod_deadline_guard.json",
+                            "results/source.json",
                             "results/host.json", "results/runpod_allocation.json")
                 if all(name in members and members[name].isfile()
                        for name in required):
                     content = tar.extractfile(members["watchdog_ready.json"]).read()
+                    guard_content = tar.extractfile(
+                        members["pod_deadline_guard.json"]).read()
                     archived_receipt = tar.extractfile(
                         members["results/runpod_allocation.json"]).read()
                     result["checks"]["archive_identity"] = (
                         hashlib.sha256(content).digest() ==
                         hashlib.sha256((archive_dir / "watchdog_ready.json")
+                                       .read_bytes()).digest() and
+                        hashlib.sha256(guard_content).digest() ==
+                        hashlib.sha256((archive_dir / "pod_deadline_guard.json")
                                        .read_bytes()).digest() and
                         json.loads(archived_receipt) == receipt)
                 else:
