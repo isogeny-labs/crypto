@@ -1,0 +1,13 @@
+card_id: CARD-bitop-ladder-20261019-6
+relay_verbatim: not_verified_by_tool
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+  - "Classified from the receipt and files, not from the executor's return: the executor handed back before the completion notice ('started, not completed') and never returned the tool output, so there is no executor text to compare."
+  - "Receipt cards/CARD-bitop-ladder-20261019-6.receipt.json (sha256 00920c67a66098e53d4072d914afa4c060a7f039dbc839d2f35705b93a54b04d): status completed, one command train-panel, exit_code 0, attempts 1, timed_out false, seconds 3.286, commit a36b9b46e6af856ca6981d235d3b79baf67874e1, argv and outputs list equal to the card's."
+  - "cards/CARD-bitop-ladder-20261019-6.run.stdout holds 'DONE train-P28-rf3-ext3' and its sha256 matches the receipt's stdout_sha256; stderr empty."
+  - "The receipt digest for sessions/train-P28-rf3-ext3/verify.json (34fcf2f82dbd494774f43b7080f10fd54375248693a99e6649811c23a09fb4ce) equals the file on disk: ok true, session_status complete, problems empty, 16 of 16 records verified, spec.json byte-identical to specs/train-P28-rf3-ext3.json."
+  - "git status --porcelain shows no tracked modification and no path outside research/bitop_ladder_20261019/."
+  - "The card was run by task_card.py, which executed only the card's argv; the executor's early hand-back does not change what ran."
+interpretation: not_assessed
