@@ -93,7 +93,11 @@ it makes a run depend on the host. `--timeout-seconds` and `--max-rss-mb` are
 safety nets enforced from inside the trial process (`ps` is not always
 available and macOS does not enforce `RLIMIT_AS`); a trial that hits one is
 `exhausted` and is classed by the host, so treat it as a failure, not a
-measurement.
+measurement. The wall-clock net holds on every host. The memory net needs
+`getrusage`, which every Unix target has and Windows does not: there `ic`
+prints a one-time warning to stderr (from `ic sweep run` and from the trial
+process) and `--max-rss-mb` is not enforced, so budget memory with the host's
+own limits.
 
 ## The study: `ic sweep run`
 

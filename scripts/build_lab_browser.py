@@ -334,7 +334,14 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
                 "log2_r": row.get("log2_r"),
                 "reference": row.get("reference"),
                 "best_recipe": best.get("variant"),
+                "best_base_points": best.get("base_points"),
+                "best_base_columns": best.get("columns"),
+                "best_base_source": row.get("source"),
                 "best_s": best.get("s"),
+                "log2_ic_gae": best.get("log2_total_gae"),
+                "log2_rho_gae": row.get("reference_log2_total_gae"),
+                "operation_unit": row.get("operation_unit"),
+                "validation_status": (row.get("validation") or {}).get("status"),
                 "ratio_rho": best.get("ratio_rho"),
                 "ratio_floor": best.get("ratio_floor"),
                 "verified": best.get("verified"),
@@ -696,8 +703,8 @@ def attach_covers(
     curves: list[dict],
     report: dict,
     source: RepositoryInputs | None = None,
-) -> None:
-    """Join preverified metadata only; mathematical checks are native Rust."""
+) -> set[str]:
+    """Join the current, complete native-verified cover catalog."""
     if (
         report.get("schema_version") != "curve-covers/v1"
         or report.get("registry_sha256") != sha256_file(REGISTRY, source)
@@ -705,13 +712,15 @@ def attach_covers(
         raise ValueError("cover report schema or registry digest is stale")
     findings = report.get("curves", [])
     by_slug = {r["slug"]: r for r in findings}
-    if len(by_slug) != len(findings) or set(by_slug) != {c["slug"] for c in curves}:
+    current_slugs = {c["slug"] for c in curves}
+    if len(by_slug) != len(findings) or set(by_slug) != current_slugs:
         raise ValueError("cover report must have exactly one finding per catalog model")
     for curve in curves:
         finding = by_slug[curve["slug"]]
         if finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
             raise ValueError(f"cover model digest mismatch: {curve['slug']}")
         curve["hyperelliptic_cover"] = finding
+    return set(by_slug)
 
 
 def store_objects(curves_by_slug: dict, fb_ids: set, source: RepositoryInputs) -> dict:
@@ -759,18 +768,23 @@ def build() -> dict:
     registry = load(REGISTRY, source)
     leaderboard = load(LEADERBOARD, source)
     curves = curve_rows(registry, leaderboard)
-    attach_covers(curves, load(COVERS, source), source)
+    report = load(COVERS, source)
+    covered_slugs = attach_covers(curves, report, source)
     graph = load(COVER_LINKS, source)  # JSON syntax is a subset of YAML 1.2.
     if (
         graph.get("schema_version") != "curve-cover-graph/v1"
-        or graph.get("registry_sha256") != sha256_file(REGISTRY, source)
+        or graph.get("registry_sha256") != report.get("registry_sha256")
     ):
-        raise ValueError("stale cover graph")
+        raise ValueError("cover graph and report have different source registries")
     nodes = {node["icv1_identity"]["slug"]: node for node in graph["curves"]}
-    if len(nodes) != len(graph["curves"]) or set(nodes) != {c["slug"] for c in curves}:
-        raise ValueError("cover graph must bind every catalog model exactly once")
+    if len(nodes) != len(graph["curves"]) or set(nodes) != covered_slugs:
+        raise ValueError("cover graph must bind every assessed model exactly once")
     for curve in curves:
-        node = nodes[curve["slug"]]
+        node = nodes.get(curve["slug"])
+        if node is None:
+            curve["cover_links"] = []
+            curve["standards_provenance"] = []
+            continue
         if node["model_json"] != curve["model_json"]:
             raise ValueError("cover graph model mismatch")
         curve["cover_links"] = [dict(link, cover_id=graph["covers"][link["cover_uid"]]["cover_id"],
@@ -808,7 +822,11 @@ def build() -> dict:
         "schema_version": "lab-browser/1",
         "generated_by": "scripts/build_lab_browser.py",
         "what_this_is": "A searchable index of the curves, methods, factor bases, candidate identities, tournament rounds and ecbench sessions this repository names, joined on the identities it already computes (ICV1 slugs, EC1 aliases, ECM1 method ids, FB1 factor-base ids, IC1 candidate ids). Every figure is quoted from a committed file named in `sources` or in the row; nothing is computed here beyond means over a session's own verified runs.",
-        "counts": {"curves": len(curves), "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates), "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields), "store_objects": len(store["objects"])},
+        "counts": {"curves": len(curves), "cover_assessed": len(covered_slugs),
+                   "cover_unassessed": len(curves) - len(covered_slugs),
+                   "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates),
+                   "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields),
+                   "store_objects": len(store["objects"])},
         "sources": sources,
         "vocabulary": VOCABULARY,
         "standards_coverage": load(STANDARDS_COVERAGE, source),
