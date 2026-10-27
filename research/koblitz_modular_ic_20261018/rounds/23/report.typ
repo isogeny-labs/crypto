@@ -77,7 +77,7 @@ no fabricated logs or terminal statuses replace them. The native wrapper now
 archives raw results after each call so the following checkpoint includes them.
 
 The characteristic-two GTZ loop, monomial-name shadowing, differentiation in the
-wrong ring, omission of a zero-indexed ideal's last unit and the stalled minor
+wrong ring, omission of the last unit after a zero entry and the stalled minor
 driver are preserved in FAILURES.md with source history and corrected replay
 references. Native exit0 alone is never accepted as a certificate. Root software
 validation and any unrelated infrastructure failures are recorded separately

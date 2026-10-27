@@ -20,6 +20,11 @@ replays under /home/ec2-user provide the retained successful certificates.
 | First-host root build | Absent sparse path dependency before tests | No scientific/Rust source defect inferred. New host restores exact paths/fixtures and records fresh compile/test status. |
 | Second-host root build01 |12 include-file failures from sparse docs fixtures | Restore exact HEAD blobs;no fixture/test weakened. Subsequent status is recorded separately. |
 
+The retained corruption control ss23-corrupt-host2-10 deliberately fails the
+actual compact inverse identity. Native exit0 and a later success marker occur,
+but the wrapper rejects the error with driver exit1 as required. This is an
+expected control rejection,not a successful source certificate.
+
 The old source-side waiting freeze followup is quiesced and untouched. Diem
 is managed and deadline-expired50/52;no duplicate generator is launched. EKS
 was reconciled after both migrations and had no active Koblitz job. No new

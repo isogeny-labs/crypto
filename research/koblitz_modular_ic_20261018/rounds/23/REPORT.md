@@ -64,6 +64,12 @@ The full scheme/normalization/DVR bridge remains written mathematics;conditional
 arithmetic lemmas expose it rather than claiming it has been formalized. See
 PROOF_MAP.md and the retained compile/audit output for the exact scope.
 
+The source-bound rejection control ss23-corrupt-host2-10 adds1 to the actual
+inverse. Singular emits the expected nonzero unit residual and error,then
+continues to print its later success marker with native exit0. The wrapper
+rejects it with exit1. Thus exit0 and a success marker alone cannot pass this
+certificate workflow.
+
 The native input model and every restored R22 raw file were verified by SHA256.
 No completed G32/G33 integral recovery or earlier normalization failure was
 repeated. Full root software validation has its own status in VALIDATION.md;
