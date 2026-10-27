@@ -600,11 +600,19 @@ pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<
     let e = f.curve();
     let tx = target.ok_or("nonidentity target required")?.0 .0;
     assert!(e.on(target));
-    let xs = (0..f.p)
-        .filter(|x| sqrt(e.rhs(Q(*x, 0)).0, f.p).is_some_and(|y| y != 0))
-        .take(bsize)
-        .collect::<Vec<_>>();
+    let xs = if task["base"].is_array() {
+        serde_json::from_value::<Vec<u64>>(task["base"].clone())?
+    } else {
+        (0..f.p)
+            .filter(|x| sqrt(e.rhs(Q(*x, 0)).0, f.p).is_some_and(|y| y != 0))
+            .take(bsize)
+            .collect::<Vec<_>>()
+    };
     assert_eq!(xs.len(), bsize);
+    assert!(xs.windows(2).all(|w| w[0] < w[1]));
+    assert!(xs
+        .iter()
+        .all(|x| *x < f.p && sqrt(e.rhs(Q(*x, 0)).0, f.p).is_some_and(|y| y != 0)));
     let points = xs
         .iter()
         .map(|x| {
@@ -620,6 +628,42 @@ pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<
         let direct = alg::build(f.p, f.a, f.b, tx, &xs, m, "product");
         match arm {
             "direct-chain" => vec![direct],
+            "companion-curve" => {
+                let shift = task["companion"]["shift"]
+                    .as_u64()
+                    .ok_or("companion shift")?;
+                let delta = task["companion"]["delta"]
+                    .as_u64()
+                    .ok_or("companion delta")?;
+                assert!(shift < f.p && delta > 0 && delta < f.p);
+                assert!(xs.iter().all(|x| sqrt(
+                    e.rhs(Q((x + f.p - shift) % f.p, 0)).0 * inv(delta, f.p) % f.p,
+                    f.p
+                )
+                .is_some()));
+                let mut c = direct;
+                let old = c.names.len();
+                let n = old + m;
+                for q in &mut c.equations {
+                    for (powers, _) in q {
+                        powers.resize(n, 0);
+                    }
+                }
+                for i in 0..m {
+                    c.names.push(format!("v{i}"));
+                    let x = add(&variable(n, i), &constant(n, (f.p - shift) % f.p), f.p);
+                    let x3 = mul(&mul(&x, &x, f.p), &x, f.p);
+                    let rhs = add(&add(&x3, &scale(&x, f.a, f.p), f.p), &constant(n, f.b), f.p);
+                    let v = variable(n, old + i);
+                    c.equations.push(add(
+                        &scale(&mul(&v, &v, f.p), delta, f.p),
+                        &scale(&rhs, f.p - 1, f.p),
+                        f.p,
+                    ));
+                }
+                c.encoding = "companion-curve".into();
+                vec![c]
+            }
             "first-pair-invariant" => vec![
                 alg::build(f.p, f.a, f.b, tx, &xs, m, "symmetric"),
                 diagonal(&direct),
@@ -732,7 +776,7 @@ pub fn decomposition_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<
     let canonical = tuples.keys().cloned().collect::<Vec<_>>();
     write_json(
         out,
-        &json!({"schema":"twist.decomposition-worker/v1","workload":task["workload"],"arm":arm,"lift_method":lift_method,"linear_roots":linear_roots,"base":xs,"target":target,"branches":branches,"canonical_projected_tuples":canonical,"signed_witnesses":witnesses,"exceptional_candidates_enumerated":exceptional_candidates,"invalid_signed_lifts":invalid_lifts,"complete_projection":complete,"construction_roots_signs_dedup_and_source_verification_included":true,"complete_IC_cost":false,"wall_time_admitted":false}),
+        &json!({"schema":"twist.decomposition-worker/v1","workload":task["workload"],"arm":arm,"lift_method":lift_method,"linear_roots":linear_roots,"base":xs,"base_provenance":task["base_provenance"],"target":target,"branches":branches,"canonical_projected_tuples":canonical,"signed_witnesses":witnesses,"exceptional_candidates_enumerated":exceptional_candidates,"invalid_signed_lifts":invalid_lifts,"complete_projection":complete,"construction_roots_signs_dedup_and_source_verification_included":true,"complete_IC_cost":false,"wall_time_admitted":false}),
     )
 }
 fn suffix(p: &Path, s: &str) -> PathBuf {

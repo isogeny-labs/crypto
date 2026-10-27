@@ -12,6 +12,7 @@ mod homogeneous;
 mod incidence;
 mod incidence_cost;
 mod partial;
+mod progression;
 mod projection;
 
 use crate::{digest, write_json, Fixture, Result};
@@ -93,6 +94,19 @@ pub fn sources(fixtures: &[Fixture]) -> Result<Vec<Source>> {
 }
 pub fn main(args: &[String]) -> Result<()> {
     let command = args.first().ok_or("missing follow-up command")?;
+    if command == "progression-census" {
+        return progression::census(
+            Path::new(args.get(1).ok_or("prior decomposition plan")?),
+            Path::new(args.get(2).ok_or("output")?),
+        );
+    }
+    if command == "progression-worker" {
+        return progression::worker(
+            Path::new(args.get(1).ok_or("input")?),
+            Path::new(args.get(2).ok_or("output")?),
+            args.get(3).ok_or("budget milliseconds")?.parse()?,
+        );
+    }
     if command == "incidence-cost-worker" {
         return incidence_cost::worker(
             Path::new(args.get(1).ok_or("input")?),
