@@ -195,6 +195,24 @@ pub fn summary(raw: &Path) {
     round02::save(raw, "round22-native-summary.json", &s);
     println!("Round22:G32 integral recovery d=1;Q41 coupled valuative exclusion;complete base divisors;proper level77 and modular reverse evaluator remain open");
 }
+fn test_counts(text: &str) -> serde_json::Value {
+    let line = text
+        .lines()
+        .rev()
+        .find(|l| l.starts_with("test result: ok."))
+        .unwrap();
+    let fields = line.split_whitespace().collect::<Vec<_>>();
+    let count = |unit: &str| {
+        let i = fields
+            .iter()
+            .position(|f| f.trim_end_matches(';') == unit)
+            .unwrap();
+        fields[i - 1].parse::<usize>().unwrap()
+    };
+    assert_eq!(count("failed"), 0);
+    json!({"passed":count("passed"),"failed":0,"ignored":count("ignored")})
+}
+
 pub fn record(round: &Path) {
     let round = std::fs::canonicalize(round).unwrap();
     let study = round.ancestors().nth(2).unwrap();
@@ -383,22 +401,6 @@ pub fn record(round: &Path) {
         .unwrap()
         .iter()
         .all(|r| r["recovered"] == 11));
-    let test_counts = |text: &str| {
-        let line = text
-            .lines()
-            .find(|l| l.starts_with("test result: ok."))
-            .unwrap();
-        let fields = line.split_whitespace().collect::<Vec<_>>();
-        let count = |unit: &str| {
-            let i = fields
-                .iter()
-                .position(|f| f.trim_end_matches(';') == unit)
-                .unwrap();
-            fields[i - 1].parse::<usize>().unwrap()
-        };
-        assert_eq!(count("failed"), 0);
-        json!({"passed":count("passed"),"failed":0,"ignored":count("ignored")})
-    };
     let revision = std::process::Command::new("git")
         .args(["rev-parse", "HEAD"])
         .current_dir(repo)
@@ -429,7 +431,7 @@ pub fn record(round: &Path) {
     let native_counts = test_counts(&native);
     let mut hashes = BTreeMap::new();
     walk(&raw, &raw, &mut hashes);
-    let ledger = json!({"schema":"koblitz.round22-ledger/v1","date":"2026-10-26","timezone":"America/Los_Angeles","experiment_parent":"69f67409f5fe6b525c23b000edea047dd38fcf83","publication_parent":"3c87193e7c754e9abefa401b7cd0974d0708b3b1","integration_parent":"baa1951357b7ca586e902f4a81287ac2ef4855ef","source_revision":source_revision,"Conductor_task":"T-409","native":summary_value(&raw),"new_named_Lean_theorems":named,"module_named_counts":modules,"audited_project_theorems":audited,"root_library_tests":root_counts,"native_tests":native_counts,"source_sha256":sources,"raw_sha256":hashes,"CAS_attempts":cas,"EKS_inventory":{"jobs":jobs.len(),"active":active,"matching_study":matching,"mutations":0},"requirements":[{"track":"exact norm-zero recovery","status":"verified complete in the CM equivariant augmentation category","open":"geometric final quotient and modular factor interpretation remain separate"},{"track":"proper level77 geometry","status":"partial","verified":"genus-one base,complete base divisors,generic QR tower,birational plane model,smooth registered open;original SS5 incidence fiber with both ideal lifts and Frobenius residue degrees","open":"proper normalized charts,all lifted coordinate and denominator divisors,complete prescribed RR basis,map with nonzero order11 action"},{"track":"node187 coupled divisors","status":"partial","verified":"all four models excluded by actual coupled valuation/descent under written DVR and pole bridges","open":"explicit source-bound polynomial separator/membership;full saturation;formal schemes/DVR bridge"},{"track":"direct relations","status":"prerequisite open","open":"arbitrary modular divisor reverse evaluator and complete460/367 fibers/images"}],"retained_failures":["generated Lean sum scope/free variable corrected;all failed files retained","missing Lean imports and Rust string-reference compilation errors corrected","original Singular saturation exponent print used wrong API;no exponent claim","affine closure normalization exits124","degree96 and degree72 plane place computations exit14 at4GiB","generic ideal-subtraction display syntax failed;lift matrices retained and corrected replay required","F8-coordinate Klein fixture fails the wide split-fiber verifier precondition;matching F512-coordinate fixture separately replayed","Conductor repeated claim requests used the four-attempt coordination budget;no fifth claim or duplicate session launched"],"performance_measured":false,"IC_efficiency_verdict":null});
+    let ledger = json!({"schema":"koblitz.round22-ledger/v1","date":"2026-10-26","timezone":"America/Los_Angeles","experiment_parent":"69f67409f5fe6b525c23b000edea047dd38fcf83","publication_parent":"3c87193e7c754e9abefa401b7cd0974d0708b3b1","integration_parent":"8eef1252714097e0b8279c0bf55b82ed9e49943d","source_revision":source_revision,"Conductor_task":"T-409","native":summary_value(&raw),"new_named_Lean_theorems":named,"module_named_counts":modules,"audited_project_theorems":audited,"root_library_tests":root_counts,"native_tests":native_counts,"source_sha256":sources,"raw_sha256":hashes,"CAS_attempts":cas,"EKS_inventory":{"jobs":jobs.len(),"active":active,"matching_study":matching,"mutations":0},"requirements":[{"track":"exact norm-zero recovery","status":"verified complete in the CM equivariant augmentation category","open":"geometric final quotient and modular factor interpretation remain separate"},{"track":"proper level77 geometry","status":"partial","verified":"genus-one base,complete base divisors,generic QR tower,birational plane model,smooth registered open;original SS5 incidence fiber with both ideal lifts and Frobenius residue degrees","open":"proper normalized charts,all lifted coordinate and denominator divisors,complete prescribed RR basis,map with nonzero order11 action"},{"track":"node187 coupled divisors","status":"partial","verified":"all four models excluded by actual coupled valuation/descent under written DVR and pole bridges","open":"explicit source-bound polynomial separator/membership;full saturation;formal schemes/DVR bridge"},{"track":"direct relations","status":"prerequisite open","open":"arbitrary modular divisor reverse evaluator and complete460/367 fibers/images"}],"retained_failures":["generated Lean sum scope/free variable corrected;all failed files retained","missing Lean imports and Rust string-reference compilation errors corrected","original Singular saturation exponent print used wrong API;no exponent claim","affine closure normalization exits124","degree96 and degree72 plane place computations exit14 at4GiB","generic ideal-subtraction display syntax failed;lift matrices retained and corrected replay required","F8-coordinate Klein fixture fails the wide split-fiber verifier precondition;matching F512-coordinate fixture separately replayed","Conductor repeated claim requests used the four-attempt coordination budget;no fifth claim or duplicate session launched"],"performance_measured":false,"IC_efficiency_verdict":null});
     assert!(!round.join("ledger.json").exists());
     round02::save(&round, "ledger.json", &ledger);
     assert!(!round.join("runs.sha256").exists());
@@ -442,4 +444,16 @@ pub fn record(round: &Path) {
     )
     .unwrap();
     println!("Round22 sealed:{named} named Lean statements;{audited} audited;{} source pins;{} raw files",sources.len(),hashes.len());
+}
+
+#[cfg(test)]
+mod seal_tests {
+    #[test]
+    fn final_cargo_summary_excludes_spawned_test_processes() {
+        let log = "running 5017 tests\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5016 filtered out;\nchild complete\ntest result: ok. 4896 passed; 0 failed; 121 ignored; 0 measured; 0 filtered out;\n";
+        assert_eq!(
+            super::test_counts(log),
+            serde_json::json!({"passed":4896,"failed":0,"ignored":121})
+        );
+    }
 }

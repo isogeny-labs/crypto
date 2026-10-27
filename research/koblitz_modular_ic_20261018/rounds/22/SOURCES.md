@@ -41,8 +41,9 @@ IC cost, deployed-curve or end-to-end solver claim is made. The exact source
 manifest, failed attempts, backend package lock and completed test/audit receipts
 are bound by ledger.json and runs.sha256 after validation.
 
-Delivery later integrated main baa1951357b7ca586e902f4a81287ac2ef4855ef in
-4008aeb19e1. The study algorithms,Lean sources and binary elliptic implementation
+Delivery integrated main8eef1252714097e0b8279c0bf55b82ed9e49943d as the
+second parent of4008aeb19e1. The earlier main checkpointbaa1951 is included
+as an ancestor;it was incorrectly labelled the merged tip in the first seal. The study algorithms,Lean sources and binary elliptic implementation
 were unchanged by that integration. Main's artifact/CI/proof-gate changes are
 adopted. Final source_revision is a committed pre-seal source frame,verified
 against every pin;later CI checks that historical frame rather than assuming

@@ -243,3 +243,14 @@ pure-curve/function-field bridge;retain every failure. If successful,add
 faithful Lean identities for the specialized projections/Jacobian and update
 the proof count from actual audit results. Full lifted pole geometry and RR
 remain separate acceptance criteria.
+
+Seal validation correction before retry:the first native seal selects a
+one-test nested subprocess summary instead of the final full root summary.
+Reject that seal. Preserve its ledger,manifest and exact entire raw snapshot
+under validation-runs/seal-attempt01. Parse the final Rust test summary and
+add a native nested-summary regression. The original full root log remains
+4896pass/0fail/121ignored. Also correct integration_parent to the actual
+second Git parent of4008aeb,8eef1252714097e0b8279c0bf55b82ed9e49943d;
+baa1951 is an earlier included main checkpoint,not the merged tip. Commit
+the corrected source frame before sealing again. No scientific input,
+arithmetic,proof,result,resource cap or acceptance criterion changes.

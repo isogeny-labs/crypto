@@ -186,3 +186,18 @@ passes242/0fail/1ignored. Artifact-tool tests pass18/18;workflow-parser
 tests pass4/4. The previously recorded broad site and workflow-budget
 failures remain distinct and are not relabelled passed. All new proof and
 scientific result checks described above complete at their original limits.
+
+The first native seal is rejected:the test-count parser chose a nested
+one-test subprocess summary,not the final4896-test summary. Its exact
+ledger,manifest and entire310-file raw snapshot are preserved under
+validation-runs/seal-attempt01. The corrected parser selects the final
+summary and has a native regression using the observed nested shape.
+The mathematical results and Lean sources are unchanged. The corrected
+seal also records the actual merged main parent8eef125;baa1951 remains an
+included earlier main checkpoint. Source revision and every pin are checked
+again before publication. This failed seal is never the published ledger.
+
+The corrected native package passes139 tests,0 failures,1 ignored,
+including the new nested-summary regression. Root software4896/0fail/
+121ignored,Lean1088/0fail/0trusted,and all scientific/native CAS certificates
+remain unchanged. The extra native test validates evidence parsing only.
