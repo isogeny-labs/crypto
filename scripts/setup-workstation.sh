@@ -55,7 +55,7 @@ case "${WORKSPACE_OFFLINE:-0}" in
   *) echo "WORKSPACE_OFFLINE must be 0 or 1" >&2; exit 2 ;;
 esac
 
-ALL_COMPONENTS=(system rust go node python conductor cairn sage agents github repos control-plane)
+ALL_COMPONENTS=(system rust go node python conductor cairn sage agents github repos isolab control-plane)
 
 WORKSPACE="${WORKSPACE:-$HOME/src}"
 GITHUB_OWNER="${GITHUB_OWNER:-aburan28}"
@@ -588,6 +588,22 @@ install_repos() {
   setup_crypto; setup_cryptanalysis; setup_autoresearcher
 }
 
+# ------------------------------------------------------------- Iso Lab ---
+install_isolab() {
+  local launcher
+  launcher="$(cd "$(dirname "$0")" && pwd)/isolab-agent.sh"
+  log "Iso Lab agent clients (configured backends only)"
+  if [ -n "${ISOLAB_URL:-}" ]; then
+    run bash "$launcher" setup nats || warn "Iso Lab NATS client setup failed; see docs/ISOLAB_AGENTS.md"
+  fi
+  if [ -n "${KUBECONFIG:-}" ] && [ -n "${ISOLAB_KUBE_CONTEXT:-}" ]; then
+    run bash "$launcher" setup eks || warn "Iso Lab EKS client setup failed; see docs/ISOLAB_AGENTS.md"
+  fi
+  if [ -z "${ISOLAB_URL:-}" ] && { [ -z "${KUBECONFIG:-}" ] || [ -z "${ISOLAB_KUBE_CONTEXT:-}" ]; }; then
+    ok "no Iso Lab connection configured; see docs/ISOLAB_AGENTS.md"
+  fi
+}
+
 # ---------------------------------------------------------- control plane ---
 start_control_plane() {
   log "Conductor control plane"
@@ -614,6 +630,7 @@ want sage          && install_sage || true
 want agents        && install_agents || true
 want github        && install_github_auth || true
 want repos         && install_repos || true
+want isolab        && install_isolab || true
 want control-plane && start_control_plane || true
 
 echo
