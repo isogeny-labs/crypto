@@ -43,11 +43,14 @@ Lean source & Verified scope\\
 \texttt{WeightedProjGlueCompatibility.lean} & The glue transition commutes with both maps into the common $D_+(XZ)$ coordinate Spec.\\
 \texttt{WeightedChartRingSmooth.lean} & The infinity quotient is Smooth over any field after inverting its $z$-partial.\\
 \texttt{WeightedInfinityOpenSmooth.lean} & Smooth on affine $D(x)$ transports conditionally to infinity $D(z)$ through the checked overlap isomorphism.\\
+\texttt{WeightedAffineRingSmooth.lean} & A plane quotient is Smooth if its two partial images span the unit ideal; the genus-2 $Y$-partial identity is checked.\\
+\texttt{WeightedAffineSquarefreeSmooth.lean} & The squarefree Jacobian certificate implies the derivative-range unit ideal, conditional on both explicit partial identities.\\
+\texttt{WeightedProjGluedMorphism.lean} & The forward separate-chart overlap transition agrees after mapping into actual weighted Proj.\\
 \bottomrule
 \end{longtable}
 \section*{Open boundary}
 Scheme-level smoothness, a global isomorphism from weighted Proj to the separately glued scheme, local-stalk transport, the Picard-class identity, and the Rust-to-Lean semantics bridge remain open. The infinity Jacobian certificate establishes coverage of the boundary locus by a nonzero partial; the immersion equalities establish compatibility of both chart localizations with the common weighted-Proj open. Neither alone constructs the remaining global theorems.
-The checked global smoothness theorem is conditional on Smooth of both full chart restrictions. The derivative-open infinity theorem and conditional overlap transport do not yet establish either full chart. The Spec localization squares now compose with the chart isomorphism inverses and actual Proj immersions. Compatibility of the glue transition with the common coordinate Spec is checked, while the further corollary into Proj and the global comparison morphism remain open.
+The checked global smoothness theorem is conditional on Smooth of both full chart restrictions. The derivative-open infinity theorem, conditional overlap transport and affine partial-ideal criterion do not yet establish either full chart under the squarefree hypothesis: the $X$-partial identity remains unproved. The squarefree ideal-span bridge is checked only with that identity as an explicit premise. The Spec localization squares compose with the chart isomorphism inverses and actual Proj immersions. The forward glue transition agrees after mapping into Proj, while the remaining Boolean cone equations and global comparison morphism remain open.
 \section*{Replay evidence}
 All nineteen new source files compiled with Lean 4.34.1 and Mathlib commit \texttt{d13f23b} (full revision in the companion Markdown), exit status 0. Axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; none lists \texttt{sorryAx}. Source SHA-256 values, in dependency order, are:
 \begin{quote}\scriptsize\ttfamily
@@ -116,6 +119,19 @@ table rows) are recorded in the companion Markdown. The chart-into-Proj,
 glue-compatibility, infinity derivative-open Smooth, and conditional
 infinity-overlap Smooth files compiled with \texttt{lake env lean} under
 the same pins; their audited theorems list only the three standard axioms.
+The affine criterion, conditional squarefree bridge, and Proj-valued
+forward-transition sources have hashes
+\begin{quote}\scriptsize\ttfamily
+81a29e680f4f3e6a9eaaecc2e53f1530\\
+8d5e2abca3c90ffa5635185ca231cc56\\
+f92421475721cd3f3e5c12eb0277fc0b\\
+949487a6fd723e2ee0352b3fa9ae4305\\
+2a74e21eec3ac4ae138b1619e8db0ed3\\
+315fe2f71ff6b43cf1d5d4c199678399
+\end{quote}
+in that order. All three compiled directly under the same Lean and Mathlib
+pins with exit status zero; their audited public theorems list only the
+three standard axioms.
 \section*{Repository validation}
 The first \texttt{cargo test --release --lib --offline --locked} run recorded
 4,652 passed, one failed, and 119 ignored. The sole failure was a 2,000-ms
