@@ -210,7 +210,7 @@ def write_gitignore(d: Path, names: list[str]) -> None:
         head, rest = text.split(BEGIN, 1)
         tail = rest.split(END, 1)[1] if END in rest else ""
         text = head.rstrip("\n") + ("\n" if head.strip() else "") + tail.lstrip("\n")
-    block = [BEGIN, *[gitignore_escape(n) for n in sorted(names)], END]
+    block = [BEGIN, "!.artifacts.json", *[gitignore_escape(n) for n in sorted(names)], END]
     text = (text.rstrip("\n") + "\n" if text.strip() else "") + "\n".join(block) + "\n"
     p.write_text(text)
 
@@ -410,7 +410,7 @@ def cache_path(cfg: Config, digest: str) -> Path:
 
 def ensure_cached(cfg: Config, remote: Remote, digest: str, size: int) -> Path:
     c = cache_path(cfg, digest)
-    if c.exists() and c.stat().st_size == size:
+    if c.exists() and c.stat().st_size == size and sha256_file(c) == digest:
         return c
     (cfg.cache / "tmp").mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=cfg.cache / "tmp")
@@ -431,19 +431,27 @@ def ensure_cached(cfg: Config, remote: Remote, digest: str, size: int) -> Path:
 
 def cache_insert(cfg: Config, src: Path, digest: str) -> None:
     c = cache_path(cfg, digest)
-    if c.exists():
+    if c.exists() and sha256_file(c) == digest:
         return
     c.parent.mkdir(parents=True, exist_ok=True)
     (cfg.cache / "tmp").mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=cfg.cache / "tmp")
     os.close(fd)
-    place_copy(src, Path(tmp))
-    Path(tmp).chmod(0o444)
-    os.replace(tmp, c)
+    try:
+        place_copy(src, Path(tmp))
+        if sha256_file(Path(tmp)) != digest:
+            die(f"source changed while caching {digest[:12]}; refused")
+        Path(tmp).chmod(0o444)
+        os.replace(tmp, c)
+    finally:
+        Path(tmp).unlink(missing_ok=True)
 
 
 def place_copy(src: Path, dest: Path) -> None:
     """Copy-on-write clone where the filesystem has it (APFS, btrfs, XFS), else a copy."""
+    # A sparse checkout can expose a tracked manifest through the index while
+    # leaving its directory absent from the working tree.
+    dest.parent.mkdir(parents=True, exist_ok=True)
     dest.unlink(missing_ok=True)
     flag = "-c" if sys.platform == "darwin" else "--reflink=auto"
     p = subprocess.run(["cp", flag, str(src), str(dest)], capture_output=True)
@@ -547,7 +555,8 @@ def cmd_push(cfg: Config, args) -> int:
     tracked = [f for f, *_ in done]
     for i in range(0, len(tracked), 500):
         git(cfg.root, "rm", "--cached", "--sparse", "-q", "--ignore-unmatch", "--", *tracked[i:i + 500])
-    git(cfg.root, "add", "--sparse", "--", *[rel(cfg.root, d / n) for d in by_dir for n in (MANIFEST, ".gitignore")])
+    git(cfg.root, "add", "-f", "--sparse", "--",
+        *[rel(cfg.root, d / n) for d in by_dir for n in (MANIFEST, ".gitignore")])
     sent = sum(1 for *_, s in done if s)
     print(f"moved {len(done)} files ({sum(s for _, _, s, _ in done) / 1e6:,.1f} MB; {sent} uploaded, "
           f"{len(done) - sent} already stored) into {len(by_dir)} manifests; review with `git status` and commit",
@@ -661,7 +670,10 @@ def cmd_migrate(cfg: Config, args) -> int:
     if not candidates:
         print("artifacts migrate: no changed data files", file=sys.stderr)
         return 0
-    paths = [p for p, _ in candidates]
+    # changed_candidates returns repository-relative paths. Resolve them before
+    # handing them to commands that also accept caller-relative paths, because
+    # migrate may be invoked from any subdirectory in the checkout.
+    paths = [str(cfg.root / p) for p, _ in candidates]
     if args.dry_run:
         for p, s in candidates:
             print(f"{s:>14,}  {p}")
