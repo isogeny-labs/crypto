@@ -131,8 +131,12 @@ if ! sage_works; then
       mv -f "$sage_wrapper" "$bin_dir/sage"
       hash -r
     else
-      echo "micromamba could not install SageMath; removing the partial install" >&2
-      rm -rf "$sage_prefix" "$MAMBA_ROOT_PREFIX/pkgs"
+      # Free the disk, but keep an environment this run did not create.
+      echo "micromamba could not install SageMath; removing the partial download" >&2
+      rm -rf "$MAMBA_ROOT_PREFIX/pkgs"
+      if [[ "$mamba_action" == create ]]; then
+        rm -rf "$sage_prefix"
+      fi
     fi
   fi
 fi
