@@ -208,6 +208,21 @@ The post-migration checked sources are `Common22FiniteZeroOrder.lean`
 `Common22BranchValuation.lean` (`cb7b317d0`), and
 `WeightedProjSmoothFinal.lean` (`37e44a178`). The last source has SHA-256
 `9aaf5174d4196aa269b599a7171440cc0e07c5f4d05ab3e019892215ce35cd6c`.
+The 27 October follow-up adds `Common22BranchMaximalIdeal.lean`
+(`4b5a09e46`, SHA-256
+`07253dabc66108c17c89544dd2e7eae8a6c5a17810832becafa13c9795650cf6`),
+`Common22BranchLocalParameter.lean` (`669caf1a6`, SHA-256
+`717ad6c04c2611b7d05a3106d1fc6f855ecc552fe8466734c40d690ae77c447d`),
+and `WeightedProjCrossChart.lean` (`69d2b67b0`, SHA-256
+`f6d33891536f4d508b49d452a26c9ac33e2883ebd9d6ddca85b859942b402d80`).
+The first identifies the actual affine branch ideal as `(x-a,y)`; the second
+shows that the actual branch localization has maximal ideal `(y)` when
+`f(a)=0` and `f'(a)≠0`; the third identifies both opposite basic-open
+preimages with the corresponding glued overlap ranges. Each compiled directly
+with pinned Lean 4.34.1 and lists only `propext`, `Classical.choice`, and
+`Quot.sound` in its axiom audit. The branch localization is not yet proved a
+domain or DVR, and the cross-chart equality needed for the global glued-to-Proj
+isomorphism remains open.
 All their reported public theorems compiled directly with pinned Lean 4.34.1
 and Mathlib `d13f23b`; axiom audits list only `propext`, `Classical.choice`,
 and `Quot.sound`. The glue files establish open-immersion and isomorphism

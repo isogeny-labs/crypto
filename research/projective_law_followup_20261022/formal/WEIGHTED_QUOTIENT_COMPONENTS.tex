@@ -59,6 +59,8 @@ Lean source & Verified scope\\
 \texttt{Common22FiniteZeroOrder.lean} & Conditional DVR order identity for the finite nonbranch norm factors.\\
 \texttt{Common22BranchStalk.lean} and \texttt{Common22BranchParameter.lean} & Actual finite branch stalk, branch equation, and complementary factor unit under a simple-root hypothesis.\\
 \texttt{Common22BranchValuation.lean} & $\operatorname{ord}(x-a)=2\operatorname{ord}(y)$ in the branch localization, assuming it is a domain and DVR.\\
+\texttt{Common22BranchMaximalIdeal.lean} and \texttt{Common22BranchLocalParameter.lean} & Actual affine branch ideal $(x-a,y)$; at a simple root, the branch localization has maximal ideal $(y)$. Domain and DVR remain open.\\
+\texttt{WeightedProjCrossChart.lean} & Both opposite basic-open preimages equal the corresponding glued overlap ranges; cross-chart point equality remains open.\\
 \texttt{WeightedProjGlueOpenImmersion.lean} and \texttt{WeightedProjGlueInjective.lean} & Chart open immersions and global isomorphism conditional on cross-chart injectivity.\\
 \bottomrule
 \end{longtable}
@@ -78,7 +80,7 @@ glued morphism; Pic$^0$ class equation
 amber node names the open global claims.
 \section*{Open boundary}
 Global weighted-Proj Smooth is checked under the stated squarefree hypotheses. An unconditional open-immersion/inverse theorem for the glued-to-Proj morphism, global divisor-class transport, the Picard-class identity, and the Rust-to-Lean semantics bridge remain open. The infinity stalk is a checked DVR with local valuation two for $z$. The global morphism is surjective on points but has no checked inverse.
-The branch-point order identity remains conditional on a domain and DVR instance at the actual branch localization; neither $\operatorname{ord}(y)=1$ nor the global principal-divisor equation has been proved.
+The actual branch localization now has a checked principal maximal ideal $(y)$ at each simple root. Its domain and DVR instances remain unproved, so the branch-point order identity remains conditional; neither $\operatorname{ord}(y)=1$ nor the global principal-divisor equation has been proved. Both cross-chart opposite-open preimages are checked, but their point equality and the global glued-to-Proj inverse remain open.
 \section*{Replay evidence}
 All nineteen new source files compiled with Lean 4.34.1 and Mathlib commit \texttt{d13f23b} (full revision in the companion Markdown), exit status 0. Axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; none lists \texttt{sorryAx}. Source SHA-256 values, in dependency order, are:
 \begin{quote}\scriptsize\ttfamily
