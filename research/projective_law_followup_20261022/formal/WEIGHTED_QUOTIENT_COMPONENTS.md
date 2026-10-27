@@ -32,16 +32,29 @@ Proj, with compatible local stalks, remains open.
 reduction `smooth_of_two_basic_opens`: for any morphism from the actual
 weighted Proj to a scheme, Smooth on both the `X` and `Z` basic-open
 restrictions implies Smooth globally. It uses the checked two-open cover.
-The two chart Smooth premises have not been established, so global
+The two full-chart Smooth premises have not been established, so global
 smoothness remains open. `WeightedProjGlobalGlue.lean` defines both actual
 chart morphisms into weighted Proj by composing the checked chart
-isomorphisms with the basic-open immersions. The next missing lemma is
-scheme-level equality after composing each chart isomorphism's inverse with
-the actual `Proj.basicOpen.ι` immersion. `WeightedProjChartNaturality.lean`
-now checks both ring-map and `Spec.map` localization squares for the two
-separately glued principal opens. It has not yet composed those squares with
-the chart isomorphisms and Proj immersions, so the global scheme isomorphism
-and local-stalk comparison remain open.
+isomorphisms with the basic-open immersions. `WeightedProjChartNaturality.lean`
+checks the two ring-map and `Spec.map` localization squares.
+`WeightedProjChartIntoProj.lean` composes these with both actual chart
+isomorphism inverses and Proj immersions: each separately glued
+principal-open chart enters Proj through the canonical `D₊(XZ)` map.
+`WeightedProjGlueCompatibility.lean` proves that the separately glued
+overlap transition commutes with both maps to the common `D₊(XZ)`
+coordinate Spec. Its equality after composing with the actual Proj
+immersion and the global glued-curve morphism have not yet been
+kernel-checked. The global scheme isomorphism and local-stalk comparison
+remain open.
+
+`WeightedChartRingSmooth.lean` constructs an explicit submersive
+presentation of the infinity quotient and proves that its structure map
+from any field is Smooth after localization away from the `z`-partial.
+`WeightedInfinityOpenSmooth.lean` conditionally transports Smooth from the
+affine `D(x)` ring to the infinity `D(z)` ring through the checked overlap
+equivalence. The affine Smooth premise is still open under the perfect,
+odd-characteristic, squarefree-quintic hypotheses. Thus neither complete
+chart nor weighted Proj is yet proved Smooth.
 
 This identifies both scheme charts, establishes their finite affine cover, proves properness over `K`, and checks the pointwise and ring-global Jacobian facts on their stated loci, overlap-coordinate identities, a canonical overlap-ring equivalence, its images of the two affine generators, scalar preservation, equality of the induced Spec transition with the separately glued scheme's transition, and compatibility of both localized chart embeddings with the actual common weighted-Proj immersion. Scheme-level smoothness, construction of the global comparison with the separately glued curve, local-stalk transport, the `Pic⁰` class equation, and the Rust-to-Lean execution bridge remain open. The finite-zero multiplicity argument in [PROOF_AUDIT.md](../PROOF_AUDIT.md) is written mathematics, not a Lean divisor theorem.
 
@@ -88,6 +101,19 @@ The chart-localization source `WeightedProjChartNaturality.lean` has SHA-256
 `lake env lean WeightedProjChartNaturality.lean` exited 0 under the same
 pins; `zRingSquare`, `xRingSquare`, `zSpecSquare`, and `xSpecSquare` each
 list only the three standard axioms and contain no `sorry`.
+
+Four further checked files are `WeightedProjChartIntoProj.lean`
+(`c0b77fdd0365616b1b98c4ac703e68bee50016aab731aa0c57ac4db8ac403c65`),
+`WeightedProjGlueCompatibility.lean`
+(`f3444da10b1949d0203d2525162d1a80663f9d873a283171a291943e8fbcd09e`),
+`WeightedChartRingSmooth.lean`
+(`31230e952c340684e132457ff71ad0b821eff41452b7c035e3ca3ef209b016ba`),
+and `WeightedInfinityOpenSmooth.lean`
+(`e659c03a592b8acbfcdf18681d1c99325c0fa5378868b7b52e1a79a36051515a`).
+Each compiled with `lake env lean` under the same pins; the audited theorems
+use only `propext`, `Classical.choice`, and `Quot.sound`, with no `sorry`.
+The overlap/Proj, full affine Smooth, full infinity Smooth, global scheme
+isomorphism, and `Pic⁰` conclusions remain open as specified in the CSV.
 
 The required `RUST_TEST_THREADS=1 cargo test --release --lib --offline --locked`
 was run with these proof-only changes. The [first raw log](validation/release-library-first.log)
