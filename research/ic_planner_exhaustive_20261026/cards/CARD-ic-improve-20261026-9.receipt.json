@@ -1,0 +1,1667 @@
+{
+  "card_id": "CARD-ic-improve-20261026-9",
+  "card_path": "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.yaml",
+  "card_sha256": "a44509fc4f45cb261de3c28866399047a3e13d26c1e5d0aeae8a7e5c8fdec84b",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/ic_planner_exhaustive_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.435,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-clean",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.435,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import os,sys; sys.exit(1 if any(os.path.exists(p) for p in ['research/ic_planner_exhaustive_20261026/sessions/R-p16.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/R-p18.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/R-p36.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/R-p37.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/B-hb19.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/B-hb23.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/B-hb25.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/B-hb27.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/K-k47.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/K-k57.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/K-k41.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/K-k53.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/K-k59.audit.json', 'research/ic_planner_exhaustive_20261026/sessions/K-k61.audit.json']) else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.015,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audits-absent",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.015,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-record",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "54666e512c0995f215a71a2ff51b5a27676d7392bd2d915b667daa434b2c329f",
+      "stdout_tail": [
+        "Filesystem      Size  Used Avail Use% Mounted on",
+        "/dev/vda        252G   36G  3.6G  92% /"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.025,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-r-p16",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.025,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/R-p16",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.996,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-r-p16",
+      "index": 5,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/R-p16.audit.json": "0b0b15fe2ff8406befbcdfaf039158afc06ceeb42561388238cf0f17200d2d12"
+      },
+      "seconds": 0.996,
+      "stderr_sha256": "162405e46f530efa1a882809c64d3dbe83413b381e56174d3439a553971abd77",
+      "stderr_tail": [
+        "audit OK: 512 records, 512 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "0b0b15fe2ff8406befbcdfaf039158afc06ceeb42561388238cf0f17200d2d12",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 480,",
+        "      \"record_id\": \"ECR1h8b4fdfb9d894\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"3c4fc97933e963e0bfecf8e9d5a331fb94df61a40baf8530bd2fc9ae61e9e5be\",",
+        "    \"plan.json\": \"7572381cf889d6c88905d961fbfa012eb7c62b62a4294a9e456d7395dc0253c5\",",
+        "    \"records.jsonl\": \"ef93a4bab670e7c1967a34eb816a37258ad514aff82783eb31e910920a121ce2\",",
+        "    \"session.json\": \"b6bc5fcf33c9de58f353b01d676bcd8786ce712ba425ad035c32c316351a7153\",",
+        "    \"spec.json\": \"05547d74144d3bde53a9d8f55805fdaaab083c7167558d490cf5c5c20477712c\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040828618",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/R-p16.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/R-p16/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.024,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-r-p16",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.024,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.026,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-r-p18",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.026,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/R-p18",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.105,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-r-p18",
+      "index": 8,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/R-p18.audit.json": "b20eaad5783baa49aca139240f3b157f2e86a6d0fea7dde566d9a9af90a4fbd2"
+      },
+      "seconds": 1.105,
+      "stderr_sha256": "162405e46f530efa1a882809c64d3dbe83413b381e56174d3439a553971abd77",
+      "stderr_tail": [
+        "audit OK: 512 records, 512 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "b20eaad5783baa49aca139240f3b157f2e86a6d0fea7dde566d9a9af90a4fbd2",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 480,",
+        "      \"record_id\": \"ECR1h19c8f102134a\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"a47318669d51651d2d0c2ed767794b9967477a885e9753cabd38d4ac9c0a6e9f\",",
+        "    \"plan.json\": \"20a0a79e154fa5730c5bc24e8fb0324940928388fcaf5b47d190912f3239a13e\",",
+        "    \"records.jsonl\": \"422c501ba016c1f38f1b24f4ebc37f0ef39c3f10bc39f2426414c0d6586e5e75\",",
+        "    \"session.json\": \"8f7506cfdc3351cfa3aec8c907ec60d91bac933d1e01ec14e4970afaab8b9338\",",
+        "    \"spec.json\": \"0c393c64729050da0397ea076a68432025ad1a502648b03a3983ae8f22a307dd\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040829772",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/R-p18.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/R-p18/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.03,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-r-p18",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.03,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.025,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-r-p36",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.025,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/R-p36",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.884,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-r-p36",
+      "index": 11,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/R-p36.audit.json": "85ce25fc5ec7d52a617d50797ec38636da4bb0d675260e8c052ec598ee9e06e4"
+      },
+      "seconds": 6.884,
+      "stderr_sha256": "162405e46f530efa1a882809c64d3dbe83413b381e56174d3439a553971abd77",
+      "stderr_tail": [
+        "audit OK: 512 records, 512 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "85ce25fc5ec7d52a617d50797ec38636da4bb0d675260e8c052ec598ee9e06e4",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 480,",
+        "      \"record_id\": \"ECR1headdac5c0e14\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"5ffe70c6028423f4b757d14031e17c7e4c17559d52ae5ea67869d1b73618670e\",",
+        "    \"plan.json\": \"0f1ed39bac1d307f75a6414ae89d6de3f84d3e849d362a3d98fcd34a09d9cbb8\",",
+        "    \"records.jsonl\": \"05fce901f7b6db45934dccfef78951c0dad91bb10905fbf30824c1b0f2877b7d\",",
+        "    \"session.json\": \"3af9e38bf454d5f079139f63e97055a8936e565a70a544f610f9c03ab630e48c\",",
+        "    \"spec.json\": \"032596f350adc0f3e0ac6136a68bd0bd2c6df250021ed6e6fbb1a15fae1b8a6f\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040836709",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/R-p36.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/R-p36/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.031,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-r-p36",
+      "index": 12,
+      "outputs": {},
+      "seconds": 0.031,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.031,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-r-p37",
+      "index": 13,
+      "outputs": {},
+      "seconds": 0.031,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/R-p37",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.763,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-r-p37",
+      "index": 14,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/R-p37.audit.json": "8e02ef42ed9278035655c39dc8c17088195a9739b96b49a3fadd4336496266e9"
+      },
+      "seconds": 6.763,
+      "stderr_sha256": "162405e46f530efa1a882809c64d3dbe83413b381e56174d3439a553971abd77",
+      "stderr_tail": [
+        "audit OK: 512 records, 512 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "8e02ef42ed9278035655c39dc8c17088195a9739b96b49a3fadd4336496266e9",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 480,",
+        "      \"record_id\": \"ECR1ha56c4c3cdfdd\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"1ab24a48350c5a998d5ff43f06ec12b1c067f7e7eb9f010f62420d040d69ebe7\",",
+        "    \"plan.json\": \"1450d2159ae80774f3969d1057dee692bec348a5583799f3ee40850754fcaa25\",",
+        "    \"records.jsonl\": \"e2bc9f13aa86ce94e71c5224f725834918837baa0d2fe900f686ebc0a933b710\",",
+        "    \"session.json\": \"be59c2c920bbdbe21f27fdeb262caa97986ce981e6c228e4a02af12679cec8f4\",",
+        "    \"spec.json\": \"3ccc5b279ec09f41747401a0abb3209c55f9122578325b0e97474bfcb457a3bc\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040843530",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/R-p37.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/R-p37/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.033,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-r-p37",
+      "index": 15,
+      "outputs": {},
+      "seconds": 0.033,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.024,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-b-hb19",
+      "index": 16,
+      "outputs": {},
+      "seconds": 0.024,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/B-hb19",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.912,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-b-hb19",
+      "index": 17,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/B-hb19.audit.json": "9bc6de4f5be6c93091329f696b59e5024e58648b3919b0f693de2da53b1f31ac"
+      },
+      "seconds": 0.912,
+      "stderr_sha256": "0d6369bf5cba81d7facc56cf248dce34fb0e4be217d29cf13af36fce1f578171",
+      "stderr_tail": [
+        "audit OK: 128 records, 128 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "9bc6de4f5be6c93091329f696b59e5024e58648b3919b0f693de2da53b1f31ac",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 120,",
+        "      \"record_id\": \"ECR1h6965156d6743\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"6a93156acc21ecb7e5afb1bb2df10d763d6bbe044be2af6c77ffde960f5e2647\",",
+        "    \"plan.json\": \"ddb68ed3ae3489874d936cef42c570ab173883b01058d20e92aa9b9923ca549b\",",
+        "    \"records.jsonl\": \"3cae773b1f7875cc6be5bea5ed1fa7f13fa809e213274e7fd5c1f786a9003713\",",
+        "    \"session.json\": \"757ca7349cb14e811e2d8af81d1876cb9f2cfb68b140a8913248141d9504c953\",",
+        "    \"spec.json\": \"849340b596be12f62d876334e98a0a9756412de117e6893ebe7381bad146da7d\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040844519",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/B-hb19.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/B-hb19/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.025,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-b-hb19",
+      "index": 18,
+      "outputs": {},
+      "seconds": 0.025,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.032,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-b-hb23",
+      "index": 19,
+      "outputs": {},
+      "seconds": 0.032,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/B-hb23",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.346,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-b-hb23",
+      "index": 20,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/B-hb23.audit.json": "69dde89fa179ad46259408fdc188f90c9fce2535d3bff518ed305b713ca8c2cc"
+      },
+      "seconds": 1.346,
+      "stderr_sha256": "0d6369bf5cba81d7facc56cf248dce34fb0e4be217d29cf13af36fce1f578171",
+      "stderr_tail": [
+        "audit OK: 128 records, 128 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "69dde89fa179ad46259408fdc188f90c9fce2535d3bff518ed305b713ca8c2cc",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 120,",
+        "      \"record_id\": \"ECR1h0578a910d5f7\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"6c37d0a5a1193a1dab004f29ca9b43fa6642b7fcbd372a82d564248e088ffa61\",",
+        "    \"plan.json\": \"7f4c33cf63b8f35c913156ad9dbd3289197c9c1bc95ac00b6eb6e73509f90a86\",",
+        "    \"records.jsonl\": \"f8d0488a9a742f10fb5627c98a985bdb1bf813e0e25d83ddc72c8e6c910643f0\",",
+        "    \"session.json\": \"ee46daae2c2aebe4d96d9a3c259efa4e44075a0cbf35de71f645b0668ca43bb5\",",
+        "    \"spec.json\": \"789ca6e1db42118644c25de1ce79b30b1581c6146f8438ce944f251b47c5b247\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040845923",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/B-hb23.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/B-hb23/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.023,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-b-hb23",
+      "index": 21,
+      "outputs": {},
+      "seconds": 0.023,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.028,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-b-hb25",
+      "index": 22,
+      "outputs": {},
+      "seconds": 0.028,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/B-hb25",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.393,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-b-hb25",
+      "index": 23,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/B-hb25.audit.json": "0ef5c8496c1e833c06651969b1bcc1d6300b6f03fd1584ca5b85382e2e6660aa"
+      },
+      "seconds": 9.393,
+      "stderr_sha256": "0d6369bf5cba81d7facc56cf248dce34fb0e4be217d29cf13af36fce1f578171",
+      "stderr_tail": [
+        "audit OK: 128 records, 128 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "0ef5c8496c1e833c06651969b1bcc1d6300b6f03fd1584ca5b85382e2e6660aa",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 120,",
+        "      \"record_id\": \"ECR1hc69fd0982928\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"c165630b188823e4c7ed064e31209ccb53adc65b6395df5dce2f585eb1d73fab\",",
+        "    \"plan.json\": \"52442a13f7ae954bf7977fc3954710f0d83805a9bdb375338f20b14747bcda28\",",
+        "    \"records.jsonl\": \"7a78468e68a70fba0310185203259e9b9b02438df5ef04da4ac26298ae384c11\",",
+        "    \"session.json\": \"30397fa016ae0c4a12ec755abfc2e4e3f2c6b08024e8bcce0b948d1def4d93c5\",",
+        "    \"spec.json\": \"178f4a20c68a8996e4014a5e27e0f9f3e5e3e693c4265810a8c85d43a543358f\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040855367",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/B-hb25.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/B-hb25/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.031,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-b-hb25",
+      "index": 24,
+      "outputs": {},
+      "seconds": 0.031,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.029,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-b-hb27",
+      "index": 25,
+      "outputs": {},
+      "seconds": 0.029,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/B-hb27",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.94,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-b-hb27",
+      "index": 26,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/B-hb27.audit.json": "d66c17e829be9f1a690fe75429d17b614df6592a7797ac66340703120d537d92"
+      },
+      "seconds": 3.94,
+      "stderr_sha256": "0d6369bf5cba81d7facc56cf248dce34fb0e4be217d29cf13af36fce1f578171",
+      "stderr_tail": [
+        "audit OK: 128 records, 128 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "d66c17e829be9f1a690fe75429d17b614df6592a7797ac66340703120d537d92",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 120,",
+        "      \"record_id\": \"ECR1h9c44951b671c\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"7c166575d7e208427e53782b8ba8dafd982196c60571b7cece81e951147fc8b4\",",
+        "    \"plan.json\": \"0fe10475c7b8f6bb1dd46e9a9526d5c01fc6882c9ca13895399a16319c00e816\",",
+        "    \"records.jsonl\": \"5bb3531aee2fcd8cc321c830653ca408154fab935ada8b658a3401cbb9205dc2\",",
+        "    \"session.json\": \"abef3eca953d5177f18d4b20fd8ae0171053e27420b00cc0382bf4963b4b2b45\",",
+        "    \"spec.json\": \"c666ae49c8d60e5241d77861a2fa6201d4125b456be6b3c8a45298a8e35db805\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040859369",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/B-hb27.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/B-hb27/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.026,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-b-hb27",
+      "index": 27,
+      "outputs": {},
+      "seconds": 0.026,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.022,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-k-k47",
+      "index": 28,
+      "outputs": {},
+      "seconds": 0.022,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/K-k47",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.058,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-k-k47",
+      "index": 29,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/K-k47.audit.json": "1aa81b00cdebd360a337e85447ea674152e7288b9c07f894580d2d5ad333a42e"
+      },
+      "seconds": 1.058,
+      "stderr_sha256": "0d6369bf5cba81d7facc56cf248dce34fb0e4be217d29cf13af36fce1f578171",
+      "stderr_tail": [
+        "audit OK: 128 records, 128 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "1aa81b00cdebd360a337e85447ea674152e7288b9c07f894580d2d5ad333a42e",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 120,",
+        "      \"record_id\": \"ECR1h0b7e69b7875c\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"4562340ceb7b8e5dfdd548e7c3d63d7394ad7e478ad9ab69f618a0056179d374\",",
+        "    \"plan.json\": \"6418c8ec3b72fa9381f68766c9a8599feb2f95056f3437fba25eb0cc9f935f06\",",
+        "    \"records.jsonl\": \"9f360edf8ba27916225623f14be29da992b8d55d291fddd6c59f4e41de9e3a9b\",",
+        "    \"session.json\": \"fbfdf68c5ca6e93df1b733c1d10742014efdfd6ba360f3cf3c3de033ebddcffe\",",
+        "    \"spec.json\": \"0808561d27fc7b4f18f5f331c34205d76fecce3d12459364ec29aedcb7f9363b\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040860475",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k47.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k47/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.024,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-k-k47",
+      "index": 30,
+      "outputs": {},
+      "seconds": 0.024,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.024,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-k-k57",
+      "index": 31,
+      "outputs": {},
+      "seconds": 0.024,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/K-k57",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.112,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-k-k57",
+      "index": 32,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/K-k57.audit.json": "73e5439382c2f87729489e7b422604c349f5a44b473f630416d15bb8b0c521f3"
+      },
+      "seconds": 1.112,
+      "stderr_sha256": "0d6369bf5cba81d7facc56cf248dce34fb0e4be217d29cf13af36fce1f578171",
+      "stderr_tail": [
+        "audit OK: 128 records, 128 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "73e5439382c2f87729489e7b422604c349f5a44b473f630416d15bb8b0c521f3",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 120,",
+        "      \"record_id\": \"ECR1hea9169923d49\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"b0fcd8b1054848f864edf8bd04cd1f191ba6f2ef05f5467127b3a3cea35a57c8\",",
+        "    \"plan.json\": \"5e7a214e5578dcd0ea404cc075dcdcea75539c4637fb8831a9e0d7bb8aa04214\",",
+        "    \"records.jsonl\": \"dbba382abb565641bc8b266a95e34236a703a16682bdadced85ce069b680ca90\",",
+        "    \"session.json\": \"d1e0f12008480d8c59699ecc622009ff2286d8aea3c2ea1c08a442ec48b6ba2f\",",
+        "    \"spec.json\": \"84120a60cc15f33351f52cc3f2d8033e8f09a8dd31a957ee5ed60546cc9b3c41\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040861637",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k57.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k57/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.022,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-k-k57",
+      "index": 33,
+      "outputs": {},
+      "seconds": 0.022,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.023,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-k-k41",
+      "index": 34,
+      "outputs": {},
+      "seconds": 0.023,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/K-k41",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.164,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-k-k41",
+      "index": 35,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/K-k41.audit.json": "d8e38cc6b66e00c88e055859643c9a437706538b6e4ede9615481f072359318e"
+      },
+      "seconds": 1.164,
+      "stderr_sha256": "0d6369bf5cba81d7facc56cf248dce34fb0e4be217d29cf13af36fce1f578171",
+      "stderr_tail": [
+        "audit OK: 128 records, 128 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "d8e38cc6b66e00c88e055859643c9a437706538b6e4ede9615481f072359318e",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 120,",
+        "      \"record_id\": \"ECR1h2f0ff1b449fc\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"4eed333d9a2276be75695f2b63057a7eda294145d71ba38aa28e6b4342da54f5\",",
+        "    \"plan.json\": \"1f16eae88226e3f7c9433f7d6982ae5f918d2f941bf6effe5f48a918db100bc7\",",
+        "    \"records.jsonl\": \"980778b2529b1d629de12f64ff9eefba38ee4219ab2efadc28d015f7dc4d5f56\",",
+        "    \"session.json\": \"b56afb4917be1ad1548b3c2de7a48a833091a6810fc06e90307dfad1b154f2f0\",",
+        "    \"spec.json\": \"00fb3935514bc3c4a6e7eb4b2e034c8b8c4cf475ee968b4b315bfa64bdf29bd3\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040862843",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k41.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k41/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.026,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-k-k41",
+      "index": 36,
+      "outputs": {},
+      "seconds": 0.026,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.036,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-k-k53",
+      "index": 37,
+      "outputs": {},
+      "seconds": 0.036,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/K-k53",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.169,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-k-k53",
+      "index": 38,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/K-k53.audit.json": "6e591619acd522933ddc1a8ec0abae175bdc9c5437d185f60776e7271cc47238"
+      },
+      "seconds": 3.169,
+      "stderr_sha256": "0d6369bf5cba81d7facc56cf248dce34fb0e4be217d29cf13af36fce1f578171",
+      "stderr_tail": [
+        "audit OK: 128 records, 128 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "6e591619acd522933ddc1a8ec0abae175bdc9c5437d185f60776e7271cc47238",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 120,",
+        "      \"record_id\": \"ECR1hf8a2a49df1f1\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"cb6f283172da7d962e04423289511b20fe0292e65d8115a6a2fb86aee7238c71\",",
+        "    \"plan.json\": \"608005266abe79eb04e92cc47d65cdaa96a6245b7c4765e126f0f603a48d9f36\",",
+        "    \"records.jsonl\": \"b8a3a3208162d7a15f58d5b86e5043bd693cd4255dc67146c4bd8082c3cbde7a\",",
+        "    \"session.json\": \"64282727e9bf454e489252d35c216df9daa16e4814387555bf6e3bc559015474\",",
+        "    \"spec.json\": \"425f685e8b591f2e0df4839583ee50a7ad09897b1b2a094daf6d9777c106fcd7\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040866078",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k53.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k53/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.025,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-k-k53",
+      "index": 39,
+      "outputs": {},
+      "seconds": 0.025,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.03,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-k-k59",
+      "index": 40,
+      "outputs": {},
+      "seconds": 0.03,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/K-k59",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.163,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-k-k59",
+      "index": 41,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/K-k59.audit.json": "4e7a4063ca919755e6cd0f5e53d3d1e69e94c27a240e97eb78ce5e1fda864751"
+      },
+      "seconds": 3.163,
+      "stderr_sha256": "0d6369bf5cba81d7facc56cf248dce34fb0e4be217d29cf13af36fce1f578171",
+      "stderr_tail": [
+        "audit OK: 128 records, 128 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "4e7a4063ca919755e6cd0f5e53d3d1e69e94c27a240e97eb78ce5e1fda864751",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 120,",
+        "      \"record_id\": \"ECR1h7673e1bf527c\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"526ced1062a20dd27a8f89fd1f8d9983836226af00175d85b75a9c60130644a9\",",
+        "    \"plan.json\": \"a3e5bdeb376b9b066c3ab9e6eea7c422d58f91562cc347c5dfc58bea73101ece\",",
+        "    \"records.jsonl\": \"ce4a36e140fec5aacab5dc9c29a41680c21f40aa22cdf271d9a78f7d77fe5e4c\",",
+        "    \"session.json\": \"d89f08f3b46ced9bcc60bf85372e569613a8c675a6f3e8e748332bcea17f6c04\",",
+        "    \"spec.json\": \"0897fe0466cfb6327de572f49c86aac52839c741def20a9f2b80b25468304f15\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040869296",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k59.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k59/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.022,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-k-k59",
+      "index": 42,
+      "outputs": {},
+      "seconds": 0.022,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.024,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-verify-k-k61",
+      "index": 43,
+      "outputs": {},
+      "seconds": 0.024,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_planner_exhaustive_20261026/sessions/K-k61",
+        "--replay",
+        "12",
+        "--exit-code"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.937,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-k-k61",
+      "index": 44,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/K-k61.audit.json": "836affb3dfeb067c6ee3ba9d2850a928865c027c2bdeaffa852fb4cdf9d072b7"
+      },
+      "seconds": 8.937,
+      "stderr_sha256": "0d6369bf5cba81d7facc56cf248dce34fb0e4be217d29cf13af36fce1f578171",
+      "stderr_tail": [
+        "audit OK: 128 records, 128 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "836affb3dfeb067c6ee3ba9d2850a928865c027c2bdeaffa852fb4cdf9d072b7",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 120,",
+        "      \"record_id\": \"ECR1h369b26589a73\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"9dd8ce65c462a27308fd8ba9943b97b3c2f349320a72fb845a80f605142c2e52\",",
+        "    \"plan.json\": \"a3151da3b7a819aa5ab031c63928eaf3ba617cdd994cd6926bf4e5c7ac06cec2\",",
+        "    \"records.jsonl\": \"f5788b16c5dbad3e783152f59e5673c9b2e2bae99528d4bdf5a4f3e3006d675b\",",
+        "    \"session.json\": \"eac86ce881eb5554d992e6a455385a9f38ff47e4c8d1775a1c1d1ea347ad410c\",",
+        "    \"spec.json\": \"d7ca96b275afbbb855e0086af8f576f1d573953ebe0e604004fbb6049c47c0c2\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519\",",
+        "  \"auditor_env_class_id\": \"ECBENV3h8be61a9c1732\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h0832b230440b\",",
+        "  \"audited_unix_ms\": 1793040878276",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json,sys; a=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k61.audit.json')); s=json.load(open('research/ic_planner_exhaustive_20261026/sessions/K-k61/session.json')); sys.exit(0 if a['verified_records'] >= s['executions_planned'] else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.025,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "count-k-k61",
+      "index": 45,
+      "outputs": {},
+      "seconds": 0.025,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 45,
+  "commit": "9ee47592f25e465f049c4a52764bb43eb7f402ad",
+  "dirty_after": [
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.disk-start.stdout",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-b-hb19.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-b-hb23.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-b-hb25.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-b-hb27.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-k-k41.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-k-k47.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-k-k53.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-k-k57.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-k-k59.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-k-k61.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-r-p16.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-r-p18.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-r-p36.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.verify-r-p37.stderr",
+    "research/ic_planner_exhaustive_20261026/sessions/B-hb19.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/B-hb23.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/B-hb25.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/B-hb27.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/K-k41.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/K-k47.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/K-k53.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/K-k57.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/K-k59.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/K-k61.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/R-p16.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/R-p18.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/R-p36.audit.json",
+    "research/ic_planner_exhaustive_20261026/sessions/R-p37.audit.json"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
