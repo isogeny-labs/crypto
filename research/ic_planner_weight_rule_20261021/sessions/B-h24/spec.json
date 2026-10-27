@@ -1,0 +1,64 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "ic planner weight rule, Phase B (held out), curve h24: N0 against round(1.41 N0)",
+  "description": "research/ic_planner_weight_rule_20261021/PROTOCOL_AMENDMENT_1.md. v1 = ic-planner/1 plan; v2-m141 = the Phase A rule at w = 1.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 10940417,
+        "a": 10128206,
+        "b": 867458,
+        "group_order": 10937713,
+        "r": 10937713,
+        "gx": 3240781,
+        "gy": 414610
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261025
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "v1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=111",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "v2-m141",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=157",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss",
+          "targets": "walk"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261026,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}
