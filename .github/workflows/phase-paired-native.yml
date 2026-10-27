@@ -49,6 +49,13 @@ jobs:
             docs/ic/calibration.json
             docs/ic/boundary_targets.json
             research/phase_paired_native_20261026
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/phase_paired_native_20261026
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
