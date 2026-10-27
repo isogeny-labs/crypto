@@ -703,7 +703,7 @@ jobs:
     # ubuntu-latest, which is now Ubuntu 26.04, and run 40259290676 failed here
     # with "Unable to locate package cuda-nvcc-12-8". Without this job
     # the `release` job never runs. docs/RELEASES.md describes the pin.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 60 }}
     steps:
       - name: Require successful scope classification
