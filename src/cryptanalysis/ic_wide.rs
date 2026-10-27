@@ -579,6 +579,8 @@ pub struct BatchedRho {
     pub ref_fq_single_ops: u64,
     pub ref_fq_verification: u64,
     pub ref_fq_total: u64,
+    /// The same total under `RefModel::PolyFreeConst` (`Fq4::ref_muls_poly`).
+    pub poly_fq_total: u64,
     pub setup_ops: GroupOps,
     pub verification_ops: u64,
     // Native work, not F_q multiplications.
@@ -641,6 +643,7 @@ pub fn rho_negation_batched<S: RhoScalar>(
     let rq = || f.ref_muls();
     let start_count = fq();
     let rstart = rq();
+    let pstart = f.ref_muls_poly();
     let mut out = BatchedRho::default();
     let mut ops = GroupOps::default();
     let mut rng = StdRng::seed_from_u64(seed);
@@ -1021,6 +1024,7 @@ pub fn rho_negation_batched<S: RhoScalar>(
     }
     out.fq_total = fq() - start_count;
     out.ref_fq_total = rq().wrapping_sub(rstart);
+    out.poly_fq_total = f.ref_muls_poly().wrapping_sub(pstart);
     (out, recovered)
 }
 

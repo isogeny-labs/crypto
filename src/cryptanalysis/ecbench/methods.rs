@@ -32,8 +32,8 @@ use crate::cryptanalysis::ecbench_large_prime::{
 };
 use crate::cryptanalysis::gaudry_quartic::Pt4;
 use crate::cryptanalysis::gaudry_quartic_bin::{
-    fq_muls_per_add, fq_muls_per_add_ref, BinCurve, BinD4Oracle, BinOptions, OracleNative, PtB,
-    TLineBase,
+    fq_muls_per_add, fq_muls_per_add_ref, fq_muls_per_add_ref_poly, BinCurve, BinD4Oracle,
+    BinOptions, OracleNative, PtB, TLineBase,
 };
 use crate::cryptanalysis::gaudry_quartic_d4::{
     fp_muls_per_add, unpack_e4, D4Curve, D4Options, D4Oracle, YLineBase,
@@ -259,7 +259,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "rho.negation_batched_ref",
             family: "rho",
-            summary: "rho.negation_batched_full in the reference pricing: the walk's F_q operations are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts) and divided by the m-independent reference affine addition (50), native work by the same divisor; detail.reference_pricing carries the current-unit total and divisor side by side; the same walk, so the same counts; curves over F_(2^m)^4 only",
+            summary: "rho.negation_batched_full in the reference pricing: the walk's F_q operations are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts) and divided by the per-m reference affine addition (50 at odd m, 64 at even m, where u^2+u+1 is reducible: reference_pricing.reference_model records the model, the per-primitive costs and the divisor; reference_pricing.poly_free_const the polynomial-basis free-constant-multiplication model, divisor 42, beside it), native work by the same divisor; detail.reference_pricing carries the current-unit total and divisor side by side; the same walk, so the same counts; curves over F_(2^m)^4 only",
             entry: "ic_wide::rho_negation_batched + ecbench::f2m4_price",
             applies: Applies::Any,
             params: RHO_BATCHED_PARAMS,
@@ -267,7 +267,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "rho.negation_f2m4_ref",
             family: "rho",
-            summary: "rho.negation_f2m4_full with its native work divided by the m-independent reference affine addition (50 F_q multiplications, gaudry_quartic_bin::RefCosts) instead of the curve's schoolbook fq_muls_per_add; group operations are one GAE each in both; detail.reference_pricing carries the current-unit total and divisor side by side; curves over F_(2^m)^4 only",
+            summary: "rho.negation_f2m4_full with its native work divided by the per-m reference affine addition (50 F_q multiplications at odd m, 64 at even m, gaudry_quartic_bin::RefCosts; reference_pricing.poly_free_const records the 42-divisor second model) instead of the curve's schoolbook fq_muls_per_add; group operations are one GAE each in both; detail.reference_pricing carries the current-unit total and divisor side by side; curves over F_(2^m)^4 only",
             entry: "ic_wide::rho_negation_tallied + ecbench::f2m4_price",
             applies: Applies::Any,
             params: RHO_PARAMS,
@@ -435,7 +435,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "ic.pipeline_f2m4_ref",
             family: "ic",
-            summary: "ic.pipeline_f2m4_full in the reference pricing: the solver's F_q operations and native work are divided by the m-independent reference affine addition (50), and the base lifts and x_of_t are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts); detail.reference_pricing carries the current-unit total, both divisors and IC's F_(q^4) share side by side; the same run, so the same counts",
+            summary: "ic.pipeline_f2m4_full in the reference pricing: the solver's F_q operations and native work are divided by the per-m reference affine addition (50 at odd m, 64 at even m; reference_pricing.reference_model and .poly_free_const record both models), and the base lifts and x_of_t are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts); detail.reference_pricing carries the current-unit total, both divisors and IC's F_(q^4) share side by side; the same run, so the same counts",
             entry: "ic_framework::run_pipeline + ecbench::f2m4_price",
             applies: Applies::Any,
             params: IC_PIPELINE_PARAMS,
@@ -2590,12 +2590,22 @@ fn solve_f2m4_rho_batched(
             * per_add;
         let current = res.fq_total as f64 / per_cur + fme / per_cur;
         let total_ref = rep.total_gae;
+        let per_poly = fq_muls_per_add_ref_poly(c) as f64;
+        let total_poly = (res.poly_fq_total as f64 + fme) / per_poly;
         add_reference_block(
             &mut rep,
             json!({
                 "pricing": "reference",
                 "fq_muls_per_add_current": per_cur,
                 "fq_muls_per_add_reference": per_ref,
+                "reference_model": reference_model_note(c, per_ref),
+                "poly_free_const": json!({
+                    "model": "polynomial-basis F_q, free constant multiplication (second model, not this id's total)",
+                    "fq_muls_per_add": per_poly,
+                    "fq_operations_total": res.poly_fq_total,
+                    "total_gae": total_poly,
+                    "ratio_over_primary": total_poly / total_ref,
+                }),
                 "total_gae_current_pricing": current,
                 "total_gae_reference_pricing": total_ref,
                 "ratio_reference_over_current": total_ref / current,
@@ -2608,6 +2618,33 @@ fn solve_f2m4_rho_batched(
         );
     }
     Ok(rep)
+}
+
+/// Which reference model priced a `*_ref` / `*_refmm` record, and the
+/// per-primitive costs and divisor it used at this `m`.  The comparison uses
+/// the log-table tower model (`RefModel::Tower`, divisor 50 at odd `m`, 64
+/// at even `m`) because the field the code runs in is a log-table field,
+/// where a constant multiple costs a multiplication; the polynomial-basis
+/// model with free constant multiplication (42 at every `m`) is recorded
+/// beside it so a reader can see both.  Both are applied identically to the
+/// rho and IC arms.
+fn reference_model_note(
+    c: &crate::cryptanalysis::gaudry_quartic_bin::CurveB,
+    per_ref: f64,
+) -> Value {
+    let (a, b) = (c.f.ref_costs(), c.f.ref_costs_poly());
+    let costs = |k: crate::cryptanalysis::gaudry_quartic_bin::RefCosts| {
+        json!({"mul": k.mul, "sq": k.sq, "scale": k.scale, "frob": k.frob,
+               "inv": k.inv, "sqrt": k.sqrt, "add": k.add()})
+    };
+    json!({
+        "used": "log_table_tower",
+        "m": c.f.f.m,
+        "m_parity": if c.f.f.m % 2 == 0 { "even (u^2+u+1 reducible, epsilon != 1)" } else { "odd (epsilon = 1)" },
+        "divisor": per_ref,
+        "tower_costs": costs(a),
+        "poly_free_const_costs": costs(b),
+    })
 }
 
 /// The record of which mod-`r` multiplication priced a `*_ref`/`*_refmm`
@@ -2741,12 +2778,21 @@ fn solve_f2m4_rho_negation_full(
             .unwrap_or(0.0);
         let current = counted + fme / per_cur;
         let total_ref = rep.total_gae;
+        let per_poly = fq_muls_per_add_ref_poly(c) as f64;
+        let total_poly = counted + fme / per_poly;
         add_reference_block(
             &mut rep,
             json!({
                 "pricing": "reference",
                 "fq_muls_per_add_current": per_cur,
                 "fq_muls_per_add_reference": per_ref,
+                "reference_model": reference_model_note(c, per_ref),
+                "poly_free_const": json!({
+                    "model": "polynomial-basis F_q, free constant multiplication (second model, not this id's total)",
+                    "fq_muls_per_add": per_poly,
+                    "total_gae": total_poly,
+                    "ratio_over_primary": total_poly / total_ref,
+                }),
                 "total_gae_current_pricing": current,
                 "total_gae_reference_pricing": total_ref,
                 "ratio_reference_over_current": total_ref / current,
@@ -2812,15 +2858,16 @@ fn solve_f2m4_ic_full_with(
         .as_u64()
         .unwrap_or(0);
     // The `x_of_t` before each base lift: its counted multiplications.
-    let (mut muls, mut rmuls, mut n) = (0u64, 0u64, 0u64);
+    let (mut muls, mut rmuls, mut pmuls, mut n) = (0u64, 0u64, 0u64, 0u64);
     for t in (2..c.f.f.q)
         .step_by(((c.f.f.q / 64).max(1)) as usize)
         .take(64)
     {
-        let before = (c.f.f.muls(), c.f.ref_muls());
+        let before = (c.f.f.muls(), c.f.ref_muls(), c.f.ref_muls_poly());
         let _ = c.x_of_t(&c.f.from_fq(t));
         muls += c.f.f.muls() - before.0;
         rmuls += c.f.ref_muls().wrapping_sub(before.1);
+        pmuls += c.f.ref_muls_poly().wrapping_sub(before.2);
         n += 1;
     }
     let ctx_mm =
@@ -2876,12 +2923,31 @@ fn solve_f2m4_ic_full_with(
     };
     crate::cryptanalysis::ecbench::f2m4_price::reprice_ic(&mut rep, &refc)?;
     let total_ref = rep.total_gae;
+    // The second model, the same run and the same mod-r pricing.
+    let polyc = crate::cryptanalysis::ecbench::f2m4_price::IcContext {
+        per_add: fq_muls_per_add_ref_poly(c) as f64,
+        lift_muls: f2m4_lift_muls_poly(inst),
+        x_of_t_muls: pmuls as f64 / n.max(1) as f64,
+        ..ctx_of(true)
+    };
+    let mut poly_rep = rep.clone();
+    crate::cryptanalysis::ecbench::f2m4_price::reprice_ic(&mut poly_rep, &polyc)?;
+    let total_poly = poly_rep.total_gae;
     add_reference_block(
         &mut rep,
         json!({
             "pricing": "reference",
             "fq_muls_per_add_current": cur.per_add,
             "fq_muls_per_add_reference": refc.per_add,
+            "reference_model": reference_model_note(c, refc.per_add),
+            "poly_free_const": json!({
+                "model": "polynomial-basis F_q, free constant multiplication (second model, not this id's total)",
+                "fq_muls_per_add": polyc.per_add,
+                "lift_plus_x_of_t_fq_muls": polyc.lift_muls + polyc.x_of_t_muls,
+                "fq4_share_of_fq_operations": share(&polyc),
+                "total_gae": total_poly,
+                "ratio_over_primary": total_poly / total_ref,
+            }),
             "lift_plus_x_of_t_fq_muls_current": cur.lift_muls + cur.x_of_t_muls,
             "lift_plus_x_of_t_fq_muls_reference": refc.lift_muls + refc.x_of_t_muls,
             "base_lifts": lifts,
@@ -2954,13 +3020,22 @@ fn f2m4_lift_muls(inst: &BinCurve) -> f64 {
 /// (`Fq4::ref_muls` instead of the counted multiplications).
 fn f2m4_lift_muls_with(inst: &BinCurve, reference: bool) -> f64 {
     let c = &inst.curve;
-    let tally = || {
+    f2m4_lift_muls_tally(inst, || {
         if reference {
             c.f.ref_muls()
         } else {
             c.f.f.muls()
         }
-    };
+    })
+}
+
+/// [`f2m4_lift_muls_with`] under the polynomial-basis model.
+fn f2m4_lift_muls_poly(inst: &BinCurve) -> f64 {
+    f2m4_lift_muls_tally(inst, || inst.curve.f.ref_muls_poly())
+}
+
+fn f2m4_lift_muls_tally(inst: &BinCurve, tally: impl Fn() -> u64) -> f64 {
+    let c = &inst.curve;
     let mut rng = <rand::rngs::StdRng as rand::SeedableRng>::seed_from_u64(0x5e);
     let (mut muls, mut n) = (0u64, 0u64);
     while n < 32 {
@@ -4073,8 +4148,10 @@ mod tests {
     /// by side.
     #[test]
     fn the_reference_methods_are_the_full_methods_in_the_reference_unit() {
-        use crate::cryptanalysis::gaudry_quartic_bin::RefCosts;
+        // The reference divisor is per m: 64 at even m, 50 at odd m; the
+        // second model's is 42 at both.
         for m in [6u32, 7] {
+            let expect = if m % 2 == 0 { 64.0 } else { 50.0 };
             let (inst, facts, t) = f2m4_case(m, 777);
             let kv = [("walks", "16")];
             for (full_id, ref_id, kv) in [
@@ -4093,11 +4170,16 @@ mod tests {
                 }
                 check_full_block(&rf);
                 let b = &rf.detail["reference_pricing"];
+                assert_eq!(b["fq_muls_per_add_reference"].as_f64(), Some(expect));
+                assert_eq!(b["reference_model"]["used"], "log_table_tower");
+                assert_eq!(b["reference_model"]["divisor"].as_f64(), Some(expect));
                 assert_eq!(
-                    b["fq_muls_per_add_reference"].as_f64(),
-                    Some(RefCosts::ADD as f64)
+                    b["reference_model"]["tower_costs"]["add"].as_f64(),
+                    Some(expect)
                 );
-                assert!(b["fq_muls_per_add_current"].as_f64().unwrap() > RefCosts::ADD as f64);
+                assert_eq!(b["poly_free_const"]["fq_muls_per_add"].as_f64(), Some(42.0));
+                assert!(b["poly_free_const"]["total_gae"].as_f64().unwrap() > 0.0);
+                assert!(b["fq_muls_per_add_current"].as_f64().unwrap() > expect);
                 assert!(
                     (b["total_gae_current_pricing"].as_f64().unwrap() - full.total_gae).abs()
                         <= 1e-9 * full.total_gae
@@ -4123,6 +4205,10 @@ mod tests {
                 (b["total_gae_current_pricing"].as_f64().unwrap() - full.total_gae).abs()
                     <= 1e-9 * full.total_gae
             );
+            assert_eq!(b["fq_muls_per_add_reference"].as_f64(), Some(expect));
+            assert_eq!(b["reference_model"]["used"], "log_table_tower");
+            assert_eq!(b["poly_free_const"]["fq_muls_per_add"].as_f64(), Some(42.0));
+            assert!(b["poly_free_const"]["total_gae"].as_f64().unwrap() > 0.0);
             let (cs, rs) = (
                 b["fq4_share_of_fq_operations_current"].as_f64().unwrap(),
                 b["fq4_share_of_fq_operations_reference"].as_f64().unwrap(),

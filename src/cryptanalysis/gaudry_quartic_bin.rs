@@ -225,6 +225,30 @@ pub struct Fq4 {
     /// The reference-pricing tally (see [`RefCosts`]); no existing count
     /// reads it.
     tally: RefTally,
+    /// The reference costs of this field's `m`: [`RefModel::Tower`] (priced
+    /// by) and [`RefModel::PolyFreeConst`] (reported beside).
+    rc: RefCosts,
+    rc_poly: RefCosts,
+}
+
+/// Which reference model prices the `F_{q⁴}` primitives (see [`RefCosts`]).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RefModel {
+    /// Log-table `F_q`, as this crate implements it: multiplying by a
+    /// constant (`ε`, `δ`, the Frobenius and twist constants) is a full
+    /// `F_q` multiplication unless the constant is 1.  **This is the model
+    /// every `*_ref` / `*_refmm` id is priced by**, because the field the
+    /// code runs in is a log-table field, where a constant multiple is a
+    /// table lookup pair like any other product, so charging it nothing
+    /// would favour whichever arm leans on the tower more (IC).  The cost
+    /// depends on the parity of `m`: see [`RefCosts::new`].
+    Tower,
+    /// Polynomial-basis `F_q` in which multiplication by a constant is an
+    /// `F_2`-linear map applied for free (XORs, no multiplication).  Reported
+    /// beside the primary model in every `*_ref` / `*_refmm` record
+    /// (`reference_pricing.poly_free_const`), never used for the id's own
+    /// total.  Its prices do not depend on the parity of `m`.
+    PolyFreeConst,
 }
 
 /// Reference cost of the `F_{q⁴}` primitives, in `F_q` multiplications:
@@ -232,33 +256,74 @@ pub struct Fq4 {
 /// quartic [`Fq4::new`] happened to pick and of how naively this file
 /// codes the arithmetic.  The model is the tower `F_q ⊂ F_{q²} ⊂ F_{q⁴}`
 /// with `F_{q²} = F_q[u]/(u² + u + ε)` and `F_{q⁴} = F_{q²}[w]/(w² + w +
-/// δ)`, `ε, δ ∈ F_q`:
+/// δ)`, `ε, δ ∈ F_q`.
 ///
-/// * `F_{q²}` product 3 (Karatsuba), square 2, inversion 7 (norm to `F_q`);
-/// * `mul` 11 = 3 `F_{q²}` products + 2 for the `δ`-multiple;
-/// * `sq` 6 = 2 `F_{q²}` squares + the `δ`-multiple 2 (squaring is linear);
+/// **Parity of `m`.**  `u² + u + 1` is irreducible over `F_{2^m}` exactly
+/// when `m` is odd (its roots are the primitive cube roots of unity, and
+/// `3 | 2^m − 1` iff `m` is even).  So for odd `m` `ε = 1` and every
+/// reduction `u² = u + 1` is free; for even `m` no `ε = 1` tower exists
+/// (any irreducible `u² + au + b` rescales to `u² + u + b/a²` with
+/// `Tr(b/a²) = 1`, hence `ε ≠ 1`), and in a log-table `F_q` each `ε`-multiple
+/// is a full multiplication.  With `e = 0` (odd `m`) or `e = 1` (even `m`,
+/// [`RefModel::Tower`]):
+///
+/// * `F_{q²}` product `3 + e` (Karatsuba; `c₀ = p₀ + ε p₁`), square `2 + e`
+///   (`c₀ = a₀² + ε a₁²`), inversion `7 + e` (norm `a₀² + a₀a₁ + ε a₁²` to
+///   `F_q` `3 + e`, `F_q` inverse 2, 2 products);
+/// * `mul` = 3 `F_{q²}` products + 2 for the `δ`-multiple (11 / 14);
+/// * `sq` = 2 `F_{q²}` squares + the `δ`-multiple 2 (6 / 8);
 /// * `scale` 4 (an `F_q` scalar times 4 coordinates);
-/// * `frob` (`a ↦ a^q`) 3 = one `F_{q²}` product by `w^{q−1}` (the
-///   conjugations are free);
-/// * `inv` 22 = relative norm 9 + `F_{q²}` inversion 7 + 2 `F_{q²}`
-///   products 6;
-/// * `sqrt` 16 = 4 `F_q` square roots (linear, 1 each) + the two twists
-///   by `√u` and `√w` (4 `F_{q²}` products 12).
+/// * `frob` (`a ↦ a^q`) = one `F_{q²}` product by `w^{q−1}` (the
+///   conjugations are free) (3 / 4);
+/// * `inv` = relative norm (2 `F_{q²}` squares + a product + the
+///   `δ`-multiple) + `F_{q²}` inversion + 2 `F_{q²}` products (22 / 28);
+/// * `sqrt` = 4 `F_q` square roots (linear, 1 each) + the two twists by `√u`
+///   and `√w` (4 `F_{q²}` products) (16 / 20).
 ///
-/// A product by 0 or 1, or a square, scalar, Frobenius or inverse of 0 or
-/// 1, costs nothing.  An affine addition (1 inversion, 2 products, 1
-/// square) is then 50, for every `m`.
-pub struct RefCosts;
+/// The model keeps charging the `δ`-multiple 2 at both parities (it does not
+/// ask whether `δ` can be chosen cheap), so the odd/even difference is the
+/// `ε` terms alone.  A product by 0 or 1, or a square, scalar, Frobenius or
+/// inverse of 0 or 1, costs nothing.  An affine addition (1 inversion, 2
+/// products, 1 square) is then **50 for odd `m` and 64 for even `m`**.
+///
+/// [`RefModel::PolyFreeConst`] gives constant multiplications (`ε`, `δ`,
+/// the Frobenius and twist constants) a price of 0, so `F_{q²}` product 3,
+/// square 2, inversion 7, `mul` 9, `sq` 4, `scale` 4, `frob` 0, `inv` 20,
+/// `sqrt` 4 and an addition 42, at every `m`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RefCosts {
+    pub model: RefModel,
+    pub mul: u64,
+    pub sq: u64,
+    pub scale: u64,
+    pub frob: u64,
+    pub inv: u64,
+    pub sqrt: u64,
+}
 impl RefCosts {
-    pub const MUL: u64 = 11;
-    pub const SQ: u64 = 6;
-    pub const SCALE: u64 = 4;
-    pub const FROB: u64 = 3;
-    pub const INV: u64 = 22;
-    pub const SQRT: u64 = 16;
+    /// The costs of `model` for `F_{(2^m)^4}`.
+    pub fn new(model: RefModel, m: u32) -> RefCosts {
+        let e = match model {
+            RefModel::Tower => u64::from(m % 2 == 0),
+            RefModel::PolyFreeConst => 0,
+        };
+        let c = u64::from(model == RefModel::Tower); // constant multiple
+        let (mul2, sq2, inv2) = (3 + e, 2 + e, 7 + e);
+        RefCosts {
+            model,
+            mul: 3 * mul2 + 2 * c,
+            sq: 2 * sq2 + 2 * c,
+            scale: 4,
+            frob: c * mul2,
+            inv: (2 * sq2 + mul2 + 2 * c) + inv2 + 2 * mul2,
+            sqrt: 4 + 4 * c * mul2,
+        }
+    }
     /// Reference `F_q` multiplications of one affine addition of distinct
     /// points: `inv + 2 mul + sq`.
-    pub const ADD: u64 = Self::INV + 2 * Self::MUL + Self::SQ;
+    pub fn add(&self) -> u64 {
+        self.inv + 2 * self.mul + self.sq
+    }
 }
 
 /// How many top-level `F_{q⁴}` primitives ran, by kind; nested calls
@@ -282,6 +347,8 @@ struct RefTally {
     /// `F_{q⁴}` primitives, and the reference price of the same.
     cur_inner: Cell<u64>,
     ref_inner: Cell<u64>,
+    /// The same under [`RefModel::PolyFreeConst`].
+    poly_inner: Cell<u64>,
     kinds: Cell<Fq4Kinds>,
 }
 
@@ -296,6 +363,8 @@ impl Fq4 {
             c: [0; 4],
             zq: [Eb::ONE; 4],
             tally: RefTally::default(),
+            rc: RefCosts::new(RefModel::Tower, m),
+            rc_poly: RefCosts::new(RefModel::PolyFreeConst, m),
         };
         // z⁴ + c₁z + c₀ is an affine linearised polynomial in characteristic
         // 2, often reducible for every (c₁, c₀); the z³ term avoids that.
@@ -405,7 +474,7 @@ impl Fq4 {
                     k.mul += 1
                 }
             },
-            if triv { 0 } else { RefCosts::MUL },
+            |c: &RefCosts| if triv { 0 } else { c.mul },
             || self.mul_impl(a, b, true),
         )
     }
@@ -414,7 +483,7 @@ impl Fq4 {
     fn tracked<R>(
         &self,
         kind: impl FnOnce(&mut Fq4Kinds),
-        price: u64,
+        price: impl Fn(&RefCosts) -> u64,
         run: impl FnOnce() -> R,
     ) -> R {
         let t = &self.tally;
@@ -426,7 +495,8 @@ impl Fq4 {
         if d == 0 {
             t.cur_inner
                 .set(t.cur_inner.get() + (self.f.muls().wrapping_sub(before)));
-            t.ref_inner.set(t.ref_inner.get() + price);
+            t.ref_inner.set(t.ref_inner.get() + price(&self.rc));
+            t.poly_inner.set(t.poly_inner.get() + price(&self.rc_poly));
             let mut k = t.kinds.get();
             kind(&mut k);
             t.kinds.set(k);
@@ -446,6 +516,23 @@ impl Fq4 {
             .wrapping_sub(t.cur_inner.get())
             .wrapping_add(t.ref_inner.get())
     }
+    /// [`Fq4::ref_muls`] under [`RefModel::PolyFreeConst`] (polynomial-basis
+    /// `F_q`, free constant multiplication): the second model, same tally.
+    pub fn ref_muls_poly(&self) -> u64 {
+        let t = &self.tally;
+        self.f
+            .muls()
+            .wrapping_sub(t.cur_inner.get())
+            .wrapping_add(t.poly_inner.get())
+    }
+    /// The reference costs this field is priced by, for its `m`.
+    pub fn ref_costs(&self) -> RefCosts {
+        self.rc
+    }
+    /// The second model's costs ([`RefModel::PolyFreeConst`]).
+    pub fn ref_costs_poly(&self) -> RefCosts {
+        self.rc_poly
+    }
     /// Top-level `F_{q⁴}` primitives run so far, by kind.
     pub fn kinds(&self) -> Fq4Kinds {
         self.tally.kinds.get()
@@ -463,7 +550,7 @@ impl Fq4 {
         let triv = a.is_zero() || *a == Eb::ONE;
         self.tracked(
             |k| k.sq += 1,
-            if triv { 0 } else { RefCosts::SQ },
+            |c: &RefCosts| if triv { 0 } else { c.sq },
             || self.sq_impl(a),
         )
     }
@@ -497,7 +584,7 @@ impl Fq4 {
         let triv = k <= 1 || a.is_zero();
         self.tracked(
             |t| t.scale += 1,
-            if triv { 0 } else { RefCosts::SCALE },
+            |c: &RefCosts| if triv { 0 } else { c.scale },
             || Eb(core::array::from_fn(|i| self.f.mul(a.0[i], k))),
         )
     }
@@ -506,7 +593,7 @@ impl Fq4 {
         let triv = a.is_zero() || a.in_fq();
         self.tracked(
             |k| k.frob += 1,
-            if triv { 0 } else { RefCosts::FROB },
+            |c: &RefCosts| if triv { 0 } else { c.frob },
             || self.frob_impl(a),
         )
     }
@@ -525,7 +612,7 @@ impl Fq4 {
         let triv = *a == Eb::ONE;
         self.tracked(
             |k| k.inv += 1,
-            if triv { 0 } else { RefCosts::INV },
+            |c: &RefCosts| if triv { 0 } else { c.inv },
             || self.inv_impl(a),
         )
     }
@@ -555,7 +642,7 @@ impl Fq4 {
         let triv = a.is_zero() || *a == Eb::ONE;
         self.tracked(
             |k| k.sqrt += 1,
-            if triv { 0 } else { RefCosts::SQRT },
+            |c: &RefCosts| if triv { 0 } else { c.sqrt },
             || self.pow2k_counted(a, 4 * self.f.m - 1),
         )
     }
@@ -2777,10 +2864,21 @@ pub fn find_bin_curve(m: u32, seed: u64, max_cofactor: u64) -> Result<BinCurve, 
     ))
 }
 
-/// The reference price ([`RefCosts`]) of one affine addition of two
-/// distinct points, measured on this curve through the reference tally:
-/// the same for every `m` and every choice of quartic.
+/// The reference price ([`RefCosts`], [`RefModel::Tower`]) of one affine
+/// addition of two distinct points, measured on this curve through the
+/// reference tally: 50 for odd `m`, 64 for even `m`, and the same for every
+/// choice of quartic.  This is the divisor every `*_ref` / `*_refmm` id uses.
 pub fn fq_muls_per_add_ref(c: &CurveB) -> u64 {
+    ref_add_with(c, |f| f.ref_muls())
+}
+
+/// [`fq_muls_per_add_ref`] under [`RefModel::PolyFreeConst`]: 42 at every
+/// `m`.  Reported beside the primary divisor, never used as an id's own.
+pub fn fq_muls_per_add_ref_poly(c: &CurveB) -> u64 {
+    ref_add_with(c, |f| f.ref_muls_poly())
+}
+
+fn ref_add_with(c: &CurveB, tally: impl Fn(&Fq4) -> u64) -> u64 {
     let mut rng = StdRng::seed_from_u64(0xadd);
     let p = loop {
         let x = c.f.random(&mut rng);
@@ -2789,9 +2887,9 @@ pub fn fq_muls_per_add_ref(c: &CurveB) -> u64 {
         }
     };
     let q = c.add(&p, &p);
-    let before = c.f.ref_muls();
+    let before = tally(&c.f);
     let _ = c.add(&p, &q);
-    c.f.ref_muls().wrapping_sub(before)
+    tally(&c.f).wrapping_sub(before)
 }
 
 /// `F_q` multiplications in one affine addition of two distinct points.
@@ -3656,20 +3754,44 @@ mod tests {
         }
     }
 
-    /// The reference price of an affine addition is the same at every `m`
-    /// and every quartic (`RefCosts::ADD`), while the current count is not;
-    /// and reading the tally changes no count.
+    /// The reference price of an affine addition depends on `m` only through
+    /// its parity (50 odd, 64 even; 42 at every `m` in the polynomial-basis
+    /// model), never on the quartic, while the current count is not; and
+    /// reading the tally changes no count.
     #[test]
-    fn reference_add_price_is_m_independent() {
+    fn reference_add_price_follows_m_parity() {
         let mut current = Vec::new();
         for m in 5..=12 {
             let c = generate_instance(m, 3);
             let r = fq_muls_per_add_ref(&c);
-            assert_eq!(r, RefCosts::ADD, "m = {m}");
+            assert_eq!(r, RefCosts::new(RefModel::Tower, m).add(), "m = {m}");
+            assert_eq!(r, if m % 2 == 1 { 50 } else { 64 }, "m = {m}");
+            assert_eq!(fq_muls_per_add_ref_poly(&c), 42, "m = {m}");
             current.push(fq_muls_per_add(&c));
         }
         assert!(current.windows(2).any(|w| w[0] != w[1]), "{current:?}");
-        assert_eq!(RefCosts::ADD, 50);
+    }
+
+    /// The per-primitive costs at both parities and in both models.
+    #[test]
+    fn reference_costs_by_parity() {
+        let odd = RefCosts::new(RefModel::Tower, 15);
+        assert_eq!(
+            (odd.mul, odd.sq, odd.scale, odd.frob, odd.inv, odd.sqrt),
+            (11, 6, 4, 3, 22, 16)
+        );
+        let even = RefCosts::new(RefModel::Tower, 14);
+        assert_eq!(
+            (even.mul, even.sq, even.scale, even.frob, even.inv, even.sqrt),
+            (14, 8, 4, 4, 28, 20)
+        );
+        for m in [14, 15] {
+            let p = RefCosts::new(RefModel::PolyFreeConst, m);
+            assert_eq!(
+                (p.mul, p.sq, p.scale, p.frob, p.inv, p.sqrt, p.add()),
+                (9, 4, 4, 0, 20, 4, 42)
+            );
+        }
     }
 
     /// `ref_muls` moves with the reference prices, nested calls are charged
@@ -3683,11 +3805,9 @@ mod tests {
         let b = f.random(&mut rng);
         let (r0, m0) = (f.ref_muls(), f.f.muls());
         let _ = f.inv(&a);
-        assert_eq!(f.ref_muls().wrapping_sub(r0), RefCosts::INV);
-        assert!(
-            f.f.muls() - m0 > RefCosts::INV,
-            "the schoolbook inv counts more"
-        );
+        let rc = f.ref_costs();
+        assert_eq!(f.ref_muls().wrapping_sub(r0), rc.inv);
+        assert!(f.f.muls() - m0 > rc.inv, "the schoolbook inv counts more");
         let r1 = f.ref_muls();
         let _ = f.mul(&a, &Eb::ONE);
         let _ = f.mul(&Eb::ZERO, &b);
@@ -3695,10 +3815,7 @@ mod tests {
         let _ = f.mul(&a, &b);
         let _ = f.sq(&a);
         let _ = f.sqrt(&a);
-        assert_eq!(
-            f.ref_muls().wrapping_sub(r1),
-            RefCosts::MUL + RefCosts::SQ + RefCosts::SQRT
-        );
+        assert_eq!(f.ref_muls().wrapping_sub(r1), rc.mul + rc.sq + rc.sqrt);
         let k = f.kinds();
         assert_eq!((k.inv, k.mul, k.mul_trivial, k.sq, k.sqrt), (1, 1, 2, 1, 1));
     }
