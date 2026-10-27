@@ -1949,6 +1949,27 @@ pub enum LinMode {
     Fast,
 }
 
+/// `JV_DUMP_INSTANCE=<path>`: append one JSON line per solved DLP with the
+/// field tower (`F_p²` = `F_p[i]/(i² − w)`, `F_p⁶` = `F_p²[θ]/(θ³ − s)`), the
+/// curve `y² = x³ + a₂x² + a₄x`, `G`, `Q`, `l`, the planted `d` and the
+/// solved `dd`, so an independent program can check `dd·G = Q`. It reads
+/// values only; no counter moves.
+fn dump_instance(f: &Fq3, ec: &EllE, spec: &Spec, seed: u64, dd: u64) {
+    let Ok(path) = std::env::var("JV_DUMP_INSTANCE") else {
+        return;
+    };
+    let e2 = |x: &E2| format!("[{},{}]", x.0[0], x.0[1]);
+    let e6 = |x: &E6| format!("[{},{},{}]", e2(&x.0[0]), e2(&x.0[1]), e2(&x.0[2]));
+    let pt = |q: &PtE6| format!("{{\"x\":{},\"y\":{},\"inf\":{}}}", e6(&q.x), e6(&q.y), q.inf);
+    let line = format!(
+        "{{\"p\":{},\"seed\":{},\"w\":{},\"s\":{},\"a2\":{},\"a4\":{},\"l\":{},\"g\":{},\"q\":{},\"d\":{},\"dd\":{},\"lin\":\"{}\"}}\n",
+        spec.p, seed, f.f.w, e2(&f.s), e6(&ec.a2), e6(&ec.a4), spec.l, pt(&spec.g), pt(&spec.q), spec.d, dd, lin_mode_name()
+    );
+    use std::io::Write;
+    let mut out = std::fs::OpenOptions::new().create(true).append(true).open(&path).expect("JV_DUMP_INSTANCE");
+    out.write_all(line.as_bytes()).expect("JV_DUMP_INSTANCE write");
+}
+
 /// `JV_LIN=dense|l1a|sparse|fast` (default fast since
 /// research/postgb_linear_stage_20261026; `sparse` is the earlier default),
 /// read once.
@@ -3362,6 +3383,7 @@ pub fn run_cover_dlp(
                     if dd.is_some_and(|dd| ec.mul(&spec.g, dd) == spec.q) {
                         rep.solved = true;
                         rep.correct = dd == Some(spec.d);
+                        dump_instance(&ctx.f, &ec, &spec, seed, dd.unwrap());
                         rep.unknowns = sel.len();
                         rep.filtered_out = full_rels.len() - sel.len();
                         rep.la_ops_last = la_ops - before;
