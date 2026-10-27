@@ -1,0 +1,8 @@
+2026-10-19T20:09:11+0000 ip-172-31-34-53.us-east-2.compute.internal systemd[1]: Started rho-worker-freshq.service - /usr/bin/taskset -c 0 /usr/bin/python3 /home/ec2-user/rho/worker/run_tier1_worker_batch.py --manifest /home/ec2-user/rho/worker/tier1-freshq-plan.json --queue-root /home/ec2-user/rho.
+2026-10-19T20:21:28+0000 ip-172-31-34-53.us-east-2.compute.internal systemd[1]: Started rho-worker-fullwidth-pinned.service - /usr/bin/taskset -c 0 /home/ec2-user/rho/worker/run-fullwidth-after-first.sh.
+2026-10-19T20:39:49+0000 ip-172-31-34-53.us-east-2.compute.internal taskset[44851]: {"job_id": "b9a2ed25901949fa8a888bf97117c1ed", "output": "/home/ec2-user/rho/results/b9a2ed25901949fa8a888bf97117c1ed", "status": "completed", "valid_pairs": 384}
+2026-10-19T20:39:49+0000 ip-172-31-34-53.us-east-2.compute.internal systemd[1]: rho-worker-freshq.service: Deactivated successfully.
+2026-10-19T20:39:49+0000 ip-172-31-34-53.us-east-2.compute.internal systemd[1]: rho-worker-freshq.service: Consumed 30min 38.191s CPU time.
+2026-10-19T21:07:01+0000 ip-172-31-34-53.us-east-2.compute.internal taskset[46317]: {"job_id": "1ce77fcd6f2f47d28afc1534b3f33a18", "output": "/home/ec2-user/rho/results/1ce77fcd6f2f47d28afc1534b3f33a18", "status": "completed", "valid_pairs": 383}
+2026-10-19T21:07:01+0000 ip-172-31-34-53.us-east-2.compute.internal systemd[1]: rho-worker-fullwidth-pinned.service: Deactivated successfully.
+2026-10-19T21:07:01+0000 ip-172-31-34-53.us-east-2.compute.internal systemd[1]: rho-worker-fullwidth-pinned.service: Consumed 27min 11.667s CPU time.
