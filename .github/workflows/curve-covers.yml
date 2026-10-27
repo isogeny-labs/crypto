@@ -1,43 +1,7 @@
 name: Curve cover certificates
 on:
-  pull_request:
-    paths:
-      - '.gitattributes'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'src/lib.rs'
-      - 'src/bin/curve_standards.rs'
-      - 'src/bin/curve_standards/**'
-      - 'src/bin/curve_cover_check.rs'
-      - 'src/bin/curve_cover_check/**'
-      - 'src/bin/hyperelliptic_cover.rs'
-      - 'src/bin/ecdlp_audit.rs'
-      - 'src/bin/ecdlp_audit/**'
-      - 'src/binary_ecc/**'
-      - 'src/prime_hyperelliptic/**'
-      - 'src/cryptanalysis/ecc2k130_guard.rs'
-      - 'src/cryptanalysis/mod.rs'
-      - 'src/hash/mod.rs'
-      - 'src/hash/sha256.rs'
-      - 'src/utils/**'
-      - 'docs/curves/**'
-      - 'docs/ecdlp-audit/**'
-      - 'docs/ECDLP_ATTACK_MATRIX.md'
-      - 'docs/ic/boundary_targets.json'
-      - 'docs/browser/**'
-      - 'scripts/build_lab_browser.py'
-      - 'scripts/test_build_lab_browser.py'
-      - 'scripts/update_curve_standards.py'
-      - 'scripts/build_curve_registry.py'
-      - 'scripts/build_cover_transfer_assessments.mjs'
-      - 'research/cover_transfer_assessment_20261013/**'
-      - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md'
-      - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.pdf'
-      - 'problems/catalog-cover-subgroup-certificates-incomplete.md'
-      - 'research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
-      - 'research/hyperelliptic_cover_infrastructure_20261006/README.md'
-      - '.github/workflows/curve-covers.yml'
-      - '.github/workflows/release.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -88,7 +52,7 @@ concurrency:
 
 jobs:
   certificates:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-covers.yml|') && 'experiment' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-covers.yml|') && 'main' || 'main' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       # The full-history checkout no longer fits a hosted runner's disk
@@ -133,7 +97,7 @@ jobs:
 
   transfer-assessment:
     name: Cover transfer assessment
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-covers.yml|') && 'experiment' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-covers.yml|') && 'main' || 'main' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       # The full-history checkout no longer fits a hosted runner's disk
@@ -165,7 +129,7 @@ jobs:
 
   transfer-lemma:
     name: Cover transfer Lean lemma
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-covers.yml|') && 'experiment' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-covers.yml|') && 'main' || 'main' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 25
     defaults:
       run:
