@@ -463,6 +463,13 @@ pub struct F4Options {
     /// `timed_out`) right after writing the checkpoint of the first step
     /// whose number is at least this.
     pub checkpoint_stop_after: Option<usize>,
+    /// With [`F4Options::checkpointing`]: also snapshot the dense row reduction
+    /// of a step every this often, so a long step is not lost with its host.
+    /// See [`F4Options::checkpointing_in_step`].
+    pub checkpoint_in_step: Option<Duration>,
+    /// Test hook for [`F4Options::checkpointing_in_step`]: stop (reported as
+    /// `timed_out`) right after this many in-step snapshots.
+    pub checkpoint_stop_in_rref: Option<usize>,
 }
 
 impl F4Options {
@@ -479,6 +486,8 @@ impl F4Options {
             capture_run_log: false,
             checkpoint: None,
             checkpoint_stop_after: None,
+            checkpoint_in_step: None,
+            checkpoint_stop_in_rref: None,
         }
     }
     /// Checkpoint the run to `path` and resume from it.
@@ -497,6 +506,23 @@ impl F4Options {
     /// log.
     pub fn checkpointing(mut self, path: std::path::PathBuf, every: Duration) -> Self {
         self.checkpoint = Some((path, every));
+        self
+    }
+    /// Snapshot the dense row reduction inside a step.
+    ///
+    /// A step's long part is the echelon form of its dense matrix. Once `every`
+    /// has passed since the last snapshot, at a column boundary of that
+    /// reduction, the loop-top state of the step (written with the checkpoint
+    /// file if it is not already there) and the partly reduced matrix with its
+    /// pivots and position (`path.rref`) are written. A resumed run re-derives
+    /// the step's matrix shape deterministically from the loop-top state,
+    /// skips the reducer pass and the finished part of the reduction, and
+    /// continues; its counted field operations are those of an uninterrupted
+    /// run. Only the wide arithmetic (`p > 2^16`) without weights: elsewhere
+    /// nothing extra is written. The snapshot is the size of the dense matrix
+    /// (tens of GB for the large steps), so `every` should be long.
+    pub fn checkpointing_in_step(mut self, every: Duration) -> Self {
+        self.checkpoint_in_step = Some(every);
         self
     }
     /// Block-aware reduction by the given `Z/3`-weights.
@@ -706,6 +732,156 @@ mod ckpt {
         pub solving_degree: u32,
         pub learned: (u32, usize, usize),
         pub blocked_steps: usize,
+    }
+
+    pub(super) fn rref_path(path: &Path) -> PathBuf {
+        sibling(path, ".rref")
+    }
+
+    const RREF_MAGIC: &[u8; 8] = b"F4RREF01";
+
+    /// The dense reduction of one step, partly done.
+    pub(super) struct RrefSnap<'a> {
+        pub fingerprint: u64,
+        /// The loop-top checkpoint this belongs to: its step counter and elapsed time.
+        pub top_steps: usize,
+        pub top_elapsed: Duration,
+        pub ops: u64,
+        pub elapsed: Duration,
+        pub phase: u32,
+        pub c: usize,
+        pub pr: usize,
+        pub i: usize,
+        pub pivots: &'a [usize],
+        pub rows: &'a [Vec<u64>],
+    }
+
+    pub(super) struct RrefLoaded {
+        pub ops: u64,
+        pub elapsed: Duration,
+        pub phase: u32,
+        pub c: usize,
+        pub pr: usize,
+        pub i: usize,
+        pub pivots: Vec<usize>,
+        pub rows: Vec<Vec<u64>>,
+    }
+
+    pub(super) fn save_rref(path: &Path, s: &RrefSnap) -> io::Result<u64> {
+        let tmp = sibling(path, ".tmp");
+        let mut w = W {
+            w: BufWriter::with_capacity(1 << 20, File::create(&tmp)?),
+            h: 0,
+        };
+        w.w.write_all(RREF_MAGIC)?;
+        w.u64(s.fingerprint)?;
+        w.u64(s.top_steps as u64)?;
+        w.u64(s.top_elapsed.as_nanos() as u64)?;
+        w.u64(s.ops)?;
+        w.u64(s.elapsed.as_nanos() as u64)?;
+        w.u32(s.phase)?;
+        w.u64(s.c as u64)?;
+        w.u64(s.pr as u64)?;
+        w.u64(s.i as u64)?;
+        w.u64(s.pivots.len() as u64)?;
+        for &x in s.pivots {
+            w.u64(x as u64)?;
+        }
+        let n_cols = s.rows.first().map_or(0, |r| r.len());
+        w.u64(s.rows.len() as u64)?;
+        w.u64(n_cols as u64)?;
+        for row in s.rows {
+            debug_assert_eq!(row.len(), n_cols);
+            for &x in row {
+                w.u64(x)?;
+            }
+        }
+        let h = w.h;
+        w.w.write_all(&h.to_le_bytes())?;
+        w.w.flush()?;
+        let file = w.w.into_inner().map_err(|e| e.into_error())?;
+        file.sync_all()?;
+        let bytes = file.metadata()?.len();
+        drop(file);
+        std::fs::rename(&tmp, path)?;
+        Ok(bytes)
+    }
+
+    /// The snapshot at `path` if it is a valid one of this run for the step
+    /// that follows the loop-top checkpoint `(top_steps, top_elapsed)`.
+    pub(super) fn load_rref(
+        path: &Path,
+        fingerprint: u64,
+        top_steps: usize,
+        top_elapsed: Duration,
+    ) -> Option<RrefLoaded> {
+        if !path.exists() {
+            return None;
+        }
+        let read = || -> io::Result<RrefLoaded> {
+            let bad = |m: &str| io::Error::new(io::ErrorKind::InvalidData, m.to_string());
+            let mut r = R {
+                r: BufReader::with_capacity(1 << 20, File::open(path)?),
+                h: 0,
+            };
+            let mut magic = [0u8; 8];
+            r.r.read_exact(&mut magic)?;
+            if &magic != RREF_MAGIC {
+                return Err(bad("not an in-step snapshot"));
+            }
+            if r.u64()? != fingerprint {
+                return Err(bad("snapshot of another system or options"));
+            }
+            if r.u64()? as usize != top_steps || r.u64()? != top_elapsed.as_nanos() as u64 {
+                return Err(bad("snapshot of another step than the checkpoint's"));
+            }
+            let ops = r.u64()?;
+            let elapsed = Duration::from_nanos(r.u64()?);
+            let phase = r.u32()?;
+            let c = r.u64()? as usize;
+            let pr = r.u64()? as usize;
+            let i = r.u64()? as usize;
+            let np = r.len()?;
+            let mut pivots = Vec::with_capacity(np.min(1 << 20));
+            for _ in 0..np {
+                pivots.push(r.u64()? as usize);
+            }
+            let n_rows = r.len()?;
+            let n_cols = r.len()?;
+            let mut rows = Vec::with_capacity(n_rows.min(1 << 20));
+            for _ in 0..n_rows {
+                let mut row = Vec::with_capacity(n_cols);
+                for _ in 0..n_cols {
+                    row.push(r.u64()?);
+                }
+                rows.push(row);
+            }
+            let h = r.h;
+            if r.raw8()? != h {
+                return Err(bad("checksum mismatch"));
+            }
+            let mut extra = [0u8; 1];
+            if r.r.read(&mut extra)? != 0 {
+                return Err(bad("trailing bytes"));
+            }
+            Ok(RrefLoaded {
+                ops,
+                elapsed,
+                phase,
+                c,
+                pr,
+                i,
+                pivots,
+                rows,
+            })
+        };
+        match read() {
+            Ok(l) => Some(l),
+            Err(e) => {
+                eprintln!("f4: in-step snapshot {} refused: {e}", path.display());
+                None
+            }
+        }
     }
 
     fn sibling(path: &Path, ext: &str) -> PathBuf {
@@ -1554,6 +1730,22 @@ impl Packed {
     }
 }
 
+/// The state a step starts from, kept while the step runs so an in-step
+/// snapshot can write the checkpoint of its top.
+struct StepTop {
+    pairs: Vec<Pair>,
+    steps: usize,
+    max_rows: usize,
+    max_cols: usize,
+    degree_reached: u32,
+    solving_degree: u32,
+    learned: (u32, usize, usize),
+    blocked_steps: usize,
+    elapsed: Duration,
+    ops: u64,
+}
+
+#[derive(Clone)]
 struct Pair {
     i: usize,
     j: usize,
@@ -2310,53 +2502,111 @@ fn add_lazy_range(acc: &mut [u64], pivot: &[u32], from: usize, to: usize, factor
     }
 }
 
+/// Where a dense reduction stands, shown to the in-step snapshot hook at a
+/// column boundary (`phase` 0, forward, `c` the next column) or before a
+/// back-substitution row (`phase` 1, `i` the row about to be cleared).
+struct RrefView<'a> {
+    phase: u32,
+    c: usize,
+    pr: usize,
+    i: usize,
+    pivots: &'a [usize],
+    rows: &'a [Vec<u64>],
+}
+
 /// Row-reduce `rows` (dense, entries in `[0, p)`) to reduced echelon form
 /// in place: zero rows are dropped, the rest sorted by pivot column, whose
 /// list is returned.  `None` when the deadline passed first.
 fn rref(rows: &mut Vec<Vec<u64>>, fp: Barrett, deadline: Option<Instant>) -> Option<Vec<usize>> {
+    rref_ckpt(rows, fp, deadline, None, None)
+}
+
+/// [`rref`] that can start from a snapshot `(phase, c, pr, i, pivots)` of its
+/// own partly reduced `rows`, and that shows its position to `hook` at column
+/// boundaries; a hook returning `true` stops the reduction (`None`).
+fn rref_ckpt(
+    rows: &mut Vec<Vec<u64>>,
+    fp: Barrett,
+    deadline: Option<Instant>,
+    resume: Option<(u32, usize, usize, usize, Vec<usize>)>,
+    mut hook: Option<&mut dyn FnMut(&RrefView) -> bool>,
+) -> Option<Vec<usize>> {
     let p = fp.p;
     let n_cols = rows.first().map_or(0, |r| r.len());
-    let mut pivots: Vec<usize> = Vec::new();
-    let mut pr = 0usize;
-    // forward: echelon form
-    for c in 0..n_cols {
-        if pr >= rows.len() {
-            break;
-        }
-        if c % 32 == 0 && deadline.is_some_and(|d| Instant::now() > d) {
-            return None;
-        }
-        let found = (pr..rows.len()).find(|&r| rows[r][c] != 0);
-        super::jv_bitops::words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
-        let Some(r) = found else {
-            continue;
-        };
-        rows.swap(pr, r);
-        let inv = invmod(rows[pr][c], p);
-        let mut ops = 0usize;
-        for x in rows[pr][c..].iter_mut() {
-            if *x != 0 {
-                *x = fp.reduce(*x * inv);
-                ops += 1;
+    let (phase0, c0, mut pr, i0, mut pivots) = match resume {
+        Some((ph, c, pr, i, pv)) => (ph, c, pr, i, pv),
+        None => (0, 0, 0, 0, Vec::new()),
+    };
+    // backward phase: rows `1..i_excl` are still to be cleared, from the top down
+    let mut i_excl = i0 + 1;
+    if phase0 == 0 {
+        // forward: echelon form
+        for c in c0..n_cols {
+            if pr >= rows.len() {
+                break;
             }
+            if c % 32 == 0 && deadline.is_some_and(|d| Instant::now() > d) {
+                return None;
+            }
+            if let Some(h) = hook.as_mut() {
+                let view = RrefView {
+                    phase: 0,
+                    c,
+                    pr,
+                    i: 0,
+                    pivots: &pivots,
+                    rows,
+                };
+                if h(&view) {
+                    return None;
+                }
+            }
+            let found = (pr..rows.len()).find(|&r| rows[r][c] != 0);
+            super::jv_bitops::words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
+            let Some(r) = found else {
+                continue;
+            };
+            rows.swap(pr, r);
+            let inv = invmod(rows[pr][c], p);
+            let mut ops = 0usize;
+            for x in rows[pr][c..].iter_mut() {
+                if *x != 0 {
+                    *x = fp.reduce(*x * inv);
+                    ops += 1;
+                }
+            }
+            count_ops(ops);
+            let (head, tail) = rows.split_at_mut(pr + 1);
+            let prow = &head[pr];
+            if tail.len() * (n_cols - c) > PAR_WORK {
+                tail.par_iter_mut()
+                    .for_each(|row| eliminate(row, prow, c, fp));
+            } else {
+                tail.iter_mut().for_each(|row| eliminate(row, prow, c, fp));
+            }
+            pivots.push(c);
+            pr += 1;
         }
-        count_ops(ops);
-        let (head, tail) = rows.split_at_mut(pr + 1);
-        let prow = &head[pr];
-        if tail.len() * (n_cols - c) > PAR_WORK {
-            tail.par_iter_mut()
-                .for_each(|row| eliminate(row, prow, c, fp));
-        } else {
-            tail.iter_mut().for_each(|row| eliminate(row, prow, c, fp));
-        }
-        pivots.push(c);
-        pr += 1;
+        rows.truncate(pr);
+        i_excl = pr;
     }
-    rows.truncate(pr);
     // backward: clear each pivot column above its pivot
-    for i in (1..pr).rev() {
+    for i in (1..i_excl).rev() {
         if deadline.is_some_and(|d| Instant::now() > d) {
             return None;
+        }
+        if let Some(h) = hook.as_mut() {
+            let view = RrefView {
+                phase: 1,
+                c: 0,
+                pr,
+                i,
+                pivots: &pivots,
+                rows,
+            };
+            if h(&view) {
+                return None;
+            }
         }
         let c = pivots[i];
         let (head, tail) = rows.split_at_mut(i);
@@ -2739,6 +2989,7 @@ fn f4_with_arithmetic(
         .as_ref()
         .map(|_| ckpt::fingerprint(input, n_vars, p, opts, mode, gm, packed.is_some()));
     let mut resumed_opts: Option<F4Options> = None;
+    let mut resume_rref: Option<ckpt::RrefLoaded> = None;
     if let (Some((path, _)), Some(fp)) = (&opts.checkpoint, ck_fp) {
         if let Some(l) = ckpt::load_best(path, Some(fp)) {
             eprintln!(
@@ -2766,11 +3017,33 @@ fn f4_with_arithmetic(
                 .map(|_| basis.iter().map(|f| pack(&f[0].0)).collect());
             carried.set(l.elapsed);
             ops_carry.set(l.field_ops);
+            let mut spent = l.elapsed;
+            // An in-step snapshot of the step that follows this checkpoint: only
+            // the wide arithmetic without weights writes one, and only that
+            // path reads it. The resumed step skips the reducer pass and the
+            // finished part of the reduction, so its counts continue from the
+            // snapshot's.
+            if !deferred && opts.weights.is_none() {
+                if let Some(r) = ckpt::load_rref(&ckpt::rref_path(path), fp, l.steps, l.elapsed) {
+                    eprintln!(
+                        "f4: in-step snapshot found: phase {}, column {}, {} pivots, {:.1} s spent, {} rows",
+                        r.phase,
+                        r.c,
+                        r.pivots.len(),
+                        r.elapsed.as_secs_f64(),
+                        r.rows.len()
+                    );
+                    carried.set(r.elapsed);
+                    ops_carry.set(r.ops);
+                    spent = r.elapsed;
+                    resume_rref = Some(r);
+                }
+            }
             // the deadline counts the time already spent
             let mut o = opts.clone();
             o.deadline = opts
                 .deadline
-                .map(|d| d.checked_sub(l.elapsed).unwrap_or_else(Instant::now));
+                .map(|d| d.checked_sub(spent).unwrap_or_else(Instant::now));
             resumed_opts = Some(o);
         }
     }
@@ -2846,6 +3119,10 @@ fn f4_with_arithmetic(
         if debug {
             eprintln!("f4: {} pairs pending, basis {}", pairs.len(), basis.len());
         }
+        // the loop-top values a checkpoint of this step's top records
+        let top_el = t0.elapsed() + carried.get();
+        let top_ops = ops_carry.get() + (field_ops_now() - ops0);
+        let mut wrote_top = false;
         if let (Some((path, every)), Some(fp)) = (&opts.checkpoint, ck_fp) {
             let stop = opts.checkpoint_stop_after.is_some_and(|k| steps >= k);
             if stop || last_ckpt.elapsed() >= *every {
@@ -2853,8 +3130,8 @@ fn f4_with_arithmetic(
                 let snap = ckpt::Snap {
                     fingerprint: fp,
                     n_vars,
-                    elapsed: t0.elapsed() + carried.get(),
-                    field_ops: ops_carry.get() + (field_ops_now() - ops0),
+                    elapsed: top_el,
+                    field_ops: top_ops,
                     basis: &basis,
                     alive: &alive,
                     pairs: &pairs,
@@ -2869,11 +3146,16 @@ fn f4_with_arithmetic(
                     blocked_steps,
                 };
                 match ckpt::save(path, &snap) {
-                    Ok(bytes) => eprintln!(
-                        "f4: checkpoint {} at step {steps}: {bytes} bytes in {:.1} s",
-                        path.display(),
-                        tw.elapsed().as_secs_f64()
-                    ),
+                    Ok(bytes) => {
+                        wrote_top = true;
+                        // a snapshot of an earlier step is stale now
+                        std::fs::remove_file(ckpt::rref_path(path)).ok();
+                        eprintln!(
+                            "f4: checkpoint {} at step {steps}: {bytes} bytes in {:.1} s",
+                            path.display(),
+                            tw.elapsed().as_secs_f64()
+                        )
+                    }
                     Err(e) => eprintln!("f4: CHECKPOINT WRITE FAILED {}: {e}", path.display()),
                 }
                 last_ckpt = Instant::now();
@@ -2915,6 +3197,27 @@ fn f4_with_arithmetic(
         }
         let ops_step0 = opts.capture_run_log.then(field_ops_now);
         let tp0 = Instant::now();
+        // The step-top state an in-step snapshot needs: the pending pairs before
+        // this step takes its own out, and the counters before it changes them.
+        let top: Option<StepTop> = (opts.checkpoint.is_some()
+            && opts.checkpoint_in_step.is_some()
+            && opts.max_pairs_per_step.is_none())
+        .then(|| StepTop {
+            pairs: pairs.clone(),
+            steps,
+            max_rows,
+            max_cols,
+            degree_reached,
+            solving_degree,
+            learned,
+            blocked_steps,
+            elapsed: top_el,
+            ops: top_ops,
+        });
+        let resume_here = resume_rref.take();
+        let mut top_written = wrote_top;
+        let mut last_snap = Instant::now();
+        let mut snaps = 0usize;
         // symbolic preprocessing
         let mut rows_poly: Vec<(usize, Vec<u32>)> = Vec::new(); // (basis index, multiplier)
         let mut seen: FxSet<(usize, Vec<u32>)> = FxSet::default();
@@ -3341,20 +3644,113 @@ fn f4_with_arithmetic(
                 }
                 Some(free_cols.iter().map(|&c| acc[c]).collect())
             };
-            let reduced: Option<Vec<Vec<u64>>> = if parallel {
+            // an in-step snapshot stands in for the reducer pass and the finished
+            // part of the reduction
+            let reduced: Option<Vec<Vec<u64>>> = if resume_here.is_some() {
+                Some(Vec::new())
+            } else if parallel {
                 pair_rows.par_iter().map(reduce_pair_row).collect()
             } else {
                 pair_rows.iter().map(reduce_pair_row).collect()
             };
+            let mut snapshot_hook = |v: &RrefView| -> bool {
+                let (Some((path, _)), Some(top), Some(every), Some(fp)) =
+                    (&opts.checkpoint, &top, opts.checkpoint_in_step, ck_fp)
+                else {
+                    return false;
+                };
+                if last_snap.elapsed() < every {
+                    return false;
+                }
+                let tw = Instant::now();
+                if !top_written {
+                    let snap = ckpt::Snap {
+                        fingerprint: fp,
+                        n_vars,
+                        elapsed: top.elapsed,
+                        field_ops: top.ops,
+                        basis: &basis,
+                        alive: &alive,
+                        pairs: &top.pairs,
+                        above: &above,
+                        pairs_above_bound,
+                        steps: top.steps,
+                        max_rows: top.max_rows,
+                        max_cols: top.max_cols,
+                        degree_reached: top.degree_reached,
+                        solving_degree: top.solving_degree,
+                        learned: top.learned,
+                        blocked_steps: top.blocked_steps,
+                    };
+                    match ckpt::save(path, &snap) {
+                        Ok(bytes) => {
+                            top_written = true;
+                            eprintln!(
+                                "f4: checkpoint {} at the top of step {}, written inside it: {bytes} bytes in {:.1} s",
+                                path.display(),
+                                top.steps,
+                                tw.elapsed().as_secs_f64()
+                            );
+                        }
+                        Err(e) => {
+                            eprintln!("f4: CHECKPOINT WRITE FAILED {}: {e}", path.display());
+                            last_snap = Instant::now();
+                            return false;
+                        }
+                    }
+                }
+                let tr = Instant::now();
+                let rs = ckpt::RrefSnap {
+                    fingerprint: fp,
+                    top_steps: top.steps,
+                    top_elapsed: top.elapsed,
+                    ops: ops_carry.get() + (field_ops_now() - ops0),
+                    elapsed: t0.elapsed() + carried.get(),
+                    phase: v.phase,
+                    c: v.c,
+                    pr: v.pr,
+                    i: v.i,
+                    pivots: v.pivots,
+                    rows: v.rows,
+                };
+                match ckpt::save_rref(&ckpt::rref_path(path), &rs) {
+                    Ok(bytes) => eprintln!(
+                        "f4: in-step snapshot of step {} (phase {}, column {}, {} pivots): {bytes} bytes in {:.1} s",
+                        top.steps + 1,
+                        v.phase,
+                        v.c,
+                        v.pivots.len(),
+                        tr.elapsed().as_secs_f64()
+                    ),
+                    Err(e) => eprintln!("f4: IN-STEP SNAPSHOT FAILED: {e}"),
+                }
+                last_snap = Instant::now();
+                snaps += 1;
+                opts.checkpoint_stop_in_rref.is_some_and(|k| snaps >= k)
+            };
             reduced.and_then(|mut rows| {
-                useful = rows.iter().map(|r| r.iter().any(|&v| v != 0)).collect();
-                rows.retain(|r| r.iter().any(|&v| v != 0));
-                if recording {
-                    rec_rows = rows.iter().map(|r| r.to_vec()).collect();
+                let mut resume_arg = None;
+                if let Some(rs) = resume_here {
+                    rows = rs.rows;
+                    resume_arg = Some((rs.phase, rs.c, rs.pr, rs.i, rs.pivots));
+                } else {
+                    useful = rows.iter().map(|r| r.iter().any(|&v| v != 0)).collect();
+                    rows.retain(|r| r.iter().any(|&v| v != 0));
+                    if recording {
+                        rec_rows = rows.iter().map(|r| r.to_vec()).collect();
+                    }
                 }
                 let piv = match &block_classes {
                     Some(cls) => rref_blocked(&mut rows, cls, |b| rref(b, fp, deadline)),
-                    None => rref(&mut rows, fp, deadline),
+                    None => {
+                        let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
+                            if top.is_some() && opts.checkpoint.is_some() {
+                                Some(&mut snapshot_hook)
+                            } else {
+                                None
+                            };
+                        rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
+                    }
                 };
                 piv.map(|piv| (rows, piv))
             })

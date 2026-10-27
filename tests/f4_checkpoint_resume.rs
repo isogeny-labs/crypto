@@ -110,6 +110,70 @@ fn a_resumed_run_is_the_uninterrupted_run() {
     }
     assert!(interrupted >= 15);
 
+    // In-step snapshots (the wide arithmetic, p > 2^16): stop inside a step's dense
+    // row reduction, at column boundaries, and resume from the snapshot.
+    let mut in_step = 0;
+    for &(n, p, seed) in &[
+        (4usize, 786_433u64, 21u64),
+        (5, 786_433, 4),
+        (6, 786_433, 9),
+    ] {
+        let sys = random_quadrics(n, p, seed);
+        let plain = f4(&sys, n, p, &F4Options::new(Ordering::Grevlex, 24));
+        for &(stop_after, stop_in_rref) in &[
+            (None, 1usize),
+            (None, 7),
+            (None, 40),
+            (Some(2usize), 3),
+            (Some(3), 25),
+        ] {
+            let path = dir.join(format!(
+                "r-{n}-{seed}-{}-{stop_in_rref}.ckpt",
+                stop_after.unwrap_or(0)
+            ));
+            for ext in ["", ".prev", ".rref"] {
+                let _ = std::fs::remove_file(format!("{}{ext}", path.display()));
+            }
+            let mut stops: Vec<(Option<usize>, Option<usize>)> = Vec::new();
+            if let Some(k) = stop_after {
+                stops.push((Some(k), None));
+            }
+            stops.push((None, Some(stop_in_rref)));
+            let mut stopped_in_step = false;
+            for (after, in_rref) in stops {
+                let mut o = F4Options::new(Ordering::Grevlex, 24)
+                    .checkpointing(path.clone(), hour)
+                    .checkpointing_in_step(Duration::ZERO);
+                o.checkpoint_stop_after = after;
+                o.checkpoint_stop_in_rref = in_rref;
+                let r = f4(&sys, n, p, &o);
+                if in_rref.is_some() && r.timed_out {
+                    stopped_in_step = true;
+                    assert!(
+                        std::path::Path::new(&format!("{}.rref", path.display())).exists(),
+                        "no in-step snapshot after stopping in the reduction"
+                    );
+                }
+            }
+            if !stopped_in_step {
+                continue; // the run finished before that many snapshots
+            }
+            let o = F4Options::new(Ordering::Grevlex, 24)
+                .checkpointing(path.clone(), hour)
+                .checkpointing_in_step(hour);
+            let resumed = f4(&sys, n, p, &o);
+            same(
+                &plain,
+                &resumed,
+                &format!(
+                    "in-step: n={n} p={p} seed={seed} stop_after={stop_after:?} snapshots={stop_in_rref}"
+                ),
+            );
+            in_step += 1;
+        }
+    }
+    assert!(in_step >= 6, "only {in_step} runs stopped inside a step");
+
     // A checkpoint of another system is refused and the run starts afresh.
     let a = random_quadrics(4, 101, 7);
     let b = random_quadrics(4, 101, 8);

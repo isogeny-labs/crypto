@@ -1877,6 +1877,14 @@ fn measure(eqs: &[Pol], n: usize, p: u64, sol: &[u64], budget: Duration) -> Valu
             .and_then(|s| s.parse().ok())
             .unwrap_or(300);
         opts = opts.checkpointing(path.clone(), Duration::from_secs(every));
+        // Amendment 16: also snapshot a long step's dense reduction
+        if let Some(step_every) = std::env::var("FB_CKPT_STEP_EVERY_S")
+            .ok()
+            .and_then(|s| s.parse::<u64>().ok())
+            .filter(|&s| s > 0)
+        {
+            opts = opts.checkpointing_in_step(Duration::from_secs(step_every));
+        }
     }
     let started = Instant::now();
     let r = f4_fp::f4(&input, n, p, &opts);
@@ -2415,6 +2423,8 @@ struct RunArgs {
     first_target: usize,
     /// Amendment 15: seconds between F4 checkpoints of a system; 0 is off.
     ckpt_every: u64,
+    /// Amendment 16: seconds between snapshots inside a step; 0 is off.
+    ckpt_step_every: u64,
 }
 
 /// Run one system in a child under `ulimit -v` and a hard wall limit of
@@ -2446,7 +2456,8 @@ fn run_child(
     let mut cmd = Command::new("sh");
     if let Some(c) = ckpt {
         cmd.env("FB_CKPT", c)
-            .env("FB_CKPT_EVERY_S", a.ckpt_every.to_string());
+            .env("FB_CKPT_EVERY_S", a.ckpt_every.to_string())
+            .env("FB_CKPT_STEP_EVERY_S", a.ckpt_step_every.to_string());
     }
     let mut child = cmd
         .arg("-c")
@@ -2600,7 +2611,15 @@ fn run_child(
     );
     if let Some(c) = ckpt {
         // the system has its row: its checkpoint and sidecar are spent
-        for ext in ["", ".prev", ".tmp", ".peak", ".peak.tmp"] {
+        for ext in [
+            "",
+            ".prev",
+            ".tmp",
+            ".rref",
+            ".rref.tmp",
+            ".peak",
+            ".peak.tmp",
+        ] {
             std::fs::remove_file(format!("{c}{ext}")).ok();
         }
     }
@@ -4409,6 +4428,7 @@ fn admit_tower(dir: &str, out: &str, prime: usize) -> bool {
             tower: true,
             first_target: 0,
             ckpt_every: 0,
+            ckpt_step_every: 0,
         };
         let mut row = run_child(&a, Arm::A0, m, t, k, None, &mut log);
         let same = row["status"] == "ok"
@@ -4526,6 +4546,7 @@ fn replay(dir: &str, out: &str, groups: &[&str], prime: Option<usize>, only_prim
             tower: c["engine"] == "f4_fp_tower",
             first_target: 0,
             ckpt_every: 0,
+            ckpt_step_every: 0,
         };
         let mut row = run_child(&a, arm, m, t, k, None, &mut log);
         let fields = ["D", "max_cols", "max_rows", "steps"];
@@ -6171,6 +6192,8 @@ fn main() {
                 tower: flag(&args, "--engine").is_some_and(|e| e == "tower"),
                 first_target: flag(&args, "--first-target").map_or(0, |s| s.parse().unwrap()),
                 ckpt_every: flag(&args, "--checkpoint-every").map_or(0, |s| s.parse().unwrap()),
+                ckpt_step_every: flag(&args, "--checkpoint-in-step-every")
+                    .map_or(0, |s| s.parse().unwrap()),
             };
             assert!(a.t_min >= 2, "t starts at 2");
             let two = (prime_of(a.prime) - 1).trailing_zeros() as usize;

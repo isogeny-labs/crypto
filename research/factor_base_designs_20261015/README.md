@@ -393,6 +393,16 @@ and the 90 GB peak did not. The run needed the checkpointing of Amendment 15; th
 report records what it did and what it did not (four of the seven A0 segments were
 lost because no checkpoint existed yet). No improvement over any baseline.
 
+### Amendment 16: snapshots inside a step (tooling)
+
+After the R256 run lost four of seven A0 segments to reclaims before any
+checkpoint existed, the F4 engine can snapshot a step's dense row reduction
+(`F4Options::checkpointing_in_step`, `run --checkpoint-in-step-every`; wide
+arithmetic only). Tested for exact equality of every counted field against the
+uninterrupted run (`tests/f4_checkpoint_resume.rs`) and gated on the host by the
+self-test; not yet used at the scale of the m = 4 cells, so its size and time
+there are unmeasured. See PREREGISTRATION.md, Amendment 16.
+
 ### Close-out of the prime-field slope line (2026-10-19)
 
 Observations only; no new run. Sources: `runs/analysis-amendment4.txt`,
