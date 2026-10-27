@@ -191,7 +191,9 @@ pdp-opcount = []
 [lints.rust]
 # `hashclash_linked` is set by a downstream build script that links the
 # HashClash C library (see src/cryptanalysis/md5_hashclash_ffi.rs).
-unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hashclash_linked)"] }
+# `ecbench_reader` is set by tools/backend-leaderboard/build.rs, which compiles
+# shared ecbench sources without the full harness.
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hashclash_linked)", "cfg(ecbench_reader)"] }
 
 [lints.clippy]
 # The whole allow list; CI runs clippy with -D warnings for everything else.
