@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Treat the build artifact as data. Never execute its binary in this AWS job.
+set -euo pipefail
+[[ $# == 3 ]] || { echo 'Usage: publish-image BUNDLE_DIR COMMIT OUTPUT.json' >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+bundle=$(realpath "$1") revision=$2 output=$3
+: "${ISOLAB_IMAGE_REPOSITORY:?}" "${AWS_REGION:?}" "${GITHUB_RUN_ID:?}" "${GITHUB_RUN_ATTEMPT:?}"
+[[ "$revision" =~ ^[a-f0-9]{40}$ && "$GITHUB_RUN_ID" =~ ^[0-9]+$ && "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ ]]
+[[ "$ISOLAB_IMAGE_REPOSITORY" =~ ^[0-9]{12}\.dkr\.ecr\.[a-z0-9-]+\.amazonaws\.com/isolab/tasks$ ]]
+for name in ecbench build-info.json; do
+  [[ -f "$bundle/$name" && ! -L "$bundle/$name" ]]
+done
+jq -e --arg revision "$revision" '
+ .source_revision==$revision and .source_repository=="https://github.com/aburan28/crypto"
+ and .architecture=="linux/amd64" and .target=="x86_64-unknown-linux-musl"
+ and .default_features==false and (.ecbench_sha256|test("^[a-f0-9]{64}$"))
+' "$bundle/build-info.json" >/dev/null
+binary=$(sha256sum "$bundle/ecbench" | cut -d' ' -f1)
+[[ "$binary" == "$(jq -r .ecbench_sha256 "$bundle/build-info.json")" ]]
+context=$(mktemp -d)
+trap 'rm -rf "$context"' EXIT
+install -m755 "$bundle/ecbench" "$context/ecbench"
+install -m644 "$bundle/build-info.json" "$context/build-info.json"
+install -m644 "$here/l2-validation.json" "$context/smoke-prime.json"
+# The Dockerfile is trusted workflow code, never taken from the tested commit.
+registry=${ISOLAB_IMAGE_REPOSITORY%%/*}
+repository=${ISOLAB_IMAGE_REPOSITORY#*/}
+tag="gh-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${revision}"
+aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$registry"
+docker build --platform linux/amd64 --file "$here/Dockerfile.ecbench" \
+  --build-arg "SOURCE_REVISION=$revision" --tag "$ISOLAB_IMAGE_REPOSITORY:$tag" "$context"
+docker push "$ISOLAB_IMAGE_REPOSITORY:$tag"
+digest=$(aws ecr describe-images --repository-name "$repository" --image-ids "imageTag=$tag" \
+  --query 'imageDetails[0].imageDigest' --output text)
+[[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]
+jq -n --arg image "$ISOLAB_IMAGE_REPOSITORY@$digest" --arg revision "$revision" --arg binary "$binary" \
+  '{image_uri:$image,source_revision:$revision,ecbench_sha256:$binary}' > "$output"

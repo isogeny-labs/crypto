@@ -6,7 +6,7 @@
 - **Affected work:** [fixed five-class protocol](../research/full_volcano_classes_20261016/PROTOCOL.md)
 - **Next action owner:** current implementation session for code and controls;
   full-run infrastructure owner unassigned
-- **Last updated:** 2026-10-18
+- **Last updated:** 2026-10-19
 
 ## Problem
 
@@ -211,3 +211,40 @@ existing volume/worker or a validated streaming backend.
 
 2026-10-16: protocol and native CLI implementation started. Full A/C/D/E
 generation and the requested graph-wide benchmark campaign remain open.
+
+2026-10-17 later update: the clean repaired checkpoint reaches 4,037 audited
+vertices / 64,592 records (41,573 verified, 20,132 exhausted, 2,887 timeout)
+and 2,098,636 relations. [Checkpoint evidence](../research/full_volcano_graphwide_ic_20261017/execution/checkpoint-4037/README.md).
+Both EC and k=1 finite-field arms now verify all prime-power components of
+each selected exact C point order on all 1,869 retained models: 3,738 targets
+per arm, 7,476 primary records, separate exact non-clock replay.
+[Full-order evidence](../research/full_volcano_graphwide_ic_20261017/execution/full_point_order/README.md).
+This supersedes the earlier statement that other prime-power parts remain
+untested for those selected C points. It does not establish maximality, all C
+vertices, transported-target comparisons, independent arithmetic or large-k IC.
+Rechecking and deleting only B's redundant compressed local cache recovered
+7,904,902,167 bytes; its checked raw graph and prior Drive parts remain.
+The historical specialized B generator is an mmap backend restricted to
+D_K=-11 and 3-power conductor, not a generic external-memory A/C/D/E generator.
+These resource and implementation gaps remain open.
+
+18 October recovery: [native-verified 5,533-vertex checkpoint](../research/full_volcano_graphwide_ic_20261017/execution/recovery-20261018T1647Z/README.md)
+retains 88,528 accepted records, all51 strata, 56,959 verified /27,545 exhausted /
+4,024 timeout and2,870,489 relations. The absent worker's in-flight attempt is
+preserved and marked interrupted by the unchanged native zero-job stop; cause
+unknown. S3 credential discovery still finds no signing identity. Frozen graph,
+solver and child budgets are unchanged; original full classes, original matrix,
+independent arithmetic and large-k implementation gaps remain open.
+
+18 October clean publication pause: the native-verified checkpoint now reaches
+6,137 audited vertices / 98,192 accepted records across all 51 strata
+(63,182 verified / 30,553 exhausted / 4,457 timeout), with 3,181,542 relations
+and 149,275,746 actual decomposition calls. PID 3298 stopped at a vertex boundary;
+no new attempt was interrupted. [Publication evidence](../research/full_volcano_graphwide_ic_20261017/execution/publication-20261018T1835Z/README.md)
+retains the old failures and validates file staging that links only immutable
+snapshot session payloads. This removes one redundant packaging payload copy,
+not the native snapshot or original-class storage/implementation requirements.
+No mathematical source, binary, queue or child budget changed. All larger
+completion gaps and the unavailable S3 runtime identity remain open.
+
+19 October publication: [7,937-vertex checkpoint](../research/full_volcano_graphwide_ic_20261017/execution/publication-20261018T2313Z/README.md),126,992 records/all51 strata,81,666 verified/39,550 exhausted/5,776 timeout,4,117,173 relations/193,153,057 actual calls. Frozen runtime source/binaries/queue/budgets preserved; owner main merge changed only the study repository driver copy, not the campaign source. Full original classes/matrix/independent arithmetic/large-k implementation and S3 identity/working-volume gaps remain open.

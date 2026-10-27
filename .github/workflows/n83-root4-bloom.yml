@@ -1,7 +1,11 @@
-# Long research runs require explicit manual dispatch.
 name: N83 root4 Bloom factor-base screen
 
 on:
+  push:
+    branches: [codex/n83-root4-bloom-20261015]
+    paths:
+      - .github/workflows/n83-root4-bloom.yml
+      - research/n83_root4_bloom_20261015/**
   workflow_dispatch:
 
 permissions:
@@ -14,7 +18,7 @@ concurrency:
 jobs:
   eight-arm-root4-bloom-screen:
     if: github.repository == 'aburan28/crypto'
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-root4-bloom.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-root4-bloom.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-root4-bloom.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-root4-bloom.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 210
     steps:
       - uses: actions/checkout@v4

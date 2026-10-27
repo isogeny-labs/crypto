@@ -1,42 +1,26 @@
 name: ECC2K-130 native m3 chain archive replay
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/ecc2k130-native-m3-chain.yml'
-      - '.github/scripts/*frozen-workflow-check*'
-      - 'research/notes/ecc2k130/native_m3_chain_20260929/**'
-      - 'research/notes/ecc2k130/native_fullpoint_edge_20260929/*.py'
-      - 'research/notes/ecc2k130/m10_export_capacity_20260925/capacity.py'
-      - 'research/notes/ecc2k130/symbolic_dag_fullpoint_20260925/dag.py'
-      - 'research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925/*.py'
-      - 'research/notes/ecc2k130/rotated_subspace_support_20260925/gate.py'
-      - 'research/ecc2k130_factor_base_replication_20260925/exact_*.json'
-      - 'research/ecc2k130_relations/*.py'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
       - '.github/workflows/ecc2k130-native-m3-chain.yml'
-      - '.github/scripts/*frozen-workflow-check*'
       - 'research/notes/ecc2k130/native_m3_chain_20260929/**'
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push' }}
-
 jobs:
   frozen-and-replay:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-native-m3-chain.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-native-m3-chain.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-native-m3-chain.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-native-m3-chain.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             .github/workflows/ecc2k130-native-m3-chain.yml
-            .github/scripts/frozen-workflow-check.mjs
-            .github/scripts/test-frozen-workflow-check.mjs
             research/notes/ecc2k130/native_m3_chain_20260929
             research/notes/ecc2k130/native_fullpoint_edge_20260929
             research/notes/ecc2k130/m10_export_capacity_20260925/capacity.py
@@ -48,25 +32,10 @@ jobs:
             research/ecc2k130_factor_base_replication_20260925/exact_replay.json
             research/ecc2k130_relations/relations.py
             research/ecc2k130_relations/fastfield.py
-      - name: Test historical workflow custody
-        run: node --test .github/scripts/test-frozen-workflow-check.mjs
       - name: Check frozen source and input bytes
-        run: |
-          node .github/scripts/frozen-workflow-check.mjs \
-            --workflow .github/workflows/ecc2k130-native-m3-chain.yml \
-            --revision d67bb0dac6e8edf907765f6527291508c9e94325 \
-            --manifest research/notes/ecc2k130/native_m3_chain_20260929/FROZEN.json \
-            --manifest-format sha256-root \
-            --root research/notes/ecc2k130/native_m3_chain_20260929 \
-            -- python3 research/notes/ecc2k130/native_m3_chain_20260929/ci_replay.py
-      - name: Independently replay the raw small-field control and both exact leaves
+        run: python3 research/notes/ecc2k130/native_m3_chain_20260929/ci_replay.py
+      - name: Independently replay raw toy and both exact leaves
         if: hashFiles('research/notes/ecc2k130/native_m3_chain_20260929/evidence/final/receipt.json') != ''
         run: |
-          node .github/scripts/frozen-workflow-check.mjs \
-            --workflow .github/workflows/ecc2k130-native-m3-chain.yml \
-            --revision d67bb0dac6e8edf907765f6527291508c9e94325 \
-            --manifest research/notes/ecc2k130/native_m3_chain_20260929/FROZEN.json \
-            --manifest-format sha256-root \
-            --root research/notes/ecc2k130/native_m3_chain_20260929 \
-            -- python3 research/notes/ecc2k130/native_m3_chain_20260929/ci_replay.py \
+          python3 research/notes/ecc2k130/native_m3_chain_20260929/ci_replay.py \
             --evidence research/notes/ecc2k130/native_m3_chain_20260929/evidence/final

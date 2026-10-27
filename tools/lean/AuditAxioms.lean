@@ -46,11 +46,11 @@ def isNativeAxiom (a : Name) : Bool :=
 def readTrusted (path : String) : IO (List Name) := do
   let lines ← IO.FS.lines path
   return lines.toList.filterMap fun l =>
-    let n := (((l.splitOn "#").head!).toList.filter (fun c => !c.isWhitespace)).foldl String.push ""
+    let n := String.mk (((l.splitOn "#").head!).toList.filter (fun c => !c.isWhitespace))
     if n.isEmpty then none else some n.toName
 
 def main (args : List String) : IO UInt32 := do
-  -- Lean 4.19 consumes the CLI separator; newer Lean versions pass it through.
+  -- Older Lean releases consume this separator; newer ones pass it to main.
   let args := match args with
     | "--" :: rest => rest
     | _ => args

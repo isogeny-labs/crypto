@@ -1,7 +1,12 @@
-# Long research runs require explicit manual dispatch.
 name: N83 symmetric S3 Tier 1 capacity gate
 
 on:
+  push:
+    branches: [codex/n83-symmetric-root-20261013]
+    paths:
+      - .github/workflows/n83-symmetric-s3-tier1.yml
+      - examples/koblitz_orbit_dlp_fast.rs
+      - research/n83_symmetric_root_20261013/**
   workflow_dispatch:
 
 permissions:
@@ -14,7 +19,7 @@ concurrency:
 jobs:
   primary-point:
     if: github.repository == 'aburan28/crypto'
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-symmetric-s3-tier1.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-symmetric-s3-tier1.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-symmetric-s3-tier1.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-symmetric-s3-tier1.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 135
     steps:
       - uses: actions/checkout@v4

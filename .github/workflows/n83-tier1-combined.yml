@@ -1,7 +1,12 @@
-# Long research runs require explicit manual dispatch.
 name: N83 sparse plus Bloom K3300 Tier 1 sealed paired IC versus rho
 
 on:
+  push:
+    branches: [codex/n83-tier1-combined-20261015]
+    paths:
+      - .github/workflows/n83-tier1-combined.yml
+      - research/n83_tier1_combined_20261015/**
+      - research/n83_tier1_combined_results_20261015/**
   workflow_dispatch:
 
 permissions:
@@ -15,7 +20,7 @@ concurrency:
 jobs:
   five-fresh-pairs:
     if: github.repository == 'aburan28/crypto'
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-tier1-combined.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-tier1-combined.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-tier1-combined.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-tier1-combined.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4

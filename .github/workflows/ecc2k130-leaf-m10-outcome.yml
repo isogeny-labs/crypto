@@ -1,24 +1,30 @@
 name: ECC2K-130 leaf m10 support outcome replay
 
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - '.github/workflows/ecc2k130-leaf-m10-outcome.yml'
       - 'research/notes/ecc2k130/leaf_m10_support_20260930/evidence/**'
       - 'research/notes/ecc2k130/leaf_m10_support_outcome_20260930/**'
 
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
+  workflow_dispatch:
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push' }}
+  group: ${{ github.event_name == 'push' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
   replay:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-leaf-m10-outcome.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-leaf-m10-outcome.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-leaf-m10-outcome.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-leaf-m10-outcome.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             research/notes/ecc2k130/leaf_m10_support_20260930
@@ -40,16 +46,6 @@ jobs:
           git diff --exit-code -- research/notes/ecc2k130/leaf_m10_support_outcome_20260930/ANALYSIS.json
       - name: Replay all 294912 rows and 264 point images again
         run: |
-          # Replay against the exact historical workflow recorded by CONFIG and
-          # FROZEN; current runner routing is not part of that archived input.
-          source_commit=1f69d4b034a50abb2be4d724454f66d0327a4f56
-          workflow=.github/workflows/ecc2k130-leaf-m10-support.yml
-          git fetch --no-tags --depth=1 origin "$source_commit"
-          git show "$source_commit:$workflow" > "$RUNNER_TEMP/leaf-m10-frozen-workflow.yml"
-          echo '23d9704a830cb053ed85dd365e9d87b4be9d1d8d8397f7170f196baf24e3bed1  '"$RUNNER_TEMP/leaf-m10-frozen-workflow.yml" | sha256sum --check
-          cp "$workflow" "$RUNNER_TEMP/leaf-m10-current-workflow.yml"
-          trap 'cp "$RUNNER_TEMP/leaf-m10-current-workflow.yml" "$workflow"' EXIT
-          cp "$RUNNER_TEMP/leaf-m10-frozen-workflow.yml" "$workflow"
           python3 research/notes/ecc2k130/leaf_m10_support_20260930/verify.py \
             --evidence research/notes/ecc2k130/leaf_m10_support_20260930/evidence \
             --out "${{ runner.temp }}/replay.json"

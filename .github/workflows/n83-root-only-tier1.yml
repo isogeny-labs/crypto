@@ -1,7 +1,16 @@
-# Long research runs require explicit manual dispatch.
 name: N83 guarded root-only Tier 1 capacity gate
 
 on:
+  push:
+    branches: [codex/n83-root-only-20261014]
+    paths:
+      - .github/workflows/n83-root-only-tier1.yml
+      - examples/koblitz_orbit_dlp_fast.rs
+      - research/n83_root_only_20261014/RootOrdinal.lean
+      - research/n83_root_only_20261014/PROTOCOL.md
+      - research/n83_root_only_20261014/PROOF_MAP.md
+      - research/n83_root_only_20261014/run.py
+      - research/n83_root_only_20261014/verify.py
   workflow_dispatch:
 
 permissions:
@@ -14,7 +23,7 @@ concurrency:
 jobs:
   primary-point:
     if: github.repository == 'aburan28/crypto'
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-root-only-tier1.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-root-only-tier1.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-root-only-tier1.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-root-only-tier1.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 160
     steps:
       - uses: actions/checkout@v4
