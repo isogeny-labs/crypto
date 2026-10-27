@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Known-log arbitrary-target recovery cost and validation](known-log-recovery-cost-and-validation.md) | open | calibrated and independently validated known-log/IC recovery comparison | complete native pricing, independent replay and recomputation, isolated measurements and strongest matched comparators |
 | [Certicom 130 CUDA/Metal physical qualification](certicom-130-gpu-hardware-qualification.md) | open | physical rho, BSGS and IC correctness on both exact curves in both repositories | complete hosted Metal library/CLI phases and physical provenance; authorized NVIDIA/Mac receipts; current-head CI/review gates |
 | [GitHub Actions infrastructure](github-actions-infrastructure.md) | open | final-main CI and all-PR merge verification | restore billing, approve required actions, restore EKS runners, then pass final-head checks/reviews |
 | [Matched trace-line C1 2LP measurement](trace-c1-2lp-measurement.md) | open | fully priced algebraic C1 standard/selected comparison | shifted x-line algebraic oracle, full native pricing, admitted Iso Lab image/checkpoint route and independent replay |
