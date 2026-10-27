@@ -39,7 +39,7 @@ for ext in ("svg", "png"):
 print("wrote reports/iterations.{svg,png}")
 
 # GPU A/B: rate ratio and derived GPU time per solve per (curve, W)
-gpu = [json.loads(l) for l in (HERE / "gpu-ab-v1.summary.jsonl").read_text().splitlines() if l.strip()]
+gpu = [json.loads(l) for l in (HERE / "gpu-ab-v2.summary.jsonl").read_text().splitlines() if l.strip()]
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.4, 2.8), sharex=True)
 for curve, col, off in (("P-256", "#2f6db5", -0.08), ("P-384", "#d68910", 0.08)):
     rows_c = sorted((r for r in gpu if r["curve"] == curve), key=lambda r: r["W"])

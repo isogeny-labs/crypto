@@ -56,22 +56,31 @@ a verified result. An ecbench run is owed before any claim or row.
 
 ![iterations](reports/iterations.svg)
 
-**GPU rate** (`gpu-ab-v1.json`; rows in `gpu-ab-v1.rows.jsonl`, summary
-`gpu-ab-v1.summary.jsonl` from `rho_walk_leads gpuab`). Setup: one RTX PRO
-6000 (driver 610.57.04) on Modal, PTX build, global table, 256 threads,
-2,048 iterations per cell, three repetitions in alternating order.
+**GPU rate** (`gpu-ab-v2.log`, the raw output of `gpu/nist/best2_ab.sh`;
+summary `gpu-ab-v2.summary.jsonl` from `rho_walk_leads gpuab --in
+gpu-ab-v2.log`). Setup: one RTX PRO 6000 (driver 610.57.04) on Modal,
+commit 5ef52df7d, PTX build, global table, 256 threads, 2,048 iterations
+per cell, three repetitions in alternating order. The bench sha256 values
+are in the log's `BUILD` lines.
 
 Both builds pass the CPU suites in the image. The `k_rho` instantiations
 sit at the same register counts as before (255 at W = 32 and 64).
 
 | curve | W | plain Gstep/s | best of P±M | rate ratio (min–max) | GPU time per solve (range) |
 |---|---:|---:|---:|---:|---:|
-| P-256 | 16 | 1.450 | 1.296 | 0.894 (0.893–0.894) | 0.979 (0.936–1.023) |
-| P-256 | 32 | 1.772 | 1.603 | 0.905 (0.903–0.905) | 0.967 (0.925–1.013) |
-| P-256 | 64 | 2.021 | 1.867 | 0.923 (0.919–0.924) | **0.948 (0.906–0.994)** |
-| P-384 | 16 | 0.474 | 0.423 | 0.892 (0.888–0.895) | 0.981 (0.936–1.029) |
-| P-384 | 32 | 0.635 | 0.561 | 0.884 (0.881–0.884) | 0.991 (0.948–1.038) |
-| P-384 | 64 | 0.756 | 0.676 | 0.894 (0.893–0.894) | 0.979 (0.936–1.023) |
+| P-256 | 16 | 1.448 | 1.295 | 0.894 (0.886–0.894) | 0.978 (0.936–1.031) |
+| P-256 | 32 | 1.771 | 1.600 | 0.903 (0.903–0.905) | 0.969 (0.925–1.012) |
+| P-256 | 64 | 2.020 | 1.866 | 0.924 (0.923–0.925) | **0.947 (0.905–0.990)** |
+| P-384 | 16 | 0.473 | 0.422 | 0.892 (0.891–0.892) | 0.981 (0.939–1.026) |
+| P-384 | 32 | 0.636 | 0.560 | 0.881 (0.881–0.882) | 0.994 (0.950–1.038) |
+| P-384 | 64 | 0.757 | 0.677 | 0.893 (0.892–0.896) | 0.980 (0.935–1.024) |
+
+**Earlier run `gpu-ab-v1` (historical).** The first A/B used the same
+CUDA binaries, but a Python driver in `gpu/nist/modal_app.py` ran the
+cells and parsed them into `gpu-ab-v1.json`. That breaks AGENTS.md's
+no-Python rule, so the driver was replaced with the shell script above
+and the A/B was rerun. v1 is kept as recorded and agrees with v2 within
+0.003 in every rate ratio.
 
 How the last column is derived: GPU time per solve = 1 / (1.143 ×
 rate ratio). The range combines the iteration interval (1.094–1.194)
@@ -118,7 +127,7 @@ neither of the other two, so the result stays in this research directory.
 make -C gpu/nist test BEST2=1
 cd research/rho_walk_leads_20261014 && modal run modal_run.py --plan nistbest2 --out ../nist_best2_small_batch_20261027/iterations-v1
 cat ../nist_best2_small_batch_20261027/iterations-v1/*.jsonl | harness/target/release/rho_walk_leads summary --ref neg_canon
-cd ../../gpu/nist && modal run modal_app.py::best2_main --iters 2048 --reps 3 --out <json>
-# rows: one JSON object per line, compact separators; then
-rho_walk_leads gpuab --in gpu-ab-v1.rows.jsonl --speedup 1.1428 --lo 1.0944 --hi 1.1943
+cd ../../gpu/nist && ./best2_ab.sh 2048 3 > best2.log   # on the GPU host; or, via Modal:
+modal run modal_app.py::best2_main --iters 2048 --reps 3 --out best2.log
+rho_walk_leads gpuab --in best2.log --speedup 1.1428 --lo 1.0944 --hi 1.1943
 ```
