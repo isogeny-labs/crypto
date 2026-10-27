@@ -46,6 +46,10 @@ writable mount holds the export. A host-side 900-second watchdog stops the
 container and retains its exit and `docker inspect` memory/OOM record. The
 replay uses a fresh container with the same envelope. Compilation is outside
 both measured intervals and may use a larger build envelope.
+`run_guarded.py` implements that envelope and writes one receipt and raw
+stdout/stderr log per phase. Run `export` and then `replay` with the same
+`--binary` and `--output` arguments; the output path is an existing empty
+directory outside the checkout.
 
 The U control object's compressed BLAKE3 is
 `82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851`;
