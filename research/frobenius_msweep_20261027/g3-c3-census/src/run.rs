@@ -200,7 +200,7 @@ pub fn cli(args: &[String]) -> i32 {
             eprintln!(
                 "g3census <run|sizes|targets|summarize|manifest> ...\n\
                  run --n N --l L --m M [--vsel 0] [--curve-a 0] [--b 1] --unsat K [--sat-keep S] [--planted P] \
-                 --arms C,Cpoly,A,B,... [--planted-only-arms U] [--tag T] [--round 1] [--conflicts CAP] [--deadline-s S] [--seed-offset 0] --out DIR\n\
+                 --arms C,Cpoly,A,B,... [--planted-only-arms U] [--unsat-only-arms Chalf] [--tag T] [--round 1] [--conflicts CAP] [--deadline-s S] [--seed-offset 0] --out DIR\n\
                  sizes --n N --l L --m M [--vsel 0]   (encoding size table, no solving)\n\
                  targets --n N --l L --m M ...         (exact-oracle census of the target pool, no solving)\n\
                  summarize DIR [DIR...] --out OUT\n\
@@ -241,6 +241,13 @@ fn cmd_run(args: &[String]) -> i32 {
             return 2;
         }
     };
+    let unsat_only = match parse_arms(flag(args, "--unsat-only-arms").unwrap_or("")) {
+        Ok(a) => a,
+        Err(e) => {
+            eprintln!("{e}");
+            return 2;
+        }
+    };
     let tag = flag(args, "--tag").unwrap_or("");
     let out = flag(args, "--out").expect("--out DIR required");
     let params = RunParams { round: flag_u(args, "--round", 1), conflict_cap: flag_u(args, "--conflicts", 20_000_000), deadline_s: flag_u(args, "--deadline-s", 900) };
@@ -264,6 +271,9 @@ fn cmd_run(args: &[String]) -> i32 {
         if t.kind == "planted" {
             todo.extend(only_planted.iter().copied());
         }
+        if t.kind == "unsat" {
+            todo.extend(unsat_only.iter().copied());
+        }
         let mut order: Vec<usize> = (0..todo.len()).collect();
         let mut rng = Rng(mix(tseed, ti as u64 + 1));
         for i in (1..order.len()).rev() {
@@ -282,7 +292,7 @@ fn cmd_sizes(args: &[String]) -> i32 {
     let (cx, _) = cell_from(args);
     let xr = 3 | 1 << (cx.n - 2);
     println!("arm\tn\tl\tm\tvars\tclauses\tclause_lits\txor_rows\txor_lits\tand_aux\tcomparators");
-    for arm in [Arm::C, Arm::CPoly, Arm::CNoBreak, Arm::A, Arm::B, Arm::BNoGauge, Arm::G, Arm::U] {
+    for arm in [Arm::C, Arm::CPoly, Arm::CNoBreak, Arm::A, Arm::B, Arm::BNoGauge, Arm::G, Arm::U, Arm::CHalf] {
         let b = build(arm, &cx, xr, true);
         let s = b.cnf.sizes();
         println!("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", arm.name(), cx.n, cx.l, cx.m, s.vars, s.clauses, s.clause_lits, s.xor_rows, s.xor_lits, s.and_aux, b.n_comparators);

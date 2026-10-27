@@ -36,6 +36,10 @@ pub enum Arm {
     BNoGauge,
     G,
     U,
+    /// P3 positive control with a derivable effect: C plus one unit clause pinning the
+    /// top u-bit of slot 1 to 0, i.e. exactly half of the slot-1 branches. UNSAT-targets only
+    /// (it deliberately loses solutions on satisfiable targets).
+    CHalf,
 }
 
 impl Arm {
@@ -49,10 +53,11 @@ impl Arm {
             Arm::BNoGauge => "Bnogauge",
             Arm::G => "G",
             Arm::U => "U",
+            Arm::CHalf => "Chalf",
         }
     }
     pub fn parse(s: &str) -> Option<Arm> {
-        [Arm::C, Arm::CPoly, Arm::CNoBreak, Arm::A, Arm::B, Arm::BNoGauge, Arm::G, Arm::U]
+        [Arm::C, Arm::CPoly, Arm::CNoBreak, Arm::A, Arm::B, Arm::BNoGauge, Arm::G, Arm::U, Arm::CHalf]
             .into_iter()
             .find(|a| a.name() == s)
     }
@@ -317,6 +322,8 @@ pub struct Built {
     pub priority: Vec<u32>,
     pub dec: Decode,
     pub n_comparators: usize,
+    /// m = 3: the free n-bit chain variable X (normal-basis coordinates); empty otherwise.
+    pub xchain: Vec<u32>,
 }
 
 // ---------------------------------------------------------------- Encoder
@@ -486,7 +493,9 @@ impl<'a> Enc<'a> {
         }
         for i in 1..bits.len().saturating_sub(1) {
             let (a, b) = (bits[i].clone(), bits[i + 1].clone());
-            self.lex_le(&a, &b, Guard::None);
+            // Free for G: C's own u-lex break orders slots by V-coordinate, an
+            // unrelated order; enforcing this comparator too would be unsound.
+            self.lex_le(&a, &b, guard);
         }
     }
 
@@ -575,7 +584,7 @@ pub fn build(arm: Arm, cx: &Cell, xr: u64, semaev: bool) -> Built {
     let dec;
     let mut target = e.fe_const(xr);
     match arm {
-        Arm::C | Arm::CPoly | Arm::CNoBreak | Arm::G | Arm::U => {
+        Arm::C | Arm::CPoly | Arm::CNoBreak | Arm::G | Arm::U | Arm::CHalf => {
             let mut us = vec![];
             for _ in 0..m {
                 let (fe, u) = e.plain_slot(&vb);
@@ -585,6 +594,9 @@ pub fn build(arm: Arm, cx: &Cell, xr: u64, semaev: bool) -> Built {
             }
             if arm != Arm::CNoBreak {
                 e.lex_on_vars(&us);
+            }
+            if arm == Arm::CHalf {
+                e.cnf.clause(vec![-(us[0][0] as Lit)]);
             }
             if arm == Arm::G || arm == Arm::U {
                 let bits: Vec<Vec<Lit>> = xs.iter().map(|x| e.coord_bits(&x.terms)).collect();
@@ -632,19 +644,21 @@ pub fn build(arm: Arm, cx: &Cell, xr: u64, semaev: bool) -> Built {
             dec = Decode::Orbit { u: us, h };
         }
     }
+    let mut xchain: Vec<u32> = vec![];
     if semaev {
         if m == 2 {
             let (a, b) = (xs[0].clone(), xs[1].clone());
             e.s3_zero(&a, &b, &target);
         } else {
             let xv: Vec<u32> = (0..n).map(|_| e.cnf.fresh()).collect();
+            xchain = xv.clone();
             let xfe = Fe { terms: xv.iter().enumerate().map(|(k, &v)| (Lin::var(v), ob.vecs[k])).collect() };
             let (a, b, c) = (xs[0].clone(), xs[1].clone(), xs[2].clone());
             e.s3_zero(&a, &b, &xfe);
             e.s3_zero(&xfe, &c, &target);
         }
     }
-    Built { arm, n_comparators: e.n_cmp, cnf: e.cnf, priority, dec }
+    Built { arm, n_comparators: e.n_cmp, cnf: e.cnf, priority, dec, xchain }
 }
 
 impl Built {

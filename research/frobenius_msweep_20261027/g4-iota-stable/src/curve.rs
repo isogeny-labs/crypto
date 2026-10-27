@@ -126,6 +126,8 @@ pub struct Group {
     pub q: u32,
     pub a: u32,
     pub logx: Vec<u32>,
+    /// the generator g used for the logarithm table (log 1)
+    pub gen: Pt,
 }
 
 pub fn build_group(f: &Fq, a: u32) -> Result<Group, String> {
@@ -162,5 +164,5 @@ pub fn build_group(f: &Fq, a: u32) -> Result<Group, String> {
     if c.add(p, g) != Pt::Inf {
         return Err("walk did not close".into());
     }
-    Ok(Group { ne, m: ne / 2, h: 1 << ne.trailing_zeros(), q: f.q, a, logx })
+    Ok(Group { ne, m: ne / 2, h: 1 << ne.trailing_zeros(), q: f.q, a, logx, gen: g })
 }

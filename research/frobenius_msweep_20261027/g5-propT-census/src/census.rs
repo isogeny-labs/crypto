@@ -52,6 +52,62 @@ impl Mult {
     pub fn len(&self) -> usize {
         self.tabs.len()
     }
+    /// Positive-control multipliers: for each lag a random m-subset S0 of the base is drawn, two distinct classes
+    /// a != b of K(S0) are picked, and mu = b / a (mod r, random sign). Then class(mu a) = b is in K(S0), so every lag
+    /// has at least one guaranteed hit (an exact floor of `count` hits per base). Returns None if the base is too poor.
+    pub fn planted(r: u32, ds: &[u32], m: usize, count: usize, rng: &mut crate::rng::Rng) -> Option<Mult> {
+        let n = ds.len();
+        if n < m {
+            return None;
+        }
+        let mut mus: Vec<u32> = vec![];
+        let mut tries = 0;
+        while mus.len() < count {
+            tries += 1;
+            if tries > 20000 {
+                return None;
+            }
+            let mut idx: Vec<usize> = vec![];
+            while idx.len() < m {
+                let i = rng.below(n as u64) as usize;
+                if !idx.contains(&i) {
+                    idx.push(i);
+                }
+            }
+            let mut ks: Vec<u32> = vec![];
+            for mask in 0u32..(1u32 << m) {
+                let mut sum: u64 = 0;
+                for (i, &k) in idx.iter().enumerate() {
+                    let d = ds[k] as u64;
+                    sum += if (mask >> i) & 1 == 0 { d } else { r as u64 - d };
+                }
+                let v = (sum % r as u64) as u32;
+                let c = v.min(r - v);
+                if c != 0 && !ks.contains(&c) {
+                    ks.push(c);
+                }
+            }
+            if ks.len() < 2 {
+                continue;
+            }
+            let ia = rng.below(ks.len() as u64) as usize;
+            let mut ib = rng.below(ks.len() as u64) as usize;
+            if ib == ia {
+                ib = (ib + 1) % ks.len();
+            }
+            let (a, b) = (ks[ia], ks[ib]);
+            let mut mu = ((b as u64 * crate::curve::pow_mod(a as u64, r as u64 - 2, r as u64)) % r as u64) as u32;
+            if rng.below(2) == 1 {
+                mu = r - mu;
+            }
+            let c = mu.min(r - mu);
+            if c <= 1 || mus.iter().any(|&x| x.min(r - x) == c) {
+                continue;
+            }
+            mus.push(mu);
+        }
+        Some(Mult::from_units(r, &mus))
+    }
 }
 
 pub fn binom(n: usize, k: usize) -> f64 {
@@ -142,6 +198,8 @@ pub struct Sample {
     pub idx: Vec<usize>,
     pub a: u32,
     pub b: u32,
+    /// index of the multiplier in the Frobenius set (mu = mults[0].mus[t])
+    pub t: usize,
 }
 
 #[derive(Debug)]
@@ -165,6 +223,22 @@ pub struct CensusOut {
     pub strat_nsub: [u64; 3],
     pub strat_nsol: [u64; 3],
     pub strat_u: [[u64; 3]; 2],
+    /// Low-height single-orbit stratum "1L" (needs orbit exponents): (tuple, lag index) pairs where the tuple has all
+    /// its legs in one sigma-orbit with circular spread s and the lag j = t + 1 satisfies m^2 2^s (2^(j/2) + 1)^2 < r.
+    /// On such pairs a Frobenius coincidence is impossible (valuation argument, PROTOCOL 3.4).
+    /// s1l_nsub = single-orbit tuples with at least one such lag; s1l_pairs = number of (tuple, lag) pairs;
+    /// s1l_cc1 = sum of c (c - 1) over those pairs (independence-model weight); s1l_u[mi] = hits of set mi.
+    pub s1l_nsub: u64,
+    pub s1l_pairs: u64,
+    pub s1l_cc1: u64,
+    pub s1l_u: [u64; 2],
+}
+
+/// Orbit labels of the base positions: orbit id, exponent k within the orbit (x = sigma^k(rep)), and the orbit length n.
+pub struct OrbInfo<'a> {
+    pub orbit: &'a [u32],
+    pub k: Option<&'a [u32]>,
+    pub n: u32,
 }
 
 /// Full census of one base. `mults[0]` is conventionally the Frobenius set, `mults[1]` the null set.
@@ -177,6 +251,47 @@ pub fn census(
     sol_sample_cap: usize,
     orb: Option<&[u32]>,
 ) -> CensusOut {
+    let oi = orb.map(|o| OrbInfo { orbit: o, k: None, n: 0 });
+    census_ex(ds, r, m, mults, sample_cap, sol_sample_cap, oi.as_ref())
+}
+
+/// Largest circular gap removed: the length s of the shortest arc of Z/n containing all exponents `ks`.
+pub fn circular_spread(ks: &mut Vec<u32>, n: u32) -> u32 {
+    ks.sort_unstable();
+    let mut max_gap = 0;
+    for i in 0..ks.len() {
+        let next = if i + 1 < ks.len() { ks[i + 1] } else { ks[0] + n };
+        max_gap = max_gap.max(next - ks[i]);
+    }
+    n - max_gap
+}
+
+/// Is the (tuple of m legs in one orbit with spread s, lag j) pair provably free of Frobenius coincidences?
+/// Condition m^2 2^s (2^(j/2) + 1)^2 < r (norm of a nonzero element of the prime above r is at least r).
+pub fn low_height(m: usize, s: u32, j: u32, r: u32) -> bool {
+    let hmax = (m as f64) * 2f64.powf(s as f64 / 2.0) * (2f64.powf(j as f64 / 2.0) + 1.0);
+    hmax * hmax < r as f64
+}
+
+pub fn census_ex(
+    ds: &[u32],
+    r: u32,
+    m: usize,
+    mults: &[&Mult],
+    sample_cap: usize,
+    sol_sample_cap: usize,
+    oinfo: Option<&OrbInfo>,
+) -> CensusOut {
+    let orb: Option<&[u32]> = oinfo.map(|o| o.orbit);
+    // lowtab[s][t]: lag j = t + 1 of the first multiplier set
+    let lowtab: Option<Vec<Vec<bool>>> = match oinfo {
+        Some(OrbInfo { k: Some(_), n, .. }) if !mults.is_empty() => {
+            let nl = mults[0].len();
+            Some((0..*n).map(|sp| (0..nl).map(|t| low_height(m, sp, t as u32 + 1, r)).collect()).collect())
+        }
+        _ => None,
+    };
+    let mut s1l = (0u64, 0u64, 0u64, [0u64; 2]);
     let half = ((r - 1) / 2) as usize;
     let mut stamp = vec![0u32; half + 1];
     let mut sid: u32 = 0;
@@ -222,6 +337,21 @@ pub fn census(
             strat_nsub[sx] += 1;
             strat_nsol[sx] += c;
         }
+        let mut lowrow: Option<&Vec<bool>> = None;
+        if let (Some(0), Some(tab), Some(oi)) = (stratum, lowtab.as_ref(), oinfo) {
+            if let Some(kk) = oi.k {
+                let mut pos: Vec<u32> = idx.iter().map(|&i| kk[i]).collect();
+                let sp = circular_spread(&mut pos, oi.n);
+                let row = &tab[sp as usize];
+                let npairs = row.iter().filter(|&&b| b).count() as u64;
+                if npairs > 0 {
+                    s1l.0 += 1;
+                    s1l.1 += npairs;
+                    s1l.2 += npairs * c * c.saturating_sub(1);
+                    lowrow = Some(row);
+                }
+            }
+        }
         for (mi, mu) in mults.iter().enumerate() {
             for (t, tab) in mu.tabs.iter().enumerate() {
                 let mut hits = 0u64;
@@ -230,13 +360,18 @@ pub fn census(
                     if stamp[b as usize] == sid {
                         hits += 1;
                         if mi == 0 && samples.len() < sample_cap && (nsub % 7 == 1 || samples.len() < 4) {
-                            samples.push(Sample { idx: idx.to_vec(), a, b });
+                            samples.push(Sample { idx: idx.to_vec(), a, b, t });
                         }
                     }
                 }
                 u[mi][t] += hits;
                 if let (Some(sx), true) = (stratum, mi < 2) {
                     strat_u[mi][sx] += hits;
+                }
+                if let (Some(row), true) = (lowrow, mi < 2) {
+                    if row[t] {
+                        s1l.3[mi] += hits;
+                    }
                 }
             }
         }
@@ -252,7 +387,7 @@ pub fn census(
         }
     };
     for_each_subset(ds, r, m, &mut visit);
-    CensusOut { nx: ds.len(), nsub, nsol, sum_cc1, cnt, u, samples, sol_samples, strat_nsub, strat_nsol, strat_u }
+    CensusOut { nx: ds.len(), nsub, nsol, sum_cc1, cnt, u, samples, sol_samples, strat_nsub, strat_nsol, strat_u, s1l_nsub: s1l.0, s1l_pairs: s1l.1, s1l_cc1: s1l.2, s1l_u: s1l.3 }
 }
 
 /// Independence prediction of sum_t U[t] for a multiplier set with `jn` lags:
@@ -331,12 +466,16 @@ pub fn corr(p: f64, joint: u64, ncls: u64) -> f64 {
     (joint as f64 / ncls as f64 - p * p) / (p * (1.0 - p))
 }
 
-/// Lemma A2-prime in signed form for one coincidence: every pair of sign patterns (p, q) with signed sums
-/// +-a and +-b differs on a nonempty proper set I, and 2 * sum_{i in I} s_i d_i = sum_p - sum_q (mod r),
-/// i.e. the I-part of the first decomposition is the unique half of (A - B) in the odd-order group.
-/// Returns (pairs_checked, all_ok).
-pub fn halving_check(ds: &[u32], r: u32, idx: &[usize], a: u32, b: u32) -> (u32, bool) {
+/// Lemma A2-prime in signed form, checked against the multiplier that produced the coincidence. For a recorded
+/// coincidence (a in K(S), b = class(mu a) in K(S)) and every pair of sign patterns (p, q) with signed sums
+/// sa = +-a and sb = +-b: (i) sb = s mu sa for a sign s (this ties the multiplier table to the unit mu), (ii) the set I
+/// where p and q differ is nonempty and proper, (iii) the I-part of p sums to h sa with h = (1 - s mu)/2 computed with
+/// the inverse of 2 mod r (the odd-order halving). Condition (iii) follows algebraically from (i) and the definition of
+/// the signed sums, so this is a consistency check of the sample bookkeeping (tables, signs, lag index) against the
+/// lemma, not an independent test of the lemma. Returns (pairs_checked, all_ok).
+pub fn halving_check(ds: &[u32], r: u32, idx: &[usize], a: u32, b: u32, mu: u32) -> (u32, bool) {
     let m = idx.len();
+    let inv2 = ((r as u64 + 1) / 2) as u64;
     let mut pa: Vec<(u32, u32)> = vec![]; // (mask, signed sum)
     let mut pb: Vec<(u32, u32)> = vec![];
     for mask in 0u32..(1u32 << m) {
@@ -361,15 +500,23 @@ pub fn halving_check(ds: &[u32], r: u32, idx: &[usize], a: u32, b: u32) -> (u32,
     let full = (1u32 << m) - 1;
     let mut ok = !pa.is_empty() && !pb.is_empty();
     let mut checked = 0u32;
-    for &(p, sp) in &pa {
-        for &(q, sq) in &pb {
-            let i_set = p ^ q;
+    for &(p, sa) in &pa {
+        for &(q, sb) in &pb {
             checked += 1;
+            let mu_sa = ((mu as u64 * sa as u64) % r as u64) as u32;
+            let sgn: i32 = if sb == mu_sa {
+                1
+            } else if sb == (r - mu_sa) % r {
+                -1
+            } else {
+                ok = false;
+                continue;
+            };
+            let i_set = p ^ q;
             if i_set == 0 || i_set == full {
                 ok = false;
                 continue;
             }
-            // sum over I of the signs of p
             let mut t: u64 = 0;
             for (i, &k) in idx.iter().enumerate() {
                 if (i_set >> i) & 1 == 1 {
@@ -377,9 +524,10 @@ pub fn halving_check(ds: &[u32], r: u32, idx: &[usize], a: u32, b: u32) -> (u32,
                     t += if (p >> i) & 1 == 0 { d } else { r as u64 - d };
                 }
             }
-            let lhs = (2 * (t % r as u64)) % r as u64;
-            let rhs = (sp as u64 + r as u64 - sq as u64) % r as u64;
-            if lhs != rhs {
+            let t = t % r as u64;
+            let num = if sgn == 1 { (1 + r as u64 - mu as u64) % r as u64 } else { (1 + mu as u64) % r as u64 };
+            let h = (num * inv2) % r as u64;
+            if t != (h * sa as u64) % r as u64 {
                 ok = false;
             }
         }

@@ -1,9 +1,14 @@
 # PROTOCOL: cell G3, the C3 census (H-BINSTD-c72284 Stage 2)
 
-Status: **prepared, not run, not frozen.** The freeze happens when the director
-records the output of `g3census manifest` and the sha256 of every file in
-`src/` next to this file (RUN_CARD step 1) before the first round-1 row. Until
-then nothing here is a preregistration. Deviations from the spec of
+Status: **prepared, not run, not frozen** (revision 2 after independent
+review; the changes are listed in section 14). The freeze happens at RUN_CARD
+step 1: the frozen set (this file, AMENDMENT.md, RUN_CARD.md, `src/`,
+`Cargo.toml`, `protocol.json`) is **committed**, `git status --porcelain` over
+the cell and `src/cryptanalysis/sat.rs` must be empty, and the commit, the
+file hashes, the binary sha256 and the toolchain are written to a separate
+`FREEZE.txt` (not into this file, which is itself hashed). Until then nothing
+here is a preregistration. The working tree this was written in is not a
+frozen committed set. Deviations from the spec of
 EXP-BINSTD-372679 are listed in [AMENDMENT.md](AMENDMENT.md); read it first.
 
 Spec: `crypto-autoresearcher/ledger/hypotheses/H-BINSTD-c72284.yaml` and
@@ -49,8 +54,16 @@ relabelling (AGENTS.md section 6), never as an improvement.
   XOR rows plus AND-definition clauses, as in the repository's
   `semaev_sat` family. Field elements are symbolic sums of linear forms
   times constants, so squaring is free and equations are n XOR rows.
-* Budgets, applied identically: conflict cap 20 000 000 (m = 2) and
-  40 000 000 (m = 3), deadline 900 s (m = 2) and 14 400 s (m = 3) per solve.
+* Budgets, applied identically to every arm of a cell: conflict cap
+  20 000 000 and deadline 900 s per solve for every m = 2 cell and for the
+  m = 3 ladder cells (31,3,5), (31,3,6) (the `run` defaults, which the card
+  passes implicitly); 40 000 000 and 14 400 s for (31,3,10) and (31,3,11)
+  (passed explicitly). The pilot (round 0) uses a hard cap of 500 000 conflicts
+  and 300 s so that a heavy arm is censored, not run away. The conflict cap is
+  the intended censor rule because counts are deterministic; the deadline is a
+  safety valve and is load dependent on shared CPUs. `g3census gate` prints,
+  per cell and arm, the smallest conflict count among censored rows: a value
+  below the cap marks a deadline censor, which is reported as a load artifact.
   A solve that hits either is `UNKNOWN`, censored, and never evidence.
 * Metric source: solver counters `conflicts`, `decisions`, `propagations`,
   `word_ops()` (bitop/v1), plus wall clock and VmHWM beside every row.
@@ -67,10 +80,11 @@ relabelling (AGENTS.md section 6), never as an improvement.
 | Cpoly | same, V coordinates and XOR rows in the polynomial basis | basis control (spec: "(c) in both bases") |
 | A | x_i = sigma^{s_i}(rho_i), rho_i the necklace-minimal representative of its sigma-orbit in V (n-1 lex comparators per slot), s_i one-hot over Z/n, s_i = 0 forced when rho_i is sigma-fixed, S_m lex break on rho; priority on r and h | spec arm (a) |
 | B | target t = sum_j h_j sigma^j(xR) with h one-hot, tuple gauge-fixed by "x_1 is the lex-minimal rotation of every slot" (m n - 1 comparators) and x_2 <= x_3; priority on u and h | spec arm (b), non-degenerate gauge |
-| G | C plus the comparator circuits of B on the same coordinate bits, each made vacuous by a free selector | **generic size-matched symmetry-breaking control** (sound, no pruning) |
+| G | C plus the comparator circuits of B on the same coordinate bits, **every** comparator (including x_2 <= x_3 at m = 3) made vacuous by a free selector | **generic size-matched symmetry-breaking control** (sound, no pruning). The review found that an enforced x_2 <= x_3 in coordinate order contradicts C's own u-lex break and made G unsound at m = 3 (about 48% of unordered triples inadmissible); fixed, and tested on every sorted triple at (7,3,3) and 120 sampled triples at (31,5,3) |
 | U | C plus the comparators of B enforced against the fixed target | literal per-instance orbit clauses, **unsound by design**, tripwire |
-| Cnobreak | C without the S_m break | positive control P1, expected C/Cnobreak ~ 1/m! |
-| Bnogauge | B without the gauge | positive control P2, expected B/Bnogauge ~ 1/n |
+| Cnobreak | C without the S_m break | informative control P1 (model expectation, section 4); not an arm to beat |
+| Bnogauge | B without the gauge | informative control P2 (model expectation, section 4) |
+| Chalf | C plus one unit clause pinning the top u-bit of slot 1 to 0 (exactly half the slot-1 branches), **UNSAT targets only** (`--unsat-only-arms`; it loses solutions by design and is tested never to invent one) | positive control P3 with a derivable effect: cost ratio about 0.5 under the section 8 model |
 | C@k | arm C with seed slot k | A/A noise floor (C@2 vs C@1) and replicates |
 
 Arm names with `@k` select the seed slot; the encoding is the same.
@@ -119,17 +133,21 @@ reports "detector works" only if B disagrees and C, A never do.
 | negative / noise floor (A/A) | C@2 vs C@1, paired per target | median ratio within the bootstrap noise of 1; sd of the log ratio s_AA sets the minimum detectable effect | an interval for a candidate effect that does not clear the A/A interval is noise |
 | negative / size control | G vs C | median ratio >= 0.95 (vacuous circuits cannot prune); G tests whether adding n(n-1) aux variables and clauses of this shape by itself moves conflicts | if G reproduces a sub-0.95 A or B ratio, that ratio is not symmetry |
 | basis control | Cpoly vs C | reported with interval, no direction predicted | if Cpoly/C < 0.95 the reference basis is not neutral and a candidate must also beat Cpoly |
-| positive P1 | C vs Cnobreak | C/Cnobreak ~ 1/m! (0.5 at m = 2): detected iff the 95% upper bound is < 0.95 | miss: cell void (O-ARTIFACT), detector blind |
-| positive P2 | B vs Bnogauge (n = 17 and 23 only) | ~ 1/n | same |
+| positive P3 (voiding) | Chalf vs C, UNSAT targets, cells where Chalf runs (n = 17, 23, 31 m = 2, and the m = 3 ladder) | about 0.5 (exactly half of the slot-1 branches removed; under the section 8 model cost is proportional to the number of first-summand branches). Detected iff the 95% upper bound is < 0.95 | miss at >= 6 paired targets: cell void (O-ARTIFACT), the detector cannot see a 2x search-space reduction |
+| informative P1 | C vs Cnobreak | model expectation in [0.5, 1.0] at m = 2 and [0.25, 1.0] at m = 3: once the first summand is fixed XOR-Gauss solves the second affinely, so a complete UNSAT proof enumerates first-summand branches and a lex break on the Gauss-solved slot may prune little (the review's argument, accepted). The earlier 1/m! was a symmetry-count prior, not a derivation | reported with interval; a miss (upper bound >= 0.95) is read "control uninformative: this solver does not exploit the S_m break", **never** a void and never a stop |
+| informative P2 | B vs Bnogauge (n = 17 and 23 only) | <= 1; about 1/n only if the solver exploits the circulant gauge | same as P1 |
 | soundness tripwire | U on planted SAT targets | at least one planted target per cell turns UNSAT (spec: H1 literal clauses change satisfiability) | none flipping anywhere contradicts S4 and is the headline |
 | ordinary-curve unsoundness detector | B vs oracle on b = t | B disagrees somewhere | detector failed: B0 untrustworthy |
 | same instrument | all | one binary, one solver source hash, one budget, one seed rule, arms interleaved per target (order shuffled per target from the master seed), arm labels in the rows | |
 
-Positive controls run on the same code path (same builder, loader, solver,
-counters). P1's effect (m!) is far above the 0.95 threshold; the original H1
-claimed n^{-m}, and P2 is a real factor-n quotient on the same circuitry. They
-show the detector sees large symmetry gains. They do not show it sees a 5%
-one: that is the MDE of section 5.
+Controls run on the same code path (same builder, loader, solver, counters).
+Only P3 has an effect derived from the model and is allowed to void a cell. P1
+and P2 are unmeasured expectations on this solver (nothing has been run), so
+they inform and never stop the campaign. P3 shows the detector sees a 2x change;
+it does not show it sees a 5% one: that is the MDE of section 5, computed from
+the sd of the A/C and B/C log ratios of the pilot (which include the
+encoding-by-target interaction), not from the A/A sd alone. The A/A sd is a
+floor for it.
 
 ## 5. Metrics, resolution and power
 
@@ -147,11 +165,13 @@ counted, bounded by n^3 bit operations, about 3e4 at n = 31, negligible against
 the search), the V basis reduction (once per cell, not counted). Wall time and
 peak RSS are reported as practicality notes only.
 
-Secondary: per-relation cost = total cost over all targets of a kind divided by
-SAT targets found. By S3 all sound arms find the same SAT targets, so the
-per-relation ratio equals the per-target ratio of the totals; it cannot show a
-yield difference. The n-fold conjugate yield (claim C4) is an equivariance
-fact, not measured here.
+Not analysed: per-relation and SAT-target cost. The rows of incidental and
+planted SAT targets are recorded (verdicts, certificates, counters) and used
+for soundness (S3) and the tripwire (S4) only; no cost statement is made from
+them. By S3 all sound arms find the same SAT targets, so a per-relation ratio
+would equal the per-target ratio of the totals and cannot show a yield
+difference. The n-fold conjugate yield (claim C4) is an equivariance fact, not
+measured here.
 
 Resolution. For N paired targets with sd(log ratio) = s, the minimum
 detectable median ratio at 80% power and two-sided 5% is
@@ -174,13 +194,25 @@ cheaper, or much dearer). Using seed slots 1+2 (and 3+4) per arm reduces the
 within-target noise by about sqrt(2). This is a resolution statement about the
 design, not a prediction of the outcome.
 
-Multiplicity. Sixteen cell-arm tests are read. The "structure" label needs
-the lower tail to clear 0.95 in the primary slots and again in the independent
-replicate slots, with G and Cpoly not reproducing it; the chance of a false
-structure label from noise alone is then about 16 x 0.025^2 = 1e-2. The
-"relabel" label is an intersection claim over cells and needs no correction.
+Planning versus decision sd. The table uses s; the relevant s is that of the
+A/C and B/C log ratios in the pilot (seed noise plus encoding-by-target
+interaction), at least the A/A sd. The SUMMARY `MDE` column is computed from
+sd(log) and the number of **targets** (not of slot pairs: the two slots of a
+target are not independent targets), and the decision-relevant minimum is read
+from the A/C and B/C rows, not from s_AA alone.
 
-Cheapest discriminator: n = 17, l = 8, arms C, C@2, A, B, G, Cnobreak on 50
+Multiplicity. Sixteen cell-arm tests are read. The replicate slots re-run the
+same targets and encodings with new renamings and phases, so they replicate
+solver noise only, not target sampling: a favourable target sample reproduces
+in slots 3 and 4. The chance that a "structure" label arises from target
+sampling alone is therefore of order 16 x 0.025 = 0.4 before the G, Cpoly and
+A/A conditions, not 16 x 0.025^2; those conditions and the 0.95 band reduce it
+by an amount that is not computed here. Treat any single O-STRUCTURE cell as an
+observation to replicate on fresh targets (a second run with `--seed-offset`),
+not as a finding. The "relabel" label is an intersection claim over cells and
+needs no correction.
+
+Cheapest discriminator: n = 17, l = 8, arms C, C@2, A, B, G, Chalf, Cnobreak on 50
 UNSAT targets (seconds of CPU).
 
 Stopping rule: fixed N per cell as in section 3; no optional stopping; a cell
@@ -203,11 +235,24 @@ functional form in n. State it that way.
 
 Per cell, evaluated on UNSAT-truth targets with both arms UNSAT:
 
-1. **O-ARTIFACT** if any sound arm (C, Cpoly, Cnobreak, A, B, Bnogauge, G)
-   disagrees with the oracle, or any SAT certificate fails, or P1 (or P2 where
-   run) is not detected (upper bound >= 0.95). The cell is void.
-2. **O-IMPEDIMENT** if any arm-slot has more than 10% censored UNSAT targets,
-   or fewer than 10 paired targets. Never evidence.
+1. **O-ARTIFACT** if any sound arm (C, Cpoly, Cnobreak, A, B, Bnogauge, G,
+   and Chalf on its UNSAT-only rows) disagrees with the oracle, or any SAT
+   certificate fails, or P3 (Chalf/C, where run, >= 6 paired targets) is not
+   detected (upper bound >= 0.95). The cell is void. P1 and P2 never void.
+2. **O-IMPEDIMENT** if any arm-slot has more than 1% censored UNSAT targets (in
+   practice any censored target at N < 100: dropping the hardest targets of one
+   arm biases its median ratio down by about 5 percentile points, about 6% at
+   sd(log) = 0.3, the size of the band), or if the cell has fewer than 10
+   paired UNSAT targets for A and B (rule 2a), or, for a B and C only cell
+   (rule 2b), fewer than 6.
+2b. **O-BOUNDED** for a B and C only m = 3 cell with at least 6 paired targets
+   (the (31,3,10) and (31,3,11) spec cells, AMENDMENT A7): the label carries the
+   median B/C ratio and its 95% interval and states "excludes B/C below
+   <lower bound>". It makes no structure claim (no A, no G, no replicate slots)
+   and is never an O-RELABEL; at N = 6 to 10 the interval is wide and the
+   statement is the large-gain exclusion only. The ladder cells (31,3,5),
+   (31,3,6) carry all arms and are labelled by rules 3 to 5 at N = 25 (rule
+   2a's minimum 10 applies).
 3. For X in {A, B}: **candidate** if the 95% interval upper bound of the median
    conflict ratio X/C (primary slots) is below 0.95. A candidate is
    **confirmed** (O-STRUCTURE) only if all of: the replicate slots also have
@@ -218,8 +263,10 @@ Per cell, evaluated on UNSAT-truth targets with both arms UNSAT:
 4. **O-RELABEL** if no candidate and both lower bounds are at least 0.95.
 5. Otherwise **O-INCONCLUSIVE** (an interval straddles 0.95).
 
-Cross-cell reading: the spec's O-TRIPWIRE headline applies if arm U flips zero
-planted SAT targets in every cell. O-RELABEL in all cells is "consistent with
+Cross-cell reading: `summarize` prints the O-TRIPWIRE headline (how many of the
+cells that ran arm U on planted targets show at least one planted SAT target
+flipped to UNSAT; the spec's tripwire is contradicted only if none does) and a
+per-cell flag. O-RELABEL in all cells is "consistent with
 the relabelling null in these cells on this solver"; it is not a proof and not
 a statement about other solvers or encodings. An O-STRUCTURE cell is a
 heuristic-class lead needing independent replication on a second build before
@@ -254,18 +301,20 @@ m = 2, 250 us for A and B, 100 us for G; 150 us for C and 800 us for B at m = 3.
 | 17,2,9 | 2.6e3 | 4 | 50 | 0.06 |
 | 23,2,11 | 1.0e4 | 14 | 50 | 0.2 |
 | 23,2,12 | 2.0e4 | 28 | 50 | 0.4 |
-| 31,2,15 | 1.6e5 | 220 | 50 | 3.1 |
-| 31,2,16 | 3.3e5 | 440 | 50 | 6.1 |
+| 31,2,15 | 1.6e5 | 220 (+15% SAT, U, Chalf) | 50 | 3.1 (3.6) |
+| 31,2,16 | 3.3e5 | 440 (+15%) | 50 | 6.1 (7.0) |
 | 31,3,5 / 6 | 5e3 / 2e4 | 17 / 67 | 25 | 0.1 / 0.5 |
 | 31,3,10 | 5.2e6 | 5.7e3 (C, C@2, B) | 10 | 16 |
 | 31,3,11 | 2.1e7 | 2.3e4 | 10 | 63 |
 
 Replicate slots 3 and 4 add about 80% at n = 31. The central total for every
-cell except (31,3,11) is about 35 CPU-hours, about 9 hours on 4 cores, beyond
+cell except (31,3,11), with the SAT, U and Chalf additions, is about 40 CPU-hours, about 9 hours on 4 cores, beyond
 the 8-hour wall budget of the spec. The band for kappa and per-conflict time is
 roughly 0.2x to 12x. Therefore the plan is gated:
 
-* **G0 (pilot, round 0, excluded from inference):** 3 to 5 targets per cell at
+* **G0 (pilot, round 0, excluded from inference, hard cap 500 000 conflicts and
+  300 s, targets from `--seed-offset 1000` so that pilot targets are disjoint
+  from the round-1 target streams and cannot leak into inference):** 3 to 5 targets per cell at
   n = 17, 23, one n = 31 m = 2 cell, and one m = 3 ladder cell. `g3census gate`
   prints conflicts and ns per conflict per arm. Compute kappa and the per-arm
   time, and re-evaluate the table.
@@ -283,16 +332,47 @@ roughly 0.2x to 12x. Therefore the plan is gated:
   (31,3,11) runs only if the re-estimate for N = 6 is at most 12 CPU-hours,
   expected not to be met. At N = 10 and s = 0.1 the MDE is 0.895 (table above):
   the m = 3 cell can establish "B is not much cheaper than C", not "B/C >= 0.95".
-  Stating the m = 3 result as a 0.95-band test would be an overclaim.
+  Its label is O-BOUNDED (rule 2b, minimum N = 6, reconciled with this
+  section); stating the m = 3 result as a 0.95-band test would be an overclaim.
 
-Memory: well under 1 GB per process (largest encoding about 7e3 variables with
-dense XOR rows of 110 words); peak RSS is recorded per row.
+Counts of targets and arms priced. The table above prices the UNSAT targets
+of the primary arms only. The full cost adds: (i) satisfiable targets, which
+the card caps at n = 31 (`--sat-keep 2 --planted 4`; the tripwire needs one
+planted flip, and U flips about 1 - 1/n of planted targets), each costing about
+half an UNSAT solve per arm in the model, about +12%; (ii) arm U on the planted
+targets, a full UNSAT-style solve of a G-sized system, +2 to +4%; (iii) Chalf,
+about half of a C solve per target, +6%; (iv) the m = 3 spec cells run no SAT
+or planted targets. The central total in the RUN_CARD includes these (about 40
+CPU-hours).
+
+Evidence that the estimate may be badly low. During review a correctness-only
+scratch run at (31,3,5) (planted SAT targets, arms C, Cnobreak, A, B, G, a
+5 000 000-conflict cap and no deadline) had used 10 CPU-minutes and 1.7 GB
+resident with 12 targets by 5 arms unfinished, against a predicted 17 s per
+target for all arms. It was not attributed to an arm (probing was stopped). This
+is one unreplicated observation, but it is in the direction the unmeasured
+constants could take. `sat.rs` never compacts forgotten clauses out of its
+arena, so resident memory grows with conflicts.
+
+Memory and wall gates (pilot, `g3census gate`):
+
+* **G4 (memory):** `max_rss_mb` and `max_conflicts` per arm. Projected RSS at
+  the real cap = `max_rss_mb` x (cap / `max_conflicts`) in the worst (linear)
+  case. Four processes run at once; each projected RSS must be at most 3 GB. If
+  not, lower that cell's `--conflicts` until it is, and record the cap as the
+  censor rule (a lower cap makes more rows censored and the cell more likely an
+  O-IMPEDIMENT, which is the honest outcome).
+* **G5 (re-estimate trigger):** if any arm's pilot mean conflicts or ns per
+  conflict is more than 2x the section 8 table for the pilot cell, or any pilot
+  row is censored, recompute every ladder cost from the pilot numbers before
+  launching anything, and cut cells by the G2 and G3 rules on the recomputed
+  numbers. The ladder never launches on the table above alone.
 
 ## 9. Variable ledger
 
 | factor | treatment |
 |:--|:--|
-| instrument: commit, rustc -Vv, build flags, binary sha256, solver source sha256 | fixed, recorded at the freeze |
+| instrument: commit (frozen set committed, `git status --porcelain` empty), `rustc -Vv`, `cargo -V`, RUSTFLAGS, binary sha256, solver source sha256 | fixed, recorded in `FREEZE.txt` at the freeze |
 | host: CPU model, governor, SMT, co-tenants (other agents share these 4 CPUs) | measured per run (`lscpu`, load average before and after); wall time is a practicality note only, so contention affects no primary metric (conflicts and word ops are counted) |
 | process pinning | fixed: one process per core, `taskset -c k` |
 | memory layout, ASLR | uncontrolled and irrelevant to the counted metrics |
@@ -311,8 +391,9 @@ B vs Bnogauge differ in one clause group. C@2 vs C@1 is the A/A.
 
 ## 10. What does not count
 
-* Any ratio read from fewer than 10 paired targets, from censored runs, or
-  from a void cell.
+* Any ratio read from fewer than 10 paired targets (the O-BOUNDED statement of
+  a B-only m = 3 cell from 6 targets is an interval and a large-gain exclusion,
+  not a 0.95 test), from censored runs, or from a void cell.
 * A ratio produced after changing the priority set, the lex break, the budget,
   N, or the threshold. These are amendments with both versions reported.
 * Conflicts without the operation counts: a conflict ratio below 1 with the
@@ -340,6 +421,8 @@ B vs Bnogauge differ in one clause group. C@2 vs C@1 is the A/A.
   of the rule.
 * m >= 4 and chained systems beyond S4; m = 3 only at one or two cells with
   small N.
+* Target sampling reproducibility of a favourable sample: replicate slots
+  re-run the same targets, so only a fresh `--seed-offset` run tests it.
 * The per-relation cost of the whole index calculus; the n-fold conjugate
   relation yield (C4) and equivariant elimination (C5) are separate claims
   not touched here.
@@ -355,3 +438,35 @@ B vs Bnogauge differ in one clause group. C@2 vs C@1 is the A/A.
 | solver dependence | single solver; stated as the main limit |
 | ordering tuned for one arm | every arm gets priority on its own free variables; no-priority replicate secondary |
 | m >= 3 never run | ladder plus one or two spec cells, gated |
+
+## 13. Expectations written before data (not results)
+
+Priors recorded here so that a later reader can see what was expected, with the
+caveat that nothing has been run and these are reasoning, not measurement:
+
+* Direction. No gain of order n or n^m from relabelling (free C_n action,
+  counting identity). A and B pay roughly 10x more variables and XOR rows.
+  Expected medians: A/C in 0.9 to 3, B/C in 0.9 to 2, G/C near 1, Cpoly/C near 1.
+* Controls. P3 Chalf/C about 0.5 (range 0.35 to 0.8). P1 in [0.5, 1.0] (m = 2).
+  P2 <= 1, near 1/n only if the solver exploits the gauge. U flips most planted
+  SAT targets (about 1 - 1/n).
+* Labels. Probability that some cell carries an O-STRUCTURE label: about 7% (the
+  most plausible source is solver exploitation of the circulant gauge in B at
+  n = 31, which G and fresh-target replication are there to remove). About 40%
+  per n = 31 m = 2 cell that the interval straddles 0.95 (O-INCONCLUSIVE),
+  because CDCL seed noise on conflict counts is often 0.2 to 0.3 in log.
+  (31,3,10) cut for budget about 35%, (31,3,11) about 80%.
+* Outcome I would bet on: O-RELABEL at n = 17 and 23; relabel or inconclusive at
+  n = 31; O-BOUNDED at m = 3. Nothing here can move the lead beyond "no large
+  gain from these two encodings on this solver".
+
+## 14. Revision 2 (changes after independent review)
+
+G made sound at m = 3 and tested on single-solution triples; chunked and
+replicate rows keyed by target (xr); B-only m = 3 cells get a rule (O-BOUNDED)
+and the minimum N is reconciled (10 full, 6 B-only); P1 demoted to
+informative, P3 (Chalf, derivable) added as the voiding control; memory and
+re-estimate gates, hard-capped pilot and disjoint pilot targets; censoring
+tolerance 1%; MDE from targets; replicate-slot multiplicity restated; tripwire
+headline, per-cell flag and S6 for A and B implemented; per-relation promise
+dropped; freeze procedure rewritten (committed set, FREEZE.txt, binary hash).

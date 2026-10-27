@@ -829,6 +829,15 @@ fn decide(ci_lo: f64, ci_hi: f64, aa_ci_lo: f64, aa_ci_hi: f64, agree_all: bool,
     }
 }
 
+/// Audit claim C3: the arm is at least 0.95x as fast as plain, i.e. its cost
+/// ratio to plain is at most 1/0.95. Non-inferiority needs the whole interval
+/// below the margin; it is reported next to, not instead of, `decide`.
+const C3_COST_MARGIN: f64 = 1.0 / 0.95;
+
+fn c3_noninferior(ci_hi: f64) -> bool {
+    ci_hi <= C3_COST_MARGIN
+}
+
 /// Anytime view in one currency (solver word_ops). A row's finish is the
 /// work at which its solve ended; it is a lower bound when censored. At a
 /// budget B no larger than every censored finish, the outcome of a run at the
@@ -953,14 +962,27 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
                         agree_all,
                         cens_frac,
                     );
-                    metrics.push(json!({"vs_P": p, "aa_conj_vs_P": aa, "decision": verdict}));
+                    let c3 = c3_noninferior(p["ci_hi"].as_f64().unwrap_or(f64::NAN));
+                    metrics.push(json!({"vs_P": p, "aa_conj_vs_P": aa, "decision": verdict,
+                        "c3_noninferior_at_0.95": c3 && verdict != "invalid_oracle_disagreement" && verdict != "invalid_aa_excludes_one" && verdict != "unresolved_censored"}));
                 }
                 // Section 5a pricing band: lift group adds + price * word_ops.
                 let priced: Vec<Value> = [0.0, 0.1, 1.0]
                     .iter()
                     .map(|&price| paired(&x, &base, "gae", price, seed ^ 11))
                     .collect();
-                arms.push(json!({"arm": arm, "censored_fraction": cens_frac, "metrics": metrics, "priced_gae": priced}));
+                let hi = |v: &Value| v["ci_hi"].as_f64().unwrap_or(f64::NAN);
+                let lo = |v: &Value| v["ci_lo"].as_f64().unwrap_or(f64::NAN);
+                // Section 5a: an order is ranked only if it holds at all three prices.
+                let band = if priced.iter().all(|v| hi(v) < 1.0) {
+                    "arm_cheaper_across_band"
+                } else if priced.iter().all(|v| lo(v) > 1.0) {
+                    "arm_dearer_across_band"
+                } else {
+                    "order_not_stable_across_band"
+                };
+                arms.push(json!({"arm": arm, "censored_fraction": cens_frac, "metrics": metrics,
+                    "priced_gae": priced, "section_5a_band": band}));
             }
             // Detector self-check: inject known ratios into the A/A log ratios.
             let aa = paired(&aa_refs, &base, "word_ops", 0.0, seed ^ 13);
@@ -1495,6 +1517,8 @@ mod tests {
         assert_eq!(decide(0.4, 0.5, nlo, nhi, false, 0.0), "invalid_oracle_disagreement");
         assert_eq!(decide(0.4, 0.5, nlo, nhi, true, 0.3), "unresolved_censored");
         assert_eq!(decide(0.4, 0.5, 1.1, 1.3, true, 0.0), "invalid_aa_excludes_one");
+        // C3 margin: a cost ratio of 1.05 is within 0.95x speed, 1.06 is not.
+        assert!(c3_noninferior(1.05) && !c3_noninferior(1.06) && !c3_noninferior(f64::NAN));
     }
 
     #[test]

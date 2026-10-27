@@ -9,7 +9,7 @@ fn main() {
     match args.first().map(|s| s.as_str()) {
         Some("cells") => {
             for c in run::cell_list() {
-                println!("{} {} {} {}", c.a, c.n, c.m, c.l);
+                println!("{} {} {} {} {}", c.a, c.n, c.m, c.l, run::reps_for(c.n));
             }
         }
         Some("run") => {

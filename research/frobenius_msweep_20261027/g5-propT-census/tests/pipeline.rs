@@ -60,9 +60,78 @@ fn drivers_write_consistent_schemas() {
     }
     g5_propt_census::analyze::analyze(&dir).unwrap();
     let md = std::fs::read_to_string(format!("{dir}/summary.md")).unwrap();
+    if std::env::var("G5_SHOW").is_ok() {
+        println!("{md}"); // formatting review of the generated summary on the smoke fixture (not a result)
+    }
     assert!(md.contains("Voids and failures"));
     // exact identities must hold on any input: no void may mention Proposition T, halving, chain or closure
     assert!(!md.contains("INSTRUMENT_FAIL"), "{md}");
     assert!(!md.contains("PROP_T_FALSIFIED"), "{md}");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+/// Design-stage power table of the frozen rule on synthetic Poisson counts (no experiment data are read or produced).
+#[test]
+fn decision_rule_operating_characteristic() {
+    use g5_propt_census::analyze::oc_probs;
+    let cells = cell_list();
+    println!("OC: a n m l reps U_per_base | D=1: E-OVERLAP E-EXTRA E-DEFICIT UNRES AAFAIL | D=1.15: E-OVERLAP E-EXTRA E-DEFICIT UNRES AAFAIL | D=0.87: E-DEFICIT");
+    for &(a, n) in &[(1u32, 11u32), (0, 13), (1, 17), (0, 19)] {
+        for &m in &[2usize, 4, 8] {
+            let c = match cells.iter().filter(|c| c.a == a && c.n == n && c.m == m).min_by_key(|c| c.l) {
+                Some(c) => c.clone(),
+                None => continue,
+            };
+            let f = g5_propt_census::field::Fq::new(c.n);
+            let (_ne, r, _) = g5_propt_census::curve::curve_summary(&f, c.a);
+            let nx = ((1u64 << c.l) as f64 * (r as f64 - 1.0) / (2.0 * f.q as f64)).round();
+            let jn = ((c.n - 1) / 2) as f64;
+            let cc = (1u64 << (c.m - 1)) as f64;
+            let u = g5_propt_census::census::binom(nx as usize, c.m) * cc * (cc - 1.0) * jn / ((r as f64 - 3.0) / 2.0);
+            let b = c.reps; // reps per half, as run
+            let p1 = oc_probs(u, b, 1.0, 60, 1);
+            let p2 = oc_probs(u, b, 1.15, 60, 2);
+            let p3 = oc_probs(u, b, 0.87, 60, 3);
+            println!("OC: {} {} {} {} {} {:.1} (bases/half used {}) | {:.2} {:.2} {:.2} {:.2} {:.2} | {:.2} {:.2} {:.2} {:.2} {:.2} | {:.2}", c.a, c.n, c.m, c.l, c.reps, u, b, p1[0], p1[1], p1[2], p1[3], p1[4], p2[0], p2[1], p2[2], p2[3], p2[4], p3[2]);
+        }
+    }
+    // sanity: a large effect is always called, no effect with plenty of counts is called equivalent
+    let big = oc_probs(2000.0, 20, 1.0, 100, 11);
+    assert!(big[0] + big[4] > 0.97 && big[0] > 0.8, "{big:?}");
+    let ex = oc_probs(2000.0, 20, 1.4, 100, 12);
+    assert!(ex[1] > 0.85, "{ex:?}");
+    let low = oc_probs(1.0, 8, 1.0, 100, 13);
+    assert!(low[0] < 0.2, "a starved cell must not be called equivalent: {low:?}");
+}
+
+/// The analyzer reconciles planned versus present jobs, survives a ragged last line and reports unfinished jobs.
+#[test]
+fn reconciliation_flags_missing_short_and_ragged_jobs() {
+    let dir = format!("{}/g5_recon", env!("CARGO_TARGET_TMPDIR"));
+    let _ = std::fs::remove_dir_all(&dir);
+    let o = RunOpts { seed: 9, reps: Some(2), out: dir.clone() };
+    run_propt(11, 3, 120, 2, &o).unwrap();
+    let cell = Cell { a: 1, n: 11, m: 3, l: 6, reps: 2 };
+    run_overlap(&cell, &o).unwrap();
+    run_rank(&cell, 6, 30, &o).unwrap();
+    std::fs::write(format!("{dir}/jobs.txt"), "propt 0 11 3 0 120\noverlap 1 11 3 6 2\nrank 1 11 3 6 2\n").unwrap();
+    for stem in ["propt_a0_n11_m3_l0", "overlap_a1_n11_m3_l6", "rank_a1_n11_m3_l6"] {
+        std::fs::write(format!("{dir}/exit_{stem}.txt"), "0\n").unwrap();
+    }
+    assert_eq!(g5_propt_census::analyze::propt_gate(&dir).unwrap(), 3);
+    g5_propt_census::analyze::analyze(&dir).unwrap();
+    let md = std::fs::read_to_string(format!("{dir}/summary.md")).unwrap();
+    assert!(md.contains("Jobs planned 3, complete 3"), "{md}");
+    // a missing exit code and a truncated (ragged) rank file are reported, not panicked on
+    std::fs::remove_file(format!("{dir}/exit_overlap_a1_n11_m3_l6.txt")).unwrap();
+    let rp = format!("{dir}/rank_a1_n11_m3_l6.tsv");
+    let mut txt = std::fs::read_to_string(&rp).unwrap();
+    txt.push_str("1\t11\t3\n");
+    std::fs::write(&rp, txt).unwrap();
+    g5_propt_census::analyze::analyze(&dir).unwrap();
+    let md = std::fs::read_to_string(format!("{dir}/summary.md")).unwrap();
+    assert!(md.contains("NOT_FINISHED"), "{md}");
+    assert!(md.contains("SHORT_OR_RAGGED"), "{md}");
+    assert!(md.contains("INCOMPLETE"), "{md}");
     let _ = std::fs::remove_dir_all(&dir);
 }

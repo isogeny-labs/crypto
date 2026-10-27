@@ -59,7 +59,7 @@ fn sound_arms_agree_with_oracle_n7_m3() {
     for xr in 1..128u64 {
         let truth = o.exists(3, xr);
         n_sat += truth as usize;
-        for arm in [Arm::C, Arm::A, Arm::B, Arm::G] {
+        for arm in [Arm::C, Arm::CPoly, Arm::CNoBreak, Arm::A, Arm::B, Arm::BNoGauge, Arm::G] {
             let (r, v) = solve(&cx, arm, xr, 7 + xr);
             assert_eq!(r == SolveResult::Sat, truth, "m3 xr={xr} arm={}", arm.name());
             if truth {
@@ -236,7 +236,7 @@ fn structure_counts() {
         // size-matched control: same comparator count, same clause literals up to the selectors
         assert_eq!(g.cnf.sizes().xor_rows, u.cnf.sizes().xor_rows);
         assert_eq!(g.cnf.sizes().clauses, u.cnf.sizes().clauses);
-        assert_eq!(g.cnf.nv, u.cnf.nv + g.n_comparators as u32 - (m - 1) as u32 - (m - 2) as u32);
+        assert_eq!(g.cnf.nv, u.cnf.nv + gauge_cmp as u32); // one free selector per gauge comparator
         assert!(a.cnf.nv > c.cnf.nv && b.cnf.nv > c.cnf.nv);
         // priority sets
         assert_eq!(c.priority.len(), m * l as usize);
@@ -293,7 +293,7 @@ fn all_census_cells_build_all_arms() {
         let cx = Cell::new(n, l, m, 0, 1);
         assert!(m as u32 * (l - 1) <= n, "admissible cell m(l-1)<=n");
         let xr = 0x1234567 & ((1u64 << n) - 1) | 1;
-        for arm in [Arm::C, Arm::CPoly, Arm::CNoBreak, Arm::A, Arm::B, Arm::BNoGauge, Arm::G, Arm::U] {
+        for arm in [Arm::C, Arm::CPoly, Arm::CNoBreak, Arm::A, Arm::B, Arm::BNoGauge, Arm::G, Arm::U, Arm::CHalf] {
             let t = std::time::Instant::now();
             let b = build(arm, &cx, xr, true);
             let s = b.cnf.sizes();
@@ -360,4 +360,114 @@ fn cli_run_summarize_gate_end_to_end_on_a_toy_cell() {
     assert_eq!(crate::run::cli(&["summarize".to_string(), dir.clone(), "--out".to_string(), format!("{dir}/out")]), 0);
     assert!(std::path::Path::new(&format!("{dir}/out/SUMMARY.md")).exists());
     assert_eq!(crate::run::cli(&["bogus".to_string()]), 2);
+}
+
+/// Pin the u-bits of the plain slots to the given V-elements (as masks over vb_n).
+fn pinned(arm: Arm, cx: &Cell, xr: u64, masks: &[u64], xx: u64) -> SolveResult {
+    let mut b = build(arm, cx, xr, true);
+    let us = match &b.dec {
+        Decode::Plain { u, .. } => u.clone(),
+        _ => unreachable!(),
+    };
+    for (slot, &mk) in us.iter().zip(masks) {
+        for (p, &v) in slot.iter().enumerate() {
+            let lit = if (mk >> p) & 1 == 1 { v as i32 } else { -(v as i32) };
+            b.cnf.clause(vec![lit]);
+        }
+    }
+    // pin the chain variable too (normal-basis coordinates of xx): pure propagation
+    let co = cx.nb.coords(xx);
+    for (k, &v) in b.xchain.iter().enumerate() {
+        b.cnf.clause(vec![if (co >> k) & 1 == 1 { v as i32 } else { -(v as i32) }]);
+    }
+    let (mut s, _) = b.load(0);
+    s.conflict_budget = 1_000_000;
+    s.solve()
+}
+
+fn elem(cx: &Cell, mk: u64) -> u64 {
+    (0..cx.l as usize).fold(0u64, |a, p| if (mk >> p) & 1 == 1 { a ^ cx.vb_n[p] } else { a })
+}
+
+/// Defect 1 of the review: G (and C) must accept EVERY unordered V-triple that
+/// solves the chain, in C's own u-lex order. Pinning the slots makes this an
+/// exact admissibility check with no solution multiplicity to hide behind.
+fn check_g_admits_all_sorted_triples(cx: &Cell, triples: &[(u64, u64, u64)]) {
+    let f = &cx.f;
+    let u_key = |mk: u64| (0..cx.l).fold(0u64, |a, p| a | (((mk >> p) & 1) << (cx.l - 1 - p)));
+    let mut checked = 0;
+    for &(a, b, c) in triples {
+        let mut t = [a, b, c];
+        t.sort_by_key(|&mk| u_key(mk));
+        let (x0, x1, x2) = (elem(cx, t[0]), elem(cx, t[1]), elem(cx, t[2]));
+        let (bb, cc) = (f.mul(x0, x1), f.sq(x0 ^ x1));
+        for xx in f.solve_quadratic(cc, bb, f.sq(bb) ^ cx.b).unwrap_or_default() {
+            let (b2, c2) = (f.mul(xx, x2), f.sq(xx ^ x2));
+            for xr in f.solve_quadratic(c2, b2, f.sq(b2) ^ cx.b).unwrap_or_default() {
+                if xr == 0 {
+                    continue;
+                }
+                assert_eq!(pinned(Arm::C, cx, xr, &t, xx), SolveResult::Sat, "C rejects its own planted triple");
+                assert_eq!(pinned(Arm::G, cx, xr, &t, xx), SolveResult::Sat, "G rejects planted triple {t:?} xr={xr}");
+                // and the verdicts agree on a wrong target too
+                let wrong = xr ^ 1;
+                if wrong != 0 {
+                    assert_eq!(pinned(Arm::G, cx, wrong, &t, xx), pinned(Arm::C, cx, wrong, &t, xx));
+                }
+                checked += 1;
+            }
+        }
+    }
+    assert!(checked > 20, "too few planted checks: {checked}");
+}
+
+#[test]
+fn g_is_sound_on_every_single_triple_m3_n7() {
+    let cx = Cell::new(7, 3, 3, 0, 1);
+    let sz = 1u64 << cx.l;
+    let mut tr = vec![];
+    for a in 0..sz {
+        for b in a..sz {
+            for c in b..sz {
+                tr.push((a, b, c));
+            }
+        }
+    }
+    check_g_admits_all_sorted_triples(&cx, &tr);
+}
+
+#[test]
+fn g_is_sound_on_sampled_triples_m3_n31() {
+    let cx = Cell::new(31, 5, 3, 0, 1);
+    let mut rng = Rng(0x9e3779b97f4a7c15);
+    let tr: Vec<(u64, u64, u64)> = (0..120).map(|_| (rng.below(32), rng.below(32), rng.below(32))).collect();
+    check_g_admits_all_sorted_triples(&cx, &tr);
+}
+
+/// P3 control Chalf: loses solutions by design but must never invent one, must agree with C on
+/// UNSAT targets, and its pin is exactly one unit clause (half the slot-1 branches).
+#[test]
+fn chalf_never_invents_and_matches_c_on_unsat_targets() {
+    for (l, m) in [(3u32, 2usize), (4, 2), (3, 3)] {
+        let cx = Cell::new(7, l, m, 0, 1);
+        let mut o = oracle(&cx);
+        let (mut unsat_seen, mut lost) = (0, 0);
+        for xr in 1..128u64 {
+            let truth = o.exists(m, xr);
+            let (r, _) = solve(&cx, Arm::CHalf, xr, 3);
+            if r == SolveResult::Sat {
+                assert!(truth, "Chalf invented a solution (l={l} m={m} xr={xr})");
+            } else if truth {
+                lost += 1;
+            } else {
+                unsat_seen += 1;
+                assert_eq!(r, SolveResult::Unsat);
+            }
+        }
+        assert!(unsat_seen > 5 && (lost > 0 || m == 3), "l={l} m={m}: unsat {unsat_seen} lost {lost}");
+        let c = build(Arm::C, &cx, 5, true);
+        let h = build(Arm::CHalf, &cx, 5, true);
+        assert_eq!(h.cnf.sizes().clauses, c.cnf.sizes().clauses + 1);
+        assert_eq!(h.cnf.nv, c.cnf.nv);
+    }
 }

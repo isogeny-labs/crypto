@@ -118,7 +118,7 @@ pub fn enumerate(b: &Base, m: usize, cap: f64) -> Result<Vec<(u32, u128)>, Strin
     if ub > cap {
         return Err(format!("C({},{})={ub:.3e} exceeds cap {cap:.3e}", b.items.len(), m));
     }
-    let mut out = Vec::with_capacity(ub as usize / 2 + 16);
+    let mut out = Vec::with_capacity((ub as usize / 2).min(1 << 22) + 16);
     rec(b, m, 0, 0, 0, 0, &mut out);
     Ok(out)
 }
@@ -232,15 +232,25 @@ pub fn n_signed_classes(b: &Base) -> usize {
     v.len()
 }
 
-/// Meet-in-the-middle cost model (group-law-free probe counts): left table of floor(m/2)-subsets,
-/// one probe per ceil(m/2)-subset per target.
+/// Meet-in-the-middle cost model (group-law-free probe counts). Two orientations exist: a left table of
+/// all floor(m/2)-subsets probed with all ceil(m/2)-subsets once per target, or the reverse. With t targets
+/// amortising one table, the cost is table + t * probe; the cheaper orientation is chosen per arm and per t.
+/// `flipped` is true when the table holds the ceil(m/2)-subsets. (`tests/identities.rs` runs an honest
+/// counted MITM on tiny bases and checks that it finds exactly the decompositions D[s].)
 pub struct Cost {
     pub table: f64,
     pub probe: f64,
+    pub flipped: bool,
 }
-pub fn mitm_cost(n_items: usize, m: usize) -> Cost {
+pub fn mitm_total(n_items: usize, m: usize, t: f64) -> Cost {
     let a = m / 2;
-    Cost { table: binom(n_items, a), probe: binom(n_items, m - a) }
+    let (lo, hi) = (binom(n_items, a), binom(n_items, m - a));
+    // orientation 0: table lo, probe hi; orientation 1: table hi, probe lo
+    if lo + t * hi <= hi + t * lo {
+        Cost { table: lo, probe: hi, flipped: false }
+    } else {
+        Cost { table: hi, probe: lo, flipped: true }
+    }
 }
 
 // ------------------------------------------------------------------ ANF ----
@@ -298,7 +308,8 @@ pub fn param_degree(n: u32, l: u32, table: &[u32]) -> u32 {
 // ----------------------------------------------------------------- rank ----
 
 fn mulmod(a: u64, b: u64, p: u64) -> u64 {
-    ((a as u128 * b as u128) % p as u128) as u64
+    // p < 2^32 (asserted in Elim::new), so the product fits in u64
+    (a * b) % p
 }
 fn powmod(mut a: u64, mut e: u64, p: u64) -> u64 {
     let mut r = 1;
@@ -320,6 +331,7 @@ pub struct Elim {
 }
 impl Elim {
     pub fn new(p: u64, ncols: usize) -> Elim {
+        assert!(p < (1u64 << 32), "modulus must be below 2^32");
         Elim { p, piv: vec![None; ncols], rank: 0 }
     }
     /// Adds a sparse row (col, coefficient mod p). True iff the rank grew.
@@ -371,17 +383,24 @@ pub struct RankOut {
     pub active: usize,
     pub rank_final: usize,
     pub targets_used: u64,
+    pub rows_total: u64,
     pub t50: Option<u64>,
+    /// whole targets needed to reach 90 percent rank (a probe is paid in full)
     pub t90: Option<u64>,
+    /// fractional targets: completed targets plus the share of the last target's rows that was needed
+    pub t90f: Option<f64>,
     pub t100: Option<u64>,
     pub rows90: Option<u64>,
     pub stalled: bool,
 }
 
-/// Streams targets (in the given order), adds the orbit rows of each, and records how many
-/// targets/rows were needed to reach 50/90/100 percent of the active columns (columns that occur
-/// in at least one orbit row of any listed target). Stops on full rank or a long stall.
-pub fn rank_stream(t: &Tally, order: &[u32], m: usize, ncls: usize, p: u64) -> RankOut {
+/// Streams targets (in the given order), adds the orbit rows of each (rows of one target in a seeded
+/// random order), and records how many targets/rows were needed to reach 50/90/100 percent of the active
+/// columns (columns that occur in at least one orbit row of any listed target). The stream stops at 90
+/// percent rank when there are more than 120 active columns (dense elimination is quadratic; t100 is then
+/// NA by design), otherwise at full rank, a long stall (3 active + 300 consecutive redundant rows) or the
+/// end of the order.
+pub fn rank_stream(t: &Tally, order: &[u32], m: usize, ncls: usize, p: u64, seed: u64) -> RankOut {
     let mut act = vec![false; ncls];
     for &s in order {
         for k in t.off[s as usize]..t.off[s as usize + 1] {
@@ -397,30 +416,43 @@ pub fn rank_stream(t: &Tally, order: &[u32], m: usize, ncls: usize, p: u64) -> R
     }
     let thr = |f: f64| ((f * active as f64).ceil() as usize).max(1);
     let (th50, th90, th100) = (thr(0.5), thr(0.9), active);
+    let full_cap = active <= 120;
     let mut el = Elim::new(p, ncls);
+    let mut rng = crate::bases::Rng(seed);
     let (mut rows, mut since) = (0u64, 0u64);
-    let stall_cap = 20 * active as u64 + 1000;
-    for (ti, &s) in order.iter().enumerate() {
-        for k in t.off[s as usize]..t.off[s as usize + 1] {
+    let stall_cap = 3 * active as u64 + 300;
+    'outer: for (ti, &s) in order.iter().enumerate() {
+        let (lo, hi) = (t.off[s as usize] as usize, t.off[s as usize + 1] as usize);
+        let mut idx: Vec<usize> = (lo..hi).collect();
+        for i in (1..idx.len()).rev() {
+            idx.swap(i, rng.below(i as u64 + 1) as usize);
+        }
+        let nr = idx.len();
+        let tn = ti as u64 + 1;
+        for (j, &k) in idx.iter().enumerate() {
             rows += 1;
-            if el.add(&row_of_key(t.keys[k as usize], m, p)) {
+            if el.add(&row_of_key(t.keys[k], m, p)) {
                 since = 0;
             } else {
                 since += 1;
             }
-            let tn = ti as u64 + 1;
             if out.t50.is_none() && el.rank >= th50 {
                 out.t50 = Some(tn);
             }
             if out.t90.is_none() && el.rank >= th90 {
                 out.t90 = Some(tn);
+                out.t90f = Some(ti as f64 + (j + 1) as f64 / nr as f64);
                 out.rows90 = Some(rows);
+                if !full_cap {
+                    out.targets_used = tn;
+                    break 'outer;
+                }
             }
             if out.t100.is_none() && el.rank >= th100 {
                 out.t100 = Some(tn);
             }
         }
-        out.targets_used = ti as u64 + 1;
+        out.targets_used = tn;
         if el.rank >= th100 {
             break;
         }
@@ -429,6 +461,7 @@ pub fn rank_stream(t: &Tally, order: &[u32], m: usize, ncls: usize, p: u64) -> R
             break;
         }
     }
+    out.rows_total = rows;
     out.rank_final = el.rank;
     out
 }

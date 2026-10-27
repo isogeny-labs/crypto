@@ -1,37 +1,99 @@
 #!/usr/bin/env bash
 # Cell G5 driver. DO NOT LAUNCH until `scripts/checkpoint.sh gate` passes (the repository forbids experiment
-# runs without an S3 resume checkpoint; there is no bypass in this script).
+# runs without an S3 resume checkpoint; there is no bypass in this script) and the route of RUN_CARD section 1 is
+# frozen (isolab-eks by default; the executor runs this script unchanged inside the job).
 # Usage: run_cells.sh [JOBS]   (default 3; the machine has 4 shared CPUs)
+# Environment: G5_MAX_CPU_MIN (default 400) is the projected CPU-minute budget; the pre-flight aborts above it.
+#              CARGO_TARGET_DIR defaults to a directory OUTSIDE the cell so the committed tree stays clean.
+# Phases: 0 gate + clean-tree + tests + build + provenance + pre-flight timing, 1 Proposition T cells and their
+# fail-fast gate (the instrument is validated before the expensive cells), 2 rank + overlap cells, 3 analyze.
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/../../.." && pwd)"
 JOBS="${1:-3}"
+MAXMIN="${G5_MAX_CPU_MIN:-400}"
 ( cd "$REPO" && scripts/checkpoint.sh gate )          # abort if the gate fails
-export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$HERE/target}"
-( cd "$HERE" && cargo test --release --quiet )         # identities must pass on the exact build that runs
-( cd "$HERE" && cargo build --release --quiet )
+if [ -n "$(git -C "$REPO" status --porcelain -- "$HERE")" ]; then
+  echo "ABORT: the cell directory has uncommitted changes; commit (or stash) so commit.txt names the code that runs" >&2
+  git -C "$REPO" status --short -- "$HERE" >&2
+  exit 3
+fi
+export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-${TMPDIR:-/tmp}/g5census-target}"
+( cd "$HERE" && cargo test --release --locked --quiet )   # identities must pass on the exact build that runs
+( cd "$HERE" && cargo build --release --locked --quiet )
 BIN="$CARGO_TARGET_DIR/release/g5census"
 RUN="$HERE/reports/run-$(date -u +%Y%m%dT%H%M%SZ)"
-mkdir -p "$RUN"
-git -C "$REPO" rev-parse HEAD > "$RUN/commit.txt"
+mkdir -p "$RUN/preflight"
+{
+  echo "head $(git -C "$REPO" rev-parse HEAD)"
+  echo "branch $(git -C "$REPO" rev-parse --abbrev-ref HEAD)"
+  echo "cell_dir_porcelain_lines $(git -C "$REPO" status --porcelain -- "$HERE" | wc -l)"
+  echo "repo_porcelain_lines $(git -C "$REPO" status --porcelain | wc -l)"
+  echo "cell_tree $(git -C "$REPO" rev-parse "HEAD:${HERE#"$REPO"/}")"
+} > "$RUN/commit.txt"
+{ rustc -Vv; cargo -V; } > "$RUN/toolchain.txt"
+( cd "$HERE" && sha256sum Cargo.toml Cargo.lock PROTOCOL.md RUN_CARD.md run_cells.sh $(find src tests -type f | sort) ) > "$RUN/inputs.sha256"
 sha256sum "$BIN" > "$RUN/binary.sha256"
 { date -u; nproc; uname -a; cat /proc/loadavg; } > "$RUN/host.txt"
-"$BIN" cells > "$RUN/plan.tsv"                         # a n m l reps  (the frozen cell list)
-# job lines: kind a n m l reps
+"$BIN" cells > "$RUN/plan.tsv" 2> "$RUN/plan_notes.txt"   # a n m l reps est_ops  (the frozen cell list)
+
+# ---- phase 0: pre-flight timing on scratch output (never read by analyze; PROTOCOL 12) ----
+t_run() { # prints elapsed seconds of "$@"
+  local t0 t1; t0=$(date +%s.%N); "$@" 2>> "$RUN/preflight/log.txt" >/dev/null; t1=$(date +%s.%N); awk -v a="$t0" -v b="$t1" 'BEGIN{printf "%.3f", b-a}'
+}
+PF="$RUN/preflight"
+NSOP=0
+for key in "1 11" "0 13" "1 17" "0 19" "1 19"; do
+  set -- $key
+  line=$(awk -v a="$1" -v n="$2" '$1==a && $2==n && $6>mx {mx=$6; l=$0} END{print l}' "$RUN/plan.tsv")
+  [ -n "$line" ] || continue
+  set -- $line
+  est=$("$BIN" estimate --a "$1" --n "$2" --m "$3" --l "$4" --reps 1)
+  sec=$(t_run "$BIN" overlap --a "$1" --n "$2" --m "$3" --l "$4" --reps 1 --out "$PF")
+  nsop=$(awk -v s="$sec" -v e="$est" 'BEGIN{printf "%.4f", s*1e9/e}')
+  echo "preflight overlap a=$1 n=$2 m=$3 l=$4 reps=1 seconds=$sec est_ops=$est ns_per_op=$nsop" | tee -a "$PF/summary.txt"
+  NSOP=$(awk -v a="$nsop" -v b="$NSOP" 'BEGIN{printf "%.4f", (a>b)?a:b}')
+done
+PT=$(t_run "$BIN" propt --n 19 --m 8 --trials 500 --assigns 4 --out "$PF")
+RT=$(t_run "$BIN" rank --a 0 --n 19 --m 5 --l 8 --reps 1 --targets 16 --rowcap 40 --out "$PF")
+echo "preflight propt n=19 m=8 trials=500 seconds=$PT; rank a=0 n=19 m=5 l=8 reps=1 seconds=$RT" | tee -a "$PF/summary.txt"
+TOTOPS=$(awk '{s+=$6} END{printf "%.6e", s}' "$RUN/plan.tsv")
+PROJ_MIN=$(awk -v n="$NSOP" -v t="$TOTOPS" -v p="$PT" -v r="$RT" 'BEGIN{printf "%.1f", (n*t/1e9 + p*40*28 + r*6*20)/60}')
+printf "projected CPU minutes (upper-bound scaling of the pre-flight, max ns/op over curves): %s; budget %s\n" "$PROJ_MIN" "$MAXMIN" | tee -a "$PF/summary.txt"
+if awk -v p="$PROJ_MIN" -v m="$MAXMIN" 'BEGIN{exit !(p>m)}'; then
+  echo "ABORT: projected CPU minutes exceed G5_MAX_CPU_MIN; re-freeze the budget (RUN_CARD section 1) instead of launching" >&2
+  exit 4
+fi
+
+# ---- jobs: kind a n m l reps (propt: reps column = trials) ----
+{ for n in 11 13 17 19; do for m in 2 3 4 5 6 7 8; do echo "propt 0 $n $m 0 20000"; done; done; } > "$RUN/jobs_propt.txt"
 {
-  # overlap cells, largest field and largest m first so the tail is short
-  sort -k2,2nr -k3,3nr "$RUN/plan.tsv" | awk '{print "overlap", $1, $2, $3, $4, $5}'
-  # rank cells: m in {2,3,5,8}, last listed (largest) l per (a,n,m), 6 bases per half
+  # rank cells first (cheap, informative controls), then overlap, largest field and m first so the tail is short
   awk '($3==2||$3==3||$3==5||$3==8){k=$1" "$2" "$3; l[k]=$4} END{for(k in l) print "rank", k, l[k], 6}' "$RUN/plan.tsv" | sort -k3,3nr -k4,4nr
-  # Proposition T cells: n in {11,13,17,19} x m in 2..8
-  for n in 11 13 17 19; do for m in 2 3 4 5 6 7 8; do echo "propt 0 $n $m 0 0"; done; done
-} > "$RUN/jobs.txt"
+  sort -k2,2nr -k3,3nr "$RUN/plan.tsv" | awk '{print "overlap", $1, $2, $3, $4, $5}'
+} > "$RUN/jobs_main.txt"
+cat "$RUN/jobs_propt.txt" "$RUN/jobs_main.txt" > "$RUN/jobs.txt"
 export BIN RUN
-xargs -P "$JOBS" -L1 sh -c '
-  case "$0" in
-    overlap) "$BIN" overlap --a "$1" --n "$2" --m "$3" --l "$4" --reps "$5" --out "$RUN" ;;
-    rank)    "$BIN" rank    --a "$1" --n "$2" --m "$3" --l "$4" --reps "$5" --targets 16 --rowcap 40 --out "$RUN" ;;
-    propt)   "$BIN" propt   --n "$2" --m "$3" --trials 20000 --assigns 4 --out "$RUN" ;;
-  esac 2> "$RUN/log_$0_a$1_n$2_m$3_l$4.txt" || true' < "$RUN/jobs.txt"
+runjobs() { # $1 = job file; every job leaves log_<stem>.txt and exit_<stem>.txt (exit code, never swallowed)
+  xargs -P "$JOBS" -L1 sh -c '
+    stem="$0_a$1_n$2_m$3_l$4"
+    case "$0" in
+      overlap) "$BIN" overlap --a "$1" --n "$2" --m "$3" --l "$4" --reps "$5" --out "$RUN" ;;
+      rank)    "$BIN" rank    --a "$1" --n "$2" --m "$3" --l "$4" --reps "$5" --targets 16 --rowcap 40 --out "$RUN" ;;
+      propt)   "$BIN" propt   --n "$2" --m "$3" --trials "$5" --assigns 4 --out "$RUN" ;;
+    esac 2> "$RUN/log_$stem.txt"
+    echo $? > "$RUN/exit_$stem.txt"' < "$1"
+}
+
+# ---- phase 1: Proposition T first, then fail fast ----
+runjobs "$RUN/jobs_propt.txt"
+if ! "$BIN" gate --dir "$RUN" 2> "$RUN/propt_gate.txt"; then
+  cat "$RUN/propt_gate.txt" >&2
+  "$BIN" analyze --dir "$RUN" || true
+  echo "ABORT: Proposition T gate failed; the expensive cells were not launched. See $RUN/summary.md" >&2
+  exit 5
+fi
+# ---- phase 2 and 3 ----
+runjobs "$RUN/jobs_main.txt"
 "$BIN" analyze --dir "$RUN"
 echo "done: $RUN"

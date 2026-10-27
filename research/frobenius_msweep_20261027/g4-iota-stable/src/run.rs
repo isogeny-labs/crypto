@@ -9,7 +9,14 @@ use std::time::Instant;
 
 pub const ARMS: [&str; 7] = ["vpoly", "vrand", "g4poly", "g4rand", "rset", "riota", "wrong"];
 pub const SINGLE_ARMS: [&str; 2] = ["vpoly", "g4poly"];
-pub const ENUM_CAP: f64 = 2.5e6;
+/// Cap on the number of m-subsets enumerated for one base (about 1 GB at 32 bytes per record). It is
+/// never hit by a matched replicate: `draw_matched` redraws the g4rand base (and with it the common item
+/// count N of every arm) until 2m <= N and C(N, m) <= ENUM_CAP, identically for all arms.
+pub const ENUM_CAP: f64 = 3e7;
+/// Arms that are matched on the exact item count within a replicate and enter the decision rule.
+pub const MATCHED_ARMS: [&str; 5] = ["vrand", "g4rand", "rset", "riota", "wrong"];
+pub const MATCH_TRIES: u64 = 20000;
+pub const G_ATTEMPTS: u64 = 200;
 
 #[derive(Clone, Debug)]
 pub struct Cell {
@@ -177,29 +184,41 @@ pub fn measure(g: &Group, f: &Fq, built: &Built, l: u32, m: usize, order_seed: u
     }
     let lpf = largest_prime_factor(ne) as u64;
     let (p, pfield) = if lpf >= 101 { (lpf, "lpf") } else { (2147483647u64, "mersenne31") };
-    let ro = rank_stream(&t, &order, m, base.ncls.max(1), p);
-    // MITM cost model (probe counts; a model, not a measured solver cost)
+    let ro = rank_stream(&t, &order, m, base.ncls.max(1), p, order_seed ^ 0xA5A5);
+    // MITM cost model (probe counts; a model, not a measured solver cost). Per arm the cheaper table
+    // orientation is chosen for the number of targets that arm needs.
     let nit = base.items.len();
-    let cb = mitm_cost(nit, m);
-    let (cq_table, cq_probe) = if base.closure == 1.0 && nit > 0 {
-        let c = mitm_cost(n_signed_classes(&base), m);
-        (c.table, c.probe)
-    } else {
-        (f64::NAN, f64::NAN)
-    };
+    let nq = if base.closure == 1.0 && nit > 0 { n_signed_classes(&base) } else { nit };
     let th90 = ((0.9 * ro.active as f64).ceil()).max(1.0);
-    let cpr = |table: f64, probe: f64| -> f64 {
-        match ro.t90 {
-            Some(t90) => (table + t90 as f64 * probe) / th90,
+    // per independent relation: fractional targets (cpr); total to 90% rank: whole targets (tot)
+    let t_lb = ro.t90f.unwrap_or(ro.targets_used as f64); // right-censored lower bound when 90% is never reached
+    let eval = |n_items: usize| -> (f64, f64, f64, bool) {
+        let cpr = match ro.t90f {
+            Some(tf) => {
+                let c = mitm_total(n_items, m, tf);
+                (c.table + tf * c.probe) / th90
+            }
             None => f64::NAN,
-        }
+        };
+        let cl = mitm_total(n_items, m, t_lb);
+        let cpr_lb = (cl.table + t_lb * cl.probe) / th90;
+        let tot = match ro.t90 {
+            Some(t90) => {
+                let c = mitm_total(n_items, m, t90 as f64);
+                c.table + t90 as f64 * c.probe
+            }
+            None => f64::NAN,
+        };
+        (cpr, cpr_lb, tot, mitm_total(n_items, m, ro.t90f.unwrap_or(t_lb)).flipped)
     };
-    let cpr_blind = cpr(cb.table, cb.probe);
-    let cpr_best = if cq_probe.is_nan() { cpr_blind } else { cpr(cq_table, cq_probe) };
+    let (cpr_blind, cpr_lb_blind, tot_blind, or_blind) = eval(nit);
+    let (cpr_best, cpr_lb_best, tot_best, or_best) = eval(nq);
+    let sat = mg_o.mean / th90;
     let ms = t0.elapsed().as_secs_f64() * 1e3;
     Ok(vec![
         kv("nx", base.nx),
         kv("nitems", nit),
+        kv("nsc", nq),
         kv("ncls", base.ncls),
         kv("closure", base.closure),
         kv("total_subsets", t.total),
@@ -218,25 +237,80 @@ pub fn measure(g: &Group, f: &Fq, built: &Built, l: u32, m: usize, order_seed: u
         kv("quot_ok", quot_ok),
         kv("ntargets_g", mg_d.n),
         kv("active", ro.active),
+        kv("sat", sat),
         kv("rank_final", ro.rank_final),
         kv("targets_used", ro.targets_used),
+        kv("rows_total", ro.rows_total),
         kv("t50", nan_opt(ro.t50)),
         kv("t90", nan_opt(ro.t90)),
+        kv("t90f", ro.t90f.map(|v| v.to_string()).unwrap_or_else(|| "NA".into())),
         kv("t100", nan_opt(ro.t100)),
         kv("rows90", nan_opt(ro.rows90)),
         kv("stalled", ro.stalled as u8),
         kv("rank_field", pfield),
-        kv("blind_table", cb.table),
-        kv("blind_probe", cb.probe),
-        kv("quot_table", cq_table),
-        kv("quot_probe", cq_probe),
         kv("cpr_blind", cpr_blind),
         kv("cpr_best", cpr_best),
+        kv("cpr_lb_blind", cpr_lb_blind),
+        kv("cpr_lb_best", cpr_lb_best),
+        kv("tot_blind", tot_blind),
+        kv("tot_best", tot_best),
+        kv("orient_blind", or_blind as u8),
+        kv("orient_best", or_best as u8),
         kv("deg", deg),
         kv("param_deg", pdeg),
         kv("anf_terms", terms),
         kv("enum_ms", format!("{ms:.1}")),
     ])
+}
+
+pub fn items_of(g: &Group, raw: &[u32]) -> usize {
+    build_base(g, &core_set(raw)).items.len()
+}
+
+/// One replicate's matched bases: every arm has exactly `n_items` items (the g4rand base's count).
+pub struct Matched {
+    pub n_items: usize,
+    pub g_attempt: u64,
+    /// (arm, base, seed, tries used)
+    pub arms: Vec<(&'static str, Built, u64, u64)>,
+}
+
+fn seed_of(seed: u64, c: &Cell, arm: &str, rep: u64, gatt: u64, att: u64) -> u64 {
+    derive_seed(seed, &[c.a as u64, c.n as u64, c.m as u64, c.l as u64, arm_id(arm), rep, gatt, att])
+}
+
+/// Draw the g4rand base of the replicate, then rejection-sample every other matched arm until its item
+/// count equals the g4rand base's. A g4rand draw is redrawn (the whole replicate with it) if N < 2m,
+/// C(N, m) > ENUM_CAP or any arm cannot be matched in MATCH_TRIES draws; the rule is the same for all
+/// arms, so it truncates the common N distribution and cannot favour one arm.
+pub fn draw_matched(f: &Fq, g: &Group, c: &Cell, seed: u64, rep: u64) -> Result<Matched, String> {
+    'g: for gatt in 0..G_ATTEMPTS {
+        let gs = seed_of(seed, c, "g4rand", rep, gatt, 0);
+        let gb = make_arm("g4rand", f, c.l, gs, 0);
+        let gcore = core_set(&gb.raw).len();
+        let n = items_of(g, &gb.raw);
+        if n < 2 * c.m || binom(n, c.m) > ENUM_CAP {
+            continue;
+        }
+        let mut arms: Vec<(&'static str, Built, u64, u64)> = vec![("g4rand", gb, gs, 0)];
+        for arm in ["vrand", "rset", "riota", "wrong"] {
+            let mut found = None;
+            for att in 0..MATCH_TRIES {
+                let s = seed_of(seed, c, arm, rep, gatt, att);
+                let b = make_arm(arm, f, c.l, s, gcore);
+                if items_of(g, &b.raw) == n {
+                    found = Some((b, s, att));
+                    break;
+                }
+            }
+            match found {
+                Some((b, s, att)) => arms.push((arm, b, s, att)),
+                None => continue 'g,
+            }
+        }
+        return Ok(Matched { n_items: n, g_attempt: gatt, arms });
+    }
+    Err(format!("replicate {rep}: no matched draw in {G_ATTEMPTS} attempts"))
 }
 
 pub struct RunOpts {
@@ -245,7 +319,8 @@ pub struct RunOpts {
     pub out: String,
 }
 
-/// Run one cell: all arms, interleaved by replicate, 2 halves (main, aa) per replicate arm.
+/// Run one cell: matched arms, interleaved by replicate, 2 halves (main, aa). On any error the rows
+/// flushed so far stay on disk and `analyze` classifies the cell INCOMPLETE (never silently complete).
 pub fn run_cell(c: &Cell, o: &RunOpts) -> Result<String, String> {
     let f = Fq::new(c.n);
     let g = build_group(&f, c.a)?;
@@ -253,28 +328,40 @@ pub fn run_cell(c: &Cell, o: &RunOpts) -> Result<String, String> {
     let path = format!("{}/rows_a{}_n{}_m{}_l{}.tsv", o.out, c.a, c.n, c.m, c.l);
     let mut w = std::io::BufWriter::new(std::fs::File::create(&path).map_err(|e| e.to_string())?);
     let mut header_done = false;
-    let cellkey = [c.a as u64, c.n as u64, c.m as u64, c.l as u64];
     for rep in 0..2 * reps {
         let (half, ridx) = if rep < reps { ("main", rep) } else { ("aa", rep - reps) };
-        // paired size for the random controls: the g4rand base of this replicate
-        let sd = |arm: &str| derive_seed(o.seed, &[cellkey[0], cellkey[1], cellkey[2], cellkey[3], arm_id(arm), rep as u64]);
-        let g4_core = core_set(&make_raw("g4rand", &f, c.l, sd("g4rand"), 0)).len();
+        let mt = draw_matched(&f, &g, c, o.seed, rep as u64).map_err(|e| format!("cell a{} n{} m{} l{}: {e}", c.a, c.n, c.m, c.l))?;
         let mut order: Vec<&str> = ARMS.to_vec();
-        let mut rng = Rng(derive_seed(o.seed, &[999, rep as u64, cellkey[1], cellkey[2]]));
+        let mut rng = Rng(derive_seed(o.seed, &[999, rep as u64, c.n as u64, c.m as u64, c.l as u64, c.a as u64]));
         for i in (1..order.len()).rev() {
             order.swap(i, rng.below(i as u64 + 1) as usize);
         }
-        for arm in order {
-            if SINGLE_ARMS.contains(&arm) && !(half == "main" && ridx == 0) {
-                continue;
+        let gcore = {
+            let gb = &mt.arms[0].1;
+            core_set(&gb.raw).len()
+        };
+        let mut single: Vec<(&'static str, Built, u64, u64)> = vec![];
+        if half == "main" && ridx == 0 {
+            for arm in SINGLE_ARMS {
+                let s = seed_of(o.seed, c, arm, rep as u64, 0, 0);
+                let b = make_arm(arm, &f, c.l, s, gcore);
+                // unmatched reference instances: skipped (not an error) if over the enumeration cap
+                if binom(items_of(&g, &b.raw), c.m) <= ENUM_CAP {
+                    single.push((arm, b, s, 0));
+                } else {
+                    eprintln!("SINGLE_SKIPPED {arm}: over enumeration cap");
+                }
             }
-            let built = make_arm(arm, &f, c.l, sd(arm), g4_core);
+        }
+        for arm in order {
+            let entry = mt.arms.iter().chain(single.iter()).find(|e| e.0 == arm);
+            let (arm, built, seed, tries) = match entry {
+                Some(e) => (e.0, &e.1, e.2, e.3),
+                None => continue,
+            };
             let raw = &built.raw;
             let stable = is_iota_stable(&f, &core_set(raw));
-            let cols = match measure(&g, &f, &built, c.l, c.m, sd(arm) ^ 0x5151) {
-                Ok(v) => v,
-                Err(e) => return Err(format!("cell a{} n{} m{} l{} arm {arm}: {e}", c.a, c.n, c.m, c.l)),
-            };
+            let cols = measure(&g, &f, built, c.l, c.m, seed ^ 0x5151).map_err(|e| format!("cell a{} n{} m{} l{} arm {arm}: {e}", c.a, c.n, c.m, c.l))?;
             let mut row = vec![
                 kv("a", c.a),
                 kv("n", c.n),
@@ -283,7 +370,10 @@ pub fn run_cell(c: &Cell, o: &RunOpts) -> Result<String, String> {
                 kv("arm", arm),
                 kv("half", half),
                 kv("rep", ridx),
-                kv("seed", sd(arm)),
+                kv("seed", seed),
+                kv("n_target", if MATCHED_ARMS.contains(&arm) { mt.n_items.to_string() } else { "NA".into() }),
+                kv("g_attempt", mt.g_attempt),
+                kv("tries", tries),
                 kv("ne", g.ne),
                 kv("h", g.h),
                 kv("stable_set", stable as u8),

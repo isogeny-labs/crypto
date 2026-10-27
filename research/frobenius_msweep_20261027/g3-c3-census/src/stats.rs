@@ -15,6 +15,7 @@ pub struct Row {
     pub curve_a: u32,
     pub round: u32,
     pub tidx: usize,
+    pub xr: u64,
     pub kind: String,
     pub truth: String,
     pub arm: String,
@@ -27,6 +28,7 @@ pub struct Row {
     pub search_ops: f64,
     pub encode_ops: f64,
     pub wall_ns: f64,
+    pub rss_kb: f64,
 }
 
 pub fn parse_rows(text: &str) -> Vec<Row> {
@@ -36,7 +38,7 @@ pub fn parse_rows(text: &str) -> Vec<Row> {
         None => return vec![],
     };
     let ix = |name: &str| head.iter().position(|h| *h == name).unwrap_or_else(|| panic!("column {name}"));
-    let (c_cell, c_n, c_m, c_l, c_a, c_r, c_t, c_k, c_truth, c_arm, c_slot, c_res, c_vok, c_cok, c_conf, c_tot, c_so, c_eo, c_wall) = (
+    let (c_cell, c_n, c_m, c_l, c_a, c_r, c_t, c_xr, c_k, c_truth, c_arm, c_slot, c_res, c_vok, c_cok, c_conf, c_tot, c_so, c_eo, c_wall, c_rss) = (
         ix("cell"),
         ix("n"),
         ix("m"),
@@ -44,6 +46,7 @@ pub fn parse_rows(text: &str) -> Vec<Row> {
         ix("curve_a"),
         ix("round"),
         ix("tidx"),
+        ix("xr"),
         ix("kind"),
         ix("truth"),
         ix("arm"),
@@ -56,6 +59,7 @@ pub fn parse_rows(text: &str) -> Vec<Row> {
         ix("search_ops"),
         ix("encode_ops"),
         ix("wall_ns"),
+        ix("rss_kb"),
     );
     lines
         .filter(|l| !l.is_empty())
@@ -69,6 +73,7 @@ pub fn parse_rows(text: &str) -> Vec<Row> {
                 curve_a: f[c_a].parse().unwrap(),
                 round: f[c_r].parse().unwrap(),
                 tidx: f[c_t].parse().unwrap(),
+                xr: f[c_xr].parse().unwrap(),
                 kind: f[c_k].to_string(),
                 truth: f[c_truth].to_string(),
                 arm: f[c_arm].to_string(),
@@ -81,6 +86,7 @@ pub fn parse_rows(text: &str) -> Vec<Row> {
                 search_ops: f[c_so].parse().unwrap(),
                 encode_ops: f[c_eo].parse().unwrap(),
                 wall_ns: f[c_wall].parse().unwrap(),
+                rss_kb: f[c_rss].parse().unwrap(),
             }
         })
         .collect()
@@ -139,7 +145,9 @@ pub struct Cmp {
     pub sd_log: f64,
 }
 
-type Key = (String, u32, u32, usize); // cell, curve_a, round, tidx
+// A target is identified by (cell, curve, round, tidx, xr): chunked runs (--seed-offset) restart
+// tidx at 0 with different targets, replicate-slot files (--tag) repeat the same targets (same xr).
+type Key = (String, u32, u32, usize, u64);
 
 fn metric_value(r: &Row, metric: &str) -> f64 {
     match metric {
@@ -158,7 +166,7 @@ fn metric_value(r: &Row, metric: &str) -> f64 {
 pub fn compare_pairs(rows: &[Row], num: &str, den: &str, pairs: &[(u32, u32)], metric: &'static str, tag: &'static str, seed: u64) -> Cmp {
     let mut by: BTreeMap<(Key, String, u32), f64> = BTreeMap::new();
     for r in rows.iter().filter(|r| r.kind == "unsat" && r.truth == "UNSAT" && r.result == "UNSAT") {
-        by.insert(((r.cell.clone(), r.curve_a, r.round, r.tidx), r.arm.clone(), r.slot), metric_value(r, metric));
+        by.insert(((r.cell.clone(), r.curve_a, r.round, r.tidx, r.xr), r.arm.clone(), r.slot), metric_value(r, metric));
     }
     let mut clusters: BTreeMap<Key, Vec<f64>> = BTreeMap::new();
     for ((k, arm, slot), x) in &by {
@@ -227,7 +235,8 @@ pub fn mde(sd_log: f64, n: usize) -> f64 {
 pub enum Label {
     Relabel,
     Structure(String),
-    Tripwire,
+    /// m = 3 B-only cell: an interval statement, no structure claim.
+    Bounded(String),
     Artifact(String),
     Impediment(String),
     Inconclusive(String),
@@ -238,7 +247,7 @@ impl Label {
         match self {
             Label::Relabel => "O-RELABEL".into(),
             Label::Structure(s) => format!("O-STRUCTURE[{s}]"),
-            Label::Tripwire => "O-TRIPWIRE".into(),
+            Label::Bounded(s) => format!("O-BOUNDED[{s}]"),
             Label::Artifact(s) => format!("O-ARTIFACT[{s}]"),
             Label::Impediment(s) => format!("O-IMPEDIMENT[{s}]"),
             Label::Inconclusive(s) => format!("O-INCONCLUSIVE[{s}]"),
@@ -247,6 +256,11 @@ impl Label {
 }
 
 pub const BAND: f64 = 0.95;
+/// Minimum paired UNSAT targets: full (A and B) cells, and B-only m = 3 cells (PROTOCOL 7, 8).
+pub const MIN_N_FULL: usize = 10;
+pub const MIN_N_BONLY: usize = 6;
+/// Censoring tolerance per arm-slot: dropping censored pairs removes the hardest targets and biases the ratio.
+pub const CENSOR_TOL: f64 = 0.01;
 
 fn has(rows: &[Row], arm: &str, slot: u32) -> bool {
     rows.iter().any(|r| r.arm == arm && r.slot == slot && r.kind == "unsat")
@@ -266,7 +280,7 @@ fn slots_for(rows: &[Row], arms: &[&str], first: u32) -> Vec<(u32, u32)> {
 
 /// Frozen decision rule for one cell (PROTOCOL.md section 7).
 pub fn decide(rows: &[Row], seed: u64) -> (Label, Vec<Cmp>) {
-    let sound = ["C", "Cpoly", "Cnobreak", "A", "B", "Bnogauge", "G"];
+    let sound = ["C", "Cpoly", "Cnobreak", "A", "B", "Bnogauge", "G", "Chalf"]; // Chalf only runs on UNSAT targets
     // 1. artifact: any sound arm disagrees with the exact oracle, or a SAT certificate fails
     let bad_verdict = rows.iter().filter(|r| sound.contains(&r.arm.as_str()) && r.result != "UNKNOWN" && !r.verdict_ok).count();
     let bad_cert = rows.iter().filter(|r| sound.contains(&r.arm.as_str()) && r.result == "SAT" && r.cert_ok == "0").count();
@@ -290,17 +304,20 @@ pub fn decide(rows: &[Row], seed: u64) -> (Label, Vec<Cmp>) {
         }
     }
     cmps.push(compare_pairs(rows, "C", "C", &[(2, 1)], "conflicts", "aa", seed)); // A/A noise floor
-    cmps.push(compare_pairs(rows, "C", "Cnobreak", &[(1, 1)], "conflicts", "control", seed)); // P1, expect ~1/m!
-    cmps.push(compare_pairs(rows, "B", "Bnogauge", &[(1, 1)], "conflicts", "control", seed)); // P2, expect ~1/n
+    // P1/P2: model-based expectations, informative only (PROTOCOL 4). P3 is the blindness control.
+    cmps.push(compare_pairs(rows, "C", "Cnobreak", &[(1, 1)], "conflicts", "control", seed)); // P1, expect in [0.5, 1.0] (m=2)
+    cmps.push(compare_pairs(rows, "B", "Bnogauge", &[(1, 1)], "conflicts", "control", seed)); // P2, expect <= 1 (about 1/n if the solver uses the gauge)
+    cmps.push(compare_pairs(rows, "Chalf", "C", &[(1, 1)], "conflicts", "control", seed)); // P3, derivable: about 0.5
     let find = |tag: &str, arm: &str, metric: &str| cmps.iter().find(|c| c.tag == tag && c.num_arm == arm && c.den_arm == "C" && c.metric == metric).cloned();
     if bad_verdict + bad_cert > 0 {
         return (Label::Artifact(format!("{bad_verdict} verdict mismatches, {bad_cert} certificate failures")), cmps);
     }
-    for (num, den, name) in [("C", "Cnobreak", "P1 (S_m break)"), ("B", "Bnogauge", "P2 (gauge)")] {
-        if let Some(p) = cmps.iter().find(|c| c.tag == "control" && c.num_arm == num && c.den_arm == den) {
-            if p.n_targets >= 10 && !(p.hi < BAND) {
-                return (Label::Artifact(format!("positive control {name} not detected (hi {:.3}): the detector is blind in this cell", p.hi)), cmps);
-            }
+    // P3 (half the slot-1 branches pinned away) is the only voiding control: a detector that cannot
+    // see a 2x search-space reduction cannot support any 0.95 statement. P1/P2 misses are reported
+    // as "control uninformative" (control_notes), never as a void.
+    if let Some(p) = cmps.iter().find(|c| c.tag == "control" && c.num_arm == "Chalf" && c.den_arm == "C") {
+        if p.n_targets >= MIN_N_BONLY && !(p.hi < BAND) {
+            return (Label::Artifact(format!("positive control P3 (Chalf/C) not detected (hi {:.3}): the detector is blind in this cell", p.hi)), cmps);
         }
     }
     let mut by_arm: BTreeMap<(String, u32), (usize, usize)> = BTreeMap::new();
@@ -311,13 +328,26 @@ pub fn decide(rows: &[Row], seed: u64) -> (Label, Vec<Cmp>) {
             e.0 += 1;
         }
     }
-    if let Some(((arm, slot), (c, t))) = by_arm.iter().find(|(_, (c, t))| *t > 0 && *c as f64 / *t as f64 > 0.10) {
+    if let Some(((arm, slot), (c, t))) = by_arm.iter().find(|(_, (c, t))| *t > 0 && *c as f64 / *t as f64 > CENSOR_TOL) {
         return (Label::Impediment(format!("{arm}@{slot}: {c}/{t} censored")), cmps);
+    }
+    // m = 3 spec cells run B and C only (PROTOCOL 7 rule 2b): an interval statement for B, nothing more.
+    if find("primary", "A", "conflicts").is_none() {
+        let Some(b) = find("primary", "B", "conflicts") else {
+            return (Label::Impediment("B or C arm missing".into()), cmps);
+        };
+        if b.n_targets < MIN_N_BONLY {
+            return (Label::Impediment(format!("too few paired UNSAT targets for a B-only cell: {} < {MIN_N_BONLY}", b.n_targets)), cmps);
+        }
+        return (
+            Label::Bounded(format!("B/C median {:.3}, 95% CI [{:.3}, {:.3}] over {} targets; excludes B/C below {:.3}; no structure claim without A, G and replicate arms", b.median_ratio, b.lo, b.hi, b.n_targets, b.lo)),
+            cmps,
+        );
     }
     let (Some(a), Some(b)) = (find("primary", "A", "conflicts"), find("primary", "B", "conflicts")) else {
         return (Label::Impediment("A or B or C arm missing".into()), cmps);
     };
-    if a.n_targets < 10 || b.n_targets < 10 {
+    if a.n_targets < MIN_N_FULL || b.n_targets < MIN_N_FULL {
         return (Label::Impediment(format!("too few paired UNSAT targets: A {} B {}", a.n_targets, b.n_targets)), cmps);
     }
     let g = find("control", "G", "conflicts");
@@ -350,6 +380,22 @@ pub fn decide(rows: &[Row], seed: u64) -> (Label, Vec<Cmp>) {
         return (Label::Relabel, cmps);
     }
     (Label::Inconclusive(format!("A lo {:.3} B lo {:.3}: interval straddles {BAND}", a.lo, b.lo)), cmps)
+}
+
+/// Informative controls P1 and P2 (not voiding). One line per control, with whether the
+/// pre-registered model expectation (PROTOCOL 4) was met.
+pub fn control_notes(cmps: &[Cmp]) -> Vec<String> {
+    let mut v = vec![];
+    for (num, den, name, exp) in [("C", "Cnobreak", "P1 S_m break", "expected in [0.5, 1.0]"), ("B", "Bnogauge", "P2 gauge", "expected <= 1")] {
+        if let Some(p) = cmps.iter().find(|c| c.tag == "control" && c.num_arm == num && c.den_arm == den && c.n_targets > 0) {
+            let seen = p.hi < BAND;
+            v.push(format!("{name}: {num}/{den} median {:.3} CI [{:.3}, {:.3}] ({exp}); effect {}", p.median_ratio, p.lo, p.hi, if seen { "detected" } else { "not detected: control uninformative (not a void)" }));
+        }
+    }
+    if let Some(p) = cmps.iter().find(|c| c.tag == "control" && c.num_arm == "Chalf" && c.n_targets > 0) {
+        v.push(format!("P3 Chalf/C median {:.3} CI [{:.3}, {:.3}] (derivable, expected about 0.5; a miss voids)", p.median_ratio, p.lo, p.hi));
+    }
+    v
 }
 
 /// Section 5a: an arm is ranked against C only if the median ratio is on the
@@ -402,16 +448,38 @@ pub fn cmd_gate(args: &[String]) -> i32 {
             rows.extend(parse_rows(&std::fs::read_to_string(&f).unwrap()));
         }
     }
-    let mut g: BTreeMap<(String, String), (usize, f64, f64)> = BTreeMap::new();
-    for r in rows.iter().filter(|r| r.result == "UNSAT" && r.conflicts > 0.0) {
-        let e = g.entry((r.cell.clone(), r.arm.clone())).or_insert((0, 0.0, 0.0));
-        e.0 += 1;
-        e.1 += r.conflicts;
-        e.2 += r.wall_ns;
+    // per (cell, arm): solved rows, censored rows, mean conflicts and ns per conflict over solved rows,
+    // the largest VmHWM seen, the largest conflict count, and the smallest conflict count among censored
+    // rows (a value below the cap means a DEADLINE censor, which is load dependent).
+    #[derive(Default)]
+    struct G {
+        n: usize,
+        unk: usize,
+        conf: f64,
+        ns: f64,
+        rss: f64,
+        maxc: f64,
+        unk_min: f64,
     }
-    println!("cell\tarm\tn_rows\tmean_conflicts\tns_per_conflict");
-    for ((c, a), (n, conf, ns)) in g {
-        println!("{c}\t{a}\t{n}\t{:.1}\t{:.0}", conf / n as f64, ns / conf);
+    let mut g: BTreeMap<(String, String), G> = BTreeMap::new();
+    for r in rows.iter() {
+        let e = g.entry((r.cell.clone(), r.arm.clone())).or_default();
+        e.rss = e.rss.max(r.rss_kb);
+        e.maxc = e.maxc.max(r.conflicts);
+        if r.result == "UNKNOWN" {
+            e.unk += 1;
+            e.unk_min = if e.unk == 1 { r.conflicts } else { e.unk_min.min(r.conflicts) };
+        } else if r.result == "UNSAT" && r.conflicts > 0.0 {
+            e.n += 1;
+            e.conf += r.conflicts;
+            e.ns += r.wall_ns;
+        }
+    }
+    println!("cell\tarm\tn_unsat_rows\tn_censored\tmean_conflicts\tns_per_conflict\tmax_rss_mb\tmax_conflicts\tmin_conflicts_of_censored");
+    for ((c, a), e) in g {
+        let mean = if e.n > 0 { e.conf / e.n as f64 } else { f64::NAN };
+        let nspc = if e.conf > 0.0 { e.ns / e.conf } else { f64::NAN };
+        println!("{c}\t{a}\t{}\t{}\t{:.1}\t{:.0}\t{:.0}\t{:.0}\t{}", e.n, e.unk, mean, nspc, e.rss / 1024.0, e.maxc, if e.unk > 0 { format!("{:.0}", e.unk_min) } else { "-".into() });
     }
     0
 }
@@ -444,6 +512,7 @@ pub fn cmd_summarize(args: &[String]) -> i32 {
     let mut json = String::from("{\n \"cells\": [\n");
     let mut svg_rows: Vec<(String, f64, f64, f64)> = vec![];
     let mut first = true;
+    let mut tw_cells = (0usize, 0usize); // (cells with planted U rows, of which with >= 1 flip)
     let mut excess_tbl: Vec<(String, u32, usize, u32, f64, f64, f64)> = vec![];
     for (cell, rs) in &cells {
         if cell.contains("_b") {
@@ -461,7 +530,17 @@ pub fn cmd_summarize(args: &[String]) -> i32 {
         }
         let (label, cmps) = decide(rs, 20261027);
         let (flips, planted_u) = tripwire_flips(rs);
-        md.push_str(&format!("## cell {cell}\n\nlabel: **{}**; tripwire: arm U flipped {flips}/{planted_u} planted SAT targets to UNSAT\n\npricing band (AGENTS.md 5a): {}; {}\n\n", label.text(), band_rank(&cmps, "A"), band_rank(&cmps, "B")));
+        if planted_u > 0 {
+            tw_cells.0 += 1;
+            if flips >= 1 {
+                tw_cells.1 += 1;
+            }
+        }
+        md.push_str(&format!("## cell {cell}\n\nlabel: **{}**; tripwire: arm U flipped {flips}/{planted_u} planted SAT targets to UNSAT ({})\n\npricing band (AGENTS.md 5a): {}; {}\n\n", label.text(), if planted_u == 0 { "not run in this cell" } else if flips >= 1 { "at least one planted flip" } else { "NO planted flip: tripwire blind in this cell" }, band_rank(&cmps, "A"), band_rank(&cmps, "B")));
+        for note in control_notes(&cmps) {
+            md.push_str(&format!("- control {note}\n"));
+        }
+        md.push('\n');
         md.push_str("| role | numerator | denominator | metric | targets | pairs | median ratio | 95% CI (cluster bootstrap) | geo-mean | frac<0.95 | sd(log) | MDE |\n|---|---|---|---|---|---|---|---|---|---|---|---|\n");
         if !first {
             json.push_str(",\n");
@@ -469,7 +548,7 @@ pub fn cmd_summarize(args: &[String]) -> i32 {
         first = false;
         json.push_str(&format!("  {{\"cell\": \"{cell}\", \"label\": \"{}\", \"tripwire_flips\": {flips}, \"planted_u\": {planted_u}, \"comparisons\": [\n", label.text()));
         for (i, c) in cmps.iter().enumerate() {
-            md.push_str(&format!("| {} | {} | {} | {} | {} | {} | {} | [{}, {}] | {} | {} | {} | {} |\n", c.tag, c.num, c.den, c.metric, c.n_targets, c.n_pairs, fmt(c.median_ratio), fmt(c.lo), fmt(c.hi), fmt(c.gm_ratio), fmt(c.frac_below_095), fmt(c.sd_log), fmt(mde(c.sd_log, c.n_pairs))));
+            md.push_str(&format!("| {} | {} | {} | {} | {} | {} | {} | [{}, {}] | {} | {} | {} | {} |\n", c.tag, c.num, c.den, c.metric, c.n_targets, c.n_pairs, fmt(c.median_ratio), fmt(c.lo), fmt(c.hi), fmt(c.gm_ratio), fmt(c.frac_below_095), fmt(c.sd_log), fmt(mde(c.sd_log, c.n_targets))));
             json.push_str(&format!("   {{\"tag\":\"{}\",\"num\":\"{}\",\"den\":\"{}\",\"metric\":\"{}\",\"targets\":{},\"pairs\":{},\"median\":{},\"lo\":{},\"hi\":{},\"gm\":{},\"sd_log\":{}}}{}\n", c.tag, c.num, c.den, c.metric, c.n_targets, c.n_pairs, fmt(c.median_ratio), fmt(c.lo), fmt(c.hi), fmt(c.gm_ratio), fmt(c.sd_log), if i + 1 < cmps.len() { "," } else { "" }));
             if c.metric == "conflicts" && c.n_pairs > 0 {
                 svg_rows.push((format!("{cell} {}/{}", c.num, c.den), c.median_ratio, c.lo, c.hi));
@@ -485,6 +564,7 @@ pub fn cmd_summarize(args: &[String]) -> i32 {
         let r0 = &rs[0];
         excess_tbl.push((cell.clone(), r0.n, r0.m, r0.l, mean_of("C"), mean_of("A") - mean_of("C"), mean_of("B") - mean_of("C")));
     }
+    md.push_str(&format!("## O-TRIPWIRE headline (H1: literal per-instance orbit clauses are unsound)\n\n{} of {} cells with planted U rows show at least one planted SAT target flipped to UNSAT (the instrument sees the unsoundness); this is a statement about arm U only, not about A or B.\n\n", tw_cells.1, tw_cells.0));
     md.push_str("## overhead diagnostic (mean conflicts; excess = arm - C)\n\n| cell | n | m | l | mean C | excess A | excess B |\n|---|---|---|---|---|---|---|\n");
     for (c, n, m, l, mc, ea, eb) in &excess_tbl {
         md.push_str(&format!("| {c} | {n} | {m} | {l} | {} | {} | {} |\n", fmt(*mc), fmt(*ea), fmt(*eb)));
@@ -493,9 +573,9 @@ pub fn cmd_summarize(args: &[String]) -> i32 {
         for j in 0..excess_tbl.len() {
             let (a, b) = (&excess_tbl[i], &excess_tbl[j]);
             if a.1 == b.1 && a.2 == b.2 && b.3 == a.3 + 1 {
-                let (rc, re) = (b.4 / a.4, b.6 / a.6);
-                let verdict = if re.is_nan() || rc.is_nan() { "n/a" } else if re < rc.sqrt() { "additive-consistent (excess grows slower than sqrt of C)" } else { "multiplicative-consistent" };
-                md.push_str(&format!("\nn={} m={} l {}->{}: C grows x{:.2}, excess_B grows x{:.2}: {}\n", a.1, a.2, a.3, b.3, rc, re, verdict));
+                let (rc, re, rea) = (b.4 / a.4, b.6 / a.6, b.5 / a.5);
+                let vd = |r: f64| if r.is_nan() || rc.is_nan() { "n/a" } else if r < rc.sqrt() { "additive-consistent (excess grows slower than sqrt of C)" } else { "multiplicative-consistent" };
+                md.push_str(&format!("\nn={} m={} l {}->{}: C grows x{:.2}; excess_A grows x{:.2}: {}; excess_B grows x{:.2}: {}\n", a.1, a.2, a.3, b.3, rc, rea, vd(rea), re, vd(re)));
             }
         }
     }
@@ -535,7 +615,7 @@ mod tests {
     use super::*;
 
     fn row(cell: &str, tidx: usize, arm: &str, slot: u32, conflicts: f64, result: &str, truth: &str, kind: &str) -> Row {
-        Row { cell: cell.into(), n: 17, m: 2, l: 8, curve_a: 0, round: 1, tidx, kind: kind.into(), truth: truth.into(), arm: arm.into(), slot, result: result.into(), verdict_ok: result == truth || result == "UNKNOWN", cert_ok: "NA".into(), conflicts, total_ops: conflicts * 100.0, search_ops: conflicts * 100.0, encode_ops: 0.0, wall_ns: conflicts * 1000.0 }
+        Row { cell: cell.into(), n: 17, m: 2, l: 8, curve_a: 0, round: 1, tidx, xr: 1000 + tidx as u64, kind: kind.into(), truth: truth.into(), arm: arm.into(), slot, result: result.into(), verdict_ok: result == truth || result == "UNKNOWN", cert_ok: "NA".into(), conflicts, total_ops: conflicts * 100.0, search_ops: conflicts * 100.0, encode_ops: 0.0, wall_ns: conflicts * 1000.0, rss_kb: 1000.0 }
     }
 
     #[test]
@@ -558,7 +638,7 @@ mod tests {
         for t in 0..30 {
             let base = 1000.0 + (t % 7) as f64 * 13.0;
             let jitter = 1.0 + (((t * 7919) % 11) as f64 - 5.0) * 0.002;
-            for (arm, slot, f) in [("C", 1, 1.0), ("C", 2, jitter), ("C", 3, 1.0), ("A", 1, a_factor * jitter), ("A", 3, a_factor), ("B", 1, 1.2), ("B", 3, 1.2), ("G", 1, g_factor), ("Cpoly", 1, 1.01), ("Cnobreak", 1, 2.0), ("Bnogauge", 1, 1.2 * 17.0)] {
+            for (arm, slot, f) in [("C", 1, 1.0), ("C", 2, jitter), ("C", 3, 1.0), ("A", 1, a_factor * jitter), ("A", 3, a_factor), ("B", 1, 1.2), ("B", 3, 1.2), ("G", 1, g_factor), ("Cpoly", 1, 1.01), ("Cnobreak", 1, 2.0), ("Bnogauge", 1, 1.2 * 17.0), ("Chalf", 1, 0.5)] {
                 rows.push(row("17_8_2_0", t, arm, slot, base * f, "UNSAT", "UNSAT", "unsat"));
             }
         }
@@ -575,9 +655,11 @@ mod tests {
         // relabelling: A costs 3x, B 1.2x, G neutral
         let (l, cmps) = decide(&synth(3.0, 1.0, false), 1);
         assert_eq!(l, Label::Relabel, "{l:?}");
-        // positive control P1: C vs Cnobreak ratio is 0.5, detected (hi < 0.95)
+        // P1 informative: C vs Cnobreak ratio is 0.5; P3 derivable control: Chalf/C is 0.5, detected
         let p1 = cmps.iter().find(|c| c.num_arm == "C" && c.den_arm == "Cnobreak").unwrap();
         assert!(p1.hi < BAND && (p1.median_ratio - 0.5).abs() < 1e-9);
+        let p3 = cmps.iter().find(|c| c.num_arm == "Chalf" && c.den_arm == "C").unwrap();
+        assert!(p3.hi < BAND && (p3.median_ratio - 0.5).abs() < 1e-9);
         // A/A noise is small and straddles 1
         let aa = cmps.iter().find(|c| c.tag == "aa").unwrap();
         assert!(aa.lo <= 1.02 && aa.hi >= 0.98 && aa.sd_log < 0.03, "{aa:?}");
@@ -693,10 +775,73 @@ mod tests {
     fn blind_detector_voids_the_cell() {
         let mut rows = synth(3.0, 1.0, false);
         let base: std::collections::HashMap<usize, f64> = rows.iter().filter(|r| r.arm == "C" && r.slot == 1).map(|r| (r.tidx, r.conflicts)).collect();
-        for r in rows.iter_mut().filter(|r| r.arm == "Cnobreak") {
-            r.conflicts = base[&r.tidx]; // the S_m break "has no effect": the detector cannot see the known effect
+        for r in rows.iter_mut().filter(|r| r.arm == "Chalf") {
+            r.conflicts = base[&r.tidx]; // halving the slot-1 branches "has no effect": the detector is blind
         }
         let (l, _) = decide(&rows, 1);
-        assert!(matches!(l, Label::Artifact(ref s) if s.contains("P1")), "{l:?}");
+        assert!(matches!(l, Label::Artifact(ref s) if s.contains("P3")), "{l:?}");
+    }
+
+    #[test]
+    fn p1_miss_is_uninformative_not_a_void() {
+        let mut rows = synth(3.0, 1.0, false);
+        let base: std::collections::HashMap<usize, f64> = rows.iter().filter(|r| r.arm == "C" && r.slot == 1).map(|r| (r.tidx, r.conflicts)).collect();
+        for r in rows.iter_mut().filter(|r| r.arm == "Cnobreak" || r.arm == "Bnogauge") {
+            r.conflicts = base[&r.tidx]; // the S_m break and the gauge do nothing
+        }
+        let (l, cmps) = decide(&rows, 1);
+        assert_eq!(l, Label::Relabel, "{l:?}");
+        let notes = control_notes(&cmps).join("\n");
+        assert!(notes.contains("P1") && notes.contains("uninformative"), "{notes}");
+    }
+
+    /// Review defect 2: chunked runs restart tidx at 0 with different targets (different xr).
+    #[test]
+    fn chunked_runs_with_restarting_tidx_are_not_collapsed() {
+        let mut rows = vec![];
+        for chunk in 0..4u64 {
+            for t in 0..3usize {
+                for (arm, f) in [("C", 1.0), ("B", 1.3)] {
+                    let mut r = row("31_3_10_0", t, arm, 1, 1000.0 * f * (1.0 + (chunk * 3 + t as u64) as f64 * 0.01), "UNSAT", "UNSAT", "unsat");
+                    r.xr = 7000 + chunk * 100 + t as u64;
+                    rows.push(r);
+                }
+            }
+        }
+        let c = compare_pairs(&rows, "B", "C", &[(1, 1)], "conflicts", "primary", 3);
+        assert_eq!(c.n_targets, 12);
+        // a replicate-slot file repeats the same targets (same xr) and must merge, not add targets
+        let mut rep = vec![];
+        for r in rows.iter().filter(|r| r.arm == "C") {
+            let mut q = r.clone();
+            q.slot = 3;
+            rep.push(q);
+        }
+        rows.extend(rep);
+        let c = compare_pairs(&rows, "C", "C", &[(3, 1)], "conflicts", "aa", 3);
+        assert_eq!(c.n_targets, 12);
+    }
+
+    /// Review defect 3: a B and C only m = 3 cell gets a label from the rule, with N from 6.
+    #[test]
+    fn b_only_cells_get_a_bounded_label_from_six_targets() {
+        let mk = |nt: usize| {
+            let mut rows = vec![];
+            for t in 0..nt {
+                for (arm, slot, f) in [("C", 1, 1.0), ("C", 2, 1.0 + 0.01 * t as f64), ("B", 1, 1.25)] {
+                    rows.push(row("31_3_10_0", t, arm, slot, 5000.0 * f * (1.0 + 0.02 * t as f64), "UNSAT", "UNSAT", "unsat"));
+                }
+            }
+            rows
+        };
+        let (l, _) = decide(&mk(6), 1);
+        assert!(matches!(l, Label::Bounded(ref s) if s.contains("excludes B/C below")), "{l:?}");
+        let (l, _) = decide(&mk(5), 1);
+        assert!(matches!(l, Label::Impediment(_)), "{l:?}");
+        // one censored target in 6 exceeds the 1 % tolerance
+        let mut rows = mk(8);
+        rows.iter_mut().find(|r| r.arm == "B" && r.tidx == 0).unwrap().result = "UNKNOWN".into();
+        let (l, _) = decide(&rows, 1);
+        assert!(matches!(l, Label::Impediment(ref s) if s.contains("censored")), "{l:?}");
     }
 }

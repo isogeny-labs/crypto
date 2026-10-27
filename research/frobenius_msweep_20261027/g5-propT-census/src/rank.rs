@@ -262,6 +262,10 @@ pub struct RankOut {
     /// conjugate orbit rows that are NOT the lam^j multiple of the original row
     pub nonproportional: usize,
     pub orbits_touched: usize,
+    /// effective row cap used (at most a third of the orbits the base touches, so the rank can still grow)
+    pub row_cap_eff: usize,
+    /// rows wanted for the independent-target control ((n-1) times the number of original relations)
+    pub indep_need: usize,
 }
 
 fn dense(row: &Sparse, rhs: u32, colmap: &HashMap<u32, usize>, cols: usize) -> Vec<u32> {
@@ -279,6 +283,16 @@ pub fn rank_census(f: &Fq, g: &Group, ob: &Orbits, ds: &[u32], m: usize, t1: usi
     let r = g.r;
     let half = g.half() as usize;
     let n = g.n;
+    // The orbit-basis column count is at most the number of sigma-orbits the base touches. With more original rows
+    // than a third of that, rank_orbit(N) saturates by pigeonhole and the controls cannot grow, so the cap is lowered.
+    let touched = {
+        let mut set = std::collections::HashSet::new();
+        for &d in ds {
+            set.insert(ob.orbit[(d - 1) as usize]);
+        }
+        set.len()
+    };
+    let row_cap = row_cap.min((touched / 3).max(2));
     let mut lab = vec![0u8; half + 1];
     let mut forb = vec![false; half + 1];
     let mut picked = 0;
@@ -294,7 +308,7 @@ pub fn rank_census(f: &Fq, g: &Group, ob: &Orbits, ds: &[u32], m: usize, t1: usi
         }
     }
     let mut picked2 = 0;
-    let want2 = (t1 * n as usize).min(half / 4);
+    let want2 = (row_cap * n as usize).min(half / 4);
     while picked2 < want2 {
         let a = 1 + rng.below(half as u64) as usize;
         if lab[a] == 0 && !forb[a] {
@@ -302,7 +316,11 @@ pub fn rank_census(f: &Fq, g: &Group, ob: &Orbits, ds: &[u32], m: usize, t1: usi
             picked2 += 1;
         }
     }
-    let rels = find_relations(ds, r, m, &lab, 2);
+    let mut rels = find_relations(ds, r, m, &lab, 2);
+    // enumeration order is lexicographic in the base, which would concentrate the kept rows on the first orbits
+    for v in rels.iter_mut() {
+        rng.shuffle(v);
+    }
     // cap per target (round-robin by target) so that the kept relations cover many targets, not the first few
     let take = |all: &Vec<Rel>, per: usize, total: usize| -> Vec<Rel> {
         let mut cnt: HashMap<u32, usize> = HashMap::new();
@@ -318,8 +336,10 @@ pub fn rank_census(f: &Fq, g: &Group, ob: &Orbits, ds: &[u32], m: usize, t1: usi
     };
     let per1 = (row_cap + t1 - 1) / t1.max(1);
     let r1 = take(&rels[0], per1.max(1), row_cap);
-    let r2 = take(&rels[1], 1, row_cap * n as usize);
-    let mut out = RankOut { n_rel: r1.len(), n_rel_indep: r2.len(), ..Default::default() };
+    // the independent control is row-matched to the conjugate rows: (n-1) times as many rows as original relations
+    let indep_need = (n as usize - 1) * r1.len();
+    let r2 = take(&rels[1], per1.max(1), indep_need);
+    let mut out = RankOut { n_rel: r1.len(), n_rel_indep: r2.len(), row_cap_eff: row_cap, indep_need, ..Default::default() };
     if r1.is_empty() {
         return out;
     }
@@ -433,12 +453,6 @@ pub fn rank_census(f: &Fq, g: &Group, ob: &Orbits, ds: &[u32], m: usize, t1: usi
     out.rank_orbit_wrong = row_;
     out.rank_orbit_indep = roi;
     out.incons = i1 + i2 + i3 + i4 + i5;
-    out.orbits_touched = {
-        let mut s = std::collections::HashSet::new();
-        for &d in ds {
-            s.insert(ob.orbit[(d - 1) as usize]);
-        }
-        s.len()
-    };
+    out.orbits_touched = touched;
     out
 }

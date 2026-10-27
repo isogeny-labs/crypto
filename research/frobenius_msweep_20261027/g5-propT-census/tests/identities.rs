@@ -342,8 +342,12 @@ fn halving_form_holds_for_every_coincidence() {
             let set = random_class_set(&g, (m + 4).min(14), &mut rng);
             let out = census(&set.ds, g.r, m, &[&fr], 64, 0, None);
             for s in &out.samples {
-                let (pairs, ok) = halving_check(&set.ds, g.r, &s.idx, s.a, s.b);
+                let (pairs, ok) = halving_check(&set.ds, g.r, &s.idx, s.a, s.b, fr.mus[s.t]);
                 assert!(ok && pairs >= 1, "m={m} a={} b={}", s.a, s.b);
+                // not vacuous: with the wrong unit the check must fail (it ties the table entry to mu)
+                let wrong = if fr.mus[s.t] + 1 == g.r - 1 || fr.mus[s.t] + 1 == 1 { fr.mus[s.t] + 2 } else { fr.mus[s.t] + 1 };
+                let (_, bad) = halving_check(&set.ds, g.r, &s.idx, s.a, s.b, wrong);
+                assert!(!bad, "wrong multiplier must be rejected, m={m}");
                 total += 1;
             }
         }
@@ -517,4 +521,199 @@ fn orbit_strata_partition_the_counts() {
             assert_eq!(out.strat_nsub[2], 0, "only two orbits present");
         }
     }
+}
+
+
+/// Every sampled coincidence of the Frobenius set is a coincidence of that very multiplier (sample.t indexes it).
+#[test]
+fn samples_carry_their_lag() {
+    let (_f, g) = group11();
+    let mut rng = Rng::new(33);
+    let fr = Mult::frobenius(&g);
+    let set = random_class_set(&g, 10, &mut rng);
+    let out = census(&set.ds, g.r, 3, &[&fr], 32, 0, None);
+    assert!(!out.samples.is_empty());
+    for s in &out.samples {
+        assert_eq!(fr.tabs[s.t][s.a as usize], s.b);
+    }
+}
+
+/// Naive check of the valuation theorem (PROTOCOL 3.4): for every single-orbit tuple and every lag with
+/// m^2 2^s (2^(j/2)+1)^2 < r there is no Frobenius coincidence; computed here without the census code.
+fn naive_low_height_hits(f: &Fq, g: &Group, ob: &Orbits, ds: &[u32], m: usize) -> (u64, u64) {
+    let jn = (g.n - 1) / 2;
+    let mut pairs = 0u64;
+    let mut hits = 0u64;
+    let nx = ds.len();
+    let mut idx: Vec<usize> = (0..m).collect();
+    loop {
+        let orbs: Vec<u32> = idx.iter().map(|&i| ob.orbit[(ds[i] - 1) as usize]).collect();
+        if orbs.iter().all(|&o| o == orbs[0]) {
+            let mut ks: Vec<u32> = idx.iter().map(|&i| ob.k[(ds[i] - 1) as usize]).collect();
+            let sp = circular_spread(&mut ks, g.n);
+            // K(S) by brute force
+            let mut kset: Vec<u32> = vec![];
+            for mask in 0u32..(1 << m) {
+                let mut sum: u64 = 0;
+                for (t, &i) in idx.iter().enumerate() {
+                    let d = ds[i] as u64;
+                    sum += if (mask >> t) & 1 == 0 { d } else { g.r as u64 - d };
+                }
+                let v = (sum % g.r as u64) as u32;
+                let c = v.min(g.r - v);
+                if c != 0 && !kset.contains(&c) {
+                    kset.push(c);
+                }
+            }
+            for j in 1..=jn {
+                if low_height(m, sp, j, g.r) {
+                    pairs += 1;
+                    let mu = g.lam_pow(j);
+                    for &a in &kset {
+                        let v = g.mulmod(mu, a);
+                        let b = v.min(g.r - v);
+                        if kset.contains(&b) {
+                            hits += 1;
+                        }
+                    }
+                }
+            }
+        }
+        // next combination
+        let mut k = m;
+        loop {
+            if k == 0 {
+                let _ = f;
+                return (pairs, hits);
+            }
+            k -= 1;
+            if idx[k] < nx - (m - k) {
+                idx[k] += 1;
+                for t in k + 1..m {
+                    idx[t] = idx[t - 1] + 1;
+                }
+                break;
+            }
+            if k == 0 {
+                return (pairs, hits);
+            }
+        }
+    }
+}
+
+#[test]
+fn low_height_single_orbit_pairs_never_coincide() {
+    for &(a, n) in &[(1u32, 11u32), (0, 13), (0, 19)] {
+        let f = Fq::new(n);
+        let g = build_group(&f, a).unwrap();
+        let ob = build_orbits(&f, &g);
+        let fr = Mult::frobenius(&g);
+        let mut rng = Rng::new(1000 + n as u64);
+        let nl = Mult::random_null(g.r, fr.len(), &mut rng);
+        let mut total_pairs = 0u64;
+        for m in 2..=4usize {
+            // two whole orbits: plenty of single-orbit tuples with small and large spread
+            let set = orbit_union(&f, &g, 2, &mut rng);
+            let orbs: Vec<u32> = set.ds.iter().map(|&d| ob.orbit[(d - 1) as usize]).collect();
+            let ks: Vec<u32> = set.ds.iter().map(|&d| ob.k[(d - 1) as usize]).collect();
+            let oi = OrbInfo { orbit: &orbs, k: Some(&ks), n: g.n };
+            let out = census_ex(&set.ds, g.r, m, &[&fr, &nl], 0, 0, Some(&oi));
+            let (np, nh) = naive_low_height_hits(&f, &g, &ob, &set.ds, m);
+            assert_eq!(out.s1l_pairs, np, "pair count a={a} n={n} m={m}");
+            assert_eq!(nh, 0, "naive: theorem violated a={a} n={n} m={m}");
+            assert_eq!(out.s1l_u[0], 0, "census: Frobenius coincidence on a provably free pair a={a} n={n} m={m}");
+            total_pairs += out.s1l_pairs;
+        }
+        assert!(total_pairs > 100, "the check is not vacuous a={a} n={n}: {total_pairs}");
+    }
+}
+
+/// The null has no such obstruction: on the same low-height pairs random multipliers do hit (n = 19, m = 4 has
+/// enough weight), so the zero above is a property of Frobenius, not of the pair selection.
+#[test]
+fn null_hits_exist_on_low_height_pairs_when_weight_is_large() {
+    let f = Fq::new(13);
+    let g = build_group(&f, 0).unwrap();
+    let ob = build_orbits(&f, &g);
+    let fr = Mult::frobenius(&g);
+    let mut tot = 0u64;
+    let mut expected = 0.0;
+    for seed in 0..30u64 {
+        let mut rng = Rng::new(5000 + seed);
+        let nl = Mult::random_null(g.r, fr.len(), &mut rng);
+        let set = orbit_union(&f, &g, 2, &mut rng);
+        let orbs: Vec<u32> = set.ds.iter().map(|&d| ob.orbit[(d - 1) as usize]).collect();
+        let ks: Vec<u32> = set.ds.iter().map(|&d| ob.k[(d - 1) as usize]).collect();
+        let oi = OrbInfo { orbit: &orbs, k: Some(&ks), n: g.n };
+        let out = census_ex(&set.ds, g.r, 3, &[&fr, &nl], 0, 0, Some(&oi));
+        assert_eq!(out.s1l_u[0], 0);
+        tot += out.s1l_u[1];
+        expected += out.s1l_cc1 as f64 / ((g.r as f64 - 3.0) / 2.0);
+    }
+    assert!(expected > 5.0, "expected null hits {expected}");
+    assert!(tot > 0, "null hits {tot} vs expected {expected}");
+}
+
+#[test]
+fn planted_multipliers_guarantee_a_hit_per_lag() {
+    let (_f, g) = group11();
+    let mut rng = Rng::new(123);
+    let fr = Mult::frobenius(&g);
+    for m in 2..=5usize {
+        for _ in 0..5 {
+            let set = random_class_set(&g, 9, &mut rng);
+            let pl = Mult::planted(g.r, &set.ds, m, fr.len(), &mut rng).expect("planted");
+            let n2 = Mult::random_null(g.r, fr.len(), &mut rng);
+            let out = census_ex(&set.ds, g.r, m, &[&fr, &n2, &pl], 0, 0, None);
+            assert!(out.u[2].iter().all(|&h| h >= 1), "every lag has its guaranteed hit, m={m}");
+            let (_, naive) = naive_census(&set.ds, g.r, m, &pl.mus);
+            assert_eq!(out.u[2], naive);
+        }
+    }
+}
+
+#[test]
+fn sigma_closure_runs_its_full_path_on_orbit_unions() {
+    // orbit unions are sigma-closed, so every image of every solution is inside the base and the closure test
+    // really compares solution sets (the non-stable case exits early); closed pairs must still be zero here
+    let f = Fq::new(11);
+    let g = build_group(&f, 1).unwrap();
+    let mut rng = Rng::new(131);
+    let mut checked = 0;
+    for m in 2..=4usize {
+        let set = orbit_union(&f, &g, 2, &mut rng);
+        assert!(set.is_sigma_closed(&f));
+        let (targets, pairs, closed) = sigma_closure(&set, &f, g.r, m);
+        assert!(targets > 0 && pairs == targets * 10);
+        assert_eq!(closed, 0, "m={m}");
+        checked += pairs;
+    }
+    assert!(checked > 0);
+}
+
+#[test]
+fn rank_cap_keeps_the_controls_able_to_grow() {
+    let f = Fq::new(13);
+    let g = build_group(&f, 0).unwrap();
+    let ob = build_orbits(&f, &g);
+    let mut rng = Rng::new(141);
+    let (mut wrong_grew, mut indep_grew, mut matched) = (0, 0, 0);
+    for m in 3..=5usize {
+        for _ in 0..4 {
+            let v = span(&random_subspace(&f, 7, &mut rng));
+            let set = BaseSet::from_elems(&g, &v);
+            let ro = rank_census(&f, &g, &ob, &set.ds, m, 16, 40, &mut rng);
+            assert!(ro.row_cap_eff <= (ro.orbits_touched / 3).max(2), "cap {} touched {}", ro.row_cap_eff, ro.orbits_touched);
+            assert!(ro.n_rel <= ro.row_cap_eff);
+            assert_eq!(ro.nonproportional, 0);
+            assert_eq!(ro.rank_orbit_n, ro.rank_orbit_1);
+            if ro.rank_orbit_1 < ro.cols_orbit {
+                wrong_grew += (ro.rank_orbit_wrong > ro.rank_orbit_n) as usize;
+                indep_grew += (ro.rank_orbit_indep > ro.rank_orbit_1) as usize;
+            }
+            matched += (ro.n_rel_indep >= ro.indep_need) as usize;
+        }
+    }
+    assert!(wrong_grew >= 6 && indep_grew >= 6, "controls grew: wrong {wrong_grew} indep {indep_grew}");
+    assert!(matched >= 6, "independent control row-matched in {matched} of 12");
 }

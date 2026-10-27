@@ -20,14 +20,20 @@ fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     match args.first().map(|s| s.as_str()) {
         Some("cells") => {
-            for c in run::cell_list() {
-                println!("{} {} {} {} {}", c.a, c.n, c.m, c.l, c.reps);
+            let cl = run::cell_list();
+            for c in &cl {
+                println!("{} {} {} {} {} {:.4e}", c.a, c.n, c.m, c.l, c.reps, run::cell_ops(c, c.reps));
+            }
+            for &(a, n) in run::CURVES.iter() {
+                if !cl.iter().any(|c| c.a == a && c.n == n) {
+                    eprintln!("CELL_NOT_RUN a={a} n={n}: the group gate (curve_summary) refused this curve; no cells planned");
+                }
             }
         }
         Some("propt") => {
             let (n, m): (u32, usize) = (num(&args, "--n"), num(&args, "--m"));
-            let trials: usize = arg(&args, "--trials").map(|s| s.parse().unwrap()).unwrap_or(20000);
-            let k: usize = arg(&args, "--assigns").map(|s| s.parse().unwrap()).unwrap_or(4);
+            let trials: usize = num(&args, "--trials");
+            let k: usize = num(&args, "--assigns");
             match run::run_propt(n, m, trials, k, &opts(&args)) {
                 Ok(p) => eprintln!("wrote {p}"),
                 Err(e) => {
@@ -40,17 +46,33 @@ fn main() {
             let cell = run::Cell { a: num(&args, "--a"), n: num(&args, "--n"), m: num(&args, "--m"), l: num(&args, "--l"), reps: 0 };
             let o = opts(&args);
             let res = if args[0] == "overlap" {
-                run::run_overlap(&run::Cell { reps: arg(&args, "--reps").map(|s| s.parse().unwrap()).unwrap_or(40), ..cell }, &o)
+                run::run_overlap(&run::Cell { reps: num(&args, "--reps"), ..cell }, &o)
             } else {
-                let t1: usize = arg(&args, "--targets").map(|s| s.parse().unwrap()).unwrap_or(16);
-                let cap: usize = arg(&args, "--rowcap").map(|s| s.parse().unwrap()).unwrap_or(40);
-                run::run_rank(&cell, t1, cap, &o)
+                let t1: usize = num(&args, "--targets");
+                let cap: usize = num(&args, "--rowcap");
+                let o2 = run::RunOpts { reps: Some(num(&args, "--reps")), ..o };
+                run::run_rank(&cell, t1, cap, &o2)
             };
             match res {
                 Ok(p) => eprintln!("wrote {p}"),
                 Err(e) => {
                     eprintln!("CELL_NOT_RUN {e}");
                     std::process::exit(2);
+                }
+            }
+        }
+        Some("estimate") => {
+            // planning-unit operation count of one overlap invocation (used by the pre-flight projection)
+            let cell = run::Cell { a: num(&args, "--a"), n: num(&args, "--n"), m: num(&args, "--m"), l: num(&args, "--l"), reps: 0 };
+            println!("{:.4e}", run::cell_ops(&cell, num(&args, "--reps")));
+        }
+        Some("gate") => {
+            // fail-fast between phases of run_cells.sh: exit 0 only if every Proposition T cell holds and every control detects
+            match analyze::propt_gate(&arg(&args, "--dir").expect("missing --dir")) {
+                Ok(n) => eprintln!("propt gate passed ({n} cell-arms)"),
+                Err(e) => {
+                    eprintln!("PROPT GATE FAILED\n{e}");
+                    std::process::exit(1);
                 }
             }
         }
@@ -61,7 +83,7 @@ fn main() {
             }
         }
         _ => eprintln!(
-            "usage: g5census cells | propt --n N --m M [--trials T] [--assigns K] --out DIR | overlap --a A --n N --m M --l L [--reps R] --out DIR | rank --a A --n N --m M --l L [--reps R] [--targets T] [--rowcap C] --out DIR | analyze --dir DIR"
+            "usage: g5census cells | propt --n N --m M --trials T --assigns K --out DIR | overlap --a A --n N --m M --l L --reps R --out DIR | rank --a A --n N --m M --l L --reps R --targets T --rowcap C --out DIR | estimate --a A --n N --m M --l L --reps R | gate --dir DIR | analyze --dir DIR"
         ),
     }
 }
