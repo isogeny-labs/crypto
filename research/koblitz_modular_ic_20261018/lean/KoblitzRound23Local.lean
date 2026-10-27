@@ -101,6 +101,17 @@ theorem ss5_unit_is_unit [CharP A 2] (a n l : A)
   apply isUnit_iff_exists_inv.mpr
   exact ⟨ssInv a n l, by simpa only [mul_comm] using ss5_explicit_inverse a n l hq hL hC⟩
 
+-- The geometric bridge identifies the native k-dimensions with e*f.
+-- These implications do not assume that a nonnormal fiber is a DVR.
+theorem z5_ramification_from_lengths (unramified ramified : ℕ)
+    (hu : 2*unramified=2) (hr : 2*ramified=14) :
+    unramified=1 ∧ ramified=7 := by omega
+
+theorem z5_degree_accounting : 1*2+7*2=16 := by norm_num
+
+theorem z5_separator_values (sep norm : ℤ)
+    (hs : min 7 sep=4) (hn : min 7 norm=6) : sep=4 ∧ norm=6 := by omega
+
 end KoblitzRound23Local
 #print axioms KoblitzRound23Local.mem_of_unit_mul_mem
 #print axioms KoblitzRound23Local.mem_of_colon_unit
@@ -114,3 +125,6 @@ end KoblitzRound23Local
 #print axioms KoblitzRound23Local.ss5_unit_integer_lift
 #print axioms KoblitzRound23Local.ss5_explicit_inverse
 #print axioms KoblitzRound23Local.ss5_unit_is_unit
+#print axioms KoblitzRound23Local.z5_ramification_from_lengths
+#print axioms KoblitzRound23Local.z5_degree_accounting
+#print axioms KoblitzRound23Local.z5_separator_values

@@ -138,3 +138,10 @@ so the next checkpoint also captures raw results. Each call gates first.
 Corrected Z5 smooth enumeration replaces continue with guarded loop bodies
 and explicitly checks/transposes the Jacobian orientation. Same4GiB/1200s caps.
 No EKS job is active or submitted. Diem remains deadline-expired50/52.
+
+The corrected source Jacobian run finds unit minors for rows8,1,2 and columns
+lambda,b,c at both Z5 residues. Their reductions are
+(a4+a+1)*lambda+(a4+a3+a+1) and a4+a3+1,respectively.
+The written regular-curve bridge may now interpret the certified local lengths;
+the new Lean implications expose that bridge instead of pretending to formalize
+normalization. No new native search or resource change is introduced.
