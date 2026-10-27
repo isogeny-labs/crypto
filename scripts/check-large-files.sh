@@ -44,20 +44,49 @@ done < <(git diff --raw -z --no-abbrev --no-renames --diff-filter=AMT "$base" "$
 # reads the same object metadata through one Git process.
 declare -a sizes=()
 if [ "${#blobs[@]}" -gt 0 ]; then
-  mapfile -t sizes < <(printf '%s\n' "${blobs[@]}" | git cat-file --batch-check='%(objectsize)')
+  # Process substitution hides git cat-file's exit status. A partial clone can
+  # fail its promisor batch fetch while still printing a line for each object;
+  # treat that as a failed batch and retry exact blob IDs before accepting any
+  # size. The normal path remains one Git process for the whole change.
+  batch_file=$(mktemp)
+  trap 'rm -f "$batch_file"' EXIT
+  batch_failed=0
+  if ! printf '%s\n' "${blobs[@]}" |
+      git cat-file --batch-check='%(objectsize)' >"$batch_file" 2>/dev/null; then
+    batch_failed=1
+  fi
+  mapfile -t sizes <"$batch_file"
+  if [ "$batch_failed" -ne 0 ] || [ "${#sizes[@]}" -ne "${#blobs[@]}" ]; then
+    echo "check-large-files: batched fetch failed; checking and retrying missing blobs directly" >&2
+    sizes=()
+    for i in "${!blobs[@]}"; do
+      if size=$(git cat-file -s "${blobs[$i]}" 2>/dev/null); then
+        sizes+=("$size")
+      else
+        echo "check-large-files: cannot size ${paths[$i]}: ${blobs[$i]} missing" >&2
+        exit 2
+      fi
+    done
+  fi
 fi
-[ "${#sizes[@]}" -eq "${#blobs[@]}" ] || {
-  echo "check-large-files: incomplete git cat-file batch response" >&2
-  exit 2
-}
 
 over=0
 for i in "${!blobs[@]}"; do
   size=${sizes[$i]}
-  [[ $size =~ ^[0-9]+$ ]] || {
-    echo "check-large-files: invalid size for ${paths[$i]}: $size" >&2
-    exit 2
-  }
+  if ! [[ $size =~ ^[0-9]+$ ]]; then
+    if [ "$batch_failed" -eq 0 ]; then
+      echo "check-large-files: batched fetch failed; checking and retrying missing blobs directly" >&2
+      batch_failed=1
+    fi
+    if ! size=$(git cat-file -s "${blobs[$i]}" 2>/dev/null); then
+      echo "check-large-files: cannot size ${paths[$i]}: ${blobs[$i]} missing" >&2
+      exit 2
+    fi
+    [[ $size =~ ^[0-9]+$ ]] || {
+      echo "check-large-files: cannot size ${paths[$i]}: invalid response $size" >&2
+      exit 2
+    }
+  fi
   if [ "$size" -gt "$limit" ]; then
     printf '%12d bytes  %s\n' "$size" "${paths[$i]}"
     over=$((over + 1))
