@@ -41,7 +41,9 @@ struct Sys {
     p: u64,
     input: Vec<Poly>,
     planted: Option<Vec<u64>>,
-    opts: F4Options,
+    /// Built just before the system's F4 call, so that its budget (an
+    /// absolute deadline) starts then and not when the corpus is built.
+    opts: fn() -> F4Options,
 }
 
 #[derive(Serialize, Default, Clone)]
@@ -124,6 +126,14 @@ fn gb_opts() -> F4Options {
     F4Options::new(F4Ordering::Grevlex, 64).with_budget(std::time::Duration::from_secs(900))
 }
 
+fn dense_opts() -> F4Options {
+    F4Options::new(F4Ordering::Grevlex, 64).with_budget(std::time::Duration::from_secs(600))
+}
+
+fn jv_opts() -> F4Options {
+    jv_cover::jv_options(24, 300.0)
+}
+
 fn corpus(families: &str, per: usize, shapes_only: Option<&str>) -> Vec<Sys> {
     let want = |f: &str| families == "all" || families.split(',').any(|x| x == f);
     let mut out = Vec::new();
@@ -138,7 +148,7 @@ fn corpus(families: &str, per: usize, shapes_only: Option<&str>) -> Vec<Sys> {
                     p,
                     input,
                     planted: None,
-                    opts: jv_cover::jv_options(24, 300.0),
+                    opts: jv_opts,
                 });
             }
         }
@@ -159,7 +169,7 @@ fn corpus(families: &str, per: usize, shapes_only: Option<&str>) -> Vec<Sys> {
                     p,
                     input: comps.iter().map(|c| comps_poly(c, p)).collect(),
                     planted: None,
-                    opts: gb_opts(),
+                    opts: gb_opts,
                 });
             }
         }
@@ -186,7 +196,7 @@ fn corpus(families: &str, per: usize, shapes_only: Option<&str>) -> Vec<Sys> {
                     p,
                     input: comps.iter().map(|c| comps_poly(c, p)).collect(),
                     planted: None,
-                    opts: gb_opts(),
+                    opts: gb_opts,
                 });
                 k += 1;
             }
@@ -208,7 +218,7 @@ fn corpus(families: &str, per: usize, shapes_only: Option<&str>) -> Vec<Sys> {
                     p,
                     input: comps.iter().map(|c| comps_poly(c, p)).collect(),
                     planted: None,
-                    opts: gb_opts(),
+                    opts: gb_opts,
                 });
             }
         }
@@ -250,8 +260,7 @@ fn corpus(families: &str, per: usize, shapes_only: Option<&str>) -> Vec<Sys> {
                         p,
                         input,
                         planted: Some(pt),
-                        opts: F4Options::new(F4Ordering::Grevlex, 64)
-                            .with_budget(std::time::Duration::from_secs(600)),
+                        opts: dense_opts,
                     });
                 }
             }
@@ -293,12 +302,24 @@ fn main() {
         .collect();
     eprintln!("{} systems", systems.len());
     let mut rows = Vec::new();
+    let mut skipped: Vec<serde_json::Value> = Vec::new();
     for (si, s) in systems.iter().enumerate() {
         let t = Instant::now();
-        let r = f4_fp::f4(&s.input, s.n, s.p, &s.opts);
+        let r = f4_fp::f4(&s.input, s.n, s.p, &(s.opts)());
         let f4_ms = t.elapsed().as_secs_f64() * 1e3;
         if r.timed_out || r.inconsistent || r.pairs_above_bound > 0 {
-            eprintln!("{} {}: F4 not usable, skipped", s.family, s.label);
+            let why = if r.timed_out {
+                "F4 timed out"
+            } else if r.inconsistent {
+                "inconsistent"
+            } else {
+                "F4 degree bound"
+            };
+            eprintln!("{} {}: F4 not usable ({why}), skipped", s.family, s.label);
+            skipped.push(serde_json::json!({
+                "family": s.family, "label": s.label, "n": s.n, "p": s.p,
+                "f4_ms": f4_ms, "reason": why,
+            }));
             continue;
         }
         // PROTOCOL.md: the dense arm (cubic in δ) is not run above δ = 1024
@@ -418,6 +439,7 @@ fn main() {
             "shapes": shapes_only,
             "primes": primes_only,
             "rows": rows,
+            "skipped": skipped,
         });
         std::fs::write(&path, serde_json::to_string_pretty(&doc).unwrap()).unwrap();
     }
