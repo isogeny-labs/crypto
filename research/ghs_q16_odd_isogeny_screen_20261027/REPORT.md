@@ -12,6 +12,8 @@ For odd `ell`, an `F_16`-rational `(ell,ell,ell)` isogeny with maximal isotropic
 
 The theorem uses the standard finite-field Tate module description of rational isogeny kernels. It applies to the specified separable odd-prime kernel route. It does not exclude higher prime degrees, composite kernels, inseparable maps, general correspondences, or GHS covers of genus at least four.
 
+There is also a closed-form **infinite-family obstruction at `ell=3`**. For any cubic extension `F_{q³}/F_q` with `3∤q`, write `t=q³+1-#E(F_{q³})`. In `F_3[T]`, `F_E(T)=(T²-tT+q)^3`. A degree-three divisor exists exactly when the quadratic has a linear factor, equivalently when `t²-4q` is a square in `F_3` (zero included). In particular, for the binary subfields `q=4^m`, `q≡1 mod 3`, so **`t≡0 mod 3` excludes every rational one-step `(3,3,3)` isogeny from the cubic restriction**. For `q=16`, this is the simple order criterion `#E(GF(4096))≡2 mod 3`, explaining all 18 excluded classes in the first row of the table. This is a theorem about the direct 3-isogeny route, not a vulnerability claim or a classification of arbitrary covers.
+
 Among the **44** simple source-order classes outside the previously certified genus-three Hess closure that have a catalog genus-three Jacobian in their isogeny class, the exact results are:
 
 | `ell` | Classes excluded | Source models excluded | Classes passing the necessary condition |
@@ -32,6 +34,8 @@ Exactly **two** classes, covering **72** normalized source equations, fail the c
 Codes `32` and `106` are polynomial-basis elements of `K=GF(2)[w]/(w¹²+w⁷+w⁶+w⁵+w³+w+1)`: code `32` means `w⁵`, while `106` means `w⁶+w⁵+w³+w`. The two exact equations above are representatives from the [frozen source census](../ghs_cubic_hess_closure_q16_20261027/certificate.json), not claims that these equations were absent from prior literature. The [LMFDB classes](https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_av) and [second class](https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_v) are known isogeny classes; a catalog model is not an explicit transfer from either source elliptic curve.
 
 For the four exact Hess genus-four controls, this screen excludes `ell=5` for `4006`, `4078`, and `4126`, and `ell=11` for `4054`. Other small primes pass the necessary condition. Their already constructed degree-four elliptic quotients and the nonzero source-to-Hess maps are [separate certificates](../ghs_q16_hess_elliptic_quotient_20261027/REPORT.md); this screen does not supply a bridge to a genus-three quartic.
+
+If a degree-`ell³` isogeny is eventually constructed and the named source subgroup has prime order `r≠ell`, its restriction to that subgroup is automatically injective: its kernel has `ell`-power order and cannot meet an `r`-group nontrivially. For the four Hess controls, `ell=3` passes this *necessary* factor test and each named prime order `2003,2027,2039,2063` is coprime to three. Computing an isotropic rational kernel, a genus-three target, and the evaluation map remains necessary.
 
 ## Prior-work boundary and candidate ledger
 

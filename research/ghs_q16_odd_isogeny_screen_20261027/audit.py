@@ -33,6 +33,7 @@ def run():
     closure = {r["order"]: r for r in json.loads(closure_path.read_text())["orders"]}
     assert len(data["rows"]) == 44
     for row in data["rows"]:
+        assert (row["trace"] % 3 == 0) == (not row["primes"]["3"]["monic_cubic_divisor"])
         for p in data["primes"]:
             found = any(cubic_divides(row["order"], p, a, b, c)
                         for a, b, c in itertools.product(range(p), repeat=3))
