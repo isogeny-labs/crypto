@@ -39,3 +39,25 @@ The3-page PDF was rendered with Typst and every page inspected,including its
 final revised third page. The SVG shows exact fiber dimensions from components07
 and explicitly distinguishes native facts,written geometry and open obligations.
 No performance,solver-rank,security,leaderboard or production claim is added.
+
+## Final root software observations
+
+The first full run completes with4896 passed,20 failed,122 ignored. All20
+failures are absent archived runtime inputs;after exact tracked restoration,
+the targeted replay passes20/20. A second complete run gives4913 passed,
+3 failed,122 ignored. Its failures are an existing GPU capsule lock conflict,
+a missing sampled CPU observation,and a Hilbert-stop test's cheaper-count18
+against a required20. Its basis-equality assertions did not fail. Replaying
+those3 tests once passes3/3. Both failed full runs and the positive targeted
+replays are retained. No single green full-suite run is claimed.
+
+Root src/Cargo/isogeny_algos bytes equal the merged PR basefd85e76f9;R23 changes
+none of those implementations or test expectations. No test is skipped or
+weakened. The full-suite outcome remains a validation limitation on the open
+PR,not a reason to promote the mathematical package or merge the branch.
+
+The companion validation.json and validation archive record those observations
+separately from the sealed mathematical export.json. The artifact utility's18
+tests pass;the local artifact policy check passes. All9 present Lean dependency
+checkouts match their pinned revisions. Optional absent package roots are listed
+in the receipt;every transitive project import was rebuilt from current source.
