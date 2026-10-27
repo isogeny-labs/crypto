@@ -63,3 +63,9 @@ reports19 workflows outside this change. These outputs are retained in
 publication-checks and are not represented as green. No waiver label or
 historical record change is used. Remote PR checks remain authoritative for
 any future merge;this task keeps the ready PR open with auto-merge disabled.
+
+The touched Koblitz workflow passes its scoped artifact-wiring check. The
+post-publication check logs/status/progress record are preserved exactly in
+publication-checks.tar.xz (a small archive below the64KiB data-store threshold).
+Extract it in this directory to read the ignored hydrated log files. The
+large scientific and validation archives remain in the artifact store.
