@@ -160,3 +160,30 @@ Class: comparative/structural claim; needs nulls (§3).
 - Nothing about N = 131 follows from N ≤ 23 except by the theorems. The
   Weil cap (all-lift dim ≤ N/2 + 1) and the absence of subfields are
   theorems; the repulsion is toy-size evidence.
+
+## Amendment 1 (2026-10-27, after the confirmatory run, before any rerun)
+
+**What failed.** H-A failed as registered: 25 of 87 rows were outside 4
+Poisson SE. The pooled measured/predicted yield over the 87 rows is 0.993
+and the mean row ratio is 1.009, so there is no bias. The registered rule
+assumed Poisson counts. Ordered counts are clustered:
+- every decomposition contributes m! orderings and its sign family;
+- distinct x-tuples per target are correlated.
+
+So the Poisson SE understates the spread. The as-registered H-A verdict
+stays "FAIL (variance model)" in every report.
+
+**Instrument change.** The harness records the per-target sum of squares
+of the ordered count (`yield_ordered_m2`). This adds an output and changes
+no computed value. A `lines` mode runs only the line cells.
+
+**Amended rule H-A′.** For each row, z = (mean − pred)/(s/√targets), with
+s the empirical per-target SD.
+- Pass iff |z| ≤ 4 on every row.
+- Pass iff, in addition, the pooled per-cell ratio Σ measured / Σ predicted
+  lies within its own 4-SE band.
+
+**Rerun.** Line cells only, with the same seed, so the targets are
+identical to those of the confirmatory run. The output goes to
+`reports/run-20261027T0356Z/lines_amend1/rows.jsonl`. The kmax, count and
+c2pnb parts are not rerun, and their verdicts stand as scored.

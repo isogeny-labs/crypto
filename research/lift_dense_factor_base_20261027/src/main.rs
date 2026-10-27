@@ -716,13 +716,15 @@ fn tr_rel(f: &Fq, z: u32, d: u32) -> u32 {
 
 /// Ordered m-tuples of factor-base points summing to R, averaged over
 /// uniform targets; exact prediction |FB|^m / #E.
-fn yield_ordered(f: &Fq, cv: &Curve, fb: &[Pt], inv: &Bits, m: usize, targets: &[Pt]) -> f64 {
+fn yield_ordered(f: &Fq, cv: &Curve, fb: &[Pt], inv: &Bits, m: usize, targets: &[Pt]) -> (f64, f64) {
     if fb.is_empty() {
-        return 0.0;
+        return (0.0, 0.0);
     }
     let mut total = 0u64;
+    let mut total2 = 0u64;
     let mut idx = vec![0usize; m - 1];
     for r in targets {
+        let mut here = 0u64;
         // enumerate (P_1..P_{m-1}); P_m = R - sum must be in FB
         loop {
             let mut acc = *r;
@@ -730,7 +732,7 @@ fn yield_ordered(f: &Fq, cv: &Curve, fb: &[Pt], inv: &Bits, m: usize, targets: &
                 acc = cv.add(f, &acc, &cv.neg(&fb[i]));
             }
             if !acc.inf && acc.x != 0 && inv.get(acc.x) {
-                total += 1;
+                here += 1;
             }
             // next index tuple
             let mut j = 0;
@@ -746,8 +748,11 @@ fn yield_ordered(f: &Fq, cv: &Curve, fb: &[Pt], inv: &Bits, m: usize, targets: &
                 break;
             }
         }
+        total += here;
+        total2 += here * here;
     }
-    total as f64 / targets.len() as f64
+    let t = targets.len() as f64;
+    (total as f64 / t, total2 as f64 / t)
 }
 
 /// For E over F_{2^N}, N = d n: the standard line F_{2^d} against a twisted
@@ -836,10 +841,10 @@ fn run_lines(n_field: u32, poly: u32, d: u32, quick: bool) -> Vec<String> {
                 }
             }
             let lifting = fb.len() / 2;
-            let y = yield_ordered(&f, &cv, &fb, &inv, m, &targets);
+            let (y, y2) = yield_ordered(&f, &cv, &fb, &inv, m, &targets);
             let pred = (fb.len() as f64).powi(m as i32) / order as f64;
             rows.push(format!(
-                "{{\"kind\":\"line\",\"N\":{n_field},\"d\":{d},\"m\":{m},\"curve\":{ci},\"a\":{a},\"b\":{b},\"Tr_a\":{ta},\"line\":\"{name}\",\"u\":{},\"u_count\":{tries},\"line_nonzero\":{},\"lifting\":{lifting},\"fb_points\":{},\"order\":{order},\"targets\":{nt},\"yield_ordered_mean\":{y:.6},\"yield_pred\":{pred:.6}}}",
+                "{{\"kind\":\"line\",\"N\":{n_field},\"d\":{d},\"m\":{m},\"curve\":{ci},\"a\":{a},\"b\":{b},\"Tr_a\":{ta},\"line\":\"{name}\",\"u\":{},\"u_count\":{tries},\"line_nonzero\":{},\"lifting\":{lifting},\"fb_points\":{},\"order\":{order},\"targets\":{nt},\"yield_ordered_mean\":{y:.6},\"yield_ordered_m2\":{y2:.6},\"yield_pred\":{pred:.6}}}",
                 if *name == "twisted" { u } else { 1 },
                 (1u64 << d) - 1,
                 fb.len()
@@ -1076,14 +1081,15 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let mode = args.get(1).map(|s| s.as_str()).unwrap_or("quick");
     let out = args.get(2).cloned().unwrap_or_else(|| "out".into());
-    let quick = mode != "full";
+    let quick = mode != "full" && mode != "lines";
+    let lines_only = mode == "lines";
     // optional third argument: largest field degree to run (for timing tests)
     let maxn: u32 = args.get(3).and_then(|s| s.parse().ok()).unwrap_or(99);
     std::fs::create_dir_all(&out).unwrap();
     let mut fh = std::fs::File::create(format!("{out}/rows.jsonl")).unwrap();
     let t0 = Instant::now();
     for &(n, poly) in FIELDS {
-        if (quick && n > 17) || n > maxn {
+        if (quick && n > 17) || n > maxn || lines_only {
             continue;
         }
         for r in run_n(n, poly, quick) {
