@@ -13,6 +13,27 @@ empty fields and the source grid for every row. The [PDF](REPORT.pdf) presents
 the same status, selected values, and all three graphs. These are operation-count prices, not
 isolated wall-time claims.
 
+Later packets are indexed separately so their distinct cohorts and controls
+remain visible. The [N12 held-out factor-base replay](../factor_base_heldout_replay_20261025/REPORT.md)
+has 420 paired source-verified targets on seven held-out models, a summed
+candidate/rho ratio of 2.4799052224835276 at the representative price, 0/36
+aggregate price-cell wins, and 19/420 individual target wins. Its own
+[PDF artifact manifest](../factor_base_heldout_replay_20261025/.artifacts.json),
+[graph](../factor_base_heldout_replay_20261025/ratio-by-size.svg), and
+[standardized target CSV](../factor_base_heldout_replay_20261025/results/validated/targets.csv)
+retain those observations; they are not pooled into this packet's 1,260-target
+grid. The [N19 signed-label Kummer fallback](../kummer_differential_collector_20261022/n19-labelled-fallback/REPORT.md)
+has 1,260 paired source-verified solves, a representative ratio of
+14.356667485478237, and no aggregate win in its 36-cell band. Its own
+[PDF artifact manifest](../kummer_differential_collector_20261022/n19-labelled-fallback/.artifacts.json),
+[graph](../kummer_differential_collector_20261022/n19-labelled-fallback/cost-graph.svg),
+and [price grid](../kummer_differential_collector_20261022/n19-labelled-fallback/results/analysis/price-grid.csv)
+retain the separate frozen arm. The
+[independent law-cohort recheck](../projective_law_followup_20261022/independent_complete_law/COHORT_RECHECK_20261027.md)
+reprices the original two 1,260-target arms from all 14 raw files without
+rerunning a target; it confirms the ratios below and leaves universal
+compiled-source completeness open.
+
 The [standardized target index](results/standard-targets.csv) joins 12,850
 target-arm rows on the exact public workload key. It retains per-target
 representative costs, source verification, DLP verification, and Kummer's
