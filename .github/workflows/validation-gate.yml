@@ -62,7 +62,9 @@ jobs:
           # fail here rather than let the freeze comparison pass silently.
           git rev-parse --verify "origin/$BASE_REF^{commit}"
       - uses: actions/setup-python@v5
-        if: runner.environment == 'github-hosted'
+        # EKS runners may default to Python 3.12; the dedicated local runner
+        # already includes 3.11 and keeps its isolated tool cache untouched.
+        if: runner.environment == 'github-hosted' || !startsWith(runner.name, 'crypto-cli-gate-')
         with:
           python-version: '3.11'
       - name: Confirm Python 3.11
