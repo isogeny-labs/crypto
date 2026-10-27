@@ -222,6 +222,67 @@ pub struct Fq4 {
     pub c: [Fe; 4],
     /// `(zⁱ)^q`, for the Frobenius.
     zq: [Eb; 4],
+    /// The reference-pricing tally (see [`RefCosts`]); no existing count
+    /// reads it.
+    tally: RefTally,
+}
+
+/// Reference cost of the `F_{q⁴}` primitives, in `F_q` multiplications:
+/// what a competent implementation pays, independent of which irreducible
+/// quartic [`Fq4::new`] happened to pick and of how naively this file
+/// codes the arithmetic.  The model is the tower `F_q ⊂ F_{q²} ⊂ F_{q⁴}`
+/// with `F_{q²} = F_q[u]/(u² + u + ε)` and `F_{q⁴} = F_{q²}[w]/(w² + w +
+/// δ)`, `ε, δ ∈ F_q`:
+///
+/// * `F_{q²}` product 3 (Karatsuba), square 2, inversion 7 (norm to `F_q`);
+/// * `mul` 11 = 3 `F_{q²}` products + 2 for the `δ`-multiple;
+/// * `sq` 6 = 2 `F_{q²}` squares + the `δ`-multiple 2 (squaring is linear);
+/// * `scale` 4 (an `F_q` scalar times 4 coordinates);
+/// * `frob` (`a ↦ a^q`) 3 = one `F_{q²}` product by `w^{q−1}` (the
+///   conjugations are free);
+/// * `inv` 22 = relative norm 9 + `F_{q²}` inversion 7 + 2 `F_{q²}`
+///   products 6;
+/// * `sqrt` 16 = 4 `F_q` square roots (linear, 1 each) + the two twists
+///   by `√u` and `√w` (4 `F_{q²}` products 12).
+///
+/// A product by 0 or 1, or a square, scalar, Frobenius or inverse of 0 or
+/// 1, costs nothing.  An affine addition (1 inversion, 2 products, 1
+/// square) is then 50, for every `m`.
+pub struct RefCosts;
+impl RefCosts {
+    pub const MUL: u64 = 11;
+    pub const SQ: u64 = 6;
+    pub const SCALE: u64 = 4;
+    pub const FROB: u64 = 3;
+    pub const INV: u64 = 22;
+    pub const SQRT: u64 = 16;
+    /// Reference `F_q` multiplications of one affine addition of distinct
+    /// points: `inv + 2 mul + sq`.
+    pub const ADD: u64 = Self::INV + 2 * Self::MUL + Self::SQ;
+}
+
+/// How many top-level `F_{q⁴}` primitives ran, by kind; nested calls
+/// (`inv` calls `frob` and `mul`) belong to the outer one.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Fq4Kinds {
+    pub mul: u64,
+    /// Products by 0 or 1 (free in the reference).
+    pub mul_trivial: u64,
+    pub sq: u64,
+    pub scale: u64,
+    pub frob: u64,
+    pub inv: u64,
+    pub sqrt: u64,
+}
+
+#[derive(Default)]
+struct RefTally {
+    depth: Cell<u32>,
+    /// `F_q` multiplications the current code counted inside top-level
+    /// `F_{q⁴}` primitives, and the reference price of the same.
+    cur_inner: Cell<u64>,
+    ref_inner: Cell<u64>,
+    kinds: Cell<Fq4Kinds>,
 }
 
 impl Fq4 {
@@ -234,6 +295,7 @@ impl Fq4 {
             f: Gf2q::new(m),
             c: [0; 4],
             zq: [Eb::ONE; 4],
+            tally: RefTally::default(),
         };
         // z⁴ + c₁z + c₀ is an affine linearised polynomial in characteristic
         // 2, often reducible for every (c₁, c₀); the z³ term avoids that.
@@ -334,13 +396,78 @@ impl Fq4 {
         self.reduce(&mut p, counted)
     }
     pub fn mul(&self, a: &Eb, b: &Eb) -> Eb {
-        self.mul_impl(a, b, true)
+        let triv = a.is_zero() || *a == Eb::ONE || b.is_zero() || *b == Eb::ONE;
+        self.tracked(
+            |k| {
+                if triv {
+                    k.mul_trivial += 1
+                } else {
+                    k.mul += 1
+                }
+            },
+            if triv { 0 } else { RefCosts::MUL },
+            || self.mul_impl(a, b, true),
+        )
+    }
+    /// Run a counted primitive, adding its price to the reference tally if
+    /// it is the outermost one.
+    fn tracked<R>(
+        &self,
+        kind: impl FnOnce(&mut Fq4Kinds),
+        price: u64,
+        run: impl FnOnce() -> R,
+    ) -> R {
+        let t = &self.tally;
+        let d = t.depth.get();
+        t.depth.set(d + 1);
+        let before = self.f.muls();
+        let r = run();
+        t.depth.set(d);
+        if d == 0 {
+            t.cur_inner
+                .set(t.cur_inner.get() + (self.f.muls().wrapping_sub(before)));
+            t.ref_inner.set(t.ref_inner.get() + price);
+            let mut k = t.kinds.get();
+            kind(&mut k);
+            t.kinds.set(k);
+        }
+        r
+    }
+    /// `F_q` multiplications counted so far, with every top-level `F_{q⁴}`
+    /// primitive priced at its [`RefCosts`] instead of what this file's
+    /// schoolbook code counts.  Differences of this are the reference
+    /// price of the work between (take them with `wrapping_sub`: the
+    /// counted multiplications are reset after set-up); [`GfTab`]-level
+    /// solver work is not in either.
+    pub fn ref_muls(&self) -> u64 {
+        let t = &self.tally;
+        self.f
+            .muls()
+            .wrapping_sub(t.cur_inner.get())
+            .wrapping_add(t.ref_inner.get())
+    }
+    /// Top-level `F_{q⁴}` primitives run so far, by kind.
+    pub fn kinds(&self) -> Fq4Kinds {
+        self.tally.kinds.get()
+    }
+    /// `F_q` multiplications the current code counted inside `F_{q⁴}`
+    /// primitives so far.
+    pub fn fq4_current_muls(&self) -> u64 {
+        self.tally.cur_inner.get()
     }
     fn mul_nc(&self, a: &Eb, b: &Eb) -> Eb {
         self.mul_impl(a, b, false)
     }
     /// `a²`: the coefficients squared into even positions, then reduced.
     pub fn sq(&self, a: &Eb) -> Eb {
+        let triv = a.is_zero() || *a == Eb::ONE;
+        self.tracked(
+            |k| k.sq += 1,
+            if triv { 0 } else { RefCosts::SQ },
+            || self.sq_impl(a),
+        )
+    }
+    fn sq_impl(&self, a: &Eb) -> Eb {
         let f = &self.f;
         let mut p = [0u32; 7];
         for i in 0..4 {
@@ -367,10 +494,23 @@ impl Fq4 {
         r
     }
     pub fn scale(&self, a: &Eb, k: Fe) -> Eb {
-        Eb(core::array::from_fn(|i| self.f.mul(a.0[i], k)))
+        let triv = k <= 1 || a.is_zero();
+        self.tracked(
+            |t| t.scale += 1,
+            if triv { 0 } else { RefCosts::SCALE },
+            || Eb(core::array::from_fn(|i| self.f.mul(a.0[i], k))),
+        )
     }
     /// `a^q`: `F_q`-linear, `Σ aᵢ (zⁱ)^q`.
     pub fn frob(&self, a: &Eb) -> Eb {
+        let triv = a.is_zero() || a.in_fq();
+        self.tracked(
+            |k| k.frob += 1,
+            if triv { 0 } else { RefCosts::FROB },
+            || self.frob_impl(a),
+        )
+    }
+    fn frob_impl(&self, a: &Eb) -> Eb {
         let mut r = Eb([a.0[0], 0, 0, 0]);
         for i in 1..4 {
             if a.0[i] != 0 {
@@ -382,6 +522,14 @@ impl Fq4 {
     /// `a⁻¹ = a^{q + q² + q³} / N(a)`, `N(a) = a · a^{q + q² + q³} ∈ F_q`.
     pub fn inv(&self, a: &Eb) -> Eb {
         assert!(!a.is_zero(), "inverse of 0");
+        let triv = *a == Eb::ONE;
+        self.tracked(
+            |k| k.inv += 1,
+            if triv { 0 } else { RefCosts::INV },
+            || self.inv_impl(a),
+        )
+    }
+    fn inv_impl(&self, a: &Eb) -> Eb {
         let a1 = self.frob(a);
         let a2 = self.frob(&a1);
         let a3 = self.frob(&a2);
@@ -404,7 +552,12 @@ impl Fq4 {
     }
     /// `√a = a^{2^{4m − 1}}`.
     pub fn sqrt(&self, a: &Eb) -> Eb {
-        self.pow2k_counted(a, 4 * self.f.m - 1)
+        let triv = a.is_zero() || *a == Eb::ONE;
+        self.tracked(
+            |k| k.sqrt += 1,
+            if triv { 0 } else { RefCosts::SQRT },
+            || self.pow2k_counted(a, 4 * self.f.m - 1),
+        )
     }
     pub fn random(&self, rng: &mut StdRng) -> Eb {
         Eb(core::array::from_fn(|_| rng.gen_range(0..self.f.q) as Fe))
@@ -2624,6 +2777,23 @@ pub fn find_bin_curve(m: u32, seed: u64, max_cofactor: u64) -> Result<BinCurve, 
     ))
 }
 
+/// The reference price ([`RefCosts`]) of one affine addition of two
+/// distinct points, measured on this curve through the reference tally:
+/// the same for every `m` and every choice of quartic.
+pub fn fq_muls_per_add_ref(c: &CurveB) -> u64 {
+    let mut rng = StdRng::seed_from_u64(0xadd);
+    let p = loop {
+        let x = c.f.random(&mut rng);
+        if let Some(p) = c.lift_x(&x, &mut rng) {
+            break p;
+        }
+    };
+    let q = c.add(&p, &p);
+    let before = c.f.ref_muls();
+    let _ = c.add(&p, &q);
+    c.f.ref_muls().wrapping_sub(before)
+}
+
 /// `F_q` multiplications in one affine addition of two distinct points.
 pub fn fq_muls_per_add(c: &CurveB) -> u64 {
     let mut rng = StdRng::seed_from_u64(0xadd);
@@ -3484,6 +3654,53 @@ mod tests {
                 return p;
             }
         }
+    }
+
+    /// The reference price of an affine addition is the same at every `m`
+    /// and every quartic (`RefCosts::ADD`), while the current count is not;
+    /// and reading the tally changes no count.
+    #[test]
+    fn reference_add_price_is_m_independent() {
+        let mut current = Vec::new();
+        for m in 5..=12 {
+            let c = generate_instance(m, 3);
+            let r = fq_muls_per_add_ref(&c);
+            assert_eq!(r, RefCosts::ADD, "m = {m}");
+            current.push(fq_muls_per_add(&c));
+        }
+        assert!(current.windows(2).any(|w| w[0] != w[1]), "{current:?}");
+        assert_eq!(RefCosts::ADD, 50);
+    }
+
+    /// `ref_muls` moves with the reference prices, nested calls are charged
+    /// once, and products by 0 and 1 are free.
+    #[test]
+    fn reference_tally_charges_outermost_primitive_once() {
+        let c = generate_instance(8, 1);
+        let f = &c.f;
+        let mut rng = StdRng::seed_from_u64(9);
+        let a = f.random(&mut rng);
+        let b = f.random(&mut rng);
+        let (r0, m0) = (f.ref_muls(), f.f.muls());
+        let _ = f.inv(&a);
+        assert_eq!(f.ref_muls().wrapping_sub(r0), RefCosts::INV);
+        assert!(
+            f.f.muls() - m0 > RefCosts::INV,
+            "the schoolbook inv counts more"
+        );
+        let r1 = f.ref_muls();
+        let _ = f.mul(&a, &Eb::ONE);
+        let _ = f.mul(&Eb::ZERO, &b);
+        assert_eq!(f.ref_muls(), r1 + 0);
+        let _ = f.mul(&a, &b);
+        let _ = f.sq(&a);
+        let _ = f.sqrt(&a);
+        assert_eq!(
+            f.ref_muls().wrapping_sub(r1),
+            RefCosts::MUL + RefCosts::SQ + RefCosts::SQRT
+        );
+        let k = f.kinds();
+        assert_eq!((k.inv, k.mul, k.mul_trivial, k.sq, k.sqrt), (1, 1, 2, 1, 1));
     }
 
     #[test]

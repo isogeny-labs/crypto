@@ -572,6 +572,13 @@ pub struct BatchedRho {
     pub fq_single_ops: u64,
     pub fq_verification: u64,
     pub fq_total: u64,
+    // The same regions in the reference pricing (`Fq4::ref_muls`).
+    pub ref_fq_setup: u64,
+    pub ref_fq_batch_inversion: u64,
+    pub ref_fq_batched_formula: u64,
+    pub ref_fq_single_ops: u64,
+    pub ref_fq_verification: u64,
+    pub ref_fq_total: u64,
     pub setup_ops: GroupOps,
     pub verification_ops: u64,
     // Native work, not F_q multiplications.
@@ -631,7 +638,9 @@ pub fn rho_negation_batched<S: RhoScalar>(
     let f = &c.f;
     let mut recovered: Option<S> = None;
     let fq = || f.f.muls();
+    let rq = || f.ref_muls();
     let start_count = fq();
+    let rstart = rq();
     let mut out = BatchedRho::default();
     let mut ops = GroupOps::default();
     let mut rng = StdRng::seed_from_u64(seed);
@@ -689,6 +698,7 @@ pub fn rho_negation_batched<S: RhoScalar>(
     }
     out.setup_ops = ops;
     out.fq_setup = fq() - start_count;
+    out.ref_fq_setup = rq().wrapping_sub(rstart);
     out.jumps = jump_count as u64;
     out.dp_bits = dp_bits;
     out.expected_steps = generic_floor_ops(r.to_f64(), 2.0);
@@ -741,8 +751,10 @@ pub fn rho_negation_batched<S: RhoScalar>(
             out.walks_started += 1;
             if !first_start {
                 let before = fq();
+                let rbefore = rq();
                 sx = c.add(&sx, &stride);
                 out.fq_single_ops += fq() - before;
+                out.ref_fq_single_ops += rq().wrapping_sub(rbefore);
                 out.single_ops += 1;
                 sa = S::add_mod(sa, ta, r);
                 sb = S::add_mod(sb, tb, r);
@@ -817,8 +829,10 @@ pub fn rho_negation_batched<S: RhoScalar>(
         for job in jobs.iter_mut().filter(|j| j.denom.is_none()) {
             let w = pool[job.slot].as_ref().unwrap();
             let before = fq();
+            let rbefore = rq();
             job.sum = Some(c.add(&w.x, &jumps[job.jump].0));
             out.fq_single_ops += fq() - before;
+            out.ref_fq_single_ops += rq().wrapping_sub(rbefore);
             out.single_ops += 1;
         }
         // 3. Montgomery's trick over the rest: one inversion, 3(n−1) multiplications.
@@ -827,6 +841,7 @@ pub fn rho_negation_batched<S: RhoScalar>(
             .collect();
         if !idx.is_empty() {
             let before = fq();
+            let rbefore = rq();
             let n = idx.len();
             let mut pref: Vec<Eb> = Vec::with_capacity(n);
             for (k, &i) in idx.iter().enumerate() {
@@ -841,10 +856,12 @@ pub fn rho_negation_batched<S: RhoScalar>(
             }
             invs[0] = acc;
             out.fq_batch_inversion += fq() - before;
+            out.ref_fq_batch_inversion += rq().wrapping_sub(rbefore);
             out.batch_inversions += 1;
             out.batch_fq4_muls += 3 * (n as u64 - 1);
             // 4. The addition formula with the inverse supplied.
             let before = fq();
+            let rbefore = rq();
             for (k, &i) in idx.iter().enumerate() {
                 let w = pool[jobs[i].slot].as_ref().unwrap();
                 let (p, q) = (&w.x, &jumps[jobs[i].jump].0);
@@ -858,6 +875,7 @@ pub fn rho_negation_batched<S: RhoScalar>(
                 });
             }
             out.fq_batched_formula += fq() - before;
+            out.ref_fq_batched_formula += rq().wrapping_sub(rbefore);
             out.batched_adds += n as u64;
         }
         // 5. Each walk takes its sum.
@@ -917,8 +935,10 @@ pub fn rho_negation_batched<S: RhoScalar>(
                     } else {
                         w.last_escape = Some(min_key);
                         let before = fq();
+                        let rbefore = rq();
                         let d2 = c.add(&mp, &mp);
                         out.fq_single_ops += fq() - before;
+                        out.ref_fq_single_ops += rq().wrapping_sub(rbefore);
                         out.single_ops += 1;
                         out.escapes += 1;
                         out.scalar_mod_ops += 2;
@@ -971,9 +991,11 @@ pub fn rho_negation_batched<S: RhoScalar>(
                                         out.scalar_mulmods += 1;
                                         let d = S::mul_mod(num, inv, r);
                                         let before = fq();
+                                        let rbefore = rq();
                                         let mut vops = GroupOps::default();
                                         let check = mul_s(c, &mut vops, generator, d);
                                         out.fq_verification += fq() - before;
+                                        out.ref_fq_verification += rq().wrapping_sub(rbefore);
                                         out.verification_ops += vops.adds + vops.doubles;
                                         if check == target {
                                             recovered = Some(d);
@@ -998,6 +1020,7 @@ pub fn rho_negation_batched<S: RhoScalar>(
         }
     }
     out.fq_total = fq() - start_count;
+    out.ref_fq_total = rq().wrapping_sub(rstart);
     (out, recovered)
 }
 

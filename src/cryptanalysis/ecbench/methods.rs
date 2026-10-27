@@ -31,7 +31,8 @@ use crate::cryptanalysis::ecbench_large_prime::{
 };
 use crate::cryptanalysis::gaudry_quartic::Pt4;
 use crate::cryptanalysis::gaudry_quartic_bin::{
-    fq_muls_per_add, BinCurve, BinD4Oracle, BinOptions, OracleNative, PtB, TLineBase,
+    fq_muls_per_add, fq_muls_per_add_ref, BinCurve, BinD4Oracle, BinOptions, OracleNative, PtB,
+    TLineBase,
 };
 use crate::cryptanalysis::gaudry_quartic_d4::{
     fp_muls_per_add, unpack_e4, D4Curve, D4Options, D4Oracle, YLineBase,
@@ -255,6 +256,22 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.negation_batched_ref",
+            family: "rho",
+            summary: "rho.negation_batched_full in the reference pricing: the walk's F_q operations are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts) and divided by the m-independent reference affine addition (50), native work by the same divisor; detail.reference_pricing carries the current-unit total and divisor side by side; the same walk, so the same counts; curves over F_(2^m)^4 only",
+            entry: "ic_wide::rho_negation_batched + ecbench::f2m4_price",
+            applies: Applies::Any,
+            params: RHO_BATCHED_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.negation_f2m4_ref",
+            family: "rho",
+            summary: "rho.negation_f2m4_full with its native work divided by the m-independent reference affine addition (50 F_q multiplications, gaudry_quartic_bin::RefCosts) instead of the curve's schoolbook fq_muls_per_add; group operations are one GAE each in both; detail.reference_pricing carries the current-unit total and divisor side by side; curves over F_(2^m)^4 only",
+            entry: "ic_wide::rho_negation_tallied + ecbench::f2m4_price",
+            applies: Applies::Any,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
             id: "rho.cubic",
             family: "rho",
             summary: "tuned walk on {±ζ₃^i(P)} (A = 6), the rational order-3 automorphism of a j = 0 curve with p ≡ 1 (mod 3) and 3 | r − 1; Wiener–Zuccherato look-ahead and cycle escape; refuses any curve without the structure",
@@ -399,6 +416,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: IC_PIPELINE_PARAMS,
         },
         MethodDecl {
+            id: "ic.pipeline_f2m4_ref",
+            family: "ic",
+            summary: "ic.pipeline_f2m4_full in the reference pricing: the solver's F_q operations and native work are divided by the m-independent reference affine addition (50), and the base lifts and x_of_t are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts); detail.reference_pricing carries the current-unit total, both divisors and IC's F_(q^4) share side by side; the same run, so the same counts",
+            entry: "ic_framework::run_pipeline + ecbench::f2m4_price",
+            applies: Applies::Any,
+            params: IC_PIPELINE_PARAMS,
+        },
+        MethodDecl {
             id: "ic.pipeline_counted",
             family: "ic",
             summary: "index calculus with solver wall pricing excluded by deterministic phase recomputation; unpriced solver work remains explicit",
@@ -501,6 +526,8 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         "rho.negation"
         | "rho.negation_batched"
         | "rho.negation_batched_full"
+        | "rho.negation_batched_ref"
+        | "rho.negation_f2m4_ref"
         | "rho.negation_f2m4_full" => Some((PI / 4.0).sqrt()),
         "rho.cubic" => Some((PI / 12.0).sqrt()),
         "rho.quartic" => Some((PI / 8.0).sqrt()),
@@ -1046,6 +1073,9 @@ pub fn solve(
             | "rho.negation_batched_full"
             | "rho.negation_f2m4_full"
             | "ic.pipeline_f2m4_full"
+            | "rho.negation_batched_ref"
+            | "rho.negation_f2m4_ref"
+            | "ic.pipeline_f2m4_ref"
     ) && !matches!(inst, Instance::F2m4(_))
     {
         return Err(format!(
@@ -1059,13 +1089,19 @@ pub fn solve(
     } else if let Instance::F2m4(i) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         if m.id == "rho.negation_batched" {
-            solve_f2m4_rho_batched(m, i, tx, ty, seed, false)?
+            solve_f2m4_rho_batched(m, i, tx, ty, seed, false, false)?
         } else if m.id == "rho.negation_batched_full" {
-            solve_f2m4_rho_batched(m, i, tx, ty, seed, true)?
+            solve_f2m4_rho_batched(m, i, tx, ty, seed, true, false)?
+        } else if m.id == "rho.negation_batched_ref" {
+            solve_f2m4_rho_batched(m, i, tx, ty, seed, true, true)?
         } else if m.id == "rho.negation_f2m4_full" {
-            solve_f2m4_rho_negation_full(m, i, tx, ty, seed)?
+            solve_f2m4_rho_negation_full(m, i, tx, ty, seed, false)?
+        } else if m.id == "rho.negation_f2m4_ref" {
+            solve_f2m4_rho_negation_full(m, i, tx, ty, seed, true)?
         } else if m.id == "ic.pipeline_f2m4_full" {
             solve_f2m4_ic_full(m, i, curve, tx, ty, seed)?
+        } else if m.id == "ic.pipeline_f2m4_ref" {
+            solve_f2m4_ic_full_with(m, i, curve, tx, ty, seed, u64::try_from(i.r).is_err(), true)?
         } else if u64::try_from(i.r).is_err() {
             // `m ≥ 16` with a small cofactor: the subgroup order needs two
             // words; the u128 implementations (`ic_wide`, `rho_wide`).
@@ -2304,6 +2340,7 @@ fn solve_f2m4_rho_batched(
     ty: u128,
     seed: u64,
     full: bool,
+    reference: bool,
 ) -> Result<SolveReport, String> {
     use crate::cryptanalysis::ic_wide::{rho_negation_batched, BatchedRhoParams};
     let c = &inst.curve;
@@ -2321,7 +2358,11 @@ fn solve_f2m4_rho_batched(
     let cap = (crate::cryptanalysis::ic_boundary::generic_floor_ops(inst.r as f64, 1.0) * multiple)
         as u64
         + 4096;
-    let per_add = fq_muls_per_add(c) as f64;
+    let per_cur = fq_muls_per_add(c) as f64;
+    let per_ref = fq_muls_per_add_ref(c) as f64;
+    // The divisor the record is priced by.
+    let per_add = if reference { per_ref } else { per_cur };
+    let fq4_before = c.f.fq4_current_muls();
     let t = Instant::now();
     measurement::begin_online(Phase::RhoSolve);
     let (res, recovered) = if let Ok(r64) = u64::try_from(inst.r) {
@@ -2332,8 +2373,19 @@ fn solve_f2m4_rho_batched(
     };
     measurement::end_online();
     let wall = t.elapsed().as_nanos() as u64;
+    let fq4_muls = c.f.fq4_current_muls() - fq4_before;
     let g = |fq: u64| fq as f64 / per_add;
-    let walk_fq = res.fq_batch_inversion + res.fq_batched_formula + res.fq_single_ops;
+    // The F_q operations by region, in the pricing of the record.
+    let (r_setup, r_total, r_verif) = if reference {
+        (res.ref_fq_setup, res.ref_fq_total, res.ref_fq_verification)
+    } else {
+        (res.fq_setup, res.fq_total, res.fq_verification)
+    };
+    let walk_fq = if reference {
+        res.ref_fq_batch_inversion + res.ref_fq_batched_formula + res.ref_fq_single_ops
+    } else {
+        res.fq_batch_inversion + res.fq_batched_formula + res.fq_single_ops
+    };
     let mut counters = BTreeMap::new();
     for (k, v) in [
         ("walks_parallel", par.walks as u64),
@@ -2423,25 +2475,15 @@ fn solve_f2m4_rho_batched(
         search.native.insert(k.to_string(), v);
     }
     let phases = vec![
-        mk(
-            "setup",
-            res.fq_setup,
-            res.setup_ops.adds,
-            res.setup_ops.doubles,
-        ),
+        mk("setup", r_setup, res.setup_ops.adds, res.setup_ops.doubles),
         search,
-        mk(
-            "internal_verification",
-            res.fq_verification,
-            res.verification_ops,
-            0,
-        ),
+        mk("internal_verification", r_verif, res.verification_ops, 0),
     ];
     let mut rep = SolveReport {
         recovered,
         exhausted: recovered.is_none(),
         phases,
-        total_gae: g(res.fq_total),
+        total_gae: g(r_total),
         automorphisms_used: 2,
         unpriced: unpriced_of(&counters),
         counters,
@@ -2469,7 +2511,43 @@ fn solve_f2m4_rho_batched(
             true,
         )?;
     }
+    if reference {
+        let fme = rep.detail["full_pricing"]["native_gae"]
+            .as_f64()
+            .unwrap_or(0.0)
+            * per_add;
+        let current = res.fq_total as f64 / per_cur + fme / per_cur;
+        let total_ref = rep.total_gae;
+        add_reference_block(
+            &mut rep,
+            json!({
+                "pricing": "reference",
+                "fq_muls_per_add_current": per_cur,
+                "fq_muls_per_add_reference": per_ref,
+                "total_gae_current_pricing": current,
+                "total_gae_reference_pricing": total_ref,
+                "ratio_reference_over_current": total_ref / current,
+                "fq_operations_total_current": res.fq_total,
+                "fq_operations_total_reference": res.ref_fq_total,
+                "fq4_share_of_current_fq_operations": fq4_muls as f64 / res.fq_total.max(1) as f64,
+                "phases_note": "setup, search and verification are the walk's own F_q operations in the reference pricing; the natives phase is native work divided by the reference divisor",
+            }),
+        );
+    }
     Ok(rep)
+}
+
+/// Attach the side-by-side pricing block of a `*_ref` record.
+fn add_reference_block(rep: &mut SolveReport, block: Value) {
+    match &mut rep.detail {
+        Value::Object(d) => {
+            d.insert("reference_pricing".into(), block);
+        }
+        other => {
+            let old = std::mem::take(other);
+            *other = json!({"base": old, "reference_pricing": block});
+        }
+    }
 }
 
 /// `rho.negation_f2m4_full`: `rho.negation`'s walk (`ic_wide::rho_negation`
@@ -2483,6 +2561,7 @@ fn solve_f2m4_rho_negation_full(
     tx: u128,
     ty: u128,
     seed: u64,
+    reference: bool,
 ) -> Result<SolveReport, String> {
     use crate::cryptanalysis::ic_wide::rho_negation_tallied;
     let c = &inst.curve;
@@ -2496,7 +2575,9 @@ fn solve_f2m4_rho_negation_full(
     let cap = (crate::cryptanalysis::ic_boundary::generic_floor_ops(inst.r as f64, 1.0) * multiple)
         as u64
         + 4096;
-    let per_add = fq_muls_per_add(c) as f64;
+    let per_cur = fq_muls_per_add(c) as f64;
+    let per_ref = fq_muls_per_add_ref(c) as f64;
+    let per_add = if reference { per_ref } else { per_cur };
     let t = Instant::now();
     measurement::begin_online(Phase::RhoSolve);
     let (res, recovered, native) = if let Ok(r64) = u64::try_from(inst.r) {
@@ -2543,6 +2624,31 @@ fn solve_f2m4_rho_negation_full(
         per_add,
         false,
     )?;
+    if reference {
+        // The group operations are one GAE each in either unit; only the
+        // native work's divisor moves.
+        let fme = rep.detail["full_pricing"]["native_gae"]
+            .as_f64()
+            .unwrap_or(0.0)
+            * per_add;
+        let counted = rep.detail["full_pricing"]["counted_gae"]
+            .as_f64()
+            .unwrap_or(0.0);
+        let current = counted + fme / per_cur;
+        let total_ref = rep.total_gae;
+        add_reference_block(
+            &mut rep,
+            json!({
+                "pricing": "reference",
+                "fq_muls_per_add_current": per_cur,
+                "fq_muls_per_add_reference": per_ref,
+                "total_gae_current_pricing": current,
+                "total_gae_reference_pricing": total_ref,
+                "ratio_reference_over_current": total_ref / current,
+                "note": "rho.negation charges one GAE per group operation whatever the arithmetic; only native work (FME / divisor) moves",
+            }),
+        );
+    }
     Ok(rep)
 }
 
@@ -2557,7 +2663,16 @@ fn solve_f2m4_ic_full(
     ty: u128,
     seed: u64,
 ) -> Result<SolveReport, String> {
-    solve_f2m4_ic_full_with(m, inst, curve, tx, ty, seed, u64::try_from(inst.r).is_err())
+    solve_f2m4_ic_full_with(
+        m,
+        inst,
+        curve,
+        tx,
+        ty,
+        seed,
+        u64::try_from(inst.r).is_err(),
+        false,
+    )
 }
 
 /// [`solve_f2m4_ic_full`], on the `u128` pipeline when `wide` (which any
@@ -2570,6 +2685,7 @@ fn solve_f2m4_ic_full_with(
     ty: u128,
     seed: u64,
     wide: bool,
+    reference: bool,
 ) -> Result<SolveReport, String> {
     let (mut rep, native) = if wide {
         solve_f2m4_wide_ic(m, inst, curve, tx, ty, seed)?
@@ -2588,29 +2704,72 @@ fn solve_f2m4_ic_full_with(
         .as_u64()
         .unwrap_or(0);
     // The `x_of_t` before each base lift: its counted multiplications.
-    let (mut muls, mut n) = (0u64, 0u64);
+    let (mut muls, mut rmuls, mut n) = (0u64, 0u64, 0u64);
     for t in (2..c.f.f.q as u32)
         .step_by(((c.f.f.q / 64).max(1)) as usize)
         .take(64)
     {
-        let before = c.f.f.muls();
+        let before = (c.f.f.muls(), c.f.ref_muls());
         let _ = c.x_of_t(&c.f.from_fq(t));
-        muls += c.f.f.muls() - before;
+        muls += c.f.f.muls() - before.0;
+        rmuls += c.f.ref_muls().wrapping_sub(before.1);
         n += 1;
     }
-    let ctx = crate::cryptanalysis::ecbench::f2m4_price::IcContext {
+    let ctx_of = |ref_unit: bool| crate::cryptanalysis::ecbench::f2m4_price::IcContext {
         m: c.f.f.m,
         wide: u64::try_from(inst.r).is_err(),
-        per_add: fq_muls_per_add(c) as f64,
-        lift_muls: f2m4_lift_muls(inst),
-        x_of_t_muls: muls as f64 / n.max(1) as f64,
+        per_add: if ref_unit {
+            fq_muls_per_add_ref(c)
+        } else {
+            fq_muls_per_add(c)
+        } as f64,
+        lift_muls: f2m4_lift_muls_with(inst, ref_unit),
+        x_of_t_muls: (if ref_unit { rmuls } else { muls }) as f64 / n.max(1) as f64,
         oracle: &native,
         fb_points: facts.signed_points,
         fb_columns: facts.columns,
         fb_abscissae: facts.abscissae,
         lp_estimate,
     };
-    crate::cryptanalysis::ecbench::f2m4_price::reprice_ic(&mut rep, &ctx)?;
+    if !reference {
+        crate::cryptanalysis::ecbench::f2m4_price::reprice_ic(&mut rep, &ctx_of(false))?;
+        return Ok(rep);
+    }
+    // The current-unit total, from a copy of the unpriced report.
+    let mut current = rep.clone();
+    crate::cryptanalysis::ecbench::f2m4_price::reprice_ic(&mut current, &ctx_of(false))?;
+    let (cur, refc) = (ctx_of(false), ctx_of(true));
+    let natives = |k: &str| -> u64 {
+        rep.phases
+            .iter()
+            .map(|p| p.native.get(k).copied().unwrap_or(0))
+            .sum()
+    };
+    let (solver_ops, lifts) = (natives("solver_ops"), natives("sqrt_solves"));
+    let solver_fq = (solver_ops - lp_estimate.min(solver_ops)) as f64;
+    let share = |c: &crate::cryptanalysis::ecbench::f2m4_price::IcContext| {
+        let f4 = lifts as f64 * (c.lift_muls + c.x_of_t_muls);
+        f4 / (f4 + solver_fq).max(1.0)
+    };
+    crate::cryptanalysis::ecbench::f2m4_price::reprice_ic(&mut rep, &refc)?;
+    let total_ref = rep.total_gae;
+    add_reference_block(
+        &mut rep,
+        json!({
+            "pricing": "reference",
+            "fq_muls_per_add_current": cur.per_add,
+            "fq_muls_per_add_reference": refc.per_add,
+            "lift_plus_x_of_t_fq_muls_current": cur.lift_muls + cur.x_of_t_muls,
+            "lift_plus_x_of_t_fq_muls_reference": refc.lift_muls + refc.x_of_t_muls,
+            "base_lifts": lifts,
+            "solver_fq_operations": solver_fq,
+            "fq4_share_of_fq_operations_current": share(&cur),
+            "fq4_share_of_fq_operations_reference": share(&refc),
+            "total_gae_current_pricing": current.total_gae,
+            "total_gae_reference_pricing": total_ref,
+            "ratio_reference_over_current": total_ref / current.total_gae,
+        }),
+    );
     Ok(rep)
 }
 
@@ -2664,14 +2823,27 @@ fn bin_oracle<'a>(
 /// `F_q` multiplications in one lift (`lift_x`) of a random abscissa
 /// that lifts, averaged over 32.
 fn f2m4_lift_muls(inst: &BinCurve) -> f64 {
+    f2m4_lift_muls_with(inst, false)
+}
+
+/// [`f2m4_lift_muls`], in the reference pricing when `reference`
+/// (`Fq4::ref_muls` instead of the counted multiplications).
+fn f2m4_lift_muls_with(inst: &BinCurve, reference: bool) -> f64 {
     let c = &inst.curve;
+    let tally = || {
+        if reference {
+            c.f.ref_muls()
+        } else {
+            c.f.f.muls()
+        }
+    };
     let mut rng = <rand::rngs::StdRng as rand::SeedableRng>::seed_from_u64(0x5e);
     let (mut muls, mut n) = (0u64, 0u64);
     while n < 32 {
         let x = c.f.random(&mut rng);
-        let before = c.f.f.muls();
+        let before = tally();
         if c.lift_x(&x, &mut rng).is_some() {
-            muls += c.f.f.muls() - before;
+            muls += tally().wrapping_sub(before);
             n += 1;
         }
     }
@@ -3697,6 +3869,78 @@ mod tests {
         }
     }
 
+    /// The `*_ref` methods are the full methods in the reference unit: the
+    /// same walk or run (same counts, same answer), the reference divisor
+    /// 50 in place of the curve's schoolbook one, and the two totals side
+    /// by side.
+    #[test]
+    fn the_reference_methods_are_the_full_methods_in_the_reference_unit() {
+        use crate::cryptanalysis::gaudry_quartic_bin::RefCosts;
+        for m in [6u32, 7] {
+            let (inst, facts, t) = f2m4_case(m, 777);
+            let kv = [("walks", "16")];
+            for (full_id, ref_id, kv) in [
+                (
+                    "rho.negation_batched_full",
+                    "rho.negation_batched_ref",
+                    &kv[..],
+                ),
+                ("rho.negation_f2m4_full", "rho.negation_f2m4_ref", &[][..]),
+            ] {
+                let full = solve(&method(full_id, kv), &inst, &facts, &t, 9).unwrap();
+                let rf = solve(&method(ref_id, kv), &inst, &facts, &t, 9).unwrap();
+                assert_eq!(full.recovered, rf.recovered);
+                for k in ["steps", "distinguished_points", "look_ahead_additions"] {
+                    assert_eq!(full.counters.get(k), rf.counters.get(k), "{k}");
+                }
+                check_full_block(&rf);
+                let b = &rf.detail["reference_pricing"];
+                assert_eq!(
+                    b["fq_muls_per_add_reference"].as_f64(),
+                    Some(RefCosts::ADD as f64)
+                );
+                assert!(b["fq_muls_per_add_current"].as_f64().unwrap() > RefCosts::ADD as f64);
+                assert!(
+                    (b["total_gae_current_pricing"].as_f64().unwrap() - full.total_gae).abs()
+                        <= 1e-9 * full.total_gae
+                );
+                assert_eq!(
+                    b["total_gae_reference_pricing"].as_f64(),
+                    Some(rf.total_gae)
+                );
+            }
+            let method = ic_method("ic.pipeline_f2m4_ref", "");
+            let full = solve(
+                &ic_method("ic.pipeline_f2m4_full", ""),
+                &inst,
+                &facts,
+                &t,
+                3,
+            )
+            .unwrap();
+            let rf = solve(&method, &inst, &facts, &t, 3).unwrap();
+            assert_eq!(full.recovered, rf.recovered);
+            let b = &rf.detail["reference_pricing"];
+            assert!(
+                (b["total_gae_current_pricing"].as_f64().unwrap() - full.total_gae).abs()
+                    <= 1e-9 * full.total_gae
+            );
+            let (cs, rs) = (
+                b["fq4_share_of_fq_operations_current"].as_f64().unwrap(),
+                b["fq4_share_of_fq_operations_reference"].as_f64().unwrap(),
+            );
+            assert!((0.0..=1.0).contains(&cs) && (0.0..=1.0).contains(&rs));
+            assert!(
+                b["lift_plus_x_of_t_fq_muls_reference"].as_f64().unwrap()
+                    < b["lift_plus_x_of_t_fq_muls_current"].as_f64().unwrap()
+            );
+            eprintln!(
+                "m={m} ic ref/current {:.3} share cur {cs:.4} ref {rs:.4}",
+                b["ratio_reference_over_current"]
+            );
+        }
+    }
+
     /// `ic.pipeline_f2m4_full` is the same run as `ic.pipeline` (the same
     /// group operations and counts, one word and `u128`, with and without
     /// large primes) with every native counter priced.
@@ -3715,7 +3959,7 @@ mod tests {
                 parse_hex_wide(&t[1]).unwrap(),
             );
             let one = solve(&method, &inst, &facts, &t, 3).unwrap();
-            let wide = solve_f2m4_ic_full_with(&method, b, &facts, tx, ty, 3, true).unwrap();
+            let wide = solve_f2m4_ic_full_with(&method, b, &facts, tx, ty, 3, true, false).unwrap();
             for full in [&one, &wide] {
                 assert_eq!(base.recovered, full.recovered, "{extra}");
                 assert!(base.recovered.is_some());
