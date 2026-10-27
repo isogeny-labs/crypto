@@ -17,6 +17,10 @@ Protocol, frozen before test data, with amendments D1-D2: [PROTOCOL.md](PROTOCOL
   - gate: [gate0.md](results/run/gate0.md); reproduction: [results/repro/](results/repro/);
   - training: [results/train/](results/train/) ([wtune.md](results/train/wtune.md), [tune.md](results/train/tune.md)).
 
+## R10 re-rate (2026-10-19)
+
+C1's 12..21 exponent claim regresses versus tuned-LP (+0.051); over 16..21, its advance is −0.0066. C1+C2 still advances by about one quarter of the original claim; C4 remains the cost pin. See [`pinned ledger`](../../ic_tool_program/ledger/r10-20261019/README.md).
+
 ## Verdict
 
 **Incumbent:** round 3's **R2**, `r2:lpsgebw2`: round 3's R1 relation primitives (one-inversion Cantor addition,

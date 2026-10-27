@@ -462,22 +462,11 @@ fn invert(gf: &Gf2, basis: &NormalBasis, a: u64) -> u64 {
 /// each key into this filter at the same time as the exact slot, so a negative
 /// filter answer can skip the exact lookup without changing a positive hit.
 struct RootBloom {
-    words: Vec<BloomBlock>,
+    words: Vec<u64>,
     bit_mask: usize,
     hashes: usize,
     profile: RootBloomProfile,
-    /// `KIC_BLOCKED_BLOOM=1`: every key sets all its bits inside one 64-byte
-    /// block chosen by the first hash, so a membership test touches one cache
-    /// line instead of up to `hashes` lines.  Off by default.
-    blocked: bool,
-    block_mask: usize,
 }
-
-/// One cache line of filter bits.  Both layouts address bit `b` as word
-/// `(b >> 6) & 7` of block `b >> 9`; the alignment only pins blocks to lines.
-#[derive(Clone, Copy, PartialEq, Eq)]
-#[repr(align(64))]
-struct BloomBlock([u64; 8]);
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum RootBloomProfile {
@@ -525,31 +514,20 @@ impl RootBloomProfile {
 
 impl RootBloom {
     fn with_capacity(keys: usize) -> Self {
-        Self::with_profile_blocked(
-            keys,
-            RootBloomProfile::from_env(),
-            std::env::var("KIC_BLOCKED_BLOOM").as_deref() == Ok("1"),
-        )
+        Self::with_profile(keys, RootBloomProfile::from_env())
     }
 
-    #[allow(dead_code)]
     fn with_profile(keys: usize, profile: RootBloomProfile) -> Self {
-        Self::with_profile_blocked(keys, profile, false)
-    }
-
-    fn with_profile_blocked(keys: usize, profile: RootBloomProfile, blocked: bool) -> Self {
         let bits = keys
             .checked_mul(profile.bits_per_request())
             .and_then(usize::checked_next_power_of_two)
             .expect("root Bloom size overflow")
-            .max(512);
+            .max(64);
         Self {
-            words: vec![BloomBlock([0; 8]); bits / 512],
+            words: vec![0; bits / 64],
             bit_mask: bits - 1,
             hashes: profile.hashes(),
             profile,
-            blocked,
-            block_mask: bits / 512 - 1,
         }
     }
 
@@ -563,69 +541,32 @@ impl RootBloom {
         )
     }
 
-    /// Bit index of hash number `index`.  Plain: double hashing over the
-    /// whole filter.  Blocked: the block comes from the high half of `first`
-    /// and each bit is nine bits of `step` (at most five hashes fit).
-    #[inline(always)]
-    fn bit_of(&self, first: u64, step: u64, index: usize) -> usize {
-        if self.blocked {
-            (((first >> 32) as usize & self.block_mask) << 9)
-                | ((step >> (9 * index)) as usize & 511)
-        } else {
-            first.wrapping_add((index as u64).wrapping_mul(step)) as usize & self.bit_mask
-        }
-    }
-
     #[inline(always)]
     fn insert(&mut self, key: u128) {
         let (first, step) = Self::hash_pair(key);
         for index in 0..self.hashes {
-            let bit = self.bit_of(first, step, index);
-            self.words[bit >> 9].0[(bit >> 6) & 7] |= 1u64 << (bit & 63);
+            let bit =
+                first.wrapping_add((index as u64).wrapping_mul(step)) as usize & self.bit_mask;
+            self.words[bit >> 6] |= 1u64 << (bit & 63);
         }
     }
 
     #[inline(always)]
     fn contains(&self, key: u128) -> bool {
         let (first, step) = Self::hash_pair(key);
-        self.contains_hashed(first, step)
-    }
-
-    #[inline(always)]
-    fn contains_hashed(&self, first: u64, step: u64) -> bool {
         for index in 0..self.hashes {
-            let bit = self.bit_of(first, step, index);
-            if self.words[bit >> 9].0[(bit >> 6) & 7] & (1u64 << (bit & 63)) == 0 {
+            let bit =
+                first.wrapping_add((index as u64).wrapping_mul(step)) as usize & self.bit_mask;
+            if self.words[bit >> 6] & (1u64 << (bit & 63)) == 0 {
                 return false;
             }
         }
         true
     }
 
-    /// Software prefetch of the line holding hash 0 (the only line in the
-    /// blocked layout).  A hint: it never changes the filter.
-    #[inline(always)]
-    fn prefetch_hashed(&self, first: u64, step: u64) {
-        let bit = self.bit_of(first, step, 0);
-        prefetch_read(&self.words[bit >> 9] as *const BloomBlock as *const u8);
-    }
-
     fn bytes(&self) -> usize {
-        self.words.len() * std::mem::size_of::<BloomBlock>()
+        self.words.len() * std::mem::size_of::<u64>()
     }
-}
-
-/// Read-prefetch hint into all cache levels; a no-op off x86_64.
-#[inline(always)]
-fn prefetch_read(ptr: *const u8) {
-    #[cfg(target_arch = "x86_64")]
-    // SAFETY: `_mm_prefetch` is a hint and never faults, even for an
-    // invalid address.
-    unsafe {
-        core::arch::x86_64::_mm_prefetch::<{ core::arch::x86_64::_MM_HINT_T0 }>(ptr as *const i8);
-    }
-    #[cfg(not(target_arch = "x86_64"))]
-    let _ = ptr;
 }
 
 #[inline(always)]
@@ -1309,9 +1250,7 @@ fn peak_rss_bytes() -> Option<u64> {
 // and the rank linear algebra stay `u64` (every admitted `r < 2^64`
 // through `n = 127`); only field elements move to the wider word.
 mod wide {
-    #[cfg(test)]
-    use super::RootBloomProfile;
-    use super::{pack, prefetch_read, root_bloom_enabled, unpack, RootBloom};
+    use super::{pack, root_bloom_enabled, unpack, RootBloom};
     use crypto_lib::cryptanalysis::koblitz_fast_arith::{
         s3_x_roots_128, FastBinaryCurve128, FastPoint128,
     };
@@ -1362,11 +1301,6 @@ mod wide {
         to_normal: Linear128,
         to_poly: Linear128,
         sparse_canonical: bool,
-        /// On by default (`KIC_LAZY_CANON=0` restores the 72-step loop on every
-        /// probe): the probe path asks only for the canonical
-        /// key (cheap early-exit zero-run form) before the table lookup and
-        /// computes the rotation shift only for a probe that hits.
-        lazy_canonical: bool,
     }
 
     impl NormalBasis128 {
@@ -1389,7 +1323,6 @@ mod wide {
                     to_normal: Linear128::from_images(&inverse_columns),
                     to_poly: Linear128::from_images(&conjugates),
                     sparse_canonical: std::env::var("KIC_SPARSE_CANONICAL").as_deref() == Ok("1"),
-                    lazy_canonical: std::env::var("KIC_LAZY_CANON").as_deref() != Ok("0"),
                 };
             }
             unreachable!()
@@ -1469,60 +1402,6 @@ mod wide {
             (best_value, best_shift)
         }
 
-        /// The canonical key alone, equal to `canonical(v).0` for every `v`.
-        /// The minimal rotation starts at the longest cyclic run of zeros
-        /// (below the top bit of the rotated word), so the key follows from
-        /// the run starts.  Unlike [`Self::canonical_sparse`] the doubling
-        /// ladder stops at the first level with no run, then refines only
-        /// below that level; for random words the longest run is about
-        /// `log2 n`, so three or four rotations replace seven plus seven.
-        #[inline(always)]
-        fn canonical_key_lazy(&self, v: u128) -> u128 {
-            let value = v & self.mask;
-            if value == 0 || value == self.mask {
-                return value;
-            }
-            let n = self.n;
-            let mut runs = [0u128; 7];
-            runs[0] = (!value) & self.mask;
-            let mut top = 0usize;
-            while top + 1 < runs.len() {
-                let length = 1u32 << top;
-                if (length << 1) >= n {
-                    break;
-                }
-                let next = runs[top] & self.rotate(runs[top], length);
-                if next == 0 {
-                    break;
-                }
-                top += 1;
-                runs[top] = next;
-            }
-            let mut gap = 1u32 << top;
-            let mut starts = runs[top];
-            for level in (0..top).rev() {
-                let length = 1u32 << level;
-                if gap + length >= n {
-                    continue;
-                }
-                let eligible = starts & self.rotate(runs[level], gap);
-                if eligible != 0 {
-                    starts = eligible;
-                    gap += length;
-                }
-            }
-            let mut best = u128::MAX;
-            while starts != 0 {
-                let start = starts.trailing_zeros();
-                starts &= starts - 1;
-                let rotated = self.rotate(value, n - 1 - start);
-                if rotated < best {
-                    best = rotated;
-                }
-            }
-            best
-        }
-
         #[inline(always)]
         fn canonical_selected(&self, v: u128) -> (u128, u32) {
             if self.sparse_canonical {
@@ -1544,7 +1423,6 @@ mod wide {
                 to_normal: Linear128 { tables: Vec::new() },
                 to_poly: Linear128 { tables: Vec::new() },
                 sparse_canonical,
-                lazy_canonical: false,
             }
         }
 
@@ -1557,73 +1435,6 @@ mod wide {
                     assert_eq!(
                         sparse.canonical_selected(value),
                         reference.canonical_selected(value),
-                        "degree={n}, value={value:#x}"
-                    );
-                }
-            }
-        }
-
-        #[test]
-        fn lazy_key_matches_canonical_for_every_word_through_degree_13() {
-            for n in 1..=13 {
-                let reference = basis(n, false);
-                for value in 0..=reference.mask {
-                    assert_eq!(
-                        reference.canonical_key_lazy(value),
-                        reference.canonical(value).0,
-                        "degree={n}, value={value:#x}"
-                    );
-                }
-            }
-        }
-
-        #[test]
-        fn lazy_key_matches_canonical_for_sampled_and_structured_wide_words() {
-            let mut seed = 0x51F1_5EED_0BAD_CAFEu64;
-            let mut next = move || {
-                seed ^= seed << 13;
-                seed ^= seed >> 7;
-                seed ^= seed << 17;
-                seed
-            };
-            for n in [65u32, 71, 73, 83, 97, 127] {
-                let reference = basis(n, false);
-                let mask = reference.mask;
-                for bit in 0..n {
-                    let singleton = 1u128 << bit;
-                    for value in [
-                        singleton,
-                        mask ^ singleton,
-                        mask ^ (3u128 << bit.min(n - 2)),
-                    ] {
-                        assert_eq!(
-                            reference.canonical_key_lazy(value),
-                            reference.canonical(value).0,
-                            "degree={n}, value={value:#x}"
-                        );
-                    }
-                }
-                for trial in 0..60_000usize {
-                    let mut value = (((next() as u128) << 64) | next() as u128) & mask;
-                    // Thin the word so long zero and one runs, ties between
-                    // equally long runs and periodic words all occur.
-                    match trial % 4 {
-                        1 => value &= (((next() as u128) << 64) | next() as u128) & mask,
-                        2 => value |= (((next() as u128) << 64) | next() as u128) & mask,
-                        3 => {
-                            let period = 1 + (next() % 12) as u32;
-                            let mut word = 0u128;
-                            let seedbits = next() as u128 & ((1u128 << period) - 1);
-                            for i in 0..n {
-                                word |= ((seedbits >> (i % period)) & 1) << i;
-                            }
-                            value = word & mask;
-                        }
-                        _ => {}
-                    }
-                    assert_eq!(
-                        reference.canonical_key_lazy(value),
-                        reference.canonical(value).0,
                         "degree={n}, value={value:#x}"
                     );
                 }
@@ -1707,10 +1518,6 @@ mod wide {
         half_trace: Linear128,
         trace_mask: u128,
         b: u128,
-        /// KIC_ROOT_ALGEBRA: one batched inversion of `(l+r)·l·r` instead of
-        /// of `(l+r)²·(l·r)²`, the quotients recovered by squarings (linear);
-        /// 10 field multiplications per candidate instead of 11, same roots.
-        algebra: bool,
     }
 
     impl S3Solver128 {
@@ -1749,7 +1556,6 @@ mod wide {
                 half_trace: Linear128::from_images(&half_trace_images),
                 trace_mask,
                 b,
-                algebra: std::env::var("KIC_ROOT_ALGEBRA").is_ok_and(|v| v == "1"),
             }
         }
 
@@ -1762,13 +1568,7 @@ mod wide {
             let a = self.square.apply(left ^ right);
             let p = gf.mul(left, right);
             let ps = self.square.apply(p);
-            let denominator = if a == 0 || ps == 0 {
-                0
-            } else if self.algebra {
-                gf.mul(left ^ right, p)
-            } else {
-                gf.mul(a, ps)
-            };
+            let denominator = if a == 0 || ps == 0 { 0 } else { gf.mul(a, ps) };
             PreparedRoot128 {
                 left,
                 right,
@@ -1791,18 +1591,9 @@ mod wide {
             if prepared.denominator == 0 {
                 return s3_x_roots_128(gf, self.b, prepared.left, prepared.right);
             }
+            let q = gf.mul(prepared.p, gf.mul(prepared.ps, inverse));
             let c = prepared.ps ^ self.b;
-            let (q, d) = if self.algebra {
-                // inverse = 1/((l+r)·p): 1/(l+r) = inverse·p, so
-                // q = p/a = p·(inverse·p)², and d = c·a/p² = c·(inverse·a)².
-                let q = gf.mul(prepared.p, gf.sqr(gf.mul(inverse, prepared.p)));
-                let d = gf.mul(c, gf.sqr(gf.mul(inverse, prepared.a)));
-                (q, d)
-            } else {
-                let q = gf.mul(prepared.p, gf.mul(prepared.ps, inverse));
-                let d = gf.mul(gf.mul(c, prepared.a), gf.mul(prepared.a, inverse));
-                (q, d)
-            };
+            let d = gf.mul(gf.mul(c, prepared.a), gf.mul(prepared.a, inverse));
             if (d & self.trace_mask).count_ones() & 1 == 1 {
                 return None;
             }
@@ -2000,6 +1791,10 @@ mod wide {
         bloom: Option<RootBloom>,
         packed_layout: Option<PackedRootLayout>,
         indexed83_id30: bool,
+        indexed83_id31: bool,
+        indexed83_four_id31: bool,
+        indexed83_four_relative_base: Option<usize>,
+        indexed83_four_fingerprint8: Option<Vec<u8>>,
     }
 
     impl RootTable128 {
@@ -2009,6 +1804,29 @@ mod wide {
         }
 
         fn with_capacity_indexed83_mode(entries: usize, indexed83_id30: bool) -> Self {
+            Self::with_capacity_indexed83_mode_bloom(entries, indexed83_id30, root_bloom_enabled())
+        }
+
+        fn with_capacity_indexed83_mode_bloom(
+            entries: usize,
+            indexed83_id30: bool,
+            bloom_enabled: bool,
+        ) -> Self {
+            Self::with_capacity_indexed83_mode_bloom_id31(
+                entries,
+                indexed83_id30,
+                false,
+                bloom_enabled,
+            )
+        }
+
+        fn with_capacity_indexed83_mode_bloom_id31(
+            entries: usize,
+            indexed83_id30: bool,
+            indexed83_id31: bool,
+            bloom_enabled: bool,
+        ) -> Self {
+            assert!(!(indexed83_id30 && indexed83_id31));
             let slots = entries
                 .checked_mul(2)
                 .expect("indexed root table request exceeds usize")
@@ -2018,13 +1836,53 @@ mod wide {
                 slots: RootSlots128::Indexed83(crate::root_slot_vec(slots, [0u8; 5])),
                 shift: 128 - slots.trailing_zeros(),
                 len: 0,
-                bloom: root_bloom_enabled().then(|| RootBloom::with_capacity(entries)),
+                bloom: bloom_enabled.then(|| RootBloom::with_capacity(entries)),
                 packed_layout: None,
                 indexed83_id30,
+                indexed83_id31,
+                indexed83_four_id31: false,
+                indexed83_four_relative_base: None,
+                indexed83_four_fingerprint8: None,
             }
         }
 
         fn with_capacity_indexed83_four(entries: usize) -> Self {
+            Self::with_capacity_indexed83_four_mode(entries, false)
+        }
+
+        fn with_capacity_indexed83_four_mode(entries: usize, id31: bool) -> Self {
+            Self::with_capacity_indexed83_four_layout(entries, id31, None)
+        }
+
+        fn with_capacity_indexed83_four_relative(entries: usize, base: usize) -> Self {
+            Self::with_capacity_indexed83_four_layout(entries, false, Some(base))
+        }
+
+        fn with_capacity_indexed83_four_layout(
+            entries: usize,
+            id31: bool,
+            relative_base: Option<usize>,
+        ) -> Self {
+            let fingerprint8 = std::env::var("KIC_INDEXED4_FINGERPRINT8").as_deref() == Ok("1");
+            Self::with_capacity_indexed83_four_layout_fp8(
+                entries,
+                id31,
+                relative_base,
+                fingerprint8,
+            )
+        }
+
+        fn with_capacity_indexed83_four_layout_fp8(
+            entries: usize,
+            id31: bool,
+            relative_base: Option<usize>,
+            fingerprint8: bool,
+        ) -> Self {
+            assert!(!id31 || relative_base.is_none());
+            assert!(
+                !fingerprint8 || relative_base.is_some(),
+                "byte fingerprint sidecar requires relative four-byte slots"
+            );
             let slots = entries
                 .checked_mul(2)
                 .expect("four-byte indexed root table request exceeds usize")
@@ -2037,6 +1895,10 @@ mod wide {
                 bloom: root_bloom_enabled().then(|| RootBloom::with_capacity(entries)),
                 packed_layout: None,
                 indexed83_id30: false,
+                indexed83_id31: false,
+                indexed83_four_id31: id31,
+                indexed83_four_relative_base: relative_base,
+                indexed83_four_fingerprint8: fingerprint8.then(|| vec![0u8; slots]),
             }
         }
 
@@ -2101,6 +1963,36 @@ mod wide {
         }
 
         #[inline(always)]
+        fn indexed83_id31_encode(
+            state_index: usize,
+            root_selector: usize,
+            fingerprint: u64,
+        ) -> [u8; 5] {
+            assert!(
+                state_index + 1 < 1 << 31,
+                "indexed root state id exceeds 31 bits"
+            );
+            assert!(root_selector < 2);
+            let word = ((fingerprint & 0xff) << 32)
+                | (((state_index + 1) as u64) << 1)
+                | root_selector as u64;
+            let bytes = word.to_le_bytes();
+            [bytes[0], bytes[1], bytes[2], bytes[3], bytes[4]]
+        }
+
+        #[inline(always)]
+        fn indexed83_id31_decode(bytes: [u8; 5]) -> (usize, usize, u64) {
+            let word =
+                u64::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], 0, 0, 0]);
+            let token = word & ((1 << 32) - 1);
+            (
+                ((token >> 1) - 1) as usize,
+                (token & 1) as usize,
+                word >> 32,
+            )
+        }
+
+        #[inline(always)]
         fn indexed83_four_encode(
             state_index: usize,
             root_selector: usize,
@@ -2126,6 +2018,52 @@ mod wide {
             )
         }
 
+        #[inline(always)]
+        fn indexed83_four_id31_encode(state_index: usize, root_selector: usize) -> u32 {
+            assert!(
+                state_index + 1 < 1 << 31,
+                "four-byte root state id exceeds 31 bits"
+            );
+            assert!(root_selector < 2);
+            (((state_index + 1) as u32) << 1) | root_selector as u32
+        }
+
+        #[inline(always)]
+        fn indexed83_four_id31_decode(word: u32) -> (usize, usize, u64) {
+            assert_ne!(word, 0, "empty four-byte root slot has no witness");
+            (((word >> 1) - 1) as usize, (word & 1) as usize, 0)
+        }
+
+        #[inline(always)]
+        fn indexed83_four_relative_encode(
+            state_index: usize,
+            root_selector: usize,
+            fingerprint: u64,
+            base: usize,
+        ) -> u32 {
+            let relative = state_index
+                .checked_sub(base)
+                .expect("four-byte relative state precedes split");
+            assert!(
+                relative + 1 < 1 << 30,
+                "four-byte relative state exceeds 30 bits"
+            );
+            assert!(root_selector < 2);
+            (((relative + 1) as u32) << 2)
+                | ((root_selector as u32) << 1)
+                | (fingerprint as u32 & 1)
+        }
+
+        #[inline(always)]
+        fn indexed83_four_relative_decode(word: u32, base: usize) -> (usize, usize, u64) {
+            assert_ne!(word, 0, "empty four-byte root slot has no witness");
+            (
+                base + ((word >> 2) - 1) as usize,
+                ((word >> 1) & 1) as usize,
+                (word & 1) as u64,
+            )
+        }
+
         fn with_capacity(
             entries: usize,
             degree: u32,
@@ -2145,6 +2083,10 @@ mod wide {
                 bloom: root_bloom_enabled().then(|| RootBloom::with_capacity(entries)),
                 packed_layout,
                 indexed83_id30: false,
+                indexed83_id31: false,
+                indexed83_four_id31: false,
+                indexed83_four_relative_base: None,
+                indexed83_four_fingerprint8: None,
             }
         }
 
@@ -2166,7 +2108,9 @@ mod wide {
                     slots.len() * std::mem::size_of::<u128>(),
                 ),
                 RootSlots128::Indexed83(slots) => (
-                    if self.indexed83_id30 {
+                    if self.indexed83_id31 {
+                        "indexed83_5byte_exact_id31"
+                    } else if self.indexed83_id30 {
                         "indexed83_5byte_exact_id30"
                     } else {
                         "indexed83_5byte_exact"
@@ -2175,11 +2119,23 @@ mod wide {
                     slots.len() * std::mem::size_of::<[u8; 5]>(),
                 ),
                 RootSlots128::Indexed83Four(slots) => (
-                    "indexed83_4byte_exact",
+                    if self.indexed83_four_relative_base.is_some() {
+                        "indexed83_4byte_split_id30"
+                    } else if self.indexed83_four_id31 {
+                        "indexed83_4byte_exact_id31"
+                    } else {
+                        "indexed83_4byte_exact"
+                    },
                     std::mem::size_of::<u32>(),
                     slots.len() * std::mem::size_of::<u32>(),
                 ),
             }
+        }
+
+        fn fingerprint_sidecar_bytes(&self) -> usize {
+            self.indexed83_four_fingerprint8
+                .as_ref()
+                .map_or(0, Vec::len)
         }
 
         fn insert_indexed83<F>(
@@ -2193,6 +2149,8 @@ mod wide {
         {
             let fingerprint = Self::indexed83_fingerprint(key);
             if matches!(&self.slots, RootSlots128::Indexed83Four(_)) {
+                let id31 = self.indexed83_four_id31;
+                let relative_base = self.indexed83_four_relative_base;
                 let mask = match &self.slots {
                     RootSlots128::Indexed83Four(slots) => slots.len() - 1,
                     _ => unreachable!(),
@@ -2201,11 +2159,25 @@ mod wide {
                 let RootSlots128::Indexed83Four(slots) = &mut self.slots else {
                     unreachable!();
                 };
+                let fingerprints = &mut self.indexed83_four_fingerprint8;
                 loop {
                     let existing = slots[slot];
                     if existing == 0 {
-                        slots[slot] =
-                            Self::indexed83_four_encode(state_index, root_selector, fingerprint);
+                        slots[slot] = if let Some(base) = relative_base {
+                            Self::indexed83_four_relative_encode(
+                                state_index,
+                                root_selector,
+                                fingerprint,
+                                base,
+                            )
+                        } else if id31 {
+                            Self::indexed83_four_id31_encode(state_index, root_selector)
+                        } else {
+                            Self::indexed83_four_encode(state_index, root_selector, fingerprint)
+                        };
+                        if let Some(bytes) = fingerprints.as_mut() {
+                            bytes[slot] = fingerprint as u8;
+                        }
                         self.len += 1;
                         assert!(
                             self.len < slots.len(),
@@ -2216,16 +2188,36 @@ mod wide {
                         }
                         return;
                     }
-                    let (old_state, old_root, old_fingerprint) =
-                        Self::indexed83_four_decode(existing);
-                    if old_fingerprint == (fingerprint & 3) && key_of(old_state, old_root) == key {
+                    let (old_state, old_root, old_fingerprint) = if let Some(base) = relative_base {
+                        Self::indexed83_four_relative_decode(existing, base)
+                    } else if id31 {
+                        Self::indexed83_four_id31_decode(existing)
+                    } else {
+                        Self::indexed83_four_decode(existing)
+                    };
+                    if fingerprints
+                        .as_ref()
+                        .is_none_or(|bytes| bytes[slot] == fingerprint as u8)
+                        && (id31
+                            || old_fingerprint
+                                == (fingerprint & if relative_base.is_some() { 1 } else { 3 }))
+                        && key_of(old_state, old_root) == key
+                    {
                         return;
                     }
                     slot = (slot + 1) & mask;
                 }
             }
             let id30 = self.indexed83_id30;
-            let fingerprint = fingerprint & if id30 { 0x1ff } else { 0x3ff };
+            let id31 = self.indexed83_id31;
+            let fingerprint = fingerprint
+                & if id31 {
+                    0xff
+                } else if id30 {
+                    0x1ff
+                } else {
+                    0x3ff
+                };
             let mask = match &self.slots {
                 RootSlots128::Indexed83(slots) => slots.len() - 1,
                 _ => unreachable!("indexed insertion needs five-byte slots"),
@@ -2237,7 +2229,9 @@ mod wide {
             loop {
                 let existing = slots[slot];
                 if existing == [0; 5] {
-                    slots[slot] = if id30 {
+                    slots[slot] = if id31 {
+                        Self::indexed83_id31_encode(state_index, root_selector, fingerprint)
+                    } else if id30 {
                         Self::indexed83_id30_encode(state_index, root_selector, fingerprint)
                     } else {
                         Self::indexed83_encode(state_index, root_selector, fingerprint)
@@ -2252,7 +2246,9 @@ mod wide {
                     }
                     return;
                 }
-                let (old_state, old_root, old_fingerprint) = if id30 {
+                let (old_state, old_root, old_fingerprint) = if id31 {
+                    Self::indexed83_id31_decode(existing)
+                } else if id30 {
                     Self::indexed83_id30_decode(existing)
                 } else {
                     Self::indexed83_decode(existing)
@@ -2276,17 +2272,11 @@ mod wide {
             {
                 return None;
             }
-            self.get_indexed83_unscreened(key, key_of)
-        }
-
-        #[inline(always)]
-        fn get_indexed83_unscreened<F>(&self, key: u128, key_of: F) -> Option<(usize, usize)>
-        where
-            F: Fn(usize, usize) -> u128,
-        {
             if let RootSlots128::Indexed83Four(slots) = &self.slots {
+                let id31 = self.indexed83_four_id31;
+                let relative_base = self.indexed83_four_relative_base;
                 let mask = slots.len() - 1;
-                let fingerprint = Self::indexed83_fingerprint(key) & 3;
+                let fingerprint = Self::indexed83_fingerprint(key);
                 let mut slot = self.slot(key);
                 loop {
                     let existing = slots[slot];
@@ -2294,8 +2284,22 @@ mod wide {
                         return None;
                     }
                     let (state_index, root_selector, old_fingerprint) =
-                        Self::indexed83_four_decode(existing);
-                    if old_fingerprint == fingerprint && key_of(state_index, root_selector) == key {
+                        if let Some(base) = relative_base {
+                            Self::indexed83_four_relative_decode(existing, base)
+                        } else if id31 {
+                            Self::indexed83_four_id31_decode(existing)
+                        } else {
+                            Self::indexed83_four_decode(existing)
+                        };
+                    if self
+                        .indexed83_four_fingerprint8
+                        .as_ref()
+                        .is_none_or(|bytes| bytes[slot] == fingerprint as u8)
+                        && (id31
+                            || old_fingerprint
+                                == (fingerprint & if relative_base.is_some() { 1 } else { 3 }))
+                        && key_of(state_index, root_selector) == key
+                    {
                         return Some((state_index, root_selector));
                     }
                     slot = (slot + 1) & mask;
@@ -2306,14 +2310,24 @@ mod wide {
             };
             let mask = slots.len() - 1;
             let id30 = self.indexed83_id30;
-            let fingerprint = Self::indexed83_fingerprint(key) & if id30 { 0x1ff } else { 0x3ff };
+            let id31 = self.indexed83_id31;
+            let fingerprint = Self::indexed83_fingerprint(key)
+                & if id31 {
+                    0xff
+                } else if id30 {
+                    0x1ff
+                } else {
+                    0x3ff
+                };
             let mut slot = self.slot(key);
             loop {
                 let existing = slots[slot];
                 if existing == [0; 5] {
                     return None;
                 }
-                let (state_index, root_selector, old_fingerprint) = if id30 {
+                let (state_index, root_selector, old_fingerprint) = if id31 {
+                    Self::indexed83_id31_decode(existing)
+                } else if id30 {
                     Self::indexed83_id30_decode(existing)
                 } else {
                     Self::indexed83_decode(existing)
@@ -2379,26 +2393,6 @@ mod wide {
             {
                 return None;
             }
-            self.get_unscreened(key)
-        }
-
-        /// Prefetch the first slot a lookup of `key` reads (a hint only).
-        #[inline(always)]
-        fn prefetch_slot(&self, key: u128) {
-            let slot = self.slot(key);
-            let ptr = match &self.slots {
-                RootSlots128::Wide(slots) => &slots[slot] as *const (u128, u64) as *const u8,
-                RootSlots128::Packed(slots) => &slots[slot] as *const u128 as *const u8,
-                RootSlots128::Indexed83(slots) => &slots[slot] as *const [u8; 5] as *const u8,
-                RootSlots128::Indexed83Four(slots) => &slots[slot] as *const u32 as *const u8,
-            };
-            prefetch_read(ptr);
-        }
-
-        /// The exact table walk, without the Bloom screen (the caller has
-        /// already screened the key).
-        #[inline(always)]
-        fn get_unscreened(&self, key: u128) -> Option<u64> {
             let mask = match &self.slots {
                 RootSlots128::Wide(slots) => slots.len() - 1,
                 RootSlots128::Packed(slots) => slots.len() - 1,
@@ -2453,40 +2447,6 @@ mod wide {
             let (state_index, root_selector) = self.get_indexed83(key, |index, selector| {
                 basis.canonical_selected(states.root_at(index, selector)).0
             })?;
-            self.finish_context(key, states, basis, state_index, root_selector)
-        }
-
-        /// [`Self::get_with_context`] for a key the caller has already passed
-        /// through the Bloom screen.
-        #[inline(always)]
-        fn get_with_context_screened(
-            &self,
-            key: u128,
-            states: &StateStore128,
-            basis: &NormalBasis128,
-        ) -> Option<u64> {
-            if !matches!(
-                &self.slots,
-                RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_)
-            ) {
-                return self.get_unscreened(key);
-            }
-            let (state_index, root_selector) = self
-                .get_indexed83_unscreened(key, |index, selector| {
-                    basis.canonical_selected(states.root_at(index, selector)).0
-                })?;
-            self.finish_context(key, states, basis, state_index, root_selector)
-        }
-
-        #[inline(always)]
-        fn finish_context(
-            &self,
-            key: u128,
-            states: &StateStore128,
-            basis: &NormalBasis128,
-            state_index: usize,
-            root_selector: usize,
-        ) -> Option<u64> {
             let state = states.get(state_index);
             let (verified_key, shift) = basis.canonical_selected(state.normal_roots[root_selector]);
             debug_assert_eq!(verified_key, key);
@@ -2497,59 +2457,13 @@ mod wide {
     #[cfg(test)]
     mod root_bloom_table_tests {
         use super::{
-            build_index128_with_symmetry, symmetric_labels_for_ordinal, symmetric_state_prefix,
-            Gf2_128, NormalBasis128, PackedRootLayout, RootBatch128, RootBloom, RootOnly11,
-            RootOnly21, RootOnly83, RootSlots128, RootTable128, S3Solver128, State128, State26,
-            State83, StateStore128,
+            build_index128_with_symmetry, indexed5_load80_request, pack, root_from_tables,
+            symmetric_labels_for_ordinal, symmetric_state_prefix, Gf2_128, NormalBasis128,
+            PackedRootLayout, RootBloom, RootOnly11, RootOnly21, RootOnly83, RootSlots128,
+            RootTable128, S3Solver128, State128, State26, State83, StateStore128,
         };
-        use crate::mix_root_bloom;
+        use crate::{mix_root_bloom, RootBloomProfile};
         use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse_wide;
-
-        /// T21 root algebra (10 multiplications per candidate) returns exactly
-        /// the roots, in the same order, of the original formulation and of
-        /// the direct solver, on random and exceptional inputs, scalar and
-        /// batched.
-        #[test]
-        fn root_algebra_matches_original_roots_n73_n83() {
-            for n in [73u32, 83] {
-                let gf = Gf2_128::new(&find_irreducible_sparse_wide(n).unwrap());
-                let basis = NormalBasis128::new(&gf);
-                let mut on = S3Solver128::new(&gf, 1);
-                let mut off = S3Solver128::new(&gf, 1);
-                on.algebra = true;
-                off.algebra = false;
-                let mut state = 0x1234_5678_9ABC_DEF0_0FED_CBA9_8765_4321u128 ^ n as u128;
-                let mut step = || {
-                    state = state
-                        .wrapping_mul(0x2360_ED05_1FC6_5DA4_4385_DF64_9FCC_F645)
-                        .wrapping_add(0x1442_6950_4088_9634_07E6_F4B7_D32B_4C2Du128);
-                    state & basis.mask
-                };
-                let mut inputs: Vec<(u128, u128)> = vec![(0, 5), (5, 0), (7, 7), (0, 0), (1, 1)];
-                for _ in 0..4000 {
-                    inputs.push((step(), step()));
-                }
-                let mut batch_on = RootBatch128::with_capacity(256);
-                let mut batch_off = RootBatch128::with_capacity(256);
-                for chunk in inputs.chunks(256) {
-                    batch_on.solve(&gf, &basis, &on, chunk);
-                    batch_off.solve(&gf, &basis, &off, chunk);
-                    assert_eq!(batch_on.results, batch_off.results, "batch n={n}");
-                }
-                let mut some = 0;
-                for &(l, r) in &inputs {
-                    let want = off.roots(&gf, &basis, l, r);
-                    assert_eq!(on.roots(&gf, &basis, l, r), want, "n={n} l={l} r={r}");
-                    assert_eq!(
-                        want,
-                        crypto_lib::cryptanalysis::koblitz_fast_arith::s3_x_roots_128(&gf, 1, l, r),
-                        "direct n={n}"
-                    );
-                    some += want.is_some() as u32;
-                }
-                assert!(some > 1000, "too few solvable inputs: {some}");
-            }
-        }
 
         #[test]
         fn indexed_five_byte_slots_match_real_n83_s3_roots() {
@@ -2608,10 +2522,20 @@ mod wide {
             assert!(states.len() > 100);
             let mut packed = RootTable128::with_capacity(states.len() * 2, 83, reps.len(), true);
             let mut indexed = RootTable128::with_capacity_indexed83(states.len() * 2);
+            let mut indexed4_id31 =
+                RootTable128::with_capacity_indexed83_four_mode(states.len() * 2, true);
+            let split_at = states.len() / 2;
+            let mut split_primary =
+                RootTable128::with_capacity_indexed83_four_relative(states.len(), 0);
+            let mut split_overflow =
+                RootTable128::with_capacity_indexed83_four_relative(states.len(), split_at);
             let mut indexed_bloom = RootTable128::with_capacity_indexed83(states.len() * 2);
             let mut indexed26 = RootTable128::with_capacity_indexed83(states.len() * 2);
             packed.bloom = None;
             indexed.bloom = None;
+            indexed4_id31.bloom = None;
+            split_primary.bloom = None;
+            split_overflow.bloom = None;
             indexed_bloom.bloom = Some(RootBloom::with_capacity(states.len() * 2));
             indexed26.bloom = None;
             let mut inserted_keys = Vec::new();
@@ -2629,6 +2553,31 @@ mod wide {
                             .canonical_selected(states.root_at(state_index, root_selector))
                             .0
                     });
+                    indexed4_id31.insert_indexed83(
+                        key,
+                        index,
+                        selector,
+                        |state_index, root_selector| {
+                            basis
+                                .canonical_selected(states.root_at(state_index, root_selector))
+                                .0
+                        },
+                    );
+                    let split_table = if index < split_at {
+                        &mut split_primary
+                    } else {
+                        &mut split_overflow
+                    };
+                    split_table.insert_indexed83(
+                        key,
+                        index,
+                        selector,
+                        |state_index, root_selector| {
+                            basis
+                                .canonical_selected(states.root_at(state_index, root_selector))
+                                .0
+                        },
+                    );
                     indexed_bloom.insert_indexed83(
                         key,
                         index,
@@ -2652,11 +2601,27 @@ mod wide {
                 }
             }
             assert_eq!(indexed.len, packed.len);
+            assert_eq!(indexed4_id31.len, packed.len);
             assert_eq!(indexed_bloom.len, packed.len);
             assert_eq!(indexed26.len, packed.len);
             for key in inserted_keys {
                 assert_eq!(
                     indexed.get_with_context(key, &states, &basis),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    indexed4_id31.get_with_context(key, &states, &basis),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    root_from_tables(
+                        &split_primary,
+                        Some(&split_overflow),
+                        None,
+                        &states,
+                        &basis,
+                        key,
+                    ),
                     packed.get(key)
                 );
                 assert_eq!(
@@ -2674,6 +2639,21 @@ mod wide {
                     .0;
                 assert_eq!(
                     indexed.get_with_context(key, &states, &basis),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    indexed4_id31.get_with_context(key, &states, &basis),
+                    packed.get(key)
+                );
+                assert_eq!(
+                    root_from_tables(
+                        &split_primary,
+                        Some(&split_overflow),
+                        None,
+                        &states,
+                        &basis,
+                        key,
+                    ),
                     packed.get(key)
                 );
                 assert_eq!(
@@ -2700,8 +2680,35 @@ mod wide {
                 2445342385696756367155238,
                 5959927424489161220022208,
             ];
-            let full = build_index128_with_symmetry(&gf, &basis, &solver, &reps, false, false);
-            let quotient = build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false);
+            let full = build_index128_with_symmetry(
+                &gf, &basis, &solver, &reps, false, false, false, false,
+            );
+            let quotient = build_index128_with_symmetry(
+                &gf, &basis, &solver, &reps, true, false, false, false,
+            );
+            let batched =
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, false, true);
+            assert_eq!(batched.states.len(), quotient.states.len());
+            assert_eq!(batched.table.len, quotient.table.len);
+            for index in 0..quotient.states.len() {
+                let scalar = quotient.states.get(index);
+                let batch = batched.states.get(index);
+                assert_eq!(
+                    (batch.left, batch.right, batch.relative),
+                    (scalar.left, scalar.right, scalar.relative)
+                );
+                assert_eq!(batch.normal_roots, scalar.normal_roots);
+                for root in scalar.normal_roots {
+                    let key = basis.canonical_selected(root).0;
+                    assert_eq!(
+                        batched.table.get_with_context(key, &batched.states, &basis),
+                        quotient
+                            .table
+                            .get_with_context(key, &quotient.states, &basis),
+                        "batched index changed the first witness for key {key}",
+                    );
+                }
+            }
             assert!(quotient.states.len() < full.states.len());
             assert_eq!(quotient.table.len, full.table.len);
             assert_eq!(
@@ -2736,6 +2743,98 @@ mod wide {
                 gf: Box::new(gf.clone()),
                 basis: Box::new(basis.clone()),
             };
+            // Partition the same real S3 roots at K=3, then compare the
+            // exact union and its core-first witness rule against a map.
+            let mut core_table =
+                RootTable128::with_capacity_indexed83_mode(quotient.states.len() * 2, true);
+            let mut extension_table =
+                RootTable128::with_capacity_indexed83_mode(quotient.states.len() * 2, true);
+            let mut expected_roots = std::collections::HashMap::new();
+            for extension in [false, true] {
+                let table = if extension {
+                    &mut extension_table
+                } else {
+                    &mut core_table
+                };
+                for state_index in 0..quotient.states.len() {
+                    let state = quotient.states.get(state_index);
+                    if (state.left >= 3 || state.right >= 3) != extension {
+                        continue;
+                    }
+                    for (selector, root) in state.normal_roots.into_iter().enumerate() {
+                        let (key, shift) = basis.canonical_selected(root);
+                        table.insert_indexed83(key, state_index, selector, |index, which| {
+                            basis
+                                .canonical_selected(root_only11.root_at(index, which))
+                                .0
+                        });
+                        expected_roots.entry(key).or_insert_with(|| {
+                            pack(state.left, state.right, state.relative, shift)
+                        });
+                    }
+                }
+            }
+            assert!(core_table.len > 0 && extension_table.len > 0);
+            for (&key, &value) in &expected_roots {
+                assert_eq!(
+                    root_from_tables(
+                        &core_table,
+                        Some(&extension_table),
+                        None,
+                        &root_only11,
+                        &basis,
+                        key,
+                    ),
+                    Some(value),
+                    "split index changed the core-first witness for {key}"
+                );
+            }
+            for probe in 1..2048u128 {
+                assert_eq!(
+                    root_from_tables(
+                        &core_table,
+                        Some(&extension_table),
+                        None,
+                        &root_only11,
+                        &basis,
+                        probe,
+                    ),
+                    expected_roots.get(&probe).copied(),
+                );
+            }
+            let mut shared_bloom =
+                RootBloom::with_profile(expected_roots.len(), RootBloomProfile::Wide3);
+            for &key in expected_roots.keys() {
+                shared_bloom.insert(key);
+            }
+            core_table.bloom = None;
+            extension_table.bloom = None;
+            for (&key, &value) in &expected_roots {
+                assert_eq!(
+                    root_from_tables(
+                        &core_table,
+                        Some(&extension_table),
+                        Some(&shared_bloom),
+                        &root_only11,
+                        &basis,
+                        key,
+                    ),
+                    Some(value),
+                );
+            }
+            for probe in 1..2048u128 {
+                assert_eq!(
+                    root_from_tables(
+                        &core_table,
+                        Some(&extension_table),
+                        Some(&shared_bloom),
+                        &root_only11,
+                        &basis,
+                        probe,
+                    ),
+                    expected_roots.get(&probe).copied(),
+                );
+            }
             for index in 0..quotient.states.len() {
                 let expected = quotient.states.get(index);
                 let (left, right, relative) = symmetric_labels_for_ordinal(reps.len(), index);
@@ -2995,6 +3094,175 @@ mod wide {
         }
 
         #[test]
+        fn indexed_four_byte_id31_slots_preserve_exact_first_witness() {
+            let boundary = RootTable128::indexed83_four_id31_encode((1 << 31) - 2, 1);
+            assert_eq!(boundary, u32::MAX);
+            assert_eq!(
+                RootTable128::indexed83_four_id31_decode(boundary),
+                ((1 << 31) - 2, 1, 0)
+            );
+            let high_state = (1 << 31) - 2;
+            let mut high_table = RootTable128::with_capacity_indexed83_four_mode(8, true);
+            high_table.bloom = None;
+            high_table.insert_indexed83(0x12345, high_state, 1, |_, _| 0x12345);
+            assert_eq!(
+                high_table.get_indexed83(0x12345, |state, selector| {
+                    assert_eq!((state, selector), (high_state, 1));
+                    0x12345
+                }),
+                Some((high_state, 1))
+            );
+            let mut table = RootTable128::with_capacity_indexed83_four_mode(64, true);
+            table.bloom = None;
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
+            }
+            assert_eq!(
+                table.layout_receipt(),
+                ("indexed83_4byte_exact_id31", 4, 512)
+            );
+            table.insert_indexed83(keys[0], 48, 0, |state, root| {
+                if state == 48 {
+                    keys[0]
+                } else {
+                    keys[2 * state + root]
+                }
+            });
+            assert_eq!(table.len, keys.len());
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * state + root]),
+                    Some((i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * state + root]),
+                None
+            );
+        }
+
+        #[test]
+        fn indexed_four_byte_relative_slots_preserve_high_global_ids() {
+            let base = 1usize << 31;
+            let high_state = base + (1usize << 30) - 2;
+            let boundary = RootTable128::indexed83_four_relative_encode(high_state, 1, 1, base);
+            assert_eq!(boundary, u32::MAX);
+            assert_eq!(
+                RootTable128::indexed83_four_relative_decode(boundary, base),
+                (high_state, 1, 1)
+            );
+            let mut table = RootTable128::with_capacity_indexed83_four_relative(64, base);
+            table.bloom = None;
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, base + i / 2, i % 2, |state, root| {
+                    keys[2 * (state - base) + root]
+                });
+            }
+            assert_eq!(
+                table.layout_receipt(),
+                ("indexed83_4byte_split_id30", 4, 512)
+            );
+            table.insert_indexed83(keys[0], base + 48, 0, |state, root| {
+                if state == base + 48 {
+                    keys[0]
+                } else {
+                    keys[2 * (state - base) + root]
+                }
+            });
+            assert_eq!(table.len, keys.len());
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * (state - base) + root]),
+                    Some((base + i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * (state - base) + root]),
+                None
+            );
+        }
+
+        #[test]
+        fn indexed_four_byte_byte_fingerprint_filters_without_changing_exact_keys() {
+            use std::cell::Cell;
+            use std::collections::HashMap;
+
+            let base = 1usize << 31;
+            let mut reference =
+                RootTable128::with_capacity_indexed83_four_layout_fp8(64, false, Some(base), false);
+            let mut filtered =
+                RootTable128::with_capacity_indexed83_four_layout_fp8(64, false, Some(base), true);
+            reference.bloom = None;
+            filtered.bloom = None;
+            assert_eq!(filtered.fingerprint_sidecar_bytes(), 128);
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                let witness = |state: usize, selector: usize| keys[2 * (state - base) + selector];
+                reference.insert_indexed83(key, base + i / 2, i % 2, witness);
+                filtered.insert_indexed83(key, base + i / 2, i % 2, witness);
+            }
+            for (i, &key) in keys.iter().enumerate() {
+                let witness = |state: usize, selector: usize| keys[2 * (state - base) + selector];
+                assert_eq!(
+                    filtered.get_indexed83(key, witness),
+                    reference.get_indexed83(key, witness)
+                );
+                assert_eq!(
+                    filtered.get_indexed83(key, witness),
+                    Some((base + i / 2, i % 2))
+                );
+            }
+            assert_eq!(filtered.len, reference.len);
+
+            let mut seen = HashMap::new();
+            let mut pair = None;
+            for i in 1..10_000u64 {
+                let key = (mix_root_bloom(i) as u128) << 19 | i as u128;
+                let fingerprint = RootTable128::indexed83_fingerprint(key);
+                let signature = (filtered.slot(key), fingerprint & 1);
+                if let Some(&(prior, prior_fingerprint)) = seen.get(&signature) {
+                    if prior_fingerprint as u8 != fingerprint as u8 {
+                        pair = Some((prior, key));
+                        break;
+                    }
+                } else {
+                    seen.insert(signature, (key, fingerprint));
+                }
+            }
+            let (first, second) = pair.expect("same slot and bit, different byte");
+            let mut collided =
+                RootTable128::with_capacity_indexed83_four_layout_fp8(64, false, Some(base), true);
+            collided.bloom = None;
+            collided.insert_indexed83(first, base, 0, |_, _| first);
+            let exact_checks = Cell::new(0);
+            collided.insert_indexed83(second, base + 1, 0, |_, _| {
+                exact_checks.set(exact_checks.get() + 1);
+                first
+            });
+            assert_eq!(exact_checks.get(), 0);
+            assert_eq!(collided.len, 2);
+            assert_eq!(collided.get_indexed83(first, |_, _| first), Some((base, 0)));
+            assert_eq!(
+                collided.get_indexed83(second, |state, _| {
+                    if state == base {
+                        first
+                    } else {
+                        second
+                    }
+                }),
+                Some((base + 1, 0))
+            );
+        }
+
+        #[test]
         fn indexed_five_byte_slots_preserve_exact_first_witness() {
             assert_eq!(std::mem::size_of::<[u8; 5]>(), 5);
             let boundary = RootTable128::indexed83_encode((1 << 29) - 2, 1, 0x3ff);
@@ -3140,6 +3408,109 @@ mod wide {
             assert_eq!(
                 collided.get_indexed83(second, |_, root| pair_keys[root]),
                 Some((0, 1))
+            );
+        }
+
+        #[test]
+        fn indexed_five_byte_id31_preserves_large_ids_and_exact_keys() {
+            let boundary = RootTable128::indexed83_id31_encode((1 << 31) - 2, 1, 0xff);
+            assert_eq!(
+                RootTable128::indexed83_id31_decode(boundary),
+                ((1 << 31) - 2, 1, 0xff)
+            );
+            assert_eq!(boundary, [0xff; 5]);
+            let mut table =
+                RootTable128::with_capacity_indexed83_mode_bloom_id31(64, false, true, false);
+            assert_eq!(
+                table.layout_receipt(),
+                ("indexed83_5byte_exact_id31", 5, 640)
+            );
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
+            }
+            table.insert_indexed83(keys[0], 48, 0, |state, root| {
+                if state == 48 {
+                    keys[0]
+                } else {
+                    keys[2 * state + root]
+                }
+            });
+            assert_eq!(table.len, keys.len());
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * state + root]),
+                    Some((i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * state + root]),
+                None
+            );
+
+            // The shorter fingerprint must still compare the reconstructed full key.
+            let mut seen = std::collections::HashMap::new();
+            let mut pair = None;
+            for i in 1..20_000u64 {
+                let key = (mix_root_bloom(i) as u128) << 19 | i as u128;
+                let signature = (
+                    table.slot(key),
+                    RootTable128::indexed83_fingerprint(key) & 0xff,
+                );
+                if let Some(&prior) = seen.get(&signature) {
+                    if prior != key {
+                        pair = Some((prior, key));
+                        break;
+                    }
+                } else {
+                    seen.insert(signature, key);
+                }
+            }
+            let (first, second) = pair.expect("deterministic ID31 slot/fingerprint collision");
+            let pair_keys = [first, second];
+            let mut collided =
+                RootTable128::with_capacity_indexed83_mode_bloom_id31(64, false, true, false);
+            collided.insert_indexed83(first, 0, 0, |_, root| pair_keys[root]);
+            collided.insert_indexed83(second, 0, 1, |_, root| pair_keys[root]);
+            assert_eq!(
+                collided.get_indexed83(first, |_, root| pair_keys[root]),
+                Some((0, 0))
+            );
+            assert_eq!(
+                collided.get_indexed83(second, |_, root| pair_keys[root]),
+                Some((0, 1))
+            );
+        }
+
+        #[test]
+        fn indexed_five_byte_load80_extends_the_same_slot_boundary_exactly() {
+            let states = |k: usize| 83 * k * (k - 1) / 2 + 42 * k;
+            assert!(indexed5_load80_request(states(4549)) <= (1 << 30));
+            assert!(indexed5_load80_request(states(4550)) > (1 << 30));
+            let slots = |count: usize| (indexed5_load80_request(count) * 2).next_power_of_two();
+            assert_eq!(slots(states(4300)), 1 << 31);
+            assert_eq!(slots(states(4405)), 1 << 31);
+            assert_eq!(slots(states(4405) - states(4300)), 1 << 27);
+            let mut table = RootTable128::with_capacity_indexed83_mode(64, true);
+            table.bloom = None;
+            let keys: Vec<u128> = (0..102u64)
+                .map(|i| ((mix_root_bloom(i) as u128) << 19) | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
+            }
+            assert_eq!(table.len, 102);
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * state + root]),
+                    Some((i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * state + root]),
+                None
             );
         }
 
@@ -3713,23 +4084,62 @@ mod wide {
     struct Index128 {
         states: StateStore128,
         table: RootTable128,
+        overflow_table: Option<RootTable128>,
+        shared_bloom: Option<RootBloom>,
+        split_at: Option<usize>,
+        overflow_request_entries: Option<usize>,
         shifted: Vec<Vec<u128>>,
         symmetric_states: bool,
         dense_table: bool,
         load75_table: bool,
         indexed5_table: bool,
         indexed5_id30: bool,
+        indexed5_id31: bool,
         indexed4_table: bool,
         indexed5_load75: bool,
+        indexed5_load80: bool,
         indexed5_fixed30: bool,
+        indexed5_fixed31: bool,
         indexed4_fixed30: bool,
         indexed4_fixed31: bool,
+        indexed4_fixed32: bool,
+        indexed4_split30: bool,
         root_table_request_entries: usize,
-        /// On by default (`KIC_PREFETCH=0` restores the one-pass scan): scan a
-        /// state in two passes, issuing a software
-        /// prefetch of each probe's Bloom line (or table slot without a
-        /// filter) while the next probe's key is computed.
-        prefetch_probes: bool,
+    }
+
+    #[inline(always)]
+    fn root_from_tables(
+        primary: &RootTable128,
+        overflow: Option<&RootTable128>,
+        shared_bloom: Option<&RootBloom>,
+        states: &StateStore128,
+        basis: &NormalBasis128,
+        key: u128,
+    ) -> Option<u64> {
+        if shared_bloom.is_some_and(|bloom| !bloom.contains(key)) {
+            return None;
+        }
+        primary
+            .get_with_context(key, states, basis)
+            .or_else(|| overflow.and_then(|table| table.get_with_context(key, states, basis)))
+    }
+
+    impl Index128 {
+        #[inline(always)]
+        fn get_root(&self, key: u128, basis: &NormalBasis128) -> Option<u64> {
+            root_from_tables(
+                &self.table,
+                self.overflow_table.as_ref(),
+                self.shared_bloom.as_ref(),
+                &self.states,
+                basis,
+                key,
+            )
+        }
+
+        fn bloom(&self) -> Option<&RootBloom> {
+            self.shared_bloom.as_ref().or(self.table.bloom.as_ref())
+        }
     }
 
     struct Relation128 {
@@ -3776,6 +4186,7 @@ mod wide {
         target: FastPoint128,
         start: usize,
         threads: usize,
+        cancel_early: bool,
     ) -> (Option<Relation128>, u128) {
         let n_states = index.states.len();
         if threads <= 1 || n_states == 0 {
@@ -3800,10 +4211,12 @@ mod wide {
         let n_u32 = gf.n;
         let chunk = n_states.div_ceil(threads);
         let (sender, receiver) = std::sync::mpsc::channel::<(usize, Relation128, u128)>();
+        let cancelled = std::sync::atomic::AtomicBool::new(false);
         std::thread::scope(|scope| {
             let mut handles = Vec::with_capacity(threads);
             for thread in 0..threads {
                 let sender = sender.clone();
+                let cancelled = &cancelled;
                 handles.push(scope.spawn(move || {
                     let pos_lo = thread * chunk;
                     let pos_hi = ((thread + 1) * chunk).min(n_states);
@@ -3819,6 +4232,9 @@ mod wide {
                     let mut scan = StateScan128::new(n_u32);
                     let mut lift_scratch = LiftScratch128::default();
                     for offset in 0..length {
+                        if cancel_early && cancelled.load(std::sync::atomic::Ordering::Acquire) {
+                            break;
+                        }
                         let state = index.states.get((state_lo + offset) % n_states);
                         if let Some(relation) = scan_state128(
                             gf,
@@ -3836,9 +4252,13 @@ mod wide {
                             &mut relation_check_ns,
                         ) {
                             let position = pos_lo + offset;
-                            sender
-                                .send((position, relation, relation_check_ns))
-                                .expect("target receiver is alive");
+                            if !cancel_early
+                                || !cancelled.swap(true, std::sync::atomic::Ordering::AcqRel)
+                            {
+                                sender
+                                    .send((position, relation, relation_check_ns))
+                                    .expect("target receiver is alive");
+                            }
                             break;
                         }
                     }
@@ -3930,44 +4350,18 @@ mod wide {
         columns: usize,
     }
 
-    /// How the index build runs.  `serial()` is the original loop (the
-    /// control); the other settings change only how the same states and the
-    /// same table are produced, never their content or order.
-    #[derive(Clone, Copy, Debug)]
-    struct IndexBuildOpts {
-        /// `KIC_INDEX_THREADS=N` (N > 1): states and canonical keys are
-        /// computed in parallel; the table is filled serially, in order.
-        threads: usize,
-        /// `KIC_INDEX_BATCH_INV=1`: one shared inversion per chunk of
-        /// `INDEX_BATCH` root solves (Montgomery's trick) instead of one each.
-        batch_inv: bool,
+    fn indexed5_fixed31_capacity_ok(max_states: usize) -> bool {
+        max_states < (1usize << 30)
+            && max_states
+                .checked_mul(5)
+                .is_some_and(|bound| bound <= (1usize << 31) * 2)
     }
 
-    /// Root solves per shared inversion in the batched build.
-    const INDEX_BATCH: usize = 256;
-
-    impl IndexBuildOpts {
-        fn serial() -> Self {
-            Self {
-                threads: 1,
-                batch_inv: false,
-            }
-        }
-
-        fn from_env() -> Self {
-            Self {
-                threads: std::env::var("KIC_INDEX_THREADS")
-                    .ok()
-                    .and_then(|value| value.trim().parse::<usize>().ok())
-                    .filter(|&threads| threads > 0)
-                    .unwrap_or(1),
-                batch_inv: std::env::var("KIC_INDEX_BATCH_INV").as_deref() == Ok("1"),
-            }
-        }
-
-        fn is_serial(self) -> bool {
-            self.threads <= 1 && !self.batch_inv
-        }
+    #[test]
+    fn indexed5_fixed31_accepts_exact_eighty_percent_boundary() {
+        let states = |k: usize| k * (k - 1) / 2 * 83 + k * 42;
+        assert!(indexed5_fixed31_capacity_ok(states(4549)));
+        assert!(!indexed5_fixed31_capacity_ok(states(4550)));
     }
 
     fn build_index128(
@@ -3978,164 +4372,28 @@ mod wide {
     ) -> Index128 {
         let symmetric_states = std::env::var("KIC_SYMMETRIC_S3").as_deref() == Ok("1");
         let indexed5_load75 = std::env::var("KIC_INDEXED5_LOAD75").as_deref() == Ok("1");
-        let opts = IndexBuildOpts::from_env();
-        let index = build_index128_impl(
+        let indexed5_load80 = std::env::var("KIC_INDEXED5_LOAD80").as_deref() == Ok("1");
+        let batch_roots = std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1");
+        build_index128_with_symmetry(
             gf,
             basis,
             solver,
             reps,
             symmetric_states,
             indexed5_load75,
-            opts,
-        );
-        if !opts.is_serial() && std::env::var("KIC_VERIFY_INDEX").as_deref() == Ok("1") {
-            let started = Instant::now();
-            let reference = build_index128_impl(
-                gf,
-                basis,
-                solver,
-                reps,
-                symmetric_states,
-                indexed5_load75,
-                IndexBuildOpts::serial(),
-            );
-            match index_difference(&index, &reference) {
-                None => eprintln!(
-                    "VERIFY_INDEX identical states={} table_entries={} serial_rebuild_s={:.3}",
-                    index.states.len(),
-                    index.table.len,
-                    started.elapsed().as_secs_f64()
-                ),
-                Some(difference) => panic!("VERIFY_INDEX mismatch: {difference}"),
-            }
-        }
-        index
+            indexed5_load80,
+            batch_roots,
+        )
     }
 
-    /// `None` when the two indexes hold identical states in identical order
-    /// and a byte-identical table and Bloom filter; otherwise the first
-    /// difference found.  Covers the default `Wide` state layout.
-    fn index_difference(a: &Index128, b: &Index128) -> Option<String> {
-        match (&a.states, &b.states) {
-            (StateStore128::Wide(x), StateStore128::Wide(y)) => {
-                if x.len() != y.len() {
-                    return Some(format!("state count {} vs {}", x.len(), y.len()));
-                }
-                for (i, (p, q)) in x.iter().zip(y).enumerate() {
-                    if (p.left, p.right, p.relative, p.normal_roots)
-                        != (q.left, q.right, q.relative, q.normal_roots)
-                    {
-                        return Some(format!("state {i} differs"));
-                    }
-                }
-            }
-            _ => return Some("state layout not comparable".into()),
-        }
-        if a.table.len != b.table.len || a.table.shift != b.table.shift {
-            return Some("table len or shift differs".into());
-        }
-        let slots_equal = match (&a.table.slots, &b.table.slots) {
-            (RootSlots128::Wide(x), RootSlots128::Wide(y)) => x == y,
-            (RootSlots128::Packed(x), RootSlots128::Packed(y)) => x == y,
-            (RootSlots128::Indexed83(x), RootSlots128::Indexed83(y)) => x == y,
-            (RootSlots128::Indexed83Four(x), RootSlots128::Indexed83Four(y)) => x == y,
-            _ => false,
-        };
-        if !slots_equal {
-            return Some("table slots differ".into());
-        }
-        match (&a.table.bloom, &b.table.bloom) {
-            (None, None) => {}
-            (Some(x), Some(y)) if x.words == y.words && x.hashes == y.hashes => {}
-            _ => return Some("Bloom filter differs".into()),
-        }
-        if a.shifted != b.shifted {
-            return Some("shifted rows differ".into());
-        }
-        None
-    }
-
-    /// The default-layout states, in the serial loop's order
-    /// `(left, right, relative)`, computed one `left` row per task.  With
-    /// `batch_inv` the root solves of a row share one inversion per
-    /// `INDEX_BATCH` pairs ([`RootBatch128::solve`] equals
-    /// `S3Solver128::roots` pair for pair, including exceptional inputs).
-    fn build_states_blocked(
-        gf: &Gf2_128,
-        basis: &NormalBasis128,
-        solver: &S3Solver128,
-        shifted: &[Vec<u128>],
-        symmetric_states: bool,
-        opts: IndexBuildOpts,
-    ) -> Vec<State128> {
-        use rayon::prelude::*;
-        let n = gf.n as usize;
-        let k = shifted.len();
-        let row = |left: usize| -> Vec<State128> {
-            let mut out = Vec::with_capacity(k * n / 2);
-            let mut batch = RootBatch128::with_capacity(INDEX_BATCH);
-            let mut inputs: Vec<(u128, u128)> = Vec::with_capacity(INDEX_BATCH);
-            let mut labels: Vec<(u16, u16)> = Vec::with_capacity(INDEX_BATCH);
-            let mut flush = |inputs: &mut Vec<(u128, u128)>,
-                             labels: &mut Vec<(u16, u16)>,
-                             out: &mut Vec<State128>| {
-                if opts.batch_inv {
-                    batch.solve(gf, basis, solver, inputs);
-                }
-                for (i, &(x, y)) in inputs.iter().enumerate() {
-                    let roots = if opts.batch_inv {
-                        batch.results[i]
-                    } else {
-                        solver.roots(gf, basis, x, y)
-                    };
-                    if let Some(roots) = roots {
-                        out.push(State128 {
-                            left: left as u16,
-                            right: labels[i].0,
-                            relative: labels[i].1,
-                            normal_roots: [
-                                basis.to_normal.apply(roots[0]),
-                                basis.to_normal.apply(roots[1]),
-                            ],
-                        });
-                    }
-                }
-                inputs.clear();
-                labels.clear();
-            };
-            for right in 0..k {
-                for relative in 0..n {
-                    if symmetric_states && (left > right || (left == right && relative > n / 2)) {
-                        continue;
-                    }
-                    inputs.push((shifted[left][0], shifted[right][relative]));
-                    labels.push((right as u16, relative as u16));
-                    if inputs.len() == INDEX_BATCH {
-                        flush(&mut inputs, &mut labels, &mut out);
-                    }
-                }
-            }
-            flush(&mut inputs, &mut labels, &mut out);
-            out
-        };
-        let rows: Vec<Vec<State128>> = if opts.threads > 1 {
-            let pool = rayon::ThreadPoolBuilder::new()
-                .num_threads(opts.threads)
-                .build()
-                .expect("index build thread pool");
-            pool.install(|| (0..k).into_par_iter().map(row).collect())
-        } else {
-            (0..k).map(row).collect()
-        };
-        let total = rows.iter().map(Vec::len).sum();
-        let mut states = Vec::with_capacity(total);
-        for part in rows {
-            states.extend(part);
-        }
+    fn indexed5_load80_request(states: usize) -> usize {
         states
+            .checked_mul(5)
+            .and_then(|count| count.checked_add(3))
+            .expect("indexed load80 root table request exceeds usize")
+            / 4
     }
 
-    #[cfg(test)]
     fn build_index128_with_symmetry(
         gf: &Gf2_128,
         basis: &NormalBasis128,
@@ -4143,29 +4401,13 @@ mod wide {
         reps: &[u128],
         symmetric_states: bool,
         indexed5_load75: bool,
+        indexed5_load80: bool,
+        batch_roots: bool,
     ) -> Index128 {
-        build_index128_impl(
-            gf,
-            basis,
-            solver,
-            reps,
-            symmetric_states,
-            indexed5_load75,
-            IndexBuildOpts::serial(),
-        )
-    }
-
-    fn build_index128_impl(
-        gf: &Gf2_128,
-        basis: &NormalBasis128,
-        solver: &S3Solver128,
-        reps: &[u128],
-        symmetric_states: bool,
-        indexed5_load75: bool,
-        opts: IndexBuildOpts,
-    ) -> Index128 {
-        let timing = std::env::var("KIC_INDEX_TIMING").as_deref() == Ok("1");
-        let index_started = Instant::now();
+        assert!(
+            !(indexed5_load75 && indexed5_load80),
+            "indexed five-byte load75 and load80 requests are mutually exclusive"
+        );
         let n = gf.n as usize;
         assert!(
             !symmetric_states || gf.n == 83,
@@ -4189,11 +4431,47 @@ mod wide {
         let root_only21 = std::env::var("KIC_ROOT_ONLY21").as_deref() == Ok("1");
         let root_only11 = std::env::var("KIC_ROOT_ONLY11").as_deref() == Ok("1");
         let indexed5_id30 = std::env::var("KIC_INDEXED5_ID30").as_deref() == Ok("1");
+        let indexed5_id31 = std::env::var("KIC_INDEXED5_ID31").as_deref() == Ok("1");
+        assert!(
+            !(indexed5_id30 && indexed5_id31),
+            "select one five-byte state-ID width"
+        );
+        let indexed5_split_at = std::env::var("KIC_INDEXED5_SPLIT_AT")
+            .ok()
+            .map(|value| value.parse::<usize>().expect("split K must be an integer"));
+        let indexed4_split_at = std::env::var("KIC_INDEXED4_SPLIT_AT").ok().map(|value| {
+            value
+                .parse::<usize>()
+                .expect("four-byte split K must be an integer")
+        });
+        assert!(
+            indexed5_split_at.is_none() || indexed4_split_at.is_none(),
+            "select one root index split"
+        );
+        let split_at = indexed4_split_at.or(indexed5_split_at);
+        let shared_bloom_requested =
+            std::env::var("KIC_INDEXED5_SPLIT_SHARED_BLOOM").as_deref() == Ok("1");
+        assert!(
+            !shared_bloom_requested || (indexed5_split_at.is_some() && root_bloom_enabled()),
+            "shared split Bloom requires a split index and an enabled root Bloom filter"
+        );
+        let indexed5_fixed31 = std::env::var("KIC_INDEXED5_FIXED31").as_deref() == Ok("1");
         let indexed4_table = std::env::var("KIC_INDEXED_ROOT4").as_deref() == Ok("1");
         let indexed4_fixed30 = std::env::var("KIC_INDEXED4_FIXED30").as_deref() == Ok("1");
         let indexed4_fixed31 = std::env::var("KIC_INDEXED4_FIXED31").as_deref() == Ok("1");
+        let indexed4_fixed32 = std::env::var("KIC_INDEXED4_FIXED32").as_deref() == Ok("1");
+        let indexed4_split30 = std::env::var("KIC_INDEXED4_SPLIT30").as_deref() == Ok("1");
+        assert_eq!(
+            indexed4_split30,
+            indexed4_split_at.is_some(),
+            "relative four-byte slots require KIC_INDEXED4_SPLIT_AT"
+        );
         assert!(
-            !(indexed4_fixed30 && indexed4_fixed31),
+            (indexed4_fixed30 as u8
+                + indexed4_fixed31 as u8
+                + indexed4_fixed32 as u8
+                + indexed4_split30 as u8)
+                <= 1,
             "select one four-byte root table capacity"
         );
         assert!(
@@ -4221,6 +4499,16 @@ mod wide {
         // Keep the lexicographically first state for every such pair so
         // first-inserted exact-root witnesses remain available.
         let k = reps.len();
+        if let Some(core) = split_at {
+            assert!(
+                0 < core
+                    && core < k
+                    && root_only11
+                    && symmetric_states
+                    && (indexed4_split30 || ((indexed5_id30 || indexed5_id31) && indexed5_load80)),
+                "split root index needs 0 < core < K and symmetric one-root indexed slots"
+            );
+        }
         let max_states = if symmetric_states {
             k.checked_mul(k.saturating_sub(1))
                 .and_then(|pairs| pairs.checked_div(2))
@@ -4235,23 +4523,68 @@ mod wide {
                 .and_then(|pairs| pairs.checked_mul(n))
                 .expect("state capacity exceeds usize")
         };
+        if indexed4_fixed32 {
+            assert!(
+                usize::BITS >= 64
+                    && indexed4_table
+                    && root_only11
+                    && symmetric_states
+                    && max_states < (1usize << 31)
+                    && max_states.checked_mul(2).is_some_and(|roots| roots <= (3usize << 30)),
+                "fixed 2^32 four-byte table needs symmetric one-root N83 states, 31-bit IDs, and at most 75% worst-case load"
+            );
+        }
+        let core_states = split_at.map(|core| {
+            core.checked_mul(core - 1)
+                .and_then(|pairs| pairs.checked_div(2))
+                .and_then(|pairs| pairs.checked_mul(n))
+                .and_then(|off_diagonal| {
+                    core.checked_mul(n / 2 + 1)
+                        .and_then(|diagonal| off_diagonal.checked_add(diagonal))
+                })
+                .expect("split core state capacity exceeds usize")
+        });
+        if indexed4_split30 {
+            let core_count = core_states.expect("four-byte split needs core states");
+            let extension_count = max_states - core_count;
+            assert!(
+                usize::BITS >= 64
+                    && indexed4_table
+                    && root_only11
+                    && symmetric_states
+                    && core_count < (1usize << 30)
+                    && extension_count < (1usize << 30)
+                    && indexed5_load80_request(core_count) <= (1usize << 30)
+                    && indexed5_load80_request(extension_count) <= (1usize << 29),
+                "relative four-byte split exceeds 30-bit IDs or table buckets"
+            );
+        }
+        let overflow_request_entries =
+            core_states.map(|core_count| indexed5_load80_request(max_states - core_count));
+        let mut shared_bloom = shared_bloom_requested
+            .then(|| RootBloom::with_capacity(indexed5_load80_request(max_states)));
         if root_only11 {
             assert!(
                 ((std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")
                     && (std::env::var("KIC_INDEXED5_FIXED30").as_deref() == Ok("1")
-                        || indexed5_load75)
+                        || indexed5_load75
+                        || indexed5_load80
+                        || indexed5_fixed31)
                     && !indexed4_table)
                     || (indexed4_table
-                        && indexed4_fixed31
+                        && (indexed4_fixed30 || indexed4_fixed31 || indexed4_fixed32 || indexed4_split30)
                         && std::env::var("KIC_INDEXED_ROOT5").as_deref() != Ok("1")
-                        && !indexed5_load75))
+                        && !indexed5_load75
+                        && !indexed5_load80))
                     && std::env::var("KIC_PACKED_ROOT_TABLE").as_deref() == Ok("1"),
-                "one-root states require exact indexed fixed30, fixed31, or load75 slots"
+                "one-root states require exact indexed fixed30, fixed31, fixed32, split30, load75, or load80 slots"
             );
             assert!(
                 max_states.checked_mul(2).unwrap()
                     < (1usize
-                        << if indexed4_table || indexed5_id30 {
+                        << if indexed4_fixed32 || indexed4_split30 || indexed5_id31 {
+                            32
+                        } else if indexed4_fixed31 || indexed5_id30 {
                             31
                         } else {
                             30
@@ -4263,15 +4596,44 @@ mod wide {
             !indexed5_id30
                 || (root_only11
                     && !indexed4_table
-                    && indexed5_load75
+                    && (indexed5_load75 || indexed5_load80 || indexed5_fixed31)
                     && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")),
-            "30-bit indexed state IDs require one-root five-byte load75 slots"
+            "30-bit indexed state IDs require one-root five-byte load75, load80, or fixed31 slots"
+        );
+        assert!(
+            !indexed5_id31
+                || (root_only11
+                    && !indexed4_table
+                    && (indexed5_load75 || indexed5_load80)
+                    && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")),
+            "31-bit indexed state IDs require one-root five-byte load75 or load80 slots"
+        );
+        assert!(
+            !indexed5_fixed31
+                || (root_only11
+                    && indexed5_id30
+                    && !indexed4_table
+                    && !indexed5_load75
+                    && std::env::var("KIC_INDEXED5_FIXED30").as_deref() != Ok("1")
+                    && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")
+                    && indexed5_fixed31_capacity_ok(max_states)),
+            "fixed31 five-byte slots require one-root ID30 states and at most 80% upper load"
         );
         // One-root states insert their exact keys while each second root is
         // still available.  The retained state count is known from the
         // symmetric traversal, so load75 can size this early table exactly.
         let root11_request_entries = root_only11.then(|| {
             if indexed4_table {
+                if indexed4_split30 {
+                    indexed5_load80_request(core_states.expect("four-byte split needs core states"))
+                } else if indexed4_fixed32 {
+                    1usize << 31
+                } else if indexed4_fixed30 {
+                    1usize << 29
+                } else {
+                    1usize << 30
+                }
+            } else if indexed5_fixed31 {
                 1usize << 30
             } else if indexed5_load75 {
                 max_states
@@ -4279,15 +4641,41 @@ mod wide {
                     .and_then(|count| count.checked_add(2))
                     .expect("one-root indexed request exceeds usize")
                     / 3
+            } else if indexed5_load80 {
+                indexed5_load80_request(core_states.unwrap_or(max_states))
             } else {
                 1usize << 29
             }
         });
         let mut early_root11_table = root11_request_entries.map(|entries| {
             if indexed4_table {
-                RootTable128::with_capacity_indexed83_four(entries)
+                if indexed4_split30 {
+                    RootTable128::with_capacity_indexed83_four_relative(entries, 0)
+                } else {
+                    RootTable128::with_capacity_indexed83_four_mode(entries, indexed4_fixed32)
+                }
             } else {
-                RootTable128::with_capacity_indexed83_mode(entries, indexed5_id30)
+                RootTable128::with_capacity_indexed83_mode_bloom_id31(
+                    entries,
+                    indexed5_id30,
+                    indexed5_id31,
+                    !shared_bloom_requested && root_bloom_enabled(),
+                )
+            }
+        });
+        let mut early_overflow_table = overflow_request_entries.map(|entries| {
+            if indexed4_split30 {
+                RootTable128::with_capacity_indexed83_four_relative(
+                    entries,
+                    core_states.expect("four-byte split needs core states"),
+                )
+            } else {
+                RootTable128::with_capacity_indexed83_mode_bloom_id31(
+                    entries,
+                    indexed5_id30,
+                    indexed5_id31,
+                    !shared_bloom_requested && root_bloom_enabled(),
+                )
             }
         });
         let mut states83 = if packed_state83 {
@@ -4315,19 +4703,100 @@ mod wide {
         } else {
             Vec::new()
         };
+        let mut core_state_insertions = 0usize;
+        let mut overflow_state_insertions = 0usize;
         let mut states_wide = Vec::new();
-        let blocked_states = !opts.is_serial()
-            && !(packed_state83 || packed_state26 || root_only83 || root_only21 || root_only11);
-        if blocked_states {
-            states_wide = build_states_blocked(gf, basis, solver, &shifted, symmetric_states, opts);
-        }
-        for left in 0..if blocked_states { 0 } else { reps.len() } {
-            for right in 0..reps.len() {
-                for relative in 0..n {
-                    if symmetric_states && (left > right || (left == right && relative > n / 2)) {
-                        continue;
+        let mut root_batch = RootBatch128::with_capacity(n);
+        let mut root_inputs = Vec::with_capacity(n);
+        let root_threads: usize = match std::env::var("KIC_INDEX_ROOT_THREADS") {
+            Ok(value) => {
+                let threads: usize = value
+                    .parse()
+                    .expect("KIC_INDEX_ROOT_THREADS must be an integer from 1 to 8");
+                assert!(
+                    (1..=8).contains(&threads),
+                    "KIC_INDEX_ROOT_THREADS must be from 1 to 8"
+                );
+                threads
+            }
+            Err(std::env::VarError::NotPresent) => 1,
+            Err(error) => panic!("invalid KIC_INDEX_ROOT_THREADS: {error}"),
+        };
+        for left in 0..reps.len() {
+            let right_start = if symmetric_states { left } else { 0 };
+            // Compute each left row concurrently, then insert states and exact
+            // root keys in the original right/relative order.  The latter
+            // preserves stable state IDs and the first-witness table rule.
+            let parallel_roots: Vec<Option<[u128; 2]>> = if root_threads > 1 {
+                std::thread::scope(|scope| {
+                    let count = reps.len() - right_start;
+                    let workers = root_threads.min(count);
+                    let chunk_width = count.div_ceil(workers);
+                    let mut handles = Vec::with_capacity(workers);
+                    let shifted = &shifted;
+                    for first in (right_start..reps.len()).step_by(chunk_width) {
+                        let last = (first + chunk_width).min(reps.len());
+                        handles.push(scope.spawn(move || {
+                            let mut batch = RootBatch128::with_capacity(n);
+                            let mut inputs = Vec::with_capacity(n);
+                            let mut roots = Vec::with_capacity((last - first) * n);
+                            for right in first..last {
+                                let relative_count = if symmetric_states && left == right {
+                                    n / 2 + 1
+                                } else {
+                                    n
+                                };
+                                if batch_roots {
+                                    inputs.clear();
+                                    for relative in 0..relative_count {
+                                        inputs.push((shifted[left][0], shifted[right][relative]));
+                                    }
+                                    batch.solve(gf, basis, solver, &inputs);
+                                    roots.extend_from_slice(&batch.results);
+                                } else {
+                                    roots.extend((0..relative_count).map(|relative| {
+                                        solver.roots(
+                                            gf,
+                                            basis,
+                                            shifted[left][0],
+                                            shifted[right][relative],
+                                        )
+                                    }));
+                                }
+                            }
+                            roots
+                        }));
                     }
-                    let roots = solver.roots(gf, basis, shifted[left][0], shifted[right][relative]);
+                    handles
+                        .into_iter()
+                        .flat_map(|handle| handle.join().expect("root worker panicked"))
+                        .collect()
+                })
+            } else {
+                Vec::new()
+            };
+            let mut root_cursor = 0;
+            for right in right_start..reps.len() {
+                let relative_count = if symmetric_states && left == right {
+                    n / 2 + 1
+                } else {
+                    n
+                };
+                if batch_roots && root_threads == 1 {
+                    root_inputs.clear();
+                    for relative in 0..relative_count {
+                        root_inputs.push((shifted[left][0], shifted[right][relative]));
+                    }
+                    root_batch.solve(gf, basis, solver, &root_inputs);
+                }
+                for relative in 0..relative_count {
+                    let roots = if root_threads > 1 {
+                        parallel_roots[root_cursor + relative]
+                    } else if batch_roots {
+                        root_batch.results[relative]
+                    } else {
+                        solver.roots(gf, basis, shifted[left][0], shifted[right][relative])
+                    };
                     if root_only83 || root_only21 || root_only11 {
                         assert!(
                             roots.is_some(),
@@ -4355,7 +4824,21 @@ mod wide {
                         } else if root_only11 {
                             let state_index = root_only11_states.len();
                             root_only11_states.push(RootOnly11::from_wide(state));
-                            let table = early_root11_table.as_mut().unwrap();
+                            // Relative IDs use a contiguous ordinal cut;
+                            // the five-byte split keeps its pair-label cut.
+                            let overflows = if indexed4_split30 {
+                                state_index
+                                    >= core_states.expect("four-byte split needs core states")
+                            } else {
+                                split_at.is_some_and(|core| left >= core || right >= core)
+                            };
+                            let table = if overflows {
+                                overflow_state_insertions += 1;
+                                early_overflow_table.as_mut().unwrap()
+                            } else {
+                                core_state_insertions += 1;
+                                early_root11_table.as_mut().unwrap()
+                            };
                             for (selector, root) in state.normal_roots.into_iter().enumerate() {
                                 let canonical = basis.canonical_selected(root).0;
                                 table.insert_indexed83(
@@ -4376,15 +4859,21 @@ mod wide {
                                             .0
                                     },
                                 );
+                                if let Some(bloom) = &mut shared_bloom {
+                                    bloom.insert(canonical);
+                                }
                             }
                         } else {
                             states_wide.push(state);
                         }
                     }
                 }
+                root_cursor += relative_count;
+            }
+            if root_threads > 1 {
+                assert_eq!(root_cursor, parallel_roots.len());
             }
         }
-        let states_done = index_started.elapsed();
         let states = if packed_state83 {
             StateStore128::Packed83(states83)
         } else if packed_state26 {
@@ -4403,6 +4892,10 @@ mod wide {
             }
         } else if root_only11 {
             assert_eq!(root_only11_states.len(), max_states);
+            if let Some(expected_core) = core_states {
+                assert_eq!(core_state_insertions, expected_core);
+                assert_eq!(overflow_state_insertions, max_states - expected_core);
+            }
             StateStore128::RootOnly11 {
                 states: root_only11_states,
                 k,
@@ -4421,8 +4914,10 @@ mod wide {
         assert!(
             !indexed4_table
                 || (!indexed5_table
-                    && ((root_only11 && indexed4_fixed31) || (root_only21 && indexed4_fixed30))),
-            "four-byte root slots require one-root/fixed31 or 21-byte/fixed30 states"
+                    && ((root_only11
+                        && (indexed4_fixed30 || indexed4_fixed31 || indexed4_fixed32 || indexed4_split30))
+                        || (root_only21 && indexed4_fixed30))),
+            "four-byte root slots require one-root/fixed30/fixed31/fixed32/split30 or 21-byte/fixed30 states"
         );
         assert!(
             !(dense_table || load75_table) || packed,
@@ -4450,8 +4945,19 @@ mod wide {
             "indexed five-byte load75 request requires the indexed table"
         );
         assert!(
+            !indexed5_load80 || indexed5_table,
+            "indexed five-byte load80 request requires the indexed table"
+        );
+        assert!(
+            !indexed5_fixed31 || (indexed5_table && root_only11 && indexed5_id30),
+            "indexed five-byte fixed31 request requires one-root ID30 states"
+        );
+        assert!(
             !indexed5_fixed30
-                || (indexed5_table && (root_only21 || root_only11) && !indexed5_load75),
+                || (indexed5_table
+                    && (root_only21 || root_only11)
+                    && !indexed5_load75
+                    && !indexed5_load80),
             "fixed 2^30 root slots require an indexed root-only state layout"
         );
         if indexed5_fixed30 {
@@ -4468,10 +4974,21 @@ mod wide {
                 "fixed 2^31 four-byte table cannot encode all state roots"
             );
         }
+        if indexed4_fixed32 {
+            assert!(
+                indexed4_table
+                    && root_only11
+                    && max_states < (1usize << 31)
+                    && max_states
+                        .checked_mul(2)
+                        .is_some_and(|roots| roots <= (3usize << 30)),
+                "fixed 2^32 four-byte table cannot encode all state roots at 75% load"
+            );
+        }
         if indexed4_fixed30 {
             assert!(
                 indexed4_table
-                    && root_only21
+                    && (root_only21 || root_only11)
                     && max_states < (1usize << 29)
                     && max_states.checked_mul(2).unwrap() < (1usize << 30),
                 "fixed 2^30 four-byte table cannot encode all state roots"
@@ -4482,6 +4999,8 @@ mod wide {
         // occupancy after the constructor doubles the request.
         let root_table_request_entries = if let Some(entries) = root11_request_entries {
             entries
+        } else if indexed4_fixed32 {
+            1usize << 31
         } else if indexed4_fixed31 {
             1usize << 30
         } else if indexed4_fixed30 || indexed5_fixed30 {
@@ -4493,6 +5012,8 @@ mod wide {
                 .and_then(|n| n.checked_add(2))
                 .expect("indexed root table request exceeds usize")
                 / 3
+        } else if indexed5_load80 {
+            indexed5_load80_request(states.len())
         } else if load75_table {
             states
                 .len()
@@ -4510,56 +5031,25 @@ mod wide {
         } else if indexed4_table {
             RootTable128::with_capacity_indexed83_four(root_table_request_entries)
         } else if indexed5_table {
-            RootTable128::with_capacity_indexed83_mode(root_table_request_entries, indexed5_id30)
+            RootTable128::with_capacity_indexed83_mode_bloom_id31(
+                root_table_request_entries,
+                indexed5_id30,
+                indexed5_id31,
+                root_bloom_enabled(),
+            )
         } else {
             RootTable128::with_capacity(root_table_request_entries, gf.n, reps.len(), packed)
         };
-        // Canonical keys of the default layout, computed ahead (in parallel
-        // when asked) so the serial, order-preserving fill below only walks
-        // the table.
-        let state_keys: Option<Vec<[(u128, u32); 2]>> = match &states {
-            StateStore128::Wide(wide_states) if blocked_states && !root_only11 => {
-                use rayon::prelude::*;
-                let keys_of = |state: &State128| {
-                    [
-                        basis.canonical_selected(state.normal_roots[0]),
-                        basis.canonical_selected(state.normal_roots[1]),
-                    ]
-                };
-                Some(if opts.threads > 1 {
-                    let pool = rayon::ThreadPoolBuilder::new()
-                        .num_threads(opts.threads)
-                        .build()
-                        .expect("index key thread pool");
-                    pool.install(|| wide_states.par_iter().map(keys_of).collect())
-                } else {
-                    wide_states.iter().map(keys_of).collect()
-                })
-            }
-            _ => None,
-        };
-        let keys_done = index_started.elapsed();
         if !root_only11 {
             for state_index in 0..states.len() {
-                if let Some(keys) = &state_keys {
-                    if let Some(ahead) = keys.get(state_index + 8) {
-                        table.prefetch_slot(ahead[0].0);
-                        table.prefetch_slot(ahead[1].0);
-                    }
-                }
                 if matches!(
                     &table.slots,
                     RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_)
                 ) {
                     for root_selector in 0..2 {
-                        let canonical = match &state_keys {
-                            Some(keys) => keys[state_index][root_selector].0,
-                            None => {
-                                basis
-                                    .canonical_selected(states.root_at(state_index, root_selector))
-                                    .0
-                            }
-                        };
+                        let canonical = basis
+                            .canonical_selected(states.root_at(state_index, root_selector))
+                            .0;
                         table.insert_indexed83(
                             canonical,
                             state_index,
@@ -4571,11 +5061,8 @@ mod wide {
                     }
                 } else {
                     let state = states.get(state_index);
-                    for (selector, &root) in state.normal_roots.iter().enumerate() {
-                        let (canonical, shift) = match &state_keys {
-                            Some(keys) => keys[state_index][selector],
-                            None => basis.canonical_selected(root),
-                        };
+                    for &root in &state.normal_roots {
+                        let (canonical, shift) = basis.canonical_selected(root);
                         table.insert_if_absent(
                             canonical,
                             pack(state.left, state.right, state.relative, shift),
@@ -4584,34 +5071,30 @@ mod wide {
                 }
             }
         }
-        if timing {
-            eprintln!(
-                "INDEX_TIMING threads={} batch_inv={} states={} states_s={:.3} keys_s={:.3} fill_s={:.3} total_s={:.3}",
-                opts.threads,
-                opts.batch_inv,
-                states.len(),
-                states_done.as_secs_f64(),
-                (keys_done - states_done).as_secs_f64(),
-                (index_started.elapsed() - keys_done).as_secs_f64(),
-                index_started.elapsed().as_secs_f64()
-            );
-        }
         Index128 {
             states,
             table,
+            overflow_table: early_overflow_table,
+            shared_bloom,
+            split_at,
+            overflow_request_entries,
             shifted,
             symmetric_states,
             dense_table,
             load75_table,
             indexed5_table,
             indexed5_id30,
+            indexed5_id31,
             indexed4_table,
             indexed5_load75,
+            indexed5_load80,
             indexed5_fixed30,
+            indexed5_fixed31,
             indexed4_fixed30,
             indexed4_fixed31,
+            indexed4_fixed32,
+            indexed4_split30,
             root_table_request_entries,
-            prefetch_probes: std::env::var("KIC_PREFETCH").as_deref() != Ok("0"),
         }
     }
 
@@ -4729,19 +5212,6 @@ mod wide {
     struct StateScan128 {
         inputs: Vec<(u128, u128)>,
         batch: RootBatch128,
-        pending: Vec<PendingProbe128>,
-    }
-
-    /// A partner root whose canonical key, Bloom hashes and prefetches are
-    /// already issued; the lookup runs one pass later (default; `KIC_PREFETCH=0` opts out).
-    #[derive(Clone, Copy)]
-    struct PendingProbe128 {
-        candidate: u32,
-        partner: u128,
-        normal: u128,
-        key: u128,
-        first: u64,
-        step: u64,
     }
 
     impl StateScan128 {
@@ -4750,7 +5220,6 @@ mod wide {
             Self {
                 inputs: Vec::with_capacity(entries),
                 batch: RootBatch128::with_capacity(entries),
-                pending: Vec::with_capacity(2 * entries),
             }
         }
     }
@@ -4785,79 +5254,11 @@ mod wide {
             }
         }
         scan.batch.solve(gf, basis, solver, &scan.inputs);
-        if index.prefetch_probes {
-            // Pass 1: canonical key, Bloom hashes and prefetch of every
-            // partner of the state, in the sequential probe order.
-            scan.pending.clear();
-            for candidate in 0..scan.inputs.len() {
-                let Some(partners) = scan.batch.results[candidate] else {
-                    continue;
-                };
-                for partner in partners {
-                    let normal = basis.to_normal.apply(partner);
-                    let key = if basis.lazy_canonical {
-                        basis.canonical_key_lazy(normal)
-                    } else {
-                        basis.canonical_selected(normal).0
-                    };
-                    let (first, step) = RootBloom::hash_pair(key);
-                    match &index.table.bloom {
-                        Some(bloom) => bloom.prefetch_hashed(first, step),
-                        None => index.table.prefetch_slot(key),
-                    }
-                    scan.pending.push(PendingProbe128 {
-                        candidate: candidate as u32,
-                        partner,
-                        normal,
-                        key,
-                        first,
-                        step,
-                    });
-                }
-            }
-            // Pass 2: the lookups, in the same order as the plain scan, so
-            // the probe counter at a hit is unchanged.
-            for position in 0..scan.pending.len() {
-                let probe = scan.pending[position];
-                *probes += 1;
-                if let Some(bloom) = &index.table.bloom {
-                    if !bloom.contains_hashed(probe.first, probe.step) {
-                        continue;
-                    }
-                }
-                let Some(value) =
-                    index
-                        .table
-                        .get_with_context_screened(probe.key, &index.states, basis)
-                else {
-                    continue;
-                };
-                let partner_shift = basis.canonical_selected(probe.normal).1;
-                let candidate = probe.candidate as usize;
-                let shift = (candidate / state.normal_roots.len()) as u32;
-                if let Some(relation) = lift_hit128(
-                    gf,
-                    fast,
-                    index,
-                    base,
-                    target,
-                    state,
-                    shift,
-                    scan.inputs[candidate].0,
-                    probe.partner,
-                    value,
-                    partner_shift,
-                    lift_scratch,
-                    probes,
-                    relation_check_ns,
-                ) {
-                    return Some(relation);
-                }
-            }
-            return None;
-        }
         let mut candidate = 0usize;
         for shift in 0..n {
+            let left_x = index.shifted[state.left as usize][shift as usize];
+            let right_x = index.shifted[state.right as usize]
+                [(shift as usize + state.relative as usize) % n as usize];
             for _ in 0..state.normal_roots.len() {
                 let absolute = scan.inputs[candidate].0;
                 let result = scan.batch.results[candidate];
@@ -4867,129 +5268,37 @@ mod wide {
                 };
                 for partner in partners {
                     *probes += 1;
-                    let normal = basis.to_normal.apply(partner);
-                    // Lazy form: key only before the lookup, shift on a hit.
-                    let (canonical, mut partner_shift) = if basis.lazy_canonical {
-                        (basis.canonical_key_lazy(normal), 0)
-                    } else {
-                        basis.canonical_selected(normal)
-                    };
-                    let Some(value) = index
-                        .table
-                        .get_with_context(canonical, &index.states, basis)
-                    else {
+                    let (canonical, partner_shift) =
+                        basis.canonical_selected(basis.to_normal.apply(partner));
+                    let Some(value) = index.get_root(canonical, basis) else {
                         continue;
                     };
-                    if basis.lazy_canonical {
-                        partner_shift = basis.canonical_selected(normal).1;
-                    }
-                    if let Some(relation) = lift_hit128(
-                        gf,
-                        fast,
-                        index,
-                        base,
-                        target,
-                        state,
-                        shift,
-                        absolute,
-                        partner,
-                        value,
-                        partner_shift,
-                        lift_scratch,
-                        probes,
-                        relation_check_ns,
-                    ) {
-                        return Some(relation);
+                    let (left2, right2, relative2, stored_shift) = unpack(value);
+                    let left_shift2 = ((stored_shift + n - partner_shift) % n) as usize;
+                    let right_shift2 = (left_shift2 + relative2) % n as usize;
+                    let codes = [
+                        left_x,
+                        right_x,
+                        index.shifted[left2][left_shift2],
+                        index.shifted[right2][right_shift2],
+                    ];
+                    // Time the whole lift once per candidate instead of one
+                    // Instant::now() per innermost add.
+                    let lift_started = Instant::now();
+                    let lifted = lift128(fast, base, &codes, target, lift_scratch);
+                    *relation_check_ns += lift_started.elapsed().as_nanos();
+                    if let Some(point_indices) = lifted {
+                        return Some(Relation128 {
+                            point_indices,
+                            x_codes: codes,
+                            intermediates: [absolute, partner],
+                            probes: *probes,
+                        });
                     }
                 }
             }
         }
         None
-    }
-
-    /// A table hit of the scan: rebuild the four x-codes from the stored
-    /// witness and try the lift.  Shared by both scan passes.
-    #[inline(always)]
-    fn lift_hit128(
-        gf: &Gf2_128,
-        fast: &FastBinaryCurve128,
-        index: &Index128,
-        base: &Base128,
-        target: FastPoint128,
-        state: &State128,
-        shift: u32,
-        absolute: u128,
-        partner: u128,
-        value: u64,
-        partner_shift: u32,
-        lift_scratch: &mut LiftScratch128,
-        probes: &mut u64,
-        relation_check_ns: &mut u128,
-    ) -> Option<Relation128> {
-        let n = gf.n;
-        PROF_HITS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-        let left_x = index.shifted[state.left as usize][shift as usize];
-        let right_x = index.shifted[state.right as usize]
-            [(shift as usize + state.relative as usize) % n as usize];
-        let (left2, right2, relative2, stored_shift) = unpack(value);
-        let left_shift2 = ((stored_shift + n - partner_shift) % n) as usize;
-        let right_shift2 = (left_shift2 + relative2) % n as usize;
-        let codes = [
-            left_x,
-            right_x,
-            index.shifted[left2][left_shift2],
-            index.shifted[right2][right_shift2],
-        ];
-        // Time the whole lift once per candidate instead of one
-        // Instant::now() per innermost add.
-        let lift_started = Instant::now();
-        let lifted = lift128(fast, base, &codes, target, lift_scratch);
-        *relation_check_ns += lift_started.elapsed().as_nanos();
-        lifted.map(|point_indices| Relation128 {
-            point_indices,
-            x_codes: codes,
-            intermediates: [absolute, partner],
-            probes: *probes,
-        })
-    }
-
-    // `KIC_PROF_MAX_STATES=<S>`: measurement cap.  The process prints one
-    // `PROF ...` line to stderr after S scanned states (counted across every
-    // `extract128` call of the process) and exits 0.  Counters: states
-    // scanned, partner probes, table hits (probes that passed Bloom and table
-    // and reached the lift), relations returned, the index size, and the
-    // wall time since the first scanned state.  Without the variable the
-    // cost is one relaxed atomic add per state.
-    static PROF_STATES: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-    static PROF_PROBES: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-    static PROF_HITS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-    static PROF_RELATIONS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-    static PROF_START: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
-
-    fn prof_cap() -> u64 {
-        static CAP: std::sync::OnceLock<u64> = std::sync::OnceLock::new();
-        *CAP.get_or_init(|| {
-            std::env::var("KIC_PROF_MAX_STATES")
-                .ok()
-                .and_then(|value| value.trim().parse().ok())
-                .unwrap_or(u64::MAX)
-        })
-    }
-
-    fn prof_exit(index_states: usize) -> ! {
-        let elapsed = PROF_START.get().map_or(0.0, |t| t.elapsed().as_secs_f64());
-        let probes = PROF_PROBES.load(std::sync::atomic::Ordering::Relaxed);
-        eprintln!(
-            "PROF states={} probes={} hits={} relations={} index_states={} scan_s={:.6} ns_per_probe={:.3}",
-            prof_cap(),
-            probes,
-            PROF_HITS.load(std::sync::atomic::Ordering::Relaxed),
-            PROF_RELATIONS.load(std::sync::atomic::Ordering::Relaxed),
-            index_states,
-            elapsed,
-            elapsed * 1e9 / probes.max(1) as f64
-        );
-        std::process::exit(0);
     }
 
     fn extract128(
@@ -5010,13 +5319,7 @@ mod wide {
         let start = start % index.states.len().max(1);
         for offset in 0..index.states.len() {
             let state = index.states.get((start + offset) % index.states.len());
-            let prof_state = PROF_STATES.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-            if prof_state >= prof_cap() {
-                prof_exit(index.states.len());
-            }
-            PROF_START.get_or_init(Instant::now);
-            let probes_before = probes;
-            let found = scan_state128(
+            if let Some(relation) = scan_state128(
                 gf,
                 fast,
                 basis,
@@ -5030,10 +5333,7 @@ mod wide {
                 &mut lift_scratch,
                 &mut probes,
                 relation_check_ns,
-            );
-            PROF_PROBES.fetch_add(probes - probes_before, std::sync::atomic::Ordering::Relaxed);
-            if let Some(relation) = found {
-                PROF_RELATIONS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            ) {
                 return Some(relation);
             }
         }
@@ -5185,10 +5485,7 @@ mod wide {
             );
         }
         let fast = FastBinaryCurve128::new(&curve.curve.irreducible, a as u128).unwrap();
-        let mut gf = Gf2_128::new(&curve.curve.irreducible);
-        if std::env::var("KIC_SPARSE_REDUCE").is_ok_and(|v| v == "1") {
-            gf.set_sparse_reduce(true);
-        }
+        let gf = Gf2_128::new(&curve.curve.irreducible);
         let b = gf.from_element(&curve.curve.b);
         let generator: FastPoint128 = match curve.generator() {
             crypto_lib::binary_ecc::BinaryPoint::Affine { x, y } => {
@@ -5234,6 +5531,47 @@ mod wide {
             }
             None => header["base_hash"].as_str().unwrap().to_owned(),
         };
+        if std::env::var("KIC_BASE_BUILD_ONLY").as_deref() == Ok("1") {
+            assert!(
+                constructed.is_some(),
+                "base-only stage needs a constructed base"
+            );
+            let dump_path =
+                std::env::var("KIC_DUMP_BASE").expect("base-only stage needs KIC_DUMP_BASE");
+            let dump = json!({
+                "kind":"point_defined_factor_base",
+                "n":n, "a":a,
+                "subgroup_order":r,
+                "field_modulus_low_terms":curve.curve.irreducible.low_terms,
+                "orbit_columns":representatives.len(),
+                "base_hash":base_hash,
+                "factor_base_points":points.len(),
+                "field_value_encoding":"base-10 strings for u128 field values",
+                "factor_base_point_coordinates":points.iter().map(|p| encode_point128(*p)).collect::<Vec<_>>(),
+                "factor_base_point_labels":labels,
+                "factor_base_representatives":representatives.iter().copied().map(encode_pair128).collect::<Vec<_>>(),
+            });
+            std::fs::write(&dump_path, format!("{dump}\n")).expect("write base-only dump");
+            println!(
+                "{}",
+                json!({
+                    "kind":"compact_orbit_base_stage",
+                    "status":"STAGE_DIAGNOSTIC_ONLY",
+                    "n":n, "a":a,
+                    "subgroup_order":r,
+                    "cofactor":curve.cofactor.to_string(),
+                    "field_modulus_low_terms":curve.curve.irreducible.low_terms,
+                    "generator":encode_point128(generator),
+                    "orbit_columns":representatives.len(),
+                    "factor_base_points":points.len(),
+                    "base_hash":base_hash,
+                    "base_scanned_x":scanned_x,
+                    "base_construction_ms":setup_started.elapsed().as_secs_f64() * 1000.0,
+                    "base_dump_path":dump_path,
+                })
+            );
+            std::process::exit(0);
+        }
         let mut by_x: HashMap<u128, Vec<usize>> = HashMap::new();
         for (index, point) in points.iter().enumerate() {
             if let Some((x, _)) = point {
@@ -5275,6 +5613,88 @@ mod wide {
         let index = build_index128(&gf, &basis, &solver, &reps);
         let index_ms = index_started.elapsed().as_secs_f64() * 1000.0;
         let setup_ms = setup_started.elapsed().as_secs_f64() * 1000.0;
+        if std::env::var("KIC_INDEX_BUILD_ONLY").as_deref() == Ok("1") {
+            let state_digest = match &index.states {
+                StateStore128::RootOnly11 { states, .. } => {
+                    let mut hasher = blake3::Hasher::new();
+                    for state in states {
+                        hasher.update(&state.root0);
+                    }
+                    Some(hasher.finalize().to_hex().to_string())
+                }
+                _ => None,
+            };
+            let table_digest = match &index.table.slots {
+                RootSlots128::Indexed83(slots) => {
+                    let mut hasher = blake3::Hasher::new();
+                    for slot in slots {
+                        hasher.update(slot);
+                    }
+                    Some(hasher.finalize().to_hex().to_string())
+                }
+                RootSlots128::Indexed83Four(slots) => {
+                    let mut hasher = blake3::Hasher::new();
+                    for slot in slots {
+                        hasher.update(&slot.to_le_bytes());
+                    }
+                    Some(hasher.finalize().to_hex().to_string())
+                }
+                _ => None,
+            };
+            let overflow_digest = index.overflow_table.as_ref().and_then(|table| {
+                let mut hasher = blake3::Hasher::new();
+                match &table.slots {
+                    RootSlots128::Indexed83(slots) => {
+                        for slot in slots {
+                            hasher.update(slot);
+                        }
+                    }
+                    RootSlots128::Indexed83Four(slots) => {
+                        for slot in slots {
+                            hasher.update(&slot.to_le_bytes());
+                        }
+                    }
+                    _ => return None,
+                }
+                Some(hasher.finalize().to_hex().to_string())
+            });
+            println!(
+                "{}",
+                json!({
+                    "kind": "compact_orbit_index_stage",
+                    "status": "STAGE_DIAGNOSTIC_ONLY",
+                    "n": gf.n,
+                    "base_hash": base_hash,
+                    "orbit_columns": base.columns,
+                    "factor_base_points": base.points.len(),
+                    "regular_states": index.states.len(),
+                    "root_table_entries": index.table.len + index.overflow_table.as_ref().map_or(0, |t| t.len),
+                    "primary_table_entries": index.table.len,
+                    "overflow_table_entries": index.overflow_table.as_ref().map_or(0, |t| t.len),
+                    "primary_table_allocated_bytes": index.table.layout_receipt().2,
+                    "overflow_table_allocated_bytes": index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
+                    "root_table_allocated_bytes": index.table.layout_receipt().2 + index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
+                    "root_fingerprint_sidecar_bytes": index.table.fingerprint_sidecar_bytes() + index.overflow_table.as_ref().map_or(0, RootTable128::fingerprint_sidecar_bytes),
+                    "root_table_layout": index.table.layout_receipt().0,
+                    "root_slot_state_id_bits": if index.indexed4_fixed32 || index.indexed5_id31 { 31 } else if index.indexed4_split30 || index.indexed5_id30 { 30 } else { 29 },
+                    "indexed5_split_at": if index.indexed4_split30 { None } else { index.split_at },
+                    "indexed4_split_at": if index.indexed4_split30 { index.split_at } else { None },
+                    "indexed5_state_id_bits": if index.indexed5_id31 { 31 } else if index.indexed5_id30 { 30 } else { 29 },
+                    "shared_bloom_enabled": index.shared_bloom.is_some(),
+                    "shared_bloom_bytes": index.shared_bloom.as_ref().map_or(0, RootBloom::bytes),
+                    "root_bloom_bytes": index.table.bloom.as_ref().map_or(0, RootBloom::bytes) + index.overflow_table.as_ref().and_then(|t| t.bloom.as_ref()).map_or(0, RootBloom::bytes) + index.shared_bloom.as_ref().map_or(0, RootBloom::bytes),
+                    "state_digest_blake3": state_digest,
+                    "table_digest_blake3": table_digest,
+                    "overflow_digest_blake3": overflow_digest,
+                    "batch_roots": std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1"),
+                    "base_load_ms": base_load_ms,
+                    "normal_basis_and_selftest_ms": basis_ms,
+                    "index_build_ms": index_ms,
+                    "setup_total_ms": setup_ms,
+                })
+            );
+            std::process::exit(0);
+        }
 
         let rank_started = Instant::now();
         let mut echelon = super::Echelon {
@@ -5289,9 +5709,6 @@ mod wide {
         let mut rank_probes = 0u64;
         let mut rank_rows_without_gain = 0u64;
         let mut rank_unused_relation_check_ns = 0u128;
-        // Per-column (column, probes, attempts, wall ns) of the parallel rank
-        // stage; printed only under KIC_RANK_TRACE=1 (observation only).
-        let mut rank_column_trace: Vec<(usize, u64, u64, u128)> = Vec::new();
         let rank_threads: usize = std::env::var("KIC_RANK_THREADS")
             .ok()
             .and_then(|value| value.trim().parse::<usize>().ok())
@@ -5306,7 +5723,7 @@ mod wide {
             // arrive covering already-pivoted columns; those count as
             // rows without gain, exactly as sequential duplicates would.
             let (sender, receiver) =
-                std::sync::mpsc::channel::<(usize, u64, Relation128, u64, u128, u64, u128)>();
+                std::sync::mpsc::channel::<(usize, u64, Relation128, u64, u128, u64)>();
             std::thread::scope(|scope| {
                 let mut handles = Vec::with_capacity(rank_threads);
                 for thread in 0..rank_threads {
@@ -5323,7 +5740,6 @@ mod wide {
                         let mut thread_attempts = 0u64;
                         let mut thread_relation_check_ns = 0u128;
                         for column in (thread..base.columns).step_by(rank_threads) {
-                            let column_started = Instant::now();
                             let rep: FastPoint128 = representatives[column].map(|[x, y]| (x, y));
                             let mut attempt = 0u64;
                             loop {
@@ -5356,7 +5772,6 @@ mod wide {
                                                 probes,
                                                 thread_relation_check_ns,
                                                 thread_attempts,
-                                                column_started.elapsed().as_nanos(),
                                             ))
                                             .expect("rank receiver is alive");
                                         thread_relation_check_ns = 0;
@@ -5370,10 +5785,7 @@ mod wide {
                     }));
                 }
                 drop(sender);
-                for (column, scalar, relation, probes, relation_check_ns, attempts, column_ns) in
-                    receiver
-                {
-                    rank_column_trace.push((column, probes, attempts, column_ns));
+                for (column, scalar, relation, probes, relation_check_ns, attempts) in receiver {
                     rank_attempts += attempts;
                     rank_relations += 1;
                     rank_probes += probes;
@@ -5439,6 +5851,7 @@ mod wide {
             .and_then(|value| value.trim().parse::<usize>().ok())
             .filter(|&threads| threads > 0)
             .unwrap_or(1);
+        let target_cancel = std::env::var("KIC_TARGET_CANCEL").as_deref() == Ok("1");
         let mut solved = 0usize;
         let mut failed = 0usize;
         let mut target_query_ms = Vec::with_capacity(target_inputs.len());
@@ -5475,6 +5888,7 @@ mod wide {
                 target,
                 start,
                 target_threads,
+                target_cancel,
             );
             let target_decomposition_total_ms = target_pdp_started.elapsed().as_secs_f64() * 1000.0;
             let target_relation_check_ms = target_relation_check_ns as f64 / 1_000_000.0;
@@ -5548,16 +5962,16 @@ mod wide {
             "root_state_layout":root_state_layout,
             "root_state_slot_bytes":root_state_slot_bytes,
             "root_state_allocated_bytes":root_state_allocated_bytes,
-            "root_table_entries":index.table.len,
+            "root_table_entries":index.table.len + index.overflow_table.as_ref().map_or(0, |t| t.len),
             "root_table_dense_enabled":index.dense_table,
             "root_table_load75_enabled":index.load75_table,
             "root_table_indexed5_enabled":index.indexed5_table,
             "root_table_request_entries":index.root_table_request_entries,
             "root_table_layout":root_table_layout,
             "root_table_slot_bytes":root_table_slot_bytes,
-            "root_table_allocated_bytes":root_table_allocated_bytes,
-            "root_bloom_enabled":index.table.bloom.is_some(),
-            "root_bloom_bytes":index.table.bloom.as_ref().map_or(0, RootBloom::bytes),
+            "root_table_allocated_bytes":root_table_allocated_bytes + index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
+            "root_bloom_enabled":index.bloom().is_some(),
+            "root_bloom_bytes":index.table.bloom.as_ref().map_or(0, RootBloom::bytes) + index.overflow_table.as_ref().and_then(|t| t.bloom.as_ref()).map_or(0, RootBloom::bytes) + index.shared_bloom.as_ref().map_or(0, RootBloom::bytes),
             "sparse_canonical_enabled":basis.sparse_canonical,
             "pair_table_entries":0,
             "edge_selectors":0,
@@ -5591,31 +6005,46 @@ mod wide {
             "target_threads":target_threads,
             "scope":"public synthetic Koblitz fixtures; shared-factor-log DLP with every stage timed in one process; no external points or key recovery",
         });
-        if std::env::var("KIC_RANK_TRACE").is_ok_and(|v| v == "1") {
-            rank_column_trace.sort_unstable();
-            summary["rank_column_trace"] = json!(rank_column_trace
-                .iter()
-                .map(|&(c, p, a, ns)| json!([c, p, a, ns as u64]))
-                .collect::<Vec<_>>());
-        }
-        summary["lazy_canonical_enabled"] = json!(basis.lazy_canonical);
-        summary["probe_prefetch_enabled"] = json!(index.prefetch_probes);
-        summary["root_bloom_blocked"] = json!(index
-            .table
-            .bloom
+        summary["root_fingerprint_sidecar_bytes"] = json!(
+            index.table.fingerprint_sidecar_bytes()
+                + index
+                    .overflow_table
+                    .as_ref()
+                    .map_or(0, RootTable128::fingerprint_sidecar_bytes)
+        );
+        summary["primary_table_entries"] = json!(index.table.len);
+        summary["overflow_table_entries"] =
+            json!(index.overflow_table.as_ref().map_or(0, |table| table.len));
+        summary["indexed5_split_at"] = json!(if index.indexed4_split30 {
+            None
+        } else {
+            index.split_at
+        });
+        summary["indexed4_split_at"] = json!(if index.indexed4_split30 {
+            index.split_at
+        } else {
+            None
+        });
+        summary["overflow_request_entries"] = json!(index.overflow_request_entries);
+        summary["overflow_table_allocated_bytes"] = json!(index
+            .overflow_table
             .as_ref()
-            .is_some_and(|bloom| bloom.blocked));
-        summary["root_bloom_profile"] = json!(index
-            .table
-            .bloom
+            .map_or(0, |table| table.layout_receipt().2));
+        summary["overflow_bloom_bytes"] = json!(index
+            .overflow_table
             .as_ref()
-            .map_or("none", |bloom| bloom.profile.name()));
-        summary["root_bloom_hashes"] =
-            json!(index.table.bloom.as_ref().map_or(0, |bloom| bloom.hashes));
+            .and_then(|table| table.bloom.as_ref())
+            .map_or(0, RootBloom::bytes));
+        summary["primary_table_allocated_bytes"] = json!(root_table_allocated_bytes);
+        summary["shared_bloom_enabled"] = json!(index.shared_bloom.is_some());
+        summary["shared_bloom_bytes"] =
+            json!(index.shared_bloom.as_ref().map_or(0, RootBloom::bytes));
+        summary["target_cancel"] = json!(target_cancel);
+        summary["root_bloom_profile"] =
+            json!(index.bloom().map_or("none", |bloom| bloom.profile.name()));
+        summary["root_bloom_hashes"] = json!(index.bloom().map_or(0, |bloom| bloom.hashes));
         summary["root_bloom_bits_per_request"] = json!(index
-            .table
-            .bloom
-            .as_ref()
+            .bloom()
             .map_or(0, |bloom| bloom.profile.bits_per_request()));
         summary["root_table_hugepage_requested"] = json!(crate::root_table_hugepage_requested());
         summary["anon_huge_pages_bytes"] = json!(crate::anon_huge_pages_bytes());
@@ -5623,9 +6052,14 @@ mod wide {
         summary["symmetric_s3_states_enabled"] = json!(index.symmetric_states);
         summary["root_table_indexed4_enabled"] = json!(index.indexed4_table);
         summary["root_table_indexed5_id30_enabled"] = json!(index.indexed5_id30);
+        summary["root_table_indexed5_id31_enabled"] = json!(index.indexed5_id31);
         summary["indexed5_load75_enabled"] = json!(index.indexed5_load75);
+        summary["indexed5_load80_enabled"] = json!(index.indexed5_load80);
         summary["indexed5_fixed30_enabled"] = json!(index.indexed5_fixed30);
+        summary["indexed5_fixed31_enabled"] = json!(index.indexed5_fixed31);
         summary["indexed4_fixed31_enabled"] = json!(index.indexed4_fixed31);
+        summary["indexed4_fixed32_enabled"] = json!(index.indexed4_fixed32);
+        summary["indexed4_split30_enabled"] = json!(index.indexed4_split30);
         summary["indexed4_fixed30_enabled"] = json!(index.indexed4_fixed30);
         summary["root_only11_enabled"] =
             json!(matches!(&index.states, StateStore128::RootOnly11 { .. }));
@@ -5647,234 +6081,6 @@ mod wide {
             std::fs::write(path, format!("{dump}\n")).expect("write base dump");
         }
         std::process::exit(0);
-    }
-
-    #[cfg(test)]
-    /// Tests of the engineering switches: each must leave the produced
-    /// index, table and probe sequence unchanged.
-    mod engineering_tests {
-        use super::*;
-        use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse_wide;
-
-        fn xorshift(seed: &mut u64) -> u64 {
-            *seed ^= *seed << 13;
-            *seed ^= *seed >> 7;
-            *seed ^= *seed << 17;
-            *seed
-        }
-
-        fn random_word(seed: &mut u64, mask: u128) -> u128 {
-            (((xorshift(seed) as u128) << 64) | xorshift(seed) as u128) & mask
-        }
-
-        #[test]
-        fn parallel_batched_index_equals_serial_build() {
-            for (n, symmetric) in [(73u32, false), (83, true)] {
-                let gf = Gf2_128::new(&find_irreducible_sparse_wide(n).unwrap());
-                let basis = NormalBasis128::new(&gf);
-                let solver = S3Solver128::new(&gf, 1);
-                let mut seed = 0xC0FF_EE00_1234_5678u64 ^ n as u64;
-                let reps: Vec<u128> = (0..7).map(|_| random_word(&mut seed, basis.mask)).collect();
-                let reference = build_index128_impl(
-                    &gf,
-                    &basis,
-                    &solver,
-                    &reps,
-                    symmetric,
-                    false,
-                    IndexBuildOpts::serial(),
-                );
-                assert!(reference.states.len() > 100);
-                for (threads, batch_inv) in [(1, true), (3, false), (3, true), (4, true)] {
-                    let built = build_index128_impl(
-                        &gf,
-                        &basis,
-                        &solver,
-                        &reps,
-                        symmetric,
-                        false,
-                        IndexBuildOpts { threads, batch_inv },
-                    );
-                    assert_eq!(
-                        index_difference(&built, &reference),
-                        None,
-                        "n={n} threads={threads} batch_inv={batch_inv}"
-                    );
-                }
-            }
-        }
-
-        #[test]
-        fn blocked_bloom_has_no_false_negatives_and_prehashed_calls_agree() {
-            let mut seed = 0x1357_9BDF_0246_8ACEu64;
-            for profile in [
-                RootBloomProfile::Compact4,
-                RootBloomProfile::Standard,
-                RootBloomProfile::Wide3,
-                RootBloomProfile::Wide5,
-            ] {
-                for blocked in [false, true] {
-                    let mut bloom = RootBloom::with_profile_blocked(20_000, profile, blocked);
-                    let keys: Vec<u128> = (0..20_000)
-                        .map(|_| random_word(&mut seed, u128::MAX >> 40))
-                        .collect();
-                    for &key in &keys {
-                        bloom.insert(key);
-                    }
-                    for &key in &keys {
-                        assert!(bloom.contains(key), "{profile:?} blocked={blocked}");
-                        let (first, step) = RootBloom::hash_pair(key);
-                        assert!(bloom.contains_hashed(first, step));
-                    }
-                    let mut passes = 0usize;
-                    for _ in 0..40_000 {
-                        let key = random_word(&mut seed, u128::MAX >> 40) | (1u128 << 100);
-                        let (first, step) = RootBloom::hash_pair(key);
-                        assert_eq!(bloom.contains(key), bloom.contains_hashed(first, step));
-                        passes += bloom.contains(key) as usize;
-                        // The prefetch is a hint: it must not fault or change state.
-                        bloom.prefetch_hashed(first, step);
-                    }
-                    // Compact4 (4 bits per key) is the loosest profile.
-                    let limit = if profile == RootBloomProfile::Compact4 {
-                        0.5
-                    } else {
-                        0.2
-                    };
-                    assert!(
-                        (passes as f64) < 40_000.0 * limit,
-                        "{profile:?} blocked={blocked}: {passes} false positives"
-                    );
-                }
-            }
-        }
-
-        #[test]
-        fn screened_lookup_and_slot_prefetch_agree_with_plain_lookup() {
-            let mut seed = 0x0F0F_1234_ABCD_9876u64;
-            for blocked in [false, true] {
-                let mut table = RootTable128::with_capacity(5_000, 73, 600, false);
-                table.bloom = Some(RootBloom::with_profile_blocked(
-                    5_000,
-                    RootBloomProfile::Standard,
-                    blocked,
-                ));
-                let mut keys = Vec::new();
-                for i in 0..5_000u64 {
-                    let key = random_word(&mut seed, (1u128 << 73) - 1);
-                    table.insert_if_absent(key, pack((i % 600) as u16, 3, 5, (i % 73) as u32));
-                    keys.push(key);
-                }
-                let states = StateStore128::Wide(Vec::new());
-                let gf = Gf2_128::new(&find_irreducible_sparse_wide(73).unwrap());
-                let basis = NormalBasis128::new(&gf);
-                for round in 0..20_000usize {
-                    let key = if round % 2 == 0 {
-                        keys[round % keys.len()]
-                    } else {
-                        random_word(&mut seed, (1u128 << 73) - 1)
-                    };
-                    table.prefetch_slot(key);
-                    let plain = table.get_with_context(key, &states, &basis);
-                    let (first, step) = RootBloom::hash_pair(key);
-                    let screened = if table.bloom.as_ref().unwrap().contains_hashed(first, step) {
-                        table.get_with_context_screened(key, &states, &basis)
-                    } else {
-                        None
-                    };
-                    assert_eq!(plain, screened);
-                    if round % 2 == 0 {
-                        assert!(plain.is_some());
-                    }
-                }
-            }
-        }
-
-        /// `KIC_PREFETCH` and `KIC_LAZY_CANON` change when work is done, not
-        /// which probes are made: the probe count over a full scan, and the
-        /// result, are identical, including for a target chosen so that
-        /// probes reach the table-hit path.
-        #[test]
-        fn scan_probe_sequence_is_unchanged_by_prefetch_and_lazy_canon() {
-            let irreducible = find_irreducible_sparse_wide(73).unwrap();
-            let gf = Gf2_128::new(&irreducible);
-            let fast = FastBinaryCurve128::new(&irreducible, 1).unwrap();
-            let mut basis = NormalBasis128::new(&gf);
-            let solver = S3Solver128::new(&gf, 1);
-            let mut seed = 0xDEAD_BEEF_0BAD_F00Du64;
-            let reps: Vec<u128> = (0..6).map(|_| random_word(&mut seed, basis.mask)).collect();
-            let mut index = build_index128_impl(
-                &gf,
-                &basis,
-                &solver,
-                &reps,
-                false,
-                false,
-                IndexBuildOpts::serial(),
-            );
-            let base = Base128 {
-                points: Vec::new(),
-                labels: Vec::new(),
-                by_x: HashMap::new(),
-                columns: 0,
-            };
-            let state_count = index.states.len();
-            // A target whose partner set contains a stored root of state 0.
-            let stored = basis.to_poly.apply(index.states.get(0).normal_roots[0]);
-            let mut targets = vec![random_word(&mut seed, basis.mask)];
-            for i in 1..state_count {
-                let absolute = basis.to_poly.apply(index.states.get(i).normal_roots[0]);
-                if let Some(roots) = solver.roots(&gf, &basis, absolute, stored) {
-                    targets.push(roots[0]);
-                    break;
-                }
-            }
-            assert_eq!(targets.len(), 2, "no crafted hit target found");
-            let mut reference: Vec<(Vec<u64>, usize)> = Vec::new();
-            for (lazy, prefetch) in [(false, false), (true, false), (false, true), (true, true)] {
-                basis.lazy_canonical = lazy;
-                index.prefetch_probes = prefetch;
-                let mut run: Vec<(Vec<u64>, usize)> = Vec::new();
-                for &target_x in &targets {
-                    let mut scan = StateScan128::new(gf.n);
-                    let mut lift_scratch = LiftScratch128::default();
-                    let mut probes = 0u64;
-                    let mut check_ns = 0u128;
-                    let mut per_state = Vec::new();
-                    let mut found = 0usize;
-                    for i in 0..state_count {
-                        let state = index.states.get(i);
-                        let before = probes;
-                        let result = scan_state128(
-                            &gf,
-                            &fast,
-                            &basis,
-                            &solver,
-                            &index,
-                            &base,
-                            Some((target_x, 0)),
-                            target_x,
-                            &state,
-                            &mut scan,
-                            &mut lift_scratch,
-                            &mut probes,
-                            &mut check_ns,
-                        );
-                        found += result.is_some() as usize;
-                        per_state.push(probes - before);
-                    }
-                    run.push((per_state, found));
-                }
-                if reference.is_empty() {
-                    reference = run;
-                } else {
-                    assert!(run == reference, "lazy={lazy} prefetch={prefetch}");
-                }
-            }
-            assert!(reference[0].0.iter().sum::<u64>() > 0);
-            // The crafted target must have reached the table-hit path.
-            assert!(PROF_HITS.load(std::sync::atomic::Ordering::Relaxed) > 0);
-        }
     }
 
     #[cfg(test)]
