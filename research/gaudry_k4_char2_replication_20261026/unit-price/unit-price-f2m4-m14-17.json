@@ -1,0 +1,1981 @@
+{
+  "binary_sha256": "880bc2a4d2a5aa2a6e31d7fa1ecb6e16ed86c3a0c7cb563a6f985898ee2d48d5",
+  "host": {
+    "build": {
+      "binary_path": "/home/user/crypto/target-repl/release/ecbench",
+      "binary_sha256": "880bc2a4d2a5aa2a6e31d7fa1ecb6e16ed86c3a0c7cb563a6f985898ee2d48d5",
+      "build_env": {},
+      "debug_assertions": false,
+      "git_commit": "0eaa19d1e31c61e7c6de3f7c3a7469ca2c97943d",
+      "git_commit_source": "runtime_worktree",
+      "git_dirty": true,
+      "runtime_git_commit": "0eaa19d1e31c61e7c6de3f7c3a7469ca2c97943d",
+      "runtime_git_dirty": true,
+      "target_arch": "x86_64",
+      "target_os": "linux"
+    },
+    "env_class_id": "ECBENV2hd0444fa4ec90",
+    "process_affinity": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "stable": {
+      "arch": "x86_64",
+      "cpu_model": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+      "cpu_settings": {
+        "0": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        },
+        "1": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        },
+        "2": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        },
+        "3": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        }
+      },
+      "cpu_signature": "6/85/7",
+      "cpu_vendor": "GenuineIntel",
+      "features": [
+        "adx",
+        "aes",
+        "avx",
+        "avx2",
+        "avx512bw",
+        "avx512dq",
+        "avx512f",
+        "avx512vl",
+        "bmi1",
+        "bmi2",
+        "fma",
+        "pclmulqdq",
+        "popcnt",
+        "sse4.2"
+      ],
+      "flags_sha256": "e28bebf6d58da864dd355505bf305dd3bd502a1e851ac057e69aedb2dcc47735",
+      "kernel_release": "6.18.44-fc-v165",
+      "logical_cpus": 4,
+      "mem_total_kib": 16477356,
+      "microcode": "0x1",
+      "numa_nodes": 1,
+      "os": "linux",
+      "packages": 1,
+      "perf_levels": [],
+      "physical_cores": 4,
+      "rustc_vv": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.0\nLLVM version: 22.1.6",
+      "topology": {
+        "cpus": [
+          {
+            "core_id": 0,
+            "cpu": 0,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              0
+            ]
+          },
+          {
+            "core_id": 1,
+            "cpu": 1,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              1
+            ]
+          },
+          {
+            "core_id": 2,
+            "cpu": 2,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              2
+            ]
+          },
+          {
+            "core_id": 3,
+            "cpu": 3,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              3
+            ]
+          }
+        ],
+        "nodes": [
+          {
+            "cpus": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "distances": [
+              10
+            ],
+            "mem_total_kib": 8615652,
+            "node": 0
+          }
+        ]
+      },
+      "transparent_hugepages": "always [madvise] never",
+      "virtualization": {
+        "cpu_flag": "hypervisor",
+        "systemd_detect_virt_vm": "kvm"
+      }
+    }
+  },
+  "ic_trials": 8,
+  "instances": {
+    "m14": {
+      "curve": "icv1-f2m56-tm338854401-5d597dcf",
+      "fq_muls_per_add": 179,
+      "group_bits": 56,
+      "in_situ": {
+        "ic_pipeline": {
+          "full_priced_fme": {
+            "max": 30006437.152831,
+            "median": 30001929.701683998,
+            "min": 30000221.278634,
+            "rel_spread": 0.0002071824798872814,
+            "values": [
+              30006437.152831,
+              30000221.278634,
+              30001929.701683998
+            ]
+          },
+          "full_trials": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "full_wall_ns": {
+            "max": 212943529.0,
+            "median": 188163324.0,
+            "min": 181429664.0,
+            "rel_spread": 0.1674814428767213,
+            "values": [
+              212943529.0,
+              181429664.0,
+              188163324.0
+            ]
+          },
+          "ic_trials_requested": 8,
+          "legacy_accepted_relations": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_decompositions": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_priced_fq_ops": {
+            "max": 26256724.0,
+            "median": 26253545.0,
+            "min": 26250527.0,
+            "rel_spread": 0.00023604431325369583,
+            "values": [
+              26256724.0,
+              26250527.0,
+              26253545.0
+            ]
+          },
+          "legacy_trials": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_wall_ns": {
+            "max": 234334723.0,
+            "median": 232649791.0,
+            "min": 207615884.0,
+            "rel_spread": 0.11484574684187014,
+            "values": [
+              207615884.0,
+              232649791.0,
+              234334723.0
+            ]
+          },
+          "ns_per_full_priced_fme": {
+            "max": 7.0965949044673415,
+            "median": 6.271707382523413,
+            "min": 6.047610859764333,
+            "rel_spread": 0.1672565348992655,
+            "values": [
+              7.0965949044673415,
+              6.047610859764333,
+              6.271707382523413
+            ]
+          },
+          "ns_per_legacy_priced_fq_op": {
+            "max": 8.925831654353725,
+            "median": 8.862671252276192,
+            "min": 7.907151097753093,
+            "rel_spread": 0.11494057802708244,
+            "values": [
+              7.907151097753093,
+              8.862671252276192,
+              8.925831654353725
+            ]
+          },
+          "rayon_threads": 1,
+          "recovered": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "reps": 3
+        },
+        "rho_negation": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 185.6146443977436,
+            "median": 185.31542623674912,
+            "min": 184.55366765643902,
+            "rel_spread": 0.005725247826638773,
+            "values": [
+              184.55366765643902,
+              185.31542623674912,
+              185.6146443977436
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 188.76686022397345,
+            "median": 188.3479125248509,
+            "min": 187.75579042979234,
+            "rel_spread": 0.005368096628348398,
+            "values": [
+              187.75579042979234,
+              188.3479125248509,
+              188.76686022397345
+            ]
+          },
+          "note": "rho.negation (one walk, an F_q^4 inversion per addition)",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 4.088675451779409,
+            "median": 3.9350807836771953,
+            "min": 3.8509918532142455,
+            "rel_spread": 0.060401199271710074,
+            "values": [
+              3.8509918532142455,
+              3.9350807836771953,
+              4.088675451779409
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 4.041451547942957,
+            "median": 3.9299507506588274,
+            "min": 3.9203647260014165,
+            "rel_spread": 0.0308112822841969,
+            "values": [
+              3.9203647260014165,
+              3.9299507506588274,
+              4.041451547942957
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 758.9180400398186,
+            "median": 729.2311727031802,
+            "min": 710.7146706257561,
+            "rel_spread": 0.06610163034498089,
+            "values": [
+              710.7146706257561,
+              729.2311727031802,
+              758.9180400398186
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 762.8921194525093,
+            "median": 740.198020212061,
+            "min": 736.0711779034722,
+            "rel_spread": 0.03623481935462773,
+            "values": [
+              736.0711779034722,
+              740.198020212061,
+              762.8921194525093
+            ]
+          },
+          "steps_requested": 25000
+        },
+        "rho_negation_batched": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 143.02476366342364,
+            "median": 142.9305463758537,
+            "min": 142.8729119079726,
+            "rel_spread": 0.0010624163924465452,
+            "values": [
+              143.02476366342364,
+              142.8729119079726,
+              142.9305463758537
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 144.20959066742373,
+            "median": 144.1740498818479,
+            "min": 144.0803077018262,
+            "rel_spread": 0.0008967145315226568,
+            "values": [
+              144.20959066742373,
+              144.0803077018262,
+              144.1740498818479
+            ]
+          },
+          "note": "rho.negation_batched, 256 lockstep walks; 'whole' includes set-up, 'marginal' is the difference of a long and a quarter-length segment",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 4.3889013378177735,
+            "median": 4.2404382063008645,
+            "min": 3.9139770887299847,
+            "rel_spread": 0.11199886096255314,
+            "values": [
+              3.9139770887299847,
+              4.2404382063008645,
+              4.3889013378177735
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 4.313728911662759,
+            "median": 4.201969572178903,
+            "min": 3.952685265270714,
+            "rel_spread": 0.08592247996808507,
+            "values": [
+              3.952685265270714,
+              4.201969572178903,
+              4.313728911662759
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 627.3080662040097,
+            "median": 605.8437543000248,
+            "min": 559.795648099661,
+            "rel_spread": 0.11143536204701941,
+            "values": [
+              559.795648099661,
+              605.8437543000248,
+              627.3080662040097
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 621.9277672868361,
+            "median": 605.4210689132475,
+            "min": 570.0151241418469,
+            "rel_spread": 0.0857463438432599,
+            "values": [
+              570.0151241418469,
+              605.4210689132475,
+              621.9277672868361
+            ]
+          },
+          "steps_requested": 100000
+        }
+      },
+      "m": 14,
+      "micro": {
+        "fq4_inv_counted_fq_ops": {
+          "max": 115.98915,
+          "median": 115.98915,
+          "min": 115.98915,
+          "rel_spread": 0.0,
+          "values": [
+            115.98915,
+            115.98915,
+            115.98915
+          ]
+        },
+        "fq4_inv_ns": {
+          "max": 445.97308,
+          "median": 396.6862,
+          "min": 380.6417,
+          "rel_spread": 0.16469284789841435,
+          "values": [
+            396.6862,
+            380.6417,
+            445.97308
+          ]
+        },
+        "fq4_mul_counted_fq_ops": {
+          "max": 24.99858,
+          "median": 24.99858,
+          "min": 24.99858,
+          "rel_spread": 0.0,
+          "values": [
+            24.99858,
+            24.99858,
+            24.99858
+          ]
+        },
+        "fq4_mul_ns": {
+          "max": 95.32482,
+          "median": 77.3292175,
+          "min": 75.0007625,
+          "rel_spread": 0.2628250764337556,
+          "values": [
+            77.3292175,
+            75.0007625,
+            95.32482
+          ]
+        },
+        "fq4_sq_counted_fq_ops": {
+          "max": 13.0,
+          "median": 13.0,
+          "min": 13.0,
+          "rel_spread": 0.0,
+          "values": [
+            13.0,
+            13.0,
+            13.0
+          ]
+        },
+        "fq4_sq_ns": {
+          "max": 46.941255,
+          "median": 45.9054475,
+          "min": 45.140025,
+          "rel_spread": 0.03923782683961412,
+          "values": [
+            45.140025,
+            45.9054475,
+            46.941255
+          ]
+        },
+        "fq_inv_counted_dependent": {
+          "max": 19.003755,
+          "median": 17.318193,
+          "min": 17.298435,
+          "rel_spread": 0.0984698576808793,
+          "values": [
+            17.298435,
+            17.318193,
+            19.003755
+          ]
+        },
+        "fq_inv_counted_independent": {
+          "max": 7.290765,
+          "median": 4.5961466,
+          "min": 4.4711902,
+          "rel_spread": 0.6134649403915882,
+          "values": [
+            4.5961466,
+            4.4711902,
+            7.290765
+          ]
+        },
+        "fq_mul_counted_dependent": {
+          "max": 9.33938005,
+          "median": 8.6151407,
+          "min": 8.1468639,
+          "rel_spread": 0.13842097204518103,
+          "values": [
+            8.6151407,
+            8.1468639,
+            9.33938005
+          ]
+        },
+        "fq_mul_counted_independent": {
+          "max": 3.2416478,
+          "median": 3.1299466,
+          "min": 3.09459125,
+          "rel_spread": 0.04698372489805412,
+          "values": [
+            3.09459125,
+            3.1299466,
+            3.2416478
+          ]
+        },
+        "fq_mul_uncounted_dependent": {
+          "max": 9.1821282,
+          "median": 8.81490785,
+          "min": 8.1032689,
+          "rel_spread": 0.12239030950278164,
+          "values": [
+            8.81490785,
+            8.1032689,
+            9.1821282
+          ]
+        },
+        "fq_sq_counted_dependent": {
+          "max": 10.5718957,
+          "median": 9.1290398,
+          "min": 8.48716515,
+          "rel_spread": 0.22836252176269423,
+          "values": [
+            10.5718957,
+            9.1290398,
+            8.48716515
+          ]
+        },
+        "group_add_counted_fq_ops": {
+          "max": 178.983425,
+          "median": 178.983425,
+          "min": 178.983425,
+          "rel_spread": 0.0,
+          "values": [
+            178.983425,
+            178.983425,
+            178.983425
+          ]
+        },
+        "group_add_ns": {
+          "max": 895.38705,
+          "median": 608.39575,
+          "min": 592.908525,
+          "rel_spread": 0.4971739611922009,
+          "values": [
+            592.908525,
+            608.39575,
+            895.38705
+          ]
+        },
+        "group_double_counted_fq_ops": {
+          "max": 191.9842,
+          "median": 191.9842,
+          "min": 191.9842,
+          "rel_spread": 0.0,
+          "values": [
+            191.9842,
+            191.9842,
+            191.9842
+          ]
+        },
+        "group_double_ns": {
+          "max": 914.76775,
+          "median": 614.654675,
+          "min": 603.67495,
+          "rel_spread": 0.5061261431062898,
+          "values": [
+            614.654675,
+            603.67495,
+            914.76775
+          ]
+        }
+      },
+      "q_bits": 14,
+      "r_bits": 56,
+      "scalar_width_bits": 64
+    },
+    "m15": {
+      "curve": "icv1-f2m60-t212516335-b0271609",
+      "fq_muls_per_add": 159,
+      "group_bits": 60,
+      "in_situ": {
+        "ic_pipeline": {
+          "full_priced_fme": {
+            "max": 29088498.501344997,
+            "median": 29066091.102759,
+            "min": 29056544.61964,
+            "rel_spread": 0.001099352561444499,
+            "values": [
+              29056544.61964,
+              29088498.501344997,
+              29066091.102759
+            ]
+          },
+          "full_trials": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "full_wall_ns": {
+            "max": 222622517.0,
+            "median": 211281601.0,
+            "min": 211112231.0,
+            "rel_spread": 0.05447841149215828,
+            "values": [
+              222622517.0,
+              211112231.0,
+              211281601.0
+            ]
+          },
+          "ic_trials_requested": 8,
+          "legacy_accepted_relations": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_decompositions": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_priced_fq_ops": {
+            "max": 25319928.0,
+            "median": 25297492.000000004,
+            "min": 25287982.0,
+            "rel_spread": 0.0012628129302303958,
+            "values": [
+              25287982.0,
+              25319928.0,
+              25297492.000000004
+            ]
+          },
+          "legacy_trials": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_wall_ns": {
+            "max": 250746270.0,
+            "median": 228175438.0,
+            "min": 218875629.0,
+            "rel_spread": 0.139676037348069,
+            "values": [
+              250746270.0,
+              228175438.0,
+              218875629.0
+            ]
+          },
+          "ns_per_full_priced_fme": {
+            "max": 7.661699624446198,
+            "median": 7.269006357031091,
+            "min": 7.257584333211237,
+            "rel_spread": 0.05559429602700415,
+            "values": [
+              7.661699624446198,
+              7.257584333211237,
+              7.269006357031091
+            ]
+          },
+          "ns_per_legacy_priced_fq_op": {
+            "max": 9.91562988300134,
+            "median": 9.01169379312611,
+            "min": 8.652068315704971,
+            "rel_spread": 0.14021354878482242,
+            "values": [
+              9.91562988300134,
+              9.01169379312611,
+              8.652068315704971
+            ]
+          },
+          "rayon_threads": 1,
+          "recovered": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "reps": 3
+        },
+        "rho_negation": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 164.83365581292497,
+            "median": 164.5363982559744,
+            "min": 164.4384513567174,
+            "rel_spread": 0.0024019272355333067,
+            "values": [
+              164.83365581292497,
+              164.5363982559744,
+              164.4384513567174
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 167.21805383022775,
+            "median": 167.18346991143116,
+            "min": 167.06712130605496,
+            "rel_spread": 0.0009027957384348314,
+            "values": [
+              167.21805383022775,
+              167.18346991143116,
+              167.06712130605496
+            ]
+          },
+          "note": "rho.negation (one walk, an F_q^4 inversion per addition)",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 7.275802142400717,
+            "median": 6.989663596500937,
+            "min": 6.988088578370017,
+            "rel_spread": 0.041162719787362946,
+            "values": [
+              6.988088578370017,
+              7.275802142400717,
+              6.989663596500937
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 7.199388684751306,
+            "median": 7.0850912710909855,
+            "min": 6.221728066847666,
+            "rel_spread": 0.13798842957644739,
+            "values": [
+              6.221728066847666,
+              7.199388684751306,
+              7.0850912710909855
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 1197.134278933716,
+            "median": 1151.8721875172757,
+            "min": 1149.3694573130376,
+            "rel_spread": 0.04146711947584193,
+            "values": [
+              1151.8721875172757,
+              1197.134278933716,
+              1149.3694573130376
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 1203.618781557818,
+            "median": 1183.6858028518288,
+            "min": 1040.3852587991719,
+            "rel_spread": 0.1379027461217927,
+            "values": [
+              1040.3852587991719,
+              1203.618781557818,
+              1183.6858028518288
+            ]
+          },
+          "steps_requested": 25000
+        },
+        "rho_negation_batched": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 122.44130464763481,
+            "median": 122.2807433223589,
+            "min": 122.22974107671342,
+            "rel_spread": 0.0017301462615716748,
+            "values": [
+              122.44130464763481,
+              122.22974107671342,
+              122.2807433223589
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 123.43798613765249,
+            "median": 123.32293579874941,
+            "min": 123.28650839486819,
+            "rel_spread": 0.001228301465604831,
+            "values": [
+              123.43798613765249,
+              123.28650839486819,
+              123.32293579874941
+            ]
+          },
+          "note": "rho.negation_batched, 256 lockstep walks; 'whole' includes set-up, 'marginal' is the difference of a long and a quarter-length segment",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 4.798288355413922,
+            "median": 4.449751926432921,
+            "min": 4.448428339062147,
+            "rel_spread": 0.07862461146957352,
+            "values": [
+              4.448428339062147,
+              4.449751926432921,
+              4.798288355413922
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 4.6973770049312575,
+            "median": 4.577610137249592,
+            "min": 4.433975975111325,
+            "rel_spread": 0.05754116709864549,
+            "values": [
+              4.577610137249592,
+              4.433975975111325,
+              4.6973770049312575
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 586.7382667750334,
+            "median": 544.6713694662806,
+            "min": 543.8920258235026,
+            "rel_spread": 0.07866438985679645,
+            "values": [
+              544.6713694662806,
+              543.8920258235026,
+              586.7382667750334
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 579.2943228016592,
+            "median": 565.0509766653927,
+            "min": 546.6494162782063,
+            "rel_spread": 0.05777338306024067,
+            "values": [
+              565.0509766653927,
+              546.6494162782063,
+              579.2943228016592
+            ]
+          },
+          "steps_requested": 100000
+        }
+      },
+      "m": 15,
+      "micro": {
+        "fq4_inv_counted_fq_ops": {
+          "max": 106.99562,
+          "median": 106.99562,
+          "min": 106.99562,
+          "rel_spread": 0.0,
+          "values": [
+            106.99562,
+            106.99562,
+            106.99562
+          ]
+        },
+        "fq4_inv_ns": {
+          "max": 467.80662,
+          "median": 354.2877,
+          "min": 344.01027,
+          "rel_spread": 0.3494232229908067,
+          "values": [
+            344.01027,
+            467.80662,
+            354.2877
+          ]
+        },
+        "fq4_mul_counted_fq_ops": {
+          "max": 21.99936,
+          "median": 21.99936,
+          "min": 21.99936,
+          "rel_spread": 0.0,
+          "values": [
+            21.99936,
+            21.99936,
+            21.99936
+          ]
+        },
+        "fq4_mul_ns": {
+          "max": 107.470735,
+          "median": 68.43203,
+          "min": 67.293315,
+          "rel_spread": 0.5871142504467571,
+          "values": [
+            67.293315,
+            107.470735,
+            68.43203
+          ]
+        },
+        "fq4_sq_counted_fq_ops": {
+          "max": 7.99961,
+          "median": 7.99961,
+          "min": 7.99961,
+          "rel_spread": 0.0,
+          "values": [
+            7.99961,
+            7.99961,
+            7.99961
+          ]
+        },
+        "fq4_sq_ns": {
+          "max": 53.2059525,
+          "median": 35.5380325,
+          "min": 35.45105,
+          "rel_spread": 0.4996028550539482,
+          "values": [
+            35.5380325,
+            53.2059525,
+            35.45105
+          ]
+        },
+        "fq_inv_counted_dependent": {
+          "max": 18.9351292,
+          "median": 18.5933964,
+          "min": 18.2902378,
+          "rel_spread": 0.03468389454656056,
+          "values": [
+            18.9351292,
+            18.2902378,
+            18.5933964
+          ]
+        },
+        "fq_inv_counted_independent": {
+          "max": 7.4474878,
+          "median": 4.3436896,
+          "min": 4.310715,
+          "rel_spread": 0.7221447867729776,
+          "values": [
+            4.3436896,
+            7.4474878,
+            4.310715
+          ]
+        },
+        "fq_mul_counted_dependent": {
+          "max": 10.9057779,
+          "median": 10.6398198,
+          "min": 9.9546137,
+          "rel_spread": 0.08939664560860335,
+          "values": [
+            10.9057779,
+            9.9546137,
+            10.6398198
+          ]
+        },
+        "fq_mul_counted_independent": {
+          "max": 3.22142055,
+          "median": 3.1478651,
+          "min": 3.08073225,
+          "rel_spread": 0.04469324304907471,
+          "values": [
+            3.22142055,
+            3.08073225,
+            3.1478651
+          ]
+        },
+        "fq_mul_uncounted_dependent": {
+          "max": 10.9960997,
+          "median": 10.05642675,
+          "min": 10.0068979,
+          "rel_spread": 0.09836513749776978,
+          "values": [
+            10.05642675,
+            10.0068979,
+            10.9960997
+          ]
+        },
+        "fq_sq_counted_dependent": {
+          "max": 11.22860615,
+          "median": 10.78416035,
+          "min": 10.72110685,
+          "rel_spread": 0.047059695287264454,
+          "values": [
+            11.22860615,
+            10.72110685,
+            10.78416035
+          ]
+        },
+        "group_add_counted_fq_ops": {
+          "max": 158.991825,
+          "median": 158.991825,
+          "min": 158.991825,
+          "rel_spread": 0.0,
+          "values": [
+            158.991825,
+            158.991825,
+            158.991825
+          ]
+        },
+        "group_add_ns": {
+          "max": 540.27475,
+          "median": 513.1958,
+          "min": 506.241025,
+          "rel_spread": 0.06631723213635042,
+          "values": [
+            513.1958,
+            540.27475,
+            506.241025
+          ]
+        },
+        "group_double_counted_fq_ops": {
+          "max": 166.993875,
+          "median": 166.993875,
+          "min": 166.993875,
+          "rel_spread": 0.0,
+          "values": [
+            166.993875,
+            166.993875,
+            166.993875
+          ]
+        },
+        "group_double_ns": {
+          "max": 540.1274,
+          "median": 515.897925,
+          "min": 512.5949,
+          "rel_spread": 0.05336811540771348,
+          "values": [
+            512.5949,
+            540.1274,
+            515.897925
+          ]
+        }
+      },
+      "q_bits": 15,
+      "r_bits": 59,
+      "scalar_width_bits": 64
+    },
+    "m16": {
+      "curve": "icv1-f2m64-t2270583391-50e5eeb7",
+      "fq_muls_per_add": 179,
+      "group_bits": 64,
+      "in_situ": {
+        "ic_pipeline": {
+          "full_priced_fme": {
+            "max": 38838042.87343401,
+            "median": 38825936.10622801,
+            "min": 38823820.766869,
+            "rel_spread": 0.0003663042798528876,
+            "values": [
+              38823820.766869,
+              38838042.87343401,
+              38825936.10622801
+            ]
+          },
+          "full_trials": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "full_wall_ns": {
+            "max": 436859431.0,
+            "median": 431547538.0,
+            "min": 424906707.0,
+            "rel_spread": 0.027697351850029556,
+            "values": [
+              431547538.0,
+              436859431.0,
+              424906707.0
+            ]
+          },
+          "ic_trials_requested": 8,
+          "legacy_accepted_relations": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_decompositions": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_priced_fq_ops": {
+            "max": 33058716.999999996,
+            "median": 33046598.0,
+            "min": 33044507.999999996,
+            "rel_spread": 0.0004299686158314995,
+            "values": [
+              33044507.999999996,
+              33058716.999999996,
+              33046598.0
+            ]
+          },
+          "legacy_trials": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_wall_ns": {
+            "max": 590552004.0,
+            "median": 441942141.0,
+            "min": 420549411.0,
+            "rel_spread": 0.3846716056887637,
+            "values": [
+              590552004.0,
+              420549411.0,
+              441942141.0
+            ]
+          },
+          "ns_per_full_priced_fme": {
+            "max": 11.248234943857598,
+            "median": 11.115534985373433,
+            "min": 10.943888277090153,
+            "rel_spread": 0.02738029857923395,
+            "values": [
+              11.115534985373433,
+              11.248234943857598,
+              10.943888277090153
+            ]
+          },
+          "ns_per_legacy_priced_fq_op": {
+            "max": 17.871411612483385,
+            "median": 13.373302177730972,
+            "min": 12.72128652179696,
+            "rel_spread": 0.3851049667644793,
+            "values": [
+              17.871411612483385,
+              12.72128652179696,
+              13.373302177730972
+            ]
+          },
+          "rayon_threads": 1,
+          "recovered": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "reps": 3
+        },
+        "rho_negation": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 185.47640362511052,
+            "median": 185.1647818171788,
+            "min": 184.78447563996696,
+            "rel_spread": 0.003736822836141352,
+            "values": [
+              185.47640362511052,
+              184.78447563996696,
+              185.1647818171788
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 188.49179444674678,
+            "median": 188.4346440397351,
+            "min": 187.9040971419131,
+            "rel_spread": 0.0031188389365904225,
+            "values": [
+              188.49179444674678,
+              187.9040971419131,
+              188.4346440397351
+            ]
+          },
+          "note": "rho.negation (one walk, an F_q^4 inversion per addition)",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 5.845509791647611,
+            "median": 5.756242399035657,
+            "min": 5.382285698964133,
+            "rel_spread": 0.08047334711982976,
+            "values": [
+              5.845509791647611,
+              5.382285698964133,
+              5.756242399035657
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 5.775252418097547,
+            "median": 5.6098153992207935,
+            "min": 5.357994906731107,
+            "rel_spread": 0.07437990052656587,
+            "values": [
+              5.775252418097547,
+              5.357994906731107,
+              5.6098153992207935
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 1084.204133510168,
+            "median": 1065.8533679042312,
+            "min": 994.5628406275805,
+            "rel_spread": 0.08410283776543077,
+            "values": [
+              1084.204133510168,
+              994.5628406275805,
+              1065.8533679042312
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 1088.5876916701202,
+            "median": 1057.0835678807946,
+            "min": 1006.7891954402776,
+            "rel_spread": 0.07738129577950915,
+            "values": [
+              1088.5876916701202,
+              1006.7891954402776,
+              1057.0835678807946
+            ]
+          },
+          "steps_requested": 25000
+        },
+        "rho_negation_batched": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 143.02303855375203,
+            "median": 142.9776602484643,
+            "min": 142.94657466325097,
+            "rel_spread": 0.0005347960679184581,
+            "values": [
+              142.9776602484643,
+              142.94657466325097,
+              143.02303855375203
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 144.22007761859544,
+            "median": 144.21177332934144,
+            "min": 144.1550811519135,
+            "rel_spread": 0.00045070152860205424,
+            "values": [
+              144.1550811519135,
+              144.21177332934144,
+              144.22007761859544
+            ]
+          },
+          "note": "rho.negation_batched, 256 lockstep walks; 'whole' includes set-up, 'marginal' is the difference of a long and a quarter-length segment",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 8.487974859519792,
+            "median": 6.714766062558996,
+            "min": 6.37604859476453,
+            "rel_spread": 0.314519708516905,
+            "values": [
+              6.37604859476453,
+              6.714766062558996,
+              8.487974859519792
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 8.008911715757204,
+            "median": 7.5022241376039505,
+            "min": 6.585792449229759,
+            "rel_spread": 0.18969298176446633,
+            "values": [
+              6.585792449229759,
+              7.5022241376039505,
+              8.008911715757204
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 1213.9759555763771,
+            "median": 959.8528083078534,
+            "min": 911.6325097099414,
+            "rel_spread": 0.314989385090662,
+            "values": [
+              911.6325097099414,
+              959.8528083078534,
+              1213.9759555763771
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 1155.0458692869825,
+            "median": 1081.909046798055,
+            "min": 949.375444968375,
+            "rel_spread": 0.19009955127678782,
+            "values": [
+              949.375444968375,
+              1081.909046798055,
+              1155.0458692869825
+            ]
+          },
+          "steps_requested": 100000
+        }
+      },
+      "m": 16,
+      "micro": {
+        "fq4_inv_counted_fq_ops": {
+          "max": 115.99741,
+          "median": 115.99741,
+          "min": 115.99741,
+          "rel_spread": 0.0,
+          "values": [
+            115.99741,
+            115.99741,
+            115.99741
+          ]
+        },
+        "fq4_inv_ns": {
+          "max": 670.92983,
+          "median": 553.7229,
+          "min": 521.30972,
+          "rel_spread": 0.27020755327258467,
+          "values": [
+            521.30972,
+            670.92983,
+            553.7229
+          ]
+        },
+        "fq4_mul_counted_fq_ops": {
+          "max": 24.999625,
+          "median": 24.999625,
+          "min": 24.999625,
+          "rel_spread": 0.0,
+          "values": [
+            24.999625,
+            24.999625,
+            24.999625
+          ]
+        },
+        "fq4_mul_ns": {
+          "max": 124.461015,
+          "median": 115.888875,
+          "min": 109.4097,
+          "rel_spread": 0.12987713445315613,
+          "values": [
+            109.4097,
+            124.461015,
+            115.888875
+          ]
+        },
+        "fq4_sq_counted_fq_ops": {
+          "max": 13.0,
+          "median": 13.0,
+          "min": 13.0,
+          "rel_spread": 0.0,
+          "values": [
+            13.0,
+            13.0,
+            13.0
+          ]
+        },
+        "fq4_sq_ns": {
+          "max": 72.2934975,
+          "median": 65.17305,
+          "min": 57.392955,
+          "rel_spread": 0.22863043082992127,
+          "values": [
+            57.392955,
+            72.2934975,
+            65.17305
+          ]
+        },
+        "fq_inv_counted_dependent": {
+          "max": 23.4073254,
+          "median": 22.645874,
+          "min": 20.6731626,
+          "rel_spread": 0.12073558300289051,
+          "values": [
+            20.6731626,
+            22.645874,
+            23.4073254
+          ]
+        },
+        "fq_inv_counted_independent": {
+          "max": 5.8602584,
+          "median": 4.414767,
+          "min": 4.3384518,
+          "rel_spread": 0.3447082484760805,
+          "values": [
+            4.3384518,
+            5.8602584,
+            4.414767
+          ]
+        },
+        "fq_mul_counted_dependent": {
+          "max": 15.19788785,
+          "median": 14.53676025,
+          "min": 12.8539058,
+          "rel_spread": 0.16124514745298912,
+          "values": [
+            12.8539058,
+            14.53676025,
+            15.19788785
+          ]
+        },
+        "fq_mul_counted_independent": {
+          "max": 4.1658697,
+          "median": 3.44131665,
+          "min": 3.2843041,
+          "rel_spread": 0.2561710210538167,
+          "values": [
+            3.44131665,
+            4.1658697,
+            3.2843041
+          ]
+        },
+        "fq_mul_uncounted_dependent": {
+          "max": 14.5158505,
+          "median": 13.88262215,
+          "min": 12.75998365,
+          "rel_spread": 0.1264794813997009,
+          "values": [
+            12.75998365,
+            13.88262215,
+            14.5158505
+          ]
+        },
+        "fq_sq_counted_dependent": {
+          "max": 13.62227225,
+          "median": 13.4087968,
+          "min": 13.2475898,
+          "rel_spread": 0.027943032890169528,
+          "values": [
+            13.62227225,
+            13.2475898,
+            13.4087968
+          ]
+        },
+        "group_add_counted_fq_ops": {
+          "max": 178.99605,
+          "median": 178.99605,
+          "min": 178.99605,
+          "rel_spread": 0.0,
+          "values": [
+            178.99605,
+            178.99605,
+            178.99605
+          ]
+        },
+        "group_add_ns": {
+          "max": 1130.1672,
+          "median": 897.93435,
+          "min": 784.4256,
+          "rel_spread": 0.38504106675504735,
+          "values": [
+            897.93435,
+            1130.1672,
+            784.4256
+          ]
+        },
+        "group_double_counted_fq_ops": {
+          "max": 191.994475,
+          "median": 191.994475,
+          "min": 191.994475,
+          "rel_spread": 0.0,
+          "values": [
+            191.994475,
+            191.994475,
+            191.994475
+          ]
+        },
+        "group_double_ns": {
+          "max": 1465.233975,
+          "median": 925.198,
+          "min": 833.530925,
+          "rel_spread": 0.6827760652314424,
+          "values": [
+            925.198,
+            1465.233975,
+            833.530925
+          ]
+        }
+      },
+      "q_bits": 16,
+      "r_bits": 63,
+      "scalar_width_bits": 64
+    },
+    "m17": {
+      "curve": "icv1-f2m68-t21557348131-6341760d",
+      "fq_muls_per_add": 161,
+      "group_bits": 68,
+      "in_situ": {
+        "ic_pipeline": {
+          "full_priced_fme": {
+            "max": 46828482.69261799,
+            "median": 46816219.894102,
+            "min": 46814588.831022,
+            "rel_spread": 0.00029677452872991676,
+            "values": [
+              46816219.894102,
+              46814588.831022,
+              46828482.69261799
+            ]
+          },
+          "full_trials": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "full_wall_ns": {
+            "max": 834863863.0,
+            "median": 750087624.0,
+            "min": 719902368.0,
+            "rel_spread": 0.15326408718349951,
+            "values": [
+              750087624.0,
+              719902368.0,
+              834863863.0
+            ]
+          },
+          "ic_trials_requested": 8,
+          "legacy_accepted_relations": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_decompositions": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_priced_fq_ops": {
+            "max": 37565417.0,
+            "median": 37553177.0,
+            "min": 37551568.0,
+            "rel_spread": 0.00036878371169501853,
+            "values": [
+              37553177.0,
+              37551568.0,
+              37565417.0
+            ]
+          },
+          "legacy_trials": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "legacy_wall_ns": {
+            "max": 723645090.0,
+            "median": 722170136.0,
+            "min": 708447768.0,
+            "rel_spread": 0.021043963523853054,
+            "values": [
+              722170136.0,
+              708447768.0,
+              723645090.0
+            ]
+          },
+          "ns_per_full_priced_fme": {
+            "max": 17.82812115609305,
+            "median": 16.02196045935989,
+            "min": 15.37773557295353,
+            "rel_spread": 0.15293918552320654,
+            "values": [
+              16.02196045935989,
+              15.37773557295353,
+              17.82812115609305
+            ]
+          },
+          "ns_per_legacy_priced_fq_op": {
+            "max": 19.263597952340046,
+            "median": 19.23060027650923,
+            "min": 18.86599696715727,
+            "rel_spread": 0.02067543287603241,
+            "values": [
+              19.23060027650923,
+              18.86599696715727,
+              19.263597952340046
+            ]
+          },
+          "rayon_threads": 1,
+          "recovered": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "reps": 3
+        },
+        "rho_negation": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 166.799270677938,
+            "median": 166.40668063058098,
+            "min": 166.1443588332416,
+            "rel_spread": 0.003935610290492506,
+            "values": [
+              166.40668063058098,
+              166.1443588332416,
+              166.799270677938
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 169.60628519377278,
+            "median": 169.2684974564705,
+            "min": 169.13589224476306,
+            "rel_spread": 0.0027789751553190713,
+            "values": [
+              169.2684974564705,
+              169.13589224476306,
+              169.60628519377278
+            ]
+          },
+          "note": "rho.negation (one walk, an F_q^4 inversion per addition)",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 12.864619232170659,
+            "median": 8.962796005233608,
+            "min": 8.899451544846817,
+            "rel_spread": 0.44240298284246093,
+            "values": [
+              8.962796005233608,
+              8.899451544846817,
+              12.864619232170659
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 11.734553189183199,
+            "median": 8.973702722110819,
+            "min": 8.746832613672673,
+            "rel_spread": 0.3329417820081014,
+            "values": [
+              8.973702722110819,
+              8.746832613672673,
+              11.734553189183199
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 2145.8091054754404,
+            "median": 1491.469132399956,
+            "min": 1478.5936708860759,
+            "rel_spread": 0.44735450442459607,
+            "values": [
+              1491.469132399956,
+              1478.5936708860759,
+              2145.8091054754404
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 1990.2539748261013,
+            "median": 1518.9651763927375,
+            "min": 1479.4033384291204,
+            "rel_spread": 0.336314909871836,
+            "values": [
+              1518.9651763927375,
+              1479.4033384291204,
+              1990.2539748261013
+            ]
+          },
+          "steps_requested": 25000
+        },
+        "rho_negation_batched": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 124.4563296809317,
+            "median": 124.39426799862211,
+            "min": 124.38393066291871,
+            "rel_spread": 0.0005820124928408226,
+            "values": [
+              124.4563296809317,
+              124.38393066291871,
+              124.39426799862211
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 125.59631312609729,
+            "median": 125.47499174304352,
+            "min": 125.43873717670857,
+            "rel_spread": 0.0012558355031527704,
+            "values": [
+              125.47499174304352,
+              125.43873717670857,
+              125.59631312609729
+            ]
+          },
+          "note": "rho.negation_batched, 256 lockstep walks; 'whole' includes set-up, 'marginal' is the difference of a long and a quarter-length segment",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 11.867276981149798,
+            "median": 11.292467581671035,
+            "min": 10.796182339861144,
+            "rel_spread": 0.09485036229168933,
+            "values": [
+              10.796182339861144,
+              11.292467581671035,
+              11.867276981149798
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 12.081395611771615,
+            "median": 11.175768728349672,
+            "min": 10.879831909478481,
+            "rel_spread": 0.10751508298888798,
+            "values": [
+              10.879831909478481,
+              11.175768728349672,
+              12.081395611771615
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 1476.2212332070271,
+            "median": 1404.6015046918276,
+            "min": 1343.6532285852113,
+            "rel_spread": 0.09438122070850373,
+            "values": [
+              1343.6532285852113,
+              1404.6015046918276,
+              1476.2212332070271
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 1517.3787462563255,
+            "median": 1401.8743162631329,
+            "min": 1365.1468190075138,
+            "rel_spread": 0.10859170860238343,
+            "values": [
+              1365.1468190075138,
+              1401.8743162631329,
+              1517.3787462563255
+            ]
+          },
+          "steps_requested": 100000
+        }
+      },
+      "m": 17,
+      "micro": {
+        "fq4_inv_counted_fq_ops": {
+          "max": 106.99841,
+          "median": 106.99841,
+          "min": 106.99841,
+          "rel_spread": 0.0,
+          "values": [
+            106.99841,
+            106.99841,
+            106.99841
+          ]
+        },
+        "fq4_inv_ns": {
+          "max": 1074.17785,
+          "median": 696.90714,
+          "min": 678.67331,
+          "rel_spread": 0.5675139732389598,
+          "values": [
+            1074.17785,
+            678.67331,
+            696.90714
+          ]
+        },
+        "fq4_mul_counted_fq_ops": {
+          "max": 21.999835,
+          "median": 21.999835,
+          "min": 21.999835,
+          "rel_spread": 0.0,
+          "values": [
+            21.999835,
+            21.999835,
+            21.999835
+          ]
+        },
+        "fq4_mul_ns": {
+          "max": 288.4099075,
+          "median": 171.678875,
+          "min": 170.90289,
+          "rel_spread": 0.6844582217818003,
+          "values": [
+            288.4099075,
+            170.90289,
+            171.678875
+          ]
+        },
+        "fq4_sq_counted_fq_ops": {
+          "max": 9.999885,
+          "median": 9.999885,
+          "min": 9.999885,
+          "rel_spread": 0.0,
+          "values": [
+            9.999885,
+            9.999885,
+            9.999885
+          ]
+        },
+        "fq4_sq_ns": {
+          "max": 90.76488,
+          "median": 87.5178125,
+          "min": 84.9551675,
+          "rel_spread": 0.06638320056274262,
+          "values": [
+            90.76488,
+            84.9551675,
+            87.5178125
+          ]
+        },
+        "fq_inv_counted_dependent": {
+          "max": 25.366308,
+          "median": 22.4372196,
+          "min": 22.3504826,
+          "rel_spread": 0.1344117254171725,
+          "values": [
+            25.366308,
+            22.4372196,
+            22.3504826
+          ]
+        },
+        "fq_inv_counted_independent": {
+          "max": 9.2042106,
+          "median": 4.4904746,
+          "min": 4.351314,
+          "rel_spread": 1.0807090635809409,
+          "values": [
+            9.2042106,
+            4.4904746,
+            4.351314
+          ]
+        },
+        "fq_mul_counted_dependent": {
+          "max": 32.2502997,
+          "median": 30.8505122,
+          "min": 24.70881295,
+          "rel_spread": 0.24445256211986005,
+          "values": [
+            30.8505122,
+            32.2502997,
+            24.70881295
+          ]
+        },
+        "fq_mul_counted_independent": {
+          "max": 4.5162681,
+          "median": 3.5645979,
+          "min": 3.46552415,
+          "rel_spread": 0.29477208354973217,
+          "values": [
+            3.46552415,
+            3.5645979,
+            4.5162681
+          ]
+        },
+        "fq_mul_uncounted_dependent": {
+          "max": 28.86816465,
+          "median": 27.9427064,
+          "min": 27.01906495,
+          "rel_spread": 0.0661746816335586,
+          "values": [
+            27.01906495,
+            27.9427064,
+            28.86816465
+          ]
+        },
+        "fq_sq_counted_dependent": {
+          "max": 28.1145785,
+          "median": 26.1048554,
+          "min": 24.30471225,
+          "rel_spread": 0.1459447367787373,
+          "values": [
+            26.1048554,
+            28.1145785,
+            24.30471225
+          ]
+        },
+        "group_add_counted_fq_ops": {
+          "max": 160.998375,
+          "median": 160.998375,
+          "min": 160.998375,
+          "rel_spread": 0.0,
+          "values": [
+            160.998375,
+            160.998375,
+            160.998375
+          ]
+        },
+        "group_add_ns": {
+          "max": 1715.74755,
+          "median": 1172.65215,
+          "min": 1127.130725,
+          "rel_spread": 0.5019534778493351,
+          "values": [
+            1715.74755,
+            1127.130725,
+            1172.65215
+          ]
+        },
+        "group_double_counted_fq_ops": {
+          "max": 170.998675,
+          "median": 170.998675,
+          "min": 170.998675,
+          "rel_spread": 0.0,
+          "values": [
+            170.998675,
+            170.998675,
+            170.998675
+          ]
+        },
+        "group_double_ns": {
+          "max": 1843.369925,
+          "median": 1161.128925,
+          "min": 1132.438375,
+          "rel_spread": 0.6122761518493737,
+          "values": [
+            1843.369925,
+            1161.128925,
+            1132.438375
+          ]
+        }
+      },
+      "q_bits": 17,
+      "r_bits": 67,
+      "scalar_width_bits": 128
+    }
+  },
+  "repeats": 3,
+  "rho_steps": 100000,
+  "schema": "ecbench.f2m4_unit_price/v1",
+  "seed": 1,
+  "spread": "every statistic carries median, min, max, rel_spread = (max-min)/median and the raw per-repeat values",
+  "units": "nanoseconds unless the key says counted_fq_ops"
+}

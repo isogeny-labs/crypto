@@ -347,6 +347,12 @@ fn ic_once(
             .unwrap_or(0) as f64;
         o.insert(tk, tr);
         if tag == "legacy" {
+            for (name, key) in [
+                ("legacy_decompositions", "decompositions"),
+                ("legacy_accepted_relations", "accepted_relations"),
+            ] {
+                o.insert(name, rep.counters.get(key).copied().unwrap_or(0) as f64);
+            }
             o.insert("recovered", if rep.recovered.is_some() { 1.0 } else { 0.0 });
         }
     }
