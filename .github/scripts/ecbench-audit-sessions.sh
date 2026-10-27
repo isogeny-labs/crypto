@@ -8,7 +8,18 @@
 # exits 1. Frozen scratch sessions without spec/host capsules are listed by
 # hash and reported as incomplete evidence, never counted as audited passes.
 # Usage: ecbench-audit-sessions.sh LIST [ECBENCH] [INCOMPLETE_TSV]
+# AUDIT_SHARD=K/N audits only shard K (0-based) of N, so N jobs together audit
+# the whole list. Shards are balanced by record bytes (a .gz file counts 8x,
+# its rough expansion), since audit time follows them: largest session first,
+# each into the lightest shard so far, ties to the lower shard and sessions in
+# list order, so every shard computes the same assignment. The incomplete-
+# session pins are still checked against the whole list in every shard.
 set -euo pipefail
+shard=${AUDIT_SHARD:-0/1}
+shard_k=${shard%/*}; shard_n=${shard#*/}
+if [[ ! "$shard_k" =~ ^[0-9]+$ || ! "$shard_n" =~ ^[1-9][0-9]*$ || "$shard_k" -ge "$shard_n" ]]; then
+  echo "::error::AUDIT_SHARD must be K/N with 0 <= K < N, got $shard" >&2; exit 1
+fi
 list=${1:?usage: ecbench-audit-sessions.sh LIST [ECBENCH] [INCOMPLETE_TSV]}
 ecbench=${2:-./target/release/ecbench}
 incomplete=${3:-docs/ecbench/INCOMPLETE_SESSIONS.tsv}
@@ -43,16 +54,26 @@ done < "$incomplete"
 audit_list=$(mktemp)
 audited=0
 incomplete_count=0
+weights=$(mktemp)
+index=0
 while IFS= read -r dir; do
   if grep -Fxq "$dir" "$excluded_list"; then
     printf '%s\n' "$dir" >> "$matched_list"
     incomplete_count=$((incomplete_count + 1))
     echo "::warning::$dir is hash-pinned incomplete scratch evidence (spec.json and host.json absent)" >&2
   else
-    printf '%s\0' "$dir" >> "$audit_list"
-    audited=$((audited + 1))
+    bytes=$(find "$dir" -maxdepth 1 -type f -printf '%s %f\n' | awk '{ b += ($2 ~ /\.gz$/) ? 8 * $1 : $1 } END { print b + 0 }')
+    printf '%s\t%s\t%s\n' "$bytes" "$index" "$dir" >> "$weights"
+    index=$((index + 1))
   fi
 done < "$list"
+while IFS= read -r dir; do
+  printf '%s\0' "$dir" >> "$audit_list"
+  audited=$((audited + 1))
+done < <(sort -t $'\t' -k1,1nr -k2,2n "$weights" | awk -F '\t' -v n="$shard_n" -v k="$shard_k" '
+  { best = 0; for (i = 1; i < n; i++) if (load[i] < load[best]) best = i
+    load[best] += $1; if (best == k) print $3 }')
+rm -f "$weights"
 if ! cmp -s <(sort "$excluded_list") <(sort "$matched_list"); then
   echo "::error::incomplete-session pins and committed session list disagree" >&2
   diff -u <(sort "$excluded_list") <(sort "$matched_list") >&2 || true
@@ -90,4 +111,4 @@ if [ -s "$failed" ]; then
   exit 1
 fi
 rm -f "$failed"
-echo "$audited committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); $incomplete_count hash-pinned scratch sessions remain incomplete"
+echo "shard $shard: $audited of $index committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); $incomplete_count hash-pinned scratch sessions remain incomplete"
