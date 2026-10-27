@@ -34,7 +34,7 @@ concurrency:
 jobs:
   lean:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 45 || 60 }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 60 }}
     env:
       LEAN_DIR: research/ic_planner_exhaustive_20261026/lean
     steps:
