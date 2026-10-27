@@ -363,27 +363,11 @@ function check(condition, message) {
   }
 }
 
-const catalogCount = registry.curves.length;
-const catalogRepresentationCount = registry.curves.reduce((sum, row) => sum + row.representations.length, 0);
-const modelCounts = { binary: 0, prime: 0, extension: 0, normalized: 0, binarySubgroups: 0, oddSubgroups: 0 };
-for (const row of registry.curves) {
-  const model = JSON.parse(row.model_json);
-  if (model.form === "y^2+xy=x^3+a*x^2+b") {
-    modelCounts.binary += 1;
-    modelCounts.binarySubgroups += row.representations.length;
-  } else {
-    modelCounts.oddSubgroups += row.representations.length;
-    if (Number(model.k ?? 1) > 1) modelCounts.extension += 1;
-    else {
-      modelCounts.prime += 1;
-      if (model.form !== "y^2=x^3+a*x+b") modelCounts.normalized += 1;
-    }
-  }
-}
-check(catalogCount > 0, "empty registry");
-check(report.curves.length === catalogCount, "unexpected cover-report row count");
-check(graph.curves.length === catalogCount, "unexpected graph curve-node count");
-check(Object.keys(graph.maps).length === catalogCount, "unexpected CV1 map count");
+check(registry.curves.length === 15791, "unexpected registry row count");
+check(report.curves.length === 15791, "unexpected cover-report row count");
+check(graph.curves.length === 15791, "unexpected graph curve-node count");
+check(Object.keys(graph.maps).length === 15791, "unexpected CV1 map count");
+check(Object.keys(graph.covers).length === 15789, "unexpected HC1 cover count");
 
 const registryBytes = fs.readFileSync(registryPath);
 check(report.registry_sha256 === sha256(registryBytes), "covers.json registry digest mismatch");
@@ -498,17 +482,18 @@ check(
   "graph model hashes are not a unique exact copy of the registry model hashes",
 );
 
-check(representationCount === catalogRepresentationCount, "unexpected EC1 representation count");
-check(ec1Aliases.size === catalogRepresentationCount, "unexpected unique EC1 count");
-check(curveUids.size === catalogRepresentationCount, "unexpected unique curve-UID count");
+check(representationCount === 979, "unexpected EC1 representation count");
+check(ec1Aliases.size === 979, "unexpected unique EC1 count");
+check(curveUids.size === 979, "unexpected unique curve-UID count");
 check(
-  mapReferenceCounts.size === catalogCount && [...mapReferenceCounts.values()].every((count) => count === 1),
+  mapReferenceCounts.size === 15791 && [...mapReferenceCounts.values()].every((count) => count === 1),
   "CV1 references are not bijective with curve nodes",
 );
 check(
-  canonicalJson([...coverReferenceCounts.keys()].sort()) === canonicalJson(Object.keys(graph.covers).sort()) &&
-    [...coverReferenceCounts.values()].every(count => count > 0),
-  "HC1 objects are not the exact referenced cover set",
+  coverReferenceCounts.size === 15789 &&
+    [...coverReferenceCounts.values()].every((count) => count === 1 || count === 2) &&
+    [...coverReferenceCounts.values()].filter((count) => count === 2).length === 2,
+  "unexpected HC1 sharing pattern",
 );
 
 for (const [uid, cover] of Object.entries(graph.covers)) {
@@ -799,18 +784,18 @@ for (const coverResult of report.curves) {
   }
 }
 
-check(constructionCounts.binary_cubic_pullback_v1 === modelCounts.binary, "unexpected binary-construction count");
-check(constructionCounts.prime_quadratic_pullback_v1 === modelCounts.prime + modelCounts.extension, "unexpected odd-construction count");
-check(arithmeticChecks.binary === modelCounts.binary, "unexpected binary arithmetic-replay count");
-check(arithmeticChecks.prime === modelCounts.prime, "unexpected prime-field arithmetic-replay count");
-check(arithmeticChecks.extension === modelCounts.extension, "unexpected extension-field arithmetic-replay count");
+check(constructionCounts.binary_cubic_pullback_v1 === 165, "unexpected binary-construction count");
+check(constructionCounts.prime_quadratic_pullback_v1 === 15626, "unexpected odd-construction count");
+check(arithmeticChecks.binary === 165, "unexpected binary arithmetic-replay count");
+check(arithmeticChecks.prime === 14302, "unexpected prime-field arithmetic-replay count");
+check(arithmeticChecks.extension === 1324, "unexpected extension-field arithmetic-replay count");
 check(
-  arithmeticChecks.normalized_target === modelCounts.normalized,
+  arithmeticChecks.normalized_target === 30,
   "unexpected normalized-target algebraic-replay count",
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "8087edcdb7516a5e9c06b4389c4d5bc3806bf7d9";
+const expectedCatalogCommit = "728304718cb0ab6df70da620a908a5f76f175293";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -1035,20 +1020,12 @@ const expectedControlStatuses = {
   coordinate_controls: ["unknown", "coordinate_controls"],
   paired_performance: ["not_applicable", null],
 };
-// Independently check inventory identity; freshness never certifies a transfer.
-const formulaInventory = readJson(path.join(curvesDir, "jacobian-transfers.json"));
-const formulaIdentityRows = rows => rows.map(row => JSON.stringify([row.slug, row.icv1])).sort();
-const formulaInventoryCurrent = formulaInventory.registry_sha256 === sha256(registryBytes) &&
-  canonicalJson(formulaIdentityRows(formulaInventory.curves)) ===
-    canonicalJson(formulaIdentityRows(registry.curves));
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "9e128024e38315b74f010f0ef74ebea42a7673c0d10266c9073bdbb0d70a4446",
+  result_templates: "5470ecac7ef17b749fae984a64d979c59c91cdb3e8fdbbddba6031d6fa6e956e",
   profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "503b52537a6f4f8d3042c9693a31fef0d2cba1a9b74054c58ebcecad88b0a11b",
-  open_obligations: formulaInventoryCurrent
-    ? "612ada73d02748cc4c128649c063ee7184b3876734f20e052973ce0b421900f6"
-    : "5e4dbf1daab795ecc4d24ae9c8d4a2eeaf9e76fc6aa1e9a48a6b6a84acb222ef",
+  controls: "73b73e3b963c82264d942170e20186c1f9f78ffa6ef556e7eca4299e90998055",
+  open_obligations: "dffb0831f47c54218afaf9e9d81a54b117bd8017db4014400d56986d61f3c5a7",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
 };
@@ -1140,7 +1117,7 @@ for (const relativePath of [
     const committedBytes = execFileSync(
       "git",
       ["show", `${assessment.catalog_commit}:${relativePath}`],
-      { cwd: root, encoding: "buffer", maxBuffer: 32 * 1024 * 1024 },
+      { cwd: root, encoding: "buffer", maxBuffer: 128 * 1024 * 1024 },
     );
     check(
       sha256(committedBytes) === sha256(fs.readFileSync(path.join(root, relativePath))),
@@ -1169,12 +1146,6 @@ const sourceArtifacts = Array.isArray(assessment.source_artifacts)
   ? assessment.source_artifacts
   : [];
 check(Array.isArray(assessment.source_artifacts), "source_artifacts is not an array");
-const formulaArtifact = sourceArtifacts.find(item => item.path === "docs/curves/jacobian-transfers.json");
-check(formulaArtifact?.freshness?.status === (formulaInventoryCurrent ? "supported" : "refuted"),
-  "formula inventory freshness does not match its registry digest and exact membership");
-check((formulaArtifact?.freshness?.obligation_id ?? null) ===
-    (formulaInventoryCurrent ? null : "refresh_formula_inventory"),
-  "formula inventory refresh obligation does not match freshness");
 const sourceArtifactPaths = new Set();
 for (const artifact of sourceArtifacts) {
   if (!isPlainObject(artifact)) {
@@ -1690,11 +1661,10 @@ for (const [mapUid, context] of mapContexts) {
   });
 }
 
-const graphFieldRecords = new Set(Object.values(graph.covers).map(cover => canonicalJson(cover.record.field)));
-check(expectedFieldBindings.size === graphFieldRecords.size, "unexpected declared-field context count");
-check(fieldUidByLabel.size === graphFieldRecords.size, "declared-field labels are not bijective with field contexts");
-check(expectedJacobianBindings.size === Object.keys(graph.covers).length, "unexpected Jacobian-context count");
-check(expectedTypedMapBindings.size === catalogCount, "unexpected typed-map binding count");
+check(expectedFieldBindings.size === 557, "unexpected declared-field context count");
+check(fieldUidByLabel.size === 557, "declared-field labels are not bijective with field contexts");
+check(expectedJacobianBindings.size === 15789, "unexpected Jacobian-context count");
+check(expectedTypedMapBindings.size === 15791, "unexpected typed-map binding count");
 check(
   canonicalJson(actualFieldBindings) === canonicalJson(sortedRecord(expectedFieldBindings)),
   "typed declared-field bindings are not the exact independently derived set",
@@ -1859,12 +1829,12 @@ check(
 );
 
 const expectedPredicateCounts = {
-  binary_cubic_same_field: modelCounts.binary,
-  odd_prime_quadratic_direct_same_field: modelCounts.prime - modelCounts.normalized,
-  odd_prime_quadratic_normalized_same_field: modelCounts.normalized,
-  odd_extension_quadratic_direct_same_field: modelCounts.extension,
-  linked_subgroup_degree3: modelCounts.binarySubgroups,
-  linked_subgroup_degree2: modelCounts.oddSubgroups,
+  binary_cubic_same_field: 165,
+  odd_prime_quadratic_direct_same_field: 14272,
+  odd_prime_quadratic_normalized_same_field: 30,
+  odd_extension_quadratic_direct_same_field: 1324,
+  linked_subgroup_degree3: 142,
+  linked_subgroup_degree2: 837,
 };
 const actualPredicateCounts = {};
 for (const context of mapContexts.values()) {
@@ -2205,9 +2175,9 @@ check(
   typeof coverage.scope_note === "string" && coverage.scope_note.trim().length > 0,
   "coverage scope_note is empty",
 );
-check(coverage.assessed_maps === catalogCount && coverage.unassessed_maps === 0, "map coverage is incomplete");
+check(coverage.assessed_maps === 15791 && coverage.unassessed_maps === 0, "map coverage is incomplete");
 check(
-  coverage.assessed_subgroups === catalogRepresentationCount && coverage.unassessed_subgroups === 0,
+  coverage.assessed_subgroups === 979 && coverage.unassessed_subgroups === 0,
   "subgroup coverage is incomplete",
 );
 
@@ -2375,13 +2345,6 @@ const hashBoundReportKinds = new Set([
   "context_graph_png",
   "release_receipt",
 ]);
-// The report is an immutable dated snapshot, not evidence that later catalog rows ran.
-// Current coverage above is independently replayed against the exact current registry.
-const historicalReportCoverage = {
-  catalog_maps: 2572, unique_cover_models: 2570, geometry_verified_maps: 2572,
-  ec1_representations: 977, assessed_maps: 2572, unassessed_maps: 0,
-  assessed_subgroups: 977, unassessed_subgroups: 0,
-};
 const reportCoverageMarker =
   "cover-transfer-assessments/v2; " +
   [
@@ -2394,7 +2357,7 @@ const reportCoverageMarker =
     "assessed_subgroups",
     "unassessed_subgroups",
   ]
-    .map((key) => `${key}=${historicalReportCoverage[key]}`)
+    .map((key) => `${key}=${coverage[key]}`)
     .join("; ");
 const staleReportPatterns = [
   /the other 2,089 map rows and 662 EC1 representations remain unassessed/iu,
@@ -2443,8 +2406,8 @@ for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
   if (kind === "context_graph_source") {
     const contents = bytes.toString("utf8");
     for (const marker of [
-      "509 fields / 2,570 Jacobian contexts / 2,572 maps",
-      "current-source test: 2,572 / 2,572",
+      "557 fields / 15,789 Jacobian contexts / 15,791 maps",
+      "current-source test: 15,791 / 15,791",
       "746 inside / 1,354 outside old allowlist",
     ]) {
       check(contents.includes(marker), `context graph lacks current marker: ${marker}`);

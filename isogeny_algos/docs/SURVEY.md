@@ -88,12 +88,25 @@ codomain must equal Ẽ. All eight reproduce Kohel's kernel and numerator exactl
 including Galois-stable kernels whose points are not rational; they also agree at 256 and 511 bits
 (V3). The arithmetic is Karatsuba, not FFT, so the M(ℓ) bounds are not reached.
 
-Not implemented – implementation gap: Couveignes' "ℓ-isogenies using the p-torsion" (ANTS-II 1996 ✔),
-Lercier's characteristic-2 algorithm, Lercier–Sirvent and Lercier–Lubicz–Vercauteren (arXiv 2003.06367).
-These solve (E, Ẽ) → isogeny in small characteristic, where the BMSS family fails (it divides by
-integers up to ≈ 2ℓ). The binary-curve support of V3 (`gf2n.rs`, `binary.rs`) is the arithmetic they
-would need; in characteristic 2 the crate currently finds isogenies only from kernels or by factoring
-division polynomials, not from (E, Ẽ).
+### P2′ — (E, Ẽ) → isogeny in small characteristic (p ≤ 4ℓ, where the BMSS family divides by p)
+
+Read in this session ✔: Lercier–Sirvent (arXiv 0809.2774, full text), De Feo 2011 (arXiv
+1002.2597), Caruso–Eid–Lercier 2020 (arXiv 2003.06367), De Feo–Hugounenq–Plût–Schost 2016 (arXiv
+1603.00711). Lercier's ANTS-II 1996 paper was not reachable from this environment.
+
+| Algorithm | Status | Where | Checked by |
+|---|---|---|---|
+| p-adic lift (Joux–Lercier; Lercier–Sirvent 2008 ✔): lift E to Q_q, the root of Φ_ℓ(j, Y) above j̃ by Hensel, Elkies' normalised model, the BMSS series and Padé over Q_q, reduce mod p | **implemented**, any p (2, 3 included) and F_q = F_{p^n}, n ≤ 32; needs j̃ to be a *simple* root of Φ_ℓ(j, Y) mod p; floating p-adics at p^N < 2¹²⁷ (N ≤ 126 for p = 2, ≤ 80 for p = 3) with verification and retry. Reach: p = 2 and 3 lose digits linearly in ℓ, so ℓ ≤ 31; p ≥ 5 needs O(log² ℓ / log p) digits (ℓ = 31, 37 at p = 101: 19 digits, first attempt) | `padic.rs`, `find/small_char.rs` | every simple-root rational isogeny of the division-polynomial reference recovered (GF(2⁹), GF(3⁶), F₅₃ with ℓ = 17–23, F_{7⁴}) |
+| Couveignes 1996 (✔ via De Feo 2011's description): match E[2^k] with Ẽ[2^k] (an Artin–Schreier tower over F_q), try each λ with φ(P) = λP̃ | **implemented for p = 2** (partial: p = 3 not implemented); the interpolation is an F_q-linear system on the ℓ − 1 coefficients of the odd numerator and even denominator (one point per Frobenius orbit), not Couveignes' fast interpolation in the tower, so O(ℓ³) per trial and O(ℓ) trials; no simple-root condition. ℓ = 61 / 101 / 127 over GF(2¹⁰): 0.7 s / 0.3 s / 5 s | `find/p_torsion.rs` | equals the reference for ℓ ≤ 13 over GF(2⁸); ℓ = 41, 61 to every rational neighbour |
+| Lercier 1996 (characteristic 2, a linear system over F₂) | not implemented – the paper was not reachable and no accessible source describes its system; its role (characteristic 2) is covered by the two rows above | — | — |
+| Caruso–Eid–Lercier 2020 (2-adic differential equation with logarithmic loss) | not implemented – implementation gap (would lift the ℓ ≤ 31 limit of the 2-adic route; also needs canonical lifts or the isogeny differential) | — | — |
+| De Feo–Hugounenq–Plût–Schost 2016 (Couveignes with ℓ′-torsion, any characteristic) | not implemented – implementation gap | — | — |
+
+Both entry points are on the command line (`small-char`, `docs/USAGE.md`) and in the API
+(`api::small_char_isogeny`), with checks recomputed from the kernel polynomial alone. The general
+Weierstrass helpers they rely on (x-only division polynomials, Kohel's codomain and x-map from a
+kernel polynomial, a doubling test, `kernel_polys`) are in `weier.rs` and work in every
+characteristic.
 
 ### P3 — curve + ℓ → ℓ-isogenies
 
@@ -214,3 +227,49 @@ The main crate already contains related code, which this crate neither imports n
 (Elkies kernel polynomial from Φ_ℓ with its own derivation of the E2 relation; **not**
 cross-tested against `find/bmss.rs::sigma_from_phi`), `src/cryptanalysis/binary_velu.rs`
 (characteristic-2 Vélu; not cross-tested against `binary.rs`).
+
+## Measured in isobench (the counted frontier)
+
+`isobench` (`docs/isobench/`) measures families in a counted unit (field-multiplication
+equivalents, fme, through `Counted<F>`) with independent checkers, sealed replayable records and
+a frontier. A family is *measurable there* only when its whole computation runs through the
+`Field` trait over a single prime field GF(p): the counter sees every operation. The measured
+problems are `kernel.codomain`, `kernel.chain`, `find.kernel`, `modpoly.phi`, `count.sea`,
+`path.ordinary`, `path.supersingular`, `csidh.action`, `klpt`, and **`radical.chain`** (radical
+ℓ-isogeny chains, ℓ ∈ {5, 7}; one ℓ-th root per step, so cost ≈ linear in the chain length — the
+fitted exponent is 0.97 in n over a 61-bit prime, session `docs/isobench/sessions/radical-7`).
+
+Implemented families that are **not** in the counted frontier, and why (the same reason external
+tools such as PARI are not counted — their work is not all in the `Field` interface over one
+GF(p)):
+- **Higher-dimensional (theta (2,2), Kani chains, Richelot, genus 2):** these run over F_{p²}
+  (and products of surfaces), not a single prime field; their wall-time behaviour is in the
+  `tests/theta*.rs`, `tests/genus2.rs` suites and the p434 benchmark, not in fme.
+- **Deuring correspondence and KLPT→isogeny:** quaternion and lattice arithmetic over the
+  integers, outside the `Field` interface (KLPT's *output norm* is measured by `klpt`, but the
+  ideal→isogeny translation is not).
+- **Fixed-degree isogenies (V4):** Cornacchia/Coppersmith lattice steps are integer work, not
+  field operations.
+- **Characteristic 2 and 3 (`binary.rs`, `gf3n.rs`):** these are `Field`s, but `isobench`'s
+  field dispatch is GF(p) only; a GF(2ⁿ)/GF(3ⁿ) counted unit would need its own calibration.
+
+## Known gaps (as of this coverage pass)
+
+Honestly recorded so the map above is not mistaken for completeness:
+- **(E, Ẽ) → isogeny in small characteristic** (p-adic lift, Couveignes' 2-torsion): implemented
+  on a separate branch/PR (small-char), not yet merged here. Lercier 1996 (char 2) and
+  Caruso–Eid–Lercier 2020 remain unimplemented.
+- **Full SIDH key recovery** (Castryck–Decru digit guessing / Robert evaluation): prototyped; the
+  dimension-2 split *decision* at a known full secret (the endomorphism Kani diamond) verifies,
+  but a correct end-to-end digit-guessing recovery did not converge and is not shipped.
+- **Ideal → isogeny at cryptographic size** (Clapoti(s)/KLaPoTi/SQIsign2D) and **PEGASIS**-style
+  group-action evaluation via dimension-2/4 isogenies: not implemented (the Deuring here is
+  limited to u64 p).
+- **Enge's quasi-linear Φ_ℓ** (floating-point evaluation/interpolation): not implemented; the
+  modular polynomial is built by q-expansions, Hecke/Newton, or CM volcano CRT.
+- **Odd (ℓ, ℓ)-isogenies in dimension 2** (Bruin–Flynn–Testa (3,3), Cosset–Robert): not
+  implemented (only (2, 2) is).
+- **Path/group-action refinements:** faster Delfs–Galbraith (subfield-root detection),
+  multi-ℓ volcano paths, the rest of Galbraith–Stolbunov, CTIDH/dCTIDH: not implemented.
+- **Radical isogenies of other degrees** (N = 2, 4, 9, 11, 13) and **Jacobi-quartic models:**
+  N = 3, 5, 7 are implemented; N = 11, 13 need the genus-1/2 modular curves X₁(11), X₁(13).
