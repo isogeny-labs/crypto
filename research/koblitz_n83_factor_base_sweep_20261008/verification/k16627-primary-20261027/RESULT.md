@@ -38,6 +38,12 @@ overwritten. Today's manifest and replay receipts are retained in
 [evidence](evidence/); the complete object and raw build/run logs remain in
 `/Volumes/SSD990-2/.codex/n83-k16627-construction-20261027-01`.
 
+The matching object was already constructed and replayed in the separate
+[K16627 prebuild study](../../../n83_k16627_prebuild_20261017/RESULT.md).
+That study also ran a native uploader and measured cgroup peaks. Today's
+run independently reconstructs and replays its bytes and brings that object
+into the previously stale size-frontier inventory.
+
 This is an exact construction and replay result. It does not rank K16627 by
 end-to-end IC time. The K4096 construction used a different binary and
 resource envelope, so its 233.702-second outer wall is not a matched

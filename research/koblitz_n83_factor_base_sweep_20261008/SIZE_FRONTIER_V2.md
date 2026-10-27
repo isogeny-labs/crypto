@@ -102,8 +102,9 @@ confirmed the same installed model counts. Its 600-second natural attempt
 and 180-second short control were wall-censored with unknown final counters.
 Those host/source observations remain separate; natural yield, useful rank
 and a complete cold comparison remain open. The [K16627 primary reconstruction](verification/k16627-primary-20261027/RESULT.md)
-adds a fourth constructed and generically replayed object; its bytes match a
-pre-existing S3 object from 17 October. The [K8192 primary run](verification/k8192-primary-20261027/RESULT.md)
+reconciles the fourth object with the prior [K16627 prebuild study](../n83_k16627_prebuild_20261017/RESULT.md);
+its freshly reconstructed bytes match the 17 October S3 object. The
+[K8192 primary run](verification/k8192-primary-20261027/RESULT.md)
 constructed, generically replayed and published the fifth added-size object.
 All five added primary sizes now have objects under the declared policy and
 seed. Natural yield, useful rank and a complete cold comparison remain open.
