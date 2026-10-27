@@ -194,6 +194,15 @@ The actual cluster, IAM/OIDC trust, ECR image availability, and hosted workflow
 have not been qualified by these mocks. First deploy with dry-run inventory, then
 a separately approved small experiment with its real image and frozen inputs.
 
+Queue additions pass the changed-file artifact policy. Broader repository checks
+remain non-green: the existing PR has two R12 data files above the Git policy
+limits ([diagnostics](full-pr-artifact-diagnostics.txt)); the root Rust run was
+stopped after unrelated ecbench failures, with three cases reproduced
+([diagnostics](root-validation-diagnostics.txt)). Rust sources and Cargo inputs
+are unchanged from the queue's parent commit. A full artifact-wiring inspection
+was not completed after sparse manifest fetches; none of these checks is claimed
+as passing in the validation record.
+
 The implementation reuses the repository's
 [queue protocol](../../.agents/skills/queue-experiment/SKILL.md),
 [native Isolab route](../../.agents/skills/isolab-eks/SKILL.md),
