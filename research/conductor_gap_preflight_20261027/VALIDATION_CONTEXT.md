@@ -104,6 +104,13 @@ patch in this change. A complete gate pass is not claimed.
 Conductor preflight exits 127 because the CLI is absent; no shared scope
 lease is claimed. Exact-head CI, review and merge authorization must be
 checked after publication; local example checks do not establish them.
+PR #2684 is open. Its initial 133e90f0 head has a fully paginated 5/5
+all-event workflow inventory and 5/5 jobs: every job failed before startup,
+with no runner/steps and an explicit account-payment/spending-limit
+annotation. See [initial snapshot](checks/ci-initial-133e90f.json). No
+submitted reviews or inline comments were returned; the Codex summary was
+still running on that head. This snapshot does not establish the complete
+required check/review/rule set or cover a later metadata-only head.
 No new scientific searches, curve constructions, solver campaigns, native
 timings, cloud jobs, billing changes or unrelated merges were performed.
 The measured crater conclusion and the open CM/algebraic-oracle obligations
