@@ -3220,6 +3220,15 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzSymmetrisedBase<'_> {
         )
         .ok_or_else(|| "the u-frame subspace produced no usable factor base".to_string())?;
         tally.add_work_native(&mut fb.cost.work_native);
+        // `koblitz_factor_base` also counts this base's Artin–Schreier
+        // lifts and orbit walks from its size, as the native `as_solves`
+        // and `frobenius_maps`.  The tally above already holds that work,
+        // so those natives stay in the record (replay compares `native`)
+        // but are marked so that `bitop/v1` does not price them twice.
+        crate::cryptanalysis::bitop_tally::mark_tallied(
+            &mut fb.cost.work_native,
+            &["as_solves", "frobenius_maps"],
+        );
         // The base is the subspace V of the u-frame, so a frozen copy
         // carries its dimension and basis (single words, as the
         // x-frame bases do) rather than only a description.

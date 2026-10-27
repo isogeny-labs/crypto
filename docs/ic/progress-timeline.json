@@ -482,6 +482,26 @@
   },
   {
    "barrier_test": false,
+   "id": "ec-bitop-counted",
+   "label": "Elliptic curve, cold counted-gate (bitop/v1) accounting diagnostics",
+   "note": "bitop/v1 prices each record's counted work in gates of a frozen primitive model (docs/units/BITOPS.md); a record is complete when nothing is unpriced or known uncounted. A quotient of such counts on a few small targets is an accounting diagnostic, not wall time, and cannot cross the rho speed barrier.",
+   "points": [
+    {
+     "anchor": "#lab-progress",
+     "class": "accounting",
+     "date": "2026-10-27",
+     "detail": "Median bitop/v1 per counted record, symmetrised index calculus (ic.pipeline_full, koblitz-symmetrised:divisor=0;1, symmetrised m = 2) 1.956e9 against rho-frob (rho.signed_frobenius_full) 1.868e6 on K_1 / F_2^17, 4 public targets, 2 rounds, 8 counted records an arm, all priced complete (nothing unpriced or known uncounted); session ECBS1h6fd757ff9d9f, ecbench verify --replay 2 OK (24 records, 0 problems). Repriced after review of PR #2638: the base's Artin-Schreier lifts and orbit walks had been charged twice (first priced 1048x); each IC record fell by 2,470,915 gates. L0, counts only, four 17-bit targets support no speed claim and there is no VALIDATION.json. Class: accounting (records made complete); not an improvement, no leaderboard row.",
+     "label": "Symmetrised oracle bitop/v1 completeness (ic-acct-7): median IC vs rho-frob on K_1 / F_2^17",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_acct7_symmetrised_20261021/README.md",
+     "unit": "bitop/v1 counted gates, complete records (diagnostic)",
+     "value": 1047.128014887494
+    }
+   ],
+   "role": "context"
+  },
+  {
+   "barrier_test": false,
    "id": "ec-callgrind-diagnostics",
    "label": "Elliptic curve, complete method-solve simulated instructions",
    "note": "Callgrind counts user-space instructions inside the solve boundary, including reusable setup. It is neither isolated native wall time nor the primary online target interval.",
@@ -1002,5 +1022,5 @@
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-21"
+ "updated": "2026-10-27"
 }

@@ -161,6 +161,18 @@ generator's system, in the `oracle_setup` phase) are charged this way, so a
 record of that oracle is complete; its engine reports no memory figure, and
 `peak_bytes` stays 0, reported and never priced.
 
+When a phase's tally already holds work that a native counter of the same
+phase also counts, the phase carries the marker `tallied:<native>` in
+`work_native` and that native counter is not priced in that phase: the work
+is charged once, as the tally. The native counter stays in the record, so
+replay (which compares `native`) and the GAE conversion are unchanged. The
+`koblitz-symmetrised` base marks `tallied:as_solves` and
+`tallied:frobenius_maps`: `koblitz_factor_base` counts the base's
+Artin–Schreier lifts and orbit walks from its size, and the builder's tally
+already counts both where they execute. Records written before the marker
+(the ic-acct-7 session `ECBS1h6fd757ff9d9f` among them) are repriced by
+`ecbench work` under this rule, since `work` is never stored by replay.
+
 A record whose counters include one with no `bitop/v1` rule has no total. Its
 `work.complete` is `false` and the unpriced counters are named. An unknown
 cost is never written as zero.

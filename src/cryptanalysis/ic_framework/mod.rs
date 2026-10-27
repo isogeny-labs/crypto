@@ -2066,5 +2066,44 @@ mod tests {
             .expect("the set-up phase is priced");
         assert!(setup.prims.get("field_inv").copied().unwrap_or(0) > 0);
         assert!(setup.prims.get("hash_probe").copied().unwrap_or(0) > 0);
+
+        // Nothing is priced twice.  `koblitz_factor_base` still writes
+        // the natives `as_solves` and `frobenius_maps` (replay compares
+        // them), and marks them as carried by the builder's tally; the
+        // base's phase then prices to exactly its tally plus the index
+        // build, primitive for primitive, with no Artin–Schreier solve
+        // of its own.
+        let fbc = &report.factor_base.cost;
+        for native in ["as_solves", "frobenius_maps"] {
+            assert!(fbc.native.get(native).copied().unwrap_or(0) > 0, "{native}");
+            assert_eq!(
+                fbc.work_native.get(&format!("tallied:{native}")),
+                Some(&1),
+                "{native} is not marked"
+            );
+        }
+        let wn = |k: &str| u128::from(fbc.work_native.get(k).copied().unwrap_or(0));
+        let expect: BTreeMap<String, u128> = [
+            ("word_op", wn("tally_word_ops") + wn("index_sort_word_ops")),
+            ("hash_probe", wn("tally_hash_probes") + wn("index_inserts")),
+            (
+                "field_add",
+                wn("tally_field_adds") + wn("index_point_negations"),
+            ),
+            ("field_mul", wn("tally_field_muls")),
+            ("field_sqr", wn("tally_field_sqrs")),
+            ("field_inv", wn("tally_field_invs")),
+            ("group_add", u128::from(fbc.group_ops.adds)),
+            ("group_double", u128::from(fbc.group_ops.doubles)),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), v))
+        .collect();
+        let base = work
+            .phases
+            .iter()
+            .find(|p| p.name == "factor_base")
+            .expect("the base's phase is priced");
+        assert_eq!(base.prims, expect, "the base's phase is priced twice");
     }
 }

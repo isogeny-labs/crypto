@@ -108,6 +108,21 @@ pub const WORK_NATIVE_KEYS: [&str; 6] = [
     "tally_field_invs",
 ];
 
+/// Prefix of the `work_native` marker `tallied:<native>`: the phase's
+/// `tally_*` counters already carry the work its native counter `<native>`
+/// counts, so `ecbench::work` does not price that native counter in that
+/// phase.  The native counter stays in the record, so replay (which
+/// compares `native`) and the GAE pricing are unchanged.
+pub const TALLIED_PREFIX: &str = "tallied:";
+
+/// Mark each of `natives` as carried by this phase's tally
+/// ([`TALLIED_PREFIX`]).
+pub fn mark_tallied(into: &mut BTreeMap<String, u64>, natives: &[&str]) {
+    for n in natives {
+        into.insert(format!("{TALLIED_PREFIX}{n}"), 1);
+    }
+}
+
 thread_local! {
     static WORD_OPS: Cell<u64> = const { Cell::new(0) };
     static HASH_PROBES: Cell<u64> = const { Cell::new(0) };

@@ -2,15 +2,16 @@
 """Figures for research/ic_acct7_symmetrised_20261021. Plots recorded values only.
 
 Reads audit/n17-work-counted.jsonl (`ecbench work --counted`), the session's
-records.jsonl (for seq, round and recovered scalar, joined on record_id) and
-audit/n17-audit-ir.jsonl (`ecbench audit-ir`). Computes no result: Ir per gate is
-the recorded `ir_per_kilo_bitop` / 1000, and the drawn median lines are checked
-against the README's recorded medians.
+records.jsonl (for seq, round and recovered scalar, joined on record_id),
+audit/n17-work-medians.json (the per-arm medians, taken by jq from the work
+lines; see the README) and audit/n17-audit-ir-repriced.jsonl (`ecbench
+audit-ir`'s Callgrind Ir joined by jq with the repriced gate counts). Computes
+no result: Ir per gate is the recorded `ir_per_kilo_bitop_repriced` / 1000, and
+the drawn median lines are the recorded medians.
 
     /tmp/report-venv/bin/python research/ic_acct7_symmetrised_20261021/figures/plots.py
 """
 import json
-import statistics
 from pathlib import Path
 
 import matplotlib
@@ -41,6 +42,7 @@ def save(fig, name):
 
 rec = {r["record_id"]: r for r in jl(D / "sessions" / "n17-symmetrised" / "records.jsonl")}
 work = jl(D / "audit" / "n17-work-counted.jsonl")
+medians = {m["arm"]: m for m in json.loads((D / "audit" / "n17-work-medians.json").read_text())["arms"]}
 assert len(work) == 16
 rows = []
 for w in work:
@@ -60,11 +62,11 @@ for arm, (label, col) in ARMS.items():
     assert len(pts) == 8
     ax.plot([p[0] for p in pts], [p[1] for p in pts], "o", ms=6, color=col, mec="white", mew=0.8,
             label=f"{label}, 8 counted records")
-    med[arm] = statistics.median(p[1] for p in pts)
+    assert medians[arm]["records"] == 8
+    med[arm] = medians[arm]["median_bitops"]
     ax.axhline(med[arm], color=col, lw=1, ls="--")
     ax.annotate(f"median {med[arm]:.3e}", (0.43, med[arm]), xycoords=ax.get_yaxis_transform(), xytext=(0, 4),
                 textcoords="offset points", ha="right", fontsize=7.5, color=INK)
-assert f"{med['ic-symmetrised-d9']:.3e}" == "1.958e+09" and f"{med['rho-frob']:.3e}" == "1.868e+06"
 ax.set_yscale("log")
 ax.set_ylim(5e5, 1e10)
 ax.set_xticks(range(len(slots)), [f"r{rd}\nk={k}" for rd, k in slots])
@@ -78,7 +80,7 @@ ax.legend(fontsize=7, frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0
 save(fig, "bitops_per_record")
 
 # 2. Instructions per counted gate, the four audit-ir re-executions.
-ir = sorted(jl(D / "audit" / "n17-audit-ir.jsonl"), key=lambda r: r["seq"])
+ir = sorted(jl(D / "audit" / "n17-audit-ir-repriced.jsonl"), key=lambda r: r["seq"])
 assert [r["seq"] for r in ir] == [8, 9, 10, 11]
 arm_of = {r["seq"]: r["arm"] for r in rec.values()}
 fig, ax = plt.subplots(figsize=(6.4, 2.6))
@@ -86,11 +88,11 @@ order = [r for r in ir if arm_of[r["seq"]] == "ic-symmetrised-d9"] + \
         [r for r in ir if arm_of[r["seq"]] == "rho-frob"]
 for i, r in enumerate(order):
     y = len(order) - 1 - i
-    v = r["ir_per_kilo_bitop"] / 1000
+    v = r["ir_per_kilo_bitop_repriced"] / 1000
     col = ARMS[arm_of[r["seq"]]][1]
     ax.plot([0, v], [y, y], color=col, lw=1.2)
     ax.plot(v, y, "o", ms=6, color=col)
-    ax.annotate(f"{v:.3f}  (Ir {r['solve_ir']:,} / {int(r['bitops']):,} gates)", (v, y), xytext=(6, 0),
+    ax.annotate(f"{v:.3f}  (Ir {r['solve_ir']:,} / {int(r['bitops_repriced']):,} gates)", (v, y), xytext=(6, 0),
                 textcoords="offset points", va="center", fontsize=7.5, color=INK)
 ax.set_yticks(range(len(order)), [f"seq {r['seq']} · {arm_of[r['seq']]}" for r in order][::-1])
 ax.set_xlim(0, 3.2)
