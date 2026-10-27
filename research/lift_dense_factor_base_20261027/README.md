@@ -2,7 +2,7 @@
 
 2026-10-27. Results report: [`REPORT.pdf`](REPORT.pdf) (source
 [`REPORT.typ`](REPORT.typ)). Protocol, frozen before the run at `80ac6c421`
-with Amendments 1–3 (`397f055bf`, `ce62b2a9e`, `0e40561a6`): [`PROTOCOL.md`](PROTOCOL.md). Lean status: [`lean/PROOF_MAP.md`](lean/PROOF_MAP.md) (attempted, **not built**). Run:
+with Amendments 1–3 (`397f055bf`, `ce62b2a9e`, `0e40561a6`): [`PROTOCOL.md`](PROTOCOL.md). Lean: [`lean/PROOF_MAP.md`](lean/PROOF_MAP.md). Theorem 2 (lift form), the trace-tower lemma, the Artin–Schreier criterion and the curve lift criterion are **proved** (11 theorems, proof gate PASS, standard axioms only). Proposition 3 (the u-count), the yield identity and the Weil cap remain open. Run:
 [`reports/run-20261027T0356Z/`](reports/run-20261027T0356Z/).
 
 **Question.** On a binary curve y² + xy = x³ + ax² + b, a nonzero x lifts
@@ -89,9 +89,8 @@ python3 plot.py reports/run-<UTC>/                                  # layout onl
 - `src/bin/c2pnb.rs`: native c2pnb check over GF(2^N), N ≤ 368.
 - `summarize/`: native scoring of PROTOCOL §4 and Amendments 1–3.
 - `plot.py`: layout only; reads `summary.json`.
-- `lean/`: the Lean draft (`LiftDense.lean.unbuilt`) and the proof map.
-  Formalization was attempted but not built: no Lean toolchain could be
-  installed in this session.
+- `lean/`: `LiftDense.lean` (Lake project, repository Mathlib pin), the
+  proof map, and the proof-gate receipt (`gate-receipt/`).
 - **Historical Python, kept as evidence and no longer executed** (AGENTS.md
   forbids Python research paths):
   - `c2pnb/c2pnb_lines.py`;
@@ -113,6 +112,10 @@ python3 plot.py reports/run-<UTC>/                                  # layout onl
 
   The frozen version's sha256 is in `FREEZE.sha256`. The as-registered
   H-A verdict ("FAIL", 25/87 rows) is kept in `summary.json`.
+- Since `485e1c00d` the confirmatory run's `rows.jsonl`, `fig1_lines.png`
+  and `fig2_repulsion.png` live in the artifact store (pointers in
+  `reports/run-20261027T0356Z/.artifacts.json`). Hydrate them with
+  `tools/artifacts` before rescoring or recompiling the report.
 - The resume checkpoint could not be uploaded: this session has no AWS
   profile or upload token. The pushed freeze commit served as the durable
   checkpoint.

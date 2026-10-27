@@ -18,8 +18,8 @@ Study `research/lift_dense_factor_base_20261027/`, 2026-10-27.
 - Plotting: `plot.py`, layout only.
 - Historical Python scripts (`c2pnb/*.py`, `summarize.py`) are kept as
   evidence and no longer executed.
-- Lean: `lean/PROOF_MAP.md`. Formalization was attempted but *not built*;
-  see §Lean.
+- Lean: `lean/LiftDense.lean`, with the proof map in `lean/PROOF_MAP.md`.
+  Theorem 2 is proved and audited; see §Lean.
 
 Each statement is tagged *theorem*, *exact computation*, *measured*,
 *model output* or *not established*.
@@ -193,21 +193,29 @@ constraint, buys.
 
 == Lean
 
-AGENTS.md requires a Lean formalization attempt for new theorems. The draft
-`lean/LiftDense.lean.unbuilt` states two results against Mathlib:
-- Lemma 1, the trace tower for $y u$;
-- Theorem 2 in trace form: $"Tr"_(M\/K)(y u + a + c\/(y u)) = "Tr"_(M\/K)(a)$
-  when $"Tr"_(M\/L)(u) = "Tr"_(M\/L)(c u^(-1)) = 0$.
+`lean/LiftDense.lean` is a Lake project on the repository Mathlib pin.
+- `lake build` is clean.
+- The repository proof gate passes: 11 theorems, all on `propext`,
+  `Classical.choice` and `Quot.sound`, with no `sorry` and no
+  `native_decide`.
 
-It was *never compiled*: this session could not install a Lean toolchain
-(the installer download was refused by the session's permission policy).
-It is therefore not a proof. The `.unbuilt` suffix keeps the repository
-proof gate from treating it as one.
+Proved, over any finite field $M$ of characteristic 2 and any intermediate
+field $L$:
+- Lemma 1, the trace tower (`trace_mul_algebraMap`).
+- Theorem 2 in trace form (`twisted_line_trace_const`).
+- $"Tr"(z^2) = "Tr"(z)$ (`trace_sq`).
+- The Artin–Schreier criterion $exists z, z^2 + z = w <==> "Tr"(w) = 0$
+  (`artin_schreier`). The range of $z |-> z^2 + z$ lies in $ker "Tr"$, and
+  both have dimension $n - 1$.
+- The curve lift criterion (`lifts_iff`).
+- Theorem 2 in lift form (`twisted_line_lifts`): for $y in L^*$, $y u$
+  lifts to $E_(a, c^2)$ iff $"Tr"(a) = 0$.
 
-Open obligations, recorded in `PROOF_MAP.md`:
-- O1: the Artin–Schreier lift criterion;
-- O2: $"Tr"(b\/x^2) = "Tr"(sqrt(b)\/x)$;
-- O3: Proposition 3.
+Still open, recorded in `PROOF_MAP.md`:
+- Proposition 3, the u-count classification. It is checked exhaustively
+  by census.
+- The yield identity.
+- The Weil cap. This needs the Kloosterman bound, which is not in Mathlib.
 
 == Not claimed
 
