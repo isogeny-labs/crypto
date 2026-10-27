@@ -151,6 +151,7 @@ same audit. This separately confirms fixed-witness encoding access on Linux
 ARM; it does not convert either natural K600 Gray/hash trial into a measured
 partial-relation yield. The full hosted job envelope of 2,400 seconds is
 charged separately from the paired trial and local ledger.
+The primary-curve [hosted K600 Gray/hash paired first trial](verification/hosted-pair-replay-20261024/README.md) was independently replayed from GitHub run `38983406418`'s exact retained artifact. Both 600-column arms imported successfully, exhausted 5,000 conflicts on the same public first trial, and produced zero models or completed relations. The three archive members matched fresh S3 downloads byte for byte on 2026-10-24. Its 4,800-second paired charge plus 214 seconds of charged preparation is recorded separately from the earlier local N83 ledger; this one-trial capped result does not establish relation yield, rank, complete runtime, or a selected base. The replay receipt binds provider job and artifact identities, pinned source blobs, every ZIP member, S3 downloads, signed-orbit overlap and raw worker receipts.
 
 The [bounded native known-witness stage control](verification/known-witness-stage-native-900-20261014/RESULT.md)
 reached the SAT solver, emitted all nine ordered markers and returned a

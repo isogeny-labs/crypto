@@ -53,16 +53,6 @@ pub struct MixedOrbitDomains<'a> {
     residual_index: HashMap<PointKey, usize>,
 }
 
-/// Optional symmetry constraint for a mixed-orbit chained-S3 search.
-/// Equal-domain runs use the same full-point base at every position in the
-/// run, so permuting those summands preserves the allowed group equations.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum MixedOrbitOrdering {
-    Unordered,
-    FirstPair,
-    EqualDomainRuns,
-}
-
 /// Materialise the residual signed-orbit suffix of two replayed, ordered bases.
 ///
 /// The smaller point record and both of its orbit maps must be exact prefixes
@@ -297,12 +287,17 @@ impl<'a> MixedOrbitDomains<'a> {
         })
     }
 
-    fn lift(
+    /// Lift exact x-domain choices to subgroup points and accept only a tuple
+    /// whose original curve-group sum equals the supplied target.
+    pub fn lift(
         &self,
         xs: &[F2mElement],
         small_summands: usize,
         target: &BinaryPoint,
     ) -> Option<(Vec<usize>, Vec<BinaryPoint>)> {
+        if small_summands > xs.len() {
+            return None;
+        }
         fn walk(
             domains: &MixedOrbitDomains<'_>,
             xs: &[F2mElement],
@@ -376,6 +371,11 @@ impl<'a> MixedOrbitDomains<'a> {
         .then_some((small, residual))
     }
 
+    /// Build the ordinary all-affine identity pattern for an external XOR
+    /// solver. The same exact domains, capacity bounds, and first-pair order
+    /// constraint used by `search` are installed before export. The caller
+    /// must verify the external assignment against the original clauses and
+    /// equations, then use `lift` for the final curve-group check.
     fn build_pattern_encoding(
         &self,
         m: usize,
@@ -486,36 +486,6 @@ impl<'a> MixedOrbitDomains<'a> {
         )
     }
 
-    /// Search one public source equation with either one or two residual
-    /// summands. `exhausted` means a cap or invalid model; `refuted` means
-    /// every identity pattern completed UNSAT after exact group lifting.
-    pub fn search(
-        &self,
-        source_id: u64,
-        coef_a: &BigUint,
-        coef_b: &BigUint,
-        public_target: &BinaryPoint,
-        small_summands: usize,
-        residual_summands: usize,
-        limits: ChainS3Limits,
-        order_first_pair: bool,
-    ) -> (Option<PartialCandidate>, ChainS3Stats) {
-        self.search_with_ordering(
-            source_id,
-            coef_a,
-            coef_b,
-            public_target,
-            small_summands,
-            residual_summands,
-            limits,
-            if order_first_pair {
-                MixedOrbitOrdering::FirstPair
-            } else {
-                MixedOrbitOrdering::Unordered
-            },
-        )
-    }
-
     /// Search with an explicit, replayable summand-ordering arm. The
     /// `EqualDomainRuns` arm is complete only across the full identity-pattern
     /// loop below; a cap remains inconclusive for either ordering.
@@ -606,6 +576,289 @@ impl<'a> MixedOrbitDomains<'a> {
                     return (None, stats);
                 }
             };
+            stats.patterns_attempted += 1;
+            stats.peak_variables = stats.peak_variables.max(enc.solver.n_vars());
+            stats.peak_clauses = stats.peak_clauses.max(enc.solver.n_clauses());
+            stats.peak_xors = stats.peak_xors.max(enc.solver.n_xors());
+            let earlier_conflicts = stats.conflicts;
+            enc.solver.conflict_budget = limits.conflict_budget - earlier_conflicts;
+            loop {
+                stats.solver_calls += 1;
+                let outcome = enc.solver.solve();
+                stats.conflicts = earlier_conflicts.saturating_add(enc.solver.conflicts());
+                match outcome {
+                    SolveResult::Unsat => {
+                        stats.patterns_refuted += 1;
+                        break;
+                    }
+                    SolveResult::Unknown => {
+                        stats.exhausted = true;
+                        return (None, stats);
+                    }
+                    SolveResult::Sat => {
+                        let xs = enc.decode_summands();
+                        stats.models += 1;
+                        if !enc.verify_model()
+                            || xs.iter().enumerate().any(|(position, x)| {
+                                let allowed = if position < small_summands {
+                                    &self.small_xs
+                                } else {
+                                    &self.residual_xs
+                                };
+                                !allowed.contains(&x.to_biguint())
+                            })
+                        {
+                            stats.invalid_models += 1;
+                            stats.exhausted = true;
+                            return (None, stats);
+                        }
+                        if let Some((small_point_indices, residual_points)) =
+                            self.lift(&xs, small_summands, &target)
+                        {
+                            return (
+                                Some(PartialCandidate {
+                                    source_id,
+                                    coef_a: a,
+                                    coef_b: b,
+                                    small_point_indices,
+                                    residual_points,
+                                }),
+                                stats,
+                            );
+                        }
+                        stats.group_rejected_models += 1;
+                        if stats.models >= limits.max_models {
+                            stats.exhausted = true;
+                            return (None, stats);
+                        }
+                        let model = enc.solver.model();
+                        enc.solver.reset_search();
+                        let block: Vec<i32> = (0..m * self.curve.n as usize)
+                            .map(|i| {
+                                if model[i] {
+                                    -((i + 1) as i32)
+                                } else {
+                                    (i + 1) as i32
+                                }
+                            })
+                            .collect();
+                        enc.solver.add_clause(block);
+                    }
+                }
+            }
+        }
+        stats.refuted = true;
+        (None, stats)
+    }
+
+
+    pub fn first_pattern_encoding(
+        &self,
+        coef_a: &BigUint,
+        coef_b: &BigUint,
+        public_target: &BinaryPoint,
+        small_summands: usize,
+        residual_summands: usize,
+        limits: ChainS3Limits,
+        order_first_pair: bool,
+    ) -> Result<(ChainedS3Encoding, BinaryPoint), &'static str> {
+        self.pattern_encoding(
+            coef_a,
+            coef_b,
+            public_target,
+            small_summands,
+            residual_summands,
+            0,
+            limits,
+            order_first_pair,
+        )
+    }
+
+    /// Build one specified identity pattern with the same domains and
+    /// symmetry constraint as `search`. The mask spans the `m - 2` chained
+    /// addition steps and is checked before any solver allocation.
+    pub fn pattern_encoding(
+        &self,
+        coef_a: &BigUint,
+        coef_b: &BigUint,
+        public_target: &BinaryPoint,
+        small_summands: usize,
+        residual_summands: usize,
+        identity_mask: u32,
+        limits: ChainS3Limits,
+        order_first_pair: bool,
+    ) -> Result<(ChainedS3Encoding, BinaryPoint), &'static str> {
+        let m = small_summands
+            .checked_add(residual_summands)
+            .ok_or("summand count overflow")?;
+        if !(5..=6).contains(&m)
+            || small_summands < 3
+            || !(1..=2).contains(&residual_summands)
+            || identity_mask >= (1u32 << (m - 2))
+            || limits.max_variables == 0
+            || limits.max_domain_clauses == 0
+            || !self.curve.curve.is_on_curve(public_target)
+            || self.curve.mul(public_target, &self.curve.subgroup_order) != BinaryPoint::Infinity
+        {
+            return Err("invalid external mixed-orbit shape or target");
+        }
+        let small_size =
+            frobenius_orbit_domain_size(self.curve.n, small_summands, self.small_reps.len())
+                .ok_or("small domain size unavailable")?;
+        let residual_size =
+            frobenius_orbit_domain_size(self.curve.n, residual_summands, self.residual_reps.len())
+                .ok_or("residual domain size unavailable")?;
+        let domain_clauses = small_size
+            .clauses
+            .checked_add(residual_size.clauses)
+            .ok_or("domain clause count overflow")?;
+        if domain_clauses > limits.max_domain_clauses {
+            return Err("external domain clause cap exceeded");
+        }
+        let modulus = &self.curve.subgroup_order;
+        let target = self.curve.add(
+            &self.curve.mul(self.curve.generator(), &(coef_a % modulus)),
+            &self.curve.mul(public_target, &(coef_b % modulus)),
+        );
+        let target_x = match &target {
+            BinaryPoint::Affine { x, .. } => Some(x),
+            BinaryPoint::Infinity => None,
+        };
+        let domains: Vec<Vec<BigUint>> = (0..m)
+            .map(|position| {
+                if position < small_summands {
+                    self.small_reps.clone()
+                } else {
+                    self.residual_reps.clone()
+                }
+            })
+            .collect();
+        let mut encoding = ChainedS3Encoding::build(
+            m,
+            &self.curve.curve.irreducible,
+            &self.curve.curve.b,
+            target_x,
+            identity_mask,
+            limits.max_variables,
+        )
+        .map_err(|_| "external identity-pattern construction failed")?;
+        if encoding
+            .constrain_frobenius_orbit_domains(
+                &domains,
+                limits.max_variables,
+                limits.max_domain_clauses,
+            )
+            .map(|size| size.clauses)
+            != Ok(domain_clauses)
+            || (order_first_pair && encoding.order_first_pair(limits.max_variables).is_err())
+        {
+            return Err("external identity-pattern domain or symmetry failed");
+        }
+        Ok((encoding, target))
+    }
+
+    /// Search one public source equation with either one or two residual
+    /// summands. `exhausted` means a cap or invalid model; `refuted` means
+    /// every identity pattern completed UNSAT after exact group lifting.
+    pub fn search(
+        &self,
+        source_id: u64,
+        coef_a: &BigUint,
+        coef_b: &BigUint,
+        public_target: &BinaryPoint,
+        small_summands: usize,
+        residual_summands: usize,
+        limits: ChainS3Limits,
+        order_first_pair: bool,
+    ) -> (Option<PartialCandidate>, ChainS3Stats) {
+        let mut stats = ChainS3Stats::default();
+        let Some(m) = small_summands.checked_add(residual_summands) else {
+            stats.exhausted = true;
+            return (None, stats);
+        };
+        if !(5..=6).contains(&m)
+            || small_summands < 3
+            || !(1..=2).contains(&residual_summands)
+            || limits.max_models == 0
+            || limits.conflict_budget == 0
+            || !self.curve.curve.is_on_curve(public_target)
+            || self.curve.mul(public_target, &self.curve.subgroup_order) != BinaryPoint::Infinity
+        {
+            stats.exhausted = true;
+            return (None, stats);
+        }
+        let small_size =
+            frobenius_orbit_domain_size(self.curve.n, small_summands, self.small_reps.len());
+        let residual_size =
+            frobenius_orbit_domain_size(self.curve.n, residual_summands, self.residual_reps.len());
+        let Some(domain_clauses) = small_size
+            .zip(residual_size)
+            .and_then(|(small, residual)| small.clauses.checked_add(residual.clauses))
+        else {
+            stats.exhausted = true;
+            return (None, stats);
+        };
+        if domain_clauses > limits.max_domain_clauses {
+            stats.exhausted = true;
+            return (None, stats);
+        }
+        stats.domain_clauses = domain_clauses;
+        let modulus = &self.curve.subgroup_order;
+        let a = coef_a % modulus;
+        let b = coef_b % modulus;
+        let target = self.curve.add(
+            &self.curve.mul(self.curve.generator(), &a),
+            &self.curve.mul(public_target, &b),
+        );
+        let target_x = match &target {
+            BinaryPoint::Affine { x, .. } => Some(x),
+            BinaryPoint::Infinity => None,
+        };
+        let domains: Vec<Vec<BigUint>> = (0..m)
+            .map(|position| {
+                if position < small_summands {
+                    self.small_reps.clone()
+                } else {
+                    self.residual_reps.clone()
+                }
+            })
+            .collect();
+        for identity_mask in 0..(1u32 << (m - 2)) {
+            if stats.conflicts >= limits.conflict_budget {
+                stats.exhausted = true;
+                return (None, stats);
+            }
+            let mut enc = match ChainedS3Encoding::build(
+                m,
+                &self.curve.curve.irreducible,
+                &self.curve.curve.b,
+                target_x,
+                identity_mask,
+                limits.max_variables,
+            ) {
+                Ok(enc) => enc,
+                Err(
+                    ChainBuildError::VariableCap { .. }
+                    | ChainBuildError::DomainClauseCap { .. }
+                    | ChainBuildError::Unsupported,
+                ) => {
+                    stats.exhausted = true;
+                    return (None, stats);
+                }
+            };
+            if enc
+                .constrain_frobenius_orbit_domains(
+                    &domains,
+                    limits.max_variables,
+                    limits.max_domain_clauses,
+                )
+                .map(|size| size.clauses)
+                != Ok(domain_clauses)
+                || (order_first_pair && enc.order_first_pair(limits.max_variables).is_err())
+            {
+                stats.exhausted = true;
+                return (None, stats);
+            }
             stats.patterns_attempted += 1;
             stats.peak_variables = stats.peak_variables.max(enc.solver.n_vars());
             stats.peak_clauses = stats.peak_clauses.max(enc.solver.n_clauses());
@@ -1374,33 +1627,6 @@ mod tests {
             max_models: 100,
             conflict_budget: 100_000,
         };
-        let exported = domains
-            .export_pattern_encoding(
-                &a,
-                &BigUint::zero(),
-                &target,
-                4,
-                1,
-                0,
-                bounded,
-                MixedOrbitOrdering::EqualDomainRuns,
-            )
-            .unwrap();
-        assert!(exported.solver.n_vars() > 0);
-        assert!(exported.solver.n_original_clauses() > 0);
-        assert!(crate::cryptanalysis::sat::to_dimacs_xor(&exported.solver).starts_with("p cnf "));
-        assert!(domains
-            .export_pattern_encoding(
-                &a,
-                &BigUint::zero(),
-                &target,
-                4,
-                1,
-                8,
-                bounded,
-                MixedOrbitOrdering::EqualDomainRuns,
-            )
-            .is_err());
         let (candidate, stats) =
             domains.search(3, &a, &BigUint::zero(), &target, 4, 1, bounded, true);
         assert!(candidate.is_some(), "bounded SAT search: {stats:?}");
@@ -1409,21 +1635,6 @@ mod tests {
             graph.feed(candidate.unwrap()).unwrap(),
             FeedOutcome::PivotStored { .. }
         ));
-        let (canonical, canonical_stats) = domains.search_with_ordering(
-            6,
-            &a,
-            &BigUint::zero(),
-            &target,
-            4,
-            1,
-            bounded,
-            MixedOrbitOrdering::EqualDomainRuns,
-        );
-        assert!(
-            canonical.is_some(),
-            "canonical one-residual search: {canonical_stats:?}"
-        );
-        assert!(canonical_stats.peak_variables > stats.peak_variables);
 
         let double_a =
             BigUint::from(selected[0].0 * 2 + selected[1].0 + selected[2].0 + selected[3].0);
@@ -1456,30 +1667,92 @@ mod tests {
         assert_eq!(candidate.residual_points.len(), 2);
         graph.feed(candidate).unwrap();
 
-        let six_a =
+        // Exercise both six-summand shapes used by the hosted N83 pilots.
+        // The target coefficients are constructed from exact domain points;
+        // SAT must still find and group-verify a candidate through each path.
+        let single_six_a = BigUint::from(selected[0].0 * 3 + selected[1].0 * 2 + selected[2].0);
+        let (candidate, stats) = domains.search(
+            6,
+            &single_six_a,
+            &BigUint::zero(),
+            &target,
+            5,
+            1,
+            bounded,
+            true,
+        );
+        let candidate = candidate.unwrap_or_else(|| panic!("5+1 SAT search: {stats:?}"));
+        assert!(stats.models > 0);
+        assert_eq!(candidate.small_point_indices.len(), 5);
+        assert_eq!(candidate.residual_points.len(), 1);
+        graph.feed(candidate).unwrap();
+
+        let double_six_a =
             BigUint::from(selected[0].0 * 2 + selected[1].0 * 2 + selected[2].0 + selected[3].0);
-        let (canonical, canonical_stats) = domains.search_with_ordering(
+        let (candidate, stats) = domains.search(
             7,
-            &six_a,
+            &double_six_a,
             &BigUint::zero(),
             &target,
             4,
             2,
             bounded,
-            MixedOrbitOrdering::EqualDomainRuns,
+            true,
         );
-        let canonical = canonical
-            .unwrap_or_else(|| panic!("canonical six-summand search: {canonical_stats:?}"));
-        assert_eq!(canonical.small_point_indices.len(), 4);
-        assert_eq!(canonical.residual_points.len(), 2);
-        let mut replay = BinaryPoint::Infinity;
-        for index in canonical.small_point_indices {
-            replay = curve.add(&replay, &small.points[index]);
+        let candidate = candidate.unwrap_or_else(|| panic!("4+2 SAT search: {stats:?}"));
+        assert!(stats.models > 0);
+        assert_eq!(candidate.small_point_indices.len(), 4);
+        assert_eq!(candidate.residual_points.len(), 2);
+        graph.feed(candidate).unwrap();
+
+        for (coefficient, small_count, residual_count) in
+            [(&single_six_a, 5, 1), (&double_six_a, 4, 2)]
+        {
+            let (mut encoding, group_target) = domains
+                .first_pattern_encoding(
+                    coefficient,
+                    &BigUint::zero(),
+                    &target,
+                    small_count,
+                    residual_count,
+                    bounded,
+                    true,
+                )
+                .unwrap();
+            assert_eq!(encoding.solver.solve(), SolveResult::Sat);
+            let assignment = encoding.solver.model();
+            assert!(encoding.verify_external_assignment(&assignment));
+            let xs = encoding.decode_summands_assignment(&assignment).unwrap();
+            let (small, residual) = domains.lift(&xs, small_count, &group_target).unwrap();
+            assert_eq!(small.len(), small_count);
+            assert_eq!(residual.len(), residual_count);
+            let (later, later_target) = domains
+                .pattern_encoding(
+                    coefficient,
+                    &BigUint::zero(),
+                    &target,
+                    small_count,
+                    residual_count,
+                    1,
+                    bounded,
+                    true,
+                )
+                .unwrap();
+            assert_eq!(later_target, group_target);
+            assert!(later.solver.n_vars() > 0);
+            assert!(domains
+                .pattern_encoding(
+                    coefficient,
+                    &BigUint::zero(),
+                    &target,
+                    small_count,
+                    residual_count,
+                    16,
+                    bounded,
+                    true,
+                )
+                .is_err());
         }
-        for point in canonical.residual_points {
-            replay = curve.add(&replay, &point);
-        }
-        assert_eq!(replay, curve.mul(curve.generator(), &six_a));
     }
 
     #[test]
