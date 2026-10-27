@@ -92,15 +92,15 @@ pub fn profile_of(inst: &Instance) -> CurveProfile {
             cofactor: w.kc.cofactor as u64,
         },
         // These research-only families do not have an IC planner profile.
-            Instance::Fp4Torsion(_)
-            | Instance::F2m4(_)
-            | Instance::Fp4(_)
-            | Instance::ThreeLeads(_)
-            | Instance::Ext(_)
-            | Instance::Genus2(_)
-            | Instance::Quartic(_)
-            | Instance::Ghs(_)
-            | Instance::Hyper(_) =>CurveProfile::other(0.0, 0.0, 0),
+        Instance::Fp4Torsion(_)
+        | Instance::F2m4(_)
+        | Instance::Fp4(_)
+        | Instance::ThreeLeads(_)
+        | Instance::Ext(_)
+        | Instance::Genus2(_)
+        | Instance::Quartic(_)
+        | Instance::Ghs(_)
+        | Instance::Hyper(_) => CurveProfile::other(0.0, 0.0, 0),
     }
 }
 

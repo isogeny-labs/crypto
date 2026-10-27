@@ -23,9 +23,9 @@ use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
 use crate::cryptanalysis::ecbench::ghs_cover::GhsInstance;
+use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench::jacobian::Genus2Instance;
 use crate::cryptanalysis::ecbench::plane_quartic::QuarticInstance;
-use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench_large_prime::binary_explicit_instance;
 use crate::cryptanalysis::gaudry_quartic::Pt4;
 use crate::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, BinCurve, PtB, TowerBasis};
@@ -1111,7 +1111,7 @@ impl Instance {
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            | Instance::Hyper(_) =>{
+            | Instance::Hyper(_) => {
                 unreachable!("returned above")
             }
             Instance::Wide(i) => (
@@ -1276,7 +1276,7 @@ impl Instance {
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            | Instance::Hyper(_) =>{
+            | Instance::Hyper(_) => {
                 unreachable!("returned above")
             }
         }
@@ -1349,10 +1349,10 @@ impl Instance {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
                 }
-            Instance::Wide(_)
-            | Instance::Fp4(_)
-            | Instance::ThreeLeads(_)
-            | Instance::Hyper(_) =>{
+                Instance::Wide(_)
+                | Instance::Fp4(_)
+                | Instance::ThreeLeads(_)
+                | Instance::Hyper(_) => {
                     unreachable!("handled above")
                 }
                 Instance::Ext(i) => {
