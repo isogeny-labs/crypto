@@ -1,0 +1,115 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ic-improve-20261026-12a
+experiment_id: ic_improve_20261026
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-12a.receipt.json
+binds:
+- path: research/ic_planner_exhaustive_20261026/PROTOCOL.md
+  sha256: ed7ea0f443875c5a6c5737e3d1f48195254bb092e288ea9455a6784b74d9f037
+- path: research/ic_planner_exhaustive_20261026/specs/R-p16.json
+  sha256: 05547d74144d3bde53a9d8f55805fdaaab083c7167558d490cf5c5c20477712c
+- path: research/ic_planner_exhaustive_20261026/specs/R-p18.json
+  sha256: 0c393c64729050da0397ea076a68432025ad1a502648b03a3983ae8f22a307dd
+- path: research/ic_planner_exhaustive_20261026/specs/R-p36.json
+  sha256: 032596f350adc0f3e0ac6136a68bd0bd2c6df250021ed6e6fbb1a15fae1b8a6f
+- path: research/ic_planner_exhaustive_20261026/specs/R-p37.json
+  sha256: 3ccc5b279ec09f41747401a0abb3209c55f9122578325b0e97474bfcb457a3bc
+- path: research/ic_planner_exhaustive_20261026/specs/B-hb19.json
+  sha256: 849340b596be12f62d876334e98a0a9756412de117e6893ebe7381bad146da7d
+- path: research/ic_planner_exhaustive_20261026/specs/B-hb23.json
+  sha256: 789ca6e1db42118644c25de1ce79b30b1581c6146f8438ce944f251b47c5b247
+- path: research/ic_planner_exhaustive_20261026/specs/B-hb25.json
+  sha256: 178f4a20c68a8996e4014a5e27e0f9f3e5e3e693c4265810a8c85d43a543358f
+- path: research/ic_planner_exhaustive_20261026/specs/B-hb27.json
+  sha256: c666ae49c8d60e5241d77861a2fa6201d4125b456be6b3c8a45298a8e35db805
+- path: research/ic_planner_exhaustive_20261026/specs/K-k47.json
+  sha256: 0808561d27fc7b4f18f5f331c34205d76fecce3d12459364ec29aedcb7f9363b
+- path: research/ic_planner_exhaustive_20261026/specs/K-k57.json
+  sha256: 84120a60cc15f33351f52cc3f2d8033e8f09a8dd31a957ee5ed60546cc9b3c41
+- path: research/ic_planner_exhaustive_20261026/specs/K-k41.json
+  sha256: 00fb3935514bc3c4a6e7eb4b2e034c8b8c4cf475ee968b4b315bfa64bdf29bd3
+- path: research/ic_planner_exhaustive_20261026/specs/K-k53.json
+  sha256: 425f685e8b591f2e0df4839583ee50a7ad09897b1b2a094daf6d9777c106fcd7
+- path: research/ic_planner_exhaustive_20261026/specs/K-k59.json
+  sha256: 0897fe0466cfb6327de572f49c86aac52839c741def20a9f2b80b25468304f15
+- path: research/ic_planner_exhaustive_20261026/specs/K-k61.json
+  sha256: d7ca96b275afbbb855e0086af8f576f1d573953ebe0e604004fbb6049c47c0c2
+- path: research/ic_prime_residual_lp_20261026/specs/p24.json
+  sha256: 8709178cfff476b50428ed4bb3fd413e5ad2d47ee94b68f6011650fc1b26f771
+- path: research/ic_prime_residual_lp_20261026/specs/p32.json
+  sha256: f634393de29b3ea6eed4927473015a471b087a4c434ac77f56c72d9895d0087f
+- path: ./target/release/ecbench
+  sha256: 8de80ce74d4cccad7fe23cc2270bddc8880754bf77dcd33c5275981177b55519
+- path: ./target/release/ic
+  sha256: 46b191d3051a19adb394ca89a1bc7e4b27eabf4c512e86ad864081a2c062d975
+- path: ./target/release/examples/ic_residual_curve_free_null
+  sha256: 0810ac9f0f2320b2ca4927a11ef2906a3ee2f76fad45405d9ea576d086951560
+must_not_exist:
+- research/ic_planner_exhaustive_20261026/analysis/null-p36-B2.json
+- research/ic_planner_exhaustive_20261026/analysis/null-p36-B4.json
+commands:
+- id: git-clean
+  argv:
+  - python3
+  - -c
+  - import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/ic_planner_exhaustive_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: analysis-absent
+  argv:
+  - python3
+  - -c
+  - import os,sys; sys.exit(1 if any(os.path.exists(p) for p in ['research/ic_planner_exhaustive_20261026/analysis/null-p36-B2.json', 'research/ic_planner_exhaustive_20261026/analysis/null-p36-B4.json']) else 0)
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: disk-record
+  argv:
+  - df
+  - -h
+  - /
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-12a.disk-start.stdout
+- id: null-p36-b2
+  argv:
+  - ./target/release/examples/ic_residual_curve_free_null
+  - '{"kind":"prime_explicit","p":68719476731,"a":68719476728,"b":33,"group_order":68719022539,"r":68719022539,"gx":2,"gy":51741851039}'
+  - '2'
+  - '128'
+  - '20261107'
+  timeout_seconds: 14400
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_exhaustive_20261026/analysis/null-p36-B2.json
+  stderr: research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-12a.null-p36-b2.stderr
+  outputs:
+  - research/ic_planner_exhaustive_20261026/analysis/null-p36-B2.json
+- id: null-p36-b4
+  argv:
+  - ./target/release/examples/ic_residual_curve_free_null
+  - '{"kind":"prime_explicit","p":68719476731,"a":68719476728,"b":33,"group_order":68719022539,"r":68719022539,"gx":2,"gy":51741851039}'
+  - '4'
+  - '128'
+  - '20261107'
+  timeout_seconds: 14400
+  success_exit_codes:
+  - 0
+  stdout: research/ic_planner_exhaustive_20261026/analysis/null-p36-B4.json
+  stderr: research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-12a.null-p36-b4.stderr
+  outputs:
+  - research/ic_planner_exhaustive_20261026/analysis/null-p36-B4.json
+bus_address: executor-mechanical-ic-improve-20261026-12a
+background: true
+write_scope:
+- research/ic_planner_exhaustive_20261026/sessions/
+- research/ic_planner_exhaustive_20261026/cards/
+- research/ic_planner_exhaustive_20261026/analysis/
+stop_when:
+- Any command in the card exits with a status other than 0, or times out.
+- The working tree has a change outside research/ic_planner_exhaustive_20261026/cards before the first null run.
+- 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'
