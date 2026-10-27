@@ -352,6 +352,34 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
 ) -> Result<(RunReport, FactorBase<G::Elt>), String> {
+    run_pipeline_inner(ctx, spec, base_builder, oracle, Some(planted), calib, rho_s)
+}
+
+/// Run the pipeline using only public instance and target inputs; recovery is
+/// checked against the source point, without supplying a held answer.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_public<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<RunReport, String> {
+    run_pipeline_inner(ctx, spec, base_builder, oracle, None, calib, rho_s)
+        .map(|(report, _)| report)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_pipeline_inner<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    planted: Option<u64>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<(RunReport, FactorBase<G::Elt>), String> {
     let started = Instant::now();
 
     // ── Stage 1: the factor base ───────────────────────────────────
@@ -667,7 +695,8 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             },
             verify: ver,
             recovered: outcome.recovered,
-            verified: outcome.verified && outcome.recovered == Some(planted),
+            verified: outcome.verified
+                && planted.is_none_or(|known| outcome.recovered == Some(known)),
             total_gae,
             s,
             rho_s,
@@ -678,7 +707,6 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         fb,
     ))
 }
-
 /// The table a sweep prints.
 pub fn format_markdown(rows: &[RunReport]) -> String {
     let mut out = String::new();
@@ -1013,6 +1041,19 @@ mod tests {
         assert!(report.s > 0.0 && report.s.is_finite());
         assert!(report.factor_base.columns > 0);
         assert!(report.decomposition.relations_found >= report.linear_algebra.rank);
+
+        let mut public_oracle = MitmOracle::new(2);
+        let public_report = run_pipeline_public(
+            &ctx,
+            &spec,
+            &base,
+            &mut public_oracle,
+            &Calibration::default(),
+            None,
+        )
+        .expect("public-only pipeline should run");
+        assert!(public_report.verified, "public source-point check failed");
+        assert_eq!(public_report.recovered, report.recovered);
         // Every stage marks the work it now counts for `bitop/v1`, and
         // counts some: the base's indexes, the table's inserts, the walk's
         // bookkeeping, the rows and the elimination's scans.

@@ -1043,6 +1043,11 @@ mod tests {
                     .as_array()
                     .filter(|coordinates| coordinates.len() == 2)
                     .expect("binary generator pair");
+                assert_eq!(
+                    representation["field"]["element_encoding"],
+                    "hex polynomial coefficient bitset, least significant bit is constant",
+                    "{ec1}: unsupported binary coordinate encoding"
+                );
                 let generator_x =
                     parse_binary_field_element(generator[0].as_str().expect("binary generator x"))
                         .expect("parsed x");

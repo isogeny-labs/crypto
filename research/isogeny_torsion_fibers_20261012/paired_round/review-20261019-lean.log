@@ -1,0 +1,39 @@
+PR #1749 degree-three map proof verification, 2026-10-19 UTC
+Toolchain is unchanged: leanprover/lean4:v4.34.1
+Official release SHA256: 47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4
+Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)
+Proof source SHA256: 7a8f61d4b6f09f16cdc13bfd7dd17ea60a9b18297136431156403f8d39aa1b0a
+Command: PATH=<verified Lean 4.34.1 bin>:$PATH lake build
+ℹ [2/9] Replayed CubicAutomorphism
+info: CubicAutomorphism.lean:49:0: 'CubicAutomorphism.degreeThreeCleared' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CubicAutomorphism.lean:50:0: 'CubicAutomorphism.degreeThreeCurveEquationCleared' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CubicAutomorphism.lean:51:0: 'CubicAutomorphism.zeta13' does not depend on any axioms
+info: CubicAutomorphism.lean:52:0: 'CubicAutomorphism.zeta199' does not depend on any axioms
+info: CubicAutomorphism.lean:53:0: 'CubicAutomorphism.scaling13' does not depend on any axioms
+info: CubicAutomorphism.lean:54:0: 'CubicAutomorphism.scaling199' does not depend on any axioms
+info: CubicAutomorphism.lean:55:0: 'CubicAutomorphism.cubicPreservesEquation' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CubicAutomorphism.lean:56:0: 'CubicAutomorphism.scalingPreservesEquation' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [4/9] Built FiberCofactor (765ms)
+info: FiberCofactor.lean:21:0: 'FiberCofactor.rationalKernelOrderDvdCofactor' depends on axioms: [propext, Quot.sound]
+info: FiberCofactor.lean:22:0: 'FiberCofactor.degreeThreeNotDvdCofactorOne' depends on axioms: [propext]
+ℹ [6/9] Built SixClassCoefficients (804ms)
+info: SixClassCoefficients.lean:34:0: 'SixClassCoefficients.endomorphismWalkCoefficients' does not depend on any axioms
+info: SixClassCoefficients.lean:35:0: 'SixClassCoefficients.scaledCoefficientValue' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: SixClassCoefficients.lean:36:0: 'SixClassCoefficients.negatedCoefficientValue' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [8/9] Built Nonisomorphic617 (1.9s)
+info: Nonisomorphic617.lean:23:0: 'Nonisomorphic617.ratioNotSixthPower' does not depend on any axioms
+info: Nonisomorphic617.lean:24:0: 'Nonisomorphic617.targetCoprimeKernel' does not depend on any axioms
+info: Nonisomorphic617.lean:25:0: 'Nonisomorphic617.kernelScalarVanishes' depends on axioms: [propext]
+Build completed successfully (9 jobs).
+
+Command: lake env lean CubicAutomorphism.lean
+'CubicAutomorphism.degreeThreeCleared' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicAutomorphism.degreeThreeCurveEquationCleared' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicAutomorphism.zeta13' does not depend on any axioms
+'CubicAutomorphism.zeta199' does not depend on any axioms
+'CubicAutomorphism.scaling13' does not depend on any axioms
+'CubicAutomorphism.scaling199' does not depend on any axioms
+'CubicAutomorphism.cubicPreservesEquation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicAutomorphism.scalingPreservesEquation' depends on axioms: [propext, Classical.choice, Quot.sound]
+
+Scope: denominator-cleared ring identities only. No projective/group-law bridge, scalar decomposition, historical-stream validation, or benchmark admission.
