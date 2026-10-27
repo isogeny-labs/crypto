@@ -54,7 +54,7 @@ this session (no AWS CLI), so this deviates from the default route of AGENTS.md
 §9a. Wall time only; §5a band as in PR #2580 (IC does no group operations, arms
 are not ranked on operation counts).
 
-## Amendment 1 (2026-10-27, after 18 rows, before any analysis was used)
+## Amendment 1 (2026-10-27, after 18 rows; those rows, all q = 2003, were laid out once with `analyze.py` before the fix)
 
 The first campaign run stopped at q = 2003, seed 5, arm lp:0.35 with a panic:
 the iota-pair check computed c from x-index 0, which in a large-prime arm need
