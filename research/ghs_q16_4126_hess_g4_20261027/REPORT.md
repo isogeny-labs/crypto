@@ -74,7 +74,7 @@ The order-4126 one-target transfer run is 688 times the rho amortized wall time 
 
 [Hess's generalized GHS paper](https://www.cambridge.org/core/journals/lms-journal-of-computation-and-mathematics/article/generalising-the-ghs-attack-on-the-elliptic-curve-discrete-logarithm-problem/315278965D8D277A85812D9498236A88) gives the generalized Artin–Schreier transfer and a nonvanishing result for the large cyclic input factor. [Magma's Weil-descent documentation](https://www.math.uzh.ch/sepp/magma-2.19.8-cr/html/text1383.htm) explicitly provides the curve and divisor-class map. The `c=1` factor orders `(1,3)` give genus `8−4−1+1=4`; this is within the published construction. The [Magma index-calculus documentation](https://magma.maths.usyd.edu.au/magma/handbook/text/1473) states the `q≥d!` gate for its line sieve. Thus neither the map nor this control constitutes a new GHS family.
 
-All four exact sources lie outside the **genus-three Hess isogeny closure** certified in the related audit, but that exclusion does not imply resistance to all GHS transfers: these explicit genus-four controls are counterexamples to that overbroad interpretation. Conversely, a successful subgroup transfer alone does not imply a rho-beating attack, as the measured runs demonstrate.
+An additional [complete `c=1` genus census](C1_BOUND.md) gives a rigorous finite bound for all 8,190 normalized ordinary sources: 30 have genus one, 510 genus three, and 7,650 genus four under this published choice. Of the 2,875 source models outside the **genus-three Hess isogeny closure**, 2,865 have a direct genus-four `c=1` image and ten are subfield genus-one exceptions. The census checks all equations and has three independent Magma genus controls; it does not assert subgroup survival or rho advantage for all 2,865. All four exact benchmarked sources lie in that genus-four part. Their complete runs show that a successful subgroup transfer alone does not imply a rho-beating attack.
 
 ## Reproduction
 
@@ -90,4 +90,6 @@ python3 research/ghs_q16_4126_hess_g4_20261027/run_magma.py attack_4078
 python3 research/ghs_q16_4126_hess_g4_20261027/run_magma.py rho_4078
 python3 research/ghs_q16_4126_hess_g4_20261027/audit.py
 lean research/ghs_q16_4126_hess_g4_20261027/AttackRelations.lean
+sage -python research/ghs_q16_4126_hess_g4_20261027/c1_audit.py
+lean research/ghs_q16_4126_hess_g4_20261027/C1Counts.lean
 ```

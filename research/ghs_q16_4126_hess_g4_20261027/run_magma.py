@@ -16,7 +16,8 @@ URL = 'https://calculator.magma-maths.org/execute'
 
 
 def main():
-    allowed={'pilot','plane_pilot','base_pilot','attack_probe','attack','rho'}
+    allowed={'pilot','plane_pilot','base_pilot','attack_probe','attack','rho',
+             'c1_controls'}
     allowed.update(f'{kind}_{order}' for kind in ('attack','rho')
                    for order in (4006,4054,4078))
     if len(sys.argv)!=2 or sys.argv[1] not in allowed:
