@@ -19,7 +19,7 @@ flags, and verifies each identifiable scalar with ellmul. Two separate control
 matrices cover rank deficiency with identifiable and ambiguous target logs.
 Local primary PARI help for matker/matinverseimage is checked before execution.
 
-One Rust and one GP execution, each <=60s,CPU0,one thread,4GiB,L0; no performance
+One Rust and one GP execution, each <=300s,CPU0,one thread,4GiB,L0; no performance
 claim. Freeze source/binary/input before data and push Setec checkpoint gate.
 Success distinguishes incomplete full-base logs from actual target ambiguity.
 It changes no frozen v8 bytes or original campaign requirement.

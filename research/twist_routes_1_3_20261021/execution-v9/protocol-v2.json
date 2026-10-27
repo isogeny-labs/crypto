@@ -1,0 +1,343 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-relation-rank-v2",
+  "version": 2,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v9",
+  "question": "Does v8 rank deficiency actually leave the target log ambiguous, or only factor-base variables?",
+  "claims": [
+    {
+      "id": "uniqueness",
+      "text": "RREF nullspace projection and independent GP determine whether each archived system fixes the target coordinate.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "scope",
+      "text": "No extra queries, changed bases, timing, speedup or NIST result.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "description": "Native reconstruction and complete affine solution/nullspace analysis of eighteen archived systems.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a3da15bda17804c75b48bbe487e48cb4ae5cb560",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-relation-rank"
+          ]
+        ],
+        "binary_sha256": "50565f79ec340316d967f6e2b1e071daf8d0e61361fd886fa99ec9dbe5a4f774",
+        "threads": 1
+      }
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "description": "Independent GP matker and matinverseimage on all eighteen exact matrices, plus public point verification. Version2 adds a hash-pinned explicit p=823 preload before unchanged main script; original failed attempt remains.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a3da15bda17804c75b48bbe487e48cb4ae5cb560",
+        "build": [
+          [
+            "gp",
+            "-f",
+            "-q",
+            "verify.gp"
+          ]
+        ],
+        "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact complete finite count, no performance or sampling inference."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Separate native matrices with rank deficiency and a fixed target; public curve verification of every unique target."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Separate native matrix with an ambiguous target; all archived nullspace directions and two feasible target values retained."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "model",
+        "levels": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      },
+      {
+        "name": "base",
+        "levels": [
+          0,
+          1
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "Native RREF versus GP matker/matinverseimage; pinned input/source/binary.",
+        "how": "Record source/binary hashes before data; reopen raw hashes."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "All eighteen unchanged v8 matrices; no extra queries or scalar logs.",
+        "how": "Exhaustive same-base signed witness equality and exact rank/recovery; all exceptional kernel/infinity cases checked."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Same local L0 managed host; no native clock or cost admitted.",
+        "how": "Record CPU/kernel/hypervisor; no time comparison."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Shared author and host, deterministic exact equality only.",
+        "how": "Shared author/host; independent CAS map/group/linear algebra, exact native replay and conditional Lean group implication."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-check",
+        "arms": [
+          "native",
+          "pari"
+        ],
+        "differs_in": [
+          "instrument"
+        ],
+        "design": "absolute",
+        "threshold": "All ranks, complete nullspace target projections, uniqueness flags and recovered public-point checks agree."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Native producer then independent CAS exact verification; no performance comparison.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Deterministic fixed input panel and exhaustive shifts; seed field zero is metadata only."
+    },
+    "instance_sampling": {
+      "rule": "All eighteen archived v8 systems. Post-v8 diagnostic motivation disclosed; no new decomposition samples.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact finite verification only; no statistical or comparative claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact complete finite counts and necessary-factor checks, not statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 900,
+      "measured_on": "Unmeasured planning bound:300s native,300s GP,300s metadata/replay allowance; not a performance result."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "systems",
+        "name": "Exact target-identifiability checks",
+        "unit": "archived systems",
+        "kind": "exact",
+        "definition": "All eighteen affine mod823 systems, including anchor and every witness row.",
+        "source": "ADMISSION.json summary.systems",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "ranks",
+      "free columns",
+      "nullspace target projection",
+      "identifiable or ambiguous target flags"
+    ],
+    "record": [
+      "source commit",
+      "binary SHA256",
+      "argv",
+      "input/output hashes",
+      "actual exit/signal",
+      "resource caps",
+      "host metadata"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_GiB": 4,
+      "paid_resources_created": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 900,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 1,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All eighteen systems; retain any mismatch, error or cap; do not alter rows or add queries.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Certify which target coordinates are uniquely fixed by the archived relation rows; separate full-system rank from target recovery.",
+    "comparison_ids": [
+      "exact-check"
+    ],
+    "statistic": "Exact ranks and nullspace target coordinates.",
+    "interval": "None: complete finite exhaustion.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact identifiable-system count; not speed.",
+    "verdict_vocabulary": [
+      "verified finite equality",
+      "mismatch",
+      "not completed"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/twist_routes_1_3_20261021/runner/src/bin/twist-relation-rank.rs",
+      "sha256": "1185f77e0006d2728aabe0f9e5e290abc595b34d219d9ba7a27abcb20fd1bfc4"
+    },
+    "inputs": [
+      "research/twist_routes_1_3_20261021/execution-v8/runs/kernel-v1/RESULTS.json"
+    ],
+    "outputs": [
+      "RESULTS.json",
+      "verify.gp",
+      "ADMISSION.json",
+      "experiment.export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Rank and target-identifiability by unchanged base across all nine models."
+    ],
+    "report_dir": "research/twist_routes_1_3_20261021/reports/relation-rank-20261027"
+  },
+  "inadmissible": [
+    "Calling standard isogeny theory novel",
+    "Calling same-base transported rows new independent information",
+    "Claiming a solver speedup without charged costs and strongest matched controls",
+    "Inferring a NIST route from this public p827 example",
+    "Closing original full-campaign criteria"
+  ],
+  "literature": [
+    {
+      "ref": "research/twist_routes_1_3_20261021/execution-v9/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Existing RREF source and primary PARI matker/matinverseimage help read; target identifiability is a nullspace projection.",
+      "verified_by": "Separate matrices test both rank-deficient possibilities."
+    }
+  ],
+  "amendments": [
+    {
+      "id": "explicit-GP-field-preload",
+      "filed": "2026-10-27",
+      "filed_before_affected_data": true,
+      "reason": "Original GP field initialization occurs inside ck definition; strict reference fails despite process0/sentinel. Preserve attempt and preload fixed p before the second GP run.",
+      "changes": [
+        "Explicit p=823 preload; main script/native output/matrices unchanged.",
+        "All original checks and exact stderr admission remain.",
+        "Actual native and both GP attempts remain in export."
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
+  },
+  "extensions": {
+    "scientific_panel_started": false,
+    "original_full_campaign_discharged": false,
+    "embedded_controls_are_not_separate_arms": true,
+    "backend_authority": "Standing authorization and documented EKS access/image fallback; bounded local L0 only, no paid resource."
+  }
+}
