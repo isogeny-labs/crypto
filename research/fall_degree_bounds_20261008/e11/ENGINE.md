@@ -103,7 +103,14 @@ commit in `commit_base`. `compare.py` and `derived.py` produce
 | `wpx` (block pairs) | 6 | 0.067 |
 
 Per cell (`w1x`; dense degree-4 seconds from the committed records, 4 threads,
-where they store it; window seconds at 3 threads):
+where they store it; window seconds at 3 threads).
+
+**The seconds columns are uncontrolled diagnostics, not a speed result.** The two
+engines ran at different thread counts, on different occasions, in fixed order, with
+no A/A noise floor and no interleaved rounds (AGENTS.md, "Measure the noise floor,
+then interleave"). No speedup is claimed from them. What this section establishes
+is about columns, recall and soundness, which are counts. A speed comparison would
+need a matched, isolated, interleaved rerun.
 
 | `m:n:ℓ` | `N` | `d_F = 4` draws certified | `w1x` cols | dense cols | cols ratio | `w1x` s (median) | dense deg-4 s (median) | `w1x` basis MB |
 |:--|--:|--:|--:|--:|--:|--:|--:|--:|
@@ -121,7 +128,8 @@ where they store it; window seconds at 3 threads):
 
 (All 27 cells are in `validation_summary.txt`; the smaller ones are all 100% too.)
 At `N = 54` the `w1x` basis is 0.37 GB against the dense engine's measured 12.6 GB
-peak, and the closure is 4–65× faster (window at 3 threads, dense at 4).
+peak. The recorded wall times are 4–65× lower for `w1x`, but they were taken at 3
+threads against 4, uncontrolled (see above). This is not a speed claim.
 
 ## 4. Scaling on fresh draws (balanced diagonal, measured)
 
@@ -146,8 +154,9 @@ threads, one process per draw) was then run on the same draws for reference.
 - **4:16:4 is certified `d_F = 4` on all four draws by the window engine alone**
   (full degree-3 closure without `1`, plus `1 ∈ W_M`); the dense reference was
   needed only for timing. The dense run was stopped by the 2 h background limit
-  during draw 1, so it covers draw 0 only (`scaling.log`). Window 3.7× faster,
-  2.9× less RAM on that draw.
+  during draw 1, so it covers draw 0 only (`scaling.log`). On that draw the recorded
+  window wall time is 3.7× lower (an uncontrolled diagnostic, not a speed claim), and
+  its peak RSS is 2.9× lower.
 - **3:21:7: `d_F ≥ 5` on all four draws (dense engine).** The degree-4 dense
   closure reaches its fixpoint at 116,485–118,185 of 124,314 columns without `1`.
   The draws are unsatisfiable by two counters (`chained_s3_solution_count_fast`
