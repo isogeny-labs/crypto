@@ -296,6 +296,36 @@ class WorkflowWiringPaths(unittest.TestCase):
         )
 
 
+class SparsePattern(unittest.TestCase):
+    """The pull step runs tools/artifacts/artifacts.py, so a sparse checkout must fetch it,
+    whether its patterns are a block scalar or a single inline path."""
+
+    def test_inline_cone_path_becomes_a_block(self):
+        block = ["      - uses: actions/checkout@v4", "        with:",
+                 "          sparse-checkout: taskq/deploy/eks-karpenter"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(block, "      ")[2:], [
+            "          sparse-checkout: |",
+            "            taskq/deploy/eks-karpenter",
+            "            tools/artifacts",
+        ])
+
+    def test_inline_non_cone_path(self):
+        block = ["      - uses: actions/checkout@v4", "        with:",
+                 "          sparse-checkout-cone-mode: false", "          sparse-checkout: /Cargo.toml"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(block, "      ")[-2:],
+                         ["            /Cargo.toml", "            /tools/artifacts/"])
+
+    def test_expression_and_block_forms(self):
+        expr = ["      - uses: actions/checkout@v4", "        with:",
+                "          sparse-checkout: ${{ matrix.paths }}"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(expr, "      "), expr)
+        blk = ["      - uses: actions/checkout@v4", "        with:",
+               "          sparse-checkout: |", "            src"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(blk, "      ")[-1], "            tools/artifacts")
+        done = wire_workflows.add_sparse_pattern(blk, "      ")
+        self.assertEqual(wire_workflows.add_sparse_pattern(done, "      "), done)
+
+
 class S3Argv(unittest.TestCase):
     def setUp(self):
         cfg = artifacts.Config(root=Path("."), remote="s3://bucket/store", endpoint=None, read_url=None,

@@ -150,6 +150,16 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
 def add_sparse_pattern(block: list[str], indent: str) -> list[str]:
     """Make a sparse checkout also fetch tools/artifacts."""
     for k, b in enumerate(block):
+        # single-line form (`sparse-checkout: some/path`): rewrite as a block scalar
+        m = re.match(rf"^({indent}    sparse-checkout: )(?!\|)(\S.*)$", b)
+        if m and "${{" not in m.group(2):
+            cone = not any("sparse-checkout-cone-mode: false" in x for x in block)
+            item = m.group(2).strip()
+            if "tools/artifacts" in item or item in ("/*", "tools", "/tools/"):
+                return block
+            pad = indent + "      "
+            return block[:k] + [m.group(1) + "|", pad + item,
+                                pad + ("tools/artifacts" if cone else "/tools/artifacts/")] + block[k + 1:]
         if re.match(rf"^{indent}    sparse-checkout: \|", b):
             cone = not any("sparse-checkout-cone-mode: false" in x for x in block)
             items = []
