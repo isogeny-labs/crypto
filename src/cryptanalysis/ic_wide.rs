@@ -133,6 +133,42 @@ struct Tally {
     abandoned: u64,
     capped: u64,
     canonicalisations: u64,
+    // Native work the unbatched walk does besides its group operations,
+    // read by `rho_negation_tallied` (nothing else depends on it).
+    key_evals: u64,
+    mix_evals: u64,
+    neg_evals: u64,
+    flips: u64,
+    scalar_mod_ops: u64,
+    window_scans: u64,
+    window_scan_elems: u64,
+    window_pushes: u64,
+    table_queries: u64,
+    table_inserts: u64,
+    scalar_mulmods: u64,
+    scalar_invmods: u64,
+    rng_draws: u64,
+}
+
+/// What [`rho_negation`] did besides its group operations: the native
+/// work the full-pricing methods charge.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct NegationNative {
+    pub canonicalisations: u64,
+    pub key_evals: u64,
+    pub mix_evals: u64,
+    pub neg_evals: u64,
+    pub canonical_flips: u64,
+    pub scalar_mod_ops: u64,
+    pub window_scans: u64,
+    pub window_scan_elems: u64,
+    pub window_pushes: u64,
+    pub table_queries: u64,
+    pub table_inserts: u64,
+    pub scalar_mulmods: u64,
+    pub scalar_invmods: u64,
+    pub rng_draws: u64,
+    pub starts: u64,
 }
 
 impl Tally {
@@ -152,8 +188,12 @@ fn canon<G: CountedGroup, S: RhoScalar>(
     tally: &mut Tally,
 ) -> (G::Elt, S, S, bool) {
     tally.canonicalisations += 1;
+    tally.neg_evals += 1;
+    tally.key_evals += 2;
     let n = g.neg(p);
     if g.key(&n) < g.key(&p) {
+        tally.flips += 1;
+        tally.scalar_mod_ops += 2;
         (
             n,
             S::sub_mod(S::zero(), a, r),
@@ -176,6 +216,20 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
     seed: u64,
     max_steps: u64,
 ) -> (RhoResult, Option<S>) {
+    let (res, d, _) = rho_negation_tallied(g, generator, target, r, seed, max_steps);
+    (res, d)
+}
+
+/// [`rho_negation`], and the native work it did besides its group
+/// operations (the walk, its draws and counts are identical).
+pub fn rho_negation_tallied<G: CountedGroup, S: RhoScalar>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: S,
+    seed: u64,
+    max_steps: u64,
+) -> (RhoResult, Option<S>, NegationNative) {
     let start = Instant::now();
     let mut ops = GroupOps::default();
     let mut rng = StdRng::seed_from_u64(seed);
@@ -201,6 +255,13 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
     let two: S = s_of(2);
     let short = (if r < cap_s { r } else { cap_s }).max(two);
     let r2 = r.max(two);
+    let mut tally = Tally {
+        // Two draws per jump, two for the stride, and the scalar
+        // reductions of the jump coefficients and the start.
+        rng_draws: 2 * jump_count as u64 + 2,
+        scalar_mod_ops: 2 * jump_count as u64 + 2,
+        ..Tally::default()
+    };
     let gq = g.add(&mut ops, generator, target);
     let jumps: Vec<(G::Elt, S, S)> = (0..jump_count)
         .map(|_| {
@@ -221,14 +282,18 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
     while g.is_identity(&stride) {
         ta = gen_below(&mut rng, S::one(), r2);
         tb = gen_below(&mut rng, S::one(), r2);
+        tally.rng_draws += 2;
         stride = joint_mul_s(g, &mut ops, generator, target, gq, ta, tb);
     }
     let setup = ops;
 
-    let index = |x: &G::Elt| ((mix(g.key(x)) >> 24) % jump_count as u64) as usize;
+    let index = |t: &mut Tally, x: &G::Elt| {
+        t.key_evals += 1;
+        t.mix_evals += 1;
+        ((mix(g.key(x)) >> 24) % jump_count as u64) as usize
+    };
     let mut table: HashMap<u64, (S, S)> = HashMap::with_capacity(1024);
     let expected = generic_floor_ops(r.to_f64(), 2.0);
-    let mut tally = Tally::default();
     let (mut walks, mut dps, mut start_adds) = (0u64, 0u64, 0u64);
     let (mut useless, mut verification_ops) = (0u64, 0u64);
     let mut recovered: Option<S> = None;
@@ -246,6 +311,7 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
             sx = g.add(&mut ops, sx, stride);
             sa = S::add_mod(sa, ta, r);
             sb = S::add_mod(sb, tb, r);
+            tally.scalar_mod_ops += 2;
             start_adds += 1;
         }
         if g.is_identity(&sx) {
@@ -258,12 +324,13 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
             let mut last_escape: Option<u64> = None;
             let mut len = 0u64;
             loop {
-                let j0 = index(&x);
+                let j0 = index(&mut tally, &x);
                 let mut tried = 0usize;
                 let (y, ya, yb) = loop {
                     let j = (j0 + tried) % jump_count;
                     let (m, aj, bj) = jumps[j];
                     let sum = g.add(&mut ops, x, m);
+                    tally.scalar_mod_ops += 2;
                     let (y, ya, yb, flipped) = canon(
                         g,
                         sum,
@@ -273,7 +340,11 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
                         &mut tally,
                     );
                     tried += 1;
-                    if flipped && tried < jump_count && !g.is_identity(&y) && index(&y) == j {
+                    if flipped
+                        && tried < jump_count
+                        && !g.is_identity(&y)
+                        && index(&mut tally, &y) == j
+                    {
                         tally.look_ahead_adds += 1;
                         continue;
                     }
@@ -288,8 +359,13 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
                     break 'walk None;
                 }
                 let key = g.key(&x);
-                if let Some(pos) = recent.iter().position(|e| e.0 == key) {
+                tally.key_evals += 1;
+                tally.window_scans += 1;
+                let found = recent.iter().position(|e| e.0 == key);
+                tally.window_scan_elems += found.map_or(recent.len(), |p| p + 1) as u64;
+                if let Some(pos) = found {
                     let c = recent.len() - pos;
+                    tally.window_scan_elems += c as u64;
                     match c {
                         2 => tally.cycles_2 += 1,
                         4 => tally.cycles_4 += 1,
@@ -308,6 +384,7 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
                     last_escape = Some(min_key);
                     let d2 = g.double(&mut ops, mp);
                     tally.escapes += 1;
+                    tally.scalar_mod_ops += 2;
                     let (e, ea, eb, _) = canon(
                         g,
                         d2,
@@ -325,6 +402,9 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
                     }
                 }
                 recent.push_back((g.key(&x), x, a, b));
+                tally.key_evals += 2;
+                tally.mix_evals += 1;
+                tally.window_pushes += 1;
                 if recent.len() > window {
                     recent.pop_front();
                 }
@@ -345,12 +425,17 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
         };
         dps += 1;
         let key = g.key(&x);
+        tally.key_evals += 1;
+        tally.table_queries += 1;
         match table.get(&key) {
             Some(&(a2, b2)) => {
                 if b2 != b {
                     let num = S::sub_mod(a, a2, r);
                     let den = S::sub_mod(b2, b, r);
+                    tally.scalar_mod_ops += 2;
+                    tally.scalar_invmods += 1;
                     if let Some(inv) = S::inverse_mod(den, r) {
+                        tally.scalar_mulmods += 1;
                         let d = S::mul_mod(num, inv, r);
                         let before = ops.gae();
                         let check = mul_s(g, &mut ops, generator, d);
@@ -364,6 +449,7 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
                 useless += 1;
             }
             None => {
+                tally.table_inserts += 1;
                 table.insert(key, (a, b));
             }
         }
@@ -372,6 +458,23 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
     let gae = ops.gae();
     let walked = tally.walk_ops();
     let rf = r.to_f64();
+    let native = NegationNative {
+        canonicalisations: tally.canonicalisations,
+        key_evals: tally.key_evals,
+        mix_evals: tally.mix_evals,
+        neg_evals: tally.neg_evals,
+        canonical_flips: tally.flips,
+        scalar_mod_ops: tally.scalar_mod_ops,
+        window_scans: tally.window_scans,
+        window_scan_elems: tally.window_scan_elems,
+        window_pushes: tally.window_pushes,
+        table_queries: tally.table_queries,
+        table_inserts: tally.table_inserts,
+        scalar_mulmods: tally.scalar_mulmods,
+        scalar_invmods: tally.scalar_invmods,
+        rng_draws: tally.rng_draws,
+        starts: walks,
+    };
     let mut counters = BTreeMap::new();
     for (k, v) in [
         ("jumps", jump_count as u64),
@@ -411,7 +514,7 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
         recovered: recovered.and_then(|d| u64::try_from(d.to_u128()).ok()),
         counters,
     };
-    (res, recovered)
+    (res, recovered, native)
 }
 
 // ── Rho with the negation map, many walks in lockstep, batched inversion ─
@@ -481,6 +584,17 @@ pub struct BatchedRho {
     pub table_inserts: u64,
     /// Additions, subtractions and negations of the `(a, b)` coefficients mod `r`.
     pub scalar_mod_ops: u64,
+    /// Scans of a walk's recent-point window (one per accepted step that
+    /// is not the identity), the entries they compared, the entries a
+    /// cycle's minimum was taken over, and the points pushed.
+    pub window_scans: u64,
+    pub window_scan_elems: u64,
+    pub window_pushes: u64,
+    /// Modular multiplications and inversions of the collision solve.
+    pub scalar_mulmods: u64,
+    pub scalar_invmods: u64,
+    /// Random draws of the set-up.
+    pub rng_draws: u64,
     pub jumps: u64,
     pub dp_bits: u32,
     pub expected_steps: f64,
@@ -547,6 +661,8 @@ pub fn rho_negation_batched<S: RhoScalar>(
     let two: S = s_of(2);
     let short = (if r < cap_s { r } else { cap_s }).max(two);
     let r2 = r.max(two);
+    out.rng_draws = 2 * jump_count as u64 + 2;
+    out.scalar_mod_ops += 2 * jump_count as u64 + 2;
     let gq = c.add(&generator, &target);
     ops.adds += 1;
     let jumps: Vec<(PtB, S, S)> = (0..jump_count)
@@ -568,6 +684,7 @@ pub fn rho_negation_batched<S: RhoScalar>(
     while c.is_identity(&stride) {
         ta = gen_below(&mut rng, S::one(), r2);
         tb = gen_below(&mut rng, S::one(), r2);
+        out.rng_draws += 2;
         stride = joint_mul_s(c, &mut ops, generator, target, gq, ta, tb);
     }
     out.setup_ops = ops;
@@ -776,8 +893,12 @@ pub fn rho_negation_batched<S: RhoScalar>(
                 end = Some(None);
             } else {
                 let kx = f.pack(&w.x.x);
-                if let Some(pos) = w.recent.iter().position(|e| e.0 == kx) {
+                out.window_scans += 1;
+                let found = w.recent.iter().position(|e| e.0 == kx);
+                out.window_scan_elems += found.map_or(w.recent.len(), |p| p + 1) as u64;
+                if let Some(pos) = found {
                     let cyc = w.recent.len() - pos;
+                    out.window_scan_elems += cyc as u64;
                     match cyc {
                         2 => out.cycles_2 += 1,
                         4 => out.cycles_4 += 1,
@@ -815,6 +936,7 @@ pub fn rho_negation_batched<S: RhoScalar>(
                     }
                 }
                 if end.is_none() {
+                    out.window_pushes += 1;
                     w.recent.push_back((f.pack(&w.x.x), w.x, w.a, w.b));
                     if w.recent.len() > window {
                         w.recent.pop_front();
@@ -844,7 +966,9 @@ pub fn rho_negation_batched<S: RhoScalar>(
                                     let num = S::sub_mod(a, a2, r);
                                     let den = S::sub_mod(b2, b, r);
                                     out.scalar_mod_ops += 2;
+                                    out.scalar_invmods += 1;
                                     if let Some(inv) = S::inverse_mod(den, r) {
+                                        out.scalar_mulmods += 1;
                                         let d = S::mul_mod(num, inv, r);
                                         let before = fq();
                                         let mut vops = GroupOps::default();

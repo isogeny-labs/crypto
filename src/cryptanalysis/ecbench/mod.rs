@@ -43,6 +43,7 @@ pub mod claw;
 pub mod compare;
 pub mod conductor_gap;
 pub mod db;
+pub mod f2m4_price;
 pub mod frontier;
 pub mod generic;
 pub mod gpu;

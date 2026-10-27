@@ -1,0 +1,1233 @@
+//! Full pricing for curves over `F_{(2^m)^4}`: every native counter of
+//! `ic.pipeline` (with `gaudry-d4-bin`) and of the two negation-map rho
+//! methods charged in one unit, so that no record on either side of the
+//! comparison is a lower bound unless a counter has no rule here.
+//!
+//! **The unit.**  The primary unit of the k = 4 comparison is the counted
+//! `F_q` multiplication: one affine group addition is `fq_muls_per_add`
+//! of them (the `Gf2q` counter's delta over one addition), the solver's
+//! cost is its counted multiplications, and `GAE = F_q multiplications /
+//! fq_muls_per_add`.  Native work that is not a counted multiplication
+//! (canonicalisations, key and hash evaluations, table probes and inserts,
+//! scalar arithmetic modulo `r`, the solver's table inversions and the
+//! matrix elements its passes touch, large-prime arithmetic, the
+//! recent-point window, ...) is priced here in *`F_q`-multiplication
+//! equivalents* (FME): the time of the operation divided by the time of
+//! one `F_q` multiplication in the solver's own inner loop (a dense
+//! `axpy` element), measured on the same field by `ecbench
+//! price-units-f2m4` and committed in `f2m4_full_prices.json`.  A record's
+//! price is therefore a function of its counts and that file alone.
+//!
+//! **Convention, applied identically to both arms.**  A counted `F_q`
+//! multiplication, and an affine group operation of `fq_muls_per_add`
+//! multiplications, absorb the `F_q` additions and the loop control of
+//! their own formulas; the repository's unit has always done so and the
+//! rho and index-calculus arms are charged alike.  Everything else is a
+//! native counter and has a rule below.
+//!
+//! **Lower bounds.**  A counter that is nonzero and has no rule stays
+//! unpriced (`<name>_uncharged`), so the record is still marked a lower
+//! bound rather than silently dropping work.
+//!
+//! **The §5a band.**  Every full record exposes, in
+//! `detail.full_pricing`, the per-counter counts and charges and the
+//! total of native operations, so the same record can be read with its
+//! native work at 0, 0.1 and 1 GAE per operation: see [`band`].
+
+use std::collections::{BTreeMap, HashMap, VecDeque};
+use std::hint::black_box;
+use std::time::Instant;
+
+use rand::{rngs::StdRng, Rng, SeedableRng};
+use serde_json::{json, Value};
+
+use crate::cryptanalysis::ecbench::canonical::sha256_hex;
+use crate::cryptanalysis::ecbench::methods::{PhaseRecord, SolveReport};
+use crate::cryptanalysis::gaudry_quartic_bin::{wide_key, BinCurve, Fe, PtB};
+use crate::cryptanalysis::ic_boundary::{fast_map, CountedGroup, FastMap};
+use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+
+/// The measured table, compiled in.
+pub const F2M4_PRICES: &str = include_str!("f2m4_full_prices.json");
+
+/// The method ids that reprice, with the base each wraps.
+pub fn base_of(id: &str) -> Option<&'static str> {
+    match id {
+        "ic.pipeline_f2m4_full" => Some("ic.pipeline"),
+        "rho.negation_batched_full" => Some("rho.negation_batched"),
+        "rho.negation_f2m4_full" => Some("rho.negation"),
+        _ => None,
+    }
+}
+
+/// Every unit of a table row, as the ratio of its time to one counted
+/// `F_q` multiplication (a dense `axpy` element) on the same field.
+pub const UNITS: &[&str] = &[
+    "fq_inv_tab",
+    "elem_fill",
+    "elem_scan",
+    "axpy_skip",
+    "par_region",
+    "monomial_hash_op",
+    "rng_seed",
+    "rng_draw",
+    "fast_probe",
+    "fast_insert",
+    "guard_insert",
+    "key_eval",
+    "neg_eval",
+    "mix_eval",
+    "pack_eval",
+    "canon_batched",
+    "hash_x",
+    "window_scan_elem",
+    "window_push",
+    "dp_probe",
+    "dp_insert",
+    "scalar_mod_op",
+    "scalar_mulmod",
+    "scalar_invmod",
+    "row_op",
+    "lp_mulmod",
+    "lp_addsub",
+    "lp_entry",
+    "btree_op",
+    "relation_row",
+    "jump_shuffle",
+    "round_job",
+    "walk_start",
+];
+
+/// The key of a table row: `m{m}`, or `m{m}_u128` for a degree measured on
+/// both widths of subgroup order (only a degree whose orders straddle a
+/// word has two).
+pub fn row_key(m: u32, wide: bool) -> String {
+    if wide {
+        format!("m{m}_u128")
+    } else {
+        format!("m{m}")
+    }
+}
+
+/// The table row for `m` and the width of the subgroup order, as unit →
+/// FME.  A row measured on a curve whose order has the other width is
+/// refused: the arithmetic modulo `r` costs several times more past a word.
+pub fn row(m: u32, wide: bool) -> Result<BTreeMap<String, f64>, String> {
+    let doc: Value = serde_json::from_str(F2M4_PRICES).map_err(|e| e.to_string())?;
+    let want = if wide { 128 } else { 64 };
+    let instances = doc.get("instances").ok_or("the table has no instances")?;
+    let (key, inst) = [row_key(m, true), row_key(m, false)]
+        .into_iter()
+        .filter_map(|k| instances.get(&k).map(|v| (k, v)))
+        .find(|(_, v)| v.get("scalar_width_bits").and_then(Value::as_u64) == Some(want))
+        .ok_or_else(|| {
+            format!(
+                "src/cryptanalysis/ecbench/f2m4_full_prices.json has no row for m = {m} with \
+                 {want}-bit orders; measure it with `ecbench price-units-f2m4 --m {m}{}`",
+                if wide { " --wide" } else { "" }
+            )
+        })?;
+    let r = inst
+        .get("row")
+        .and_then(Value::as_object)
+        .ok_or_else(|| format!("row `{key}` has no units"))?;
+    let mut out = BTreeMap::new();
+    for u in UNITS {
+        let v = r
+            .get(*u)
+            .and_then(Value::as_f64)
+            .ok_or_else(|| format!("f2m4_full_prices.json row {key} lacks `{u}`"))?;
+        out.insert((*u).to_string(), v);
+    }
+    Ok(out)
+}
+
+// ── Rules ───────────────────────────────────────────────────────────────
+
+/// How one counter is charged.
+#[derive(Clone, Copy)]
+enum Rule {
+    /// A count of outcomes or shape, no work of its own (or work charged
+    /// through another counter, named in the rule table's comment).
+    Outcome,
+    /// Work already in the group operations or counted `F_q`
+    /// multiplications of the phase.
+    Counted,
+    /// A sum of units: FME = Σ k · unit · count.
+    Units(&'static [(&'static str, f64)]),
+}
+
+/// Every counter of `rho.negation_batched` and `rho.negation` (as
+/// `rho.negation_f2m4_full` reports it) that names work or its absence.
+fn rho_rule(counter: &str, batched: bool) -> Option<Rule> {
+    use Rule::*;
+    Some(match counter {
+        // Counts of outcomes, parameters, and group operations that the
+        // F_q counter (batched) or the group-operation ledger
+        // (unbatched) already prices.
+        "walks_parallel"
+        | "rounds"
+        | "distinguished_points"
+        | "useless_collisions"
+        | "steps"
+        | "look_ahead_additions"
+        | "cycle_escape_doublings"
+        | "cycles_length_2"
+        | "cycles_length_4"
+        | "cycles_other_length"
+        | "walks_abandoned_in_a_cycle"
+        | "walks_capped"
+        | "batched_additions"
+        | "unbatched_operations"
+        | "batch_inversions"
+        | "batch_fq4_multiplications"
+        | "jumps"
+        | "jump_coefficient_bits"
+        | "distinguished_point_bits"
+        | "setup_additions"
+        | "setup_doublings"
+        | "start_additions"
+        | "walk_operations"
+        | "verification_operations"
+        | "fq_muls_per_add"
+        | "canonical_flips"
+        | "walks"
+        // A canonicalisation's four F_q additions are inside its
+        // `canon_batched` unit; the unbatched walk's are inside `neg_eval`
+        // and `key_eval`.
+        | "canonicalisation_fq_additions" => Outcome,
+        "fq_operations_total"
+        | "fq_operations_setup"
+        | "fq_operations_batch_inversion"
+        | "fq_operations_batched_formula"
+        | "fq_operations_unbatched"
+        | "fq_operations_verification" => Counted,
+        // Batched: one canonicalisation compares two packed ordinates; the
+        // unbatched walk's is charged through its key and negation
+        // evaluations below.
+        "canonicalisations" if batched => Units(&[("canon_batched", 1.0)]),
+        "canonicalisations" => Outcome,
+        "hash_evaluations" => Units(&[("hash_x", 1.0)]),
+        "walks_started" => Units(&[("walk_start", 1.0)]),
+        // One job per accepted step or look-ahead retry.
+        "round_jobs" => Units(&[("round_job", 1.0)]),
+        // A batched scan packs the abscissa once and a push packs it again;
+        // the unbatched walk's keys are counted in `key_evaluations`.
+        "window_scans" if batched => Units(&[("pack_eval", 1.0)]),
+        "window_scans" => Outcome,
+        "window_scan_elements" => Units(&[("window_scan_elem", 1.0)]),
+        "window_pushes" if batched => Units(&[("window_push", 1.0), ("pack_eval", 1.0)]),
+        "window_pushes" => Units(&[("window_push", 1.0)]),
+        // Unbatched: the keys, mixes and negations the walk evaluates.
+        "key_evaluations" => Units(&[("key_eval", 1.0)]),
+        "mix_evaluations" => Units(&[("mix_eval", 1.0)]),
+        "negation_evaluations" => Units(&[("neg_eval", 1.0)]),
+        // Both.
+        "distinguished_point_table_queries" => Units(&[("dp_probe", 1.0)]),
+        "distinguished_point_table_inserts" => Units(&[("dp_insert", 1.0)]),
+        "scalar_mod_r_operations" => Units(&[("scalar_mod_op", 1.0)]),
+        "scalar_mulmods" => Units(&[("scalar_mulmod", 1.0)]),
+        "scalar_invmods" => Units(&[("scalar_invmod", 1.0)]),
+        "rng_draws" => Units(&[("rng_draw", 1.0)]),
+        _ => return None,
+    })
+}
+
+/// Every counter of the `ic.pipeline` records on a curve over
+/// `F_{(2^m)^4}` (both factor-base bases, both linear algebras, with and
+/// without large primes), plus the counters the full method injects.
+fn ic_rule(counter: &str) -> Option<Rule> {
+    use Rule::*;
+    Some(match counter {
+        // Outcomes and shapes.
+        "relations"
+        | "columns"
+        | "rank"
+        | "rows"
+        | "single_column_rows"
+        | "two_column_rows"
+        | "repeated_column_rows"
+        | "pinned_by_repeated_row"
+        | "direct_relations_skipped"
+        | "repeated_targets_skipped"
+        | "lift_failures"
+        | "unliftable_systems"
+        | "frobfold_mismatches"
+        | "s4_hits"
+        | "trials"
+        | "solver_budget_exceeded"
+        | "walk_pool_offsets"
+        | "walk_pool_restarts"
+        | "walk_pool_ops"
+        | "lp_decompositions_0_large"
+        | "lp_decompositions_1_large"
+        | "lp_decompositions_2_large"
+        | "lp_discarded"
+        | "lp_full_direct"
+        | "lp_full_merged"
+        | "lp_full_weight"
+        | "lp_merges"
+        | "lp_small_columns"
+        | "lp_stored_1_large"
+        | "lp_stored_2_large"
+        | "lp_stored_pivots"
+        | "inconsistent"
+        | "full_rank_unpinned"
+        | "verification_failures"
+        | "solver_calls" => Outcome,
+        // Counted F_q multiplications (the solver's, including its
+        // set-up) and the base lifts (their counted multiplications and
+        // the `x_of_t` before each).
+        "solver_ops" | "sqrt_solves" => Counted,
+        // Each trial inserts its target's key into the guard set.
+        "target_guard_probes" => Units(&[("guard_insert", 1.0), ("key_eval", 1.0)]),
+        "lookups" => Units(&[("fast_probe", 1.0)]),
+        "row_ops" => Units(&[("row_op", 1.0)]),
+        // One key, one hash and two coefficient additions per walk step.
+        "walk_steps" => Units(&[("key_eval", 1.0), ("mix_eval", 1.0), ("scalar_mod_op", 2.0)]),
+        // A restart permutes the jump table and adds an offset.
+        "walk_restarts" => Units(&[("jump_shuffle", 1.0), ("scalar_mod_op", 2.0)]),
+        // Two draws per jump or pool offset.
+        "walk_jumps" => Units(&[("rng_draw", 2.0)]),
+        // Counters the full method injects.
+        "relation_rows_built" => Units(&[("relation_row", 1.0)]),
+        "solver_table_inversions" => Units(&[("fq_inv_tab", 1.0)]),
+        "solver_element_fills" => Units(&[("elem_fill", 1.0)]),
+        "solver_element_scans" => Units(&[("elem_scan", 1.0)]),
+        "solver_element_skips" => Units(&[("axpy_skip", 1.0)]),
+        "solver_parallel_regions" => Units(&[("par_region", 1.0)]),
+        "solver_monomial_hash_ops" => Units(&[("monomial_hash_op", 1.0)]),
+        "solver_systems_built" => Units(&[("rng_seed", 1.0)]),
+        "witness_lookups" => Units(&[("fast_probe", 1.0), ("key_eval", 1.0)]),
+        "lp_modular_multiplications" => Units(&[("lp_mulmod", 1.0)]),
+        "lp_additions_subtractions" => Units(&[("lp_addsub", 1.0)]),
+        "lp_entries_merged" => Units(&[("lp_entry", 1.0)]),
+        "lp_pivot_probes" => Units(&[("dp_probe", 1.0)]),
+        "lp_pivot_inserts" => Units(&[("dp_insert", 1.0)]),
+        "lp_ordered_map_operations" => Units(&[("btree_op", 1.0)]),
+        "factor_base_points" => {
+            Units(&[("fast_insert", 2.0), ("fast_probe", 1.0), ("key_eval", 3.0)])
+        }
+        "factor_base_columns" => Units(&[("key_eval", 1.0), ("neg_eval", 4.0)]),
+        "factor_base_sort_comparisons" => Units(&[("elem_scan", 1.0)]),
+        _ => return None,
+    })
+}
+
+/// One charge: a counter, its count, and what it costs.
+#[derive(Clone, Debug)]
+pub struct Charge {
+    pub counter: String,
+    pub count: u64,
+    /// FME; `None` when the counter is a count of outcomes or work already
+    /// in the counted unit.
+    pub fme: f64,
+    /// Whether the counter is native work priced by a unit (so it counts
+    /// toward the band's native operations).
+    pub native: bool,
+}
+
+fn charge(rule: Rule, counter: &str, count: u64, u: &BTreeMap<String, f64>) -> Option<Charge> {
+    match rule {
+        Rule::Outcome | Rule::Counted => None,
+        Rule::Units(us) => Some(Charge {
+            counter: counter.to_string(),
+            count,
+            fme: us.iter().map(|(n, k)| k * u[*n] * count as f64).sum(),
+            native: true,
+        }),
+    }
+}
+
+/// Reprice a batched- or unbatched-rho report in place.  Counters are
+/// read from `rep.counters`; the group operations or `F_q` operations
+/// already in `rep.total_gae` stay; native work becomes a `natives` phase.
+pub fn reprice_rho(
+    rep: &mut SolveReport,
+    m: u32,
+    wide: bool,
+    per_add: f64,
+    batched: bool,
+) -> Result<BTreeMap<String, f64>, String> {
+    let units = row(m, wide)?;
+    let mut charges = Vec::new();
+    let mut unknown = Vec::new();
+    for (name, &count) in &rep.counters {
+        if count == 0 {
+            continue;
+        }
+        match rho_rule(name, batched) {
+            Some(rule) => charges.extend(charge(rule, name, count, &units)),
+            None => unknown.push(format!("{}_uncharged", name.trim_end_matches("_uncharged"))),
+        }
+    }
+    finish(rep, per_add, &units, charges, unknown, "natives");
+    Ok(units)
+}
+
+fn finish(
+    rep: &mut SolveReport,
+    per_add: f64,
+    units: &BTreeMap<String, f64>,
+    charges: Vec<Charge>,
+    mut unknown: Vec<String>,
+    phase: &str,
+) {
+    let fme: f64 = charges.iter().map(|c| c.fme).sum();
+    let native_ops: u64 = charges.iter().map(|c| c.count).sum();
+    let counted_gae = rep.total_gae;
+    let mut p = PhaseRecord {
+        name: phase.into(),
+        gae: fme / per_add,
+        ..Default::default()
+    };
+    for c in &charges {
+        p.native.insert(c.counter.clone(), c.count);
+    }
+    rep.phases.push(p);
+    rep.total_gae += fme / per_add;
+    unknown.sort();
+    unknown.dedup();
+    rep.unpriced = unknown;
+    let by_counter: BTreeMap<String, Value> = charges
+        .iter()
+        .map(|c| {
+            (
+                c.counter.clone(),
+                json!({"count": c.count, "fme": c.fme, "gae": c.fme / per_add}),
+            )
+        })
+        .collect();
+    let block = json!({
+        "unit": "GAE = (counted F_q multiplications + native work in F_q-multiplication equivalents) / fq_muls_per_add",
+        "table": "src/cryptanalysis/ecbench/f2m4_full_prices.json",
+        "table_sha256": sha256_hex(F2M4_PRICES.as_bytes()),
+        "units_fme": units,
+        "fq_muls_per_add": per_add,
+        "counted_gae": counted_gae,
+        "native_gae": fme / per_add,
+        "native_operations": native_ops,
+        "by_counter": by_counter,
+        "band": band(counted_gae, native_ops),
+        "convention": "a counted F_q multiplication and an affine group operation absorb the F_q additions and loop control of their own formulas; every other native counter has a rule or the record stays a lower bound",
+    });
+    match &mut rep.detail {
+        Value::Object(d) => {
+            d.insert("full_pricing".into(), block);
+        }
+        other => {
+            let old = std::mem::take(other);
+            *other = json!({"base": old, "full_pricing": block});
+        }
+    }
+}
+
+/// §5a: the total with the native work at 0, 0.1 and 1 GAE per operation
+/// instead of its measured price: `counted_gae + rate · native_operations`.
+/// `counted_gae` is everything the unit counted (group operations,
+/// counted `F_q` multiplications); native operations are the counts of the
+/// counters priced by a unit.
+pub fn band(counted_gae: f64, native_operations: u64) -> Value {
+    json!({
+        "native_gae_per_operation_0": counted_gae,
+        "native_gae_per_operation_0.1": counted_gae + 0.1 * native_operations as f64,
+        "native_gae_per_operation_1": counted_gae + native_operations as f64,
+    })
+}
+
+// ── IC ──────────────────────────────────────────────────────────────────
+
+/// What the index-calculus repricing needs besides the report.
+pub struct IcContext<'a> {
+    pub m: u32,
+    /// The subgroup order does not fit a word.
+    pub wide: bool,
+    pub per_add: f64,
+    /// Counted `F_q` multiplications of one base lift plus the `x_of_t`
+    /// before it, per attempt.
+    pub lift_muls: f64,
+    pub x_of_t_muls: f64,
+    pub oracle: &'a crate::cryptanalysis::gaudry_quartic_bin::OracleNative,
+    /// Factor-base points, columns and abscissae.
+    pub fb_points: u64,
+    pub fb_columns: u64,
+    pub fb_abscissae: u64,
+    /// The legacy estimate the pipeline added to the solver's operations
+    /// for large-prime merges (`lp_merge_mulmods`), replaced here by the
+    /// counted arithmetic.
+    pub lp_estimate: u64,
+}
+
+/// Reprice an `ic.pipeline` report of a curve over `F_{(2^m)^4}` in place:
+/// every phase is rebuilt from its group operations, its counted
+/// multiplications and lifts, and a charge for every other native counter.
+pub fn reprice_ic(
+    rep: &mut SolveReport,
+    ctx: &IcContext<'_>,
+) -> Result<BTreeMap<String, f64>, String> {
+    let units = row(ctx.m, ctx.wide)?;
+    let per_add = ctx.per_add;
+    let mut charges: Vec<Charge> = Vec::new();
+    let mut unknown: Vec<String> = Vec::new();
+    // Counters the full method injects, by phase.
+    let o = ctx.oracle;
+    let mut extra: BTreeMap<&str, Vec<(&str, u64)>> = BTreeMap::new();
+    let a = ctx.fb_abscissae.max(2);
+    extra.insert(
+        "factor_base",
+        vec![
+            ("factor_base_points", ctx.fb_points),
+            ("factor_base_columns", ctx.fb_columns),
+            (
+                "factor_base_sort_comparisons",
+                (a as f64 * (a as f64).log2()).ceil() as u64,
+            ),
+        ],
+    );
+    extra.insert(
+        "relations",
+        vec![
+            ("solver_systems_built", o.solves),
+            ("solver_table_inversions", o.table_inversions),
+            ("solver_element_fills", o.touch.fills),
+            ("solver_element_scans", o.touch.scans),
+            ("solver_element_skips", o.touch.skips),
+            ("solver_parallel_regions", o.touch.regions),
+            ("solver_monomial_hash_ops", o.monomial_hash_ops),
+            ("witness_lookups", o.witness_lookups),
+            ("lp_modular_multiplications", o.lp_mulmods),
+            ("lp_additions_subtractions", o.lp_addsubs),
+            ("lp_entries_merged", o.lp_entries),
+            ("lp_pivot_probes", o.lp_map_ops[0]),
+            ("lp_pivot_inserts", o.lp_map_ops[1]),
+            ("lp_ordered_map_operations", o.lp_map_ops[2]),
+        ],
+    );
+    let mut total = 0.0;
+    let mut counted_total = 0.0;
+    for p in rep.phases.iter_mut() {
+        // Group operations and counted multiplications.
+        let mut counted = (p.adds + p.doubles) as f64;
+        // `scalar_mults` is a tally of multiplications whose additions are
+        // already in `adds` and `doubles`.
+        let mut natives = p.native.clone();
+        for (k, v) in extra.get(p.name.as_str()).into_iter().flatten() {
+            if *v > 0 {
+                natives.insert((*k).to_string(), *v);
+            }
+        }
+        let mut native_fme = 0.0;
+        for (name, &count) in &natives {
+            if count == 0 {
+                continue;
+            }
+            match ic_rule(name) {
+                Some(Rule::Counted) => match name.as_str() {
+                    "solver_ops" => {
+                        // The pipeline's operations include its estimate for
+                        // the large-prime merges; those are counted below.
+                        counted += (count - ctx.lp_estimate.min(count)) as f64 / per_add;
+                    }
+                    "sqrt_solves" => {
+                        counted += count as f64 * (ctx.lift_muls + ctx.x_of_t_muls) / per_add;
+                    }
+                    _ => {}
+                },
+                Some(rule) => {
+                    if let Some(c) = charge(rule, name, count, &units) {
+                        native_fme += c.fme;
+                        charges.push(c);
+                    }
+                }
+                None => unknown.push(format!("{}_uncharged", name.trim_end_matches("_uncharged"))),
+            }
+        }
+        p.native = natives;
+        p.gae = counted + native_fme / per_add;
+        counted_total += counted;
+        total += p.gae;
+    }
+    // The pipeline's top-level counters are shapes (matrix rank and rows,
+    // targets tried, relations found), not work; anything else is not
+    // known to be.
+    for (name, &count) in &rep.counters {
+        let shape =
+            name.starts_with("matrix_") || name == "targets_tried" || name == "relations_found";
+        if count > 0 && !shape {
+            unknown.push(format!("{}_uncharged", name.trim_end_matches("_uncharged")));
+        }
+    }
+    rep.total_gae = total;
+    // Solver wall-time items stay what they were; native counters get rules.
+    let mut kept: Vec<String> = rep
+        .unpriced
+        .iter()
+        .filter(|u| u.starts_with("solver_") || u.starts_with("counts_lost"))
+        .cloned()
+        .collect();
+    kept.extend(unknown);
+    kept.sort();
+    kept.dedup();
+    rep.unpriced = kept;
+    let native_ops: u64 = charges.iter().map(|c| c.count).sum();
+    let native_gae: f64 = charges.iter().map(|c| c.fme).sum::<f64>() / per_add;
+    let by_counter: BTreeMap<String, Value> = {
+        let mut m: BTreeMap<String, (u64, f64)> = BTreeMap::new();
+        for c in &charges {
+            let e = m.entry(c.counter.clone()).or_default();
+            e.0 += c.count;
+            e.1 += c.fme;
+        }
+        m.into_iter()
+            .map(|(k, (n, f))| (k, json!({"count": n, "fme": f, "gae": f / per_add})))
+            .collect()
+    };
+    let block = json!({
+        "unit": "GAE = (counted F_q multiplications + native work in F_q-multiplication equivalents) / fq_muls_per_add",
+        "table": "src/cryptanalysis/ecbench/f2m4_full_prices.json",
+        "table_sha256": sha256_hex(F2M4_PRICES.as_bytes()),
+        "units_fme": units,
+        "fq_muls_per_add": per_add,
+        "counted_gae": counted_total,
+        "native_gae": native_gae,
+        "native_operations": native_ops,
+        "large_prime_estimate_replaced": ctx.lp_estimate,
+        "by_counter": by_counter,
+        "band": band(counted_total, native_ops),
+        "convention": "a counted F_q multiplication and an affine group operation absorb the F_q additions and loop control of their own formulas; every other native counter has a rule or the record stays a lower bound",
+    });
+    match &mut rep.detail {
+        Value::Object(d) => {
+            d.insert("full_pricing".into(), block);
+        }
+        other => {
+            let old = std::mem::take(other);
+            *other = json!({"base": old, "full_pricing": block});
+        }
+    }
+    Ok(units)
+}
+
+// ── Measuring the units ─────────────────────────────────────────────────
+
+fn median(mut v: Vec<f64>) -> f64 {
+    v.sort_by(|a, b| a.partial_cmp(b).expect("finite"));
+    let n = v.len();
+    if n % 2 == 1 {
+        v[n / 2]
+    } else {
+        (v[n / 2 - 1] + v[n / 2]) / 2.0
+    }
+}
+
+fn ns_per<F: FnMut(u64) -> u64>(iters: u64, mut f: F) -> f64 {
+    let start = Instant::now();
+    let mut acc = 0u64;
+    for i in 0..iters {
+        acc = acc.wrapping_add(f(i));
+    }
+    black_box(acc);
+    start.elapsed().as_nanos() as f64 / iters as f64
+}
+
+/// `ic_boundary::mix`, the walk's hash (private there).
+fn mix(v: u64) -> u64 {
+    let mut h = v ^ 0x2545_F491_4F6C_DD1D;
+    h = h.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+    h ^= h >> 31;
+    h = h.wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    h ^= h >> 29;
+    h
+}
+
+fn scalar_units<S: RhoScalar>(r: S, rng: &mut StdRng, out: &mut BTreeMap<&'static str, f64>) {
+    let draw = |rng: &mut StdRng| -> S {
+        let v = rng.gen::<u64>() as u128 | ((rng.gen::<u64>() as u128) << 64);
+        let v = v % r.to_u128().max(2);
+        S::from_biguint(&num_bigint::BigUint::from(v.max(1))).expect("below r")
+    };
+    let xs: Vec<S> = (0..1024).map(|_| draw(rng)).collect();
+    let iters = 4_000_000u64;
+    let mut acc = xs[0];
+    out.insert(
+        "scalar_mod_op",
+        ns_per(iters, |i| {
+            let x = xs[(i % 1024) as usize];
+            acc = if i & 1 == 0 {
+                S::add_mod(acc, x, r)
+            } else {
+                S::sub_mod(acc, x, r)
+            };
+            acc.to_u128() as u64
+        }),
+    );
+    let mut acc = xs[1];
+    out.insert(
+        "scalar_mulmod",
+        ns_per(1_000_000, |i| {
+            acc = S::mul_mod(acc, xs[(i % 1024) as usize], r);
+            acc.to_u128() as u64
+        }),
+    );
+    out.insert(
+        "scalar_invmod",
+        ns_per(20_000, |i| {
+            S::inverse_mod(xs[(i % 1024) as usize], r).map_or(0, |v| v.to_u128() as u64)
+        }),
+    );
+    // A relation-matrix multiply-subtract: row[j] -= f * pivot[j] (mod r).
+    let cols = 2048usize;
+    let pivot: Vec<S> = (0..cols).map(|_| draw(rng)).collect();
+    let mut row: Vec<S> = (0..cols).map(|_| draw(rng)).collect();
+    let passes = 300u64;
+    let start = Instant::now();
+    for k in 0..passes {
+        let f = xs[(k % 1024) as usize];
+        for j in 0..cols {
+            row[j] = S::sub_mod(row[j], S::mul_mod(f, pivot[j], r), r);
+        }
+    }
+    black_box(&row);
+    out.insert(
+        "row_op",
+        start.elapsed().as_nanos() as f64 / (passes * cols as u64) as f64,
+    );
+    // One relation's row: four summands into an ordered map, the column
+    // hash, the right-hand side, the sparse vector.
+    let cols4: Vec<usize> = (0..1024).map(|_| rng.gen_range(0..4096)).collect();
+    out.insert(
+        "relation_row",
+        ns_per(200_000, |i| {
+            let mut row: std::collections::BTreeMap<usize, S> = std::collections::BTreeMap::new();
+            for k in 0..4usize {
+                let c = cols4[((i as usize) * 4 + k) % 1024];
+                let e = row.entry(c).or_insert(S::zero());
+                *e = S::add_mod(*e, xs[(k + i as usize) % 1024], r);
+            }
+            row.retain(|_, v| *v != S::zero());
+            let mut h = 0x9E37_79B9_7F4A_7C15u64;
+            for (&c, &v) in &row {
+                let v = v.to_u128();
+                let v64 = (v as u64) ^ ((v >> 64) as u64).rotate_left(29);
+                h = mix(h ^ mix(((c as u64) << 32) ^ v64));
+            }
+            let dv = S::sub_mod(S::zero(), S::mul_mod(xs[0], xs[1], r), r);
+            let rhs = S::mul_mod(xs[2], xs[3], r);
+            let mut sparse: Vec<(usize, S)> = row.into_iter().collect();
+            sparse.push((4096, dv));
+            h ^ rhs.to_u128() as u64 ^ sparse.len() as u64
+        }),
+    );
+}
+
+/// Measure every unit on `inst`'s field once and return unit → ns.
+fn measure_once(inst: &BinCurve, seed: u64) -> BTreeMap<&'static str, f64> {
+    let c = &inst.curve;
+    let f = &c.f;
+    let g = &f.f.tab;
+    let q = f.f.q;
+    let m = f.f.m;
+    let mut rng = StdRng::seed_from_u64(seed);
+    let mut out: BTreeMap<&'static str, f64> = BTreeMap::new();
+
+    // The reference: a dense axpy element (log-table multiply and XOR).
+    let n = 4096usize;
+    let piv: Vec<Fe> = (0..n).map(|_| rng.gen_range(1..q)).collect();
+    let mut row: Vec<Fe> = (0..n).map(|_| rng.gen_range(0..q)).collect();
+    let passes = 600u64;
+    let start = Instant::now();
+    for k in 0..passes {
+        g.axpy(
+            &mut row,
+            &piv,
+            1 + ((k as u32).wrapping_mul(7919) % (q - 1)),
+        );
+    }
+    black_box(&row);
+    out.insert(
+        "fq_mul",
+        start.elapsed().as_nanos() as f64 / (passes * n as u64) as f64,
+    );
+    let xs: Vec<Fe> = (0..1024).map(|_| rng.gen_range(1..q)).collect();
+    out.insert(
+        "fq_inv_tab",
+        ns_per(4_000_000, |i| u64::from(g.inv(xs[(i % 1024) as usize]))),
+    );
+    // Passes that multiply nothing, which the solver's elimination makes
+    // over its rows: count a row's nonzero entries, scan it for its
+    // leading entry, and step over its zero entries in a dense axpy (a
+    // quarter of the pivot's entries nonzero).  The unit is their mean.
+    let mut zero_tail = vec![0u32; n];
+    zero_tail[n - 1] = 1;
+    let sparse_piv: Vec<Fe> = (0..n)
+        .map(|_| {
+            if rng.gen_range(0..4) == 0 {
+                rng.gen_range(1..q)
+            } else {
+                0
+            }
+        })
+        .collect();
+    let start = Instant::now();
+    let mut s1 = 0usize;
+    for _ in 0..passes {
+        s1 += black_box(&row).iter().filter(|&&x| x != 0).count();
+    }
+    black_box(s1);
+    let count_ns = start.elapsed().as_nanos() as f64 / (passes * n as u64) as f64;
+    let start = Instant::now();
+    let mut s2 = 0usize;
+    for _ in 0..passes {
+        s2 += black_box(&zero_tail)
+            .iter()
+            .position(|&x| x != 0)
+            .unwrap_or(0);
+    }
+    black_box(s2);
+    let scan_ns = start.elapsed().as_nanos() as f64 / (passes * n as u64) as f64;
+    let start = Instant::now();
+    for k in 0..passes {
+        g.axpy(
+            &mut row,
+            &sparse_piv,
+            1 + ((k as u32).wrapping_mul(104_729) % (q - 1)),
+        );
+    }
+    black_box(&row);
+    let sparse_ns = start.elapsed().as_nanos() as f64 / (passes * n as u64) as f64;
+    out.insert("elem_scan", (count_ns + scan_ns) / 2.0);
+    // A dense axpy over a pivot with a quarter of its entries nonzero costs
+    // its nonzero entries a multiplication each and its zero entries a
+    // skip.
+    let frac = sparse_piv.iter().filter(|&&x| x != 0).count() as f64 / n as f64;
+    out.insert(
+        "axpy_skip",
+        ((sparse_ns - frac * out["fq_mul"]) / (1.0 - frac)).max(0.0),
+    );
+    // One fork and join of a small parallel region (four rows, a trivial
+    // body) on a one-thread pool: the dispatch work itself (the job, the
+    // latch, the split), which every run pays.  What a multi-thread pool
+    // adds is waiting for sleeping workers to be scheduled, a property of
+    // the host's load and placement that a count cannot carry; evidence
+    // runs pin the solve to one core (`ecbench run --cpus auto`).
+    {
+        use rayon::prelude::*;
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .expect("a one-thread pool");
+        let mut small: Vec<(u32, Vec<Fe>)> = (0..4).map(|k| (k, vec![1u32; 8])).collect();
+        out.insert(
+            "par_region",
+            pool.install(|| {
+                ns_per(400_000, |_| {
+                    small.par_iter_mut().for_each(|(k, v)| {
+                        v[(*k as usize) % 8] ^= 1;
+                    });
+                    u64::from(small[0].1[0])
+                })
+            }),
+        );
+    }
+    // Zero-filling a new row.
+    let start = Instant::now();
+    for k in 0..passes {
+        let mut v = vec![0u32; black_box(n)];
+        v[(k as usize) % n] = 1;
+        black_box(&v);
+    }
+    out.insert(
+        "elem_fill",
+        start.elapsed().as_nanos() as f64 / (passes * n as u64) as f64,
+    );
+    let keys4: Vec<[u8; 4]> = (0..600)
+        .map(|_| core::array::from_fn(|_| rng.gen_range(0..12)))
+        .collect();
+    let mono: HashMap<[u8; 4], usize> = keys4.iter().enumerate().map(|(i, k)| (*k, i)).collect();
+    out.insert(
+        "monomial_hash_op",
+        ns_per(2_000_000, |i| {
+            mono.get(&keys4[(i % 600) as usize]).copied().unwrap_or(0) as u64
+        }),
+    );
+    out.insert(
+        "rng_seed",
+        ns_per(200_000, |i| {
+            StdRng::seed_from_u64(i ^ 0x9e37_79b9).gen::<u64>()
+        }),
+    );
+    let mut r2 = StdRng::seed_from_u64(seed ^ 1);
+    out.insert("rng_draw", ns_per(4_000_000, |_| r2.gen::<u64>()));
+    out.insert("mix_eval", ns_per(8_000_000, |i| mix(i)));
+
+    // Points.
+    let mut pts: Vec<PtB> = Vec::with_capacity(256);
+    while pts.len() < 256 {
+        let x = f.random(&mut rng);
+        if let Some(p) = c.lift_x(&x, &mut rng) {
+            pts.push(p);
+        }
+    }
+    out.insert(
+        "key_eval",
+        ns_per(2_000_000, |i| {
+            CountedGroup::key(c, &pts[(i % 256) as usize])
+        }),
+    );
+    out.insert(
+        "neg_eval",
+        ns_per(2_000_000, |i| {
+            u64::from(c.neg(&pts[(i % 256) as usize]).y.0[0])
+        }),
+    );
+    out.insert(
+        "pack_eval",
+        ns_per(4_000_000, |i| f.pack(&pts[(i % 256) as usize].x) as u64),
+    );
+    out.insert(
+        "canon_batched",
+        ns_per(2_000_000, |i| {
+            let p = pts[(i % 256) as usize];
+            let ny = p.x.add(&p.y);
+            let q = if f.pack(&ny) < f.pack(&p.y) {
+                PtB {
+                    x: p.x,
+                    y: ny,
+                    inf: false,
+                }
+            } else {
+                p
+            };
+            u64::from(q.y.0[0])
+        }),
+    );
+    out.insert(
+        "hash_x",
+        ns_per(2_000_000, |i| {
+            mix(wide_key(f.pack(&pts[(i % 256) as usize].x)))
+        }),
+    );
+
+    // The recent-point window: 16 entries of (key, point, a, b).
+    let mut recent: VecDeque<(u128, PtB, u128, u128)> = VecDeque::with_capacity(17);
+    for k in 0..16u128 {
+        recent.push_back((k + 1000, pts[k as usize], k, k));
+    }
+    let scan = ns_per(2_000_000, |i| {
+        let key = f.pack(&pts[(i % 256) as usize].x) | (1u128 << 100);
+        recent.iter().position(|e| e.0 == key).unwrap_or(16) as u64
+    });
+    // Subtract the pack that the scan loop includes, then per element.
+    out.insert(
+        "window_scan_elem",
+        ((scan - out["pack_eval"]).max(0.0)) / 16.0,
+    );
+    out.insert(
+        "window_push",
+        ns_per(4_000_000, |i| {
+            recent.push_back((i as u128, pts[(i % 256) as usize], 1, 2));
+            if recent.len() > 16 {
+                recent.pop_front();
+            }
+            recent.len() as u64
+        }),
+    );
+    out.insert(
+        "walk_start",
+        ns_per(1_000_000, |i| {
+            let d: VecDeque<(u128, PtB, u128, u128)> = VecDeque::with_capacity(black_box(17));
+            black_box(&d);
+            i
+        }),
+    );
+
+    // Hash tables of the sizes the methods use.
+    // At least 2^14 entries, so that the allocation of a small table is
+    // not charged to its few inserts.
+    let size = (1usize << (m + 1)).clamp(1 << 14, 1 << 22);
+    let mut fm: FastMap<u32> = fast_map(size);
+    let mut insert_rng = StdRng::seed_from_u64(seed ^ 2);
+    let start = Instant::now();
+    for i in 0..size {
+        fm.insert(insert_rng.gen::<u64>(), i as u32);
+    }
+    out.insert(
+        "fast_insert",
+        start.elapsed().as_nanos() as f64 / size as f64,
+    );
+    let hit_keys: Vec<u64> = fm.keys().copied().step_by(97).take(1 << 13).collect();
+    let probes: Vec<u64> = (0..(1usize << 14))
+        .map(|i| {
+            if i % 2 == 0 {
+                hit_keys[(i / 2) % hit_keys.len()]
+            } else {
+                insert_rng.gen::<u64>()
+            }
+        })
+        .collect();
+    out.insert(
+        "fast_probe",
+        ns_per(2_000_000, |i| {
+            u64::from(fm.contains_key(&probes[(i as usize) % probes.len()]))
+        }),
+    );
+    // The guard set of the relation loop, grown to a million entries.
+    let mut guard: HashMap<u64, ()> = HashMap::with_capacity(1 << 21);
+    for _ in 0..(1u32 << 20) {
+        guard.insert(insert_rng.gen::<u64>(), ());
+    }
+    out.insert(
+        "guard_insert",
+        ns_per(1 << 18, |_| {
+            u64::from(guard.insert(insert_rng.gen::<u64>(), ()).is_some())
+        }),
+    );
+    // The distinguished-point table, growing from 4096.
+    let mut dp: HashMap<u128, (u128, u128)> = HashMap::with_capacity(4096);
+    let start = Instant::now();
+    let mut dp_keys = Vec::with_capacity(size);
+    for i in 0..size {
+        let k = (insert_rng.gen::<u64>() as u128) << 40 | i as u128;
+        dp_keys.push(k);
+        dp.insert(k, (i as u128, 1));
+    }
+    out.insert("dp_insert", start.elapsed().as_nanos() as f64 / size as f64);
+    out.insert(
+        "dp_probe",
+        ns_per(2_000_000, |i| {
+            let k = if i % 2 == 0 {
+                dp_keys[(i as usize / 2) % dp_keys.len()]
+            } else {
+                (insert_rng.gen::<u64>() as u128) << 40
+            };
+            u64::from(dp.contains_key(&k))
+        }),
+    );
+    let bt_keys: Vec<usize> = (0..1024).map(|_| insert_rng.gen_range(0..4096)).collect();
+    out.insert(
+        "btree_op",
+        ns_per(500_000, |i| {
+            let mut b: std::collections::BTreeMap<usize, u128> = Default::default();
+            for k in 0..4 {
+                *b.entry(bt_keys[(i as usize + k) % 1024]).or_insert(0) += 1;
+            }
+            b.len() as u64
+        }) / 4.0,
+    );
+    // The shuffle of the sixteen-entry jump table.
+    let mut perm: Vec<usize> = (0..16).collect();
+    out.insert(
+        "jump_shuffle",
+        ns_per(500_000, |_| {
+            for i in (1..16).rev() {
+                perm.swap(i, insert_rng.gen_range(0..i + 1));
+            }
+            perm[0] as u64
+        }),
+    );
+    // A round's bookkeeping for one walk: the job, the denominator, the
+    // take and put of the walk's state.
+    #[derive(Clone)]
+    #[allow(dead_code)]
+    struct Job {
+        slot: usize,
+        jump: usize,
+        denom: Option<crate::cryptanalysis::gaudry_quartic_bin::Eb>,
+        sum: Option<PtB>,
+    }
+    #[derive(Clone)]
+    #[allow(dead_code)]
+    struct Walk {
+        x: PtB,
+        a: u128,
+        b: u128,
+        tried: usize,
+        j0: usize,
+        len: u64,
+        last: Option<u128>,
+        recent: VecDeque<(u128, PtB, u128, u128)>,
+    }
+    let mut pool: Vec<Option<Walk>> = (0..256)
+        .map(|k| {
+            Some(Walk {
+                x: pts[k],
+                a: 1,
+                b: 2,
+                tried: 0,
+                j0: k % 16,
+                len: 0,
+                last: None,
+                recent: VecDeque::new(),
+            })
+        })
+        .collect();
+    let jump_pt = pts[7];
+    let mut jobs: Vec<Job> = Vec::with_capacity(256);
+    let rounds = 4_000u64;
+    let start = Instant::now();
+    let mut acc = 0u64;
+    for _ in 0..rounds {
+        jobs.clear();
+        for (slot, w) in pool.iter().enumerate() {
+            let Some(w) = w else { continue };
+            let j = (w.j0 + w.tried) % 16;
+            let d = w.x.x.add(&jump_pt.x);
+            jobs.push(Job {
+                slot,
+                jump: j,
+                denom: if d.is_zero() { None } else { Some(d) },
+                sum: None,
+            });
+        }
+        for job in jobs.drain(..) {
+            let mut w = pool[job.slot].take().unwrap();
+            w.len += 1;
+            w.tried = 0;
+            acc = acc.wrapping_add(job.jump as u64 + w.len);
+            pool[job.slot] = Some(w);
+        }
+    }
+    black_box(acc);
+    out.insert(
+        "round_job",
+        start.elapsed().as_nanos() as f64 / (rounds * 256) as f64,
+    );
+
+    // Arithmetic modulo r, at the width of r; the large-prime code always
+    // works in u128.
+    if let Ok(r64) = u64::try_from(inst.r) {
+        scalar_units::<u64>(r64, &mut rng, &mut out);
+    } else {
+        scalar_units::<u128>(inst.r, &mut rng, &mut out);
+    }
+    {
+        let r = inst.r;
+        let xs: Vec<u128> = (0..1024).map(|_| rng.gen::<u128>() % r.max(2)).collect();
+        let mut acc = xs[0].max(1);
+        out.insert(
+            "lp_mulmod",
+            ns_per(1_000_000, |i| {
+                acc = <u128 as RhoScalar>::mul_mod(acc, xs[(i % 1024) as usize].max(1), r);
+                acc as u64
+            }),
+        );
+        let mut acc = xs[1];
+        out.insert(
+            "lp_addsub",
+            ns_per(4_000_000, |i| {
+                let x = xs[(i % 1024) as usize];
+                acc = if acc >= x { acc - x } else { r - (x - acc) };
+                acc as u64
+            }),
+        );
+        // The merge loop of two sparse vectors, per entry, with the
+        // arithmetic replaced by a wrapping add (it is priced apart).
+        let xv: Vec<(usize, u128)> = (0..64).map(|k| (2 * k, xs[k] | 1)).collect();
+        let yv: Vec<(usize, u128)> = (0..64).map(|k| (3 * k, xs[k + 64] | 1)).collect();
+        let per_merge = ns_per(100_000, |_| {
+            let mut o: Vec<(usize, u128)> = Vec::with_capacity(128);
+            let (mut i, mut j) = (0, 0);
+            while i < xv.len() || j < yv.len() {
+                let take_x = j >= yv.len() || (i < xv.len() && xv[i].0 < yv[j].0);
+                let take_y = i >= xv.len() || (j < yv.len() && yv[j].0 < xv[i].0);
+                if take_x {
+                    o.push(xv[i]);
+                    i += 1;
+                } else if take_y {
+                    o.push((yv[j].0, yv[j].1.wrapping_add(1)));
+                    j += 1;
+                } else {
+                    o.push((xv[i].0, xv[i].1.wrapping_add(yv[j].1)));
+                    i += 1;
+                    j += 1;
+                }
+            }
+            o.len() as u64
+        });
+        out.insert("lp_entry", per_merge / 128.0);
+    }
+    out
+}
+
+/// Measure every unit for `inst` `reps` times on this host and return the
+/// median ratio to one `F_q` multiplication per unit, with the per-rep
+/// ratios and the multiplication's own time.
+pub fn measure(inst: &BinCurve, reps: usize) -> Result<Value, String> {
+    let mut ratios: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
+    let mut mul_ns = Vec::new();
+    for k in 0..reps.max(1) {
+        let t = measure_once(inst, 0xF2 + k as u64);
+        let mul = t["fq_mul"];
+        if mul <= 0.0 {
+            return Err("an F_q multiplication measured at zero nanoseconds".into());
+        }
+        mul_ns.push(mul);
+        for (u, ns) in t {
+            if u != "fq_mul" {
+                ratios.entry(u).or_default().push(ns / mul);
+            }
+        }
+    }
+    let mut row = serde_json::Map::new();
+    let mut per_rep = serde_json::Map::new();
+    for u in UNITS {
+        let v = ratios
+            .get(u)
+            .ok_or_else(|| format!("unit {u} was not measured"))?;
+        if v.iter().any(|x| !x.is_finite() || *x < 0.0) {
+            return Err(format!("unit {u} did not measure"));
+        }
+        row.insert((*u).into(), json!((median(v.clone()) * 1e6).round() / 1e6));
+        per_rep.insert((*u).into(), json!(v));
+    }
+    Ok(json!({
+        "row": row,
+        "scalar_width_bits": if u64::try_from(inst.r).is_ok() { 64 } else { 128 },
+        "reps": reps,
+        "ns_per_fq_mul_median": median(mul_ns.clone()),
+        "ns_per_fq_mul": mul_ns,
+        "ratios_per_rep": per_rep,
+    }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_table_parses_and_every_row_has_every_unit() {
+        let doc: Value = serde_json::from_str(F2M4_PRICES).unwrap();
+        let inst = doc["instances"].as_object().unwrap();
+        assert!(!inst.is_empty());
+        for (k, v) in inst {
+            let wide = v["scalar_width_bits"] == 128;
+            let m: u32 = k
+                .trim_start_matches('m')
+                .trim_end_matches("_u128")
+                .parse()
+                .unwrap();
+            let r = row(m, wide).unwrap();
+            assert_eq!(r.len(), UNITS.len());
+            assert!(r.values().all(|v| *v > 0.0), "{k}: a unit priced at zero");
+        }
+    }
+
+    #[test]
+    fn the_ids_have_bases() {
+        for id in [
+            "ic.pipeline_f2m4_full",
+            "rho.negation_batched_full",
+            "rho.negation_f2m4_full",
+        ] {
+            assert!(base_of(id).is_some());
+        }
+    }
+
+    #[test]
+    fn the_band_is_linear_in_the_rate() {
+        let b = band(100.0, 50);
+        assert_eq!(b["native_gae_per_operation_0"], 100.0);
+        assert_eq!(b["native_gae_per_operation_0.1"], 105.0);
+        assert_eq!(b["native_gae_per_operation_1"], 150.0);
+    }
+}

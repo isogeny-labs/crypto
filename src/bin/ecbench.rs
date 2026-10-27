@@ -196,6 +196,24 @@ enum Cmd {
         #[arg(long)]
         reference: Option<String>,
     },
+    /// Measure the full-pricing units for curves over F_(2^m)^4
+    /// (src/cryptanalysis/ecbench/f2m4_full_prices.json), as ratios to one
+    /// counted F_q multiplication, median of --reps passes.
+    PriceUnitsF2m4 {
+        /// Field degrees m (4m is the group's bit length), comma separated.
+        #[arg(long, value_delimiter = ',', required = true)]
+        m: Vec<u32>,
+        #[arg(long, default_value_t = 1)]
+        seed: u64,
+        #[arg(long, default_value_t = 15)]
+        reps: usize,
+        /// Measure on a curve whose subgroup order does not fit a word
+        /// (the row is named m{m}_u128; seeds from --seed are scanned).
+        #[arg(long)]
+        wide: bool,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
     /// Resource vectors for all measured attempts; no invented SAT/GAE conversion.
     Resources {
         #[arg(long)]
@@ -941,6 +959,59 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             }
         }
         Cmd::Table { dir, reference } => table(&dir, reference.as_deref())?,
+        Cmd::PriceUnitsF2m4 {
+            m,
+            seed,
+            reps,
+            wide,
+            out,
+        } => {
+            let mut instances = serde_json::Map::new();
+            for mm in m {
+                // The cofactor bound of the committed sessions' workloads.
+                let cof = if mm >= 15 { 2 } else { 16 };
+                let mut s = seed;
+                let inst = loop {
+                    let inst =
+                        crypto_lib::cryptanalysis::gaudry_quartic_bin::find_bin_curve(mm, s, cof)?;
+                    if !wide || u64::try_from(inst.r).is_err() {
+                        break inst;
+                    }
+                    s += 1;
+                    if s > seed + 64 {
+                        return Err(format!(
+                            "no curve with a wide order at m = {mm} from seed {seed}"
+                        ));
+                    }
+                };
+                let key = crypto_lib::cryptanalysis::ecbench::f2m4_price::row_key(
+                    mm,
+                    u64::try_from(inst.r).is_err(),
+                );
+                let t = crypto_lib::cryptanalysis::ecbench::f2m4_price::measure(&inst, reps)?;
+                eprintln!(
+                    "m = {mm}: measured {} units",
+                    t["row"].as_object().map_or(0, |r| r.len())
+                );
+                instances.insert(key, t);
+            }
+            let doc = serde_json::json!({
+                "schema": "ecbench.f2m4_full_prices/v1",
+                "what": "Ratios to one counted F_q multiplication (a dense axpy element on the same field) of every native unit the *_f2m4_full ecbench methods price (src/cryptanalysis/ecbench/f2m4_price.rs). Read only by those methods; every other method is unchanged.",
+                "unit": "time of the native unit / time of one counted F_q multiplication, dimensionless",
+                "method": format!("ecbench price-units-f2m4 --reps {reps} --seed {seed}: median of the passes per unit per m, one process, one host; hash tables sized as the methods' own (2^(m+1) entries, the guard set 2^20)"),
+                "host": host::capture().map(|c| serde_json::json!({"env_class_id": c.env_class_id, "stable": c.stable})).map_err(|e| e.to_string())?,
+                "instances": instances,
+            });
+            let text = serde_json::to_string_pretty(&doc).map_err(|e| e.to_string())? + "\n";
+            match out {
+                Some(p) => {
+                    std::fs::write(&p, &text).map_err(|e| format!("{}: {e}", p.display()))?;
+                    eprintln!("saved {}", p.display());
+                }
+                None => print!("{text}"),
+            }
+        }
         Cmd::Resources { dir, out } => {
             let report = resources::session(&dir)?;
             if let Some(path) = out {

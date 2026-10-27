@@ -31,7 +31,7 @@ use crate::cryptanalysis::ecbench_large_prime::{
 };
 use crate::cryptanalysis::gaudry_quartic::Pt4;
 use crate::cryptanalysis::gaudry_quartic_bin::{
-    fq_muls_per_add, BinCurve, BinD4Oracle, BinOptions, PtB, TLineBase,
+    fq_muls_per_add, BinCurve, BinD4Oracle, BinOptions, OracleNative, PtB, TLineBase,
 };
 use crate::cryptanalysis::gaudry_quartic_d4::{
     fp_muls_per_add, unpack_e4, D4Curve, D4Options, D4Oracle, YLineBase,
@@ -123,6 +123,45 @@ const RHO_BATCHED_PARAMS: &[ParamDecl] = &[
     },
 ];
 
+/// `ic.pipeline`'s parameters, shared by `ic.pipeline_f2m4_full`.
+const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "factor_base",
+        default: None,
+        help: "plug-in spec: prime-abscissa:size=N, glv-orbit:size=N, binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+    },
+    ParamDecl {
+        name: "oracle",
+        default: None,
+        help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+    },
+    ParamDecl {
+        name: "solver",
+        default: Some(""),
+        help: "descent-algebraic and descent-algebraic-fiber only: f4-f2, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
+    },
+    ParamDecl {
+        name: "linalg",
+        default: Some("incremental-gauss"),
+        help: "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), or structured-gauss",
+    },
+    ParamDecl {
+        name: "targets",
+        default: Some("walk"),
+        help: "random ([a]G+[b]Q per trial), walk, or walk-prime-fast (same guarded stream using native Montgomery additions on prime curves)",
+    },
+    ParamDecl {
+        name: "max_trials",
+        default: Some("100000000"),
+        help: "relation trials before the run counts as exhausted",
+    },
+    ParamDecl {
+        name: "solver_budget_seconds",
+        default: Some("0"),
+        help: "per-call wall budget for an algebraic solver; nonzero makes the run nondeterministic",
+    },
+];
+
 // Keep the defaults of the frozen `ic.pipeline_counted` sessions. The
 // existing `ic.pipeline` declaration below retains main's newer options.
 const IC_COUNTED_PARAMS: &[ParamDecl] = &[
@@ -198,6 +237,22 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ic_wide::rho_negation_batched",
             applies: Applies::Any,
             params: RHO_BATCHED_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.negation_batched_full",
+            family: "rho",
+            summary: "rho.negation_batched with every native counter priced in F_q-multiplication equivalents from src/cryptanalysis/ecbench/f2m4_full_prices.json (ecbench price-units-f2m4): canonicalisation, hashing, recent-point window, distinguished-point table, scalar arithmetic modulo r, walk bookkeeping; the same walk, so the same counts; curves over F_(2^m)^4 only",
+            entry: "ic_wide::rho_negation_batched + ecbench::f2m4_price",
+            applies: Applies::Any,
+            params: RHO_BATCHED_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.negation_f2m4_full",
+            family: "rho",
+            summary: "rho.negation (the unbatched one-affine-inversion walk, one-word and u128) with every native counter priced in F_q-multiplication equivalents from src/cryptanalysis/ecbench/f2m4_full_prices.json: key, hash and negation evaluations, window, distinguished-point table, scalar arithmetic modulo r; the same walk as rho.negation, so the same counts; curves over F_(2^m)^4 only",
+            entry: "ic_wide::rho_negation_tallied + ecbench::f2m4_price",
+            applies: Applies::Any,
+            params: RHO_PARAMS,
         },
         MethodDecl {
             id: "rho.cubic",
@@ -333,43 +388,15 @@ pub fn registry() -> &'static [MethodDecl] {
             summary: "index calculus through ic_framework::run_pipeline: factor base, oracle set-up, relations, linear algebra, verification, all charged",
             entry: "ic_framework::run_pipeline",
             applies: Applies::Any,
-            params: &[
-                ParamDecl {
-                    name: "factor_base",
-                    default: None,
-                    help: "plug-in spec: prime-abscissa:size=N, glv-orbit:size=N, binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
-                },
-                ParamDecl {
-                    name: "oracle",
-                    default: None,
-                    help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
-                },
-                ParamDecl {
-                    name: "solver",
-                    default: Some(""),
-                    help: "descent-algebraic and descent-algebraic-fiber only: f4-f2, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
-                },
-                ParamDecl {
-                    name: "linalg",
-                    default: Some("incremental-gauss"),
-                    help: "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), or structured-gauss",
-                },
-                ParamDecl {
-                    name: "targets",
-                    default: Some("walk"),
-                    help: "random ([a]G+[b]Q per trial), walk, or walk-prime-fast (same guarded stream using native Montgomery additions on prime curves)",
-                },
-                ParamDecl {
-                    name: "max_trials",
-                    default: Some("100000000"),
-                    help: "relation trials before the run counts as exhausted",
-                },
-                ParamDecl {
-                    name: "solver_budget_seconds",
-                    default: Some("0"),
-                    help: "per-call wall budget for an algebraic solver; nonzero makes the run nondeterministic",
-                },
-            ],
+            params: IC_PIPELINE_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.pipeline_f2m4_full",
+            family: "ic",
+            summary: "ic.pipeline on a curve over F_(2^m)^4 (bin-t-line + gaudry-d4-bin, one-word and u128) with every native counter priced in F_q-multiplication equivalents from src/cryptanalysis/ecbench/f2m4_full_prices.json: row operations, guard and witness lookups, the solver's table inversions and the matrix elements its passes touch, monomial hash-map operations, large-prime arithmetic, relation rows, factor-base construction; the same run, so the same counts",
+            entry: "ic_framework::run_pipeline + ecbench::f2m4_price",
+            applies: Applies::Any,
+            params: IC_PIPELINE_PARAMS,
         },
         MethodDecl {
             id: "ic.pipeline_counted",
@@ -471,7 +498,10 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
     use std::f64::consts::PI;
     match id {
         "rho.frozen_reference" | "rho.plain" => Some((PI / 2.0).sqrt()),
-        "rho.negation" | "rho.negation_batched" => Some((PI / 4.0).sqrt()),
+        "rho.negation"
+        | "rho.negation_batched"
+        | "rho.negation_batched_full"
+        | "rho.negation_f2m4_full" => Some((PI / 4.0).sqrt()),
         "rho.cubic" => Some((PI / 12.0).sqrt()),
         "rho.quartic" => Some((PI / 8.0).sqrt()),
         "rho.signed_frobenius"
@@ -1010,10 +1040,17 @@ pub fn solve(
     // The phase clock: the methods open and close the online window, the
     // session turns it into exclusive phase times.
     let session = measurement::Session::begin().ok();
-    if m.id == "rho.negation_batched" && !matches!(inst, Instance::F2m4(_)) {
+    if matches!(
+        m.id.as_str(),
+        "rho.negation_batched"
+            | "rho.negation_batched_full"
+            | "rho.negation_f2m4_full"
+            | "ic.pipeline_f2m4_full"
+    ) && !matches!(inst, Instance::F2m4(_))
+    {
         return Err(format!(
-            "`rho.negation_batched` runs on curves over F_(2^m)^4 only; {} is {}",
-            curve.slug, curve.family
+            "`{}` runs on curves over F_(2^m)^4 only; {} is {}",
+            m.id, curve.slug, curve.family
         ));
     }
     let mut rep = if let Instance::Wide(wi) = inst {
@@ -1022,7 +1059,13 @@ pub fn solve(
     } else if let Instance::F2m4(i) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         if m.id == "rho.negation_batched" {
-            solve_f2m4_rho_batched(m, i, tx, ty, seed)?
+            solve_f2m4_rho_batched(m, i, tx, ty, seed, false)?
+        } else if m.id == "rho.negation_batched_full" {
+            solve_f2m4_rho_batched(m, i, tx, ty, seed, true)?
+        } else if m.id == "rho.negation_f2m4_full" {
+            solve_f2m4_rho_negation_full(m, i, tx, ty, seed)?
+        } else if m.id == "ic.pipeline_f2m4_full" {
+            solve_f2m4_ic_full(m, i, curve, tx, ty, seed)?
         } else if u64::try_from(i.r).is_err() {
             // `m ≥ 16` with a small cofactor: the subgroup order needs two
             // words; the u128 implementations (`ic_wide`, `rho_wide`).
@@ -2062,6 +2105,18 @@ fn solve_ic_f2m4(
     target: PtB,
     seed: u64,
 ) -> Result<SolveReport, String> {
+    solve_ic_f2m4_native(m, inst, curve, target, seed).map(|(rep, _)| rep)
+}
+
+/// [`solve_ic_f2m4`], and the native work the oracle did that no count
+/// includes (read by `ic.pipeline_f2m4_full` only).
+fn solve_ic_f2m4_native(
+    m: &ResolvedMethod,
+    inst: &BinCurve,
+    curve: &CurveFacts,
+    target: PtB,
+    seed: u64,
+) -> Result<(SolveReport, OracleNative), String> {
     let (spec, fb_name, or_name) = pipeline_spec(m, seed)?;
     if fb_name != "bin-t-line" {
         return Err(format!(
@@ -2113,7 +2168,8 @@ fn solve_ic_f2m4(
         &fb,
         |q| CountedGroup::key(c, q),
     )?;
-    Ok(ic_report(m, rep, &calib, facts, wall, 2))
+    let native = oracle.native.clone();
+    Ok((ic_report(m, rep, &calib, facts, wall, 2), native))
 }
 
 /// A curve over `F_{(2^m)^4}` whose subgroup order needs two words
@@ -2127,7 +2183,7 @@ fn solve_f2m4_wide(
     ty: u128,
     seed: u64,
 ) -> Result<SolveReport, String> {
-    use crate::cryptanalysis::ic_wide::{rho_negation, run_f2m4};
+    use crate::cryptanalysis::ic_wide::rho_negation;
     let f = &inst.curve.f;
     let target = PtB {
         x: f.unpack(tx),
@@ -2152,62 +2208,82 @@ fn solve_f2m4_wide(
             rep.exhausted = d.is_none();
             Ok(rep)
         }
-        "ic.pipeline" => {
-            let (spec, fb_name, or_name) = pipeline_spec(m, seed)?;
-            if fb_name != "bin-t-line" || or_name != "gaudry-d4-bin" {
-                return Err("on a wide curve over F_(2^m)^4 only bin-t-line + gaudry-d4-bin run".into());
-            }
-            let mut oracle = bin_oracle(&spec, inst, seed)?;
-            let c = &inst.curve;
-            // The one-word fields are not read on this path (the base and
-            // the oracle ignore them); r and h travel as u128.
-            let ctx = InstanceCtx {
-                group: c,
-                generator: inst.generator,
-                target,
-                r: 0,
-                cofactor: 0,
-                group_order: 0,
-                name: curve.slug.clone(),
-                field_degree: None,
-            };
-            let per_add = fq_muls_per_add(c) as f64;
-            let calib = Calibration {
-                ns_per_add: per_add,
-                ns_per_double: per_add,
-                ns_per_row_op: 1.0,
-                ns_per_lookup: 1.0,
-                ns_per_sqrt: Some(f2m4_lift_muls(inst)),
-                pinned_units: vec![
-                    "ns_per_double".into(),
-                    "ns_per_row_op".into(),
-                    "ns_per_lookup".into(),
-                    "ns_per_sqrt".into(),
-                ],
-                ..Default::default()
-            };
-            let t = Instant::now();
-            let run = run_f2m4::<u128>(&ctx, inst, &spec, &mut oracle, r, inst.cofactor, &calib)?;
-            let wall = t.elapsed().as_nanos() as u64;
-            let mut scratch = GroupOps::default();
-            let base = TLineBase { curve: inst };
-            let fb = base.build(&ctx, &spec.factor_base_params, &mut scratch)?;
-            let facts = factor_base_facts(
-                &curve.slug,
-                &m.params["factor_base"],
-                &spec.factor_base_params,
-                &fb,
-                |q| CountedGroup::key(c, q),
-            )?;
-            let mut rep = ic_report(m, run.report, &calib, facts, wall, 2);
-            rep.recovered = run.recovered;
-            rep.exhausted = run.recovered.is_none();
-            Ok(rep)
-        }
+        "ic.pipeline" => solve_f2m4_wide_ic(m, inst, curve, tx, ty, seed).map(|(rep, _)| rep),
         other => Err(format!(
             "`{other}` has no implementation past one word on a curve over F_(2^m)^4; rho.negation and ic.pipeline do"
         )),
     }
+}
+
+/// The wide `ic.pipeline`, and the native work its oracle did that no
+/// count includes.
+fn solve_f2m4_wide_ic(
+    m: &ResolvedMethod,
+    inst: &BinCurve,
+    curve: &CurveFacts,
+    tx: u128,
+    ty: u128,
+    seed: u64,
+) -> Result<(SolveReport, OracleNative), String> {
+    use crate::cryptanalysis::ic_wide::run_f2m4;
+    let f = &inst.curve.f;
+    let target = PtB {
+        x: f.unpack(tx),
+        y: f.unpack(ty),
+        inf: false,
+    };
+    let r = inst.r;
+    let (spec, fb_name, or_name) = pipeline_spec(m, seed)?;
+    if fb_name != "bin-t-line" || or_name != "gaudry-d4-bin" {
+        return Err("on a wide curve over F_(2^m)^4 only bin-t-line + gaudry-d4-bin run".into());
+    }
+    let mut oracle = bin_oracle(&spec, inst, seed)?;
+    let c = &inst.curve;
+    // The one-word fields are not read on this path (the base and
+    // the oracle ignore them); r and h travel as u128.
+    let ctx = InstanceCtx {
+        group: c,
+        generator: inst.generator,
+        target,
+        r: 0,
+        cofactor: 0,
+        group_order: 0,
+        name: curve.slug.clone(),
+        field_degree: None,
+    };
+    let per_add = fq_muls_per_add(c) as f64;
+    let calib = Calibration {
+        ns_per_add: per_add,
+        ns_per_double: per_add,
+        ns_per_row_op: 1.0,
+        ns_per_lookup: 1.0,
+        ns_per_sqrt: Some(f2m4_lift_muls(inst)),
+        pinned_units: vec![
+            "ns_per_double".into(),
+            "ns_per_row_op".into(),
+            "ns_per_lookup".into(),
+            "ns_per_sqrt".into(),
+        ],
+        ..Default::default()
+    };
+    let t = Instant::now();
+    let run = run_f2m4::<u128>(&ctx, inst, &spec, &mut oracle, r, inst.cofactor, &calib)?;
+    let wall = t.elapsed().as_nanos() as u64;
+    let mut scratch = GroupOps::default();
+    let base = TLineBase { curve: inst };
+    let fb = base.build(&ctx, &spec.factor_base_params, &mut scratch)?;
+    let facts = factor_base_facts(
+        &curve.slug,
+        &m.params["factor_base"],
+        &spec.factor_base_params,
+        &fb,
+        |q| CountedGroup::key(c, q),
+    )?;
+    let oracle_native = oracle.native.clone();
+    let mut rep = ic_report(m, run.report, &calib, facts, wall, 2);
+    rep.recovered = run.recovered;
+    rep.exhausted = run.recovered.is_none();
+    Ok((rep, oracle_native))
 }
 
 /// `rho.negation_batched` on a curve over `F_{(2^m)^4}`, one word or `u128`.
@@ -2227,6 +2303,7 @@ fn solve_f2m4_rho_batched(
     tx: u128,
     ty: u128,
     seed: u64,
+    full: bool,
 ) -> Result<SolveReport, String> {
     use crate::cryptanalysis::ic_wide::{rho_negation_batched, BatchedRhoParams};
     let c = &inst.curve;
@@ -2307,6 +2384,25 @@ fn solve_f2m4_rho_batched(
     ] {
         counters.insert(k.to_string(), v);
     }
+    if full {
+        // The full method prices these, so they are not `_uncharged`; and
+        // it exposes the rest of the native work.
+        counters = counters
+            .into_iter()
+            .map(|(k, v)| (k.trim_end_matches("_uncharged").to_string(), v))
+            .collect();
+        for (k, v) in [
+            ("round_jobs", res.steps + res.look_ahead_adds),
+            ("window_scans", res.window_scans),
+            ("window_scan_elements", res.window_scan_elems),
+            ("window_pushes", res.window_pushes),
+            ("scalar_mulmods", res.scalar_mulmods),
+            ("scalar_invmods", res.scalar_invmods),
+            ("rng_draws", res.rng_draws),
+        ] {
+            counters.insert(k.to_string(), v);
+        }
+    }
     let mk = |name: &str, fq: u64, adds: u64, doubles: u64| PhaseRecord {
         name: name.into(),
         adds,
@@ -2341,7 +2437,7 @@ fn solve_f2m4_rho_batched(
             0,
         ),
     ];
-    Ok(SolveReport {
+    let mut rep = SolveReport {
         recovered,
         exhausted: recovered.is_none(),
         phases,
@@ -2363,7 +2459,159 @@ fn solve_f2m4_rho_batched(
         online_error: None,
         solver: None,
         field_ops: None,
-    })
+    };
+    if full {
+        crate::cryptanalysis::ecbench::f2m4_price::reprice_rho(
+            &mut rep,
+            c.f.f.m,
+            u64::try_from(inst.r).is_err(),
+            per_add,
+            true,
+        )?;
+    }
+    Ok(rep)
+}
+
+/// `rho.negation_f2m4_full`: `rho.negation`'s walk (`ic_wide::rho_negation`
+/// is pinned to it step for step, at one word and at `u128`), run for its
+/// native tallies, and priced in `F_q`-multiplication equivalents.  The
+/// group operations are charged one affine addition each, as
+/// `rho.negation` charges them.
+fn solve_f2m4_rho_negation_full(
+    m: &ResolvedMethod,
+    inst: &BinCurve,
+    tx: u128,
+    ty: u128,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use crate::cryptanalysis::ic_wide::rho_negation_tallied;
+    let c = &inst.curve;
+    let f = &c.f;
+    let target = PtB {
+        x: f.unpack(tx),
+        y: f.unpack(ty),
+        inf: false,
+    };
+    let multiple = param_u64(m, "cap_multiple")? as f64;
+    let cap = (crate::cryptanalysis::ic_boundary::generic_floor_ops(inst.r as f64, 1.0) * multiple)
+        as u64
+        + 4096;
+    let per_add = fq_muls_per_add(c) as f64;
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let (res, recovered, native) = if let Ok(r64) = u64::try_from(inst.r) {
+        let (res, d, n) = rho_negation_tallied::<_, u64>(c, inst.generator, target, r64, seed, cap);
+        (res, d.map(u128::from), n)
+    } else {
+        rho_negation_tallied::<_, u128>(c, inst.generator, target, inst.r, seed, cap)
+    };
+    measurement::end_online();
+    let wall = t.elapsed().as_nanos() as u64;
+    let mut rep = rho_report(res, wall, None);
+    rep.recovered = recovered;
+    rep.exhausted = recovered.is_none();
+    let mut counters: BTreeMap<String, u64> = rep
+        .counters
+        .iter()
+        .map(|(k, v)| (k.trim_end_matches("_uncharged").to_string(), *v))
+        .collect();
+    for (k, v) in [
+        ("key_evaluations", native.key_evals),
+        ("mix_evaluations", native.mix_evals),
+        ("negation_evaluations", native.neg_evals),
+        ("canonical_flips", native.canonical_flips),
+        ("scalar_mod_r_operations", native.scalar_mod_ops),
+        ("window_scans", native.window_scans),
+        ("window_scan_elements", native.window_scan_elems),
+        ("window_pushes", native.window_pushes),
+        ("distinguished_point_table_queries", native.table_queries),
+        ("distinguished_point_table_inserts", native.table_inserts),
+        ("scalar_mulmods", native.scalar_mulmods),
+        ("scalar_invmods", native.scalar_invmods),
+        ("rng_draws", native.rng_draws),
+        ("walks_started", native.starts),
+        ("fq_muls_per_add", per_add as u64),
+    ] {
+        counters.insert(k.to_string(), v);
+    }
+    rep.counters = counters;
+    rep.unpriced.clear();
+    crate::cryptanalysis::ecbench::f2m4_price::reprice_rho(
+        &mut rep,
+        c.f.f.m,
+        u64::try_from(inst.r).is_err(),
+        per_add,
+        false,
+    )?;
+    Ok(rep)
+}
+
+/// `ic.pipeline_f2m4_full`: the `ic.pipeline` run on a curve over
+/// `F_{(2^m)^4}` (one word or `u128`), unchanged, then every phase repriced
+/// with the native work its oracle tallied.
+fn solve_f2m4_ic_full(
+    m: &ResolvedMethod,
+    inst: &BinCurve,
+    curve: &CurveFacts,
+    tx: u128,
+    ty: u128,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    solve_f2m4_ic_full_with(m, inst, curve, tx, ty, seed, u64::try_from(inst.r).is_err())
+}
+
+/// [`solve_f2m4_ic_full`], on the `u128` pipeline when `wide` (which any
+/// order may take; the one-word run is `run_pipeline`).
+fn solve_f2m4_ic_full_with(
+    m: &ResolvedMethod,
+    inst: &BinCurve,
+    curve: &CurveFacts,
+    tx: u128,
+    ty: u128,
+    seed: u64,
+    wide: bool,
+) -> Result<SolveReport, String> {
+    let (mut rep, native) = if wide {
+        solve_f2m4_wide_ic(m, inst, curve, tx, ty, seed)?
+    } else {
+        let f = &inst.curve.f;
+        let target = PtB {
+            x: f.unpack(tx),
+            y: f.unpack(ty),
+            inf: false,
+        };
+        solve_ic_f2m4_native(m, inst, curve, target, seed)?
+    };
+    let c = &inst.curve;
+    let facts = rep.factor_base.clone().ok_or("no factor base facts")?;
+    let lp_estimate = rep.detail["decomposition"]["solver"]["extra"]["lp_merge_mulmods"]
+        .as_u64()
+        .unwrap_or(0);
+    // The `x_of_t` before each base lift: its counted multiplications.
+    let (mut muls, mut n) = (0u64, 0u64);
+    for t in (2..c.f.f.q as u32)
+        .step_by(((c.f.f.q / 64).max(1)) as usize)
+        .take(64)
+    {
+        let before = c.f.f.muls();
+        let _ = c.x_of_t(&c.f.from_fq(t));
+        muls += c.f.f.muls() - before;
+        n += 1;
+    }
+    let ctx = crate::cryptanalysis::ecbench::f2m4_price::IcContext {
+        m: c.f.f.m,
+        wide: u64::try_from(inst.r).is_err(),
+        per_add: fq_muls_per_add(c) as f64,
+        lift_muls: f2m4_lift_muls(inst),
+        x_of_t_muls: muls as f64 / n.max(1) as f64,
+        oracle: &native,
+        fb_points: facts.signed_points,
+        fb_columns: facts.columns,
+        fb_abscissae: facts.abscissae,
+        lp_estimate,
+    };
+    crate::cryptanalysis::ecbench::f2m4_price::reprice_ic(&mut rep, &ctx)?;
+    Ok(rep)
 }
 
 /// `gaudry-d4-bin`'s parameters, checked, as an oracle on `inst`; shared
@@ -3271,5 +3519,295 @@ mod tests {
             params: BTreeMap::new()
         })
         .is_err());
+    }
+
+    // ── Full pricing of the f2m4 / gaudry-d4-bin comparison ─────────────
+
+    fn f2m4_case(m: u32, d: u128) -> (Instance, CurveFacts, [String; 2]) {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+        let spec = CurveSpec::F2m4Torsion {
+            m,
+            seed: 1,
+            max_cofactor: 16,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::F2m4(b) = &inst else {
+            unreachable!()
+        };
+        let q = b.curve.mul(&b.generator, d % b.r);
+        let f = &b.curve.f;
+        let t = [
+            format!("0x{:x}", f.pack(&q.x)),
+            format!("0x{:x}", f.pack(&q.y)),
+        ];
+        (inst, facts, t)
+    }
+
+    fn method(id: &str, kv: &[(&str, &str)]) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: id.into(),
+            params: kv
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
+        })
+        .unwrap()
+    }
+
+    fn ic_params(extra: &str) -> Vec<(String, String)> {
+        vec![
+            ("factor_base".into(), "bin-t-line".into()),
+            (
+                "oracle".into(),
+                format!("gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1{extra}"),
+            ),
+            ("linalg".into(), "wiedemann".into()),
+            ("max_trials".into(), "2000000".into()),
+        ]
+    }
+
+    fn ic_method(id: &str, extra: &str) -> ResolvedMethod {
+        let p = ic_params(extra);
+        let kv: Vec<(&str, &str)> = p.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect();
+        method(id, &kv)
+    }
+
+    /// The block every full record carries: the counted part, the native
+    /// part, the band, and a sum that adds up.
+    fn check_full_block(rep: &SolveReport) -> (f64, f64, u64) {
+        let b = &rep.detail["full_pricing"];
+        let counted = b["counted_gae"].as_f64().unwrap();
+        let native = b["native_gae"].as_f64().unwrap();
+        let ops = b["native_operations"].as_u64().unwrap();
+        assert!((rep.total_gae - (counted + native)).abs() <= 1e-9 * rep.total_gae.max(1.0));
+        let by: f64 = b["by_counter"]
+            .as_object()
+            .unwrap()
+            .values()
+            .map(|v| v["gae"].as_f64().unwrap())
+            .sum();
+        assert!(
+            (by - native).abs() <= 1e-9 * native.max(1.0),
+            "{by} {native}"
+        );
+        let ops_by: u64 = b["by_counter"]
+            .as_object()
+            .unwrap()
+            .values()
+            .map(|v| v["count"].as_u64().unwrap())
+            .sum();
+        assert_eq!(ops_by, ops);
+        // The §5a band: native work at 0, 0.1 and 1 GAE per operation.
+        let band = &b["band"];
+        assert_eq!(
+            band["native_gae_per_operation_0"].as_f64().unwrap(),
+            counted
+        );
+        assert!(
+            (band["native_gae_per_operation_1"].as_f64().unwrap() - (counted + ops as f64)).abs()
+                < 1e-6
+        );
+        assert!(rep.unpriced.is_empty(), "{:?}", rep.unpriced);
+        (counted, native, ops)
+    }
+
+    /// `rho.negation_f2m4_full` walks `rho.negation`'s walk (same counts)
+    /// and prices every native counter: no `_uncharged`, no lower bound.
+    #[test]
+    fn rho_negation_f2m4_full_is_the_same_walk_fully_priced() {
+        for m in [6u32, 7] {
+            let (inst, facts, t) = f2m4_case(m, 4321);
+            let base = solve(&method("rho.negation", &[]), &inst, &facts, &t, 5).unwrap();
+            let full = solve(&method("rho.negation_f2m4_full", &[]), &inst, &facts, &t, 5).unwrap();
+            assert_eq!(base.recovered, full.recovered);
+            assert!(base
+                .unpriced
+                .contains(&"canonicalisations_uncharged".to_string()));
+            for k in [
+                "steps",
+                "walk_operations",
+                "look_ahead_additions",
+                "cycle_escape_doublings",
+                "cycles_length_2",
+                "cycles_length_4",
+                "distinguished_points",
+                "useless_collisions",
+                "walks_capped",
+            ] {
+                assert_eq!(base.counters.get(k), full.counters.get(k), "{k}");
+            }
+            assert_eq!(
+                base.counters["canonicalisations_uncharged"],
+                full.counters["canonicalisations"]
+            );
+            let (counted, native, ops) = check_full_block(&full);
+            // The counted part is exactly what rho.negation charged.
+            assert_eq!(counted, base.total_gae);
+            assert!(native > 0.0 && ops > 0);
+            // Invariants of the tallies: a canonicalisation is a negation
+            // and two keys; the table is probed once per distinguished
+            // point; every start is a walk.
+            let c = &full.counters;
+            assert_eq!(c["negation_evaluations"], c["canonicalisations"]);
+            assert!(c["key_evaluations"] >= 2 * c["canonicalisations"]);
+            assert_eq!(
+                c["distinguished_point_table_queries"],
+                c["distinguished_points"]
+            );
+            assert!(c["distinguished_point_table_inserts"] <= c["distinguished_points"]);
+            assert!(c["scalar_mod_r_operations"] >= 2 * (c["steps"] + c["look_ahead_additions"]));
+        }
+    }
+
+    /// `rho.negation_batched_full` is `rho.negation_batched`'s walk (same
+    /// counts, same F_q operations) with the native work priced on top.
+    #[test]
+    fn rho_negation_batched_full_is_the_same_walk_fully_priced() {
+        for m in [6u32, 7] {
+            let (inst, facts, t) = f2m4_case(m, 777);
+            let kv = [("walks", "16")];
+            let base = solve(&method("rho.negation_batched", &kv), &inst, &facts, &t, 9).unwrap();
+            let full = solve(
+                &method("rho.negation_batched_full", &kv),
+                &inst,
+                &facts,
+                &t,
+                9,
+            )
+            .unwrap();
+            assert_eq!(base.recovered, full.recovered);
+            assert!(!base.unpriced.is_empty(), "the base is a lower bound");
+            for k in [
+                "steps",
+                "rounds",
+                "batched_additions",
+                "batch_inversions",
+                "fq_operations_total",
+                "look_ahead_additions",
+                "distinguished_points",
+            ] {
+                assert_eq!(base.counters.get(k), full.counters.get(k), "{k}");
+            }
+            let (counted, native, ops) = check_full_block(&full);
+            assert_eq!(counted, base.total_gae, "the F_q part is unchanged");
+            assert!(native > 0.0 && ops > 0);
+            let c = &full.counters;
+            assert_eq!(c["round_jobs"], c["steps"] + c["look_ahead_additions"]);
+        }
+    }
+
+    /// `ic.pipeline_f2m4_full` is the same run as `ic.pipeline` (the same
+    /// group operations and counts, one word and `u128`, with and without
+    /// large primes) with every native counter priced.
+    #[test]
+    fn ic_pipeline_f2m4_full_prices_every_native_counter() {
+        let d = 12_345u128;
+        for extra in ["", ",large_primes=2,small_permille=500"] {
+            let (inst, facts, t) = f2m4_case(6, d);
+            let Instance::F2m4(b) = &inst else {
+                unreachable!()
+            };
+            let base = solve(&ic_method("ic.pipeline", extra), &inst, &facts, &t, 3).unwrap();
+            let method = ic_method("ic.pipeline_f2m4_full", extra);
+            let (tx, ty) = (
+                parse_hex_wide(&t[0]).unwrap(),
+                parse_hex_wide(&t[1]).unwrap(),
+            );
+            let one = solve(&method, &inst, &facts, &t, 3).unwrap();
+            let wide = solve_f2m4_ic_full_with(&method, b, &facts, tx, ty, 3, true).unwrap();
+            for full in [&one, &wide] {
+                assert_eq!(base.recovered, full.recovered, "{extra}");
+                assert!(base.recovered.is_some());
+                assert_eq!(base.counters, full.counters);
+                for (a, f) in base.phases.iter().zip(&full.phases) {
+                    assert_eq!((a.adds, a.doubles), (f.adds, f.doubles), "{}", a.name);
+                    for (k, v) in &a.native {
+                        assert_eq!(f.native.get(k), Some(v), "{} {k}", a.name);
+                    }
+                }
+                let (counted, native, ops) = check_full_block(full);
+                assert!(native > 0.0 && ops > 0 && counted > 0.0);
+                let rel = full.phases.iter().find(|p| p.name == "relations").unwrap();
+                assert_eq!(
+                    rel.native["solver_systems_built"],
+                    rel.native["solver_calls"]
+                );
+                assert!(rel.native["solver_table_inversions"] > 0);
+                assert!(rel.native["solver_element_scans"] > 0);
+                assert!(rel.native["solver_element_fills"] > 0);
+                assert!(rel.native["solver_monomial_hash_ops"] > 0);
+                assert!(rel.native["witness_lookups"] > 0);
+                assert_eq!(
+                    extra.is_empty(),
+                    !rel.native.contains_key("lp_modular_multiplications")
+                );
+                let fb = full
+                    .phases
+                    .iter()
+                    .find(|p| p.name == "factor_base")
+                    .unwrap();
+                assert!(fb.native["factor_base_points"] > 0);
+            }
+            // The one-word and the u128 pipelines walk the same run.
+            assert_eq!(one.counters, wide.counters);
+            for (a, b) in one.phases.iter().zip(&wide.phases) {
+                assert_eq!(a.native, b.native, "{}", a.name);
+            }
+            assert_eq!(one.total_gae, wide.total_gae);
+        }
+    }
+
+    /// The native tallies do not depend on how rayon schedules the solver.
+    #[test]
+    fn ic_native_tallies_are_deterministic() {
+        let (inst, facts, t) = f2m4_case(6, 999);
+        let method = ic_method("ic.pipeline_f2m4_full", "");
+        let a = solve(&method, &inst, &facts, &t, 4).unwrap();
+        let b = solve(&method, &inst, &facts, &t, 4).unwrap();
+        assert_eq!(a.total_gae, b.total_gae);
+        assert_eq!(
+            a.detail["full_pricing"]["by_counter"],
+            b.detail["full_pricing"]["by_counter"]
+        );
+    }
+
+    /// A counter without a rule stays unpriced: the record is a lower bound.
+    #[test]
+    fn a_counter_without_a_rule_stays_unpriced() {
+        let (inst, facts, t) = f2m4_case(6, 55);
+        let Instance::F2m4(b) = &inst else {
+            unreachable!()
+        };
+        let mut rep = solve(&method("rho.negation_f2m4_full", &[]), &inst, &facts, &t, 2).unwrap();
+        rep.counters.insert("mystery_work".into(), 3);
+        crate::cryptanalysis::ecbench::f2m4_price::reprice_rho(
+            &mut rep,
+            b.curve.f.f.m,
+            false,
+            fq_muls_per_add(&b.curve) as f64,
+            false,
+        )
+        .unwrap();
+        assert_eq!(rep.unpriced, vec!["mystery_work_uncharged".to_string()]);
+    }
+
+    /// The full methods exist on curves over F_(2^m)^4 only.
+    #[test]
+    fn the_full_methods_refuse_other_curves() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+        let spec = CurveSpec::Koblitz { a: 1, n: 17 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        for id in ["rho.negation_f2m4_full", "rho.negation_batched_full"] {
+            let r = solve(
+                &method(id, &[]),
+                &inst,
+                &facts,
+                &["0x1".into(), "0x1".into()],
+                1,
+            );
+            assert!(r.unwrap_err().contains("F_(2^m)^4 only"));
+        }
     }
 }

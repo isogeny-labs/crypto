@@ -522,6 +522,34 @@ Two consequences to read every table with:
   full costs. Read it as a counted-work diagnostic until both arms have
   complete, calibrated costs; do not infer an end-to-end speedup from it.
 
+- **Full pricing for curves over `F_{(2^m)^4}` is opt-in.**
+  `ic.pipeline_f2m4_full` (`bin-t-line` + `gaudry-d4-bin`, one word and
+  `u128`), `rho.negation_batched_full` and `rho.negation_f2m4_full` (the
+  unbatched `rho.negation` walk) run their base method unchanged, so the
+  group operations and counted multiplications are the base's, then price
+  every other native counter in `F_q`-multiplication equivalents (FME):
+  the time of the operation over the time of one counted `F_q`
+  multiplication (a dense `axpy` element) on the same field, measured by
+  `ecbench price-units-f2m4 --m 6,...,18` and committed in
+  `src/cryptanalysis/ecbench/f2m4_full_prices.json`. The record's price is
+  a function of its counts and that file. `GAE = (counted multiplications
+  + native FME) / fq_muls_per_add`, the unit `ic.pipeline` already used on
+  these curves. A counted multiplication and a group operation absorb the
+  `F_q` additions and loop control of their own formulas, on both arms;
+  every other counter has a rule in `ecbench/f2m4_price.rs` or the record
+  stays a lower bound. `detail.full_pricing` carries the per-counter
+  counts and charges, the number of native operations and the §5a band
+  (`counted + {0, 0.1, 1} · native operations`). The index-calculus run
+  tallies, without changing any count, the solver's table inversions, the
+  matrix elements its non-multiplying passes touch (zero fills, read
+  scans, zero entries a dense axpy steps over), monomial hash-map
+  operations, its parallel regions (priced at a one-thread pool's
+  dispatch work; waiting for other workers is a placement effect of the
+  host that a count cannot carry), the oracle's factor-base probes and
+  the large-prime arithmetic; the rho walks tally canonicalisations, key and hash
+  evaluations, the recent-point window, the distinguished-point table and
+  the scalar arithmetic modulo `r`. The existing methods are untouched.
+
 `ecbench resources --dir SESSION --out resources.json` reports, for every
 measured attempt including failures, the native integer counters by phase,
 charged GAE and clocks by phase, the target's exclusive online window,
