@@ -610,6 +610,16 @@ pub fn registry() -> &'static [MethodDecl] {
                     default: Some("0"),
                     help: "1 keeps one-large-prime partials and combines pairs",
                 },
+                ParamDecl {
+                    name: "branches",
+                    default: Some("64"),
+                    help: "number of factor-base walk branches for hyperelliptic thread workloads",
+                },
+                ParamDecl {
+                    name: "d_step_in",
+                    default: Some("4"),
+                    help: "frequency of start-divisor steps for hyperelliptic thread workloads",
+                },
             ],
         },
         MethodDecl {
