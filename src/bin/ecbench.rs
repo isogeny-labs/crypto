@@ -214,6 +214,25 @@ enum Cmd {
         #[arg(long)]
         out: Option<PathBuf>,
     },
+    /// Measured binary-field unit price on f2m4_torsion curves: ns per F_q
+    /// multiplication, squaring and inversion (micro and in situ), per
+    /// F_q^4 operation, per group addition and per rho step.
+    UnitPriceF2m4 {
+        #[arg(long, value_delimiter = ',', default_value = "14,15,16,17")]
+        m: Vec<u32>,
+        #[arg(long, default_value_t = 1)]
+        seed: u64,
+        #[arg(long, default_value_t = 5)]
+        reps: usize,
+        /// Trials of the partial ic.pipeline solve (0 skips it).
+        #[arg(long, default_value_t = 12)]
+        ic_trials: u64,
+        /// Steps of the rho walk segments.
+        #[arg(long, default_value_t = 200_000)]
+        rho_steps: u64,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
     /// Resource vectors for all measured attempts; no invented SAT/GAE conversion.
     Resources {
         #[arg(long)]
@@ -1003,6 +1022,32 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 "host": host::capture().map(|c| serde_json::json!({"env_class_id": c.env_class_id, "stable": c.stable})).map_err(|e| e.to_string())?,
                 "instances": instances,
             });
+            let text = serde_json::to_string_pretty(&doc).map_err(|e| e.to_string())? + "\n";
+            match out {
+                Some(p) => {
+                    std::fs::write(&p, &text).map_err(|e| format!("{}: {e}", p.display()))?;
+                    eprintln!("saved {}", p.display());
+                }
+                None => print!("{text}"),
+            }
+        }
+        Cmd::UnitPriceF2m4 {
+            m,
+            seed,
+            reps,
+            ic_trials,
+            rho_steps,
+            out,
+        } => {
+            let doc = crypto_lib::cryptanalysis::ecbench::unit_price::run(
+                &crypto_lib::cryptanalysis::ecbench::unit_price::Opts {
+                    ms: m,
+                    reps,
+                    seed,
+                    ic_trials,
+                    rho_steps,
+                },
+            )?;
             let text = serde_json::to_string_pretty(&doc).map_err(|e| e.to_string())? + "\n";
             match out {
                 Some(p) => {
