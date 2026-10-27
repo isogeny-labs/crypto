@@ -32,8 +32,9 @@ Proj, with compatible local stalks, remains open.
 reduction `smooth_of_two_basic_opens`: for any morphism from the actual
 weighted Proj to a scheme, Smooth on both the `X` and `Z` basic-open
 restrictions implies Smooth globally. It uses the checked two-open cover.
-The two full-chart Smooth premises have not been established, so global
-smoothness remains open. `WeightedProjGlobalGlue.lean` defines both actual
+The affine `Z` chart is now Smooth under the stated squarefree hypotheses;
+the full infinity `X` chart and global conclusion remain open.
+`WeightedProjGlobalGlue.lean` defines both actual
 chart morphisms into weighted Proj by composing the checked chart
 isomorphisms with the basic-open immersions. `WeightedProjChartNaturality.lean`
 checks the two ring-map and `Spec.map` localization squares.
@@ -42,19 +43,22 @@ isomorphism inverses and Proj immersions: each separately glued
 principal-open chart enters Proj through the canonical `D₊(XZ)` map.
 `WeightedProjGlueCompatibility.lean` proves that the separately glued
 overlap transition commutes with both maps to the common `D₊(XZ)`
-coordinate Spec. Its equality after composing with the actual Proj
-immersion and the global glued-curve morphism have not yet been
-kernel-checked. The global scheme isomorphism and local-stalk comparison
-remain open.
+coordinate Spec. `WeightedProjGluedMorphism.lean` checks compatibility after
+the actual Proj immersion. `WeightedProjGlueCone.lean` constructs a morphism
+from the separately glued two-chart scheme to actual weighted Proj and checks
+its restriction to each chart. A global inverse remains open.
 
 `WeightedChartRingSmooth.lean` constructs an explicit submersive
 presentation of the infinity quotient and proves that its structure map
 from any field is Smooth after localization away from the `z`-partial.
 `WeightedInfinityOpenSmooth.lean` conditionally transports Smooth from the
 affine `D(x)` ring to the infinity `D(z)` ring through the checked overlap
-equivalence. The affine Smooth premise is still open under the perfect,
-odd-characteristic, squarefree-quintic hypotheses. Thus neither complete
-chart nor weighted Proj is yet proved Smooth.
+equivalence. `WeightedAffineXPartial.lean` proves both genus-2 partial
+identities in the affine quotient. `WeightedAffineSquarefreeFinal.lean`
+combines these with the squarefree Jacobian certificate and generic
+plane-quotient criterion to prove `RingHom.Smooth` for the full affine chart
+over a perfect field of characteristic other than two with a squarefree
+quintic. Full infinity-chart and global weighted-Proj Smooth remain open.
 
 `WeightedAffineRingSmooth.lean` proves a generic plane-quotient criterion:
 if the quotient images of both partial derivatives span the unit ideal,
@@ -62,15 +66,13 @@ the affine coordinate-ring map from `K` is `RingHom.Smooth`. It also checks
 the `Y`-partial identity for this genus-2 equation. The separate
 `WeightedAffineSquarefreeSmooth.lean` proves that the existing squarefree
 Jacobian unit-ideal theorem implies the derivative-range premise,
-**conditional on both explicit derivative identities**. The `X`-partial
-identity has not been proved, so the squarefree affine Smooth
-specialization remains open. `WeightedProjGluedMorphism.lean` proves the
-forward glue transition is compatible after mapping into actual weighted
-Proj. Its attempted whole glued-curve morphism still needs Mathlib's
-diagonal and reverse Boolean cone equations; no global morphism or
-isomorphism is asserted.
+**conditional on both explicit derivative identities**. The two new affine
+files above discharge that condition and establish the specialization.
+`WeightedPic0Bridge.lean` identifies the actual weighted-Proj stalk at the
+infinity-chart origin with `Localization.AtPrime` of the explicit chart ring.
+This does not establish a principal divisor or equality in `Pic⁰`.
 
-This identifies both scheme charts, establishes their finite affine cover, proves properness over `K`, and checks the pointwise and ring-global Jacobian facts on their stated loci, overlap-coordinate identities, a canonical overlap-ring equivalence, its images of the two affine generators, scalar preservation, equality of the induced Spec transition with the separately glued scheme's transition, and compatibility of both localized chart embeddings with the actual common weighted-Proj immersion. Scheme-level smoothness, construction of the global comparison with the separately glued curve, local-stalk transport, the `Pic⁰` class equation, and the Rust-to-Lean execution bridge remain open. The finite-zero multiplicity argument in [PROOF_AUDIT.md](../PROOF_AUDIT.md) is written mathematics, not a Lean divisor theorem.
+This identifies both scheme charts, establishes their finite affine cover and properness over `K`, proves affine chart Smooth under the stated hypotheses, constructs a glued-curve-to-Proj morphism, and identifies the actual Proj stalk at infinity with the explicit chart localization. Full infinity-chart and global weighted-Proj Smooth, an inverse to the glued morphism, global stalk transport, the `Pic⁰` class equation, and the Rust-to-Lean execution bridge remain open. The finite-zero multiplicity argument in [PROOF_AUDIT.md](../PROOF_AUDIT.md) is written mathematics, not a Lean divisor theorem.
 
 The new source SHA-256 values, in dependency order, are `4f775fb6ac97fb2d478c2e550a955351df0ab730a5e344712ca5f4930cfb61b5` (`WeightedRingComponent`), `b810dd4a6024bc77a7b8de1916c217caf8e1a0de2d555448c73a5d2515ff865c` (`WeightedRingGraded`), `f02b2f827ca8123f3daabbf19b15d25f9f7793ab7693e8a795bec5572a9d4010` (`WeightedChartKernelRec`), `ed6c4bc5b88acefa45fa00ed6ee83655b580e41e8f1d4fa0186777b821abab89` (`WeightedChartRoute`), `fbcb3cae7cc4c9d7f0722da5f546892bb4cde848eb072580486be3c7a9ecd433` (`WeightedChartIso`), `ffa7dd90d349648f22ab4d86cb18d557f6fb1b93bf5bd78febd116d4e95afd29` (`WeightedProjSchemeChart`), and `58dd0a75dbc7544cdd127314a0ffea33d6551766ddc0cc0dc2774f4861f243a0` (`WeightedProjCover`). The five further files are `19745cadc9e00fdb5e052e872c0a3739fe9856390ea10c65aa8a441f8836367d` (`WeightedChartDehomog`), `2ce21319bf69de82a24d99e8d118ce6eedb132134eecf17b03c2f0b627c52441` (`WeightedInfinityOrdinary`), `95e0e583514cb3f65ca14040079f7a5be68970e38e15e313265af0bdf3c3e17c` (`WeightedProjInfinityChart`), `d0861dc892c5d7f047ae08d95948e59b68e1df37958475fca59f129649644ef8` (`WeightedProjProper`), and `59109ab636ff9331997cfcb06a1190c5a245ff8385e783a7d2de5761e714c157` (`WeightedProjBase`). The bounded follow-ups are `e0618f97117ca6ba52010da028958cdba26dcf2e5909a1d358e8717d9a709ff9` (`WeightedProjSmoothPoints`), `75fff6c37fcced8bf28e33afc5af3d30dee6dcb07a6e2d8caa1520458fbb2162` (`WeightedJacobianIdeal`), and `12c2308c91e42aab0c090afd03d5a86634896c590f76def0b12a1c8a5a33eca2` (`WeightedOverlapScratch`), and `0dec04a522aacdbccd6cfe4c7956a11838ca372eafadc5ddc0fbb86d5a388e75` (`WeightedOverlapFull`), and `ba604cbd287f179804be77598c72e78b41c9a968feadea63a1bef6bd70603eed` (`WeightedOverlapEquality`), and `06eecf27628466109d71494edb50c279798fe987090a93b43c2c3bab5e1ea720` (`WeightedOverlapMapEquality`), and `dbd8e1a5489ee6fd158e2541b2576ea4cc2bde9edc86ead716553b74399d5925` (`WeightedOverlapScalar`). All nineteen compiled with Lean `v4.34.1` and Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612`, exit status 0. Their theorem axiom audits list only `propext`, `Classical.choice`, and `Quot.sound`; no `sorryAx` occurs.
 
@@ -126,8 +128,8 @@ and `WeightedInfinityOpenSmooth.lean`
 (`e659c03a592b8acbfcdf18681d1c99325c0fa5378868b7b52e1a79a36051515a`).
 Each compiled with `lake env lean` under the same pins; the audited theorems
 use only `propext`, `Classical.choice`, and `Quot.sound`, with no `sorry`.
-The overlap/Proj, full affine Smooth, full infinity Smooth, global scheme
-isomorphism, and `Pic⁰` conclusions remain open as specified in the CSV.
+The full infinity Smooth, global Proj Smooth, global scheme isomorphism, and
+`Pic⁰` conclusions remain open as specified in the CSV.
 
 `WeightedAffineRingSmooth.lean` has SHA-256
 `81a29e680f4f3e6a9eaaecc2e53f15308d5e2abca3c90ffa5635185ca231cc56`;
@@ -139,6 +141,18 @@ Under the same pins, all three compiled with direct, unpiped `lake env lean`
 exit status zero. The public Smooth, conditional bridge, and
 Proj-compatibility theorem audits list only `propext`,
 `Classical.choice`, and `Quot.sound`, with no `sorry`.
+
+The 27 October follow-up sources are `WeightedProjGlueCone.lean`
+(`7f2788d1680e606de52421208d26a4a63e1e4a0dbe99547661958c06ec6aa431`),
+`WeightedPic0Bridge.lean`
+(`409509fd1665ac1ab53d24f0db17884fc00f910ae9dae8fb985c5d15ecb70da5`),
+`WeightedAffineXPartial.lean`
+(`3a50e5a9491ab747b17e0cc885b3bdfcbed418b1b94d957a2f02ed8bc1f71fb3`),
+and `WeightedAffineSquarefreeFinal.lean`
+(`a58e4ea4dede6db2d3a34f943bb5a5da3b0913b8a8c16db987a88b19f845ab7f`).
+Each compiled directly with pinned Lean `4.34.1` and Mathlib `d13f23b`;
+the audited glued morphism, infinity stalk, two partial identities, and affine
+Smooth theorem list only `propext`, `Classical.choice`, and `Quot.sound`.
 
 The required `RUST_TEST_THREADS=1 cargo test --release --lib --offline --locked`
 was run with these proof-only changes. The [first raw log](validation/release-library-first.log)
