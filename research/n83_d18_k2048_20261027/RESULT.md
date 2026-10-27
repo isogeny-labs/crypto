@@ -43,6 +43,14 @@ comparison can isolate their point-set choice. The exact five-summand
 uniform-target subset count is `binomial(339968,5)/r = 15.6518808172` for
 either size; this count does not measure solver yield.
 
+A fresh GET of the U archive matched its retained compressed BLAKE3. The
+[independent structural audit](evidence/structural-overlap.json) parsed and
+uniqueness-checked all 339,968 rows in each archive. Their point-set
+intersection is **zero points and zero signed-Frobenius orbits**. Thus the
+matched K2048 comparison changes the entire base point set while preserving
+its count and curve; the overlap result is a structural identity, not a
+relation-yield or runtime preference.
+
 The next measurement is a source-pinned U/D K2048 importer and a frozen,
 same-point natural-query panel with independent relation/rank replay. The
 candidate ID, natural yield, final matrix, target logarithm, same-point rho
