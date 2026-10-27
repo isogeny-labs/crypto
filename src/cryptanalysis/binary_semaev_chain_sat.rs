@@ -80,9 +80,6 @@ pub enum FrobeniusOrbitRootEncoding {
     SharedBits,
 }
 
-/// The exact selector and phase wires allocated for one orbit-domain block.
-/// Selectors follow the sorted representative order used during installation.
-#[derive(Clone, Debug)]
 /// SAT wires allocated for one exact Frobenius-orbit x-domain. Selectors
 /// follow the sorted representative order used by the domain builder.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -629,6 +626,7 @@ impl ChainedS3Encoding {
     /// then re-evaluate the chain over the original binary field.
     pub fn verify_external_assignment(&self, model: &[bool]) -> bool {
         self.solver.check_original_assignment(model) && self.verify_field_assignment(model)
+    }
 
     /// Fix one named x-coordinate block: summands `0..m`, intermediate
     /// outputs `m..2m-2`, and the final target at `2m-2`. The target is
