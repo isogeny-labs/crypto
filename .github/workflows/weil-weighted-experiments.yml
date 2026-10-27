@@ -32,6 +32,12 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/weil_weighted_decomposition_20261019
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
@@ -49,6 +55,12 @@ jobs:
       DLP_MAX_P: ${{ inputs.dlp_max_p }}
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/weil_weighted_decomposition_20261019
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
