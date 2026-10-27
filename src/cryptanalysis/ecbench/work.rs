@@ -2223,6 +2223,8 @@ mod tests {
             basis_view(r, CostBasis::Total).unwrap().cost.unit,
             "bitop/v1"
         );
+    }
+
     #[test]
     fn memory_of_a_baby_step_table_and_of_a_walk() {
         let c = curve("prime", 20, (1 << 19) + 21, 2);
