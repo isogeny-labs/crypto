@@ -6,8 +6,14 @@ The follow-up locally integrates actual parent source
 `6420ed5c3a26ad2825e437097ecfdc2f8f61d8d3` as merge
 `df3b0ec17a324a14e2f474a97e82021fac9a6cfa`, preserving both log bodies
 and every problem-index link under the documented Copilot fallback.
-Native checks pass; the separate required full library command is running
-with no final result at the retained snapshot. See the separate
+Native checks pass. The separate full library command completed naturally
+with exit 101: 4,931 passed, five failed, 122 repository-ignored; all 5,058
+unique names reconcile to the native final summary. All six affected emulator
+module cases pass after materializing tracked sparse inputs, but the original
+full aggregate stays failed. The prior observer receipt and all snapshots
+remain preserved; its 19 expected-panic omissions are reconciled in the new
+independent final receipt. Process supervision is retired without a signal
+or full rerun. See the separate
 [6420ed5c validation record](checks/parent-6420ed5c-20261027/README.md)
 for actual results and pending checks. Earlier sections retain their original
 543bbd/2efb source scope and are not substituted for this new integration.
