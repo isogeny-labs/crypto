@@ -3,7 +3,9 @@
 
 use std::collections::BTreeMap;
 
-use crate::combi::{binom_f, pattern_weight, pattern_weight_mod4, pattern_weight_parity, PatternTable};
+use crate::combi::{
+    binom_f, pattern_weight, pattern_weight_mod4, pattern_weight_parity, PatternTable,
+};
 use crate::runner::Row;
 use crate::Rng;
 
@@ -21,7 +23,11 @@ pub enum NullMode {
 }
 impl From<bool> for NullMode {
     fn from(aware: bool) -> NullMode {
-        if aware { NullMode::Parity } else { NullMode::Naive }
+        if aware {
+            NullMode::Parity
+        } else {
+            NullMode::Naive
+        }
     }
 }
 
@@ -42,7 +48,9 @@ pub fn mu_classes(row: &Row, pt: &PatternTable, mode: impl Into<NullMode>) -> Ve
             scale
                 * ps.iter()
                     .map(|&p| match mode {
-                        NullMode::Parity if row.a == 0 => pattern_weight_mod4(&pt.pats[p], &xs, &row.xodd, &row.xtwo),
+                        NullMode::Parity if row.a == 0 => {
+                            pattern_weight_mod4(&pt.pats[p], &xs, &row.xodd, &row.xtwo)
+                        }
                         NullMode::Parity => pattern_weight_parity(&pt.pats[p], &xs, &row.xodd),
                         _ => pattern_weight(&pt.pats[p], &xs),
                     })
@@ -64,7 +72,12 @@ pub struct Pooled {
 }
 
 /// Pool rows; each row's null is rescaled to that row's observed total.
-pub fn pool(rows: &[&Row], pt: &PatternTable, aware: impl Into<NullMode> + Copy, use_frac: bool) -> Pooled {
+pub fn pool(
+    rows: &[&Row],
+    pt: &PatternTable,
+    aware: impl Into<NullMode> + Copy,
+    use_frac: bool,
+) -> Pooled {
     let d = pt.n_classes();
     let (mut y, mut mu) = (vec![0.0; d], vec![0.0; d]);
     for r in rows {
@@ -107,12 +120,22 @@ pub fn rel_bias(p: &Pooled) -> f64 {
             k += 1;
         }
     }
-    if k > 0 { acc / k as f64 } else { f64::NAN }
+    if k > 0 {
+        acc / k as f64
+    } else {
+        f64::NAN
+    }
 }
 
 fn resid(p: &Pooled) -> Vec<f64> {
     (0..p.y.len())
-        .map(|c| if p.mu[c] > 0.0 { (p.y[c] - p.mu[c]) / p.mu[c].sqrt() } else { 0.0 })
+        .map(|c| {
+            if p.mu[c] > 0.0 {
+                (p.y[c] - p.mu[c]) / p.mu[c].sqrt()
+            } else {
+                0.0
+            }
+        })
         .collect()
 }
 
@@ -179,11 +202,16 @@ fn split_core(ys: &[&[f64]], m0: &[Vec<f64>], seed: u64, nsplit: usize) -> (f64,
         let (sy, sm): (f64, f64) = (pb.y.iter().sum(), pb.mu.iter().sum());
         let ty: f64 = order[..q].iter().map(|&c| pb.y[c]).sum();
         let tm: f64 = order[..q].iter().map(|&c| pb.mu[c]).sum();
-        trs.push(if sy > 0.0 && tm > 0.0 { (ty / sy) / (tm / sm) } else { f64::NAN });
+        trs.push(if sy > 0.0 && tm > 0.0 {
+            (ty / sy) / (tm / sm)
+        } else {
+            f64::NAN
+        });
     }
     let rho = rhos.iter().sum::<f64>() / rhos.len() as f64;
     let tr = trs.iter().sum::<f64>() / trs.len() as f64;
-    let tr_sd = (trs.iter().map(|t| (t - tr).powi(2)).sum::<f64>() / trs.len().max(1) as f64).sqrt();
+    let tr_sd =
+        (trs.iter().map(|t| (t - tr).powi(2)).sum::<f64>() / trs.len().max(1) as f64).sqrt();
     (rho, tr, tr_sd)
 }
 
@@ -196,7 +224,14 @@ fn split_core(ys: &[&[f64]], m0: &[Vec<f64>], seed: u64, nsplit: usize) -> (f64,
 /// null datasets: class counts drawn Poisson around each row's own null (rescaled to the row's
 /// observed total), pushed through the SAME splits and the SAME code. Under that null z has sd 1
 /// up to the Monte-Carlo error of the SE (about 1/sqrt(2 nperm)); a test checks this at two D.
-pub fn split_stats(rows: &[&Row], pt: &PatternTable, aware: impl Into<NullMode> + Copy, seed: u64, nsplit: usize, nperm: usize) -> SplitStat {
+pub fn split_stats(
+    rows: &[&Row],
+    pt: &PatternTable,
+    aware: impl Into<NullMode> + Copy,
+    seed: u64,
+    nsplit: usize,
+    nperm: usize,
+) -> SplitStat {
     let all = pool(rows, pt, aware, true);
     let phi_all = phi(&all);
     let m0: Vec<Vec<f64>> = rows.iter().map(|r| mu_classes(r, pt, aware)).collect();
@@ -206,7 +241,11 @@ pub fn split_stats(rows: &[&Row], pt: &PatternTable, aware: impl Into<NullMode> 
     let ks: Vec<f64> = (0..rows.len())
         .map(|i| {
             let (sy, sm): (f64, f64) = (ys[i].iter().sum(), m0[i].iter().sum());
-            if sm > 0.0 { sy / sm } else { 0.0 }
+            if sm > 0.0 {
+                sy / sm
+            } else {
+                0.0
+            }
         })
         .collect();
     let mut null = vec![];
@@ -218,13 +257,26 @@ pub fn split_stats(rows: &[&Row], pt: &PatternTable, aware: impl Into<NullMode> 
         null.push(split_core(&simr, &m0, seed, nsplit).0);
     }
     let nm = null.iter().sum::<f64>() / null.len().max(1) as f64;
-    let se = (null.iter().map(|v| (v - nm).powi(2)).sum::<f64>() / (null.len().max(2) - 1) as f64).sqrt();
-    SplitStat { rho, rho_se: se, rho_null_mean: nm, transfer: tr, transfer_sd: tr_sd, phi: phi_all, nsplit }
+    let se = (null.iter().map(|v| (v - nm).powi(2)).sum::<f64>() / (null.len().max(2) - 1) as f64)
+        .sqrt();
+    SplitStat {
+        rho,
+        rho_se: se,
+        rho_null_mean: nm,
+        transfer: tr,
+        transfer_sd: tr_sd,
+        phi: phi_all,
+        nsplit,
+    }
 }
 
 /// Calibrated z of one arm: (rho - null mean) / null sd.
 pub fn z_of(s: &SplitStat) -> f64 {
-    if s.rho_se > 0.0 { (s.rho - s.rho_null_mean) / s.rho_se } else { 0.0 }
+    if s.rho_se > 0.0 {
+        (s.rho - s.rho_null_mean) / s.rho_se
+    } else {
+        0.0
+    }
 }
 
 /// Direct frob-versus-frobperm contrast: difference of the two arms' calibrated rho over the
@@ -232,7 +284,11 @@ pub fn z_of(s: &SplitStat) -> f64 {
 /// rhos are positively correlated and this z is conservative; under independent nulls it is exact).
 pub fn contrast_z(f: &SplitStat, p: &SplitStat) -> f64 {
     let sd = (f.rho_se.powi(2) + p.rho_se.powi(2)).sqrt();
-    if sd > 0.0 { ((f.rho - f.rho_null_mean) - (p.rho - p.rho_null_mean)) / sd } else { 0.0 }
+    if sd > 0.0 {
+        ((f.rho - f.rho_null_mean) - (p.rho - p.rho_null_mean)) / sd
+    } else {
+        0.0
+    }
 }
 
 /// Rows grouped by cell then arm.
@@ -241,7 +297,11 @@ pub type Cells = BTreeMap<(u32, u32, usize, usize), BTreeMap<String, Vec<Row>>>;
 pub fn group(rows: Vec<Row>) -> Cells {
     let mut m: Cells = BTreeMap::new();
     for r in rows {
-        m.entry((r.a, r.n, r.m, r.l)).or_default().entry(r.arm.clone()).or_default().push(r);
+        m.entry((r.a, r.n, r.m, r.l))
+            .or_default()
+            .entry(r.arm.clone())
+            .or_default()
+            .push(r);
     }
     m
 }
@@ -267,15 +327,28 @@ pub const MIN_D_FOR_RHO: usize = 61;
 
 /// Bootstrap (over V draws, rows resampled with replacement within each arm)
 /// of phi(frob) / max(phi(controls)). Returns (point, lo95, hi95).
-pub fn phi_ratio_boot(frob: &[&Row], ctrls: &[Vec<&Row>], pt: &PatternTable, seed: u64, nboot: usize) -> (f64, f64, f64) {
+pub fn phi_ratio_boot(
+    frob: &[&Row],
+    ctrls: &[Vec<&Row>],
+    pt: &PatternTable,
+    seed: u64,
+    nboot: usize,
+) -> (f64, f64, f64) {
     let ratio = |f: &[&Row], cs: &[Vec<&Row>]| {
         let pf = phi(&pool(f, pt, true, true));
-        let pc = cs.iter().map(|c| phi(&pool(c, pt, true, true))).fold(f64::MIN, f64::max);
+        let pc = cs
+            .iter()
+            .map(|c| phi(&pool(c, pt, true, true)))
+            .fold(f64::MIN, f64::max);
         pf / pc
     };
     let point = ratio(frob, ctrls);
     let mut rng = Rng(seed);
-    let rs = |v: &[&Row], rng: &mut Rng| -> Vec<usize> { (0..v.len()).map(|_| rng.below(v.len() as u64) as usize).collect() };
+    let rs = |v: &[&Row], rng: &mut Rng| -> Vec<usize> {
+        (0..v.len())
+            .map(|_| rng.below(v.len() as u64) as usize)
+            .collect()
+    };
     let mut vals = vec![];
     for _ in 0..nboot {
         let fi = rs(frob, &mut rng);

@@ -71,7 +71,14 @@ impl Fq {
         for i in 0..q1 {
             exp[q1 + i] = exp[i];
         }
-        let mut f = Fq { n, q1, exp, log, tr_mask: 0, half_trace: vec![] };
+        let mut f = Fq {
+            n,
+            q1,
+            exp,
+            log,
+            tr_mask: 0,
+            half_trace: vec![],
+        };
         for i in 0..n {
             let e = 1u32 << i;
             let (mut t, mut z) = (0u32, e);

@@ -24,6 +24,9 @@ The token is a bearer credential: never commit it or paste it into a PR, report 
 3. Commit the cell directory. `run_cells.sh` refuses a dirty tree under this directory (exit 3) and records the frozen sha
    (the last commit that touched the directory). The PR that lands the result names that sha.
 
+Gate scope (amendment 2026-10-27): `scripts/checkpoint.sh gate` is a SESSION-side launcher gate. The session runs it (and `run_cells.sh`, which calls it) before
+submitting or launching; it is never invoked inside a remote/isolab job. Each fenced block below is self-contained: it starts with its own `cd` and exports, so it runs in a fresh shell.
+
 ## 2. Run
 
 Route (revision 3, to be decided by the experiment director before the freeze): AGENTS.md 9a makes isolab-eks the default for authorized x86 CPU
@@ -40,7 +43,7 @@ arms (frob, frobperm, rsub, rset, skew, geom, plain, plainbig) through the same 
     cd /home/user/crypto/research/frobenius_msweep_20261027/g2-orbit-union-Dnm
     ./run_cells.sh 3          # 3 parallel cell jobs; the 4th CPU stays free
 
-Steps it performs: gate, clean-tree check, `cargo test --release` (28 tests must pass; about 50 s), `cargo build --release`, then writes
+Steps it performs: gate, clean-tree check, `cargo test --release` (30 tests must pass; about 50 s), `cargo build --release`, then writes
 `plan.tsv`, `cells.txt`, `run_meta.txt` (frozen sha, HEAD, rustc -V, cargo -V, seed, jobs, nproc, uname, load, start/finish UTC),
 `host.txt`, `binary.sha256`, `rows.sha256`; runs the 52 cells (largest estimated first, one process per cell, `xargs -P`), logs each to
 `log_a*_n*_m*_l*.txt`, records failed jobs in `run_meta.txt` and continues, then runs `g2dnm analyze` on whatever was written.

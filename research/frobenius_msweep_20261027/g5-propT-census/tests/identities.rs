@@ -30,7 +30,11 @@ fn field_basics() {
             }
         }
         for j in 1..n {
-            assert_eq!(rank(&sigma_matrix(&f, j)), n as usize, "sigma^j matrix is invertible");
+            assert_eq!(
+                rank(&sigma_matrix(&f, j)),
+                n as usize,
+                "sigma^j matrix is invertible"
+            );
         }
     }
 }
@@ -45,7 +49,9 @@ fn s3_matches_point_addition_for_both_a() {
         while checked < 300 {
             let x1 = f.rand(&mut rng);
             let x2 = f.rand(&mut rng);
-            let (Some(y1), Some(y2)) = (c.lift_x(x1), c.lift_x(x2)) else { continue };
+            let (Some(y1), Some(y2)) = (c.lift_x(x1), c.lift_x(x2)) else {
+                continue;
+            };
             let p = Pt::Aff(x1, y1);
             let q = Pt::Aff(x2, y2);
             assert!(c.on_curve(p) && c.on_curve(q));
@@ -86,7 +92,12 @@ fn roots_are_all_roots() {
 #[test]
 fn primary_curve_orders() {
     // Orders and largest prime factors of the planned primary cells (a, n) = (1,11), (0,13), (1,17), (0,19).
-    for (a, n, ne, r) in [(1u32, 11u32, 1982u32, 991u32), (0, 13, 8012, 2003), (1, 17, 131174, 65587), (0, 19, 523492, 130873)] {
+    for (a, n, ne, r) in [
+        (1u32, 11u32, 1982u32, 991u32),
+        (0, 13, 8012, 2003),
+        (1, 17, 131174, 65587),
+        (0, 19, 523492, 130873),
+    ] {
         let f = Fq::new(n);
         let (ne2, r2, chk) = curve_summary(&f, a);
         assert_eq!((ne2, r2), (ne, r), "a={a} n={n}");
@@ -112,7 +123,11 @@ fn group_frobenius_equivariance_exhaustive() {
             let xj = f.frob(x, j);
             let dj = g.dlog[xj as usize];
             assert_ne!(dj, NONE, "sigma maps G-classes to G-classes");
-            assert_eq!(dj, g.class(g.mulmod(g.lam_pow(j), d)), "d(sigma^j x) = class(lam^j d)");
+            assert_eq!(
+                dj,
+                g.class(g.mulmod(g.lam_pow(j), d)),
+                "d(sigma^j x) = class(lam^j d)"
+            );
         }
     }
 }
@@ -128,7 +143,11 @@ fn chain_membership_matches_signed_sums_m2_m3_exhaustive() {
             for mask in 0u32..(1 << m) {
                 let mut s: u64 = 0;
                 for (i, &d) in set.ds.iter().enumerate() {
-                    s += if (mask >> i) & 1 == 0 { d as u64 } else { (g.r - d) as u64 };
+                    s += if (mask >> i) & 1 == 0 {
+                        d as u64
+                    } else {
+                        (g.r - d) as u64
+                    };
                 }
                 let c = g.class((s % g.r as u64) as u32);
                 if c != 0 {
@@ -154,7 +173,11 @@ fn chain_implies_signed_sum_and_converse_up_to_order_m4() {
         for mask in 0u32..16 {
             let mut s: u64 = 0;
             for (i, &d) in set.ds.iter().enumerate() {
-                s += if (mask >> i) & 1 == 0 { d as u64 } else { (g.r - d) as u64 };
+                s += if (mask >> i) & 1 == 0 {
+                    d as u64
+                } else {
+                    (g.r - d) as u64
+                };
             }
             let c = g.class((s % g.r as u64) as u32);
             if c != 0 {
@@ -187,7 +210,11 @@ fn chain_implies_signed_sum_and_converse_up_to_order_m4() {
                 }
                 any |= c;
             }
-            assert_eq!(any, ks.contains(&a), "a={a}: some order of the chain finds every signed-sum solution");
+            assert_eq!(
+                any,
+                ks.contains(&a),
+                "a={a}: some order of the chain finds every signed-sum solution"
+            );
         }
     }
 }
@@ -197,7 +224,11 @@ fn prop_t_holds_on_koblitz_all_m_and_fails_on_controls() {
     let f = Fq::new(11);
     for m in 2..=8usize {
         let mut rng = Rng::new(100 + m as u64);
-        let (mut kob, mut ord, mut wrong) = (CellTally::default(), CellTally::default(), CellTally::default());
+        let (mut kob, mut ord, mut wrong) = (
+            CellTally::default(),
+            CellTally::default(),
+            CellTally::default(),
+        );
         for _ in 0..150 {
             kob.add(&run_trial(&f, Arm::Koblitz, m, 3, &[], &mut rng).unwrap());
             ord.add(&run_trial(&f, Arm::Ordinary, m, 3, &[], &mut rng).unwrap());
@@ -207,15 +238,30 @@ fn prop_t_holds_on_koblitz_all_m_and_fails_on_controls() {
         assert_eq!(kob.trials_bool_fail, 0);
         assert_eq!(kob.rec_singular, 0);
         assert_eq!(kob.plant_bad, 0);
-        assert_eq!(kob.conj_member_fail, 0, "conjugated planted solution must be a solution");
+        assert_eq!(
+            kob.conj_member_fail, 0,
+            "conjugated planted solution must be a solution"
+        );
         assert_eq!(kob.dom_fail, 0);
         assert_eq!(kob.neg_disagree, 0);
-        assert!(kob.planted > 80, "planting must mostly succeed (m={m}: {})", kob.planted);
+        assert!(
+            kob.planted > 80,
+            "planting must mostly succeed (m={m}: {})",
+            kob.planted
+        );
         // ordinary curve: the identity fails in every assignment
         assert_eq!(ord.assigns_eq_fail, ord.assigns, "m={m}");
-        assert!(ord.conj_member_fail * 10 >= ord.conj_member_n * 9, "ordinary conj_member fails in >= 90%");
+        assert!(
+            ord.conj_member_fail * 10 >= ord.conj_member_n * 9,
+            "ordinary conj_member fails in >= 90%"
+        );
         // wrong direction: field identity fails (with K=3 assignments) in nearly every trial
-        assert!(wrong.trials_eq_fail * 10 >= wrong.trials * 9, "wrongdir detection {}/{}", wrong.trials_eq_fail, wrong.trials);
+        assert!(
+            wrong.trials_eq_fail * 10 >= wrong.trials * 9,
+            "wrongdir detection {}/{}",
+            wrong.trials_eq_fail,
+            wrong.trials
+        );
     }
 }
 
@@ -239,7 +285,10 @@ fn stable_subspaces_at_n17_and_collapse() {
     let mut cnt = 0;
     for j in 1..17 {
         let w = poly_window(8);
-        if frob_basis(&f, &w, j).iter().all(|&v| coords(&w, v).is_some()) {
+        if frob_basis(&f, &w, j)
+            .iter()
+            .all(|&v| coords(&w, v).is_some())
+        {
             cnt += 1;
         }
     }
@@ -261,7 +310,11 @@ fn naive_census(ds: &[u32], r: u32, m: usize, mus: &[u32]) -> (u64, Vec<u64>) {
         for mask in 0u32..(1 << m) {
             let mut s: u64 = 0;
             for (i, &k) in idx.iter().enumerate() {
-                s += if (mask >> i) & 1 == 0 { ds[k] as u64 } else { (r - ds[k]) as u64 };
+                s += if (mask >> i) & 1 == 0 {
+                    ds[k] as u64
+                } else {
+                    (r - ds[k]) as u64
+                };
             }
             let c = cls(s);
             if c != 0 {
@@ -314,7 +367,9 @@ fn census_matches_naive_and_planted_overlaps_are_recalled() {
     for m in 2..=6usize {
         let set = random_class_set(&g, m, &mut rng);
         let out = census(&set.ds, g.r, m, &[&fr], 0, 0, None);
-        let ks: Vec<u32> = (1..=g.half()).filter(|&a| out.cnt[a as usize] > 0).collect();
+        let ks: Vec<u32> = (1..=g.half())
+            .filter(|&a| out.cnt[a as usize] > 0)
+            .collect();
         assert!(ks.len() >= 2, "m={m}");
         let (a, b) = (ks[0], ks[ks.len() / 2]);
         // mu = b / a mod r
@@ -325,7 +380,10 @@ fn census_matches_naive_and_planted_overlaps_are_recalled() {
         }
         let pl = Mult::from_units(g.r, &[mu]);
         let o2 = census(&set.ds, g.r, m, &[&pl], 4, 0, None);
-        assert!(o2.u[0][0] >= 1, "planted overlap (a -> b) must be recalled, m={m}");
+        assert!(
+            o2.u[0][0] >= 1,
+            "planted overlap (a -> b) must be recalled, m={m}"
+        );
         let (_, naive) = naive_census(&set.ds, g.r, m, &[mu]);
         assert_eq!(o2.u[0][0], naive[0]);
     }
@@ -345,7 +403,11 @@ fn halving_form_holds_for_every_coincidence() {
                 let (pairs, ok) = halving_check(&set.ds, g.r, &s.idx, s.a, s.b, fr.mus[s.t]);
                 assert!(ok && pairs >= 1, "m={m} a={} b={}", s.a, s.b);
                 // not vacuous: with the wrong unit the check must fail (it ties the table entry to mu)
-                let wrong = if fr.mus[s.t] + 1 == g.r - 1 || fr.mus[s.t] + 1 == 1 { fr.mus[s.t] + 2 } else { fr.mus[s.t] + 1 };
+                let wrong = if fr.mus[s.t] + 1 == g.r - 1 || fr.mus[s.t] + 1 == 1 {
+                    fr.mus[s.t] + 2
+                } else {
+                    fr.mus[s.t] + 1
+                };
                 let (_, bad) = halving_check(&set.ds, g.r, &s.idx, s.a, s.b, wrong);
                 assert!(!bad, "wrong multiplier must be rejected, m={m}");
                 total += 1;
@@ -394,7 +456,10 @@ fn stable_base_has_exact_equivariance_and_nonstable_does_not() {
     assert!(set.is_sigma_closed(&f));
     let out = census(&set.ds, g.r, 2, &[&fr], 0, 0, None);
     let ind = ind_stats(&out.cnt, &fr);
-    assert!(ind.count_equal.iter().all(|&c| c == ind.ncls), "stable base: |Sol(a)| = |Sol(lam^j a)| for all a, j");
+    assert!(
+        ind.count_equal.iter().all(|&c| c == ind.ncls),
+        "stable base: |Sol(a)| = |Sol(lam^j a)| for all a, j"
+    );
     // a random subspace of the same dimension is not closed and not equivariant (nonempty solution sets)
     let mut rng = Rng::new(51);
     let w = span(&random_subspace(&f, 9, &mut rng));
@@ -445,7 +510,11 @@ fn rank_orbit_basis_conjugates_add_nothing_and_controls_grow() {
     let f = Fq::new(11);
     let g = build_group(&f, 1).unwrap();
     let ob = build_orbits(&f, &g);
-    assert_eq!(ob.n_orbits as u32 * f.n, g.half(), "all orbits of G-classes have size n");
+    assert_eq!(
+        ob.n_orbits as u32 * f.n,
+        g.half(),
+        "all orbits of G-classes have size n"
+    );
     let mut rng = Rng::new(81);
     let mut saw_growth = false;
     for m in 2..=4usize {
@@ -453,13 +522,25 @@ fn rank_orbit_basis_conjugates_add_nothing_and_controls_grow() {
         let set = BaseSet::from_elems(&g, &v);
         let ro = rank_census(&f, &g, &ob, &set.ds, m, 12, 60, &mut rng);
         assert!(ro.n_rel > 0, "m={m}");
-        assert_eq!(ro.rows_bad, 0, "every row satisfies its identity with the true logarithms");
+        assert_eq!(
+            ro.rows_bad, 0,
+            "every row satisfies its identity with the true logarithms"
+        );
         assert_eq!(ro.incons, 0);
-        assert_eq!(ro.nonproportional, 0, "orbit rows of conjugates are lam^j multiples");
-        assert_eq!(ro.rank_orbit_n, ro.rank_orbit_1, "conjugates add no rank in the orbit basis (m={m})");
+        assert_eq!(
+            ro.nonproportional, 0,
+            "orbit rows of conjugates are lam^j multiples"
+        );
+        assert_eq!(
+            ro.rank_orbit_n, ro.rank_orbit_1,
+            "conjugates add no rank in the orbit basis (m={m})"
+        );
         assert!(ro.rank_plain_n >= ro.rank_plain_1);
         assert!(ro.rank_orbit_wrong >= ro.rank_orbit_n);
-        if ro.rank_plain_n > ro.rank_plain_1 || ro.rank_orbit_wrong > ro.rank_orbit_n || ro.rank_orbit_indep > ro.rank_orbit_1 {
+        if ro.rank_plain_n > ro.rank_plain_1
+            || ro.rank_orbit_wrong > ro.rank_orbit_n
+            || ro.rank_orbit_indep > ro.rank_orbit_1
+        {
             saw_growth = true;
         }
     }
@@ -498,7 +579,10 @@ fn orbit_union_is_sigma_closed_and_equivariant() {
     let fr = Mult::frobenius(&g);
     let out = census(&set.ds, g.r, 2, &[&fr], 0, 0, None);
     let ind = ind_stats(&out.cnt, &fr);
-    assert!(ind.count_equal.iter().all(|&c| c == ind.ncls), "sigma-closed base: |Sol(a)| = |Sol(lam^j a)|");
+    assert!(
+        ind.count_equal.iter().all(|&c| c == ind.ncls),
+        "sigma-closed base: |Sol(a)| = |Sol(lam^j a)|"
+    );
 }
 
 #[test]
@@ -515,14 +599,19 @@ fn orbit_strata_partition_the_counts() {
         let out = census(&set.ds, g.r, m, &[&fr, &nl], 0, 0, Some(&orbs));
         assert_eq!(out.strat_nsub.iter().sum::<u64>(), out.nsub);
         assert_eq!(out.strat_nsol.iter().sum::<u64>(), out.nsol);
-        assert_eq!(out.strat_u[0].iter().sum::<u64>(), out.u[0].iter().sum::<u64>());
-        assert_eq!(out.strat_u[1].iter().sum::<u64>(), out.u[1].iter().sum::<u64>());
+        assert_eq!(
+            out.strat_u[0].iter().sum::<u64>(),
+            out.u[0].iter().sum::<u64>()
+        );
+        assert_eq!(
+            out.strat_u[1].iter().sum::<u64>(),
+            out.u[1].iter().sum::<u64>()
+        );
         if m >= 3 {
             assert_eq!(out.strat_nsub[2], 0, "only two orbits present");
         }
     }
 }
-
 
 /// Every sampled coincidence of the Frobenius set is a coincidence of that very multiplier (sample.t indexes it).
 #[test]
@@ -547,7 +636,10 @@ fn naive_low_height_hits(f: &Fq, g: &Group, ob: &Orbits, ds: &[u32], m: usize) -
     let nx = ds.len();
     let mut idx: Vec<usize> = (0..m).collect();
     loop {
-        let orbs: Vec<u32> = idx.iter().map(|&i| ob.orbit[(ds[i] - 1) as usize]).collect();
+        let orbs: Vec<u32> = idx
+            .iter()
+            .map(|&i| ob.orbit[(ds[i] - 1) as usize])
+            .collect();
         if orbs.iter().all(|&o| o == orbs[0]) {
             let mut ks: Vec<u32> = idx.iter().map(|&i| ob.k[(ds[i] - 1) as usize]).collect();
             let sp = circular_spread(&mut ks, g.n);
@@ -557,7 +649,11 @@ fn naive_low_height_hits(f: &Fq, g: &Group, ob: &Orbits, ds: &[u32], m: usize) -
                 let mut sum: u64 = 0;
                 for (t, &i) in idx.iter().enumerate() {
                     let d = ds[i] as u64;
-                    sum += if (mask >> t) & 1 == 0 { d } else { g.r as u64 - d };
+                    sum += if (mask >> t) & 1 == 0 {
+                        d
+                    } else {
+                        g.r as u64 - d
+                    };
                 }
                 let v = (sum % g.r as u64) as u32;
                 let c = v.min(g.r - v);
@@ -616,15 +712,25 @@ fn low_height_single_orbit_pairs_never_coincide() {
             let set = orbit_union(&f, &g, 2, &mut rng);
             let orbs: Vec<u32> = set.ds.iter().map(|&d| ob.orbit[(d - 1) as usize]).collect();
             let ks: Vec<u32> = set.ds.iter().map(|&d| ob.k[(d - 1) as usize]).collect();
-            let oi = OrbInfo { orbit: &orbs, k: Some(&ks), n: g.n };
+            let oi = OrbInfo {
+                orbit: &orbs,
+                k: Some(&ks),
+                n: g.n,
+            };
             let out = census_ex(&set.ds, g.r, m, &[&fr, &nl], 0, 0, Some(&oi));
             let (np, nh) = naive_low_height_hits(&f, &g, &ob, &set.ds, m);
             assert_eq!(out.s1l_pairs, np, "pair count a={a} n={n} m={m}");
             assert_eq!(nh, 0, "naive: theorem violated a={a} n={n} m={m}");
-            assert_eq!(out.s1l_u[0], 0, "census: Frobenius coincidence on a provably free pair a={a} n={n} m={m}");
+            assert_eq!(
+                out.s1l_u[0], 0,
+                "census: Frobenius coincidence on a provably free pair a={a} n={n} m={m}"
+            );
             total_pairs += out.s1l_pairs;
         }
-        assert!(total_pairs > 100, "the check is not vacuous a={a} n={n}: {total_pairs}");
+        assert!(
+            total_pairs > 100,
+            "the check is not vacuous a={a} n={n}: {total_pairs}"
+        );
     }
 }
 
@@ -644,7 +750,11 @@ fn null_hits_exist_on_low_height_pairs_when_weight_is_large() {
         let set = orbit_union(&f, &g, 2, &mut rng);
         let orbs: Vec<u32> = set.ds.iter().map(|&d| ob.orbit[(d - 1) as usize]).collect();
         let ks: Vec<u32> = set.ds.iter().map(|&d| ob.k[(d - 1) as usize]).collect();
-        let oi = OrbInfo { orbit: &orbs, k: Some(&ks), n: g.n };
+        let oi = OrbInfo {
+            orbit: &orbs,
+            k: Some(&ks),
+            n: g.n,
+        };
         let out = census_ex(&set.ds, g.r, 3, &[&fr, &nl], 0, 0, Some(&oi));
         assert_eq!(out.s1l_u[0], 0);
         tot += out.s1l_u[1];
@@ -665,7 +775,10 @@ fn planted_multipliers_guarantee_a_hit_per_lag() {
             let pl = Mult::planted(g.r, &set.ds, m, fr.len(), &mut rng).expect("planted");
             let n2 = Mult::random_null(g.r, fr.len(), &mut rng);
             let out = census_ex(&set.ds, g.r, m, &[&fr, &n2, &pl], 0, 0, None);
-            assert!(out.u[2].iter().all(|&h| h >= 1), "every lag has its guaranteed hit, m={m}");
+            assert!(
+                out.u[2].iter().all(|&h| h >= 1),
+                "every lag has its guaranteed hit, m={m}"
+            );
             let (_, naive) = naive_census(&set.ds, g.r, m, &pl.mus);
             assert_eq!(out.u[2], naive);
         }
@@ -703,7 +816,12 @@ fn rank_cap_keeps_the_controls_able_to_grow() {
             let v = span(&random_subspace(&f, 7, &mut rng));
             let set = BaseSet::from_elems(&g, &v);
             let ro = rank_census(&f, &g, &ob, &set.ds, m, 16, 40, &mut rng);
-            assert!(ro.row_cap_eff <= (ro.orbits_touched / 3).max(2), "cap {} touched {}", ro.row_cap_eff, ro.orbits_touched);
+            assert!(
+                ro.row_cap_eff <= (ro.orbits_touched / 3).max(2),
+                "cap {} touched {}",
+                ro.row_cap_eff,
+                ro.orbits_touched
+            );
             assert!(ro.n_rel <= ro.row_cap_eff);
             assert_eq!(ro.nonproportional, 0);
             assert_eq!(ro.rank_orbit_n, ro.rank_orbit_1);
@@ -714,6 +832,12 @@ fn rank_cap_keeps_the_controls_able_to_grow() {
             matched += (ro.n_rel_indep >= ro.indep_need) as usize;
         }
     }
-    assert!(wrong_grew >= 6 && indep_grew >= 6, "controls grew: wrong {wrong_grew} indep {indep_grew}");
-    assert!(matched >= 6, "independent control row-matched in {matched} of 12");
+    assert!(
+        wrong_grew >= 6 && indep_grew >= 6,
+        "controls grew: wrong {wrong_grew} indep {indep_grew}"
+    );
+    assert!(
+        matched >= 6,
+        "independent control row-matched in {matched} of 12"
+    );
 }

@@ -60,7 +60,13 @@ pub fn build_orbits(f: &Fq, g: &Group) -> Orbits {
         }
     }
     let n_orbits = rep_d.len();
-    Orbits { orbit, k: kk, sgn, rep_d, n_orbits }
+    Orbits {
+        orbit,
+        k: kk,
+        sgn,
+        rep_d,
+        n_orbits,
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -80,7 +86,13 @@ pub struct Ech {
 
 impl Ech {
     pub fn new(r: u32, cols: usize) -> Ech {
-        Ech { r: r as u64, cols, piv: vec![None; cols], rank: 0, incons: 0 }
+        Ech {
+            r: r as u64,
+            cols,
+            piv: vec![None; cols],
+            rank: 0,
+            incons: 0,
+        }
     }
     /// row has length cols + 1 (last = right-hand side). Returns true if the rank grew.
     pub fn insert(&mut self, mut row: Vec<u32>) -> bool {
@@ -156,7 +168,14 @@ pub fn plain_row(f: &Fq, g: &Group, rel: &Rel, j: u32) -> (Sparse, u32, bool) {
 
 /// Orbit-basis row of the relation conjugated by sigma^j, built from the tables of the conjugate legs.
 /// `lam_used` is lam for the honest row; a wrong multiplier gives the negative control.
-pub fn orbit_row(f: &Fq, g: &Group, ob: &Orbits, rel: &Rel, j: u32, lam_used: u32) -> (Sparse, u32, bool) {
+pub fn orbit_row(
+    f: &Fq,
+    g: &Group,
+    ob: &Orbits,
+    rel: &Rel,
+    j: u32,
+    lam_used: u32,
+) -> (Sparse, u32, bool) {
     let r = g.r;
     let lj = g.lam_pow(j);
     let mut tmp: HashMap<u32, u32> = HashMap::new();
@@ -235,7 +254,11 @@ pub fn find_relations(ds: &[u32], r: u32, m: usize, lab: &[u8], nlabels: usize) 
                             }
                         })
                         .collect();
-                    out[label].push(Rel { a, ds: idx.iter().map(|&k| ds[k]).collect(), eps });
+                    out[label].push(Rel {
+                        a,
+                        ds: idx.iter().map(|&k| ds[k]).collect(),
+                        eps,
+                    });
                 }
             }
         }
@@ -279,7 +302,16 @@ fn dense(row: &Sparse, rhs: u32, colmap: &HashMap<u32, usize>, cols: usize) -> V
 
 /// Rank census of one base. t1 targets (label 1) give N relations; their n-1 conjugates are added;
 /// the independent control uses t1 * n fresh targets outside the conjugate orbits.
-pub fn rank_census(f: &Fq, g: &Group, ob: &Orbits, ds: &[u32], m: usize, t1: usize, row_cap: usize, rng: &mut Rng) -> RankOut {
+pub fn rank_census(
+    f: &Fq,
+    g: &Group,
+    ob: &Orbits,
+    ds: &[u32],
+    m: usize,
+    t1: usize,
+    row_cap: usize,
+    rng: &mut Rng,
+) -> RankOut {
     let r = g.r;
     let half = g.half() as usize;
     let n = g.n;
@@ -339,7 +371,13 @@ pub fn rank_census(f: &Fq, g: &Group, ob: &Orbits, ds: &[u32], m: usize, t1: usi
     // the independent control is row-matched to the conjugate rows: (n-1) times as many rows as original relations
     let indep_need = (n as usize - 1) * r1.len();
     let r2 = take(&rels[1], per1.max(1), indep_need);
-    let mut out = RankOut { n_rel: r1.len(), n_rel_indep: r2.len(), row_cap_eff: row_cap, indep_need, ..Default::default() };
+    let mut out = RankOut {
+        n_rel: r1.len(),
+        n_rel_indep: r2.len(),
+        row_cap_eff: row_cap,
+        indep_need,
+        ..Default::default()
+    };
     if r1.is_empty() {
         return out;
     }

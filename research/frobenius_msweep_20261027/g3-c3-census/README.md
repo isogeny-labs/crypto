@@ -59,3 +59,4 @@ Clean-up: build with `CARGO_TARGET_DIR=<dir outside the tree> cargo build --rele
 (the freeze requires an empty `git status`; tests write to the OS temp dir);
 delete that directory when finished. Revision 3 (PROTOCOL section 15): P3 re-derived,
 O-STRUCTURE fails closed on missing controls, freeze commands made exact.
+Revision 4 (PROTOCOL section 16, 2026-10-27): O-RELABEL now requires the P3 positive control; Cargo.lock no longer git-added in the freeze (ignored; hashed only). 38 tests.

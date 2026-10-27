@@ -57,10 +57,16 @@ pub const HEADER: &str =
     "a\tn\tm\tl\tarm\tvd\tnt\tnb\tD\torder\tnpts\tnleft\ttotal\tunamb\toverflow\taudit\tms\txs\txodd\txtwo\tseed\tycov\tyfrac\tyrep";
 
 fn join<T: ToString>(v: &[T]) -> String {
-    v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",")
+    v.iter()
+        .map(|x| x.to_string())
+        .collect::<Vec<_>>()
+        .join(",")
 }
 fn join_f(v: &[f64]) -> String {
-    v.iter().map(|x| format!("{x:.5}")).collect::<Vec<_>>().join(",")
+    v.iter()
+        .map(|x| format!("{x:.5}"))
+        .collect::<Vec<_>>()
+        .join(",")
 }
 fn split<T: std::str::FromStr>(s: &str) -> Vec<T>
 where
@@ -171,7 +177,11 @@ pub fn odd_counts(f: &Fq, c: &Curve, fam: &family::Family) -> Vec<u64> {
     let ta = f.tr(c.a);
     fam.blocks
         .iter()
-        .map(|b| b.iter().filter(|&&x| c.lift(f, x).is_some() && f.tr(x) != ta).count() as u64)
+        .map(|b| {
+            b.iter()
+                .filter(|&&x| c.lift(f, x).is_some() && f.tr(x) != ta)
+                .count() as u64
+        })
         .collect()
 }
 
@@ -182,7 +192,10 @@ pub fn two_counts(f: &Fq, c: &Curve, fam: &family::Family, order: u64) -> Vec<u6
     if c.a != 0 {
         return vec![0; fam.blocks.len()];
     }
-    assert!(order % 4 == 0 && (order / 4) % 2 == 1, "a = 0: the 2-part of #E must be exactly Z/4");
+    assert!(
+        order % 4 == 0 && (order / 4) % 2 == 1,
+        "a = 0: the 2-part of #E must be exactly Z/4"
+    );
     let kp = order / 4;
     let mut cache: std::collections::HashMap<u32, bool> = Default::default();
     fam.blocks
@@ -229,16 +242,38 @@ pub fn run_cell(cfg: &Cfg, mut sink: impl FnMut(&Row)) {
     let f = Fq::new(cfg.n);
     let c = Curve::koblitz(cfg.a);
     let order = koblitz_order(cfg.a, cfg.n);
-    assert_eq!(c.all_points(&f).len() as u64 + 1, order, "point count != Koblitz formula");
+    assert_eq!(
+        c.all_points(&f).len() as u64 + 1,
+        order,
+        "point count != Koblitz formula"
+    );
     let n = cfg.n as usize;
-    let targets = make_targets(&f, &c, cfg.a, cfg.nt, derive_seed(cfg.seed, &[cfg.a as u64, cfg.n as u64, cfg.m as u64, cfg.l as u64, 0x7A12]));
+    let targets = make_targets(
+        &f,
+        &c,
+        cfg.a,
+        cfg.nt,
+        derive_seed(
+            cfg.seed,
+            &[
+                cfg.a as u64,
+                cfg.n as u64,
+                cfg.m as u64,
+                cfg.l as u64,
+                0x7A12,
+            ],
+        ),
+    );
     let nt_eff = targets.len();
     let pt_union = PatternTable::new(n, cfg.m, true);
     let pt_one = PatternTable::new(1, cfg.m, false);
     for vd in 0..cfg.nv {
         // arm order is shuffled per draw (interleaving); seeds do not depend on the order
         let mut arms: Vec<&String> = cfg.arms.iter().collect();
-        let mut orng = Rng(derive_seed(cfg.seed, &[cfg.n as u64, cfg.m as u64, vd as u64, 0x0DE7]));
+        let mut orng = Rng(derive_seed(
+            cfg.seed,
+            &[cfg.n as u64, cfg.m as u64, vd as u64, 0x0DE7],
+        ));
         for i in (1..arms.len()).rev() {
             arms.swap(i, orng.below(i as u64 + 1) as usize);
         }
@@ -246,7 +281,14 @@ pub fn run_cell(cfg: &Cfg, mut sink: impl FnMut(&Row)) {
             let t0 = Instant::now();
             let mut rng = Rng(derive_seed(
                 cfg.seed,
-                &[cfg.a as u64, cfg.n as u64, cfg.m as u64, cfg.l as u64, seed_code(arm), vd as u64],
+                &[
+                    cfg.a as u64,
+                    cfg.n as u64,
+                    cfg.m as u64,
+                    cfg.l as u64,
+                    seed_code(arm),
+                    vd as u64,
+                ],
             ));
             let fam = family::build(arm, &f, &mut rng, cfg.l);
             let pt = if fam.nb == 1 { &pt_one } else { &pt_union };
@@ -267,8 +309,14 @@ pub fn run_cell(cfg: &Cfg, mut sink: impl FnMut(&Row)) {
                     yrep[ci] += k.cover[pt.rep[ci]] as f64;
                 }
             }
-            let audit = if vd == 0 && fam.nb == n && matches!(arm.as_str(), "frob" | "geom" | "rsub" | "rset" | "frobperm") {
-                targets.iter().take(AUDIT_TARGETS).all(|&r| gauge_identity_holds(&e, &c, &f, pt, r)) as i32
+            let audit = if vd == 0
+                && fam.nb == n
+                && matches!(arm.as_str(), "frob" | "geom" | "rsub" | "rset" | "frobperm")
+            {
+                targets
+                    .iter()
+                    .take(AUDIT_TARGETS)
+                    .all(|&r| gauge_identity_holds(&e, &c, &f, pt, r)) as i32
             } else {
                 -1
             };

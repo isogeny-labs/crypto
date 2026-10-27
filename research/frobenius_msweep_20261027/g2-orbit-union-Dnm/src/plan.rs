@@ -53,7 +53,8 @@ fn left_tuples(nx: f64, m: usize) -> f64 {
 /// the exact number (review round 2: the earlier count used Frobenius orbits only and overstated
 /// independent targets by up to 2x).
 pub fn nt_effective(a: u32, n: u32) -> f64 {
-    let orbits = ((koblitz_order(a, n) / crate::curve::cofactor(a)) as f64 - 1.0) / (2.0 * n as f64);
+    let orbits =
+        ((koblitz_order(a, n) / crate::curve::cofactor(a)) as f64 - 1.0) / (2.0 * n as f64);
     orbits.round().max(1.0).min(NT as f64)
 }
 

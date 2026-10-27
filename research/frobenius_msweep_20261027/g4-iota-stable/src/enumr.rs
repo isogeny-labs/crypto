@@ -57,7 +57,12 @@ pub fn build_base(g: &Group, xs: &[u32]) -> Base {
         .iter()
         .map(|&(lc, sg, ell, x)| {
             let cid = lcs.binary_search(&lc).unwrap() as u32;
-            Item { ell, cid, sc: 2 * cid + sg, x }
+            Item {
+                ell,
+                cid,
+                sc: 2 * cid + sg,
+                x,
+            }
         })
         .collect();
     items.sort_unstable_by_key(|i| (i.sc, i.ell));
@@ -75,9 +80,24 @@ pub fn build_base(g: &Group, xs: &[u32]) -> Base {
     }
     let mut ells: Vec<u32> = items.iter().map(|i| i.ell).collect();
     ells.sort_unstable();
-    let closed = items.iter().filter(|i| ells.binary_search(&((i.ell + mm) % ne)).is_ok()).count();
-    let closure = if n == 0 { 1.0 } else { closed as f64 / n as f64 };
-    Base { ne, mm, items, ncls: lcs.len(), nx, next, closure }
+    let closed = items
+        .iter()
+        .filter(|i| ells.binary_search(&((i.ell + mm) % ne)).is_ok())
+        .count();
+    let closure = if n == 0 {
+        1.0
+    } else {
+        closed as f64 / n as f64
+    };
+    Base {
+        ne,
+        mm,
+        items,
+        ncls: lcs.len(),
+        nx,
+        next,
+        closure,
+    }
 }
 
 #[inline]
@@ -97,7 +117,15 @@ pub fn binom(n: usize, k: usize) -> f64 {
     r
 }
 
-fn rec(b: &Base, m: usize, depth: usize, start: usize, sum: u32, key: u128, out: &mut Vec<(u32, u128)>) {
+fn rec(
+    b: &Base,
+    m: usize,
+    depth: usize,
+    start: usize,
+    sum: u32,
+    key: u128,
+    out: &mut Vec<(u32, u128)>,
+) {
     let n = b.items.len();
     for i in start..n {
         let it = b.items[i];
@@ -116,7 +144,11 @@ pub fn enumerate(b: &Base, m: usize, cap: f64) -> Result<Vec<(u32, u128)>, Strin
     assert!((1..=8).contains(&m));
     let ub = binom(b.items.len(), m);
     if ub > cap {
-        return Err(format!("C({},{})={ub:.3e} exceeds cap {cap:.3e}", b.items.len(), m));
+        return Err(format!(
+            "C({},{})={ub:.3e} exceeds cap {cap:.3e}",
+            b.items.len(),
+            m
+        ));
     }
     let mut out = Vec::with_capacity((ub as usize / 2).min(1 << 22) + 16);
     rec(b, m, 0, 0, 0, 0, &mut out);
@@ -152,7 +184,14 @@ pub fn tally(ne: u32, mut raw: Vec<(u32, u128)>) -> Tally {
     for s in 0..ne as usize {
         off[s + 1] = off[s] + o[s];
     }
-    Tally { ne, d, o, off, keys, total }
+    Tally {
+        ne,
+        d,
+        o,
+        off,
+        keys,
+        total,
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -178,7 +217,13 @@ pub fn moments(cnt: &[u32], step: u32) -> Mom {
     }
     let mean = s1 / n as f64;
     let var = s2 / n as f64 - mean * mean;
-    Mom { n, mean, var, fano: if mean > 0.0 { var / mean } else { f64::NAN }, hit: hit as f64 / n as f64 }
+    Mom {
+        n,
+        mean,
+        var,
+        fano: if mean > 0.0 { var / mean } else { f64::NAN },
+        hit: hit as f64 / n as f64,
+    }
 }
 
 /// True iff D[s] = 2^(m-1) O[s] for every target s.
@@ -211,7 +256,16 @@ pub fn quot_counts(b: &Base, m: usize) -> Vec<u32> {
             next[i + 1]
         };
     }
-    fn go(sc: &[(u32, u32)], next: &[usize], mm: u32, m: usize, depth: usize, start: usize, sum: u32, cnt: &mut [u32]) {
+    fn go(
+        sc: &[(u32, u32)],
+        next: &[usize],
+        mm: u32,
+        m: usize,
+        depth: usize,
+        start: usize,
+        sum: u32,
+        cnt: &mut [u32],
+    ) {
         for i in start..sc.len() {
             let s2 = add_mod(sum, sc[i].1, mm);
             if depth + 1 == m {
@@ -247,9 +301,17 @@ pub fn mitm_total(n_items: usize, m: usize, t: f64) -> Cost {
     let (lo, hi) = (binom(n_items, a), binom(n_items, m - a));
     // orientation 0: table lo, probe hi; orientation 1: table hi, probe lo
     if lo + t * hi <= hi + t * lo {
-        Cost { table: lo, probe: hi, flipped: false }
+        Cost {
+            table: lo,
+            probe: hi,
+            flipped: false,
+        }
     } else {
-        Cost { table: hi, probe: lo, flipped: true }
+        Cost {
+            table: hi,
+            probe: lo,
+            flipped: true,
+        }
     }
 }
 
@@ -332,7 +394,11 @@ pub struct Elim {
 impl Elim {
     pub fn new(p: u64, ncols: usize) -> Elim {
         assert!(p < (1u64 << 32), "modulus must be below 2^32");
-        Elim { p, piv: vec![None; ncols], rank: 0 }
+        Elim {
+            p,
+            piv: vec![None; ncols],
+            rank: 0,
+        }
     }
     /// Adds a sparse row (col, coefficient mod p). True iff the rank grew.
     pub fn add(&mut self, row: &[(usize, u64)]) -> bool {
@@ -410,7 +476,10 @@ pub fn rank_stream(t: &Tally, order: &[u32], m: usize, ncls: usize, p: u64, seed
         }
     }
     let active = act.iter().filter(|&&a| a).count();
-    let mut out = RankOut { active, ..Default::default() };
+    let mut out = RankOut {
+        active,
+        ..Default::default()
+    };
     if active == 0 {
         return out;
     }

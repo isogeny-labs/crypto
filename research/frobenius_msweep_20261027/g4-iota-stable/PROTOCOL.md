@@ -391,3 +391,25 @@ None yet (no data has been taken).
    infeasibility, multiple comparisons stated (sections 7, 11). 11. Driver records dirty tree, toolchain, seed, sources hash and a
    manifest; `.gitignore`. 12. Test expanding orbit members to curve points; echelon moved to u64 and stopped at 90 percent
    rank; runtime table re-estimated.
+
+## 12b. Amendment A2 (2026-10-27; pre-freeze, no data taken; from the round-2 independent review)
+
+1. **Draw rule: a base must have a row in G.** For a = 0 every item of a class has the same parity, and a target in G needs an even
+   sum, so a base with exactly m classes has one class selection and, with probability about 1/2, no decomposition at any target in G
+   (active = 0, no finite cost, counted as censored by construction). Fraction of accepted g4rand bases with no row in G under the
+   review's binomial model: 1.96 percent at m = 4, 4.71 percent at m = 5, 8.49 percent at m = 6 (l = 5, a = 0). `draw_matched` now
+   redraws the whole replicate unless the g4rand base has at least one decomposition at a target of G (`has_g_row`: exact enumeration,
+   cap-bounded, any sum divisible by h), and applies the same acceptance to every matched arm (vrand, rset, riota, wrong), so the rule
+   truncates the common N distribution identically for all arms. The acceptance rule of A1 item 1 (ncls >= m, C(N,m) <= cap) is kept and
+   this is added to it; the m = 6 acceptance is about 0.78 by the review's recomputation (still above 0.5; model arithmetic, not run).
+   Superseded text: the body of section 4 ("redraw if N < 2m") and A1 item 1 describe only the ncls >= m part.
+2. **CENSORED gate is an integer comparison.** Registered rule (section 7 rules 2 and 9): CENSORED if MORE than 5 percent of a
+   gated arm's bases never reach 90 percent rank. The code used `1 - finite/n > 0.05` in f64, which classes exactly 5 percent (2 of 40,
+   5 of 100) as CENSORED because 1 - 38/40 = 0.05000000000000004. It now tests `censored * 20 > n` (`censored_over_5pct`), per gated
+   arm and estimand (vrand cpr_blind, g4rand cpr_best and cpr_blind, wrong and rset cpr_blind). The printed censored fractions are unchanged.
+3. Tests added: `bases_with_no_row_in_g_are_rejected_by_the_draw_rule` (a = 0, n = 13, m = 4: m-class bases of both parities occur; the
+   rejected ones have active = 0 and t90f = NA in `measure`, the accepted ones a finite cost; every arm of eight matched replicates
+   has a row in G) and `censoring_gate_is_an_integer_comparison_at_exactly_five_percent` (2 of 40 allowed, 3 of 40 CENSORED, 5 and 6
+   of 100, 1 of 16 and 1 of 20, n = 0). The unit tests now number 24.
+4. Not changed (caveats, not part of this fix): ncls is still not printed next to m, the resolution priors for the l = 5, m >= 4 cells
+   are still unmeasured, and the stale sentences listed by the review are not edited in the body.

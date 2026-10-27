@@ -192,7 +192,10 @@ impl BaseSet {
     pub fn from_classes(g: &Group, ids: &[u32]) -> BaseSet {
         // ids are logarithms d in 1..=half
         let xs: Vec<u32> = ids.iter().map(|&d| g.xs[(d - 1) as usize]).collect();
-        BaseSet { xs, ds: ids.to_vec() }
+        BaseSet {
+            xs,
+            ds: ids.to_vec(),
+        }
     }
     pub fn len(&self) -> usize {
         self.xs.len()

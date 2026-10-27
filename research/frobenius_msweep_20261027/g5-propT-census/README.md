@@ -16,8 +16,8 @@ and by measurement, for m = 2..8 on toy Koblitz curves, against a random-multipl
 (AGENTS.md 8a calls it m), m is the number of legs.
 
 Files: `PROTOCOL.md` (design, claim classes, arms, controls, decision rule, power table, priors, runtime estimate, revision log),
-`RUN_CARD.md` (token command, frozen route, preconditions, run commands, outputs, after-run steps), `run_cells.sh` (gated
-driver: clean-tree check, tests, build, provenance, pre-flight timing, Proposition T cells and fail-fast gate, then rank and overlap
+`RUN_CARD.md` (token command, frozen route with argv array and env, session-side checkpoint gate, preconditions, run commands, outputs, after-run steps), `run_cells.sh` (driver, needs the
+session's `G5_CHECKPOINT_STAMP`, never calls the gate itself, archives and uploads the run on exit: clean-tree check, tests, build, provenance, pre-flight timing, Proposition T cells and fail-fast gate, then rank and overlap
 cells, then analyze), `src/` (std-only native Rust: `field`, `curve`, `chain`, `bases`, `census`, `rank`, `proptt`, `rng`, `run`,
 `analyze`, `main`), `tests/`. No file outside this directory was touched.
 

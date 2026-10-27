@@ -59,9 +59,19 @@ impl Arm {
         }
     }
     pub fn parse(s: &str) -> Option<Arm> {
-        [Arm::C, Arm::CPoly, Arm::CNoBreak, Arm::A, Arm::B, Arm::BNoGauge, Arm::G, Arm::U, Arm::CHalf]
-            .into_iter()
-            .find(|a| a.name() == s)
+        [
+            Arm::C,
+            Arm::CPoly,
+            Arm::CNoBreak,
+            Arm::A,
+            Arm::B,
+            Arm::BNoGauge,
+            Arm::G,
+            Arm::U,
+            Arm::CHalf,
+        ]
+        .into_iter()
+        .find(|a| a.name() == s)
     }
 }
 
@@ -75,13 +85,22 @@ pub struct Lin {
 
 impl Lin {
     pub fn zero() -> Lin {
-        Lin { vars: vec![], c: false }
+        Lin {
+            vars: vec![],
+            c: false,
+        }
     }
     pub fn one() -> Lin {
-        Lin { vars: vec![], c: true }
+        Lin {
+            vars: vec![],
+            c: true,
+        }
     }
     pub fn var(v: u32) -> Lin {
-        Lin { vars: vec![v], c: false }
+        Lin {
+            vars: vec![v],
+            c: false,
+        }
     }
     pub fn is_const(&self) -> bool {
         self.vars.is_empty()
@@ -176,7 +195,10 @@ impl Cnf {
         if v == TRUE_VAR {
             return if l > 0 { Lin::one() } else { Lin::zero() };
         }
-        Lin { vars: vec![v], c: l < 0 }
+        Lin {
+            vars: vec![v],
+            c: l < 0,
+        }
     }
     /// Literal equal to the linear form (a fresh XOR-defined variable if needed).
     pub fn lit_of(&mut self, l: &Lin) -> Lit {
@@ -300,12 +322,25 @@ impl Cell {
         let f = Field::new(n);
         let nb = Basis::normal(&f);
         let pb = Basis::polynomial(&f);
-        let spec = vspec_for_dim(n, l, vsel).unwrap_or_else(|| panic!("no sigma-stable V of dim {l} at n={n} (vsel {vsel})"));
+        let spec = vspec_for_dim(n, l, vsel)
+            .unwrap_or_else(|| panic!("no sigma-stable V of dim {l} at n={n} (vsel {vsel})"));
         let (t1, fs, _) = cyclotomic_factors(n);
         let g = spec.g(t1, &fs);
         let vb_n = stable_subspace(&f, &nb, g, &nb);
         let vb_p = stable_subspace(&f, &nb, g, &pb);
-        Cell { f, nb, pb, n, l, m, b, g, vb_n, vb_p, with_one: spec.with_t_plus_1 }
+        Cell {
+            f,
+            nb,
+            pb,
+            n,
+            l,
+            m,
+            b,
+            g,
+            vb_n,
+            vb_p,
+            with_one: spec.with_t_plus_1,
+        }
     }
 }
 
@@ -353,7 +388,9 @@ impl<'a> Enc<'a> {
         if c == 0 {
             Fe::default()
         } else {
-            Fe { terms: vec![(Lin::one(), c)] }
+            Fe {
+                terms: vec![(Lin::one(), c)],
+            }
         }
     }
     fn merge(&self, items: Vec<(Lin, u64)>) -> Fe {
@@ -364,7 +401,13 @@ impl<'a> Enc<'a> {
             }
             m.entry(e).or_default().xor_with(&l);
         }
-        Fe { terms: m.into_iter().filter(|(_, l)| !l.is_zero()).map(|(e, l)| (l, e)).collect() }
+        Fe {
+            terms: m
+                .into_iter()
+                .filter(|(_, l)| !l.is_zero())
+                .map(|(e, l)| (l, e))
+                .collect(),
+        }
     }
     fn fe_add(&self, a: &Fe, b: &Fe) -> Fe {
         let mut v = a.terms.clone();
@@ -372,7 +415,12 @@ impl<'a> Enc<'a> {
         self.merge(v)
     }
     fn fe_sq(&self, a: &Fe) -> Fe {
-        self.merge(a.terms.iter().map(|(l, e)| (l.clone(), self.cx.f.sq(*e))).collect())
+        self.merge(
+            a.terms
+                .iter()
+                .map(|(l, e)| (l.clone(), self.cx.f.sq(*e)))
+                .collect(),
+        )
     }
     fn fe_coord_lins(&self, a: &Fe) -> Vec<Lin> {
         let n = self.n();
@@ -389,7 +437,14 @@ impl<'a> Enc<'a> {
     }
     fn fe_coordinize(&self, a: &Fe) -> Fe {
         let lins = self.fe_coord_lins(a);
-        Fe { terms: lins.into_iter().enumerate().filter(|(_, l)| !l.is_zero()).map(|(k, l)| (l, self.ob.vecs[k])).collect() }
+        Fe {
+            terms: lins
+                .into_iter()
+                .enumerate()
+                .filter(|(_, l)| !l.is_zero())
+                .map(|(k, l)| (l, self.ob.vecs[k]))
+                .collect(),
+        }
     }
     fn fe_mul(&mut self, a: &Fe, b: &Fe) -> Fe {
         let n = self.n();
@@ -443,7 +498,11 @@ impl<'a> Enc<'a> {
     /// is appended to every violation clause (the circuit is then vacuous).
     fn lex_le(&mut self, a: &[Lit], b: &[Lit], guard: Guard) {
         self.n_cmp += 1;
-        let sel: Option<Lit> = if guard == Guard::Free { Some(self.cnf.fresh() as Lit) } else { None };
+        let sel: Option<Lit> = if guard == Guard::Free {
+            Some(self.cnf.fresh() as Lit)
+        } else {
+            None
+        };
         let mut e: Lit = TRUE_VAR as Lit;
         for c in 0..a.len() {
             let mut viol = vec![-e, -a[c], b[c]];
@@ -512,7 +571,9 @@ impl<'a> Enc<'a> {
 
     fn plain_slot(&mut self, vb: &[u64]) -> (Fe, Vec<u32>) {
         let u: Vec<u32> = (0..vb.len()).map(|_| self.cnf.fresh()).collect();
-        let fe = Fe { terms: u.iter().zip(vb).map(|(&v, &e)| (Lin::var(v), e)).collect() };
+        let fe = Fe {
+            terms: u.iter().zip(vb).map(|(&v, &e)| (Lin::var(v), e)).collect(),
+        };
         (fe, u)
     }
 
@@ -532,7 +593,8 @@ impl<'a> Enc<'a> {
         let r: Vec<u32> = (0..l).map(|_| self.cnf.fresh()).collect();
         let h: Vec<u32> = (0..n).map(|_| self.cnf.fresh()).collect();
         self.one_hot(&h);
-        let rho_terms: Vec<(Lin, u64)> = r.iter().zip(&vb).map(|(&v, &e)| (Lin::var(v), e)).collect();
+        let rho_terms: Vec<(Lin, u64)> =
+            r.iter().zip(&vb).map(|(&v, &e)| (Lin::var(v), e)).collect();
         let rho_bits = self.coord_bits(&rho_terms);
         for k in 1..n {
             let rk = Self::rotated(&rho_bits, k);
@@ -546,7 +608,10 @@ impl<'a> Enc<'a> {
         c1.push(h[0] as Lit);
         self.cnf.clause(c1);
         // x = sigma^s(rho) in V-coordinates (reduced echelon pivots)
-        let piv: Vec<u32> = vb.iter().map(|&v| pdeg(self.cx.nb.coords(v)) as u32).collect();
+        let piv: Vec<u32> = vb
+            .iter()
+            .map(|&v| pdeg(self.cx.nb.coords(v)) as u32)
+            .collect();
         let mut y = vec![vec![0 as Lit; l]; n];
         for s in 0..n {
             for p in 0..l {
@@ -576,11 +641,23 @@ impl<'a> Enc<'a> {
 /// the counting-identity tests).
 pub fn build(arm: Arm, cx: &Cell, xr: u64, semaev: bool) -> Built {
     let ob: &Basis = if arm == Arm::CPoly { &cx.pb } else { &cx.nb };
-    let mut e = Enc { cx, ob, cnf: Cnf::new(), n_cmp: 0 };
+    let mut e = Enc {
+        cx,
+        ob,
+        cnf: Cnf::new(),
+        n_cmp: 0,
+    };
     let m = cx.m;
-    assert!(m == 2 || m == 3, "chain encoder implemented for m in {{2,3}}");
+    assert!(
+        m == 2 || m == 3,
+        "chain encoder implemented for m in {{2,3}}"
+    );
     let n = cx.n as usize;
-    let vb: Vec<u64> = if arm == Arm::CPoly { cx.vb_p.clone() } else { cx.vb_n.clone() };
+    let vb: Vec<u64> = if arm == Arm::CPoly {
+        cx.vb_p.clone()
+    } else {
+        cx.vb_n.clone()
+    };
     let mut xs: Vec<Fe> = vec![];
     let mut priority: Vec<u32> = vec![];
     let dec;
@@ -606,9 +683,19 @@ pub fn build(arm: Arm, cx: &Cell, xr: u64, semaev: bool) -> Built {
             }
             if arm == Arm::G || arm == Arm::U {
                 let bits: Vec<Vec<Lit>> = xs.iter().map(|x| e.coord_bits(&x.terms)).collect();
-                e.gauge(&bits, if arm == Arm::G { Guard::Free } else { Guard::None });
+                e.gauge(
+                    &bits,
+                    if arm == Arm::G {
+                        Guard::Free
+                    } else {
+                        Guard::None
+                    },
+                );
             }
-            dec = Decode::Plain { u: us, poly: arm == Arm::CPoly };
+            dec = Decode::Plain {
+                u: us,
+                poly: arm == Arm::CPoly,
+            };
         }
         Arm::A => {
             let mut rs = vec![];
@@ -639,7 +726,9 @@ pub fn build(arm: Arm, cx: &Cell, xr: u64, semaev: bool) -> Built {
             let h: Vec<u32> = (0..n).map(|_| e.cnf.fresh()).collect();
             priority.extend(&h);
             e.one_hot(&h);
-            let terms: Vec<(Lin, u64)> = (0..n).map(|j| (Lin::var(h[j]), cx.f.frob(xr, j as u32))).collect();
+            let terms: Vec<(Lin, u64)> = (0..n)
+                .map(|j| (Lin::var(h[j]), cx.f.frob(xr, j as u32)))
+                .collect();
             target = e.merge(terms);
             if arm == Arm::B {
                 let bits: Vec<Vec<Lit>> = xs.iter().map(|x| e.coord_bits(&x.terms)).collect();
@@ -658,13 +747,26 @@ pub fn build(arm: Arm, cx: &Cell, xr: u64, semaev: bool) -> Built {
         } else {
             let xv: Vec<u32> = (0..n).map(|_| e.cnf.fresh()).collect();
             xchain = xv.clone();
-            let xfe = Fe { terms: xv.iter().enumerate().map(|(k, &v)| (Lin::var(v), ob.vecs[k])).collect() };
+            let xfe = Fe {
+                terms: xv
+                    .iter()
+                    .enumerate()
+                    .map(|(k, &v)| (Lin::var(v), ob.vecs[k]))
+                    .collect(),
+            };
             let (a, b, c) = (xs[0].clone(), xs[1].clone(), xs[2].clone());
             e.s3_zero(&a, &b, &xfe);
             e.s3_zero(&xfe, &c, &target);
         }
     }
-    Built { arm, n_comparators: e.n_cmp, cnf: e.cnf, priority, dec, xchain }
+    Built {
+        arm,
+        n_comparators: e.n_cmp,
+        cnf: e.cnf,
+        priority,
+        dec,
+        xchain,
+    }
 }
 
 impl Built {
@@ -711,11 +813,19 @@ impl Built {
 
     /// Decode the tuple (as a PLAIN solution for target xr) and check it
     /// independently of the encoding: membership in V and the S_{m+1} chain.
-    pub fn verify(&self, cx: &Cell, model: &[bool], pi: &[u32], xr: u64) -> Result<Vec<u64>, String> {
+    pub fn verify(
+        &self,
+        cx: &Cell,
+        model: &[bool],
+        pi: &[u32],
+        xr: u64,
+    ) -> Result<Vec<u64>, String> {
         let f = &cx.f;
         let vb = |poly: bool| if poly { &cx.vb_p } else { &cx.vb_n };
         let one_hot = |h: &[u32]| -> Result<usize, String> {
-            let idx: Vec<usize> = (0..h.len()).filter(|&i| Self::get(model, pi, h[i])).collect();
+            let idx: Vec<usize> = (0..h.len())
+                .filter(|&i| Self::get(model, pi, h[i]))
+                .collect();
             if idx.len() == 1 {
                 Ok(idx[0])
             } else {
@@ -725,12 +835,26 @@ impl Built {
         let xs: Vec<u64> = match &self.dec {
             Decode::Plain { u, poly } => u
                 .iter()
-                .map(|us| us.iter().zip(vb(*poly)).fold(0u64, |a, (&v, &e)| if Self::get(model, pi, v) { a ^ e } else { a }))
+                .map(|us| {
+                    us.iter().zip(vb(*poly)).fold(0u64, |a, (&v, &e)| {
+                        if Self::get(model, pi, v) {
+                            a ^ e
+                        } else {
+                            a
+                        }
+                    })
+                })
                 .collect(),
             Decode::RepShift { r, h } => {
                 let mut v = vec![];
                 for (rs, hs) in r.iter().zip(h) {
-                    let rho = rs.iter().zip(&cx.vb_n).fold(0u64, |a, (&x, &e)| if Self::get(model, pi, x) { a ^ e } else { a });
+                    let rho = rs.iter().zip(&cx.vb_n).fold(0u64, |a, (&x, &e)| {
+                        if Self::get(model, pi, x) {
+                            a ^ e
+                        } else {
+                            a
+                        }
+                    });
                     v.push(f.frob(rho, one_hot(hs)? as u32));
                 }
                 v
@@ -739,7 +863,13 @@ impl Built {
                 let j = one_hot(h)? as u32;
                 u.iter()
                     .map(|us| {
-                        let x = us.iter().zip(&cx.vb_n).fold(0u64, |a, (&v, &e)| if Self::get(model, pi, v) { a ^ e } else { a });
+                        let x = us.iter().zip(&cx.vb_n).fold(0u64, |a, (&v, &e)| {
+                            if Self::get(model, pi, v) {
+                                a ^ e
+                            } else {
+                                a
+                            }
+                        });
                         f.frob(x, cx.n - j) // sigma^-j: solution of the j-th conjugate target -> target 0
                     })
                     .collect()
@@ -755,7 +885,9 @@ impl Built {
             f.s3(xs[0], xs[1], xr, cx.b) == 0
         } else {
             let (bb, c) = (f.mul(xs[0], xs[1]), f.sq(xs[0] ^ xs[1]));
-            let roots = f.solve_quadratic(c, bb, f.sq(bb) ^ cx.b).unwrap_or_default();
+            let roots = f
+                .solve_quadratic(c, bb, f.sq(bb) ^ cx.b)
+                .unwrap_or_default();
             roots.iter().any(|&xx| f.s3(xx, xs[2], xr, cx.b) == 0)
         };
         if ok {

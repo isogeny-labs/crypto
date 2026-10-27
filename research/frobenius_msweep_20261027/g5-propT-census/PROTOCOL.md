@@ -464,4 +464,14 @@ of this one.
   `orbunion`/`stable` bases come in rotation clusters of n (K(sigma^k S) = lambda^k K(S)), so effective counts are U/n and the
   section 6 Poisson table is optimistic by about sqrt(n) there; the claim B2 'D = 1' is scoped to non-sigma-closed bases, and
   for orbunion/stable D < 1 is expected from the theorem; (g) `run_cells.sh` aborts if git is unavailable or the repo has no HEAD.
+* 2026-10-27, revision 4, still before any data and before the freeze (edits, not deviations), after a third review (defect N4,
+  route/driver only, no science change): (a) `run_cells.sh` no longer calls `scripts/checkpoint.sh gate`: the gate is a session-side
+  launcher gate (it needs the gitignored `.resume/RESUME.md` and an upload credential that must not be in the job). The session runs
+  it before submitting and passes the non-secret line of `.resume/.last-push` as `G5_CHECKPOINT_STAMP`; the driver aborts (exit 3)
+  if it is empty and records it in `commit.txt`. (b) A `finish` EXIT trap writes `driver_exit.txt`, packs `reports/run-<UTC>/`
+  into a deterministic `.tar.xz` with a `.sha256`, and uploads archive and run directory to `$ISOLAB_RESULTS_URI` on every exit
+  (exit 90 if the upload fails), because `/work` is temporary. (c) The RUN_CARD argv is now an array (`/bin/bash`, script path, `4`)
+  with env fields, not a shell string; the card states that a `.git` checkout and rustc/cargo >= 1.78 are required. A pipeline
+  test checks the driver statically (no gate call, stamp required, upload trap) and that it aborts before building when the stamp
+  is missing.
 * No deviations after the freeze yet.

@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
-# Cell G5 driver. DO NOT LAUNCH until `scripts/checkpoint.sh gate` passes (the repository forbids experiment
-# runs without an S3 resume checkpoint; there is no bypass in this script) and the route of RUN_CARD section 1 is
-# frozen (isolab-eks by default; the executor runs this script unchanged inside the job).
+# Cell G5 driver. The checkpoint gate (`scripts/checkpoint.sh gate`) is a SESSION-SIDE launcher gate: the session runs it
+# BEFORE submitting (RUN_CARD section 2) and passes the non-secret stamp line of .resume/.last-push in G5_CHECKPOINT_STAMP.
+# This script never invokes the gate (it needs the gitignored .resume/RESUME.md and an upload credential, neither of which
+# may be in the job); it refuses to start without the stamp and records it in commit.txt.
+# The route of RUN_CARD section 1 is frozen (isolab-eks by default; the executor runs this script unchanged inside the job).
+# Requirements: a git checkout (.git present), rustc/cargo >= 1.78, bash, awk, tar, xz, sha256sum; `aws` when
+# ISOLAB_RESULTS_URI is set (the run directory is archived and uploaded there on every exit, success or abort).
 # Usage: run_cells.sh [JOBS]   (default 3; the machine has 4 shared CPUs)
 # Environment: G5_MAX_CPU_MIN (default 400) is the projected CPU-minute budget; the pre-flight aborts above it.
 #              CARGO_TARGET_DIR defaults to a directory OUTSIDE the cell so the committed tree stays clean.
@@ -12,7 +16,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/../../.." && pwd)"
 JOBS="${1:-3}"
 MAXMIN="${G5_MAX_CPU_MIN:-400}"
-( cd "$REPO" && scripts/checkpoint.sh gate )          # abort if the gate fails
+[ -n "${G5_CHECKPOINT_STAMP:-}" ] || { echo "ABORT: G5_CHECKPOINT_STAMP is empty; the session must run scripts/checkpoint.sh gate before submitting and pass the .resume/.last-push line (RUN_CARD section 2)" >&2; exit 3; }
 git -C "$REPO" rev-parse HEAD >/dev/null || { echo "ABORT: git metadata unavailable; the run must name its commit" >&2; exit 3; }
 [ -f "$HERE/Cargo.lock" ] || { echo "ABORT: Cargo.lock missing (must be committed with the cell)" >&2; exit 3; }
 if [ -n "$(git -C "$REPO" status --porcelain -- "$HERE")" ]; then
@@ -26,11 +30,29 @@ export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-${TMPDIR:-/tmp}/g5census-target}"
 BIN="$CARGO_TARGET_DIR/release/g5census"
 RUN="$HERE/reports/run-$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$RUN/preflight"
+finish() { # archive + sha256 + upload on EVERY exit; the evidence must outlive the job's temporary /work
+  rc=$?; trap - EXIT; set +e
+  echo "$rc" > "$RUN/driver_exit.txt"
+  OUT="${ISOLAB_OUTPUT_DIR:-$RUN.out}"; mkdir -p "$OUT"
+  ( cd "$(dirname "$RUN")" && tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -cf - "$(basename "$RUN")" | xz -9 > "$OUT/$(basename "$RUN").tar.xz" )
+  ( cd "$OUT" && sha256sum "$(basename "$RUN").tar.xz" > "$(basename "$RUN").tar.xz.sha256" )
+  if [ -n "${ISOLAB_RESULTS_URI:-}" ]; then
+    if ! { aws s3 cp "$OUT/" "$ISOLAB_RESULTS_URI" --recursive --only-show-errors \
+        && aws s3 cp "$RUN/" "${ISOLAB_RESULTS_URI%/}/run/" --recursive --only-show-errors; }; then
+      echo "ABORT: results upload failed (archive kept in $OUT)" >&2; exit 90
+    fi
+  else
+    echo "note: ISOLAB_RESULTS_URI unset; archive left in $OUT (local run, not the frozen route)" >&2
+  fi
+  exit "$rc"
+}
+trap finish EXIT
 {
   echo "head $(git -C "$REPO" rev-parse HEAD)"
   echo "branch $(git -C "$REPO" rev-parse --abbrev-ref HEAD)"
   echo "cell_dir_porcelain_lines $(git -C "$REPO" status --porcelain -- "$HERE" | wc -l)"
   echo "repo_porcelain_lines $(git -C "$REPO" status --porcelain | wc -l)"
+  echo "checkpoint_stamp $G5_CHECKPOINT_STAMP"
   echo "cell_tree $(git -C "$REPO" rev-parse "HEAD:${HERE#"$REPO"/}")"
 } > "$RUN/commit.txt"
 { rustc -Vv; cargo -V; } > "$RUN/toolchain.txt"

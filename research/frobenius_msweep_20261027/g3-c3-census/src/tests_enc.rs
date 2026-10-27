@@ -12,7 +12,11 @@ fn solve(cx: &Cell, arm: Arm, xr: u64, seed: u64) -> (SolveResult, Result<Vec<u6
     let (mut s, pi) = b.load(seed);
     s.conflict_budget = 5_000_000;
     let r = s.solve();
-    let v = if r == SolveResult::Sat { b.verify(cx, &s.model(), &pi, xr) } else { Err("n/a".into()) };
+    let v = if r == SolveResult::Sat {
+        b.verify(cx, &s.model(), &pi, xr)
+    } else {
+        Err("n/a".into())
+    };
     (r, v)
 }
 
@@ -30,12 +34,33 @@ fn sound_arms_agree_with_oracle_exhaustively_n7_m2() {
         for xr in 1..128u64 {
             let truth = o.exists(2, xr);
             n_sat += truth as usize;
-            for (k, arm) in [Arm::C, Arm::CPoly, Arm::CNoBreak, Arm::A, Arm::B, Arm::BNoGauge, Arm::G].into_iter().enumerate() {
+            for (k, arm) in [
+                Arm::C,
+                Arm::CPoly,
+                Arm::CNoBreak,
+                Arm::A,
+                Arm::B,
+                Arm::BNoGauge,
+                Arm::G,
+            ]
+            .into_iter()
+            .enumerate()
+            {
                 let (r, v) = solve(&cx, arm, xr, if k % 2 == 0 { 0 } else { 1000 + xr });
-                assert_eq!(r == SolveResult::Sat, truth, "l={l} xr={xr} arm={}", arm.name());
+                assert_eq!(
+                    r == SolveResult::Sat,
+                    truth,
+                    "l={l} xr={xr} arm={}",
+                    arm.name()
+                );
                 assert_ne!(r, SolveResult::Unknown);
                 if truth {
-                    assert!(v.is_ok(), "certificate l={l} xr={xr} arm={}: {:?}", arm.name(), v);
+                    assert!(
+                        v.is_ok(),
+                        "certificate l={l} xr={xr} arm={}: {:?}",
+                        arm.name(),
+                        v
+                    );
                 }
             }
             // the literal per-instance orbit clauses (U) can only lose solutions
@@ -46,8 +71,14 @@ fn sound_arms_agree_with_oracle_exhaustively_n7_m2() {
                 u_flips += 1;
             }
         }
-        assert!(n_sat > 5, "need SAT targets to test soundness (l={l}, got {n_sat})");
-        assert!(u_flips > 0, "tripwire must change satisfiability on some SAT target (l={l})");
+        assert!(
+            n_sat > 5,
+            "need SAT targets to test soundness (l={l}, got {n_sat})"
+        );
+        assert!(
+            u_flips > 0,
+            "tripwire must change satisfiability on some SAT target (l={l})"
+        );
     }
 }
 
@@ -59,11 +90,29 @@ fn sound_arms_agree_with_oracle_n7_m3() {
     for xr in 1..128u64 {
         let truth = o.exists(3, xr);
         n_sat += truth as usize;
-        for arm in [Arm::C, Arm::CPoly, Arm::CNoBreak, Arm::A, Arm::B, Arm::BNoGauge, Arm::G] {
+        for arm in [
+            Arm::C,
+            Arm::CPoly,
+            Arm::CNoBreak,
+            Arm::A,
+            Arm::B,
+            Arm::BNoGauge,
+            Arm::G,
+        ] {
             let (r, v) = solve(&cx, arm, xr, 7 + xr);
-            assert_eq!(r == SolveResult::Sat, truth, "m3 xr={xr} arm={}", arm.name());
+            assert_eq!(
+                r == SolveResult::Sat,
+                truth,
+                "m3 xr={xr} arm={}",
+                arm.name()
+            );
             if truth {
-                assert!(v.is_ok(), "m3 certificate xr={xr} arm={}: {:?}", arm.name(), v);
+                assert!(
+                    v.is_ok(),
+                    "m3 certificate xr={xr} arm={}: {:?}",
+                    arm.name(),
+                    v
+                );
             }
         }
     }
@@ -82,7 +131,12 @@ fn ordinary_curve_unsoundness_is_detected() {
         let truth = o.exists(2, xr);
         for arm in [Arm::C, Arm::A] {
             let (r, v) = solve(&cx, arm, xr, 0);
-            assert_eq!(r == SolveResult::Sat, truth, "sound arm {} on ordinary curve", arm.name());
+            assert_eq!(
+                r == SolveResult::Sat,
+                truth,
+                "sound arm {} on ordinary curve",
+                arm.name()
+            );
             if truth {
                 assert!(v.is_ok());
             }
@@ -92,7 +146,10 @@ fn ordinary_curve_unsoundness_is_detected() {
             b_bad += 1;
         }
     }
-    assert!(b_bad > 0, "B on an ordinary curve should be caught as unsound");
+    assert!(
+        b_bad > 0,
+        "B on an ordinary curve should be caught as unsound"
+    );
 }
 
 #[test]
@@ -144,7 +201,16 @@ fn count_models(b: &Built, proj: &[u32]) -> usize {
         }
         let m = s.model();
         cnt += 1;
-        let blk: Vec<i32> = proj.iter().map(|&v| if m[(v - 1) as usize] { -(v as i32) } else { v as i32 }).collect();
+        let blk: Vec<i32> = proj
+            .iter()
+            .map(|&v| {
+                if m[(v - 1) as usize] {
+                    -(v as i32)
+                } else {
+                    v as i32
+                }
+            })
+            .collect();
         s.reset_search();
         if !s.add_clause(blk) {
             break;
@@ -160,7 +226,16 @@ fn binom(n: usize, k: usize) -> usize {
 fn tuples(len: usize, m: usize) -> Vec<Vec<usize>> {
     let mut out = vec![vec![]];
     for _ in 0..m {
-        out = out.into_iter().flat_map(|t| (0..len).map(move |i| { let mut t = t.clone(); t.push(i); t })).collect();
+        out = out
+            .into_iter()
+            .flat_map(|t| {
+                (0..len).map(move |i| {
+                    let mut t = t.clone();
+                    t.push(i);
+                    t
+                })
+            })
+            .collect();
     }
     out
 }
@@ -174,8 +249,15 @@ fn counting_identity_of_the_three_domains_n7() {
         let size_v = nv_elems.len();
         // (C) multisets of V
         let c = build(Arm::C, &cx, 5, false);
-        let proj: Vec<u32> = match &c.dec { Decode::Plain { u, .. } => u.iter().flatten().copied().collect(), _ => unreachable!() };
-        assert_eq!(count_models(&c, &proj), binom(size_v + m - 1, m), "C domain l={l} m={m}");
+        let proj: Vec<u32> = match &c.dec {
+            Decode::Plain { u, .. } => u.iter().flatten().copied().collect(),
+            _ => unreachable!(),
+        };
+        assert_eq!(
+            count_models(&c, &proj),
+            binom(size_v + m - 1, m),
+            "C domain l={l} m={m}"
+        );
         // (A) predicate: necklace-minimal rho (fixed => s=0), non-decreasing rho
         let coords: Vec<u64> = nv_elems.iter().map(|&x| cx.nb.coords(x)).collect();
         let mut slots: Vec<(u64, usize)> = vec![]; // (rho coords, s)
@@ -192,25 +274,42 @@ fn counting_identity_of_the_three_domains_n7() {
                 slots.push((c0, s));
             }
         }
-        let want_a = tuples(slots.len(), m).iter().filter(|t| t.windows(2).all(|w| lexkey(slots[w[0]].0, n) <= lexkey(slots[w[1]].0, n))).count();
+        let want_a = tuples(slots.len(), m)
+            .iter()
+            .filter(|t| {
+                t.windows(2)
+                    .all(|w| lexkey(slots[w[0]].0, n) <= lexkey(slots[w[1]].0, n))
+            })
+            .count();
         let a = build(Arm::A, &cx, 5, false);
-        let proj: Vec<u32> = match &a.dec { Decode::RepShift { r, h } => r.iter().chain(h.iter()).flatten().copied().collect(), _ => unreachable!() };
+        let proj: Vec<u32> = match &a.dec {
+            Decode::RepShift { r, h } => r.iter().chain(h.iter()).flatten().copied().collect(),
+            _ => unreachable!(),
+        };
         assert_eq!(count_models(&a, &proj), want_a, "A domain l={l} m={m}");
-        assert!(want_a >= binom(size_v + m - 1, m), "A must cover every multiset");
+        assert!(
+            want_a >= binom(size_v + m - 1, m),
+            "A must cover every multiset"
+        );
         // (B) predicate: x_1 is the minimal rotation of every slot, x_2 <= x_3; j free
         let want_b = tuples(size_v, m)
             .iter()
             .filter(|t| {
                 let x: Vec<u64> = t.iter().map(|&i| coords[i]).collect();
                 let k1 = lexkey(x[0], n);
-                let ok1 = (0..m).all(|i| (0..n).all(|k| (i == 0 && k == 0) || k1 <= lexkey(rot(x[i], k, n), n)));
+                let ok1 = (0..m).all(|i| {
+                    (0..n).all(|k| (i == 0 && k == 0) || k1 <= lexkey(rot(x[i], k, n), n))
+                });
                 let ok2 = (1..m.saturating_sub(1)).all(|i| lexkey(x[i], n) <= lexkey(x[i + 1], n));
                 ok1 && ok2
             })
             .count()
             * n as usize;
         let b = build(Arm::B, &cx, 5, false);
-        let proj: Vec<u32> = match &b.dec { Decode::Orbit { u, h } => u.iter().flatten().chain(h.iter()).copied().collect(), _ => unreachable!() };
+        let proj: Vec<u32> = match &b.dec {
+            Decode::Orbit { u, h } => u.iter().flatten().chain(h.iter()).copied().collect(),
+            _ => unreachable!(),
+        };
         assert_eq!(count_models(&b, &proj), want_b, "B domain l={l} m={m}");
         // every C_n x S_m class has at least one canonical representative with all n targets
         assert!(want_b >= (binom(size_v + m - 1, m) / n as usize) * n as usize / 2);
@@ -252,10 +351,20 @@ fn n17_cell_agrees_with_oracle_and_targets_are_sound() {
     let targets = gen_targets_small(&cx, &mut o);
     assert!(targets.iter().any(|t| t.truth_sat) && targets.iter().any(|t| !t.truth_sat));
     for t in &targets {
-        for (k, arm) in [Arm::C, Arm::CPoly, Arm::A, Arm::B, Arm::G].into_iter().enumerate() {
+        for (k, arm) in [Arm::C, Arm::CPoly, Arm::A, Arm::B, Arm::G]
+            .into_iter()
+            .enumerate()
+        {
             let (r, v) = solve(&cx, arm, t.xr, 31 * k as u64);
             assert_ne!(r, SolveResult::Unknown);
-            assert_eq!(r == SolveResult::Sat, t.truth_sat, "n=17 xr={} arm={} kind={}", t.xr, arm.name(), t.kind);
+            assert_eq!(
+                r == SolveResult::Sat,
+                t.truth_sat,
+                "n=17 xr={} arm={} kind={}",
+                t.xr,
+                arm.name(),
+                t.kind
+            );
             if t.truth_sat {
                 assert!(v.is_ok(), "{:?}", v);
             }
@@ -266,11 +375,24 @@ fn n17_cell_agrees_with_oracle_and_targets_are_sound() {
 fn gen_targets_small(cx: &Cell, o: &mut Oracle) -> Vec<crate::run::Target> {
     let t = crate::run::gen_targets(cx, o, 0, 2, 2, 2, 4242);
     // distinct sigma-orbits
-    let mut keys: Vec<u64> = t.iter().map(|x| (0..cx.n).map(|k| rot(cx.nb.coords(x.xr), k, cx.n)).min().unwrap()).collect();
+    let mut keys: Vec<u64> = t
+        .iter()
+        .map(|x| {
+            (0..cx.n)
+                .map(|k| rot(cx.nb.coords(x.xr), k, cx.n))
+                .min()
+                .unwrap()
+        })
+        .collect();
     keys.sort();
     keys.dedup();
     assert_eq!(keys.len(), t.len());
-    assert!(t.iter().filter(|x| x.kind == "planted").count() == 2 && t.iter().filter(|x| x.kind == "planted").all(|x| x.truth_sat));
+    assert!(
+        t.iter().filter(|x| x.kind == "planted").count() == 2
+            && t.iter()
+                .filter(|x| x.kind == "planted")
+                .all(|x| x.truth_sat)
+    );
     t
 }
 
@@ -288,12 +410,31 @@ fn equivariance_of_conflict_counts_is_exact_for_plain_arm_n7() {
 /// overflow or panic, and the sizes are within the solver's comfortable range.
 #[test]
 fn all_census_cells_build_all_arms() {
-    let cells = [(17u32, 8u32, 2usize), (17, 9, 2), (23, 11, 2), (23, 12, 2), (31, 15, 2), (31, 16, 2), (31, 10, 3), (31, 11, 3)];
+    let cells = [
+        (17u32, 8u32, 2usize),
+        (17, 9, 2),
+        (23, 11, 2),
+        (23, 12, 2),
+        (31, 15, 2),
+        (31, 16, 2),
+        (31, 10, 3),
+        (31, 11, 3),
+    ];
     for (n, l, m) in cells {
         let cx = Cell::new(n, l, m, 0, 1);
         assert!(m as u32 * (l - 1) <= n, "admissible cell m(l-1)<=n");
         let xr = 0x1234567 & ((1u64 << n) - 1) | 1;
-        for arm in [Arm::C, Arm::CPoly, Arm::CNoBreak, Arm::A, Arm::B, Arm::BNoGauge, Arm::G, Arm::U, Arm::CHalf] {
+        for arm in [
+            Arm::C,
+            Arm::CPoly,
+            Arm::CNoBreak,
+            Arm::A,
+            Arm::B,
+            Arm::BNoGauge,
+            Arm::G,
+            Arm::U,
+            Arm::CHalf,
+        ] {
             let t = std::time::Instant::now();
             let b = build(arm, &cx, xr, true);
             let s = b.cnf.sizes();
@@ -312,7 +453,11 @@ fn runner_rows_parse_and_columns_align() {
     let cx = Cell::new(7, 4, 2, 0, 1);
     let mut o = oracle(&cx);
     let targets = gen_targets(&cx, &mut o, 0, 2, 1, 1, 777);
-    let params = RunParams { round: 1, conflict_cap: 1_000_000, deadline_s: 60 };
+    let params = RunParams {
+        round: 1,
+        conflict_cap: 1_000_000,
+        deadline_s: 60,
+    };
     let mut text = format!("{HEADER}\n");
     let toks = parse_arms("C,C@2,A,B,G,U,Cnobreak").unwrap();
     for (ti, t) in targets.iter().enumerate() {
@@ -332,10 +477,18 @@ fn runner_rows_parse_and_columns_align() {
         }
         assert!(matches!(r.result.as_str(), "SAT" | "UNSAT"));
     }
-    assert!(rows.iter().any(|r| r.kind == "planted" && r.result == "SAT" && r.cert_ok == "1"));
+    assert!(rows
+        .iter()
+        .any(|r| r.kind == "planted" && r.result == "SAT" && r.cert_ok == "1"));
     // arms that share an instance but differ by seed slot are distinct runs of the same encoding
-    let c1 = rows.iter().find(|r| r.arm == "C" && r.slot == 1 && r.tidx == 0).unwrap();
-    let c2 = rows.iter().find(|r| r.arm == "C" && r.slot == 2 && r.tidx == 0).unwrap();
+    let c1 = rows
+        .iter()
+        .find(|r| r.arm == "C" && r.slot == 1 && r.tidx == 0)
+        .unwrap();
+    let c2 = rows
+        .iter()
+        .find(|r| r.arm == "C" && r.slot == 2 && r.tidx == 0)
+        .unwrap();
     assert_eq!(c1.result, c2.result);
     // bad arm token
     assert!(parse_arms("C,Zzz").is_err());
@@ -345,20 +498,68 @@ fn runner_rows_parse_and_columns_align() {
 fn cli_run_summarize_gate_end_to_end_on_a_toy_cell() {
     // Exercises the exact CLI path of RUN_CARD on n = 7 (fixture only; output lives under target/).
     // temp dir outside the source tree: the freeze requires an empty `git status`
-    let dir = format!("{}/g3census-test-cli-run-{}", std::env::temp_dir().display(), std::process::id());
+    let dir = format!(
+        "{}/g3census-test-cli-run-{}",
+        std::env::temp_dir().display(),
+        std::process::id()
+    );
     let _ = std::fs::remove_dir_all(&dir);
     let s = |x: &str| x.to_string();
-    let args: Vec<String> = ["run", "--n", "7", "--l", "4", "--m", "2", "--curve-a", "0", "--unsat", "3", "--sat-keep", "0", "--planted", "1", "--arms", "C,C@2,A,B", "--planted-only-arms", "U", "--round", "1", "--tag", "t", "--out", &dir].iter().map(|x| s(x)).collect();
+    let args: Vec<String> = [
+        "run",
+        "--n",
+        "7",
+        "--l",
+        "4",
+        "--m",
+        "2",
+        "--curve-a",
+        "0",
+        "--unsat",
+        "3",
+        "--sat-keep",
+        "0",
+        "--planted",
+        "1",
+        "--arms",
+        "C,C@2,A,B",
+        "--planted-only-arms",
+        "U",
+        "--round",
+        "1",
+        "--tag",
+        "t",
+        "--out",
+        &dir,
+    ]
+    .iter()
+    .map(|x| s(x))
+    .collect();
     assert_eq!(crate::run::cli(&args), 0);
     let f = format!("{dir}/rows_n7_l4_m2_v0_b1_a0_r1_t.tsv");
     let text = std::fs::read_to_string(&f).unwrap();
     assert!(text.starts_with("cell\t"));
     let rows = crate::stats::parse_rows(&text);
     assert!(rows.len() >= 3 * 4 + 5, "{}", rows.len());
-    assert!(rows.iter().filter(|r| r.arm == "U").all(|r| r.kind == "planted"));
-    assert_eq!(crate::run::cli(&args), 3, "must refuse to overwrite an existing rows file");
+    assert!(rows
+        .iter()
+        .filter(|r| r.arm == "U")
+        .all(|r| r.kind == "planted"));
+    assert_eq!(
+        crate::run::cli(&args),
+        3,
+        "must refuse to overwrite an existing rows file"
+    );
     assert_eq!(crate::run::cli(&["gate".to_string(), dir.clone()]), 0);
-    assert_eq!(crate::run::cli(&["summarize".to_string(), dir.clone(), "--out".to_string(), format!("{dir}/out")]), 0);
+    assert_eq!(
+        crate::run::cli(&[
+            "summarize".to_string(),
+            dir.clone(),
+            "--out".to_string(),
+            format!("{dir}/out")
+        ]),
+        0
+    );
     assert!(std::path::Path::new(&format!("{dir}/out/SUMMARY.md")).exists());
     assert_eq!(crate::run::cli(&["bogus".to_string()]), 2);
 }
@@ -372,14 +573,22 @@ fn pinned(arm: Arm, cx: &Cell, xr: u64, masks: &[u64], xx: u64) -> SolveResult {
     };
     for (slot, &mk) in us.iter().zip(masks) {
         for (p, &v) in slot.iter().enumerate() {
-            let lit = if (mk >> p) & 1 == 1 { v as i32 } else { -(v as i32) };
+            let lit = if (mk >> p) & 1 == 1 {
+                v as i32
+            } else {
+                -(v as i32)
+            };
             b.cnf.clause(vec![lit]);
         }
     }
     // pin the chain variable too (normal-basis coordinates of xx): pure propagation
     let co = cx.nb.coords(xx);
     for (k, &v) in b.xchain.iter().enumerate() {
-        b.cnf.clause(vec![if (co >> k) & 1 == 1 { v as i32 } else { -(v as i32) }]);
+        b.cnf.clause(vec![if (co >> k) & 1 == 1 {
+            v as i32
+        } else {
+            -(v as i32)
+        }]);
     }
     let (mut s, _) = b.load(0);
     s.conflict_budget = 1_000_000;
@@ -387,7 +596,13 @@ fn pinned(arm: Arm, cx: &Cell, xr: u64, masks: &[u64], xx: u64) -> SolveResult {
 }
 
 fn elem(cx: &Cell, mk: u64) -> u64 {
-    (0..cx.l as usize).fold(0u64, |a, p| if (mk >> p) & 1 == 1 { a ^ cx.vb_n[p] } else { a })
+    (0..cx.l as usize).fold(0u64, |a, p| {
+        if (mk >> p) & 1 == 1 {
+            a ^ cx.vb_n[p]
+        } else {
+            a
+        }
+    })
 }
 
 /// Defect 1 of the review: G (and C) must accept EVERY unordered V-triple that
@@ -402,18 +617,35 @@ fn check_g_admits_all_sorted_triples(cx: &Cell, triples: &[(u64, u64, u64)]) {
         t.sort_by_key(|&mk| u_key(mk));
         let (x0, x1, x2) = (elem(cx, t[0]), elem(cx, t[1]), elem(cx, t[2]));
         let (bb, cc) = (f.mul(x0, x1), f.sq(x0 ^ x1));
-        for xx in f.solve_quadratic(cc, bb, f.sq(bb) ^ cx.b).unwrap_or_default() {
+        for xx in f
+            .solve_quadratic(cc, bb, f.sq(bb) ^ cx.b)
+            .unwrap_or_default()
+        {
             let (b2, c2) = (f.mul(xx, x2), f.sq(xx ^ x2));
-            for xr in f.solve_quadratic(c2, b2, f.sq(b2) ^ cx.b).unwrap_or_default() {
+            for xr in f
+                .solve_quadratic(c2, b2, f.sq(b2) ^ cx.b)
+                .unwrap_or_default()
+            {
                 if xr == 0 {
                     continue;
                 }
-                assert_eq!(pinned(Arm::C, cx, xr, &t, xx), SolveResult::Sat, "C rejects its own planted triple");
-                assert_eq!(pinned(Arm::G, cx, xr, &t, xx), SolveResult::Sat, "G rejects planted triple {t:?} xr={xr}");
+                assert_eq!(
+                    pinned(Arm::C, cx, xr, &t, xx),
+                    SolveResult::Sat,
+                    "C rejects its own planted triple"
+                );
+                assert_eq!(
+                    pinned(Arm::G, cx, xr, &t, xx),
+                    SolveResult::Sat,
+                    "G rejects planted triple {t:?} xr={xr}"
+                );
                 // and the verdicts agree on a wrong target too
                 let wrong = xr ^ 1;
                 if wrong != 0 {
-                    assert_eq!(pinned(Arm::G, cx, wrong, &t, xx), pinned(Arm::C, cx, wrong, &t, xx));
+                    assert_eq!(
+                        pinned(Arm::G, cx, wrong, &t, xx),
+                        pinned(Arm::C, cx, wrong, &t, xx)
+                    );
                 }
                 checked += 1;
             }
@@ -441,7 +673,9 @@ fn g_is_sound_on_every_single_triple_m3_n7() {
 fn g_is_sound_on_sampled_triples_m3_n31() {
     let cx = Cell::new(31, 5, 3, 0, 1);
     let mut rng = Rng(0x9e3779b97f4a7c15);
-    let tr: Vec<(u64, u64, u64)> = (0..120).map(|_| (rng.below(32), rng.below(32), rng.below(32))).collect();
+    let tr: Vec<(u64, u64, u64)> = (0..120)
+        .map(|_| (rng.below(32), rng.below(32), rng.below(32)))
+        .collect();
     check_g_admits_all_sorted_triples(&cx, &tr);
 }
 
@@ -465,7 +699,10 @@ fn chalf_never_invents_and_matches_c_on_unsat_targets() {
                 assert_eq!(r, SolveResult::Unsat);
             }
         }
-        assert!(unsat_seen > 5 && (lost > 0 || m == 3), "l={l} m={m}: unsat {unsat_seen} lost {lost}");
+        assert!(
+            unsat_seen > 5 && (lost > 0 || m == 3),
+            "l={l} m={m}: unsat {unsat_seen} lost {lost}"
+        );
         let c = build(Arm::C, &cx, 5, true);
         let h = build(Arm::CHalf, &cx, 5, true);
         assert_eq!(h.cnf.sizes().clauses, c.cnf.sizes().clauses + m);

@@ -278,7 +278,10 @@ Per cell, evaluated on UNSAT-truth targets with both arms UNSAT:
    bound is at least 0.95; the A/A lower bound exceeds the candidate's upper
    bound. A candidate that is not confirmed gives O-INCONCLUSIVE with the
    failed conditions listed.
-4. **O-RELABEL** if no candidate and both lower bounds are at least 0.95.
+4. **O-RELABEL** if no candidate, both lower bounds are at least 0.95, and P3
+   (Chalf/C) is present with at least 6 paired targets and detected (upper
+   bound below 0.95); otherwise O-INCONCLUSIVE ("P3 absent or undersized").
+   Dropping `--unsat-only-arms Chalf` from a cell therefore cannot yield a null label.
 5. Otherwise **O-INCONCLUSIVE** (an interval straddles 0.95).
 
 Cross-cell reading: `summarize` prints the O-TRIPWIRE headline (how many of the
@@ -506,3 +509,12 @@ dropped; freeze procedure rewritten (committed set, FREEZE.txt, binary hash).
 * Budget: gate G1 at n = 17 and 23 is not exempt from an abort: the first
   censored UNSAT row in any cell stops that cell's remaining targets (RUN_CARD
   step 4 note); a censored pilot row is a lower bound only and triggers G5.
+
+## 16. Amendment 2026-10-27 (round-2 review of revision 3)
+
+* Rule 4 (O-RELABEL) now fails closed without its positive control: P3
+  required with >= 6 paired targets and hi < 0.95, else O-INCONCLUSIVE. New
+  unit test `relabel_requires_the_positive_control`. AMENDMENT A19.
+* Cargo.lock is ignored by the root `.gitignore` and is not committed: the
+  freeze `git add` no longer lists it (it exited 1); its sha256 stays in
+  FREEZE.txt. RUN_CARD step 1 corrected.

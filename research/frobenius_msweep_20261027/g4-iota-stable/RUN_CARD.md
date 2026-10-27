@@ -20,6 +20,11 @@ Defaults come from `scripts/checkpoint.sh` (bucket `setec-astronomy-artifacts`, 
 
 ## 1. Preconditions (the gate is not bypassed anywhere in this cell)
 
+The checkpoint gate is a session-side launcher gate: the session runs `scripts/checkpoint.sh gate` (step 2) before it launches or
+submits anything, and it is never invoked inside a remote job. Each fenced block below is self-contained and runs in a fresh shell
+(it sets its own `cd`, `BIN` and `RUN`). Amendment A2 (PROTOCOL.md 12b) changed the draw rule and the censoring gate; the run must
+use a build that contains it.
+
 1. Token available as above.
 2. `scripts/checkpoint.sh init`, fill `.resume/RESUME.md` (all sections), `scripts/checkpoint.sh push`, then
    `scripts/checkpoint.sh gate` must exit 0. `run_cells.sh` calls the gate itself and aborts otherwise.
@@ -28,7 +33,7 @@ Defaults come from `scripts/checkpoint.sh` (bucket `setec-astronomy-artifacts`, 
 4. Freeze the protocol: write `protocol.json` from `PROTOCOL.md` revision 2 (same cells, arms, decision rule, estimands in
    section 7) and freeze it with `python3 experiment_protocol.py freeze protocol.json` from the sibling crypto-autoresearcher
    checkout (`tools/`) before the first data point. Put the SHA-256 of `src/analyze.rs` and of `PROTOCOL.md` in it.
-5. Unit tests (`cargo test --release`, 22 tests) pass on the exact binary being run; `run_cells.sh` runs them first.
+5. Unit tests (`cargo test --release`, 24 tests) pass on the exact binary being run; `run_cells.sh` runs them first.
 6. Commit the cell (or at least record the dirty state): the driver writes `commit.txt` and `dirty.txt`; a run from a dirty
    tree is allowed only for files outside this directory.
 

@@ -14,11 +14,19 @@ fn plan_is_sane_and_prints_cost_table() {
         assert!((2..=8).contains(&c.m));
     }
     for m in 2..=4usize {
-        assert!(cells.iter().any(|c| c.a == 1 && c.n == 17 && c.l == 8 && c.m == m), "stable cell m={m}");
+        assert!(
+            cells
+                .iter()
+                .any(|c| c.a == 1 && c.n == 17 && c.l == 8 && c.m == m),
+            "stable cell m={m}"
+        );
     }
     for &(a, n) in &[(1u32, 11u32), (0, 13), (1, 17), (0, 19)] {
         for m in 2..=8usize {
-            assert!(cells.iter().any(|c| c.a == a && c.n == n && c.m == m), "missing primary cell a={a} n={n} m={m}");
+            assert!(
+                cells.iter().any(|c| c.a == a && c.n == n && c.m == m),
+                "missing primary cell a={a} n={n} m={m}"
+            );
         }
     }
     println!("a n m l reps nx_exp nu_exp est_ops_per_base est_ops_cell tuned_n");
@@ -33,7 +41,19 @@ fn plan_is_sane_and_prints_cost_table() {
         let tops = g5_propt_census::census::est_ops(tn, c.m, jn);
         let cell_ops = c.reps as f64 * 2.0 * (2.0 * ops + tops);
         ops_all += cell_ops;
-        println!("{} {} {} {} {} {} {:.2} {:.2e} {:.2e} {}", c.a, c.n, c.m, c.l, c.reps, nx, nu_exp(nx, c.m, r), ops, cell_ops, tn);
+        println!(
+            "{} {} {} {} {} {} {:.2} {:.2e} {:.2e} {}",
+            c.a,
+            c.n,
+            c.m,
+            c.l,
+            c.reps,
+            nx,
+            nu_exp(nx, c.m, r),
+            ops,
+            cell_ops,
+            tn
+        );
         total += 1.0;
     }
     println!("cells: {total} total est ops {ops_all:.3e}");
@@ -42,12 +62,26 @@ fn plan_is_sane_and_prints_cost_table() {
 #[test]
 fn drivers_write_consistent_schemas() {
     let dir = format!("{}/g5_smoke", env!("CARGO_TARGET_TMPDIR"));
-    let o = RunOpts { seed: 7, reps: Some(2), out: dir.clone() };
+    let o = RunOpts {
+        seed: 7,
+        reps: Some(2),
+        out: dir.clone(),
+    };
     run_propt(11, 3, 120, 2, &o).unwrap();
-    let cell = Cell { a: 1, n: 11, m: 3, l: 6, reps: 2 };
+    let cell = Cell {
+        a: 1,
+        n: 11,
+        m: 3,
+        l: 6,
+        reps: 2,
+    };
     run_overlap(&cell, &o).unwrap();
     run_rank(&cell, 6, 30, &o).unwrap();
-    for f in ["propt_n11_m3.tsv", "overlap_a1_n11_m3_l6.tsv", "rank_a1_n11_m3_l6.tsv"] {
+    for f in [
+        "propt_n11_m3.tsv",
+        "overlap_a1_n11_m3_l6.tsv",
+        "rank_a1_n11_m3_l6.tsv",
+    ] {
         let txt = std::fs::read_to_string(format!("{dir}/{f}")).unwrap();
         let mut lines = txt.lines();
         let h = lines.next().unwrap().split('\t').count();
@@ -78,7 +112,11 @@ fn decision_rule_operating_characteristic() {
     println!("OC: a n m l reps U_per_base | D=1: E-OVERLAP E-EXTRA E-DEFICIT UNRES AAFAIL | D=1.15: E-OVERLAP E-EXTRA E-DEFICIT UNRES AAFAIL | D=0.87: E-DEFICIT");
     for &(a, n) in &[(1u32, 11u32), (0, 13), (1, 17), (0, 19)] {
         for &m in &[2usize, 4, 8] {
-            let c = match cells.iter().filter(|c| c.a == a && c.n == n && c.m == m).min_by_key(|c| c.l) {
+            let c = match cells
+                .iter()
+                .filter(|c| c.a == a && c.n == n && c.m == m)
+                .min_by_key(|c| c.l)
+            {
                 Some(c) => c.clone(),
                 None => continue,
             };
@@ -87,7 +125,8 @@ fn decision_rule_operating_characteristic() {
             let nx = ((1u64 << c.l) as f64 * (r as f64 - 1.0) / (2.0 * f.q as f64)).round();
             let jn = ((c.n - 1) / 2) as f64;
             let cc = (1u64 << (c.m - 1)) as f64;
-            let u = g5_propt_census::census::binom(nx as usize, c.m) * cc * (cc - 1.0) * jn / ((r as f64 - 3.0) / 2.0);
+            let u = g5_propt_census::census::binom(nx as usize, c.m) * cc * (cc - 1.0) * jn
+                / ((r as f64 - 3.0) / 2.0);
             let b = c.reps; // reps per half, as run
             let p1 = oc_probs(u, b, 1.0, 60, 1);
             let p2 = oc_probs(u, b, 1.15, 60, 2);
@@ -101,7 +140,10 @@ fn decision_rule_operating_characteristic() {
     let ex = oc_probs(2000.0, 20, 1.4, 100, 12);
     assert!(ex[1] > 0.85, "{ex:?}");
     let low = oc_probs(1.0, 8, 1.0, 100, 13);
-    assert!(low[0] < 0.2, "a starved cell must not be called equivalent: {low:?}");
+    assert!(
+        low[0] < 0.2,
+        "a starved cell must not be called equivalent: {low:?}"
+    );
 }
 
 /// The analyzer reconciles planned versus present jobs, survives a ragged last line and reports unfinished jobs.
@@ -109,13 +151,31 @@ fn decision_rule_operating_characteristic() {
 fn reconciliation_flags_missing_short_and_ragged_jobs() {
     let dir = format!("{}/g5_recon", env!("CARGO_TARGET_TMPDIR"));
     let _ = std::fs::remove_dir_all(&dir);
-    let o = RunOpts { seed: 9, reps: Some(2), out: dir.clone() };
+    let o = RunOpts {
+        seed: 9,
+        reps: Some(2),
+        out: dir.clone(),
+    };
     run_propt(11, 3, 120, 2, &o).unwrap();
-    let cell = Cell { a: 1, n: 11, m: 3, l: 6, reps: 2 };
+    let cell = Cell {
+        a: 1,
+        n: 11,
+        m: 3,
+        l: 6,
+        reps: 2,
+    };
     run_overlap(&cell, &o).unwrap();
     run_rank(&cell, 6, 30, &o).unwrap();
-    std::fs::write(format!("{dir}/jobs.txt"), "propt 0 11 3 0 120\noverlap 1 11 3 6 2\nrank 1 11 3 6 2\n").unwrap();
-    for stem in ["propt_a0_n11_m3_l0", "overlap_a1_n11_m3_l6", "rank_a1_n11_m3_l6"] {
+    std::fs::write(
+        format!("{dir}/jobs.txt"),
+        "propt 0 11 3 0 120\noverlap 1 11 3 6 2\nrank 1 11 3 6 2\n",
+    )
+    .unwrap();
+    for stem in [
+        "propt_a0_n11_m3_l0",
+        "overlap_a1_n11_m3_l6",
+        "rank_a1_n11_m3_l6",
+    ] {
         std::fs::write(format!("{dir}/exit_{stem}.txt"), "0\n").unwrap();
     }
     assert_eq!(g5_propt_census::analyze::propt_gate(&dir).unwrap(), 3);
@@ -148,13 +208,79 @@ fn trend_rule_counts_identical_sequences() {
     assert_eq!(trend_agreement(&rep("UNRESOLVED,UNRESOLVED")), 4);
     assert_eq!(trend_agreement(&rep("")), 0);
     assert_eq!(trend_agreement(&rep("E-OVERLAP,-")), 0);
-    let mixed = vec![ov.to_string(), ov.to_string(), ov.to_string(), "E-EXTRA".to_string()];
+    let mixed = vec![
+        ov.to_string(),
+        ov.to_string(),
+        ov.to_string(),
+        "E-EXTRA".to_string(),
+    ];
     assert_eq!(trend_agreement(&mixed), 3);
-    let two = vec![ov.to_string(), ov.to_string(), "E-EXTRA".to_string(), "".to_string()];
+    let two = vec![
+        ov.to_string(),
+        ov.to_string(),
+        "E-EXTRA".to_string(),
+        "".to_string(),
+    ];
     assert_eq!(trend_agreement(&two), 2);
-    let ci = |lo90: f64, hi90: f64, lo95: f64, hi95: f64| Ci { pt: 1.0, lo95, hi95, lo90, hi90 };
+    let ci = |lo90: f64, hi90: f64, lo95: f64, hi95: f64| Ci {
+        pt: 1.0,
+        lo95,
+        hi95,
+        lo90,
+        hi90,
+    };
     assert_eq!(classify(&ci(0.95, 1.05, 0.94, 1.06), 0.10), "E-OVERLAP");
     assert_eq!(classify(&ci(1.3, 1.5, 1.25, 1.55), 0.10), "E-EXTRA");
     assert_eq!(classify(&ci(0.5, 0.7, 0.45, 0.75), 0.10), "E-DEFICIT");
     assert_eq!(classify(&ci(0.7, 1.4, 0.6, 1.5), 0.10), "UNRESOLVED");
+}
+
+#[test]
+fn driver_is_job_safe_gate_free_and_uploads_its_evidence() {
+    let dir = env!("CARGO_MANIFEST_DIR");
+    let src = std::fs::read_to_string(format!("{dir}/run_cells.sh")).unwrap();
+    let code: String = src
+        .lines()
+        .filter(|l| !l.trim_start().starts_with('#'))
+        .collect::<Vec<_>>()
+        .join("\n");
+    assert!(
+        !code.contains("scripts/checkpoint.sh gate )")
+            && !code.contains("&& scripts/checkpoint.sh"),
+        "the session-side gate must not be invoked inside the job"
+    );
+    assert!(
+        code.contains("G5_CHECKPOINT_STAMP") && code.contains("checkpoint_stamp"),
+        "stamp required and recorded"
+    );
+    assert!(
+        code.contains("trap finish EXIT"),
+        "evidence is archived and uploaded on every exit"
+    );
+    assert!(
+        code.contains("aws s3 cp")
+            && code.contains("ISOLAB_RESULTS_URI")
+            && code.contains("sha256sum")
+    );
+    assert!(
+        code.contains("exit 90"),
+        "an upload failure is never swallowed"
+    );
+    let stamp_at = code.find("G5_CHECKPOINT_STAMP").unwrap();
+    assert!(
+        stamp_at < code.find("cargo test").unwrap(),
+        "the stamp check precedes any build or test"
+    );
+    // behavioural: without the stamp the driver exits 3 before touching anything (no build, no run directory)
+    let out = std::process::Command::new("bash")
+        .arg(format!("{dir}/run_cells.sh"))
+        .env_remove("G5_CHECKPOINT_STAMP")
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    assert!(String::from_utf8_lossy(&out.stderr).contains("G5_CHECKPOINT_STAMP"));
+    // the run card carries an argv array and the .git / toolchain requirements
+    let card = std::fs::read_to_string(format!("{dir}/RUN_CARD.md")).unwrap();
+    assert!(card.contains("\"/bin/bash\"") && card.contains(".git") && card.contains(">= 1.78"));
+    assert!(!card.contains("must pass inside the job"));
 }

@@ -29,7 +29,10 @@ impl Mult {
             }
             tabs.push(t);
         }
-        Mult { tabs, mus: mus.to_vec() }
+        Mult {
+            tabs,
+            mus: mus.to_vec(),
+        }
     }
     /// mu_j = lam^j for j = 1..=(n-1)/2 (the other half of the lags is the same set of unordered pairs).
     pub fn frobenius(g: &Group) -> Mult {
@@ -55,7 +58,13 @@ impl Mult {
     /// Positive-control multipliers: for each lag a random m-subset S0 of the base is drawn, two distinct classes
     /// a != b of K(S0) are picked, and mu = b / a (mod r, random sign). Then class(mu a) = b is in K(S0), so every lag
     /// has at least one guaranteed hit (an exact floor of `count` hits per base). Returns None if the base is too poor.
-    pub fn planted(r: u32, ds: &[u32], m: usize, count: usize, rng: &mut crate::rng::Rng) -> Option<Mult> {
+    pub fn planted(
+        r: u32,
+        ds: &[u32],
+        m: usize,
+        count: usize,
+        rng: &mut crate::rng::Rng,
+    ) -> Option<Mult> {
         let n = ds.len();
         if n < m {
             return None;
@@ -79,7 +88,11 @@ impl Mult {
                 let mut sum: u64 = 0;
                 for (i, &k) in idx.iter().enumerate() {
                     let d = ds[k] as u64;
-                    sum += if (mask >> i) & 1 == 0 { d } else { r as u64 - d };
+                    sum += if (mask >> i) & 1 == 0 {
+                        d
+                    } else {
+                        r as u64 - d
+                    };
                 }
                 let v = (sum % r as u64) as u32;
                 let c = v.min(r - v);
@@ -96,7 +109,8 @@ impl Mult {
                 ib = (ib + 1) % ks.len();
             }
             let (a, b) = (ks[ia], ks[ib]);
-            let mut mu = ((b as u64 * crate::curve::pow_mod(a as u64, r as u64 - 2, r as u64)) % r as u64) as u32;
+            let mut mu = ((b as u64 * crate::curve::pow_mod(a as u64, r as u64 - 2, r as u64))
+                % r as u64) as u32;
             if rng.below(2) == 1 {
                 mu = r - mu;
             }
@@ -251,7 +265,11 @@ pub fn census(
     sol_sample_cap: usize,
     orb: Option<&[u32]>,
 ) -> CensusOut {
-    let oi = orb.map(|o| OrbInfo { orbit: o, k: None, n: 0 });
+    let oi = orb.map(|o| OrbInfo {
+        orbit: o,
+        k: None,
+        n: 0,
+    });
     census_ex(ds, r, m, mults, sample_cap, sol_sample_cap, oi.as_ref())
 }
 
@@ -260,7 +278,11 @@ pub fn circular_spread(ks: &mut Vec<u32>, n: u32) -> u32 {
     ks.sort_unstable();
     let mut max_gap = 0;
     for i in 0..ks.len() {
-        let next = if i + 1 < ks.len() { ks[i + 1] } else { ks[0] + n };
+        let next = if i + 1 < ks.len() {
+            ks[i + 1]
+        } else {
+            ks[0] + n
+        };
         max_gap = max_gap.max(next - ks[i]);
     }
     n - max_gap
@@ -287,7 +309,15 @@ pub fn census_ex(
     let lowtab: Option<Vec<Vec<bool>>> = match oinfo {
         Some(OrbInfo { k: Some(_), n, .. }) if !mults.is_empty() => {
             let nl = mults[0].len();
-            Some((0..*n).map(|sp| (0..nl).map(|t| low_height(m, sp, t as u32 + 1, r)).collect()).collect())
+            Some(
+                (0..*n)
+                    .map(|sp| {
+                        (0..nl)
+                            .map(|t| low_height(m, sp, t as u32 + 1, r))
+                            .collect()
+                    })
+                    .collect(),
+            )
         }
         _ => None,
     };
@@ -359,8 +389,16 @@ pub fn census_ex(
                     let b = tab[a as usize];
                     if stamp[b as usize] == sid {
                         hits += 1;
-                        if mi == 0 && samples.len() < sample_cap && (nsub % 7 == 1 || samples.len() < 4) {
-                            samples.push(Sample { idx: idx.to_vec(), a, b, t });
+                        if mi == 0
+                            && samples.len() < sample_cap
+                            && (nsub % 7 == 1 || samples.len() < 4)
+                        {
+                            samples.push(Sample {
+                                idx: idx.to_vec(),
+                                a,
+                                b,
+                                t,
+                            });
                         }
                     }
                 }
@@ -387,7 +425,23 @@ pub fn census_ex(
         }
     };
     for_each_subset(ds, r, m, &mut visit);
-    CensusOut { nx: ds.len(), nsub, nsol, sum_cc1, cnt, u, samples, sol_samples, strat_nsub, strat_nsol, strat_u, s1l_nsub: s1l.0, s1l_pairs: s1l.1, s1l_cc1: s1l.2, s1l_u: s1l.3 }
+    CensusOut {
+        nx: ds.len(),
+        nsub,
+        nsol,
+        sum_cc1,
+        cnt,
+        u,
+        samples,
+        sol_samples,
+        strat_nsub,
+        strat_nsol,
+        strat_u,
+        s1l_nsub: s1l.0,
+        s1l_pairs: s1l.1,
+        s1l_cc1: s1l.2,
+        s1l_u: s1l.3,
+    }
 }
 
 /// Independence prediction of sum_t U[t] for a multiplier set with `jn` lags:
@@ -455,7 +509,13 @@ pub fn ind_stats(cnt: &[u32], mu: &Mult) -> IndStats {
             }
         }
     }
-    IndStats { p: ones as f64 / half as f64, joint, concord, count_equal, ncls: half as u64 }
+    IndStats {
+        p: ones as f64 / half as f64,
+        joint,
+        concord,
+        count_equal,
+        ncls: half as u64,
+    }
 }
 
 /// Pearson correlation of the indicators at one lag.
@@ -525,7 +585,11 @@ pub fn halving_check(ds: &[u32], r: u32, idx: &[usize], a: u32, b: u32, mu: u32)
                 }
             }
             let t = t % r as u64;
-            let num = if sgn == 1 { (1 + r as u64 - mu as u64) % r as u64 } else { (1 + mu as u64) % r as u64 };
+            let num = if sgn == 1 {
+                (1 + r as u64 - mu as u64) % r as u64
+            } else {
+                (1 + mu as u64) % r as u64
+            };
             let h = (num * inv2) % r as u64;
             if t != (h * sa as u64) % r as u64 {
                 ok = false;
@@ -538,7 +602,12 @@ pub fn halving_check(ds: &[u32], r: u32, idx: &[usize], a: u32, b: u32, mu: u32)
 /// Proposition Sigma, setwise form: for how many (target class a with Sol(a) nonempty, lag j in 1..n-1) is the
 /// whole solution set closed under the coordinatewise shift S -> sigma^j S (every image is a solution of a)?
 /// Returns (targets with solutions, pairs checked, closed pairs). Exact; memory ~ number of solutions.
-pub fn sigma_closure(set: &crate::bases::BaseSet, f: &crate::field::Fq, r: u32, m: usize) -> (u64, u64, u64) {
+pub fn sigma_closure(
+    set: &crate::bases::BaseSet,
+    f: &crate::field::Fq,
+    r: u32,
+    m: usize,
+) -> (u64, u64, u64) {
     use std::collections::{HashMap, HashSet};
     let half = ((r - 1) / 2) as usize;
     let index_of: HashMap<u32, usize> = set.xs.iter().enumerate().map(|(i, &x)| (x, i)).collect();

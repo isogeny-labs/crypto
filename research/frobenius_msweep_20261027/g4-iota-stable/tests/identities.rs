@@ -22,12 +22,23 @@ fn group_and_point_arithmetic_are_consistent() {
         let (f, g) = setup(n, a);
         let c = Curve { f: &f, a };
         let bound = 2.0 * (f.q as f64).sqrt() + 1.0;
-        assert!(((g.ne as f64) - (f.q as f64) - 1.0).abs() <= bound, "Hasse n={n} a={a}");
-        assert_eq!(g.ne % (2 * (1 + (a == 0) as u32)), 0, "cofactor 4 for a=0, 2 for a=1");
+        assert!(
+            ((g.ne as f64) - (f.q as f64) - 1.0).abs() <= bound,
+            "Hasse n={n} a={a}"
+        );
+        assert_eq!(
+            g.ne % (2 * (1 + (a == 0) as u32)),
+            0,
+            "cofactor 4 for a=0, 2 for a=1"
+        );
         assert_eq!(g.logx[0], g.m, "T = (0,1) has log ne/2");
         assert_eq!(c.add(Pt::Aff(0, 1), Pt::Aff(0, 1)), Pt::Inf);
         // log table agrees with the group law on a sample of pairs
-        let xs: Vec<u32> = (2..f.q).filter(|&x| g.logx[x as usize] != NONE).step_by(37).take(60).collect();
+        let xs: Vec<u32> = (2..f.q)
+            .filter(|&x| g.logx[x as usize] != NONE)
+            .step_by(37)
+            .take(60)
+            .collect();
         for &x1 in &xs {
             for &x2 in xs.iter().step_by(7) {
                 let (y1, y2) = (c.lift_x(x1).unwrap(), c.lift_x(x2).unwrap());
@@ -139,7 +150,11 @@ fn orbit_structure_identity_on_stable_bases_all_targets() {
                         let v = cls[sc >> 1] as i64;
                         acc += if sc & 1 == 0 { v } else { -v };
                     }
-                    assert_eq!(acc.rem_euclid(g.m as i64), (s as u32 % g.m) as i64, "row/log mismatch");
+                    assert_eq!(
+                        acc.rem_euclid(g.m as i64),
+                        (s as u32 % g.m) as i64,
+                        "row/log mismatch"
+                    );
                 }
             }
         }
@@ -151,14 +166,21 @@ fn non_stable_bases_have_trivial_orbits() {
     let (f, g) = setup(13, 0);
     let mut rng = Rng(9);
     let v = core_set(&span(&random_basis(f.n, 6, &mut rng)));
-    let wrong = core_set(&involution_union(&f, &span(&random_basis(f.n, 5, &mut rng)), 91));
+    let wrong = core_set(&involution_union(
+        &f,
+        &span(&random_basis(f.n, 5, &mut rng)),
+        91,
+    ));
     for xs in [v, wrong] {
         let base = build_base(&g, &xs);
         for m in 2..=3usize {
             let t = tally(g.ne, enumerate(&base, m, 1e7).unwrap());
             assert!(!identity_exact(&t, m));
             let ratio = t.total as f64 / t.o.iter().map(|&x| x as f64).sum::<f64>();
-            assert!(ratio < 1.2, "collapse {ratio} should be ~1 on a non-stable base");
+            assert!(
+                ratio < 1.2,
+                "collapse {ratio} should be ~1 on a non-stable base"
+            );
         }
     }
 }
@@ -172,7 +194,11 @@ fn enumerator_matches_naive_brute_force() {
     xs.truncate(xs.len().min(30));
     // truncated set is no longer stable: the brute force must still agree for any set
     let base = build_base(&g, &xs);
-    let pts: Vec<(u32, u32, u32, u32)> = base.items.iter().map(|i| (i.ell, class_of(&g, i.ell).0, class_of(&g, i.ell).1, i.x)).collect();
+    let pts: Vec<(u32, u32, u32, u32)> = base
+        .items
+        .iter()
+        .map(|i| (i.ell, class_of(&g, i.ell).0, class_of(&g, i.ell).1, i.x))
+        .collect();
     let nit = pts.len();
     assert!(nit <= 24, "fixture too large for brute force: {nit}");
     for m in 2..=4usize {
@@ -197,7 +223,11 @@ fn enumerator_matches_naive_brute_force() {
         }
         let t = tally(g.ne, enumerate(&base, m, 1e7).unwrap());
         assert_eq!(t.d, d, "D mismatch m={m}");
-        assert_eq!(t.o.iter().map(|&x| x as usize).sum::<usize>(), orbits.len(), "orbit count m={m}");
+        assert_eq!(
+            t.o.iter().map(|&x| x as usize).sum::<usize>(),
+            orbits.len(),
+            "orbit count m={m}"
+        );
     }
 }
 
@@ -225,9 +255,26 @@ fn planted_decomposition_has_a_full_translation_orbit() {
         if u.count_ones() % 2 != 0 {
             continue;
         }
-        let tr: Vec<u32> = chosen.iter().enumerate().map(|(i, c)| if u >> i & 1 == 1 { (c.ell + g.m) % g.ne } else { c.ell }).collect();
-        assert!(tr.iter().all(|e| ells.contains(e)), "translate leaves the stable base");
-        assert_eq!(tr.iter().map(|&e| e as u64).sum::<u64>() % g.ne as u64, s, "translate changes the sum");
+        let tr: Vec<u32> = chosen
+            .iter()
+            .enumerate()
+            .map(|(i, c)| {
+                if u >> i & 1 == 1 {
+                    (c.ell + g.m) % g.ne
+                } else {
+                    c.ell
+                }
+            })
+            .collect();
+        assert!(
+            tr.iter().all(|e| ells.contains(e)),
+            "translate leaves the stable base"
+        );
+        assert_eq!(
+            tr.iter().map(|&e| e as u64).sum::<u64>() % g.ne as u64,
+            s,
+            "translate changes the sum"
+        );
         let mut sorted = tr.clone();
         sorted.sort_unstable();
         found.insert(sorted);
@@ -236,7 +283,12 @@ fn planted_decomposition_has_a_full_translation_orbit() {
     assert!(t.d[s as usize] as usize >= 1 << (m - 1));
     assert_eq!(t.d[s as usize], t.o[s as usize] << (m - 1));
     // an odd-weight translate changes the sum by T (leaves the target)
-    let odd: u64 = chosen.iter().enumerate().map(|(i, c)| if i == 0 { (c.ell + g.m) % g.ne } else { c.ell } as u64).sum::<u64>() % g.ne as u64;
+    let odd: u64 = chosen
+        .iter()
+        .enumerate()
+        .map(|(i, c)| if i == 0 { (c.ell + g.m) % g.ne } else { c.ell } as u64)
+        .sum::<u64>()
+        % g.ne as u64;
     assert_eq!(odd, (s + g.m as u64) % g.ne as u64);
 }
 
@@ -257,16 +309,36 @@ fn rank_elimination_and_planted_system() {
     let m = 3usize;
     let t = tally(g.ne, enumerate(&base, m, 1e7).unwrap());
     let order: Vec<u32> = (0..g.ne).step_by(g.h as usize).collect();
-    let r = rank_stream(&t, &order, m, base.ncls, largest_prime_factor(g.ne) as u64, 4);
+    let r = rank_stream(
+        &t,
+        &order,
+        m,
+        base.ncls,
+        largest_prime_factor(g.ne) as u64,
+        4,
+    );
     assert!(r.active > 0 && r.rank_final <= r.active);
-    assert!(r.t90.is_some(), "dense toy base should reach 90% rank: {r:?}");
+    assert!(
+        r.t90.is_some(),
+        "dense toy base should reach 90% rank: {r:?}"
+    );
     // fractional targets: within (t90 - 1, t90], and the rows used so far never exceed rows90
     let tf = r.t90f.unwrap();
     let t90 = r.t90.unwrap() as f64;
     assert!(tf > t90 - 1.0 && tf <= t90, "t90f {tf} vs t90 {t90}");
     // same stream, same seed: deterministic
-    let r2 = rank_stream(&t, &order, m, base.ncls, largest_prime_factor(g.ne) as u64, 4);
-    assert_eq!((r.t90f, r.rows90, r.rank_final), (r2.t90f, r2.rows90, r2.rank_final));
+    let r2 = rank_stream(
+        &t,
+        &order,
+        m,
+        base.ncls,
+        largest_prime_factor(g.ne) as u64,
+        4,
+    );
+    assert_eq!(
+        (r.t90f, r.rows90, r.rank_final),
+        (r2.t90f, r2.rows90, r2.rank_final)
+    );
 }
 
 #[test]
@@ -279,19 +351,29 @@ fn anf_degree_of_subspace_and_point() {
     let v2 = span(&random_basis(n, 5, &mut rng));
     assert_eq!(anf(n, &v2).0, n - 5);
     assert_eq!(anf(n, &[37]).0, n, "a point has degree n");
-    assert_eq!(anf(n, &(0..512).filter(|x| x & 1 == 1).collect::<Vec<u32>>()), (1, 1));
+    assert_eq!(
+        anf(n, &(0..512).filter(|x| x & 1 == 1).collect::<Vec<u32>>()),
+        (1, 1)
+    );
 }
 
 #[test]
 fn measure_smoke_on_a_tiny_fixture() {
     let (f, g) = setup(13, 0);
     let raw = make_arm("g4poly", &f, 5, 1, 0);
-    let r: std::collections::HashMap<String, String> = measure(&g, &f, &raw, 5, 3, 5).unwrap().into_iter().collect();
+    let r: std::collections::HashMap<String, String> = measure(&g, &f, &raw, 5, 3, 5)
+        .unwrap()
+        .into_iter()
+        .collect();
     assert_eq!(r["ident_ok"], "1");
     assert_eq!(r["quot_ok"], "1");
     assert_eq!(r["closure"].parse::<f64>().unwrap(), 1.0);
     assert!((r["collapse"].parse::<f64>().unwrap() - 4.0).abs() < 1e-12);
-    let rv: std::collections::HashMap<String, String> = measure(&g, &f, &make_arm("vpoly", &f, 5, 1, 0), 5, 3, 5).unwrap().into_iter().collect();
+    let rv: std::collections::HashMap<String, String> =
+        measure(&g, &f, &make_arm("vpoly", &f, 5, 1, 0), 5, 3, 5)
+            .unwrap()
+            .into_iter()
+            .collect();
     assert_eq!(rv["ident_ok"], "0");
     assert!(rv["collapse"].parse::<f64>().unwrap() < 1.1);
     // membership degree: subspace n-l (+0), union is higher
@@ -323,7 +405,10 @@ fn seeds_are_distinct_and_cap_logic_is_sound() {
             }
             pmf *= (pairs - b) as f64 / (b + 1) as f64;
         }
-        assert!(p_ok > 0.5, "cell {c:?}: only {p_ok:.3} of g4rand draws are accepted (truncation too strong)");
+        assert!(
+            p_ok > 0.5,
+            "cell {c:?}: only {p_ok:.3} of g4rand draws are accepted (truncation too strong)"
+        );
         // the unmatched single instances are skipped (not an error) above the cap, so nothing else can abort
         assert!(binom(4 * pairs, c.m).is_finite());
     }
@@ -331,7 +416,12 @@ fn seeds_are_distinct_and_cap_logic_is_sound() {
 
 #[test]
 fn matched_replicates_have_exactly_equal_item_counts() {
-    for (a, n, m, l) in [(0u32, 13u32, 3usize, 5u32), (0, 13, 4, 5), (1, 11, 5, 5), (0, 13, 2, 7)] {
+    for (a, n, m, l) in [
+        (0u32, 13u32, 3usize, 5u32),
+        (0, 13, 4, 5),
+        (1, 11, 5, 5),
+        (0, 13, 2, 7),
+    ] {
         let (f, g) = setup(n, a);
         let c = Cell { a, n, m, l };
         for rep in 0..6u64 {
@@ -339,8 +429,15 @@ fn matched_replicates_have_exactly_equal_item_counts() {
             assert!(mt.n_items >= 4 * m && binom(mt.n_items, m) <= ENUM_CAP);
             assert_eq!(mt.arms.len(), 5);
             for (arm, b, _seed, _tries) in &mt.arms {
-                assert!(shape_of(&g, &b.raw).1 >= m, "{arm} has fewer than m classes");
-                assert_eq!(items_of(&g, &b.raw), mt.n_items, "{arm} not matched (a{a} n{n} m{m} l{l} rep {rep})");
+                assert!(
+                    shape_of(&g, &b.raw).1 >= m,
+                    "{arm} has fewer than m classes"
+                );
+                assert_eq!(
+                    items_of(&g, &b.raw),
+                    mt.n_items,
+                    "{arm} not matched (a{a} n{n} m{m} l{l} rep {rep})"
+                );
                 let stable = is_iota_stable(&f, &core_set(&b.raw));
                 match *arm {
                     "g4rand" | "riota" => assert!(stable, "{arm} must be iota-stable"),
@@ -351,7 +448,10 @@ fn matched_replicates_have_exactly_equal_item_counts() {
             // deterministic
             let mt2 = draw_matched(&f, &g, &c, 20261027, rep).unwrap();
             assert_eq!(mt.n_items, mt2.n_items);
-            assert_eq!(mt.arms.iter().map(|x| x.2).collect::<Vec<_>>(), mt2.arms.iter().map(|x| x.2).collect::<Vec<_>>());
+            assert_eq!(
+                mt.arms.iter().map(|x| x.2).collect::<Vec<_>>(),
+                mt2.arms.iter().map(|x| x.2).collect::<Vec<_>>()
+            );
         }
     }
 }
@@ -365,7 +465,10 @@ fn counted_mitm_finds_exactly_the_decompositions_and_matches_the_cost_model() {
     let (f, g) = setup(13, 0);
     let mut rng = Rng(11);
     let w = span(&random_basis(f.n, 3, &mut rng));
-    let sets = [core_set(&involution_union(&f, &w, 1)), core_set(&involution_union(&f, &w, 77))];
+    let sets = [
+        core_set(&involution_union(&f, &w, 1)),
+        core_set(&involution_union(&f, &w, 77)),
+    ];
     for xs in sets {
         let base = build_base(&g, &xs);
         let nit = base.items.len();
@@ -377,7 +480,13 @@ fn counted_mitm_finds_exactly_the_decompositions_and_matches_the_cost_model() {
                 fn subsets(n: usize, k: usize) -> Vec<Vec<usize>> {
                     let mut out = vec![];
                     let mut cur = vec![];
-                    fn go(n: usize, k: usize, start: usize, cur: &mut Vec<usize>, out: &mut Vec<Vec<usize>>) {
+                    fn go(
+                        n: usize,
+                        k: usize,
+                        start: usize,
+                        cur: &mut Vec<usize>,
+                        out: &mut Vec<Vec<usize>>,
+                    ) {
                         if cur.len() == k {
                             out.push(cur.clone());
                             return;
@@ -397,28 +506,40 @@ fn counted_mitm_finds_exactly_the_decompositions_and_matches_the_cost_model() {
                 assert_eq!(right.len() as f64, binom(nit, m - a), "probe size");
                 let cls = |idx: &[usize]| -> Option<HashSet<u32>> {
                     let h: HashSet<u32> = idx.iter().map(|&i| base.items[i].cid).collect();
-                    if h.len() == idx.len() { Some(h) } else { None }
+                    if h.len() == idx.len() {
+                        Some(h)
+                    } else {
+                        None
+                    }
                 };
                 let mut table: HashMap<u32, Vec<&Vec<usize>>> = HashMap::new();
                 for l in &left {
                     if cls(l).is_some() {
-                        let s = l.iter().map(|&i| base.items[i].ell as u64).sum::<u64>() % g.ne as u64;
+                        let s =
+                            l.iter().map(|&i| base.items[i].ell as u64).sum::<u64>() % g.ne as u64;
                         table.entry(s as u32).or_default().push(l);
                     }
                 }
-                let targets: Vec<usize> = (0..g.ne as usize).filter(|&s| t.d[s] > 0).step_by(37).take(12).chain((0..g.ne as usize).filter(|&s| t.d[s] == 0).take(3)).collect();
+                let targets: Vec<usize> = (0..g.ne as usize)
+                    .filter(|&s| t.d[s] > 0)
+                    .step_by(37)
+                    .take(12)
+                    .chain((0..g.ne as usize).filter(|&s| t.d[s] == 0).take(3))
+                    .collect();
                 for s in targets {
                     let mut found: HashSet<Vec<usize>> = HashSet::new();
                     let mut probes = 0u64;
                     for r in &right {
                         probes += 1;
                         let Some(rc) = cls(r) else { continue };
-                        let rs = r.iter().map(|&i| base.items[i].ell as u64).sum::<u64>() % g.ne as u64;
+                        let rs =
+                            r.iter().map(|&i| base.items[i].ell as u64).sum::<u64>() % g.ne as u64;
                         let need = ((s as u64 + g.ne as u64 - rs) % g.ne as u64) as u32;
                         if let Some(ls) = table.get(&need) {
                             for l in ls {
                                 if l.iter().all(|&i| !rc.contains(&base.items[i].cid)) {
-                                    let mut u: Vec<usize> = l.iter().chain(r.iter()).copied().collect();
+                                    let mut u: Vec<usize> =
+                                        l.iter().chain(r.iter()).copied().collect();
                                     u.sort_unstable();
                                     u.dedup();
                                     if u.len() == m {
@@ -429,7 +550,11 @@ fn counted_mitm_finds_exactly_the_decompositions_and_matches_the_cost_model() {
                         }
                     }
                     assert_eq!(probes as f64, binom(nit, m - a));
-                    assert_eq!(found.len() as u32, t.d[s], "MITM finds exactly D[s]: s={s} m={m} a={a}");
+                    assert_eq!(
+                        found.len() as u32,
+                        t.d[s],
+                        "MITM finds exactly D[s]: s={s} m={m} a={a}"
+                    );
                 }
             }
             // the cost model picks the cheaper orientation for the given number of targets
@@ -452,7 +577,8 @@ fn orbit_members_expand_to_points_that_sum_to_the_target() {
     let mut rng = Rng(31);
     let w = span(&random_basis(f.n, 5, &mut rng));
     let base = build_base(&g, &core_set(&involution_union(&f, &w, 1)));
-    let by_ell: std::collections::HashMap<u32, u32> = base.items.iter().map(|i| (i.ell, i.x)).collect();
+    let by_ell: std::collections::HashMap<u32, u32> =
+        base.items.iter().map(|i| (i.ell, i.x)).collect();
     for m in [2usize, 3, 4] {
         for _ in 0..25 {
             let mut chosen: Vec<Item> = vec![];
@@ -469,7 +595,17 @@ fn orbit_members_expand_to_points_that_sum_to_the_target() {
                 if u.count_ones() % 2 != 0 {
                     continue;
                 }
-                let ells: Vec<u32> = chosen.iter().enumerate().map(|(i, x)| if u >> i & 1 == 1 { (x.ell + g.m) % g.ne } else { x.ell }).collect();
+                let ells: Vec<u32> = chosen
+                    .iter()
+                    .enumerate()
+                    .map(|(i, x)| {
+                        if u >> i & 1 == 1 {
+                            (x.ell + g.m) % g.ne
+                        } else {
+                            x.ell
+                        }
+                    })
+                    .collect();
                 let mut acc = Pt::Inf;
                 for &e in &ells {
                     let p = c.mul(g.gen, e as u64);
@@ -496,13 +632,32 @@ fn pipeline_cost_ratio_has_a_valid_null_and_a_planted_effect_through_the_same_co
     // identities here; the effect and null behaviour of the DECISION code is tested on planted rows below.
     let (f, g) = setup(13, 0);
     let b = make_arm("g4poly", &f, 5, 1, 0);
-    let r: std::collections::HashMap<String, String> = measure(&g, &f, &b, 5, 3, 5).unwrap().into_iter().collect();
-    for k in ["cpr_blind", "cpr_best", "tot_blind", "tot_best", "cpr_lb_blind", "t90f", "sat", "nsc"] {
+    let r: std::collections::HashMap<String, String> =
+        measure(&g, &f, &b, 5, 3, 5).unwrap().into_iter().collect();
+    for k in [
+        "cpr_blind",
+        "cpr_best",
+        "tot_blind",
+        "tot_best",
+        "cpr_lb_blind",
+        "t90f",
+        "sat",
+        "nsc",
+    ] {
         assert!(r.contains_key(k), "missing column {k}");
     }
-    let (cb, cq): (f64, f64) = (r["cpr_blind"].parse().unwrap(), r["cpr_best"].parse().unwrap());
-    assert!(cb.is_finite() && cq.is_finite() && cq <= cb + 1e-9, "the quotient search never costs more than the blind one: {cq} vs {cb}");
-    let (tb, tq): (f64, f64) = (r["tot_blind"].parse().unwrap(), r["tot_best"].parse().unwrap());
+    let (cb, cq): (f64, f64) = (
+        r["cpr_blind"].parse().unwrap(),
+        r["cpr_best"].parse().unwrap(),
+    );
+    assert!(
+        cb.is_finite() && cq.is_finite() && cq <= cb + 1e-9,
+        "the quotient search never costs more than the blind one: {cq} vs {cb}"
+    );
+    let (tb, tq): (f64, f64) = (
+        r["tot_blind"].parse().unwrap(),
+        r["tot_best"].parse().unwrap(),
+    );
     assert!(tq <= tb + 1e-9);
 }
 
@@ -532,7 +687,21 @@ mod synth {
     }
     impl P {
         pub fn new(m: usize, reps: usize) -> P {
-            P { m, reps, v: 1.0, g_blind: 1.0, g_best: 1.0, w: 1.0, s: 1.0, noise: 0.03, collapse_g: (1u64 << (m - 1)) as f64, ident: "1", aa_shift: 1.0, cens_v: 0, nitems_w: 30 }
+            P {
+                m,
+                reps,
+                v: 1.0,
+                g_blind: 1.0,
+                g_best: 1.0,
+                w: 1.0,
+                s: 1.0,
+                noise: 0.03,
+                collapse_g: (1u64 << (m - 1)) as f64,
+                ident: "1",
+                aa_shift: 1.0,
+                cens_v: 0,
+                nitems_w: 30,
+            }
         }
     }
     pub fn rows(p: &P) -> Vec<Row> {
@@ -541,18 +710,36 @@ mod synth {
         for arm in ["vrand", "g4rand", "rset", "riota", "wrong"] {
             for half in ["main", "aa"] {
                 for rep in 0..p.reps {
-                    let mut jit = |x: f64| x * (1.0 + p.noise * ((rng.below(2001) as f64 / 1000.0) - 1.0));
+                    let mut jit =
+                        |x: f64| x * (1.0 + p.noise * ((rng.below(2001) as f64 / 1000.0) - 1.0));
                     let stable = arm == "g4rand" || arm == "riota";
-                    let shift = if half == "aa" && arm == "vrand" { p.aa_shift } else { 1.0 };
+                    let shift = if half == "aa" && arm == "vrand" {
+                        p.aa_shift
+                    } else {
+                        1.0
+                    };
                     let (blind, best, tot_b, tot_s) = match arm {
                         "vrand" => (p.v, p.v, 10.0 * p.v, 10.0 * p.v),
-                        "g4rand" | "riota" => (p.g_blind, p.g_best, 10.0 * p.g_blind, 10.0 * p.g_best),
+                        "g4rand" | "riota" => {
+                            (p.g_blind, p.g_best, 10.0 * p.g_blind, 10.0 * p.g_best)
+                        }
                         "rset" => (p.s, p.s, 10.0 * p.s, 10.0 * p.s),
                         _ => (p.w, p.w, 10.0 * p.w, 10.0 * p.w),
                     };
-                    let (cb, cs, tb, ts) = (jit(blind) * shift, jit(best) * shift, jit(tot_b) * shift, jit(tot_s) * shift);
+                    let (cb, cs, tb, ts) = (
+                        jit(blind) * shift,
+                        jit(best) * shift,
+                        jit(tot_b) * shift,
+                        jit(tot_s) * shift,
+                    );
                     let censored = arm == "vrand" && half == "main" && rep < p.cens_v;
-                    let na = |v: f64| if censored { "NA".to_string() } else { v.to_string() };
+                    let na = |v: f64| {
+                        if censored {
+                            "NA".to_string()
+                        } else {
+                            v.to_string()
+                        }
+                    };
                     let mut r: Row = HashMap::new();
                     let mut put = |k: &str, v: String| {
                         r.insert(k.to_string(), v);
@@ -563,8 +750,27 @@ mod synth {
                     put("ident_ok", if stable { p.ident.into() } else { "0".into() });
                     put("quot_ok", if stable { "1".into() } else { "NA".into() });
                     put("closure", if stable { "1".into() } else { "0.01".into() });
-                    put("collapse", if stable { (if arm == "g4rand" { p.collapse_g } else { (1u64 << (p.m - 1)) as f64 }).to_string() } else { "1.0".into() });
-                    put("nitems", if arm == "wrong" && rep == 0 && half == "main" { p.nitems_w.to_string() } else { "30".into() });
+                    put(
+                        "collapse",
+                        if stable {
+                            (if arm == "g4rand" {
+                                p.collapse_g
+                            } else {
+                                (1u64 << (p.m - 1)) as f64
+                            })
+                            .to_string()
+                        } else {
+                            "1.0".into()
+                        },
+                    );
+                    put(
+                        "nitems",
+                        if arm == "wrong" && rep == 0 && half == "main" {
+                            p.nitems_w.to_string()
+                        } else {
+                            "30".into()
+                        },
+                    );
                     put("active", if stable { "15".into() } else { "30".into() });
                     put("sat", "0.1".into());
                     put("cpr_blind", na(cb));
@@ -592,22 +798,45 @@ fn classify_covers_every_class() {
     assert_eq!(classify(ci(0.4, 0.5, 0.6), 0.05), "LOSS");
     assert_eq!(classify(ci(0.97, 1.0, 1.03), 0.05), "PARITY");
     assert_eq!(classify(ci(0.7, 1.0, 1.4), 0.05), "UNRESOLVED");
-    assert_eq!(classify(ci(0.99, 1.04, 1.2), 0.05), "UNRESOLVED", "straddling the margin edge is not parity");
-    assert_eq!(classify(ci(0.7, 1.0, 1.4), 2.0), "UNRESOLVED", "a wide A/A delta must not turn a noisy cell into PARITY");
+    assert_eq!(
+        classify(ci(0.99, 1.04, 1.2), 0.05),
+        "UNRESOLVED",
+        "straddling the margin edge is not parity"
+    );
+    assert_eq!(
+        classify(ci(0.7, 1.0, 1.4), 2.0),
+        "UNRESOLVED",
+        "a wide A/A delta must not turn a noisy cell into PARITY"
+    );
     assert_eq!(classify(ci(f64::NAN, f64::NAN, f64::NAN), 0.05), "NO_DATA");
     // bootstrap sanity on planted data
     let a: Vec<f64> = (0..30).map(|i| 4.0 + 0.01 * (i % 5) as f64).collect();
     let b: Vec<f64> = (0..30).map(|i| 1.0 + 0.01 * (i % 5) as f64).collect();
     let r = boot_ratio(&a, &b, 1);
-    assert!(r.lo > 3.8 && r.hi < 4.1 && r.est > 3.9 && r.est < 4.0, "{r:?}");
+    assert!(
+        r.lo > 3.8 && r.hi < 4.1 && r.est > 3.9 && r.est < 4.0,
+        "{r:?}"
+    );
     // paired bootstrap: costs proportional to a shared N cancel exactly inside each pair
     let nn: Vec<f64> = (0..30).map(|i| 0.5 + 0.1 * ((i * 7) % 30) as f64).collect();
-    let pa: std::collections::BTreeMap<usize, f64> = nn.iter().enumerate().map(|(i, n)| (i, 4.0 * n)).collect();
-    let pb: std::collections::BTreeMap<usize, f64> = nn.iter().enumerate().map(|(i, n)| (i, 1.0 * n)).collect();
+    let pa: std::collections::BTreeMap<usize, f64> =
+        nn.iter().enumerate().map(|(i, n)| (i, 4.0 * n)).collect();
+    let pb: std::collections::BTreeMap<usize, f64> =
+        nn.iter().enumerate().map(|(i, n)| (i, 1.0 * n)).collect();
     let rp = boot_ratio_paired(&pa, &pb, 1);
-    assert!((rp.lo - 4.0).abs() < 1e-9 && (rp.hi - 4.0).abs() < 1e-9, "paired ratio of proportional series is exact: {rp:?}");
-    let ru = boot_ratio(&pa.values().cloned().collect::<Vec<_>>(), &pb.values().cloned().collect::<Vec<_>>(), 1);
-    assert!(ru.hi - ru.lo > 0.0, "the unpaired interval is wider: {ru:?}");
+    assert!(
+        (rp.lo - 4.0).abs() < 1e-9 && (rp.hi - 4.0).abs() < 1e-9,
+        "paired ratio of proportional series is exact: {rp:?}"
+    );
+    let ru = boot_ratio(
+        &pa.values().cloned().collect::<Vec<_>>(),
+        &pb.values().cloned().collect::<Vec<_>>(),
+        1,
+    );
+    assert!(
+        ru.hi - ru.lo > 0.0,
+        "the unpaired interval is wider: {ru:?}"
+    );
     let k = binom_threshold(72, 0.10, 0.01);
     assert!((11..=17).contains(&k), "A/A gate threshold {k}");
 }
@@ -624,9 +853,21 @@ fn judge_cell_detects_planted_gain_loss_parity_unresolved() {
     p.g_best = 1.0;
     let j = judge(&p);
     assert_eq!(j.instr, "ok");
-    assert_eq!((j.v_best.as_str(), j.v_blind.as_str(), j.v_tbest.as_str(), j.v_q_best.as_str()), ("GAIN", "GAIN", "GAIN", "GAIN"), "{j:?}");
+    assert_eq!(
+        (
+            j.v_best.as_str(),
+            j.v_blind.as_str(),
+            j.v_tbest.as_str(),
+            j.v_q_best.as_str()
+        ),
+        ("GAIN", "GAIN", "GAIN", "GAIN"),
+        "{j:?}"
+    );
     assert!(j.license, "R_best and Q_best GAIN, tot not LOSS");
-    assert_eq!(j.v_null, "PARITY", "S and W equal: the construction null is parity");
+    assert_eq!(
+        j.v_null, "PARITY",
+        "S and W equal: the construction null is parity"
+    );
     // planted LOSS
     let mut p = P::new(4, 24);
     p.v = 1.0;
@@ -637,7 +878,11 @@ fn judge_cell_detects_planted_gain_loss_parity_unresolved() {
     assert!(!j.license);
     // planted PARITY (everything equal)
     let j = judge(&P::new(3, 40));
-    assert_eq!((j.v_best.as_str(), j.v_blind.as_str(), j.v_null.as_str()), ("PARITY", "PARITY", "PARITY"), "{j:?}");
+    assert_eq!(
+        (j.v_best.as_str(), j.v_blind.as_str(), j.v_null.as_str()),
+        ("PARITY", "PARITY", "PARITY"),
+        "{j:?}"
+    );
     assert_eq!(j.aa_flags, 0);
     // planted effect but huge noise and few bases -> UNRESOLVED
     let mut p = P::new(3, 6);
@@ -653,7 +898,10 @@ fn judge_cell_detects_planted_gain_loss_parity_unresolved() {
     p.g_blind = 1.0;
     p.g_best = 1.0;
     let j = judge(&p);
-    assert_eq!(j.v_null, "LOSS", "null = cpr(S)/cpr(W) = 0.25: the construction W costs more than the plain random set");
+    assert_eq!(
+        j.v_null, "LOSS",
+        "null = cpr(S)/cpr(W) = 0.25: the construction W costs more than the plain random set"
+    );
 }
 
 #[test]
@@ -697,10 +945,24 @@ fn partial_and_missing_cells_are_never_classified() {
     assert_eq!(judge_cell(&[], (0, 13, 3, 5), 10).completeness, "NOT_RUN");
     assert_eq!(judge_cell(&[], (0, 13, 3, 5), 10).v_best, "NOT_RUN");
     // drop the whole A/A half of one arm and one main replicate of another
-    let partial: Vec<Row> = all.into_iter().filter(|r| !(r["arm"] == "vrand" && r["half"] == "aa") && !(r["arm"] == "wrong" && r["rep"] == "3" && r["half"] == "main")).collect();
+    let partial: Vec<Row> = all
+        .into_iter()
+        .filter(|r| {
+            !(r["arm"] == "vrand" && r["half"] == "aa")
+                && !(r["arm"] == "wrong" && r["rep"] == "3" && r["half"] == "main")
+        })
+        .collect();
     let j = judge_cell(&partial, (0, 13, 3, 5), 10);
-    assert!(j.completeness.starts_with("INCOMPLETE"), "{}", j.completeness);
-    assert!(j.completeness.contains("vrand/aa:0of10") && j.completeness.contains("wrong/main:9of10"), "{}", j.completeness);
+    assert!(
+        j.completeness.starts_with("INCOMPLETE"),
+        "{}",
+        j.completeness
+    );
+    assert!(
+        j.completeness.contains("vrand/aa:0of10") && j.completeness.contains("wrong/main:9of10"),
+        "{}",
+        j.completeness
+    );
     assert_eq!(j.v_best, j.completeness, "no class for a partial cell");
     // a plan that expects more replicates than were written is INCOMPLETE, not silently classified
     let j = judge_cell(&rows(&P::new(3, 10)), (0, 13, 3, 5), 12);
@@ -715,7 +977,10 @@ fn planned_fields_have_cyclic_groups() {
         for a in [0u32, 1] {
             let ne = Curve { f: &f, a }.count();
             let ok = build_group(&f, a).is_ok();
-            println!("n={n} a={a} ne={ne} lpf={} cyclic={ok}", largest_prime_factor(ne));
+            println!(
+                "n={n} a={a} ne={ne} lpf={} cyclic={ok}",
+                largest_prime_factor(ne)
+            );
             if !ok {
                 bad.push((n, a));
             }
@@ -735,20 +1000,38 @@ fn pipeline_plumbing_on_a_tiny_fixture() {
     let dir = std::env::temp_dir().join(format!("g4iota-plumbing-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let d = dir.to_string_lossy().to_string();
-    let c = Cell { a: 0, n: 13, m: 3, l: 5 };
-    let o = RunOpts { seed: 1, reps: Some(3), out: d.clone() };
+    let c = Cell {
+        a: 0,
+        n: 13,
+        m: 3,
+        l: 5,
+    };
+    let o = RunOpts {
+        seed: 1,
+        reps: Some(3),
+        out: d.clone(),
+    };
     std::fs::write(dir.join("plan.tsv"), "0 13 3 5 3\n0 13 4 5 3\n").unwrap();
     let p = run_cell(&c, &o).expect("run_cell");
     let txt = std::fs::read_to_string(&p).unwrap();
     let hdr: Vec<&str> = txt.lines().next().unwrap().split('\t').collect();
-    assert!(txt.lines().all(|l| l.split('\t').count() == hdr.len()), "ragged rows");
+    assert!(
+        txt.lines().all(|l| l.split('\t').count() == hdr.len()),
+        "ragged rows"
+    );
     // 2 single arms once + 5 replicated arms x (3 main + 3 aa)
     assert_eq!(txt.lines().count() - 1, 2 + 5 * 6);
     g4_iota_stable::analyze::analyze(&d).expect("analyze");
     let md = std::fs::read_to_string(dir.join("summary.md")).unwrap();
-    assert!(md.contains("| ok |"), "instrument/control status should be ok:\n{md}");
+    assert!(
+        md.contains("| ok |"),
+        "instrument/control status should be ok:\n{md}"
+    );
     // the second planned cell was never run: it must be reported, not dropped
-    assert!(md.contains("NOT_RUN"), "missing cell must be reported:\n{md}");
+    assert!(
+        md.contains("NOT_RUN"),
+        "missing cell must be reported:\n{md}"
+    );
     assert!(dir.join("fig_cost_ratio.svg").exists() && dir.join("summary.tsv").exists());
     std::fs::remove_dir_all(&dir).unwrap();
 }
@@ -777,8 +1060,79 @@ fn per_m_closure_wording_ignores_void_cells_and_needs_two_nonvoid() {
     notrun.completeness = "NOT_RUN".into();
     notrun.v_best = "NOT_RUN".into();
     assert!(per_m_closed(&[&loss, &par], false));
-    assert!(per_m_closed(&[&loss, &par, &void, &notrun], false), "void cells neither count nor block");
-    assert!(!per_m_closed(&[&loss, &void], false), "one non-void cell is not enough");
-    assert!(!per_m_closed(&[&loss, &par, &gain], false), "a non-void GAIN blocks closure");
-    assert!(!per_m_closed(&[&loss, &par], true), "A/A failure voids the wording");
+    assert!(
+        per_m_closed(&[&loss, &par, &void, &notrun], false),
+        "void cells neither count nor block"
+    );
+    assert!(
+        !per_m_closed(&[&loss, &void], false),
+        "one non-void cell is not enough"
+    );
+    assert!(
+        !per_m_closed(&[&loss, &par, &gain], false),
+        "a non-void GAIN blocks closure"
+    );
+    assert!(
+        !per_m_closed(&[&loss, &par], true),
+        "A/A failure voids the wording"
+    );
+}
+
+#[test]
+fn bases_with_no_row_in_g_are_rejected_by_the_draw_rule() {
+    // A2 (a = 0): a stable base with exactly m classes has one class selection; when its parity is odd it has
+    // no decomposition at any target of G (active = 0, cost NaN). The draw rule must reject it.
+    let (f, g) = setup(13, 0);
+    let m = 4usize;
+    let (mut bad, mut good) = (0, 0);
+    for seed in 0..4000u64 {
+        let b = make_arm("g4rand", &f, 5, seed, 0);
+        let (n, ncls) = shape_of(&g, &b.raw);
+        if ncls != m || binom(n, m) > ENUM_CAP {
+            continue;
+        }
+        let r: std::collections::HashMap<String, String> =
+            measure(&g, &f, &b, 5, m, 7).unwrap().into_iter().collect();
+        if has_g_row(&g, &b.raw, m) {
+            good += 1;
+            assert!(
+                r["active"].parse::<usize>().unwrap() > 0 && r["t90f"] != "NA",
+                "accepted base must have a finite cost"
+            );
+        } else {
+            bad += 1;
+            assert_eq!(r["active"], "0", "rejected base must have no row in G");
+            assert_eq!(r["t90f"], "NA");
+        }
+    }
+    assert!(
+        bad > 0 && good > 0,
+        "expected both parities among {m}-class bases (bad {bad}, good {good})"
+    );
+    // every accepted matched arm has a row in G
+    let c = Cell {
+        a: 0,
+        n: 13,
+        m,
+        l: 5,
+    };
+    for rep in 0..8u64 {
+        let mt = draw_matched(&f, &g, &c, 20261027, rep).unwrap();
+        for (arm, b, _, _) in &mt.arms {
+            assert!(has_g_row(&g, &b.raw, m), "{arm} has no row in G");
+        }
+    }
+}
+
+#[test]
+fn censoring_gate_is_an_integer_comparison_at_exactly_five_percent() {
+    use g4_iota_stable::analyze::censored_over_5pct;
+    assert!(!censored_over_5pct((2, 40)));
+    assert!(censored_over_5pct((3, 40)));
+    assert!(!censored_over_5pct((5, 100)));
+    assert!(censored_over_5pct((6, 100)));
+    assert!(!censored_over_5pct((1, 20)));
+    assert!(censored_over_5pct((1, 16)));
+    assert!(!censored_over_5pct((0, 16)));
+    assert!(censored_over_5pct((0, 0)));
 }

@@ -1,6 +1,6 @@
 # Cell G4: iota-stable non-subspace factor bases
 
-Status: **prepared, not run.** No experiment, sweep or data-producing binary has been executed. The unit tests (21, all
+Status: **prepared, not run.** No experiment, sweep or data-producing binary has been executed. The unit tests (24, all
 passing under `cargo test --release`) use tiny exact fixtures and planted decompositions; their output is discarded.
 
 Question: does the same-instance 2-torsion stabiliser of order 2^(m-1) on iota-stable (x -> 1/x, non-subspace) bases W

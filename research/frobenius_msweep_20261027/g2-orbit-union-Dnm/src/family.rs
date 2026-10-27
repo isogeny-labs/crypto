@@ -59,7 +59,12 @@ fn finish(name: &str, n: u32, blocks: Vec<Vec<u32>>) -> Family {
             kmask[x as usize] |= 1 << k;
         }
     }
-    Family { name: name.to_string(), nb: blocks.len(), blocks, kmask }
+    Family {
+        name: name.to_string(),
+        nb: blocks.len(),
+        blocks,
+        kmask,
+    }
 }
 
 pub fn from_blocks(name: &str, n: u32, blocks: Vec<Vec<u32>>) -> Family {
@@ -68,7 +73,9 @@ pub fn from_blocks(name: &str, n: u32, blocks: Vec<Vec<u32>>) -> Family {
 
 pub fn frob_from_v(f: &Fq, v: &[u32], name: &str) -> Family {
     let n = f.n;
-    let blocks = (0..n).map(|k| v.iter().map(|&x| f.frob_pow(x, k)).collect()).collect();
+    let blocks = (0..n)
+        .map(|k| v.iter().map(|&x| f.frob_pow(x, k)).collect())
+        .collect();
     finish(name, n, blocks)
 }
 
@@ -106,7 +113,9 @@ pub fn geom(f: &Fq, rng: &mut Rng, l: usize) -> Family {
 
 pub fn rsub(f: &Fq, rng: &mut Rng, l: usize) -> Family {
     let n = f.n;
-    let blocks = (0..n).map(|_| span_nonzero(&random_basis(rng, n, l))).collect();
+    let blocks = (0..n)
+        .map(|_| span_nonzero(&random_basis(rng, n, l)))
+        .collect();
     finish("rsub", n, blocks)
 }
 
@@ -144,7 +153,15 @@ pub fn plain(f: &Fq, rng: &mut Rng, l: usize) -> Family {
 
 pub fn plainbig(f: &Fq, rng: &mut Rng, l: usize) -> Family {
     let extra = (f.n as f64).log2().ceil() as usize;
-    finish("plainbig", f.n, vec![span_nonzero(&random_basis(rng, f.n, (l + extra).min(f.n as usize - 1)))])
+    finish(
+        "plainbig",
+        f.n,
+        vec![span_nonzero(&random_basis(
+            rng,
+            f.n,
+            (l + extra).min(f.n as usize - 1),
+        ))],
+    )
 }
 
 pub fn build(arm: &str, f: &Fq, rng: &mut Rng, l: usize) -> Family {
@@ -162,4 +179,6 @@ pub fn build(arm: &str, f: &Fq, rng: &mut Rng, l: usize) -> Family {
 }
 
 /// Arm order is part of the seed derivation (arm_code); append only.
-pub const ARMS: [&str; 8] = ["frob", "geom", "rsub", "rset", "skew", "plain", "plainbig", "frobperm"];
+pub const ARMS: [&str; 8] = [
+    "frob", "geom", "rsub", "rset", "skew", "plain", "plainbig", "frobperm",
+];

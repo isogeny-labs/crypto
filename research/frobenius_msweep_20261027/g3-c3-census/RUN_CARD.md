@@ -27,14 +27,14 @@ export CARGO_TARGET_DIR=/tmp/g3census-target          # outside the tree: the fr
 export BIN=$CARGO_TARGET_DIR/release/g3census
 mkdir -p $RUN/rows $RUN/pilot $RUN/summary            # reports/run-*/ is gitignored in this cell
 cargo build --release 2>&1 | tail -3                  # ~5 s, std-only
-cargo test --release -- --skip satlib 2>&1 | tail -3  # expect: 37 passed (about 21 s); satlib = the repo solver's own tests, skipped
+cargo test --release -- --skip satlib 2>&1 | tail -3  # expect: 38 passed (about 21 s); satlib = the repo solver's own tests, skipped
                                                       # (tests write to the OS temp dir, not the tree)
 ```
 
 ## 1. Freeze (before any data)
 
 The frozen set is committed first, so that the commit binds the sources
-(`Cargo.lock` is un-ignored by the root `.gitignore` and is committed). Commit and PR handling follow AGENTS.md "Default workflow"; this
+(`Cargo.lock` is ignored by the root `.gitignore` (`**/Cargo.lock`) and is NOT committed; the crate has no dependencies, and its sha256 is recorded in FREEZE.txt below). Commit and PR handling follow AGENTS.md "Default workflow"; this
 card only fixes what must be true before round 0.
 
 ```sh
@@ -44,7 +44,7 @@ A=../../../../crypto-autoresearcher/tools/experiment_protocol.py     # sibling c
 python3 $A validate protocol.json || { echo "protocol.json invalid: do not run"; exit 1; }
 # 1b. commit the frozen set (this also records the removal of the old tracked target/test-* fixtures)
 git rm -r -q --cached target 2>/dev/null || true
-git add .gitignore PROTOCOL.md AMENDMENT.md RUN_CARD.md README.md protocol.json Cargo.toml Cargo.lock src
+git add .gitignore PROTOCOL.md AMENDMENT.md RUN_CARD.md README.md protocol.json Cargo.toml src
 git commit -m "g3-c3-census: freeze protocol, run card and sources"
 python3 $A freeze protocol.json --commit auto --filed-before-affected-data
 git add protocol.json && git commit -m "g3-c3-census: frozen protocol.json" && git rev-parse HEAD

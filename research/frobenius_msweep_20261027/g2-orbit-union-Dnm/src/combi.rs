@@ -22,7 +22,10 @@ pub fn n_patterns(n: u64, m: u64) -> u128 {
 /// D(n,m) = C(n+m-1,m)/n. Valid (an integer, free diagonal action) for n prime, m < n.
 pub fn d_nm(n: u64, m: u64) -> u128 {
     let t = n_patterns(n, m);
-    assert!(t % n as u128 == 0, "n does not divide C(n+m-1,m): action not free");
+    assert!(
+        t % n as u128 == 0,
+        "n does not divide C(n+m-1,m): action not free"
+    );
     t / n as u128
 }
 
@@ -101,7 +104,8 @@ pub struct PatternTable {
 impl PatternTable {
     pub fn new(nb: usize, m: usize, diagonal: bool) -> PatternTable {
         let pats = all_patterns(nb, m);
-        let index: HashMap<u64, usize> = pats.iter().enumerate().map(|(i, p)| (pack(p), i)).collect();
+        let index: HashMap<u64, usize> =
+            pats.iter().enumerate().map(|(i, p)| (pack(p), i)).collect();
         let mut class_of = vec![usize::MAX; pats.len()];
         let mut class_pats: Vec<Vec<usize>> = vec![];
         let mut rep = vec![];
@@ -124,7 +128,16 @@ impl PatternTable {
                 rep.push(i);
             }
         }
-        PatternTable { nb, m, pats, index, class_of, class_pats, rep, diagonal }
+        PatternTable {
+            nb,
+            m,
+            pats,
+            index,
+            class_of,
+            class_pats,
+            rep,
+            diagonal,
+        }
     }
     pub fn n_classes(&self) -> usize {
         self.class_pats.len()

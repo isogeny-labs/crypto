@@ -2,12 +2,12 @@
 
 pub fn poly_for(n: u32) -> u32 {
     match n {
-        5 => 0x25,       // x^5 + x^2 + 1
-        7 => 0x83,       // x^7 + x + 1
-        11 => 0x805,     // x^11 + x^2 + 1
-        13 => 0x201B,    // x^13 + x^4 + x^3 + x + 1
-        17 => 0x20009,   // x^17 + x^3 + 1
-        19 => 0x80027,   // x^19 + x^5 + x^2 + x + 1
+        5 => 0x25,     // x^5 + x^2 + 1
+        7 => 0x83,     // x^7 + x + 1
+        11 => 0x805,   // x^11 + x^2 + 1
+        13 => 0x201B,  // x^13 + x^4 + x^3 + x + 1
+        17 => 0x20009, // x^17 + x^3 + 1
+        19 => 0x80027, // x^19 + x^5 + x^2 + x + 1
         _ => panic!("no polynomial registered for n={n}"),
     }
 }
@@ -73,7 +73,16 @@ impl Fq {
         for i in 0..q1 {
             exp[q1 + i] = exp[i];
         }
-        let mut f = Fq { n, q: 1 << n, poly, q1, exp, log, tr_mask: 0, ht_tab: vec![] };
+        let mut f = Fq {
+            n,
+            q: 1 << n,
+            poly,
+            q1,
+            exp,
+            log,
+            tr_mask: 0,
+            ht_tab: vec![],
+        };
         for i in 0..n {
             let e = 1u32 << i;
             let (mut t, mut z) = (0u32, e);

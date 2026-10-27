@@ -52,3 +52,8 @@ A15. Censoring tolerance 1% (was 10%); the pilot uses a hard 500 000-conflict ca
 A16. Chalf now pins the top u-bit of every slot (m unit clauses), not slot 1 alone: C's lex break makes slot 1 the smallest slot, so a slot-1 pin retains 3/4 (m = 2) or 7/8 (m = 3) of the sorted space and could fail to clear 0.95 on a sound instrument. Expectation is a range (0.125 to 0.5), with a numeric pilot threshold of 0.8. Supersedes the "about 0.5" of A13.
 A17. Decision rule 3 (O-STRUCTURE) requires G, Cpoly and A/A with at least 10 paired targets each; absent controls leave the candidate not confirmed. This implements PROTOCOL section 7 as written (the code was fail-open).
 A18. Freeze mechanics: tests write outside the tree, a cell `.gitignore`, out-of-tree cargo target dir, exact freeze commands. No scientific content changes.
+
+## Revision 4 (after the round-2 review, 2026-10-27)
+
+A19. O-RELABEL requires the positive control P3 (Chalf/C, >= 6 paired targets, detected); without it the label is O-INCONCLUSIVE. Implements PROTOCOL section 7 rule 4 as amended; the earlier code issued the null label with no positive control. No other scientific change.
+A20. Freeze command no longer `git add`s the ignored Cargo.lock (it exited 1); the file is hashed in FREEZE.txt only.

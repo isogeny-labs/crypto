@@ -66,13 +66,29 @@ impl<'a> Enumerator<'a> {
                 r += 1;
             }
         }
-        let mut e = Enumerator { f, c, pts, pmask, rank, m, a, b, left: vec![], right: HashMap::new() };
+        let mut e = Enumerator {
+            f,
+            c,
+            pts,
+            pmask,
+            rank,
+            m,
+            a,
+            b,
+            left: vec![],
+            right: HashMap::new(),
+        };
         let est = e.tuple_count(a);
-        assert!(est <= max_left as f64, "left table too large: {est:.3e} > {max_left}");
+        assert!(
+            est <= max_left as f64,
+            "left table too large: {est:.3e} > {max_left}"
+        );
         let mut left = vec![];
         e.gen(a, &mut |ent| left.push(ent));
         let mut right: HashMap<u64, Vec<Ent>> = HashMap::new();
-        e.gen(b, &mut |ent| right.entry(ent.sum.key()).or_default().push(ent));
+        e.gen(b, &mut |ent| {
+            right.entry(ent.sum.key()).or_default().push(ent)
+        });
         e.left = left;
         e.right = right;
         e
@@ -96,9 +112,22 @@ impl<'a> Enumerator<'a> {
         self.rec(0, s, 0, &mut cur, INF, out);
     }
 
-    fn rec(&self, depth: usize, s: usize, start: usize, cur: &mut [u32; 3], sum: P, out: &mut dyn FnMut(Ent)) {
+    fn rec(
+        &self,
+        depth: usize,
+        s: usize,
+        start: usize,
+        cur: &mut [u32; 3],
+        sum: P,
+        out: &mut dyn FnMut(Ent),
+    ) {
         if depth == s {
-            out(Ent { sum, rmin: self.rank[cur[0] as usize], rmax: self.rank[cur[s - 1] as usize], idx: *cur });
+            out(Ent {
+                sum,
+                rmin: self.rank[cur[0] as usize],
+                rmax: self.rank[cur[s - 1] as usize],
+                idx: *cur,
+            });
             return;
         }
         for j in start..self.pts.len() {
@@ -193,7 +222,14 @@ impl<'a> Enumerator<'a> {
     /// Brute-force reference (m nested loops, no meet-in-the-middle, no
     /// tuple tables) for tiny instances: returns the number of decompositions.
     pub fn brute_total(&self, r: P) -> u64 {
-        fn rec(e: &Enumerator, depth: usize, start: usize, last_rank: Option<u32>, sum: P, r: P) -> u64 {
+        fn rec(
+            e: &Enumerator,
+            depth: usize,
+            start: usize,
+            last_rank: Option<u32>,
+            sum: P,
+            r: P,
+        ) -> u64 {
             if depth == e.m {
                 return (sum == r) as u64;
             }
@@ -204,7 +240,14 @@ impl<'a> Enumerator<'a> {
                         continue;
                     }
                 }
-                t += rec(e, depth + 1, j + 1, Some(e.rank[j]), e.c.add(e.f, sum, e.pts[j]), r);
+                t += rec(
+                    e,
+                    depth + 1,
+                    j + 1,
+                    Some(e.rank[j]),
+                    e.c.add(e.f, sum, e.pts[j]),
+                    r,
+                );
             }
             t
         }

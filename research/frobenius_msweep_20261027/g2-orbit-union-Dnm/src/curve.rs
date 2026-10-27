@@ -43,7 +43,10 @@ impl Curve {
         if p.is_inf() {
             p
         } else {
-            P { x: p.x, y: p.y ^ p.x }
+            P {
+                x: p.x,
+                y: p.y ^ p.x,
+            }
         }
     }
     pub fn add(&self, f: &Fq, p: P, q: P) -> P {
@@ -72,7 +75,10 @@ impl Curve {
         if p.is_inf() {
             p
         } else {
-            P { x: f.sq(p.x), y: f.sq(p.y) }
+            P {
+                x: f.sq(p.x),
+                y: f.sq(p.y),
+            }
         }
     }
     pub fn scalar(&self, f: &Fq, p: P, mut k: u64) -> P {

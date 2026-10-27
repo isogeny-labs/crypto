@@ -25,6 +25,8 @@
 //! solver: `verify_cert` re-adds the returned points in the group, and
 //! `Oracle` is a meet-in-the-middle sumset over the factor-base points.
 
+#![recursion_limit = "256"]
+
 use crypto_lib::binary_ecc::curve::point_neg;
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
 use crypto_lib::cryptanalysis::binary_semaev_chain_sat::{ChainBuildError, ChainedS3Encoding};
@@ -121,7 +123,10 @@ fn build_cell(spec: CellSpec) -> Result<CellData, String> {
         return Err("n > 62 unsupported by the u64 keys".into());
     }
     let kc = KoblitzCurve::new(spec.a, spec.n).ok_or("KoblitzCurve::new returned None")?;
-    let r = kc.subgroup_order.to_u64().ok_or("subgroup order exceeds u64")?;
+    let r = kc
+        .subgroup_order
+        .to_u64()
+        .ok_or("subgroup order exceeds u64")?;
     let mut rng = Rng(derive(&[spec.seed, spec.n as u64, spec.k as u64, 0xFB]));
     let mut reps: Vec<F2mElement> = Vec::new();
     let mut seen: HashSet<u64> = HashSet::new();
@@ -464,8 +469,7 @@ fn shadow_solve(
     let mut representatives: Vec<BigUint> = Vec::new();
     if arm.orbit {
         for orbit in &fb.signed_orbits {
-            let Some(BinaryPoint::Affine { x, .. }) =
-                orbit.first().and_then(|&i| fb.points.get(i))
+            let Some(BinaryPoint::Affine { x, .. }) = orbit.first().and_then(|&i| fb.points.get(i))
             else {
                 return done(Verdict::Censored, "orbit_representative", None, c, build_s);
             };
@@ -559,16 +563,22 @@ fn shadow_solve(
                 SolveResult::Sat => {
                     let xs = enc.decode_summands();
                     c.models += 1;
-                    if !enc.verify_model()
-                        || xs.iter().any(|x| !cd.xcodes.contains(&code(x)))
-                    {
+                    if !enc.verify_model() || xs.iter().any(|x| !cd.xcodes.contains(&code(x))) {
                         c.invalid += 1;
                         absorb(&mut c, &enc);
                         return done(Verdict::Censored, "invalid_model", None, c, build_s);
                     }
                     let mut chosen = Vec::new();
                     let mut adds = 0u64;
-                    let ok = lift(kc, &xs, 0, &BinaryPoint::Infinity, &mut chosen, target, &mut adds);
+                    let ok = lift(
+                        kc,
+                        &xs,
+                        0,
+                        &BinaryPoint::Infinity,
+                        &mut chosen,
+                        target,
+                        &mut adds,
+                    );
                     c.lift_adds += adds;
                     if ok {
                         absorb(&mut c, &enc);
@@ -620,7 +630,12 @@ fn public_solve(
 }
 
 /// True iff the shadow loop and the production entry point agree exactly.
-fn tie_out(cd: &CellData, target: &BinaryPoint, limits: ChainS3Limits, arm: ArmSpec) -> Option<bool> {
+fn tie_out(
+    cd: &CellData,
+    target: &BinaryPoint,
+    limits: ChainS3Limits,
+    arm: ArmSpec,
+) -> Option<bool> {
     let (found, stats) = public_solve(cd, target, limits, arm)?;
     let shadow = shadow_solve(cd, target, limits, arm);
     let class = if found.is_some() {
@@ -655,6 +670,83 @@ fn verify_cert(cd: &CellData, target: &BinaryPoint, pts: &[BinaryPoint]) -> bool
         acc = cd.kc.add(&acc, p);
     }
     &acc == target
+}
+
+// ------------------------------------------------------- certificates on disk
+
+fn pt_json(p: &BinaryPoint) -> Value {
+    match p {
+        BinaryPoint::Affine { x, y } => json!([code(x), code(y)]),
+        BinaryPoint::Infinity => Value::Null,
+    }
+}
+
+struct RowCtx<'a> {
+    run_id: &'a str,
+    cd: &'a CellData,
+    id: &'a str,
+    class: &'a str,
+    arm: &'a str,
+    conj: u32,
+    cap: u64,
+    point: &'a BinaryPoint,
+    o: &'a Outcome,
+    want: bool,
+    agree: bool,
+    cert_ok: bool,
+    tie: Option<bool>,
+}
+
+/// One JSONL row. A `found` row carries the m certificate points (x, y) and
+/// the solved target point, so that the native verifier crate `verify_certs/` can re-add them with the
+/// curve in the cell manifest, without the solver and without rerunning.
+fn row_json(c: &RowCtx) -> Value {
+    let (cd, o, spec) = (c.cd, c.o, c.cd.spec);
+    let cert = match (&o.verdict, &o.points) {
+        (Verdict::Found, Some(p)) => Value::Array(p.iter().map(pt_json).collect()),
+        _ => Value::Null,
+    };
+    json!({
+        "schema": "g1-chain-sat-orbit/row/v1", "run_id": c.run_id, "host": host(),
+        "cell": spec.id(), "a": spec.a, "n": spec.n, "m": spec.m, "k": spec.k,
+        "seed": spec.seed, "r": cd.r as f64, "fb_x": cd.xcodes.len(), "fb_points": cd.fb.points.len(),
+        "target_id": c.id, "class": c.class, "arm": c.arm, "conj": c.conj,
+        "target_xy": pt_json(c.point), "cert_points": cert,
+        "verdict": o.verdict.name(), "censor_reason": o.reason, "oracle": c.want,
+        "agree": c.agree, "cert_ok": c.cert_ok, "tieout": c.tie,
+        "conflict_cap": c.cap,
+        "conflicts": o.c.conflicts, "decisions": o.c.decisions,
+        "propagations": o.c.propagations, "word_ops": o.c.word_ops,
+        "patterns_attempted": o.c.patterns_attempted, "patterns_refuted": o.c.patterns_refuted,
+        "solver_calls": o.c.solver_calls, "models": o.c.models,
+        "group_rejected": o.c.group_rejected, "invalid_models": o.c.invalid,
+        "peak_vars": o.c.peak_vars, "peak_clauses": o.c.peak_clauses,
+        "peak_xors": o.c.peak_xors, "domain_clauses": o.c.domain_clauses,
+        "lift_adds": o.c.lift_adds, "wall_s": o.wall_s, "build_s": o.build_s,
+    })
+}
+
+/// Per-cell manifest: everything an independent verifier needs to re-add a
+/// certificate (field polynomial, curve, generator, order, the factor-base
+/// points and their orbits). Written by `oracle` next to the oracle file.
+fn manifest_json(cd: &CellData) -> Value {
+    let kc = &cd.kc;
+    let mut xs: Vec<u64> = cd.xcodes.iter().copied().collect();
+    xs.sort_unstable();
+    json!({
+        "schema": "g1-chain-sat-orbit/manifest/v1", "cell": cd.spec.id(),
+        "n": cd.spec.n, "m": cd.spec.m, "k": cd.spec.k, "a": cd.spec.a, "seed": cd.spec.seed,
+        "poly_degree": kc.curve.irreducible.degree, "poly_low_terms": kc.curve.irreducible.low_terms,
+        "curve_a": code(&kc.curve.a), "curve_b": code(&kc.curve.b),
+        "generator": pt_json(&kc.curve.generator), "subgroup_order_r": cd.r,
+        "factor_base_points": cd.fb.points.iter().map(pt_json).collect::<Vec<_>>(),
+        "factor_base_x_codes": xs,
+        "signed_orbits": cd.fb.signed_orbits.iter().map(|o| o.iter().map(|&i| i as u64).collect::<Vec<_>>()).collect::<Vec<_>>(),
+        "orbit_representative_x": cd.fb.signed_orbits.iter()
+            .filter_map(|o| o.first().and_then(|&i| cd.fb.points.get(i)))
+            .filter_map(|p| match p { BinaryPoint::Affine { x, .. } => Some(code(x)), _ => None })
+            .collect::<Vec<_>>(),
+    })
 }
 
 fn limits_for(cap: u64) -> ChainS3Limits {
@@ -699,7 +791,9 @@ fn expected_yield(r: u64, n: u32, m: usize, k: usize) -> f64 {
 
 // ------------------------------------------------------------------ cap rule
 
-const CAP_GRID: [u64; 7] = [20_000, 50_000, 100_000, 200_000, 500_000, 1_000_000, 2_000_000];
+const CAP_GRID: [u64; 7] = [
+    20_000, 50_000, 100_000, 200_000, 500_000, 1_000_000, 2_000_000,
+];
 
 /// Frozen cap rule (PROTOCOL amendment 1). From the pilot rows of each cell
 /// (every pilot row of arms P and O: n, m and k come from the cell id), per
@@ -712,7 +806,8 @@ const CAP_GRID: [u64; 7] = [20_000, 50_000, 100_000, 200_000, 500_000, 1_000_000
 ///   CAP    = the largest grid value with b + CAP * t_conf <= budget seconds.
 /// If even the smallest grid value exceeds the budget, the cell is an
 /// O-IMPEDIMENT(budget) and is not run. Output: one `n:m:k:CAP` line per cell
-/// (or `n:m:k:IMPEDIMENT`), the exact cell tokens `run_stage.sh` takes.
+/// (or `n:m:k:IMPEDIMENT`, or `n:m:k:NODATA` for a cell whose pilot rows have
+/// no solve with conflicts > 0), the exact cell tokens `run_stage.sh` takes.
 fn cap_lines(dir: &str, budget: f64) -> Result<Vec<String>, String> {
     // cell id -> arm -> (sum solver seconds, sum conflicts), and max build_s
     let mut acc: HashMap<String, HashMap<String, (f64, f64)>> = HashMap::new();
@@ -720,14 +815,22 @@ fn cap_lines(dir: &str, budget: f64) -> Result<Vec<String>, String> {
     for e in std::fs::read_dir(dir).map_err(|e| e.to_string())? {
         let path = e.map_err(|e| e.to_string())?.path();
         if path.extension().and_then(|s| s.to_str()) != Some("jsonl")
-            || !path.file_name().unwrap().to_string_lossy().starts_with("rows-")
+            || !path
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .starts_with("rows-")
         {
             continue;
         }
         let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
         for line in text.lines().filter(|l| !l.trim().is_empty()) {
             let v: Value = serde_json::from_str(line).map_err(|e| e.to_string())?;
-            let f = |k: &str| v.get(k).and_then(Value::as_f64).ok_or(format!("row lacks {k}"));
+            let f = |k: &str| {
+                v.get(k)
+                    .and_then(Value::as_f64)
+                    .ok_or(format!("row lacks {k}"))
+            };
             let cell = v["cell"].as_str().ok_or("row lacks cell")?.to_string();
             let arm = v["arm"].as_str().ok_or("row lacks arm")?.to_string();
             if v["conj"].as_u64() != Some(0) || !(arm == "P" || arm == "O") {
@@ -737,20 +840,37 @@ fn cap_lines(dir: &str, budget: f64) -> Result<Vec<String>, String> {
             let b = maxb.entry(cell.clone()).or_insert(0.0);
             *b = b.max(build);
             if conf > 0.0 {
-                let a = acc.entry(cell).or_default().entry(arm).or_insert((0.0, 0.0));
+                let a = acc
+                    .entry(cell)
+                    .or_default()
+                    .entry(arm)
+                    .or_insert((0.0, 0.0));
                 a.0 += (wall - build).max(0.0);
                 a.1 += conf;
             }
         }
     }
-    let mut cells: Vec<&String> = acc.keys().collect();
+    // Every cell with any pilot row is listed: one with no row of conflicts > 0
+    // (a systematic precondition censor, say) gets an explicit NODATA token
+    // instead of silently vanishing.
+    let mut cells: Vec<&String> = maxb.keys().collect();
     cells.sort();
     let mut out = Vec::new();
     for cell in cells {
         let (n, m, k) = parse_cell(cell).ok_or("bad cell id")?;
-        let t_conf = acc[cell].values().map(|(t, c)| t / c).fold(0.0f64, f64::max);
+        if !acc.contains_key(cell) {
+            out.push(format!("{n}:{m}:{k}:NODATA"));
+            continue;
+        }
+        let t_conf = acc[cell]
+            .values()
+            .map(|(t, c)| t / c)
+            .fold(0.0f64, f64::max);
         let b = maxb[cell];
-        let cap = CAP_GRID.iter().rev().find(|&&c| b + c as f64 * t_conf <= budget);
+        let cap = CAP_GRID
+            .iter()
+            .rev()
+            .find(|&&c| b + c as f64 * t_conf <= budget);
         out.push(match cap {
             Some(c) => format!("{n}:{m}:{k}:{c}"),
             None => format!("{n}:{m}:{k}:IMPEDIMENT"),
@@ -833,7 +953,11 @@ fn boot_mean(v: &[f64], seed: u64) -> (f64, f64, f64) {
         })
         .collect();
     means.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    (mean(v), means[(0.025 * b as f64) as usize], means[(0.975 * b as f64) as usize])
+    (
+        mean(v),
+        means[(0.025 * b as f64) as usize],
+        means[(0.975 * b as f64) as usize],
+    )
 }
 
 fn metric(r: &Row, name: &str, price: f64) -> f64 {
@@ -857,7 +981,8 @@ fn paired(x: &[&Row], y: &[&Row], name: &str, price: f64, seed: u64) -> Value {
     let ymap: HashMap<&str, &Row> = y.iter().map(|r| (r.target_id.as_str(), *r)).collect();
     let mut logs = Vec::new();
     let (mut sx, mut sy) = (0.0, 0.0);
-    let (mut d_x_only, mut d_y_only, mut d_both, mut d_other, mut absent) = (0usize, 0usize, 0usize, 0usize, 0usize);
+    let (mut d_x_only, mut d_y_only, mut d_both, mut d_other, mut absent) =
+        (0usize, 0usize, 0usize, 0usize, 0usize);
     for r in x {
         let Some(q) = ymap.get(r.target_id.as_str()) else {
             absent += 1;
@@ -906,7 +1031,13 @@ fn per_relation(x: &[&Row], y: &[&Row], name: &str, price: f64, unsat: bool, see
         .iter()
         .filter_map(|r| ymap.get(r.target_id.as_str()).map(|q| (*r, *q)))
         .collect();
-    let unit = |r: &Row| if unsat { r.verdict == "refuted" } else { r.verdict == "found" };
+    let unit = |r: &Row| {
+        if unsat {
+            r.verdict == "refuted"
+        } else {
+            r.verdict == "found"
+        }
+    };
     let ratio = |idx: &[usize]| -> (f64, f64, f64, f64, f64) {
         let (mut cx, mut cy, mut ux, mut uy) = (0.0, 0.0, 0.0, 0.0);
         for &i in idx {
@@ -917,7 +1048,13 @@ fn per_relation(x: &[&Row], y: &[&Row], name: &str, price: f64, unsat: bool, see
             uy += unit(b) as u8 as f64;
         }
         let ok = ux > 0.0 && uy > 0.0 && cy > 0.0;
-        (if ok { (cx / ux) / (cy / uy) } else { f64::NAN }, cx, cy, ux, uy)
+        (
+            if ok { (cx / ux) / (cy / uy) } else { f64::NAN },
+            cx,
+            cy,
+            ux,
+            uy,
+        )
     };
     let all: Vec<usize> = (0..pairs.len()).collect();
     let (point, cx, cy, ux, uy) = ratio(&all);
@@ -928,7 +1065,9 @@ fn per_relation(x: &[&Row], y: &[&Row], name: &str, price: f64, unsat: bool, see
         if pairs.is_empty() {
             break;
         }
-        let idx: Vec<usize> = (0..pairs.len()).map(|_| rng.below(pairs.len() as u64) as usize).collect();
+        let idx: Vec<usize> = (0..pairs.len())
+            .map(|_| rng.below(pairs.len() as u64) as usize)
+            .collect();
         let v = ratio(&idx).0;
         if v.is_finite() && v > 0.0 {
             boots.push(v);
@@ -939,7 +1078,11 @@ fn per_relation(x: &[&Row], y: &[&Row], name: &str, price: f64, unsat: bool, see
     let (lo, hi, sdl) = if point.is_finite() && boots.len() as f64 >= 0.95 * b as f64 {
         boots.sort_by(|a, b| a.partial_cmp(b).unwrap());
         let l: Vec<f64> = boots.iter().map(|v| v.ln()).collect();
-        (boots[(0.025 * boots.len() as f64) as usize], boots[(0.975 * boots.len() as f64) as usize], sd(&l))
+        (
+            boots[(0.025 * boots.len() as f64) as usize],
+            boots[(0.975 * boots.len() as f64) as usize],
+            sd(&l),
+        )
     } else {
         (f64::NAN, f64::NAN, f64::NAN)
     };
@@ -986,7 +1129,11 @@ struct Gate {
 
 impl Gate {
     fn frac(&self, c: usize) -> f64 {
-        if self.targets == 0 { 1.0 } else { c as f64 / self.targets as f64 }
+        if self.targets == 0 {
+            1.0
+        } else {
+            c as f64 / self.targets as f64
+        }
     }
 }
 
@@ -1013,9 +1160,17 @@ fn decide(ci_lo: f64, ci_hi: f64, aa_ci_lo: f64, aa_ci_hi: f64, g: &Gate) -> &'s
         return "invalid_aa_excludes_one";
     }
     if ci_hi < 1.0 {
-        if g.cens_x <= g.cens_p { "improvement" } else { "unresolved_asymmetric_censoring" }
+        if g.cens_x <= g.cens_p {
+            "improvement"
+        } else {
+            "unresolved_asymmetric_censoring"
+        }
     } else if ci_lo > 1.0 {
-        if g.cens_p <= g.cens_x { "regression" } else { "unresolved_asymmetric_censoring" }
+        if g.cens_p <= g.cens_x {
+            "regression"
+        } else {
+            "unresolved_asymmetric_censoring"
+        }
     } else {
         "unresolved_no_difference"
     }
@@ -1029,8 +1184,54 @@ const C3_COST_MARGIN: f64 = 1.0 / 0.95;
 
 fn c3_noninferior(ci_hi: f64, decision: &str, g: &Gate) -> bool {
     let usable = !(decision.starts_with("invalid")
-        || matches!(decision, "unresolved_censored" | "unresolved_too_few_targets" | "unresolved_no_relations"));
+        || matches!(
+            decision,
+            "unresolved_censored" | "unresolved_too_few_targets" | "unresolved_no_relations"
+        ));
     usable && g.cens_x <= g.cens_p && ci_hi <= C3_COST_MARGIN
+}
+
+/// One stratum's word_ops result for arm O, as the C3 grade consumes it.
+#[derive(Clone, Debug)]
+struct C3Entry {
+    stratum: String,
+    decision: String,
+    ci_lo: f64,
+    ci_hi: f64,
+    /// `c3_noninferior` on the word_ops interval
+    flag: bool,
+    /// priced legs (see `c3_priced_ok`) all within the margin
+    priced_ok: bool,
+}
+
+/// Priced-GAE legs that decide C3: only prices above 0. At price 0 the cost is
+/// `lift_adds` alone, whose per-target noise (a depth-first search over 2^m sign
+/// patterns, CV about 0.5, independent between arms) makes a 5 percent
+/// non-inferiority bound unreachable even for identical encodings (PROTOCOL
+/// section 11, Amendment 2). Price 0 stays in the 5a band for rankings.
+/// `legs` is (price, ci_hi); both positive prices must be present.
+fn c3_priced_ok(legs: &[(f64, f64)]) -> bool {
+    let pos: Vec<&(f64, f64)> = legs.iter().filter(|l| l.0 > 0.0).collect();
+    pos.len() >= 2 && pos.iter().all(|l| l.1 <= C3_COST_MARGIN)
+}
+
+/// Per-cell C3 grade for arm O. `supported`: natural_all and natural_sat both
+/// non-inferior (upper bound <= 1/0.95, usable stratum, cens_O <= cens_P) and
+/// the positive-price legs within the margin. `contradicted`: some stratum is a
+/// `regression` (ci_lo > 1, which `decide` returns only for a valid, gated
+/// stratum with cens_P <= cens_O) whose LOWER bound exceeds the margin, i.e.
+/// O is dearer than 1/0.95 with 95 percent confidence. Otherwise `unresolved`.
+fn c3_grade(entries: &[C3Entry]) -> &'static str {
+    if entries.len() == 2 && entries.iter().all(|t| t.flag && t.priced_ok) {
+        "supported"
+    } else if entries
+        .iter()
+        .any(|t| t.decision == "regression" && t.ci_lo > C3_COST_MARGIN)
+    {
+        "contradicted"
+    } else {
+        "unresolved"
+    }
 }
 
 /// Anytime view in one currency (solver word_ops). A row's finish is the
@@ -1039,7 +1240,10 @@ fn c3_noninferior(ci_hi: f64, decision: &str, g: &Gate) -> bool {
 /// largest cap is exactly the outcome of a run capped at B (the solver is
 /// deterministic and the cap only truncates; see `budget_only_truncates_the_search`).
 fn anytime(rows: &[&Row], budget: f64) -> (usize, f64) {
-    let found = rows.iter().filter(|r| r.verdict == "found" && r.word_ops <= budget).count();
+    let found = rows
+        .iter()
+        .filter(|r| r.verdict == "found" && r.word_ops <= budget)
+        .count();
     let cost = rows.iter().map(|r| r.word_ops.min(budget)).sum();
     (found, cost)
 }
@@ -1054,7 +1258,10 @@ fn censor_horizon(rows: &[&Row]) -> f64 {
 /// Yield and cost per relation on a geometric budget grid up to the common
 /// horizon. `arms` are (name, rows) over the same targets.
 fn anytime_table(arms: &[(&str, Vec<&Row>)]) -> Value {
-    let horizon = arms.iter().map(|(_, r)| censor_horizon(r)).fold(f64::INFINITY, f64::min);
+    let horizon = arms
+        .iter()
+        .map(|(_, r)| censor_horizon(r))
+        .fold(f64::INFINITY, f64::min);
     let top = arms
         .iter()
         .flat_map(|(_, r)| r.iter().map(|x| x.word_ops))
@@ -1092,7 +1299,10 @@ fn hash_str(s: &str) -> u64 {
 
 /// (n, m, k) parsed from a cell id `a0-n17-m4-k2-s1027`.
 fn parse_cell(id: &str) -> Option<(u64, u64, u64)> {
-    let get = |p: char| id.split('-').find_map(|t| t.strip_prefix(p)?.parse::<u64>().ok());
+    let get = |p: char| {
+        id.split('-')
+            .find_map(|t| t.strip_prefix(p)?.parse::<u64>().ok())
+    };
     Some((get('n')?, get('m')?, get('k')?))
 }
 
@@ -1109,7 +1319,11 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
     for e in std::fs::read_dir(dir).map_err(|e| e.to_string())? {
         let path = e.map_err(|e| e.to_string())?.path();
         if path.extension().and_then(|s| s.to_str()) != Some("jsonl")
-            || !path.file_name().unwrap().to_string_lossy().starts_with("rows-")
+            || !path
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .starts_with("rows-")
         {
             continue;
         }
@@ -1132,13 +1346,20 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
         // or any certificate that failed invalidates every stratum of the cell,
         // and every (arm, conj) job must cover the same target set.
         let crow: Vec<&Row> = rows.iter().filter(|r| &r.cell == cell).collect();
-        let agree_cell = crow.iter().all(|r| r.agree && (r.verdict != "found" || r.cert_ok));
+        let agree_cell = crow
+            .iter()
+            .all(|r| r.agree && (r.verdict != "found" || r.cert_ok));
         let mut groups: HashMap<(String, u32), HashSet<&str>> = HashMap::new();
         for r in &crow {
-            groups.entry((r.arm.clone(), r.conj)).or_default().insert(r.target_id.as_str());
+            groups
+                .entry((r.arm.clone(), r.conj))
+                .or_default()
+                .insert(r.target_id.as_str());
         }
         let union: HashSet<&str> = groups.values().flatten().copied().collect();
-        let complete_cell = ["O", "R", "Q"].iter().all(|a| groups.contains_key(&(a.to_string(), 0)))
+        let complete_cell = ["O", "R", "Q"]
+            .iter()
+            .all(|a| groups.contains_key(&(a.to_string(), 0)))
             && groups.contains_key(&("P".to_string(), 0))
             && groups.contains_key(&("P".to_string(), 1))
             && groups.values().all(|g| g.len() == union.len());
@@ -1149,13 +1370,19 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
         };
         let strata: [(&str, Box<dyn Fn(&Row) -> bool>); 4] = [
             ("planted", Box::new(|r: &Row| r.class == "planted")),
-            ("natural_sat", Box::new(|r: &Row| r.class == "natural" && r.oracle)),
-            ("unsat", Box::new(|r: &Row| r.class != "planted" && !r.oracle)),
+            (
+                "natural_sat",
+                Box::new(|r: &Row| r.class == "natural" && r.oracle),
+            ),
+            (
+                "unsat",
+                Box::new(|r: &Row| r.class != "planted" && !r.oracle),
+            ),
             ("natural_all", Box::new(|r: &Row| r.class == "natural")),
         ];
         let mut cell_out = Vec::new();
-        // (stratum, decision, ci_hi, flag, stable across the 5a band) for arm O, word_ops
-        let mut o_c3: Vec<(String, String, f64, bool, bool)> = Vec::new();
+        // C3Entry per natural stratum for arm O, word_ops
+        let mut o_c3: Vec<C3Entry> = Vec::new();
         for (sname, pred) in &strata {
             let unsat = *sname == "unsat";
             let seed = derive(&[hash_str(cell), hash_str(sname), 0xA11A]);
@@ -1191,10 +1418,16 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
                     let p = per_relation(&x, &base, m, 0.0, unsat, seed);
                     let aa = per_relation(&aa_refs, &base, m, 0.0, unsat, seed ^ 7);
                     let f = |v: &Value, k: &str| v[k].as_f64().unwrap_or(f64::NAN);
-                    let verdict = decide(f(&p, "ci_lo"), f(&p, "ci_hi"), f(&aa, "ci_lo"), f(&aa, "ci_hi"), &gate);
+                    let verdict = decide(
+                        f(&p, "ci_lo"),
+                        f(&p, "ci_hi"),
+                        f(&aa, "ci_lo"),
+                        f(&aa, "ci_hi"),
+                        &gate,
+                    );
                     let c3 = c3_noninferior(f(&p, "ci_hi"), verdict, &gate);
                     if m == "word_ops" {
-                        word_ops_entry = Some((verdict, f(&p, "ci_hi"), c3));
+                        word_ops_entry = Some((verdict, f(&p, "ci_lo"), f(&p, "ci_hi"), c3));
                     }
                     metrics.push(json!({"vs_P": p, "aa_conj_vs_P": aa, "decision": verdict,
                         "c3_noninferior_at_0.95": c3,
@@ -1216,9 +1449,20 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
                 } else {
                     "order_not_stable_across_band"
                 };
-                let c3_band = priced.iter().all(|v| hi(v) <= C3_COST_MARGIN);
+                let c3_band = c3_priced_ok(
+                    &[0.0f64, 0.1, 1.0]
+                        .iter()
+                        .zip(&priced)
+                        .map(|(&p, v)| (p, hi(v)))
+                        .collect::<Vec<_>>(),
+                );
+                // A/A resolution of each priced leg (plain on sigma(T) against plain on T).
+                let aa_priced: Vec<Value> = [0.0, 0.1, 1.0]
+                    .iter()
+                    .map(|&price| per_relation(&aa_refs, &base, "gae", price, unsat, seed ^ 17))
+                    .collect();
                 // Final graded outcome: decision (word_ops) merged with the band.
-                let (wd, whi, wc3) = word_ops_entry.unwrap();
+                let (wd, wlo, whi, wc3) = word_ops_entry.unwrap();
                 let final_grade = match (wd, band) {
                     ("improvement", "arm_cheaper_across_band") => "improvement_ranked",
                     ("regression", "arm_dearer_across_band") => "regression_ranked",
@@ -1226,12 +1470,19 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
                     (d, _) => d,
                 };
                 if arm == "O" && (*sname == "natural_all" || *sname == "natural_sat") {
-                    o_c3.push((sname.to_string(), wd.to_string(), whi, wc3, c3_band));
+                    o_c3.push(C3Entry {
+                        stratum: sname.to_string(),
+                        decision: wd.to_string(),
+                        ci_lo: wlo,
+                        ci_hi: whi,
+                        flag: wc3,
+                        priced_ok: c3_band,
+                    });
                 }
                 arms.push(json!({"arm": arm, "gate": {"agree_all_cell": gate.agree_all, "complete": gate.complete,
                     "targets": gate.targets, "censored_x": gate.cens_x, "censored_P": gate.cens_p},
-                    "metrics": metrics, "priced_gae": priced, "section_5a_band": band,
-                    "c3_noninferior_across_5a_band": c3_band, "final_grade_word_ops": final_grade}));
+                    "metrics": metrics, "priced_gae": priced, "aa_priced_gae": aa_priced, "section_5a_band": band,
+                    "c3_noninferior_at_positive_prices": c3_band, "final_grade_word_ops": final_grade}));
             }
             // Detector self-check: scale the A/A word_ops by a known ratio and
             // see whether the same cost-per-relation statistic detects it.
@@ -1248,12 +1499,18 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
                     .collect();
                 let sr: Vec<&Row> = scaled.iter().collect();
                 let v = per_relation(&sr, &base, "word_ops", 0.0, unsat, seed ^ delta.to_bits());
-                let (lo, hi) = (v["ci_lo"].as_f64().unwrap_or(f64::NAN), v["ci_hi"].as_f64().unwrap_or(f64::NAN));
+                let (lo, hi) = (
+                    v["ci_lo"].as_f64().unwrap_or(f64::NAN),
+                    v["ci_hi"].as_f64().unwrap_or(f64::NAN),
+                );
                 inject.push(json!({"injected": delta, "detected": lo > 1.0 || hi < 1.0}));
             }
             // Absolute cost per relation per arm and price, and the distance to
             // the matched rho (analytic placeholder, arm P).
-            let (r0, k0) = base.first().map(|r| (r.r, r.k)).unwrap_or((f64::NAN, f64::NAN));
+            let (r0, k0) = base
+                .first()
+                .map(|r| (r.r, r.k))
+                .unwrap_or((f64::NAN, f64::NAN));
             let rho = (std::f64::consts::PI * r0 / 2.0).sqrt();
             let mut per_rel = Vec::new();
             for arm in ["P", "O", "R", "Q"] {
@@ -1261,10 +1518,23 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
                 if ar.is_empty() {
                     continue;
                 }
-                let found = ar.iter().filter(|r| if unsat { r.verdict == "refuted" } else { r.verdict == "found" }).count();
+                let found = ar
+                    .iter()
+                    .filter(|r| {
+                        if unsat {
+                            r.verdict == "refuted"
+                        } else {
+                            r.verdict == "found"
+                        }
+                    })
+                    .count();
                 for price in [0.0f64, 0.1, 1.0] {
                     let total: f64 = ar.iter().map(|r| metric(r, "gae", price)).sum();
-                    let cpr = if found > 0 { total / found as f64 } else { f64::INFINITY };
+                    let cpr = if found > 0 {
+                        total / found as f64
+                    } else {
+                        f64::INFINITY
+                    };
                     per_rel.push(json!({
                         "arm": arm, "price": price, "relations": found, "targets": ar.len(),
                         "gae_per_relation": cpr,
@@ -1287,20 +1557,12 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
                 "detector_injection": inject, "arms": arms, "cost_per_relation": per_rel,
             }));
         }
-        // Per-cell C3 grade for arm O: supported only if natural_all and
-        // natural_sat both have word_ops upper bound <= 1/0.95, a usable
-        // stratum, O not censored more than P, and the same at all three prices.
-        let grade = if o_c3.len() == 2 && o_c3.iter().all(|t| t.3 && t.4) {
-            "supported"
-        } else if o_c3.iter().any(|t| t.1 == "regression" && t.2 > C3_COST_MARGIN) {
-            "contradicted"
-        } else {
-            "unresolved"
-        };
+        // Per-cell C3 grade for arm O (see `c3_grade`).
+        let grade = c3_grade(&o_c3);
         c3_cells.push(grade);
         let cc = parse_cell(cell).map(|(n, m, k)| class_count(n, m, k));
         report.push(json!({"cell": cell, "class_count_info_only": cc, "c3_grade_O": grade,
-            "c3_detail": o_c3.iter().map(|t| json!({"stratum": t.0, "decision": t.1, "ci_hi": t.2, "flag": t.3, "stable_5a": t.4})).collect::<Vec<_>>(),
+            "c3_detail": o_c3.iter().map(|t| json!({"stratum": t.stratum, "decision": t.decision, "ci_lo": t.ci_lo, "ci_hi": t.ci_hi, "flag": t.flag, "positive_price_legs_ok": t.priced_ok})).collect::<Vec<_>>(),
             "strata": cell_out}));
     }
     std::fs::create_dir_all(out).map_err(|e| e.to_string())?;
@@ -1377,8 +1639,14 @@ fn main() {
                 num(&args, "--coset", Some(20)),
             );
             let t0 = Instant::now();
-            let oracle = Oracle::new(&cd, num(&args, "--cap", Some(6_000_000))).unwrap_or_else(|e| panic!("{e}"));
+            let oracle = Oracle::new(&cd, num(&args, "--cap", Some(6_000_000)))
+                .unwrap_or_else(|e| panic!("{e}"));
             std::fs::create_dir_all(&out).unwrap();
+            std::fs::write(
+                format!("{out}/manifest-{}.json", spec.id()),
+                serde_json::to_string_pretty(&manifest_json(&cd)).unwrap(),
+            )
+            .unwrap();
             let mut f = std::fs::File::create(format!("{out}/oracle-{}.jsonl", spec.id())).unwrap();
             for t in &targets {
                 let verdict = oracle.decide(&cd.kc, &t.point);
@@ -1412,7 +1680,9 @@ fn main() {
                 .unwrap_or_else(|e| panic!("oracle file: {e}"))
                 .lines()
                 .filter_map(|l| serde_json::from_str::<Value>(l).ok())
-                .filter_map(|v| Some((v["target_id"].as_str()?.to_string(), v["oracle"].as_bool()?)))
+                .filter_map(|v| {
+                    Some((v["target_id"].as_str()?.to_string(), v["oracle"].as_bool()?))
+                })
                 .collect();
             let limits = limits_for(cap);
             std::fs::create_dir_all(&out).unwrap();
@@ -1432,29 +1702,35 @@ fn main() {
                 let want = *oracle
                     .get(&t.id)
                     .unwrap_or_else(|| panic!("target {} missing from the oracle file", t.id));
-                let cert_ok = o.points.as_ref().is_some_and(|p| verify_cert(&cd, &point, p));
+                let cert_ok = o
+                    .points
+                    .as_ref()
+                    .is_some_and(|p| verify_cert(&cd, &point, p));
                 let agree = match o.verdict {
                     Verdict::Found => want && cert_ok,
                     Verdict::Refuted => !want,
                     Verdict::Censored => true,
                 };
-                writeln!(f, "{}", json!({
-                    "schema": "g1-chain-sat-orbit/row/v1", "run_id": run_id, "host": host(),
-                    "cell": spec.id(), "a": spec.a, "n": spec.n, "m": spec.m, "k": spec.k,
-                    "seed": spec.seed, "r": cd.r as f64, "fb_x": cd.xcodes.len(), "fb_points": cd.fb.points.len(),
-                    "target_id": t.id, "class": t.class.name(), "arm": arm_name, "conj": conj,
-                    "verdict": o.verdict.name(), "censor_reason": o.reason, "oracle": want,
-                    "agree": agree, "cert_ok": cert_ok, "tieout": tie,
-                    "conflict_cap": cap,
-                    "conflicts": o.c.conflicts, "decisions": o.c.decisions,
-                    "propagations": o.c.propagations, "word_ops": o.c.word_ops,
-                    "patterns_attempted": o.c.patterns_attempted, "patterns_refuted": o.c.patterns_refuted,
-                    "solver_calls": o.c.solver_calls, "models": o.c.models,
-                    "group_rejected": o.c.group_rejected, "invalid_models": o.c.invalid,
-                    "peak_vars": o.c.peak_vars, "peak_clauses": o.c.peak_clauses,
-                    "peak_xors": o.c.peak_xors, "domain_clauses": o.c.domain_clauses,
-                    "lift_adds": o.c.lift_adds, "wall_s": o.wall_s, "build_s": o.build_s,
-                })).unwrap();
+                writeln!(
+                    f,
+                    "{}",
+                    row_json(&RowCtx {
+                        run_id: &run_id,
+                        cd: &cd,
+                        id: &t.id,
+                        class: t.class.name(),
+                        arm: &arm_name,
+                        conj,
+                        cap,
+                        point: &point,
+                        o: &o,
+                        want,
+                        agree,
+                        cert_ok,
+                        tie
+                    })
+                )
+                .unwrap();
                 f.flush().unwrap();
             }
         }
@@ -1567,7 +1843,11 @@ mod tests {
                 let t = cd.kc.mul(cd.kc.generator(), &BigUint::from(s));
                 let want = all.contains(&pkey(&t));
                 assert_eq!(oracle.decide(&cd.kc, &t), want, "m={m} s={s}");
-                if want { seen_true += 1 } else { seen_false += 1 }
+                if want {
+                    seen_true += 1
+                } else {
+                    seen_false += 1
+                }
             }
             for t in make_targets(&cd, 0, 0, 6) {
                 let want = all.contains(&pkey(&t.point));
@@ -1584,7 +1864,9 @@ mod tests {
         let s42: HashSet<(u64, u64)> = lv[1].iter().map(pkey).collect();
         for s in 1..cd.r {
             let t = cd.kc.mul(cd.kc.generator(), &BigUint::from(s));
-            let by42 = lv[3].iter().any(|p| s42.contains(&pkey(&cd.kc.add(&t, &point_neg(p)))));
+            let by42 = lv[3]
+                .iter()
+                .any(|p| s42.contains(&pkey(&cd.kc.add(&t, &point_neg(p)))));
             assert_eq!(o33.decide(&cd.kc, &t), by42, "s={s}");
         }
     }
@@ -1621,12 +1903,20 @@ mod tests {
                     let o = shadow_solve(&cd, &t.point, tiny_limits(), arm_spec(arm).unwrap());
                     match o.verdict {
                         Verdict::Found => {
-                            assert!(want, "m={m} arm={arm} {}: solver found, oracle says none", t.id);
+                            assert!(
+                                want,
+                                "m={m} arm={arm} {}: solver found, oracle says none",
+                                t.id
+                            );
                             assert!(verify_cert(&cd, &t.point, o.points.as_ref().unwrap()));
                             sat += 1;
                         }
                         Verdict::Refuted => {
-                            assert!(!want, "m={m} arm={arm} {}: solver refuted a reachable target", t.id);
+                            assert!(
+                                !want,
+                                "m={m} arm={arm} {}: solver refuted a reachable target",
+                                t.id
+                            );
                             unsat += 1;
                         }
                         Verdict::Censored => {
@@ -1640,7 +1930,10 @@ mod tests {
                     }
                 }
             }
-            assert!(sat > 0, "m={m}: found verdicts exercised ({censored} censored, {unsat} refuted)");
+            assert!(
+                sat > 0,
+                "m={m}: found verdicts exercised ({censored} censored, {unsat} refuted)"
+            );
         }
     }
 
@@ -1659,8 +1952,15 @@ mod tests {
         assert_eq!(o.verdict, Verdict::Refuted, "{:?}", o.reason);
         assert!(o.points.is_none());
         // A coset target has no x-level model: SAT alone refutes it, the lift never runs.
-        assert_eq!((o.c.models, o.c.lift_adds), (0, 0), "coset refutation must not reach the lift");
-        eprintln!("UNSAT_FIXTURE conflicts={} wall={:.1}s", o.c.conflicts, o.wall_s);
+        assert_eq!(
+            (o.c.models, o.c.lift_adds),
+            (0, 0),
+            "coset refutation must not reach the lift"
+        );
+        eprintln!(
+            "UNSAT_FIXTURE conflicts={} wall={:.1}s",
+            o.c.conflicts, o.wall_s
+        );
     }
 
     #[test]
@@ -1708,7 +2008,10 @@ mod tests {
         let t = &make_targets(&cd, 0, 1, 0)[0];
         let a = shadow_solve(&cd, &t.point, tiny_limits(), arm_spec("O").unwrap());
         let b = shadow_solve(&cd, &t.point, tiny_limits(), arm_spec("O").unwrap());
-        assert_eq!((a.c.conflicts, a.c.propagations, a.c.word_ops), (b.c.conflicts, b.c.propagations, b.c.word_ops));
+        assert_eq!(
+            (a.c.conflicts, a.c.propagations, a.c.word_ops),
+            (b.c.conflicts, b.c.propagations, b.c.word_ops)
+        );
     }
 
     #[test]
@@ -1740,11 +2043,17 @@ mod tests {
         assert!(verify_cert(&cd, &t.point, &pts));
         let mut neg = pts.clone();
         neg[0] = point_neg(&neg[0]);
-        let negated_sum = neg.iter().fold(BinaryPoint::Infinity, |a, p| cd.kc.add(&a, p));
+        let negated_sum = neg
+            .iter()
+            .fold(BinaryPoint::Infinity, |a, p| cd.kc.add(&a, p));
         assert_eq!(verify_cert(&cd, &t.point, &neg), negated_sum == t.point);
         assert_ne!(negated_sum, t.point, "negating one leg must move the sum");
         assert!(!verify_cert(&cd, &t.point, &pts[..3]));
-        assert!(!verify_cert(&cd, &cd.kc.add(&t.point, cd.kc.generator()), &pts));
+        assert!(!verify_cert(
+            &cd,
+            &cd.kc.add(&t.point, cd.kc.generator()),
+            &pts
+        ));
         let outside = cd.kc.generator().clone();
         let outside_in_fb = match &outside {
             BinaryPoint::Affine { x, .. } => cd.xcodes.contains(&code(x)),
@@ -1786,34 +2095,133 @@ mod tests {
             o.push(mk("O", 0, i, 0.5 * base * noise(&mut rng)));
             aa.push(mk("P", 1, i, base * noise(&mut rng)));
         }
-        let (pr, or, ar): (Vec<&Row>, Vec<&Row>, Vec<&Row>) = (p.iter().collect(), o.iter().collect(), aa.iter().collect());
+        let (pr, or, ar): (Vec<&Row>, Vec<&Row>, Vec<&Row>) =
+            (p.iter().collect(), o.iter().collect(), aa.iter().collect());
         let eff = per_relation(&or, &pr, "word_ops", 0.0, true, 1);
         let null = per_relation(&ar, &pr, "word_ops", 0.0, true, 2);
-        let (lo, hi) = (eff["ci_lo"].as_f64().unwrap(), eff["ci_hi"].as_f64().unwrap());
+        let (lo, hi) = (
+            eff["ci_lo"].as_f64().unwrap(),
+            eff["ci_hi"].as_f64().unwrap(),
+        );
         assert!(hi < 0.6 && lo > 0.4, "{eff}");
-        let (nlo, nhi) = (null["ci_lo"].as_f64().unwrap(), null["ci_hi"].as_f64().unwrap());
+        let (nlo, nhi) = (
+            null["ci_lo"].as_f64().unwrap(),
+            null["ci_hi"].as_f64().unwrap(),
+        );
         assert!(nlo <= 1.0 && 1.0 <= nhi, "{null}");
-        let g = Gate { agree_all: true, complete: true, targets: 80, cens_x: 0, cens_p: 0 };
+        let g = Gate {
+            agree_all: true,
+            complete: true,
+            targets: 80,
+            cens_x: 0,
+            cens_p: 0,
+        };
         assert_eq!(decide(lo, hi, nlo, nhi, &g), "improvement");
         assert_eq!(decide(1.2, 1.4, nlo, nhi, &g), "regression");
         assert_eq!(decide(0.9, 1.1, nlo, nhi, &g), "unresolved_no_difference");
-        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { agree_all: false, ..g }), "invalid_oracle_disagreement");
-        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { complete: false, ..g }), "invalid_incomplete_rows");
-        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { targets: 5, ..g }), "unresolved_too_few_targets");
-        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { cens_x: 17, ..g }), "unresolved_censored");
-        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { cens_p: 17, ..g }), "unresolved_censored");
-        assert_eq!(decide(f64::NAN, f64::NAN, nlo, nhi, &g), "unresolved_no_relations");
+        assert_eq!(
+            decide(
+                0.4,
+                0.5,
+                nlo,
+                nhi,
+                &Gate {
+                    agree_all: false,
+                    ..g
+                }
+            ),
+            "invalid_oracle_disagreement"
+        );
+        assert_eq!(
+            decide(
+                0.4,
+                0.5,
+                nlo,
+                nhi,
+                &Gate {
+                    complete: false,
+                    ..g
+                }
+            ),
+            "invalid_incomplete_rows"
+        );
+        assert_eq!(
+            decide(0.4, 0.5, nlo, nhi, &Gate { targets: 5, ..g }),
+            "unresolved_too_few_targets"
+        );
+        assert_eq!(
+            decide(0.4, 0.5, nlo, nhi, &Gate { cens_x: 17, ..g }),
+            "unresolved_censored"
+        );
+        assert_eq!(
+            decide(0.4, 0.5, nlo, nhi, &Gate { cens_p: 17, ..g }),
+            "unresolved_censored"
+        );
+        assert_eq!(
+            decide(f64::NAN, f64::NAN, nlo, nhi, &g),
+            "unresolved_no_relations"
+        );
         assert_eq!(decide(0.4, 0.5, 1.1, 1.3, &g), "invalid_aa_excludes_one");
         // One-sided censoring below the 20 percent gate: a claim in favour of the arm
         // censored more is never made, in either direction.
-        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { cens_x: 10, cens_p: 2, ..g }), "unresolved_asymmetric_censoring");
-        assert_eq!(decide(1.2, 1.4, nlo, nhi, &Gate { cens_x: 2, cens_p: 10, ..g }), "unresolved_asymmetric_censoring");
-        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { cens_x: 2, cens_p: 10, ..g }), "improvement");
+        assert_eq!(
+            decide(
+                0.4,
+                0.5,
+                nlo,
+                nhi,
+                &Gate {
+                    cens_x: 10,
+                    cens_p: 2,
+                    ..g
+                }
+            ),
+            "unresolved_asymmetric_censoring"
+        );
+        assert_eq!(
+            decide(
+                1.2,
+                1.4,
+                nlo,
+                nhi,
+                &Gate {
+                    cens_x: 2,
+                    cens_p: 10,
+                    ..g
+                }
+            ),
+            "unresolved_asymmetric_censoring"
+        );
+        assert_eq!(
+            decide(
+                0.4,
+                0.5,
+                nlo,
+                nhi,
+                &Gate {
+                    cens_x: 2,
+                    cens_p: 10,
+                    ..g
+                }
+            ),
+            "improvement"
+        );
         // C3 margin: a cost ratio of 1.05 is within 0.95x speed, 1.06 is not.
         assert!(c3_noninferior(1.05, "unresolved_no_difference", &g));
-        assert!(!c3_noninferior(1.06, "unresolved_no_difference", &g) && !c3_noninferior(f64::NAN, "unresolved_no_difference", &g));
+        assert!(
+            !c3_noninferior(1.06, "unresolved_no_difference", &g)
+                && !c3_noninferior(f64::NAN, "unresolved_no_difference", &g)
+        );
         assert!(!c3_noninferior(0.9, "unresolved_censored", &g));
-        assert!(!c3_noninferior(0.9, "unresolved_asymmetric_censoring", &Gate { cens_x: 10, cens_p: 2, ..g }));
+        assert!(!c3_noninferior(
+            0.9,
+            "unresolved_asymmetric_censoring",
+            &Gate {
+                cens_x: 10,
+                cens_p: 2,
+                ..g
+            }
+        ));
     }
 
     /// The failure the survivors-only statistic had: O censored on 30 percent of
@@ -1822,26 +2230,55 @@ mod tests {
     #[test]
     fn censoring_asymmetry_cannot_flatter_the_arm_censored_more() {
         let mk = |arm: &str, i: usize, verdict: &str, w: f64| Row {
-            cell: "c".into(), target_id: format!("t{i}"), class: "planted".into(), arm: arm.into(), conj: 0,
-            verdict: verdict.into(), oracle: true, agree: true, cert_ok: true,
-            conflicts: w, propagations: w, word_ops: w, wall_s: w, lift_adds: 0.0, r: 1e6, k: 2.0,
+            cell: "c".into(),
+            target_id: format!("t{i}"),
+            class: "planted".into(),
+            arm: arm.into(),
+            conj: 0,
+            verdict: verdict.into(),
+            oracle: true,
+            agree: true,
+            cert_ok: true,
+            conflicts: w,
+            propagations: w,
+            word_ops: w,
+            wall_s: w,
+            lift_adds: 0.0,
+            r: 1e6,
+            k: 2.0,
         };
         let (mut p, mut o) = (vec![], vec![]);
         for i in 0..40 {
             let hard = i < 12; // 30 percent
             p.push(mk("P", i, "found", if hard { 1000.0 } else { 100.0 }));
             // O is 1.5x dearer everywhere it finishes but is censored (at cap 1000) on the hard targets.
-            o.push(if hard { mk("O", i, "censored", 1000.0) } else { mk("O", i, "found", 150.0) });
+            o.push(if hard {
+                mk("O", i, "censored", 1000.0)
+            } else {
+                mk("O", i, "found", 150.0)
+            });
         }
         let (pr, or): (Vec<&Row>, Vec<&Row>) = (p.iter().collect(), o.iter().collect());
         let surv = paired(&or, &pr, "word_ops", 0.0, 1);
-        assert!(surv["ci_lo"].as_f64().unwrap() > 1.4, "survivors-only sees 1.5x: {surv}");
+        assert!(
+            surv["ci_lo"].as_f64().unwrap() > 1.4,
+            "survivors-only sees 1.5x: {surv}"
+        );
         assert_eq!(surv["dropped_x_censored_only"].as_u64().unwrap(), 12);
         let cpr = per_relation(&or, &pr, "word_ops", 0.0, false, 1);
         // O: (12*1000 + 28*150) / 28 = 579; P: (12*1000 + 28*100) / 40 = 370.
-        assert!((cpr["ratio"].as_f64().unwrap() - (16200.0 / 28.0) / (14800.0 / 40.0)).abs() < 1e-9, "{cpr}");
+        assert!(
+            (cpr["ratio"].as_f64().unwrap() - (16200.0 / 28.0) / (14800.0 / 40.0)).abs() < 1e-9,
+            "{cpr}"
+        );
         assert_eq!(cpr["censored_x_only"].as_u64().unwrap(), 12);
-        let g = Gate { agree_all: true, complete: true, targets: 40, cens_x: 12, cens_p: 0 };
+        let g = Gate {
+            agree_all: true,
+            complete: true,
+            targets: 40,
+            cens_x: 12,
+            cens_p: 0,
+        };
         // 12/40 = 0.3 > 0.2: gated per arm even though the pooled fraction is 0.15.
         assert_eq!(decide(0.5, 0.9, 0.9, 1.1, &g), "unresolved_censored");
         // O finds nothing: no ratio, no claim.
@@ -1853,11 +2290,29 @@ mod tests {
     #[test]
     fn anytime_curve_is_exact_below_the_horizon() {
         let mk = |t: &str, verdict: &str, w: f64| Row {
-            cell: "c".into(), target_id: t.into(), class: "natural".into(), arm: "P".into(), conj: 0,
-            verdict: verdict.into(), oracle: true, agree: true, cert_ok: true,
-            conflicts: w, propagations: w, word_ops: w, wall_s: w, lift_adds: 0.0, r: 1.0, k: 2.0,
+            cell: "c".into(),
+            target_id: t.into(),
+            class: "natural".into(),
+            arm: "P".into(),
+            conj: 0,
+            verdict: verdict.into(),
+            oracle: true,
+            agree: true,
+            cert_ok: true,
+            conflicts: w,
+            propagations: w,
+            word_ops: w,
+            wall_s: w,
+            lift_adds: 0.0,
+            r: 1.0,
+            k: 2.0,
         };
-        let rows = vec![mk("a", "found", 10.0), mk("b", "found", 100.0), mk("c", "refuted", 50.0), mk("d", "censored", 1000.0)];
+        let rows = vec![
+            mk("a", "found", 10.0),
+            mk("b", "found", 100.0),
+            mk("c", "refuted", 50.0),
+            mk("d", "censored", 1000.0),
+        ];
         let r: Vec<&Row> = rows.iter().collect();
         assert_eq!(censor_horizon(&r), 1000.0);
         assert_eq!(anytime(&r, 60.0), (1, 10.0 + 60.0 + 50.0 + 60.0));
@@ -1893,9 +2348,15 @@ mod tests {
         assert_eq!(
             table,
             vec![
-                (19, 4, 2, 1.0), (19, 5, 2, 1.0), (19, 6, 2, 1.0),
-                (23, 4, 2, 0.7593), (23, 5, 2, 1.0), (23, 6, 2, 1.0),
-                (31, 4, 2, 0.9989), (31, 5, 2, 1.0), (31, 6, 2, 1.0),
+                (19, 4, 2, 1.0),
+                (19, 5, 2, 1.0),
+                (19, 6, 2, 1.0),
+                (23, 4, 2, 0.7593),
+                (23, 5, 2, 1.0),
+                (23, 6, 2, 1.0),
+                (31, 4, 2, 0.9989),
+                (31, 5, 2, 1.0),
+                (31, 6, 2, 1.0),
             ]
         );
     }
@@ -1903,18 +2364,37 @@ mod tests {
     #[test]
     fn every_planned_cell_builds_with_full_orbits() {
         for n in [19u32, 23, 31] {
-            let cd = build_cell(CellSpec { a: 0, n, m: 4, k: 2, seed: 1027 }).unwrap();
+            let cd = build_cell(CellSpec {
+                a: 0,
+                n,
+                m: 4,
+                k: 2,
+                seed: 1027,
+            })
+            .unwrap();
             assert_eq!(cd.r, subgroup_r(n));
             assert_eq!(cd.fb.points.len(), 4 * n as usize);
             assert_eq!(cd.xcodes.len(), 2 * n as usize);
         }
     }
 
-    fn synth_row(cell: &str, arm: &str, conj: u32, i: usize, class: &str, oracle: bool, verdict: &str, w: f64, conf: f64, build: f64) -> String {
+    fn synth_row(
+        cell: &str,
+        arm: &str,
+        conj: u32,
+        i: usize,
+        class: &str,
+        oracle: bool,
+        verdict: &str,
+        w: f64,
+        conf: f64,
+        build: f64,
+    ) -> String {
         json!({"cell": cell, "target_id": format!("{cell}-{class}-{i}"), "class": class, "arm": arm, "conj": conj,
             "verdict": verdict, "oracle": oracle, "agree": true, "cert_ok": verdict == "found", "tieout": Value::Null,
             "conflicts": conf, "propagations": w, "word_ops": w, "wall_s": w * 1e-3 + build, "build_s": build,
-            "lift_adds": 3.0, "r": 1e6, "k": 2.0}).to_string()
+            "lift_adds": 3.0 + ((i * 13 + arm.len() * 7 + conj as usize * 5 + arm.as_bytes()[0] as usize * 3) % 40) as f64,
+            "r": 1e6, "k": 2.0}).to_string()
     }
 
     fn scratch(name: &str) -> String {
@@ -1929,44 +2409,104 @@ mod tests {
         let dir = scratch("an");
         let cell = "a0-n19-m4-k2-s1";
         let mut rng = Rng(5);
-        for (arm, conj, scale) in [("P", 0u32, 1.0), ("O", 0, 1.0), ("R", 0, 0.9), ("Q", 0, 0.9), ("P", 1, 1.0)] {
+        for (arm, conj, scale) in [
+            ("P", 0u32, 1.0),
+            ("O", 0, 1.0),
+            ("R", 0, 0.9),
+            ("Q", 0, 0.9),
+            ("P", 1, 1.0),
+        ] {
             let mut lines = vec![];
             for i in 0..30 {
                 let base = 1000.0 * (1.0 + 3.0 * ((i * 7) % 11) as f64 / 11.0);
                 let noise = (0.1 * (rng.unit() - 0.5)).exp();
-                lines.push(synth_row(cell, arm, conj, i, "natural", true, "found", base * scale * noise, 100.0, 0.01));
+                lines.push(synth_row(
+                    cell,
+                    arm,
+                    conj,
+                    i,
+                    "natural",
+                    true,
+                    "found",
+                    base * scale * noise,
+                    100.0,
+                    0.01,
+                ));
             }
             for i in 0..8 {
-                lines.push(synth_row(cell, arm, conj, i, "coset", false, "censored", 5.0e5, 20000.0, 0.01));
+                lines.push(synth_row(
+                    cell, arm, conj, i, "coset", false, "censored", 5.0e5, 20000.0, 0.01,
+                ));
             }
-            std::fs::write(format!("{dir}/rows-{cell}-{arm}-c{conj}.jsonl"), lines.join("\n")).unwrap();
+            std::fs::write(
+                format!("{dir}/rows-{cell}-{arm}-c{conj}.jsonl"),
+                lines.join("\n"),
+            )
+            .unwrap();
         }
         analyze(&dir, &format!("{dir}/out")).unwrap();
-        let v: Value = serde_json::from_str(&std::fs::read_to_string(format!("{dir}/out/summary.json")).unwrap()).unwrap();
+        let v: Value = serde_json::from_str(
+            &std::fs::read_to_string(format!("{dir}/out/summary.json")).unwrap(),
+        )
+        .unwrap();
         assert_eq!(v["schema"], "g1-chain-sat-orbit/summary/v2");
         let c = &v["cells"][0];
         assert_eq!(c["c3_grade_O"], "supported", "{c}");
         assert_eq!(v["c3_cells_supported"], 1);
         let strata = c["strata"].as_array().unwrap();
-        let nat = strata.iter().find(|s| s["stratum"] == "natural_all").unwrap();
+        let nat = strata
+            .iter()
+            .find(|s| s["stratum"] == "natural_all")
+            .unwrap();
         assert_eq!(nat["arms"][0]["arm"], "O");
-        assert_eq!(nat["arms"][0]["metrics"][0]["decision"], "unresolved_no_difference");
+        assert_eq!(
+            nat["arms"][0]["metrics"][0]["decision"],
+            "unresolved_no_difference"
+        );
         let uns = strata.iter().find(|s| s["stratum"] == "unsat").unwrap();
-        assert_eq!(uns["arms"][0]["metrics"][0]["decision"], "unresolved_too_few_targets");
+        assert_eq!(
+            uns["arms"][0]["metrics"][0]["decision"],
+            "unresolved_too_few_targets"
+        );
         assert!(c["class_count_info_only"].as_f64().unwrap() > 0.0);
         // R and Q were made 10 percent cheaper in word_ops: the cost-per-relation statistic sees it.
-        let r = nat["arms"].as_array().unwrap().iter().find(|a| a["arm"] == "R").unwrap();
+        let r = nat["arms"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|a| a["arm"] == "R")
+            .unwrap();
         assert_eq!(r["metrics"][0]["decision"], "improvement", "{r}");
         // ... but at price 0 only the lift additions are priced (identical here), so the
         // order is not stable across the 5a band and nothing is ranked.
-        assert_eq!(r["final_grade_word_ops"], "not_ranked_unstable_across_5a_band", "{r}");
+        assert_eq!(
+            r["final_grade_word_ops"], "not_ranked_unstable_across_5a_band",
+            "{r}"
+        );
         // A missing row (a job lost to a timeout) makes the cell invalid, not silently smaller.
-        let lines: Vec<String> = std::fs::read_to_string(format!("{dir}/rows-{cell}-O-c0.jsonl")).unwrap().lines().take(25).map(String::from).collect();
+        let lines: Vec<String> = std::fs::read_to_string(format!("{dir}/rows-{cell}-O-c0.jsonl"))
+            .unwrap()
+            .lines()
+            .take(25)
+            .map(String::from)
+            .collect();
         std::fs::write(format!("{dir}/rows-{cell}-O-c0.jsonl"), lines.join("\n")).unwrap();
         analyze(&dir, &format!("{dir}/out2")).unwrap();
-        let v2: Value = serde_json::from_str(&std::fs::read_to_string(format!("{dir}/out2/summary.json")).unwrap()).unwrap();
-        let nat2 = v2["cells"][0]["strata"].as_array().unwrap().iter().find(|s| s["stratum"] == "natural_all").unwrap().clone();
-        assert_eq!(nat2["arms"][0]["metrics"][0]["decision"], "invalid_incomplete_rows");
+        let v2: Value = serde_json::from_str(
+            &std::fs::read_to_string(format!("{dir}/out2/summary.json")).unwrap(),
+        )
+        .unwrap();
+        let nat2 = v2["cells"][0]["strata"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|s| s["stratum"] == "natural_all")
+            .unwrap()
+            .clone();
+        assert_eq!(
+            nat2["arms"][0]["metrics"][0]["decision"],
+            "invalid_incomplete_rows"
+        );
         assert_eq!(v2["cells"][0]["c3_grade_O"], "unresolved");
         let _ = std::fs::remove_dir_all(&dir);
     }
@@ -1988,8 +2528,250 @@ mod tests {
         std::fs::write(format!("{dir}/rows-b.jsonl"), b.join("\n")).unwrap();
         let lines = cap_lines(&dir, 180.0).unwrap();
         // A: t = 0.2/20030 = ~1e-5; b = 3 s; 2e6 * 1e-5 = 20 s, so the largest grid value.
-        assert_eq!(lines, vec!["19:4:2:2000000".to_string(), "31:6:2:IMPEDIMENT".to_string()]);
+        assert_eq!(
+            lines,
+            vec![
+                "19:4:2:2000000".to_string(),
+                "31:6:2:IMPEDIMENT".to_string()
+            ]
+        );
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    fn entry(decision: &str, lo: f64, hi: f64, flag: bool, priced_ok: bool) -> C3Entry {
+        C3Entry {
+            stratum: "natural_all".into(),
+            decision: decision.into(),
+            ci_lo: lo,
+            ci_hi: hi,
+            flag,
+            priced_ok,
+        }
+    }
+
+    #[test]
+    fn contradicted_needs_the_lower_bound_above_the_margin() {
+        // O between 3% and 7% dearer: partly inside the 1/0.95 = 1.0526 margin, NOT contradicted.
+        let near = [
+            entry("regression", 1.03, 1.07, false, false),
+            entry("regression", 1.03, 1.07, false, false),
+        ];
+        assert_eq!(c3_grade(&near), "unresolved");
+        // O at least 6% dearer with 95% confidence: contradicted.
+        let far = [
+            entry("regression", 1.06, 1.12, false, false),
+            entry("unresolved_no_difference", 0.9, 1.2, false, false),
+        ];
+        assert_eq!(c3_grade(&far), "contradicted");
+        // A lower bound above the margin under a non-regression label (censoring gate) never contradicts.
+        let gated = [
+            entry("unresolved_asymmetric_censoring", 1.2, 1.4, false, false),
+            entry("unresolved_censored", f64::NAN, f64::NAN, false, false),
+        ];
+        assert_eq!(c3_grade(&gated), "unresolved");
+        let ok = [
+            entry("unresolved_no_difference", 0.97, 1.04, true, true),
+            entry("unresolved_no_difference", 0.98, 1.05, true, true),
+        ];
+        assert_eq!(c3_grade(&ok), "supported");
+        // supported needs the positive-price legs too
+        let leg = [
+            entry("unresolved_no_difference", 0.97, 1.04, true, true),
+            entry("unresolved_no_difference", 0.98, 1.05, true, false),
+        ];
+        assert_eq!(c3_grade(&leg), "unresolved");
+    }
+
+    #[test]
+    fn c3_priced_legs_exclude_the_noisy_price_zero_lift_only_leg() {
+        assert!(
+            c3_priced_ok(&[(0.0, 1.30), (0.1, 1.02), (1.0, 1.01)]),
+            "price 0 is lift_adds only and must not decide C3"
+        );
+        assert!(!c3_priced_ok(&[(0.0, 1.0), (0.1, 1.06), (1.0, 1.01)]));
+        assert!(!c3_priced_ok(&[(0.0, 1.0), (0.1, f64::NAN), (1.0, 1.01)]));
+        assert!(
+            !c3_priced_ok(&[(0.0, 1.0), (1.0, 1.01)]),
+            "both positive prices are required"
+        );
+    }
+
+    #[test]
+    fn identical_encodings_with_noisy_lift_still_grade_supported_and_report_priced_aa() {
+        // word_ops equal between P and O, lift_adds random per target and arm (synth_row): the
+        // price-0 interval is wide, but C3 rests on prices 0.1 and 1.
+        let dir = scratch("nl");
+        let cell = "a0-n19-m4-k2-s1";
+        for (arm, conj) in [("P", 0u32), ("O", 0), ("R", 0), ("Q", 0), ("P", 1)] {
+            let mut lines = vec![];
+            for i in 0..40 {
+                let w = 20000.0 * (1.0 + 3.0 * ((i * 7) % 11) as f64 / 11.0);
+                lines.push(synth_row(
+                    cell, arm, conj, i, "natural", true, "found", w, 100.0, 0.01,
+                ));
+            }
+            std::fs::write(
+                format!("{dir}/rows-{cell}-{arm}-c{conj}.jsonl"),
+                lines.join("\n"),
+            )
+            .unwrap();
+        }
+        analyze(&dir, &format!("{dir}/out")).unwrap();
+        let v: Value = serde_json::from_str(
+            &std::fs::read_to_string(format!("{dir}/out/summary.json")).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(
+            v["cells"][0]["c3_grade_O"], "supported",
+            "{}",
+            v["cells"][0]
+        );
+        let nat = v["cells"][0]["strata"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|s| s["stratum"] == "natural_all")
+            .unwrap();
+        let o = &nat["arms"][0];
+        assert_eq!(o["aa_priced_gae"].as_array().unwrap().len(), 3);
+        assert!(o["aa_priced_gae"][0]["mde_ratio_95"].as_f64().unwrap() > 1.0);
+        let hi0 = o["priced_gae"][0]["ci_hi"].as_f64().unwrap();
+        assert!(
+            hi0 > C3_COST_MARGIN,
+            "price-0 leg is wide under random lift: {hi0}"
+        );
+        assert_eq!(o["c3_noninferior_at_positive_prices"], true);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn cap_lists_a_cell_without_conflict_rows_as_nodata() {
+        let dir = scratch("nodata");
+        let rows = [
+            json!({"cell": "a0-n19-m4-k2-s1", "arm": "P", "conj": 0, "conflicts": 20000.0, "wall_s": 3.2, "build_s": 3.0}),
+            json!({"cell": "a0-n23-m4-k2-s1", "arm": "P", "conj": 0, "conflicts": 0.0, "wall_s": 0.1, "build_s": 0.1}),
+            json!({"cell": "a0-n23-m4-k2-s1", "arm": "O", "conj": 0, "conflicts": 0.0, "wall_s": 0.1, "build_s": 0.1}),
+        ];
+        let text: Vec<String> = rows.iter().map(|r| r.to_string()).collect();
+        std::fs::write(format!("{dir}/rows-a.jsonl"), text.join("\n")).unwrap();
+        assert_eq!(
+            cap_lines(&dir, 180.0).unwrap(),
+            vec!["19:4:2:2000000".to_string(), "23:4:2:NODATA".to_string()]
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    fn repo_file(rel: &str) -> String {
+        format!(
+            "{}/research/frobenius_msweep_20261027/g1-chain-sat-orbit/{rel}",
+            env!("CARGO_MANIFEST_DIR")
+        )
+    }
+
+    #[test]
+    fn certificates_and_manifest_reach_disk_and_the_independent_native_verifier_accepts_them() {
+        let cd = cell(7, 4, 2);
+        let t = &make_targets(&cd, 0, 1, 0)[0];
+        let arm = arm_spec("O").unwrap();
+        let o = shadow_solve(&cd, &t.point, tiny_limits(), arm);
+        assert!(matches!(o.verdict, Verdict::Found));
+        let cert_ok = o
+            .points
+            .as_ref()
+            .is_some_and(|p| verify_cert(&cd, &t.point, p));
+        let row = row_json(&RowCtx {
+            run_id: "t",
+            cd: &cd,
+            id: &t.id,
+            class: t.class.name(),
+            arm: "O",
+            conj: 0,
+            cap: 20_000,
+            point: &t.point,
+            o: &o,
+            want: true,
+            agree: cert_ok,
+            cert_ok,
+            tie: None,
+        });
+        assert_eq!(row["cert_points"].as_array().unwrap().len(), 4);
+        assert!(row["target_xy"].is_array());
+        let man = manifest_json(&cd);
+        assert_eq!(
+            man["factor_base_points"].as_array().unwrap().len(),
+            cd.fb.points.len()
+        );
+        assert_eq!(man["subgroup_order_r"], cd.r);
+        let dir = scratch("cert");
+        let cell_id = cd.spec.id();
+        std::fs::write(format!("{dir}/manifest-{cell_id}.json"), man.to_string()).unwrap();
+        std::fs::write(format!("{dir}/rows-{cell_id}-O-c0.jsonl"), row.to_string()).unwrap();
+        let vtarget = scratch("verify-target");
+        let run = |d: &str| {
+            std::process::Command::new("cargo")
+                .args([
+                    "run",
+                    "--release",
+                    "--offline",
+                    "--quiet",
+                    "--manifest-path",
+                ])
+                .arg(repo_file("verify_certs/Cargo.toml"))
+                .args([
+                    "--target-dir",
+                    &vtarget,
+                    "--",
+                    "--rows",
+                    d,
+                    "--manifests",
+                    &dir,
+                ])
+                .env_remove("CARGO_TARGET_DIR")
+                .output()
+                .expect("cargo is needed to build the independent verifier")
+        };
+        let good = run(&dir);
+        assert!(
+            good.status.success(),
+            "{}",
+            String::from_utf8_lossy(&good.stdout)
+        );
+        // Tamper: change one certificate point's y; the independent verifier must reject.
+        let mut bad = row.clone();
+        let y = bad["cert_points"][0][1].as_u64().unwrap();
+        bad["cert_points"][0][1] = json!(y ^ 1);
+        let bdir = format!("{dir}/bad");
+        std::fs::create_dir_all(&bdir).unwrap();
+        std::fs::write(format!("{bdir}/rows-{cell_id}-O-c0.jsonl"), bad.to_string()).unwrap();
+        assert_eq!(run(&bdir).status.code(), Some(1));
+        // A found row without certificate points is rejected too.
+        let mut none = row.clone();
+        none["cert_points"] = Value::Null;
+        std::fs::write(
+            format!("{bdir}/rows-{cell_id}-O-c0.jsonl"),
+            none.to_string(),
+        )
+        .unwrap();
+        assert_eq!(run(&bdir).status.code(), Some(1));
+        let _ = std::fs::remove_dir_all(&dir);
+        let _ = std::fs::remove_dir_all(&vtarget);
+    }
+
+    #[test]
+    fn run_stage_rejects_an_empty_cell_list() {
+        let out = std::process::Command::new("bash")
+            .arg(repo_file("run_stage.sh"))
+            .args(["t", "1", "0", "1", "1", "1", " "])
+            .env("RUN", "test-empty")
+            .output()
+            .unwrap();
+        assert_eq!(
+            out.status.code(),
+            Some(2),
+            "{}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        assert!(String::from_utf8_lossy(&out.stderr).contains("empty cell list"));
     }
 
     #[test]

@@ -80,7 +80,13 @@ pub fn apply_matrix(cols: &[u32], v: u32) -> u32 {
 
 /// Draw distinct nonzero legs from `elems` one at a time, each accepted only if S3(prev, x, .) has a root;
 /// follow a random root. Returns (legs, x_R) with the chain satisfied, or None after 64 failed draws.
-pub fn plant_adaptive(f: &Fq, b: u32, elems: &[u32], m: usize, rng: &mut Rng) -> Option<(Vec<u32>, u32)> {
+pub fn plant_adaptive(
+    f: &Fq,
+    b: u32,
+    elems: &[u32],
+    m: usize,
+    rng: &mut Rng,
+) -> Option<(Vec<u32>, u32)> {
     use crate::chain::{roots, Roots};
     let pick = |rng: &mut Rng, t: &Vec<u32>| -> u32 {
         loop {
@@ -124,7 +130,14 @@ pub fn plant_adaptive(f: &Fq, b: u32, elems: &[u32], m: usize, rng: &mut Rng) ->
 }
 
 /// One instance. `stable` supplies sigma-stable bases for the Stable arm (n = 17 only), else empty.
-pub fn run_trial(f: &Fq, arm: Arm, m: usize, k_assign: usize, stable: &[Vec<u32>], rng: &mut Rng) -> Option<TrialOut> {
+pub fn run_trial(
+    f: &Fq,
+    arm: Arm,
+    m: usize,
+    k_assign: usize,
+    stable: &[Vec<u32>],
+    rng: &mut Rng,
+) -> Option<TrialOut> {
     let n = f.n;
     let b: u32 = match arm {
         Arm::Ordinary => loop {
@@ -217,7 +230,8 @@ pub fn run_trial(f: &Fq, arm: Arm, m: usize, k_assign: usize, stable: &[Vec<u32>
         let xr_rand = f.rand(rng);
         let t_dst: Vec<u32> = t.iter().map(|&x| f.frob(x, j)).collect();
         if xr_rand != 0 {
-            out.neg_agree = Some(member(f, b, xr_rand, &t) == member(f, b, f.frob(xr_rand, j), &t_dst));
+            out.neg_agree =
+                Some(member(f, b, xr_rand, &t) == member(f, b, f.frob(xr_rand, j), &t_dst));
         }
     }
     Some(out)

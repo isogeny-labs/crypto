@@ -34,7 +34,13 @@ impl Field {
 
     pub fn with_modulus(n: u32, modulus: u64) -> Field {
         assert!(n % 2 == 1 && n <= 31, "n must be odd and <= 31");
-        let mut f = Field { n, modulus, mask: (1u64 << n) - 1, trace_mask: 0, ht_cols: vec![] };
+        let mut f = Field {
+            n,
+            modulus,
+            mask: (1u64 << n) - 1,
+            trace_mask: 0,
+            ht_cols: vec![],
+        };
         let mut tm = 0u64;
         let mut cols = vec![];
         for i in 0..n {
@@ -208,7 +214,12 @@ impl Basis {
         }
         // M c = x  =>  c = M^-1 x; rows[i].1 is row i of M^-1 (over x bits)
         let inv_rows = rows.iter().map(|r| r.1).collect();
-        Some(Basis { n, vecs, inv_rows, normal })
+        Some(Basis {
+            n,
+            vecs,
+            inv_rows,
+            normal,
+        })
     }
 
     pub fn polynomial(f: &Field) -> Basis {
@@ -332,7 +343,11 @@ pub fn cyclotomic_factors(n: u32) -> (u64, Vec<u64>, u32) {
             out.push(f);
         }
     }
-    assert_eq!(out.len() as u32 * ord, n - 1, "factor degrees must sum to n-1");
+    assert_eq!(
+        out.len() as u32 * ord,
+        n - 1,
+        "factor degrees must sum to n-1"
+    );
     (0b11, out, ord)
 }
 
@@ -384,7 +399,13 @@ pub fn vspec_for_dim(n: u32, l: u32, which: usize) -> Option<VSpec> {
         // enumerate k-subsets of 0..k_total lexicographically
         let mut combos = vec![];
         let mut cur = vec![];
-        fn rec(start: usize, k: usize, total: usize, cur: &mut Vec<usize>, out: &mut Vec<Vec<usize>>) {
+        fn rec(
+            start: usize,
+            k: usize,
+            total: usize,
+            cur: &mut Vec<usize>,
+            out: &mut Vec<Vec<usize>>,
+        ) {
             if cur.len() == k {
                 out.push(cur.clone());
                 return;
@@ -397,7 +418,10 @@ pub fn vspec_for_dim(n: u32, l: u32, which: usize) -> Option<VSpec> {
         }
         rec(0, k, k_total, &mut cur, &mut combos);
         if let Some(c) = combos.get(which) {
-            return Some(VSpec { factor_idx: c.clone(), with_t_plus_1: with });
+            return Some(VSpec {
+                factor_idx: c.clone(),
+                with_t_plus_1: with,
+            });
         }
         return None;
     }
@@ -597,7 +621,18 @@ mod tests {
 
     #[test]
     fn stable_subspace_dimension_and_stability() {
-        for (n, l) in [(7u32, 3u32), (7, 4), (17, 8), (17, 9), (23, 11), (23, 12), (31, 10), (31, 11), (31, 15), (31, 16)] {
+        for (n, l) in [
+            (7u32, 3u32),
+            (7, 4),
+            (17, 8),
+            (17, 9),
+            (23, 11),
+            (23, 12),
+            (31, 10),
+            (31, 11),
+            (31, 15),
+            (31, 16),
+        ] {
             let f = Field::new(n);
             let nb = Basis::normal(&f);
             let spec = vspec_for_dim(n, l, 0).expect("spec");

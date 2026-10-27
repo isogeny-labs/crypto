@@ -48,5 +48,11 @@ pub fn hash_str(s: &str) -> u64 {
 
 /// Seed of one (cell, arm, replicate, half) stream: arms never share an RNG stream.
 pub fn derive_seed(seed: u64, cell: &str, arm: &str, half: &str, rep: u64) -> u64 {
-    mix(mix(mix(mix(seed, hash_str(cell)), hash_str(arm)), hash_str(half)), rep)
+    mix(
+        mix(
+            mix(mix(seed, hash_str(cell)), hash_str(arm)),
+            hash_str(half),
+        ),
+        rep,
+    )
 }

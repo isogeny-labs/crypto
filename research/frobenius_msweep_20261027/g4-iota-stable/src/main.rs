@@ -1,7 +1,9 @@
 use g4_iota_stable::{analyze, run};
 
 fn arg(args: &[String], k: &str) -> Option<String> {
-    args.iter().position(|a| a == k).and_then(|i| args.get(i + 1).cloned())
+    args.iter()
+        .position(|a| a == k)
+        .and_then(|i| args.get(i + 1).cloned())
 }
 
 fn main() {

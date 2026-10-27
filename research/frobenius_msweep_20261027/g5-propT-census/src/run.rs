@@ -90,7 +90,10 @@ pub fn cell_list() -> Vec<Cell> {
                 if ops > BASE_OPS_CAP {
                     break;
                 }
-                if nu_exp(nx, m, r) >= 1.0 && star.is_none() && p_too_few(l, m, dens) <= MAX_P_TOO_FEW {
+                if nu_exp(nx, m, r) >= 1.0
+                    && star.is_none()
+                    && p_too_few(l, m, dens) <= MAX_P_TOO_FEW
+                {
                     star = Some(l);
                 }
             }
@@ -98,7 +101,10 @@ pub fn cell_list() -> Vec<Cell> {
                 Some(l) => {
                     chosen.push(l);
                     let nx2 = nx_of(l + 1);
-                    if l + 1 <= n - 2 && est_ops(nx2 as usize, m, jn) <= BASE_OPS_CAP && nu_exp(nx2, m, r) <= 3000.0 {
+                    if l + 1 <= n - 2
+                        && est_ops(nx2 as usize, m, jn) <= BASE_OPS_CAP
+                        && nu_exp(nx2, m, r) <= 3000.0
+                    {
                         chosen.push(l + 1);
                     }
                 }
@@ -107,7 +113,10 @@ pub fn cell_list() -> Vec<Cell> {
                     let mut best = None;
                     for l in 3..=(n - 2) {
                         let nx = nx_of(l);
-                        if nx >= m as f64 && est_ops(nx as usize, m, jn) <= BASE_OPS_CAP && p_too_few(l, m, dens) <= MAX_P_TOO_FEW {
+                        if nx >= m as f64
+                            && est_ops(nx as usize, m, jn) <= BASE_OPS_CAP
+                            && p_too_few(l, m, dens) <= MAX_P_TOO_FEW
+                        {
                             best = Some(l);
                         }
                     }
@@ -148,15 +157,65 @@ pub fn cell_ops(c: &Cell, reps: usize) -> f64 {
 
 // ---------------------------------------------------------------------------------------------------------------
 pub const OVERLAP_COLS: [&str; 34] = [
-    "a", "n", "m", "l", "r", "arm", "half", "rep", "seed", "status", "nx", "nsub", "nsol", "nu", "u_frob", "u_null",
-    "u_pred", "corr_frob", "corr_null", "concord_frob", "concord_null", "p_solved", "count_equal_frob", "halving_n",
-    "halving_bad", "chain_pos_n", "chain_pos_bad", "chain_neg_n", "chain_neg_bad", "lb_checked", "lb_bad",
-    "clos_targets", "clos_pairs", "clos_closed",
+    "a",
+    "n",
+    "m",
+    "l",
+    "r",
+    "arm",
+    "half",
+    "rep",
+    "seed",
+    "status",
+    "nx",
+    "nsub",
+    "nsol",
+    "nu",
+    "u_frob",
+    "u_null",
+    "u_pred",
+    "corr_frob",
+    "corr_null",
+    "concord_frob",
+    "concord_null",
+    "p_solved",
+    "count_equal_frob",
+    "halving_n",
+    "halving_bad",
+    "chain_pos_n",
+    "chain_pos_bad",
+    "chain_neg_n",
+    "chain_neg_bad",
+    "lb_checked",
+    "lb_bad",
+    "clos_targets",
+    "clos_pairs",
+    "clos_closed",
 ];
 pub const OVERLAP_COLS2: [&str; 23] = [
-    "enum_ms", "u_by_j_frob", "u_by_j_null", "s1_nsub", "s1_nsol", "s1_uf", "s1_un", "s2_nsub", "s2_nsol", "s2_uf",
-    "s2_un", "s3_nsub", "s3_nsol", "s3_uf", "s3_un", "u_null2", "u_plant", "plant_lags_ok", "s1l_nsub", "s1l_pairs",
-    "s1l_cc1", "s1l_uf", "s1l_un",
+    "enum_ms",
+    "u_by_j_frob",
+    "u_by_j_null",
+    "s1_nsub",
+    "s1_nsol",
+    "s1_uf",
+    "s1_un",
+    "s2_nsub",
+    "s2_nsol",
+    "s2_uf",
+    "s2_un",
+    "s3_nsub",
+    "s3_nsol",
+    "s3_uf",
+    "s3_un",
+    "u_null2",
+    "u_plant",
+    "plant_lags_ok",
+    "s1l_nsub",
+    "s1l_pairs",
+    "s1l_cc1",
+    "s1l_uf",
+    "s1l_un",
 ];
 
 fn member_any_order(f: &Fq, xr: u32, xs: &[u32], rng: &mut Rng) -> bool {
@@ -181,7 +240,15 @@ pub struct Ctx<'a> {
 }
 
 /// One base, one row. The same function serves every arm.
-pub fn measure(ctx: &Ctx, base: &BaseSet, m: usize, null: &Mult, aux_seed: u64, rng: &mut Rng, lead: Vec<String>) -> Vec<String> {
+pub fn measure(
+    ctx: &Ctx,
+    base: &BaseSet,
+    m: usize,
+    null: &Mult,
+    aux_seed: u64,
+    rng: &mut Rng,
+    lead: Vec<String>,
+) -> Vec<String> {
     let g = ctx.g;
     let jn = ctx.fr.len();
     let mut row = lead;
@@ -203,9 +270,21 @@ pub fn measure(ctx: &Ctx, base: &BaseSet, m: usize, null: &Mult, aux_seed: u64, 
         return row;
     }
     let t0 = Instant::now();
-    let orbs: Vec<u32> = base.ds.iter().map(|&d| ctx.ob.orbit[(d - 1) as usize]).collect();
-    let ks: Vec<u32> = base.ds.iter().map(|&d| ctx.ob.k[(d - 1) as usize]).collect();
-    let oi = OrbInfo { orbit: &orbs, k: Some(&ks), n: g.n };
+    let orbs: Vec<u32> = base
+        .ds
+        .iter()
+        .map(|&d| ctx.ob.orbit[(d - 1) as usize])
+        .collect();
+    let ks: Vec<u32> = base
+        .ds
+        .iter()
+        .map(|&d| ctx.ob.k[(d - 1) as usize])
+        .collect();
+    let oi = OrbInfo {
+        orbit: &orbs,
+        k: Some(&ks),
+        n: g.n,
+    };
     // two further multiplier sets on the same enumeration: an independent second null (truth D_nn = 1, calibrates the
     // whole decision pipeline) and the planted positive control (at least one guaranteed hit per lag)
     let mut null2_rng = Rng::new(crate::rng::mix(aux_seed, 0x6E32));
@@ -213,8 +292,20 @@ pub fn measure(ctx: &Ctx, base: &BaseSet, m: usize, null: &Mult, aux_seed: u64, 
     let mut plant_rng = Rng::new(crate::rng::mix(aux_seed, 0x706C));
     let plant = Mult::planted(g.r, &base.ds, m, jn, &mut plant_rng);
     let plant_ref = plant.as_ref().unwrap_or(&null2);
-    let out = census_ex(&base.ds, g.r, m, &[ctx.fr, null, &null2, plant_ref], 16, 8, Some(&oi));
-    let plant_lags_ok = if plant.is_some() { out.u[3].iter().filter(|&&h| h >= 1).count() } else { 0 };
+    let out = census_ex(
+        &base.ds,
+        g.r,
+        m,
+        &[ctx.fr, null, &null2, plant_ref],
+        16,
+        8,
+        Some(&oi),
+    );
+    let plant_lags_ok = if plant.is_some() {
+        out.u[3].iter().filter(|&&h| h >= 1).count()
+    } else {
+        0
+    };
     let enum_ms = t0.elapsed().as_secs_f64() * 1000.0;
     let ind_f = ind_stats(&out.cnt, ctx.fr);
     let ind_n = ind_stats(&out.cnt, null);
@@ -226,8 +317,20 @@ pub fn measure(ctx: &Ctx, base: &BaseSet, m: usize, null: &Mult, aux_seed: u64, 
             ok.iter().sum::<f64>() / ok.len() as f64
         }
     };
-    let corr_f = mean(ind_f.joint.iter().map(|&j| corr(ind_f.p, j, ind_f.ncls)).collect());
-    let corr_n = mean(ind_n.joint.iter().map(|&j| corr(ind_n.p, j, ind_n.ncls)).collect());
+    let corr_f = mean(
+        ind_f
+            .joint
+            .iter()
+            .map(|&j| corr(ind_f.p, j, ind_f.ncls))
+            .collect(),
+    );
+    let corr_n = mean(
+        ind_n
+            .joint
+            .iter()
+            .map(|&j| corr(ind_n.p, j, ind_n.ncls))
+            .collect(),
+    );
     let conc_f = ind_f.concord.iter().sum::<u64>() as f64 / (ind_f.ncls as f64 * jn as f64);
     let conc_n = ind_n.concord.iter().sum::<u64>() as f64 / (ind_n.ncls as f64 * jn as f64);
     let ceq_f = ind_f.count_equal.iter().sum::<u64>() as f64 / (ind_f.ncls as f64 * jn as f64);
@@ -310,8 +413,20 @@ pub fn measure(ctx: &Ctx, base: &BaseSet, m: usize, null: &Mult, aux_seed: u64, 
     row.push(cp);
     row.push(cc);
     row.push(format!("{:.2}", enum_ms));
-    row.push(out.u[0].iter().map(|x| x.to_string()).collect::<Vec<_>>().join(","));
-    row.push(out.u[1].iter().map(|x| x.to_string()).collect::<Vec<_>>().join(","));
+    row.push(
+        out.u[0]
+            .iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<_>>()
+            .join(","),
+    );
+    row.push(
+        out.u[1]
+            .iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<_>>()
+            .join(","),
+    );
     for sx in 0..3 {
         row.push(out.strat_nsub[sx].to_string());
         row.push(out.strat_nsol[sx].to_string());
@@ -319,8 +434,16 @@ pub fn measure(ctx: &Ctx, base: &BaseSet, m: usize, null: &Mult, aux_seed: u64, 
         row.push(out.strat_u[1][sx].to_string());
     }
     row.push(out.u[2].iter().sum::<u64>().to_string());
-    row.push(if plant.is_some() { out.u[3].iter().sum::<u64>().to_string() } else { "NA".into() });
-    row.push(if plant.is_some() { plant_lags_ok.to_string() } else { "NA".into() });
+    row.push(if plant.is_some() {
+        out.u[3].iter().sum::<u64>().to_string()
+    } else {
+        "NA".into()
+    });
+    row.push(if plant.is_some() {
+        plant_lags_ok.to_string()
+    } else {
+        "NA".into()
+    });
     row.push(out.s1l_nsub.to_string());
     row.push(out.s1l_pairs.to_string());
     row.push(out.s1l_cc1.to_string());
@@ -351,7 +474,12 @@ pub fn run_overlap(cell: &Cell, o: &RunOpts) -> Result<String, String> {
     let fr = Mult::frobenius(&g);
     let jn = fr.len();
     let ob = build_orbits(&f, &g);
-    let ctx = Ctx { f: &f, g: &g, fr: &fr, ob: &ob };
+    let ctx = Ctx {
+        f: &f,
+        g: &g,
+        fr: &fr,
+        ob: &ob,
+    };
     let cname = cell.name();
     let reps = o.reps.unwrap_or(cell.reps);
     let tuned_n = tuned_size(cell.m, g.r);
@@ -359,7 +487,11 @@ pub fn run_overlap(cell: &Cell, o: &RunOpts) -> Result<String, String> {
     hdr.extend_from_slice(&OVERLAP_COLS2);
     let file = format!("overlap_{cname}.tsv");
     let mut fh = open_out(&o.out, &file, &hdr)?;
-    let stable: Vec<Vec<u32>> = if cell.n == 17 && cell.l == 8 { stable_subspaces(&f, 8) } else { vec![] };
+    let stable: Vec<Vec<u32>> = if cell.n == 17 && cell.l == 8 {
+        stable_subspaces(&f, 8)
+    } else {
+        vec![]
+    };
     // work items: (arm, half, rep)
     let mut items: Vec<(&'static str, &'static str, usize)> = vec![];
     items.push(("poly", "main", 0));
@@ -375,7 +507,9 @@ pub fn run_overlap(cell: &Cell, o: &RunOpts) -> Result<String, String> {
     }
     // interleave: shuffle within each (half, rep) group, keeping the single-instance arms first
     let mut order_rng = Rng::new(derive_seed(o.seed, &cname, "order", "-", 0));
-    let (single, rest): (Vec<_>, Vec<_>) = items.into_iter().partition(|it| it.0 == "poly" || it.0 == "stable");
+    let (single, rest): (Vec<_>, Vec<_>) = items
+        .into_iter()
+        .partition(|it| it.0 == "poly" || it.0 == "stable");
     let mut groups: Vec<Vec<(&'static str, &'static str, usize)>> = vec![];
     for chunk in rest.chunks(4) {
         let mut c = chunk.to_vec();
@@ -424,7 +558,15 @@ pub fn run_overlap(cell: &Cell, o: &RunOpts) -> Result<String, String> {
             rep.to_string(),
             seed.to_string(),
         ];
-        let row = measure(&ctx, &base, cell.m, &null, mix_null(seed) ^ 0x1234, &mut rng, lead);
+        let row = measure(
+            &ctx,
+            &base,
+            cell.m,
+            &null,
+            mix_null(seed) ^ 0x1234,
+            &mut rng,
+            lead,
+        );
         writeln!(fh, "{}", row.join("\t")).map_err(|e| e.to_string())?;
     }
     Ok(format!("{}/{}", o.out, file))
@@ -436,20 +578,47 @@ fn mix_null(seed: u64) -> u64 {
 
 // ---------------------------------------------------------------------------------------------------------------
 pub const PROPT_COLS: [&str; 20] = [
-    "n", "m", "arm", "half", "block", "seed", "trials", "assigns", "trials_eq_fail", "assigns_eq_fail",
-    "trials_bool_fail", "rec_singular", "planted", "plant_bad", "conj_member_n", "conj_member_fail", "dom_n",
-    "dom_fail", "neg_n", "neg_disagree",
+    "n",
+    "m",
+    "arm",
+    "half",
+    "block",
+    "seed",
+    "trials",
+    "assigns",
+    "trials_eq_fail",
+    "assigns_eq_fail",
+    "trials_bool_fail",
+    "rec_singular",
+    "planted",
+    "plant_bad",
+    "conj_member_n",
+    "conj_member_fail",
+    "dom_n",
+    "dom_fail",
+    "neg_n",
+    "neg_disagree",
 ];
 
 /// Proposition T cell (n, m): arms koblitz, wrongdir, ordinary (+ stable at n = 17), two halves, blocks of trials.
-pub fn run_propt(n: u32, m: usize, trials: usize, k_assign: usize, o: &RunOpts) -> Result<String, String> {
+pub fn run_propt(
+    n: u32,
+    m: usize,
+    trials: usize,
+    k_assign: usize,
+    o: &RunOpts,
+) -> Result<String, String> {
     let f = Fq::new(n);
     let cname = format!("propt_n{n}_m{m}");
     let mut hdr: Vec<&str> = PROPT_COLS.to_vec();
     hdr.extend_from_slice(&["stable_n", "stable_cob_fail"]);
     let file = format!("{cname}.tsv");
     let mut fh = open_out(&o.out, &file, &hdr)?;
-    let stable = if n == 17 { stable_subspaces(&f, 8) } else { vec![] };
+    let stable = if n == 17 {
+        stable_subspaces(&f, 8)
+    } else {
+        vec![]
+    };
     let mut arms: Vec<Arm> = vec![Arm::Koblitz, Arm::WrongDir, Arm::Ordinary];
     if !stable.is_empty() {
         arms.push(Arm::Stable);
@@ -504,9 +673,28 @@ pub fn run_propt(n: u32, m: usize, trials: usize, k_assign: usize, o: &RunOpts) 
 
 // ---------------------------------------------------------------------------------------------------------------
 pub const RANK_COLS: [&str; 22] = [
-    "a", "n", "m", "l", "r", "arm", "half", "rep", "seed", "nx", "n_rel", "n_rel_indep", "orbits_touched",
-    "cols_orbit", "cols_plain_n", "rank_plain_1", "rank_plain_n", "rank_orbit_1", "rank_orbit_n", "rank_orbit_wrong",
-    "rank_orbit_indep", "rows_bad",
+    "a",
+    "n",
+    "m",
+    "l",
+    "r",
+    "arm",
+    "half",
+    "rep",
+    "seed",
+    "nx",
+    "n_rel",
+    "n_rel_indep",
+    "orbits_touched",
+    "cols_orbit",
+    "cols_plain_n",
+    "rank_plain_1",
+    "rank_plain_n",
+    "rank_orbit_1",
+    "rank_orbit_n",
+    "rank_orbit_wrong",
+    "rank_orbit_indep",
+    "rows_bad",
 ];
 
 /// Rank census of one cell on rand (subspace) and tuned bases; two halves.

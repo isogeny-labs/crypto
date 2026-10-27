@@ -217,7 +217,9 @@ pub fn build_group(f: &Fq, a: u32) -> Result<Group, String> {
         match p {
             Pt::Aff(x, _) => {
                 if dlog[x as usize] != NONE {
-                    return Err(format!("x repeated at k={k}: not a prime-order cyclic walk"));
+                    return Err(format!(
+                        "x repeated at k={k}: not a prime-order cyclic walk"
+                    ));
                 }
                 dlog[x as usize] = k;
                 xs.push(x);
@@ -254,5 +256,16 @@ pub fn build_group(f: &Fq, a: u32) -> Result<Group, String> {
     if lam == 1 || pow_mod(lam as u64, f.n as u64, r as u64) != 1 {
         return Err(format!("lambda={lam} does not have order n"));
     }
-    Ok(Group { n: f.n, a, q: f.q, ne, cof, r, lam, g, dlog, xs })
+    Ok(Group {
+        n: f.n,
+        a,
+        q: f.q,
+        ne,
+        cof,
+        r,
+        lam,
+        g,
+        dlog,
+        xs,
+    })
 }

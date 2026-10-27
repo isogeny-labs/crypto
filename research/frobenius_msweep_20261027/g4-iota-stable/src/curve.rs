@@ -164,5 +164,13 @@ pub fn build_group(f: &Fq, a: u32) -> Result<Group, String> {
     if c.add(p, g) != Pt::Inf {
         return Err("walk did not close".into());
     }
-    Ok(Group { ne, m: ne / 2, h: 1 << ne.trailing_zeros(), q: f.q, a, logx, gen: g })
+    Ok(Group {
+        ne,
+        m: ne / 2,
+        h: 1 << ne.trailing_zeros(),
+        q: f.q,
+        a,
+        logx,
+        gen: g,
+    })
 }

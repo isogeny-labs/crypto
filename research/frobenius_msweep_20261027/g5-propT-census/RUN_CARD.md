@@ -2,8 +2,9 @@
 
 ## 0. The token (the checkpoint upload token the repository gate needs)
 
-The gate (`scripts/checkpoint.sh gate`, called by the PostToolUse hook and by `run_cells.sh`) refuses run launchers until a resume
-checkpoint is uploaded to S3. The preparation container has no AWS profile (`ecc-challenges-new`), no `CHECKPOINT_UPLOAD_TOKEN`
+The gate (`scripts/checkpoint.sh gate`, called by the PostToolUse hook) refuses run launchers until a resume
+checkpoint is uploaded to S3. It is a session-side launcher gate: the SESSION runs it before submitting; it is never invoked inside
+the remote job and `run_cells.sh` does not call it. The preparation container has no AWS profile (`ecc-challenges-new`), no `CHECKPOINT_UPLOAD_TOKEN`
 and no `~/.config/checkpoint/upload-token`, so the upload cannot happen there. The token is a presigned S3 POST policy that can only
 write keys under `checkpoints/` for up to 7 days. Mint it where AWS credentials exist, from the repository root:
 
@@ -32,19 +33,22 @@ Frozen request fields to hand to the `isolab-eks` skill (card instructions in it
 | field | value |
 |---|---|
 | source | the commit that contains this directory with a clean tree (`run_cells.sh` refuses a dirty cell directory); image built from that commit; record source SHA, binary SHA-256 (`binary.sha256`) and OCI digest separately |
-| argv | `cd research/frobenius_msweep_20261027/g5-propT-census && G5_MAX_CPU_MIN=400 ./run_cells.sh 4` |
+| argv (array, no shell) | `["/bin/bash", "research/frobenius_msweep_20261027/g5-propT-census/run_cells.sh", "4"]` with the working directory at the checkout root (the script locates itself, so any working directory inside the checkout also works) |
+| env | `G5_MAX_CPU_MIN=400`; `G5_CHECKPOINT_STAMP=<the single line of .resume/.last-push after the session gate passed>` (non-secret: commit hash, UTC stamp, S3 prefix; the driver aborts with exit 3 if empty and records it in `commit.txt`); `ISOLAB_RESULTS_URI` is set by Iso Lab |
 | resources | 4 vCPU (the `4` is the number of parallel jobs, equal to the vCPUs), 2 GiB memory (jobs stay below 300 MB), 2 GiB disk (build 100 MB, reports below 50 MB) |
-| image needs | Rust stable with cargo, bash, awk, bc, git, coreutils; `scripts/checkpoint.sh gate` must pass inside the job (the driver calls it unconditionally and has no bypass); the committed `Cargo.lock` must be present in the checkout |
+| image needs | a git checkout of the commit **with its `.git` directory** (the driver runs `git rev-parse HEAD`, `git status --porcelain` and `HEAD:<tree>`), Rust stable with cargo and rustc **>= 1.78**, bash, awk, tar, xz, sha256sum, coreutils, and the `aws` CLI for the upload; the committed `Cargo.lock` must be present. No checkpoint gate and no credential for it is needed or allowed in the job |
+| outputs kept | on every exit (success, abort or failure) the driver writes `driver_exit.txt`, packs `reports/run-<UTC>/` into a deterministic `run-<UTC>.tar.xz` with `run-<UTC>.tar.xz.sha256` in `$ISOLAB_OUTPUT_DIR` (default `reports/run-<UTC>.out`), and uploads that directory and the unpacked run directory (under `run/`) to `$ISOLAB_RESULTS_URI` with `aws s3 cp --recursive`; an upload failure exits 90. `/work` is temporary, so nothing else retains the evidence |
 | deadline | 3 hours from submission (expected 10 to 25 minutes; the pre-flight aborts above `G5_MAX_CPU_MIN`) |
 | acceptance | `reports/run-<UTC>/summary.md` exists; its section 0 shows every job complete or CELL_NOT_RUN; "Abort conditions" says none triggered; `exit_*.txt` are 0 or 2 |
-| retrieval | the whole `reports/run-<UTC>/` directory as one archive with its SHA-256 (section 6) |
+| retrieval | download the archive and `.sha256` from `$ISOLAB_RESULTS_URI`, verify the hash, unpack into `reports/` of a checkout (section 6) |
 
 If the image or build route is unavailable, report that instead of running a different experiment.
 
-## 2. Preconditions (the gate is not bypassed anywhere in this cell)
+## 2. Preconditions (the session passes the gate before submitting; the job never runs it)
 
-1. Token available as in section 0; `scripts/checkpoint.sh init`, fill `.resume/RESUME.md` (all sections),
-   `scripts/checkpoint.sh push`, then `scripts/checkpoint.sh gate` must exit 0.
+1. In the session: token available as in section 0; `scripts/checkpoint.sh init`, fill `.resume/RESUME.md` (all sections),
+   `scripts/checkpoint.sh push`, then `scripts/checkpoint.sh gate` must exit 0. Then read the stamp for the job env:
+   `G5_CHECKPOINT_STAMP="$(cat .resume/.last-push)"` (do this in the same shell that submits; it holds no secret).
 2. Conductor: `conductor check --summary "G5 Proposition T / Sigma census run" --scope path:research/frobenius_msweep_20261027/g5-propT-census`
    (not done in preparation).
 3. Freeze the protocol: write `protocol.json` from `PROTOCOL.md` (cells from `g5census cells`, arms, controls, the decision rule of
@@ -53,20 +57,23 @@ If the image or build route is unavailable, report that instead of running a dif
    preparation.** The SHA-256 of `PROTOCOL.md`, `RUN_CARD.md`, `run_cells.sh`, `Cargo.lock` and every source and test file is
    recorded by the driver in `inputs.sha256`, so a post-freeze edit is visible.
 4. Commit the cell directory (clean tree). `target/` is ignored; the driver builds into `$TMPDIR/g5census-target`.
-5. `cargo test --release --locked` (30 tests: 25 in `tests/identities.rs`, 5 in `tests/pipeline.rs`) passes on the exact binary
+5. `cd /home/user/crypto/research/frobenius_msweep_20261027/g5-propT-census && cargo test --release --locked` (31 tests: 25 in `tests/identities.rs`, 6 in `tests/pipeline.rs`) passes on the exact binary
    that runs; `run_cells.sh` runs it first. A test failure aborts.
 
 ## 3. Run (single entry point) and what it does, in order
 
-    cd /home/user/crypto/research/frobenius_msweep_20261027/g5-propT-census
-    G5_MAX_CPU_MIN=400 ./run_cells.sh 4
+On Iso Lab the entry point is the argv of section 1. Locally (not the frozen route), from a fresh shell in a clean checkout:
+
+    cd /home/user/crypto && G5_CHECKPOINT_STAMP="$(cat .resume/.last-push)" G5_MAX_CPU_MIN=400 \
+      bash research/frobenius_msweep_20261027/g5-propT-census/run_cells.sh 4
 
 | phase | content | stops when |
 |---|---|---|
-| 0 | gate; clean-tree check (exit 3); `cargo test`; `cargo build --release --locked`; `commit.txt`, `toolchain.txt`, `inputs.sha256`, `binary.sha256`, `host.txt`, `plan.tsv` (a n m l reps est_ops), `plan_notes.txt`; **pre-flight**: one `--reps 1` call per curve on its most expensive planned cell plus one propt and one rank call, on scratch output in `preflight/`, ns per planning-unit operation and a projected CPU-minute total | projection above `G5_MAX_CPU_MIN` (exit 4) |
+| 0 | stamp check and clean-tree check (exit 3); `cargo test`; `cargo build --release --locked`; `commit.txt`, `toolchain.txt`, `inputs.sha256`, `binary.sha256`, `host.txt`, `plan.tsv` (a n m l reps est_ops), `plan_notes.txt`; **pre-flight**: one `--reps 1` call per curve on its most expensive planned cell plus one propt and one rank call, on scratch output in `preflight/`, ns per planning-unit operation and a projected CPU-minute total | projection above `G5_MAX_CPU_MIN` (exit 4) |
 | 1 | the 28 Proposition T cells, then `g5census gate` (every T cell must hold and every control must detect) | gate fails (exit 5, `summary.md` written, the expensive cells are NOT launched) |
 | 2 | 20 rank cells, then 54 overlap cells (largest first), `xargs -P` with exit codes kept in `exit_<kind>_a.._n.._m.._l...txt` and logs in `log_*.txt` | never (a failing cell is recorded) |
 | 3 | `g5census analyze`: reconciliation of planned versus present, decision rule, abort conditions | |
+| exit | `finish` trap: archive, sha256, upload (above) | upload failure (exit 90) |
 
 Expected wall time on 4 vCPU: 7 to 20 minutes (25 to 60 CPU minutes; plausible range 8 to 120; per-operation cost not measured).
 Memory below 300 MB per job.
@@ -81,6 +88,8 @@ arms across directories). Arms per kind:
 | `g5census propt` | koblitz, wrongdir, ordinary (+ stable at n = 17) | main, aa (blocks of 500 trials) |
 | `g5census overlap` | poly (1 instance), stable (n = 17, l = 8, 2 instances), rand, rset, orbunion, tuned; every base measured with Frobenius, null, null2 and planted multipliers | main, aa |
 | `g5census rank` | rand, tuned | main, aa |
+
+The following is ONE block: run it as a whole in a single fresh shell (it sets `CARGO_TARGET_DIR`, `BIN` and `RUN` itself and needs nothing from an earlier shell):
 
     cd /home/user/crypto/research/frobenius_msweep_20261027/g5-propT-census
     export CARGO_TARGET_DIR=${TMPDIR:-/tmp}/g5census-target; cargo build --release --locked

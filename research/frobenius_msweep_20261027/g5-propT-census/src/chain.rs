@@ -96,7 +96,15 @@ pub fn member(f: &Fq, b: u32, xr: u32, xs: &[u32]) -> bool {
 /// Plant a chain solution: choose the auxiliaries along the chain (depth-first with random root order and
 /// backtracking) and return (x_R, aux) with the chain satisfied, or None if no branch survives. Any b != 0.
 pub fn plant(f: &Fq, b: u32, xs: &[u32], rng: &mut crate::rng::Rng) -> Option<(u32, Vec<u32>)> {
-    fn rec(f: &Fq, b: u32, xs: &[u32], i: usize, prev: u32, aux: &mut Vec<u32>, rng: &mut crate::rng::Rng) -> Option<u32> {
+    fn rec(
+        f: &Fq,
+        b: u32,
+        xs: &[u32],
+        i: usize,
+        prev: u32,
+        aux: &mut Vec<u32>,
+        rng: &mut crate::rng::Rng,
+    ) -> Option<u32> {
         let m = xs.len();
         let cands: Vec<u32> = match roots(f, b, prev, xs[i]) {
             Roots::None | Roots::All => return None,

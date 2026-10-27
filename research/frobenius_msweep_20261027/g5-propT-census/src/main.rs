@@ -1,16 +1,23 @@
 use g5_propt_census::{analyze, run};
 
 fn arg(args: &[String], k: &str) -> Option<String> {
-    args.iter().position(|a| a == k).and_then(|i| args.get(i + 1).cloned())
+    args.iter()
+        .position(|a| a == k)
+        .and_then(|i| args.get(i + 1).cloned())
 }
 
 fn num<T: std::str::FromStr>(args: &[String], k: &str) -> T {
-    arg(args, k).unwrap_or_else(|| panic!("missing {k}")).parse::<T>().unwrap_or_else(|_| panic!("bad value for {k}"))
+    arg(args, k)
+        .unwrap_or_else(|| panic!("missing {k}"))
+        .parse::<T>()
+        .unwrap_or_else(|_| panic!("bad value for {k}"))
 }
 
 fn opts(args: &[String]) -> run::RunOpts {
     run::RunOpts {
-        seed: arg(args, "--seed").map(|s| s.parse().unwrap()).unwrap_or(run::SEED_DEFAULT),
+        seed: arg(args, "--seed")
+            .map(|s| s.parse().unwrap())
+            .unwrap_or(run::SEED_DEFAULT),
         reps: arg(args, "--reps").map(|s| s.parse().unwrap()),
         out: arg(args, "--out").expect("missing --out"),
     }

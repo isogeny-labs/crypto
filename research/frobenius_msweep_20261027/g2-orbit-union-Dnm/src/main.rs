@@ -9,7 +9,9 @@ use g2_orbit_union_dnm::plan::{cells, plan_row, MAX_LEFT, NT, NV};
 use g2_orbit_union_dnm::runner::{run_cell, Cfg, Row, HEADER};
 
 fn arg(args: &[String], k: &str) -> Option<String> {
-    args.iter().position(|a| a == k).map(|i| args[i + 1].clone())
+    args.iter()
+        .position(|a| a == k)
+        .map(|i| args[i + 1].clone())
 }
 
 fn main() {
@@ -36,7 +38,9 @@ fn main() {
             let a: u32 = arg(&args, "--a").expect("--a").parse().unwrap();
             let n: u32 = arg(&args, "--n").expect("--n").parse().unwrap();
             let m: usize = arg(&args, "--m").expect("--m").parse().unwrap();
-            let l: usize = arg(&args, "--l").map(|v| v.parse().unwrap()).expect("--l (frozen cells are listed by `g2dnm cells`)");
+            let l: usize = arg(&args, "--l")
+                .map(|v| v.parse().unwrap())
+                .expect("--l (frozen cells are listed by `g2dnm cells`)");
             let cfg = Cfg {
                 a,
                 n,
@@ -44,7 +48,9 @@ fn main() {
                 l,
                 nv: arg(&args, "--nv").map(|v| v.parse().unwrap()).unwrap_or(NV),
                 nt: arg(&args, "--nt").map(|v| v.parse().unwrap()).unwrap_or(NT),
-                seed: arg(&args, "--seed").map(|v| v.parse().unwrap()).unwrap_or(20261027),
+                seed: arg(&args, "--seed")
+                    .map(|v| v.parse().unwrap())
+                    .unwrap_or(20261027),
                 arms: arg(&args, "--arms")
                     .map(|v| v.split(',').map(|s| s.to_string()).collect())
                     .unwrap_or_else(|| ARMS.iter().map(|s| s.to_string()).collect()),
@@ -57,7 +63,10 @@ fn main() {
             writeln!(fh, "{HEADER}").unwrap();
             run_cell(&cfg, |r: &Row| {
                 writeln!(fh, "{}", r.to_tsv()).unwrap();
-                eprintln!("a={} n={} m={} l={} arm={} vd={} total={} ms={:.0}", r.a, r.n, r.m, r.l, r.arm, r.vd, r.total, r.ms);
+                eprintln!(
+                    "a={} n={} m={} l={} arm={} vd={} total={} ms={:.0}",
+                    r.a, r.n, r.m, r.l, r.arm, r.vd, r.total, r.ms
+                );
             });
             eprintln!("wrote {path}");
         }

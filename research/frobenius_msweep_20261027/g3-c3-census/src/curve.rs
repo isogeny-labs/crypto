@@ -127,7 +127,14 @@ impl<'a> Oracle<'a> {
             cur ^= vbasis[i.trailing_zeros() as usize]; // Gray code
             velems.push(cur);
         }
-        Oracle { f, b, nb, vmem: VMember::new(f.n, g), velems, d2: None }
+        Oracle {
+            f,
+            b,
+            nb,
+            vmem: VMember::new(f.n, g),
+            velems,
+            d2: None,
+        }
     }
 
     #[inline]
@@ -139,7 +146,8 @@ impl<'a> Oracle<'a> {
     fn roots_in_third(&self, p: u64, q: u64) -> Vec<u64> {
         let f = self.f;
         let bb = f.mul(p, q);
-        f.solve_quadratic(f.sq(p ^ q), bb, f.sq(bb) ^ self.b).unwrap_or_default()
+        f.solve_quadratic(f.sq(p ^ q), bb, f.sq(bb) ^ self.b)
+            .unwrap_or_default()
     }
 
     /// Number of ORDERED pairs (x1,x2) in V^2 with S3(x1,x2,xr)=0.
@@ -213,7 +221,13 @@ mod tests {
     fn group_law_and_s3_identity_exact() {
         // S3(x1,x2,x(P1+P2)) = 0 for random points: validates the Semaev formula
         // against the group law (exact identity, both curves a=0,1, ordinary b).
-        for &(n, a, b) in &[(7u32, 0u64, 1u64), (7, 1, 1), (13, 0, 1), (13, 1, 1), (13, 1, 2)] {
+        for &(n, a, b) in &[
+            (7u32, 0u64, 1u64),
+            (7, 1, 1),
+            (13, 0, 1),
+            (13, 1, 1),
+            (13, 1, 2),
+        ] {
             let f = Field::new(n);
             let c = Curve { f: &f, a, b };
             let mut rng = Rng(12345 + n as u64 + a);
@@ -259,7 +273,11 @@ mod tests {
         let c0 = Curve { f: &f, a: 0, b: 1 };
         let c1 = Curve { f: &f, a: 1, b: 1 };
         for x in 1..128u64 {
-            assert_ne!(c0.is_abscissa(x), c1.is_abscissa(x), "twist complement, x={x}");
+            assert_ne!(
+                c0.is_abscissa(x),
+                c1.is_abscissa(x),
+                "twist complement, x={x}"
+            );
         }
     }
 

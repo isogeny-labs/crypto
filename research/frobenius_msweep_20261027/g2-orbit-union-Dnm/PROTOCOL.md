@@ -148,7 +148,9 @@ Statistics (pooled classes; analysis in `src/stats.rs`, frozen before data):
   Monte-Carlo error of about 3.5 percent, which fattens the tail by roughly a factor 1.3 at z = 4.
 * contrast z (rev 3) = ((rho - m0)_frob - (rho - m0)_frobperm) / sqrt(SE_frob^2 + SE_frobperm^2): the DIRECT frob-versus-frobperm test.
   The arms share V, so under a shared nuisance their rhos covary positively and this z is conservative (under independent nulls it is exact);
-  its power is lower than z(frob) by about sqrt(2).
+  (amended 2026-10-27, see the amendment section: the earlier claim that its power is lower than z(frob) by only about sqrt(2) is WITHDRAWN. rho is bounded by 1; when a shared class-profile
+  nuisance already makes rho(frobperm) large, rho(frob) saturates and this contrast has no power. Synthetic demonstration by the reviewer at 3.3e5 per class per half: shared nuisance 1 percent with
+  a frob-only effect of 3 percent gives z(frob) 15.8, z(frobperm) 15.4, contrast 0.3.)
 * transfer = share of half-B yield in the top 10 percent classes selected on half A, divided by their null share (1 = none).
 * phi ratio (only in the low-D branch) = phi(frob)/max(phi(rsub), phi(rset), phi(frobperm)), 400 bootstrap resamples of the V draws within each arm, 95 percent interval.
   The max over three noisy controls biases the ratio DOWN, which makes CONCENTRATED_VS_CONTROLS harder, not easier.
@@ -242,6 +244,9 @@ Campaign-level reading, fixed now (tiny-block cells excluded from all tallies):
   (rev 3: the l = 2 cell is a tiny-block cell, printed but not used; the clip at 0 cannot make the test vacuous because l = 5 must itself be flagged.) A
   Frobenius-twisted decomposition (Q and sigma^d Q both landing in neighbouring blocks automatically) gives a class-specific excess of relative size about
   2^-l (12 percent at l = 3, 3 percent at l = 5, ratio 1/4); an excess that falls like that is read as the toy-size artefact, not a lever (status FALLING_OR_ABSENT).
+  (amended 2026-10-27) FALLING_OR_ABSENT is assigned only when the l = 5 verdict is CONCENTRATED, CONCENTRATED_WEAK, UNIFORM or UNRESOLVED. If the l = 5 verdict is INSTRUMENT_FAIL,
+  NUISANCE_REPLICABLE, REPLICABLE_NOT_SEPARATED, INCOMPLETE, NO_DATA or CONCENTRATED_VS_CONTROLS the ladder is NOT_EVALUABLE: that is a failure of the instrument or of specificity
+  resolution, not decay of the effect, and is never read as "toy-size artefact".
   rel. excess has no confidence interval; at mu of 2 to 21 per class (l = 2) it is noisy, which is why only l = 3 and l = 5 are used.
   Only then does the "visit only a few classes" idea survive; the next step would be the SAT cell restricted to those classes.
 * NO LEVER FROM YIELD: no CONCENTRATED or CONCENTRATED_WEAK cell and UNIFORM in every rho-resolved non-tiny cell. Cost-neutrality
@@ -251,6 +256,11 @@ Campaign-level reading, fixed now (tiny-block cells excluded from all tallies):
   for the mod-4 cause.)
 * Pre-registered expectation (rev 3): if a Frobenius-twisted excess of relative size 2^-l exists it is replicable and frob-specific at counts of 1e3 to 3e5 per class, so the
   likely labels on l <= 3 cells are CONCENTRATED(_WEAK); the campaign reading then rests on the ladder status, not on a single cell label.
+* (amended 2026-10-27) Saturation rule: when the frob yield is at least 10000 per class per half (integer floor of total frob yield / (2 D) >= 10000; `report::SATURATION_COUNT`),
+  NUISANCE_REPLICABLE and REPLICABLE_NOT_SEPARATED mean "Frobenius-specificity NOT RESOLVABLE", never a negative: the cell note says so and `verdicts.tsv` column
+  `specificity_resolvable` is false. The l = 5 cells at (13,4,5) carry about 3.3e5 per class per half and fall in this regime. The contrast resolves specificity only while the shared
+  nuisance is below about 1.3 times the Poisson noise sd of a pooled-half class (about 0.2 percent at l = 5). No paired-difference statistic was implemented (the reviewer's
+  alternative); this is the pre-registered option B.
 * Mixed or UNRESOLVED-dominated: report as such. The 26 low-D cells cannot establish uniformity.
 geom, skew and all other arms are descriptive; no verdict is drawn from geom. Unit tests pin each verdict on planted fixtures
 (`analysis_pipeline_pins_verdicts_on_planted_fixtures`, `contrast_decides_...`, `instrument_fail_on_gauge_audit_zero_missed_skew_and_incomplete_cells`,
@@ -343,3 +353,13 @@ Revision 3 (2026-10-27, second independent review; nothing has been run, so the 
 5. l-ladder persistence criterion coded and redefined on l = 3 versus l = 5 (the l = 2 cell is tiny and excluded); a zero or undefined value cannot satisfy it.
 6. INCOMPLETE verdict for arms short of NV rows; truncated lines skipped and reported; summary.md carries the section 12 disclosures and the "no 5a band" statement.
 7. Not changed (stated, not fixed): no decomposition certificate is emitted (section 2); the route question is left to the experiment director (section 11); rows files were not hashed in revision 2; `run_cells.sh` now writes `rows.sha256`).
+
+## 14. Amendment 2026-10-27 (round-2 review; nothing has been run, the freeze is still open)
+
+1. Ladder (blocking defect 1): `report::ladder_status` returns NOT_EVALUABLE unless the l = 5 verdict is CONCENTRATED, CONCENTRATED_WEAK, UNIFORM or UNRESOLVED. Before this, any other l = 5
+   verdict (INSTRUMENT_FAIL, NUISANCE_REPLICABLE, REPLICABLE_NOT_SEPARATED, INCOMPLETE, NO_DATA) printed FALLING_OR_ABSENT, e.g. l = 3 CONCENTRATED at rel. excess 0.3938 and l = 5 INSTRUMENT_FAIL at 0.3945.
+   Test: `ladder_l5_instrument_failures_are_not_evaluable_not_falling`.
+2. Contrast resolution (blocking defect 2, option B): the sqrt(2) power claim of section 5 is withdrawn; the saturation limit and the pre-registered reading are in section 7
+   (`SATURATION_COUNT` = 10000 per class per half, integer comparison; verdicts.tsv gains column `specificity_resolvable`; the cell note says "SPECIFICITY NOT RESOLVABLE").
+   Verdict labels are unchanged. Test: `specificity_saturation_threshold_is_an_integer_count_comparison`.
+3. Not changed (caveats, not in scope): the positive-control power sentence of section 6, the UNIFORM effect-size figure and the lever-candidate combination rule are as in revision 3.
