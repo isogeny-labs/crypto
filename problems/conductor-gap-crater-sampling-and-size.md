@@ -101,6 +101,17 @@ obligations in [the existing problem record](conductor-gap-upper-floor-and-cost.
   seeds, fixed block randomization and explicit zero executed solves.
   Exact models/maps, measurement execution and independent replay remain
   unimplemented; a passing allocation audit leaves preflight blocked.
+- **Development-validation blockers:** The preflight's own 12 tests and
+  complete allocation audit pass, but repository-wide validation is not
+  green. [Exact evidence](../research/conductor_gap_preflight_20261027/VALIDATION_CONTEXT.md)
+  records four failures in unchanged parent-library code (legacy weighted
+  comparison identity and three unsupported hyperelliptic-parameter cases),
+  an inherited gate-verdict schema disagreement, unconfirmed artifact
+  read-back without a configured AWS identity, and a full library run with
+  no final completion record. Clear these with a complete applicable
+  current-head validation run, compatible evidence/gate inputs and confirmed
+  artifact hydration. Doing so would unblock development validation, not
+  establish the scientific equivalence or discharge missing models/maps.
 - **Controls:** Same-point generator/target transport, fixed subgroup/method/
   budgets, separate solver seeds, grouped inference, complete retention and
   replay; counted work is primary and L0 timing stays descriptive.

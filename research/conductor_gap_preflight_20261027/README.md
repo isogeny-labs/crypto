@@ -18,7 +18,7 @@ retains those requirements.
 | Solver invocations attempted by this tool | **0** |
 
 These are exact prospective allocation counts, not statistical observations.
-All 12 native example tests pass, including deliberate target/seed reuse,
+All 12 native example tests pass on the actual parent branch, including deliberate target/seed reuse,
 incomplete cohorts, modified order, invalid readiness claims and overwrite
 attempts. A separate `jq` pass checks the allocation's counts, per-class
 target uniqueness/range and global seed/block uniqueness. The retained
@@ -39,7 +39,7 @@ Repository-wide validation has separate limits recorded in
 - [Allocation audit](checks/allocation-audit.json),
   [separate count check](checks/jq-allocation-counts.json),
   [blocked readiness receipt](checks/readiness.json),
-  [example tests](checks/example-tests.md), and
+  [current-base example tests](checks/example-tests-current-base.md), and
   [parameter re-verification](checks/parameter-verification.json).
 
 From the repository root:
