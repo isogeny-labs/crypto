@@ -437,6 +437,27 @@ Component speed-up, class engineering: the dense linear stage against sparse FGL
 | 101 | 1 | 53 | 287.8 | 224.4 | 1.28 | 194 | 151 |
 | 101 | 2 | 50 | 466.3 | 365.5 | 1.28 | 373 | 293 |
 
+## Linear stage after F4 across Gröbner-basis corpora
+
+Component speed-up, class engineering, in median wall time, single thread (host B): from a monic grevlex F4 basis to every checked F_p point, on 253 systems in five families (`research/postgb_linear_stage_20261026/`, [report](research/postgb_linear_stage_20261026/REPORT.pdf)). Leader: `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp–Massey, gcd(f, x^p − x) roots, rational univariate read-out, AVX-512/AVX2 kernels), now the default `JV_LIN`. Incumbent: sparse FGLM (the section above). Every arm returned the same solution set on every system; fast gave up (and fell back to dense) on 1. Counted multiplications differ by 0.76–1.90× and are not ranked. It moves no row of tables A–C. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+
+| family | systems | δ | sparse ms | fast ms | **sparse ÷ fast** [95%] | dense ÷ fast | portable fast | host A | counted sparse ÷ fast |
+|:--|--:|--:|--:|--:|:--|--:|--:|--:|:--|
+| jv-nagao | 48 | 64 | 3.055 | 0.3953 | **7.60** [7.43, 7.77] | 17.9 | 6.31 | 4.01 | 0.82–1.10 |
+| gaudry-s4 | 24 | 64 | 2.212 | 0.3179 | **7.13** [6.79, 7.48] | 14.6 | 6.75 | 3.79 | 0.84–1.22 |
+| gaudry-d4 | 24 | 512 | 313 | 16.5 | **17.76** [13.69, 20.49] | 109.3 | 8.35 | 8.14 | 0.80–1.36 |
+| gaudry-s5 | 4 | 4096 | 2.297e+05 | 4849 | **45.51** [42.77, 47.19] | — | 9.63 | — | 0.76–0.88 |
+| dense | 153 | 32–1024 | 104.1 | 4.64 | **19.98** [18.33, 21.79] | 60.6 | 11.10 | 8.75 | 0.92–1.90 |
+
+Inside the IC run (`jv_cover --exp dlp`, same seeds and relations, `JV_LIN=sparse` → `fast`, same-process rho; every log verified). S rises about 3% in the counted unit; S/rho is the distance remaining.
+
+| p | seed | relations | linear stage s | lin ÷ | S | S/rho |
+|---:|---:|---:|:--|--:|:--|:--|
+| 53 | 1 | 31 | 64.8 → 12.8 | **5.07×** | 731.6 → 754.4 | 664 → 685 |
+| 53 | 2 | 33 | 29.5 → 6.2 | **4.79×** | 328.8 → 338.6 | 286 → 294 |
+| 101 | 1 | 53 | 162.0 → 22.6 | **7.16×** | 224.4 → 229.8 | 151 → 155 |
+| 101 | 2 | 50 | 220.7 → 36.5 | **6.05×** | 365.5 → 374.4 | 293 → 300 |
+
 ## Algebraic-decomposition IC ladder (linear two-summand S3), outside tables A–C
 
 Owner criterion (2026-10-24): relations come from solving summation-polynomial systems over an algebraically defined factor base, with no table collisions. Factor base x ∈ span{1..z^(d−1)}; the Weil descent of S3 is linear in the symmetric unknowns (x1+x2, x1x2). One-target cold solves, every scalar verified, beside same-process strong rho (`research/ic_m2_linear_ladder_20261024/`). Fitted slope of log2(trials) per bit of n: 0.647 [0.639, 0.655] (wall 0.717); the F4 algebraic arm's solver work grows at 1.079. The IC ÷ rho column is the distance remaining.
@@ -685,6 +706,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
+- `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `66f4f1225ac787fa…`
 - `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json` — sha256 `02427944511bd86f…`
@@ -730,7 +752,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `46d4060fafd71863…`
+- `docs/curves/registry.json` — sha256 `e7e8cd2ce2570e6e…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`

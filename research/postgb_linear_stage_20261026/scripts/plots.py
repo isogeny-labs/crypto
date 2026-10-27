@@ -75,8 +75,8 @@ ax.set_ylabel("sparse (incumbent) median wall time (ms)")
 ax.set_title(f"Every system of the corpus ({len(d['systems'])}), host B", fontsize=9)
 ax.legend(fontsize=6.5)
 ax.grid(alpha=0.3, which="both")
-fig.text(0.01, 0.005, "Above the 1× line: fast is faster. The isolated point on the 1× line family "
-         "gaudry-d4 is p97-4 (x_n not separating; fast fell back to dense).", fontsize=5)
+fig.text(0.01, 0.005, "Above the 1× line: fast is faster. The gaudry-d4 point near the 1× line is "
+         "p97-4 (x_n not separating; fast fell back to dense).", fontsize=5)
 save(fig, "per_system")
 
 # 3. dense family: speed-up against δ (P2).

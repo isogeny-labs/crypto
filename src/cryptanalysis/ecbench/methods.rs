@@ -4207,6 +4207,7 @@ fn solve_koblitz_descent(
             gae: ph.ops.gae(),
             wall_ns: Some(ph.wall_ns),
             native: koblitz_descent::native_of(&ph.ops),
+            work_native: BTreeMap::new(),
         })
         .collect();
     let total_gae: f64 = phases.iter().map(|p| p.gae).sum();

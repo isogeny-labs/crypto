@@ -1949,14 +1949,16 @@ pub enum LinMode {
     Fast,
 }
 
-/// `JV_LIN=dense|l1a|sparse` (default sparse), read once.
+/// `JV_LIN=dense|l1a|sparse|fast` (default fast since
+/// research/postgb_linear_stage_20261026; `sparse` is the earlier default),
+/// read once.
 fn lin_mode() -> LinMode {
     static MODE: OnceLock<LinMode> = OnceLock::new();
     *MODE.get_or_init(|| match std::env::var("JV_LIN").as_deref() {
         Ok("dense") => LinMode::Dense,
         Ok("l1a") => LinMode::L1a,
-        Ok("fast") => LinMode::Fast,
-        _ => LinMode::Sparse,
+        Ok("sparse") => LinMode::Sparse,
+        _ => LinMode::Fast,
     })
 }
 
