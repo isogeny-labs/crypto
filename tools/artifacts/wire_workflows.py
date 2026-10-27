@@ -148,19 +148,29 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
 
 
 def add_sparse_pattern(block: list[str], indent: str) -> list[str]:
-    """Make a sparse checkout also fetch tools/artifacts."""
+    """Make a sparse checkout also fetch tools/artifacts and .artifacts (the
+    store config the pull step reads; without it the remote is empty)."""
+    cone = not any("sparse-checkout-cone-mode: false" in x for x in block)
+    want = [("tools/artifacts", "/tools/artifacts/", ("tools", "/tools/")),
+            (".artifacts", "/.artifacts/", ())]
     for k, b in enumerate(block):
+        scalar = re.match(rf"^({indent}    sparse-checkout: )(?!\|)(\S.*)$", b)
+        if scalar:  # one pattern on the key line: rewrite as a block list
+            pad = indent + "      "
+            block = block[:k] + [f"{scalar.group(1)}|", pad + scalar.group(2)] + block[k + 1:]
+            b = block[k]
         if re.match(rf"^{indent}    sparse-checkout: \|", b):
-            cone = not any("sparse-checkout-cone-mode: false" in x for x in block)
             items = []
             n = k + 1
             while n < len(block) and len(block[n]) - len(block[n].lstrip()) > len(indent) + 4:
                 items.append(block[n])
                 n += 1
-            if any("tools/artifacts" in x or x.strip() in ("/*", "tools", "/tools/") for x in items):
+            if any(x.strip() == "/*" for x in items):
                 return block
             pad = (items[0][: len(items[0]) - len(items[0].lstrip())]) if items else indent + "      "
-            return block[:n] + [pad + ("tools/artifacts" if cone else "/tools/artifacts/")] + block[n:]
+            extra = [pad + (c if cone else nc) for c, nc, covers in want
+                     if not any(c in x or x.strip() in covers for x in items)]
+            return block[:n] + extra + block[n:]
     return block
 
 

@@ -296,6 +296,37 @@ class WorkflowWiringPaths(unittest.TestCase):
         )
 
 
+class WorkflowSparsePatterns(unittest.TestCase):
+    """The pull step needs tools/artifacts and the .artifacts config in a sparse checkout."""
+
+    def test_block_list_gets_tools_and_config(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout-cone-mode: false",
+                 "          sparse-checkout: |",
+                 "            /docs/x/"]
+        out = wire_workflows.add_sparse_pattern(block, "      ")
+        self.assertEqual(out[-3:], ["            /docs/x/", "            /tools/artifacts/", "            /.artifacts/"])
+
+    def test_scalar_pattern_becomes_a_list(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout: taskq/deploy/eks-karpenter"]
+        out = wire_workflows.add_sparse_pattern(block, "      ")
+        self.assertEqual(out[2:], ["          sparse-checkout: |",
+                                   "            taskq/deploy/eks-karpenter",
+                                   "            tools/artifacts",
+                                   "            .artifacts"])
+
+    def test_existing_patterns_are_not_duplicated(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout: |",
+                 "            tools/artifacts",
+                 "            .artifacts"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(block, "      "), block)
+
+
 class S3Argv(unittest.TestCase):
     def setUp(self):
         cfg = artifacts.Config(root=Path("."), remote="s3://bucket/store", endpoint=None, read_url=None,
