@@ -75,7 +75,11 @@ fn collect(reps: usize, mut f: impl FnMut() -> BTreeMap<&'static str, f64>) -> V
             acc.entry(k).or_default().push(v);
         }
     }
-    Value::Object(acc.into_iter().map(|(k, v)| (k.to_string(), stat(&v))).collect())
+    Value::Object(
+        acc.into_iter()
+            .map(|(k, v)| (k.to_string(), stat(&v)))
+            .collect(),
+    )
 }
 
 fn time_ns(iters: u64, mut f: impl FnMut(u64)) -> f64 {
@@ -198,7 +202,10 @@ fn rho_batched_once(inst: &BinCurve, seed: u64, steps: u64) -> BTreeMap<&'static
     use crate::cryptanalysis::ic_wide::{rho_negation_batched, BatchedRhoParams};
     let c = &inst.curve;
     let target = target_of(inst, 0x1234_5678_9abc_def1 ^ seed as u128);
-    let par = BatchedRhoParams { walks: 256, dp_bits: 0 };
+    let par = BatchedRhoParams {
+        walks: 256,
+        dp_bits: 0,
+    };
     let t = Instant::now();
     let res = if let Ok(r64) = u64::try_from(inst.r) {
         rho_negation_batched::<u64>(c, inst.generator, target, r64, seed, steps, par).0
@@ -261,14 +268,20 @@ fn rho_block(
         let long = once(seed, steps);
         let (ns_step, ns_fq) = derived(&long, "fq_ops_total");
         acc.entry("ns_per_step_whole").or_default().push(ns_step);
-        acc.entry("ns_per_counted_fq_op_whole").or_default().push(ns_fq);
+        acc.entry("ns_per_counted_fq_op_whole")
+            .or_default()
+            .push(ns_fq);
         let dw = long["wall_ns"] - short["wall_ns"];
         let ds = long["steps"] - short["steps"];
         let dq = long["fq_ops_total"] - short["fq_ops_total"];
         if ds > 0.0 && dq > 0.0 && dw > 0.0 {
             acc.entry("ns_per_step_marginal").or_default().push(dw / ds);
-            acc.entry("ns_per_counted_fq_op_marginal").or_default().push(dw / dq);
-            acc.entry("counted_fq_ops_per_step_marginal").or_default().push(dq / ds);
+            acc.entry("ns_per_counted_fq_op_marginal")
+                .or_default()
+                .push(dw / dq);
+            acc.entry("counted_fq_ops_per_step_marginal")
+                .or_default()
+                .push(dq / ds);
         }
         acc.entry("counted_fq_ops_per_step_whole")
             .or_default()
@@ -283,7 +296,10 @@ fn rho_block(
     Value::Object(o)
 }
 
-fn ic_method(id: &str, trials: u64) -> Result<crate::cryptanalysis::ecbench::methods::ResolvedMethod, String> {
+fn ic_method(
+    id: &str,
+    trials: u64,
+) -> Result<crate::cryptanalysis::ecbench::methods::ResolvedMethod, String> {
     resolve(&MethodSpec {
         id: id.into(),
         params: BTreeMap::from([
@@ -347,11 +363,17 @@ pub fn run(o: &Opts) -> Result<Value, String> {
         .ok();
     // One solver thread: the unit price is per CPU-second of one core, not
     // of a wake-up pattern on a loaded host.  (Ignored if a pool exists.)
-    let _ = rayon::ThreadPoolBuilder::new().num_threads(1).build_global();
+    let _ = rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build_global();
     let mut per_m = serde_json::Map::new();
     for &m in &o.ms {
         let cof = if m >= 15 { 2 } else { 16 };
-        let spec = CurveSpec::F2m4Torsion { m, seed: o.seed, max_cofactor: cof };
+        let spec = CurveSpec::F2m4Torsion {
+            m,
+            seed: o.seed,
+            max_cofactor: cof,
+        };
         let inst = spec.build()?;
         let facts = inst.facts(&spec);
         let Instance::F2m4(b) = &inst else {
@@ -382,7 +404,10 @@ pub fn run(o: &Opts) -> Result<Value, String> {
             let d = 0x0123_4567_89ab_cdefu128 % b.r;
             let q = target_of(b, d);
             let f = &b.curve.f;
-            let target = [format!("0x{:x}", f.pack(&q.x)), format!("0x{:x}", f.pack(&q.y))];
+            let target = [
+                format!("0x{:x}", f.pack(&q.x)),
+                format!("0x{:x}", f.pack(&q.y)),
+            ];
             let t0 = Instant::now();
             let mut acc: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
             let ic_reps = o.reps.min(3);
@@ -446,4 +471,3 @@ pub fn run(o: &Opts) -> Result<Value, String> {
     })
     .unwrap())
 }
-
