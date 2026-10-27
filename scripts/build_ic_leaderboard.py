@@ -831,8 +831,12 @@ def postgb_linear_stage_component() -> dict:
                      "counted": [v["counted_ratio"]["min"], v["counted_ratio"]["max"]]})
     dlp = [{"p": r["p"], "seed": r["seed"], "relations": r["relations"][1],
             "lin_s": [x / 1e3 for x in r["lin_ms"]], "lin_ratio": r["lin_ms_ratio_sparse_over_fast"],
-            "s": r["s"], "s_over_rho": r["s_over_rho"], "correct": all(r["correct"])} for r in d["dlp"]]
+            "s": r["s"], "s_over_rho": r["s_over_rho"], "s_over_rho_neg": r["s_over_rho_neg"],
+            "correct": all(r["correct"])} for r in d["dlp"]]
+    counted = [x for f in fams for x in f["counted"]]
+    s_change = [r["s"][1] / r["s"][0] - 1 for r in dlp]
     return {"families": fams, "dlp": dlp, "systems": d["gates"]["systems"],
+            "counted_range": [min(counted), max(counted)], "s_change": [min(s_change), max(s_change)],
             "gave_up": d["gates"]["fast_gave_up"],
             "predictions": {k: v["held"] for k, v in d["predictions"].items()},
             "class": "engineering", "unit": "median wall time, single thread (host B)",
@@ -2630,7 +2634,8 @@ def markdown(doc: dict) -> str:
           "Leader: `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp–Massey, gcd(f, x^p − x) roots, "
           "rational univariate read-out, AVX-512/AVX2 kernels), now the default `JV_LIN`. Incumbent: sparse FGLM "
           "(the section above). Every arm returned the same solution set on every system; fast gave up (and fell "
-          f"back to dense) on {len(pg['gave_up'])}. Counted multiplications differ by 0.76–1.90× and are not ranked. "
+          f"back to dense) on {len(pg['gave_up'])}. Counted multiplications (sparse ÷ fast "
+          f"{pg['counted_range'][0]:.2f}–{pg['counted_range'][1]:.2f}×) are reported, not ranked. "
           "It moves no row of tables A–C. " + pg["validation"], "",
           "| family | systems | δ | sparse ms | fast ms | **sparse ÷ fast** [95%] | dense ÷ fast | portable fast | host A | counted sparse ÷ fast |",
           "|:--|--:|--:|--:|--:|:--|--:|--:|--:|:--|"]
@@ -2641,12 +2646,16 @@ def markdown(doc: dict) -> str:
                  f"{'—' if f['dense_over_fast'] is None else format(f['dense_over_fast'], '.1f')} | {f['portable']:.2f} | "
                  f"{'—' if f['host_a'] is None else format(f['host_a'], '.2f')} | {f['counted'][0]:.2f}–{f['counted'][1]:.2f} |")
     L += ["", "Inside the IC run (`jv_cover --exp dlp`, same seeds and relations, `JV_LIN=sparse` → `fast`, "
-          "same-process rho; every log verified). S rises about 3% in the counted unit; S/rho is the distance remaining.", "",
-          "| p | seed | relations | linear stage s | lin ÷ | S | S/rho |", "|---:|---:|---:|:--|--:|:--|:--|"]
+          f"same-process plain and negation-map rho; every log verified). Counted S changes by "
+          f"{100 * pg['s_change'][0]:+.1f}% to {100 * pg['s_change'][1]:+.1f}%; S over the negation-map rho, the matched "
+          "§5a reference, is the distance remaining.", "",
+          "| p | seed | relations | linear stage s | lin ÷ | S | S/rho | S/rho (negation map) |",
+          "|---:|---:|---:|:--|--:|:--|:--|:--|"]
     for r in pg["dlp"]:
         L.append(f"| {r['p']} | {r['seed']} | {r['relations']} | {r['lin_s'][0]:.1f} → {r['lin_s'][1]:.1f} | "
                  f"**{r['lin_ratio']:.2f}×** | {r['s'][0]:.4g} → {r['s'][1]:.4g} | "
-                 f"{r['s_over_rho'][0]:.0f} → {r['s_over_rho'][1]:.0f} |")
+                 f"{r['s_over_rho'][0]:.0f} → {r['s_over_rho'][1]:.0f} | "
+                 f"{r['s_over_rho_neg'][0]:.0f} → **{r['s_over_rho_neg'][1]:.0f}** |")
     al = doc["algebraic_ladder"]
     st, sw = al["slope_ic_trials"], al["slope_ic_wall"]
     L += ["", "## Algebraic-decomposition IC ladder (linear two-summand S3), outside tables A–C", "",
@@ -3723,7 +3732,8 @@ def page(doc: dict, standalone: bool) -> str:
              '<code>zero_dim_la::fast_stage</code> (transposed Krylov, Berlekamp–Massey, gcd(f, x<sup>p</sup> − x) roots, '
              'rational univariate read-out, AVX-512/AVX2 kernels), now the default <code>JV_LIN</code>. Incumbent: sparse '
              'FGLM (the section above). Every arm returned the same solution set on every system; fast gave up (and fell '
-             f'back to dense) on {len(pg["gave_up"])}. Counted multiplications differ by 0.76–1.90× and are not ranked. '
+             f'back to dense) on {len(pg["gave_up"])}. Counted multiplications (sparse ÷ fast '
+             f'{pg["counted_range"][0]:.2f}–{pg["counted_range"][1]:.2f}×) are reported, not ranked. '
              f'It moves no row of tables A–C. {esc(pg["validation"])}</p>'
              '<table><thead><tr><th>family</th><th>systems</th><th>δ</th><th>sparse ms</th><th>fast ms</th>'
              '<th>sparse ÷ fast [95%]</th><th>dense ÷ fast</th><th>portable fast</th><th>host A</th>'
@@ -3736,14 +3746,16 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{f["portable"]:.2f}</td><td>{"—" if f["host_a"] is None else format(f["host_a"], ".2f")}</td>'
                  f'<td>{f["counted"][0]:.2f}–{f["counted"][1]:.2f}</td></tr>')
     P.append('</tbody></table><p>Inside the IC run (<code>jv_cover --exp dlp</code>, same seeds and relations, '
-             '<code>JV_LIN=sparse</code> → <code>fast</code>, same-process rho; every log verified). S rises about 3% '
-             'in the counted unit; S/rho is the distance remaining.</p>'
+             '<code>JV_LIN=sparse</code> → <code>fast</code>, same-process plain and negation-map rho; every log '
+             f'verified). Counted S changes by {100 * pg["s_change"][0]:+.1f}% to {100 * pg["s_change"][1]:+.1f}%; S over '
+             'the negation-map rho, the matched §5a reference, is the distance remaining.</p>'
              '<table><thead><tr><th>p</th><th>seed</th><th>relations</th><th>linear stage s</th><th>lin ÷</th>'
-             '<th>S</th><th>S/rho</th></tr></thead><tbody>')
+             '<th>S</th><th>S/rho</th><th>S/rho (negation map)</th></tr></thead><tbody>')
     for r in pg["dlp"]:
         P.append(f'<tr><td>{r["p"]}</td><td>{r["seed"]}</td><td>{r["relations"]}</td>'
                  f'<td>{r["lin_s"][0]:.1f} → {r["lin_s"][1]:.1f}</td><td><b>{r["lin_ratio"]:.2f}×</b></td>'
-                 f'<td>{r["s"][0]:.4g} → {r["s"][1]:.4g}</td><td>{r["s_over_rho"][0]:.0f} → {r["s_over_rho"][1]:.0f}</td></tr>')
+                 f'<td>{r["s"][0]:.4g} → {r["s"][1]:.4g}</td><td>{r["s_over_rho"][0]:.0f} → {r["s_over_rho"][1]:.0f}</td>'
+                 f'<td>{r["s_over_rho_neg"][0]:.0f} → <b>{r["s_over_rho_neg"][1]:.0f}</b></td></tr>')
     P.append('</tbody></table>' + gh(pg["study"], 'Study, report, run records and validation') + '</section>')
 
     al = doc["algebraic_ladder"]
