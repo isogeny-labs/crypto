@@ -308,6 +308,36 @@ def twist_cm8_transfer(ref):
         emit(f"ic.twist.cm8_transfer.{key}", d[key], date="2026-10-25",
              problem=P_IC, unit="finite audit count", better="higher",
              label="F13 finite audit; no cost or generalization", source=path)
+def fall_degree(ref):
+    """HKY last fall degree d_F of Weil-descended chained Semaev systems (unsatisfiable draws,
+    research/fall_degree_bounds_20261008, E7 onward). Counts of recorded draws only; a draw not
+    refuted at its cap is counted as censored, never as a value."""
+    base = "research/fall_degree_bounds_20261008/"
+    files = [f for f in ls(ref, base) if f.endswith(".jsonl") and (
+        f.startswith(base + "e7/E7_") or f.startswith(base + "e8/E8_")
+        or ("/out/E_" in f and (f.startswith(base + "e9/") or f.startswith(base + "e10/") or f.startswith(base + "e12/"))))]
+    draws = censored = 0
+    max_n = min_censored_n = None
+    for f in files:
+        for line in (show(ref, f) or "").splitlines():
+            if not line.startswith("{"):
+                continue
+            r = json.loads(line)
+            if r.get("solutions") != 0 or "n_vars" not in r:
+                continue
+            draws += 1
+            n = r["n_vars"]
+            max_n = n if max_n is None else max(max_n, n)
+            if r.get("d_f") is None:
+                censored += 1
+                min_censored_n = n if min_censored_n is None else min(min_censored_n, n)
+    if not draws:
+        return
+    src = base + "{e7,e8,e9,e10,e12}"
+    emit("fall_degree.draws_measured", draws, problem="fall-degree", unit="draws", label="Unsatisfiable chained Semaev draws with a recorded d_F (E7 onward)", source=src)
+    emit("fall_degree.draws_censored", censored, problem="fall-degree", unit="draws", label="Draws whose closure did not reach 1 at its cap (d_F above the cap)", source=src)
+    emit("fall_degree.max_n_vars_measured", max_n, problem="fall-degree", unit="variables", better="higher", label="Largest N with a recorded d_F draw", source=src)
+    emit("fall_degree.min_n_vars_censored", min_censored_n, problem="fall-degree", unit="variables", label="Smallest N with a draw censored above its cap", source=src)
 
 
 def main():
@@ -325,6 +355,7 @@ def main():
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
     nist_selection_exact_embedding(a.ref, a.since)
+    fall_degree(a.ref)
 
 
 if __name__ == "__main__":
