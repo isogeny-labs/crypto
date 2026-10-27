@@ -216,6 +216,17 @@ enum Cmd {
         /// (src/cryptanalysis/ecbench/f2m4_mulmod_prices.json).
         #[arg(long)]
         mulmod: bool,
+        /// Measure the whole table in one interleaved pass on this host
+        /// (src/cryptanalysis/ecbench/f2m4_onepass_prices.json): every unit,
+        /// and the three mod-r units on the code's kernel and on a Montgomery
+        /// kernel; a warm-up rep is discarded.  Degrees listed in --wide-m
+        /// are measured on a wide-order curve (rows m{m}_u128), the others
+        /// on a one-word one, all in this one process.
+        #[arg(long)]
+        onepass: bool,
+        /// With --onepass: the degrees measured on a wide-order curve.
+        #[arg(long, value_delimiter = ',')]
+        wide_m: Vec<u32>,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -1002,10 +1013,13 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             reps,
             wide,
             mulmod,
+            onepass,
+            wide_m,
             out,
         } => {
             let mut instances = serde_json::Map::new();
             for mm in m {
+                let wide = wide || (onepass && wide_m.contains(&mm));
                 // The cofactor bound of the committed sessions' workloads.
                 let cof = if mm >= 15 { 2 } else { 16 };
                 let mut s = seed;
@@ -1026,7 +1040,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     mm,
                     u64::try_from(inst.r).is_err(),
                 );
-                let t = if mulmod {
+                let t = if onepass {
+                    crypto_lib::cryptanalysis::ecbench::f2m4_price::measure_onepass(&inst, reps)?
+                } else if mulmod {
                     crypto_lib::cryptanalysis::ecbench::f2m4_price::measure_mulmod(&inst, reps)?
                 } else {
                     crypto_lib::cryptanalysis::ecbench::f2m4_price::measure(&inst, reps)?
@@ -1036,12 +1052,27 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     t["row"].as_object().map_or(0, |r| r.len())
                 );
                 instances.insert(key, t);
+                if onepass {
+                    // Containers restart: keep what has been measured.
+                    if let Some(p) = &out {
+                        let part = serde_json::json!({"partial": true, "instances": instances});
+                        std::fs::write(
+                            p.with_extension("partial.json"),
+                            serde_json::to_string(&part).map_err(|e| e.to_string())?,
+                        )
+                        .map_err(|e| e.to_string())?;
+                    }
+                }
             }
             let doc = serde_json::json!({
-                "schema": if mulmod { "ecbench.f2m4_mulmod_prices/v1" } else { "ecbench.f2m4_full_prices/v1" },
-                "what": if mulmod { "Ratios to one counted F_q multiplication of scalar_mulmod, row_op and lp_mulmod on a Montgomery multiplication modulo r (`row`), beside the same units on the repository's code path (`code_row`), measured in the same pass. Read only by the *_refmm ecbench methods (src/cryptanalysis/ecbench/f2m4_price.rs, Mulmod::Montgomery)." } else { "Ratios to one counted F_q multiplication (a dense axpy element on the same field) of every native unit the *_f2m4_full ecbench methods price (src/cryptanalysis/ecbench/f2m4_price.rs). Read only by those methods; every other method is unchanged." },
+                "binary_sha256": std::env::current_exe()
+                    .ok()
+                    .and_then(|p| std::fs::read(p).ok())
+                    .map(|b| crypto_lib::cryptanalysis::ecbench::canonical::sha256_hex(&b)),
+                "schema": if onepass { "ecbench.f2m4_onepass_prices/v1" } else if mulmod { "ecbench.f2m4_mulmod_prices/v1" } else { "ecbench.f2m4_full_prices/v1" },
+                "what": if onepass { "Ratios to one counted F_q multiplication (a dense axpy element on the same field) of every native unit, measured in ONE interleaved pass on one host in one process with a discarded warm-up rep. `row` is what the *_refmm ecbench methods read: every unit's median, with scalar_mulmod, row_op and lp_mulmod each the smaller of the code's kernel and a Montgomery kernel (u64 storage and one limb for a one-word order, u128 and two limbs otherwise); `row_code` and `row_montgomery` are the same table with those three units on one kernel only; `spread` and `mulmod_samples` carry the per-unit spread (src/cryptanalysis/ecbench/f2m4_price.rs, Mulmod::Onepass)." } else if mulmod { "Ratios to one counted F_q multiplication of scalar_mulmod, row_op and lp_mulmod on a Montgomery multiplication modulo r (`row`), beside the same units on the repository's code path (`code_row`), measured in the same pass. Read only by the *_refmm ecbench methods (src/cryptanalysis/ecbench/f2m4_price.rs, Mulmod::Montgomery)." } else { "Ratios to one counted F_q multiplication (a dense axpy element on the same field) of every native unit the *_f2m4_full ecbench methods price (src/cryptanalysis/ecbench/f2m4_price.rs). Read only by those methods; every other method is unchanged." },
                 "unit": "time of the native unit / time of one counted F_q multiplication, dimensionless",
-                "method": format!("ecbench price-units-f2m4 --reps {reps} --seed {seed}: median of the passes per unit per m, one process, one host; hash tables sized as the methods' own (2^(m+1) entries, the guard set 2^20)"),
+                "method": format!("ecbench price-units-f2m4{} --reps {reps} --seed {seed}: median of the passes per unit per m, one process, one host; hash tables sized as the methods' own (2^(m+1) entries, the guard set 2^20)", if onepass { " --onepass" } else if mulmod { " --mulmod" } else { "" }),
                 "host": host::capture().map(|c| serde_json::json!({"env_class_id": c.env_class_id, "stable": c.stable})).map_err(|e| e.to_string())?,
                 "instances": instances,
             });

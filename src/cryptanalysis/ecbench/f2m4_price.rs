@@ -50,9 +50,13 @@ use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
 /// The measured table, compiled in.
 pub const F2M4_PRICES: &str = include_str!("f2m4_full_prices.json");
 
-/// The three mod-`r` multiplication units re-measured on a Montgomery
-/// mulmod (see [`Mulmod`]), compiled in.
-pub const F2M4_MULMOD_PRICES: &str = include_str!("f2m4_mulmod_prices.json");
+/// The whole native price table re-measured in one interleaved pass on one
+/// host, with the three mod-`r` units taken as the smaller of the code's and
+/// a Montgomery kernel's price (see [`Mulmod::Onepass`]), compiled in.  The
+/// older `f2m4_mulmod_prices.json` (Montgomery units only, measured on
+/// another host and with a different kernel) is kept as a record and read by
+/// nothing.
+pub const F2M4_ONEPASS_PRICES: &str = include_str!("f2m4_onepass_prices.json");
 
 /// The method ids that reprice, with the base each wraps.
 pub fn base_of(id: &str) -> Option<&'static str> {
@@ -146,33 +150,59 @@ pub fn row(m: u32, wide: bool) -> Result<BTreeMap<String, f64>, String> {
     Ok(out)
 }
 
-/// Which multiplication modulo `r` the three mulmod-bound units are priced
-/// from.
+/// Which table, and which multiplication modulo `r`, prices the units.
 ///
-/// `Code` is what the repository's code does: `koblitz_strong_rho`'s
-/// `mul_mod_u128`, a chunked `u128 %` that costs 19 times more at 68-bit
-/// orders than at 64-bit ones (an implementation step, not the problem's).
-/// `Montgomery` prices `scalar_mulmod`, `row_op` and `lp_mulmod` from a
-/// Montgomery multiplication in one limb (`r < 2^64`) or two (`r` wider),
-/// the rate a competent implementation reaches at every `m`, so the unit
-/// has no step where the order crosses a word.  Counts do not change; only
-/// these three prices do.
+/// `Code` is the committed `f2m4_full_prices.json` (the older host), with the
+/// repository's own mod-`r` arithmetic: `koblitz_strong_rho`'s `mul_mod_u128`
+/// is a chunked `u128 %` that costs 19 times more at 68-bit orders than at
+/// 64-bit ones (an implementation step, not the problem's).  Every legacy
+/// and `*_ref` id uses it.
+///
+/// The three `Onepass` variants read `f2m4_onepass_prices.json` instead: the
+/// whole table (every unit, not only the mod-`r` ones) measured in one
+/// interleaved pass on one host, with a warm-up pass, so no row mixes hosts
+/// or kernels.  The mod-`r` units (`scalar_mulmod`, `row_op`, `lp_mulmod`)
+/// are measured there on the code's kernel and on a Montgomery kernel (u64
+/// storage and one limb for `r < 2^64`, u128 storage and two limbs
+/// otherwise), side by side:
+/// * `Onepass` prices each of the three as the smaller of the two (what a
+///   competent implementation reaches, with no step where the order crosses
+///   a word that the other kernel does not also have);
+/// * `OnepassCode` prices them on the code's kernel only;
+/// * `OnepassMont` on the Montgomery kernel only.
+///
+/// Counts never change; only prices do.  The three are recorded side by side
+/// by the `*_refmm` ids so that neither choice is hidden.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Mulmod {
     Code,
-    Montgomery,
+    Onepass,
+    OnepassCode,
+    OnepassMont,
 }
 
-/// The units [`Mulmod::Montgomery`] replaces.
+impl Mulmod {
+    /// The same table with the code's mod-`r` kernel.
+    pub fn code_of(self) -> Mulmod {
+        match self {
+            Mulmod::Code => Mulmod::Code,
+            _ => Mulmod::OnepassCode,
+        }
+    }
+}
+
+/// The units the mod-`r` kernel choice moves.
 pub const MULMOD_UNITS: &[&str] = &["scalar_mulmod", "row_op", "lp_mulmod"];
 
-/// [`row`], with the mulmod-bound units from `mulmod`.
+/// [`row`], or the one-pass table's row for `mulmod`: unit → FME.
 pub fn row_mm(m: u32, wide: bool, mulmod: Mulmod) -> Result<BTreeMap<String, f64>, String> {
-    let mut out = row(m, wide)?;
-    if mulmod == Mulmod::Code {
-        return Ok(out);
-    }
-    let doc: Value = serde_json::from_str(F2M4_MULMOD_PRICES).map_err(|e| e.to_string())?;
+    let field = match mulmod {
+        Mulmod::Code => return row(m, wide),
+        Mulmod::Onepass => "row",
+        Mulmod::OnepassCode => "row_code",
+        Mulmod::OnepassMont => "row_montgomery",
+    };
+    let doc: Value = serde_json::from_str(F2M4_ONEPASS_PRICES).map_err(|e| e.to_string())?;
     let want = if wide { 128 } else { 64 };
     let key = row_key(m, wide);
     let inst = doc
@@ -181,17 +211,20 @@ pub fn row_mm(m: u32, wide: bool, mulmod: Mulmod) -> Result<BTreeMap<String, f64
         .filter(|v| v.get("scalar_width_bits").and_then(Value::as_u64) == Some(want))
         .ok_or_else(|| {
             format!(
-                "src/cryptanalysis/ecbench/f2m4_mulmod_prices.json has no row `{key}`; measure it \
-                 with `ecbench price-units-f2m4 --mulmod --m {m}{}`",
-                if wide { " --wide" } else { "" }
+                "src/cryptanalysis/ecbench/f2m4_onepass_prices.json has no row `{key}`; measure it \
+                 with `ecbench price-units-f2m4 --onepass --m {m}`",
             )
         })?;
-    for u in MULMOD_UNITS {
-        let v = inst
-            .get("row")
-            .and_then(|r| r.get(*u))
+    let r = inst
+        .get(field)
+        .and_then(Value::as_object)
+        .ok_or_else(|| format!("f2m4_onepass_prices.json row {key} has no `{field}`"))?;
+    let mut out = BTreeMap::new();
+    for u in UNITS {
+        let v = r
+            .get(*u)
             .and_then(Value::as_f64)
-            .ok_or_else(|| format!("f2m4_mulmod_prices.json row {key} lacks `{u}`"))?;
+            .ok_or_else(|| format!("f2m4_onepass_prices.json row {key} `{field}` lacks `{u}`"))?;
         out.insert((*u).to_string(), v);
     }
     Ok(out)
@@ -1334,7 +1367,7 @@ pub fn measure(inst: &BinCurve, reps: usize) -> Result<Value, String> {
     }))
 }
 
-// ── Montgomery multiplication modulo r (the Mulmod::Montgomery price) ───
+// ── Montgomery multiplication modulo r (the Montgomery kernel of the one-pass table) ───
 
 /// `a·b` as a 256-bit product `(hi, lo)`.
 fn mul_wide(a: u128, b: u128) -> (u128, u128) {
@@ -1608,6 +1641,368 @@ pub fn measure_mulmod(inst: &BinCurve, reps: usize) -> Result<Value, String> {
     }))
 }
 
+// ── The one-pass table ──────────────────────────────────────────────────
+
+/// Montgomery multiplication modulo an odd `r < 2^64` on `u64` storage and
+/// one limb (`R = 2^64`): the kernel a competent implementation uses for a
+/// narrow order, with no 128-bit subtraction or select.
+#[derive(Clone, Copy)]
+pub struct Mont64 {
+    m: u64,
+    minv: u64,
+    r2: u64,
+}
+
+impl Mont64 {
+    /// `None` for an even or trivial modulus.
+    pub fn new(r: u64) -> Option<Mont64> {
+        if r < 3 || r & 1 == 0 {
+            return None;
+        }
+        let mut x = r;
+        for _ in 0..6 {
+            x = x.wrapping_mul(2u64.wrapping_sub(r.wrapping_mul(x)));
+        }
+        let rmod = ((1u128 << 64) % r as u128) as u64;
+        let r2 = ((rmod as u128 * rmod as u128) % r as u128) as u64;
+        Some(Mont64 { m: r, minv: x, r2 })
+    }
+
+    /// `t·R⁻¹ mod r` for `t < r·R`; the final correction is a select.
+    #[inline(always)]
+    fn redc(&self, t: u128) -> u64 {
+        let u = (t as u64).wrapping_mul(self.minv);
+        let uh = ((u as u128 * self.m as u128) >> 64) as u64;
+        let (d, borrow) = ((t >> 64) as u64).overflowing_sub(uh);
+        d.wrapping_add(std::hint::select_unpredictable(borrow, self.m, 0))
+    }
+
+    /// `a·b·R⁻¹ mod r`.
+    #[inline(always)]
+    pub fn mul(&self, a: u64, b: u64) -> u64 {
+        self.redc(a as u128 * b as u128)
+    }
+
+    /// `a·R mod r`.
+    pub fn to_mont(&self, a: u64) -> u64 {
+        self.mul(a, self.r2)
+    }
+
+    /// `a·b mod r` for plain `a, b < r`: two reductions.
+    #[inline(always)]
+    pub fn mulmod(&self, a: u64, b: u64) -> u64 {
+        self.mul(self.mul(a, b), self.r2)
+    }
+}
+
+/// The Montgomery kernel at either width, behind one interface.
+trait MontKernel: Copy {
+    type S: Copy;
+    fn from_u128(v: u128) -> Self::S;
+    fn to_mont(&self, a: Self::S) -> Self::S;
+    fn mul(&self, a: Self::S, b: Self::S) -> Self::S;
+    fn mulmod(&self, a: Self::S, b: Self::S) -> Self::S;
+    /// `a − b mod r` for `a, b < r`.
+    fn sub(&self, a: Self::S, b: Self::S) -> Self::S;
+    fn low(a: Self::S) -> u64;
+}
+
+impl MontKernel for Mont64 {
+    type S = u64;
+    fn from_u128(v: u128) -> u64 {
+        v as u64
+    }
+    fn to_mont(&self, a: u64) -> u64 {
+        Mont64::to_mont(self, a)
+    }
+    #[inline(always)]
+    fn mul(&self, a: u64, b: u64) -> u64 {
+        Mont64::mul(self, a, b)
+    }
+    #[inline(always)]
+    fn mulmod(&self, a: u64, b: u64) -> u64 {
+        Mont64::mulmod(self, a, b)
+    }
+    #[inline(always)]
+    fn sub(&self, a: u64, b: u64) -> u64 {
+        let (d, borrow) = a.overflowing_sub(b);
+        d.wrapping_add(std::hint::select_unpredictable(borrow, self.m, 0))
+    }
+    fn low(a: u64) -> u64 {
+        a
+    }
+}
+
+impl MontKernel for Mont {
+    type S = u128;
+    fn from_u128(v: u128) -> u128 {
+        v
+    }
+    fn to_mont(&self, a: u128) -> u128 {
+        Mont::to_mont(self, a)
+    }
+    #[inline(always)]
+    fn mul(&self, a: u128, b: u128) -> u128 {
+        Mont::mul(self, a, b)
+    }
+    #[inline(always)]
+    fn mulmod(&self, a: u128, b: u128) -> u128 {
+        Mont::mulmod(self, a, b)
+    }
+    #[inline(always)]
+    fn sub(&self, a: u128, b: u128) -> u128 {
+        let (d, borrow) = a.overflowing_sub(b);
+        d.wrapping_add(std::hint::select_unpredictable(borrow, self.m, 0))
+    }
+    fn low(a: u128) -> u64 {
+        a as u64
+    }
+}
+
+/// The Montgomery kernel's `scalar_mulmod`, `lp_mulmod` and `row_op` on `k`
+/// (storage at the kernel's width), in ns: an isolated product costs two
+/// reductions; the row operation's multiplier is converted once per row (the
+/// conversion charged) and each element then costs one.
+fn mont_units<K: MontKernel>(
+    k: K,
+    r: u128,
+    rng: &mut StdRng,
+    out: &mut BTreeMap<&'static str, f64>,
+) {
+    let xs: Vec<K::S> = (0..1024)
+        .map(|_| K::from_u128((rng.gen::<u128>() % r).max(1)))
+        .collect();
+    let mut acc = xs[1];
+    out.insert(
+        "scalar_mulmod",
+        ns_per(1_000_000, |i| {
+            acc = k.mulmod(acc, xs[(i % 1024) as usize]);
+            K::low(acc)
+        }),
+    );
+    let mut acc = xs[2];
+    out.insert(
+        "lp_mulmod",
+        ns_per(1_000_000, |i| {
+            acc = k.mulmod(acc, xs[(i % 1024) as usize]);
+            K::low(acc)
+        }),
+    );
+    let cols = 2048usize;
+    let pivot: Vec<K::S> = (0..cols)
+        .map(|_| K::from_u128((rng.gen::<u128>() % r).max(1)))
+        .collect();
+    let mut row: Vec<K::S> = (0..cols)
+        .map(|_| K::from_u128((rng.gen::<u128>() % r).max(1)))
+        .collect();
+    let passes = 300u64;
+    let start = Instant::now();
+    for p in 0..passes {
+        let fm = k.to_mont(xs[(p % 1024) as usize]);
+        for j in 0..cols {
+            row[j] = k.sub(row[j], k.mul(pivot[j], fm));
+        }
+    }
+    black_box(&row);
+    out.insert(
+        "row_op",
+        start.elapsed().as_nanos() as f64 / (passes * cols as u64) as f64,
+    );
+}
+
+/// The ns of one counted `F_q` multiplication (a dense axpy element), as
+/// [`measure_once`] measures it.
+fn fq_mul_ns(inst: &BinCurve, rng: &mut StdRng) -> f64 {
+    let g = &inst.curve.f.f.tab;
+    let q = inst.curve.f.f.q;
+    let n = 4096usize;
+    let piv: Vec<Fe> = (0..n).map(|_| rng.gen_range(1..q)).collect();
+    let mut row: Vec<Fe> = (0..n).map(|_| rng.gen_range(0..q)).collect();
+    let passes = 600u64;
+    let start = Instant::now();
+    for k in 0..passes {
+        g.axpy(
+            &mut row,
+            &piv,
+            1 + ((k as u32).wrapping_mul(7919) % (q - 1)),
+        );
+    }
+    black_box(&row);
+    start.elapsed().as_nanos() as f64 / (passes * n as u64) as f64
+}
+
+/// The code's kernel for the three mod-`r` units (the repository's
+/// `scalar_mulmod`/`row_op` loops at the width of `r`, `lp_mulmod` always
+/// `u128`), in ns.
+fn code_units(r: u128, narrow: bool, rng: &mut StdRng) -> BTreeMap<&'static str, f64> {
+    let xs: Vec<u128> = (0..1024).map(|_| (rng.gen::<u128>() % r).max(1)).collect();
+    let mut cu: BTreeMap<&'static str, f64> = BTreeMap::new();
+    code_scalar_units(r, narrow, &xs, rng, &mut cu);
+    let mut acc = xs[0];
+    cu.insert(
+        "lp_mulmod",
+        ns_per(1_000_000, |i| {
+            acc = <u128 as RhoScalar>::mul_mod(acc, xs[(i % 1024) as usize], r);
+            acc as u64
+        }),
+    );
+    cu
+}
+
+/// The Montgomery kernel's three units at the width of `r`, in ns.
+fn mont_kernel_units(r: u128, narrow: bool, rng: &mut StdRng) -> BTreeMap<&'static str, f64> {
+    let mut o = BTreeMap::new();
+    if narrow {
+        let k = Mont64::new(r as u64).expect("an odd order");
+        mont_units(k, r, rng, &mut o);
+    } else {
+        let k = Mont::new(r).expect("an odd order");
+        mont_units(k, r, rng, &mut o);
+    }
+    o
+}
+
+fn spread(v: &[f64]) -> Value {
+    let med = median(v.to_vec());
+    let (lo, hi) = v
+        .iter()
+        .fold((f64::MAX, f64::MIN), |(a, b), &x| (a.min(x), b.max(x)));
+    let mad = median(v.iter().map(|x| (x - med).abs()).collect());
+    json!({
+        "n": v.len(),
+        "min": lo,
+        "median": med,
+        "max": hi,
+        "relative_range": (hi - lo) / med,
+        "relative_mad": mad / med,
+    })
+}
+
+/// Measure the whole table for `inst` in one interleaved pass on this host:
+/// every unit of [`measure`], and the three mod-`r` units on the code's
+/// kernel and on a Montgomery kernel (u64 storage and one limb for a narrow
+/// order), side by side.
+///
+/// Rep 0 is a warm-up and is discarded.  In every other rep the full unit
+/// set is measured first (its mod-`r` units are the code's), then one block
+/// of `F_q`-multiplication / code kernel / Montgomery kernel / code kernel /
+/// `F_q`-multiplication, in the order C M C on even reps and M C M on odd
+/// ones, so that neither kernel always runs first.  The block's ratios use
+/// the mean of its two flanking `F_q`-multiplication times.  A unit's price
+/// is the median over reps; for the three mod-`r` units the code's samples
+/// are the full set's and the block's, and `row` takes the smaller of the
+/// code's and the Montgomery median.  Spread per unit is recorded.
+pub fn measure_onepass(inst: &BinCurve, reps: usize) -> Result<Value, String> {
+    let r = inst.r;
+    let narrow = u64::try_from(r).is_ok();
+    Mont::new(r).ok_or("the subgroup order is not odd")?;
+    let reps = reps.max(1);
+    let mut all: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
+    let mut code: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
+    let mut mont: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
+    let mut mul_ns = Vec::new();
+    for k in 0..=reps {
+        let warm = k == 0;
+        let seed = 0xF2 + k as u64;
+        let t = measure_once(inst, seed);
+        let mul = t["fq_mul"];
+        if mul <= 0.0 {
+            return Err("an F_q multiplication measured at zero nanoseconds".into());
+        }
+        let mut rng = StdRng::seed_from_u64(seed ^ 0x51);
+        let before = fq_mul_ns(inst, &mut rng);
+        let order: [bool; 3] = if k % 2 == 0 {
+            [true, false, true]
+        } else {
+            [false, true, false]
+        };
+        let mut blocks: Vec<(bool, BTreeMap<&'static str, f64>)> = Vec::new();
+        for is_code in order {
+            let b = if is_code {
+                code_units(r, narrow, &mut rng)
+            } else {
+                mont_kernel_units(r, narrow, &mut rng)
+            };
+            blocks.push((is_code, b));
+        }
+        let after = fq_mul_ns(inst, &mut rng);
+        if warm {
+            continue;
+        }
+        mul_ns.push(mul);
+        let fq_adj = (before + after) / 2.0;
+        for (u, ns) in &t {
+            if *u != "fq_mul" {
+                all.entry(u).or_default().push(ns / mul);
+            }
+            if MULMOD_UNITS.contains(u) {
+                code.entry(u).or_default().push(ns / mul);
+            }
+        }
+        for (is_code, b) in blocks {
+            for (u, ns) in b {
+                let dst = if is_code { &mut code } else { &mut mont };
+                dst.entry(u).or_default().push(ns / fq_adj);
+            }
+        }
+    }
+    let mut row = serde_json::Map::new();
+    let mut row_code = serde_json::Map::new();
+    let mut row_mont = serde_json::Map::new();
+    let mut chosen = serde_json::Map::new();
+    let mut spreads = serde_json::Map::new();
+    let mut mulmod = serde_json::Map::new();
+    let rnd = |x: f64| json!((x * 1e6).round() / 1e6);
+    for u in UNITS {
+        let v = all
+            .get(u)
+            .ok_or_else(|| format!("unit {u} was not measured"))?;
+        if v.iter().any(|x| !x.is_finite() || *x < 0.0) {
+            return Err(format!("unit {u} did not measure"));
+        }
+        if MULMOD_UNITS.contains(u) {
+            let (c, m) = (&code[u], &mont[u]);
+            if c.iter().chain(m).any(|x| !x.is_finite() || *x <= 0.0) {
+                return Err(format!("unit {u} did not measure"));
+            }
+            let (mc, mm) = (median(c.clone()), median(m.clone()));
+            row_code.insert((*u).into(), rnd(mc));
+            row_mont.insert((*u).into(), rnd(mm));
+            row.insert((*u).into(), rnd(mc.min(mm)));
+            chosen.insert(
+                (*u).into(),
+                json!(if mm < mc { "montgomery" } else { "code" }),
+            );
+            spreads.insert(format!("{u}_code"), spread(c));
+            spreads.insert(format!("{u}_montgomery"), spread(m));
+            mulmod.insert(
+                (*u).into(),
+                json!({"code_samples": c, "montgomery_samples": m}),
+            );
+        } else {
+            let med = median(v.clone());
+            for t in [&mut row, &mut row_code, &mut row_mont] {
+                t.insert((*u).into(), rnd(med));
+            }
+            spreads.insert((*u).into(), spread(v));
+        }
+    }
+    Ok(json!({
+        "row": row,
+        "row_code": row_code,
+        "row_montgomery": row_mont,
+        "mulmod_chosen": chosen,
+        "spread": spreads,
+        "scalar_width_bits": if narrow { 64 } else { 128 },
+        "montgomery_kernel": if narrow { "u64 storage, one limb" } else { "u128 storage, two limbs" },
+        "reps": reps,
+        "warmup_reps": 1,
+        "ns_per_fq_mul_median": median(mul_ns.clone()),
+        "ns_per_fq_mul": mul_ns,
+        "mulmod_samples": mulmod,
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1702,10 +2097,42 @@ mod tests {
         assert_eq!(mul_wide(1u128 << 100, 1u128 << 100), (1u128 << 72, 0));
     }
 
-    /// The Montgomery price moves the three mulmod units and nothing else.
     #[test]
-    fn the_mulmod_table_covers_every_row_and_moves_three_units() {
+    fn montgomery_one_limb_u64_agrees_with_the_code_path() {
+        let mut rng = StdRng::seed_from_u64(11);
+        for bits in [3u32, 20, 40, 50, 63, 64] {
+            for _ in 0..20 {
+                let r = ((rng.gen::<u64>() >> (64 - bits)) | 1 | (1u64 << (bits - 1))) as u128;
+                let Some(mt) = Mont64::new(r as u64) else {
+                    continue;
+                };
+                for _ in 0..200 {
+                    let a = rng.gen::<u64>() % r as u64;
+                    let b = rng.gen::<u64>() % r as u64;
+                    let want = <u128 as RhoScalar>::mul_mod(a as u128, b as u128, r) as u64;
+                    assert_eq!(mt.mulmod(a, b), want, "bits {bits} r {r} a {a} b {b}");
+                    assert_eq!(mt.mul(a, mt.to_mont(b)), want);
+                    let s = MontKernel::sub(&mt, a, b);
+                    assert_eq!(s as u128, (a as u128 + r - b as u128) % r);
+                }
+            }
+        }
+        assert!(Mont64::new(10).is_none());
+    }
+
+    /// The one-pass table has every unit in every row of the older table,
+    /// from one host and one binary; the three variants of the mod-r kernel
+    /// differ in the three mod-r units only, and the default is the smaller
+    /// of the two kernels in each.
+    #[test]
+    fn the_onepass_table_covers_every_row_and_moves_three_units() {
         let doc: Value = serde_json::from_str(F2M4_PRICES).unwrap();
+        let new: Value = serde_json::from_str(F2M4_ONEPASS_PRICES).unwrap();
+        assert!(new["host"]["env_class_id"]
+            .as_str()
+            .unwrap()
+            .starts_with("ECBENV2h"));
+        assert_eq!(new["binary_sha256"].as_str().unwrap().len(), 64);
         for (k, v) in doc["instances"].as_object().unwrap() {
             let wide = v["scalar_width_bits"] == 128;
             let m: u32 = k
@@ -1713,13 +2140,65 @@ mod tests {
                 .trim_end_matches("_u128")
                 .parse()
                 .unwrap();
-            let a = row_mm(m, wide, Mulmod::Montgomery).unwrap();
-            let b = row(m, wide).unwrap();
+            let a = row_mm(m, wide, Mulmod::Onepass).unwrap();
+            let c = row_mm(m, wide, Mulmod::OnepassCode).unwrap();
+            let t = row_mm(m, wide, Mulmod::OnepassMont).unwrap();
             for u in UNITS {
-                if !MULMOD_UNITS.contains(u) {
-                    assert_eq!(a[*u], b[*u], "{k}: {u} must not move");
+                assert!(a[*u] > 0.0, "{k}: {u} priced at zero");
+                if MULMOD_UNITS.contains(u) {
+                    assert_eq!(a[*u], c[*u].min(t[*u]), "{k}: {u}");
+                } else {
+                    assert_eq!(a[*u], c[*u], "{k}: {u} must not move");
+                    assert_eq!(a[*u], t[*u], "{k}: {u} must not move");
                 }
             }
+        }
+    }
+
+    fn row_op_ns(r: u128, narrow: bool, seed: u64, production: bool) -> f64 {
+        let mut rng = StdRng::seed_from_u64(seed);
+        if production {
+            // `measure_once`'s own kernel.
+            let mut out = BTreeMap::new();
+            if narrow {
+                scalar_units::<u64>(r as u64, &mut rng, &mut out);
+            } else {
+                scalar_units::<u128>(r, &mut rng, &mut out);
+            }
+            out["row_op"]
+        } else {
+            code_units(r, narrow, &mut rng)["row_op"]
+        }
+    }
+
+    /// The row-op kernel of the one-pass table's code arm reproduces the
+    /// production kernel (`measure_once`'s `row_op`, the committed unit's
+    /// definition) on the same host: interleaved, the medians agree within a
+    /// factor of 1.5, at one word and at two.
+    #[test]
+    fn the_code_row_kernel_reproduces_the_production_row_op() {
+        for (r, narrow) in [
+            (0xFFFF_FFFF_FFFF_FFC5u128, true),
+            ((1u128 << 40) + 15, true),
+            ((1u128 << 68) + 1_000_003, false),
+        ] {
+            let (mut a, mut b) = (Vec::new(), Vec::new());
+            for k in 0..5u64 {
+                // Interleave and alternate which runs first.
+                if k % 2 == 0 {
+                    a.push(row_op_ns(r, narrow, k, true));
+                    b.push(row_op_ns(r, narrow, k, false));
+                } else {
+                    b.push(row_op_ns(r, narrow, k, false));
+                    a.push(row_op_ns(r, narrow, k, true));
+                }
+            }
+            let (pa, pb) = (median(a), median(b));
+            let ratio = pb / pa;
+            assert!(
+                (1.0 / 1.5..=1.5).contains(&ratio),
+                "r = {r}: code kernel {pb:.2} ns against production {pa:.2} ns (ratio {ratio:.2})"
+            );
         }
     }
 }

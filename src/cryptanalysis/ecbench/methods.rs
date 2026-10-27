@@ -275,7 +275,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "rho.negation_batched_refmm",
             family: "rho",
-            summary: "rho.negation_batched_ref and mod-r multiplications (scalar_mulmod, row_op, lp_mulmod) priced from a one- or two-limb Montgomery multiplication (f2m4_mulmod_prices.json, ecbench price-units-f2m4 --mulmod) at every m, so the unit has no step where the subgroup order crosses a word; detail.reference_pricing carries the same record with the code's mulmod beside it; the same run, so the same counts; curves over F_(2^m)^4 only",
+            summary: "rho.negation_batched_ref and the whole native price table re-measured in one interleaved pass on one host (f2m4_onepass_prices.json, ecbench price-units-f2m4 --onepass) with the mod-r units (scalar_mulmod, row_op, lp_mulmod) priced as min(the code's kernel, a one- or two-limb Montgomery kernel on u64 or u128 storage) from that pass; detail.reference_pricing carries the same record with the code-only and Montgomery-only totals from the same table beside it; the same run, so the same counts; curves over F_(2^m)^4 only",
             entry: "ic_wide::rho_negation_batched + ecbench::f2m4_price",
             applies: Applies::Any,
             params: RHO_BATCHED_PARAMS,
@@ -283,7 +283,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "rho.negation_f2m4_refmm",
             family: "rho",
-            summary: "rho.negation_f2m4_ref and mod-r multiplications (scalar_mulmod, row_op, lp_mulmod) priced from a one- or two-limb Montgomery multiplication (f2m4_mulmod_prices.json, ecbench price-units-f2m4 --mulmod) at every m, so the unit has no step where the subgroup order crosses a word; detail.reference_pricing carries the same record with the code's mulmod beside it; the same run, so the same counts; curves over F_(2^m)^4 only",
+            summary: "rho.negation_f2m4_ref and the whole native price table re-measured in one interleaved pass on one host (f2m4_onepass_prices.json, ecbench price-units-f2m4 --onepass) with the mod-r units (scalar_mulmod, row_op, lp_mulmod) priced as min(the code's kernel, a one- or two-limb Montgomery kernel on u64 or u128 storage) from that pass; detail.reference_pricing carries the same record with the code-only and Montgomery-only totals from the same table beside it; the same run, so the same counts; curves over F_(2^m)^4 only",
             entry: "ic_wide::rho_negation_tallied + ecbench::f2m4_price",
             applies: Applies::Any,
             params: RHO_PARAMS,
@@ -443,7 +443,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "ic.pipeline_f2m4_refmm",
             family: "ic",
-            summary: "ic.pipeline_f2m4_ref and mod-r multiplications (scalar_mulmod, row_op, lp_mulmod) priced from a one- or two-limb Montgomery multiplication (f2m4_mulmod_prices.json, ecbench price-units-f2m4 --mulmod) at every m, so the unit has no step where the subgroup order crosses a word; detail.reference_pricing carries the same record with the code's mulmod beside it; the same run, so the same counts; curves over F_(2^m)^4 only",
+            summary: "ic.pipeline_f2m4_ref and the whole native price table re-measured in one interleaved pass on one host (f2m4_onepass_prices.json, ecbench price-units-f2m4 --onepass) with the mod-r units (scalar_mulmod, row_op, lp_mulmod) priced as min(the code's kernel, a one- or two-limb Montgomery kernel on u64 or u128 storage) from that pass; detail.reference_pricing carries the same record with the code-only and Montgomery-only totals from the same table beside it; the same run, so the same counts; curves over F_(2^m)^4 only",
             entry: "ic_framework::run_pipeline + ecbench::f2m4_price",
             applies: Applies::Any,
             params: IC_PIPELINE_PARAMS,
@@ -1125,13 +1125,13 @@ pub fn solve(
         } else if m.id == "rho.negation_batched_ref" {
             solve_f2m4_rho_batched(m, i, tx, ty, seed, true, true, Mulmod::Code)?
         } else if m.id == "rho.negation_batched_refmm" {
-            solve_f2m4_rho_batched(m, i, tx, ty, seed, true, true, Mulmod::Montgomery)?
+            solve_f2m4_rho_batched(m, i, tx, ty, seed, true, true, Mulmod::Onepass)?
         } else if m.id == "rho.negation_f2m4_full" {
             solve_f2m4_rho_negation_full(m, i, tx, ty, seed, false, Mulmod::Code)?
         } else if m.id == "rho.negation_f2m4_ref" {
             solve_f2m4_rho_negation_full(m, i, tx, ty, seed, true, Mulmod::Code)?
         } else if m.id == "rho.negation_f2m4_refmm" {
-            solve_f2m4_rho_negation_full(m, i, tx, ty, seed, true, Mulmod::Montgomery)?
+            solve_f2m4_rho_negation_full(m, i, tx, ty, seed, true, Mulmod::Onepass)?
         } else if m.id == "ic.pipeline_f2m4_full" {
             solve_f2m4_ic_full(m, i, curve, tx, ty, seed)?
         } else if m.id == "ic.pipeline_f2m4_ref" {
@@ -1156,7 +1156,7 @@ pub fn solve(
                 seed,
                 u64::try_from(i.r).is_err(),
                 true,
-                Mulmod::Montgomery,
+                Mulmod::Onepass,
             )?
         } else if u64::try_from(i.r).is_err() {
             // `m ≥ 16` with a small cofactor: the subgroup order needs two
@@ -2559,7 +2559,7 @@ fn solve_f2m4_rho_batched(
         solver: None,
         field_ops: None,
     };
-    let code_mulmod_total = if full && mulmod == Mulmod::Montgomery {
+    let code_mulmod_total = if full && mulmod == Mulmod::Onepass {
         let mut alt = rep.clone();
         crate::cryptanalysis::ecbench::f2m4_price::reprice_rho_mm(
             &mut alt,
@@ -2567,7 +2567,21 @@ fn solve_f2m4_rho_batched(
             u64::try_from(inst.r).is_err(),
             per_add,
             true,
-            Mulmod::Code,
+            Mulmod::OnepassCode,
+        )?;
+        Some(alt.total_gae)
+    } else {
+        None
+    };
+    let mont_mulmod_total = if full && mulmod == Mulmod::Onepass {
+        let mut alt = rep.clone();
+        crate::cryptanalysis::ecbench::f2m4_price::reprice_rho_mm(
+            &mut alt,
+            c.f.f.m,
+            u64::try_from(inst.r).is_err(),
+            per_add,
+            true,
+            Mulmod::OnepassMont,
         )?;
         Some(alt.total_gae)
     } else {
@@ -2613,7 +2627,7 @@ fn solve_f2m4_rho_batched(
                 "fq_operations_total_reference": res.ref_fq_total,
                 "fq4_share_of_current_fq_operations": fq4_muls as f64 / res.fq_total.max(1) as f64,
                 "phases_note": "setup, search and verification are the walk's own F_q operations in the reference pricing; the natives phase is native work divided by the reference divisor",
-                "mulmod": mulmod_note(mulmod, code_mulmod_total, total_ref),
+                "mulmod": mulmod_note(mulmod, code_mulmod_total, mont_mulmod_total, total_ref),
             }),
         );
     }
@@ -2648,17 +2662,30 @@ fn reference_model_note(
 }
 
 /// The record of which mod-`r` multiplication priced a `*_ref`/`*_refmm`
-/// record, with the total under the code's mulmod beside it when the
-/// Montgomery price was used (reference unit, same run).
-fn mulmod_note(mulmod: Mulmod, code_total: Option<f64>, total: f64) -> Value {
+/// record.  For `*_refmm` (`Mulmod::Onepass`) the price of each of the three
+/// mod-`r` units is the smaller of the code's and the Montgomery kernel's
+/// from one interleaved pass (`f2m4_onepass_prices.json`); the totals under
+/// the code's kernel only and the Montgomery kernel only, from the same
+/// table, are recorded beside it (reference unit, same run), so neither
+/// choice is hidden.
+fn mulmod_note(
+    mulmod: Mulmod,
+    code_total: Option<f64>,
+    mont_total: Option<f64>,
+    total: f64,
+) -> Value {
     match mulmod {
-        Mulmod::Code => json!({"pricing": "code", "units": "f2m4_full_prices.json"}),
-        Mulmod::Montgomery => json!({
-            "pricing": "montgomery",
-            "units": "f2m4_mulmod_prices.json (scalar_mulmod, row_op, lp_mulmod)",
-            "total_gae_reference_unit_montgomery_mulmod": total,
+        Mulmod::Code | Mulmod::OnepassCode | Mulmod::OnepassMont => {
+            json!({"pricing": "code", "units": "f2m4_full_prices.json"})
+        }
+        Mulmod::Onepass => json!({
+            "pricing": "min_code_montgomery",
+            "units": "f2m4_onepass_prices.json (every unit and the three mod-r units, one interleaved pass on one host)",
+            "total_gae_reference_unit_min_code_montgomery": total,
             "total_gae_reference_unit_code_mulmod": code_total,
-            "ratio_montgomery_over_code": code_total.map(|c| total / c),
+            "total_gae_reference_unit_montgomery_mulmod": mont_total,
+            "ratio_min_over_code": code_total.map(|c| total / c),
+            "ratio_min_over_montgomery": mont_total.map(|c| total / c),
         }),
     }
 }
@@ -2744,7 +2771,7 @@ fn solve_f2m4_rho_negation_full(
     }
     rep.counters = counters;
     rep.unpriced.clear();
-    let code_mulmod_total = if mulmod == Mulmod::Montgomery {
+    let code_mulmod_total = if mulmod == Mulmod::Onepass {
         let mut alt = rep.clone();
         crate::cryptanalysis::ecbench::f2m4_price::reprice_rho_mm(
             &mut alt,
@@ -2752,7 +2779,21 @@ fn solve_f2m4_rho_negation_full(
             u64::try_from(inst.r).is_err(),
             per_add,
             false,
-            Mulmod::Code,
+            Mulmod::OnepassCode,
+        )?;
+        Some(alt.total_gae)
+    } else {
+        None
+    };
+    let mont_mulmod_total = if mulmod == Mulmod::Onepass {
+        let mut alt = rep.clone();
+        crate::cryptanalysis::ecbench::f2m4_price::reprice_rho_mm(
+            &mut alt,
+            c.f.f.m,
+            u64::try_from(inst.r).is_err(),
+            per_add,
+            false,
+            Mulmod::OnepassMont,
         )?;
         Some(alt.total_gae)
     } else {
@@ -2797,7 +2838,7 @@ fn solve_f2m4_rho_negation_full(
                 "total_gae_reference_pricing": total_ref,
                 "ratio_reference_over_current": total_ref / current,
                 "note": "rho.negation charges one GAE per group operation whatever the arithmetic; only native work (FME / divisor) moves",
-                "mulmod": mulmod_note(mulmod, code_mulmod_total, total_ref),
+                "mulmod": mulmod_note(mulmod, code_mulmod_total, mont_mulmod_total, total_ref),
             }),
         );
     }
@@ -2916,7 +2957,8 @@ fn solve_f2m4_ic_full_with(
         };
     // The unit's own mulmod applies to the primary record only; the
     // current-unit comparison block always prices the code's.
-    let ctx_of = |ref_unit: bool| ctx_mm(ref_unit, if ref_unit { mulmod } else { Mulmod::Code });
+    let ctx_of =
+        |ref_unit: bool| ctx_mm(ref_unit, if ref_unit { mulmod } else { mulmod.code_of() });
     if !reference {
         crate::cryptanalysis::ecbench::f2m4_price::reprice_ic(&mut rep, &ctx_of(false))?;
         return Ok(rep);
@@ -2941,11 +2983,21 @@ fn solve_f2m4_ic_full_with(
         let rest = solver_fq - c.f4_in_solver.min(solver_fq as u64) as f64;
         f4 / (f4 + rest).max(1.0)
     };
-    let code_mulmod_total = if mulmod == Mulmod::Montgomery {
+    let code_mulmod_total = if mulmod == Mulmod::Onepass {
         let mut alt = rep.clone();
         crate::cryptanalysis::ecbench::f2m4_price::reprice_ic(
             &mut alt,
-            &ctx_mm(true, Mulmod::Code),
+            &ctx_mm(true, Mulmod::OnepassCode),
+        )?;
+        Some(alt.total_gae)
+    } else {
+        None
+    };
+    let mont_mulmod_total = if mulmod == Mulmod::Onepass {
+        let mut alt = rep.clone();
+        crate::cryptanalysis::ecbench::f2m4_price::reprice_ic(
+            &mut alt,
+            &ctx_mm(true, Mulmod::OnepassMont),
         )?;
         Some(alt.total_gae)
     } else {
@@ -3001,7 +3053,7 @@ fn solve_f2m4_ic_full_with(
             "total_gae_current_pricing": current.total_gae,
             "total_gae_reference_pricing": total_ref,
             "ratio_reference_over_current": total_ref / current.total_gae,
-            "mulmod": mulmod_note(mulmod, code_mulmod_total, total_ref),
+            "mulmod": mulmod_note(mulmod, code_mulmod_total, mont_mulmod_total, total_ref),
         }),
     );
     Ok(rep)
@@ -4135,13 +4187,33 @@ mod tests {
         }
     }
 
-    /// The `*_refmm` methods are the `*_ref` methods with the mod-r
-    /// multiplications priced from Montgomery: same counts and answer, the
-    /// same reference divisor, a different price only for those units.
+    /// The `*_refmm` methods are the `*_ref` methods with the whole native
+    /// table taken from one pass on one host and each mod-r unit priced as
+    /// the smaller of the code's and the Montgomery kernel: same counts and
+    /// answer, same reference divisor.  Against the same table, the minimum
+    /// never exceeds either kernel alone.
     #[test]
-    fn the_refmm_methods_differ_from_the_ref_methods_in_the_mulmod_units_only() {
+    fn the_refmm_methods_differ_from_the_ref_methods_in_the_native_table_only() {
         let (inst, facts, t) = f2m4_case(6, 777);
         let kv = [("walks", "16")];
+        let check = |a: &SolveReport, b: &SolveReport| {
+            assert_eq!(a.recovered, b.recovered);
+            assert_eq!(a.counters, b.counters);
+            let n = &b.detail["reference_pricing"]["mulmod"];
+            assert_eq!(n["pricing"], "min_code_montgomery");
+            let (mn, code, mont) = (
+                n["total_gae_reference_unit_min_code_montgomery"]
+                    .as_f64()
+                    .unwrap(),
+                n["total_gae_reference_unit_code_mulmod"].as_f64().unwrap(),
+                n["total_gae_reference_unit_montgomery_mulmod"]
+                    .as_f64()
+                    .unwrap(),
+            );
+            assert_eq!(mn, b.total_gae);
+            assert!(mn <= code * (1.0 + 1e-12) && mn <= mont * (1.0 + 1e-12));
+            assert!(code > 0.0 && mont > 0.0);
+        };
         for (ref_id, mm_id, kv) in [
             (
                 "rho.negation_batched_ref",
@@ -4152,18 +4224,7 @@ mod tests {
         ] {
             let a = solve(&method(ref_id, kv), &inst, &facts, &t, 9).unwrap();
             let b = solve(&method(mm_id, kv), &inst, &facts, &t, 9).unwrap();
-            assert_eq!(a.recovered, b.recovered);
-            assert_eq!(a.counters, b.counters);
-            let n = &b.detail["reference_pricing"]["mulmod"];
-            assert_eq!(n["pricing"], "montgomery");
-            assert!(
-                (n["total_gae_reference_unit_code_mulmod"].as_f64().unwrap() - a.total_gae).abs()
-                    <= 1e-9 * a.total_gae
-            );
-            assert_eq!(
-                n["total_gae_reference_unit_montgomery_mulmod"].as_f64(),
-                Some(b.total_gae)
-            );
+            check(&a, &b);
         }
         let a = solve(&ic_method("ic.pipeline_f2m4_ref", ""), &inst, &facts, &t, 3).unwrap();
         let b = solve(
@@ -4174,16 +4235,7 @@ mod tests {
             3,
         )
         .unwrap();
-        assert_eq!(a.recovered, b.recovered);
-        let n = &b.detail["reference_pricing"]["mulmod"];
-        assert!(
-            (n["total_gae_reference_unit_code_mulmod"].as_f64().unwrap() - a.total_gae).abs()
-                <= 1e-9 * a.total_gae
-        );
-        assert_eq!(
-            n["total_gae_reference_unit_montgomery_mulmod"].as_f64(),
-            Some(b.total_gae)
-        );
+        check(&a, &b);
     }
 
     /// The `*_ref` methods are the full methods in the reference unit: the
