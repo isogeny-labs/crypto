@@ -541,7 +541,7 @@ fn rho_full_once(
 /// The priced total of a solve in F_q-multiplication equivalents of its own
 /// unit: `total_gae` times the divisor that unit uses.  `full` is the
 /// current unit (the curve's schoolbook `fq_muls_per_add`); `ref` and
-/// `refmm` are the reference unit (`fq_muls_per_add_ref`, 50 at odd m and 64
+/// `refmm` are the reference unit (`fq_muls_per_add_ref`, 42 at odd m and 64
 /// at even m).  For the reference ids the second model (polynomial basis,
 /// free constant multiplication, divisor 42) is read from the record's own
 /// `reference_pricing.poly_free_const` block and returned beside it.

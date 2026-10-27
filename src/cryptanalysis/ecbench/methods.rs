@@ -259,7 +259,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "rho.negation_batched_ref",
             family: "rho",
-            summary: "rho.negation_batched_full in the reference pricing: the walk's F_q operations are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts) and divided by the per-m reference affine addition (50 at odd m, 64 at even m, where u^2+u+1 is reducible: reference_pricing.reference_model records the model, the per-primitive costs and the divisor; reference_pricing.poly_free_const the polynomial-basis free-constant-multiplication model, divisor 42, beside it), native work by the same divisor; detail.reference_pricing carries the current-unit total and divisor side by side; the same walk, so the same counts; curves over F_(2^m)^4 only",
+            summary: "rho.negation_batched_full in the reference pricing: the walk's F_q operations are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts) and divided by the per-m reference affine addition (42 at odd m, where delta = u makes the delta-multiple and Frobenius free, 64 at even m, where u^2+u+1 is reducible: reference_pricing.reference_model records the model, the per-primitive costs and the divisor; reference_pricing.poly_free_const the polynomial-basis free-constant-multiplication model, divisor 42, beside it), native work by the same divisor; detail.reference_pricing carries the current-unit total and divisor side by side; the same walk, so the same counts; curves over F_(2^m)^4 only Table and kernel: every native unit from f2m4_onepass_prices.json (one interleaved pass on one host) with the mod-r units on the code's kernel (Mulmod::OnepassCode), so no u128 step and no old-host table; reported beside the *_refmm id, which is the decision-grade variant (min of code and Montgomery).",
             entry: "ic_wide::rho_negation_batched + ecbench::f2m4_price",
             applies: Applies::Any,
             params: RHO_BATCHED_PARAMS,
@@ -267,7 +267,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "rho.negation_f2m4_ref",
             family: "rho",
-            summary: "rho.negation_f2m4_full with its native work divided by the per-m reference affine addition (50 F_q multiplications at odd m, 64 at even m, gaudry_quartic_bin::RefCosts; reference_pricing.poly_free_const records the 42-divisor second model) instead of the curve's schoolbook fq_muls_per_add; group operations are one GAE each in both; detail.reference_pricing carries the current-unit total and divisor side by side; curves over F_(2^m)^4 only",
+            summary: "rho.negation_f2m4_full with its native work divided by the per-m reference affine addition (42 F_q multiplications at odd m, 64 at even m, gaudry_quartic_bin::RefCosts; reference_pricing.poly_free_const records the 42-divisor second model) instead of the curve's schoolbook fq_muls_per_add; group operations are one GAE each in both; detail.reference_pricing carries the current-unit total and divisor side by side; curves over F_(2^m)^4 only Table and kernel: every native unit from f2m4_onepass_prices.json (one interleaved pass on one host) with the mod-r units on the code's kernel (Mulmod::OnepassCode), so no u128 step and no old-host table; reported beside the *_refmm id, which is the decision-grade variant (min of code and Montgomery).",
             entry: "ic_wide::rho_negation_tallied + ecbench::f2m4_price",
             applies: Applies::Any,
             params: RHO_PARAMS,
@@ -275,7 +275,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "rho.negation_batched_refmm",
             family: "rho",
-            summary: "rho.negation_batched_ref and the whole native price table re-measured in one interleaved pass on one host (f2m4_onepass_prices.json, ecbench price-units-f2m4 --onepass) with the mod-r units (scalar_mulmod, row_op, lp_mulmod) priced as min(the code's kernel, a one- or two-limb Montgomery kernel on u64 or u128 storage) from that pass; detail.reference_pricing carries the same record with the code-only and Montgomery-only totals from the same table beside it; the same run, so the same counts; curves over F_(2^m)^4 only",
+            summary: "rho.negation_batched_ref and the whole native price table re-measured in one interleaved pass on one host (f2m4_onepass_prices.json, ecbench price-units-f2m4 --onepass) with the mod-r units (scalar_mulmod, row_op, lp_mulmod) priced as min(the code's kernel, a one- or two-limb Montgomery kernel on u64 or u128 storage) from that pass; detail.reference_pricing carries the same record with the code-only and Montgomery-only totals from the same table beside it; the same run, so the same counts; curves over F_(2^m)^4 only Decision-grade: this id (min of the code and Montgomery kernels) decides; the *_ref id (code kernel) is reported beside it.",
             entry: "ic_wide::rho_negation_batched + ecbench::f2m4_price",
             applies: Applies::Any,
             params: RHO_BATCHED_PARAMS,
@@ -283,7 +283,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "rho.negation_f2m4_refmm",
             family: "rho",
-            summary: "rho.negation_f2m4_ref and the whole native price table re-measured in one interleaved pass on one host (f2m4_onepass_prices.json, ecbench price-units-f2m4 --onepass) with the mod-r units (scalar_mulmod, row_op, lp_mulmod) priced as min(the code's kernel, a one- or two-limb Montgomery kernel on u64 or u128 storage) from that pass; detail.reference_pricing carries the same record with the code-only and Montgomery-only totals from the same table beside it; the same run, so the same counts; curves over F_(2^m)^4 only",
+            summary: "rho.negation_f2m4_ref and the whole native price table re-measured in one interleaved pass on one host (f2m4_onepass_prices.json, ecbench price-units-f2m4 --onepass) with the mod-r units (scalar_mulmod, row_op, lp_mulmod) priced as min(the code's kernel, a one- or two-limb Montgomery kernel on u64 or u128 storage) from that pass; detail.reference_pricing carries the same record with the code-only and Montgomery-only totals from the same table beside it; the same run, so the same counts; curves over F_(2^m)^4 only Decision-grade: this id (min of the code and Montgomery kernels) decides; the *_ref id (code kernel) is reported beside it.",
             entry: "ic_wide::rho_negation_tallied + ecbench::f2m4_price",
             applies: Applies::Any,
             params: RHO_PARAMS,
@@ -435,7 +435,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "ic.pipeline_f2m4_ref",
             family: "ic",
-            summary: "ic.pipeline_f2m4_full in the reference pricing: the solver's F_q operations and native work are divided by the per-m reference affine addition (50 at odd m, 64 at even m; reference_pricing.reference_model and .poly_free_const record both models), and the base lifts, x_of_t, the Weil-restriction system builds and the interpolation precomputation are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts; reference_pricing.weil_restriction has weil_muls and weil_ref_muls, solver.extra the same per record); detail.reference_pricing carries the current-unit total, both divisors and IC's F_(q^4) share side by side; the same run, so the same counts",
+            summary: "ic.pipeline_f2m4_full in the reference pricing: the solver's F_q operations and native work are divided by the per-m reference affine addition (42 at odd m, 64 at even m; reference_pricing.reference_model and .poly_free_const record both models), and the base lifts, x_of_t, the Weil-restriction system builds and the interpolation precomputation are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts; reference_pricing.weil_restriction has weil_muls and weil_ref_muls, solver.extra the same per record); detail.reference_pricing carries the current-unit total, both divisors and IC's F_(q^4) share side by side; the same run, so the same counts Table and kernel: every native unit from f2m4_onepass_prices.json (one interleaved pass on one host) with the mod-r units on the code's kernel (Mulmod::OnepassCode), so no u128 step and no old-host table; reported beside the *_refmm id, which is the decision-grade variant (min of code and Montgomery).",
             entry: "ic_framework::run_pipeline + ecbench::f2m4_price",
             applies: Applies::Any,
             params: IC_PIPELINE_PARAMS,
@@ -443,7 +443,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "ic.pipeline_f2m4_refmm",
             family: "ic",
-            summary: "ic.pipeline_f2m4_ref and the whole native price table re-measured in one interleaved pass on one host (f2m4_onepass_prices.json, ecbench price-units-f2m4 --onepass) with the mod-r units (scalar_mulmod, row_op, lp_mulmod) priced as min(the code's kernel, a one- or two-limb Montgomery kernel on u64 or u128 storage) from that pass; detail.reference_pricing carries the same record with the code-only and Montgomery-only totals from the same table beside it; the same run, so the same counts; curves over F_(2^m)^4 only",
+            summary: "ic.pipeline_f2m4_ref and the whole native price table re-measured in one interleaved pass on one host (f2m4_onepass_prices.json, ecbench price-units-f2m4 --onepass) with the mod-r units (scalar_mulmod, row_op, lp_mulmod) priced as min(the code's kernel, a one- or two-limb Montgomery kernel on u64 or u128 storage) from that pass; detail.reference_pricing carries the same record with the code-only and Montgomery-only totals from the same table beside it; the same run, so the same counts; curves over F_(2^m)^4 only Decision-grade: this id (min of the code and Montgomery kernels) decides; the *_ref id (code kernel) is reported beside it.",
             entry: "ic_framework::run_pipeline + ecbench::f2m4_price",
             applies: Applies::Any,
             params: IC_PIPELINE_PARAMS,
@@ -1123,13 +1123,13 @@ pub fn solve(
         } else if m.id == "rho.negation_batched_full" {
             solve_f2m4_rho_batched(m, i, tx, ty, seed, true, false, Mulmod::Code)?
         } else if m.id == "rho.negation_batched_ref" {
-            solve_f2m4_rho_batched(m, i, tx, ty, seed, true, true, Mulmod::Code)?
+            solve_f2m4_rho_batched(m, i, tx, ty, seed, true, true, Mulmod::OnepassCode)?
         } else if m.id == "rho.negation_batched_refmm" {
             solve_f2m4_rho_batched(m, i, tx, ty, seed, true, true, Mulmod::Onepass)?
         } else if m.id == "rho.negation_f2m4_full" {
             solve_f2m4_rho_negation_full(m, i, tx, ty, seed, false, Mulmod::Code)?
         } else if m.id == "rho.negation_f2m4_ref" {
-            solve_f2m4_rho_negation_full(m, i, tx, ty, seed, true, Mulmod::Code)?
+            solve_f2m4_rho_negation_full(m, i, tx, ty, seed, true, Mulmod::OnepassCode)?
         } else if m.id == "rho.negation_f2m4_refmm" {
             solve_f2m4_rho_negation_full(m, i, tx, ty, seed, true, Mulmod::Onepass)?
         } else if m.id == "ic.pipeline_f2m4_full" {
@@ -1144,7 +1144,7 @@ pub fn solve(
                 seed,
                 u64::try_from(i.r).is_err(),
                 true,
-                Mulmod::Code,
+                Mulmod::OnepassCode,
             )?
         } else if m.id == "ic.pipeline_f2m4_refmm" {
             solve_f2m4_ic_full_with(
@@ -2636,7 +2636,7 @@ fn solve_f2m4_rho_batched(
 
 /// Which reference model priced a `*_ref` / `*_refmm` record, and the
 /// per-primitive costs and divisor it used at this `m`.  The comparison uses
-/// the log-table tower model (`RefModel::Tower`, divisor 50 at odd `m`, 64
+/// the log-table tower model (`RefModel::Tower`, divisor 42 at odd `m`, 64
 /// at even `m`) because the field the code runs in is a log-table field,
 /// where a constant multiple costs a multiplication; the polynomial-basis
 /// model with free constant multiplication (42 at every `m`) is recorded
@@ -2654,7 +2654,7 @@ fn reference_model_note(
     json!({
         "used": "log_table_tower",
         "m": c.f.f.m,
-        "m_parity": if c.f.f.m % 2 == 0 { "even (u^2+u+1 reducible, epsilon != 1)" } else { "odd (epsilon = 1)" },
+        "m_parity": if c.f.f.m.is_multiple_of(2) { "even (u^2+u+1 reducible, epsilon != 1)" } else { "odd (epsilon = 1, delta = u: constant multiples and Frobenius free)" },
         "divisor": per_ref,
         "tower_costs": costs(a),
         "poly_free_const_costs": costs(b),
@@ -2675,11 +2675,21 @@ fn mulmod_note(
     total: f64,
 ) -> Value {
     match mulmod {
-        Mulmod::Code | Mulmod::OnepassCode | Mulmod::OnepassMont => {
+        Mulmod::Code => {
             json!({"pricing": "code", "units": "f2m4_full_prices.json"})
+        }
+        Mulmod::OnepassCode => json!({
+            "pricing": "code",
+            "units": "f2m4_onepass_prices.json (every unit, one interleaved pass on one host; the mod-r units on the code's kernel)",
+            "decision_grade": false,
+            "note": "reported beside the *_refmm id, which decides",
+        }),
+        Mulmod::OnepassMont => {
+            json!({"pricing": "montgomery", "units": "f2m4_onepass_prices.json"})
         }
         Mulmod::Onepass => json!({
             "pricing": "min_code_montgomery",
+            "decision_grade": true,
             "units": "f2m4_onepass_prices.json (every unit and the three mod-r units, one interleaved pass on one host)",
             "total_gae_reference_unit_min_code_montgomery": total,
             "total_gae_reference_unit_code_mulmod": code_total,
@@ -4240,14 +4250,14 @@ mod tests {
 
     /// The `*_ref` methods are the full methods in the reference unit: the
     /// same walk or run (same counts, same answer), the reference divisor
-    /// 50 in place of the curve's schoolbook one, and the two totals side
+    /// 42 or 64 in place of the curve's schoolbook one, and the two totals side
     /// by side.
     #[test]
     fn the_reference_methods_are_the_full_methods_in_the_reference_unit() {
-        // The reference divisor is per m: 64 at even m, 50 at odd m; the
+        // The reference divisor is per m: 64 at even m, 42 at odd m; the
         // second model's is 42 at both.
         for m in [6u32, 7] {
-            let expect = if m % 2 == 0 { 64.0 } else { 50.0 };
+            let expect = if m % 2 == 0 { 64.0 } else { 42.0 };
             let (inst, facts, t) = f2m4_case(m, 777);
             let kv = [("walks", "16")];
             for (full_id, ref_id, kv) in [
@@ -4276,10 +4286,16 @@ mod tests {
                 assert_eq!(b["poly_free_const"]["fq_muls_per_add"].as_f64(), Some(42.0));
                 assert!(b["poly_free_const"]["total_gae"].as_f64().unwrap() > 0.0);
                 assert!(b["fq_muls_per_add_current"].as_f64().unwrap() > expect);
-                assert!(
-                    (b["total_gae_current_pricing"].as_f64().unwrap() - full.total_gae).abs()
-                        <= 1e-9 * full.total_gae
-                );
+                // `*_ref` reads the one-pass table, `*_full` the old one: the
+                // same counts, so the current-unit totals agree to the
+                // tables' difference only.
+                let cur = b["total_gae_current_pricing"].as_f64().unwrap();
+                assert!(cur > 0.25 * full.total_gae && cur < 4.0 * full.total_gae);
+                assert!(b["mulmod"]["units"]
+                    .as_str()
+                    .unwrap()
+                    .starts_with("f2m4_onepass_prices.json"));
+                assert_eq!(b["mulmod"]["decision_grade"], false);
                 assert_eq!(
                     b["total_gae_reference_pricing"].as_f64(),
                     Some(rf.total_gae)
@@ -4297,10 +4313,9 @@ mod tests {
             let rf = solve(&method, &inst, &facts, &t, 3).unwrap();
             assert_eq!(full.recovered, rf.recovered);
             let b = &rf.detail["reference_pricing"];
-            assert!(
-                (b["total_gae_current_pricing"].as_f64().unwrap() - full.total_gae).abs()
-                    <= 1e-9 * full.total_gae
-            );
+            let cur = b["total_gae_current_pricing"].as_f64().unwrap();
+            assert!(cur > 0.25 * full.total_gae && cur < 4.0 * full.total_gae);
+            assert_eq!(b["mulmod"]["decision_grade"], false);
             assert_eq!(b["fq_muls_per_add_reference"].as_f64(), Some(expect));
             assert_eq!(b["reference_model"]["used"], "log_table_tower");
             assert_eq!(b["poly_free_const"]["fq_muls_per_add"].as_f64(), Some(42.0));

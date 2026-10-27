@@ -270,21 +270,29 @@ pub enum RefModel {
 /// * `F_{q²}` product `3 + e` (Karatsuba; `c₀ = p₀ + ε p₁`), square `2 + e`
 ///   (`c₀ = a₀² + ε a₁²`), inversion `7 + e` (norm `a₀² + a₀a₁ + ε a₁²` to
 ///   `F_q` `3 + e`, `F_q` inverse 2, 2 products);
-/// * `mul` = 3 `F_{q²}` products + 2 for the `δ`-multiple (11 / 14);
-/// * `sq` = 2 `F_{q²}` squares + the `δ`-multiple 2 (6 / 8);
+/// * `mul` = 3 `F_{q²}` products + 2 for the `δ`-multiple (9 / 14);
+/// * `sq` = 2 `F_{q²}` squares + the `δ`-multiple 2 (4 / 8);
 /// * `scale` 4 (an `F_q` scalar times 4 coordinates);
 /// * `frob` (`a ↦ a^q`) = one `F_{q²}` product by `w^{q−1}` (the
-///   conjugations are free) (3 / 4);
+///   conjugations are free) (0 / 4);
 /// * `inv` = relative norm (2 `F_{q²}` squares + a product + the
-///   `δ`-multiple) + `F_{q²}` inversion + 2 `F_{q²}` products (22 / 28);
+///   `δ`-multiple) + `F_{q²}` inversion + 2 `F_{q²}` products (20 / 28);
 /// * `sqrt` = 4 `F_q` square roots (linear, 1 each) + the two twists by `√u`
-///   and `√w` (4 `F_{q²}` products) (16 / 20).
+///   and `√w` (4 `F_{q²}` products) (4 / 20).
 ///
-/// The model keeps charging the `δ`-multiple 2 at both parities (it does not
-/// ask whether `δ` can be chosen cheap), so the odd/even difference is the
-/// `ε` terms alone.  A product by 0 or 1, or a square, scalar, Frobenius or
-/// inverse of 0 or 1, costs nothing.  An affine addition (1 inversion, 2
-/// products, 1 square) is then **50 for odd `m` and 64 for even `m`**.
+/// **The choice of `δ`.**  `δ ∈ F_q` never makes `w² + w + δ` irreducible
+/// over `F_{q²}`, so `δ` lies in `F_{q²}`.  At odd `m`, `ε = 1` and
+/// `Tr_{F_{q²}/F_2}(u) = Tr_{F_q/F_2}(1) = 1`, so `δ = u` works: the
+/// `δ`-multiple is free (`(a₀ + a₁u)u = a₁ + (a₀ + a₁)u`), the Frobenius is
+/// free (`w^q = w + u`) and so are the twists (`√u = u + 1`, `√w = w + u + 1`,
+/// additions only).  At even `m`, `δ = μu` with `Tr(μ) = 1` forces `μ ≠ 1`, so
+/// the multiple costs 2 (`μ` and `με` precomputed) and the twists are products.
+/// With `c = 1` at even `m` and `c = 0` at odd `m`: the `δ`-multiple is `2c`,
+/// `frob` is `c` products, `sqrt` is 4 + `4c` products.  A product by 0 or 1,
+/// or a square, scalar, Frobenius or inverse of 0 or 1, costs nothing.  An
+/// affine addition (1 inversion, 2 products, 1 square) is then **42 for odd
+/// `m` and 64 for even `m`**; at odd `m` the Tower model equals
+/// [`RefModel::PolyFreeConst`].
 ///
 /// [`RefModel::PolyFreeConst`] gives constant multiplications (`ε`, `δ`,
 /// the Frobenius and twist constants) a price of 0, so `F_{q²}` product 3,
@@ -303,11 +311,14 @@ pub struct RefCosts {
 impl RefCosts {
     /// The costs of `model` for `F_{(2^m)^4}`.
     pub fn new(model: RefModel, m: u32) -> RefCosts {
+        let even = m.is_multiple_of(2);
         let e = match model {
-            RefModel::Tower => u64::from(m % 2 == 0),
+            RefModel::Tower => u64::from(even),
             RefModel::PolyFreeConst => 0,
         };
-        let c = u64::from(model == RefModel::Tower); // constant multiple
+        // Constant multiples are free at odd m (δ = u) and in the polynomial
+        // model; at even m of the tower the δ-multiple costs 2.
+        let c = u64::from(model == RefModel::Tower && even);
         let (mul2, sq2, inv2) = (3 + e, 2 + e, 7 + e);
         RefCosts {
             model,
@@ -2897,7 +2908,7 @@ pub fn find_bin_curve(m: u32, seed: u64, max_cofactor: u64) -> Result<BinCurve, 
 
 /// The reference price ([`RefCosts`], [`RefModel::Tower`]) of one affine
 /// addition of two distinct points, measured on this curve through the
-/// reference tally: 50 for odd `m`, 64 for even `m`, and the same for every
+/// reference tally: 42 for odd `m`, 64 for even `m`, and the same for every
 /// choice of quartic.  This is the divisor every `*_ref` / `*_refmm` id uses.
 pub fn fq_muls_per_add_ref(c: &CurveB) -> u64 {
     ref_add_with(c, |f| f.ref_muls())
@@ -3792,7 +3803,7 @@ mod tests {
     }
 
     /// The reference price of an affine addition depends on `m` only through
-    /// its parity (50 odd, 64 even; 42 at every `m` in the polynomial-basis
+    /// its parity (42 odd, 64 even; 42 at every `m` in the polynomial-basis
     /// model), never on the quartic, while the current count is not; and
     /// reading the tally changes no count.
     #[test]
@@ -3802,7 +3813,7 @@ mod tests {
             let c = generate_instance(m, 3);
             let r = fq_muls_per_add_ref(&c);
             assert_eq!(r, RefCosts::new(RefModel::Tower, m).add(), "m = {m}");
-            assert_eq!(r, if m % 2 == 1 { 50 } else { 64 }, "m = {m}");
+            assert_eq!(r, if m % 2 == 1 { 42 } else { 64 }, "m = {m}");
             assert_eq!(fq_muls_per_add_ref_poly(&c), 42, "m = {m}");
             current.push(fq_muls_per_add(&c));
         }
@@ -3815,7 +3826,7 @@ mod tests {
         let odd = RefCosts::new(RefModel::Tower, 15);
         assert_eq!(
             (odd.mul, odd.sq, odd.scale, odd.frob, odd.inv, odd.sqrt),
-            (11, 6, 4, 3, 22, 16)
+            (9, 4, 4, 0, 20, 4)
         );
         let even = RefCosts::new(RefModel::Tower, 14);
         assert_eq!(
