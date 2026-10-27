@@ -347,7 +347,9 @@ fn main() {
     let gave_up_frac = gates["fast_gave_up"].as_array().unwrap().len() as f64 / corpus.len() as f64;
     let cr: Vec<f64> = counts.values().map(|(s, f)| s / f.max(1.0)).collect();
     let logs_correct = dlp.iter().all(|r| r["correct"][0] == true && r["correct"][1] == true);
-    let within = cr.iter().all(|c| (0.75..=1.25).contains(c));
+    // P4's wording: fast's counted multiplications within ±25% of sparse's.
+    let fast_over_sparse: Vec<f64> = counts.values().map(|(s, f)| f / s.max(1.0)).collect();
+    let within = fast_over_sparse.iter().all(|c| (0.75..=1.25).contains(c));
     let s10 = dlp.iter().all(|r| (r["s_ratio_sparse_over_fast"].as_f64().unwrap() - 1.0).abs() <= 0.10);
     let lin_lower = dlp.iter().all(|r| r["lin_ms_ratio_sparse_over_fast"].as_f64().unwrap() > 1.0);
     let ab = family_table(&abl, "sparse", "fast", None);
@@ -360,7 +362,7 @@ fn main() {
         "P4": {
             "logs_correct": logs_correct, "counted_within_25pct_every_system": within,
             "counted_ratio_range": [cr.iter().cloned().fold(f64::INFINITY, f64::min), cr.iter().cloned().fold(f64::NEG_INFINITY, f64::max)],
-            "counted_outside_25pct": cr.iter().filter(|c| !(0.75..=1.25).contains(*c)).count(),
+            "counted_outside_25pct": fast_over_sparse.iter().filter(|c| !(0.75..=1.25).contains(*c)).count(),
             "s_within_10pct": s10, "lin_ms_lower_every_run": lin_lower,
             "held": logs_correct && within && s10 && lin_lower,
         },

@@ -40,7 +40,7 @@ staircase, normal forms, $M_(x_n)$, minimal polynomial, roots, coordinates and t
   [P1], [every family sparse/fast ≥ 1.5, interval above 1], [*held*: 7.1–45.5×],
   [P2], [in `dense`, sparse/fast grows with δ], [*held*: Spearman ρ = 0.93 (153 systems)],
   [P3], [fast gives up on ≤ 5%], [*held*: 1 of 253 (`gaudry-d4 p97-4`, $x_n$ not separating)],
-  [P4], [DLP logs correct; counted muls within ±25% on every system; S within ±10%; lower linear-stage wall time], [*failed* on the counted clause (R3: 0.77–2.14; outside on 121 systems); the other three held],
+  [P4], [DLP logs correct; counted muls within ±25% on every system; S within ±10%; lower linear-stage wall time], [*failed* on the counted clause (R3: fast outside ±25% of sparse on 97 systems; sparse ÷ fast 0.77–2.14); the other three held],
   [P5], [portable fast (no vector kernels) still ≥ 1.2], [*held*: 6.3–11.1×],
 )
 

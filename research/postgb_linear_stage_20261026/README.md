@@ -67,7 +67,7 @@ the protocol).
 | **P1** every family `sparse/fast` ≥ 1.5, interval above 1 | **held**: 7.1–45.5× |
 | **P2** in `dense`, `sparse/fast` grows with δ | **held**: Spearman ρ = 0.93 over 153 systems |
 | **P3** `fast` gives up on ≤ 5% | **held**: 1 of 253 (0.4%), `gaudry-d4 p97-4` |
-| **P4** DLP logs correct, counted multiplications within ±25% on every system, S within ±10%, lower linear-stage wall time on every run | **failed** on the counted clause: counted sparse ÷ fast (R3) is 0.77–2.14, outside ±25% on 121 systems (102 `dense`, 8 `gaudry-s4`, 7 `jv-nagao`, 4 `gaudry-d4`). The other three clauses held |
+| **P4** DLP logs correct, counted multiplications within ±25% on every system, S within ±10%, lower linear-stage wall time on every run | **failed** on the counted clause: fast's count falls outside ±25% of sparse's (R3) on 97 systems (85 `dense`, 8 `gaudry-s4`, 2 `gaudry-d4`, 2 `gaudry-s5`); counted sparse ÷ fast ranges 0.77–2.14. The other three clauses held |
 | **P5** portable `fast` (no vector kernels) still ≥ 1.2 | **held**: 6.3–11.1× |
 
 ### 1. The linear stage is 7–46× faster than the incumbent in every family
