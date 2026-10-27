@@ -1129,7 +1129,9 @@ fn summary(args: &[String]) {
             adds / tot,
             esc / tot * 1e6
         );
-        let rname = reference(exp);
+        // --ref ARM overrides the default reference for every experiment
+        let ref_override = arg_s(args, "--ref", "");
+        let rname = if ref_override.is_empty() { reference(exp) } else { ref_override.as_str() };
         if let Some(rrows) = cells.get(&(exp.clone(), *bits, rname.to_string())) {
             if rname != arm {
                 // paired by trial: ratio of means ref/arm, bootstrap over trials

@@ -184,7 +184,7 @@ state_hash() {
     git diff --binary HEAD 2>/dev/null || true
     [ -f .resume/RESUME.md ] && cat .resume/RESUME.md
     git ls-files --others --exclude-standard | grep -Ev "$EXCLUDE_RE" | grep -v '^\.resume/' | while IFS= read -r f; do
-      [ -f "$f" ] && stat -f '%N %z %m' "$f" 2>/dev/null || stat -c '%n %s %Y' "$f" 2>/dev/null || true
+      [ -f "$f" ] && { stat -c '%n %s %Y' "$f" 2>/dev/null || stat -f '%N %z %m' "$f" 2>/dev/null || true; }
     done
   } | shasum -a 256 | cut -d' ' -f1
 }
@@ -288,7 +288,9 @@ cmd_push() {
   : > "$stage/untracked.list"; : > "$stage/skipped-untracked.txt"
   while IFS= read -r f; do
     [ -f "$f" ] || continue
-    sz="$(stat -f %z "$f" 2>/dev/null || stat -c %s "$f")"
+    # GNU stat first: on Linux `stat -f` is filesystem status and succeeds
+    # with a multi-line report, which is not a size.
+    sz="$(stat -c %s "$f" 2>/dev/null || stat -f %z "$f")"
     if [ "$sz" -gt "$maxb" ] || [ $((total + sz)) -gt "$capb" ]; then
       printf '%s\t%s bytes\n' "$f" "$sz" >> "$stage/skipped-untracked.txt"
     else
