@@ -348,6 +348,33 @@ proof was checked.
     on the SAT step may be assumed any more.  No cost row in this repository
     assumes ETH (`grep -w ETH` finds only unrelated uses).
 
+### Provenance: OpenAI's 2026-10-26 announcement
+
+OpenAI's post "Working with academic communities to build scientific
+understanding" (2026-10-26,
+<https://openai.com/index/building-scientific-understanding-with-academic-communities/>)
+accompanies `42907c9`.  The page returned HTTP 403 to automated fetches
+from this session.  What follows comes from a search-engine summary of it
+and from Gizmodo's coverage (2026-10-26), not from the post itself:
+
+- It announces three results: local smoothing/Kakeya (family 079), the ETH
+  disproof (378), and a construction of four-dimensional interacting gauge
+  theories including QCD.  The QCD result is not in `openai/math`: its
+  external group chose to write it up themselves.
+- It calls the manuscripts "raw research data" and names outside
+  "shepherds" who form groups to interpret them.  For ETH, `history.md`
+  names a working group led by R. Impagliazzo, R. Paturi and R. Williams.
+  OpenAI says it seeks no academic credit.
+- The coverage recalls that in an earlier claim (Navier–Stokes), Lean
+  "verified a weaker assertion" than the one published.  That is why this
+  note treats every corpus "formalized" claim as unchecked until its
+  Comparator statement is compared with the paper.  That applies to
+  `complex_omega_le_nine_quarters`, `omega_lt_source_constant` and
+  `exact_count_and_sat`.
+
+Effect on this note: none on any number.  Family 378 stays galactic and
+unverified here until its working group reports.
+
 ### Correction to the 2026-10-07 addendum: family 107 was already formalized
 
 `lean/docs/107.md` and its Comparator statements date from the initial
