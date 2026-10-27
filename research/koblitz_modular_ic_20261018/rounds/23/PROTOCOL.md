@@ -145,3 +145,8 @@ lambda,b,c at both Z5 residues. Their reductions are
 The written regular-curve bridge may now interpret the certified local lengths;
 the new Lean implications expose that bridge instead of pretending to formalize
 normalization. No new native search or resource change is introduced.
+
+Recover the first-host Tate source-factor checks in the compact replay:verify
+both exact original residual factorizations and cofactorA=1 on the entire
+original SS5 fiber. This restores a missing raw bridge without repeating the
+complete colon computation;its literal h/lift certificate already survives.

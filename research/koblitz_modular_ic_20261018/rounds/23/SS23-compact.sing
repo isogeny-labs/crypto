@@ -2,6 +2,10 @@
 print("BEGIN_SS23_COMPACT");
 poly F=b*c7+b2*c5+b*c6+b2*c4+c6+b5+b4*c+b3*c2+b2*c3;
 poly Q0=nn[239];poly Q1=nn[241];poly Q2=nn[243];
+poly tateCofactorA=nn[49]/F;
+poly tateCofactorB=nn[53]/F;
+print("ORIGINAL_TATE_FACTOR_RESIDUALS");nn[49]-tateCofactorA*F;nn[53]-tateCofactorB*F;
+if(nn[49]-tateCofactorA*F!=0 || nn[53]-tateCofactorB*F!=0){ERROR("Tate source factor mismatch");}
 print("COMPACT_COLON_MEMBERSHIP_RESIDUAL");h*Q2-liftF*F-liftQ0*Q0-liftQ1*Q1;
 if(h*Q2-liftF*F-liftQ0*Q0-liftQ1*Q1!=0){ERROR("compact source certificate failed");}
 poly baseDerivative=diff(F,b);
@@ -10,6 +14,8 @@ ring ss=(2,a),(n,l),lp;
 minpoly=a5+a3+1;
 number bb=a+1;
 map sp=r,n,l,bb,1;
+print("ORIGINAL_TATE_COFACTORS_ON_FIBER");sp(tateCofactorA);sp(tateCofactorB);
+if(sp(tateCofactorA)!=1){ERROR("original Tate equation does not recover F near the fiber");}
 poly hs=sp(h);
 poly L=l4+bb*l+bb^2;
 poly C=n4+bb^3*n+bb^4*(l+1);
