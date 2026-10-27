@@ -60,4 +60,18 @@ The ranked tables contain 28 regime rows for 24 curves. The registry names
 the page shows measured base sizes and recipes with that limitation. The
 browser index in the starting revision held 15,791 curves and an older
 registry digest. The coverage gate treats that as a stale index to repair,
-not as 4,801 absent curves to hide or price by extrapolation.
+not as 4,801 absent curves to hide or price by extrapolation. This change
+rebuilds the browser index against all 20,592 registered models. The older
+cover catalog remains attached only to the 15,791 exact models it certifies;
+the 4,801 newer models are explicitly shown as unassessed for covers. A cover
+certificate is never borrowed across a changed model hash. The browser also
+preserves the canonical leaderboard's IC1 identities when that source file
+exceeds the general text-scan size cap.
+
+Further coverage work is evidence work: audit committed whole-pipeline
+sessions for qualified curve/target/reference rows that the ranked tables do
+not yet include, and add their frozen sources through the leaderboard builder.
+Keep stage-only, unmatched and incomplete sessions searchable as diagnostics.
+Reconcile each ranked base to an FB1 identity only when the frozen point set
+and curve representation establish that join; until then the measured size and
+recipe remain useful, with the identity marked unresolved.
