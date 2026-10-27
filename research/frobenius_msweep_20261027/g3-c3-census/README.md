@@ -17,7 +17,7 @@ for it.
 | file | what |
 |:--|:--|
 | [PROTOCOL.md](PROTOCOL.md) | frozen-at-run design: claims, arms, controls, metric, decision rule, sizes and resolution, runtime estimate, limits |
-| [AMENDMENT.md](AMENDMENT.md) | where the spec is not executable as written (12 items) and what replaces it |
+| [AMENDMENT.md](AMENDMENT.md) | where the spec is not executable as written (A1-A18) and what replaces it |
 | [RUN_CARD.md](RUN_CARD.md) | exact commands, gates, expected wall times, output paths under `reports/run-<UTC>/` |
 | `src/gf.rs` | GF(2^n), normal and polynomial bases, stable subspaces V = ker g(sigma) |
 | `src/curve.rs` | binary curve arithmetic, planted instances, exact solver-free decomposition oracle |
@@ -37,7 +37,7 @@ re-estimate gates, a hard-capped pilot with a disjoint target stream, 1%
 censoring tolerance, a freeze procedure that commits the frozen set and writes
 `FREEZE.txt`. See PROTOCOL.md section 14.
 
-Tests (cell directory): `cargo test --release -- --skip satlib` gives 36
+Tests (cell directory): `CARGO_TARGET_DIR=<outside the tree> cargo test --release -- --skip satlib` gives 37
 passed, 0 failed. `satlib` is the repository solver's own suite, skipped here.
 
 What the tests establish (exact, no statistics): the Semaev S3 formula equals
@@ -46,7 +46,7 @@ B, Bnogauge and G return the oracle's verdict with valid certificates on all 127
 targets at n = 7 for m = 2 (l = 3 and 4) and, with the same seven arms, for
 m = 3 (l = 3); on six n = 17 targets only C, Cpoly, A, B and G were checked;
 G admits every sorted V-triple at (7,3,3) and 120 sampled triples at (31,5,3)
-with the slots and chain variable pinned; Chalf never invents a solution; the unsound arm U flips satisfiable targets and B is caught as unsound
+with the slots and chain variable pinned; Chalf (all-slot pin) never invents a solution; the unsound arm U flips satisfiable targets and B is caught as unsound
 on an ordinary curve; the domain of each arm equals an independent Rust predicate
 (PROTOCOL claim S2, "up to the tie sliver", is checked only as that equality
 plus a weak lower bound on B's domain, not numerically against |V^m/S_m|).
@@ -55,5 +55,7 @@ What is not known: any conflict count, ratio or runtime. The runtime table in
 PROTOCOL.md section 8 is a code-reasoning estimate with a factor-ten
 uncertainty.
 
-Clean-up: build with `cargo build --release` in this directory; delete
-`target/` when finished (`rm -rf target`).
+Clean-up: build with `CARGO_TARGET_DIR=<dir outside the tree> cargo build --release`
+(the freeze requires an empty `git status`; tests write to the OS temp dir);
+delete that directory when finished. Revision 3 (PROTOCOL section 15): P3 re-derived,
+O-STRUCTURE fails closed on missing controls, freeze commands made exact.

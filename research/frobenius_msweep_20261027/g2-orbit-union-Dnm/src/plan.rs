@@ -48,10 +48,12 @@ fn left_tuples(nx: f64, m: usize) -> f64 {
     binom(nx.round() as u64, aa as u64) as f64 * (1u64 << aa) as f64
 }
 
-/// Effective number of targets: distinct Frobenius orbits in hE (about |hE|/n), at most NT.
-/// Only n = 7 is affected (4 to 10 orbits); the runner returns the exact number.
+/// Effective number of targets: distinct orbits of <Frobenius, negation> in hE (about
+/// (|hE| - 1)/(2n); +-R share x), at most NT. n = 7 and n = 11 are affected; the runner returns
+/// the exact number (review round 2: the earlier count used Frobenius orbits only and overstated
+/// independent targets by up to 2x).
 pub fn nt_effective(a: u32, n: u32) -> f64 {
-    let orbits = (koblitz_order(a, n) / crate::curve::cofactor(a)) as f64 / n as f64;
+    let orbits = ((koblitz_order(a, n) / crate::curve::cofactor(a)) as f64 - 1.0) / (2.0 * n as f64);
     orbits.round().max(1.0).min(NT as f64)
 }
 

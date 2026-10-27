@@ -34,7 +34,7 @@ Frozen request fields to hand to the `isolab-eks` skill (card instructions in it
 | source | the commit that contains this directory with a clean tree (`run_cells.sh` refuses a dirty cell directory); image built from that commit; record source SHA, binary SHA-256 (`binary.sha256`) and OCI digest separately |
 | argv | `cd research/frobenius_msweep_20261027/g5-propT-census && G5_MAX_CPU_MIN=400 ./run_cells.sh 4` |
 | resources | 4 vCPU (the `4` is the number of parallel jobs, equal to the vCPUs), 2 GiB memory (jobs stay below 300 MB), 2 GiB disk (build 100 MB, reports below 50 MB) |
-| image needs | Rust stable with cargo, bash, awk, bc, git, coreutils; `scripts/checkpoint.sh gate` must pass inside the job or be passed on the submitter side with the receipt (the driver has no bypass) |
+| image needs | Rust stable with cargo, bash, awk, bc, git, coreutils; `scripts/checkpoint.sh gate` must pass inside the job (the driver calls it unconditionally and has no bypass); the committed `Cargo.lock` must be present in the checkout |
 | deadline | 3 hours from submission (expected 10 to 25 minutes; the pre-flight aborts above `G5_MAX_CPU_MIN`) |
 | acceptance | `reports/run-<UTC>/summary.md` exists; its section 0 shows every job complete or CELL_NOT_RUN; "Abort conditions" says none triggered; `exit_*.txt` are 0 or 2 |
 | retrieval | the whole `reports/run-<UTC>/` directory as one archive with its SHA-256 (section 6) |
@@ -53,7 +53,7 @@ If the image or build route is unavailable, report that instead of running a dif
    preparation.** The SHA-256 of `PROTOCOL.md`, `RUN_CARD.md`, `run_cells.sh`, `Cargo.lock` and every source and test file is
    recorded by the driver in `inputs.sha256`, so a post-freeze edit is visible.
 4. Commit the cell directory (clean tree). `target/` is ignored; the driver builds into `$TMPDIR/g5census-target`.
-5. `cargo test --release --locked` (29 tests: 25 in `tests/identities.rs`, 4 in `tests/pipeline.rs`) passes on the exact binary
+5. `cargo test --release --locked` (30 tests: 25 in `tests/identities.rs`, 5 in `tests/pipeline.rs`) passes on the exact binary
    that runs; `run_cells.sh` runs it first. A test failure aborts.
 
 ## 3. Run (single entry point) and what it does, in order

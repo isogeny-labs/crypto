@@ -11,7 +11,7 @@ pub const ARMS: [&str; 7] = ["vpoly", "vrand", "g4poly", "g4rand", "rset", "riot
 pub const SINGLE_ARMS: [&str; 2] = ["vpoly", "g4poly"];
 /// Cap on the number of m-subsets enumerated for one base (about 1 GB at 32 bytes per record). It is
 /// never hit by a matched replicate: `draw_matched` redraws the g4rand base (and with it the common item
-/// count N of every arm) until 2m <= N and C(N, m) <= ENUM_CAP, identically for all arms.
+/// count N of every arm) until ncls >= m and C(N, m) <= ENUM_CAP, identically for all arms.
 pub const ENUM_CAP: f64 = 3e7;
 /// Arms that are matched on the exact item count within a replicate and enter the decision rule.
 pub const MATCHED_ARMS: [&str; 5] = ["vrand", "g4rand", "rset", "riota", "wrong"];
@@ -35,7 +35,7 @@ pub fn cell_list() -> Vec<Cell> {
         (0, 13, &[(2, 7), (2, 8), (3, 6), (4, 5), (5, 5), (6, 5)]),
         (0, 17, &[(2, 9), (3, 7), (4, 6), (5, 5), (6, 5)]),
         (0, 19, &[(2, 10), (3, 7), (4, 6), (5, 5), (6, 5)]),
-        (1, 11, &[(2, 6), (2, 7), (3, 5), (4, 4), (4, 5), (5, 4), (5, 5), (6, 4), (6, 5)]),
+        (1, 11, &[(2, 6), (2, 7), (3, 5), (4, 5), (5, 5), (6, 5)]),
         (1, 13, &[(2, 7), (2, 8), (3, 6), (4, 5), (5, 5), (6, 5)]),
         (1, 17, &[(2, 9), (3, 7), (4, 6), (5, 5), (6, 5)]),
     ];
@@ -267,6 +267,13 @@ pub fn items_of(g: &Group, raw: &[u32]) -> usize {
     build_base(g, &core_set(raw)).items.len()
 }
 
+/// (items, classes) of a raw x-set. The enumerator needs m pairwise distinct classes, so a base with
+/// fewer than m classes has no decomposition at any target (amendment A1).
+pub fn shape_of(g: &Group, raw: &[u32]) -> (usize, usize) {
+    let b = build_base(g, &core_set(raw));
+    (b.items.len(), b.ncls)
+}
+
 /// One replicate's matched bases: every arm has exactly `n_items` items (the g4rand base's count).
 pub struct Matched {
     pub n_items: usize,
@@ -280,7 +287,7 @@ fn seed_of(seed: u64, c: &Cell, arm: &str, rep: u64, gatt: u64, att: u64) -> u64
 }
 
 /// Draw the g4rand base of the replicate, then rejection-sample every other matched arm until its item
-/// count equals the g4rand base's. A g4rand draw is redrawn (the whole replicate with it) if N < 2m,
+/// count equals the g4rand base's. A g4rand draw is redrawn (the whole replicate with it) if ncls < m (a stable base has 4 items per class, so N < 4m),
 /// C(N, m) > ENUM_CAP or any arm cannot be matched in MATCH_TRIES draws; the rule is the same for all
 /// arms, so it truncates the common N distribution and cannot favour one arm.
 pub fn draw_matched(f: &Fq, g: &Group, c: &Cell, seed: u64, rep: u64) -> Result<Matched, String> {
@@ -288,8 +295,8 @@ pub fn draw_matched(f: &Fq, g: &Group, c: &Cell, seed: u64, rep: u64) -> Result<
         let gs = seed_of(seed, c, "g4rand", rep, gatt, 0);
         let gb = make_arm("g4rand", f, c.l, gs, 0);
         let gcore = core_set(&gb.raw).len();
-        let n = items_of(g, &gb.raw);
-        if n < 2 * c.m || binom(n, c.m) > ENUM_CAP {
+        let (n, gcls) = shape_of(g, &gb.raw);
+        if gcls < c.m || binom(n, c.m) > ENUM_CAP {
             continue;
         }
         let mut arms: Vec<(&'static str, Built, u64, u64)> = vec![("g4rand", gb, gs, 0)];
@@ -298,7 +305,8 @@ pub fn draw_matched(f: &Fq, g: &Group, c: &Cell, seed: u64, rep: u64) -> Result<
             for att in 0..MATCH_TRIES {
                 let s = seed_of(seed, c, arm, rep, gatt, att);
                 let b = make_arm(arm, f, c.l, s, gcore);
-                if items_of(g, &b.raw) == n {
+                let (bi, bc) = shape_of(g, &b.raw);
+                if bi == n && bc >= c.m {
                     found = Some((b, s, att));
                     break;
                 }

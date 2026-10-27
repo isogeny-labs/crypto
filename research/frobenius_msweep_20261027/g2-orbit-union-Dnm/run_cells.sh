@@ -40,6 +40,7 @@ export BIN RUN
 FAIL=0
 sort -k5,5 -nr "$RUN/cells.txt" | awk '{print $1, $2, $3, $4}' \
   | xargs -P "$JOBS" -L1 sh -c '"$BIN" run --a "$0" --n "$1" --m "$2" --l "$3" --out "$RUN" 2> "$RUN/log_a$0_n$1_m$2_l$3.txt"' || FAIL=1
+( cd "$RUN" && sha256sum rows_*.tsv > rows.sha256 ) || true   # hash the raw rows before analysis
 echo "finished_utc=$(date -u +%FT%TZ) failed_jobs=$FAIL" >> "$RUN/run_meta.txt"
 # analyze whatever was written; a failed cell is a recorded NOT-RUN, never silently dropped
 "$BIN" analyze --dir "$RUN"

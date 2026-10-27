@@ -36,3 +36,5 @@ against the SAT encoder in `src/cryptanalysis/binary_semaev_chain_sat.rs` (S3 an
 
 Standalone crate (own `[workspace]` stub, no dependencies): `target/` is ignored by Git and the driver builds outside the cell by
 default; delete any `target/` after use.
+
+Revision 3 (2026-10-27): trend-rule inversion fixed, B4 now voids before classing, Cargo.lock is tracked via the cell .gitignore (commit it), see PROTOCOL 13.

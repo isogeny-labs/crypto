@@ -13,6 +13,8 @@ REPO="$(cd "$HERE/../../.." && pwd)"
 JOBS="${1:-3}"
 MAXMIN="${G5_MAX_CPU_MIN:-400}"
 ( cd "$REPO" && scripts/checkpoint.sh gate )          # abort if the gate fails
+git -C "$REPO" rev-parse HEAD >/dev/null || { echo "ABORT: git metadata unavailable; the run must name its commit" >&2; exit 3; }
+[ -f "$HERE/Cargo.lock" ] || { echo "ABORT: Cargo.lock missing (must be committed with the cell)" >&2; exit 3; }
 if [ -n "$(git -C "$REPO" status --porcelain -- "$HERE")" ]; then
   echo "ABORT: the cell directory has uncommitted changes; commit (or stash) so commit.txt names the code that runs" >&2
   git -C "$REPO" status --short -- "$HERE" >&2

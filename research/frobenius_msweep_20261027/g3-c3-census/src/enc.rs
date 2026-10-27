@@ -36,8 +36,10 @@ pub enum Arm {
     BNoGauge,
     G,
     U,
-    /// P3 positive control with a derivable effect: C plus one unit clause pinning the
-    /// top u-bit of slot 1 to 0, i.e. exactly half of the slot-1 branches. UNSAT-targets only
+    /// P3 positive control: C plus one unit clause per slot pinning that slot's top u-bit to 0
+    /// (all m slots in the lower half of V's coordinate order). The retained fraction is at most
+    /// 1/2 under any enumeration model: 1/2 of the first-summand branches if the solver enumerates
+    /// one slot, 2^-m (1/4 at m = 2, 1/8 at m = 3) of the sorted solution space. UNSAT-targets only
     /// (it deliberately loses solutions on satisfiable targets).
     CHalf,
 }
@@ -596,7 +598,11 @@ pub fn build(arm: Arm, cx: &Cell, xr: u64, semaev: bool) -> Built {
                 e.lex_on_vars(&us);
             }
             if arm == Arm::CHalf {
-                e.cnf.clause(vec![-(us[0][0] as Lit)]);
+                // every slot, not only slot 1: C's lex break makes slot 1 the smallest, so a pin on
+                // it alone retains 3/4 (m=2) or 7/8 (m=3) of the sorted space (review round 2).
+                for u in &us {
+                    e.cnf.clause(vec![-(u[0] as Lit)]);
+                }
             }
             if arm == Arm::G || arm == Arm::U {
                 let bits: Vec<Vec<Lit>> = xs.iter().map(|x| e.coord_bits(&x.terms)).collect();

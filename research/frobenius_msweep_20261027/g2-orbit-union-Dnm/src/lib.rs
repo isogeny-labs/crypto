@@ -26,6 +26,26 @@ impl Rng {
     pub fn below(&mut self, m: u64) -> u64 {
         self.next() % m
     }
+    /// Poisson(lam): Knuth for lam <= 30; above, the normal approximation WITHOUT rounding
+    /// (the class counts here are real-valued fractional sums, and the variance stays lam).
+    pub fn poisson(&mut self, lam: f64) -> f64 {
+        if lam <= 0.0 {
+            return 0.0;
+        }
+        if lam > 30.0 {
+            let (u1, u2) = (self.unit().max(1e-12), self.unit());
+            let g = (-2.0 * u1.ln()).sqrt() * (2.0 * std::f64::consts::PI * u2).cos();
+            return lam + lam.sqrt() * g;
+        }
+        let (l, mut k, mut p) = ((-lam).exp(), 0.0, 1.0);
+        loop {
+            p *= self.unit();
+            if p <= l {
+                return k;
+            }
+            k += 1.0;
+        }
+    }
     pub fn unit(&mut self) -> f64 {
         (self.next() >> 11) as f64 / (1u64 << 53) as f64
     }

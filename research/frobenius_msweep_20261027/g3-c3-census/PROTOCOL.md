@@ -84,7 +84,7 @@ relabelling (AGENTS.md section 6), never as an improvement.
 | U | C plus the comparators of B enforced against the fixed target | literal per-instance orbit clauses, **unsound by design**, tripwire |
 | Cnobreak | C without the S_m break | informative control P1 (model expectation, section 4); not an arm to beat |
 | Bnogauge | B without the gauge | informative control P2 (model expectation, section 4) |
-| Chalf | C plus one unit clause pinning the top u-bit of slot 1 to 0 (exactly half the slot-1 branches), **UNSAT targets only** (`--unsat-only-arms`; it loses solutions by design and is tested never to invent one) | positive control P3 with a derivable effect: cost ratio about 0.5 under the section 8 model |
+| Chalf | C plus one unit clause **per slot** pinning that slot's top u-bit to 0 (m unit clauses; all slots in the lower half of V's coordinate order), **UNSAT targets only** (`--unsat-only-arms`; it loses solutions by design and is tested never to invent one) | positive control P3: search space retained is at most 1/2 under any enumeration model (see section 4 arithmetic); revision 3 replaced the slot-1-only pin, which retains 3/4 (m = 2) or 7/8 (m = 3) of the sorted space |
 | C@k | arm C with seed slot k | A/A noise floor (C@2 vs C@1) and replicates |
 
 Arm names with `@k` select the seed slot; the encoding is the same.
@@ -133,12 +133,28 @@ reports "detector works" only if B disagrees and C, A never do.
 | negative / noise floor (A/A) | C@2 vs C@1, paired per target | median ratio within the bootstrap noise of 1; sd of the log ratio s_AA sets the minimum detectable effect | an interval for a candidate effect that does not clear the A/A interval is noise |
 | negative / size control | G vs C | median ratio >= 0.95 (vacuous circuits cannot prune); G tests whether adding n(n-1) aux variables and clauses of this shape by itself moves conflicts | if G reproduces a sub-0.95 A or B ratio, that ratio is not symmetry |
 | basis control | Cpoly vs C | reported with interval, no direction predicted | if Cpoly/C < 0.95 the reference basis is not neutral and a candidate must also beat Cpoly |
-| positive P3 (voiding) | Chalf vs C, UNSAT targets, cells where Chalf runs (n = 17, 23, 31 m = 2, and the m = 3 ladder) | about 0.5 (exactly half of the slot-1 branches removed; under the section 8 model cost is proportional to the number of first-summand branches). Detected iff the 95% upper bound is < 0.95 | miss at >= 6 paired targets: cell void (O-ARTIFACT), the detector cannot see a 2x search-space reduction |
+| positive P3 (voiding) | Chalf vs C, UNSAT targets, cells where Chalf runs (n = 17, 23, 31 m = 2, and the m = 3 ladder) | expected range 0.125 to 0.5 (arithmetic below), not a point value. Detected iff the 95% upper bound is < 0.95 | miss at >= 6 paired targets: cell void (O-ARTIFACT), the detector cannot see a >= 2x search-space reduction |
 | informative P1 | C vs Cnobreak | model expectation in [0.5, 1.0] at m = 2 and [0.25, 1.0] at m = 3: once the first summand is fixed XOR-Gauss solves the second affinely, so a complete UNSAT proof enumerates first-summand branches and a lex break on the Gauss-solved slot may prune little (the review's argument, accepted). The earlier 1/m! was a symmetry-count prior, not a derivation | reported with interval; a miss (upper bound >= 0.95) is read "control uninformative: this solver does not exploit the S_m break", **never** a void and never a stop |
 | informative P2 | B vs Bnogauge (n = 17 and 23 only) | <= 1; about 1/n only if the solver exploits the circulant gauge | same as P1 |
 | soundness tripwire | U on planted SAT targets | at least one planted target per cell turns UNSAT (spec: H1 literal clauses change satisfiability) | none flipping anywhere contradicts S4 and is the headline |
 | ordinary-curve unsoundness detector | B vs oracle on b = t | B disagrees somewhere | detector failed: B0 untrustworthy |
 | same instrument | all | one binary, one solver source hash, one budget, one seed rule, arms interleaved per target (order shuffled per target from the master seed), arm labels in the rows | |
+
+P3 arithmetic (revision 3). C's lex break forces u_1 <= u_2 (<= u_3), so slot 1
+is the lexicographically smallest and its top bit is 1 only if every slot is in
+the upper half. Pinning slot 1 alone therefore keeps 3/4 of the sorted space at
+m = 2 and 7/8 at m = 3 (N = 1024 count: 393472 of 524800 = 0.7497 pairs; 0.8746
+triples) and, with a seed sd(log) of 0.2 to 0.3 at N = 25, would not clear 0.95
+on a sound instrument. Chalf pins the top bit of **every** slot: the retained
+fraction is (1/2)^m of the ordered tuples, 1/4 (m = 2) and 1/8 (m = 3) of the
+sorted space; if the solver instead enumerates the branches of one slot, half of
+them are removed (0.5); the solver's actual enumeration order is not known
+(nothing has been run). Expectation: Chalf/C in [0.125, 0.5] if cost follows
+the search space, and anything below 0.95 counts as detected. The pilot gate
+(RUN_CARD step 3) is numeric: pilot median Chalf/C must be <= 0.8 over the
+pooled pilot UNSAT targets of the cells that run Chalf (at least 3 targets), or
+the instrument is stopped for review; the 0.8 is the top of the section 13
+range, chosen so a half-search-space effect with seed noise is not misread.
 
 Controls run on the same code path (same builder, loader, solver, counters).
 Only P3 has an effect derived from the model and is allowed to void a cell. P1
@@ -255,7 +271,9 @@ Per cell, evaluated on UNSAT-truth targets with both arms UNSAT:
    2a's minimum 10 applies).
 3. For X in {A, B}: **candidate** if the 95% interval upper bound of the median
    conflict ratio X/C (primary slots) is below 0.95. A candidate is
-   **confirmed** (O-STRUCTURE) only if all of: the replicate slots also have
+   **confirmed** (O-STRUCTURE) only if all of (each of G, Cpoly and A/A is a
+   required control: if it is absent or has fewer than 10 paired targets the
+   candidate is not confirmed, fail closed): the replicate slots also have
    upper bound below 0.95; G/C upper bound is at least 0.95; Cpoly/C upper
    bound is at least 0.95; the A/A lower bound exceeds the candidate's upper
    bound. A candidate that is not confirmed gives O-INCONCLUSIVE with the
@@ -447,7 +465,7 @@ caveat that nothing has been run and these are reasoning, not measurement:
 * Direction. No gain of order n or n^m from relabelling (free C_n action,
   counting identity). A and B pay roughly 10x more variables and XOR rows.
   Expected medians: A/C in 0.9 to 3, B/C in 0.9 to 2, G/C near 1, Cpoly/C near 1.
-* Controls. P3 Chalf/C about 0.5 (range 0.35 to 0.8). P1 in [0.5, 1.0] (m = 2).
+* Controls. P3 Chalf/C in 0.125 to 0.5 (all-slot pin; up to 0.8 allowed before the pilot gate stops). P1 in [0.5, 1.0] (m = 2).
   P2 <= 1, near 1/n only if the solver exploits the gauge. U flips most planted
   SAT targets (about 1 - 1/n).
 * Labels. Probability that some cell carries an O-STRUCTURE label: about 7% (the
@@ -470,3 +488,21 @@ re-estimate gates, hard-capped pilot and disjoint pilot targets; censoring
 tolerance 1%; MDE from targets; replicate-slot multiplicity restated; tripwire
 headline, per-cell flag and S6 for A and B implemented; per-relation promise
 dropped; freeze procedure rewritten (committed set, FREEZE.txt, binary hash).
+
+## 15. Revision 3 (changes after the round-1 review of revision 2)
+
+* Freeze mechanics made executable: tests write to the OS temp dir (the
+  tracked `target/test-*` fixtures are removed), the cell has a `.gitignore`
+  for `target/` and `reports/run-*/`, RUN_CARD builds with `CARGO_TARGET_DIR`
+  outside the tree, and steps 1a/1b are exact commands (README.md is in the
+  hash list). `protocol.json` still has to be authored and validated with the
+  sibling `crypto-autoresearcher` checker; the schema was not available in the
+  preparation checkout, so this is a pre-freeze step that blocks the run if it
+  fails (RUN_CARD step 1a).
+* P3 (Chalf) re-derived: pin on every slot, expectation a range 0.125 to 0.5,
+  numeric pilot gate (section 4).
+* Decision rule rule 3 fails closed on missing or under-10-target G, Cpoly or
+  A/A (new unit test).
+* Budget: gate G1 at n = 17 and 23 is not exempt from an abort: the first
+  censored UNSAT row in any cell stops that cell's remaining targets (RUN_CARD
+  step 4 note); a censored pilot row is a lower bound only and triggers G5.

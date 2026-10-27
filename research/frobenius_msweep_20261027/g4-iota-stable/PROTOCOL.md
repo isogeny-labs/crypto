@@ -106,8 +106,9 @@ Controls, per the controlled-experiment skill:
   vrand main/aa and g4rand main/aa (same arm, disjoint seeds) with a design-level false-alarm gate; (ii) the construction
   null S/W = cpr_blind(rset) / cpr_blind(wrong) (same N, neither stable: it can differ from 1 only through additive
   structure of W union c/W*, not through any stabiliser) and the attribution contrast Q = cpr_blind(wrong) / cpr_best(G)
-  (identical construction, differing in the stabiliser only). The pairs V/W and V/S are printed as calibration, not gated:
-  they differ in the number of classes by construction and are not expected to be 1.
+  (identical construction, differing in the stabiliser only). The pairs V/W and V/S and Q_blind are printed as calibration, not gated
+  (amendment A1; revision 2 gave a wrong reason for not printing them: V, W and S are all non-stable with about N/2 classes, so V/W and V/S are
+  expected near 1 up to additive structure; a clear departure is reported as a caveat on the cell, it does not void it).
 * **A/A**: every replicated arm runs a second, seed-disjoint half ("aa"). The A/A ratio of the *same estimand* between the
   halves (vrand main/aa, g4rand main/aa) sets the noise floor delta = max(0.05, A/A half-width) used in section 7.
 * **Same instrument on every arm**: one enumerator, one tally, one rank routine, one cost model; no arm has bespoke code.
@@ -121,7 +122,7 @@ Computed over the target set G (the odd-order subgroup, ne/h targets), exhaustiv
   an item (1 on a stable set).
 * `active` = columns occurring in some orbit row of some target in G; rank stream: targets of G taken in a seeded random
   order, all orbit rows of each target added to an incremental F_p echelon; `t90` = targets needed to reach
-  ceil(0.9 active) rank (NA = never; stall rule: stop after 20 active + 1000 consecutive redundant rows); `rank_final`.
+  ceil(0.9 active) rank (NA = never; stall rule: when active > 120, stop after 3*active + 300 consecutive redundant rows, as implemented in `enumr.rs::rank_stream`); `rank_final`.
 * Cost model (probe counts of a meet-in-the-middle search; **a model of group-law work, not a solver cost**). For N items
   and m terms a MITM has two orientations: table of all floor(m/2)-subsets and one probe of all ceil(m/2)-subsets per
   target, or the reverse. For t targets the cost is table + t * probe and **each arm uses the cheaper orientation for its
@@ -162,16 +163,17 @@ curve), a = 1 at n = 11, 13, 17 (robustness, secondary), m = 2..6. Nominal yield
 | 0, 13 (8012) | (2,7): 0.98; (2,8): 4.0; (3,6): 4.7; (4,5): 3.4; (5,5): 18; (6,5): 74 |
 | 0, 17 (130972) | (2,9): 0.99; (3,7): 2.5; (4,6): 4.3; (5,5): 1.1; (6,5): 4.5 |
 | 0, 19 (523492) | (2,10): 1.0; (3,7): 0.62; (4,6): 1.07; (5,5): 0.27; (6,5): 1.13 |
-| 1, 11 (1982) | (2,6): 0.95; (2,7): 4.0; (3,5): 2.0; (4,4): 0.5; (4,5): 14; (5,4): 1.0; (5,5): 72; (6,4): 1.5; (6,5): 300 |
+| 1, 11 (1982) | (2,6): 0.95; (2,7): 4.0; (3,5): 2.0; (4,5): 14; (5,5): 72; (6,5): 300; the cells (4,4), (5,4), (6,4) of revision 2 are dropped, amendment A1 |
 | 1, 13 (8374) and 1, 17 (131174) | as the a = 0 rows at the same n, scaled by #E |
 
 The l values are chosen so that the nominal enumeration C(2^l - 2, m) is at most about 5e7 and lambda is in 0.3 to 300; l is
 an integer, so lambda cannot be tuned and is not matched across m. The enumeration cap is not a nominal property: the
 realised item count is random (about half of the x carry points, and on iota-stable sets they come in pairs x, 1/x), so
 the cap is enforced on the realised N by the matched draw (section 4), and a unit test checks that at least half of the
-g4rand draws are accepted in every cell. The orbit rate per target on the G4 arm is lambda / 2^(m-1) (as low as 0.017 at
-(0,19,5,5) and 0.035 at (0,19,6,5)): m >= 5 cells are low-yield by construction and that is a finding about the arm, not a
-defect. The lambda column is nominal (all 2^l - 2 x carrying points are not realised; realised lambda is `lam_pred`).
+g4rand draws are accepted in every cell under the amendment A1 rule (ncls >= m). The orbit rate per target on the G4 arm is lambda / 2^(m-1) (as low as 0.017 at
+(0,19,5,5) and 0.035 at (0,19,6,5)): m >= 5 cells are low-yield by construction. Distinct classes (amendment A1): the lambda column and the closed-form priors ignore the
+constraint that the m summands lie in m distinct classes; at l = 5 the G arm has only about 7 to 8 classes at m = 5, 6, so the realised
+yield (`lam_pred`) of G is below nominal there and the priors R_best = 1, 0.5, 0.25 are not expected to hold; the data decide. The lambda column is nominal (all 2^l - 2 x carrying points are not realised; realised lambda is `lam_pred`).
 
 Replicates per half (matched replicate sets; main and A/A halves are independent): 100 at n = 11, 40 at n = 13, 24 at n = 17,
 16 at n = 19; vpoly and g4poly are single instances (no interval, listed only as the standard-window reference).
@@ -182,7 +184,7 @@ removing x = 1 and the order-dividing-h points the matched N is the same for all
 Resolution check (reasoned before data; the realised spread is reported by the run and the first cells decide nothing):
 * Targets are exhaustive, so the only sampling unit is the matched replicate. For the orbit count the relative SD of a
   per-base mean over G is about sqrt(Fano_O / (lambda' |G|)), lambda' = lambda / 2^(m-1): 1.5% at (0,13,6,5), 1.5% at
-  (0,17,6,5), 2.1% at (0,19,5,5), but about 14% at (1,11,6,4) (|G| = 991, lambda' = 0.05): the n = 11 cells with m >= 5 are
+  (0,17,6,5), 2.1% at (0,19,5,5), but large at the n = 11 cells with m >= 5 ((1,11,6,4) is dropped by amendment A1; (1,11,6,5) remains): those are
   exploratory.
 * The earlier unmatched design had item-count SD of 12 to 18 percent and cost scaling like N^(c-m), c = ceil(m/2): a cpr CV of
   25 to 55 percent at m >= 4. Exact matching removes that component from every replicate pair and the paired bootstrap
@@ -238,7 +240,7 @@ Per cell, with V = vrand, G = g4rand, W = wrong, S = rset (main halves; replicat
    algebra" from revision 1 was wrong for collection (the number of relations needed scales with the active columns) and is
    withdrawn: R_best alone (per relation) can say nothing about total cost; R_tbest does. GAIN is a licence to build a
    solver-level cell (section 11), never an improvement over the index-calculus baseline.
-9. Multiple comparisons. There are 36 cells and four non-void estimands per cell; no family-wise correction is applied and
+9. Multiple comparisons. There are 33 cells and four non-void estimands per cell; no family-wise correction is applied and
    none is claimed. Under a global null a nominal 95 percent interval clears 1 by chance in about 5 percent of estimands, so a
    single GAIN or LOSS cell is a descriptive observation only; statements are made per m through the counts in rule 7 and
    the licence needs two cells at the same m plus the Q and R_tbest conditions. The null S/W, the A/A flags and the Q
@@ -300,7 +302,7 @@ bounded at 90 percent rank for more than 120 active columns; at n = 19, m = 2, l
 and about 600 rows) I estimate 0.1 to 1 s per base, and a stall (a base that never reaches 90 percent, up to 3 active + 300
 redundant rows at about 1 ms) adds seconds. Per-cell budgets (single core, wall): n = 11 and n = 13 cells under 1 to 2 minutes
 each; n = 17 cells 1 to 5 minutes; n = 19 cells 2 to 10 minutes, the m = 2 cell the longest; the group build (log table by
-repeated addition, ne up to 5e5) about 1 to 3 s per cell. Total over 36 cells: 40 to 90 minutes single core (the previous 12
+repeated addition, ne up to 5e5) about 1 to 3 s per cell. Total over 33 cells: 40 to 90 minutes single core (the previous 12
 minutes was too optimistic for the echelon); with 3 parallel jobs 15 to 35 minutes, budget 60. Memory under 300 MB per job
 typically, up to about 1.2 GB in the rare tail (three jobs: keep 4 GB free). Disk: a few MB of TSV. `timing.tsv` records the
 seconds per cell; the first finished cells should be checked against this table and the run stopped, not altered, if a cell
@@ -345,6 +347,30 @@ exceeds 3 times its budget.
   the same cell list and decision rule, and record the SHA-256 of `src/analyze.rs` (the analysis program) in it before the
   run. After the run the rows are bound with `experiment_protocol.py from-rows ... --protocol protocol.json` and checked with
   `check-export` (RUN_CARD.md section 6). Until then this file is the preregistration of record.
+
+## 11a. Amendment A1 (2026-10-27, before any data; from the round-1 fresh review)
+
+Nothing has been run, so the frozen design is revised here and the changes are recorded.
+1. **Feasibility floor.** A stable base has exactly 4 items per class, so the number of classes is ncls = N/4 and the enumerator needs m
+   pairwise distinct classes. The revision-2 floor N >= 2m left many g4rand replicates with no decomposition at any target, which would have
+   been counted as CENSORED (probability of tripping the 5 percent gate about 0.9 at m = 6, l = 5 and 1 at the l = 4 cells). The matched
+   draw now redraws the g4rand base (hence N for all arms) unless ncls >= m, and a matched arm is accepted only if its item count equals N and
+   ncls >= m (`run.rs::draw_matched`, `shape_of`). The acceptance check uses the same rule: accepted fractions of g4rand draws are
+   0.98 / 0.94 / 0.85 for m = 4 / 5 / 6 at l = 5 (binomial model of the cell test) and 1.0 for the larger-l cells.
+2. **Cells dropped.** (1,11,4,4), (1,11,5,4), (1,11,6,4) accept 0.50, 0.23 and 0.06 of draws, so a truncated N distribution would be the
+   estimand; they are removed. The plan has 33 cells; n = 11 keeps m = 4, 5, 6 at l = 5. The earlier "36 cells" is superseded everywhere.
+3. **Per-m wording** (rule 8) is implemented as written: `analyze.rs::per_m_closed` filters to the non-void primary cells for both the count
+   and the all-LOSS/PARITY condition (the code previously let one void cell block "closed"); a synthetic-row test covers it.
+4. **Calibration printed**: V/W, V/S and Q_blind appear in the decision table as an ungated column.
+5. **Censoring gate** now also covers the wrong and rset main-half bases (cpr_blind), since censored control bases would silently drop pairs from
+   Q and the null.
+6. Stall-rule text in section 5 reconciled with the code. Convention: in this cell m is the number of summands and n the field degree; the
+   AGENTS.md "m = 83 / m = 31" gates use m for the field degree, and section 11 refers to those by "field degree".
+7. Not changed: riota stays a collapse positive control only (no G/riota ratio is registered); the `closure < 0.5` control is brittle at
+   N about 8 to 14 (one chance coincidence gives closure 4/N); with the l = 4 cells gone the smallest N is 4m = 16, so one coincidence gives
+   0.25 at most and the control is not tripped by a single coincidence. The execution route (this container versus isolab-eks) is a decision for
+   the task card; this cell does not freeze it. The point-level certificate is the unit test only; an artifact-store step for the rows_*.tsv files
+   and a post-run independent expansion of sample orbit rows are listed as pre-run steps for whoever launches the run.
 
 ## 12. Deviations (append only)
 

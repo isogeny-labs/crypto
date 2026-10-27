@@ -344,7 +344,8 @@ fn runner_rows_parse_and_columns_align() {
 #[test]
 fn cli_run_summarize_gate_end_to_end_on_a_toy_cell() {
     // Exercises the exact CLI path of RUN_CARD on n = 7 (fixture only; output lives under target/).
-    let dir = format!("{}/target/test-cli-run", env!("CARGO_MANIFEST_DIR"));
+    // temp dir outside the source tree: the freeze requires an empty `git status`
+    let dir = format!("{}/g3census-test-cli-run-{}", std::env::temp_dir().display(), std::process::id());
     let _ = std::fs::remove_dir_all(&dir);
     let s = |x: &str| x.to_string();
     let args: Vec<String> = ["run", "--n", "7", "--l", "4", "--m", "2", "--curve-a", "0", "--unsat", "3", "--sat-keep", "0", "--planted", "1", "--arms", "C,C@2,A,B", "--planted-only-arms", "U", "--round", "1", "--tag", "t", "--out", &dir].iter().map(|x| s(x)).collect();
@@ -445,7 +446,7 @@ fn g_is_sound_on_sampled_triples_m3_n31() {
 }
 
 /// P3 control Chalf: loses solutions by design but must never invent one, must agree with C on
-/// UNSAT targets, and its pin is exactly one unit clause (half the slot-1 branches).
+/// UNSAT targets, and its pin is exactly one unit clause per slot (top u-bit of every slot = 0).
 #[test]
 fn chalf_never_invents_and_matches_c_on_unsat_targets() {
     for (l, m) in [(3u32, 2usize), (4, 2), (3, 3)] {
@@ -467,7 +468,7 @@ fn chalf_never_invents_and_matches_c_on_unsat_targets() {
         assert!(unsat_seen > 5 && (lost > 0 || m == 3), "l={l} m={m}: unsat {unsat_seen} lost {lost}");
         let c = build(Arm::C, &cx, 5, true);
         let h = build(Arm::CHalf, &cx, 5, true);
-        assert_eq!(h.cnf.sizes().clauses, c.cnf.sizes().clauses + 1);
+        assert_eq!(h.cnf.sizes().clauses, c.cnf.sizes().clauses + m);
         assert_eq!(h.cnf.nv, c.cnf.nv);
     }
 }

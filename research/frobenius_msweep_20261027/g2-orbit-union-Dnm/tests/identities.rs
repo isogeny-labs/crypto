@@ -260,7 +260,7 @@ fn row_roundtrip() {
     let r = Row {
         a: 1, n: 7, m: 3, l: 2, arm: "frob".into(), vd: 3, nt: 4, nb: 7, d: 3, order: 128, npts: 10,
         nleft: 5, total: 9, unamb: 8, overflow: 0, audit: 1, ms: 1.5,
-        xs: vec![1, 2, 3], xodd: vec![0, 1, 1], seed: 20261027,
+        xs: vec![1, 2, 3], xodd: vec![0, 1, 1], xtwo: vec![1, 0, 0], seed: 20261027,
         ycov: vec![1.0, 2.0, 3.0], yfrac: vec![0.5, 1.5, 2.0], yrep: vec![1.0, 0.0, 0.0],
     };
     let r2 = Row::from_tsv(&r.to_tsv());
@@ -348,7 +348,7 @@ fn plan_grid_is_feasible_and_printed() {
             unresolved += 1;
         }
     }
-    println!("cells {}: TOTAL est seconds (single core): {total_s:.0}; longest cell {crit:.0}; cells with D<113: {unresolved}", cs.len());
+    println!("cells {}: TOTAL est seconds (single core): {total_s:.0}; longest cell {crit:.0}; rho-unresolved cells (D < {MIN_D_FOR_RHO}): {unresolved}", cs.len());
     // the fixed-l column and the m = 4 ladder are in the frozen set
     for &a in &[0u32, 1] {
         for &n in &[13u32, 17] {
@@ -643,16 +643,16 @@ fn targets_are_distinct_one_per_frobenius_orbit() {
         let mut seen = std::collections::HashSet::new();
         for &r in &ts {
             let mut q = r;
-            let mut mn = q.key();
+            let mut mn = q.key().min(c.neg(q).key());
             for _ in 1..n {
                 q = c.sigma(&f, q);
-                mn = mn.min(q.key());
+                mn = mn.min(q.key()).min(c.neg(q).key());
             }
-            assert!(seen.insert(mn), "two targets share a Frobenius orbit");
+            assert!(seen.insert(mn), "two targets share a Frobenius-and-negation orbit (+-R have the same x)");
             assert!(c.scalar(&f, r, koblitz_order(a, n) / cofactor(a)).is_inf(), "target outside hE");
         }
         println!("n={n} a={a}: {} orbit representatives in hE", ts.len());
-        assert!(ts.len() >= 4);
+        assert!(ts.len() >= 2);
         if n == 7 {
             assert!(ts.len() < 48, "NT = 48 cannot be met at n = 7; the row records the effective nt");
         }
@@ -686,4 +686,330 @@ fn run_cell_smoke_on_a_tiny_fixture_checks_plumbing_not_results() {
         assert_eq!(get("frob").nb, 7);
         assert_eq!(get("plain").nb, 1);
     }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Review round 2: mod-4 null for a = 0, calibrated z, direct frob/frobperm contrast, completeness
+// ---------------------------------------------------------------------------------------------
+
+/// Type of a liftable x in E/4E for a = 0: 0 (class 0), 2 (class 2), 1 (odd, class +-1), by the
+/// independent test "k' Q for k' = #E/4": O, order 2 (not O), order 4.
+fn type_of(f: &Fq, c: &Curve, order: u64, x: u32) -> u8 {
+    let (q, _) = c.lift(f, x).unwrap();
+    let r = c.scalar(f, q, order / 4);
+    if r.is_inf() {
+        0
+    } else if c.add(f, r, r).is_inf() {
+        2
+    } else {
+        1
+    }
+}
+
+#[test]
+fn mod4_sign_count_structure_for_a0() {
+    // a = 0: #E = 4 * odd and the 2-part is cyclic. For random distinct-x tuples, the number of sign
+    // choices whose sum lies in 4E (k' * sum = O) is 0 if #odd is odd, 2^(m-1) if #odd > 0 is even,
+    // and for #odd = 0: 2^m if #type-2 is even else 0. Also: types agree with Tr(x) (odd <=> Tr(x) = 1).
+    for &n in &[7u32, 11, 13] {
+        let f = Fq::new(n);
+        let c = Curve::koblitz(0);
+        let order = koblitz_order(0, n);
+        assert!(order % 4 == 0 && (order / 4) % 2 == 1);
+        let kp = order / 4;
+        let lifts: Vec<u32> = (1..f.size() as u32).filter(|&x| c.lift(&f, x).is_some()).collect();
+        let types: Vec<u8> = lifts.iter().map(|&x| type_of(&f, &c, order, x)).collect();
+        for (i, &x) in lifts.iter().enumerate() {
+            assert_eq!(types[i] == 1, f.tr(x) == 1, "odd <=> Tr(x) != Tr(a)");
+        }
+        let cnt = |t: u8| types.iter().filter(|&&v| v == t).count() as f64 / types.len() as f64;
+        println!("n={n}: type fractions 0:{:.3} 2:{:.3} odd:{:.3}", cnt(0), cnt(2), cnt(1));
+        assert!((cnt(0) - 0.25).abs() < 0.08 && (cnt(2) - 0.25).abs() < 0.08 && (cnt(1) - 0.5).abs() < 0.08);
+        let mut rng = Rng(555 + n as u64);
+        let mut seen = [0usize; 3];
+        for t in 0..3000 {
+            let m = 2 + (t % 4);
+            let mut idx: Vec<usize> = vec![];
+            while idx.len() < m {
+                let i = rng.below(lifts.len() as u64) as usize;
+                if !idx.contains(&i) {
+                    idx.push(i);
+                }
+            }
+            let pts: Vec<P> = idx.iter().map(|&i| c.lift(&f, lifts[i]).unwrap().0).collect();
+            let mut ok = 0u64;
+            for mask in 0..(1u32 << m) {
+                let mut s = INF;
+                for (j, &p) in pts.iter().enumerate() {
+                    s = c.add(&f, s, if (mask >> j) & 1 == 1 { c.neg(p) } else { p });
+                }
+                ok += c.scalar(&f, s, kp).is_inf() as u64;
+            }
+            let o = idx.iter().filter(|&&i| types[i] == 1).count();
+            let tw = idx.iter().filter(|&&i| types[i] == 2).count();
+            let expect = if o % 2 == 1 {
+                seen[0] += 1;
+                0
+            } else if o > 0 {
+                seen[1] += 1;
+                1u64 << (m - 1)
+            } else {
+                seen[2] += 1;
+                if tw % 2 == 0 { 1u64 << m } else { 0 }
+            };
+            assert_eq!(ok, expect, "n={n} m={m} types={:?}", idx.iter().map(|&i| types[i]).collect::<Vec<_>>());
+        }
+        assert!(seen.iter().all(|&v| v > 20), "{seen:?}");
+        // the recorded per-block counts are exactly these types
+        let fam = family::frob(&f, &mut Rng(7), 4);
+        let (xo, xt) = (odd_counts(&f, &c, &fam), two_counts(&f, &c, &fam, order));
+        for (b, blk) in fam.blocks.iter().enumerate() {
+            let want_o = blk.iter().filter(|&&x| c.lift(&f, x).is_some() && type_of(&f, &c, order, x) == 1).count() as u64;
+            let want_t = blk.iter().filter(|&&x| c.lift(&f, x).is_some() && type_of(&f, &c, order, x) == 2).count() as u64;
+            assert_eq!((xo[b], xt[b]), (want_o, want_t));
+        }
+    }
+    // a = 1: nothing of type 2 is recorded
+    let f = Fq::new(7);
+    let fam = family::frob(&f, &mut Rng(1), 3);
+    assert!(two_counts(&f, &Curve::koblitz(1), &fam, koblitz_order(1, 7)).iter().all(|&v| v == 0));
+}
+
+#[test]
+fn mod4_weight_matches_tuple_sum_and_reduces_correctly() {
+    // brute-force sum over x-tuples of the tuple weight (0, 1/2, [T even]) against the closed form
+    let pt = PatternTable::new(3, 3, false);
+    let xs = [5u64, 4, 6];
+    let xo = [2u64, 1, 3];
+    let xt = [1u64, 2, 1];
+    for p in &pt.pats {
+        // enumerate: per block, choose mu_s of its x's; each x has a type
+        let mut tot2 = 0.0;
+        let mut blocks: Vec<(usize, usize)> = vec![]; // (block, mult)
+        let mut i = 0;
+        while i < p.len() {
+            let mut j = i;
+            while j < p.len() && p[j] == p[i] {
+                j += 1;
+            }
+            blocks.push((p[i] as usize, j - i));
+            i = j;
+        }
+        // type lists per block
+        let mut slots: Vec<Vec<u8>> = vec![];
+        for &(b, mu) in &blocks {
+            let mut ty = vec![];
+            ty.extend(std::iter::repeat(1u8).take(xo[b] as usize));
+            ty.extend(std::iter::repeat(2u8).take(xt[b] as usize));
+            ty.extend(std::iter::repeat(0u8).take((xs[b] - xo[b] - xt[b]) as usize));
+            slots.push(ty);
+            let _ = mu;
+        }
+        // recursive subset enumeration
+        fn rec(bi: usize, blocks: &[(usize, usize)], slots: &[Vec<u8>], o: usize, t: usize, acc: &mut f64) {
+            if bi == blocks.len() {
+                *acc += if o % 2 == 1 { 0.0 } else if o > 0 { 0.5 } else if t % 2 == 0 { 1.0 } else { 0.0 };
+                return;
+            }
+            let (_, mu) = blocks[bi];
+            let ty = &slots[bi];
+            fn subs(start: usize, left: usize, ty: &[u8], o: usize, t: usize, f: &mut dyn FnMut(usize, usize)) {
+                if left == 0 {
+                    f(o, t);
+                    return;
+                }
+                for i in start..ty.len() {
+                    subs(i + 1, left - 1, ty, o + (ty[i] == 1) as usize, t + (ty[i] == 2) as usize, f);
+                }
+            }
+            let mut res = vec![];
+            subs(0, mu, ty, 0, 0, &mut |oo, tt| res.push((oo, tt)));
+            for (oo, tt) in res {
+                rec(bi + 1, blocks, slots, o + oo, t + tt, acc);
+            }
+        }
+        rec(0, &blocks, &slots, 0, 0, &mut tot2);
+        let w = pattern_weight_mod4(p, &xs, &xo, &xt);
+        assert!((w - 2.0 * tot2).abs() < 1e-9, "{p:?}: {w} vs {}", 2.0 * tot2);
+    }
+    // reduces to twice the size weight when no odd and no type-2 points
+    let pt4 = PatternTable::new(7, 4, true);
+    let xs7 = vec![5u64, 3, 4, 6, 2, 5, 3];
+    for p in &pt4.pats {
+        let w = pattern_weight(p, &xs7);
+        assert!((pattern_weight_mod4(p, &xs7, &[], &[]) - 2.0 * w).abs() < 1e-9 * (1.0 + w));
+    }
+}
+
+#[test]
+fn type2_only_family_has_exactly_zero_decompositions_for_odd_m_when_a_is_zero() {
+    // a = 0: a block of only type-2 points (class 2 in Z/4) with m = 3 has T = 3 odd and O = 0: the class sum is 2
+    // mod 4, never in 4E, so every target (all in 4E) has exactly 0 decompositions. The mod-2 parity null
+    // (which sees only 'even' points) predicts a positive count here; the mod-4 null predicts exactly 0.
+    let (n, m) = (11u32, 3usize);
+    let f = Fq::new(n);
+    let c = Curve::koblitz(0);
+    let order = koblitz_order(0, n);
+    let blk: Vec<u32> = (1..f.size() as u32).filter(|&x| c.lift(&f, x).is_some() && f.tr(x) == 0 && type_of(&f, &c, order, x) == 2).take(40).collect();
+    assert!(blk.len() == 40);
+    let fam = family::from_blocks("t2", n, {
+        let mut b = vec![blk.clone()];
+        b.extend((1..n).map(|_| vec![]));
+        b
+    });
+    let e = Enumerator::new(&f, &c, &fam, m, 1 << 24);
+    let pt = PatternTable::new(n as usize, m, true);
+    let xs = liftable_counts(&f, &c, &fam);
+    let (xo, xt) = (odd_counts(&f, &c, &fam), two_counts(&f, &c, &fam, order));
+    assert_eq!((xs[0], xo[0], xt[0]), (40, 0, 40));
+    let p000 = pt.pats.iter().find(|p| p.iter().all(|&k| k == 0)).unwrap();
+    assert_eq!(pattern_weight_mod4(p000, &xs, &xo, &xt), 0.0);
+    assert!(pattern_weight_parity(p000, &xs, &xo) > 0.0, "the mod-2 null cannot see this zero");
+    let targets = make_targets(&f, &c, 0, 12, 3);
+    assert!(!targets.is_empty());
+    for &r in &targets {
+        assert_eq!(e.count_target(r, &pt).total, 0);
+    }
+    // and for m = 4 (T = 4 even) the count is positive for some target
+    let e4 = Enumerator::new(&f, &c, &fam, 4, 1 << 24);
+    let pt4 = PatternTable::new(n as usize, 4, true);
+    let any: u64 = make_targets(&f, &c, 0, 48, 3).iter().map(|&r| e4.count_target(r, &pt4).total).sum();
+    assert!(any > 0);
+}
+
+#[test]
+fn z_is_calibrated_under_the_null_at_two_values_of_d() {
+    // sd of the calibrated z on pure parity-aware Poisson null datasets must be within 10 percent of 1
+    // (the permutation-SE z of revision 2 had sd 1.37 to 1.60). Two D values; deterministic seeds.
+    for &(n, m, reps) in &[(11u32, 3usize, 400usize), (13, 4, 400)] {
+        let mut zs = vec![];
+        let mut d = 0;
+        for rep in 0..reps {
+            let (rows, pt) = synthetic_rows_o(n, m, 16, 0.0, 9000 + rep as u64, 16);
+            d = pt.n_classes();
+            let refs: Vec<&Row> = rows.iter().collect();
+            zs.push(z_of(&split_stats(&refs, &pt, true, 77, 40, 200)));
+        }
+        let mean = zs.iter().sum::<f64>() / reps as f64;
+        let sd = (zs.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / (reps - 1) as f64).sqrt();
+        let tail3 = zs.iter().filter(|&&v| v >= 3.0).count();
+        println!("calibration n={n} m={m} D={d}: z mean {mean:.3} sd {sd:.3}; z>=3 in {tail3}/{reps}");
+        assert!((sd - 1.0).abs() < 0.10, "D={d}: sd(z) = {sd}");
+        assert!(mean.abs() < 0.25, "D={d}: mean z = {mean}");
+        assert!(tail3 <= 3, "D={d}: {tail3}/{reps} at z >= 3 (normal: 0.13 percent)");
+    }
+    assert!(rho_min(140) < 0.35 && rho_min(61) <= 0.5 && rho_min(57) > 0.5, "resolved/unresolved cut");
+    assert_eq!(MIN_D_FOR_RHO, 61);
+}
+
+fn write_cell_l(dir: &str, n: u32, m: usize, l: usize, spec: &[(&str, f64, u64)], frob_audit: i32, nrows: usize) {
+    // like write_cell, with the ladder level l, the audit value of the frob arm and the rows per arm
+    let mut body = String::from(HEADER);
+    body.push('\n');
+    for &(arm, bump, seed) in spec {
+        let (rows, _) = synthetic_rows_o(n, m, nrows, bump, seed + 31 * n as u64 + m as u64 + 1000 * l as u64, 8192);
+        for mut r in rows {
+            r.arm = arm.into();
+            r.l = l;
+            r.audit = if arm == "frob" { frob_audit } else if arm == "skew" { -1 } else { 0 };
+            body.push_str(&r.to_tsv());
+            body.push('\n');
+        }
+    }
+    std::fs::write(format!("{dir}/rows_a1_n{n}_m{m}_l{l}.tsv"), body).unwrap();
+}
+
+fn fresh_dir(tag: &str) -> String {
+    let base = std::env::var("G2_TEST_TMP").unwrap_or_else(|_| std::env::temp_dir().to_string_lossy().to_string());
+    let dir = format!("{base}/g2_{tag}_{}", std::process::id());
+    std::fs::create_dir_all(&dir).unwrap();
+    dir
+}
+
+fn verdict_l(dir: &str, n: u32, m: usize, l: usize) -> String {
+    let t = std::fs::read_to_string(format!("{dir}/verdicts.tsv")).unwrap();
+    for line in t.lines().skip(1) {
+        let c: Vec<&str> = line.split('\t').collect();
+        if c[1] == n.to_string() && c[2] == m.to_string() && c[3] == l.to_string() {
+            return c[6].to_string();
+        }
+    }
+    panic!("no verdict for n={n} m={m} l={l}");
+}
+
+
+#[test]
+fn contrast_decides_frobenius_specificity_not_the_power_dependent_zperm() {
+    // D(13,5) = 476. Planted fixtures (synthetic rows, not results).
+    let run = |frob: f64, perm: f64| -> (String, String) {
+        let dir = fresh_dir(&format!("con{}_{}", (frob * 1000.0) as u32, (perm * 1000.0) as u32));
+        write_cell_l(&dir, 13, 5, 3, &[("frob", frob, 1), ("frobperm", perm, 2), ("rsub", 0.0, 3), ("rset", 0.0, 4), ("skew", 0.25, 5)], 1, 16);
+        g2_orbit_union_dnm::report::analyze_dir(&dir);
+        let v = verdict_l(&dir, 13, 5, 3);
+        let line = std::fs::read_to_string(format!("{dir}/verdicts.tsv")).unwrap().lines().nth(1).unwrap().to_string();
+        std::fs::remove_dir_all(&dir).unwrap();
+        (v, line)
+    };
+    // frob far above frobperm, BOTH above z = 4: the rev-2 rule called this NUISANCE_REPLICABLE; the contrast says frob-specific
+    let (v, line) = run(0.10, 0.04);
+    println!("{line}");
+    assert!(v == "CONCENTRATED_WEAK" || v == "CONCENTRATED", "{v}");
+    // equal shared excess: NUISANCE
+    assert_eq!(run(0.10, 0.10).0, "NUISANCE_REPLICABLE");
+    // frob replicable, frobperm just below the flag but not significantly lower: specificity NOT resolved
+    // (rev-2 rule would have said CONCENTRATED_WEAK on z(frobperm) < 4 alone)
+    assert_eq!(run(0.04, 0.01).0, "REPLICABLE_NOT_SEPARATED"); // z(frob) 9.1, z(frobperm) 3.75, contrast 3.4
+    // nothing planted
+    assert_eq!(run(0.0, 0.0).0, "UNIFORM");
+}
+
+#[test]
+fn instrument_fail_on_gauge_audit_zero_missed_skew_and_incomplete_cells() {
+    // audit = 0 on frob
+    let dir = fresh_dir("aud");
+    write_cell_l(&dir, 13, 5, 3, &[("frob", 0.0, 1), ("frobperm", 0.0, 2), ("rsub", 0.0, 3), ("rset", 0.0, 4), ("skew", 0.25, 5)], 0, 16);
+    g2_orbit_union_dnm::report::analyze_dir(&dir);
+    assert_eq!(verdict_l(&dir, 13, 5, 3), "INSTRUMENT_FAIL");
+    std::fs::remove_dir_all(&dir).unwrap();
+    // positive control (skew) not planted -> not detected -> INSTRUMENT_FAIL
+    let dir = fresh_dir("skw");
+    write_cell_l(&dir, 13, 5, 3, &[("frob", 0.0, 1), ("frobperm", 0.0, 2), ("rsub", 0.0, 3), ("rset", 0.0, 4), ("skew", 0.0, 5)], 1, 16);
+    g2_orbit_union_dnm::report::analyze_dir(&dir);
+    assert_eq!(verdict_l(&dir, 13, 5, 3), "INSTRUMENT_FAIL");
+    std::fs::remove_dir_all(&dir).unwrap();
+    // 12 rows per arm instead of NV = 16 -> INCOMPLETE; and a truncated last line does not abort the analysis
+    let dir = fresh_dir("inc");
+    write_cell_l(&dir, 13, 5, 3, &[("frob", 0.0, 1), ("frobperm", 0.0, 2), ("rsub", 0.0, 3), ("rset", 0.0, 4), ("skew", 0.25, 5)], 1, 12);
+    let path = format!("{dir}/rows_a1_n13_m5_l3.tsv");
+    let mut body = std::fs::read_to_string(&path).unwrap();
+    body.push_str("1\t13\t5\t3\tfrob\t99\t4"); // killed mid-line
+    std::fs::write(&path, body).unwrap();
+    g2_orbit_union_dnm::report::analyze_dir(&dir);
+    assert_eq!(verdict_l(&dir, 13, 5, 3), "INCOMPLETE");
+    let md = std::fs::read_to_string(format!("{dir}/summary.md")).unwrap();
+    assert!(md.contains("truncated or malformed"));
+    assert!(md.contains("no m = 83 evidence") || md.contains("NO m = 83 evidence"));
+    std::fs::remove_dir_all(&dir).unwrap();
+}
+
+#[test]
+fn ladder_persistence_is_coded() {
+    let (n, m) = (13u32, 4usize);
+    let dir = fresh_dir("lad");
+    // l = 3 and l = 5 both carry the same frob-only excess -> PERSISTENT
+    for l in [3usize, 5] {
+        write_cell_l(&dir, n, m, l, &[("frob", 1.5, 1), ("frobperm", 0.0, 2), ("rsub", 0.0, 3), ("rset", 0.0, 4), ("skew", 0.6, 5)], 1, 16);
+    }
+    g2_orbit_union_dnm::report::analyze_dir(&dir);
+    let md = std::fs::read_to_string(format!("{dir}/summary.md")).unwrap();
+    assert!(md.contains("ladder PERSISTENT"), "{md}");
+    std::fs::remove_dir_all(&dir).unwrap();
+    // excess at l = 3 only -> FALLING_OR_ABSENT
+    let dir = fresh_dir("lad2");
+    write_cell_l(&dir, n, m, 3, &[("frob", 1.5, 1), ("frobperm", 0.0, 2), ("rsub", 0.0, 3), ("rset", 0.0, 4), ("skew", 0.6, 5)], 1, 16);
+    write_cell_l(&dir, n, m, 5, &[("frob", 0.0, 1), ("frobperm", 0.0, 2), ("rsub", 0.0, 3), ("rset", 0.0, 4), ("skew", 0.6, 5)], 1, 16);
+    g2_orbit_union_dnm::report::analyze_dir(&dir);
+    let md = std::fs::read_to_string(format!("{dir}/summary.md")).unwrap();
+    assert!(md.contains("ladder FALLING_OR_ABSENT"), "{md}");
+    std::fs::remove_dir_all(&dir).unwrap();
 }

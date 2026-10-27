@@ -67,7 +67,7 @@ reports no distance to rho. At most it settles which of the "m = 2 only" stateme
 | E | any solver, SAT, wall-time, per-relation-cost or rho comparison; any ECC2K-130 statement beyond the arithmetic of section 9 | out of scope | not claimed |
 
 | G-NN | the whole decision pipeline returns D = 1 when the truth is 1 | instrument calibration | null-vs-null arm: a second independent random-multiplier set on the same enumeration; D_nn = U_null / U_null2 |
-| G-PLANT | the detector sees a known excess | instrument positive control | planted multipliers with a guaranteed hit per lag; recovered excess (U_plant - U_null2)/(J bases) should be 1 |
+| G-PLANT | the detector sees a known excess | instrument positive control | planted multipliers with a guaranteed hit per lag; recovered excess (U_plant - U_null2)/(J bases) should be 1 on arms that are not sigma-closed, and about n on `orbunion` and `stable` (all n rotations of the planted tuple lie in the base and each hits); only the one-sided gate rec < 0.5 on informative cell-arms aborts |
 
 T1, T2, T4, A2, S1 (for 2^(m-1) < n), S2, S3, C1 are not experimental findings: they are instrument checks and regression tests. A failure voids
 the cell; a pass says only that the code implements the definitions. The measured quantities are B1..B5 and C2.
@@ -301,7 +301,7 @@ arm (2 bases) is never informative.** The theorem is therefore checked by the ex
 tiny fixtures), not by this run, which can only fail to contradict it where informative.
 
 Rank: exact identities, no statistics. The cap N <= touched/3 keeps rank_orbit(1) below the column count, so the controls can grow;
-a cell where neither control grows in any base is reported NOT_INFORMATIVE rather than as support.
+a cell where either control (the within-orbit control or the independent control) fails to grow in every base is reported NOT_INFORMATIVE rather than as support (code: both must grow, `wg > 0 && ig > 0`).
 
 ## 7. Variable ledger
 
@@ -350,8 +350,7 @@ a cell where neither control grows in any base is reported NOT_INFORMATIVE rathe
    pooled into one claim; a statement specific to E_0 rests on two toy curves.
 6. **Wording allowed:** "same-tuple overlap of conjugate instances at (n, m): E-OVERLAP / E-EXTRA / E-DEFICIT / UNRESOLVED relative
    to random multipliers". Nothing is worded as a cost, a speed-up, an improvement or a distance to rho.
-7. **B4** (valuation theorem, stratum 1L): the observed Frobenius count on provably free pairs must be 0 (a positive count voids the
-   cell-arm and is a counterexample to the derivation or an instrument error); a cell-arm is informative only if the expected null
+7. **B4** (valuation theorem, stratum 1L): the observed Frobenius count on provably free pairs must be 0 (a positive count sets the cell-arm class to `VOID`, before the E-class is computed, so it counts in the 25 percent VOID abort, and is a counterexample to the derivation or an instrument error); a cell-arm is informative only if the expected null
    hits on the same pairs E = sum c(c-1)/((r-3)/2) are at least 5, otherwise `NOT_INFORMATIVE`. The stratum table by number of orbits
    (B5) is descriptive and has no decision rule.
 8. **Abort conditions** (`analyze` prints them; RUN_CARD section 5): any T void; more than a quarter of the evaluated cell-arms VOID
@@ -383,7 +382,7 @@ transfer to m = 131 is extrapolation until separately checked there.
   error in the proof or the spread bookkeeping, both unit-tested); fraction of cell-arms that are informative at all: 0.3.
 * B5: indicator autocorrelation: Frobenius minus null positive on rand only through shared legs (small, positive), 1 on stable.
 * G-NN: about 5 percent of D_nn intervals miss 1 (0.8 that the rate is below 12 percent). G-PLANT: recovery inside [0.7, 1.3] on the
-  informative cell-arms (0.9).
+  informative cell-arms of rand, rset, tuned (0.9); no prior is registered for orbunion/stable, where the expected recovery is about n.
 * C1: equality in 100 percent of bases (0.99). C2: plain-basis rank multiplies by close to n until columns or rows saturate. Rank
   cells informative (both controls grow): 0.8 of the 20 cells; the m = 2 cells may be NOT_INFORMATIVE when the rows touch exactly as
   many orbits as the rank.
@@ -455,4 +454,14 @@ of this one.
   pigeonhole in about 12 of 20 cells); (f) `halving_check` now uses the multiplier and is described as a consistency check;
   (g) the planner skips lag-starved subspace sizes (P(nx < m) <= 2 percent), giving 54 cells; (h) provenance, phase order
   (T first, fail-fast), exit codes, pre-flight timing, route; (i) family reporting, glossary, m = 83 disclosure, ord table.
+* 2026-10-27, revision 3, still before any data and before the freeze (edits, not deviations), after a second review:
+  (a) the trend rule (8.5) in `analyze` was inverted (the exclusion of the missing-cell placeholder matched every class containing
+  '-', including E-OVERLAP); it is now `trend_agreement`, which ignores only sequences with a "-" class or no cells, with a unit
+  test; (b) B4 (8.7) now sets the class to VOID before the E-class is computed, as written; (c) the cell `.gitignore` re-includes
+  `Cargo.lock` (the root ignores `**/Cargo.lock`) so `--locked` builds and the lockfile hash work from a clean checkout; the lockfile
+  must be committed with the cell; (d) the rank informativeness sentence in section 6 now states the code rule (both controls
+  must grow); (e) G-PLANT truth is per arm (about n on sigma-closed arms); (f) caveat for the decision table: hit counts on
+  `orbunion`/`stable` bases come in rotation clusters of n (K(sigma^k S) = lambda^k K(S)), so effective counts are U/n and the
+  section 6 Poisson table is optimistic by about sqrt(n) there; the claim B2 'D = 1' is scoped to non-sigma-closed bases, and
+  for orbunion/stable D < 1 is expected from the theorem; (g) `run_cells.sh` aborts if git is unavailable or the repo has no HEAD.
 * No deviations after the freeze yet.

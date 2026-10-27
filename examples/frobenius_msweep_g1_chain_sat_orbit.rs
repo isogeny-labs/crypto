@@ -1,13 +1,14 @@
 //! Cell G1 of the 2026-10-27 Frobenius m-sweep: chained-S3 SAT, plain x-domain
 //! against the exact Frobenius-orbit x-domain, at m = 4, 5, 6.
 //!
-//! STATUS: prepared, not run. Read
+//! STATUS: prepared, not run (amended 2026-10-27 before any data: PROTOCOL.md section 11). Read
 //! `research/frobenius_msweep_20261027/g1-chain-sat-orbit/PROTOCOL.md` first.
 //!
-//! The driver has four subcommands (see RUN_CARD.md for the exact lines):
+//! The driver has five subcommands (see RUN_CARD.md for the exact lines):
 //!   oracle   exact sumset verdicts for every target of one cell (no solver)
 //!   run      one arm over every target of one cell, one JSONL row per solve
-//!   analyze  paired comparison, A/A band, resolution check, decision rule
+//!   cap      per-cell conflict caps from the pilot rows (frozen rule)
+//!   analyze  cost-per-relation comparison, A/A band, resolution check, decision rule
 //!   plan     static design numbers (sizes, expected yield); solves nothing
 //!
 //! Instrument. Every arm runs through `shadow_solve`, a line-for-line copy of
@@ -667,26 +668,95 @@ fn limits_for(cap: u64) -> ChainS3Limits {
 
 // ------------------------------------------------------------------- planning
 
-/// Orbits needed so that the expected number of m-sums, (2kn)^m / m!, is
-/// about 0.7 of the group order (natural-target yield about 0.5). At least 2,
-/// because the orbit arm needs two representatives.
-fn suggest_k(n: u32, m: usize) -> usize {
-    let order = 2f64.powi(n as i32);
+/// Order r of the prime-order subgroup that holds every target and every sum
+/// (r = #E / 4 for the a = 0 Koblitz curve, about 2^n / 4; not 2^n).
+fn subgroup_r(n: u32) -> u64 {
+    KoblitzCurve::new(0, n)
+        .and_then(|kc| kc.subgroup_order.to_u64())
+        .expect("Koblitz a=0 curve with u64 subgroup order")
+}
+
+/// Orbits needed so that the expected number of m-sums, (2kn)^m / m!, is about
+/// 0.7 of the SUBGROUP order r (natural-target yield about 0.5). At least 2,
+/// because the orbit arm needs two representatives; where k = 2 already
+/// overshoots, the cell is saturated and stays at k = 2.
+fn suggest_k(r: u64, n: u32, m: usize) -> usize {
     let fact: f64 = (1..=m).map(|i| i as f64).product();
     for k in 2..=64usize {
         let s = (2.0 * k as f64 * n as f64).powi(m as i32) / fact;
-        if s >= 0.7 * order {
+        if s >= 0.7 * r as f64 {
             return k;
         }
     }
     64
 }
 
-fn expected_yield(n: u32, m: usize, k: usize) -> f64 {
-    let order = 2f64.powi(n as i32);
+fn expected_yield(r: u64, n: u32, m: usize, k: usize) -> f64 {
     let fact: f64 = (1..=m).map(|i| i as f64).product();
     let s = (2.0 * k as f64 * n as f64).powi(m as i32) / fact;
-    1.0 - (-s / order).exp()
+    1.0 - (-s / r as f64).exp()
+}
+
+// ------------------------------------------------------------------ cap rule
+
+const CAP_GRID: [u64; 7] = [20_000, 50_000, 100_000, 200_000, 500_000, 1_000_000, 2_000_000];
+
+/// Frozen cap rule (PROTOCOL amendment 1). From the pilot rows of each cell
+/// (every pilot row of arms P and O: n, m and k come from the cell id), per
+/// cell:
+///   t_conf = max over arms of  sum(wall_s - build_s) / sum(conflicts)
+///            (ratio of sums over that arm's rows with conflicts > 0, so
+///            construction time and the near-zero-conflict solves that bias a
+///            median of per-row ratios upward do not enter),
+///   b      = max build_s over those rows (CNF construction per target),
+///   CAP    = the largest grid value with b + CAP * t_conf <= budget seconds.
+/// If even the smallest grid value exceeds the budget, the cell is an
+/// O-IMPEDIMENT(budget) and is not run. Output: one `n:m:k:CAP` line per cell
+/// (or `n:m:k:IMPEDIMENT`), the exact cell tokens `run_stage.sh` takes.
+fn cap_lines(dir: &str, budget: f64) -> Result<Vec<String>, String> {
+    // cell id -> arm -> (sum solver seconds, sum conflicts), and max build_s
+    let mut acc: HashMap<String, HashMap<String, (f64, f64)>> = HashMap::new();
+    let mut maxb: HashMap<String, f64> = HashMap::new();
+    for e in std::fs::read_dir(dir).map_err(|e| e.to_string())? {
+        let path = e.map_err(|e| e.to_string())?.path();
+        if path.extension().and_then(|s| s.to_str()) != Some("jsonl")
+            || !path.file_name().unwrap().to_string_lossy().starts_with("rows-")
+        {
+            continue;
+        }
+        let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+        for line in text.lines().filter(|l| !l.trim().is_empty()) {
+            let v: Value = serde_json::from_str(line).map_err(|e| e.to_string())?;
+            let f = |k: &str| v.get(k).and_then(Value::as_f64).ok_or(format!("row lacks {k}"));
+            let cell = v["cell"].as_str().ok_or("row lacks cell")?.to_string();
+            let arm = v["arm"].as_str().ok_or("row lacks arm")?.to_string();
+            if v["conj"].as_u64() != Some(0) || !(arm == "P" || arm == "O") {
+                continue;
+            }
+            let (conf, wall, build) = (f("conflicts")?, f("wall_s")?, f("build_s")?);
+            let b = maxb.entry(cell.clone()).or_insert(0.0);
+            *b = b.max(build);
+            if conf > 0.0 {
+                let a = acc.entry(cell).or_default().entry(arm).or_insert((0.0, 0.0));
+                a.0 += (wall - build).max(0.0);
+                a.1 += conf;
+            }
+        }
+    }
+    let mut cells: Vec<&String> = acc.keys().collect();
+    cells.sort();
+    let mut out = Vec::new();
+    for cell in cells {
+        let (n, m, k) = parse_cell(cell).ok_or("bad cell id")?;
+        let t_conf = acc[cell].values().map(|(t, c)| t / c).fold(0.0f64, f64::max);
+        let b = maxb[cell];
+        let cap = CAP_GRID.iter().rev().find(|&&c| b + c as f64 * t_conf <= budget);
+        out.push(match cap {
+            Some(c) => format!("{n}:{m}:{k}:{c}"),
+            None => format!("{n}:{m}:{k}:IMPEDIMENT"),
+        });
+    }
+    Ok(out)
 }
 
 // ------------------------------------------------------------------- analysis
@@ -777,22 +847,32 @@ fn metric(r: &Row, name: &str, price: f64) -> f64 {
     }
 }
 
-/// Paired log ratio X/Y over targets where both finished and agree with the
-/// oracle. Returns (geometric ratio, lo, hi, total ratio, pairs, dropped, sd).
+/// SECONDARY, survivors-only statistic: paired log ratio X/Y over targets
+/// where both arms finished and agree with the oracle. It drops every pair in
+/// which an arm was censored, so it is biased toward the arm censored more and
+/// never decides anything (PROTOCOL amendment 1). The dropped pairs are
+/// counted per direction so the bias is visible.
 fn paired(x: &[&Row], y: &[&Row], name: &str, price: f64, seed: u64) -> Value {
     // Keyed by target only: the A/A pairs a target with its own sigma-conjugate.
     let ymap: HashMap<&str, &Row> = y.iter().map(|r| (r.target_id.as_str(), *r)).collect();
     let mut logs = Vec::new();
     let (mut sx, mut sy) = (0.0, 0.0);
-    let mut dropped = 0usize;
+    let (mut d_x_only, mut d_y_only, mut d_both, mut d_other, mut absent) = (0usize, 0usize, 0usize, 0usize, 0usize);
     for r in x {
         let Some(q) = ymap.get(r.target_id.as_str()) else {
+            absent += 1;
             continue;
         };
         let (a, b) = (metric(r, name, price), metric(q, name, price));
-        let ok = r.verdict != "censored" && q.verdict != "censored" && r.agree && q.agree;
+        let (cx, cy) = (r.verdict == "censored", q.verdict == "censored");
+        let ok = !cx && !cy && r.agree && q.agree;
         if !ok || !(a > 0.0) || !(b > 0.0) {
-            dropped += 1;
+            match (cx, cy) {
+                (true, false) => d_x_only += 1,
+                (false, true) => d_y_only += 1,
+                (true, true) => d_both += 1,
+                _ => d_other += 1,
+            }
             continue;
         }
         logs.push((a / b).ln());
@@ -801,7 +881,9 @@ fn paired(x: &[&Row], y: &[&Row], name: &str, price: f64, seed: u64) -> Value {
     }
     let (m, lo, hi) = boot_mean(&logs, seed);
     json!({
-        "metric": name, "price": price, "pairs": logs.len(), "dropped": dropped,
+        "metric": name, "price": price, "pairs": logs.len(),
+        "dropped_x_censored_only": d_x_only, "dropped_y_censored_only": d_y_only,
+        "dropped_both_censored": d_both, "dropped_other": d_other, "absent_from_other_arm": absent,
         "geo_ratio": m.exp(), "ci_lo": lo.exp(), "ci_hi": hi.exp(),
         "total_ratio": if sy > 0.0 { sx / sy } else { f64::NAN },
         "sd_log": sd(&logs),
@@ -809,33 +891,146 @@ fn paired(x: &[&Row], y: &[&Row], name: &str, price: f64, seed: u64) -> Value {
     })
 }
 
-/// Frozen decision rule (PROTOCOL section 7).
-fn decide(ci_lo: f64, ci_hi: f64, aa_ci_lo: f64, aa_ci_hi: f64, agree_all: bool, cens_frac: f64) -> &'static str {
-    if !agree_all {
+/// DECIDING statistic (PROTOCOL amendment 1): cost per relation of X over
+/// cost per relation of Y on the same targets,
+///   (sum over ALL targets of cost(X) / relations(X)) / (same for Y),
+/// where a censored solve contributes its spend (a lower bound of its true
+/// cost, so it flatters the censored arm; `decide` blocks any claim in favour
+/// of the arm censored more) and contributes no relation. A relation is a
+/// `found` solve in the satisfiable strata and a `refuted` solve in the
+/// `unsat` stratum. No pair is dropped; the interval is a percentile bootstrap
+/// over targets resampled jointly for both arms (2000 resamples).
+fn per_relation(x: &[&Row], y: &[&Row], name: &str, price: f64, unsat: bool, seed: u64) -> Value {
+    let ymap: HashMap<&str, &Row> = y.iter().map(|r| (r.target_id.as_str(), *r)).collect();
+    let pairs: Vec<(&Row, &Row)> = x
+        .iter()
+        .filter_map(|r| ymap.get(r.target_id.as_str()).map(|q| (*r, *q)))
+        .collect();
+    let unit = |r: &Row| if unsat { r.verdict == "refuted" } else { r.verdict == "found" };
+    let ratio = |idx: &[usize]| -> (f64, f64, f64, f64, f64) {
+        let (mut cx, mut cy, mut ux, mut uy) = (0.0, 0.0, 0.0, 0.0);
+        for &i in idx {
+            let (a, b) = pairs[i];
+            cx += metric(a, name, price);
+            cy += metric(b, name, price);
+            ux += unit(a) as u8 as f64;
+            uy += unit(b) as u8 as f64;
+        }
+        let ok = ux > 0.0 && uy > 0.0 && cy > 0.0;
+        (if ok { (cx / ux) / (cy / uy) } else { f64::NAN }, cx, cy, ux, uy)
+    };
+    let all: Vec<usize> = (0..pairs.len()).collect();
+    let (point, cx, cy, ux, uy) = ratio(&all);
+    let b = 2000usize;
+    let mut rng = Rng(seed);
+    let mut boots: Vec<f64> = Vec::with_capacity(b);
+    for _ in 0..b {
+        if pairs.is_empty() {
+            break;
+        }
+        let idx: Vec<usize> = (0..pairs.len()).map(|_| rng.below(pairs.len() as u64) as usize).collect();
+        let v = ratio(&idx).0;
+        if v.is_finite() && v > 0.0 {
+            boots.push(v);
+        }
+    }
+    // A resample without a relation in an arm has no ratio; if more than 5
+    // percent of resamples lack one, the interval is declared undefined.
+    let (lo, hi, sdl) = if point.is_finite() && boots.len() as f64 >= 0.95 * b as f64 {
+        boots.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let l: Vec<f64> = boots.iter().map(|v| v.ln()).collect();
+        (boots[(0.025 * boots.len() as f64) as usize], boots[(0.975 * boots.len() as f64) as usize], sd(&l))
+    } else {
+        (f64::NAN, f64::NAN, f64::NAN)
+    };
+    let cens = |f: &dyn Fn(&(&Row, &Row)) -> (bool, bool)| -> (usize, usize, usize) {
+        let (mut xo, mut yo, mut bo) = (0, 0, 0);
+        for p in &pairs {
+            match f(p) {
+                (true, false) => xo += 1,
+                (false, true) => yo += 1,
+                (true, true) => bo += 1,
+                _ => {}
+            }
+        }
+        (xo, yo, bo)
+    };
+    let (xo, yo, bo) = cens(&|(a, b)| (a.verdict == "censored", b.verdict == "censored"));
+    json!({
+        "metric": name, "price": price, "statistic": "cost_per_relation_ratio", "unit": if unsat { "refuted" } else { "found" },
+        "targets": pairs.len(), "ratio": point, "ci_lo": lo, "ci_hi": hi,
+        "relations_x": ux, "relations_y": uy, "cost_x": cx, "cost_y": cy,
+        "cost_per_relation_x": if ux > 0.0 { cx / ux } else { f64::NAN },
+        "cost_per_relation_y": if uy > 0.0 { cy / uy } else { f64::NAN },
+        "censored_x_only": xo, "censored_y_only": yo, "censored_both": bo,
+        "boot_sd_log": sdl, "mde_ratio_95": (1.96 * sdl).exp(),
+    })
+}
+
+/// Minimum number of targets (shared by both arms) for any claim.
+const MIN_TARGETS: usize = 10;
+/// Per-arm censored fraction above which a stratum is unresolved.
+const MAX_CENSORED: f64 = 0.2;
+
+/// Facts about one (cell, stratum, arm X against P) comparison that gate it.
+#[derive(Clone, Copy, Debug)]
+struct Gate {
+    /// every row of the cell (all arms, A/A included) agrees with the oracle
+    agree_all: bool,
+    /// every (arm, conj) job of the cell has the same target set
+    complete: bool,
+    targets: usize,
+    cens_x: usize,
+    cens_p: usize,
+}
+
+impl Gate {
+    fn frac(&self, c: usize) -> f64 {
+        if self.targets == 0 { 1.0 } else { c as f64 / self.targets as f64 }
+    }
+}
+
+/// Frozen decision rule (PROTOCOL section 7 as amended). The interval is that
+/// of the cost-per-relation ratio X/P. Censoring is gated per arm, and a claim
+/// in favour of the arm that was censored more is never made.
+fn decide(ci_lo: f64, ci_hi: f64, aa_ci_lo: f64, aa_ci_hi: f64, g: &Gate) -> &'static str {
+    if !g.agree_all {
         return "invalid_oracle_disagreement";
     }
-    if cens_frac > 0.2 {
+    if !g.complete {
+        return "invalid_incomplete_rows";
+    }
+    if g.targets < MIN_TARGETS {
+        return "unresolved_too_few_targets";
+    }
+    if g.frac(g.cens_x) > MAX_CENSORED || g.frac(g.cens_p) > MAX_CENSORED {
         return "unresolved_censored";
+    }
+    if !(ci_lo.is_finite() && ci_hi.is_finite()) {
+        return "unresolved_no_relations";
     }
     if !(aa_ci_lo <= 1.0 && 1.0 <= aa_ci_hi) {
         return "invalid_aa_excludes_one";
     }
     if ci_hi < 1.0 {
-        "improvement"
+        if g.cens_x <= g.cens_p { "improvement" } else { "unresolved_asymmetric_censoring" }
     } else if ci_lo > 1.0 {
-        "regression"
+        if g.cens_p <= g.cens_x { "regression" } else { "unresolved_asymmetric_censoring" }
     } else {
         "unresolved_no_difference"
     }
 }
 
 /// Audit claim C3: the arm is at least 0.95x as fast as plain, i.e. its cost
-/// ratio to plain is at most 1/0.95. Non-inferiority needs the whole interval
-/// below the margin; it is reported next to, not instead of, `decide`.
+/// per relation relative to plain is at most 1/0.95. Non-inferiority needs the
+/// whole interval below the margin, a valid stratum, and the arm not censored
+/// more than plain (censored spend understates cost).
 const C3_COST_MARGIN: f64 = 1.0 / 0.95;
 
-fn c3_noninferior(ci_hi: f64) -> bool {
-    ci_hi <= C3_COST_MARGIN
+fn c3_noninferior(ci_hi: f64, decision: &str, g: &Gate) -> bool {
+    let usable = !(decision.starts_with("invalid")
+        || matches!(decision, "unresolved_censored" | "unresolved_too_few_targets" | "unresolved_no_relations"));
+    usable && g.cens_x <= g.cens_p && ci_hi <= C3_COST_MARGIN
 }
 
 /// Anytime view in one currency (solver word_ops). A row's finish is the
@@ -891,6 +1086,24 @@ fn anytime_table(arms: &[(&str, Vec<&Row>)]) -> Value {
     json!({"horizon_word_ops": horizon, "grid": grid})
 }
 
+fn hash_str(s: &str) -> u64 {
+    s.bytes().fold(0x5EED_u64, |h, b| splitmix(h ^ b as u64))
+}
+
+/// (n, m, k) parsed from a cell id `a0-n17-m4-k2-s1027`.
+fn parse_cell(id: &str) -> Option<(u64, u64, u64)> {
+    let get = |p: char| id.split('-').find_map(|t| t.strip_prefix(p)?.parse::<u64>().ok());
+    Some((get('n')?, get('m')?, get('k')?))
+}
+
+/// Number of orbits of the k^m n^m tuples (k Frobenius orbits of length n,
+/// m summands, each summand one of n rotations of a representative) under
+/// simultaneous rotation, n prime: k^m n^(m-1). Information only (PROTOCOL
+/// section 3); no cost in this cell is divided by it.
+fn class_count(n: u64, m: u64, k: u64) -> f64 {
+    (k as f64).powi(m as i32) * (n as f64).powi(m as i32 - 1)
+}
+
 fn analyze(dir: &str, out: &str) -> Result<(), String> {
     let mut rows: Vec<Row> = Vec::new();
     for e in std::fs::read_dir(dir).map_err(|e| e.to_string())? {
@@ -913,7 +1126,22 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
     cells.sort();
     cells.dedup();
     let mut report = Vec::new();
+    let mut c3_cells = Vec::new();
     for cell in &cells {
+        // Cell-level integrity: any agree=false row of any arm (A/A included)
+        // or any certificate that failed invalidates every stratum of the cell,
+        // and every (arm, conj) job must cover the same target set.
+        let crow: Vec<&Row> = rows.iter().filter(|r| &r.cell == cell).collect();
+        let agree_cell = crow.iter().all(|r| r.agree && (r.verdict != "found" || r.cert_ok));
+        let mut groups: HashMap<(String, u32), HashSet<&str>> = HashMap::new();
+        for r in &crow {
+            groups.entry((r.arm.clone(), r.conj)).or_default().insert(r.target_id.as_str());
+        }
+        let union: HashSet<&str> = groups.values().flatten().copied().collect();
+        let complete_cell = ["O", "R", "Q"].iter().all(|a| groups.contains_key(&(a.to_string(), 0)))
+            && groups.contains_key(&("P".to_string(), 0))
+            && groups.contains_key(&("P".to_string(), 1))
+            && groups.values().all(|g| g.len() == union.len());
         let sel = |arm: &str, conj0: bool, pred: &dyn Fn(&Row) -> bool| -> Vec<&Row> {
             rows.iter()
                 .filter(|r| &r.cell == cell && r.arm == arm && (r.conj == 0) == conj0 && pred(r))
@@ -926,8 +1154,11 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
             ("natural_all", Box::new(|r: &Row| r.class == "natural")),
         ];
         let mut cell_out = Vec::new();
+        // (stratum, decision, ci_hi, flag, stable across the 5a band) for arm O, word_ops
+        let mut o_c3: Vec<(String, String, f64, bool, bool)> = Vec::new();
         for (sname, pred) in &strata {
-            let seed = derive(&[cell.len() as u64, sname.len() as u64, 0xA11A]);
+            let unsat = *sname == "unsat";
+            let seed = derive(&[hash_str(cell), hash_str(sname), 0xA11A]);
             let base = sel("P", true, pred.as_ref());
             if base.is_empty() {
                 continue;
@@ -945,31 +1176,35 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
                 if x.is_empty() {
                     continue;
                 }
-                let n_all = x.len();
-                let cens = x.iter().filter(|r| r.verdict == "censored").count()
-                    + base.iter().filter(|r| r.verdict == "censored").count();
-                let cens_frac = cens as f64 / (n_all + base.len()) as f64;
-                let agree_all = x.iter().chain(base.iter()).all(|r| r.agree && (r.verdict == "censored" || r.cert_ok || r.verdict == "refuted"));
+                let ids_x: HashSet<&str> = x.iter().map(|r| r.target_id.as_str()).collect();
+                let ids_p: HashSet<&str> = base.iter().map(|r| r.target_id.as_str()).collect();
+                let gate = Gate {
+                    agree_all: agree_cell,
+                    complete: complete_cell && ids_x == ids_p,
+                    targets: ids_p.intersection(&ids_x).count(),
+                    cens_x: x.iter().filter(|r| r.verdict == "censored").count(),
+                    cens_p: base.iter().filter(|r| r.verdict == "censored").count(),
+                };
                 let mut metrics = Vec::new();
+                let mut word_ops_entry = None;
                 for m in ["word_ops", "conflicts", "propagations", "wall_s"] {
-                    let p = paired(&x, &base, m, 0.0, seed);
-                    let aa = paired(&aa_refs, &base, m, 0.0, seed ^ 7);
-                    let verdict = decide(
-                        p["ci_lo"].as_f64().unwrap_or(f64::NAN),
-                        p["ci_hi"].as_f64().unwrap_or(f64::NAN),
-                        aa["ci_lo"].as_f64().unwrap_or(f64::NAN),
-                        aa["ci_hi"].as_f64().unwrap_or(f64::NAN),
-                        agree_all,
-                        cens_frac,
-                    );
-                    let c3 = c3_noninferior(p["ci_hi"].as_f64().unwrap_or(f64::NAN));
+                    let p = per_relation(&x, &base, m, 0.0, unsat, seed);
+                    let aa = per_relation(&aa_refs, &base, m, 0.0, unsat, seed ^ 7);
+                    let f = |v: &Value, k: &str| v[k].as_f64().unwrap_or(f64::NAN);
+                    let verdict = decide(f(&p, "ci_lo"), f(&p, "ci_hi"), f(&aa, "ci_lo"), f(&aa, "ci_hi"), &gate);
+                    let c3 = c3_noninferior(f(&p, "ci_hi"), verdict, &gate);
+                    if m == "word_ops" {
+                        word_ops_entry = Some((verdict, f(&p, "ci_hi"), c3));
+                    }
                     metrics.push(json!({"vs_P": p, "aa_conj_vs_P": aa, "decision": verdict,
-                        "c3_noninferior_at_0.95": c3 && verdict != "invalid_oracle_disagreement" && verdict != "invalid_aa_excludes_one" && verdict != "unresolved_censored"}));
+                        "c3_noninferior_at_0.95": c3,
+                        "survivors_only_secondary": paired(&x, &base, m, 0.0, seed ^ 3)}));
                 }
-                // Section 5a pricing band: lift group adds + price * word_ops.
+                // Section 5a pricing band: lift group adds + price * word_ops,
+                // same cost-per-relation statistic at the three prices.
                 let priced: Vec<Value> = [0.0, 0.1, 1.0]
                     .iter()
-                    .map(|&price| paired(&x, &base, "gae", price, seed ^ 11))
+                    .map(|&price| per_relation(&x, &base, "gae", price, unsat, seed ^ 11))
                     .collect();
                 let hi = |v: &Value| v["ci_hi"].as_f64().unwrap_or(f64::NAN);
                 let lo = |v: &Value| v["ci_lo"].as_f64().unwrap_or(f64::NAN);
@@ -981,45 +1216,62 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
                 } else {
                     "order_not_stable_across_band"
                 };
-                arms.push(json!({"arm": arm, "censored_fraction": cens_frac, "metrics": metrics,
-                    "priced_gae": priced, "section_5a_band": band}));
+                let c3_band = priced.iter().all(|v| hi(v) <= C3_COST_MARGIN);
+                // Final graded outcome: decision (word_ops) merged with the band.
+                let (wd, whi, wc3) = word_ops_entry.unwrap();
+                let final_grade = match (wd, band) {
+                    ("improvement", "arm_cheaper_across_band") => "improvement_ranked",
+                    ("regression", "arm_dearer_across_band") => "regression_ranked",
+                    ("improvement" | "regression", _) => "not_ranked_unstable_across_5a_band",
+                    (d, _) => d,
+                };
+                if arm == "O" && (*sname == "natural_all" || *sname == "natural_sat") {
+                    o_c3.push((sname.to_string(), wd.to_string(), whi, wc3, c3_band));
+                }
+                arms.push(json!({"arm": arm, "gate": {"agree_all_cell": gate.agree_all, "complete": gate.complete,
+                    "targets": gate.targets, "censored_x": gate.cens_x, "censored_P": gate.cens_p},
+                    "metrics": metrics, "priced_gae": priced, "section_5a_band": band,
+                    "c3_noninferior_across_5a_band": c3_band, "final_grade_word_ops": final_grade}));
             }
-            // Detector self-check: inject known ratios into the A/A log ratios.
-            let aa = paired(&aa_refs, &base, "word_ops", 0.0, seed ^ 13);
-            let sdl = aa["sd_log"].as_f64().unwrap_or(f64::NAN);
-            let pairs = aa["pairs"].as_u64().unwrap_or(0) as f64;
+            // Detector self-check: scale the A/A word_ops by a known ratio and
+            // see whether the same cost-per-relation statistic detects it.
+            let aa0 = per_relation(&aa_refs, &base, "word_ops", 0.0, unsat, seed ^ 13);
             let mut inject = Vec::new();
             for delta in [1.05f64, 1.1, 1.25, 1.5, 2.0] {
-                let mut logs: Vec<f64> = Vec::new();
-                let ymap: HashMap<&str, &&Row> = base.iter().map(|r| (r.target_id.as_str(), r)).collect();
-                for r in &aa_refs {
-                    if let Some(b) = ymap.get(r.target_id.as_str()) {
-                        if r.word_ops > 0.0 && b.word_ops > 0.0 && r.verdict != "censored" && b.verdict != "censored" {
-                            logs.push((r.word_ops / b.word_ops).ln() + delta.ln());
-                        }
-                    }
-                }
-                let (_, lo, hi) = boot_mean(&logs, seed ^ (delta.to_bits()));
-                inject.push(json!({"injected": delta, "detected": lo > 0.0 || hi < 0.0}));
+                let scaled: Vec<Row> = aa_rows
+                    .iter()
+                    .cloned()
+                    .map(|mut r| {
+                        r.word_ops *= delta;
+                        r
+                    })
+                    .collect();
+                let sr: Vec<&Row> = scaled.iter().collect();
+                let v = per_relation(&sr, &base, "word_ops", 0.0, unsat, seed ^ delta.to_bits());
+                let (lo, hi) = (v["ci_lo"].as_f64().unwrap_or(f64::NAN), v["ci_hi"].as_f64().unwrap_or(f64::NAN));
+                inject.push(json!({"injected": delta, "detected": lo > 1.0 || hi < 1.0}));
             }
-            // Cost per relation and distance to the matched rho (analytic placeholder).
-            let nat: Vec<&Row> = rows
-                .iter()
-                .filter(|r| &r.cell == cell && r.arm == "P" && r.conj == 0 && r.class == "natural")
-                .collect();
-            let found = nat.iter().filter(|r| r.verdict == "found").count();
+            // Absolute cost per relation per arm and price, and the distance to
+            // the matched rho (analytic placeholder, arm P).
+            let (r0, k0) = base.first().map(|r| (r.r, r.k)).unwrap_or((f64::NAN, f64::NAN));
+            let rho = (std::f64::consts::PI * r0 / 2.0).sqrt();
             let mut per_rel = Vec::new();
-            for price in [0.0f64, 0.1, 1.0] {
-                let total: f64 = nat.iter().map(|r| metric(r, "gae", price)).sum();
-                let (r0, k0) = nat.first().map(|r| (r.r, r.k)).unwrap_or((f64::NAN, f64::NAN));
-                let rho = (std::f64::consts::PI * r0 / 2.0).sqrt();
-                per_rel.push(json!({
-                    "price": price,
-                    "relations": found,
-                    "gae_per_relation": if found > 0 { total / found as f64 } else { f64::INFINITY },
-                    "gap_to_rho_analytic": if found > 0 { (k0 + 1.0) * total / found as f64 / rho } else { f64::INFINITY },
-                    "rho_analytic_adds": rho,
-                }));
+            for arm in ["P", "O", "R", "Q"] {
+                let ar = sel(arm, true, pred.as_ref());
+                if ar.is_empty() {
+                    continue;
+                }
+                let found = ar.iter().filter(|r| if unsat { r.verdict == "refuted" } else { r.verdict == "found" }).count();
+                for price in [0.0f64, 0.1, 1.0] {
+                    let total: f64 = ar.iter().map(|r| metric(r, "gae", price)).sum();
+                    let cpr = if found > 0 { total / found as f64 } else { f64::INFINITY };
+                    per_rel.push(json!({
+                        "arm": arm, "price": price, "relations": found, "targets": ar.len(),
+                        "gae_per_relation": cpr,
+                        "gap_to_rho_analytic": if arm == "P" && !unsat { json!((k0 + 1.0) * cpr / rho) } else { Value::Null },
+                        "rho_analytic_adds": if arm == "P" { json!(rho) } else { Value::Null },
+                    }));
+                }
             }
             let any_arms: Vec<(&str, Vec<&Row>)> = ["P", "O", "R", "Q"]
                 .iter()
@@ -1030,16 +1282,35 @@ fn analyze(dir: &str, out: &str) -> Result<(), String> {
             cell_out.push(json!({
                 "anytime": anytime_view,
                 "stratum": sname, "targets_P": base.len(),
-                "aa_sd_log_word_ops": sdl,
-                "aa_mde_ratio_95": (1.96 * sdl / pairs.sqrt()).exp(),
-                "detector_injection": inject, "arms": arms, "cost_per_relation_P": per_rel,
+                "aa_boot_sd_log_word_ops": aa0["boot_sd_log"],
+                "aa_mde_ratio_95": aa0["mde_ratio_95"],
+                "detector_injection": inject, "arms": arms, "cost_per_relation": per_rel,
             }));
         }
-        report.push(json!({"cell": cell, "strata": cell_out}));
+        // Per-cell C3 grade for arm O: supported only if natural_all and
+        // natural_sat both have word_ops upper bound <= 1/0.95, a usable
+        // stratum, O not censored more than P, and the same at all three prices.
+        let grade = if o_c3.len() == 2 && o_c3.iter().all(|t| t.3 && t.4) {
+            "supported"
+        } else if o_c3.iter().any(|t| t.1 == "regression" && t.2 > C3_COST_MARGIN) {
+            "contradicted"
+        } else {
+            "unresolved"
+        };
+        c3_cells.push(grade);
+        let cc = parse_cell(cell).map(|(n, m, k)| class_count(n, m, k));
+        report.push(json!({"cell": cell, "class_count_info_only": cc, "c3_grade_O": grade,
+            "c3_detail": o_c3.iter().map(|t| json!({"stratum": t.0, "decision": t.1, "ci_hi": t.2, "flag": t.3, "stable_5a": t.4})).collect::<Vec<_>>(),
+            "strata": cell_out}));
     }
     std::fs::create_dir_all(out).map_err(|e| e.to_string())?;
-    let text = serde_json::to_string_pretty(&json!({"schema": "g1-chain-sat-orbit/summary/v1", "cells": report}))
-        .map_err(|e| e.to_string())?;
+    let supported = c3_cells.iter().filter(|g| **g == "supported").count();
+    let text = serde_json::to_string_pretty(&json!({
+        "schema": "g1-chain-sat-orbit/summary/v2",
+        "c3_cells_supported": supported, "c3_cells_total": c3_cells.len(),
+        "c3_k_of_9": format!("{supported} of {} analysed (9 planned)", c3_cells.len()),
+        "cells": report}))
+    .map_err(|e| e.to_string())?;
     std::fs::write(format!("{out}/summary.json"), text).map_err(|e| e.to_string())
 }
 
@@ -1077,18 +1348,20 @@ fn host() -> String {
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let Some(cmd) = args.first().cloned() else {
-        eprintln!("usage: oracle|run|analyze|plan (see RUN_CARD.md)");
+        eprintln!("usage: oracle|run|cap|analyze|plan (see RUN_CARD.md)");
         std::process::exit(2);
     };
     match cmd.as_str() {
         "plan" => {
-            for n in [17u32, 23, 31] {
+            for n in [19u32, 23, 31] {
+                let r = subgroup_r(n);
                 for m in [4usize, 5, 6] {
-                    let k = suggest_k(n, m);
+                    let k = suggest_k(r, n, m);
                     println!(
-                        "n={n} m={m} k={k} points={} yield~{:.2}",
+                        "n={n} m={m} r={r} k={k} points={} yield~{:.4} class_count_info_only={:.4e}",
                         2 * n as usize * k,
-                        expected_yield(n, m, k)
+                        expected_yield(r, n, m, k),
+                        class_count(n as u64, m as u64, k as u64)
                     );
                 }
             }
@@ -1183,6 +1456,13 @@ fn main() {
                     "lift_adds": o.c.lift_adds, "wall_s": o.wall_s, "build_s": o.build_s,
                 })).unwrap();
                 f.flush().unwrap();
+            }
+        }
+        "cap" => {
+            let rows: String = num(&args, "--rows", None);
+            let budget: f64 = num(&args, "--budget", Some(180.0));
+            for l in cap_lines(&rows, budget).unwrap_or_else(|e| panic!("{e}")) {
+                println!("{l}");
             }
         }
         "analyze" => {
@@ -1378,6 +1658,8 @@ mod tests {
         let o = shadow_solve(&cd, &t.point, l, arm_spec("P").unwrap());
         assert_eq!(o.verdict, Verdict::Refuted, "{:?}", o.reason);
         assert!(o.points.is_none());
+        // A coset target has no x-level model: SAT alone refutes it, the lift never runs.
+        assert_eq!((o.c.models, o.c.lift_adds), (0, 0), "coset refutation must not reach the lift");
         eprintln!("UNSAT_FIXTURE conflicts={} wall={:.1}s", o.c.conflicts, o.wall_s);
     }
 
@@ -1505,20 +1787,67 @@ mod tests {
             aa.push(mk("P", 1, i, base * noise(&mut rng)));
         }
         let (pr, or, ar): (Vec<&Row>, Vec<&Row>, Vec<&Row>) = (p.iter().collect(), o.iter().collect(), aa.iter().collect());
-        let eff = paired(&or, &pr, "word_ops", 0.0, 1);
-        let null = paired(&ar, &pr, "word_ops", 0.0, 2);
+        let eff = per_relation(&or, &pr, "word_ops", 0.0, true, 1);
+        let null = per_relation(&ar, &pr, "word_ops", 0.0, true, 2);
         let (lo, hi) = (eff["ci_lo"].as_f64().unwrap(), eff["ci_hi"].as_f64().unwrap());
         assert!(hi < 0.6 && lo > 0.4, "{eff}");
         let (nlo, nhi) = (null["ci_lo"].as_f64().unwrap(), null["ci_hi"].as_f64().unwrap());
         assert!(nlo <= 1.0 && 1.0 <= nhi, "{null}");
-        assert_eq!(decide(lo, hi, nlo, nhi, true, 0.0), "improvement");
-        assert_eq!(decide(1.2, 1.4, nlo, nhi, true, 0.0), "regression");
-        assert_eq!(decide(0.9, 1.1, nlo, nhi, true, 0.0), "unresolved_no_difference");
-        assert_eq!(decide(0.4, 0.5, nlo, nhi, false, 0.0), "invalid_oracle_disagreement");
-        assert_eq!(decide(0.4, 0.5, nlo, nhi, true, 0.3), "unresolved_censored");
-        assert_eq!(decide(0.4, 0.5, 1.1, 1.3, true, 0.0), "invalid_aa_excludes_one");
+        let g = Gate { agree_all: true, complete: true, targets: 80, cens_x: 0, cens_p: 0 };
+        assert_eq!(decide(lo, hi, nlo, nhi, &g), "improvement");
+        assert_eq!(decide(1.2, 1.4, nlo, nhi, &g), "regression");
+        assert_eq!(decide(0.9, 1.1, nlo, nhi, &g), "unresolved_no_difference");
+        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { agree_all: false, ..g }), "invalid_oracle_disagreement");
+        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { complete: false, ..g }), "invalid_incomplete_rows");
+        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { targets: 5, ..g }), "unresolved_too_few_targets");
+        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { cens_x: 17, ..g }), "unresolved_censored");
+        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { cens_p: 17, ..g }), "unresolved_censored");
+        assert_eq!(decide(f64::NAN, f64::NAN, nlo, nhi, &g), "unresolved_no_relations");
+        assert_eq!(decide(0.4, 0.5, 1.1, 1.3, &g), "invalid_aa_excludes_one");
+        // One-sided censoring below the 20 percent gate: a claim in favour of the arm
+        // censored more is never made, in either direction.
+        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { cens_x: 10, cens_p: 2, ..g }), "unresolved_asymmetric_censoring");
+        assert_eq!(decide(1.2, 1.4, nlo, nhi, &Gate { cens_x: 2, cens_p: 10, ..g }), "unresolved_asymmetric_censoring");
+        assert_eq!(decide(0.4, 0.5, nlo, nhi, &Gate { cens_x: 2, cens_p: 10, ..g }), "improvement");
         // C3 margin: a cost ratio of 1.05 is within 0.95x speed, 1.06 is not.
-        assert!(c3_noninferior(1.05) && !c3_noninferior(1.06) && !c3_noninferior(f64::NAN));
+        assert!(c3_noninferior(1.05, "unresolved_no_difference", &g));
+        assert!(!c3_noninferior(1.06, "unresolved_no_difference", &g) && !c3_noninferior(f64::NAN, "unresolved_no_difference", &g));
+        assert!(!c3_noninferior(0.9, "unresolved_censored", &g));
+        assert!(!c3_noninferior(0.9, "unresolved_asymmetric_censoring", &Gate { cens_x: 10, cens_p: 2, ..g }));
+    }
+
+    /// The failure the survivors-only statistic had: O censored on 30 percent of
+    /// targets on exactly the expensive ones. Survivors-only calls O cheaper;
+    /// the per-relation statistic charges the censored spend and does not.
+    #[test]
+    fn censoring_asymmetry_cannot_flatter_the_arm_censored_more() {
+        let mk = |arm: &str, i: usize, verdict: &str, w: f64| Row {
+            cell: "c".into(), target_id: format!("t{i}"), class: "planted".into(), arm: arm.into(), conj: 0,
+            verdict: verdict.into(), oracle: true, agree: true, cert_ok: true,
+            conflicts: w, propagations: w, word_ops: w, wall_s: w, lift_adds: 0.0, r: 1e6, k: 2.0,
+        };
+        let (mut p, mut o) = (vec![], vec![]);
+        for i in 0..40 {
+            let hard = i < 12; // 30 percent
+            p.push(mk("P", i, "found", if hard { 1000.0 } else { 100.0 }));
+            // O is 1.5x dearer everywhere it finishes but is censored (at cap 1000) on the hard targets.
+            o.push(if hard { mk("O", i, "censored", 1000.0) } else { mk("O", i, "found", 150.0) });
+        }
+        let (pr, or): (Vec<&Row>, Vec<&Row>) = (p.iter().collect(), o.iter().collect());
+        let surv = paired(&or, &pr, "word_ops", 0.0, 1);
+        assert!(surv["ci_lo"].as_f64().unwrap() > 1.4, "survivors-only sees 1.5x: {surv}");
+        assert_eq!(surv["dropped_x_censored_only"].as_u64().unwrap(), 12);
+        let cpr = per_relation(&or, &pr, "word_ops", 0.0, false, 1);
+        // O: (12*1000 + 28*150) / 28 = 579; P: (12*1000 + 28*100) / 40 = 370.
+        assert!((cpr["ratio"].as_f64().unwrap() - (16200.0 / 28.0) / (14800.0 / 40.0)).abs() < 1e-9, "{cpr}");
+        assert_eq!(cpr["censored_x_only"].as_u64().unwrap(), 12);
+        let g = Gate { agree_all: true, complete: true, targets: 40, cens_x: 12, cens_p: 0 };
+        // 12/40 = 0.3 > 0.2: gated per arm even though the pooled fraction is 0.15.
+        assert_eq!(decide(0.5, 0.9, 0.9, 1.1, &g), "unresolved_censored");
+        // O finds nothing: no ratio, no claim.
+        let none: Vec<Row> = (0..40).map(|i| mk("O", i, "censored", 1000.0)).collect();
+        let nr: Vec<&Row> = none.iter().collect();
+        assert!(per_relation(&nr, &pr, "word_ops", 0.0, false, 1)["ci_lo"].is_null());
     }
 
     #[test]
@@ -1540,19 +1869,133 @@ mod tests {
 
     #[test]
     fn design_numbers_match_the_protocol_table() {
-        // (n, m) -> k, rounded yield; documented in PROTOCOL.md section 5.
-        let table: Vec<(u32, usize, usize)> = [17u32, 23, 31]
-            .iter()
-            .flat_map(|&n| [4usize, 5, 6].map(|m| (n, m, suggest_k(n, m))))
-            .collect();
-        for &(n, m, k) in &table {
-            assert!(k >= 2);
-            let y = expected_yield(n, m, k);
-            assert!((0.0..=1.0).contains(&y));
-            if k > 2 {
-                assert!(expected_yield(n, m, k - 1) < 1.0 - (-0.7f64).exp() + 1e-9);
+        // r is the order of the generator (the largest prime factor of #E, which must
+        // exceed the cofactor), not 2^n and not #E/4: n = 31 has #E = 4 * 373 * 1439393
+        // and r = 1439393. a = 0 has no usable subgroup at n = 17 (#E = 4 * 137 * 239,
+        // r = 239 < h = 548, `KoblitzCurve::new` returns None), so n = 19 replaces it.
+        assert!(KoblitzCurve::new(0, 17).is_none());
+        let rs = [(19u32, 130_873u64), (23, 2_095_853), (31, 1_439_393)];
+        let mut table = Vec::new();
+        for &(n, r) in &rs {
+            assert_eq!(subgroup_r(n), r, "n={n}");
+            for m in [4usize, 5, 6] {
+                let k = suggest_k(r, n, m);
+                assert!(k >= 2);
+                let y = expected_yield(r, n, m, k);
+                assert!((0.0..=1.0).contains(&y));
+                if k > 2 {
+                    assert!(expected_yield(r, n, m, k - 1) < 1.0 - (-0.7f64).exp() + 1e-9);
+                }
+                table.push((n, m, k, (y * 1e4).round() / 1e4));
             }
         }
-        eprintln!("DESIGN_TABLE {table:?}");
+        // k = 2 (the minimum the orbit arm allows) already overshoots in 8 of 9 cells.
+        assert_eq!(
+            table,
+            vec![
+                (19, 4, 2, 1.0), (19, 5, 2, 1.0), (19, 6, 2, 1.0),
+                (23, 4, 2, 0.7593), (23, 5, 2, 1.0), (23, 6, 2, 1.0),
+                (31, 4, 2, 0.9989), (31, 5, 2, 1.0), (31, 6, 2, 1.0),
+            ]
+        );
+    }
+
+    #[test]
+    fn every_planned_cell_builds_with_full_orbits() {
+        for n in [19u32, 23, 31] {
+            let cd = build_cell(CellSpec { a: 0, n, m: 4, k: 2, seed: 1027 }).unwrap();
+            assert_eq!(cd.r, subgroup_r(n));
+            assert_eq!(cd.fb.points.len(), 4 * n as usize);
+            assert_eq!(cd.xcodes.len(), 2 * n as usize);
+        }
+    }
+
+    fn synth_row(cell: &str, arm: &str, conj: u32, i: usize, class: &str, oracle: bool, verdict: &str, w: f64, conf: f64, build: f64) -> String {
+        json!({"cell": cell, "target_id": format!("{cell}-{class}-{i}"), "class": class, "arm": arm, "conj": conj,
+            "verdict": verdict, "oracle": oracle, "agree": true, "cert_ok": verdict == "found", "tieout": Value::Null,
+            "conflicts": conf, "propagations": w, "word_ops": w, "wall_s": w * 1e-3 + build, "build_s": build,
+            "lift_adds": 3.0, "r": 1e6, "k": 2.0}).to_string()
+    }
+
+    fn scratch(name: &str) -> String {
+        let d = std::env::temp_dir().join(format!("g1test-{name}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).unwrap();
+        d.to_string_lossy().into_owned()
+    }
+
+    #[test]
+    fn analyze_end_to_end_on_synthetic_rows_grades_c3_and_censoring() {
+        let dir = scratch("an");
+        let cell = "a0-n19-m4-k2-s1";
+        let mut rng = Rng(5);
+        for (arm, conj, scale) in [("P", 0u32, 1.0), ("O", 0, 1.0), ("R", 0, 0.9), ("Q", 0, 0.9), ("P", 1, 1.0)] {
+            let mut lines = vec![];
+            for i in 0..30 {
+                let base = 1000.0 * (1.0 + 3.0 * ((i * 7) % 11) as f64 / 11.0);
+                let noise = (0.1 * (rng.unit() - 0.5)).exp();
+                lines.push(synth_row(cell, arm, conj, i, "natural", true, "found", base * scale * noise, 100.0, 0.01));
+            }
+            for i in 0..8 {
+                lines.push(synth_row(cell, arm, conj, i, "coset", false, "censored", 5.0e5, 20000.0, 0.01));
+            }
+            std::fs::write(format!("{dir}/rows-{cell}-{arm}-c{conj}.jsonl"), lines.join("\n")).unwrap();
+        }
+        analyze(&dir, &format!("{dir}/out")).unwrap();
+        let v: Value = serde_json::from_str(&std::fs::read_to_string(format!("{dir}/out/summary.json")).unwrap()).unwrap();
+        assert_eq!(v["schema"], "g1-chain-sat-orbit/summary/v2");
+        let c = &v["cells"][0];
+        assert_eq!(c["c3_grade_O"], "supported", "{c}");
+        assert_eq!(v["c3_cells_supported"], 1);
+        let strata = c["strata"].as_array().unwrap();
+        let nat = strata.iter().find(|s| s["stratum"] == "natural_all").unwrap();
+        assert_eq!(nat["arms"][0]["arm"], "O");
+        assert_eq!(nat["arms"][0]["metrics"][0]["decision"], "unresolved_no_difference");
+        let uns = strata.iter().find(|s| s["stratum"] == "unsat").unwrap();
+        assert_eq!(uns["arms"][0]["metrics"][0]["decision"], "unresolved_too_few_targets");
+        assert!(c["class_count_info_only"].as_f64().unwrap() > 0.0);
+        // R and Q were made 10 percent cheaper in word_ops: the cost-per-relation statistic sees it.
+        let r = nat["arms"].as_array().unwrap().iter().find(|a| a["arm"] == "R").unwrap();
+        assert_eq!(r["metrics"][0]["decision"], "improvement", "{r}");
+        // ... but at price 0 only the lift additions are priced (identical here), so the
+        // order is not stable across the 5a band and nothing is ranked.
+        assert_eq!(r["final_grade_word_ops"], "not_ranked_unstable_across_5a_band", "{r}");
+        // A missing row (a job lost to a timeout) makes the cell invalid, not silently smaller.
+        let lines: Vec<String> = std::fs::read_to_string(format!("{dir}/rows-{cell}-O-c0.jsonl")).unwrap().lines().take(25).map(String::from).collect();
+        std::fs::write(format!("{dir}/rows-{cell}-O-c0.jsonl"), lines.join("\n")).unwrap();
+        analyze(&dir, &format!("{dir}/out2")).unwrap();
+        let v2: Value = serde_json::from_str(&std::fs::read_to_string(format!("{dir}/out2/summary.json")).unwrap()).unwrap();
+        let nat2 = v2["cells"][0]["strata"].as_array().unwrap().iter().find(|s| s["stratum"] == "natural_all").unwrap().clone();
+        assert_eq!(nat2["arms"][0]["metrics"][0]["decision"], "invalid_incomplete_rows");
+        assert_eq!(v2["cells"][0]["c3_grade_O"], "unresolved");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn cap_rule_uses_ratio_of_sums_excluding_build_time_per_cell() {
+        let dir = scratch("cap");
+        // Cell A: fast solver, 1e-5 s per conflict; many tiny solves with big build time that a
+        // median of wall/conflicts would blow up. Cell B: 1e-2 s per conflict (impediment).
+        let mut a = vec![];
+        let mut b = vec![];
+        for i in 0..6 {
+            a.push(json!({"cell": "a0-n19-m4-k2-s1", "arm": "P", "conj": 0, "conflicts": 5.0, "wall_s": 3.0, "build_s": 3.0}).to_string());
+            let _ = i;
+        }
+        a.push(json!({"cell": "a0-n19-m4-k2-s1", "arm": "P", "conj": 0, "conflicts": 20000.0, "wall_s": 3.2, "build_s": 3.0}).to_string());
+        b.push(json!({"cell": "a0-n31-m6-k2-s1", "arm": "O", "conj": 0, "conflicts": 20000.0, "wall_s": 201.0, "build_s": 1.0}).to_string());
+        std::fs::write(format!("{dir}/rows-a.jsonl"), a.join("\n")).unwrap();
+        std::fs::write(format!("{dir}/rows-b.jsonl"), b.join("\n")).unwrap();
+        let lines = cap_lines(&dir, 180.0).unwrap();
+        // A: t = 0.2/20030 = ~1e-5; b = 3 s; 2e6 * 1e-5 = 20 s, so the largest grid value.
+        assert_eq!(lines, vec!["19:4:2:2000000".to_string(), "31:6:2:IMPEDIMENT".to_string()]);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn class_count_is_the_exact_free_rotation_orbit_count() {
+        // n prime: simultaneous rotation acts freely on the k^m n^m tuples.
+        assert_eq!(class_count(7, 3, 2), 8.0 * 49.0);
+        assert_eq!(parse_cell("a0-n17-m4-k2-s1027"), Some((17, 4, 2)));
     }
 }

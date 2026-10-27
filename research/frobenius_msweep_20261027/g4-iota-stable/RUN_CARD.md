@@ -28,14 +28,14 @@ Defaults come from `scripts/checkpoint.sh` (bucket `setec-astronomy-artifacts`, 
 4. Freeze the protocol: write `protocol.json` from `PROTOCOL.md` revision 2 (same cells, arms, decision rule, estimands in
    section 7) and freeze it with `python3 experiment_protocol.py freeze protocol.json` from the sibling crypto-autoresearcher
    checkout (`tools/`) before the first data point. Put the SHA-256 of `src/analyze.rs` and of `PROTOCOL.md` in it.
-5. Unit tests (`cargo test --release`, 21 tests) pass on the exact binary being run; `run_cells.sh` runs them first.
+5. Unit tests (`cargo test --release`, 22 tests) pass on the exact binary being run; `run_cells.sh` runs them first.
 6. Commit the cell (or at least record the dirty state): the driver writes `commit.txt` and `dirty.txt`; a run from a dirty
    tree is allowed only for files outside this directory.
 
 ## 2. Run (single entry point)
 
     cd /home/user/crypto/research/frobenius_msweep_20261027/g4-iota-stable
-    SEED=20261027 ./run_cells.sh 3          # 3 parallel cell jobs, 36 cells, largest field first
+    SEED=20261027 ./run_cells.sh 3          # 3 parallel cell jobs, 33 cells, largest field first
 
 Expected wall time: 15 to 35 minutes on 3 free cores (single-core 40 to 90 minutes, code reasoning, not measured; budget
 60 minutes wall). Memory typically under 300 MB per job, up to about 1.2 GB in a rare tail (keep 4 GB free for 3 jobs).

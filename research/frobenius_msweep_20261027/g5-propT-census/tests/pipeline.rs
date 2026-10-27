@@ -135,3 +135,26 @@ fn reconciliation_flags_missing_short_and_ragged_jobs() {
     assert!(md.contains("INCOMPLETE"), "{md}");
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+/// PROTOCOL 8.5: the trend rule counts identical class sequences, including E-OVERLAP / E-EXTRA / E-DEFICIT ones
+/// (which contain '-'), and never counts a missing-cell placeholder or an empty sequence.
+#[test]
+fn trend_rule_counts_identical_sequences() {
+    use g5_propt_census::analyze::{classify, trend_agreement, Ci};
+    let rep = |s: &str| vec![s.to_string(); 4];
+    let ov = "E-OVERLAP,E-OVERLAP,E-OVERLAP,E-OVERLAP,E-OVERLAP,E-OVERLAP,E-OVERLAP";
+    assert_eq!(trend_agreement(&rep(ov)), 4);
+    assert_eq!(trend_agreement(&rep("E-DEFICIT,E-DEFICIT")), 4);
+    assert_eq!(trend_agreement(&rep("UNRESOLVED,UNRESOLVED")), 4);
+    assert_eq!(trend_agreement(&rep("")), 0);
+    assert_eq!(trend_agreement(&rep("E-OVERLAP,-")), 0);
+    let mixed = vec![ov.to_string(), ov.to_string(), ov.to_string(), "E-EXTRA".to_string()];
+    assert_eq!(trend_agreement(&mixed), 3);
+    let two = vec![ov.to_string(), ov.to_string(), "E-EXTRA".to_string(), "".to_string()];
+    assert_eq!(trend_agreement(&two), 2);
+    let ci = |lo90: f64, hi90: f64, lo95: f64, hi95: f64| Ci { pt: 1.0, lo95, hi95, lo90, hi90 };
+    assert_eq!(classify(&ci(0.95, 1.05, 0.94, 1.06), 0.10), "E-OVERLAP");
+    assert_eq!(classify(&ci(1.3, 1.5, 1.25, 1.55), 0.10), "E-EXTRA");
+    assert_eq!(classify(&ci(0.5, 0.7, 0.45, 0.75), 0.10), "E-DEFICIT");
+    assert_eq!(classify(&ci(0.7, 1.4, 0.6, 1.5), 0.10), "UNRESOLVED");
+}

@@ -6,7 +6,7 @@ use std::fs;
 
 use crate::combi::PatternTable;
 use crate::runner::Row;
-use crate::stats::{expected_total_per_target, group, phi_ratio_boot, pool, rel_bias, rho_min, split_stats, NullMode, SplitStat, MIN_D_FOR_RHO};
+use crate::stats::{contrast_z, z_of, expected_total_per_target, group, phi_ratio_boot, pool, rel_bias, rho_min, split_stats, NullMode, SplitStat, MIN_D_FOR_RHO};
 
 const NSPLIT: usize = 40;
 const NPERM: usize = 400;
@@ -29,20 +29,22 @@ struct ArmOut {
 }
 
 fn z(s: &SplitStat) -> f64 {
-    if s.rho_se > 0.0 {
-        s.rho / s.rho_se
-    } else {
-        0.0
-    }
+    z_of(s)
 }
 
 pub fn analyze_dir(dir: &str) {
     let mut rows: Vec<Row> = vec![];
+    let mut skipped_lines = 0usize;
     for e in fs::read_dir(dir).unwrap() {
         let p = e.unwrap().path();
         let name = p.file_name().unwrap().to_string_lossy().to_string();
         if name.starts_with("rows_") && name.ends_with(".tsv") {
             for line in fs::read_to_string(&p).unwrap().lines().skip(1) {
+                // a truncated last line (killed process) must not abort the analysis; it is counted
+                if line.split('\t').count() != 24 || line.trim().is_empty() {
+                    skipped_lines += 1;
+                    continue;
+                }
                 rows.push(Row::from_tsv(line));
             }
         }
@@ -52,10 +54,14 @@ pub fn analyze_dir(dir: &str) {
     let mut tsv = String::from("a\tn\tm\tl\tD\tarm\tmean_total\tanalytic\tunamb\trep_per_target\taudit\tphi_aware\trho_aware\tz_aware\ttransfer_aware\tphi_naive\trho_naive\tz_naive\n");
     let mut zs: Vec<(String, f64, f64, f64)> = vec![];
     writeln!(md, "# G2 orbit-union D(n,m): analysis\n").unwrap();
-    writeln!(md, "Decision rule: PROTOCOL.md section 7. Counts of decompositions only; no solver cost is measured.\n").unwrap();
-    writeln!(md, "| cell (a,n,m,l) | D | n^(m-1)/D | rho resolved | verdict | z frob | z frobperm | z rsub | z rset | naive z skew | transfer frob | phi frob/frobperm | rel. excess frob over frobperm | note |").unwrap();
-    writeln!(md, "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|").unwrap();
-    let mut vtsv = String::from("a\tn\tm\tl\tD\trho_resolved\tverdict\tz_frob\tz_frobperm\tz_frob_sizeonly_null\n");
+    writeln!(md, "Decision rule: PROTOCOL.md section 7 (revision 3). Counts of decompositions only; no solver cost is measured; no cross-method cost claim, so no AGENTS.md 5a band applies.\n").unwrap();
+    writeln!(md, "Reading notes (PROTOCOL.md section 12). In this document n is the FIELD DEGREE and m the DECOMPOSITION SIZE, the reverse of the repository's m = field degree. There is NO m = 83 evidence here (field degrees 7..17 only); ECC2K-130 is over F_(2^131) and nothing here is a statement at 131. D(131,m) is closed-form arithmetic. a = 0 is the ECC2K-130 model at a toy degree, a = 1 its quadratic twist over F_2. ord_n(2) = 3, 10, 12, 8 for n = 7, 11, 13, 17, so n = 7 and 17 have Frobenius-invariant subspaces that 83 and 131 do not.\n").unwrap();
+    if skipped_lines > 0 {
+        writeln!(md, "WARNING: {skipped_lines} truncated or malformed row line(s) were skipped; the affected cells are marked INCOMPLETE if an arm is short of NV rows.\n").unwrap();
+    }
+    writeln!(md, "| cell (a,n,m,l) | D | n^(m-1)/D | rho resolved | verdict | z frob | z frobperm | z contrast (frob - frobperm) | z rsub | z rset | naive z skew | transfer frob | phi frob/frobperm | rel. excess frob over frobperm | note |").unwrap();
+    writeln!(md, "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|").unwrap();
+    let mut vtsv = String::from("a\tn\tm\tl\tD\trho_resolved\tverdict\tz_frob\tz_frobperm\tz_contrast\tz_frob_sizeonly_null\n");
     let mut detail = String::new();
     let mut ladder: std::collections::BTreeMap<(u32, u32, usize), Vec<(usize, Option<f64>, String)>> = Default::default();
     for ((a, n, m, l), arms) in &cells {
@@ -123,12 +129,21 @@ pub fn analyze_dir(dir: &str) {
         let zskew_naive = outs.get("skew").and_then(|o| o.naive.as_ref()).map(z);
         let tr = outs.get("frob").and_then(|o| o.aware.as_ref()).map(|s| s.transfer);
         let rho_ok = d >= MIN_D_FOR_RHO;
+        let zcon = match (outs.get("frob").and_then(|o| o.aware.as_ref()), outs.get("frobperm").and_then(|o| o.aware.as_ref())) {
+            (Some(f), Some(p)) => Some(contrast_z(f, p)),
+            _ => None,
+        };
+        let complete = ["frob", "frobperm", "rsub", "rset"].iter().all(|a| arms.get(*a).map(|v| v.len() == crate::plan::NV).unwrap_or(false));
         // ---- frozen decision rule (PROTOCOL section 7) ----
         let mut note = String::new();
         let verdict = (|| {
             let (Some(zfrob), Some(zrsub), Some(zrset), Some(zperm)) = (zfrob, zrsub, zrset, zperm) else {
                 return "NO_DATA";
             };
+            if !complete {
+                note.push_str("an arm is short of NV rows (killed or truncated): NOT RUN");
+                return "INCOMPLETE";
+            }
             for arm in ["frob", "geom"] {
                 if let Some(o) = outs.get(arm) {
                     if o.audit == "0" {
@@ -161,16 +176,23 @@ pub fn analyze_dir(dir: &str) {
             }
             let sf = outs["frob"].aware.as_ref().unwrap();
             let t = tr.unwrap_or(f64::NAN);
-            if zfrob >= Z_FLAG && zperm >= Z_FLAG {
-                note.push_str("replicable excess ALSO in frobperm: shared nuisance, not Frobenius-specific");
-                return "NUISANCE_REPLICABLE";
-            }
-            if zfrob >= Z_FLAG && t >= LEVER_TRANSFER {
-                return "CONCENTRATED";
-            }
             if zfrob >= Z_FLAG {
-                note.push_str("replicable, absent in frobperm, but transfer < 2x");
-                return "CONCENTRATED_WEAK";
+                // Frobenius-specificity is decided by the DIRECT frob - frobperm contrast, never by the
+                // power-dependent non-event z(frobperm) < 4.
+                let zc = zcon.unwrap_or(f64::NAN);
+                if zc >= Z_FLAG {
+                    if t >= LEVER_TRANSFER {
+                        return "CONCENTRATED";
+                    }
+                    note.push_str("replicable and frob-specific, but transfer < 2x");
+                    return "CONCENTRATED_WEAK";
+                }
+                if zperm >= Z_FLAG {
+                    note.push_str("replicable excess ALSO in frobperm and not separable from it: shared nuisance, not Frobenius-specific");
+                    return "NUISANCE_REPLICABLE";
+                }
+                note.push_str("replicable, but frobperm is not significantly lower (contrast z < 4): specificity NOT resolved");
+                return "REPLICABLE_NOT_SEPARATED";
             }
             if sf.rho + 1.96 * sf.rho_se < 0.25 {
                 return "UNIFORM";
@@ -198,12 +220,12 @@ pub fn analyze_dir(dir: &str) {
         }
         writeln!(
             md,
-            "| {a},{n},{m},{l} | {d} | {:.2} | {} | {verdict} | {} | {} | {} | {} | {} | {} | {} | {} | {note} |",
+            "| {a},{n},{m},{l} | {d} | {:.2} | {} | {verdict} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {note} |",
             crate::combi::baseline_ratio(*n as u64, *m as u64), if rho_ok { "yes" } else { "NO" },
-            fmt(zfrob), fmt(zperm), fmt(zrsub), fmt(zrset), fmt(zskew_naive), fmt(tr), fmt(excess), rel_excess.map(|v| format!("{v:.4}")).unwrap_or("-".into())
+            fmt(zfrob), fmt(zperm), fmt(zcon), fmt(zrsub), fmt(zrset), fmt(zskew_naive), fmt(tr), fmt(excess), rel_excess.map(|v| format!("{v:.4}")).unwrap_or("-".into())
         ).unwrap();
         ladder.entry((*a, *n, *m)).or_default().push((*l, rel_excess, verdict.to_string()));
-        writeln!(vtsv, "{a}\t{n}\t{m}\t{l}\t{d}\t{rho_ok}\t{verdict}\t{}\t{}\t{}", fmt(zfrob), fmt(zperm), fmt(zsize)).unwrap();
+        writeln!(vtsv, "{a}\t{n}\t{m}\t{l}\t{d}\t{rho_ok}\t{verdict}\t{}\t{}\t{}\t{}", fmt(zfrob), fmt(zperm), fmt(zcon), fmt(zsize)).unwrap();
         zs.push((format!("{a},{n},{m},{l}"), zfrob.unwrap_or(0.0), zrsub.unwrap_or(0.0), zrset.unwrap_or(0.0)));
         // yield comparison block
         let g = |arm: &str| outs.get(arm).map(|o| o.mean_total);
@@ -239,7 +261,20 @@ pub fn analyze_dir(dir: &str) {
     for ((a, n, m), v) in &ladder {
         if v.len() > 1 {
             let cells: Vec<String> = v.iter().map(|(l, e, vd)| format!("l={l}: {} ({vd})", e.map(|x| format!("{x:.4}")).unwrap_or("-".into()))).collect();
-            writeln!(md, "* a={a} n={n} m={m}: {}", cells.join("; ")).unwrap();
+            // Coded persistence criterion (PROTOCOL section 7, revision 3). l = 2 is a tiny-block cell and is
+            // printed but not used. Evaluable only where l = 3 shows a frob-specific replicable excess; it
+            // PERSISTS iff l = 5 is also flagged frob-specific and rel. excess(l=5) >= 0.5 * rel. excess(l=3) > 0.
+            // A 2^-l artefact predicts a ratio of 1/4.
+            let at = |l: usize| v.iter().find(|(ll, _, _)| *ll == l);
+            let flagged = |vd: &str| vd == "CONCENTRATED" || vd == "CONCENTRATED_WEAK";
+            let status = match (at(3), at(5)) {
+                (Some((_, e3, v3)), Some((_, e5, v5))) if flagged(v3) => match (e3, e5) {
+                    (Some(e3), Some(e5)) if *e3 > 0.0 && flagged(v5) && *e5 >= 0.5 * *e3 => "PERSISTENT",
+                    _ => "FALLING_OR_ABSENT",
+                },
+                _ => "NOT_EVALUABLE (no frob-specific excess at l = 3, or no l = 3 / 5 cell)",
+            };
+            writeln!(md, "* a={a} n={n} m={m}: {} -> ladder {status}", cells.join("; ")).unwrap();
         }
     }
     md.push_str(&detail);

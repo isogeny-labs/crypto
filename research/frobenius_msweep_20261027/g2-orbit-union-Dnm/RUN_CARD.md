@@ -26,6 +26,12 @@ The token is a bearer credential: never commit it or paste it into a PR, report 
 
 ## 2. Run
 
+Route (revision 3, to be decided by the experiment director before the freeze): AGENTS.md 9a makes isolab-eks the default for authorized x86 CPU
+experiments. This card is written for the shared local container (`./run_cells.sh 3`). The counts and class vectors are exact and cannot depend
+on isolation, host load or timing (PROTOCOL section 11), so the route affects wall time only. Either record "local route, counts are
+isolation-independent" in the PR, or submit the same command through the isolab-eks skill; do not leave the route unstated. Whichever is
+chosen, the `.resume/RESUME.md` checkpoint (section 1) comes first.
+
 Deviation from the "one command per arm" template, stated: arms are NOT run as separate invocations. The decision rule compares
 frob against frobperm, rsub, rset and skew on the same targets, interleaved per draw with shuffled arm order, and writes one rows file per
 cell; splitting arms across processes would lose the interleaving and collide on file names. The single entry point runs all 8
@@ -34,12 +40,12 @@ arms (frob, frobperm, rsub, rset, skew, geom, plain, plainbig) through the same 
     cd /home/user/crypto/research/frobenius_msweep_20261027/g2-orbit-union-Dnm
     ./run_cells.sh 3          # 3 parallel cell jobs; the 4th CPU stays free
 
-Steps it performs: gate, clean-tree check, `cargo test --release` (21 tests must pass), `cargo build --release`, then writes
+Steps it performs: gate, clean-tree check, `cargo test --release` (28 tests must pass; about 50 s), `cargo build --release`, then writes
 `plan.tsv`, `cells.txt`, `run_meta.txt` (frozen sha, HEAD, rustc -V, cargo -V, seed, jobs, nproc, uname, load, start/finish UTC),
-`host.txt`, `binary.sha256`; runs the 52 cells (largest estimated first, one process per cell, `xargs -P`), logs each to
+`host.txt`, `binary.sha256`, `rows.sha256`; runs the 52 cells (largest estimated first, one process per cell, `xargs -P`), logs each to
 `log_a*_n*_m*_l*.txt`, records failed jobs in `run_meta.txt` and continues, then runs `g2dnm analyze` on whatever was written.
 
-Expected wall time: about 18 minutes on 3 free cores (the plan sums to about 3200 s single core, longest cell (17,3,l=6) about
+Expected wall time: about 18 minutes on 3 free cores (the plan sums to about 3183 s single core, longest cell (17,3,l=6) about
 633 s). The 150 ns per lookup behind it is an assumption uncertain by about 3x, so 6 to 54 minutes; allow one hour. See PROTOCOL section 8.
 
 One cell by hand (all 8 arms in one file; set the target dir and build first):
@@ -54,8 +60,8 @@ One cell by hand (all 8 arms in one file; set the target dir and build first):
 
 Outputs, all under `research/frobenius_msweep_20261027/g2-orbit-union-Dnm/reports/run-<UTC>/`:
 `rows_a*_n*_m*_l*.tsv` (raw, one row per cell/arm/draw, with seed, xs, xodd), `log_*.txt`, `plan.tsv`, `cells.txt`, `run_meta.txt`,
-`host.txt`, `binary.sha256`, `summary.md` (verdict table with the "rho resolved" flag, per-cell yield tables, A/A, l ladder),
-`summary.tsv`, `verdicts.tsv`, `rho_z.svg` (graph).
+`host.txt`, `binary.sha256`, `summary.md` (verdict table with the "rho resolved" flag, per-cell yield tables, A/A, l ladder with its PERSISTENT / FALLING_OR_ABSENT status, section 12 disclosures),
+`summary.tsv`, `verdicts.tsv` (with z_contrast), `rho_z.svg` (graph).
 
 Disk: the whole run is under 25 MB. Rows files over 1 MiB, expected for (13,5,3) and (17,5,3) at about 1.1 and 3 MB per curve,
 follow AGENTS.md section 13 (`tools/artifacts`, `.artifacts.json`), not `git add`.
@@ -66,4 +72,5 @@ in the same directory following `.claude/skills/research-visuals/SKILL.md`; dele
 (docs/session-logs/YYYY-MM-DD.md) with the verdict table, naming the frozen sha.
 
 Abort conditions: gate fails; dirty tree; unit tests fail; any cell reports INSTRUMENT_FAIL (record, do not rerun with altered
-parameters); a cell process that panics on the left-table assertion (record it as NOT RUN; raise nothing).
+parameters); a cell process that panics on the left-table assertion (record it as NOT RUN; raise nothing). A cell whose arms have fewer than 16 rows is reported INCOMPLETE (NOT RUN), never re-run with altered parameters.
+`run_cells.sh` writes `rows.sha256` (sha256 of every rows file) before the analysis runs (rev 3).

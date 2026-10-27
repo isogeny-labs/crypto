@@ -317,7 +317,8 @@ fn seeds_are_distinct_and_cap_logic_is_sound() {
         let mut p_ok = 0.0;
         for b in 0..=pairs {
             let n = 4 * b;
-            if n >= 2 * c.m && binom(n, c.m) <= ENUM_CAP {
+            // a stable base has 4 items per class, so ncls = b carriers' classes must be >= m (amendment A1)
+            if b >= c.m && binom(n, c.m) <= ENUM_CAP {
                 p_ok += pmf;
             }
             pmf *= (pairs - b) as f64 / (b + 1) as f64;
@@ -330,14 +331,15 @@ fn seeds_are_distinct_and_cap_logic_is_sound() {
 
 #[test]
 fn matched_replicates_have_exactly_equal_item_counts() {
-    for (a, n, m, l) in [(0u32, 13u32, 3usize, 5u32), (0, 13, 4, 5), (1, 11, 5, 4), (0, 13, 2, 7)] {
+    for (a, n, m, l) in [(0u32, 13u32, 3usize, 5u32), (0, 13, 4, 5), (1, 11, 5, 5), (0, 13, 2, 7)] {
         let (f, g) = setup(n, a);
         let c = Cell { a, n, m, l };
         for rep in 0..6u64 {
             let mt = draw_matched(&f, &g, &c, 20261027, rep).expect("matched draw");
-            assert!(mt.n_items >= 2 * m && binom(mt.n_items, m) <= ENUM_CAP);
+            assert!(mt.n_items >= 4 * m && binom(mt.n_items, m) <= ENUM_CAP);
             assert_eq!(mt.arms.len(), 5);
             for (arm, b, _seed, _tries) in &mt.arms {
+                assert!(shape_of(&g, &b.raw).1 >= m, "{arm} has fewer than m classes");
                 assert_eq!(items_of(&g, &b.raw), mt.n_items, "{arm} not matched (a{a} n{n} m{m} l{l} rep {rep})");
                 let stable = is_iota_stable(&f, &core_set(&b.raw));
                 match *arm {
@@ -749,4 +751,34 @@ fn pipeline_plumbing_on_a_tiny_fixture() {
     assert!(md.contains("NOT_RUN"), "missing cell must be reported:\n{md}");
     assert!(dir.join("fig_cost_ratio.svg").exists() && dir.join("summary.tsv").exists());
     std::fs::remove_dir_all(&dir).unwrap();
+}
+
+#[test]
+fn per_m_closure_wording_ignores_void_cells_and_needs_two_nonvoid() {
+    use g4_iota_stable::analyze::*;
+    use synth::*;
+    let mut lossp = P::new(4, 24);
+    lossp.v = 1.0;
+    lossp.g_blind = 4.0;
+    lossp.g_best = 4.0;
+    let loss = judge(&lossp);
+    let par = judge(&P::new(3, 40));
+    let mut gp = P::new(4, 24);
+    gp.v = 4.0;
+    gp.w = 4.0;
+    gp.s = 4.0;
+    gp.g_blind = 1.0;
+    gp.g_best = 1.0;
+    let gain = judge(&gp);
+    let mut void = loss.clone();
+    void.v_best = "CENSORED".into();
+    void.v_tbest = "CENSORED".into();
+    let mut notrun = loss.clone();
+    notrun.completeness = "NOT_RUN".into();
+    notrun.v_best = "NOT_RUN".into();
+    assert!(per_m_closed(&[&loss, &par], false));
+    assert!(per_m_closed(&[&loss, &par, &void, &notrun], false), "void cells neither count nor block");
+    assert!(!per_m_closed(&[&loss, &void], false), "one non-void cell is not enough");
+    assert!(!per_m_closed(&[&loss, &par, &gain], false), "a non-void GAIN blocks closure");
+    assert!(!per_m_closed(&[&loss, &par], true), "A/A failure voids the wording");
 }

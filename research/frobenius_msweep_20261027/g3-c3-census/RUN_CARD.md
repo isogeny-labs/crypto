@@ -23,31 +23,41 @@ Seed slots `@k` select independent renamings and phases of the same encoding.
 ```sh
 cd /home/user/crypto/research/frobenius_msweep_20261027/g3-c3-census
 export RUN=reports/run-$(date -u +%Y%m%dT%H%MZ)      # fix once, reuse in every command
-export BIN=$PWD/target/release/g3census
-mkdir -p $RUN/rows $RUN/pilot $RUN/summary
+export CARGO_TARGET_DIR=/tmp/g3census-target          # outside the tree: the freeze needs an empty git status
+export BIN=$CARGO_TARGET_DIR/release/g3census
+mkdir -p $RUN/rows $RUN/pilot $RUN/summary            # reports/run-*/ is gitignored in this cell
 cargo build --release 2>&1 | tail -3                  # ~5 s, std-only
-cargo test --release -- --skip satlib 2>&1 | tail -3  # expect: 36 passed (about 21 s); satlib = the repo solver's own tests, skipped
+cargo test --release -- --skip satlib 2>&1 | tail -3  # expect: 37 passed (about 21 s); satlib = the repo solver's own tests, skipped
+                                                      # (tests write to the OS temp dir, not the tree)
 ```
 
 ## 1. Freeze (before any data)
 
-The frozen set is committed first, so that the commit binds the sources (the
-cell's files are untracked or partly tracked until then, and `Cargo.lock` is
-gitignored). Commit and PR handling follow AGENTS.md "Default workflow"; this
+The frozen set is committed first, so that the commit binds the sources
+(`Cargo.lock` is un-ignored by the root `.gitignore` and is committed). Commit and PR handling follow AGENTS.md "Default workflow"; this
 card only fixes what must be true before round 0.
 
 ```sh
-# 1a. generate protocol.json (experiment.protocol/v1) with the canonical tool named in the
-#     experiment-protocol skill; frozen analysis = `g3census summarize`, its sha256 is in FREEZE.txt
-# 1b. commit PROTOCOL.md AMENDMENT.md RUN_CARD.md README.md protocol.json Cargo.toml src/ (not target/, not reports/)
-git status --porcelain -- . ../../../src/cryptanalysis/sat.rs > $RUN/FREEZE_status.txt
-test ! -s $RUN/FREEZE_status.txt || { echo "dirty tree: do not run"; exit 1; }   # must be empty
+# 1a. protocol.json (experiment.protocol/v1): author it beside PROTOCOL.md, then validate and freeze it
+#     with the sibling checker. If `validate` fails or the schema is missing, STOP: no data.
+A=../../../../crypto-autoresearcher/tools/experiment_protocol.py     # sibling checkout at origin/main
+python3 $A validate protocol.json || { echo "protocol.json invalid: do not run"; exit 1; }
+# 1b. commit the frozen set (this also records the removal of the old tracked target/test-* fixtures)
+git rm -r -q --cached target 2>/dev/null || true
+git add .gitignore PROTOCOL.md AMENDMENT.md RUN_CARD.md README.md protocol.json Cargo.toml Cargo.lock src
+git commit -m "g3-c3-census: freeze protocol, run card and sources"
+python3 $A freeze protocol.json --commit auto --filed-before-affected-data
+git add protocol.json && git commit -m "g3-c3-census: frozen protocol.json" && git rev-parse HEAD
+# 1c. the tree must now be clean for the cell and for the solver source
+git status --porcelain -- . ../../../src/cryptanalysis/sat.rs > /tmp/g3_freeze_status.txt
+test ! -s /tmp/g3_freeze_status.txt || { cat /tmp/g3_freeze_status.txt; echo "dirty tree: do not run"; exit 1; }
+cp /tmp/g3_freeze_status.txt $RUN/FREEZE_status.txt
 cargo build --release 2>&1 | tail -3
 {
   echo "commit $(git rev-parse HEAD)"; echo "branch $(git rev-parse --abbrev-ref HEAD)"
   echo "cargo $(cargo -V)"; echo "RUSTFLAGS=[${RUSTFLAGS}]"; rustc -Vv
   echo "binary_sha256 $(sha256sum $BIN)"
-  sha256sum src/*.rs Cargo.toml ../../../src/cryptanalysis/sat.rs PROTOCOL.md AMENDMENT.md RUN_CARD.md protocol.json
+  sha256sum src/*.rs Cargo.toml Cargo.lock .gitignore ../../../src/cryptanalysis/sat.rs PROTOCOL.md AMENDMENT.md RUN_CARD.md README.md protocol.json
 } > $RUN/FREEZE.txt
 $BIN manifest | tee $RUN/manifest.tsv                 # fnv64 of sources and of src/cryptanalysis/sat.rs
 lscpu > $RUN/host.txt; cat /proc/loadavg > $RUN/load_before.txt
@@ -87,8 +97,10 @@ cell = K x sum over its arms of `c1(arm)`. CPU-hours = that x N / 3600.
 * **G5 (re-estimate):** if any arm is more than 2x off the PROTOCOL.md section 8 table, or any pilot row is censored, recompute the whole plan from the pilot numbers (including SAT, U and Chalf rows) before launching the ladder or anything at n = 31.
 * G2: n = 31, m = 2: N per curve = min(25, floor(4 x 3600 / seconds-per-target)). If N < 10 per curve: do not launch that cell; record O-IMPEDIMENT(budget).
 * G3: (31,3,10): arms C, C@2, B; pooled N = min(10, floor(12 x 3600 / seconds-per-target)); if N < 6 do not launch. (31,3,11): launch only if N = 6 fits in 12 CPU-hours.
-* If the pilot sd(log) of the A/C and B/C ratios (read from the pilot SUMMARY, not only C@2/C@1) is above 0.2 in any cell, add slots 3 and 4 for that cell's primary arms (the MDE table of PROTOCOL.md section 5) before reading anything.
-* If any pilot soundness check fails (a `verdict_ok = 0` on a sound arm, a failed certificate), or `Chalf` shows no effect, stop and fix the instrument. `Cnobreak` showing no effect is an informative miss (PROTOCOL.md section 4), not a stop.
+* If the pilot sd(log) of the A/C and B/C ratios (read from the pilot SUMMARY, not only C@2/C@1) is above 0.2 in any cell, that cell is *resolution-limited*: report its MDE (PROTOCOL.md section 5) as is. Slots 3 and 4 are already in the step-4 arm list `$SM`; they are replicate slots (PROTOCOL.md rule 3) and are not pooled into the primary ratio.
+* **P3 numeric gate:** pooled over the pilot's Chalf cells (at least 3 UNSAT targets), the median Chalf/C must be <= 0.8 (PROTOCOL.md section 4). Above 0.8, or any pilot soundness failure (a `verdict_ok = 0` on a sound arm, a failed certificate): stop and review the instrument. A censored pilot row is only a lower bound on cost: do not use it for a projection; it triggers G5. `Cnobreak` showing no effect is an informative miss (PROTOCOL.md section 4), not a stop.
+
+**Abort rule (n = 17 and 23 are not exempt):** if `$BIN gate $RUN/rows` shows any censored UNSAT row in a cell, stop launching that cell's remaining chunks (the 1% tolerance already makes it O-IMPEDIMENT) and re-estimate under G5 before the next cell.
 
 ## 4. Round 1, cheap cells first, ~1.5 CPU-h, core 0 (about 1.5 h wall)
 
@@ -111,7 +123,7 @@ taskset -c 0 $BIN run --n 17 --l 8 --m 2 --b 2 --curve-a 0 --unsat 25 --sat-keep
 # no-priority sensitivity is NOT in this build; do not improvise it (it would be an amendment)
 $BIN summarize $RUN/rows --out $RUN/summary
 ```
-Gate before continuing: `SUMMARY.md` must show P3 (`Chalf@1` over `C@1`, role `control`) with upper bound below 0.95 in every n = 17 and 23 cell, no `O-ARTIFACT`, and the ordinary-curve line "detector WORKS". Otherwise stop. P1 (`C@1` over `Cnobreak@1`) and P2 are read and recorded as informative; a miss there does not stop the run.
+Gate before continuing: `SUMMARY.md` must show P3 (`Chalf@1` over `C@1`, role `control`, expected 0.125 to 0.5) with upper bound below 0.95 in every n = 17 and 23 cell, no `O-ARTIFACT`, and the ordinary-curve line "detector WORKS". Otherwise stop. P1 (`C@1` over `Cnobreak@1`) and P2 are read and recorded as informative; a miss there does not stop the run.
 
 ## 5. Round 1, n = 31, m = 2, ~3.6 + 7.0 CPU-h per curve pair at N = 50 (central estimate, SAT/U/Chalf included), cores 1 and 2
 

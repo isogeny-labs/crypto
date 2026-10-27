@@ -1,6 +1,6 @@
-# Cell G1: chained-S3 SAT, plain x-domain against exact Frobenius-orbit x-domain (m = 4, 5, 6; n = 17, 23, 31)
+# Cell G1: chained-S3 SAT, plain x-domain against exact Frobenius-orbit x-domain (m = 4, 5, 6; n = 19, 23, 31)
 
-Status: **prepared, not run.** No experiment, sweep or data-producing binary was executed. The 14 unit tests of the driver use tiny
+Status: **prepared, not run.** No experiment, sweep or data-producing binary was executed. The 19 unit tests of the driver use tiny
 fixtures (n = 7 exact identities, a planted instance, a proven UNSAT coset target, tamper checks, a synthetic known-ratio analysis) and
 their output was discarded.
 
@@ -8,7 +8,9 @@ Question: audit claim C3 (orbit encodings >= 0.95x plain) was never tested at m 
 plain+ordering R, orbit+ordering Q) and a plain-on-sigma-conjugate A/A through one shadow copy of the production chained-S3 loop, against an
 exact solver-free oracle and an independent certificate check, on 9 (n, m) cells.
 
-Files: `PROTOCOL.md` (frozen design, controls, resolution, decision rule, runtime reasoning, what does not count), `RUN_CARD.md` (token
+Amendment 1 (2026-10-27, before any data; PROTOCOL section 11): n = 17 replaced by 19 (a = 0 has no usable subgroup at n = 17), group order and k recomputed from the real r (all cells saturated with k = 2), coset targets 8, the deciding statistic is cost per relation with per-arm censoring gates (the old survivors-only ratio could flatter an arm censored more), per-cell caps from a nine-cell pilot via `cap`, provenance written by `run_stage.sh`.
+
+Files: `PROTOCOL.md` (frozen design, amended before data, controls, resolution, decision rule, runtime reasoning, what does not count), `RUN_CARD.md` (token
 command, stages, cap rule, row schema), `run_stage.sh` (one stage), and, outside this directory, `examples/frobenius_msweep_g1_chain_sat_orbit.rs`
 (driver plus tests; auto-discovered, no Cargo.toml edit). No standalone crate, so there is no private `target/` to delete.
 

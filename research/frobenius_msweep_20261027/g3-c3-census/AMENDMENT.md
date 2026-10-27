@@ -46,3 +46,9 @@ PROTOCOL.md describes.
 A13. The positive control P1 (C vs Cnobreak, 1/m!) had no derivation on this solver and contradicted the section 8 cost model; it is demoted to informative. A new arm Chalf (C plus one unit clause on the top u-bit of slot 1, UNSAT targets only) is the voiding positive control P3 with a derivable effect (about 0.5). This replaces the spec's "positive control" notion by a control constructed on the same code path; the spec does not name one.
 A14. Arm G at m = 3 is now fully sound (all comparators made vacuous, including x_2 <= x_3); the earlier build was unsound there.
 A15. Censoring tolerance 1% (was 10%); the pilot uses a hard 500 000-conflict cap and a disjoint target stream.
+
+## Revision 3 (after the round-1 review of revision 2)
+
+A16. Chalf now pins the top u-bit of every slot (m unit clauses), not slot 1 alone: C's lex break makes slot 1 the smallest slot, so a slot-1 pin retains 3/4 (m = 2) or 7/8 (m = 3) of the sorted space and could fail to clear 0.95 on a sound instrument. Expectation is a range (0.125 to 0.5), with a numeric pilot threshold of 0.8. Supersedes the "about 0.5" of A13.
+A17. Decision rule 3 (O-STRUCTURE) requires G, Cpoly and A/A with at least 10 paired targets each; absent controls leave the candidate not confirmed. This implements PROTOCOL section 7 as written (the code was fail-open).
+A18. Freeze mechanics: tests write outside the tree, a cell `.gitignore`, out-of-tree cargo target dir, exact freeze commands. No scientific content changes.

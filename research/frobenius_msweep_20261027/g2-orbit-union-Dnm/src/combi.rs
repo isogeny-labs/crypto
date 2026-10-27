@@ -186,3 +186,55 @@ pub fn pattern_weight_parity(p: &[u8], xs: &[u64], xodd: &[u64]) -> f64 {
     }
     plus + minus
 }
+
+/// Mod-4 null weight for a = 0 curves (review round 2, blocking defect 1). For a = 0,
+/// E(F_{2^n}) has a CYCLIC 2-part Z/4 and every target lies in 4E. A liftable x (point +-Q)
+/// has a class in E/4E = Z/4: type 0 (class 0), type 2 (class 2, in 2E but not 4E) or odd
+/// (class +-1, not in 2E; Tr(x) != Tr(a)). Counting the 2^m sign choices whose class sum is 0
+/// mod 4 (verified by test `mod4_sign_count_structure_for_a0`): 0 if the number O of odd points is
+/// odd; 2^(m-1) if O > 0 is even; 2^m if O = 0 and the number T of type-2 points is even, else 0.
+/// With Z_s = X_s - O_s - T_s the per-block type-0 count, the tuple-weight (sign choices / 2^m) is
+/// 0, 1/2 or [T even] respectively, and this returns TWICE the sum of that weight over x-tuples:
+///   (E_even - N0) + 2 * N0_Teven,
+///   E_even  = #tuples with O even          = (prod P_s(1) + prod P_s(-1)) / 2,
+///             P_s(t) = sum_j C(O_s,j) C(X_s-O_s, mu_s-j) t^j,
+///   N0      = #tuples with O = 0           = prod C(X_s-O_s, mu_s),
+///   N0_Teven= #tuples with O = 0, T even   = (N0 + prod Q_s(-1)) / 2,
+///             Q_s(t) = sum_i C(T_s,i) C(Z_s, mu_s-i) t^i.
+/// It reduces to 2 * pattern_weight when O = T = 0 (the factor 2 is absorbed by the per-row
+/// rescaling in stats::pool). `xodd`/`xtwo` shorter than `xs` are read as zeros.
+pub fn pattern_weight_mod4(p: &[u8], xs: &[u64], xodd: &[u64], xtwo: &[u64]) -> f64 {
+    let (mut plus, mut minus, mut n0, mut qminus) = (1.0, 1.0, 1.0, 1.0);
+    let mut i = 0;
+    while i < p.len() {
+        let mut j = i;
+        while j < p.len() && p[j] == p[i] {
+            j += 1;
+        }
+        let mu = (j - i) as u64;
+        let s = p[i] as usize;
+        let x = xs[s];
+        let o = xodd.get(s).copied().unwrap_or(0).min(x);
+        let t = xtwo.get(s).copied().unwrap_or(0).min(x - o);
+        let (even, z) = (x - o, x - o - t);
+        let (mut p1, mut pm) = (0.0, 0.0);
+        for k in 0..=mu.min(o) {
+            let term = binom_f(o, k) * binom_f(even, mu - k);
+            p1 += term;
+            pm += if k % 2 == 0 { term } else { -term };
+        }
+        plus *= p1;
+        minus *= pm;
+        n0 *= binom_f(even, mu);
+        let mut qm = 0.0;
+        for k in 0..=mu.min(t) {
+            let term = binom_f(t, k) * binom_f(z, mu - k);
+            qm += if k % 2 == 0 { term } else { -term };
+        }
+        qminus *= qm;
+        i = j;
+    }
+    let e_even = (plus + minus) / 2.0;
+    let n0_teven = (n0 + qminus) / 2.0;
+    (e_even - n0) + 2.0 * n0_teven
+}

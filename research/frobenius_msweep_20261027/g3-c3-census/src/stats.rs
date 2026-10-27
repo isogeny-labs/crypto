@@ -307,12 +307,12 @@ pub fn decide(rows: &[Row], seed: u64) -> (Label, Vec<Cmp>) {
     // P1/P2: model-based expectations, informative only (PROTOCOL 4). P3 is the blindness control.
     cmps.push(compare_pairs(rows, "C", "Cnobreak", &[(1, 1)], "conflicts", "control", seed)); // P1, expect in [0.5, 1.0] (m=2)
     cmps.push(compare_pairs(rows, "B", "Bnogauge", &[(1, 1)], "conflicts", "control", seed)); // P2, expect <= 1 (about 1/n if the solver uses the gauge)
-    cmps.push(compare_pairs(rows, "Chalf", "C", &[(1, 1)], "conflicts", "control", seed)); // P3, derivable: about 0.5
+    cmps.push(compare_pairs(rows, "Chalf", "C", &[(1, 1)], "conflicts", "control", seed)); // P3, all-slot pin: expected 0.125 to 0.5
     let find = |tag: &str, arm: &str, metric: &str| cmps.iter().find(|c| c.tag == tag && c.num_arm == arm && c.den_arm == "C" && c.metric == metric).cloned();
     if bad_verdict + bad_cert > 0 {
         return (Label::Artifact(format!("{bad_verdict} verdict mismatches, {bad_cert} certificate failures")), cmps);
     }
-    // P3 (half the slot-1 branches pinned away) is the only voiding control: a detector that cannot
+    // P3 (top u-bit of every slot pinned to 0; at most half the search space retained) is the only voiding control: a detector that cannot
     // see a 2x search-space reduction cannot support any 0.95 statement. P1/P2 misses are reported
     // as "control uninformative" (control_notes), never as a void.
     if let Some(p) = cmps.iter().find(|c| c.tag == "control" && c.num_arm == "Chalf" && c.den_arm == "C") {
@@ -358,15 +358,21 @@ pub fn decide(rows: &[Row], seed: u64) -> (Label, Vec<Cmp>) {
         if c.hi < BAND {
             let rep = find("replicate", nm, "conflicts");
             let replicated = rep.as_ref().map(|r| r.n_targets >= 10 && r.hi < BAND).unwrap_or(false);
-            let g_reproduces = g.as_ref().map(|g| g.n_targets >= 10 && g.hi < BAND).unwrap_or(false);
+            // PROTOCOL 7 rule 3: G, Cpoly and A/A are REQUIRED controls. A missing control, or one
+            // with fewer than 10 paired targets, leaves the candidate "not confirmed" (fail closed).
+            let g_present = g.as_ref().map(|g| g.n_targets >= MIN_N_FULL).unwrap_or(false);
+            let cp_present = cp.as_ref().map(|p| p.n_targets >= MIN_N_FULL).unwrap_or(false);
+            let aa_present = aa.as_ref().map(|x| x.n_targets >= MIN_N_FULL).unwrap_or(false);
+            let g_reproduces = g.as_ref().map(|g| g.n_targets >= MIN_N_FULL && g.hi < BAND).unwrap_or(false);
             // basis: the plain arm in the polynomial basis must not be the cheaper reference
-            let basis_explains = cp.as_ref().map(|p| p.n_targets >= 10 && p.hi < BAND).unwrap_or(false);
+            let basis_explains = cp.as_ref().map(|p| p.n_targets >= MIN_N_FULL && p.hi < BAND).unwrap_or(false);
             // noise: the A/A interval must not already reach the effect
-            let noise = aa.as_ref().map(|x| x.n_targets >= 10 && x.lo <= c.hi).unwrap_or(false);
-            if replicated && !g_reproduces && !basis_explains && !noise {
+            let noise = aa.as_ref().map(|x| x.n_targets >= MIN_N_FULL && x.lo <= c.hi).unwrap_or(false);
+            let controls_present = g_present && cp_present && aa_present;
+            if replicated && controls_present && !g_reproduces && !basis_explains && !noise {
                 hits.push(nm.to_string());
             } else {
-                hits.push(format!("{nm}:sub-0.95 but not confirmed (replicated={replicated}, generic_control_reproduces={g_reproduces}, basis_explains={basis_explains}, aa_noise={noise})"));
+                hits.push(format!("{nm}:sub-0.95 but not confirmed (replicated={replicated}, controls_present[G,Cpoly,AA]=[{g_present},{cp_present},{aa_present}], generic_control_reproduces={g_reproduces}, basis_explains={basis_explains}, aa_noise={noise})"));
             }
         }
     }
@@ -393,7 +399,7 @@ pub fn control_notes(cmps: &[Cmp]) -> Vec<String> {
         }
     }
     if let Some(p) = cmps.iter().find(|c| c.tag == "control" && c.num_arm == "Chalf" && c.n_targets > 0) {
-        v.push(format!("P3 Chalf/C median {:.3} CI [{:.3}, {:.3}] (derivable, expected about 0.5; a miss voids)", p.median_ratio, p.lo, p.hi));
+        v.push(format!("P3 Chalf/C median {:.3} CI [{:.3}, {:.3}] (all-slot pin; expected 0.125-0.5, see PROTOCOL 4; a miss voids)", p.median_ratio, p.lo, p.hi));
     }
     v
 }
@@ -742,7 +748,7 @@ mod tests {
             text.push_str(&f.join("\t"));
             text.push('\n');
         }
-        let dir = format!("{}/target/test-summarize", env!("CARGO_MANIFEST_DIR"));
+        let dir = format!("{}/g3census-test-summarize-{}", std::env::temp_dir().display(), std::process::id());
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(format!("{dir}/rows_synthetic.tsv"), text).unwrap();
         let out = format!("{dir}/out");
@@ -776,10 +782,28 @@ mod tests {
         let mut rows = synth(3.0, 1.0, false);
         let base: std::collections::HashMap<usize, f64> = rows.iter().filter(|r| r.arm == "C" && r.slot == 1).map(|r| (r.tidx, r.conflicts)).collect();
         for r in rows.iter_mut().filter(|r| r.arm == "Chalf") {
-            r.conflicts = base[&r.tidx]; // halving the slot-1 branches "has no effect": the detector is blind
+            r.conflicts = base[&r.tidx]; // pinning every slot's top bit "has no effect": the detector is blind
         }
         let (l, _) = decide(&rows, 1);
         assert!(matches!(l, Label::Artifact(ref s) if s.contains("P3")), "{l:?}");
+    }
+
+    #[test]
+    fn structure_is_not_confirmed_when_required_controls_are_missing() {
+        // A at 0.5x C, replicated (slot 3), so with G, Cpoly and A/A present this is O-STRUCTURE
+        let full = synth(0.5, 1.0, false);
+        let (l, _) = decide(&full, 1);
+        assert!(matches!(l, Label::Structure(_)), "{l:?}");
+        // dropping any one required control (G, Cpoly, or the C@2 A/A slot) must NOT confirm
+        for drop in ["G", "Cpoly", "C2"] {
+            let rows: Vec<Row> = full.iter().filter(|r| !(r.arm == drop || (drop == "C2" && r.arm == "C" && r.slot == 2))).cloned().collect();
+            let (l, _) = decide(&rows, 1);
+            assert!(!matches!(l, Label::Structure(_)), "dropped {drop}: {l:?}");
+        }
+        // a control with fewer than 10 paired targets does not confirm either
+        let rows: Vec<Row> = full.iter().filter(|r| !(r.arm == "G" && r.tidx >= 6)).cloned().collect();
+        let (l, _) = decide(&rows, 1);
+        assert!(!matches!(l, Label::Structure(_)), "G with 6 targets: {l:?}");
     }
 
     #[test]

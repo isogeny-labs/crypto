@@ -254,7 +254,9 @@ pub fn judge_cell(rows: &[Row], key: CellKey, reps: usize) -> Judge {
     };
     j.cens_v = cens("vrand", "cpr_blind");
     j.cens_g = cens("g4rand", "cpr_best").max(cens("g4rand", "cpr_blind"));
-    let censored = j.cens_v > 0.05 || j.cens_g > 0.05;
+    // the null/attribution arms (wrong, rset) are gated too: censored bases would silently drop pairs from Q and the null
+    let cens_ctl = cens("wrong", "cpr_blind").max(cens("rset", "cpr_blind"));
+    let censored = j.cens_v > 0.05 || j.cens_g > 0.05 || cens_ctl > 0.05;
     j.size_ratio = mean(&c("g4rand", "main", "nitems")) / mean(&c("vrand", "main", "nitems"));
     j.col_ratio = mean(&c("g4rand", "main", "active")) / mean(&c("vrand", "main", "active"));
     j.sat_v = mean(&c("vrand", "main", "sat"));
@@ -372,12 +374,12 @@ pub fn analyze(dir: &str) -> Result<(), String> {
         let fin = |v: &String| if aa_fail && j.completeness == "COMPLETE" { "VOID_AA".to_string() } else { v.clone() };
         let attrib = if j.v_best == "UNRESOLVED" || !["GAIN", "LOSS", "PARITY"].contains(&j.v_best.as_str()) { "-".to_string() } else if j.v_best == j.v_q_best { "stabiliser".to_string() } else { "construction/size (Q disagrees)".to_string() };
         let lic = j.license && !aa_fail;
-        writeln!(verdicts, "| {lab} | {} | {:.2} | {:.2} | {:.2} / {:.2} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {:.3} | {attrib} | {} |", if primary { "primary" } else { "secondary" },
+        writeln!(verdicts, "| {lab} | {} | {:.2} | {:.2} | {:.2} / {:.2} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} / {} / {} | {:.3} | {attrib} | {} |", if primary { "primary" } else { "secondary" },
             j.size_ratio, j.col_ratio, j.sat_v, j.sat_g, f3(j.r_best), fin(&j.v_best), f3(j.r_blind), fin(&j.v_blind), f3(j.r_tbest), fin(&j.v_tbest), f3(j.r_tblind), fin(&j.v_tblind),
-            format!("{} ({})", f3(j.q_best), fin(&j.v_q_best)), format!("{} ({})", f3(j.null_rw), fin(&j.v_null)), j.delta, if lic { "LICENSE" } else { "-" }).unwrap();
+            format!("{} ({})", f3(j.q_best), fin(&j.v_q_best)), format!("{} ({})", f3(j.null_rw), fin(&j.v_null)), f3(j.null_vw), f3(j.null_vr), f3(j.q_blind), j.delta, if lic { "LICENSE" } else { "-" }).unwrap();
         fig.push((lab, m, j.r_best, j.r_blind));
     }
-    writeln!(md, "## 2. Decision table\n\nV = vrand (subspace), G = g4rand (iota-stable), W = wrong-involution control, S = rset; all matched on the exact item count within a replicate (column `items G/V` must be 1.00). cpr = model search operations per independent relation, fractional targets, to 90% of the arm's own active columns. tot = model search operations in total to 90% rank (whole targets). R = V/G (R > 1: G cheaper). R_best: V blind versus G in the quotient; R_blind: the same blind search on both. Q_best = cpr_blind(W)/cpr_best(G): the same construction without the stabiliser against G (isolates the stabiliser); null = cpr_blind(S)/cpr_blind(W): the construction null, expected 1. delta = max(0.05, A/A half-width). Classes GAIN / LOSS / PARITY / UNRESOLVED per PROTOCOL.md section 7; CENSORED if more than 5% of a main-half arm never reached 90% rank (a class that changes when censored bases are replaced by their lower-bound cost becomes UNRESOLVED); UNMATCHED if any replicate's item counts differ; VOID if an instrument or control check failed. `orbits/0.9 active` (V / G) is the saturation: above 1 one target alone supplies the rank that is needed. LICENSE = R_best GAIN and Q_best GAIN and tot_best not LOSS. Model costs are MITM probe counts, not solver conflicts.\n\n| cell | tier | items G/V | active cols G/V | saturation V / G | R_best (CI) | class | R_blind (CI) | class | R_tot_best (CI) | class | R_tot_blind (CI) | class | Q_best (class) | null S/W (class) | delta | attributed to | licence |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|").unwrap();
+    writeln!(md, "## 2. Decision table\n\nV = vrand (subspace), G = g4rand (iota-stable), W = wrong-involution control, S = rset; all matched on the exact item count within a replicate (column `items G/V` must be 1.00). cpr = model search operations per independent relation, fractional targets, to 90% of the arm's own active columns. tot = model search operations in total to 90% rank (whole targets). R = V/G (R > 1: G cheaper). R_best: V blind versus G in the quotient; R_blind: the same blind search on both. Q_best = cpr_blind(W)/cpr_best(G): the same construction without the stabiliser against G (isolates the stabiliser); null = cpr_blind(S)/cpr_blind(W): the construction null, expected 1. delta = max(0.05, A/A half-width). Classes GAIN / LOSS / PARITY / UNRESOLVED per PROTOCOL.md section 7; CENSORED if more than 5% of a main-half arm never reached 90% rank (a class that changes when censored bases are replaced by their lower-bound cost becomes UNRESOLVED); UNMATCHED if any replicate's item counts differ; VOID if an instrument or control check failed. `orbits/0.9 active` (V / G) is the saturation: above 1 one target alone supplies the rank that is needed. LICENSE = R_best GAIN and Q_best GAIN and tot_best not LOSS. Model costs are MITM probe counts, not solver conflicts.\n\n| cell | tier | items G/V | active cols G/V | saturation V / G | R_best (CI) | class | R_blind (CI) | class | R_tot_best (CI) | class | R_tot_blind (CI) | class | Q_best (class) | null S/W (class) | calibration V/W, V/S, Q_blind (not gated) | delta | attributed to | licence |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|").unwrap();
     md.push_str(&verdicts);
     // per-m counts over the primary cells (no analyst choices, no trend rule)
     writeln!(md, "\n## 2b. Per m, primary cells (a = 0, n >= 13): class counts\n\n| m | cells | R_best classes | R_tot_best classes | licensed | model-level closure |\n|---|---|---|---|---|---|").unwrap();
@@ -390,9 +392,7 @@ pub fn analyze(dir: &str) -> Result<(), String> {
             t.iter().map(|(k, v)| format!("{k}:{v}")).collect::<Vec<_>>().join(" ")
         };
         let nlic = cs.iter().filter(|(_, j)| j.license).count();
-        let ok = |s: &String| s == "LOSS" || s == "PARITY";
-        let nonvoid = cs.iter().filter(|(_, j)| j.completeness == "COMPLETE" && !["UNMATCHED", "CENSORED", "VOID"].contains(&j.v_best.as_str())).count();
-        let closed = !aa_fail && nonvoid >= 2 && cs.iter().filter(|(_, j)| j.completeness == "COMPLETE").all(|(_, j)| ok(&j.v_best) && ok(&j.v_tbest));
+        let closed = per_m_closed(&cs.iter().map(|(_, j)| j).collect::<Vec<_>>(), aa_fail);
         writeln!(md, "| {mm} | {} | {} | {} | {} (need >= 2) | {} |", cs.len(), tally(&|j| j.v_best.clone()), tally(&|j| j.v_tbest.clone()), nlic,
             if nlic >= 2 && !aa_fail { "no: licence" } else if closed { "yes: R_best and R_tot_best are LOSS or PARITY in every non-void primary cell" } else { "no: mixed, unresolved or void" }).unwrap();
     }
@@ -426,4 +426,13 @@ fn svg(fig: &[(String, usize, Ci, Ci)]) -> String {
     }
     s.push_str("</svg>");
     s
+}
+
+/// PROTOCOL 7 rule 8: "closed at the model level at m" needs at least two non-void primary cells at m and
+/// R_best and R_tbest LOSS or PARITY in every non-void primary cell; void cells (NOT_RUN, INCOMPLETE,
+/// UNMATCHED, CENSORED, VOID) neither count nor block.
+pub fn per_m_closed(cs: &[&Judge], aa_fail: bool) -> bool {
+    let ok = |s: &String| s == "LOSS" || s == "PARITY";
+    let nonvoid = |j: &&&Judge| j.completeness == "COMPLETE" && !["UNMATCHED", "CENSORED", "VOID"].contains(&j.v_best.as_str());
+    !aa_fail && cs.iter().filter(nonvoid).count() >= 2 && cs.iter().filter(nonvoid).all(|j| ok(&j.v_best) && ok(&j.v_tbest))
 }

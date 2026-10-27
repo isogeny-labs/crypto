@@ -169,6 +169,15 @@ fn slope(x: &[f64], y: &[f64]) -> f64 {
     sxy / sxx
 }
 
+/// Number of curves whose class sequence equals the most common one, ignoring sequences with a missing-cell placeholder "-".
+pub fn trend_agreement(sq: &[String]) -> usize {
+    let mut best = 0;
+    for s in sq {
+        best = best.max(sq.iter().filter(|x| *x == s && !s.is_empty() && !s.split(',').any(|c| c == "-")).count());
+    }
+    best
+}
+
 /// A/A gate: the 95 percent bootstrap interval of the ratio D_main / D_aa must contain 1 (the two halves are the same
 /// arm under disjoint seeds). Returns (lo, hi, contains_one).
 pub fn aa_gate(mu: &[f64], mn: &[f64], au: &[f64], an: &[f64], seed: u64) -> (f64, f64, bool) {
@@ -546,7 +555,12 @@ pub fn analyze(dir: &str) -> Result<(), String> {
                     gate.push_str("; PLANT_MISS");
                 }
                 let censored = skipped as f64 / ai.len() as f64 > 0.05;
-                let class = if gates_bad != 0.0 || plok_bad || control_fail {
+                // B4 (PROTOCOL 8.7): a positive Frobenius count on provably coincidence-free pairs voids the cell-arm
+                let b4_viol = ok.iter().any(|&i| rows[i].s1l_pairs.is_finite() && rows[i].s1l_uf > 0.0);
+                if b4_viol {
+                    gate.push_str("; B4_VIOLATION");
+                }
+                let class = if gates_bad != 0.0 || plok_bad || control_fail || b4_viol {
                     "VOID".to_string()
                 } else if !aa_ok {
                     "AA_FAIL".to_string()
@@ -670,10 +684,7 @@ pub fn analyze(dir: &str) -> Result<(), String> {
                 let s = seqs.get(&format!("{arm}|{ci}")).map(|v| v.iter().map(|(_, c)| c[0].clone()).collect::<Vec<_>>().join(",")).unwrap_or_default();
                 sq.push(s);
             }
-            let mut best = 0;
-            for s in &sq {
-                best = best.max(sq.iter().filter(|x| *x == s && !s.contains('-')).count());
-            }
+            let best = trend_agreement(&sq);
             writeln!(md, "- trend in m, arm {arm}: class sequence identical in {best} of 4 curves -> {}", if best >= 3 { "TREND STATEMENT ALLOWED (sequence above)" } else { "no trend statement" }).unwrap();
         }
         writeln!(md).unwrap();
