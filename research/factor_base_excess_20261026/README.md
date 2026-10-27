@@ -1,5 +1,7 @@
 # Native factor-base construction and structure screening
 
+**Storage update (2026-10-26):** The owner approved canonical S3 use. The original validation archive is now uploaded and fully read back; the resume checkpoint passed and its contents were verified. [Publication receipt](publication-20261026/README.md) supersedes the historical storage/authorization blockers below. No new research result or broader native-validation pass follows from publication.
+
 Status: implementation and correctness validation; **no new research panel run**.
 The requested goal of finding a factor base with lower verified decomposition
 cost remains open. This addition makes the next comparison concrete without
