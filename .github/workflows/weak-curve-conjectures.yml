@@ -1,6 +1,9 @@
 name: Weak curve conjecture evidence
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - 'research/weak_curve_conjectures_20261012/**'
       - 'research/iso1_weak_classes_20261007/two_branch_20261009/p*_classes.csv'

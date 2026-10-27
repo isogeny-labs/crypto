@@ -1,0 +1,228 @@
+{
+  "scope": "Reproducible algebraic checks for research Figures 7--10.\n\nThe order-557 relations are constructed examples, not collected attack data.\nThe fiber census exhausts E(F_571). The uniform-Jacobian numerator is obtained\nby enumerating distinct-x degree-two divisors and invoking the genus-two\nAbel-map uniqueness away from the hyperelliptic pencil; it does not enumerate\nevery Jacobian class or solve the Certicom challenge.\n",
+  "toy_curve": {
+    "p": 571,
+    "a": 508,
+    "b": 137,
+    "n": 557,
+    "P": [
+      517,
+      168
+    ],
+    "Q": [
+      560,
+      245
+    ],
+    "k": 37,
+    "factor_base_logs_for_construction_only": [
+      11,
+      23
+    ],
+    "factor_base_points": [
+      [
+        253,
+        70
+      ],
+      [
+        345,
+        358
+      ]
+    ]
+  },
+  "kernel": {
+    "M": [
+      [
+        1,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "w": [
+      -1,
+      -1,
+      1
+    ],
+    "scenarios": {
+      "usable": {
+        "a": [
+          494,
+          469,
+          332
+        ],
+        "b": [
+          2,
+          3,
+          7
+        ],
+        "wTa": 483,
+        "wTb": 2,
+        "rank_M": 2,
+        "rank_augmented": 3,
+        "recovered_k": 37
+      },
+      "dependent": {
+        "a": [
+          494,
+          469,
+          406
+        ],
+        "b": [
+          2,
+          3,
+          5
+        ],
+        "wTa": 0,
+        "wTb": 0,
+        "rank_M": 2,
+        "rank_augmented": 2,
+        "recovered_k": null
+      }
+    }
+  },
+  "partial_triangle": {
+    "A_large": [
+      [
+        1,
+        -1,
+        0
+      ],
+      [
+        0,
+        1,
+        -1
+      ],
+      [
+        -1,
+        0,
+        1
+      ]
+    ],
+    "factor_base_logs": [
+      11,
+      23,
+      31
+    ],
+    "large_class_logs_for_construction_only": [
+      5,
+      9,
+      14
+    ],
+    "a": [
+      527,
+      427,
+      523
+    ],
+    "b": [
+      1,
+      4,
+      2
+    ],
+    "combined_a": 363,
+    "combined_b": 7,
+    "combined_log": 65
+  },
+  "fiber_census": {
+    "auxiliary_elliptic_order": 609,
+    "Jacobian_order": 339213,
+    "rows": [
+      {
+        "positive_X_cutoff": 4,
+        "B": 4,
+        "covered_E_targets": 2,
+        "nonidentity_E_targets": 556,
+        "distinct_x_degree_two_divisors": 4,
+        "Jacobian_order": 339213,
+        "E_probability": 0.0035971223021582736,
+        "J_probability": 1.1792000896192068e-05
+      },
+      {
+        "positive_X_cutoff": 8,
+        "B": 16,
+        "covered_E_targets": 8,
+        "nonidentity_E_targets": 556,
+        "distinct_x_degree_two_divisors": 112,
+        "Jacobian_order": 339213,
+        "E_probability": 0.014388489208633094,
+        "J_probability": 0.0003301760250933779
+      },
+      {
+        "positive_X_cutoff": 16,
+        "B": 32,
+        "covered_E_targets": 16,
+        "nonidentity_E_targets": 556,
+        "distinct_x_degree_two_divisors": 480,
+        "Jacobian_order": 339213,
+        "E_probability": 0.02877697841726619,
+        "J_probability": 0.0014150401075430483
+      },
+      {
+        "positive_X_cutoff": 32,
+        "B": 80,
+        "covered_E_targets": 40,
+        "nonidentity_E_targets": 556,
+        "distinct_x_degree_two_divisors": 3120,
+        "Jacobian_order": 339213,
+        "E_probability": 0.07194244604316546,
+        "J_probability": 0.009197760699029812
+      },
+      {
+        "positive_X_cutoff": 64,
+        "B": 144,
+        "covered_E_targets": 72,
+        "nonidentity_E_targets": 556,
+        "distinct_x_degree_two_divisors": 10224,
+        "Jacobian_order": 339213,
+        "E_probability": 0.12949640287769784,
+        "J_probability": 0.030140354290666926
+      },
+      {
+        "positive_X_cutoff": 128,
+        "B": 264,
+        "covered_E_targets": 132,
+        "nonidentity_E_targets": 556,
+        "distinct_x_degree_two_divisors": 34584,
+        "Jacobian_order": 339213,
+        "E_probability": 0.23741007194244604,
+        "J_probability": 0.10195363974847663
+      }
+    ],
+    "counting_scope": "S_B consists of degree-two divisors supported on F_B with distinct X, modulo D_infinity. Abel-map injectivity away from the hyperelliptic pencil gives distinct classes; full J is not enumerated."
+  },
+  "published_ECCp131_fibers": {
+    "P": {
+      "chi_x": 1,
+      "split": true,
+      "root_X": "0x246dfc7937f95d799ad7c6de10f22037e",
+      "y": "0x14721161917a44fb7b4626f36f0942e71"
+    },
+    "Q": {
+      "chi_x": -1,
+      "split": false,
+      "X_in_quadratic_extension": "i times imaginary_scale, with i^2=-1",
+      "imaginary_scale": "0x211837549b8c14936eb9e066c27174689",
+      "y": "0x9c21c284ba8a445bb2701bf55e3a67ed"
+    }
+  },
+  "collection_model": {
+    "baseline": {
+      "trial_cost": 1,
+      "p_valid": 0.02,
+      "eta": 0.5,
+      "cost_per_effective_row": 100
+    },
+    "alternative": {
+      "trial_cost": 4,
+      "p_valid": 0.04,
+      "eta": 0.5,
+      "cost_per_effective_row": 200
+    },
+    "scope": "Illustrative phase-average model, not measured challenge attack costs."
+  }
+}

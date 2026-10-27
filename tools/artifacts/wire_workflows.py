@@ -56,6 +56,10 @@ def moved_dirs(moved: set[str]) -> set[str]:
 def needed(text: str, moved: set[str], dirs: set[str]) -> list[str]:
     """Paths the workflow names that are, or contain, moved files; minimal cover."""
     found = set()
+    # A sibling script may read data in the same artifact directory. Do not
+    # infer that it reads every artifact in a broad ancestor such as
+    # research/notes: many independent studies share that namespace.
+    artifact_dirs = {p.rsplit("/", 1)[0] for p in moved if "/" in p}
     # YAML comments name paths without reading them.
     text = "\n".join(line for line in text.split("\n") if not line.lstrip().startswith("#"))
     for m in PATH_RE.finditer(text):
@@ -64,10 +68,10 @@ def needed(text: str, moved: set[str], dirs: set[str]) -> list[str]:
         p = head.rstrip("/.")
         if "*" not in raw:
             if p not in moved and p not in dirs:
-                # A workflow can name a script or input nested in the same
-                # study directory as moved data. Pull that subtree, while
-                # leaving unrelated sibling research paths alone.
-                while p and p not in dirs:
+                # A workflow can name a script or input in the directory
+                # holding moved data. Pull that directory, while leaving
+                # scripts in shared ancestor namespaces alone.
+                while p and p not in artifact_dirs:
                     p = p.rsplit("/", 1)[0] if "/" in p else ""
             if p:
                 found.add(p)
