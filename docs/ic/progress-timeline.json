@@ -229,6 +229,17 @@
      "value": 14.39
     },
     {
+     "anchor": "#ic-planner-exhaustive-20261026",
+     "class": "engineering",
+     "date": "2026-10-27",
+     "detail": "Residual collector res2 (ic.pipeline targets=residual, 2-point base, the large-prime limit) against rho.negation on the same 48 one-target workloads, paired ecbench compare; all 512 records of the session verified, audit OK with 12 exact replays. Across the AGENTS.md section 5a band rho is cheaper: res2/rho 2.592 [2.234, 3.008] at w = 0 and 23.29 [20.06, 27.03] at w = 1 (band means at w = 0.1: S 7.926 for res2, 1.248 for rho). Was: the ic plan recipe on the same curve and targets, 40.87 [35.54, 47.01] at w = 0 and 47.25 [40.81, 54.69] at w = 1; res2/plan is 0.063 [0.056, 0.071] at w = 0 and 0.493 [0.433, 0.561] at w = 1, below 1 at every band weight. At r = 2^36.25 (icv1-fp37-t277-91fd6e29): 2.709 [2.336, 3.141] and 24.34 against rho, plan 46.89. The gain is generic: on a curve-free Z/r carrier the collector costs the same (15 of 16 null intervals contain 1), and its exponent is rho's (slope 0.460 for res4 against 0.619 for the plan). Class engineering: S fell for a birthday search on Z/r with a base attached, not an index calculus that uses the curve; no advance. Not validated under the 2026-10-19 gate (no VALIDATION.json), so no leaderboard row moves.",
+     "label": "Residual collector res2 vs rho.negation, one target cold, best cell icv1-fp36-t454193-44a20818 (r = 2^36.0)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_planner_exhaustive_20261026/README.md",
+     "unit": "S",
+     "value": 2.5920755326864784
+    },
+    {
      "date": "2026-10-17",
      "value": 47.061156446677266,
      "reference": "matched",
@@ -1057,5 +1068,5 @@
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-21"
+ "updated": "2026-10-27"
 }
