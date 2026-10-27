@@ -644,7 +644,7 @@ pub fn registry() -> &'static [MethodDecl] {
             ],
         },
         MethodDecl {
-            id: "ic.hyperelliptic",
+            id: "ic.hyperelliptic_thread",
             family: "ic",
             summary: "the hyperelliptic thread's index calculus (ADH/Gaudry) on a genus 2-4 Jacobian (hyperelliptic_thread / hyperelliptic_explicit only): degree-1 places folded by ±, the factor-base walk (start D₁ + D₂, then one Cantor addition a trial), u split by gcd(u, x^p − x) and Cantor–Zassenhaus, Markowitz sparse elimination mod r, up to 4 solve rounds; expected ≈ (m + 1 + extra)·g! trials, so S ≈ (p/2)·g!/√r with the full base, plus uncharged F_p work O(g² log p) a trial and the elimination's mulmods mod r",
             entry: "ecbench::hyper_ic::solve",
@@ -2514,13 +2514,13 @@ fn is_hyper_generic(id: &str) -> bool {
 
 fn hyper_refusal(id: &str, h: &HyperInstance) -> String {
     format!(
-        "`{id}` has no hyperelliptic-Jacobian implementation; on a genus-{} Jacobian over F_{} only rho.plain, rho.negation, rho.frozen_reference, bsgs.*, kangaroo.vow and ic.hyperelliptic run",
+        "`{id}` has no hyperelliptic-Jacobian implementation; on a genus-{} Jacobian over F_{} only rho.plain, rho.negation, rho.frozen_reference, bsgs.*, kangaroo.vow and ic.hyperelliptic_thread run",
         h.genus, h.p
     )
 }
 
 /// The index calculus that runs on a hyperelliptic Jacobian, and only there.
-const HYPER_IC: &str = "ic.hyperelliptic";
+const HYPER_IC: &str = "ic.hyperelliptic_thread";
 
 fn hyper_ic_refusal(curve: &CurveFacts) -> String {
     format!(
@@ -2556,7 +2556,7 @@ fn hyper_ic_params(m: &ResolvedMethod) -> Result<HyperIcParams, String> {
     let branches = param_u64(m, "branches")?;
     let d_step_in = param_u64(m, "d_step_in")?;
     if branches == 0 || d_step_in < 2 {
-        return Err("`ic.hyperelliptic` needs branches ≥ 1 and d_step_in ≥ 2".into());
+        return Err("`ic.hyperelliptic_thread` needs branches ≥ 1 and d_step_in ≥ 2".into());
     }
     Ok(HyperIcParams {
         fb_size,
@@ -2571,7 +2571,7 @@ fn hyper_ic_params(m: &ResolvedMethod) -> Result<HyperIcParams, String> {
 
 /// A hyperelliptic Jacobian (`ecbench::hyper`): a generic method on the
 /// Cantor group, one composition-and-reduction per group operation, or
-/// the thread's index calculus (`ic.hyperelliptic`).
+/// the thread's index calculus (`ic.hyperelliptic_thread`).
 fn solve_hyper(
     m: &ResolvedMethod,
     i: &HyperInstance,
@@ -2591,7 +2591,7 @@ fn solve_hyper(
     solve_generic(m, &i.curve, i.generator, target, i.r, seed)
 }
 
-/// `ic.hyperelliptic`: phases `factor_base`, `walk_setup`, `relations`,
+/// `ic.hyperelliptic_thread`: phases `factor_base`, `walk_setup`, `relations`,
 /// `linear_algebra`, each with its group ledger (Cantor additions, the
 /// only charged work) and its exact native counts, all `*_uncharged`.
 fn solve_hyper_ic(

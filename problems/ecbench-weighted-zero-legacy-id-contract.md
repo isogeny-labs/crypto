@@ -76,3 +76,8 @@ Unresolved. Discovered during the 2026-10-25 relocation gate. The separate
 missing bounds-session fixture was materialized and its focused test passed;
 it is not evidence of this compatibility defect. No library repair or test
 suppression is included in the relocation PR.
+
+
+### 2026-10-27 repair update
+
+The current main baseline c8a37174 has the opposite mismatch from the historical baseline above: its implementation returns a legacy ID for explicit zero weight while its existing regression test requires no legacy ID. The CI repair preserves the current test contract: explicit pricing includes `pricing_weight` in its comparison identity, even at zero; only `None` carries a legacy unweighted ID. No historical comparison is edited. See `docs/ci-repair-20261027.md`; focused/final verification is still required before resolving this record.
