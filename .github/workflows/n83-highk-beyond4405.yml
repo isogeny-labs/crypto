@@ -18,6 +18,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/n83_highk_beyond4405_20261021
       - name: Check capacity model
         run: python3 research/n83_highk_beyond4405_20261021/capacity.py
       - name: Install pinned Lean
@@ -42,6 +48,12 @@ jobs:
     timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/n83_highk_beyond4405_20261021
       - name: Test N83 root index and fixed31 guard
         shell: bash
         run: |
