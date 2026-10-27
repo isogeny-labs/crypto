@@ -11,8 +11,9 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [Weighted Weil complete cost and rho reference](weil-weighted-complete-cost.md) | open | interpreting larger cubic-field decomposition gains as a full IC speedup | complete native accounting, matched ecbench strong rho, independent-host replay and external solver comparison |
 | [Cover-assessment catalog population](catalog-cover-assessment-population-stale.md) | open | current catalog-wide assessment freshness check | review current model membership, update older population guards and regenerate typed evidence bindings |
+| [Weighted Weil complete cost and rho reference](weil-weighted-complete-cost.md) | open | interpreting larger cubic-field decomposition gains as a full IC speedup | complete native accounting, matched ecbench strong rho, independent-host replay and external solver comparison |
+| [Certicom 130 CUDA/Metal physical qualification](certicom-130-gpu-hardware-qualification.md) | open | physical rho, BSGS and IC correctness on both exact curves in both repositories | complete hosted Metal library/CLI phases and physical provenance; authorized NVIDIA/Mac receipts; current-head CI/review gates |
 | [GitHub Actions infrastructure](github-actions-infrastructure.md) | open | final-main CI and all-PR merge verification | restore billing, approve required actions, restore EKS runners, then pass final-head checks/reviews |
 | [Matched trace-line C1 2LP measurement](trace-c1-2lp-measurement.md) | open | fully priced algebraic C1 standard/selected comparison | shifted x-line algebraic oracle, full native pricing, admitted Iso Lab image/checkpoint route and independent replay |
 | [EKS resumable L2 experiments](eks-resumable-l2-experiments.md) | partially resolved | final review/CI, merge and main GitHub Action | Dedicated v6 pool deployed; J passed 3,606 L2 / 3,600 replays / 1,200 A/A pairs / 19 S3 hashes; prior recovery and failed epochs retained |
