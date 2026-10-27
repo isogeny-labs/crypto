@@ -549,9 +549,9 @@ fn pmul_school(fp: &Fp, a: &[u32], b: &[u32], muls: &mut u64) -> Vec<u32> {
     for (i, &c) in s.iter().enumerate() {
         if c != 0 {
             fp.axpy(&mut lo[i..i + l.len()], &mut hi[i..i + l.len()], c, l);
+            *muls += l.len() as u64;
         }
     }
-    *muls += (a.len() * b.len()) as u64;
     lo.iter()
         .zip(&hi)
         .map(|(&l, &h)| fp.red_lohi(l, h) as u32)
@@ -864,6 +864,22 @@ fn kara_threshold() -> usize {
 }
 
 /// `out[..la + lb − 1] = a · b` by schoolbook, lazily (one reduction per output).
+thread_local! {
+    /// Products the polynomial kernels below execute, one per nonzero
+    /// coefficient times the row it scales (`school_into`, `square_into`,
+    /// `mul_low`, and through them `kmul`); the powering charges its
+    /// difference, so `FastStats` counts what ran, not a formula.
+    static KMULS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+fn kcount(k: usize) {
+    KMULS.with(|c| c.set(c.get() + k as u64));
+}
+
+fn kmuls() -> u64 {
+    KMULS.with(|c| c.get())
+}
+
 fn school_into(fp: &Fp, a: &[u32], b: &[u32], out: &mut [u32], lo: &mut [u64], hi: &mut [u64]) {
     let len = a.len() + b.len() - 1;
     let (lo, hi) = (&mut lo[..len], &mut hi[..len]);
@@ -873,6 +889,7 @@ fn school_into(fp: &Fp, a: &[u32], b: &[u32], out: &mut [u32], lo: &mut [u64], h
     for (i, &c) in s.iter().enumerate() {
         if c != 0 {
             fp.axpy(&mut lo[i..i + l.len()], &mut hi[i..i + l.len()], c, l);
+            kcount(l.len());
         }
     }
     for i in 0..len {
@@ -900,6 +917,7 @@ fn mul_low(fp: &Fp, a: &[u32], b: &[u32], lim: usize, out: &mut [u32], ks: &mut 
         if c != 0 {
             let len = b.len().min(lim - i);
             fp.axpy(&mut lo[i..i + len], &mut hi[i..i + len], c, &b[..len]);
+            kcount(len);
         }
     }
     for i in 0..lim {
@@ -925,12 +943,14 @@ fn square_into(fp: &Fp, a: &[u32], out: &mut [u32], ks: &mut KScratch) {
         if c != 0 {
             let row = &a[i + 1..];
             fp.axpy(&mut lo[2 * i + 1..2 * i + 1 + row.len()], &mut hi[2 * i + 1..2 * i + 1 + row.len()], c, row);
+            kcount(row.len());
         }
     }
     for i in 0..len {
         // a lane is below 2^32·n, so doubling it stays far from 2^64
         let (mut l, mut h) = (2 * lo[i], 2 * hi[i]);
         if i % 2 == 0 {
+            kcount(1);
             let pr = a[i / 2] as u64 * a[i / 2] as u64;
             l += pr & LO;
             h += pr >> 32;
@@ -1038,6 +1058,7 @@ impl Powering {
     fn square(&mut self, fp: &Fp, acc: &mut [u32], muls: &mut u64) {
         let d = self.d;
         let k = d - 1;
+        let before = kmuls();
         square_into(fp, acc, &mut self.prod[..2 * d - 1], &mut self.ks);
         // rev(q) = rev(prod)_{<k} · finv mod x^k
         for i in 0..k {
@@ -1054,10 +1075,10 @@ impl Powering {
         for i in 0..d {
             acc[i] = fp.sub(self.prod[i] as u64, self.qf[i] as u64) as u32;
         }
-        *muls += 3 * (d as u64).pow(2) / 2;
+        *muls += kmuls() - before;
     }
     /// `acc ← x · acc mod f`.
-    fn times_x(&self, fp: &Fp, acc: &mut [u32]) {
+    fn times_x(&self, fp: &Fp, acc: &mut [u32], muls: &mut u64) {
         let d = self.d;
         let top = acc[d - 1] as u64;
         for i in (1..d).rev() {
@@ -1068,6 +1089,7 @@ impl Powering {
             for i in 0..d {
                 acc[i] = fp.sub(acc[i] as u64, fp.mul(top, self.f[i] as u64)) as u32;
             }
+            *muls += d as u64;
         }
     }
 }
@@ -1081,7 +1103,7 @@ fn x_pow_p(fp: &Fp, mf: &ModF, muls: &mut u64) -> Vec<u32> {
     for bit in (0..64 - e.leading_zeros()).rev() {
         pw.square(fp, &mut acc, muls);
         if (e >> bit) & 1 == 1 {
-            pw.times_x(fp, &mut acc);
+            pw.times_x(fp, &mut acc, muls);
         }
     }
     acc
