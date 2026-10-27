@@ -63,3 +63,20 @@ pinned point (always in the small base). The fix touches only that check; the
 iota arm still reproduces the recorded PR #2580 run at q = 1009 seed 1 exactly.
 The 18 rows are kept as `results/campaign_v1_superseded.*`, and the whole grid is
 rerun with the fixed binary. Predictions and metrics are unchanged.
+
+## Amendment 2 (2026-10-27, after the q = 2003–8009 rows)
+
+- **Confound found in the baseline.** Every lp:0.5 win at q ≥ 4001 is on an
+  instance where the iota baseline needed 3–10 linear-algebra rounds. Each round
+  collects about 5 % more relations and reruns the whole Wiedemann solve, mostly
+  because some factor-base column appears in no relation yet. On every instance
+  where the baseline needed one round, lp:0.5 was slower (0.66–0.95). The A/A arm
+  repeats the same rounds, so this is deterministic, not noise. P1 is falsified
+  as preregistered (3/5 at q = 8009).
+- **q = 12007 rerun.** The first q = 12007 attempt overlapped a separate test run
+  on the same host, so its 3 rows are set aside as
+  `results/campaign_12007_contaminated.jsonl`, and q = 12007 is rerun alone with the
+  same frozen binary (`bin/humbert-v1`, sha256 prefix e5d73aa5683c8f0f).
+- **Follow-up protocol.** The baseline fix (no Wiedemann solve while a column is
+  empty, `HUMBERT_LA_PRECHECK=1`) and a re-test of lp:0.5 against it are a
+  separate protocol, `PROTOCOL_v2.md`, frozen before its data.

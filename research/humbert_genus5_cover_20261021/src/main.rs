@@ -281,6 +281,9 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let mut lp_combined = 0u64;
     let mut lp_dropped = 0u64;
     let mut target = ncols + 5;
+    // HUMBERT_LA_PRECHECK=1: never start a Wiedemann solve while a column is empty
+    let la_precheck = std::env::var("HUMBERT_LA_PRECHECK").map(|v| v == "1").unwrap_or(false);
+    let mut precheck_extensions = 0u64;
     let mut t_rel = 0.0;
     let mut t_la = 0.0;
     let mut la_mulmods = 0u64;
@@ -355,6 +358,22 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
             rows.push(row);
         }
         t_rel += tr.elapsed().as_secs_f64();
+        if la_precheck && ncols > DENSE_MAX {
+            // columns in no relation are certain extra corank: collect more relations
+            // before paying for a Wiedemann solve that is bound to be rejected
+            let mut used = vec![false; ncols];
+            for row in &rows {
+                for &(c, _) in row {
+                    used[c] = true;
+                }
+            }
+            let empty = used.iter().filter(|u| !**u).count();
+            if empty > 0 {
+                precheck_extensions += 1;
+                target += (2 * empty).max(5);
+                continue;
+            }
+        }
         let tl = Instant::now();
 
         let solve = if ncols <= DENSE_MAX {
@@ -509,7 +528,7 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     println!(
         "{{\"kind\":\"attack\",\"p\":{p},\"twist\":{twist},\"seed\":{seed},\"arm\":\"{arm}\",\"E_order\":{},\"r\":{r},\"D_order\":{},\
 \"fb_x\":{nx},\"fb_points\":{nfb},\"small_x\":{nsmall},\"lp_alpha\":{},\"lp_partials\":{},\"lp_combined\":{lp_combined},\"lp_dropped\":{lp_dropped},\"lp_known\":{lp_known},\"unknowns\":{ncols},\
-\"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\
+\"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_precheck\":{la_precheck},\"precheck_extensions\":{precheck_extensions},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\
 \"target_multipliers\":{:?},\"place_degrees\":{:?},\"descent_candidates\":{},\"descent_relations\":{},\
 \"pushforward_8P\":{push_ok},\"T_P_nonzero\":{tp_nonzero},\"iota_pairs_constant\":{iota_pairs_const},\"x_inf_eq_4c\":{xinf_eq_4c},\
 \"x_true\":{x_true},\"x_recovered\":{x_rec},\"solved\":{solved},\
