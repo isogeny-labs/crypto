@@ -24,7 +24,7 @@
   },
   "progress_timeline": {
    "path": "docs/ic/progress-timeline.json",
-   "sha256": "3ccdd971c38080f936d67a81a62f1ae404272ba9aed9d2eb5151ef61832cbf2f"
+   "sha256": "2ee5a83478a1311fa51cbc4cab835aedfd3fcdd77c7c20aadb6cb29a1c182f56"
   },
   "koblitz_s20": {
    "path": "research/ic_exponent_20260926/analysis.json",
@@ -113,6 +113,10 @@
   "jv_cover_sparse_fglm": {
    "path": "research/jv_cover_sparse_fglm_20261018/summary.json",
    "sha256": "4217cb1de3458ee8227da4283028fce724aed83505f1d48bb9d9dc7c0637ad5b"
+  },
+  "postgb_linear_stage": {
+   "path": "research/postgb_linear_stage_20261026/analysis/summary.json",
+   "sha256": "ef9aae284eceddb7424b65833f5d469084fcb9a428f648691a5e4bc02feb60fc"
   },
   "ic_m2_linear_ladder": {
    "path": "research/ic_m2_linear_ladder_20261024/fit.json",
@@ -922,6 +926,17 @@
     "reference": "matched",
     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md",
     "value": 14.39
+   },
+   {
+    "anchor": "#ic-planner-exhaustive-20261026",
+    "class": "engineering",
+    "date": "2026-10-27",
+    "detail": "Residual collector res2 (ic.pipeline targets=residual, 2-point base, the large-prime limit) against rho.negation on the same 48 one-target workloads, paired ecbench compare; all 512 records of the session verified, audit OK with 12 exact replays. Across the AGENTS.md section 5a band rho is cheaper: res2/rho 2.592 [2.234, 3.008] at w = 0 and 23.29 [20.06, 27.03] at w = 1 (band means at w = 0.1: S 7.926 for res2, 1.248 for rho). Was: the ic plan recipe on the same curve and targets, 40.87 [35.54, 47.01] at w = 0 and 47.25 [40.81, 54.69] at w = 1; res2/plan is 0.063 [0.056, 0.071] at w = 0 and 0.493 [0.433, 0.561] at w = 1, below 1 at every band weight. At r = 2^36.25 (icv1-fp37-t277-91fd6e29): 2.709 [2.336, 3.141] and 24.34 against rho, plan 46.89. The gain is generic: on a curve-free Z/r carrier the collector costs the same (15 of 16 null intervals contain 1), and its exponent is rho's (slope 0.460 for res4 against 0.619 for the plan). Class engineering: S fell for a birthday search on Z/r with a base attached, not an index calculus that uses the curve; no advance. Not validated under the 2026-10-19 gate (no VALIDATION.json), so no leaderboard row moves.",
+    "label": "Residual collector res2 vs rho.negation, one target cold, best cell icv1-fp36-t454193-44a20818 (r = 2^36.0)",
+    "reference": "matched",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_planner_exhaustive_20261026/README.md",
+    "unit": "S",
+    "value": 2.59207553269
    },
    {
     "date": "2026-10-17",
@@ -304085,6 +304100,261 @@
     "s_over_rho_l1a": 303.746850733
    }
   ]
+ },
+ "postgb_linear_stage_component": {
+  "families": [
+   {
+    "family": "dense",
+    "systems": 153,
+    "delta": [
+     32,
+     1024
+    ],
+    "n": [
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ],
+    "sparse_ms": 104.055317,
+    "fast_ms": 4.640235,
+    "sparse_over_fast": 19.9835415549,
+    "ci95": [
+     18.2850244757,
+     21.7137844975
+    ],
+    "dense_over_fast": 60.6112227684,
+    "portable": 11.0988297364,
+    "host_a": 8.75452629933,
+    "counted": [
+     0.991939495352,
+     2.14190748661
+    ]
+   },
+   {
+    "family": "gaudry-d4",
+    "systems": 24,
+    "delta": [
+     512,
+     512
+    ],
+    "n": [
+     5
+    ],
+    "sparse_ms": 312.958741,
+    "fast_ms": 16.501495,
+    "sparse_over_fast": 17.7572548472,
+    "ci95": [
+     13.7157500094,
+     20.4652733056
+    ],
+    "dense_over_fast": 109.33669358,
+    "portable": 8.35032924635,
+    "host_a": 8.14257661636,
+    "counted": [
+     0.89575285359,
+     1.56371253639
+    ]
+   },
+   {
+    "family": "gaudry-s4",
+    "systems": 24,
+    "delta": [
+     64,
+     64
+    ],
+    "n": [
+     3
+    ],
+    "sparse_ms": 2.212465,
+    "fast_ms": 0.317939,
+    "sparse_over_fast": 7.12525008025,
+    "ci95": [
+     6.80189227363,
+     7.49016558054
+    ],
+    "dense_over_fast": 14.5560747889,
+    "portable": 6.75403496582,
+    "host_a": 3.79070177538,
+    "counted": [
+     1.12419512739,
+     1.53804337199
+    ]
+   },
+   {
+    "family": "gaudry-s5",
+    "systems": 4,
+    "delta": [
+     4096,
+     4096
+    ],
+    "n": [
+     4
+    ],
+    "sparse_ms": 229741.016079,
+    "fast_ms": 4848.751901,
+    "sparse_over_fast": 45.5057422342,
+    "ci95": [
+     42.7735477439,
+     47.1869655811
+    ],
+    "dense_over_fast": null,
+    "portable": 9.62810955412,
+    "host_a": null,
+    "counted": [
+     0.769341620385,
+     0.887825175845
+    ]
+   },
+   {
+    "family": "jv-nagao",
+    "systems": 48,
+    "delta": [
+     64,
+     64
+    ],
+    "n": [
+     6
+    ],
+    "sparse_ms": 3.054797,
+    "fast_ms": 0.39534,
+    "sparse_over_fast": 7.60167050559,
+    "ci95": [
+     7.4286703236,
+     7.78346259932
+    ],
+    "dense_over_fast": 17.9058585386,
+    "portable": 6.30629661202,
+    "host_a": 4.01296660549,
+    "counted": [
+     0.983218994382,
+     1.3191839323
+    ]
+   }
+  ],
+  "dlp": [
+   {
+    "p": 53,
+    "seed": 1,
+    "relations": 31,
+    "lin_s": [
+     64.813041007,
+     12.785308864
+    ],
+    "lin_ratio": 5.06933713502,
+    "s": [
+     731.59031538,
+     727.117416375
+    ],
+    "s_over_rho": [
+     663.984480738,
+     659.924919723
+    ],
+    "s_over_rho_neg": [
+     1318.53623338,
+     1310.47478248
+    ],
+    "correct": true
+   },
+   {
+    "p": 53,
+    "seed": 2,
+    "relations": 33,
+    "lin_s": [
+     29.546739272,
+     6.166433775
+    ],
+    "lin_ratio": 4.79154408368,
+    "s": [
+     328.794467838,
+     326.450819439
+    ],
+    "s_over_rho": [
+     285.731621485,
+     283.694925242
+    ],
+    "s_over_rho_neg": [
+     509.787825484,
+     506.154055644
+    ],
+    "correct": true
+   },
+   {
+    "p": 101,
+    "seed": 1,
+    "relations": 53,
+    "lin_s": [
+     161.978948985,
+     22.610960032
+    ],
+    "lin_ratio": 7.16373602694,
+    "s": [
+     224.407337397,
+     220.419950526
+    ],
+    "s_over_rho": [
+     151.356203028,
+     148.666826897
+    ],
+    "s_over_rho_neg": [
+     326.110382891,
+     320.315883146
+    ],
+    "correct": true
+   },
+   {
+    "p": 101,
+    "seed": 2,
+    "relations": 50,
+    "lin_s": [
+     220.697245068,
+     36.489656486
+    ],
+    "lin_ratio": 6.04821383157,
+    "s": [
+     365.462700636,
+     359.019001989
+    ],
+    "s_over_rho": [
+     292.501374513,
+     287.344102081
+    ],
+    "s_over_rho_neg": [
+     261.809474322,
+     257.193349743
+    ],
+    "correct": true
+   }
+  ],
+  "systems": 253,
+  "counted_range": [
+   0.769341620385,
+   2.14190748661
+  ],
+  "s_change": [
+   -0.0177685227121,
+   -0.0061139396064
+  ],
+  "gave_up": [
+   "R2-L1:p97-4:minimal polynomial short of delta"
+  ],
+  "predictions": {
+   "P1": true,
+   "P2": true,
+   "P3": true,
+   "P4": false,
+   "P5": true
+  },
+  "class": "engineering",
+  "unit": "median wall time, single thread (host B)",
+  "study": "research/postgb_linear_stage_20261026/",
+  "report": "research/postgb_linear_stage_20261026/REPORT.pdf",
+  "source": "research/postgb_linear_stage_20261026/analysis/summary.json",
+  "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (research/postgb_linear_stage_20261026/validation/VALIDATION.json)",
+  "validated": true
  },
  "algebraic_ladder": {
   "source": "research/ic_m2_linear_ladder_20261024/fit.json",
