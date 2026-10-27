@@ -53,6 +53,12 @@ seven raw files are byte-identical to the original; the aggregate ratio is
 winning cells and 19/420 target-level wins. Two preliminary image-tool setup
 failures returned zero target rows and remain in the packet. Step 3's isolated
 paired wall-cost comparison is still open; the two hosts differed in hardware.
+The [27 October executable recheck](../factor_base_heldout_replay_20261025/BINARY_REBUILD.json)
+downloaded the frozen S3 input binary read-only and rebuilt the checked-in
+source offline with locked dependencies and the same rustc version. The
+ordinary checkout-path build differed, while the build through the original
+recorded source path matched the frozen executable byte for byte. No target
+trial was rerun and the operation-count ratio is unchanged.
 
 The [paired wall no-run packet](../factor_base_heldout_wall_20261025/REPORT.md)
 closed at its frozen 09:03 UTC gate with the benchmark lock occupied. Its
