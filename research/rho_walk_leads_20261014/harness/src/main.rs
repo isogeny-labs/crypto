@@ -1036,6 +1036,7 @@ fn main() {
             t(&MF::<1>::new([(1u64 << 62) - 57]), "2^62-57");
             t(&MF::<4>::new([0xFFFF_FFFF_FFFF_FFFF, 0x0000_0000_FFFF_FFFF, 0, 0xFFFF_FFFF_0000_0001]), "P-256");
         }
+        "gpuab" => gpuab(&args),
         "summary" => summary(&args),
         _ => eprintln!("usage: rho_walk_leads e1|rf|e2|e4|bench|summary [--bits B] [--trials T] [--seed S] [--arms a,b]"),
     }
@@ -1200,5 +1201,62 @@ fn summary(args: &[String]) {
             }
         }
         println!("{line}}}");
+    }
+}
+
+// ------------------------------------------------------------- gpu A/B
+
+/// gpu/nist RHO_BEST2 A/B: JSON lines with best2, rep, W, curve, Gstep_s,
+/// DPs, expected_DPs (one per cell, both builds).  Per (curve, W): median
+/// rate per build, the per-repetition paired ratio best2/plain (median, min,
+/// max), the DP ratio observed/expected, and GPU time per solve relative to
+/// the plain kernel, `1 / (iteration speedup x rate ratio)`, at the measured
+/// iteration speedup and its interval (`--speedup S --lo L --hi H`).
+fn gpuab(args: &[String]) {
+    let path = arg_s(args, "--in", "-");
+    let sp: f64 = arg(args, "--speedup", 1.0);
+    let lo: f64 = arg(args, "--lo", sp);
+    let hi: f64 = arg(args, "--hi", sp);
+    let rd: Box<dyn BufRead> = if path == "-" {
+        Box::new(std::io::BufReader::new(std::io::stdin()))
+    } else {
+        Box::new(std::io::BufReader::new(std::fs::File::open(&path).expect("open")))
+    };
+    // (curve, W) -> rep -> [plain, best2] rates; DP sums per build
+    let mut cells: std::collections::BTreeMap<(String, u32), std::collections::BTreeMap<u32, [f64; 2]>> = Default::default();
+    let mut dps: std::collections::BTreeMap<(String, u32, usize), (f64, f64)> = Default::default();
+    for l in rd.lines() {
+        let l = l.unwrap();
+        let (Some(b), Some(w), Some(c), Some(g), Some(r)) =
+            (jget(&l, "best2"), jget(&l, "W"), jget(&l, "curve"), jget(&l, "Gstep_s"), jget(&l, "rep"))
+        else {
+            continue;
+        };
+        let b: usize = b.parse().unwrap();
+        let key = (c.to_string(), w.parse::<u32>().unwrap());
+        cells.entry(key.clone()).or_default().entry(r.parse().unwrap()).or_insert([f64::NAN; 2])[b] = g.parse().unwrap();
+        let e = dps.entry((key.0, key.1, b)).or_insert((0.0, 0.0));
+        e.0 += jget(&l, "DPs").unwrap().parse::<f64>().unwrap();
+        e.1 += jget(&l, "expected_DPs").unwrap().parse::<f64>().unwrap();
+    }
+    let med = |mut v: Vec<f64>| {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let n = v.len();
+        if n % 2 == 1 { v[n / 2] } else { (v[n / 2 - 1] + v[n / 2]) / 2.0 }
+    };
+    for ((curve, w), reps) in &cells {
+        let plain: Vec<f64> = reps.values().map(|r| r[0]).collect();
+        let best: Vec<f64> = reps.values().map(|r| r[1]).collect();
+        let ratios: Vec<f64> = reps.values().map(|r| r[1] / r[0]).collect();
+        let rmin = ratios.iter().cloned().fold(f64::INFINITY, f64::min);
+        let rmax = ratios.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+        let rmed = med(ratios.clone());
+        let d0 = dps[&(curve.clone(), *w, 0)];
+        let d1 = dps[&(curve.clone(), *w, 1)];
+        println!(
+            "{{\"curve\":\"{curve}\",\"W\":{w},\"reps\":{},\"plain_median_Gstep_s\":{:.4},\"best2_median_Gstep_s\":{:.4},\"rate_ratio_median\":{rmed:.4},\"rate_ratio_min\":{rmin:.4},\"rate_ratio_max\":{rmax:.4},\"dp_obs_over_exp_plain\":{:.4},\"dp_obs_over_exp_best2\":{:.4},\"iteration_speedup\":{sp},\"gpu_time_per_solve\":{:.4},\"gpu_time_per_solve_range\":[{:.4},{:.4}]}}",
+            ratios.len(), med(plain), med(best), d0.0 / d0.1, d1.0 / d1.1,
+            1.0 / (sp * rmed), 1.0 / (hi * rmax), 1.0 / (lo * rmin)
+        );
     }
 }

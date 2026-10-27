@@ -49,10 +49,61 @@ handles them.
 
 ![iterations](reports/iterations.svg)
 
-**GPU rate** (RTX PRO 6000, PTX build, global table, 256 threads,
-W = 16/32/64, both curves, three alternating repetitions): running on
-Modal (`gpu/nist/modal_app.py::best2_main`). Best of P±M pays at a given W
-only if its rate costs less than the 1.143× iteration gain.
+**GPU rate** (`gpu-ab-v1.json`; rows in `gpu-ab-v1.rows.jsonl`, summary
+`gpu-ab-v1.summary.jsonl` from `rho_walk_leads gpuab`). Setup: one RTX PRO
+6000 (driver 610.57.04) on Modal, PTX build, global table, 256 threads,
+2,048 iterations per cell, three repetitions in alternating order.
+
+Both builds pass the CPU suites in the image. The `k_rho` instantiations
+sit at the same register counts as before (255 at W = 32 and 64).
+
+| curve | W | plain Gstep/s | best of P±M | rate ratio (min–max) | GPU time per solve (range) |
+|---|---:|---:|---:|---:|---:|
+| P-256 | 16 | 1.450 | 1.296 | 0.894 (0.893–0.894) | 0.979 (0.936–1.023) |
+| P-256 | 32 | 1.772 | 1.603 | 0.905 (0.903–0.905) | 0.967 (0.925–1.013) |
+| P-256 | 64 | 2.021 | 1.867 | 0.923 (0.919–0.924) | **0.948 (0.906–0.994)** |
+| P-384 | 16 | 0.474 | 0.423 | 0.892 (0.888–0.895) | 0.981 (0.936–1.029) |
+| P-384 | 32 | 0.635 | 0.561 | 0.884 (0.881–0.884) | 0.991 (0.948–1.038) |
+| P-384 | 64 | 0.756 | 0.676 | 0.894 (0.893–0.894) | 0.979 (0.936–1.023) |
+
+How the last column is derived: GPU time per solve = 1 / (1.143 ×
+rate ratio). The range combines the iteration interval (1.094–1.194)
+with the min–max of the rate ratio.
+
+![GPU](reports/gpu.svg)
+
+**Verdict.** Best of P±M costs 8–12% of the kernel's rate. Against 1.143×
+fewer steps, that nets a 1–5% saving of GPU time per solve.
+
+- **P-256 at W = 64**, the kernel's fastest cell, saves about 5%, and its
+  whole range lies below 1.
+- **The other cells** save 1–3%, but their ranges cross 1.
+- **Cost against batch size.** Against the CPU model's expectation, the
+  relative cost is smallest at W = 64, where the kernel already spills
+  registers.
+
+This is an engineering gain at the kernel's best configuration, not a
+change to the rho exponent.
+
+**Open observations, reported as measured.**
+
+- **Distinguished-point counts on P-256.** With best of P±M they ran
+  2–8% below the 2^-24 expectation: observed/expected 0.923, 0.946 and
+  0.974 at W = 16/32/64, about 2–3σ, with each W one sample because the
+  repetitions replay identical walks. The plain build (0.981–0.996) and
+  P-384 (0.991–1.019) sit at the expectation. The score (x limb 1) and
+  the DP test (limb 0) read different limbs, so no cause is identified.
+- **Cycle iterations the step model doesn't count.** The kernel walks up
+  to `RHO_CYCLE_DEPTH + 1` = 6 extra iterations per detected fruitless
+  cycle, and the harness's step count leaves these out. At the measured
+  cycle rates that is about 1.2% (plain) against 1.5% (best of two) of
+  iterations: roughly 0.4% more GPU time for best of P±M (derived).
+
+**Not in `benchmarks/README.md`.** The validation gate
+(`docs/VALIDATION_GATE.md`) admits a benchmark row only with a replay
+certificate, a validator report and a matched rho reference. This run has
+the matched reference (the plain kernel, same binary family and unit) but
+neither of the other two, so the result stays in this research directory.
 
 ## Reproduce
 
@@ -61,4 +112,6 @@ make -C gpu/nist test BEST2=1
 cd research/rho_walk_leads_20261014 && modal run modal_run.py --plan nistbest2 --out ../nist_best2_small_batch_20261027/iterations-v1
 cat ../nist_best2_small_batch_20261027/iterations-v1/*.jsonl | harness/target/release/rho_walk_leads summary --ref neg_canon
 cd ../../gpu/nist && modal run modal_app.py::best2_main --iters 2048 --reps 3 --out <json>
+# rows: one JSON object per line, compact separators; then
+rho_walk_leads gpuab --in gpu-ab-v1.rows.jsonl --speedup 1.1428 --lo 1.0944 --hi 1.1943
 ```
