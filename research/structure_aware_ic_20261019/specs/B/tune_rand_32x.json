@@ -1,0 +1,70 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "glv-orbit:size=2048,group=negation",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "ic-a2-2048",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "glv-orbit:size=4096,group=negation",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "ic-a2-4096",
+      "role": "control"
+    }
+  ],
+  "description": "structure_aware_ic_20261019 PROTOCOL.md Amendment 4: the A=2 optimum was on the grid edge",
+  "label": "tuning grid extension, rand, 32 bits",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 1,
+    "seed": 1,
+    "timeout_seconds": 3600,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 2624724493,
+        "b": 413257523,
+        "group_order": 3309475109,
+        "gx": 2,
+        "gy": 292427539,
+        "kind": "prime_explicit",
+        "p": 3309530503,
+        "r": 3309475109
+      },
+      {
+        "a": 1900950227,
+        "b": 31345756,
+        "group_order": 2268099793,
+        "gx": 1,
+        "gy": 1204982703,
+        "kind": "prime_explicit",
+        "p": 2268164593,
+        "r": 2268099793
+      }
+    ],
+    "target_seed": 5001,
+    "targets_per_curve": 4
+  }
+}
