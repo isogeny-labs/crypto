@@ -37,7 +37,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 2 research/p192_extension_cover_20261012/type_i_residual_endpoint_clique_pilot.json
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build the pencil and four-cell theorems
         uses: leanprover/lean-action@v1
         with:
@@ -78,7 +78,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 2 research/p192_extension_cover_20261012/type_i_residual_endpoint_clique_pilot.json
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build and fresh-check residual-endpoint theorems
         uses: leanprover/lean-action@v1
         with:
@@ -116,7 +116,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 2 research/p192_extension_cover_20261012/type_i_residual_endpoint_clique_pilot.json
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build and fresh-check anchored fan theorems
         uses: leanprover/lean-action@v1
         with:
@@ -156,7 +156,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 2 research/p192_extension_cover_20261012/type_i_residual_endpoint_clique_pilot.json
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
       - name: Build and fresh-check four-anchor recurrence
         uses: leanprover/lean-action@v1
         with:
