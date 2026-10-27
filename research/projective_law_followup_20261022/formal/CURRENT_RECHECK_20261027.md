@@ -26,7 +26,16 @@ also passes after the written-audit binding was refreshed. Direct pinned
 Lean compilation of `Common22BranchDomain.lean` and
 `WeightedProjCrossImage.lean` exited 0, and their `#print axioms` output
 lists only `propext`, `Classical.choice`, and `Quot.sound`. The
-[weighted-quotient report](WEIGHTED_QUOTIENT_COMPONENTS.md),
+branch file imports a separately checked module that is not a default Lake
+target; a fresh checkout can reproduce the direct compile with:
+
+```sh
+lake env lean -o .lake/build/lib/lean/Common22BranchValuation.olean Common22BranchValuation.lean
+lake env lean Common22BranchDomain.lean
+lake env lean WeightedProjCrossImage.lean
+```
+
+The [weighted-quotient report](WEIGHTED_QUOTIENT_COMPONENTS.md),
 [PDF artifact pointer](.artifacts.json), [graph](weighted-quotient-components.svg),
 and [status CSV](weighted-quotient-components.csv) state the theorem scopes
 and the remaining gluing and Picard-class obligations.
