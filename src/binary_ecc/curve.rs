@@ -33,6 +33,7 @@
 //! **classical reference** here.
 
 use super::f2m::{F2mElement, IrreduciblePoly};
+use crate::cryptanalysis::group_op_count;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 use std::collections::HashMap;
@@ -781,10 +782,12 @@ pub fn point_add(curve: &BinaryCurve, p1: &BinaryPoint, p2: &BinaryPoint) -> Bin
                 // x₁ = x₂.  Either P + P (double) or P + (-P) = O.
                 if y1.add(y2) == *x1 {
                     // y₂ = y₁ + x₁ ⇒ P₂ = -P₁.
+                    group_op_count::count_adds(1);
                     return BinaryPoint::Infinity;
                 }
                 return point_double(curve, p1);
             }
+            group_op_count::count_adds(1);
             let irr = &curve.irreducible;
             let num = y1.add(y2);
             let den = x1.add(x2);
@@ -808,6 +811,7 @@ pub fn point_double(curve: &BinaryCurve, p: &BinaryPoint) -> BinaryPoint {
     match p {
         BinaryPoint::Infinity => BinaryPoint::Infinity,
         BinaryPoint::Affine { x: x1, y: y1 } => {
+            group_op_count::count_doubles(1);
             let irr = &curve.irreducible;
             if x1.is_zero() {
                 return BinaryPoint::Infinity;
@@ -833,6 +837,7 @@ pub fn scalar_mul(curve: &BinaryCurve, p: &BinaryPoint, k: &BigUint) -> BinaryPo
     if k.is_zero() {
         return BinaryPoint::Infinity;
     }
+    group_op_count::count_scalar_mults(1);
     let bits = k.bits();
     let mut result = BinaryPoint::Infinity;
     for i in (0..bits).rev() {
