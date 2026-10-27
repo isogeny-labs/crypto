@@ -10,6 +10,17 @@ and weekly.
 | Lake project (directory with `lakefile.toml` / `lakefile.lean`) | `lake exe cache get` if it uses Mathlib, then `lake build`, then an audit of every module the project built |
 | standalone `.lean` file outside any Lake project | `lean -o` against the core library under its directory's `lean-toolchain`, then an audit of that module |
 
+The retained first attempt at
+`research/isogeny_world_frontier_20261016/replay-optimization-v1/implementation-01/Newton.failed.lean`
+is one explicit negative control. It stays in `--list` and its source SHA-256
+is pinned in `proof-gate.sh`. The gate compiles it with the repository's pinned
+Lean toolchain and accepts only exit status 1 with its single recorded
+`lean.unknownIdentifier` error for `Int.mul_two`. A changed file, successful
+compile, timeout, or different diagnostic fails the target. The corrected
+`proof/Newton.lean` remains a separate positive target subject to the normal
+build and axiom audit. `PASS_expected_failure` certifies only that the frozen
+historical failure reproduced; it is not a theorem proof.
+
 The audit, [`AuditAxioms.lean`](AuditAxioms.lean), imports the modules and
 collects each theorem's **transitive** axioms. Only `propext`,
 `Classical.choice` and `Quot.sound` are accepted. A grep cannot do this
@@ -47,8 +58,15 @@ tools/lean/proof-gate.sh --out receipts          # keep build and audit logs
 `Trusted.lean` is a listed `native_decide`), and `selftest/fail/` must fail
 (a transitive `sorry`, a user axiom, an unlisted `native_decide`, a file with
 no theorems, a build error). CI runs it on every trigger, so the gate stays
-exercised even in a repository with no Lean proofs yet. `LEAN_GATE_TRUSTED`
+exercised even in a repository with no Lean proofs yet. The CI matrix covers
+the repository's pinned toolchain and Lean 4.19, used by the SEA project.
+`LEAN_GATE_TRUSTED`
 points the gate at another trust manifest. The self-test uses its own one.
+
+The audit invocation separates compiler options from program arguments with
+`--`; the auditor accepts both toolchain conventions for forwarding that
+separator. Cache-download failures retain `cache.log` and an `INFRA_cache`
+status under `--out`, while still exiting with infrastructure status 3.
 
 ## What passing does not mean
 

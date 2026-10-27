@@ -1,0 +1,80 @@
+name: pqc-assay
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/pqc/fast/ml_dsa.rs'
+      - 'src/pqc/ml_dsa.rs'
+      - 'src/pqc/fast/keccak*.rs'
+      - 'src/hash/sha3.rs'
+      - 'verification/pqc-assay/**'
+      - '.github/workflows/pqc-assay.yml'
+      - '.gitmodules'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/pqc/fast/ml_dsa.rs'
+      - 'src/pqc/ml_dsa.rs'
+      - 'src/pqc/fast/keccak*.rs'
+      - 'src/hash/sha3.rs'
+      - 'verification/pqc-assay/**'
+      - '.github/workflows/pqc-assay.yml'
+      - '.gitmodules'
+  # The macOS-only standalone-verify and math-reference jobs (and their
+  # dispatch inputs) were removed on 2026-10-26: every job runs on
+  # ubuntu-latest only, and the upstream proof pipeline targets macOS.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pqc-assay-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  standalone-integrity:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|pqc-assay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|pqc-assay.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: verification/pqc-assay
+      - name: Check the pinned standalone suite and its generated proof inputs
+        run: verification/pqc-assay/standalone.sh check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pqc-assay-standalone-integrity
+          path: verification/pqc-assay/build/standalone-*.txt
+          if-no-files-found: warn
+
+  rust-reduce:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|pqc-assay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|pqc-assay.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/hash
+            src/pqc
+            verification/pqc-assay
+      - name: Install the pinned Rust compiler
+        run: rustup toolchain install 1.90.0 --profile minimal && rustup default 1.90.0
+      - uses: actions/cache@v4
+        with:
+          path: verification/pqc-assay/.cache
+          key: assay-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('verification/pqc-assay/toolchain.env') }}
+      - name: Install SAW and pin the upstream proof model
+        run: verification/pqc-assay/setup.sh
+      - name: Prove the production reductions and reject four wrong specifications
+        run: verification/pqc-assay/verify.sh
+      - name: Reject a changed production reduction
+        run: verification/pqc-assay/mutations.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pqc-assay-rust-reduce
+          path: verification/pqc-assay/build/*.txt
+          if-no-files-found: warn
