@@ -62,7 +62,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             variables:vec!["x".into()],degree_bound:(size-1) as u32,lhs:a(sum),rhs:n(den)});
     }
     let pair_lift = argv.get(2).is_some_and(|s| s == "pair-lift");
-    let proof = if pair_lift {
+    let overlap_mask = argv.get(2).is_some_and(|s| s == "overlap-mask");
+    let proof = if overlap_mask {
+        statements = vec![S {
+            name: "quadratic-character overlap indicator expansion".into(),
+            source: "lean-v4/TwistShiftOverlap.lean mask_expansion; elementary ring identity, not a novelty or complexity claim".into(),
+            variables: vec!["x".into(), "y".into()],
+            degree_bound: 2,
+            lhs: m(vec![a(vec![n(1), m(vec![n(-1),v("x")])]), a(vec![n(1),v("y")])]),
+            rhs: a(vec![n(1),m(vec![n(-1),v("x")]),v("y"),m(vec![n(-1),v("x"),v("y")])]),
+        }];
+        let path = "research/twist_routes_1_3_20261021/lean-v4/TwistShiftOverlap.lean";
+        Some(certificate::ProofRef {
+            kind: "lean4".into(),
+            path: path.into(),
+            sha256: hex::encode(source_sha256::sha256(&fs::read(path)?)),
+        })
+    } else if pair_lift {
         let cubic = |x: E| a(vec![power(x.clone(), 3), m(vec![v("a"), x]), v("b")]);
         let middle = |x: E, y: E| {
             a(vec![
