@@ -22,9 +22,10 @@ The main results are:
   to the field-validity assumptions stated below;
 - all 165 binary maps have the implemented one-infinity genus-three Jacobian
   arithmetic and bounded rational-point-class transfer;
-- all 142 binary EC1 bindings pass typed native tests for generator membership,
+- the retained native batch receipt covers 140 of 142 binary EC1 bindings for generator membership,
   `[r]G=O`, pullback validity, `[r]phi^*(G)=0`, composition, and
-  degree-inverse recovery;
+  degree-inverse recovery; the refreshed catalog has two binary bindings without
+  native batch evidence;
 - those generator-level tests do **not** prove pullback additivity,
   all-element composition, injectivity, or image-order equality on the full
   generated subgroup; only the retained order-29 overlay has the stronger
@@ -94,8 +95,8 @@ the fixed-`GF(8)` order or all-class transfer results.
 | Separate supported input models | implemented with explicit boundaries | binary and odd-characteristic constructors are separate; unsupported infinity configurations return a structured result |
 | Constructive covers | supported for the two fixed catalog families | all 15,791 formulas are explicit and replayed; this is not a theorem-complete Xarles constructor |
 | Genuine Jacobian arithmetic | partial | binary one-infinity sources are supported; all 15,626 odd two-infinity catalog sources remain outside the current backend |
-| Pullback, pushforward, and subgroup transfer | partial | bounded binary point-class domains and 142 generator checks; exhaustive arbitrary-class pushforward exists only for the non-catalog exact fixed-`GF(8)` fixture; catalog-general binary norm and all odd induced maps remain open |
-| EC1/ICV1 catalog evidence | partial | exact memberships, typed object bindings, hashes, statuses, and four narrow overlays cover the 15,791 catalog geometry rows; the positive fixed-GF(8) source/target/Jacobian/map fixture is non-catalog and has no EC1/ICV1/HC1/CV1 export or transfer-certificate binding |
+| Pullback, pushforward, and subgroup transfer | partial | bounded binary point-class domains and 140 retained generator checks; exhaustive arbitrary-class pushforward exists only for the non-catalog exact fixed-`GF(8)` fixture; catalog-general binary norm and all odd induced maps remain open |
+| EC1/ICV1 catalog evidence | partial | exact memberships, typed object bindings, hashes, statuses, and five narrow overlays cover the 15,791 catalog geometry rows; the positive fixed-GF(8) source/target/Jacobian/map fixture is non-catalog and has no EC1/ICV1/HC1/CV1 export or transfer-certificate binding |
 | Standalone executable | source verified; packaged scope incomplete | current-source tests cover 15,791 inputs; the published artifact was replayed on its bundled 592-row registry, not on all current inputs |
 | Validation and shipping | partial | deterministic checks and native tests exist; independent divisor-class replay, local Lean kernel receipt, fresh package, and final CI gates remain open |
 | Full Jacobian index-calculus solver | separate and not delivered | no cover-integrated or catalog-supported solver/run for these binary and even-sextic sources; the existing tiny odd-prime one-infinity relation/linear-algebra/recovery library is outside this assessment and is not a general solver |
@@ -117,11 +118,12 @@ than count-only.
 
 The two repeated cover objects are intentional shared models, not duplicate
 assessment rows. The 15,626 odd-characteristic rows comprise 14,302 prime-field
-rows and 1,324 extension-field rows.
+arithmetic replays (including 30 normalized targets) and 1,324 extension-field
+rows.
 
 | Subgroup profile | EC1 bindings | Established catalog-wide facts | Still open |
 |---|---:|---|---|
-| Binary degree 3 | 142 | exact identity joins, `gcd(3,r)=1`, typed generator-level transfer checks | additivity and all-element composition; injectivity and image order; proof-grade numeric exact order except order 29; arbitrary-result norm/recovery |
+| Binary degree 3 | 142 | exact identity joins, `gcd(3,r)=1`; 140 have typed generator-level transfer checks | additivity and all-element composition; injectivity and image order; proof-grade numeric exact order except order 29; arbitrary-result norm/recovery; two linked bindings lack native batch evidence |
 | Odd degree 2 | 837 | exact identity joins and `gcd(2,r)=1` | generator/order certificates and every induced-map claim |
 | **Total** | **979** | **every binding classified** | **unknowns remain explicit** |
 
@@ -321,9 +323,9 @@ behavior. For every catalog binary profile, the same entry point still returns
 claim, not the mathematical existence of a norm. This boundary is tracked in
 [`binary-cover-arbitrary-jacobian-norm-missing.md`](../../problems/binary-cover-arbitrary-jacobian-norm-missing.md).
 
-## The 142 binary subgroup checks
+## The 140 retained binary subgroup checks
 
-For every exact linked binary EC1 triple, the native batch test decodes the
+For each of the 140 binary triples in the retained native batch receipt, the test decodes the
 catalog generator and verifies:
 
 1. the generator lies on the exact target and is nonidentity;
@@ -342,7 +344,7 @@ composition identity for every subgroup element through an independent map
 oracle. Catalog-wide kernel intersection and actual image/source-order
 equality therefore remain `unknown` and conditional. It also does **not**
 prove `ord(G)=r`. Proof-grade numeric equality with the catalog order remains
-`unknown` for 141 of the 142 binary bindings; the retained
+`unknown` for 139 of the 140 binary bindings; the retained
 \(\mathbf F_{2^7}\) order-29 overlay is the one narrow exception.
 
 The elementary group-theoretic core is formalized in
@@ -355,7 +357,7 @@ cardinality is coprime to `d`.
 
 That Lean theorem assumes exact cardinality and the composition identity; it
 constructs neither map, does not supply the missing `IDC1h…` identity
-certificate, and does not promote the 142 catalog rows by itself.
+certificate, and does not promote the tested catalog bindings by itself.
 The additional bridge from `[r]G=O` to
 `ord(G) | r`, and hence coprimality with the actual generated-subgroup order,
 is used in the native certificate but is not a separately formalized Lean
@@ -412,7 +414,7 @@ screen is not imported as a map, order, or recovery certificate.
 The current source allowlist accepts all four catalog input profiles. The
 catalog-wide constructor test exercises the standalone `construct` path for
 all 15,791 models in catalog snapshot
-[72830471](https://github.com/aburan28/crypto/commit/728304718cb0ab6df70da620a908a5f76f175293). That commit pins the three
+[4a181ccb](https://github.com/aburan28/crypto/commit/4a181ccb3201d3275cbf7aed29bfd72f58d82467). That commit pins the three
 catalog files; the test assertion is part of the current source. This is
 source-level evidence, not a published-artifact claim.
 
@@ -424,7 +426,7 @@ source allowlist with the earlier 2,100-row model partition placed 746 forms
 inside its syntactic domain (160 binary and 586 direct-prime) and 1,354
 outside: the latter were 1,324 extension-field rows and 30 normalized
 Montgomery/Edwards rows. That historical classification has not been rerun
-against the expanded 15,791-row catalog. No exact batch receipt ran all current
+against the later 2,572-row catalog. No exact batch receipt ran all current
 inputs against the archived executable. The artifact is therefore **not**
 evidence of a catalog-wide current binary. Exact asset hashes, directly
 executed commands, and the historical static-classification boundary are
@@ -460,9 +462,9 @@ new norm or CLI changes.
 | Cover geometry | `supported` | all 15,791 fixed-family rows; equations, smoothness, genus, degree, separability, and infinity behavior, conditional on the declared odd base-prime assumptions described above |
 | Internal Jacobian arithmetic | `supported` on stated models | binary and separate odd-prime one-infinity fixtures; not the 15,626 odd two-infinity cover sources |
 | Independent arithmetic/map oracle | `unknown` | no separate CAS or independently implemented divisor-class replay across the catalog |
-| Binary catalog generators | `supported` on tested generators | all 142 triples pass the listed membership, annihilation, pullback, composition, and inverse-degree checks; no subgroup-wide promotion |
+| Binary catalog generators | `supported` on tested generators | 140 retained triples pass the listed membership, annihilation, pullback, composition, and inverse-degree checks; two additional binary triples are absent from that test receipt; no subgroup-wide promotion |
 | Odd cover/backend compatibility | `refuted` as a current implementation claim | the one-infinity backend cannot accept the 15,626 even-sextic sources; mathematical induced maps remain `unknown` |
-| Published artifact on all current inputs | `refuted` as evidence claim | only its bundled 592 rows were directly replayed; 746/1,354 is a historical static allowlist classification, not a 15,791-command receipt |
+| Published artifact on all current inputs | `refuted` as evidence claim | only its bundled 592 rows were directly replayed; 746/1,354 is a historical static allowlist classification, not a catalog-wide receipt |
 | Historical cross-repository core parity | `supported` on the pinned receipt snapshot | offline rerun verified exactly seven bindings; CLI, Cargo, catalogs, schema, ledger, workflows, packages, and actual-HEAD binding are excluded |
 | Current fixed-F8 norm mirror | `unknown` | retained parity binds old `cover_transfer.rs` digest `67b94112…`, not current `6e801f14…`; no current-tip cryptanalysis mirror receipt is attached |
 | Coordinate commutation and proper-subfield descent | `unknown` | normalization geometry is checked, but induced-divisor commutation and descent are not |
@@ -592,14 +594,17 @@ assessment into a solver or advantage result.
    induced maps over both prime and declared extension fields.
 3. Add proof-grade exact-order evidence and map-bound certificates wherever a
    numeric EC1 order or image-order claim is desired.
-4. Replay map additivity and composition through an independent divisor-class
+4. Replay generator membership and catalog-order annihilation for the 837 odd
+   bindings and the two binary bindings outside the retained native batch;
+   replay typed transfer for those two binary bindings.
+5. Replay map additivity and composition through an independent divisor-class
    implementation.
-5. Add coordinate-isomorphism commutation and proper-subfield descent controls.
-6. Publish and replay a standalone artifact that accepts all 15,791 current
+6. Add coordinate-isomorphism commutation and proper-subfield descent controls.
+7. Publish and replay a standalone artifact that accepts all 15,791 current
    model forms.
-7. Refresh the legacy formula inventory without promoting modeled routes to
+8. Refresh the legacy formula inventory without promoting modeled routes to
    certificates.
-8. Keep the full solver and every cost claim behind its separate acceptance
+9. Keep the full solver and every cost claim behind its separate acceptance
    gates.
 
 # Exploration boundary

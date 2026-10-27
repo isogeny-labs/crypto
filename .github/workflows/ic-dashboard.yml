@@ -29,6 +29,13 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - name: Free runner disk before Chrome installation
+        if: runner.environment == 'github-hosted'
+        run: |
+          df -h /
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/powershell
+          df -h /
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

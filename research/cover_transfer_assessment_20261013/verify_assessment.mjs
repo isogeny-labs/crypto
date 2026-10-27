@@ -363,11 +363,11 @@ function check(condition, message) {
   }
 }
 
-check(registry.curves.length === 15791, "unexpected registry row count");
-check(report.curves.length === 15791, "unexpected cover-report row count");
-check(graph.curves.length === 15791, "unexpected graph curve-node count");
-check(Object.keys(graph.maps).length === 15791, "unexpected CV1 map count");
-check(Object.keys(graph.covers).length === 15789, "unexpected HC1 cover count");
+check(registry.curves.length === 15813, "unexpected registry row count");
+check(report.curves.length === 15813, "unexpected cover-report row count");
+check(graph.curves.length === 15813, "unexpected graph curve-node count");
+check(Object.keys(graph.maps).length === 15813, "unexpected CV1 map count");
+check(Object.keys(graph.covers).length === 15811, "unexpected HC1 cover count");
 
 const registryBytes = fs.readFileSync(registryPath);
 check(report.registry_sha256 === sha256(registryBytes), "covers.json registry digest mismatch");
@@ -482,15 +482,15 @@ check(
   "graph model hashes are not a unique exact copy of the registry model hashes",
 );
 
-check(representationCount === 979, "unexpected EC1 representation count");
-check(ec1Aliases.size === 979, "unexpected unique EC1 count");
-check(curveUids.size === 979, "unexpected unique curve-UID count");
+check(representationCount === 1001, "unexpected EC1 representation count");
+check(ec1Aliases.size === 1001, "unexpected unique EC1 count");
+check(curveUids.size === 1001, "unexpected unique curve-UID count");
 check(
-  mapReferenceCounts.size === 15791 && [...mapReferenceCounts.values()].every((count) => count === 1),
+  mapReferenceCounts.size === 15813 && [...mapReferenceCounts.values()].every((count) => count === 1),
   "CV1 references are not bijective with curve nodes",
 );
 check(
-  coverReferenceCounts.size === 15789 &&
+  coverReferenceCounts.size === 15811 &&
     [...coverReferenceCounts.values()].every((count) => count === 1 || count === 2) &&
     [...coverReferenceCounts.values()].filter((count) => count === 2).length === 2,
   "unexpected HC1 sharing pattern",
@@ -785,17 +785,17 @@ for (const coverResult of report.curves) {
 }
 
 check(constructionCounts.binary_cubic_pullback_v1 === 165, "unexpected binary-construction count");
-check(constructionCounts.prime_quadratic_pullback_v1 === 15626, "unexpected odd-construction count");
+check(constructionCounts.prime_quadratic_pullback_v1 === 15648, "unexpected odd-construction count");
 check(arithmeticChecks.binary === 165, "unexpected binary arithmetic-replay count");
-check(arithmeticChecks.prime === 14302, "unexpected prime-field arithmetic-replay count");
-check(arithmeticChecks.extension === 1324, "unexpected extension-field arithmetic-replay count");
+check(arithmeticChecks.prime === 14305, "unexpected prime-field arithmetic-replay count");
+check(arithmeticChecks.extension === 1343, "unexpected extension-field arithmetic-replay count");
 check(
   arithmeticChecks.normalized_target === 30,
   "unexpected normalized-target algebraic-replay count",
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "728304718cb0ab6df70da620a908a5f76f175293";
+const expectedCatalogCommit = "17922e31b1ef00ca0f1c3cc04647b10d7f278198";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -877,6 +877,8 @@ const expectedTemplateStatuses = {
   "subgroup.binary-injective-generated.unknown": "unknown",
   "subgroup.binary-inverse-recovery.supported": "supported",
   "subgroup.binary-pullback.supported": "supported",
+  "subgroup.binary-untested-generator.unknown": "unknown",
+  "subgroup.binary-untested-transfer.unknown": "unknown",
   "subgroup.degree-coprime.supported": "supported",
   "subgroup.exact-image-order29.supported": "supported",
   "subgroup.exact-order29.supported": "supported",
@@ -1022,10 +1024,10 @@ const expectedControlStatuses = {
 };
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "5470ecac7ef17b749fae984a64d979c59c91cdb3e8fdbbddba6031d6fa6e956e",
-  profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "73b73e3b963c82264d942170e20186c1f9f78ffa6ef556e7eca4299e90998055",
-  open_obligations: "dffb0831f47c54218afaf9e9d81a54b117bd8017db4014400d56986d61f3c5a7",
+  result_templates: "91a1695012de08dedf823da26d6b97704ef4768963bf92c7741b1ed7b0c4fd1d",
+  profiles: "3bdd304400d1eebc6d86a4fcebdac6d9f8377232e0692cbf50319cf314c071dd",
+  controls: "4a202047ce88566f46de87d80ce2befe49f02ec9b1414053bd44b9adbf27e89c",
+  open_obligations: "238520a990f10a3f542ea12f9fa75367716a0e046450f2e3df37687e144676fa",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
 };
@@ -1117,7 +1119,7 @@ for (const relativePath of [
     const committedBytes = execFileSync(
       "git",
       ["show", `${assessment.catalog_commit}:${relativePath}`],
-      { cwd: root, encoding: "buffer", maxBuffer: 128 * 1024 * 1024 },
+      { cwd: root, encoding: "buffer", maxBuffer: 64 * 1024 * 1024 },
     );
     check(
       sha256(committedBytes) === sha256(fs.readFileSync(path.join(root, relativePath))),
@@ -1661,10 +1663,10 @@ for (const [mapUid, context] of mapContexts) {
   });
 }
 
-check(expectedFieldBindings.size === 557, "unexpected declared-field context count");
-check(fieldUidByLabel.size === 557, "declared-field labels are not bijective with field contexts");
-check(expectedJacobianBindings.size === 15789, "unexpected Jacobian-context count");
-check(expectedTypedMapBindings.size === 15791, "unexpected typed-map binding count");
+check(expectedFieldBindings.size === 579, "unexpected declared-field context count");
+check(fieldUidByLabel.size === 579, "declared-field labels are not bijective with field contexts");
+check(expectedJacobianBindings.size === 15811, "unexpected Jacobian-context count");
+check(expectedTypedMapBindings.size === 15813, "unexpected typed-map binding count");
 check(
   canonicalJson(actualFieldBindings) === canonicalJson(sortedRecord(expectedFieldBindings)),
   "typed declared-field bindings are not the exact independently derived set",
@@ -1830,11 +1832,11 @@ check(
 
 const expectedPredicateCounts = {
   binary_cubic_same_field: 165,
-  odd_prime_quadratic_direct_same_field: 14272,
+  odd_prime_quadratic_direct_same_field: 14275,
   odd_prime_quadratic_normalized_same_field: 30,
-  odd_extension_quadratic_direct_same_field: 1324,
+  odd_extension_quadratic_direct_same_field: 1343,
   linked_subgroup_degree3: 142,
-  linked_subgroup_degree2: 837,
+  linked_subgroup_degree2: 859,
 };
 const actualPredicateCounts = {};
 for (const context of mapContexts.values()) {
@@ -1903,6 +1905,40 @@ const expectedExactOverlays = {
       "docs/curves/cover-links.yaml#EC1P10Cfphcf15d87ab724",
       "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#icv1-fp10-t5-192cb216",
     ],
+  },
+  "subgroup.binary-new-registry-unvalidated": {
+    kind: "subgroup",
+    target: [
+      "EC1N73Ce0h9999c3e90683",
+      "urn:ec-record:1:sha256:9999c3e9068310bbfdef49da0bb3e43251d8a89431b9e79715225d5671ab2abd",
+      "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4",
+    ],
+    claim_overrides: {
+      generator_on_curve: "subgroup.binary-untested-generator.unknown",
+      catalog_order_annihilates_generator: "subgroup.binary-untested-generator.unknown",
+      pullback_valid: "subgroup.binary-untested-transfer.unknown",
+      image_annihilated_by_catalog_order: "subgroup.binary-untested-transfer.unknown",
+      composition_on_generator: "subgroup.binary-untested-transfer.unknown",
+      degree_inverse_recovery: "subgroup.binary-untested-transfer.unknown",
+    },
+    evidence_additions: ["docs/curves/cover-links.yaml#EC1N73Ce0h9999c3e90683"],
+  },
+  "subgroup.binary-pr2452-registry-unvalidated": {
+    kind: "subgroup",
+    target: [
+      "EC1N73Ce0h243f847bccdd",
+      "urn:ec-record:1:sha256:243f847bccdd57c5fb0e458c368f5dee255dbd26406ce6c72e727b45cede73d3",
+      "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4",
+    ],
+    claim_overrides: {
+      generator_on_curve: "subgroup.binary-untested-generator.unknown",
+      catalog_order_annihilates_generator: "subgroup.binary-untested-generator.unknown",
+      pullback_valid: "subgroup.binary-untested-transfer.unknown",
+      image_annihilated_by_catalog_order: "subgroup.binary-untested-transfer.unknown",
+      composition_on_generator: "subgroup.binary-untested-transfer.unknown",
+      degree_inverse_recovery: "subgroup.binary-untested-transfer.unknown",
+    },
+    evidence_additions: ["docs/curves/cover-links.yaml#EC1N73Ce0h243f847bccdd"],
   },
 };
 const exactOverlays = Array.isArray(assessment.exact_overlays)
@@ -2175,9 +2211,9 @@ check(
   typeof coverage.scope_note === "string" && coverage.scope_note.trim().length > 0,
   "coverage scope_note is empty",
 );
-check(coverage.assessed_maps === 15791 && coverage.unassessed_maps === 0, "map coverage is incomplete");
+check(coverage.assessed_maps === 15813 && coverage.unassessed_maps === 0, "map coverage is incomplete");
 check(
-  coverage.assessed_subgroups === 979 && coverage.unassessed_subgroups === 0,
+  coverage.assessed_subgroups === 1001 && coverage.unassessed_subgroups === 0,
   "subgroup coverage is incomplete",
 );
 
@@ -2345,20 +2381,13 @@ const hashBoundReportKinds = new Set([
   "context_graph_png",
   "release_receipt",
 ]);
+// These rendered research reports are immutable records of the preceding
+// 15,791-model catalog. The live ledger above is checked against the expanded
+// registry independently; it must not relabel the older PDF as current.
 const reportCoverageMarker =
-  "cover-transfer-assessments/v2; " +
-  [
-    "catalog_maps",
-    "unique_cover_models",
-    "geometry_verified_maps",
-    "ec1_representations",
-    "assessed_maps",
-    "unassessed_maps",
-    "assessed_subgroups",
-    "unassessed_subgroups",
-  ]
-    .map((key) => `${key}=${coverage[key]}`)
-    .join("; ");
+  "cover-transfer-assessments/v2; catalog_maps=15791; unique_cover_models=15789; " +
+  "geometry_verified_maps=15791; ec1_representations=979; assessed_maps=15791; " +
+  "unassessed_maps=0; assessed_subgroups=979; unassessed_subgroups=0";
 const staleReportPatterns = [
   /the other 2,089 map rows and 662 EC1 representations remain unassessed/iu,
   /2,089 map rows unassessed here/iu,

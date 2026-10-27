@@ -37,7 +37,7 @@ jobs:
         if: runner.environment == 'github-hosted'
         run: |
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
-            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/powershell
           df -h /
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

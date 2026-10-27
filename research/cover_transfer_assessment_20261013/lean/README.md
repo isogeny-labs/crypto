@@ -35,22 +35,28 @@ lake env lean AxiomAudit.lean
 allowlist (`propext`, `Classical.choice`, and `Quot.sound`) and also prints the
 kernel's transitive axiom report for the theorem.
 
-### Local validation status (2026-10-13)
+### Local validation status (2026-10-25)
 
-The session installed and identified Lean `v4.34.1`, and `lake update`
-completed in a temporary copy and produced the included manifest.  The
-remaining replay could not be completed in this workspace.  The exact cache
-command was:
+The original 2026-10-13 replay stopped when its cache ran out of workspace
+space.  A later replay used Lean `v4.34.1` and the exact package revisions in
+the committed `lake-manifest.json`, including Mathlib
+`d13f23b723b8a846827a245b89c10fc7d3f11612`.  The tracked theorem,
+audit, manifest, build file, and toolchain were copied byte for byte into an
+isolated project with a matching local package cache.  The missing Mathlib
+order-of-element object was restored using `lake exe cache get
+Mathlib.GroupTheory.OrderOfElement`.
 
-```sh
-XDG_CACHE_HOME=/tmp/cover-transfer-cache lake exe cache get
+In that project, `lake build CoverTransfer` completed successfully (1,131
+jobs), and `lake env lean AxiomAudit.lean` exited zero.  The audit printed:
+
+```text
+AXIOM_AUDIT|CoverTransfer.pull_injective_on_subgroup|[propext, Classical.choice, Quot.sound]
 ```
 
-Its last captured progress was 2,536 of 8,908 cache files; the sandbox then
-reported `No space left on device` while creating a workspace mount.  The
-temporary downloader and its files were stopped and removed.  Consequently,
-`lake build` and `lake env lean AxiomAudit.lean` remain unexecuted locally and
-must run in CI before this source is described as kernel-verified.
+This is a local kernel and axiom check of the conditional theorem as stated.
+The exact-head hosted proof job must also pass before this PR merges.  Neither
+check establishes the geometric or arithmetic hypotheses for any particular
+catalog row; see the boundary below.
 
 ## Boundary
 

@@ -88,7 +88,7 @@ pub struct Match<'a> {
 
 /// Every other curve ranked by likeness to `target`: least mismatch
 /// weight first, then nearest in the two size-free reals.  With
-/// `other_sizes`, curves over a field of the target's size are left out.
+/// `other_sizes`, curves with the target's field kind and bit length are left out.
 pub fn similar<'a>(
     curves: &'a [CurveTraits],
     target: &CurveTraits,
@@ -171,7 +171,8 @@ mod tests {
         let ranked = similar(&file.curves, target, DEFAULT_WEIGHTS, true);
         assert!(ranked
             .iter()
-            .all(|m| m.curve.field.size_bits != target.field.size_bits));
+            .all(|m| m.curve.field.kind != target.field.kind
+                || m.curve.field.size_bits != target.field.size_bits));
         for m in ranked.iter().take(5) {
             assert_eq!(m.curve.keys["cm"], "-7");
             assert_eq!(m.curve.keys["descent"], "k1|t|=1");
