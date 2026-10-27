@@ -25,9 +25,7 @@
 //! - `newcells --cells m:n:ell,... --seed S --keep K --cmax C`: fresh draws
 //!   exactly as `dreg_ladder` makes them (as `hky_grid newcells`).
 use crypto_lib::binary_ecc::F2mElement;
-use crypto_lib::cryptanalysis::koblitz_bench::{
-    chained_s3_solution_count, chained_solution_count, ladder_sample,
-};
+use crypto_lib::cryptanalysis::koblitz_bench::{chained_solution_count_fast, ladder_sample};
 use crypto_lib::cryptanalysis::koblitz_groebner::{build_decomposition_system, FieldStructure};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
 use rand::rngs::StdRng;
@@ -405,11 +403,10 @@ fn main() {
                     let draw = drawn;
                     drawn += 1;
                     let b1 = F2mElement::one(n);
-                    let sols = if m == 3 {
-                        chained_s3_solution_count(&basis, &x_r, &b1, &irr)
-                    } else {
-                        chained_solution_count(m, &basis, &x_r, &b1, &irr)
-                    };
+                    // Exactly the count of the scans E6–E8 used
+                    // (`fast_chained_count_matches_the_reference`), so the same
+                    // draws are kept; the scan is infeasible at n ≥ 20 (Amendment 10).
+                    let sols = chained_solution_count_fast(m, &basis, &x_r, &b1, &irr);
                     if sols > 0 {
                         continue;
                     }
