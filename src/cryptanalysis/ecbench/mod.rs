@@ -77,6 +77,7 @@ pub mod runner;
 pub mod signals;
 pub mod spec;
 pub mod stats;
+pub mod three_leads;
 pub mod trend;
 pub mod work;
 pub mod wordram_price;
