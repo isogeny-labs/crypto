@@ -1,0 +1,48 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    }
+  ],
+  "description": "Sampled vertices of the levels named in the label, built and verified by `crypto volcano sample`; counted operations only.",
+  "label": "2-volcano, D = -7, depth 24, m = 0, p = 5263679187971873: levels {2}, 5 targets per curve",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 2,
+    "seed": 18,
+    "timeout_seconds": 3600,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 3546389816611683,
+        "b": 597962293835133,
+        "group_order": 5263679049825604,
+        "gx": 1034532030697599,
+        "gy": 2972479732484144,
+        "kind": "prime_explicit",
+        "p": 5263679187971873,
+        "r": 1315919762456401
+      },
+      {
+        "a": 1023953319794090,
+        "b": 3029300877889016,
+        "group_order": 5263679049825604,
+        "gx": 4698883977745496,
+        "gy": 760992793115255,
+        "kind": "prime_explicit",
+        "p": 5263679187971873,
+        "r": 1315919762456401
+      }
+    ],
+    "target_seed": 20261018,
+    "targets_per_curve": 5
+  }
+}

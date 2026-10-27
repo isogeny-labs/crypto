@@ -1,5 +1,5 @@
 //! Emit `research/fall_degree_bounds_20261008/lean/FallDegree/Data.lean`
-//! from the E3, E4, E6 and E7 run records, for the Lean scoring in
+//! from the E3, E4, E6, E7 and E8 run records, for the Lean scoring in
 //! `FallDegree/Rule.lean` and `Verdict.lean`.
 //!
 //! Usage: `fall_degree_lean_data <study_dir> <out.lean>`
@@ -105,9 +105,34 @@ fn main() {
     // E7 (Amendments 7, 8): kind 4, one shape per (m, n, ℓ) cell
     for f in files(&dir.join("e7"), "E7_") {
         for r in lines(&f) {
-            let (m, n, ell) = (r["m"].as_u64().unwrap(), r["n"].as_u64().unwrap(), r["ell"].as_u64().unwrap());
+            let (m, n, ell) = (
+                r["m"].as_u64().unwrap(),
+                r["n"].as_u64().unwrap(),
+                r["ell"].as_u64().unwrap(),
+            );
             rows.push(Row {
                 kind: 4,
+                m,
+                n,
+                ell,
+                shape: format!("n{n}l{ell}m{m}"),
+                value: r["d_f"].as_u64(),
+                cap: r["d_f_at_least"].as_u64().map_or(4, |x| x - 1),
+                dstar: None,
+                at_least: false,
+            });
+        }
+    }
+    // E8 (Amendment 9): kind 5, d_F against m at fixed (n, ℓ)
+    for f in files(&dir.join("e8"), "E8_") {
+        for r in lines(&f) {
+            let (m, n, ell) = (
+                r["m"].as_u64().unwrap(),
+                r["n"].as_u64().unwrap(),
+                r["ell"].as_u64().unwrap(),
+            );
+            rows.push(Row {
+                kind: 5,
                 m,
                 n,
                 ell,
