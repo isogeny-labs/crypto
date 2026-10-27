@@ -40,8 +40,9 @@
   for both `c2pnb176w1` and `c2pnb272w1`, with 48,921,052 nominal half-split
   places, smoothness log2 fraction -26.328277, and model relation-query
   log2 count 51.872229. It independently reproduces the transfer registry's
-  71.336 and 71.774 log2 destination prices from the pinned source cost
-  parameters. The receipt retains every candidate price and the exact
+  74.835 and 74.879 log2 destination prices from the pinned source cost
+  parameters (71.336 and 71.774 before #1983 measured the Jacobian
+  group-operation cost). The receipt retains every candidate price and the exact
   smoothness numerator, with null fields for curve-specific arithmetic and
   measured relation stages.
 - The binary GHS criterion now requires actual usable base classes,
@@ -504,3 +505,7 @@ The new Lean module proves unique extension for every assignment of the old
 logarithms. The validator now checks 26 indexed criteria and 38 WAM1
 research checks; this is a registry and static-site-data update, not a new
 hosted deployment.
+
+## Merged-tree artifact hashes
+
+The canonical `ARTIFACTS.sha256` now checks the merged tree. The exact manifests from the two merge parents are retained as `ARTIFACTS.pr-2116-head-11f29e2.sha256` and `ARTIFACTS.target-2d84f819.sha256`; their original file contents are also preserved in their respective parent commits.
