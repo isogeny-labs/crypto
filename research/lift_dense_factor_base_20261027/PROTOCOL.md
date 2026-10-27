@@ -187,3 +187,12 @@ s the empirical per-target SD.
 identical to those of the confirmatory run. The output goes to
 `reports/run-20261027T0356Z/lines_amend1/rows.jsonl`. The kmax, count and
 c2pnb parts are not rerun, and their verdicts stand as scored.
+
+## Amendment 2 (2026-10-27, after the run): rustfmt only
+
+The CI job `rustfmt (changed files)` requires formatted sources, so
+`cargo fmt` was applied to `src/main.rs`. Formatting changes no logic.
+Equivalence was checked by running quick mode before and after the change:
+the rows (173 lines, `secs` fields removed) are byte-identical, sha256
+`591f531e…0ff0` both times. Every result was produced by the pre-format
+binary (sha256 of its source in `AMEND1.sha256`).

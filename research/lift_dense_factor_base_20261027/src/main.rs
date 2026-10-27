@@ -79,7 +79,10 @@ impl Fq {
             found = true;
             break;
         }
-        assert!(found, "no generator: poly {poly:#x} not irreducible for n = {n}");
+        assert!(
+            found,
+            "no generator: poly {poly:#x} not irreducible for n = {n}"
+        );
         for i in 0..q1 {
             exp[q1 + i] = exp[i];
         }
@@ -405,7 +408,9 @@ fn count_in(s: &Bits, basis: &[u32]) -> u64 {
 
 fn random_basis(n: u32, l: usize, rng: &mut Rng) -> Vec<u32> {
     loop {
-        let b: Vec<u32> = (0..l).map(|_| 1 + rng.below((1u64 << n) - 1) as u32).collect();
+        let b: Vec<u32> = (0..l)
+            .map(|_| 1 + rng.below((1u64 << n) - 1) as u32)
+            .collect();
         if rank(&b) == l {
             return b;
         }
@@ -507,7 +512,11 @@ fn structured(f: &Fq, s: &Bits, a: u32, b: u32, tries: usize, rng: &mut Rng) -> 
                     .map(|i| if lin[i] == 1 { vb[i] ^ vb[p] } else { vb[i] })
                     .collect()
             };
-            if !cand.is_empty() && rank(&cand) == cand.len() && all_lift(s, &cand) && cand.len() > best.1 {
+            if !cand.is_empty()
+                && rank(&cand) == cand.len()
+                && all_lift(s, &cand)
+                && cand.len() > best.1
+            {
                 best = (d, cand.len());
             }
         }
@@ -528,7 +537,10 @@ fn null_log2_count(n: u32, k: u32) -> f64 {
 }
 
 fn null_kmax(n: u32) -> u32 {
-    (1..n).filter(|&k| null_log2_count(n, k) >= 0.0).max().unwrap_or(1)
+    (1..n)
+        .filter(|&k| null_log2_count(n, k) >= 0.0)
+        .max()
+        .unwrap_or(1)
 }
 
 // --------------------------------------------------------- curves (m=2) ----
@@ -539,7 +551,11 @@ struct Pt {
     y: u32,
     inf: bool,
 }
-const O: Pt = Pt { x: 0, y: 0, inf: true };
+const O: Pt = Pt {
+    x: 0,
+    y: 0,
+    inf: true,
+};
 
 struct Curve {
     a: u32,
@@ -556,7 +572,11 @@ impl Curve {
         if p.inf {
             *p
         } else {
-            Pt { x: p.x, y: p.y ^ p.x, inf: false }
+            Pt {
+                x: p.x,
+                y: p.y ^ p.x,
+                inf: false,
+            }
         }
     }
     fn add(&self, f: &Fq, p: &Pt, q: &Pt) -> Pt {
@@ -573,12 +593,20 @@ impl Curve {
             let lam = p.x ^ f.mul(p.y, f.inv(p.x));
             let x3 = f.sq(lam) ^ lam ^ self.a;
             let y3 = f.sq(p.x) ^ f.mul(lam ^ 1, x3);
-            return Pt { x: x3, y: y3, inf: false };
+            return Pt {
+                x: x3,
+                y: y3,
+                inf: false,
+            };
         }
         let lam = f.mul(p.y ^ q.y, f.inv(p.x ^ q.x));
         let x3 = f.sq(lam) ^ lam ^ p.x ^ q.x ^ self.a;
         let y3 = f.mul(lam, p.x ^ x3) ^ x3 ^ p.y;
-        Pt { x: x3, y: y3, inf: false }
+        Pt {
+            x: x3,
+            y: y3,
+            inf: false,
+        }
     }
     /// A lift of x != 0 to E(F_q), if x lifts.
     fn lift(&self, f: &Fq, x: u32) -> Option<Pt> {
@@ -586,7 +614,11 @@ impl Curve {
         if f.tr(w) != 0 {
             return None;
         }
-        let p = Pt { x, y: f.mul(x, f.ht(w)), inf: false };
+        let p = Pt {
+            x,
+            y: f.mul(x, f.ht(w)),
+            inf: false,
+        };
         assert!(self.on(f, &p));
         Some(p)
     }
@@ -595,7 +627,15 @@ impl Curve {
 /// Mean number of unordered pairs {P, Q} of factor-base points (x in V)
 /// with P + Q = R, over `targets` uniform R, and the counting prediction
 /// k(2k+1) / #E from |V ∩ L| = k.
-fn yield_m2(f: &Fq, cv: &Curve, s: &Bits, basis: &[u32], targets: usize, order: u64, rng: &mut Rng) -> (f64, f64, u64) {
+fn yield_m2(
+    f: &Fq,
+    cv: &Curve,
+    s: &Bits,
+    basis: &[u32],
+    targets: usize,
+    order: u64,
+    rng: &mut Rng,
+) -> (f64, f64, u64) {
     let n = f.n;
     let mut inv = Bits::new(n);
     let mut fb: Vec<Pt> = vec![];
@@ -684,7 +724,11 @@ impl AsSolver {
 fn lift_any(f: &Fq, asv: &AsSolver, cv: &Curve, x: u32) -> Option<Pt> {
     let w = x ^ cv.a ^ f.mul(cv.b, f.inv(f.sq(x)));
     let z = asv.solve(w)?;
-    let p = Pt { x, y: f.mul(x, z), inf: false };
+    let p = Pt {
+        x,
+        y: f.mul(x, z),
+        inf: false,
+    };
     assert!(cv.on(f, &p));
     Some(p)
 }
@@ -716,7 +760,14 @@ fn tr_rel(f: &Fq, z: u32, d: u32) -> u32 {
 
 /// Ordered m-tuples of factor-base points summing to R, averaged over
 /// uniform targets; exact prediction |FB|^m / #E.
-fn yield_ordered(f: &Fq, cv: &Curve, fb: &[Pt], inv: &Bits, m: usize, targets: &[Pt]) -> (f64, f64) {
+fn yield_ordered(
+    f: &Fq,
+    cv: &Curve,
+    fb: &[Pt],
+    inv: &Bits,
+    m: usize,
+    targets: &[Pt],
+) -> (f64, f64) {
     if fb.is_empty() {
         return (0.0, 0.0);
     }
@@ -812,7 +863,13 @@ fn run_lines(n_field: u32, poly: u32, d: u32, quick: bool) -> Vec<String> {
         }
         let u = u_found.unwrap_or(1);
         // common targets: uniform points of E(F_q)
-        let nt = if quick { 100 } else if m >= 4 { 300 } else { 4000 };
+        let nt = if quick {
+            100
+        } else if m >= 4 {
+            300
+        } else {
+            4000
+        };
         let targets: Vec<Pt> = (0..nt)
             .map(|_| loop {
                 let x = 1 + rng.below(f.q1 as u64) as u32;
@@ -855,7 +912,17 @@ fn run_lines(n_field: u32, poly: u32, d: u32, quick: bool) -> Vec<String> {
 }
 
 /// (N, d) cells for the composite-degree line study.
-const LINE_CELLS: &[(u32, u32)] = &[(12, 6), (16, 8), (20, 10), (18, 9), (15, 5), (21, 7), (18, 6), (16, 4), (20, 5)];
+const LINE_CELLS: &[(u32, u32)] = &[
+    (12, 6),
+    (16, 8),
+    (20, 10),
+    (18, 9),
+    (15, 5),
+    (21, 7),
+    (18, 6),
+    (16, 4),
+    (20, 5),
+];
 
 // -------------------------------------------------------------- driver ----
 
@@ -884,13 +951,31 @@ fn run_n(n: u32, poly: u32, quick: bool) -> Vec<String> {
     let f = Fq::new(n, poly);
     let mut rng = Rng::new("curves", n);
     let mut insts: Vec<Inst> = vec![];
-    insts.push(Inst { arm: "curve", label: "koblitz_a0_b1".into(), a: 0, b: 1, s: lift_set(&f, 0, 1) });
-    insts.push(Inst { arm: "curve", label: "koblitz_a1_b1".into(), a: 1, b: 1, s: lift_set(&f, 1, 1) });
+    insts.push(Inst {
+        arm: "curve",
+        label: "koblitz_a0_b1".into(),
+        a: 0,
+        b: 1,
+        s: lift_set(&f, 0, 1),
+    });
+    insts.push(Inst {
+        arm: "curve",
+        label: "koblitz_a1_b1".into(),
+        a: 1,
+        b: 1,
+        s: lift_set(&f, 1, 1),
+    });
     let extra = if n <= 11 && !quick { 24 } else { 4 };
     for i in 0..extra {
         let a = (i % 2) as u32;
         let b = 2 + rng.below(f.q1 as u64 - 1) as u32;
-        insts.push(Inst { arm: "curve", label: format!("random_{i}"), a, b, s: lift_set(&f, a, b) });
+        insts.push(Inst {
+            arm: "curve",
+            label: format!("random_{i}"),
+            a,
+            b,
+            s: lift_set(&f, a, b),
+        });
     }
     // density-matched nulls: null_i is a uniformly random set with exactly
     // the lift-set size of curve i (paired), so subspace counts compare at
@@ -915,7 +1000,13 @@ fn run_n(n: u32, poly: u32, quick: bool) -> Vec<String> {
         let tag = format!("null_{i}");
         let size = members(n, &insts[i].s).len();
         let s = make_null(&tag, size);
-        insts.push(Inst { arm: "null", label: tag, a: 0, b: 0, s });
+        insts.push(Inst {
+            arm: "null",
+            label: tag,
+            a: 0,
+            b: 0,
+            s,
+        });
     }
     let kp = (null_kmax(n) + 3).min(n - 2);
     for i in 0..3 {
@@ -946,7 +1037,13 @@ fn run_n(n: u32, poly: u32, quick: bool) -> Vec<String> {
                 added -= 1;
             }
         }
-        insts.push(Inst { arm: "planted", label: tag, a: 0, b: 0, s });
+        insts.push(Inst {
+            arm: "planted",
+            label: tag,
+            a: 0,
+            b: 0,
+            s,
+        });
     }
 
     let exact = n <= 13 && !quick;
@@ -1052,7 +1149,10 @@ fn run_n(n: u32, poly: u32, quick: bool) -> Vec<String> {
         // against random subspaces of the same dimension.
         if n % 2 == 1 && n >= 11 {
             let inst = &insts[0];
-            let cv = Curve { a: inst.a, b: inst.b };
+            let cv = Curve {
+                a: inst.a,
+                b: inst.b,
+            };
             let order = 2 + 2 * members(n, &inst.s).len() as u64;
             let dense = &res[0].1;
             let l = dense.len();
@@ -1063,7 +1163,9 @@ fn run_n(n: u32, poly: u32, quick: bool) -> Vec<String> {
             for j in 0..4 {
                 let b = random_basis(n, l, &mut ry);
                 let (mr, pr, kr) = yield_m2(&f, &cv, &inst.s, &b, targets, order, &mut ry);
-                rnd.push(format!("{{\"j\":{j},\"k\":{kr},\"mean\":{mr:.6},\"pred\":{pr:.6}}}"));
+                rnd.push(format!(
+                    "{{\"j\":{j},\"k\":{kr},\"mean\":{mr:.6},\"pred\":{pr:.6}}}"
+                ));
             }
             rows.push(format!(
                 "{{\"kind\":\"yield_m2\",\"n\":{n},\"label\":\"{}\",\"order\":{order},\"l\":{l},\"targets\":{targets},\"dense\":{{\"k\":{kd},\"mean\":{md:.6},\"pred\":{pd:.6}}},\"random\":{}}}",
@@ -1107,7 +1209,10 @@ fn main() {
             writeln!(fh, "{r}").unwrap();
         }
         fh.flush().unwrap();
-        eprintln!("lines N = {nf}, d = {d}: {:.1} s", t.elapsed().as_secs_f64());
+        eprintln!(
+            "lines N = {nf}, d = {d}: {:.1} s",
+            t.elapsed().as_secs_f64()
+        );
     }
     let mut run = std::fs::File::create(format!("{out}/run.json")).unwrap();
     writeln!(
