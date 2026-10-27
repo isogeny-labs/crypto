@@ -36,7 +36,8 @@ host-pressure gate.
 The versioned [`runner_v1.py`](evidence-01/runner_v1.py) matches the executed
 wrapper byte for byte. Its config, terminal receipt, samples, empty producer
 output and file hashes are in [`evidence-01`](evidence-01/). Run
-`python3 audit.py` here to check that bundle; it returns
+`cargo run --release --locked --bin n83_k4405_audit` from the repository root
+to check that bundle; it returns
 `PASS_BOUNDED_HOST_SWAP_ABORT_RECEIPT`. A producer summary, base dump,
 relation matrix and target receipt were not emitted before the stop.
 The [source-linked visual report](reports/run-20261026T2210Z/README.md)
