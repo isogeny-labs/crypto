@@ -403,7 +403,7 @@ See `e11/ENGINE.md`.
 
 ## E12 (Amendment 11): interim state, 2026-10-27 20:40 UTC
 
-No E12 part has a registered reading yet. This section records what is fixed so far.
+No E12 part has a registered reading yet. This section records what is fixed so far (updated 2026-10-27 22:10 UTC with E12b r2).
 
 **Lean (E12b, job r1).** The `FallDegree` package builds with `lake build`
 (`e12/run-b1/out/lean/status`: `exit=0`; `lake.log`: "Build completed successfully
@@ -420,20 +420,31 @@ Amendment 11 allows one relaunch per interruption, and both jobs have used it. U
 rules they are **not completed**, with no data, and have **no reading**. A third attempt needs
 a new amendment before launch.
 
-**E12b: being relaunched.** Job r1 (`run-b1`) was Spot-reclaimed at 3:24:7, partway
-through. Its finished draws are listed below for the record. They are **not scored**: the
-Amendment-11 relaunch r2 (`e12/launch3.card.yaml`, launched 18:11 UTC, m7i.4xlarge, 24 h TTL)
-reruns every cell from scratch on the same archive, and only r2 is scored.
+**E12b: both attempts reclaimed at 3:24:7.** The first attempt (r1, `run-b1`) and the one
+Amendment-11 relaunch (r2, `run-b2`; job `20261027-181036-fd-e12b-ell-20261027-r2-409f97`,
+m7i.4xlarge Spot, archive commit `371035216942`) both passed gates 0–3. Both finished 3:30:4,
+3:27:5 and 3:24:6, and draw 0 of 3:24:7. Both were then SIGTERM'd by a Spot reclaim, r2 at
+19:06 UTC. r2 reproduces r1 exactly on every non-timing field (13/13 draws: `d_F`,
+per-degree dimensions and rounds, `v_basis`, `x_r`, solution count). The relaunch budget is
+spent.
 
-| cell (m:n:ℓ) | N | r1 draws, `d_F` |
-|:--|--:|:--|
-| 3:30:4 | 42 | 4 4 4 4 |
-| 3:27:5 | 42 | 4 4 4 4 |
-| 3:24:6 | 42 | 4 4 4 4 |
-| 3:24:7 | 45 | ≥5 (draw 0 only; r1 was killed before draws 1–3) |
+| cell (m:n:ℓ) | N | status | `d_F` per draw (r2) | median |
+|:--|--:|:--|:--|:--|
+| 3:30:4 | 42 | completed | 4 4 4 4 | 4 |
+| 3:27:5 | 42 | completed | 4 4 4 4 | 4 |
+| 3:24:6 | 42 | completed | 4 4 4 4 | 4 |
+| 3:24:7 | 45 | **not completed** (1 of 4 draws) | ≥5 | — |
 
-The r2 draws use the same seed (20261012) and the same archive, so they should reproduce
-these values. If they differ, that is a finding.
+Against the Amendment 11 rules:
+- **"`n`-driven" is excluded.** It needs 3:30:4 and 3:27:5 at median `≥ 5`; both are 4.
+- **"Consistent with H_ℓ"** needs the three `ℓ ≤ 6` cells at median `≤ 4`, which holds, and
+  3:24:7 at median `≥ 5`. 3:24:7 is not completed, with one finished draw, which is censored
+  at `≥ 5`. Amendment 11 says a cell that does not complete is reported "with whatever
+  finished". It does not say whether one draw gives a median. **The reading is therefore
+  left open** between "consistent with H_ℓ (on one 3:24:7 draw)" and "mixed". It is decided
+  only by a registered amendment or a completed 3:24:7 cell, not here.
+
+The Lean build passed again on r2 (`run-b2/out/lean/status`: `exit=0`).
 
 **Cross-check (`hky_crosscheck`, 3:21:7 draw 0).** Both local attempts were lost to container
 restarts (`e10/crosscheck/attempt{1,2}_lost_on_container_restart.*`). Attempt 2 ran about
