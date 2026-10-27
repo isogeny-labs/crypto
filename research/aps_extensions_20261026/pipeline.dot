@@ -1,0 +1,22 @@
+digraph APS {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.2", ranksep="0.35",
+         label="APS single-relation correctness instrument · 2026-10-26\nSolid path: implemented on tiny public fixtures · Performance panel: pending",
+         labelloc=t, fontname="Helvetica", fontsize=15];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fb", color="#365979",
+        fontname="Helvetica", fontsize=11, margin="0.12,0.08"];
+  edge [color="#526477", arrowsize=0.7, fontname="Helvetica", fontsize=10];
+  instance [label="Public (E,G,Q,n)\nTarget logarithm excluded from solver arguments"];
+  labels [label="Known labels R = uG + vQ\nRandom or fixed coefficients · validated signs and orders"];
+  bases [label="Distinct coordinate base\nRandom lists or verified automorphism orbits"];
+  enc [label="Equation choices\nPartitioned S3 · cubic divisor · two-pair blocks\nExpanded S4 · joined S3 · hybrid · covering family"];
+  solve [label="Existing native F4 + substitution\nShared branch budgets · explicit incomplete status"];
+  verify [label="Decode roots and signs · check point sum\nAG + BQ = O · reject B = 0 · verify (-A/B)G = Q", fillcolor="#e6f3e9"];
+  oracle [label="Unit-test oracle\nExhaustive point addition; separate from polynomial solving",
+          fillcolor="#fff4dd", color="#947032"];
+  pending [label="Pending performance validation\nComplete accounting + replay + frozen protocol\nS3 checkpoint + matched controls/rho + external solver",
+           fillcolor="#f1f1f1", color="#727272", style="rounded,filled,dashed"];
+  instance -> labels -> bases -> enc -> solve -> verify;
+  bases -> oracle [style=dashed, label="tests only"];
+  oracle -> verify [style=dashed, label="compare full coordinate sets"];
+  verify -> pending [style=dashed, label="correctness does not establish speed"];
+}

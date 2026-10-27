@@ -1,0 +1,158 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hc5181f7d7bd8",
+  "label": "isogeny volcano: BSGS exactness",
+  "spec_id": "ECS1ha23760dc4ae3",
+  "spec_sha256": "a23760dc4ae38c13d159237b5f8cc169c2e082997aa8502d9d310403c26597f2",
+  "env_class_id": "ECBENV2ha20a995299c2",
+  "host_sha256": "429ea53bb6a35c16ca8a609c9879b6d2c9950ab559853bd6ab00e32362dddcd2",
+  "plan_sha256": "27c83c96dccc1d80b3521c43d87dd97296bac8be4cc1403653eab74dd3533750",
+  "binary_sha256": "7da27ec3f0dadbae565181b0faa74582eb94a8f36cf6fe806eecc7b4b1fa7a9f",
+  "git_commit": "de8cd615ce7f0eeb1469c3e6d19257f8be945667",
+  "git_dirty": false,
+  "options": {
+    "cpus": "inherit",
+    "lock_path": "/tmp/crypto-bench-g4.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": {
+    "run_cpu": 3,
+    "reserved": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "node": 0,
+    "request": "inherit",
+    "unreserved_siblings": [],
+    "observed": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "preflight": {
+    "quiet": false,
+    "reasons": [
+      "CPU 3 was busy 2.000s of the 2.0s settle",
+      "PSI cpu some avg10 57.70 > 5.00"
+    ],
+    "settle_seconds": 2.0,
+    "reserved_busy_seconds": {
+      "0": 0.05,
+      "1": 0.05,
+      "2": 0.06,
+      "3": 2.0
+    },
+    "before": {
+      "unix_ms": 1792252549787,
+      "loadavg": [
+        4.0,
+        4.0439453125,
+        4.07373046875
+      ],
+      "psi_cpu_some_avg10": 51.21,
+      "psi_cpu_some_total_us": 21287920143,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 258295,
+          "idle": 2219544,
+          "steal": 10839
+        },
+        "1": {
+          "busy": 294625,
+          "idle": 2169266,
+          "steal": 10756
+        },
+        "2": {
+          "busy": 235045,
+          "idle": 2223830,
+          "steal": 10456
+        },
+        "3": {
+          "busy": 2404765,
+          "idle": 45797,
+          "steal": 26471
+        }
+      }
+    },
+    "after": {
+      "unix_ms": 1792252551787,
+      "loadavg": [
+        4.0,
+        4.0439453125,
+        4.07373046875
+      ],
+      "psi_cpu_some_avg10": 57.7,
+      "psi_cpu_some_total_us": 21289868930,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 258300,
+          "idle": 2219740,
+          "steal": 10839
+        },
+        "1": {
+          "busy": 294630,
+          "idle": 2169459,
+          "steal": 10757
+        },
+        "2": {
+          "busy": 235051,
+          "idle": 2224024,
+          "steal": 10457
+        },
+        "3": {
+          "busy": 2404965,
+          "idle": 45797,
+          "steal": 26472
+        }
+      }
+    }
+  },
+  "eviction": {
+    "moved_count": 0,
+    "failed_user_threads": 51,
+    "failed_kernel_threads": 69
+  },
+  "runner_on_run_cpu": false,
+  "runner_cpus": [
+    0,
+    1,
+    2
+  ],
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792252551800,
+  "finished_unix_ms": 1792252903859,
+  "status": "complete",
+  "executions_planned": 1280,
+  "records_written": 1280,
+  "records_sha256": "15ee3194b0abc201a4a77c0ad3b9eb02147a8332e9384303897e69420f39880c",
+  "status_counts": {
+    "verified": 1280
+  }
+}
