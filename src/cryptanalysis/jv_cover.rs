@@ -2672,6 +2672,90 @@ pub fn rho_e(spec: &Spec, seed: u64) -> RhoRunE {
     }
 }
 
+/// [`rho_e`] on the classes `{±P}`: the negation map, the strongest rho on
+/// this curve (`y² = x³ + a₂x² + a₄x` with `α ∉ F_q` has only `±1` and no
+/// Frobenius acting on it). The same 32 multipliers, exhaustive storage of
+/// canonical representatives (the one of `P`, `−P` with the smaller `y`), the
+/// coefficients negated with the point. Fruitless 2-cycles are avoided by
+/// look-ahead (Wiener–Zuccherato): when the next point would pick the same
+/// multiplier, the next multiplier is tried, and after `r` tries the point is
+/// doubled. Longer fruitless cycles end in a stored collision with `db = 0`,
+/// and the walk restarts. Every group operation is charged.
+pub fn rho_e_neg(spec: &Spec, seed: u64) -> RhoRunE {
+    let f = Fq3::new(spec.p);
+    let ec = EllE::new(&f, &spec.alpha);
+    let n = spec.l;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x8D06);
+    let r = 32usize;
+    let mults: Vec<(u64, u64, PtE6)> = (0..r)
+        .map(|_| {
+            let al = rng.gen_range(0..n);
+            let be = rng.gen_range(1..n);
+            (al, be, ec.add(&ec.mul(&spec.g, al), &ec.mul(&spec.q, be)))
+        })
+        .collect();
+    // (point, a, b) with point = aG + bQ, made canonical in its class {±P}.
+    let canon = |pt: PtE6, a: u64, b: u64| -> (PtE6, u64, u64) {
+        let ny = f.neg(&pt.y);
+        if !pt.inf && ny < pt.y {
+            (PtE6 { x: pt.x, y: ny, inf: false }, (n - a) % n, (n - b) % n)
+        } else {
+            (pt, a, b)
+        }
+    };
+    let index = |pt: &PtE6| -> usize {
+        let h = pt.x.0[0].0[0]
+            ^ pt.x.0[0].0[1].wrapping_mul(0x9E37_79B9)
+            ^ pt.x.0[1].0[0].rotate_left(17)
+            ^ pt.x.0[2].0[1].rotate_left(33);
+        (mix64(h) % r as u64) as usize
+    };
+    let mut table: HashMap<PtE6, (u64, u64)> = HashMap::new();
+    let mut steps = 0u64;
+    let mut found = None;
+    'outer: loop {
+        let a0 = rng.gen_range(0..n);
+        let b0 = rng.gen_range(1..n);
+        let start = ec.add(&ec.mul(&spec.g, a0), &ec.mul(&spec.q, b0));
+        let (mut l, mut a, mut b) = canon(start, a0, b0);
+        loop {
+            steps += 1;
+            if let Some(&(a2, b2)) = table.get(&l) {
+                let db = (b + n - b2) % n;
+                if db != 0 {
+                    let da = (a2 + n - a) % n;
+                    found = Some(mm(da, inv_mod(db, n), n));
+                    break 'outer;
+                }
+                break;
+            }
+            table.insert(l, (a, b));
+            let mut j = index(&l);
+            let mut next = None;
+            for _ in 0..r {
+                let c = canon(ec.add(&l, &mults[j].2), (a + mults[j].0) % n, (b + mults[j].1) % n);
+                if index(&c.0) != j {
+                    next = Some(c);
+                    break;
+                }
+                j = (j + 1) % r;
+            }
+            (l, a, b) = next.unwrap_or_else(|| canon(ec.add(&l, &l), 2 * a % n, 2 * b % n));
+            if steps > 64 * (n as f64).sqrt() as u64 + 1_000_000 {
+                break 'outer;
+            }
+        }
+    }
+    let ops = ec.ops();
+    RhoRunE {
+        seed,
+        steps,
+        group_ops: ops,
+        s: ops as f64 / (n as f64).sqrt(),
+        correct: found == Some(spec.d),
+    }
+}
+
 /// [`rho_e`] without the stored walk (note §15): the same r-adding walk,
 /// `threads` walkers from random starts, a point distinguished when `dp_bits`
 /// bits of its mixed hash vanish, the distinguished points shared between
@@ -3183,6 +3267,14 @@ pub struct CoverDlpReport {
     pub rho_s_mean: f64,
     pub rho_s_sd: f64,
     pub s_over_rho: f64,
+    /// `JV_RHO_NEG=1`: as many [`rho_e_neg`] runs as `rho`, after the clock,
+    /// and `S` over their mean; absent otherwise.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub rho_neg: Vec<RhoRunE>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rho_neg_s_mean: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub s_over_rho_neg: Option<f64>,
     pub relation_over_rho: f64,
     pub r: f64,
     pub r_last: f64,
@@ -3442,6 +3534,17 @@ pub fn run_cover_dlp(
     rep.predicted_s_over_rho =
         360.0 * p as f64 * rep.c_cov / (rep.rho_s_mean * sqrt_l * c_e) + rep.r;
     rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
+    if std::env::var("JV_RHO_NEG").as_deref() == Ok("1") {
+        rep.rho_neg = (0..rho_runs as u64)
+            .into_par_iter()
+            .map(|k| rho_e_neg(&spec, seed * 1000 + k))
+            .collect();
+        if !rep.rho_neg.is_empty() {
+            let m = rep.rho_neg.iter().map(|r| r.s).sum::<f64>() / rep.rho_neg.len() as f64;
+            rep.rho_neg_s_mean = Some(m);
+            rep.s_over_rho_neg = Some(rep.s / m);
+        }
+    }
     rep
 }
 
@@ -4212,6 +4315,22 @@ mod tests {
             applied >= n - 3,
             "applied {applied} fallbacks {fallbacks} of {n}"
         );
+    }
+
+    #[test]
+    fn negation_rho_finds_the_planted_logarithm_in_fewer_operations() {
+        // p = 53: the stored walk on {±P} against the plain one, same seeds;
+        // the negation map should need about 1/sqrt(2) of the operations.
+        let spec = generate_spec(53, 1);
+        let (mut plain, mut neg) = (0.0, 0.0);
+        for run in 0..8u64 {
+            let a = rho_e(&spec, 200 + run);
+            let b = rho_e_neg(&spec, 200 + run);
+            assert!(a.correct && b.correct, "run {run}: {a:?} {b:?}");
+            plain += a.s;
+            neg += b.s;
+        }
+        assert!(neg < plain, "negation map S {neg} not below plain {plain}");
     }
 
     #[test]
