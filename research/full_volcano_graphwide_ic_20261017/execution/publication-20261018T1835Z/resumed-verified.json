@@ -1,0 +1,55 @@
+{
+  "schema": "volcano-publication-resume-readback/v1",
+  "checked_utc": "2026-10-18T19:00:23.433487+00:00",
+  "pid": 50943,
+  "process_readback": "50943       1   50943 Ss   /workspace/volcano_ic_repaired_survey_20261017/volcano-ic-driver run /workspace/volcano_ic_repaired_survey_20261017 24823 177220 6442450944",
+  "native_status": {
+    "campaign": "/workspace/volcano_ic_repaired_survey_20261017",
+    "coverage": [
+      {
+        "graph": "mixed",
+        "state": "audited",
+        "vertices": 2057
+      },
+      {
+        "graph": "mixed",
+        "state": "queued",
+        "vertices": 8013
+      },
+      {
+        "graph": "three",
+        "state": "audited",
+        "vertices": 2038
+      },
+      {
+        "graph": "three",
+        "state": "queued",
+        "vertices": 4522
+      },
+      {
+        "graph": "three",
+        "state": "running",
+        "vertices": 1
+      },
+      {
+        "graph": "two",
+        "state": "audited",
+        "vertices": 2044
+      },
+      {
+        "graph": "two",
+        "state": "queued",
+        "vertices": 6148
+      }
+    ]
+  },
+  "new_audited_progress": true,
+  "log_tail": [
+    "1792350003778 RUN mixed-v2053 attempt 1",
+    "1792350006047 audited mixed-v2053: {\"exhausted\":2,\"verified\":14}",
+    "1792350006197 RUN two-v2041 attempt 1",
+    "1792350008736 audited two-v2041: {\"exhausted\":6,\"verified\":10}",
+    "1792350008887 RUN three-v2037 attempt 1"
+  ],
+  "scope": "Actual own-session, PPID1, non-zombie process; native progress required separately from a stale running row. Original deadline/6GiB cap and mathematical budgets unchanged; no host-survival guarantee."
+}

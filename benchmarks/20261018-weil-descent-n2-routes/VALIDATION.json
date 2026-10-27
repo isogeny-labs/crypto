@@ -1,0 +1,43 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "2da4ce0d43e813c2c1ec127bde69785dad355cd34d5a7fd62033f46dfa9394e4"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "3f2fc340d45cbe98f18c7c4f4050ebb0fdf30ba7a48ddcff11fb66cd67a21806"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "unit": "counted F_p operations (M, I, native) priced in GAE; 1 GAE = the run's own measured affine E(F_{p^2}) addition at I = 3M",
+  "binary_or_process": "examples/n2_routes.rs: rho (arm R) and the index-calculus arms run in the same process and thread, on the same instance and targets, with the same counters and the same pricing function",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "protocol": "research/weil_descent_angles_20261018/PROTOCOL.md, Amendments C, E, G and Erratum V: rho with the negation map, r = 64, distinguished-point trails, fruitless-cycle escape (K6: 0.886*sqrt(ell)/p). j(E) is never in F_p and never 0 or 1728 on any instance, so the only automorphisms are +-1 (validator check)",
+  "gae_band": {
+   "0": {
+    "ic": 1264882.0,
+    "rho": 453373.2
+   },
+   "0.1": {
+    "ic": 1532832.0,
+    "rho": 540461.6
+   },
+   "1": {
+    "ic": 3944376.0,
+    "rho": 1324257.0
+   }
+  },
+  "order_holds_across_band": true,
+  "note": "Arm J, c = 1, 40 bits (log2 #E), I = 3M, measured Jacobian cost, cost per solve in GAE. Rho is cheaper at all three points (2.79x / 2.84x / 2.98x); c = 2 and c = 4 give the same order. Over the full 12-cell band of Amendment C (I price x Jacobian pricing x native weight) the ranking is unresolved at every size, 0.51-2.98."
+ },
+ "validation": {
+  "id": "VAL-20261024-wd3",
+  "report": "research/weil_descent_angles_20261018/validation/validation_report.yaml",
+  "verifier": "research/weil_descent_angles_20261018/validation/verify_dump.rs",
+  "tool_commit": "d01c574a271dbf8d04b19636d4612cf9926915eb"
+ }
+}

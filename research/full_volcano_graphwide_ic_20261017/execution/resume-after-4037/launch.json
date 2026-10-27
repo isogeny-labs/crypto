@@ -1,0 +1,68 @@
+{
+  "schema": "volcano-outer-execution-envelope/v1",
+  "created_utc": "2026-10-17T20:13:41.721916+00:00",
+  "baseline_vertices": 4037,
+  "queue_vertices": 24823,
+  "argv": [
+    "/workspace/volcano_ic_repaired_survey_20261017/volcano-ic-driver",
+    "run",
+    "/workspace/volcano_ic_repaired_survey_20261017",
+    "24823",
+    "259200",
+    "6442450944"
+  ],
+  "previous_outer_guards": {
+    "seconds": 86400,
+    "spool_bytes": 2147483648
+  },
+  "new_outer_guards": {
+    "seconds": 259200,
+    "spool_bytes": 6442450944
+  },
+  "change": "Operational time/storage envelope only; frozen solver, queue, two targets, one round, bases16/64,4096 source trials and 3-second child watchdog unchanged. New runtime epoch; clocks unqualified.",
+  "frozen_sha256": {
+    "ecbench": "35d89073f4d666b094c213a1d31b0c819b63600123e067c111af3c947d7609a9",
+    "volcano-ic-driver": "b8b489c7225c64ed492ffce39286c995f5ca820960956cf706c0d3110f5bdd2d",
+    "queue.jsonl": "45e277bede6017c30a49405096afefab3d34a18553ecd6b1a79238f2b9559728"
+  },
+  "free_bytes_before": 10427092992,
+  "before_status": {
+    "campaign": "/workspace/volcano_ic_repaired_survey_20261017",
+    "coverage": [
+      {
+        "graph": "mixed",
+        "state": "audited",
+        "vertices": 1356
+      },
+      {
+        "graph": "mixed",
+        "state": "queued",
+        "vertices": 8714
+      },
+      {
+        "graph": "three",
+        "state": "audited",
+        "vertices": 1338
+      },
+      {
+        "graph": "three",
+        "state": "queued",
+        "vertices": 5223
+      },
+      {
+        "graph": "two",
+        "state": "audited",
+        "vertices": 1343
+      },
+      {
+        "graph": "two",
+        "state": "queued",
+        "vertices": 6849
+      }
+    ]
+  },
+  "scope": "Bounded survey, not full original matrix or A/C/D/E completion. Process survival across host interruption and unattended uploads are not guaranteed.",
+  "pid": 97646,
+  "log_path": "/workspace/volcano_ic_repaired_survey_20261017/worker-resume-after-4037.log",
+  "launch_utc": "2026-10-17T20:13:41.722914+00:00"
+}

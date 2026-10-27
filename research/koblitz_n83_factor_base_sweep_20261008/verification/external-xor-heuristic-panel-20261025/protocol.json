@@ -1,0 +1,43 @@
+{
+  "schema": "n83.external-xor-heuristic-panel-protocol/v1",
+  "study": "koblitz_n83_factor_base_sweep_20261008",
+  "curve_slug": "icv1-f2m83-tm6151469093347-debefd74",
+  "source_commit": "fd488218620e4dbacc42a7e6ea5812dd3e52a0f6",
+  "input_export_commit": "fd488218620e4dbacc42a7e6ea5812dd3e52a0f6",
+  "worker_binary_sha256": "7c15310f0ede9d6fdb62af9b4c1eb4e1f5cfe527350118b1d38854bc66936108",
+  "solver_binary_sha256": "a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac",
+  "solver_version": "CryptoMiniSat version 5.14.7",
+  "host": "Darwin arm64, L0 local, sequential processes",
+  "inputs": {
+    "hash_5_1": {
+      "xcnf_sha256": "2c6dba1feabb28bc6b064268a1f53ebe3b0ecd8aa731d26b31016830ce431022",
+      "pool_object_blake3": "b4dda45e6c3edfca673db6f3f82c16cce8c860f5e62c092155258df399a0363e",
+      "pool_object_sha256": "3e85c9e419fcddd3c9faed3c84470bf96fcad9178e48e1d73629369335841ecf"
+    },
+    "gray_5_1": {
+      "xcnf_sha256": "220eaeb04a43ee8c853b637d6255420e2e341c6bb3e5f3588ca1295529b327e9",
+      "pool_object_blake3": "966a0493c96674f0af6d184615ed05309d08fba5c7342957b4186cd50366dc47",
+      "pool_object_sha256": "df02963d1706fa7a64fd7558d88db79b23ea34801ac58062c4c500113e8c57fe"
+    }
+  },
+  "base_object_blake3": "3888e2597fd3519807c9d722f49f83329c93ce5cb0929501cf7cb7cbc3cab1a0",
+  "base_object_sha256": "8463aaf30365d6f6f5d6b189aff4e8afcb6c8305ec27c216700776cbdccba29d",
+  "common_solver_flags": ["--verb", "1", "--verbstat", "1", "--threads", "1", "--random", "0", "--maxtime", "120", "--maxconfl", "1000000", "--printsol", "1"],
+  "conflict_cap": 1000000,
+  "solver_time_cap_seconds": 120,
+  "process_watchdog_seconds": 140,
+  "arms": [
+    {"id": "hash_A1", "input": "hash_5_1", "branchstr": "vmtf+vsids", "autodisablegauss": 1},
+    {"id": "gray_A1", "input": "gray_5_1", "branchstr": "vmtf+vsids", "autodisablegauss": 1},
+    {"id": "hash_B", "input": "hash_5_1", "branchstr": "vsids", "autodisablegauss": 1},
+    {"id": "gray_B", "input": "gray_5_1", "branchstr": "vsids", "autodisablegauss": 1},
+    {"id": "hash_C", "input": "hash_5_1", "branchstr": "vmtf+vsids", "autodisablegauss": 0},
+    {"id": "gray_C", "input": "gray_5_1", "branchstr": "vmtf+vsids", "autodisablegauss": 0},
+    {"id": "hash_D", "input": "hash_5_1", "branchstr": "vsids", "autodisablegauss": 0},
+    {"id": "gray_D", "input": "gray_5_1", "branchstr": "vsids", "autodisablegauss": 0},
+    {"id": "hash_A2", "input": "hash_5_1", "branchstr": "vmtf+vsids", "autodisablegauss": 1},
+    {"id": "gray_A2", "input": "gray_5_1", "branchstr": "vmtf+vsids", "autodisablegauss": 1}
+  ],
+  "stop_rule": "Run all arms in order unless an arm is SAT, has a nonstandard solver exit, or reaches the process watchdog. A SAT model must pass exact external-model replay before interpretation; halt for model blocking or relation accounting. Preserve every stopped or censored arm.",
+  "selected_best_total_runtime": null
+}
