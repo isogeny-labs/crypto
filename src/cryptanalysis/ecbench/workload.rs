@@ -213,6 +213,7 @@ pub enum CurveSpec {
         alpha: [u64; 6],
         l: u64,
         generator: [String; 2],
+    },
     /// `hyperelliptic_ic_bench::thread_instance(p, genus)`: the
     /// hyperelliptic thread's curve `y² = f(x)`, `deg f = 2g + 1`, over
     /// `F_p` (`p < 256`, `g ∈ {2, 3, 4}`), its generator `D₁` of prime
