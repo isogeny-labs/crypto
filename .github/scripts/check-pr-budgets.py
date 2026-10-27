@@ -22,6 +22,18 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # Named jobs whose routine PR budget is longer than 25 minutes, each with the
 # reason. Exact on workflow path, job name and timeout; nothing else matches.
 NAMED_BUDGET_EXCEPTIONS = {
+    (".github/workflows/phase-paired-native.yml", "replay"): {
+        "timeout": 45,
+        "reason": "Full native phase-paired replay and committed output comparison",
+    },
+    (".github/workflows/planner-proofs-lean.yml", "lean"): {
+        "timeout": 45,
+        "reason": "Lean certificate regeneration, theorem audit, and leanchecker replay",
+    },
+    (".github/workflows/validation-gate.yml", "gate"): {
+        "timeout": 30,
+        "reason": "Repository-wide validation gate with base-tip fetch and row replay",
+    },
     (".github/workflows/release.yml", "isogeny"): {
         "timeout": 45,
         # Run 39652680641, job 119434898023 exhausted 25 minutes during
