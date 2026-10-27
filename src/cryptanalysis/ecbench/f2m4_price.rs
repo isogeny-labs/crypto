@@ -586,6 +586,13 @@ pub struct IcContext<'a> {
     /// for large-prime merges (`lp_merge_mulmods`), replaced here by the
     /// counted arithmetic.
     pub lp_estimate: u64,
+    /// The Weil-restriction system build and the interpolation
+    /// precomputation, as the pipeline counted them inside `solver_ops`
+    /// (this file's schoolbook `F_{q⁴}` arithmetic), and what the same
+    /// work costs in this context's unit.  Both 0 for the current unit,
+    /// which keeps the count as it is.
+    pub f4_in_solver: u64,
+    pub f4_in_solver_priced: f64,
     /// Which multiplication modulo `r` prices `row_op`, `lp_mulmod` and
     /// `scalar_mulmod`.
     pub mulmod: Mulmod,
@@ -659,7 +666,10 @@ pub fn reprice_ic(
                     "solver_ops" => {
                         // The pipeline's operations include its estimate for
                         // the large-prime merges; those are counted below.
-                        counted += (count - ctx.lp_estimate.min(count)) as f64 / per_add;
+                        let f4 = ctx.f4_in_solver.min(count - ctx.lp_estimate.min(count));
+                        counted += ((count - ctx.lp_estimate.min(count) - f4) as f64
+                            + ctx.f4_in_solver_priced)
+                            / per_add;
                     }
                     "sqrt_solves" => {
                         counted += count as f64 * (ctx.lift_muls + ctx.x_of_t_muls) / per_add;

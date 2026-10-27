@@ -1020,6 +1020,10 @@ pub struct SymmetrisedBin {
     pub coef: Vec<[Eb; 9]>,
     pub checked_points: usize,
     pub precompute_muls: u64,
+    /// The same bracket under the reference prices ([`Fq4::ref_muls`]) and
+    /// under the second model ([`Fq4::ref_muls_poly`]).
+    pub precompute_ref_muls: u64,
+    pub precompute_ref_poly_muls: u64,
 }
 
 impl SymmetrisedBin {
@@ -1068,6 +1072,7 @@ impl SymmetrisedBin {
     pub fn precompute(curve: &CurveB, rng: &mut StdRng, checks: usize) -> Result<Self, String> {
         let f = &curve.f;
         let before = f.f.muls();
+        let (rbefore, pbefore) = (f.ref_muls(), f.ref_muls_poly());
         let nodes = Self::nodes();
         // Inverse Vandermonde: coefficient j of the polynomial through the
         // nodes is Σ_k vinv[j][k] · value_k.
@@ -1144,6 +1149,8 @@ impl SymmetrisedBin {
                 coef,
                 checked_points: checks,
                 precompute_muls: f.f.muls() - before,
+                precompute_ref_muls: f.ref_muls().wrapping_sub(rbefore),
+                precompute_ref_poly_muls: f.ref_muls_poly().wrapping_sub(pbefore),
             });
         }
         Err("the interpolation system was singular eight times".into())
@@ -1909,6 +1916,19 @@ fn split_roots(f: &Gf2q, h: Vec<Fe>, out: &mut Vec<Fe>, mut seed: u32, muls: &mu
     }
 }
 
+/// Add one solve's Weil-restriction `F_{q⁴}` work (system build, charged to
+/// the solver's operations) to the oracle's `extra` counters: the
+/// schoolbook count, the reference-priced count and the second model's.
+fn add_weil(extra: &mut std::collections::BTreeMap<String, u64>, s: &BinSolve) {
+    for (k, v) in [
+        ("weil_fq_muls", s.weil_muls),
+        ("weil_ref_fq_muls", s.weil_ref_muls),
+        ("weil_ref_poly_fq_muls", s.weil_ref_poly_muls),
+    ] {
+        *extra.entry(k.into()).or_insert(0) += v;
+    }
+}
+
 // ── The solve ────────────────────────────────────────────────────────────
 
 /// What one solve cost, by phase, in `F_q` multiplications.
@@ -1922,6 +1942,10 @@ pub struct BinSolve {
     pub dim: usize,
     pub chains: usize,
     pub weil_muls: u64,
+    /// `weil_muls` with every `F_{q⁴}` product priced at the reference
+    /// cost ([`Fq4::ref_muls`]), and under the second model.
+    pub weil_ref_muls: u64,
+    pub weil_ref_poly_muls: u64,
     pub triangularise_muls: u64,
     pub echelon_muls: u64,
     pub nf_muls: u64,
@@ -2561,10 +2585,13 @@ pub fn solve_d4_bin(
     let g = &f.f.tab;
     let mut out = BinD4Solve::default();
     let before = f.f.muls();
+    let (rbefore, pbefore) = (f.ref_muls(), f.ref_muls_poly());
     let t_r = curve.t_of_x(&r.x);
     let sols: Option<Vec<[Fe; 5]>> = if opts.frobenius {
         let comps = pre.system_frobenius(f, &t_r);
         out.solve.weil_muls = f.f.muls() - before;
+        out.solve.weil_ref_muls = f.ref_muls().wrapping_sub(rbefore);
+        out.solve.weil_ref_poly_muls = f.ref_muls_poly().wrapping_sub(pbefore);
         out.solve.monomial_hash_ops += 4 * pre.monos.len() as u64;
         let fq = &f.f;
         solve_bin::<4>(
@@ -2591,6 +2618,8 @@ pub fn solve_d4_bin(
     } else if opts.weighted {
         let comps = pre.system_weighted(f, &t_r);
         out.solve.weil_muls = f.f.muls() - before;
+        out.solve.weil_ref_muls = f.ref_muls().wrapping_sub(rbefore);
+        out.solve.weil_ref_poly_muls = f.ref_muls_poly().wrapping_sub(pbefore);
         out.solve.monomial_hash_ops += 4 * pre.monos.len() as u64;
         solve_bin::<4>(
             &f.f,
@@ -2613,6 +2642,8 @@ pub fn solve_d4_bin(
     } else {
         let comps = pre.system_plain(f, &t_r);
         out.solve.weil_muls = f.f.muls() - before;
+        out.solve.weil_ref_muls = f.ref_muls().wrapping_sub(rbefore);
+        out.solve.weil_ref_poly_muls = f.ref_muls_poly().wrapping_sub(pbefore);
         out.solve.monomial_hash_ops += 5 * pre.monos.len() as u64;
         solve_bin::<5>(
             &f.f,
@@ -3587,9 +3618,13 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
             );
         }
         self.totals.ops += pre.precompute_muls;
-        self.totals
-            .extra
-            .insert("precompute_fq_muls".into(), pre.precompute_muls);
+        for (k, v) in [
+            ("precompute_fq_muls", pre.precompute_muls),
+            ("precompute_ref_fq_muls", pre.precompute_ref_muls),
+            ("precompute_ref_poly_fq_muls", pre.precompute_ref_poly_muls),
+        ] {
+            self.totals.extra.insert(k.into(), v);
+        }
         self.totals
             .extra
             .insert("fp_muls_per_add".into(), self.per_add);
@@ -3649,6 +3684,7 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
                     .or_insert(0) += 1;
                 if self.charge_unsolved {
                     self.totals.ops += cost.total_muls;
+                    add_weil(&mut self.totals.extra, &cost);
                     *self
                         .totals
                         .extra
@@ -3659,6 +3695,7 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
             }
         };
         self.totals.ops += sol.solve.total_muls;
+        add_weil(&mut self.totals.extra, &sol.solve);
         for (k, v) in [
             ("echelon_fq_muls", sol.solve.echelon_muls),
             ("normal_form_fq_muls", sol.solve.nf_muls),

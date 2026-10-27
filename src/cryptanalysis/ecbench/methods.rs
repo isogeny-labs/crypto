@@ -435,7 +435,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "ic.pipeline_f2m4_ref",
             family: "ic",
-            summary: "ic.pipeline_f2m4_full in the reference pricing: the solver's F_q operations and native work are divided by the per-m reference affine addition (50 at odd m, 64 at even m; reference_pricing.reference_model and .poly_free_const record both models), and the base lifts and x_of_t are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts); detail.reference_pricing carries the current-unit total, both divisors and IC's F_(q^4) share side by side; the same run, so the same counts",
+            summary: "ic.pipeline_f2m4_full in the reference pricing: the solver's F_q operations and native work are divided by the per-m reference affine addition (50 at odd m, 64 at even m; reference_pricing.reference_model and .poly_free_const record both models), and the base lifts, x_of_t, the Weil-restriction system builds and the interpolation precomputation are priced with Karatsuba/tower F_(q^4) arithmetic (gaudry_quartic_bin::RefCosts; reference_pricing.weil_restriction has weil_muls and weil_ref_muls, solver.extra the same per record); detail.reference_pricing carries the current-unit total, both divisors and IC's F_(q^4) share side by side; the same run, so the same counts",
             entry: "ic_framework::run_pipeline + ecbench::f2m4_price",
             applies: Applies::Any,
             params: IC_PIPELINE_PARAMS,
@@ -2857,6 +2857,26 @@ fn solve_f2m4_ic_full_with(
     let lp_estimate = rep.detail["decomposition"]["solver"]["extra"]["lp_merge_mulmods"]
         .as_u64()
         .unwrap_or(0);
+    let solver_extra = |k: &str| -> u64 {
+        rep.detail["decomposition"]["solver"]["extra"][k]
+            .as_u64()
+            .unwrap_or(0)
+    };
+    // The Weil-restriction system builds and the precomputation, which the
+    // pipeline counted in schoolbook F_{q^4} multiplications: their
+    // counted size and the reference-priced size under each model.
+    let (weil_cur, pre_cur) = (
+        solver_extra("weil_fq_muls"),
+        solver_extra("precompute_fq_muls"),
+    );
+    let (weil_ref, pre_ref) = (
+        solver_extra("weil_ref_fq_muls"),
+        solver_extra("precompute_ref_fq_muls"),
+    );
+    let (weil_poly, pre_poly) = (
+        solver_extra("weil_ref_poly_fq_muls"),
+        solver_extra("precompute_ref_poly_fq_muls"),
+    );
     // The `x_of_t` before each base lift: its counted multiplications.
     let (mut muls, mut rmuls, mut pmuls, mut n) = (0u64, 0u64, 0u64, 0u64);
     for t in (2..c.f.f.q)
@@ -2887,6 +2907,12 @@ fn solve_f2m4_ic_full_with(
             fb_columns: facts.columns,
             fb_abscissae: facts.abscissae,
             lp_estimate,
+            f4_in_solver: if ref_unit { weil_cur + pre_cur } else { 0 },
+            f4_in_solver_priced: if ref_unit {
+                (weil_ref + pre_ref) as f64
+            } else {
+                0.0
+            },
         };
     // The unit's own mulmod applies to the primary record only; the
     // current-unit comparison block always prices the code's.
@@ -2907,9 +2933,13 @@ fn solve_f2m4_ic_full_with(
     };
     let (solver_ops, lifts) = (natives("solver_ops"), natives("sqrt_solves"));
     let solver_fq = (solver_ops - lp_estimate.min(solver_ops)) as f64;
+    // The F_{q^4} share of the F_q operations: lifts, x_of_t, and the
+    // Weil system builds and precomputation in the context's own unit
+    // (the current unit leaves the latter inside the solver count).
     let share = |c: &crate::cryptanalysis::ecbench::f2m4_price::IcContext| {
-        let f4 = lifts as f64 * (c.lift_muls + c.x_of_t_muls);
-        f4 / (f4 + solver_fq).max(1.0)
+        let f4 = lifts as f64 * (c.lift_muls + c.x_of_t_muls) + c.f4_in_solver_priced;
+        let rest = solver_fq - c.f4_in_solver.min(solver_fq as u64) as f64;
+        f4 / (f4 + rest).max(1.0)
     };
     let code_mulmod_total = if mulmod == Mulmod::Montgomery {
         let mut alt = rep.clone();
@@ -2928,6 +2958,7 @@ fn solve_f2m4_ic_full_with(
         per_add: fq_muls_per_add_ref_poly(c) as f64,
         lift_muls: f2m4_lift_muls_poly(inst),
         x_of_t_muls: pmuls as f64 / n.max(1) as f64,
+        f4_in_solver_priced: (weil_poly + pre_poly) as f64,
         ..ctx_of(true)
     };
     let mut poly_rep = rep.clone();
@@ -2947,6 +2978,19 @@ fn solve_f2m4_ic_full_with(
                 "fq4_share_of_fq_operations": share(&polyc),
                 "total_gae": total_poly,
                 "ratio_over_primary": total_poly / total_ref,
+            }),
+            "weil_restriction": json!({
+                "note": "the Weil-restriction system builds and the interpolation precomputation are F_{q^4} work: the pipeline counts them in this file's schoolbook multiplications; this reference unit prices the same operations at the reference costs before dividing by the divisor",
+                "weil_muls": weil_cur,
+                "weil_ref_muls": weil_ref,
+                "weil_ref_poly_muls": weil_poly,
+                "precompute_muls": pre_cur,
+                "precompute_ref_muls": pre_ref,
+                "precompute_ref_poly_muls": pre_poly,
+                "ratio_ref_over_counted": (weil_ref + pre_ref) as f64 / (weil_cur + pre_cur).max(1) as f64,
+                "gae_counted_at_reference_divisor": (weil_cur + pre_cur) as f64 / refc.per_add,
+                "gae_reference_priced": (weil_ref + pre_ref) as f64 / refc.per_add,
+                "gae_poly_free_const": (weil_poly + pre_poly) as f64 / polyc.per_add,
             }),
             "lift_plus_x_of_t_fq_muls_current": cur.lift_muls + cur.x_of_t_muls,
             "lift_plus_x_of_t_fq_muls_reference": refc.lift_muls + refc.x_of_t_muls,
@@ -4217,6 +4261,43 @@ mod tests {
             assert!(
                 b["lift_plus_x_of_t_fq_muls_reference"].as_f64().unwrap()
                     < b["lift_plus_x_of_t_fq_muls_current"].as_f64().unwrap()
+            );
+            // The Weil-restriction system builds and the precomputation are
+            // reference-priced: the counted size is recorded beside it and
+            // the reference price is not above the schoolbook count.
+            let w = &b["weil_restriction"];
+            let wc = w["weil_muls"].as_u64().unwrap();
+            let pc = w["precompute_muls"].as_u64().unwrap();
+            assert!(wc > 0 && pc > 0);
+            assert_eq!(
+                rf.detail["decomposition"]["solver"]["extra"]["weil_fq_muls"].as_u64(),
+                Some(wc)
+            );
+            let (wr, pr) = (
+                w["weil_ref_muls"].as_u64().unwrap(),
+                w["precompute_ref_muls"].as_u64().unwrap(),
+            );
+            assert!(
+                wr > 0 && pr > 0 && wr + pr < wc + pc,
+                "{wr}+{pr} vs {wc}+{pc}"
+            );
+            assert!(w["weil_ref_poly_muls"].as_u64().unwrap() > 0);
+            // The substitution moves the total by exactly the difference
+            // of the two prices over the divisor (the same run, so the same
+            // counts), and not at all in the current unit.
+            let moved = ((wc + pc) as f64 - (wr + pr) as f64) / expect;
+            assert!(moved > 0.0);
+            let nosub = {
+                let mut alt = rf.clone();
+                alt.total_gae += moved;
+                alt.total_gae
+            };
+            assert!(nosub > rf.total_gae);
+            assert!(b["fq4_share_of_fq_operations_reference"].as_f64().unwrap() > 0.0);
+            eprintln!(
+                "m={m} weil {wc}->{wr} pre {pc}->{pr} (gae {:.1} -> {:.1})",
+                (wc + pc) as f64 / expect,
+                (wr + pr) as f64 / expect
             );
             eprintln!(
                 "m={m} ic ref/current {:.3} share cur {cs:.4} ref {rs:.4}",
