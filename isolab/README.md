@@ -311,6 +311,11 @@ lost worker's job returns to `queued` and `attempt` increments.
 
 ## MCP
 
+Claude Code and Codex project connections are registered in this repository.
+See [agent setup](../docs/ISOLAB_AGENTS.md) for installation, inherited connection
+settings and a read-only access check. The NATS `isolab` and EKS `isolab-eks`
+connections expose separate tool families; they do not substitute for one another.
+
 `isolab mcp` serves these tools over stdio. The server runs on the agent's
 machine, uploads local inputs from there, and writes fetched artifacts
 there.

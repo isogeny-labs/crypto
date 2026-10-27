@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="410" viewBox="0 0 1100 410">
+ <rect width="1100" height="410" fill="#f7fafc"/>
+ <style>text{font-family:DejaVu Sans,sans-serif;fill:#172b4d}.title{font-size:24px;font-weight:bold}.label{font-size:17px;font-weight:bold}.body{font-size:15px}.small{font-size:13px}</style>
+ <text x="26" y="35" class="title">Observed automatic recovery: computation and timing stay separate</text>
+ <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#49657d"/></marker></defs>
+ <g fill="#e2edf6" stroke="#62809b" stroke-width="1.5">
+  <rect x="26" y="64" width="235" height="112" rx="9"/>
+  <rect x="298" y="64" width="235" height="112" rx="9"/>
+  <rect x="570" y="64" width="235" height="112" rx="9"/>
+  <rect x="842" y="64" width="232" height="112" rx="9"/>
+ </g>
+ <g class="label"><text x="42" y="91">Frozen request</text><text x="314" y="91">Commit checkpoint</text><text x="586" y="91">Fence and restore</text><text x="858" y="91">Verify computation</text></g>
+ <g class="body"><text x="42" y="119">Source / image / spec</text><text x="42" y="145">Original UTC deadline</text><text x="314" y="119">CRIU + encrypted EBS</text><text x="314" y="145">Full versioned S3 readback</text><text x="586" y="119">Old EC2 terminated</text><text x="586" y="145">Compatible new Spot worker</text><text x="858" y="119">Native replay</text><text x="858" y="145">All timing invalid / L0</text></g>
+ <g stroke="#49657d" stroke-width="2" fill="none" marker-end="url(#a)"><path d="M263 120 H292"/><path d="M535 120 H564"/><path d="M807 120 H836"/><path d="M958 179 V212 H555 V235"/></g>
+ <rect x="26" y="237" width="1048" height="104" rx="9" fill="#dff2e8" stroke="#519275" stroke-width="1.5"/>
+ <text x="43" y="267" class="label">One distinct fresh benchmark epoch — new warmup, host checks and A/A</text>
+ <text x="43" y="295" class="body">Test E: 1,806 L2 observations · 1,800 native replays · 600 admitted A/A pairs · 19 S3 payload hashes</text>
+ <text x="43" y="320" class="body">Failed L2 or A/A is terminal. A controller retry cannot create another measurement epoch.</text>
+ <text x="26" y="370" class="small">E preserved 1,140 checkpointed records and completed 1,806. Final runtime retest F is recorded in REPORT.md.</text>
+ <text x="26" y="393" class="small">Trusted c8a.2xlarge native CPU workload only. Infrastructure qualification; no algorithm speed or general CRIU portability claim.</text>
+</svg>
