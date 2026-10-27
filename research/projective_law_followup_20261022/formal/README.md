@@ -31,10 +31,12 @@ hypotheses `N=(x-a)t` and unit `B`. Its [diagram](projective-branch-zero-order.s
 keep the compiled-law hypotheses and global divisor/Pic⁰ equation open.
 
 The [branch norm-factor packet](BRANCH_NORM_FACTOR.md) proves that a polynomial
-norm identity at a rational branch root on its norm support forces `(X-a) ∣ n`.
+norm identity at a rational branch root on its norm support forces `(X-a) ∣ n`,
+then transports that factor through a checked polynomial evaluation map to
+the actual weighted-Proj branch stalk.
 Its [diagram](branch-norm-factor.svg), [CSV](branch-norm-factor.csv), and
 [PDF](BRANCH_NORM_FACTOR.pdf) distinguish this algebraic factor from the still
-open compiled-numerator and projective-stalk bridge.
+open compiled-numerator and global-divisor bridges.
 
 The [weighted-Proj head and chart packet](WEIGHTED_PROJ_HEAD_VERIFIED.md)
 checks homogeneity of the proposed sextic and its principal ideal, plus the
