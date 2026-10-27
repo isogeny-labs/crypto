@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Matched trace-line C1 2LP measurement](trace-c1-2lp-measurement.md) | open | fully priced algebraic C1 standard/selected comparison | shifted x-line algebraic oracle, full native pricing, admitted Iso Lab image/checkpoint route and independent replay |
 | [EKS resumable L2 experiments](eks-resumable-l2-experiments.md) | partially resolved | final review/CI, merge and main GitHub Action | Dedicated v6 pool deployed; J passed 3,606 L2 / 3,600 replays / 1,200 A/A pairs / 19 S3 hashes; prior recovery and failed epochs retained |
 | [N83 mixed-orbit factor-base total-runtime selection](n83-mixed-orbit-factor-base-selection.md) | investigating | natural relation yield, closure/rank/logs, unseen-target solve and same-target rho across the frozen finite grid | resource-qualified native full-D18 positive/natural run with exact S3 replay, then full downstream charged gates |
 | [GHS descent with magic number two or more is not executable](ghs-higher-magic-descent-not-executable.md) | open | executed subgroup-preservation certificates and relation counts for composite-degree binary curves with `m >= 2` (transfer-audit family A) | a smooth model of the GHS curve and the norm-conorm point map on one toy tower, checked on all point pairs, then a binary-Jacobian relation search in the `S = ops/sqrt(r)` unit |
