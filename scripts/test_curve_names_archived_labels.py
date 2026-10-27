@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed metadata checks for exact labels in one frozen rendering."""
+"""Fail-closed metadata checks for exact labels in frozen reports."""
 import unittest
 from unittest.mock import patch
 
@@ -39,6 +39,15 @@ class ArchivedLabelTests(unittest.TestCase):
             problems = names.lint_diff("base", self.resolver)
         self.assertEqual(len(problems), 1)
         self.assertIn("K_1 / 2^19", problems[0])
+
+    def test_diff_preserves_frozen_source_and_still_lints_live_source(self):
+        diff = ("+++ b/research/study/evidence/source/sat.rs\n"
+                "@@ -0,0 +1 @@\n+K_1 / 2^19\n"
+                "+++ b/src/live.rs\n@@ -0,0 +1 @@\n+K_1 / 2^19\n")
+        with patch.object(names, "git", side_effect=["", diff]):
+            problems = names.lint_diff("base", self.resolver)
+        self.assertEqual(len(problems), 1)
+        self.assertTrue(problems[0].startswith("src/live.rs:"))
 
     def test_archived_raw_metric_keys_require_exact_path_hash_and_label(self):
         report = "benchmarks/20261017-volcano-ecdlp-census/VALIDATOR_REPORT.md"

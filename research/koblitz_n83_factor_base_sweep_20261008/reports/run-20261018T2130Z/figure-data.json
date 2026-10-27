@@ -1,0 +1,53 @@
+{
+  "run": "cloud-matched-k2048-k4096-20261018",
+  "capacity": [
+    {
+      "columns": 2048,
+      "sat_variables": 111478,
+      "domain_clauses": 892470
+    },
+    {
+      "columns": 4096,
+      "sat_variables": 131958,
+      "domain_clauses": 1773110
+    }
+  ],
+  "stages": [
+    {
+      "stage": "capacity",
+      "columns": 2048,
+      "worker_status": "PASS_model_construction_only",
+      "outer_wall_ms": 23314.246807000018
+    },
+    {
+      "stage": "capacity",
+      "columns": 4096,
+      "worker_status": "PASS_model_construction_only",
+      "outer_wall_ms": 12539.25328600053
+    },
+    {
+      "stage": "search",
+      "columns": 2048,
+      "worker_status": "UNKNOWN_wall_cap",
+      "outer_wall_ms": 600612.2280159998
+    },
+    {
+      "stage": "search",
+      "columns": 4096,
+      "worker_status": "UNKNOWN_wall_cap",
+      "outer_wall_ms": 601214.6951769992
+    },
+    {
+      "stage": "control",
+      "columns": 2048,
+      "worker_status": "UNKNOWN_solver_cap",
+      "outer_wall_ms": 162630.4918810001
+    },
+    {
+      "stage": "control",
+      "columns": 4096,
+      "worker_status": "UNKNOWN_wall_cap",
+      "outer_wall_ms": 181095.333452
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "card_id": "CARD-native-natural-1m-k2048-v18",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "stopped",
+  "classification": "infrastructure_refusal_not_search",
+  "stopped_at_step": "k2048-v18",
+  "recommendation": "rerun_after_infrastructure_fix",
+  "reasons": [
+    "Native runner-v18 card-check exit 0: record_digests_verified=true, relay_verbatim=true, status=stopped at command 1; exact stdout/stderr/status saved beside this assessment.",
+    "Original receipt and actual relay SHA256 both a416b84c507fc1ea16b6bf541f356e2c2a0b952b36959d5e9633902f96e976b0; card unchanged; one specified argv attempt, exit 1, timed_out=false, seconds=15.12057284.",
+    "Original stderr SHA256 6ff0a04105b987dc3e4e7bce8aeafdf11cfa4cfb56f4976fa6a06a4ab1d6ba03: cannot open lock /tmp/crypto-bench.lock: Permission denied (os error 13).",
+    "All twelve declared measurement outputs are absent. Source reservation.rs:29 acquires the benchmark lock before CPU planning, thread eviction and isolation preflight; main.rs acquires reservation before copying spec or constructing container configuration. No worker/search observation is admitted.",
+    "Frozen HEAD c601582357842feb5a99807341687cdb7abed81c verified; receipt dirty_before and dirty_after empty; independent git status output is zero bytes. Assessment writes confined to authorized scratch/cards.",
+    "Infrastructure recommendation is a classification only; no retry, replacement card, lock modification or new timed command was performed or authorized by this assessment."
+  ],
+  "interpretation": "not_assessed",
+  "commit": "c601582357842feb5a99807341687cdb7abed81c",
+  "receipt_sha256": "a416b84c507fc1ea16b6bf541f356e2c2a0b952b36959d5e9633902f96e976b0",
+  "relay_sha256": "a416b84c507fc1ea16b6bf541f356e2c2a0b952b36959d5e9633902f96e976b0",
+  "card_check_exit_code": 0
+}

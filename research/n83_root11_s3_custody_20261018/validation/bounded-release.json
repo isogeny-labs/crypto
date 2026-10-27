@@ -1,0 +1,15 @@
+{
+  "command": "cargo test --release --lib -- --test-threads=4",
+  "compressed_log": "lib-release-bounded.log.gz",
+  "compressed_log_sha256": "3a511fe7e4d6fe7a5aa649daba20538af7920c883d436b665ecca5d603e67d76",
+  "environment": "local unsandboxed socket access, four test threads",
+  "failed": 1,
+  "failure_case": "cryptanalysis::jv_cover::tests::replayed_f4_agrees_with_the_full_solver_and_the_oracle",
+  "failure_detail": "n=16 below required 30 after capped cases were skipped",
+  "ignored": 117,
+  "passed": 4084,
+  "raw_log_sha256": "3bf4c1a90d7688aef058c0309f2adc0e80e8adb875740f4a97c905acba35ecc3",
+  "schema": "n83.root11-custody-validation/v1",
+  "status": "FAIL_ONE_BOUNDED_SOLVER",
+  "test_wall_seconds": 1217.45
+}

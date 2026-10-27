@@ -9223,6 +9223,28 @@ pub fn sat_decompose_chained_s3_frobenius_orbit_ordered(
     sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, true, true)
 }
 
+/// Diagnostic only: opt-in, flushed records; no solver decisions use these values.
+fn chain_phase_record(
+    enabled: bool,
+    start: std::time::Instant,
+    phase: &str,
+    data: impl FnOnce() -> serde_json::Value,
+) {
+    if enabled {
+        use std::io::Write;
+        let mut stderr = std::io::stderr().lock();
+        let _ = writeln!(
+            stderr,
+            "{}",
+            serde_json::json!({
+                "schema":"n83.chain-phase/v1", "phase":phase,
+                "elapsed_ms":start.elapsed().as_secs_f64()*1000.0, "data":data()
+            })
+        );
+        let _ = stderr.flush();
+    }
+}
+
 fn sat_decompose_chained_s3_with_domain(
     kc: &KoblitzCurve,
     fb: &FrobeniusFactorBase,
@@ -9236,6 +9258,9 @@ fn sat_decompose_chained_s3_with_domain(
         finite_domain_clause_count, frobenius_orbit_domain_size, ChainBuildError, ChainedS3Encoding,
     };
     let mut stats = ChainS3Stats::default();
+    let trace =
+    let trace_start = std::time::Instant::now();
+
     if !(4..=6).contains(&m)
         || limits.max_models == 0
         || limits.conflict_budget == 0
@@ -9252,6 +9277,12 @@ fn sat_decompose_chained_s3_with_domain(
         stats.exhausted = true;
         return (None, stats);
     }
+    chain_phase_record(trace, trace_start, "closure_begin", || {
+        serde_json::json!({"points":fb.points.len(),"summands":m,"target":match target {
+            BinaryPoint::Affine{x,y} => Some([x.to_biguint().to_string(),y.to_biguint().to_string()]),
+            BinaryPoint::Infinity => None,
+        }})
+    });
     let mut codes: Vec<BigUint> = fb
         .points
         .iter()
@@ -9312,7 +9343,16 @@ fn sat_decompose_chained_s3_with_domain(
         return (None, stats);
     }
     stats.domain_clauses = domain_clauses;
+    chain_phase_record(
+        trace,
+        trace_start,
+        "closure_complete",
+        || serde_json::json!({"representatives":representatives.len(),"domain_clauses":domain_clauses}),
+    );
     let index_of = fb.index_map();
+    chain_phase_record(trace, trace_start, "index_complete", || {
+        serde_json::json!({})
+    });
     let target_x = match target {
         BinaryPoint::Affine { x, .. } => Some(x),
         BinaryPoint::Infinity => None,
@@ -9322,6 +9362,12 @@ fn sat_decompose_chained_s3_with_domain(
             stats.exhausted = true;
             return (None, stats);
         }
+        chain_phase_record(
+            trace,
+            trace_start,
+            "encoding_begin",
+            || serde_json::json!({"identity_mask":identity_mask}),
+        );
         let mut enc = match ChainedS3Encoding::build(
             m,
             &kc.curve.irreducible,
@@ -9340,6 +9386,12 @@ fn sat_decompose_chained_s3_with_domain(
                 return (None, stats);
             }
         };
+        chain_phase_record(
+            trace,
+            trace_start,
+            "circuit_complete",
+            || serde_json::json!({"identity_mask":identity_mask,"variables":enc.solver.n_vars()}),
+        );
         let installed = if frobenius_orbits {
             enc.constrain_frobenius_orbit_summands(
                 &representatives,
@@ -9362,12 +9414,30 @@ fn sat_decompose_chained_s3_with_domain(
         stats.peak_variables = stats.peak_variables.max(enc.solver.n_vars());
         stats.peak_clauses = stats.peak_clauses.max(enc.solver.n_clauses());
         stats.peak_xors = stats.peak_xors.max(enc.solver.n_xors());
+        chain_phase_record(
+            trace,
+            trace_start,
+            "domain_complete",
+            || serde_json::json!({"identity_mask":identity_mask,"variables":enc.solver.n_vars(),"clauses":enc.solver.n_clauses(),"domain_clauses":domain_clauses}),
+        );
         let earlier_conflicts = stats.conflicts;
         enc.solver.conflict_budget = limits.conflict_budget - earlier_conflicts;
         loop {
             stats.solver_calls += 1;
+            chain_phase_record(
+                trace,
+                trace_start,
+                "solver_enter",
+                || serde_json::json!({"identity_mask":identity_mask,"call":stats.solver_calls,"conflict_budget":enc.solver.conflict_budget}),
+            );
             let outcome = enc.solver.solve();
             stats.conflicts = earlier_conflicts.saturating_add(enc.solver.conflicts());
+            chain_phase_record(
+                trace,
+                trace_start,
+                "solver_return",
+                || serde_json::json!({"identity_mask":identity_mask,"outcome":format!("{outcome:?}"),"conflicts":stats.conflicts}),
+            );
             match outcome {
                 SolveResult::Unsat => {
                     stats.patterns_refuted += 1;
@@ -10323,6 +10393,16 @@ pub enum KoblitzIcEvent {
         first_trial: usize,
         trials: usize,
     },
+    /// Emitted before decomposition when native chain-S3 tracing is enabled.
+    /// Coordinates and coefficients are decimal strings for direct replay.
+    RelationQueryStarted {
+        trial: usize,
+        coefficient_a: String,
+        coefficient_b: String,
+        target_x: String,
+        target_y: String,
+        target_infinity: bool,
+    },
     /// Exact completion record for one generated relation candidate.
     RelationAttemptFinished {
         trial: usize,
@@ -10701,8 +10781,48 @@ fn koblitz_index_calculus_dlp_observed(
             .collect();
         report.trials += attempts.len();
         report.relation_batches += 1;
+        if matches!(
+            opts.strategy,
+            DecompositionStrategy::ChainedS3
+                | DecompositionStrategy::ChainedS3FrobeniusOrbit
+                | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
+        ) {
+            for (offset, (a, b, target)) in attempts.iter().enumerate() {
+                let (target_x, target_y, target_infinity) = match target {
+                    BinaryPoint::Affine { x, y } => (
+                        x.to_biguint().to_string(),
+                        y.to_biguint().to_string(),
+                        false,
+                    ),
+                    BinaryPoint::Infinity => ("0".into(), "0".into(), true),
+                };
+                progress(KoblitzIcEvent::RelationQueryStarted {
+                    trial: report.trials - attempts.len() + offset + 1,
+                    coefficient_a: a.to_string(),
+                    coefficient_b: b.to_string(),
+                    target_x,
+                    target_y,
+                    target_infinity,
+                });
+            }
+        }
 
-        let evaluate = |(_, _, target): &(BigUint, BigUint, BinaryPoint)| {
+        let evaluate = |(a, b, target): &(BigUint, BigUint, BinaryPoint)| {
+            if std::env::var_os("N83_CHAIN_PHASE_TRACE").as_deref()
+                == Some(std::ffi::OsStr::new("1"))
+            {
+                use std::io::Write;
+                let mut stderr = std::io::stderr().lock();
+                let _ = writeln!(
+                    stderr,
+                    "{}",
+                    serde_json::json!({"schema":"n83.chain-query/v1","a":a.to_string(),"b":b.to_string(),"target":match target {
+                        BinaryPoint::Affine{x,y} => Some([x.to_biguint().to_string(),y.to_biguint().to_string()]),
+                        BinaryPoint::Infinity => None,
+                    }})
+                );
+                let _ = stderr.flush();
+            }
             if *target == BinaryPoint::Infinity {
                 return RelationAttemptOutcome::Direct;
             }
@@ -16994,8 +17114,54 @@ mod tests {
             },
             ..KoblitzIcOptions::default()
         };
-        let report = koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+        let mut queries = Vec::new();
+        let report = koblitz_index_calculus_dlp_with_factor_base_and_progress(
+            &kc,
+            &target,
+            &fb,
+            &opts,
+            &mut |event| {
+                if let KoblitzIcEvent::RelationQueryStarted {
+                    trial,
+                    coefficient_a,
+                    coefficient_b,
+                    target_x,
+                    target_y,
+                    target_infinity,
+                } = event
+                {
+                    queries.push((
+                        trial,
+                        coefficient_a,
+                        coefficient_b,
+                        target_x,
+                        target_y,
+                        target_infinity,
+                    ));
+                }
+            },
+        )
+        .unwrap();
         assert_eq!(report.log, Some(known), "{report:?}");
+        assert!(!queries.is_empty());
+        assert_eq!(queries.len(), report.trials);
+        for (index, (trial, a, b, x, y, infinity)) in queries.iter().enumerate() {
+            assert_eq!(*trial, index + 1);
+            let a = BigUint::parse_bytes(a.as_bytes(), 10).unwrap();
+            let b = BigUint::parse_bytes(b.as_bytes(), 10).unwrap();
+            let public_query = kc.add(&kc.mul(kc.generator(), &a), &kc.mul(&target, &b));
+            match public_query {
+                BinaryPoint::Affine {
+                    x: actual_x,
+                    y: actual_y,
+                } => {
+                    assert!(!*infinity);
+                    assert_eq!(x, &actual_x.to_biguint().to_string());
+                    assert_eq!(y, &actual_y.to_biguint().to_string());
+                }
+                BinaryPoint::Infinity => assert!(*infinity),
+            }
+        }
         assert!(report.sat_calls > 0);
         assert!(report.independent_relations > 0);
         assert!(report.linear_solve_attempts > 0);

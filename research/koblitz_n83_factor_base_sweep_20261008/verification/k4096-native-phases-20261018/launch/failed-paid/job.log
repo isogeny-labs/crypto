@@ -1,0 +1,19 @@
+[ephemeral 01:55:14] phase: booting
+[ephemeral 01:55:15] phase: setup
+[ephemeral 01:55:17] toolchain preset: rust (baked into the image: 2026-10-16T22:38:40Z)
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+[ephemeral 01:55:18] phase: fetching (50585a361a35d7bee8a77a790740392e0ba5d5d2)
+[ephemeral 01:55:28] git cache: restored base 7a89573d0441 (2546 MiB, 10 s)
+[ephemeral 01:56:27] git: fetched 444 MiB from origin on top of base 7a89573d0441
+[ephemeral 01:56:27] source at 50585a361a35d7bee8a77a790740392e0ba5d5d2 (69 s)
+[ephemeral 01:56:30] phase: cache
+[ephemeral 01:56:40] cache: restored root-ac5cd7a3459be776 (nearest; exact key root-45223ac12cb2f0d1 missing), 818 MiB target, 15671 of 115348 files changed, 10 s
+[ephemeral 01:56:42] phase: running (bash research/koblitz_n83_factor_base_sweep_20261008/verification/k4096-native-phases-20261018/run_ephemeral_native.sh)
+
+aws: [ERROR]: An error occurred (AccessDenied) when calling the GetObject operation: User: arn:aws:sts::104186811093:assumed-role/ephemeral-runner/i-0851aab25d0fd46cf is not authorized to perform: s3:GetObject on resource: "arn:aws:s3:::ephemeral-runs-104186811093-us-east-1/n83-frozen-inputs/ccc1196d75de406b1daba634b8011f08308c37bd1e674758f9efeabb0ff0bcad.jsonl.gz" because no identity-based policy allows the s3:GetObject action
+[ephemeral 01:58:15] command exited 254
+[ephemeral 01:58:15] phase: uploading
+[ephemeral 01:58:15] phase: failed (exit 254)
+[ephemeral 01:58:15] terminating
+[ephemeral 01:58:22] cache: saved cache/cargo/x86_64-rust-1.99.1-58cf8f9c3/root-45223ac12cb2f0d1 (818 MiB target, 5 s)
+[ephemeral 01:59:23] git cache: saved 50585a361a35 to cache/git/github.com-aburan28-crypto.tar (refresh, 2978 MiB, 61 s)

@@ -1,0 +1,58 @@
+{
+  "card_changed": false,
+  "card_id": "CARD-native-natural-1m-k2048-v19",
+  "card_path": "/home/ec2-user/scratch/n83-natural-1m-20261020/cards/k2048-v19.json",
+  "card_sha256": "3decb3544b01b501bd26245f935825d1e682786ce013f59b0452f6b4d0f93293",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/scratch/n83-natural-1m-20261020/bin/runner-v19",
+        "run",
+        "/home/ec2-user/scratch/n83-natural-1m-20261020/specs-v19/k2048.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 1,
+          "seconds": 1643.653593095,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 1,
+      "id": "k2048-v19",
+      "index": 1,
+      "outputs": {
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/audit.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/config.json": "971fabca782512719c64541b487094df3593b25a519fbe521d9397bbc70bcb83",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/custody.json": "8a5c5889774347eebe17ad5af97ef1788c4a24df836c5fdb4e2d171a87568b34",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/inspect-final.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/inspect-live.json": "e6c613837310ab23ff5c0295352de661933ef0e6c361853eda50ae85fa2663c3",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/isolation-after.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/isolation-before.json": "f35b1f799a77d65d7d9df7edc49d7e7e9456e0b784564765c91060cba990b518",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/memory-profile.jsonl": "70429bec8f94998bdcad9289ddd96b94e0bf4d52a561923b4317540e4c3a2fb7",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/outer.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/spec.json": "560dcacce829e13dc4171192ea700816f4081fb3cbda6500f044c285a97fb528",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/stderr.log": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v19/stdout.log": null
+      },
+      "seconds": 1643.653593095,
+      "stderr_sha256": "8219fb896c830db475183965e6cd9c0f0404400c958e0415fa9c32f9d6aa14a6",
+      "stderr_tail": [
+        "Error: \"sampled live memory/swap limit changed or unavailable; data retained\""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "f31532017bbf2d5b9685f2ca03a3a912b2612325",
+  "dirty_after": "",
+  "dirty_before": "",
+  "native_executor": "n83-sweep-runner strict frozen-command subset/v1",
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 1"
+}

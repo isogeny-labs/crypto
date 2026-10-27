@@ -1,0 +1,11 @@
+ExecMainStatus=0
+ExecStart={ path=/usr/bin/dockerd ; argv[]=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock $OPTIONS $DOCKER_STORAGE_OPTIONS $DOCKER_ADD_RUNTIMES ; ignore_errors=no ; start_time=[Tue 2026-10-20 00:43:18 UTC] ; stop_time=[Tue 2026-10-20 17:04:32 UTC] ; pid=9433 ; code=exited ; status=0 }
+ActiveState=inactive
+SubState=dead
+FragmentPath=/usr/lib/systemd/system/docker.service
+
+ExecMainStatus=0
+ExecStart={ path=/usr/bin/containerd ; argv[]=/usr/bin/containerd ; ignore_errors=no ; start_time=[Tue 2026-10-20 00:43:18 UTC] ; stop_time=[Tue 2026-10-20 17:04:32 UTC] ; pid=9324 ; code=exited ; status=0 }
+ActiveState=inactive
+SubState=dead
+FragmentPath=/usr/lib/systemd/system/containerd.service

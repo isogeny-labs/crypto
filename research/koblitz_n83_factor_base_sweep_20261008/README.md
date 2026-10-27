@@ -1,5 +1,30 @@
 # Factor-base sweep for degree-83 Koblitz index calculus
 
+Latest diagnostic: [native arena reclamation, 23 October](reports/run-20261023T0150Z/REPORT.md).
+K2048/K4096 each complete a candidate 1M-conflict validation: all 1,001 retained
+counter snapshots, 102 storage snapshots per base and 59/61 memory samples pass.
+Three/one reclamations remove 988,381,364/776,774,054 arena words. Both return
+bounded Unknown with zero models/relations/rank. The prior
+[450K ownership profiles](reports/run-20261021T1617Z/REPORT.md) and
+[original 1M arms](reports/run-20261020T1546Z/REPORT.md) remain immutable.
+[All raw evidence is verified in S3](verification/native-arena-reclamation-20261023/PUBLICATION.md).
+The [exact 1.5M continuation](verification/native-arena-reclamation-20261023/CONTINUATION.md)
+is separately planned; no higher-cap worker or speed gain is claimed here.
+
+Latest control: [native free-selector witness verified](verification/native-selector-export-20261019/RESULT.md),
+787 conflicts / 167.34 s worker wall, actual model selectors and original
+group sum independently replayed. XOR propagation dominates this control;
+natural yield/rank and full-cold base selection remain open.
+
+Storage addendum: the [approved 49 MB native evidence bundle](verification/native-phase-publication-20261019/RESULT.md)
+is published and all 308 payload files passed fresh-download verification.
+
+Latest: the [19 October native retained-base continuation](verification/native-phase-20261019-v3/RESULT.md)
+completed K2048/K4096 at the matched 1,000-conflict bound with zero models,
+relations and rank. The [approved historical raw ZIP](verification/raw-approved-publication-20261019/RESULT.md)
+is uploaded and verified in `setec-astronomy-artifacts`. Full cold-runtime
+selection and the full finite-grid sweep remain open.
+
 Date: 2026-10-08. The primary objective is the lowest fully charged index-calculus runtime for one public known-answer target. Construction, orbit/index preparation, failed relation attempts, lifting, partial-relation processing, linear algebra, individual logarithm, verification and artifact I/O all belong in the cold cost. Reusable online-only cost is a separate secondary measurement. A candidate is a factor base together with its oracle, solver and resource configuration; a base cannot be selected by cardinality or relation yield alone.
 
 The exact primary model is `icv1-f2m83-tm6151469093347-debefd74`, with equation `y^2 + xy = x^3 + 1`, polynomial-basis modulus `z^83 + z^45 + z^2 + z + 1`, subgroup order `2417851639230796216685689`, and cofactor 4. Its generator is pinned in the native exporter. The diagnostic model is `icv1-f2m83-t6151469093347-cdcc5432`, with `a=1`, the same modulus, subgroup order `8569786107849059`, and cofactor `1128547018`. These are different workloads: an 81-bit subgroup and a 53-bit subgroup. The degree alone does not identify a workload. The slugs were checked against the registry at `c70c32d486a3ac7531fe27f7193d9f09caa58344`; exact representations, generators and subgroup parameters are retained in every exported header.
@@ -27,9 +52,44 @@ replays all 648 ordered pilot pairs and retains 311 admitted configurations
 in 24 distinct shapes under the conditional rank-query floor, source domain
 clauses and source variable count. The selected sequential-K600/hash-K600
 arm is on this source frontier; the same-base Gray arm is a matched control
-with 114 strict source dominators. The [frozen paired gate](verification/k600-gray-hash-paired-protocol-20261014/RESULT.md)
-has not launched either arm, and its local Docker precheck failed at the VM
-disk layer. Source dominance does not establish runtime dominance.
+with 114 strict source dominators. The local [frozen paired gate](verification/k600-gray-hash-paired-protocol-20261014/RESULT.md)
+did not launch because its Docker precheck failed at the VM disk layer. A
+separate [hosted first pair](verification/hosted-paired-run-38983406418/RESULT.md)
+ran both arms on Linux ARM; each reached the 5,000-conflict cap with zero
+models. The retained archive and raw stage receipts passed independent replay
+and S3 byte checks. Source dominance and these censored first trials do not
+establish runtime dominance.
+
+The later [hosted fixed-witness control](verification/hosted-fixed-witness-run-39051579293/RESULT.md)
+reproduced an ordered K1182/K2048 known-answer SAT model on Linux ARM after
+fixing its five summand and three partial-sum x-coordinates. It passed original
+group/S3 replay at 787 conflicts; the 22-file artifact and a fresh S3 GET
+passed byte-identical independent audit. This confirms access to that fixed
+encoding on another host, while the natural Gray/hash searches above remain
+censored. A [separate whole-subgroup support replication](verification/cross-stream-support-20261017/RESULT.md)
+recounts all 648 primary pilot pairs from the later independent overlap
+receipt; its five-summand ceilings agree with the earlier nonidentity screen
+at the reported precision. Neither stage measures a complete IC runtime.
+
+The subsequent [hosted 4+2 six-summand Gray/hash pair](verification/hosted-m6-paired-run-39054543374/RESULT.md)
+used the same public trial and S3-backed sequential K600 base. Both residual
+pool arms hit `UNKNOWN_search_cap` after one SAT call, 20,000 conflicts and zero
+models. The 65-file hosted artifact and three freshly downloaded S3 base
+archives passed independent replay; all 54 pilot factor-base objects were
+present at their manifest-listed sizes. The full 7,500-second hosted envelope
+is charged. These capped one-query results leave natural relation yield and
+complete index-calculus runtime unmeasured; no factor-base winner is selected.
+
+The [hosted equal-domain canonical 4+2 successor](verification/hosted-m6-canonical-run-39082501084/RESULT.md)
+retained the same target, coefficients and three exact S3-backed archives,
+while ordering exchangeable summand x coordinates within the four-base and
+two-residual blocks. Both Gray and hash arms again reached
+`UNKNOWN_search_cap` at 20,000 conflicts with zero models and only the first
+identity pattern attempted. The 65-file artifact, fresh S3 bytes for the three
+inputs, and live presence of all 54 pilot objects passed separate audits. Its
+full 7,500-second hosted envelope is charged. The different hosted jobs do not
+support a paired speed comparison, and this one-query screen still cannot
+select a minimum-total-runtime factor base.
 
 ## Matched retained-base extension, 2026-10-11
 
@@ -184,3 +244,30 @@ aws s3 sync s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_
 aws s3 sync s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/a1/objects/ "$n83_replay_dir/objects/"
 target/release/examples/koblitz_n83_factor_base_export replay "$n83_replay_dir"
 ```
+
+Original append-only native continuation: [1M-conflict report](reports/run-20261020T1546Z/REPORT.md)
+and [publication](verification/native-natural-1m-20261020/PUBLICATION.md).
+Both final K2048/K4096 runs reach1Mconflicts with zero models/relations/rank;
+59/61memory samples pass at8GiB/zero extra swap. Earlier refusals, interruption
+and failed resource profiles remain unadmitted. No base or runtime winner is selected.
+
+Continuation correction: the first K2048 1.5M command was refused before SAT
+by the worker's old 7200-second admission gate. [RESPEC-C2.md](verification/native-arena-reclamation-20261023/RESPEC-C2.md)
+records the retained failure, validated narrow gate correction and conservative
+13-second charge inside the original slot. The corrective ceiling is8987 seconds;
+K4096 retains9000. The total allowance remains30000, with no automatic retries.
+
+The corrected K2048-c2 card then stopped before worker release at Docker's
+15-second launch-RPC limit; cleanup and custody pass. [RESPEC-C3.md](verification/native-arena-reclamation-20261023/RESPEC-C3.md)
+retains that distinct failure, charges its entire29.838953191-second command
+upward as30seconds, and records8957seconds remaining in the same slot. The
+validated launch wait is60seconds within the existing command envelope, with
+no automatic mutation retry. Both CPU and I/O pressure must pass before dispatch.
+
+K2048-c3 now completes1500000conflicts in one attempt, exit0/no timeout,
+boundedUnknown and zero relations. Native audit, all1001 original signatures
+through1M,152storage snapshots, memory custody and independent director
+receipt/relay/bind/cleanup checks pass. Four reclamations remove1581835327words.
+[Completed run report and native data](reports/run-20261023T0533Z/REPORT.md).
+K4096's1.5M arm remains open; total allowance is unchanged. Later search
+signatures are unpaired; no selected base, speed or rho claim follows.

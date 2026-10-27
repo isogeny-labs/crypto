@@ -1,0 +1,142 @@
+{
+  "schema": "crypto.autoresearch.mechanical-task-card.v1",
+  "card_id": "CARD-n83-native-phase-20261019-v2-controls",
+  "experiment_id": "n83-native-phase-20261019-v2",
+  "author_role": "experiment-director",
+  "executor_role": "executor-mechanical",
+  "kind": "frozen_command",
+  "commit": "c259497ec9cf1fde358ffc91eabe8c2cff242f95",
+  "receipt": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls.receipt.json",
+  "binds": [
+    {
+      "path": "/home/ec2-user/scratch/n83-native-phase-20261019/runner-v2-target/release/n83-sweep-runner",
+      "sha256": "0a4271d4585d1a00af57b330302b8b15423155c6daf5a41b7cf46cbc607bfd9d"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/PROTOCOL.md",
+      "sha256": "639d970dbc80300c2aedf3150cbf8344793d00da85977047c082a1e44f7ba6e8"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019/PROTOCOL.md",
+      "sha256": "1d6e938544bfe503b2265c58c27966d6da4603eef083e06de7f55751c7355aef"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/bin/docker",
+      "sha256": "be7b67b49e885cf85867da63de8fae7021178b89e056c97dce34707657fd3d54"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/examples/koblitz_n83_selector_witness_control.rs",
+      "sha256": "8e88ad07d21844d0fb1a8be2a0763a38e75152d06809cb606ad9a55780937e54"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-native-phase-20261019/v2/specs/witness.json",
+      "sha256": "20a257dcd4f0368d8adbd7a5b51a8a2439b395ee03793d87ecf8539b3376bb75"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/integration-target/release/examples/koblitz_n83_selector_witness_control",
+      "sha256": "879480df6c8694459b8ff6021b4f73b4dbb5534d622f10f20d56b67854b42795"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-native-phase-20261019/inputs/witness/domains.json",
+      "sha256": "63accc5b9dc9de6327c5b07e93b3e62717f8376a96c3f91f7bb70b77095f23bb"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-native-phase-20261019/inputs/witness/fixture.json",
+      "sha256": "fc203db28eed0164e47b0c755c3d9a09f80df1acd5e4c7e09dfe172fa5f0a538"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/fixtures/probe-corpus.json",
+      "sha256": "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/fixtures/probe-validation.json",
+      "sha256": "1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/integration-target/release/deps/crypto_lib-565bcb20cb4d5bb4",
+      "sha256": "b0c7f64f77fbbb59534864255521778055cadb9a3675f93ad9f53f36eebd3e03"
+    }
+  ],
+  "must_not_exist": [
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-test.stdout",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-test.stderr",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-trace.stdout",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-trace.stderr",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-run.stdout",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-run.stderr",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls.receipt.json"
+  ],
+  "commands": [
+    {
+      "id": "traced-small-field-positive-controls",
+      "argv": [
+        "/home/ec2-user/scratch/n83-docker-sweep-20261018/integration-target/release/deps/crypto_lib-565bcb20cb4d5bb4",
+        "cryptanalysis::koblitz_index_calculus::tests::chained_s3_frobenius_domain_lifts_and_rejects_incomplete_orbits",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "env": {
+        "N83_CHAIN_PHASE_TRACE": "1",
+        "RAYON_NUM_THREADS": "1"
+      },
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-test.stdout",
+      "stderr": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-test.stderr",
+      "outputs": []
+    },
+    {
+      "id": "check-positive-trace",
+      "argv": [
+        "/home/ec2-user/scratch/n83-native-phase-20261019/runner-v2-target/release/n83-sweep-runner",
+        "check-positive-trace",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-test.stderr"
+      ],
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-trace.stdout",
+      "stderr": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-trace.stderr",
+      "outputs": []
+    },
+    {
+      "id": "n83-selector-witness-control",
+      "argv": [
+        "/home/ec2-user/scratch/n83-native-phase-20261019/runner-v2-target/release/n83-sweep-runner",
+        "run",
+        "/home/ec2-user/scratch/n83-native-phase-20261019/v2/specs/witness.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness"
+      ],
+      "timeout_seconds": 240,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-run.stdout",
+      "stderr": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls-run.stderr",
+      "outputs": [
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness/audit.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness/config.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness/outer.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness/inspect-live.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness/inspect-final.json"
+      ]
+    }
+  ],
+  "bus_address": "executor-mechanical-n83-v2-controls",
+  "background": false,
+  "write_scope": [
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/"
+  ],
+  "stop_when": [
+    "Native card validation refuses execution.",
+    "A bound digest differs or the pinned commit differs from HEAD.",
+    "A command fails or times out or a declared output is missing."
+  ],
+  "notes": "This distinct v2 control pins known coordinates, representatives and phases. It establishes consistency of that specified witness only. Preserve the original free-selector control failure and its open search gap. All commands must complete before parent dispatches v2 retained-arm cards.",
+  "native_path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/bin:/home/ec2-user/.codex/packages/standalone/releases/0.163.0-x86_64-unknown-linux-musl/codex-path:/home/ec2-user/.elan/bin:/home/ec2-user/.codex/tmp/arg0-linux/codex-arg0eEJtgH:/home/ec2-user/.codex/packages/standalone/releases/0.163.0-x86_64-unknown-linux-musl/codex-path:/home/ec2-user/.local/bin:/home/ec2-user/.elan/bin:/home/ec2-user/.cargo/bin:/home/ec2-user/.local/bin:/home/ec2-user/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
+}

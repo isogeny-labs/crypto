@@ -1,0 +1,275 @@
+[
+    {
+        "Id": "9a53d519d83a00bae762f08065b9d77ec70f6781e0bb87047ef09e6edf3a5861",
+        "Created": "2026-10-18T19:58:07.429718126Z",
+        "Path": "/worker",
+        "Args": [
+            "v2-construct-one",
+            "/out/object",
+            "0",
+            "public_x_hash",
+            "4096",
+            "2026100801",
+            "900"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 11056,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-10-18T19:58:07.513268043Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:7c4ae649a84014c467d79319bbf17ce2632ae8b8be123ac2fb2ea5be46823f31",
+        "ResolvConfPath": "/var/lib/docker/containers/9a53d519d83a00bae762f08065b9d77ec70f6781e0bb87047ef09e6edf3a5861/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/9a53d519d83a00bae762f08065b9d77ec70f6781e0bb87047ef09e6edf3a5861/hostname",
+        "HostsPath": "/var/lib/docker/containers/9a53d519d83a00bae762f08065b9d77ec70f6781e0bb87047ef09e6edf3a5861/hosts",
+        "LogPath": "/var/lib/docker/containers/9a53d519d83a00bae762f08065b9d77ec70f6781e0bb87047ef09e6edf3a5861/9a53d519d83a00bae762f08065b9d77ec70f6781e0bb87047ef09e6edf3a5861-json.log",
+        "Name": "/n83-v2-object-f1b841e76b2a4407",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": true,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": [
+                "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+                "no-new-privileges"
+            ],
+            "Tmpfs": {
+                "/tmp": "rw,noexec,nosuid,size=64m"
+            },
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 4294967296,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 4294967296,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": 64,
+            "Ulimits": [],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990/crypto",
+                    "Target": "/Volumes/SSD990/crypto",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990/crypto/artifacts/n83_k2048_natural_highcap_20261018/worker",
+                    "Target": "/worker",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990/llm/tmp/n83_k4096_primary_20261018/construction-01",
+                    "Target": "/out"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990/crypto",
+                "Destination": "/Volumes/SSD990/crypto",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990/crypto/artifacts/n83_k2048_natural_highcap_20261018/worker",
+                "Destination": "/worker",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990/llm/tmp/n83_k4096_primary_20261018/construction-01",
+                "Destination": "/out",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "9a53d519d83a",
+            "Domainname": "",
+            "User": "501:20",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "GIT_CONFIG_VALUE_0=/Volumes/SSD990/crypto/worktrees/codex-n83-mixed-orbit-worker-20261012",
+                "GIT_CONFIG_COUNT=1",
+                "GIT_CONFIG_KEY_0=safe.directory",
+                "PATH=/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "RUSTUP_HOME=/usr/local/rustup",
+                "CARGO_HOME=/usr/local/cargo",
+                "RUST_VERSION=1.93.1"
+            ],
+            "Cmd": [
+                "/worker",
+                "v2-construct-one",
+                "/out/object",
+                "0",
+                "public_x_hash",
+                "4096",
+                "2026100801",
+                "900"
+            ],
+            "Image": "sha256:7c4ae649a84014c467d79319bbf17ce2632ae8b8be123ac2fb2ea5be46823f31",
+            "Volumes": null,
+            "WorkingDir": "/Volumes/SSD990/crypto/worktrees/codex-n83-mixed-orbit-worker-20261012",
+            "Entrypoint": null,
+            "Labels": {
+                "org.opencontainers.image.source": "https://github.com/rust-lang/docker-rust"
+            }
+        },
+        "NetworkSettings": {
+            "SandboxID": "0d19a4055f37d893df49b356403ef18fe9fa2eb62ba248c45b6bdfb90ed1920e",
+            "SandboxKey": "/var/run/docker/netns/0d19a4055f37",
+            "Ports": {},
+            "Networks": {
+                "none": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "dc053748e31d45366de97db4d48a29c0e156b61a47571b6a61ad24d52db43551",
+                    "EndpointID": "327cc5e237029c2f258b00d8ebbfd24371741677f5014df41dd2b5abc0a4a511",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "MacAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:e469417188261e17b3ec9c14a54c2802beafe400bf9baf9688fdb5294d925c06",
+            "size": 1942,
+            "annotations": {
+                "com.docker.official-images.bashbrew.arch": "arm64v8",
+                "org.opencontainers.image.base.digest": "sha256:adc6d8c3c358512d67f057da417b6a046adc76412a5138d98c591755cb4c7606",
+                "org.opencontainers.image.base.name": "buildpack-deps:bookworm",
+                "org.opencontainers.image.created": "2026-02-24T23:05:06Z",
+                "org.opencontainers.image.revision": "a67145c24ae0a04790c9d7b5289beb103e35e95e",
+                "org.opencontainers.image.source": "https://github.com/rust-lang/docker-rust.git#a67145c24ae0a04790c9d7b5289beb103e35e95e:stable/bookworm",
+                "org.opencontainers.image.url": "https://hub.docker.com/_/rust",
+                "org.opencontainers.image.version": "1-bookworm"
+            },
+            "platform": {
+                "architecture": "arm64",
+                "os": "linux",
+                "variant": "v8"
+            }
+        }
+    }
+]

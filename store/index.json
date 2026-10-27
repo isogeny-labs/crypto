@@ -228,6 +228,138 @@
         "p20-glv"
       ],
       "provenance": "ecbench fb --curve '{\"kind\":\"prime_search\",\"bits\":20,\"seed\":59297}' --factor-base 'glv-orbit:size=16' (commit 0f0db951ad)"
+    },
+    "evidence/n83/natural-800k-20261020/runs.tar.xz": {
+      "sha256": "d15b8935a470707e572e4aa5a2bf6ab9da04270b266859fafe3f693b04b254d6",
+      "bytes": 50310788,
+      "description": "All five native 800K attempts and raw custody, including failures",
+      "provenance": "Original immutable archive; access restored on replacement host; fresh S3 GET/replay/repack verified"
+    },
+    "evidence/n83/natural-800k-20261020/verification.tar.xz": {
+      "sha256": "264c77eae6bd71ee672136284b08a92ac57621739589c5ed68384fbe7f4b2c20",
+      "bytes": 168096,
+      "description": "Original sealed local 800K verification sidecar",
+      "provenance": "Immutable original sidecar, original qualifications retained"
+    },
+    "evidence/n83/natural-1m-20261020/pre-repeat-checkpoint-20261021.tar.xz": {
+      "sha256": "cbd453b3e37ff3cf97576ae40405ba9926eb70dfe9cd8dd90daa616b3868ecd9",
+      "bytes": 45155524,
+      "description": "All original 1M raw attempts including refusal, resource-profile rejection and host interruption; before strict repeats",
+      "provenance": "Frozen c60158235; no v18 timed run included"
+    },
+    "evidence/n83/natural-1m-20261020/pre-repeat-checkpoint-v20-20261021.tar.xz": {
+      "sha256": "dc52c9c6bd7e18b16fe0c0365efb79b21e9b06c008aa688eb95fcc72866b3026",
+      "bytes": 54769744,
+      "description": "All original 1M raw attempts including refusal, resource-profile rejection and host interruption; before strict repeats",
+      "provenance": "Frozen 66ab009b; five actual attempts; no v20 SAT arm included"
+    },
+    "evidence/n83/natural-1m-20261020/runs.tar.xz": {
+      "sha256": "98c4396b189493eba773c7d3d5e10f05f974d77cf9b811af8437c1150417c5ea",
+      "bytes": 55236480,
+      "description": "Seven native N83 1M attempts, all available raw evidence, final K2048/K4096 replay and memory profile PASS, original failures retained",
+      "provenance": "Worker unchanged; final controller66ab009b; protocols SCOPE-V20; seal-final.sh"
+    },
+    "evidence/n83/natural-1m-20261020/verification.tar.xz": {
+      "sha256": "3a7bb909928f164075ac695f58959968eaf4a692463c38b37b00d0b9bf4a0f6b",
+      "bytes": 1077344,
+      "description": "Full compact verification, exact source commits, post-main validation and report companion to native N83 1M raw archive",
+      "provenance": "seal-publish-sidecar.sh; raw98c4396b; integrated source7abf1175; experiment66ab009b"
+    },
+    "evidence/n83/allocation-profile-20261021/pre-profile-checkpoint.tar.xz": {
+      "sha256": "4822a25cf24f4e43c1493404f3496c18f6abbedbb106ddec2309db021cc28d8f",
+      "bytes": 34149480,
+      "description": "Frozen native N83 storage diagnostic source, ELFs, inputs, compiled K2048 card and all readiness failures before new SAT launch",
+      "provenance": "674d2075958c5cb388cbfcb271e8ebcd6dea646c; no diagnostic SAT run"
+    },
+    "evidence/n83/allocation-profile-20261021/p22-launch.tar.xz": {
+      "sha256": "924c49350a8bcf51d309ffc3132fbb16c835ea9a4e391a4221d61c770fa19be3",
+      "bytes": 8040,
+      "description": "Original shell-launch failure, director assessment, corrected frozen p22 card and recipe before worker launch",
+      "provenance": "674d2075958c5cb388cbfcb271e8ebcd6dea646c"
+    },
+    "evidence/n83/allocation-profile-20261021/completed-k2048.tar.xz": {
+      "sha256": "684432eeb4c133ddf537908a8e327b2aed00d3321469c5975521fe6cfc719060",
+      "bytes": 287300,
+      "description": "Completed K2048 450K native ownership diagnostic; raw traces/receipts/profiles and compiled K4096 card",
+      "provenance": "Frozen674d; original p21 shell failure retained; p22 all native validation PASS"
+    },
+    "evidence/n83/allocation-profile-20261021/queued-checkpoint.tar.xz": {
+      "sha256": "f8fa473bccd5bfc77daa9ef74277a0c51e6da6ca4062fbad3e50be5c7c080740",
+      "bytes": 853144,
+      "description": "New bounded queue guard, frozen source and K4096-p22 card with all earlier diagnostic raw attempts",
+      "provenance": "7e8ae96c; before K4096-p22 worker"
+    },
+    "evidence/n83/allocation-profile-20261021/runs.tar.xz": {
+      "sha256": "03754a1f073698cc4f786f03a2d3acd6eda253712370f266d11553b85982ea98",
+      "bytes": 36130808,
+      "description": "Both 450K N83 native SAT ownership profiles with all failures, full raw traces/receipts/ELFs/inputs, source and inspected report",
+      "provenance": "Worker674d; queued guard7e8ae96c; original1M arms retained separately; no reclamation or speed claim"
+    },
+    "evidence/n83/allocation-profile-20261021/verification.tar.xz": {
+      "sha256": "fdf07b855f097ecb3afb5a331ae3440b43746ff2a4e53ff588d06cdec135f76e",
+      "bytes": 633232,
+      "description": "Native N83 ownership raw publication proofs, positive/negative downloaded replay and source history",
+      "provenance": "Raw03754a1f; exact674d/7e8ae96c experiment source; post-raw-publication source bundle"
+    },
+    "evidence/n83/allocation-profile-20261021/integration-verification.tar.xz": {
+      "sha256": "99aeb0c37f3d585368be87a66787102ccc154aa1b2e818e573ebe8600bb65c53",
+      "bytes": 608144,
+      "description": "Combined PR2036 main integration source and full native release validation, preserving documentary N83 ownership evidence",
+      "provenance": "Source d5aac8e9; prerequisite remote05ec85b5; no new SAT worker/cap; raw03754a1f and sidecarfdf07b85 unchanged"
+    },
+    "evidence/n83/arena-reclamation-20261023/readiness.tar.xz": {
+      "sha256": "585d71ad1ce557a3354062a732834c5a2f61cc135a2b5038e7f65ba7fe971e16",
+      "bytes": 3390892,
+      "description": "N83 arena reclamation readiness, original CI failures and complete native validation",
+      "provenance": "Local freeze90dc5a262f; prerequisite05ec85b5; no new timed SAT arm; retains failed test source and full native gate logs"
+    },
+    "evidence/n83/arena-reclamation-20261023/integration-readiness.tar.xz": {
+      "sha256": "3f798c707ffc2d8640746b15422a97671cc089ce2478ff115b4f516f2e0d1fe1",
+      "bytes": 197506204,
+      "description": "PR2036 main integration, retained failed GPU receipt and corrected full native validation",
+      "provenance": "Freeze37631c5c; native build9d858211; prerequisite05ec85b5; no new timed N83 arm; old readiness585d71ad immutable"
+    },
+    "evidence/n83/arena-reclamation-20261023/validation-k2048-r1.tar.xz": {
+      "sha256": "4176a287c6d4cbcb18f27dd1df67a8a069788d434fcc4a9d90993f99a68a52c9",
+      "bytes": 34144472,
+      "description": "Accepted K2048 1M arena reclamation validation and all raw custody",
+      "provenance": "HEAD37631c5c; worker4fcda42f; all1001 retained counter signatures match;102 storage snapshots;59 memory samples;3 reclamations; zero relations at capUnknown; source bundle in integration-readiness3f798c70; no speed claim"
+    },
+    "evidence/n83/arena-reclamation-20261023/validation-k4096-r1.tar.xz": {
+      "sha256": "97eba74aaabf9ea5c6e3edc31a91bf985b8b2d840bb80f7f219cfd036044ae93",
+      "bytes": 34143964,
+      "description": "Accepted K4096 1M arena reclamation validation and all raw custody",
+      "provenance": "HEAD37631c5c; worker4fcda42f; all1001 retained counter signatures match;102 storage snapshots;61 memory samples;1 reclamation; zero relations at capUnknown; source bundle in integration-readiness3f798c70; no speed claim"
+    },
+    "evidence/n83/arena-reclamation-20261023/continuation-preparation.tar.xz": {
+      "sha256": "c103fb3250fe66466fffe6f90fff5ebe4bcddef49dce117c912b8ae3340c6bdc",
+      "bytes": 2984808,
+      "description": "Accepted1M arena report and exact1.5M guard readiness; no higher-cap worker yet",
+      "provenance": "a591f1da; worker sources unchanged from9d858211; guardv3b49c6f92;41+7 native tests; inspected3page PDF; retained formatting/invocation failures; bundle prerequisite37631; original30000second four-arm allowance"
+    },
+    "evidence/n83/arena-reclamation-20261023/admission-correction.tar.xz": {
+      "sha256": "d44fb92ca0bdfdec4c966c0c030d29bf0c1eab3db0e7da5289b5ad2907739d6f",
+      "bytes": 37079684,
+      "description": "K2048-c1 pre-search refusal, raw custody, validated exact worker admission and13/8987 accounting without budget extension",
+      "provenance": "Originala591 refusal12.87025458commandseconds; correctionworker0cfb0d19 guard-e11f22b0;21exporter43guard7cardtests;SOURCE-CORRECTION.bundle prerequisitea591; unchanged30000worker-second allowance; no corrected run yet"
+    },
+    "evidence/n83/arena-reclamation-20261023/launch-correction.tar.xz": {
+      "sha256": "0debd4e2016dc99c12ff152e6921b111861fe97c169d135b1e70cd2c6e285018",
+      "bytes": 37112636,
+      "description": "K2048-c2 launch failure raw evidence, bounded Docker correction, native cumulative43charge8957remaining and validated barrier readiness",
+      "provenance": "Originalde389 oneattempt29.838953191commandseconds; worker8ab6f9cf guardefa7c805;21exporter44runner7card;SOURCE-LAUNCH-CORRECTION.bundle prerequisiteb877; original30000searchallowance unchanged"
+    },
+    "evidence/n83/arena-reclamation-20261023/continuation-k2048-c3.tar.xz": {
+      "sha256": "8930bb0a93a608148f8f4e271a34628a0d2e20ce3e4fd57e1791ed14e7e2b143",
+      "bytes": 37639824,
+      "description": "Completed nativeK2048 1.5M continuation, full raw custody and 1001 reference-prefix/152storage/memory validation; CIrepair evidence",
+      "provenance": "c13e33dc oneattempt5325.486226592commandseconds;1.5MboundedUnknown0relations;4reclamations1581835327words;worker8ab6f9cf guardefa7c805; original30000allowance unchanged; SOURCE-K2048-C3.bundle prerequisite99516"
+    },
+    "evidence/n83/arena-reclamation-20261023/k4096-c1-lock-refusal.tar": {
+      "sha256": "5816e6396a98a6abfed356ba5580fc396c3761d149cda7f6561b3448ed329619",
+      "bytes": 40960,
+      "description": "K4096-c1 one-attempt benchmark-lock refusal before worker timing; exact card, receipt, relay and custody assessment",
+      "provenance": "Frozen card 83d44b539f09dfa1a74407981772d0ea0c74b61b45f4ece7847fe90fed340f58; 600.000080831 seconds queued; acquired=false; worker_search_seconds=null; no retry"
     }
   }
 }

@@ -1,0 +1,38 @@
+{
+  "card_id": "CARD-n83-sat-boundary-20261019-pinned",
+  "outcome": "impeded",
+  "stopped_at_step": null,
+  "recommendation": "escalate",
+  "interpretation": "not_assessed",
+  "relay_verbatim": true,
+  "relay_verification_basis": "Saved relay is byte-identical to the original on-disk receipt, verified with cmp and matching SHA256. Native checker itself failed after reparsing/re-rendering floats.",
+  "record_digests_verified": true,
+  "native_card_check": {
+    "exit_code": 1,
+    "passed": false,
+    "error": "relay differs from native receipt rendering",
+    "first_difference": {
+      "byte": 693,
+      "line": 17,
+      "actual_relay_and_original_receipt": "          \"seconds\": 1.1790702610000001,",
+      "regenerated_native_report": "          \"seconds\": 1.179070261,",
+      "also_differs_at_line": 37
+    }
+  },
+  "execution_status": "completed",
+  "reasons": [
+    "Frozen command receipt reports one exact argv,exit0,succeeded=true,timed_out=false,card_changed=false; no run failure observed.",
+    "All nine declared output SHA256s and both command-stream SHA256s were independently checked and matched the receipt.",
+    "Original receipt and saved actual relay have identical SHA2565ff7ce692be82354cc22e30830c1f78a02813324ca1318a476bd43846cba9264 and cmp reports no difference.",
+    "Native card-check fails because receipt read-and-render changes floating-point spelling at lines17 and37; original raw receipt and actual relay agree. Preserve this failed check as verifier/transport evidence; no artifact was rewritten.",
+    "Declared stream/output/receipt paths are inside the frozen exec/v4 write_scope; receipt dirty_before/dirty_after and current git status are empty; HEAD remains frozen5e9ee5d4b1aa6ca22368213e5bc05b343e00bfb4.",
+    "Native verification acceptance remains blocked by this concrete rendering discrepancy; parent must resolve it before treating native card-check as passed."
+  ],
+  "evidence": {
+    "card": "/home/ec2-user/scratch/n83-sat-boundary-20261019/cards/pinned.json",
+    "relay": "/home/ec2-user/scratch/n83-sat-boundary-20261019/pinned-relay.txt",
+    "receipt": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned.receipt.json",
+    "relay_and_receipt_sha256": "5ff7ce692be82354cc22e30830c1f78a02813324ca1318a476bd43846cba9264"
+  },
+  "scientific_interpretation": "not_assessed"
+}

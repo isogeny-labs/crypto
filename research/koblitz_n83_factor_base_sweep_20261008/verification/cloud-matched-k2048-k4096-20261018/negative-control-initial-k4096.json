@@ -1,0 +1,9 @@
+{
+  "status": "INITIAL_CONTROL_TEMPLATE_MISMATCH",
+  "exit_code": 1,
+  "observed_error": "worker receipt invalid: worker rank replay record is malformed",
+  "cause": "Historical K2048 template rank-history column count was not adapted to K4096. The auditor rejected the malformed template before the intended forged-target check.",
+  "correction": "Set rank-history columns to K+1 and bind manifest digest to the selected panel before retrying; original actual run evidence unchanged.",
+  "initial_negative_script_sha256": "433df48d917c23884710ebc68cc5f1761066f94bb1b0d87ef8cb8e61dd4e478d",
+  "initial_auditor_sha256": "02359a2e83f9f179f8506dd63a9d90f8f78cf10240ef3957ae25ed1745cffb88"
+}

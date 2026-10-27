@@ -1,5 +1,66 @@
 {
  "schema_version": 1,
+ "native_xor_component": {
+  "source": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-xor-indexed-20261019/SUMMARY.json",
+  "sha256": "ab4c77811a681437494b184c12eabd9fdc834eba1c524de79c8b4b664087f41c",
+  "summary": {
+   "baseline_solver_ms": {
+    "max": 216393.80451,
+    "median": 182074.425421,
+    "min": 177459.286074,
+    "n": 7
+   },
+   "candidate_solver_ms": {
+    "max": 17862.255509,
+    "median": 17767.144183,
+    "min": 17731.849428,
+    "n": 7
+   },
+   "external_algorithm_cpu_ms": {
+    "max": 2840.0,
+    "median": 2830.0,
+    "min": 2810.0,
+    "n": 7
+   },
+   "pairs": [
+    {
+     "candidate_wall_over_external_algorithm_cpu": 6.28629953357,
+     "external_timer_note": "native solve wall / CMS solve-simplify reported CPU; different timer kinds",
+     "round": 1,
+     "solver_a_over_b": 12.1636332262,
+     "word_updates_a_over_b": 394.704355222
+    },
+    {
+     "candidate_wall_over_external_algorithm_cpu": 6.27411646961,
+     "external_timer_note": "native solve wall / CMS solve-simplify reported CPU; different timer kinds",
+     "round": 2,
+     "solver_a_over_b": 9.99446883302,
+     "word_updates_a_over_b": 394.704355222
+    },
+    {
+     "candidate_wall_over_external_algorithm_cpu": 6.34929032028,
+     "external_timer_note": "native solve wall / CMS solve-simplify reported CPU; different timer kinds",
+     "round": 3,
+     "solver_a_over_b": 9.9586682883,
+     "word_updates_a_over_b": 394.704355222
+    },
+    {
+     "candidate_wall_over_external_algorithm_cpu": 6.27814282085,
+     "external_timer_note": "native solve wall / CMS solve-simplify reported CPU; different timer kinds",
+     "round": 4,
+     "solver_a_over_b": 10.1695267031,
+     "word_updates_a_over_b": 394.704355222
+    },
+    {
+     "candidate_wall_over_external_algorithm_cpu": 6.28952658768,
+     "external_timer_note": "native solve wall / CMS solve-simplify reported CPU; different timer kinds",
+     "round": 5,
+     "solver_a_over_b": 10.1932494096,
+     "word_updates_a_over_b": 394.704355222
+    }
+   ]
+  }
+ },
  "generated_by": "scripts/build_ic_leaderboard.py",
  "unit": "none: the board has three families, each with its own unit, reference and floor (families[*].unit, .reference, .floor); S, ratio to reference and ratio to floor are comparable within a family and nowhere else",
  "what_this_is": "A view of frozen whole-pipeline ECDLP measurements, curve by curve, each against its own family's matched reference and generic floor. No new measurement.",

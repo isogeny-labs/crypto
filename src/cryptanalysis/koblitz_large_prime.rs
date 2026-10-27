@@ -376,6 +376,282 @@ impl<'a> MixedOrbitDomains<'a> {
     /// constraint used by `search` are installed before export. The caller
     /// must verify the external assignment against the original clauses and
     /// equations, then use `lift` for the final curve-group check.
+    fn build_pattern_encoding(
+        &self,
+        m: usize,
+        target_x: Option<&F2mElement>,
+        identity_mask: u32,
+        domains: &[Vec<BigUint>],
+        expected_domain_clauses: usize,
+        limits: ChainS3Limits,
+        ordering: MixedOrbitOrdering,
+    ) -> Result<ChainedS3Encoding, ChainBuildError> {
+        let mut enc = ChainedS3Encoding::build(
+            m,
+            &self.curve.curve.irreducible,
+            &self.curve.curve.b,
+            target_x,
+            identity_mask,
+            limits.max_variables,
+        )?;
+        let actual = enc.constrain_frobenius_orbit_domains(
+            domains,
+            limits.max_variables,
+            limits.max_domain_clauses,
+        )?;
+        if actual.clauses != expected_domain_clauses {
+            return Err(ChainBuildError::Unsupported);
+        }
+        match ordering {
+            MixedOrbitOrdering::Unordered => {}
+            MixedOrbitOrdering::FirstPair => enc.order_first_pair(limits.max_variables)?,
+            MixedOrbitOrdering::EqualDomainRuns => {
+                enc.order_equal_adjacent_summands(limits.max_variables)?;
+            }
+        }
+        Ok(enc)
+    }
+
+    /// Build one exact pre-solve instance for external XOR-SAT replay. A single
+    /// identity mask is only one pattern, so UNSAT here does not refute a query.
+    pub fn export_pattern_encoding(
+        &self,
+        coef_a: &BigUint,
+        coef_b: &BigUint,
+        public_target: &BinaryPoint,
+        small_summands: usize,
+        residual_summands: usize,
+        identity_mask: u32,
+        limits: ChainS3Limits,
+        ordering: MixedOrbitOrdering,
+    ) -> Result<ChainedS3Encoding, ChainBuildError> {
+        let m = small_summands
+            .checked_add(residual_summands)
+            .ok_or(ChainBuildError::Unsupported)?;
+        if !(5..=6).contains(&m)
+            || small_summands < 3
+            || !(1..=2).contains(&residual_summands)
+            || identity_mask >= (1u32 << (m - 2))
+            || limits.max_models == 0
+            || limits.conflict_budget == 0
+            || !self.curve.curve.is_on_curve(public_target)
+            || self.curve.mul(public_target, &self.curve.subgroup_order) != BinaryPoint::Infinity
+        {
+            return Err(ChainBuildError::Unsupported);
+        }
+        let small =
+            frobenius_orbit_domain_size(self.curve.n, small_summands, self.small_reps.len())
+                .ok_or(ChainBuildError::Unsupported)?;
+        let residual =
+            frobenius_orbit_domain_size(self.curve.n, residual_summands, self.residual_reps.len())
+                .ok_or(ChainBuildError::Unsupported)?;
+        let clauses = small
+            .clauses
+            .checked_add(residual.clauses)
+            .ok_or(ChainBuildError::Unsupported)?;
+        if clauses > limits.max_domain_clauses {
+            return Err(ChainBuildError::DomainClauseCap {
+                required: clauses,
+                maximum: limits.max_domain_clauses,
+            });
+        }
+        let modulus = &self.curve.subgroup_order;
+        let a = coef_a % modulus;
+        let b = coef_b % modulus;
+        let target = self.curve.add(
+            &self.curve.mul(self.curve.generator(), &a),
+            &self.curve.mul(public_target, &b),
+        );
+        let target_x = match &target {
+            BinaryPoint::Affine { x, .. } => Some(x),
+            BinaryPoint::Infinity => None,
+        };
+        let domains: Vec<Vec<BigUint>> = (0..m)
+            .map(|position| {
+                if position < small_summands {
+                    self.small_reps.clone()
+                } else {
+                    self.residual_reps.clone()
+                }
+            })
+            .collect();
+        self.build_pattern_encoding(
+            m,
+            target_x,
+            identity_mask,
+            &domains,
+            clauses,
+            limits,
+            ordering,
+        )
+    }
+
+    /// Search with an explicit, replayable summand-ordering arm. The
+    /// `EqualDomainRuns` arm is complete only across the full identity-pattern
+    /// loop below; a cap remains inconclusive for either ordering.
+    pub fn search_with_ordering(
+        &self,
+        source_id: u64,
+        coef_a: &BigUint,
+        coef_b: &BigUint,
+        public_target: &BinaryPoint,
+        small_summands: usize,
+        residual_summands: usize,
+        limits: ChainS3Limits,
+        ordering: MixedOrbitOrdering,
+    ) -> (Option<PartialCandidate>, ChainS3Stats) {
+        let mut stats = ChainS3Stats::default();
+        let Some(m) = small_summands.checked_add(residual_summands) else {
+            stats.exhausted = true;
+            return (None, stats);
+        };
+        if !(5..=6).contains(&m)
+            || small_summands < 3
+            || !(1..=2).contains(&residual_summands)
+            || limits.max_models == 0
+            || limits.conflict_budget == 0
+            || !self.curve.curve.is_on_curve(public_target)
+            || self.curve.mul(public_target, &self.curve.subgroup_order) != BinaryPoint::Infinity
+        {
+            stats.exhausted = true;
+            return (None, stats);
+        }
+        let small_size =
+            frobenius_orbit_domain_size(self.curve.n, small_summands, self.small_reps.len());
+        let residual_size =
+            frobenius_orbit_domain_size(self.curve.n, residual_summands, self.residual_reps.len());
+        let Some(domain_clauses) = small_size
+            .zip(residual_size)
+            .and_then(|(small, residual)| small.clauses.checked_add(residual.clauses))
+        else {
+            stats.exhausted = true;
+            return (None, stats);
+        };
+        if domain_clauses > limits.max_domain_clauses {
+            stats.exhausted = true;
+            return (None, stats);
+        }
+        stats.domain_clauses = domain_clauses;
+        let modulus = &self.curve.subgroup_order;
+        let a = coef_a % modulus;
+        let b = coef_b % modulus;
+        let target = self.curve.add(
+            &self.curve.mul(self.curve.generator(), &a),
+            &self.curve.mul(public_target, &b),
+        );
+        let target_x = match &target {
+            BinaryPoint::Affine { x, .. } => Some(x),
+            BinaryPoint::Infinity => None,
+        };
+        let domains: Vec<Vec<BigUint>> = (0..m)
+            .map(|position| {
+                if position < small_summands {
+                    self.small_reps.clone()
+                } else {
+                    self.residual_reps.clone()
+                }
+            })
+            .collect();
+        for identity_mask in 0..(1u32 << (m - 2)) {
+            if stats.conflicts >= limits.conflict_budget {
+                stats.exhausted = true;
+                return (None, stats);
+            }
+            let mut enc = match self.build_pattern_encoding(
+                m,
+                target_x,
+                identity_mask,
+                &domains,
+                domain_clauses,
+                limits,
+                ordering,
+            ) {
+                Ok(enc) => enc,
+                Err(
+                    ChainBuildError::VariableCap { .. }
+                    | ChainBuildError::DomainClauseCap { .. }
+                    | ChainBuildError::Unsupported,
+                ) => {
+                    stats.exhausted = true;
+                    return (None, stats);
+                }
+            };
+            stats.patterns_attempted += 1;
+            stats.peak_variables = stats.peak_variables.max(enc.solver.n_vars());
+            stats.peak_clauses = stats.peak_clauses.max(enc.solver.n_clauses());
+            stats.peak_xors = stats.peak_xors.max(enc.solver.n_xors());
+            let earlier_conflicts = stats.conflicts;
+            enc.solver.conflict_budget = limits.conflict_budget - earlier_conflicts;
+            loop {
+                stats.solver_calls += 1;
+                let outcome = enc.solver.solve();
+                stats.conflicts = earlier_conflicts.saturating_add(enc.solver.conflicts());
+                match outcome {
+                    SolveResult::Unsat => {
+                        stats.patterns_refuted += 1;
+                        break;
+                    }
+                    SolveResult::Unknown => {
+                        stats.exhausted = true;
+                        return (None, stats);
+                    }
+                    SolveResult::Sat => {
+                        let xs = enc.decode_summands();
+                        stats.models += 1;
+                        if !enc.verify_model()
+                            || xs.iter().enumerate().any(|(position, x)| {
+                                let allowed = if position < small_summands {
+                                    &self.small_xs
+                                } else {
+                                    &self.residual_xs
+                                };
+                                !allowed.contains(&x.to_biguint())
+                            })
+                        {
+                            stats.invalid_models += 1;
+                            stats.exhausted = true;
+                            return (None, stats);
+                        }
+                        if let Some((small_point_indices, residual_points)) =
+                            self.lift(&xs, small_summands, &target)
+                        {
+                            return (
+                                Some(PartialCandidate {
+                                    source_id,
+                                    coef_a: a,
+                                    coef_b: b,
+                                    small_point_indices,
+                                    residual_points,
+                                }),
+                                stats,
+                            );
+                        }
+                        stats.group_rejected_models += 1;
+                        if stats.models >= limits.max_models {
+                            stats.exhausted = true;
+                            return (None, stats);
+                        }
+                        let model = enc.solver.model();
+                        enc.solver.reset_search();
+                        let block: Vec<i32> = (0..m * self.curve.n as usize)
+                            .map(|i| {
+                                if model[i] {
+                                    -((i + 1) as i32)
+                                } else {
+                                    (i + 1) as i32
+                                }
+                            })
+                            .collect();
+                        enc.solver.add_clause(block);
+                    }
+                }
+            }
+        }
+        stats.refuted = true;
+        (None, stats)
+    }
+
+
     pub fn first_pattern_encoding(
         &self,
         coef_a: &BigUint,
