@@ -38,6 +38,11 @@ jobs:
         toolchain: [pinned, 'leanprover/lean4:v4.19.0']
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The gate's fixtures need only this subtree. A full research
+          # checkout can exhaust disk before the Lean toolchain extracts.
+          sparse-checkout: /tools/lean/
+          sparse-checkout-cone-mode: false
       - name: Install elan
         run: |
           toolchain='${{ matrix.toolchain }}'

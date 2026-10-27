@@ -1,0 +1,3450 @@
+{
+  "audited_case_local_count_sums": {
+    "double-l0-active": {
+      "f4_row_reduction_fp_muls": 4110616998,
+      "pair_representatives": 33696,
+      "signed_pairs": 808704,
+      "signed_physical_relations": 504,
+      "systems_attempted": 33696,
+      "unique_projective_augmented_rows": 15,
+      "zero_augmented_rows": 0
+    },
+    "phi-l0-active": {
+      "f4_row_reduction_fp_muls": 4112120748,
+      "pair_representatives": 33696,
+      "signed_pairs": 808704,
+      "signed_physical_relations": 504,
+      "systems_attempted": 33696,
+      "unique_projective_augmented_rows": 15,
+      "zero_augmented_rows": 0
+    }
+  },
+  "audited_complete_case_arms": 42,
+  "expected_case_arms": 42,
+  "records": [
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "35cf042e1d5f7497e4a65f91d8ab7141d672c60a226400e0746ace9d2ec69335",
+      "candidate_sha256": "96a95b2e558c73df17051cd83cb27f054066416f7a25212d0024a6434a9fa04d",
+      "case": "p37-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 4248208,
+        "group_add_calls": 4262,
+        "subgroup_muls": 3263
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 24179740,
+      "factor_log_rank": 2,
+      "factor_log_solution_point_verified": true,
+      "independent_checks": {
+        "factor_log_rank": 2,
+        "factor_log_solution_point_verified": true,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 12,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 24179740,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 72
+        },
+        "relations": 72,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 2,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 303757671,
+        "allocation_calls": 3021831,
+        "peak_live_rust_bytes": 6366732,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 37,
+      "pair_representatives": 216,
+      "public_input_sha256": "5a55715c3d8f532634722ff6f58562e8f7e9f7d339f529cda724677da0f9b393",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 7568794,
+        "group_add_calls": 2658,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 72,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 2,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "952b321b00007b9190b3ce350a55bc92473613eca1f6df493c3d38b1649f927f",
+      "candidate_sha256": "a5faec126b569c6a5cc6c36755b417cfeb4dca5cef7555a957740658cb556b90",
+      "case": "p37-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 2091854,
+        "group_add_calls": 856,
+        "subgroup_muls": 1043
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 24381105,
+      "factor_log_rank": 1,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 1,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 4,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 24381105,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 24
+        },
+        "relations": 24,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 1,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 292763231,
+        "allocation_calls": 2822707,
+        "peak_live_rust_bytes": 6365433,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 37,
+      "pair_representatives": 216,
+      "public_input_sha256": "5a55715c3d8f532634722ff6f58562e8f7e9f7d339f529cda724677da0f9b393",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 6718582,
+        "group_add_calls": 1506,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 24,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 1,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "71d2b9205e50faf234c4f6dfa6615a05f8a6e06123c0bc5b7c8a0e9d51d0f75f",
+      "candidate_sha256": "efbf2913662126cd6db6bcf80d52930ac8268b09ca26be6844a1f1cc1e89a30c",
+      "case": "p37-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 4294834,
+        "group_add_calls": 4325,
+        "subgroup_muls": 3263
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 24179740,
+      "factor_log_rank": 2,
+      "factor_log_solution_point_verified": true,
+      "independent_checks": {
+        "factor_log_rank": 2,
+        "factor_log_solution_point_verified": true,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 12,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 24179740,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 72
+        },
+        "relations": 72,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 2,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 303757676,
+        "allocation_calls": 3021831,
+        "peak_live_rust_bytes": 6367146,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 37,
+      "pair_representatives": 216,
+      "public_input_sha256": "201282ca734eabae167e11ec15b97741aaff93580e1b65198cd433b4a99f9003",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 7552150,
+        "group_add_calls": 2634,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 72,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 2,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "ba31626ad64a6d94d31e1b3195c1398efe86269a8242e49cf8c70b7109c22d85",
+      "candidate_sha256": "1b9d7b812ab22e71f6933502ae990190a643a06692ef4da44aa41b940b3923b0",
+      "case": "p37-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 2091854,
+        "group_add_calls": 856,
+        "subgroup_muls": 1043
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 24381105,
+      "factor_log_rank": 1,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 1,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 4,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 24381105,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 24
+        },
+        "relations": 24,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 1,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 292763265,
+        "allocation_calls": 2822707,
+        "peak_live_rust_bytes": 6365863,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 37,
+      "pair_representatives": 216,
+      "public_input_sha256": "201282ca734eabae167e11ec15b97741aaff93580e1b65198cd433b4a99f9003",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 6701938,
+        "group_add_calls": 1482,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 24,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 1,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "2fb8436db2176db5ec082689d0bbe8dcef21d9ecd5f277d27cc37d270e8b6bf7",
+      "candidate_sha256": "ecc738f67a7cb943911c26b90ed4fe4186c9d9b1cabe257b25e86491d69d3c9e",
+      "case": "p37-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 4258373,
+        "group_add_calls": 4275,
+        "subgroup_muls": 3263
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 24179740,
+      "factor_log_rank": 2,
+      "factor_log_solution_point_verified": true,
+      "independent_checks": {
+        "factor_log_rank": 2,
+        "factor_log_solution_point_verified": true,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 12,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 24179740,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 72
+        },
+        "relations": 72,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 2,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 303757664,
+        "allocation_calls": 3021831,
+        "peak_live_rust_bytes": 6366432,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 37,
+      "pair_representatives": 216,
+      "public_input_sha256": "ec16adf0dd572374bb7d79f9f8094fd9930a3c3d90709848411696183f247fba",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 7559237,
+        "group_add_calls": 2644,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 72,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 2,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "fda59eefcab9a00d3363d4bc4bf30301cb07de21d54d011fd170c0849ec5e9ed",
+      "candidate_sha256": "19c507bcc587e9d9be584a459fdd747d5cfa29734d30ce535a276fc046e4a3cb",
+      "case": "p37-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 2091854,
+        "group_add_calls": 856,
+        "subgroup_muls": 1043
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 24381105,
+      "factor_log_rank": 1,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 1,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 4,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 24381105,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 24
+        },
+        "relations": 24,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 1,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 292763230,
+        "allocation_calls": 2822707,
+        "peak_live_rust_bytes": 6365139,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 37,
+      "pair_representatives": 216,
+      "public_input_sha256": "ec16adf0dd572374bb7d79f9f8094fd9930a3c3d90709848411696183f247fba",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 6709025,
+        "group_add_calls": 1492,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 24,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 1,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "a747f1ea1011aacfae064d5a241c1162f2f526b682c6ece11f0dcfaa37a2c68c",
+      "candidate_sha256": "ee2494327155e5dcb2b2195bd7c3784777e5449714abb3744b3d2a8afc4559e6",
+      "case": "p73-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 3473290,
+        "group_add_calls": 384,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 45111785,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 384,
+          "f4_row_reduction_fp_muls_checked_sum": 45111785,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 9216,
+          "systems_inspected": 384,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 3,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 556630425,
+        "allocation_calls": 5591404,
+        "peak_live_rust_bytes": 11353763,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 73,
+      "pair_representatives": 384,
+      "public_input_sha256": "45b3ca3006bc4c77c703d5affb626786fb65573799193620982c8048a7210436",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 11583842,
+        "group_add_calls": 3732,
+        "subgroup_muls": 6114
+      },
+      "signed_pairs": 9216,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 384,
+      "unanchored_factor_columns": 3,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "9192f1280d40d12ff1f485392f6a07618961e712f7b1477b0f1d3f764489f11e",
+      "candidate_sha256": "ef6e121cb3fa5460257fea520e256c1d797a3c86a1296bb7610a1bc399a1a860",
+      "case": "p73-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 3338085,
+        "group_add_calls": 384,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 45508035,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 384,
+          "f4_row_reduction_fp_muls_checked_sum": 45508035,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 9216,
+          "systems_inspected": 384,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 3,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 536214823,
+        "allocation_calls": 5256294,
+        "peak_live_rust_bytes": 11369033,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 73,
+      "pair_representatives": 384,
+      "public_input_sha256": "45b3ca3006bc4c77c703d5affb626786fb65573799193620982c8048a7210436",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 10293362,
+        "group_add_calls": 2196,
+        "subgroup_muls": 6114
+      },
+      "signed_pairs": 9216,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 384,
+      "unanchored_factor_columns": 3,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "a09707f40265ed804234b9fbfd94f60eb8ea50969f949158f928da254d427a89",
+      "candidate_sha256": "def397e2374965fbdaafb6cb925120ef5daac329fdba4cec4e4ff258f7b33b9e",
+      "case": "p73-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 3473290,
+        "group_add_calls": 384,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 45111785,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 384,
+          "f4_row_reduction_fp_muls_checked_sum": 45111785,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 9216,
+          "systems_inspected": 384,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 3,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 556630447,
+        "allocation_calls": 5591404,
+        "peak_live_rust_bytes": 11354408,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 73,
+      "pair_representatives": 384,
+      "public_input_sha256": "ec8a683fe70e5e3659a3bdd02237242ace337b1ecef9dbd6ab5d188b67e144aa",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 11571473,
+        "group_add_calls": 3717,
+        "subgroup_muls": 6114
+      },
+      "signed_pairs": 9216,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 384,
+      "unanchored_factor_columns": 3,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "e921f6e531230c7d76bd18fccd47950ec851f704f8e40aad1c8d36c1b3c0ba51",
+      "candidate_sha256": "f28f2f7e2e399fa8c6743de4042dc5af2cddfca5a86e9b737f70cb3148d942e5",
+      "case": "p73-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 3338085,
+        "group_add_calls": 384,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 45508035,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 384,
+          "f4_row_reduction_fp_muls_checked_sum": 45508035,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 9216,
+          "systems_inspected": 384,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 3,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 536214823,
+        "allocation_calls": 5256294,
+        "peak_live_rust_bytes": 11369446,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 73,
+      "pair_representatives": 384,
+      "public_input_sha256": "ec8a683fe70e5e3659a3bdd02237242ace337b1ecef9dbd6ab5d188b67e144aa",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 10280993,
+        "group_add_calls": 2181,
+        "subgroup_muls": 6114
+      },
+      "signed_pairs": 9216,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 384,
+      "unanchored_factor_columns": 3,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "1f8881757925f7246a6e8f7186100a72729481a85b05ae3e47b39de0bda293f2",
+      "candidate_sha256": "5408b9c3e362384bc32dc84c0db65bd861e67f64d0e2c36c52baff62839e2605",
+      "case": "p73-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 3473290,
+        "group_add_calls": 384,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 45111785,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 384,
+          "f4_row_reduction_fp_muls_checked_sum": 45111785,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 9216,
+          "systems_inspected": 384,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 3,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 556630437,
+        "allocation_calls": 5591404,
+        "peak_live_rust_bytes": 11354709,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 73,
+      "pair_representatives": 384,
+      "public_input_sha256": "016730d4475f6a987d853622f957e6d1d6705b07e71846e336b408ef45fb48ff",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 11594729,
+        "group_add_calls": 3746,
+        "subgroup_muls": 6114
+      },
+      "signed_pairs": 9216,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 384,
+      "unanchored_factor_columns": 3,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "05e8fcdbb1123fdf744b286cb8363bff881f0050fbab06d2ea155320d0ebc3c1",
+      "candidate_sha256": "655dcd3980cf40cdded09b0843e262ebeed651d1cf124f81a47746ea0da1d173",
+      "case": "p73-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 3338085,
+        "group_add_calls": 384,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 45508035,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 384,
+          "f4_row_reduction_fp_muls_checked_sum": 45508035,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 9216,
+          "systems_inspected": 384,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 3,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 536214837,
+        "allocation_calls": 5256294,
+        "peak_live_rust_bytes": 11369759,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 73,
+      "pair_representatives": 384,
+      "public_input_sha256": "016730d4475f6a987d853622f957e6d1d6705b07e71846e336b408ef45fb48ff",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 10304249,
+        "group_add_calls": 2210,
+        "subgroup_muls": 6114
+      },
+      "signed_pairs": 9216,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 384,
+      "unanchored_factor_columns": 3,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "1bbd0385879c7791c62d5a237cb520b6ef077697044347f4af05a6e165f0764c",
+      "candidate_sha256": "c333e7400c920cd12077f8a716a14ac12108d9ad73e0279dff21c4ffa741adf9",
+      "case": "p97-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 2140777,
+        "group_add_calls": 216,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 25470519,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 25470519,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 331299821,
+        "allocation_calls": 3442869,
+        "peak_live_rust_bytes": 6605757,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 97,
+      "pair_representatives": 216,
+      "public_input_sha256": "b65f6457ed20374af4b672d1b4e26dba0fd442f92843fd5e7065f5160d9ba0d3",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 9525173,
+        "group_add_calls": 2889,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "3566d632b38a3f947a13771976d829479e8fcb34657d72f6c374d7efbfbd65a1",
+      "candidate_sha256": "7d090dce5ab967435e1b70edbebccefb1886a16b0b5bfd90bd1d54fb9fdb3d5d",
+      "case": "p97-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 1984341,
+        "group_add_calls": 216,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 25671609,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 25671609,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 310780091,
+        "allocation_calls": 3120726,
+        "peak_live_rust_bytes": 6616184,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 97,
+      "pair_representatives": 216,
+      "public_input_sha256": "b65f6457ed20374af4b672d1b4e26dba0fd442f92843fd5e7065f5160d9ba0d3",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 8475917,
+        "group_add_calls": 1773,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "d50998e4d94419bb568fd674c14a2401859429e770ce992d2fcd5cec45d2886e",
+      "candidate_sha256": "6ad65f1058e4c34b62d821e96810c9ffcad98235a38b4000797da92385aca6b4",
+      "case": "p97-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 2140777,
+        "group_add_calls": 216,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 25470519,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 25470519,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 331299831,
+        "allocation_calls": 3442869,
+        "peak_live_rust_bytes": 6590503,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 97,
+      "pair_representatives": 216,
+      "public_input_sha256": "029997e1b3de77668b4d1183cab2a1c72247e3d3cd446861427c8847e15edaaa",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 9565662,
+        "group_add_calls": 2933,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "2b26b2b1d7d7eccb342177c46918d96ca6fd9371ae980435df036436234698a2",
+      "candidate_sha256": "69eb70991be7a569c9f4bfb9228f42d87559f0cc707043daeb9065d9aef0018d",
+      "case": "p97-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 1984341,
+        "group_add_calls": 216,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 25671609,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 25671609,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 310780135,
+        "allocation_calls": 3120726,
+        "peak_live_rust_bytes": 6578847,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 97,
+      "pair_representatives": 216,
+      "public_input_sha256": "029997e1b3de77668b4d1183cab2a1c72247e3d3cd446861427c8847e15edaaa",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 8516406,
+        "group_add_calls": 1817,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "e860a500e16967bbb9e48f5e8d02e0ab56d2345a4a9e02c8f7fa1d54d9556ced",
+      "candidate_sha256": "8d282b083e8f08dbac34f30305be1682b98b2ef23cdaf3e92ea150e822ef73f5",
+      "case": "p97-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 2140777,
+        "group_add_calls": 216,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 25470519,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 25470519,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 331299823,
+        "allocation_calls": 3442869,
+        "peak_live_rust_bytes": 6578324,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 97,
+      "pair_representatives": 216,
+      "public_input_sha256": "2a162b4867db56aa15b876852d3429360067f528d08469a6a10274a5dae5f330",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 9592908,
+        "group_add_calls": 2963,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "04878016e23e36b369b7cf48dcd26e2c9329bbeaa620374c471a645b0e7bb29e",
+      "candidate_sha256": "224071d5cd94bc204b9af79307a3ab5294ed7fc9fa5ebcd1c34e1387c7b516f7",
+      "case": "p97-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 1984341,
+        "group_add_calls": 216,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 25671609,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 216,
+          "f4_row_reduction_fp_muls_checked_sum": 25671609,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 5184,
+          "systems_inspected": 216,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 2,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 310780123,
+        "allocation_calls": 3120726,
+        "peak_live_rust_bytes": 6588766,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 97,
+      "pair_representatives": 216,
+      "public_input_sha256": "2a162b4867db56aa15b876852d3429360067f528d08469a6a10274a5dae5f330",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 8543652,
+        "group_add_calls": 1847,
+        "subgroup_muls": 4615
+      },
+      "signed_pairs": 5184,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 216,
+      "unanchored_factor_columns": 2,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "1d32957da4b2e6be59f251681a6ce5ef080b36cc91f339a641900858438d06bc",
+      "candidate_sha256": "2191f6cbf733247cae9165d3a845a72c7388c8e1e875afb4bf5181b0cf8d857d",
+      "case": "p157-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 19378664,
+        "group_add_calls": 3224,
+        "subgroup_muls": 3310
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 236332991,
+      "factor_log_rank": 2,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 2,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 8,
+          "disjoint_free_pair_orbits": 1944,
+          "f4_row_reduction_fp_muls_checked_sum": 236332991,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 46656,
+          "systems_inspected": 1944,
+          "transported_union_relations": 48
+        },
+        "relations": 48,
+        "unanchored_factor_columns": 8,
+        "unique_projective_augmented_rows": 2,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2837984452,
+        "allocation_calls": 28425043,
+        "peak_live_rust_bytes": 57065061,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 157,
+      "pair_representatives": 1944,
+      "public_input_sha256": "0f850a61559bffc8a002f23f13d8d3abc094f8708e5948546a0dac6e0920d3e4",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 31726576,
+        "group_add_calls": 9077,
+        "subgroup_muls": 13609
+      },
+      "signed_pairs": 46656,
+      "signed_physical_relations": 48,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1944,
+      "unanchored_factor_columns": 8,
+      "unique_projective_augmented_rows": 2,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "516689842d9d8a3a5715341ac1f1142ccf96a851019be332fe12b09fc92a70e0",
+      "candidate_sha256": "06ebfc7542280d03a7bc147c5e42fa86fc1e252c7c413b7662ad09f0171bb7e2",
+      "case": "p157-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 18051994,
+        "group_add_calls": 2584,
+        "subgroup_muls": 1631
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 235863673,
+      "factor_log_rank": 1,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 1,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 4,
+          "disjoint_free_pair_orbits": 1944,
+          "f4_row_reduction_fp_muls_checked_sum": 235863673,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 46656,
+          "systems_inspected": 1944,
+          "transported_union_relations": 24
+        },
+        "relations": 24,
+        "unanchored_factor_columns": 8,
+        "unique_projective_augmented_rows": 1,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2714839194,
+        "allocation_calls": 26457695,
+        "peak_live_rust_bytes": 56948191,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 157,
+      "pair_representatives": 1944,
+      "public_input_sha256": "0f850a61559bffc8a002f23f13d8d3abc094f8708e5948546a0dac6e0920d3e4",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 28156096,
+        "group_add_calls": 5405,
+        "subgroup_muls": 13609
+      },
+      "signed_pairs": 46656,
+      "signed_physical_relations": 24,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1944,
+      "unanchored_factor_columns": 8,
+      "unique_projective_augmented_rows": 1,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "a3778804352d24bba38e0dcbc5c083467150cb5bc9dfc9f2af260b2d63d8af6f",
+      "candidate_sha256": "c5b56f8ca6485c21ac761012277be7518aa3d935b2e69f7f520d2203632305f0",
+      "case": "p157-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 19378664,
+        "group_add_calls": 3224,
+        "subgroup_muls": 3310
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 236332991,
+      "factor_log_rank": 2,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 2,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 8,
+          "disjoint_free_pair_orbits": 1944,
+          "f4_row_reduction_fp_muls_checked_sum": 236332991,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 46656,
+          "systems_inspected": 1944,
+          "transported_union_relations": 48
+        },
+        "relations": 48,
+        "unanchored_factor_columns": 8,
+        "unique_projective_augmented_rows": 2,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2837984505,
+        "allocation_calls": 28425043,
+        "peak_live_rust_bytes": 57066845,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 157,
+      "pair_representatives": 1944,
+      "public_input_sha256": "ebd31897d2e2551e6a5bc1dd5db2259be990bbe26a51af65cc62321450972842",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 31724030,
+        "group_add_calls": 9075,
+        "subgroup_muls": 13609
+      },
+      "signed_pairs": 46656,
+      "signed_physical_relations": 48,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1944,
+      "unanchored_factor_columns": 8,
+      "unique_projective_augmented_rows": 2,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "cc76ce49a72a3af8123b137098a01265a806d4668b81aca81c63f1137070f5e0",
+      "candidate_sha256": "bbe711c241fb33256c91f524bc65560bdea55e37e3580ab351149ee2cafa5709",
+      "case": "p157-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 18051994,
+        "group_add_calls": 2584,
+        "subgroup_muls": 1631
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 235863673,
+      "factor_log_rank": 1,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 1,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 4,
+          "disjoint_free_pair_orbits": 1944,
+          "f4_row_reduction_fp_muls_checked_sum": 235863673,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 46656,
+          "systems_inspected": 1944,
+          "transported_union_relations": 24
+        },
+        "relations": 24,
+        "unanchored_factor_columns": 8,
+        "unique_projective_augmented_rows": 1,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2714839230,
+        "allocation_calls": 26457695,
+        "peak_live_rust_bytes": 56949196,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 157,
+      "pair_representatives": 1944,
+      "public_input_sha256": "ebd31897d2e2551e6a5bc1dd5db2259be990bbe26a51af65cc62321450972842",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 28153550,
+        "group_add_calls": 5403,
+        "subgroup_muls": 13609
+      },
+      "signed_pairs": 46656,
+      "signed_physical_relations": 24,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1944,
+      "unanchored_factor_columns": 8,
+      "unique_projective_augmented_rows": 1,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "f0e218dcba66077c530ae837eb01c76c88161f63950e51f216d64c0531994416",
+      "candidate_sha256": "3f6f5086ae5ede4669461ce11c3f3a480f124d6127b38ef76e3e2708c82c8048",
+      "case": "p157-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 19378664,
+        "group_add_calls": 3224,
+        "subgroup_muls": 3310
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 236332991,
+      "factor_log_rank": 2,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 2,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 8,
+          "disjoint_free_pair_orbits": 1944,
+          "f4_row_reduction_fp_muls_checked_sum": 236332991,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 46656,
+          "systems_inspected": 1944,
+          "transported_union_relations": 48
+        },
+        "relations": 48,
+        "unanchored_factor_columns": 8,
+        "unique_projective_augmented_rows": 2,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2837984523,
+        "allocation_calls": 28425043,
+        "peak_live_rust_bytes": 57065573,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 157,
+      "pair_representatives": 1944,
+      "public_input_sha256": "05b4fb5497cb12f76f77c6ed35fc3fdc445a5d9d1c00335c119fb550d80f2710",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 31685555,
+        "group_add_calls": 9036,
+        "subgroup_muls": 13609
+      },
+      "signed_pairs": 46656,
+      "signed_physical_relations": 48,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1944,
+      "unanchored_factor_columns": 8,
+      "unique_projective_augmented_rows": 2,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "11005cb0b8f79fde7cb98b19314f498db8a5b1ddbbda164eb8bba00669529aab",
+      "candidate_sha256": "ee324d980f31155d04e5ec4812c012a36c8882ca88866214da558b1a62251e4c",
+      "case": "p157-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 18051994,
+        "group_add_calls": 2584,
+        "subgroup_muls": 1631
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 235863673,
+      "factor_log_rank": 1,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 1,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 4,
+          "disjoint_free_pair_orbits": 1944,
+          "f4_row_reduction_fp_muls_checked_sum": 235863673,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 46656,
+          "systems_inspected": 1944,
+          "transported_union_relations": 24
+        },
+        "relations": 24,
+        "unanchored_factor_columns": 8,
+        "unique_projective_augmented_rows": 1,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2714839346,
+        "allocation_calls": 26457695,
+        "peak_live_rust_bytes": 56948750,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 157,
+      "pair_representatives": 1944,
+      "public_input_sha256": "05b4fb5497cb12f76f77c6ed35fc3fdc445a5d9d1c00335c119fb550d80f2710",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 28115075,
+        "group_add_calls": 5364,
+        "subgroup_muls": 13609
+      },
+      "signed_pairs": 46656,
+      "signed_physical_relations": 24,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1944,
+      "unanchored_factor_columns": 8,
+      "unique_projective_augmented_rows": 1,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "0b068c66ade21d4c8978ab7604b5d40815e0858018694f0149a88324a8d15ca0",
+      "candidate_sha256": "c009ed52c2632077727b976ec4af812b1342c62da75566907402c9ecfaeb297c",
+      "case": "p229-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 16630493,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187512130,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187512130,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2350070972,
+        "allocation_calls": 24162769,
+        "peak_live_rust_bytes": 45577323,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 229,
+      "pair_representatives": 1536,
+      "public_input_sha256": "40c69d9eebda084bbd9000775fb92d10cc31fea132e1b6b4760f610e32712773",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 33309257,
+        "group_add_calls": 9804,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "43ec59750405a1d60f0beecf784322d467ba78dd6ad69a5253dc4d9a29db2b03",
+      "candidate_sha256": "4a401eba2846d6c0160c7426a5ee35f8aafc1c1091d6507524754517bb09568a",
+      "case": "p229-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 15143666,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187399810,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187399810,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2207967293,
+        "allocation_calls": 22015344,
+        "peak_live_rust_bytes": 45420541,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 229,
+      "pair_representatives": 1536,
+      "public_input_sha256": "40c69d9eebda084bbd9000775fb92d10cc31fea132e1b6b4760f610e32712773",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 28238537,
+        "group_add_calls": 5196,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "3ebd47aab9b29f015643d9cd591d8364298ba066f330dfea7313319f11d24e10",
+      "candidate_sha256": "32f43332d1cadd7bc4321b3c09ca68ac3a8b8f102c0c2414afe03ba90a81f671",
+      "case": "p229-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 16630493,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187512130,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187512130,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2350070978,
+        "allocation_calls": 24162769,
+        "peak_live_rust_bytes": 45576479,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 229,
+      "pair_representatives": 1536,
+      "public_input_sha256": "c6988eadaf773fde3e07e638285256af90b7d117c5d7fdf2553e550c3e2b79ef",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 33310093,
+        "group_add_calls": 9805,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "2af91c0ee9d89f79cda60440f7547a8ef8fec17fa771f7be67fcef955705fe98",
+      "candidate_sha256": "38e73847087408ecf67e584cb54e561fa945a21d7f2eeea1d6ffb2452b2aa9c9",
+      "case": "p229-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 15143666,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187399810,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187399810,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2207967345,
+        "allocation_calls": 22015344,
+        "peak_live_rust_bytes": 45428034,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 229,
+      "pair_representatives": 1536,
+      "public_input_sha256": "c6988eadaf773fde3e07e638285256af90b7d117c5d7fdf2553e550c3e2b79ef",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 28239373,
+        "group_add_calls": 5197,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "367c16ebaeaea2ad95f0a191756fcd582c22ed3d45c2cc3c0196cdfbfcce186e",
+      "candidate_sha256": "285ad671b3122e3b29aac844df2117d9999da84ada0819c6d9222f53dff8f2db",
+      "case": "p229-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 16630493,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187512130,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187512130,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2350071008,
+        "allocation_calls": 24162769,
+        "peak_live_rust_bytes": 45566453,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 229,
+      "pair_representatives": 1536,
+      "public_input_sha256": "a7a82b38dcd58ee33a6c0c145410e0f92abb75a693c912c08cacc565c671ac18",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 33345547,
+        "group_add_calls": 9838,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "4a1f2625411a08f5dc309f3ec2a075519da03e44cd5a58851d106203cfa5e460",
+      "candidate_sha256": "75befd6093f54472bcf94c7862bf73af61575e7af1537f25db3b1afc7cee7aa7",
+      "case": "p229-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 15143666,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187399810,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187399810,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2207967417,
+        "allocation_calls": 22015344,
+        "peak_live_rust_bytes": 45418032,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 229,
+      "pair_representatives": 1536,
+      "public_input_sha256": "a7a82b38dcd58ee33a6c0c145410e0f92abb75a693c912c08cacc565c671ac18",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 28274827,
+        "group_add_calls": 5230,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "f853c52505912c6ec887888106e4c36e5d5cde06c462bd50b45b65b9742133a5",
+      "candidate_sha256": "707e23794affa45eab76c90275bea44f501ffd026c5c77d81f69356c094e8cc6",
+      "case": "p241-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 16746762,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187414417,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187414417,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2369331274,
+        "allocation_calls": 24527226,
+        "peak_live_rust_bytes": 45648182,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 241,
+      "pair_representatives": 1536,
+      "public_input_sha256": "c0ae813643d682dfd62714327338b3566b7997cdb110ae00ecee0a2327038791",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 29624490,
+        "group_add_calls": 8992,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "60b960a54116a848a265db5a2bd34be7fbedf5a1d537b56a944903d7354a01d3",
+      "candidate_sha256": "034b44f4f82dfd720e0c234fae9d1edf87e8d164b862a1642f15068e531ac0a6",
+      "case": "p241-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 15127647,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187826220,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187826220,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2216855629,
+        "allocation_calls": 22163087,
+        "peak_live_rust_bytes": 45462096,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 241,
+      "pair_representatives": 1536,
+      "public_input_sha256": "c0ae813643d682dfd62714327338b3566b7997cdb110ae00ecee0a2327038791",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 25808682,
+        "group_add_calls": 5152,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "aa96e1958d95b9ac21f99bf5f2bb4fdb9c81c96e57c08f54a9c8dba841bea33f",
+      "candidate_sha256": "e50ec53799d979a4afeb42635edcc3b87d35d2fd6f01f022a3a97f0e45409d05",
+      "case": "p241-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 16746762,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187414417,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187414417,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2369331313,
+        "allocation_calls": 24527226,
+        "peak_live_rust_bytes": 45657095,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 241,
+      "pair_representatives": 1536,
+      "public_input_sha256": "5bd767f7c25e9689ad276ffe0d87aa30509ac45df27d3dcf2c531ec5099c053c",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 29663155,
+        "group_add_calls": 9033,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "1b29899e55d5746c42b75a369664b2dba133f5aab25038f83a22165d2bd4673d",
+      "candidate_sha256": "0f5787a02f5045282750bebb4e3d98b0144ec6234b8c3c3ebdea64feae9617bd",
+      "case": "p241-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 15127647,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187826220,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187826220,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2216855477,
+        "allocation_calls": 22163087,
+        "peak_live_rust_bytes": 45470960,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 241,
+      "pair_representatives": 1536,
+      "public_input_sha256": "5bd767f7c25e9689ad276ffe0d87aa30509ac45df27d3dcf2c531ec5099c053c",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 25847347,
+        "group_add_calls": 5193,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "442405ae95ea62240ec0fa26156857745081917d57629ee8482d30ba680daa2d",
+      "candidate_sha256": "8745778a733ad5f580a0ccd9bcccd0e3937f06bfdace258e84049d5a25719728",
+      "case": "p241-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 16746762,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187414417,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187414417,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2369331194,
+        "allocation_calls": 24527226,
+        "peak_live_rust_bytes": 45653905,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 241,
+      "pair_representatives": 1536,
+      "public_input_sha256": "64da1e4f7268e9558fb53a7de4173795d2ba0610b0725df6973200e279701069",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 29594470,
+        "group_add_calls": 8961,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "971c13e1c2e04ee83e653fd63e3d97d72389bccc32cdf11174ad477020d05269",
+      "candidate_sha256": "e030c0e6993964c043186f483681a121cec508cb2fa79c86f4f3a48a67b22f38",
+      "case": "p241-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 15127647,
+        "group_add_calls": 1536,
+        "subgroup_muls": 0
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 187826220,
+      "factor_log_rank": 0,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 0,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 0,
+          "disjoint_free_pair_orbits": 1536,
+          "f4_row_reduction_fp_muls_checked_sum": 187826220,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 36864,
+          "systems_inspected": 1536,
+          "transported_union_relations": 0
+        },
+        "relations": 0,
+        "unanchored_factor_columns": 7,
+        "unique_projective_augmented_rows": 0,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 2216855691,
+        "allocation_calls": 22163087,
+        "peak_live_rust_bytes": 45467941,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 241,
+      "pair_representatives": 1536,
+      "public_input_sha256": "64da1e4f7268e9558fb53a7de4173795d2ba0610b0725df6973200e279701069",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 25778662,
+        "group_add_calls": 5121,
+        "subgroup_muls": 12110
+      },
+      "signed_pairs": 36864,
+      "signed_physical_relations": 0,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 1536,
+      "unanchored_factor_columns": 7,
+      "unique_projective_augmented_rows": 0,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "27cbd0cca2c24fcd25dd6714d42de733739af917c6977a7f37c12355da62c410",
+      "candidate_sha256": "1ba2bd946ea87b8786f18b17545b4b56c2f56bafa89a2e2208441d76e4972302",
+      "case": "p337-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 60209776,
+        "group_add_calls": 6680,
+        "subgroup_muls": 3889
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 664685334,
+      "factor_log_rank": 1,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 1,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 8,
+          "disjoint_free_pair_orbits": 5400,
+          "f4_row_reduction_fp_muls_checked_sum": 664685334,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 129600,
+          "systems_inspected": 5400,
+          "transported_union_relations": 48
+        },
+        "relations": 48,
+        "unanchored_factor_columns": 14,
+        "unique_projective_augmented_rows": 1,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 8090234169,
+        "allocation_calls": 82095347,
+        "peak_live_rust_bytes": 159392572,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 337,
+      "pair_representatives": 5400,
+      "public_input_sha256": "354041114090d7e81589c4718ea7d41962694350ce2e874dba8c59ecbee557ed",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 60263450,
+        "group_add_calls": 17739,
+        "subgroup_muls": 22603
+      },
+      "signed_pairs": 129600,
+      "signed_physical_relations": 48,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 5400,
+      "unanchored_factor_columns": 14,
+      "unique_projective_augmented_rows": 1,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "79ce65657848af144fd4648671711c8e5ffcf34793794c189ebcdeda999e798e",
+      "candidate_sha256": "c3f2c91aaa48b7a7ae29af076d691ecbdc2706a4e81dc68c6150f9c55fed5497",
+      "case": "p337-seed0",
+      "collection_and_matrix_work": {
+        "fp_muls": 56260711,
+        "group_add_calls": 8600,
+        "subgroup_muls": 10587
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 663555214,
+      "factor_log_rank": 3,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 3,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 20,
+          "disjoint_free_pair_orbits": 5400,
+          "f4_row_reduction_fp_muls_checked_sum": 663555214,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 129600,
+          "systems_inspected": 5400,
+          "transported_union_relations": 120
+        },
+        "relations": 120,
+        "unanchored_factor_columns": 14,
+        "unique_projective_augmented_rows": 3,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 7683086246,
+        "allocation_calls": 75776480,
+        "peak_live_rust_bytes": 158836113,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 337,
+      "pair_representatives": 5400,
+      "public_input_sha256": "354041114090d7e81589c4718ea7d41962694350ce2e874dba8c59ecbee557ed",
+      "seed": 0,
+      "setup_work": {
+        "fp_muls": 51987050,
+        "group_add_calls": 9999,
+        "subgroup_muls": 22603
+      },
+      "signed_pairs": 129600,
+      "signed_physical_relations": 120,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 5400,
+      "unanchored_factor_columns": 14,
+      "unique_projective_augmented_rows": 3,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "bbaf669f66d395f08cf3257c50754022aec450d190d6f1916c8590e795bb2cb6",
+      "candidate_sha256": "8c80d6dadcaad165ca550fcb4f6d7d5d9613a6bafdb7056c435410c151f38438",
+      "case": "p337-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 60209776,
+        "group_add_calls": 6680,
+        "subgroup_muls": 3889
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 664685334,
+      "factor_log_rank": 1,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 1,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 8,
+          "disjoint_free_pair_orbits": 5400,
+          "f4_row_reduction_fp_muls_checked_sum": 664685334,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 129600,
+          "systems_inspected": 5400,
+          "transported_union_relations": 48
+        },
+        "relations": 48,
+        "unanchored_factor_columns": 14,
+        "unique_projective_augmented_rows": 1,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 8090234271,
+        "allocation_calls": 82095348,
+        "peak_live_rust_bytes": 159397415,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 337,
+      "pair_representatives": 5400,
+      "public_input_sha256": "3d1a1e79e0556c8ca452c98d9a1bdf29a8e3026fc01a596557ae88747b0ad7ce",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 60371408,
+        "group_add_calls": 17842,
+        "subgroup_muls": 22603
+      },
+      "signed_pairs": 129600,
+      "signed_physical_relations": 48,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 5400,
+      "unanchored_factor_columns": 14,
+      "unique_projective_augmented_rows": 1,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "b63b5315ce8ff16d798ff604612a3350b1f77365ef5cf6690c1fb1d4dac9da9c",
+      "candidate_sha256": "34db7fb41ece9a75c7ec303a2f2b4f8e0cdaacb35145160e628f6ff2cb959432",
+      "case": "p337-seed1",
+      "collection_and_matrix_work": {
+        "fp_muls": 56260711,
+        "group_add_calls": 8600,
+        "subgroup_muls": 10587
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 663555214,
+      "factor_log_rank": 3,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 3,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 20,
+          "disjoint_free_pair_orbits": 5400,
+          "f4_row_reduction_fp_muls_checked_sum": 663555214,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 129600,
+          "systems_inspected": 5400,
+          "transported_union_relations": 120
+        },
+        "relations": 120,
+        "unanchored_factor_columns": 14,
+        "unique_projective_augmented_rows": 3,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 7683086418,
+        "allocation_calls": 75776479,
+        "peak_live_rust_bytes": 158840899,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 337,
+      "pair_representatives": 5400,
+      "public_input_sha256": "3d1a1e79e0556c8ca452c98d9a1bdf29a8e3026fc01a596557ae88747b0ad7ce",
+      "seed": 1,
+      "setup_work": {
+        "fp_muls": 52095008,
+        "group_add_calls": 10102,
+        "subgroup_muls": 22603
+      },
+      "signed_pairs": 129600,
+      "signed_physical_relations": 120,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 5400,
+      "unanchored_factor_columns": 14,
+      "unique_projective_augmented_rows": 3,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "phi-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "737f0ddb19ed9a255bd209132ac48f52570ba8843afc747ca8d1a4b711d57f57",
+      "candidate_sha256": "cc03cc9301d41e74a00459c546a88fcb0fc94c805cce13237f3c1377097ce4e4",
+      "case": "p337-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 60209776,
+        "group_add_calls": 6680,
+        "subgroup_muls": 3889
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 664685334,
+      "factor_log_rank": 1,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 1,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 8,
+          "disjoint_free_pair_orbits": 5400,
+          "f4_row_reduction_fp_muls_checked_sum": 664685334,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 129600,
+          "systems_inspected": 5400,
+          "transported_union_relations": 48
+        },
+        "relations": 48,
+        "unanchored_factor_columns": 14,
+        "unique_projective_augmented_rows": 1,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 8090233766,
+        "allocation_calls": 82095347,
+        "peak_live_rust_bytes": 159396170,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 337,
+      "pair_representatives": 5400,
+      "public_input_sha256": "4ed6e5021b6b687b4ccbec1bbe0c6a6b01bad674aa43253aee462155945f63ae",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 60362459,
+        "group_add_calls": 17833,
+        "subgroup_muls": 22603
+      },
+      "signed_pairs": 129600,
+      "signed_physical_relations": 48,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 5400,
+      "unanchored_factor_columns": 14,
+      "unique_projective_augmented_rows": 1,
+      "zero_augmented_rows": 0
+    },
+    {
+      "arm": "double-l0-active",
+      "audit_exit": "0",
+      "audit_sha256": "cc97d1e390a04e7c2943876f1a6a4e2a9d796e420c3f5476f4d269a7b678eb6b",
+      "candidate_sha256": "7445cfb82a850b1ea11d6fb2802e985b0e05ef6565da8a4d14f86d437ee9a98d",
+      "case": "p337-seed2",
+      "collection_and_matrix_work": {
+        "fp_muls": 56260711,
+        "group_add_calls": 8600,
+        "subgroup_muls": 10587
+      },
+      "collector_exit": "0",
+      "corruption_controls": [
+        {
+          "control": "changed-public-binding",
+          "rejected_as": "public-seal"
+        },
+        {
+          "control": "unresolved-system",
+          "rejected_as": "incomplete-systems"
+        },
+        {
+          "control": "omitted-system-with-unchanged-headline-counts",
+          "rejected_as": "system-record-count"
+        },
+        {
+          "control": "duplicated-pair-with-unchanged-headline-counts",
+          "rejected_as": "pair-coverage"
+        },
+        {
+          "control": "changed-per-system-work-with-unchanged-total",
+          "rejected_as": "f4-work-sum"
+        },
+        {
+          "control": "omitted-tuple-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        },
+        {
+          "control": "changed-sign-with-consistent-set-hash",
+          "rejected_as": "physical-set"
+        }
+      ],
+      "f4_row_reduction_fp_muls": 663555214,
+      "factor_log_rank": 3,
+      "factor_log_solution_point_verified": false,
+      "independent_checks": {
+        "factor_log_rank": 3,
+        "factor_log_solution_point_verified": false,
+        "pair_and_work_trace": {
+          "accepted_representative_occurrences": 20,
+          "disjoint_free_pair_orbits": 5400,
+          "f4_row_reduction_fp_muls_checked_sum": 663555214,
+          "scalar_action_maps": 24,
+          "scope": "Scalar-multiplication action maps, exact signed-pair partition, immutable per-pair physical-set equality and transported union; separate RREF is checked by the caller. Shared field/curve kernel and equation deriver. Counter-shape/sum checks do not calibrate hashes, allocator CPU or complete IC prices.",
+          "signed_pairs_independently_covered": 129600,
+          "systems_inspected": 5400,
+          "transported_union_relations": 120
+        },
+        "relations": 120,
+        "unanchored_factor_columns": 14,
+        "unique_projective_augmented_rows": 3,
+        "zero_augmented_rows": 0
+      },
+      "memory": {
+        "allocated_bytes": 7683086569,
+        "allocation_calls": 75776479,
+        "peak_live_rust_bytes": 158839934,
+        "scope": "Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."
+      },
+      "p": 337,
+      "pair_representatives": 5400,
+      "public_input_sha256": "4ed6e5021b6b687b4ccbec1bbe0c6a6b01bad674aa43253aee462155945f63ae",
+      "seed": 2,
+      "setup_work": {
+        "fp_muls": 52086059,
+        "group_add_calls": 10093,
+        "subgroup_muls": 22603
+      },
+      "signed_pairs": 129600,
+      "signed_physical_relations": 120,
+      "status": "complete-independent-physical-replay",
+      "systems_attempted": 5400,
+      "unanchored_factor_columns": 14,
+      "unique_projective_augmented_rows": 3,
+      "zero_augmented_rows": 0
+    }
+  ],
+  "schema": "twist-zero-five-polynomial-panel/v1",
+  "scope": "All seven curves in three public scalar-271 presentations, two matched image arms. Sums are case-local diagnostics; ranks remain per case. Full physical enumeration and recorded pair/work replay only. No target recovered by zero-only equations, no admitted timing, no calibrated IC or rho speedup.",
+  "status": "complete-independent-physical-replay",
+  "unverified_case_arms": []
+}
