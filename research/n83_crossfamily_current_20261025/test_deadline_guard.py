@@ -72,6 +72,27 @@ class DeadlineTests(unittest.TestCase):
             self.assertEqual(json.loads(receipt.read_text())['status'],
                              'TERMINATION_REQUESTED')
 
+    def test_pod_side_expiry_accepts_frozen_ada2000_names(self):
+        with tempfile.TemporaryDirectory() as temp:
+            folder = Path(temp)
+            plan = folder / 'allocation_plan.json'
+            allocation = folder / 'allocation_s0.json'
+            receipt = folder / 'pod_guard.json'
+            ada_plan = {**PLAN, 'hardware_profile': 'ada2000',
+                        'names': [f'n83-crossfamily-ada2000-{HEAD[:12]}-s{i}'
+                                  for i in range(2)]}
+            plan.write_text(json.dumps(ada_plan))
+            allocation.write_text(json.dumps({
+                'schema': 'n83.crossfamily-current-runpod-allocation/v1',
+                'source_head_sha': HEAD, 'source_archive_sha256': 'b' * 64,
+                'source_manifest_sha256': 'c' * 64,
+                'stratum': 0, 'pod_id': 'pod0'}))
+            removed = []
+            pod_deadline_guard.guard(allocation, plan, receipt,
+                                    clock=lambda: NOW, pause=lambda _: None,
+                                    remove=removed.append)
+            self.assertEqual(removed, ['pod0'])
+
 
 if __name__ == '__main__':
     unittest.main()
