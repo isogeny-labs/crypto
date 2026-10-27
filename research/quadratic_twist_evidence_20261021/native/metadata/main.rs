@@ -1,6 +1,8 @@
 //! Reuses the repository's native ICV1 and IDC1 implementations without
 //! running the historical Python registry builder or experiment harness.
 #![allow(dead_code)]
+#[path = "../../../../src/binary_ecc/operation_tally.rs"]
+mod operation_tally;
 #[path = "../../../../src/binary_ecc/f2m.rs"]
 mod field_backend;
 pub mod binary_ecc {

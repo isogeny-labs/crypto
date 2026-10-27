@@ -259,6 +259,25 @@ must not be bypassed. No new experiment is claimed as executed by this policy.
 
 ## Resolution and history
 
+The [2026-10-27 backend build repair](../research/quadratic_twist_evidence_20261021/validation/backend-build-20261027/README.md)
+addresses standalone-crate and sparse-checkout dependencies exposed by the normal
+main merges: canonical operation tally, calibration JSON and the identity-backend
+test fixture. 42 metadata/22 F13 backend tests pass. Frozen arithmetic, proofs and
+research outputs remain unchanged; this closes no uniform-yield/regularity/cost
+obligation. Auto-merge was found re-enabled and disabled again. Scientific launch
+still awaits pending checkpoint-only authorization and token access.
+
+The refreshed library check separately detects a registry integration regression:
+all1921 study models at pre-merge `2d1407270` are missing from `51d8b2932`
+(958 fp/963 fpk);18020 models are new and150 shared records changed. The exact
+slug/hash receipt is in the same archive. The strict extension count correctly
+rejects1324 versus2287 and is not weakened. Reconcile the study population with
+current-main records/representations and validate all combined catalog,
+membership, identity and byte bindings before closing active registration.
+Do not restore a whole registry side or fabricate cover rows. Frozen evidence
+and generic mathematics are not disproved by this integration loss; the active
+registry requirement is reopened, and full-library CI remains unresolved.
+
 The initial import supplied historical evidence and a certificate-only auditor.
 The 2026-10-21 continuation closes the full native replay and identity-record gaps,
 installs the missing proof/test toolchains, and proves 14 algebraic implications

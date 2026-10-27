@@ -1,5 +1,21 @@
 # Requirement-to-evidence map
 
+2026-10-27 integration update: [standalone backend build repair](validation/backend-build-20261027/README.md)
+reproduces current-head compiler failures and restores real module/fixture inputs.
+42 metadata and22 unchanged F13 backend tests pass; this is ordinary software
+validation, not uniform-yield execution or a new formal theorem. The refreshed
+root-library attempt is recorded separately, without substituting old receipts.
+Keep PR2381 open with auto-merge disabled; checkpoint authorization/access,
+mathematical and completion holds remain.
+
+The same check detects a new active-registry regression after the main merges:
+1921 previously registered study models are missing (958 fp/963 fpk), alongside
+18020 new and150 changed shared records. The exact slug/hash receipt is in the
+build-repair archive. Historical identity/proof evidence remains valid within
+its scope, but active registration/integration is now unresolved. Preserve the
+strict2287-extension assertion; do not lower it to the current1324 or choose one
+whole registry side. Full library validation is not claimed green.
+
 | Requested/required item | Status | Evidence or remaining gap |
 | --- | --- | --- |
 | PR in `aburan28/crypto` | complete | PR #2381, extended on its existing branch |
@@ -13,10 +29,10 @@
 | Historical general readable arguments | preserved | archived report remains available with its original hypotheses |
 | Checked Lean implications and proof map | partial overall; finite S3/degree/source-reduction, adaptive fixture and shifted recovery verified |191 public named theorems /249 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, yield/rank/cost, S3 ideals/degree certificates, F43 reduction, row-adjunction, D2/D3, exact twist vanishing space and annihilator-aware shifted recovery checked; general geometry and complete-work bridges remain open |
 | Algebraic identity certificates | verified for sixteen stated study identities | all previous fifteen retained; inverse-coordinate IDC1h202bb532af10c977 adds32+16 replay and false controls; cache/group/list implications separately Lean-proved |
-| Exact curve/model/subgroup identities | verified within stated representations | 1,921 registered monic models, 27 EC1 representations; unused subgroup choices stay unknown |
+| Exact curve/model/subgroup identities | historically verified within stated representations; active registry integration regressed after main merge | frozen1,921-model/27 EC1 evidence retained, but all1,921 models are absent from the merged registry; reconcile both inputs and revalidate without lowering strict coverage; unused subgroup choices stay unknown |
 | Shared Conductor check | blocked by unavailable tool/configuration | CLI exits 127; shared workflow/state unavailable; no reservation claimed |
-| Repository `cargo test --release --lib --locked` | passed on refreshed code and unchanged registry | 4,479 passed, 119 existing ignores; earlier 4,474 receipt and prior failures retained in `validation/` |
-| Native metadata/backend tests | passed | earlier 39/40 metadata tests and 22 new isolated-auditor backend tests; exact registry/certificate replay checked |
+| Repository `cargo test --release --lib --locked` | historical passes; current merged-tree attempt is not green | earlier4,479/119-ignore and4,474 receipts retained; refreshed5057-test build succeeds but strict active-registry test fails1324 versus2287, with other failures not silently classified inherited; see backend-build-20261027 |
+| Native metadata/backend tests | current build inputs repaired, focused tests pass |42 metadata and22 shared F13 backend tests pass on merged source dependencies; earlier39/40 receipts and frozen exact registry/certificate replay retained, not substituted for current integration |
 | Source-linked report, graph and inspected PDF | supplied | `reports/native-20261021T150125Z/` |
 | General GHS implementation / asymptotic or hardness claim | unresolved, not established | finite examples and conditional algebra do not establish either |
 | Continued falsification experiments (2026-10-22) | verified finite coverage | 74,693,760 signed words, 942 models and 274 subgroup cases; independent Rust arithmetic/DP replay; no component counterexample or rank gain |
