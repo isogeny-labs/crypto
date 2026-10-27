@@ -191,6 +191,23 @@ record this infrastructure outcome. It supplies no paired ratio or Table A
 value. Resume only after a qualified quiet window or an allowed stable host;
 the frozen candidate, panel and decision rule remain unchanged.
 
+### Shared-host replacement before timing (2026-10-27)
+
+The original shared Spot instance `i-03d5e15a586275e77` disappeared from
+EC2 after the bounded A/A stop. The spot-system replacement is
+`i-0250d75e16bbdafb0`, launched at 01:50:46 UTC. At 05:25 UTC it held
+the former public IP `3.134.144.201`, reported the same Intel Xeon
+6975P-C model and 32 logical CPUs, and CPU 2's SMT sibling remained 18.
+Its root filesystem contains neither `/var/tmp/ic-r13` nor the former
+`/home/ec2-user/ic-r13` path. This replacement has produced no R13 output;
+the prior 60-refusal record belongs only to the former instance.
+Restoring source and binaries on this host requires a fresh checkpoint,
+source/binary digest binding, host-class check, 24 holdouts, 90 pin rows
+and a new host manifest before any timed work. It is currently occupied by
+unrelated Rust and proof workloads; do not launch A/A until the unchanged
+quiet-host preflight qualifies. If a future paired schedule runs here, all
+its timed samples must come from this replacement instance only.
+
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
 for this CPU subclass only if every primary size's suite and holdout
