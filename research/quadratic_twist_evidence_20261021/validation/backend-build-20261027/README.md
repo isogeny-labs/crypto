@@ -97,3 +97,7 @@ Current instructions/rules name exactly `gate`, `size`, `artifacts`; new-head
 hosted results must be checked separately. At the reviewed baseline, gate passes
 and size/artifacts are cancelled, not passes. Mathematical, coordination and
 completion obligations in the existing problem record remain open.
+
+The full-library test process was interrupted at600 test-phase seconds after a
+successful release compile; Cargo exits101. Its nested one-test subprocess
+summary is not a completed5057-test suite. No full-library pass is claimed.
