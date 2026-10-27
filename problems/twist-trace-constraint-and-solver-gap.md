@@ -133,3 +133,28 @@ The [continued audited reports](../research/twist_routes_1_3_20261021/reports/co
 Given-map genus-two BSGS costs 59.3414–289.8055 times source BSGS in Ir on 24 targets. The 600-box frontier verifies 57 full-mask and 190 reduced-U degree reductions, but the 560-process cost grid has 146 cooperative-budget failures and no completed box cost reduction versus product or group MITM. These are prototype losses, not universal impossibility results. The classical F3 lift has five Lean theorems and IDC1hfab3acdc297476e5; its formal group-sum bridge remains open.
 
 Full E26/E27/E30 criteria, external full-root comparison, calibrated cold relation/recovery and matched rho, balanced Fp Jacobians, polarized graph identification and independent-host replay remain open. Final E28 labels 32–63 remain unopened. All sixteen full-campaign cards retain failing run sentinels and zero funding. Earlier dated evidence is preserved.
+
+### 2026-10-27: shifted progression bases and redundant companion constraints
+
+The [new bounded report](../research/twist_routes_1_3_20261021/reports/progression-20261027/RESULTS.md)
+verifies all 240 constructions and 7,680 finite query records. Shifted twist
+progressions can supply original-curve points; the zero-shift twist supplies
+none. Ordinary curve shifts also change target coverage, so coverage alone
+does not identify a twist-specific advantage.
+
+All 880 fixed cost cells were attempted: 751 accepted, 105 cooperative caps,
+24 underfilled bases. Strict PARI verifies 1,841 positive and 1,841 wrong-sign
+checks. Group MITM costs less in every admitted same-base comparison. Companion
+equations cost 1.2943715012885497–4.948801810455357 times direct F4 on 38 admitted
+arity-two pairs; no arity-three companion completes in budget. Helpers save
+against direct F4 on 124 pairs but remain above group MITM. Different-base
+ratios compare different answer sets and cannot establish a solving speedup.
+
+The full generic structured protocol binding rejects this nonfactorial panel's
+configuration/control metadata; the frozen native plan and all failures are
+preserved. Standalone export shape/file checks and native/PARI gates are
+separate evidence, not a leaderboard admission. Six unchanged incoming library
+regressions also remain. Full-campaign and external/full-IC/rho criteria stay
+open. Next check: independently count all shifts' source/twist character
+overlap and corresponding genus-two points, before claiming that finite
+progression structure supplies unusually cheap useful relations.

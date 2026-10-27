@@ -1,5 +1,14 @@
 # Twist routes 1–3: designs and bounded execution
 
+[2026-10-27 twist-derived progression bases and companion costs](reports/progression-20261027/RESULTS.md)
+· [frozen plan, independent replay and artifacts](execution-v4/README.md).
+The new 880-cell panel has 751 accepted outputs, 105 cooperative caps and
+24 underfilled bases. Shifted twist coordinates supply valid source bases;
+ordinary shifts change coverage too. Group enumeration is cheaper in every
+admitted same-base comparison, while companion equations cost more in all 38
+admitted pairs. The structured protocol binding gap is explicit; no full-IC
+or twist-specific gain is promoted.
+
 [2026-10-26 continued experiments and inspected reports](reports/continue-20261026/RESULTS.md) · [protocols, exact audits and reproduction](execution-v3/README.md).
 
 The stronger ordinary control changes the interpretation of the polynomial savings: group meet-in-the-middle is cheaper on every tested completed comparison. Given-map genus-two BSGS loses on all 24 public targets. The 600-box frontier has 57 full-mask and 190 reduced-U degree reductions; actual completed cost pairs for both box encodings exceed direct product membership and group MITM. Explicit signs and an opt-in linear-root shortcut preserve exact rows without reversing the ranking. No calibrated whole-IC, novelty or NIST-size gain is established. The dated reports below remain historical evidence.

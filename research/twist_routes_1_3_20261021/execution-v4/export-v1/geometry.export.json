@@ -1,0 +1,172 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-progression-geometry-20261027-v1",
+  "created": "2026-10-27T06:34:29Z",
+  "protocol": {
+    "path": "research/twist_routes_1_3_20261021/execution-v4/geometry.protocol.json",
+    "sha256": "cc5569184e7bbd2ef92a2a39d3766ae5af52788876360d1e73fa3fbd77de0ef9",
+    "protocol_id": "twist-progression-geometry-v3",
+    "version": 3
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-progression-20261027",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "research/twist_routes_1_3_20261021/execution-v4/HOST.json",
+    "sha256": "d5428357b6f9b2527bb49eb8b1474df54a9e2798332c8d6aa60410b31acfba72",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882674688,
+      "kernel": "Linux 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "producer",
+      "role": "baseline",
+      "binary_sha256": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    },
+    {
+      "id": "independent",
+      "role": "reference",
+      "binary_sha256": "6587f1b861f03d5ca579f27329d388d8654ee5908ec667fe6494d10ae96089b9",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    },
+    {
+      "id": "planted-positive",
+      "role": "control_positive",
+      "binary_sha256": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    },
+    {
+      "id": "unshifted-twist",
+      "role": "control_negative",
+      "binary_sha256": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "commit": "d01d7bb63cc577a4299200ae3c560767b6d68650"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "geometry-census-000",
+      "arm": "producer",
+      "instance_id": "all-240-bases-7680-queries",
+      "seed": 202610260001,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "construction_records": 240,
+          "query_records": 7680,
+          "filled_bases": 214
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact finite census; no performance claim."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent square table, Euclidean affine group arithmetic and complete signed-tuple census"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/runs.tar.xz",
+          "sha256": "225c00f390768d6a3bae8b89e3635fc51101b09be4452991dec54a9c59fe9f56",
+          "bytes": 4639704,
+          "kind": "raw"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/execution-v4/RAW_MEMBERS.json",
+          "sha256": "3788a881d58d930c91643ecf004188e8217c8ec82ce71c6e52843590737e4055",
+          "bytes": 1011114,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T01:15:38Z",
+      "finished_at": "2026-10-27T01:15:39Z",
+      "worker": "11a56173c4292ff277b721ff2488a51804245be24b3805ed88810d14e27bbaa5",
+      "backend_ref": "runs/geometry-v1"
+    }
+  ],
+  "flow": {
+    "planned": 1,
+    "attempted": 1,
+    "completed": 1,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "research/twist_routes_1_3_20261021/execution-v4/geometry.protocol.json",
+      "sha256": "1f85a377444a5a5f7e9cf3a474bd7636f54ad97557f4c443c9641754b68ba9b4",
+      "bytes": 16966,
+      "kind": "protocol"
+    },
+    {
+      "path": "research/twist_routes_1_3_20261021/execution-v4/geometry-audit-v1/AUDIT.json",
+      "sha256": "dd274b627966fa8ef9f3a261e96bd2342cc742ba8bc06dd070ad6ed06cc3cd77",
+      "bytes": 12324,
+      "kind": "analysis"
+    }
+  ],
+  "analysis": {
+    "script": null,
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "research/twist_routes_1_3_20261021/execution-v4/geometry-audit-v1/AUDIT.json",
+        "sha256": "dd274b627966fa8ef9f3a261e96bd2342cc742ba8bc06dd070ad6ed06cc3cd77",
+        "bytes": 12324,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Exact pinned scientific source; the worktree also contains subsequent metadata and this exporter. No native wall-time performance is admitted. Independent reviewer/host replay is absent.",
+      "by": "native exporter"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

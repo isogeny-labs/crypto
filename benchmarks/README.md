@@ -1,5 +1,14 @@
 # Benchmarks
 
+**Unadmitted diagnostic, 2026-10-27:** [Twist-derived progression bases](20261027-twist-progression/README.md).
+The fixed 880-cell run has 751 accepted outputs, 105 cooperative caps and 24
+underfilled bases. Helper/direct median is 0.8937482746077081 Ir on 124 admitted
+pairs, but helper/group median is 2.3585326491871; companion/direct median is
+1.352375384073076 on 38 pairs. Intel Xeon Platinum 8573C, KVM, L0; no admitted
+time, GAE or full IC. [Study and inspected reports](../research/twist_routes_1_3_20261021/reports/progression-20261027/RESULTS.md).
+This indexes diagnostic artifacts only; full generic protocol binding remains
+rejected and no validated table row or leaderboard promotion is added.
+
 **Unadmitted diagnostic, 2026-10-26:** [Twist controls and full finite-worker probes](20261026-twist-controls/README.md). Ordinary group MITM is cheaper in every completed polynomial comparison; the B8 twenty-configuration control records median group/direct ratio 0.11239 in simulated guest instructions Ir. Given-map transfer BSGS loses all 24 targets. All 560 box-cost cells are retained, including 146 cooperative-budget failures. Intel Xeon Platinum 8573C, managed Linux x86_64, L0; no admitted time, GAE or full IC. [Study and inspected reports](../research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md). This paragraph indexes diagnostic artifacts only; it adds no validated row or leaderboard promotion.
 
 The visual record of every performance measurement and speedup: report PDFs,
