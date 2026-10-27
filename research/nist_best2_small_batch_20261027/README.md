@@ -47,6 +47,13 @@ Best of P±M against the kernel's walk, paired: **1.143× fewer steps,
 Fruitless 2-cycles rise by a third; the kernel's existing doubling escape
 handles them.
 
+**Status: diagnostic.** This ratio comes from the standalone
+rho-walk-leads harness. It has no ecbench spec, sealed session or replay
+receipt, as AGENTS.md §12 requires for a cited rho-variant comparison.
+Every collision in it is solved and checked against the planted secret,
+but the figure is a diagnostic input to the GPU-time estimate below, not
+a verified result. An ecbench run is owed before any claim or row.
+
 ![iterations](reports/iterations.svg)
 
 **GPU rate** (`gpu-ab-v1.json`; rows in `gpu-ab-v1.rows.jsonl`, summary
