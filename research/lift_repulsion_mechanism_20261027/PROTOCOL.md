@@ -164,3 +164,13 @@ z_plane = D_plane/(√N_planes·(p(1−p))²).
 - P3b (α) outside [0.5, 2]: the first-order correlation terms do not
   account for the deficit and the mechanism is not established.
 - Not claimed: anything about N > 13 or k ≥ 5; any ECDLP cost.
+
+## Addendum (post-run, 2026-10-27): execution route
+
+§3 above records a local run with "no isolab-eks submission". AGENTS.md §9a
+does not exempt exact counting studies, so the local run is local evidence,
+and the §9a confirmatory EKS run of the same binary and seeds is **open**.
+The blocker was that this session had no AWS identity or CLI. The text above
+is unchanged. See `../lift_dense_followups_20261027/README.md`, "Execution
+route".
+

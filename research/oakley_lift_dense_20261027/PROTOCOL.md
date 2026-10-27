@@ -85,3 +85,11 @@ per-trial relation-yield factor 2^n = 32 is not a measured cost; the cost of
 linear algebra, the factor-base size, the Weil-descent system solving and the
 unpriced native work (AGENTS.md section 5a, 0/0.1/1 GAE band) are not
 measured here. Not a leaderboard or benchmark row; no VALIDATION.json.
+
+## Addendum (post-run, 2026-10-27): execution route
+
+This run was local on the session host. AGENTS.md §9a makes isolab-eks the
+default for x86 CPU experiments, so the result is local evidence, and the §9a
+confirmatory EKS run of the same binary and seed is **open**. The blocker was
+that this session had no AWS identity or CLI. See
+`../lift_dense_followups_20261027/README.md`, "Execution route".

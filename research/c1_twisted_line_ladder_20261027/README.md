@@ -5,6 +5,11 @@
 `REPORT.typ`). Run: [`reports/run-20261027T1502Z/`](./reports/run-20261027T1502Z/) (`summary.txt` is the source of every
 number below). Figure: `fig_c1_ladder.svg` / `.png`. Seed `0xC1_7715_7ED_2610_27`.
 
+**Execution route.** The run was local on the session host, not isolab-eks
+(AGENTS.md §9a). The session had no AWS identity or CLI. This is local
+evidence, and the §9a confirmatory EKS run is open; see
+`../lift_dense_followups_20261027/README.md`, "Execution route".
+
 ## What was measured, and what was not
 
 Measured, exact and host independent:
@@ -30,7 +35,7 @@ this simplified solver only.
 Yield, tau = 1 curves (A1 A2 B1 B2 B3), twisted/standard:
 - `H-Y2 (tau=1 curves A1 A2 B*): R_pred inside the interval in 34/36; pooled (sum of means) obs 17.3254 / pred 16.9227 = 1.0238  => PASS`
 - k = 5: A1 18.718 [16.229, 21.993] against R_pred 18.287; k = 7: A1 16.877 [15.026, 19.185] against 16.516; k = 9: A1 20.778 [15.946, 28.155] against 16.126; k = 11: A1 16.667 [8.909, 51.500] against 16.031. The prediction is the counting identity (about (2Q-2)^4 / (Q-2)^4); this is an instrument check.
-- `H-Y1: tested rows 50, |z|<=3 on 48, |z|>5 on 1; z mean -0.240 sd 1.352  => FAIL` (the single |z| > 5 row is the A0 control, k = 9, z = -5.17; excluding A0, post hoc: 44 of 45 rows within |z| <= 3, the exception z = -3.60, B2 std at k = 5).
+- `H-Y1: tested rows 54, |z|<=3 on 48, |z|>5 on 5 (4 of them constant counts != pred, z infinite); finite z mean -0.240 sd 1.352  => FAIL`. All five |z| > 5 rows are the A0 control: k = 9, z = -5.17, and the four constant-zero rows (std and `tw_a`, k = 7 and 9, mean 0 against pred 15.47 and 15.87). The first scoring pass gave these four rows z = NaN and dropped them from the denominator (50 rows, 1 above 5); the scorer now keeps a constant row in the gate with z = -inf (Codex review on PR #2704). The verdict is FAIL either way. The first-pass output is kept as `reports/run-20261027T1502Z/summary_firstpass.{txt,json}`; `RAW.sha256` names it under that file name. Excluding A0, post hoc: 44 of 45 rows within |z| <= 3, the exception z = -3.60, B2 std at k = 5.
 - `H-Y3 (A0, tau=0 control): R_pred inside the interval in 2/6; pooled ... = 1.5262  => FAIL`. A0 (b = 1, #E(F_16) = 16) has extremely clustered counts (sd 954 for mean 17 at k = 5; zero hits in 8000 and 1500 standard-base targets at k = 7, 9 although the prediction is about 15.5), so the control is uninformative, not a confirmation. The all-lift fact itself is exact: lifting abscissae 31/31, 127/127, 511/511 on both lines.
 - `H-Y4: PASS`: Tr(a) = 1 gives 0 of Q-1 lifting abscissae on the twisted line at k = 5, 7, 9 and 0 relations (the standard base lifts 16/31, 64/127, 256/511).
 - `H-Y5: interval contains 1 in 18/21; pooled ratio 0.9518 => PASS`. Caveat: on A2 the two valid u (4 and 6) give identical counts at every k (A/A ratio exactly 1.000), and on A0 `tw_a` is u = 1, the standard line itself; those A/A comparisons carry no information.
@@ -48,7 +53,7 @@ Cost (counted F_Q multiplications, D = 26, same targets):
 
 | hypothesis | verdict |
 |:--|:--|
-| H-Y1 yield identity, |z| <= 3 on 90 % and none above 5 | FAIL (48/50; one row, A0 control, z = -5.17) |
+| H-Y1 yield identity, |z| <= 3 on 90 % and none above 5 | FAIL (48/54; five rows above 5, all A0 control: z = -5.17 and four constant-zero rows) |
 | H-Y2 yield ratio, tau = 1 | PASS (34/36 covered; pooled 1.0238) |
 | H-Y3 positive control A0 | FAIL (clustered, uninformative) |
 | H-Y4 negative control Tr(a) = 1 | PASS (exact 0) |

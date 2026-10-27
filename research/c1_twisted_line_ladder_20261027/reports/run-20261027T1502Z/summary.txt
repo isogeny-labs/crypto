@@ -30,8 +30,8 @@
  5 B3   std                        30  20000    0.8303     0.7703     8.0989    1.05   true
  5 B3   tw_a(u generic)            62  20000   14.3858    14.0873    38.6462    1.09   true
  5 B3   tw_b(u generic)            62  20000   13.8512    14.0873    37.2258   -0.90   true
- 7 A0   std                       254   8000    0.0000    15.4719     0.0000     NaN  false
- 7 A0   tw_a(u=1)                 254   8000    0.0000    15.4719     0.0000     NaN  false
+ 7 A0   std                       254   8000    0.0000    15.4719     0.0000    -inf   true
+ 7 A0   tw_a(u=1)                 254   8000    0.0000    15.4719     0.0000    -inf   true
  7 A0   tw_b(u=6)                 254   8000   13.2995    15.5034    96.3057   -2.05   true
  7 A1   std                       126   8000    0.9225     0.9388     4.7810   -0.31   true
  7 A1   tw_a(u=2)                 254   8000   15.5687    15.5059    41.8899    0.13   true
@@ -49,8 +49,8 @@
  7 B3   std                       126   8000    1.1270     0.9388    17.3184    0.97   true
  7 B3   tw_a(u generic)           254   8000   15.5105    15.5051    24.3402    0.02   true
  7 B3   tw_b(u generic)           254   8000   15.0038    15.5051    24.1324   -1.86   true
- 9 A0   std                      1022   1500    0.0000    15.8676     0.0000     NaN  false
- 9 A0   tw_a(u=1)                1022   1500    0.0000    15.8676     0.0000     NaN  false
+ 9 A0   std                      1022   1500    0.0000    15.8676     0.0000    -inf   true
+ 9 A0   tw_a(u=1)                1022   1500    0.0000    15.8676     0.0000    -inf   true
  9 A0   tw_b(u=6)                1022   1500    7.7120    15.8754    61.1273   -5.17   true
  9 A1   std                       510   1500    0.7920     0.9845     4.3664   -1.71   true
  9 A1   tw_a(u=2)                1022   1500   16.4560    15.8754    25.5963    0.88   true
@@ -69,7 +69,7 @@
  9 B3   tw_a(u generic)          1022   1500   15.3840          -    24.4750      -  false
  9 B3   tw_b(u generic)          1022   1500   15.4560          -    24.9606      -  false
 
-H-Y1: tested rows 50, |z|<=3 on 48, |z|>5 on 1; z mean -0.240 sd 1.352  => FAIL
+H-Y1: tested rows 54, |z|<=3 on 48, |z|>5 on 5 (4 of them constant counts != pred, z infinite); finite z mean -0.240 sd 1.352  => FAIL
 
 -- H-Y2/H-Y3 yield ratio tw/std on the same targets (95 % paired bootstrap, 2000) --
  k curve arm                       R_obs    CI lo    CI hi     R_pred R_pred_src  covers

@@ -34,8 +34,9 @@ $k in {5,...,15}$ for cost.
 observed 17.3254 against predicted 16.9227 (1.0238). H-Y4 passes exactly: with
 $"Tr"(a)=1$ the twisted line has 0 lifting abscissae and 0 relations at
 $k = 5,7,9$. H-Y5 (A/A) passes 18/21, but on A2 the two valid $u$ give
-identical counts. H-Y1 fails (48/50 rows within $|z| <= 3$; one row beyond 5:
-A0, $k=9$, $z=-5.17$) and H-Y3 fails: A0 ($b = 1$) has extremely clustered
+identical counts. H-Y1 fails (48/54 rows within $|z| <= 3$; five rows beyond 5, all on
+A0: $k=9$, $z=-5.17$, and four rows whose counts are all zero against a
+prediction near 15.5, kept in the gate with $z = -infinity$) and H-Y3 fails: A0 ($b = 1$) has extremely clustered
 counts, so the control is uninformative. 16678 relations enumerated at $k=5$
 all satisfy the descended equations (0 violations).
 

@@ -132,7 +132,7 @@ fn main() {
     writeln!(txt, "== YIELD (exact ordered decompositions per target; PROTOCOL section 3) ==\n").unwrap();
     writeln!(txt, "-- H-Y1 rows: z = (mean - pred)/(s/sqrt T), empirical variance --").unwrap();
     writeln!(txt, "{:>2} {:<4} {:<22} {:>6} {:>6} {:>9} {:>10} {:>10} {:>7} {:>6}", "k", "curve", "arm", "FBpts", "T", "mean N", "pred", "sd", "z", "tested").unwrap();
-    let (mut z_tested, mut z_pass, mut z_gt5) = (0, 0, 0);
+    let (mut z_tested, mut z_pass, mut z_gt5, mut z_const) = (0, 0, 0, 0);
     let mut zs: Vec<f64> = vec![];
     let mut y1_rows = String::new();
     for r in &yr {
@@ -144,8 +144,16 @@ fn main() {
         let s = sd(&r.counts);
         let (zstr, tested, z) = match r.pred {
             Some(p) => {
-                let z = if s > 0.0 { (mu - p) / (s / t.sqrt()) } else { f64::NAN };
-                let tested = t * p >= 50.0 && z.is_finite();
+                // Constant counts (s = 0) stay in the gate: z = 0 if the
+                // constant equals pred, else +-inf (a failing row).
+                let z = if s > 0.0 {
+                    (mu - p) / (s / t.sqrt())
+                } else if mu == p {
+                    0.0
+                } else {
+                    (mu - p).signum() * f64::INFINITY
+                };
+                let tested = t * p >= 50.0;
                 (format!("{z:7.2}"), tested, z)
             }
             None => ("     -".into(), false, f64::NAN),
@@ -158,7 +166,11 @@ fn main() {
             if z.abs() > 5.0 {
                 z_gt5 += 1;
             }
-            zs.push(z);
+            if z.is_finite() {
+                zs.push(z);
+            } else {
+                z_const += 1;
+            }
         }
         writeln!(txt, "{:>2} {:<4} {:<22} {:>6} {:>6} {:>9.4} {:>10} {:>10.4} {} {:>6}", r.k, r.curve, r.arm, r.m, t, mu, r.pred.map(|p| format!("{p:.4}")).unwrap_or("-".into()), s, zstr, tested).unwrap();
         write!(y1_rows, "{{\"k\":{},\"curve\":\"{}\",\"arm\":\"{}\",\"fb\":{},\"T\":{},\"mean\":{:.6},\"pred\":{},\"z\":{}}},", r.k, r.curve, r.arm, r.m, t, mu, r.pred.map(|p| format!("{p:.6}")).unwrap_or("null".into()), if z.is_finite() { format!("{z:.4}") } else { "null".into() }).unwrap();
@@ -166,7 +178,7 @@ fn main() {
     let zm = if zs.is_empty() { f64::NAN } else { mean(&zs) };
     let zsd = if zs.len() > 1 { sd(&zs) } else { f64::NAN };
     let hy1 = z_tested > 0 && (z_pass as f64) >= 0.9 * z_tested as f64 && z_gt5 == 0;
-    writeln!(txt, "\nH-Y1: tested rows {z_tested}, |z|<=3 on {z_pass}, |z|>5 on {z_gt5}; z mean {zm:.3} sd {zsd:.3}  => {}\n", if hy1 { "PASS" } else { "FAIL" }).unwrap();
+    writeln!(txt, "\nH-Y1: tested rows {z_tested}, |z|<=3 on {z_pass}, |z|>5 on {z_gt5} ({z_const} of them constant counts != pred, z infinite); finite z mean {zm:.3} sd {zsd:.3}  => {}\n", if hy1 { "PASS" } else { "FAIL" }).unwrap();
 
     // ratios tw/std and tw_a/tw_b by cell
     let mut cells: BTreeMap<(u32, String), Vec<&YRow>> = BTreeMap::new();
@@ -521,7 +533,7 @@ fn main() {
     writeln!(txt, "mean inversions per solve: {minv:.0} (negligible against mults)").unwrap();
 
     // summary.json
-    write!(js, "\"hY1\":{{\"tested\":{z_tested},\"pass3\":{z_pass},\"gt5\":{z_gt5},\"z_mean\":{zm:.4},\"z_sd\":{zsd:.4},\"verdict\":\"{}\"}},", if hy1 { "PASS" } else { "FAIL" }).unwrap();
+    write!(js, "\"hY1\":{{\"tested\":{z_tested},\"pass3\":{z_pass},\"gt5\":{z_gt5},\"const_fail\":{z_const},\"z_mean\":{zm:.4},\"z_sd\":{zsd:.4},\"verdict\":\"{}\"}},", if hy1 { "PASS" } else { "FAIL" }).unwrap();
     write!(js, "\"hY1_rows\":[{}],", y1_rows.trim_end_matches(',')).unwrap();
     let y2j: Vec<String> = y2.iter().map(|x| format!("{{\"k\":{},\"curve\":\"{}\",\"arm\":\"{}\",\"obs\":{},\"lo\":{},\"hi\":{},\"pred\":{:.5},\"covers\":{},\"exact_pred\":{}}}", x.0, x.1, x.2, fj(x.3), fj(x.4), fj(x.5), x.6, x.7, x.8)).collect();
     write!(js, "\"yield_ratio\":[{}],", y2j.join(",")).unwrap();
