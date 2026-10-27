@@ -8,7 +8,9 @@ that hold moved files, and inserts after each `actions/checkout` step:
 
     - name: Pull store data this workflow reads (tools/artifacts)
       env: {AWS_ACCESS_KEY_ID: ..., AWS_SECRET_ACCESS_KEY: ..., AWS_REGION: ...}
-      run: python3 tools/artifacts/artifacts.py pull research/x experiments/y/results
+      run: |
+        if ! command -v aws ...; then (install the AWS CLI into $RUNNER_TEMP); fi
+        python3 tools/artifacts/artifacts.py pull research/x experiments/y/results
 
 A sparse checkout also gets `tools/artifacts` added to its patterns. The edit
 is textual (comments and layout survive) and idempotent; checkouts into a
@@ -98,7 +100,17 @@ def step_lines(indent: str, paths: list[str]) -> list[str]:
         f"{i2}  AWS_ACCESS_KEY_ID: ${{{{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}}}",
         f"{i2}  AWS_SECRET_ACCESS_KEY: ${{{{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}}}",
         f"{i2}  AWS_REGION: ${{{{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}}}",
-        f"{i2}run: python3 tools/artifacts/artifacts.py pull --jobs 16 {' '.join(paths)}",
+        f"{i2}run: |",
+        # Self-hosted runners may lack the AWS CLI the store backend shells
+        # out to; install it into the runner's temp dir (no sudo) when absent.
+        f"{i2}  if ! command -v aws >/dev/null; then",
+        f'{i2}    curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$RUNNER_TEMP/awscli.zip"',
+        f'{i2}    python3 -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$RUNNER_TEMP/awscli.zip" "$RUNNER_TEMP/awscli"',
+        f'{i2}    chmod -R u+x "$RUNNER_TEMP/awscli"',  # zipfile drops the mode bits
+        f'{i2}    "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"',
+        f'{i2}    export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"',
+        f"{i2}  fi",
+        f"{i2}  python3 tools/artifacts/artifacts.py pull --jobs 16 {' '.join(paths)}",
     ]
 
 
@@ -135,14 +147,22 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
             continue
         block = add_sparse_pattern(block, indent)
         out.extend(block)
-        nxt = next((lines[k] for k in range(j, len(lines)) if lines[k].strip()), "")
-        if STEP_NAME not in nxt:
-            step = step_lines(indent, paths)
-            cond = next((re.sub(rf"^{indent}(?:- |  )", "", b) for b in block
-                         if re.match(rf"^{indent}(?:- |  )if: ", b)), None)
-            if cond:  # skipped with its checkout, so it never runs against an empty workspace
-                step.insert(1, f"{indent}  {cond}")
-            out.extend(step)
+        k = next((k for k in range(j, len(lines)) if lines[k].strip()), len(lines))
+        if k < len(lines) and STEP_NAME in lines[k]:
+            # A step inserted earlier: replace it, so a changed template or
+            # path list regenerates (and --check flags the stale copy).
+            out.extend(lines[j:k])
+            j = k + 1
+            while j < len(lines) and (not lines[j].strip() or len(lines[j]) - len(lines[j].lstrip()) > len(indent)):
+                j += 1
+            while not lines[j - 1].strip():
+                j -= 1
+        step = step_lines(indent, paths)
+        cond = next((re.sub(rf"^{indent}(?:- |  )", "", b) for b in block
+                     if re.match(rf"^{indent}(?:- |  )if: ", b)), None)
+        if cond:  # skipped with its checkout, so it never runs against an empty workspace
+            step.insert(1, f"{indent}  {cond}")
+        out.extend(step)
         i = j
     return "\n".join(out), notes
 
