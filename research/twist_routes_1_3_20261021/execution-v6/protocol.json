@@ -1,0 +1,342 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-generator-census-v1",
+  "version": 1,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v6",
+  "question": "Does deterministic full-order twist-generator selection change exact finite-base completeness relative to the archived first-point rule?",
+  "claims": [
+    {
+      "id": "orders",
+      "text": "Exact native/CAS source/twist orders and canonical seed selection agree on all ten original fixtures.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "bases",
+      "text": "All 120 complete base sets agree independently, including sixty archived baseline sets and forty zero-shift controls.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "scope",
+      "text": "No cost, scalar transfer, NIST security, novelty or whole-IC gain is established by construction counts.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "description": "Actual native target-blind generator discovery and complete construction panel.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-generator-census"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "description": "Actual independent PARI replay of all cardinalities, canonical seeds, orders, base sets and fill aggregates. GP script is generated from the same frozen repository source; the prebuilt CAS engine has its own binary hash.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "gp",
+            "-f",
+            "-q",
+            "verify.gp"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact complete finite count, no performance or sampling inference."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No separate experimental arm: known source-generator orders and pre-data p7 native/GP controls are embedded correctness checks, not performance observations."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No separate experimental arm: all forty zero-shift sets must be empty; a nonmultiple-order p7 unit control must be rejected."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "seed strategy",
+        "levels": [
+          "first nonzero point",
+          "lexicographically first full-order point"
+        ]
+      },
+      {
+        "name": "shift",
+        "levels": [
+          0,
+          1,
+          3
+        ]
+      },
+      {
+        "name": "B",
+        "levels": [
+          8,
+          16
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "Pinned native field/group binary and independent PARI engine; generated GP script source is frozen with native source.",
+        "how": "Record source/binary hashes before data; reopen raw hashes."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "All original ten fixtures; both strategies; c=0,1,3 and B8/B16; selection reads no target, shift, size or yield.",
+        "how": "Complete finite exhaustion; never infer prefix mixing from full-universe density."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Same local L0 managed host; no native clock or cost admitted.",
+        "how": "Record CPU/kernel/hypervisor; no time comparison."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Shared author and host, deterministic exact equality only.",
+        "how": "Independent code, square-table finite census, GP factor controls and Lean sign identity."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-check",
+        "arms": [
+          "native",
+          "pari"
+        ],
+        "differs_in": [
+          "instrument"
+        ],
+        "design": "absolute",
+        "threshold": "Exact all ten orders/seeds and all120 complete-base equalities; all controls; native/CAS fill aggregates identical."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Native producer then independent PARI replay; exact count comparison only, no clock or performance.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Deterministic fixed input panel and exhaustive shifts; seed field zero is metadata only."
+    },
+    "instance_sampling": {
+      "rule": "One complete fixed panel with120 constructions; two actual whole-panel executions, not120 independent targets.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact finite verification only; no statistical or comparative claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact complete finite counts and necessary-factor checks, not statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 1200,
+      "measured_on": "Unmeasured prospective watchdog envelope;600s native,300s CAS plus admission/metadata allowance. No performance observation."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "base-cases",
+        "name": "Complete finite base constructions",
+        "unit": "construction cases in the fixed panel",
+        "kind": "exact",
+        "definition": "Both canonical seeds, all ten fixtures, shifts0/1/3 and B8/B16; complete sorted sets, including underfilled and empty controls.",
+        "source": "ADMISSION.json summary.base_cases",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "exact complete base counts",
+      "point orders",
+      "discovery x/order-test counts (not complete cost)"
+    ],
+    "record": [
+      "source commit",
+      "binary SHA256",
+      "argv",
+      "input/output hashes",
+      "actual exit/signal",
+      "resource caps",
+      "host metadata"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_GiB": 4,
+      "paid_resources_created": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 1200,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 1,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly ten fixture seed/order cases and120 complete base constructions; fail explicitly if a full-order seed is absent or a stage hits its cap. No outcome-dependent enlargement/refill.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Admit exact cardinality, order, seed, full-base and aggregate equality plus embedded controls; no speedup or scalar-map verdict.",
+    "comparison_ids": [
+      "exact-check"
+    ],
+    "statistic": "Complete finite construction counts and group orders.",
+    "interval": "None: complete finite exhaustion.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Filled bases among forty nonzero cases per seed strategy; different answer sets, not same-output speed.",
+    "verdict_vocabulary": [
+      "verified finite equality",
+      "mismatch",
+      "not completed"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/twist_routes_1_3_20261021/runner/src/bin/twist-generator-census.rs",
+      "sha256": "ffd890f2e4d2ef4617e72f0048ff340d1ad7d210d245fa98fd99c5ffe4d9fa2b"
+    },
+    "inputs": [
+      "archived geometry ROWS.json",
+      "native records",
+      "actual GP receipt and output hashes"
+    ],
+    "outputs": [
+      "RECORDS.json",
+      "verify.gp",
+      "ADMISSION.json",
+      "experiment.export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Recorded native/CAS-verified generator orders and finite-fill counts; no invented cost axis."
+    ],
+    "report_dir": "research/twist_routes_1_3_20261021/reports/generators-20261027"
+  },
+  "inadmissible": [
+    "Calling different coordinate sets a same-output speedup",
+    "Interpreting rational twist generators as a scalar-preserving source map",
+    "Ignoring discovery, failed fills or zero-shift controls",
+    "Claiming IC/rho or NIST benefit from toy construction counts",
+    "Changing selection using targets, shifts, sizes or observed yield",
+    "Closing original full-campaign criteria"
+  ],
+  "literature": [
+    {
+      "ref": "research/twist_routes_1_3_20261021/execution-v6/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Pre-data repository/atlas/field-source review and local primary PARI ellorder/ellcard help, with noncohort p7 controls.",
+      "verified_by": "Read before source/selection and panel freeze."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
+  },
+  "extensions": {
+    "scientific_panel_started": false,
+    "original_full_campaign_discharged": false,
+    "embedded_controls_are_not_separate_arms": true,
+    "backend_authority": "Standing user authorization; documented EKS access/local fallback. No new paid resource."
+  }
+}
