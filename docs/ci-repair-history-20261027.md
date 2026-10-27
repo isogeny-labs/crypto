@@ -108,3 +108,27 @@ full checkout. Its checkout now materializes the assessment's source/evidence
 surface while retaining Git history for the snapshot. The timeout and every
 validation remain unchanged. The bounded replacement job retrieved the replay
 assets by 20:16:40 UTC. Final current-head hosted checks remain necessary.
+
+## Refresh the lab browser without losing candidate or session identities
+
+The canonical browser still described 15,791 models. It is regenerated from the
+current 20,592-model registry and refreshed native catalogs. All 248 old session
+summaries and their raw-record hashes are exactly unchanged; four committed
+sessions are added. Every old curve model and every old candidate's semantic
+fields remain equal. The current index has 252 sessions, 220 methods, 672 factor
+bases, 277 candidates and 30 rounds. Registry provenance/retired aliases refresh
+from the canonical source; existing scientific records are untouched.
+
+The first regeneration exposed four missing candidate IDs. Their sole source
+was the required leaderboard, which has grown to 9,268,417 bytes and crossed the
+general eight-MiB citation-scan limit. The required, already-parsed leaderboard
+now always contributes candidate IDs; the limit remains for general research
+notes. A regression control exercises both the oversized core input and refusal
+to scan an oversized general note. All four browser tests pass. The corrected
+regeneration retains every old candidate and adds six currently named only by
+the leaderboard. Production --check passes with its no-lazy-fetch guard after
+explicitly retrieving the exact missing committed Git objects.
+
+The exact retained/added identity comparison and successful/failed browser logs
+are retained with the native/transfer evidence. This index refresh does not
+re-run solvers, change measurements or extend the dated transfer assessment.
