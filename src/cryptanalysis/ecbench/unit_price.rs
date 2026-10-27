@@ -23,7 +23,9 @@
 use crate::cryptanalysis::ecbench::canonical::sha256_hex;
 use crate::cryptanalysis::ecbench::methods::{resolve, solve, MethodSpec};
 use crate::cryptanalysis::ecbench::workload::{CurveSpec, Instance};
-use crate::cryptanalysis::gaudry_quartic_bin::{fq_muls_per_add, BinCurve, PtB};
+use crate::cryptanalysis::gaudry_quartic_bin::{
+    fq_muls_per_add, fq_muls_per_add_ref, BinCurve, PtB,
+};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use serde_json::{json, Value};
@@ -55,6 +57,11 @@ pub struct Opts {
     /// on this host.  A nonempty `unpriced` list is an error.  Implies
     /// `ic_complete` and `rho_full`.
     pub closure: bool,
+    /// Which pricing variants the closure check covers: `full` (the current
+    /// unit), `ref` and `refmm` (the reference unit, the code's and the
+    /// one-pass min(code, Montgomery) mod-r units).  Empty means `full`
+    /// only.  Only read with `closure`.
+    pub closure_variants: Vec<String>,
 }
 
 /// Run `f` with the calling thread as the only thread of its own rayon
@@ -398,6 +405,40 @@ fn ic_method(
     })
 }
 
+/// The IC counters of one solve, keyed `<tag>_targets_tried`,
+/// `<tag>_relations_found`, `<tag>_matrix_rank`, `<tag>_matrix_rows`, from
+/// the counters `ic_report` (methods.rs) emits: `targets_tried`
+/// (decomposition trials), `relations_found`, `matrix_rank`, `matrix_rows`.
+/// An earlier version of this readout looked up `trials`, `decompositions`
+/// and `accepted_relations`, which no report has, so it recorded zero for
+/// all of them (withdrawn in `unit-price/WITHDRAWN.md`).  A counter the
+/// report lacks is an error in the test below, not a silent zero.
+fn ic_counter_readout(
+    tag: &str,
+    counters: &BTreeMap<String, u64>,
+    o: &mut BTreeMap<&'static str, f64>,
+) {
+    let get = |k: &str| counters.get(k).copied().unwrap_or(0) as f64;
+    let (tk, rk, kk, ak) = match tag {
+        "legacy" => (
+            "legacy_targets_tried",
+            "legacy_relations_found",
+            "legacy_matrix_rank",
+            "legacy_matrix_rows",
+        ),
+        _ => (
+            "full_targets_tried",
+            "full_relations_found",
+            "full_matrix_rank",
+            "full_matrix_rows",
+        ),
+    };
+    o.insert(tk, get("targets_tried"));
+    o.insert(rk, get("relations_found"));
+    o.insert(kk, get("matrix_rank"));
+    o.insert(ak, get("matrix_rows"));
+}
+
 /// A partial `ic.pipeline` solve of `trials` trials (the global rayon pool,
 /// set to one thread by [`run`]): the wall time, the counted work, and the full-priced total.
 fn ic_once(
@@ -444,30 +485,7 @@ fn ic_once(
         };
         o.insert(wk, wall);
         o.insert(fk, fq);
-        // The counters `ic_report` emits (methods.rs): `targets_tried`
-        // (decomposition trials), `relations_found`, `matrix_*`.  The keys
-        // `trials`, `decompositions` and `accepted_relations` that an
-        // earlier version of this readout looked up do not exist, so it
-        // reported zero for all of them.
-        let get = |k: &str| rep.counters.get(k).copied().unwrap_or(0) as f64;
-        let (tk, rk, kk, ak) = match tag {
-            "legacy" => (
-                "legacy_targets_tried",
-                "legacy_relations_found",
-                "legacy_matrix_rank",
-                "legacy_matrix_rows",
-            ),
-            _ => (
-                "full_targets_tried",
-                "full_relations_found",
-                "full_matrix_rank",
-                "full_matrix_rows",
-            ),
-        };
-        o.insert(tk, get("targets_tried"));
-        o.insert(rk, get("relations_found"));
-        o.insert(kk, get("matrix_rank"));
-        o.insert(ak, get("matrix_rows"));
+        ic_counter_readout(tag, &rep.counters, &mut o);
         if tag == "legacy" {
             o.insert("recovered", if rep.recovered.is_some() { 1.0 } else { 0.0 });
         }
@@ -520,6 +538,159 @@ fn rho_full_once(
     Ok(o)
 }
 
+/// The priced total of a solve in F_q-multiplication equivalents of its own
+/// unit: `total_gae` times the divisor that unit uses.  `full` is the
+/// current unit (the curve's schoolbook `fq_muls_per_add`); `ref` and
+/// `refmm` are the reference unit (`fq_muls_per_add_ref`, 50 at odd m and 64
+/// at even m).  For the reference ids the second model (polynomial basis,
+/// free constant multiplication, divisor 42) is read from the record's own
+/// `reference_pricing.poly_free_const` block and returned beside it.
+fn priced_fme_of(
+    rep: &crate::cryptanalysis::ecbench::methods::SolveReport,
+    b: &BinCurve,
+    variant: &str,
+) -> (f64, Option<f64>) {
+    if variant == "full" {
+        return (rep.total_gae * fq_muls_per_add(&b.curve) as f64, None);
+    }
+    let primary = rep.total_gae * fq_muls_per_add_ref(&b.curve) as f64;
+    let poly = &rep.detail["reference_pricing"]["poly_free_const"];
+    let second = match (poly["total_gae"].as_f64(), poly["fq_muls_per_add"].as_f64()) {
+        (Some(g), Some(d)) => Some(g * d),
+        _ => None,
+    };
+    (primary, second)
+}
+
+/// The table row's F_q multiplication time (ns) that the FME of a variant
+/// is defined in: `f2m4_full_prices.json` for `full` and `ref`, the
+/// one-pass table for `refmm`.
+fn table_ns_fq_mul(m: u32, wide: bool, variant: &str) -> Result<f64, String> {
+    use crate::cryptanalysis::ecbench::f2m4_price::{row_key, F2M4_ONEPASS_PRICES, F2M4_PRICES};
+    let src = if variant == "refmm" {
+        F2M4_ONEPASS_PRICES
+    } else {
+        F2M4_PRICES
+    };
+    let doc: Value = serde_json::from_str(src).map_err(|e| e.to_string())?;
+    doc["instances"][row_key(m, wide)]["ns_per_fq_mul_median"]
+        .as_f64()
+        .ok_or_else(|| format!("no {variant} table row for m = {m}"))
+}
+
+/// One complete one-thread solve of `id` with its CPU time, and the closure
+/// of it under the primary model and (for the reference ids) the second.
+fn closure_solve(
+    inst: &Instance,
+    facts: &crate::cryptanalysis::ecbench::workload::CurveFacts,
+    b: &BinCurve,
+    target: &[String; 2],
+    id: &str,
+    variant: &str,
+    params: BTreeMap<String, String>,
+    seed: u64,
+    ns_local: f64,
+    ns_table: f64,
+) -> Result<Value, String> {
+    let m = resolve(&MethodSpec {
+        id: id.into(),
+        params,
+    })?;
+    let (u0, s0) = cpu_times_ns();
+    let t = Instant::now();
+    let rep = on_one_thread(|| solve(&m, inst, facts, target, seed))?;
+    let wall = t.elapsed().as_nanos() as f64;
+    let (u1, s1) = cpu_times_ns();
+    if !rep.unpriced.is_empty() {
+        return Err(format!(
+            "{id} is a lower bound: unpriced {:?}",
+            rep.unpriced
+        ));
+    }
+    let (fme, fme_poly) = priced_fme_of(&rep, b, variant);
+    let mut o = serde_json::Map::new();
+    o.insert("id".into(), json!(id));
+    o.insert("recovered".into(), json!(rep.recovered.is_some()));
+    o.insert("total_gae".into(), json!(rep.total_gae));
+    o.insert(
+        "divisor".into(),
+        json!(if variant == "full" {
+            fq_muls_per_add(&b.curve)
+        } else {
+            fq_muls_per_add_ref(&b.curve)
+        }),
+    );
+    o.insert("counters".into(), json!(rep.counters));
+    o.insert(
+        "closure".into(),
+        closure_of(wall, u1 - u0, s1 - s0, fme, ns_local, ns_table),
+    );
+    if let Some(fp) = fme_poly {
+        // The second model prices the same run; the measured CPU time is the
+        // same number, only the priced total differs.
+        o.insert(
+            "closure_poly_free_const".into(),
+            closure_of(wall, u1 - u0, s1 - s0, fp, ns_local, ns_table),
+        );
+    }
+    Ok(Value::Object(o))
+}
+
+/// The closure check of one pricing variant on one curve: the three arms'
+/// complete solves, each on one thread.
+fn closure_variant(
+    inst: &Instance,
+    facts: &crate::cryptanalysis::ecbench::workload::CurveFacts,
+    b: &BinCurve,
+    target: &[String; 2],
+    m: u32,
+    variant: &str,
+    ns_local: f64,
+) -> Result<Value, String> {
+    let wide = u64::try_from(b.r).is_err();
+    let ns_table = table_ns_fq_mul(m, wide, variant)?;
+    let mut blk = serde_json::Map::new();
+    blk.insert("variant".into(), json!(variant));
+    blk.insert("ns_per_fq_mul_table".into(), json!(ns_table));
+    for (name, id) in [
+        (
+            "rho_negation_batched",
+            format!("rho.negation_batched_{variant}"),
+        ),
+        ("rho_negation_f2m4", format!("rho.negation_f2m4_{variant}")),
+    ] {
+        let t0 = Instant::now();
+        let v = closure_solve(
+            inst,
+            facts,
+            b,
+            target,
+            &id,
+            variant,
+            BTreeMap::new(),
+            7,
+            ns_local,
+            ns_table,
+        )?;
+        eprintln!("m = {m}: {id} {:.1}s", t0.elapsed().as_secs_f64());
+        blk.insert(name.into(), v);
+    }
+    let id = format!("ic.pipeline_f2m4_{variant}");
+    let t0 = Instant::now();
+    let params = BTreeMap::from([
+        ("factor_base".to_string(), IC_FACTOR_BASE.to_string()),
+        ("oracle".to_string(), IC_ORACLE.to_string()),
+        ("linalg".to_string(), IC_LINALG.to_string()),
+        ("max_trials".to_string(), CLAIM_MAX_TRIALS.to_string()),
+    ]);
+    let v = closure_solve(
+        inst, facts, b, target, &id, variant, params, 3, ns_local, ns_table,
+    )?;
+    eprintln!("m = {m}: {id} {:.1}s", t0.elapsed().as_secs_f64());
+    blk.insert("ic_pipeline".into(), v);
+    Ok(Value::Object(blk))
+}
+
 pub fn run(o: &Opts) -> Result<Value, String> {
     let exe_hash = std::env::current_exe()
         .ok()
@@ -535,6 +706,18 @@ pub fn run(o: &Opts) -> Result<Value, String> {
         .build_global();
     let rho_full_on = o.rho_full || o.closure;
     let ic_complete = o.ic_complete || o.closure;
+    let variants: Vec<String> = if o.closure_variants.is_empty() {
+        vec!["full".to_string()]
+    } else {
+        o.closure_variants.clone()
+    };
+    for v in &variants {
+        if !matches!(v.as_str(), "full" | "ref" | "refmm") {
+            return Err(format!("unknown closure variant `{v}` (full, ref, refmm)"));
+        }
+    }
+    // With `--closure`, the current-unit (`full`) arms run only when asked.
+    let full_arms = !o.closure || variants.iter().any(|v| v == "full");
     let mut per_m = serde_json::Map::new();
     for &m in &o.ms {
         let cof = if m >= 15 { 2 } else { 16 };
@@ -598,7 +781,7 @@ pub fn run(o: &Opts) -> Result<Value, String> {
         } else {
             (f64::NAN, f64::NAN)
         };
-        let rho_full = if rho_full_on {
+        let rho_full = if rho_full_on && full_arms {
             let mut blk = serde_json::Map::new();
             for (name, id) in [
                 ("rho_negation_batched_full", "rho.negation_batched_full"),
@@ -642,7 +825,7 @@ pub fn run(o: &Opts) -> Result<Value, String> {
         } else {
             Value::Null
         };
-        let ic = if o.ic_trials > 0 || ic_complete {
+        let ic = if (o.ic_trials > 0 || ic_complete) && full_arms {
             let t0 = Instant::now();
             let mut acc: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
             let ic_reps = if ic_complete { 1 } else { o.reps.min(3) };
@@ -721,6 +904,15 @@ pub fn run(o: &Opts) -> Result<Value, String> {
         } else {
             Value::Null
         };
+        let mut closure_variants = serde_json::Map::new();
+        if o.closure {
+            for v in variants.iter().filter(|v| v.as_str() != "full") {
+                closure_variants.insert(
+                    v.clone(),
+                    closure_variant(&inst, &facts, b, &target, m, v, ns_local)?,
+                );
+            }
+        }
         per_m.insert(
             format!("m{m}"),
             json!({
@@ -731,7 +923,7 @@ pub fn run(o: &Opts) -> Result<Value, String> {
                 "ns_per_fq_mul_table": ns_table,
                 "curve": facts.slug,
                 "micro": micro,
-                "in_situ": { "rho_negation_batched": rb, "rho_negation": ru, "ic_pipeline": ic, "rho_full": rho_full },
+                "in_situ": { "rho_negation_batched": rb, "rho_negation": ru, "ic_pipeline": ic, "rho_full": rho_full, "closure_variants": Value::Object(closure_variants) },
             }),
         );
     }
@@ -744,6 +936,15 @@ pub fn run(o: &Opts) -> Result<Value, String> {
         "spread": "every statistic carries median, min, max, rel_spread = (max-min)/median and the raw per-repeat values",
         "units": "nanoseconds unless the key says counted_fq_ops",
         "ic_trials": o.ic_trials,
+        "ic_complete": ic_complete,
+        "closure": o.closure,
+        "closure_variants": variants,
+        "supersedes": {
+            "file": "research/gaudry_k4_char2_replication_20261026/unit-price/unit-price-f2m4-m14-17.json",
+            "withdrawn_fields": ["legacy_decompositions", "legacy_trials", "full_trials", "legacy_accepted_relations"],
+            "note": "research/gaudry_k4_char2_replication_20261026/unit-price/WITHDRAWN.md: the old file is kept unedited; its IC decomposition/trial/relation counters read keys no report has and are withdrawn, as is the statement that zero decompositions were found",
+        },
+        "readout": "ic_counter_readout (targets_tried, relations_found, matrix_rank, matrix_rows); supersedes the `decompositions`/`trials`/`accepted_relations` readout of unit-price-f2m4-m14-17.json, see WITHDRAWN.md there",
         "rho_steps": o.rho_steps,
     })
     .as_object()
@@ -753,4 +954,154 @@ pub fn run(o: &Opts) -> Result<Value, String> {
         Value::Object(d)
     })
     .unwrap())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn case(
+        m: u32,
+    ) -> (
+        Instance,
+        crate::cryptanalysis::ecbench::workload::CurveFacts,
+        [String; 2],
+    ) {
+        let spec = CurveSpec::F2m4Torsion {
+            m,
+            seed: 1,
+            max_cofactor: 16,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::F2m4(b) = &inst else {
+            unreachable!()
+        };
+        let q = target_of(b, 0x0123_4567_89ab_cdefu128 % b.r);
+        let f = &b.curve.f;
+        let t = [
+            format!("0x{:x}", f.pack(&q.x)),
+            format!("0x{:x}", f.pack(&q.y)),
+        ];
+        (inst, facts, t)
+    }
+
+    /// The readout reads the counters `ic_report` emits.  The keys the
+    /// withdrawn readout looked up (`trials`, `decompositions`,
+    /// `accepted_relations`) are not among them, which is why it recorded
+    /// zero; this reads them back as zero and the real keys as nonzero.
+    #[test]
+    fn the_ic_readout_reads_the_counters_the_report_emits() {
+        let emitted = BTreeMap::from([
+            ("targets_tried".to_string(), 47_330u64),
+            ("relations_found".to_string(), 251),
+            ("matrix_rank".to_string(), 214),
+            ("matrix_rows".to_string(), 251),
+        ]);
+        let mut o = BTreeMap::new();
+        ic_counter_readout("full", &emitted, &mut o);
+        assert_eq!(o["full_targets_tried"], 47_330.0);
+        assert_eq!(o["full_relations_found"], 251.0);
+        assert_eq!(o["full_matrix_rank"], 214.0);
+        assert_eq!(o["full_matrix_rows"], 251.0);
+        let mut l = BTreeMap::new();
+        ic_counter_readout("legacy", &emitted, &mut l);
+        assert_eq!(l["legacy_targets_tried"], 47_330.0);
+        // The withdrawn keys read as zero.
+        let old = BTreeMap::from([
+            ("trials".to_string(), 9u64),
+            ("decompositions".to_string(), 9),
+            ("accepted_relations".to_string(), 9),
+        ]);
+        let mut z = BTreeMap::new();
+        ic_counter_readout("full", &old, &mut z);
+        assert!(z.values().all(|&v| v == 0.0));
+    }
+
+    /// End to end at m = 6: a real partial solve of both arms reports the
+    /// decomposition trials it ran, and they equal the solve's own counter.
+    /// The withdrawn readout reported 0 here.
+    #[test]
+    fn the_ic_readout_is_nonzero_on_a_real_solve() {
+        let (inst, facts, target) = case(6);
+        let Instance::F2m4(b) = &inst else {
+            unreachable!()
+        };
+        let o = ic_once(&inst, &facts, b, &target, 400, 3, false).unwrap();
+        for k in ["legacy_targets_tried", "full_targets_tried"] {
+            assert!(o[k] > 0.0, "{k} = {}", o[k]);
+        }
+        let direct = solve(
+            &ic_method("ic.pipeline_f2m4_full", 400).unwrap(),
+            &inst,
+            &facts,
+            &target,
+            3,
+        )
+        .unwrap();
+        assert_eq!(
+            o["full_targets_tried"],
+            direct.counters["targets_tried"] as f64
+        );
+        assert_eq!(
+            o["full_relations_found"],
+            direct.counters["relations_found"] as f64
+        );
+        assert!(o["full_priced_fme"] > 0.0 && o["full_wall_ns"] > 0.0);
+    }
+
+    /// The reference-unit closure at m = 6 (even: divisor 64): the divisor,
+    /// the primary and the second model are both recorded, and the priced
+    /// total is `total_gae` times the divisor.  The only test that uses
+    /// the one-thread pool (it binds the calling thread).
+    #[test]
+    fn the_reference_closure_prices_by_the_per_m_divisor() {
+        let (inst, facts, target) = case(6);
+        let Instance::F2m4(b) = &inst else {
+            unreachable!()
+        };
+        for variant in ["ref", "refmm"] {
+            let id = format!("rho.negation_f2m4_{variant}");
+            let ns_table = table_ns_fq_mul(6, false, variant).unwrap();
+            assert!(ns_table > 0.0);
+            let v = closure_solve(
+                &inst,
+                &facts,
+                b,
+                &target,
+                &id,
+                variant,
+                BTreeMap::new(),
+                7,
+                ns_table,
+                ns_table,
+            )
+            .unwrap();
+            assert_eq!(v["divisor"].as_u64(), Some(64), "{variant}");
+            let c = &v["closure"];
+            let want = v["total_gae"].as_f64().unwrap() * 64.0;
+            assert!((c["priced_fme"].as_f64().unwrap() / want - 1.0).abs() < 1e-12);
+            // The second model: its own divisor (42), the same measured CPU.
+            let p = &v["closure_poly_free_const"];
+            assert!(p["priced_fme"].as_f64().unwrap() > 0.0);
+            assert_eq!(p["user_cpu_ns"], c["user_cpu_ns"]);
+            assert!(c["user_over_priced"].as_f64().unwrap().is_finite());
+        }
+        // The current unit has no second model and the schoolbook divisor.
+        let v = closure_solve(
+            &inst,
+            &facts,
+            b,
+            &target,
+            "rho.negation_f2m4_full",
+            "full",
+            BTreeMap::new(),
+            7,
+            1.0,
+            1.0,
+        )
+        .unwrap();
+        assert_eq!(v["divisor"].as_u64(), Some(fq_muls_per_add(&b.curve)));
+        assert!(v.get("closure_poly_free_const").is_none());
+    }
 }

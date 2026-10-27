@@ -259,6 +259,11 @@ enum Cmd {
         /// error. Implies --ic-complete and --rho-full.
         #[arg(long)]
         closure: bool,
+        /// Pricing variants the closure check covers: full (current unit),
+        /// ref, refmm (reference unit; refmm with the one-pass mod-r
+        /// units). Default full.
+        #[arg(long, value_delimiter = ',')]
+        closure_variants: Vec<String>,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -1094,6 +1099,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             ic_complete,
             rho_full,
             closure,
+            closure_variants,
             out,
         } => {
             let doc = crypto_lib::cryptanalysis::ecbench::unit_price::run(
@@ -1106,6 +1112,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     ic_complete,
                     rho_full,
                     closure,
+                    closure_variants,
                 },
             )?;
             let text = serde_json::to_string_pretty(&doc).map_err(|e| e.to_string())? + "\n";
