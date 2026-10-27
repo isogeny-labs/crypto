@@ -2567,6 +2567,8 @@ fn jacobians_and_transfers_verify_and_replay() {
         ]);
         assert!(ok, "{family} replay: {err}");
     }
+}
+
 /// `ecbench work` on committed records is frozen byte for byte: the
 /// snapshot in `tests/fixtures/ecbench/work-v1/expected.jsonl` was written
 /// by the binary before `bitop/v2` existed, and `--unit bitop/v1` is the
