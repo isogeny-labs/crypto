@@ -66,11 +66,7 @@ def point_rows(blob: bytes) -> list[tuple[int, int]]:
 
 
 def verified_git_points(rev: str, path: str, sha256: str) -> list[tuple[int, int]]:
-    try:
-        blob = subprocess.check_output(["git", "show", f"{rev}:{path}"],
-                                       cwd=ROOT, stderr=subprocess.DEVNULL)
-    except subprocess.CalledProcessError:
-        raise ValueError(f"sealed fixture is absent: {rev}:{path}") from None
+    blob = subprocess.check_output(["git", "show", f"{rev}:{path}"], cwd=ROOT)
     if digest(blob) != sha256:
         raise ValueError(f"sealed fixture differs: {rev}:{path}")
     return point_rows(blob)
