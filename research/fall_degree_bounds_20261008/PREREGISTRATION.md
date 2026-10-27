@@ -488,3 +488,88 @@ the first 4 draws with no solutions, `cmax = 4` (a draw not refuted by degree 4 
   in `e8/N100_SCOPING.md` and is not measured.
 
 Nothing from any E8 cell has been computed.
+
+## Amendment 10 (2026-10-27, before any draw of the cells below): E9, the large-host tier; E10, the balanced diagonal `mℓ = n`
+
+**Why.**
+- **E9.** Amendment 7's large-host tier, (6, 10, 3) `N = 58` and (5, 15, 3) `N = 60`, was
+  never run because no AWS route existed. Lab-account credentials are now present, and the
+  `ephemeral` one-command Spot runner (`taskq/deploy/ephemeral`) is deployed in it.
+- **E10.** HKYY's growth requirement is along `m ≈ n^{1/3}`, `n' = n/m`. That is, the
+  factor base is balanced: `mℓ ≈ n`. E8 raised `m` at `n ≤ 8` with `ℓ = 2`, so `mℓ ≥ n`
+  there, and the field was small. E10 instead holds `mℓ = n` and raises `n` along each `m`,
+  as far as a dense degree-4 closure reaches (`N ≤ 60`).
+
+**Route and measurement class.** The output is a count (`d_F`, closure dimensions), not a
+timing, so this is a `search`-class job. It runs on `ephemeral` Spot instances in the lab
+account. The Iso Lab EKS request contracts accept only `ecbench` specs from outside the
+cluster, so they cannot run this binary. Wall times are recorded but not scored, and are
+valid only as rough indications (no isolation level).
+
+**Engine change.** `examples/hky_par.rs` now counts solutions with
+`chained_solution_count_fast` (one Artin–Schreier lookup per link) instead of a scan of
+`F_{2^n}`. The scan costs about `2^{(m−1)ℓ+n}`, which is infeasible at `n ≥ 20`. The count is
+exact: the unit test `fast_chained_count_matches_the_reference` holds it to the scan at
+`m = 3 … 6`. So the same draws are kept. The closure code is unchanged.
+
+**Gate (on the exact binary each instance builds, before any E9/E10 draw on that
+instance).** If any part fails, that instance runs no cell.
+0. `cargo test --release --lib -- fast_chained_count_matches_the_reference chained_count`
+   passes (the counter equals the scan; run on the instance, because the local host lacks
+   the disk to build the test target).
+1. `e7/validate.sh`: `AGREE 24 DISAGREE 0`.
+2. `newcells --cells 5:10:2` reproduces `e6/B_5-10-2.rerun.jsonl` (draw, `d_F`,
+   `v_basis`, `x_r`, closure dimensions).
+3. New, for the counter change: `newcells --cells 3:18:6` reproduces
+   `e6/B_3-18-6.jsonl`, and `newcells --cells 4:8:2,5:8:2` reproduces
+   `e8/E8_4-8-2.jsonl` and `e8/E8_5-8-2.jsonl`, on the same fields.
+
+**Draw rule.** As E6 Part B and E7–E8: `ladder_sample` with `cell_seed(20261012, n, ℓ, m)`;
+keep the first 4 draws with no solutions; `cmax = 4`, and a draw not refuted at degree 4
+is `d_F ≥ 5`.
+
+**Cells.** `N = (m − 2)·n + m·ℓ`.
+
+| experiment | `m` | `(n, ℓ)` | `N` | columns `≤ 4` | basis, formula |
+|:--|--:|:--|--:|--:|--:|
+| E9 | 6 | (10, 3) | 58 | 456,838 | ≈ 13 GB |
+| E9 (also E10, `m = 5`) | 5 | (15, 3) | 60 | 523,686 | ≈ 17 GB |
+| E10 | 3 | (21, 7) | 42 | 124,314 | ≈ 1.0 GB |
+| E10 | 3 | (24, 8) | 48 | 213,053 | ≈ 2.8 GB |
+| E10 | 3 | (27, 9) | 54 | 342,541 | ≈ 7.3 GB |
+| E10 | 4 | (12, 3) | 36 | 66,712 | ≈ 0.3 GB |
+| E10 | 4 | (16, 4) | 48 | 213,053 | ≈ 2.8 GB |
+| E10 | 4 | (20, 5) | 60 | 523,686 | ≈ 17 GB |
+| E10 | 6 | (12, 2) | 60 | 523,686 | ≈ 17 GB |
+
+The measured peak is about 1.7× the formula (E7, `N = 54`). Instances need ≥ 64 GB.
+
+Earlier diagonal points, read with E10 but not rerun:
+- `m = 3`: (9, 3), (15, 5) and (18, 6);
+- `m = 4`: (8, 2);
+- `m = 5`: (10, 2).
+
+**Reading rules (fixed now; exploratory).**
+- **E9:** Amendment 7's rule, read for the large tier and pooled with E7.
+- **E10**, per `m` ladder along the diagonal, by the median `d_F` of each cell:
+
+| reading | condition |
+|:--|:--|
+| **`d_F` flat on the diagonal** | every median `d_F ≤ 4` |
+| **`d_F` grows on the diagonal** | some median `d_F ≥ 5` |
+| **mixed** | otherwise |
+
+- **Cross-`m` reading at fixed `N`.** At `N = 48`, compare (3, 24, 8) and (4, 16, 4).
+  At `N = 60`, compare (4, 20, 5), (5, 15, 3) and (6, 12, 2). The reading is "rises with
+  `m`" if the median strictly increases with `m` at a fixed `N`. Otherwise it is "not
+  rising".
+- A cell that runs out of memory or time is **not completed**, with whatever draws finished.
+- A Spot interruption is an infrastructure failure. The interrupted job is relaunched once,
+  from scratch, on the same commit. The computation is deterministic, so the relaunch
+  makes the same draws. The interrupted attempt's partial outputs are kept and must agree
+  with the relaunch. A second interruption makes the remaining cells **not completed**.
+- A cell with no draw free of solutions in 1000 draws is reported as such.
+- Nothing is extrapolated beyond `N = 60` here. `N ≈ 100` is a separate engine (E11) with
+  its own validation, and is registered separately before any `N ≈ 100` draw.
+
+Nothing from any E9 or E10 cell has been computed, and no E9 or E10 draw has been generated.
