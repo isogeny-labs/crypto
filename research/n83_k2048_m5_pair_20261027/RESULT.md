@@ -45,3 +45,19 @@ natural SAT models against the group or improves decomposition search enough
 to reach one within a frozen cap. Any selection still needs novel-rank yield,
 matrix and target-log recovery, and a calibrated same-point rho comparison
 under the Tier 0 or Tier 1 contract.
+
+## Native guarded replay
+
+The [native amendment](NATIVE_AMENDMENT_1.md) supersedes the original Python
+guard and receipt-audit execution path while retaining its inputs and
+historical receipts. The Rust guard completed six new cells, and the
+[independent Rust audit](evidence/panel-native-audit.json) passed on the
+committed receipts. Capped search times were U 152.482 s versus D 166.213 s
+on fixture 0, and U 159.272 s versus D 153.158 s on fixture 1. Every search
+again returned `Unknown` at 5,000 conflicts. The direction of the capped
+stage-time difference reverses across the two public points; this local
+shared-host panel does not select a base. The
+[visual report](reports/run-20261027T2012Z/REPORT.md),
+[SVG](reports/run-20261027T2012Z/capped_search.svg), and
+[PDF](reports/run-20261027T2012Z/REPORT.pdf) show the native result and its
+exact evidence links. The earlier table above remains the historical run.
