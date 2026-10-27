@@ -67,7 +67,10 @@ fn load(dir: &Path, names: &[&str]) -> (Vec<Row>, Map<String, Value>) {
         }
         meta.insert(n.to_string(), Value::Object(m));
         for r in d["rows"].as_array().expect("rows") {
-            rows.push(Row { card: n.to_string(), v: r.clone() });
+            rows.push(Row {
+                card: n.to_string(),
+                v: r.clone(),
+            });
         }
     }
     (rows, meta)
@@ -114,7 +117,9 @@ fn spearman(xs: &[f64], ys: &[f64]) -> f64 {
     let n = rx.len() as f64;
     let (mx, my) = (rx.iter().sum::<f64>() / n, ry.iter().sum::<f64>() / n);
     let num: f64 = rx.iter().zip(&ry).map(|(a, b)| (a - mx) * (b - my)).sum();
-    let den = (rx.iter().map(|a| (a - mx).powi(2)).sum::<f64>() * ry.iter().map(|b| (b - my).powi(2)).sum::<f64>()).sqrt();
+    let den = (rx.iter().map(|a| (a - mx).powi(2)).sum::<f64>()
+        * ry.iter().map(|b| (b - my).powi(2)).sum::<f64>())
+    .sqrt();
     num / den
 }
 
@@ -137,7 +142,10 @@ fn family_table(rows: &[Row], num: &str, den: &str, counts: Option<&Counts>) -> 
         if rs.is_empty() {
             continue;
         }
-        let logs: Vec<f64> = rs.iter().map(|r| (r.ms(num).unwrap() / r.ms(den).unwrap()).ln()).collect();
+        let logs: Vec<f64> = rs
+            .iter()
+            .map(|r| (r.ms(num).unwrap() / r.ms(den).unwrap()).ln())
+            .collect();
         let (g, ci) = boot_geomean(&logs);
         let mut ns: Vec<u64> = rs.iter().map(|r| r.v["n"].as_u64().unwrap()).collect();
         ns.sort();
@@ -154,14 +162,26 @@ fn family_table(rows: &[Row], num: &str, den: &str, counts: Option<&Counts>) -> 
         let cr: Vec<f64> = rs.iter().filter_map(|r| counted(r, counts)).collect();
         let mut e = Map::new();
         e.insert("systems".into(), json!(rs.len()));
-        e.insert("delta".into(), json!([deltas.iter().min(), deltas.iter().max()]));
+        e.insert(
+            "delta".into(),
+            json!([deltas.iter().min(), deltas.iter().max()]),
+        );
         e.insert("n".into(), json!(ns));
         e.insert("p".into(), json!(ps));
         e.insert("geomean".into(), json!(g));
         e.insert("ci95".into(), json!(ci));
-        e.insert("min".into(), json!(logs.iter().cloned().fold(f64::INFINITY, f64::min).exp()));
-        e.insert("max".into(), json!(logs.iter().cloned().fold(f64::NEG_INFINITY, f64::max).exp()));
-        e.insert("median_ms".into(), json!({ num: median(num), den: median(den) }));
+        e.insert(
+            "min".into(),
+            json!(logs.iter().cloned().fold(f64::INFINITY, f64::min).exp()),
+        );
+        e.insert(
+            "max".into(),
+            json!(logs.iter().cloned().fold(f64::NEG_INFINITY, f64::max).exp()),
+        );
+        e.insert(
+            "median_ms".into(),
+            json!({ num: median(num), den: median(den) }),
+        );
         if !cr.is_empty() {
             e.insert(
                 "counted_ratio".into(),
@@ -178,7 +198,11 @@ fn family_table(rows: &[Row], num: &str, den: &str, counts: Option<&Counts>) -> 
 }
 
 fn dlp_rows(v: &Value) -> BTreeMap<(u64, u64), Value> {
-    let rs = v.as_array().cloned().or_else(|| v["rows"].as_array().cloned()).expect("DLP rows");
+    let rs = v
+        .as_array()
+        .cloned()
+        .or_else(|| v["rows"].as_array().cloned())
+        .expect("DLP rows");
     rs.into_iter()
         .map(|r| r.get("Dlp").cloned().unwrap_or(r))
         .filter(|r| r.get("rho").is_some())
@@ -206,16 +230,33 @@ fn main() {
             Some(c) => {
                 for a in ["sparse", "fast"] {
                     if c.arm(a).map(|x| &x["sols"]) != r.arm(a).map(|x| &x["sols"]) {
-                        r3_mismatch.push(format!("{}:{}:{}:{a}", r.card, r.s("family"), r.s("label")));
+                        r3_mismatch.push(format!(
+                            "{}:{}:{}:{a}",
+                            r.card,
+                            r.s("family"),
+                            r.s("label")
+                        ));
                     }
                 }
-                counts.insert(r.key(), (c.muls("sparse").unwrap(), c.muls("fast").unwrap()));
+                counts.insert(
+                    r.key(),
+                    (c.muls("sparse").unwrap(), c.muls("fast").unwrap()),
+                );
             }
-            None => r3_mismatch.push(format!("{}:{}:{}:missing", r.card, r.s("family"), r.s("label"))),
+            None => r3_mismatch.push(format!(
+                "{}:{}:{}:missing",
+                r.card,
+                r.s("family"),
+                r.s("label")
+            )),
         }
     }
     if r3.len() != corpus.len() {
-        r3_mismatch.push(format!("R3-C has {} systems, R2 {}", r3.len(), corpus.len()));
+        r3_mismatch.push(format!(
+            "R3-C has {} systems, R2 {}",
+            r3.len(),
+            corpus.len()
+        ));
     }
 
     let mut skipped = Map::new();
@@ -235,14 +276,24 @@ fn main() {
         .filter(|r| r.v["agree"] != true)
         .map(|r| format!("{}:{}:{}", r.card, r.s("family"), r.s("label")))
         .collect();
-    let planted_lost: Vec<String> = corpus.iter().filter(|r| r.v["planted_found"] == false).map(lab).collect();
+    let planted_lost: Vec<String> = corpus
+        .iter()
+        .filter(|r| r.v["planted_found"] == false)
+        .map(lab)
+        .collect();
     let sparse_fell_back: Vec<String> = corpus
         .iter()
         .filter(|r| r.arm("sparse").is_some_and(|a| a["fallback"] == true))
         .map(lab)
         .collect();
-    let ablation_disagree: Vec<String> = abl.iter().filter(|r| r.v["agree"] != true).map(lab).collect();
-    let skipped_any = skipped.values().any(|v| v.as_array().is_some_and(|a| !a.is_empty()));
+    let ablation_disagree: Vec<String> = abl
+        .iter()
+        .filter(|r| r.v["agree"] != true)
+        .map(lab)
+        .collect();
+    let skipped_any = skipped
+        .values()
+        .any(|v| v.as_array().is_some_and(|a| !a.is_empty()));
     let pass = disagree.is_empty()
         && planted_lost.is_empty()
         && ablation_disagree.is_empty()
@@ -258,9 +309,15 @@ fn main() {
     let dense_rows: Vec<&Row> = corpus.iter().filter(|r| r.s("family") == "dense").collect();
     let rho = spearman(
         &dense_rows.iter().map(|r| r.f("delta")).collect::<Vec<_>>(),
-        &dense_rows.iter().map(|r| r.ms("sparse").unwrap() / r.ms("fast").unwrap()).collect::<Vec<_>>(),
+        &dense_rows
+            .iter()
+            .map(|r| r.ms("sparse").unwrap() / r.ms("fast").unwrap())
+            .collect::<Vec<_>>(),
     );
-    let simd: BTreeMap<_, _> = corpus.iter().map(|r| (r.key(), r.ms("fast").unwrap())).collect();
+    let simd: BTreeMap<_, _> = corpus
+        .iter()
+        .map(|r| (r.key(), r.ms("fast").unwrap()))
+        .collect();
     let mut portable = Map::new();
     for fam in FAMILIES {
         let ratios: Vec<f64> = abl
@@ -294,8 +351,14 @@ fn main() {
         .collect();
 
     // jv_cover DLP: wall time from R2-D, counts and the references from R3-D.
-    let (t1, t2) = (dlp_rows(&read(&dir, "R2-D1")), dlp_rows(&read(&dir, "R2-D2")));
-    let (c1, c2) = (dlp_rows(&read(&dir, "R3-D1")), dlp_rows(&read(&dir, "R3-D2")));
+    let (t1, t2) = (
+        dlp_rows(&read(&dir, "R2-D1")),
+        dlp_rows(&read(&dir, "R2-D2")),
+    );
+    let (c1, c2) = (
+        dlp_rows(&read(&dir, "R3-D1")),
+        dlp_rows(&read(&dir, "R3-D2")),
+    );
     let mut dlp = Vec::new();
     let mut dlp_mismatch = Vec::new();
     for (k, x) in &t1 {
@@ -309,8 +372,18 @@ fn main() {
                     dlp_mismatch.push(format!("{k:?}: {f}"));
                 }
             }
-            let rt: Vec<_> = t["rho"].as_array().unwrap().iter().map(|z| (z["s"].clone(), z["correct"].clone())).collect();
-            let rc: Vec<_> = c["rho"].as_array().unwrap().iter().map(|z| (z["s"].clone(), z["correct"].clone())).collect();
+            let rt: Vec<_> = t["rho"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|z| (z["s"].clone(), z["correct"].clone()))
+                .collect();
+            let rc: Vec<_> = c["rho"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|z| (z["s"].clone(), z["correct"].clone()))
+                .collect();
             if rt != rc {
                 dlp_mismatch.push(format!("{k:?}: plain rho"));
             }
@@ -318,7 +391,13 @@ fn main() {
         let num = |v: &Value, f: &str| v[f].as_f64().unwrap();
         let rho_all = [cx, cy]
             .iter()
-            .flat_map(|c| c["rho"].as_array().unwrap().iter().chain(c["rho_neg"].as_array().into_iter().flatten()))
+            .flat_map(|c| {
+                c["rho"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .chain(c["rho_neg"].as_array().into_iter().flatten())
+            })
             .all(|z| z["correct"] == true);
         dlp.push(json!({
             "p": k.0, "seed": k.1,
@@ -342,18 +421,34 @@ fn main() {
 
     // Predictions.
     let fams = so.as_object().unwrap();
-    let p1 = fams.values().all(|v| v["geomean"].as_f64().unwrap() >= 1.5 && v["ci95"][0].as_f64().unwrap() > 1.0);
-    let by_family: Map<String, Value> = fams.iter().map(|(k, v)| (k.clone(), json!([v["geomean"], v["ci95"]]))).collect();
+    let p1 = fams
+        .values()
+        .all(|v| v["geomean"].as_f64().unwrap() >= 1.5 && v["ci95"][0].as_f64().unwrap() > 1.0);
+    let by_family: Map<String, Value> = fams
+        .iter()
+        .map(|(k, v)| (k.clone(), json!([v["geomean"], v["ci95"]])))
+        .collect();
     let gave_up_frac = gates["fast_gave_up"].as_array().unwrap().len() as f64 / corpus.len() as f64;
     let cr: Vec<f64> = counts.values().map(|(s, f)| s / f.max(1.0)).collect();
-    let logs_correct = dlp.iter().all(|r| r["correct"][0] == true && r["correct"][1] == true);
+    let logs_correct = dlp
+        .iter()
+        .all(|r| r["correct"][0] == true && r["correct"][1] == true);
     // P4's wording: fast's counted multiplications within ±25% of sparse's.
     let fast_over_sparse: Vec<f64> = counts.values().map(|(s, f)| f / s.max(1.0)).collect();
     let within = fast_over_sparse.iter().all(|c| (0.75..=1.25).contains(c));
-    let s10 = dlp.iter().all(|r| (r["s_ratio_sparse_over_fast"].as_f64().unwrap() - 1.0).abs() <= 0.10);
-    let lin_lower = dlp.iter().all(|r| r["lin_ms_ratio_sparse_over_fast"].as_f64().unwrap() > 1.0);
+    let s10 = dlp
+        .iter()
+        .all(|r| (r["s_ratio_sparse_over_fast"].as_f64().unwrap() - 1.0).abs() <= 0.10);
+    let lin_lower = dlp
+        .iter()
+        .all(|r| r["lin_ms_ratio_sparse_over_fast"].as_f64().unwrap() > 1.0);
     let ab = family_table(&abl, "sparse", "fast", None);
-    let p5_by: Map<String, Value> = ab.as_object().unwrap().iter().map(|(k, v)| (k.clone(), v["geomean"].clone())).collect();
+    let p5_by: Map<String, Value> = ab
+        .as_object()
+        .unwrap()
+        .iter()
+        .map(|(k, v)| (k.clone(), v["geomean"].clone()))
+        .collect();
     let p5 = p5_by.values().all(|v| v.as_f64().unwrap() >= 1.2);
     let predictions = json!({
         "P1": { "held": p1, "by_family": by_family },
@@ -389,9 +484,17 @@ fn main() {
     });
     let a = dir.join("analysis");
     std::fs::create_dir_all(&a).unwrap();
-    std::fs::write(a.join("summary.json"), serde_json::to_string_pretty(&out).unwrap() + "\n").unwrap();
+    std::fs::write(
+        a.join("summary.json"),
+        serde_json::to_string_pretty(&out).unwrap() + "\n",
+    )
+    .unwrap();
     for k in ["P1", "P2", "P3", "P4", "P5"] {
         println!("{k} {}", out["predictions"][k]["held"]);
     }
-    println!("gates {} dlp_mismatch {}", out["gates"]["pass"], out["dlp_mismatch"].as_array().unwrap().len());
+    println!(
+        "gates {} dlp_mismatch {}",
+        out["gates"]["pass"],
+        out["dlp_mismatch"].as_array().unwrap().len()
+    );
 }
