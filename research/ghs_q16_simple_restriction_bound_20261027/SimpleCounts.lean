@@ -6,6 +6,10 @@ theorem residual_models : 2691 + 184 = 2875 := by omega
 theorem residual_orders : 46 + 3 = 49 := by omega
 theorem simple_residual_catalog : 2643 + 48 = 2691 := by omega
 theorem simple_residual_catalog_orders : 44 + 2 = 46 := by omega
+theorem complement_4006 : 4006 * 22 = 88132 := by omega
+theorem complement_4054 : 4054 * 14 = 56756 := by omega
+theorem complement_4078 : 4078 * 14 = 57092 := by omega
+theorem complement_4126 : 4126 * 14 = 57764 := by omega
 
 -- The Hasse-Weil input r ≤ 25^g is supplied by the mathematical argument.
 theorem genus_at_least_three_of_large_subgroup

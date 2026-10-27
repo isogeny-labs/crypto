@@ -29,6 +29,19 @@ The eight reducible orders are `3980, 3982, 4050, 4090, 4104, 4144, 4212, 4214`.
 
 In the residual simple, catalog-positive class, the 2,643 equations form a **structural search family**: they have a genus-three carrier at the level of an isogeny class and no algebraic carrier of smaller genus. This is an exact classification within this finite census, not a new attack construction or a statement that all 2,643 are vulnerable. Of all 8,190 source models, 1,986 have largest prime factor greater than 625; 984 of those are outside the Hess genus-three closure. Those are also subject to the point-count lower bound.
 
+## The elliptic complement in the four complete Hess controls
+
+The [four evaluated direct Hess maps](../ghs_q16_4126_hess_g4_20261027/EXACT_MODELS.md) are nonzero on their named prime-order generators. Since their source restrictions are `k`-simple, each image is a three-dimensional abelian subvariety of the genus-four Hess Jacobian. Poincare complete reducibility therefore gives a `k`-isogeny `Jac(H) ~ Res(E) × B` for an elliptic curve `B/k`. The exact recorded group orders determine `#B(k)` and its trace:
+
+| Source order | `#Jac(H)(k)` | `#B(k)=#Jac(H)(k)/#E(K)` | `Tr(B)=17-#B(k)` |
+| ---: | ---: | ---: | ---: |
+| 4006 | 88132 | 22 | -5 |
+| 4054 | 56756 | 14 | 3 |
+| 4078 | 57092 | 14 | 3 |
+| 4126 | 57764 | 14 | 3 |
+
+This decomposition is an algebraic consequence of the verified maps and source simplicity. It supplies no explicit projection from the Hess Jacobian to a genus-three quartic Jacobian. In particular, the recent [genus-four `(2,2)` decomposition theorem](https://www.cambridge.org/core/journals/canadian-journal-of-mathematics/article/on-22decomposable-genus-4-jacobians/651E1FC3F6A593EB7B03A0642E81C7F0) assumes characteristic different from two and cannot be applied directly here; a characteristic-two correspondence and its action on the named subgroup remain the next proof and implementation obligations.
+
 ## Prior work and novelty boundary
 
 [Tate's isogeny theorem](https://pazuki.perso.math.cnrs.fr/index_fichiers/Tate66.pdf) supplies the standard Frobenius/isogeny criterion. [Hess's generalized GHS construction](https://doi.org/10.1112/S146115700000108X), the [published characteristic-two field-family analysis](https://cacr.uwaterloo.ca/techreports/2004/corr2004-25.pdf), and [Magma's documented norm/conorm map](https://www.math.uzh.ch/sepp/magma-2.19.8-cr/html/text1383.htm) predate this census. The new contribution here is the **exact local cross-classification** of all 8,190 equations against simplicity, the existing Hess closure, and the catalog carrier check. The general dimension theorem and both known transfer constructions are prior work. The four candidate isogeny classes and their per-candidate publication checks are in the [quartic search ledger](../ghs_q16_residual_quartic_search_20261027/prior_work.json).
