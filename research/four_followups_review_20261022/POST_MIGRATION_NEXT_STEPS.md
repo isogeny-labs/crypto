@@ -32,6 +32,12 @@ calls matched the oracle, 494 fallback lifts succeeded, and 569 final lifts
 returned no divisor. Step 2 remains open for the other 18 models and complete
 cold cost. The table above records the starting state, not these added results.
 
+The later [cross-chart inverse packet](../projective_law_followup_20261022/formal/CROSS_CHART_INVERSE.md)
+kernel-checks the global scheme isomorphism between the separately glued
+two-chart model and the actual weighted Proj. The `Pic⁰` class equation,
+global divisor transport, and compiled Rust semantics remain open. This
+formal result changes no frozen target row or cost ratio.
+
 The later [N14 sample](../kummer_differential_collector_20261022/n14-concrete-gate/REPORT.md)
 checks 1,029 signed states in each of the other 18 models. All 55,566 sampled
 xADD calls matched the oracle; 62 signed lifts returned no divisor. This is a

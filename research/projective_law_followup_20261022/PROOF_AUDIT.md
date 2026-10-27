@@ -567,7 +567,8 @@ isomorphisms to the explicit affine and infinity charts, the cover
 structure map is Smooth over a perfect field of characteristic other than
 two with squarefree quintic. `WeightedProjInfinityDVR.lean` transports the
 explicit infinity-chart DVR and the local order of `z` to the actual Proj
-stalk. The glued-to-Proj inverse and the `Pic⁰` class equation remain open.
+stalk. The later cross-chart packet below closes the glued-to-Proj inverse;
+the `Pic⁰` class equation remains open.
 The [same packet](formal/WEIGHTED_QUOTIENT_COMPONENTS.md) also checks
 pointwise Jacobian nonvanishing and a ring-global affine Jacobian ideal certificate under stated hypotheses. `WeightedInfinityJacobian.infinity_jacobian_ideal_top` additionally proves, for any field and coefficients, that `z` and the `z`-partial generate the unit ideal on the explicit infinity chart. The packet also checks the chart
 generator identities `x·z=1`, `w·x³=y` in the common overlap ring. The common localized overlap rings have a checked
@@ -581,8 +582,14 @@ glued two-chart scheme. `WeightedOverlapEmbedding.zLocalized_awayι` and
 `xLocalized_awayι` check that both localized chart Spec maps enter weighted
 Proj through the same canonical `D₊(XZ)` immersion.
 `WeightedProjCrossChart.lean` identifies both opposite basic-open preimages
-with the separately glued overlap ranges; proving equality of cross-chart
-points in those ranges and the global glued-to-Proj inverse remains open.
+with the separately glued overlap ranges. The later
+[cross-chart inverse packet](formal/CROSS_CHART_INVERSE.md) kernel-checks
+`WeightedProjCrossInjective.cross`: equal weighted-Proj images of points
+from the two charts have equal images in the separately glued scheme.
+`WeightedProjCrossInjective.gluedToProj_isIso` consequently proves the
+global glued-to-Proj scheme isomorphism for every field and coefficient
+tuple. This does not prove the global divisor-class equation or compiled
+Rust field-operation semantics.
 The [infinity-chart packet](formal/INFINITY_CHART.md)
 now proves the chart equation `w²=z(1+a3z²+a2z³+a1z⁴+a0z⁵)` for
 `z=1/x,w=y/x³` and the source-style identity

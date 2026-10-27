@@ -364,6 +364,13 @@ includes these declarations, their [status CSV](weighted-quotient-components.csv
 [PDF](WEIGHTED_QUOTIENT_COMPONENTS.pdf). Global scheme smoothness, the
 isomorphism to the separately glued scheme, stalk transport, and `Pic⁰`
 remain open.
+The later [cross-chart inverse packet](CROSS_CHART_INVERSE.md) closes the
+glued-scheme-to-weighted-Proj isomorphism gate with two kernel-checked
+theorems. Its [gate CSV](cross-chart-inverse.csv),
+[dependency diagram](cross-chart-inverse.svg), and
+[PDF](CROSS_CHART_INVERSE.pdf) record the exact scope. The global divisor
+and `Pic⁰` equation and the compiled Rust semantics bridge remain open;
+the new proof adds no target measurement or cost ratio.
 The [bounded weighted-Proj attempt](WEIGHTED_PROJ_HEAD.md) records the
 specific quotient-grading and `D₊(Z)` chart-isomorphism obligations, available
 pinned APIs, and three failed/timed-out compiler commands. Its
