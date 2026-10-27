@@ -1,4 +1,4 @@
-githubConfigUrl: https://github.com/aburan28/crypto
+githubConfigUrl: https://github.com/isogeny-labs/crypto
 githubConfigSecret: arc-github-auth
 runnerScaleSetName: crypto-eks-highmem
 minRunners: 0
@@ -23,8 +23,10 @@ listenerTemplate:
 template:
   spec:
     automountServiceAccountToken: false
+    # Spot gives 2 minutes; leave the job's SIGTERM trap time to push records.
+    terminationGracePeriodSeconds: 110
     nodeSelector:
-      gha.dev/pool: on-demand
+      gha.dev/pool: gates
     tolerations:
       - key: gha.dev/workload
         operator: Equal
@@ -36,7 +38,8 @@ template:
         command: ["/home/runner/run.sh"]
         resources:
           requests:
-            cpu: "16"
+            # Leave room for kube/system reservations and the Docker sidecar.
+            cpu: "14"
             memory: 112Gi
             ephemeral-storage: 20Gi
           limits:

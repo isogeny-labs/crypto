@@ -1,0 +1,2522 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Elliptic curves over extension fields — experiment results</title>
+<style>
+:root{font-family:system-ui,sans-serif;color:#17263e;background:#f4f6fa}body{max-width:1280px;margin:auto;padding:32px}
+h1{font-size:2rem;margin-bottom:8px}h2{margin-top:34px}p,li{line-height:1.55}a{color:#225ea8}
+.cards{display:flex;gap:16px;flex-wrap:wrap;margin:24px 0}.card{background:white;border:1px solid #dce2ed;border-radius:10px;padding:16px 22px;min-width:150px}
+.card strong{display:block;font-size:1.8rem}.note{background:#fff6df;border-left:4px solid #edaa45;padding:12px 18px}
+table{width:100%;border-collapse:collapse;background:white;font-size:.88rem}td,th{padding:10px;border-bottom:1px solid #e3e7ef;text-align:left;vertical-align:top}
+th{background:#e8edf5}pre{max-width:600px;max-height:450px;overflow:auto;white-space:pre-wrap;font-size:.76rem}input,select{padding:9px;margin:0 10px 14px 0;border:1px solid #bbc7db;border-radius:5px}
+input{width:min(420px,70vw)}figure{margin:22px 0;background:white;padding:14px;border-radius:10px}img{max-width:100%}figcaption,small{color:#50627d}
+.scroll{overflow:auto}code{font-size:.9em}
+</style>
+<h1>Elliptic curves over extension fields</h1>
+<p>Reproducible experiments on low-genus transfers, trace-zero subgroups, and intermediate fields. All input scalars are synthetic.</p>
+<div class="cards"><div class="card"><strong>38</strong>recorded cases</div>
+<div class="card"><strong>37</strong>passed</div>
+<div class="card"><strong>1</strong>ineligible parameter sets</div>
+<div class="card"><strong>0</strong>unexpected outcomes</div></div>
+<p><a href="results.json">Full JSON</a> · <a href="results.jsonl">Streaming JSONL</a> · <a href="summary.csv">CSV</a> · <a href="plan.json">Executed plan</a></p>
+<div class="note"><b>A successful transfer is not a measured DLP speedup.</b> Toy cover experiments use the same generic BSGS algorithm and the same subgroup order on both sides. Transfer timings include the measured point-transfer and generator-search work; separate construction and validation work is included in total runtime.</div>
+<h2>What each experiment establishes</h2>
+<ul>
+<li><b>Tian kernel:</b> published prime-order cubic curve, rational maximal isotropic 3-torsion kernel, Frobenius stability, coordinate-factor rejection, and full source ECDLP recovery.</li>
+<li><b>Tian rational map:</b> evaluate all six published functions, trace the divisor classes, match both published images, and verify the subgroup order and homomorphism relations. This evaluates one published isogeny, not a constructor for arbitrary new curves.</li>
+<li><b>Tian Jacobian:</b> replay the actual non-hyperelliptic genus-three divisor classes. The target BSGS searches a 4096-element scalar interval; it is not comparable to the full-order source search and is excluded from the timing-ratio plot.</li>
+<li><b>Constructed covers:</b> explicit genus-two and genus-three pullback-and-trace maps, including genuine curves over F_(p⁴) and F_(p⁶) mapping to Jacobians over proper intermediate fields. This is not a reproduction of the full Joux–Vitse record computation.</li>
+<li><b>Trace zero:</b> exact orders, sampled prime subgroups, Frobenius action, small-field kernel enumeration, and scalar recovery. Relation experiments use exhaustive signed decompositions and linear algebra, not the paper’s Gröbner-basis implementation.</li>
+<li><b>Intermediate-field controls:</b> trace transitivity, a surviving base-field subgroup, and a new extension subgroup annihilated by ordinary trace.</li>
+<li><b>Binary GHS:</b> original characteristic-two Artin–Schreier rank and candidate-genus screening. It does not construct a divisor map or time an attack.</li>
+</ul>
+<h2>Measurements and theoretical reference</h2><figure><img src="transfer_timings.svg" alt="Measured toy-instance timings. No index-calculus implementation is timed here."><figcaption>Measured toy-instance timings. No index-calculus implementation is timed here.</figcaption></figure><figure><img src="degree_bounds.svg" alt="These are asymptotic reference exponents, not experimental measurements."><figcaption>These are asymptotic reference exponents, not experimental measurements.</figcaption></figure>
+<h2>Recorded cases</h2><input id="search" placeholder="Filter by family, p, n, or result"><select id="status"><option value="">All statuses</option><option>passed</option><option>ineligible</option><option>error</option><option>timeout</option></select><small id="count"></small>
+<div class="scroll"><table><thead><tr><th>Family</th><th>Parameters</th><th>Status</th><th>r</th><th>Genus</th><th>Total seconds</th><th>Evidence</th></tr></thead><tbody><tr data-status='passed'><td>trace_zero_structure</td><td>{&quot;enumerate_kernel&quot;: true, &quot;n&quot;: 2, &quot;p&quot;: 7}</td><td>passed</td><td>13</td><td>—</td><td>1.614</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_structure&quot;,
+  &quot;p&quot;: 7,
+  &quot;n&quot;: 2,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 7,
+    &quot;degree&quot;: 2,
+    &quot;order&quot;: 49,
+    &quot;modulus&quot;: &quot;x^2 + 6*x + 3&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + 4 over Finite Field in z of size 7^2&quot;,
+  &quot;base_curve_order&quot;: 3,
+  &quot;ambient_curve_order&quot;: 39,
+  &quot;trace_zero_order&quot;: 13,
+  &quot;trace_zero_factorization&quot;: &quot;13&quot;,
+  &quot;subgroup_order&quot;: 13,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;1&quot;,
+    &quot;y&quot;: &quot;3*z + 2&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;4&quot;,
+    &quot;y&quot;: &quot;3*z + 2&quot;
+  },
+  &quot;secret&quot;: 9,
+  &quot;minimum_point_field_degree&quot;: 2,
+  &quot;frobenius_eigenvalue_mod_r&quot;: 12,
+  &quot;enumerated_kernel_size&quot;: 13,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 9,
+    &quot;seconds&quot;: 0.00026221400003123563,
+    &quot;group_additions&quot;: 6,
+    &quot;baby_steps&quot;: 4,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 13
+  },
+  &quot;seconds&quot;: 0.336815339000168,
+  &quot;claim&quot;: &quot;subgroup structure and scalar recovery only&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_structure-5153e41d6f&quot;,
+  &quot;seed&quot;: 1364452381,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 7,
+    &quot;n&quot;: 2,
+    &quot;enumerate_kernel&quot;: true
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 1.6141497429998708,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_structure</td><td>{&quot;enumerate_kernel&quot;: true, &quot;n&quot;: 3, &quot;p&quot;: 7}</td><td>passed</td><td>13</td><td>—</td><td>1.960</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_structure&quot;,
+  &quot;p&quot;: 7,
+  &quot;n&quot;: 3,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 7,
+    &quot;degree&quot;: 3,
+    &quot;order&quot;: 343,
+    &quot;modulus&quot;: &quot;x^3 + 6*x^2 + 4&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + 6 over Finite Field in z of size 7^3&quot;,
+  &quot;base_curve_order&quot;: 4,
+  &quot;ambient_curve_order&quot;: 364,
+  &quot;trace_zero_order&quot;: 91,
+  &quot;trace_zero_factorization&quot;: &quot;7 * 13&quot;,
+  &quot;subgroup_order&quot;: 13,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;z^2 + z + 4&quot;,
+    &quot;y&quot;: &quot;6&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;4*z^2 + 4*z + 2&quot;,
+    &quot;y&quot;: &quot;6&quot;
+  },
+  &quot;secret&quot;: 9,
+  &quot;minimum_point_field_degree&quot;: 3,
+  &quot;frobenius_eigenvalue_mod_r&quot;: 9,
+  &quot;enumerated_kernel_size&quot;: 91,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 9,
+    &quot;seconds&quot;: 0.00028426900007616496,
+    &quot;group_additions&quot;: 6,
+    &quot;baby_steps&quot;: 4,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 13
+  },
+  &quot;seconds&quot;: 0.4848962840005697,
+  &quot;claim&quot;: &quot;subgroup structure and scalar recovery only&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_structure-cd7bfff583&quot;,
+  &quot;seed&quot;: 3447455733,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 7,
+    &quot;n&quot;: 3,
+    &quot;enumerate_kernel&quot;: true
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 1.9604315110000243,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_structure</td><td>{&quot;enumerate_kernel&quot;: false, &quot;n&quot;: 4, &quot;p&quot;: 7}</td><td>passed</td><td>13</td><td>—</td><td>2.010</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_structure&quot;,
+  &quot;p&quot;: 7,
+  &quot;n&quot;: 4,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 7,
+    &quot;degree&quot;: 4,
+    &quot;order&quot;: 2401,
+    &quot;modulus&quot;: &quot;x^4 + 5*x^2 + 4*x + 3&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + 1 over Finite Field in z of size 7^4&quot;,
+  &quot;base_curve_order&quot;: 12,
+  &quot;ambient_curve_order&quot;: 2496,
+  &quot;trace_zero_order&quot;: 208,
+  &quot;trace_zero_factorization&quot;: &quot;2^4 * 13&quot;,
+  &quot;subgroup_order&quot;: 13,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;5*z^3 + z^2 + 5*z + 4&quot;,
+    &quot;y&quot;: &quot;2*z^2 + 5*z + 5&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;3*z^3 + 2*z^2 + 3*z + 1&quot;,
+    &quot;y&quot;: &quot;5*z^2 + 2*z + 2&quot;
+  },
+  &quot;secret&quot;: 4,
+  &quot;minimum_point_field_degree&quot;: 4,
+  &quot;frobenius_eigenvalue_mod_r&quot;: 5,
+  &quot;enumerated_kernel_size&quot;: null,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 4,
+    &quot;seconds&quot;: 0.0005393330002334551,
+    &quot;group_additions&quot;: 5,
+    &quot;baby_steps&quot;: 4,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 13
+  },
+  &quot;seconds&quot;: 0.4203807490002873,
+  &quot;claim&quot;: &quot;subgroup structure and scalar recovery only&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_structure-6288732d27&quot;,
+  &quot;seed&quot;: 1653109549,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 7,
+    &quot;n&quot;: 4,
+    &quot;enumerate_kernel&quot;: false
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.010150058000363,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_structure</td><td>{&quot;enumerate_kernel&quot;: false, &quot;n&quot;: 5, &quot;p&quot;: 7}</td><td>passed</td><td>1381</td><td>—</td><td>2.201</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_structure&quot;,
+  &quot;p&quot;: 7,
+  &quot;n&quot;: 5,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 7,
+    &quot;degree&quot;: 5,
+    &quot;order&quot;: 16807,
+    &quot;modulus&quot;: &quot;x^5 + x + 4&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + 1 over Finite Field in z of size 7^5&quot;,
+  &quot;base_curve_order&quot;: 12,
+  &quot;ambient_curve_order&quot;: 16572,
+  &quot;trace_zero_order&quot;: 1381,
+  &quot;trace_zero_factorization&quot;: &quot;1381&quot;,
+  &quot;subgroup_order&quot;: 1381,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;3*z^2 + 2&quot;,
+    &quot;y&quot;: &quot;5*z^4 + 5*z^3 + 6*z^2 + z + 4&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;z^4 + z^2 + 3*z + 5&quot;,
+    &quot;y&quot;: &quot;6*z^4 + 6*z^3 + 4*z^2 + 2*z + 5&quot;
+  },
+  &quot;secret&quot;: 870,
+  &quot;minimum_point_field_degree&quot;: 5,
+  &quot;frobenius_eigenvalue_mod_r&quot;: 670,
+  &quot;enumerated_kernel_size&quot;: null,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 870,
+    &quot;seconds&quot;: 0.0013245810005173553,
+    &quot;group_additions&quot;: 60,
+    &quot;baby_steps&quot;: 38,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 1381
+  },
+  &quot;seconds&quot;: 0.45706712099945435,
+  &quot;claim&quot;: &quot;subgroup structure and scalar recovery only&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_structure-d444d16593&quot;,
+  &quot;seed&quot;: 3561279845,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 7,
+    &quot;n&quot;: 5,
+    &quot;enumerate_kernel&quot;: false
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.2014314429998194,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_structure</td><td>{&quot;enumerate_kernel&quot;: false, &quot;n&quot;: 6, &quot;p&quot;: 7}</td><td>passed</td><td>13</td><td>—</td><td>1.926</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_structure&quot;,
+  &quot;p&quot;: 7,
+  &quot;n&quot;: 6,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 7,
+    &quot;degree&quot;: 6,
+    &quot;order&quot;: 117649,
+    &quot;modulus&quot;: &quot;x^6 + x^4 + 5*x^3 + 4*x^2 + 6*x + 3&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + 1 over Finite Field in z of size 7^6&quot;,
+  &quot;base_curve_order&quot;: 12,
+  &quot;ambient_curve_order&quot;: 117936,
+  &quot;trace_zero_order&quot;: 9828,
+  &quot;trace_zero_factorization&quot;: &quot;2^2 * 3^3 * 7 * 13&quot;,
+  &quot;subgroup_order&quot;: 13,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;5*z^5 + 4*z^3 + z^2 + z + 4&quot;,
+    &quot;y&quot;: &quot;6*z^5 + 6*z^4 + 3*z^3 + 4*z^2 + 5*z + 1&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;2*z^5 + 3*z^3 + 6*z^2 + 6*z + 3&quot;,
+    &quot;y&quot;: &quot;4*z^5 + 4*z^4 + 2*z^3 + 5*z^2 + z + 3&quot;
+  },
+  &quot;secret&quot;: 7,
+  &quot;minimum_point_field_degree&quot;: 6,
+  &quot;frobenius_eigenvalue_mod_r&quot;: 4,
+  &quot;enumerated_kernel_size&quot;: null,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 7,
+    &quot;seconds&quot;: 0.0005698670001947903,
+    &quot;group_additions&quot;: 5,
+    &quot;baby_steps&quot;: 4,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 13
+  },
+  &quot;seconds&quot;: 0.4226816160007729,
+  &quot;claim&quot;: &quot;subgroup structure and scalar recovery only&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_structure-39325ad1c0&quot;,
+  &quot;seed&quot;: 959601361,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 7,
+    &quot;n&quot;: 6,
+    &quot;enumerate_kernel&quot;: false
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 1.9264485739995507,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_relations</td><td>{&quot;n&quot;: 3, &quot;p&quot;: 7}</td><td>passed</td><td>13</td><td>—</td><td>2.746</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_relations&quot;,
+  &quot;p&quot;: 7,
+  &quot;n&quot;: 3,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 7,
+    &quot;degree&quot;: 3,
+    &quot;order&quot;: 343,
+    &quot;modulus&quot;: &quot;x^3 + 6*x^2 + 4&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + 6 over Finite Field in z of size 7^3&quot;,
+  &quot;subgroup_order&quot;: 13,
+  &quot;trace_zero_order&quot;: 91,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;6*z^2 + 6*z + 3&quot;,
+    &quot;y&quot;: &quot;2&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;3*z^2 + 3*z + 5&quot;,
+    &quot;y&quot;: &quot;2&quot;
+  },
+  &quot;secret&quot;: 9,
+  &quot;recovered_scalar&quot;: 9,
+  &quot;factor_base_size&quot;: 3,
+  &quot;factor_base&quot;: [
+    {
+      &quot;x&quot;: &quot;3*z^2 + 3*z + 5&quot;,
+      &quot;y&quot;: &quot;2&quot;
+    },
+    {
+      &quot;x&quot;: &quot;5*z^2 + 5*z + 6&quot;,
+      &quot;y&quot;: &quot;2&quot;
+    },
+    {
+      &quot;x&quot;: &quot;6*z^2 + 6*z + 3&quot;,
+      &quot;y&quot;: &quot;2&quot;
+    }
+  ],
+  &quot;factor_base_x_candidates&quot;: 98,
+  &quot;decomposition_length&quot;: 2,
+  &quot;decomposition_tuples&quot;: 27,
+  &quot;decomposition_table_entries&quot;: 13,
+  &quot;decomposition_capped&quot;: false,
+  &quot;relation_attempts&quot;: 4,
+  &quot;relations_collected&quot;: 4,
+  &quot;matrix_rank&quot;: 4,
+  &quot;factor_base_seconds&quot;: 0.03417371999967145,
+  &quot;decomposition_seconds&quot;: 0.0004601760001605726,
+  &quot;relation_seconds&quot;: 0.010382030000073428,
+  &quot;linear_algebra_seconds&quot;: 0.0011574370000744238,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 9,
+    &quot;seconds&quot;: 0.0023036479997244896,
+    &quot;group_additions&quot;: 6,
+    &quot;baby_steps&quot;: 4,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 13
+  },
+  &quot;seconds&quot;: 0.6209093220004434,
+  &quot;claim&quot;: &quot;enumerative relation mechanism; not a Groebner-basis speed benchmark&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_relations-ac03fc2a3d&quot;,
+  &quot;seed&quot;: 2885942314,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 7,
+    &quot;n&quot;: 3
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.7463370080004097,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_relations</td><td>{&quot;n&quot;: 5, &quot;p&quot;: 7}</td><td>passed</td><td>1381</td><td>—</td><td>2.575</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_relations&quot;,
+  &quot;p&quot;: 7,
+  &quot;n&quot;: 5,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 7,
+    &quot;degree&quot;: 5,
+    &quot;order&quot;: 16807,
+    &quot;modulus&quot;: &quot;x^5 + x + 4&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + 1 over Finite Field in z of size 7^5&quot;,
+  &quot;subgroup_order&quot;: 1381,
+  &quot;trace_zero_order&quot;: 1381,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;z^4 + 2*z^3 + z^2 + 6&quot;,
+    &quot;y&quot;: &quot;5*z^4 + 5*z^3 + z^2 + z&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;5*z^4 + 5*z^3 + 4*z^2 + 3*z&quot;,
+    &quot;y&quot;: &quot;z^4 + 4*z^3 + 5*z^2 + 6*z + 6&quot;
+  },
+  &quot;secret&quot;: 189,
+  &quot;recovered_scalar&quot;: 189,
+  &quot;factor_base_size&quot;: 6,
+  &quot;factor_base&quot;: [
+    {
+      &quot;x&quot;: &quot;z^4 + z^3 + 1&quot;,
+      &quot;y&quot;: &quot;2*z^4 + 5*z^3 + 5*z^2 + 6*z&quot;
+    },
+    {
+      &quot;x&quot;: &quot;2*z^4 + 2*z^3 + 2&quot;,
+      &quot;y&quot;: &quot;2*z^4 + 5*z^3 + 5*z^2 + 6*z&quot;
+    },
+    {
+      &quot;x&quot;: &quot;6*z^4 + 3*z^3 + 3&quot;,
+      &quot;y&quot;: &quot;2*z^4 + 2*z^3 + 2*z + 3&quot;
+    },
+    {
+      &quot;x&quot;: &quot;4*z^4 + 4*z^3 + 4&quot;,
+      &quot;y&quot;: &quot;2*z^4 + 5*z^3 + 5*z^2 + 6*z&quot;
+    },
+    {
+      &quot;x&quot;: &quot;3*z^4 + 5*z^3 + 5&quot;,
+      &quot;y&quot;: &quot;2*z^4 + 2*z^3 + 2*z + 3&quot;
+    },
+    {
+      &quot;x&quot;: &quot;5*z^4 + 6*z^3 + 6&quot;,
+      &quot;y&quot;: &quot;2*z^4 + 2*z^3 + 2*z + 3&quot;
+    }
+  ],
+  &quot;factor_base_x_candidates&quot;: 98,
+  &quot;decomposition_length&quot;: 4,
+  &quot;decomposition_tuples&quot;: 1819,
+  &quot;decomposition_table_entries&quot;: 595,
+  &quot;decomposition_capped&quot;: false,
+  &quot;relation_attempts&quot;: 17,
+  &quot;relations_collected&quot;: 7,
+  &quot;matrix_rank&quot;: 7,
+  &quot;factor_base_seconds&quot;: 0.0546449979992758,
+  &quot;decomposition_seconds&quot;: 0.110120389000258,
+  &quot;relation_seconds&quot;: 0.017548343999806093,
+  &quot;linear_algebra_seconds&quot;: 0.0021789639995404286,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 189,
+    &quot;seconds&quot;: 0.0021992890006004018,
+    &quot;group_additions&quot;: 42,
+    &quot;baby_steps&quot;: 38,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 1381
+  },
+  &quot;seconds&quot;: 0.7092979769995509,
+  &quot;claim&quot;: &quot;enumerative relation mechanism; not a Groebner-basis speed benchmark&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_relations-94fa99cadf&quot;,
+  &quot;seed&quot;: 2499451338,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 7,
+    &quot;n&quot;: 5
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.5749873859995205,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_structure</td><td>{&quot;enumerate_kernel&quot;: true, &quot;n&quot;: 2, &quot;p&quot;: 11}</td><td>passed</td><td>11</td><td>—</td><td>2.280</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_structure&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 2,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 2,
+    &quot;order&quot;: 121,
+    &quot;modulus&quot;: &quot;x^2 + 7*x + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + x + 6 over Finite Field in z of size 11^2&quot;,
+  &quot;base_curve_order&quot;: 13,
+  &quot;ambient_curve_order&quot;: 143,
+  &quot;trace_zero_order&quot;: 11,
+  &quot;trace_zero_factorization&quot;: &quot;11&quot;,
+  &quot;subgroup_order&quot;: 11,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;9&quot;,
+    &quot;y&quot;: &quot;3*z + 5&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;9&quot;,
+    &quot;y&quot;: &quot;3*z + 5&quot;
+  },
+  &quot;secret&quot;: 1,
+  &quot;minimum_point_field_degree&quot;: 2,
+  &quot;frobenius_eigenvalue_mod_r&quot;: 10,
+  &quot;enumerated_kernel_size&quot;: 11,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 1,
+    &quot;seconds&quot;: 0.00017026000023179222,
+    &quot;group_additions&quot;: 4,
+    &quot;baby_steps&quot;: 4,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 11
+  },
+  &quot;seconds&quot;: 0.49885925899980066,
+  &quot;claim&quot;: &quot;subgroup structure and scalar recovery only&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_structure-87e3576d93&quot;,
+  &quot;seed&quot;: 2279823213,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;n&quot;: 2,
+    &quot;enumerate_kernel&quot;: true
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.280393417000596,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_structure</td><td>{&quot;enumerate_kernel&quot;: false, &quot;n&quot;: 3, &quot;p&quot;: 11}</td><td>passed</td><td>13</td><td>—</td><td>2.775</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_structure&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 3,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 3,
+    &quot;order&quot;: 1331,
+    &quot;modulus&quot;: &quot;x^3 + 2*x + 9&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + x + 1 over Finite Field in z of size 11^3&quot;,
+  &quot;base_curve_order&quot;: 14,
+  &quot;ambient_curve_order&quot;: 1274,
+  &quot;trace_zero_order&quot;: 91,
+  &quot;trace_zero_factorization&quot;: &quot;7 * 13&quot;,
+  &quot;subgroup_order&quot;: 13,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;4*z^2 + 10*z + 9&quot;,
+    &quot;y&quot;: &quot;7&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;10*z^2 + 7*z + 10&quot;,
+    &quot;y&quot;: &quot;10*z^2 + 7*z + 7&quot;
+  },
+  &quot;secret&quot;: 6,
+  &quot;minimum_point_field_degree&quot;: 3,
+  &quot;frobenius_eigenvalue_mod_r&quot;: 3,
+  &quot;enumerated_kernel_size&quot;: null,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 6,
+    &quot;seconds&quot;: 0.0003668569997898885,
+    &quot;group_additions&quot;: 5,
+    &quot;baby_steps&quot;: 4,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 13
+  },
+  &quot;seconds&quot;: 0.566807704999519,
+  &quot;claim&quot;: &quot;subgroup structure and scalar recovery only&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_structure-fa992b82c9&quot;,
+  &quot;seed&quot;: 4204342146,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;n&quot;: 3,
+    &quot;enumerate_kernel&quot;: false
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.7749118779993296,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_structure</td><td>{&quot;enumerate_kernel&quot;: false, &quot;n&quot;: 4, &quot;p&quot;: 11}</td><td>passed</td><td>13</td><td>—</td><td>2.244</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_structure&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 4,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 4,
+    &quot;order&quot;: 14641,
+    &quot;modulus&quot;: &quot;x^4 + 8*x^2 + 10*x + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + x + 1 over Finite Field in z of size 11^4&quot;,
+  &quot;base_curve_order&quot;: 14,
+  &quot;ambient_curve_order&quot;: 14560,
+  &quot;trace_zero_order&quot;: 1040,
+  &quot;trace_zero_factorization&quot;: &quot;2^4 * 5 * 13&quot;,
+  &quot;subgroup_order&quot;: 13,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;6*z^3 + 9*z^2 + 3*z + 1&quot;,
+    &quot;y&quot;: &quot;10*z^3 + 6*z^2 + 8*z&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;9*z^3 + 8*z^2 + 10*z + 4&quot;,
+    &quot;y&quot;: &quot;9*z^3 + z^2 + 5*z&quot;
+  },
+  &quot;secret&quot;: 2,
+  &quot;minimum_point_field_degree&quot;: 4,
+  &quot;frobenius_eigenvalue_mod_r&quot;: 8,
+  &quot;enumerated_kernel_size&quot;: null,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 2,
+    &quot;seconds&quot;: 0.0003266910007369006,
+    &quot;group_additions&quot;: 4,
+    &quot;baby_steps&quot;: 4,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 13
+  },
+  &quot;seconds&quot;: 0.4654652530007297,
+  &quot;claim&quot;: &quot;subgroup structure and scalar recovery only&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_structure-933b2c2897&quot;,
+  &quot;seed&quot;: 2470128680,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;n&quot;: 4,
+    &quot;enumerate_kernel&quot;: false
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.2442919800005257,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_structure</td><td>{&quot;enumerate_kernel&quot;: false, &quot;n&quot;: 5, &quot;p&quot;: 11}</td><td>passed</td><td>1051</td><td>—</td><td>2.609</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_structure&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 5,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 5,
+    &quot;order&quot;: 161051,
+    &quot;modulus&quot;: &quot;x^5 + 10*x^2 + 9&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + x + 1 over Finite Field in z of size 11^5&quot;,
+  &quot;base_curve_order&quot;: 14,
+  &quot;ambient_curve_order&quot;: 161854,
+  &quot;trace_zero_order&quot;: 11561,
+  &quot;trace_zero_factorization&quot;: &quot;11 * 1051&quot;,
+  &quot;subgroup_order&quot;: 1051,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;4*z^4 + z^3 + 5*z^2 + 8*z + 3&quot;,
+    &quot;y&quot;: &quot;4*z^4 + 2*z^3 + 9*z^2 + 4*z + 9&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;9*z^4 + 7*z^3 + 7*z^2 + 3*z + 2&quot;,
+    &quot;y&quot;: &quot;7*z^4 + 3*z^3 + 9*z^2 + 9*z + 3&quot;
+  },
+  &quot;secret&quot;: 954,
+  &quot;minimum_point_field_degree&quot;: 5,
+  &quot;frobenius_eigenvalue_mod_r&quot;: 710,
+  &quot;enumerated_kernel_size&quot;: null,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 954,
+    &quot;seconds&quot;: 0.00811608299954969,
+    &quot;group_additions&quot;: 61,
+    &quot;baby_steps&quot;: 33,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 1051
+  },
+  &quot;seconds&quot;: 0.47877060500013613,
+  &quot;claim&quot;: &quot;subgroup structure and scalar recovery only&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_structure-c95f3ff4a0&quot;,
+  &quot;seed&quot;: 3378462708,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;n&quot;: 5,
+    &quot;enumerate_kernel&quot;: false
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.60880312900008,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_structure</td><td>{&quot;enumerate_kernel&quot;: false, &quot;n&quot;: 6, &quot;p&quot;: 11}</td><td>passed</td><td>139</td><td>—</td><td>1.941</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_structure&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 6,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 6,
+    &quot;order&quot;: 1771561,
+    &quot;modulus&quot;: &quot;x^6 + 3*x^4 + 4*x^3 + 6*x^2 + 7*x + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + x + 1 over Finite Field in z of size 11^6&quot;,
+  &quot;base_curve_order&quot;: 14,
+  &quot;ambient_curve_order&quot;: 1770860,
+  &quot;trace_zero_order&quot;: 126490,
+  &quot;trace_zero_factorization&quot;: &quot;2 * 5 * 7 * 13 * 139&quot;,
+  &quot;subgroup_order&quot;: 139,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;5*z^5 + 2*z^4 + 2*z^3 + 2*z^2 + 2*z + 7&quot;,
+    &quot;y&quot;: &quot;z^5 + 2*z^4 + z^3 + z^2 + 10&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;7*z^4 + 7*z^3 + 10*z^2 + 4*z + 9&quot;,
+    &quot;y&quot;: &quot;7*z^5 + 9*z^4 + 7*z^3 + 3*z^2 + 10*z + 6&quot;
+  },
+  &quot;secret&quot;: 92,
+  &quot;minimum_point_field_degree&quot;: 6,
+  &quot;frobenius_eigenvalue_mod_r&quot;: 43,
+  &quot;enumerated_kernel_size&quot;: null,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 92,
+    &quot;seconds&quot;: 0.0018501260001357878,
+    &quot;group_additions&quot;: 19,
+    &quot;baby_steps&quot;: 12,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 139
+  },
+  &quot;seconds&quot;: 0.4188615920002121,
+  &quot;claim&quot;: &quot;subgroup structure and scalar recovery only&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_structure-fc4435ec9a&quot;,
+  &quot;seed&quot;: 4232328684,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;n&quot;: 6,
+    &quot;enumerate_kernel&quot;: false
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 1.9410729809997065,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_relations</td><td>{&quot;n&quot;: 3, &quot;p&quot;: 11}</td><td>passed</td><td>13</td><td>—</td><td>2.202</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_relations&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 3,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 3,
+    &quot;order&quot;: 1331,
+    &quot;modulus&quot;: &quot;x^3 + 2*x + 9&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + x + 1 over Finite Field in z of size 11^3&quot;,
+  &quot;subgroup_order&quot;: 13,
+  &quot;trace_zero_order&quot;: 91,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;10*z^2 + 7*z + 10&quot;,
+    &quot;y&quot;: &quot;10*z^2 + 7*z + 7&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;9*z^2 + 10*z + 5&quot;,
+    &quot;y&quot;: &quot;2*z^2 + z + 9&quot;
+  },
+  &quot;secret&quot;: 4,
+  &quot;recovered_scalar&quot;: 4,
+  &quot;factor_base_size&quot;: 3,
+  &quot;factor_base&quot;: [
+    {
+      &quot;x&quot;: &quot;3*z^2 + 5*z + 8&quot;,
+      &quot;y&quot;: &quot;3*z^2 + 5*z + 5&quot;
+    },
+    {
+      &quot;x&quot;: &quot;9*z^2 + 10*z + 5&quot;,
+      &quot;y&quot;: &quot;2*z^2 + z + 9&quot;
+    },
+    {
+      &quot;x&quot;: &quot;4*z^2 + 10*z + 9&quot;,
+      &quot;y&quot;: &quot;4&quot;
+    }
+  ],
+  &quot;factor_base_x_candidates&quot;: 242,
+  &quot;decomposition_length&quot;: 2,
+  &quot;decomposition_tuples&quot;: 27,
+  &quot;decomposition_table_entries&quot;: 13,
+  &quot;decomposition_capped&quot;: false,
+  &quot;relation_attempts&quot;: 6,
+  &quot;relations_collected&quot;: 6,
+  &quot;matrix_rank&quot;: 4,
+  &quot;factor_base_seconds&quot;: 0.0791115499996522,
+  &quot;decomposition_seconds&quot;: 0.0005688640003427281,
+  &quot;relation_seconds&quot;: 0.02114409399928263,
+  &quot;linear_algebra_seconds&quot;: 0.002521391999835032,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 4,
+    &quot;seconds&quot;: 0.0005765519999840762,
+    &quot;group_additions&quot;: 5,
+    &quot;baby_steps&quot;: 4,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 13
+  },
+  &quot;seconds&quot;: 0.6056971810003233,
+  &quot;claim&quot;: &quot;enumerative relation mechanism; not a Groebner-basis speed benchmark&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_relations-5339c992d8&quot;,
+  &quot;seed&quot;: 1396296082,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;n&quot;: 3
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.2023572250000143,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>trace_zero_relations</td><td>{&quot;n&quot;: 5, &quot;p&quot;: 11}</td><td>passed</td><td>1051</td><td>—</td><td>2.974</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;trace_zero_relations&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 5,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 5,
+    &quot;order&quot;: 161051,
+    &quot;modulus&quot;: &quot;x^5 + 10*x^2 + 9&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + x + 1 over Finite Field in z of size 11^5&quot;,
+  &quot;subgroup_order&quot;: 1051,
+  &quot;trace_zero_order&quot;: 11561,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;6*z^4 + 3*z^3 + 6*z^2 + 5*z + 10&quot;,
+    &quot;y&quot;: &quot;z^4 + 8*z^3 + 3*z^2 + 2*z + 6&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;3*z^4 + 10*z^3 + 8*z^2 + 8*z + 5&quot;,
+    &quot;y&quot;: &quot;z^4 + 4*z^3 + 9*z^2 + 9*z + 9&quot;
+  },
+  &quot;secret&quot;: 455,
+  &quot;recovered_scalar&quot;: 455,
+  &quot;factor_base_size&quot;: 6,
+  &quot;factor_base&quot;: [
+    {
+      &quot;x&quot;: &quot;7*z^4 + 6*z^3 + 10*z^2 + 10*z + 10&quot;,
+      &quot;y&quot;: &quot;10*z^4 + 6*z^3 + 3*z^2 + 2*z + 6&quot;
+    },
+    {
+      &quot;x&quot;: &quot;8*z^4 + z^2 + 3&quot;,
+      &quot;y&quot;: &quot;4*z^4 + 10*z^3 + 6*z^2 + 6*z + 6&quot;
+    },
+    {
+      &quot;x&quot;: &quot;2*z^4 + z^3 + 4*z^2 + 3*z + 6&quot;,
+      &quot;y&quot;: &quot;10*z^4 + 10*z^3 + 4*z^2 + 9*z + 7&quot;
+    },
+    {
+      &quot;x&quot;: &quot;4*z^4 + 7*z^3 + 6*z^2 + 9*z + 10&quot;,
+      &quot;y&quot;: &quot;3*z^4 + 8*z^3 + 9*z^2 + 7*z + 1&quot;
+    },
+    {
+      &quot;x&quot;: &quot;5*z^4 + 3*z^3 + 6*z^2&quot;,
+      &quot;y&quot;: &quot;3*z^4 + 3*z^3 + 3*z^2 + 4&quot;
+    },
+    {
+      &quot;x&quot;: &quot;7*z^4 + 9*z^3 + 6*z^2 + 2*z + 6&quot;,
+      &quot;y&quot;: &quot;3*z^4 + 4*z^3 + z^2 + 9&quot;
+    }
+  ],
+  &quot;factor_base_x_candidates&quot;: 242,
+  &quot;decomposition_length&quot;: 4,
+  &quot;decomposition_tuples&quot;: 1819,
+  &quot;decomposition_table_entries&quot;: 621,
+  &quot;decomposition_capped&quot;: false,
+  &quot;relation_attempts&quot;: 12,
+  &quot;relations_collected&quot;: 7,
+  &quot;matrix_rank&quot;: 7,
+  &quot;factor_base_seconds&quot;: 0.2892518740000014,
+  &quot;decomposition_seconds&quot;: 0.276896413999566,
+  &quot;relation_seconds&quot;: 0.007950774999699206,
+  &quot;linear_algebra_seconds&quot;: 0.0008754720001888927,
+  &quot;bsgs&quot;: {
+    &quot;scalar&quot;: 455,
+    &quot;seconds&quot;: 0.0067579699998532305,
+    &quot;group_additions&quot;: 46,
+    &quot;baby_steps&quot;: 33,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 1051
+  },
+  &quot;seconds&quot;: 1.1102032409999083,
+  &quot;claim&quot;: &quot;enumerative relation mechanism; not a Groebner-basis speed benchmark&quot;,
+  &quot;case_id&quot;: &quot;trace_zero_relations-2fc91c3e8e&quot;,
+  &quot;seed&quot;: 801709118,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;n&quot;: 5
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.974376427000607,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>quadratic_genus_two_transfer</td><td>{&quot;m&quot;: 1, &quot;p&quot;: 11}</td><td>passed</td><td>7</td><td>2</td><td>2.313</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;quadratic_genus_two_transfer&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 2,
+  &quot;d&quot;: 1,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 2,
+    &quot;order&quot;: 121,
+    &quot;modulus&quot;: &quot;x^2 + 7*x + 2&quot;
+  },
+  &quot;target_field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 1,
+    &quot;order&quot;: 11,
+    &quot;modulus&quot;: &quot;x + 10&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + (9*z+3)*x^2 + 5*x + (2*z+10) over Finite Field in z of size 11^2&quot;,
+  &quot;curve_order&quot;: 112,
+  &quot;subgroup_order&quot;: 7,
+  &quot;target_genus&quot;: 2,
+  &quot;j_invariant_in_target_field&quot;: false,
+  &quot;cover_sextic&quot;: &quot;t^6 + 5*t^5 + 3*t^4 + t^3 + 6*t^2 + 9*t + 8&quot;,
+  &quot;cover_odd_model&quot;: &quot;t^5 + 4*t^4 + 6*t^3 + 10*t^2 + 1&quot;,
+  &quot;c&quot;: &quot;2&quot;,
+  &quot;target_field_generator_embedding&quot;: &quot;1&quot;,
+  &quot;a&quot;: &quot;5&quot;,
+  &quot;b&quot;: &quot;3&quot;,
+  &quot;h&quot;: &quot;1&quot;,
+  &quot;s&quot;: &quot;10*z + 2&quot;,
+  &quot;L&quot;: &quot;10*z + 1&quot;,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;9*z + 1&quot;,
+    &quot;y&quot;: &quot;7*z + 7&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;2*z + 9&quot;,
+    &quot;y&quot;: &quot;z + 8&quot;
+  },
+  &quot;secret&quot;: 2,
+  &quot;image_generator&quot;: &quot;(x^2 + 3*x + 1, y + 4*x + 6)&quot;,
+  &quot;image_target&quot;: &quot;(x^2 + x + 1, y + 3*x + 4)&quot;,
+  &quot;image_order_verified&quot;: 7,
+  &quot;homomorphism_checks&quot;: 3,
+  &quot;construction_seconds&quot;: 0.4112132999998721,
+  &quot;order_count_seconds&quot;: 0.002459506000377587,
+  &quot;transfer_seconds_two_points_plus_search&quot;: 0.004970947001311288,
+  &quot;source_bsgs&quot;: {
+    &quot;scalar&quot;: 2,
+    &quot;seconds&quot;: 0.0005167169993001153,
+    &quot;group_additions&quot;: 3,
+    &quot;baby_steps&quot;: 3,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 7
+  },
+  &quot;target_bsgs&quot;: {
+    &quot;scalar&quot;: 2,
+    &quot;seconds&quot;: 0.004238669999722333,
+    &quot;group_additions&quot;: 3,
+    &quot;baby_steps&quot;: 3,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 7
+  },
+  &quot;measured_speedup_including_transfer&quot;: 0.056106241903666865,
+  &quot;seconds&quot;: 0.44489534799959074,
+  &quot;claim&quot;: &quot;explicit genus-two pullback-and-trace transfer; BSGS on both sides, no index-calculus speed claim&quot;,
+  &quot;case_id&quot;: &quot;quadratic_genus_two_transfer-e5d57e0e4f&quot;,
+  &quot;seed&quot;: 3855973902,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;m&quot;: 1
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.3130203470000197,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>quadratic_genus_two_transfer</td><td>{&quot;m&quot;: 1, &quot;p&quot;: 17}</td><td>passed</td><td>23</td><td>2</td><td>1.879</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;quadratic_genus_two_transfer&quot;,
+  &quot;p&quot;: 17,
+  &quot;n&quot;: 2,
+  &quot;d&quot;: 1,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 17,
+    &quot;degree&quot;: 2,
+    &quot;order&quot;: 289,
+    &quot;modulus&quot;: &quot;x^2 + 16*x + 3&quot;
+  },
+  &quot;target_field&quot;: {
+    &quot;characteristic&quot;: 17,
+    &quot;degree&quot;: 1,
+    &quot;order&quot;: 17,
+    &quot;modulus&quot;: &quot;x + 16&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + (2*z+13)*x^2 + (9*z+11)*x + (15*z+12) over Finite Field in z of size 17^2&quot;,
+  &quot;curve_order&quot;: 276,
+  &quot;subgroup_order&quot;: 23,
+  &quot;target_genus&quot;: 2,
+  &quot;j_invariant_in_target_field&quot;: false,
+  &quot;cover_sextic&quot;: &quot;t^6 + 10*t^5 + 4*t^4 + 9*t^3 + 12*t^2 + 5*t + 10&quot;,
+  &quot;cover_odd_model&quot;: &quot;9*t^5 + 8*t^4 + 9*t^3 + t^2 + 16*t + 1&quot;,
+  &quot;c&quot;: &quot;3&quot;,
+  &quot;target_field_generator_embedding&quot;: &quot;1&quot;,
+  &quot;a&quot;: &quot;10&quot;,
+  &quot;b&quot;: &quot;4&quot;,
+  &quot;h&quot;: &quot;9&quot;,
+  &quot;s&quot;: &quot;11*z + 3&quot;,
+  &quot;L&quot;: &quot;16*z + 10&quot;,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;7*z + 6&quot;,
+    &quot;y&quot;: &quot;15*z + 7&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;4*z + 13&quot;,
+    &quot;y&quot;: &quot;15*z + 5&quot;
+  },
+  &quot;secret&quot;: 2,
+  &quot;image_generator&quot;: &quot;(x^2 + 8*x + 1, y + 16*x + 15)&quot;,
+  &quot;image_target&quot;: &quot;(x^2 + 13*x + 5, y + 8)&quot;,
+  &quot;image_order_verified&quot;: 23,
+  &quot;homomorphism_checks&quot;: 3,
+  &quot;construction_seconds&quot;: 0.3575482850001208,
+  &quot;order_count_seconds&quot;: 0.0014208220000000438,
+  &quot;transfer_seconds_two_points_plus_search&quot;: 0.004751886999656563,
+  &quot;source_bsgs&quot;: {
+    &quot;scalar&quot;: 2,
+    &quot;seconds&quot;: 0.00046657599978061626,
+    &quot;group_additions&quot;: 5,
+    &quot;baby_steps&quot;: 5,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 23
+  },
+  &quot;target_bsgs&quot;: {
+    &quot;scalar&quot;: 2,
+    &quot;seconds&quot;: 0.002427452000119956,
+    &quot;group_additions&quot;: 5,
+    &quot;baby_steps&quot;: 5,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 23
+  },
+  &quot;measured_speedup_including_transfer&quot;: 0.0649887127206474,
+  &quot;seconds&quot;: 0.38661041500017745,
+  &quot;claim&quot;: &quot;explicit genus-two pullback-and-trace transfer; BSGS on both sides, no index-calculus speed claim&quot;,
+  &quot;case_id&quot;: &quot;quadratic_genus_two_transfer-220add1ea1&quot;,
+  &quot;seed&quot;: 571137310,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 17,
+    &quot;m&quot;: 1
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 1.8788944859998082,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>quadratic_genus_two_transfer</td><td>{&quot;m&quot;: 1, &quot;p&quot;: 23}</td><td>passed</td><td>71</td><td>2</td><td>2.191</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;quadratic_genus_two_transfer&quot;,
+  &quot;p&quot;: 23,
+  &quot;n&quot;: 2,
+  &quot;d&quot;: 1,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 23,
+    &quot;degree&quot;: 2,
+    &quot;order&quot;: 529,
+    &quot;modulus&quot;: &quot;x^2 + 21*x + 5&quot;
+  },
+  &quot;target_field&quot;: {
+    &quot;characteristic&quot;: 23,
+    &quot;degree&quot;: 1,
+    &quot;order&quot;: 23,
+    &quot;modulus&quot;: &quot;x + 22&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + (18*z+12)*x^2 + (17*z+18)*x + (15*z+2) over Finite Field in z of size 23^2&quot;,
+  &quot;curve_order&quot;: 568,
+  &quot;subgroup_order&quot;: 71,
+  &quot;target_genus&quot;: 2,
+  &quot;j_invariant_in_target_field&quot;: false,
+  &quot;cover_sextic&quot;: &quot;t^6 + 4*t^5 + 8*t^4 + 21*t^3 + 17*t^2 + 8*t + 10&quot;,
+  &quot;cover_odd_model&quot;: &quot;2*t^5 + 22*t^4 + 21*t^3 + 20*t^2 + 10*t + 1&quot;,
+  &quot;c&quot;: &quot;5&quot;,
+  &quot;target_field_generator_embedding&quot;: &quot;1&quot;,
+  &quot;a&quot;: &quot;4&quot;,
+  &quot;b&quot;: &quot;8&quot;,
+  &quot;h&quot;: &quot;21&quot;,
+  &quot;s&quot;: &quot;19*z + 4&quot;,
+  &quot;L&quot;: &quot;12*z + 3&quot;,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;z + 2&quot;,
+    &quot;y&quot;: &quot;3*z + 9&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;7*z + 12&quot;,
+    &quot;y&quot;: &quot;z + 15&quot;
+  },
+  &quot;secret&quot;: 58,
+  &quot;image_generator&quot;: &quot;(x^2 + x + 6, y + x + 14)&quot;,
+  &quot;image_target&quot;: &quot;(x + 5, y + 6)&quot;,
+  &quot;image_order_verified&quot;: 71,
+  &quot;homomorphism_checks&quot;: 3,
+  &quot;construction_seconds&quot;: 0.39472185999966314,
+  &quot;order_count_seconds&quot;: 0.0007055329997456283,
+  &quot;transfer_seconds_two_points_plus_search&quot;: 0.005363082000258146,
+  &quot;source_bsgs&quot;: {
+    &quot;scalar&quot;: 58,
+    &quot;seconds&quot;: 0.0010641630005920888,
+    &quot;group_additions&quot;: 15,
+    &quot;baby_steps&quot;: 9,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 71
+  },
+  &quot;target_bsgs&quot;: {
+    &quot;scalar&quot;: 58,
+    &quot;seconds&quot;: 0.006686728000204312,
+    &quot;group_additions&quot;: 15,
+    &quot;baby_steps&quot;: 9,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 71
+  },
+  &quot;measured_speedup_including_transfer&quot;: 0.0883136747011984,
+  &quot;seconds&quot;: 0.42329690200040204,
+  &quot;claim&quot;: &quot;explicit genus-two pullback-and-trace transfer; BSGS on both sides, no index-calculus speed claim&quot;,
+  &quot;case_id&quot;: &quot;quadratic_genus_two_transfer-5df4a67cb4&quot;,
+  &quot;seed&quot;: 1576314492,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 23,
+    &quot;m&quot;: 1
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.191262805000406,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>quadratic_genus_two_transfer</td><td>{&quot;m&quot;: 2, &quot;p&quot;: 5}</td><td>passed</td><td>79</td><td>2</td><td>2.329</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;quadratic_genus_two_transfer&quot;,
+  &quot;p&quot;: 5,
+  &quot;n&quot;: 4,
+  &quot;d&quot;: 2,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 5,
+    &quot;degree&quot;: 4,
+    &quot;order&quot;: 625,
+    &quot;modulus&quot;: &quot;x^4 + 4*x^2 + 4*x + 2&quot;
+  },
+  &quot;target_field&quot;: {
+    &quot;characteristic&quot;: 5,
+    &quot;degree&quot;: 2,
+    &quot;order&quot;: 25,
+    &quot;modulus&quot;: &quot;x^2 + 4*x + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + (z^3+z^2)*x^2 + (4*z^3+2*z^2+4*z+2)*x + (3*z^3+4*z^2+3*z+3) over Finite Field in z of size 5^4&quot;,
+  &quot;curve_order&quot;: 632,
+  &quot;subgroup_order&quot;: 79,
+  &quot;target_genus&quot;: 2,
+  &quot;j_invariant_in_target_field&quot;: false,
+  &quot;cover_sextic&quot;: &quot;t^6 + 2*v*t^5 + (3*v + 4)*t^4 + (v + 2)*t^3 + (2*v + 4)*t^2 + (3*v + 1)*t + 4*v + 3&quot;,
+  &quot;cover_odd_model&quot;: &quot;(2*v + 2)*t^5 + (3*v + 4)*t^4 + (3*v + 3)*t^3 + (3*v + 4)*t^2 + (2*v + 1)*t + 1&quot;,
+  &quot;c&quot;: &quot;v&quot;,
+  &quot;target_field_generator_embedding&quot;: &quot;4*z^3 + 4*z^2 + 4*z + 3&quot;,
+  &quot;a&quot;: &quot;2*v&quot;,
+  &quot;b&quot;: &quot;3*v + 4&quot;,
+  &quot;h&quot;: &quot;v + 2&quot;,
+  &quot;s&quot;: &quot;2*z^3 + 3*z^2 + 2&quot;,
+  &quot;L&quot;: &quot;2*z^3 + 4*z^2 + 2*z + 3&quot;,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;4&quot;,
+    &quot;y&quot;: &quot;3*z^3 + 2*z^2 + 4&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;3*z^3 + z^2&quot;,
+    &quot;y&quot;: &quot;z^3 + 2*z^2 + z + 2&quot;
+  },
+  &quot;secret&quot;: 5,
+  &quot;image_generator&quot;: &quot;(x^2 + (2*v + 4)*x + 2, y + (v + 2)*x + v + 4)&quot;,
+  &quot;image_target&quot;: &quot;(x^2 + (v + 2)*x + 1, y + (4*v + 4)*x + 3*v)&quot;,
+  &quot;image_order_verified&quot;: 79,
+  &quot;homomorphism_checks&quot;: 3,
+  &quot;construction_seconds&quot;: 0.45864586899915594,
+  &quot;order_count_seconds&quot;: 0.0008580240000810591,
+  &quot;transfer_seconds_two_points_plus_search&quot;: 0.019622399000581936,
+  &quot;source_bsgs&quot;: {
+    &quot;scalar&quot;: 5,
+    &quot;seconds&quot;: 0.00047615299990866333,
+    &quot;group_additions&quot;: 9,
+    &quot;baby_steps&quot;: 9,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 79
+  },
+  &quot;target_bsgs&quot;: {
+    &quot;scalar&quot;: 5,
+    &quot;seconds&quot;: 0.017403165000359877,
+    &quot;group_additions&quot;: 9,
+    &quot;baby_steps&quot;: 9,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 79
+  },
+  &quot;measured_speedup_including_transfer&quot;: 0.012860114700657944,
+  &quot;seconds&quot;: 0.6138632579995829,
+  &quot;claim&quot;: &quot;explicit genus-two pullback-and-trace transfer; BSGS on both sides, no index-calculus speed claim&quot;,
+  &quot;case_id&quot;: &quot;quadratic_genus_two_transfer-16489e548d&quot;,
+  &quot;seed&quot;: 373857876,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 5,
+    &quot;m&quot;: 2
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.3288733669996873,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>quadratic_genus_two_transfer</td><td>{&quot;m&quot;: 3, &quot;p&quot;: 5}</td><td>passed</td><td>19</td><td>2</td><td>2.644</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;quadratic_genus_two_transfer&quot;,
+  &quot;p&quot;: 5,
+  &quot;n&quot;: 6,
+  &quot;d&quot;: 3,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 5,
+    &quot;degree&quot;: 6,
+    &quot;order&quot;: 15625,
+    &quot;modulus&quot;: &quot;x^6 + x^4 + 4*x^3 + x^2 + 2&quot;
+  },
+  &quot;target_field&quot;: {
+    &quot;characteristic&quot;: 5,
+    &quot;degree&quot;: 3,
+    &quot;order&quot;: 125,
+    &quot;modulus&quot;: &quot;x^3 + 3*x + 3&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + (4*z^5+2*z^3+2*z+4)*x^2 + (3*z^5+4*z^3+2*z^2+3*z+1)*x + (3*z^5+3*z^4+2*z^2+2*z+2) over Finite Field in z of size 5^6&quot;,
+  &quot;curve_order&quot;: 15504,
+  &quot;subgroup_order&quot;: 19,
+  &quot;target_genus&quot;: 2,
+  &quot;j_invariant_in_target_field&quot;: false,
+  &quot;cover_sextic&quot;: &quot;t^6 + 2*v^2*t^5 + (v^2 + 2*v + 2)*t^4 + (v^2 + 3*v + 3)*t^3 + (2*v^2 + 4*v + 2)*t^2 + (4*v^2 + 4*v)*t + 2*v + 2&quot;,
+  &quot;cover_odd_model&quot;: &quot;(4*v + 2)*t^5 + (v^2 + 3)*t^4 + (v + 1)*t^3 + (v^2 + 2*v + 2)*t^2 + (2*v^2 + 1)*t + 1&quot;,
+  &quot;c&quot;: &quot;v&quot;,
+  &quot;target_field_generator_embedding&quot;: &quot;4*z^5 + z^4 + 4*z^3 + 4*z^2 + 3*z + 3&quot;,
+  &quot;a&quot;: &quot;2*v^2&quot;,
+  &quot;b&quot;: &quot;v^2 + 2*v + 2&quot;,
+  &quot;h&quot;: &quot;v^2 + 3*v + 3&quot;,
+  &quot;s&quot;: &quot;2*z^5 + 2*z^3 + z^2 + 2*z + 1&quot;,
+  &quot;L&quot;: &quot;2*z^5 + z^3 + 3*z^2 + z + 2&quot;,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;3*z^5 + z^4 + 4*z^3 + 4*z + 1&quot;,
+    &quot;y&quot;: &quot;z^5 + z^4 + 2*z^3 + z^2 + 3*z + 1&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;z^5 + 2*z^3 + 3*z^2 + 4*z + 1&quot;,
+    &quot;y&quot;: &quot;3*z^4 + 2*z^3 + z + 4&quot;
+  },
+  &quot;secret&quot;: 7,
+  &quot;image_generator&quot;: &quot;(x^2 + (4*v^2 + 3*v + 1)*x + v^2 + 4*v + 1, y + x + 3*v + 3)&quot;,
+  &quot;image_target&quot;: &quot;(x^2 + (4*v^2 + 3*v + 4)*x + 4, y + (3*v + 2)*x + 2*v^2 + 4)&quot;,
+  &quot;image_order_verified&quot;: 19,
+  &quot;homomorphism_checks&quot;: 3,
+  &quot;construction_seconds&quot;: 0.4112791420002395,
+  &quot;order_count_seconds&quot;: 0.0028507070001069224,
+  &quot;transfer_seconds_two_points_plus_search&quot;: 0.0252982960009831,
+  &quot;source_bsgs&quot;: {
+    &quot;scalar&quot;: 7,
+    &quot;seconds&quot;: 0.0007985380007085041,
+    &quot;group_additions&quot;: 6,
+    &quot;baby_steps&quot;: 5,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 19
+  },
+  &quot;target_bsgs&quot;: {
+    &quot;scalar&quot;: 7,
+    &quot;seconds&quot;: 0.010591464999379241,
+    &quot;group_additions&quot;: 6,
+    &quot;baby_steps&quot;: 5,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 19
+  },
+  &quot;measured_speedup_including_transfer&quot;: 0.02224974417356644,
+  &quot;seconds&quot;: 0.5667841470003623,
+  &quot;claim&quot;: &quot;explicit genus-two pullback-and-trace transfer; BSGS on both sides, no index-calculus speed claim&quot;,
+  &quot;case_id&quot;: &quot;quadratic_genus_two_transfer-b9e4cedffa&quot;,
+  &quot;seed&quot;: 3118780127,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 5,
+    &quot;m&quot;: 3
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.6440551510004298,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>cubic_genus_three_transfer</td><td>{&quot;m&quot;: 1, &quot;p&quot;: 5}</td><td>passed</td><td>31</td><td>3</td><td>2.457</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;cubic_genus_three_transfer&quot;,
+  &quot;p&quot;: 5,
+  &quot;n&quot;: 3,
+  &quot;d&quot;: 1,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 5,
+    &quot;degree&quot;: 3,
+    &quot;order&quot;: 125,
+    &quot;modulus&quot;: &quot;x^3 + 3*x + 3&quot;
+  },
+  &quot;target_field&quot;: {
+    &quot;characteristic&quot;: 5,
+    &quot;degree&quot;: 1,
+    &quot;order&quot;: 5,
+    &quot;modulus&quot;: &quot;x + 4&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + (3*z^2+1)*x^2 + (4*z^2+3*z+4)*x over Finite Field in z of size 5^3&quot;,
+  &quot;curve_order&quot;: 124,
+  &quot;subgroup_order&quot;: 31,
+  &quot;target_genus&quot;: 3,
+  &quot;target_hyperelliptic&quot;: true,
+  &quot;cover_polynomial&quot;: &quot;4*t^7 + 3*t^5 + t^4 + 4*t^3 + 3&quot;,
+  &quot;target_field_generator_embedding&quot;: &quot;1&quot;,
+  &quot;cover_u&quot;: &quot;4*t^4 + t^2 + 4*t + 1&quot;,
+  &quot;cover_v&quot;: &quot;4*t^3 + 2*t + 2&quot;,
+  &quot;cover_A&quot;: &quot;2*t^2 + z*t + z^2 + 4&quot;,
+  &quot;cover_identity_verified&quot;: true,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;3*z^2 + 2*z + 4&quot;,
+    &quot;y&quot;: &quot;z&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;4*z^2 + 3*z + 4&quot;,
+    &quot;y&quot;: &quot;3*z^2 + z + 1&quot;
+  },
+  &quot;secret&quot;: 14,
+  &quot;image_generator&quot;: &quot;(x^3 + 2*x^2 + 3, y + 4*x^2 + 4*x)&quot;,
+  &quot;image_target&quot;: &quot;(x^3 + 4*x^2 + 4*x + 2, y + 3*x^2 + 4*x + 3)&quot;,
+  &quot;homomorphism_checks&quot;: 2,
+  &quot;image_order_verified&quot;: 31,
+  &quot;construction_seconds&quot;: 0.5316702150003039,
+  &quot;order_count_seconds&quot;: 0.0024133310007528053,
+  &quot;transfer_seconds_two_points_plus_search&quot;: 0.004438399000719073,
+  &quot;source_bsgs&quot;: {
+    &quot;scalar&quot;: 14,
+    &quot;seconds&quot;: 0.0005701639993276331,
+    &quot;group_additions&quot;: 8,
+    &quot;baby_steps&quot;: 6,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 31
+  },
+  &quot;target_bsgs&quot;: {
+    &quot;scalar&quot;: 14,
+    &quot;seconds&quot;: 0.0031905329997243825,
+    &quot;group_additions&quot;: 8,
+    &quot;baby_steps&quot;: 6,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 31
+  },
+  &quot;measured_speedup_including_transfer&quot;: 0.07473706664242,
+  &quot;seconds&quot;: 0.5667250140004398,
+  &quot;claim&quot;: &quot;explicit special-family genus-three cover; not a full Joux--Vitse reproduction&quot;,
+  &quot;case_id&quot;: &quot;cubic_genus_three_transfer-72cc18d759&quot;,
+  &quot;seed&quot;: 1925978327,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 5,
+    &quot;m&quot;: 1
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.4567662130002645,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>cubic_genus_three_transfer</td><td>{&quot;m&quot;: 1, &quot;p&quot;: 11}</td><td>passed</td><td>19</td><td>3</td><td>2.197</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;cubic_genus_three_transfer&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 3,
+  &quot;d&quot;: 1,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 3,
+    &quot;order&quot;: 1331,
+    &quot;modulus&quot;: &quot;x^3 + 2*x + 9&quot;
+  },
+  &quot;target_field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 1,
+    &quot;order&quot;: 11,
+    &quot;modulus&quot;: &quot;x + 10&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + (z^2+z+5)*x^2 + (9*z^2+8*z+9)*x over Finite Field in z of size 11^3&quot;,
+  &quot;curve_order&quot;: 1368,
+  &quot;subgroup_order&quot;: 19,
+  &quot;target_genus&quot;: 3,
+  &quot;target_hyperelliptic&quot;: true,
+  &quot;cover_polynomial&quot;: &quot;3*t^7 + 5*t^5 + 9*t^4 + 10*t^3 + 10*t^2 + 5*t + 9&quot;,
+  &quot;target_field_generator_embedding&quot;: &quot;1&quot;,
+  &quot;cover_u&quot;: &quot;3*t^4 + 10*t^2 + 4*t + 1&quot;,
+  &quot;cover_v&quot;: &quot;10*t^3 + 9*t + 2&quot;,
+  &quot;cover_A&quot;: &quot;5*t^2 + z*t + z^2 + 1&quot;,
+  &quot;cover_identity_verified&quot;: true,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;7*z^2 + 7*z + 3&quot;,
+    &quot;y&quot;: &quot;2*z^2 + 7*z + 7&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;3*z^2 + 3&quot;,
+    &quot;y&quot;: &quot;5*z^2 + 9*z + 10&quot;
+  },
+  &quot;secret&quot;: 4,
+  &quot;image_generator&quot;: &quot;(x^3 + x^2 + 7*x + 1, y + 7*x^2 + 3*x + 2)&quot;,
+  &quot;image_target&quot;: &quot;(x^3 + 6*x^2 + x + 7, y + 6*x^2 + 2*x)&quot;,
+  &quot;homomorphism_checks&quot;: 2,
+  &quot;image_order_verified&quot;: 19,
+  &quot;construction_seconds&quot;: 0.46455606300060026,
+  &quot;order_count_seconds&quot;: 0.0026811810002982384,
+  &quot;transfer_seconds_two_points_plus_search&quot;: 0.005977379000796645,
+  &quot;source_bsgs&quot;: {
+    &quot;scalar&quot;: 4,
+    &quot;seconds&quot;: 0.00042120700072700856,
+    &quot;group_additions&quot;: 5,
+    &quot;baby_steps&quot;: 5,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 19
+  },
+  &quot;target_bsgs&quot;: {
+    &quot;scalar&quot;: 4,
+    &quot;seconds&quot;: 0.002855605999684485,
+    &quot;group_additions&quot;: 5,
+    &quot;baby_steps&quot;: 5,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 19
+  },
+  &quot;measured_speedup_including_transfer&quot;: 0.047685691836232655,
+  &quot;seconds&quot;: 0.5049467560002086,
+  &quot;claim&quot;: &quot;explicit special-family genus-three cover; not a full Joux--Vitse reproduction&quot;,
+  &quot;case_id&quot;: &quot;cubic_genus_three_transfer-d618001b1e&quot;,
+  &quot;seed&quot;: 3591897115,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;m&quot;: 1
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.197074500999406,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>cubic_genus_three_transfer</td><td>{&quot;m&quot;: 1, &quot;p&quot;: 13}</td><td>passed</td><td>37</td><td>3</td><td>2.381</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;cubic_genus_three_transfer&quot;,
+  &quot;p&quot;: 13,
+  &quot;n&quot;: 3,
+  &quot;d&quot;: 1,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 13,
+    &quot;degree&quot;: 3,
+    &quot;order&quot;: 2197,
+    &quot;modulus&quot;: &quot;x^3 + 2*x + 11&quot;
+  },
+  &quot;target_field&quot;: {
+    &quot;characteristic&quot;: 13,
+    &quot;degree&quot;: 1,
+    &quot;order&quot;: 13,
+    &quot;modulus&quot;: &quot;x + 12&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + (8*z^2+5*z+2)*x^2 + (7*z^2+z+10)*x over Finite Field in z of size 13^3&quot;,
+  &quot;curve_order&quot;: 2220,
+  &quot;subgroup_order&quot;: 37,
+  &quot;target_genus&quot;: 3,
+  &quot;target_hyperelliptic&quot;: true,
+  &quot;cover_polynomial&quot;: &quot;10*t^7 + 6*t^5 + 10*t^4 + 12*t^3 + 10*t^2 + 7*t + 11&quot;,
+  &quot;target_field_generator_embedding&quot;: &quot;1&quot;,
+  &quot;cover_u&quot;: &quot;10*t^4 + 12*t^2 + 4*t + 1&quot;,
+  &quot;cover_v&quot;: &quot;12*t^3 + 11*t + 2&quot;,
+  &quot;cover_A&quot;: &quot;6*t^2 + z*t + z^2 + 1&quot;,
+  &quot;cover_identity_verified&quot;: true,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;3*z^2 + 7*z + 4&quot;,
+    &quot;y&quot;: &quot;12*z^2 + 8*z + 2&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;10*z^2 + 9*z + 7&quot;,
+    &quot;y&quot;: &quot;10*z^2 + 7*z + 2&quot;
+  },
+  &quot;secret&quot;: 21,
+  &quot;image_generator&quot;: &quot;(x^2 + 12*x + 2, y + 12)&quot;,
+  &quot;image_target&quot;: &quot;(x^3 + 12*x^2 + 6*x + 7, y + 10*x^2 + 10*x + 7)&quot;,
+  &quot;homomorphism_checks&quot;: 2,
+  &quot;image_order_verified&quot;: 37,
+  &quot;construction_seconds&quot;: 0.4442936989998998,
+  &quot;order_count_seconds&quot;: 0.002079455000057351,
+  &quot;transfer_seconds_two_points_plus_search&quot;: 0.005007428000681102,
+  &quot;source_bsgs&quot;: {
+    &quot;scalar&quot;: 21,
+    &quot;seconds&quot;: 0.000850707999234146,
+    &quot;group_additions&quot;: 10,
+    &quot;baby_steps&quot;: 7,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 37
+  },
+  &quot;target_bsgs&quot;: {
+    &quot;scalar&quot;: 21,
+    &quot;seconds&quot;: 0.004409711999869614,
+    &quot;group_additions&quot;: 10,
+    &quot;baby_steps&quot;: 7,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 37
+  },
+  &quot;measured_speedup_including_transfer&quot;: 0.09033613169013059,
+  &quot;seconds&quot;: 0.4843269639995924,
+  &quot;claim&quot;: &quot;explicit special-family genus-three cover; not a full Joux--Vitse reproduction&quot;,
+  &quot;case_id&quot;: &quot;cubic_genus_three_transfer-959383670e&quot;,
+  &quot;seed&quot;: 2509472615,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 13,
+    &quot;m&quot;: 1
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.3812548590003644,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>cubic_genus_three_transfer</td><td>{&quot;m&quot;: 2, &quot;p&quot;: 5}</td><td>passed</td><td>83</td><td>3</td><td>2.316</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;cubic_genus_three_transfer&quot;,
+  &quot;p&quot;: 5,
+  &quot;n&quot;: 6,
+  &quot;d&quot;: 2,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 5,
+    &quot;degree&quot;: 6,
+    &quot;order&quot;: 15625,
+    &quot;modulus&quot;: &quot;x^6 + x^4 + 4*x^3 + x^2 + 2&quot;
+  },
+  &quot;target_field&quot;: {
+    &quot;characteristic&quot;: 5,
+    &quot;degree&quot;: 2,
+    &quot;order&quot;: 25,
+    &quot;modulus&quot;: &quot;x^2 + 4*x + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + (3*z^5+z^4+2*z^3+1)*x^2 + (4*z^5+z^4+2*z^3+2*z^2+4*z+1)*x over Finite Field in z of size 5^6&quot;,
+  &quot;curve_order&quot;: 15604,
+  &quot;subgroup_order&quot;: 83,
+  &quot;target_genus&quot;: 3,
+  &quot;target_hyperelliptic&quot;: true,
+  &quot;cover_polynomial&quot;: &quot;4*t^7 + (3*v + 4)*t^5 + (2*v + 3)*t^4 + (3*v + 3)*t^3 + (2*v + 3)*t + 2*v + 4&quot;,
+  &quot;target_field_generator_embedding&quot;: &quot;4*z^5 + 2*z^4 + 4*z^2 + z&quot;,
+  &quot;cover_u&quot;: &quot;4*t^4 + (v + 3)*t^2 + (3*v + 2)*t + 2*v + 2&quot;,
+  &quot;cover_v&quot;: &quot;4*t^3 + (2*v + 1)*t + 4*v + 1&quot;,
+  &quot;cover_A&quot;: &quot;2*t^2 + z*t + z^5 + 3*z^4 + 2*z^2 + 4*z + 2&quot;,
+  &quot;cover_identity_verified&quot;: true,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;4*z^5 + 4*z^2 + 3&quot;,
+    &quot;y&quot;: &quot;3*z^5 + z^3 + 2*z^2 + 3*z&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;4*z^5 + z^4 + 2*z^3 + 2*z + 2&quot;,
+    &quot;y&quot;: &quot;2*z^5 + 4*z^4 + 4*z^3 + 4*z^2 + 1&quot;
+  },
+  &quot;secret&quot;: 64,
+  &quot;image_generator&quot;: &quot;(x^3 + (2*v + 2)*x^2 + (v + 1)*x + 3*v + 3, y + (v + 1)*x^2 + (v + 3)*x + 3*v + 2)&quot;,
+  &quot;image_target&quot;: &quot;(x^2 + 3*x + 1, y + (2*v + 2)*x)&quot;,
+  &quot;homomorphism_checks&quot;: 2,
+  &quot;image_order_verified&quot;: 83,
+  &quot;construction_seconds&quot;: 0.4133457850002742,
+  &quot;order_count_seconds&quot;: 0.001099795999834896,
+  &quot;transfer_seconds_two_points_plus_search&quot;: 0.016841691000081482,
+  &quot;source_bsgs&quot;: {
+    &quot;scalar&quot;: 64,
+    &quot;seconds&quot;: 0.0006968710004002787,
+    &quot;group_additions&quot;: 16,
+    &quot;baby_steps&quot;: 10,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 83
+  },
+  &quot;target_bsgs&quot;: {
+    &quot;scalar&quot;: 64,
+    &quot;seconds&quot;: 0.026505566999730945,
+    &quot;group_additions&quot;: 16,
+    &quot;baby_steps&quot;: 10,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 83
+  },
+  &quot;measured_speedup_including_transfer&quot;: 0.01607647248191095,
+  &quot;seconds&quot;: 0.5398821040007533,
+  &quot;claim&quot;: &quot;explicit special-family genus-three cover; not a full Joux--Vitse reproduction&quot;,
+  &quot;case_id&quot;: &quot;cubic_genus_three_transfer-6c1c0c58d1&quot;,
+  &quot;seed&quot;: 1813777496,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 5,
+    &quot;m&quot;: 2
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.315795046999483,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='ineligible'><td>cubic_genus_three_transfer</td><td>{&quot;m&quot;: 1, &quot;p&quot;: 7}</td><td>ineligible</td><td>—</td><td>—</td><td>2.029</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;cubic_genus_three_transfer&quot;,
+  &quot;status&quot;: &quot;ineligible&quot;,
+  &quot;error_type&quot;: &quot;ValueError&quot;,
+  &quot;reason&quot;: &quot;No suitable odd subgroup for this cubic cover&quot;,
+  &quot;case_id&quot;: &quot;cubic_genus_three_transfer-368f541f30&quot;,
+  &quot;seed&quot;: 915362847,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 7,
+    &quot;m&quot;: 1
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.028977855999983,
+  &quot;expected_status&quot;: &quot;ineligible&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>intermediate_field_controls</td><td>{&quot;d&quot;: 2, &quot;n&quot;: 4, &quot;p&quot;: 11}</td><td>passed</td><td>—</td><td>—</td><td>2.295</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;intermediate_field_controls&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 4,
+  &quot;d&quot;: 2,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 4,
+    &quot;order&quot;: 14641,
+    &quot;modulus&quot;: &quot;x^4 + 8*x^2 + 10*x + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + x + 1 over Finite Field in z of size 11^4&quot;,
+  &quot;ambient_curve_order&quot;: 14560,
+  &quot;intermediate_curve_order&quot;: 140,
+  &quot;base_curve_order&quot;: 14,
+  &quot;extension_subgroup_order&quot;: 13,
+  &quot;extension_point&quot;: {
+    &quot;x&quot;: &quot;5*z^3 + 2*z^2 + 8*z + 4&quot;,
+    &quot;y&quot;: &quot;4*z^3 + 4*z^2 + 8*z + 2&quot;
+  },
+  &quot;extension_point_minimum_degree&quot;: 4,
+  &quot;extension_trace_is_zero&quot;: true,
+  &quot;extension_scalar_information_retained&quot;: false,
+  &quot;base_subgroup_order&quot;: 7,
+  &quot;base_trace_multiplier&quot;: 2,
+  &quot;base_subgroup_survives&quot;: true,
+  &quot;trace_transitivity_verified&quot;: true,
+  &quot;base_bsgs&quot;: {
+    &quot;scalar&quot;: 5,
+    &quot;seconds&quot;: 0.0014125130001048092,
+    &quot;group_additions&quot;: 4,
+    &quot;baby_steps&quot;: 3,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 7
+  },
+  &quot;seconds&quot;: 0.5655188539994924,
+  &quot;claim&quot;: &quot;field trace is homomorphic but annihilates the selected new subgroup&quot;,
+  &quot;case_id&quot;: &quot;intermediate_field_controls-e59388dbfb&quot;,
+  &quot;seed&quot;: 3851651291,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;n&quot;: 4,
+    &quot;d&quot;: 2
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.2952013959993565,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>intermediate_field_controls</td><td>{&quot;d&quot;: 2, &quot;n&quot;: 6, &quot;p&quot;: 11}</td><td>passed</td><td>—</td><td>—</td><td>2.329</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;intermediate_field_controls&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 6,
+  &quot;d&quot;: 2,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 6,
+    &quot;order&quot;: 1771561,
+    &quot;modulus&quot;: &quot;x^6 + 3*x^4 + 4*x^3 + 6*x^2 + 7*x + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + x + 1 over Finite Field in z of size 11^6&quot;,
+  &quot;ambient_curve_order&quot;: 1770860,
+  &quot;intermediate_curve_order&quot;: 140,
+  &quot;base_curve_order&quot;: 14,
+  &quot;extension_subgroup_order&quot;: 139,
+  &quot;extension_point&quot;: {
+    &quot;x&quot;: &quot;10*z^5 + 2*z^4 + 2*z^3 + 9*z^2 + 6*z + 7&quot;,
+    &quot;y&quot;: &quot;7*z^5 + 9*z^3 + 2*z^2 + 3*z&quot;
+  },
+  &quot;extension_point_minimum_degree&quot;: 6,
+  &quot;extension_trace_is_zero&quot;: true,
+  &quot;extension_scalar_information_retained&quot;: false,
+  &quot;base_subgroup_order&quot;: 7,
+  &quot;base_trace_multiplier&quot;: 3,
+  &quot;base_subgroup_survives&quot;: true,
+  &quot;trace_transitivity_verified&quot;: true,
+  &quot;base_bsgs&quot;: {
+    &quot;scalar&quot;: 5,
+    &quot;seconds&quot;: 0.0003159650004818104,
+    &quot;group_additions&quot;: 4,
+    &quot;baby_steps&quot;: 3,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 7
+  },
+  &quot;seconds&quot;: 0.4646798220001074,
+  &quot;claim&quot;: &quot;field trace is homomorphic but annihilates the selected new subgroup&quot;,
+  &quot;case_id&quot;: &quot;intermediate_field_controls-75e5a5887f&quot;,
+  &quot;seed&quot;: 1977984392,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;n&quot;: 6,
+    &quot;d&quot;: 2
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.3293116720005855,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>intermediate_field_controls</td><td>{&quot;d&quot;: 3, &quot;n&quot;: 6, &quot;p&quot;: 11}</td><td>passed</td><td>—</td><td>—</td><td>1.710</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;intermediate_field_controls&quot;,
+  &quot;p&quot;: 11,
+  &quot;n&quot;: 6,
+  &quot;d&quot;: 3,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 11,
+    &quot;degree&quot;: 6,
+    &quot;order&quot;: 1771561,
+    &quot;modulus&quot;: &quot;x^6 + 3*x^4 + 4*x^3 + 6*x^2 + 7*x + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + x + 1 over Finite Field in z of size 11^6&quot;,
+  &quot;ambient_curve_order&quot;: 1770860,
+  &quot;intermediate_curve_order&quot;: 1274,
+  &quot;base_curve_order&quot;: 14,
+  &quot;extension_subgroup_order&quot;: 139,
+  &quot;extension_point&quot;: {
+    &quot;x&quot;: &quot;7*z^5 + 6*z^4 + 6*z^3 + 8*z^2 + 4*z + 2&quot;,
+    &quot;y&quot;: &quot;6*z^5 + 7*z^4 + 2*z^3 + 5*z^2 + 5*z + 2&quot;
+  },
+  &quot;extension_point_minimum_degree&quot;: 6,
+  &quot;extension_trace_is_zero&quot;: true,
+  &quot;extension_scalar_information_retained&quot;: false,
+  &quot;base_subgroup_order&quot;: 7,
+  &quot;base_trace_multiplier&quot;: 2,
+  &quot;base_subgroup_survives&quot;: true,
+  &quot;trace_transitivity_verified&quot;: true,
+  &quot;base_bsgs&quot;: {
+    &quot;scalar&quot;: 6,
+    &quot;seconds&quot;: 0.0003533140006766189,
+    &quot;group_additions&quot;: 5,
+    &quot;baby_steps&quot;: 3,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 7
+  },
+  &quot;seconds&quot;: 0.3478137929996592,
+  &quot;claim&quot;: &quot;field trace is homomorphic but annihilates the selected new subgroup&quot;,
+  &quot;case_id&quot;: &quot;intermediate_field_controls-d58d0997ff&quot;,
+  &quot;seed&quot;: 3582790039,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 11,
+    &quot;n&quot;: 6,
+    &quot;d&quot;: 3
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 1.7104820639997342,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>intermediate_field_controls</td><td>{&quot;d&quot;: 2, &quot;n&quot;: 4, &quot;p&quot;: 13}</td><td>passed</td><td>—</td><td>—</td><td>2.119</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;intermediate_field_controls&quot;,
+  &quot;p&quot;: 13,
+  &quot;n&quot;: 4,
+  &quot;d&quot;: 2,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 13,
+    &quot;degree&quot;: 4,
+    &quot;order&quot;: 28561,
+    &quot;modulus&quot;: &quot;x^4 + 3*x^2 + 12*x + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + 2 over Finite Field in z of size 13^4&quot;,
+  &quot;ambient_curve_order&quot;: 28899,
+  &quot;intermediate_curve_order&quot;: 171,
+  &quot;base_curve_order&quot;: 19,
+  &quot;extension_subgroup_order&quot;: 13,
+  &quot;extension_point&quot;: {
+    &quot;x&quot;: &quot;8*z^3 + 2*z^2 + 7*z + 5&quot;,
+    &quot;y&quot;: &quot;4*z^2 + 2*z + 6&quot;
+  },
+  &quot;extension_point_minimum_degree&quot;: 4,
+  &quot;extension_trace_is_zero&quot;: true,
+  &quot;extension_scalar_information_retained&quot;: false,
+  &quot;base_subgroup_order&quot;: 19,
+  &quot;base_trace_multiplier&quot;: 2,
+  &quot;base_subgroup_survives&quot;: true,
+  &quot;trace_transitivity_verified&quot;: true,
+  &quot;base_bsgs&quot;: {
+    &quot;scalar&quot;: 10,
+    &quot;seconds&quot;: 0.00043293999988236465,
+    &quot;group_additions&quot;: 7,
+    &quot;baby_steps&quot;: 5,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 19
+  },
+  &quot;seconds&quot;: 0.4891938860000664,
+  &quot;claim&quot;: &quot;field trace is homomorphic but annihilates the selected new subgroup&quot;,
+  &quot;case_id&quot;: &quot;intermediate_field_controls-1552a523cf&quot;,
+  &quot;seed&quot;: 357737763,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 13,
+    &quot;n&quot;: 4,
+    &quot;d&quot;: 2
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.118726116000289,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>intermediate_field_controls</td><td>{&quot;d&quot;: 2, &quot;n&quot;: 6, &quot;p&quot;: 13}</td><td>passed</td><td>—</td><td>—</td><td>2.421</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;intermediate_field_controls&quot;,
+  &quot;p&quot;: 13,
+  &quot;n&quot;: 6,
+  &quot;d&quot;: 2,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 13,
+    &quot;degree&quot;: 6,
+    &quot;order&quot;: 4826809,
+    &quot;modulus&quot;: &quot;x^6 + 10*x^3 + 11*x^2 + 11*x + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + 2 over Finite Field in z of size 13^6&quot;,
+  &quot;ambient_curve_order&quot;: 4826304,
+  &quot;intermediate_curve_order&quot;: 171,
+  &quot;base_curve_order&quot;: 19,
+  &quot;extension_subgroup_order&quot;: 7,
+  &quot;extension_point&quot;: {
+    &quot;x&quot;: &quot;8*z^5 + 5*z^4 + 12*z^3 + 8*z^2 + 9*z + 1&quot;,
+    &quot;y&quot;: &quot;3&quot;
+  },
+  &quot;extension_point_minimum_degree&quot;: 3,
+  &quot;extension_trace_is_zero&quot;: true,
+  &quot;extension_scalar_information_retained&quot;: false,
+  &quot;base_subgroup_order&quot;: 19,
+  &quot;base_trace_multiplier&quot;: 3,
+  &quot;base_subgroup_survives&quot;: true,
+  &quot;trace_transitivity_verified&quot;: true,
+  &quot;base_bsgs&quot;: {
+    &quot;scalar&quot;: 2,
+    &quot;seconds&quot;: 0.001344268999673659,
+    &quot;group_additions&quot;: 5,
+    &quot;baby_steps&quot;: 5,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 19
+  },
+  &quot;seconds&quot;: 0.6242448610000793,
+  &quot;claim&quot;: &quot;field trace is homomorphic but annihilates the selected new subgroup&quot;,
+  &quot;case_id&quot;: &quot;intermediate_field_controls-e3848f30de&quot;,
+  &quot;seed&quot;: 3817115440,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 13,
+    &quot;n&quot;: 6,
+    &quot;d&quot;: 2
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.4208221810004034,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>intermediate_field_controls</td><td>{&quot;d&quot;: 3, &quot;n&quot;: 6, &quot;p&quot;: 13}</td><td>passed</td><td>—</td><td>—</td><td>2.315</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;intermediate_field_controls&quot;,
+  &quot;p&quot;: 13,
+  &quot;n&quot;: 6,
+  &quot;d&quot;: 3,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 13,
+    &quot;degree&quot;: 6,
+    &quot;order&quot;: 4826809,
+    &quot;modulus&quot;: &quot;x^6 + 10*x^3 + 11*x^2 + 11*x + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + 4 over Finite Field in z of size 13^6&quot;,
+  &quot;ambient_curve_order&quot;: 4826304,
+  &quot;intermediate_curve_order&quot;: 2268,
+  &quot;base_curve_order&quot;: 21,
+  &quot;extension_subgroup_order&quot;: 19,
+  &quot;extension_point&quot;: {
+    &quot;x&quot;: &quot;z^5 + 11*z^4 + 10*z^3 + 6*z + 12&quot;,
+    &quot;y&quot;: &quot;5*z^5 + 2*z^4 + 3*z^3 + 7*z + 4&quot;
+  },
+  &quot;extension_point_minimum_degree&quot;: 6,
+  &quot;extension_trace_is_zero&quot;: true,
+  &quot;extension_scalar_information_retained&quot;: false,
+  &quot;base_subgroup_order&quot;: 7,
+  &quot;base_trace_multiplier&quot;: 2,
+  &quot;base_subgroup_survives&quot;: true,
+  &quot;trace_transitivity_verified&quot;: true,
+  &quot;base_bsgs&quot;: {
+    &quot;scalar&quot;: 5,
+    &quot;seconds&quot;: 0.0006559980001838994,
+    &quot;group_additions&quot;: 4,
+    &quot;baby_steps&quot;: 3,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 7
+  },
+  &quot;seconds&quot;: 0.4541987290003817,
+  &quot;claim&quot;: &quot;field trace is homomorphic but annihilates the selected new subgroup&quot;,
+  &quot;case_id&quot;: &quot;intermediate_field_controls-9aad613a6b&quot;,
+  &quot;seed&quot;: 2595053882,
+  &quot;parameters&quot;: {
+    &quot;p&quot;: 13,
+    &quot;n&quot;: 6,
+    &quot;d&quot;: 3
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.3149930030003816,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>binary_ghs_geometry_screen</td><td>{&quot;n&quot;: 2, &quot;s&quot;: 2, &quot;samples&quot;: 8}</td><td>passed</td><td>—</td><td>—</td><td>2.371</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;binary_ghs_geometry_screen&quot;,
+  &quot;p&quot;: 2,
+  &quot;s&quot;: 2,
+  &quot;n&quot;: 4,
+  &quot;relative_extension_degree&quot;: 2,
+  &quot;q&quot;: 4,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 2,
+    &quot;degree&quot;: 4,
+    &quot;order&quot;: 16,
+    &quot;modulus&quot;: &quot;x^4 + x + 1&quot;
+  },
+  &quot;samples&quot;: [
+    {
+      &quot;b&quot;: &quot;z&quot;,
+      &quot;curve_order&quot;: 16,
+      &quot;largest_prime_factor&quot;: 2,
+      &quot;magic_number&quot;: 2,
+      &quot;candidate_genus&quot;: 2,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 1.4142135623730951,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 4.0
+    },
+    {
+      &quot;b&quot;: &quot;z^2&quot;,
+      &quot;curve_order&quot;: 16,
+      &quot;largest_prime_factor&quot;: 2,
+      &quot;magic_number&quot;: 2,
+      &quot;candidate_genus&quot;: 2,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 1.4142135623730951,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 4.0
+    },
+    {
+      &quot;b&quot;: &quot;z^3&quot;,
+      &quot;curve_order&quot;: 20,
+      &quot;largest_prime_factor&quot;: 5,
+      &quot;magic_number&quot;: 2,
+      &quot;candidate_genus&quot;: 2,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 2.23606797749979,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 4.0
+    },
+    {
+      &quot;b&quot;: &quot;z^3 + z^2&quot;,
+      &quot;curve_order&quot;: 20,
+      &quot;largest_prime_factor&quot;: 5,
+      &quot;magic_number&quot;: 2,
+      &quot;candidate_genus&quot;: 2,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 2.23606797749979,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 4.0
+    },
+    {
+      &quot;b&quot;: &quot;z^3 + z + 1&quot;,
+      &quot;curve_order&quot;: 12,
+      &quot;largest_prime_factor&quot;: 3,
+      &quot;magic_number&quot;: 2,
+      &quot;candidate_genus&quot;: 2,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 1.7320508075688772,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 4.0
+    },
+    {
+      &quot;b&quot;: &quot;z^3 + z^2 + z&quot;,
+      &quot;curve_order&quot;: 12,
+      &quot;largest_prime_factor&quot;: 3,
+      &quot;magic_number&quot;: 2,
+      &quot;candidate_genus&quot;: 2,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 1.7320508075688772,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 4.0
+    }
+  ],
+  &quot;candidate_genera&quot;: [
+    2
+  ],
+  &quot;seconds&quot;: 0.6199444009998842,
+  &quot;claim&quot;: &quot;GHS rank/genus eligibility screen only; no divisor map or attack timing&quot;,
+  &quot;case_id&quot;: &quot;binary_ghs_geometry_screen-ada57a337d&quot;,
+  &quot;seed&quot;: 2913303091,
+  &quot;parameters&quot;: {
+    &quot;s&quot;: 2,
+    &quot;n&quot;: 2,
+    &quot;samples&quot;: 8
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.370658910000202,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>binary_ghs_geometry_screen</td><td>{&quot;n&quot;: 3, &quot;s&quot;: 2, &quot;samples&quot;: 8}</td><td>passed</td><td>—</td><td>—</td><td>3.475</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;binary_ghs_geometry_screen&quot;,
+  &quot;p&quot;: 2,
+  &quot;s&quot;: 2,
+  &quot;n&quot;: 6,
+  &quot;relative_extension_degree&quot;: 3,
+  &quot;q&quot;: 4,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 2,
+    &quot;degree&quot;: 6,
+    &quot;order&quot;: 64,
+    &quot;modulus&quot;: &quot;x^6 + x^4 + x^3 + x + 1&quot;
+  },
+  &quot;samples&quot;: [
+    {
+      &quot;b&quot;: &quot;z&quot;,
+      &quot;curve_order&quot;: 72,
+      &quot;largest_prime_factor&quot;: 3,
+      &quot;magic_number&quot;: 3,
+      &quot;candidate_genus&quot;: 4,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 1.7320508075688772,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 8.0
+    },
+    {
+      &quot;b&quot;: &quot;z^2&quot;,
+      &quot;curve_order&quot;: 72,
+      &quot;largest_prime_factor&quot;: 3,
+      &quot;magic_number&quot;: 3,
+      &quot;candidate_genus&quot;: 4,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 1.7320508075688772,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 8.0
+    },
+    {
+      &quot;b&quot;: &quot;z^3&quot;,
+      &quot;curve_order&quot;: 68,
+      &quot;largest_prime_factor&quot;: 17,
+      &quot;magic_number&quot;: 3,
+      &quot;candidate_genus&quot;: 4,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 4.123105625617661,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 8.0
+    },
+    {
+      &quot;b&quot;: &quot;z^5&quot;,
+      &quot;curve_order&quot;: 64,
+      &quot;largest_prime_factor&quot;: 2,
+      &quot;magic_number&quot;: 3,
+      &quot;candidate_genus&quot;: 4,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 1.4142135623730951,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 8.0
+    },
+    {
+      &quot;b&quot;: &quot;z^4 + z^3 + z + 1&quot;,
+      &quot;curve_order&quot;: 68,
+      &quot;largest_prime_factor&quot;: 17,
+      &quot;magic_number&quot;: 3,
+      &quot;candidate_genus&quot;: 4,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 4.123105625617661,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 8.0
+    },
+    {
+      &quot;b&quot;: &quot;z^5 + z^4 + z^2 + z&quot;,
+      &quot;curve_order&quot;: 64,
+      &quot;largest_prime_factor&quot;: 2,
+      &quot;magic_number&quot;: 3,
+      &quot;candidate_genus&quot;: 3,
+      &quot;x_only_character_present&quot;: true,
+      &quot;generic_baseline_sqrt_r&quot;: 1.4142135623730951,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 6.349604207872799
+    },
+    {
+      &quot;b&quot;: &quot;z^5 + z^4 + z^2 + 1&quot;,
+      &quot;curve_order&quot;: 80,
+      &quot;largest_prime_factor&quot;: 5,
+      &quot;magic_number&quot;: 3,
+      &quot;candidate_genus&quot;: 3,
+      &quot;x_only_character_present&quot;: true,
+      &quot;generic_baseline_sqrt_r&quot;: 2.23606797749979,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 6.349604207872799
+    },
+    {
+      &quot;b&quot;: &quot;z^5 + z^4 + 1&quot;,
+      &quot;curve_order&quot;: 64,
+      &quot;largest_prime_factor&quot;: 2,
+      &quot;magic_number&quot;: 3,
+      &quot;candidate_genus&quot;: 4,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 1.4142135623730951,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 8.0
+    }
+  ],
+  &quot;candidate_genera&quot;: [
+    3,
+    4
+  ],
+  &quot;seconds&quot;: 0.9075595499998599,
+  &quot;claim&quot;: &quot;GHS rank/genus eligibility screen only; no divisor map or attack timing&quot;,
+  &quot;case_id&quot;: &quot;binary_ghs_geometry_screen-a3095fec35&quot;,
+  &quot;seed&quot;: 2735300588,
+  &quot;parameters&quot;: {
+    &quot;s&quot;: 2,
+    &quot;n&quot;: 3,
+    &quot;samples&quot;: 8
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 3.4748532019993945,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>binary_ghs_geometry_screen</td><td>{&quot;n&quot;: 4, &quot;s&quot;: 2, &quot;samples&quot;: 8}</td><td>passed</td><td>—</td><td>—</td><td>2.463</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;binary_ghs_geometry_screen&quot;,
+  &quot;p&quot;: 2,
+  &quot;s&quot;: 2,
+  &quot;n&quot;: 8,
+  &quot;relative_extension_degree&quot;: 4,
+  &quot;q&quot;: 4,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 2,
+    &quot;degree&quot;: 8,
+    &quot;order&quot;: 256,
+    &quot;modulus&quot;: &quot;x^8 + x^4 + x^3 + x^2 + 1&quot;
+  },
+  &quot;samples&quot;: [
+    {
+      &quot;b&quot;: &quot;z&quot;,
+      &quot;curve_order&quot;: 240,
+      &quot;largest_prime_factor&quot;: 5,
+      &quot;magic_number&quot;: 4,
+      &quot;candidate_genus&quot;: 8,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 2.23606797749979,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 11.313708498984761
+    },
+    {
+      &quot;b&quot;: &quot;z^2&quot;,
+      &quot;curve_order&quot;: 240,
+      &quot;largest_prime_factor&quot;: 5,
+      &quot;magic_number&quot;: 4,
+      &quot;candidate_genus&quot;: 8,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 2.23606797749979,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 11.313708498984761
+    },
+    {
+      &quot;b&quot;: &quot;z^3&quot;,
+      &quot;curve_order&quot;: 248,
+      &quot;largest_prime_factor&quot;: 31,
+      &quot;magic_number&quot;: 4,
+      &quot;candidate_genus&quot;: 8,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 5.5677643628300215,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 11.313708498984761
+    },
+    {
+      &quot;b&quot;: &quot;z^5&quot;,
+      &quot;curve_order&quot;: 276,
+      &quot;largest_prime_factor&quot;: 23,
+      &quot;magic_number&quot;: 4,
+      &quot;candidate_genus&quot;: 8,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 4.795831523312719,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 11.313708498984761
+    },
+    {
+      &quot;b&quot;: &quot;z^6&quot;,
+      &quot;curve_order&quot;: 248,
+      &quot;largest_prime_factor&quot;: 31,
+      &quot;magic_number&quot;: 4,
+      &quot;candidate_genus&quot;: 8,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 5.5677643628300215,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 11.313708498984761
+    },
+    {
+      &quot;b&quot;: &quot;z^7&quot;,
+      &quot;curve_order&quot;: 264,
+      &quot;largest_prime_factor&quot;: 11,
+      &quot;magic_number&quot;: 3,
+      &quot;candidate_genus&quot;: 4,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 3.3166247903554,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 8.0
+    },
+    {
+      &quot;b&quot;: &quot;z^5 + z^4 + z^3 + z&quot;,
+      &quot;curve_order&quot;: 284,
+      &quot;largest_prime_factor&quot;: 71,
+      &quot;magic_number&quot;: 4,
+      &quot;candidate_genus&quot;: 8,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 8.426149773176359,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 11.313708498984761
+    },
+    {
+      &quot;b&quot;: &quot;z^6 + z^5 + z^4 + z^2&quot;,
+      &quot;curve_order&quot;: 276,
+      &quot;largest_prime_factor&quot;: 23,
+      &quot;magic_number&quot;: 4,
+      &quot;candidate_genus&quot;: 8,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 4.795831523312719,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 11.313708498984761
+    }
+  ],
+  &quot;candidate_genera&quot;: [
+    4,
+    8
+  ],
+  &quot;seconds&quot;: 0.5473038970003472,
+  &quot;claim&quot;: &quot;GHS rank/genus eligibility screen only; no divisor map or attack timing&quot;,
+  &quot;case_id&quot;: &quot;binary_ghs_geometry_screen-814d34011f&quot;,
+  &quot;seed&quot;: 2169320449,
+  &quot;parameters&quot;: {
+    &quot;s&quot;: 2,
+    &quot;n&quot;: 4,
+    &quot;samples&quot;: 8
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.4630369639999117,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>binary_ghs_geometry_screen</td><td>{&quot;n&quot;: 5, &quot;s&quot;: 2, &quot;samples&quot;: 8}</td><td>passed</td><td>—</td><td>—</td><td>2.640</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;binary_ghs_geometry_screen&quot;,
+  &quot;p&quot;: 2,
+  &quot;s&quot;: 2,
+  &quot;n&quot;: 10,
+  &quot;relative_extension_degree&quot;: 5,
+  &quot;q&quot;: 4,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 2,
+    &quot;degree&quot;: 10,
+    &quot;order&quot;: 1024,
+    &quot;modulus&quot;: &quot;x^10 + x^6 + x^5 + x^3 + x^2 + x + 1&quot;
+  },
+  &quot;samples&quot;: [
+    {
+      &quot;b&quot;: &quot;z&quot;,
+      &quot;curve_order&quot;: 1072,
+      &quot;largest_prime_factor&quot;: 67,
+      &quot;magic_number&quot;: 5,
+      &quot;candidate_genus&quot;: 15,
+      &quot;x_only_character_present&quot;: true,
+      &quot;generic_baseline_sqrt_r&quot;: 8.18535277187245,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 13.299806338284604
+    },
+    {
+      &quot;b&quot;: &quot;z^2&quot;,
+      &quot;curve_order&quot;: 1072,
+      &quot;largest_prime_factor&quot;: 67,
+      &quot;magic_number&quot;: 5,
+      &quot;candidate_genus&quot;: 15,
+      &quot;x_only_character_present&quot;: true,
+      &quot;generic_baseline_sqrt_r&quot;: 8.18535277187245,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 13.299806338284604
+    },
+    {
+      &quot;b&quot;: &quot;z^3&quot;,
+      &quot;curve_order&quot;: 1008,
+      &quot;largest_prime_factor&quot;: 7,
+      &quot;magic_number&quot;: 5,
+      &quot;candidate_genus&quot;: 15,
+      &quot;x_only_character_present&quot;: true,
+      &quot;generic_baseline_sqrt_r&quot;: 2.6457513110645907,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 13.299806338284604
+    },
+    {
+      &quot;b&quot;: &quot;z^5&quot;,
+      &quot;curve_order&quot;: 964,
+      &quot;largest_prime_factor&quot;: 241,
+      &quot;magic_number&quot;: 5,
+      &quot;candidate_genus&quot;: 16,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 15.524174696260024,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 13.454342644059432
+    },
+    {
+      &quot;b&quot;: &quot;z^6&quot;,
+      &quot;curve_order&quot;: 1008,
+      &quot;largest_prime_factor&quot;: 7,
+      &quot;magic_number&quot;: 5,
+      &quot;candidate_genus&quot;: 15,
+      &quot;x_only_character_present&quot;: true,
+      &quot;generic_baseline_sqrt_r&quot;: 2.6457513110645907,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 13.299806338284604
+    },
+    {
+      &quot;b&quot;: &quot;z^7&quot;,
+      &quot;curve_order&quot;: 1068,
+      &quot;largest_prime_factor&quot;: 89,
+      &quot;magic_number&quot;: 5,
+      &quot;candidate_genus&quot;: 16,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 9.433981132056603,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 13.454342644059432
+    },
+    {
+      &quot;b&quot;: &quot;z^9&quot;,
+      &quot;curve_order&quot;: 1024,
+      &quot;largest_prime_factor&quot;: 2,
+      &quot;magic_number&quot;: 5,
+      &quot;candidate_genus&quot;: 15,
+      &quot;x_only_character_present&quot;: true,
+      &quot;generic_baseline_sqrt_r&quot;: 1.4142135623730951,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 13.299806338284604
+    },
+    {
+      &quot;b&quot;: &quot;z^6 + z^5 + z^3 + z^2 + z + 1&quot;,
+      &quot;curve_order&quot;: 964,
+      &quot;largest_prime_factor&quot;: 241,
+      &quot;magic_number&quot;: 5,
+      &quot;candidate_genus&quot;: 16,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 15.524174696260024,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 13.454342644059432
+    }
+  ],
+  &quot;candidate_genera&quot;: [
+    15,
+    16
+  ],
+  &quot;seconds&quot;: 0.6028029589997459,
+  &quot;claim&quot;: &quot;GHS rank/genus eligibility screen only; no divisor map or attack timing&quot;,
+  &quot;case_id&quot;: &quot;binary_ghs_geometry_screen-75af30e856&quot;,
+  &quot;seed&quot;: 1974415592,
+  &quot;parameters&quot;: {
+    &quot;s&quot;: 2,
+    &quot;n&quot;: 5,
+    &quot;samples&quot;: 8
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.63990695999928,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>binary_ghs_geometry_screen</td><td>{&quot;n&quot;: 6, &quot;s&quot;: 2, &quot;samples&quot;: 8}</td><td>passed</td><td>—</td><td>—</td><td>2.276</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;binary_ghs_geometry_screen&quot;,
+  &quot;p&quot;: 2,
+  &quot;s&quot;: 2,
+  &quot;n&quot;: 12,
+  &quot;relative_extension_degree&quot;: 6,
+  &quot;q&quot;: 4,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 2,
+    &quot;degree&quot;: 12,
+    &quot;order&quot;: 4096,
+    &quot;modulus&quot;: &quot;x^12 + x^7 + x^6 + x^5 + x^3 + x + 1&quot;
+  },
+  &quot;samples&quot;: [
+    {
+      &quot;b&quot;: &quot;z&quot;,
+      &quot;curve_order&quot;: 4032,
+      &quot;largest_prime_factor&quot;: 7,
+      &quot;magic_number&quot;: 6,
+      &quot;candidate_genus&quot;: 32,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 2.6457513110645907,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 14.67206469127474
+    },
+    {
+      &quot;b&quot;: &quot;z^2&quot;,
+      &quot;curve_order&quot;: 4032,
+      &quot;largest_prime_factor&quot;: 7,
+      &quot;magic_number&quot;: 6,
+      &quot;candidate_genus&quot;: 32,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 2.6457513110645907,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 14.67206469127474
+    },
+    {
+      &quot;b&quot;: &quot;z^3&quot;,
+      &quot;curve_order&quot;: 4088,
+      &quot;largest_prime_factor&quot;: 73,
+      &quot;magic_number&quot;: 5,
+      &quot;candidate_genus&quot;: 16,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 8.54400374531753,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 13.454342644059432
+    },
+    {
+      &quot;b&quot;: &quot;z^5&quot;,
+      &quot;curve_order&quot;: 4140,
+      &quot;largest_prime_factor&quot;: 23,
+      &quot;magic_number&quot;: 6,
+      &quot;candidate_genus&quot;: 32,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 4.795831523312719,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 14.67206469127474
+    },
+    {
+      &quot;b&quot;: &quot;z^6&quot;,
+      &quot;curve_order&quot;: 4088,
+      &quot;largest_prime_factor&quot;: 73,
+      &quot;magic_number&quot;: 5,
+      &quot;candidate_genus&quot;: 16,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 8.54400374531753,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 13.454342644059432
+    },
+    {
+      &quot;b&quot;: &quot;z^7&quot;,
+      &quot;curve_order&quot;: 3996,
+      &quot;largest_prime_factor&quot;: 37,
+      &quot;magic_number&quot;: 6,
+      &quot;candidate_genus&quot;: 32,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 6.082762530298219,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 14.67206469127474
+    },
+    {
+      &quot;b&quot;: &quot;z^9&quot;,
+      &quot;curve_order&quot;: 4180,
+      &quot;largest_prime_factor&quot;: 19,
+      &quot;magic_number&quot;: 6,
+      &quot;candidate_genus&quot;: 32,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 4.358898943540674,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 14.67206469127474
+    },
+    {
+      &quot;b&quot;: &quot;z^10&quot;,
+      &quot;curve_order&quot;: 4140,
+      &quot;largest_prime_factor&quot;: 23,
+      &quot;magic_number&quot;: 6,
+      &quot;candidate_genus&quot;: 32,
+      &quot;x_only_character_present&quot;: false,
+      &quot;generic_baseline_sqrt_r&quot;: 4.795831523312719,
+      &quot;fixed_genus_index_calculus_power_only&quot;: 14.67206469127474
+    }
+  ],
+  &quot;candidate_genera&quot;: [
+    16,
+    32
+  ],
+  &quot;seconds&quot;: 0.6547254189999876,
+  &quot;claim&quot;: &quot;GHS rank/genus eligibility screen only; no divisor map or attack timing&quot;,
+  &quot;case_id&quot;: &quot;binary_ghs_geometry_screen-027b59f7d0&quot;,
+  &quot;seed&quot;: 41638391,
+  &quot;parameters&quot;: {
+    &quot;s&quot;: 2,
+    &quot;n&quot;: 6,
+    &quot;samples&quot;: 8
+  },
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 2.276142064999476,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>tian_cubic_kernel</td><td>{}</td><td>passed</td><td>143069629</td><td>—</td><td>3.160</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;tian_cubic_kernel&quot;,
+  &quot;p&quot;: 523,
+  &quot;n&quot;: 3,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;field&quot;: {
+    &quot;characteristic&quot;: 523,
+    &quot;degree&quot;: 3,
+    &quot;order&quot;: 143055667,
+    &quot;modulus&quot;: &quot;x^3 + 2&quot;
+  },
+  &quot;curve&quot;: &quot;Elliptic Curve defined by y^2 = x^3 + (82*w^2+92*w+140)*x + (359*w^2+339*w+243) over Finite Field in w of size 523^3&quot;,
+  &quot;subgroup_order&quot;: 143069629,
+  &quot;kernel_size&quot;: 27,
+  &quot;kernel_prime&quot;: 3,
+  &quot;kernel_rank&quot;: 3,
+  &quot;frobenius_stability&quot;: true,
+  &quot;isotropy_checks&quot;: 9,
+  &quot;no_coordinate_factor&quot;: true,
+  &quot;kernel_degree_coprime_to_r&quot;: true,
+  &quot;negative_axis_kernel_rejected&quot;: true,
+  &quot;point&quot;: {
+    &quot;x&quot;: &quot;7&quot;,
+    &quot;y&quot;: &quot;155*w^2 + 306*w + 310&quot;
+  },
+  &quot;target&quot;: {
+    &quot;x&quot;: &quot;311*w^2 + 393*w + 38&quot;,
+    &quot;y&quot;: &quot;418*w^2 + 167*w + 33&quot;
+  },
+  &quot;source_bsgs&quot;: {
+    &quot;scalar&quot;: 1987,
+    &quot;seconds&quot;: 1.0980562670001746,
+    &quot;group_additions&quot;: 11962,
+    &quot;baby_steps&quot;: 11962,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 143069629
+  },
+  &quot;seconds&quot;: 1.4663843320004162,
+  &quot;claim&quot;: &quot;published kernel eligibility and full source ECDLP recovery&quot;,
+  &quot;case_id&quot;: &quot;tian_cubic_kernel-b8f03aa89f&quot;,
+  &quot;seed&quot;: 3102751400,
+  &quot;parameters&quot;: {},
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 3.1600554400001784,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>tian_cubic_jacobian</td><td>{}</td><td>passed</td><td>143069629</td><td>3</td><td>13.994</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;tian_cubic_jacobian&quot;,
+  &quot;p&quot;: 523,
+  &quot;n&quot;: 3,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;target_genus&quot;: 3,
+  &quot;target_hyperelliptic&quot;: false,
+  &quot;subgroup_order&quot;: 143069629,
+  &quot;image_order_verified&quot;: 143069629,
+  &quot;scalar_relation_verified&quot;: 1987,
+  &quot;target_bounded_bsgs&quot;: {
+    &quot;scalar&quot;: 1987,
+    &quot;seconds&quot;: 8.81294965699999,
+    &quot;group_additions&quot;: 95,
+    &quot;baby_steps&quot;: 64,
+    &quot;algorithm&quot;: &quot;BSGS&quot;,
+    &quot;interval_size&quot;: 4096
+  },
+  &quot;image_generator&quot;: &quot;[Place (x^3 + 364*x^2 + 3*x + 380, y + 140*x^2 + 33*x + 147)]&quot;,
+  &quot;image_target&quot;: &quot;[Place (x + 210, y + 16)\n + Place (x^2 + 518*x + 162, y + 487*x + 136)]&quot;,
+  &quot;seconds&quot;: 11.827586319999682,
+  &quot;claim&quot;: &quot;published image-pair replay in the actual Jacobian; interval DLP only&quot;,
+  &quot;case_id&quot;: &quot;tian_cubic_jacobian-053c911c0a&quot;,
+  &quot;seed&quot;: 87855388,
+  &quot;parameters&quot;: {},
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 13.994485290000739,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr><tr data-status='passed'><td>tian_cubic_rational_map</td><td>{}</td><td>passed</td><td>143069629</td><td>3</td><td>49.327</td><td><details><summary>Raw record</summary><pre>{
+  &quot;family&quot;: &quot;tian_cubic_rational_map&quot;,
+  &quot;p&quot;: 523,
+  &quot;n&quot;: 3,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;subgroup_order&quot;: 143069629,
+  &quot;target_genus&quot;: 3,
+  &quot;target_hyperelliptic&quot;: false,
+  &quot;published_six_functions_evaluated&quot;: true,
+  &quot;map_evaluations&quot;: 7,
+  &quot;published_image_pair_matched&quot;: true,
+  &quot;image_order_verified&quot;: 143069629,
+  &quot;homomorphism_checks&quot;: 3,
+  &quot;scalar_relation_verified&quot;: 1987,
+  &quot;mathematical_target_field_order&quot;: 523,
+  &quot;arithmetic_constant_field_order&quot;: 143055667,
+  &quot;construction_seconds&quot;: 7.149610068000584,
+  &quot;two_point_transfer_seconds&quot;: 6.692721136999353,
+  &quot;seconds&quot;: 47.31686125300075,
+  &quot;claim&quot;: &quot;full evaluation of one published isogeny; no new-isogeny constructor or index-calculus benchmark&quot;,
+  &quot;case_id&quot;: &quot;tian_cubic_rational_map-9bf11563d4&quot;,
+  &quot;seed&quot;: 2616268131,
+  &quot;parameters&quot;: {},
+  &quot;replicate&quot;: 0,
+  &quot;worker_wall_seconds&quot;: 49.326651852000396,
+  &quot;expected_status&quot;: &quot;passed&quot;,
+  &quot;expectation_met&quot;: true
+}</pre></details></td></tr></tbody></table></div>
+<h2>Reproducibility</h2><pre>{
+  &quot;started_utc&quot;: &quot;2026-10-24T20:16:35.495024+00:00&quot;,
+  &quot;sage&quot;: &quot;SageMath version 10.6, Release Date: 2025-03-31&quot;,
+  &quot;python&quot;: &quot;3.12.5&quot;,
+  &quot;platform&quot;: &quot;Linux-6.18.55-x86_64-with-glibc2.35&quot;,
+  &quot;machine&quot;: &quot;x86_64&quot;,
+  &quot;preset&quot;: &quot;standard&quot;,
+  &quot;replicates&quot;: 1,
+  &quot;master_seed&quot;: 20261024,
+  &quot;per_case_timeout_seconds&quot;: 180,
+  &quot;source_sha256&quot;: {
+    &quot;binary_ghs.py&quot;: &quot;3131644ed36288373aacc4a87cb08ebfe21738bac3c15c0fe2d8d0900279b0c8&quot;,
+    &quot;case_worker.py&quot;: &quot;d46218da34c441c960ac331be4b46f406d1957845cf65bbc81c6ed5933da8b07&quot;,
+    &quot;common.py&quot;: &quot;dfc0911053e76485446559b859fbf9ee10845a1a170d8f352825a64f4d5fe642&quot;,
+    &quot;cubic_cover.py&quot;: &quot;c0fa811dc5e8af4648288f0a3a96c925b315800f2b24c70bd05fed3e116398ff&quot;,
+    &quot;extract_tian_data.py&quot;: &quot;f2e0d2b52bde8c6a9e029d242987f3bd93c78d063af46b05e045b7a7177c473e&quot;,
+    &quot;quadratic_cover.py&quot;: &quot;f095285ada039a5566afe3e118793f63aed66473ea5301c4dd821fa8b655b5b0&quot;,
+    &quot;report.py&quot;: &quot;aed94ff72a945d7bc9cde4a080cc39535ca0f23ffef04bf8ce1ffdf3a3f95797&quot;,
+    &quot;run_experiments.py&quot;: &quot;54b5f1cdb7cdf150704fcf3ee10b9e7ee56fadb6d450e35c8aa688e2ff60d96e&quot;,
+    &quot;tian.py&quot;: &quot;d28b270f6339daf8c1fc105218dbf9b0694a9c85f233a6ab1b62dd9f5ce2ca94&quot;,
+    &quot;towers.py&quot;: &quot;925d73a1ccd50103ae20c088578f47daf6e7e56a2514ebd010efa300773995b2&quot;,
+    &quot;trace_zero.py&quot;: &quot;10e45d212a1a5260db80ceb9a2d34725420743ccb1a47284fe86554395aed4d2&quot;
+  },
+  &quot;data_sha256&quot;: &quot;a544f821756b16a369e20673113cf63734f1a8c66a0f34003c15968fc3282c8b&quot;,
+  &quot;container_image&quot;: &quot;sagemath/sagemath:10.6&quot;,
+  &quot;container_digest&quot;: &quot;sha256:19995db6194f4a4bab18ce9a88556fd15b9ed5e916b4504fefe618a7796ddbdb&quot;,
+  &quot;completed_utc&quot;: &quot;2026-10-24T20:19:03.328380+00:00&quot;,
+  &quot;elapsed_seconds&quot;: 147.8317716900001,
+  &quot;status_counts&quot;: {
+    &quot;passed&quot;: 37,
+    &quot;ineligible&quot;: 1
+  },
+  &quot;expectations_met&quot;: 38
+}</pre>
+<h2>Sources</h2><ul>
+<li><a href="https://arxiv.org/abs/2012.07173">Tian, Cover attacks for elliptic curves with prime order (2020 preprint; 2023 publication)</a></li>
+<li><a href="https://arxiv.org/abs/1405.1059">Gorla–Massierer, Index Calculus in the Trace Zero Variety (2015)</a></li>
+<li><a href="https://eprint.iacr.org/2011/020">Joux–Vitse, Cover and Decomposition Index Calculus (EUROCRYPT 2012)</a></li>
+<li><a href="https://www.kantmath.de/publications/papers/weil_descent.pdf">Gaudry–Hess–Smart, Constructive and Destructive Facets of Weil Descent (2002)</a></li>
+<li><a href="https://doi.org/10.1090/S0025-5718-2010-02281-1">Diem, On the discrete logarithm problem in class groups of curves (2011)</a></li></ul>
+<script>
+const q=document.querySelector('#search'),s=document.querySelector('#status'),rs=[...document.querySelectorAll('tbody tr')];
+function filter(){let n=0;for(const r of rs){let show=(!s.value||r.dataset.status===s.value)&&r.textContent.toLowerCase().includes(q.value.toLowerCase());r.hidden=!show;if(show)n++;}document.querySelector('#count').textContent=n+' cases shown';}
+q.addEventListener('input',filter);s.addEventListener('change',filter);filter();
+</script></html>

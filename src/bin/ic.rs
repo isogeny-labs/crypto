@@ -31,6 +31,8 @@ mod prime_external;
 mod progress;
 #[path = "ic/rho.rs"]
 mod rho;
+#[path = "ic/sweep/mod.rs"]
+mod sweep;
 #[path = "ic/workflow.rs"]
 mod workflow;
 
@@ -130,6 +132,15 @@ enum Action {
     CubicGraph(cubic_route::GraphArgs),
     /// Generate a checked one-hop cubic Vélu route for a rational prime-order kernel.
     CubicRouteGenerate(cubic_route::GenerateArgs),
+    /// Search index-calculus configurations with an Optuna-style sweeper: a
+    /// typed conditional space, a TPE sampler, median pruning over a ladder
+    /// of sizes, and an append-only resumable store.  The objective is the
+    /// §5a-banded S against a frozen baseline, projected to the target size.
+    Sweep(sweep::SweepArgs),
+    /// Run one pipeline configuration and print one scored, classified
+    /// record: the unit `ic sweep` optimises over.  The score is a function
+    /// of operation counts alone.
+    SweepTrial(sweep::trial::TrialArgs),
 }
 #[derive(Args)]
 #[group(required = true, multiple = false)]
@@ -191,6 +202,8 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::SolveCubic(args)) => cubic_external::solve(args),
         Some(Action::CubicGraph(args)) => cubic_route::enumerate_j(args),
         Some(Action::CubicRouteGenerate(args)) => cubic_route::generate(args),
+        Some(Action::Sweep(args)) => sweep::run_sweep(args.clone(), cli.json),
+        Some(Action::SweepTrial(args)) => sweep::trial::run(args.clone()),
         Some(Action::Run(args)) => experiment::run(args.clone(), cli.json),
         None => {
             if let Some(name) = &cli.profile {

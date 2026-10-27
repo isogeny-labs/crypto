@@ -1,16 +1,7 @@
 name: ECC2K-130 native m3 chain archive replay
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/ecc2k130-native-m3-chain.yml'
-      - 'research/notes/ecc2k130/native_m3_chain_20260929/**'
-      - 'research/notes/ecc2k130/native_fullpoint_edge_20260929/*.py'
-      - 'research/notes/ecc2k130/m10_export_capacity_20260925/capacity.py'
-      - 'research/notes/ecc2k130/symbolic_dag_fullpoint_20260925/dag.py'
-      - 'research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925/*.py'
-      - 'research/notes/ecc2k130/rotated_subspace_support_20260925/gate.py'
-      - 'research/ecc2k130_factor_base_replication_20260925/exact_*.json'
-      - 'research/ecc2k130_relations/*.py'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -20,7 +11,7 @@ on:
 
 jobs:
   frozen-and-replay:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-native-m3-chain.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-native-m3-chain.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4

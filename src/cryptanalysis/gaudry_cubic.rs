@@ -70,10 +70,12 @@ pub const FP_MULS_PER_ADD: f64 = 60.0;
 
 #[inline]
 pub(crate) fn mm(a: u64, b: u64, p: u64) -> u64 {
+    super::jv_bitops::hook_mul(p);
     ((a as u128 * b as u128) % p as u128) as u64
 }
 #[inline]
 pub(crate) fn am(a: u64, b: u64, p: u64) -> u64 {
+    super::jv_bitops::hook_add(p);
     let s = a + b;
     if s >= p {
         s - p
@@ -83,6 +85,7 @@ pub(crate) fn am(a: u64, b: u64, p: u64) -> u64 {
 }
 #[inline]
 pub(crate) fn sm(a: u64, b: u64, p: u64) -> u64 {
+    super::jv_bitops::hook_add(p);
     if a >= b {
         a - b
     } else {
@@ -3127,7 +3130,7 @@ impl Default for GaudryOptions {
 }
 
 /// A relation as a sparse row: `Σ coeff · x_col ≡ rhs (mod n)`.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct SparseRel {
     pub cols: Vec<(usize, u64)>,
     pub rhs: u64,
@@ -3401,6 +3404,7 @@ pub fn wiedemann_u64(
     let b: Vec<u64> = rows.iter().map(|r| r.rhs).collect();
     for _attempt in 0..3 {
         let u: Vec<u64> = (0..ncols).map(|_| rng.gen_range(0..n)).collect();
+        super::jv_bitops::rng_words(ncols as u64);
         let mut seq = Vec::with_capacity(2 * ncols);
         let mut v = b.clone();
         for _ in 0..2 * ncols {
@@ -3427,6 +3431,7 @@ pub fn wiedemann_u64(
             *ops += ncols as u64;
         }
         let neg_inv = (n - inv_mod(c[l], n)) % n;
+        super::jv_bitops::hook_adds(n, 1);
         let x: Vec<u64> = acc.iter().map(|&a| mm(a, neg_inv, n)).collect();
         *ops += ncols as u64;
         if mat_vec(&x, ops) == b {

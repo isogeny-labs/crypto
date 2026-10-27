@@ -638,7 +638,6 @@ fn run(cli: Cli) -> Result<(), String> {
                 Ok(())
             };
             w.run_with_progress((managed || show_progress).then_some(&mut on_batch))?;
-            drop(on_batch);
             if let Some(heartbeat) = &heartbeat {
                 heartbeat.update("class audits", w.nodes.len(), w.edges.len());
             }
