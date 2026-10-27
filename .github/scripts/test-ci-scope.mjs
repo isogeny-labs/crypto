@@ -55,6 +55,11 @@ test('dependencies, workflow edits and frozen evidence remain applicable', () =>
   assert.equal(classify(['research/pkm_example_ecbench_20261016/sessions/one/session.json']).ecbench_replay, true);
   assert.equal(classify(['research/isogeny_example/interrupted/run1/records.jsonl']).ecbench_replay, true);
   assert.equal(classify(['research/isogeny_example/README.md']).ecbench_replay, false);
+  for (const file of ['analysis/src/coverage.rs', 'analysis/Cargo.toml',
+    'analysis/Cargo.lock', 'runs.tar.xz', 'observations.json', 'exact-coverage.json']) {
+    assert.equal(classify([`research/factor_base_shape_leads_20261018/${file}`]).ecbench_replay, true, file);
+  }
+  assert.equal(classify(['research/factor_base_shape_leads_20261018/README.md']).ecbench_replay, false);
   assert.equal(classify(['research/fixture.json'], new Set(['research/fixture.json'])).rust_root, true);
 });
 

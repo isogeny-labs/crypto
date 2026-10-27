@@ -1,6 +1,9 @@
 name: Conductor-gap native controls
 on:
-  pull_request:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - 'research/conductor_gap_cm_orbits_20261015/**'
       - 'research/conductor_gap_followups_20261016/**'
@@ -28,7 +31,6 @@ jobs:
             /Cargo.lock
             /.cargo/
             /tools/volcano-cli/
-            /tools/factor-base/
             /isogeny_algos/
             /build.rs
             /rust-toolchain*
@@ -47,7 +49,7 @@ jobs:
         with:
           toolchain: '1.98'
       - uses: Swatinem/rust-cache@v2
-      - run: sudo apt-get update && sudo apt-get install -y pari-gp
+      - run: sudo apt-get update && sudo apt-get install -y pari-gp zstd
       - name: Public fixture and CM map tests
         run: |
           cargo test --release --lib cm_orbit
@@ -142,11 +144,13 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: /research/conductor_gap_cm_orbits_20261015/lean/
-      - name: Install Lean archive decompressor
+      - name: Install Lean archive dependency
+        shell: bash
         run: |
+          set -euo pipefail
           if ! command -v zstd >/dev/null 2>&1; then
             sudo apt-get update
-            sudo apt-get install -y --no-install-recommends zstd
+            sudo apt-get install -y zstd
           fi
       - name: Install hash-pinned Lean 4.34.1
         shell: bash
@@ -154,6 +158,10 @@ jobs:
           set -euo pipefail
           curl --fail --location --retry 3 https://github.com/leanprover/lean4/releases/download/v4.34.1/lean-4.34.1-linux.tar.zst -o /tmp/lean.tar.zst
           echo '47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4  /tmp/lean.tar.zst' | sha256sum --check
+          # The self-hosted runner image has no zstd; main does.
+          if ! command -v zstd > /dev/null; then
+            sudo apt-get update && sudo apt-get install -y zstd
+          fi
           mkdir /tmp/lean
           tar --zstd -xf /tmp/lean.tar.zst -C /tmp/lean --strip-components=1
           /tmp/lean/bin/lean research/conductor_gap_cm_orbits_20261015/lean/OrbitControls.lean

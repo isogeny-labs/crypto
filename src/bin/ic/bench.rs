@@ -32,10 +32,10 @@ use crypto_lib::cryptanalysis::ic_boundary::{
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
 use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
-    BinarySubspaceBase, CompactOrbitScanBase, DescentAlgebraicOracle, FrobeniusMitmOracle,
-    GlvOrbitBase, KoblitzClosureBase, KoblitzOrbitBase, KoblitzSymmetrisedBase,
-    KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase, PrimeBatchMitmOracle,
-    RootfindSubtractOracle, SubtractOracle, SymmetrisedOracle,
+    BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
+    DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KnownLogBase, KoblitzClosureBase,
+    KoblitzOrbitBase, KoblitzSymmetrisedBase, KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase,
+    PrimeBatchMitmOracle, RootfindSubtractOracle, SubtractOracle, SymmetrisedOracle,
 };
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
     solver_by_name, solver_registry, validate_solver_params,
@@ -274,14 +274,25 @@ fn listing() -> Value {
                                     {"name": "symmetry", "means": "none, negation (default), frobenius (certified closed Koblitz archive), cubic (j=0), quartic (j=1728); every point coefficient is replayed"}]},
                     {"name": "prime-abscissa", "regimes": ["prime"],
                      "parameters": [{"name": "size", "means": "abscissae in the base; the family optimum is about #E^(1/3)"}]},
+                    {"name": "known-log", "regimes": ["prime"],
+                     "parameters": [{"name": "size", "means": "multiples [i]G, 1 <= i <= size, one column each, every logarithm known so linear algebra is skipped"}]},
                     {"name": "glv-orbit", "regimes": ["prime"],
                      "parameters": [
                         {"name": "size", "means": "seed abscissae; the base is their closure under the curve's automorphism group"},
                         {"name": "group", "means": "auto, negation, j0 or j1728 (use --family j0 or j1728 for a curve that has one)"},
                         {"name": "no_fold", "means": "1 to fold the same points by negation only: the control that shows what the fold buys"}]},
+                    {"name": "cm-multiplier", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "size", "means": "seed abscissae (columns)"},
+                        {"name": "norm", "means": "include alpha(P) = [a]P + [b]phi(P) for every alpha = a + b*phi of norm <= this (needs --family j0, j1728, d7 or d8); 0 for the seeds alone"},
+                        {"name": "endo", "means": "index of the curve's CM endomorphism; default 0"}]},
                     {"name": "gls-line", "regimes": ["gls (examples/glv_invariant_bench.rs)"],
                      "parameters": [
                         {"name": "no_fold", "means": "1 to fold the same points by negation only"}]},
+                    {"name": "binary-multiplier", "regimes": ["char2", "koblitz"],
+                     "parameters": [
+                        {"name": "size", "means": "seed abscissae (columns)"},
+                        {"name": "mult", "means": "include [m]P for m = 2..=mult with weight m; 1 for the seeds alone"}]},
                     {"name": "binary-subspace", "regimes": ["char2", "koblitz"],
                      "parameters": [{"name": "dimension", "means": "F_2-dimension of the abscissa subspace"}]},
                     {"name": "koblitz-orbit", "regimes": ["koblitz"],
@@ -580,13 +591,17 @@ fn run_prime(
     let abscissa = PrimeAbscissaBase { instance: inst };
     let orbit = GlvOrbitBase { instance: inst };
     let archive = PrimeArchiveBase { instance: inst };
+    let known_log = KnownLogBase;
+    let multiplier = CmMultiplierBase { instance: inst };
     let base: &dyn FactorBaseBuilder<_> = match fb_name {
         "archive" => &archive,
         "prime-abscissa" => &abscissa,
         "glv-orbit" => &orbit,
+        "known-log" => &known_log,
+        "cm-multiplier" => &multiplier,
         other => {
             return Err(format!(
-                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa or glv-orbit"
+                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, glv-orbit, known-log or cm-multiplier"
             ))
         }
     };
@@ -661,8 +676,10 @@ fn run_binary(
     let symmetrised_base = KoblitzSymmetrisedBase { instance: inst };
     let compact_orbit = CompactOrbitScanBase { instance: inst };
     let closure = KoblitzClosureBase { instance: inst };
+    let multiplier = BinaryMultiplierBase { instance: inst };
     let base: &dyn FactorBaseBuilder<BinaryGroup> = match fb_name {
         "archive" => &archive,
+        "binary-multiplier" => &multiplier,
         "koblitz-closure" => &closure,
         "binary-subspace" => &subspace,
         "koblitz-orbit" => &orbit,
