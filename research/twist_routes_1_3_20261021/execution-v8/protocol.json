@@ -1,0 +1,380 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-kernel-relations-v1",
+  "version": 1,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v8",
+  "question": "Do twist-rational7-torsion kernels define certified source isogenies that preserve a public DLP and complete relation rows?",
+  "claims": [
+    {
+      "id": "maps",
+      "text": "All eight twist-derived degree7 maps and duals are certified with generic polynomial identities and exhaustive rational checks.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "relations",
+      "text": "All576 signed decomposition query sets and18 linear systems agree under same-base transport; recovered scalars are checked against public points.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "scope",
+      "text": "Known isogeny theory establishes a connection, not novelty, more transported relations, a solver speedup, original campaign completion or a NIST result.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "description": "Actual native exhaustive twist torsion, eight maps/duals, signed relation collection and non-oracle modular linear algebra.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-kernel-relations"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "description": "Independent PARI engine builds all eight maps and reverse maps, verifies generic compositions, rational images/recovery and all576 signed witness sets and18 ranks.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "gp",
+            "-f",
+            "-q",
+            "verify.gp"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact complete finite count, no performance or sampling inference."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Embedded public generator/dual/scalar checks and separate F11/F101 development controls; no separate measured control arm."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Eight corrupt-map coefficients must fail; every witness with one flipped sign must fail. No separate measured arm."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "kernel line",
+        "levels": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "name": "base construction",
+        "levels": [
+          "ordinary ascending x plus anchor G",
+          "maximal twist progression shifted by1 plus anchor G"
+        ]
+      },
+      {
+        "name": "arity",
+        "levels": [
+          2,
+          3
+        ]
+      },
+      {
+        "name": "offset",
+        "levels": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "Pinned native worker and independent PARI engine; GP export source and native generic group law frozen.",
+        "how": "Record source/binary hashes before data; reopen raw hashes."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "One public p827 source and target; all8 kernels, both bases, both arities and all16 offsets. Target never selects a kernel or base.",
+        "how": "Exhaustive same-base signed witness equality and exact rank/recovery; all exceptional kernel/infinity cases checked."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Same local L0 managed host; no native clock or cost admitted.",
+        "how": "Record CPU/kernel/hypervisor; no time comparison."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Shared author and host, deterministic exact equality only.",
+        "how": "Shared author/host; independent CAS map/group/linear algebra, exact native replay and conditional Lean group implication."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-check",
+        "arms": [
+          "native",
+          "pari"
+        ],
+        "differs_in": [
+          "instrument"
+        ],
+        "design": "absolute",
+        "threshold": "All8 maps and duals,16 generic dual compositions,all576 signed query sets and18 relation-system ranks/recoveries pass; every corrupt/sign control is rejected."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Native producer then independent CAS exact verification; no performance comparison.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Deterministic fixed input panel and exhaustive shifts; seed field zero is metadata only."
+    },
+    "instance_sampling": {
+      "rule": "One fixed public source/DLP, complete eight-kernel/both-base/both-arity/16-offset panel. Offsets are correlated relation queries for one Q.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact finite verification only; no statistical or comparative claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact complete finite counts and necessary-factor checks, not statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 1200,
+      "measured_on": "Unmeasured prospective caps:300s producer,300s CAS,300s native audit plus metadata allowance. Not an observed performance result."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "query-cases",
+        "name": "Complete signed decomposition query cases",
+        "unit": "query cases in one fixed finite panel",
+        "kind": "exact",
+        "definition": "Nine models,two bases,two arities,sixteen offsets;64source and512destination. Equality includes every empty case and repeated-index witness.",
+        "source": "ADMISSION.json summary.query_cases",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "kernel-lines",
+        "name": "Certified twist-derived maps",
+        "unit": "degree7 maps",
+        "kind": "exact",
+        "definition": "All8 lines in full7-torsion, with generic map and dual identities.",
+        "source": "ADMISSION.json summary.kernel_lines",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "kernel lines",
+      "complete signed query sets",
+      "generic dual checks",
+      "rational image/recovery checks",
+      "relation-system ranks"
+    ],
+    "record": [
+      "source commit",
+      "binary SHA256",
+      "argv",
+      "input/output hashes",
+      "actual exit/signal",
+      "resource caps",
+      "host metadata"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_GiB": 4,
+      "paid_resources_created": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 1200,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 1,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly eight kernels and576 query cases; retain any failure/cap. No outcome-dependent enlargement, target/base replacement or retries.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Admit the executable twist-derived scalar/relation-preserving route only after native and independent CAS exact checks. Costs and any destination-solving benefit remain unknown.",
+    "comparison_ids": [
+      "exact-check"
+    ],
+    "statistic": "Exact generic identities, finite point/witness equalities and matrix ranks.",
+    "interval": "None: complete finite exhaustion.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact preservation of witnesses and ranks, not a performance effect.",
+    "verdict_vocabulary": [
+      "verified finite equality",
+      "mismatch",
+      "not completed"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/twist_routes_1_3_20261021/runner/src/bin/twist-kernel-relations.rs",
+      "sha256": "a3063f16dc79029dfa5b9b879414e57638c9d66ccb7b02843779c1b3374331b0"
+    },
+    "inputs": [
+      "fixed public p827 parameters in frozen source",
+      "native output",
+      "actual PARI receipt and output hashes"
+    ],
+    "outputs": [
+      "RESULTS.json",
+      "verify.gp",
+      "ADMISSION.json",
+      "experiment.export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Recorded relation rows and ranks by base/model, with identical transported systems retained."
+    ],
+    "report_dir": "research/twist_routes_1_3_20261021/reports/kernel-relations-20261027"
+  },
+  "inadmissible": [
+    "Calling standard isogeny theory novel",
+    "Calling same-base transported rows new independent information",
+    "Claiming a solver speedup without charged costs and strongest matched controls",
+    "Inferring a NIST route from this public p827 example",
+    "Closing original full-campaign criteria"
+  ],
+  "literature": [
+    {
+      "ref": "research/twist_routes_1_3_20261021/execution-v8/LITERATURE.md",
+      "provenance": "internal",
+      "claim": "Primary MIT kernel descent and Velu formulas, primary PARI help and atlas reviewed before implementation.",
+      "verified_by": "Source-linked review and separate control curves before main data."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
+  },
+  "extensions": {
+    "scientific_panel_started": false,
+    "original_full_campaign_discharged": false,
+    "embedded_controls_are_not_separate_arms": true,
+    "backend_authority": "Standing authorization and documented EKS access/image fallback; bounded local L0 only, no paid resource."
+  }
+}
