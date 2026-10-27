@@ -57,10 +57,10 @@ template<class C> struct RhoHost {
 
  struct Walk { rho_state<C> st; unsigned long long a,b; };
 
- static void seed(Walk&w,uint32_t idx,uint32_t restart,const pt&G,const pt&Q,const rho_params&prm,const Zn&zn){
+ static void seed(Walk&w,uint32_t idx,uint32_t&restart,const pt&G,const pt&Q,const rho_params&prm,const Zn&zn){
   for(;;){
    uint32_t ab[F::N],bb[F::N];
-   rho_walk_seed<F::N>(idx,restart,ab,bb,prm.order_bits);
+   rho_walk_seed<F::N>(idx,restart,ab,bb,prm.order_bits,prm.walk_seed);
    pt S=C::double_scalar_mul(G,ab,Q,bb,prm.order_bits);
    if(!S.inf){
     w.a=zn.template from_limbs<F::N>(ab); w.b=zn.template from_limbs<F::N>(bb);

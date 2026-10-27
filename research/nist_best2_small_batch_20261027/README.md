@@ -1,5 +1,11 @@
 # Best of P+M and P−M in the gpu/nist small-batch rho kernel (2026-10-27)
 
+**Audit status (2026-10-27): BEST2 stays disabled.** The estimates below
+are historical diagnostics, not measured GPU solve costs or validated
+benchmark claims. See [the seeded-walk audit](seeded-audit-v1/README.md)
+for native tests, independent OpenSSL checks, the infinity-restart replay
+fix, warmup-count correction, and the outstanding experiment protocol.
+
 Question: does stepping to the better of `P + M_j` and `P − M_j` pay in the
 `gpu/nist` P-256 / P-384 rho kernel, whose batched inversion covers only
 W = 16–64 walks per thread? This is the open lead of
@@ -88,18 +94,23 @@ with the min–max of the rate ratio.
 
 ![GPU](reports/gpu.svg)
 
-**Verdict.** Best of P±M costs 8–12% of the kernel's rate. Against 1.143×
-fewer steps, that nets a 1–5% saving of GPU time per solve.
+**Preliminary model estimate, superseded as a performance verdict.**
+Best of P±M costs 8–12% of the measured physical-iteration rate. Combining
+this with the different standalone walk's iteration ratio suggests a
+1–5% saving; that saving has not been measured or validated.
 
-- **P-256 at W = 64**, the kernel's fastest cell, saves about 5%, and its
-  whole range lies below 1.
-- **The other cells** save 1–3%, but their ranges cross 1.
+- **P-256 at W = 64** has a derived estimate of 0.947, with the combined
+  range below 1. This range is not an end-to-end 95% confidence interval.
+- **The other cells** have derived estimates of 1–3% savings, with combined
+  ranges crossing 1.
 - **Cost against batch size.** Against the CPU model's expectation, the
   relative cost is smallest at W = 64, where the kernel already spills
   registers.
 
-This is an engineering gain at the kernel's best configuration, not a
-change to the rho exponent.
+An engineering gain has not yet been established. The standalone harness
+uses hashed scores and DP predicates and does not restart after each DP,
+unlike this CUDA kernel. A validated comparison must account for those
+differences and all physical cycle work.
 
 **Open observations, reported as measured.**
 
@@ -122,6 +133,12 @@ the matched reference (the plain kernel, same binary family and unit) but
 neither of the other two, so the result stays in this research directory.
 
 ## Reproduce
+
+The commands below reproduce the historical diagnostic methodology. The
+current `best2_ab.sh` additionally varies seed namespaces and excludes
+warmup DPs; use the frozen protocol in `seeded-audit-v1/PROTOCOL.md` for
+the new comparison. Its `SEED` markers are not understood by the old
+`rho_walk_leads gpuab` summarizer as independent samples.
 
 ```sh
 make -C gpu/nist test BEST2=1

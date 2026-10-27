@@ -40,6 +40,7 @@
 //! [`CountedGroup`]: crate::cryptanalysis::ic_boundary::CountedGroup
 
 pub mod audit;
+pub mod best2_model;
 pub mod band;
 pub mod bounds;
 pub mod calibration;

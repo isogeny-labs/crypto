@@ -74,6 +74,7 @@ struct rho_params {
  uint32_t max_steps;   /* abandon a walk after this many steps */
  uint32_t table_seed;  /* seed for the c_j,d_j table coefficients */
  uint32_t order_bits;  /* bit-width the seed scalars are masked to */
+ uint64_t walk_seed;   /* experiment namespace; zero preserves historical starts */
 };
 
 template<class F> struct rho_dp {
@@ -102,8 +103,9 @@ template<int N> NF_HD void rho_scalar_from_seed(uint64_t&s,uint32_t out[N],uint3
  for(int i=0;i<(N+1)/2;i++){uint64_t z=rho_splitmix64(s); if(2*i<N)out[2*i]=(uint32_t)z; if(2*i+1<N)out[2*i+1]=(uint32_t)(z>>32);}
  for(int l=0;l<N;l++){int lo=32*l; if((uint32_t)lo>=order_bits)out[l]=0; else if(lo+32>(int)order_bits)out[l]&=(1u<<(order_bits-lo))-1u;}
 }
-template<int N> NF_HD void rho_walk_seed(uint32_t walk,uint32_t restart,uint32_t a[N],uint32_t b[N],uint32_t order_bits){
+template<int N> NF_HD void rho_walk_seed(uint32_t walk,uint32_t restart,uint32_t a[N],uint32_t b[N],uint32_t order_bits,uint64_t walk_seed=0){
  uint64_t s=((uint64_t)walk<<32|restart)*0xD1B54A32D192ED03ull+0x8CB92BA72F3D8DD7ull;
+ s^=walk_seed;
  rho_scalar_from_seed<N>(s,a,order_bits); rho_scalar_from_seed<N>(s,b,order_bits);
 }
 template<int N> NF_HD void rho_table_seed(uint32_t table_seed,uint32_t j,uint32_t c[N],uint32_t d[N],uint32_t order_bits){
@@ -115,7 +117,8 @@ template<class C> NF_HD uint32_t rho_partition(const nap<typename C::Field>&P,co
 template<class C> NF_HD int rho_is_dp(const nap<typename C::Field>&P,const rho_params&prm){return ((P.x.v[0]>>RHO_DP_SHIFT)&prm.dp_mask)==0;}
 template<class C> NF_HD uint32_t rho_hash(const nap<typename C::Field>&P){return P.x.v[0];}
 
-/* Best-of-two score of an image's x: bits the partition and DP test do not read. */
+/* Distinct limbs do not prove statistical independence from the DP predicate.
+ * On one-limb test fields the score explicitly reuses the same coordinate. */
 template<class F> NF_HD uint32_t rho_score(const typename F::elt&x){
  if(F::N>1) return x.v[F::N>1?1:0];
  uint32_t z=x.v[0]*0x9E3779B1u; return z^(z>>15);
@@ -275,7 +278,7 @@ template<class C> NF_HD void rho_seed_walk(const rho_ctx<C>&c,uint32_t idx,rho_s
  typedef typename C::Field F;
  for(;;){
   uint32_t a[F::N],b[F::N];
-  rho_walk_seed<F::N>(idx,c.restarts[idx],a,b,c.prm.order_bits);
+  rho_walk_seed<F::N>(idx,c.restarts[idx],a,b,c.prm.order_bits,c.prm.walk_seed);
   nap<F> S=C::double_scalar_mul(c.G,a,c.Q,b,c.prm.order_bits);
   if(!S.inf){ int code; (void)code; rho_canonical<C>(S,c.prm); st.P=S; rho_reset_cycle<C>(st,S); return; }
   c.restarts[idx]++;
