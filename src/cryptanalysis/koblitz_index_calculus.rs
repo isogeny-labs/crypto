@@ -9259,6 +9259,7 @@ fn sat_decompose_chained_s3_with_domain(
     };
     let mut stats = ChainS3Stats::default();
     let trace =
+        std::env::var_os("N83_CHAIN_PHASE_TRACE").as_deref() == Some(std::ffi::OsStr::new("1"));
     let trace_start = std::time::Instant::now();
 
     if !(4..=6).contains(&m)

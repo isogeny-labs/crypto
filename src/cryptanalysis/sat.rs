@@ -2287,7 +2287,7 @@ impl Solver {
         // less error-prone than unhooking clauses one at a time.  One per
         // list cleared, two per clause (offset, length and detached
         // test) and two watchers per survivor, charged as every clause.
-        self.stats.word_ops += self.watches.len() as u64 + 4 * n_clauses as u64;
+        self.stats.word_ops += self.watches.len() as u64 + 4 * self.clause_at.len() as u64;
         for w in self.watches.iter_mut() {
             w.clear();
         }
@@ -2560,11 +2560,14 @@ impl Solver {
                 self.conflicts += 1;
                 self.stats.conflicts += 1;
                 if let Some(progress) = &self.progress {
-                    progress.conflicts.store(self.stats.conflicts, Ordering::Relaxed);
+                    progress
+                        .conflicts
+                        .store(self.stats.conflicts, Ordering::Relaxed);
                 }
-                if trace.is_some() && (self.stats.conflicts == 1 || self.stats.conflicts % 1000 == 0) {
+                if trace.is_some()
+                    && (self.stats.conflicts == 1 || self.stats.conflicts % 1000 == 0)
+                {
                     self.trace_solve_phase(trace, "conflict_snapshot", None);
-                }
                 }
                 let lvl = self.trail_lim.len() as u64;
                 self.stats.conflict_level_sum += lvl;
