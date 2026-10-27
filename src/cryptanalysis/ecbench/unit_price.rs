@@ -57,6 +57,33 @@ pub struct Opts {
     pub closure: bool,
 }
 
+/// Run `f` with the calling thread as the only thread of its own rayon
+/// pool, so every nested `par_iter` of the solver runs inline on this thread
+/// and never hands work across threads.  The global pool (also one thread)
+/// parks and wakes its worker on each rayon call, which on this solver is
+/// hundreds of thousands of futex calls and `sched_yield` spins: system time
+/// and user spin that no count prices.  The closure check measures the
+/// solver, not the scheduler.
+fn on_one_thread<T>(f: impl FnOnce() -> T) -> T {
+    // The closure runs on this very thread (the pool's only thread), so
+    // the non-`Sync` counters it borrows are never shared.
+    struct Local<F>(F);
+    unsafe impl<F> Send for Local<F> {}
+    struct Out<T>(T);
+    unsafe impl<T> Send for Out<T> {}
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .use_current_thread()
+        .build()
+        .expect("one-thread rayon pool on the current thread");
+    let job = Local(f);
+    let out = pool.install(move || {
+        let job = job;
+        Out((job.0)())
+    });
+    out.0
+}
+
 /// User and system CPU time of this process, in nanoseconds.
 fn cpu_times_ns() -> (f64, f64) {
     let mut ru: libc::rusage = unsafe { std::mem::zeroed() };
@@ -388,7 +415,11 @@ fn ic_once(
         let m = ic_method(id, trials)?;
         let (u0, s0) = cpu_times_ns();
         let t = Instant::now();
-        let rep = solve(&m, inst, facts, target, seed)?;
+        let rep = if closure {
+            on_one_thread(|| solve(&m, inst, facts, target, seed))?
+        } else {
+            solve(&m, inst, facts, target, seed)?
+        };
         let wall = t.elapsed().as_nanos() as f64;
         let (u1, s1) = cpu_times_ns();
         if closure && !rep.unpriced.is_empty() {
@@ -460,7 +491,11 @@ fn rho_full_once(
     })?;
     let (u0, s0) = cpu_times_ns();
     let t = Instant::now();
-    let rep = solve(&m, inst, facts, target, seed)?;
+    let rep = if closure {
+        on_one_thread(|| solve(&m, inst, facts, target, seed))?
+    } else {
+        solve(&m, inst, facts, target, seed)?
+    };
     let wall = t.elapsed().as_nanos() as f64;
     let (u1, s1) = cpu_times_ns();
     if closure && !rep.unpriced.is_empty() {
