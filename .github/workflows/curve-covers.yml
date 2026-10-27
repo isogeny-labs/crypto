@@ -68,6 +68,12 @@ jobs:
           # verify-plan replays three immutable historical Git blobs.
           fetch-depth: 0
           filter: blob:none
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
@@ -112,6 +118,12 @@ jobs:
         with:
           fetch-depth: 0
           filter: blob:none
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -150,6 +162,12 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: /research/cover_transfer_assessment_20261013/lean/**
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
       - name: Build the conditional injectivity theorem and replay it in a fresh kernel
         uses: leanprover/lean-action@v1
         with:

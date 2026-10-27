@@ -80,6 +80,7 @@ SOURCES = {
     "f4_fp_ic_effect": "research/f4_fp_ic_effect_20261018/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
+    "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
     "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "quartic_tagged_p13": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
@@ -804,6 +805,46 @@ def lazy_members_component() -> dict:
     return {"rows": d["rows"], "unit": d["unit"], "class": d["class"], "note": d["note"],
             "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
             "source": SOURCES["lazy_members"], "validation": NOT_VALIDATED}
+
+
+def postgb_linear_stage_component() -> dict:
+    """The linear stage after F4 across Gröbner-basis corpora, from
+    research/postgb_linear_stage_20261026: per-family wall-time ratios of
+    the incumbent (sparse FGLM) and the dense stage over zero_dim_la's
+    fast_stage, and the jv_cover DLP run with each stage, copied from the
+    study's summary.json (made from its run records). A component speed-up
+    in wall time; counted multiplications ride beside it, and it moves no
+    row of tables A-C. Its standing comes from the study's VALIDATION.json."""
+    d = load(SOURCES["postgb_linear_stage"])
+    if d.get("schema") != "postgb_linear_stage.summary/v1" or not d["gates"]["pass"]:
+        raise SystemExit(f"{SOURCES['postgb_linear_stage']}: unexpected schema or a failed correctness gate")
+    study = "research/postgb_linear_stage_20261026"
+    errs = gate.check_evidence_dir(REPO / study / "validation", REPO)
+    fams = []
+    for f, v in d["sparse_over_fast"].items():
+        dn = d["dense_over_fast"].get(f)
+        fams.append({"family": f, "systems": v["systems"], "delta": v["delta"], "n": v["n"],
+                     "sparse_ms": v["median_ms"]["sparse"], "fast_ms": v["median_ms"]["fast"],
+                     "sparse_over_fast": v["geomean"], "ci95": v["ci95"],
+                     "dense_over_fast": dn["geomean"] if dn else None,
+                     "portable": d["ablation_sparse_over_portable_fast"][f]["geomean"],
+                     "host_a": d["host_a_sparse_over_fast"].get(f, {}).get("geomean"),
+                     "counted": [v["counted_ratio"]["min"], v["counted_ratio"]["max"]]})
+    dlp = [{"p": r["p"], "seed": r["seed"], "relations": r["relations"][1],
+            "lin_s": [x / 1e3 for x in r["lin_ms"]], "lin_ratio": r["lin_ms_ratio_sparse_over_fast"],
+            "s": r["s"], "s_over_rho": r["s_over_rho"], "s_over_rho_neg": r["s_over_rho_neg"],
+            "correct": all(r["correct"])} for r in d["dlp"]]
+    counted = [x for f in fams for x in f["counted"]]
+    s_change = [r["s"][1] / r["s"][0] - 1 for r in dlp]
+    return {"families": fams, "dlp": dlp, "systems": d["gates"]["systems"],
+            "counted_range": [min(counted), max(counted)], "s_change": [min(s_change), max(s_change)],
+            "gave_up": d["gates"]["fast_gave_up"],
+            "predictions": {k: v["held"] for k, v in d["predictions"].items()},
+            "class": "engineering", "unit": "median wall time, single thread (host B)",
+            "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["postgb_linear_stage"],
+            "validation": ("validated: replay certificate, validator report and the matched rho reference "
+                           f"with the §5a band ({study}/validation/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
 
 
 def secs(x: float) -> str:
@@ -1820,6 +1861,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
+        "postgb_linear_stage_component": postgb_linear_stage_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
         "quartic_twist_pair_component": quartic_twist_pair_component(),
@@ -2600,6 +2642,35 @@ def markdown(doc: dict) -> str:
     for r in ls["dlp"]:
         L.append(f"| {r['p']} | {r['seed']} | {r['relations']} | {r['s_before']:.4g} | {r['s_after']:.4g} | "
                  f"{r['s_ratio']:.2f} | {r['s_over_rho_before']:.0f} | {r['s_over_rho_after']:.0f} |")
+    pg = doc["postgb_linear_stage_component"]
+    L += ["", "## Linear stage after F4 across Gröbner-basis corpora", "",
+          f"Component speed-up, class {pg['class']}, in {pg['unit']}: from a monic grevlex F4 basis to every checked "
+          f"F_p point, on {pg['systems']} systems in five families (`{pg['study']}`, [report]({pg['report']})). "
+          "Leader: `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp–Massey, gcd(f, x^p − x) roots, "
+          "rational univariate read-out, AVX-512/AVX2 kernels), now the default `JV_LIN`. Incumbent: sparse FGLM "
+          "(the section above). Every arm returned the same solution set on every system; fast gave up (and fell "
+          f"back to dense) on {len(pg['gave_up'])}. Counted multiplications (sparse ÷ fast "
+          f"{pg['counted_range'][0]:.2f}–{pg['counted_range'][1]:.2f}×) are reported, not ranked. "
+          "It moves no row of tables A–C. " + pg["validation"], "",
+          "| family | systems | δ | sparse ms | fast ms | **sparse ÷ fast** [95%] | dense ÷ fast | portable fast | host A | counted sparse ÷ fast |",
+          "|:--|--:|--:|--:|--:|:--|--:|--:|--:|:--|"]
+    for f in pg["families"]:
+        dl = f"{f['delta'][0]}" if f["delta"][0] == f["delta"][1] else f"{f['delta'][0]}–{f['delta'][1]}"
+        L.append(f"| {f['family']} | {f['systems']} | {dl} | {f['sparse_ms']:.4g} | {f['fast_ms']:.4g} | "
+                 f"**{f['sparse_over_fast']:.2f}** [{f['ci95'][0]:.2f}, {f['ci95'][1]:.2f}] | "
+                 f"{'—' if f['dense_over_fast'] is None else format(f['dense_over_fast'], '.1f')} | {f['portable']:.2f} | "
+                 f"{'—' if f['host_a'] is None else format(f['host_a'], '.2f')} | {f['counted'][0]:.2f}–{f['counted'][1]:.2f} |")
+    L += ["", "Inside the IC run (`jv_cover --exp dlp`, same seeds and relations, `JV_LIN=sparse` → `fast`, "
+          f"same-process plain and negation-map rho; every log verified). Counted S changes by "
+          f"{100 * pg['s_change'][0]:+.1f}% to {100 * pg['s_change'][1]:+.1f}%; S over the negation-map rho, the matched "
+          "§5a reference, is the distance remaining.", "",
+          "| p | seed | relations | linear stage s | lin ÷ | S | S/rho | S/rho (negation map) |",
+          "|---:|---:|---:|:--|--:|:--|:--|:--|"]
+    for r in pg["dlp"]:
+        L.append(f"| {r['p']} | {r['seed']} | {r['relations']} | {r['lin_s'][0]:.1f} → {r['lin_s'][1]:.1f} | "
+                 f"**{r['lin_ratio']:.2f}×** | {r['s'][0]:.4g} → {r['s'][1]:.4g} | "
+                 f"{r['s_over_rho'][0]:.0f} → {r['s_over_rho'][1]:.0f} | "
+                 f"{r['s_over_rho_neg'][0]:.0f} → **{r['s_over_rho_neg'][1]:.0f}** |")
     al = doc["algebraic_ladder"]
     st, sw = al["slope_ic_trials"], al["slope_ic_wall"]
     L += ["", "## Algebraic-decomposition IC ladder (linear two-summand S3), outside tables A–C", "",
@@ -3681,6 +3752,39 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{r["s_after"]:.4g}</td><td>{r["s_ratio"]:.2f}</td><td>{r["s_over_rho_before"]:.0f}</td>'
                  f'<td>{r["s_over_rho_after"]:.0f}</td></tr>')
     P.append('</tbody></table>' + gh(ls["study"], 'Study, run report and raw records') + '</section>')
+
+    pg = doc["postgb_linear_stage_component"]
+    P.append('<section id="postgb-linear-stage-component"><h2>Linear stage after F4 across Gröbner-basis corpora</h2>'
+             f'<p>Component speed-up, class {esc(pg["class"])}, in {esc(pg["unit"])}: from a monic grevlex F4 basis to '
+             f'every checked F<sub>p</sub> point, on {pg["systems"]} systems in five families. Leader: '
+             '<code>zero_dim_la::fast_stage</code> (transposed Krylov, Berlekamp–Massey, gcd(f, x<sup>p</sup> − x) roots, '
+             'rational univariate read-out, AVX-512/AVX2 kernels), now the default <code>JV_LIN</code>. Incumbent: sparse '
+             'FGLM (the section above). Every arm returned the same solution set on every system; fast gave up (and fell '
+             f'back to dense) on {len(pg["gave_up"])}. Counted multiplications (sparse ÷ fast '
+             f'{pg["counted_range"][0]:.2f}–{pg["counted_range"][1]:.2f}×) are reported, not ranked. '
+             f'It moves no row of tables A–C. {esc(pg["validation"])}</p>'
+             '<table><thead><tr><th>family</th><th>systems</th><th>δ</th><th>sparse ms</th><th>fast ms</th>'
+             '<th>sparse ÷ fast [95%]</th><th>dense ÷ fast</th><th>portable fast</th><th>host A</th>'
+             '<th>counted sparse ÷ fast</th></tr></thead><tbody>')
+    for f in pg["families"]:
+        dl = f"{f['delta'][0]}" if f["delta"][0] == f["delta"][1] else f"{f['delta'][0]}–{f['delta'][1]}"
+        P.append(f'<tr><td>{esc(f["family"])}</td><td>{f["systems"]}</td><td>{dl}</td><td>{f["sparse_ms"]:.4g}</td>'
+                 f'<td>{f["fast_ms"]:.4g}</td><td><b>{f["sparse_over_fast"]:.2f}</b> [{f["ci95"][0]:.2f}, {f["ci95"][1]:.2f}]</td>'
+                 f'<td>{"—" if f["dense_over_fast"] is None else format(f["dense_over_fast"], ".1f")}</td>'
+                 f'<td>{f["portable"]:.2f}</td><td>{"—" if f["host_a"] is None else format(f["host_a"], ".2f")}</td>'
+                 f'<td>{f["counted"][0]:.2f}–{f["counted"][1]:.2f}</td></tr>')
+    P.append('</tbody></table><p>Inside the IC run (<code>jv_cover --exp dlp</code>, same seeds and relations, '
+             '<code>JV_LIN=sparse</code> → <code>fast</code>, same-process plain and negation-map rho; every log '
+             f'verified). Counted S changes by {100 * pg["s_change"][0]:+.1f}% to {100 * pg["s_change"][1]:+.1f}%; S over '
+             'the negation-map rho, the matched §5a reference, is the distance remaining.</p>'
+             '<table><thead><tr><th>p</th><th>seed</th><th>relations</th><th>linear stage s</th><th>lin ÷</th>'
+             '<th>S</th><th>S/rho</th><th>S/rho (negation map)</th></tr></thead><tbody>')
+    for r in pg["dlp"]:
+        P.append(f'<tr><td>{r["p"]}</td><td>{r["seed"]}</td><td>{r["relations"]}</td>'
+                 f'<td>{r["lin_s"][0]:.1f} → {r["lin_s"][1]:.1f}</td><td><b>{r["lin_ratio"]:.2f}×</b></td>'
+                 f'<td>{r["s"][0]:.4g} → {r["s"][1]:.4g}</td><td>{r["s_over_rho"][0]:.0f} → {r["s_over_rho"][1]:.0f}</td>'
+                 f'<td>{r["s_over_rho_neg"][0]:.0f} → <b>{r["s_over_rho_neg"][1]:.0f}</b></td></tr>')
+    P.append('</tbody></table>' + gh(pg["study"], 'Study, report, run records and validation') + '</section>')
 
     al = doc["algebraic_ladder"]
     st = al["slope_ic_trials"]
