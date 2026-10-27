@@ -2518,9 +2518,23 @@ fn run_child(
         out.read_to_string(&mut s).ok();
         s
     });
+    // The child's stderr goes to the log as it is written, so a segment that
+    // the host kills still leaves its checkpoint lines there.
+    let mut err_log = log.try_clone().expect("clone the log");
     let err_t = std::thread::spawn(move || {
         let mut s = String::new();
-        err.read_to_string(&mut s).ok();
+        let mut buf = [0u8; 4096];
+        loop {
+            match err.read(&mut buf) {
+                Ok(0) | Err(_) => break,
+                Ok(n) => {
+                    let chunk = String::from_utf8_lossy(&buf[..n]);
+                    s.push_str(&chunk);
+                    err_log.write_all(chunk.as_bytes()).ok();
+                    err_log.flush().ok();
+                }
+            }
+        }
         s
     });
     let started = Instant::now();
@@ -2553,9 +2567,6 @@ fn run_child(
     let wall = started.elapsed().as_secs_f64();
     let stdout = out_t.join().unwrap_or_default();
     let stderr = err_t.join().unwrap_or_default();
-    if !stderr.is_empty() {
-        write!(log, "{stderr}").ok();
-    }
     let rows: Vec<Value> = stdout
         .lines()
         .filter_map(|l| serde_json::from_str(l).ok())
