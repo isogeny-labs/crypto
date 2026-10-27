@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS schema_info (
 CREATE TABLE IF NOT EXISTS curves (
   slug                    TEXT PRIMARY KEY,           -- icv1-...
   icv1                    TEXT NOT NULL UNIQUE,       -- full ICV1 string
-  family                  TEXT NOT NULL CHECK (family IN ('prime', 'koblitz', 'binary')),
+  family                  TEXT NOT NULL CHECK (family IN ('prime', 'koblitz', 'binary', 'extension', 'fp4', 'hyperelliptic')),
   field_degree            INTEGER,                    -- m for GF(2^m)
   field_bits              INTEGER,                    -- bits of p for GF(p)
   group_order             TEXT NOT NULL,

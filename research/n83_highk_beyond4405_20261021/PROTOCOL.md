@@ -57,10 +57,10 @@ Stop every child at a frozen 2,400-second wall cap; preserve timeout, OOM,
 partial output and failed verification rows. Retire the Pod at the allocation
 deadline even if the scientific screen remains incomplete. The proposed new
 allocation envelope is at most 10 hours from provider creation to verified
-termination, at a provider-quoted rate no greater than $0.22/hour, plus a
-$0.25 reserve for billing uncertainty: an incremental ceiling of $2.45.
+termination, at a provider-quoted rate no greater than $0.20/hour, plus a
+$0.25 reserve for billing uncertainty: an incremental ceiling of $2.25.
 The earlier campaign's conservative upper charge was $5.710216 against its
-earlier $5 ceiling, giving a combined conservative bound of $8.160216 if
+earlier $5 ceiling, giving a combined conservative bound of $7.960216 if
 the new envelope is fully used. This new ceiling requires owner approval
 before any paid allocation. A quote above the rate cap, missing creation
 timestamp, stale predecessor Pod, or inability to confirm termination aborts
@@ -69,25 +69,20 @@ immediately after sealing the allocation receipt. It reads the live Pod
 identity, rate and provider creation time, then writes `watchdog_ready.json`.
 Copy that file to `/tmp/n83_fixed31_watchdog_ready.json` on the Pod before
 starting `launch_on_pod.sh`; the launcher checks its allocation hash, Pod ID,
-freshness and five-minute retirement margin. The controller transfers the raw
-archive on producer completion or at the margin, verifies its checksum,
+freshness and five-minute retirement margin. Before compilation, the launcher
+arms an independent Pod-side deletion task against the same allocation and
+readiness receipts. That task requests Pod
+deletion at `stop_after_utc` if the external controller has stopped. RunPod's
+`terminateAfter` creation field is not an enforced expiry; the two deletion
+paths reduce spend risk but cannot guarantee an account billing ceiling if
+both lose provider access. The Pod guard's archived `ARMED` receipt is a
+provider-custody admission gate. The controller transfers the raw archive on
+producer completion or at the margin, verifies its checksum,
 issues the provider termination mutation even if transfer or verification
 failed, and records `provider_post_terminate.json` after the Pod is absent.
 It retires the Pod at least five minutes before the 10-hour provider deadline.
 An absent termination receipt or failed provider deletion leaves spend and
 the Tier 1 result unadmitted.
-
-The preallocation quote amendment on 2026-10-21 raises only the proposed
-rate and derived spending ceilings. The earlier $0.20/hour, $2.25 proposal
-has no allocation receipt or Tier 1 measurements. The
-[RunPod Community Cloud catalog](https://www.runpod.io/gpu-models) currently
-lists an RTX 3090 at $0.22/hour with 125 GB host RAM and 16 vCPUs; the
-lower-priced RTX A5000 lists 25 GB host RAM, below this protocol's 32 GiB
-minimum. The catalog is a lead, not a live allocation quote. Admission still
-requires the provider's actual rate, at least 32 GiB effective cgroup memory,
-four CPUs of quota, and every existing correctness, noise and custody gate.
-The sealed source, candidates, points, event order, per-child limits and
-ten-hour lifetime are unchanged.
 Run the controller from outside the Pod in a persistent terminal or service:
 
 ```sh
