@@ -1,3 +1,41 @@
+<!-- BEGIN SHARED SESSION LOG -->
+
+## Session log
+
+At the start of every session, read the newest dated Markdown file in
+`docs/session-logs/`.
+
+Write today's log at `docs/session-logs/YYYY-MM-DD.md`, using the current date.
+These paths are relative to the repository or workspace root.
+Create the folder and file if missing. Claude and Codex share this directory.
+
+Do not wait for the user to end the session. Append a timestamped entry after
+every finished piece of work, after every decision, and whenever we switch
+tasks. Preserve previous entries. Record concrete facts from commands and
+logs; distinguish verified results from plans or assumptions.
+
+Every entry has four headings:
+
+- What was done (commands, files, features)
+- Decisions made (and why)
+- Open threads (unfinished, pick up next time)
+- Errors (what went wrong, how it was handled)
+
+Commit project handoffs with the related PR so they survive across sessions.
+Keep entries about this project; do not copy private global logs or chat transcripts.
+
+<!-- END SHARED SESSION LOG -->
+
+Run authorized x86 CPU experiments and crypto benchmarks through
+[`isolab-eks`](.claude/skills/isolab-eks/SKILL.md) on EKS Spot by default
+(owner, 2026-10-25; AGENTS.md §9a). Use the executor's existing AWS identity,
+submit from the agent, and verify source/image identity and S3 hashes. L2
+benchmarks require native L2/replay/A/A admission. Requested resume uses the
+separate CRIU/EBS contract. The
+experiment director freezes this route in the task card; the executor runs it
+unchanged. Preserve explicitly requested environments and keep local development
+checks local. Loading instructions alone does not authorize an experiment.
+
 Open pull requests ready for review, never as drafts, whatever the runtime
 defaults to, and mark an existing draft ready; only a user request in the task
 makes a draft. Enable auto-merge as you open the PR (`gh pr merge <n> --auto
