@@ -34,3 +34,5 @@ Freeze a follow-up protocol that separates input expansion from standard-basis w
 ## Resolution and history
 
 Unresolved. The v1 launch failed before target data; v2 corrects permissions and preserves the original mathematical inputs and limits. Merging the runner and evidence does not resolve the outstanding measurements.
+
+The user's follow-up permits first or last fall identification, retaining all families and m=2..9 and allowing n51/53. R3 completed on the retained n83 inputs: 32 explicit binary/Koblitz witnesses certify first fall 2, while 16 prime coefficient-minor certificates exclude falls through degree 4 only. All 48 fresh-process replays passed; [R3 evidence](../research/n83_ic_degree_sweep_20261027/fall/experiment.export.json). This progress does not resolve regularity or last fall. Exact prime first/last values are the remaining active-goal gap. The next step is a higher-degree prime certificate with an explicit lower-degree exclusion, or the authorized smaller-n fallback. A leading-form nontrivial syzygy and an earliest new affine degree fall must be identified separately if their definitions differ.

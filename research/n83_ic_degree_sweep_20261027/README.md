@@ -1,5 +1,7 @@
 # N83 balanced index-calculus degree sweep
 
+**First-fall follow-up (R3):** On all retained n83 inputs, Koblitz and general binary have certified first fall 2 at every m=2..9, for both planted and natural targets (32 exact witnesses). Prime inputs have a certified lower bound of 5 (16 bound-only certificates); exact prime first/last degrees remain unresolved. All 48 fresh-process replays and 58 raw manifest entries passed. This does not determine last fall or regularity. See [certificate report](fall/reports/report.md), [PDF](fall/reports/report.pdf), [frozen protocol](fall/protocol.json), [exact certificates](fall/evidence/results.json) and [export](fall/experiment.export.json). The active user goal permits n51/53 as a fallback and remains open for unresolved prime cells.
+
 Requested grid: Koblitz, general binary and prime curves, n=83, decomposition arity m=2..9, balanced candidate abscissa domain 2^floor(83/m). This study preserves all 24 cells and attempts a planted and a natural target with two distinct computations each (96 attempts).
 
 **Observed:** all 96 attempts ran; 53 exited at the process time limit and 43 with Singular's no-more-memory code. No top-form degree or affine final-basis degree completed. Forty attempts stopped before the solver-start marker; 56 entered standard-basis computation. All 533 raw-manifest entries passed SHA-256 verification. One time-limit exit also printed a memory diagnostic; classifications follow the exit status and retain that diagnostic separately.
