@@ -28,6 +28,19 @@ lemmas. These equalities concern maps into weighted Proj; the theorem that
 the separately glued two-chart scheme is globally isomorphic to weighted
 Proj, with compatible local stalks, remains open.
 
+`WeightedProjSmoothness.lean` proves the scheme-level local-on-source
+reduction `smooth_of_two_basic_opens`: for any morphism from the actual
+weighted Proj to a scheme, Smooth on both the `X` and `Z` basic-open
+restrictions implies Smooth globally. It uses the checked two-open cover.
+The two chart Smooth premises have not been established, so global
+smoothness remains open. `WeightedProjGlobalGlue.lean` defines both actual
+chart morphisms into weighted Proj by composing the checked chart
+isomorphisms with the basic-open immersions. The next missing lemma is
+scheme-level naturality between each separately glued principal-open
+embedding and the canonical `D₊(XZ)` immersion. The corresponding ring
+squares are checked, but the global scheme isomorphism and local-stalk
+comparison are still open.
+
 This identifies both scheme charts, establishes their finite affine cover, proves properness over `K`, and checks the pointwise and ring-global Jacobian facts on their stated loci, overlap-coordinate identities, a canonical overlap-ring equivalence, its images of the two affine generators, scalar preservation, equality of the induced Spec transition with the separately glued scheme's transition, and compatibility of both localized chart embeddings with the actual common weighted-Proj immersion. Scheme-level smoothness, construction of the global comparison with the separately glued curve, local-stalk transport, the `Pic⁰` class equation, and the Rust-to-Lean execution bridge remain open. The finite-zero multiplicity argument in [PROOF_AUDIT.md](../PROOF_AUDIT.md) is written mathematics, not a Lean divisor theorem.
 
 The new source SHA-256 values, in dependency order, are `4f775fb6ac97fb2d478c2e550a955351df0ab730a5e344712ca5f4930cfb61b5` (`WeightedRingComponent`), `b810dd4a6024bc77a7b8de1916c217caf8e1a0de2d555448c73a5d2515ff865c` (`WeightedRingGraded`), `f02b2f827ca8123f3daabbf19b15d25f9f7793ab7693e8a795bec5572a9d4010` (`WeightedChartKernelRec`), `ed6c4bc5b88acefa45fa00ed6ee83655b580e41e8f1d4fa0186777b821abab89` (`WeightedChartRoute`), `fbcb3cae7cc4c9d7f0722da5f546892bb4cde848eb072580486be3c7a9ecd433` (`WeightedChartIso`), `ffa7dd90d349648f22ab4d86cb18d557f6fb1b93bf5bd78febd116d4e95afd29` (`WeightedProjSchemeChart`), and `58dd0a75dbc7544cdd127314a0ffea33d6551766ddc0cc0dc2774f4861f243a0` (`WeightedProjCover`). The five further files are `19745cadc9e00fdb5e052e872c0a3739fe9856390ea10c65aa8a441f8836367d` (`WeightedChartDehomog`), `2ce21319bf69de82a24d99e8d118ce6eedb132134eecf17b03c2f0b627c52441` (`WeightedInfinityOrdinary`), `95e0e583514cb3f65ca14040079f7a5be68970e38e15e313265af0bdf3c3e17c` (`WeightedProjInfinityChart`), `d0861dc892c5d7f047ae08d95948e59b68e1df37958475fca59f129649644ef8` (`WeightedProjProper`), and `59109ab636ff9331997cfcb06a1190c5a245ff8385e783a7d2de5761e714c157` (`WeightedProjBase`). The bounded follow-ups are `e0618f97117ca6ba52010da028958cdba26dcf2e5909a1d358e8717d9a709ff9` (`WeightedProjSmoothPoints`), `75fff6c37fcced8bf28e33afc5af3d30dee6dcb07a6e2d8caa1520458fbb2162` (`WeightedJacobianIdeal`), and `12c2308c91e42aab0c090afd03d5a86634896c590f76def0b12a1c8a5a33eca2` (`WeightedOverlapScratch`), and `0dec04a522aacdbccd6cfe4c7956a11838ca372eafadc5ddc0fbb86d5a388e75` (`WeightedOverlapFull`), and `ba604cbd287f179804be77598c72e78b41c9a968feadea63a1bef6bd70603eed` (`WeightedOverlapEquality`), and `06eecf27628466109d71494edb50c279798fe987090a93b43c2c3bab5e1ea720` (`WeightedOverlapMapEquality`), and `dbd8e1a5489ee6fd158e2541b2576ea4cc2bde9edc86ead716553b74399d5925` (`WeightedOverlapScalar`). All nineteen compiled with Lean `v4.34.1` and Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612`, exit status 0. Their theorem axiom audits list only `propext`, `Classical.choice`, and `Quot.sound`; no `sorryAx` occurs.
@@ -58,6 +71,15 @@ the axiom audits of `zCommon_symm_awayMap`, `xCommon_symm_awayMap`,
 `Classical.choice`, and `Quot.sound`. A transient host `Disk quota exceeded`
 opening Mathlib's `KernelPair.olean` occurred during an earlier attempt;
 retry without deleting saved evidence completed successfully.
+
+The conditional smoothness reduction in `WeightedProjSmoothness.lean` has
+SHA-256 `ce40d3f812e5b34f5776e95f4bed85e0a241430a2374763d922ded7ef9dcfd85`.
+The two actual chart morphisms in `WeightedProjGlobalGlue.lean` have SHA-256
+`882540f48615916aafb652a05eecfbc8dbca9302d68e852fd21cc4218a0e3115`.
+Both `lake env lean WeightedProjSmoothness.lean` and
+`lake env lean WeightedProjGlobalGlue.lean` exited 0 under the pinned Lean
+and Mathlib revisions. Their axiom audits list only `propext`,
+`Classical.choice`, and `Quot.sound`; neither file contains `sorry`.
 
 The required `RUST_TEST_THREADS=1 cargo test --release --lib --offline --locked`
 was run with these proof-only changes. The [first raw log](validation/release-library-first.log)
