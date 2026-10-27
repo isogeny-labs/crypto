@@ -66,3 +66,45 @@ Release staging failed its native cover-link check because the canonical registr
 Every one of the 15,791 existing report rows, every existing graph curve row, all 15,789 existing cover objects and all 15,791 existing map objects are unchanged. Exactly 4,801 rows/maps/covers are added from the already-present registry. Root --check and a cold installed layout both pass, including construct/verify, identity arithmetic, catalog export and fixed-F8 order 486. These establish the existing native geometry contract; subgroup transfer and ECDLP advantage are not established.
 
 The exact semantic delta, before/after hashes, binary hashes, commands and outputs are retained in the evidence directory. These current generated metadata files are explicitly kept in Git by .artifacts/config.json and exempted as delta-compressible catalog text by scripts/check-large-files.sh; neither policy changes. Frozen experiment records and historical source snapshots are untouched. The separate transfer-assessment builder still binds its older cohort and is handled as a distinct source-bound update.
+
+## Keep the dated transfer cohort and repair its derived reports
+
+The transfer assessment explicitly declares catalog commit
+728304718cb0ab6df70da620a908a5f76f175293. Its builder and independent verifier
+now read the three catalog inputs from that immutable commit, while ordinary
+source/evidence artifacts continue to bind current working-tree bytes. A missing
+Git snapshot fails rather than falling back to the live catalog. Three snapshot
+controls and six stale-catalog refusal controls pass. The existing merge gate
+now rejects stale registry/checker bindings without waiting for Release.
+
+All 17 scientific and contract sections outside source_artifacts are exactly
+equal before and after generation, including profiles, memberships, typed
+bindings, overlays, coverage, statuses and open obligations. All six independent
+authoritative semantic digests remain unchanged. The complete independent
+verifier reports zero problems; deterministic generation and the pinned Draft
+2020-12 schema check pass. This preserves the 15,791-map/979-EC1 assessment and
+does not apply its conclusions to the 4,801 later maps or 15 later EC1 bindings.
+The problem record and report explicitly retain that coverage gap.
+
+The three archived visual/report assets were retrieved through authenticated
+manual workflow 40576338037 and checked against every original size and SHA-256.
+This exposed a stale PDF describing 2,572 maps. Both diagrams and the PDF were
+rebuilt from the current DOT/Markdown sources. The original PDF remains under
+store digest 1f6cde8011714af43814bd28aca117e048f3d6cf3f58eba9c444712328cbed8e.
+The existing policy explicitly keeps PDFs in Git, so its obsolete store pointer
+is removed and the newly derived PDF is committed; PNGs use the ordinary trusted
+artifact migration. No store object is overwritten or removed.
+
+Tectonic 0.17.0 was verified against its official release digest, but its bundle
+endpoint returned HTTP 403. The installed XeLaTeX engine rendered the same
+Markdown successfully. The metadata helper records the actual engine and pypdf
+version, and the documented fallback preserves this provenance. The PDF's exact
+coverage Subject is correct and its first page was visually inspected. The
+new/old hashes, exact section-equality proof, successful and failed logs and
+renderer details are retained with the earlier native evidence.
+
+Manual transfer job 122439966503 separately exhausted its five-minute timeout in
+full checkout. Its checkout now materializes the assessment's source/evidence
+surface while retaining Git history for the snapshot. The timeout and every
+validation remain unchanged. The bounded replacement job retrieved the replay
+assets by 20:16:40 UTC. Final current-head hosted checks remain necessary.
