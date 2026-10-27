@@ -309,6 +309,54 @@ class WorkflowWiringPaths(unittest.TestCase):
         )
 
 
+class WorkflowSparsePatterns(unittest.TestCase):
+    """The pull step needs tools/artifacts and the .artifacts config in a sparse checkout."""
+
+    def test_block_list_gets_tools_and_config(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout-cone-mode: false",
+                 "          sparse-checkout: |",
+                 "            /docs/x/"]
+        out = wire_workflows.add_sparse_pattern(block, "      ")
+        self.assertEqual(out[-3:], ["            /docs/x/", "            /tools/artifacts/", "            /.artifacts/"])
+
+    def test_scalar_pattern_becomes_a_list(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout: taskq/deploy/eks-karpenter"]
+        out = wire_workflows.add_sparse_pattern(block, "      ")
+        self.assertEqual(out[2:], ["          sparse-checkout: |",
+                                   "            taskq/deploy/eks-karpenter",
+                                   "            tools/artifacts",
+                                   "            .artifacts"])
+
+    def test_existing_patterns_are_not_duplicated(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout: |",
+                 "            tools/artifacts",
+                 "            .artifacts"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(block, "      "), block)
+
+
+class WorkflowPullStep(unittest.TestCase):
+    WF = "jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n      - run: make\n"
+
+    def test_step_installs_the_aws_cli_when_absent(self):
+        out, _ = wire_workflows.wire(self.WF, ["docs/x"])
+        self.assertIn("if ! command -v aws >/dev/null; then", out)
+        self.assertIn('export ARTIFACTS_AWS="$artifacts_cli_aws"', out)
+        self.assertIn("awscli==1.46.2", out)
+        self.assertTrue(out.endswith("      - run: make\n"))
+
+    def test_rewiring_is_idempotent_and_refreshes_a_stale_step(self):
+        once, _ = wire_workflows.wire(self.WF, ["docs/x"])
+        self.assertEqual(wire_workflows.wire(once, ["docs/x"])[0], once)
+        stale = once.replace("pull --jobs 16 docs/x", "pull docs/old")
+        self.assertEqual(wire_workflows.wire(stale, ["docs/x"])[0], once)
+
+
 class S3Argv(unittest.TestCase):
     def setUp(self):
         cfg = artifacts.Config(root=Path("."), remote="s3://bucket/store", endpoint=None, read_url=None,
