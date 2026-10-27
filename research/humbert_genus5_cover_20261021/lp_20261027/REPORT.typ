@@ -5,7 +5,7 @@
 #set heading(numbering: "1.")
 
 #align(center)[
-  #text(size: 15pt, weight: "bold")[Single large prime on the genus-5 cover:\ a confound, a baseline fix, and a crossover]\
+  #text(size: 15pt, weight: "bold")[Single large prime on the genus-5 cover:\ a confound, a baseline fix, and an exploratory crossover]\
   #v(2pt)
   Study `research/humbert_genus5_cover_20261021/lp_20261027` · 2026-10-27 · follows PR \#2580
 ]
@@ -80,13 +80,17 @@ one-round instances the only difference is a column scan of the relation rows, s
 likely noise, but Q1 is falsified as written. Q2, lp:0.5 not faster against the fixed baseline at
 $q <= 8009$: holds (0/5, 0/5 and 2/5 seeds faster; medians 0.71, 0.78, 0.97). Q3 (exploratory):
 at $q = 12007$ lp:0.5 is faster on 5/5 seeds, median 1.08 (1.06–1.33), outside that $q$'s A/A
-band (0.968–1.004).
+band (0.968–1.004). This is an exploratory diagnostic, not an established crossover: the runs are
+wall time on an unisolated shared VM with no reserved or pinned core and no contention
+admission, and the A/A arm measures repeat spread, not uncontended execution (AGENTS.md
+requires isolated execution for wall-clock evidence). The crossover stays unestablished until
+matched isolated measurements support it.
 
 *Reading.* The precheck is a baseline fix: it removes repeated Wiedemann solves, and on
 one-round instances it adds only a column scan (11 of 12 such instances were not below the A/A floor). Against the fixed baseline, a single large prime costs more in
 relation search (2.1–3.0× the candidates at $alpha = 0.5$) than it saves in linear algebra up to
-$q approx 8000$, and starts to pay at $q = 12007$, where the baseline's linear algebra is large.
-This matches the cost shapes: relation search grows about linearly in $q$, sparse linear algebra
+$q approx 8000$; at $q = 12007$ the unisolated runs suggest it starts to pay, where the
+baseline's linear algebra is large (exploratory, see Q3). That would match the cost shapes: relation search grows about linearly in $q$, sparse linear algebra
 about quadratically. At $q = 12007$ the median distance to rho moves from 4.03 (v1 baseline) to
 3.32 (precheck) and 3.08 (lp:0.5 with precheck). Rho is still faster at every $q$.
 
@@ -104,7 +108,8 @@ wall time only.
 
 = Limits
 
-- Toy sizes; 5 instances per $q$; one host with no isolation.
+- Toy sizes; 5 instances per $q$; one host with no isolation, so every wall-time ratio here is
+  exploratory until isolated measurements replicate it.
 - Only single large primes; residuals with two outside points are dropped (about 7,800 per
   instance at $q = 8009$, $alpha = 0.5$), which a double-large-prime variant could use.
 - The validation gate (replay certificate, validator report, `VALIDATION.json`) is not done, so
@@ -114,5 +119,8 @@ wall time only.
 
 `PROTOCOL.md`, `PROTOCOL_v2.md`, `results/campaign.jsonl`, `results/v2.jsonl` (+ `.stderr`),
 `results/summary.md`, `results/summary_v2.md`, `results/summary_v1.csv`, `results/summary_v2.csv`,
-the superseded and contaminated rows. Reproduce: build the crate one directory up, then
-`run_campaign.sh` and `run_v2.sh`; `python3 analyze.py`; `python3 analyze_v2.py`.
+`results/instances_v1.csv`, `results/instances_v2.csv`, the superseded and contaminated rows.
+Tables are computed in Rust by `humbert summarize-lp <dir>` (it rejects duplicate records);
+`plot_lp.py` only draws the figures from those CSVs. Reproduce into a new directory:
+`run_campaign.sh <new-dir>` and `run_v2.sh <new-dir>` (they refuse an existing directory;
+`BIN` and `BIN_SHA256_PREFIX` select and check a frozen binary), then `humbert summarize-lp <new-dir>`.

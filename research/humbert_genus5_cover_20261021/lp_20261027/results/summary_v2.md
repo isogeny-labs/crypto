@@ -1,6 +1,4 @@
-runs: 80; complete instances: 20; all correctness gates pass: True
-
-Per instance (t_ic in s; rounds = LA rounds):
+runs: 80; complete instances: 20; all correctness gates pass: true
 
 | q | seed | v1 t_ic (rounds) | pre t_ic (rounds, ext.) | M1 v1/pre | A/A pre/pre_aa | lp50pre t_ic (rounds) | M2 pre/lp50pre |
 |--:|--:|--:|--:|--:|--:|--:|--:|

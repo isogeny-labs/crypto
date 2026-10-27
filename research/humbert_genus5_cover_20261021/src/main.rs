@@ -10,6 +10,7 @@ mod cover;
 mod curve;
 mod field;
 mod la;
+mod lpsummary;
 mod poly;
 
 use cover::*;
@@ -37,6 +38,12 @@ fn main() {
             }
         }
         Some("verify") => verify(args[2].parse().unwrap(), args[3].parse().unwrap(), args[4].parse().unwrap()),
+        Some("summarize-lp") => {
+            if let Err(e) = lpsummary::run(&args[2]) {
+                eprintln!("summarize-lp: {e}");
+                std::process::exit(1);
+            }
+        }
         Some("attack") => attack(args[2].parse().unwrap(), args[3].parse().unwrap(), args[4].parse().unwrap(), &args[5]),
         _ => eprintln!("usage: humbert classify | verify p twist seed | attack p twist seed full|iota"),
     }
@@ -611,6 +618,18 @@ mod tests {
             assert_eq!(mulr(xd[c], id, r), mulr(xw[c], iw, r));
             assert_eq!(mulr(xd[c], id, r), mulr(hidden[c], invr(hidden[0], r), r));
         }
+    }
+
+    #[test]
+    fn summarize_lp_parses_records_and_rejects_duplicates() {
+        let r = lpsummary::Rec::parse(r#"{"tag":"pre","order":2,"p":4001,"place_degrees":[4, 4],"solved":true,"t_ic_total":5.25}"#).unwrap();
+        assert_eq!((r.s("tag"), r.u("p"), r.b("solved"), r.f("t_ic_total")), ("pre".to_string(), 4001, true, 5.25));
+        let dir = std::env::temp_dir().join(format!("humbert-dup-{}", std::process::id()));
+        std::fs::create_dir_all(dir.join("results")).unwrap();
+        std::fs::write(dir.join("results/v2.jsonl"), "{\"tag\":\"pre\",\"p\":1,\"seed\":1}\n{\"tag\":\"pre\",\"p\":1,\"seed\":1}\n").unwrap();
+        let e = lpsummary::run(dir.to_str().unwrap()).unwrap_err();
+        assert!(e.contains("duplicate record"), "{e}");
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 
     #[test]
