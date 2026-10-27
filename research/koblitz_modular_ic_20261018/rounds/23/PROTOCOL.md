@@ -150,3 +150,12 @@ Recover the first-host Tate source-factor checks in the compact replay:verify
 both exact original residual factorizations and cofactorA=1 on the entire
 original SS5 fiber. This restores a missing raw bridge without repeating the
 complete colon computation;its literal h/lift certificate already survives.
+
+## Frozen source-bound rejection control
+
+The first-host corrupt-lift control's raw output was lost. Recover the fail-closed
+control in ss-corrupt:alter the actual compact inverse by adding1,leaving every
+original input and subsequent check unchanged. The native unit identity must
+emit its nonzero residual/error;the wrapper must reject even if Singular exits0
+and later prints a success marker. This is an expected rejection,not a valid
+source certificate. Same4GiB/1200s cap and checkpoint rule.

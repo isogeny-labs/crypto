@@ -3,7 +3,7 @@
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 repo=$(git -C "$here" rev-parse --show-toplevel)
-name=${1:?choose ss-compact,ss-unit,z-components,z-smooth}
+name=${1:?choose ss-compact,ss-corrupt,ss-unit,z-components,z-smooth}
 attempt=${2:?supply a fresh attempt basename}
 mkdir -p "$here/runs"
 base="$here/runs/$attempt"
@@ -11,10 +11,10 @@ base="$here/runs/$attempt"
 "$repo/scripts/checkpoint.sh" gate > "$base.gate.log" 2>&1
 case "$name" in
  ss-unit) cp "$here/SS23-unit.sing" "$base.sing"; marker=SS23_UNIT_LIFT_ALL_CHECKS_PASS ;;
- ss-compact|z-components|z-smooth)
+ ss-compact|ss-corrupt|z-components|z-smooth)
   awk '/^poly unitprod=1;/{exit} {print}' "$here/../22/runs/cm22-incidence.sing" > "$base.sing"
   case "$name" in
-   ss-compact) cat "$here/SS23-certificate.sing" "$here/SS23-compact.sing" >> "$base.sing";marker=SS23_COMPACT_ALL_CHECKS_PASS ;;
+   ss-compact|ss-corrupt) cat "$here/SS23-certificate.sing" "$here/SS23-compact.sing" >> "$base.sing";marker=SS23_COMPACT_ALL_CHECKS_PASS ;;
    z-components|z-smooth)
     sed -n '2p' "$here/../22/runs/cm22-saturated.dump" >> "$base.sing"
     if [ "$name" = z-components ];then cat "$here/Z23-components.sing" >> "$base.sing";marker=Z23_COMPONENTS_ALL_CHECKS_PASS
@@ -22,6 +22,7 @@ case "$name" in
   esac ;;
  *) echo 'unknown native case' >&2;exit 1 ;;
 esac
+if [ "$name" = ss-corrupt ];then sed -i 's/^poly inv=/poly inv=1+/' "$base.sing";fi
 sha256sum "$base.sing" > "$base.source.sha256"
 git -C "$repo" rev-parse HEAD > "$base.source-revision.txt"
 date -u +%FT%TZ > "$base.started-utc.txt"
