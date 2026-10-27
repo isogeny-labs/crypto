@@ -24,7 +24,7 @@ pilot, confirmation, timing experiment or new parameter search.
 | Check | Observed status |
 |---|---|
 | `cargo check --release --lib --example conductor_gap_confirmation --offline` | Pass |
-| Full `cargo test --release --lib --offline` | Incomplete: 5,036/5,037 terminal names, 13 initial failures; nine pass focused reruns with permitted local TCP access, four parent-code failures persist |
+| Full `cargo test --release --lib --offline` | Completed with exit 101: 4,902 passed, 13 failed, 122 repository-ignored; zero measured/filtered; all 5,037 names terminal |
 | Focused `cargo test --release --example conductor_gap_confirmation --offline` | 12 pass, zero failed/ignored/filtered |
 | Release example and backlog build | Pass |
 | Fresh `plan` compared with the retained allocation | Byte-identical: 1,011,591 bytes, SHA-256 `bf8ebc6255d660c4b9d34dc9843958eacc4182ee593f85f50e73284c9abe7ea5` |
@@ -40,8 +40,9 @@ pilot, confirmation, timing experiment or new parameter search.
 | Whitespace check against actual parent | Pass |
 | Repository-wide workflow artifact wiring | Exit 1; reports two unchanged parent workflows lacking artifact pulls |
 
-Native validation is complete. The full library command still has no final
-result; publication does not claim a passing full suite or exact-head CI.
+Native validation is complete. The full library command has now completed
+with failures, and the previously unfinished walk case passed. Publication
+does not claim a passing full library suite or exact-head CI.
 
 See [raw development traces](traces.md), [native allocation audit](allocation-audit.json),
 [blocked preflight](readiness.json), [merge-preservation receipt](merge-review.json),
@@ -50,6 +51,20 @@ and [site-input classification](site-input-plan.json). These are additional
 validation records; the original checks are preserved.
 
 ## Full-library execution and focused diagnosis
+
+**Final result observed 16:09 UTC:** exit **101**, **4,902 passed, 13 failed,
+122 repository-ignored, zero measured/filtered**. All 5,037 test names have a
+terminal result. The previously unconfirmed `jv_isogeny_walk` end-to-end case
+passed. Both owned processes are absent; no timeout, signal or full rerun was
+needed. See the [appended final receipt](library-final.json) and
+[complete failure footer](library-final-output.md).
+
+The full raw log is 438,245 bytes, SHA-256
+`e891b5147f4fdb17ff730d97cd8fe8e26822eb2f9096752e6079676a18fc0bcd`.
+It remains local-only, not durably uploaded. The original 14:46 snapshot and
+its receipt below remain preserved. The nine subsequent passing network
+reruns do not retroactively turn the original 13-failure aggregate into a pass;
+four focused parent-code failures still reproduce.
 
 At 14:46 UTC the full run has 4,901 passing, 13 failed and 122 repository-ignored
 terminal test names; the single remaining case is
@@ -71,9 +86,9 @@ The active full capture remains at
 publication snapshot is 431,637 bytes, SHA-256
 `a99f4c179ac774cf84bbd0ac117dfc672a9c5d32a38fec6352e7bfec4a189528`.
 It is local only, not durably uploaded or placed in Git contrary to artifact
-policy. The existing process is tracked for the authoring follow-up; no full
-rerun is launched. A future timeout must remain failed/incomplete and cannot
-be treated as a passing or inapplicable check.
+policy. The process completed naturally after this historical snapshot; no
+full rerun was launched. The old process-supervision/timeout instruction is
+retired, and its PIDs must not be reused for further process control.
 
 ## Parent evidence and setup limits
 
@@ -110,6 +125,17 @@ unmodified wiring check subsequently finished with the two diagnostics above.
 No authentication configuration, workflow, evidence record or gate was changed.
 
 ## Scientific and publication limits
+
+The [pre-publication CI snapshot for 3a8acd764](ci-3a8-20261027T1609Z.json)
+contains all five all-event runs and all five jobs: two success, two cancelled
+without runner/steps, and the gate queued. Both cancellation annotations say
+the run was cancelled by `aburan28`; this session did not cancel or rerun them.
+They remain unpassed. The successful LLM job explicitly skipped review because
+no provider is configured. No submitted review, inline feedback or thread was
+returned; old Codex feedback does not approve the current head. Artifact-autofix
+success is not a pass of the required `artifacts` check. This snapshot is scoped
+to 3a8acd764 and cannot certify a later documentation head or the complete
+required gate set.
 
 The prospective allocation and all scientific requirements are unchanged.
 The planner/auditor/preflight do not execute solvers. Repository unit tests are

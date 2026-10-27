@@ -14,6 +14,14 @@ remain historical. See the separate [current-parent validation record](checks/cu
 for the follow-up's actual results and remaining gates. Local validation does
 not establish successful exact-head CI, review or merge authorization.
 
+The [appended final library receipt](checks/current-parent-20261027/library-final.json)
+now confirms exit 101: 4,902 passed, 13 failed, 122 repository-ignored; all 5,037
+names are terminal. The formerly unconfirmed end-to-end walk test passed.
+Nine network cases pass focused reruns with local TCP permission, but the four
+parent-code failures remain and the original full aggregate stays failed.
+The earlier progress snapshot is retained; no timeout, rerun or process signal
+was needed. The original-base incomplete run below remains historical.
+
 ## Original publication context
 
 The publication branch starts at the actual parent #2430 source-branch head
