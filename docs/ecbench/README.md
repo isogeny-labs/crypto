@@ -440,6 +440,7 @@ default; the ids are:
 | `claw.pair_table` | claw | the four-point signed-Frobenius pair claw (cryptanalysis#175): known-log orbit base, target-independent quotient pair table |
 | `ic.pipeline`, `ic.pipeline_counted` | ic | the index-calculus pipeline (factor base, oracle, relations, linear algebra, verification), and the same with the relation charge rebuilt from counted work |
 | `ic.large_prime`, `ic.shared_rank` | ic | the large-prime variation and the shared-rank adapter on binary curves |
+| `ic.koblitz_descent` | ic | the ledger §23 one-target Koblitz index calculus as `ic price --single-target` runs it (subgroup-orbit base, folded pair table, aimed m = 3 collection, sparse logs, walked m = 2 descent), every stage charged by counted group operations; odd `n < 64` Koblitz curves |
 | `ic.k4_gaudry` | ic | Gaudry's k = 4 index calculus on `E(F_{p⁴})`, `fp4_translation` curves only |
 | `ic.hyperelliptic` | ic | the hyperelliptic thread's index calculus (ADH/Gaudry: degree-1 places folded by ±, factor-base walk, sparse elimination mod `r`, optional single large primes) on a genus 2–4 Jacobian, `hyperelliptic_*` curves only |
 | `ic.cm_folded_native_v1`, `ic.cm_folded_recurrence_v1`, `ic.cm_folded_native_d43_v1` | ic | the CM scalar-orbit signed MITM2 controls with a native backend, prime curves only |
@@ -467,6 +468,7 @@ Curves of higher genus and the transfers are described in
 | `transfer.isogeny` | the inner method's phases (`target:*`, on the isogenous curve, the same unit), the source check `[k]G` (`verify`) | the kernel search and the two point maps, `F_p` multiplications and inversions (`transfer`, 0 GAE) |
 | `transfer.quartic_cover`, `transfer.ghs_cover` | everything: the cover's construction (`cover_setup`, quartic only), the two pullbacks (`transfer`, with the two additions `G + B`, `Q + B` on `E` for the quartic), the inner solve (`target:solve`), the check on `E` (`verify`); Jacobian work counted in `F_p` multiplications and divided by `c_E`, measured in the run (§7a) | nothing |
 | `ic.large_prime` | cofactor projection, exact combination-table group additions, target probes, and relation witness checks; the external runner verifies the returned scalar | combination states, MITM lookups, large-prime merge operations, and modular row operations; the record is therefore a lower bound, not a speed claim |
+| `ic.koblitz_descent` | every point addition and doubling each stage performs, counted in the arithmetic itself (`group_op_count`: `binary_ecc` `point_add`/`point_double`, `FastCurve`'s affine, batched, lazy, AVX-512 and López–Dahab paths, `koblitz_fast_arith`'s 64- and 128-bit curves; a batch of `k` counts `k`, a ladder its actual steps): the factor-base cofactor projections (`factor_base`), every folded pair sum (`oracle_setup`), the anchors, strides, walk steps, window scans, hit recoveries and witness checks (`relations`), the relation re-checks and column-log checks (`linear_algebra`), the descent's stride multiples (`descent_setup`), the walks' starts and steps, pair recoveries and the recovery ladder (`descent`, the online window), and the final `[d]G = Q` (`verify`) | canonicalisations, pair-table filter probes, bucket and point-index reads, Frobenius coordinate maps, factor-base lifts and rebuilds, sparse row operations; field arithmetic outside the group law, hashing, the descent's modular combination, and the forward pass of a vector batch that declined a degenerate block (its lane count is in `detail`, host-dependent) are listed unpriced without a replayed counter |
 | `rho.plain`, `rho.negation`, `rho.frozen_reference`, `bsgs.*`, `kangaroo.vow` on a hyperelliptic Jacobian | as on a curve: one Cantor composition-and-reduction (`hyperelliptic_word::HCurve`) is one addition or one doubling, whatever its degree; the walk's set-up, starts, steps, look-ahead, escapes and internal verification as `rho.*` | as `rho.*` (`canonicalisations_uncharged`, …) and `bsgs.*`; the `F_p` work inside a Cantor step is neither charged nor tallied (`counts_field_ops` is `false`) |
 | `ic.hyperelliptic` | every Cantor addition on `HCurve`: the walk start `D₁ + D₂` (phase `walk_setup`, 1 GAE) and one addition per relation trial (phase `relations`); the factor base (`factor_base`) and the elimination (`linear_algebra`) are phases with no group operation. No internal verification: the runner verifies the returned `k` | every other operation, exactly: `F_p` multiplications building the factor base (`factor_base_fp_muls_uncharged`) and in the smoothness oracle — splitting `u`, evaluating `v` at its roots, inversions and square roots included (`oracle_fp_muls_uncharged`); column lookups and `±` canonicalisations per root; the walk's random draws (`step_draws_uncharged`); multiplications and inversions mod `r` in the Markowitz elimination (`linalg_mulmods_uncharged`, `linalg_inversions_uncharged`); with `large_primes = 1`, partial-table lookups and the combination's mulmods. The record is a lower bound at `w = 0` |
 
@@ -518,6 +520,26 @@ so it is compared with `L` single-target runs (`L·S_rho.negation`) or with the
 Kuhn–Struik reference `Σ_{i<L} C(2i,i)·4^{−i}·√(π/4)`; its `expected_s` is
 unset because it depends on `L`. A batch keeps one distinguished-point table
 for all targets (memory grows with `L`).
+
+`ic.koblitz_descent` reproduces `ic price --single-target` stage for stage
+(`src/bin/ic/price.rs`, test `the_ecbench_koblitz_descent_pipeline_is_this_pass`:
+the same logs, trials, relations, summands scanned, units and descent trials on
+the rule v8 `k0n41` recipe at three seeds). Its parameters are the rule v8
+parameter files' fields; each defaults to `rule_v8`, the file's value at the
+six §23 sizes (k0n41, k0n53, k0n57, k0n61, k1n47, k1n59), and the planner
+refuses `rule_v8` anywhere else, where every value must be given. `seed = run`
+takes the run's algorithm seed; by default the recipe's seed 201 fixes the
+base, the probes and the descent walks, so only the target varies between
+runs. The stages keep no `GroupOps` ledger of their own: the method runs them
+in a one-thread Rayon pool and charges each by the difference of two
+thread-local counter snapshots taken on that pool's only worker
+(`src/cryptanalysis/group_op_count.rs` defines one count). Its completeness
+test (`koblitz_descent::tests`) checks every phase against an independent
+reconstruction: exact for `factor_base` (cofactor ladders), `oracle_setup`
+(one operation per stored pair), `linear_algebra` (relation and column-log
+re-checks), `descent_setup` and `verify`; a lower bound for `relations` and
+`descent`, whose hit recoveries are data-dependent. The pair table is the
+memory side of the trade: `|F|²/(4n)` folded entries at about 4.5 bytes each.
 
 The counted IC method has its own method identity so frozen SAT/PDP sessions
 retain their exact parameter and accounting contract. It removes solver wall
