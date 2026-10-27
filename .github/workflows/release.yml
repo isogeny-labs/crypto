@@ -67,7 +67,6 @@ jobs:
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
             /tools/artifacts/
-            /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
@@ -92,10 +91,7 @@ jobs:
         with:
           filter: blob:none
           sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /Cargo.toml
-            /tools/artifacts/
-            /.artifacts/
+          sparse-checkout: /Cargo.toml
       - name: Pull store data this workflow reads (tools/artifacts)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
@@ -162,7 +158,6 @@ jobs:
             /README.md
             /LICENSE*
             /tools/artifacts/
-            /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         env:
@@ -462,7 +457,6 @@ jobs:
             /LICENSE
             /LICENSE.md
             /tools/artifacts/
-            /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         env:
@@ -645,7 +639,6 @@ jobs:
             /gpu/macaulay/
             /gpu/btcpuzzle/
             /tools/artifacts/
-            /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_cuda != 'false'
         env:

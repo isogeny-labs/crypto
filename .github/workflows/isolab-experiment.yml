@@ -49,10 +49,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
-          sparse-checkout: |
-            taskq/deploy/eks-karpenter
-            tools/artifacts
-            .artifacts
+          sparse-checkout: taskq/deploy/eks-karpenter
       - name: Pull store data this workflow reads (tools/artifacts)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
@@ -145,10 +142,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
-          sparse-checkout: |
-            taskq/deploy/eks-karpenter
-            tools/artifacts
-            .artifacts
+          sparse-checkout: taskq/deploy/eks-karpenter
       - name: Pull store data this workflow reads (tools/artifacts)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
