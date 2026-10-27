@@ -379,6 +379,20 @@ PREREGISTRATION.md, Amendment 15. Evidence that a resumed system gives the
 uninterrupted row: `tests/f4_checkpoint_resume.rs` and, on the host,
 `scripts/selftest_checkpoint.sh` (its output goes to the run's report).
 
+### Amendments 14 and 15: results (2026-10-27)
+
+The two `m = 4` cells ran on one 256 GiB EC2 host (rows `runs/R256-*`, report
+`reports/run-20261027T1318Z/REPORT.pdf`, analysis `runs/analysis-amendment14.txt`).
+R256-A0 (A0, `t = 4`): both systems completed (D = 7, 3.235e13 counted operations,
+121 GB), so A0 at `m = 4` has three cells: κ = 9.477, σ = 0.5, cost-unfavourable.
+R1: A11 survives at `t = 4`. R256-A11 (A11, `t = 5`): both systems hit the 14 400 s
+budget (D = 6 reached, 9e13 operations so far, 223 and 217 GB), not measurable
+within 4 h; the three-cell verdict stands (κ = 14.886, cost-unfavourable).
+Amendment 14's prediction for A0 (memory-bound) did not hold; for A11 the timeout held
+and the 90 GB peak did not. The run needed the checkpointing of Amendment 15; the
+report records what it did and what it did not (four of the seven A0 segments were
+lost because no checkpoint existed yet). No improvement over any baseline.
+
 ### Close-out of the prime-field slope line (2026-10-19)
 
 Observations only; no new run. Sources: `runs/analysis-amendment4.txt`,

@@ -1534,3 +1534,13 @@ comes from one system's chain of segments, resumed from its own checkpoints.
 the limit rule, the attribution rule, the identity checks, R1, R2 and the
 predictions of Amendment 14 (none of them depends on the number of
 segments). No prediction is made for the number of reclaims.
+
+### Amendment 15, erratum and results note, 2026-10-27 (after the rows; changes no rule, threshold, prediction or row)
+
+The rows of R256-A0 and R256-A11 are in `runs/` and `reports/run-20261027T1318Z/REPORT.pdf` reports them. Four things the amendment text above gets wrong or leaves out:
+- It says the 16 h cap per boot terminates the instance. With interruption behaviour *stop* it stops it; the instance's own terminate call did not take effect either, and stopped instances were terminated by hand.
+- `run_amendment15.sh` as first committed skipped a cell as soon as it had any row. A host reclaimed during A0's second target never resumed it; the target was run afterwards with the fixed script (commit `dfe40db2c`, `--first-target`). No row depends on the skipped attempt.
+- The V spread: the six A0 segments computed V from their own MemTotal and range over 259 227 456--259 227 476 kB. The amendment's "segments that disagree on V make a cell not decided" is not applied, because the spread is 20 kB of MemTotal rounding on one instance type, no limit was reached, and no row depends on V. It is reported as a deviation from the letter of the rule.
+- The Amendment 14 scorecard in `analyze --amendment14` prints "held" for R256-A11 because it checks completion and limit only; the amendment's memory figure (about 90 GB) did not hold (223.0 and 216.9 GB). The report scores both parts separately.
+
+Outcome under the registered rules: R1 survives (A11 below A0 at t = 4); A0 at m = 4 has three completed cells, κ = 9.477, σ = 0.5, cost-unfavourable; R2: A11 at t = 5 is not measurable within V and 4 h, binding limit time, and the three-cell verdict (κ = 14.886, σ = 1.5, cost-unfavourable) stands. R256-A0's prediction did not hold (both systems completed, 121 GB).
