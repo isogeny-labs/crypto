@@ -50,6 +50,10 @@ use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
 /// The measured table, compiled in.
 pub const F2M4_PRICES: &str = include_str!("f2m4_full_prices.json");
 
+/// The three mod-`r` multiplication units re-measured on a Montgomery
+/// mulmod (see [`Mulmod`]), compiled in.
+pub const F2M4_MULMOD_PRICES: &str = include_str!("f2m4_mulmod_prices.json");
+
 /// The method ids that reprice, with the base each wraps.
 pub fn base_of(id: &str) -> Option<&'static str> {
     match id {
@@ -137,6 +141,57 @@ pub fn row(m: u32, wide: bool) -> Result<BTreeMap<String, f64>, String> {
             .get(*u)
             .and_then(Value::as_f64)
             .ok_or_else(|| format!("f2m4_full_prices.json row {key} lacks `{u}`"))?;
+        out.insert((*u).to_string(), v);
+    }
+    Ok(out)
+}
+
+/// Which multiplication modulo `r` the three mulmod-bound units are priced
+/// from.
+///
+/// `Code` is what the repository's code does: `koblitz_strong_rho`'s
+/// `mul_mod_u128`, a chunked `u128 %` that costs 19 times more at 68-bit
+/// orders than at 64-bit ones (an implementation step, not the problem's).
+/// `Montgomery` prices `scalar_mulmod`, `row_op` and `lp_mulmod` from a
+/// Montgomery multiplication in one limb (`r < 2^64`) or two (`r` wider),
+/// the rate a competent implementation reaches at every `m`, so the unit
+/// has no step where the order crosses a word.  Counts do not change; only
+/// these three prices do.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Mulmod {
+    Code,
+    Montgomery,
+}
+
+/// The units [`Mulmod::Montgomery`] replaces.
+pub const MULMOD_UNITS: &[&str] = &["scalar_mulmod", "row_op", "lp_mulmod"];
+
+/// [`row`], with the mulmod-bound units from `mulmod`.
+pub fn row_mm(m: u32, wide: bool, mulmod: Mulmod) -> Result<BTreeMap<String, f64>, String> {
+    let mut out = row(m, wide)?;
+    if mulmod == Mulmod::Code {
+        return Ok(out);
+    }
+    let doc: Value = serde_json::from_str(F2M4_MULMOD_PRICES).map_err(|e| e.to_string())?;
+    let want = if wide { 128 } else { 64 };
+    let key = row_key(m, wide);
+    let inst = doc
+        .get("instances")
+        .and_then(|i| i.get(&key))
+        .filter(|v| v.get("scalar_width_bits").and_then(Value::as_u64) == Some(want))
+        .ok_or_else(|| {
+            format!(
+                "src/cryptanalysis/ecbench/f2m4_mulmod_prices.json has no row `{key}`; measure it \
+                 with `ecbench price-units-f2m4 --mulmod --m {m}{}`",
+                if wide { " --wide" } else { "" }
+            )
+        })?;
+    for u in MULMOD_UNITS {
+        let v = inst
+            .get("row")
+            .and_then(|r| r.get(*u))
+            .and_then(Value::as_f64)
+            .ok_or_else(|| format!("f2m4_mulmod_prices.json row {key} lacks `{u}`"))?;
         out.insert((*u).to_string(), v);
     }
     Ok(out)
@@ -349,7 +404,19 @@ pub fn reprice_rho(
     per_add: f64,
     batched: bool,
 ) -> Result<BTreeMap<String, f64>, String> {
-    let units = row(m, wide)?;
+    reprice_rho_mm(rep, m, wide, per_add, batched, Mulmod::Code)
+}
+
+/// [`reprice_rho`], with the mod-`r` multiplications priced as `mulmod`.
+pub fn reprice_rho_mm(
+    rep: &mut SolveReport,
+    m: u32,
+    wide: bool,
+    per_add: f64,
+    batched: bool,
+    mulmod: Mulmod,
+) -> Result<BTreeMap<String, f64>, String> {
+    let units = row_mm(m, wide, mulmod)?;
     let mut charges = Vec::new();
     let mut unknown = Vec::new();
     for (name, &count) in &rep.counters {
@@ -456,6 +523,9 @@ pub struct IcContext<'a> {
     /// for large-prime merges (`lp_merge_mulmods`), replaced here by the
     /// counted arithmetic.
     pub lp_estimate: u64,
+    /// Which multiplication modulo `r` prices `row_op`, `lp_mulmod` and
+    /// `scalar_mulmod`.
+    pub mulmod: Mulmod,
 }
 
 /// Reprice an `ic.pipeline` report of a curve over `F_{(2^m)^4}` in place:
@@ -465,7 +535,7 @@ pub fn reprice_ic(
     rep: &mut SolveReport,
     ctx: &IcContext<'_>,
 ) -> Result<BTreeMap<String, f64>, String> {
-    let units = row(ctx.m, ctx.wide)?;
+    let units = row_mm(ctx.m, ctx.wide, ctx.mulmod)?;
     let per_add = ctx.per_add;
     let mut charges: Vec<Charge> = Vec::new();
     let mut unknown: Vec<String> = Vec::new();
@@ -1190,6 +1260,280 @@ pub fn measure(inst: &BinCurve, reps: usize) -> Result<Value, String> {
     }))
 }
 
+// ── Montgomery multiplication modulo r (the Mulmod::Montgomery price) ───
+
+/// `a·b` as a 256-bit product `(hi, lo)`.
+fn mul_wide(a: u128, b: u128) -> (u128, u128) {
+    let (a0, a1) = (a as u64 as u128, a >> 64);
+    let (b0, b1) = (b as u64 as u128, b >> 64);
+    let p00 = a0 * b0;
+    let p01 = a0 * b1;
+    let p10 = a1 * b0;
+    let p11 = a1 * b1;
+    let mid = (p00 >> 64) + (p01 as u64 as u128) + (p10 as u64 as u128);
+    let lo = (p00 as u64 as u128) | (mid << 64);
+    let hi = p11 + (p01 >> 64) + (p10 >> 64) + (mid >> 64);
+    (hi, lo)
+}
+
+/// `m⁻¹ mod 2^128` for odd `m` (Newton iteration).
+fn inv_pow2_128(m: u128) -> u128 {
+    let mut x = m;
+    for _ in 0..7 {
+        x = x.wrapping_mul(2u128.wrapping_sub(m.wrapping_mul(x)));
+    }
+    x
+}
+
+/// Montgomery multiplication modulo an odd `r`, in one limb (`r < 2^64`) or
+/// two (`r` wider), with `R = 2^64` or `2^128`.  `mul` of a plain and a
+/// Montgomery-form operand is the plain product, so a multiplier fixed
+/// across a vector operation is converted once (`to_mont`) and each
+/// element then costs one reduction.
+#[derive(Clone, Copy)]
+pub struct Mont {
+    m: u128,
+    minv: u128,
+    r2: u128,
+    wide: bool,
+}
+
+impl Mont {
+    /// `None` for an even or trivial modulus.
+    pub fn new(r: u128) -> Option<Mont> {
+        if r < 3 || r & 1 == 0 {
+            return None;
+        }
+        let wide = r >> 64 != 0;
+        let minv = inv_pow2_128(r);
+        let rmod = if wide {
+            (u128::MAX % r + 1) % r
+        } else {
+            (1u128 << 64) % r
+        };
+        let r2 = <u128 as RhoScalar>::mul_mod(rmod, rmod, r);
+        Some(Mont {
+            m: r,
+            minv,
+            r2,
+            wide,
+        })
+    }
+
+    /// The reduction.  The final correction is a select, not a branch: the
+    /// operand is random, a branch there mispredicts half the time and
+    /// costs more than the multiplications.
+    #[inline(always)]
+    fn redc(&self, hi: u128, lo: u128) -> u128 {
+        use std::hint::select_unpredictable as sel;
+        if self.wide {
+            let u = lo.wrapping_mul(self.minv);
+            let (uh, _) = mul_wide(u, self.m);
+            let (d, borrow) = hi.overflowing_sub(uh);
+            d.wrapping_add(sel(borrow, self.m, 0))
+        } else {
+            // One limb: the product fits a u128 (`hi` is zero).
+            let m = self.m as u64;
+            let u = (lo as u64).wrapping_mul(self.minv as u64);
+            let uh = ((u as u128 * m as u128) >> 64) as u64;
+            let (d, borrow) = ((lo >> 64) as u64).overflowing_sub(uh);
+            d.wrapping_add(sel(borrow, m, 0)) as u128
+        }
+    }
+
+    /// `a·b·R⁻¹ mod r`.
+    #[inline(always)]
+    pub fn mul(&self, a: u128, b: u128) -> u128 {
+        if self.wide {
+            let (hi, lo) = mul_wide(a, b);
+            self.redc(hi, lo)
+        } else {
+            self.redc(0, (a as u64 as u128) * (b as u64 as u128))
+        }
+    }
+
+    /// `a·R mod r`.
+    pub fn to_mont(&self, a: u128) -> u128 {
+        self.mul(a, self.r2)
+    }
+
+    /// `a·b mod r` for plain `a, b < r`: two reductions.
+    #[inline(always)]
+    pub fn mulmod(&self, a: u128, b: u128) -> u128 {
+        self.mul(self.mul(a, b), self.r2)
+    }
+}
+
+fn push<'a>(m: &mut BTreeMap<&'a str, Vec<f64>>, k: &'a str, v: f64) {
+    m.entry(k).or_default().push(v);
+}
+
+/// The repository's `scalar_mulmod` and `row_op` loops at the width of `r`
+/// (the same code as [`scalar_units`], these two units only), in ns.
+fn code_scalar_units(
+    r: u128,
+    narrow: bool,
+    xs: &[u128],
+    rng: &mut StdRng,
+    out: &mut BTreeMap<&'static str, f64>,
+) {
+    fn go<S: RhoScalar>(
+        r: S,
+        xs: &[u128],
+        rng: &mut StdRng,
+        out: &mut BTreeMap<&'static str, f64>,
+    ) {
+        let conv = |v: u128| S::from_biguint(&num_bigint::BigUint::from(v)).expect("below r");
+        let xs: Vec<S> = xs.iter().map(|&v| conv(v)).collect();
+        let mut acc = xs[1];
+        out.insert(
+            "scalar_mulmod",
+            ns_per(1_000_000, |i| {
+                acc = S::mul_mod(acc, xs[(i % 1024) as usize], r);
+                acc.to_u128() as u64
+            }),
+        );
+        let cols = 2048usize;
+        let rr = r.to_u128();
+        let mut draw = || conv((rng.gen::<u128>() % rr).max(1));
+        let pivot: Vec<S> = (0..cols).map(|_| draw()).collect();
+        let mut row: Vec<S> = (0..cols).map(|_| draw()).collect();
+        let passes = 300u64;
+        let start = Instant::now();
+        for k in 0..passes {
+            let f = xs[(k % 1024) as usize];
+            for j in 0..cols {
+                row[j] = S::sub_mod(row[j], S::mul_mod(f, pivot[j], r), r);
+            }
+        }
+        black_box(&row);
+        out.insert(
+            "row_op",
+            start.elapsed().as_nanos() as f64 / (passes * cols as u64) as f64,
+        );
+    }
+    if narrow {
+        go::<u64>(r as u64, xs, rng, out);
+    } else {
+        go::<u128>(r, xs, rng, out);
+    }
+}
+
+/// Measure `scalar_mulmod`, `row_op` and `lp_mulmod` on the repository's
+/// code path and on [`Mont`], in the same pass as one counted `F_q`
+/// multiplication, and return the median ratios per unit.  Montgomery:
+/// two reductions for an isolated product (`scalar_mulmod`, `lp_mulmod`),
+/// one for a multiplier fixed over a vector (`row_op`, whose multiplier is
+/// converted once per row and the conversion charged).
+pub fn measure_mulmod(inst: &BinCurve, reps: usize) -> Result<Value, String> {
+    let r = inst.r;
+    let mont = Mont::new(r).ok_or("the subgroup order is not odd")?;
+    let narrow = u64::try_from(r).is_ok();
+    let mut cur: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
+    let mut fast: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
+    let mut extra: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
+    let mut mul_ns = Vec::new();
+    for k in 0..reps.max(1) {
+        let mut rng = StdRng::seed_from_u64(0xF2 + k as u64);
+        let g = &inst.curve.f.f.tab;
+        let q = inst.curve.f.f.q;
+        let n = 4096usize;
+        let piv: Vec<Fe> = (0..n).map(|_| rng.gen_range(1..q)).collect();
+        let mut frow: Vec<Fe> = (0..n).map(|_| rng.gen_range(0..q)).collect();
+        let passes = 600u64;
+        let start = Instant::now();
+        for k in 0..passes {
+            g.axpy(
+                &mut frow,
+                &piv,
+                1 + ((k as u32).wrapping_mul(7919) % (q - 1)),
+            );
+        }
+        black_box(&frow);
+        let fq = start.elapsed().as_nanos() as f64 / (passes * n as u64) as f64;
+        if fq <= 0.0 {
+            return Err("an F_q multiplication measured at zero nanoseconds".into());
+        }
+        mul_ns.push(fq);
+        let xs: Vec<u128> = (0..1024).map(|_| (rng.gen::<u128>() % r).max(1)).collect();
+        let xm: Vec<u128> = xs.iter().map(|&x| mont.to_mont(x)).collect();
+        // The repository's path: the scalar units at the width of r, the
+        // large-prime code always u128.
+        let mut cu: BTreeMap<&'static str, f64> = BTreeMap::new();
+        code_scalar_units(r, narrow, &xs, &mut rng, &mut cu);
+        let mut acc = xs[0];
+        cu.insert(
+            "lp_mulmod",
+            ns_per(1_000_000, |i| {
+                acc = <u128 as RhoScalar>::mul_mod(acc, xs[(i % 1024) as usize], r);
+                acc as u64
+            }),
+        );
+        for (u, v) in &cu {
+            push(&mut cur, u, v / fq);
+        }
+        let mut acc = xs[1];
+        let sm = ns_per(1_000_000, |i| {
+            acc = mont.mulmod(acc, xs[(i % 1024) as usize]);
+            acc as u64
+        });
+        push(&mut fast, "scalar_mulmod", sm / fq);
+        let mut acc = xs[2];
+        let lp = ns_per(1_000_000, |i| {
+            acc = mont.mulmod(acc, xs[(i % 1024) as usize]);
+            acc as u64
+        });
+        push(&mut fast, "lp_mulmod", lp / fq);
+        let mut acc = xs[3];
+        let one = ns_per(1_000_000, |i| {
+            acc = mont.mul(acc, xm[(i % 1024) as usize]);
+            acc as u64
+        });
+        push(&mut extra, "lp_mulmod_one_reduction", one / fq);
+        let cols = 2048usize;
+        let pivot: Vec<u128> = (0..cols).map(|_| (rng.gen::<u128>() % r).max(1)).collect();
+        let mut rowv: Vec<u128> = (0..cols).map(|_| (rng.gen::<u128>() % r).max(1)).collect();
+        let passes = 300u64;
+        let mut row_time = |fixed_mont: bool| -> f64 {
+            let start = Instant::now();
+            for k in 0..passes {
+                let f = xs[(k % 1024) as usize];
+                let fm = mont.to_mont(f);
+                for j in 0..cols {
+                    let p = if fixed_mont {
+                        mont.mul(pivot[j], fm)
+                    } else {
+                        mont.mulmod(f, pivot[j])
+                    };
+                    let (d, borrow) = rowv[j].overflowing_sub(p);
+                    rowv[j] = d.wrapping_add(std::hint::select_unpredictable(borrow, r, 0));
+                }
+            }
+            black_box(&rowv);
+            start.elapsed().as_nanos() as f64 / (passes * cols as u64) as f64
+        };
+        push(&mut fast, "row_op", row_time(true) / fq);
+        push(&mut extra, "row_op_two_reductions", row_time(false) / fq);
+    }
+    let med = |m: &BTreeMap<&str, Vec<f64>>| -> Value {
+        let mut o = serde_json::Map::new();
+        for (u, v) in m {
+            o.insert((*u).into(), json!((median(v.clone()) * 1e6).round() / 1e6));
+        }
+        Value::Object(o)
+    };
+    Ok(json!({
+        "row": med(&fast),
+        "code_row": med(&cur),
+        "extra": med(&extra),
+        "scalar_width_bits": if narrow { 64 } else { 128 },
+        "reps": reps,
+        "ns_per_fq_mul_median": median(mul_ns.clone()),
+        "ns_per_fq_mul": mul_ns,
+        "ratios_per_rep": {"row": fast, "code_row": cur},
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1229,5 +1573,51 @@ mod tests {
         assert_eq!(b["native_gae_per_operation_0"], 100.0);
         assert_eq!(b["native_gae_per_operation_0.1"], 105.0);
         assert_eq!(b["native_gae_per_operation_1"], 150.0);
+    }
+
+    #[test]
+    fn montgomery_agrees_with_the_code_path() {
+        let mut rng = StdRng::seed_from_u64(7);
+        for bits in [3u32, 20, 40, 63, 64, 65, 68, 80, 100, 127] {
+            for _ in 0..20 {
+                let r = (rng.gen::<u128>() >> (128 - bits)) | 1 | (1u128 << (bits - 1));
+                let Some(mt) = Mont::new(r) else { continue };
+                for _ in 0..200 {
+                    let a = rng.gen::<u128>() % r;
+                    let b = rng.gen::<u128>() % r;
+                    let want = <u128 as RhoScalar>::mul_mod(a, b, r);
+                    assert_eq!(mt.mulmod(a, b), want, "bits {bits} r {r} a {a} b {b}");
+                    assert_eq!(mt.mul(a, mt.to_mont(b)), want);
+                }
+            }
+        }
+        assert!(Mont::new(10).is_none());
+    }
+
+    #[test]
+    fn mul_wide_is_the_256_bit_product() {
+        assert_eq!(mul_wide(u128::MAX, u128::MAX), (u128::MAX - 1, 1));
+        assert_eq!(mul_wide(1u128 << 100, 1u128 << 100), (1u128 << 72, 0));
+    }
+
+    /// The Montgomery price moves the three mulmod units and nothing else.
+    #[test]
+    fn the_mulmod_table_covers_every_row_and_moves_three_units() {
+        let doc: Value = serde_json::from_str(F2M4_PRICES).unwrap();
+        for (k, v) in doc["instances"].as_object().unwrap() {
+            let wide = v["scalar_width_bits"] == 128;
+            let m: u32 = k
+                .trim_start_matches('m')
+                .trim_end_matches("_u128")
+                .parse()
+                .unwrap();
+            let a = row_mm(m, wide, Mulmod::Montgomery).unwrap();
+            let b = row(m, wide).unwrap();
+            for u in UNITS {
+                if !MULMOD_UNITS.contains(u) {
+                    assert_eq!(a[*u], b[*u], "{k}: {u} must not move");
+                }
+            }
+        }
     }
 }

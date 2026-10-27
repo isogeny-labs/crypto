@@ -211,6 +211,11 @@ enum Cmd {
         /// (the row is named m{m}_u128; seeds from --seed are scanned).
         #[arg(long)]
         wide: bool,
+        /// Measure the three mod-r multiplication units on the repository's
+        /// code path and on a Montgomery mulmod instead
+        /// (src/cryptanalysis/ecbench/f2m4_mulmod_prices.json).
+        #[arg(long)]
+        mulmod: bool,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -983,6 +988,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             seed,
             reps,
             wide,
+            mulmod,
             out,
         } => {
             let mut instances = serde_json::Map::new();
@@ -1007,7 +1013,11 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     mm,
                     u64::try_from(inst.r).is_err(),
                 );
-                let t = crypto_lib::cryptanalysis::ecbench::f2m4_price::measure(&inst, reps)?;
+                let t = if mulmod {
+                    crypto_lib::cryptanalysis::ecbench::f2m4_price::measure_mulmod(&inst, reps)?
+                } else {
+                    crypto_lib::cryptanalysis::ecbench::f2m4_price::measure(&inst, reps)?
+                };
                 eprintln!(
                     "m = {mm}: measured {} units",
                     t["row"].as_object().map_or(0, |r| r.len())
@@ -1015,8 +1025,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 instances.insert(key, t);
             }
             let doc = serde_json::json!({
-                "schema": "ecbench.f2m4_full_prices/v1",
-                "what": "Ratios to one counted F_q multiplication (a dense axpy element on the same field) of every native unit the *_f2m4_full ecbench methods price (src/cryptanalysis/ecbench/f2m4_price.rs). Read only by those methods; every other method is unchanged.",
+                "schema": if mulmod { "ecbench.f2m4_mulmod_prices/v1" } else { "ecbench.f2m4_full_prices/v1" },
+                "what": if mulmod { "Ratios to one counted F_q multiplication of scalar_mulmod, row_op and lp_mulmod on a Montgomery multiplication modulo r (`row`), beside the same units on the repository's code path (`code_row`), measured in the same pass. Read only by the *_refmm ecbench methods (src/cryptanalysis/ecbench/f2m4_price.rs, Mulmod::Montgomery)." } else { "Ratios to one counted F_q multiplication (a dense axpy element on the same field) of every native unit the *_f2m4_full ecbench methods price (src/cryptanalysis/ecbench/f2m4_price.rs). Read only by those methods; every other method is unchanged." },
                 "unit": "time of the native unit / time of one counted F_q multiplication, dimensionless",
                 "method": format!("ecbench price-units-f2m4 --reps {reps} --seed {seed}: median of the passes per unit per m, one process, one host; hash tables sized as the methods' own (2^(m+1) entries, the guard set 2^20)"),
                 "host": host::capture().map(|c| serde_json::json!({"env_class_id": c.env_class_id, "stable": c.stable})).map_err(|e| e.to_string())?,
