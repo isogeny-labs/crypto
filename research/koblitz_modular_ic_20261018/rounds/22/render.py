@@ -61,6 +61,8 @@ fig.suptitle("Koblitz cover transfers · Round22 · exact evidence and remaining
 fig.supxlabel("Source: runs/round22-native-summary.json · exact integers, no sampling uncertainty · no IC cost or rank result",
               fontsize=9)
 fig.savefig(root / "round22.svg")
+svg = root / "round22.svg"
+svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
 fig.savefig(root / "round22.png", dpi=150)
 
 if __name__ == "__main__":
