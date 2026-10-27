@@ -43,13 +43,15 @@ relation matrix and target receipt were not emitted before the stop.
 The [source-linked visual report](reports/run-20261026T2210Z/README.md)
 plots the retained resource samples and embeds the graph in a PDF.
 
-The current [`run.py`](run.py) is a revised guard for a later attempt. It
-requires at most 2 GiB host swap at admission and stops if swap crosses
-that threshold during execution, in addition to the existing wall, child
-RSS and host-free gates. Its preflight currently rejects this host with
-more than 11 GiB swap in use. This change prevents repeating the same
-high-memory launch while the host remains unsuitable; it does not
-reclassify the interrupted result.
+The native `n83_k4405_audit --preflight --binary PATH` command checks the
+archived producer source, exact binary, earlier public fixture, host free
+memory and host swap before a later attempt. Admission requires at least
+50% host free memory and at most 2,048 MiB swap in use. It reports
+`HOST_ADMISSION_BLOCKED` with exit code 2 when either host gate fails. This
+is an admission check; a later producer launch needs its own runtime stop
+guard and terminal receipt. The active Python launcher was removed because
+it could leave a worker running if telemetry failed and mishandled relative
+output paths.
 
 The next full-process K4405 control needs a 64 GiB-class host with a
 working provider stop guard or a cleared local memory envelope. Once rank,

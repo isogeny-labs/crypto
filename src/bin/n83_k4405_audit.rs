@@ -4,10 +4,17 @@ use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::fs;
+use std::io::Read;
 use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
+use std::thread;
+use std::time::{Duration, Instant};
 
 const SOURCE_SHA: &str = "58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d8";
 const BINARY_SHA: &str = "07f7b5b424d0f1ecea1cd7e6564522c4d9c64557a820441c381e7474b13a388a";
+const ARCHIVED_SOURCE: &str = "research/n83_k2304_current_source_control_20261026/koblitz_orbit_dlp_fast.executed-20261026.rs";
+const PUBLIC: &str = "research/n83_cold_factor_base_20261016/targets.jsonl";
+const ANSWERS: &str = "research/n83_cold_factor_base_20261016/answers.jsonl";
 type Result<T> = std::result::Result<T, String>;
 
 fn digest(path: &Path) -> Result<String> {
@@ -175,20 +182,109 @@ fn audit(root: &Path) -> Result<Value> {
     )
 }
 
-fn evidence_path() -> Result<PathBuf> {
-    let mut args = std::env::args().skip(1);
+fn command_output(program: &str, args: &[&str]) -> Result<String> {
+    let mut child = Command::new(program)
+        .args(args)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .map_err(|e| format!("{program}: {e}"))?;
+    let start = Instant::now();
+    loop {
+        if let Some(status) = child.try_wait().map_err(|e| format!("{program}: {e}"))? {
+            let mut stdout = String::new();
+            child
+                .stdout
+                .take()
+                .ok_or("telemetry stdout missing")?
+                .read_to_string(&mut stdout)
+                .map_err(|e| e.to_string())?;
+            require(status.success(), &format!("{program} exited {status}"))?;
+            return Ok(stdout);
+        }
+        if start.elapsed() >= Duration::from_secs(5) {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(format!("{program} telemetry timeout after 5 seconds"));
+        }
+        thread::sleep(Duration::from_millis(20));
+    }
+}
+
+fn first_jsonl(path: &Path) -> Result<Value> {
+    let raw = fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    serde_json::from_str(raw.lines().next().ok_or("empty fixture")?).map_err(|e| e.to_string())
+}
+
+fn preflight(binary: &Path) -> Result<Value> {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let binary = binary
+        .canonicalize()
+        .map_err(|e| format!("{}: {e}", binary.display()))?;
+    require(
+        digest(&root.join(ARCHIVED_SOURCE))? == SOURCE_SHA,
+        "archived producer source differs",
+    )?;
+    require(digest(&binary)? == BINARY_SHA, "producer binary differs")?;
+    let point = first_jsonl(&root.join(PUBLIC))?;
+    let answer = first_jsonl(&root.join(ANSWERS))?;
+    require(
+        answer["fixture_index"] == 0 && answer["point"] == point,
+        "earlier public fixture differs",
+    )?;
+    let free_output = command_output("memory_pressure", &["-Q"])?;
+    let free = free_output
+        .lines()
+        .find_map(|line| {
+            line.split_once("System-wide memory free percentage: ")
+                .and_then(|(_, value)| value.trim_end_matches('%').parse::<u64>().ok())
+        })
+        .ok_or("host free-memory telemetry missing")?;
+    let swap_output = command_output("sysctl", &["vm.swapusage"])?;
+    let swap = swap_output
+        .split("used = ")
+        .nth(1)
+        .and_then(|s| s.split('M').next())
+        .and_then(|s| s.parse::<f64>().ok())
+        .ok_or("host swap telemetry missing")?;
+    let status = if free >= 50 && swap <= 2048.0 {
+        "PASS_PREFLIGHT"
+    } else {
+        "HOST_ADMISSION_BLOCKED"
+    };
+    Ok(
+        json!({"status":status, "host_free_percent":free, "host_swap_used_mib":swap,
+        "min_host_free_percent":50, "max_host_swap_used_mib":2048,
+        "source_sha256":SOURCE_SHA, "binary_sha256":BINARY_SHA,
+        "target":point, "scope":"admission-only"}),
+    )
+}
+
+fn evidence_path(args: &[String]) -> Result<PathBuf> {
     let default = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("research/n83_k4405_current_source_full_control_20261026/evidence-01");
-    match (args.next(), args.next(), args.next()) {
-        (None, None, None) => Ok(default),
-        (Some(flag), Some(path), None) if flag == "--evidence" => Ok(PathBuf::from(path)),
-        _ => Err("usage: n83_k4405_audit [--evidence PATH]".into()),
+    match args {
+        [] => Ok(default),
+        [flag, path] if flag == "--evidence" => Ok(PathBuf::from(path)),
+        _ => Err("usage: n83_k4405_audit [--evidence PATH] | --preflight --binary PATH".into()),
     }
 }
 
 fn main() {
-    match evidence_path().and_then(|root| audit(&root)) {
-        Ok(report) => println!("{report}"),
+    let args: Vec<_> = std::env::args().skip(1).collect();
+    let result = match args.as_slice() {
+        [flag, key, binary] if flag == "--preflight" && key == "--binary" => {
+            preflight(Path::new(binary))
+        }
+        _ => evidence_path(&args).and_then(|root| audit(&root)),
+    };
+    match result {
+        Ok(report) => {
+            println!("{report}");
+            if report["status"] == "HOST_ADMISSION_BLOCKED" {
+                std::process::exit(2);
+            }
+        }
         Err(e) => {
             eprintln!("n83_k4405_audit: {e}");
             std::process::exit(1);
