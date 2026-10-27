@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Twist root-library validation](twist-root-validation-gap.md) | open | complete root-suite/merge-readiness claims | fix four existing regressions and complete a pinned full-suite run; one-hour resource exit is preserved |
 | [Twist GitHub repository access](twist-github-repository-access.md) | resolved for canonical access and evidence delivery | earlier 403/404 no longer blocks the E26 update | canonical connector/CLI and evidence push verified; CI/review, main conflicts and historical size hold remain separate |
 | [Twist trace constraint and solver comparison](twist-trace-constraint-and-solver-gap.md) | open; explicit geometry and bounded controls checked locally | establishing a calibrated twist-assisted IC improvement for NIST prime-field P-curves | polarized graph identification, higher-prime quotients, formal bridges, broader grids, complete costs and independent-host replay |
 | [Twist follow-up evidence publication](twist-followup-evidence-publication.md) | open; corrected remote publication verified | full scientific replay and the twelve existing oversized Git blobs | verified Setec upload/pull, member hashes and frozen incidence replay are complete; remaining checker replays and owner/reviewer size-policy resolution |

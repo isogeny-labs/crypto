@@ -221,6 +221,9 @@ fn models() -> Result<()> {
                 .cloned(),
         );
     }
+    if let Ok(extra) = read(Path::new(S).join("execution-v10/registry-additions.json")) {
+        all_additions.extend(extra.as_array().unwrap().iter().cloned());
+    }
     let mut appended = std::collections::BTreeSet::new();
     for id in &all_additions {
         let slug = id["slug"].as_str().unwrap();
@@ -281,6 +284,96 @@ fn models() -> Result<()> {
     }
     Ok(())
 }
+fn endo_models() -> Result<()> {
+    let v = Path::new(S).join("execution-v10");
+    let data = read(v.join("ADMISSION.json"))?;
+    let mut id = data["intermediate_model"].clone();
+    let word = |k: &str| {
+        id["params"][k]
+            .as_str()
+            .unwrap()
+            .parse::<BigUint>()
+            .unwrap()
+    };
+    let canonical =
+        curve_id::prime(&word("p"), &word("a"), &word("b"), &BigUint::from(823u64)).unwrap();
+    assert_eq!(canonical.slug, id["slug"]);
+    assert_eq!(canonical.icv1, id["icv1"]);
+    assert_eq!(canonical.model_json, id["model_json"]);
+    id["sources"] = json!([format!("{S}/execution-v10/ADMISSION.json")]);
+    write(v.join("registry-additions.json"), &json!([id]))?;
+    let old = read(Path::new(S).join("execution-v8/GLOBAL_MODELS_INPUT.json"))?;
+    let field = old[0]["field"].clone();
+    let mut destination = old[0].clone();
+    destination["curve"]["generator"] = data["mapped_generator"].clone();
+    write(
+        v.join("GLOBAL_MODELS_INPUT.json"),
+        &json!([old[0].clone(),{"icv1":id["slug"],"field":field,"curve":{"model":"short-weierstrass","a":data["velu"]["a"],"b":data["velu"]["b"],"subgroup_order":823,"cofactor":1,"generator":data["intermediate_generator"],"target_group":"E(F827)"}},destination]),
+    )?;
+    models()
+}
+fn endo_export() -> Result<()> {
+    let v = Path::new(S).join("execution-v10");
+    let p = read(v.join("protocol.json"))?;
+    let f = read(v.join("FROZEN.json"))?;
+    let a = read(v.join("ADMISSION.json"))?;
+    assert_eq!(
+        a["status"],
+        "native-generic-and-independent-PARI-endomorphism-verified"
+    );
+    let h = read(v.join("HOST.json"))?;
+    let transport = read(v.join("runs/producer-transport.json"))?;
+    let mut e = read(Path::new(S).join("execution-v8/experiment.export.json"))?;
+    e["export_id"] = json!("twist-endo-symmetry-20261027-v1");
+    e["protocol"] = json!({"path":"protocol.json","sha256":p["freeze"]["protocol_sha256"],"protocol_id":p["protocol_id"],"version":p["version"]});
+    e["source"]["commit"] = f["source_revision"].clone();
+    e["host"] = json!({"path":"HOST.json","sha256":sha(v.join("HOST.json"))?,"class_id":null,"summary":h["summary"]});
+    e["arms"]=json!(p["arms"].as_array().unwrap().iter().map(|a|json!({"id":a["id"],"role":a["role"],"binary_sha256":a["instrument"]["binary_sha256"],"commit":a["instrument"]["commit"]})).collect::<Vec<_>>());
+    let artifacts = vec![
+        file(&v.join("runs.tar.xz"), &v, "raw")?,
+        file(&v.join("RAW_MEMBERS.json"), &v, "receipt")?,
+        file(&v.join("ADMISSION.json"), &v, "receipt")?,
+        file(&v.join("runs/pari-v1/RECEIPT.json"), &v, "receipt")?,
+    ];
+    let mut runs = e["runs"].as_array().unwrap().clone();
+    for (i, r) in runs.iter_mut().enumerate() {
+        r["run_id"] = json!(format!(
+            "endo-{}-000",
+            if i == 0 { "native" } else { "pari" }
+        ));
+        r["instance_id"] = json!("p827-fixed-degree17-endomorphism");
+        r["worker"] = p["arms"][i]["instrument"]["binary_sha256"].clone();
+        r["artifacts"] = json!(artifacts);
+        r["measurements"]["counted"] =
+            json!({"source_rational_checks":a["source_rational_checks"]});
+        r["measurements"]["counters"] = json!({"twist_rational_checks":a["twist_rational_checks"],"generic_norm_compositions":a["generic_norm_compositions_verified"],"scalar_multiplicative_order":a["scalar_multiplicative_order"]});
+        r["verification"] = json!({"status":"verified","verifier":"native exact generic/finite endomorphism identities and independent PARI construction/group replay"});
+        r["backend_ref"] = json!(if i == 0 {
+            "runs/endo-v1"
+        } else {
+            "runs/pari-v1"
+        });
+        r["started_at"] = if i == 0 {
+            transport["started"].clone()
+        } else {
+            Value::Null
+        };
+        r["finished_at"] = if i == 0 {
+            transport["finished"].clone()
+        } else {
+            Value::Null
+        };
+    }
+    e["runs"] = json!(runs);
+    e["analysis"] = json!({"script":file(&Path::new(S).join("runner/src/endo_experiment_20261027.rs"),&v,"analysis")?,"blinded":false,"blinding_key_sha256":null,"outputs":[file(&v.join("ADMISSION.json"),&v,"analysis")?],"unmasked_at":null});
+    e["files"] = json!([
+        file(&v.join("FROZEN.json"), &v, "receipt")?,
+        file(&v.join("protocol.json"), &v, "protocol")?
+    ]);
+    e["notes"] = json!([{"kind":"observation","text":"One fixed public degree17 endomorphism: exact generic Frobenius/norm identities, full source/twist finite checks and scalar action. Counts are exact, not independent DLP samples or calibrated cost. No novelty, unknown-log, NIST or speed claim.","by":"native publication tool"}]);
+    e["producer"]["session"] = json!("twist-endo-symmetry-20261027");
+    write(v.join("experiment.export.json"), &e)
+}
 fn main() -> Result<()> {
     let a: Vec<_> = std::env::args().skip(1).collect();
     match a.first().map(String::as_str) {
@@ -288,6 +381,8 @@ fn main() -> Result<()> {
         Some("export-original") => export(1),
         Some("export") => export(2),
         Some("models") => models(),
+        Some("endo-models") => endo_models(),
+        Some("endo-export") => endo_export(),
         _ => Err("admit|export-original|export|models".into()),
     }
 }

@@ -212,3 +212,21 @@ algebra and recovery, against strongest ordinary/group/solver controls. No
 cost panel, new speedup, complete original campaign or independent-host result
 is supplied by this connection. The problem stays open; the kernel card is
 partial, with its cost phase blocked/unfunded rather than unimplemented maps.
+
+### 2026-10-27: a verified source endomorphism from twist torsion
+
+The [v10 report](../research/twist_routes_1_3_20261021/reports/endomorphism-20261027/RESULTS.md)
+certifies alpha=(pi+[1])/[7] on the same public p827 source, with degree17,
+alpha²-alpha+[17]=0 and scalar353/inverse415 on all823 source points. Independent
+native/GP generic rational-function checks include both norm compositions and
+[7]alpha=pi+[1], not only finite point agreement. On all833 twist points the
+kernel is17 and image49 killed by7; the scalar has order274 on the823 group.
+This is standard endomorphism theory, not a direct rational twist DLP transfer,
+a cheap orbit-fold result or an IC/NIST speedup. Three additional conditional
+Lean ring/group lemmas pass; the concrete formal bridge remains open.
+
+Two new, validated but unrun/zero-funding cards separately test rank repair and
+endomorphism action on the eight7-kernels. Complete cold solving costs remain
+in the existing partial kernel card. Library validation has its own
+[explicit blocker](twist-root-validation-gap.md), separate from the verified
+scientific connection and the still-open solving-cost requirement.

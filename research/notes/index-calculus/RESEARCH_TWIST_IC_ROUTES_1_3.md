@@ -222,3 +222,14 @@ verifies9 identifiable and9 ambiguous systems, preserving an initial failed
 GP attempt and its explicit field-preload correction. Four conditional Lean
 group implications pass; concrete curve/map bridges, charged solving advantage,
 NIST route and original full campaigns remain open. No performance row moves.
+
+### 2026-10-27 — degree17 source endomorphism verified
+
+[Executed v10](../../twist_routes_1_3_20261021/reports/endomorphism-20261027/RESULTS.md)
+constructs alpha=(pi+[1])/[7] from the twist17-kernel[7]H. Native/PARI generic
+identities verify both norm compositions with1-alpha and the Frobenius relation.
+The map acts as353 on all823 source points, inverse415; on all833 twist points
+it has kernel17/image49. Its source scalar-action order is274. This is an
+explicit twist-derived generator connection by known endomorphism theory,
+with no claimed unknown-log, cheap folding, novelty or IC/NIST speed advantage.
+Three conditional Lean lemmas pass; concrete formal bridges and costs stay open.
