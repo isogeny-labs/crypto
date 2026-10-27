@@ -38,3 +38,11 @@ Four old main runs held concurrency groups while their remaining jobs waited for
 The mirrored IC metadata validator now supports the exact original format emitted by cryptanalysis's half-trace candidate producer: `summand_count: 2` plus its exact `htsolver.py` implementation path. This fixes a real cryptanalysis CI failure without rewriting ten frozen content-addressed candidates. Modern explicit solver-family records still must match their stage codes. New controls reject a changed stage, arity, implementation, Boolean arity, or incomplete mixed format.
 
 Both validator and test copies are byte-identical across the two repair branches. Crypto's test run passes 11 controls with 2 existing cryptanalysis-only skips; cryptanalysis passes all 37 catalog tests, and the cross-repository metadata check reports zero errors. The initial crypto diagnostic was missing a local sparse registry fixture; restoring tracked docs/curves made it pass. These checks establish metadata consistency only.
+
+## Additional contained histories and daily journal
+
+PR #2165 head 2d0b3a2a997614410ffef4f9dbebfb4ca85f9647 has no remaining file delta. A normal merge preserves its ten-commit author history with a complete tree identical before and after; the exact proof is retained alongside the earlier #2124/#2138 proofs. No research result is rerun or reinterpreted.
+
+PR #2697 head 0e50ff68ccc2ce897b88212265e340c9b942d3fc now contributes only five artifact-wiring regression tests; the implementation and workflow repairs are already on main. Those tests are retained and all 27 artifact tests pass. The original author history is preserved rather than reconstructing it with cherry-picks.
+
+PR #2694's journal and timestamped session note are retained exactly as an early-day historical observation. The session-log conflict retained both that note and main's subsequent Lean-build entry; no later observation is overwritten. These additional merges alter only artifact tests and journal/session documentation relative to the dry-run source at 9918decb2. CUDA and production source are unchanged.
