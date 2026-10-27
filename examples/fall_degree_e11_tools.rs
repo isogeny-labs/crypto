@@ -274,7 +274,7 @@ fn truthy(v: Option<&Value>) -> bool {
     match v {
         None | Some(Value::Null) => false,
         Some(Value::Bool(b)) => *b,
-        Some(Value::Number(n)) => n.as_f64().map_or(true, |x| x != 0.0),
+        Some(Value::Number(n)) => n.as_f64() != Some(0.0),
         Some(Value::String(s)) => !s.is_empty(),
         Some(Value::Array(a)) => !a.is_empty(),
         Some(Value::Object(o)) => !o.is_empty(),

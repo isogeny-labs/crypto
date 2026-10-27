@@ -453,24 +453,22 @@ fn closure(eqs: &[Vec<u128>], nv: u32, sp: &Space, windows: Option<&[u128]>) -> 
             );
         }
         let mut refuted = basis.piv[0].is_some();
-        if !refuted && new_low.is_empty() {
-            if windows.is_some() {
-                // Exact pass: per window, the low rows whose cubic part is
-                // local, multiplied by the window's variables.
-                let t0 = Instant::now();
-                let (got, tried) = exact_pass(&mut basis, sp, &mut states, chunk, nv);
-                exact.0 += 1;
-                exact.1 += tried;
-                new_low = got.into_iter().filter(|&t| sp.deg_of_col(t) < c).collect();
-                refuted = basis.piv[0].is_some();
-                if prof {
-                    eprintln!(
-                        "exact pass: {tried} products, {} new low pivots, {:.2}s, dim {}",
-                        new_low.len(),
-                        t0.elapsed().as_secs_f64(),
-                        basis.dim
-                    );
-                }
+        if !refuted && new_low.is_empty() && windows.is_some() {
+            // Exact pass: per window, the low rows whose cubic part is
+            // local, multiplied by the window's variables.
+            let t0 = Instant::now();
+            let (got, tried) = exact_pass(&mut basis, sp, &mut states, chunk, nv);
+            exact.0 += 1;
+            exact.1 += tried;
+            new_low = got.into_iter().filter(|&t| sp.deg_of_col(t) < c).collect();
+            refuted = basis.piv[0].is_some();
+            if prof {
+                eprintln!(
+                    "exact pass: {tried} products, {} new low pivots, {:.2}s, dim {}",
+                    new_low.len(),
+                    t0.elapsed().as_secs_f64(),
+                    basis.dim
+                );
             }
         }
         if refuted || new_low.is_empty() {
