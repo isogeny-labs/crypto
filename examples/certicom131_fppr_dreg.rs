@@ -212,7 +212,19 @@ fn main() {
                     continue;
                 }
             }
-            let m = measure(n, d_max, ffd_max, pair, drawn - 1, slug, a, b, &basis, &x_r);
+            let m = measure(
+                n,
+                ell,
+                d_max,
+                ffd_max,
+                pair,
+                drawn - 1,
+                slug,
+                a,
+                b,
+                &basis,
+                &x_r,
+            );
             print_json(n, ell, d_max, &m, semireg);
             eprintln!(
                 "n={n} ℓ={ell}: unsat draw {k} ({}) -> random-b {} ffd {} | b=1 {} ({:.1}s)",
