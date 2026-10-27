@@ -434,7 +434,7 @@ default; the ids are:
 | `ic.pipeline`, `ic.pipeline_counted` | ic | the index-calculus pipeline (factor base, oracle, relations, linear algebra, verification), and the same with the relation charge rebuilt from counted work |
 | `ic.large_prime`, `ic.shared_rank` | ic | the large-prime variation and the shared-rank adapter on binary curves |
 | `ic.k4_gaudry` | ic | Gaudry's k = 4 index calculus on `E(F_{p⁴})`, `fp4_translation` curves only |
-| `ic.hyperelliptic` | ic | the hyperelliptic thread's index calculus (ADH/Gaudry: degree-1 places folded by ±, factor-base walk, sparse elimination mod `r`, optional single large primes) on a genus 2–4 Jacobian, `hyperelliptic_*` curves only |
+| `ic.hyperelliptic_thread` | ic | the hyperelliptic thread's index calculus (ADH/Gaudry: degree-1 places folded by ±, factor-base walk, sparse elimination mod `r`, optional single large primes) on a genus 2–4 Jacobian, `hyperelliptic_*` curves only |
 | `ic.cm_folded_native_v1`, `ic.cm_folded_recurrence_v1`, `ic.cm_folded_native_d43_v1` | ic | the CM scalar-orbit signed MITM2 controls with a native backend, prime curves only |
 | `ic.hyperelliptic` | ic | Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (`genus2_*` workloads): factor base of degree-1 places, smoothness by gcd, sparse elimination mod r |
 | `transfer.isogeny` | rho | carry the instance across a rational ℓ-isogeny (ℓ = 2, 3; Vélu), solve on the isogenous curve with a generic inner method, check `[k]G = Q` on the source; prime curves |
@@ -461,7 +461,7 @@ Curves of higher genus and the transfers are described in
 | `transfer.quartic_cover`, `transfer.ghs_cover` | everything: the cover's construction (`cover_setup`, quartic only), the two pullbacks (`transfer`, with the two additions `G + B`, `Q + B` on `E` for the quartic), the inner solve (`target:solve`), the check on `E` (`verify`); Jacobian work counted in `F_p` multiplications and divided by `c_E`, measured in the run (§7a) | nothing |
 | `ic.large_prime` | cofactor projection, exact combination-table group additions, target probes, and relation witness checks; the external runner verifies the returned scalar | combination states, MITM lookups, large-prime merge operations, and modular row operations; the record is therefore a lower bound, not a speed claim |
 | `rho.plain`, `rho.negation`, `rho.frozen_reference`, `bsgs.*`, `kangaroo.vow` on a hyperelliptic Jacobian | as on a curve: one Cantor composition-and-reduction (`hyperelliptic_word::HCurve`) is one addition or one doubling, whatever its degree; the walk's set-up, starts, steps, look-ahead, escapes and internal verification as `rho.*` | as `rho.*` (`canonicalisations_uncharged`, …) and `bsgs.*`; the `F_p` work inside a Cantor step is neither charged nor tallied (`counts_field_ops` is `false`) |
-| `ic.hyperelliptic` | every Cantor addition on `HCurve`: the walk start `D₁ + D₂` (phase `walk_setup`, 1 GAE) and one addition per relation trial (phase `relations`); the factor base (`factor_base`) and the elimination (`linear_algebra`) are phases with no group operation. No internal verification: the runner verifies the returned `k` | every other operation, exactly: `F_p` multiplications building the factor base (`factor_base_fp_muls_uncharged`) and in the smoothness oracle — splitting `u`, evaluating `v` at its roots, inversions and square roots included (`oracle_fp_muls_uncharged`); column lookups and `±` canonicalisations per root; the walk's random draws (`step_draws_uncharged`); multiplications and inversions mod `r` in the Markowitz elimination (`linalg_mulmods_uncharged`, `linalg_inversions_uncharged`); with `large_primes = 1`, partial-table lookups and the combination's mulmods. The record is a lower bound at `w = 0` |
+| `ic.hyperelliptic_thread` | every Cantor addition on `HCurve`: the walk start `D₁ + D₂` (phase `walk_setup`, 1 GAE) and one addition per relation trial (phase `relations`); the factor base (`factor_base`) and the elimination (`linear_algebra`) are phases with no group operation. No internal verification: the runner verifies the returned `k` | every other operation, exactly: `F_p` multiplications building the factor base (`factor_base_fp_muls_uncharged`) and in the smoothness oracle — splitting `u`, evaluating `v` at its roots, inversions and square roots included (`oracle_fp_muls_uncharged`); column lookups and `±` canonicalisations per root; the walk's random draws (`step_draws_uncharged`); multiplications and inversions mod `r` in the Markowitz elimination (`linalg_mulmods_uncharged`, `linalg_inversions_uncharged`); with `large_primes = 1`, partial-table lookups and the combination's mulmods. The record is a lower bound at `w = 0` |
 
 **Hyperelliptic Jacobians** (`ecbench::hyper`, family `hyperelliptic`).
 `{"kind": "hyperelliptic_thread", "p": 41, "genus": 2}` builds the
@@ -484,8 +484,8 @@ the BSGS tables and the `{D, −D}` choice all read, is injective:
 pairs. The name keeps ICV1's shape with a `hyp` tag
 (`icv1-hypg<g>p<p>-n<#J>-<8 hex>`) and is never registered; targets are
 planted only (no public-target law), and every IC method but
-`ic.hyperelliptic` and every endomorphism walk is refused at plan time.
-`ic.hyperelliptic` (`ecbench::hyper_ic`) is the thread's index calculus
+`ic.hyperelliptic_thread` and every endomorphism walk is refused at plan time.
+`ic.hyperelliptic_thread` (`ecbench::hyper_ic`) is the thread's index calculus
 (`hyperelliptic_index_calculus`, `RelationSearch::FactorBaseWalk`, sparse
 solve) run on the counted Cantor group with every search parameter required
 (`fb_size`, `large_primes`, `extra_relations`, `branches`, `d_step_in`); on a
