@@ -1,0 +1,68 @@
+{
+  "auditor_policy_selfcheck": {
+    "data_kind": "synthetic_policy_validation_only",
+    "receipt": "shared-lock-auditor-selfcheck.json",
+    "sha256": "4e8d17df2f3483e3c0239472cafdd27a80e91031b1db2c43d7692d28e698572e",
+    "status": "pass"
+  },
+  "branch_commit_before_receipt": "130890bec6ae24de028b21b810aff03366c340b2",
+  "date_utc": "2026-10-18",
+  "extracted_q00_replay": {
+    "batch": "shared-lock-extracted-smoke/q00-batch.json",
+    "batch_sha256": "9d3e42274587a3fe3ef8f4117be010ff5040e64a4b12038f7529bd6cfb7fa182",
+    "exact_output_fields": [
+      "job_id",
+      "checkin_blake3_time_normalized",
+      "walkers_done",
+      "walk_steps",
+      "distinguished_points",
+      "dead_trails",
+      "units_completed",
+      "checkins"
+    ],
+    "serial": "shared-lock-extracted-smoke/q00-serial.json",
+    "serial_sha256": "69805ee3f46dd9328a3bdbff69ac9767713875dca4537fc1429686694a911ce8",
+    "status": "pass",
+    "verified_distinguished_points": 26,
+    "walk_steps": 120070
+  },
+  "fresh_extracted_build": {
+    "binary_sha256": "b8b79be216e453a4c7f50713ea642d7e87911519254a3e3dc91bbed5ccca849c",
+    "command": "CARGO_TARGET_DIR=/Volumes/SSD990/llm/tmp/rho-worker-shared-lock-clean-target-20261018 cargo build --offline --release --example rho_worker_batch_benchmark",
+    "log": "shared-lock-extracted-smoke/clean-build.log",
+    "log_sha256": "0dda2d126f5268f4fe61be9d3e3d55da73939cea31f2b006bbf058d3fa3e397e",
+    "matches_checkout_binary": true,
+    "status": "pass"
+  },
+  "hosted_performance_result": null,
+  "measurement_tier": "local_build_and_correctness_only",
+  "nonlinux_preflight": {
+    "audit_decision": "unknown_gate_failed",
+    "completed_arms": 0,
+    "data_kind": "local_policy_validation_only",
+    "receipt": "shared-lock-nonlinux-preflight.json",
+    "sha256": "b281cae6ff53a0c3fa87f9832cc678c53bd26167a824348e801b9e22f8b1d32a",
+    "status": "pass"
+  },
+  "schema": "rho-worker-shared-lock-source-validation-v1",
+  "shared_queue_lock_process_check": {
+    "data_kind": "local_lock_behavior_only",
+    "receipt": "shared-lock-process-check.json",
+    "sha256": "cae7804428653f445efb4d45d50288e8f3754b8d364020f30950c92e0afa30ee",
+    "status": "pass"
+  },
+  "source_bundle": {
+    "file_count": 1224,
+    "previous_bundle_sha256": "abd7a2eaeebca050dcf0a9f2290c02b116dbdd4b0bfb43cb45bf4be1ca5f7025",
+    "rebuilt_identically_twice": true,
+    "sha256": "ccc4c83128510e145bed6e8c04b26eb9a63f617bb2d3665826856ccd91902904"
+  },
+  "source_components_sha256": {
+    "experiments/rho-worker-phase-profile-20261017/analyze_tier1_worker_batch.py": "0e0b17531f66e1315a6eea9ccd75f56ab06c868b8edba861bd401bd79f382393",
+    "experiments/rho-worker-phase-profile-20261017/build_worker_batch_plan.py": "172451e64726a4303689e13e592ae3d83e7ce2743bce5d089e66a61669ed1c7c",
+    "experiments/rho-worker-phase-profile-20261017/make_worker_source_bundle.py": "c78b1b34064e20d7f5012e25f629dd6a26c2d4570781c9151f90fc74b3783ec5",
+    "experiments/rho-worker-phase-profile-20261017/run_tier1_worker_batch.py": "89c6ee14f3ebc101397abfeea58c0e3b50c74ab988e3c2518d0a7292cc858fd5",
+    "experiments/rho-worker-phase-profile-20261017/validate_shared_queue_lock.py": "7d53c42a4684bfdbee38bd6cf5a773ada1617a17bd3d564865c394895eb0b248",
+    "experiments/rho-worker-phase-profile-20261017/validate_worker_batch_auditor.py": "b902606317edf20d0c6dcb2f997b82b0222a0f90951c56d11b1b21650d043ce4"
+  }
+}
