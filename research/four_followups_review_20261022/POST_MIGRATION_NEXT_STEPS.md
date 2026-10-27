@@ -115,6 +115,10 @@ frequency or its cost distribution.
 ## Ordered actions
 
 1. **Finish the two independent projective-law proof checks already in flight.**
+   The [simple-branch zero-order packet](../projective_law_followup_20261022/formal/BRANCH_ZERO_ORDER.md)
+   now checks the conditional local order-one statement for `N=(x-a)t` and
+   unit `B` in the actual branch stalk. It does not discharge the global
+   divisor-class or compiled-source obligations below.
    One check connects the actual 2+2 polynomial identity to the affine
    coordinate ring; the other binds runtime branch guards to Lean statements.
    Require kernel-checked theorem names, a checksum-bound source revision,

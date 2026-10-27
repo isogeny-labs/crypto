@@ -4,6 +4,12 @@ This directory pins and builds a Lean packet for algebraic obligations used by
 the weighted genus-2 projective-law implementation.  It is a proof-boundary
 artifact.  It does not claim a complete formal proof of Jacobian addition.
 
+The [simple-branch zero-order packet](BRANCH_ZERO_ORDER.md) proves that an
+actual local numerator of the form `N=(x-a)t` has `ord(N-By)=1` at a rational
+simple branch when `B` is a unit. Its [diagram](branch-zero-order.svg),
+[gate table](branch-zero-order.csv), and [PDF](BRANCH_ZERO_ORDER.pdf) keep the
+explicit factorization hypothesis and the still-open global `Pic⁰` law visible.
+
 The [weighted-Proj head and chart packet](WEIGHTED_PROJ_HEAD_VERIFIED.md)
 checks homogeneity of the proposed sextic and its principal ideal, plus the
 two dehomogenized equations obtained at `Z=1` and `X=1`. Its [CSV](weighted-proj-head-verified.csv),
