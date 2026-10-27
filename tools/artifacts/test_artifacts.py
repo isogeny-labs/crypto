@@ -297,8 +297,8 @@ class WorkflowWiringPaths(unittest.TestCase):
 
 
 class SparsePattern(unittest.TestCase):
-    """The pull step runs tools/artifacts/artifacts.py, so a sparse checkout must fetch it,
-    whether its patterns are a block scalar or a single inline path."""
+    """The pull step runs tools/artifacts/artifacts.py with .artifacts/config.json, so a
+    sparse checkout must fetch both, whether its patterns are a block scalar or one inline path."""
 
     def test_inline_cone_path_becomes_a_block(self):
         block = ["      - uses: actions/checkout@v4", "        with:",
@@ -307,13 +307,14 @@ class SparsePattern(unittest.TestCase):
             "          sparse-checkout: |",
             "            taskq/deploy/eks-karpenter",
             "            tools/artifacts",
+            "            .artifacts",
         ])
 
     def test_inline_non_cone_path(self):
         block = ["      - uses: actions/checkout@v4", "        with:",
                  "          sparse-checkout-cone-mode: false", "          sparse-checkout: /Cargo.toml"]
-        self.assertEqual(wire_workflows.add_sparse_pattern(block, "      ")[-2:],
-                         ["            /Cargo.toml", "            /tools/artifacts/"])
+        self.assertEqual(wire_workflows.add_sparse_pattern(block, "      ")[-3:],
+                         ["            /Cargo.toml", "            /tools/artifacts/", "            /.artifacts/"])
 
     def test_expression_and_block_forms(self):
         expr = ["      - uses: actions/checkout@v4", "        with:",
@@ -321,7 +322,8 @@ class SparsePattern(unittest.TestCase):
         self.assertEqual(wire_workflows.add_sparse_pattern(expr, "      "), expr)
         blk = ["      - uses: actions/checkout@v4", "        with:",
                "          sparse-checkout: |", "            src"]
-        self.assertEqual(wire_workflows.add_sparse_pattern(blk, "      ")[-1], "            tools/artifacts")
+        self.assertEqual(wire_workflows.add_sparse_pattern(blk, "      ")[-2:],
+                         ["            tools/artifacts", "            .artifacts"])
         done = wire_workflows.add_sparse_pattern(blk, "      ")
         self.assertEqual(wire_workflows.add_sparse_pattern(done, "      "), done)
 

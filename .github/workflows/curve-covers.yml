@@ -164,6 +164,7 @@ jobs:
           sparse-checkout: |
             /research/cover_transfer_assessment_20261013/lean/**
             /tools/artifacts/
+            /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}

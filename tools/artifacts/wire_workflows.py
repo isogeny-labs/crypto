@@ -10,9 +10,10 @@ that hold moved files, and inserts after each `actions/checkout` step:
       env: {AWS_ACCESS_KEY_ID: ..., AWS_SECRET_ACCESS_KEY: ..., AWS_REGION: ...}
       run: python3 tools/artifacts/artifacts.py pull research/x experiments/y/results
 
-A sparse checkout also gets `tools/artifacts` added to its patterns. The edit
-is textual (comments and layout survive) and idempotent; checkouts into a
-`path:` other than the workspace are reported, not edited.
+A sparse checkout also gets `tools/artifacts` and `.artifacts` (the store
+configuration) added to its patterns. The edit is textual (comments and
+layout survive) and idempotent; checkouts into a `path:` other than the
+workspace are reported, not edited.
 
     python3 tools/artifacts/wire_workflows.py [--check] [WORKFLOW ...]
 
@@ -148,29 +149,35 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
 
 
 def add_sparse_pattern(block: list[str], indent: str) -> list[str]:
-    """Make a sparse checkout also fetch tools/artifacts."""
+    """Make a sparse checkout also fetch what the pull step runs on: the tool
+    (tools/artifacts) and the store configuration (.artifacts/config.json)."""
     for k, b in enumerate(block):
-        # single-line form (`sparse-checkout: some/path`): rewrite as a block scalar
-        m = re.match(rf"^({indent}    sparse-checkout: )(?!\|)(\S.*)$", b)
-        if m and "${{" not in m.group(2):
-            cone = not any("sparse-checkout-cone-mode: false" in x for x in block)
-            item = m.group(2).strip()
-            if "tools/artifacts" in item or item in ("/*", "tools", "/tools/"):
-                return block
+        inline = re.match(rf"^({indent}    sparse-checkout: )(?!\|)(\S.*)$", b)
+        if inline and "${{" in inline.group(2):
+            return block
+        if not inline and not re.match(rf"^{indent}    sparse-checkout: \|", b):
+            continue
+        cone = not any("sparse-checkout-cone-mode: false" in x for x in block)
+        if inline:  # single-line form (`sparse-checkout: some/path`): rewrite as a block scalar
             pad = indent + "      "
-            return block[:k] + [m.group(1) + "|", pad + item,
-                                pad + ("tools/artifacts" if cone else "/tools/artifacts/")] + block[k + 1:]
-        if re.match(rf"^{indent}    sparse-checkout: \|", b):
-            cone = not any("sparse-checkout-cone-mode: false" in x for x in block)
-            items = []
-            n = k + 1
+            head, items, n = [inline.group(1) + "|"], [pad + inline.group(2).strip()], k + 1
+        else:
+            head, items, n = [b], [], k + 1
             while n < len(block) and len(block[n]) - len(block[n].lstrip()) > len(indent) + 4:
                 items.append(block[n])
                 n += 1
-            if any("tools/artifacts" in x or x.strip() in ("/*", "tools", "/tools/") for x in items):
-                return block
             pad = (items[0][: len(items[0]) - len(items[0].lstrip())]) if items else indent + "      "
-            return block[:n] + [pad + ("tools/artifacts" if cone else "/tools/artifacts/")] + block[n:]
+        have = [x.strip() for x in items]
+        if "/*" in have:
+            return block
+        add = []
+        if not any("tools/artifacts" in x or x in ("tools", "/tools/") for x in have):
+            add.append("tools/artifacts" if cone else "/tools/artifacts/")
+        if not any(x.strip("/") in (".artifacts", ".artifacts/config.json") for x in have):
+            add.append(".artifacts" if cone else "/.artifacts/")
+        if inline or add:
+            return block[:k] + head + items + [pad + x for x in add] + block[n:]
+        return block
     return block
 
 
