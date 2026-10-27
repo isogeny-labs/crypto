@@ -4,6 +4,16 @@
 (22–28-bit p). All records were verified and the audits passed. The wall-time
 comparison was not admitted.
 
+> **Erratum (2026-10-24).** The binary that wrote these sessions left the
+> `rho.quartic` / `rho.cubic` class set-up out of each record's total
+> (16–58 GAE per solve). Corrected with the same `compare`, the ratios are
+> **`rho.cubic` / `rho.negation` = 0.647 [0.543, 0.770]** (was 0.611) and
+> **`rho.quartic` / `rho.negation` = 0.819 [0.722, 0.929]** (was 0.791).
+> The quartic interval no longer contains the prediction 0.707, so finding 1
+> holds for cubic only. The round-2 factors below become about 1.55× and
+> 1.22×, and round 2's conclusion stands. The sessions and the run report are
+> unchanged. See [`../class_setup_impact_20261024/`](../class_setup_impact_20261024/README.md).
+
 Round 2 of the conductor gap
 ([`../isogeny_conductor_gap_round2_20261011/`](../isogeny_conductor_gap_round2_20261011/README.md),
 finding 4) matched index calculus against `rho.negation` only and noted that

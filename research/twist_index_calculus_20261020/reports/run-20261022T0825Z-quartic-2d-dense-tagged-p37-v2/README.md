@@ -1,0 +1,19 @@
+# Combined tagged/dense p=37 exact-oracle IC · final-source rerun
+
+Run ID `run-20261022T0825Z-quartic-2d-dense-tagged-p37-v2`; 22 October 2026; shared Intel Xeon 6975P-C host, L0; one public known-answer target `[271]G`. This repeats the [registered combined protocol](../../QUARTIC_TWIST_LINE_PROTOCOL.md) after an item-level lint annotation in the tagged-index example and removal of two redundant Rust borrows in the quartic fold library. The [first-run source and records](../run-20261022T0758Z-quartic-2d-dense-tagged-p37/README.md) are preserved in commit `345d2feeb`. Current producer SHA-256 `201d30777812399be02ae414d8fe8d13b63f73c6ace1f5d7024763ce6a31e42a`; tagged-index module `c28ee64777b08cb210050bf9542b7b6d3c667678bcbf53b633964b6241c4cd53`; quartic fold library `6f378a0ba5a5855601359428e46cb2cab7f15f62b21b743739a05fd93632b3be`.
+
+Command: `prlimit --as=8589934592 -- timeout 300s target/release/examples/quartic_twist_2d_dense_tagged_p37 research/twist_index_calculus_20261020/quartic_twist_mixed_v1.ndjson research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_v1.json`. The [raw record](../../quartic_twist_2d_dense_tagged_p37_v2.json) completed 1/1 residual before the 64-query, 300-second and 8-GiB caps; [stderr](../../quartic_twist_2d_dense_tagged_p37_v2.log) is empty. No failure or censored query. The 624-point signed two-dimensional base has 52 twist-folded log columns. The direct-posting tagged table used 32,396 pair-orbit representatives and 388,752 postings. Its complete first-residual signed decomposition set equals the separately counted full pair-table set: **53,551** decompositions. The first **115** candidates supply anchored rank **52/52**, recover 271 and verify every factor log. A separate group addition checked all postings. The [independent point-keyed auditor](../../quartic_twist_2d_dense_tagged_p37_native_audit_v2.json) enumerated all **1,873,633** subgroup logs, replayed the complete first-query count and 52 selected rows with a different elimination routine, and recovered 271. The [A/A non-timing diff](../../quartic_twist_2d_dense_tagged_p37_aa_v2.diff) and [original/final-source parity diff](../../quartic_twist_2d_dense_tagged_p37_v1_v2.diff) are both empty after omitting only three shared-host L0 timing fields.
+
+| One-target counted path | Earlier full-table dense | Current tagged-table dense |
+| --- | ---: | ---: |
+| Model/base/input/eigen/map `Fp M` | 4,466,941 | 4,466,941 |
+| Pair-table setup `Fp M` / group ops | 37,708,944 / 388,752 | **7,796,605 / 32,396** |
+| First-residual stream `Fp M` / group ops | 75,560,753 / 779,024 | 75,560,753 / 779,024 |
+| Answer checks `Fp M` / group ops | 2,004,307 / 18,854 | 2,004,307 / 18,854 |
+| **Total `Fp M` / group ops** | **119,740,945 / 1,204,356** | **89,828,606 / 848,000** |
+
+The **29,912,339 `Fp M`** and **356,356 group-operation** total deltas equal the table-setup deltas exactly; all other counted phases match. The tagged table retained **47,721,464** allocator-requested bytes; the path peaked **78,834,528** requested bytes above pre-table allocation. It counted **777,503** hash lookups and **324,839** candidate postings. Anchored row selection and final solve used 20,969 and 11,484 modular operations. A further 17,251,447 modular operations computed an unanchored-rank diagnostic: excluded from the proposed anchored algorithmic path, but included in this run's shared-host L0 observation of 639.113 ms. The 1.333× field-count and 1.420× group-count reductions compare identical one-target exact-oracle work. Polynomial `S5` enumeration, hash/allocator CPU pricing, isolated wall timing and matched rho GAE remain unmeasured.
+
+![Counted full-table and final tagged-table dense paths](dense_tagged_cost.svg)
+
+Graph source: [plot_dense_tagged.py](plot_dense_tagged.py). [PDF report](README.pdf). The [A/A report](../run-20261022T0825Z-quartic-2d-dense-tagged-p37-v2-aa/README.md) is separate.
