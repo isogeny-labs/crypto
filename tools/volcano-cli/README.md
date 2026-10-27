@@ -58,6 +58,18 @@ Resume refuses a changed source hash; verification may replay an earlier source.
 Only one writer should operate on a database at a time. Plan/status read-outs
 are not certificates against simultaneous or malicious edits.
 
+For live committed-vertex counts and S3 recovery, add `--verbose` (or
+`--progress-every 5`) and `--state-s3-uri s3://BUCKET/PREFIX` to `build` and
+`resume`. `--sync-every 60` changes the periodic S3 copy interval. The local
+SQLite transaction remains the restart boundary; a remote restore can repeat
+transactions committed since the most recent S3 snapshot. An immutable SQLite
+snapshot is uploaded before `LATEST.json` points to it. Resume into a fresh
+path downloads the named snapshot, verifies its SHA-256 and byte count, and
+checks SQLite integrity and the stored plan. A local `.lock` protects a single
+database path; use one writer per S3 prefix across hosts. The sidecar
+`graph.sqlite.progress.json` records counts, and the final S3 result is
+published after the last snapshot.
+
 The default **10,000 expansions is a partial checkpoint**. Exit 3 indicates
 partial graph/class coverage. An exhausted frontier with fewer vertices than
 the exact class number is `COMPLETE_COMPONENT_ONLY`, also exit 3. Use

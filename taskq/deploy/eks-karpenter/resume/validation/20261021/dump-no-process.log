@@ -1,0 +1,145 @@
+(00.000000) CRIU run id = 79ebd1b5-ee2e-46a9-ad83-d56e776743b6
+(00.000055) Version: 4.2.1 (gitid 0)
+(00.000059) Running on resume-process-probe Linux 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64
+(00.000064) File /run/criu.kdat does not exist
+(00.000072) sockets: Probing sock diag modules
+(00.010150) sockets: Done probing
+(00.010509) PAGEMAP_SCAN is supported
+(00.010516) Pagemap is fully functional
+(00.010537) Found anon-shmem device at 1
+(00.010555) Hugetlb size 2 Mb is supported but cannot get dev's number
+(00.010561) Hugetlb size 1024 Mb is supported but cannot get dev's number
+(00.010563) Reset 44's dirty tracking
+(00.010580)  ... done
+(00.010589) Dirty track supported on kernel
+(00.010633) Found task size of 7ffffffff000
+(00.011228) net: Restoring netdev veth idx 10
+(00.011724) net: Dumping netns links
+(00.011736) net: 	LD: Got link 1, type 772
+(00.011738) net: 	LD: Got link 10, type 1
+(00.011813) Warn  (criu/kerndat.c:1642): CRIU was built without libnftables support
+(00.013096) vdso: Parsing at 7f5ed4350000 7f5ed4352000
+(00.013099) vdso: PT_LOAD p_vaddr: 0
+(00.013100) vdso: DT_HASH: 120
+(00.013101) vdso: DT_GNU_HASH: 170
+(00.013101) vdso: DT_STRTAB: 320
+(00.013102) vdso: DT_SYMTAB: 1d0
+(00.013102) vdso: DT_STRSZ: 83
+(00.013103) vdso: DT_SYMENT: 18
+(00.013103) vdso: nbucket 3 nchain e bucket 7f5ed4350128 chain 7f5ed4350134
+(00.013104) vdso: symbol __vdso_clock_gettime at address fd0
+(00.013105) vdso: symbol __vdso_getcpu at address 1050
+(00.013105) vdso: symbol __vdso_gettimeofday at address f90
+(00.013106) vdso: symbol __vdso_time at address fa0
+(00.013106) vdso: symbol __kernel_sigreturn at address 0
+(00.013107) vdso: symbol __kernel_rt_sigreturn at address 0
+(00.013107) vdso: symbol __vdso_clock_gettime64 at address 0
+(00.013108) vdso: rt [vdso] 7f5ed4350000-7f5ed4352000 [vvar] 7f5ed434a000-7f5ed4350000
+(00.013245) vdso: Parsing at 7f5ed40cf000 7f5ed40d1000
+(00.013248) vdso: PT_LOAD p_vaddr: 0
+(00.013249) vdso: DT_HASH: b4
+(00.013249) vdso: DT_GNU_HASH: f8
+(00.013250) vdso: DT_STRTAB: 208
+(00.013250) vdso: DT_SYMTAB: 148
+(00.013251) vdso: DT_STRSZ: ce
+(00.013251) vdso: DT_SYMENT: 10
+(00.013251) vdso: nbucket 3 nchain c bucket 7f5ed40cf0bc chain 7f5ed40cf0c8
+(00.013252) vdso: symbol __vdso_clock_gettime at address 1840
+(00.013253) vdso: symbol __vdso_getcpu at address 1900
+(00.013253) vdso: symbol __vdso_gettimeofday at address 17f0
+(00.013254) vdso: symbol __vdso_time at address 1800
+(00.013254) vdso: symbol __kernel_sigreturn at address 5a0
+(00.013255) vdso: symbol __kernel_rt_sigreturn at address 5b0
+(00.013255) vdso: symbol __vdso_clock_gettime64 at address 1850
+(00.013256) vdso: compat [vdso] 7f5ed4350000-7f5ed4352000 [vvar] 7f5ed434a000-7f5ed4350000
+(00.013368) cpu: x86_family 26 x86_vendor_id AuthenticAMD x86_model_id AMD EPYC 9R45
+(00.013372) cpu: fpu: xfeatures_mask 0x2e5 xsave_size 2440 xsave_size_max 2440 xsaves_size 2440
+(00.013383) cpu: fpu: x87 floating point registers     xstate_offsets      0 / 0      xstate_sizes    160 / 160   
+(00.013384) cpu: fpu: AVX registers                    xstate_offsets    576 / 576    xstate_sizes    256 / 256   
+(00.013385) cpu: fpu: AVX-512 opmask                   xstate_offsets    832 / 832    xstate_sizes     64 / 64    
+(00.013386) cpu: fpu: AVX-512 Hi256                    xstate_offsets    896 / 896    xstate_sizes    512 / 512   
+(00.013386) cpu: fpu: AVX-512 ZMM_Hi256                xstate_offsets   1408 / 1408   xstate_sizes   1024 / 1024  
+(00.013387) cpu: fpu: Protection Keys User registers   xstate_offsets   2432 / 2432   xstate_sizes      8 / 8     
+(00.039207) Found mmap_min_addr 0x10000
+(00.039253) files stat: fs/nr_open 1073741816
+(00.039260) ========================================
+(00.039265) Warn  (criu/seize.c:63): Failed to open /proc/34/comm: No such file or directory
+(00.039266) Dumping processes (pid: 34 comm: )
+(00.039267) ========================================
+(00.039269) rlimit: RLIMIT_NOFILE unlimited for self
+(00.039271) Running pre-dump scripts
+(00.039295) irmap: Searching irmap cache in work dir
+(00.039305) No irmap-cache image
+(00.039306) irmap: Searching irmap cache in parent
+(00.039309) No parent images directory provided
+(00.039309) irmap: No irmap cache
+(00.039310) cpu: fpu:1 fxsr:1 xsave:1 xsaveopt:1 xsavec:1 xgetbv1:1 xsaves:1
+(00.039333) cg-prop: Parsing controller "cpu"
+(00.039334) cg-prop: 	Strategy "replace"
+(00.039336) cg-prop: 	Property "cpu.shares"
+(00.039336) cg-prop: 	Property "cpu.cfs_period_us"
+(00.039337) cg-prop: 	Property "cpu.cfs_quota_us"
+(00.039337) cg-prop: 	Property "cpu.rt_period_us"
+(00.039338) cg-prop: 	Property "cpu.rt_runtime_us"
+(00.039338) cg-prop: Parsing controller "memory"
+(00.039339) cg-prop: 	Strategy "replace"
+(00.039339) cg-prop: 	Property "memory.limit_in_bytes"
+(00.039340) cg-prop: 	Property "memory.memsw.limit_in_bytes"
+(00.039340) cg-prop: 	Property "memory.swappiness"
+(00.039340) cg-prop: 	Property "memory.soft_limit_in_bytes"
+(00.039341) cg-prop: 	Property "memory.move_charge_at_immigrate"
+(00.039341) cg-prop: 	Property "memory.oom_control"
+(00.039342) cg-prop: 	Property "memory.use_hierarchy"
+(00.039342) cg-prop: 	Property "memory.kmem.limit_in_bytes"
+(00.039342) cg-prop: 	Property "memory.kmem.tcp.limit_in_bytes"
+(00.039343) cg-prop: Parsing controller "cpuset"
+(00.039344) cg-prop: 	Strategy "replace"
+(00.039345) cg-prop: 	Property "cpuset.cpus"
+(00.039345) cg-prop: 	Property "cpuset.mems"
+(00.039345) cg-prop: 	Property "cpuset.memory_migrate"
+(00.039346) cg-prop: 	Property "cpuset.cpu_exclusive"
+(00.039346) cg-prop: 	Property "cpuset.mem_exclusive"
+(00.039347) cg-prop: 	Property "cpuset.mem_hardwall"
+(00.039347) cg-prop: 	Property "cpuset.memory_spread_page"
+(00.039348) cg-prop: 	Property "cpuset.memory_spread_slab"
+(00.039348) cg-prop: 	Property "cpuset.sched_load_balance"
+(00.039348) cg-prop: 	Property "cpuset.sched_relax_domain_level"
+(00.039349) cg-prop: Parsing controller "blkio"
+(00.039349) cg-prop: 	Strategy "replace"
+(00.039350) cg-prop: 	Property "blkio.weight"
+(00.039350) cg-prop: Parsing controller "freezer"
+(00.039351) cg-prop: 	Strategy "replace"
+(00.039351) cg-prop: Parsing controller "perf_event"
+(00.039352) cg-prop: 	Strategy "replace"
+(00.039352) cg-prop: Parsing controller "net_cls"
+(00.039352) cg-prop: 	Strategy "replace"
+(00.039353) cg-prop: 	Property "net_cls.classid"
+(00.039353) cg-prop: Parsing controller "net_prio"
+(00.039354) cg-prop: 	Strategy "replace"
+(00.039354) cg-prop: 	Property "net_prio.ifpriomap"
+(00.039355) cg-prop: Parsing controller "pids"
+(00.039355) cg-prop: 	Strategy "replace"
+(00.039356) cg-prop: 	Property "pids.max"
+(00.039356) cg-prop: Parsing controller "devices"
+(00.039357) cg-prop: 	Strategy "replace"
+(00.039357) cg-prop: 	Property "devices.list"
+(00.039368) Preparing image inventory (version 1)
+(00.039379) Add pid ns 1 pid 44
+(00.039382) Add net ns 2 pid 44
+(00.039386) Add ipc ns 3 pid 44
+(00.039389) Add uts ns 4 pid 44
+(00.039393) Add time ns 5 pid 44
+(00.039398) Add mnt ns 6 pid 44
+(00.039401) Add user ns 7 pid 44
+(00.039403) Add cgroup ns 8 pid 44
+(00.039404) cg: Dumping cgroups for thread 44
+(00.039414) cg:  `- New css ID 1
+(00.039415) cg:     `- [] -> [/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-podfdfb8d6b_710a_471e_abc0_e2305b90043f.slice/cri-containerd-9be8e19d9356d45217b1485f02487cd626385dd02c35b14adaae7386ba2d877e.scope] [0]
+(00.039416) cg: Set 1 is criu one
+(00.039450) Detected cgroup V1 freezer
+(00.039452) Warn  (compel/src/lib/infect.c:132): Unable to interrupt task: 34 (No such process)
+(00.039455) net: Unlock network
+(00.039458) Unfreezing tasks into 1
+(00.039458) 	Unseizing 34 into 1
+(00.039459) Error (compel/src/lib/infect.c:417): Unable to detach from 34: No such process
+(00.039462) Error (criu/cr-dump.c:1975): Dumping FAILED.
