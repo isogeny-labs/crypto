@@ -5,6 +5,7 @@ const s='research/twist_routes_1_3_20261021',v=s+'/execution-v4';
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 const source=process.argv[2]||null;
+const save=(name,record)=>{const p=v+'/'+name;if(fs.existsSync(p)&&read(p).freeze?.status==='frozen')return;fs.writeFileSync(p,JSON.stringify(record,null,2)+'\n');};
 const original=read(v+'/protocol.json');
 const instrument=(binary)=>({repo:'crypto',commit:source,build:[['cargo','+1.90.0','build','--release','--offline','--locked','--manifest-path',s+'/runner/Cargo.toml','--bin','twist-route-experiments','--bin','twist-progression']],binary_sha256:source?hash(s+'/runner/target/release/'+binary):null,threads:1});
 function common(p){
@@ -25,7 +26,7 @@ cost.variable_ledger.factors.find(f=>f.name==='analyst labels').how='Source is f
 const runtime=v+'/PREFLIGHT_RUNTIME.json';
 if(fs.existsSync(runtime)){const r=read(runtime);cost.sample_size.preflight_runtime={fixed_seconds:r.fixed_seconds,per_sample_seconds:r.per_sample_seconds,threads:1,estimated_total_seconds:r.estimated_880_worker_seconds,measured_on:runtime+'; operational L0 sizing only, not performance time'};}
 cost.extensions.metadata_and_blinding_gaps_remain=!source;
-fs.writeFileSync(v+'/cost.protocol.json',JSON.stringify(cost,null,2)+'\n');
+save('cost.protocol.json',cost);
 const geometry=common(structuredClone(original));geometry.protocol_id='twist-progression-geometry-v3';
 geometry.question='Exactly reproduce 240 target-blind base constructions and 7,680 finite source-group query counts on the original ten public fixtures.';
 geometry.claims=geometry.claims.filter(c=>c.class==='exact_computation'||c.class==='out_of_scope');
@@ -42,7 +43,7 @@ geometry.stopping_rules=[{rule:'Exactly 240 construction records and 7,680 queri
 geometry.decision_rule={text:'Accept only complete independent equality; publish every unsupported base and zero count.',comparison_ids:['finite-verification'],statistic:'Exact per-query counts and finite descriptive totals.',interval:'None: complete finite enumeration, no sampling inference.',multiple_comparison_correction:'none',effect_size_measure:'Exact finite tuple counts, not a speedup.',verdict_vocabulary:['verified finite equality','mismatch','unsupported base','not completed']};
 geometry.analysis_plan.blinded=false;geometry.analysis_plan.outputs=['CONSTRUCTION_CHECKS.json','QUERY_YIELDS.json','AUDIT.json'];
 geometry.extensions.phase='exact geometry only';geometry.extensions.metadata_and_blinding_gaps_remain=!source;
-fs.writeFileSync(v+'/geometry.protocol.json',JSON.stringify(geometry,null,2)+'\n');
+save('geometry.protocol.json',geometry);
 const preflight=common(structuredClone(cost));preflight.protocol_id='twist-progression-preflight-v3';
 preflight.question='Retain 60 fixed operational code-path/runtime probes before the main cost panel without selecting its sample or interpreting primary Ir.';
 preflight.claims=[{id:'preflight-records',text:'Retain actual exits and operational durations for the fixed 60 calls; no cost comparison or performance result is admitted.',class:'exact_computation',decided_by:['preflight-preservation']}];
@@ -57,5 +58,5 @@ preflight.randomization.blinding={analysis_labels_masked:false,how:'Primary Ir a
 preflight.analysis_plan.blinded=false;preflight.analysis_plan.outputs=['PREFLIGHT_RUNTIME.json'];
 preflight.decision_rule={text:'Retain all preflight attempts and derive operational planning estimates without changing the main sample/thresholds.',comparison_ids:['preflight-preservation'],statistic:'Operational worker durations only; primary Ir remains withheld.',interval:'No admitted performance interval.',multiple_comparison_correction:'none',effect_size_measure:'No scientific effect size is claimed.',verdict_vocabulary:['all attempts retained','not completed']};
 preflight.extensions.phase='separate operational preflight; not part of the 880 main cost cells';
-fs.writeFileSync(v+'/preflight.protocol.json',JSON.stringify(preflight,null,2)+'\n');
+save('preflight.protocol.json',preflight);
 console.log('Wrote phase protocol metadata; no research data analyzed.');
