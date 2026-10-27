@@ -36,6 +36,13 @@ jobs:
             research/ecbench_rho_optimized_20261014
             research/validation_sweep_20261019/A-leaderboard
             scripts/ic_audit
+            tools/artifacts
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/ic
       - name: The check catches a tampered row and a missing row
         run: bash scripts/ic_audit/test_check_board_recompute.sh
       - name: Every board row recomputes from raw records
