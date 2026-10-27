@@ -6,6 +6,7 @@ COPY run.sh /opt/run.sh
 COPY protocol.json /opt/protocol.json
 COPY source-revision.txt /opt/source-revision.txt
 COPY src /opt/src
+RUN chmod 755 /opt/sweep /opt/run.sh && chmod 644 /opt/protocol.json /opt/source-revision.txt && chmod -R a+rX /opt/src
 USER 1000
 WORKDIR /work
 ENTRYPOINT ["/bin/bash", "/opt/run.sh"]

@@ -38,3 +38,7 @@ Controls took about 0.006 seconds each in local development; this is not a pilot
 ## Deliverables
 
 Frozen source/protocol; digest-pinned image and job receipt; per-input/per-attempt results including failures; a table and graph of recorded results with a PDF report; a unified export; a committed branch and PR. Exact completion of every requested Dreg remains unresolved for resource-limited cells. This protocol does not promise that n83 systems will finish within the stated bounds.
+
+## Premeasurement amendment A1
+
+The first EKS job (v1) failed at container startup with `/opt/run.sh: Permission denied`, before any control or n83 input ran. Image permissions are corrected explicitly for UID 1000. The v1 schema had `sample_size.instances=48` even though that field means per-arm instances; v2 corrects it to 16 (8 m values times 2 target kinds), so 3 arms times 16 inputs times 2 modes is 96. The original prose and executable workload already specified that exact grid. Both protocols and the startup failure are retained. One fresh v2 attempt uses the unchanged mathematical source and budgets. This amendment precedes all affected target data.
