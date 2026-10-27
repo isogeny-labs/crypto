@@ -900,8 +900,21 @@ fn run_lines(n_field: u32, poly: u32, d: u32, quick: bool) -> Vec<String> {
             let lifting = fb.len() / 2;
             let (y, y2) = yield_ordered(&f, &cv, &fb, &inv, m, &targets);
             let pred = (fb.len() as f64).powi(m as i32) / order as f64;
+            // Amendment 3: the sampler never draws O or T = (0, sqrt b), so
+            // the matching expectation drops the ordered tuples summing to
+            // them: (|FB|^m - C_O - C_T) / (#E - 2), C_O and C_T exact.
+            let t_pt = Pt {
+                x: 0,
+                y: f.sqrt(b),
+                inf: false,
+            };
+            assert!(cv.on(&f, &t_pt));
+            let c_o = yield_ordered(&f, &cv, &fb, &inv, m, &[O]).0 as u64;
+            let c_t = yield_ordered(&f, &cv, &fb, &inv, m, &[t_pt]).0 as u64;
+            let pred_excl = ((fb.len() as f64).powi(m as i32) - (c_o + c_t) as f64)
+                / (order - 2) as f64;
             rows.push(format!(
-                "{{\"kind\":\"line\",\"N\":{n_field},\"d\":{d},\"m\":{m},\"curve\":{ci},\"a\":{a},\"b\":{b},\"Tr_a\":{ta},\"line\":\"{name}\",\"u\":{},\"u_count\":{tries},\"line_nonzero\":{},\"lifting\":{lifting},\"fb_points\":{},\"order\":{order},\"targets\":{nt},\"yield_ordered_mean\":{y:.6},\"yield_ordered_m2\":{y2:.6},\"yield_pred\":{pred:.6}}}",
+                "{{\"kind\":\"line\",\"N\":{n_field},\"d\":{d},\"m\":{m},\"curve\":{ci},\"a\":{a},\"b\":{b},\"Tr_a\":{ta},\"line\":\"{name}\",\"u\":{},\"u_count\":{tries},\"line_nonzero\":{},\"lifting\":{lifting},\"fb_points\":{},\"order\":{order},\"targets\":{nt},\"yield_ordered_mean\":{y:.6},\"yield_ordered_m2\":{y2:.6},\"yield_pred\":{pred:.6},\"c_O\":{c_o},\"c_T\":{c_t},\"yield_pred_excl\":{pred_excl:.6}}}",
                 if *name == "twisted" { u } else { 1 },
                 (1u64 << d) - 1,
                 fb.len()
@@ -909,6 +922,62 @@ fn run_lines(n_field: u32, poly: u32, d: u32, quick: bool) -> Vec<String> {
         }
     }
     rows
+}
+
+/// Exact number of u with Tr_{N/d}(u) = Tr_{N/d}(sqrt(b)/u) = 0 (u != 0).
+fn u_count_exact(f: &Fq, d: u32, b: u32) -> u64 {
+    let c = f.sqrt(b);
+    let mut cnt = 0u64;
+    for u in 1..=(f.q1 as u32) {
+        if tr_rel(f, u, d) == 0 && tr_rel(f, f.mul(c, f.inv(u)), d) == 0 {
+            cnt += 1;
+        }
+    }
+    cnt
+}
+
+/// Amendment 3 census: u-count distribution over b, exhaustive (every b in
+/// F_q^*) or on `sample` uniform b. With q = 2^d and n = N/d the corrected
+/// theorem allows only (q - 1) * r with
+/// n = 2: r in {0, q - 1} ... written as count in {0, q - 1};
+/// n = 3: r in {0, 1, 2, q + 1} (zeros of a binary quadratic form on P^1);
+/// n = 4: any r (points of a plane cubic), count divisible by q - 1.
+fn u_census(n_field: u32, poly: u32, d: u32, sample: Option<u64>) -> String {
+    let f = Fq::new(n_field, poly);
+    let q1 = (1u64 << d) - 1;
+    let n = n_field / d;
+    let mut hist: std::collections::BTreeMap<u64, u64> = Default::default();
+    let mut bad = 0u64;
+    let mut rng = Rng::new(&format!("ucensus_d{d}"), n_field);
+    // ker Tr_{N/d}, listed once (the u-count only ranges over it)
+    let ker: Vec<u32> = (1..=(f.q1 as u32))
+        .filter(|&u| tr_rel(&f, u, d) == 0)
+        .collect();
+    let bs: Vec<u32> = match sample {
+        None => (1..=(f.q1 as u32)).collect(),
+        Some(k) => (0..k).map(|_| 1 + rng.below(f.q1 as u64) as u32).collect(),
+    };
+    for &b in &bs {
+        let cb = f.sqrt(b);
+        let c = ker
+            .iter()
+            .filter(|&&u| tr_rel(&f, f.mul(cb, f.inv(u)), d) == 0)
+            .count() as u64;
+        *hist.entry(c).or_default() += 1;
+        let ok = match n {
+            2 => c == 0 || c == q1,
+            3 => c % q1 == 0 && [0, 1, 2, q1 + 2].contains(&(c / q1)),
+            _ => c % q1 == 0,
+        };
+        bad += (!ok) as u64;
+    }
+    let h: Vec<String> = hist.iter().map(|(k, v)| format!("\"{k}\":{v}")).collect();
+    format!(
+        "{{\"kind\":\"u_census\",\"N\":{n_field},\"d\":{d},\"n\":{n},\"exhaustive\":{},\"b_count\":{},\"violations\":{bad},\"hist\":{{{}}}}}",
+        sample.is_none(),
+        bs.len(),
+        h.join(",")
+    )
 }
 
 /// (N, d) cells for the composite-degree line study.
@@ -1188,6 +1257,35 @@ fn main() {
     // optional third argument: largest field degree to run (for timing tests)
     let maxn: u32 = args.get(3).and_then(|s| s.parse().ok()).unwrap_or(99);
     std::fs::create_dir_all(&out).unwrap();
+    if mode == "ucount" {
+        // ucount <N> <d> <b>: exact u-count for one curve
+        let nf: u32 = args[2].parse().unwrap();
+        let d: u32 = args[3].parse().unwrap();
+        let b: u32 = args[4].parse().unwrap();
+        let poly = FIELDS.iter().find(|x| x.0 == nf).unwrap().1;
+        let f = Fq::new(nf, poly);
+        println!("N={nf} d={d} b={b} u_count={}", u_count_exact(&f, d, b));
+        return;
+    }
+    if mode == "census" {
+        std::fs::create_dir_all(&out).unwrap();
+        let mut fh = std::fs::File::create(format!("{out}/u_census.jsonl")).unwrap();
+        for &(nf, d, sample) in &[
+            (12u32, 6u32, None),
+            (15, 5, None),
+            (18, 6, None),
+            (18, 9, None),
+            (16, 4, None),
+            (21, 7, Some(4096u64)),
+            (20, 5, Some(4096)),
+        ] {
+            let poly = FIELDS.iter().find(|x| x.0 == nf).unwrap().1;
+            let r = u_census(nf, poly, d, sample);
+            eprintln!("{r}");
+            writeln!(fh, "{r}").unwrap();
+        }
+        return;
+    }
     let mut fh = std::fs::File::create(format!("{out}/rows.jsonl")).unwrap();
     let t0 = Instant::now();
     for &(n, poly) in FIELDS {

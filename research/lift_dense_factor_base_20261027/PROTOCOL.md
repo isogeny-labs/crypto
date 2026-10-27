@@ -196,3 +196,49 @@ Equivalence was checked by running quick mode before and after the change:
 the rows (173 lines, `secs` fields removed) are byte-identical, sha256
 `591f531e…0ff0` both times. Every result was produced by the pre-format
 binary (sha256 of its source in `AMEND1.sha256`).
+
+## Amendment 3 (2026-10-27, after review findings on PR #2686, before any rerun)
+
+Three review findings (Codex, PR #2686) were verified. Each is a defect in
+this study.
+
+1. **n = 3 u-count (theorem error).** The set of valid [u] ∈ P(ker T) ≅ P¹
+   is the zero set of a binary quadratic form over F_q. It has 0, 1 or 2
+   points, or all q + 1 points if the form vanishes. So the u-count is in
+   {0, q−1, 2(q−1), q²−1}, not {0, 2(q−1)}.
+   - Verified counterexample: N = 15, d = 5, b = 4 gives 31.
+   - H-B was scored with the wrong set. It passed only because no sampled
+     curve was degenerate.
+   - **H-B′:** the corrected sets, n = 2: {0, q−1}; n = 3: as above;
+     n = 4: multiple of q−1.
+   - Plus an exhaustive census over every b ∈ F_q^* at (12,6), (15,5),
+     (18,6), (18,9), (16,4), and 4096 sampled b at (21,7), (20,5)
+     (`census` mode). Pass iff zero violations.
+2. **Yield expectation vs sampled population.** The sampler draws only
+   points with x ≠ 0, so O and T = (0, √b) are never targets, while
+   |F|^m/#E averages over all of E. The matching expectation is
+   (|F|^m − C_O − C_T)/(#E − 2), where C_O and C_T are the exact numbers of
+   ordered m-tuples summing to O and to T.
+   - **H-A″:** H-A′ against this expectation. The line cells are rerun with
+     the same seed and identical targets, adding C_O and C_T, into
+     `reports/run-20261027T0356Z/lines_amend3/`.
+   - The run must reproduce the confirmatory means exactly.
+3. **No Python execution path (AGENTS.md).**
+   - The c2pnb check is replaced by the native `src/bin/c2pnb.rs`. It must
+     reproduce every deterministic field of the historical Python output
+     exactly: Tr(a), F₁₆ membership, u_kernel_T and u_all_lift. Sampled
+     lifts use 200 samples.
+   - Scoring is replaced by the native `summarize/` crate. The historical
+     `summarize.py`, `c2pnb_lines.py` and `c2pnb_delta.py` and their outputs
+     are kept unchanged, as labelled Python-provenance evidence. They are no
+     longer executed.
+   - The cost-model delta is reported natively only for the 2LP time
+     metric, in closed form:
+     Δ = ½(log₂ p′/p − 3 log₂ N′/N) = ½(4 − 3) = +0.5 bits.
+     The multi-metric table came from the upstream Python model
+     (crypto-autoresearcher) and is quoted as historical evidence, not
+     regenerated.
+   - `plot.py` stays: it is layout only and reads `summary.json`.
+
+The kmax, count, H-C and density results are not rerun; their verdicts
+stand.
