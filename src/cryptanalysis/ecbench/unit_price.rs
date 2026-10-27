@@ -71,11 +71,16 @@ fn on_one_thread<T>(f: impl FnOnce() -> T) -> T {
     unsafe impl<F> Send for Local<F> {}
     struct Out<T>(T);
     unsafe impl<T> Send for Out<T> {}
-    let pool = rayon::ThreadPoolBuilder::new()
-        .num_threads(1)
-        .use_current_thread()
-        .build()
-        .expect("one-thread rayon pool on the current thread");
+    // One pool for the process: a thread can be the current-thread member of
+    // only one.
+    static POOL: std::sync::OnceLock<rayon::ThreadPool> = std::sync::OnceLock::new();
+    let pool = POOL.get_or_init(|| {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .use_current_thread()
+            .build()
+            .expect("one-thread rayon pool on the current thread")
+    });
     let job = Local(f);
     let out = pool.install(move || {
         let job = job;
