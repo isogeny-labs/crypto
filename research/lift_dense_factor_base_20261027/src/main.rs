@@ -911,8 +911,8 @@ fn run_lines(n_field: u32, poly: u32, d: u32, quick: bool) -> Vec<String> {
             assert!(cv.on(&f, &t_pt));
             let c_o = yield_ordered(&f, &cv, &fb, &inv, m, &[O]).0 as u64;
             let c_t = yield_ordered(&f, &cv, &fb, &inv, m, &[t_pt]).0 as u64;
-            let pred_excl = ((fb.len() as f64).powi(m as i32) - (c_o + c_t) as f64)
-                / (order - 2) as f64;
+            let pred_excl =
+                ((fb.len() as f64).powi(m as i32) - (c_o + c_t) as f64) / (order - 2) as f64;
             rows.push(format!(
                 "{{\"kind\":\"line\",\"N\":{n_field},\"d\":{d},\"m\":{m},\"curve\":{ci},\"a\":{a},\"b\":{b},\"Tr_a\":{ta},\"line\":\"{name}\",\"u\":{},\"u_count\":{tries},\"line_nonzero\":{},\"lifting\":{lifting},\"fb_points\":{},\"order\":{order},\"targets\":{nt},\"yield_ordered_mean\":{y:.6},\"yield_ordered_m2\":{y2:.6},\"yield_pred\":{pred:.6},\"c_O\":{c_o},\"c_T\":{c_t},\"yield_pred_excl\":{pred_excl:.6}}}",
                 if *name == "twisted" { u } else { 1 },

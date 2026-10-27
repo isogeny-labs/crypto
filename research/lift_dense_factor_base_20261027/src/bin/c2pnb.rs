@@ -193,7 +193,10 @@ fn field(block: &str, key: &str) -> El {
             acc.push_str(rest);
         }
     }
-    let acc: String = acc.chars().filter(|c| !c.is_whitespace() && *c != ':').collect();
+    let acc: String = acc
+        .chars()
+        .filter(|c| !c.is_whitespace() && *c != ':')
+        .collect();
     hex_to_el(&acc)
 }
 

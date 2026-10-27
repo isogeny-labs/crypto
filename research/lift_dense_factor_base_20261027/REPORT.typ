@@ -8,11 +8,18 @@
 Study `research/lift_dense_factor_base_20261027/`, 2026-10-27.
 - Run: `reports/run-20261027T0356Z/`, master seed `0x11F7_2026_1027_C`.
 - Protocol: `PROTOCOL.md`, frozen at `80ac6c421` before the run.
-  Amendment 1 is at `397f055bf`, made after the run and before the rerun of
-  the line cells.
+  Amendments, all made after the run:
+  - 1 (`397f055bf`): empirical variance;
+  - 2 (`ce62b2a9e`): rustfmt only, with byte-identical outputs;
+  - 3 (`0e40561a6`): review fixes.
 - Harness: `src/main.rs`, std-only Rust.
-- Real-parameter checks: `c2pnb/`.
-- Scoring: `summarize.py`. Plotting: `plot.py`, layout only.
+- Real-parameter check: `src/bin/c2pnb.rs`, native.
+- Scoring: `summarize/`, native.
+- Plotting: `plot.py`, layout only.
+- Historical Python scripts (`c2pnb/*.py`, `summarize.py`) are kept as
+  evidence and no longer executed.
+- Lean: `lean/PROOF_MAP.md`. Formalization was attempted but *not built*;
+  see §Lean.
 
 Each statement is tagged *theorem*, *exact computation*, *measured*,
 *model output* or *not established*.
@@ -44,6 +51,11 @@ constraint, buys.
   - The amended rule (H-A′, empirical per-target variance, same targets)
     fails on *one* row: $N = 15$, standard line, $z = -4.35$. Over all 87
     rows, $z$ has mean $-0.28$ and sd $1.24$.
+  - Amendment 3 fixes a population mismatch: targets are never $O$ or
+    $T = (0, sqrt(b))$, so the matching expectation is
+    $(|F|^m - C_O - C_T)\/(\#E - 2)$, with $C_O$ and $C_T$ counted exactly.
+    Scored against it (H-A″), the same single row fails ($z = -4.35$), and
+    $z$ has mean $-0.18$ and sd $1.26$.
   - No bias is indicated. The residual overdispersion is a limit of the
     sampling model, not of the identity.
 
@@ -57,18 +69,34 @@ constraint, buys.
   all-twist if $"Tr"(a) = 1$. The line is an $FF_(2^d)$-subspace, so
   Gaudry–Diem descent applies with the same monomial support.
 
-  Existence of $u$ is a projective condition on $P(ker T)$:
-  - $n = 2$: $ker T = FF_(2^d)$, so $u$ exists iff $c in FF_(2^d)$;
-  - $n = 3$: a binary quadratic form, so the count is $0$ or
-    $2(2^d - 1)$, with an isotropy (Artin–Schreier) criterion;
-  - $n = 4$: a plane cubic, so the count is $(2^d - 1)$ times its points.
+  *Proposition 3 (corrected in Amendment 3).* Existence of $u$ is a
+  projective condition on $P(ker T)$, with $q = 2^d$:
+  - $n = 2$: $ker T = FF_q$, so $u$ exists iff $c in FF_q$, and then every
+    $u in FF_q^*$ works;
+  - $n = 3$: $T(c\/u) = T(c u^q u^(q^2))\/N(u)$ is a binary quadratic form
+    on $ker T tilde.equiv FF_q^2$. Its zero set in $P^1$ has 0, 1 or 2
+    points, or all $q+1$ if the form vanishes. So the count is in
+    $\{0, q-1, 2(q-1), q^2 - 1\}$;
+  - $n = 4$: a plane cubic, so the count is $(q - 1)$ times its points.
 
-  *Exact computation* (H-B): pass on 72 of 72 curves.
+  The first version claimed $\{0, 2(q-1)\}$ at $n = 3$. That is wrong:
+  Codex review found $N = 15$, $d = 5$, $b = 4$ with count 31, the
+  single-root case.
+
+  *Exact computation, corrected rule (H-B′): pass.*
+  - Exhaustive census over every $b$ at $(N, d) = (12,6), (15,5), (18,6),
+    (18,9), (16,4)$, plus 4096 sampled $b$ at $(21,7), (20,5)$: 0
+    violations.
+  - At $N = 15$ the counts are 0 (15,376 of $b$), 31 (1,023 $approx 1\/q$)
+    and 62 (16,368).
+  - At $n = 4$, $u$ existed for every $b$ checked (minimum 150 at
+    $N = 16$).
+
+  *Line curves (H-B as registered, also H-B′): pass on 72 of 72.*
   - With $"Tr"(a) = 0$, every twisted line lifts 100 %.
   - With $"Tr"(a) = 1$, every one lifts 0 %.
   - $n = 2$: no $u$ on 32 of 32 random curves.
-  - $n = 3$: counts in $\{0, 2(2^d - 1)\}$ on all 24 curves; 11 of 24 had
-    a $u$.
+  - $n = 3$: 11 of 24 curves had a $u$; none was degenerate.
   - $n = 4$: counts are multiples of $2^d - 1$ (180–1116), and $u$ exists
     on 16 of 16 curves.
 
@@ -76,14 +104,21 @@ constraint, buys.
   curves ($N = 16k$, $a, b in FF_(2^16)$), $u$ is taken in $FF_(2^16)$, so
   $u FF_Q$ stays $pi_16$-stable.
   - *c2pnb208w1* and *c2pnb368w1* have $"Tr"(a) = 0$. They have 180 and 330
-    valid $u$. 40/40 sampled twisted elements lift, against 23/40 and 25/40
-    on the standard base $FF_Q$: *applicable*.
-  - *c2pnb176v1, 272w1, 304w1* have $"Tr"(a) = 1$. The lines lift 0/40:
+    valid $u$. 200/200 sampled twisted elements lift, against 103/200 and
+    95/200 on the standard base $FF_Q$: *applicable*.
+  - *c2pnb176v1, 272w1, 304w1* have $"Tr"(a) = 1$. The lines lift 0/200:
     *inapplicable*. The trace homomorphism puts the whole line on the twist.
+  - The native check reproduces the historical Python output on every
+    deterministic field: $"Tr"(a)$, $FF_(2^16)$ membership, the kernel size
+    and the u-counts.
 
-+ *Cost (model output, not a measurement).* The upstream C1 Gaudry–Diem
-  $n = 4$ model was rerun with only two inputs changed: base doubled and
-  $p_"dec" = 16\/24$. The model is unchanged and copied with its sha256.
++ *Cost (model output, not a measurement).* Natively, in closed form:
+  the 2LP optimum $T^* prop sqrt(N^3\/p)$ with $N' = 2N$ and $p' = 16p$
+  changes the margin by $+0.50$ bits.
+
+  The upstream C1 Gaudry–Diem $n = 4$ model (Python, crypto-autoresearcher)
+  was run once with only those two inputs changed. Its output is quoted as
+  historical evidence and not regenerated:
   - Under double large primes, for the applicable rows at
     $c_"trial" = 2^27$ and $2^30$:
     - time, memory model (a) and mesh-a: *+0.50 to +0.78 bits*;
@@ -155,6 +190,24 @@ constraint, buys.
     $"Tr"(a) = 0$, and nothing at prime degree.
   - It also decides applicability: on c2pnb176v1, 272w1 and 304w1 the same
     construction lands on the twist.
+
+== Lean
+
+AGENTS.md requires a Lean formalization attempt for new theorems. The draft
+`lean/LiftDense.lean.unbuilt` states two results against Mathlib:
+- Lemma 1, the trace tower for $y u$;
+- Theorem 2 in trace form: $"Tr"_(M\/K)(y u + a + c\/(y u)) = "Tr"_(M\/K)(a)$
+  when $"Tr"_(M\/L)(u) = "Tr"_(M\/L)(c u^(-1)) = 0$.
+
+It was *never compiled*: this session could not install a Lean toolchain
+(the installer download was refused by the session's permission policy).
+It is therefore not a proof. The `.unbuilt` suffix keeps the repository
+proof gate from treating it as one.
+
+Open obligations, recorded in `PROOF_MAP.md`:
+- O1: the Artin–Schreier lift criterion;
+- O2: $"Tr"(b\/x^2) = "Tr"(sqrt(b)\/x)$;
+- O3: Proposition 3.
 
 == Not claimed
 

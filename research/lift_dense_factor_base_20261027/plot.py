@@ -1,4 +1,5 @@
 """Layout only: plots values recorded in summary.json (research-visuals skill).
+summary.json is written by the native scorer (summarize/); this file computes nothing.
 
 Usage: python3 plot.py reports/run-<UTC>/
 """
@@ -110,7 +111,7 @@ style(ax)
 save(fig, "fig3_kmax")
 
 # 4. c2pnb cost-model delta (model output)
-D = [r for r in S.get("c2pnb_delta", []) if r["lp"] == "2LP" and r["log2_c_trial"] == 30.0]
+D = [r for r in S.get("c2pnb_delta_historical_python", []) if r["lp"] == "2LP" and r["log2_c_trial"] == 30.0]
 if D:
     fig, ax = plt.subplots(figsize=(6.4, 3.0))
     curves = sorted({r["curve"] for r in D})
@@ -123,8 +124,8 @@ if D:
     ax.set_xticks(range(len(curves)), [c + ("" if any(r["applies"] for r in D if r["curve"] == c) else "\n(Tr a = 1)")
                                        for c in curves], fontsize=7)
     ax.set_ylabel("margin change, bits (model)")
-    ax.set_title("C1 Gaudry-Diem n=4 cost model, 2LP, c_trial = 2^30: all-lift line vs x in F_Q\n"
-                 "(applies only where Tr(a) = 0; model output, not a measurement)", fontsize=9)
+    ax.set_title("C1 Gaudry-Diem n=4 cost model (historical Python model output), 2LP, c_trial = 2^30:\n"
+                 "all-lift line vs x in F_Q; applies only where Tr(a) = 0; not a measurement", fontsize=9)
     ax.legend(fontsize=7, frameon=False, ncol=4)
     style(ax)
     save(fig, "fig4_c2pnb_delta")

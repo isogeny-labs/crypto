@@ -2,7 +2,7 @@
 
 2026-10-27. Results report: [`REPORT.pdf`](REPORT.pdf) (source
 [`REPORT.typ`](REPORT.typ)). Protocol, frozen before the run at `80ac6c421`
-with Amendment 1 at `397f055bf`: [`PROTOCOL.md`](PROTOCOL.md). Run:
+with Amendments 1–3 (`397f055bf`, `ce62b2a9e`, `0e40561a6`): [`PROTOCOL.md`](PROTOCOL.md). Lean status: [`lean/PROOF_MAP.md`](lean/PROOF_MAP.md) (attempted, **not built**). Run:
 [`reports/run-20261027T0356Z/`](reports/run-20261027T0356Z/).
 
 **Question.** On a binary curve y² + xy = x³ + ax² + b, a nonzero x lifts
@@ -29,11 +29,11 @@ avoid the twist?
 | check | result |
 |:--|:--|
 | twisted line lifts (Tr(a) = 0 / Tr(a) = 1), N ∈ {15, 16, 18, 20, 21}; u exists on 0/32 (n = 2), 11/24 (n = 3), 16/16 (n = 4) | 100 % on every curve with a u / 0 % on every curve |
-| u-count rule (n = 2: none unless √b ∈ F_{2^d}; n = 3: 0 or 2(2^d − 1); n = 4: multiple of 2^d − 1) | holds on 72 of 72 curves (H-B) |
-| m = n yield, twisted / standard (Tr(a) = 0) | measured 4.65–35.3 against predicted 4.94–21.1 per curve; pooled measured/predicted per cell 0.906–1.022. H-A (Poisson rule) failed on 25/87 rows; H-A′ (empirical variance, Amendment 1) fails on 1/87 rows (z = −4.35), all pooled cells pass |
-| c2pnb208w1, c2pnb368w1 (Tr(a) = 0) | 180 / 330 valid u ∈ F_{2^16} (π_16-stable); 40/40 sampled line elements lift (standard base: 23/40, 25/40) |
-| c2pnb176v1, 272w1, 304w1 (Tr(a) = 1) | the same lines lift 0/40: inapplicable by the trace obstruction |
-| upstream C1 cost model (2LP), applicable rows | time / memory-(a) / mesh-a: +0.50 to +0.78 bits; memory-(b) metrics: −0.51 to +0.57 bits (**model output, not a measurement**); falling back to a half sub-base recovers the standard rate, so the option is weakly dominant |
+| u-count (q = 2^d). n = 2: {0, q−1}, and nonzero only when √b ∈ F_q. n = 3: {0, q−1, 2(q−1), q²−1}, the zeros of a binary quadratic form on P¹. n = 4: a multiple of q−1 | **H-B′ pass**: 72/72 line curves, plus an exhaustive census over every b at (12,6), (15,5), (18,6), (18,9), (16,4) and 4096 sampled b at (21,7), (20,5), with 0 violations. The registered rule (n = 3: 0 or 2(q−1)) was **wrong**: Codex found N = 15, d = 5, b = 4 → 31, and the census shows the single-root case for 1023 of 32767 b at N = 15. n = 4: u existed for every b checked |
+| m = n yield, twisted / standard (Tr(a) = 0) | measured 4.65–35.3 against predicted 4.94–21.1 per curve; pooled measured/predicted per cell 0.906–1.022. H-A (Poisson rule) failed on 25/87 rows; H-A′ (empirical variance, Amendment 1) and H-A″ (expectation excluding O and T, Amendment 3) each fail on 1/87 rows (z = −4.35); all pooled cells pass; z has mean −0.18, sd 1.26 |
+| c2pnb208w1, c2pnb368w1 (Tr(a) = 0) | 180 / 330 valid u ∈ F_{2^16} (π_16-stable); 200/200 sampled line elements lift (standard base: 103/200, 95/200). Native check (`src/bin/c2pnb.rs`); it reproduces the historical Python output on every deterministic field |
+| c2pnb176v1, 272w1, 304w1 (Tr(a) = 1) | the same lines lift 0/200: inapplicable by the trace obstruction |
+| C1 cost model (2LP), applicable rows | native closed form, 2LP time: **+0.50 bits**. The historical Python run of the upstream model gave: time / memory-(a) / mesh-a +0.50 to +0.78 bits; memory-(b) −0.51 to +0.57 bits. All are **model outputs, not measurements**. Falling back to a half sub-base recovers the standard rate, so the option is weakly dominant |
 | prime-degree repulsion, exact all-lift 4-subspace counts / E₄ (curves vs density-paired nulls) | N = 11: 0.921 ± 0.018 vs 1.027 ± 0.053, one-sided permutation p = 2·10⁻⁵ (**confirmed**, H-C); N = 9: 0.68 vs 1.02; N = 13: 0.981 vs 0.994, p = 0.019 |
 | largest all-lift subspace, prime N ≤ 13 (exact) | curve median ≤ null median (4/4, 4/5, 5/5 at N = 9, 11, 13); planted subspaces recovered 100 %. Above N = 13 the budgeted search found 0 of the planted subspaces, so those values are 'found under budget' only |
 
@@ -73,10 +73,11 @@ The study records where the trace acts and what each use is worth:
 
 ```sh
 cargo run --release -- full reports/run-<UTC>/                     # ~27 min, 4 threads
-cargo run --release -- lines reports/run-<UTC>/lines_amend1/       # Amendment 1 rerun
-python3 -I c2pnb/c2pnb_lines.py <binary-curve-params.txt> reports/run-<UTC>/c2pnb_lines.json
-python3 c2pnb/c2pnb_delta.py reports/run-<UTC>/c2pnb_delta.json
-python3 summarize.py reports/run-<UTC>/ && python3 plot.py reports/run-<UTC>/
+cargo run --release -- lines reports/run-<UTC>/lines_amend3/       # Amendment 3 rerun (adds C_O, C_T)
+cargo run --release -- census reports/run-<UTC>/lines_amend3/      # u-count census
+cargo run --release --bin c2pnb -- reports/run-<UTC>/c2pnb_input_binary-curve-params.txt reports/run-<UTC>/c2pnb_native.json 200
+(cd summarize && cargo run --release -- ../reports/run-<UTC>/)     # native scoring
+python3 plot.py reports/run-<UTC>/                                  # layout only
 ```
 
 - `src/main.rs`: std-only harness.
@@ -85,18 +86,26 @@ python3 summarize.py reports/run-<UTC>/ && python3 plot.py reports/run-<UTC>/
   - planted, null and structured arms;
   - twisted-line construction with exact u-counts;
   - point-arithmetic yields.
-- `c2pnb/`:
-  - real-parameter checks;
-  - cost-model delta;
-  - the upstream model, copied unchanged (sha256 in `FREEZE.sha256`);
-  - the input parameter file and its sha256, kept in the run directory.
-- `summarize.py`: scoring against PROTOCOL §4 and Amendment 1.
-  `plot.py`: layout only.
+- `src/bin/c2pnb.rs`: native c2pnb check over GF(2^N), N ≤ 368.
+- `summarize/`: native scoring of PROTOCOL §4 and Amendments 1–3.
+- `plot.py`: layout only; reads `summary.json`.
+- `lean/`: the Lean draft (`LiftDense.lean.unbuilt`) and the proof map.
+  Formalization was attempted but not built: no Lean toolchain could be
+  installed in this session.
+- **Historical Python, kept as evidence and no longer executed** (AGENTS.md
+  forbids Python research paths):
+  - `c2pnb/c2pnb_lines.py`;
+  - `c2pnb/c2pnb_delta.py`, with the upstream model copied unchanged as
+    `c2pnb/c1_model_upstream.py`;
+  - `summarize.py`.
+
+  Their outputs (`c2pnb_lines.json`, `c2pnb_delta.json`) stay in the run
+  directory with Python provenance.
 
 ## Provenance notes
 
-- `summarize.py` was changed after the run, in two places, both recorded
-  in git history:
+- Before the native scorer replaced it, `summarize.py` was changed after
+  the run in two places, both recorded in git history:
   - the Amendment 1 scoring (H-A′);
   - a post-hoc correction of the m = 2 instrument check, which is not a
     decision rule. Sampled targets exclude O and T, so the prediction drops
