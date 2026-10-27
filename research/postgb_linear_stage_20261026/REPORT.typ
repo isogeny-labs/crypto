@@ -106,7 +106,9 @@ appeared to rise about 3%.
 
 *Tables A–C.* No row moves.
 
-*§5a band.* `jv_cover` emits no unpriced native work, so S is the same at 0, 0.1 and 1 GAE per operation. Rho is
+*§5a band.* The IC emits no unpriced native work, so its S (pooled 408) is a lower bound at w > 0. The negation-map
+rho's unpriced canonicalisations and table operations, bounded by the validator, put its pooled S at 0.82, 1.37 and 6.35
+at 0, 0.1 and 1 GAE, so IC ÷ rho is 497, 297 and 64. Rho is
 cheaper than both arms across the band. Against the negation-map rho, S/rho with `fast` is 257–1310; that is the
 distance remaining.
 

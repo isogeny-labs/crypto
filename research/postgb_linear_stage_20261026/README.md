@@ -9,8 +9,12 @@ before any measured session, with amendments
 [`examples/postgb_la_summary.rs`](../../examples/postgb_la_summary.rs) from the
 run records in `runs/`: wall time from the R2 cards, counted multiplications and
 S from the R3 cards. Validation lives in [`validation/`](validation/): an
-independent replay, recompute and scalar check, described in
-[`VALIDATION_NOTES.md`](validation/VALIDATION_NOTES.md).
+independent replay, recompute and scalar check, all in Rust, described in
+[`VALIDATION_NOTES.md`](validation/VALIDATION_NOTES.md). **Validated** under the
+2026-10-19 gate: [`validation/VALIDATION.json`](validation/VALIDATION.json) holds
+the replay certificate (with every solved logarithm checked independently), the
+validator report (151 headline numbers recomputed at 1e-9), and the matched
+negation-map rho reference with its §5a band.
 
 The owner asked (2026-10-26) for the linear-algebra stage to be sped up until
 it takes the leaderboard's linear-algebra section. The measurement is end to
@@ -165,8 +169,19 @@ counter, S had appeared to rise about 3%. P4's ±10% bound on S held.
 257–1310. The negation map's mean S over 4 runs is 0.55–1.40, against 1.10–1.48
 for the plain rho.
 
-**§5a band.** `jv_cover` emits no unpriced native work, so S is the same at 0,
-0.1 and 1 GAE per operation. Rho is cheaper than either arm across the band.
+**§5a band.** The IC side emits no unpriced native work, so its S is the same at
+0, 0.1 and 1 GAE per operation, and at w > 0 it is a lower bound. The
+negation-map rho leaves its canonicalisations, partition hashes and table
+operations unpriced. The validator bounded that work from rho's own counts.
+Pooled over the four instances, with rho at the upper bound:
+
+| GAE per unpriced op | 0 | 0.1 | 1 |
+|:--|--:|--:|--:|
+| IC (fast) S | 408 | 408 (lower bound) | 408 (lower bound) |
+| negation-map rho S | 0.82 | 1.37 | 6.35 |
+| IC ÷ rho | 497 | 297 | 64 |
+
+Rho is cheaper on every instance at every weight, so the order holds across the band.
 
 ### 4. Host dependence
 

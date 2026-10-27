@@ -1,262 +1,280 @@
-# Validation notes: postgb_linear_stage_20261026
+# Validation notes, round 2: postgb_linear_stage_20261026
 
-Independent validation of snapshot `e9bf8737a38fa4446acec23812eaaf085d8426a6`
-(branch `feat/sleepy-tesla-1ucug8`), 2026-10-27. The validator did not produce
-the study. Every input was read from the commit with `git show` / `git archive`,
-not from the working tree. `scripts/summary.py` was neither read nor run before
-the recomputation agreed with `analysis/summary.json`.
+This is an independent validation of snapshot `6f356f71ef8b5392fe27da22170b914e37109390`
+(branch `feat/sleepy-tesla-1ucug8`), made on 2026-10-27. It covers amendment 3, the R3
+cards, the native summary, and the negation-map rho reference. The validator did not
+produce the study.
 
-Files:
+**Inputs.** Every input was read with `git show <commit>:<path>`. The working tree was
+not used. `examples/postgb_la_summary.rs` was neither read nor run.
 
-- `recompute.py` writes `validator-report.json`. It is the validator's own
-  recomputation from the raw `runs/` files and the card receipts.
-- `replay/sample.py` draws the nonce sample (`replay/sample.json`).
-  `replay/run_replay.py` runs the pinned binaries and writes `replay/journal.json`
-  and `replay/out/`. `replay/check_replay.py` writes `replay-certificate.json`.
-- `verify_scalars.py` writes `scalar-verification.json`. It is the validator's
-  own F_p / F_{p²} / F_{p⁶} and curve arithmetic, and shares no code with the
-  repository.
-- `replay/run_dump_replay.py` is the validator's own run of the dump binary on
-  three instances; it writes `replay/journal-dump.json` and
-  `replay/out/dump_*`.
-- `scalar-dump/` holds the producer's dump runs (commit ca7dc711fa); the
-  validator only read them.
+**Target commit.** The work started on 12a5bba630. The Coordinator then moved the
+target to 6f356f71ef. Between the two commits no file under `runs/` or `cards/` and no
+protocol file changed. Only `summary.json`, its generator, the write-ups and the
+leaderboard changed.
+
+## Tooling (AGENTS.md, "Implementation language: no Python")
+
+The validator's tools are now one Rust crate, `vtool/`. It is a standalone Cargo
+package with its own `[workspace]`. Its only dependencies are `serde_json`, `sha2` and
+`rand` 0.8, and it uses no repository code.
+
+- `vtool sample` draws the nonce sample.
+- `vtool verify-scalars` is the scalar check. It uses the validator's own F_p,
+  F_{p²}, F_{p⁶} and curve arithmetic.
+- `vtool recompute` recomputes the summary and checks receipts, coverage, gates and
+  the rho band.
+- `vtool check-replay` compares the replays and writes the certificate.
+
+`round2/run.sh` is the only shell piece. It is thin launch orchestration: it hashes
+and refuses a non-pinned binary, runs it, and appends a journal line.
+
+**Build:** `CARGO_TARGET_DIR=<scratch> cargo build --release --offline` in `vtool/`.
+
+**Python removed.** The round-1 Python tools are deleted from the tree:
+`recompute.py`, `verify_scalars.py` and `replay/{sample,run_replay,run_dump_replay,check_replay}.py`.
+They stay in git history (8165804332).
+
+**Round-1 outputs kept.** The round-1 outputs are kept as historical evidence of
+Python provenance and are superseded by round 2: `replay/`, `scalar-verification.json`
+and `scalar-dump/`.
 
 ## Status
 
 | file | status |
 |:--|:--|
-| `validator-report.json` | `pass`, `independent: true`. 273 checks, 110 headline numbers at rel_tol 1e-9, 0 mismatches, 0 underivable numbers. The gate's own `check_validator_report` returns no errors with `validation/` as base. |
-| `replay-certificate.json` | `verified`, `independent: true`, `scalars_verified: true`. Updated after the scalar follow-up (issue 1). The gate's `check_replay_certificate` reports no errors. The first version (sha256 b949534c…, committed by the producer in d600250d2c) had `scalars_verified: false`. |
-| `scalar-verification.json` | All 8 solved DLPs of R2-D1 and R2-D2 verified by `verify_scalars.py`, and all ties hold (issue 1). |
+| `validator-report.json` | `pass`, `independent: true`. 276 checks, 0 problems, 693 values compared, 151 headline numbers at rel_tol 1e-9, 0 mismatches. |
+| `replay-certificate.json` | `verified`, `independent: true`, `scalars_verified: true` (gate checker: no errors). It is backed by the full R3-C replay (253/253 systems, counts exact), 2 DLP replays, and the scalar verification. |
+| `round2/scalar-verification.json` | The 8 R3-D instances, the 8 round-1 dumps and the validator's 2 replay dumps all verify. |
+| `validation_report.yaml` | Role-contract report, verdict `passed`. |
 
-## Replay
+**Intermediate finding on 12a5bba630.** That commit failed on 17 `counted_ratio`
+fields:
+- In `dense_over_fast` and `host_a_dense_over_fast`, the figure labelled dense/fast
+  was R2 sparse/fast.
+- `ablation_sparse_over_portable_fast` and `host_a_sparse_over_fast` used the pre-fix
+  formula counts.
+- `P4.counted_outside_25pct` = 121 was in the sparse/fast direction.
 
-- **Nonce.** `82fe12d03e751ddca56c8de9e43ae80569404e92a7c2ea63e3db3068f79ca68f`,
-  256 bits from `/dev/urandom`. It was drawn at 2026-10-27T05:44:53Z, after
-  the snapshot commit (05:39:32Z).
-- **Sample.** 14 systems across all five families:
-  - jv-nagao: p101-0, p1009-11c, p53-8c
-  - gaudry-s4: p271-6, p271-3, p8191-7
-  - gaudry-d4: p97-4, p97-3, p1033-0
+The producer fixed these in 3b4ec13ae0 and 6f356f71ef. The dense, ablation and host-A
+blocks now carry no counted ratio, because no fixed-counter counts exist for them. P4
+now counts fast/sparse outside [0.75, 1.25]: 97 systems, made up of 85 dense,
+8 gaudry-s4, 2 gaudry-d4, 2 gaudry-s5 and 0 jv-nagao. The validator recomputed all of
+these.
+
+## Replay (round 2)
+
+- **Nonce.** `390ee4d7e27df3970a4bddaa8a10b09ea36962f5d9e9f12e81fdf86330c1faac`, from
+  `/dev/urandom`, drawn at 2026-10-27T09:00:14Z. That is after commit 12a5bba630
+  (08:54:36Z). The target 6f356f71ef came later, but changed no run record.
+- **Pinned binaries.** `postgb_la_bench` 06351d89… and `jv_cover` a49184b0… were copied
+  from `target/` the moment their hashes matched the R3 cards' binds. The copies were
+  used throughout.
+- **Sample.** 14 R3-C systems, drawn in `round2/sample.json`:
+  - jv-nagao: p53-3, p101-9c, p53-7
+  - gaudry-s4: p1039-2, p1039-6, p8191-1
+  - gaudry-d4: p4093-3, p1033-1, p4093-5
   - gaudry-s5: p13-0
-  - dense: n4-d5-p31-0, n4-d3-p31-1, n8-d2-p32-2, n2-d32-p16-0
-- **How they were reached.** 12 runs of the pinned `postgb_la_bench`
-  (c5612e2e…), one per (family, p[, shape]) group, with the card's `--per 8`
-  and `--reps 1`, cwd `/home/user/crypto`.
-- **Bench result.** All 82 systems in those groups (the 14 sampled plus 68
-  others) equal their recorded rows: n, p, delta, the arms present, every
-  arm's solution count, agreement, planted-point finding, fast give-up and
-  fallback.
-- **Counted muls.** These are exact on the 17 systems the replay placed at the
-  same index `si` as their card: jv-nagao p53 ×12, gaudry-s5 p13 ×2 and dense
-  n2d32 p16 ×3. Elsewhere the randomized choices differ by construction
-  (convention 5).
-- **The give-up on p97-4.** It reproduced at a different index (si 76 → 4),
-  so it does not depend on one random functional.
-- **DLP.** Pinned `jv_cover` (afa830fc…) with
-  `--exp dlp --sizes 53 --seeds 1 --rho-runs 4 --check-every 64`:
-  - Under `JV_LIN=fast`, all 54 non-timing fields equal R2-D2's p=53 seed=1
-    row: `lin_muls` 4593464878, `relations` 31, `solved` and `correct` true,
-    and all 4 rho runs correct.
-  - The extra run under `JV_LIN=sparse` equals R2-D1's row on all 54
-    (`lin_muls` 4032563426, `relations` 31).
-- **Timing not replayed.** The `f4_ms`, `lin_ms` and `wall_ms` fields were not
-  compared. The replay host is host-B hardware (`replay/replay-host.lscpu.stdout`),
-  but a concurrent `cargo test --release` build kept CPU pressure high, so the
-  replay's summed `lin_ms` was about 2× the recorded value.
+  - dense: n6-d3-p32-2, n5-d2-p31-0, n3-d4-p32-0, n6-d2-p16-0
+- **R3-C was replayed in full.** The counted multiplications depend on each system's
+  index `si` in its invocation, and R3-C ran every family in one process. So the only
+  way to reach the sampled systems at their recorded `si` was to replay the whole
+  R3-C card command: 253 systems, sparse and fast, `--reps 1`.
+- **R3-C result.** All 253 systems equal the recorded rows in every non-timing field,
+  `muls` included (253/253). That covers sols, give-up, fallback, and the fast arm's
+  krylov, bm, nf, roots and readout counters with its delta, dense_cols,
+  functionals_tried, nnz, nf_rows and roots. The 14 sampled systems are among them.
+  The counts are exact.
+- **DLP.** The nonce chose one R3-D instance per arm: p=53 seed=1 for both. Each ran
+  with the pinned `jv_cover`, `JV_RHO_NEG=1` and `JV_DUMP_INSTANCE`. Both replays equal their R3-D1 and R3-D2 rows on all 57 non-timing fields: `lin_muls` 4032563426 (sparse) and 3922354568 (fast), relations 31, S 731.5903153798725 and 727.1174163750129, solved and correct, and the 4 rho and 4 rho_neg runs. Their instance-dump lines are byte-identical to R3. Timing fields (`f4_ms`, `lin_ms`, `wall_ms`) were not compared.
+- **Journal quirk.** The `env` of the R3-C journal line reads `[""]`. That is the
+  shell's rendering of an empty environment list; no variable was set.
 
-## Mismatches
+## Scalars
 
-None. All 110 headline numbers and every other numeric or list leaf of
-`analysis/summary.json` match the recomputation from the R2 raw records at
-rel_tol 1e-9, most of them exactly. The other leaves are meta, skipped, gates,
-the 253-entry `systems` list, the predictions, the DLP rows and the host-A
-blocks. `recompute.py` found no leaf it could not derive.
+`vtool verify-scalars` checks every dumped instance with its own arithmetic.
 
-## Coverage, hosts, receipts (all hold)
+**Instances covered.**
+- R3-D1 and R3-D2: 8;
+- the round-1 `scalar-dump/` lines: 8;
+- the validator's own replay dumps: 2.
 
-- **Coverage.** R2-L1..L6 contain exactly the protocol corpus: 253 systems,
-  each once, none dropped, none extra. That is jv-nagao 48, gaudry-s4 24,
-  gaudry-d4 24, gaudry-s5 4 and dense 153 (17 shapes × 3 primes × 3).
-  R2-A1 + R2-A2 cover the same 253. Every `skipped` list is empty.
-- **Arms and rounds.** The dense arm is present exactly where δ ≤ 1024. Every
-  arm has 7 rounds (3 in the ablation), and every `median_ms` equals
-  `sorted(ms)[len//2]` of its raw `ms`.
-- **Receipts.** All ten R2 receipts are `completed`, and every command has exit
-  status 0, a single attempt and no timeout. Each `card_sha256` equals the
-  committed card. Every card binds `postgb_la_bench` c5612e2e… and `jv_cover`
-  afa830fc…, the pins, which also match the copies used for the replay.
-  `tools/task_card.py run` refuses a card whose binds do not match, so the
-  receipt plus the card hash binds the binary. Output, stdout, stderr and
-  `lscpu` hashes in the receipts equal the committed files. The launcher logs
-  name the committed receipt hashes.
-- **Ordering and timeouts.** Each card started at the commit that added the
-  previous card's receipt, so the cards ran one at a time. The run timeouts
-  follow amendment 2: 1700 s for R2-L1 and R2-L2, 7000 s for the rest.
-- **Source stability.** No file under `src/`, `examples/` or `Cargo.*` changed
-  between the commit of the first R2 card (e370e78) and that of the last
-  (d544b78).
-- **Hosts.** The ten R2 `lscpu` records are byte-identical: Xeon @ 2.80 GHz,
-  L2 4 MiB, L3 33 MiB (host B). L1–L4 ran on host A (Xeon @ 2.10 GHz, L2 8 MiB)
-  with the pre-fix bench binary 10e79226…. No third host appeared. Host A is
-  only in the `host_a_*` blocks, which recompute from L1–L4 alone, and every
-  host-B number recomputes from R2 rows alone. Nothing is pooled. Host A lacks
-  exactly the 11 systems amendment 1 names (`n3-d10-p32-1`, `n3-d10-p32-2` and
-  the nine `n6-d3`), plus the four gaudry-s5 systems, which were never run
-  there.
-- **Gates.** All arms agree on all 253 systems. Every dense-family planted
-  point is found. The fast arm gave up on one system (R2-L1 `gaudry-d4 p97-4`,
-  "minimal polynomial short of delta"), so P3 = 1/253 = 0.00395. The sparse arm
-  fell back on that same system. The ablation agrees and matches the main
-  runs' solution counts on every system.
+**Checks on each instance.**
+- w is a non-residue mod p, by Euler's criterion and by finding no root of i² − w.
+- s is a non-cube in F_{p²}, by Euler's criterion and by finding no root of θ³ − s.
+- The curve is non-singular, and G and Q lie on it.
+- l is prime (Miller–Rabin and trial division), G ≠ O and l·G = O.
+- dd·G = Q, dd = d, and 0 < d < l.
 
-## Conventions identified (not errors; stated so that a reader can recompute)
+**Self-tests and negative controls** behaved as required on every instance.
 
-1. **Direction of `counted_ratio`.** In each block it is the block's own
-   direction: sparse.muls/fast.muls in `sparse_over_fast` and
-   dense.muls/fast.muls in `dense_over_fast`. P4 is worded the other way
-   ("fast's counted multiplications within ±25% of sparse's"). The P4 verdict
-   is the same in both directions. Fast/sparse spans [0.528, 1.311] and
-   sparse/fast spans [0.763, 1.895], so the counted-cost sub-prediction fails
-   either way. `summary.json` records `P4.held: false`, and the recomputation
-   agrees.
-2. **Family `median_ms`.** For an even system count it is the upper median,
-   `v[n//2]`, not the mean of the two middle values. For example, jv-nagao
-   sparse is 3.054797 and not 3.044692.
-3. **`portable_over_simd_fast`.** The geometric mean over systems of
-   (R2-A fast median) / (R2-L fast median), paired by family and label.
-4. **Bootstrap CI.** The validator's own stdlib bootstrap reproduced every
-   claimed `ci95` bit for bit, so the CIs are in the 1e-9 headline. Its
-   conventions are `random.Random(20261027)`, 4000 resamples of the per-system
-   log-ratios by `choice` in card order, and nearest-rank 2.5%/97.5%. The
-   protocol fixes only the resample count and the seed, so this agreement
-   depends on those conventions.
-5. **Counted multiplications depend on the invocation.** The arms are seeded
-   with `0x5EED ^ si`, where `si` is the system's index in that invocation's
-   filtered list. A system's `muls` is therefore fixed only for a given
-   (invocation, position). Across R2-L and R2-A, the 98 systems at the same
-   `si` have identical sparse and fast `muls`, and the other 155 differ by
-   construction. This explains the small differences between the main-run and
-   ablation `counted_ratio` values, for example gaudry-s5 max 0.8787 against
-   0.8745. Solution sets do not depend on `si`.
+**Ties to the measured runs.**
+- Each dumped (p, seed, l) is that of its R3-D row, and that row is solved and
+  correct.
+- The R3 dump lines are byte-identical to the round-1 dumps (R2-equivalent runs).
+- The sparse and fast instances are identical.
+- The validator's own dumps are byte-identical to R3's.
 
-## Issues and discrepancies (none changes a recorded number)
+**Extras (not used to decide the result).** On each curve 4l lies in the Hasse
+interval and kills random points, and the 2-torsion is rational, consistent with
+#E = 4l.
 
-1. **Scalars: resolved by the follow-up.** The pinned `jv_cover` outputs
-   neither the solved logarithm nor the instance. The first certificate
-   therefore had `scalars_verified: false`.
-   - **The dump.** The producer then added a read-only, opt-in dump
-     (`JV_DUMP_INSTANCE`, commit 243a718e41; binary `jv_cover_dump`, sha256
-     b2b8ab34…). The dump is written only after the binary's own `dd·G == Q`
-     test succeeds. The producer re-ran both DLP card commands with it
-     (outputs in `scalar-dump/`, commit ca7dc711fa).
-   - **Independent check.** `verify_scalars.py` uses only its own arithmetic.
-     For all 8 instances (p ∈ {53, 101}, seed ∈ {1, 2}, both arms) it checked:
-     - w is a non-residue mod p (Euler, and no root of i² − w in F_p by
-       exhaustion);
-     - s is a non-cube in F_{p²} (Euler, and no root of θ³ − s in F_{p²} by
-       exhaustion), so the tower is a field;
-     - the curve is non-singular, and G and Q lie on it;
-     - l is prime (Miller–Rabin and trial division), G ≠ O and l·G = O;
-     - dd·G = Q, dd = d and 0 < d < l.
+## Recompute (`vtool recompute`, 6f356f71ef)
 
-     The self-tests (associativity, distributivity, inverses, x^(p⁶) = x,
-     scalar linearity, (l−1)G = −G) and the negative controls (dd+1, a
-     perturbed G, 3l, a residue w, a cube s, (l−1)G) all behaved as required.
-     As extras that do not gate the result, 4l lies in the Hasse interval and
-     kills three random points per curve (cofactor 4).
-   - **Tie to the measured runs.** Every row of `dlp-sparse.json` and
-     `dlp-fast.json` equals its R2-D1 or R2-D2 row on all 54 non-timing
-     fields. Each dumped (p, seed, l) equals the row's, and the instances are
-     identical across arms.
-   - **Why the tie matters.** The dump binary is built from 243a718e41. That
-     source also carries the post-run main merge (issue 5), so it is not the
-     measured source. Output equality is what ties the dumps to the measured
-     computation.
-   - **Validator's own dump runs.** The validator ran the dump binary itself,
-     with the card's arguments, on three instances:
-     - `JV_LIN=fast --sizes 53,101 --seeds 1`;
-     - `JV_LIN=sparse --sizes 101 --first-seed 2 --seeds 1`.
+**What matches.** Every number in `analysis/summary.json` matches its recomputation
+from the raw R2 and R3 runs:
+- **Corpus blocks:** the per-family geometric means, minima and maxima of sparse/fast
+  and dense/fast (R2 wall time), and the upper medians.
+- **Bootstrap CIs:** the validator's own `StdRng::seed_from_u64(20261027)` bootstrap,
+  4000 resamples and nearest-rank, reproduces every interval within 8e-16.
+- **Counted ratio:** `sparse_over_fast` counted ratio from R3-C.
+- **Predictions:** P1–P5, Spearman ρ = 0.93080369034499, give-up fraction 1/253,
+  P4's 97 and its range, the ablation geometric means, and `portable_over_simd_fast`.
+- **DLP block:** S, S/rho and S/rho_neg from R3 with S rebuilt from its counters;
+  `lin_ms`, `f4_ms` and `wall_ms` from R2; the sparse/fast S and `lin_ms` ratios;
+  relations; correctness.
+- **Bookkeeping:** gates, the 253 `systems` entries (R2 medians, R3 `muls`, R2
+  `muls_r2`, fast phases) and the meta and skipped blocks.
 
-     Both runs exited 0 (`replay/journal-dump.json`). They gave instance lines
-     byte-identical to the producer's dumps for (53, 1, fast), (101, 1, fast)
-     and (101, 2, sparse), and rows equal to R2-D2 or R2-D1 on all 54
-     non-timing fields.
-   - **Verdict.** The certificate now has `scalars_verified: true`, and the
-     gate's `check_replay_certificate` reports no errors.
-   - **Gaps.** No receipt records the argv of the producer's dump runs; it is
-     taken from the Coordinator's message and confirmed by the output
-     equality. The dump binary's correspondence to 243a718e41 was not checked
-     by a rebuild.
-2. **Dense-family F4 budget.** PROTOCOL.md says "a 900 s budget for the others
-   [than jv-nagao]". The bench has given the dense family 600 s
-   (`dense_opts`) since the protocol was frozen (544eb84), and amendment 1's
-   table also says 600 s. No R2 system hit an F4 timeout, so this had no
-   effect on what was measured. The protocol text and the code still differ.
-3. **Planted points outside the dense family.** The bench sets
-   `planted: None` for the constructed jv-nagao systems (label suffix `c`).
-   The gate "every planted point is found" is therefore enforced only on the
-   dense family. The validator checked the weaker property that every `c`
-   system has at least one solution in every arm; this holds for all 16. The
-   planted point itself is not verifiable from the records.
-4. **Activity during R2-A2.** R2-A2's measured run started about 04:33:25Z
-   (launch 04:31:39Z, then a 105 s quiet wait). The producer committed afa857a
-   (analysis scripts) at 04:34:09Z, during that run. The quiet-CPU rule is
-   checked only before a run. This can affect A2's timings, not its counts.
-   Other concurrent activity during any card cannot be ruled out from the
-   records.
-5. **Snapshot HEAD and the binaries' source.** The snapshot includes a merge of
-   main (6dd803e, after R2-D2) that changes `src/cryptanalysis/f4_fp.rs`,
-   `jv_cover.rs`, `gaudry_cubic.rs`, `gaudry_quartic.rs` and `Cargo.toml`. The
-   binaries correspond to the run commits (e370e78..d544b78), not to HEAD, so a
-   rebuild from HEAD would not reproduce them. The correspondence between the
-   binaries and their source was not checked by a rebuild; the binaries are
-   bound by sha256 only. Their mtimes (jv_cover 2026-10-26T23:30:41Z,
-   postgb_la_bench 2026-10-27T00:31:51Z) are a few minutes earlier than the
-   commits that record their source (544eb84, 4d55b73).
-6. **The DLP `lin_ms` is not single-threaded wall time.** `jv_cover` runs each
-   64-residual batch on a rayon pool (4 threads on 4 vCPU), and `lin_ms` sums
-   each residual's linear-stage wall time inside that pool. The bench arms are
-   single-threaded. Facts from the records, not an assessment:
-   - The instance and relation counters are identical across `JV_LIN` arms:
-     residuals, decompositions, relations, unknowns, filtered, la_ops,
-     incomplete and cross_checked.
-   - The counted S under `fast` is 2.3–3.0% higher than under `sparse`
-     (sparse/fast = 0.970, 0.971, 0.976, 0.976), so S/rho is higher under
-     `fast` on all four rows.
-   - `wall_ms` is about the same for p = 53 (248.5 → 247.5 s and
-     135.7 → 136.4 s) and lower for p = 101 (121.0 → 75.7 s and
-     164.3 → 119.3 s).
-7. **The working tree changed during validation.** The producer had
-   uncommitted edits to `scripts/plots.py` and `src/cryptanalysis/jv_cover.rs`
-   (the `JV_LIN` default changed to `fast`). `README.md` and `figures/` were
-   untracked, and a `cargo test --release` build was running in the shared
-   `target/`. None of this is in the snapshot, and none of it was validated.
-   At check time every committed run, card, receipt and `summary.json` in the
-   working tree was byte-identical to the snapshot. The README that amendments
-   1 and 2 refer to (the host-A/host-B comparison) is not in the snapshot.
+**Receipts.** All 13 R2 and R3 receipts are `completed`, every command exited 0, and
+each card hash equals its card.
+- The R3 cards bind the R3 pins, PROTOCOL.md and amendments 1–3.
+- The output hashes (including the `instances.jsonl` files), the stdout, stderr and
+  `lscpu` hashes, and the launcher logs all match the committed files.
+- The cards ran one at a time: R3-C, then R3-D1, then R3-D2.
+- The timeouts are 7000 s, and the env and argv are those of amendment 3.
+- All R2 and R3 cards ran on host B, with byte-identical `lscpu`.
 
-8. **A producer commit landed during this validation.** Commit `e6ff48ea72`
-   (05:49:33Z) came after the snapshot, while the replay was running.
-   - **It swept validator files.** It added a partial copy of this directory's
-     `replay/` files under the producer's commit: 7 of 14 runs. Its
-     `journal.json` and `run_replay.log` were later superseded by the complete
-     ones here.
-   - **It made gate-relevant changes before validation finished.** It changes
-     `docs/ic/leaderboard.json`, `docs/ic/LEADERBOARD.md`,
-     `docs/ic-leaderboard.html` and `scripts/build_ic_leaderboard.py`. It adds
-     `benchmarks/20261027-postgb-linear-stage/` and makes `fast` the `JV_LIN`
-     default. No `VALIDATION.json` is named.
-   - **It does not touch the validated records.** `runs/`, `cards/`,
-     `analysis/` and the protocol files are unchanged.
-   - **Not validated here.** Whether those rows pass the gate as committed was
-     not checked; that is for the Coordinator.
+**R3 gates.**
+- R3-C's solution sets equal R2's on all 253 systems, along with agree, delta,
+  planted, give-up and fallback.
+- R3-D's relations, solved logarithms and plain-rho runs equal R2-D's.
+- All 32 rho runs and all 32 rho_neg runs are correct.
+
+**Scope of the counter fix.** The fix does what amendment 3 says and nothing more:
+- At the same `si` (the first 96 systems), R3-C's sparse counts equal R2's (96/96).
+- The fast arm's non-root counters equal R2's (96/96); only `roots_muls` moves
+  (95/96).
+- R3-D1's rows differ from R2-D1's only in the new rho_neg fields.
+- R3-D2's rows differ from R2-D2's only in `lin_muls` and the counts derived from it:
+  `oracle_muls`, `total_muls`, s, s/rho, c_cov, relation_over_rho,
+  predicted_s_over_rho.
+
+**R2 records unchanged since round 1.** The R2 run files are byte-identical to the
+round-1 snapshot.
+
+**Conventions.**
+1. `sparse_over_fast.counted_ratio` and `P4.counted_ratio_range` are in the sparse/fast
+   direction, while `P4.counted_outside_25pct` counts fast/sparse outside
+   [0.75, 1.25]. In fast/sparse terms the range would be [0.467, 1.300].
+   Recommendation: label the direction of the range.
+2. The median over an even number of systems is the upper median.
+3. `portable_over_simd_fast` is the geometric mean of per-system portable/SIMD fast
+   ratios.
+
+## Rho reference (for VALIDATION.json)
+
+**Strongest rho on this curve: yes, the negation map, `kind: negation`.**
+- On all 8 dumped curves (4 distinct instances), the j-invariant is neither 0 nor
+  1728. The checks are c₄ ≠ 0 and c₆ ≠ 0, with the identity 1728Δ = c₄³ − c₆²
+  verified. So Aut(E) = {±1}.
+- j is in neither F_{p²} nor F_{p³} (j^{p²} ≠ j and j^{p³} ≠ j). So E is not
+  isomorphic, even over the closure, to a curve defined over a proper subfield. That
+  rules out any Frobenius-type class speed-up.
+- The claim "only ±1, no Frobenius acts" is confirmed by computation, not taken from
+  α. α is not dumped; j decides the question.
+- `rho_e_neg` uses the negation map with look-ahead against fruitless 2-cycles. Longer
+  cycles end in a db = 0 collision and a restart. Every group operation is charged:
+  setup, look-ahead candidates and doublings.
+
+**Same unit: yes, with one convention.**
+- IC S = counted F_p multiplications / (c_add_E · √l), where c_add_E is the measured
+  F_p-multiplication cost of one generic E-addition (`unit_costs`).
+- rho S = counted group operations / √l. Additions and doublings each count one.
+- So both are group-addition equivalents per √l.
+
+**Same process: yes.** `rho_e_neg` runs in the same `jv_cover` process, on the same
+`Spec` (curve, G, Q, l), after the IC clock, with seeds seed·1000 + k. Its 4 runs are
+identical in the sparse and fast processes.
+
+**Matches amendment 3: yes.** Each R3-D row has 4 `rho_neg` runs, and
+`s_over_rho_neg` = S / mean(rho_neg S). The validator recomputed this from
+`group_ops`/√l.
+
+**§5a band: S is not the same at 0, 0.1 and 1 GAE.**
+- `rho_e_neg` leaves native work unpriced, and the binary emits no counter for it.
+  Per step there is 1 table lookup, 1 insert and 1 partition hash. Per candidate
+  addition there is 1 canonicalisation (an F_{p⁶} negation and a compare), 1 hash and
+  2 coefficient updates.
+- From the emitted `steps` and `group_ops`:
+  - lower bound u_lo = 5·steps, the §5a-listed operations only;
+  - upper bound u_hi = 3·steps + 4·group_ops, all non-group native work.
+- The IC also emits no unpriced counter (F_p additions, hash lookups, F4 symbolic
+  work). Its S at w > 0 is therefore a lower bound.
+- The IC "stays the same across the band" only because nothing is emitted. It is not
+  complete.
+
+**Figures** (fast arm S against the mean S of the rho_neg runs; rho given as
+lo / hi):
+
+| | w = 0 | w = 0.1 | w = 1 |
+|:--|--:|--:|--:|
+| pooled, 4 instances / 16 rho_neg runs: IC fast mean S (lower bound) | 408.25 | 408.25 | 408.25 |
+| pooled rho_neg mean S | 0.8210 | 1.1956 / 1.3741 | 4.5671 / 6.3525 |
+| pooled IC / rho_neg | 497.3 | 341.5 / 297.1 | 89.4 / 64.3 |
+| p=53 seed 1: fast S 727.12, rho_neg 0.5549 | 1310.5 | 912.5 / 788.6 | 244.4 / 172.0 |
+| p=53 seed 2: fast S 326.45, rho_neg 0.6450 | 506.2 | 351.7 / 304.3 | 93.9 / 66.3 |
+| p=101 seed 1: fast S 220.42, rho_neg 0.6881 | 320.3 | 218.6 / 190.8 | 56.7 / 41.1 |
+| p=101 seed 2: fast S 359.02, rho_neg 1.3959 | 257.2 | 175.2 / 153.0 | 45.3 / 32.9 |
+
+Pooled by p, the rows are in `validator-report.json`, `rho_reference.pooled_by_p`.
+
+**Proposed `gae_band`.** This uses the pooled figures and the conservative upper bound
+for rho, so the distance remaining is not overstated:
+
+```json
+{"0": {"ic": 408.25, "rho": 0.821}, "0.1": {"ic": 408.25, "rho": 1.374}, "1": {"ic": 408.25, "rho": 6.352}}
+```
+
+Mark ic as a lower bound at 0.1 and 1.
+
+**The order holds across the band.** rho_neg is cheaper than both IC arms on every
+instance at every weight: the IC lower bound is above the rho_neg upper bound. The
+IC's missing unpriced work can only widen the gap. So `order_holds_across_band: true`,
+with the IC behind rho and the distance remaining between 33× and 1310× per instance
+(pooled 64×–497×).
+
+**Caveat: rho_neg sample size.** The rho_neg means rest on 4 runs per instance and are
+noisy:
+- the per-instance means range from 0.55 to 1.40, and at p=101 seed 2 the rho_neg
+  mean exceeds the plain-rho mean;
+- the pooled steps/√l of 0.749 is below the theoretical √(π/4) = 0.886.
+
+The pooled figure is the better reference, and more rho_neg runs would tighten it.
+
+## Issues and limitations carried forward
+
+1. **Planted points outside the dense family.** The bench records no planted point
+   for the constructed jv-nagao systems. All 16 have at least one solution.
+2. **Dense-family F4 budget.** PROTOCOL.md's text says 900 s for the dense family;
+   the code uses 600 s. No system timed out.
+3. **DLP `lin_ms`.** It is summed inside a 4-thread pool, not single-threaded wall
+   time.
+4. **Aborted preflights before R3-C and R3-D1.** These were launched at 08:03:40Z and
+   08:04:00Z, close together. R3-C's was terminated (exit 143). Neither left a receipt
+   or an output. The real cards' `output-absent` checks passed later. No run record
+   comes from them.
+5. **Binaries not rebuilt.** Neither binary was rebuilt to confirm its source. Both
+   are bound by sha256. R3's mtimes (07:56:39Z) precede the commit 30cef72a5b that
+   records their source.
+6. **Concurrent work in the worktree.** The producer kept working in the shared
+   worktree during validation; for example, `summary.json` was modified after
+   12a5bba630. Only committed snapshots were read.
+7. **Round-1 artifacts are historical.** Their journals were produced by the deleted
+   Python tools.
 
 ## Not assessed
 
 - Whether the speed-up matters.
-- The rho reference that the validation gate needs (kind, strongest available,
-  §5a band). The DLP S/rho uses the same-process `rho_e` with 4 runs, as
-  recorded.
-- Any leaderboard or benchmarks row.
+- The leaderboard and benchmarks rows that 3b4ec13ae0 and f393dac1f0 changed. The
+  `VALIDATION.json` that would name these files is for the Coordinator.

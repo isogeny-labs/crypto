@@ -818,7 +818,7 @@ def postgb_linear_stage_component() -> dict:
     if d.get("schema") != "postgb_linear_stage.summary/v1" or not d["gates"]["pass"]:
         raise SystemExit(f"{SOURCES['postgb_linear_stage']}: unexpected schema or a failed correctness gate")
     study = "research/postgb_linear_stage_20261026"
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = gate.check_evidence_dir(REPO / study / "validation", REPO)
     fams = []
     for f, v in d["sparse_over_fast"].items():
         dn = d["dense_over_fast"].get(f)
@@ -842,7 +842,7 @@ def postgb_linear_stage_component() -> dict:
             "class": "engineering", "unit": "median wall time, single thread (host B)",
             "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["postgb_linear_stage"],
             "validation": ("validated: replay certificate, validator report and the matched rho reference "
-                           f"with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+                           f"with the §5a band ({study}/validation/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
