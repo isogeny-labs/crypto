@@ -43,6 +43,12 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # Named jobs whose routine PR budget is longer than 25 minutes, each with the
 # reason. Exact on workflow path, job name and timeout; nothing else matches.
 NAMED_BUDGET_EXCEPTIONS = {
+    (".github/workflows/certicom-devices.yml", "metal-qualification"): {
+        "timeout": 45,
+        # The macOS library phase took 27m42s in run 40571119394 and
+        # 30m17s in run 40511856969; both completed successfully.
+        "reason": "Native Metal compilation and solver qualification on macOS",
+    },
     (".github/workflows/release.yml", "isogeny"): {
         "timeout": 45,
         # Run 39652680641, job 119434898023 exhausted 25 minutes during
