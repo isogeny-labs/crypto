@@ -108,6 +108,11 @@ its freshly reconstructed bytes match the 17 October S3 object. The
 constructed, generically replayed and published the fifth added-size object.
 All five added primary sizes now have objects under the declared policy and
 seed. Natural yield, useful rank and a complete cold comparison remain open.
+The [bounded K8192 five-summand diagnostic](verification/k8192-m5-natural-20261027/RESULT.md)
+built a 172,918-variable orbit-chain model and returned
+`UNKNOWN_solver_cap` after one natural trial and 1,000 conflicts, with zero
+models, relations and rank. It supplies a completed zero-yield cell at that
+cap, not a yield-rate estimate or size ranking.
 
 The exporter now has a one-object path for the five added sizes. It accepts
 only the two pinned curve arms, the three public-x policies, the three frozen
