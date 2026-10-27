@@ -1,0 +1,37 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.73in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\title{Branch factor forced by a norm identity}
+\author{Formal proof packet}
+\date{27 October 2026}
+\begin{document}
+\maketitle
+\noindent This is a conditional polynomial proof, not a target experiment or cost comparison. The editable diagram, gate CSV, Lean source, and compiler log are beside this PDF.
+
+\section*{Checked statement}
+For polynomials $f,u_1,u_2,n,U$ over a field and a rational point $a$, assume
+\[
+f(a)=0,\qquad n^2-u_1u_2U=b^2f,\qquad u_1(a)u_2(a)U(a)=0.
+\]
+The checked theorem specializes the norm identity at ordinate zero and uses the polynomial factor theorem to conclude
+\[
+(X-a)\mid n.
+\]
+
+\begin{center}
+\setlength{\fboxsep}{9pt}
+\fbox{\begin{minipage}{0.88\linewidth}\centering
+Norm identity plus rational branch-support root\par\vspace{5pt}
+$\Downarrow$ checked pointwise branch overlap: $n(a)=0$\par\vspace{5pt}
+$\Downarrow$ checked polynomial factor theorem\par\vspace{5pt}
+$(X-a)\mid n$
+\end{minipage}}
+\end{center}
+
+\section*{Verification and remaining gates}
+Direct Lean 4.34.1 compilation with Mathlib \texttt{d13f23b} exited zero. The theorem axiom audit lists only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; no \texttt{sorryAx}. Lean source SHA-256:\par\smallskip\noindent{\scriptsize\texttt{7e583e29d15de7b4eba06d1cbb93a8eb52812c57039248791389d723317b8051}}.
+
+The concrete source-style norm theorem is separately checked. This packet does not show that the compiled runtime numerator satisfies the identity on every branch, that $B$ is a local unit, or that all local orders form the claimed global principal divisor and $\mathrm{Pic}^0$ equation. The frozen 1,260-target rows and matched-rho ratios remain unchanged.
+\end{document}
