@@ -1,0 +1,9 @@
+# Conditional zero order at an actual projective branch
+
+This is a formal local-geometry packet, not a new target experiment or cost comparison. The [PDF](PROJECTIVE_BRANCH_ZERO_ORDER.pdf), [diagram](projective-branch-zero-order.svg), [standardized gate CSV](projective-branch-zero-order.csv), [Lean source](WeightedProjBranchZeroOrder.lean), and [compiler log](weighted-proj-branch-zero-order-lean.log) are supplied for independent review.
+
+For a field `K`, a rational simple root `a` of the quintic, and the **actual weighted-Proj structure-sheaf stalk** `R` at that branch, the checked theorem states: if local elements `N,B,t : R` satisfy `N = (x-a)t` and `B` is a unit, then `ord(N-B*y)=1`. It uses the previously checked projective DVR, `ord(y)=1`, and `y²=(x-a)q` with `q` a unit, plus the generic branch zero-order lemma. The local DVR criterion is described in [Stacks Project Lemma 10.119.7](https://stacks.math.columbia.edu/tag/00PD).
+
+This theorem does **not** prove that the compiled Rust numerator factors as `N=(x-a)t` at every branch, that its coefficient `B` is always a unit, or that all finite and infinity orders combine to the claimed principal divisor. The global `Pic⁰` class equation and universal compiled-law semantics remain open. No frozen 1,260-target row or matched-rho cost ratio changes.
+
+Verification: from this formal package directory, run `lake env lean -o .lake/build/lib/lean/WeightedProjBranchZeroOrder.olean WeightedProjBranchZeroOrder.lean`. The pinned Lean 4.34.1/Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612` run exited zero. The theorem's axiom audit lists only `propext`, `Classical.choice`, and `Quot.sound`, with no `sorryAx`. Source SHA-256: `49005acc564b41341b37296d42de90c48e56ac4f4a4ec4860d7278fc8bc00cca`. The saved compiler log has trailing whitespace removed; its messages are otherwise unchanged.

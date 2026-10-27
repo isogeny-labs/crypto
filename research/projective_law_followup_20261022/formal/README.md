@@ -24,6 +24,12 @@ root. Its [diagram](finite-branch-dvr.svg), [CSV](finite-branch-dvr.csv), and
 [PDF](FINITE_BRANCH_DVR.pdf) retain the open global divisor, `Pic⁰`, and
 compiled-law gates.
 
+The [actual projective branch zero-order packet](PROJECTIVE_BRANCH_ZERO_ORDER.md)
+then proves `ord(N-B*y)=1` in that projective stalk under the explicit local
+hypotheses `N=(x-a)t` and unit `B`. Its [diagram](projective-branch-zero-order.svg),
+[CSV](projective-branch-zero-order.csv), and [PDF](PROJECTIVE_BRANCH_ZERO_ORDER.pdf)
+keep the compiled-law hypotheses and global divisor/Pic⁰ equation open.
+
 The [weighted-Proj head and chart packet](WEIGHTED_PROJ_HEAD_VERIFIED.md)
 checks homogeneity of the proposed sextic and its principal ideal, plus the
 two dehomogenized equations obtained at `Z=1` and `X=1`. Its [CSV](weighted-proj-head-verified.csv),

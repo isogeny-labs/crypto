@@ -1,0 +1,35 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.73in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\title{Conditional zero order at an actual projective branch}
+\author{Formal proof packet}
+\date{27 October 2026}
+\begin{document}
+\maketitle
+\noindent This packet records a conditional local-geometry proof, not a target experiment or cost comparison. The editable diagram, gate CSV, Lean source, and compiler log are beside this PDF.
+
+\section*{Checked statement}
+Let $a$ be a rational simple root of the quintic and $R$ the structure-sheaf stalk of the actual weighted-Proj curve at that branch. The previously checked local geometry makes $R$ a DVR, with $\operatorname{ord}(y)=1$ and $y^2=(x-a)q$ for a unit $q$. The new theorem proves that if $N=(x-a)t$ and $B$ is a unit in $R$, then
+\[
+\operatorname{ord}(N-By)=1.
+\]
+The proof transports the generic branch zero-order lemma into this actual projective stalk. The underlying DVR criterion is discussed in the \href{https://stacks.math.columbia.edu/tag/00PD}{Stacks Project, Lemma 10.119.7}.
+
+\begin{center}
+\setlength{\fboxsep}{9pt}
+\fbox{\begin{minipage}{0.88\linewidth}\centering
+Checked actual stalk: $R$ is a DVR and $\operatorname{ord}(y)=1$\par\vspace{5pt}
+Explicit input: $N=(x-a)t$, and $B$ is a unit\par\vspace{5pt}
+$\Downarrow$ checked local valuation algebra\par\vspace{5pt}
+$\operatorname{ord}(N-By)=1$
+\end{minipage}}
+\end{center}
+
+\section*{Verification and remaining gates}
+Direct Lean 4.34.1 compilation with Mathlib \texttt{d13f23b} exited zero. The theorem axiom audit lists only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; no \texttt{sorryAx}. Lean source SHA-256:\par\smallskip\noindent{\scriptsize\texttt{49005acc564b41341b37296d42de90c48e56ac4f4a4ec4860d7278fc8bc00cca}}.
+
+The compiled Rust law has not been shown to satisfy the numerator factorization or unit hypothesis at every branch. Nonbranch multiplicities, the global principal divisor, the $\mathrm{Pic}^0$ class equation, and universal runtime semantics remain open. No frozen 1,260-target row or matched-rho ratio changes.
+\end{document}
