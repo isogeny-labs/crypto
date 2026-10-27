@@ -19,6 +19,15 @@ they inherit no transfer or subgroup-support conclusion from it. See the
 [coverage gap](../../problems/catalog-cover-subgroup-certificates-incomplete.md)
 for the separate current-catalog obligation.
 
+The legacy formula-inventory finding is also historical: its source artifact
+now declares `source_commit` =
+`0c82a7dd1d1e6e3c847b49f8446d29d405beb0c5`, preserving the exact 2,572-entry
+inventory that the finding describes. Separately, the live Jacobian formula
+catalog now screens 20,592 registry entries with the same cost model. This
+completes the metadata refresh in historical obligation 7 below; it supplies no
+new transfer certificate, solver execution, or measured advantage. All other
+implementation artifacts still bind their current repository bytes.
+
 Every current cover map and every linked EC1 representation now has an
 explicit v2 assessment. Classification is complete; implementation support is
 not. In particular, the complete inventory must not be read as a complete

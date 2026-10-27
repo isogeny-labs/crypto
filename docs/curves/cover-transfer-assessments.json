@@ -50,7 +50,7 @@
     },
     {
       "path": "docs/curves/cover-transfer-assessment.schema.json",
-      "sha256": "4ab7679502a6c7c9c76dd139037ab74d8cf15aacd3711e42323c9c1c6bf9983c",
+      "sha256": "131e4867835bcc5cb465645d398acad5f14f8f2320f97b52b6dd95ab0cb6cc7c",
       "role": "machine-readable v2 ledger contract",
       "freshness": {
         "status": "supported",
@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "03ebe52917cb4ad3285d874d913e8028feff06f3b15fa77210914b230b763149",
+      "sha256": "6bc2bf57d51b2f395cbb991417b29689d25908841a31cdf3bb810b925db670aa",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -448,13 +448,14 @@
       "freshness": {
         "status": "refuted",
         "scope": "claim that this inventory is current for the 15,791-row registry",
-        "rationale": "It pins an older registry, omits current slugs, and contains modeled routes without exact HC1/CV1 subgroup certificates.",
+        "rationale": "At source_commit it pins an older registry and omits assessment slugs. This historical finding does not describe the refreshed live inventory; modeled routes remain distinct from exact HC1/CV1 subgroup certificates.",
         "evidence_refs": [
           "docs/curves/jacobian-transfers.json",
           "docs/curves/JACOBIAN_TRANSFERS.md"
         ],
         "obligation_id": "refresh_formula_inventory"
-      }
+      },
+      "source_commit": "0c82a7dd1d1e6e3c847b49f8446d29d405beb0c5"
     },
     {
       "path": "docs/curves/JACOBIAN_TRANSFERS.md",
@@ -536,7 +537,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "f7fd33efe3dc5a1d99586baa1551c046765b23c3745b7a2b6803acb4c8aee603",
+      "sha256": "e09e3d7511d0d18e52941b8f8f1fa18409f4b473e71935e18b95806b66fc372c",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",
@@ -549,7 +550,7 @@
     },
     {
       "path": "scripts/catalog_snapshot.mjs",
-      "sha256": "b11407fbcc23da35552cb5abea27f303f8a4c41a4a388e624d98fa5a70fa1b6f",
+      "sha256": "3eede268f12e1092dcea14ad90ae6e9d91fba6ebd97173a09d6022f48bbb2fde",
       "role": "exact dated-catalog input selector; Git failures never fall back to live inputs",
       "freshness": {
         "status": "supported",
@@ -575,7 +576,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/README.md",
-      "sha256": "917844d205669eaf366ce04f670577566f8e960136df78eb7eada7a9660aa0ff",
+      "sha256": "b10e4a8ad86e6fedf16daf9eaa59965904b65c815b6b36e6b7a2f686b5db74bf",
       "role": "source-linked catalog-wide assessment report",
       "freshness": {
         "status": "supported",
@@ -679,7 +680,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-      "sha256": "32d0e029241cea0765e2cc3be00872acbf061e46259e10013b1f6e7bd97e4f94",
+      "sha256": "5e88b8192420e1f416597965647413f03f9190276f62b549c15179ea0ac0d6ec",
       "role": "rendered catalog-wide assessment PDF",
       "freshness": {
         "status": "supported",
