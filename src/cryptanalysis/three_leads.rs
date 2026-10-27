@@ -340,6 +340,23 @@ impl Field {
             let v = self.bm((self.p - y) % self.p, inv);
             return u + self.p * v;
         }
+        if self.n == 3 && self.modulus < self.p {
+            // For w^3 + d = 0, multiply by the two Frobenius conjugates.
+            // This leaves one base-field norm inversion instead of expanding
+            // an inversion into hundreds of extension-field multiplications.
+            let (x, y, z) = (a % self.p, a / self.p % self.p, a / (self.p * self.p));
+            let d = self.modulus;
+            let u = (self.bs(x) + self.bm(d, self.bm(y, z))) % self.p;
+            let v = (self.p - (self.bm(x, y) + self.bm(d, self.bs(z))) % self.p) % self.p;
+            let w = (self.bs(y) + self.p - self.bm(x, z)) % self.p;
+            let cross = (self.bm(z, v) + self.bm(y, w)) % self.p;
+            let norm = (self.bm(x, u) + self.p - self.bm(d, cross)) % self.p;
+            let inverse_norm = self.bi(norm);
+            self.count(|c| c.field_adds += 6);
+            return self.bm(u, inverse_norm)
+                + self.p * self.bm(v, inverse_norm)
+                + self.p * self.p * self.bm(w, inverse_norm);
+        }
         // Expanded exponentiation: no extra inversion macro is charged.
         self.pow(a, self.size() - 2)
     }
@@ -1526,6 +1543,49 @@ impl SignedGraph {
                 self.fixed[root] = Some((a, b));
                 None
             }
+        }
+    }
+    /// Rank effect of an edge after reducing its target coefficient against
+    /// the current signed potentials. This performs counted `find` and ring
+    /// operations, but does not insert the edge. Scores are: 0 target-free,
+    /// 1 target-bearing merge, 2 target-bearing anchor, 3 target equation.
+    pub fn target_rank_score(&mut self, u: usize, su: i8, v: usize, sv: i8, b: u64) -> u8 {
+        let (ru, pu) = self.find(u);
+        let (rv, pv) = self.find(v);
+        let cu = su * pu.s;
+        let cv = sv * pv.s;
+        let b = self.ring.sub(
+            self.ring.sub(b, self.ring.signed(su, pu.b)),
+            self.ring.signed(sv, pv.b),
+        );
+        if ru == rv {
+            if cu + cv == 0 {
+                return u8::from(b != 0) * 3;
+            }
+            if let Some((_, fixed_b)) = self.fixed[ru] {
+                let doubled = self.ring.mul(2, fixed_b);
+                return u8::from(b != self.ring.signed(cu, doubled)) * 3;
+            }
+            return u8::from(b != 0) * 2;
+        }
+        let residual = if let Some((_, fixed_b)) = self.fixed[ru] {
+            self.ring.sub(b, self.ring.signed(cu, fixed_b))
+        } else {
+            b
+        };
+        let residual = if let Some((_, fixed_b)) = self.fixed[rv] {
+            self.ring.sub(residual, self.ring.signed(cv, fixed_b))
+        } else {
+            residual
+        };
+        if residual == 0 {
+            0
+        } else if self.fixed[ru].is_some() && self.fixed[rv].is_some() {
+            3
+        } else if self.fixed[ru].is_some() || self.fixed[rv].is_some() {
+            2
+        } else {
+            1
         }
     }
     /// Edge su*xu+sv*xv=a+b*k, all coefficients reduced modulo the subgroup order.
