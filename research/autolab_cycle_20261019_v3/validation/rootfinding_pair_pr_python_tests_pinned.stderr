@@ -1,0 +1,192 @@
+...E........E.FE.......E........E....E.EEEF.........
+======================================================================
+ERROR: test_panel_manifest_never_lists_itself (test_boundary_autolab.BatchPanelTests.test_panel_manifest_never_lists_itself)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py", line 1070, in test_panel_manifest_never_lists_itself
+    with tempfile.TemporaryDirectory(dir=lab.RUNS_DIR) as tmp:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/tempfile.py", line 886, in __init__
+    self.name = mkdtemp(suffix, prefix, dir)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/tempfile.py", line 384, in mkdtemp
+    _os.mkdir(file, 0o700)
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/runs/tmplzex7wp0'
+
+======================================================================
+ERROR: test_equal_advice_pair_helpers_pin_archive (test_boundary_autolab.EqualAdviceBlTests.test_equal_advice_pair_helpers_pin_archive)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py", line 1255, in test_equal_advice_pair_helpers_pin_archive
+    import equal_advice_pair
+ModuleNotFoundError: No module named 'equal_advice_pair'
+
+======================================================================
+ERROR: test_prepare_only_scaffolds_fail_closed_claim (test_boundary_autolab.EqualAdviceBlTests.test_prepare_only_scaffolds_fail_closed_claim)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py", line 1219, in test_prepare_only_scaffolds_fail_closed_claim
+    state = lab.launch_equal_advice(args)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/boundary_autolab.py", line 3264, in launch_equal_advice
+    import equal_advice_pair
+ModuleNotFoundError: No module named 'equal_advice_pair'
+
+======================================================================
+ERROR: test_single_target_claim_points_to_separate_validation_receipt (test_boundary_autolab.HelperTests.test_single_target_claim_points_to_separate_validation_receipt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py", line 574, in test_single_target_claim_points_to_separate_validation_receipt
+    claim = lab.draft_vs_rho_claim(
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/boundary_autolab.py", line 1417, in draft_vs_rho_claim
+    "rank_fixture_source": sha256(REPO / "examples/koblitz_rank_fixture.rs"),
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/boundary_autolab.py", line 159, in sha256
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/rootfinding-pair-pr-validation/examples/koblitz_rank_fixture.rs'
+
+======================================================================
+ERROR: test_single_target_producer_fields_complete_archived_claim (test_boundary_autolab.MeasurementSchemaTests.test_single_target_producer_fields_complete_archived_claim)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py", line 182, in test_single_target_producer_fields_complete_archived_claim
+    claim = json.loads((run / "artifacts/claim_draft.json").read_text())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/evidence/20261001-koblitz-n61-single-target/autolab_runs/20261001T200614Z-d687d78737/artifacts/claim_draft.json'
+
+======================================================================
+ERROR: test_every_rung_accounts_and_matches_the_committed_block (test_boundary_autolab.OperationAccountingTests.test_every_rung_accounts_and_matches_the_committed_block)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py", line 685, in test_every_rung_accounts_and_matches_the_committed_block
+    block = op_accounting.account_rung(name)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 219, in account_rung
+    runs = [account_run(rung_dir, spec) for spec in cfg["runs"]]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 176, in account_run
+    ic = one_row(run_dir / "ic.jsonl", "compact_orbit_dlp_target")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 159, in one_row
+    rows = [row for row in json_rows(path) if row.get("kind") == kind]
+                           ^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 138, in json_rows
+    text = path.read_text()
+           ^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/rootfinding-pair-pr-validation/experiments/koblitz-single-target-n61-20260925/runs/R1/ic.jsonl'
+
+======================================================================
+ERROR: test_n73_separates_contended_runs_and_native_counter_ratios (test_boundary_autolab.OperationAccountingTests.test_n73_separates_contended_runs_and_native_counter_ratios)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py", line 697, in test_n73_separates_contended_runs_and_native_counter_ratios
+    block = op_accounting.account_rung("n73")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 219, in account_rung
+    runs = [account_run(rung_dir, spec) for spec in cfg["runs"]]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 176, in account_run
+    ic = one_row(run_dir / "ic.jsonl", "compact_orbit_dlp_target")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 159, in one_row
+    rows = [row for row in json_rows(path) if row.get("kind") == kind]
+                           ^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 138, in json_rows
+    text = path.read_text()
+           ^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/rootfinding-pair-pr-validation/experiments/koblitz-single-target-n73-20261003/runs/IC1N73Ckb1fb87600PDP4rootRCguidedLAgaussTDdirectISO0h980b4cf20ad4We79c49b134eaR1/ic.jsonl'
+
+======================================================================
+ERROR: test_native_counters_do_not_promote_total_work (test_boundary_autolab.OperationAccountingTests.test_native_counters_do_not_promote_total_work)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py", line 708, in test_native_counters_do_not_promote_total_work
+    block = op_accounting.account_rung("n73")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 219, in account_rung
+    runs = [account_run(rung_dir, spec) for spec in cfg["runs"]]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 176, in account_run
+    ic = one_row(run_dir / "ic.jsonl", "compact_orbit_dlp_target")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 159, in one_row
+    rows = [row for row in json_rows(path) if row.get("kind") == kind]
+                           ^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/op_accounting.py", line 138, in json_rows
+    text = path.read_text()
+           ^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/rootfinding-pair-pr-validation/experiments/koblitz-single-target-n73-20261003/runs/IC1N73Ckb1fb87600PDP4rootRCguidedLAgaussTDdirectISO0h980b4cf20ad4We79c49b134eaR1/ic.jsonl'
+
+======================================================================
+ERROR: test_single_target_claim_points_to_separate_validation_receipt (test_boundary_autolab.OperationAccountingTests.test_single_target_claim_points_to_separate_validation_receipt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py", line 781, in test_single_target_claim_points_to_separate_validation_receipt
+    claim = lab.draft_vs_rho_claim(
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/boundary_autolab.py", line 1417, in draft_vs_rho_claim
+    "rank_fixture_source": sha256(REPO / "examples/koblitz_rank_fixture.rs"),
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/boundary_autolab.py", line 159, in sha256
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/rootfinding-pair-pr-validation/examples/koblitz_rank_fixture.rs'
+
+======================================================================
+FAIL: test_prepare_only_pair_ic_reuses_archive_pin (test_boundary_autolab.EqualAdviceBlTests.test_prepare_only_pair_ic_reuses_archive_pin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py", line 1235, in test_prepare_only_pair_ic_reuses_archive_pin
+    self.assertTrue((archive / "logs" / "bl.jsonl").is_file())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_beat_is_one_target_against_strong_rho (test_boundary_autolab.SingleTargetPanelTests.test_beat_is_one_target_against_strong_rho)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/rootfinding-pair-pr-validation/research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py", line 1106, in test_beat_is_one_target_against_strong_rho
+    self.assertTrue((lab.REPO / producer["source"]).is_file(), producer["source"])
+AssertionError: False is not true : examples/koblitz_orbit_dlp_fast_online.rs
+
+----------------------------------------------------------------------
+Ran 52 tests in 2.060s
+
+FAILED (failures=2, errors=9)

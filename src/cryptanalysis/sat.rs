@@ -309,6 +309,21 @@ pub struct SolverStats {
     /// should never exceed the number of free variables.
     pub conflict_level_sum: u64,
     pub max_level: u64,
+
+    // ── `bitop/v1` accounting ───────────────────────────────────────
+    // [`Solver::word_ops`] charges the whole run in 64-bit word
+    // operations (`docs/units/BITOPS.md`, `word_op`): these two
+    // counters hold the work no counter above already measures, and
+    // `word_ops` adds the per-unit constants of the ones that do.  One
+    // unit is one inner-loop iteration that reads, compares, XORs or
+    // writes one word of clause, watch, trail, bitset or matrix data.
+    // Neither feeds back into the search.
+    /// Search-side word operations not implied by the counters above.
+    pub word_ops: u64,
+    /// Word operations of building the encoding before the search:
+    /// Tseitin definitions, parity expansion or rows, blocking clauses.
+    /// Written by the encoders (`semaev_sat`).
+    pub encode_word_ops: u64,
 }
 
 /// Max-heap of variables by VSIDS activity, with position tracking so a
@@ -322,6 +337,12 @@ struct VarHeap {
     heap: Vec<u32>,
     /// `pos[v]` is `v`'s index in `heap`, or `-1` when absent.
     pos: Vec<i32>,
+    /// Word operations spent in the heap (`bitop/v1` accounting, see
+    /// [`Solver::word_ops`]): one per call (the membership or root
+    /// test), one per percolate-up step (a key compare), two per
+    /// percolate-down step (a key compare between the children, then
+    /// against the moving key).
+    steps: u64,
 }
 
 /// Branching order key: priority class first, then VSIDS activity,
@@ -347,6 +368,7 @@ impl VarHeap {
         Self {
             heap: (0..n_vars).collect(),
             pos: (0..n_vars as i32).collect(),
+            steps: 2 * n_vars as u64,
         }
     }
 
@@ -358,7 +380,9 @@ impl VarHeap {
     fn percolate_up(&mut self, mut i: usize, key: &[u64]) {
         let v = self.heap[i];
         let kv = key[v as usize];
+        self.steps += 1;
         while i > 0 {
+            self.steps += 1;
             let parent = (i - 1) >> 1;
             if kv <= key[self.heap[parent] as usize] {
                 break;
@@ -374,7 +398,9 @@ impl VarHeap {
     fn percolate_down(&mut self, mut i: usize, key: &[u64]) {
         let v = self.heap[i];
         let kv = key[v as usize];
+        self.steps += 1;
         loop {
+            self.steps += 2;
             let left = 2 * i + 1;
             if left >= self.heap.len() {
                 break;
@@ -406,6 +432,7 @@ impl VarHeap {
     /// unassigned variable, about 3% of a random 3-SAT solve.
     #[inline(always)]
     fn insert(&mut self, v: u32, key: &[u64]) {
+        self.steps += 1;
         if self.contains(v) {
             return;
         }
@@ -416,6 +443,7 @@ impl VarHeap {
 
     /// A variable's activity rose; restore the heap property.
     fn bumped(&mut self, v: u32, key: &[u64]) {
+        self.steps += 1;
         if self.contains(v) {
             let i = self.pos[v as usize] as usize;
             self.percolate_up(i, key);
@@ -425,6 +453,7 @@ impl VarHeap {
     /// Rebuild after a wholesale change of the ordering key.
     fn rebuild(&mut self, n_vars: u32, key: &[u64]) {
         self.heap.clear();
+        self.steps += self.pos.len() as u64;
         self.pos.iter_mut().for_each(|p| *p = -1);
         for v in 0..n_vars {
             self.insert(v, key);
@@ -432,6 +461,7 @@ impl VarHeap {
     }
 
     fn pop_max(&mut self, key: &[u64]) -> Option<u32> {
+        self.steps += 1;
         if self.heap.is_empty() {
             return None;
         }
@@ -540,11 +570,17 @@ pub struct Solver {
     /// Maximum total conflicts before giving up. `u64::MAX` means
     /// no limit.
     pub conflict_budget: u64,
-    /// Wall-clock deadline; checked at every conflict alongside the
-    /// conflict budget, and `None` means no limit. A solve that reaches
-    /// it returns [`SolveResult::Unknown`], exactly as an exhausted
-    /// conflict budget does.
+    /// Wall-clock deadline; checked at the start of every solve-loop
+    /// iteration and after conflicts. A single propagation pass can still
+    /// overrun it, so a hard outer process watchdog remains necessary.
+    /// `None` means no deadline.
     pub deadline: Option<std::time::Instant>,
+    /// Run the XOR matrix after every N decision levels, and always at
+    /// level zero or a complete assignment. One preserves the original
+    /// propagation policy. Larger values trade weaker intermediate XOR
+    /// propagation for fewer full-matrix passes without omitting the final
+    /// original XOR check before SAT.
+    xor_decision_cadence: usize,
     /// Set when `add_clause` detects UNSAT (empty clause or
     /// conflict-on-unit).  `solve()` short-circuits to UNSAT when set.
     is_unsat: bool,
@@ -715,6 +751,7 @@ impl Solver {
             conflicts: 0,
             conflict_budget: u64::MAX,
             deadline: None,
+            xor_decision_cadence: 1,
             is_unsat: false,
             xors: Vec::new(),
             epoch: 0,
@@ -739,37 +776,14 @@ impl Solver {
             heap_key: vec![order_key(0.0, false); n],
             detached: Vec::new(),
             max_learnts: 0,
-            stats: SolverStats::default(),
+            // Initialising the tables: the two literal-indexed ones
+            // (`values`, `watches`), eight per-variable ones and the two
+            // bitsets, one unit per slot.  The heap charges its own two.
+            stats: SolverStats {
+                word_ops: 2 * (2 * n as u64 + 1) + 8 * n as u64 + 2 * bs_words(n_vars) as u64,
+                ..SolverStats::default()
+            },
         }
-    }
-
-    /// Skip rechecking satisfied, fully assigned XOR rows until an
-    /// unassignment or matrix mutation. Disabled by default. Changing the
-    /// setting invalidates every cached row, including during incremental use.
-    /// Enabling this policy disables the generation-based policy.
-    pub fn set_xor_decided_cache(&mut self, enabled: bool) {
-        self.cache_decided_xors = enabled;
-        self.xor_decided.clear();
-        if enabled {
-            self.decided_xor_row_cache = false;
-            self.decided_xor_row_generation.clear();
-            self.xor_decided.resize(self.matrix_rhs.len(), false);
-        }
-        self.xor_epoch = u64::MAX;
-    }
-
-    /// Skip rechecking satisfied XOR rows until an assignment is undone.
-    /// Default-off so existing solver traces and callers keep their behavior.
-    /// Call before search; switching modes clears every cached certificate.
-    /// Enabling this generation-based policy disables the boolean policy.
-    pub fn set_decided_xor_row_cache(&mut self, enabled: bool) {
-        self.decided_xor_row_cache = enabled;
-        self.decided_xor_row_generation = vec![None; self.matrix_rhs.len()];
-        if enabled {
-            self.cache_decided_xors = false;
-            self.xor_decided.clear();
-        }
-        self.xor_epoch = u64::MAX;
     }
 
     /// Install an observer before search. Existing counters are copied so a
@@ -812,6 +826,72 @@ impl Solver {
         }
     }
 
+    /// Skip rechecking satisfied, fully assigned XOR rows until an
+    /// unassignment or matrix mutation. Disabled by default. Changing the
+    /// setting invalidates every cached row, including during incremental use.
+    /// Enabling this policy disables the generation-based policy.
+    pub fn set_xor_decided_cache(&mut self, enabled: bool) {
+        self.cache_decided_xors = enabled;
+        self.xor_decided.clear();
+        if enabled {
+            self.decided_xor_row_cache = false;
+            self.decided_xor_row_generation.clear();
+            self.xor_decided.resize(self.matrix_rhs.len(), false);
+        }
+        self.xor_epoch = u64::MAX;
+    }
+
+    /// Skip rechecking satisfied XOR rows until an assignment is undone.
+    /// Default-off so existing solver traces and callers keep their behavior.
+    /// Call before search; switching modes clears every cached certificate.
+    /// Enabling this generation-based policy disables the boolean policy.
+    pub fn set_decided_xor_row_cache(&mut self, enabled: bool) {
+        self.decided_xor_row_cache = enabled;
+        self.decided_xor_row_generation = vec![None; self.matrix_rhs.len()];
+        if enabled {
+            self.cache_decided_xors = false;
+            self.xor_decided.clear();
+        }
+        self.xor_epoch = u64::MAX;
+    }
+
+
+    /// **The whole run in `bitop/v1` word operations**: encoding,
+    /// propagation over clauses and parity rows, conflict analysis and
+    /// minimisation, branching heap, backjumps, restarts, clause-database
+    /// reduction and model read-out (the last charged by the caller that
+    /// reads the model; see [`Solver::model`]).
+    ///
+    /// Per-unit constants for the counters measured elsewhere:
+    ///
+    /// - `clause_visits` × 2: the clause's length word and watched pair,
+    ///   and the other watch's value;
+    /// - `clause_lit_visits` × 1: one literal's value lookup;
+    /// - `propagations` × 2: an assignment writes the two literal slots
+    ///   and the two bitset words (level, reason, phase and trail are
+    ///   counted with it as stores, not gates);
+    /// - `analyze_lit_visits` × 1: a reason literal's seen/level test;
+    /// - `learnt_lits_raw` × 2: the abstract-level fold and the
+    ///   redundancy test of each literal before minimisation;
+    /// - `learnt_lits_kept` × 2: the asserting clause's copy and its
+    ///   backjump-level scan;
+    /// - the heap's own steps (see `VarHeap::steps`).
+    ///
+    /// Everything else is in `word_ops` and `encode_word_ops`, counted
+    /// at the site that does it.
+    pub fn word_ops(&self) -> u64 {
+        let st = &self.stats;
+        st.word_ops
+            + st.encode_word_ops
+            + 2 * st.clause_visits
+            + st.clause_lit_visits
+            + 2 * st.propagations
+            + st.analyze_lit_visits
+            + 2 * st.learnt_lits_raw
+            + 2 * st.learnt_lits_kept
+            + self.order.steps
+    }
+
     /// **Add a native XOR (parity) constraint** `x_{v₁} ⊕ … ⊕ x_{v_k}
     /// = rhs`, with variables given 1-indexed exactly as in
     /// [`Solver::add_clause`].  Returns `false` if the constraint is
@@ -829,6 +909,9 @@ impl Solver {
     /// not deduplicate.
     pub fn add_xor(&mut self, vars: &[u32], rhs: bool) -> bool {
         let mut mask = vec![0u64; bs_words(self.n_vars)];
+        // One per variable flipped, and the row's words twice: the
+        // emptiness test and the copy into the row store.
+        self.stats.word_ops += vars.len() as u64 + 2 * mask.len() as u64;
         for &v in vars {
             debug_assert!(v >= 1 && v <= self.n_vars, "xor var {v} out of range");
             bs_flip(&mut mask, v - 1); // duplicates cancel
@@ -867,6 +950,10 @@ impl Solver {
         let new_total = old + count;
         let n = new_total as usize;
         let words = bs_words(new_total);
+        // Ten per-variable slots and two literal slots per new variable
+        // (the heap charges its own insertions), and every parity row
+        // widened to the new word count.
+        self.stats.word_ops += 12 * count as u64 + (self.xors.len() * words) as u64;
         if new_total > self.lit_base {
             self.recentre_literal_tables(new_total);
         }
@@ -910,6 +997,8 @@ impl Solver {
         // variables not yet added are unassigned and watched by nothing,
         // and move along with the rest.
         let shift = (base - self.lit_base) as usize;
+        // Both literal tables rewritten in full.
+        self.stats.word_ops += 2 * len as u64;
         let mut values = vec![None; len];
         values[shift..shift + self.values.len()].copy_from_slice(&self.values);
         self.values = values;
@@ -940,6 +1029,9 @@ impl Solver {
     ///
     /// Variables are 1-indexed, as in [`Solver::add_clause`].
     pub fn set_branch_priority(&mut self, vars: &[u32]) {
+        // Clear and re-key every variable, mark each named one; the heap
+        // rebuild charges itself.
+        self.stats.word_ops += 2 * self.n_vars as u64 + vars.len() as u64;
         self.branch_priority.iter_mut().for_each(|p| *p = false);
         for &v in vars {
             debug_assert!(v >= 1 && v <= self.n_vars, "priority var {v} out of range");
@@ -953,6 +1045,14 @@ impl Solver {
             *k = order_key(a, p);
         }
         self.order.rebuild(self.n_vars, &self.heap_key);
+    }
+
+    /// Choose how often a search decision triggers native XOR elimination.
+    /// A complete assignment and the root level always run the XOR engine,
+    /// so a slower cadence cannot turn an XOR-violating assignment into SAT.
+    pub fn set_xor_decision_cadence(&mut self, cadence: usize) {
+        assert!(cadence > 0, "XOR decision cadence must be positive");
+        self.xor_decision_cadence = cadence;
     }
 
     /// Propagate to fixpoint at the current level without deciding.
@@ -986,9 +1086,37 @@ impl Solver {
         })
     }
 
+    /// Check a complete external assignment against the exact original
+    /// CNF and XOR rows, before accepting any independently produced model.
+    /// Learned clauses are deliberately excluded: they are not part of the
+    /// exported instance and may depend on a particular search history.
+    pub fn check_original_assignment(&self, model: &[bool]) -> bool {
+        if self.is_unsat || model.len() != self.n_vars as usize {
+            return false;
+        }
+        self.clause_at
+            .iter()
+            .take(self.n_orig_clauses)
+            .all(|&cref| {
+                clause_in(&self.arena, cref).iter().any(|&literal| {
+                    let value = model[var_of(literal) as usize];
+                    if is_neg(literal) {
+                        !value
+                    } else {
+                        value
+                    }
+                })
+            })
+            && self.check_xors(model)
+    }
+
     /// Add a clause `lits` (DIMACS literal encoding). Returns false if
     /// the empty clause is added (immediately UNSAT).
     pub fn add_clause(&mut self, mut lits: Vec<Lit>) -> bool {
+        // Normalisation: the sort's `k⌈log₂ k⌉` comparisons, then one
+        // pass each to deduplicate and to test for a tautology.
+        let k = lits.len() as u64;
+        self.stats.word_ops += k * (64 - k.leading_zeros()) as u64 + 2 * k;
         // Deduplicate and remove tautologies.
         lits.sort_by_key(|&l| (var_of(l), l));
         lits.dedup();
@@ -1005,6 +1133,8 @@ impl Solver {
         // Root assignments persist across reset_search and are consequences
         // of the permanent formula, so this simplification is sound.
         if self.trail_lim.is_empty() {
+            // Two passes of value lookups over the clause.
+            self.stats.word_ops += 2 * lits.len() as u64;
             if lits.iter().any(|&l| self.lit_value(l) == Some(true)) {
                 return true;
             }
@@ -1033,6 +1163,8 @@ impl Solver {
             _ => {
                 let idx = self.push_clause(&lits);
                 let (l0, l1) = (lits[0], lits[1]);
+                // The two watchers.
+                self.stats.word_ops += 2;
                 let (w0, w1) = (self.watch_slot(l0), self.watch_slot(l1));
                 self.watches[w0].push(Watcher {
                     cref: idx,
@@ -1061,6 +1193,10 @@ impl Solver {
     /// whole trail.
     fn add_lazy_clause_at_current_level(&mut self, mut lits: Vec<Lit>) -> Option<Conflict> {
         debug_assert!(lits.len() >= 2);
+        // The sort by (not false, level), the non-false prefix scan, two
+        // watchers and the unit test.
+        let k = lits.len() as u64;
+        self.stats.word_ops += 2 * k * (64 - k.leading_zeros()) as u64 + k + 3;
         lits.sort_by(|&left, &right| {
             let key = |lit: Lit| {
                 (
@@ -1165,6 +1301,8 @@ impl Solver {
     fn push_clause(&mut self, lits: &[Lit]) -> u32 {
         let cref = self.next_cref();
         let len = Lit::try_from(lits.len()).expect("clause exceeds 2^31 literals");
+        // The length word, the literals, and the index entry.
+        self.stats.word_ops += lits.len() as u64 + 2;
         self.arena.push(len);
         self.arena.extend_from_slice(lits);
         self.clause_at.push(cref);
@@ -1182,6 +1320,8 @@ impl Solver {
     /// Assign `lit` to true with the given reason. Returns `Err` if it
     /// conflicts with the current assignment.
     fn enqueue(&mut self, lit: Lit, r: Reason) -> Result<(), ()> {
+        // The value test; `assign` is charged through `propagations`.
+        self.stats.word_ops += 1;
         match self.lit_value(lit) {
             Some(true) => Ok(()),
             Some(false) => Err(()),
@@ -1245,6 +1385,14 @@ impl Solver {
                 // Nothing has moved since the last Gauss-Jordan pass.
                 return None;
             }
+            if self.xor_decision_cadence > 1
+                && self.trail_lim.len() % self.xor_decision_cadence != 0
+                && self.trail.len() != self.n_vars as usize
+            {
+                // CNF is at a fixpoint. A later decision-level boundary,
+                // restart, or complete assignment must still check XOR.
+                return None;
+            }
             self.xor_epoch = self.epoch;
             self.progress_phase(SolverProgressPhase::XorPropagation);
             let t = std::time::Instant::now();
@@ -1292,6 +1440,9 @@ impl Solver {
             self.rebuild_matrix();
         }
         let rows = self.matrix_rhs.len();
+        // Each pass tests every row's pivot (phase 1) and every row's
+        // pivot slot again (phase 2): two per row, plus the epoch test.
+        self.stats.word_ops += 2 * rows as u64 + 1;
 
         // ── Phase 1: restore the pivot invariant ────────────────────
         //
@@ -1321,10 +1472,15 @@ impl Solver {
             match self.lowest_unassigned(&self.matrix[row_i.clone()]) {
                 None => {
                     // No unassigned variable left: the row is decided.
+                    // Its words were scanned for a pivot, then for the
+                    // residual parity.
+                    self.stats.word_ops += 2 * words as u64;
                     self.pivot[i] = None;
                     if self.row_residual(i, words) {
                         let mut buf = std::mem::take(&mut self.xor_conflict);
                         self.write_xor_reason(&self.matrix[row_i], None, &mut buf);
+                        // The reason: one per row word, one per literal.
+                        self.stats.word_ops += (words + buf.len()) as u64;
                         self.xor_conflict = buf;
                         self.stats.xor_conflicts += 1;
                         return XorStep::Conflict;
@@ -1370,6 +1526,11 @@ impl Solver {
                         xor_into(&mut matrix[j * words..(j + 1) * words], &src);
                     }
                     self.stats.xor_row_ops += row_ops;
+                    // Pivot search up to `p`'s word, the row copied out,
+                    // the column tested in every row, and each row
+                    // operation's `words` XORs plus its rhs.
+                    self.stats.word_ops +=
+                        (pw + 1 + words + rows) as u64 + row_ops * (words as u64 + 1);
                     self.xor_src = src;
                 }
             }
@@ -1402,11 +1563,15 @@ impl Solver {
                 if free.count_ones() > 1
                     || (free != 0 && free.trailing_zeros() + (w * 64) as u32 != p)
                 {
+                    // The read-off stopped at word `w`.
+                    self.stats.word_ops += w as u64 + 1;
                     continue 'rows;
                 }
                 parity ^= ((m & assigned & value).count_ones() & 1) == 1;
             }
 
+            // The read-off reached the end of the row.
+            self.stats.word_ops += words as u64;
             let lit = if parity {
                 (p + 1) as Lit
             } else {
@@ -1419,6 +1584,8 @@ impl Solver {
                 &mut buf,
             );
             self.stats.xor_reason_lits += buf.len() as u64;
+            // The reason: one per row word, one per literal.
+            self.stats.word_ops += (words + buf.len()) as u64;
             self.xor_reason[p as usize] = buf;
             self.stats.xor_propagations += 1;
             if self.enqueue(lit, Reason::XorPropagated).is_err() {
@@ -1450,6 +1617,12 @@ impl Solver {
     /// the reason clauses read off them.  Rebuilding at restarts, where
     /// the trail is empty anyway, bounds that drift.
     fn rebuild_matrix(&mut self) {
+        // Every row's words copied, its rhs and its pivot slot reset.
+        self.stats.word_ops += self
+            .xors
+            .iter()
+            .map(|row| row.mask.len() as u64 + 2)
+            .sum::<u64>();
         self.matrix.clear();
         self.matrix_rhs.clear();
         for row in &self.xors {
@@ -1564,6 +1737,11 @@ impl Solver {
             // allocation per propagated literal, which at ~280
             // propagations a conflict is millions per solve.
             let mut ws = std::mem::take(&mut self.watches[wi]);
+            // The trail read, then every watcher once: its blocker test
+            // and write-back in the scan, or its copy after a conflict.
+            // (Clause dereferences and replacement searches are charged
+            // through `clause_visits` and `clause_lit_visits`.)
+            self.stats.word_ops += 1 + ws.len() as u64;
             let (mut i, mut j) = (0usize, 0usize);
 
             while i < ws.len() {
@@ -1612,6 +1790,8 @@ impl Solver {
                             cref,
                             blocker: other,
                         });
+                        // The literal swap and the new watcher.
+                        self.stats.word_ops += 2;
                         moved = true;
                         break;
                     }
@@ -1680,6 +1860,11 @@ impl Solver {
                 Reason::Propagated(cref) => clause_in(&self.arena, cref),
                 Reason::XorPropagated => &self.xor_reason[qv],
             };
+            // The step's reason test, then each reason literal's
+            // seen/level/reason tests, charged at the reason's full
+            // length (a failing walk stops early, and is then charged
+            // for literals it did not reach).
+            self.stats.word_ops += 1 + reason.len() as u64;
             for &r in reason {
                 let rv = var_of(r) as usize;
                 // The propagated literal itself, anything already in the
@@ -1693,6 +1878,8 @@ impl Solver {
                     self.seen_stack.push(rv as u32);
                     stack.push(r);
                 } else {
+                    // The rollback of this walk's marks.
+                    self.stats.word_ops += (self.seen_stack.len() - top) as u64;
                     for j in top..self.seen_stack.len() {
                         self.seen[self.seen_stack[j] as usize] = false;
                     }
@@ -1747,11 +1934,16 @@ impl Solver {
                 // those literals was leaving learnt clauses averaging
                 // 188 literals on an `n = 19` instance.
                 if !self.seen[v] && self.level[v] > 0 {
+                    // The mark, the activity bump and its new key, and the
+                    // clause or counter update; the heap charges itself.
+                    self.stats.word_ops += 4;
                     self.seen[v] = true;
                     self.seen_stack.push(v as u32);
                     // Bump activity, and reposition in the branching heap.
                     self.activity[v] += self.activity_inc;
                     if self.activity[v] > 1e100 {
+                        // Rescale: every activity and key rewritten.
+                        self.stats.word_ops += 2 * self.activity.len() as u64;
                         for (a, (k, &prio)) in self
                             .activity
                             .iter_mut()
@@ -1783,6 +1975,9 @@ impl Solver {
             }
             let v = var_of(p) as usize;
             self.seen[v] = false;
+            // The resolution step's own bookkeeping: the reason fetch,
+            // unmarking `p` and the counter.
+            self.stats.word_ops += 2;
             counter -= 1;
             if counter <= 0 {
                 break;
@@ -1808,6 +2003,9 @@ impl Solver {
         // `seen` is still marked for exactly the clause's literals at
         // this point, which is what makes the test a lookup.
         self.stats.learnt_lits_raw += learnt.len() as u64;
+        // The trail walked back to find each resolved literal: one seen
+        // test per trail entry passed.
+        self.stats.word_ops += (self.trail.len() - trail_pos) as u64;
         if learnt.len() > 1 {
             // Cheap filter: a literal can only be redundant if its
             // reason stays inside the levels the clause already covers.
@@ -1835,6 +2033,7 @@ impl Solver {
         self.stats.learnt_lits_kept += learnt.len() as u64;
 
         // Clear only the marks we set.
+        self.stats.word_ops += self.seen_stack.len() as u64;
         for v in self.seen_stack.drain(..) {
             self.seen[v as usize] = false;
         }
@@ -1874,6 +2073,9 @@ impl Solver {
         }
         let target = self.trail_lim[level];
         self.xor_decided.fill(false);
+        // Each unassignment: the two literal slots, the bitset word and
+        // the level; the heap re-insertion charges itself.
+        self.stats.word_ops += 3 * (self.trail.len() - target) as u64 + 1;
         while self.trail.len() > target {
             let l = self.trail.pop().unwrap();
             let v = var_of(l) as usize;
@@ -1905,6 +2107,8 @@ impl Solver {
     /// so we skip those.
     fn pick_branching_variable(&mut self) -> Option<u32> {
         while let Some(v) = self.order.pop_max(&self.heap_key) {
+            // The popped variable's value test.
+            self.stats.word_ops += 1;
             if self.var_value(v as usize).is_none() {
                 return Some(v);
             }
@@ -1931,6 +2135,10 @@ impl Solver {
     fn reduce_db(&mut self) {
         let n_clauses = self.clause_at.len();
         self.detached.resize(n_clauses, false);
+        // The lock table cleared, each trail literal's reason tested and
+        // a propagated one's clause found by binary search over the index.
+        let log_clauses = (64 - (n_clauses as u64).leading_zeros()) as u64;
+        self.stats.word_ops += n_clauses as u64 + self.trail.len() as u64 * (1 + log_clauses);
 
         let mut locked = vec![false; n_clauses];
         for &l in &self.trail {
@@ -1947,9 +2155,15 @@ impl Solver {
         let mut candidates: Vec<usize> = (self.n_orig_clauses..n_clauses)
             .filter(|&i| !self.detached[i] && !locked[i] && clause_len(i) > 2)
             .collect();
+        // The learnt clauses filtered: detached, locked, length.
+        self.stats.word_ops += 3 * (n_clauses - self.n_orig_clauses) as u64;
         if candidates.len() < 2 {
             return;
         }
+        // The sort's `c⌈log₂ c⌉` comparisons of two lengths each, and
+        // the front half marked.
+        let c = candidates.len() as u64;
+        self.stats.word_ops += 2 * c * (64 - c.leading_zeros()) as u64 + c / 2;
         // Longest first, so the front half is the one to drop.
         candidates.sort_by_key(|&i| std::cmp::Reverse(clause_len(i)));
         for &i in candidates.iter().take(candidates.len() / 2) {
@@ -1957,7 +2171,10 @@ impl Solver {
         }
 
         // Rebuild the watch lists from what survives.  Cheaper and much
-        // less error-prone than unhooking clauses one at a time.
+        // less error-prone than unhooking clauses one at a time.  One per
+        // list cleared, two per clause (offset, length and detached
+        // test) and two watchers per survivor, charged as every clause.
+        self.stats.word_ops += self.watches.len() as u64 + 4 * n_clauses as u64;
         for w in self.watches.iter_mut() {
             w.clear();
         }
@@ -2032,11 +2249,19 @@ impl Solver {
         if self.max_learnts == 0 {
             self.max_learnts = (self.n_orig_clauses / 3).max(4000);
         }
+        // The detached flags extended over the clauses, a word per 64.
+        self.stats.word_ops += (self.clause_at.len() as u64).div_ceil(64);
         self.detached.resize(self.clause_at.len(), false);
         let mut luby_index = 1u64;
         let mut restart_limit = 100u64 * luby(luby_index);
         let mut pending_conflict = None;
         loop {
+            if self
+                .deadline
+                .is_some_and(|deadline| std::time::Instant::now() >= deadline)
+            {
+                return SolveResult::Unknown;
+            }
             if let Some(conflict_idx) = pending_conflict.take().or_else(|| self.propagate()) {
                 self.conflicts += 1;
                 self.stats.conflicts += 1;
@@ -2049,6 +2274,8 @@ impl Solver {
                 self.stats.conflict_level_sum += lvl;
                 self.stats.max_level = self.stats.max_level.max(lvl);
                 self.conflicts_since_restart += 1;
+                // The conflict's counters and budget and level tests.
+                self.stats.word_ops += 3;
                 if self.conflicts >= self.conflict_budget
                     || self
                         .deadline
@@ -2074,6 +2301,8 @@ impl Solver {
                     self.stats.learnt_clauses += 1;
                     let l0 = learnt[0];
                     let l1 = learnt[1];
+                    // The two watchers; the arena push charges itself.
+                    self.stats.word_ops += 2;
                     let idx = self.push_clause(&learnt);
                     let (w0, w1) = (self.watch_slot(l0), self.watch_slot(l1));
                     self.watches[w0].push(Watcher {
@@ -2093,6 +2322,9 @@ impl Solver {
                     self.progress_phase(SolverProgressPhase::Restart);
                     self.backjump(0);
                     self.stats.restarts += 1;
+                    // The restart's own bookkeeping: the limit tests, and
+                    // the Luby recurrence's at most `⌈log₂ i⌉` steps.
+                    self.stats.word_ops += 2 + (64 - luby_index.leading_zeros()) as u64;
                     self.conflicts_since_restart = 0;
                     // Level 0: a good moment to shed accumulated
                     // fill-in in the parity matrix.
@@ -2122,6 +2354,8 @@ impl Solver {
                 // Through the `n_vars`-long assignment, so a trigger past the
                 // variables panics on the index as it did before the tables
                 // had spare slots, instead of reading as never assigned.
+                // The trigger test, one value read per trigger variable.
+                self.stats.word_ops += trigger_vars.len() as u64;
                 if !trigger_vars.is_empty() && {
                     let assignment = self.assignment();
                     trigger_vars
@@ -2131,6 +2365,16 @@ impl Solver {
                     if let Some(clauses) = theory(self.assignment()) {
                         assert!(!clauses.is_empty(), "lazy theory returned an empty update");
                         let mut normalized = Vec::with_capacity(clauses.len());
+                        // Normalising each theory clause: the sort, the
+                        // deduplication and tautology passes, and the
+                        // all-false test.
+                        self.stats.word_ops += clauses
+                            .iter()
+                            .map(|c| {
+                                let k = c.len() as u64;
+                                k * (64 - k.leading_zeros()) as u64 + 3 * k
+                            })
+                            .sum::<u64>();
                         for mut clause in clauses {
                             clause.sort_by_key(|&lit| (var_of(lit), lit));
                             clause.dedup();
@@ -2170,6 +2414,8 @@ impl Solver {
                     None => return SolveResult::Sat,
                     Some(v) => {
                         self.stats.decisions += 1;
+                        // The level push and the saved phase.
+                        self.stats.word_ops += 2;
                         self.trail_lim.push(self.trail.len());
                         let lit = if self.saved_phase[v as usize] {
                             (v + 1) as i32
@@ -2236,6 +2482,18 @@ impl Solver {
     /// Force every saved phase to a constant polarity (search-polarity lever).
     pub fn set_all_saved_phases(&mut self, value: bool) {
         self.saved_phase.fill(value);
+    }
+
+    /// Set the initial decision polarity of selected 1-indexed variables.
+    /// This changes search order only; it adds no constraint to the formula.
+    pub fn set_saved_phase_for_vars(&mut self, vars: &[u32], value: bool) {
+        for &var in vars {
+            assert!(
+                var >= 1 && var <= self.n_vars,
+                "saved-phase variable out of range"
+            );
+            self.saved_phase[(var - 1) as usize] = value;
+        }
     }
 
     /// Cumulative conflicts across all calls to [`Self::solve`].
@@ -3123,6 +3381,124 @@ mod tests {
         }
     }
 
+    fn deferred_xor_still_checks_a_complete_assignment() {
+        for cadence in [1, 2, 8] {
+            let mut sat = Solver::new(4);
+            sat.set_xor_decision_cadence(cadence);
+            assert!(sat.add_xor(&[1, 2, 3, 4], true));
+            assert_eq!(sat.solve(), SolveResult::Sat);
+            let model = sat.model();
+            assert!(sat.check_xors(&model));
+            assert_eq!(model.iter().filter(|&&value| value).count() % 2, 1);
+
+            let mut unsat = Solver::new(4);
+            unsat.set_xor_decision_cadence(cadence);
+            assert!(unsat.add_xor(&[1, 2, 3, 4], true));
+            // These eight clauses admit only even-parity assignments.
+            for assignment in 0u32..16 {
+                if assignment.count_ones() % 2 == 1 {
+                    let clause = (0..4)
+                        .map(|bit| {
+                            let variable = (bit + 1) as Lit;
+                            if assignment & (1 << bit) != 0 {
+                                -variable
+                            } else {
+                                variable
+                            }
+                        })
+                        .collect();
+                    assert!(unsat.add_clause(clause));
+                }
+            }
+            assert_eq!(unsat.solve(), SolveResult::Unsat);
+        }
+    }
+
+    #[test]
+    fn deferred_xor_mixed_cnf_agrees_with_exhaustive_search() {
+        let mut state = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = || {
+            state ^= state >> 12;
+            state ^= state << 25;
+            state ^= state >> 27;
+            state.wrapping_mul(0x2545_F491_4F6C_DD1D)
+        };
+        for trial in 0..120 {
+            let clauses: Vec<Vec<Lit>> = (0..(3 + next() % 8))
+                .map(|_| {
+                    (0..3)
+                        .map(|_| {
+                            let var = (1 + next() % 6) as Lit;
+                            if next() & 1 == 0 {
+                                var
+                            } else {
+                                -var
+                            }
+                        })
+                        .collect()
+                })
+                .collect();
+            let xors: Vec<(Vec<u32>, bool)> = (0..(2 + next() % 5))
+                .map(|_| {
+                    let mut vars: Vec<u32> = (1..=6).filter(|_| next() & 1 == 0).collect();
+                    if vars.is_empty() {
+                        vars.push((1 + next() % 6) as u32);
+                    }
+                    (vars, next() & 1 == 0)
+                })
+                .collect();
+            let brute_sat = (0u32..64).any(|bits| {
+                clauses.iter().all(|clause| {
+                    clause.iter().any(|&lit| {
+                        let bit = (bits >> var_of(lit)) & 1 != 0;
+                        if lit > 0 {
+                            bit
+                        } else {
+                            !bit
+                        }
+                    })
+                }) && xors.iter().all(|(vars, rhs)| {
+                    vars.iter().filter(|&&v| (bits >> (v - 1)) & 1 != 0).count() % 2
+                        == usize::from(*rhs)
+                })
+            });
+            for cadence in [1, 2, 4, 32] {
+                let mut solver = Solver::new(6);
+                solver.set_xor_decision_cadence(cadence);
+                for clause in &clauses {
+                    solver.add_clause(clause.clone());
+                }
+                for (vars, rhs) in &xors {
+                    solver.add_xor(vars, *rhs);
+                }
+                let answer = solver.solve();
+                assert_eq!(
+                    answer == SolveResult::Sat,
+                    brute_sat,
+                    "mixed CNF/XOR trial {trial}, cadence {cadence}: {answer:?}; clauses={clauses:?}; xors={xors:?}"
+                );
+                if answer == SolveResult::Sat {
+                    let model = solver.model();
+                    assert!(solver.check_xors(&model));
+                    assert!(clauses.iter().all(|clause| clause.iter().any(|&lit| {
+                        if lit > 0 {
+                            model[(lit - 1) as usize]
+                        } else {
+                            !model[(-lit - 1) as usize]
+                        }
+                    })));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn expired_deadline_stops_conflict_free_search() {
+        let mut solver = Solver::new(4);
+        solver.deadline = Some(std::time::Instant::now());
+        assert_eq!(solver.solve(), SolveResult::Unknown);
+    }
+
     /// The extended-DIMACS reader must apply CryptoMiniSat's parity
     /// convention: bare literals mean `= 1`, one negation flips to `= 0`.
     #[test]
@@ -3171,6 +3547,19 @@ mod tests {
                 .solve(),
             SolveResult::Unsat
         );
+    }
+
+    #[test]
+    fn targeted_saved_phase_changes_first_decision_without_changing_satisfiability() {
+        for value in [false, true] {
+            let mut solver = Solver::new(2);
+            assert!(solver.add_clause(vec![1, 2]));
+            solver.set_branch_priority(&[1]);
+            solver.set_saved_phase_for_vars(&[1], value);
+            assert_eq!(solver.solve(), SolveResult::Sat);
+            assert_eq!(solver.model()[0], value);
+            assert!(solver.check_original_assignment(&solver.model()));
+        }
     }
 
     #[test]
@@ -3434,6 +3823,18 @@ mod tests {
         let s2 = parse_dimacs(&dimacs).expect("parse failed");
         assert_eq!(s2.n_vars(), 4);
         assert_eq!(s2.n_clauses(), 3);
+    }
+
+    #[test]
+    fn external_assignment_checks_original_cnf_and_xor_rows() {
+        let mut solver = Solver::new(3);
+        solver.add_clause(vec![1]);
+        solver.add_clause(vec![3]);
+        solver.add_xor(&[1, 2], true);
+        assert!(solver.check_original_assignment(&[true, false, true]));
+        assert!(!solver.check_original_assignment(&[true, true, true]));
+        assert!(!solver.check_original_assignment(&[false, false, true]));
+        assert!(!solver.check_original_assignment(&[true, false]));
     }
 
     /// Luby sequence check.
