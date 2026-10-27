@@ -1,5 +1,21 @@
 # Validation context
 
+## Current-parent follow-up (2026-10-27)
+
+The authoring follow-up locally merges actual parent #2430 source head
+`543bbd3e53b5f81f3875bafbb1678fce47d739e0` into published PR head
+`f12e8a2fed1488637e2948c1b73ffb82d7ca90f4`, producing merge revision
+`adfb858227a5a31585a12afb2cd55114dbcd2c81`. Both session-log entry bodies
+are preserved verbatim. The implementation, protocol, allocation, parameter
+CSV and frozen conductor-gap studies are unchanged by the merge.
+
+The newer parent changes library source, so the original-base results below
+remain historical. See the separate [current-parent validation record](checks/current-parent-20261027/README.md)
+for the follow-up's actual results and remaining gates. Local validation does
+not establish successful exact-head CI, review or merge authorization.
+
+## Original publication context
+
 The publication branch starts at the actual parent #2430 source-branch head
 `2efb7830fb732928a5da8451648dc1fa40adaef7`. The initial checks used the
 stale PR ref `f416adefe9fc43f3a68c5658b88e832eaedaf9ea`; the unpublished
