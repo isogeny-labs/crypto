@@ -2390,7 +2390,14 @@ mod tests {
             // one ulp off the written text for some values, so compare with
             // the line as written: under `arbitrary_precision` a `Value`
             // keeps each number's decimal token, and the comparison is exact.
-            let written: serde_json::Value = serde_json::from_str(line).unwrap();
+            let mut written: serde_json::Value = serde_json::from_str(line).unwrap();
+            // The fixture predates the target-aware split (a rho set-up that
+            // builds `[a]G + [b]Q` is per target); its stored split is read
+            // through `target_split`, as every reader does, and the rest of
+            // the block must match byte for byte.
+            let (reusable, per_target) = target_split(&r.method.id, committed).unwrap();
+            written["work"]["reusable_bitops"] = reusable.to_string().into();
+            written["work"]["per_target_bitops"] = per_target.to_string().into();
             assert_eq!(
                 serde_json::to_value(price_record(r).unwrap()).unwrap(),
                 written["work"],

@@ -2085,6 +2085,9 @@ mod tests {
                     resamples: 50,
                     unit: Some(crate::cryptanalysis::bitops::UNIT.into()),
                     cost,
+                    // The study's bounds are sealed under version 1; version 2
+                    // withholds the addition exponent without an audit.
+                    fit_version: 1,
                     ..Default::default()
                 },
             })
