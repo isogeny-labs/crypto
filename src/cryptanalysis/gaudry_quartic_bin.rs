@@ -1975,6 +1975,10 @@ pub struct BinSolve {
     pub touch: Touch,
     #[serde(skip)]
     pub monomial_hash_ops: u64,
+    /// The same native counters split by stage of the solve, for the
+    /// per-phase CPU report (never read by a count).
+    #[serde(skip)]
+    pub stages: StageNative,
     pub rational_eigenvalues: usize,
     pub degenerate_eigenspaces: usize,
     pub e_solutions: usize,
@@ -1984,8 +1988,51 @@ pub struct BinSolve {
     pub total_ms: f64,
 }
 
+/// Names of the stages of [`StageNative`], in order.
+pub const SOLVE_STAGES: [&str; 8] = [
+    "weil_build",
+    "macaulay_build",
+    "echelon",
+    "normal_form",
+    "charpoly",
+    "roots",
+    "eigen",
+    "split_lift",
+];
+
+/// The native counters (`touch`, `monomial_hash_ops`) accumulated per stage:
+/// [`BinSolve::mark`] charges what accrued since the last mark to the stage
+/// that was current.  Stage 0 takes everything counted before the Macaulay
+/// solve starts (the Weil system build).
+#[derive(Clone, Copy, Debug, Default)]
+pub struct StageNative {
+    cur: usize,
+    last: (Touch, u64),
+    /// Per stage: the touch counters and the monomial hash operations.
+    pub acc: [(Touch, u64); 8],
+}
+
 impl BinSolve {
+    /// Charge the native counters since the last mark to the current stage
+    /// and make `next` current.
+    fn mark(&mut self, next: usize) {
+        let now = (self.touch, self.monomial_hash_ops);
+        let (lt, lh) = self.stages.last;
+        let d = Touch {
+            fills: now.0.fills.saturating_sub(lt.fills),
+            scans: now.0.scans.saturating_sub(lt.scans),
+            skips: now.0.skips.saturating_sub(lt.skips),
+            regions: now.0.regions.saturating_sub(lt.regions),
+        };
+        let cur = self.stages.cur;
+        self.stages.acc[cur].0.add(d);
+        self.stages.acc[cur].1 += now.1.saturating_sub(lh);
+        self.stages.last = now;
+        self.stages.cur = next;
+    }
+
     fn close(&mut self) {
+        self.mark(7);
         self.total_muls = self.weil_muls
             + self.triangularise_muls
             + self.echelon_muls
@@ -2209,6 +2256,10 @@ fn solve_once<const N: usize>(
     let g = &f.tab;
     let q = f.q as u64;
     let t0 = std::time::Instant::now();
+    let _phase = crate::cryptanalysis::phase_cpu::enter(
+        crate::cryptanalysis::phase_cpu::Phase::MacaulayBuild,
+    );
+    st.mark(1);
     st.macaulay_degree = macaulay;
     let cols = monomials_desc(macaulay, w);
     let col_index: HashMap<[u8; N], usize> =
@@ -2270,6 +2321,8 @@ fn solve_once<const N: usize>(
     st.rows = rows.len();
     st.cols = cols.len();
     let mut em = 0;
+    crate::cryptanalysis::phase_cpu::set(crate::cryptanalysis::phase_cpu::Phase::Echelon);
+    st.mark(2);
     let mut ech = echelon(g, rows, &mut em, sparsest);
     if let Some(t) = replay {
         let have = ech.pivot_row.iter().filter(|&&r| r != u32::MAX).count();
@@ -2279,6 +2332,8 @@ fn solve_once<const N: usize>(
     }
     st.echelon_muls += em;
     st.touch.add(ech.touch);
+    crate::cryptanalysis::phase_cpu::set(crate::cryptanalysis::phase_cpu::Phase::MacaulayBuild);
+    st.mark(1);
     st.zero_rows = ech.zero_rows;
     st.pivots = ech.pivot_row.iter().filter(|&&r| r != u32::MAX).count();
     let is_std: Vec<bool> = (0..cols.len())
@@ -2374,6 +2429,8 @@ fn solve_once<const N: usize>(
         .filter(|&c| ech.pivot_row[c] != u32::MAX)
         .map(|c| (ncols - c) as u64)
         .sum::<u64>();
+    crate::cryptanalysis::phase_cpu::set(crate::cryptanalysis::phase_cpu::Phase::NormalForm);
+    st.mark(3);
     let reduced: Vec<Result<(Vec<Fe>, u64, Touch), ()>> = ends
         .par_iter()
         .map(|&b| {
@@ -2421,6 +2478,8 @@ fn solve_once<const N: usize>(
     }
     let ch = Chains { pos, len, nf };
     // Rational eigenvalues: zeros of det A on F_q, or its roots.
+    crate::cryptanalysis::phase_cpu::set(crate::cryptanalysis::phase_cpu::Phase::Charpoly);
+    st.mark(4);
     let npts = if q <= dim as u64 + 1 {
         q
     } else {
@@ -2452,11 +2511,15 @@ fn solve_once<const N: usize>(
             return Ok(None);
         }
         let mut rm = 0;
+        crate::cryptanalysis::phase_cpu::set(crate::cryptanalysis::phase_cpu::Phase::Roots);
+        st.mark(5);
         let r = roots(f, &poly, &mut rm);
         st.roots_muls += rm;
         r
     };
     st.rational_eigenvalues = lambdas.len();
+    crate::cryptanalysis::phase_cpu::set(crate::cryptanalysis::phase_cpu::Phase::Eigen);
+    st.mark(6);
     let known: Vec<Vec<(usize, usize)>> = (0..N)
         .filter(|&v| v != mvar)
         .map(|v| {
@@ -2594,6 +2657,8 @@ pub fn solve_d4_bin(
 ) -> Result<BinD4Solve, BinSolve> {
     let f = &curve.f;
     let g = &f.f.tab;
+    let _phase =
+        crate::cryptanalysis::phase_cpu::enter(crate::cryptanalysis::phase_cpu::Phase::WeilBuild);
     let mut out = BinD4Solve::default();
     let before = f.f.muls();
     let (rbefore, pbefore) = (f.ref_muls(), f.ref_muls_poly());
@@ -2667,6 +2732,8 @@ pub fn solve_d4_bin(
             trace,
         )
     };
+    crate::cryptanalysis::phase_cpu::set(crate::cryptanalysis::phase_cpu::Phase::SplitLift);
+    out.solve.mark(7);
     let Some(sols) = sols else {
         out.solve.close();
         return Err(out.solve);
@@ -3120,6 +3187,9 @@ impl FactorBaseBuilder<CurveB> for TLineBase<'_> {
         _params: &Params,
         ops: &mut GroupOps,
     ) -> Result<FactorBase<PtB>, String> {
+        let _phase = crate::cryptanalysis::phase_cpu::enter_in_loop(
+            crate::cryptanalysis::phase_cpu::Phase::FactorBase,
+        );
         let d = self.curve;
         let c = &d.curve;
         let t = c.torsion();
@@ -3223,11 +3293,51 @@ pub struct OracleNative {
     pub lp_entries: u64,
     /// `[pivot probes, pivot inserts, ordered-map operations]`.
     pub lp_map_ops: [u64; 3],
+    /// Counted F_q multiplications of every solve (solved or not), by
+    /// phase, in the order of [`SOLVE_MUL_PHASES`]; read only by the
+    /// per-phase CPU report of `ecbench unit-price-f2m4 --phases`.
+    pub solve_muls: [u64; 9],
+    /// The native counters by stage of the solve ([`SOLVE_STAGES`]): fills,
+    /// scans, skips, parallel regions, monomial hash operations.
+    pub stage_native: [[u64; 5]; 8],
+    /// Solves that returned no system solution (their muls are included).
+    pub unsolved: u64,
 }
+
+/// The phases of [`OracleNative::solve_muls`].
+pub const SOLVE_MUL_PHASES: [&str; 9] = [
+    "weil",
+    "triangularise",
+    "echelon",
+    "normal_form",
+    "charpoly",
+    "roots",
+    "eigenvector",
+    "verify",
+    "split",
+];
 
 impl OracleNative {
     fn add_solve(&mut self, s: &BinSolve) {
         self.solves += 1;
+        for (a, b) in self.solve_muls.iter_mut().zip([
+            s.weil_muls,
+            s.triangularise_muls,
+            s.echelon_muls,
+            s.nf_muls,
+            s.charpoly_muls,
+            s.roots_muls,
+            s.eigenvector_muls,
+            s.verify_muls,
+            s.split_muls,
+        ]) {
+            *a += b;
+        }
+        for (a, (t, h)) in self.stage_native.iter_mut().zip(s.stages.acc) {
+            for (x, y) in a.iter_mut().zip([t.fills, t.scans, t.skips, t.regions, h]) {
+                *x += y;
+            }
+        }
         self.touch.add(s.touch);
         self.monomial_hash_ops += s.monomial_hash_ops;
     }
@@ -3620,6 +3730,9 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
         _params: &Params,
         _ops: &mut GroupOps,
     ) -> Result<(), String> {
+        let _phase = crate::cryptanalysis::phase_cpu::enter(
+            crate::cryptanalysis::phase_cpu::Phase::Precompute,
+        );
         let mut rng = StdRng::seed_from_u64(self.seed ^ 0x9e);
         let pre = SymmetrisedBin::precompute(&self.curve.curve, &mut rng, 8)?;
         if self.opts.frobenius && !pre.frobenius_reducible() {
@@ -3652,6 +3765,9 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
     ) -> Option<Vec<usize>> {
         let pre = self.pre.as_ref()?;
         let c = &self.curve.curve;
+        let _phase = crate::cryptanalysis::phase_cpu::enter(
+            crate::cryptanalysis::phase_cpu::Phase::OracleOther,
+        );
         let mut rng =
             StdRng::seed_from_u64(self.seed ^ self.totals.calls.wrapping_mul(0x9e37_79b9));
         let adds_before = c.ops();
@@ -3670,7 +3786,10 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
         self.native.table_inversions += c.f.f.tab.table_inversions() - invs_before;
         match &sol {
             Ok(s) => self.native.add_solve(&s.solve),
-            Err(s) => self.native.add_solve(s),
+            Err(s) => {
+                self.native.add_solve(s);
+                self.native.unsolved += 1;
+            }
         }
         // The additions that test a candidate's signs (their field
         // multiplications are inside the additions' price, not the solve's).

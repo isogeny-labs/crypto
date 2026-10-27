@@ -1,0 +1,1533 @@
+{
+  "binary_sha256": "4dd11a7f62ff0878f00a87b155814d4d50d819f32a8581a19898e3fded05ae23",
+  "closure": false,
+  "closure_variants": [
+    "full"
+  ],
+  "host": {
+    "build": {
+      "binary_path": "/home/user/crypto/target-repl/release/ecbench",
+      "binary_sha256": "4dd11a7f62ff0878f00a87b155814d4d50d819f32a8581a19898e3fded05ae23",
+      "build_env": {},
+      "debug_assertions": false,
+      "git_commit": "4e272668a15041894882386c046eaf024a9d050f",
+      "git_commit_source": "runtime_worktree",
+      "git_dirty": true,
+      "runtime_git_commit": "4e272668a15041894882386c046eaf024a9d050f",
+      "runtime_git_dirty": true,
+      "target_arch": "x86_64",
+      "target_os": "linux"
+    },
+    "env_class_id": "ECBENV2ha932978c2a89",
+    "process_affinity": [
+      3
+    ],
+    "stable": {
+      "arch": "x86_64",
+      "cpu_model": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+      "cpu_settings": {
+        "0": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        },
+        "1": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        },
+        "2": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        },
+        "3": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": null,
+          "no_turbo": null,
+          "smt_control": "notsupported"
+        }
+      },
+      "cpu_signature": "6/85/7",
+      "cpu_vendor": "GenuineIntel",
+      "features": [
+        "adx",
+        "aes",
+        "avx",
+        "avx2",
+        "avx512bw",
+        "avx512dq",
+        "avx512f",
+        "avx512vl",
+        "bmi1",
+        "bmi2",
+        "fma",
+        "pclmulqdq",
+        "popcnt",
+        "sse4.2"
+      ],
+      "flags_sha256": "e28bebf6d58da864dd355505bf305dd3bd502a1e851ac057e69aedb2dcc47735",
+      "kernel_release": "6.18.44-fc-v165",
+      "logical_cpus": 4,
+      "mem_total_kib": 16477356,
+      "microcode": "0x1",
+      "numa_nodes": 1,
+      "os": "linux",
+      "packages": 1,
+      "perf_levels": [],
+      "physical_cores": 4,
+      "rustc_vv": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.0\nLLVM version: 22.1.6",
+      "topology": {
+        "cpus": [
+          {
+            "core_id": 0,
+            "cpu": 0,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              0
+            ]
+          },
+          {
+            "core_id": 1,
+            "cpu": 1,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              1
+            ]
+          },
+          {
+            "core_id": 2,
+            "cpu": 2,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              2
+            ]
+          },
+          {
+            "core_id": 3,
+            "cpu": 3,
+            "node": 0,
+            "package": 0,
+            "siblings": [
+              3
+            ]
+          }
+        ],
+        "nodes": [
+          {
+            "cpus": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "distances": [
+              10
+            ],
+            "mem_total_kib": 16477356,
+            "node": 0
+          }
+        ]
+      },
+      "transparent_hugepages": "always [madvise] never",
+      "virtualization": {
+        "cpu_flag": "hypervisor",
+        "systemd_detect_virt_vm": "kvm"
+      }
+    }
+  },
+  "ic_complete": false,
+  "ic_trials": 2000,
+  "instances": {
+    "m15": {
+      "curve": "icv1-f2m60-t212516335-b0271609",
+      "curve_build_cpu_ns": 4054122000.0,
+      "fq_muls_per_add": 159,
+      "group_bits": 60,
+      "in_situ": {
+        "closure_variants": {},
+        "ic_pipeline": {
+          "full_matrix_rank": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "full_matrix_rows": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "full_priced_fme": {
+            "max": 992936440.7586219,
+            "median": 992593969.820016,
+            "min": 992542603.830199,
+            "rel_spread": 0.00039677545945029376,
+            "values": [
+              992936440.7586219,
+              992593969.820016,
+              992542603.830199
+            ]
+          },
+          "full_relations_found": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "full_sys_cpu_ns": {
+            "max": 2208825000.0,
+            "median": 2170762000.0,
+            "min": 2090109000.0,
+            "rel_spread": 0.05468863007552187,
+            "values": [
+              2170762000.0,
+              2090109000.0,
+              2208825000.0
+            ]
+          },
+          "full_targets_tried": {
+            "max": 2000.0,
+            "median": 2000.0,
+            "min": 2000.0,
+            "rel_spread": 0.0,
+            "values": [
+              2000.0,
+              2000.0,
+              2000.0
+            ]
+          },
+          "full_unpriced_entries": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "full_user_cpu_ns": {
+            "max": 7924290000.0,
+            "median": 7586914000.0,
+            "min": 7380728000.0,
+            "rel_spread": 0.07164467661027922,
+            "values": [
+              7380728000.0,
+              7924290000.0,
+              7586914000.0
+            ]
+          },
+          "full_wall_ns": {
+            "max": 10184553221.0,
+            "median": 9916777082.0,
+            "min": 9695372407.0,
+            "rel_spread": 0.049328608473806976,
+            "values": [
+              9695372407.0,
+              10184553221.0,
+              9916777082.0
+            ]
+          },
+          "ic_complete": false,
+          "ic_trials_requested": 2000,
+          "legacy_matrix_rank": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "legacy_matrix_rows": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "legacy_priced_fq_ops": {
+            "max": 521371775.0,
+            "median": 521021485.0,
+            "min": 520976184.0,
+            "rel_spread": 0.0007592604362562899,
+            "values": [
+              521371775.0,
+              521021485.0,
+              520976184.0
+            ]
+          },
+          "legacy_relations_found": {
+            "max": 15.0,
+            "median": 11.0,
+            "min": 5.0,
+            "rel_spread": 0.9090909090909091,
+            "values": [
+              15.0,
+              11.0,
+              5.0
+            ]
+          },
+          "legacy_targets_tried": {
+            "max": 2000.0,
+            "median": 2000.0,
+            "min": 2000.0,
+            "rel_spread": 0.0,
+            "values": [
+              2000.0,
+              2000.0,
+              2000.0
+            ]
+          },
+          "legacy_wall_ns": {
+            "max": 10034703555.0,
+            "median": 9894402019.0,
+            "min": 9593998355.0,
+            "rel_spread": 0.04454086251536208,
+            "values": [
+              9894402019.0,
+              9593998355.0,
+              10034703555.0
+            ]
+          },
+          "ns_per_full_priced_fme": {
+            "max": 10.26054311295759,
+            "median": 9.991286060398199,
+            "min": 9.764343425237325,
+            "rel_spread": 0.04966324502378321,
+            "values": [
+              9.764343425237325,
+              10.26054311295759,
+              9.991286060398199
+            ]
+          },
+          "ns_per_legacy_priced_fq_op": {
+            "max": 19.26134795251984,
+            "median": 18.97763264802741,
+            "min": 18.413824825285275,
+            "rel_spread": 0.04465905431690716,
+            "values": [
+              18.97763264802741,
+              18.413824825285275,
+              19.26134795251984
+            ]
+          },
+          "pool_mode": "global rayon pool (one worker); this thread is not a pool member, so each parallel region of the solver is handed to the worker; run before any on_one_thread call",
+          "rayon_threads": 1,
+          "reached_relations": {
+            "max": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "rel_spread": 0.0,
+            "values": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "recovered": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "rel_spread": null,
+            "values": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "reps": 3,
+          "spec": {
+            "factor_base": "bin-t-line",
+            "linalg": "wiedemann",
+            "max_cofactor": 2,
+            "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+            "source": "claim sessions e-m15 and d-ladder (ic-wied arm); max_cofactor 16 for m <= 12 (d-ladder) and 2 for m >= 15 (e-m15)"
+          }
+        },
+        "ic_pipeline_phased": {
+          "counters": {
+            "matrix_rank": 11,
+            "relations_found": 11,
+            "targets_tried": 2000
+          },
+          "groups": {
+            "counted_multiplications_by_cpu_phase": [
+              {
+                "counted_fq_muls": 2529932.0,
+                "cpu_ns": 70919279.0,
+                "cpu_ns_per_counted_fq_mul": 28.032089004763765,
+                "cpu_over_counted_at_local_fq_mul": 13.199024559883297,
+                "cpu_phase": "weil_build"
+              },
+              {
+                "counted_fq_muls": 109641263.0,
+                "cpu_ns": 2150498042.0,
+                "cpu_ns_per_counted_fq_mul": 19.613948099083828,
+                "cpu_over_counted_at_local_fq_mul": 9.235308243780509,
+                "cpu_phase": "echelon"
+              },
+              {
+                "counted_fq_muls": 43836803.0,
+                "cpu_ns": 469244060.0,
+                "cpu_ns_per_counted_fq_mul": 10.704340368981743,
+                "cpu_over_counted_at_local_fq_mul": 5.040182749260322,
+                "cpu_phase": "normal_form"
+              },
+              {
+                "counted_fq_muls": 175493760.0,
+                "cpu_ns": 1057332906.0,
+                "cpu_ns_per_counted_fq_mul": 6.0249031418553,
+                "cpu_over_counted_at_local_fq_mul": 2.8368504582998457,
+                "cpu_phase": "charpoly"
+              },
+              {
+                "counted_fq_muls": 160204732.0,
+                "cpu_ns": 542665839.0,
+                "cpu_ns_per_counted_fq_mul": 3.3873271546061448,
+                "cpu_over_counted_at_local_fq_mul": 1.594936941674529,
+                "cpu_phase": "roots"
+              },
+              {
+                "counted_fq_muls": 3294726.0,
+                "cpu_ns": 112875016.0,
+                "cpu_ns_per_counted_fq_mul": 34.25930289802551,
+                "cpu_over_counted_at_local_fq_mul": 16.13113386871292,
+                "cpu_phase": "eigen"
+              },
+              {
+                "counted_fq_muls": 1248035.0,
+                "cpu_ns": 18914596.0,
+                "cpu_ns_per_counted_fq_mul": 15.155501247961796,
+                "cpu_over_counted_at_local_fq_mul": 7.136030181525014,
+                "cpu_phase": "split_lift"
+              }
+            ],
+            "note": "solver priced_fme includes every native counter the report prices for the solver (element touches, hash operations, table inversions, parallel regions, systems built, witness lookups) and the lifts; those have no phase of their own",
+            "solver_phases": [
+              {
+                "counted_fme": 2529932.0,
+                "cpu_ns": 70919279.0,
+                "cpu_ns_per_priced_fme": 7.783110789560061,
+                "cpu_phase": "weil_build",
+                "cpu_share": 0.01277303608472618,
+                "native_counts": {
+                  "element_fills": 0,
+                  "element_scans": 0,
+                  "element_skips": 0,
+                  "fme": 6582013.2,
+                  "monomial_hash_ops": 840000,
+                  "parallel_regions": 0
+                },
+                "native_fme": 6582013.2,
+                "priced_fme": 9111945.2,
+                "priced_share": 0.009179932053840947
+              },
+              {
+                "counted_fme": 255955.0,
+                "cpu_ns": 951964385.0,
+                "cpu_ns_per_priced_fme": 5.4376951670451215,
+                "cpu_phase": "macaulay_build",
+                "cpu_share": 0.17145514749211094,
+                "native_counts": {
+                  "element_fills": 346752000,
+                  "element_scans": 197931998,
+                  "element_skips": 0,
+                  "fme": 174811671.21953,
+                  "monomial_hash_ops": 16661570,
+                  "parallel_regions": 0
+                },
+                "native_fme": 174811671.21953,
+                "priced_fme": 175067626.21953,
+                "priced_share": 0.17637385632241395
+              },
+              {
+                "counted_fme": 109641263.0,
+                "cpu_ns": 2150498042.0,
+                "cpu_ns_per_priced_fme": 5.690305340145956,
+                "cpu_phase": "echelon",
+                "cpu_share": 0.38731906863575133,
+                "native_counts": {
+                  "element_fills": 0,
+                  "element_scans": 1535295142,
+                  "element_skips": 143828733,
+                  "fme": 268281873.53678903,
+                  "monomial_hash_ops": 0,
+                  "parallel_regions": 770000
+                },
+                "native_fme": 268281873.53678903,
+                "priced_fme": 377923136.53678906,
+                "priced_share": 0.38074293016843197
+              },
+              {
+                "counted_fme": 43836803.0,
+                "cpu_ns": 469244060.0,
+                "cpu_ns_per_priced_fme": 8.201849193858292,
+                "cpu_phase": "normal_form",
+                "cpu_share": 0.08451399105345413,
+                "native_counts": {
+                  "element_fills": 10752000,
+                  "element_scans": 5176000,
+                  "element_skips": 167352673,
+                  "fme": 13375180.408739,
+                  "monomial_hash_ops": 0,
+                  "parallel_regions": 0
+                },
+                "native_fme": 13375180.408739,
+                "priced_fme": 57211983.408739,
+                "priced_share": 0.057638858534585974
+              },
+              {
+                "counted_fme": 175493760.0,
+                "cpu_ns": 1057332906.0,
+                "cpu_ns_per_priced_fme": 5.999689257204564,
+                "cpu_phase": "charpoly",
+                "cpu_share": 0.19043272227720187,
+                "native_counts": {
+                  "element_fills": 18720000,
+                  "element_scans": 0,
+                  "element_skips": 0,
+                  "fme": 737518.1,
+                  "monomial_hash_ops": 0,
+                  "parallel_regions": 4000
+                },
+                "native_fme": 737518.1,
+                "priced_fme": 176231278.1,
+                "priced_share": 0.17754619054552132
+              },
+              {
+                "counted_fme": 160204732.0,
+                "cpu_ns": 542665839.0,
+                "cpu_ns_per_priced_fme": 3.3873271546061448,
+                "cpu_phase": "roots",
+                "cpu_share": 0.09773774411179798,
+                "native_counts": {
+                  "element_fills": 0,
+                  "element_scans": 0,
+                  "element_skips": 0,
+                  "fme": 0.0,
+                  "monomial_hash_ops": 0,
+                  "parallel_regions": 0
+                },
+                "native_fme": 0.0,
+                "priced_fme": 160204732.0,
+                "priced_share": 0.16140006575805554
+              },
+              {
+                "counted_fme": 3695678.0,
+                "cpu_ns": 112875016.0,
+                "cpu_ns_per_priced_fme": 30.54243795049244,
+                "cpu_phase": "eigen",
+                "cpu_share": 0.02032954469872776,
+                "native_counts": {
+                  "element_fills": 0,
+                  "element_scans": 0,
+                  "element_skips": 0,
+                  "fme": 0.0,
+                  "monomial_hash_ops": 0,
+                  "parallel_regions": 0
+                },
+                "native_fme": 0.0,
+                "priced_fme": 3695678.0,
+                "priced_share": 0.003723252520534782
+              },
+              {
+                "counted_fme": 1248035.0,
+                "cpu_ns": 18914596.0,
+                "cpu_ns_per_priced_fme": 15.155501247961796,
+                "cpu_phase": "split_lift",
+                "cpu_share": 0.003406645141386977,
+                "native_counts": {
+                  "element_fills": 0,
+                  "element_scans": 0,
+                  "element_skips": 0,
+                  "fme": 0.0,
+                  "monomial_hash_ops": 0,
+                  "parallel_regions": 0
+                },
+                "native_fme": 0.0,
+                "priced_fme": 1248035.0,
+                "priced_share": 0.0012573469494543698
+              }
+            ],
+            "solver_unstaged_fme": 5773895.991235971,
+            "solver_unstaged_note": "table inversions, systems built, witness lookups and lifts, which have no stage",
+            "sum_priced_fme": 992593969.820016,
+            "table": [
+              {
+                "cpu_ns": 134243485.0,
+                "cpu_over_priced_at_local_fq_mul": 2.5549530748819773,
+                "cpu_phases": [
+                  "factor_base",
+                  "factor_base_facts_rebuild",
+                  "precompute"
+                ],
+                "cpu_share": 0.024178148766069628,
+                "group": "setup",
+                "priced_fme": 24739827.288505,
+                "priced_share": 0.024924418282523914
+              },
+              {
+                "cpu_ns": 5388685954.0,
+                "cpu_over_priced_at_local_fq_mul": 2.6253162650498085,
+                "cpu_phases": [
+                  "weil_build",
+                  "macaulay_build",
+                  "echelon",
+                  "normal_form",
+                  "charpoly",
+                  "roots",
+                  "eigen",
+                  "split_lift",
+                  "oracle_other"
+                ],
+                "cpu_share": 0.97053835163354,
+                "group": "solver",
+                "priced_fme": 966468310.4562941,
+                "priced_share": 0.9736794095490432
+              },
+              {
+                "cpu_ns": 28218835.0,
+                "cpu_over_priced_at_local_fq_mul": 9.587709015022854,
+                "cpu_phases": [
+                  "loop"
+                ],
+                "cpu_share": 0.005082400763323244,
+                "group": "loop",
+                "priced_fme": 1385832.075217,
+                "priced_share": 0.0013961721684328675
+              },
+              {
+                "cpu_ns": 1116554.0,
+                "cpu_over_priced_at_local_fq_mul": 1116553999999999.9,
+                "cpu_phases": [
+                  "linalg"
+                ],
+                "cpu_share": 0.00020109883706721492,
+                "group": "linalg",
+                "priced_fme": 0.0,
+                "priced_share": 0.0
+              }
+            ]
+          },
+          "one_thread": true,
+          "phase_priced": {
+            "by_native_counter": {
+              "factor_base_columns": {
+                "count": 8170,
+                "fme": 60709.97914,
+                "gae": 381.82376817610066
+              },
+              "factor_base_points": {
+                "count": 32680,
+                "fme": 1529783.6107199998,
+                "gae": 9621.280570566036
+              },
+              "factor_base_sort_comparisons": {
+                "count": 228697,
+                "fme": 36656.698645000004,
+                "gae": 230.54527449685537
+              },
+              "solver_element_fills": {
+                "count": 376224000,
+                "fme": 13595606.688000001,
+                "gae": 85506.9603018868
+              },
+              "solver_element_scans": {
+                "count": 1738403140,
+                "fme": 278639947.2949,
+                "gae": 1752452.4987100628
+              },
+              "solver_element_skips": {
+                "count": 311181406,
+                "fme": 22605150.876058,
+                "gae": 142170.76022677988
+              },
+              "solver_monomial_hash_ops": {
+                "count": 17501570,
+                "fme": 137137577.0961,
+                "gae": 862500.4848811321
+              },
+              "solver_parallel_regions": {
+                "count": 774000,
+                "fme": 11809974.51,
+                "gae": 74276.56924528301
+              },
+              "solver_systems_built": {
+                "count": 2000,
+                "fme": 114453.494,
+                "gae": 719.8332955974843
+              },
+              "solver_table_inversions": {
+                "count": 6656694,
+                "fme": 5659081.896996,
+                "gae": 35591.710044
+              },
+              "target_guard_probes": {
+                "count": 2000,
+                "fme": 104229.354,
+                "gae": 655.5305283018869
+              },
+              "walk_jumps": {
+                "count": 16,
+                "fme": 46.206336,
+                "gae": 0.2906058867924528
+              },
+              "walk_restarts": {
+                "count": 1,
+                "fme": 77.626003,
+                "gae": 0.48821385534591194
+              },
+              "walk_steps": {
+                "count": 1999,
+                "fme": 18700.888878,
+                "gae": 117.61565332075473
+              },
+              "witness_lookups": {
+                "count": 44,
+                "fme": 360.60024,
+                "gae": 2.2679260377358488
+              }
+            },
+            "fq_muls_per_add": 159.0,
+            "lift_fme": 2867025.0,
+            "native_fme_total": 471312356.82001597,
+            "precompute_fq_muls": 18946622,
+            "report_phases": {
+              "factor_base": {
+                "adds": 8170,
+                "doubles": 0,
+                "fme": 5793205.288505,
+                "gae": 36435.2533868239,
+                "group_ops_fme": 1299030.0
+              },
+              "linear_algebra": {
+                "adds": 0,
+                "doubles": 0,
+                "fme": 0.0,
+                "gae": 0.0,
+                "group_ops_fme": 0.0
+              },
+              "oracle_setup": {
+                "adds": 0,
+                "doubles": 0,
+                "fme": 0.0,
+                "gae": 0.0,
+                "group_ops_fme": 0.0
+              },
+              "relations": {
+                "adds": 5993,
+                "doubles": 1949,
+                "fme": 986800764.5315111,
+                "gae": 6206294.116550384,
+                "group_ops_fme": 1262778.0
+              },
+              "verify": {
+                "adds": 0,
+                "doubles": 0,
+                "fme": 0.0,
+                "gae": 0.0,
+                "group_ops_fme": 0.0
+              }
+            },
+            "solver_counted_fq_muls_by_phase": {
+              "charpoly": 175493760,
+              "echelon": 109641263,
+              "eigenvector": 3294726,
+              "normal_form": 43836803,
+              "roots": 160204732,
+              "split": 1248035,
+              "triangularise": 255955,
+              "verify": 400952,
+              "weil": 2529932
+            },
+            "solver_native_by_stage": {
+              "charpoly": {
+                "element_fills": 18720000,
+                "element_scans": 0,
+                "element_skips": 0,
+                "fme": 737518.1,
+                "monomial_hash_ops": 0,
+                "parallel_regions": 4000
+              },
+              "echelon": {
+                "element_fills": 0,
+                "element_scans": 1535295142,
+                "element_skips": 143828733,
+                "fme": 268281873.53678903,
+                "monomial_hash_ops": 0,
+                "parallel_regions": 770000
+              },
+              "eigen": {
+                "element_fills": 0,
+                "element_scans": 0,
+                "element_skips": 0,
+                "fme": 0.0,
+                "monomial_hash_ops": 0,
+                "parallel_regions": 0
+              },
+              "macaulay_build": {
+                "element_fills": 346752000,
+                "element_scans": 197931998,
+                "element_skips": 0,
+                "fme": 174811671.21953,
+                "monomial_hash_ops": 16661570,
+                "parallel_regions": 0
+              },
+              "normal_form": {
+                "element_fills": 10752000,
+                "element_scans": 5176000,
+                "element_skips": 167352673,
+                "fme": 13375180.408739,
+                "monomial_hash_ops": 0,
+                "parallel_regions": 0
+              },
+              "roots": {
+                "element_fills": 0,
+                "element_scans": 0,
+                "element_skips": 0,
+                "fme": 0.0,
+                "monomial_hash_ops": 0,
+                "parallel_regions": 0
+              },
+              "split_lift": {
+                "element_fills": 0,
+                "element_scans": 0,
+                "element_skips": 0,
+                "fme": 0.0,
+                "monomial_hash_ops": 0,
+                "parallel_regions": 0
+              },
+              "weil_build": {
+                "element_fills": 0,
+                "element_scans": 0,
+                "element_skips": 0,
+                "fme": 6582013.2,
+                "monomial_hash_ops": 840000,
+                "parallel_regions": 0
+              }
+            },
+            "solver_systems": 2000,
+            "solver_systems_unsolved": 0,
+            "unit": "F_q-multiplication equivalents (FME) of the current unit; gae * fq_muls_per_add"
+          },
+          "phases": {
+            "charpoly": {
+              "cpu_ns": 1057332906,
+              "cpu_share": 0.19043272227720187,
+              "entries": 2000,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 528666.453,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "echelon": {
+              "cpu_ns": 2150498042,
+              "cpu_share": 0.38731906863575133,
+              "entries": 2000,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 1075249.021,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "eigen": {
+              "cpu_ns": 112875016,
+              "cpu_share": 0.02032954469872776,
+              "entries": 2000,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 56437.508,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "factor_base": {
+              "cpu_ns": 35356565,
+              "cpu_share": 0.0063679536360905006,
+              "entries": 1,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 35356565.0,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "factor_base_facts_rebuild": {
+              "cpu_ns": 34218652,
+              "cpu_share": 0.006163007900386123,
+              "entries": 1,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 34218652.0,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "linalg": {
+              "cpu_ns": 1116554,
+              "cpu_share": 0.00020109883706721492,
+              "entries": 11,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 101504.90909090909,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "loop": {
+              "cpu_ns": 28218835,
+              "cpu_share": 0.005082400763323244,
+              "entries": 2014,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 14011.33813306852,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "macaulay_build": {
+              "cpu_ns": 951964385,
+              "cpu_share": 0.17145514749211094,
+              "entries": 4000,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 237991.09625,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "normal_form": {
+              "cpu_ns": 469244060,
+              "cpu_share": 0.08451399105345413,
+              "entries": 2000,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 234622.03,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "oracle_other": {
+              "cpu_ns": 14271831,
+              "cpu_share": 0.0025704521383827623,
+              "entries": 4000,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 3567.95775,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "precompute": {
+              "cpu_ns": 64668268,
+              "cpu_share": 0.011647187229593004,
+              "entries": 1,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 64668268.0,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "roots": {
+              "cpu_ns": 542665839,
+              "cpu_share": 0.09773774411179798,
+              "entries": 2000,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 271332.9195,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "split_lift": {
+              "cpu_ns": 18914596,
+              "cpu_share": 0.003406645141386977,
+              "entries": 2000,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 9457.298,
+              "sys_cpu_ns_by_fault_share": 0.0
+            },
+            "weil_build": {
+              "cpu_ns": 70919279,
+              "cpu_share": 0.01277303608472618,
+              "entries": 4000,
+              "fault_share": 0.0,
+              "minor_faults": 0,
+              "ns_per_entry": 17729.81975,
+              "sys_cpu_ns_by_fault_share": 0.0
+            }
+          },
+          "pool_mode": "on_one_thread: this thread is the only member of a one-thread pool, so every parallel region runs inline (no hand-off)",
+          "repeats": [
+            {
+              "cpu_ns_per_full_priced_fme": 5.9859088215746805,
+              "cpu_over_priced_at_local_fq_mul": 2.8184898219950596,
+              "relations_found": 15,
+              "sys_cpu_ns": 39416000.0,
+              "user_cpu_ns": 5904211000.0
+            },
+            {
+              "cpu_ns_per_full_priced_fme": 5.593699104384823,
+              "cpu_over_priced_at_local_fq_mul": 2.633816261314867,
+              "relations_found": 11,
+              "sys_cpu_ns": 35366000.0,
+              "user_cpu_ns": 5516906000.0
+            },
+            {
+              "cpu_ns_per_full_priced_fme": 5.505702202517116,
+              "cpu_over_priced_at_local_fq_mul": 2.592382557649467,
+              "relations_found": 5,
+              "sys_cpu_ns": 36013000.0,
+              "user_cpu_ns": 5428631000.0
+            }
+          ],
+          "reported_run": "the median by cpu_ns_per_full_priced_fme",
+          "solver_cpu_ns": 5355499527.0,
+          "trials": 2000,
+          "unpriced": [],
+          "window": {
+            "cpu_ns_per_full_priced_fme": 5.593699104384823,
+            "cpu_over_priced_at_local_fq_mul": 2.633816261314867,
+            "phase_cpu_ns_total": 5552264828.0,
+            "priced_fme": 992593969.820016,
+            "priced_ns_at_local_fq_mul": 2108071121.5702522,
+            "sys_cpu_ns": 35366000.0,
+            "user_cpu_ns": 5516906000.0,
+            "user_cpu_ns_per_full_priced_fme": 5.558069228448328,
+            "wall_ns": 5615613240.0,
+            "wall_ns_per_full_priced_fme": 5.657512951663671
+          }
+        },
+        "rho_full": {
+          "rho_negation_batched_full": {
+            "cpu_ns_per_full_priced_fme_marginal": {
+              "max": 4.713173447913368,
+              "median": 4.147032921594273,
+              "min": 3.813331480455283,
+              "rel_spread": 0.21698452471222546,
+              "values": [
+                3.813331480455283,
+                4.713173447913368,
+                4.147032921594273
+              ]
+            },
+            "cpu_ns_per_full_priced_fme_whole": {
+              "max": 4.530935800441688,
+              "median": 4.196543015451236,
+              "min": 3.8477175035205273,
+              "rel_spread": 0.16280502651959536,
+              "values": [
+                3.8477175035205273,
+                4.530935800441688,
+                4.196543015451236
+              ]
+            },
+            "ns_per_full_priced_fme_marginal": {
+              "max": 4.776673823753588,
+              "median": 4.293830657776234,
+              "min": 3.815765009051521,
+              "rel_spread": 0.22378824208212236,
+              "values": [
+                3.815765009051521,
+                4.776673823753588,
+                4.293830657776234
+              ]
+            },
+            "ns_per_full_priced_fme_whole": {
+              "max": 4.597907606459719,
+              "median": 4.311285876303026,
+              "min": 3.8502597460617136,
+              "rel_spread": 0.17341644276188,
+              "values": [
+                3.8502597460617136,
+                4.597907606459719,
+                4.311285876303026
+              ]
+            },
+            "one_thread": true,
+            "partial": true,
+            "priced_fme": {
+              "max": 144226497.302455,
+              "median": 144205599.17337802,
+              "min": 144191198.93608898,
+              "rel_spread": 0.0002447780569434731,
+              "values": [
+                144191198.93608898,
+                144226497.302455,
+                144205599.17337802
+              ]
+            },
+            "steps_cap": 1000000,
+            "steps_cap_short": 250000,
+            "sys_cpu_ns": {
+              "max": 0.0,
+              "median": 0.0,
+              "min": 0.0,
+              "rel_spread": null,
+              "values": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "user_cpu_ns": {
+              "max": 653481000.0,
+              "median": 605165000.0,
+              "min": 554807000.0,
+              "rel_spread": 0.16305305164707146,
+              "values": [
+                554807000.0,
+                653481000.0,
+                605165000.0
+              ]
+            }
+          },
+          "rho_negation_f2m4_full": {
+            "cpu_ns_per_full_priced_fme_marginal": {
+              "max": 3.387434460426129,
+              "median": 3.385405341047794,
+              "min": 3.1536062178352133,
+              "rel_spread": 0.06906949656980961,
+              "values": [
+                3.387434460426129,
+                3.1536062178352133,
+                3.385405341047794
+              ]
+            },
+            "cpu_ns_per_full_priced_fme_whole": {
+              "max": 3.7066079669260943,
+              "median": 3.6593721368687606,
+              "min": 3.4566548912341286,
+              "rel_spread": 0.06830490760249508,
+              "values": [
+                3.4566548912341286,
+                3.6593721368687606,
+                3.7066079669260943
+              ]
+            },
+            "ns_per_full_priced_fme_marginal": {
+              "max": 3.4473266443014023,
+              "median": 3.4414527460651367,
+              "min": 3.280800410734825,
+              "rel_spread": 0.04838835394644861,
+              "values": [
+                3.4473266443014023,
+                3.280800410734825,
+                3.4414527460651367
+              ]
+            },
+            "ns_per_full_priced_fme_whole": {
+              "max": 3.834942026417656,
+              "median": 3.7561669535179036,
+              "min": 3.5013959252897595,
+              "rel_spread": 0.08879959417552194,
+              "values": [
+                3.5013959252897595,
+                3.834942026417656,
+                3.7561669535179036
+              ]
+            },
+            "one_thread": true,
+            "partial": true,
+            "priced_fme": {
+              "max": 52360271.636968,
+              "median": 52358423.300795,
+              "min": 52355156.249273,
+              "rel_spread": 0.00009769942203209746,
+              "values": [
+                52358423.300795,
+                52355156.249273,
+                52360271.636968
+              ]
+            },
+            "steps_cap": 250000,
+            "steps_cap_short": 62500,
+            "sys_cpu_ns": {
+              "max": 0.0,
+              "median": 0.0,
+              "min": 0.0,
+              "rel_spread": null,
+              "values": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "user_cpu_ns": {
+              "max": 194079000.0,
+              "median": 191587000.0,
+              "min": 180985000.0,
+              "rel_spread": 0.06834492945763543,
+              "values": [
+                180985000.0,
+                191587000.0,
+                194079000.0
+              ]
+            }
+          }
+        },
+        "rho_negation": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 164.49747024712678,
+            "median": 164.40809180342333,
+            "min": 164.3436800617386,
+            "rel_spread": 0.0009354173733252505,
+            "values": [
+              164.40809180342333,
+              164.3436800617386,
+              164.49747024712678
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 164.75888878314802,
+            "median": 164.70683064856414,
+            "min": 164.65711792632294,
+            "rel_spread": 0.0006178909303539023,
+            "values": [
+              164.70683064856414,
+              164.65711792632294,
+              164.75888878314802
+            ]
+          },
+          "note": "rho.negation (one walk, an F_q^4 inversion per addition)",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 4.88012550473326,
+            "median": 4.746650545605264,
+            "min": 4.305301786675649,
+            "rel_spread": 0.121100913693724,
+            "values": [
+              4.305301786675649,
+              4.746650545605264,
+              4.88012550473326
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 4.784124364660943,
+            "median": 4.666282508515971,
+            "min": 4.598921076479231,
+            "rel_spread": 0.03968968613531555,
+            "values": [
+              4.598921076479231,
+              4.666282508515971,
+              4.784124364660943
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 802.7683000171041,
+            "median": 780.0820186318284,
+            "min": 707.8264513852126,
+            "rel_spread": 0.12170752095838368,
+            "values": [
+              707.8264513852126,
+              780.0820186318284,
+              802.7683000171041
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 788.227014121921,
+            "median": 768.3366292822524,
+            "min": 757.4737149097768,
+            "rel_spread": 0.04002581425913872,
+            "values": [
+              757.4737149097768,
+              768.3366292822524,
+              788.227014121921
+            ]
+          },
+          "steps_requested": 250000
+        },
+        "rho_negation_batched": {
+          "counted_fq_ops_per_step_marginal": {
+            "max": 122.32746257824799,
+            "median": 122.28625953145519,
+            "min": 122.26584362820948,
+            "rel_spread": 0.0005038910362832515,
+            "values": [
+              122.28625953145519,
+              122.32746257824799,
+              122.26584362820948
+            ]
+          },
+          "counted_fq_ops_per_step_whole": {
+            "max": 122.4197940955577,
+            "median": 122.39593804142639,
+            "min": 122.36784140969164,
+            "rel_spread": 0.00042446413416502186,
+            "values": [
+              122.39593804142639,
+              122.4197940955577,
+              122.36784140969164
+            ]
+          },
+          "note": "rho.negation_batched, 256 lockstep walks; 'whole' includes set-up, 'marginal' is the difference of a long and a quarter-length segment",
+          "ns_per_counted_fq_op_marginal": {
+            "max": 6.197621056104587,
+            "median": 6.057530195754965,
+            "min": 5.3443040778442,
+            "rel_spread": 0.1408687948197732,
+            "values": [
+              6.197621056104587,
+              5.3443040778442,
+              6.057530195754965
+            ]
+          },
+          "ns_per_counted_fq_op_whole": {
+            "max": 6.214254832689172,
+            "median": 5.871640702986131,
+            "min": 5.185185077834687,
+            "rel_spread": 0.17526102275487207,
+            "values": [
+              5.871640702986131,
+              5.185185077834687,
+              6.214254832689172
+            ]
+          },
+          "ns_per_step_marginal": {
+            "max": 757.8838969444168,
+            "median": 740.6290396873336,
+            "min": 653.7551570892645,
+            "rel_spread": 0.14059500002742495,
+            "values": [
+              757.8838969444168,
+              653.7551570892645,
+              740.6290396873336
+            ]
+          },
+          "ns_per_step_whole": {
+            "max": 760.4249498459184,
+            "median": 718.6649716842078,
+            "min": 634.7692895758807,
+            "rel_spread": 0.17484595078505177,
+            "values": [
+              718.6649716842078,
+              634.7692895758807,
+              760.4249498459184
+            ]
+          },
+          "steps_requested": 1000000
+        }
+      },
+      "m": 15,
+      "micro": {
+        "fq4_inv_counted_fq_ops": {
+          "max": 106.99562,
+          "median": 106.99562,
+          "min": 106.99562,
+          "rel_spread": 0.0,
+          "values": [
+            106.99562,
+            106.99562,
+            106.99562
+          ]
+        },
+        "fq4_inv_ns": {
+          "max": 379.91404,
+          "median": 367.50124,
+          "min": 365.93973,
+          "rel_spread": 0.03802520503060072,
+          "values": [
+            365.93973,
+            367.50124,
+            379.91404
+          ]
+        },
+        "fq4_mul_counted_fq_ops": {
+          "max": 21.99936,
+          "median": 21.99936,
+          "min": 21.99936,
+          "rel_spread": 0.0,
+          "values": [
+            21.99936,
+            21.99936,
+            21.99936
+          ]
+        },
+        "fq4_mul_ns": {
+          "max": 68.982035,
+          "median": 68.054505,
+          "min": 67.3831425,
+          "rel_spread": 0.023494293287417062,
+          "values": [
+            68.054505,
+            68.982035,
+            67.3831425
+          ]
+        },
+        "fq4_sq_counted_fq_ops": {
+          "max": 7.99961,
+          "median": 7.99961,
+          "min": 7.99961,
+          "rel_spread": 0.0,
+          "values": [
+            7.99961,
+            7.99961,
+            7.99961
+          ]
+        },
+        "fq4_sq_ns": {
+          "max": 46.92801,
+          "median": 39.1142825,
+          "min": 37.42597,
+          "rel_spread": 0.2429301879690622,
+          "values": [
+            39.1142825,
+            37.42597,
+            46.92801
+          ]
+        },
+        "fq_inv_counted_dependent": {
+          "max": 17.8275248,
+          "median": 17.6680878,
+          "min": 17.6168404,
+          "rel_spread": 0.011924572844832598,
+          "values": [
+            17.6680878,
+            17.8275248,
+            17.6168404
+          ]
+        },
+        "fq_inv_counted_independent": {
+          "max": 4.3247786,
+          "median": 4.2859778,
+          "min": 4.2520952,
+          "rel_spread": 0.01695841728344926,
+          "values": [
+            4.3247786,
+            4.2859778,
+            4.2520952
+          ]
+        },
+        "fq_mul_counted_dependent": {
+          "max": 11.93482845,
+          "median": 11.18007365,
+          "min": 10.00424555,
+          "rel_spread": 0.17268069607036973,
+          "values": [
+            10.00424555,
+            11.93482845,
+            11.18007365
+          ]
+        },
+        "fq_mul_counted_independent": {
+          "max": 5.0408261,
+          "median": 4.3298304,
+          "min": 4.28630455,
+          "rel_spread": 0.17426122510479872,
+          "values": [
+            4.28630455,
+            4.3298304,
+            5.0408261
+          ]
+        },
+        "fq_mul_uncounted_dependent": {
+          "max": 11.75828535,
+          "median": 10.30295545,
+          "min": 10.05406345,
+          "rel_spread": 0.16541097438211286,
+          "values": [
+            10.30295545,
+            10.05406345,
+            11.75828535
+          ]
+        },
+        "fq_sq_counted_dependent": {
+          "max": 13.79636825,
+          "median": 12.1792121,
+          "min": 12.08892585,
+          "rel_spread": 0.14019317390818734,
+          "values": [
+            12.1792121,
+            13.79636825,
+            12.08892585
+          ]
+        },
+        "group_add_counted_fq_ops": {
+          "max": 158.991825,
+          "median": 158.991825,
+          "min": 158.991825,
+          "rel_spread": 0.0,
+          "values": [
+            158.991825,
+            158.991825,
+            158.991825
+          ]
+        },
+        "group_add_ns": {
+          "max": 568.965125,
+          "median": 560.35575,
+          "min": 554.482725,
+          "rel_spread": 0.02584501006726528,
+          "values": [
+            554.482725,
+            568.965125,
+            560.35575
+          ]
+        },
+        "group_double_counted_fq_ops": {
+          "max": 166.993875,
+          "median": 166.993875,
+          "min": 166.993875,
+          "rel_spread": 0.0,
+          "values": [
+            166.993875,
+            166.993875,
+            166.993875
+          ]
+        },
+        "group_double_ns": {
+          "max": 607.683125,
+          "median": 574.6218,
+          "min": 546.273125,
+          "rel_spread": 0.10687029277343806,
+          "values": [
+            546.273125,
+            574.6218,
+            607.683125
+          ]
+        }
+      },
+      "ns_per_fq_mul_local": 2.123800048828125,
+      "ns_per_fq_mul_table": 2.1718375651041666,
+      "q_bits": 15,
+      "r_bits": 59,
+      "scalar_width_bits": 64
+    }
+  },
+  "readout": "ic_counter_readout (targets_tried, relations_found, matrix_rank, matrix_rows); supersedes the `decompositions`/`trials`/`accepted_relations` readout of unit-price-f2m4-m14-17.json, see WITHDRAWN.md there",
+  "repeats": 3,
+  "rho_steps": 1000000,
+  "schema": "ecbench.f2m4_unit_price/v1",
+  "seed": 1,
+  "spread": "every statistic carries median, min, max, rel_spread = (max-min)/median and the raw per-repeat values",
+  "supersedes": {
+    "file": "research/gaudry_k4_char2_replication_20261026/unit-price/unit-price-f2m4-m14-17.json",
+    "note": "research/gaudry_k4_char2_replication_20261026/unit-price/WITHDRAWN.md: the old file is kept unedited; its IC decomposition/trial/relation counters read keys no report has and are withdrawn, as is the statement that zero decompositions were found",
+    "withdrawn_fields": [
+      "legacy_decompositions",
+      "legacy_trials",
+      "full_trials",
+      "legacy_accepted_relations"
+    ]
+  },
+  "units": "nanoseconds unless the key says counted_fq_ops"
+}

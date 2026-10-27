@@ -2252,7 +2252,12 @@ fn solve_ic_f2m4_native(
     let rep = run_pipeline(&ctx, &spec, &base, &mut oracle, u64::MAX, &calib, None)?;
     let wall = t.elapsed().as_nanos() as u64;
     let mut scratch = GroupOps::default();
-    let fb = base.build(&ctx, &spec.factor_base_params, &mut scratch)?;
+    let fb = {
+        let _phase = crate::cryptanalysis::phase_cpu::enter(
+            crate::cryptanalysis::phase_cpu::Phase::FactorBaseFacts,
+        );
+        base.build(&ctx, &spec.factor_base_params, &mut scratch)?
+    };
     let facts = factor_base_facts(
         &curve.slug,
         &m.params["factor_base"],
@@ -2363,7 +2368,12 @@ fn solve_f2m4_wide_ic(
     let wall = t.elapsed().as_nanos() as u64;
     let mut scratch = GroupOps::default();
     let base = TLineBase { curve: inst };
-    let fb = base.build(&ctx, &spec.factor_base_params, &mut scratch)?;
+    let fb = {
+        let _phase = crate::cryptanalysis::phase_cpu::enter(
+            crate::cryptanalysis::phase_cpu::Phase::FactorBaseFacts,
+        );
+        base.build(&ctx, &spec.factor_base_params, &mut scratch)?
+    };
     let facts = factor_base_facts(
         &curve.slug,
         &m.params["factor_base"],
@@ -2376,6 +2386,21 @@ fn solve_f2m4_wide_ic(
     rep.recovered = run.recovered;
     rep.exhausted = run.recovered.is_none();
     Ok((rep, oracle_native))
+}
+
+/// A step cap for the `F_(2^m)^4` rho methods that replaces the claim's
+/// `cap_multiple` cap while nonzero (`ecbench unit-price-f2m4`, which prices
+/// a fixed-length partial walk at the full unit when a complete solve does
+/// not fit).  Zero, the default, leaves every method's cap as it was.
+pub static F2M4_RHO_STEP_CAP: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+fn f2m4_rho_cap(r: f64, multiple: f64) -> u64 {
+    match F2M4_RHO_STEP_CAP.load(std::sync::atomic::Ordering::Relaxed) {
+        0 => {
+            (crate::cryptanalysis::ic_boundary::generic_floor_ops(r, 1.0) * multiple) as u64 + 4096
+        }
+        n => n,
+    }
 }
 
 /// `rho.negation_batched` on a curve over `F_{(2^m)^4}`, one word or `u128`.
@@ -2412,9 +2437,7 @@ fn solve_f2m4_rho_batched(
         dp_bits: u32::try_from(param_u64(m, "dp_bits")?).map_err(|_| "dp_bits too large")?,
     };
     let multiple = param_u64(m, "cap_multiple")? as f64;
-    let cap = (crate::cryptanalysis::ic_boundary::generic_floor_ops(inst.r as f64, 1.0) * multiple)
-        as u64
-        + 4096;
+    let cap = f2m4_rho_cap(inst.r as f64, multiple);
     let per_cur = fq_muls_per_add(c) as f64;
     let per_ref = fq_muls_per_add_ref(c) as f64;
     // The divisor the record is priced by.
@@ -2736,9 +2759,7 @@ fn solve_f2m4_rho_negation_full(
         inf: false,
     };
     let multiple = param_u64(m, "cap_multiple")? as f64;
-    let cap = (crate::cryptanalysis::ic_boundary::generic_floor_ops(inst.r as f64, 1.0) * multiple)
-        as u64
-        + 4096;
+    let cap = f2m4_rho_cap(inst.r as f64, multiple);
     let per_cur = fq_muls_per_add(c) as f64;
     let per_ref = fq_muls_per_add_ref(c) as f64;
     let per_add = if reference { per_ref } else { per_cur };
@@ -2881,6 +2902,97 @@ fn solve_f2m4_ic_full(
 
 /// [`solve_f2m4_ic_full`], on the `u128` pipeline when `wide` (which any
 /// order may take; the one-word run is `run_pipeline`).
+/// The priced work of a full-priced IC solve, by the phases the per-phase
+/// CPU timers use (`phase_cpu`), in F_q-multiplication equivalents of the
+/// current unit.  Only built while the timers are on, so no record of a
+/// run without them changes.
+///
+/// Counted F_q multiplications are exact per phase (`OracleNative::
+/// solve_muls`).  The native counters have rules but no phase of their own,
+/// so they are listed beside by counter and by the phases they belong to.
+fn phase_priced_block(
+    rep: &SolveReport,
+    native: &OracleNative,
+    ctx: &crate::cryptanalysis::ecbench::f2m4_price::IcContext<'_>,
+) -> Value {
+    let per_add = ctx.per_add;
+    let by_phase: serde_json::Map<String, Value> = rep
+        .phases
+        .iter()
+        .map(|p| {
+            (
+                p.name.clone(),
+                json!({
+                    "gae": p.gae, "fme": p.gae * per_add,
+                    "adds": p.adds, "doubles": p.doubles,
+                    "group_ops_fme": (p.adds + p.doubles) as f64 * per_add,
+                }),
+            )
+        })
+        .collect();
+    let muls: serde_json::Map<String, Value> =
+        crate::cryptanalysis::gaudry_quartic_bin::SOLVE_MUL_PHASES
+            .iter()
+            .zip(native.solve_muls)
+            .map(|(k, v)| ((*k).to_string(), json!(v)))
+            .collect();
+    // The native counters by stage, priced at the rate the record gave each
+    // counter (its by-counter FME over its count).
+    let by_counter = &rep.detail["full_pricing"]["by_counter"];
+    let rate = |k: &str| {
+        let (n, f) = (
+            by_counter[k]["count"].as_f64().unwrap_or(0.0),
+            by_counter[k]["fme"].as_f64().unwrap_or(0.0),
+        );
+        if n > 0.0 {
+            f / n
+        } else {
+            0.0
+        }
+    };
+    let rates = [
+        rate("solver_element_fills"),
+        rate("solver_element_scans"),
+        rate("solver_element_skips"),
+        rate("solver_parallel_regions"),
+        rate("solver_monomial_hash_ops"),
+    ];
+    let stage_native: serde_json::Map<String, Value> =
+        crate::cryptanalysis::gaudry_quartic_bin::SOLVE_STAGES
+            .iter()
+            .zip(native.stage_native)
+            .map(|(k, c)| {
+                let fme: f64 = c.iter().zip(rates).map(|(&n, r)| n as f64 * r).sum();
+                (
+                    (*k).to_string(),
+                    json!({
+                        "element_fills": c[0], "element_scans": c[1],
+                        "element_skips": c[2], "parallel_regions": c[3],
+                        "monomial_hash_ops": c[4], "fme": fme,
+                    }),
+                )
+            })
+            .collect();
+    let lifts: u64 = rep
+        .phases
+        .iter()
+        .map(|p| p.native.get("sqrt_solves").copied().unwrap_or(0))
+        .sum();
+    json!({
+        "unit": "F_q-multiplication equivalents (FME) of the current unit; gae * fq_muls_per_add",
+        "fq_muls_per_add": per_add,
+        "report_phases": by_phase,
+        "solver_counted_fq_muls_by_phase": muls,
+        "precompute_fq_muls": rep.detail["decomposition"]["solver"]["extra"]["precompute_fq_muls"].as_u64().unwrap_or(0),
+        "solver_native_by_stage": stage_native,
+        "solver_systems": native.solves,
+        "solver_systems_unsolved": native.unsolved,
+        "lift_fme": lifts as f64 * (ctx.lift_muls + ctx.x_of_t_muls),
+        "by_native_counter": rep.detail["full_pricing"]["by_counter"].clone(),
+        "native_fme_total": rep.detail["full_pricing"]["native_gae"].as_f64().unwrap_or(0.0) * per_add,
+    })
+}
+
 fn solve_f2m4_ic_full_with(
     m: &ResolvedMethod,
     inst: &BinCurve,
@@ -2971,6 +3083,12 @@ fn solve_f2m4_ic_full_with(
         |ref_unit: bool| ctx_mm(ref_unit, if ref_unit { mulmod } else { mulmod.code_of() });
     if !reference {
         crate::cryptanalysis::ecbench::f2m4_price::reprice_ic(&mut rep, &ctx_of(false))?;
+        if crate::cryptanalysis::phase_cpu::is_on() {
+            let block = phase_priced_block(&rep, &native, &ctx_of(false));
+            if let Value::Object(d) = &mut rep.detail {
+                d.insert("phase_priced".into(), block);
+            }
+        }
         return Ok(rep);
     }
     // The current-unit total, from a copy of the unpriced report.

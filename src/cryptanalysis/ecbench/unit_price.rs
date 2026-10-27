@@ -62,6 +62,11 @@ pub struct Opts {
     /// one-pass min(code, Montgomery) mod-r units).  Empty means `full`
     /// only.  Only read with `closure`.
     pub closure_variants: Vec<String>,
+    /// Per-phase CPU timers on a one-thread partial IC solve (user and
+    /// system CPU of the window, thread CPU and minor faults of each phase
+    /// beside its priced FME), the partial `*_full` rho arms at the same
+    /// unit, and the local F_q multiplication time.  Needs `ic_trials > 0`.
+    pub phases: bool,
 }
 
 /// Run `f` with the calling thread as the only thread of its own rayon
@@ -507,18 +512,27 @@ fn rho_full_once(
     id: &str,
     seed: u64,
     closure: bool,
+    cap: Option<u64>,
 ) -> Result<BTreeMap<&'static str, f64>, String> {
+    use crate::cryptanalysis::ecbench::methods::F2M4_RHO_STEP_CAP;
+    use std::sync::atomic::Ordering;
     let m = resolve(&MethodSpec {
         id: id.into(),
         params: BTreeMap::new(),
     })?;
+    // A fixed-length partial walk (`cap` steps) is run on one thread, and
+    // is not an error for being unrecovered.
+    let one_thread = closure || cap.is_some();
+    F2M4_RHO_STEP_CAP.store(cap.unwrap_or(0), Ordering::Relaxed);
     let (u0, s0) = cpu_times_ns();
     let t = Instant::now();
-    let rep = if closure {
-        on_one_thread(|| solve(&m, inst, facts, target, seed))?
+    let rep = if one_thread {
+        on_one_thread(|| solve(&m, inst, facts, target, seed))
     } else {
-        solve(&m, inst, facts, target, seed)?
+        solve(&m, inst, facts, target, seed)
     };
+    F2M4_RHO_STEP_CAP.store(0, Ordering::Relaxed);
+    let rep = rep?;
     let wall = t.elapsed().as_nanos() as f64;
     let (u1, s1) = cpu_times_ns();
     if closure && !rep.unpriced.is_empty() {
@@ -536,6 +550,285 @@ fn rho_full_once(
     o.insert("recovered", if rep.recovered.is_some() { 1.0 } else { 0.0 });
     o.insert("unpriced_entries", rep.unpriced.len() as f64);
     Ok(o)
+}
+
+/// A partial `ic.pipeline_f2m4_full` solve of `trials` trials on one thread
+/// with the per-phase CPU timers on: the window's user and system CPU, each
+/// phase's thread CPU, minor faults and entries beside the priced work of
+/// the phases that have a count.  The CPU split of a phase is exclusive
+/// (see `phase_cpu`); `other_cpu_ns` is the window's CPU that no phase
+/// claims (the timers' own clock reads and the solve's wrapper).
+fn ic_phased_once(
+    inst: &Instance,
+    facts: &crate::cryptanalysis::ecbench::workload::CurveFacts,
+    b: &BinCurve,
+    target: &[String; 2],
+    trials: u64,
+    seed: u64,
+    ns_local: f64,
+) -> Result<Value, String> {
+    use crate::cryptanalysis::phase_cpu as pc;
+    let m = ic_method("ic.pipeline_f2m4_full", trials)?;
+    let per_add = fq_muls_per_add(&b.curve) as f64;
+    let (u0, s0) = cpu_times_ns();
+    let t = Instant::now();
+    pc::start();
+    let rep = on_one_thread(|| solve(&m, inst, facts, target, seed));
+    let totals = pc::finish();
+    let wall = t.elapsed().as_nanos() as f64;
+    let (u1, s1) = cpu_times_ns();
+    let rep = rep?;
+    let fme = rep.total_gae * per_add;
+    let cpu_total: f64 = totals.iter().map(|t| t.cpu_ns as f64).sum();
+    let faults_total: f64 = totals.iter().map(|t| t.faults as f64).sum();
+    let sys = s1 - s0;
+    let priced = &rep.detail["phase_priced"];
+    let mut phases = serde_json::Map::new();
+    for (i, t) in totals.iter().enumerate() {
+        phases.insert(
+            pc::NAMES[i].into(),
+            json!({
+                "cpu_ns": t.cpu_ns,
+                "cpu_share": t.cpu_ns as f64 / cpu_total.max(1.0),
+                "minor_faults": t.faults,
+                "fault_share": t.faults as f64 / faults_total.max(1.0),
+                "entries": t.entries,
+                // System time attributed by fault share: an estimate, the
+                // kernel's per-thread user/system split is tick-sampled.
+                "sys_cpu_ns_by_fault_share": sys * t.faults as f64 / faults_total.max(1.0),
+                "ns_per_entry": t.cpu_ns as f64 / (t.entries.max(1)) as f64,
+            }),
+        );
+    }
+    let cpu = |name: &str| totals[pc::NAMES.iter().position(|n| *n == name).unwrap()].cpu_ns as f64;
+    let solve_cpu = [
+        "weil_build",
+        "macaulay_build",
+        "echelon",
+        "normal_form",
+        "charpoly",
+        "roots",
+        "eigen",
+    ]
+    .iter()
+    .map(|n| cpu(n))
+    .sum::<f64>();
+    let groups = phase_groups(&totals, priced, ns_local, fme);
+    Ok(json!({
+        "trials": trials,
+        "one_thread": true,
+        "pool_mode": "on_one_thread: this thread is the only member of a one-thread pool, so every parallel region runs inline (no hand-off)",
+        "window": {
+            "wall_ns": wall, "user_cpu_ns": u1 - u0, "sys_cpu_ns": sys,
+            "phase_cpu_ns_total": cpu_total,
+            "priced_fme": fme,
+            "priced_ns_at_local_fq_mul": fme * ns_local,
+            "cpu_ns_per_full_priced_fme": (u1 - u0 + sys) / fme,
+            "user_cpu_ns_per_full_priced_fme": (u1 - u0) / fme,
+            "wall_ns_per_full_priced_fme": wall / fme,
+            "cpu_over_priced_at_local_fq_mul": (u1 - u0 + sys) / (fme * ns_local),
+        },
+        "phases": Value::Object(phases),
+        "groups": groups,
+        "solver_cpu_ns": solve_cpu,
+        "phase_priced": priced.clone(),
+        "counters": {
+            "targets_tried": rep.counters.get("targets_tried"),
+            "relations_found": rep.counters.get("relations_found"),
+            "matrix_rank": rep.counters.get("matrix_rank"),
+        },
+        "unpriced": rep.unpriced,
+    }))
+}
+
+/// The CPU phases grouped to the priced work they belong to, each group's CPU
+/// share beside its priced-FME share (current unit), and for every solver
+/// phase with a multiplication count its CPU per counted multiplication.
+///
+/// The groups: `setup` (factor base, its second build, the symmetrised
+/// precomputation), `solver` (Weil build, Macaulay build, echelon, normal
+/// form, charpoly, roots, eigen, split and lift, oracle bookkeeping), `loop`
+/// (the walk, the sign-test additions, the target guard) and `linalg` (the
+/// relation matrix and the verification).  A native counter the report prices
+/// (matrix elements touched, hash operations, table inversions, parallel
+/// regions) cannot be told apart by phase, so the solver group takes all of
+/// them.  `priced_fme` of the groups adds up to the window's total.
+fn phase_groups(
+    totals: &[crate::cryptanalysis::phase_cpu::Total],
+    priced: &Value,
+    ns_local: f64,
+    total_fme: f64,
+) -> Value {
+    use crate::cryptanalysis::phase_cpu::NAMES;
+    let cpu = |n: &str| totals[NAMES.iter().position(|x| *x == n).unwrap()].cpu_ns as f64;
+    let cpu_total: f64 = totals.iter().map(|t| t.cpu_ns as f64).sum();
+    let fme = |p: &str| priced["report_phases"][p]["fme"].as_f64().unwrap_or(0.0);
+    let ops = |p: &str| {
+        priced["report_phases"][p]["group_ops_fme"]
+            .as_f64()
+            .unwrap_or(0.0)
+    };
+    let counted = |k: &str| {
+        priced["solver_counted_fq_muls_by_phase"][k]
+            .as_f64()
+            .unwrap_or(0.0)
+    };
+    let native = |k: &str| {
+        priced["by_native_counter"][k]["fme"]
+            .as_f64()
+            .unwrap_or(0.0)
+    };
+    let precompute = priced["precompute_fq_muls"].as_f64().unwrap_or(0.0);
+    let loop_natives = [
+        "target_guard_probes",
+        "walk_jumps",
+        "walk_restarts",
+        "walk_steps",
+    ]
+    .iter()
+    .map(|k| native(k))
+    .sum::<f64>();
+    let setup = fme("factor_base") + precompute;
+    let looped = ops("relations") + loop_natives;
+    let linalg = fme("linear_algebra") + fme("verify");
+    let solver = fme("relations") - ops("relations") - precompute - loop_natives;
+    let group = |name: &str, phases: &[&str], priced_fme: f64| {
+        let c: f64 = phases.iter().map(|p| cpu(p)).sum();
+        json!({
+            "group": name, "cpu_phases": phases,
+            "cpu_ns": c, "cpu_share": c / cpu_total.max(1.0),
+            "priced_fme": priced_fme, "priced_share": priced_fme / total_fme.max(1.0),
+            "cpu_over_priced_at_local_fq_mul": c / (priced_fme * ns_local).max(1e-9),
+        })
+    };
+    let mul_phase = |name: &str, key: &str| {
+        let n = counted(key);
+        json!({
+            "cpu_phase": name, "counted_fq_muls": n, "cpu_ns": cpu(name),
+            "cpu_ns_per_counted_fq_mul": cpu(name) / n.max(1.0),
+            "cpu_over_counted_at_local_fq_mul": cpu(name) / (n * ns_local).max(1e-9),
+        })
+    };
+    // Per CPU phase: its counted multiplications plus the native counters of
+    // its stage, priced as the record prices them; the rest of the solver's
+    // priced work (table inversions, systems built, witness lookups, lifts)
+    // has no stage and is listed apart.
+    let stage_fme = |k: &str| {
+        priced["solver_native_by_stage"][k]["fme"]
+            .as_f64()
+            .unwrap_or(0.0)
+    };
+    let per_phase = |name: &str, muls: &[&str]| {
+        let counted_fme: f64 = muls.iter().map(|k| counted(k)).sum();
+        let p = counted_fme + stage_fme(name);
+        json!({
+            "cpu_phase": name,
+            "counted_fme": counted_fme, "native_fme": stage_fme(name), "priced_fme": p,
+            "priced_share": p / total_fme.max(1.0),
+            "cpu_ns": cpu(name), "cpu_share": cpu(name) / cpu_total.max(1.0),
+            "cpu_ns_per_priced_fme": cpu(name) / p.max(1e-9),
+            "native_counts": priced["solver_native_by_stage"][name].clone(),
+        })
+    };
+    let phases = [
+        per_phase("weil_build", &["weil"]),
+        per_phase("macaulay_build", &["triangularise"]),
+        per_phase("echelon", &["echelon"]),
+        per_phase("normal_form", &["normal_form"]),
+        per_phase("charpoly", &["charpoly"]),
+        per_phase("roots", &["roots"]),
+        per_phase("eigen", &["eigenvector", "verify"]),
+        per_phase("split_lift", &["split"]),
+    ];
+    let staged: f64 = phases
+        .iter()
+        .map(|p| p["priced_fme"].as_f64().unwrap())
+        .sum();
+    json!({
+        "solver_phases": phases,
+        "solver_unstaged_fme": solver - staged,
+        "solver_unstaged_note": "table inversions, systems built, witness lookups and lifts, which have no stage",
+        "table": [
+            group("setup", &["factor_base", "factor_base_facts_rebuild", "precompute"], setup),
+            group("solver", &["weil_build", "macaulay_build", "echelon", "normal_form", "charpoly", "roots", "eigen", "split_lift", "oracle_other"], solver),
+            group("loop", &["loop"], looped),
+            group("linalg", &["linalg"], linalg),
+        ],
+        "sum_priced_fme": setup + solver + looped + linalg,
+        "counted_multiplications_by_cpu_phase": [
+            mul_phase("weil_build", "weil"),
+            mul_phase("echelon", "echelon"),
+            mul_phase("normal_form", "normal_form"),
+            mul_phase("charpoly", "charpoly"),
+            mul_phase("roots", "roots"),
+            mul_phase("eigen", "eigenvector"),
+            mul_phase("split_lift", "split"),
+        ],
+        "note": "solver priced_fme includes every native counter the report prices for the solver (element touches, hash operations, table inversions, parallel regions, systems built, witness lookups) and the lifts; those have no phase of their own",
+    })
+}
+
+/// A fixed-length partial `*_full` rho walk on one thread, priced at the
+/// full unit, whole (the walk with its set-up) and marginal (long minus
+/// quarter-length, set-up free), in ns per full-priced FME, wall and CPU:
+/// the rho side of the IC/rho CPU comparison when a complete solve does
+/// not fit.
+fn rho_full_partial(
+    inst: &Instance,
+    facts: &crate::cryptanalysis::ecbench::workload::CurveFacts,
+    b: &BinCurve,
+    target: &[String; 2],
+    id: &str,
+    steps: u64,
+    reps: usize,
+) -> Result<Value, String> {
+    let mut acc: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
+    for k in 0..reps.max(1) {
+        let seed = 7 + k as u64;
+        let short = rho_full_once(
+            inst,
+            facts,
+            b,
+            target,
+            id,
+            seed,
+            false,
+            Some((steps / 4).max(1)),
+        )?;
+        let long = rho_full_once(inst, facts, b, target, id, seed, false, Some(steps))?;
+        let cpu = |r: &BTreeMap<&'static str, f64>| r["user_cpu_ns"] + r["sys_cpu_ns"];
+        acc.entry("ns_per_full_priced_fme_whole")
+            .or_default()
+            .push(long["wall_ns"] / long["priced_fme"]);
+        acc.entry("cpu_ns_per_full_priced_fme_whole")
+            .or_default()
+            .push(cpu(&long) / long["priced_fme"]);
+        let dfme = long["priced_fme"] - short["priced_fme"];
+        if dfme > 0.0 {
+            acc.entry("ns_per_full_priced_fme_marginal")
+                .or_default()
+                .push((long["wall_ns"] - short["wall_ns"]) / dfme);
+            acc.entry("cpu_ns_per_full_priced_fme_marginal")
+                .or_default()
+                .push((cpu(&long) - cpu(&short)) / dfme);
+        }
+        acc.entry("priced_fme")
+            .or_default()
+            .push(long["priced_fme"]);
+        acc.entry("user_cpu_ns")
+            .or_default()
+            .push(long["user_cpu_ns"]);
+        acc.entry("sys_cpu_ns")
+            .or_default()
+            .push(long["sys_cpu_ns"]);
+    }
+    let mut o: serde_json::Map<String, Value> =
+        acc.iter().map(|(k, v)| (k.to_string(), stat(v))).collect();
+    o.insert("partial".into(), json!(true));
+    o.insert("steps_cap".into(), json!(steps));
+    o.insert("steps_cap_short".into(), json!((steps / 4).max(1)));
+    o.insert("one_thread".into(), json!(true));
+    Ok(Value::Object(o))
 }
 
 /// The priced total of a solve in F_q-multiplication equivalents of its own
@@ -726,7 +1019,10 @@ pub fn run(o: &Opts) -> Result<Value, String> {
             seed: o.seed,
             max_cofactor: cof,
         };
+        let (bu0, bs0) = cpu_times_ns();
         let inst = spec.build()?;
+        let (bu1, bs1) = cpu_times_ns();
+        let curve_build_cpu_ns = (bu1 - bu0) + (bs1 - bs0);
         let facts = inst.facts(&spec);
         let Instance::F2m4(b) = &inst else {
             return Err("not an f2m4 instance".into());
@@ -763,7 +1059,7 @@ pub fn run(o: &Opts) -> Result<Value, String> {
         };
         // The unit's own F_q multiplication time: on this host, and in the
         // committed table row the prices come from.
-        let (ns_local, ns_table) = if o.closure {
+        let (ns_local, ns_table) = if o.closure || o.phases || rho_full_on {
             let wide = u64::try_from(b.r).is_err();
             let local = crate::cryptanalysis::ecbench::f2m4_price::measure(b, 3)?
                 ["ns_per_fq_mul_median"]
@@ -781,50 +1077,11 @@ pub fn run(o: &Opts) -> Result<Value, String> {
         } else {
             (f64::NAN, f64::NAN)
         };
-        let rho_full = if rho_full_on && full_arms {
-            let mut blk = serde_json::Map::new();
-            for (name, id) in [
-                ("rho_negation_batched_full", "rho.negation_batched_full"),
-                ("rho_negation_f2m4_full", "rho.negation_f2m4_full"),
-            ] {
-                let t0 = Instant::now();
-                let mut acc: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
-                let nrep = if o.closure { 1 } else { o.reps.min(3) };
-                for k in 0..nrep {
-                    for (kk, v) in
-                        rho_full_once(&inst, &facts, b, &target, id, 7 + k as u64, o.closure)?
-                    {
-                        acc.entry(kk).or_default().push(v);
-                    }
-                }
-                eprintln!("m = {m}: {id} {:.1}s", t0.elapsed().as_secs_f64());
-                let mut e: serde_json::Map<String, Value> =
-                    acc.iter().map(|(k, v)| (k.to_string(), stat(v))).collect();
-                let r: Vec<f64> = acc["wall_ns"]
-                    .iter()
-                    .zip(&acc["priced_fme"])
-                    .map(|(a, b)| a / b)
-                    .collect();
-                e.insert("ns_per_full_priced_fme".into(), stat(&r));
-                if o.closure {
-                    e.insert(
-                        "closure".into(),
-                        closure_of(
-                            acc["wall_ns"][0],
-                            acc["user_cpu_ns"][0],
-                            acc["sys_cpu_ns"][0],
-                            acc["priced_fme"][0],
-                            ns_local,
-                            ns_table,
-                        ),
-                    );
-                }
-                blk.insert(name.into(), Value::Object(e));
-            }
-            Value::Object(blk)
-        } else {
-            Value::Null
-        };
+        // The plain IC block (the global one-worker pool: each parallel
+        // region of the solver is handed to the worker) runs before anything
+        // calls `on_one_thread`: that makes this thread a permanent member
+        // of the one-thread pool, after which every later solve runs inline
+        // and the hand-off cost this block measures is gone.
         let ic = if (o.ic_trials > 0 || ic_complete) && full_arms {
             let t0 = Instant::now();
             let mut acc: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
@@ -899,8 +1156,120 @@ pub fn run(o: &Opts) -> Result<Value, String> {
             .collect();
             blk.insert("reached_relations".into(), stat(&reached));
             blk.insert("rayon_threads".into(), json!(rayon::current_num_threads()));
+            blk.insert(
+                "pool_mode".into(),
+                json!("global rayon pool (one worker); this thread is not a pool member, so each parallel region of the solver is handed to the worker; run before any on_one_thread call"),
+            );
             blk.insert("reps".into(), json!(ic_reps));
             Value::Object(blk)
+        } else {
+            Value::Null
+        };
+        let rho_full = if rho_full_on && full_arms {
+            let mut blk = serde_json::Map::new();
+            for (name, id) in [
+                ("rho_negation_batched_full", "rho.negation_batched_full"),
+                ("rho_negation_f2m4_full", "rho.negation_f2m4_full"),
+            ] {
+                let t0 = Instant::now();
+                let mut acc: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
+                let nrep = if o.closure { 1 } else { o.reps.min(3) };
+                for k in 0..nrep {
+                    for (kk, v) in
+                        rho_full_once(&inst, &facts, b, &target, id, 7 + k as u64, o.closure, None)?
+                    {
+                        acc.entry(kk).or_default().push(v);
+                    }
+                }
+                eprintln!("m = {m}: {id} {:.1}s", t0.elapsed().as_secs_f64());
+                let mut e: serde_json::Map<String, Value> =
+                    acc.iter().map(|(k, v)| (k.to_string(), stat(v))).collect();
+                let r: Vec<f64> = acc["wall_ns"]
+                    .iter()
+                    .zip(&acc["priced_fme"])
+                    .map(|(a, b)| a / b)
+                    .collect();
+                e.insert("ns_per_full_priced_fme".into(), stat(&r));
+                if o.closure {
+                    e.insert(
+                        "closure".into(),
+                        closure_of(
+                            acc["wall_ns"][0],
+                            acc["user_cpu_ns"][0],
+                            acc["sys_cpu_ns"][0],
+                            acc["priced_fme"][0],
+                            ns_local,
+                            ns_table,
+                        ),
+                    );
+                }
+                blk.insert(name.into(), Value::Object(e));
+            }
+            Value::Object(blk)
+        } else if o.phases && full_arms {
+            let mut blk = serde_json::Map::new();
+            for (name, id, steps) in [
+                (
+                    "rho_negation_batched_full",
+                    "rho.negation_batched_full",
+                    o.rho_steps,
+                ),
+                (
+                    "rho_negation_f2m4_full",
+                    "rho.negation_f2m4_full",
+                    o.rho_steps / 4,
+                ),
+            ] {
+                let t0 = Instant::now();
+                blk.insert(
+                    name.into(),
+                    rho_full_partial(&inst, &facts, b, &target, id, steps, o.reps.min(3))?,
+                );
+                eprintln!("m = {m}: {id} partial {:.1}s", t0.elapsed().as_secs_f64());
+            }
+            Value::Object(blk)
+        } else {
+            Value::Null
+        };
+        let ic_phased = if o.phases && o.ic_trials > 0 && full_arms {
+            let t0 = Instant::now();
+            // Repeats on seeds 3, 4, ...: the run with the median CPU per
+            // priced FME is reported in full, every run's headline beside it.
+            let mut runs = Vec::new();
+            for k in 0..o.reps.clamp(1, 3) {
+                runs.push(ic_phased_once(
+                    &inst,
+                    &facts,
+                    b,
+                    &target,
+                    o.ic_trials,
+                    3 + k as u64,
+                    ns_local,
+                )?);
+            }
+            let key = |v: &Value| {
+                v["window"]["cpu_ns_per_full_priced_fme"]
+                    .as_f64()
+                    .unwrap_or(0.0)
+            };
+            let heads: Vec<Value> = runs
+                .iter()
+                .map(|v| {
+                    json!({
+                        "cpu_ns_per_full_priced_fme": key(v),
+                        "cpu_over_priced_at_local_fq_mul": v["window"]["cpu_over_priced_at_local_fq_mul"],
+                        "user_cpu_ns": v["window"]["user_cpu_ns"],
+                        "sys_cpu_ns": v["window"]["sys_cpu_ns"],
+                        "relations_found": v["counters"]["relations_found"],
+                    })
+                })
+                .collect();
+            runs.sort_by(|a, b| key(a).partial_cmp(&key(b)).unwrap());
+            let mut v = runs.swap_remove(runs.len() / 2);
+            v["repeats"] = Value::Array(heads);
+            v["reported_run"] = json!("the median by cpu_ns_per_full_priced_fme");
+            eprintln!("m = {m}: ic phased {:.1}s", t0.elapsed().as_secs_f64());
+            v
         } else {
             Value::Null
         };
@@ -923,7 +1292,8 @@ pub fn run(o: &Opts) -> Result<Value, String> {
                 "ns_per_fq_mul_table": ns_table,
                 "curve": facts.slug,
                 "micro": micro,
-                "in_situ": { "rho_negation_batched": rb, "rho_negation": ru, "ic_pipeline": ic, "rho_full": rho_full, "closure_variants": Value::Object(closure_variants) },
+                "curve_build_cpu_ns": curve_build_cpu_ns,
+                "in_situ": { "rho_negation_batched": rb, "rho_negation": ru, "ic_pipeline": ic, "ic_pipeline_phased": ic_phased, "rho_full": rho_full, "closure_variants": Value::Object(closure_variants) },
             }),
         );
     }
@@ -1103,5 +1473,76 @@ mod tests {
         .unwrap();
         assert_eq!(v["divisor"].as_u64(), Some(fq_muls_per_add(&b.curve)));
         assert!(v.get("closure_poly_free_const").is_none());
+    }
+
+    /// The groups of `phase_groups` add up to the priced total they were
+    /// given, and each CPU phase lands in exactly one group.
+    #[test]
+    fn the_phase_groups_add_up_to_the_priced_total() {
+        use crate::cryptanalysis::phase_cpu::{Total, NAMES, N_PHASES};
+        let priced = json!({
+            "report_phases": {
+                "factor_base": {"fme": 10.0, "group_ops_fme": 2.0},
+                "relations": {"fme": 100.0, "group_ops_fme": 5.0},
+                "linear_algebra": {"fme": 3.0, "group_ops_fme": 0.0},
+                "verify": {"fme": 1.0, "group_ops_fme": 0.0},
+            },
+            "precompute_fq_muls": 7,
+            "by_native_counter": {"target_guard_probes": {"fme": 1.0}, "walk_steps": {"fme": 0.5}},
+            "solver_counted_fq_muls_by_phase": {"echelon": 40},
+        });
+        let totals: [Total; N_PHASES] = std::array::from_fn(|i| Total {
+            cpu_ns: 1000 * (i as u64 + 1),
+            faults: 0,
+            entries: 1,
+        });
+        let g = phase_groups(&totals, &priced, 2.0, 114.0);
+        let sum: f64 = g["table"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| r["priced_fme"].as_f64().unwrap())
+            .sum();
+        assert!((sum - 114.0).abs() < 1e-9, "{sum}");
+        assert!((g["sum_priced_fme"].as_f64().unwrap() - 114.0).abs() < 1e-9);
+        let listed: usize = g["table"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| r["cpu_phases"].as_array().unwrap().len())
+            .sum();
+        assert_eq!(listed, NAMES.len(), "every phase in one group");
+        let cpu: f64 = g["table"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| r["cpu_share"].as_f64().unwrap())
+            .sum();
+        assert!((cpu - 1.0).abs() < 1e-9, "{cpu}");
+    }
+
+    /// The per-phase timers read clocks and change no count: the priced
+    /// total and the counters of a solve are identical with them on.
+    #[test]
+    fn the_phase_timers_change_no_count() {
+        let _lock = crate::cryptanalysis::phase_cpu::TEST_LOCK
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
+        let (inst, facts, target) = case(6);
+        let m = ic_method("ic.pipeline_f2m4_full", 400).unwrap();
+        let plain = solve(&m, &inst, &facts, &target, 3).unwrap();
+        crate::cryptanalysis::phase_cpu::start();
+        let timed = solve(&m, &inst, &facts, &target, 3).unwrap();
+        let tot = crate::cryptanalysis::phase_cpu::finish();
+        assert_eq!(plain.total_gae, timed.total_gae);
+        assert_eq!(plain.counters, timed.counters);
+        assert!(
+            timed.detail["phase_priced"]["solver_systems"]
+                .as_u64()
+                .unwrap()
+                > 0
+        );
+        assert!(plain.detail.get("phase_priced").is_none());
+        assert!(tot.iter().map(|t| t.cpu_ns).sum::<u64>() > 0);
     }
 }

@@ -6113,6 +6113,8 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
         // form every relation carries the target, so the solve is the
         // target's descent.
         measurement::mark(measurement::Phase::TargetDescent);
+        let _cpu_phase =
+            crate::cryptanalysis::phase_cpu::enter(crate::cryptanalysis::phase_cpu::Phase::Linalg);
         let la_start = Instant::now();
         let mut stop = false;
         let mut la_timed = false;

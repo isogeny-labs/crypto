@@ -195,6 +195,7 @@ pub mod ic_descent_degrees;
 pub mod ic_engine;
 pub mod ic_framework;
 pub mod ic_measurement;
+pub mod phase_cpu;
 pub mod ic_oracle_pricing;
 pub mod ic_progress;
 pub mod ic_run;

@@ -1194,6 +1194,8 @@ pub fn run_f2m4<S: RhoScalar>(
         if relations.is_empty() {
             continue;
         }
+        let _cpu_phase =
+            crate::cryptanalysis::phase_cpu::enter(crate::cryptanalysis::phase_cpu::Phase::Linalg);
         let la_start = Instant::now();
         let mut stop = false;
         let mut la_timed = false;

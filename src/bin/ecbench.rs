@@ -264,6 +264,11 @@ enum Cmd {
         /// units). Default full.
         #[arg(long, value_delimiter = ',')]
         closure_variants: Vec<String>,
+        /// Per-phase CPU timers on a one-thread partial IC solve of
+        /// --ic-trials trials, partial *_full rho arms at the same unit,
+        /// and the local F_q multiplication time.
+        #[arg(long)]
+        phases: bool,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -1100,6 +1105,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             rho_full,
             closure,
             closure_variants,
+            phases,
             out,
         } => {
             let doc = crypto_lib::cryptanalysis::ecbench::unit_price::run(
@@ -1113,6 +1119,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     rho_full,
                     closure,
                     closure_variants,
+                    phases,
                 },
             )?;
             let text = serde_json::to_string_pretty(&doc).map_err(|e| e.to_string())? + "\n";
