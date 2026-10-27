@@ -50,5 +50,29 @@ descriptive paired bootstrap 95% interval of 1.474–1.672 (20,000 resamples,
 fixed seed 8312). An earlier [three-pair pilot](runs/k128_split3) on the same
 source had FP2 faster in two pairs and slower in one; those rows are retained.
 This is an adaptive K128 construction diagnostic under shared-host conditions.
-Rank, target lookup, peak RSS and Tier 1 comparison remain open. The variant
-has `candidate_id: null` until its complete pipeline is sealed and measured.
+
+## Full K1107 correctness replay
+
+The frozen FP2 producer at commit `aa56a1d1022c1d1f90fbe276436d592b9910ae53`
+also completed a fresh one-target K1107 process. Its [retained run](runs/k1107_full)
+uses the same public point and 183,762-point base as the earlier plain ID31
+control. The base dump is linked to that identical, already committed dump by
+SHA-256 `08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc`.
+The executable, launch flags, output, and hashes are retained. The independent
+verifier reconstructed the four-point relation and scalar, and checked full
+rank 1,107, exact base identity, source and binary hashes, and the charged
+target phases: `PASS_INDEPENDENT_FULL_REPLAY`.
+
+| K1107 FP2 full-process result | Observed value |
+| --- | ---: |
+| Root entries; side-array bytes | 101,708,857; 41,943,040 |
+| Rank; solved targets | 1,107; 1 |
+| Index build; rank stage | 40,399.069 ms; 73,617.888 ms |
+| One-target online interval | 415.325 ms |
+| Whole-process wall; peak child RSS | 115.396 s; 1,477,574,656 bytes |
+
+This local run is a correctness and capacity check on a shared macOS ARM64
+host. Its wall times are not a paired Tier 1 comparison. The K5500 peak RSS,
+same-point Tier 1 IC/rho panel, and complete factor-base selection remain
+open. The variant has `candidate_id: null` until its complete pipeline is
+sealed and measured.

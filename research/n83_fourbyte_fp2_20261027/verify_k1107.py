@@ -49,16 +49,19 @@ def verify(output):
         "source_hash": launch["source_sha256"] == executed_source_sha256(
             launch["source_git_head"]),
         "binary_hash": launch["binary_sha256"] ==
-            sha256(Path(launch["command"][0])),
+            sha256(output / "executed_binary"),
         "target_hash": launch["target_sha256"] ==
             sha256(HERE / "target_k1107.jsonl"),
         "public_fixture": (HERE / "target_k1107.jsonl").read_bytes() ==
             (ROOT / "research/n83_cold_factor_base_20261016/targets.jsonl")
             .read_bytes().splitlines(keepends=True)[0],
         "flags": launch["flags"] == full_k1107.FLAGS,
-        "command": launch["command"][1:] == [
-            "construct:83:1:1107", str(HERE / "target_k1107.jsonl"),
-            "29", str(output / "targets_result.jsonl")],
+        "command": len(launch["command"]) == 5 and
+            Path(launch["command"][0]).name == "executed_binary" and
+            launch["command"][1] == "construct:83:1:1107" and
+            Path(launch["command"][2]).name == "target_k1107.jsonl" and
+            launch["command"][3] == "29" and
+            Path(launch["command"][4]).name == "targets_result.jsonl",
         "answer_sidecar": int(one_json(
             ROOT / "research/n83_cold_factor_base_20261016/answers.jsonl"
         )["scalar"]) == EXPECTED_SCALAR,
