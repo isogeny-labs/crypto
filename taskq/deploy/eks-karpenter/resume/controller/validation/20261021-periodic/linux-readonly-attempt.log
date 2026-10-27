@@ -1,0 +1,89 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded block-buffer v0.10.4
+  Downloaded crypto-common v0.1.7
+  Downloaded version_check v0.9.5
+  Downloaded zmij v1.0.23
+  Downloaded unicode-ident v1.0.27
+  Downloaded serde_derive v1.0.229
+  Downloaded typenum v1.20.1
+  Downloaded proc-macro2 v1.0.107
+  Downloaded serde v1.0.229
+  Downloaded memchr v2.8.3
+  Downloaded serde_core v1.0.229
+  Downloaded sha2 v0.10.9
+  Downloaded digest v0.10.7
+  Downloaded serde_json v1.0.151
+  Downloaded quote v1.0.47
+  Downloaded itoa v1.0.18
+  Downloaded cpufeatures v0.2.17
+  Downloaded cfg-if v1.0.5
+  Downloaded syn v3.0.9
+  Downloaded generic-array v0.14.7
+  Downloaded libc v0.2.190
+   Compiling version_check v0.9.5
+   Compiling proc-macro2 v1.0.107
+   Compiling generic-array v0.14.7
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling typenum v1.20.1
+   Compiling serde_core v1.0.229
+   Compiling libc v0.2.190
+   Compiling zmij v1.0.23
+   Compiling syn v3.0.9
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling serde_json v1.0.151
+   Compiling serde v1.0.229
+   Compiling serde_derive v1.0.229
+   Compiling digest v0.10.7
+   Compiling cpufeatures v0.2.17
+   Compiling itoa v1.0.18
+   Compiling cfg-if v1.0.5
+   Compiling memchr v2.8.3
+   Compiling sha2 v0.10.9
+   Compiling isolab-eks-recovery v0.1.0 (/src/taskq/deploy/eks-karpenter/resume/controller)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 37.48s
+     Running unittests src/lib.rs (/target/debug/deps/isolab_eks_recovery-5dcc004b055905d9)
+
+running 18 tests
+test cloud::tests::runtime_class_requires_all_fields_and_exact_container_runtime ... ok
+test contract::tests::expiry_never_supplies_a_fresh_budget ... ok
+test contract::tests::request_hash_binds_source_spec_and_original_deadline ... ok
+test contract::tests::strict_contract_rejects_unknown_fields_and_unpinned_sources ... ok
+test io::tests::relative_atomic_file_has_a_durable_current_directory_parent ... FAILED
+
+running 1 test
+test model::tests::ambiguous_controller_ownership_is_not_a_lease_expiry ... ok
+test model::tests::expired_original_deadline_prevents_restore ... ok
+test model::tests::failed_measurement_cannot_spawn_a_second_epoch ... ok
+test model::tests::generation_cannot_move_between_runs_or_attempts ... ok
+test model::tests::incomplete_generation_keeps_prior_committed_progress ... ok
+test model::tests::legacy_checkpoint_state_without_intent_is_not_guessed ... ok
+test model::tests::missing_or_stopped_worker_is_not_a_fence ... ok
+test model::tests::periodic_checkpoints_survive_restart_on_both_sides_of_continue ... ok
+test model::tests::same_run_name_never_accepts_a_new_command_or_deadline ... ok
+test supervisor::tests::changed_ids_capabilities_and_missing_nnp_are_rejected ... ok
+test supervisor::tests::completed_computation_wins_race_with_checkpoint_request ... ok
+test supervisor::tests::restored_group_zero_is_rejected_before_continue ... ok
+test cloud::tests::checkpoint_readback_rejects_corruption_version_and_manifest_changes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.66s
+
+test cloud::tests::checkpoint_readback_rejects_corruption_version_and_manifest_changes ... ok
+
+failures:
+
+---- io::tests::relative_atomic_file_has_a_durable_current_directory_parent stdout ----
+
+thread 'io::tests::relative_atomic_file_has_a_durable_current_directory_parent' (724) panicked at src/io.rs:80:32:
+called `Result::unwrap()` on an `Err` value: "Read-only file system (os error 30)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    io::tests::relative_atomic_file_has_a_durable_current_directory_parent
+
+test result: FAILED. 17 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s
+
+error: test failed, to rerun pass `--lib`
