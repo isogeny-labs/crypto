@@ -52,3 +52,14 @@ seal's preserved raw tree. SHA256:
 Its extracted checksums and byte-identical deterministic repack also pass.
 The separate historical native verifier confirms all249 source pins against
 64121dd0c55f030ad11d973efbcd12f8dadd8931,matching CI's historical verification.
+
+Post-publication local checks:artifact policy and large-file checks pass;
+the committed progress export emits exact augmentation scalar1. The first
+validation-gate invocation lacks sparse benchmarks/README.md;after exact
+tracked materialization,the broad gate reports124 historical row failures
+from unavailable provenance and archive/admission mismatches. No benchmark
+or leaderboard rows differ from main. The full artifact-wiring checker
+reports19 workflows outside this change. These outputs are retained in
+publication-checks and are not represented as green. No waiver label or
+historical record change is used. Remote PR checks remain authoritative for
+any future merge;this task keeps the ready PR open with auto-merge disabled.
