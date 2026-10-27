@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [GitHub Actions infrastructure](github-actions-infrastructure.md) | open | final-main CI and all-PR merge verification | restore billing, approve required actions, restore EKS runners, then pass final-head checks/reviews |
 | [N83 balanced IC regularity](n83-balanced-ic-regularity.md) | open | finite regularity measurements on the requested m2–m9 grid; intermediate solving degree | certified finite-degree computations, suitable prime presentation and solver-degree instrumentation |
 | [EKS resumable L2 experiments](eks-resumable-l2-experiments.md) | partially resolved | final review/CI, merge and main GitHub Action | Dedicated v6 pool deployed; J passed 3,606 L2 / 3,600 replays / 1,200 A/A pairs / 19 S3 hashes; prior recovery and failed epochs retained |
 | [N83 mixed-orbit factor-base total-runtime selection](n83-mixed-orbit-factor-base-selection.md) | investigating | natural relation yield, closure/rank/logs, unseen-target solve and same-target rho across the frozen finite grid | resource-qualified native full-D18 positive/natural run with exact S3 replay, then full downstream charged gates |
