@@ -208,6 +208,21 @@ unrelated Rust and proof workloads; do not launch A/A until the unchanged
 quiet-host preflight qualifies. If a future paired schedule runs here, all
 its timed samples must come from this replacement instance only.
 
+The replacement's isolated run tree is
+`runs-host-0250d75e/`; the former instance's bounded refusal tree stays
+under `runs/`. Both arms rebuilt from clean frozen source snapshots with
+rustc 1.99.1 and the same Cargo.lock. The new base and candidate `ic`
+SHA-256 values are respectively
+`31bbdd987cfc3d13c8b110319ccfe8a3204f03f095d9d43d11d105fa414754cd`
+and `83aac314c7556d8351b00395b31a274c3fbc9d3bca679ae0d376fcc2dd9ff65f`.
+The native runner SHA-256 is
+`172948adf90d37c3021801623f9b77abff3c7d87bd1926c445df3e52ed4d91f0`;
+the isolation binary remains
+`03d5b835157361b997c9643b5320bb8df2a778463c9fe50d66bcad133b3ed3df`.
+`icprog host-class r13` passed and all 24 frozen holdouts regenerated
+byte-for-byte. The replacement still owes a fresh 90-row native pin,
+manifest and quiet A/A before a paired schedule.
+
 The native `icprog analyse r13` computes geometric mean paired cold
 base/candidate ratios and 95% intervals by size. Accept the candidate
 for this CPU subclass only if every primary size's suite and holdout
