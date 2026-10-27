@@ -13,13 +13,22 @@ Files:
 - `replay/sample.py` draws the nonce sample (`replay/sample.json`).
   `replay/run_replay.py` runs the pinned binaries and writes `replay/journal.json`
   and `replay/out/`. `replay/check_replay.py` writes `replay-certificate.json`.
+- `verify_scalars.py` writes `scalar-verification.json`. It is the validator's
+  own F_p / F_{p²} / F_{p⁶} and curve arithmetic, and shares no code with the
+  repository.
+- `replay/run_dump_replay.py` is the validator's own run of the dump binary on
+  three instances; it writes `replay/journal-dump.json` and
+  `replay/out/dump_*`.
+- `scalar-dump/` holds the producer's dump runs (commit ca7dc711fa); the
+  validator only read them.
 
 ## Status
 
 | file | status |
 |:--|:--|
 | `validator-report.json` | `pass`, `independent: true`. 273 checks, 110 headline numbers at rel_tol 1e-9, 0 mismatches, 0 underivable numbers. The gate's own `check_validator_report` returns no errors with `validation/` as base. |
-| `replay-certificate.json` | `verified`, `independent: true`, `scalars_verified: false`. The gate's `check_replay_certificate` reports exactly one error, "scalars_verified is not true" (issue 1). |
+| `replay-certificate.json` | `verified`, `independent: true`, `scalars_verified: true`. Updated after the scalar follow-up (issue 1). The gate's `check_replay_certificate` reports no errors. The first version (sha256 b949534c…, committed by the producer in d600250d2c) had `scalars_verified: false`. |
+| `scalar-verification.json` | All 8 solved DLPs of R2-D1 and R2-D2 verified by `verify_scalars.py`, and all ties hold (issue 1). |
 
 ## Replay
 
@@ -134,16 +143,52 @@ blocks. `recompute.py` found no leaf it could not derive.
 
 ## Issues and discrepancies (none changes a recorded number)
 
-1. **Scalars not independently verified (gate blocker).** The pinned
-   `jv_cover` prints and writes neither the solved logarithm nor the instance
-   (α, G, Q). The only check available is the binary's own: `dd·G == Q` on
-   E(F_{p^6}), then `correct = (dd == planted d)`. The replay reproduced
-   `solved`/`correct` = true, so `replay-certificate.json` has
-   `scalars_verified: false`. `docs/VALIDATION_GATE.md` requires `true`, so a
-   `VALIDATION.json` naming this certificate will not pass the gate. Closing
-   this needs a path that emits dd, G, Q and α from the pinned source, checked
-   by independent F_{p^6} curve arithmetic. That would be a new card, not an
-   edit of these records.
+1. **Scalars: resolved by the follow-up.** The pinned `jv_cover` outputs
+   neither the solved logarithm nor the instance. The first certificate
+   therefore had `scalars_verified: false`.
+   - **The dump.** The producer then added a read-only, opt-in dump
+     (`JV_DUMP_INSTANCE`, commit 243a718e41; binary `jv_cover_dump`, sha256
+     b2b8ab34…). The dump is written only after the binary's own `dd·G == Q`
+     test succeeds. The producer re-ran both DLP card commands with it
+     (outputs in `scalar-dump/`, commit ca7dc711fa).
+   - **Independent check.** `verify_scalars.py` uses only its own arithmetic.
+     For all 8 instances (p ∈ {53, 101}, seed ∈ {1, 2}, both arms) it checked:
+     - w is a non-residue mod p (Euler, and no root of i² − w in F_p by
+       exhaustion);
+     - s is a non-cube in F_{p²} (Euler, and no root of θ³ − s in F_{p²} by
+       exhaustion), so the tower is a field;
+     - the curve is non-singular, and G and Q lie on it;
+     - l is prime (Miller–Rabin and trial division), G ≠ O and l·G = O;
+     - dd·G = Q, dd = d and 0 < d < l.
+
+     The self-tests (associativity, distributivity, inverses, x^(p⁶) = x,
+     scalar linearity, (l−1)G = −G) and the negative controls (dd+1, a
+     perturbed G, 3l, a residue w, a cube s, (l−1)G) all behaved as required.
+     As extras that do not gate the result, 4l lies in the Hasse interval and
+     kills three random points per curve (cofactor 4).
+   - **Tie to the measured runs.** Every row of `dlp-sparse.json` and
+     `dlp-fast.json` equals its R2-D1 or R2-D2 row on all 54 non-timing
+     fields. Each dumped (p, seed, l) equals the row's, and the instances are
+     identical across arms.
+   - **Why the tie matters.** The dump binary is built from 243a718e41. That
+     source also carries the post-run main merge (issue 5), so it is not the
+     measured source. Output equality is what ties the dumps to the measured
+     computation.
+   - **Validator's own dump runs.** The validator ran the dump binary itself,
+     with the card's arguments, on three instances:
+     - `JV_LIN=fast --sizes 53,101 --seeds 1`;
+     - `JV_LIN=sparse --sizes 101 --first-seed 2 --seeds 1`.
+
+     Both runs exited 0 (`replay/journal-dump.json`). They gave instance lines
+     byte-identical to the producer's dumps for (53, 1, fast), (101, 1, fast)
+     and (101, 2, sparse), and rows equal to R2-D2 or R2-D1 on all 54
+     non-timing fields.
+   - **Verdict.** The certificate now has `scalars_verified: true`, and the
+     gate's `check_replay_certificate` reports no errors.
+   - **Gaps.** No receipt records the argv of the producer's dump runs; it is
+     taken from the Coordinator's message and confirmed by the output
+     equality. The dump binary's correspondence to 243a718e41 was not checked
+     by a rebuild.
 2. **Dense-family F4 budget.** PROTOCOL.md says "a 900 s budget for the others
    [than jv-nagao]". The bench has given the dense family 600 s
    (`dense_opts`) since the protocol was frozen (544eb84), and amendment 1's

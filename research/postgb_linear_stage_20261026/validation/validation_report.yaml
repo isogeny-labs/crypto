@@ -40,6 +40,12 @@ validation_report:
       the p97-4 give-up reproduced at a different si; jv_cover p=53 seed=1 under JV_LIN=fast equals R2-D2 on all
       54 non-timing fields (lin_muls 4593464878, relations 31, correct true), and under JV_LIN=sparse equals R2-D1."
     - "Counted-mul determinism: 98 systems at equal si in R2-L and R2-A have identical sparse and fast muls."
+    - "Scalars (follow-up): verify_scalars.py, the validator's own F_p/F_{p^2}/F_{p^6} and curve arithmetic,
+      verified all 8 solved DLPs of R2-D1/R2-D2 from the JV_DUMP_INSTANCE dumps (ca7dc711fa). For each:
+      w a non-residue and s a non-cube (Euler and exhaustive root search), curve non-singular, G and Q on it,
+      l prime, G != O, l*G = O, dd*G = Q, dd = d. Self-tests and negative controls behaved as required.
+      Every dump-run row equals its R2 row in all 54 non-timing fields. The validator's own dump-binary runs
+      reproduced 3 instances byte-identically."
   heuristic_validation_checks:
     - "Not applicable: no heuristic distribution is validated; the predictions P1-P5 were frozen in PROTOCOL.md
       (544eb84) before any measured session and are scored on host B per amendment 2."
@@ -57,12 +63,14 @@ validation_report:
   verdict: passed
   verdict_scope: >-
     The R2 records are admissible receipts, and every number in analysis/summary.json is supported by them.
-    This is not an ECDLP claim, a promotion, or a judgement of whether the speed-up matters. It is not
-    gate-complete: replay-certificate.json has scalars_verified false, and the rho reference was not assessed.
+    This is not an ECDLP claim, a promotion, or a judgement of whether the speed-up matters. The replay
+    certificate now has scalars_verified true and passes the gate's certificate check. The rho reference
+    for VALIDATION.json was not assessed.
   limitations:
-    - "Scalars not independently verified. The pinned jv_cover outputs neither the solved logarithm nor the
-      instance. The check used is the binary's own (dd*G == Q on E(F_{p^6}), then dd == planted d), replayed.
-      docs/VALIDATION_GATE.md requires scalars_verified true."
+    - "Scalar check: the dump binary (243a718e41, sha256 b2b8ab34...) is not the measured binary. Its source
+      also carries the post-run main merge, so the dumps are tied to the measured runs by output equality, not
+      by identical code. The argv of the producer's dump runs is not in a receipt. The dump binary was not
+      rebuilt to confirm its source."
     - "Protocol text vs code: the dense-family F4 budget is 600 s (since the freeze; amendment 1 says 600 s)
       against 900 s in PROTOCOL.md. No R2 system hit an F4 timeout, so there was no effect."
     - "Commit afa857a landed during R2-A2's measured run; this can affect its timings, not its counts."
@@ -79,10 +87,12 @@ validation_report:
       runs/, cards/, analysis/ or the protocol files. Not validated here."
   artifact_paths:
     - research/postgb_linear_stage_20261026/validation/validator-report.json     # sha256 62687f322a88414d07686c693bcb004e1ed300ca4da36e15a236cbb9dc2ecf7c
-    - research/postgb_linear_stage_20261026/validation/replay-certificate.json   # sha256 b949534ca936ae3cb66df7f195abe8bdf473ed3a7e448dc19ae7632fb096d7be
+    - research/postgb_linear_stage_20261026/validation/replay-certificate.json   # sha256 bc1e5c6d3b81a81f3bb289133eb6a509e65a6e4c2e6d57252a0d78a5087b151e (first version b949534c..., scalars_verified false)
+    - research/postgb_linear_stage_20261026/validation/scalar-verification.json # sha256 ad1cf7cac12dca0c8f709edeb122c08edb0a95acd8ad574a66539ed8824a2912
+    - research/postgb_linear_stage_20261026/validation/verify_scalars.py        # sha256 64b31aec00cdccc191c264e22c33539b5deefdb58f4945674c5e77a4625aaefb
     - research/postgb_linear_stage_20261026/validation/VALIDATION_NOTES.md
     - research/postgb_linear_stage_20261026/validation/recompute.py
-    - research/postgb_linear_stage_20261026/validation/replay/   # nonce.txt, sample.py/json, run_replay.py, journal.json, check_replay.py, out/
+    - research/postgb_linear_stage_20261026/validation/replay/   # nonce.txt, sample.py/json, run_replay.py, journal.json, run_dump_replay.py, journal-dump.json, check_replay.py, out/
   review_attestation:
     joints_owned: []   # no review_plan; whole-task validation as assigned
     blind_rederivation: false   # recomputed from the producer's raw records, so not a blind re-derivation
@@ -103,3 +113,4 @@ validation_report:
       - tools/task_card.py (lint and run_card)
       - docs/VALIDATION_GATE.md, scripts/validation_gate.py (check functions), scripts/fixtures/validation_gate/positive/, benchmarks/20261017-ic-a15-filter-slots/VALIDATION.json and validator-report.json raw_data
       - git log / diff metadata for the study, src/, examples/ and Cargo.*
+      - "follow-up: commit 243a718e41 diff (dump_instance); validation/scalar-dump/ at ca7dc711fa (all 10 files, by script; BINARY.txt, exit.txt and one dump line read); examples/jv_cover.rs --first-seed handling"

@@ -143,6 +143,54 @@ def main():
 
     missing = sorted(sampled - sampled_seen)
     all_ok &= not missing
+
+    # scalar verification (validation/verify_scalars.py -> validation/scalar-verification.json)
+    sv_path = REPO / STUDY / "validation/scalar-verification.json"
+    verifier = REPO / STUDY / "validation/verify_scalars.py"
+    scalars_ok, scalar_block = False, None
+    if sv_path.exists():
+        sv = json.loads(sv_path.read_text())
+        by_arm = {}
+        for inst in sv["instances"]:
+            by_arm.setdefault(inst["lin"], []).append(inst)
+        for mode, card in (("sparse", "R2-D1"), ("fast", "R2-D2")):
+            ties = [t for t in sv["ties"] if t["check"].startswith(f"{mode} (")]
+            runs.append({
+                "name": f"scalar_dump_{mode}",
+                "run_by": "producer (main session), not the validator",
+                "argv": ("not recorded in a receipt; stated by the Coordinator as the card command "
+                         f"JV_LIN={mode} JV_DUMP_INSTANCE=<path> jv_cover_dump --exp dlp --sizes 53,101 --seeds 2 "
+                         "--rho-runs 4 --check-every 64"),
+                "binary_sha256": "b2b8ab340fb6ab5dfca09552226b2005a1495e3ed1045d4bbe3250f15a8b3300",
+                "binary_source": "243a718e41 (adds the read-only JV_DUMP_INSTANCE hook; also carries the post-run "
+                                 "main merge, so the tie below is by output equality)",
+                "outputs_at_commit": {p: h for p, h in sv["inputs"].items() if f"-{mode}." in p},
+                "dump_commit": sv["dump_commit"],
+                "matched": (f"all 4 dumped instances verified by verify_scalars.py (tower, curve, l prime, "
+                            f"l*G = O, dd*G = Q, dd = d); every dlp-{mode}.json row equals its {card} row in all "
+                            f"{ties[0]['fields_compared'] if ties else '?'} non-timing fields"),
+                "ok": all(i["verified"] for i in by_arm.get(mode, [])) and len(by_arm.get(mode, [])) == 4
+                      and len(ties) == 4 and all(t["ok"] for t in ties),
+            })
+        for own in sv["own_runs"]:
+            runs.append({"name": own["name"], "run_by": "validator", "argv": own["argv"], "env": own["env"],
+                         "binary_sha256": own["binary_sha256"], "exit_code": own["exit_code"],
+                         "matched": "instance lines byte-identical to the producer's dump; rows equal to R2 in "
+                                    "every non-timing field", "checks": own["checks"], "ok": own["ok"]})
+        cross = [t for t in sv["ties"] if "identical across JV_LIN arms" in t["check"]]
+        scalars_ok = (sv["all_verified"] and len(sv["instances"]) == 8 and all(i["verified"] for i in sv["instances"])
+                      and bool(sv["own_runs"]) and all(o["ok"] for o in sv["own_runs"])
+                      and len(cross) == 4 and all(t["ok"] for t in cross))
+        scalar_block = {
+            "verifier": str(verifier.relative_to(REPO)),
+            "verifier_sha256": sha(verifier),
+            "result": str(sv_path.relative_to(REPO)),
+            "result_sha256": sha(sv_path),
+            "instances_verified": sum(i["verified"] for i in sv["instances"]),
+            "instances_total": len(sv["instances"]),
+            "independent_arithmetic": sv["independent_arithmetic"],
+        }
+        all_ok &= scalars_ok
     cert = {
         "schema": "postgb-la-replay-certificate/v1",
         "status": "verified" if all_ok else "failed",
@@ -150,14 +198,20 @@ def main():
         "independence": "replayed by the validator (not the producer) with the pinned binaries; nonce drawn by "
                         "the validator from /dev/urandom after the snapshot commit; comparison code written by "
                         "the validator",
-        "scalars_verified": False,
+        "scalars_verified": bool(scalars_ok),
         "scalar_check_used": (
-            "Not independently verified. The pinned jv_cover prints and writes neither the solved logarithm nor "
-            "the instance (alpha, G, Q, l). The check used is the binary's own: after the linear algebra it "
-            "tests dd*G == Q on E(F_{p^6}) (EllE::mul) and sets correct = (dd == planted d) "
-            "(src/cryptanalysis/jv_cover.rs, run_cover_dlp, at the run commit). The replay reproduced "
-            "solved=true and correct=true, and all four same-process rho runs correct=true, with every "
-            "deterministic counter equal to the recorded row."),
+            "Independent: validation/verify_scalars.py (the validator's own F_p, F_{p^2}, F_{p^6} and curve "
+            "arithmetic; no repository code) checked all 8 solved DLPs of R2-D1 and R2-D2 (p in {53, 101}, "
+            "seed in {1, 2}, both JV_LIN arms) from the JV_DUMP_INSTANCE dumps: w a non-residue and s a non-cube "
+            "(Euler criteria and exhaustive root search), curve non-singular, G and Q on it, l prime, G != O, "
+            "l*G = O, dd*G = Q and dd = d, with self-tests and negative controls. The dumps are tied to the "
+            "measured runs by equality of every non-timing field of the dump runs' rows with the R2-D1/R2-D2 "
+            "rows, and by the validator's own dump-binary runs (three instances) giving byte-identical "
+            "instance lines." if scalars_ok else
+            "Not independently verified (scalar-verification.json missing or not all checks passed). The pinned "
+            "jv_cover prints neither the solved logarithm nor the instance; the binary's own check "
+            "(dd*G == Q, dd == planted d) was replayed."),
+        "scalar_verification": scalar_block,
         "nonce": nonce,
         "nonce_drawn_utc": (HERE / "nonce.drawn_at").read_text().strip(),
         "snapshot_commit": a.commit,
