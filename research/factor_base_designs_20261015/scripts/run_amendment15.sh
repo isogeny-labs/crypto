@@ -28,8 +28,17 @@ esac
 name="R256-$arm-m4-t$t"
 mkdir -p "$out"
 pre="$out/$name.preflight.txt"
-if [ -s "$out/$name.jsonl" ]; then
-    echo "$name already has its row; skipping"
+# A cell has two targets. Rows already written are kept; the run continues from
+# the first target without a row. (The first version of this script skipped a
+# cell as soon as it had any row, so a host that died during the second target
+# never resumed it: see Amendment 15, erratum.)
+targets=2
+rows=0
+if [ -f "$out/$name.jsonl" ]; then
+    rows=$(grep -c . "$out/$name.jsonl" || true)
+fi
+if [ "$rows" -ge "$targets" ]; then
+    echo "$name already has its $rows rows; skipping"
     exit 0
 fi
 
@@ -113,6 +122,7 @@ fi
 "$bin" run --arms "$arm" --m 4 --t-min "$t" --t-max "$t" \
     --budget 14400 --grace 600 --vmem-kb "$v_kb" \
     --checkpoint-every "${FB_CKPT_EVERY:-600}" \
+    --first-target "$rows" --targets "$((targets - rows))" \
     --file "R256-{arm}-m4-t$t" --out-dir "$out"
 
 # Attribution: the job cgroup's OOM-kill counter, and the kernel log if
