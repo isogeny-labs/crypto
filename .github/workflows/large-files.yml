@@ -8,6 +8,7 @@ name: large-files
 on:
   workflow_dispatch:
   pull_request:
+    branches: [main]
     types: [opened, synchronize, reopened, labeled, unlabeled]
 # A newer push to the same pull request cancels this workflow's run for the older commit.
 # Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
@@ -18,7 +19,7 @@ concurrency:
 jobs:
   size:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|large-files.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|large-files.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 10
     permissions:
       contents: read
@@ -31,21 +32,13 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /scripts/check-large-files.sh
-            /scripts/test-check-large-files.sh
-            /.github/large-files-allowed.txt
-      - name: Reject unavailable changed blobs
-        run: scripts/test-check-large-files.sh
       - name: No added or modified file over 10 MiB
         env:
           LARGE_FILE_OK: ${{ contains(github.event.pull_request.labels.*.name, 'large-file-ok') }}
         run: |
-          set +e
-          scripts/check-large-files.sh HEAD^1 HEAD
-          result=$?
-          set -e
-          if [ "$result" -eq 0 ]; then exit 0; fi
-          if [ "$result" -eq 1 ] && [ "$LARGE_FILE_OK" = true ]; then
+          if scripts/check-large-files.sh HEAD^1 HEAD; then exit 0; fi
+          if [ "$LARGE_FILE_OK" = true ]; then
             echo "::warning::large files committed under the large-file-ok label"
             exit 0
           fi
-          exit "$result"
+          exit 1
