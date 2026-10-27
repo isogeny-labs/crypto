@@ -177,3 +177,27 @@ preserves inputs, validator output and outstanding image/custom-command gaps.
 No paid job, fixture substitution, implicit cap increase, main-merge action or
 retry of the denied SSM operation was performed. The scientific replay remains
 frozen independently.
+
+## Actual same-protocol recovery, 2026-10-27
+
+A later real process check found the original driver absent after11completed
+new900s caps. No case was unclosed and no scientific child remained. Frozen
+guards and the old complete rawmanifest passed; exit cause is unknown, and no
+batch completion/result was inferred. The exact original --resume path was
+used only after a fresh quiet checkpoint and actual archive/meta/resume/source-
+bundle GET/hash verification. The new controller104308/PGID104306 and actual
+hky/d0-k3-b0 child were verified live after its02:31:53UTC start. Eleven caps
+are preserved, with zero retries. Persistent console files live outside the
+hashed raw tree. The outer watchdog still ends at the original absolute
+2026-10-29T20:02:21UTC deadline. Source/binary/input/protocol/per-case controls,
+budget and host allocation are unchanged. The prospective plan and separate
+actual launch receipt are in pipeline-receipts/native-hky-resume-20261027.
+
+## Subsequent storage-only feature update
+
+After the verified52b6a2c5source delivery, feature commit8d6ff275 moved the
+three inspected report PDFs out of Git and retained their genuine artifact
+bindings. Their exact S3bytes/readback receipts and immutable52b6blob links
+remain valid; physical local files are preserved. That commit also adds three
+other report PDFs outside this study. Recovery publication preserves all of
+those disjoint storage changes rather than overwriting the advanced branch.
