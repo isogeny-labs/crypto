@@ -16,6 +16,7 @@
 //! | [`hec`] | hyperelliptic Jacobians: the thread's instances, `hec.ic_fb_walk` and its rho reference, counted in `bitop/v1` primitives |
 //! | [`hyper`] | the hyperelliptic thread's Jacobians (genus 2–4, `p < 256`) for the generic arms |
 //! | [`hyper_ic`] | `ic.hyperelliptic`: the thread's index calculus on those Jacobians, counted |
+//! | [`koblitz_descent`] | `ic.koblitz_descent`: the ledger §23 one-target Koblitz index calculus, charged by counted group operations |
 //! | [`claw`] | the four-point signed-Frobenius pair claw (aburan28/cryptanalysis#175) on a Koblitz curve |
 //! | [`conductor_gap`] | CM crater/floor curve pairs with a certified prime endomorphism-conductor gap |
 //! | [`spec`] | the experiment spec and its deterministic expansion |
@@ -69,6 +70,7 @@ pub mod hyper_ic;
 pub mod isolab;
 pub mod isolation;
 pub mod jacobian;
+pub mod koblitz_descent;
 pub mod methods;
 pub mod plane_quartic;
 pub mod record;
