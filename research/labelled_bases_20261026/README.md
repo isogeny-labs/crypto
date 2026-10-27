@@ -4,7 +4,7 @@
 **class: derivation (no measurement, no leaderboard row).** Graph `bound.svg`:
 [`examples/labelled_base_bound.rs`](../../examples/labelled_base_bound.rs) evaluates the
 closed-form bound below natively and writes `bound.jsonl`, and `plot.py` only lays those records
-out. Nothing is measured. PDF `report.pdf`. **Lean formalization: open** (see "Formalization").
+out. Nothing is measured. PDF `report.pdf`. **Lean: the bound is proved and kernel-checked** (see "Formalization").
 
 ## The idea examined
 
@@ -79,30 +79,36 @@ oracle's output, and without structure it is generic.
 
 ## Formalization
 
-**Status: open. Not formalized, not built.** AGENTS.md ("Mathematical results should include
-Lean proofs") asks for a Lean 4 theorem. This container has no Lean toolchain, and installing one
-(elan, plus the Mathlib cache) was not permitted in this session. No `.lean` file is committed,
-because an unbuilt file would only be a claim.
+**Status: proved in Lean 4 (kernel-checked), for the inequality. The cost model is not
+formalized.** Project [`lean/`](lean/): `LabelledBases.lean`, Lean v4.34.1, Mathlib pinned at
+`d13f23b723b8a846827a245b89c10fc7d3f11612` (the same pin as `research/enge_primefield_cover_20261024/lean`),
+`lake-manifest.json` committed.
 
-Proof map, for whoever formalizes it:
+| report statement | Lean declaration | exact hypotheses | status |
+|:--|:--|:--|:--|
+| Bound, both cases (`C ≥ 2√N`) | `LabelledBases.labelled_base_lower` | `N s B : ℝ`, `m : ℕ`, `0 < N`, `0 < B`, `B ≤ s`, `1 ≤ m`; conclusion `2 * √N ≤ cost N s B m`, with `cost N s B m = B*N/s + (m!*N/B^m) * max 1 (s^m/(m!*N))` | proved |
+| The two terms multiply to at least `N` | `LabelledBases.terms_mul_ge` | same | proved |
 
-| report statement | intended Lean statement | status |
-|:--|:--|:--|
-| Bound, both cases | `theorem labelled_base_lower (N s B : ℝ) (m : ℕ) (hN : 0 < N) (hB : 0 < B) (hBs : B ≤ s) (hm : 1 ≤ m) : 2 * Real.sqrt N ≤ B * N / s + ((m.factorial : ℝ) * N / B ^ m) * max 1 (s ^ m / ((m.factorial : ℝ) * N))` | open (no toolchain) |
-
-Proof sketch for the Lean proof. It handles both cases at once, because only `max ≥` its second
-argument is used. Let `x = B·N/s` and `y = (m!N/B^m)·max(…)`. Then `y ≥ s^m/B^m`, so
+The proof covers both cases of "Bound" at once, because it only uses that `max` is at least its
+second argument. Let `x = B·N/s` and `y = (m!N/B^m)·max(…)`. Then `y ≥ s^m/B^m`, so
 `x·y ≥ N·(s/B)^{m−1} ≥ N`, since `s/B ≥ 1`. Then `(x+y)² ≥ 4xy ≥ 4N` and `x + y ≥ 0` give
-`x + y ≥ 2√N`. Dependencies: Mathlib `Real.sqrt`, `Real.sqrt_le_sqrt`, `one_le_pow_of_le`
-(or `one_le_pow₀`), `le_max_right`.
+`x + y ≥ 2√N`.
 
-What the theorem would not cover: the cost model itself (the bullets under "Model"). That an
+Verification, 2026-10-27:
+- `lake exe cache get` and `lake build` succeed with no warnings and no `sorry`.
+- `#print axioms` gives `[propext, Classical.choice, Quot.sound]` for both theorems.
+- The repository gate `tools/lean/proof-gate.sh research/labelled_bases_20261026/lean` reports
+  `PASS 2 thm 0 trusted`. Its logs are in `lean/receipts/`.
+- `lean4checker --fresh` was not run; it is not installed here.
+
+What the theorem does not cover: the cost model itself (the bullets under "Model"). That an
 attack must pay `N/s` per useful label, and at least one operation per returned decomposition,
-are modelling assumptions. They are not theorems about elliptic curves.
+are modelling assumptions about attacks. They are not theorems about elliptic curves, and the
+Lean statement takes the cost formula as its definition.
 
 ## Verdict for the triage
 
-Item 3 is **closed by derivation** (written proof above; Lean formalization open). With a structured oracle, no setting of `S`,
+Item 3 is **closed by derivation** (written proof above; the inequality is proved in Lean, the cost model is an assumption). With a structured oracle, no setting of `S`,
 `B` or `m` gets a labelled-base attack below `2√N` (in practice far above it).
 Without structure the attack is generic and bounded by `√N`. The single-dependency stopping it relies on is
 already in the baseline. Nothing here is a measured result; the bound is exact
