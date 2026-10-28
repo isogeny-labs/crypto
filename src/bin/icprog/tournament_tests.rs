@@ -338,10 +338,10 @@ fn profile_text_helpers_follow_python() {
     assert_eq!(splitlines("a\r\nb\rc\n\nd"), vec!["a", "b", "c", "", "d"]);
     assert_eq!(collected("==1== Collected : 123\n"), vec!["123"]);
     assert_eq!(collected("Collected:9 Collected x"), vec!["9"]);
-    assert_eq!(
-        includes(r#"include_str!( "a.txt"); include!("b.rs")"#),
-        vec!["b.rs", "a.txt"]
-    );
+    // Built at run time: .github/scripts/ci-scope.mjs scans source text for
+    // literal include directives and would take this fixture for a real one.
+    let fixture = format!("include_str!( \"a.txt\"); {}(\"b.rs\")", "include!");
+    assert_eq!(includes(&fixture), vec!["b.rs", "a.txt"]);
 }
 
 /// A historical round's frozen verdict, from its committed archive:

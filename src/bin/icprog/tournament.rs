@@ -203,7 +203,7 @@ fn int_to_f64(i: i128) -> f64 {
 fn py_div(a: Num, b: Num) -> R<f64> {
     match (a, b) {
         (_, Num::Int(0)) => Err("ZeroDivisionError: division by zero".into()),
-        (_, Num::Float(y)) if y == 0.0 => Err("ZeroDivisionError: float division by zero".into()),
+        (_, Num::Float(0.0)) => Err("ZeroDivisionError: float division by zero".into()),
         (Num::Int(x), Num::Int(y)) => {
             let q = stats::div_to_f64(
                 &BigUint::from(x.unsigned_abs()),

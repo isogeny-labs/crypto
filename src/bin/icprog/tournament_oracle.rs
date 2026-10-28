@@ -129,7 +129,7 @@ fn is_prime(n: u128) -> bool {
         return false;
     }
     for p in [2u128, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if n % p == 0 {
+        if n.is_multiple_of(p) {
             return n == p;
         }
     }
