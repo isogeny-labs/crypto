@@ -1,10 +1,10 @@
-# N83 balanced index-calculus regularity remains unresolved
+# N83 index-calculus regularity remains unresolved
 
 - **Status:** open
 - **Kind:** resource limit; presentation limitation; instrumentation gap
 - **Affected work:** [N83 m2–m9 study](../research/n83_ic_degree_sweep_20261027/README.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-27
+- **Last updated:** 2026-10-28
 
 ## Problem
 
@@ -38,3 +38,24 @@ Unresolved. The v1 launch failed before target data; v2 corrects permissions and
 The user's follow-up permits first or last fall identification, retaining all families and m=2..9 and allowing n51/53. R3 completed on the retained n83 inputs: 32 explicit binary/Koblitz witnesses certify first fall 2, while 16 prime coefficient-minor certificates exclude falls through degree 4 only. All 48 fresh-process replays passed; [R3 evidence](../research/n83_ic_degree_sweep_20261027/fall/experiment.export.json).
 
 R4 subsequently validated all 16 prime standard leading-syzygy first-fall certificates: floor(ell/2)+4, giving 24,17,14,12,10,9,9,8 for m=2..9. The lower bound is a written Lefschetz/filtered-Koszul derivation, supported by five exact small-matrix controls; target witnesses, hypotheses and original presentations are checked natively. These are not full n83 matrix-rank measurements. [Combined report](../research/n83_ic_degree_sweep_20261027/fall/prime/reports/report.md), [R4 evidence](../research/n83_ic_degree_sweep_20261027/fall/prime/experiment.export.json), and [formal proof map](../research/n83_ic_degree_sweep_20261027/fall/prime/PROOF_MAP.md). The complete Lean theorem and independent scientific review remain open. Earliest NEW affine prime fall is also unresolved: a leading-form nontrivial syzygy and a nonzero affine degree-lowering product do not by themselves prove novelty in the lower closed space. This completes the standard first-fall grid but does not resolve this regularity problem or identify last fall.
+
+## Fixed ell27 follow-up, 2026-10-28
+
+The user subsequently requested one shared 2^27-candidate factor base per curve
+for every m2..9. Complete point datasets were generated and pinned by manifest.
+The [fixed-base regularity rerun](../research/n83_fixed_degree_sweep_20261028/README.md)
+executed all 96 attempts against this new domain, checking every planted point
+against actual stored records. Observed:4 completed affine computations, 63
+whole-process time limits, 29 memory exits, zero completed top-form regularity
+values. Koblitz and general binary m2 have final affine basis degrees 2/0 for
+planted/natural targets; these are not regularity measurements. See the
+[export](../research/n83_fixed_degree_sweep_20261028/experiment.export.json)
+and [report](../research/n83_fixed_degree_sweep_20261028/reports/run-20261028T0325Z/report.md).
+
+The latest requested factor-base size is fixed ell27. Future work on this
+request must retain those manifests and all m2..9 cells. The next discriminating
+step above applies to these retained fixed-domain inputs as well: distinguish
+input expansion from solver work and validate an appropriate finite-degree
+presentation/backend. No first-fall substitution or timeout-derived bound
+resolves the remaining regularity measurements. The earlier balanced-domain
+results and protocol remain historical evidence, unchanged.
