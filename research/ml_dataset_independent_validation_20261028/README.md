@@ -11,6 +11,11 @@ artifacts. They are superseded for execution; see [NATIVE_MIGRATION.md](NATIVE_M
 The producer remains separately owned in `codex/ml-ecdlp-dataset-20261028`.
 This companion does not modify its working tree or launch compute workers.
 
+Explicit factor-base policy datasets have a versioned companion contract:
+see [POLICY_COMPATIBILITY.md](POLICY_COMPATIBILITY.md). The native consumer
+accepts strict plan/v2 and factor-base/v2 bindings and emits its own static
+routing view/v2. This is not conformance to the producer's v4 training export.
+
 ## Native commands
 
 ```sh
