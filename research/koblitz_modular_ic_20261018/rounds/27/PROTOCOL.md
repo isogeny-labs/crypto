@@ -363,3 +363,13 @@ all coefficient components and proper descent P2=P0+sigmaP1.
 This is a proper-chart polynomial separator for the actualsource boundary,
 not yet global h^k f membership in the original affine homogeneous ideal.
 Do not silently discharge global saturation from it. Caps4GiB/1200 unchanged.
+
+## Prospective arbitrary cusp reverse evaluator
+Using the ACTUAL five ramified cusp principal divisors, verify overQ an
+integral5x5matrix W with M W=134292 I-d(1,6,36,216,1296), d=(-9,-11,-4,8,10).
+Check every denominator1 and each product entry independently. Bind arbitrary
+formal coefficients e0..e4, not forward-generated examples. Along with actual
+nonzero order11 proof this identifies the full11primary cusp subgroup and
+its coordinate e(6) after prime-to11 scalar134292. Corrupt one witness.
+This does not evaluate ordinary degree460/367 supports, nor isolate a CM sign.
+Same4GiB/1200s native caps. Proper principal-divisor bridge remains written.
