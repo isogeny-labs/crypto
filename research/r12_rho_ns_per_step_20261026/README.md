@@ -166,3 +166,25 @@ re-measure: build `ecbench` and the `n83_rho_optimization_eval` example at a
 compiling commit, then
 `ecbench run --spec spec.json --out <dir> --cpus none --lock <file> --allow-busy`
 and `./n83_abba.sh` (edit the paths in the script).
+
+## Capsule restoration provenance (2026-10-28)
+
+The committed `data/session.json` originally lacked the session's `spec.json`
+and `plan.json`, so the repository-wide evidence audit could not check this
+otherwise complete capsule. The restored `data/spec.json` is a byte-for-byte
+copy of this study's checked-in `spec.json` (raw SHA-256
+`a4d1fbabd5072bfcbfc127aff263d67be7129ce5474fb7e35eec26b6d0f883c4`).
+Expanding it through the repository's deterministic `Spec::from_json` ->
+`spec::plan` -> `runner::PlanDoc` serialization at
+`f6ef59053567470f313b80f6438fd6524a746d01` reproduces the session's pinned
+spec SHA-256
+`68278bcbc7c4c17e893f17ab16743be91f091ab60f9a6659cd064d0c068993d6`
+and plan SHA-256
+`77763dc5f2786e77c9deb2ed4beb18e5c0167ad211ca987fe170924d57cded28`.
+
+The existing compressed record artifact was also given the standard
+`records.jsonl.gz` alias expected by the audit script. Both artifact names
+point to the same immutable object; decompression produces 378 records with
+the session-pinned SHA-256
+`bed8044b3395f97b543a2451724d3c94b3475e30fc8cd73a7e372ecee5443807`.
+This restoration reran no trial and changed no measured record.
