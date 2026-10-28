@@ -93,7 +93,9 @@ and does not certify complete execution, every intermediate event identity,
 instruction cost, factor-base construction, subgroup order, UNSAT or fall degree.
 Historical root artifacts remain readable with explicit unverified status.
 See [ROOT_CERTIFICATE_DESIGN.md](ROOT_CERTIFICATE_DESIGN.md) for the bounded
-prime/binary contracts and primary mathematical sources.
+prime/binary contracts and primary mathematical sources, and
+[ROOT_VALIDATION.md](ROOT_VALIDATION.md) for the 51-cell sealed acceptance,
+retained failures, source reviews and verified S3 readback.
 
 ## Feature and measurement contract
 
