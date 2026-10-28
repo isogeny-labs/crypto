@@ -62,6 +62,10 @@ jobs:
           python-version: '3.11'
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
+      - name: Reject stale native curve catalog bindings
+        run: |
+          python3 scripts/test_curve_catalog_consistency.py
+          python3 scripts/check_curve_catalog_consistency.py
       - name: Every leaderboard and benchmarks row is validated or frozen pre-gate
         run: |
           base=""
