@@ -76,3 +76,5 @@ No mathematical input, acceptance rule or resource cap changes.
 Positive03 is rejected on map syntax: bind n and l to named polynomials
 before composing the existing map. Positive04 repeats the same mathematics
 and cap; acceptance still requires every block and no native diagnostics.
+Registered01 rejects reserved ring name quotient. Use qr25 in registered02;
+no equations, localization, number of generators or acceptance rules change.
