@@ -20,6 +20,18 @@ case "$name" in
  o-charts)
   cp "$here/O24-charts.sing" "$base/input.sing"
   marker=O24_CHARTS_ALL_CHECKS_PASS ;;
+ o-series)
+  awk '/^poly unitprod=1;/{exit} {print}' "$here/../22/runs/cm22-incidence.sing" > "$base/input.sing"
+  sed -n 's/^generic\[2\]=/poly nuEquation=/p' "$here/../22/runs/cm22-generic-qr-01.log" | sed 's/$/;/' >> "$base/input.sing"
+  cat >> "$base/input.sing" <<'EOF'
+poly nuCoefficient=diff(nuEquation,n);
+if(nuCoefficient!=(1+c)^2*b^3*(b+c*(1+c)^3)){ERROR("original nu coefficient mismatch");}
+ideal original=nn[49],nn[53],nn[239],nn[241],nn[243];
+ideal registered=nn[1],nn[12],nn[2],nn[2],nn[20],nn[37],nn[65],nn[75];
+EOF
+  awk '/^matrix J0/{exit} {print}' "$here/O24-charts.sing" >> "$base/input.sing"
+  cat "$here/O24-series.sing" >> "$base/input.sing"
+  marker=O24_SERIES_ALL_CHECKS_PASS ;;
  *) echo 'unknown case' >&2; exit 1 ;;
 esac
 sha256sum "$base/input.sing" > "$base/source.sha256"

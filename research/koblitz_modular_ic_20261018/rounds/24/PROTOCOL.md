@@ -107,3 +107,27 @@ Only after these chart checks pass, freeze the finite-precision coefficient
 evaluation of nu and all eight original registered entries. No mere Newton
 slope or finite projected factor multiplicity supplies a geometric branch.
 All resource limits, checkpoint and no-new-job/claim rules above persist.
+
+## Frozen O24 original-coordinate valuation evaluation
+
+O24-charts-02 passes all base/tower/toric identities and all four unit
+Jacobian checks. Compute the unique coefficient lifts in F2[[w]]/(w^192)
+of those four etale charts, with all unknown residues fixed before the run.
+For e=1 put t=w,Z=t^3*y; for e=7 use t=w^7*x^2,Z=w^11*x^3. Iterate the
+displayed char-2 implicit equations with unit inverses and require residuals
+zero modulo w^192. Lift both lambda residues through its quadratic equation.
+
+Evaluate the exact original nu equation from the retained R22 generic record;
+check its n coefficient is A^2*Delta. Do not recompute the generic Groebner
+basis. Divide the numerator and denominator by their actual displayed w
+orders. If nu has a pole or vanishes beyond the precision, stop this case
+without inventing a valuation; a Laurent extension would need a new frozen
+adaptation. If nu is integral, evaluate all five original source residuals
+modulo w^100 and all eight actual registered polynomial entries. Every claimed
+valuation must have a displayed nonzero leading coefficient below order 100.
+The true series precision for nu is at least 192-77=115 on the tame chart.
+
+Finite truncation identifies a valuation only with the already certified
+unique smooth-chart lift and exact rational function identity. It is not a
+standalone simultaneous arc for node187 or a complete global divisor. Retain
+the truncations, all residuals and orders; no timing claim is made.
