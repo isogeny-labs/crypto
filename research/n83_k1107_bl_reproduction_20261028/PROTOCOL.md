@@ -85,3 +85,22 @@ The fix is to install the distribution package `time` (GNU Time) at `/usr/bin/ti
 `run.sh`, the binaries (`scratchpad/n83bin/`, same SHA-256s), the configs, the targets or the seeds
 changes. The run is repeated once into a new directory, and that second run is the decision-bearing
 one. Its plain-rho control is a fresh re-run under the same seeds, not a reuse of the first.
+
+**Amendment 2 (2026-10-28, before any precomputed-rho output existed).** Run 2,
+`records/run-20261028T1159Z`, finished the IC arm (16/16 targets, 11:59:49 to 12:02:28Z) and the
+plain-rho control. It was then killed during the precomputed-rho arm (a), which started at
+12:03:11Z, by a restart of the container itself (`uptime` reset at about 13:47Z). Arm (a) left
+an empty `records.jsonl` and no stderr, and no analysis ran. The directory is kept unchanged as
+evidence.
+
+The run is repeated once more as run 3, into a new directory, under the same inputs, binaries,
+configs, seeds and `run.sh`. Run 3 is the decision-bearing run. Run 2's partial IC records are
+not combined with run 3's, because AGENTS.md forbids combining results from different
+experiments.
+
+A further infrastructure kill would need another dated amendment, not a silent retry.
+
+The owner's default EKS route (`isolab-eks`, 2026-10-25) does not fit this study as written. The
+AWS request contract (`isolab.eks.request/v1`) takes only an `ecbench.spec/v1` job, `ecbench`
+cannot run IC at m = 83, and custom commands need the EKS MCP `isolab_k8s_run`, which this session
+lacks. The study therefore stays L0 on this VM, as section 3 already states.
