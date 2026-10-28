@@ -123,6 +123,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 expected_lock_sha256,
                 ..
             }) => Some(expected_lock_sha256.as_str()),
+            Some(Command::VerifyFrozenReport) => unreachable!("handled before report generation"),
             None => None,
         };
         Some(reproduction::verify_inputs(
