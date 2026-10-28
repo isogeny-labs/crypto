@@ -313,62 +313,62 @@ S(w) charges all arms alike at w = 0, 0.1 and 1 GAE per native operation. These 
 | ECBS1haeebe969c2a3 / W5317b2ca0ece | F6-IC / ic-f6 | 0 / 1 / 1 | unknown / unknown / unknown | unknown | unknown | 23952 | failed or unverified attempts; missing or invalid priced count; no hash-bound historical native arithmetic audit; nondeterministic charged work; session integrity audit failed; session is running |
 | ECBS1haeebe969c2a3 / W5317b2ca0ece | Pollard rho / rho-strong | 1 / 1 / 1 | 1.5095 / 1.6338 / 2.7531 | 197.1554 | 0.1541 | 8408 | no hash-bound historical native arithmetic audit; session integrity audit failed; session is running |
 | ECBS1haeebe969c2a3 / Wc0e4519b763c | Pollard rho / rho-strong | 1 / 1 / 1 | 1.0827 / 1.1187 / 1.4428 | 181.2483 | 0.0604 | 8388 | no hash-bound historical native arithmetic audit; session integrity audit failed; session is running |
-| ECBS1hfd5bf1885227 / W23ae51507c22 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 15.0970 / 704.3923 / 6908.0499 | 14.9441 | 14.8167 | 31664 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / W23ae51507c22 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 14.2778 / 14235.4745 / 142226.2450 | 206.1415 | 205.9083 | 33600 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / W23ae51507c22 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 26.5446 / 27.3341 / 34.4394 | 2.6611 | 0.2144 | 31680 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / W23ae51507c22 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 35.8397 / 37.7657 / 55.1001 | 2.4229 | 0.1651 | 30768 | dominated count band |
-| ECBS1hfd5bf1885227 / W23ae51507c22 | Pollard rho / rho-frob | 3 / 3 / 3 | 1.8471 / 1.8851 / 2.2269 | 0.0870 | 0.0855 | 28080 | observed count frontier |
-| ECBS1hfd5bf1885227 / W23ae51507c22 | Pollard rho / rho-strong | 3 / 3 / 3 | 14.5716 / 14.8487 / 17.3423 | 0.1083 | 0.0292 | 27984 | dominated count band |
-| ECBS1hfd5bf1885227 / W23ae51507c22 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 14.5716 / 14.8487 / 17.3423 | 0.0893 | 0.0237 | 27952 | dominated count band |
-| ECBS1hfd5bf1885227 / W96346bcf839e | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 19.7297 / 1134.3454 / 11165.8865 | 12.5668 | 12.4527 | 31712 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / W96346bcf839e | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 15.8344 / 15963.7699 / 159495.1893 | 163.9252 | 163.8037 | 33552 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / W96346bcf839e | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 31.5496 / 32.6266 / 42.3194 | 2.1745 | 0.3337 | 30800 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / W96346bcf839e | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 36.8898 / 39.0669 / 58.6603 | 0.9619 | 0.2774 | 31696 | dominated count band |
-| ECBS1hfd5bf1885227 / W96346bcf839e | Pollard rho / rho-frob | 3 / 3 / 3 | 1.8620 / 1.9067 / 2.3089 | 0.1028 | 0.1012 | 28080 | observed count frontier |
-| ECBS1hfd5bf1885227 / W96346bcf839e | Pollard rho / rho-strong | 3 / 3 / 3 | 13.8492 / 13.9825 / 15.1823 | 0.0888 | 0.0242 | 28080 | dominated count band |
-| ECBS1hfd5bf1885227 / W96346bcf839e | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 13.8492 / 13.9825 / 15.1823 | 0.0883 | 0.0229 | 27936 | dominated count band |
-| ECBS1hfd5bf1885227 / Wba3041cc3555 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 17.1378 / 1033.2026 / 10177.7859 | 19.9195 | 19.7170 | 31680 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / Wba3041cc3555 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 15.2460 / 16518.8847 / 165051.6326 | 234.1560 | 233.9455 | 33648 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / Wba3041cc3555 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 28.6822 / 29.7293 / 39.1540 | 3.7695 | 0.1807 | 30720 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / Wba3041cc3555 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 38.2528 / 40.5706 / 61.4309 | 2.1698 | 0.2329 | 31664 | dominated count band |
-| ECBS1hfd5bf1885227 / Wba3041cc3555 | Pollard rho / rho-frob | 3 / 3 / 3 | 1.7130 / 1.7503 / 2.0854 | 0.1301 | 0.1279 | 28112 | observed count frontier |
-| ECBS1hfd5bf1885227 / Wba3041cc3555 | Pollard rho / rho-strong | 3 / 3 / 3 | 14.3184 / 14.5433 / 16.5677 | 0.0829 | 0.0257 | 27920 | dominated count band |
-| ECBS1hfd5bf1885227 / Wba3041cc3555 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 14.3184 / 14.5433 / 16.5677 | 0.1252 | 0.0387 | 28048 | dominated count band |
-| ECBS1hfd5bf1885227 / We57e12997b8e | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 15.2162 / 735.9070 / 7222.1236 | 12.3751 | 12.1813 | 31616 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / We57e12997b8e | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 15.7003 / 14695.7237 / 146815.9336 | 138.9577 | 138.8201 | 32928 | dominated count band |
-| ECBS1hfd5bf1885227 / We57e12997b8e | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 26.9840 / 27.8264 / 35.4077 | 1.4903 | 0.3697 | 30704 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / We57e12997b8e | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 36.1152 / 38.4740 / 59.7030 | 4.3703 | 0.1500 | 30672 | dominated count band |
-| ECBS1hfd5bf1885227 / We57e12997b8e | Pollard rho / rho-frob | 3 / 3 / 3 | 1.8769 / 1.9112 / 2.2195 | 0.0908 | 0.0890 | 28080 | observed count frontier |
-| ECBS1hfd5bf1885227 / We57e12997b8e | Pollard rho / rho-strong | 3 / 3 / 3 | 14.3184 / 14.5493 / 16.6272 | 0.0820 | 0.0224 | 28000 | dominated count band |
-| ECBS1hfd5bf1885227 / We57e12997b8e | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 14.3184 / 14.5493 / 16.6272 | 0.0900 | 0.0253 | 28112 | dominated count band |
-| ECBS1hfd5bf1885227 / We718d2747255 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 14.3448 / 596.4905 / 5835.8020 | 10.4797 | 10.2746 | 31568 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / We718d2747255 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 15.3801 / 16693.0697 / 166792.2768 | 191.1727 | 191.0524 | 33248 | dominated count band |
-| ECBS1hfd5bf1885227 / We718d2747255 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 26.2467 / 26.9013 / 32.7934 | 2.4215 | 0.1712 | 30992 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / We718d2747255 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 38.9753 / 41.5403 / 64.6261 | 0.6426 | 0.2085 | 30976 | dominated count band |
-| ECBS1hfd5bf1885227 / We718d2747255 | Pollard rho / rho-frob | 3 / 3 / 3 | 1.8620 / 1.9059 / 2.3014 | 0.1137 | 0.1120 | 28112 | observed count frontier |
-| ECBS1hfd5bf1885227 / We718d2747255 | Pollard rho / rho-strong | 3 / 3 / 3 | 13.8417 / 13.9758 / 15.1823 | 0.1237 | 0.0369 | 27984 | dominated count band |
-| ECBS1hfd5bf1885227 / We718d2747255 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 13.8417 / 13.9758 / 15.1823 | 0.0781 | 0.0186 | 27968 | dominated count band |
-| ECBS1hfd5bf1885227 / Wf3adc0458f26 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 16.8920 / 884.2125 / 8690.0973 | 16.2430 | 16.1267 | 32464 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / Wf3adc0458f26 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 16.0131 / 21424.5321 / 214101.2024 | 312.2933 | 312.1652 | 32944 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / Wf3adc0458f26 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 28.6747 / 29.5975 / 37.9028 | 4.1208 | 0.2280 | 30832 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / Wf3adc0458f26 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 40.8000 / 43.2869 / 65.6688 | 6.1561 | 0.5041 | 30624 | dominated count band |
-| ECBS1hfd5bf1885227 / Wf3adc0458f26 | Pollard rho / rho-frob | 3 / 3 / 3 | 1.9365 / 1.9804 / 2.3759 | 0.1024 | 0.1008 | 28192 | observed count frontier |
-| ECBS1hfd5bf1885227 / Wf3adc0458f26 | Pollard rho / rho-strong | 3 / 3 / 3 | 13.6034 / 13.6860 / 14.4301 | 0.1165 | 0.0307 | 27952 | dominated count band |
-| ECBS1hfd5bf1885227 / Wf3adc0458f26 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 13.6034 / 13.6860 / 14.4301 | 0.0756 | 0.0165 | 28032 | dominated count band |
-| ECBS1hfd5bf1885227 / Wf9115104de18 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 19.2530 / 1027.3150 / 10099.8726 | 33.5842 | 33.4433 | 31616 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / Wf9115104de18 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 16.3632 / 20176.2677 / 201615.4079 | 365.5160 | 365.3810 | 32880 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / Wf9115104de18 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 30.8644 / 31.8572 / 40.7926 | 4.4226 | 0.2866 | 31680 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / Wf9115104de18 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 41.3512 / 44.2924 / 70.7632 | 0.7894 | 0.1634 | 31200 | dominated count band |
-| ECBS1hfd5bf1885227 / Wf9115104de18 | Pollard rho / rho-frob | 3 / 3 / 3 | 1.8545 / 1.8910 / 2.2195 | 0.6524 | 0.6508 | 28128 | observed count frontier |
-| ECBS1hfd5bf1885227 / Wf9115104de18 | Pollard rho / rho-strong | 3 / 3 / 3 | 14.3556 / 14.5835 / 16.6347 | 0.0820 | 0.0223 | 27984 | dominated count band |
-| ECBS1hfd5bf1885227 / Wf9115104de18 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 14.3556 / 14.5835 / 16.6347 | 0.1172 | 0.0306 | 28016 | dominated count band |
-| ECBS1hfd5bf1885227 / Wff35e13b8437 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 14.2480 / 625.9532 / 6131.3005 | 11.2165 | 11.0812 | 31968 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / Wff35e13b8437 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 16.8026 / 17953.8452 / 179387.2288 | 214.5674 | 214.4474 | 33024 | dominated count band |
-| ECBS1hfd5bf1885227 / Wff35e13b8437 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 26.0530 / 26.7248 / 32.7711 | 5.6973 | 0.1280 | 31120 | observed IC recipe frontier |
-| ECBS1hfd5bf1885227 / Wff35e13b8437 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 39.1615 / 41.8003 / 65.5496 | 3.2650 | 0.3933 | 30752 | dominated count band |
-| ECBS1hfd5bf1885227 / Wff35e13b8437 | Pollard rho / rho-frob | 3 / 3 / 3 | 2.0184 / 2.0758 / 2.5919 | 0.1350 | 0.1327 | 28208 | observed count frontier |
-| ECBS1hfd5bf1885227 / Wff35e13b8437 | Pollard rho / rho-strong | 3 / 3 / 3 | 14.0875 / 14.2655 / 15.8676 | 0.0793 | 0.0210 | 28000 | dominated count band |
-| ECBS1hfd5bf1885227 / Wff35e13b8437 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 14.0875 / 14.2655 / 15.8676 | 0.1396 | 0.0237 | 28032 | dominated count band |
+| ECBS1h396db1437f4a / W23ae51507c22 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 15.0970 / 708.3368 / 6947.4944 | 10.6133 | 10.4324 | 31408 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / W23ae51507c22 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 14.2778 / 18565.3174 / 185524.6739 | 171.1849 | 170.9526 | 31104 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / W23ae51507c22 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 26.5446 / 27.3341 / 34.4394 | 0.8367 | 0.1573 | 31284 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / W23ae51507c22 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 35.8397 / 37.7657 / 55.1001 | 0.7599 | 0.1859 | 30768 | dominated count band |
+| ECBS1h396db1437f4a / W23ae51507c22 | Pollard rho / rho-frob | 3 / 3 / 3 | 1.8471 / 1.8851 / 2.2269 | 0.1560 | 0.1497 | 31220 | observed count frontier |
+| ECBS1h396db1437f4a / W23ae51507c22 | Pollard rho / rho-strong | 3 / 3 / 3 | 14.5716 / 14.8487 / 17.3423 | 0.1272 | 0.0340 | 31024 | dominated count band |
+| ECBS1h396db1437f4a / W23ae51507c22 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 14.5716 / 14.8487 / 17.3423 | 0.1252 | 0.0302 | 31368 | dominated count band |
+| ECBS1h396db1437f4a / W96346bcf839e | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 19.7297 / 1138.8119 / 11210.5520 | 21.2745 | 21.0899 | 31124 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / W96346bcf839e | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 15.8344 / 20922.0194 / 209077.6841 | 144.3341 | 144.1077 | 31024 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / W96346bcf839e | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 31.5496 / 32.6266 / 42.3194 | 0.8857 | 0.2097 | 31008 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / W96346bcf839e | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 36.8898 / 39.0669 / 58.6603 | 0.7924 | 0.1792 | 30964 | dominated count band |
+| ECBS1h396db1437f4a / W96346bcf839e | Pollard rho / rho-frob | 3 / 3 / 3 | 1.8620 / 1.9067 / 2.3089 | 0.1861 | 0.1796 | 31048 | observed count frontier |
+| ECBS1h396db1437f4a / W96346bcf839e | Pollard rho / rho-strong | 3 / 3 / 3 | 13.8492 / 13.9825 / 15.1823 | 0.1111 | 0.0250 | 31020 | dominated count band |
+| ECBS1h396db1437f4a / W96346bcf839e | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 13.8492 / 13.9825 / 15.1823 | 0.1528 | 0.0374 | 31176 | dominated count band |
+| ECBS1h396db1437f4a / Wba3041cc3555 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 17.1378 / 1038.2412 / 10228.1714 | 14.9860 | 14.7902 | 31080 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / Wba3041cc3555 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 15.2460 / 21752.3264 / 217386.0503 | 148.9167 | 148.6995 | 31072 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / Wba3041cc3555 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 28.6822 / 29.7293 / 39.1540 | 0.9234 | 0.2110 | 31292 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / Wba3041cc3555 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 38.2528 / 40.5706 / 61.4309 | 0.8028 | 0.1906 | 31000 | dominated count band |
+| ECBS1h396db1437f4a / Wba3041cc3555 | Pollard rho / rho-frob | 3 / 3 / 3 | 1.7130 / 1.7503 / 2.0854 | 0.1912 | 0.1850 | 31012 | observed count frontier |
+| ECBS1h396db1437f4a / Wba3041cc3555 | Pollard rho / rho-strong | 3 / 3 / 3 | 14.3184 / 14.5433 / 16.5677 | 0.1198 | 0.0312 | 31252 | dominated count band |
+| ECBS1h396db1437f4a / Wba3041cc3555 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 14.3184 / 14.5433 / 16.5677 | 0.1611 | 0.0572 | 31452 | dominated count band |
+| ECBS1h396db1437f4a / We57e12997b8e | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 15.2162 / 739.6913 / 7259.9668 | 13.1442 | 12.9364 | 31412 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / We57e12997b8e | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 15.7003 / 19591.6939 / 195775.6361 | 126.7141 | 126.4975 | 31232 | dominated count band |
+| ECBS1h396db1437f4a / We57e12997b8e | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 26.9840 / 27.8264 / 35.4077 | 0.7778 | 0.1642 | 31476 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / We57e12997b8e | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 36.1152 / 38.4740 / 59.7030 | 0.9144 | 0.2183 | 31228 | dominated count band |
+| ECBS1h396db1437f4a / We57e12997b8e | Pollard rho / rho-frob | 3 / 3 / 3 | 1.8769 / 1.9112 / 2.2195 | 0.1934 | 0.1848 | 30912 | observed count frontier |
+| ECBS1h396db1437f4a / We57e12997b8e | Pollard rho / rho-strong | 3 / 3 / 3 | 14.3184 / 14.5493 / 16.6272 | 0.1217 | 0.0292 | 31044 | dominated count band |
+| ECBS1h396db1437f4a / We57e12997b8e | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 14.3184 / 14.5493 / 16.6272 | 0.1162 | 0.0261 | 31068 | dominated count band |
+| ECBS1h396db1437f4a / We718d2747255 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 14.3448 / 599.7997 / 5868.8934 | 10.2044 | 10.0184 | 31184 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / We718d2747255 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 15.3801 / 21818.6805 / 218048.3839 | 177.4907 | 177.3145 | 31384 | dominated count band |
+| ECBS1h396db1437f4a / We718d2747255 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 26.2467 / 26.9013 / 32.7934 | 0.9184 | 0.1528 | 31088 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / We718d2747255 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 38.9753 / 41.5403 / 64.6261 | 1.1114 | 0.2106 | 30972 | dominated count band |
+| ECBS1h396db1437f4a / We718d2747255 | Pollard rho / rho-frob | 3 / 3 / 3 | 1.8620 / 1.9059 / 2.3014 | 0.1562 | 0.1482 | 31248 | observed count frontier |
+| ECBS1h396db1437f4a / We718d2747255 | Pollard rho / rho-strong | 3 / 3 / 3 | 13.8417 / 13.9758 / 15.1823 | 0.1101 | 0.0222 | 31044 | dominated count band |
+| ECBS1h396db1437f4a / We718d2747255 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 13.8417 / 13.9758 / 15.1823 | 0.1534 | 0.0273 | 31012 | dominated count band |
+| ECBS1h396db1437f4a / Wf3adc0458f26 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 16.8920 / 889.1759 / 8739.7307 | 16.6536 | 16.3496 | 31352 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / Wf3adc0458f26 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 16.0131 / 27782.1624 / 277677.5057 | 163.4115 | 163.2050 | 31076 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / Wf3adc0458f26 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 28.6747 / 29.5975 / 37.9028 | 0.9860 | 0.1761 | 31040 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / Wf3adc0458f26 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 40.8000 / 43.2869 / 65.6688 | 0.8257 | 0.2007 | 30944 | dominated count band |
+| ECBS1h396db1437f4a / Wf3adc0458f26 | Pollard rho / rho-frob | 3 / 3 / 3 | 1.9365 / 1.9804 / 2.3759 | 0.2016 | 0.1945 | 31028 | observed count frontier |
+| ECBS1h396db1437f4a / Wf3adc0458f26 | Pollard rho / rho-strong | 3 / 3 / 3 | 13.6034 / 13.6860 / 14.4301 | 0.1464 | 0.0244 | 31032 | dominated count band |
+| ECBS1h396db1437f4a / Wf3adc0458f26 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 13.6034 / 13.6860 / 14.4301 | 0.1529 | 0.0358 | 31064 | dominated count band |
+| ECBS1h396db1437f4a / Wf9115104de18 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 19.2530 / 1031.0151 / 10136.8741 | 18.2145 | 17.9530 | 31396 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / Wf9115104de18 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 16.3632 / 26311.5148 / 262967.8796 | 179.4183 | 179.2013 | 30936 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / Wf9115104de18 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 30.8644 / 31.8572 / 40.7926 | 0.7600 | 0.1707 | 31040 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / Wf9115104de18 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 41.3512 / 44.2924 / 70.7632 | 0.8016 | 0.2001 | 31120 | dominated count band |
+| ECBS1h396db1437f4a / Wf9115104de18 | Pollard rho / rho-frob | 3 / 3 / 3 | 1.8545 / 1.8910 / 2.2195 | 0.1638 | 0.1575 | 31028 | observed count frontier |
+| ECBS1h396db1437f4a / Wf9115104de18 | Pollard rho / rho-strong | 3 / 3 / 3 | 14.3556 / 14.5835 / 16.6347 | 0.1138 | 0.0260 | 31016 | dominated count band |
+| ECBS1h396db1437f4a / Wf9115104de18 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 14.3556 / 14.5835 / 16.6347 | 0.1169 | 0.0298 | 31224 | dominated count band |
+| ECBS1h396db1437f4a / Wff35e13b8437 | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 14.2480 / 629.1901 / 6163.6694 | 10.5504 | 10.3292 | 31116 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / Wff35e13b8437 | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 16.8026 / 23574.2183 / 235590.9594 | 152.1086 | 151.8656 | 31060 | dominated count band |
+| ECBS1h396db1437f4a / Wff35e13b8437 | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 26.0530 / 26.7248 / 32.7711 | 0.8014 | 0.1903 | 31056 | observed IC recipe frontier |
+| ECBS1h396db1437f4a / Wff35e13b8437 | Root finding / ic-rootfind-m3 | 3 / 3 / 3 | 39.1615 / 41.8003 / 65.5496 | 0.7839 | 0.1986 | 30768 | dominated count band |
+| ECBS1h396db1437f4a / Wff35e13b8437 | Pollard rho / rho-frob | 3 / 3 / 3 | 2.0184 / 2.0758 / 2.5919 | 0.2062 | 0.1972 | 31224 | observed count frontier |
+| ECBS1h396db1437f4a / Wff35e13b8437 | Pollard rho / rho-strong | 3 / 3 / 3 | 14.0875 / 14.2655 / 15.8676 | 0.1207 | 0.0303 | 31440 | dominated count band |
+| ECBS1h396db1437f4a / Wff35e13b8437 | Pollard rho / rho-strong-aa | 3 / 3 / 3 | 14.0875 / 14.2655 / 15.8676 | 0.1084 | 0.0217 | 31060 | dominated count band |
 | ECBS1h52e3269d5dab / W028b0c376bbc | F4 inherited / ic-f4-m2 | 3 / 3 / 3 | 8.1379 / 11080.7232 / 110733.9905 | 535.7167 | 535.4463 | 33184 | observed IC recipe frontier |
 | ECBS1h52e3269d5dab / W028b0c376bbc | F4 inherited / ic-f4-m3 | 3 / 3 / 3 | 4.8991 / 157786.3818 / 1577819.7260 | 5695.9674 | 5695.3854 | 37696 | observed IC recipe frontier |
 | ECBS1h52e3269d5dab / W028b0c376bbc | Root finding / ic-rootfind-m2 | 3 / 3 / 3 | 34.7252 / 35.7468 / 44.9409 | 6.2927 | 1.5687 | 31568 | observed IC recipe frontier |
@@ -706,7 +706,7 @@ Complete method parameters, curve/EC1/UID, subgroup r, target, factor-base ident
 - `ECBS1h83ac48e3f4d3`: `research/f6_ic_ecbench_ladder_20261005/sessions/n31-interrupted-01`, interrupted, integrity true; host Intel(R) Xeon(R) Processor @ 2.80GHz / x86_64; planned 24, written 2; bound historical replay receipt: false. [Session](https://github.com/aburan28/crypto/tree/main/research/f6_ic_ecbench_ladder_20261005/sessions/n31-interrupted-01).
 - `ECBS1haeebe969c2a3`: `research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02`, running, integrity false; host Intel(R) Xeon(R) Processor @ 2.80GHz / x86_64; planned 24, written 0; bound historical replay receipt: false. [Session](https://github.com/aburan28/crypto/tree/main/research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02).
   - records file is unbound or its hash mismatches
-- `ECBS1hfd5bf1885227`: `research/ecbench_rootfind_engine_20261012/sessions/claim-n13`, complete, integrity true; host Apple M4 Pro / aarch64; planned 224, written 224; bound historical replay receipt: true. [Session](https://github.com/aburan28/crypto/tree/main/research/ecbench_rootfind_engine_20261012/sessions/claim-n13).
+- `ECBS1h396db1437f4a`: `research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2`, complete, integrity true; host Intel(R) Xeon(R) Processor @ 2.10GHz / x86_64; planned 224, written 224; bound historical replay receipt: true. [Session](https://github.com/aburan28/crypto/tree/main/research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2).
 - `ECBS1h52e3269d5dab`: `research/ecbench_rootfind_engine_20261012/sessions/claim-n19`, complete, integrity true; host Apple M4 Pro / aarch64; planned 224, written 224; bound historical replay receipt: true. [Session](https://github.com/aburan28/crypto/tree/main/research/ecbench_rootfind_engine_20261012/sessions/claim-n19).
 - `ECBS1hb55a1bdabf18`: `research/ecbench_sat_pdp_20261009/sessions/count-qualified-main`, complete, integrity true; host unknown / aarch64; planned 240, written 240; bound historical replay receipt: true. [Session](https://github.com/aburan28/crypto/tree/main/research/ecbench_sat_pdp_20261009/sessions/count-qualified-main).
 - `ECBS1h49d054e2f51a`: `research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0`, interrupted, integrity true; host Apple M4 Pro / aarch64; planned 768, written 2; bound historical replay receipt: false. [Session](https://github.com/aburan28/crypto/tree/main/research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0).

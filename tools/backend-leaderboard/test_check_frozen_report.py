@@ -36,6 +36,17 @@ class FrozenReportControls(unittest.TestCase):
         (self.root / "src/cryptanalysis/ecbench/methods.rs").write_text("new current code")
         report.verify_live_evidence(self.root, self.lock)
 
+    def test_current_manifest_may_select_other_sessions(self):
+        manifest = self.root / "docs/backend-leaderboard/manifest.json"
+        manifest.parent.mkdir(parents=True, exist_ok=True)
+        manifest.write_text('{"sessions": ["old"]}\n')
+        self.lock["files"]["docs/backend-leaderboard/manifest.json"] = report.sha256(manifest.read_bytes())
+        manifest.write_text('{"sessions": ["re-recorded"]}\n')
+        report.verify_live_evidence(self.root, self.lock)
+        (self.root / "research/control/records.jsonl").write_text("replacement")
+        with self.assertRaisesRegex(ValueError, "frozen scientific input changed"):
+            report.verify_live_evidence(self.root, self.lock)
+
     def test_changed_scientific_record_is_refused(self):
         (self.root / "research/control/records.jsonl").write_text("replacement")
         with self.assertRaisesRegex(ValueError, "frozen scientific input changed"):

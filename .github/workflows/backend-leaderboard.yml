@@ -35,6 +35,10 @@ jobs:
             /docs/ecbench/BACKEND_REPRODUCTION.md
             /tools/artifacts/
             /.artifacts/
+      - name: Materialize the manifest's sealed inputs
+        run: |
+          jq -r '.sessions[] | "/" + .dir + "/", (select(.replay_receipt != null) | "/" + .replay_receipt)' docs/backend-leaderboard/manifest.json > /tmp/backend-sources.txt
+          git sparse-checkout add --stdin < /tmp/backend-sources.txt
       - name: Pull store data this workflow reads (tools/artifacts)
         shell: bash
         working-directory: ${{ github.workspace }}
@@ -54,7 +58,9 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard
+          # Manifest sessions may keep records.jsonl in the store (e.g. claim-n13-v2).
+          mapfile -t session_dirs < <(jq -r '.sessions[].dir' docs/backend-leaderboard/manifest.json)
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard "${session_dirs[@]}"
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.99.1'
@@ -62,10 +68,6 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: tools/backend-leaderboard
-      - name: Materialize the manifest's sealed inputs
-        run: |
-          jq -r '.sessions[] | "/" + .dir + "/", (select(.replay_receipt != null) | "/" + .replay_receipt)' docs/backend-leaderboard/manifest.json > /tmp/backend-sources.txt
-          git sparse-checkout add --stdin < /tmp/backend-sources.txt
       - name: Format, admission tests and lint
         run: |
           cargo +1.99.1 fmt --manifest-path tools/backend-leaderboard/Cargo.toml --check
