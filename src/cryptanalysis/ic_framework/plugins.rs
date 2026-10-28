@@ -598,11 +598,16 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
             };
             let mut fb = binary_subspace_factor_base(self.instance, &sel.basis);
             // Unpriced native work of the selection (AGENTS.md section 5a).
-            fb.cost.count("strict4e_membership_tests_uncharged", 1u64 << self.instance.n);
-            fb.cost.count("strict4e_sieve_lookups_uncharged", sel.lookups);
+            fb.cost.count(
+                "strict4e_membership_tests_uncharged",
+                1u64 << self.instance.n,
+            );
+            fb.cost
+                .count("strict4e_sieve_lookups_uncharged", sel.lookups);
             fb.cost.count("strict4e_x4_in_span", sel.x4_in_span);
             fb.cost.count("strict4e_span_nonzero", sel.span_nonzero);
-            fb.cost.count("strict4e_fallback_steps", u64::from(sel.fallback_steps));
+            fb.cost
+                .count("strict4e_fallback_steps", u64::from(sel.fallback_steps));
             fb.cost.wall_ns += start.elapsed().as_nanos() as u64;
             return Ok(fb);
         }

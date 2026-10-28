@@ -7500,8 +7500,21 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
     oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
 ) -> PipelineOutcome {
     collect_and_solve_relations_scaled(
-        g, generator, target, r, h, fb, seed, max_trials, targets, pool_mode, matrix, completion,
-        None, oracle, |_| {},
+        g,
+        generator,
+        target,
+        r,
+        h,
+        fb,
+        seed,
+        max_trials,
+        targets,
+        pool_mode,
+        matrix,
+        completion,
+        None,
+        oracle,
+        |_| {},
     )
 }
 
