@@ -383,3 +383,20 @@ explicit theta-section computation. Exact integral E and actual residual
 class are independently native-bound; actual CM-sign projection remains open.
 
 Lean07 reached elaboration after removing the extra address-space restriction, failed five scalar-zero goals because Abel does not import Group.Basic. Add the actual Group.Basic import and zsmul_zero; retain all failed source/logs. Add three conditional additive/numeric mixed-carrier lemmas, now17named inTorsion plus18Collector=35expected, not a formal polarization theorem.
+
+## Prospective ordinary460/367 paired-image recovery
+Import the4actual ordinary pushed supports from originalM15/M16:436(simple),
+12(double),284(simple),83(simple). Freeze exact original JSON bytes/hashes.
+Native verify every modulus byRabin, original curve equation, actual recovered
+norm A+B*y=0, nonzero denominators. Product-plus-one forces secondY=1/firstY;
+asymmetric-plus-one forces secondY=1/firstX. Factor actual second-X cubic
+ X^3+X^2+secondY*X+1+secondY^2,
+reconstruct all factors/multiplicities, check every rational root on E49.
+At a SIMPLE pushed zero the norm valuation formula forces a unique source
+zero of residue degree1/order1 (under existing proper-correspondence bridge).
+If cubic has exactly1rational root, this uniquely identifies its second image.
+At the degree12 double zero additional residue-degree2 possibilities remain.
+This does not construct the scalar-C5 lifts or a complete reverse divisor.
+No finite candidate set is promoted as selected images or relation rank.
+Four4GiB/1200s caps may be applied individually; initial frozen invocation
+processes these4inorder under the same single cap. No replacement of targets.
