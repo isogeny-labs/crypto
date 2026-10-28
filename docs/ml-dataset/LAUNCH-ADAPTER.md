@@ -1,7 +1,8 @@
 # Dataset launch adapter contract
 
-Status: implementation proposal and read-only inventory at source
-`23b3c0e527d621aebf6532db61744fab77867f48`, 2026-10-28. No new worker,
+Status: native two-stage allocation implemented, with centralized validation
+pending. Launcher inventory starts at source `23b3c0e527d621aebf6532db61744fab77867f48`,
+2026-10-28. No new worker,
 resource allocation, IAM change or scientific generation follows from this
 record. The native budget CLI exists; the complete lab launch adapter described
 here does not yet exist.
@@ -55,8 +56,10 @@ flowchart TD
 1. Reserve provisioning, startup, runtime and termination costs before creating
    a billable worker. Bind actual region, permitted hardware, price evidence,
    original campaign deadline and finite resource lifetime. A waiting worker
-   costs compute too. This pending-launch reservation is a missing adapter
-   capability; the current worker grant requires the actual Pod identity.
+   costs compute too. The native `budget reserve-launch` command
+   implements this ownerless allocation; `budget bind-launch` transfers it to
+   the observed owner without changing capacity. See the
+   [frozen reservation contract](PRELAUNCH-RESERVATION.md).
 2. Create one digest-pinned Job with exact instance selection, no automatic
    replacement/retry and a bounded local startup gate. The gate must perform no
    solver work, STS call or S3 polling before admission. Expose actual Pod UID

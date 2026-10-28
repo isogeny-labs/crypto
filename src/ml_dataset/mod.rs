@@ -12,8 +12,8 @@ pub mod telemetry;
 pub mod types;
 
 use budget::{
-    BudgetScope, BudgetSession, CampaignLedger, CampaignPolicy, GrantRequest, OwnerIdentity,
-    Resources, RunBinding, WorkerGrant,
+    BudgetScope, BudgetSession, CampaignLedger, CampaignPolicy, GrantRequest, LaunchBinding,
+    LaunchRequest, OwnerIdentity, Resources, RunBinding, WorkerGrant,
 };
 use clap::{Args, Subcommand};
 use s3_budget::S3BudgetContext;
@@ -155,6 +155,33 @@ pub enum BudgetCommand {
         /// Create the single authoritative campaign ledger; never use for lost-state recovery.
         #[arg(long)]
         create_ledger: bool,
+    },
+    /// Reserve an ownerless launch envelope before submission; dry-run is strictly read-only.
+    ReserveLaunch {
+        #[arg(long)]
+        policy: PathBuf,
+        #[arg(long)]
+        ledger: PathBuf,
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long, conflicts_with_all = ["out", "create_ledger"])]
+        dry_run: bool,
+        #[arg(long, required_unless_present = "dry_run")]
+        out: Option<PathBuf>,
+        /// First initialization only; never recreate a lost allocator.
+        #[arg(long)]
+        create_ledger: bool,
+    },
+    /// Bind a retained launch reservation to reconciled owner evidence; no cloud submission.
+    BindLaunch {
+        #[arg(long)]
+        policy: PathBuf,
+        #[arg(long)]
+        ledger: PathBuf,
+        #[arg(long)]
+        binding: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
     },
     /// Activate a grant once with a charged conditional S3 PUT and verified GET.
     Activate {
@@ -639,6 +666,23 @@ fn cell_budget_scope(
     Ok(BudgetScope::Cell(id))
 }
 
+fn write_budget_receipt<T: Serialize>(
+    out: &Path,
+    role: &str,
+    value: &T,
+) -> Result<Artifact, String> {
+    let parent = out
+        .parent()
+        .filter(|p| !p.as_os_str().is_empty())
+        .unwrap_or(Path::new("."));
+    let parent = checked_directory(parent, true)?;
+    let filename = out
+        .file_name()
+        .and_then(|s| s.to_str())
+        .ok_or("invalid budget receipt filename")?;
+    storage::write_json(&parent, filename, role, value)
+}
+
 fn run_budget_command(command: &BudgetCommand) -> Result<Value, String> {
     match command {
         BudgetCommand::Admit {
@@ -671,7 +715,11 @@ fn run_budget_command(command: &BudgetCommand) -> Result<Value, String> {
             } else {
                 CampaignLedger::open(ledger, &policy)?
             };
-            let previous = ledger.snapshot()?["grants"][&request.grant_id].clone();
+            let snapshot = ledger.snapshot()?;
+            if snapshot["launches"].get(&request.grant_id).is_some() {
+                return Err("grant ID belongs to a launch reservation; use bind-launch to preserve its binding evidence".into());
+            }
+            let previous = snapshot["grants"][&request.grant_id].clone();
             let grant = if previous.is_null() {
                 ledger.reserve(&request)?
             } else {
@@ -699,6 +747,69 @@ fn run_budget_command(command: &BudgetCommand) -> Result<Value, String> {
             )?;
             Ok(
                 json!({"grant":grant,"artifact":artifact,"campaign":ledger.snapshot()?,"cloud_requests":0,"launched":false}),
+            )
+        }
+        BudgetCommand::ReserveLaunch {
+            policy,
+            ledger,
+            request,
+            dry_run,
+            out,
+            create_ledger,
+        } => {
+            // Enforce the same constraints for direct native callers as clap.
+            // Check before reading inputs or opening/creating allocator state.
+            if *dry_run && (out.is_some() || *create_ledger) {
+                return Err(
+                    "reserve-launch --dry-run conflicts with --out and --create-ledger".into(),
+                );
+            }
+            if !*dry_run && out.is_none() {
+                return Err("reserve-launch requires --out unless --dry-run is set".into());
+            }
+            let policy: CampaignPolicy = read_json(policy)?;
+            let request: LaunchRequest = read_json(request)?;
+            if *dry_run {
+                return serde_json::to_value(CampaignLedger::dry_admit_launch(
+                    ledger, &policy, &request,
+                )?)
+                .map_err(|e| e.to_string());
+            }
+            let out = out.as_ref().ok_or("reserve-launch requires --out")?;
+            let ledger = if *create_ledger {
+                CampaignLedger::create(ledger, &policy)?
+            } else {
+                CampaignLedger::open(ledger, &policy)?
+            };
+            // Commit before exporting. An output failure retains the complete
+            // reservation; exact retries recover it without another allocation.
+            let reservation = ledger.reserve_launch(&request)?;
+            let reservation_sha256 = reservation.sha256()?;
+            let artifact =
+                write_budget_receipt(out, "restricted-campaign-launch-reservation", &reservation)?;
+            Ok(
+                json!({"reservation":reservation,"reservation_sha256":reservation_sha256,
+                "artifact":artifact,"campaign":ledger.snapshot()?,"cloud_requests":0,
+                "launched":false,"worker_grant_issued":false}),
+            )
+        }
+        BudgetCommand::BindLaunch {
+            policy,
+            ledger,
+            binding,
+            out,
+        } => {
+            let policy: CampaignPolicy = read_json(policy)?;
+            let binding: LaunchBinding = read_json(binding)?;
+            // Binding never initializes an allocator or creates new allowance.
+            let ledger = CampaignLedger::open(ledger, &policy)?;
+            let grant = ledger.bind_launch(&binding)?;
+            let grant_sha256 = grant.sha256()?;
+            let artifact = write_budget_receipt(out, "restricted-campaign-budget-grant", &grant)?;
+            Ok(
+                json!({"grant":grant,"grant_sha256":grant_sha256,"binding":binding,
+                "artifact":artifact,"campaign":ledger.snapshot()?,
+                "cloud_requests":0,"launched":false}),
             )
         }
         BudgetCommand::Activate { budget, resume } => {
@@ -2676,6 +2787,227 @@ pub(super) mod budget_test_support {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn parse_budget_test_args(args: &[&str]) -> Result<BudgetCommand, clap::Error> {
+        use clap::Parser;
+        #[derive(Parser)]
+        struct TestCli {
+            #[command(flatten)]
+            dataset: DatasetArgs,
+        }
+        let cli = TestCli::try_parse_from(args)?;
+        let DatasetCommand::Budget { command } = cli.dataset.command else {
+            panic!("wrong CLI route")
+        };
+        Ok(command)
+    }
+
+    #[test]
+    fn launch_cli_requires_output_and_rejects_mutating_dry_run_flags() {
+        let base = [
+            "test",
+            "budget",
+            "reserve-launch",
+            "--policy",
+            "policy.json",
+            "--ledger",
+            "campaign.sqlite",
+            "--request",
+            "request.json",
+        ];
+        let invalid: &[&[&str]] = &[
+            &[],
+            &["--create-ledger"],
+            &["--dry-run", "--out", "reservation.json"],
+            &["--dry-run", "--create-ledger"],
+        ];
+        for suffix in invalid {
+            let mut args = base.to_vec();
+            args.extend_from_slice(suffix);
+            assert!(
+                parse_budget_test_args(&args).is_err(),
+                "accepted {suffix:?}"
+            );
+        }
+        let mut args = base.to_vec();
+        args.push("--dry-run");
+        assert!(matches!(
+            parse_budget_test_args(&args).unwrap(),
+            BudgetCommand::ReserveLaunch {
+                dry_run: true,
+                out: None,
+                create_ledger: false,
+                ..
+            }
+        ));
+        let mut args = base.to_vec();
+        args.extend_from_slice(&["--out", "reservation.json", "--create-ledger"]);
+        assert!(matches!(
+            parse_budget_test_args(&args).unwrap(),
+            BudgetCommand::ReserveLaunch {
+                dry_run: false,
+                out: Some(_),
+                create_ledger: true,
+                ..
+            }
+        ));
+        assert!(parse_budget_test_args(&[
+            "test",
+            "budget",
+            "bind-launch",
+            "--policy",
+            "policy.json",
+            "--ledger",
+            "campaign.sqlite",
+            "--binding",
+            "binding.json",
+            "--out",
+            "grant.json",
+            "--create-ledger",
+        ])
+        .is_err());
+        // Direct native callers cannot bypass clap's read-only constraints.
+        let invalid = BudgetCommand::ReserveLaunch {
+            policy: PathBuf::from("not-read-policy.json"),
+            ledger: PathBuf::from("not-created-ledger.sqlite"),
+            request: PathBuf::from("not-read-request.json"),
+            dry_run: true,
+            out: Some(PathBuf::from("not-written-reservation.json")),
+            create_ledger: false,
+        };
+        assert!(run_budget_command(&invalid)
+            .unwrap_err()
+            .contains("conflicts"));
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn launch_cli_preserves_binding_origin_and_reexports_identical_receipts() {
+        let temp = TempRun::new();
+        let (policy, direct) = budget::test_policy_request(&temp.0);
+        let request = LaunchRequest {
+            schema: budget::LAUNCH_REQUEST_SCHEMA.into(),
+            launch_id: direct.grant_id.clone(),
+            target: budget::LaunchTarget {
+                cluster_identity: "arn:aws:eks:us-east-2:104186811093:cluster/offline-test".into(),
+                namespace: "isolab".into(),
+                job_name: "offline-launch-test".into(),
+            },
+            worker_journal_path: direct.worker_journal_path.clone(),
+            binding: direct.binding.clone(),
+            expires_unix_seconds: direct.expires_unix_seconds,
+            resource_envelope_sha256: direct.resource_envelope_sha256.clone(),
+            resources: direct.resources.clone(),
+            finalization: direct.finalization.clone(),
+            credential_role_arn: direct.credential_role_arn.clone(),
+        };
+        let policy_path = temp.0.join("policy.json");
+        let request_path = temp.0.join("launch-request.json");
+        let direct_path = temp.0.join("direct-request.json");
+        let ledger_path = temp.0.join("campaign.sqlite");
+        let reservation_path = temp.0.join("reservation.json");
+        fs::write(&policy_path, serde_json::to_vec(&policy).unwrap()).unwrap();
+        fs::write(&request_path, serde_json::to_vec(&request).unwrap()).unwrap();
+        fs::write(&direct_path, serde_json::to_vec(&direct).unwrap()).unwrap();
+        let reserved = run_budget_command(
+            &parse_budget_test_args(&[
+                "test",
+                "budget",
+                "reserve-launch",
+                "--policy",
+                policy_path.to_str().unwrap(),
+                "--ledger",
+                ledger_path.to_str().unwrap(),
+                "--request",
+                request_path.to_str().unwrap(),
+                "--out",
+                reservation_path.to_str().unwrap(),
+                "--create-ledger",
+            ])
+            .unwrap(),
+        )
+        .unwrap();
+        let reservation: budget::LaunchReservation = read_json(&reservation_path).unwrap();
+        assert_eq!(
+            reserved["reservation_sha256"],
+            reservation.sha256().unwrap()
+        );
+        assert_ne!(
+            reserved["reservation_sha256"],
+            reserved["artifact"]["sha256"]
+        );
+        assert_eq!(reserved["campaign"]["pending_launch_count"], 1);
+        assert_eq!(reserved["cloud_requests"], 0);
+        assert_eq!(reserved["worker_grant_issued"], false);
+        let direct_out = temp.0.join("must-not-issue-direct.json");
+        let reject_direct = || {
+            let before = crate::store::hash_file(&ledger_path).unwrap();
+            let error = run_budget_command(&BudgetCommand::Reserve {
+                policy: policy_path.clone(),
+                ledger: ledger_path.clone(),
+                request: direct_path.clone(),
+                out: direct_out.clone(),
+                create_ledger: false,
+            })
+            .unwrap_err();
+            assert!(error.contains("use bind-launch"), "{error}");
+            assert!(!direct_out.exists());
+            assert_eq!(crate::store::hash_file(&ledger_path).unwrap(), before);
+        };
+        reject_direct();
+        let binding = LaunchBinding {
+            schema: budget::LAUNCH_BINDING_SCHEMA.into(),
+            launch_id: request.launch_id,
+            reservation_sha256: reservation.sha256().unwrap(),
+            observed_target: request.target,
+            owner: direct.owner,
+            observation_evidence_sha256: "e".repeat(64),
+        };
+        let binding_path = temp.0.join("binding.json");
+        let grant_path = temp.0.join("grant.json");
+        fs::write(&binding_path, serde_json::to_vec(&binding).unwrap()).unwrap();
+        let bind = parse_budget_test_args(&[
+            "test",
+            "budget",
+            "bind-launch",
+            "--policy",
+            policy_path.to_str().unwrap(),
+            "--ledger",
+            ledger_path.to_str().unwrap(),
+            "--binding",
+            binding_path.to_str().unwrap(),
+            "--out",
+            grant_path.to_str().unwrap(),
+        ])
+        .unwrap();
+        let bound = run_budget_command(&bind).unwrap();
+        assert_eq!(
+            bound["grant"]["schema"],
+            "crypto.ml-dataset.budget-grant/v1"
+        );
+        assert_eq!(bound["campaign"]["bound_launch_count"], 1);
+        assert_eq!(bound["campaign"]["pending_launch_count"], 0);
+        assert_eq!(bound["binding"], serde_json::to_value(&binding).unwrap());
+        assert_eq!(
+            reserved["campaign"]["prior_and_allocated"],
+            bound["campaign"]["prior_and_allocated"]
+        );
+        // Even an exact v1 grant request must retain its launch route and evidence.
+        assert_eq!(
+            bound["grant"]["request"],
+            read_json::<Value>(&direct_path).unwrap()
+        );
+        reject_direct();
+        let before = crate::store::hash_file(&ledger_path).unwrap();
+        let again = run_budget_command(&bind).unwrap();
+        assert_eq!(again, bound);
+        assert_eq!(crate::store::hash_file(&ledger_path).unwrap(), before);
+        let written: WorkerGrant = read_json(&grant_path).unwrap();
+        assert_eq!(bound["grant_sha256"], written.sha256().unwrap());
+        assert_ne!(bound["grant_sha256"], bound["artifact"]["sha256"]);
+        assert_eq!(serde_json::to_value(written).unwrap(), bound["grant"]);
+    }
+
     #[cfg(target_os = "linux")]
     #[test]
     fn budget_cli_dry_admission_is_read_only_and_reserve_reexports_same_grant() {

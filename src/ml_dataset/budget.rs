@@ -10,7 +10,7 @@
 use rusqlite::{params, Connection, OpenFlags, OptionalExtension, TransactionBehavior};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File, OpenOptions};
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -19,6 +19,9 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 pub const POLICY_SCHEMA: &str = "crypto.ml-dataset.budget-policy/v1";
 pub const GRANT_SCHEMA: &str = "crypto.ml-dataset.budget-grant/v1";
+pub const LAUNCH_REQUEST_SCHEMA: &str = "crypto.ml-dataset.budget-launch-request/v1";
+pub const LAUNCH_RESERVATION_SCHEMA: &str = "crypto.ml-dataset.budget-launch-reservation/v1";
+pub const LAUNCH_BINDING_SCHEMA: &str = "crypto.ml-dataset.budget-launch-binding/v1";
 const STATE_MAX_BYTES: usize = 32 * 1024 * 1024;
 const MAX_GRANTS: usize = 4096;
 const MONEY_CEILING: u64 = 200_000_000;
@@ -185,6 +188,69 @@ pub struct WorkerGrant {
     pub activation_key: String,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(deny_unknown_fields)]
+pub struct LaunchTarget {
+    pub cluster_identity: String,
+    pub namespace: String,
+    pub job_name: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct LaunchRequest {
+    pub schema: String,
+    /// This is also the eventual worker grant ID; there is no second balance ID.
+    pub launch_id: String,
+    pub target: LaunchTarget,
+    pub worker_journal_path: String,
+    pub binding: RunBinding,
+    pub expires_unix_seconds: u64,
+    pub resource_envelope_sha256: String,
+    pub resources: Resources,
+    pub finalization: Resources,
+    #[serde(default)]
+    pub credential_role_arn: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct LaunchReservation {
+    pub schema: String,
+    pub campaign_id: String,
+    pub policy_sha256: String,
+    pub request: LaunchRequest,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct LaunchBinding {
+    pub schema: String,
+    pub launch_id: String,
+    pub reservation_sha256: String,
+    pub observed_target: LaunchTarget,
+    pub owner: OwnerIdentity,
+    /// Identity of retained external observations, not Kubernetes attestation.
+    pub observation_evidence_sha256: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct LaunchAdmissionReport {
+    pub schema: String,
+    pub admitted: bool,
+    pub dry_run: bool,
+    pub reasons: Vec<String>,
+    pub policy_sha256: String,
+    pub prior_and_allocated: Resources,
+    pub requested: Resources,
+    pub additional_requested: Resources,
+    pub remaining: Option<Resources>,
+    pub existing_reservation_sha256: Option<String>,
+    pub already_bound: bool,
+    pub account_wide_billing_cutoff: bool,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct AdmissionReport {
@@ -269,6 +335,16 @@ pub struct CellReservation {
 struct CampaignState {
     policy: CampaignPolicy,
     grants: BTreeMap<String, WorkerGrant>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    launches: BTreeMap<String, LaunchRecord>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LaunchRecord {
+    reservation: LaunchReservation,
+    /// Permanent once present. Expiration and failures do not release a target.
+    binding: Option<LaunchBinding>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -301,6 +377,10 @@ pub struct BudgetSession {
 }
 
 fn now() -> Result<u64, String> {
+    #[cfg(all(test, target_os = "linux"))]
+    if let Some(value) = tests::CLOCK.with(std::cell::Cell::get) {
+        return Ok(value);
+    }
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_secs())
@@ -516,10 +596,23 @@ impl CampaignPolicy {
     }
 }
 
-impl GrantRequest {
-    fn validate(&self, policy: &CampaignPolicy) -> Result<(), String> {
-        identifier(&self.grant_id)?;
-        let journal = Path::new(&self.worker_journal_path);
+/// Borrowed common fields keep pending allocations ownerless. Historical checks
+/// use the same structural rules without turning expiry into a quota refund.
+struct GrantEnvelope<'a> {
+    id: &'a str,
+    worker_journal_path: &'a str,
+    binding: &'a RunBinding,
+    expires_unix_seconds: u64,
+    resource_envelope_sha256: &'a str,
+    resources: &'a Resources,
+    finalization: &'a Resources,
+    credential_role_arn: Option<&'a str>,
+}
+
+impl GrantEnvelope<'_> {
+    fn validate(&self, policy: &CampaignPolicy, live: bool) -> Result<(), String> {
+        identifier(self.id)?;
+        let journal = Path::new(self.worker_journal_path);
         if !journal.is_absolute()
             || journal
                 .components()
@@ -527,8 +620,6 @@ impl GrantRequest {
         {
             return Err("grant must bind the exact absolute worker journal path".into());
         }
-        identifier(&self.owner.job_uid)?;
-        identifier(&self.owner.pod_uid)?;
         if self.binding.source_commit.len() != 40
             || !self
                 .binding
@@ -551,14 +642,15 @@ impl GrantRequest {
         if self.resource_envelope_sha256 != policy.resource_envelope_sha256 {
             return Err("grant resource envelope differs from priced actual resources".into());
         }
-        if self.expires_unix_seconds <= now()?
+        if self.expires_unix_seconds == 0
+            || (live && self.expires_unix_seconds <= now()?)
             || self.expires_unix_seconds > policy.deadline_unix_seconds
         {
             return Err("grant deadline is expired or extends the original campaign".into());
         }
         self.resources.sqlite_safe()?;
         self.finalization.sqlite_safe()?;
-        self.resources.checked_sub(&self.finalization)?;
+        self.resources.checked_sub(self.finalization)?;
         if self.resources.money_micro_usd < policy.compute_floor_micro_usd()? {
             return Err(
                 "grant money is below the conservative actual resource lifetime price".into(),
@@ -575,7 +667,7 @@ impl GrantRequest {
                     .into(),
             );
         }
-        if let Some(role) = &self.credential_role_arn {
+        if let Some(role) = self.credential_role_arn {
             let parts: Vec<_> = role.splitn(6, ':').collect();
             if parts.len() != 6
                 || parts[0] != "arn"
@@ -601,6 +693,156 @@ impl GrantRequest {
         }
         Ok(())
     }
+}
+
+impl GrantRequest {
+    fn envelope(&self) -> GrantEnvelope<'_> {
+        GrantEnvelope {
+            id: &self.grant_id,
+            worker_journal_path: &self.worker_journal_path,
+            binding: &self.binding,
+            expires_unix_seconds: self.expires_unix_seconds,
+            resource_envelope_sha256: &self.resource_envelope_sha256,
+            resources: &self.resources,
+            finalization: &self.finalization,
+            credential_role_arn: self.credential_role_arn.as_deref(),
+        }
+    }
+
+    fn validate(&self, policy: &CampaignPolicy) -> Result<(), String> {
+        identifier(&self.owner.job_uid)?;
+        identifier(&self.owner.pod_uid)?;
+        self.envelope().validate(policy, true)
+    }
+}
+
+impl LaunchTarget {
+    fn validate(&self, policy: &CampaignPolicy) -> Result<(), String> {
+        let parts: Vec<_> = self.cluster_identity.splitn(6, ':').collect();
+        if parts.len() != 6
+            || parts[0] != "arn"
+            || parts[1] != "aws"
+            || parts[2] != "eks"
+            || parts[3] != policy.region
+            || parts[4].len() != 12
+            || !parts[4].bytes().all(|b| b.is_ascii_digit())
+        {
+            return Err(
+                "launch target requires an exact EKS cluster ARN in the admitted region".into(),
+            );
+        }
+        let name = parts[5]
+            .strip_prefix("cluster/")
+            .ok_or("launch target requires an EKS cluster ARN")?;
+        if name.is_empty()
+            || name.len() > 100
+            || !name.as_bytes()[0].is_ascii_alphanumeric()
+            || !name
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b"_-".contains(&b))
+        {
+            return Err("invalid bounded EKS cluster name".into());
+        }
+        for label in [&self.namespace, &self.job_name] {
+            if label.is_empty()
+                || label.len() > 63
+                || !label.as_bytes()[0].is_ascii_alphanumeric()
+                || !label.as_bytes()[label.len() - 1].is_ascii_alphanumeric()
+                || !label
+                    .bytes()
+                    .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+            {
+                return Err(
+                    "launch namespace and Job name must be bounded lowercase DNS labels".into(),
+                );
+            }
+        }
+        Ok(())
+    }
+}
+
+impl LaunchRequest {
+    fn envelope(&self) -> GrantEnvelope<'_> {
+        GrantEnvelope {
+            id: &self.launch_id,
+            worker_journal_path: &self.worker_journal_path,
+            binding: &self.binding,
+            expires_unix_seconds: self.expires_unix_seconds,
+            resource_envelope_sha256: &self.resource_envelope_sha256,
+            resources: &self.resources,
+            finalization: &self.finalization,
+            credential_role_arn: self.credential_role_arn.as_deref(),
+        }
+    }
+
+    fn validate(&self, policy: &CampaignPolicy, live: bool) -> Result<(), String> {
+        if self.schema != LAUNCH_REQUEST_SCHEMA {
+            return Err("unsupported budget launch request schema".into());
+        }
+        self.target.validate(policy)?;
+        self.envelope().validate(policy, live)
+    }
+
+    fn with_owner(&self, owner: &OwnerIdentity) -> GrantRequest {
+        GrantRequest {
+            grant_id: self.launch_id.clone(),
+            worker_journal_path: self.worker_journal_path.clone(),
+            owner: owner.clone(),
+            binding: self.binding.clone(),
+            expires_unix_seconds: self.expires_unix_seconds,
+            resource_envelope_sha256: self.resource_envelope_sha256.clone(),
+            resources: self.resources.clone(),
+            finalization: self.finalization.clone(),
+            credential_role_arn: self.credential_role_arn.clone(),
+        }
+    }
+}
+
+impl LaunchReservation {
+    pub fn sha256(&self) -> Result<String, String> {
+        hash(self)
+    }
+
+    fn validate(&self, policy: &CampaignPolicy) -> Result<(), String> {
+        if self.schema != LAUNCH_RESERVATION_SCHEMA
+            || self.campaign_id != policy.campaign_id
+            || self.policy_sha256 != policy.sha256()?
+        {
+            return Err("launch reservation differs from frozen campaign".into());
+        }
+        self.request.validate(policy, false)
+    }
+}
+
+impl LaunchBinding {
+    fn validate(&self, reservation: &LaunchReservation) -> Result<(), String> {
+        if self.schema != LAUNCH_BINDING_SCHEMA
+            || self.launch_id != reservation.request.launch_id
+            || self.reservation_sha256 != reservation.sha256()?
+            || self.observed_target != reservation.request.target
+        {
+            return Err("launch binding differs from the reserved target or digest".into());
+        }
+        identifier(&self.owner.job_uid)?;
+        identifier(&self.owner.pod_uid)?;
+        sha(&self.observation_evidence_sha256)
+    }
+}
+
+fn worker_grant(policy: &CampaignPolicy, request: &GrantRequest) -> Result<WorkerGrant, String> {
+    Ok(WorkerGrant {
+        schema: GRANT_SCHEMA.into(),
+        campaign_id: policy.campaign_id.clone(),
+        policy_sha256: policy.sha256()?,
+        request: request.clone(),
+        activation_bucket: "setec-astronomy-artifacts".into(),
+        activation_key: format!(
+            "{}activations/{}/{}.json",
+            policy.coordination_prefix,
+            policy.campaign_id,
+            hash(&request.grant_id)?
+        ),
+    })
 }
 
 impl WorkerGrant {
@@ -792,12 +1034,75 @@ fn verify_events(conn: &Connection) -> Result<(), String> {
 }
 
 fn allocated(state: &CampaignState) -> Result<Resources, String> {
-    state
+    validate_launches(state)?;
+    let grants = state
         .grants
         .values()
         .try_fold(state.policy.prior.clone(), |sum, g| {
             sum.checked_add(&g.request.resources)
+        })?;
+    state
+        .launches
+        .values()
+        .filter(|record| record.binding.is_none())
+        .try_fold(grants, |sum, record| {
+            sum.checked_add(&record.reservation.request.resources)
         })
+}
+
+fn allocation_slots(state: &CampaignState) -> Result<usize, String> {
+    state
+        .grants
+        .len()
+        .checked_add(
+            state
+                .launches
+                .values()
+                .filter(|record| record.binding.is_none())
+                .count(),
+        )
+        .ok_or_else(|| "campaign allocation count overflow".into())
+}
+
+fn validate_launches(state: &CampaignState) -> Result<(), String> {
+    if allocation_slots(state)? > MAX_GRANTS {
+        return Err("maximum campaign allocation count exceeded".into());
+    }
+    let mut targets = BTreeSet::new();
+    for (id, record) in &state.launches {
+        let reservation = &record.reservation;
+        if id != &reservation.request.launch_id {
+            return Err("launch map key differs from its reserved ID".into());
+        }
+        reservation.validate(&state.policy)?;
+        if !targets.insert(&reservation.request.target) {
+            return Err("multiple allocations occupy the same launch target".into());
+        }
+        match &record.binding {
+            None if state.grants.contains_key(id) => {
+                return Err("pending launch also has a worker grant".into());
+            }
+            None => {}
+            Some(binding) => {
+                binding.validate(reservation)?;
+                let expected = worker_grant(
+                    &state.policy,
+                    &reservation.request.with_owner(&binding.owner),
+                )?;
+                if state.grants.get(id) != Some(&expected) {
+                    return Err("bound launch is missing its exact worker grant".into());
+                }
+                if state.grants.iter().any(|(other_id, grant)| {
+                    other_id != id
+                        && (grant.request.owner.job_uid == binding.owner.job_uid
+                            || grant.request.owner.pod_uid == binding.owner.pod_uid)
+                }) {
+                    return Err("bound launch owner also has another allocation".into());
+                }
+            }
+        }
+    }
+    Ok(())
 }
 
 fn admission(
@@ -813,8 +1118,11 @@ fn admission(
     if let Err(e) = request.validate(&state.policy) {
         reasons.push(e);
     }
-    if state.grants.len() >= MAX_GRANTS {
+    if allocation_slots(state)? >= MAX_GRANTS {
         reasons.push("maximum campaign grant count reached".into());
+    }
+    if state.launches.contains_key(&request.grant_id) {
+        reasons.push("grant ID belongs to a retained launch reservation; use bind-launch".into());
     }
     if state.grants.contains_key(&request.grant_id) {
         reasons.push("grant ID already issued; resume its existing allocation".into());
@@ -825,6 +1133,17 @@ fn admission(
         .any(|g| g.request.owner == request.owner)
     {
         reasons.push("owner already has a grant; do not issue a second balance".into());
+    }
+    if state.launches.values().any(|record| {
+        record.binding.as_ref().is_some_and(|binding| {
+            binding.owner.job_uid == request.owner.job_uid
+                || binding.owner.pod_uid == request.owner.pod_uid
+        })
+    }) {
+        reasons.push(
+            "owner belongs to a retained launch; replacement balances require reconciliation"
+                .into(),
+        );
     }
     let remaining = sum
         .checked_add(&request.resources)
@@ -841,6 +1160,73 @@ fn admission(
         prior_and_allocated: sum,
         requested: request.resources.clone(),
         remaining: remaining.ok(),
+        account_wide_billing_cutoff: false,
+    })
+}
+
+fn launch_admission(
+    state: &CampaignState,
+    request: &LaunchRequest,
+    dry_run: bool,
+) -> Result<LaunchAdmissionReport, String> {
+    let sum = allocated(state)?;
+    let mut reasons = Vec::new();
+    if let Err(e) = state.policy.validate() {
+        reasons.push(e);
+    }
+    if let Err(e) = request.validate(&state.policy, true) {
+        reasons.push(e);
+    }
+    let mut additional = request.resources.clone();
+    let mut existing = None;
+    let mut already_bound = false;
+    match state.launches.get(&request.launch_id) {
+        Some(record) if record.reservation.request == *request => {
+            additional = Resources::default();
+            existing = Some(record.reservation.sha256()?);
+            already_bound = record.binding.is_some();
+            if already_bound {
+                reasons.push(
+                    "launch already bound; exact retry may export its existing evidence only"
+                        .into(),
+                );
+            }
+        }
+        Some(_) => reasons.push("launch ID cannot be repointed to a different request".into()),
+        None => {
+            if state.grants.contains_key(&request.launch_id) {
+                reasons.push("launch ID already belongs to a direct worker grant".into());
+            }
+            if state
+                .launches
+                .values()
+                .any(|record| record.reservation.request.target == request.target)
+            {
+                reasons.push("launch target already has a retained allocation".into());
+            }
+            if allocation_slots(state)? >= MAX_GRANTS {
+                reasons.push("maximum campaign allocation count reached".into());
+            }
+        }
+    }
+    let remaining = sum
+        .checked_add(&additional)
+        .and_then(|value| state.policy.caps.checked_sub(&value));
+    if let Err(e) = &remaining {
+        reasons.push(e.clone());
+    }
+    Ok(LaunchAdmissionReport {
+        schema: "crypto.ml-dataset.budget-launch-admission/v1".into(),
+        admitted: reasons.is_empty(),
+        dry_run,
+        reasons,
+        policy_sha256: state.policy.sha256()?,
+        prior_and_allocated: sum,
+        requested: request.resources.clone(),
+        additional_requested: additional,
+        remaining: remaining.ok(),
+        existing_reservation_sha256: existing,
+        already_bound,
         account_wide_billing_cutoff: false,
     })
 }
@@ -915,6 +1301,7 @@ impl CampaignLedger {
             &CampaignState {
                 policy: policy.clone(),
                 grants: BTreeMap::new(),
+                launches: BTreeMap::new(),
             },
         )?;
         event(
@@ -952,6 +1339,10 @@ impl CampaignLedger {
         policy: &CampaignPolicy,
         request: &GrantRequest,
     ) -> Result<AdmissionReport, String> {
+        admission(&Self::dry_state(path, policy)?, request, true)
+    }
+
+    fn dry_state(path: &Path, policy: &CampaignPolicy) -> Result<CampaignState, String> {
         Self::authority(path, policy)?;
         let state = match fs::symlink_metadata(path) {
             Ok(_) => {
@@ -973,11 +1364,21 @@ impl CampaignLedger {
                 CampaignState {
                     policy: policy.clone(),
                     grants: BTreeMap::new(),
+                    launches: BTreeMap::new(),
                 }
             }
             Err(e) => return Err(e.to_string()),
         };
-        admission(&state, request, true)
+        Ok(state)
+    }
+
+    /// Pure read-only admission; an exact retry requests no additional capacity.
+    pub fn dry_admit_launch(
+        path: &Path,
+        policy: &CampaignPolicy,
+        request: &LaunchRequest,
+    ) -> Result<LaunchAdmissionReport, String> {
+        launch_admission(&Self::dry_state(path, policy)?, request, true)
     }
 
     pub fn reserve(&self, request: &GrantRequest) -> Result<WorkerGrant, String> {
@@ -999,22 +1400,129 @@ impl CampaignLedger {
                 report.reasons.join("; ")
             ));
         }
-        let grant = WorkerGrant {
-            schema: GRANT_SCHEMA.into(),
-            campaign_id: self.policy.campaign_id.clone(),
-            policy_sha256: self.policy.sha256()?,
-            request: request.clone(),
-            activation_bucket: "setec-astronomy-artifacts".into(),
-            activation_key: format!(
-                "{}activations/{}/{}.json",
-                self.policy.coordination_prefix,
-                self.policy.campaign_id,
-                hash(&request.grant_id)?
-            ),
-        };
+        let grant = worker_grant(&self.policy, request)?;
         state.grants.insert(request.grant_id.clone(), grant.clone());
         write_state(&tx, "campaign", &state)?;
         event(&tx, "grant_reserved", json!({"grant":grant}))?;
+        tx.commit().map_err(|e| e.to_string())?;
+        Ok(grant)
+    }
+
+    /// Commit the complete finite allocation before any external Job submission.
+    /// Exact retries export the retained record, even after expiry; they never
+    /// authorize another submission or renew its original deadline.
+    pub fn reserve_launch(&self, request: &LaunchRequest) -> Result<LaunchReservation, String> {
+        let mut conn = self
+            .connection
+            .lock()
+            .map_err(|_| "poisoned campaign ledger")?;
+        let tx = conn
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|e| e.to_string())?;
+        let mut state: CampaignState = read_state(&tx, "campaign")?;
+        if state.policy != self.policy {
+            return Err("campaign binding changed".into());
+        }
+        self.policy.caps.checked_sub(&allocated(&state)?)?;
+        if let Some(record) = state.launches.get(&request.launch_id) {
+            if record.reservation.request != *request {
+                return Err("launch ID cannot be repointed to a different request".into());
+            }
+            return Ok(record.reservation.clone());
+        }
+        let report = launch_admission(&state, request, false)?;
+        if !report.admitted {
+            return Err(format!(
+                "launch budget admission rejected: {}",
+                report.reasons.join("; ")
+            ));
+        }
+        let reservation = LaunchReservation {
+            schema: LAUNCH_RESERVATION_SCHEMA.into(),
+            campaign_id: self.policy.campaign_id.clone(),
+            policy_sha256: self.policy.sha256()?,
+            request: request.clone(),
+        };
+        state.launches.insert(
+            request.launch_id.clone(),
+            LaunchRecord {
+                reservation: reservation.clone(),
+                binding: None,
+            },
+        );
+        self.policy.caps.checked_sub(&allocated(&state)?)?;
+        write_state(&tx, "campaign", &state)?;
+        event(&tx, "launch_reserved", json!({"reservation":reservation}))?;
+        tx.commit().map_err(|e| e.to_string())?;
+        Ok(reservation)
+    }
+
+    /// Bind one retained allocation once. External observations are pinned by
+    /// digest; this method does not query or attest Kubernetes owner identities.
+    pub fn bind_launch(&self, binding: &LaunchBinding) -> Result<WorkerGrant, String> {
+        let mut conn = self
+            .connection
+            .lock()
+            .map_err(|_| "poisoned campaign ledger")?;
+        let tx = conn
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|e| e.to_string())?;
+        let mut state: CampaignState = read_state(&tx, "campaign")?;
+        if state.policy != self.policy {
+            return Err("campaign binding changed".into());
+        }
+        let before = allocated(&state)?;
+        self.policy.caps.checked_sub(&before)?;
+        let record = state
+            .launches
+            .get(&binding.launch_id)
+            .ok_or("launch reservation missing; binding cannot create an allocation")?
+            .clone();
+        binding.validate(&record.reservation)?;
+        if let Some(previous) = &record.binding {
+            if previous != binding {
+                return Err(
+                    "launch already bound; owner and observation evidence cannot change".into(),
+                );
+            }
+            return state
+                .grants
+                .get(&binding.launch_id)
+                .cloned()
+                .ok_or_else(|| "bound launch worker grant missing".into());
+        }
+        self.policy.validate()?;
+        record.reservation.request.validate(&self.policy, true)?;
+        if state.grants.values().any(|grant| {
+            grant.request.owner.job_uid == binding.owner.job_uid
+                || grant.request.owner.pod_uid == binding.owner.pod_uid
+        }) {
+            return Err(
+                "observed Job or Pod already has a grant; do not issue another balance".into(),
+            );
+        }
+        let grant = worker_grant(
+            &self.policy,
+            &record.reservation.request.with_owner(&binding.owner),
+        )?;
+        grant.validate(&self.policy)?;
+        state
+            .grants
+            .insert(binding.launch_id.clone(), grant.clone());
+        state
+            .launches
+            .get_mut(&binding.launch_id)
+            .ok_or("launch reservation disappeared")?
+            .binding = Some(binding.clone());
+        if allocated(&state)? != before {
+            return Err("launch binding changed total allocation".into());
+        }
+        write_state(&tx, "campaign", &state)?;
+        event(
+            &tx,
+            "launch_bound",
+            json!({"binding":binding,"grant_sha256":grant.sha256()?}),
+        )?;
         tx.commit().map_err(|e| e.to_string())?;
         Ok(grant)
     }
@@ -1026,8 +1534,18 @@ impl CampaignLedger {
             .map_err(|_| "poisoned campaign ledger")?;
         let state: CampaignState = read_state(&conn, "campaign")?;
         let sum = allocated(&state)?;
+        let pending: Vec<_> = state
+            .launches
+            .values()
+            .filter(|record| record.binding.is_none())
+            .collect();
+        let pending_resources = pending
+            .iter()
+            .try_fold(Resources::default(), |sum, record| {
+                sum.checked_add(&record.reservation.request.resources)
+            })?;
         Ok(
-            json!({"schema":"crypto.ml-dataset.budget-campaign-status/v1","policy_sha256":state.policy.sha256()?,"prior_and_allocated":sum,"remaining":state.policy.caps.checked_sub(&sum)?,"grants":state.grants,"automatic_refunds":false,"account_wide_billing_cutoff":false,"total_allocator_directory_loss_safe":false,"allocator_authority_state_must_be_retained":true,"automatic_allocator_recovery_supported":false}),
+            json!({"schema":"crypto.ml-dataset.budget-campaign-status/v1","policy_sha256":state.policy.sha256()?,"prior_and_allocated":sum,"remaining":state.policy.caps.checked_sub(&sum)?,"grants":state.grants,"launches":state.launches,"pending_launch_count":pending.len(),"bound_launch_count":state.launches.len()-pending.len(),"pending_launch_resources":pending_resources,"automatic_refunds":false,"account_wide_billing_cutoff":false,"total_allocator_directory_loss_safe":false,"allocator_authority_state_must_be_retained":true,"automatic_allocator_recovery_supported":false}),
         )
     }
 }
@@ -1973,10 +2491,27 @@ pub(super) fn test_policy_request(root: &Path) -> (CampaignPolicy, GrantRequest)
 #[cfg(all(test, target_os = "linux"))]
 mod tests {
     use super::*;
+    use std::cell::Cell;
     use std::sync::{
         atomic::{AtomicU64, Ordering},
         Arc, Barrier,
     };
+
+    thread_local! {
+        pub(super) static CLOCK: Cell<Option<u64>> = const { Cell::new(None) };
+    }
+
+    struct ClockGuard(Option<u64>);
+    impl ClockGuard {
+        fn at(timestamp: u64) -> Self {
+            Self(CLOCK.replace(Some(timestamp)))
+        }
+    }
+    impl Drop for ClockGuard {
+        fn drop(&mut self) {
+            CLOCK.set(self.0);
+        }
+    }
 
     struct Temp(PathBuf);
     impl Temp {
@@ -2007,6 +2542,572 @@ mod tests {
             CampaignLedger::create(Path::new(&policy.allocator_ledger_path), &policy).unwrap();
         let grant = ledger.reserve(&request).unwrap();
         (policy, grant)
+    }
+
+    fn launch_request(request: &GrantRequest) -> LaunchRequest {
+        LaunchRequest {
+            schema: LAUNCH_REQUEST_SCHEMA.into(),
+            launch_id: request.grant_id.clone(),
+            target: LaunchTarget {
+                cluster_identity: "arn:aws:eks:us-east-2:123456789012:cluster/software-test".into(),
+                namespace: "isolab".into(),
+                job_name: "software-only-launch".into(),
+            },
+            worker_journal_path: request.worker_journal_path.clone(),
+            binding: request.binding.clone(),
+            expires_unix_seconds: request.expires_unix_seconds,
+            resource_envelope_sha256: request.resource_envelope_sha256.clone(),
+            resources: request.resources.clone(),
+            finalization: request.finalization.clone(),
+            credential_role_arn: request.credential_role_arn.clone(),
+        }
+    }
+
+    fn launch_binding(reservation: &LaunchReservation) -> LaunchBinding {
+        LaunchBinding {
+            schema: LAUNCH_BINDING_SCHEMA.into(),
+            launch_id: reservation.request.launch_id.clone(),
+            reservation_sha256: reservation.sha256().unwrap(),
+            observed_target: reservation.request.target.clone(),
+            owner: OwnerIdentity {
+                job_uid: "observed-test-job-uid".into(),
+                pod_uid: "observed-test-pod-uid".into(),
+            },
+            observation_evidence_sha256: "e".repeat(64),
+        }
+    }
+
+    fn events(ledger: &CampaignLedger) -> u64 {
+        ledger
+            .connection
+            .lock()
+            .unwrap()
+            .query_row("SELECT COUNT(*) FROM events", [], |row| row.get(0))
+            .unwrap()
+    }
+
+    #[test]
+    fn launch_dry_admission_preserves_legacy_state_and_never_creates_files() {
+        let temp = Temp::new();
+        let (policy, direct) = test_policy_request(&temp.0);
+        let request = launch_request(&direct);
+        let path = Path::new(&policy.allocator_ledger_path);
+        let report = CampaignLedger::dry_admit_launch(path, &policy, &request).unwrap();
+        assert!(report.admitted && report.dry_run);
+        assert_eq!(report.additional_requested, request.resources);
+        assert_eq!(fs::read_dir(&temp.0).unwrap().count(), 0);
+        let ledger = CampaignLedger::create(path, &policy).unwrap();
+        let raw: String = ledger
+            .connection
+            .lock()
+            .unwrap()
+            .query_row("SELECT json FROM state WHERE id=1", [], |row| row.get(0))
+            .unwrap();
+        assert!(serde_json::from_str::<Value>(&raw)
+            .unwrap()
+            .get("launches")
+            .is_none());
+        let legacy: CampaignState = decode(&raw).unwrap();
+        assert!(legacy.launches.is_empty());
+        assert_eq!(encode(&legacy).unwrap(), raw);
+        let before = fs::read(path).unwrap();
+        let event_count = events(&ledger);
+        assert!(
+            CampaignLedger::dry_admit_launch(path, &policy, &request)
+                .unwrap()
+                .admitted
+        );
+        ledger.snapshot().unwrap();
+        drop(CampaignLedger::open(path, &policy).unwrap());
+        assert_eq!(fs::read(path).unwrap(), before);
+        assert_eq!(events(&ledger), event_count);
+        assert_eq!(fs::read_dir(&temp.0).unwrap().count(), 2);
+        let original_grant = ledger.reserve(&direct).unwrap();
+        assert_eq!(original_grant.request, direct);
+        assert_eq!(original_grant.schema, GRANT_SCHEMA);
+        assert!(
+            !CampaignLedger::dry_admit_launch(path, &policy, &request)
+                .unwrap()
+                .admitted
+        );
+        assert!(ledger.reserve_launch(&request).is_err());
+    }
+
+    #[test]
+    fn launch_binding_preserves_all_resource_coordinates_and_exact_retries() {
+        let temp = Temp::new();
+        let (policy, mut direct) = test_policy_request(&temp.0);
+        let request = launch_request(&direct);
+        let path = Path::new(&policy.allocator_ledger_path);
+        let ledger = CampaignLedger::create(path, &policy).unwrap();
+        let reservation = ledger.reserve_launch(&request).unwrap();
+        let before = ledger.snapshot().unwrap();
+        assert_eq!(before["pending_launch_count"], 1);
+        assert_eq!(before["bound_launch_count"], 0);
+        assert_eq!(before["grants"], json!({}));
+        assert_eq!(events(&ledger), 2);
+        let dry = CampaignLedger::dry_admit_launch(path, &policy, &request).unwrap();
+        assert!(dry.admitted && !dry.already_bound);
+        assert_eq!(dry.additional_requested, Resources::default());
+        assert_eq!(
+            dry.existing_reservation_sha256,
+            Some(reservation.sha256().unwrap())
+        );
+        assert_eq!(ledger.reserve_launch(&request).unwrap(), reservation);
+        assert_eq!(events(&ledger), 2);
+        assert!(ledger.reserve(&direct).is_err());
+        direct.grant_id = "separate-direct-grant".into();
+        let dry_direct = CampaignLedger::dry_admit(path, &policy, &direct).unwrap();
+        assert_eq!(
+            serde_json::to_value(dry_direct.prior_and_allocated).unwrap(),
+            before["prior_and_allocated"]
+        );
+        let binding = launch_binding(&reservation);
+        let grant = ledger.bind_launch(&binding).unwrap();
+        grant.validate(&policy).unwrap();
+        let after = ledger.snapshot().unwrap();
+        assert_eq!(before["prior_and_allocated"], after["prior_and_allocated"]);
+        assert_eq!(before["remaining"], after["remaining"]);
+        assert_eq!(
+            after["pending_launch_resources"],
+            serde_json::to_value(Resources::default()).unwrap()
+        );
+        assert_eq!(after["pending_launch_count"], 0);
+        assert_eq!(after["bound_launch_count"], 1);
+        assert_eq!(grant.request, request.with_owner(&binding.owner));
+        assert_eq!(ledger.bind_launch(&binding).unwrap(), grant);
+        assert_eq!(ledger.reserve_launch(&request).unwrap(), reservation);
+        assert_eq!(events(&ledger), 3);
+        let dry = CampaignLedger::dry_admit_launch(path, &policy, &request).unwrap();
+        assert!(!dry.admitted && dry.already_bound);
+        assert_eq!(dry.additional_requested, Resources::default());
+        direct.owner = binding.owner.clone();
+        direct.owner.pod_uid = "replacement-pod".into();
+        assert!(ledger.reserve(&direct).is_err());
+    }
+
+    #[test]
+    fn launch_expiry_retains_capacity_targets_and_exact_evidence_recovery() {
+        let temp = Temp::new();
+        let (policy, direct) = test_policy_request(&temp.0);
+        let path = Path::new(&policy.allocator_ledger_path);
+        let ledger = CampaignLedger::create(path, &policy).unwrap();
+        let mut request = launch_request(&direct);
+        request.expires_unix_seconds = now().unwrap() + 60;
+        let reservation = ledger.reserve_launch(&request).unwrap();
+        let binding = launch_binding(&reservation);
+        let grant = ledger.bind_launch(&binding).unwrap();
+        let mut pending = request.clone();
+        pending.launch_id = "unknown-submission".into();
+        pending.target.job_name = "unknown-submission".into();
+        let pending_reservation = ledger.reserve_launch(&pending).unwrap();
+        let before = ledger.snapshot().unwrap();
+        let count = events(&ledger);
+        {
+            let _grant_expired = ClockGuard::at(request.expires_unix_seconds + 1);
+            policy.validate().unwrap();
+            assert_eq!(ledger.bind_launch(&binding).unwrap(), grant);
+            assert!(ledger
+                .bind_launch(&launch_binding(&pending_reservation))
+                .is_err());
+            let mut reuse = pending.clone();
+            reuse.launch_id = "reuse-expired-target".into();
+            reuse.expires_unix_seconds = policy.deadline_unix_seconds;
+            assert!(ledger.reserve_launch(&reuse).is_err());
+        }
+        drop(ledger);
+        let _expired = ClockGuard::at(policy.deadline_unix_seconds + 1);
+        assert!(policy.validate().is_err());
+        assert!(grant.validate(&policy).is_err());
+        let ledger = CampaignLedger::open(path, &policy).unwrap();
+        assert_eq!(ledger.bind_launch(&binding).unwrap(), grant);
+        assert_eq!(ledger.reserve_launch(&request).unwrap(), reservation);
+        assert_eq!(
+            ledger.reserve_launch(&pending).unwrap(),
+            pending_reservation
+        );
+        assert!(ledger
+            .bind_launch(&launch_binding(&pending_reservation))
+            .is_err());
+        assert!(
+            !CampaignLedger::dry_admit_launch(path, &policy, &pending)
+                .unwrap()
+                .admitted
+        );
+        let mut reused = pending.clone();
+        reused.launch_id = "new-id-same-expired-target".into();
+        assert!(ledger.reserve_launch(&reused).is_err());
+        assert_eq!(ledger.snapshot().unwrap(), before);
+        assert_eq!(events(&ledger), count);
+    }
+
+    #[test]
+    fn launch_requests_targets_and_observation_bindings_are_immutable() {
+        let temp = Temp::new();
+        let (policy, direct) = test_policy_request(&temp.0);
+        let ledger =
+            CampaignLedger::create(Path::new(&policy.allocator_ledger_path), &policy).unwrap();
+        let request = launch_request(&direct);
+        let reservation = ledger.reserve_launch(&request).unwrap();
+        let mut duplicate = request.clone();
+        duplicate.launch_id = "duplicate-target".into();
+        assert!(ledger.reserve_launch(&duplicate).is_err());
+        let mut changed = request.clone();
+        changed.resources.put_attempts += 1;
+        assert!(ledger.reserve_launch(&changed).is_err());
+        changed = request.clone();
+        changed.target.job_name = "repointed-job".into();
+        assert!(ledger.reserve_launch(&changed).is_err());
+        let binding = launch_binding(&reservation);
+        let before = ledger.snapshot().unwrap();
+        let mut wrong = binding.clone();
+        wrong.reservation_sha256 = "a".repeat(64);
+        assert!(ledger.bind_launch(&wrong).is_err());
+        wrong = binding.clone();
+        wrong.observed_target.job_name = "wrong-job".into();
+        assert!(ledger.bind_launch(&wrong).is_err());
+        assert_eq!(ledger.snapshot().unwrap(), before);
+        ledger.bind_launch(&binding).unwrap();
+        for wrong in [
+            LaunchBinding {
+                owner: OwnerIdentity {
+                    pod_uid: "replacement".into(),
+                    ..binding.owner.clone()
+                },
+                ..binding.clone()
+            },
+            LaunchBinding {
+                observation_evidence_sha256: "f".repeat(64),
+                ..binding.clone()
+            },
+        ] {
+            assert!(ledger.bind_launch(&wrong).is_err());
+        }
+        assert!(ledger.reserve_launch(&duplicate).is_err());
+        assert_eq!(events(&ledger), 3);
+        let mut invalid = request.clone();
+        invalid.target.cluster_identity = "default-context".into();
+        assert!(invalid.validate(&policy, true).is_err());
+        invalid = request.clone();
+        invalid.target.namespace = "Uppercase".into();
+        assert!(invalid.validate(&policy, true).is_err());
+        invalid = request.clone();
+        invalid.target.job_name = "x".repeat(64);
+        assert!(invalid.validate(&policy, true).is_err());
+        let mut extra = serde_json::to_value(&request).unwrap();
+        extra["owner"] = json!({"job_uid":"invented","pod_uid":"invented"});
+        assert!(serde_json::from_value::<LaunchRequest>(extra).is_err());
+        let mut extra = serde_json::to_value(&binding).unwrap();
+        extra["replacement_allowed"] = json!(true);
+        assert!(serde_json::from_value::<LaunchBinding>(extra).is_err());
+    }
+
+    #[test]
+    fn concurrent_launch_and_direct_allocators_share_one_finite_balance() {
+        let temp = Temp::new();
+        let (mut policy, mut direct) = test_policy_request(&temp.0);
+        policy.caps.money_micro_usd = policy.prior.money_micro_usd + 100;
+        direct.resources.money_micro_usd = 60;
+        let mut request = launch_request(&direct);
+        request.launch_id = "launch-racer".into();
+        let path = Path::new(&policy.allocator_ledger_path);
+        let first = CampaignLedger::create(path, &policy).unwrap();
+        let second = CampaignLedger::open(path, &policy).unwrap();
+        let barrier = Arc::new(Barrier::new(2));
+        let ready = barrier.clone();
+        let a = std::thread::spawn(move || {
+            ready.wait();
+            first.reserve_launch(&request).is_ok()
+        });
+        let b = std::thread::spawn(move || {
+            barrier.wait();
+            second.reserve(&direct).is_ok()
+        });
+        assert_eq!(
+            usize::from(a.join().unwrap()) + usize::from(b.join().unwrap()),
+            1
+        );
+        let ledger = CampaignLedger::open(path, &policy).unwrap();
+        assert_eq!(
+            ledger.snapshot().unwrap()["remaining"]["money_micro_usd"],
+            40
+        );
+        assert_eq!(events(&ledger), 2);
+    }
+
+    #[test]
+    fn concurrent_duplicate_targets_and_competing_owner_bindings_have_one_winner() {
+        let temp = Temp::new();
+        let (policy, direct) = test_policy_request(&temp.0);
+        let request = launch_request(&direct);
+        let path = Path::new(&policy.allocator_ledger_path);
+        let first = CampaignLedger::create(path, &policy).unwrap();
+        let second = CampaignLedger::open(path, &policy).unwrap();
+        let barrier = Arc::new(Barrier::new(2));
+        let handles: Vec<_> = [first, second]
+            .into_iter()
+            .enumerate()
+            .map(|(i, ledger)| {
+                let ready = barrier.clone();
+                let mut request = request.clone();
+                request.launch_id = format!("launch-{i}");
+                std::thread::spawn(move || {
+                    ready.wait();
+                    ledger.reserve_launch(&request).ok()
+                })
+            })
+            .collect();
+        let winners: Vec<_> = handles
+            .into_iter()
+            .filter_map(|h| h.join().unwrap())
+            .collect();
+        assert_eq!(winners.len(), 1);
+        let reservation = &winners[0];
+        let barrier = Arc::new(Barrier::new(2));
+        let handles: Vec<_> = (0..2)
+            .map(|i| {
+                let ledger = CampaignLedger::open(path, &policy).unwrap();
+                let ready = barrier.clone();
+                let mut binding = launch_binding(reservation);
+                binding.owner.pod_uid = format!("observed-pod-{i}");
+                std::thread::spawn(move || {
+                    ready.wait();
+                    ledger.bind_launch(&binding).is_ok()
+                })
+            })
+            .collect();
+        assert_eq!(
+            handles
+                .into_iter()
+                .map(|h| usize::from(h.join().unwrap()))
+                .sum::<usize>(),
+            1
+        );
+        let ledger = CampaignLedger::open(path, &policy).unwrap();
+        assert_eq!(events(&ledger), 3);
+        assert_eq!(ledger.snapshot().unwrap()["bound_launch_count"], 1);
+    }
+
+    #[test]
+    fn launch_transaction_rollback_and_lost_export_never_create_a_second_balance() {
+        let temp = Temp::new();
+        let (policy, direct) = test_policy_request(&temp.0);
+        let path = Path::new(&policy.allocator_ledger_path);
+        let ledger = CampaignLedger::create(path, &policy).unwrap();
+        let request = launch_request(&direct);
+        let reservation = ledger.reserve_launch(&request).unwrap();
+        let binding = launch_binding(&reservation);
+        let pending = ledger.snapshot().unwrap();
+        {
+            let mut conn = ledger.connection.lock().unwrap();
+            let tx = conn
+                .transaction_with_behavior(TransactionBehavior::Immediate)
+                .unwrap();
+            let mut state: CampaignState = read_state(&tx, "campaign").unwrap();
+            let grant = worker_grant(&policy, &request.with_owner(&binding.owner)).unwrap();
+            state.grants.insert(request.launch_id.clone(), grant);
+            state.launches.get_mut(&request.launch_id).unwrap().binding = Some(binding.clone());
+            write_state(&tx, "campaign", &state).unwrap();
+            event(&tx, "launch_bound", json!({"binding":binding})).unwrap();
+            // Simulate failure before commit: SQLite drops this complete transition.
+        }
+        assert_eq!(ledger.snapshot().unwrap(), pending);
+        assert_eq!(events(&ledger), 2);
+        let grant = ledger.bind_launch(&binding).unwrap();
+        drop(ledger); // Commit survived, caller's output may have been lost.
+        let ledger = CampaignLedger::open(path, &policy).unwrap();
+        assert_eq!(ledger.reserve_launch(&request).unwrap(), reservation);
+        assert_eq!(ledger.bind_launch(&binding).unwrap(), grant);
+        assert_eq!(events(&ledger), 3);
+        drop(ledger);
+        fs::remove_file(path).unwrap();
+        assert!(CampaignLedger::create(path, &policy).is_err());
+        assert!(CampaignLedger::dry_admit_launch(path, &policy, &request).is_err());
+    }
+
+    #[test]
+    fn launch_integrity_checks_reject_forged_linkage_even_with_valid_journal_hashes() {
+        for pending_with_grant in [false, true] {
+            let temp = Temp::new();
+            let (policy, direct) = test_policy_request(&temp.0);
+            let path = Path::new(&policy.allocator_ledger_path);
+            let ledger = CampaignLedger::create(path, &policy).unwrap();
+            let request = launch_request(&direct);
+            let reservation = ledger.reserve_launch(&request).unwrap();
+            let binding = launch_binding(&reservation);
+            {
+                let mut conn = ledger.connection.lock().unwrap();
+                let tx = conn
+                    .transaction_with_behavior(TransactionBehavior::Immediate)
+                    .unwrap();
+                let mut state: CampaignState = read_state(&tx, "campaign").unwrap();
+                if pending_with_grant {
+                    state.grants.insert(
+                        request.launch_id.clone(),
+                        worker_grant(&policy, &request.with_owner(&binding.owner)).unwrap(),
+                    );
+                } else {
+                    state.launches.get_mut(&request.launch_id).unwrap().binding = Some(binding);
+                }
+                write_state(&tx, "campaign", &state).unwrap();
+                event(&tx, "test_corrupt_linkage", json!({})).unwrap();
+                tx.commit().unwrap();
+                verify_events(&conn).unwrap();
+            }
+            assert!(ledger.snapshot().is_err());
+            assert!(CampaignLedger::open(path, &policy).is_err());
+            assert!(CampaignLedger::dry_admit_launch(path, &policy, &request).is_err());
+        }
+    }
+
+    #[test]
+    fn launch_admission_checks_every_resource_coordinate_and_integer_boundary() {
+        let temp = Temp::new();
+        let (policy, direct) = test_policy_request(&temp.0);
+        let request = launch_request(&direct);
+        let path = Path::new(&policy.allocator_ledger_path);
+        for coordinate in [
+            "money_micro_usd",
+            "output_bytes",
+            "put_attempts",
+            "read_attempts",
+            "download_bytes",
+            "local_bytes",
+        ] {
+            let mut changed = request.clone();
+            let mut resources = serde_json::to_value(&changed.resources).unwrap();
+            resources[coordinate] = json!(
+                serde_json::to_value(&policy.caps).unwrap()[coordinate]
+                    .as_u64()
+                    .unwrap()
+                    + 1
+            );
+            changed.resources = serde_json::from_value(resources).unwrap();
+            let report = CampaignLedger::dry_admit_launch(path, &policy, &changed).unwrap();
+            assert!(!report.admitted, "unbounded coordinate {coordinate}");
+            assert!(report.remaining.is_none());
+            let mut single = serde_json::to_value(Resources::default()).unwrap();
+            single[coordinate] = json!(1);
+            let single: Resources = serde_json::from_value(single).unwrap();
+            let mut maximum = serde_json::to_value(Resources::default()).unwrap();
+            maximum[coordinate] = json!(u64::MAX);
+            let maximum: Resources = serde_json::from_value(maximum).unwrap();
+            assert!(maximum.checked_add(&single).is_err());
+            assert!(Resources::default().checked_sub(&single).is_err());
+        }
+        assert_eq!(fs::read_dir(&temp.0).unwrap().count(), 0);
+    }
+
+    #[test]
+    fn launch_slot_limit_counts_bound_transfers_once_and_refuses_oversized_metadata() {
+        let temp = Temp::new();
+        let (mut policy, direct) = test_policy_request(&temp.0);
+        policy.caps.output_bytes = OUTPUT_CEILING;
+        policy.caps.download_bytes = OUTPUT_CEILING;
+        policy.caps.put_attempts = 100_000;
+        policy.caps.read_attempts = 200_000;
+        policy.validate().unwrap();
+        let mut request = launch_request(&direct);
+        request.resources = Resources {
+            money_micro_usd: 1,
+            output_bytes: 4096,
+            put_attempts: 1,
+            read_attempts: 1,
+            download_bytes: 4096,
+            local_bytes: 0,
+        };
+        request.finalization = Resources {
+            money_micro_usd: 0,
+            ..request.resources.clone()
+        };
+        let mut state = CampaignState {
+            policy: policy.clone(),
+            grants: BTreeMap::new(),
+            launches: BTreeMap::new(),
+        };
+        for i in 0..MAX_GRANTS {
+            let mut request = request.clone();
+            request.launch_id = format!("launch-{i}");
+            request.target.job_name = format!("job-{i}");
+            let reservation = LaunchReservation {
+                schema: LAUNCH_RESERVATION_SCHEMA.into(),
+                campaign_id: policy.campaign_id.clone(),
+                policy_sha256: policy.sha256().unwrap(),
+                request,
+            };
+            state.launches.insert(
+                reservation.request.launch_id.clone(),
+                LaunchRecord {
+                    reservation,
+                    binding: None,
+                },
+            );
+        }
+        let total = allocated(&state).unwrap();
+        assert_eq!(allocation_slots(&state).unwrap(), MAX_GRANTS);
+        assert!(launch_admission(&state, &request, true)
+            .unwrap()
+            .reasons
+            .iter()
+            .any(|r| r.contains("maximum campaign")));
+        assert!(admission(&state, &direct, true)
+            .unwrap()
+            .reasons
+            .iter()
+            .any(|r| r.contains("maximum campaign")));
+        let record = state.launches.get_mut("launch-0").unwrap();
+        let binding = launch_binding(&record.reservation);
+        let grant = worker_grant(
+            &policy,
+            &record.reservation.request.with_owner(&binding.owner),
+        )
+        .unwrap();
+        record.binding = Some(binding);
+        state.grants.insert("launch-0".into(), grant);
+        assert_eq!(allocation_slots(&state).unwrap(), MAX_GRANTS);
+        assert_eq!(allocated(&state).unwrap(), total);
+        let mut extra = state.launches["launch-1"].clone();
+        extra.reservation.request.launch_id = "one-too-many".into();
+        extra.reservation.request.target.job_name = "one-too-many".into();
+        state.launches.insert("one-too-many".into(), extra);
+        assert!(allocated(&state).is_err());
+        drop(state);
+        let path = Path::new(&policy.allocator_ledger_path);
+        let ledger = CampaignLedger::create(path, &policy).unwrap();
+        request.worker_journal_path = format!("/{}", "x".repeat(STATE_MAX_BYTES));
+        let before = ledger.snapshot().unwrap();
+        assert!(ledger
+            .reserve_launch(&request)
+            .unwrap_err()
+            .contains("metadata limit"));
+        assert_eq!(ledger.snapshot().unwrap(), before);
+        assert_eq!(events(&ledger), 1);
+    }
+
+    #[test]
+    fn concurrent_direct_and_pending_requests_cannot_share_the_same_id() {
+        let temp = Temp::new();
+        let (policy, direct) = test_policy_request(&temp.0);
+        let request = launch_request(&direct);
+        let path = Path::new(&policy.allocator_ledger_path);
+        let first = CampaignLedger::create(path, &policy).unwrap();
+        let second = CampaignLedger::open(path, &policy).unwrap();
+        let barrier = Arc::new(Barrier::new(2));
+        let ready = barrier.clone();
+        let a = std::thread::spawn(move || {
+            ready.wait();
+            first.reserve_launch(&request).is_ok()
+        });
+        let b = std::thread::spawn(move || {
+            barrier.wait();
+            second.reserve(&direct).is_ok()
+        });
+        assert_eq!(
+            usize::from(a.join().unwrap()) + usize::from(b.join().unwrap()),
+            1
+        );
+        let ledger = CampaignLedger::open(path, &policy).unwrap();
+        assert_eq!(events(&ledger), 2);
     }
 
     fn session(root: &Path) -> (CampaignPolicy, WorkerGrant, BudgetSession) {
