@@ -18,6 +18,7 @@
 //! | [`spec`] | the experiment spec and its deterministic expansion |
 //! | [`host`] | the host capsule and its environment class |
 //! | [`isolation`] | CPU reservation, eviction, pinning, NUMA binding, kernel counters |
+//! | [`legacy`] | the accounting of the past under which committed records still replay |
 //! | [`record`] | the record, the child protocol, isolation grading |
 //! | [`runner`] | sessions: interleaved measured children, sealed append-only records |
 //! | [`signals`] | interruption: the host is restored and no child outlives the runner |
@@ -58,6 +59,7 @@ pub mod gpu;
 pub mod host;
 pub mod isolab;
 pub mod isolation;
+pub mod legacy;
 pub mod methods;
 pub mod record;
 pub mod resources;

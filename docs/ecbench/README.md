@@ -684,6 +684,32 @@ who rewrites every observation and reseals every hash could forge a
 quieter run. Git history and the replay on another host are the
 witnesses against that, as with ICMS.
 
+**Legacy accounting.** The rule was broken before it was enforced: after
+sessions were recorded, several merges changed what the same
+`ic.pipeline` / `pdp3-koblitz` ids count, and sessions of both
+generations are committed under identical ids and parameters, so the id
+cannot say which accounting a record has. `src/cryptanalysis/ecbench/legacy.rs`
+holds the named profiles of the past; a replay that does not reproduce
+under the current accounting is tried under each in turn and accepted
+only if the **whole** record then reproduces (answer, totals, phases,
+counters, native counters, factor base, unpriced list). The receipt's
+replay detail names the profile (`pre-2043`, `pre-2043-priced`). New
+sessions are recorded and replayed under the current accounting only.
+The changes: #1774 (`c8b1594f6`) priced the qualified F4 word-XOR unit
+by count (before, a wall-priced solver term was taken back out and the
+run was a lower bound); linear harvest on by default (`d1d034d94`,
+`9e69f57ef`) and F6-IC gate-first on by default (`d72e8b04d`) changed the
+F4/F6-IC search and word count; #2043 (`d72e8b04d`) made every aarch64
+host charge the eager rewrite that x86-64 already charged, where before
+it rewrote lazily and charged only the rows read (the Apple-silicon
+records of 2026-10-13/14). The `oracle_setup` descriptors
+`pair_table_kind`, `pair_table_points` and `window_div` were added to
+`pdp3-koblitz`'s set-up counters later; a record without one is compared
+without it. `engine=rootfind-window-negfold` without `window_div` is the
+`⌈|F|/3⌉` window it was before the divisor became a parameter.
+A change of accounting still needs a new id: do not add a profile to
+excuse one.
+
 **Independent runner (isolab).** `ecbench isolab-job` writes an
 `isolab.job/v1` that runs a spec on a lab worker:
 

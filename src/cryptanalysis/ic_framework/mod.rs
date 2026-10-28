@@ -274,7 +274,23 @@ pub struct RunReport {
 /// compare an F4 `S` from before that merge with one after it, or a priced
 /// curve with an unpriced one: `research/f4_pricing_jump_20261018/`.
 fn is_word_xor_op_unit(op_unit: &str) -> bool {
+    if LEGACY_EXACT_WORD_XOR_UNIT.with(|c| c.get()) {
+        return op_unit == "word XORs";
+    }
     op_unit == "word XORs" || op_unit.starts_with("word XORs (")
+}
+
+// Pre-#1774 pricing for committed evidence, set by the replay audit only
+// (`ecbench::legacy`): only the bare `word XORs` unit is priced by count, so
+// a qualified inherited-F4 unit is priced at wall time and taken back out.
+thread_local! {
+    static LEGACY_EXACT_WORD_XOR_UNIT: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Match the bare `word XORs` unit alone, as before #1774; `false` restores
+/// the normal prefix match.
+pub fn set_legacy_exact_word_xor_unit(on: bool) {
+    LEGACY_EXACT_WORD_XOR_UNIT.with(|c| c.set(on));
 }
 
 /// Certify the solved logarithm of one nonzero-coefficient point in each
