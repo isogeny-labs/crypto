@@ -16,7 +16,7 @@ poly bad=jet(good+oneJet^2,256);
 print("QUADRICS27_ACTUAL_SOURCE_POSITIVE_AND_CORRUPTED_CONTROLS");good;bad;
 if(good!=0 || bad!=1){ERROR("source-bound quadratic identity controls failed");}
 proc makeQuadrics27(ideal jets,int count,int precision,int expectedRank,string label){
- list columns;list pivotPolys;list pivotCombinations;list kernel;
+ list columns;list pivotPolys;list pivotCombinations;list quadraticRelations;
  int i;int j;int k;int p;int term;int index;int rank=0;int n=count*(count+1) div 2;
  intmat pairs[n][2];poly value;poly combination;poly residue;
  for(i=1;i<=precision;i++){
@@ -35,19 +35,19 @@ proc makeQuadrics27(ideal jets,int count,int precision,int expectedRank,string l
    value=value+pivotPolys[p];combination=combination+pivotCombinations[p];
   }
   if(value==0){
-   if(deg(combination)!=k){ERROR("quadratic kernel leading-index independence failed");}
-   kernel=insert(kernel,combination,size(kernel));
+   if(deg(combination)!=k){ERROR("quadratic quadraticRelations leading-index independence failed");}
+   quadraticRelations=insert(quadraticRelations,combination,size(quadraticRelations));
   }
   k=k+1;
  }
  }
- print("QUADRICS27_COUNTS "+label+" basis,monomials,rank,kernel");count;n;rank;size(kernel);
- if(k!=n || rank!=expectedRank || rank+size(kernel)!=n){ERROR("quadratic multiplication rank mismatch");}
+ print("QUADRICS27_COUNTS "+label+" basis,monomials,rank,quadraticRelations");count;n;rank;size(quadraticRelations);
+ if(k!=n || rank!=expectedRank || rank+size(quadraticRelations)!=n){ERROR("quadratic multiplication rank mismatch");}
  // Independently recombine from saved original product columns.
- for(i=1;i<=size(kernel);i++){
-  residue=0;combination=kernel[i];
+ for(i=1;i<=size(quadraticRelations);i++){
+  residue=0;combination=quadraticRelations[i];
   for(term=1;term<=size(combination);term++){residue=residue+columns[deg(combination[term])+1];}
-  if(residue!=0){ERROR("quadratic kernel independent recombination failed");}
+  if(residue!=0){ERROR("quadratic quadraticRelations independent recombination failed");}
  }
  for(p=1;p<=precision;p++){
   if(pivotPolys[p]!=0){
@@ -60,8 +60,8 @@ proc makeQuadrics27(ideal jets,int count,int precision,int expectedRank,string l
  link output="ASCII:w "+label+"-quadrics.sing";open(output);
  write(output,"ring "+label+"=2,(x(1.."+string(count)+")),dp;ideal equations;");
  string row;
- for(i=1;i<=size(kernel);i++){
-  row="equations["+string(i)+"]=0";combination=kernel[i];
+ for(i=1;i<=size(quadraticRelations);i++){
+  row="equations["+string(i)+"]=0";combination=quadraticRelations[i];
   for(term=1;term<=size(combination);term++){
    index=deg(combination[term])+1;
    row=row+"+x("+string(pairs[index,1])+")*x("+string(pairs[index,2])+")";
@@ -69,9 +69,9 @@ proc makeQuadrics27(ideal jets,int count,int precision,int expectedRank,string l
   write(output,row+";");
  }
  close(output);
- link certificate="ASCII:w "+label+"-kernel.sing";open(certificate);
+ link certificate="ASCII:w "+label+"-quadraticRelations.sing";open(certificate);
  write(certificate,"ideal kernelVectors;");
- for(i=1;i<=size(kernel);i++){write(certificate,"kernelVectors["+string(i)+"]="+string(kernel[i])+";");}
+ for(i=1;i<=size(quadraticRelations);i++){write(certificate,"kernelVectors["+string(i)+"]="+string(quadraticRelations[i])+";");}
  close(certificate);
  link colfile="ASCII:w "+label+"-products.sing";open(colfile);write(colfile,"ideal productColumns;");
  for(i=1;i<=size(columns);i++){write(colfile,"productColumns["+string(i)+"]="+string(columns[i])+";");}

@@ -341,3 +341,5 @@ Before newtorsion-module compile,include the actual128/64very-ample degree
 bounds,2*129>256 and expected2346/595product counts/2150/497kernels,and
 free-quotient genus/mixed-dimension arithmetic. Newmodule14named theorems,
 combinedwith18previousnamed results; no full curve/rank formalization claim.
+
+QUADRICS01 rejected before multiplication: kernel is a Singular reserved identifier. Actual-source positive/corrupt controls returned0/1; neither target rank accepted. Rename local list quadraticRelations; same inputs, cap and acceptance tests for retry02. Lean04 stopped at checkpoint credential discovery before compilation; retain gate error and use frozen inherited credential wrapper for Lean05.
