@@ -257,3 +257,16 @@ reuses the single native run, giving3actual processes across both exports.
 Two abstract Lean quotient lemmas pass;83canonical model records/34extensions
 check, and24generator-bound EC1 records retain changed endpoints. Standard
 theory supplies executable routes; charged solving/novelty/NIST benefit remain open.
+
+### 2026-10-28 — matched endomorphism equations repair some target fibers
+
+[Executed v14](../../twist_routes_1_3_20261021/reports/rank-repair-20261028/RESULTS.md)
+retains all42 fixed base configurations and252 planned matrix cases.29 bases
+fill/13 underfill;174 matrices are analyzed and78 fill-rule exclusions remain
+explicit. All bases/map edges/witnesses/equations/ranks/complete kernels and
+target projections pass native Rust and independent GP.114 cells fix the one
+public toy target;60 are ambiguous. Known alpha equations newly fix14 cases,
+including ordinary bases; the archived B8 twist base remains ambiguous.
+Rank-deficient systems can still fix the target. Two generic affine-kernel
+Lean theorems pass fresh audit; concrete bridge open. Complete cold costs,
+larger heldouts and original campaigns remain open; no cost row changes.

@@ -1,5 +1,14 @@
 # Twist routes 1–3: designs and bounded execution
 
+[2026-10-28 target-blind rank repair](reports/rank-repair-20261028/RESULTS.md)
+· [frozen panel and exact independent replay](execution-v14/README.md).
+42 fixed configurations include29 filled/13 underfilled bases. All174 analyzed
+matrix cells replay;114 fix the target and60 leave it ambiguous. Known degree17
+endomorphism equations newly fix14 cases, including ordinary controls. This is
+one public toy target, with no twist-specific or complete-cost gain established.
+[Concrete next gates](execution-v14/NEXT_STEPS.md) preserve the full cold-cost
+and larger held-out requirements.
+
 [2026-10-27 generator-order results](reports/generators-20261027/RESULTS.md)
 · [exact native/CAS replay](execution-v7/README.md)
 · [preserved failed full-order candidate](execution-v6/README.md).

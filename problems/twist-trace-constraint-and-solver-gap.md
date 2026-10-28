@@ -255,3 +255,18 @@ All83canonical model records/34extensions and24exact EC1 metadata records check.
 This closes the bounded induced-map construction gap. Complete discovery,
 map evaluation and useful relation-solving costs are still unmeasured; the
 problem remains open, with no cost row, novelty or NIST conclusion promoted.
+
+### 2026-10-28: target-blind relation repair has exact matched evidence
+
+[V14](../research/twist_routes_1_3_20261021/reports/rank-repair-20261028/RESULTS.md)
+executes all42 fixed base configurations, including matched half-seed/alpha-image
+augmentation for ordinary and twist rules.29 bases fill/13 underfill;174 matrix
+cases analyzed/78 excluded by the frozen rule.114 cases fix the public toy
+target and60 leave it ambiguous. Adding known alpha equations newly fixes14,
+with ordinary controls benefiting too. Original B8 twist ambiguity persists.
+Full native/PARI base/witness/row/kernel/recovery replay and two general Lean
+affine-kernel proofs pass; concrete finite formal bridge remains external.
+This closes the bounded rank-repair diagnostic, not the complete discovery,
+collection, solving and verification cost interval. Larger heldouts, strongest
+matched cost controls and original campaign criteria remain open. No calibrated
+cost, novelty, NIST conclusion or root-suite/CI completion is promoted.
