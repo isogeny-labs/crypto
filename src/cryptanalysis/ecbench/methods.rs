@@ -682,8 +682,6 @@ pub fn registry() -> &'static [MethodDecl] {
                 ParamDecl { name: "seconds", default: Some("1800"), help: "cold wall watchdog; failures are censored" },
             ],
         },
-        // This shares its historical public id with the earlier genus-2 arm.
-        // `decl_for_spec` uses the thread-only required parameters to distinguish them.
         MethodDecl {
             id: "ic.hyperelliptic_thread",
             family: "ic",
@@ -989,29 +987,15 @@ pub fn decl(id: &str) -> Option<&'static MethodDecl> {
     registry().iter().find(|m| m.id == id)
 }
 
-// Both historical genus-2 sessions and the newer hyperelliptic thread used
-// `ic.hyperelliptic`. Their parameter sets and implementations differ, while
-// the method id and resolved parameters are part of committed record hashes.
-// A thread spec must name one of its required, thread-only parameters; an
-// older spec keeps the original declaration and its exact defaults.
+// Keep the historical genus-2 configuration identity distinct from the
+// explicitly named thread implementation, including when refusing workloads.
+const HYPER_GENUS2_ID: &str = "ic.hyperelliptic";
 const HYPER_THREAD_ENTRY: &str = "ecbench::hyper_ic::solve";
 const HYPER_GENUS2_ENTRY: &str = "hyperelliptic_index_calculus::hec_index_calculus_dlp";
 
-fn decl_for_spec(spec: &MethodSpec) -> Option<&'static MethodDecl> {
-    if spec.id == HYPER_IC
-        && (spec.params.contains_key("branches") || spec.params.contains_key("d_step_in"))
-    {
-        registry()
-            .iter()
-            .find(|m| m.id == HYPER_IC && m.entry == HYPER_THREAD_ENTRY)
-    } else {
-        decl(&spec.id)
-    }
-}
-
 /// Fill defaults, refuse unknown and missing parameters, hash.
 pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
-    let d = decl_for_spec(spec).ok_or_else(|| {
+    let d = decl(&spec.id).ok_or_else(|| {
         let ids: Vec<&str> = registry().iter().map(|m| m.id).collect();
         format!("unknown method `{}`; known: {}", spec.id, ids.join(", "))
     })?;
@@ -2643,18 +2627,15 @@ fn hyper_ic_variant_guard(
     inst: &Instance,
     curve: &CurveFacts,
 ) -> Result<(), String> {
-    if m.id != HYPER_IC {
-        return Ok(());
-    }
-    let expected = match inst {
-        Instance::Genus2(_) => HYPER_GENUS2_ENTRY,
-        Instance::Hyper(_) => HYPER_THREAD_ENTRY,
-        _ => return Err(hyper_ic_refusal(curve)),
+    let (expected, workload_matches) = match m.id.as_str() {
+        HYPER_GENUS2_ID => (HYPER_GENUS2_ENTRY, matches!(inst, Instance::Genus2(_))),
+        HYPER_IC => (HYPER_THREAD_ENTRY, matches!(inst, Instance::Hyper(_))),
+        _ => return Ok(()),
     };
-    if m.entry != expected {
+    if !workload_matches || m.entry != expected {
         return Err(format!(
-            "`{HYPER_IC}` parameters select `{}`, but {} requires `{expected}`",
-            m.entry, curve.family
+            "`{}` requires its matching Jacobian workload and `{expected}`; {} uses `{}`",
+            m.id, curve.family, m.entry
         ));
     }
     Ok(())
@@ -5034,7 +5015,7 @@ mod tests {
     #[test]
     fn historical_genus2_method_id_survives_thread_parameter_resolution() {
         let historical = resolve(&MethodSpec {
-            id: HYPER_IC.into(),
+            id: HYPER_GENUS2_ID.into(),
             params: BTreeMap::new(),
         })
         .unwrap();
@@ -5058,6 +5039,64 @@ mod tests {
         .unwrap();
         assert_eq!(thread.entry, HYPER_THREAD_ENTRY);
         assert_ne!(thread.method_id, historical.method_id);
+    }
+
+    #[test]
+    fn hyperelliptic_variants_refuse_other_workloads_and_mismatched_entries() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+        let genus2 = resolve(&MethodSpec {
+            id: HYPER_GENUS2_ID.into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        let thread = resolve(&MethodSpec {
+            id: HYPER_IC.into(),
+            params: [
+                ("fb_size", "all"),
+                ("large_primes", "0"),
+                ("extra_relations", "8"),
+                ("branches", "64"),
+                ("d_step_in", "4"),
+            ]
+            .into_iter()
+            .map(|(k, v)| (k.into(), v.into()))
+            .collect(),
+        })
+        .unwrap();
+        let cases = [
+            CurveSpec::Genus2Search {
+                p_bits: 8,
+                seed: 3,
+                max_cofactor: 16,
+            },
+            CurveSpec::HyperellipticThread { p: 23, genus: 3 },
+            CurveSpec::PrimeSearch { bits: 12, seed: 3 },
+        ];
+        for spec in cases {
+            let (w, inst) = Workload::build(&spec, 7, 0, TargetKind::Planted).unwrap();
+            for method in [&genus2, &thread] {
+                let matches = match method.id.as_str() {
+                    HYPER_GENUS2_ID => matches!(inst, Instance::Genus2(_)),
+                    HYPER_IC => matches!(inst, Instance::Hyper(_)),
+                    _ => unreachable!(),
+                };
+                if matches {
+                    assert!(applicable(method, &inst, &w.curve).is_ok());
+                    let mut wrong_entry = method.clone();
+                    wrong_entry.entry = "different implementation".into();
+                    assert!(applicable(&wrong_entry, &inst, &w.curve).is_err());
+                    assert!(solve(&wrong_entry, &inst, &w.curve, &w.target, 1).is_err());
+                } else {
+                    assert!(applicable(method, &inst, &w.curve).is_err());
+                    assert!(solve(method, &inst, &w.curve, &w.target, 1).is_err());
+                }
+            }
+        }
+        assert!(resolve(&MethodSpec {
+            id: HYPER_IC.into(),
+            params: BTreeMap::new()
+        })
+        .is_err());
     }
 
     #[test]
