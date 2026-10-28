@@ -152,6 +152,9 @@ class RoundTrip(unittest.TestCase):
         diffs = [line for line in log.read_text().splitlines() if " diff " in f" {line} " and "--raw" in line]
         self.assertTrue(diffs, "check never ran git diff --raw")
         self.assertTrue(all("--no-abbrev" in line for line in diffs), diffs)
+        sizes = [line for line in log.read_text().splitlines() if " cat-file " in f" {line} "]
+        self.assertEqual(len(sizes), 1)
+        self.assertIn("--batch-check", sizes[0])
 
     def test_pull_into_absent_sparse_directory_preserves_bytes_and_clean_tree(self):
         self.art("push", "research/r1/runs/a.jsonl")

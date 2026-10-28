@@ -285,7 +285,23 @@ pub struct RunReport {
 /// compare an F4 `S` from before that merge with one after it, or a priced
 /// curve with an unpriced one: `research/f4_pricing_jump_20261018/`.
 fn is_word_xor_op_unit(op_unit: &str) -> bool {
+    if LEGACY_EXACT_WORD_XOR_UNIT.with(|c| c.get()) {
+        return op_unit == "word XORs";
+    }
     op_unit == "word XORs" || op_unit.starts_with("word XORs (")
+}
+
+// Pre-#1774 pricing for committed evidence, set by the replay audit only
+// (`ecbench::legacy`): only the bare `word XORs` unit is priced by count, so
+// a qualified inherited-F4 unit is priced at wall time and taken back out.
+thread_local! {
+    static LEGACY_EXACT_WORD_XOR_UNIT: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Match the bare `word XORs` unit alone, as before #1774; `false` restores
+/// the normal prefix match.
+pub fn set_legacy_exact_word_xor_unit(on: bool) {
+    LEGACY_EXACT_WORD_XOR_UNIT.with(|c| c.set(on));
 }
 
 /// Certify the solved logarithm of one nonzero-coefficient point in each
@@ -436,7 +452,11 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     let known = fb.known_logs.is_some();
     let linalg_name = {
         let prior = linalg_name;
-        if known { "known-logs" } else { prior }
+        if known {
+            "known-logs"
+        } else {
+            prior
+        }
     };
     // The loop's unknowns are the logs of `[h]P_v` (its rows read
     // `Σ c·x − h·b·d = h·a`), so on a cofactor-`h` curve a known column
@@ -567,8 +587,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     // verified full-rank solution solely from the target-point check.
     if checked_full_rank && outcome.verified {
         measurement::mark(measurement::Phase::RecoveryCheck);
-        outcome.verified =
-            check_full_rank_base_columns(ctx, &fb, matrix, &mut outcome.verify);
+        outcome.verified = check_full_rank_base_columns(ctx, &fb, matrix, &mut outcome.verify);
         // The check's `pinned` scans: the matrix's totals replace the
         // ones the relation loop recorded.
         outcome
@@ -738,7 +757,9 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             total_gae,
             s,
             rho_s,
-            s_over_rho: rho_s.filter(|_| cost_qualification.is_none()).map(|rho| s / rho),
+            s_over_rho: rho_s
+                .filter(|_| cost_qualification.is_none())
+                .map(|rho| s / rho),
             wall_seconds: started.elapsed().as_secs_f64(),
             exhausted: outcome.recovered.is_none(),
         },
