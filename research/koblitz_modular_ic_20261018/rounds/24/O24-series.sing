@@ -25,7 +25,7 @@ proc recordOrder(string name,poly p){
 int kind;int branch;int k;int j;
 poly tt;poly qq;poly xx;poly yy;poly zz;poly bb;poly cc;poly aa;poly dd;poly ee;
 poly ll;poly nnum;poly nden;poly nu;poly residue;int denorder;int numorder;
-ideal lifted;
+ideal lifted;ideal evaluatedUnits;
 for(kind=0;kind<=1;kind++){
  qq=1;xx=1;yy=1;
  if(kind==0){
@@ -75,8 +75,9 @@ for(kind=0;kind<=1;kind++){
   recordOrder("t",tt);recordOrder("b",bb);recordOrder("c",cc);
   recordOrder("lambda",ll);recordOrder("nu",nu);recordOrder("A",aa);
   recordOrder("Z",zz);
+  evaluatedUnits=evaluate(registered);
   for(j=1;j<=8;j++){
-   poly entry=tr(evaluate(registered[j]));
+   poly entry=tr(evaluatedUnits[j]);
    recordOrder("unit"+string(j),entry);
   }
  }
