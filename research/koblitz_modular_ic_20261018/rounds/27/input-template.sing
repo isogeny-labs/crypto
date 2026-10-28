@@ -435,22 +435,22 @@ list initialL=ol;list initialN=on;list initialB=ob;list initialC=oc;
 list ou=li(lm(lpw(lseed(tt,precision),2),lseed(qq,precision)));
 list ov=li(lm(lpw(lseed(tt,precision),3),lseed(qq,precision)));
 list oa;list ok;list osc;list osl;list nb;list nc;list nl;list nnu;
-list nbu;list nbv;list coords;list result;int orbit;int entry;int ram=1;
+list nbu;list nbv;list coords;list result;int orbit;int index27;int ram=1;
 if(kind==1){ram=7;}
 intvec expectedB=3,-7,1,2,1;
 intvec expectedC=2,-4,1,2,-1;
 for(orbit=0;orbit<=4;orbit++){
  print("CUSPORBIT "+string(kind)+" "+string(branch)+" "+string(orbit));
  coords=list(on,ol,ob,oc);
- for(entry=1;entry<=5;entry++){
-  result=leval(sourceTerms[entry],coords);lzero("original"+string(entry),result);
+ for(index27=1;index27<=5;index27++){
+  result=leval(sourceTerms[index27],coords);lzero("original"+string(index27),result);
  }
  lrecord("lambda",ol);lrecord("nu",on);
- for(entry=1;entry<=8;entry++){
-  result=leval(registeredTerms[entry],coords);
-  lrecord("registered"+string(entry),result);
-  if(entry==1 && result[2]!=ram*expectedB[orbit+1]){ERROR("base b order mismatch");}
-  if(entry==3 && result[2]!=ram*expectedC[orbit+1]){ERROR("base c order mismatch");}
+ for(index27=1;index27<=8;index27++){
+  result=leval(registeredTerms[index27],coords);
+  lrecord("registered"+string(index27),result);
+  if(index27==1 && result[2]!=ram*expectedB[orbit+1]){ERROR("base b order mismatch");}
+  if(index27==3 && result[2]!=ram*expectedC[orbit+1]){ERROR("base c order mismatch");}
  }
  oa=la(lc(1),oc);ok=la(ob,lm(oa,oc));
  osc=lm(lpw(oc,3),li(ok));osl=lm(ok,li(oc));

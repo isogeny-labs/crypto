@@ -49,3 +49,7 @@ Checkpoint current source/raw to setec-astronomy-artifacts before each native
 call. Never mutate repo concurrently with commit/checkpoint/gate. Native raw
 must be durable before continuation. New faithful Lean identities will expose
 geometric bridges rather than assuming missing geometry as axioms.
+
+Prospective correction before LAURENT02:01 retains native exit0/late marker
+but wrapperrejects the collision between seed poly entry and new int entry.
+Rename only the new loop index to index27. No chart or precision change.
