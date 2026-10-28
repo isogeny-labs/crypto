@@ -30,6 +30,13 @@ W12 engine tests. Its corruption tests reject a changed kernel entry, changed
 point label and duplicate selected minor column. The original engine, Cargo
 configuration and Cargo lockfile are unchanged by the import.
 
+The full library invocation completed with 4,968 passed, 26 failed and 122
+ignored. All 26 failures were missing sparse-checkout inputs, and all 26
+affected tests pass in exact focused reruns after restoring their original
+tracked files. Thus all 4,994 non-ignored library tests pass across those
+checks; the original full invocation itself failed, and no clean full-suite
+invocation is claimed. No assertion or ignore list was changed.
+
 The PDF was compiled with Typst 0.15.0 and both pages visually inspected.
 Its final render was compared byte for byte with the inspected page renders.
 Matplotlib 3.10.8 reads frozen counts only; `reports/render_visuals.py` performs

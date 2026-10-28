@@ -49,11 +49,22 @@
     {
       "name": "library-suite",
       "command": "cargo test --release --lib --locked -- --test-threads=4",
-      "status": "in_progress",
-      "remaining_test": "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies",
-      "missing_runtime_fixture_failures": 19,
+      "status": "completed_with_initial_fixture_failures",
+      "missing_runtime_fixture_failures": 26,
       "all_missing_fixture_failures_passed_after_restoration": true,
-      "note": "Do not interpret this record as a clean full-suite pass. One unchanged library test was still active when this receipt was prepared; PR follow-up records its eventual outcome."
+      "note": "All 4994 non-ignored tests pass across the full run and exact focused reruns. The original full invocation itself failed on missing sparse-checkout inputs; no clean full-suite invocation is claimed.",
+      "first_full_run": {
+        "exit_code": 101,
+        "passed": 4968,
+        "failed": 26,
+        "ignored": 122,
+        "seconds": 2576.51
+      },
+      "formerly_remaining_test": {
+        "name": "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies",
+        "status": "passed_in_full_run"
+      },
+      "clean_full_suite_pass": false
     },
     {
       "name": "restored-runtime-fixture-tests",
@@ -77,9 +88,16 @@
         "cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files",
         "cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks",
         "cryptanalysis::ic_framework::planner::tests::every_cited_file_exists",
-        "cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42"
+        "cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42",
+        "ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused",
+        "ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree",
+        "ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares",
+        "ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors",
+        "ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused",
+        "ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path",
+        "ecc::endo_generic_chain_set::tests::tampered_sets_are_refused"
       ],
-      "passed": 19,
+      "passed": 26,
       "failed": 0,
       "note": "Each missing-input failure was rerun with the same compiled library-test binary after materializing the original tracked inputs. No source or test assertion was changed."
     },
@@ -124,5 +142,15 @@
   "original_engine_and_cargo_unchanged": true,
   "new_performance_experiments": 0,
   "historical_timings_remeasured": false,
-  "benchmark_admission": false
+  "benchmark_admission": false,
+  "upstream_merge": {
+    "base": "bd58c75eb86efe9bec36868ac01b9a152bd298e3",
+    "library_cargo_reused_engine_crates_tools_unchanged": true
+  },
+  "isolated_diagnostic": {
+    "test": "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies",
+    "environment": "RAYON_NUM_THREADS=1",
+    "status": "cancelled_after_original_test_passed",
+    "reason": "The full-suite test completed successfully; the duplicate diagnostic was no longer needed."
+  }
 }

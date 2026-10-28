@@ -27,3 +27,27 @@
 - Sparse checkout initially omitted a path dependency and compile-time fixtures, then 19 runtime-fixture tests failed. Materialized the tracked inputs; focused reruns of every affected test pass. No source assertion was changed, skipped or quarantined.
 - Matplotlib emitted trailing whitespace in SVG paths; the rendering source now normalizes that formatting. Final staged diff checks pass. The original historical files remain unchanged.
 - Automatic approval review rejected uploading the shared daily session log, citing unrelated infrastructure details in its existing contents. That file is excluded from the PR; this task-only extract preserves the new work record without republishing unrelated content.
+
+## 2026-10-28T17:38:00Z — library validation and ready PR
+
+### What was done (commands, files, features)
+
+- Published ready PR #2797 with the 33-file classical package. The GitHub tree matched the reviewed local index exactly; the shared daily log is absent from the PR.
+- The original full library command completed: 4,968 passed, 26 failed, 122 ignored, 2,576.51 seconds. The formerly outstanding `jv_isogeny_walk` test passed. All 26 failures were missing tracked inputs in the sparse checkout.
+- Restored the remaining frozen CryptoPro constants and ran every affected test exactly. The initial 19 and later seven all pass. All 4,994 non-ignored library tests therefore pass across the full run and focused replays; no clean full-suite invocation is claimed. Stopped the duplicate isolated diagnostic after the original test passed.
+- Merged current `main` at `bd58c75eb86efe9bec36868ac01b9a152bd298e3` without conflicts. Its four workflow/script changes leave the library, Cargo files and reused solver unchanged.
+
+### Decisions made (and why)
+
+- Kept the failed full-run counts and successful fixture replays explicit. Restoring missing tracked data needed no test or source changes.
+- The connector's auto-merge action requested squash, which the repository's rules forbid. Continue with a merge commit after the current-head merge gates and review are satisfied; no alternative merge method or protection bypass is authorized.
+
+### Open threads (unfinished, pick up next time)
+
+- Publish the base update and final development receipts, update the PR description, and follow current-head `gate`, `size`, `artifacts` and review through merge.
+- The historical source-access and qualified-performance gaps recorded above remain unchanged.
+
+### Errors (what went wrong, how it was handled)
+
+- Seven additional missing CryptoPro-fixture failures appeared when the full suite finished. Restoring the committed constants made all seven exact reruns pass.
+- Auto-merge could not be enabled through the connector because it selected the disallowed squash method. No check or repository rule was weakened.
