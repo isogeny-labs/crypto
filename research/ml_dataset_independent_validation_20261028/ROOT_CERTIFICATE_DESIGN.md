@@ -12,8 +12,10 @@ The campaign's USD200 total ceiling remains unchanged.
 Read the frozen prime producer's `src/cryptanalysis/prime_root_trace.rs`,
 `src/ml_dataset/solvers.rs`, `docs/ml-dataset/PRIME-ROOT-RECORDS.md`, and the
 binary producer's `src/cryptanalysis/binary_root_trace.rs` and typed adapter
-`src/ml_dataset/binary_roots.rs`. The binary adapter schema remains provisional
-until its owner commits and validates it; interoperability must pin that source.
+`src/ml_dataset/binary_roots.rs`. The original design required a committed,
+validated schema before interoperability. Its owner subsequently froze source
+`d79f658f7a0a83e2f75f4cb6f0d1f7542d0e6b83`; the retained fixture driver pins its
+source-bound binary SHA256 and records zero-generation provenance preflights.
 
 The mathematical reference is [Shoup, second edition](https://shoup.net/ntb/ntb-v2.pdf),
 Theorem 17.2 (polynomial Euclid), Theorems 19.5–19.6 (the product of all field

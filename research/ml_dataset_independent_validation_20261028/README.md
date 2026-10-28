@@ -72,6 +72,29 @@ count zero. The broad `mathematics_independently_verified` and
 `labels.independently_verified` flags remain false. Positive checks do not turn
 unsupported, timed-out or negative cells into verified mathematical results.
 
+## Independent distinct-root certificates
+
+The native consumer also checks recognized prime/root/m=2 and binary/root/m=2
+certificates with `--arithmetic`. Its separate polynomial implementation computes
+`monic gcd(f, X^q-X)` and compares it with the product of the declared distinct
+linear factors. This checks the complete root set of each completed nonzero
+polynomial without invoking the producer root finder. The zero polynomial has
+an explicit all-field result; only the saved finite factor-base domain is used
+for group-lift checks. Censored calls never establish absence of roots.
+
+The checker binds curve, field, twist, target, configured budget, ordered signed
+factor base, S3 coefficients, query order, finite-domain lift prefix and outcome.
+Binary certificates additionally bind hashes of the complete public/base/config
+objects. Prime v1 certificates have no equivalent full-object hash; their
+mathematical fields are bound, but arbitrary annotations are outside that claim.
+Results appear only in `labels.root_certificate_arithmetic`; static feature
+schemas are unchanged. A positive root-set label is per supplied completed call,
+and does not certify complete execution, every intermediate event identity,
+instruction cost, factor-base construction, subgroup order, UNSAT or fall degree.
+Historical root artifacts remain readable with explicit unverified status.
+See [ROOT_CERTIFICATE_DESIGN.md](ROOT_CERTIFICATE_DESIGN.md) for the bounded
+prime/binary contracts and primary mathematical sources.
+
 ## Feature and measurement contract
 
 Only `features` is suitable as a model input. It contains typed public curve and
@@ -119,8 +142,10 @@ changing bytes; and bounded S3/producer command handling. They are software
 fixtures, not campaign draws. Historical 19-test and 25-test Python receipts
 remain unchanged, with separate evidence for the Rust replacement.
 
-The first real native-producer-to-S3-to-independent-consumer replay remains
-outstanding. As of the 2026-10-28 06:47 UTC inspection, the dated canonical
+The deployed-worker native-producer-to-S3-to-independent-consumer replay remains
+outstanding. The separate controller archive roundtrip in
+[POLICY_COMPATIBILITY.md](POLICY_COMPATIBILITY.md) checks retained software
+fixtures. As of the 2026-10-28 06:47 UTC inspection, the dated canonical
 catalog had no completed cells. Pilot 002 failed on S3 HEAD permission before
 publication. Broad solver/curve/twist coverage, instruction accounting, factor
 base controls, large-scale generation and scientific label acceptance remain
