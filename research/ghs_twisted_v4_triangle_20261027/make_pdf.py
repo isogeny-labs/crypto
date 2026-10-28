@@ -271,12 +271,21 @@ def render():
                "Counting double and distinct rational linear factors gives the "
                "exact all-q product count below."),
              P("#(V*V*) = (q^2-1)(q+2)/2.", code),
-             P("At q=16, 2295 b values pass this second gate. Exhaustive finite-field "
-               "enumeration finds 1088 whose trace-zero twist fails the triangle "
-               "gate. The two constructions together cover <b>5183 of 8190</b> "
-               "normalized ordinary models. For all q, the proved union lower "
-               "bound is q^3-1+q^2-q/2; the sharper q=16 overlap is a finite "
-               "census. These are eligibility counts, not attack-cost counts."),
+             P("The all-q overlap has a closed form. Put e=(q+1)^(-1) modulo "
+               "q^3-1 and t=s^e. Since b=s^2, the triangle trace is the "
+               "absolute trace of t. Scaling s by c in k* scales t by "
+               "sqrt(c). The projective product classes with relative trace "
+               "t=0 are exactly t^(q+1) for t in V*, giving q+1 classes; "
+               "the remaining q(q+1)/2 classes each contribute q/2 trace-one "
+               "scalars. Hence exactly q^2(q+1)/4 source models pass Hess "
+               "while failing the triangle gate."),
+             P("Union of the two gates: q^3-1+q^2(q+1)/4 of 2(q^3-1).", code),
+             P("At q=16, the Hess gate has 2295 b values, the new overlap count "
+               "adds 1088 models, and the union is <b>5183 of 8190</b>. This "
+               "is an exact cover-eligibility count and a lower bound for the "
+               "wider cover universe; it is not an attack-cost count or a "
+               "global vulnerability classification. The overlap formula is "
+               "new to this audit; its publication novelty is unresolved."),
              P("9. Exact two-pole witness and subgroup map", h1),
              P("In the pinned F_(2^12) field, A=1079, B=2852, a=0, b=3399, "
                "and E: Y^2+XY=X^3+b. It has #E(K)=4132=4·1033, "

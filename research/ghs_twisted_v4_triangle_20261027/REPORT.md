@@ -39,9 +39,9 @@ The two-common-pole construction below is the **already known Hess
 double-trace-zero branch**, analyzed in this repository at
 `research/ghs_hess_c_parameter_audit_20261026/EXACT_CUBIC_FAMILY.md`.
 That earlier file already proves the same product count for all `q`.
-The added contribution here is a `q=16` exact witness with its canonical
-quartic and evaluated source-subgroup map, plus its overlap with this
-triangle gate. This is not a new family criterion.
+The added contribution here is an exact all-`q` overlap formula with the
+triangle gate, plus a `q=16` witness with its canonical quartic and
+evaluated source-subgroup map. This is not a new family criterion.
 
 Primary references:
 
@@ -343,17 +343,46 @@ linear factors. Counting those forms gives
 ```
 
 Because squaring permutes `K*`, the same count holds for `b`.
-At `q=16`, it is **2295** `b` values. `two_pole.py` exhausts all 255
-nonzero elements of `V` and obtains exactly **1088** `b` values for which
-`Tr(b^d)=1`; their trace-zero twists fail the triangle gate but pass this
-two-pole gate. Thus the *union of these two particular constructions*
-contains **5183 of 8190** normalized ordinary `K`-isomorphism classes.
-For all `q`, the product count and the size `q^3/2-1` of the triangle's
-trace-zero `b` fiber imply the rigorous union lower bound
-`q^3-1+q^2-q/2`. The sharper `5183` value is an exhaustive `q=16`
-computation, not a proven all-`q` overlap formula. The published broader
+The overlap with the triangle gate has an **exact all-`q` formula**.
+Set `e=(q+1)^(-1) mod(q^3-1)` and `t=s^e`. Then
+`Tr_(K/F2)(b^d)=Tr_(K/F2)(t)`, since `2d=e` modulo `q^3-1`.
+Multiplying `s` by `c in k*` multiplies `t` by `sqrt(c)`, so each
+projective class of products `s` either has relative trace zero for
+every scalar multiple or has absolute trace one for exactly `q/2`
+scalar multiples. There are `(q+1)(q+2)/2` projective product classes.
+The relative-trace-zero classes are exactly
+`{t^(q+1): t in V*}/k*`: if `t in V` then both `t` and `t^q` lie in
+`V`, and conversely `s=t^(q+1)` whenever its unique root `t=s^e`
+lies in `V`. Since the `q+1` power is a permutation of `K*`, these
+are exactly `q+1` projective classes. Thus the nonzero-relative-trace
+classes number `q(q+1)/2`, and precisely
+
+```
+q^2*(q+1)/4
+```
+
+trace-zero source twists pass the Hess gate while failing the triangle
+gate. The *union of these two particular constructions* therefore
+contains exactly
+
+```
+q^3-1 + q^2*(q+1)/4
+```
+
+of the `2(q^3-1)` normalized ordinary `K`-isomorphism classes.
+This is a rigorous cover-eligibility lower bound for the wider set of
+possible GHS transfers; it is an upper bound on the number of measured
+vulnerabilities **within this two-construction union**, since cost
+comparison imposes additional conditions. It is not a global
+vulnerability count. At `q=16`, the Hess gate has **2295** `b` values,
+**1088** source models lie outside the triangle gate, and the union is
+**5183 of 8190**. `two_pole.py` independently exhausts all 255 nonzero
+elements of `V` and checks these numbers. The published broader
 weak-curve density of roughly three quarters for even-degree binary bases
-remains above this two-construction count.
+remains above this two-construction count. The all-`q` overlap proof is new
+to this audit; a full publication novelty check for that formula is open.
+`overlap_census.py` independently checks the formula for
+`q=2,4,8,16,32`, retaining every row in `overlap_census.json`.
 
 An exact witness outside the triangle gate uses the same pinned
 `K=F_2[w]/(w^12+w^7+w^6+w^5+w^3+w+1)` and bitmask convention:
@@ -441,6 +470,7 @@ sage -python research/ghs_twisted_v4_triangle_20261027/descent_model.py
 python3 research/ghs_twisted_v4_triangle_20261027/magma_canonical.py
 sage -python research/ghs_twisted_v4_triangle_20261027/subgroup_map.py
 sage -python research/ghs_twisted_v4_triangle_20261027/two_pole.py
+sage -python research/ghs_twisted_v4_triangle_20261027/overlap_census.py
 python3 research/ghs_twisted_v4_triangle_20261027/magma_two_pole.py
 sage -python research/ghs_twisted_v4_triangle_20261027/two_pole_map.py
 lean research/ghs_twisted_v4_triangle_20261027/TwoPoleGate.lean
