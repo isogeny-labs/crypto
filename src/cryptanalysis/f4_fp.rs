@@ -3608,6 +3608,240 @@ fn autoreduce_with(polys: &[Poly], p: u64, ord: Ordering, packed: bool) -> Vec<P
 
 // ── Solving ────────────────────────────────────────────────────────
 
+/// Observations from the opt-in streaming/domain solver. These are stage
+/// diagnostics, not complete operation accounting or a performance claim.
+#[derive(Clone, Debug, Default, serde::Serialize)]
+pub struct VisitReport {
+    /// Every solution in the requested Cartesian domain has been visited.
+    pub complete: bool,
+    /// The visitor requested termination after an equation-checked witness.
+    pub stopped_early: bool,
+    pub timed_out: bool,
+    pub solutions_visited: usize,
+    pub candidates_rejected: usize,
+    pub solving_degree: u32,
+    pub max_rows: usize,
+    pub max_cols: usize,
+    pub f4_runs: usize,
+    pub field_ops: u64,
+    pub domain_evaluations: u64,
+    pub factored_univariates: usize,
+    /// Counted coefficient multiplications in the reused root finder only.
+    pub root_field_multiplications: u64,
+    pub full_field_branches: u64,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum VisitEnd {
+    Complete,
+    Stopped,
+    TimedOut,
+}
+
+struct VisitState<'a, F> {
+    original: &'a [Poly],
+    domains: &'a [Option<Vec<u64>>],
+    p: u64,
+    opts: &'a F4Options,
+    assignment: Vec<u64>,
+    visitor: F,
+    report: VisitReport,
+}
+
+impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
+    fn expired(&self) -> bool {
+        self.opts.deadline.is_some_and(|d| Instant::now() >= d)
+    }
+
+    fn walk(&mut self, input: &[Poly], active: &[usize]) -> VisitEnd {
+        if self.expired() {
+            return VisitEnd::TimedOut;
+        }
+        if active.is_empty() {
+            // A degree-truncated basis can describe a strict superset of
+            // the original variety. Never expose those spurious roots.
+            if input.iter().any(|g| eval(g, &[], self.p) != 0) {
+                return VisitEnd::Complete;
+            }
+            if !self
+                .original
+                .iter()
+                .all(|g| eval(g, &self.assignment, self.p) == 0)
+            {
+                self.report.candidates_rejected += 1;
+                return VisitEnd::Complete;
+            }
+            self.report.solutions_visited += 1;
+            return if (self.visitor)(&self.assignment) {
+                VisitEnd::Stopped
+            } else {
+                VisitEnd::Complete
+            };
+        }
+        if active
+            .iter()
+            .any(|&i| self.domains[i].as_ref().is_some_and(Vec::is_empty))
+        {
+            return VisitEnd::Complete;
+        }
+        let r = f4(input, active.len(), self.p, self.opts);
+        if self.report.f4_runs == 0 {
+            self.report.solving_degree = r.solving_degree;
+        }
+        self.report.f4_runs += 1;
+        self.report.max_rows = self.report.max_rows.max(r.max_rows);
+        self.report.max_cols = self.report.max_cols.max(r.max_cols);
+        self.report.field_ops += r.field_ops;
+        if r.timed_out || self.expired() {
+            return VisitEnd::TimedOut;
+        }
+        if r.inconsistent {
+            return VisitEnd::Complete;
+        }
+        let mut best: Option<(usize, Vec<u64>)> = None;
+        for g in &r.basis {
+            let vars: HashSet<_> = g
+                .iter()
+                .flat_map(|(e, _)| {
+                    e.iter()
+                        .enumerate()
+                        .filter(|(_, k)| **k != 0)
+                        .map(|(i, _)| i)
+                })
+                .collect();
+            if vars.len() != 1 {
+                continue;
+            }
+            let var = *vars.iter().next().unwrap();
+            let roots = if let Some(domain) = &self.domains[active[var]] {
+                let mut roots = Vec::new();
+                for &x in domain {
+                    if self.expired() {
+                        return VisitEnd::TimedOut;
+                    }
+                    self.report.domain_evaluations += 1;
+                    let value = g.iter().fold(0, |v, (e, c)| {
+                        (v + mulmod(*c, powmod(x, u64::from(e[var]), self.p), self.p)) % self.p
+                    });
+                    if value == 0 {
+                        roots.push(x);
+                    }
+                }
+                roots
+            } else {
+                let degree = g.iter().map(|(e, _)| e[var]).max().unwrap_or(0) as usize;
+                let mut coefficients = vec![0; degree + 1];
+                for (e, c) in g {
+                    coefficients[e[var] as usize] = *c;
+                }
+                self.report.factored_univariates += 1;
+                let Some(roots) = super::glv_invariant_base::poly_roots_fp_counted_until(
+                    &coefficients,
+                    self.p,
+                    0x4634_524f_4f54,
+                    &mut self.report.root_field_multiplications,
+                    self.opts.deadline,
+                ) else {
+                    return VisitEnd::TimedOut;
+                };
+                roots
+            };
+            if best.as_ref().is_none_or(|(_, old)| roots.len() < old.len()) {
+                best = Some((var, roots));
+            }
+            if best.as_ref().is_some_and(|(_, roots)| roots.is_empty()) {
+                return VisitEnd::Complete;
+            }
+        }
+        // Without a univariate, branch on the smallest finite domain when
+        // one is known. Full-field fallback is lazy and remains explicit.
+        let has_univariate = best.is_some();
+        let (var, values): (usize, Box<dyn Iterator<Item = u64>>) = if let Some((i, roots)) = best {
+            (i, Box::new(roots.into_iter()))
+        } else if let Some((i, domain)) = active
+            .iter()
+            .enumerate()
+            .filter_map(|(i, &original)| self.domains[original].as_ref().map(|d| (i, d)))
+            .min_by_key(|(_, d)| d.len())
+        {
+            (i, Box::new(domain.clone().into_iter()))
+        } else {
+            (0, Box::new(0..self.p))
+        };
+        let full_field = !has_univariate && self.domains[active[var]].is_none();
+        let mut remaining = active.to_vec();
+        let original = remaining.remove(var);
+        for value in values {
+            if self.expired() {
+                return VisitEnd::TimedOut;
+            }
+            if full_field {
+                self.report.full_field_branches += 1;
+            }
+            self.assignment[original] = value;
+            let sub: Vec<_> = r
+                .basis
+                .iter()
+                .map(|g| {
+                    normalise_owned(specialise(g, var, value, self.p), self.p, self.opts.order)
+                })
+                .filter(|g| !g.is_empty())
+                .collect();
+            let end = self.walk(&sub, &remaining);
+            if end != VisitEnd::Complete {
+                return end;
+            }
+        }
+        VisitEnd::Complete
+    }
+}
+
+/// Visit exact solutions in the Cartesian product of `domains` (`None`
+/// means all of F_p), stopping when the visitor returns true. Domain
+/// restrictions define the requested problem; completeness is relative to
+/// them. Callers claiming unrestricted completeness must justify their domains.
+/// Auxiliary variables must not inherit a coordinate membership domain.
+///
+/// Unlike [`solve`], this opt-in path uses rational-factor extraction for
+/// unrestricted univariates. The legacy exhaustive scan remains a control.
+pub fn solve_visit(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    visitor: impl FnMut(&[u64]) -> bool,
+) -> Result<VisitReport, String> {
+    if p >= 1u64 << 32
+        || !super::residual_walk::is_prime_u64(p)
+        || domains.len() != n_vars
+        || domains
+            .iter()
+            .flatten()
+            .any(|d| d.iter().any(|&x| x >= p) || d.iter().collect::<HashSet<_>>().len() != d.len())
+        || input
+            .iter()
+            .flatten()
+            .any(|(e, c)| e.len() != n_vars || *c >= p)
+    {
+        return Err("invalid prime, domains or polynomial dimensions".into());
+    }
+    let mut state = VisitState {
+        original: input,
+        domains,
+        p,
+        opts,
+        assignment: vec![0; n_vars],
+        visitor,
+        report: VisitReport::default(),
+    };
+    let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>());
+    state.report.complete = end == VisitEnd::Complete;
+    state.report.stopped_early = end == VisitEnd::Stopped;
+    state.report.timed_out = end == VisitEnd::TimedOut;
+    Ok(state.report)
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Verdict {
     Inconsistent,
@@ -3873,6 +4107,102 @@ pub fn eval(f: &Poly, x: &[u64], p: u64) -> u64 {
 mod tests {
     use super::*;
     use std::collections::BTreeMap;
+
+    #[test]
+    fn streaming_domains_follow_original_variables_and_match_the_legacy_solver() {
+        let p = 7;
+        // x^2=1, y=x*z, z^2=1. Variable elimination may remove z
+        // before y; the support tag still belongs to the original x.
+        let input = vec![
+            vec![(vec![2, 0, 0], 1), (vec![0, 0, 0], p - 1)],
+            vec![(vec![0, 1, 0], 1), (vec![1, 0, 1], p - 1)],
+            vec![(vec![0, 0, 2], 1), (vec![0, 0, 0], p - 1)],
+        ];
+        for order in [Ordering::Lex, Ordering::Grevlex] {
+            let opts = F4Options::new(order, 6);
+            let Verdict::Solutions(mut want) = solve(&input, 3, p, &opts).verdict else {
+                panic!("control must resolve");
+            };
+            want.sort();
+            let mut got = Vec::new();
+            let report = solve_visit(&input, 3, p, &opts, &[Some(vec![1, 6]), None, None], |s| {
+                got.push(s.to_vec());
+                false
+            })
+            .unwrap();
+            got.sort();
+            assert_eq!(got, want);
+            assert!(report.complete && !report.stopped_early && !report.timed_out);
+            assert!(report.domain_evaluations > 0);
+            assert!(report.factored_univariates > 0);
+            assert_eq!(report.full_field_branches, 0);
+        }
+    }
+
+    #[test]
+    fn streaming_verifies_truncated_roots_and_distinguishes_stop_timeout_and_exhaustion() {
+        // A deliberately truncated F4 can leave candidate supersets. The
+        // visitor still sees only exact roots of the original equations.
+        let input = vec![
+            vec![(vec![2, 0], 1), (vec![0, 1], 6)],
+            vec![(vec![0, 2], 1), (vec![1, 0], 6)],
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 1);
+        let mut count = 0;
+        let report = solve_visit(&input, 2, 7, &opts, &[None, None], |s| {
+            assert!(input.iter().all(|g| eval(g, s, 7) == 0));
+            count += 1;
+            count == 2
+        })
+        .unwrap();
+        assert_eq!(count, 2);
+        assert!(report.stopped_early && !report.complete && !report.timed_out);
+        let expired = F4Options::new(Ordering::Grevlex, 4).with_budget(Duration::ZERO);
+        let timeout =
+            solve_visit(&input, 2, 7, &expired, &[None, None], |_| panic!("expired")).unwrap();
+        assert!(timeout.timed_out && !timeout.complete && !timeout.stopped_early);
+        let empty = solve_visit(&input, 2, 7, &opts, &[Some(vec![]), None], |_| {
+            panic!("empty domain")
+        })
+        .unwrap();
+        assert!(empty.complete && !empty.stopped_early && !empty.timed_out);
+        assert_eq!(empty.solutions_visited, 0);
+        assert!(solve_visit(&input, 2, 7, &opts, &[Some(vec![1, 1]), None], |_| false).is_err());
+    }
+
+    #[test]
+    fn unrestricted_rational_factors_handle_repeated_roots_and_characteristic_two() {
+        for p in [2, 5, 7, 13] {
+            // x^p-x is squarefree and vanishes at the whole field; its
+            // square checks that factor extraction does not repeat roots.
+            let f = vec![
+                (vec![2 * p as u32], 1),
+                (vec![p as u32 + 1], (2 * p - 2) % p),
+                (vec![2], 1),
+            ];
+            let input = vec![f4_fp_normalise_for_test(&f, p)];
+            let mut got = Vec::new();
+            let report = solve_visit(
+                &input,
+                1,
+                p,
+                &F4Options::new(Ordering::Grevlex, 30),
+                &[None],
+                |s| {
+                    got.push(s[0]);
+                    false
+                },
+            )
+            .unwrap();
+            got.sort();
+            assert_eq!(got, (0..p).collect::<Vec<_>>());
+            assert!(report.complete);
+        }
+    }
+
+    fn f4_fp_normalise_for_test(f: &Poly, p: u64) -> Poly {
+        normalise(f, p, Ordering::Grevlex)
+    }
 
     #[cfg(target_arch = "x86_64")]
     #[test]
