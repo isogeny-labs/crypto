@@ -336,3 +336,8 @@ NewKoblitzTorsion27source formalizes actual five integerprincipal-relation
 combinations,11annihilation,diamond6,movingby4,recoveryby3,conditionalnonzero
 andmixedprojector10recovery. The actual RR nonvanishing and curve/Picard
 bridges remain native/written,not Leanaxioms. Freeze before compiling it.
+
+Before newtorsion-module compile,include the actual128/64very-ample degree
+bounds,2*129>256 and expected2346/595product counts/2150/497kernels,and
+free-quotient genus/mixed-dimension arithmetic. Newmodule14named theorems,
+combinedwith18previousnamed results; no full curve/rank formalization claim.

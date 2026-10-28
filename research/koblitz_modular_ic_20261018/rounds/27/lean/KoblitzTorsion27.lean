@@ -91,4 +91,15 @@ theorem trace_coordinate_degree_obstructions :
 theorem degree_three_tower_impossible (d : ℕ)
     (h : 3*d=34 ∨ 3*d=80 ∨ 3*d=110) : False := by omega
 
+theorem proper_model_degree_bounds :
+    (128 : ℕ) ≥ 2*61+2 ∧ (64 : ℕ) ≥ 2*31+2 ∧ 2*129>256 := by decide
+
+theorem quadratic_kernel_dimensions :
+    (68*69/2 : ℕ)=2346 ∧ 2346-(256+1-61)=2150 ∧
+    (34*35/2 : ℕ)=595 ∧ 595-(128+1-31)=497 := by decide
+
+theorem free_quotient_dimensions :
+    (61-1)/5+1=13 ∧ (61-1)/10+1=7 ∧ (31-1)/5+1=7 ∧
+    (61-31-13+7 : ℕ)=24 := by decide
+
 end KoblitzTorsion27
