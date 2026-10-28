@@ -1,6 +1,6 @@
 # Collector implementation status
 
-## Current validation: focused gates passed, full library pending
+## Current validation: full library, focused tests and strict lint passed
 
 Compiled runtime source: `9ab6260a2aa57ca4df3729d6d17f10fefea312f5`.
 Toolchain 1.98.0, release profile, clean/full-commit build metadata. All 25 checked
@@ -10,9 +10,12 @@ Source hashes were checked before/after and the worktree remained clean.
 
 The immutable library test executable is 248471168 bytes, SHA256
 `fcf2d574774547a204c2a19f2c17ffe97796c34039f35435d0d24e5073040d57`.
-The parent owns the one full-library run against that copy; its live log and
-unfinished result are deliberately absent from the focused validation archive.
-No duplicate full-suite run or live PMU/fork campaign was started here.
+The parent completed one full-library run against that copy: **5208 passed,
+0 failed, 123 ignored**, terminal exit 0, 1402.62 seconds. The completed log and
+exit record are in the final archive. The historical focused archive deliberately
+excluded the then-live full log. No duplicate full-suite run or new live PMU/fork
+campaign was started here. The unchanged full suite may attempt legacy counter
+calls; these are not a new collector measurement campaign.
 
 No CLI or dataset caller invokes the new CheckedCounters API. CLI integration
 tests are therefore inapplicable to this increment; the source reference search
@@ -21,15 +24,31 @@ dataset records remain unchanged. Hardware-independent, whole-worker and full
 execution claims remain false.
 
 The source bundle, executable, completed logs and metadata are preserved in the
-canonical S3 archive described by `FOCUSED_VALIDATION_RECEIPT.json`. Conditional
-PUT, fresh ETag-bound GET, archive SHA-256/length/byte comparison, all 30 inner
-hashes, bundle verification and restored executable byte comparison passed.
-The archived source STATUS.md intentionally retains its pre-validation wording;
-the packet's VALIDATION.json records the later completed focused/lint results.
+canonical S3 archive described by `FINAL_VALIDATION_RECEIPT.json`: 37794116 bytes,
+SHA256 `9c01de42001e2368089651eeb6c83ae64c92aef49db579383243e76fbc806a7e`.
+Conditional PUT, fresh ETag-bound GET, archive SHA-256/length/byte comparison,
+all 35 inner hashes, bundle verification and restored executable byte comparison
+passed. The bundle contains tested runtime 9ab6260; documentation head 564638d
+has identical runtime, build and test files. This final receipt/status update
+also changes documentation only. The archived source STATUS.md intentionally
+retains its pre-validation wording; the packet's VALIDATION.json records the
+completed gates. `FOCUSED_VALIDATION_RECEIPT.json` preserves the earlier packet.
+
+The delivery is stacked on `codex/ml-binary-root-trace-20261028`, verified at
+base `c14d4552e513f6e28bda0e0e045f5e64beb492db` (PR #2782). Hosted checks and
+review of the new PR remain separate from these local gates; no main merge is
+performed. Phase-schema integration and independent consumer support for such
+future records remain pending. This increment creates no scientific dataset
+cells or new worker publication evidence.
 
 Preparation diagnostic: sparse materialization succeeded; the first hash list
 included a nonexistent build.rs. That list was corrected before Cargo began.
 No compilation, focused-test or lint failure occurred.
+At final documentation delivery, an explicit rustfmt +1.98.0 check reported that
+its rustfmt component was not installed. The already-installed default rustfmt
+1.10.0-stable completed the scoped check successfully; no source changed and no
+component was installed. This tooling diagnostic occurred after final archive
+creation and is retained in the local publication readback packet.
 
 ## Implementation history
 
