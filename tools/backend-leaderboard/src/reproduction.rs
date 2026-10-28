@@ -156,19 +156,19 @@ fn read_live_checked(root: &Path, relative: &str) -> Result<Option<Vec<u8>>, Str
     let path = root.join(relative);
     match std::fs::symlink_metadata(&path) {
         Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(format!("frozen input is a symlink: {relative}"));
+            Err(format!("frozen input is a symlink: {relative}"))
         }
         Ok(_) => {
             let resolved = path.canonicalize().map_err(|e| e.to_string())?;
             if !resolved.starts_with(&base) {
                 return Err(format!("frozen input escapes checkout: {relative}"));
             }
-            return std::fs::read(&resolved)
+            std::fs::read(&resolved)
                 .map(Some)
-                .map_err(|e| format!("{relative}: {e}"));
+                .map_err(|e| format!("{relative}: {e}"))
         }
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
-        Err(e) => return Err(format!("{relative}: {e}")),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(format!("{relative}: {e}")),
     }
 }
 
