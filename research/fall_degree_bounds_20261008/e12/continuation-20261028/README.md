@@ -1,13 +1,21 @@
 # E12 continuation launch record
 
-[Live-launch snapshot and handoff](STATUS.md): E12a and E12c were admitted on
-2026-10-28 UTC, with startup source checks verified. E12b remains unlaunched.
-These are launch observations, not completed scientific results.
+**E12b update, October 27 Pacific:** the user selected one new Spot attempt,
+which has now launched. See [its receipt and handoff](E12B_STATUS.md).
+Amendment 15 permits `launch.sh b-spot`: cell `3:24:7`, four draws, cap 4,
+`m7i.4xlarge` (16 vCPU / 64 GiB), 24-hour lifetime. Source and gates remain
+frozen. The post-run checker requires four complete draws and exact draw-0
+agreement with the r2 reference after removing only `secs` fields. One attempt
+only; no automatic relaunch. Receipts are under `receipts/b-spot/`.
+
+[Earlier launch snapshot and handoff](STATUS.md): E12a and E12c were admitted on
+2026-10-28 UTC, with startup source checks verified. E12b was pending at that
+snapshot. These are launch observations, not completed scientific results.
 
 [Amendment 13](../../PREREGISTRATION.md) permits one additional E12a and E12c
 attempt after the user's explicit launch request. The exact source, mathematical
-parameters, and acceptance gates remain frozen. E12b awaits the user's choice
-about retaining On-Demand or registering a new Spot attempt.
+parameters, and acceptance gates remain frozen. Amendment 15 records the user's
+subsequent authorization of one E12b Spot attempt.
 
 | Part | Cell | Draws | Instance | Memory | Lifetime |
 | --- | --- | --- | --- | --- | --- |

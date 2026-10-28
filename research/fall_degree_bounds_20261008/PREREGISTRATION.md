@@ -757,3 +757,46 @@ does not authorize an alternative. No additional instances beyond this ordered
 list are authorized here. The wrapper enforces separate receipt directories and
 the absence-of-instance check. This infrastructure amendment adds no new draw,
 changes no scientific acceptance rule, and makes no timing comparison.
+
+## Amendment 15 (2026-10-27 Pacific, 2026-10-28 UTC): one E12b Spot continuation
+
+The user explicitly selected one new Spot attempt for E12b after the current
+role denied On-Demand. This supersedes Amendment 12's market requirement for
+this attempt only. The earlier partial results and On-Demand denial stay in the
+record. Current EC2 enumeration finds only the admitted E12a/E12c jobs, and the
+two earlier E12b jobs have durable `interrupted` status. No On-Demand E12b job was
+launched. This amendment is committed and pushed before the new submission.
+
+- **One attempt:** cell `3:24:7` (N=45), from scratch, cap 4, four unsatisfiable
+  draws, seed `20261012`, using the unchanged `e12/run_par.sh` without Lean.
+- **Frozen source:** `fd-src-371035216942.tgz`, SHA-256
+  `4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f`, commit
+  `371035216942660c4615dfbb88d85a14afaf5c16`.
+- **Host and budget:** one `m7i.4xlarge` Spot instance in `us-east-1`, 16 vCPU,
+  64 GiB, maximum lifetime 24 hours, no `--keep`. Together with E12a/E12c this
+  uses 64 vCPU against the observed 64-vCPU quota. Timing remains diagnostic.
+- **Gates:** original gates 0–3 on the exact binary, then Amendment 12's gate 4:
+  draw 0 must equal the r2 reference on every non-timing field. The known timing
+  fields are the top-level and per-degree `secs`; all other fields are compared,
+  including thread count. The r2 reference is
+  `e12/run-b2/out/E_3-24-7.jsonl`, SHA-256
+  `589c5045361c9a9138baecae629ea91512c35a87efbc022f31780d2d3a91574a`.
+  Earlier reconciliation established r1/r2 non-timing equality. Reference bytes
+  and a completion checker travel separately from the frozen source archive and
+  are hashed in the launch receipt. Neither changes the solver.
+- **Completion:** require all four draws numbered 0–3, the expected cell/seed,
+  zero solutions for each, successful cell exit, original gate completion, and
+  gate 4 equality. Missing or failed checks prevent a completed reading even if
+  the original wrapper exits zero. Preserve all raw outputs and checker logs.
+- **Reading:** retain Amendment 12's lower-median rule, substituting these four
+  new Spot draws for the unrun On-Demand draws; the other three cells remain r2.
+  At least three of four draws at `>=5` are required for consistency with H_ell.
+  A partial cell receives no reading. No independent implementation claim is made.
+- **Stopping:** no resumable mid-closure checkpoint and no automatic relaunch.
+  Reclaim, timeout, OOM, gate failure, or another failure ends this attempt as
+  not completed. The command stops ten minutes before the hard deadline for
+  output upload; existing deadline shutdown/reaper protections remain enabled.
+
+Submission uses selection `b-spot` in `e12/continuation-20261028/launch.sh`,
+with a separate receipt directory. This amendment does not relaunch E12a/E12c
+or authorize any further E12b attempt.
