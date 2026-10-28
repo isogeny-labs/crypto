@@ -19,8 +19,19 @@
     {
       "path": "research/ghs_cubic_tate_bridge_20261026/REPORT.md",
       "finding": "Proves an abstract simple-root subgroup-survival gate but does not evaluate an isogeny."
+    },
+    {
+      "url": "https://magma.maths.usyd.edu.au/magma/handbook/text/1561",
+      "finding": "Documents the parameterized characteristic-two WeilDescentGenus intrinsic and distinguishes its hyperelliptic and general divisor maps."
     }
   ],
+  "magma_parameter_sweep": {
+    "scope": "Every nonzero c in K for one exact source representative per class, using WeilDescentGenus(E,k,c) in Magma 2.30-1.",
+    "receipt": "magma_genus_frontier_q16_receipt.json",
+    "each_order": [3974, 3978, 4178],
+    "histogram_each_order": {"genus_3": 0, "genus_4": 30, "genus_6": 450, "genus_7": 3585, "intrinsic_rejections": 30},
+    "limitation": "Does not classify all covers, all source models in the classes, or non-cover isogeny routes."
+  },
   "candidates": [
     {
       "source_order": 3974,

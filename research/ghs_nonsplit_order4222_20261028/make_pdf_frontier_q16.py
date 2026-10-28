@@ -106,6 +106,14 @@ story += [
       "screen; its selected prime has only 17 elements. The order-3974 "
       "and order-4178 classes have selected primes 1987 and 2089 and "
       "are the stronger map-construction targets."),
+    p("Complete Magma parameter sweep on representatives", "ReportSection"),
+    p("For each exact representative, Magma 2.30-1 exhausted all 4,095 "
+      "nonzero parameters c in its documented WeilDescentGenus intrinsic: "
+      "30 intrinsic rejections, 30 genus-four outputs, 450 genus-six "
+      "outputs, and 3,585 genus-seven outputs. <b>Zero parameters gave "
+      "genus three.</b> This is a complete parameter-specific result for "
+      "those equations; it does not exclude other covers or the "
+      "Jacobian-isogeny route."),
     p("Claim boundary and sources", "ReportSection"),
     p("This is a new <i>finite exclusion certificate for these three "
       "screens</i>, not a new geometric family, new transfer method, or "

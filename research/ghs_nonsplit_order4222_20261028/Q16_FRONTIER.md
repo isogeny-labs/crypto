@@ -101,6 +101,34 @@ the order-3974 and order-4178 representatives, verify `Phi(G)` has order
 Jacobian index calculus and matched source-group rho on the same backend.
 Until those receipts exist, attack advantage is unmeasured.
 
+## Complete Magma GHS-parameter genus sweep on representatives
+
+The [Magma Weil-descent documentation](https://magma.maths.usyd.edu.au/magma/handbook/text/1561)
+defines a standard descent parameter `c in K*` and exposes
+`WeilDescentGenus(E,k,c)`. For each of the three exact representative
+equations above, `magma_genus_frontier_q16.py` asserted that its Conway root
+`w` has order 4,095 and exhausted `c=w^i` for every `0 <= i < 4095` in
+Magma 2.30-1. All three representatives gave the same complete histogram:
+
+| Outcome for one source | Parameter count |
+|:---|---:|
+| Genus 4 | 30 |
+| Genus 6 | 450 |
+| Genus 7 | 3,585 |
+| Intrinsic rejection | 30 |
+| Genus 3 | 0 |
+
+The four nonzero counts sum to 4,095 for each source. This eliminates a
+genus-three output from **that documented parameterized GHS intrinsic on
+those three equations**. The first exploratory receipt was mathematically
+complete but the local output parser expected three lines instead of Magma's
+six wrapped lines; the parser was corrected and the whole sweep was rerun.
+The retained Magma code and final untruncated server receipt are
+`magma_genus_frontier_q16.magma` and
+`magma_genus_frontier_q16_receipt.json`. The sweep does not quantify all
+covers, all 66 source equations, or the separate isogeny-to-Jacobian route.
+
 Reproduce: `sage -python research/ghs_nonsplit_order4222_20261028/frontier_q16.py`
 and `lean research/ghs_nonsplit_order4222_20261028/FrontierQ16Gate.lean`.
+Then run `python3 research/ghs_nonsplit_order4222_20261028/magma_genus_frontier_q16.py`.
 The compact rendered report is `output/pdf/GHS_Q16_DIRECT_SCREEN_FRONTIER.pdf`.
