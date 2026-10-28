@@ -40,8 +40,8 @@
 //! [`CountedGroup`]: crate::cryptanalysis::ic_boundary::CountedGroup
 
 pub mod audit;
-pub mod best2_model;
 pub mod band;
+pub mod best2_model;
 pub mod bounds;
 pub mod calibration;
 pub mod callgrind;
@@ -68,8 +68,8 @@ pub mod hyper_ic;
 pub mod isogeny;
 pub mod isolab;
 pub mod isolation;
-pub mod known_log;
 pub mod jacobian;
+pub mod known_log;
 pub mod koblitz_descent;
 pub mod methods;
 pub mod plane_quartic;
