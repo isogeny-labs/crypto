@@ -4,8 +4,8 @@ ARG BINARY_SHA256
 LABEL org.opencontainers.image.source="https://github.com/isogeny-labs/crypto" \
       org.opencontainers.image.revision="${SOURCE_REVISION}"
 # The build context contains the tested executable and frozen public inputs only.
-COPY crypto /usr/local/bin/crypto
-COPY protocol.json pilot-plan.json build-info.json /opt/ml-dataset/
+COPY --chmod=0755 crypto /usr/local/bin/crypto
+COPY --chmod=0644 protocol.json pilot-plan.json build-info.json /opt/ml-dataset/
 RUN test "$(sha256sum /usr/local/bin/crypto | cut -d' ' -f1)" = "$BINARY_SHA256" \
     && mkdir -p /work && chown 1000:1000 /work
 ENV HOME=/work
