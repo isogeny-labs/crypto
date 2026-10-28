@@ -245,6 +245,23 @@ def koblitz_modular_augmentation(ref, since):
              problem=P_IC, unit="integer scalar", better="lower",
              label="Exact equivariant recovery scalar on the n=5 augmentation targets; no cost claim",
              source=f"{path}@{commit}")
+
+def ghs_ipsec_archive(ref, since):
+    """Export recorded archive counters; no cryptographic computation or estimates."""
+    path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
+    txt = show(ref, path)
+    if not txt:
+        return
+    data = json.loads(txt)
+    date = data.get("snapshot_date_utc")
+    if not date or date < since:
+        return
+    for key in ("discovered", "screened", "expanded"):
+        emit("ghs.ipsec155.archive." + key + "_frobenius_orbits",
+             data.get("counters", {}).get(key), date=date,
+             problem="ghs-ipsec155-isogeny-class", unit="Frobenius orbits",
+             better="higher", label="Historical IPsec GHS archive: " + key + " orbits",
+             source=path + "@" + ref)
 def fall_degree(ref):
     """HKY last fall degree d_F of Weil-descended chained Semaev systems (unsatisfiable draws,
     research/fall_degree_bounds_20261008, E7 onward). Counts of recorded draws only; a draw not
@@ -288,10 +305,10 @@ def main():
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
     nist_selection_exact_embedding(a.ref, a.since)
+    ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
 
     koblitz_modular_augmentation(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
-
