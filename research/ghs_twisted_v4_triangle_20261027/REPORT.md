@@ -2,6 +2,8 @@
 
 Research status: 27 October 2026. This is a cover-eligibility and transfer-map
 result. It does not establish a faster discrete-logarithm attack.
+The compact rendered report is `output/pdf/GHS_TRIANGLE_COVER_AUDIT.pdf`;
+`make_pdf.py` rebuilds it from the candidate certificates and map receipts.
 
 ## Prior-work boundary
 
@@ -301,4 +303,5 @@ lean research/ghs_twisted_v4_triangle_20261027/TriangleGate.lean
 sage -python research/ghs_twisted_v4_triangle_20261027/descent_model.py
 python3 research/ghs_twisted_v4_triangle_20261027/magma_canonical.py
 sage -python research/ghs_twisted_v4_triangle_20261027/subgroup_map.py
+python3 research/ghs_twisted_v4_triangle_20261027/make_pdf.py
 ```
