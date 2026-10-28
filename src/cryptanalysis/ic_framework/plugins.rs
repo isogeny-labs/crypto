@@ -2118,6 +2118,14 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
         let table = self.table.as_ref()?;
         decompose_mitm(ctx.group, fb, table, self.m, ops, counters, point)
     }
+
+    fn touch(&self, ctx: &InstanceCtx<G>, point: &G::Elt) {
+        if self.m == 2 {
+            if let Some(table) = &self.table {
+                table.touch(ctx.group, point);
+            }
+        }
+    }
 }
 
 /// The two-summand prime MITM search with the same probe and table keys as
@@ -2221,6 +2229,12 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
         point: PrimePoint,
     ) -> Option<Vec<usize>> {
         decompose_mitm(ctx.group, fb, self.table.as_ref()?, 2, ops, counters, point)
+    }
+
+    fn touch(&self, ctx: &InstanceCtx<PrimeCurve>, point: &PrimePoint) {
+        if let Some(table) = &self.table {
+            table.touch(ctx.group, point);
+        }
     }
 }
 

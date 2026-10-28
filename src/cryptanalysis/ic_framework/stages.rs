@@ -230,6 +230,11 @@ pub trait DecompositionOracle<G: CountedGroup> {
         BTreeMap::new()
     }
 
+    /// Read, without counting or deciding anything, the memory
+    /// [`Self::decompose`] will read for `point`, so that a caller that
+    /// knows several targets ahead can overlap their cache misses.  The
+    /// default does nothing; it never changes a result or a counter.
+    fn touch(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) {}
     /// Work performed by `prepare` that only `bitop/v1` prices (table
     /// insert attempts, canonicalisation tables), by `ecbench::work`
     /// counter name; kept out of `setup_native` so committed records
