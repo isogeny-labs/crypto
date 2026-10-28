@@ -119,3 +119,28 @@ freeze before data. Preserve allm2..9 andprime outstanding requirements.
 No production process or replay error. ExactLFD unknown is a mathematical
 coverage limit, not a failed process. Root progress-metrics reservation remains
 outside this study's write scope.
+
+## Paired data delivered
+
+### What was done
+
+Data commit42599209e2c pushed before derived paired report. Unified export check
+has0findings. Full archive downloaded from S3 and SHA256 matches. Both paired
+PDF pages rendered and visually inspected; plot uses recorded ranks only.
+
+### Decisions made
+
+Keep exactLFD and regularity unknowns explicit. Next stage needs replayable
+higher-degree closure with both lower and upper certificate checks, using saved
+systems rather than regenerating targets or discarding the observed candidate.
+
+### Open threads
+
+Candidate higher-degree closure, larger-m andprime LFD, regularity/solving-degree
+measurement, independent review, shared metrics integration and exact-head CI.
+The full user goal remains active; no universal theorem or elite base established.
+
+### Errors
+
+No unresolved run, export or archive error. Earlier empty parent-directory
+artifact verification and transient uploader warnings remain in preserved logs.
