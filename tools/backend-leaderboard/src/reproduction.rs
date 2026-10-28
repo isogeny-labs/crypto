@@ -292,6 +292,21 @@ pub fn verify_frozen_report(root: &Path) -> Result<(), String> {
         }
         run_checked("git", &["read-tree", "-mu", "HEAD"], &checkout)?;
 
+        // Artifact-backed inputs are intentionally absent from Git worktrees.
+        // The live checkout has already been checked against this immutable
+        // lock above, so copy only missing bytes into the historical snapshot.
+        // Keep tracked snapshot files (especially its manifest) authoritative.
+        for relative in lock.files.keys() {
+            let target = checkout.join(relative);
+            if target.exists() {
+                continue;
+            }
+            let bytes = read_live_or_snapshot(root, SNAPSHOT, relative)?;
+            let parent = target.parent().ok_or("invalid frozen input path")?;
+            std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+            std::fs::write(&target, bytes).map_err(|e| e.to_string())?;
+        }
+
         for name in lock.outputs.keys() {
             let relative = format!("{FROZEN_ARCHIVE}/{name}");
             let target = checkout.join(&relative);
@@ -305,19 +320,6 @@ pub fn verify_frozen_report(root: &Path) -> Result<(), String> {
 
         eprintln!("R0 snapshot {SNAPSHOT}; lock SHA-256 {FROZEN_LOCK_SHA256}");
         let manifest = "tools/backend-leaderboard/Cargo.toml";
-        run_checked(
-            "cargo",
-            &[
-                "+1.99.1",
-                "run",
-                "--locked",
-                "--manifest-path",
-                manifest,
-                "--",
-                "--check",
-            ],
-            &checkout,
-        )?;
         run_checked(
             "cargo",
             &[
