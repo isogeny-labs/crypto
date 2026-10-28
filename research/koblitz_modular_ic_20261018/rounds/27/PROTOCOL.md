@@ -83,3 +83,13 @@ If68independent valid functions are found, RRdimension68 certifies completeness;
 fewer do not. An actual source-basis independence calculation is mandatory.
 Freeze precise monomial range and matrix source before RR data; do not claim
 completeness from a kernel count without independence and pole exhaustiveness.
+
+Before NORM27data, extend it with native integer sums of literal accepted
+LAURENT02 orders: check pole degrees lambda64,nu132,S308,N462;lambda cusp
+zero50leaves14,nu cuspzeros132 andS/N cusp+Z5zeros exhaust308/462. Completeness
+uses regularity away cusps via monic G and existing SS5/Z5 recovery charts.
+For remaininglambda support, compute actual mu=b^4+bcA^3+c^2A^4,
+clearu^28, take its exact elliptic-base quadratic norm and factor it with an
+exact product check. No residual degree guessed from a scalar model.
+Negative Laurent control rejected original3/fifthlambda despite native0/late
+marker, as required. Its full diagnostics retained.
