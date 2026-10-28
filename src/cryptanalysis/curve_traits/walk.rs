@@ -725,13 +725,8 @@ pub fn height_above_floor(p: u64, j0: u64, l: u64, depth: u32) -> Option<u32> {
                 best = Some(best.map_or(len, |b| b.min(len)));
                 break;
             }
-            match roots.iter_mut().find(|r| r.0 == prev) {
-                Some(r) => r.1 -= 1,
-                None => return None,
-            }
-            let Some(&(next, _)) = roots.iter().find(|r| r.1 > 0) else {
-                return None;
-            };
+            roots.iter_mut().find(|r| r.0 == prev)?.1 -= 1;
+            let &(next, _) = roots.iter().find(|r| r.1 > 0)?;
             prev = cur;
             cur = next;
             len += 1;
