@@ -893,8 +893,16 @@ fn consistency_problems(
             r.binary_sha256, host.build.binary_sha256
         ));
     }
-    // Automorphisms.
-    if let Some(used) = r.boundaries.automorphisms_used {
+    // Automorphisms.  For a walk (rho, BSGS, kangaroo, claw) the figure is
+    // the class size the walk divides by, which the floor `√(π/2A)` is
+    // about; an index-calculus or transfer method records the fold of its
+    // factor base there (`ic.k4_gaudry` folds by ± and 2-torsion
+    // translation: 4 on a curve with 2), which no derived figure reads.
+    let walk = matches!(
+        r.method.family.as_str(),
+        "rho" | "bsgs" | "kangaroo" | "claw"
+    );
+    if let Some(used) = r.boundaries.automorphisms_used.filter(|_| walk) {
         let has = r
             .boundaries
             .automorphisms_available
@@ -2691,6 +2699,25 @@ pub(crate) mod tests {
         assert!(!rep.ok);
         assert!(
             problems_with(&rep, "used 6 automorphisms, the curve has 2"),
+            "{:?}",
+            rep.problems
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// An index-calculus record's `automorphisms_used` is the fold of its
+    /// factor base (`ic.k4_gaudry` folds by ± and 2-torsion translation),
+    /// not a walk's class size: it is not held to the curve's count.
+    #[test]
+    fn an_index_calculus_fold_is_not_held_to_the_curves_automorphisms() {
+        let dir = fresh("auto-ic");
+        tamper(&dir, |recs, _| {
+            assert_eq!(recs[IC_SEQ]["method"]["family"], json!("ic"));
+            recs[IC_SEQ]["boundaries"]["automorphisms_used"] = json!(4);
+        });
+        let rep = audit_opts(&dir, &opts(0)).unwrap();
+        assert!(
+            !problems_with(&rep, "automorphisms, the curve has"),
             "{:?}",
             rep.problems
         );
