@@ -187,6 +187,7 @@ def main():
             {row["label"] for row in catalog["rows"]})
     for model in degree3["models"]:
         assert len(model["branch_roots_masks"]) == len(model["reduced_residue_masks"]) == 4
+        assert all(z != 0 for z in model["reduced_residue_masks"])
         assert len(model["cases"]) == 24
         rhs = model["rhs_bitmask"]
         for case in model["cases"]:

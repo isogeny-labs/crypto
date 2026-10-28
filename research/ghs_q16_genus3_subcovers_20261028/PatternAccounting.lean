@@ -12,6 +12,9 @@ namespace GHSQ16GenusThree
 theorem exponent_pattern_accounting :
     12 + 12 + 6 = 30 ∧ 12 * 30 * 4095 = 1474200 := by decide
 
+theorem degree_three_pattern_accounting :
+    24 + 4 + 4 = 32 ∧ 60 * 24 = 1440 := by decide
+
 theorem branch_symmetry_accounting :
     4 * 3 = 12 ∧ 3 * 12 = 36 := by decide
 

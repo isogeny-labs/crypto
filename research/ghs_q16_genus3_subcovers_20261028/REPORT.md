@@ -25,8 +25,8 @@ curve in the same isogeny class. The direct-cover negative search covers the
 12 order-3974 source equations; the automorphism check covers one
 genus-three representative in each of three source-order classes.
 
-A later degree-three branch-supported check excludes 1,440 residue systems
-across all 60 cataloged models in those three classes. Separately, a
+A later degree-three check excludes maps to ordinary elliptic curves from
+all 60 cataloged models in those three classes. Separately, a
 prime-to-subgroup-order isogeny to a genus-three Jacobian **exists
 abstractly** for all 66 older source equations. The isogeny has not been
 evaluated on source points, so these results remain bounds and feasibility
@@ -293,20 +293,32 @@ are still missing. [`IsogenyGate.lean`](IsogenyGate.lean) checks the finite
 count and three modular discriminant values. It does not formalize Tate's
 theorem or the geometric isogeny.
 
-The degree-three branch-supported certificate (stored by checksum in
-[`.artifacts.json`](.artifacts.json))
-tests a different direct-cover route on all 60 cataloged genus-three models
-in these classes. For each model and each of the 24 permutations of the
-branch-root divisor `(2,1,-2,-1)`, it forms the `48 x 24` binary
-residue-matching matrix for `X=lambda*product(x-r_i)^e_i`, with arbitrary
-independent `lambda,mu`, where `mu=sqrt(b)/lambda`. Every matrix has rank
-24 and its augmentation by the required residues has rank 25:
-**1,440 bounded cases excluded**. The remaining branch-supported
-degree-three divisors have an order-three pole, which an Artin–Schreier
-coboundary cannot remove. This excludes the specified degree-three ansatz
-for those 60 exact target models, regardless of source `b`. It does not
-exclude maps with other zeros or poles, another model, a higher-degree
-cover, or an isogeny correspondence.
+The degree-three certificate (stored by checksum in
+[`.artifacts.json`](.artifacts.json)) tests all 60 cataloged genus-three
+models in these classes. In every model, `h` has four simple roots in `K`,
+and the four reduced residues of `f/h^2` are nonzero. Suppose a degree-three
+map from one of these curves `C/K` to an ordinary elliptic curve
+`E: Y^2+XY=X^3+uX^2+b` exists. Choose a rational Weierstrass point of `C`
+as the Jacobian base point and translate the elliptic target so its image
+is the origin. The hyperelliptic involution on `C` then maps to negation on
+`E`, so the pullback of the elliptic `X` coordinate is a rational function
+`R(x)` of degree three. In Artin–Schreier coordinates the target has form
+`z_E^2+z_E=R+u+sqrt(b)/R`. Since each of the four branch roots of `C` has
+a nonzero reduced simple-pole residue, each must be a zero or pole of `R`.
+The zero and pole divisors each have degree three. Their nonzero orders at
+the four roots are therefore a permutation of `(3,-1,-1,-1)`, its negative,
+or `(2,1,-2,-1)`; there is no degree left for zeros or poles elsewhere.
+The order-three cases cannot have the same reduced conductor-one poles as
+`C`. For each of the 24 remaining permutations, the script forms the
+`48 x 24` binary residue-matching matrix for
+`R=lambda*product(x-r_i)^e_i` with arbitrary independent `lambda,mu`, where
+`mu=sqrt(b)/lambda`. Every matrix has rank 24 and its augmentation by the
+required residues has rank 25. Thus the **1,440 matrix exclusions plus
+the divisor argument exclude every degree-three map from these 60 exact
+models to an ordinary elliptic curve over `K`**. The receipt retains every
+matrix and RHS; `audit.py` independently replays the ranks and checks the
+nonzero residues. This does not exclude a different genus-three model in
+the same isogeny class, a higher-degree cover, or an isogeny correspondence.
 
 ## Replay and proof scope
 
