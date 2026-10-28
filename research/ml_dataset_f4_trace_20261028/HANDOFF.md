@@ -35,3 +35,10 @@
 - Separate checker PR2800 passed actual native interoperability: ranks 0/1/1/2/92, 68 genuine nonzero start-word XORs, four rehashed corruption rejections, and a four-event cap-zero prefix with no final rank. All six CLI reports matched library reports. Parent source review found no actionable producer defect.
 - Accepted source archive53f2f989 and terminal full-gate archivee5dbfcf4 passed fresh readback, content hashes and incremental source-bundle verification. The preceding c6fb086c archive is quarantined because its exclusion assertion found a copied live full log. It remains immutable; the accepted correction used a finite completed-file allowlist. Exact URIs and claim boundaries are in VALIDATION.md/VALIDATION.json.
 - Native runtime, tests, fixtures and shared Cargo output were not changed or re-executed during final delivery. Scope remains a bounded native Boolean F4 single-call API. Hosted PR checks and integration remain separate. Source metadata is not execution attestation; no scientific dataset or fall-degree result was generated.
+
+## 18:10 UTC PR delivery
+
+- Opened regular ready PR [2802](https://github.com/isogeny-labs/crypto/pull/2802) at 2026-10-28T18:10:13Z. Creation head was 07d4e817ac45da9ca1587e95e3ed5c8019f39bfd; this handoff-only follow-up does not change runtime, build or tests.
+- Target remains codex/ml-binary-root-trace-20261028 at c14d4552e513f6e28bda0e0e045f5e64beb492db, parent PR2782. Independent checker is PR2800. The PR is open; hosted exact-current-head CI/review and main integration are pending, and feature-base auto-merge is unavailable.
+- The child app attachment request hung without a result and its cell was terminated. Parent will reconcile attachments before retrying; no successful attachment or duplicate request is claimed here.
+- Final delivery/source checkpoint and exact post-push head are retained externally under /home/ec2-user/ml-dataset-resume-20261028/f4-trace-delivery. Check CI about 50 minutes after the final push/activity, later unchanged checks about four hours apart; do not busy poll or merge into a temporary review base.
