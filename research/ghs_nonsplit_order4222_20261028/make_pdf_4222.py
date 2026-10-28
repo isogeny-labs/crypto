@@ -24,10 +24,10 @@ styles.add(ParagraphStyle(name="DocTitle", parent=styles["Title"],
                           textColor=colors.HexColor("#17324f"), spaceAfter=14))
 styles.add(ParagraphStyle(name="Section", parent=styles["Heading2"],
                           fontName="Helvetica-Bold", fontSize=12, leading=15,
-                          textColor=colors.HexColor("#174f77"), spaceBefore=12,
+                          textColor=colors.HexColor("#174f77"), spaceBefore=10,
                           spaceAfter=6, keepWithNext=True))
 styles.add(ParagraphStyle(name="BodyResearch", parent=styles["BodyText"],
-                          fontName="Helvetica", fontSize=9.0, leading=12.2,
+                          fontName="Helvetica", fontSize=8.7, leading=11.7,
                           spaceAfter=4))
 styles.add(ParagraphStyle(name="BodyLead", parent=styles["BodyResearch"],
                           keepWithNext=True))

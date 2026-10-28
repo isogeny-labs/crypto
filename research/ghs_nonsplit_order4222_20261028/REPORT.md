@@ -8,7 +8,13 @@ a smooth nonhyperelliptic genus-three curve over `F_16`. Its Jacobian lies in
 LMFDB isogeny class `3.16.a_a_ev`, whose `has_jacobian` value was `0`
 (**unknown**) in both the 2026-10-19 local snapshot and the live SQL mirror
 queried on 2026-10-28. The explicit quartic and its L-polynomial constitute a
-positive class witness suitable for catalog review. The source equation is new
+positive class witness suitable for catalog review. The earlier
+`ghs_twisted_v4_triangle_20261027/REPORT.md` already gives an
+explicit construction in this same isogeny class, using source parameters
+`(a,b)=(32,853)` in its own field basis. This run adds a second source
+equation and a complete measured attack route. Isomorphism of the two source
+curves has not been checked. Neither the class witness nor
+the geometric family is first identified here. The source equation is new
 to this audit; global publication novelty remains unverified.
 
 This curve belongs to the previously identified nonsplit quadratic-pole
