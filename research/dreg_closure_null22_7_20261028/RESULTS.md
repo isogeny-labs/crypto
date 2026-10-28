@@ -26,6 +26,17 @@ amendments).
   the limit. Degree-4 columns: 136,698 per N0 run, 102,091 per B run. Scan time:
   245–277 s per N0 run, 130–210 s per B run.
 - **Run report** with graph and PDF: `reports/run-20261028T0335Z/`.
+- **Scorer note (added after review, verdict unchanged).** The first version of
+  `dreg_score null` scored only the files it was given and accepted any non-empty
+  satisfiable-control record. It now enumerates the registered draws from the
+  frozen draw file, counts a missing or short record as unmeasured, and counts a
+  satisfiable control only when its scan reached degree 4, saturated and unrefuted
+  (unit tests in `examples/dreg_score.rs`; checked by hand with a missing draw, a
+  missing control and a capped control, which give "incomplete", "controls not
+  valid" and "controls not valid"). `score-output.txt` was regenerated: the table
+  and verdict are unchanged and only two header lines gained wording. The graph's
+  counts now come from `dreg_score null-plot-data` (`reports/run-20261028T0335Z/plot-data.json`);
+  `plot.py` only draws them. The counts are the same as before.
 
 ## The measurement
 
