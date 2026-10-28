@@ -261,6 +261,18 @@ pub fn replay_with_accounting(
     if ok {
         return (ok, detail);
     }
+    if let Some(view) = legacy::pre_endomorphism_a1(&rep, r) {
+        let (ok, d) = compare_replay(&view, r, host, session);
+        if ok {
+            return (
+                true,
+                format!(
+                    "{d} (accounting of the code before the later changes: {})",
+                    legacy::PRE_ENDOMORPHISM_A1
+                ),
+            );
+        }
+    }
     for profile in legacy::PROFILES {
         let again = {
             let _in_force = profile.enter();
@@ -1136,5 +1148,51 @@ mod tests {
         // Pinned solver work was never subtracted.
         assert!(legacy_solver_rounding(&exact, &detail(w, before, "pinned")).is_none());
         assert!(legacy_solver_rounding(&exact, &json!({})).is_none());
+    }
+}
+
+/// Committed sessions recorded before amendment A1 of
+/// `research/ext_endo_rho_20261023` changed the endomorphism classes' uncharged
+/// counters in place (`legacy::pre_endomorphism_a1`).  The methods are in the
+/// library, so these replays are too; the pdp3 ones are in the binary.
+#[cfg(test)]
+mod committed_replays {
+    use super::*;
+
+    fn replay(rel: &str, seq: u64) -> Option<(bool, String)> {
+        let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(rel);
+        dir.join("session.json")
+            .exists()
+            .then(|| replay_record(&dir, seq).unwrap())
+    }
+
+    #[test]
+    fn gls_record_from_before_amendment_a1_replays() {
+        if let Some((ok, detail)) = replay("research/ext_endo_rho_20261023/sessions/gls-fp2", 0) {
+            assert!(
+                ok && detail.contains(legacy::PRE_ENDOMORPHISM_A1),
+                "{detail}"
+            );
+        }
+    }
+
+    #[test]
+    fn subfield_record_from_before_amendment_a1_replays() {
+        if let Some((ok, detail)) =
+            replay("research/ext_endo_rho_20261023/sessions/subfield-fp3", 2)
+        {
+            assert!(
+                ok && detail.contains(legacy::PRE_ENDOMORPHISM_A1),
+                "{detail}"
+            );
+        }
+    }
+
+    #[test]
+    fn amended_session_replays_under_the_current_counters() {
+        if let Some((ok, detail)) = replay("research/ext_endo_rho_20261023/sessions-a1/gls-fp2", 0)
+        {
+            assert!(ok && detail == "identical", "{detail}");
+        }
     }
 }

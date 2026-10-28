@@ -6079,6 +6079,9 @@ pub fn parse_linear_harvest(spec: &str) -> Option<LinearHarvest> {
 /// ([`LINEAR_HARVEST_GPV`]), anything else is [`parse_linear_harvest`]d.
 pub fn linear_harvest() -> Option<LinearHarvest> {
     static ENV: std::sync::OnceLock<Option<LinearHarvest>> = std::sync::OnceLock::new();
+    if LEGACY_NO_LINEAR_HARVEST.with(|c| c.get()) {
+        return None;
+    }
     if let Some(v) = LINEAR_HARVEST_OVERRIDE.with(|c| c.get()) {
         return v;
     }
@@ -6086,6 +6089,20 @@ pub fn linear_harvest() -> Option<LinearHarvest> {
         Err(_) => Some(LINEAR_HARVEST_DEFAULT),
         Ok(s) => parse_linear_harvest(&s),
     })
+}
+
+// The replay audit's view of a record made before the harvest was on by
+// default (`ecbench::legacy`): no harvest at all, whatever a caller's
+// override says, since the oracle sets and clears that override around each
+// solve.  Per thread.
+thread_local! {
+    static LEGACY_NO_LINEAR_HARVEST: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Count as the engine did before the harvest was the default; `false`
+/// restores the normal choice.
+pub fn set_legacy_no_linear_harvest(on: bool) {
+    LEGACY_NO_LINEAR_HARVEST.with(|c| c.set(on));
 }
 
 /// Override `KIC_LINEAR_HARVEST` on this thread (`None` restores it;

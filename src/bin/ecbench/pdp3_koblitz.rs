@@ -1280,7 +1280,11 @@ mod committed_replays {
         let mut records = read_records(&dir).unwrap();
         let r = records.iter_mut().find(|r| r.seq == 58).unwrap();
         *r.phases[2].native.get_mut("solver_ops").unwrap() += 1;
-        let (ok, detail) = replay_with_accounting(&replay_input_json(&p, r).unwrap(), r);
+        let session = crypto_lib::cryptanalysis::ecbench::runner::read_session(&dir).unwrap();
+        let host: crypto_lib::cryptanalysis::ecbench::host::HostCapsule =
+            serde_json::from_str(&std::fs::read_to_string(dir.join("host.json")).unwrap()).unwrap();
+        let (ok, detail) =
+            replay_with_accounting(&replay_input_json(&p, r).unwrap(), r, &host, &session);
         assert!(!ok, "{detail}");
         assert!(detail.contains("phase counts"), "{detail}");
     }

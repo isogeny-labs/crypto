@@ -28,8 +28,8 @@
 //! a value, only whether the whole record reproduces.  A new session is
 //! always recorded and replayed under the current accounting.
 //!
-//! The switches are the solver's own thread-local ones (`set_linear_harvest`,
-//! `set_gate_first`, and the eager-rewrite and word-XOR-unit switches added
+//! The switches are the solver's own thread-local ones (`set_gate_first`,
+//! and the eager-rewrite, word-XOR-unit, harvest and calibration switches added
 //! beside them): the solve runs on the calling thread, so a test running
 //! another solve on another thread is unaffected.  They are restored when
 //! the guard drops.
@@ -38,7 +38,7 @@ use crate::cryptanalysis::ic_boundary::set_legacy_calibration_before_1640;
 use crate::cryptanalysis::ic_framework::set_legacy_exact_word_xor_unit;
 use crate::cryptanalysis::inherited_f4::set_legacy_lazy_rewrite;
 use crate::cryptanalysis::koblitz_groebner::{
-    set_gate_first, set_legacy_pre_1646, set_linear_harvest,
+    set_gate_first, set_legacy_no_linear_harvest, set_legacy_pre_1646,
 };
 
 /// A named accounting of the past.
@@ -106,9 +106,7 @@ impl Profile {
         set_legacy_lazy_rewrite(self.lazy_rewrite);
         set_legacy_pre_1646(self.pre_1646);
         set_legacy_calibration_before_1640(self.calibration_before_1640);
-        if self.no_linear_harvest {
-            set_linear_harvest(Some(None));
-        }
+        set_legacy_no_linear_harvest(self.no_linear_harvest);
         if self.no_gate_first {
             set_gate_first(Some(false));
         }
@@ -122,7 +120,7 @@ impl Drop for Guard {
         set_legacy_lazy_rewrite(false);
         set_legacy_pre_1646(false);
         set_legacy_calibration_before_1640(false);
-        set_linear_harvest(None);
+        set_legacy_no_linear_harvest(false);
         set_gate_first(None);
     }
 }
@@ -138,3 +136,40 @@ pub const SETUP_DESCRIPTORS: [&str; 3] = ["pair_table_kind", "pair_table_points"
 pub fn is_setup_descriptor(name: &str) -> bool {
     SETUP_DESCRIPTORS.contains(&name)
 }
+
+/// What a `rho.gls` / `rho.frobenius_orbit` replay reports of its uncharged
+/// endomorphism counters, as the binaries did before amendment A1 of
+/// `research/ext_endo_rho_20261023` (2026-10-23) changed
+/// `EndomorphismClasses` in place: no `endomorphism_field_muls_uncharged`,
+/// and on GLS three applications of `ψ` per canonicalisation where the class
+/// needs one (`ψ² = −1`; the subfield family's two per step is unchanged).
+/// Only uncharged counters differ: the totals and every group-operation
+/// count are the same.
+///
+/// The view is taken from the replay alone (the new counter is dropped from
+/// the counters and the unpriced list, GLS applications are multiplied by
+/// three) and is offered only for a record that lacks the new counter, so a
+/// record cannot choose any figure; every other field must still match.
+pub fn pre_endomorphism_a1(
+    rep: &crate::cryptanalysis::ecbench::methods::SolveReport,
+    r: &crate::cryptanalysis::ecbench::record::Record,
+) -> Option<crate::cryptanalysis::ecbench::methods::SolveReport> {
+    const FIELD_MULS: &str = "endomorphism_field_muls_uncharged";
+    const APPLICATIONS: &str = "endomorphism_applications_uncharged";
+    if !matches!(r.method.id.as_str(), "rho.gls" | "rho.frobenius_orbit")
+        || r.counters.contains_key(FIELD_MULS)
+        || !rep.counters.contains_key(FIELD_MULS)
+    {
+        return None;
+    }
+    let mut view = rep.clone();
+    view.counters.remove(FIELD_MULS);
+    view.unpriced.retain(|name| name != FIELD_MULS);
+    if r.method.id == "rho.gls" {
+        *view.counters.get_mut(APPLICATIONS)? *= 3;
+    }
+    Some(view)
+}
+
+/// How the replay detail names [`pre_endomorphism_a1`].
+pub const PRE_ENDOMORPHISM_A1: &str = "pre-A1 endomorphism counters";
