@@ -131,5 +131,21 @@ positive certificates. This proves a controller archive roundtrip; the worker
 publication and completion-receipt fetch paths remain outside this check.
 Exact receipts and raw local checks are in
 [evidence/policy-compatibility-20261028/](evidence/policy-compatibility-20261028/).
-Parent-owned root-library checks, current-head CI and PR delivery are separate
-gates; this record does not claim they have passed.
+The parent-owned root-library gate also passed: 4,987 passed, zero failed and
+122 ignored, with the log reporting 1340.44 seconds. The release test executable
+was built from runtime source `8d55079e37f2c5f2f506edf20670f018354edd56`;
+its SHA256 is `c833e37af8a54d1a92dadbc6385fb071b24e15fdef31e3463cdab46e3a88a563`.
+Commit `377319ecf33d561be7bec3de0de7e40642ca3ea5` and this publication follow-up
+change only documentation and evidence. The native subtree remains
+`ffc2c5727e8902add679db8ac875677d2f8397de`, and the root source/build/test files
+are unchanged from the tested runtime commit. No test suite was rerun for
+this evidence-only update. These are software checks, not timing comparisons.
+
+The full root build/test logs and hash metadata, excluding the 268,484,192-byte
+test executable, are archived at
+`s3://setec-astronomy-artifacts/research/ml-dataset/validation/20261028/consumer-policy-root-gate/ec3a9621a0d5e58a145a8c3a5bfb2f15fbe80deb2c3a1ccd8962453d11f820fe/root-validation.tar.gz`.
+The 83,828-byte archive passed conditional creation, ETag-bound fresh GET,
+SHA256 and byte comparison, extraction, and all six internal file hashes.
+Exact metadata is in [root-validation.json](evidence/policy-compatibility-20261028/root-validation.json)
+and [root-durability.json](evidence/policy-compatibility-20261028/root-durability.json).
+Current-head remote CI, review and merger remain separate delivery gates.
