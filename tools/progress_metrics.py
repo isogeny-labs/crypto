@@ -284,6 +284,23 @@ def fall_degree(ref):
     emit("fall_degree.min_n_vars_censored", min_censored_n, problem="fall-degree", unit="variables", label="Smallest N with a draw censored above its cap", source=src)
 
 
+def n83_fixed_fall(ref, since):
+    """Forward recorded fixed-base certificates, without inferring regularity."""
+    path = "research/n83_fixed_fall_catalog_20261028/evidence/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for row in data.get("rows", []):
+            status = row.get("closure_status", {})
+            if status.get("closure_exit_code") != 0 or status.get("replay_exit_code") != 0:
+                continue
+            for field in ("last_fall_degree", "closure_rank", "linear_rank"):
+                emit(f"n83.fixed_ell27.{row['id']}.{field}", row.get(field),
+                     date=date, problem="n83-fixed-factor-base-fall-degree",
+                     unit="degree" if field == "last_fall_degree" else "rank",
+                     label=f"Fixed ell27 {row['id']}: {field}; producer replay, review pending",
+                     source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -297,6 +314,7 @@ def main():
     nist_selection_exact_embedding(a.ref, a.since)
     ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
+    n83_fixed_fall(a.ref, a.since)
 
 
 if __name__ == "__main__":
