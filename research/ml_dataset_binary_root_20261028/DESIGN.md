@@ -99,3 +99,35 @@ total budget (maximum USD200) remain separate unchanged obligations.
 - The repository's Semaev S3 derivation and reference to ePrint2004/031 were
   reviewed. A fresh request for the primary PDF returned HTTP403; its full
   text was not newly inspected. No novelty or speed claim is made.
+
+## Authorized dataset integration, 2026-10-28
+
+After the standalone increment, the parent handed off `src/ml_dataset` and
+module registration under renewed T-743 ownership and exclusive centralized
+Cargo ownership. The nine native tests passed at registration commit
+`aea52933390a63e38cdebe7c81d1baff1b059a45`; strict lint and integration follow.
+
+Replace only the binary/Koblitz m=2 root adapter with the bounded producer.
+Bind canonical JSON digests of the complete public instance, complete actual
+factor base and exact CaseConfig, plus the explicit field/modulus, target,
+ordered fixed-x calls, recomputed S3 coefficients, and work prefixes. Never
+read private-witness data. Preserve legacy APIs and legacy artifacts without
+the new certificate markers. Higher-m remains explicitly unsupported.
+
+Charge the five-operation binary S3 recipe, native mixed primitive work,
+six-operation Horner checks, and actual group lift additions against one
+aggregate cap. Bound native events and serialized event bytes across all calls;
+independent replay recomputes both aggregates, verifies the sole recognized
+byte-cap sink stop, and rejects unjustified omitted calls or lifts. Live sink
+I/O failure aborts immediately and preserves its previously fsynced prefix.
+Selected native states and per-call reports become live artifacts. An all-field
+zero polynomial enumerates only actual factor-base x values under the same cap.
+
+Certificate, outcome and training-export reference bindings enforce false
+execution-completeness and total-cost flags and no scalar or ECDLP completion
+claim. Tests cover both binary families and twists, odd/even fields, cap
+boundaries, exact public/config/domain/field binding, tampered aggregates,
+sealed outcome labels and live-prefix persistence. These are bounded software
+fixtures, not new scientific data or coverage measurements. Persistence uses
+the existing canonical S3 source/evidence path; no cloud scientific execution,
+new budget, public push or PR is authorized by this increment.
