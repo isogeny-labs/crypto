@@ -1,6 +1,6 @@
 name = "projective_law_boundary"
 version = "0.1.0"
-defaultTargets = ["ProjectiveLawBoundary", "RuntimeSemantics", "AxiomAudit", "WeightedProjCoheight", "WeightedProjQuadraticPoint", "WeightedProjQuadraticLocal"]
+defaultTargets = ["ProjectiveLawBoundary", "RuntimeSemantics", "AxiomAudit", "WeightedProjCoheight", "WeightedProjQuadraticPoint", "WeightedProjQuadraticLocal", "WeightedProjQuadraticJacobian"]
 
 [[require]]
 name = "mathlib"
@@ -24,3 +24,6 @@ name = "WeightedProjQuadraticPoint"
 
 [[lean_lib]]
 name = "WeightedProjQuadraticLocal"
+
+[[lean_lib]]
+name = "WeightedProjQuadraticJacobian"
