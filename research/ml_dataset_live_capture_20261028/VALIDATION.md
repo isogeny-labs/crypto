@@ -1,5 +1,48 @@
 # Partial artifact software validation
 
+## Controller contention fix — source 7d2aad8
+
+Runtime source `7d2aad8baa5fa5851e3f2ac16b6024cd3999210a` passes **5,130
+full-library tests, zero failures and 123 ignored**, all 25 focused budget
+tests, strict Rust 1.98 release-library Clippy and scoped formatting. The
+source-bound result is in `validation-7d2aad8.json`.
+
+Distinct workers now wait up to 30 seconds for the controller lock, retrying
+contention and interrupted calls while preserving other errors. A worker's
+session lock remains immediately exclusive. Path identity is checked across
+the wait; the controller is released before worker-journal replay. The limit
+bounds retry time, not a blocked filesystem syscall. Regression tests exercise
+disjoint allocations, reserved credits, interruption, timeout, missing and
+replaced paths, and session exclusivity.
+
+The full suite ran from a fixed test executable with SHA-256
+`4fb48e0d7ba537067324e87cf8b74711c8deeea56cac4c9448a288ce9d5c1d78`
+using `RAYON_NUM_THREADS=16` and `--test-threads=1`, finishing in 1,616.44
+seconds. That is shared-host validation duration, not benchmark evidence.
+The pre-migration run ended during host shutdown without a terminal result.
+The first migrated run exposed missing C++ tooling; its interrupted log and
+isolated diagnostic are retained. After installing gcc-c++ and
+perl-Digest-SHA, all six device-emulation checks and the full suite passed.
+No source test was weakened or skipped.
+
+The 172,671-byte final archive was conditionally uploaded and freshly downloaded
+with matching bytes at 2026-10-28T13:37:38Z:
+
+```text
+s3://setec-astronomy-artifacts/ml-dataset/20261028/software/live-lockfix/5c9b23c58de04f17878c20a964666ac42f51e23b795f516de2b61ab57c5ab2aa/validation.tar.gz
+```
+
+It preserves the successful and interrupted logs, diagnostics, source patch,
+source/binary digests and terminal validation metadata. Its SHA-256 is
+`5c9b23c58de04f17878c20a964666ac42f51e23b795f516de2b61ab57c5ab2aa`.
+See `validation-7d2aad8-archive.json`. This transfer uses the controller's
+existing credentials; actual dataset-worker S3 access remains unverified.
+The future main/persistence merge must separately preserve main's exact-prefix
+absence probing, cumulative admission and scoped-head integration fixtures,
+then pass its own validation. This result does not validate that future source.
+
+## Earlier partial-artifact implementation — source ae0683c
+
 The tested runtime source is `ae0683c2edeee9066d696af9d0ca3e41ad9c4a24`.
 Rust 1.98.0 release compilation, strict Clippy, scoped formatting and the
 library/CLI tests pass. The final full library run passed **5,122 tests with
