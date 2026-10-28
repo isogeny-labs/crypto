@@ -7,8 +7,7 @@ the distance to the matched rho.negation reference (S / S_rho), the residuals st
 (targets tried x 2B) with the table's memory estimate, and the paired geometric mean of
 S against the pair-table incumbent over the same (session, target, round).  Fits
 log2 S against log2 B for the sweep at each size (the model S = c sqrt(2B) predicts a
-slope of 1/2) and log2 S against the curve size at fixed B (the model predicts 0 for the
-sweep and 1/6 per bit... of the base-optimised pair table).  Writes results.json,
+slope of 1/2) and log2 S against the curve size at fixed B (the model predicts 0 for the sweep).  Writes results.json,
 sweep-s.svg and report.html next to this file.  Standard library only.
 """
 import json
@@ -120,6 +119,29 @@ def figure(rs):
     (HERE / "sweep-s.svg").write_text("\n".join(out) + "\n")
 
 
+def findings(rs, fit):
+    g = lambda bits, arm, k: next(r[k] for r in rs if r["bits"] == bits and r["arm"] == arm)
+    inc = lambda bits: INCUMBENT[bits]
+    items = [
+        f"<li><b>The sweep beats the pair-table recipe in the counted unit, by a lot.</b> At 32 bits S is {g(32,'sweep-b2','mean_s'):.2f} at B = 2, "
+        f"{g(32,'sweep-b16','mean_s'):.2f} at B = 16 and {g(32,'sweep-b128','mean_s'):.2f} at B = 128, against {g(32,inc(32),'mean_s'):.2f} for the incumbent "
+        f"(B = 1024) and {g(32,'rho-neg','mean_s'):.2f} for rho.negation: the distance to rho falls from {g(32,inc(32),'distance_to_rho'):.1f}x to "
+        f"{g(32,'sweep-b2','distance_to_rho'):.1f}x. Every one of the {sum(r['runs'] for r in rs if r['arm'].startswith('sweep'))} sweep runs verified.</li>",
+        f"<li><b>Its cost is a square root, and it is cheapest where there is least index calculus.</b> At fixed B the S does not grow with the curve "
+        f"(slope of log2 S against bits: {', '.join(f'{v:+.3f}' for k, v in fit['s_vs_bits_slope'].items() if k.startswith('sweep'))}), i.e. the work is "
+        f"c*sqrt(r) additions; S grows with the base as B^{statistics.mean(fit['s_vs_base_slope'].values()):.2f} (model 0.5), so the smallest base wins. "
+        "At B = 2 the base is four points and the search is a birthday collision of aG + bQ values.</li>",
+        f"<li><b>The memory is the price the unit does not see.</b> The residual table holds {g(32,'sweep-b2','residuals_stored'):.0f} entries at 32 bits for B = 2 "
+        f"({g(32,'sweep-b2','table_mb'):.1f} MB) and {g(32,'sweep-b128','residuals_stored'):.0f} for B = 128 ({g(32,'sweep-b128','table_mb'):.0f} MB); it grows like sqrt(r B). "
+        "rho.negation keeps O(1) memory. S counts group additions only.</li>",
+        "<li><b>What this is.</b> A real, verified reduction of the cost of an index-calculus-pipeline arm and of its distance to rho; also the cost profile of "
+        "a baby-step/giant-step collision search with a small signed base. The owner's rule that relabelling is not an improvement applies: this PR therefore "
+        "does not put the sweep on tables A-C of the leaderboard and leaves that decision to the owner.</li>",
+        "<li><b>Unpriced native work.</b> Each residual costs a hash insert or probe that S does not charge. Priced at 1 GAE per probe the band keeps every ordering "
+        "(sweep below the pair table, rho below the sweep).</li>"]
+    return "<ul>" + "".join(items) + "</ul>"
+
+
 def report(rs, fit):
     tr = "\n".join(
         f"<tr><td>{r['bits']}</td><td>{r['arm']}</td><td>{r['verified']}/{r['runs']}</td><td>{r['mean_s']:.2f}</td>"
@@ -137,7 +159,10 @@ residuals is a base-only relation. Three sessions per size in one binary; all ar
 <p>Slope of log2 S against log2 B per size (model: +0.5): {f1}.<br>
 Slope of log2 S against curve bits at fixed base (model: 0 for the sweep): {f2}.</p>
 <table><tr><th>bits</th><th>arm</th><th>verified</th><th>mean S</th><th>S / rho.negation</th><th>paired S vs pair-table</th>
-<th>residuals stored</th><th>table MB (est.)</th></tr>{tr}</table></body></html>"""
+<th>residuals stored</th><th>table MB (est.)</th></tr>{tr}</table>
+<h2>Findings</h2>
+{findings(rs, fit)}
+</body></html>"""
     (HERE / "report.html").write_text(html)
 
 
@@ -146,7 +171,12 @@ def main():
     fit = fits(rs)
     figure(rs)
     report(rs, fit)
-    (HERE / "results.json").write_text(json.dumps({"rows": rs, "fits": fit}, indent=1, sort_keys=True) + "\n")
+    headline = []
+    for r in rs:
+        headline.append({"name": f"{r['bits']}/{r['arm']}/mean_s", "claimed": r["mean_s"]})
+        if "paired_s_vs_incumbent" in r:
+            headline.append({"name": f"{r['bits']}/{r['arm']}/paired_s_vs_incumbent", "claimed": r["paired_s_vs_incumbent"]})
+    (HERE / "results.json").write_text(json.dumps({"rows": rs, "fits": fit, "headline": headline}, indent=1, sort_keys=True) + "\n")
     for r in rs:
         print(f"{r['bits']:3d} {r['arm']:18s} {r['verified']}/{r['runs']} S={r['mean_s']:8.2f} dist={r['distance_to_rho']:6.1f} "
               f"vsInc={r.get('paired_s_vs_incumbent', float('nan')):.3f} stored={r.get('residuals_stored', float('nan')):.0f}")

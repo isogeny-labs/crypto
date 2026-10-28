@@ -97,6 +97,30 @@ def figure(rs):
     (HERE / "wall-ratio.svg").write_text("\n".join(out) + "\n")
 
 
+def findings(rs):
+    g = lambda bits, arm, k: next(r[k] for r in rs if r["bits"] == bits and r["arm"] == arm)
+    ci = lambda bits, arm: next(r["relations_wall_ci95"] for r in rs if r["bits"] == bits and r["arm"] == arm)
+    items = [
+        f"<li><b>Sixteen lanes is the knee; wider does not pay.</b> Relation-phase wall time against the incumbent walk at 32 bits: "
+        f"16 lanes {g(32,'batch-16','paired_relations_wall'):.3f}, 64 lanes {g(32,'batch-64','paired_relations_wall'):.3f}, "
+        f"256 lanes {g(32,'batch-256','paired_relations_wall'):.3f}, 1024 lanes {g(32,'batch-1024','paired_relations_wall'):.3f}; "
+        f"at 28 bits {g(28,'batch-16','paired_relations_wall'):.3f}, {g(28,'batch-64','paired_relations_wall'):.3f}, "
+        f"{g(28,'batch-256','paired_relations_wall'):.3f}, {g(28,'batch-1024','paired_relations_wall'):.3f}. "
+        f"At 1024 lanes the 28-bit interval ({ci(28,'batch-1024')[0]:.3f}, {ci(28,'batch-1024')[1]:.3f}) spans 1: no gain over the walk.</li>",
+        f"<li><b>The shared inversion is the mechanism.</b> The serial control with the same 1024 walks and no shared inversion is "
+        f"{g(32,'serial-1024','paired_relations_wall'):.3f} of the walk at 32 bits, against {g(32,'batch-1024','paired_relations_wall'):.3f} with it.</li>",
+        f"<li><b>Counted S cannot fall with width.</b> Every lane's start-up and the work in flight when the logarithm is found are charged: "
+        f"paired S against the walk at 20 bits is {g(20,'batch-16','paired_s'):.3f} (16 lanes) and {g(20,'batch-1024','paired_s'):.3f} (1024 lanes).</li>",
+        f"<li><b>Small curves lose.</b> At 20 bits even 16 lanes cost {g(20,'batch-16','paired_relations_wall'):.3f} of the walk's relation time: "
+        "the lane start-up is not amortised over a solve of a few thousand trials.</li>",
+        f"<li><b>Existing path to look at.</b> <code>walk-prime-fast</code> (native Montgomery additions, same S) is slower than the plain walk at every size: "
+        f"{g(20,'fast','paired_relations_wall'):.2f}, {g(24,'fast','paired_relations_wall'):.2f}, {g(28,'fast','paired_relations_wall'):.2f}, {g(32,'fast','paired_relations_wall'):.2f} of the walk's relation time.</li>",
+        "<li><b>Verdict for the lead.</b> The predicted 2x from stepping 1024 targets in lock-step comes from a regime in which one inversion per target dominates; "
+        "at 16 lanes the inversion is already shared and is a few nanoseconds a step, so the lead's wide-batching item closes as measured. "
+        "The constant gain that exists is the 16-lane one (round 3), now measured at 24 and 28 bits as well.</li>"]
+    return "<ul>" + "".join(items) + "</ul>"
+
+
 def report(rs):
     tr = "\n".join(
         f"<tr><td>{r['bits']}</td><td>{r['arm']}</td><td>{r['verified']}/{r['runs']}</td><td>{r['mean_s']:.2f}</td>"
@@ -115,7 +139,10 @@ inversion serves a whole round, against the incumbent guarded walk, on the pair-
 <th>paired S vs walk</th><th>paired relations wall vs walk</th><th>paired solve wall vs walk</th></tr>
 {tr}</table>
 <p>Counted S includes every lane's in-flight work and the start-up of every lane, so S cannot fall with width; the measurement
-is the relation-phase wall time.</p></body></html>"""
+is the relation-phase wall time.</p>
+<h2>Findings</h2>
+{findings(rs)}
+</body></html>"""
     (HERE / "report.html").write_text(html)
 
 
@@ -123,7 +150,13 @@ def main():
     rs = rows()
     figure(rs)
     report(rs)
-    (HERE / "results.json").write_text(json.dumps({"rows": rs}, indent=1, sort_keys=True) + "\n")
+    headline = []
+    for r in rs:
+        if r["arm"] in ("rho-neg", BASE):
+            continue
+        for k, f in (("relations_wall_ratio", "paired_relations_wall"), ("solve_wall_ratio", "paired_solve_wall"), ("s_ratio", "paired_s")):
+            headline.append({"name": f"{r['bits']}/{r['arm']}/{k}", "claimed": r[f]})
+    (HERE / "results.json").write_text(json.dumps({"rows": rs, "headline": headline}, indent=1, sort_keys=True) + "\n")
     for r in rs:
         if r["arm"] != "rho-neg":
             print(f"{r['bits']:3d} {r['arm']:12s} S={r['mean_s']:8.2f} dist={r['distance_to_rho']:6.1f} "
