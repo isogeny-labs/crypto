@@ -156,6 +156,11 @@ def main():
                r["exact_equation_publication_status"] == "unverified" and
                r["verified_eligible_transfer"] and
                not r["measured_full_cost_below_rho"] for r in prior["rows"])
+    family = json.loads((HERE/"family_formula_receipt.json").read_text())
+    assert family["search_sha256"] == sha(HERE/"family_formula.py")
+    assert family["map_receipt_sha256"] == sha(map_path)
+    assert len(family["rows"]) == 15
+    assert {r["delta_base_mask"] for r in family["rows"]} == set(range(1,16))
     representative_path = HERE/"map4162_receipt.json"
     representative = json.loads(representative_path.read_text())
     assert representative["search_sha256"] == sha(HERE/"map4162.py")

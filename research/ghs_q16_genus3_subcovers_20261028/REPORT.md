@@ -70,6 +70,43 @@ rows with `#E=4098`, `4162`, and `3970` lie in already cataloged
 respectively. This is prior-work evidence at the isogeny-class level,
 not proof that each exact equation or map appeared in print.
 
+### Closed-form family and count for this construction
+
+The six surviving exponent patterns reduce to a `V4` cover form. The
+following algebraic construction works for `k=F_q`, `q=2^(2m)`, and
+`K=F_(q^3)`. Choose a noncube `a` in `k`, a root `r` of
+`r^3=a^-1` in `K`, and any `delta in k*`. Set
+
+`h(x)=a^2*x^4+a*x`,
+`V(x)=(x-r^q)*(x-r^(q^2))/(x*(x-r))`,
+`lambda=delta^2/(a^2*r^2)`, and `b=lambda^4`.
+
+The three nonzero roots of `h` are `r,r^q,r^(q^2)`; their sum is zero.
+Multiplying out the two quadratic factors gives
+`V+1/V=a*r/h(x)`. With `alpha=delta/(a*r)`, we have
+`alpha^2=lambda` and `alpha*(V+1/V)=delta/h(x)`. Consequently
+
+`C_delta: y^2+h(x)*y=delta*h(x)+d0*h(x)^2`
+
+has four distinct simple Artin–Schreier poles and genus three. For any
+`u in K` and `d0 in k` with `Tr_(K/F2)(u+d0)=0`, choose `c in K`
+with `c^2+c=u+d0`. The formulas for `C_K -> E' -> E_b` in the
+representative section below apply with `E_b`'s `X^2` coefficient `u`.
+For fixed `a,r,u,d0`, distinct `delta in k*` give distinct `b`:
+`b=delta^8/(a^8*r^8)`, and the eighth-power map permutes `k*`
+because `q-1` is odd. Thus this **specific construction contains exactly
+`q-1` source parameters**. It gives 15 at `q=16`; the identity and
+distinctness are checked by [`family_formula.py`](family_formula.py)
+for all 15. The Lean theorem `iterated_square_injective` checks the
+abstract injectivity step.
+
+This is a bound on the displayed construction, not on every curve exposed
+to transfer attacks. The `V4` genus-three cover structure is already
+studied in [Nart–Ritzenthaler](https://arxiv.org/abs/0905.0546), and
+the published even-characteristic isogeny-condition classification also
+applies. The closed formula generates and excludes exact cases, but it
+does not establish a new family type or a speedup.
+
 ### Explicit transfer for `b=1384`
 
 The source prime subgroup has order `2081`, with `G=(2411,528)` and
@@ -225,6 +262,7 @@ TMPDIR=/Volumes/SSD990/llm/tmp /Volumes/SSD990/cryptanalysis/third_party/sage-bi
 TMPDIR=/Volumes/SSD990/llm/tmp /Volumes/SSD990/cryptanalysis/third_party/sage-binary/sage -python research/ghs_q16_genus3_subcovers_20261028/map4162.py
 TMPDIR=/Volumes/SSD990/llm/tmp /Volumes/SSD990/cryptanalysis/third_party/sage-binary/sage -python research/ghs_q16_genus3_subcovers_20261028/attack4162.py
 python3 research/ghs_q16_genus3_subcovers_20261028/prior_work.py
+TMPDIR=/Volumes/SSD990/llm/tmp /Volumes/SSD990/cryptanalysis/third_party/sage-binary/sage -python research/ghs_q16_genus3_subcovers_20261028/family_formula.py
 python3 research/ghs_q16_genus3_subcovers_20261028/audit.py
 lean research/ghs_q16_genus3_subcovers_20261028/PatternAccounting.lean
 lean research/ghs_q16_genus3_subcovers_20261028/BranchPole.lean
@@ -233,7 +271,7 @@ lean research/ghs_q16_genus3_subcovers_20261028/BranchPole.lean
 `PatternAccounting.lean` checks the exact search cardinalities and subgroup
 order arithmetic. `BranchPole.lean` proves the characteristic-two additive
 step that two distinct reciprocals cannot sum to zero, given injectivity of
-inversion. Neither file formalizes the Laurent-series expansion, the Sage
+inversion, and injectivity of iterated squaring. Neither file formalizes the Laurent-series expansion, the Sage
 finite-field computation, the curve point counts, or the geometric subgroup
 maps. Those have executable Sage checks and exact coordinate receipts.
 The next route toward a genuinely new vulnerability is to test

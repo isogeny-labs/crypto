@@ -39,4 +39,10 @@ theorem inverse_sum_nonzero {F : Type u} (A : CharTwoAdd F)
   have h_inv : inv x = inv y := (add_eq_zero_iff_eq A (inv x) (inv y)).mp hzero
   exact h_distinct (h_injective h_inv)
 
+theorem iterated_square_injective {F : Type u} (sq : F → F)
+    (h_sq : Function.Injective sq) :
+    Function.Injective (fun x => sq (sq (sq x))) := by
+  intro x y h
+  exact h_sq (h_sq (h_sq h))
+
 end GHSQ16BranchPole
