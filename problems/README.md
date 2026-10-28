@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [E12b On-Demand launch denied](fall-degree-e12b-on-demand-launch.md) | open | completion of registered fall-degree cell 3:24:7 after two Spot interruptions | administrator-authorized On-Demand execution environment, successful launch preflight, then unchanged Amendment 12 gates and four draws |
 | [NIST BEST2 DP bias and GPU validation](nist-best2-dp-bias-and-gpu-validation.md) | investigating | seeded DP diagnosis and effective GPU cost per verified collision | matched seed panels, native ecbench session, independent replay and complete collision accounting |
 | [Known-log arbitrary-target recovery cost and validation](known-log-recovery-cost-and-validation.md) | open | calibrated and independently validated known-log/IC recovery comparison | complete native pricing, independent replay and recomputation, isolated measurements and strongest matched comparators |
 | [Certicom 130 CUDA/Metal physical qualification](certicom-130-gpu-hardware-qualification.md) | open | physical rho, BSGS and IC correctness on both exact curves in both repositories | complete hosted Metal library/CLI phases and physical provenance; authorized NVIDIA/Mac receipts; current-head CI/review gates |
@@ -82,7 +83,7 @@ Keep resolved and superseded records in the index.
 | [Binary decomposition systems capped at 64 Boolean unknowns](binary-boolean-system-64-variable-cap.md) | resolved | Gröbner/SAT decomposition arms on chain systems with `md + (m−2)n > 64` unknowns (the `m = 4`, n ≥ 23 cells of `research/ic_m3_algebraic_vs_mitm_20261014/`); the study itself was completed with the `u128` `wide_groebner` solver (amendment 1) | a ≥128-variable monomial type in `build_decomposition_system`, inherited F4 and the SAT encoder, agreeing with the floor on 12 targets at `m = 4`, n = 23 |
 
 | [ECDLP portfolio exhaustive-reading coverage](ecdlp-portfolio-reading-coverage.md) | open | certifying the owner's request to read all six-month portfolio sources and artifacts | complete acknowledged source coverage, branch/history reconciliation and access to named missing raw evidence; indexing and hashing remain separate |
-| [claim-n13 replay fails on accounting-version drift](ecbench-claim-n13-replay-accounting-version-drift.md) | open | replaying the Apple-recorded `claim-n13` inherited-F4 arms on `main` (BMI2 and portable paths already agree) | owner decision on the specialisation accounting identity (lazy vs eager) plus a method-identity field for it |
+| [claim-n13 replay fails on accounting-version drift](ecbench-claim-n13-replay-accounting-version-drift.md) | resolved | replaying the Apple-recorded `claim-n13` inherited-F4 arms on `main` (BMI2 and portable paths already agree) | owner chose eager (version 2) as the identity, 2026-10-28; original marked pre-#2043; re-recorded as `claim-n13-v2`, which replays with 0 problems, twice |
 
 ## Add or update a problem
 

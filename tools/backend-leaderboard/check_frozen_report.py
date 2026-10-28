@@ -9,9 +9,11 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
-LOCK = "docs/backend-leaderboard/reproduction.lock.json"
-SNAPSHOT = "c1eb1ff25e14bcd388cc852a29fa741e56280268"
-LOCK_SHA256 = "9a93e4224835be898394bd1284966db738282a85f431c26aea55731575600f9c"
+ARCHIVE = "docs/backend-leaderboard/revisions/20261027-pre-method-registry"
+LOCK = ARCHIVE + "/reproduction.lock.json"
+SNAPSHOT_LOCK = "docs/backend-leaderboard/reproduction.lock.json"
+SNAPSHOT = "91424ecf8cc7db04e7c4a2805c9001a02a6106ca"
+LOCK_SHA256 = "5385e70d724341e07922412b007b42e0ce685fde2c3c68f462bc7dd6f8721278"
 # These are the producer/build inputs declared by the sealed native producer.
 # Scientific session inputs and generated report bytes never receive an exemption.
 PRODUCER_INPUTS = {
@@ -48,7 +50,7 @@ def verify_live_evidence(root, lock):
             if sha256(checked_path(root, name).read_bytes()) != expected:
                 raise ValueError(f"frozen scientific input changed: {name}")
     for name, expected in lock["outputs"].items():
-        path = checked_path(root, "docs/backend-leaderboard/" + name)
+        path = checked_path(root, ARCHIVE + "/" + name)
         if sha256(path.read_bytes()) != expected:
             raise ValueError(f"frozen report output changed: {name}")
 
@@ -59,7 +61,7 @@ def run(args, cwd):
 
 def main():
     lock_bytes = (ROOT / LOCK).read_bytes()
-    snapshot_lock = subprocess.check_output(["git", "show", SNAPSHOT + ":" + LOCK], cwd=ROOT)
+    snapshot_lock = subprocess.check_output(["git", "show", SNAPSHOT + ":" + SNAPSHOT_LOCK], cwd=ROOT)
     if sha256(lock_bytes) != LOCK_SHA256 or snapshot_lock != lock_bytes:
         raise ValueError("reviewed frozen report lock changed; do not reseal")
     lock = json.loads(lock_bytes)
@@ -69,7 +71,7 @@ def main():
         run(["git", "worktree", "add", "--detach", "--no-checkout",
              str(checkout), SNAPSHOT], ROOT)
         try:
-            paths = set(lock["files"]) | {LOCK, ".gitignore"}
+            paths = set(lock["files"]) | {SNAPSHOT_LOCK, ".gitignore"}
             paths |= {"docs/backend-leaderboard/" + p for p in lock["outputs"]}
             patterns = ["/" + re.sub(r"([\\*?\[\]!# ])", r"\\\1", p)
                         for p in sorted(paths)]
@@ -84,7 +86,7 @@ def main():
                     # The current trusted artifact pull already hash-checked the
                     # ignored report; the frozen native checker checks it again.
                     path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copyfile(checked_path(ROOT, relative), path)
+                    shutil.copyfile(checked_path(ROOT, ARCHIVE + "/" + name), path)
             print(f"R0 snapshot {SNAPSHOT}; lock SHA-256 {LOCK_SHA256}", flush=True)
             cargo = ["cargo", "+1.99.1", "run", "--locked", "--manifest-path",
                      "tools/backend-leaderboard/Cargo.toml", "--"]
