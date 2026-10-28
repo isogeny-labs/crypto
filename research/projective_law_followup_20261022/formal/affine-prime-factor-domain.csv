@@ -1,0 +1,11 @@
+item,status,scope,assumptions,source_sha256,dependency_or_gate
+nested_equation_irreducible_of_prime_factor,checked,outer quadratic over K[x],f=t*u; Prime t; t does not divide u,4ead48655a0379aaac0107324236231aa122b32ed1efb1911409865a455d05da,Common22Eisenstein.outer_quadratic_irreducible
+affine_ring_domain_of_prime_factor,checked,actual affine quintic quotient,f=t*u; Prime t; t does not divide u,4ead48655a0379aaac0107324236231aa122b32ed1efb1911409865a455d05da,nested-variable equivalence and prime principal ideal
+point_local_domain_of_prime_factor,checked,localization at any rational point on curve,f=t*u; Prime t; t does not divide u,4ead48655a0379aaac0107324236231aa122b32ed1efb1911409865a455d05da,localization preserves domain
+projective_point_domain_of_prime_factor,checked,actual weighted-Proj point stalk,f=t*u; Prime t; t does not divide u,4ead48655a0379aaac0107324236231aa122b32ed1efb1911409865a455d05da,checked projective-stalk ring equivalence
+separable_to_prime_factor_witness,open,monic quintic over arbitrary field,separable quintic,,extract irreducible factor once and prove nondivisibility of cofactor
+odd_degree_direct_domain,open,all monic odd-degree quintics,odd degree,,show non-square in K(x) and transfer quadratic irreducibility
+nonbranch_maximal_principal,open,local maximal ideal at rational nonbranch point,y nonzero,,show x-a generates after y plus point value becomes a unit
+nonbranch_local_dvr,open,actual weighted-Proj nonbranch stalk,domain and principal maximal ideal,,apply local DVR criterion
+source_norm_transport,open,proof-side common 2+2 numerator,actual nonbranch DVR,,map numerator and norm factors into point stalk
+global_Pic0_and_compiled_semantics,open,global law and runtime,all local orders and code correspondence,,principal divisor Pic0 class transport and compiled Rust semantics
