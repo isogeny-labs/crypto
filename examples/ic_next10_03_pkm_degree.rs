@@ -445,7 +445,7 @@ fn macaulay(inp: &str, dmax: u32) {
                     let mut x: u64 = (1u64 << ydeg) - 1;
                     while x < (1u64 << nbits) {
                         masks.push(x);
-                        let c = x.isolate_lowest_one();
+                        let c = x & x.wrapping_neg();
                         let r = x + c;
                         x = (((r ^ x) >> 2) / c) | r;
                     }
