@@ -251,7 +251,7 @@ def render():
                "prime orders. It does not formalize the function-field geometry "
                "or the quartic Jacobian computations."),
              PageBreak(),
-             P("8. A distinct two-common-pole construction", h1),
+             P("8. Hess's known two-common-pole construction", h1),
              P("Let V=ker Tr_(K/k), a two-dimensional k-space. Choose A,B in V* "
                "with A B=sqrt(b), and put f_i=A^(q^i)x+B^(q^i)/x for i=0,1,2. "
                "The three f_i sum to zero. The connected V4 cover "
@@ -260,6 +260,10 @@ def render():
                "smooth normalization has genus three. Its first elliptic quotient "
                "is the normalized E_(a,b) precisely for the trace-zero twist "
                "Tr_(K/F2)(a)=0."),
+             P("This is Hess's published double-trace-zero branch. The exact "
+               "all-q product count was already proved in this repository's "
+               "earlier Hess audit. The calculation below restates it to make "
+               "the overlap with the triangle gate precise."),
              P("The product test is a binary-quadratic isotropy test: "
                "Q_s(A)=Tr_(K/k)(s A^q A^(q^2))=0 for s=sqrt(b). Over an algebraic "
                "closure, the three conjugates of A have coordinates (u,v,u+v); "
@@ -294,11 +298,13 @@ def render():
                "A full index-calculus and matched-rho cost is still unmeasured."),
              P(link("https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_bj",
                     "LMFDB class 3.16.a_a_bj")
-               + " already records a positive Jacobian. The V4-cover type "
-               "and binary cubic weak-cover context have earlier published "
-               "classifications. This exact witness is therefore a rediscovery "
-               "at isogeny-class level. Its exact equation has not been "
-               "checked against every earlier case table."),
+               + " already records a positive Jacobian. "
+               + link("https://www.cambridge.org/core/services/aop-cambridge-core/content/view/315278965D8D277A85812D9498236A88/S146115700000108Xa.pdf/generalising-the-ghs-attack-on-the-elliptic-curve-discrete-logarithm-problem.pdf",
+                      "Hess (2004)")
+               + " covers the factor branch. This is a new q=16 exact map "
+               "witness in this audit, while its family and isogeny class "
+               "are known. Its exact equation has not been checked against "
+               "every earlier case table."),
              P("TwoPoleGate.lean kernel-checks the q=16 count arithmetic and "
                "the doubling kernel on the 1033-order subgroup; it does not "
                "formalize the field-product proof or geometric map."),

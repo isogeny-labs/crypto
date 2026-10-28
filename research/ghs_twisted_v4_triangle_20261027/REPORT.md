@@ -35,10 +35,20 @@ three, so it falls within that stated domain. This is an inference from the
 published scope, not a match of our exact trace equation to a full case
 table. Those case tables and the related restricted thesis remain unavailable
 to us. The global novelty status of this family is therefore **not established**.
+The two-common-pole construction below is the **already known Hess
+double-trace-zero branch**, analyzed in this repository at
+`research/ghs_hess_c_parameter_audit_20261026/EXACT_CUBIC_FAMILY.md`.
+That earlier file already proves the same product count for all `q`.
+The added contribution here is a `q=16` exact witness with its canonical
+quartic and evaluated source-subgroup map, plus its overlap with this
+triangle gate. This is not a new family criterion.
 
 Primary references:
 
 * Momose–Chao, https://eprint.iacr.org/2006/347
+* Hess, *Generalising the GHS Attack on the Elliptic Curve Discrete
+  Logarithm Problem* (2004), especially Section 6,
+  https://www.cambridge.org/core/services/aop-cambridge-core/content/view/315278965D8D277A85812D9498236A88/S146115700000108Xa.pdf/generalising-the-ghs-attack-on-the-elliptic-curve-discrete-logarithm-problem.pdf
 * Nart–Ritzenthaler, https://arxiv.org/abs/0905.0546
 * Murai–Shimura–Iijima–Chao, SCIS 2022 abstract,
   https://www.iwsec.org/scis/2022/_abst/1A3-2.pdf
@@ -284,7 +294,7 @@ numbers are relative to the frozen Hess and simple-restriction inputs whose
 SHA-256 hashes are recorded in `census.json`; they are not a global count
 of newly discovered attacks.
 
-## A second gate: two common branch poles
+## A second, known gate: Hess's two common branch poles
 
 The triangle gate does not exhaust even the direct degree-two V4 covers.
 Let `V=ker(Tr_(K/k))`, a two-dimensional `k`-space. Given `s=sqrt(b)`,
@@ -313,6 +323,8 @@ nonzero elements of `V`. It is a sufficient cover criterion, not a
 classification of all covers or attacks.
 
 There is an exact **general product count**, valid for every `q=2^m`.
+It was already derived in this repository's Hess audit; the equivalent
+quadratic-form proof here makes the overlap with the triangle gate explicit.
 For `A in V*`, `B=s/A` lies in `V` precisely when
 `Q_s(A)=Tr_(K/k)(s*A^q*A^(q^2))=0`. This is a binary quadratic form on
 `V`. The linear map from `s in K` to the three coefficients of `Q_s` is
@@ -372,12 +384,15 @@ and both map evaluations took 5.09 s on the shared host. These are map
 stage times only.
 
 The catalog class [3.16.a_a_bj](https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_bj)
-already has `has_jacobian=1`, and [Nart–Ritzenthaler (2009)](https://arxiv.org/abs/0905.0546)
-as well as the even-characteristic cubic cover classifications above are
-prior art for the V4 setting. This witness is a rediscovery at the
-isogeny-class level. An exact-equation publication check is unresolved.
-The new result here is an explicit second criterion and construction-specific
-count in this audit; global novelty is not established.
+already has `has_jacobian=1`. [Hess (2004)](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/315278965D8D277A85812D9498236A88/S146115700000108Xa.pdf/generalising-the-ghs-attack-on-the-elliptic-curve-discrete-logarithm-problem.pdf)
+describes the same double-trace-zero factor branch, and the prior local
+`EXACT_CUBIC_FAMILY.md` proves the same product count.
+[Nart–Ritzenthaler (2009)](https://arxiv.org/abs/0905.0546) and the
+even-characteristic cubic classifications above are additional prior art.
+This witness is a rediscovery at the isogeny-class level. An exact-equation
+publication check is unresolved. The new evidence is the `q=16` exact
+quartic and evaluated subgroup map for this known Hess family, along with
+the finite overlap count with the triangle construction.
 `TwoPoleGate.lean` kernel-checks the q=16 arithmetic and the doubling
 kernel on the `1033`-order source subgroup. It does not formalize the
 field-product isomorphism, genus, or Jacobian geometry.
