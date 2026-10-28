@@ -485,3 +485,65 @@ a [PDF](DERIVATIVE_POINT_DVR.pdf), [dependency graph](derivative-point-dvr.svg),
 and [gate CSV](derivative-point-dvr.csv). A combined theorem and the norm,
 Pic⁰, and compiled-runtime gates remain open. These packets do not change a
 target or cost row.
+
+The [nonbranch norm-transport packet](NONBRANCH_NORM_TRANSPORT.md) then maps
+the source-style common 2+2 polynomial identity into the actual weighted-Proj
+rational-point stalk under the stated Mumford congruences and nonzero
+determinant. Its [PDF](NONBRANCH_NORM_TRANSPORT.pdf),
+[dependency graph](nonbranch-norm-transport.svg), and
+[gate CSV](nonbranch-norm-transport.csv) separate the checked identity from a
+chosen-factor valuation theorem. The latter assumes a separable quintic,
+`y²=f(a)`, `2*y≠0`, a nonzero coefficient, and a nonunit chosen factor.
+Characteristic-two order allocation, global Pic⁰ transport, and compiled Rust
+semantics remain open. This packet changes no target or cost row.
+
+The [smooth-point DVR packet](SMOOTH_POINT_DVR.md) combines the two rational
+point cases: `2*y≠0 ∨ f'(a)≠0` is equivalent to one of the explicit affine
+partials of `y²-f(x)` being nonzero, and under the point equation and a
+separable quintic the actual weighted-Proj point stalk is a DVR. Its
+[PDF](SMOOTH_POINT_DVR.pdf), [dependency graph](smooth-point-dvr.svg), and
+[gate CSV](smooth-point-dvr.csv) leave the scheme-theoretic `Smooth`
+equivalence, global Pic⁰ transport, characteristic-two norm-order allocation,
+and compiled Rust semantics open. No target or cost row changes.
+
+The [global divisor/Pic⁰ gap inventory](GLOBAL_PIC0_GAP.md) identifies the
+first missing construction after these local results: a function-field
+element and its finite principal divisor on all closed points of the actual
+curve. Its [PDF](GLOBAL_PIC0_GAP.pdf), [dependency graph](global-pic0-gap.svg),
+and [gate CSV](global-pic0-gap.csv) distinguish nine previously checked
+declarations from four open construction gates. It adds no theorem or cost row.
+
+The [function-field gate packet](FUNCTION_FIELD_GATE.md) records the missing
+whole-curve integrality and closed-point valuation bridge. Its exact F3
+[diagnostic script](global-divisor-counterexample.py) checks valid common 2+2
+data whose two quadratic supports have no F3-rational points. The
+[PDF](FUNCTION_FIELD_GATE.pdf), [dependency graph](function-field-gate.svg),
+and [gate CSV](function-field-gate.csv) mark the closed-point interpretation,
+global divisor, and Pic⁰ result as open. No new Lean theorem or cost row is
+claimed.
+
+The [infinity-chart integrality gate](PROJECTIVE_INTEGRAL.md) checks `zbar≠0`
+and supplies a [PDF](PROJECTIVE_INTEGRAL.pdf),
+[graph](projective-integral.svg), and [CSV](projective-integral.csv). The
+[actual X/Z overlap packet](PROJECTIVE_OVERLAP_NONEMPTY.md) then constructs a
+point in both weighted-Proj basic opens, with its own
+[PDF](PROJECTIVE_OVERLAP_NONEMPTY.pdf),
+[graph](projective-overlap-nonempty.svg), and
+[CSV](projective-overlap-nonempty.csv). Finally, the
+[whole-curve integrality packet](PROJECTIVE_IS_INTEGRAL.md) transports the
+two chart-domain results and uses the overlap and open cover to prove the
+actual weighted-Proj scheme is integral under separability of its quintic.
+Its [PDF](PROJECTIVE_IS_INTEGRAL.pdf),
+[graph](projective-is-integral.svg), and [CSV](projective-is-integral.csv)
+separate this checked geometric result from the still-open function-field
+element, all-closed-point principal divisor, Pic⁰ equality, and compiled
+runtime link. None of these packets changes a target or cost row.
+
+The [source function-field packet](SOURCE_FUNCTION_FIELD.md) maps the actual
+affine chart injectively into the integral curve's function field and defines
+the source-shaped `N/B-y` expression there. It checks that `B ≠ 0` keeps the
+denominator nonzero. Its [PDF](SOURCE_FUNCTION_FIELD.pdf),
+[graph](source-function-field.svg), and [11-row CSV](source-function-field.csv)
+record the hypotheses and open gates. All-closed-point orders, a finite
+principal divisor, Pic⁰ equality, and compiled runtime correspondence remain
+open; no target or cost row changes.
