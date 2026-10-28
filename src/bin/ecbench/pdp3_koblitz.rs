@@ -1265,27 +1265,96 @@ mod committed_replays {
         }
     }
 
-    /// A legacy accounting is accepted only when the whole record
-    /// reproduces: one word XOR more in the record, and it does not.
-    #[test]
-    fn a_legacy_accounting_does_not_excuse_a_changed_count() {
+    /// Replay record `seq` of `rel` after `edit` has changed the record
+    /// (not its session): `None` when the checkout does not carry it.
+    fn replay_edited(
+        rel: &str,
+        seq: u64,
+        edit: impl FnOnce(&mut crypto_lib::cryptanalysis::ecbench::record::Record),
+    ) -> Option<(bool, String)> {
         register_binary_plugins(crate::binary_plugins());
-        let dir = root()
-            .join("research/ecbench_rootfind_engine_20261012/abandoned/claim-n13-interrupted");
+        let dir = root().join(rel);
         if !dir.join("session.json").exists() {
-            return;
+            return None;
         }
         let spec_text = std::fs::read_to_string(dir.join("spec.json")).unwrap();
         let p = plan(Spec::from_json(&spec_text).unwrap()).unwrap();
         let mut records = read_records(&dir).unwrap();
-        let r = records.iter_mut().find(|r| r.seq == 58).unwrap();
-        *r.phases[2].native.get_mut("solver_ops").unwrap() += 1;
+        let r = records.iter_mut().find(|r| r.seq == seq).unwrap();
+        edit(r);
         let session = crypto_lib::cryptanalysis::ecbench::runner::read_session(&dir).unwrap();
         let host: crypto_lib::cryptanalysis::ecbench::host::HostCapsule =
             serde_json::from_str(&std::fs::read_to_string(dir.join("host.json")).unwrap()).unwrap();
-        let (ok, detail) =
-            replay_with_accounting(&replay_input_json(&p, r).unwrap(), r, &host, &session);
-        assert!(!ok, "{detail}");
-        assert!(detail.contains("phase counts"), "{detail}");
+        Some(replay_with_accounting(
+            &replay_input_json(&p, r).unwrap(),
+            r,
+            &host,
+            &session,
+        ))
+    }
+
+    /// A legacy accounting is accepted only when the whole record
+    /// reproduces: one word XOR more in the record, and it does not.
+    #[test]
+    fn a_legacy_accounting_does_not_excuse_a_changed_count() {
+        let rel = "research/ecbench_rootfind_engine_20261012/abandoned/claim-n13-interrupted";
+        if let Some((ok, detail)) = replay_edited(rel, 58, |r| {
+            *r.phases[2].native.get_mut("solver_ops").unwrap() += 1;
+        }) {
+            assert!(!ok, "{detail}");
+            assert!(detail.contains("phase counts"), "{detail}");
+        }
+    }
+
+    /// A record that names a binary no profile lists is replayed exactly:
+    /// the same committed record, one digit of its binary hash changed,
+    /// is not excused by any legacy accounting.  One case per profile, and
+    /// one for the set-up descriptors and the missing `window_div`.
+    #[test]
+    fn a_record_from_an_unlisted_binary_is_not_excused() {
+        let unlisted = "0".repeat(64);
+        let cases = [
+            // pre-2043: lazy rewrite, F4 solver term taken out
+            (
+                "research/ecbench_rootfind_engine_20261012/abandoned/claim-n13-interrupted",
+                58,
+            ),
+            // pre-2043-priced
+            (
+                "research/ecbench_rootfind_faster_20261014/sessions/cycle1",
+                10,
+            ),
+            // pre-1646
+            ("research/f6_ic_ecbench_ladder_20261005/sessions/n13", 25),
+            // the calibration row of #1640, under pre-1646
+            (
+                "research/ecbench_all_candidates_20261003/sessions/koblitz",
+                625,
+            ),
+            // set-up descriptors the record predates
+            (
+                "research/ecbench_rootfind_engine_20261012/abandoned/claim-n13-interrupted",
+                59,
+            ),
+            // rootfind-window-negfold without window_div
+            (
+                "research/ecbench_rootfind_parity_20261013/sessions/cycle1",
+                17,
+            ),
+        ];
+        for (rel, seq) in cases {
+            let listed = replay_edited(rel, seq, |_| {});
+            let Some((ok, detail)) = listed else { continue };
+            assert!(ok, "{rel} seq {seq} replays as committed: {detail}");
+            let (ok, detail) = replay_edited(rel, seq, |r| {
+                r.binary_sha256 = Some(unlisted.clone());
+            })
+            .unwrap();
+            assert!(
+                !ok,
+                "{rel} seq {seq} excused from an unlisted binary: {detail}"
+            );
+            assert!(!detail.contains("accounting of the code"), "{detail}");
+        }
     }
 }

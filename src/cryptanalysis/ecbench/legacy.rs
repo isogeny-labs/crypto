@@ -173,3 +173,186 @@ pub fn pre_endomorphism_a1(
 
 /// How the replay detail names [`pre_endomorphism_a1`].
 pub const PRE_ENDOMORPHISM_A1: &str = "pre-A1 endomorphism counters";
+
+// ── Who may be replayed under a legacy accounting ──────────────────────
+//
+// A legacy accounting excuses a difference, so it must not be available to
+// a record that merely claims it.  As for the class set-up
+// (`audit::PRE_CLASS_SETUP_BINARIES`), each profile is offered only to a
+// record written by a binary on that profile's closed list, found by
+// scanning the committed sessions that needed it.  Each entry is
+// `(binary_sha256, commit, sessions)`: the full SHA-256 of the ecbench
+// binary the record names, the commit the session names (`session.json`
+// `git_commit`; empty where it names none, and informational where one
+// binary served several sessions: matching is by binary hash alone), and
+// where the records are (paths under `research/`).  Anything else, and
+// every record the current harness writes, must replay exactly.
+
+/// `(binary_sha256, commit, sessions)`.
+pub type Producer = (&'static str, &'static str, &'static str);
+
+/// Binaries whose records replay under [`PRE_2043`].
+pub const PRE_2043_BINARIES: [Producer; 7] = [
+    (
+        "1e972df4d8e769629ad4fd4a023214b05ee513a2cfea6f3ef51f2ca9e61fe531",
+        "2245b7596f3fe04586c33b53a7cac97185fadba2",
+        "ecbench_rootfind_engine_20261012/{sessions/claim-n13,sessions/claim-n19,sessions/smoke-koblitz,abandoned/claim-n13-interrupted}",
+    ),
+    (
+        "394e0c1bfe705f2bb0795425099beb02c50f04abe5027fe8b4020b91d40ec973",
+        "7cc12f568eb0a9c93b1430d348af9fd4383041dd",
+        "ecbench_rootfind_improve_20261013/sessions/{claim-n13,select,window-d4}",
+    ),
+    (
+        "1622e3fa8e638031c8406b651a8e2e596573189bd2c78aa8b83d5e979fa372dc",
+        "5c14590755da5a9cad11caee33b40eb2b42b7970",
+        "ecbench_rootfind_parity_20261013/sessions/{claim-n13,claim-n13-v2,cycle2,cycle4,cycle4b,cycle5}",
+    ),
+    (
+        "de2e66bcf3ed770d5ea6fdf87a4c24bb16fd3c4f554cee5a65dc41699dcb320c",
+        "2fad98b0bdaedc5735156ba7e3188c729e5f8c03",
+        "ecbench_rootfind_parity_20261013/sessions/cycle1",
+    ),
+    (
+        "b978f0e4a427e4a822234e263a8ec93bbc2c83bfe16f208505140f499d5cccdf",
+        "cd0228d4c8e7a6b8d0037e7504b3e3e18b13059f",
+        "ecbench_yield_sweep_20261004/sessions/koblitz (the da-f4 arms)",
+    ),
+    (
+        "712a58bb4ae2ba9da32ed4170d6b4c775453a3b0cdf46fd28760559a249cebad",
+        "",
+        "f6_ic_ecbench_ladder_20261005/sessions/n7 (exhausted runs)",
+    ),
+    (
+        "9bb9a1a64ea01bf5f447e0c87980207d26fb4f9fa8961270edc66ce37bfb8b68",
+        "",
+        "ecbench_factor_bases_20261013/sessions/koblitz17-algebraic (exhausted runs)",
+    ),
+];
+
+/// Binaries whose records replay under [`PRE_2043_PRICED`].
+pub const PRE_2043_PRICED_BINARIES: [Producer; 1] = [(
+    "27fd2653b706b6e82e8da1c39a8c26c8f686e3f6e4831953b85eb9798610b76c",
+    "f67fc6dbd06d5a295696cf36c339181d4b92efae",
+    "ecbench_rootfind_faster_20261014/sessions/{claim-n13-v3,cycle1,cycle3}",
+)];
+
+/// Binaries whose records replay under [`PRE_1646`].
+pub const PRE_1646_BINARIES: [Producer; 3] = [
+    (
+        "712a58bb4ae2ba9da32ed4170d6b4c775453a3b0cdf46fd28760559a249cebad",
+        "",
+        "f6_ic_ecbench_ladder_20261005/sessions/{n13,n19}",
+    ),
+    (
+        "b2596e9db8b79a11479ae22b4d12570114501b841c22716929f61012fd9d3845",
+        "678d7e5fa67777b6791ebe7fa6fe9a275d0bcc2f",
+        "ecbench_all_candidates_20261003/sessions/koblitz",
+    ),
+    (
+        "b978f0e4a427e4a822234e263a8ec93bbc2c83bfe16f208505140f499d5cccdf",
+        "cd0228d4c8e7a6b8d0037e7504b3e3e18b13059f",
+        "ecbench_yield_sweep_20261004/sessions/koblitz",
+    ),
+];
+
+/// Binaries whose records predate the `oracle_setup` descriptors
+/// ([`SETUP_DESCRIPTORS`]) and the `window_div` parameter.
+pub const SETUP_DESCRIPTOR_BINARIES: [Producer; 3] = [
+    (
+        "1e972df4d8e769629ad4fd4a023214b05ee513a2cfea6f3ef51f2ca9e61fe531",
+        "2245b7596f3fe04586c33b53a7cac97185fadba2",
+        "ecbench_rootfind_engine_20261012/{sessions/claim-n13,sessions/claim-n19,sessions/smoke-koblitz,abandoned/claim-n13-interrupted}",
+    ),
+    (
+        "394e0c1bfe705f2bb0795425099beb02c50f04abe5027fe8b4020b91d40ec973",
+        "7cc12f568eb0a9c93b1430d348af9fd4383041dd",
+        "ecbench_rootfind_improve_20261013/sessions/{claim-n13,select,window-d4}",
+    ),
+    (
+        "de2e66bcf3ed770d5ea6fdf87a4c24bb16fd3c4f554cee5a65dc41699dcb320c",
+        "2fad98b0bdaedc5735156ba7e3188c729e5f8c03",
+        "ecbench_rootfind_parity_20261013/sessions/cycle1 (rootfind-window-negfold without window_div)",
+    ),
+];
+
+/// Binaries whose `rho.gls` / `rho.frobenius_orbit` records predate
+/// amendment A1 ([`pre_endomorphism_a1`]).
+pub const PRE_ENDOMORPHISM_A1_BINARIES: [Producer; 1] = [(
+    "87bac3448d63e3c1dcd841a2d23b565c09477c855eda0febf11a03d9931d148f",
+    "6bf8d5c2f51dbdd1b134b11a02396e1e4ac76b68",
+    "ext_endo_rho_20261023/sessions/{gls-fp2,subfield-fp3}",
+)];
+
+fn listed(list: &[Producer], r: &crate::cryptanalysis::ecbench::record::Record) -> bool {
+    list.iter()
+        .any(|&(binary, _, _)| r.binary_sha256.as_deref() == Some(binary))
+}
+
+/// Whether `r` may be replayed under `profile`.  Every condition must
+/// hold, so anything unforeseen fails closed to an exact comparison: the
+/// record names a binary on the profile's list; it is an index-calculus
+/// pipeline record (the profiles change nothing else); and it carries no
+/// `bitop/v1` work counters (every binary since 2026-10-16 writes them).
+pub fn admits(profile: &Profile, r: &crate::cryptanalysis::ecbench::record::Record) -> bool {
+    let list: &[Producer] = match profile.name {
+        "pre-2043" => &PRE_2043_BINARIES,
+        "pre-2043-priced" => &PRE_2043_PRICED_BINARIES,
+        "pre-1646" => &PRE_1646_BINARIES,
+        _ => return false,
+    };
+    r.method.id.starts_with("ic.")
+        && r.phases.iter().all(|p| p.work_native.is_empty())
+        && listed(list, r)
+}
+
+/// Whether `r` may be compared without the set-up descriptors it predates:
+/// it names a binary on [`SETUP_DESCRIPTOR_BINARIES`].
+pub fn admits_setup_descriptors(r: &crate::cryptanalysis::ecbench::record::Record) -> bool {
+    listed(&SETUP_DESCRIPTOR_BINARIES, r)
+}
+
+/// Whether `r` may be replayed under [`pre_endomorphism_a1`]: it names a
+/// binary on [`PRE_ENDOMORPHISM_A1_BINARIES`] (the record must also lack
+/// the counter amendment A1 added, which the function checks).
+pub fn admits_pre_endomorphism_a1(r: &crate::cryptanalysis::ecbench::record::Record) -> bool {
+    listed(&PRE_ENDOMORPHISM_A1_BINARIES, r)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn producer_lists_hold_full_digests_and_commits() {
+        let lists: [&[Producer]; 5] = [
+            &PRE_2043_BINARIES,
+            &PRE_2043_PRICED_BINARIES,
+            &PRE_1646_BINARIES,
+            &SETUP_DESCRIPTOR_BINARIES,
+            &PRE_ENDOMORPHISM_A1_BINARIES,
+        ];
+        for list in lists {
+            for &(binary, commit, sessions) in list {
+                assert!(binary.len() == 64 && binary.bytes().all(|b| b.is_ascii_hexdigit()));
+                assert!(
+                    commit.is_empty()
+                        || (commit.len() == 40 && commit.bytes().all(|b| b.is_ascii_hexdigit())),
+                    "{commit}"
+                );
+                assert!(!sessions.is_empty());
+            }
+        }
+    }
+
+    #[test]
+    fn every_profile_has_a_producer_list() {
+        for profile in PROFILES {
+            assert!(
+                matches!(profile.name, "pre-2043" | "pre-2043-priced" | "pre-1646"),
+                "{} has no list in `admits`",
+                profile.name
+            );
+        }
+    }
+}

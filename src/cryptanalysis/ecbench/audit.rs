@@ -261,7 +261,10 @@ pub fn replay_with_accounting(
     if ok {
         return (ok, detail);
     }
-    if let Some(view) = legacy::pre_endomorphism_a1(&rep, r) {
+    if let Some(view) = legacy::admits_pre_endomorphism_a1(r)
+        .then(|| legacy::pre_endomorphism_a1(&rep, r))
+        .flatten()
+    {
         let (ok, d) = compare_replay(&view, r, host, session);
         if ok {
             return (
@@ -274,6 +277,9 @@ pub fn replay_with_accounting(
         }
     }
     for profile in legacy::PROFILES {
+        if !legacy::admits(&profile, r) {
+            continue;
+        }
         let again = {
             let _in_force = profile.enter();
             child_main(input_json)
@@ -303,9 +309,11 @@ fn compare_replay(
 ) -> (bool, String) {
     // A set-up descriptor the record predates is compared without it.
     let mut rep = rep.clone();
-    for (ph, rec) in rep.phases.iter_mut().zip(&r.phases) {
-        ph.native
-            .retain(|k, _| !legacy::is_setup_descriptor(k) || rec.native.contains_key(k));
+    if legacy::admits_setup_descriptors(r) {
+        for (ph, rec) in rep.phases.iter_mut().zip(&r.phases) {
+            ph.native
+                .retain(|k, _| !legacy::is_setup_descriptor(k) || rec.native.contains_key(k));
+        }
     }
     let rep = &rep;
     let mut diffs = Vec::new();
@@ -1197,6 +1205,27 @@ mod committed_replays {
         {
             assert!(ok && detail.contains("pre-"), "{detail}");
         }
+    }
+
+    /// A record from a binary the A1 list does not name is replayed exactly.
+    #[test]
+    fn a_record_from_an_unlisted_binary_is_not_excused_from_amendment_a1() {
+        let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("research/ext_endo_rho_20261023/sessions/gls-fp2");
+        if !dir.join("session.json").exists() {
+            return;
+        }
+        let spec_text = std::fs::read_to_string(dir.join("spec.json")).unwrap();
+        let p = plan(Spec::from_json(&spec_text).unwrap()).unwrap();
+        let mut records = crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap();
+        let r = records.iter_mut().find(|r| r.seq == 0).unwrap();
+        r.binary_sha256 = Some("0".repeat(64));
+        let session = read_session(&dir).unwrap();
+        let host: HostCapsule =
+            serde_json::from_str(&std::fs::read_to_string(dir.join("host.json")).unwrap()).unwrap();
+        let (ok, detail) =
+            replay_with_accounting(&replay_input_json(&p, r).unwrap(), r, &host, &session);
+        assert!(!ok, "{detail}");
     }
 
     #[test]
