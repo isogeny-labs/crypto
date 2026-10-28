@@ -261,8 +261,40 @@ order388,34invariant basis vectors and129jets, and exact representations of
 all requested389coefficients. This enables later complete degree-two equation
 construction; it does not yet claim those equations or whole ideal saturation.
 Very ample degree bounds and finite-field quadratic generation checked in
-Duursma-Pellikaan, Unique representation of VSAG codes,Proposition11:
+Marquez-Corbella, Martinez-Moro and Pellikaan, On the unique representation of very strong algebraic geometry codes,Proposition11:
 https://ruudp.win.tue.nl/paper/65.pdf. It explicitly includes finite fields.
 A future quadratic-relation experiment needs its own source freeze. These
 are new proper curve models; old coupled-quotient saturation/polarized abelian
 embedding are separate, not discharged by changing coordinate models.
+
+## Prospective low-genus and direct relation filters
+Primary LMFDB spaces read:77.2.a (new dimension5,fournewform orbits;total cusp7,
+old2) and77.2.b (primitive quadratic character conductor77,dimension6,
+newform degrees2and4). Under R15/R16's written moduli bridge, the free
+cyclic10quotient is X0(77),genus7; quotientbyorder5 hasgenus13 and adds the
+quadratic-character space. Every trivial-character constituent has dimension
+atmost2; the only additional4dim constituent has chi(2)=-1,so its degree8
+Euler polynomial is even (complex conjugation pairs a2 with-a2).
+LOWGENUS27 factors the actual two degree8tracezero polynomials overQ,
+requires irreducibility and non-evenness, checks the generic conjugate-pair
+Euler parity. Hence these particular genus7/13quotients cannot contain either
+A5factor up toF2isogeny, under that modular decomposition bridge. This is
+stronger than the already retained norm-annihilation for the selected factor;
+it does not exclude other low-genus curves.
+
+Also certify source base-translation fixed-locus ideal1 and allunramified
+quotient genus arithmetic. The actual integral correspondence
+E=(1-T5)(5-(1+T2+T4+T6+T8)) obeysE²=10E, image dimension24. Check it acts10
+and10E acts1 on the residualT=6line mod11. This is a sourceJacobian mixed
+carrier projection with denominator10unitat11,not a map from Koblitz points.
+Its inherited polarization type and the old det19polarized embedding remain
+uncomputed. The knownPrym30principal polarization does not supply them.
+
+For the direct elliptic-coordinate route, factor the normalized ordinary
+elliptic cubic x3+(z²+z+aCurve)x²+1 oververifiedF32 forbothaCurve0,1.
+The target z=y/x has degree3. Constant shifts of actual trace-one coordinates
+nu/b,lambda/A andthe ACTION canonical trace-one section have degrees34,80,110.
+Their nondivisibilityby3 excludes these direct matches,not all nonconstant
+invariant adjustments. No coefficient search or IC efficiency claim.
+The higher-degree quadratic-generation reference was retrieved bycurl after
+webtimeout;fitztextreadactualProp11 confirms the finite-field statement.
