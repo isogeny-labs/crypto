@@ -5,6 +5,12 @@ plus a substantial **cryptanalysis suite** for studying how those algorithms bre
 Every algorithm is documented with the underlying mathematics, making this a study
 companion as much as a working library.
 
+[Backend performance frontier](docs/backend-leaderboard/index.html) ·
+[Machine-readable leaderboard](docs/backend-leaderboard/leaderboard.json) ·
+[How agents measure and beat an incumbent](docs/ecbench/BACKEND_FRONTIER.md).
+Compare F4, F5, F6-IC, root finding and SAT by exact workload, including cold
+operation time, solver counters and explicit gaps in field-size coverage.
+
 > ## ⚠️ DO NOT USE IN PRODUCTION
 >
 > This library is **not safe** for any real use case where confidentiality,
@@ -231,6 +237,10 @@ Generic attacks over the `HashFunction` / `MerkleDamgardHash` trait:
 CLI:
 
 ```bash
+# Isogeny-volcano tools (docs/volcano/README.md)
+crypto volcano profile --koblitz-n 83 --ell 6473        # conductor, depth, level tables
+crypto volcano koblitz-step --n 131 --ell 263          # ECC2K-130: the 262 level-1 neighbours over F_(2^131)
+
 # Auto-run every applicable hash attack
 crypto cryptanalysis hash-auto --hash md5
 crypto cryptanalysis hash-auto --hash md4
@@ -481,7 +491,7 @@ another's success condition. The doc explains both.
 | `zk::bulletproofs`    | Bulletproofs range proofs                       |
 | `zk::groth16`         | Groth16 zk-SNARK skeleton                       |
 | `zk::plonk`           | PLONK zk-SNARK skeleton                         |
-| `zk::stark` / `stark_v2` | STARK-style proof skeletons: **educational, unaudited, not zero-knowledge, no DEEP/out-of-domain sample, no stated security level; must not back a research claim** (`stark` is a spot-check argument, not a STARK; see the module docs) |
+| `zk::stark` / `stark_v2` | STARK-style proof skeletons: **educational, unaudited, not zero-knowledge, no grinding, no stated security level; must not back a research claim**. `stark_v2` is DEEP-ALI: coset LDE, composition polynomial, an out-of-domain sample `z` (the AIR checked at `z`) and degree-bounded FRI on the DEEP quotient; its conjectured soundness (Reed–Solomon proximity conjecture, random-oracle Fiat–Shamir) is `ε ≲ β^(−q) + ε_field + ε_hash`, capped at 128 bits by SHA-256 Merkle commitments, over the BLS12-381 scalar field. `stark` is a spot-check argument, not a STARK (see the module docs) |
 
 ---
 
@@ -1151,3 +1161,88 @@ See [the Gröbner comparison protocol](groebner_compare/README.md) for the bound
 Boolean worker runner, independent basis certificates, learn/apply fallback
 accounting, and immutable diagnostic receipts. These are solver-stage controls;
 no full-DLP speedup or research-state transition is implied.
+
+## Certicom ECC2-131 and ECCp-131
+
+The random binary ECC2-131 and prime-field ECCp-131 challenges are in the
+curve catalog. `ECC2-130` and `ECCp-130` are accepted aliases for these
+published 131-bit names. ECC2K-130 retains its separate Koblitz parameters.
+Both challenge loaders in [`src/ecc/certicom.rs`](src/ecc/certicom.rs)
+return the published generator, subgroup order, cofactor, and target Q from
+[Certicom's parameter list](https://www.certicom.com/en/curves-list).
+
+```sh
+cargo run --release --bin icx -- inspect ECC2-130 --json
+cargo run --release --bin icx -- inspect ECCp-130 --json
+cargo run --release --bin ecdlp-nist -- solve ECCp-130 --secret 42 --interval-bits 8 --method bsgs --json
+```
+
+`ecdlp-nist solve <curve> --challenge` selects the published Q for either
+field. Full-width solving retains the existing feasibility and iteration
+budgets. The tests check both published points on each curve and verify
+`[n]G = [n]Q = O`; interval tests recover planted scalars. This adds parameter
+and arithmetic coverage; it does not establish a full-width challenge solution.
+
+All three requested solvers also share an exact-curve entry point:
+
+```sh
+cargo run --release --bin icx -- solve ECC2-130 --method bsgs --secret 12345 --interval-width 65536 --json
+cargo run --release --bin icx -- solve ECCp-130 --method rho --challenge --max-iterations 16 --max-restarts 0 --json
+cargo run --release --bin icx -- solve ECC2-130 --method index-calculus --challenge --factor-base-size 16 --max-iterations 32 --json
+```
+
+Each method accepts either challenge and aliases. `icx solve` uses the exact
+published field, curve, generator, subgroup order and target; `icx run` remains
+the separate smaller-analogue experiment interface. `--point X,Y` supplies an
+external target and `--secret K` constructs a known-answer target. Scalars,
+coordinates, interval bounds and matrix coefficients retain their full width.
+Unfinished searches report `budget_exhausted`, no scalar, and a nonzero exit.
+BSGS caps its baby table with `--max-table-entries`; rho's iteration limit is
+per restart. IC caps relation and descent queries separately and bounds its
+signed-point table and dense matrix with `--max-table-entries` and
+`--max-matrix-entries`.
+
+The native [solver API](src/cryptanalysis/certicom_dlp/mod.rs) exposes `rho`,
+`bsgs`, and `index_calculus`. IC constructs a cofactor-cleared low-x factor
+base, decomposes public queries into signed pairs, collects verified relations,
+solves their full-width system modulo the subgroup order, checks every base
+log by scalar replay, and descends the target. It requires full matrix rank;
+it never substitutes rho or BSGS for a failed IC stage.
+
+For externally prepared IC work, `--preparation FILE.json` accepts these fields:
+
+| field | contents |
+| --- | --- |
+| `curve` | The exact challenge name or its alias. |
+| `factor_base` | An array of `{ "x": "0x...", "y": "0x..." }` public subgroup points. |
+| `relation_queries` | Integer strings `a` whose points `[a]G` are decomposed to build the relation matrix. |
+| `descent_shifts` | Integer strings `a` for the target queries `Q + [a]G`. |
+| `label` | Optional provenance text retained in the output. |
+
+Integers accept decimal or `0x` hex. Preparation files contain no factor-base
+logs or target log. Points, subgroup membership, duplicate sign orbits, matrix
+rank and scalar replay are checked. See the [functional tests](tests/certicom_solvers.rs)
+for constructed examples on both exact curves: BSGS recovers a scalar above
+`2^100`, rho recovers the special known answer `Q = -G`, and IC learns three
+base logs through a full-rank relation system and performs target descent.
+These are correctness fixtures, not natural-target yield or speed measurements.
+
+The same three methods support portable CPUs, NVIDIA CUDA and Apple Metal.
+CPU execution is the default. Build the matching native worker and select it
+explicitly:
+
+```sh
+make -C gpu/certicom cuda ARCH=sm_80
+target/release/icx solve ECCp-130 --method rho --challenge --max-iterations 16 --max-restarts 0 --backend cuda --gpu-worker gpu/certicom/certicom_cuda --json
+# On a Mac with Metal:
+make -C gpu/certicom metal
+target/release/icx solve ECC2-130 --method bsgs --secret 12345 --interval-width 65536 --backend metal --gpu-worker gpu/certicom/certicom_metal --json
+```
+
+Explicit GPU selection fails if the requested device is unavailable.
+`--backend auto` may choose CPU and reports its choice; `gpu-emulator` is
+explicitly labelled host execution. GPU rho runs parallel full-width walks;
+BSGS batches point generation; IC offloads query generation and decomposition
+while its modular linear algebra and independent verification stay on CPU.
+See [GPU setup and hardware qualification](gpu/certicom/README.md) for build
+requirements, device ordinals, batch/walk budgets, deadlines and tests.

@@ -1,0 +1,57 @@
+{
+  "schema": "twist-final-metadata-reference-reconciliation/v1",
+  "recorded_utc": "2026-10-24T19:05:45Z",
+  "scope": "Publication metadata only; no scientific experiment or successful upload repeated",
+  "conductor_task": "T-100",
+  "checked_source_commit": "496d5dc98ae03156ca3f7161225395961b8d1924",
+  "observed_main": "5cb553810e5bbfbd8691ec614ffcaacefc625757",
+  "pr_common_ancestor": "092d1ff47ef904e219778a8ea9b4ef241f852842",
+  "first_attempt": {
+    "directory": "final-metadata-v1",
+    "curve_names_exit": 0,
+    "validation_exit": 1,
+    "reported_removed_benchmark_rows": 24,
+    "status": "failed; retained unchanged",
+    "explanation": "The shared origin/main ref advanced after the integration gate. A direct comparison to newer main treated its later benchmark additions as removals from this branch."
+  },
+  "reference_check": {
+    "branch_benchmark_index_diff_from_common_ancestor": "empty",
+    "newer_main_benchmark_index_numstat_from_common_ancestor": "26 additions, 0 deletions",
+    "method": "Native git diff against the two recorded immutable commits",
+    "validation_code_or_ledger_rows_changed_to_pass": false
+  },
+  "corrected_attempt": {
+    "directory": "final-metadata-v2",
+    "reference": "Recorded immutable PR common ancestor",
+    "validation_exit": 0,
+    "large_files_exit": 0,
+    "terminal_exit": 0,
+    "root_source_files_verified_unchanged": 855,
+    "unrelated_dirty_files_verified_unchanged": 2,
+    "service": "twist-joint-final-metadata-v2.service",
+    "service_result": "success",
+    "source": "Saved executed script, command/exit/output receipts and terminal systemd state",
+    "does_not_establish": "GitHub CI, a merged-head check, scientific validation beyond the cited checks, or permission to bypass any PR gate"
+  },
+  "migration_reconciliation": {
+    "approved_handoff_sha256": "a16037f61139810dcb13bea313349a2f9d4f1a43471c7ffc04ea3e1828dac0c1",
+    "original_source_disk_retained": true,
+    "diem_state": "deadline-expired",
+    "diem_original_deadline_utc_epoch": 1792521741.993407,
+    "diem_durable_records": 50,
+    "diem_expected_records": 52,
+    "diem_pending": false,
+    "diem_launcher_pid": null,
+    "diem_managed_owner_active": false,
+    "legacy_waiting_freeze_lane": "left quiesced; not resumed by this study",
+    "direct_kubectl_refresh": "Failed API discovery with invalid character '<'; no job mutation or role change attempted",
+    "eks_reconciliation_source": "Read-only isolab_k8s_overview through the existing research service",
+    "eks_namespace": "isolab",
+    "study_job_name": "twist-joint-capability-20261024-v1",
+    "study_job_uid": "ee711fcc-27b1-47cd-be6b-5c78b068ccc1",
+    "study_job_state": "failed",
+    "study_job_reason": "DeadlineExceeded",
+    "nonterminal_jobs_in_observed_overview": 0,
+    "new_generator_or_eks_submission": false
+  }
+}
