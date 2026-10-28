@@ -443,7 +443,7 @@ fn symmetry_export() -> Result<()> {
 }
 fn quotient_models() -> Result<()> {
     let v = Path::new(S).join("execution-v12");
-    let data = read(v.join("ADMISSION.json"))?;
+    let data = read(Path::new(S).join("execution-v13/ADMISSION.json"))?;
     let old = read(Path::new(S).join("execution-v8/GLOBAL_MODELS_INPUT.json"))?;
     let mut additions = vec![];
     let mut global = vec![];
@@ -463,7 +463,7 @@ fn quotient_models() -> Result<()> {
         assert_eq!(canonical.slug, id["slug"]);
         assert_eq!(canonical.icv1, id["icv1"]);
         assert_eq!(canonical.model_json, id["model_json"]);
-        id["sources"] = json!([format!("{S}/execution-v12/ADMISSION.json")]);
+        id["sources"] = json!([format!("{S}/execution-v13/ADMISSION.json")]);
         additions.push(id.clone());
         let mut dest = old[j + 1].clone();
         dest["curve"]["generator"] = m["mapped_generator"].clone();
@@ -475,49 +475,161 @@ fn quotient_models() -> Result<()> {
     write(v.join("GLOBAL_MODELS_INPUT.json"), &json!(global))?;
     models()
 }
-fn quotient_export() -> Result<()> {
-    let v = Path::new(S).join("execution-v12");
+fn quotient_correct_reference() -> Result<()> {
+    let v = Path::new(S).join("execution-v13");
+    fs::create_dir_all(&v)?;
+    let original = Path::new(S).join("execution-v12/runs/quotient-v1/verify.gp");
+    let text = fs::read_to_string(&original)?;
+    assert!(text.contains("Pi="));
+    let corrected = text.replace("Pi", "iso_i");
+    let target = v.join("REFERENCE_V2.gp");
+    if target.exists() {
+        return Err("fresh corrected script required".into());
+    }
+    fs::write(&target, &corrected)?;
+    write(
+        v.join("REFERENCE_CORRECTION.json"),
+        &json!({"schema":"twist.reference-variable-correction/v1","original_script_sha256":sha(&original)?,"corrected_script_sha256":sha(&target)?,"literal_replacement":{"from":"Pi","to":"iso_i"},"occurrences":text.matches("Pi").count(),"only_change_is_uniform_literal_identifier_rename":true,"native_raw_unchanged":true}),
+    )
+}
+fn quotient_admit_v2() -> Result<()> {
+    let v = Path::new(S).join("execution-v13");
+    let raw = Path::new(S).join("execution-v12/runs/quotient-v1");
+    let pari = v.join("runs/pari-v2");
+    let original = fs::read_to_string(raw.join("verify.gp"))?;
+    assert_eq!(
+        original.replace("Pi", "iso_i"),
+        fs::read_to_string(v.join("REFERENCE_V2.gp"))?
+    );
+    let p = read(pari.join("RECEIPT.json"))?;
+    assert_eq!(p["exit_code"], 0);
+    assert!(p["signal"].is_null());
+    assert_eq!(p["script_sha256"], sha(v.join("REFERENCE_V2.gp"))?);
+    let so = fs::read(pari.join("pari.stdout"))?;
+    let se = fs::read(pari.join("pari.stderr"))?;
+    assert_eq!(p["stdout_sha256"], hex::encode(source_sha256::sha256(&so)));
+    assert_eq!(p["stderr_sha256"], hex::encode(source_sha256::sha256(&se)));
+    assert_eq!(
+        String::from_utf8(so)?.trim(),
+        "ALL_TWIST_QUOTIENT_SQUARES_OK 8 6584 136"
+    );
+    let err = String::from_utf8(se)?;
+    assert!(
+        err.trim().is_empty()
+            || err.trim()
+                == "***   Warning: new maximum stack size = 4000002048 (3814.699 Mbytes)."
+    );
+    let mut a = read(raw.join("RESULTS.json"))?;
+    assert_eq!(
+        a["point_checks_sha256"],
+        sha(raw.join("point-checks.jsonl"))?
+    );
+    assert_eq!(a["summary"]["generic_squares"], 8);
+    a["status"] = json!("native-and-independent-PARI-quotient-squares-verified");
+    a["native_result_sha256"] = json!(sha(raw.join("RESULTS.json"))?);
+    a["pari_receipt_sha256"] = json!(sha(pari.join("RECEIPT.json"))?);
+    a["original_reference_failed_strict_verification"] = json!(true);
+    a["reference_correction_sha256"] = json!(sha(v.join("REFERENCE_CORRECTION.json"))?);
+    let compact_maps:Vec<_>=a["maps"].as_array().unwrap().iter().map(|m|json!({"line":m["line"],"next_line":m["next_line"],"source_model":m["source_model"]["slug"],"destination_model":m["destination_model"]["slug"],"intermediate_model":m["intermediate_model"]["slug"],"degree":m["degree"],"generic_square_verified":m["generic_square_verified"],"generic_composition_x_degree":m["generic_composition_x_degree"],"source_rational_checks":m["source_rational_checks"],"kernel_checks":m["kernel_checks"],"source_generator":m["source_generator"],"next_quotient_generator":m["next_quotient_generator"],"mapped_generator":m["mapped_generator"],"mapped_target":m["mapped_target"]})).collect();
+    write(
+        v.join("SUMMARY.json"),
+        &json!({"schema":"twist.quotient-summary/v1","status":a["status"],"summary":a["summary"],"line_cycle":a["line_cycle"],"maps":compact_maps,"scalar_action_relative_to_next_generator":353,"scalar_inverse":415,"native_result_sha256":a["native_result_sha256"],"pari_receipt_sha256":a["pari_receipt_sha256"],"performance_claim":false,"novelty_claim":false}),
+    )?;
+    write(v.join("ADMISSION.json"), &a)
+}
+fn quotient_export(version: u64) -> Result<()> {
+    let v = Path::new(S).join(if version == 1 {
+        "execution-v12"
+    } else {
+        "execution-v13"
+    });
+    let raw_v = Path::new(S).join("execution-v12");
     let p = read(v.join("protocol.json"))?;
     let f = read(v.join("FROZEN.json"))?;
-    let a = read(v.join("ADMISSION.json"))?;
+    let a = read(if version == 1 {
+        raw_v.join("runs/quotient-v1/RESULTS.json")
+    } else {
+        v.join("ADMISSION.json")
+    })?;
     let h = read(v.join("HOST.json"))?;
-    assert_eq!(
-        a["status"],
-        "native-and-independent-PARI-quotient-squares-verified"
-    );
-    let transport = read(v.join("runs/producer-transport.json"))?;
+    if version == 2 {
+        assert_eq!(
+            a["status"],
+            "native-and-independent-PARI-quotient-squares-verified"
+        );
+    }
+    let transport = read(raw_v.join("runs/producer-transport.json"))?;
     assert_eq!(transport["exit_code"], 0);
-    assert_eq!(transport["binary_sha256"], f["binary"]["sha256"]);
+    assert_eq!(
+        transport["binary_sha256"],
+        p["arms"][0]["instrument"]["binary_sha256"]
+    );
     let mut e = read(Path::new(S).join("execution-v11/experiment.export.json"))?;
-    e["export_id"] = json!("twist-quotient-cycle-20261028-v1");
+    e["export_id"] = json!(format!("twist-quotient-cycle-20261028-v{version}"));
     e["created"] = transport["finished"].clone();
     e["protocol"] = json!({"path":"protocol.json","sha256":p["freeze"]["protocol_sha256"],"protocol_id":p["protocol_id"],"version":p["version"]});
     e["source"]["commit"] = f["source_revision"].clone();
     e["host"] = json!({"path":"HOST.json","sha256":sha(v.join("HOST.json"))?,"class_id":null,"summary":h["summary"]});
     e["arms"]=json!(p["arms"].as_array().unwrap().iter().map(|a|json!({"id":a["id"],"role":a["role"],"binary_sha256":a["instrument"]["binary_sha256"],"commit":a["instrument"]["commit"]})).collect::<Vec<_>>());
-    let artifacts = vec![
-        file(&v.join("runs.tar.xz"), &v, "raw")?,
-        file(&v.join("RAW_MEMBERS.json"), &v, "receipt")?,
-        file(&v.join("ADMISSION.json"), &v, "receipt")?,
-        file(&v.join("runs/pari-v1/RECEIPT.json"), &v, "receipt")?,
+    let mut artifacts = vec![
+        file(&raw_v.join("runs.tar.xz"), &v, "raw")?,
+        file(&raw_v.join("RAW_MEMBERS.json"), &v, "receipt")?,
     ];
+    artifacts.push(file(
+        &if version == 1 {
+            raw_v.join("runs/pari-v1/RECEIPT.json")
+        } else {
+            v.join("runs/pari-v2/RECEIPT.json")
+        },
+        &v,
+        "receipt",
+    )?);
+    artifacts.push(file(
+        &if version == 1 {
+            raw_v.join("runs/quotient-v1/RESULTS.json")
+        } else {
+            v.join("ADMISSION.json")
+        },
+        &v,
+        "receipt",
+    )?);
+    if version == 2 {
+        artifacts.push(file(&v.join("runs.tar.xz"), &v, "raw")?);
+    }
     let mut runs = e["runs"].as_array().unwrap().clone();
     assert_eq!(runs.len(), 2);
     for (i, r) in runs.iter_mut().enumerate() {
         r["run_id"] = json!(format!(
             "quotient-{}-000",
-            if i == 0 { "native" } else { "pari" }
+            if i == 0 {
+                "native"
+            } else if version == 1 {
+                "pari"
+            } else {
+                "pari-v2"
+            }
         ));
         r["instance_id"] = json!("p827-eight-fixed-quotient-squares");
         r["worker"] = p["arms"][i]["instrument"]["binary_sha256"].clone();
         r["artifacts"] = json!(artifacts);
         r["measurements"]["counted"] = json!({"generic_squares":a["summary"]["generic_squares"]});
         r["measurements"]["counters"] = a["summary"].clone();
-        r["verification"] = json!({"status":"verified","verifier":"Native generic maps and independent PARI ellisogeny/quotient-square/complete group checks"});
-        r["backend_ref"] = json!(if i == 0 {
-            "runs/quotient-v1"
+        r["status"] = json!(if version == 1 && i == 1 {
+            "failed"
         } else {
+            "succeeded"
+        });
+        r["verification"] = json!({"status":if version==1&&i==1{"error"}else{"verified"},"verifier":if version==1&&i==1{"Strict stderr gate rejects reserved Pi assignment despite process0/sentinel"}else if version==1{"Native exact generic/finite checks; independent reference failed separately"}else{"Native generic maps and independent PARI ellisogeny/quotient-square/complete group checks"}});
+        r["backend_ref"] = json!(if i == 0 {
+            if version == 1 {
+                "runs/quotient-v1"
+            } else {
+                "../execution-v12/runs/quotient-v1"
+            }
+        } else if version == 1 {
             "runs/pari-v1"
+        } else {
+            "runs/pari-v2"
         });
         r["started_at"] = if i == 0 {
             transport["started"].clone()
@@ -531,12 +643,12 @@ fn quotient_export() -> Result<()> {
         };
     }
     e["runs"] = json!(runs);
-    e["analysis"] = json!({"script":file(&Path::new(S).join("runner/src/quotient_cycle_20261028.rs"),&v,"analysis")?,"blinded":false,"blinding_key_sha256":null,"outputs":[file(&v.join("ADMISSION.json"),&v,"analysis")?],"unmasked_at":null});
+    e["analysis"] = json!({"script":file(&Path::new(S).join(if version==1{"runner/src/quotient_cycle_20261028.rs"}else{"runner/src/bin/twist-kernel-publication.rs"}),&v,"analysis")?,"blinded":false,"blinding_key_sha256":null,"outputs":[file(&if version==1{raw_v.join("runs/quotient-v1/RESULTS.json")}else{v.join("ADMISSION.json")},&v,"analysis")?],"unmasked_at":null});
     e["files"] = json!([
         file(&v.join("FROZEN.json"), &v, "receipt")?,
         file(&v.join("protocol.json"), &v, "protocol")?
     ]);
-    e["notes"] = json!([{"kind":"observation","text":"All eight fixed degree17 quotient maps and generic commuting squares; complete finite/kernel checks. No charged cost, novelty, unknown-log or NIST claim. Shared author/host independent CAS; no separate-runner review.","by":"native publication tool"}]);
+    e["notes"] = json!([{"kind":"observation","text":if version==1{"Native all8 generic squares pass; first GP strict verification fails on reserved Pi name despite exit0/sentinel. Original records retained; not independently certified."}else{"Variable-name-only GP correction independently verifies unchanged native all8 generic squares and complete finite/kernel checks. This export reuses the same native run as v12; actual combined total is3 processes, not4 independent runs. No charged cost, novelty, unknown-log or NIST claim."},"by":"native publication tool"}]);
     e["producer"]["session"] = json!("twist-quotient-cycle-20261028");
     write(v.join("experiment.export.json"), &e)
 }
@@ -551,7 +663,10 @@ fn main() -> Result<()> {
         Some("endo-export") => endo_export(),
         Some("symmetry-export") => symmetry_export(),
         Some("quotient-models") => quotient_models(),
-        Some("quotient-export") => quotient_export(),
+        Some("quotient-export-original") => quotient_export(1),
+        Some("quotient-export") => quotient_export(2),
+        Some("quotient-reference-correct") => quotient_correct_reference(),
+        Some("quotient-admit-v2") => quotient_admit_v2(),
         _ => Err("admit|export-original|export|models".into()),
     }
 }
