@@ -396,3 +396,30 @@ Freeze and run v2, preserve both attempts and report both outcomes.
 
 Initial export formatter used wrong kind, instance IDs and failure outcome
 vocabulary; corrected without changing raw evidence. Diagnostics retained.
+
+## 16:43 UTC — Exact prime m2 Hilbert data completed and restored from S3
+
+### What was done
+
+R2 ran16:40:30–16:40:33UTC, producer/replay exit0. All six source certificates
+and six fresh replays passed. Exact original-top dreg42; h41=5348880,h42=0,
+total quotient dimension9159376218609600.168 explicit rank controls and63
+product-degree controls passed;44 small-characteristic rank deficiencies detected.
+Eight unit tests and Lean finite arithmetic pass; full algebraic proof not formalized.
+
+### Decisions made
+
+Archive all r1 failed and r2 completed data separately. S3 download reconstructed
+all34 r1 files and all48 r2 files, every hash verified. Downloaded r2 instrument
+replayed all six certificates, then all48 hashes were checked unchanged.
+No solving-degree/LFD, elite-base, timing or independent-review claim.
+
+### Open threads
+
+Commit/push data first, then report both attempts, metrics and PR2706 update.
+Broader FFD/LFD and binary exact regularity remain open.
+
+### Errors
+
+R1 source-template failure and cancelled cases remain explicit. Both failed-r1
+and completed-r2 unified exports now validate with zero findings.
