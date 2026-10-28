@@ -362,3 +362,15 @@ No software test is evidence of cloud owner reconciliation, grant delivery,
 worker publication, resource termination, account-wide spend control, CRIU
 recovery or a completed scientific dataset cell. Those acceptance steps remain
 with the launch adapter and the frozen dataset campaign.
+
+## Primary references and scope
+
+The implementation uses SQLite's existing [IMMEDIATE transaction semantics](https://www.sqlite.org/lang_transaction.html)
+for serialized state transitions; it does not claim an atomic transaction across
+SQLite and Kubernetes. Grant delivery is a separate proposal based on
+[Kubernetes projected volumes](https://kubernetes.io/docs/concepts/storage/projected-volumes/)
+and [downward API fields](https://kubernetes.io/docs/concepts/workloads/pods/downward-api/).
+These references informed the design on 2026-10-28; none establishes deployed
+permissions or successful cloud execution. Existing allocator `open` permits
+historical inspection after deadlines, while live admission and worker validation
+reject expiry. Exact reservation/grant recovery preserves that distinction.

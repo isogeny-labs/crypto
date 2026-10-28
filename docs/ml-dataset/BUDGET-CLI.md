@@ -75,6 +75,54 @@ does not guarantee sufficient finalization capacity for an arbitrary cell.
 Actual requests fail closed when the needed allocation is unavailable. A
 trace-size setting alone does not bound request counts or metadata bytes.
 
+## Reserve before creation, bind after observing the worker
+
+When a Job has not yet been created, use an ownerless launch reservation. Do not
+invent Job or Pod UIDs to obtain a direct grant. The request pins the exact EKS
+cluster ARN, namespace and Job name in addition to the same resource, executor,
+plan, protocol, shard, journal and expiry fields. See the exact JSON schemas in
+[the frozen reservation contract](PRELAUNCH-RESERVATION.md).
+
+```sh
+crypto dataset budget reserve-launch --dry-run \
+  --policy policy.json --ledger /durable/campaign.sqlite \
+  --request launch-request.json
+crypto dataset budget reserve-launch --create-ledger \
+  --policy policy.json --ledger /durable/campaign.sqlite \
+  --request launch-request.json --out launch-reservation.json
+# External launcher creates/reconciles the exact reserved Job and retains evidence.
+crypto dataset budget bind-launch \
+  --policy policy.json --ledger /durable/campaign.sqlite \
+  --binding launch-binding.json --out grant.json
+```
+
+Use `--create-ledger` only for the first authoritative initialization. On exact
+retries, omit it and retain the same request, target and original ledger. The
+dry-run command forbids output and initialization options, creates no files,
+and requires inspecting `admitted` in its report. A successful dry run neither
+reserves resources nor creates a Job.
+
+The committed reservation consumes its complete envelope before submission.
+Use the returned `reservation_sha256` in the binding: it identifies the native
+typed serialization, independently of the reservation file's formatting. The
+binding names the observed target, actual Job/Pod UIDs and SHA-256 of the retained
+observation evidence. The trusted launcher must verify those external facts;
+the allocator checks their consistency and digest format, not Kubernetes itself.
+
+Binding moves the same allocation into a worker grant in one transaction.
+Pending and bound reservations stay in status permanently, including expired
+or failed attempts. Exact reserve/bind retries re-export identical records;
+changed requests, targets, owners or evidence are rejected. Recovering an expired
+receipt does not authorize new submission or activation. A pending reservation
+cannot activate a worker, and direct `reserve` cannot reuse its launch ID.
+Ambiguous submission must be reconciled under the original Job name.
+
+These commands make no cloud requests and do not submit or deliver a grant.
+The [launch adapter](LAUNCH-ADAPTER.md) still requires actual owner/placement
+reconciliation, finite resource lifetime and the separately reviewed
+[startup delivery mechanism](STARTUP-GRANT-DELIVERY.md). Its proposed Kubernetes
+permission and the worker S3 policy remain unapplied.
+
 ## Activate exactly one worker journal
 
 Inside the intended worker, use the executing binary named by the grant:
