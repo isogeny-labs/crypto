@@ -516,7 +516,7 @@ fn configured_remote(remote: Option<&str>) -> Result<crate::store::backend::Remo
     }
     crate::store::Config::discover()?
         .remote
-        .ok_or("explicit S3 or file remote required")
+        .ok_or_else(|| "explicit S3 or file remote required".to_string())
 }
 
 fn require_remote_budget(
