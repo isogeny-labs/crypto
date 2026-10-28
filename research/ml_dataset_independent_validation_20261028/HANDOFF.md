@@ -37,3 +37,41 @@ rejected and native replay could certify stale cached rows. Added both the
 new exact rule and pre/post input/binary checks, with regression tests.
 The initial producer test log had failures; those are the other worktree's
 responsibility, not evidence that this consumer validates native datasets.
+
+# Phase measurement continuation — 2026-10-28 UTC
+
+## What was done (commands, files, features)
+
+Added hash-bound phase telemetry labels to the independent training view.
+The suite now passes 25 tests, covering exact/raw/scaled distinctions, absent
+PMU readings, unfinished phases, inconsistent timing/scaling and feature
+separation. No new generation, PMU experiment or compute worker was launched.
+
+## Decisions made (and why)
+
+Keep phase counts and exclusions intact instead of presenting them as total
+pipeline instruction cost. Preserve older S3 and software validation receipts;
+the new validation record identifies the changed consumer and tests separately.
+
+## Open threads (unfinished, pick up next time)
+
+At the current read-only check, producer HEAD was
+3f1c7822976d29b15a01fd94e0f29c417760c6b5, its native builds remained active,
+its pilot protocol remained draft, and the documented native S3 catalog
+prefixes contained no completed cells. The $200 budget admission and durable
+publication of retained interrupted attempts were not integrated in the
+inspected producer. Source audits still identify prime F4 modulus limits and
+public/config and outcome consistency defects; the consumer rejects several
+of these but does not repair the separately owned producer. Recheck the final
+revision before describing any of these as current or resolved.
+
+## Errors (what went wrong, how it was handled)
+
+The repository's restricted fetch refspec did not create a remote-tracking
+ref for the consumer branch. Fast-forwarded using the explicitly fetched
+FETCH_HEAD instead; no rebasing, force pushing or producer edits occurred.
+
+Independent review found unchecked cycle scaling and unavailable-counter estimates.
+Both counter tuples now use the same producer-compatible validator, including
+zero-running boundaries and aggregate multiplexing. Regression tests pass.
+The original consumer merged in PR #2754; T-700 owns this follow-up.

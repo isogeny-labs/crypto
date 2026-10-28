@@ -4,7 +4,7 @@ This companion checks saved native dataset artifacts, restores one completed
 cell from S3, and exports an allowlisted view for static solver-routing and cost
 models. It does not generate cryptographic instances or implement a second
 cryptographic solver. The native producer remains separately owned under
-`codex/ml-ecdlp-dataset-20261028` (Conductor T-684); this directory is T-693.
+`codex/ml-ecdlp-dataset-20261028` (Conductor T-684); the initial consumer was T-693; phase-label continuation is T-700.
 
 ## Checks and boundaries
 
@@ -39,6 +39,18 @@ terminal BSGS hit. Do not feed the entire exported record to a model: only
 `features` is the feature view; IDs, labels and split metadata are separate.
 The record schema `ml-dataset.static-routing-view/v1` is a narrow companion
 view, not a claim of conformance to the broader `crypto-ml-v1` training schema.
+
+Phase PMU telemetry is retained only under `labels.phase_measurements`. Each
+readback retains its durable start, raw counts, scaled estimates, enabled/running
+times, errors, scope exclusions and artifact digests. The consumer checks label
+consistency against those raw fields and the producer's integer scaling rule.
+An unmultiplexed instruction count must have equal enabled/running times; a
+multiplexed estimate cannot populate the exact-count field. Missing PMU readings
+remain null, and a start without readback remains interrupted or unfinished.
+These checks do not calibrate the PMU or establish whole-worker instruction
+cost: process startup, publication and work outside the phase remain excluded.
+`whole_worker_instruction_count` stays null; phase counts and peak RSS are not
+summed into an unsupported total. Telemetry never enters the feature view.
 
 Whole field sizes are assigned deterministically to 80/10/10 hash buckets.
 Every generator, key, twist and family at a fixed n stays together. This can
@@ -86,7 +98,9 @@ or training examples. Tests cover corruption, duplicate members and JSON keys,
 path traversal/symlinks, forged success without inputs, transplanted metadata,
 contradictory labels, arity/domain mismatches, false factor-base completion,
 feature leakage, atomic export failure, native replay coverage and changing
-inputs/binaries, and S3 restore using mocked HTTP-facing commands.
+inputs/binaries, S3 restore using mocked HTTP-facing commands, and raw/scaled/
+missing/interrupted instruction-label consistency. The current suite has 25
+tests; the earlier 19-test receipt remains preserved as historical evidence.
 
 `integration_s3.py --execute --evidence NEW_DIRECTORY` performs a separate
 bounded live S3 software test (under 100 kB and 32 artifact references). It
