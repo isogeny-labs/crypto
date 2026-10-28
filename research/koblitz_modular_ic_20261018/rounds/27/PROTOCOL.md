@@ -381,3 +381,5 @@ actual free cyclic10 tower and characteristic2 Prym/duality literature.
 Proposed type(1^18,5^6) is a geometric deduction, not a measured lattice or
 explicit theta-section computation. Exact integral E and actual residual
 class are independently native-bound; actual CM-sign projection remains open.
+
+Lean07 reached elaboration after removing the extra address-space restriction, failed five scalar-zero goals because Abel does not import Group.Basic. Add the actual Group.Basic import and zsmul_zero; retain all failed source/logs. Add three conditional additive/numeric mixed-carrier lemmas, now17named inTorsion plus18Collector=35expected, not a formal polarization theorem.

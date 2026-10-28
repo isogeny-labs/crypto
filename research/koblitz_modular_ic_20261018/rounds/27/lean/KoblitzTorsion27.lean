@@ -1,4 +1,5 @@
 import Mathlib.Tactic.Abel
+import Mathlib.Algebra.Group.Basic
 import Lean.Elab.Tactic.Omega
 
 /-! Integral identities in an arbitrary additive group. The actual principal
@@ -76,14 +77,14 @@ theorem moved_nonzero_implies_original_nonzero (a : Fin 5 → A)
     (hne : moved a ≠ 0) : torsion a ≠ 0 := by
   intro h
   apply hne
-  rw [moved_is_four a h1 h2 h3 h4,h,smul_zero]
+  rw [moved_is_four a h1 h2 h3 h4,h,zsmul_zero]
 
 theorem mixed_ten_recovers {A : Type*} [AddCommGroup A] (d : A)
     (h : (11:ℤ) • d = 0) : (10:ℤ) • ((10:ℤ) • d) = d := by
   apply sub_eq_zero.mp
   calc
     (10:ℤ) • ((10:ℤ) • d) - d = (9:ℤ) • ((11:ℤ) • d) := by abel
-    _ = 0 := by rw [h,smul_zero]
+    _ = 0 := by rw [h,zsmul_zero]
 
 theorem trace_coordinate_degree_obstructions :
     (¬ 3 ∣ 34) ∧ (¬ 3 ∣ 80) ∧ (¬ 3 ∣ 110) := by decide
@@ -101,5 +102,17 @@ theorem quadratic_kernel_dimensions :
 theorem free_quotient_dimensions :
     (61-1)/5+1=13 ∧ (61-1)/10+1=7 ∧ (31-1)/5+1=7 ∧
     (61-31-13+7 : ℕ)=24 := by decide
+
+theorem coprime_two_five_kernel (x : A)
+    (h2 : (2:ℤ) • x = 0) (h5 : (5:ℤ) • x = 0) : x = 0 := by
+  calc
+    x = (3:ℤ) • ((2:ℤ) • x) - (5:ℤ) • x := by abel
+    _ = 0 := by rw [h2,h5]; simp
+
+theorem mixed_polarization_type_counts :
+    (18+6 : ℕ)=24 ∧ 2*6=12 ∧ 30-6=24 ∧ 5^12=244140625 := by decide
+
+theorem mixed_polarization_prime_to_eleven :
+    (244140625 : ℕ) % 11 = 3 ∧ Nat.Coprime 244140625 11 := by decide
 
 end KoblitzTorsion27
