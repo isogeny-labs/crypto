@@ -28,3 +28,16 @@ See the current [operator guide](../../../docs/ml-dataset/BUDGET-CLI.md),
 [remaining coverage](../../../docs/ml-dataset/REMAINING-COVERAGE.md) for the
 canonical-plan metadata, launch identity/resource, worker IAM and broader
 solver/ML work still outstanding.
+
+## Completed validation
+
+`validation-final.json` records the completed release library suite: **5,105
+passed, zero failed,123 ignored**, exit0 observed. The complete log and process
+receipt are archived; source hashes matched after execution. Later delivery
+commits change only documentation/evidence, with src/Cargo/build.rs equality
+checked against23b3.
+
+`remote-readback-final.json` binds all40 archive references totaling42,909,776
+bytes. It preserves the37 initial verified downloads and adds fresh downloads
+for the final log, exit receipt and source readback. Earlier pending records
+remain unchanged. The current generator has not produced a verified cloud cell.

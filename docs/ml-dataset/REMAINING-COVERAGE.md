@@ -2,8 +2,9 @@
 
 The native cumulative-budget implementation at `23b3c0e` adds authoritative
 SQLite allocation, bound worker journals, charged native S3/STS attempts and
-budget CLI commands. Its focused dataset tests, strict lint, release build and
-CLI/container preflight passed; final full-library validation is pending.
+budget CLI commands. It passed 5,105 full-library tests, zero failures and123 ignored, with exit0
+observed. Strict lint, formatting, release build,19 CLI checks,7 synthetic
+admission cases and non-root container preflight also passed.
 A small canonical plan-digest metadata correction is awaiting an active file
 reservation. The [launch adapter contract](LAUNCH-ADAPTER.md) records additional
 actual-UID startup gating and finite resource-lifetime integration still needed.

@@ -129,3 +129,16 @@ handshake; reconcile prior obligations and resource evidence; then perform
 worker-role conditional PUT/GET verification and the frozen wave only after
 its existing admission and permission gates are satisfied. Preserve the
 earlier failed attempts and zero verified cloud cells.
+
+### Completed software validation and coordination
+
+The final unchanged-source23b3 release library suite completed with5,105 passed,
+zero failed and123 ignored, exit0 observed. Source hashes still matched after
+the run. The existing initial validation record remains unchanged; the final
+result is retained separately in the source23b3 archive.
+
+The human authorized coordination with T-755. Its owner could not be addressed
+through the app's available task routing, so the exact minimal metadata request
+was posted on the owning delivery PR: [coordination comment](https://github.com/isogeny-labs/crypto/pull/2790#issuecomment-6475281809).
+No reserved source was changed. The worker IAM decision remains separate and
+unanswered; no new cloud wave or real budget grant was issued.
