@@ -472,4 +472,10 @@ thereby proves the affine ring, rational-point localization, and weighted-Proj
 point stalk are domains. Its [PDF](SEPARABLE_AFFINE_DOMAIN.pdf),
 [dependency graph](separable-affine-domain.svg), and
 [gate CSV](separable-affine-domain.csv) state the checked hypotheses and
-remaining DVR/Pic⁰/runtime gates. Neither packet changes a cost row.
+remaining DVR/Pic⁰/runtime gates. The later [nonbranch DVR packet](NONBRANCH_DVR.md)
+proves that the actual weighted-Proj point stalk is a DVR when the quintic is
+separable, `y²=f(a)`, and `2*y≠0`. Its [PDF](NONBRANCH_DVR.pdf),
+[dependency graph](nonbranch-dvr.svg), and [gate CSV](nonbranch-dvr.csv)
+retain the alternative `f'(a)≠0` case, formula-specific norm transport,
+global Pic⁰ equation, and compiled Rust semantics as open gates. These
+packets do not change a target or cost row.
