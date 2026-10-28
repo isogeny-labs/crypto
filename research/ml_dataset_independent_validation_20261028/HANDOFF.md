@@ -75,3 +75,78 @@ Independent review found unchecked cycle scaling and unavailable-counter estimat
 Both counter tuples now use the same producer-compatible validator, including
 zero-running boundaries and aggregate multiplexing. Regression tests pass.
 The original consumer merged in PR #2754; T-700 owns this follow-up.
+
+# Native consumer and positive arithmetic — 2026-10-28 UTC
+
+## What was done (commands, files, features)
+
+Replaced the supported execution path with the independent Rust crate in
+`native/`: audit, static export, phase-label validation, bounded S3 restore,
+optional producer replay and public positive-certificate arithmetic. The crate
+links no producer arithmetic. The full release suite passed 79 tests (72 library,
+7 integration), with formatting, strict Clippy and release build also passing.
+Native integration includes rehashed false certificates and provenance, corrupted
+objects, incomplete attempts, duplicate keys, symlinks/FIFOs and label isolation.
+
+Read-only AWS inspection at 06:52 UTC found E12a and E12c still running; both
+06:51:57 snapshot archives had zero completed target draws. E12b's completed
+mixed result was merged in PR #2758 at 06:21:29 UTC. No new worker was launched
+and no IAM permissions were changed in this continuation.
+
+## Decisions made (and why)
+
+The repository forbids Python field arithmetic, certificate verifiers and replay.
+The prior Python consumer is historical; its files and old test receipts remain
+unchanged. The unpublished arithmetic draft was archived to S3 and read back
+with matching SHA-256 5457479f629afc34b19baf573f69b2a4e5b6ccc53878f8df70dd19c538cf0a15.
+The native replacement has separate validation and S3 evidence. Public scalar
+or PDP equations do not establish order, solver independence, UNSAT, cost or
+fall-degree claims. Both broad independently-verified flags remain false.
+
+Conductor T-706 reserves only this companion directory. The shared daily log
+and native producer are separately owned, so this scoped handoff preserves the
+work without changing either owner’s files. The total budget ceiling remains
+$200 through tomorrow, with the existing conservative $188.3888 reservation;
+there is no new daily allowance or account-wide spending guarantee.
+
+## Open threads (unfinished, pick up next time)
+
+Pilot `ml-dataset-4c94f1d-pilot-002-20261028` failed with S3 HeadObject 403 before
+its first publication. The dated canonical catalog remained empty at 06:47 UTC.
+No recoverable native cell was found in the available job/receipt interfaces.
+Producer HEAD was eb7e1c203a5dfc98eae88134f6b43e775ee45721, with substantial
+uncommitted native coverage work in its separate worktree. Reconcile that owner
+before edits, retries or source freezes.
+
+A prepared prefix-scoped `isolab-job` inline policy is awaiting the explicit
+administrative approval already requested. It permits no deletion or IAM
+management. After approval, check the actual worker's fresh-key HEAD/conditional
+PUT/GET/hash behavior: prefix-limited ListBucket may still leave a missing-key
+HEAD returning 403. Fix that narrow publication path if needed; do not silently
+widen listing or reuse the old unapproved bucket-root store. Run no new pilot
+until preflight and source/budget gates pass. Separately requested permission
+to message the other dataset chat remains pending.
+
+The broad campaign remains unfinished: solver/factor-base/family/twist coverage,
+all intermediate traces, instruction accounting, real native S3 replay, extensive
+production, linked-component splits and scientific acceptance of labels.
+
+## Errors (what went wrong, how it was handled)
+
+The first unpublished arithmetic extension mistakenly used Python. It was
+superseded before publication with native Rust, preserving the draft as historical
+evidence. Independent review found FIFO reads could block before file-type checks;
+regular-file checks, no-follow/nonblocking Unix opens and regressions now cover it.
+A release-only corruption-fixture failure was fixed by constructing equal-length
+corrupted bytes directly in Rust, ensuring the hash rejection is what is tested.
+The first strict Clippy pass found three style issues; they were fixed and the
+complete release suite rerun. None of these software fixtures are campaign draws.
+
+At 07:02 UTC the native live S3 software test completed: 13 references,
+11 unique objects, 4,153 declared bytes, complete ETag-bound download and hash
+verification, and one independently checked positive certificate after restore.
+The receipt SHA-256 is bb4afa59b8e2b68b9e5f59ff547db60b6c7688bac6ae5c4c6ab79449d3124122.
+`evidence/native-20261028/validation.json` pins the source hashes, binary,
+reports, raw native test output and the durable receipt. This used the controller
+role and a software fixture; it does not validate worker permissions or replace
+the first real native dataset replay.
