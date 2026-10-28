@@ -26,7 +26,7 @@ class FrozenReportControls(unittest.TestCase):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content)
             self.lock["files"][name] = report.sha256(path.read_bytes())
-        path = self.root / "docs/backend-leaderboard/leaderboard.json"
+        path = self.root / report.ARCHIVE / "leaderboard.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text('{"frozen": true}\n')
         self.lock["outputs"]["leaderboard.json"] = report.sha256(path.read_bytes())
@@ -42,7 +42,16 @@ class FrozenReportControls(unittest.TestCase):
             report.verify_live_evidence(self.root, self.lock)
 
     def test_changed_published_output_is_refused(self):
-        (self.root / "docs/backend-leaderboard/leaderboard.json").write_text('{}')
+        (self.root / report.ARCHIVE / "leaderboard.json").write_text('{}')
+        with self.assertRaisesRegex(ValueError, "frozen report output changed"):
+            report.verify_live_evidence(self.root, self.lock)
+
+    def test_new_current_report_does_not_replace_the_pinned_historical_output(self):
+        current = self.root / "docs/backend-leaderboard/leaderboard.json"
+        current.parent.mkdir(parents=True, exist_ok=True)
+        current.write_text('{"new_producer_revision": true}\n')
+        report.verify_live_evidence(self.root, self.lock)
+        (self.root / report.ARCHIVE / "leaderboard.json").write_bytes(current.read_bytes())
         with self.assertRaisesRegex(ValueError, "frozen report output changed"):
             report.verify_live_evidence(self.root, self.lock)
 
