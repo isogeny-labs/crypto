@@ -358,6 +358,10 @@ pub struct Closure {
     pub censored: Option<String>,
     pub rows_reduced: u64,
     pub entries: u64,
+    /// `F_p` multiply-adds: one per entry of a pivot row subtracted during
+    /// reduction, plus one per term of a variable product before rewriting
+    /// merges it (the unit `f4_fp_tower` reports as `muladds`).
+    pub muladds: u64,
     pub ms: f64,
 }
 
@@ -390,8 +394,10 @@ struct Echelon {
 const NONE: u32 = u32::MAX;
 
 impl Echelon {
-    /// Reduce `r` by every pivot (full reduction) and make it monic.
-    fn reduce(&self, r: &Row, acc: &mut [u64], touched: &mut Vec<u32>) -> Row {
+    /// Reduce `r` by every pivot (full reduction) and make it monic; also
+    /// the multiply-adds it took.
+    fn reduce(&self, r: &Row, acc: &mut [u64], touched: &mut Vec<u32>) -> (Row, u64) {
+        let mut ops = 0u64;
         let p = self.p;
         let mut heap: BinaryHeap<Reverse<u32>> = BinaryHeap::with_capacity(r.len() * 2);
         for &(col, c) in r {
@@ -415,6 +421,7 @@ impl Echelon {
             }
             // acc -= v · row (rows are monic)
             let f = p - v;
+            ops += self.rows[piv as usize].len() as u64;
             for &(c2, x) in &self.rows[piv as usize] {
                 let i = c2 as usize;
                 if acc[i] == 0 && c2 != col {
@@ -434,8 +441,9 @@ impl Echelon {
             for e in out.iter_mut() {
                 e.1 = mulm(u64::from(e.1), s, p) as u32;
             }
+            ops += out.len() as u64;
         }
-        out
+        (out, ops)
     }
 }
 
@@ -444,7 +452,7 @@ pub fn closure(ring: &HkyRing, gens: &[NfPoly], c: u32, limits: &HkyLimits) -> C
     let started = Instant::now();
     let p = ring.p;
     let n_cols = count_monomials(ring.n_tower(), ring.n_free, c);
-    let censored = |why: &str, rows: u64, entries: u64| Closure {
+    let censored = |why: &str, rows: u64, entries: u64, muladds: u64| Closure {
         c,
         cols: n_cols,
         dims: Vec::new(),
@@ -452,10 +460,11 @@ pub fn closure(ring: &HkyRing, gens: &[NfPoly], c: u32, limits: &HkyLimits) -> C
         censored: Some(why.to_string()),
         rows_reduced: rows,
         entries,
+        muladds,
         ms: started.elapsed().as_secs_f64() * 1e3,
     };
     if n_cols > limits.max_cols {
-        return censored("max_cols", 0, 0);
+        return censored("max_cols", 0, 0, 0);
     }
     let cols = Columns::build(ring, c);
     assert_eq!(cols.keys.len() as u128, n_cols, "hky_fp_tower: column count");
@@ -516,16 +525,17 @@ pub fn closure(ring: &HkyRing, gens: &[NfPoly], c: u32, limits: &HkyLimits) -> C
         .map(|g| to_row(g))
         .collect();
     let mut rows_reduced = 0u64;
+    let mut muladds = 0u64;
     let mut contains_one = false;
     let n = cols.keys.len();
     'outer: while !queue.is_empty() {
         if started.elapsed() > limits.budget {
-            return censored("budget", rows_reduced, ech.entries);
+            return censored("budget", rows_reduced, ech.entries, muladds);
         }
         let take = queue.len().min(limits.batch);
         let batch: Vec<Row> = queue.drain(queue.len() - take..).collect();
         // Reduce the batch in parallel against the echelon as it stands.
-        let reduced: Vec<Row> = batch
+        let reduced: Vec<(Row, u64)> = batch
             .par_iter()
             .map_init(
                 || (vec![0u64; n], Vec::new()),
@@ -535,17 +545,21 @@ pub fn closure(ring: &HkyRing, gens: &[NfPoly], c: u32, limits: &HkyLimits) -> C
         rows_reduced += take as u64;
         let mut acc = vec![0u64; n];
         let mut touched = Vec::new();
-        for r in reduced {
+        for (r, ops) in reduced {
+            muladds += ops;
             if r.is_empty() {
                 continue;
             }
             // Against the pivots this batch has added.
-            let r = ech.reduce(&r, &mut acc, &mut touched);
+            let (r, ops) = ech.reduce(&r, &mut acc, &mut touched);
+            muladds += ops;
             let Some(&(lead, _)) = r.first() else { continue };
             let d = cols.deg[lead as usize] as u32;
             if d < c {
                 for v in 0..nv {
-                    queue.push(multiply(&r, v));
+                    let prod = multiply(&r, v);
+                    muladds += prod.len() as u64;
+                    queue.push(prod);
                 }
             }
             ech.entries += r.len() as u64;
@@ -556,7 +570,7 @@ pub fn closure(ring: &HkyRing, gens: &[NfPoly], c: u32, limits: &HkyLimits) -> C
                 break 'outer;
             }
             if ech.entries > limits.max_entries {
-                return censored("max_entries", rows_reduced, ech.entries);
+                return censored("max_entries", rows_reduced, ech.entries, muladds);
             }
         }
     }
@@ -589,6 +603,7 @@ pub fn closure(ring: &HkyRing, gens: &[NfPoly], c: u32, limits: &HkyLimits) -> C
         censored: None,
         rows_reduced,
         entries: ech.entries,
+        muladds,
         ms: started.elapsed().as_secs_f64() * 1e3,
     }
 }

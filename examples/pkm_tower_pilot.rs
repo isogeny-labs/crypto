@@ -1338,7 +1338,7 @@ fn measure_hky(
         .map(|c| {
             json!({"c": c.c, "cols": c.cols as u64, "dims": c.dims, "one": c.contains_one,
                    "censored": c.censored, "rows_reduced": c.rows_reduced,
-                   "entries": c.entries, "ms": c.ms})
+                   "entries": c.entries, "muladds": c.muladds, "ms": c.ms})
         })
         .collect();
     let censored_at = fd
@@ -1384,6 +1384,8 @@ fn measure_hky(
             "first_fall_degree": fd.first_fall,
             "falls": fd.falls,
             "censored_at": censored_at,
+            "muladds": fd.closures.iter().map(|c| c.muladds).sum::<u64>(),
+            "muladds_last_closure": fd.closures.last().map(|c| c.muladds),
             "closures": closures,
         }),
     }

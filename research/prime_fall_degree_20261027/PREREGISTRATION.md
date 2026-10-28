@@ -230,3 +230,18 @@ on the grid. Two parts:
 **Reading for (ii), fixed now:** "1-D grows" if the median rises by `≥ 2`
 over the ladder, "1-D flat" if it is constant, "mixed" otherwise. A rise
 transfers to `m = 2` as a proved lower bound on the measured draws only.
+
+## Amendment 5 (2026-10-28; stage A had rows for t ≤ 10 only, before any t ≥ 11 row)
+
+- **Operation counts.** Both engines now report `F_p` multiply-adds
+  (`muladds`): `f4_fp_tower` in its eliminations, the closure in its
+  reductions and products. These are deterministic counts, not timings. Rows
+  written before this change lack the field. Stage A is rerun from `t = 1`
+  (repeats must agree) so that every A row carries it.
+- **A at `t ≥ 11`.** The closure runs to `cmax = 5` only. That gives `ffd`
+  and either `d_F ≤ 5` or `d_F ≥ 6`. `d_F` itself comes from the Amendment-3
+  procedure: `D` from `f4_fp_tower`, then capped F4 at `D − 1`. The full
+  closure at `t = 11` would need about 0.1–0.5 M columns at `c ≥ 6`, which is
+  hours per draw on this host.
+- **The 1-D arm (Amendment 4 (ii)) read "1-D flat"**: `d_F(q) = 2` on all
+  4 draws at every `t = 2 … 24`. DERIVED.md D8 proves it.

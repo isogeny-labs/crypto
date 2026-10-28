@@ -26,6 +26,15 @@
 //!   against their maximum (a violation is a bug). Rows past the closure's
 //!   reach get a proved lower bound. Writes `DIR/derived/spec_chain.jsonl`.
 //!
+//! - `spec-1d DIR [--t-max T] [--draws K] [--cmax C]` (Amendment 4): the
+//!   one-summand specialisation. Evaluating `z_2` at `ζ^j` is a ring map that
+//!   never raises degree, so `d_F(f) ≥ d_F(q_j)`, `q_j(z) = S₃(g·z, g·ζ^j, x_R)`
+//!   on one Kummer tower. (i) For each Kummer `m = 2` closure row, `d_F(q_j)`
+//!   at 4 grid points, checked against the row. (ii) A synthetic ladder
+//!   `t = 2 … T` at `P1`, `K` draws per `t`, with `q` checked to have no root on
+//!   `μ_K`. Writes `DIR/derived/spec_1d_rows.jsonl` and
+//!   `DIR/derived/spec_1d_ladder.jsonl` (+ `.md`).
+//!
 //! `cargo run --release --example prime_fall_degree_tools -- score research/prime_fall_degree_20261027`
 use crypto_lib::cryptanalysis::hky_fp_tower::{self, HkyLimits, HkyRing};
 use serde_json::{json, Value};
@@ -863,6 +872,162 @@ fn spec_chain(dir: &Path, cmax: u64, points: u64, m_max: u64) {
     }
 }
 
+// ── spec-1d ──────────────────────────────────────────────────────────
+
+fn kummer_rules(t: usize) -> Vec<crypto_lib::cryptanalysis::f4_fp_tower::SquareRule> {
+    use crypto_lib::cryptanalysis::f4_fp_tower::SquareRule;
+    (0..t)
+        .map(|j| {
+            let top = j + 1 == t;
+            SquareRule { next: (!top).then_some((j + 1) as u8), a: 0, b: if top { 0 } else { 1 }, c: 0, d: if top { 1 } else { 0 } }
+        })
+        .collect()
+}
+
+/// `d_F` of `q(z) = S₃(g·z, x2, x_R)` on one Kummer tower of height `t`
+/// (`y_0 = z`, `y_{j+1} = y_j²`, `y_{t−1}² = 1`), with the closure dims.
+#[allow(clippy::too_many_arguments)]
+fn one_d(t: usize, g: u64, x2: u64, xr: u64, a: u64, b: u64, p: u64, cmax: u64, budget: u64) -> ((u64, &'static str), Option<u32>, Vec<u32>, f64, u128) {
+    let ring = HkyRing::new(p, kummer_rules(t), 0);
+    let n = t;
+    let x1 = raw_scale(&raw_var(n, 0), g, p);
+    let q = raw_s3(&x1, &raw_const(n, x2, p), &raw_const(n, xr, p), a, b, p, n);
+    let gen = ring.from_raw(&q.iter().map(|(k, v)| (k.clone(), *v)).collect::<Vec<_>>());
+    let lim = HkyLimits { budget: std::time::Duration::from_secs(budget), ..HkyLimits::default() };
+    let fd = hky_fp_tower::fall_degrees(&ring, &[gen], 1, cmax as u32, &lim);
+    let last = fd.closures.last().unwrap();
+    let ms = fd.closures.iter().map(|c| c.ms).sum();
+    let v = match fd.last_fall {
+        Some(d) => (d as u64, ""),
+        None if last.censored.is_some() => (last.c as u64, ">="),
+        None => (last.c as u64 + 1, ">"),
+    };
+    (v, fd.first_fall, fd.falls.clone(), ms, last.cols)
+}
+
+fn splitmix(state: &mut u64) -> u64 {
+    *state = state.wrapping_add(0x9e37_79b9_7f4a_7c15);
+    let mut z = *state;
+    z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+    z ^ (z >> 31)
+}
+
+fn spec_1d(dir: &Path, t_max: u64, draws: u64, cmax: u64) {
+    fs::create_dir_all(dir.join("derived")).unwrap();
+    // (i) rows
+    let mut md = vec![
+        "| p | t | target | d_F (m = 2 closure) | d_F(q_j) at 4 grid points | check |".to_string(),
+        "|--:|--:|--:|:--|:--|:--|".into(),
+    ];
+    let mut out = Vec::new();
+    let mut seen = std::collections::BTreeSet::new();
+    let mut bad = 0;
+    for r in rows(dir, &["A-", "C-"]) {
+        if r["engine"] != "hky_fp_tower" || r["kind"] != "kummer" || u(&r, "m") != 2 || r["control"] != "tower" || r["target"] != "random" {
+            continue;
+        }
+        let t = u(&r, "t") as usize;
+        if t < 2 || !seen.insert(key(&r)) {
+            continue;
+        }
+        let p = u(&r, "p");
+        let (a, b) = (u(&r["curve"], "a"), u(&r["curve"], "b"));
+        let (g, zeta) = (u(&r["tower"], "g"), u(&r["tower"], "zeta"));
+        let xr = u(&r, "x_r");
+        let mut vals = Vec::new();
+        for j in 0..4u64 {
+            let k = (j * 0x2545_f491) % (1u64 << t);
+            let x2 = mulm(g, powm(zeta, k, p), p);
+            vals.push(one_d(t, g, x2, xr, a, b, p, cmax, 900).0);
+        }
+        let (dfv, dfc) = d_f(&r);
+        let exact_max = vals.iter().filter(|v| v.1.is_empty()).map(|v| v.0).max().unwrap_or(0);
+        let ok = !(dfc.is_empty() && dfv < exact_max);
+        if !ok {
+            bad += 1;
+        }
+        let vs: Vec<String> = vals.iter().map(|(v, c)| format!("{c}{v}")).collect();
+        md.push(format!("| {p} | {t} | {} | {dfc}{dfv} | {} | {} |", r["target_index"], vs.join(" "), if ok { "ok" } else { "VIOLATION" }));
+        out.push(json!({"p": p, "t": t, "target_index": r["target_index"], "x_r": xr, "d_F": format!("{dfc}{dfv}"), "spec_1d": vs, "ok": ok}));
+    }
+    let mut f = fs::File::create(dir.join("derived/spec_1d_rows.jsonl")).unwrap();
+    for v in &out {
+        writeln!(f, "{v}").unwrap();
+    }
+    fs::write(dir.join("derived/spec_1d_rows.md"), md.join("\n") + "\n").unwrap();
+    println!("{}", md.join("\n"));
+    // (ii) synthetic ladder at P1
+    let p: u64 = 2_013_265_921;
+    let nonres = (2..p).find(|&h| powm(h, (p - 1) / 2, p) == p - 1).unwrap();
+    let mut md2 = vec![
+        format!("Synthetic 1-D ladder at p = {p}: q(z) = S₃(g·z, x₂, x_R) on one Kummer tower; {draws} draws per t; cmax {cmax}."),
+        String::new(),
+        "| t | d_F per draw | median | ffd per draw | falls (draw 0) | cols at last c | ms |".to_string(),
+        "|--:|:--|:--|:--|:--|--:|:--|".into(),
+    ];
+    let mut f2 = fs::File::create(dir.join("derived/spec_1d_ladder.jsonl")).unwrap();
+    for t in 2..=t_max as usize {
+        let zeta = powm(nonres, (p - 1) >> t, p);
+        let kk = 1u64 << t;
+        let mut st = 0x5eed_0000u64 ^ (t as u64) << 40;
+        let mut vals = Vec::new();
+        let mut ffds = Vec::new();
+        let mut falls0 = Vec::new();
+        let mut cols = 0;
+        let mut mss = Vec::new();
+        let mut d = 0;
+        while d < draws {
+            let a = splitmix(&mut st) % p;
+            let b = 1 + splitmix(&mut st) % (p - 1);
+            let g = 2 + splitmix(&mut st) % (p - 2);
+            let x2 = splitmix(&mut st) % p;
+            let xr = splitmix(&mut st) % p;
+            if (mulm(4, mulm(mulm(a, a, p), a, p), p) + mulm(27, mulm(b, b, p), p)) % p == 0 {
+                continue;
+            }
+            // no root of q on V = g·μ_K (else the 1-D system is consistent)
+            let mut w = g;
+            let mut root = false;
+            for _ in 0..kk {
+                if s3(w, x2, xr, a, b, p) == 0 {
+                    root = true;
+                    break;
+                }
+                w = mulm(w, zeta, p);
+            }
+            if root {
+                continue;
+            }
+            let (v, ffd, falls, ms, c) = one_d(t, g, x2, xr, a, b, p, cmax, 1800);
+            if d == 0 {
+                falls0 = falls;
+            }
+            vals.push(v);
+            ffds.push(ffd);
+            cols = cols.max(c);
+            mss.push(ms as u64);
+            writeln!(f2, "{}", json!({"p": p, "t": t, "draw": d, "a": a, "b": b, "g": g, "x2": x2, "x_r": xr, "zeta": zeta,
+                "d_F": format!("{}{}", v.1, v.0), "ffd": ffd, "ms": ms, "cols": c as u64})).unwrap();
+            d += 1;
+        }
+        let med = lower_median(&vals);
+        let vs: Vec<String> = vals.iter().map(|(v, c)| format!("{c}{v}")).collect();
+        let fs_: Vec<String> = ffds.iter().map(|x| x.map_or("—".into(), |y| y.to_string())).collect();
+        md2.push(format!("| {t} | {} | {} | {} | {falls0:?} | {cols} | {mss:?} |", vs.join(" "), fmt(med), fs_.join(" ")));
+        eprintln!("t={t} {:?}", vs);
+        if vals.iter().all(|v| v.1 == ">=") {
+            md2.push(format!("| (stopped: every draw at t = {t} hit a closure limit) | | | | | | |"));
+            break;
+        }
+    }
+    fs::write(dir.join("derived/spec_1d_ladder.md"), md2.join("\n") + "\n").unwrap();
+    println!("{}", md2.join("\n"));
+    if bad > 0 {
+        std::process::exit(1);
+    }
+}
+
 fn main() {
     let a: Vec<String> = std::env::args().skip(1).collect();
     let opt = |name: &str, d: u64| -> u64 {
@@ -876,6 +1041,7 @@ fn main() {
         Some("gate3") => gate3(Path::new(&a[1]), &a[2], opt("--max-n", 24), opt("--jobs", 2) as usize, opt("--budget", 900)),
         Some("ns-degree") => ns_degree(Path::new(&a[1]), opt("--t-max", 12)),
         Some("spec-synthetic") => spec_synthetic(Path::new(&a[1]), opt("--cmax", 16), opt("--points", 3), opt("--m-max", 10), opt("--budget", 900)),
+        Some("spec-1d") => spec_1d(Path::new(&a[1]), opt("--t-max", 24), opt("--draws", 4), opt("--cmax", 12)),
         Some("spec-chain") => spec_chain(Path::new(&a[1]), opt("--cmax", 12), opt("--points", 4), opt("--m-max", 10)),
         _ => {
             eprintln!("usage: prime_fall_degree_tools score DIR | gate3 DIR PILOT [--max-n N] [--jobs J] [--budget S] | ns-degree DIR [--t-max T]");
