@@ -82,13 +82,15 @@ fn document(path: &Path) -> Result<(Value, Vec<u8>)> {
 
 fn validate_plan(plan: &Value) -> Result<u64> {
     let object = plan.as_object().context("plan must be an object")?;
+    let versioned = plan["schema"] == "crypto.ml-dataset.plan/v2";
     ensure!(
-        object.len() == PLAN_FIELDS.len()
-            && PLAN_FIELDS.iter().all(|key| object.contains_key(*key)),
+        object.len() == PLAN_FIELDS.len() + usize::from(versioned)
+            && PLAN_FIELDS.iter().all(|key| object.contains_key(*key))
+            && (!versioned || object.contains_key("factor_base_policies")),
         "unknown/missing plan fields"
     );
     ensure!(
-        plan["schema"] == "crypto.ml-dataset.plan/v1" && plan["twists"] == true,
+        (plan["schema"] == "crypto.ml-dataset.plan/v1" || versioned) && plan["twists"] == true,
         "unsupported plan schema/twist policy"
     );
     ensure!(
@@ -116,6 +118,27 @@ fn validate_plan(plan: &Value) -> Result<u64> {
             "invalid field sizes"
         );
     }
+    if versioned {
+        let policies = array(&plan["factor_base_policies"], "policy axis")?;
+        ensure!(
+            (1..=32).contains(&policies.len()),
+            "invalid policy axis length"
+        );
+        let mut unique = BTreeSet::new();
+        for policy in policies {
+            let mut canonical = Value::Null;
+            for n in array(&plan["field_sizes"], "field sizes")? {
+                canonical = crate::policy::recipe(policy, uint(n, "field size")?)?;
+            }
+            ensure!(
+                unique.insert(serde_json::to_vec(&canonical)?),
+                "duplicate policy recipe"
+            );
+        }
+        total = total
+            .checked_mul(policies.len() as u64)
+            .context("plan count overflow")?;
+    }
     for m in array(&plan["arities"], "arities")? {
         ensure!((2..=15).contains(&uint(m, "arity")?), "invalid arities");
     }
@@ -127,6 +150,28 @@ fn validate_plan(plan: &Value) -> Result<u64> {
     }
     for solver in array(&plan["solvers"], "solvers")? {
         ensure!(!text(solver, "solver")?.is_empty(), "empty solver");
+        if versioned {
+            ensure!(
+                matches!(
+                    solver.as_str(),
+                    Some(
+                        "enumerate"
+                            | "pdp"
+                            | "bsgs"
+                            | "sat"
+                            | "weil"
+                            | "weil-descent"
+                            | "f4"
+                            | "f5"
+                            | "f6"
+                            | "root"
+                            | "pkm"
+                            | "double-large-prime"
+                    )
+                ),
+                "unknown versioned-plan solver"
+            );
+        }
     }
     for key in [
         "curve_seeds",
@@ -143,12 +188,36 @@ fn validate_plan(plan: &Value) -> Result<u64> {
             .checked_mul(uint(&plan[key], key)?)
             .context("plan count overflow")?;
     }
+    if versioned {
+        ensure!(
+            (2..=4096).contains(&uint(&plan["factor_base_size"], "factor-base size")?)
+                && (1..=32).contains(&uint(&plan["degree_bound"], "degree bound")?),
+            "versioned plan resource bounds"
+        );
+    }
     uint(&plan["seed"], "seed")?;
     ensure!(
         hex(&plan["protocol_sha256"], 64),
         "invalid protocol identity"
     );
     Ok(total)
+}
+
+fn canonical_plan(plan: &Value) -> Result<Value> {
+    validate_plan(plan)?;
+    let mut ordered = Map::new();
+    for key in PLAN_FIELDS {
+        ordered.insert(key.into(), plan[key].clone());
+    }
+    if plan["schema"] == "crypto.ml-dataset.plan/v2" {
+        let n = uint(&plan["field_sizes"][0], "field size")?;
+        let policies = array(&plan["factor_base_policies"], "policy axis")?
+            .iter()
+            .map(|p| crate::policy::recipe(p, n))
+            .collect::<Result<Vec<_>>>()?;
+        ordered.insert("factor_base_policies".into(), Value::Array(policies));
+    }
+    Ok(Value::Object(ordered))
 }
 
 struct PlanInfo {
@@ -173,11 +242,7 @@ fn plan_info(root: &Path) -> Result<PlanInfo> {
     );
     // Producer DatasetPlan is a struct: JSON field order is part of its digest.
     // serde_json's preserve_order feature is required by the parent crate.
-    let mut ordered = Map::new();
-    for key in PLAN_FIELDS {
-        ordered.insert(key.into(), plan[key].clone());
-    }
-    let plan_sha = digest(&serde_json::to_vec(&Value::Object(ordered))?);
+    let plan_sha = digest(&serde_json::to_vec(&canonical_plan(&plan)?)?);
     let (binding, bytes) = document(&contained(root, "run.json")?)?;
     ensure!(
         binding["schema"] == "crypto.ml-dataset.run/v1" && binding["plan_sha256"] == plan_sha,
@@ -215,6 +280,7 @@ pub fn config_at(plan: &Value, mut index: u64) -> Result<Value> {
     }
     for (key, axis) in [
         ("solver", "solvers"),
+        ("factor_base_policy", "factor_base_policies"),
         ("twist", ""),
         ("m", "arities"),
         ("key_index", "keys"),
@@ -223,6 +289,9 @@ pub fn config_at(plan: &Value, mut index: u64) -> Result<Value> {
         ("n", "field_sizes"),
         ("family", "families"),
     ] {
+        if key == "factor_base_policy" && plan["schema"] == "crypto.ml-dataset.plan/v1" {
+            continue;
+        }
         let value = if key == "twist" {
             let value = Value::Bool(index % 2 == 1);
             index /= 2;
@@ -565,12 +634,11 @@ fn audit_cell(root: &Path, info: &PlanInfo, arithmetic: bool) -> Result<Value> {
                 base["requested_size"] == config["factor_base_size"],
                 "factor-base size provenance"
             );
-            ensure!(
-                base["schema"] == "ml-ecdlp-factor-base/v1",
-                "factor-base schema"
-            );
+            crate::policy::bind_base(&public, &base, &config)?;
             let points = array(&base["points"], "factor-base points")?;
-            if base["construction_status"] == "verified" {
+            if base["schema"] == "ml-ecdlp-factor-base/v1"
+                && base["construction_status"] == "verified"
+            {
                 let r = decimal_u64(&public["curve"]["subgroup_order"])?;
                 let count = u64::try_from(points.len())?;
                 ensure!(
@@ -580,6 +648,12 @@ fn audit_cell(root: &Path, info: &PlanInfo, arithmetic: bool) -> Result<Value> {
                 );
             }
         }
+    }
+    if base["schema"] == "ml-ecdlp-factor-base/v2" && base["construction_status"] == "unsupported" {
+        ensure!(
+            !success && outcome["status"] == "unsupported",
+            "unsupported policy has solver success or non-unsupported outcome"
+        );
     }
     let mut checks = Vec::new();
     for artifact in members.values() {
@@ -723,19 +797,36 @@ fn static_features(row: &Value) -> Result<Value> {
     if public.is_null() || base.is_null() {
         return Ok(Value::Null);
     }
+    let versioned = base["schema"] == "ml-ecdlp-factor-base/v2";
+    let policy = if versioned {
+        crate::policy::bind_base(public, base, config)?;
+        if base["construction_status"] == "unsupported" {
+            return Ok(Value::Null);
+        }
+        Some(crate::policy::recipe(
+            &base["policy"],
+            uint(&config["n"], "field size")?,
+        )?)
+    } else {
+        None
+    };
     ensure!(
-        matches!(
-            base["rule"].as_str(),
-            Some(
-                "small-x-cofactor-projection"
-                    | "small-x-prime-primary-projection-with-cyclic-membership"
-            )
-        ),
+        versioned
+            || matches!(
+                base["rule"].as_str(),
+                Some(
+                    "small-x-cofactor-projection"
+                        | "small-x-prime-primary-projection-with-cyclic-membership"
+                )
+            ),
         "unsupported factor-base rule"
     );
     let base_points = array(&base["points"], "factor-base points")?;
     let mut base_view = Map::new();
     base_view.insert("rule".into(), base["rule"].clone());
+    if let Some(policy) = policy {
+        base_view.insert("policy".into(), policy);
+    }
     for key in ["negation_action", "frobenius_action"] {
         if let Some(action) = base.get(key) {
             ensure!(
@@ -869,12 +960,32 @@ pub fn export_rows(rows: &[Value], path: &Path) -> Result<()> {
                 .get("positive_certificate_arithmetic")
                 .cloned()
                 .unwrap_or_else(|| json!([]));
-            let record = json!({"schema":"ml-dataset.static-routing-view/v1","record_id":row["id"],
-                "split":split_for(&component)?,"independent_unit":component,"features":static_features(row)?,
+            let versioned = row["config"].get("factor_base_policy").is_some();
+            let features = static_features(row)?;
+            let mut record = json!({"schema":if versioned {"ml-dataset.static-routing-view/v2"} else {"ml-dataset.static-routing-view/v1"},"record_id":row["id"],
+                "split":split_for(&component)?,"independent_unit":component,"features":features,
                 "labels":{"producer_reported":row["outcome"],"independently_verified":false,
                     "phase_measurements":row["phase_measurements"],"positive_certificate_arithmetic":checks,
                     "whole_worker_instruction_count":null},
                 "feature_policy":"allowlisted public static inputs only; no trace/manifest/witness features"});
+            if versioned {
+                record["feature_policy"] = json!("consumer-static-policy-recipes-v2; distinct from producer strict-structural-allowlist-v4-policy-recipes");
+                record["feature_status"] = json!(if row["factor_base"]["construction_status"]
+                    == "unsupported"
+                {
+                    "unsupported_factor_base_policy"
+                } else if features.is_null() {
+                    "missing_public_inputs"
+                } else {
+                    "available"
+                });
+                record["labels"]["factor_base_construction"] = json!({
+                    "producer_reported_status":row["factor_base"]["construction_status"],
+                    "producer_reported_counters":row["factor_base"]["construction_counters"],
+                    "independently_verified":false});
+                record["labels"]["root_sets_independently_verified"] = json!(false);
+                record["producer_training_export_equivalence_verified"] = json!(false);
+            }
             serde_json::to_writer(&mut file, &record)?;
             file.write_all(b"\n")?;
         }
@@ -933,6 +1044,76 @@ mod tests {
         let mut bad = plan;
         bad["generators"] = json!(true);
         assert!(validate_plan(&bad).is_err());
+    }
+
+    #[test]
+    fn versioned_recipe_axis_preserves_matched_legacy_cells_and_hash_order() {
+        let legacy = plan();
+        let mut versioned = legacy.clone();
+        versioned["schema"] = json!("crypto.ml-dataset.plan/v2");
+        versioned["factor_base_policies"] = json!([
+            {"kind":"legacy"},
+            {"kind":"sampled_x_projected_control","candidate_limit":32},
+            {"kind":"binary_subspace_intersection","basis":[1,2],"candidate_limit":4},
+            {"kind":"binary_frobenius_union_intersection","basis":[1,2],"candidate_limit":64}
+        ]);
+        assert_eq!(validate_plan(&versioned).unwrap(), 512);
+        for i in 0..128 {
+            for p in 0..4 {
+                let index = (i / 2) * 8 + p * 2 + i % 2;
+                let mut config = config_at(&versioned, index).unwrap();
+                assert_eq!(
+                    config["factor_base_policy"],
+                    versioned["factor_base_policies"][p as usize]
+                );
+                config.as_object_mut().unwrap().remove("factor_base_policy");
+                assert_eq!(config, config_at(&legacy, i).unwrap());
+            }
+        }
+        let original = canonical_plan(&versioned).unwrap();
+        versioned["factor_base_policies"][2] = serde_json::from_str(
+            r#"{"candidate_limit":4,"basis":[1,2],"kind":"binary_subspace_intersection"}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            serde_json::to_vec(&original).unwrap(),
+            serde_json::to_vec(&canonical_plan(&versioned).unwrap()).unwrap()
+        );
+        for axis in [
+            json!([]),
+            json!([{"kind":"legacy"},{"kind":"legacy"}]),
+            json!([{"kind":"legacy","extra":1}]),
+            json!([{"kind":"binary_subspace_intersection","basis":[1,2,3],"candidate_limit":8}]),
+        ] {
+            let mut bad = versioned.clone();
+            bad["factor_base_policies"] = axis;
+            assert!(validate_plan(&bad).is_err());
+        }
+        versioned["schema"] = json!("crypto.ml-dataset.plan/v1");
+        assert!(validate_plan(&versioned).is_err());
+        let mut missing = legacy;
+        missing["schema"] = json!("crypto.ml-dataset.plan/v2");
+        assert!(validate_plan(&missing).is_err());
+    }
+
+    #[test]
+    fn frozen_legacy_pilot_hash_and_all_720_cells_are_unchanged() {
+        let pilot: Value = serde_json::from_str(r#"{"schema":"crypto.ml-dataset.plan/v1","field_sizes":[23],"arities":[2,4,15],"families":["koblitz","binary","prime"],"solvers":["bsgs","enumerate","root","sat","f4","f5","f6","weil","pkm","double-large-prime"],"curve_seeds":1,"generators":2,"keys":2,"seed":20261027,"factor_base_size":4,"degree_bound":3,"work_limit":20000,"twists":true,"protocol_sha256":"05a54dacc052b49bf7b9d6ffd776c461f49757e01488088c9a79bbf136f11604","split_rule":"curve-twist-component-sha256-v1"}"#).unwrap();
+        assert_eq!(
+            digest(&serde_json::to_vec(&canonical_plan(&pilot).unwrap()).unwrap()),
+            "c905e878e3dcb29e407e743874d18b6b7091c097984f829820f26673ccd47f21"
+        );
+        assert_eq!(validate_plan(&pilot).unwrap(), 720);
+        for i in 0..720 {
+            let config = config_at(&pilot, i).unwrap();
+            assert_eq!(config["solver"], pilot["solvers"][(i % 10) as usize]);
+            assert_eq!(config["twist"], (i / 10) % 2 == 1);
+            assert_eq!(config["m"], [2, 4, 15][((i / 20) % 3) as usize]);
+            assert_eq!(config["key_index"], (i / 60) % 2);
+            assert_eq!(config["generator_index"], (i / 120) % 2);
+            assert_eq!(config["family"], pilot["families"][(i / 240) as usize]);
+            assert!(config.get("factor_base_policy").is_none());
+        }
     }
 
     #[test]
@@ -1014,5 +1195,65 @@ mod tests {
         let mut bad = row;
         bad["public"]["curve"]["a"] = json!({"seed":42});
         assert!(static_features(&bad).is_err());
+    }
+
+    #[test]
+    fn policy_export_is_separate_and_excludes_unsupported_features() {
+        let (public, mut base, config) = crate::policy::tests::fixture();
+        base["construction_candidates"] = json!({"private_log":"NEVER-A-FEATURE"});
+        let row = json!({"id":"a".repeat(64),"public":public,"factor_base":base,"config":config,
+            "outcome":{"status":"solved","scalar":"NEVER-AN-INPUT"},
+            "phase_measurements":[],"positive_certificate_arithmetic":[]});
+        let mut unsupported = row.clone();
+        let recipe =
+            json!({"kind":"binary_subspace_intersection","basis":[1,2],"candidate_limit":4});
+        unsupported["config"]["factor_base_policy"] = recipe.clone();
+        let base = &mut unsupported["factor_base"];
+        base["policy"] = recipe;
+        base["rule"] = json!("binary_subspace_intersection");
+        base["subgroup_treatment"] = json!("literal-coordinate-domain-intersection");
+        base["construction_status"] = json!("unsupported");
+        base["unsupported_reason"] = json!("binary policy on prime field");
+        base["points"] = json!([]);
+        base["actual_size"] = json!(0);
+        base["negation_action"] = json!([]);
+        base["frobenius_action"] = json!([]);
+        base["construction_counters"]["candidate_coordinates"] = json!(0);
+        unsupported["outcome"] = json!({"status":"unsupported","solver_completed":false});
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().join("view.jsonl");
+        export_rows(&[row, unsupported], &path).unwrap();
+        let rows: Vec<Value> = fs::read_to_string(path)
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        for record in &rows {
+            assert_eq!(record["schema"], "ml-dataset.static-routing-view/v2");
+            assert_eq!(
+                record["producer_training_export_equivalence_verified"],
+                false
+            );
+            assert_eq!(record["labels"]["root_sets_independently_verified"], false);
+            assert_eq!(
+                record["labels"]["factor_base_construction"]["independently_verified"],
+                false
+            );
+            let features = serde_json::to_string(&record["features"]).unwrap();
+            for secret in ["NEVER", "construction", "sampling_seed", "scalar"] {
+                assert!(!features.contains(secret));
+            }
+        }
+        assert_eq!(
+            rows[0]["features"]["factor_base"]["policy"],
+            json!({"kind":"legacy"})
+        );
+        assert_eq!(rows[0]["feature_status"], "available");
+        assert_eq!(rows[1]["feature_status"], "unsupported_factor_base_policy");
+        assert!(rows[1]["features"].is_null());
+        assert_eq!(
+            rows[1]["labels"]["producer_reported"]["status"],
+            "unsupported"
+        );
     }
 }

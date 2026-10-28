@@ -512,7 +512,11 @@ fn public_curve(public: &Value, config: &Value) -> Result<PublicCurve> {
 
 fn signed_domain(curve: &Curve, base: &Value) -> Result<BTreeSet<Point>> {
     ensure!(
-        base.is_object() && base["schema"] == "ml-ecdlp-factor-base/v1",
+        base.is_object()
+            && matches!(
+                base["schema"].as_str(),
+                Some("ml-ecdlp-factor-base/v1" | "ml-ecdlp-factor-base/v2")
+            ),
         "invalid factor-base schema"
     );
     let rows = base["points"]
@@ -622,6 +626,11 @@ pub fn verify_certificate(
         );
         domain_kind = "scalar-interval-under-declared-order";
     } else {
+        crate::policy::bind_base(public, base, config)?;
+        ensure!(
+            base["construction_status"] != "unsupported",
+            "positive PDP certificate has unsupported factor-base policy"
+        );
         let mut domain = signed_domain(curve, base)?;
         domain_kind = if let Some(definition) = cert.get("factor_base_definition") {
             domain = kummer_domain(curve, &domain, definition, config)?;
@@ -662,6 +671,32 @@ pub fn verify_certificate(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn policy_base_positive_pdp_keeps_construction_and_root_claims_unverified() {
+        let (public, base, config) = crate::policy::tests::fixture();
+        let certificate = json!({"target":public["target"],"sum":public["target"],
+            "summands":[public["generator"],public["generator"]]});
+        let result = verify_certificate(&public, &base, &config, &certificate, PDP).unwrap();
+        assert_eq!(result["group_relation"], true);
+        assert_eq!(result["declared_domain"], true);
+        for key in [
+            "factor_base_construction",
+            "subgroup_order",
+            "unsat",
+            "fall_degree",
+            "instructions",
+            "exhaustiveness",
+        ] {
+            assert_eq!(result[key], false);
+        }
+        let mut wrong = base.clone();
+        wrong["construction_context"]["sampling_seed"] = json!("0");
+        assert!(verify_certificate(&public, &wrong, &config, &certificate, PDP).is_err());
+        let mut wrong_certificate = certificate;
+        wrong_certificate["summands"][0] = public["target"].clone();
+        assert!(verify_certificate(&public, &base, &config, &wrong_certificate, PDP).is_err());
+    }
 
     // Fixed public software vectors; no producer calls or campaign cells.
     struct Fixture {
