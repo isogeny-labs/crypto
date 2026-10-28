@@ -159,3 +159,24 @@ D_X is arm X's measured closure degree on a draw (3, 4, or "> measured").
 m = 3, two cells, 4 unsatisfiable draws each (plus 3 satisfiable draws), one
 4-core 16 GB container that is not isolated. Conductor is not installed in
 this container, so no task was taken.
+
+## Amendment 1 (2026-10-28T17:12Z, after the first secondary run, before scoring)
+
+- **What happened.** The first secondary run (Q, (22, 6), draw 0, sparse
+  degree 4) hit `--max-entries 1000000000` after 6,553 s at a peak RSS of
+  12.0 GB. Under the rules above that run is **unmeasured**: a capped run
+  reports no refutation reading in either direction.
+- **The change.** The secondary step stops there. The remaining 21 runs (15
+  unsatisfiable and 6 satisfiable) are not run.
+  - At about 1.8 h each they would take about 40 h, and on this 16 GB
+    container they would hit the same entry cap: Q and R have 60–63
+    unknowns, against the 61 of the run that capped.
+  - The second run was stopped 39 s after it started. Its empty outputs are
+    in `runs/stopped-by-amendment-1/`.
+- **Effect on the verdicts: none.** The verdict rules already fix them
+  without degree 4.
+  - At (22, 6), H_lower needs D_Q = 3.
+  - At (21, 7), the registered H_none explicitly includes "unmeasured at 4".
+  - Degree 4 for Q and R is reported as unmeasured on every draw.
+- **What I knew when deciding.** No Q or R degree-4 reading exists. The only
+  output was `"capped":true`.
