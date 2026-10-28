@@ -218,3 +218,39 @@ applies to an etale double cover once our proper-curve bridge is established:
 the30dim complement has a principal polarization overF2,restriction is twice
 it. This is an additional Prym carrier,not the old det19 quotient embedding,
 not a30genus Jacobian,and not an explicit theta/projective model.
+
+## Prospective ACTION27 after complete RR export and MOVE01
+MOVE01 strictaccepts k4,m=(0,-1,-1,-3,-2),moved=(1,-3,10,2,0),
+principal exponents(4,-3,5,-1,-2),after205833 bounded visits. Define
+D'=sum moved_i delta_i-div(lambda);11D'=div(product g_i^c_i/lambda^11),
+where g_i=gNu composed withT^(-i) (pushforward divisor convention).
+D'<=D128,hasdegree0,positive/negative degree64. Nonvanishing unproved.
+
+ACTION27 imports individually framed20charts,68vectors,1568jets andactual
+moving certificate, bound by action-inputs.sha256; no stochastic samples.
+Regroup actual candidate bitsets into rational numerators in(n,l,v,u) over
+common denominatoru16(u+1)16. Reconstruct all68sections atall20charts and
+check their old divisor bounds and129Ojet agreement with independently saved
+original column jets. Every requested coefficient must be below propagated
+absolute precision. Recover sigma on68basis using Obranch1 versusObranch0,
+verify sigma²=I, require rank(sigma+I)=34. Solve traceone and retain its full
+basis coefficients and actual cusp pole degree. Record every function in an
+individually framed symbolic numerator file; no bulk list serialization.
+
+Then evaluate at the actual degree14lambda-zero point. Use all14absolute
+trace pairings against1,a,...,a13; verify this detector has rank14. Impose
+all20moved-divisor bounds plus that degree14zero. Check D'<=D128 anddegree0.
+Compute exact F2 matrix rank/kernel on68sections, verify each retained pivot
+and kernel vector by recombination from original columns. Ldimension0 proves
+nonzero actual11torsion;dimension1 gives a principal-function witness;>1 is
+an error requiring audit. This uses the written complete-RR/divisor bridge,
+not an unformalized geometry axiom in Lean. No desiredCM projection follows
+from the shared residual eigencharacter alone. Same4GiB/1200s native caps.
+Input source/raw is explicitly in checkpoint-live before invocation; runner
+and all inputs immutable for its full lifetime. Store all errors/rejections.
+
+Lean03 on the unchanged18theorem source with original pinned dependencyroots
+and task-local source/output compiles andaudits exit0:18named/18audited,
+0failures,0trusted-native. Lean01proof errors andLean02import runtime failure
+remain retained. Standard foundational axioms only; no geometric theorem is
+silently promoted. Future proof extensions require new source freeze.
