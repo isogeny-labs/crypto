@@ -19,7 +19,7 @@ for(d=1;d<77;d++){
   unitsCount++;r=d%7;nonresidue=1;
   if(r==1 || r==2 || r==4){nonresidue=0;}
   exponent=(etaLog[(d%11)+1]+5*nonresidue)%10;
-  histogram[exponent+1]++;
+  histogram[exponent+1]=histogram[exponent+1]+1;
   if(d==delta){deltaExponent=exponent;}
  }
 }

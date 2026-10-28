@@ -62,3 +62,5 @@ repository state while checkpoint/gate runs. Use task-owned TMPDIR because
 Prospective implementation correction before CHAR02: CHAR01 rejects reserved
 identifier ord. Rename subgroupSize; all equations, finite sets, detector and
 caps stay unchanged. This is an implementation retry, not a new search arm.
+Full CHAR01 diagnostics also reject intvec-entry ++. Replace it by explicit
+indexed assignment before02; no finite population or detector is changed.
