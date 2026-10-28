@@ -1,6 +1,6 @@
 # Native cumulative dataset budget admission — design handoff
 
-Prepared 2026-10-28. **Proposal only: none of the campaign caps below is currently enforced by this design.** No cloud action, experiment, Cargo invocation, or budget implementation accompanied this handoff. The existing dataset source remains frozen after the separately authorized lab-receipt publication fix.
+Prepared 2026-10-28 as a design-first handoff. The design below preceded implementation. Native implementation is now being integrated in `budget.rs`, `s3_budget.rs` and the dataset CLI; see [BUDGET-CLI.md](BUDGET-CLI.md). Software validation and actual cloud enforcement are separate acceptance gates. The completed source `0f55f1c` validation predates this implementation, and no cloud budget-enforcement result is claimed here.
 
 The smallest correct extension is one durable campaign allocator, disjoint worker grants, and a dataset-only S3 backend that accounts before every HTTP attempt. Keep the current immutable publication/readback checks. Do not equate a successful publication, a per-cell trace limit, or a local writer lease with campaign admission.
 
@@ -85,4 +85,4 @@ Compute admission must reserve the actual billable resource lifetime, not just s
 5. Dry admission is read-only and rejects unreconciled prior usage, wrong region/resource identity, insufficient finalization reserve, or USD 200 overflow. Boundary/overflow tests cover every integer cap.
 6. The final cloud proof runs only after separate authorization and admission, retaining request/byte journals, grant/checkpoint hashes, raw receipts, and the independent S3 readback. Local tests alone do not establish the cloud budget guarantee.
 
-Suggested implementation scope: new `ml_dataset/budget.rs` and dataset S3 transport module; narrow backend injection in `store/mod.rs`; budget/session plumbing through dataset generation/publication/restore; controlled writers where a strict local-byte claim is required; and focused failure/concurrency tests. This is explicit remaining acceptance work, not part of the currently frozen implementation.
+Original implementation scope: new `ml_dataset/budget.rs` and dataset S3 transport module; narrow backend injection in `store/mod.rs`; budget/session plumbing through dataset generation/publication/restore; controlled writers where a strict local-byte claim is required; and focused failure/concurrency tests. The acceptance checklist remains authoritative; implementation alone does not establish a passing check or a cloud result.

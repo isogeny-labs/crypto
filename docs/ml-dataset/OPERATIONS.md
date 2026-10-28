@@ -54,10 +54,17 @@ bound to the exact binary, plan, source, resource limits and shard.
 crypto dataset generate --plan pilot-plan.json --protocol protocol.json \
   --out /work/dataset --max-cases 36 --shard-index 0 --shard-count 19 \
   --seconds-per-case 30 --memory-mib 2048 --trace-mib 64 --publish \
-  --remote s3://setec-astronomy-artifacts/store
+  --remote s3://setec-astronomy-artifacts/ml-dataset/20261028/store \
+  --budget-policy /work/budget/policy.json --budget-grant /work/budget/grant.json \
+  --budget-owner /work/budget/owner.json --budget-state /work/budget/worker.sqlite \
+  --budget-cell-envelope /work/budget/cell-envelope.json
 crypto dataset verify --out /work/dataset
 crypto dataset status --out /work/dataset
 ```
+
+S3 execution requires the activated, source-bound budget session described in
+[BUDGET-CLI.md](BUDGET-CLI.md). The example assumes that finite grant has already
+been issued and activated; it does not create spending authority.
 
 Use a digest-pinned image on the repository's EKS Spot lab. Assign disjoint
 shards before submission, record every Job identity, and inspect the existing
@@ -75,7 +82,9 @@ The current lab service supplies a legacy `ISOLAB_RESULTS_URI`. Dataset receipts
 must use the approved bucket: explicitly set a unique campaign/job prefix under
 `s3://setec-astronomy-artifacts/ml-dataset-lab/runs/`. Keep the original service
 URI and the effective override in the launch record. The EKS role must permit
-get/put and required prefix listing for the actual data and receipt destinations;
+get/put for the actual data, budget-control and receipt destinations; the native
+budgeted transport does not list objects. The prepared policy also includes scoped
+listing for older tooling. In every case,
 a local role's successful upload does not establish worker access. See the
 prepared [role policy proposal](../../research/ml_dataset_20261028/worker-s3-policy-proposal.md).
 It has not been applied. Its scoped data remote is
@@ -110,21 +119,33 @@ For the scoped pilot remote, download the exact catalog object to a local
 ordinary file, then restore one cell at a time:
 
 ```sh
-aws s3 cp \
-  s3://setec-astronomy-artifacts/ml-dataset/20261028/store/ml-dataset/catalog/NAMESPACE/MANIFEST_SHA256.json \
-  /work/receipts/cell-publication.json --region us-east-2
+crypto dataset budget fetch \
+  --remote s3://setec-astronomy-artifacts/ml-dataset/20261028/store \
+  --key ml-dataset/catalog/NAMESPACE/MANIFEST_SHA256.json \
+  --sha256 CATALOG_SHA256 --bytes CATALOG_BYTES \
+  --out /work/receipts/cell-publication.json \
+  --budget-policy /work/budget/policy.json --budget-grant /work/budget/grant.json \
+  --budget-owner /work/budget/owner.json --budget-state /work/budget/worker.sqlite
 crypto dataset restore --receipt /work/receipts/cell-publication.json \
-  --out /work/restored-dataset
+  --out /work/restored-dataset \
+  --budget-policy /work/budget/policy.json --budget-grant /work/budget/grant.json \
+  --budget-owner /work/budget/owner.json --budget-state /work/budget/worker.sqlite
 crypto dataset verify --out /work/restored-dataset
 crypto dataset status --out /work/restored-dataset
 ```
 
 Create the local receipt directory before the download and replace the uppercase
-components with the returned namespace and manifest digest. Restore uses the
+components with the returned namespace, manifest digest and catalog locator
+digest/byte length. The fetch requires exact expected content and does not list
+or discover keys; its requests consume the same active grant as restore. Do not
+substitute an unaccounted transfer command when claiming cumulative caps.
+Restore uses the
 remote recorded in the receipt. Its optional `--remote` argument must identify
 the same remote; it cannot redirect proof to a mirror. The supported S3 bucket
 is `setec-astronomy-artifacts`; `file://` remotes are also supported for local
-round-trip validation. Restore reads remote objects and does not upload them.
+round-trip validation. Restore requires an already activated journal: the separate
+`budget activate` command writes its immutable control object; restore itself
+reads remote data and retains local accounting checkpoints.
 
 Each invocation freshly downloads the completion marker and all cell objects,
 checks lengths and SHA-256 digests, and replays native public-instance and

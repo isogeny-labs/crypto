@@ -1,21 +1,29 @@
 //! Versioned synthetic research datasets with explicit capabilities and durable receipts.
+pub mod budget;
 pub mod curves;
 pub mod export;
 pub mod relations;
 pub mod report;
 pub mod restore;
+pub mod s3_budget;
 pub mod solvers;
 pub mod storage;
 pub mod telemetry;
 pub mod types;
 
+use budget::{
+    BudgetScope, BudgetSession, CampaignLedger, CampaignPolicy, GrantRequest, OwnerIdentity,
+    Resources, RunBinding, WorkerGrant,
+};
 use clap::{Args, Subcommand};
+use s3_budget::S3BudgetContext;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File, OpenOptions};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitStatus, Stdio};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 use types::{Artifact, CaseConfig};
 
@@ -27,6 +35,11 @@ pub struct DatasetArgs {
 
 #[derive(Subcommand)]
 pub enum DatasetCommand {
+    /// Inspect or reserve cumulative campaign allocations; admission is not launch authorization.
+    Budget {
+        #[command(subcommand)]
+        command: BudgetCommand,
+    },
     /// Freeze a deterministic cross-product; planning performs no cryptography.
     Plan(PlanArgs),
     /// Execute a bounded number of cells, preserving failures and resuming verified cells.
@@ -61,6 +74,8 @@ pub enum DatasetCommand {
         out: PathBuf,
         #[arg(long)]
         remote: Option<String>,
+        #[command(flatten)]
+        budget: BudgetArgs,
     },
     /// Show actual method support and instrumentation limits.
     Capabilities,
@@ -79,6 +94,8 @@ pub enum DatasetCommand {
         out: PathBuf,
         #[arg(long)]
         remote: Option<String>,
+        #[command(flatten)]
+        budget: BudgetArgs,
     },
     /// Preserve an interrupted attempt after proving no matching worker remains.
     Reconcile {
@@ -95,6 +112,79 @@ pub enum DatasetCommand {
         config: PathBuf,
         #[arg(long)]
         out: PathBuf,
+    },
+}
+
+#[derive(Clone, Default, Args)]
+pub struct BudgetArgs {
+    #[arg(long)]
+    pub budget_policy: Option<PathBuf>,
+    #[arg(long)]
+    pub budget_grant: Option<PathBuf>,
+    /// Existing durable journal; normal commands never create a fresh balance.
+    #[arg(long)]
+    pub budget_state: Option<PathBuf>,
+    /// Exact Job/Pod UID identity document bound by the grant.
+    #[arg(long)]
+    pub budget_owner: Option<PathBuf>,
+}
+
+#[derive(Subcommand)]
+pub enum BudgetCommand {
+    /// Read-only hypothetical admission. No allocation, local directory or cloud request is made.
+    Admit {
+        #[arg(long)]
+        policy: PathBuf,
+        #[arg(long)]
+        ledger: PathBuf,
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        dry_run: bool,
+    },
+    /// Durably allocate one disjoint worker grant, without launching or contacting S3.
+    Reserve {
+        #[arg(long)]
+        policy: PathBuf,
+        #[arg(long)]
+        ledger: PathBuf,
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        /// Create the single authoritative campaign ledger; never use for lost-state recovery.
+        #[arg(long)]
+        create_ledger: bool,
+    },
+    /// Activate a grant once with a charged conditional S3 PUT and verified GET.
+    Activate {
+        #[command(flatten)]
+        budget: BudgetArgs,
+        /// Retry an existing pending activation using its original journal nonce.
+        #[arg(long)]
+        resume: bool,
+    },
+    /// Fetch one known object with exact digest/length and charged S3 requests; no LIST.
+    Fetch {
+        #[command(flatten)]
+        budget: BudgetArgs,
+        #[arg(long)]
+        remote: String,
+        #[arg(long)]
+        key: String,
+        #[arg(long)]
+        sha256: String,
+        #[arg(long)]
+        bytes: u64,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Inspect the authoritative local campaign ledger without contacting S3.
+    Status {
+        #[arg(long)]
+        policy: PathBuf,
+        #[arg(long)]
+        ledger: PathBuf,
     },
 }
 
@@ -161,6 +251,11 @@ pub struct GenerateArgs {
     pub publish: bool,
     #[arg(long)]
     pub remote: Option<String>,
+    #[command(flatten)]
+    pub budget: BudgetArgs,
+    /// Finite Resources reservation charged once per cell, with requests spent inside it.
+    #[arg(long)]
+    pub budget_cell_envelope: Option<PathBuf>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -350,8 +445,363 @@ pub fn digest(bytes: &[u8]) -> String {
     crate::utils::encoding::to_hex(&crate::hash::sha256(bytes))
 }
 
+fn budget_inputs(
+    args: &BudgetArgs,
+) -> Result<Option<(CampaignPolicy, WorkerGrant, OwnerIdentity, &Path)>, String> {
+    match (
+        &args.budget_policy,
+        &args.budget_grant,
+        &args.budget_owner,
+        &args.budget_state,
+    ) {
+        (None, None, None, None) => Ok(None),
+        (Some(policy), Some(grant), Some(owner), Some(state)) => Ok(Some((
+            read_json(policy)?,
+            read_json(grant)?,
+            read_json(owner)?,
+            state,
+        ))),
+        _ => Err(
+            "budget-policy, budget-grant, budget-owner and budget-state must be supplied together"
+                .into(),
+        ),
+    }
+}
+
+fn validate_budget_actor(session: &BudgetSession) -> Result<(), String> {
+    let source = generation_source()?;
+    let binary = crate::store::hash_file(&std::env::current_exe().map_err(|e| e.to_string())?)?.0;
+    let binding = &session.grant().request.binding;
+    if binding.source_commit != source || binding.binary_sha256 != binary {
+        return Err("current executor source/binary differs from budget grant".into());
+    }
+    Ok(())
+}
+
+fn open_budget(args: &BudgetArgs) -> Result<Option<Arc<BudgetSession>>, String> {
+    let Some((policy, grant, owner, state)) = budget_inputs(args)? else {
+        return Ok(None);
+    };
+    let session = Arc::new(BudgetSession::open(state, &policy, &grant, &owner)?);
+    session.require_active()?;
+    validate_budget_actor(&session)?;
+    Ok(Some(session))
+}
+
+/// Actor identity is checked before creating the transport. Imported data keep
+/// their original producer identity; the grant binds this reader/publisher.
+pub(super) fn validate_budget_run(session: &BudgetSession, root: &Path) -> Result<(), String> {
+    let (plan, producer, plan_sha) = bound_run(root)?;
+    let protocol_sha = plan
+        .protocol_sha256
+        .ok_or("budgeted run lacks frozen protocol")?;
+    let actor = &session.grant().request.binding;
+    session.validate_binding(&RunBinding {
+        source_commit: actor.source_commit.clone(),
+        binary_sha256: actor.binary_sha256.clone(),
+        plan_sha256: plan_sha,
+        protocol_sha256: protocol_sha,
+        shard_index: producer["shard_index"]
+            .as_u64()
+            .ok_or("missing run shard")?,
+        shard_count: producer["shard_count"]
+            .as_u64()
+            .ok_or("missing run shard count")?,
+    })
+}
+
+fn configured_remote(remote: Option<&str>) -> Result<crate::store::backend::RemoteSpec, String> {
+    if let Some(remote) = remote {
+        return crate::store::backend::RemoteSpec::parse(remote);
+    }
+    crate::store::Config::discover()?
+        .remote
+        .ok_or("explicit S3 or file remote required")
+}
+
+fn require_remote_budget(
+    remote: &crate::store::backend::RemoteSpec,
+    session: Option<&Arc<BudgetSession>>,
+) -> Result<(), String> {
+    if matches!(remote, crate::store::backend::RemoteSpec::S3 { .. }) && session.is_none() {
+        return Err("dataset S3 operations require policy/grant/owner and an existing activated budget journal".into());
+    }
+    Ok(())
+}
+
+fn budget_transport(
+    session: Option<Arc<BudgetSession>>,
+) -> Result<Option<Arc<S3BudgetContext>>, String> {
+    session.map(S3BudgetContext::from_env).transpose()
+}
+
+fn save_budget_checkpoint(root: &Path, session: &BudgetSession) -> Result<Artifact, String> {
+    let directory = checked_directory(&root.join("budget-checkpoints"), true)?;
+    let nonce = unix_nanos()?;
+    let filename = format!("{}-{nonce}.sqlite", session.grant().request.grant_id);
+    let checkpoint = session.checkpoint(&directory.join(&filename))?;
+    let snapshot = session.snapshot()?;
+    storage::write_json(
+        &directory,
+        &format!("{filename}.json"),
+        "restricted-budget-audit-checkpoint",
+        &json!({"checkpoint":checkpoint,"snapshot":snapshot,
+            "local_byte_allocation_is_hard_write_limit":false,"account_wide_billing_cutoff":false}),
+    )?;
+    let (sha256, bytes) = crate::store::hash_file(&directory.join(&filename))?;
+    Ok(Artifact {
+        path: format!("budget-checkpoints/{filename}"),
+        role: "restricted-budget-audit-database".into(),
+        encoding: "sqlite".into(),
+        sha256,
+        bytes,
+    })
+}
+
+fn finalize_budget(
+    root: &Path,
+    context: Option<&Arc<S3BudgetContext>>,
+    remote: Option<&crate::store::backend::RemoteSpec>,
+    publish: bool,
+) -> Result<(), String> {
+    let Some(context) = context else {
+        return Ok(());
+    };
+    let checkpoint = save_budget_checkpoint(root, context.session())?;
+    if publish {
+        let remote = remote.ok_or("budget checkpoint requires an explicit remote")?;
+        if matches!(remote, crate::store::backend::RemoteSpec::S3 { .. }) {
+            let mut cfg = crate::store::Config::discover()?;
+            cfg.remote = Some(remote.clone());
+            cfg.index_path = root.join("store-index.json");
+            let result = storage::publish_budget_checkpoint(root, &checkpoint, cfg, context);
+            // Retain even failed/unknown checkpoint publication attempts. This
+            // final local copy is not recursively uploaded or called remote.
+            let retained = save_budget_checkpoint(root, context.session());
+            result?;
+            retained?;
+        }
+    }
+    Ok(())
+}
+
+fn combine_finalization<T>(
+    result: Result<T, String>,
+    finalization: Result<(), String>,
+) -> Result<T, String> {
+    match (result, finalization) {
+        (Ok(value), Ok(())) => Ok(value),
+        (Err(error), Ok(())) => Err(error),
+        (Ok(_), Err(error)) => Err(format!(
+            "budget finalization failed; retained journal remains charged: {error}"
+        )),
+        (Err(error), Err(final_error)) => Err(format!(
+            "{error}; budget finalization also failed: {final_error}"
+        )),
+    }
+}
+
+fn cell_budget_scope(
+    context: Option<&Arc<S3BudgetContext>>,
+    envelope: Option<&Resources>,
+    plan: &str,
+    index: u64,
+) -> Result<BudgetScope, String> {
+    let Some(context) = context else {
+        return Ok(BudgetScope::Work);
+    };
+    // A minimum control allowance is protected before starting more work.
+    // Actual metadata/checkpoint sizes are admitted again before transmission;
+    // this is not a claim that polling bounds all local writes or artifact counts.
+    context
+        .session()
+        .finalization_remaining()?
+        .checked_sub(&Resources {
+            output_bytes: 64 * 1024,
+            put_attempts: 2,
+            read_attempts: 4,
+            download_bytes: 256 * 1024,
+            ..Resources::default()
+        })?;
+    let id = format!("cell-{plan}-{index}");
+    context.session().reserve_cell(
+        &id,
+        envelope.ok_or("budgeted generation requires --budget-cell-envelope")?,
+    )?;
+    Ok(BudgetScope::Cell(id))
+}
+
+fn run_budget_command(command: &BudgetCommand) -> Result<Value, String> {
+    match command {
+        BudgetCommand::Admit {
+            policy,
+            ledger,
+            request,
+            dry_run,
+        } => {
+            if !dry_run {
+                return Err(
+                    "budget admit requires --dry-run; use budget reserve for explicit allocation"
+                        .into(),
+                );
+            }
+            let report =
+                CampaignLedger::dry_admit(ledger, &read_json(policy)?, &read_json(request)?)?;
+            serde_json::to_value(report).map_err(|e| e.to_string())
+        }
+        BudgetCommand::Reserve {
+            policy,
+            ledger,
+            request,
+            out,
+            create_ledger,
+        } => {
+            let policy: CampaignPolicy = read_json(policy)?;
+            let request: GrantRequest = read_json(request)?;
+            let ledger = if *create_ledger {
+                CampaignLedger::create(ledger, &policy)?
+            } else {
+                CampaignLedger::open(ledger, &policy)?
+            };
+            let previous = ledger.snapshot()?["grants"][&request.grant_id].clone();
+            let grant = if previous.is_null() {
+                ledger.reserve(&request)?
+            } else {
+                let grant: WorkerGrant =
+                    serde_json::from_value(previous).map_err(|e| e.to_string())?;
+                if grant.request != request {
+                    return Err("issued grant ID cannot be repointed to a different request".into());
+                }
+                grant
+            };
+            let parent = out
+                .parent()
+                .filter(|p| !p.as_os_str().is_empty())
+                .unwrap_or(Path::new("."));
+            let parent = checked_directory(parent, true)?;
+            let filename = out
+                .file_name()
+                .and_then(|s| s.to_str())
+                .ok_or("invalid grant filename")?;
+            let artifact = storage::write_json(
+                &parent,
+                filename,
+                "restricted-campaign-budget-grant",
+                &grant,
+            )?;
+            Ok(
+                json!({"grant":grant,"artifact":artifact,"campaign":ledger.snapshot()?,"cloud_requests":0,"launched":false}),
+            )
+        }
+        BudgetCommand::Activate { budget, resume } => {
+            let (policy, grant, owner, state) =
+                budget_inputs(budget)?.ok_or("activation requires all budget inputs")?;
+            let session = Arc::new(if *resume {
+                BudgetSession::open(state, &policy, &grant, &owner)?
+            } else {
+                BudgetSession::create(state, &policy, &grant, &owner)?
+            });
+            validate_budget_actor(&session)?;
+            let context = S3BudgetContext::from_env(session.clone())?;
+            let activation = context.activate();
+            let parent = state
+                .parent()
+                .filter(|p| !p.as_os_str().is_empty())
+                .unwrap_or(Path::new("."));
+            let checkpoint = save_budget_checkpoint(parent, &session);
+            activation?;
+            Ok(
+                json!({"activated":true,"checkpoint":checkpoint?,"budget":session.snapshot()?,"launched":false}),
+            )
+        }
+        BudgetCommand::Fetch {
+            budget,
+            remote,
+            key,
+            sha256,
+            bytes,
+            out,
+        } => {
+            crate::store::index::validate_sha256(sha256)?;
+            if *bytes > 1024 * 1024 * 1024 {
+                return Err("budget fetch exceeds the 1 GiB single-object limit".into());
+            }
+            let remote = crate::store::backend::RemoteSpec::parse(remote)?;
+            if !matches!(remote, crate::store::backend::RemoteSpec::S3 { .. }) {
+                return Err("budget fetch requires an explicit S3 remote".into());
+            }
+            let session =
+                open_budget(budget)?.ok_or("budget fetch requires an active bound session")?;
+            let context = S3BudgetContext::from_env(session)?;
+            fetch_budget_object(&context, &remote, key, sha256, *bytes, out)
+        }
+        BudgetCommand::Status { policy, ledger } => {
+            CampaignLedger::open(ledger, &read_json(policy)?)?.snapshot()
+        }
+    }
+}
+
+fn fetch_budget_object(
+    context: &Arc<S3BudgetContext>,
+    remote: &crate::store::backend::RemoteSpec,
+    key: &str,
+    sha256: &str,
+    bytes: u64,
+    out: &Path,
+) -> Result<Value, String> {
+    let parent = checked_directory(
+        out.parent()
+            .filter(|p| !p.as_os_str().is_empty())
+            .unwrap_or(Path::new(".")),
+        true,
+    )?;
+    let name = out
+        .file_name()
+        .and_then(|v| v.to_str())
+        .ok_or("invalid fetch destination")?;
+    let destination = storage::contained_path(&parent, name, false)?;
+    if fs::symlink_metadata(&destination).is_ok() {
+        return Err("fetch destination exists; use a fresh path for a new readback".into());
+    }
+    let partial = parent.join(format!(
+        ".budget-fetch-{}-{}",
+        std::process::id(),
+        unix_nanos()?
+    ));
+    let artifact = Artifact {
+        path: name.into(),
+        role: "budgeted-exact-object-download".into(),
+        encoding: "native".into(),
+        sha256: sha256.into(),
+        bytes,
+    };
+    let result = (|| {
+        storage::expect_remote_object(Some(context), remote, key, &artifact, BudgetScope::Work)?;
+        let mut cfg = crate::store::Config::discover()?;
+        cfg.remote = Some(remote.clone());
+        cfg.index_path = parent.join("budget-fetch-unused-index.json");
+        let store = storage::dataset_store(cfg, Some(context), BudgetScope::Work)?;
+        store.remote()?.get(key, &partial)?;
+        storage::check_file(&partial, sha256, bytes)?;
+        File::open(&partial)
+            .and_then(|f| f.sync_all())
+            .map_err(|e| e.to_string())?;
+        fs::hard_link(&partial, &destination)
+            .map_err(|e| format!("activate verified fetch without overwrite: {e}"))?;
+        storage::sync_directory(&parent)?;
+        fs::remove_file(&partial).map_err(|e| e.to_string())?;
+        Ok(
+            json!({"schema":"crypto.ml-dataset.budget-fetch/v1","remote":remote.display(),"object_key":key,
+            "destination":destination,"sha256":sha256,"bytes":bytes,"fresh_readback_verified":true,
+            "listing_performed":false,"remote_object_written":false}),
+        )
+    })();
+    combine_finalization(result, finalize_budget(&parent, Some(context), None, false))
+}
+
 pub fn run(args: &DatasetArgs) -> Result<(), String> {
     match &args.command {
+        DatasetCommand::Budget { command } => println!("{}", run_budget_command(command)?),
         DatasetCommand::Plan(a) => {
             let plan = DatasetPlan {
                 schema: "crypto.ml-dataset.plan/v1".into(),
@@ -424,12 +874,36 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
         DatasetCommand::Report { out, destination } => {
             println!("{}", report::report_run(out, destination)?);
         }
-        DatasetCommand::Publish { out, remote } => {
-            let _lease = Lease::acquire(out)?;
-            verify_run(out, true)?;
-            for dir in completed_cells(out)? {
-                publish_cell(out, &dir, remote.as_deref())?;
+        DatasetCommand::Publish {
+            out,
+            remote,
+            budget,
+        } => {
+            let session = open_budget(budget)?;
+            let remote = configured_remote(remote.as_deref())?;
+            require_remote_budget(&remote, session.as_ref())?;
+            if let Some(session) = &session {
+                validate_budget_run(session, out)?;
             }
+            let context = budget_transport(session)?;
+            let _lease = Lease::acquire(out)?;
+            let result = (|| {
+                verify_run(out, true)?;
+                for dir in completed_cells(out)? {
+                    publish_cell(
+                        out,
+                        &dir,
+                        Some(&remote.display()),
+                        context.as_ref(),
+                        BudgetScope::Work,
+                    )?;
+                }
+                Ok(())
+            })();
+            combine_finalization(
+                result,
+                finalize_budget(out, context.as_ref(), Some(&remote), true),
+            )?;
         }
         DatasetCommand::Capabilities => println!("{}", solvers::capabilities()),
         DatasetCommand::Export { out, destination } => {
@@ -439,7 +913,15 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
             receipt,
             out,
             remote,
-        } => println!("{}", restore::restore(receipt, out, remote.as_deref())?),
+            budget,
+        } => {
+            let session = open_budget(budget)?;
+            let context = budget_transport(session)?;
+            let result =
+                restore::restore_budgeted(receipt, out, remote.as_deref(), context.as_ref());
+            let finalized = finalize_budget(out, context.as_ref(), None, false);
+            println!("{}", combine_finalization(result, finalized)?);
+        }
         DatasetCommand::Reconcile { out, cell, reason } => reconcile(out, *cell, reason)?,
     }
     Ok(())
@@ -734,253 +1216,301 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
     }
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     let binary_sha = crate::store::hash_file(&exe)?.0;
+    let session = open_budget(&a.budget)?;
+    let remote = if a.publish {
+        Some(configured_remote(a.remote.as_deref())?)
+    } else {
+        None
+    };
+    if let Some(remote) = &remote {
+        require_remote_budget(remote, session.as_ref())?;
+    }
+    if a.publish
+        && std::env::var("ISOLAB_RESULTS_URI").is_ok_and(|uri| !uri.is_empty())
+        && session.is_none()
+    {
+        return Err("S3 lab receipt routing requires an active budget even when the data remote is a file backend".into());
+    }
+    let envelope: Option<Resources> = a
+        .budget_cell_envelope
+        .as_ref()
+        .map(|path| read_json(path))
+        .transpose()?;
+    if session.is_some() && envelope.is_none() {
+        return Err("budgeted generation requires a finite --budget-cell-envelope".into());
+    }
+    if session.is_none() && envelope.is_some() {
+        return Err("cell envelope requires a bound budget session".into());
+    }
     let _lease = Lease::acquire(&a.out)?;
     let out = checked_directory(&a.out, false)?;
     assert_no_workers(&out)?;
     let canonical = serde_json::to_vec(&plan).map_err(|e| e.to_string())?;
     let plan_sha = digest(&canonical);
+    if let Some(session) = &session {
+        session.validate_binding(&RunBinding {
+            source_commit: source.into(),
+            binary_sha256: binary_sha.clone(),
+            plan_sha256: plan_sha.clone(),
+            protocol_sha256: digest(&protocol),
+            shard_index: a.shard_index,
+            shard_count: a.shard_count,
+        })?;
+    }
+    let context = budget_transport(session)?;
     let binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
         "source_commit":source,"binary_sha256":binary_sha,"shard_index":a.shard_index,
         "shard_count":a.shard_count,"seconds_per_case":a.seconds_per_case,"memory_mib":a.memory_mib,
         "trace_mib":a.trace_mib,"output_budget_scope":"all_cell_files_before_manifest_seal",
         "clock_valid_for_comparison":false});
-    storage::write_json(&out, "run.json", "run-binding", &binding)?;
-    storage::write_json(&out, "plan.json", "frozen-plan", &plan)?;
-    storage::write_bytes(&out, "protocol.json", "frozen-protocol", "json", &protocol)?;
-    let cells = checked_directory(&out.join("cells"), true)?;
-    let mut attempted = 0;
-    for index in (a.shard_index..plan.cell_count()?)
-        .step_by(usize::try_from(a.shard_count).map_err(|_| "shard count too large")?)
-    {
-        let config = plan.cell(index)?;
-        let dir = cells.join(format!("{index:012}"));
-        if dir.join("manifest.json").exists() {
-            verify_resumed_cell(&dir, &binding, &config, index, &plan_sha)?;
-            if a.publish {
-                publish_cell(&out, &dir, a.remote.as_deref())?;
+    let result = (|| {
+        storage::write_json(&out, "run.json", "run-binding", &binding)?;
+        storage::write_json(&out, "plan.json", "frozen-plan", &plan)?;
+        storage::write_bytes(&out, "protocol.json", "frozen-protocol", "json", &protocol)?;
+        let cells = checked_directory(&out.join("cells"), true)?;
+        let mut attempted = 0;
+        for index in (a.shard_index..plan.cell_count()?)
+            .step_by(usize::try_from(a.shard_count).map_err(|_| "shard count too large")?)
+        {
+            let config = plan.cell(index)?;
+            let dir = cells.join(format!("{index:012}"));
+            if dir.join("manifest.json").exists() {
+                verify_resumed_cell(&dir, &binding, &config, index, &plan_sha)?;
+                if a.publish {
+                    let scope =
+                        cell_budget_scope(context.as_ref(), envelope.as_ref(), &plan_sha, index)?;
+                    publish_cell(&out, &dir, a.remote.as_deref(), context.as_ref(), scope)?;
+                    finalize_budget(&out, context.as_ref(), remote.as_ref(), true)?;
+                }
+                continue;
             }
-            continue;
-        }
-        if attempted >= a.max_cases {
-            break;
-        }
-        // An unfinished attempt is retained under its original directory. Retrying
-        // requires explicit reconciliation; no surviving child is duplicated.
-        if dir.exists() {
-            return Err(format!(
-                "cell {index} has an incomplete attempt; reconcile it before retrying"
-            ));
-        }
-        fs::create_dir(&dir).map_err(|e| e.to_string())?;
-        sync_dir(&cells)?;
-        storage::write_json(&dir, "run.json", "restricted-run-binding", &binding)?;
-        storage::write_json(&dir, "plan.json", "restricted-frozen-plan", &plan)?;
-        storage::write_bytes(
-            &dir,
-            "protocol.json",
-            "restricted-frozen-protocol",
-            "json",
-            &protocol,
-        )?;
-        storage::write_json(&dir, "config.json", "restricted-provenance", &config)?;
-        storage::write_json(
-            &dir,
-            "host.json",
-            "host-measurement-context",
-            &host_context(),
-        )?;
-        storage::write_json(
-            &dir,
-            "attempt.json",
-            "attempt-provenance",
-            &json!({
+            if attempted >= a.max_cases {
+                break;
+            }
+            // An unfinished attempt is retained under its original directory. Retrying
+            // requires explicit reconciliation; no surviving child is duplicated.
+            if dir.exists() {
+                return Err(format!(
+                    "cell {index} has an incomplete attempt; reconcile it before retrying"
+                ));
+            }
+            let scope = cell_budget_scope(context.as_ref(), envelope.as_ref(), &plan_sha, index)?;
+            fs::create_dir(&dir).map_err(|e| e.to_string())?;
+            sync_dir(&cells)?;
+            storage::write_json(&dir, "run.json", "restricted-run-binding", &binding)?;
+            storage::write_json(&dir, "plan.json", "restricted-frozen-plan", &plan)?;
+            storage::write_bytes(
+                &dir,
+                "protocol.json",
+                "restricted-frozen-protocol",
+                "json",
+                &protocol,
+            )?;
+            storage::write_json(&dir, "config.json", "restricted-provenance", &config)?;
+            storage::write_json(
+                &dir,
+                "host.json",
+                "host-measurement-context",
+                &host_context(),
+            )?;
+            storage::write_json(
+                &dir,
+                "attempt.json",
+                "attempt-provenance",
+                &json!({
             "schema":"crypto.ml-dataset.attempt/v1","cell_index":index,"plan_sha256":plan_sha,
             "supervisor_pid":std::process::id(),"started_unix_nanos":unix_nanos()?.to_string(),
             "status":"attempt_started"}),
-        )?;
-        let stdout = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(dir.join("stdout.log"))
-            .map_err(|e| e.to_string())?;
-        let stderr = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(dir.join("stderr.log"))
-            .map_err(|e| e.to_string())?;
-        let mut command = Command::new(&exe);
-        command
-            .args(["dataset", "worker", "--config"])
-            .arg(dir.join("config.json"))
-            .arg("--out")
-            .arg(&dir)
-            .env("RAYON_NUM_THREADS", "1")
-            .stdout(Stdio::from(stdout))
-            .stderr(Stdio::from(stderr));
-        let memory = a
-            .memory_mib
-            .checked_mul(1024 * 1024)
-            .ok_or("memory limit overflow")?;
-        #[cfg(target_os = "linux")]
-        {
-            use std::os::unix::process::CommandExt;
-            let parent = std::process::id();
-            // Limit the child only. Kill it if its supervising process vanishes.
-            unsafe {
-                command.pre_exec(move || {
-                    if libc::setpgid(0, 0) != 0 {
-                        return Err(std::io::Error::last_os_error());
-                    }
-                    if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0 {
-                        return Err(std::io::Error::last_os_error());
-                    }
-                    if libc::getppid() as u32 != parent {
-                        return Err(std::io::Error::other("supervisor exited"));
-                    }
-                    let limit = libc::rlimit {
-                        rlim_cur: memory,
-                        rlim_max: memory,
-                    };
-                    if libc::setrlimit(libc::RLIMIT_AS, &limit) != 0 {
-                        return Err(std::io::Error::last_os_error());
-                    }
-                    Ok(())
-                });
+            )?;
+            let stdout = OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(dir.join("stdout.log"))
+                .map_err(|e| e.to_string())?;
+            let stderr = OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(dir.join("stderr.log"))
+                .map_err(|e| e.to_string())?;
+            let mut command = Command::new(&exe);
+            command
+                .args(["dataset", "worker", "--config"])
+                .arg(dir.join("config.json"))
+                .arg("--out")
+                .arg(&dir)
+                .env("RAYON_NUM_THREADS", "1")
+                .stdout(Stdio::from(stdout))
+                .stderr(Stdio::from(stderr));
+            let memory = a
+                .memory_mib
+                .checked_mul(1024 * 1024)
+                .ok_or("memory limit overflow")?;
+            #[cfg(target_os = "linux")]
+            {
+                use std::os::unix::process::CommandExt;
+                let parent = std::process::id();
+                // Limit the child only. Kill it if its supervising process vanishes.
+                unsafe {
+                    command.pre_exec(move || {
+                        if libc::setpgid(0, 0) != 0 {
+                            return Err(std::io::Error::last_os_error());
+                        }
+                        if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0 {
+                            return Err(std::io::Error::last_os_error());
+                        }
+                        if libc::getppid() as u32 != parent {
+                            return Err(std::io::Error::other("supervisor exited"));
+                        }
+                        let limit = libc::rlimit {
+                            rlim_cur: memory,
+                            rlim_max: memory,
+                        };
+                        if libc::setrlimit(libc::RLIMIT_AS, &limit) != 0 {
+                            return Err(std::io::Error::last_os_error());
+                        }
+                        Ok(())
+                    });
+                }
             }
-        }
-        #[cfg(all(unix, not(target_os = "linux")))]
-        {
-            use std::os::unix::process::CommandExt;
-            command.process_group(0);
-        }
-        let start = Instant::now();
-        let mut child = SupervisedChild {
-            child: command.spawn().map_err(|e| e.to_string())?,
-            finished: false,
-        };
-        storage::write_json(
-            &dir,
-            "worker-process.json",
-            "process-provenance",
-            &json!({
+            #[cfg(all(unix, not(target_os = "linux")))]
+            {
+                use std::os::unix::process::CommandExt;
+                command.process_group(0);
+            }
+            let start = Instant::now();
+            let mut child = SupervisedChild {
+                child: command.spawn().map_err(|e| e.to_string())?,
+                finished: false,
+            };
+            storage::write_json(
+                &dir,
+                "worker-process.json",
+                "process-provenance",
+                &json!({
             "worker_pid":child.child.id(),"supervisor_pid":std::process::id(),
             "output":dir,"process_group":child.child.id()}),
-        )?;
-        let mut stop_reason = None;
-        let exit = loop {
-            if let Some(status) = child.poll()? {
-                break status;
-            }
-            let bytes = tree_bytes_while_running(&dir)?;
-            if start.elapsed() >= Duration::from_secs(a.seconds_per_case) {
-                stop_reason = Some("timeout");
-            }
-            if bytes > a.trace_mib.saturating_mul(1024 * 1024) {
+            )?;
+            let mut stop_reason = None;
+            let exit = loop {
+                if let Some(status) = child.poll()? {
+                    break status;
+                }
+                let bytes = tree_bytes_while_running(&dir)?;
+                if start.elapsed() >= Duration::from_secs(a.seconds_per_case) {
+                    stop_reason = Some("timeout");
+                }
+                if bytes > a.trace_mib.saturating_mul(1024 * 1024) {
+                    stop_reason = Some("trace_budget_exhausted");
+                }
+                if stop_reason.is_some() {
+                    break child.stop()?;
+                }
+                std::thread::sleep(Duration::from_millis(100));
+            };
+            let final_bytes = tree_bytes_while_running(&dir)?;
+            if final_bytes > a.trace_mib.saturating_mul(1024 * 1024) {
                 stop_reason = Some("trace_budget_exhausted");
             }
-            if stop_reason.is_some() {
-                break child.stop()?;
+            let mut outcome: Value = if dir.join("result.json").exists() {
+                read_json(&dir.join("result.json"))?
+            } else {
+                json!({"status":"worker_failed","solver_completed":false})
+            };
+            if let Some(reason) = stop_reason {
+                outcome = json!({"status":reason,"solver_completed":false});
             }
-            std::thread::sleep(Duration::from_millis(100));
-        };
-        let final_bytes = tree_bytes_while_running(&dir)?;
-        if final_bytes > a.trace_mib.saturating_mul(1024 * 1024) {
-            stop_reason = Some("trace_budget_exhausted");
-        }
-        let mut outcome: Value = if dir.join("result.json").exists() {
-            read_json(&dir.join("result.json"))?
-        } else {
-            json!({"status":"worker_failed","solver_completed":false})
-        };
-        if let Some(reason) = stop_reason {
-            outcome = json!({"status":reason,"solver_completed":false});
-        }
-        if !exit.success() && stop_reason.is_none() {
-            outcome =
-                json!({"status":"worker_failed","exit_code":exit.code(),"solver_completed":false});
-        }
-        outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":start.elapsed().as_secs_f64()*1000.0,
+            if !exit.success() && stop_reason.is_none() {
+                outcome = json!({"status":"worker_failed","exit_code":exit.code(),"solver_completed":false});
+            }
+            outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":start.elapsed().as_secs_f64()*1000.0,
             "clock_valid_for_comparison":false,"retired_instructions":null,
             "instruction_counter_status":"whole_worker_not_counted; see phase telemetry for available hardware counts","memory_limit_bytes":memory,
             "worker_output_bytes_before_seal":final_bytes,"output_budget_bytes":a.trace_mib.saturating_mul(1024*1024),
             "output_budget_scope":"all_cell_files_before_manifest_seal",
             "checkpoint_mid_call":false,"interrupted_trace_loss_possible":true});
-        let registry: Vec<Artifact> = if dir.join("worker-artifacts.json").exists() {
-            read_json(&dir.join("worker-artifacts.json"))?
-        } else {
-            Vec::new()
-        };
-        storage::verify_manifest(&dir, &registry)?;
-        let registered: BTreeMap<_, _> = registry.iter().map(|a| (a.path.as_str(), a)).collect();
-        let mut artifacts = Vec::new();
-        for path in tree_files(&dir)? {
-            let relative = path
-                .strip_prefix(&dir)
-                .map_err(|e| e.to_string())?
-                .to_str()
-                .ok_or("non-UTF8 output")?
-                .to_string();
-            File::open(&path)
-                .and_then(|f| f.sync_all())
-                .map_err(|e| format!("sync {}: {e}", path.display()))?;
-            if let Some(artifact) = registered.get(relative.as_str()) {
-                artifacts.push((**artifact).clone());
-                continue;
-            }
-            let (sha256, bytes) = crate::store::hash_file(&path)?;
-            let (role, encoding) = match relative.as_str() {
-                "witness.json" => ("restricted-known-answer", "json"),
-                "config.json" => ("restricted-provenance", "json"),
-                "plan.json" => ("restricted-frozen-plan", "json"),
-                "run.json" => ("restricted-run-binding", "json"),
-                "protocol.json" => ("restricted-frozen-protocol", "json"),
-                "attempt.json" | "worker-process.json" => ("process-provenance", "json"),
-                "host.json" => ("host-measurement-context", "json"),
-                "worker-artifacts.json" => ("artifact-registry", "json"),
-                "stdout.log" | "stderr.log" => ("process-log", "utf8"),
-                _ => ("unregistered-partial-artifact", "native"),
+            let registry: Vec<Artifact> = if dir.join("worker-artifacts.json").exists() {
+                read_json(&dir.join("worker-artifacts.json"))?
+            } else {
+                Vec::new()
             };
-            artifacts.push(Artifact {
-                role: role.into(),
-                path: relative,
-                sha256,
-                bytes,
-                encoding: encoding.into(),
-            });
-        }
-        sync_dir(&dir)?;
-        let has = |path: &str| artifacts.iter().any(|a| a.path == path);
-        outcome["known_answer_verified"] = json!(has("public.json") && has("witness.json"));
-        outcome["factor_base_verified"] = json!(has("public.json") && has("factor-base.json"));
-        let manifest = CellManifest {
-            schema: "crypto.ml-dataset.cell/v1".into(),
-            cell_index: index,
-            plan_sha256: plan_sha.clone(),
-            config,
-            outcome,
-            artifacts,
-        };
-        storage::write_json(&dir, "manifest.json", "cell-manifest", &manifest)?;
-        verify_cell(&dir, true)?;
-        if a.publish {
-            publish_cell(&out, &dir, a.remote.as_deref())?;
-        }
-        attempted += 1;
-        let manifest_bytes = crate::store::hash_file(&dir.join("manifest.json"))?.1;
-        let publication_bytes = if dir.join("publication").exists() {
-            tree_bytes_while_running(&dir.join("publication"))?
-        } else {
-            0
-        };
-        println!(
-            "{}",
-            json!({"cell_index":index,"outcome":manifest.outcome,"durable_remote":a.publish,
+            storage::verify_manifest(&dir, &registry)?;
+            let registered: BTreeMap<_, _> =
+                registry.iter().map(|a| (a.path.as_str(), a)).collect();
+            let mut artifacts = Vec::new();
+            for path in tree_files(&dir)? {
+                let relative = path
+                    .strip_prefix(&dir)
+                    .map_err(|e| e.to_string())?
+                    .to_str()
+                    .ok_or("non-UTF8 output")?
+                    .to_string();
+                File::open(&path)
+                    .and_then(|f| f.sync_all())
+                    .map_err(|e| format!("sync {}: {e}", path.display()))?;
+                if let Some(artifact) = registered.get(relative.as_str()) {
+                    artifacts.push((**artifact).clone());
+                    continue;
+                }
+                let (sha256, bytes) = crate::store::hash_file(&path)?;
+                let (role, encoding) = match relative.as_str() {
+                    "witness.json" => ("restricted-known-answer", "json"),
+                    "config.json" => ("restricted-provenance", "json"),
+                    "plan.json" => ("restricted-frozen-plan", "json"),
+                    "run.json" => ("restricted-run-binding", "json"),
+                    "protocol.json" => ("restricted-frozen-protocol", "json"),
+                    "attempt.json" | "worker-process.json" => ("process-provenance", "json"),
+                    "host.json" => ("host-measurement-context", "json"),
+                    "worker-artifacts.json" => ("artifact-registry", "json"),
+                    "stdout.log" | "stderr.log" => ("process-log", "utf8"),
+                    _ => ("unregistered-partial-artifact", "native"),
+                };
+                artifacts.push(Artifact {
+                    role: role.into(),
+                    path: relative,
+                    sha256,
+                    bytes,
+                    encoding: encoding.into(),
+                });
+            }
+            sync_dir(&dir)?;
+            let has = |path: &str| artifacts.iter().any(|a| a.path == path);
+            outcome["known_answer_verified"] = json!(has("public.json") && has("witness.json"));
+            outcome["factor_base_verified"] = json!(has("public.json") && has("factor-base.json"));
+            let manifest = CellManifest {
+                schema: "crypto.ml-dataset.cell/v1".into(),
+                cell_index: index,
+                plan_sha256: plan_sha.clone(),
+                config,
+                outcome,
+                artifacts,
+            };
+            storage::write_json(&dir, "manifest.json", "cell-manifest", &manifest)?;
+            verify_cell(&dir, true)?;
+            if a.publish {
+                publish_cell(&out, &dir, a.remote.as_deref(), context.as_ref(), scope)?;
+            }
+            finalize_budget(&out, context.as_ref(), remote.as_ref(), a.publish)?;
+            attempted += 1;
+            let manifest_bytes = crate::store::hash_file(&dir.join("manifest.json"))?.1;
+            let publication_bytes = if dir.join("publication").exists() {
+                tree_bytes_while_running(&dir.join("publication"))?
+            } else {
+                0
+            };
+            println!(
+                "{}",
+                json!({"cell_index":index,"outcome":manifest.outcome,"durable_remote":a.publish,
             "worker_output_bytes_before_seal":final_bytes,"sealed_manifest_bytes":manifest_bytes,
             "publication_metadata_bytes":publication_bytes})
-        );
-    }
-    println!("{}", verify_run(&out, true)?);
-    Ok(())
+            );
+        }
+        println!("{}", verify_run(&out, true)?);
+        Ok(())
+    })();
+    combine_finalization(
+        result,
+        finalize_budget(&out, context.as_ref(), remote.as_ref(), a.publish),
+    )
 }
 
 fn tree_files(root: &Path) -> Result<Vec<PathBuf>, String> {
@@ -1858,7 +2388,13 @@ fn publication_namespace(binding: &Value, cell: u64) -> Result<String, String> {
     Ok(format!("ml-ecdlp/{run_id}/cells/{cell:012}"))
 }
 
-fn publish_cell(root: &Path, dir: &Path, remote: Option<&str>) -> Result<(), String> {
+fn publish_cell(
+    root: &Path,
+    dir: &Path,
+    remote: Option<&str>,
+    budget: Option<&Arc<S3BudgetContext>>,
+    scope: BudgetScope,
+) -> Result<(), String> {
     let manifest = verify_cell(dir, true)?;
     let path = dir.join("manifest.json");
     let (sha256, bytes) = crate::store::hash_file(&path)?;
@@ -1875,12 +2411,17 @@ fn publish_cell(root: &Path, dir: &Path, remote: Option<&str>) -> Result<(), Str
         cfg.remote = Some(crate::store::backend::RemoteSpec::parse(remote)?);
     }
     let namespace = publication_namespace(&read_json(&dir.join("run.json"))?, manifest.cell_index)?;
-    let receipt = storage::publish(
+    if let Some(context) = budget {
+        validate_budget_run(context.session(), dir)?;
+    }
+    let receipt = storage::publish_budgeted(
         dir,
         &manifest.artifacts,
         &manifest_artifact,
         cfg,
         &namespace,
+        budget,
+        scope,
     )?;
     let receipt_file = storage::write_json(
         root,
@@ -1891,7 +2432,7 @@ fn publish_cell(root: &Path, dir: &Path, remote: Option<&str>) -> Result<(), Str
         "publication-receipt",
         &receipt,
     )?;
-    publish_lab_receipt(root, &receipt_file)?;
+    publish_lab_receipt(root, &receipt_file, budget)?;
     println!(
         "{}",
         serde_json::to_string(&receipt).map_err(|e| e.to_string())?
@@ -1902,7 +2443,11 @@ fn publish_cell(root: &Path, dir: &Path, remote: Option<&str>) -> Result<(), Str
 /// The EKS command contract supplies this explicit results destination. Keep a
 /// receipt under that attempt prefix as well as the dataset's stable catalog,
 /// so lab results remain discoverable after Pod/log TTL cleanup.
-fn publish_lab_receipt(root: &Path, artifact: &Artifact) -> Result<(), String> {
+fn publish_lab_receipt(
+    root: &Path,
+    artifact: &Artifact,
+    budget: Option<&Arc<S3BudgetContext>>,
+) -> Result<(), String> {
     let Some(uri) = std::env::var("ISOLAB_RESULTS_URI")
         .ok()
         .filter(|s| !s.is_empty())
@@ -1910,12 +2455,30 @@ fn publish_lab_receipt(root: &Path, artifact: &Artifact) -> Result<(), String> {
         return Ok(());
     };
     let remote = lab_receipt_remote(&uri)?;
+    publish_lab_receipt_to(root, artifact, &remote, budget)
+}
+
+fn publish_lab_receipt_to(
+    root: &Path,
+    artifact: &Artifact,
+    remote: &crate::store::backend::RemoteSpec,
+    budget: Option<&Arc<S3BudgetContext>>,
+) -> Result<(), String> {
+    let remote = lab_receipt_remote(&remote.display())?;
+    let uri = remote.display();
     let mut cfg = crate::store::Config::discover()?;
     cfg.remote = Some(remote);
     cfg.index_path = root.join("store-index.json");
-    let store = crate::store::Store::open(cfg)?;
+    let store = storage::dataset_store(cfg, budget, BudgetScope::Finalization)?;
     let backend = store.remote()?;
     let key = format!("dataset-receipts/{}.json", artifact.sha256);
+    storage::reserve_remote_output(
+        budget,
+        store.cfg.remote.as_ref().expect("validated remote"),
+        &key,
+        artifact,
+        BudgetScope::Finalization,
+    )?;
     storage::verify_manifest(root, std::slice::from_ref(artifact))?;
     storage::prepare_s3_publication(
         backend,
@@ -1941,6 +2504,12 @@ fn publish_lab_receipt(root: &Path, artifact: &Artifact) -> Result<(), String> {
     if crate::store::hash_file(&temporary)? != (artifact.sha256.clone(), artifact.bytes) {
         return Err("lab receipt remote readback mismatch".into());
     }
+    storage::verify_remote_output(
+        budget,
+        store.cfg.remote.as_ref().expect("validated remote"),
+        &key,
+        BudgetScope::Finalization,
+    )?;
     fs::remove_file(&temporary).map_err(|e| e.to_string())?;
     storage::write_json(
         root,
@@ -1962,9 +2531,239 @@ fn lab_receipt_remote(uri: &str) -> Result<crate::store::backend::RemoteSpec, St
     Ok(remote)
 }
 
+#[cfg(all(test, target_os = "linux"))]
+pub(super) mod budget_test_support {
+    use super::*;
+    use aws_smithy_runtime_api::client::http::{
+        HttpClient, HttpConnector, HttpConnectorFuture, HttpConnectorSettings, SharedHttpClient,
+        SharedHttpConnector,
+    };
+    use aws_smithy_runtime_api::client::orchestrator::{HttpRequest, HttpResponse};
+    use aws_smithy_runtime_api::client::runtime_components::RuntimeComponents;
+    use aws_smithy_types::body::SdkBody;
+    use std::sync::Mutex;
+
+    /// Full SDK serializer/interceptor/connector path, with no sockets or AWS.
+    /// Missing keys deliberately return403, exercising immutable PUT fallback.
+    #[derive(Clone)]
+    pub struct MemoryWire {
+        session: Arc<BudgetSession>,
+        objects: Arc<Mutex<BTreeMap<String, Vec<u8>>>>,
+        pub calls: Arc<Mutex<Vec<(String, String)>>>,
+        pub fail_next_get: Arc<Mutex<bool>>,
+    }
+    impl std::fmt::Debug for MemoryWire {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            f.write_str("MemoryWire(no network)")
+        }
+    }
+    impl HttpClient for MemoryWire {
+        fn http_connector(
+            &self,
+            _: &HttpConnectorSettings,
+            _: &RuntimeComponents,
+        ) -> SharedHttpConnector {
+            SharedHttpConnector::new(self.clone())
+        }
+    }
+    impl HttpConnector for MemoryWire {
+        fn call(&self, request: HttpRequest) -> HttpConnectorFuture {
+            let method = request.method().to_owned();
+            let uri = request.uri().to_string();
+            let uri = uri.split('?').next().unwrap().to_owned();
+            let charged = self.session.snapshot().unwrap()["charged_attempts"]
+                .as_u64()
+                .unwrap();
+            let mut calls = self.calls.lock().unwrap();
+            assert!(
+                charged > calls.len() as u64,
+                "HTTP reached memory wire before durable debit"
+            );
+            calls.push((method.clone(), uri.clone()));
+            drop(calls);
+            if method == "PUT" {
+                assert_eq!(request.headers().get("if-none-match"), Some("*"));
+            }
+            let objects = self.objects.clone();
+            let fail_next_get = self.fail_next_get.clone();
+            HttpConnectorFuture::new(async move {
+                let incoming = aws_smithy_types::byte_stream::ByteStream::new(request.into_body())
+                    .collect()
+                    .await
+                    .expect("collect offline SDK request")
+                    .into_bytes()
+                    .to_vec();
+                let mut objects = objects.lock().unwrap();
+                let (status, body, length) = match method.as_str() {
+                    "PUT" => {
+                        if let std::collections::btree_map::Entry::Vacant(entry) =
+                            objects.entry(uri)
+                        {
+                            entry.insert(incoming);
+                            (200, Vec::new(), 0)
+                        } else {
+                            (412, Vec::new(), 0)
+                        }
+                    }
+                    "HEAD" => match objects.get(&uri) {
+                        Some(bytes) => (200, Vec::new(), bytes.len()),
+                        None => (403, Vec::new(), 0),
+                    },
+                    "GET" if std::mem::take(&mut *fail_next_get.lock().unwrap()) => {
+                        (403, Vec::new(), 0)
+                    }
+                    "GET" => match objects.get(&uri) {
+                        Some(bytes) => (200, bytes.clone(), bytes.len()),
+                        None => (403, Vec::new(), 0),
+                    },
+                    _ => panic!("unexpected offline request method {method}"),
+                };
+                let mut response =
+                    HttpResponse::new(status.try_into().unwrap(), SdkBody::from(body));
+                response
+                    .headers_mut()
+                    .insert("content-length", length.to_string());
+                response
+                    .headers_mut()
+                    .insert("x-amz-request-id", "offline-integration");
+                Ok(response)
+            })
+        }
+    }
+    pub fn context(root: &Path, binding: Option<RunBinding>) -> (Arc<S3BudgetContext>, MemoryWire) {
+        let (mut policy, mut request) = budget::test_policy_request(root);
+        policy.caps.output_bytes = 16 * 1024 * 1024;
+        policy.caps.download_bytes = 256 * 1024 * 1024;
+        policy.caps.put_attempts = 10_000;
+        policy.caps.read_attempts = 20_000;
+        request.resources.output_bytes = 8 * 1024 * 1024;
+        request.resources.download_bytes = 128 * 1024 * 1024;
+        request.resources.put_attempts = 4000;
+        request.resources.read_attempts = 10000;
+        request.finalization.output_bytes = 4 * 1024 * 1024;
+        request.finalization.download_bytes = 64 * 1024 * 1024;
+        request.finalization.put_attempts = 2000;
+        request.finalization.read_attempts = 5000;
+        if let Some(binding) = binding {
+            request.binding = binding;
+        }
+        let ledger = CampaignLedger::create(&root.join("campaign.sqlite"), &policy).unwrap();
+        let grant = ledger.reserve(&request).unwrap();
+        let session = Arc::new(
+            BudgetSession::create(&root.join("worker.sqlite"), &policy, &grant, &request.owner)
+                .unwrap(),
+        );
+        let wire = MemoryWire {
+            session: session.clone(),
+            objects: Arc::new(Mutex::new(BTreeMap::new())),
+            calls: Arc::new(Mutex::new(Vec::new())),
+            fail_next_get: Arc::new(Mutex::new(false)),
+        };
+        let context = S3BudgetContext::test_context(session, SharedHttpClient::new(wire.clone()));
+        context.activate().unwrap();
+        (context, wire)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn budget_cli_dry_admission_is_read_only_and_reserve_reexports_same_grant() {
+        use clap::Parser;
+        #[derive(Parser)]
+        struct TestCli {
+            #[command(flatten)]
+            dataset: DatasetArgs,
+        }
+        let temp = TempRun::new();
+        let (policy, request) = budget::test_policy_request(&temp.0);
+        let policy_file = temp.0.join("policy.json");
+        let request_file = temp.0.join("request.json");
+        fs::write(&policy_file, serde_json::to_vec(&policy).unwrap()).unwrap();
+        fs::write(&request_file, serde_json::to_vec(&request).unwrap()).unwrap();
+        let ledger = temp.0.join("campaign.sqlite");
+        let cli = TestCli::try_parse_from([
+            "test",
+            "budget",
+            "admit",
+            "--policy",
+            policy_file.to_str().unwrap(),
+            "--ledger",
+            ledger.to_str().unwrap(),
+            "--request",
+            request_file.to_str().unwrap(),
+            "--dry-run",
+        ])
+        .unwrap();
+        let DatasetCommand::Budget { command } = cli.dataset.command else {
+            panic!("wrong CLI route")
+        };
+        let before = tree_files(&temp.0).unwrap();
+        let report = run_budget_command(&command).unwrap();
+        assert_eq!(report["dry_run"], true);
+        assert_eq!(report["admitted"], true);
+        assert!(!ledger.exists());
+        assert_eq!(tree_files(&temp.0).unwrap(), before);
+        let grant_file = temp.0.join("grant.json");
+        let reservation = BudgetCommand::Reserve {
+            policy: policy_file.clone(),
+            ledger: ledger.clone(),
+            request: request_file.clone(),
+            out: grant_file.clone(),
+            create_ledger: true,
+        };
+        let first = run_budget_command(&reservation).unwrap();
+        let before = crate::store::hash_file(&ledger).unwrap();
+        let report = run_budget_command(&command).unwrap();
+        assert_eq!(report["admitted"], false);
+        assert_eq!(crate::store::hash_file(&ledger).unwrap(), before);
+        let second = run_budget_command(&BudgetCommand::Reserve {
+            policy: policy_file,
+            ledger: ledger.clone(),
+            request: request_file,
+            out: grant_file,
+            create_ledger: false,
+        })
+        .unwrap();
+        assert_eq!(first["grant"], second["grant"]);
+        assert_eq!(crate::store::hash_file(&ledger).unwrap(), before);
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn budget_cell_resume_reuses_reservation_and_missing_budget_has_no_s3_fallback() {
+        let temp = TempRun::new();
+        let (context, wire) = budget_test_support::context(&temp.0, None);
+        let envelope = Resources {
+            output_bytes: 4096,
+            put_attempts: 3,
+            read_attempts: 20,
+            download_bytes: 65536,
+            ..Resources::default()
+        };
+        let first = cell_budget_scope(Some(&context), Some(&envelope), &"c".repeat(64), 0).unwrap();
+        let before = context.session().snapshot().unwrap();
+        let again = cell_budget_scope(Some(&context), Some(&envelope), &"c".repeat(64), 0).unwrap();
+        assert_eq!(first, again);
+        assert_eq!(before, context.session().snapshot().unwrap());
+        assert_eq!(wire.calls.lock().unwrap().len(), 2);
+        let mut cfg = crate::store::Config::discover().unwrap();
+        cfg.remote = Some(
+            crate::store::backend::RemoteSpec::parse(
+                "s3://setec-astronomy-artifacts/ml-dataset/test",
+            )
+            .unwrap(),
+        );
+        cfg.index_path = temp.0.join("unbudgeted-index.json");
+        assert!(storage::dataset_store(cfg, None, BudgetScope::Work)
+            .err()
+            .unwrap()
+            .contains("active bound budget"));
+        assert!(!temp.0.join("unbudgeted-index.json").exists());
+        assert_eq!(wire.calls.lock().unwrap().len(), 2);
+    }
     #[test]
     fn lab_receipt_routing_rejects_legacy_bucket_before_generation() {
         assert!(

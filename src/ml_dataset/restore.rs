@@ -3,15 +3,21 @@
 //! Downloads go into retained attempt directories, outside the active cells
 //! tree. A cell becomes active only after remote byte checks and native replay.
 //! This is a reader: it never requires the producer executable to be installed,
-//! and it never uploads or changes a remote object.
+//! and it never uploads or changes a remote object. S3 reads require an active
+//! budget journal; the separate activation command first writes and verifies
+//! its admitted ownership control object. Supplied job/pod identities are exact
+//! bindings, not an automatic Kubernetes ownership attestation.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File};
 use std::path::Path;
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
+use super::budget::BudgetScope;
+use super::s3_budget::S3BudgetContext;
 use super::storage::{self, PublicationConfirmation, PublishReceipt, PublishedObject};
 use super::types::Artifact;
 use crate::store::backend::{object_key, RemoteSpec};
@@ -306,8 +312,21 @@ fn activate(_source: &Path, _destination: &Path) -> Result<(), String> {
 /// shard axes) matches. Partial downloads are retained for inspection/retry;
 /// each retry performs fresh remote reads before creating a local confirmation.
 pub fn restore(receipt_path: &Path, out: &Path, remote: Option<&str>) -> Result<Value, String> {
+    restore_budgeted(receipt_path, out, remote, None)
+}
+
+pub fn restore_budgeted(
+    receipt_path: &Path,
+    out: &Path,
+    remote: Option<&str>,
+    budget: Option<&Arc<S3BudgetContext>>,
+) -> Result<Value, String> {
     let receipt = checked_receipt(receipt_path)?;
     let remote = validate_receipt(&receipt, remote)?;
+    // Refuse the ordinary CLI-backed store before creating a restore attempt.
+    if matches!(&remote, RemoteSpec::S3 { .. }) && budget.is_none() {
+        return Err("S3 restore requires an active bound budget session".into());
+    }
     let _lease = super::Lease::acquire(out)?;
     let out = super::checked_directory(out, false)?;
     super::assert_no_workers(&out)?;
@@ -328,10 +347,19 @@ pub fn restore(receipt_path: &Path, out: &Path, remote: Option<&str>) -> Result<
     let cell = super::checked_directory(&attempt.join("cell"), true)?;
     storage::write_json(&attempt, "receipt.json", "restore-input-receipt", &receipt)?;
     let mut cfg = Config::discover()?;
-    cfg.remote = Some(remote);
+    cfg.remote = Some(remote.clone());
     cfg.index_path = attempt.join("read-only-store-index.json");
     cfg.cache_dir = attempt.join("unused-cache");
-    let store = Store::open(cfg)?;
+    let store = storage::dataset_store(cfg, budget, BudgetScope::Work)?;
+    for object in std::iter::once(&receipt.completion).chain(&receipt.objects) {
+        storage::expect_remote_object(
+            budget,
+            &remote,
+            &object.object_key,
+            &object.artifact,
+            BudgetScope::Work,
+        )?;
+    }
 
     // Fetch the final publication marker first, and require it to bind the
     // complete object list supplied in the externally retained receipt.
@@ -364,6 +392,9 @@ pub fn restore(receipt_path: &Path, out: &Path, remote: Option<&str>) -> Result<
         return Err("remote manifest artifacts do not exactly match the receipt object set".into());
     }
     let (plan, binding, _) = super::bound_run(&cell)?;
+    if let Some(context) = budget {
+        super::validate_budget_run(context.session(), &cell)?;
+    }
     let shard_count = binding["shard_count"]
         .as_u64()
         .filter(|n| *n > 0)
@@ -657,6 +688,86 @@ mod tests {
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.root);
         }
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn native_budgeted_restore_retains_failed_attempt_and_retries_with_read_debits() {
+        let fixture = Fixture::new(256);
+        fixture.publish(0);
+        let source = fixture.root.join("source-0");
+        let manifest: super::super::CellManifest =
+            super::super::read_json(&source.join("manifest.json")).unwrap();
+        let (sha256, bytes) = crate::store::hash_file(&source.join("manifest.json")).unwrap();
+        let artifact = Artifact {
+            path: "manifest.json".into(),
+            role: "cell-manifest".into(),
+            encoding: "json".into(),
+            sha256,
+            bytes,
+        };
+        let journal = fixture.root.join("budget");
+        fs::create_dir(&journal).unwrap();
+        let binding = super::super::budget::RunBinding {
+            source_commit: "c".repeat(40),
+            binary_sha256: "d".repeat(64),
+            plan_sha256: fixture.binding["plan_sha256"].as_str().unwrap().into(),
+            protocol_sha256: fixture.plan.protocol_sha256.clone().unwrap(),
+            shard_index: 0,
+            shard_count: 1,
+        };
+        let (context, wire) = super::super::budget_test_support::context(&journal, Some(binding));
+        let remote = RemoteSpec::parse("s3://setec-astronomy-artifacts/ml-dataset/test").unwrap();
+        let cfg = Config {
+            index_path: fixture.root.join("native-index.json"),
+            cache_dir: fixture.root.join("native-cache"),
+            remote: Some(remote),
+            endpoint: None,
+            aws: "aws".into(),
+        };
+        let receipt = storage::publish_budgeted(
+            &source,
+            &manifest.artifacts,
+            &artifact,
+            cfg,
+            &super::super::publication_namespace(&fixture.binding, 0).unwrap(),
+            Some(&context),
+            BudgetScope::Work,
+        )
+        .unwrap();
+        let receipt_path = fixture.root.join("native-receipt.json");
+        fs::write(&receipt_path, serde_json::to_vec(&receipt).unwrap()).unwrap();
+        let out = fixture.root.join("native-restored");
+        let before = context.session().snapshot().unwrap();
+        *wire.fail_next_get.lock().unwrap() = true;
+        assert!(restore_budgeted(&receipt_path, &out, None, Some(&context)).is_err());
+        assert!(!out.join("cells/000000000000/manifest.json").exists());
+        let attempts = out
+            .join(".restore")
+            .join(&receipt.completion.artifact.sha256);
+        assert_eq!(fs::read_dir(&attempts).unwrap().count(), 1);
+        let failed = context.session().snapshot().unwrap();
+        assert!(
+            failed["get_attempts"].as_u64().unwrap() > before["get_attempts"].as_u64().unwrap()
+        );
+        let restored = restore_budgeted(&receipt_path, &out, None, Some(&context)).unwrap();
+        assert_eq!(restored["native_replay_performed"], true);
+        assert_eq!(fs::read_dir(&attempts).unwrap().count(), 2);
+        assert_eq!(
+            super::super::read_json::<Value>(&out.join("run.json")).unwrap(),
+            fixture.binding
+        );
+        let after = context.session().snapshot().unwrap();
+        assert_eq!(after["put_attempts"], before["put_attempts"]);
+        assert_eq!(
+            after["reserved_unique_output_bytes"],
+            before["reserved_unique_output_bytes"]
+        );
+        assert!(after["get_attempts"].as_u64().unwrap() > failed["get_attempts"].as_u64().unwrap());
+        assert_eq!(
+            after["charged_attempts"].as_u64().unwrap(),
+            wire.calls.lock().unwrap().len() as u64
+        );
     }
 
     #[test]
