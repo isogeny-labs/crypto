@@ -2910,7 +2910,9 @@ fn solve_ext(
 }
 
 /// Rho on the classes of an endomorphism, the verification of its
-/// eigenvalue on `G` charged as set-up.
+/// eigenvalue on `G` charged as set-up, in the `setup` phase and in the
+/// total.  Records written before 2026-10-28 carried it in the phases only
+/// (`audit::PRE_CLASS_SETUP_BINARIES`).
 #[allow(clippy::too_many_arguments)]
 fn solve_endo_orbit<G: CountedGroup, E: Endomorphism<G>>(
     m: &ResolvedMethod,
@@ -2936,7 +2938,7 @@ fn solve_endo_orbit<G: CountedGroup, E: Endomorphism<G>>(
         rho_cap(r, param_u64(m, "cap_multiple")? as f64),
         RhoWalk::negation(),
     );
-    res.group_ops.merge(setup);
+    charge_class_setup(&mut res, setup, r);
     res.counters.insert(
         "endomorphism_applications_uncharged".into(),
         classes.applications(),
@@ -2947,7 +2949,11 @@ fn solve_endo_orbit<G: CountedGroup, E: Endomorphism<G>>(
     );
     measurement::end_online();
     let f = field_ops_of(g, &[res.group_ops]);
-    Ok(rho_report(res, t.elapsed().as_nanos() as u64, f))
+    let mut rep = rho_report(res, t.elapsed().as_nanos() as u64, f);
+    if let (Some(d), Value::Object(c)) = (rep.detail.as_object_mut(), class_setup_detail(setup)) {
+        d.extend(c);
+    }
+    Ok(rep)
 }
 
 /// `E(F_{p⁴})`: `ic.k4_gaudry`, or a generic method on [`Fp4Group`].

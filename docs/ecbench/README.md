@@ -1110,8 +1110,9 @@ the exact figure.
 The audit also recomputes every derived figure from the record's own
 counts (`S = total/√r`, the floor, the ratio, the lower-bound flag) and
 checks each record against what needs no replay: phases sum to the total
-(except the frozen `rho.cubic` and `rho.quartic` accounting,
-`audit::PHASE_SUM_EXEMPT_METHODS`), `automorphisms_used` does not exceed
+(except a class-set-up record from one of the named pre-fix producers,
+`audit::pre_class_setup_record`, whose replay checks the shortfall),
+`automorphisms_used` does not exceed
 `automorphisms_available`, `role` is the spec arm's, `env_class_id` and
 `binary_sha256` are the host capsule's, `field_ops` is present where the
 method counts field operations on a prime curve, and `status_counts`,
@@ -1155,7 +1156,7 @@ historical reconstruction it needed:
 |:--|:--|
 | `identical` | every compared figure is bit for bit the record's |
 | `identical (legacy gae rounding, …)` | an `ic.pipeline` record from before 2026-10-05 whose solver wall term was removed by subtraction, reproduced from the record's own solver term |
-| `identical (pre-2026-10-18 phase accounting, reproduced from the replay)` | a `rho.quartic` / `rho.cubic` record from one of the five pre-fix producers, whose total left out the class set-up |
+| `identical (pre-2026-10-18 phase accounting, reproduced from the replay)` | a `rho.quartic` / `rho.cubic` record from one of the five pre-fix producers, or a `rho.gls` / `rho.frobenius_orbit` record from one of the two written before 2026-10-28, whose total left out the class set-up (the string keeps its original date) |
 
 
 **A method's counts are frozen by its id.** Changing what a registered
