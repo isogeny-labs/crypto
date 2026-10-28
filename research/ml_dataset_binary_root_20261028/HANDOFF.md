@@ -1,5 +1,31 @@
 # Standalone binary root module handoff
 
+## Integration update, 2026-10-28
+
+The original standalone snapshot below is retained as history. The parent
+subsequently authorized module registration, exclusive centralized Cargo and
+dataset integration under renewed T-743 scopes. A reported Git index lock was
+already absent when reconciled; no lock was removed. Registration was committed
+as `aea52933390a63e38cdebe7c81d1baff1b059a45`.
+
+All nine native tests passed and strict release-library Clippy with `-D warnings`
+passed using Rust 1.98.0. Logs are retained at
+`/home/ec2-user/ml-dataset-resume-20261028/binary-root-validation/native-first.log`
+and `clippy-first.log`. The integration design was committed first as
+`8f6d423ef21`; the adapter now has typed exact-instance/domain/configuration
+bindings, aggregate work/event/byte replay, live intermediate/call artifacts,
+outcome checks and restricted training-export references. Native dataset tests
+are being compiled; these changes are not yet a passing integration gate.
+
+Rust 1.98.0 lacks the rustfmt component on this host. The attempted scoped
+format command failed before changing files; installed default rustfmt then
+completed successfully. This tool setup failure is retained separately from
+native correctness results. No scientific cloud job or experiment ran.
+
+Remaining: finish dataset tests, address any actual failures, strict integrated
+lint, exact-source evidence persistence and parent full-library/consumer gate.
+The companion consumer agent is independently implementing root-set replay.
+
 Recorded 2026-10-28 at 14:08 UTC. Implementation is reviewable; native
 compilation, tests, strict lint, dataset integration and publication are pending.
 
