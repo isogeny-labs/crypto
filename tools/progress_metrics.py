@@ -7,6 +7,8 @@ Sources (all committed, read at --ref unless noted):
   docs/perf/history.json          on branch origin/perf-history: chained Ir performance index per push
   benchmarks/README.md            append-only benchmark entries (one row per study)
   docs/ic/ci/runs/*.json          ic e2e history records
+  docs/curves/jacobian-transfers.json
+                                exact catalog coverage counts, not attack-performance claims
   research/nist_skipped_curve_dissection_20261021/factorization/progress.json
                                 certified factorization status and recorded raw relation counts
   research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json
@@ -81,6 +83,21 @@ def args():
 
 P_IC = "ecdlp-index-calculus"
 P_PERF = "crypto-performance"
+
+
+def jacobian_catalog(ref, since):
+    path = "docs/curves/jacobian-transfers.json"
+    for date, commit, text in file_history(ref, path, since):
+        summary = json.loads(text).get("summary") or {}
+        source = f"{path}@{commit}"
+        for field, label in (("curves", "screened registry entries"),
+                             ("routes", "enumerated model routes")):
+            emit(f"jacobian.catalog.{field}", summary.get(field), date=date,
+                 problem="jacobian-transfer-catalog", unit="count", better="neutral",
+                 label=f"Jacobian catalog: {label}", source=source)
+        emit("jacobian.catalog.boundary_entries", (summary.get("by_class") or {}).get("boundary"),
+             date=date, problem="jacobian-transfer-catalog", unit="count", better="neutral",
+             label="Jacobian catalog: boundary classifications", source=source)
 
 
 def leaderboard(ref, since):
@@ -235,6 +252,23 @@ def nist_selection_exact_embedding(ref, since):
              source=f"{path}@{commit}")
 
 
+
+def ghs_ipsec_archive(ref, since):
+    """Export recorded archive counters; no cryptographic computation or estimates."""
+    path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
+    txt = show(ref, path)
+    if not txt:
+        return
+    data = json.loads(txt)
+    date = data.get("snapshot_date_utc")
+    if not date or date < since:
+        return
+    for key in ("discovered", "screened", "expanded"):
+        emit("ghs.ipsec155.archive." + key + "_frobenius_orbits",
+             data.get("counters", {}).get(key), date=date,
+             problem="ghs-ipsec155-isogeny-class", unit="Frobenius orbits",
+             better="higher", label="Historical IPsec GHS archive: " + key + " orbits",
+             source=path + "@" + ref)
 def fall_degree(ref):
     """HKY last fall degree d_F of Weil-descended chained Semaev systems (unsatisfiable draws,
     research/fall_degree_bounds_20261008, E7 onward). Counts of recorded draws only; a draw not
@@ -269,6 +303,7 @@ def fall_degree(ref):
 
 def main():
     a = args()
+    jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
     perf_history(a.since)
@@ -278,9 +313,9 @@ def main():
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
     nist_selection_exact_embedding(a.ref, a.since)
+    ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
 
 
 if __name__ == "__main__":
     main()
-
