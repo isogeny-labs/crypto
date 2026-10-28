@@ -243,7 +243,11 @@ impl Store {
     /// the default store factory remains unchanged.
     pub fn open_with_backend(cfg: Config, backend: Box<dyn Backend>) -> Result<Self, String> {
         let index = Index::load(&cfg.index_path)?;
-        Ok(Self { cfg, index, backend: Some(backend) })
+        Ok(Self {
+            cfg,
+            index,
+            backend: Some(backend),
+        })
     }
 
     pub fn open(cfg: Config) -> Result<Self, String> {
