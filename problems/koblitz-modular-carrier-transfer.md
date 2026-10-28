@@ -1066,3 +1066,28 @@ No arbitrary collected-divisor reverse evaluator or new relation rank is
 established. The remaining four polar supports, additional zero supports,
 complete global divisors/RR/F2 map, node187 membership and460/367 images
 remain open. Every failed native/Lean/gate/storage attempt is retained.
+
+## Round26: Prym direction, rational cusp transport and fixed RR target
+
+[Round26](../research/koblitz_modular_ic_20261018/rounds/26/CM.md) connects
+R25's actual quotient to the already known R15/R16 diamond character: all
+nontrivial diamond quotient norms annihilate the intended CM factor under
+that written modular/specialization bridge. Native and kernel finite checks
+verify all4primitive characters and subgroup orders2,5,10. The group direction
+is1-sigma:it doubles actual minus11-torsion and6 recovers it. An actual factor
+inclusion/subgroup evaluator is still unconstructed;functions in characteristic2
+are not split into ordinary plus/minus eigenspaces.
+
+Exact base translation and all original affine lambda/nu coefficients are
+checked through5steps,T^5=sigma,T^10=1. Transport of verified O charts gives
+four rational branches e1,1,7,7 at each O,A0,C0,D0,B0 under the written proper
+source bridge. Complete lifted base divisors now cover registered slots
+1,12,2,2,20,37. Lambda,nu,S,N source-specific valuations/zeros still need
+calculation. The failed unshifted C/D ansatz is explicitly rejected.
+
+A precise next RR target is D=7*pi^*A0+pi^*B0,degree128,dimension68 under the
+genus61/Riemann-Roch bridge. A complete basis with independent dimension check
+must precede map search. Six native attempts and both Lean attempts are
+retained;16named proofs/17audited declarations pass0failing0trusted-native.
+Node187,full coupled quotient saturation/proper polarized embedding,arbitrary
+reverse and ordinary460/367 images remain open. No new IC cost/rank claim.

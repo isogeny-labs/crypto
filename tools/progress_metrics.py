@@ -250,7 +250,7 @@ def koblitz_modular_augmentation(ref, since):
 def koblitz_modular_geometry(ref, since):
     """Export exact recorded certificate counts, never cost or subgroup rank."""
     base = "research/koblitz_modular_ic_20261018/rounds/"
-    for round_id in (24, 25):
+    for round_id in (24, 25, 26):
         path = f"{base}{round_id}/results.json"
         for date, commit, text in file_history(ref, path, since):
             record = json.loads(text)
@@ -262,7 +262,7 @@ def koblitz_modular_geometry(ref, since):
                 metric = "koblitz_modular.infinity_source_points"
                 label = "Original infinity fiber points under the written normalization bridge; no cost claim"
                 unit = "closed points"
-            else:
+            elif round_id == 25:
                 quotient = record.get("registered_quotient", {})
                 if not (quotient.get("accepted") and quotient.get("all_pullback_residuals_zero")):
                     continue
@@ -270,6 +270,14 @@ def koblitz_modular_geometry(ref, since):
                 metric = "koblitz_modular.registered_quotient_pullbacks"
                 label = "Exact original-source pullback identities on the registered b-unit quotient; no rank claim"
                 unit = "identities"
+            else:
+                transport = record.get("normalization_transport", {})
+                if not (transport.get("accepted") and transport.get("source_fifth_iterate_residuals_zero")):
+                    continue
+                value = len(transport.get("rational_base_cusps", []))
+                metric = "koblitz_modular.rational_cusp_fibers_with_charts"
+                label = "Rational base cusp fibers with transported charts under the written normalization bridge"
+                unit = "base cusps"
             emit(metric, value, date=date, problem=P_IC, unit=unit,
                  better="neutral", label=label, source=f"{path}@{commit}")
 

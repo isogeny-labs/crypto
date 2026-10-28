@@ -1,6 +1,16 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [25](rounds/25/README.md): the original quadratic
+The current round is [26](rounds/26/README.md): exact diamond norms exclude
+the invariant quotient as a carrier of the intended CM factor under the
+retained modular bridge. Prym differences act by2 and recover via6 at11.
+The original source fifth iterate is checked exactly, transporting charts
+to all five rational cusps and completing the lifted base-derived entry
+divisors. The next prescribed RR space has degree128/dimension68 under the
+genus61 bridge; its complete basis is still required. See the
+[construction](rounds/26/CM.md),[proof map](rounds/26/PROOF_MAP.md) and
+[next steps](rounds/26/NEXT.md).
+
+[Round25](rounds/25/README.md) records the original quadratic
 source involution, thirteen exact pullback equations for its registered
 b-unit affine quotient, direct norms and fourteen audited Lean identities.
 See the [geometry](rounds/25/CM.md), [PDF](rounds/25/report.pdf),
