@@ -140,6 +140,22 @@ pub enum CurveSpec {
     /// `p ≡ 1 (mod 4)`, `p < 2^15`.  Unregistered: ICV1 has no
     /// extension-field form.
     Fp4Translation { p: u64, seed: u64 },
+    /// Frozen finite-extension fixture for the three-leads study. The source
+    /// is a short odd curve or normalized ordinary binary curve, never a
+    /// Jacobian masquerading as an elliptic input.
+    ThreeLeads {
+        p: u64,
+        n: u32,
+        modulus: u64,
+        a: u64,
+        b: u64,
+        group_order: u64,
+        r: u64,
+        gx: u64,
+        gy: u64,
+        family: String,
+        parameter: u64,
+    },
     /// `gls_fp2::generate_gls_instance(p_bits, seed, max_cofactor)`: the
     /// GLS twist over `F_{p²} = F_p[s]/(s² − ν)` of a curve over `F_p`,
     /// `p` of `p_bits ≤ 24` bits, with the verified `ψ` (`ψ² = −1` on the
@@ -251,6 +267,41 @@ impl CurveSpec {
     /// Build the instance, or say why it cannot be built.
     pub fn build(&self) -> Result<Instance, String> {
         match *self {
+            CurveSpec::ThreeLeads {
+                p,
+                n,
+                modulus,
+                a,
+                b,
+                group_order,
+                r,
+                gx,
+                gy,
+                ref family,
+                parameter,
+            } => {
+                if r < 3 || n == 0 || n > 30 || (p != 2 && n > 2) {
+                    return Err("invalid three-leads field or subgroup parameters".into());
+                }
+                let f = crate::cryptanalysis::three_leads::Field::new(p, n as usize, modulus);
+                let c = if p == 2 { [b, 0, a, 1] } else { [b, a, 0, 1] };
+                let i = crate::cryptanalysis::three_leads::StudyInstance {
+                    curve: crate::cryptanalysis::three_leads::Elliptic {
+                        f,
+                        c,
+                        binary: p == 2,
+                    },
+                    order: group_order,
+                    r,
+                    h: group_order / r,
+                    generator: crate::cryptanalysis::three_leads::Point::affine(gx, gy),
+                    family: family.clone(),
+                    parameter,
+                    evidence: json!({"source":"frozen three-leads fixture manifest"}),
+                };
+                i.validate()?;
+                Ok(Instance::ThreeLeads(Box::new(i)))
+            }
             CurveSpec::PrimePublicFixture {
                 p,
                 a,
@@ -563,6 +614,7 @@ impl CurveSpec {
             | Instance::Fp4(_)
             | Instance::Fp4Torsion(_)
             | Instance::F2m4(_)
+            | Instance::ThreeLeads(_)
             | Instance::Ext(_) => None,
             // The thread rule and the order's point counts are the slow
             // part; a child rebuilds from the explicit model.
@@ -584,6 +636,7 @@ impl CurveSpec {
     /// The constructor call, in the registry's `generator_call` form.
     pub fn call(&self) -> String {
         match *self {
+            CurveSpec::ThreeLeads {p,n,a,b,ref family,parameter,..}=>format!("three_leads_explicit(p={p},n={n},a={a},b={b},family={family},parameter={parameter})"),
             CurveSpec::PrimeSearch { bits, seed } => {
                 format!("find_prime_order_curve({bits}, {seed})")
             }
@@ -670,6 +723,7 @@ impl CurveSpec {
 
 /// A built curve instance.
 pub enum Instance {
+    ThreeLeads(Box<crate::cryptanalysis::three_leads::StudyInstance>),
     Prime(PrimeInstance),
     /// A curve over `F_{p⁴}` with rational 2-torsion (`fp4_torsion`).
     Fp4Torsion(Box<D4Curve>),
@@ -886,6 +940,7 @@ fn matching_representation(entry: &Value, r: u128, gx: u128, gy: u128) -> Option
 impl Instance {
     pub fn r(&self) -> u128 {
         match self {
+            Instance::ThreeLeads(i) => u128::from(i.r),
             Instance::Prime(i) => u128::from(i.r),
             Instance::Binary(i) => u128::from(i.r),
             Instance::Wide(i) => i.kc.r,
@@ -901,6 +956,9 @@ impl Instance {
     }
 
     pub fn facts(&self, spec: &CurveSpec) -> CurveFacts {
+        if let Instance::ThreeLeads(i) = self {
+            return super::three_leads::facts(i, spec);
+        }
         let jac = match self {
             Instance::Genus2(i) => Some((
                 i.names(),
@@ -1049,6 +1107,7 @@ impl Instance {
                 if i.koblitz.is_some() { 2 * i.n } else { 2 },
             ),
             Instance::Fp4(_)
+            | Instance::ThreeLeads(_)
             | Instance::Ext(_)
             | Instance::Genus2(_)
             | Instance::Quartic(_)
@@ -1161,6 +1220,10 @@ impl Instance {
         if let Instance::Fp4(i) = self {
             return i.mul_generator_hex(k);
         }
+        if let Instance::ThreeLeads(i) = self {
+            let p = i.curve.mul(i.generator, k);
+            return (!p.inf).then(|| [format!("0x{:x}", p.x), format!("0x{:x}", p.y)]);
+        }
         if let Instance::Ext(i) = self {
             return i.mul_generator_hex(k);
         }
@@ -1209,6 +1272,7 @@ impl Instance {
             }
             Instance::Wide(_)
             | Instance::Fp4(_)
+            | Instance::ThreeLeads(_)
             | Instance::Ext(_)
             | Instance::Genus2(_)
             | Instance::Quartic(_)
@@ -1235,7 +1299,8 @@ impl Instance {
     ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
-        if let Instance::Fp4(_) | Instance::Hyper(_) = self {
+        if let Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) = self {
+            // Planted targets only on E(F_{p⁴}): no public-target law yet.
             // Planted targets only on E(F_{p⁴}) and on the hyperelliptic
             // Jacobians: no public-target law yet.
             return None;
@@ -1285,7 +1350,10 @@ impl Instance {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
                 }
-                Instance::Wide(_) | Instance::Fp4(_) | Instance::Hyper(_) => {
+                Instance::Wide(_)
+                | Instance::Fp4(_)
+                | Instance::ThreeLeads(_)
+                | Instance::Hyper(_) => {
                     unreachable!("handled above")
                 }
                 Instance::Ext(i) => {
