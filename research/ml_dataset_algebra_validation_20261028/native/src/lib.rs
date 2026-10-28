@@ -83,7 +83,7 @@ fn validate_limits(l: &Limits) -> Result<()> {
         "producer limits exceed frozen profile",
     )?;
     require(
-        l.max_events >= 2 && l.max_stream_bytes >= 1024 && l.max_event_bytes > 0,
+        l.max_events >= 2 && l.max_stream_bytes >= 2048 && l.max_event_bytes >= 1024,
         "producer limits cannot hold reserved terminal",
     )?;
     // Named component admission only, not a proof of actual allocation or RSS.
@@ -319,6 +319,13 @@ impl Replay {
     }
 
     fn next(&mut self) -> Result<Event> {
+        // The native visitor emits the first row beyond its native row cap,
+        // then stops. Preserve that bounded acknowledged candidate as censored
+        // evidence; no further arithmetic event may follow it.
+        require(
+            self.products.len() as u64 <= self.row_cap,
+            "nonterminal event after native row cap was crossed",
+        )?;
         loop {
             match self.stage {
                 Stage::Candidates => {
@@ -362,11 +369,7 @@ impl Replay {
                     let matrix_row = if terms.is_empty() {
                         None
                     } else {
-                        require(
-                            self.products.len() < 4096
-                                && (self.products.len() as u64) < self.row_cap,
-                            "matrix exceeds native row cap",
-                        )?;
+                        require(self.products.len() < 4096, "matrix exceeds checker row cap")?;
                         self.products.push(terms.clone());
                         Some((self.products.len() - 1) as u64)
                     };

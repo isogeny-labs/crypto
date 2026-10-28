@@ -500,3 +500,57 @@ fn producer_and_parser_resource_limits_fail_closed() {
     let mut reader = Cursor::new(b"x\n");
     assert!(line(&mut reader, &mut bytes).is_err());
 }
+
+#[test]
+fn native_row_cap_crossing_is_a_valid_last_candidate_but_cannot_continue() {
+    let mut events = vec![
+        begin(2, 1, &[vec![0]]),
+        Event::Input {
+            index: 0,
+            terms: vec![0],
+        },
+        Event::Candidate {
+            index: 0,
+            generator: 0,
+            multiplier: 0,
+            terms: vec![0],
+            matrix_row: Some(0),
+        },
+        Event::Candidate {
+            index: 1,
+            generator: 0,
+            multiplier: 1,
+            terms: vec![1],
+            matrix_row: Some(1),
+        },
+    ];
+    if let Event::Begin { native_row_cap, .. } = &mut events[0] {
+        *native_row_cap = 1;
+    }
+    let prefix = check(&events).unwrap();
+    assert!(!prefix.matrix_trace_complete && prefix.independent_rank.is_none());
+    let mut stopped = events.clone();
+    stopped.push(Event::Stopped {
+        reason: StopReason::NativeSizeLimit,
+        acknowledged_before_stop: 4,
+    });
+    let report = check(&stopped).unwrap();
+    assert_eq!(report.acknowledged_records, 5);
+    assert!(!report.stop_reason_independently_verified);
+    events.push(Event::Candidate {
+        index: 2,
+        generator: 0,
+        multiplier: 2,
+        terms: vec![2],
+        matrix_row: Some(2),
+    });
+    assert!(check(&events).unwrap_err().contains("after native row cap"));
+    for (stream_bytes, event_bytes) in [(1024, 65536), (4194304, 1023)] {
+        let mut invalid = constant();
+        if let Event::Begin { limits, .. } = &mut invalid[0] {
+            limits.max_stream_bytes = stream_bytes;
+            limits.max_event_bytes = event_bytes;
+        }
+        assert!(check(&invalid).is_err());
+    }
+}
