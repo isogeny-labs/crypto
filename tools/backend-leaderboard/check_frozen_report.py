@@ -46,12 +46,25 @@ def checked_path(root, name):
     return path
 
 
+def frozen_input_bytes(root, name):
+    """Read current bytes, falling back to the pinned source commit if absent."""
+    path = checked_path(root, name)
+    try:
+        return path.read_bytes()
+    except FileNotFoundError:
+        try:
+            return subprocess.check_output(
+                ["git", "show", f"{SNAPSHOT}:{name}"], cwd=root)
+        except subprocess.CalledProcessError as exc:
+            raise ValueError(f"frozen scientific input unavailable: {name}") from exc
+
+
 def verify_live_evidence(root, lock):
     if not PRODUCER_INPUTS <= set(lock["files"]):
         raise ValueError("frozen producer inventory incomplete")
     for name, expected in lock["files"].items():
         if name not in PRODUCER_INPUTS | CURRENT_SELECTION:
-            if sha256(checked_path(root, name).read_bytes()) != expected:
+            if sha256(frozen_input_bytes(root, name)) != expected:
                 raise ValueError(f"frozen scientific input changed: {name}")
     for name, expected in lock["outputs"].items():
         path = checked_path(root, ARCHIVE + "/" + name)

@@ -47,6 +47,24 @@ class FrozenReportControls(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "frozen scientific input changed"):
             report.verify_live_evidence(self.root, self.lock)
 
+    def test_missing_scientific_record_uses_pinned_snapshot_bytes(self):
+        path = self.root / "research/control/records.jsonl"
+        expected = path.read_bytes()
+        path.unlink()
+        with patch.object(report.subprocess, "check_output", return_value=expected) as show:
+            report.verify_live_evidence(self.root, self.lock)
+        show.assert_called_once_with(
+            ["git", "show", f"{report.SNAPSHOT}:research/control/records.jsonl"],
+            cwd=self.root)
+
+    def test_missing_scientific_record_without_snapshot_is_refused(self):
+        (self.root / "research/control/records.jsonl").unlink()
+        error = report.subprocess.CalledProcessError(128, ["git", "show"])
+        with patch.object(report.subprocess, "check_output", side_effect=error):
+            with self.assertRaisesRegex(
+                    ValueError, "frozen scientific input unavailable"):
+                report.verify_live_evidence(self.root, self.lock)
+
     def test_changed_scientific_record_is_refused(self):
         (self.root / "research/control/records.jsonl").write_text("replacement")
         with self.assertRaisesRegex(ValueError, "frozen scientific input changed"):
