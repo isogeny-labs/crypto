@@ -698,3 +698,6 @@ pub fn verify<R: BufRead>(mut reader: R, expected: &Binding) -> Result<Report> {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod interop;
