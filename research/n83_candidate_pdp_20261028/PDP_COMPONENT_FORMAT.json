@@ -1,0 +1,60 @@
+{
+  "schema": "n83.paired-component-layout/v1",
+  "catalog/index.json": {
+    "encoding": "UTF-8 JSON",
+    "contains": "input identities, source hashes and sizes, variable blocks, per-equation index names, Boolean degree/term summaries"
+  },
+  "catalog/*.equations.jsonl": {
+    "encoding": "UTF-8 JSON lines",
+    "record": "one original equation, original source byte_offset and byte_length, line_1_based, equation_id, field_equation, Boolean degree/terms/support where applicable"
+  },
+  "closure/<id>/basis.rows.u64le": {
+    "encoding": "binary little endian",
+    "header_bytes": 28,
+    "header": [
+      "offset0:8 bytes magic N83V2R1 followed by newline",
+      "offset8:u32 variable count n",
+      "offset12:u64 column count C=1+n+n(n-1)/2",
+      "offset20:u64 words W=ceil(C/64)"
+    ],
+    "record_bytes": "8*W",
+    "record": "one immutable inserted row in insertion order; bit c is the F2 coefficient of column c",
+    "columns": {
+      "0": "constant",
+      "1+i": "variable i, zero based",
+      "1+n+j*(j-1)/2+i": "variable product i*j, 0<=i<j<n"
+    }
+  },
+  "closure/<id>/operations.jsonl": {
+    "encoding": "UTF-8 JSON lines",
+    "record": "step, source equation ID or prior parent-row ID and zero-based variable, prior xor_basis_rows, inserted_row ID or null for zero"
+  },
+  "closure/<id>/result.json": {
+    "encoding": "UTF-8 JSON",
+    "contains": "input identity, source hash, closure rank, linear row IDs, free variables, all exhaustively checked assignments and whether each satisfies every original equation, optional exact LFD2 certificate or lower bound"
+  },
+  "first-fall/<id>.json": {
+    "schema": "degree-fall.certificate/v1",
+    "contains": "source identity, rank/witness or prime minor, exact first fall or lower bound; not last fall"
+  },
+  "status/*.json": {
+    "contains": "actual producer/replay exit codes including limits and errors"
+  },
+  "summary.json": {
+    "schema": "n83.fixed-fall-summary/v1",
+    "contains": "48 inputs per arm, separate first fall, closure/LFD and null regularity fields"
+  },
+  "manifest.sha256": {
+    "encoding": "sha256sum format",
+    "contains": "relative paths and hashes of every raw file except the manifest itself"
+  },
+  "instruments/*": {
+    "encoding": "ELF native executable",
+    "contains": "exact frozen producer binaries"
+  },
+  "retention": "Append new run IDs and amendments; preserve partial and failed outputs. Never treat an incomplete file as a completed certificate.",
+  "path_prefix": "All paths below are relative to ARM/ within paired raw run, except root manifest and instruments.",
+  "replay/*.log": {
+    "contains": "Fresh-process JSON receipt or preserved stdout/stderr failure text. Producer replay only."
+  }
+}

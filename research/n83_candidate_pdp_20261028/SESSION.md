@@ -91,3 +91,31 @@ corrected to three family directories, then verified all384 actual objects.
 Preserved both logs. Native test logs retain terminal blank lines; scoped Git
 whitespace attribute preserves their bytes. App PR attachment call did not
 return; existing PR2706 itself was successfully updated via GitHub CLI.
+
+## Paired native computations completed
+
+### What was done
+
+Terminal exit0 at06:25:17UTC; all96FFD cases,64V2 closures,160 fresh replays and
+96 catalogs complete. All989 raw manifest checks pass. Native paired summary
+checks48 target/tuple/witness identities. Prepared full deterministic archive
+SHA25625f88306bde0643f435ffe3db3ab1de9c95952f9e3476242083d4ab551c23845.
+
+### Decisions made
+
+Report actual difference: same binaryFFD2, but m2 candidate linear rank17 versus
+baseline53/54; only baseline has globalLFD2 certificates. This is not proof of
+candidateLFD>2. For m3..9 linear rank1 remains in botharms. PrimeFFD>=5 remains
+only a lower bound. No candidate regularity/elite improvement established.
+
+### Open threads
+
+Publish archive/export/report. Next: bounded native V3 closure on the saved m2
+candidate systems, with explicit degree3fall and global upper-certificate tests;
+freeze before data. Preserve allm2..9 andprime outstanding requirements.
+
+### Errors
+
+No production process or replay error. ExactLFD unknown is a mathematical
+coverage limit, not a failed process. Root progress-metrics reservation remains
+outside this study's write scope.

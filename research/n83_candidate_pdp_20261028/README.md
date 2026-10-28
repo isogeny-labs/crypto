@@ -49,3 +49,26 @@ No candidate degree measurement is claimed by the enumeration report.
 The shared progress-metrics exporter was reserved by Conductor task T-705 when
 publication was prepared. Its integration remains a separate pending task;
 actual committed counts are available directly from `data/index.json`.
+
+## Completed paired FFD/V2 panel
+
+Run `n83-candidate-paired-falls-20261028-r1` completed06:18:11–06:25:17UTC.
+All96 FFD computations,64 binary V2 closures,160 producer replays and96 equation
+catalogs completed. The48 target pairs have identical targets and planted tuples.
+`evidence/pdp/paired-summary.json` records the paired native results;
+`experiment-pdp.export.json` binds them to `protocol-pdp.json`.
+
+Both arms have FFD=2 for all32 binary/Koblitz inputs per arm. All16 prime inputs
+per arm have FFD>=5, with exact FFD unknown. For the four binary/Koblitz m2 cases,
+baseline linear rank is53(planted) or54(natural) with LFD=2 certificates; spike40
+linear rank is17 and exact LFD remains unknown. For m3..9, both arms have V2
+linear rank1 and unknown exact LFD. This does not establish a higher spike40 LFD
+or lower regularity. It records a difference in degree-two elimination despite
+identical FFD. No elite-base improvement is established.
+
+`PDP_FORMAT.json` and `PDP_COMPONENT_FORMAT.json` describe inputs, equation byte
+offsets, variable blocks, u64 closure-row encoding and operation/replay records.
+`evidence/pdp-storage.json` describes the complete raw archive and S3 provenance.
+The next mathematical measurement is a higher-degree closure on these preserved
+m2 candidate systems, with explicit new-fall witnesses and a separately frozen
+protocol. Larger-m LFD, prime LFD and candidate regularity remain open.
