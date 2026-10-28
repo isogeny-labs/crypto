@@ -1,5 +1,29 @@
 # n83 spike40 factor bases and matched PDP work
 
+
+## Latest exact m2 results
+
+All retained original, paired baseline and spike40 m2 systems now have exact
+original-top vanishing degrees: **Koblitz28, binary28, prime42**, for both planted
+and natural targets. These replace the earlier m2 intervals below; the earlier
+certificates remain historical evidence. The same2^27-candidate base per family
+is reused across m2..9. Higher-m bounds and unknowns remain as recorded below.
+
+- Binary/Koblitz: [12-case summary](evidence/binary-pair/verified-summary.json),
+  [export](experiment-binary-pair.export.json), [proof](BINARY_PAIR_DESIGN.md),
+  [file encodings](BINARY_PAIR_FORMAT.json), [report](reports/run-20261028T1715Z/report.pdf).
+  All12 producer,12 fresh and12 S3-restored replays passed;60 raw manifest entries
+  verified. The Hilbert arrays are bounds, not exact full Hilbert functions.
+- Prime: [six-case summary](evidence/hilbert/verified-summary.json),
+  [export](experiment-hilbert.export.json), [file encodings](HILBERT_FORMAT_V2.json),
+  [report](reports/run-20261028T1632Z/report.pdf). Exact full Hilbert functions;
+  all six S3-restored replays passed. The failed first attempt remains archived.
+
+Spike40 has binary quadratic rank67 versus53 but equal m2 regularity. Paired
+binary/Koblitz LFD remains2 for baseline and3 for spike40. No elite-base gain or
+universal FFD/LFD conclusion is established. Independent review and full algebraic
+formalization remain separate from producer replay. See [next work](NEXT_EXACT.md).
+
 The complete **spike40** point dataset is at `data/index.json`. Every curve has
 134,217,728 candidate x-values and 128 shards. The coordinate map is
 `x=(index & (2^26-1)) | ((index>>26)<<40)`. The same base serves m=2..9.

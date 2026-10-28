@@ -501,3 +501,25 @@ Larger-m regularity/LFD and held-out base comparisons remain open.
 Initial pre-data protocol validation lacked the required draft freeze record;
 rejected draft/log preserved, corrected before freeze and execution. No production
 case failed. Earlier PR conflict remains unrelated to these numerical results.
+
+## 2026-10-28 — Binary m2 report and metrics
+
+### What was done
+Data4f52357908d committed/pushed before the two-page report. Both PDF pages
+visually inspected. All60 new progress metrics equal the committed native
+summary; full recent export823 rows. README now points to exact m2 results
+for all families and preserves the older interval tables as historical evidence.
+
+### Decisions made
+Report shows exact binary degree28 alongside Hilbert coefficient bounds; the
+latter are never labelled an exact full function. Keep larger-m and held-out
+work open. Preserve report drafts, diagnostics and helpers in support archive.
+
+### Open threads
+Publish report/support archive, update PR2706 and inspect its exact current head.
+Independent review and broader FFD/LFD/base-search objectives remain open.
+
+### Errors
+Initial Typst render required a context block for the page counter. Failed
+render log and original source retained; corrected two-page output inspected.
+No mathematical data or frozen instrument changed.
