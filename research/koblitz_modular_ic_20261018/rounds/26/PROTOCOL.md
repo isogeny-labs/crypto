@@ -77,3 +77,14 @@ Check O maps toA0 with original local uniformizer leading coefficient1.
 The proper source-chart transport and cusp-cycle interpretation use the
 written R16/R18 moduli/normal-curve bridge; no new original-coordinate
 valuations or complete divisor is inferred. Resource/detector caps unchanged.
+
+## Prospective source-orbit strengthening
+TRANSPORT01 accepts the exact base action/period and universal Tate/line
+change. One final SOURCEORBIT26 call strengthens the written source inverse:
+iterate the actual affine lambda/nu transformation coefficients five times
+in the exact quadratic base function field, retaining each intermediate
+coefficient. Require lambda coefficient1/offsetA,nu coefficient1/lambda
+coefficient0/offsetb at step5. Together with sigma^2=1 this gives the actual
+rational T^10 identity and inverse T^9. No finite fixture substitutes for
+these function-field equalities; same4GiB/1200s cap. No further native calls
+are planned beyond implementation corrections, and no CDseries is launched.
