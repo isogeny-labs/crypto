@@ -40,7 +40,7 @@ pub const MAX_SIEVE_DEGREE: u32 = 26;
 
 /// Why `strict4e` cannot be offered on an instance, or `None` if it can.
 pub fn strict4e_refusal(inst: &BinaryInstance) -> Option<String> {
-    if inst.n % 2 == 0 {
+    if inst.n.is_multiple_of(2) {
         return Some(format!("n = {} is even; the 4E criterion needs odd n", inst.n));
     }
     if inst.cofactor != 4 {
@@ -111,6 +111,9 @@ impl X4Map {
 /// Deterministic splitmix64 stream.
 pub struct SplitMix(pub u64);
 impl SplitMix {
+    // The frozen stream returns a word on every draw; an Iterator would change
+    // the call sites to Option<u64> without adding a termination condition.
+    #[allow(clippy::should_implement_trait)]
     pub fn next(&mut self) -> u64 {
         self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
         let mut z = self.0;
@@ -180,7 +183,7 @@ pub fn strict4e_sieve(map: &X4Map, l: u32, seed: u64) -> Result<SelectedBasis, S
             }
             if ok {
                 seen += 1;
-                if rng.next() % seen == 0 {
+                if rng.next().is_multiple_of(seen) {
                     pick = v;
                 }
             }
@@ -208,7 +211,7 @@ pub fn strict4e_sieve(map: &X4Map, l: u32, seed: u64) -> Result<SelectedBasis, S
                     }
                     std::cmp::Ordering::Equal => {
                         ties += 1;
-                        if rng.next() % ties == 0 {
+                        if rng.next().is_multiple_of(ties) {
                             best = v;
                         }
                     }

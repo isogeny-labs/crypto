@@ -3,7 +3,7 @@
 //! Every physical step (including seek and doubling) is charged. Existing
 //! registered walks and their replay semantics remain unchanged.
 use super::generic::GenericOutcome;
-use crate::cryptanalysis::ic_boundary::{addmod, invmod, mulmod, CountedGroup, GroupOps};
+use crate::cryptanalysis::ic_boundary::{addmod, invmod, mulmod, CountedGroup};
 use std::collections::BTreeMap;
 
 fn hash(mut x: u64) -> u64 {
@@ -227,6 +227,7 @@ pub fn solve<G: CountedGroup>(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::cryptanalysis::ic_boundary::GroupOps;
     // Exact cyclic group oracle. Model bookkeeping test; not a curve benchmark.
     struct Z;
     impl CountedGroup for Z {
