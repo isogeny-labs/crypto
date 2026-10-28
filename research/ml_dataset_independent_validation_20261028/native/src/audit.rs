@@ -687,13 +687,17 @@ fn audit_cell(root: &Path, info: &PlanInfo, arithmetic: bool) -> Result<Value> {
     }
     let root_checks =
         root_certificates(root, &members, &public, &base, &config, outcome, arithmetic)?;
+    let filter_checks =
+        crate::large_prime::audit(root, &members, &public, &base, &config, outcome, arithmetic)?;
     let manifest_sha = digest(&manifest_bytes);
-    Ok(
-        json!({"id":manifest_sha,"index":index,"config":config,"public":public,"factor_base":base,
+    let mut row = json!({"id":manifest_sha,"index":index,"config":config,"public":public,"factor_base":base,
         "outcome":outcome,"phase_measurements":phase_measurements(root,&members)?,
         "positive_certificate_arithmetic":checks,"root_certificate_arithmetic":root_checks,
-        "artifact_roles":roles,"manifest_sha256":manifest_sha}),
-    )
+        "artifact_roles":roles,"manifest_sha256":manifest_sha});
+    if let Some(checks) = filter_checks {
+        row["large_prime_filter_arithmetic"] = checks;
+    }
+    Ok(row)
 }
 
 fn root_certificates(
@@ -840,17 +844,38 @@ pub fn audit(root: &Path, expected: Option<&str>, arithmetic: bool) -> Result<(V
             )?)
             .context("root certificate count overflow")?;
     }
-    Ok((
-        json!({"schema":"ml-dataset.consumer-audit/v1","run_sha256":info.run_sha,
+    let mut summary = json!({"schema":"ml-dataset.consumer-audit/v1","run_sha256":info.run_sha,
         "trusted_run_anchor_checked":expected.is_some(),"plan_sha256":info.plan_sha,"planned_cells":info.total,
         "checked_cells":rows.len(),"incomplete_attempts":incomplete,"outcomes":counts,
         "hashes_and_cross_artifact_bindings_verified":true,"mathematics_independently_verified":false,
         "producer_native_replay_passed":false,"independent_arithmetic_requested":arithmetic,
         "positive_certificates_arithmetic_checked":checked_certificates,
         "completed_distinct_root_sets_checked":checked_root_sets,
-        "remote_rechecked":false,"full_scope_complete":false}),
-        rows,
-    ))
+        "remote_rechecked":false,"full_scope_complete":false});
+    if rows
+        .iter()
+        .any(|r| r.get("large_prime_filter_arithmetic").is_some())
+    {
+        let mut counts = BTreeMap::new();
+        for field in [
+            "completed_batches_checked",
+            "censored_prefixes_checked",
+            "source_equations_checked",
+            "complete_matrix_ranks_checked",
+        ] {
+            let mut total = 0u64;
+            for row in &rows {
+                if let Some(check) = row.get("large_prime_filter_arithmetic") {
+                    total = total
+                        .checked_add(uint(&check[field], field)?)
+                        .context("filter check count overflow")?;
+                }
+            }
+            counts.insert(field, total);
+        }
+        summary["generic_filter_finite_checks"] = json!(counts);
+    }
+    Ok((summary, rows))
 }
 
 fn decimal_u64(value: &Value) -> Result<u64> {
@@ -1076,6 +1101,9 @@ pub fn export_rows(rows: &[Value], path: &Path) -> Result<()> {
                     "root_sets_independently_verified":root_checks["all_supplied_root_sets_verified"]==true,
                     "whole_worker_instruction_count":null},
                 "feature_policy":"allowlisted public static inputs only; no trace/manifest/witness features"});
+            if let Some(checks) = row.get("large_prime_filter_arithmetic") {
+                record["labels"]["large_prime_filter_arithmetic"] = checks.clone();
+            }
             if versioned {
                 record["feature_policy"] = json!("consumer-static-policy-recipes-v2; distinct from producer strict-structural-allowlist-v4-policy-recipes");
                 record["feature_status"] = json!(if row["factor_base"]["construction_status"]

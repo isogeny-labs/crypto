@@ -8,7 +8,7 @@ const HELP: &str = "Independent native saved-dataset consumer\n\
   dataset-consumer export --run DIR --out FILE [--arithmetic] [--native-verifier BIN | --allow-unreplayed-preview]\n\
   dataset-consumer fetch --receipt FILE --expected-sha256 SHA --out NEW_DIR\n\
   dataset-consumer certificate --public FILE --base FILE --config FILE --certificate FILE --role ROLE\n\
-Independent arithmetic checks positive equations and completed distinct-root sets, excluding UNSAT, cost, subgroup orders and fall degrees.\n\
+Independent arithmetic checks positive equations, completed distinct-root sets and generic-v2 supplied source/filter/rank certificates; excludes UNSAT, total cost, full group orders, construction completeness and fall degrees.\n\
 Fetch reads the canonical S3 bucket and does not create a compute worker.\n";
 
 fn run() -> Result<()> {
