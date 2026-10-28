@@ -48,3 +48,25 @@ open. Prime m3..9 original top quotients are positive-dimensional in this saved
 presentation, so a finite vanishing-degree search there is inappropriate without
 an explicitly different formulation. No elite factor base or universal FFD/LFD
 conclusion is established. All prior datasets remain required evidence.
+
+## 2026-10-28 update: binary/Koblitz m2 resolved on twelve retained inputs
+
+Run n83-binary-m2-pair-20261028-r1 completed12 exact original-top degree28
+certificates and12 fresh replays, followed by12 S3-restored replays and all60
+raw manifest checks. Source ac08cf2f902; frozen protocol95cf1fbd579f98e7b766b3fceb105b833d90c372566e180defe027e13cf95ad6.
+Original/baseline/spike40, both families and both targets all have degree28.
+Original/baseline quadratic/product rank53 and spike40 rank67. This rank change
+does not lower regularity on the retained m2 panel. Keep the exact LFD2 versus3
+results distinct from these equal regularities. The complete Hilbert functions
+are not known from this certificate: stored arrays are lower/upper bounds.
+See BINARY_PAIR_DESIGN.md, BINARY_PAIR_FORMAT.json, experiment-binary-pair.export.json.
+No need to repeat the binary m2 batch. All previous data remains required.
+
+Next investigate larger-m binary highest-form structure and held-out m2
+targets under a new frozen protocol. For larger m, retain the intermediate
+83-variable blocks and the original polynomial presentation; do not extrapolate
+the m2 disjoint-pair proof. A product-span failure must remain a failed
+certificate condition, not a different-degree assertion. Before any new base
+search, define matched target sampling and keep source/preprocessing constant.
+Prime larger-m positive-dimensional top quotients, larger-m LFD and prime LFD
+remain unresolved. No elite base or universal FFD/LFD result is established.

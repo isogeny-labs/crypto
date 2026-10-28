@@ -477,3 +477,27 @@ claiming results. No new production result exists at this entry.
 ### Errors
 No native test failure in this phase. Full algebraic theorem is not formalized;
 independent review remains pending. Earlier failed phases remain preserved.
+
+## 2026-10-28 17:16 UTC — Binary m2 certificates completed
+
+### What was done
+Frozen12-case run started17:15:52Z and finished17:16:05Z, producer/replay exit0.
+All12 original/baseline/spike40 Koblitz/binary planted/natural systems have exact
+original-top regularity28. Original/baseline ranks53 and spike40 ranks67.
+All60 raw manifest entries verified after S3 restoration; downloaded executable
+replayed12 cases and all60 sealed files still matched. Export has zero findings.
+
+### Decisions made
+Publish exact degree with written/native algebraic proof and partial Lean slot
+lemma; no full Hilbert function or full formalization claim. Spike40 does not
+lower m2 original-top regularity on these saved targets. Data commit precedes
+report; keep all earlier evidence and phase failures.
+
+### Open threads
+Derived report and PR update, exact-head check status, and independent review.
+Larger-m regularity/LFD and held-out base comparisons remain open.
+
+### Errors
+Initial pre-data protocol validation lacked the required draft freeze record;
+rejected draft/log preserved, corrected before freeze and execution. No production
+case failed. Earlier PR conflict remains unrelated to these numerical results.
