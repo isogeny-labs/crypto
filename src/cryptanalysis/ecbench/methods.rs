@@ -6618,7 +6618,7 @@ mod accounting_tests {
                 let curve = PrimeCurve { p, a, b: 0 };
                 let n = curve.point_count();
                 for h in [1u64, 2, 4, 8] {
-                    if n % h != 0 {
+                    if !n.is_multiple_of(h) {
                         continue;
                     }
                     let r = n / h;
