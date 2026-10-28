@@ -2206,7 +2206,7 @@ def markdown(doc: dict) -> str:
           "the F_q root finding is done as Σ aᵢ²X²ⁱ with a per-modulus table instead of a generic product and reduction "
           "(`frob_roots=1`). Same trials, relations and logarithms; every executed multiplication is still counted. "
           "These curves have no row in tables A–C. "
-          f"{d4['unit']}; IC arms emit no unpriced counter, so only rho is repriced across the §5a band.", "",
+          f"{d4['unit']}; IC arms emit no counter for the eigen step's XOR accumulation and table lookups, so IC S is a lower bound (counted F_q multiplications only) and only rho is repriced across the §5a band; whether the gain survives pricing that work is unverified.", "",
           "| curve | target | S before → after | after ÷ before | IC ÷ rho-neg before → after (w = 0 / 0.1 / 1) |",
           "|:--|--:|:--|:--|:--|"]
     for r in d4["rows"]:
@@ -3116,7 +3116,8 @@ def page(doc: dict, standalone: bool) -> str:
              'done as Σ a<sub>i</sub>²X<sup>2i</sup> with a per-modulus table instead of a generic product and '
              'reduction (<code>frob_roots=1</code>). Same trials, relations and logarithms; every executed '
              'multiplication is still counted. These curves have no row in tables A–C. '
-             f'{esc(d4["unit"])}; only rho is repriced across the §5a band.</p>'
+             f'{esc(d4["unit"])}; IC S counts F<sub>q</sub> multiplications only (the eigen step\'s XOR and table-lookup work is not emitted), so it is a lower bound; '
+             f'only rho is repriced across the §5a band, and whether the gain survives pricing that work is unverified.</p>'
              '<div class="scroll"><table><thead><tr><th>Curve</th><th>Target</th><th>S before → after</th>'
              '<th>after ÷ before</th><th>IC ÷ rho-neg before → after (w = 0 / 0.1 / 1)</th></tr></thead><tbody>')
     for r in d4["rows"]:

@@ -35,12 +35,13 @@ because the solve cost does not depend on the outcome.
 | m = 14, 1 target | 0.8154 | [0.815, 0.815] (within; one target) | 1.0000 |
 
 IC arms emit no `*_uncharged` counter (`unpriced: []`, `lower_bound: false`), so the lever/base ratio
-is the same at w = 0, 0.1 and 1 GAE per unpriced native operation: 0.8543 at all three weights at
-m = 12 and 0.8154 at all three at m = 14. Intervals are degenerate because counts are deterministic;
+of *counted* work reads the same at w = 0, 0.1 and 1 GAE: 0.8543 at m = 12 and 0.8154 at m = 14. That
+is not a §5a robustness result: the eigen step's XOR accumulation and table lookups are real native work
+that neither session emits, so the band prices them at 0 by omission. The ratio is a counted-unit
+(F_q multiplication) result and the IC S values are lower bounds; whether the improvement survives
+pricing the uncounted work is **unverified** until those counters are emitted (open implementation gap). Intervals are degenerate because counts are deterministic;
 per-target ratios at m = 12 are 0.85430, 0.85430, 0.85432. m = 14 is one target: `within` says nothing
-about other targets. Caveat: non-multiplication native work in the eigen step (XOR accumulation, table
-lookups) is not counted for either IC arm; the lever removes it roughly in proportion, but that is not
-measured.
+about other targets. The lever is expected to remove that work roughly in proportion, but that is not measured.
 
 Against the prediction PROTOCOL.md froze: m = 12 (0.8543) falls inside its predicted interval
 [0.85, 0.97]. m = 14 (0.8154) falls just *outside* its predicted [0.82, 0.95], on the favourable side.
@@ -51,6 +52,17 @@ Per-trial components at m = 12 (300 random targets, `examples/d4_char2_profile`,
 finding 55,505 -> 22,977; total 224,196 -> 191,435; charpoly 87,728, echelon 54,809, normal forms
 21,913 unchanged (asserted equal in the unit test). In-process wall per trial 4.595 ms -> 4.439 ms
 (ratio 0.966; shared VM, one run, descriptive only).
+
+### External implementation comparison (AGENTS.md §15): outstanding
+
+The computation the lever speeds up is root finding of the eigen-step polynomial over F(2^m)
+(m = 48, 56), inside the D₄ decomposition oracle. The reference tools for that are FLINT
+(`fq_nmod_poly` / `fq_zech_poly` roots), NTL (`GF2EX` `FindRoots`), Magma and PARI/GP. None was run
+on these inputs: no exporter of the per-trial polynomials exists yet and none of the tools is installed
+on this host. So this study measures progress against our own previous kernel only (§10) and says
+nothing about where the kernel stands against them; no "fastest" claim is made. Still missing: an
+exporter of the per-trial polynomials, and an equal-output, same-host, single-thread timing against
+FLINT and NTL (Magma if a licence is available).
 
 ### Is this relabelling or accounting?
 
@@ -102,5 +114,7 @@ Receipts: `results/lever-m12.audit.json`, `results/lever-m14.audit.json`.
 3. Raise the 0.5 % per-trial success (second coset, larger Artin-Schreier class).
 4. An L2 wall session to see whether the counted gain survives.
 
-Not touched: leaderboard, `benchmarks/README.md` (no VALIDATION.json), no PR. Graph:
+After validation (`VALIDATION.json`, validated with caveats): leaderboard component section
+(`docs/ic/LEADERBOARD.md`, outside tables A–C) and benchmarks entry
+(`benchmarks/20261028-d4-char2-frob-roots/`). Graph:
 `figures/s_lever.svg` (data `results/table-m*.tsv`, layout `figures/plot.py`); PDF: `REPORT.pdf`.
