@@ -59,3 +59,35 @@ remains reserved; this scoped log preserves the handoff.
 Periodic S3 uploader logged disappearing .partial paths during native rename;
 final terminal sync succeeded. Raw launcher diagnostics copied without changes.
 PMC literature endpoint returned a browser challenge; primary arXiv text readable.
+
+## Paired panel launched after freeze
+
+### What was done
+
+Data/source commitca3ac5bd0d3 pushed, then report/protocol commitb6be02f7ffe
+pushed. Protocol36a0b990d80dbe2e4660d1910eed3dfa39e23bea4cb4630b4b5eeac2ba4531ab
+frozen before all paired data. Started fresh pdp-r1 with exact pinned executables.
+Baseline generation checks original natural source hashes; all48 baseline first
+fall computations completed. Fresh replays and V2 closures run under native caps.
+All384 candidate artifact remote checks report384 hydrated,0 problems.
+
+### Decisions made
+
+Retain current process/session40872; never duplicate this run on observation
+latency. Raw prefix runs/n83-candidate-paired-falls-20261028-r1/local/. Source
+archive SHA256 de1a23cd8ece0b5fb28c54ea62e77d428370a7469095887fd19559ee6489ab0b
+is stored at the run's source/frozen-source.tar.xz key.
+
+### Open threads
+
+Finish both arms, validate all outcome/replay statuses, archive/export/publish
+actual paired results and render a new report. Candidate regularity/solving
+degree remains unmeasured and elite-base status unestablished.
+
+### Errors
+
+Initial artifact verification pointed at parent data/ and inspected0 entries;
+corrected to three family directories, then verified all384 actual objects.
+Preserved both logs. Native test logs retain terminal blank lines; scoped Git
+whitespace attribute preserves their bytes. App PR attachment call did not
+return; existing PR2706 itself was successfully updated via GitHub CLI.
