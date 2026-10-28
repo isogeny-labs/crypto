@@ -279,3 +279,13 @@ failed projections, validate export, publish data then the report.
 Initial protocol inspection used a nonexistent design key; the schema uses
 variable_ledger and top-level controls. Corrected the drafting helper before
 any protocol freeze or production data. Prior datasets remain unchanged.
+
+### Pre-freeze structural check
+
+Added an explicit prime paired graded-isomorphism check before any affected data:
+each selector maps diagonally by1 or2^14, with its inverse modulo the saved p.
+Both original prime presentations must pass the complete source/formula checks.
+This distinguishes a possible equality certificate from coincident bounds.
+Ten unit controls pass, including inverse/weight agreement and wrong-map rejection.
+The first protocol draft failed because the required draft freeze block was
+absent; retained that draft and finding, then corrected before freeze.

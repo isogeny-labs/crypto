@@ -52,7 +52,7 @@ must verify the actual weight map and equations before admitting this proof.
 Interleave arms for each of48 cases. Preserve per-case errors and continue
 other cases. Fresh-process replay recomputes every source check, top monomial,
 map, linear XOR certificate and result. No measured wall time or speed claim.
-Nine native unit controls cover failed maps, linear tops, cancellation, missing
+Ten native unit controls cover failed maps, linear tops, cancellation, missing
 fields, duplicate equations, changed weights and both new certificate methods.
 
 Freeze source, executable, two input-index hashes, every per-input source hash,
@@ -63,3 +63,15 @@ EKS shared-bucket denial; refreshed inventory shows no duplicate. Preserve
 partial summaries and upload every30s and on terminal exit. This is not a
 checkpoint resume contract. Full raw snapshot and failed development logs go
 to S3, with Git format/index/export pointers; data precede the derived report.
+
+
+For each of the16 prime pairs, additionally certify the diagonal graded map
+v_i -> c_i v_i from baseline to spike40, with c_i=2^14 for the last selector
+in each block and c_i=1 otherwise. Keep each coefficient and its inverse mod p,
+and check each source selector weight maps exactly. The already checked highest
+S3 formulas map onto their counterparts; selector-square generators acquire
+nonzero scalar multiples. Thus the original top ideals have isomorphic graded
+quotients and equal Hilbert functions. This certifies equality of regularity
+under the recorded convention, not an affine-selector ideal isomorphism or a
+universal assertion about other bases/encodings. Add this check before freeze;
+no affected production data have yet been taken.

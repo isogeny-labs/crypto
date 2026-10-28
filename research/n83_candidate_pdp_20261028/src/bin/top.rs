@@ -296,6 +296,43 @@ fn linear_upper(polys: &[(usize, Vec<Vec<usize>>)], n: usize) -> Value {
     }
     json!({"rank":basis.len(),"dreg_upper_bound":n-basis.len()+1,"basis":basis.into_iter().map(|(pivot,(variables,equation_ids))|json!({"pivot_zero_based":pivot,"variables_zero_based":variables,"original_equation_ids_xor":equation_ids})).collect::<Vec<_>>(),"argument":"All variable squares are original field tops. In characteristic2 any linear coordinate change preserves their ideal. Quotient by r independent linear tops plus squares is a square-zero polynomial ring on n-r variables; the original top quotient is its graded quotient."})
 }
+fn prime_isomorphism(a: &Value, b: &Value) -> Value {
+    let pa = positions(a);
+    let pb = positions(b);
+    let p = 4835703278761981908090881u128;
+    assert_eq!(a["field_modulus"], p.to_string());
+    assert_eq!(b["field_modulus"], p.to_string());
+    for key in ["m", "n_vars", "curve_a", "curve_b", "target_x"] {
+        assert_eq!(a[key], b[key]);
+    }
+    let m = a["m"].as_u64().unwrap() as usize;
+    let nv = a["n_vars"].as_u64().unwrap() as usize;
+    let mut map = vec![];
+    for v in 0..nv {
+        let scale = if v < m * 27 {
+            assert!(pb[v % 27] >= pa[v % 27]);
+            1u128 << (pb[v % 27] - pa[v % 27])
+        } else {
+            1
+        };
+        let inverse = (0..scale)
+            .find_map(|k| {
+                let x = k * p + 1;
+                if x % scale == 0 {
+                    Some(x / scale)
+                } else {
+                    None
+                }
+            })
+            .unwrap();
+        assert_eq!(scale * inverse % p, 1);
+        if v < m * 27 {
+            assert_eq!((1u128 << pa[v % 27]) * scale % p, (1u128 << pb[v % 27]) % p);
+        }
+        map.push(json!({"variable_zero_based":v,"scale":scale.to_string(),"inverse":inverse.to_string(),"field_top_multiplier":if v<m*27{Some((scale*scale%p).to_string())}else{None}}));
+    }
+    json!({"schema":"n83.prime-top-isomorphism/v1","id":a["id"],"baseline_source_sha256":a["source_sha256"],"spike40_source_sha256":b["source_sha256"],"field_modulus":p.to_string(),"map_direction":"Substitute baseline variable v_i by scale_i times spike40 variable v_i","variables":map,"verified_graded_quotient_isomorphism":true,"argument":"Both complete source presentations have separately passed prime() validation. Each selector linear form maps exactly to its counterpart; intermediate coordinates are unchanged. Every original S3 highest form therefore maps to the matching highest form. Each selector square maps to its recorded nonzero scalar multiple. Invertible diagonal substitution maps the two homogeneous ideals onto each other; graded Hilbert functions and graded vanishing degrees coincide. This is not an isomorphism claim for the affine Boolean selector ideals."})
+}
 fn paired(root: &Path, out: &Path, replay: bool) {
     let indices = [
         read(&root.join("baseline/inputs/inputs.json")),
@@ -309,6 +346,7 @@ fn paired(root: &Path, out: &Path, replay: bool) {
     }
     let mut rows = vec![];
     let mut replay_rows = vec![];
+    let mut prime_isomorphisms = vec![];
     for j in 0..48 {
         let a = &indices[0][j];
         let b = &indices[1][j];
@@ -364,16 +402,30 @@ fn paired(root: &Path, out: &Path, replay: bool) {
                 save(&out.join("partial-summary.json"), &json!({"rows":rows}));
             }
         }
+        if a["family"] == "prime"
+            && replay_rows[replay_rows.len() - 2..]
+                .iter()
+                .all(|r| r["verified"] == true)
+        {
+            let proof = prime_isomorphism(a, b);
+            let file = format!("isomorphism-{}.json", a["id"].as_str().unwrap());
+            if replay {
+                assert_eq!(read(&out.join(&file)), proof);
+            } else {
+                save(&out.join(&file), &proof);
+            }
+            prime_isomorphisms.push(json!({"id":a["id"],"certificate":file,"verified":true}));
+        }
     }
     if replay {
         save(
             &out.parent().unwrap().join("replay.json"),
-            &json!({"schema":"n83.paired-top-replay/v1","rows":replay_rows,"all_verified":replay_rows.iter().all(|r|r["verified"]==true),"independent_review":false}),
+            &json!({"schema":"n83.paired-top-replay/v1","rows":replay_rows,"prime_isomorphisms":prime_isomorphisms,"all_verified":replay_rows.iter().all(|r|r["verified"]==true),"independent_review":false}),
         );
     } else {
         save(
             &out.join("summary.json"),
-            &json!({"schema":"n83.paired-top-summary/v1","rows":rows,"scope":"Original saved top-form ideals; intervals are not exact regularity or LFD/solving-degree values. Greedy maps are not claimed optimal."}),
+            &json!({"schema":"n83.paired-top-summary/v1","rows":rows,"prime_isomorphisms":prime_isomorphisms,"scope":"Original saved top-form ideals; intervals are not exact regularity or LFD/solving-degree values. Greedy maps are not claimed optimal."}),
         );
     }
 }
@@ -508,5 +560,22 @@ mod tests {
     #[should_panic]
     fn duplicate_equation_rejected() {
         parse_binary("I[1]=v(1);\nI[1]=v(1)^2-v(1);", 1);
+    }
+    #[test]
+    fn prime_diagonal_map_invertible_and_weight_matched() {
+        for m in [2, 3] {
+            let (a, t) = prime_fixture(m);
+            let mut b = a.clone();
+            b["arm"] = json!("spike40");
+            b["coordinate_bit_positions"][26] = json!(40);
+            prime(&a, &t);
+            prime(&b, &t.replace("67108864*", "1099511627776*"));
+            let proof = prime_isomorphism(&a, &b);
+            assert_eq!(proof["variables"][26]["scale"], "16384");
+            assert_eq!(proof["verified_graded_quotient_isomorphism"], true);
+            let mut bad = b.clone();
+            bad["coordinate_bit_positions"][26] = json!(41);
+            assert!(std::panic::catch_unwind(|| prime_isomorphism(&a, &bad)).is_err());
+        }
     }
 }
