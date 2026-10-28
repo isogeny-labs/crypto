@@ -68,6 +68,14 @@
 //! quality pairing (Bowe / Aranha / `blst`) would be needed for the
 //! integration test to pass.
 //!
+//! **`verify` is non-functional.**  It returns `false` for the honest
+//! proof too, so it also returns `false` for every forged or tampered
+//! proof; a negative test would pass vacuously and show nothing.  No
+//! tampered-proof rejection is tested, and `verify` must not be used as
+//! evidence that a proof is bad or good (sheriff case SHF-20261028-0f3f64,
+//! S2N-9).  Add tampered-proof negative tests, with a positive control,
+//! once the pairing is fixed.
+//!
 //! What this means in practice:
 //! - The R1CS-to-QAP transformation is correct and reusable.
 //! - The SRS construction follows Groth 2016.
