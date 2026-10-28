@@ -15,7 +15,7 @@ Exact curves copied from the original frozen n83 generator:
 - Koblitz: GF(2^83), modulus z^83+z^45+z^2+z+1, y^2+xy=x^3+1.
 - Binary: the same field, y^2+xy=x^3+x^2+(2^82+0x51b).
 - Prime: p=4835703278761981908090881, y^2=x^3+2x+3; original Proth
-  certificate uses witness 3, with p-1=(2^40+29)*2^42.
+  certificate uses witness 3, with p-1=(2^40+69)*2^42.
 
 ## Algorithm and acceptance
 
