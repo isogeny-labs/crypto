@@ -2157,6 +2157,11 @@ impl Solver {
         if self.is_unsat {
             return SolveResult::Unsat;
         }
+        // A previous call may have stopped mid-search (budget or
+        // deadline), with a conflict found but not analysed.  Resuming
+        // from that trail answered wrongly; restart from level zero
+        // instead, keeping learnt clauses.
+        self.backjump(0);
         // Initial propagation at level 0 catches trivial UNSAT from
         // unit clauses.
         if self.propagate().is_some() {
@@ -2410,6 +2415,17 @@ impl Solver {
             );
             self.saved_phase[(var - 1) as usize] = value;
         }
+    }
+
+    /// Per-variable VSIDS activity, indexed by `var − 1`.  Read-only;
+    /// for studies that learn a branching order from finished solves.
+    pub fn activities(&self) -> &[f64] {
+        &self.activity
+    }
+
+    /// Variables assigned at decision level zero.
+    pub fn root_fixed_count(&self) -> usize {
+        self.trail_lim.first().copied().unwrap_or(self.trail.len())
     }
 
     /// Cumulative conflicts across all calls to [`Self::solve`].
@@ -2687,6 +2703,64 @@ pub fn check_model(clauses: &[Vec<Lit>], model: &[bool]) -> bool {
 mod tests {
     use super::*;
     use std::collections::HashSet;
+
+    /// Re-entering `solve` after a conflict-budget stop must give the
+    /// same answer as one unbounded call.  Before the level-zero restart
+    /// on entry, a resumed solve could return SAT with a model that
+    /// violates the formula, or UNSAT on a satisfiable one.
+    #[test]
+    fn resume_after_budget_stop_is_sound() {
+        let mut state = 0x2026_1027u64;
+        let mut next = || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        let (vars, clauses_n) = (60u32, 255usize);
+        let (mut sat, mut unsat) = (0, 0);
+        for _ in 0..60 {
+            let clauses: Vec<Vec<Lit>> = (0..clauses_n)
+                .map(|_| {
+                    (0..3)
+                        .map(|_| {
+                            let v = (next() % vars as u64) as i32 + 1;
+                            if next() & 1 == 1 {
+                                v
+                            } else {
+                                -v
+                            }
+                        })
+                        .collect()
+                })
+                .collect();
+            let build = || {
+                let mut s = Solver::new(vars);
+                for c in &clauses {
+                    s.add_clause(c.clone());
+                }
+                s
+            };
+            let expected = build().solve();
+            let mut s = build();
+            let mut budget = 1u64;
+            let got = loop {
+                s.conflict_budget = budget;
+                match s.solve() {
+                    SolveResult::Unknown => budget += 1 + budget / 4,
+                    r => break r,
+                }
+            };
+            assert_eq!(got, expected);
+            if got == SolveResult::Sat {
+                assert!(check_model(&clauses, &s.model()));
+                sat += 1;
+            } else {
+                unsat += 1;
+            }
+        }
+        assert!(sat > 0 && unsat > 0, "sat={sat} unsat={unsat}");
+    }
 
     // ── native XOR reasoning ────────────────────────────────────────
 
