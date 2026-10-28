@@ -11,9 +11,11 @@
     "WeightedProjQuadraticLocal.root_stalk_domain",
     "WeightedProjQuadraticLocal.root_stalk_noetherian",
     "WeightedProjQuadraticLocal.root_stalk_dvr_of_cotangent_one",
-    "WeightedProjQuadraticJacobian.root_affine_jacobian_nonzero"
+    "WeightedProjQuadraticJacobian.root_affine_jacobian_nonzero",
+    "WeightedProjQuadraticJacobian.affineTangentRow_ker_finrank_one",
+    "WeightedProjQuadraticJacobian.root_affine_tangent_finrank_one"
   ],
-  "scope": "irreducible-support weighted-Proj point; domain and Noetherian stalk; residue-field affine Jacobian nonzero under odd characteristic and separability; DVR conditional on cotangent dimension one; coheight conditional on DVR",
+  "scope": "irreducible-support weighted-Proj point; domain and Noetherian stalk; residue-field affine Jacobian nonzero and formal tangent kernel dimension one under odd characteristic and separability; actual stalk cotangent rank open; DVR conditional on that rank",
   "compiler_status": "passed",
   "compiler": "Lean 4.34.1, pinned Mathlib d13f23b723b8a846827a245b89c10fc7d3f11612",
   "compiler_command": "lake env lean WeightedProjQuadraticJacobian.lean; lake build (pinned local package and predecessor olean caches)",
@@ -24,7 +26,7 @@
   "lakefile_sha256": "918b60652ecb6ae73a6f5b0955e229ee794c8a13229c326589b470e261bf0953",
   "build_jobs": 2595,
   "default_lake_build_status": "passed",
-  "default_lake_build_jobs": 2606,
+  "default_lake_build_jobs": 2607,
   "pre_push_rust_lib_tests": {
     "first_full_run": {
       "passed": 4993,
@@ -69,6 +71,7 @@
   "global_divisor_identity_proved": false,
   "new_target_runs": 0,
   "cost_ratio": null,
-  "quadratic_jacobian_source_sha256": "19d2158ed8fa1322cc6c612d827a0196e8845f508a601d31ad1ac7c24c66ee7b",
-  "quadratic_support_affine_jacobian_nonzero_if_odd_and_separable": true
+  "quadratic_jacobian_source_sha256": "2ba790e46226cf4982fb3c268d8a6e6295dff90cc86ee74aa9d91602b12d30fd",
+  "quadratic_support_affine_jacobian_nonzero_if_odd_and_separable": true,
+  "formal_affine_tangent_kernel_dimension_one_if_odd_and_separable": true
 }
