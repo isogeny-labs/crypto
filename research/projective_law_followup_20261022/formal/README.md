@@ -521,3 +521,20 @@ data whose two quadratic supports have no F3-rational points. The
 and [gate CSV](function-field-gate.csv) mark the closed-point interpretation,
 global divisor, and Pic⁰ result as open. No new Lean theorem or cost row is
 claimed.
+
+The [infinity-chart integrality gate](PROJECTIVE_INTEGRAL.md) checks `zbar≠0`
+and supplies a [PDF](PROJECTIVE_INTEGRAL.pdf),
+[graph](projective-integral.svg), and [CSV](projective-integral.csv). The
+[actual X/Z overlap packet](PROJECTIVE_OVERLAP_NONEMPTY.md) then constructs a
+point in both weighted-Proj basic opens, with its own
+[PDF](PROJECTIVE_OVERLAP_NONEMPTY.pdf),
+[graph](projective-overlap-nonempty.svg), and
+[CSV](projective-overlap-nonempty.csv). Finally, the
+[whole-curve integrality packet](PROJECTIVE_IS_INTEGRAL.md) transports the
+two chart-domain results and uses the overlap and open cover to prove the
+actual weighted-Proj scheme is integral under separability of its quintic.
+Its [PDF](PROJECTIVE_IS_INTEGRAL.pdf),
+[graph](projective-is-integral.svg), and [CSV](projective-is-integral.csv)
+separate this checked geometric result from the still-open function-field
+element, all-closed-point principal divisor, Pic⁰ equality, and compiled
+runtime link. None of these packets changes a target or cost row.
