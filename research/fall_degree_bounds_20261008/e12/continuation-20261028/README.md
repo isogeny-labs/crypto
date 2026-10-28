@@ -15,6 +15,13 @@ starts from scratch; a failure leaves the part incomplete with no automatic
 relaunch. Output preservation is not checkpoint/restore support. Both machines
 self-terminate and have the existing deadline/reaper protections.
 
+**Capacity update:** the E12a `r7i.8xlarge` submission created no instance because
+all configured zones lacked capacity or support. Amendment 14 permits the fixed
+fallback sequence `r6a.8xlarge`, then `r6i.8xlarge`, only after a durable capacity
+error and a fresh check finding no prior instance. Both have 32 vCPU / 256 GiB.
+There can still be only one admitted E12a solver attempt. E12c's successful
+submission is not repeated.
+
 ## Submission
 
 After committing and pushing the amendment and scripts, from the repository root:
@@ -23,6 +30,11 @@ After committing and pushing the amendment and scripts, from the repository root
 bash research/fall_degree_bounds_20261008/e12/continuation-20261028/launch.sh a
 bash research/fall_degree_bounds_20261008/e12/continuation-20261028/launch.sh c
 ```
+
+The Amendment 14 alternatives are `launch.sh a-r6a`, then `launch.sh a-r6i`
+only if the prior alternative fails before creating any instance. Keep each
+prior durable status under its receipt directory before invoking the next;
+the script rechecks that status against S3 and queries EC2 before proceeding.
 
 Each command atomically creates its own receipt directory before calling the
 existing ephemeral launcher. It refuses to reuse that directory. A failed or

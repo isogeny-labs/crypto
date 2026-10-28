@@ -3,10 +3,13 @@
 set -euo pipefail
 HERE=$(cd -- "$(dirname -- "$0")" && pwd)
 ROOT=$(git -C "$HERE" rev-parse --show-toplevel)
-part=${1:?usage: launch.sh a|c}
-case "$part" in
-  a) instance_type=r7i.8xlarge; ttl=48h ;;
-  c) instance_type=r7i.4xlarge; ttl=48h ;;
+selection=${1:?usage: launch.sh a|c|a-r6a|a-r6i}
+previous=
+case "$selection" in
+  a) part=a; instance_type=r7i.8xlarge; ttl=48h ;;
+  c) part=c; instance_type=r7i.4xlarge; ttl=48h ;;
+  a-r6a) part=a; instance_type=r6a.8xlarge; ttl=48h; previous=a ;;
+  a-r6i) part=a; instance_type=r6i.8xlarge; ttl=48h; previous=a-r6a ;;
   *) echo 'Only Amendment 13 parts a and c are admitted; E12b is pending.' >&2; exit 2 ;;
 esac
 cd "$ROOT"
@@ -20,8 +23,22 @@ git diff --quiet HEAD -- "$protocol" "$launcher" "$runner" "$relative_here/launc
 git cat-file -e "HEAD:$relative_here/launch.sh"
 protocol_sha=$(sha256sum "$protocol" | cut -d' ' -f1)
 protocol_commit=$(git rev-parse HEAD)
+if [ -n "$previous" ]; then
+  previous_job=$(jq -er '.job' "$HERE/receipts/$previous/status.json")
+  previous_status=$(aws s3 cp --region us-east-1 --only-show-errors \
+    "s3://ephemeral-runs-104186811093-us-east-1/jobs/$previous_job/status.json" -)
+  jq -e --arg job "$previous_job" \
+    '.job == $job and .phase == "error" and (.reason | contains("no Spot capacity"))' \
+    <<<"$previous_status" >/dev/null
+  prior_instances=$(aws ec2 describe-instances --region us-east-1 \
+    --filters "Name=tag:ephemeral:job,Values=$previous_job" \
+    --query 'Reservations[].Instances[].InstanceId' --output json)
+  jq -e 'length == 0' <<<"$prior_instances" >/dev/null || {
+    echo 'A prior instance exists; fallback is forbidden.' >&2; exit 2;
+  }
+fi
 mkdir -p "$HERE/receipts"
-receipt="$HERE/receipts/$part"
+receipt="$HERE/receipts/$selection"
 mkdir "$receipt" || { echo 'Receipt already exists; reconcile it instead of retrying.' >&2; exit 2; }
 jq -n --arg part "$part" --arg type "$instance_type" --arg ttl "$ttl" \
   --arg commit "$protocol_commit" --arg protocol_sha "$protocol_sha" \
@@ -52,7 +69,7 @@ REMOTE
 set +e
 EPHEMERAL_REGION=us-east-1 bash "$launcher" run --detach --no-source --spot \
   --type "$instance_type" --toolchain rust --ttl "$ttl" \
-  --name "fd-e12${part}-20261028-r3" \
+  --name "fd-e12${selection}-20261028-r3" \
   --env "E12_PART=$part" --env "E12_PROTOCOL_SHA256=$protocol_sha" \
   --env "E12_PROTOCOL_COMMIT=$protocol_commit" \
   -- "$command" >"$receipt/launch.stdout" 2>"$receipt/launch.stderr"

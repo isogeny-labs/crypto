@@ -733,3 +733,27 @@ not authorized by Amendment 13; any change is recorded separately before launch.
 
 Launch scripts, the resource plan and receipts are stored under
 `e12/continuation-20261028/`. All prior attempts remain separate.
+
+## Amendment 14 (2026-10-28 UTC): E12a pre-execution capacity alternatives
+
+The Amendment 13 E12a submission
+`20261028-020921-fd-e12a-20261028-r3-4358b0` exhausted the configured zones with
+`InsufficientInstanceCapacity` or `Unsupported`. Its durable status is `error`;
+EC2 enumeration found no instance for that job. No solver, gate, or draw ran.
+E12c has been submitted separately and is not relaunched by this amendment.
+
+To fulfill the same user-requested E12a launch, allow at most two additional
+capacity submissions, in this fixed order: `r6a.8xlarge`, then `r6i.8xlarge`.
+Both are x86 hosts with 32 vCPU and 256 GiB. Source archive, seed, two draws,
+degree cap 5, gates, 48-hour lifetime, and scientific readings are unchanged.
+This amendment is committed before either fallback submission.
+
+Each alternative requires the preceding submission's durable `error` status
+to identify a no-Spot-capacity failure and a fresh EC2 check to find no instance
+for it. Preserve every failed submission in a separate receipt. If any instance
+is created, stop trying alternatives; there is only one admitted solver attempt.
+An ambiguous launch, any other error, or a started job's interruption/failure
+does not authorize an alternative. No additional instances beyond this ordered
+list are authorized here. The wrapper enforces separate receipt directories and
+the absence-of-instance check. This infrastructure amendment adds no new draw,
+changes no scientific acceptance rule, and makes no timing comparison.
