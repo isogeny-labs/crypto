@@ -465,5 +465,11 @@ weighted-Proj stalk to be domains: the quintic must have an explicitly
 supplied prime factor occurring once. Its [PDF](AFFINE_PRIME_FACTOR_DOMAIN.pdf),
 [dependency graph](affine-prime-factor-domain.svg), and
 [gate CSV](affine-prime-factor-domain.csv) state that hypothesis and mark the
-separability-to-factor implication, nonbranch DVR, norm transport, global
-Pic⁰ equation, and compiled semantics open. It changes no cost row.
+nonbranch DVR, norm transport, global Pic⁰ equation, and compiled semantics
+open. The subsequent [separable-quintic packet](SEPARABLE_AFFINE_DOMAIN.md)
+derives that factor witness from the actual monic quintic's separability and
+thereby proves the affine ring, rational-point localization, and weighted-Proj
+point stalk are domains. Its [PDF](SEPARABLE_AFFINE_DOMAIN.pdf),
+[dependency graph](separable-affine-domain.svg), and
+[gate CSV](separable-affine-domain.csv) state the checked hypotheses and
+remaining DVR/Pic⁰/runtime gates. Neither packet changes a cost row.
