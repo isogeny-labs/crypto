@@ -250,3 +250,32 @@ The fourteen-file support archive is also remotely verified. Fixed-base index
 readback exactly matches the enumerated point-data index; all96 original sweep
 attempts use ell27 and cover m2..9. The two-page derived report and next-step
 handoff are committed after data. Broader elite-base research remains active.
+
+## Paired top-form certificate preparation
+
+### What was done
+
+Reconciled all existing runs and live EKS jobs: no duplicate top-form paired job.
+Read Caminata/Gorla, Kosters/Yeo and the original top-quotient native source.
+Conductor scope for this study and progress metrics is clear. Implemented native
+paired verifier with actual selector-weight validation, six fixed binary
+projections, original-linear-top rank/XOR upper certificates and per-case errors.
+Nine relevant unit controls pass; the release instrument builds successfully.
+
+### Decisions made
+
+Keep every saved equation and target unchanged. Freeze before affected data.
+Use same existing-host fallback after recorded EKS shared-bucket denial, with
+one native process,900s each producer/replay,8GiB and1900s outer limit. No retries
+or clock claims. All96 paired systems remain in scope.
+
+### Open threads
+
+Freeze protocol and source, run/replay, preserve complete raw snapshots and
+failed projections, validate export, publish data then the report.
+
+### Errors
+
+Initial protocol inspection used a nonexistent design key; the schema uses
+variable_ledger and top-level controls. Corrected the drafting helper before
+any protocol freeze or production data. Prior datasets remain unchanged.

@@ -1,0 +1,16 @@
+{
+ "schema":"n83.paired-top-layout/v1",
+ "inputs/ARM/inputs/inputs.json":"48 input records per arm, preserving exact source, curve, target, point manifest and coordinate positions",
+ "inputs/ARM/inputs/ID/":"Original UTF-8 system.sing and input.json, copied unchanged from paired-r1",
+ "certificates/ARM-ID.json":"Original input identity; status; optional lower/upper dreg bounds and dimension lower bound; binary six projection candidates and linear-top certificate, or checked prime formulas",
+ "candidates":"name, retained zero-based variables, target quotient, successful/failed projection and every generator's top degree, term count, compact-JSON hash and surviving projected monomials. Failed candidates remain data, with no bound admitted.",
+ "monomial_encoding":"Sorted lists of zero-based variable indices. Repetitions retain ordinary powers. Coefficient1 in F2. Top-term hash uses SHA256 of compact sorted JSON monomial array after cancellation and top extraction.",
+ "linear_top_certificate":"F2 rank, echelon rows with pivot/variable indices, and XOR of original degree-one generator IDs. Original variable squares and these linear forms prove upper nvars-rank+1.",
+ "certificates/partial-summary.json":"Progress snapshot after every case, periodically uploaded; no complete replay claim",
+ "certificates/summary.json":"96 producer rows with arm, target, nvars, point-manifest and source hashes, intervals/status, linear-top rank. Producer rows alone are not replay certificates.",
+ "replay.json":"Fresh-process result for every input; all_verified plus source hashes/errors. This is producer replay, not independent scientific review.",
+ "status.json":"Actual whole-producer and whole-replay exit codes; timeouts and partial files remain retained",
+ "manifest.sha256":"SHA256 and relative path for every raw file except itself",
+ "instrument":"Frozen native executable; hash pinned in protocol-top.json",
+ "retention":"One deterministic top-runs.tar.xz plus .artifacts.json restores entire raw tree. Original paired-r1 inputs and prior evidence are unchanged. Unknowns remain null, not zero."
+}
