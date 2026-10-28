@@ -1,0 +1,1977 @@
+//! Native, bounded dataset adapters. No adapter reads the private witness.
+//!
+//! The finite-domain encodings below preserve the actual factor base, including
+//! projected abscissae. A polynomial root is accepted only after a group replay.
+//! Native operation counters retain their units; none is an instruction count.
+
+use std::cell::RefCell;
+use std::collections::HashMap;
+use std::fs::{self, File, OpenOptions};
+use std::io::Write;
+use std::path::{Path, PathBuf};
+use std::time::{Duration, Instant};
+
+use num_bigint::BigUint;
+use num_traits::ToPrimitive;
+use serde_json::{json, Value};
+
+use crate::binary_ecc::{curve as binary, BinaryCurve, BinaryPoint, F2mElement};
+use crate::cryptanalysis::binary_semaev::{binary_semaev_s3_in_x3, solve_quadratic_f2m};
+use crate::cryptanalysis::binary_semaev_chain_sat::ChainedS3Encoding;
+use crate::cryptanalysis::f6_wide_geometry::F6WidePairIndex;
+use crate::cryptanalysis::koblitz_groebner::{self as boolean, FieldStructure, SymElement};
+use crate::cryptanalysis::matrix_f5_f2::matrix_f5_f2;
+use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly, Mask};
+use crate::cryptanalysis::sat::{self, SolveResult};
+use crate::ecc::{CurveParams, Point};
+
+use super::curves;
+use super::types::{ArtifactPayload, CaseConfig, CaseData, SolverData};
+
+const TRACE_EVENT_CAP: u64 = 100_000;
+const TRACE_BYTE_CAP: usize = 64 * 1024 * 1024;
+
+struct LiveSink {
+    directory: PathBuf,
+    events: File,
+    sequence: u64,
+}
+thread_local! { static LIVE_SINK:RefCell<Option<LiveSink>>=const { RefCell::new(None) }; }
+impl LiveSink {
+    fn event(&mut self, event: &Value) -> Result<(), String> {
+        self.sequence += 1;
+        let bytes = serde_json::to_vec(&json!({"sequence":self.sequence,"event":event}))
+            .map_err(|e| e.to_string())?;
+        self.events
+            .write_all(&bytes)
+            .and_then(|_| self.events.write_all(b"\n"))
+            .and_then(|_| self.events.sync_data())
+            .map_err(|e| format!("persist live solver event: {e}"))
+    }
+    fn payload(&mut self, payload: &ArtifactPayload) -> Result<(), String> {
+        if payload.path.contains('/') || payload.path == "." || payload.path == ".." {
+            return Err("invalid live payload basename".into());
+        }
+        let path = self.directory.join("payloads").join(&payload.path);
+        if fs::symlink_metadata(&path).is_ok_and(|m| m.file_type().is_symlink()) {
+            return Err("live payload path is a symlink".into());
+        }
+        if path.exists() {
+            return if fs::read(&path).map_err(|e| e.to_string())? == payload.bytes {
+                Ok(())
+            } else {
+                Err("live payload path collision with different bytes".into())
+            };
+        }
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)
+            .map_err(|e| format!("create live payload {}: {e}", path.display()))?;
+        file.write_all(&payload.bytes)
+            .and_then(|_| file.sync_all())
+            .map_err(|e| format!("persist live payload {}: {e}", path.display()))?;
+        File::open(path.parent().unwrap())
+            .and_then(|f| f.sync_all())
+            .map_err(|e| format!("sync live payload directory: {e}"))?;
+        self.event(&json!({"kind":"artifact_persisted","path":format!("payloads/{}",payload.path),"role":payload.role,"bytes":payload.bytes.len()}))
+    }
+}
+pub(super) fn live_event(event: &Value) -> Result<(), String> {
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(s) => s.event(event),
+        None => Ok(()),
+    })
+}
+pub(super) fn live_payload(payload: &ArtifactPayload) -> Result<(), String> {
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(s) => s.payload(payload),
+        None => Ok(()),
+    })
+}
+struct LiveSinkGuard;
+impl Drop for LiveSinkGuard {
+    fn drop(&mut self) {
+        LIVE_SINK.with(|slot| {
+            slot.borrow_mut().take();
+        });
+    }
+}
+
+/// Persist each exposed event and complete artifact before proceeding. The
+/// outer worker retains this directory even when a native call is killed.
+/// Native engines' currently unexposed internal states remain explicit gaps.
+pub fn solve_with_event_sink(
+    config: &CaseConfig,
+    case: &CaseData,
+    directory: &Path,
+) -> Result<SolverData, String> {
+    if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+        return Err("nested live solver sink".into());
+    }
+    fs::create_dir_all(directory.join("payloads")).map_err(|e| e.to_string())?;
+    let events = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(directory.join("events.jsonl"))
+        .map_err(|e| format!("create exclusive solver event stream: {e}"))?;
+    File::open(directory)
+        .and_then(|f| f.sync_all())
+        .map_err(|e| e.to_string())?;
+    if let Some(parent) = directory.parent() {
+        File::open(parent)
+            .and_then(|f| f.sync_all())
+            .map_err(|e| e.to_string())?;
+    }
+    LIVE_SINK.with(|slot| {
+        *slot.borrow_mut() = Some(LiveSink {
+            directory: directory.to_owned(),
+            events,
+            sequence: 0,
+        })
+    });
+    let _guard = LiveSinkGuard;
+    live_event(
+        &json!({"kind":"solver_begin","solver":config.solver,"family":config.family,"n":config.n,"m":config.m,"work_limit":config.work_limit,"degree_bound":config.degree_bound,"format":"ml-dataset.live-events/v1","sync_policy":"fsync every emitted event and complete payload"}),
+    )?;
+    let result = solve(config, case);
+    if let Ok(data) = &result {
+        for payload in &data.artifacts {
+            live_payload(payload)?;
+        }
+    }
+    live_event(
+        &json!({"kind":"solver_return","outcome":result.as_ref().map(|r|&r.outcome).ok(),"error":result.as_ref().err()}),
+    )?;
+    result
+}
+
+pub fn capabilities() -> Value {
+    json!({
+        "schema":"ml-dataset.capabilities/v1",
+        "solvers":[
+            {"id":"enumerate","families":["koblitz","binary","prime"],"m":[2,15],"kind":"bounded exact signed finite-domain PDP","trace":"all visited group transitions"},
+            {"id":"bsgs","families":["koblitz","binary","prime"],"m":[2,15],"kind":"independent ECDLP baseline","trace":"baby table and giant probes"},
+            {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"original formulas, models, rejects, aggregate counters","gaps":["decisions/trail/reasons/learned clause stream","UNSAT proof"]},
+            {"id":"weil","families":["koblitz","binary"],"m":[2,2],"kind":"exact finite-domain selector Weil restriction","trace":"complete ANF equations and coordinate lift map","solver_completed":false},
+            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native Boolean matrix F4 plus splitting; native prime F4 plus bounded finite-domain extraction","trace":"original systems, reduced rows, splitting nodes or useful-row replay schedule","gaps":["internal pivot operations at every node","complete critical-pair stream"]},
+            {"id":"f5","families":["koblitz","binary"],"m":[2,2],"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
+            {"id":"f6","families":["koblitz","binary"],"m":[4,4],"kind":"native F6WidePairIndex geometric four-sum; not a general Groebner algorithm","trace":"pair sums, domain, verified indices","gaps":["native internal lookup sequence"]},
+            {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"each polynomial, returned roots, lift checks","gaps":["internal factorization and gcd states"]},
+            {"id":"pkm","families":["prime"],"m":[2,3],"modulus_limit_exclusive":"2147483648","kind":"native PKM Kummer-tower F4 with finite-grid extraction","trace":"exact alternative Kummer base, quotient rules, prepared and specialized equations, native F4 report, extracted roots","gaps":["private elimination pivots and row operations","m>3 or p>=2^31"]},
+            {"id":"double-large-prime","families":["koblitz"],"m":[2,15],"kind":"native verified two-residual elimination with actual F2-coefficient model, exact signed Frobenius closure and full-rank recovery","trace":"partial candidates, completed rows, source coefficients and rank/recovery transcript","gaps":["general binary and prime curves","even-degree twists outside F2"]}
+        ],
+        "global_gaps":["hardware instructions require permitted worker PMU; interrupted calls may lose counter readback","exact first fall degree certificates","exact last fall degree certificates","private native SAT and matrix internal event streams"],
+        "checkpoint_mid_call":"exposed events and completed payloads when using solve_with_event_sink; native opaque calls retain their last checkpoint",
+        "interrupted_trace_loss_possible":true,
+        "checkpoint_reason":"Each emitted event and completed payload is fsynced; interruption inside an uninstrumented native call can lose private intermediate states",
+        "bounded_search_event_cap":TRACE_EVENT_CAP,"sat_formula_trace_byte_cap":TRACE_BYTE_CAP
+    })
+}
+
+#[derive(Clone)]
+enum Group {
+    Binary(BinaryCurve),
+    Prime(CurveParams),
+}
+#[derive(Clone, Debug, PartialEq)]
+enum Element {
+    Binary(BinaryPoint),
+    Prime(Point),
+}
+
+impl Element {
+    fn json(&self) -> Value {
+        match self {
+            Self::Binary(BinaryPoint::Infinity) | Self::Prime(Point::Infinity) => Value::Null,
+            Self::Binary(BinaryPoint::Affine { x, y }) => {
+                json!({"x":x.to_biguint().to_string(),"y":y.to_biguint().to_string()})
+            }
+            Self::Prime(Point::Affine { x, y }) => {
+                json!({"x":x.value.to_string(),"y":y.value.to_string()})
+            }
+        }
+    }
+    fn key(&self) -> String {
+        self.json().to_string()
+    }
+    fn x(&self) -> Option<BigUint> {
+        match self {
+            Self::Binary(BinaryPoint::Affine { x, .. }) => Some(x.to_biguint()),
+            Self::Prime(Point::Affine { x, .. }) => Some(x.value.clone()),
+            _ => None,
+        }
+    }
+}
+
+impl Group {
+    fn read(case: &CaseData) -> Result<Self, String> {
+        if case.public_instance["family"] == "prime" {
+            Ok(Self::Prime(curves::prime_curve(&case.public_instance)?))
+        } else {
+            Ok(Self::Binary(curves::binary_curve(&case.public_instance)?))
+        }
+    }
+    fn point(&self, value: &Value) -> Result<Element, String> {
+        match self {
+            Self::Binary(c) => curves::binary_point(value, c.m).map(Element::Binary),
+            Self::Prime(c) => curves::prime_point(value, c).map(Element::Prime),
+        }
+    }
+    fn zero(&self) -> Element {
+        match self {
+            Self::Binary(_) => Element::Binary(BinaryPoint::Infinity),
+            Self::Prime(_) => Element::Prime(Point::Infinity),
+        }
+    }
+    fn add(&self, left: &Element, right: &Element) -> Element {
+        match (self, left, right) {
+            (Self::Binary(c), Element::Binary(p), Element::Binary(q)) => {
+                Element::Binary(binary::point_add(c, p, q))
+            }
+            (Self::Prime(c), Element::Prime(p), Element::Prime(q)) => {
+                Element::Prime(p.add_vartime(q, &c.a_fe()))
+            }
+            _ => unreachable!("validated homogeneous group"),
+        }
+    }
+    fn neg(&self, p: &Element) -> Element {
+        match p {
+            Element::Binary(p) => Element::Binary(binary::point_neg(p)),
+            Element::Prime(p) => Element::Prime(p.neg_vartime()),
+        }
+    }
+    fn mul(&self, p: &Element, k: u64) -> Element {
+        match (self, p) {
+            (Self::Binary(c), Element::Binary(p)) => {
+                Element::Binary(binary::scalar_mul(c, p, &BigUint::from(k)))
+            }
+            (Self::Prime(c), Element::Prime(p)) => {
+                Element::Prime(p.scalar_mul_vartime(&BigUint::from(k), &c.a_fe()))
+            }
+            _ => unreachable!("validated homogeneous group"),
+        }
+    }
+    fn on_curve(&self, p: &Element) -> bool {
+        match (self, p) {
+            (Self::Binary(c), Element::Binary(p)) => c.is_on_curve(p),
+            (Self::Prime(c), Element::Prime(p)) => c.is_on_curve(p),
+            _ => false,
+        }
+    }
+    fn order(&self) -> Option<u64> {
+        match self {
+            Self::Binary(c) => c.order.to_u64(),
+            Self::Prime(c) => c.n.to_u64(),
+        }
+    }
+}
+
+fn domain(group: &Group, case: &CaseData) -> Result<Vec<Element>, String> {
+    let rows = case.factor_base["points"]
+        .as_array()
+        .ok_or("factor_base.points must be an array")?;
+    let mut points = Vec::new();
+    for row in rows {
+        let p = group.point(row)?;
+        if p == group.zero() || !group.on_curve(&p) {
+            return Err("invalid factor-base point".into());
+        }
+        for signed in [p.clone(), group.neg(&p)] {
+            if !points.contains(&signed) {
+                points.push(signed);
+            }
+        }
+    }
+    Ok(points)
+}
+
+fn outcome(status: &str, reason: &str) -> Value {
+    json!({"schema":"ml-dataset.solver-outcome/v1","status":status,"reason":reason,
+        "solver_completed":false,"pdp_witness_verified":false,"scalar_recovered_without_witness":false,"scalar_replay_verified":false,
+        "first_fall_degree":null,"last_fall_degree":null,"retired_hardware_instructions":null,
+        "instruction_count_reason":"Worker-level PMU records, when permitted, are saved separately; this adapter does not invent per-operation instruction attribution",
+        "trace_complete":false,"counters":{},"counter_scope":"native adapter operations, not retired instructions"})
+}
+fn unsupported(reason: &str) -> SolverData {
+    SolverData {
+        outcome: outcome("unsupported", reason),
+        artifacts: vec![],
+    }
+}
+fn save(data: &mut SolverData, path: &str, role: &str, value: &Value) -> Result<(), String> {
+    let payload = ArtifactPayload::json(path, role, value)?;
+    live_payload(&payload)?;
+    data.artifacts.push(payload);
+    Ok(())
+}
+fn set_witness(
+    data: &mut SolverData,
+    group: &Group,
+    points: &[Element],
+    target: &Element,
+) -> Result<(), String> {
+    set_witness_with_definition(data, group, points, target, None)
+}
+fn set_witness_with_definition(
+    data: &mut SolverData,
+    group: &Group,
+    points: &[Element],
+    target: &Element,
+    definition: Option<&Value>,
+) -> Result<(), String> {
+    let mut sum = group.zero();
+    for p in points {
+        if !group.on_curve(p) {
+            return Err("off-curve PDP lift".into());
+        }
+        sum = group.add(&sum, p);
+    }
+    if &sum != target {
+        return Err("PDP group replay failed".into());
+    }
+    data.outcome["status"] = json!("verified");
+    data.outcome["pdp_witness_verified"] = json!(true);
+    data.outcome["solver_completed"] = json!(true);
+    data.outcome["reason"] =
+        json!("A signed factor-base decomposition was independently replayed in the curve group");
+    let mut label = json!({"summands":points.iter().map(Element::json).collect::<Vec<_>>(),"target":target.json(),"sum":sum.json(),"replay_group_add_calls":points.len()});
+    if let Some(definition) = definition {
+        label["factor_base_definition"] = definition.clone();
+    }
+    save(
+        data,
+        "pdp-witness.json",
+        "independently-verified-pdp",
+        &label,
+    )
+}
+
+pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String> {
+    if !(2..=15).contains(&config.m) {
+        return Err("decomposition arity must be 2..15".into());
+    }
+    let group = Group::read(case)?;
+    let target = group.point(&case.public_instance["target"])?;
+    if !group.on_curve(&target) {
+        return Err("target is not on the declared curve".into());
+    }
+    let points = domain(&group, case)?;
+    let field_tally = crate::binary_ecc::operation_tally::OperationTally::begin();
+    let mut result = match config.solver.as_str() {
+        "enumerate" | "pdp" => enumerate(config, &group, &points, &target)?,
+        "bsgs" => bsgs(config, case, &group, &target)?,
+        "sat" => sat_solve(config, &group, &points, &target)?,
+        "f4" if matches!(group, Group::Prime(_)) => prime_f4(config, &group, &points, &target)?,
+        "weil" | "weil-descent" | "f4" | "f5" => boolean_solve(config, &group, &points, &target)?,
+        "f6" => f6_solve(config, &group, &points, &target)?,
+        "root" => root_solve(config, &group, &points, &target)?,
+        "pkm" => pkm_solve(config, case, &group, &points, &target)?,
+        "double-large-prime" => super::relations::solve(config, case)?,
+        other => return Err(format!("unknown solver {other}")),
+    };
+    result.outcome["solver"] = json!(config.solver);
+    result.outcome["requested_work_limit"] = json!(config.work_limit);
+    result.outcome["m"] = json!(config.m);
+    if result.outcome.get("ecdlp_pipeline_completed").is_none() {
+        result.outcome["ecdlp_pipeline_completed"] = json!(false);
+    }
+    result.outcome["checkpoint_mid_call"] = json!(LIVE_SINK.with(|slot| slot.borrow().is_some()));
+    result.outcome["interrupted_trace_loss_possible"] = json!(true);
+    result.outcome["binary_field_operation_tally"] = json!({
+        "counts":field_tally.finish(),
+        "scope":"calling-thread instrumented binary field APIs during adapter solve and replay; excludes setup before solve and optimized kernels bypassing these APIs",
+        "inversion_count_includes_its_mul_and_square_cost":true,
+        "complete_machine_instruction_count":false
+    });
+    save(
+        &mut result,
+        "solver-domain.json",
+        "exact-signed-factor-base",
+        &json!({"points":points.iter().map(Element::json).collect::<Vec<_>>(),"negation_closed":true,"repetitions_allowed":true}),
+    )?;
+    Ok(result)
+}
+
+/// Replay security-relevant labels from public data, independently of the
+/// generator's known scalar. Call after checking the artifact's digest.
+pub fn verify_solution_artifact(
+    public: &Value,
+    factor_base: &Value,
+    role: &str,
+    artifact: &Value,
+) -> Result<(), String> {
+    let case = CaseData {
+        public_instance: public.clone(),
+        private_witness: Value::Null,
+        factor_base: factor_base.clone(),
+    };
+    let group = Group::read(&case)?;
+    let target = group.point(&public["target"])?;
+    if artifact["target"] != public["target"] {
+        return Err("solution artifact target differs from public target".into());
+    }
+    match role {
+        "independently-verified-pdp" => {
+            let domain = if artifact["factor_base_definition"].is_object() {
+                verify_kummer_domain(&group, &case, &artifact["factor_base_definition"])?
+            } else {
+                domain(&group, &case)?
+            };
+            let points = artifact["summands"]
+                .as_array()
+                .ok_or("missing PDP summands")?;
+            let m = public["m"].as_u64().ok_or("missing public arity")?;
+            if points.len() as u64 != m {
+                return Err("PDP witness has wrong arity".into());
+            }
+            let mut sum = group.zero();
+            for row in points {
+                let p = group.point(row)?;
+                if !group.on_curve(&p) || !domain.contains(&p) {
+                    return Err("PDP witness has a point outside the signed factor base".into());
+                }
+                sum = group.add(&sum, &p);
+            }
+            if sum != target || artifact["sum"] != target.json() {
+                return Err("PDP witness group replay failed".into());
+            }
+        }
+        "restricted-independent-scalar-label" => {
+            if artifact["generator"] != public["generator"] {
+                return Err("scalar artifact generator differs from public generator".into());
+            }
+            let scalar = artifact["scalar"]
+                .as_str()
+                .and_then(|s| s.parse::<u64>().ok())
+                .ok_or("invalid recovered scalar")?;
+            let order = group.order().ok_or("invalid subgroup order")?;
+            if scalar >= order {
+                return Err("recovered scalar is not canonical".into());
+            }
+            let generator = group.point(&public["generator"])?;
+            if group.mul(&generator, scalar) != target {
+                return Err("recovered scalar replay failed".into());
+            }
+        }
+        _ => return Err("not a solution artifact role".into()),
+    }
+    Ok(())
+}
+
+struct Search<'a> {
+    group: &'a Group,
+    target: &'a Element,
+    domain: &'a [Element],
+    limit: u64,
+    operations: u64,
+    trace: Vec<Value>,
+    exhausted: bool,
+    io_error: Option<String>,
+}
+impl Search<'_> {
+    fn descend(
+        &mut self,
+        depth: usize,
+        m: usize,
+        sum: &Element,
+        path: &mut Vec<usize>,
+    ) -> Option<Vec<usize>> {
+        if depth == m {
+            return (sum == self.target).then(|| path.clone());
+        }
+        for i in 0..self.domain.len() {
+            if self.operations >= self.limit {
+                self.exhausted = true;
+                return None;
+            }
+            let next = self.group.add(sum, &self.domain[i]);
+            self.operations += 1;
+            let event = json!({"kind":"pdp_transition","event":self.operations,"depth":depth,"domain_index":i,"parent_sum":sum.json(),"sum":next.json()});
+            if let Err(error) = live_event(&event) {
+                self.io_error = Some(error);
+                self.exhausted = true;
+                return None;
+            }
+            self.trace.push(event);
+            path.push(i);
+            if let Some(found) = self.descend(depth + 1, m, &next, path) {
+                return Some(found);
+            }
+            path.pop();
+            if self.exhausted {
+                return None;
+            }
+        }
+        None
+    }
+}
+fn enumerate(
+    config: &CaseConfig,
+    group: &Group,
+    points: &[Element],
+    target: &Element,
+) -> Result<SolverData, String> {
+    let mut search = Search {
+        group,
+        target,
+        domain: points,
+        limit: config.work_limit.min(TRACE_EVENT_CAP),
+        operations: 0,
+        trace: vec![],
+        exhausted: false,
+        io_error: None,
+    };
+    let found = search.descend(0, config.m, &group.zero(), &mut vec![]);
+    if let Some(error) = search.io_error.take() {
+        return Err(error);
+    }
+    let mut data = SolverData {
+        outcome: outcome(
+            if search.exhausted {
+                "budget_exhausted"
+            } else {
+                "verified"
+            },
+            if search.exhausted {
+                "Finite-domain search stopped at the recorded transition budget"
+            } else {
+                "Finite-domain search completed"
+            },
+        ),
+        artifacts: vec![],
+    };
+    data.outcome["solver_completed"] = json!(!search.exhausted);
+    data.outcome["exhaustive_no_decomposition"] = json!(found.is_none() && !search.exhausted);
+    data.outcome["trace_complete"] = json!(true);
+    data.outcome["effective_work_limit"] = json!(search.limit);
+    data.outcome["counters"] = json!({"group_add_api_calls":search.operations,"complete_candidate_tests":search.trace.iter().filter(|x|x["depth"]==json!(config.m-1)).count()});
+    save(
+        &mut data,
+        "enumeration-events.json",
+        "all-visited-pdp-transitions",
+        &json!(search.trace),
+    )?;
+    if let Some(indices) = found {
+        set_witness(
+            &mut data,
+            group,
+            &indices
+                .iter()
+                .map(|&i| points[i].clone())
+                .collect::<Vec<_>>(),
+            target,
+        )?;
+    }
+    Ok(data)
+}
+
+fn bsgs(
+    config: &CaseConfig,
+    case: &CaseData,
+    group: &Group,
+    target: &Element,
+) -> Result<SolverData, String> {
+    let generator = group.point(&case.public_instance["generator"])?;
+    if !group.on_curve(&generator) || generator == group.zero() {
+        return Err("invalid BSGS generator".into());
+    }
+    let Some(order) = group.order().filter(|&r| r > 1) else {
+        return Ok(unsupported(
+            "BSGS needs a certified subgroup order fitting u64",
+        ));
+    };
+    let mut width = (order as f64).sqrt() as u64;
+    while (width as u128) * (width as u128) < order as u128 {
+        width += 1;
+    }
+    while width > 0 && ((width - 1) as u128) * ((width - 1) as u128) >= order as u128 {
+        width -= 1;
+    }
+    let limit = config.work_limit.min(TRACE_EVENT_CAP);
+    let mut data = SolverData {
+        outcome: outcome(
+            "budget_exhausted",
+            "Independent BSGS budget insufficient for the complete baby table",
+        ),
+        artifacts: vec![],
+    };
+    data.outcome["required_baby_entries"] = json!(width);
+    data.outcome["effective_work_limit"] = json!(limit);
+    if width > limit {
+        return Ok(data);
+    }
+    let mut baby = HashMap::new();
+    let mut rows = Vec::new();
+    let mut p = group.zero();
+    let mut ops = 0;
+    for j in 0..width {
+        baby.entry(p.key()).or_insert(j);
+        let event = json!({"kind":"bsgs_baby","j":j.to_string(),"point":p.json()});
+        live_event(&event)?;
+        rows.push(event);
+        p = group.add(&p, &generator);
+        ops += 1;
+    }
+    let stride = group.neg(&p);
+    let mut giant = target.clone();
+    let mut probes = vec![];
+    let mut answer = None;
+    let mut scalar_checks = 0u64;
+    for i in 0..=width {
+        if ops >= limit {
+            break;
+        }
+        let hit = baby.get(&giant.key()).copied();
+        let event = json!({"kind":"bsgs_giant","i":i.to_string(),"point":giant.json(),"baby_index":hit.map(|j|j.to_string())});
+        live_event(&event)?;
+        probes.push(event);
+        if let Some(j) = hit {
+            let k = ((i as u128 * width as u128 + j as u128) % order as u128) as u64;
+            scalar_checks += 1;
+            if group.mul(&generator, k) == *target {
+                answer = Some(k);
+                break;
+            }
+        }
+        giant = group.add(&giant, &stride);
+        ops += 1;
+    }
+    save(
+        &mut data,
+        "bsgs-baby-table.json",
+        "independent-scalar-search-table",
+        &json!(rows),
+    )?;
+    save(
+        &mut data,
+        "bsgs-giant-probes.json",
+        "independent-scalar-search-probes",
+        &json!(probes),
+    )?;
+    data.outcome["counters"] = json!({"group_add_api_calls_search":ops,"baby_entries":width,"giant_probes":probes.len(),"scalar_verification_calls":scalar_checks});
+    data.outcome["trace_complete"] = json!(true);
+    if let Some(k) = answer {
+        data.outcome["status"] = json!("verified");
+        data.outcome["solver_completed"] = json!(true);
+        data.outcome["scalar_recovered_without_witness"] = json!(true);
+        data.outcome["scalar_replay_verified"] = json!(true);
+        data.outcome["reason"]=json!("Independent bounded BSGS recovered a scalar and replayed Q=[k]G; this is a generic baseline, not index calculus");
+        save(
+            &mut data,
+            "scalar-recovery.json",
+            "restricted-independent-scalar-label",
+            &json!({"scalar":k.to_string(),"generator":generator.json(),"target":target.json(),"method":"native-bsgs","read_private_witness":false}),
+        )?;
+    }
+    Ok(data)
+}
+
+fn lift(
+    group: &Group,
+    domain: &[Element],
+    xs: &[BigUint],
+    target: &Element,
+    limit: u64,
+) -> (Option<Vec<Element>>, u64, bool) {
+    let choices: Vec<Vec<Element>> = xs
+        .iter()
+        .map(|x| {
+            domain
+                .iter()
+                .filter(|p| p.x().as_ref() == Some(x))
+                .cloned()
+                .collect()
+        })
+        .collect();
+    fn visit(
+        group: &Group,
+        choices: &[Vec<Element>],
+        depth: usize,
+        sum: &Element,
+        target: &Element,
+        path: &mut Vec<Element>,
+        used: &mut u64,
+        limit: u64,
+    ) -> Option<Vec<Element>> {
+        if depth == choices.len() {
+            return (sum == target).then(|| path.clone());
+        }
+        for p in &choices[depth] {
+            if *used >= limit {
+                return None;
+            }
+            *used += 1;
+            let next = group.add(sum, p);
+            path.push(p.clone());
+            if let Some(found) = visit(group, choices, depth + 1, &next, target, path, used, limit)
+            {
+                return Some(found);
+            }
+            path.pop();
+        }
+        None
+    }
+    let mut used = 0;
+    let result = visit(
+        group,
+        &choices,
+        0,
+        &group.zero(),
+        target,
+        &mut vec![],
+        &mut used,
+        limit,
+    );
+    let exhausted = result.is_none() && used >= limit && choices.iter().all(|c| !c.is_empty());
+    (result, used, exhausted)
+}
+
+fn sat_solve(
+    config: &CaseConfig,
+    group: &Group,
+    domain: &[Element],
+    target: &Element,
+) -> Result<SolverData, String> {
+    let Group::Binary(curve) = group else {
+        return Ok(unsupported(
+            "Native chained-S3 SAT currently requires a binary curve",
+        ));
+    };
+    if crate::cryptanalysis::binary_semaev_chain_sat::chain_s3_max_variables(curve.m, config.m)
+        .is_none()
+    {
+        return Ok(unsupported(
+            "Native chained-S3 circuit rejects this n/m; no substitute solve was performed",
+        ));
+    }
+    let target_x = match target {
+        Element::Binary(BinaryPoint::Affine { x, .. }) => Some(x),
+        _ => None,
+    };
+    let mut codes: Vec<BigUint> = domain.iter().filter_map(Element::x).collect();
+    codes.sort();
+    codes.dedup();
+    let patterns = 1u32 << (config.m - 2);
+    let limit = config.work_limit.min(TRACE_EVENT_CAP);
+    let mut data = SolverData {
+        outcome: outcome(
+            "budget_exhausted",
+            "Native SAT search has not covered all intermediate-identity patterns",
+        ),
+        artifacts: vec![],
+    };
+    let mut summaries = vec![];
+    let mut lift_calls = 0;
+    let mut conflicts = 0;
+    let mut attempts = 0;
+    let mut complete_patterns = 0;
+    let deadline = Instant::now() + Duration::from_secs(10);
+    'patterns: for pattern in 0..patterns {
+        if attempts >= limit || Instant::now() >= deadline {
+            break;
+        }
+        let mut enc = match ChainedS3Encoding::build(
+            config.m,
+            &curve.irreducible,
+            &curve.b,
+            target_x,
+            pattern,
+            100_000,
+        ) {
+            Ok(x) => x,
+            Err(e) => {
+                data.outcome["reason"] = json!(format!("Circuit construction cap: {e:?}"));
+                break;
+            }
+        };
+        if let Err(e) = enc.constrain_summands(&codes, 1_000_000) {
+            data.outcome["reason"] = json!(format!("Finite-domain construction cap: {e:?}"));
+            break;
+        }
+        let formula = sat::to_dimacs_xor(&enc.solver);
+        let used_bytes: usize = data.artifacts.iter().map(|a| a.bytes.len()).sum();
+        if used_bytes.saturating_add(formula.len()) > TRACE_BYTE_CAP {
+            data.outcome["reason"] = json!("Formula trace byte budget exhausted before solve");
+            break;
+        }
+        let payload = ArtifactPayload {
+            path: format!("sat-pattern-{pattern}.xor.cnf"),
+            role: "complete-original-cnf-xor".into(),
+            encoding: "dimacs-xor".into(),
+            bytes: formula.into_bytes(),
+        };
+        live_payload(&payload)?;
+        data.artifacts.push(payload);
+        enc.solver.conflict_budget = limit.saturating_sub(conflicts);
+        enc.solver.deadline = Some(deadline);
+        // One model per pattern is a bounded diagnostic. A spurious lift does
+        // not refute this pattern; it remains explicitly incomplete.
+        attempts += 1;
+        live_event(
+            &json!({"kind":"sat_call_begin","pattern":pattern,"conflict_budget":enc.solver.conflict_budget}),
+        )?;
+        let verdict = enc.solver.solve();
+        let stats = &enc.solver.stats;
+        conflicts = conflicts.saturating_add(stats.conflicts);
+        let mut row = json!({"pattern":pattern,"verdict":format!("{verdict:?}"),"variables":enc.solver.n_vars(),"and_gates":enc.n_and_gates,"s3_nodes":enc.n_s3_nodes,
+            "native_counters":{"decisions":stats.decisions,"conflicts":stats.conflicts,"propagations":stats.propagations,"restarts":stats.restarts,"xor_passes":stats.xor_passes,"xor_row_ops":stats.xor_row_ops,"xor_row_scans":stats.xor_row_scans,"learnt_clauses":stats.learnt_clauses,"clause_visits":stats.clause_visits,"clause_lit_visits":stats.clause_lit_visits,"analyze_lit_visits":stats.analyze_lit_visits,"word_ops":enc.solver.word_ops()},"unsat_proof_checked":false});
+        match verdict {
+            SolveResult::Sat => {
+                let model = enc.solver.model();
+                if !enc.verify_external_assignment(&model) {
+                    return Err("native SAT model failed original constraint verification".into());
+                }
+                let xs = enc
+                    .decode_summands_assignment(&model)
+                    .ok_or("SAT model cannot be decoded")?;
+                let xs: Vec<BigUint> = xs.iter().map(F2mElement::to_biguint).collect();
+                let (witness, adds, exhausted) =
+                    lift(group, domain, &xs, target, limit.saturating_sub(lift_calls));
+                lift_calls += adds;
+                row["model"] = json!(model);
+                row["x_coordinates"] =
+                    json!(xs.iter().map(ToString::to_string).collect::<Vec<_>>());
+                row["group_lift_verified"] = json!(witness.is_some());
+                row["lift_budget_exhausted"] = json!(exhausted);
+                live_event(&json!({"kind":"sat_call_result","result":row}))?;
+                summaries.push(row);
+                if let Some(w) = witness {
+                    set_witness(&mut data, group, &w, target)?;
+                    break 'patterns;
+                }
+            }
+            SolveResult::Unsat => {
+                complete_patterns += 1;
+                live_event(&json!({"kind":"sat_call_result","result":row}))?;
+                summaries.push(row);
+            }
+            SolveResult::Unknown => {
+                live_event(&json!({"kind":"sat_call_result","result":row}))?;
+                summaries.push(row);
+                break;
+            }
+        }
+    }
+    if complete_patterns == patterns {
+        data.outcome["status"] = json!("partial");
+        data.outcome["solver_completed"] = json!(true);
+        data.outcome["reason"]=json!("All identity patterns were solver-reported UNSAT; no independently checked UNSAT proof is available");
+    }
+    data.outcome["identity_patterns_required"] = json!(patterns);
+    data.outcome["identity_patterns_attempted"] = json!(attempts);
+    data.outcome["counters"] =
+        json!({"sat_conflicts":conflicts,"group_lift_add_calls":lift_calls,"sat_calls":attempts});
+    data.outcome["trace_gaps"]=json!(["CDCL decisions, trails, reasons, learned/deleted clauses, and internal parity pivots are not exported","Only the first SAT model of each pattern is attempted; rejected lifts leave the pattern inconclusive"]);
+    save(
+        &mut data,
+        "sat-attempts.json",
+        "native-sat-models-and-counters",
+        &json!(summaries),
+    )?;
+    Ok(data)
+}
+
+fn finite_selector(
+    codes: &[BigUint],
+    offset: usize,
+    bits: usize,
+    n: u32,
+    n_vars: usize,
+) -> SymElement {
+    let count = 1usize << bits;
+    let coords = (0..n)
+        .map(|field_bit| {
+            let mut table: Vec<bool> = (0..count)
+                .map(|i| codes[i % codes.len()].bit(field_bit as u64))
+                .collect();
+            for bit in 0..bits {
+                for mask in 0..count {
+                    if mask & (1 << bit) != 0 {
+                        table[mask] ^= table[mask ^ (1 << bit)];
+                    }
+                }
+            }
+            F2BoolPoly::from_monos(
+                table
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, v)| **v)
+                    .map(|(m, _)| F2BoolMono::from_mask((m as Mask) << offset))
+                    .collect(),
+                n_vars,
+            )
+        })
+        .collect();
+    SymElement { coords }
+}
+fn polys_json(polys: &[F2BoolPoly]) -> Value {
+    json!(polys.iter().map(|p|json!({"n_vars":p.n_vars,"monomial_masks_hex":p.terms.iter().map(|t|format!("{:x}",t.mask)).collect::<Vec<_>>()})).collect::<Vec<_>>())
+}
+
+fn boolean_solve(
+    config: &CaseConfig,
+    group: &Group,
+    domain: &[Element],
+    target: &Element,
+) -> Result<SolverData, String> {
+    let Group::Binary(curve) = group else {
+        return Ok(unsupported(
+            "This F5/Weil lane requires characteristic two; use f4 for the native prime-field adapter",
+        ));
+    };
+    if config.m != 2 {
+        return Ok(unsupported("Exact finite-domain selector Weil/F4/F5 adapter currently supports m=2; larger arities remain separate planned cells"));
+    }
+    let Some(xr) = target.x() else {
+        return Ok(unsupported("Boolean S3 lane currently requires an affine target; use enumerative PDP for identity targets"));
+    };
+    let mut codes: Vec<BigUint> = domain.iter().filter_map(Element::x).collect();
+    codes.sort();
+    codes.dedup();
+    if codes.is_empty() {
+        return Ok(unsupported("Factor base is empty"));
+    }
+    let bits = (usize::BITS - (codes.len().saturating_sub(1)).leading_zeros()) as usize;
+    if bits > 6 {
+        return Ok(unsupported(
+            "Finite-domain selector trace cap is 64 distinct x-coordinates",
+        ));
+    }
+    let n_vars = 2 * bits;
+    let st = FieldStructure::new(curve.m, &curve.irreducible);
+    let left = finite_selector(&codes, 0, bits, curve.m, n_vars);
+    let right = finite_selector(&codes, bits, bits, curve.m, n_vars);
+    let target_symbol =
+        SymElement::constant(&F2mElement::from_biguint(&xr, curve.m), curve.m, n_vars);
+    let equations = boolean::sym_semaev_s3(&left, &right, &target_symbol, &curve.b, &st);
+    let mut data = SolverData {
+        outcome: outcome(
+            "partial",
+            "Exact finite-domain S3 system was Weil-restricted to the Boolean quotient",
+        ),
+        artifacts: vec![],
+    };
+    save(
+        &mut data,
+        "weil-system.json",
+        "complete-original-boolean-polynomials",
+        &json!({"coefficient_field":"F2","quotient":"v_i^2+v_i","monomial_order":"degrevlex","n_vars":n_vars,"selector_bits_per_summand":bits,"selector_codes":(0..1usize<<bits).map(|i|codes[i%codes.len()].to_string()).collect::<Vec<_>>(),"coordinate_maps":[polys_json(&left.coords),polys_json(&right.coords)],"equations":polys_json(&equations),"target_x":xr.to_string(),"field_degree":curve.m,"irreducible_low_terms":curve.irreducible.low_terms,"lifting_required":true}),
+    )?;
+    data.outcome["polynomial_encoding_verified"] = json!(true);
+    if config.solver == "weil" || config.solver == "weil-descent" {
+        data.outcome["trace_complete"] = json!(true);
+        return Ok(data);
+    }
+    let is_f5 = config.solver == "f5";
+    let degree = config.degree_bound.min(6);
+    // Save the complete degree-bounded Macaulay input as explicit polynomials.
+    // It is small under this selector cap and does not claim to expose every
+    // private elimination state at descendant nodes.
+    let mut matrix_rows = Vec::new();
+    let mut matrix_truncated = false;
+    for (equation, p) in equations.iter().enumerate() {
+        let d = p.terms.iter().map(|t| t.degree()).max().unwrap_or(0);
+        if d > degree {
+            continue;
+        }
+        for mask in 0usize..1usize << n_vars {
+            if (mask.count_ones() + d) <= degree {
+                if matrix_rows.len() as u64 >= config.work_limit.min(TRACE_EVENT_CAP) {
+                    matrix_truncated = true;
+                    break;
+                }
+                let q = p.mul_mono(F2BoolMono::from_mask(mask as Mask));
+                matrix_rows.push(json!({"equation":equation,"multiplier_hex":format!("{mask:x}"),"row":polys_json(&[q])}));
+            }
+        }
+        if matrix_truncated {
+            break;
+        }
+    }
+    if matrix_truncated {
+        data.outcome["status"] = json!("budget_exhausted");
+        data.outcome["reason"] =
+            json!("Macaulay input trace cap reached before native elimination");
+        save(
+            &mut data,
+            "macaulay-input.json",
+            "partial-macaulay-input",
+            &json!(matrix_rows),
+        )?;
+        return Ok(data);
+    }
+    save(
+        &mut data,
+        "macaulay-input.json",
+        "complete-unpruned-degree-bounded-macaulay-candidates",
+        &json!(matrix_rows),
+    )?;
+    let reduced = if is_f5 {
+        matrix_f5_f2(&equations, n_vars, degree).map(|(rows, report)| (rows, json!(report)))
+    } else {
+        boolean::matrix_f4_f2_counted(&equations, n_vars, degree)
+            .map(|(rows, word_ops)| (rows, json!({"elimination_word_xors":word_ops})))
+    };
+    if let Some((rows, report)) = reduced {
+        save(
+            &mut data,
+            "macaulay-output.json",
+            "native-reduced-macaulay-rows",
+            &json!({"rows":polys_json(&rows),"report":report}),
+        )?;
+    } else {
+        data.outcome["macaulay_step"] = json!("native_size_cap");
+    }
+    let before = boolean::f4_word_ops_thread();
+    live_event(
+        &json!({"kind":"boolean_native_solve_begin","engine":config.solver,"n_vars":n_vars,"node_budget":config.work_limit.min(4096)}),
+    )?;
+    boolean::set_node_trace(true);
+    let opts = boolean::SolveOptions {
+        engine: if is_f5 {
+            boolean::SolverEngine::MatrixF5 { max_degree: degree }
+        } else {
+            boolean::SolverEngine::MatrixF4 { max_degree: degree }
+        },
+        max_solutions: usize::MAX,
+        node_budget: config.work_limit.min(4096) as usize,
+        split_rule: boolean::SplitRule::LowestFree,
+    };
+    let mut witnessed = None;
+    let mut root_rows = vec![];
+    let mut lift_ops = 0;
+    let mut lift_censored = false;
+    let (roots, stats) = boolean::solve_boolean_system_filtered(
+        &equations,
+        n_vars,
+        &opts,
+        |root| {
+            let mask = (1usize << bits) - 1;
+            let xs = [
+                codes[(root as usize & mask) % codes.len()].clone(),
+                codes[((root >> bits) as usize & mask) % codes.len()].clone(),
+            ];
+            let (found, adds, exhausted) = lift(
+                group,
+                domain,
+                &xs,
+                target,
+                config
+                    .work_limit
+                    .min(TRACE_EVENT_CAP)
+                    .saturating_sub(lift_ops),
+            );
+            lift_ops += adds;
+            lift_censored |= exhausted;
+            root_rows.push(json!({"assignment_hex":format!("{root:x}"),"x":xs.iter().map(ToString::to_string).collect::<Vec<_>>(),"group_lift_verified":found.is_some(),"lift_budget_exhausted":exhausted}));
+            if found.is_some() {
+                witnessed = found;
+            }
+            witnessed.is_some()
+        },
+    );
+    let events = boolean::take_node_trace();
+    boolean::set_node_trace(false);
+    save(
+        &mut data,
+        "boolean-solve.json",
+        "native-algebra-result-and-node-trace",
+        &json!({"stats":stats,"roots_hex":roots.iter().map(|r|format!("{r:x}")).collect::<Vec<_>>(),"root_lifts":root_rows,"nodes":events.iter().map(|e|json!({"assigned_hex":format!("{:x}",e.assigned),"values_hex":format!("{:x}",e.values),"thread_cumulative_word_ops":e.word_ops})).collect::<Vec<_>>()}),
+    )?;
+    data.outcome["counters"] = json!({"native_f4_word_ops_search":boolean::f4_word_ops_thread().saturating_sub(before),"group_lift_add_calls":lift_ops,"native_solve_stats":stats});
+    data.outcome["observed_max_macaulay_degree"] = json!(stats.max_degree_built);
+    data.outcome["algebra_completed"] = json!(!stats.exhausted);
+    data.outcome["lift_completed"] = json!(!lift_censored);
+    data.outcome["trace_gaps"] = json!([
+        "Internal row/pivot and signature operations at recursive solver nodes are not exported",
+        "Maximum built degree is an observation, not first or last fall degree"
+    ]);
+    if let Some(w) = witnessed {
+        set_witness(&mut data, group, &w, target)?;
+    } else if stats.exhausted {
+        data.outcome["status"] = json!(if stats.unsupported {
+            "unsupported"
+        } else {
+            "budget_exhausted"
+        });
+        data.outcome["reason"] = json!("Native Boolean solve was incomplete");
+    } else if lift_censored {
+        data.outcome["status"] = json!("budget_exhausted");
+        data.outcome["reason"] =
+            json!("Native algebra completed but group lifting exhausted its separate budget");
+    } else {
+        data.outcome["solver_completed"] = json!(true);
+        data.outcome["reason"]=json!("Native Boolean root search completed; no accepted group lift was found within the separate lift budget");
+    }
+    Ok(data)
+}
+
+fn verify_kummer_domain(
+    group: &Group,
+    case: &CaseData,
+    definition: &Value,
+) -> Result<Vec<Element>, String> {
+    let Group::Prime(curve) = group else {
+        return Err("Kummer factor-base override requires a prime curve".into());
+    };
+    if definition["kind"] != "prime-kummer" {
+        return Err("unknown factor-base override".into());
+    }
+    let t = definition["t"].as_u64().ok_or("invalid Kummer height")?;
+    let g = definition["g"]
+        .as_str()
+        .and_then(|s| s.parse::<u64>().ok())
+        .ok_or("invalid Kummer coset")?;
+    let p = curve.p.to_u64().ok_or("invalid Kummer modulus")?;
+    if !(1..=4).contains(&t) || g == 0 || g >= p || !(p - 1).is_multiple_of(1 << t) {
+        return Err("invalid Kummer base definition".into());
+    }
+    let original = domain(group, case)?;
+    let expected_g = original
+        .iter()
+        .filter_map(Element::x)
+        .filter_map(|x| x.to_u64())
+        .filter(|&x| x != 0)
+        .min()
+        .ok_or("no original nonzero abscissa")?;
+    if g != expected_g {
+        return Err("Kummer coset is not bound to the canonical original factor base".into());
+    }
+    let points = definition["points"]
+        .as_array()
+        .ok_or("missing Kummer points")?;
+    let mut out = Vec::new();
+    let inverse = BigUint::from(g).modpow(&BigUint::from(p - 2), &curve.p);
+    for row in points {
+        let point = group.point(row)?;
+        let x = point.x().ok_or("infinite Kummer point")?;
+        if !group.on_curve(&point)
+            || ((&x * &inverse) % &curve.p).modpow(&BigUint::from(1u64 << t), &curve.p)
+                != BigUint::from(1u8)
+        {
+            return Err("point outside defined Kummer base".into());
+        }
+        if out.contains(&point) {
+            return Err("duplicate Kummer point".into());
+        }
+        out.push(point);
+    }
+    Ok(out)
+}
+
+fn pkm_solve(
+    config: &CaseConfig,
+    case: &CaseData,
+    group: &Group,
+    domain: &[Element],
+    target: &Element,
+) -> Result<SolverData, String> {
+    use crate::cryptanalysis::ic_boundary::{
+        GroupOps, OracleCounters, PrimeCurve, PrimeInstance, PrimePoint,
+    };
+    use crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
+    use crate::cryptanalysis::ic_framework::prime_tower::PrimeKummerBase;
+    use crate::cryptanalysis::ic_framework::stages::{
+        DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params,
+    };
+    let Group::Prime(curve) = group else {
+        return Ok(unsupported(
+            "PKM Kummer-tower adapter requires a prime curve",
+        ));
+    };
+    let p = curve.p.to_u64().ok_or("PKM modulus exceeds u64")?;
+    if p >= 1 << 31 || !(2..=3).contains(&config.m) {
+        return Ok(unsupported(
+            "Native PKM tower currently supports only m=2 or 3 and p<2^31",
+        ));
+    }
+    let Some(g) = domain
+        .iter()
+        .filter_map(Element::x)
+        .filter_map(|x| x.to_u64())
+        .filter(|&x| x != 0)
+        .min()
+    else {
+        return Ok(unsupported("PKM base needs a nonzero source abscissa"));
+    };
+    let mut t = ((p - 1).trailing_zeros()).min(4);
+    while t > 1 && (1u64 << t).pow(config.m as u32) > config.work_limit.min(TRACE_EVENT_CAP) {
+        t -= 1;
+    }
+    if (1u64 << t).pow(config.m as u32) > config.work_limit {
+        return Ok(SolverData {
+            outcome: outcome("budget_exhausted", "Minimum PKM grid exceeds work limit"),
+            artifacts: vec![],
+        });
+    }
+    let word_point = |element: &Element| -> Result<PrimePoint, String> {
+        match element {
+            Element::Prime(Point::Affine { x, y }) => Ok(PrimePoint::affine(
+                x.value.to_u64().ok_or("x too wide")?,
+                y.value.to_u64().ok_or("y too wide")?,
+            )),
+            Element::Prime(Point::Infinity) => Ok(PrimePoint::INFINITY),
+            _ => Err("wrong group".into()),
+        }
+    };
+    let generator = word_point(&group.point(&case.public_instance["generator"])?)?;
+    let q = word_point(target)?;
+    if q.infinity {
+        return Ok(unsupported("Native PKM oracle requires an affine target"));
+    }
+    let r = group.order().ok_or("missing subgroup order")?;
+    let cofactor = case.public_instance["curve"]["cofactor"]
+        .as_str()
+        .and_then(|s| s.parse::<u64>().ok())
+        .ok_or("invalid cofactor")?;
+    let instance = PrimeInstance {
+        name: "dataset-prime-kummer".into(),
+        curve: PrimeCurve {
+            p,
+            a: curve.a.to_u64().unwrap(),
+            b: curve.b.to_u64().unwrap(),
+        },
+        group_order: r.checked_mul(cofactor).ok_or("order overflow")?,
+        r,
+        cofactor,
+        generator: (generator.x, generator.y),
+    };
+    let ctx = InstanceCtx {
+        group: &instance.curve,
+        generator,
+        target: q,
+        r,
+        cofactor,
+        group_order: instance.group_order,
+        name: instance.name.clone(),
+        field_degree: None,
+    };
+    let mut params = Params::default();
+    params
+        .set("t", t.to_string())
+        .set("g", g.to_string())
+        .set("degree", config.degree_bound.min(12).to_string())
+        .set(
+            "max_nnz",
+            config
+                .work_limit
+                .min(TRACE_EVENT_CAP)
+                .saturating_mul(64)
+                .to_string(),
+        );
+    let mut ops = GroupOps::default();
+    let base = PrimeKummerBase {
+        instance: &instance,
+    }
+    .build(&ctx, &params, &mut ops)?;
+    let base_points: Vec<Element> = base
+        .points
+        .iter()
+        .map(|p| group.point(&json!({"x":p.x.to_string(),"y":p.y.to_string()})))
+        .collect::<Result<_, _>>()?;
+    let definition = json!({"kind":"prime-kummer","t":t,"g":g.to_string(),"points":base_points.iter().map(Element::json).collect::<Vec<_>>(),"subgroup_filtered":false,"variant":"rational Kummer points on the same full curve; separate from small-x-cofactor-projection","known_logs":false});
+    verify_kummer_domain(group, case, &definition)?;
+    let mut data=SolverData{outcome:outcome("partial","Native PKM Kummer-tower algebra and bounded grid extraction ran on an explicitly separate factor base"),artifacts:vec![]};
+    save(
+        &mut data,
+        "pkm-factor-base.json",
+        "explicit-alternative-kummer-factor-base",
+        &json!({"definition":definition,"columns":base.columns,"column_of":base.col_of,"coefficient_of":base.coef_of.iter().map(ToString::to_string).collect::<Vec<_>>(),"construction_cost":base.cost,"abscissae":base.abscissa_list.iter().map(ToString::to_string).collect::<Vec<_>>()}),
+    )?;
+    let mut oracle =
+        PkmSemaevOracle::new(config.m as u32, t, g).with_budget(Some(Duration::from_secs(5)));
+    oracle.enable_dataset_trace();
+    oracle.prepare(&ctx, &base, &params, &mut ops)?;
+    if let Some(snapshot) = oracle.prepared_system_artifact() {
+        save(
+            &mut data,
+            "pkm-prepared-system.json",
+            "exact-prepared-pkm-system-before-solve",
+            &snapshot,
+        )?;
+    }
+    live_event(
+        &json!({"kind":"pkm_native_solve_begin","m":config.m,"t":t,"grid_bound":(1u64<<t).pow(config.m as u32)}),
+    )?;
+    let mut counters = OracleCounters::default();
+    let found = oracle.decompose(&ctx, &base, &mut ops, &mut counters, q);
+    if let Some(snapshot) = oracle.dataset_artifact() {
+        save(
+            &mut data,
+            "pkm-algebra.json",
+            "native-pkm-exact-system-and-solver-artifacts",
+            snapshot,
+        )?;
+    }
+    data.outcome["factor_base_variant"] = json!("prime-kummer");
+    data.outcome["solver_completed"] = json!(true);
+    data.outcome["counters"] = json!({"native_group_ops":ops,"native_setup":oracle.setup_native(),"native_relation_counters":oracle.relation_counters(),"native_solver_totals":oracle.solver_totals(),"lift_failures":counters.lift_failures,"unliftable_systems":counters.unliftable_systems});
+    data.outcome["trace_gaps"]=json!(["Native F4 report exports aggregate step traces and final basis, not every private pivot or rejected pair","PKM includes separately counted finite-grid fallback after inconclusive F4","Kummer factor base includes rational points outside the target subgroup; this is PDP-only evidence"]);
+    if let Some(indices) = found {
+        let witness = indices
+            .iter()
+            .map(|&i| {
+                base_points
+                    .get(i)
+                    .cloned()
+                    .ok_or("PKM returned out-of-range index")
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        set_witness_with_definition(&mut data, group, &witness, target, Some(&definition))?;
+        let payload = data
+            .artifacts
+            .iter_mut()
+            .find(|a| a.role == "independently-verified-pdp")
+            .ok_or("missing PKM witness artifact")?;
+        let label: Value = serde_json::from_slice(&payload.bytes).map_err(|e| e.to_string())?;
+        verify_solution_artifact(
+            &case.public_instance,
+            &case.factor_base,
+            &payload.role,
+            &label,
+        )?;
+    }
+    Ok(data)
+}
+
+fn prime_f4(
+    config: &CaseConfig,
+    group: &Group,
+    domain: &[Element],
+    target: &Element,
+) -> Result<SolverData, String> {
+    use crate::cryptanalysis::f4_fp::{self, F4Options};
+    use crate::cryptanalysis::groebner_f4::Ordering;
+    if config.m != 2 {
+        return Ok(unsupported(
+            "Prime F4 finite-domain S3 adapter currently supports m=2",
+        ));
+    }
+    let Group::Prime(curve) = group else {
+        unreachable!()
+    };
+    let Some(xr) = target.x().and_then(|x| x.to_u64()) else {
+        return Ok(unsupported("Prime F4 needs an affine target"));
+    };
+    let p = curve.p.to_u64().ok_or("modulus exceeds u64")?;
+    let a = curve.a.to_u64().ok_or("a exceeds u64")?;
+    let b = curve.b.to_u64().ok_or("b exceeds u64")?;
+    let mul = |x: u64, y: u64| ((x as u128 * y as u128) % p as u128) as u64;
+    let add = |x: u64, y: u64| ((x as u128 + y as u128) % p as u128) as u64;
+    let neg = |x: u64| if x == 0 { 0 } else { p - x };
+    let r2 = mul(xr, xr);
+    let linear = neg(add(mul(2, mul(a, xr)), mul(4, b)));
+    let terms = vec![
+        (vec![2, 2], 1),
+        (vec![2, 1], neg(mul(2, xr))),
+        (vec![1, 2], neg(mul(2, xr))),
+        (vec![2, 0], r2),
+        (vec![0, 2], r2),
+        (vec![1, 1], neg(mul(2, add(r2, a)))),
+        (vec![1, 0], linear),
+        (vec![0, 1], linear),
+        (vec![0, 0], add(mul(a, a), neg(mul(4, mul(b, xr))))),
+    ];
+    let mut codes: Vec<u64> = domain
+        .iter()
+        .filter_map(Element::x)
+        .filter_map(|x| x.to_u64())
+        .collect();
+    codes.sort();
+    codes.dedup();
+    if codes.is_empty() || codes.len() > 32 {
+        return Ok(unsupported(
+            "Prime F4 domain must contain 1..32 distinct abscissae",
+        ));
+    }
+    let mut member = vec![1u64];
+    for &x in &codes {
+        let mut next = vec![0; member.len() + 1];
+        for (i, &c) in member.iter().enumerate() {
+            next[i] = add(next[i], neg(mul(c, x)));
+            next[i + 1] = add(next[i + 1], c);
+        }
+        member = next;
+    }
+    let order = Ordering::Grevlex;
+    let mut input = vec![f4_fp::normalise(&terms, p, order)];
+    for axis in 0..2 {
+        input.push(f4_fp::normalise(
+            &member
+                .iter()
+                .enumerate()
+                .map(|(d, &c)| {
+                    let mut e = vec![0, 0];
+                    e[axis] = d as u32;
+                    (e, c)
+                })
+                .collect::<Vec<_>>(),
+            p,
+            order,
+        ));
+    }
+    let mut data = SolverData {
+        outcome: outcome(
+            "partial",
+            "Native prime F4 was run on S3 plus exact finite-domain membership polynomials",
+        ),
+        artifacts: vec![],
+    };
+    let encode = |polys: &[f4_fp::Poly]| {
+        json!(polys
+            .iter()
+            .map(|f| f
+                .iter()
+                .map(|(e, c)| json!({"exponents":e,"coefficient":c.to_string()}))
+                .collect::<Vec<_>>())
+            .collect::<Vec<_>>())
+    };
+    save(
+        &mut data,
+        "prime-f4-input.json",
+        "complete-prime-field-polynomial-system",
+        &json!({"modulus":p.to_string(),"variables":["x0","x1"],"monomial_order":"degrevlex","polynomials":encode(&input),"factor_base_x":codes.iter().map(ToString::to_string).collect::<Vec<_>>(),"target_x":xr.to_string()}),
+    )?;
+    let mut opts = F4Options::new(order, config.degree_bound.min(12))
+        .with_budget(Duration::from_secs(5))
+        .capturing_run_log();
+    opts.max_pairs_per_step = Some(config.work_limit.clamp(1, 256) as usize);
+    live_event(&json!({"kind":"prime_f4_native_begin","degree_bound":opts.max_degree,"n_vars":2}))?;
+    let (report, trace) = f4_fp::f4_record(&input, 2, p, &opts);
+    let log = f4_fp::take_run_log();
+    save(
+        &mut data,
+        "prime-f4-output.json",
+        "native-f4-basis-useful-row-trace-and-counters",
+        &json!({"basis":encode(&report.basis),"inconsistent":report.inconsistent,"degree_reached":report.degree_reached,"observed_productive_degree_max":report.solving_degree_max,"pairs_above_bound":report.pairs_above_bound,"timed_out":report.timed_out,"max_rows":report.max_rows,"max_cols":report.max_cols,"elimination_fp_multiplies":report.field_ops,
+        "trace":{"input_leading_monomials":trace.input_lms,"stopped":trace.stopped,"steps":trace.steps.iter().map(|s|json!({"degree":s.degree,"contributing_rows_and_multipliers":s.rows,"new_leading_monomials":s.new_lms})).collect::<Vec<_>>()},
+        "step_log":log.steps.iter().map(|s|json!({"degree":s.degree,"pairs":s.pairs,"rows":s.rows,"all_rows":s.all_rows,"ops":s.ops,"new_polynomials":s.new_polys,"staircase":s.staircase})).collect::<Vec<_>>()}),
+    )?;
+    let limit = config.work_limit.min(TRACE_EVENT_CAP);
+    let mut tests = 0;
+    let mut lift_ops = 0;
+    let mut checks = vec![];
+    let mut found = None;
+    'grid: for &x in &codes {
+        for &y in &codes {
+            if tests >= limit || lift_ops >= limit {
+                break 'grid;
+            }
+            tests += 1;
+            let is_root = input.iter().all(|f| f4_fp::eval(f, &[x, y], p) == 0);
+            if !is_root {
+                checks
+                    .push(json!({"x":[x.to_string(),y.to_string()],"original_system_root":false}));
+                continue;
+            }
+            if report.inconsistent {
+                return Err("Native prime F4 refutation contradicted by independently evaluated finite-domain root".into());
+            }
+            let (w, adds, exhausted) = lift(
+                group,
+                domain,
+                &[BigUint::from(x), BigUint::from(y)],
+                target,
+                limit.saturating_sub(lift_ops),
+            );
+            lift_ops += adds;
+            checks.push(json!({"x":[x.to_string(),y.to_string()],"original_system_root":true,"group_lift_verified":w.is_some(),"lift_budget_exhausted":exhausted}));
+            if w.is_some() {
+                found = w;
+                break 'grid;
+            }
+        }
+    }
+    save(
+        &mut data,
+        "prime-f4-root-extraction.json",
+        "bounded-finite-domain-root-extraction-after-f4",
+        &json!(checks),
+    )?;
+    data.outcome["counters"] = json!({"native_elimination_fp_multiplies":report.field_ops,"finite_domain_root_tests":tests,"group_lift_add_calls":lift_ops});
+    data.outcome["algebra_completed"] = json!(!report.timed_out && report.pairs_above_bound == 0);
+    data.outcome["trace_gaps"]=json!(["Useful-row replay schedule omits zero rows and private pivots; not a complete event stream","Root extraction is separately counted finite-domain enumeration, not native F4 substitution"]);
+    if let Some(w) = found {
+        set_witness(&mut data, group, &w, target)?;
+    } else if tests < (codes.len() * codes.len()) as u64 || lift_ops >= limit {
+        data.outcome["status"] = json!("budget_exhausted");
+    } else {
+        data.outcome["solver_completed"] = json!(true);
+        data.outcome["exhaustive_no_decomposition"] = json!(true);
+    }
+    Ok(data)
+}
+
+fn f6_solve(
+    config: &CaseConfig,
+    group: &Group,
+    domain: &[Element],
+    target: &Element,
+) -> Result<SolverData, String> {
+    let Group::Binary(curve) = group else {
+        return Ok(unsupported("F6WidePairIndex requires a binary curve"));
+    };
+    if config.m != 4 {
+        return Ok(unsupported(
+            "Native F6 geometric pair index supports exactly four summands",
+        ));
+    }
+    let points: Vec<BinaryPoint> = domain
+        .iter()
+        .map(|p| match p {
+            Element::Binary(p) => p.clone(),
+            _ => unreachable!(),
+        })
+        .collect();
+    let target_native = match target {
+        Element::Binary(p) => p,
+        _ => unreachable!(),
+    };
+    let cap = config.work_limit.min(TRACE_EVENT_CAP) as usize;
+    let Some(index) = F6WidePairIndex::new(curve, &points, cap) else {
+        return Ok(SolverData {
+            outcome: outcome(
+                "budget_exhausted",
+                "Native F6 pair construction exceeded its cap or rejected the input",
+            ),
+            artifacts: vec![],
+        });
+    };
+    let mut pairs = vec![];
+    for i in 0..domain.len() {
+        for j in i..domain.len() {
+            pairs.push(json!({"i":i,"j":j,"sum":group.add(&domain[i],&domain[j]).json()}));
+        }
+    }
+    let found = index.solve4(target_native);
+    let mut data = SolverData {
+        outcome: outcome(
+            "verified",
+            "Native four-sum geometric search completed over the signed finite domain",
+        ),
+        artifacts: vec![],
+    };
+    data.outcome["solver_completed"] = json!(true);
+    data.outcome["exhaustive_no_decomposition"] = json!(found.is_none());
+    data.outcome["algorithm"] = json!("F6WidePairIndex exact geometric four-sum; not Groebner F6");
+    data.outcome["counters"] = json!({"native_pair_count":index.pair_count(),"artifact_replay_group_add_calls":pairs.len(),"native_query_group_add_calls":null});
+    data.outcome["trace_gaps"]=json!(["Private native lookup and batch-arithmetic sequence is not exported; pair sums are independently reconstructed and charged separately"]);
+    save(
+        &mut data,
+        "f6-pair-table.json",
+        "independently-reconstructed-native-pair-domain",
+        &json!(pairs),
+    )?;
+    if let Some(indices) = found {
+        set_witness(
+            &mut data,
+            group,
+            &indices
+                .iter()
+                .map(|&i| domain[i].clone())
+                .collect::<Vec<_>>(),
+            target,
+        )?;
+    }
+    Ok(data)
+}
+
+fn root_solve(
+    config: &CaseConfig,
+    group: &Group,
+    domain: &[Element],
+    target: &Element,
+) -> Result<SolverData, String> {
+    if config.m != 2 {
+        return Ok(unsupported(
+            "Native S3 univariate root adapter currently supports m=2",
+        ));
+    }
+    let Some(xr) = target.x() else {
+        return Ok(unsupported("S3 root adapter requires affine target"));
+    };
+    let mut codes: Vec<BigUint> = domain.iter().filter_map(Element::x).collect();
+    codes.sort();
+    codes.dedup();
+    let mut data = SolverData {
+        outcome: outcome(
+            "partial",
+            "Native univariate S3 roots checked against the finite domain and curve group",
+        ),
+        artifacts: vec![],
+    };
+    let mut rows = vec![];
+    let mut calls = 0;
+    let mut lift_ops = 0;
+    let mut prime_muls = 0;
+    let limit = config.work_limit.min(TRACE_EVENT_CAP);
+    let mut found = None;
+    for x1 in &codes {
+        if calls >= limit || lift_ops >= limit {
+            break;
+        }
+        let (coefficients, roots) = match group {
+            Group::Binary(c) => {
+                let a = F2mElement::from_biguint(x1, c.m);
+                let r = F2mElement::from_biguint(&xr, c.m);
+                let (a, b, z) = binary_semaev_s3_in_x3(&a, &r, &c.b, &c.irreducible);
+                live_event(
+                    &json!({"kind":"root_problem","fixed_x":x1.to_string(),"coefficients_constant_first":[z.to_biguint().to_string(),b.to_biguint().to_string(),a.to_biguint().to_string()]}),
+                )?;
+                let roots = solve_quadratic_f2m(&a, &b, &z, c.m, &c.irreducible)
+                    .iter()
+                    .map(F2mElement::to_biguint)
+                    .collect::<Vec<_>>();
+                (
+                    vec![
+                        z.to_biguint().to_string(),
+                        b.to_biguint().to_string(),
+                        a.to_biguint().to_string(),
+                    ],
+                    roots,
+                )
+            }
+            Group::Prime(c) => {
+                let p = c.p.to_u64().ok_or("prime root lane modulus exceeds u64")?;
+                let u = x1.to_u64().ok_or("x exceeds u64")?;
+                let r = xr.to_u64().ok_or("target x exceeds u64")?;
+                let a = c.a.to_u64().ok_or("a exceeds u64")?;
+                let b = c.b.to_u64().ok_or("b exceeds u64")?;
+                let add = |x: u64, y: u64| ((x as u128 + y as u128) % p as u128) as u64;
+                let mul = |x: u64, y: u64| ((x as u128 * y as u128) % p as u128) as u64;
+                let sub = |x: u64, y: u64| ((x as u128 + p as u128 - y as u128) % p as u128) as u64;
+                let product = mul(u, r);
+                let sum = add(u, r);
+                let coeffs = vec![
+                    sub(
+                        mul(sub(product, a), sub(product, a)),
+                        mul(4 % p, mul(b, sum)),
+                    ),
+                    sub(0, add(mul(2 % p, mul(sum, add(product, a))), mul(4 % p, b))),
+                    mul(sub(u, r), sub(u, r)),
+                ];
+                live_event(
+                    &json!({"kind":"root_problem","fixed_x":x1.to_string(),"coefficients_constant_first":coeffs.iter().map(ToString::to_string).collect::<Vec<_>>()}),
+                )?;
+                let roots = crate::cryptanalysis::glv_invariant_base::poly_roots_fp_counted(
+                    &coeffs,
+                    p,
+                    config.seed ^ calls,
+                    &mut prime_muls,
+                )
+                .into_iter()
+                .map(BigUint::from)
+                .collect::<Vec<_>>();
+                (coeffs.iter().map(ToString::to_string).collect(), roots)
+            }
+        };
+        calls += 1;
+        let mut checks = vec![];
+        for x2 in &roots {
+            let verified = match group {
+                Group::Binary(c) => {
+                    let x = F2mElement::from_biguint(x2, c.m);
+                    let mut value = F2mElement::zero(c.m);
+                    for coefficient in coefficients.iter().rev() {
+                        let value_big = BigUint::parse_bytes(coefficient.as_bytes(), 10)
+                            .ok_or("invalid root polynomial coefficient")?;
+                        value = value
+                            .mul(&x, &c.irreducible)
+                            .add(&F2mElement::from_biguint(&value_big, c.m));
+                    }
+                    value.is_zero()
+                }
+                Group::Prime(c) => {
+                    let p = c.p.to_u64().unwrap();
+                    let x = x2.to_u64().ok_or("root exceeds u64")?;
+                    let mut value = 0u64;
+                    for coefficient in coefficients.iter().rev() {
+                        let coefficient = coefficient.parse::<u64>().map_err(|e| e.to_string())?;
+                        value =
+                            ((value as u128 * x as u128 + coefficient as u128) % p as u128) as u64;
+                    }
+                    value == 0
+                }
+            };
+            if !verified {
+                return Err("native root solver returned a non-root".into());
+            }
+            let (w, adds, exhausted) = lift(
+                group,
+                domain,
+                &[x1.clone(), x2.clone()],
+                target,
+                limit.saturating_sub(lift_ops),
+            );
+            lift_ops += adds;
+            checks.push(json!({"x":x2.to_string(),"in_factor_base":codes.contains(x2),"group_lift_verified":w.is_some(),"lift_budget_exhausted":exhausted}));
+            if w.is_some() {
+                found = w;
+                break;
+            }
+        }
+        let event = json!({"kind":"root_result","fixed_x":x1.to_string(),"coefficients_constant_first":coefficients,"all_returned_roots":roots.iter().map(ToString::to_string).collect::<Vec<_>>(),"checks":checks});
+        live_event(&event)?;
+        rows.push(event);
+        if found.is_some() {
+            break;
+        }
+    }
+    data.outcome["counters"] = json!({"root_solver_calls":calls,"prime_field_multiplications_native_root_only":prime_muls,"group_lift_add_calls":lift_ops});
+    data.outcome["trace_gaps"] = json!([
+        "Native root solver gcd/factorization states and internal root counter are not exported",
+        "Root completeness is not independently certified"
+    ]);
+    save(
+        &mut data,
+        "root-polynomials.json",
+        "native-univariate-inputs-roots-and-group-lifts",
+        &json!(rows),
+    )?;
+    if let Some(w) = found {
+        set_witness(&mut data, group, &w, target)?;
+    } else if calls < codes.len() as u64 || lift_ops >= limit {
+        data.outcome["status"] = json!("budget_exhausted");
+        data.outcome["reason"] = json!("Root/lift work cap reached");
+    } else {
+        data.outcome["solver_completed"] = json!(true);
+    }
+    Ok(data)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn finite_domain_selector_is_exact_for_non_subspace_codes() {
+        let codes = vec![
+            BigUint::from(3u32),
+            BigUint::from(9u32),
+            BigUint::from(22u32),
+        ];
+        let s = finite_selector(&codes, 0, 2, 5, 4);
+        for i in 0..4 {
+            assert_eq!(s.eval(i as Mask, 5).to_biguint(), codes[i % 3]);
+        }
+    }
+    #[test]
+    fn wrong_target_does_not_pass_group_lift() {
+        let c = BinaryCurve::test_curve_f256();
+        let group = Group::Binary(c.clone());
+        let p = Element::Binary(c.generator.clone());
+        let domain = vec![p.clone(), group.neg(&p)];
+        let xs = vec![p.x().unwrap(), p.x().unwrap()];
+        let target = group.mul(&p, 3);
+        let (found, _, _) = lift(&group, &domain, &xs, &target, 100);
+        assert!(found.is_none());
+    }
+    #[test]
+    fn exhaustive_pdp_trace_replays_every_transition() {
+        let c = BinaryCurve::test_curve_f256();
+        let group = Group::Binary(c.clone());
+        let p = Element::Binary(c.generator.clone());
+        let target = group.mul(&p, 3);
+        let mut search = Search {
+            group: &group,
+            target: &target,
+            domain: std::slice::from_ref(&p),
+            limit: 3,
+            operations: 0,
+            trace: vec![],
+            exhausted: false,
+            io_error: None,
+        };
+        assert_eq!(
+            search.descend(0, 3, &group.zero(), &mut vec![]),
+            Some(vec![0, 0, 0])
+        );
+        assert_eq!(search.trace.len(), 3);
+        assert!(!search.exhausted);
+    }
+
+    fn config(family: &str, solver: &str) -> CaseConfig {
+        CaseConfig {
+            family: family.into(),
+            n: 7,
+            m: 2,
+            twist: false,
+            curve_seed: 7,
+            generator_index: 1,
+            key_index: 1,
+            seed: 42,
+            factor_base_size: 8,
+            degree_bound: 4,
+            work_limit: 1000,
+            solver: solver.into(),
+        }
+    }
+
+    #[test]
+    fn independent_bsgs_never_needs_the_private_scalar_and_rejects_wrong_labels() {
+        for family in ["koblitz", "binary", "prime"] {
+            let cfg = config(family, "bsgs");
+            let mut case = curves::generate(&cfg).unwrap();
+            case.private_witness = Value::Null;
+            let result = solve(&cfg, &case).unwrap();
+            assert_eq!(
+                result.outcome["scalar_recovered_without_witness"], true,
+                "{family}: {}",
+                result.outcome
+            );
+            let artifact = result
+                .artifacts
+                .iter()
+                .find(|a| a.role == "restricted-independent-scalar-label")
+                .unwrap();
+            let mut label: Value = serde_json::from_slice(&artifact.bytes).unwrap();
+            verify_solution_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &artifact.role,
+                &label,
+            )
+            .unwrap();
+            label["scalar"] = json!("0");
+            assert!(verify_solution_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &artifact.role,
+                &label
+            )
+            .is_err());
+        }
+    }
+
+    #[test]
+    fn native_algebra_and_root_adapters_replay_a_public_planted_pdp() {
+        let mut cfg = config("koblitz", "enumerate");
+        let mut case = curves::generate(&cfg).unwrap();
+        case.private_witness = Value::Null;
+        let group = Group::read(&case).unwrap();
+        let points = domain(&group, &case).unwrap();
+        let target = group.add(&points[0], &points[0]);
+        assert_ne!(target, group.zero());
+        case.public_instance["target"] = target.json();
+        case.public_instance["population"] = json!("unit-test-public-planted-pdp");
+        for solver in ["enumerate", "root", "f4", "f5", "sat"] {
+            cfg.solver = solver.into();
+            let result = solve(&cfg, &case).unwrap();
+            assert_eq!(
+                result.outcome["pdp_witness_verified"], true,
+                "{solver}: {}",
+                result.outcome
+            );
+            let artifact = result
+                .artifacts
+                .iter()
+                .find(|a| a.role == "independently-verified-pdp")
+                .unwrap();
+            let mut label: Value = serde_json::from_slice(&artifact.bytes).unwrap();
+            verify_solution_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &artifact.role,
+                &label,
+            )
+            .unwrap();
+            label["summands"] = json!([]);
+            assert!(verify_solution_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &artifact.role,
+                &label
+            )
+            .is_err());
+        }
+    }
+
+    #[test]
+    fn prime_f4_and_native_pkm_bind_their_actual_domains() {
+        let mut cfg = config("prime", "f4");
+        let mut case = curves::generate(&cfg).unwrap();
+        case.private_witness = Value::Null;
+        let group = Group::read(&case).unwrap();
+        let points = domain(&group, &case).unwrap();
+        let p = points
+            .iter()
+            .filter(|p| p.x().is_some_and(|x| x != BigUint::from(0u8)))
+            .min_by_key(|p| p.x())
+            .unwrap();
+        case.public_instance["target"] = group.add(p, p).json();
+        for solver in ["root", "f4", "pkm"] {
+            cfg.solver = solver.into();
+            let result = solve(&cfg, &case).unwrap();
+            assert_eq!(
+                result.outcome["pdp_witness_verified"], true,
+                "{solver}: {}",
+                result.outcome
+            );
+            let artifact = result
+                .artifacts
+                .iter()
+                .find(|a| a.role == "independently-verified-pdp")
+                .unwrap();
+            let mut label: Value = serde_json::from_slice(&artifact.bytes).unwrap();
+            verify_solution_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &artifact.role,
+                &label,
+            )
+            .unwrap();
+            if solver == "pkm" {
+                assert_eq!(label["factor_base_definition"]["kind"], "prime-kummer");
+                label["factor_base_definition"]["g"] = json!("0");
+                assert!(verify_solution_artifact(
+                    &case.public_instance,
+                    &case.factor_base,
+                    &artifact.role,
+                    &label
+                )
+                .is_err());
+                assert!(result
+                    .artifacts
+                    .iter()
+                    .any(|a| a.role == "native-pkm-exact-system-and-solver-artifacts"));
+            }
+        }
+    }
+
+    #[test]
+    fn live_sink_persists_exposed_prefix_and_refuses_existing_stream() {
+        let mut cfg = config("koblitz", "enumerate");
+        cfg.work_limit = 5;
+        let mut case = curves::generate(&cfg).unwrap();
+        case.private_witness = Value::Null;
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let dir = std::env::temp_dir().join(format!(
+            "crypto-dataset-live-{}-{nonce}",
+            std::process::id()
+        ));
+        let result = solve_with_event_sink(&cfg, &case, &dir).unwrap();
+        assert_eq!(result.outcome["checkpoint_mid_call"], true);
+        let stream = fs::read_to_string(dir.join("events.jsonl")).unwrap();
+        let events = stream
+            .lines()
+            .map(|line| serde_json::from_str::<Value>(line).unwrap())
+            .collect::<Vec<_>>();
+        assert!(events
+            .iter()
+            .any(|row| row["event"]["kind"] == "pdp_transition"));
+        for (i, row) in events.iter().enumerate() {
+            assert_eq!(row["sequence"].as_u64(), Some(i as u64 + 1));
+        }
+        for payload in result.artifacts {
+            assert_eq!(
+                fs::read(dir.join("payloads").join(payload.path)).unwrap(),
+                payload.bytes
+            );
+        }
+        assert!(solve_with_event_sink(&cfg, &case, &dir).is_err());
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
