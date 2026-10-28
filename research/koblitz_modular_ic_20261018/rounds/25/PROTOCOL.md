@@ -64,3 +64,12 @@ equations, powers d and zero residuals. Check the derivative is b, a unit
 on the actual registered open. This gives an explicit affine quotient
 presentation via mutually inverse coordinate maps; the proper boundary,
 polarization and order11 action remain separate. Native caps unchanged.
+
+## Diagnostic correction before positive03
+
+Both positive01 and positive02 fail first at the reserved Singular name
+`kernel`; neither is an accepted whole-chain certificate. The earlier
+intermediate-name diagnosis was incomplete. Replace that ideal name by
+kernelCoefficients, retain both failed inputs, and run one corrected positive
+attempt before the unchanged corrupt control and registered quotient call.
+No mathematical input, acceptance rule or resource cap changes.

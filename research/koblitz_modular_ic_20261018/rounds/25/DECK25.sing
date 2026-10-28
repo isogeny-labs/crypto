@@ -6,16 +6,16 @@ poly D=diff(nuEquation,n);
 if(D!=A^2*Delta){ERROR("nu source coefficient mismatch");}
 ideal original=nn[49],nn[53],nn[239],nn[241],nn[243];
 ideal units=nn[1],nn[12],nn[2],nn[2],nn[20],nn[37],nn[65],nn[75];
-ideal kernel=b+l^2+A*l,A*n+b*l,n^2+b*n;
+ideal kernelCoefficients=b+l^2+A*l,A*n+b*l,n^2+b*n;
 map sig=r,n+b,l+A,b,c;
-ideal shifted=sig(original);ideal shiftedUnits=sig(units);ideal shiftedKernel=sig(kernel);
+ideal shifted=sig(original);ideal shiftedUnits=sig(units);ideal shiftedKernel=sig(kernelCoefficients);
 int k;
 print("SOURCE_RESIDUAL_INVARIANCE");
 for(k=1;k<=5;k++){shifted[k]-original[k];if(shifted[k]!=original[k]){ERROR("source residual not exactly invariant");}}
 print("REGISTERED_ENTRY_INVARIANCE");
 for(k=1;k<=8;k++){shiftedUnits[k]-units[k];if(shiftedUnits[k]!=units[k]){ERROR("registered entry not invariant");}}
 print("KERNEL_COEFFICIENT_INVARIANCE");
-for(k=1;k<=3;k++){shiftedKernel[k]-kernel[k];if(shiftedKernel[k]!=kernel[k]){ERROR("kernel coefficient not invariant");}}
+for(k=1;k<=3;k++){shiftedKernel[k]-kernelCoefficients[k];if(shiftedKernel[k]!=kernelCoefficients[k]){ERROR("kernel coefficient not invariant");}}
 poly imageN=sig(n);poly imageL=sig(l);poly twiceN=sig(imageN);poly twiceL=sig(imageL);
 print("INVOLUTION_RESIDUALS");twiceN-n;twiceL-l;
 if(twiceN!=n || twiceL!=l){ERROR("not involutive");}
