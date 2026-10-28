@@ -423,3 +423,32 @@ Broader FFD/LFD and binary exact regularity remain open.
 
 R1 source-template failure and cancelled cases remain explicit. Both failed-r1
 and completed-r2 unified exports now validate with zero findings.
+
+## 16:49 UTC — Hilbert report and publication checks complete
+
+### What was done
+
+Data6ffbad49b7c pushed before report generation. Two-page report under
+reports/run-20261028T1632Z covers failed r1 and completed r2; final pages visually
+inspected. PDF SHA66e85c4e0d5f3dad20a432c5f5eba47f6db4b792f0a67a71cd38430ed32d8da7
+matches S3 download. Raw archives plus support archive remotely verified:
+3entries,3hydrated,0problems.38 supporting payloads retained.18 metric values
+match the committed native summary exactly; full forwarding export has763rows.
+
+### Decisions made
+
+Publish HILBERT_FORMAT_V2.json with exact-integer parsing requirements, both
+outcomes and source-version mapping. Preserve full written proof and partial
+Lean scope. Update existing PR2706 around all retained datasets.
+
+### Open threads
+
+Binary/Koblitz exact regularity, larger-m/prime LFD and elite bases remain open.
+NEXT_EXACT.md now records completed prime m2 and the remaining gaps. Current
+PR conflict and hosted checks are separate from completed data verification.
+
+### Errors
+
+Corrected an initial graph axis showing unused negative range and a Typst s3
+URI interpreted as a comment; final graph/PDF inspected after correction.
+First previews and rendering helpers are retained in support archive.
