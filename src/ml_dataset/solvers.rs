@@ -33,6 +33,8 @@ use super::types::{ArtifactPayload, CaseConfig, CaseData, SolverData};
 
 const TRACE_EVENT_CAP: u64 = 100_000;
 const TRACE_BYTE_CAP: usize = 64 * 1024 * 1024;
+pub(super) const PRIME_ROOT_CERTIFICATE_SCOPE: &str =
+    "distinct roots per completed prime S3 call; incomplete calls prove no root absence";
 
 const SAT_EVENT_BYTE_CAP: usize = TRACE_BYTE_CAP / 4;
 const SAT_EVENT_CAP_REASON: &str = "native SAT event trace budget exhausted";
@@ -2197,8 +2199,7 @@ fn prime_root_solve(
     data.outcome["counters"] = json!({"aggregate_root_field_and_group_work":used,
         "root_solver_calls":queries.len(),"acknowledged_native_events":events,
         "acknowledged_native_event_bytes":event_bytes});
-    data.outcome["root_certificate_scope"] =
-        json!("distinct roots per completed prime S3 call; incomplete calls prove no root absence");
+    data.outcome["root_certificate_scope"] = json!(PRIME_ROOT_CERTIFICATE_SCOPE);
     data.outcome["root_execution_trace_complete_verified"] = json!(false);
     data.outcome["root_total_operation_count_verified"] = json!(false);
     data.outcome["trace_gaps"] = json!([

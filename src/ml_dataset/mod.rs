@@ -1755,6 +1755,51 @@ fn cell_directories(root: &Path) -> Result<Vec<PathBuf>, String> {
     Ok(result)
 }
 
+/// A replayed root-set certificate does not certify the native operation stream.
+/// Keep the exported outcome labels no stronger than the certificate's terminal
+/// state. This also runs during hash-only verification as a consistency check;
+/// mathematical replay remains the separate `replay` gate below.
+fn verify_prime_root_outcome(outcome: &Value, certificate: &Value) -> Result<(), String> {
+    let found = certificate["found_pdp"]
+        .as_bool()
+        .ok_or("prime-root certificate lacks a boolean PDP result")?;
+    let censored = certificate["censored"]
+        .as_bool()
+        .ok_or("prime-root certificate lacks a boolean censoring result")?;
+    let all_queries = certificate["root_queries_completed"]
+        .as_bool()
+        .ok_or("prime-root certificate lacks a boolean query completion result")?;
+    if (found && censored) || (censored && all_queries) || (!found && !censored && !all_queries) {
+        return Err("inconsistent prime-root aggregate termination".into());
+    }
+    let expected_status = if found {
+        "verified"
+    } else if censored {
+        "budget_exhausted"
+    } else {
+        "partial"
+    };
+    if outcome["root_execution_trace_complete_verified"] != false
+        || outcome["root_total_operation_count_verified"] != false
+        || outcome["trace_complete"] != false
+        || certificate["execution_trace_complete_verified"] != false
+        || certificate["total_operation_count_verified"] != false
+        || outcome["scalar_recovered_without_witness"] != false
+        || outcome["scalar_replay_verified"] != false
+        || outcome["ecdlp_pipeline_completed"] != false
+        || outcome["pdp_witness_verified"].as_bool() != Some(found)
+        || outcome["solver_completed"].as_bool() != Some(found || !censored)
+        || outcome["status"] != expected_status
+        || outcome["root_certificate_scope"] != solvers::PRIME_ROOT_CERTIFICATE_SCOPE
+    {
+        return Err(
+            "prime-root outcome labels differ from verified certificate scope or termination"
+                .into(),
+        );
+    }
+    Ok(())
+}
+
 fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     checked_directory(dir, false)?;
     let metadata = fs::symlink_metadata(dir.join("manifest.json")).map_err(|e| e.to_string())?;
@@ -1795,7 +1840,15 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         .iter()
         .filter(|a| a.role == "prime-root-certificates/v1")
         .collect();
-    if manifest.outcome.get("root_certificate_scope").is_some() && root_certificates.is_empty() {
+    if [
+        "root_certificate_scope",
+        "root_execution_trace_complete_verified",
+        "root_total_operation_count_verified",
+    ]
+    .iter()
+    .any(|name| manifest.outcome.get(*name).is_some())
+        && root_certificates.is_empty()
+    {
         return Err("prime-root outcome lacks its distinct-root certificate artifact".into());
     }
     if !root_certificates.is_empty()
@@ -1807,6 +1860,13 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
             || root_certificates[0].encoding != "json")
     {
         return Err("prime-root certificate lacks its unique public prime/root/m2 domain".into());
+    }
+    let root_certificate: Option<Value> = root_certificates
+        .first()
+        .map(|artifact| read_json(&dir.join(&artifact.path)))
+        .transpose()?;
+    if let Some(certificate) = &root_certificate {
+        verify_prime_root_outcome(&manifest.outcome, certificate)?;
     }
     if manifest.outcome["known_answer_verified"] == true && !complete_known_answer {
         return Err("known-answer label lacks required artifacts".into());
@@ -1846,7 +1906,9 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
                     &public,
                     &base,
                     &manifest.config,
-                    &read_json(&dir.join(&artifact.path))?,
+                    root_certificate
+                        .as_ref()
+                        .ok_or("missing parsed root certificate")?,
                 )?;
             }
             if artifact.role == "restricted-large-prime-membership-provenance" {
@@ -2468,9 +2530,18 @@ mod tests {
             (p, binding, protocol)
         }
         fn failed_cell(&self, p: &DatasetPlan, binding: &Value, protocol: &[u8]) -> PathBuf {
-            let dir = self.0.join("cells/000000000001");
+            self.failed_cell_at(p, binding, protocol, 1)
+        }
+        fn failed_cell_at(
+            &self,
+            p: &DatasetPlan,
+            binding: &Value,
+            protocol: &[u8],
+            index: u64,
+        ) -> PathBuf {
+            let dir = self.0.join(format!("cells/{index:012}"));
             fs::create_dir_all(&dir).unwrap();
-            let config = p.cell(1).unwrap();
+            let config = p.cell(index).unwrap();
             let mut artifacts = vec![
                 storage::write_json(&dir, "plan.json", "plan", p).unwrap(),
                 storage::write_json(&dir, "run.json", "run", binding).unwrap(),
@@ -2484,7 +2555,7 @@ mod tests {
                 artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
             }
             storage::write_json(&dir,"manifest.json","manifest",&CellManifest {
-                schema:"crypto.ml-dataset.cell/v1".into(),cell_index:1,plan_sha256:binding["plan_sha256"].as_str().unwrap().into(),
+                schema:"crypto.ml-dataset.cell/v1".into(),cell_index:index,plan_sha256:binding["plan_sha256"].as_str().unwrap().into(),
                 config,outcome:json!({"status":"worker_failed","known_answer_verified":false,"solver_completed":false}),artifacts,
             }).unwrap();
             dir
@@ -2538,6 +2609,164 @@ mod tests {
         assert!(export::export(&fixture.0, &fixture.0.join("export"))
             .unwrap_err()
             .contains("prime-root certificate lacks"));
+    }
+
+    #[test]
+    fn prime_root_outcome_contract_covers_found_exhausted_and_censored() {
+        for (found, censored, all_queries, status, completed) in [
+            (true, false, false, "verified", true),
+            (true, false, true, "verified", true),
+            (false, false, true, "partial", true),
+            (false, true, false, "budget_exhausted", false),
+        ] {
+            let certificate = json!({"found_pdp":found,"censored":censored,
+                "root_queries_completed":all_queries,"execution_trace_complete_verified":false,
+                "total_operation_count_verified":false});
+            let outcome = json!({"root_certificate_scope":solvers::PRIME_ROOT_CERTIFICATE_SCOPE,
+                "root_execution_trace_complete_verified":false,"root_total_operation_count_verified":false,
+                "trace_complete":false,"scalar_recovered_without_witness":false,
+                "scalar_replay_verified":false,"ecdlp_pipeline_completed":false,
+                "pdp_witness_verified":found,"solver_completed":completed,"status":status});
+            verify_prime_root_outcome(&outcome, &certificate).unwrap();
+            for field in [
+                "root_execution_trace_complete_verified",
+                "root_total_operation_count_verified",
+                "trace_complete",
+                "scalar_recovered_without_witness",
+                "scalar_replay_verified",
+                "ecdlp_pipeline_completed",
+            ] {
+                let mut bad = outcome.clone();
+                bad[field] = json!(true);
+                assert!(
+                    verify_prime_root_outcome(&bad, &certificate).is_err(),
+                    "{field}"
+                );
+            }
+            for (field, value) in [
+                ("pdp_witness_verified", json!(!found)),
+                ("solver_completed", json!(!completed)),
+                ("status", json!("unsupported")),
+                (
+                    "root_certificate_scope",
+                    json!("full execution trace verified"),
+                ),
+            ] {
+                let mut bad = outcome.clone();
+                bad[field] = value;
+                assert!(
+                    verify_prime_root_outcome(&bad, &certificate).is_err(),
+                    "{field}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn sealed_prime_root_censoring_cannot_be_promoted_by_manifest_tampering() {
+        let fixture = TempRun::new();
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        // This chooses the same public n=11, seed=7, generator/key=1 fixture
+        // already used by the curve and root adapter tests; no experimental
+        // campaign cell is generated. Work=1 stops before S3 setup.
+        plan.field_sizes = vec![11];
+        plan.solvers = vec!["root".into()];
+        plan.curve_seeds = 8;
+        plan.generators = 2;
+        plan.keys = 2;
+        plan.seed = 42;
+        plan.factor_base_size = 8;
+        plan.work_limit = 1;
+        plan.validate().unwrap();
+        binding["plan_sha256"] = json!(digest(&serde_json::to_vec(&plan).unwrap()));
+        fs::write(
+            fixture.0.join("plan.json"),
+            serde_json::to_vec(&plan).unwrap(),
+        )
+        .unwrap();
+        fs::write(
+            fixture.0.join("run.json"),
+            serde_json::to_vec(&binding).unwrap(),
+        )
+        .unwrap();
+        let dir = fixture.failed_cell_at(&plan, &binding, &protocol, 63);
+        let mut manifest: CellManifest = read_json(&dir.join("manifest.json")).unwrap();
+        assert_eq!(manifest.config.curve_seed, 7);
+        assert_eq!(manifest.config.generator_index, 1);
+        assert_eq!(manifest.config.key_index, 1);
+        let case = curves::generate(&manifest.config).unwrap();
+        let solved = solvers::solve(&manifest.config, &case).unwrap();
+        assert_eq!(solved.outcome["status"], "budget_exhausted");
+        manifest.artifacts.push(
+            storage::write_json(
+                &dir,
+                "public.json",
+                "public-instance",
+                &case.public_instance,
+            )
+            .unwrap(),
+        );
+        manifest.artifacts.push(
+            storage::write_json(&dir, "factor-base.json", "factor-base", &case.factor_base)
+                .unwrap(),
+        );
+        for artifact in solved.artifacts {
+            manifest.artifacts.push(
+                storage::write_bytes(
+                    &dir,
+                    &artifact.path,
+                    &artifact.role,
+                    &artifact.encoding,
+                    &artifact.bytes,
+                )
+                .unwrap(),
+            );
+        }
+        manifest.outcome = solved.outcome;
+        manifest.outcome["known_answer_verified"] = json!(false);
+        manifest.outcome["factor_base_verified"] = json!(true);
+        let original = manifest.outcome.clone();
+        let save_manifest = |manifest: &CellManifest| {
+            fs::write(
+                dir.join("manifest.json"),
+                serde_json::to_vec(manifest).unwrap(),
+            )
+            .unwrap();
+        };
+        save_manifest(&manifest);
+        verify_cell(&dir, false).unwrap();
+        verify_cell(&dir, true).unwrap();
+        for (field, value) in [
+            ("root_execution_trace_complete_verified", json!(true)),
+            ("root_total_operation_count_verified", json!(true)),
+            ("trace_complete", json!(true)),
+            ("solver_completed", json!(true)),
+            ("pdp_witness_verified", json!(true)),
+            (
+                "root_certificate_scope",
+                json!("full execution trace verified"),
+            ),
+            ("status", json!("verified")),
+            ("status", json!("partial")),
+        ] {
+            manifest.outcome = original.clone();
+            manifest.outcome[field] = value;
+            save_manifest(&manifest);
+            for replay in [false, true] {
+                assert!(
+                    verify_cell(&dir, replay)
+                        .unwrap_err()
+                        .contains("prime-root outcome labels"),
+                    "{field}/{replay}"
+                );
+            }
+        }
+        assert!(export::export(&fixture.0, &fixture.0.join("export"))
+            .unwrap_err()
+            .contains("prime-root outcome labels"));
+        manifest.outcome = original;
+        save_manifest(&manifest);
+        verify_cell(&dir, true).unwrap();
     }
 
     #[test]
