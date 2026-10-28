@@ -269,12 +269,14 @@ coordinate/order adapter is unavailable explicitly report `not_evaluated`;
 Curve25519 is one such record. A complete catalogue entry does not by itself
 certify its coordinates or group order.
 
-In the regenerated file (15,791 registry curves and 176 source curves: 175
+In the regenerated file (20,592 registry curves and 176 source curves: 175
 walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
-degree-263 descendant), `End(E)` is proved for 15,045 curves and probable
-for 907; 14 remain unknown and one record is not applicable. Of the 1,324
+degree-263 descendant), `End(E)` is proved for 19,829 curves and probable
+for 915; 17 are bounded (open volcano levels on curves added since the last
+level work), 6 remain unknown because a 125- to 153-digit composite of `Δ`
+is unsplit, and one record is not applicable. Of the 1,324
 curves over `GF(p^k)`, `k > 1`, 1,319 have a certified order (9 by generator,
-1,310 by point orders: 493 proved, 826 probable); five are not evaluated.
+1,310 by point orders: 484 proved, 826 probable); five are not evaluated.
 Per-prime level methods and bounds, and the individual `End(E)` statuses,
 remain recorded in `traits.json`. P-256's `Δ` factors with
 the committed hints as `−3·5·456597257999·p81·p136` (squarefree), so
