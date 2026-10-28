@@ -485,3 +485,14 @@ a [PDF](DERIVATIVE_POINT_DVR.pdf), [dependency graph](derivative-point-dvr.svg),
 and [gate CSV](derivative-point-dvr.csv). A combined theorem and the norm,
 Pic⁰, and compiled-runtime gates remain open. These packets do not change a
 target or cost row.
+
+The [nonbranch norm-transport packet](NONBRANCH_NORM_TRANSPORT.md) then maps
+the source-style common 2+2 polynomial identity into the actual weighted-Proj
+rational-point stalk under the stated Mumford congruences and nonzero
+determinant. Its [PDF](NONBRANCH_NORM_TRANSPORT.pdf),
+[dependency graph](nonbranch-norm-transport.svg), and
+[gate CSV](nonbranch-norm-transport.csv) separate the checked identity from a
+chosen-factor valuation theorem. The latter assumes a separable quintic,
+`y²=f(a)`, `2*y≠0`, a nonzero coefficient, and a nonunit chosen factor.
+Characteristic-two order allocation, global Pic⁰ transport, and compiled Rust
+semantics remain open. This packet changes no target or cost row.
