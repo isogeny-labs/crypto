@@ -64,3 +64,16 @@ identifier ord. Rename subgroupSize; all equations, finite sets, detector and
 caps stay unchanged. This is an implementation retry, not a new search arm.
 Full CHAR01 diagnostics also reject intvec-entry ++. Replace it by explicit
 indexed assignment before02; no finite population or detector is changed.
+
+## Prospective transport amendment after rejected CD01
+CD01 rejects exact t^14 divisibility and the unramified residue: the raw
+Z coordinate has a different constant-term order at C/D. No branches are
+accepted from it and its conditional series call is NOT launched. Instead,
+use the existing R18 diamond2 re-normalization to transport the certified O
+charts. Freeze one TRANSPORT26 call: universal exact Tate/line identities,
+then exact reduction in F2(u)[v]/(v^2+v+u^3+u) to compare the base action to
+u'=(u+v)/u^2,v'=(uv+u+v)/u^3, all5 iterates and identity at step5.
+Check O maps toA0 with original local uniformizer leading coefficient1.
+The proper source-chart transport and cusp-cycle interpretation use the
+written R16/R18 moduli/normal-curve bridge; no new original-coordinate
+valuations or complete divisor is inferred. Resource/detector caps unchanged.

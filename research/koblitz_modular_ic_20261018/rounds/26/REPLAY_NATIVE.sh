@@ -7,6 +7,7 @@ mode=${1:?char,corrupt,charts};attempt=${2:?fresh basename};base="$here/runs/$at
 case "$mode" in
  char|corrupt) cp "$here/CHAR26.sing" "$base/input.sing";marker=CHAR26_ALL_CHECKS_PASS
  if [ "$mode" = corrupt ];then sed -i 's/int delta=34;/int delta=1;/' "$base/input.sing";fi ;;
+ transport) cp "$here/TRANSPORT26.sing" "$base/input.sing";marker=TRANSPORT26_ALL_CHECKS_PASS ;;
  charts) cp "$here/CD26.sing" "$base/input.sing";marker=CD26_CHARTS_ALL_CHECKS_PASS ;;
  *) exit 1 ;;
 esac

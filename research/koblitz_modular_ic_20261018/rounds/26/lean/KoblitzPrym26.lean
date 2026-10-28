@@ -12,13 +12,13 @@ namespace KoblitzPrym26
 
 theorem crt_delta : 34%11=1 ∧ 34%7=6 ∧ (34*34)%77=1 := by decide
 
-theorem diamond_two_fifth : (2:ZMod 11)^5 = -1 := by norm_num
+theorem diamond_two_fifth : (2:ZMod 11)^5 = -1 := by decide
 
-theorem shared_rational_diamond_fifth : (6:ZMod 11)^5 = -1 := by norm_num
+theorem shared_rational_diamond_fifth : (6:ZMod 11)^5 = -1 := by decide
 
 theorem primitive_sigma (k:ℕ) (hk:k=1 ∨ k=3 ∨ k=7 ∨ k=9) :
     ((2:ZMod 11)^k)^5 = -1 := by
-  rcases hk with rfl|rfl|rfl|rfl <;> norm_num
+  rcases hk with rfl|rfl|rfl|rfl <;> decide
 
 def diamondNorm (k d:ℕ) : ZMod 11 :=
   ∑ j ∈ Finset.range d, (2:ZMod 11)^(k*(j*(10/d)))
@@ -28,7 +28,7 @@ theorem nontrivial_diamond_norm (k d:ℕ)
     diamondNorm k d=0 := by
   rcases hk with rfl|rfl|rfl|rfl <;>
     rcases hd with rfl|rfl|rfl <;>
-      norm_num [diamondNorm, Finset.sum_range_succ]
+      decide
 
 theorem trivial_diamond_norm (k:ℕ) : diamondNorm k 1=1 := by
   simp [diamondNorm]
@@ -58,7 +58,7 @@ theorem difference_detects_nonzero (s:G→G) (v:G) (hv:s v= -v)
 
 theorem difference_is_minus (s:G→+G) (hs:Function.Involutive s) (v:G) :
     s (v-s v)= -(v-s v) := by
-  rw [map_sub,hs v]; abel
+  rw [map_sub,hs v]; exact (neg_sub v (s v)).symm
 
 theorem difference_norm_zero (s:G→+G) (hs:Function.Involutive s) (v:G) :
     (v-s v)+s (v-s v)=0 := norm_zero_of_minus s _ (difference_is_minus s hs v)
@@ -80,9 +80,9 @@ section Fields
 variable {K:Type*} [Field K]
 
 theorem normalized_trace_one (n b:K) (hb:b≠0) : (n+b)/b=n/b+1 := by
-  field_simp;ring
+  field_simp
 
 theorem normalized_AS_relation (n b:K) (hb:b≠0) :
-    (n/b)^2+n/b=(n^2+b*n)/b^2 := by field_simp;ring
+    (n/b)^2+n/b=(n^2+b*n)/b^2 := by field_simp
 end Fields
 end KoblitzPrym26
