@@ -95,6 +95,12 @@ xargs -0 -P "$(nproc)" -n 1 bash -c '
     dir="$out.session"
     cp -r "$1" "$dir"
     gunzip "$dir"/*.gz
+  elif [ -f "$1/ecbench_records.jsonl.gz" ] && [ ! -f "$1/records.jsonl" ]; then
+    # Older capsules used this artifact name. Audit the same decompressed
+    # records under the canonical filename without editing committed evidence.
+    dir="$out.session"
+    cp -r "$1" "$dir"
+    gzip -dc "$dir/ecbench_records.jsonl.gz" > "$dir/records.jsonl"
   fi
   if ! "$ecbench" verify --dir "$dir" --replay 0 --allow-interrupted --exit-code > "$out.json" 2> "$out.err"; then
     msg=$(echo "$1"; { jq -r ".problems[]" "$out.json" 2> /dev/null || true; cat "$out.err"; } | sed "s/^/    /")

@@ -182,9 +182,10 @@ spec SHA-256
 and plan SHA-256
 `77763dc5f2786e77c9deb2ed4beb18e5c0167ad211ca987fe170924d57cded28`.
 
-The existing compressed record artifact was also given the standard
-`records.jsonl.gz` alias expected by the audit script. Both artifact names
-point to the same immutable object; decompression produces 378 records with
+The repository audit script now accepts the capsule's existing compressed
+`ecbench_records.jsonl.gz` artifact name and materializes `records.jsonl`
+only in its temporary audit copy. The committed artifact manifest and ignore
+file retain their original bytes. Decompression produces 378 records with
 the session-pinned SHA-256
 `bed8044b3395f97b543a2451724d3c94b3475e30fc8cd73a7e372ecee5443807`.
 This restoration reran no trial and changed no measured record.
