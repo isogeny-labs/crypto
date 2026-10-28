@@ -134,7 +134,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/bitop_ladder_20261019 research/hec_bitop_20261020 research/n83_e2e_finalist_results_20261017 research/quartic_n4_20261019 research/quartic_n4v2_20261020 research/validation_sweep_20261019
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/bitop_ladder_20261019 research/ecbench_perf_round2_20261022 research/hec_bitop_20261020 research/n83_e2e_finalist_results_20261017 research/quartic_n4_20261019 research/quartic_n4v2_20261020 research/validation_sweep_20261019
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
