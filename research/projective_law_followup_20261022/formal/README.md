@@ -458,3 +458,12 @@ items, one conditional norm-order theorem, and seven open gates. The
 nonbranch domain/DVR construction, formula-specific norm transport, global
 divisor/Pic⁰ equation, and compiled Rust semantics remain open. Neither
 packet changes a target or cost row.
+
+The [prime-factor domain packet](AFFINE_PRIME_FACTOR_DOMAIN.md) gives a
+separate sufficient condition for the affine ring and its actual
+weighted-Proj stalk to be domains: the quintic must have an explicitly
+supplied prime factor occurring once. Its [PDF](AFFINE_PRIME_FACTOR_DOMAIN.pdf),
+[dependency graph](affine-prime-factor-domain.svg), and
+[gate CSV](affine-prime-factor-domain.csv) state that hypothesis and mark the
+separability-to-factor implication, nonbranch DVR, norm transport, global
+Pic⁰ equation, and compiled semantics open. It changes no cost row.
