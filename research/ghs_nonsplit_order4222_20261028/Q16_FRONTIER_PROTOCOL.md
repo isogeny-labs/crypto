@@ -34,3 +34,13 @@ An existing Jacobian in the isogeny class plus the simple-root gate proves
 existence of *some* subgroup-preserving isogeny, but does not supply its
 coordinates or an attack cost. Only evaluated maps and complete same-target
 GHS/rho runs can establish a new vulnerability.
+
+After the exact-class replay, run a separate exhaustive genus probe using
+Magma 2.30-1's documented `WeilDescentGenus(E,k,c)` intrinsic. For the three
+fixed representative equations in `frontier_q16.json`, assert that the
+Conway root `w` has multiplicative order 4,095, then enumerate
+`c=w^i` for every `0 <= i < 4095`. Record the genus histogram and the
+number of intrinsic rejections separately, checking that they sum to
+4,095 for each curve. This is a complete parameter sweep for those three
+exact representatives and that intrinsic; it is not a classification of all
+possible cover maps for their isogeny classes.
