@@ -607,6 +607,19 @@ mod tests {
         assert_eq!(first["already_present"], false);
         assert_eq!(first["remote_rechecked"], true);
         assert_eq!(first["publication_confirmations"], 1);
+        // A new host discovers this portable receipt from the remote catalog;
+        // it has neither the producer's local index path nor its self locator.
+        let catalog_path = fixture
+            .root
+            .join("remote")
+            .join(&receipt.catalog.as_ref().expect("published catalog").key);
+        let portable: PublishReceipt = super::super::read_json(&catalog_path).unwrap();
+        assert!(portable.index_path.as_os_str().is_empty());
+        assert!(portable.catalog.is_none());
+        let catalog_restore =
+            restore(&catalog_path, &fixture.root.join("from-catalog"), None).unwrap();
+        assert_eq!(catalog_restore["native_replay_performed"], true);
+        assert_eq!(catalog_restore["manifest_sha256"], receipt.manifest_sha256);
         assert_eq!(
             super::super::read_json::<Value>(&out.join("run.json")).unwrap(),
             fixture.binding

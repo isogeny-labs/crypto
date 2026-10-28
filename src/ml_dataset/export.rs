@@ -8,7 +8,7 @@
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::fs::{self, File, OpenOptions};
-use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::io::{self, BufRead, BufReader, BufWriter, Write};
 use std::path::{Path, PathBuf};
 
 use serde_json::{json, Value};
@@ -166,15 +166,44 @@ struct Record {
     json: String,
 }
 
+struct CappedWriter {
+    bytes: Vec<u8>,
+    limit: usize,
+}
+
+impl Write for CappedWriter {
+    fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+        if bytes.len() > self.limit.saturating_sub(self.bytes.len()) {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!(
+                    "export row exceeds {}-byte limit; split the source artifact",
+                    self.limit
+                ),
+            ));
+        }
+        self.bytes.extend_from_slice(bytes);
+        Ok(bytes.len())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+fn bounded_json(value: &Value, limit: usize) -> Result<String, String> {
+    let mut writer = CappedWriter {
+        bytes: Vec::new(),
+        limit,
+    };
+    serde_json::to_writer(&mut writer, value).map_err(|e| e.to_string())?;
+    String::from_utf8(writer.bytes).map_err(|e| e.to_string())
+}
+
 impl Record {
     fn new(key: &str, value: &Value) -> Result<Self, String> {
         crate::store::index::validate_sha256(key)?;
-        let json = serde_json::to_string(value).map_err(|e| e.to_string())?;
-        if json.len() > MAX_RECORD_BYTES {
-            return Err(format!(
-                "export row exceeds {MAX_RECORD_BYTES}-byte limit; split the source artifact"
-            ));
-        }
+        let json = bounded_json(value, MAX_RECORD_BYTES)?;
         Ok(Self {
             key: key.into(),
             json,
@@ -223,15 +252,37 @@ fn new_file(path: &Path) -> Result<File, String> {
         .map_err(|e| format!("{}: {e}", path.display()))
 }
 
+fn bounded_line(reader: &mut impl BufRead, limit: usize) -> Result<Vec<u8>, String> {
+    let mut line = Vec::new();
+    loop {
+        let available = reader.fill_buf().map_err(|e| e.to_string())?;
+        if available.is_empty() {
+            return Ok(line);
+        }
+        let newline = available.iter().position(|byte| *byte == b'\n');
+        let take = newline.map_or(available.len(), |position| position + 1);
+        if take > limit.saturating_sub(line.len()) {
+            return Err("external-sort record exceeds bounded line limit".into());
+        }
+        line.extend_from_slice(&available[..take]);
+        reader.consume(take);
+        if newline.is_some() {
+            return Ok(line);
+        }
+    }
+}
+
 fn next_record(reader: &mut BufReader<File>) -> Result<Option<Record>, String> {
-    let mut line = String::new();
-    let count = reader.read_line(&mut line).map_err(|e| e.to_string())?;
-    if count == 0 {
+    // 64 hex key bytes, tab and newline are the only non-JSON bytes. Reject
+    // before extending the buffer, including a malformed unterminated row.
+    let line = bounded_line(reader, MAX_RECORD_BYTES + 66)?;
+    if line.is_empty() {
         return Ok(None);
     }
-    if count > MAX_RECORD_BYTES + 66 || !line.ends_with('\n') {
+    if !line.ends_with(b"\n") {
         return Err("invalid external-sort record".into());
     }
+    let mut line = String::from_utf8(line).map_err(|e| e.to_string())?;
     line.pop();
     let (key, json) = line
         .split_once('\t')
@@ -485,7 +536,7 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
                 let public: Value = super::read_json(&dir.join("public.json"))?;
                 let base: Value = super::read_json(&dir.join("factor-base.json"))?;
                 let inputs = feature_projection(&public, &base)?;
-                let id = super::digest(&serde_json::to_vec(&inputs).map_err(|e| e.to_string())?);
+                let id = super::digest(bounded_json(&inputs, MAX_RECORD_BYTES)?.as_bytes());
                 let (group, partition) = split_for_size(integer(&inputs["n"], "n")?);
                 let row = json!({"schema":"ml-dataset.features/v1","feature_id":id,"split_component":group,"split":partition,"inputs":inputs});
                 features.push(&id, &row)?;
@@ -577,7 +628,8 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
             "cross_size_algebraic_links_merged":false,"row_random_split_permitted":false},
         "feature_policy":{"version":"strict-structural-allowlist-v1","only_features_jsonl_is_model_input":true,
             "excluded":["private witness","sampling seeds","curve/generator/key indices","configuration","order certificates","construction candidates","construction trace","solver outcomes","solver event streams","labels","source paths"]},
-        "sort":{"implementation":"bounded Rust external merge","chunk_bytes":CHUNK_BYTES,"merge_fan_in":MERGE_FAN_IN,"max_row_bytes":MAX_RECORD_BYTES},
+        "sort":{"implementation":"bounded Rust external merge","chunk_bytes":CHUNK_BYTES,"merge_fan_in":MERGE_FAN_IN,"max_row_bytes":MAX_RECORD_BYTES,
+            "source_cell_values_materialized":true,"total_process_rss_bound_claimed":false},
         "source_artifacts_modified":false,"remote_download_performed":false});
     let manifest_artifact =
         storage::write_json(&out, "manifest.json", "training-export-manifest", &manifest)?;
@@ -707,6 +759,35 @@ mod tests {
         let mut poisoned = public;
         poisoned["field"]["basis"] = json!({"private":marker});
         assert!(feature_projection(&poisoned, &base).is_err());
+    }
+
+    #[test]
+    fn malformed_scratch_lines_and_serialization_stop_at_their_limits() {
+        let mut reader = BufReader::with_capacity(16, io::Cursor::new(vec![b'x'; 4096]));
+        let error = bounded_line(&mut reader, 32).unwrap_err();
+        assert!(error.contains("bounded line limit"));
+        // At most one fixed reader buffer can be prefetched beyond the cap;
+        // the rest of the malformed, unterminated row is never read.
+        assert!(reader.get_ref().position() <= 48);
+
+        let mut reader = BufReader::with_capacity(3, io::Cursor::new(b"abc\nnext\n"));
+        assert_eq!(bounded_line(&mut reader, 4).unwrap(), b"abc\n");
+        assert_eq!(bounded_line(&mut reader, 5).unwrap(), b"next\n");
+        assert!(bounded_line(&mut reader, 5).unwrap().is_empty());
+
+        let value = json!({"escaped":"\n\n\n\n\n\n\n\n"});
+        assert!(bounded_json(&value, 16)
+            .unwrap_err()
+            .contains("exceeds 16-byte limit"));
+        let expected = serde_json::to_string(&value).unwrap();
+        assert_eq!(bounded_json(&value, expected.len()).unwrap(), expected);
+        let mut writer = CappedWriter {
+            bytes: Vec::new(),
+            limit: 8,
+        };
+        writer.write_all(b"1234").unwrap();
+        assert!(writer.write_all(b"12345").is_err());
+        assert_eq!(writer.bytes, b"1234");
     }
 
     #[test]

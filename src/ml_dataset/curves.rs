@@ -239,8 +239,10 @@ fn prime_projection(
     reference: bool,
 ) -> (WPoint, u64) {
     let mut clearing = order;
-    while clearing % r == 0 {
+    let mut multiplicity = 0;
+    while clearing > 0 && clearing % r == 0 {
         clearing /= r;
+        multiplicity += 1;
     }
     let mul = |p, k| {
         if reference {
@@ -251,7 +253,12 @@ fn prime_projection(
     };
     let mut result = mul(p, clearing);
     let mut multiplier = clearing;
-    while result.is_some() {
+    // Public transcript replay must remain bounded even when its claimed
+    // group order is false. Callers reject a surviving point not killed by r.
+    for _ in 1..multiplicity {
+        if result.is_none() {
+            break;
+        }
         let next = mul(result, r);
         if next.is_none() {
             break;
@@ -326,6 +333,7 @@ impl SubgroupProjector {
         let generator = point_words(&public["generator"])?;
         if r <= 2
             || !is_prime_u64(r)
+            || order == 0
             || order % r != 0
             || order / r != cofactor
             || generator.is_none()
@@ -333,6 +341,10 @@ impl SubgroupProjector {
             || arithmetic.reference_mul(generator, r).is_some()
         {
             return Err("invalid cyclic subgroup projection parameters".into());
+        }
+        let factors = read_factors(&public["curve"]["group_order_factorization"], order)?;
+        if factors.last().map(|&(p, _)| p) != Some(r) {
+            return Err("projection subgroup differs from largest prime factor".into());
         }
         let membership =
             (cofactor % r == 0).then(|| CyclicMembership::new(&arithmetic, generator, r));
@@ -356,6 +368,9 @@ impl SubgroupProjector {
             return Err("projection input is off curve".into());
         }
         let (p, multiplier) = prime_projection(&self.arithmetic, p, self.order, self.r, true);
+        if self.arithmetic.reference_mul(p, self.r).is_some() {
+            return Err("claimed group order does not project into r-torsion".into());
+        }
         self.checks += 1;
         let (member, log) = if let Some(test) = &self.membership {
             let (log, additions) = test.logarithm_counted(&self.arithmetic, p);
@@ -705,8 +720,9 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
             let membership_log = membership
                 .as_ref()
                 .and_then(|test| test.logarithm(&arithmetic, projected));
-            let subgroup_member =
-                projected.is_some() && (membership.is_none() || membership_log.is_some());
+            let subgroup_member = projected.is_some()
+                && arithmetic.mul(projected, subgroup).is_none()
+                && (membership.is_none() || membership_log.is_some());
             let accepted = subgroup_member && seen.insert(projected);
             row.push(json!({"lifted":point_json(p),"projected":point_json(projected),"projection_multiplier":u(projection_multiplier),"cyclic_subgroup_member":subgroup_member,"accepted":accepted}));
             if accepted {
@@ -1176,6 +1192,7 @@ pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
     let generator = point_words(&public["generator"])?;
     if r <= 2
         || !is_prime_u64(r)
+        || order == 0
         || order % r != 0
         || order / r != cofactor
         || generator.is_none()
@@ -1183,6 +1200,10 @@ pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
         || c.reference_mul(generator, r).is_some()
     {
         return Err("invalid factor-base subgroup parameters".into());
+    }
+    let factors = read_factors(&public["curve"]["group_order_factorization"], order)?;
+    if factors.last().map(|&(p, _)| p) != Some(r) {
+        return Err("factor-base subgroup differs from largest prime factor".into());
     }
     let membership = (cofactor % r == 0).then(|| CyclicMembership::new(&c, generator, r));
     let points = base["points"]
@@ -1225,6 +1246,12 @@ pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
         }
         for (p, saved) in lifts.into_iter().zip(saved) {
             let (projected, projection_multiplier) = prime_projection(&c, p, order, r, true);
+            if c.reference_mul(projected, r).is_some() {
+                return Err(
+                    "claimed group order does not project factor-base candidates into r-torsion"
+                        .into(),
+                );
+            }
             let subgroup_member = projected.is_some()
                 && membership
                     .as_ref()
@@ -1350,13 +1377,28 @@ mod tests {
                 let mut public = data.public_instance.clone();
                 public["curve"]["subgroup_order"] = json!("0");
                 assert!(verify_factor_base(&public, &data.factor_base).is_err());
+                let mut public = data.public_instance.clone();
+                let r = number(&public["curve"]["subgroup_order"], "r").unwrap();
+                let h = number(&public["curve"]["cofactor"], "h").unwrap();
+                let fake_h = if h == 3 { 5 } else { 3 };
+                public["curve"]["group_order"] = u(fake_h * r);
+                public["curve"]["cofactor"] = u(fake_h);
+                assert!(verify_factor_base(&public, &data.factor_base).is_err());
+                public["curve"]["group_order"] = u(0);
+                public["curve"]["cofactor"] = u(0);
+                assert!(verify_factor_base(&public, &data.factor_base).is_err());
             }
         }
     }
     #[test]
     fn repeated_prime_projection_checks_actual_cyclic_subgroup() {
-        let data = generate(&config("koblitz", 11, false)).unwrap();
+        // Seed7 selects a=1; its odd-degree quadratic twist is a=0 and has
+        // #E=2116=4*23^2 with rank-two rational23-torsion.
+        let data = generate(&config("koblitz", 11, true)).unwrap();
         let public = &data.public_instance;
+        assert_eq!(public["curve"]["a"], "0");
+        assert_eq!(public["curve"]["group_order"], "2116");
+        assert_eq!(public["curve"]["subgroup_order"], "23");
         let c = arithmetic(public).unwrap();
         let order = number(&public["curve"]["group_order"], "order").unwrap();
         let r = number(&public["curve"]["subgroup_order"], "r").unwrap();
