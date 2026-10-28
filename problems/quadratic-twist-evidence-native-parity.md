@@ -288,6 +288,16 @@ reconciliation, but neither validates the two new entries nor produces an active
 union/catalog. Preserve main-side records and retrieve missing study records
 from the pinned prior input, then meet all existing native validation gates.
 
+The [2026-10-28 existing-unit fixture triage](../research/quadratic_twist_evidence_20261021/validation/library-fixture-triage-20261028/README.md)
+reproduces missing tracked inputs/source for19 of the20 earlier observed unit
+failures. After materializing immutable Git inputs, a completed20-case selection
+reports19 pass/1 fail, with no source or assertion changes. The sole failure in
+that selection remains the active extension count1324 versus2287. Five cases
+use documented CPU emulation, not GPU hardware or a new research workload.
+The5037 filtered cases and further full-suite interactions remain outside this
+completed diagnostic; the full library still has no completed green result.
+Keep the1921-model reconciliation, checkpoint and broader completion holds open.
+
 The initial import supplied historical evidence and a certificate-only auditor.
 The 2026-10-21 continuation closes the full native replay and identity-record gaps,
 installs the missing proof/test toolchains, and proves 14 algebraic implications

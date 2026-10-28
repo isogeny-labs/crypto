@@ -25,6 +25,14 @@ validity result or active registry repair follows; preserve those main-side
 updates when retrieving the1921 missing study records. Combined native/catalog
 validation and the strict2287 assertion remain required.
 
+2026-10-28 [existing-unit fixture triage](validation/library-fixture-triage-20261028/README.md)
+completes a20-case rerun of the failures observed in the interrupted library
+attempt:19 pass after materializing immutable tracked inputs; one still fails
+1324 versus2287. No source/assertion/registry change. Five cases use CPU emulation,
+with no hardware or benchmark claim. The20 selected cases exclude5037 others;
+the full5057-test suite remains incomplete/non-green, and additional full-suite
+failures are not ruled out. The1921-model reconciliation hold is unchanged.
+
 | Requested/required item | Status | Evidence or remaining gap |
 | --- | --- | --- |
 | PR in `aburan28/crypto` | complete | PR #2381, extended on its existing branch |
@@ -40,7 +48,7 @@ validation and the strict2287 assertion remain required.
 | Algebraic identity certificates | verified for sixteen stated study identities | all previous fifteen retained; inverse-coordinate IDC1h202bb532af10c977 adds32+16 replay and false controls; cache/group/list implications separately Lean-proved |
 | Exact curve/model/subgroup identities | historically verified within stated representations; active registry integration regressed after main merge | frozen1,921-model/27 EC1 evidence retained, but all1,921 models are absent from the merged registry; reconcile both inputs and revalidate without lowering strict coverage; unused subgroup choices stay unknown |
 | Shared Conductor check | blocked by unavailable tool/configuration | CLI exits 127; shared workflow/state unavailable; no reservation claimed |
-| Repository `cargo test --release --lib --locked` | historical passes; current merged-tree attempt is not green | earlier4,479/119-ignore and4,474 receipts retained; refreshed5057-test build succeeds but strict active-registry test fails1324 versus2287, with other failures not silently classified inherited; see backend-build-20261027 |
+| Repository `cargo test --release --lib --locked` | historical passes; full merged-tree attempt remains incomplete/non-green | earlier4,479/119-ignore and4,474 receipts retained;5057-test build succeeds; targeted20-case triage now19 pass/1 strict registry failure1324 versus2287 after tracked-input materialization;5037 cases outside this completed subset, no full-suite pass inferred; see library-fixture-triage-20261028 |
 | Native metadata/backend tests | current build inputs repaired, focused tests pass |42 metadata and22 shared F13 backend tests pass on merged source dependencies; earlier39/40 receipts and frozen exact registry/certificate replay retained, not substituted for current integration |
 | Source-linked report, graph and inspected PDF | supplied | `reports/native-20261021T150125Z/` |
 | General GHS implementation / asymptotic or hardness claim | unresolved, not established | finite examples and conditional algebra do not establish either |
