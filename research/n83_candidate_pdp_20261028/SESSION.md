@@ -289,3 +289,10 @@ This distinguishes a possible equality certificate from coincident bounds.
 Ten unit controls pass, including inverse/weight agreement and wrong-map rejection.
 The first protocol draft failed because the required draft freeze block was
 absent; retained that draft and finding, then corrected before freeze.
+
+### Source-pin correction before data
+
+The source commit had not finished when an initial predata freeze read HEAD.
+Its subsequent Git staging failed on the live index lock; no lock was removed
+and no production launched. Preserved that freeze and log, verified the completed
+94b5400d9cb source bytes, and filed version2 amendment before affected data.
