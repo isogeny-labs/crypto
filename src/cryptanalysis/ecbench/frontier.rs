@@ -839,6 +839,12 @@ pub fn build(bounds: &[Bound], axes: &[String]) -> Result<Frontier, String> {
     }
     let mut domains = Vec::new();
     for (domain_id, (domain, bs)) in by_domain {
+        // A domain with an oracle reads the oracle axis whatever was asked.
+        let mut domain_axes = axes.to_vec();
+        if domain.envelope.oracle.is_some() && !domain_axes.iter().any(|a| a == ORACLE_AXIS) {
+            domain_axes.push(ORACLE_AXIS.to_string());
+        }
+        let axes = &domain_axes[..];
         let (ranked, unranked): (Vec<&Bound>, Vec<&Bound>) = bs
             .iter()
             .copied()

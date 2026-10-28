@@ -1620,7 +1620,12 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
                     .collect(),
             );
         }
-        let q_est = estimate(&q_strata, opts.resamples, opts.seed ^ 0x13);
+        let q_est = estimate_v(
+            &q_strata,
+            opts.resamples,
+            opts.seed ^ 0x13,
+            opts.fit_version,
+        );
         dimensions.insert(
             "oracle_queries".to_string(),
             Dimension {
