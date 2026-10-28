@@ -156,14 +156,23 @@ fn main() {
             }
         }
     }
-    // rho per p, pooled over the arm-A runs of that p; p without rho runs use the pool over all p
+    // rho per p, pooled over the arm-A runs of that p; p without rho runs use the pool over all p.
+    // Each entry is (S, steps per group op, runs). Steps are normalised per run by that run's own
+    // sqrt(l) before pooling, so a pool over runs of different p stays a dimensionless ratio.
     let mut rho_by_p: BTreeMap<u64, Vec<(f64, f64, f64)>> = BTreeMap::new();
     let mut all_rho: Vec<(f64, f64, f64)> = Vec::new();
     for &(p, s) in cells.keys() {
         if let Some(r) = load(raw, p, s, "A") {
             let k = r["rho"].as_array().map_or(0, |x| x.len()) as f64;
             if k > 0.0 {
-                let e = (f(&r, "rho_s_mean"), f(&r, "rho_steps_mean"), k);
+                let s_mean = f(&r, "rho_s_mean");
+                let ops = s_mean * (u(&r, "l") as f64).sqrt();
+                let per_op = if ops > 0.0 {
+                    f(&r, "rho_steps_mean") / ops
+                } else {
+                    1.0
+                };
+                let e = (s_mean, per_op, k);
                 rho_by_p.entry(p).or_default().push(e);
                 all_rho.push(e);
             }
@@ -178,7 +187,7 @@ fn main() {
         )
     };
     let pooled_all = if all_rho.is_empty() {
-        (1.3, 0.0, 0.0)
+        (1.3, 1.0, 0.0)
     } else {
         pool(&all_rho)
     };
@@ -204,11 +213,7 @@ fn main() {
         let sqrt_l = (u(&ra, "l") as f64).sqrt();
         let ce = f(&ra, "c_add_e");
         let rho_muls = rho.0 * sqrt_l * ce;
-        let steps_per_op = if rho.0 > 0.0 {
-            rho.1 / (rho.0 * sqrt_l)
-        } else {
-            1.0
-        };
+        let steps_per_op = rho.1;
         let mut cell = json!({"p": p, "seed": s, "l_bits": f(&ra, "bits"), "rho_source": rho_src, "rho_S": rho.0,
             "rho_runs_pooled": rho.2, "rho_steps_per_group_op": steps_per_op, "A": arm_json(&ra, rho_muls, steps_per_op)});
         let tot_a = u(&ra, "total_muls") as f64;
