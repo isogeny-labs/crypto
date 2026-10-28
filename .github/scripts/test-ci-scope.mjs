@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync
 import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
-import { classify, embeddedInputs, materializeInputs, scopes, select } from './ci-scope.mjs';
+import { classify, embeddedInputs, materializeInputs, pathDependencyDirs, scopes, select } from './ci-scope.mjs';
 
 test('prose does not run compilers, profiling or CodeQL', () => {
   for (const file of ['AGENTS.md', 'docs/ecbench/README.md',
@@ -227,5 +227,41 @@ test('external Rust path modules and includes are followed recursively', () => {
       assert.deepEqual(select({ event: 'pull_request', base: deletionBase, cwd }), Object.fromEntries(scopes.map(key => [key, true])));
       write(relative, saved); git('add', '.'); git('commit', '-qm', `restore ${file}`);
     }
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
+test('shared factor-base crate selects root compilation and release checks', () => {
+  for (const file of ['tools/factor-base/Cargo.toml', 'tools/factor-base/src/lib.rs', 'tools/factor-base/src/store.rs']) {
+    const scope = classify([file]);
+    assert.equal(scope.rust_root, true, file);
+    assert.equal(scope.release_rust, true, file);
+    assert.equal(scope.ecbench_replay, true, file);
+  }
+});
+
+test('path dependencies of the root crate are materialized, transitively', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-pathdeps-'));
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  const write = (file, text) => { mkdirSync(path.dirname(path.join(cwd, file)), { recursive: true }); writeFileSync(path.join(cwd, file), text); };
+  try {
+    git('init', '-q'); git('config', 'user.email', 'ci@example.invalid'); git('config', 'user.name', 'CI scope test');
+    write('Cargo.toml', '[package]\nname="fixture"\nversion="0.1.0"\n[dependencies]\nhelper = { path = "tools/helper" }\nserde = "1"\n');
+    write('src/lib.rs', '// maintained\n');
+    write('tools/helper/Cargo.toml', '[package]\nname="helper"\nversion="0.1.0"\n[dependencies]\ninner = { version = "0.1", path = "../../inner" }\n');
+    write('tools/helper/src/lib.rs', '// helper\n');
+    write('inner/Cargo.toml', '[package]\nname="inner"\nversion="0.1.0"\n');
+    write('inner/src/lib.rs', '// inner\n');
+    write('tools/other/Cargo.toml', '[package]\nname="other"\nversion="0.1.0"\n');
+    git('add', '.'); git('commit', '-qm', 'base');
+    git('sparse-checkout', 'set', '--no-cone', '/src/', '/Cargo.toml');
+    assert.equal(existsSync(path.join(cwd, 'tools/helper/Cargo.toml')), false);
+    assert.deepEqual([...pathDependencyDirs(cwd)], ['tools/helper', 'inner']);
+    materializeInputs(cwd);
+    for (const file of ['tools/helper/Cargo.toml', 'tools/helper/src/lib.rs', 'inner/Cargo.toml', 'inner/src/lib.rs']) {
+      assert.equal(existsSync(path.join(cwd, file)), true, file);
+    }
+    assert.equal(existsSync(path.join(cwd, 'tools/other/Cargo.toml')), false);
+    write('Cargo.toml', '[package]\nname="fixture"\nversion="0.1.0"\n[dependencies]\nup = { path = "../up" }\n');
+    assert.throws(() => pathDependencyDirs(cwd), /escapes the checkout/);
   } finally { rmSync(cwd, { recursive: true, force: true }); }
 });
