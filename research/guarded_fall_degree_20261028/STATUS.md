@@ -2,7 +2,7 @@
 
 | Requested item | Status | Evidence or remaining gap |
 |:--|:--|:--|
-| Put the established proof into `isogeny-labs/crypto` | Prepared on the feature branch; publication tracked by its PR | This directory, commit, and PR |
+| Put the established proof into `isogeny-labs/crypto` | Committed and pushed; ready PR opened with auto-merge enabled | [PR #2795](https://github.com/isogeny-labs/crypto/pull/2795); live CI/review/merge state is tracked there |
 | Preserve executable verification | Implemented natively and tested | `native/`, compact input/DAG files, native validation receipts |
 | Extend to growing factor bases | Derived for the explicit degree-`B` membership model | `extensions/growing_b/proof.txt`, `binary_bridge.txt` |
 | Extend to characteristic two | Derived for ordinary binary coefficient-field systems | `extensions/characteristic_two/extension_proof.txt` and independent audits |
