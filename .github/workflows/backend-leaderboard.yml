@@ -20,6 +20,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           filter: blob:none
+          fetch-depth: 0
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /.gitignore
@@ -70,9 +71,7 @@ jobs:
           cargo +1.99.1 fmt --manifest-path tools/backend-leaderboard/Cargo.toml --check
           cargo +1.99.1 test --locked --manifest-path tools/backend-leaderboard/Cargo.toml
           cargo +1.99.1 clippy --locked --manifest-path tools/backend-leaderboard/Cargo.toml --all-targets -- -D warnings
-      - name: All generated views match their sealed sources
+      - name: Frozen report matches its reviewed source snapshot and sealed outputs
         run: |
-          cargo +1.99.1 run --locked --manifest-path tools/backend-leaderboard/Cargo.toml -- --check
-          lock_sha=$(sha256sum docs/backend-leaderboard/reproduction.lock.json | cut -d ' ' -f 1)
-          cargo +1.99.1 run --locked --manifest-path tools/backend-leaderboard/Cargo.toml -- reproduce --expected-lock-sha256 "$lock_sha" > /tmp/backend-reproduction.json
-          cat /tmp/backend-reproduction.json
+          python3 tools/backend-leaderboard/test_check_frozen_report.py
+          python3 tools/backend-leaderboard/check_frozen_report.py
