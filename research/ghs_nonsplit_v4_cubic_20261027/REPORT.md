@@ -93,8 +93,14 @@ N_new(q) = ((q^2+q+2)/2)*(q/2-1) + Z*q/2
            (q^3-q^2-4)/4      if m is odd.            (2)
 ```
 
-The Hess two-rational-pole screen adds `q^2(q+1)/4` models outside
-the triangle screen, all with trace-zero twist. It is disjoint from
+For completeness, the Hess two-rational-pole screen takes products
+`s=u*v` with `u,v in V*` and selects the trace-zero twist. Unique
+factorization in `Sym^2(V)` gives `(q+1)(q+2)/2` projective product
+classes. Exactly `q+1` have `Tr_(K/k)(s^e)=0`: they are the classes
+`s=z^(q+1)` with `z in V*`. Each of the other `q(q+1)/2` classes
+has `q/2` scalar multiples with absolute trace one, and those are
+precisely the trace-zero Hess models outside the triangle screen.
+Hence that screen adds `q^2(q+1)/4` models. It is disjoint from
 the trace-one nonsplit addition. Thus the **three-screen union** is
 
 ```text
