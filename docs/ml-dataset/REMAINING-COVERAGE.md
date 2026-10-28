@@ -1,23 +1,24 @@
 # Original-scope coverage and remaining work
 
 This is an implementation handoff, not a completed-corpus certificate. Read the
-committed test manifests, frozen campaign manifest, per-cell outcomes and S3
-receipts for executed coverage. Source `4c94f1dfc9b` passed 49 focused and 5,016
-full-library tests (122 ignored, zero failures); its six validation files were
-uploaded and download-verified. The subsequent SAT-event, generic-large-prime
-and report increment passed 59 focused tests plus four native observer tests.
-Later changes include prime-F4 modulus guards, PKM actual-domain export,
-run-binding checks, lint fixes and Koblitz terminal-completeness replay. Central
-Clippy and the final full-library run for that combined source remain pending;
-the superseded final-suite compile is not a completed validation result. No
-performance comparison follows from these correctness tests.
+committed validation manifests, frozen campaign plan, per-cell outcomes and S3
+receipts for executed coverage. Source `f0863aefd6e1a416929f8acc02283d46f9c69936`
+passed **5,043 full-library tests, zero failures, 123 ignored**, including 71
+dataset tests. The separately invoked endpoint integration test passed all 360
+combinations of n = 23/61, three families, both twists, m = 2/4/15 and ten methods.
+It checks structured outcomes and any returned certificates; unsupported and
+budget-censored cells do not become solved instances. Strict maintained-code
+Clippy with CI's Rust 1.98 and changed-file formatting passed. The new CLI and
+UID 1000 container preflight passed without scientific generation.
 
-Cloud pilot 001 exposed unreadable container input modes; pilot 002 reached
-publication but failed with S3 `HeadObject` HTTP 403. The worker-role access
-proposal is prepared but has not been applied. The earlier local-role upload
-does not demonstrate EKS worker access, and neither pilot establishes cloud
-durability. See the [worker access proposal](../../research/ml_dataset_20261028/worker-s3-policy-proposal.md)
-for the retained failure and exact proposed scope.
+Earlier launch source `4c94f1d` passed 49 focused and 5,016 full-library tests
+(122 ignored); its six validation files were uploaded and download-verified.
+Pilot 001 exposed unreadable container input modes in a same-image reproduction;
+its original stderr was lost in a cleanup race. Pilot 002 reached publication
+but retained S3 HeadObject HTTP 403. The scoped role policy is prepared but not
+applied. The new conditional-write fallback has software tests but no actual
+worker S3 validation. Neither launch establishes a completed cloud cell or
+remote corpus. No performance comparison follows from these correctness tests.
 
 ## Preserve the whole campaign
 
@@ -33,12 +34,12 @@ enormous corpus.
 
 | Area | Current implementation boundary | Remaining acceptance condition |
 |---|---|---|
-| Curve construction | Native arithmetic, Koblitz trace recurrence, exact Hasse certificates for general curves, exhaustive small-field certificates, trace-one binary twists and nonsquare prime twists; bounded tests cover n = 23, 24, 31, 47, 61 across families and twists | Validate the combined source and run the frozen all-degree correctness wave; independently replay every order and scalar certificate, including repeated largest-prime factors and rank-two rational torsion |
+| Curve construction | Native arithmetic, Koblitz trace recurrence, exact Hasse certificates for general curves, exhaustive small-field certificates, trace-one binary twists and nonsquare prime twists; bounded tests cover n = 23, 24, 31, 47, 61 across families and twists | Run the frozen all-degree correctness wave; independently replay every order and scalar certificate, including repeated largest-prime factors and rank-two rational torsion |
 | Prime cofactors | `CurveParams.h` is a u32; larger exact cofactors are explicitly unsupported | Introduce an exact-cofactor representation for generic solver adapters, without truncating or replacing the selected curve |
 | Repeated prime factors | Remove all r factors from the clearing scalar, then trim the sampled r-primary point to exact order r; repeated-r membership uses bounded BSGS in the actual generated cyclic subgroup | Preserve and charge this diagnostic setup separately; membership logs remain private; validate membership against the generated subgroup rather than accepting all rational r-torsion |
 | Factor bases | Small-x lifting, per-point prime-primary projection, signed membership and exact orbit records | Add independently declared polynomial-subspace, Frobenius-union, quotient, PKM and learned base policies as separate populations, with rejection probabilities, selection costs and matched solver domains |
 | General ECDLP recovery | Independent bounded BSGS and native large-prime scalar recovery now have adapters for all three families and both twist positions; generic recovery uses identity/sign symmetry where Frobenius does not preserve the model | Validate actual cloud coverage and practical relation yield at requested sizes; extend target descent and factor-base policies; preserve insufficient-rank and resource-capped outcomes |
-| Double large primes | Native signed-Frobenius elimination for admitted Koblitz models, plus native sparse graph/hypergraph filtering for general binary/twists/prime; source coefficients, modular rank and determined-target recovery are checked; both replayers now enforce complete terminal attempt histories, pending combined-source tests | Export internal pivot snapshots and every reduction operation; validate broad natural targets and retain ineffective and capped graph runs |
+| Double large primes | Native signed-Frobenius elimination for admitted Koblitz models, plus native sparse graph/hypergraph filtering for general binary/twists/prime; source coefficients, modular rank and determined-target recovery are checked; both replayers now enforce complete terminal attempt histories, covered by passing combined-source tests | Export internal pivot snapshots and every reduction operation; validate broad natural targets and retain ineffective and capped graph runs |
 | Sampling replay | Public algebra and independent scalar certificates are replayed; seeds and sampling indices are retained in restricted provenance | Reconstruct curve, generator, key and solver-query draws from the frozen configuration in a separate sampling audit; the current relation verifier checks the recorded coefficients and group equations but does not prove that they came from the declared RNG stream |
 | Binary SAT | Chained S3 finite-domain circuits with checked point-sign lifts and bounded native decision/assignment/reason/conflict/learning/deletion/backjump/restart/XOR streams; sticky sink failure returns Unknown | Add full encoder gate maps, clause-minimization derivations and independently checked UNSAT proofs; extend practical admitted coverage at m=2..15 without interpreting a cap as UNSAT |
 | Prime SAT | No prime-field SAT adapter is yet declared complete | Integrate an actual prime-field bit-vector/modular encoding with exact domain maps, verified models and proof-checkable outcomes |
@@ -49,8 +50,8 @@ enormous corpus.
 | Fall degrees | Exact first and last fall degree remain null | Define each invariant for the actual ring and field equations; export degree-fall witnesses, complete lower-degree exclusion/closure evidence and independently checked counterexamples; formalize universal claims separately |
 | Measurements | Typed native counters and worker-level measurement mechanisms have distinct scopes | Admit and verify PMU instructions with event configuration, enabled/running time, thread/process coverage and readback; preserve unavailable/failed counter collection explicitly; add missing phase/peak-memory/I/O/checkpoint accounting |
 | Complete intermediate artifacts | Curve construction and several native solver adapters still export summaries rather than every internal state | Add incremental event/chunk sinks inside long native calls, export Hasse baby/giant tables and integer-factorization internals, and test truncation/exhaustion as explicit terminal outcomes |
-| Durable publication | Native plan/lease/shard, content-addressed upload/readback, discoverable catalogs, portable restore and immutable coverage reports are implemented; earlier-source checks passed, while current-source validation is pending; EKS publication fails because its role only permits the legacy bucket | Resolve worker IAM access with the prepared scoped role policy and verify its readback, then demonstrate actual worker S3 roundtrips, fresh restore/replay, kill/resume without duplication, finite budgets and committed results; retained attempts and process checkpoints are different guarantees |
-| ML consumer | Strict public feature allowlist, restricted targets/provenance, stable feature deduplication and bounded external sorting are implemented; PKM features reconstruct and verify the actual Kummer base, carry a distinct PDP-domain identity, and require success labels to bind that same domain; PKM cells missing their actual base retain provenance but receive no matched feature | Validate the combined export source and a real restored cloud training view; retain the current conservative whole-n split while constructing merged transfer/isomorphism/isogeny components across field sizes and frozen holdouts |
+| Durable publication | Native plan/lease/shard, content-addressed upload/readback, discoverable catalogs, portable restore and immutable coverage reports are implemented; current-source software checks passed; EKS publication fails because its role only permits the legacy bucket | Resolve worker IAM access with the prepared scoped role policy and verify its readback, then demonstrate actual worker S3 roundtrips, fresh restore/replay, kill/resume without duplication, finite budgets and committed results; retained attempts and process checkpoints are different guarantees |
+| ML consumer | Strict public feature allowlist, restricted targets/provenance, stable feature deduplication and bounded external sorting are implemented; PKM features reconstruct and verify the actual Kummer base, carry a distinct PDP-domain identity, and require success labels to bind that same domain; PKM cells missing their actual base retain provenance but receive no matched feature | Validate a real restored cloud training view; retain the current conservative whole-n split while constructing merged transfer/isomorphism/isogeny components across field sizes and frozen holdouts |
 | Training and novel solvers | No trained-model efficacy or novel SAT solver is established by the generator | Materialize a validated training view, freeze held-out benchmarks and controls, train candidate policies, verify each proposed action with exact solvers, charge inference and fallback, and report failures and uncertainty |
 
 ## Next discriminating validation

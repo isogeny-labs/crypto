@@ -11,7 +11,11 @@ and an independently recovered discrete logarithm are different records.
 Its default cross-product has 24 field sizes, 14 arities, three curve families,
 two twist choices, 16 curve seeds, eight generators, 64 target keys and ten
 methods: **165,150,720 method cells**. This is a derived planned count, not a
-count of completed solutions. Every curve/target configuration has both twist
+count of completed solutions. The checked-in
+`research/ml_dataset_20261028/full-campaign-plan.json` materializes these axes
+without expanding the cross-product. Its protocol digest is intentionally null:
+it is a planning artifact and generation refuses it until a matching full-campaign
+protocol and finite execution budgets have been frozen. Every curve/target configuration has both twist
 choices. The prime field at n=61 is exactly 2305843009213693951.
 
 Freeze an `experiment.protocol/v1` record with the shared research protocol
@@ -290,3 +294,32 @@ resource predictors with censoring, and measure learned SAT or elimination
 policies against frozen classical baselines with held-out instances. A neural
 prediction about hidden algebraic structure becomes a mathematical result only
 after independent symbolic or formal verification.
+
+## Shared campaign reservation and independent consumer
+
+The existing [campaign budget record in PR 2751](https://github.com/isogeny-labs/crypto/pull/2751)
+sets a USD 200 cumulative ceiling through the stated horizon, with USD 188.3888
+conservatively reserved and USD 11.6112 unallocated. It includes existing E12
+jobs, storage/transfers/contingency and a proposed single c6a.4xlarge worker for
+at most 24 hours. These are reservations, not verified billing or an account-wide
+spending guard. The reservation does not renew per wave or per day.
+
+That proposed worker was priced in us-east-1; the producer's EKS lab is in
+us-east-2. Before another cloud wave, reconcile prior Job usage and inventory,
+price and admit the actual EKS node/worker shape, and bind cumulative output
+and request accounting. Preserve the recorded proposed limits of 20 GiB unique
+output, 100,000 PUT requests and 200,000 GET requests; this CLI's per-cell trace
+limit alone does not enforce those campaign-wide limits. The large planning
+manifest is not an authorization to launch its cross-product. The role-policy
+approval and this admission gate must both be resolved before a new pilot.
+
+An independently implemented Rust consumer is maintained in the companion
+[PR 2757](https://github.com/isogeny-labs/crypto/pull/2757), under
+`research/ml_dataset_independent_validation_20261028/native`. It checks public
+positive certificates without linking producer arithmetic, with narrowly stated
+limits on order, solver-independence and fall-degree claims. Reconcile and pin
+its current revision before using it. Its controller-role software fixture does
+not establish worker access or replace a real producer-to-S3-to-consumer replay.
+The first durable producer cell must be restored into an isolated directory and
+checked by both the native producer and that independent consumer before any
+broader scientific claim or training acceptance.
