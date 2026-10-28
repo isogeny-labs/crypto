@@ -1,0 +1,42 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.72in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\title{Simple-branch zero order for the common genus-2 model}
+\author{Formal proof packet}
+\date{27 October 2026}
+\begin{document}
+\maketitle
+\noindent This is a conditional formal result, not a new target experiment or cost comparison. The editable diagram \texttt{branch-zero-order.svg}, machine-readable gate table \texttt{branch-zero-order.csv}, Lean source, and compiler output accompany this PDF.
+
+\section*{Checked statement}
+At a rational simple root $a$ of the cubic $f$, the actual local stalk has $y^2=(x-a)q$, with $q$ a unit and $\operatorname{ord}(y)=1$. The new theorem \texttt{actual\_branch\_x\_factor\_zero\_order} assumes $N=(x-a)t$ and $B$ is a unit. It proves
+\[
+N-By=y\bigl(yq^{-1}t-B\bigr),\qquad \operatorname{ord}(N-By)=1.
+\]
+The second factor is a unit because $yt$ is a nonunit and $B$ is a unit in the local ring. The result is also recorded as a generic discrete-valuation-ring lemma and an actual-stalk specialization.
+
+The discrete-valuation-ring characterization and unit-times-uniformizer valuation are recorded in the Stacks Project, \href{https://stacks.math.columbia.edu/tag/00PD}{Lemma 10.119.7}. The present packet imports the already checked actual-stalk DVR theorem and proves the conditional order statement; the Stacks lemma alone does not establish the genus-2 divisor-class equation.
+
+\begin{center}
+\setlength{\fboxsep}{8pt}
+\fbox{\begin{minipage}{0.88\linewidth}\centering
+\textbf{Checked dependency}\par\vspace{4pt}
+$y^2=(x-a)q$, $q$ unit, $\operatorname{ord}(y)=1$\par\vspace{4pt}
+$\Downarrow$\par\vspace{4pt}
+$N=(x-a)t$, $B$ unit $\Longrightarrow$ $N-By=y(yq^{-1}t-B)$\par\vspace{4pt}
+$\Downarrow$\par\vspace{4pt}
+$\operatorname{ord}(N-By)=1$\par\vspace{8pt}
+\textbf{Open:} all law numerators; global divisor/Pic$^0$ equation; compiled Rust semantics
+\end{minipage}}
+\end{center}
+
+\section*{Verification and boundary}
+Direct Lean 4.34.1/Mathlib \texttt{d13f23b} compilation of \texttt{Common22BranchZeroOrder.lean} exited zero. All three theorem axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; no \texttt{sorryAx}. Source SHA-256:\par\smallskip\noindent{\small\texttt{5e89be1013b4234938e336634a3a20455d3605e287abcf2c6ecb3e321729f5d9}}.
+
+The theorem does not establish that every compiled-law numerator factors as $N=(x-a)t$, or that the corresponding rational function has the required divisor class. The matched-rho costs and frozen 1,260-target rows remain unchanged. The accompanying Markdown names the exact command and source files.
+
+After restoring tracked fixtures omitted by the sparse checkout, the repository-wide release library test exited zero with 4,954 passed, 0 failed, and 122 ignored tests using eight test threads. This test result does not extend the theorem's mathematical scope.
+\end{document}
