@@ -61,6 +61,10 @@ fn rows(dir: &Path, prefix: &[&str]) -> Vec<Value> {
         for l in fs::read_to_string(&f).unwrap().lines() {
             if l.starts_with('{') {
                 let mut v: Value = serde_json::from_str(l).expect("row");
+                // Run summaries (no `x_r`) are not measured rows.
+                if v.get("x_r").is_none() || v.get("kind").is_none() {
+                    continue;
+                }
                 v["_file"] = json!(name);
                 out.push(v);
             }
@@ -155,6 +159,10 @@ struct Cell {
     d_f: Vec<(u64, &'static str)>,
     ffd: Vec<(u64, &'static str)>,
     d: Vec<(u64, &'static str)>,
+    /// `F_p` multiply-adds per draw: the closure (all closures computed) and
+    /// F4 (`muladds`), where recorded.
+    hky_ops: Vec<u64>,
+    f4_ops: Vec<u64>,
     files: Vec<String>,
 }
 
@@ -203,6 +211,8 @@ fn score(dir: &Path) {
             d_f: Vec::new(),
             ffd: Vec::new(),
             d: Vec::new(),
+            hky_ops: Vec::new(),
+            f4_ops: Vec::new(),
             files: Vec::new(),
         });
         let df = d_f(r);
@@ -210,7 +220,13 @@ fn score(dir: &Path) {
         if let Some(f) = r["first_fall_degree"].as_u64() {
             c.ffd.push((f, ""));
         }
+        if let Some(x) = r["muladds"].as_u64() {
+            c.hky_ops.push(x);
+        }
         if let Some(g) = f4.get(k) {
+            if let Some(x) = g["muladds"].as_u64() {
+                c.f4_ops.push(x);
+            }
             let dv = u(g, "solving_degree_max");
             if g["timed_out"] == json!(true) {
                 c.d.push((dv, ">="));
@@ -236,8 +252,8 @@ fn score(dir: &Path) {
         String::new(),
         format!("Gate G2 (`d_F ≤ D`): {g2_checked} draws checked, {g2_bad} violations. Repeated systems: {repeats}, mismatches: {mismatches}. Planted-solution violations: {planted_bad}."),
         String::new(),
-        "| p | kind | m | control | t | N | λ | d_F | ffd | D | falls | max cols | ms |".into(),
-        "|--:|:--|--:|:--|--:|--:|--:|:--|:--|:--|:--|--:|:--|".into(),
+        "| p | kind | m | control | t | N | λ | d_F | ffd | D | falls | max cols | closure F_p muladds | F4 F_p muladds |".into(),
+        "|--:|:--|--:|:--|--:|--:|--:|:--|:--|:--|:--|--:|:--|:--|".into(),
     ];
     let mut cells_json = Vec::new();
     for c in cells.values() {
@@ -250,9 +266,10 @@ fn score(dir: &Path) {
             .max()
             .unwrap_or(0);
         let ms: Vec<u64> = c.rows.iter().map(|r| r["ms"].as_f64().unwrap_or(0.0) as u64).collect();
+        let ops = |v: &[u64]| if v.is_empty() { "—".to_string() } else { v.iter().map(|x| format!("{:.2e}", *x as f64)).collect::<Vec<_>>().join(" ") };
         let fl = |v: &[(u64, &str)]| v.iter().map(|&(x, s)| format!("{s}{x}")).collect::<Vec<_>>().join(" ");
         md.push(format!(
-            "| {} | {} | {} | {}{} | {} | {} | {:.2e} | {} | {} | {} | {} | {} | {:?} |",
+            "| {} | {} | {} | {}{} | {} | {} | {:.2e} | {} | {} | {} | {} | {} | {} | {} |",
             c.p,
             c.kind,
             c.m,
@@ -266,14 +283,15 @@ fn score(dir: &Path) {
             if c.d.is_empty() { "—".into() } else { fl(&c.d) },
             serde_json::to_string(&falls).unwrap(),
             max_cols,
-            ms
+            ops(&c.hky_ops),
+            ops(&c.f4_ops)
         ));
         cells_json.push(json!({"p": c.p, "kind": c.kind, "m": c.m, "control": c.control, "t": c.t,
             "N": c.m * c.t, "lambda": lambda(c.p, c.t, c.m), "small_base": small,
             "d_F": fl(&c.d_f), "d_F_median": fmt(lower_median(&c.d_f)), "ffd": fl(&c.ffd),
             "ffd_median": fmt(lower_median(&c.ffd)), "D": fl(&c.d),
             "D_median": if c.d.len() == c.d_f.len() { fmt(lower_median(&c.d)) } else { "—".into() },
-            "max_cols": max_cols, "ms": ms, "files": c.files}));
+            "max_cols": max_cols, "ms": ms, "hky_muladds": c.hky_ops, "f4_muladds": c.f4_ops, "files": c.files}));
     }
     // Ladders in t at fixed (p, kind, m, control).
     md.extend([
@@ -352,7 +370,9 @@ fn score(dir: &Path) {
     ]);
     let mut ml: BTreeMap<(u64, String, u64), Vec<&Cell>> = BTreeMap::new();
     for c in cells.values() {
-        if c.control == "tower" && c.files.iter().any(|f| f.starts_with("C-")) {
+        // Every tower cell at (p, kind, t): the same seed gives the same
+        // system in A, B and C, and repeats are merged above.
+        if c.control == "tower" && (c.t == 2 || c.t == 3) {
             ml.entry((c.p, c.kind.clone(), c.t)).or_default().push(c);
         }
     }

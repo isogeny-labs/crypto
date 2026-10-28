@@ -245,3 +245,16 @@ transfers to `m = 2` as a proved lower bound on the measured draws only.
   hours per draw on this host.
 - **The 1-D arm (Amendment 4 (ii)) read "1-D flat"**: `d_F(q) = 2` on all
   4 draws at every `t = 2 … 24`. DERIVED.md D8 proves it.
+
+## Amendment 6 (2026-10-28, a prediction; before any Kummer `m = 2` row at `t ≥ 11`)
+
+From the `t ≤ 10` medians (3, 4, 4, 4, 4, 5, 5, 5, 5, 6), registered as a
+falsifiable conjecture:
+
+**C-step.** For Kummer `m = 2` at `P1`, `d_F = 4 + ⌊(t − 2)/4⌋` for `t ≥ 2`.
+- It predicts `d_F = 6` at `t = 11, 12, 13` and `7` at `t = 14`.
+- It is refuted by any `t ≥ 11` median that differs.
+- `ffd = 4` (theorem D3) is predicted unchanged.
+
+If C-step holds, `d_F` grows linearly in `t`, at one degree per four tower
+levels, against `2t + 2` for the no-fall certificate (D4).

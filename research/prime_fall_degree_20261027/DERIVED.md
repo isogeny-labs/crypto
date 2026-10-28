@@ -130,6 +130,41 @@ per `m`): `d_F(φF) = 2, 4, 4, 5, 5, 5, 5, 5` for `m = 3 … 10`.
 - On every measured chain row, the closure's `d_F` is at least the bound
   (`derived/spec_chain.md`). This check is an engine cross-check.
 
+## D8. Theorem (one summand is easy). `d_F(q) = 2` for every `t`
+
+**Statement.** Let `q(z) = S₃(g·z, x_2, x_R)` on one Kummer tower of height
+`t ≥ 2`, with `x_2 ≠ x_R` and no root on `μ_K`. In tower variables `q` is
+*linear*: `q = α + β·y_0 + γ·y_1` with `γ = g²(x_2 − x_R)² ≠ 0`. Then
+`1 ∈ V_{q,2}` and `1 ∉ V_{q,1}`, so `d_F = 2` for every `t`.
+
+**Proof.** `F_p[z]/(q)` has dimension 2. Write `z^{2^j} ≡ a_j + b_j z (mod q)`
+and `L_j = y_j − a_j − b_j·y_0`. Then `L_0 = 0` and `L_1 = q/γ`. Suppose
+`L_j ∈ V_{q,2}`.
+- `y_0·L_j = y_0 y_j − a_j y_0 − b_j y_1` has degree 2 and lies in `V_{q,2}`.
+  It writes `y_0 y_j` as a linear form.
+- `y_j·L_j = y_{j+1} − a_j y_j − b_j·y_0 y_j` lies in `V_{q,2}`.
+- Substituting `y_0 y_j` from the first, `y_j` from `L_j`, and `y_1` from `q`
+  leaves `y_{j+1} − a_{j+1} − b_{j+1} y_0`, which is `L_{j+1}`.
+
+At the top, `y_{t−1}·L_{t−1}` uses `y_{t−1}² = 1` and leaves
+`M = c_0 + c_1 y_0`, the remainder of `z^K − 1` modulo `q`. It is coprime to `q`
+because `q` has no root on `μ_K`. Then `q`, `M` and `y_0·M` are three
+independent linear forms in `⟨1, y_0, y_1⟩`; if `c_1 = 0`, `M` is a non-zero
+constant directly. Either way `1 ∈ V_{q,2}`. The quotient `F_p[z]/(q)` is
+finite, so a constant-size state `(a_j, b_j)` carries the tower in degree 2. ∎
+
+*Measured* (`derived/spec_1d_ladder.md`): `d_F(q) = 2` on all 4 draws at every
+`t = 2 … 24` (`ffd = 2`), and `d_F(q_j) ≤ d_F(f)` on every Kummer `m = 2` row
+(`derived/spec_1d_rows.md`).
+
+**What D8 says about `m = 2`.** The one-summand specialisation bound of D6
+is 2, so it cannot show growth. The growth of `d_F` at `m = 2` is
+two-dimensional. `f(z_1, z_2) = 0` is a curve of bidegree `(2, 2)`, genus 1,
+and `F_p[z_1, z_2]/(f)` is not finite. Running D8's recursion over `F_p[z_2]`
+needs coefficients `a_j(z_2)` and `b_j(z_2)`, functions on the `z_2`-grid,
+and their degree grows with `j`. A lower bound on `d_F` at `m = 2` therefore
+has to see the curve. No specialisation to finitely many points can give one.
+
 ## D7. Recorded relations (literature, restated)
 
 - **`d_F ≤ D`** (Huang–Kosters–Yeo; Caminata–Gorla, for degree-compatible
