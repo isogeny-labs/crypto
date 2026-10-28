@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -u
+root=research/pencil_sparse_20261022
+stem="$root/results/p186379-peel-cap25m-t0"
+date -u +%Y-%m-%dT%H:%M:%SZ > "$stem.started"
+(
+  ulimit -v 8388608
+  timeout 3600s env PENCIL_MAX_TARGETS=1 PENCIL_NODE_ORDER=identity \
+    PENCIL_SOLVER=peel PENCIL_MATRIX_CAP=25000000 \
+    "$root/target/release/pencil-sparse" --cohort 32 186379
+) > "$stem.jsonl" 2> "$stem.stderr"
+status=$?
+printf '%s\n' "$status" > "$stem.exit"
+date -u +%Y-%m-%dT%H:%M:%SZ > "$stem.ended"
+"$root/target/release/cap-process-status" "$status" "$stem"
+exit "$status"
