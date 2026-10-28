@@ -5,8 +5,16 @@ reproduces current-head compiler failures and restores real module/fixture input
 42 metadata and22 unchanged F13 backend tests pass; this is ordinary software
 validation, not uniform-yield execution or a new formal theorem. The refreshed
 root-library attempt is recorded separately, without substituting old receipts.
-Keep PR2381 open with auto-merge disabled; checkpoint authorization/access,
+Keep PR2381 open with auto-merge disabled; checkpoint access,
 mathematical and completion holds remain.
+
+2026-10-28: the user approved the existing branch-scoped checkpoint-only
+request. Secure token environment/file presence is still false; no gate or
+upload occurred. The [native runner](UNIFORM_YIELD_20261028_RUNNER.md) is now
+implemented and shell/CLI checked, but none of its scientific/control paths
+has run. Refresh current official checkpoint tooling and bind a complete
+RESUME to the approved branch before any future launch. Approval persists
+within that exact scope; do not repeat the permission question.
 
 The same check detects a new active-registry regression after the main merges:
 1921 previously registered study models are missing (958 fp/963 fpk), alongside
@@ -91,7 +99,7 @@ failures are not ruled out. The1921-model reconciliation hold is unchanged.
 | Direct uncached sign reference | executed and independently replayed |120 setups/1200 source checks, equal ordered operand/lift traces/certificates; direct saves2 cold adds in all400 comparisons, cache saves negations; no total ranking |
 | Registered F13 degree-two twist route | executed finite reduction and actual systems |12arms/72source scalars/196addition pairs;17new public proofs,208public/269audit;3of54 reduced joint gains/0original; matched rows conserved,4degree changes favor source; general classification/geometry still explicit |
 | Explicit dual and subgroup inverse | next unexecuted draft | `backlog/XP-20261025-cm8-explicit-dual`; doubling composition and odd-annihilator inverse before replacing public-base enumeration |
-| Uniform sampler useful yield / state collection | preregistered, native pair compiled, launch blocked |96arms/896targets/210policy comparisons planned;0scientific execution; C++v2/Rust audit and backend harness compile only; checkpoint approval/token absent; actual replay/controls and Lean proof/runner pending |
+| Uniform sampler useful yield / state collection | preregistered, native pair compiled, runner syntax checked, launch blocked |96arms/896targets/210policy comparisons planned;0scientific execution; C++v2/Rust audit and backend harness compile only; checkpoint scope approved, secure token absent; native replay/controls and Lean proof remain pending |
 
 The fresh library suite for the F13 continuation again passes 4,479
 tests with zero failures and 119 existing ignores; its 22 backend and four
@@ -110,7 +118,8 @@ implementation gap or passing CI does not settle general ECDLP hardness.
 The source-only [uniform collection draft](drafts/uniform-collection-20261026/README.md)
 prepares algebraic first-step/degree statements but is not elaborated or checked.
 It does not add to208public/269audited historical declarations or17identities.
-Actual-state binding, iid probability semantics, native uniform execution and
-the exact runner remain pending behind the unchanged checkpoint launch gate.
+Actual-state binding, iid probability semantics and native uniform execution
+remain pending. The new runner is implemented but its native paths are
+unverified; the checkpoint gate still needs secure token access/current tooling.
 
 Storage/CI maintenance: [artifact migration review](validation/artifact-migration-review-20261026/README.md) verifies32frozen byte bindings, removes55unrelated newly added loose files while preserving their immutable Git history, and adds read-only input restoration without changing any old verification command. Physical S3 availability/new-head CI remain unverified; no new scientific/Lean result.

@@ -104,6 +104,16 @@ may still be useful, provided the comparison and attribution stay exact.
 
 ## Gates and access
 
+Current status (2026-10-28): the pending checkpoint-only scope was approved by
+the user. Secure token environment/file presence is still false; no upload or
+scientific/proof run occurred. The new [native runner](UNIFORM_YIELD_20261028_RUNNER.md)
+implements record/replay/control glue with only shell syntax and safe CLI
+validation so far. Its native paths and the faithful probability bridge remain
+unverified. Use current official tooling, a branch-bound fresh RESUME/preview,
+and the approved secure-token route before launch; do not ask again for the
+same checkpoint permission. This update supersedes the approval-pending status
+in the dated historical notes below, without rewriting their evidence.
+
 An unresolved mathematical claim is not by itself an access blocker. Actual
 missing runtime, credentials, unavailable required tools, coordination access,
 resource caps or approval requirements are recorded separately, with an

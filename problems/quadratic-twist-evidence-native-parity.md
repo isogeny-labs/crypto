@@ -4,7 +4,17 @@
 - **Kind:** remaining formal implementation gap; coordination tool/access limit
 - **Affected work:** [quadratic-twist study](../research/quadratic_twist_evidence_20261021/README.md)
 - **Next action owner:** authoring session for PR #2381; shared coordination unassigned
-- **Last updated:** 2026-10-24
+- **Last updated:** 2026-10-28
+
+Current launch status: the user approved the previously reviewed checkpoint-only
+scope for this same branch. Secure token access is still absent. The new
+[uniform native runner](../research/quadratic_twist_evidence_20261021/UNIFORM_YIELD_20261028_RUNNER.md)
+passes shell syntax/safe CLI checks only; no gate, upload, producer, audit,
+corruption control or Lean elaboration ran in this update. Its native behavior,
+the actual-state/iid probability bridge, registry reconciliation and full-library
+completion remain open. Use current official checkpoint tooling and a fresh
+branch-bound RESUME before launch; the older dated approval-pending notes below
+are historical, not a request to ask for the same permission again.
 
 ## Problem
 
