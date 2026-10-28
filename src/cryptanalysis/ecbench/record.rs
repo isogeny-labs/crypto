@@ -42,6 +42,58 @@ pub const RECORD_SCHEMA: &str = "ecbench.record/v1";
 /// A session is regraded under the version it was graded with
 /// ([`grade_for_version`]); [`grade_v2`] is frozen.
 pub const GRADING_VERSION: u32 = 3;
+
+/// The key under which a session records the version of the inherited-F4
+/// word-operation accounting it was made under.
+pub const F4_ACCOUNTING_KEY: &str = "inherited_f4_specialise";
+
+/// The versions of the counted-work definitions this binary charges, recorded
+/// in every new session.  A method's identity hashes its configuration, not
+/// the code, so a change to what a unit counts is otherwise visible only as
+/// a different binary hash and, on replay, as bare count differences.
+pub fn current_accounting_versions() -> BTreeMap<String, u32> {
+    BTreeMap::from([(
+        F4_ACCOUNTING_KEY.to_string(),
+        crate::cryptanalysis::inherited_f4::INHERITED_F4_ACCOUNTING_VERSION,
+    )])
+}
+
+/// When inherited-F4 specialisation became eager on every host (`#2043`,
+/// 2026-10-17T17:19:59Z), in Unix milliseconds.  Before it a host without BMI2
+/// charged the lazy rewrite, which counts differently.
+pub const F4_EAGER_EVERYWHERE_UNIX_MS: u128 = 1_792_257_599_000;
+
+/// What to add to a failed replay of an inherited-F4 record, given the
+/// accounting versions its session recorded; `None` when the accounting
+/// cannot be the reason, so the difference is something else and is left
+/// unattributed.
+///
+/// A session without the field predates it, and is not assigned a version.
+/// The one change known to have moved the counts is `#2043`: it is named only
+/// when it can apply, that is when the session started before it and its host
+/// had no BMI2 (a BMI2 x86-64 host was eager before it as it is now).
+pub fn f4_accounting_note(
+    recorded: &BTreeMap<String, u32>,
+    started_unix_ms: u128,
+    recorded_host_has_bmi2: bool,
+) -> Option<String> {
+    let current = crate::cryptanalysis::inherited_f4::INHERITED_F4_ACCOUNTING_VERSION;
+    match recorded.get(F4_ACCOUNTING_KEY) {
+        Some(&v) if v == current => None,
+        Some(&v) => Some(format!(
+            "recorded under inherited-F4 accounting v{v}, this binary charges v{current}: \
+             the counts are different definitions, not a disagreement"
+        )),
+        None if recorded_host_has_bmi2 || started_unix_ms >= F4_EAGER_EVERYWHERE_UNIX_MS => None,
+        None => Some(format!(
+            "recorded before #2043 (2026-10-17) on a host without BMI2, where inherited-F4 \
+             specialisation was charged lazily; this binary charges it eagerly on every host \
+             (accounting v{current}), so a count difference here is expected, and later changes \
+             recorded only by binary hash can add to it"
+        )),
+    }
+}
+
 pub const CHILD_INPUT_SCHEMA: &str = "ecbench.child_input/v1";
 pub const CHILD_OUTPUT_SCHEMA: &str = "ecbench.child_output/v1";
 
@@ -383,6 +435,9 @@ pub fn child_main(input: &str) -> ChildOutput {
                 m.method_id, job.expected_method_id
             ));
         }
+        // Harness tables a solve may consult by name are loaded outside
+        // the measured interval.
+        crate::cryptanalysis::curve_id::warm();
         // Everything the workload's set-up freed is consolidated now, so
         // the first sizeable allocation inside the solve does not pay for
         // it (see `AllocatorFacts`).  Not part of any clock.
@@ -602,6 +657,12 @@ pub struct Record {
     pub isolation: IsolationRecord,
     pub env_class_id: String,
     pub binary_sha256: Option<String>,
+    /// The run's work in `bitop/v1` (`ecbench::work`), derived from the
+    /// record's own counts.  Written only by runners that price it, so a
+    /// record from before the block existed is byte for byte what it was and
+    /// its seal still checks; `ecbench work` prices those from their counts.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub work: Option<crate::cryptanalysis::ecbench::work::WorkBlock>,
 }
 
 impl Record {
@@ -652,9 +713,30 @@ pub fn json_roundtrip(x: f64) -> f64 {
 /// records and all bounds derived from them retain the former result. Keep
 /// that protocol behavior explicit instead of depending on a crate feature.
 pub(crate) fn legacy_json_float(x: f64) -> Option<f64> {
-    const POW10: [f64; 23] = [
-        1.0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11, 1e12, 1e13, 1e14, 1e15, 1e16,
-        1e17, 1e18, 1e19, 1e20, 1e21, 1e22,
+    const POW10: [f64; 309] = [
+        1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11, 1e12, 1e13, 1e14, 1e15, 1e16,
+        1e17, 1e18, 1e19, 1e20, 1e21, 1e22, 1e23, 1e24, 1e25, 1e26, 1e27, 1e28, 1e29, 1e30, 1e31,
+        1e32, 1e33, 1e34, 1e35, 1e36, 1e37, 1e38, 1e39, 1e40, 1e41, 1e42, 1e43, 1e44, 1e45, 1e46,
+        1e47, 1e48, 1e49, 1e50, 1e51, 1e52, 1e53, 1e54, 1e55, 1e56, 1e57, 1e58, 1e59, 1e60, 1e61,
+        1e62, 1e63, 1e64, 1e65, 1e66, 1e67, 1e68, 1e69, 1e70, 1e71, 1e72, 1e73, 1e74, 1e75, 1e76,
+        1e77, 1e78, 1e79, 1e80, 1e81, 1e82, 1e83, 1e84, 1e85, 1e86, 1e87, 1e88, 1e89, 1e90, 1e91,
+        1e92, 1e93, 1e94, 1e95, 1e96, 1e97, 1e98, 1e99, 1e100, 1e101, 1e102, 1e103, 1e104, 1e105,
+        1e106, 1e107, 1e108, 1e109, 1e110, 1e111, 1e112, 1e113, 1e114, 1e115, 1e116, 1e117, 1e118,
+        1e119, 1e120, 1e121, 1e122, 1e123, 1e124, 1e125, 1e126, 1e127, 1e128, 1e129, 1e130, 1e131,
+        1e132, 1e133, 1e134, 1e135, 1e136, 1e137, 1e138, 1e139, 1e140, 1e141, 1e142, 1e143, 1e144,
+        1e145, 1e146, 1e147, 1e148, 1e149, 1e150, 1e151, 1e152, 1e153, 1e154, 1e155, 1e156, 1e157,
+        1e158, 1e159, 1e160, 1e161, 1e162, 1e163, 1e164, 1e165, 1e166, 1e167, 1e168, 1e169, 1e170,
+        1e171, 1e172, 1e173, 1e174, 1e175, 1e176, 1e177, 1e178, 1e179, 1e180, 1e181, 1e182, 1e183,
+        1e184, 1e185, 1e186, 1e187, 1e188, 1e189, 1e190, 1e191, 1e192, 1e193, 1e194, 1e195, 1e196,
+        1e197, 1e198, 1e199, 1e200, 1e201, 1e202, 1e203, 1e204, 1e205, 1e206, 1e207, 1e208, 1e209,
+        1e210, 1e211, 1e212, 1e213, 1e214, 1e215, 1e216, 1e217, 1e218, 1e219, 1e220, 1e221, 1e222,
+        1e223, 1e224, 1e225, 1e226, 1e227, 1e228, 1e229, 1e230, 1e231, 1e232, 1e233, 1e234, 1e235,
+        1e236, 1e237, 1e238, 1e239, 1e240, 1e241, 1e242, 1e243, 1e244, 1e245, 1e246, 1e247, 1e248,
+        1e249, 1e250, 1e251, 1e252, 1e253, 1e254, 1e255, 1e256, 1e257, 1e258, 1e259, 1e260, 1e261,
+        1e262, 1e263, 1e264, 1e265, 1e266, 1e267, 1e268, 1e269, 1e270, 1e271, 1e272, 1e273, 1e274,
+        1e275, 1e276, 1e277, 1e278, 1e279, 1e280, 1e281, 1e282, 1e283, 1e284, 1e285, 1e286, 1e287,
+        1e288, 1e289, 1e290, 1e291, 1e292, 1e293, 1e294, 1e295, 1e296, 1e297, 1e298, 1e299, 1e300,
+        1e301, 1e302, 1e303, 1e304, 1e305, 1e306, 1e307, 1e308,
     ];
 
     let encoded = serde_json::to_string(&x).ok()?;
@@ -691,14 +773,36 @@ pub(crate) fn legacy_json_float(x: f64) -> Option<f64> {
             _ => return None,
         }
     }
-    let exponent = explicit_exponent.checked_sub(fractional_digits)?;
-    let power = usize::try_from(exponent.unsigned_abs()).ok()?;
-    let pow = *POW10.get(power)?;
+    let mut exponent = explicit_exponent.checked_sub(fractional_digits)?;
     let mut value = significand as f64;
-    if exponent >= 0 {
-        value *= pow;
-    } else {
-        value /= pow;
+    // The former parser: one multiplication or division by the tabulated
+    // power when the exponent is within the table, and below it repeated
+    // division by 1e308 until it is; a positive exponent past the table
+    // was an error, as a finite f64 never prints one.
+    loop {
+        match POW10.get(usize::try_from(exponent.unsigned_abs()).ok()?) {
+            Some(&pow) => {
+                if exponent >= 0 {
+                    value *= pow;
+                    if value.is_infinite() {
+                        return None;
+                    }
+                } else {
+                    value /= pow;
+                }
+                break;
+            }
+            None => {
+                if value == 0.0 {
+                    break;
+                }
+                if exponent >= 0 {
+                    return None;
+                }
+                value /= 1e308;
+                exponent += 308;
+            }
+        }
     }
     Some(if negative { -value } else { value })
 }
@@ -1411,6 +1515,34 @@ mod tests {
         integer: u64,
     }
 
+    /// The v1 parser accepted every finite decimal: a power of ten past
+    /// the fast table was reached by repeated division by 1e308, never an
+    /// error.  A record holding `2^-24`, or a subnormal, must stay readable.
+    #[test]
+    fn legacy_float_parser_covers_the_whole_finite_domain() {
+        for x in [
+            2f64.powi(-24),
+            5.960464477539063e-8,
+            1e-300,
+            2.2250738585072014e-308,
+            5e-324,
+            1e300,
+            f64::MAX,
+            -1e-200,
+            0.0,
+        ] {
+            let y = legacy_json_float(x).unwrap_or_else(|| panic!("{x:e} rejected"));
+            assert!(
+                ((y - x) / x.abs().max(f64::MIN_POSITIVE)).abs() < 1e-14 || y == x,
+                "{x:e} -> {y:e}"
+            );
+        }
+        let text = r#"{"gae":5.960464477539063e-8,"nested":[5e-324,1e300],"integer":1}"#;
+        let legacy: LegacyFloatFixture = from_str_legacy_floats(text).unwrap();
+        assert!(legacy.gae > 5.9e-8 && legacy.gae < 6e-8);
+        assert!(legacy.nested[0] > 0.0 && legacy.nested[1] == 1e300);
+    }
+
     #[test]
     fn legacy_record_deserializer_reproduces_v1_decimal_semantics() {
         let text = r#"{"gae":3934.0137668849675,"nested":[0.37222665730402227],"integer":17}"#;
@@ -1843,6 +1975,54 @@ mod grade_tests {
             assert_eq!(g.level, r.isolation.level, "seq {}", r.seq);
             assert_eq!(g.blockers, r.isolation.blockers, "seq {}", r.seq);
         }
+    }
+
+    /// A failed replay names the accounting version, and only when it can
+    /// matter: not when the session was made under the version charged now.
+    #[test]
+    fn f4_accounting_note_names_the_version_only_when_it_differs() {
+        use crate::cryptanalysis::inherited_f4::INHERITED_F4_ACCOUNTING_VERSION as NOW;
+        assert_eq!(
+            current_accounting_versions().get(F4_ACCOUNTING_KEY),
+            Some(&NOW)
+        );
+        let (before, after) = (F4_EAGER_EVERYWHERE_UNIX_MS - 1, F4_EAGER_EVERYWHERE_UNIX_MS);
+        // Same version: the accounting is not the reason.
+        assert_eq!(
+            f4_accounting_note(&current_accounting_versions(), before, false),
+            None
+        );
+        // A different recorded version is named, whatever the host.
+        let older = BTreeMap::from([(F4_ACCOUNTING_KEY.to_string(), NOW + 1)]);
+        let note = f4_accounting_note(&older, after, true).expect("a different version is named");
+        assert!(note.contains(&format!("v{}", NOW + 1)) && note.contains(&format!("v{NOW}")));
+        // No version recorded: named only when #2043 can apply, that is before
+        // it and on a host without BMI2.
+        let none = BTreeMap::new();
+        let note = f4_accounting_note(&none, before, false).expect("pre-#2043 without BMI2");
+        assert!(note.contains("#2043") && note.contains("without BMI2"));
+        assert_eq!(
+            f4_accounting_note(&none, before, true),
+            None,
+            "BMI2 hosts were eager"
+        );
+        assert_eq!(f4_accounting_note(&none, after, false), None, "after #2043");
+    }
+
+    /// A session written before the field existed reads with no versions and
+    /// is written back without the key, so it is byte for byte what it was.
+    #[test]
+    fn a_committed_session_without_versions_round_trips_without_the_key() {
+        use crate::cryptanalysis::ecbench::runner::read_session;
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/ecbench_rootfind_engine_20261012/sessions/claim-n13");
+        if !dir.join("session.json").exists() {
+            return; // a sparse checkout without the evidence
+        }
+        let session = read_session(&dir).unwrap();
+        assert!(session.accounting_versions.is_empty());
+        let text = serde_json::to_string(&session).unwrap();
+        assert!(!text.contains("accounting_versions"));
     }
 }
 

@@ -55,6 +55,11 @@ test('dependencies, workflow edits and frozen evidence remain applicable', () =>
   assert.equal(classify(['research/pkm_example_ecbench_20261016/sessions/one/session.json']).ecbench_replay, true);
   assert.equal(classify(['research/isogeny_example/interrupted/run1/records.jsonl']).ecbench_replay, true);
   assert.equal(classify(['research/isogeny_example/README.md']).ecbench_replay, false);
+  for (const file of ['analysis/src/coverage.rs', 'analysis/Cargo.toml',
+    'analysis/Cargo.lock', 'runs.tar.xz', 'observations.json', 'exact-coverage.json']) {
+    assert.equal(classify([`research/factor_base_shape_leads_20261018/${file}`]).ecbench_replay, true, file);
+  }
+  assert.equal(classify(['research/factor_base_shape_leads_20261018/README.md']).ecbench_replay, false);
   assert.equal(classify(['research/fixture.json'], new Set(['research/fixture.json'])).rust_root, true);
 });
 
@@ -223,4 +228,13 @@ test('external Rust path modules and includes are followed recursively', () => {
       write(relative, saved); git('add', '.'); git('commit', '-qm', `restore ${file}`);
     }
   } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
+test('shared factor-base crate selects root compilation and release checks', () => {
+  for (const file of ['tools/factor-base/Cargo.toml', 'tools/factor-base/src/lib.rs', 'tools/factor-base/src/store.rs']) {
+    const scope = classify([file]);
+    assert.equal(scope.rust_root, true, file);
+    assert.equal(scope.release_rust, true, file);
+    assert.equal(scope.ecbench_replay, true, file);
+  }
 });

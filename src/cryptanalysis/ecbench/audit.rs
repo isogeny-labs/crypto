@@ -52,14 +52,17 @@ use serde_json::json;
 
 use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id, splitmix64};
 use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
-use crate::cryptanalysis::ecbench::methods::{MethodSpec, PhaseRecord, ResolvedMethod};
+use crate::cryptanalysis::ecbench::methods::{
+    MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
+};
 use crate::cryptanalysis::ecbench::record::{
-    check_line_seal, child_main, expected_automorphisms, floor_s, from_str_legacy_floats,
-    grade_for_version, json_roundtrip, ChildInput, Grade, GradeInput, Record, CHILD_INPUT_SCHEMA,
+    check_line_seal, child_main, expected_automorphisms, f4_accounting_note, floor_s,
+    from_str_legacy_floats, grade_for_version, json_roundtrip, ChildInput, Grade, GradeInput,
+    Record, CHILD_INPUT_SCHEMA,
 };
 use crate::cryptanalysis::ecbench::runner::{read_session, PlanDoc, Session};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Execution, Level, Plan, Spec};
-use crate::cryptanalysis::ecbench::workload::Workload;
+use crate::cryptanalysis::ecbench::workload::{CurveFacts, Workload};
 
 /// Replay every measured deterministic run.
 pub const REPLAY_ALL: usize = usize::MAX;
@@ -436,6 +439,114 @@ fn grade_v1_candidates(g: &GradeInput) -> Option<Vec<Grade>> {
 
 // ── The receipt ────────────────────────────────────────────────────
 
+/// Replay detail for a record written before an accounting correction,
+/// reproduced from the replay with the correction undone.
+pub const LEGACY_ACCOUNTING_IDENTICAL: &str =
+    "identical (pre-2026-10-18 phase accounting, reproduced from the replay)";
+
+/// The ecbench binaries that wrote `rho.quartic` / `rho.cubic` records
+/// before the class set-up was charged to the total (2026-10-18; the last
+/// one is the accounting study's binary, built before this branch merged
+/// that fix), with the
+/// commit each was built from (none of which has `charge_class_setup`) and
+/// where their records are.  This list is closed: these are the only
+/// producers whose undercharge is historical, found by scanning every
+/// session in this repository and its siblings, archived (`.tar.xz`) and
+/// compressed (`records.jsonl.gz`) ones included, and the accounting
+/// study's two sessions
+/// (`docs/ecbench/CLASS_SETUP_AUDIT.md` has the census and the impact).
+/// A record from any other binary, including every record the current
+/// harness writes, must replay exactly.
+pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 6] = [
+    (
+        "0a8a48d7580df43d089a62e02f228e93e27ad4a049285cb28a0f5b87eb1473b6",
+        "c9db37d01bc776a1e8594ce5495e58ba2ccf5a1d",
+        "research/prime_rho_automorphism_20261015/sessions/{quartic,cubic}",
+    ),
+    (
+        "1a87842e671358071b2950e6b780bb9d0c750c2a35684329fd5a1fc1967505fa",
+        "466035c18f651bdc675806dfaa767c9a9c0073f5",
+        "research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-*-cubic",
+    ),
+    (
+        "d24c224771974018c0655d0df87af54d6cc787fba1daba4377bff3f56ade6acf",
+        "7fa17f92e0247d885285f90dd215db4f0068a6a4",
+        "research/drastic_prime_conductor_gap_round3_20261012/sessions/{d4-*-auto,d3-*-cubic}",
+    ),
+    (
+        "ac4bc5b26f858a4d8a374208297157840af25fb1dc25ea1c19dd41360735fb35",
+        "d13f5259c4313f96fbe0837f810a3cbd83eaeecc",
+        "research/volcano_ecdlp_census_20261017/sessions/V3-*.tar.xz and \
+         research/volcano_ecdlp_census_followup_20261023/sessions/V5-*.tar.xz",
+    ),
+    (
+        "7da27ec3f0dadbae565181b0faa74582eb94a8f36cf6fe806eecc7b4b1fa7a9f",
+        "3d191d8069b3acd3cd3e1f8535d41651560cc431",
+        "research/isogeny-volcano-cost_20261017/sessions/{j0,j1728}/spec-crater-aut (gzip)",
+    ),
+    // The accounting study's branch binary: built at 7ed39a752 of the
+    // accounting branch, before it had merged the 2026-10-18 class set-up
+    // fix, so its frozen `rho.cubic` records carry the set-up in the phases
+    // and not in the total.  Its `rho.cubic_v2` and every other id replay
+    // exactly.  The two sessions with such records are
+    // `research/ecbench_accounting_v2_20261023/sessions/{j0-frozen-branch,j0-v2}`
+    // (48 `rho.cubic` records; PREREGISTRATION.md, "Run protocol").
+    (
+        "e265bbc00a91e8742e50421618c8bb9fe23347b4cba1f1d3dbf14d52954d50b1",
+        "7ed39a752b6cd9cd62f015ca9416a8af85e3dc5b",
+        "research/ecbench_accounting_v2_20261023/sessions/{j0-frozen-branch,j0-v2}",
+    ),
+];
+
+/// Whether `r` may be replayed under the pre-2026-10-18 class set-up
+/// accounting.  Every condition must hold, so anything unforeseen fails
+/// closed to an exact comparison: the method is one the correction
+/// changed; the record carries no `detail.class_setup` (every binary since
+/// the correction writes it); and the record names a listed producer.
+pub fn pre_class_setup_record(r: &Record) -> bool {
+    matches!(r.method.id.as_str(), "rho.quartic" | "rho.cubic")
+        && r.detail.get("class_setup").is_none()
+        && PRE_CLASS_SETUP_BINARIES
+            .iter()
+            .any(|&(binary, _, _)| r.binary_sha256.as_deref() == Some(binary))
+}
+
+/// The figures a `rho.quartic` / `rho.cubic` record written before
+/// 2026-10-18 carries.  Those binaries merged the class set-up into the
+/// ledger the phases are read from, but not into the total, so the total
+/// fell short of the phase sum by exactly the set-up.  The replay reports
+/// its own set-up (`detail.class_setup`, computed by the replay, never read
+/// from the record), so the record cannot choose the amount.  Applied only
+/// to a record [`pre_class_setup_record`] admits.
+pub fn legacy_class_setup(rep: &SolveReport) -> Option<(Vec<PhaseRecord>, f64)> {
+    let d = rep.detail.pointer("/class_setup/gae")?.as_f64()?;
+    (d > 0.0).then(|| (rep.phases.clone(), rep.total_gae - d))
+}
+
+/// The phases a `kangaroo.vow` record written before 2026-10-18 carries.
+/// Those binaries charged a kangaroo's re-placement after a same-kind
+/// collision to `setup`; it is search.  The total is unchanged.  The
+/// replay reports the re-placement work it moved (`detail.
+/// restarts_in_search`, computed by the replay), and this moves it back.
+pub fn legacy_restart_phase(rep: &SolveReport) -> Option<(Vec<PhaseRecord>, f64)> {
+    let moved = rep.detail.get("restarts_in_search")?;
+    let field = |k: &str| moved.get(k).and_then(serde_json::Value::as_u64);
+    let (adds, doubles, sm) = (field("adds")?, field("doubles")?, field("scalar_mults")?);
+    let mut phases = rep.phases.clone();
+    let si = phases.iter().position(|p| p.name == "setup")?;
+    let wi = phases.iter().position(|p| p.name == "search")?;
+    let w = &mut phases[wi];
+    w.adds = w.adds.checked_sub(adds)?;
+    w.doubles = w.doubles.checked_sub(doubles)?;
+    w.scalar_mults = w.scalar_mults.checked_sub(sm)?;
+    w.gae = (w.adds + w.doubles) as f64;
+    let s = &mut phases[si];
+    s.adds += adds;
+    s.doubles += doubles;
+    s.scalar_mults += sm;
+    s.gae = (s.adds + s.doubles) as f64;
+    Some((phases, rep.total_gae))
+}
 pub const AUDIT_SCHEMA: &str = "ecbench.audit/v1";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -716,11 +827,14 @@ impl Ledger {
     }
 }
 
-/// Phases that do not sum to the total on purpose, by method id: the
-/// frozen accounting of `rho.cubic` and `rho.quartic` leaves their
-/// set-up scalar multiplication out of the total (DEEP_DIVE §1.4; the
-/// ids stay byte for byte and a corrected method gets a new id).  Every
-/// other method's phases sum to its total.
+/// Phases that do not sum to the total on purpose, by method id: records of
+/// `rho.cubic` and `rho.quartic` written before 2026-10-18 leave their
+/// set-up scalar multiplication out of the total (DEEP_DIVE §1.4; those
+/// records replay through [`legacy_class_setup`]).  The harness has charged
+/// it in the total since, under the frozen ids and under the `_v2` ids
+/// (phase `automorphism_setup`), so their current records do sum, and the
+/// exemption only spares the old ones.  Every other method's phases sum to
+/// its total.
 pub const PHASE_SUM_EXEMPT_METHODS: &[&str] = &["rho.cubic", "rho.quartic"];
 
 /// Relative tolerance of the phases-sum-to-total check.  Phases and total
@@ -749,6 +863,24 @@ fn counts_field_ops(r: &Record, started_unix_ms: u128) -> bool {
         && r.cost.total_gae.is_some()
 }
 
+/// The automorphisms a record may have used.  A record under the current
+/// floor rule (`automorphisms/v2`) is held to its own figure, which the
+/// derived-figure check ties to the spec.  A record written under the first
+/// rule (no `floor_rule`: 2 on every prime curve) carries 2 for a `j = 0` or
+/// `j = 1728` curve whose `rho.cubic` / `rho.quartic` used 6 or 4, whichever
+/// binary wrote it (the committed `research/prime_rho_automorphism_20261015`
+/// and every main-binary record since); its bound is the count rebuilt from
+/// the spec (`curve`, never read from the record), so a record cannot raise
+/// it.
+fn automorphisms_bound(r: &Record, curve: &CurveFacts) -> u32 {
+    let own = r.boundaries.automorphisms_available;
+    if r.boundaries.floor_rule.is_none() {
+        own.max(curve.automorphisms_available)
+    } else {
+        own
+    }
+}
+
 /// Everything about one record that follows from the record, the arm it
 /// ran under and the host capsule, without re-running anything.
 fn consistency_problems(
@@ -757,6 +889,7 @@ fn consistency_problems(
     host: &HostCapsule,
     timeout_seconds: u64,
     started_unix_ms: u128,
+    curve: &CurveFacts,
 ) -> Vec<String> {
     let mut out = Vec::new();
     let tag = format!("record seq {}", r.seq);
@@ -785,10 +918,10 @@ fn consistency_problems(
     }
     // Automorphisms.
     if let Some(used) = r.boundaries.automorphisms_used {
-        if used > r.boundaries.automorphisms_available {
+        let has = automorphisms_bound(r, curve);
+        if used > has {
             out.push(format!(
-                "{tag}: used {used} automorphisms, the curve has {}",
-                r.boundaries.automorphisms_available
+                "{tag}: used {used} automorphisms, the curve has {has}"
             ));
         }
     }
@@ -917,7 +1050,13 @@ fn child_output(
 }
 
 /// One replay: re-execute the run and compare it with the record.
-fn replay_one(p: &Plan, r: &Record, ex: &Execution) -> Result<(bool, String), String> {
+fn replay_one(
+    p: &Plan,
+    r: &Record,
+    ex: &Execution,
+    session: &Session,
+    host: &HostCapsule,
+) -> Result<(bool, String), String> {
     let out = child_output(p, r, ex)?;
     if r.outcome.status == "error" {
         // The recorded error must be the one the replay hits (the runner
@@ -973,9 +1112,6 @@ fn replay_one(p: &Plan, r: &Record, ex: &Execution) -> Result<(bool, String), St
                     }
                 }
             }
-            if !total_ok {
-                diffs.push("total_gae");
-            }
             let ints = |ps: &[PhaseRecord]| {
                 ps.iter()
                     .map(|p| {
@@ -989,8 +1125,48 @@ fn replay_one(p: &Plan, r: &Record, ex: &Execution) -> Result<(bool, String), St
                     })
                     .collect::<Vec<_>>()
             };
-            if ints(&rep.phases) != ints(&r.phases) {
+            let mut counts_ok = ints(&rep.phases) == ints(&r.phases);
+            let mut accounting = false;
+            if !(total_ok && phases_ok && counts_ok) {
+                type Undo = fn(&SolveReport) -> Option<(Vec<PhaseRecord>, f64)>;
+                // The class set-up reconstruction is for the listed
+                // pre-fix producers only ([`pre_class_setup_record`]);
+                // any other record must replay exactly.
+                let undos: [(bool, Undo); 2] = [
+                    (pre_class_setup_record(r), legacy_class_setup),
+                    (true, legacy_restart_phase),
+                ];
+                for (admitted, undo) in undos {
+                    if !admitted {
+                        continue;
+                    }
+                    let Some((phases, total)) = undo(&rep) else {
+                        continue;
+                    };
+                    let gae: Vec<f64> = phases.iter().map(|p| p.gae).collect();
+                    if same_gae(&gae, total) == (true, true) && ints(&phases) == ints(&r.phases) {
+                        (total_ok, phases_ok, counts_ok, accounting) = (true, true, true, true);
+                        break;
+                    }
+                }
+            }
+            if !total_ok {
+                diffs.push("total_gae");
+            }
+            if !counts_ok {
                 diffs.push("phase counts");
+            }
+            // bitop/v1 counters compare only when the committed record has
+            // them: one written before they existed carries none, and unknown
+            // is not a disagreement.
+            if r.phases.iter().any(|p| !p.work_native.is_empty())
+                && rep
+                    .phases
+                    .iter()
+                    .map(|p| &p.work_native)
+                    .ne(r.phases.iter().map(|p| &p.work_native))
+            {
+                diffs.push("work counters");
             }
             if !phases_ok {
                 diffs.push("phase gae");
@@ -1017,12 +1193,34 @@ fn replay_one(p: &Plan, r: &Record, ex: &Execution) -> Result<(bool, String), St
             }
             (
                 diffs.is_empty(),
-                if diffs.is_empty() && legacy {
+                if diffs.is_empty() && accounting {
+                    LEGACY_ACCOUNTING_IDENTICAL.into()
+                } else if diffs.is_empty() && legacy {
                     LEGACY_IDENTICAL.into()
                 } else if diffs.is_empty() {
                     "identical".into()
                 } else {
-                    format!("differs in {}", diffs.join(", "))
+                    // A word-XOR solver record whose replay differs in counts
+                    // is named by the accounting it was made under, when that
+                    // can be the reason; the failure itself is unchanged.
+                    let has_bmi2 = host.stable.arch == "x86_64"
+                        && host.stable.features.iter().any(|f| f == "bmi2");
+                    let note = r
+                        .solver
+                        .as_ref()
+                        .filter(|s| s.op_unit.contains("word XOR"))
+                        .filter(|_| diffs.contains(&"phase counts"))
+                        .and_then(|_| {
+                            f4_accounting_note(
+                                &session.accounting_versions,
+                                session.started_unix_ms,
+                                has_bmi2,
+                            )
+                        });
+                    match note {
+                        Some(n) => format!("differs in {} ({n})", diffs.join(", ")),
+                        None => format!("differs in {}", diffs.join(", ")),
+                    }
                 },
             )
         }
@@ -1094,7 +1292,8 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
 
     // The host class.
     let host: HostCapsule = serde_json::from_str(
-        &std::fs::read_to_string(dir.join("host.json")).map_err(|e| e.to_string())?,
+        &std::fs::read_to_string(dir.join("host.json"))
+            .map_err(|e| format!("{}: {e}", dir.join("host.json").display()))?,
     )
     .map_err(|e| format!("host.json: {e}"))?;
     let class = recompute_class(&host)?;
@@ -1117,10 +1316,12 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
     );
 
     // The spec re-expands to the plan.
-    let spec_text = std::fs::read_to_string(dir.join("spec.json")).map_err(|e| e.to_string())?;
+    let spec_text = std::fs::read_to_string(dir.join("spec.json"))
+        .map_err(|e| format!("{}: {e}", dir.join("spec.json").display()))?;
     let p = plan(Spec::from_json(&spec_text)?)?;
     let doc: PlanDoc = serde_json::from_str(
-        &std::fs::read_to_string(dir.join("plan.json")).map_err(|e| e.to_string())?,
+        &std::fs::read_to_string(dir.join("plan.json"))
+            .map_err(|e| format!("{}: {e}", dir.join("plan.json").display()))?,
     )
     .map_err(|e| format!("plan.json: {e}"))?;
     led.check(
@@ -1287,6 +1488,7 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
             &host,
             timeout_seconds,
             session.started_unix_ms,
+            &w.curve,
         ));
         // Re-check the answer here.
         let inst = p.instance(ex.workload);
@@ -1491,8 +1693,7 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         replay_selection.get_or_insert_with(|| "explicit".to_string());
         match candidates.iter().find(|&&i| records[i].seq == seq) {
             Some(&i) => {
-                picked.insert(i);
-            }
+                picked.insert(i);            }
             None => led.problems.push(format!(
                 "replay of seq {seq}: no such record, or it is not replayable (a warm-up, a timeout, a crash, \
                  a nondeterministic method, or out of its plan slot)"
@@ -1502,7 +1703,7 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
     for &i in &picked {
         let r = &records[i];
         let ex = &p.executions[i];
-        let (ok, detail) = replay_one(&p, r, ex)?;
+        let (ok, detail) = replay_one(&p, r, ex, &session, &host)?;
         if !ok {
             led.problems
                 .push(format!("replay of seq {}: {detail}", r.seq));
@@ -1566,6 +1767,100 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use crate::cryptanalysis::ecbench::methods::{PhaseRecord, SolveReport};
+
+    fn phase(name: &str, adds: u64, doubles: u64, sm: u64) -> PhaseRecord {
+        PhaseRecord {
+            name: name.into(),
+            adds,
+            doubles,
+            scalar_mults: sm,
+            gae: (adds + doubles) as f64,
+            ..Default::default()
+        }
+    }
+
+    /// The first `rho.quartic` record of
+    /// `research/prime_rho_automorphism_20261015/sessions/quartic`, byte for
+    /// byte (embedded, so every lane that builds the tests has it).
+    const PRE_FIX_QUARTIC_RECORD: &str = r##"{"schema":"ecbench.record/v1","record_id":"ECR1h4dd135adc8ea","session_id":"ECBS1hf8d1171784f1","run_id":"ECM1h6a12f9c4f6abW91a1cc55dfeaR1","seq":1,"round":0,"warmup":true,"arm":"rho-quartic","role":"candidate","method":{"id":"rho.quartic","family":"rho","params":{"cap_multiple":"64"},"method_id":"ECM1h6a12f9c4f6ab","method_sha256":"6a12f9c4f6ab11596019028dd7660932fc0f3e7507f6c31cd0aa47e92af4e9b1","entry":"ic_boundary::QuarticClasses with RhoWalk::negation()"},"workload":{"workload_id":"W91a1cc55dfea","workload_sha256":"91a1cc55dfeadc5ddf41905dbc4d419dd96bbf2857a758a8928a037f0bb7b6ed","curve_spec":{"kind":"prime_explicit","p":2463541,"a":8,"b":0,"group_order":2460762,"r":136709,"gx":1664813,"gy":581781},"curve":{"slug":"icv1-fp22-t2780-de70e970","icv1":"ICV1:fp-2463541:2780:2460762:1728:unk:unk:r:de70e970f651","family":"prime","construction":"PrimeCurve { p: 2463541, a: 8, b: 0 } (explicit)","field_degree":null,"field_bits":22,"group_order":2460762,"r":136709,"cofactor":18,"generator":["0x19672d","0x8e095"],"automorphisms_available":2,"registered":true,"ec1":"EC1P22Cfphf792205717b1","curve_uid":"urn:ec-record:1:sha256:f792205717b10dcdea770c208a6cf129d5410f857ced08197e5ef86f86f5deb3"},"target_law":"uniform_scalar_sha256_v1","target_seed":20261011,"target_index":0,"target":["0xf267","0x1881e9"],"planted":74430},"algorithm_seed":"11412311281651647685","outcome":{"status":"verified","recovered":"74430","matches_target":true,"matches_planted":true,"error":null,"exit":"exit 0","stderr_sha256":null},"cost":{"unit":"ecbench.gae","total_gae":562.0,"s":1.5199796108001962,"lower_bound":true,"unpriced":["canonicalisations_uncharged"],"deterministic":true,"nondeterminism":[]},"boundaries":{"automorphisms_available":2,"automorphisms_used":4,"floor_s":0.8862269254527579,"ratio_to_floor":1.7151133272368868},"phases":[{"name":"setup","adds":60,"doubles":77,"scalar_mults":0,"gae":137.0,"wall_ns":null,"native":{}},{"name":"search","adds":0,"doubles":0,"scalar_mults":11,"gae":422.0,"wall_ns":null,"native":{}},{"name":"internal_verification","adds":0,"doubles":0,"scalar_mults":0,"gae":24.0,"wall_ns":null,"native":{}}],"counters":{"canonicalisations_uncharged":402,"cycle_escape_doublings":1,"cycles_length_2":0,"cycles_length_4":1,"cycles_other_length":0,"distinguished_point_bits":4,"distinguished_points":26,"jump_coefficient_bits":9,"jumps":8,"look_ahead_additions":11,"setup_additions":60,"setup_doublings":77,"start_additions":25,"steps":364,"useless_collisions":0,"verification_operations":24,"walk_operations":376,"walks":26,"walks_abandoned_in_a_cycle":0,"walks_capped":0},"factor_base":null,"detail":{"expected_steps":231.70131367765455,"method":"quartic-automorphism r-adding walk on {±i^i(P)}: look-ahead, short-cycle escape by doubling, distinguished points, stride starts"},"online":{"wall_ns":1790074,"phases_ns":{"rho_solve":1790074},"zero_phases":{},"start_event":"first target-dependent operation (the jump table [a]G + [b]Q, or the first table step)","stop_event":"[d]G = Q verified inside the method","included_stages":["walk","collision","recovery_check"],"mapping":"rho: the whole target-dependent solve, one exclusive phase"},"solver":null,"field_ops":{"muls":1901,"sqrs":694,"invs":583},"time":{"solve_wall_ns":1791114,"process_wall_ns":15139992,"user_ns":14767000,"sys_ns":0,"max_rss_kib":28540,"minor_faults":4290,"major_faults":0,"voluntary_switches":2,"involuntary_switches":0,"schedstat_solve":{"cpu_ns":0,"run_delay_ns":0,"timeslices":0},"hw_solve":{"instructions":10372594,"cycles":9004985,"instructions_time_enabled_ns":1862340,"instructions_time_running_ns":1862340,"cycles_time_enabled_ns":1855560,"cycles_time_running_ns":1855560,"error":null}},"isolation":{"level":"L0","blockers":["L1: 68 user threads could not be moved off the reserved CPUs (not root?)","L3: run CPU is in neither isolcpus nor nohz_full","L3: governor is None, not performance","L3: turbo/boost is not known to be off","L3: not known to be bare metal"],"run_cpu":1,"reserved":[1],"node":0,"placement":{"affinity":[1],"cpu_at_start":1,"cpu_at_end":1,"mems_allowed":"0","mempolicy":"default","anon_pages_by_node":{"0":4061}},"foreign_busy_ticks":1,"steal_ticks":0,"idle_sibling_busy_ticks":0,"before":{"unix_ms":1792105531447,"loadavg":[0.16,0.09,0.03],"psi_cpu_some_avg10":0.92,"psi_cpu_some_total_us":66171250,"psi_memory_some_avg10":0.0,"psi_memory_some_total_us":2010415,"reserved_ticks":{"1":{"busy":65662,"idle":7618750,"steal":39}}},"after":{"unix_ms":1792105531462,"loadavg":[0.16,0.09,0.03],"psi_cpu_some_avg10":0.92,"psi_cpu_some_total_us":66171259,"psi_memory_some_avg10":0.0,"psi_memory_some_total_us":2010415,"reserved_ticks":{"1":{"busy":65664,"idle":7618750,"steal":39}}}},"env_class_id":"ECBENV2h0e1f15f7c61e","binary_sha256":"0a8a48d7580df43d089a62e02f228e93e27ad4a049285cb28a0f5b87eb1473b6"}"##;
+
+    /// The reconstruction's gate on a committed pre-fix record: admitted
+    /// as written (its seal still checks), refused when any one condition
+    /// is changed.  The end to
+    /// end negative control (a current record undercharged and resealed)
+    /// is `tests/ecbench.rs`,
+    /// `a_current_record_undercharged_by_its_class_setup_fails_replay`.
+    #[test]
+    fn only_a_listed_pre_fix_record_is_eligible_for_the_class_setup_undo() {
+        let rec: Record = serde_json::from_str(PRE_FIX_QUARTIC_RECORD).unwrap();
+        assert!(crate::cryptanalysis::ecbench::record::check_line_seal(
+            PRE_FIX_QUARTIC_RECORD,
+            &rec.record_id
+        ));
+        assert!(pre_class_setup_record(&rec));
+        let mut other_binary = rec.clone();
+        other_binary.binary_sha256 = Some("0".repeat(64));
+        assert!(!pre_class_setup_record(&other_binary));
+        let mut no_binary = rec.clone();
+        no_binary.binary_sha256 = None;
+        assert!(!pre_class_setup_record(&no_binary));
+        let mut marked = rec.clone();
+        marked.detail = json!({"class_setup": {"gae": 21.0}});
+        assert!(!pre_class_setup_record(&marked));
+        let mut other_method = rec.clone();
+        other_method.method.id = "rho.negation".into();
+        assert!(!pre_class_setup_record(&other_method));
+        // Each listed producer is a full digest and a full commit.
+        for (b, c, _) in PRE_CLASS_SETUP_BINARIES {
+            assert!(b.len() == 64 && b.bytes().all(|x| x.is_ascii_hexdigit()));
+            assert!(c.len() == 40 && c.bytes().all(|x| x.is_ascii_hexdigit()));
+        }
+    }
+
+    /// A first-rule `rho.quartic` record used 4 automorphisms on a curve its
+    /// floor counted 2 for; the bound is the curve's own count, rebuilt from
+    /// the spec, whichever binary wrote the record.  A record under the
+    /// current rule keeps its own figure, and a curve that has only 2 allows
+    /// nothing more.
+    #[test]
+    fn a_first_rule_record_may_use_the_curves_own_count() {
+        use crate::cryptanalysis::ecbench::workload::FLOOR_RULE_V2;
+        let rec: Record = serde_json::from_str(PRE_FIX_QUARTIC_RECORD).unwrap();
+        assert_eq!(rec.boundaries.automorphisms_used, Some(4));
+        assert_eq!(rec.boundaries.automorphisms_available, 2);
+        let mut curve = rec.workload.curve.clone();
+        curve.automorphisms_available = 4;
+        assert_eq!(super::automorphisms_bound(&rec, &curve), 4);
+        // The curve the spec rebuilds to has only 2: nothing to allow.
+        assert_eq!(super::automorphisms_bound(&rec, &rec.workload.curve), 2);
+        let mut other_binary = rec.clone();
+        other_binary.binary_sha256 = Some("0".repeat(64));
+        assert_eq!(super::automorphisms_bound(&other_binary, &curve), 4);
+        let mut v2 = rec.clone();
+        v2.boundaries.floor_rule = Some(FLOOR_RULE_V2.into());
+        assert_eq!(super::automorphisms_bound(&v2, &curve), 2);
+        let mut other_method = rec.clone();
+        other_method.method.id = "rho.negation".into();
+        assert_eq!(super::automorphisms_bound(&other_method, &curve), 4);
+    }
+
+    /// A `rho.quartic` / `rho.cubic` replay's class set-up is subtracted
+    /// from the total only; the phases stay as they are.
+    #[test]
+    fn legacy_class_setup_lowers_only_the_total() {
+        let rep = SolveReport {
+            phases: vec![phase("setup", 5, 16, 1), phase("search", 541, 0, 0)],
+            total_gae: 562.0,
+            detail: serde_json::json!({"class_setup":
+                {"adds": 5, "doubles": 16, "scalar_mults": 1, "gae": 21.0}}),
+            ..Default::default()
+        };
+        let (phases, total) = legacy_class_setup(&rep).unwrap();
+        assert_eq!(phases, rep.phases);
+        assert_eq!(total, 541.0);
+        assert!(legacy_class_setup(&SolveReport::default()).is_none());
+    }
     use super::*;
     use serde_json::json;
 
@@ -2172,7 +2467,7 @@ pub(crate) mod tests {
         let mut r = read_record_file(&dir).unwrap().lines[RHO_SEQ].1.clone();
         let arm = &p.arms[p.executions[RHO_SEQ].arm];
         assert_eq!(
-            consistency_problems(&r, arm, &host, 180, started),
+            consistency_problems(&r, arm, &host, 180, started, &r.workload.curve),
             Vec::<String>::new()
         );
         r.outcome.status = "timeout".into();
@@ -2183,19 +2478,25 @@ pub(crate) mod tests {
         r.boundaries.ratio_to_floor = None;
         r.time.process_wall_ns = 180_000_000_001;
         assert_eq!(
-            consistency_problems(&r, arm, &host, 180, started),
+            consistency_problems(&r, arm, &host, 180, started, &r.workload.curve),
             Vec::<String>::new()
         );
         r.time.process_wall_ns = 179_000_000_000;
-        assert_eq!(consistency_problems(&r, arm, &host, 180, started).len(), 1);
+        assert_eq!(
+            consistency_problems(&r, arm, &host, 180, started, &r.workload.curve).len(),
+            1
+        );
         r.outcome.status = "crashed".into();
         r.outcome.exit = Some("signal 11".into());
         assert_eq!(
-            consistency_problems(&r, arm, &host, 180, started),
+            consistency_problems(&r, arm, &host, 180, started, &r.workload.curve),
             Vec::<String>::new()
         );
         r.outcome.exit = Some("exit 0".into());
-        assert_eq!(consistency_problems(&r, arm, &host, 180, started).len(), 1);
+        assert_eq!(
+            consistency_problems(&r, arm, &host, 180, started, &r.workload.curve).len(),
+            1
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 

@@ -14,7 +14,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
 use crate::cryptanalysis::ecbench::canonical::{derive_u64, short_id};
-use crate::cryptanalysis::ecbench::methods::{decl, resolve, Applies, MethodSpec, ResolvedMethod};
+use crate::cryptanalysis::ecbench::methods::{
+    applicable, decl, resolve, Applies, MethodSpec, ResolvedMethod,
+};
 use crate::cryptanalysis::ecbench::workload::{CurveSpec, Instance, TargetKind, Workload};
 
 pub const SPEC_SCHEMA: &str = "ecbench.spec/v1";
@@ -307,6 +309,15 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
                         a.name, a.method.id, w.curve.slug, w.curve.family
                     ));
                 }
+                if i == 0 {
+                    // Once per curve: the refusal does not depend on the target.
+                    applicable(&a.method, &inst, &w.curve).map_err(|e| {
+                        format!(
+                            "arm `{}` ({}) cannot run on {}: {e}",
+                            a.name, a.method.id, w.curve.slug
+                        )
+                    })?;
+                }
             }
             if workloads
                 .iter()
@@ -404,6 +415,17 @@ mod tests {
             .to_string(),
         )
         .unwrap()
+    }
+
+    /// An arm whose method cannot run on the spec's curve is a spec error
+    /// at plan time, not a session of `error` records.
+    #[test]
+    fn plan_rejects_an_arm_its_curve_cannot_run() {
+        let err = plan(spec(&[("q", "rho.quartic")])).err().expect("refused");
+        assert!(
+            err.contains("cannot run on") && err.contains("rho.quartic"),
+            "{err}"
+        );
     }
 
     #[test]
@@ -554,6 +576,41 @@ mod tests {
         s.workloads.curves.push(c);
         let err = plan(s).err().unwrap();
         assert!(err.contains("appears twice"), "{err}");
+    }
+
+    /// `rho.multitarget_pooled` is prime-only: a Koblitz or random binary
+    /// workload is a plan-time spec error, a prime workload plans.
+    #[test]
+    fn prime_only_arm_on_a_binary_curve_is_refused_at_plan_time() {
+        let with_curve = |curve: Value| {
+            Spec::from_json(
+                &json!({
+                    "schema": SPEC_SCHEMA,
+                    "label": "t",
+                    "workloads": {"curves": [curve], "targets_per_curve": 1, "target_seed": 1},
+                    "arms": [{"name": "pooled", "role": "candidate",
+                              "method": {"id": "rho.multitarget_pooled",
+                                         "params": {"batch": "4"}}}],
+                    "measurement": {"rounds": 3, "seed": 9},
+                })
+                .to_string(),
+            )
+            .unwrap()
+        };
+        for curve in [
+            json!({"kind": "koblitz", "a": 1, "n": 17}),
+            json!({"kind": "binary_random", "n": 17, "seed": 3, "max_cofactor": 4}),
+        ] {
+            let err = plan(with_curve(curve)).err().expect("refused at plan time");
+            assert!(
+                err.contains("rho.multitarget_pooled") && err.contains("prime-field curves only"),
+                "{err}"
+            );
+        }
+        plan(with_curve(
+            json!({"kind": "prime_search", "bits": 14, "seed": 59297}),
+        ))
+        .expect("the prime curve plans");
     }
 
     #[test]

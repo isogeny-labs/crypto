@@ -1,0 +1,85 @@
+{
+  "canonical_manifests": [
+    {
+      "current_paths_before_report": 998,
+      "current_paths_with_report": 999,
+      "historical_entries": 1987,
+      "manifest": "research/p192_extension_cover_20261012/ARTIFACTS.sha256",
+      "refreshed_paths": 4,
+      "snapshot_paths": [
+        "ARTIFACTS.snapshot-main-da3a1b5.sha256",
+        "ARTIFACTS.snapshot-pr-4cea0f7.sha256"
+      ]
+    },
+    {
+      "current_paths_before_report": 108,
+      "historical_entries": 257,
+      "manifest": "research/weak_curve_leaderboard_20261012/ARTIFACTS.sha256",
+      "refreshed_paths": 5,
+      "snapshot_paths": [
+        "research/weak_curve_leaderboard_20261012/ARTIFACTS.snapshot-main-da3a1b5.sha256",
+        "research/weak_curve_leaderboard_20261012/ARTIFACTS.snapshot-pr-4cea0f7.sha256"
+      ]
+    }
+  ],
+  "derived_export_validation": "build_decomposition_properties.py and validate_decomposition_properties.py passed on the merged sources.",
+  "derived_exports_regenerated": [
+    "research/weak_curve_leaderboard_20261012/decomposition_properties.json",
+    "website/weakcurves/dist/decomposition_properties.json"
+  ],
+  "main_commit": "da3a1b5d53323a4fb14ed761ca269e84b6018089",
+  "merge_resolutions": {
+    "frozen_manifests": "Retained exact parent snapshots, preserved both append-only histories, and appended refreshed hashes for merged-tree content.",
+    "lakefile": "Kept all current-main targets and added ThreePivotSupport from the PR.",
+    "workflow": "Retained the current-main check_artifact_manifest.py validation and merged in both PR-specific three-pivot jobs."
+  },
+  "method": "Preserve both parent manifest files byte-for-byte as sidecars, concatenate their append-only histories, and append current hashes for all merged-tree paths whose latest parent receipt differs.",
+  "pr_head_commit": "4cea0f7d0cc0dba64f19b046afefc1aef09ce68a",
+  "schema": "artifact-manifest-merge/v1",
+  "source_manifests": [
+    {
+      "commit": "da3a1b5d53323a4fb14ed761ca269e84b6018089",
+      "entries": 996,
+      "hash_mismatch_paths": [],
+      "manifest": "research/p192_extension_cover_20261012/ARTIFACTS.sha256",
+      "missing_paths": [],
+      "parent": "main",
+      "paths": 996
+    },
+    {
+      "commit": "4cea0f7d0cc0dba64f19b046afefc1aef09ce68a",
+      "entries": 991,
+      "hash_mismatch_paths": [],
+      "manifest": "research/p192_extension_cover_20261012/ARTIFACTS.sha256",
+      "missing_paths": [],
+      "parent": "pr",
+      "paths": 991
+    },
+    {
+      "commit": "da3a1b5d53323a4fb14ed761ca269e84b6018089",
+      "entries": 151,
+      "hash_mismatch_paths": [
+        ".gitattributes",
+        ".github/workflows/weak-curve-database.yml",
+        "docs/curves/registry.json",
+        "research/weak_curve_leaderboard_20261012/README.md",
+        "research/weak_curve_leaderboard_20261012/REPORT.md",
+        "research/weak_curve_leaderboard_20261012/VALIDATION.md",
+        "research/weak_curve_leaderboard_20261012/snapshot.json"
+      ],
+      "manifest": "research/weak_curve_leaderboard_20261012/ARTIFACTS.sha256",
+      "missing_paths": [],
+      "parent": "main",
+      "paths": 106
+    },
+    {
+      "commit": "4cea0f7d0cc0dba64f19b046afefc1aef09ce68a",
+      "entries": 106,
+      "hash_mismatch_paths": [],
+      "manifest": "research/weak_curve_leaderboard_20261012/ARTIFACTS.sha256",
+      "missing_paths": [],
+      "parent": "pr",
+      "paths": 106
+    }
+  ]
+}
