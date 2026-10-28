@@ -72,8 +72,10 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
       || /^research\/(ecbench_[^/]+|ghs_curve_comparison_20261009)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
       || /^research\/notes\/ecc2k130\/(cold_compact_orbit_ic_20261003|full_rank_compact_orbit_ic_20261003)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
       // ecbench.yml audits every committed session by schema, wherever it
-      // lives; a session directory always holds these two files.
-      || /(^|\/)(session\.json|records\.jsonl)$/.test(file) && /^research\//.test(file);
+      // lives (research/, taskq/deploy/, ...), so its files select the audit
+      // anywhere in the tree (sheriff SHF-20261028-0f3f64, PPN-6). Large
+      // sessions commit their records gzip-compressed.
+      || /(^|\/)(session\.json|(ecbench_)?records\.jsonl(\.gz)?)$/.test(file);
     result.actions ||= /^\.github\/(workflows|actions)\//.test(file);
     result.c_cpp ||= /\.(c|cc|cpp|cxx|h|hh|hpp|hxx|cu|cuh)$/.test(file)
       || /(^|\/)(Makefile|CMakeLists\.txt)$|\.cmake$/.test(file);
@@ -235,8 +237,9 @@ export function pathDependencyDirs(cwd) {
 }
 
 export function materializeInputs(cwd = process.cwd()) {
-  const crates = [...pathDependencyDirs(cwd)].filter(dir => !existsSync(path.join(cwd, dir, 'Cargo.toml')));
-  if (crates.length) git(['sparse-checkout', 'add', ...crates.map(dir => `/${dir}/`)], cwd);
+  // Read sparse path-dependency manifests through git and materialize only
+  // the required manifests, sources and embedded inputs below. Adding whole
+  // crate directories would also materialize unrelated archives.
   const sources = sourceFiles(cwd);
   const manifests = trackedFiles(cwd).filter(file => file.endsWith('/Cargo.toml')
     && (rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)));
