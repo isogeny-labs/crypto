@@ -142,6 +142,9 @@ authorization and a frozen amendment.
 `flow.svg` is the editable diagram source. Native Typst renders `report.typ`
 to `report.pdf`; the PDF is inspected before publication. Validation and delivery
 status are in [HANDOFF.md](HANDOFF.md).
+[delivery-checks.json](delivery-checks.json) preserves the native library-test
+results, fixture-restoration reruns and canonical S3 readback receipts for all
+three validation logs. These delivery checks do not validate the closure algorithm.
 
 The raw evidence was committed first in `cbb6b152511`; this report is a later,
 separate commit. Render with Typst 0.15.1 and DejaVu Sans available (or provide its
