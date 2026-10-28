@@ -46,7 +46,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde::Deserialize;
 
 use crate::hash::sha256::Sha256;
-use backend::{object_key, Backend, DirBackend, Meta, RemoteSpec, S3Backend};
+use backend::{object_key, Backend, DirBackend, Meta, RemoteSpec, S3Backend, S3Guard};
 use index::{validate_name, validate_sha256, Entry, Index};
 
 /// Where the store keeps things, resolved from the environment, the
@@ -217,6 +217,7 @@ fn make_backend(cfg: &Config) -> Option<Box<dyn Backend>> {
             prefix: prefix.clone(),
             endpoint: cfg.endpoint.clone(),
             aws: cfg.aws.clone(),
+            guard: None,
         }),
     })
 }
@@ -238,6 +239,27 @@ fn make_read_only(path: &Path) {
 fn make_read_only(_path: &Path) {}
 
 impl Store {
+    /// Opt-in per-command admission; ordinary store clients retain their API
+    /// and transport behavior. Every internal HEAD/PUT/GET uses this guard.
+    pub fn open_guarded(cfg: Config, guard: S3Guard) -> Result<Self, String> {
+        let index = Index::load(&cfg.index_path)?;
+        let backend: Option<Box<dyn Backend>> = match cfg.remote.as_ref() {
+            Some(RemoteSpec::S3 { bucket, prefix }) => Some(Box::new(S3Backend {
+                bucket: bucket.clone(),
+                prefix: prefix.clone(),
+                endpoint: cfg.endpoint.clone(),
+                aws: cfg.aws.clone(),
+                guard: Some(guard),
+            })),
+            Some(RemoteSpec::Dir(p)) => Some(Box::new(DirBackend::new(p.clone()))),
+            None => None,
+        };
+        Ok(Self {
+            cfg,
+            index,
+            backend,
+        })
+    }
     pub fn open(cfg: Config) -> Result<Self, String> {
         let index = Index::load(&cfg.index_path)?;
         let backend = make_backend(&cfg);

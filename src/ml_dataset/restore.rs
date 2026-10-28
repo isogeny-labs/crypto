@@ -306,8 +306,20 @@ fn activate(_source: &Path, _destination: &Path) -> Result<(), String> {
 /// shard axes) matches. Partial downloads are retained for inspection/retry;
 /// each retry performs fresh remote reads before creating a local confirmation.
 pub fn restore(receipt_path: &Path, out: &Path, remote: Option<&str>) -> Result<Value, String> {
+    restore_guarded(receipt_path, out, remote, None)
+}
+
+pub fn restore_guarded(
+    receipt_path: &Path,
+    out: &Path,
+    remote: Option<&str>,
+    guard: Option<crate::store::backend::S3Guard>,
+) -> Result<Value, String> {
     let receipt = checked_receipt(receipt_path)?;
     let remote = validate_receipt(&receipt, remote)?;
+    if matches!(remote, crate::store::backend::RemoteSpec::S3 { .. }) && guard.is_none() {
+        return Err("S3 dataset restore requires cumulative command admission".into());
+    }
     let _lease = super::Lease::acquire(out)?;
     let out = super::checked_directory(out, false)?;
     super::assert_no_workers(&out)?;
@@ -331,7 +343,10 @@ pub fn restore(receipt_path: &Path, out: &Path, remote: Option<&str>) -> Result<
     cfg.remote = Some(remote);
     cfg.index_path = attempt.join("read-only-store-index.json");
     cfg.cache_dir = attempt.join("unused-cache");
-    let store = Store::open(cfg)?;
+    let store = match guard {
+        Some(guard) => Store::open_guarded(cfg, guard)?,
+        None => Store::open(cfg)?,
+    };
 
     // Fetch the final publication marker first, and require it to bind the
     // complete object list supplied in the externally retained receipt.
