@@ -188,3 +188,8 @@ and1568jets, with closed links. No bulk list writer. Retain originalfiles.
 Use the frozen generic custom-source runner branch for future inputs; never
 edit that runner while a process uses it. This replay recovers unavailable
 required outputs; it is not a new or enlarged RR search.
+
+Lean02 local dependency-root copy fails before proof elaboration with unknown
+private Lean initializer declaration. Keep this runtime failure and exactsource.
+Next attempt uses the original pinned dependency search roots,with only source
+and output copied to task-local disk. No changed theorem or enlarged cap.
