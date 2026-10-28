@@ -163,3 +163,16 @@ the complete tame different,129jet degree obstruction. Geometry remains
 written. Source count18named theorem declarations. Local cache is a byte-
 verified copy of pinned compiled dependencies; an initial overinclusive
 source-comment parser copied extra modules,not a missing-library result.
+
+## Prospective export reconciliation after RR-O01
+RR-O01 strictaccepts nativeexit0/marker/noerrors and internalrank68 atK16.
+However bulk write(list) exports have one fewer record:19chart records,
+67basis vectors,1567jet columns. Do not silently synthesize missing records
+or treat an exported67-vector file as a complete68basis. First IO27 tests
+3explicit elements with internal size/print,implicit list write,explicit
+closed-link list write,and element-by-element closed-link writes. This is
+an I/O experiment, no new arithmetic claim. Reconcile actual in-memory list
+counts and export framing before any dependent basis-action/torsion run.
+A necessary export-recovery replay must assert20charts,68basis vectors and
+1568candidate columns,print all finalbasis vectors,and explicitly close each
+output link. Retain all originals. No result is promoted from a receipt count.
