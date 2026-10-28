@@ -1571,6 +1571,8 @@ mod tests {
             declared_ratio_to_floor: None,
             memory_entries_per_sqrt_r: Some(sz.3),
             uncharged_per_sqrt_r: Some(uncharged),
+            oracle_queries: None,
+            oracle_server_group_ops: None,
             levels: BTreeMap::new(),
             axes,
             band: vec![point(0.0), point(0.1), point(1.0)],
@@ -1627,6 +1629,7 @@ mod tests {
                 entry: "x".into(),
             },
             level: "exponent".into(),
+            oracle: None,
             sizes: sizes.iter().map(|z| size_row(z, uncharged)).collect(),
             fit: Fit {
                 size_parameter: "r".into(),
