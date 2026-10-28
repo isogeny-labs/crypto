@@ -1,0 +1,72 @@
+[package]
+name = "projective-law-followup"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+five-leads-study = { path = "../five_leads_e2e_20261019/native" }
+serde_json = "1"
+
+[[bin]]
+name = "projective-law-gate"
+path = "src/bin/projective_law_gate.rs"
+
+[[bin]]
+name = "projective-collector"
+path = "src/bin/projective_collector.rs"
+
+[[bin]]
+name = "analyze-projective"
+path = "src/bin/analyze.rs"
+
+[[bin]]
+name = "projective-state-collector"
+path = "src/bin/projective_state_collector.rs"
+
+[[bin]]
+name = "validate-projective"
+path = "src/bin/validate.rs"
+
+[[bin]]
+name = "projective-proof-audit"
+path = "src/bin/projective_proof_audit.rs"
+
+[[bin]]
+name = "projective-symbolic-12"
+path = "src/bin/projective_symbolic_12.rs"
+
+[[bin]]
+name = "projective-symbolic-12-exception"
+path = "src/bin/projective_symbolic_12_exception.rs"
+
+[[bin]]
+name = "projective-symbolic-triple"
+path = "src/bin/projective_symbolic_triple.rs"
+
+[[bin]]
+name = "projective-symbolic-22-common"
+path = "src/bin/projective_symbolic_22_common.rs"
+
+[[bin]]
+name = "projective-symbolic-22-drop"
+path = "src/bin/projective_symbolic_22_drop.rs"
+
+[[bin]]
+name = "projective-symbolic-22-mixed"
+path = "src/bin/projective_symbolic_22_mixed.rs"
+
+[[bin]]
+name = "projective-symbolic-22-double"
+path = "src/bin/projective_symbolic_22_double.rs"
+
+[[bin]]
+name = "projective-symbolic-22-shared"
+path = "src/bin/projective_symbolic_22_shared.rs"
+
+[[bin]]
+name = "validate-cross-scale-weights"
+path = "src/bin/validate_cross_scale_weights.rs"
+
+[[bin]]
+name = "verify-weighted-source22"
+path = "src/bin/verify_weighted_source22.rs"

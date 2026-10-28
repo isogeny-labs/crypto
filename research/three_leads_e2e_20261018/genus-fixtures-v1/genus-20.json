@@ -1,0 +1,105 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.three_leads_plain_v1",
+        "params": {
+          "trial_cap": "98300"
+        }
+      },
+      "name": "rho_plain",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "params": {
+          "trial_cap": "98300"
+        }
+      },
+      "name": "rho_neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "rho.three_leads_jacobian_v1",
+        "params": {
+          "trial_cap": "98300"
+        }
+      },
+      "name": "jac_rho",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.three_leads_genus2_v1",
+        "params": {
+          "independent": "0",
+          "trial_cap": "98300",
+          "unique_relations": "1"
+        }
+      },
+      "name": "genus_ic",
+      "role": "candidate"
+    }
+  ],
+  "description": "Fresh three-leads counts-only experiment; all cold phases; walls unqualified",
+  "label": "three-leads-genus-20",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026101801,
+    "timeout_seconds": 1200,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 133947,
+        "b": 289745,
+        "family": "scholten",
+        "group_order": 678560,
+        "gx": 120369,
+        "gy": 590655,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 823,
+        "parameter": 0,
+        "r": 4241
+      },
+      {
+        "a": 47422,
+        "b": 173198,
+        "family": "scholten",
+        "group_order": 738272,
+        "gx": 651842,
+        "gy": 460677,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 859,
+        "parameter": 0,
+        "r": 23071
+      },
+      {
+        "a": 582462,
+        "b": 270708,
+        "family": "scholten",
+        "group_order": 779392,
+        "gx": 350590,
+        "gy": 375062,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 883,
+        "parameter": 0,
+        "r": 6089
+      }
+    ],
+    "target_seed": 202610181260,
+    "targets_per_curve": 60
+  }
+}

@@ -1,5 +1,17 @@
 # Results: fall-degree experiments E1, E1b, E2 (`m = 2`)
 
+**Latest E12c preservation update (2026-10-28):** the additional `4:28:7`,
+`N=84` Spot attempt retained **one of four requested completed draw records**
+before reclaim (exit 143). Its window is uncertified, with null degree-result
+fields: this is **inconclusive**, not a `d_F >= 5` measurement. See the appended
+interrupted-continuation section and [report](e12/interrupted-c-20261028/README.md).
+
+**Latest continuation (2026-10-28):** E12b cell `3:24:7` completed four draws,
+`≥5, 4, ≥5, 4`. Amendment 15's frozen lower-median rule gives **4**, hence
+the registered reading **“mixed.”** See the appended completed-continuation
+section and [report](e12/completed-20261028/README.md). Earlier dated sections
+below retain their historical state.
+
 Scored on 2026-10-08 by `score.py` (output in `score-output.txt`), from
 the committed JSONL in `runs/` and `exp/`, against `PREREGISTRATION.md`
 and its Amendment 1. E3, E4 and E5 have not run.
@@ -451,3 +463,71 @@ The Lean build passed again on r2 (`run-b2/out/lean/status`: `exit=0`).
 **Cross-check (`hky_crosscheck`, 3:21:7 draw 0).** Both local attempts were lost to container
 restarts (`e10/crosscheck/attempt{1,2}_lost_on_container_restart.*`). Attempt 2 ran about
 2 hours without finishing on the 4-core authoring host. It has no result.
+
+## E12b (Amendment 15): completed continuation, 2026-10-28
+
+The additional authorized Spot attempt
+`20261028-031317-fd-e12b-spot-20261028-r3-24148b` completed cell `(3,24,7)`,
+`N=45`, seed `20261012`, four draws, degree cap 4, exit 0. The frozen source is
+`371035216942660c4615dfbb88d85a14afaf5c16` and protocol commit is
+`020f03193c46d975935a065c966c81941cbdbf6d`. All original gates and the additional
+draw-0 identity gate are recorded as passing. Raw rows, hashes, read-only record
+verification and the final S3 archive reference are in
+[`e12/completed-20261028/`](e12/completed-20261028/README.md).
+
+| Cell (m:n:ℓ) | N | Data retained for registered reading | Recorded `d_F` | Lower median |
+|:--|--:|:--|:--|--:|
+| 3:30:4 | 42 | carried forward from r2 | 4, 4, 4, 4 | 4 |
+| 3:27:5 | 42 | carried forward from r2 | 4, 4, 4, 4 | 4 |
+| 3:24:6 | 42 | carried forward from r2 | 4, 4, 4, 4 | 4 |
+| 3:24:7 | 45 | completed Amendment-15 attempt | ≥5, 4, ≥5, 4 | **4** |
+
+**Mechanical registered reading: “mixed.”** Amendments 12/15 specify the second
+smallest of four values, with a censored result scored as `cap + 1` only for
+this statistic. `[5,4,5,4]` sorts to `[4,4,5,5]`; two of four score at least 5,
+where the rule requires at least three. The old partial draw 0 is used as an
+identity reference and is not counted again. This resolves the missing-cell
+reading under the frozen rule; it is not a hypothesis promotion or an
+asymptotic conclusion.
+
+The record audit checked the archive checksum, frozen protocol and identities,
+carried-forward rows, draw-0 non-timing equality, and gate records against their
+references. It did not independently execute the closure algorithm or establish
+unsatisfiability/saturation. Both `≥5` rows remain censored; their exact degrees
+are unknown. The prior 282-row Lean table excludes these four new rows. No new
+Lean proof or independent implementation validation is claimed.
+
+The [PDF](e12/completed-20261028/report.pdf) and censoring-aware
+[graph](e12/completed-20261028/draws.svg) describe this completed attempt. E12a
+and E12c remain separate ongoing attempts; this section adds no results for them.
+
+## E12c interrupted additional attempt, 2026-10-28
+
+The Amendment-13 attempt at `(m,n,ell)=(4,28,7)`, `N=84`, retained **one of four
+requested completed draw records** before Spot reclaim. Draw 0 records zero
+solutions, `window.w1x.certified=false`, `d_f_window=null` and `d_f_le3=null`.
+These are producer-reported labels. A failed restricted window is inconclusive
+and cannot establish `d_F >= 5`; there is no exact degree or lower-bound claim.
+The frozen E12c positive reading requires at least two completed degree-4
+certifications; this attempt has none and supplies **no reading**.
+
+Job `20261028-021036-fd-e12c-20261028-r3-914d46` records a Spot notice at
+07:21:44 UTC, exit **143**, final output upload, then shutdown. The terminal
+receipt reports `interrupted`; output status remains `gate_passed`, without the
+wrapper's final `done`. Three requested completed records are missing. This is
+not an overall completion or a resumable solver-memory checkpoint.
+
+The original and canonical S3 archives passed download/hash verification. The
+archive contains 24 regular `out/` files plus `host.txt` and `rusage.txt`; all
+24 separately downloaded final outputs match the archive. Archive SHA-256:
+`fa4edf72399ec45b293b783d8582d9a26406c1670a3612a75b6110dd1e824f09`.
+The raw 775-byte row, original terminal/snapshot receipts, canonical PUT/GET
+readback, full identities, [report](e12/interrupted-c-20261028/README.md),
+[completion diagram](e12/interrupted-c-20261028/flow.svg) and
+[PDF](e12/interrupted-c-20261028/report.pdf) are preserved together.
+
+Gate logs were inspected; no solution recount, closure replay, formal independent
+experiment review or Lean proof was performed. Earlier reports remain historical
+records. Existing degree plots and unrestricted `fall_degree.*` metrics exclude
+this null window result because it is not a censored unrestricted degree. E12a
+and the general first-/last-fall-degree questions remain separate unfinished work.
