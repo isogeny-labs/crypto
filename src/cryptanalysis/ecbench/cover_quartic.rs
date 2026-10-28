@@ -130,7 +130,7 @@ pub fn sqrt_with_count(p: u64, n: u64) -> (Option<u64>, u64) {
     }
     let mut q = p - 1;
     let mut s = 0u32;
-    while q % 2 == 0 {
+    while q.is_multiple_of(2) {
         q /= 2;
         s += 1;
     }

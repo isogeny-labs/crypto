@@ -676,7 +676,7 @@ fn solve_relations(relations: &[Relation], m: usize, n: u64, t: &mut Tally) -> O
 /// multiplication; the scan visits the same `x` and finds the same places,
 /// so the tally is the work an equivalent counted scan performs.
 pub fn factor_base_scan_muls(p: u64, f: &[u64], fb_size: usize) -> Result<(u64, usize), String> {
-    if !(3..1 << 32).contains(&p) || p % 2 == 0 {
+    if !(3..1 << 32).contains(&p) || p.is_multiple_of(2) {
         return Err(format!(
             "the factor-base tally needs an odd p < 2^32, not {p}"
         ));
