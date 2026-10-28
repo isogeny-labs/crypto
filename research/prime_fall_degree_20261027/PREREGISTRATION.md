@@ -178,3 +178,25 @@ little free. Changes, all to resources and order:
   reproducibility failure and stops the study.
 
 No hypothesis, rule or cell changes.
+
+## Amendment 3 (2026-10-28, after G1–G4 passed; before any D-cell or t = 1 row)
+
+**Gates.** G1 passed (6 hand cases). G3 passed: 70 capped-F4 runs on
+closure-measured systems (`m = 2 … 4`, both primes, `N ≤ 20`), 0
+disagreements, `x_R` matched on every one. G4 passed: no planted closure
+contains `1`, and every planted point solves its generators. G2 is checked
+by `score` as F4 rows arrive.
+
+**Cell D, made concrete.** This is the procedure §5 D allows once G3 has
+passed. For a system the closure does not decide, run `f4_fp_tower` uncapped,
+which gives `D`, so `d_F ≤ D`. Then run it capped at `D − 1`. If it does not
+refute, then `d_F = D` (by the G3-validated equivalence; written `=D (F4)` in
+the table). If it refutes, step the cap down. This applies wherever
+`f4_fp_tower` runs (at most 4 free unknowns, `m ≤ 6`). The `D` rows for the C
+cells are named `DC-*` and are scored like the other `D*` rows.
+
+**Exploratory (not registered; no §6 rule is applied to them).** Cell C at
+`t = 1`, Kummer, `m = 2 … 10`, `P1`, closure with `cmax = 12`. Every one of
+these is a *small base* cell (`|V| = 2`). They exist because, with
+`t ≥ 2`, `m ≥ 7` lies beyond both the closure's limits and the F4 engine's
+4-free-variable limit.
