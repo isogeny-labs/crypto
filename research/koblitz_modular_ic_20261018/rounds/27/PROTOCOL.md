@@ -193,3 +193,28 @@ Lean02 local dependency-root copy fails before proof elaboration with unknown
 private Lean initializer declaration. Keep this runtime failure and exactsource.
 Next attempt uses the original pinned dependency search roots,with only source
 and output copied to task-local disk. No changed theorem or enlarged cap.
+
+## Prospective actual cusp 11-torsion test
+CUSP01's actual relation matrix M has an integral vectorz=(1,2,4,8,5)
+with Mz=11d,d=(-9,-11,-4,8,10). Thus11[d]=0 in the actual Jacobian,
+but nonvanishing is unproved. Also Tz-6z=-11(1,1,2,4,2), soT[d]=6[d]
+by actual principal relations. MOVE27 verifies these integer/source products
+then searches k=1,...,10 andm in[-4,4]^5 in fixed lexicographic order for
+moved=k*d+M*m withO,C,D,B in[0,11] andA in[-28,21]. Stop atfirst, or
+report the bounded moving-family failure without any global obstruction.
+For a found certificate D'=sum moved_i delta_i-div(lambda) <=D128.
+Then L(D') is a linear subspace of the newly complete68space. Impose all
+cusp orders and simple vanishing at the degree14 lambda-zero point. Since
+D' has degree0,dimension0 proves actualnonzero11torsion,dimension1 produces
+a principal-function witness. Freeze the exact dependent linear source
+before doing that test. This is a decisive actual divisor-class question,
+not merely a nonzero finite lattice quotient. No factor inclusion follows
+from matching the residual diamondvalue6.
+
+Literature lead: Achter-Casalaina-Martin, Putting the P back in Prym,
+https://www.math.colostate.edu/~achter/math/prym1224.pdf (December18,2024),
+TheoremA(2a),Theorems5.12/6.4. Its arbitrary-base characteristic2 treatment
+applies to an etale double cover once our proper-curve bridge is established:
+the30dim complement has a principal polarization overF2,restriction is twice
+it. This is an additional Prym carrier,not the old det19 quotient embedding,
+not a30genus Jacobian,and not an explicit theta/projective model.

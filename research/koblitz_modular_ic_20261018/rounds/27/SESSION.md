@@ -19,3 +19,8 @@ rejected/stopped,no validmatrixrank. Rawretained; renamebeforeRR02.
 RR02 native observes19 atK8/12/16 andcomplete recombination checks, but
 live runner edit causes post-native Bashsyntaxfailure; nativeexitunknown.
 Not strictaccept. FrozenRR-O expandsactual Ocoeffpole bound,allcapsfixed.
+
+IO01 isolates bulk-list last-element omission; RR-export01 strictPASS
+20charts,68basisvectors,1568columns,all individually framed andcountverified.
+Lean02localimports failruntime;originaldependencyroot retryplanned.
+NewMOVEtorsioncertificate andchar2Prymprimaryliterature lead frozen.
