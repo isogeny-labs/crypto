@@ -1,0 +1,173 @@
+{
+  "card_id": "CARD-fall-degree-e10-20261027-2",
+  "card_path": "research/fall_degree_bounds_20261008/e10/launch2.card.yaml",
+  "card_sha256": "3f3889ca4d5b3311b1317d3073fe769a59c980e4e177c25eb38ef93705db18e1",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/fall_degree_bounds_20261008/e10/aws_env.sh",
+        "taskq/deploy/ephemeral/ephemeral",
+        "run",
+        "--detach",
+        "--ref",
+        "5296ce8a74382f1f872f8f57da52261ef8fbbc34",
+        "--type",
+        "m7a.8xlarge",
+        "--ttl",
+        "24h",
+        "--name",
+        "fd-e9-large-20261027",
+        "--",
+        "research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 6:10:3 5:15:3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 28.156,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-e9",
+      "index": 1,
+      "outputs": {},
+      "seconds": 28.156,
+      "stderr_sha256": "955746731f7fbec9b22b15934ad735c86e170bae18e63129f1a85cc41867bf36",
+      "stderr_tail": [
+        "ephemeral: subnet-0c343d40111cce085: (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 4): We currently do not have sufficient m7a.8xlarge capacity in the Availability Zone you requested (us-eas; trying the next zone",
+        "ephemeral: subnet-052a1486b71ae8df1: (Unsupported) when calling the RunInstances operation: Your requested instance type (m7a.8xlarge) is not supported in your requested Availability Zone (us-east-1e). Please retry your request by not sp; trying the next zone",
+        "ephemeral: job 20261027-041804-fd-e9-large-20261027-a31572",
+        "ephemeral:   m7a.8xlarge spot i-0fdd7944e38d97a36 (resolve:ssm:/ephemeral/ami/rust-x86_64), ttl 24h (terminates by 2026-10-28T04:18:06Z)",
+        "ephemeral:   source 5296ce8a7438, command: research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 6:10:3 5:15:3",
+        "ephemeral:   s3://ephemeral-runs-104186811093-us-east-1/jobs/20261027-041804-fd-e9-large-20261027-a31572/"
+      ],
+      "stdout_sha256": "4b93d7828d4f1e3440c4f9486c23b22a4863e5abf48fa90fc60494f544578d91",
+      "stdout_tail": [
+        "20261027-041804-fd-e9-large-20261027-a31572"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/fall_degree_bounds_20261008/e10/aws_env.sh",
+        "taskq/deploy/ephemeral/ephemeral",
+        "run",
+        "--detach",
+        "--ref",
+        "5296ce8a74382f1f872f8f57da52261ef8fbbc34",
+        "--type",
+        "m7a.4xlarge",
+        "--ttl",
+        "24h",
+        "--name",
+        "fd-e10-m3m6-20261027",
+        "--",
+        "research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 3:21:7 3:24:8 3:27:9 6:12:2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.173,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-e10-m3-m6",
+      "index": 2,
+      "outputs": {},
+      "seconds": 10.173,
+      "stderr_sha256": "7e51356089945e572e6bc265c9b9c1355c59289ad5e7fbdbe90908b05870c3fb",
+      "stderr_tail": [
+        "ephemeral: job 20261027-041832-fd-e10-m3m6-20261027-be0fad",
+        "ephemeral:   m7a.4xlarge spot i-0e46498fd5d294d91 (resolve:ssm:/ephemeral/ami/rust-x86_64), ttl 24h (terminates by 2026-10-28T04:18:34Z)",
+        "ephemeral:   source 5296ce8a7438, command: research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 3:21:7 3:24:8 3:27:9 6:12:2",
+        "ephemeral:   s3://ephemeral-runs-104186811093-us-east-1/jobs/20261027-041832-fd-e10-m3m6-20261027-be0fad/"
+      ],
+      "stdout_sha256": "57efd59e8ff657f2e972db4cc11d08e47adc63230968ca588b488161762cddf9",
+      "stdout_tail": [
+        "20261027-041832-fd-e10-m3m6-20261027-be0fad"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/fall_degree_bounds_20261008/e10/aws_env.sh",
+        "taskq/deploy/ephemeral/ephemeral",
+        "run",
+        "--detach",
+        "--ref",
+        "5296ce8a74382f1f872f8f57da52261ef8fbbc34",
+        "--type",
+        "m7a.4xlarge",
+        "--ttl",
+        "24h",
+        "--name",
+        "fd-e10-m4-20261027",
+        "--",
+        "research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 4:12:3 4:16:4 4:20:5"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.134,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-e10-m4",
+      "index": 3,
+      "outputs": {},
+      "seconds": 9.134,
+      "stderr_sha256": "03c0ed722f85e9ad58e570ac0089694287b910013ae2cc48966e6781f9674295",
+      "stderr_tail": [
+        "ephemeral: job 20261027-041842-fd-e10-m4-20261027-606bf6",
+        "ephemeral:   m7a.4xlarge spot i-06e5ba154563c2eef (resolve:ssm:/ephemeral/ami/rust-x86_64), ttl 24h (terminates by 2026-10-28T04:18:44Z)",
+        "ephemeral:   source 5296ce8a7438, command: research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 4:12:3 4:16:4 4:20:5",
+        "ephemeral:   s3://ephemeral-runs-104186811093-us-east-1/jobs/20261027-041842-fd-e10-m4-20261027-606bf6/"
+      ],
+      "stdout_sha256": "64355b0c003f5e4f1e588f3c165c47387fcbd7cc5d85cc7df6b4b2992dacdd27",
+      "stdout_tail": [
+        "20261027-041842-fd-e10-m4-20261027-606bf6"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 3,
+  "commit": "ae8b1115478d698cc318542ea6fe883e7c62fcd7",
+  "dirty_after": [
+    "research/fall_degree_bounds_20261008/e10/aws_env.sh",
+    "research/fall_degree_bounds_20261008/e10/launch.card.yaml",
+    "research/fall_degree_bounds_20261008/e10/launch2.card.yaml",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt/CARD-fall-degree-e10-20261027-1.receipt.json",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt/launch-e9.stderr",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt/launch-e9.stdout",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt2/launch-e10-m3-m6.stderr",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt2/launch-e10-m3-m6.stdout",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt2/launch-e10-m4.stderr",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt2/launch-e10-m4.stdout",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt2/launch-e9.stderr",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt2/launch-e9.stdout"
+  ],
+  "dirty_before": [
+    "research/fall_degree_bounds_20261008/e10/aws_env.sh",
+    "research/fall_degree_bounds_20261008/e10/launch.card.yaml",
+    "research/fall_degree_bounds_20261008/e10/launch2.card.yaml",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt/CARD-fall-degree-e10-20261027-1.receipt.json",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt/launch-e9.stderr",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt/launch-e9.stdout"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

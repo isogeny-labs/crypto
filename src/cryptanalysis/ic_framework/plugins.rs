@@ -554,6 +554,13 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
                 "basis",
                 "optional explicit full-rank polynomial-basis words separated by semicolons",
             ),
+            (
+                "select",
+                "optional subspace selection: `prefix` (default, <1, z, ...>), `strict4e` (sieve-built subspace with every abscissa in 4E; Koblitz a=0, odd n, h=4 only) or `gated-rank` (best of `candidates` draws by the rank-aware key); excludes `basis`",
+            ),
+            ("seed", "seed of `select` (default 1); deterministic per seed"),
+            ("candidates", "`select=gated-rank` only: sieve draws (default 16)"),
+            ("m", "`select=gated-rank` only: summands of the ceiling (default 3)"),
         ]
     }
 
@@ -566,6 +573,43 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
         let dim = params.u64("dimension")? as u32;
         if dim == 0 || dim > 30 {
             return Err(format!("subspace dimension {dim} outside 1..=30"));
+        }
+        let select = params.get("select").unwrap_or("prefix");
+        if select != "prefix" && params.get("basis").is_some() {
+            return Err("`select` and an explicit `basis` are mutually exclusive".into());
+        }
+        if matches!(select, "strict4e" | "gated-rank") {
+            use crate::cryptanalysis::ic_framework::subspace_select as ss;
+            if let Some(why) = ss::strict4e_refusal(self.instance) {
+                return Err(format!("select={select} refused: {why}"));
+            }
+            if dim >= self.instance.n {
+                return Err(format!("subspace dimension {dim} must be below n"));
+            }
+            let seed = params.u64_or("seed", 1)?;
+            let start = Instant::now();
+            let map = ss::X4Map::build(self.instance);
+            let sel = if select == "strict4e" {
+                ss::strict4e_sieve(&map, dim, seed)?
+            } else {
+                let k = params.u64_or("candidates", 16)? as u32;
+                let m = params.u64_or("m", 3)? as u32;
+                ss::gated_rank_select(self.instance, &map, dim, seed, k, m)?.0
+            };
+            let mut fb = binary_subspace_factor_base(self.instance, &sel.basis);
+            // Unpriced native work of the selection (AGENTS.md section 5a).
+            fb.cost.count("strict4e_membership_tests_uncharged", 1u64 << self.instance.n);
+            fb.cost.count("strict4e_sieve_lookups_uncharged", sel.lookups);
+            fb.cost.count("strict4e_x4_in_span", sel.x4_in_span);
+            fb.cost.count("strict4e_span_nonzero", sel.span_nonzero);
+            fb.cost.count("strict4e_fallback_steps", u64::from(sel.fallback_steps));
+            fb.cost.wall_ns += start.elapsed().as_nanos() as u64;
+            return Ok(fb);
+        }
+        if select != "prefix" {
+            return Err(format!(
+                "unknown select `{select}`; try prefix, strict4e or gated-rank"
+            ));
         }
         let basis: Vec<u64> = if let Some(text) = params.get("basis") {
             let basis: Vec<u64> = text
