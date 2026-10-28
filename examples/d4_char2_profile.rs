@@ -27,7 +27,11 @@ fn main() {
             .position(|a| a == k)
             .map_or(d, |i| args[i + 1].parse().expect(k))
     };
-    let (m, seed, trials) = (get("--m", 12) as u32, get("--seed", 1), get("--trials", 300));
+    let (m, seed, trials) = (
+        get("--m", 12) as u32,
+        get("--seed", 1),
+        get("--trials", 300),
+    );
     let c = find_bin_curve(m, seed, 16).expect("curve");
     let curve = c.curve;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x9e);
@@ -56,7 +60,15 @@ fn main() {
         for a in 0..2 {
             let mut srng = StdRng::seed_from_u64(5);
             let t = Instant::now();
-            let out = solve_d4_bin(&curve, &pre, &r, mk(a == 1), 11, &mut srng, Some(&mut traces[a]));
+            let out = solve_d4_bin(
+                &curve,
+                &pre,
+                &r,
+                mk(a == 1),
+                11,
+                &mut srng,
+                Some(&mut traces[a]),
+            );
             wall[a] += t.elapsed().as_secs_f64();
             res.push(out);
         }
@@ -69,8 +81,16 @@ fn main() {
         for (a, s) in [x, y].into_iter().enumerate() {
             let b = &s.solve;
             for (i, v) in [
-                b.weil_muls, b.triangularise_muls, b.echelon_muls, b.nf_muls, b.charpoly_muls,
-                b.roots_muls, b.eigenvector_muls, b.verify_muls, b.split_muls, b.total_muls,
+                b.weil_muls,
+                b.triangularise_muls,
+                b.echelon_muls,
+                b.nf_muls,
+                b.charpoly_muls,
+                b.roots_muls,
+                b.eigenvector_muls,
+                b.verify_muls,
+                b.split_muls,
+                b.total_muls,
             ]
             .iter()
             .enumerate()
@@ -85,7 +105,11 @@ fn main() {
         rel += u64::from(x.witness.is_some());
     }
     let n = trials as f64;
-    println!("m {m} seed {seed} trials {trials}: dim {:.1}, chains {:.1}", dim as f64 / n, chains as f64 / n);
+    println!(
+        "m {m} seed {seed} trials {trials}: dim {:.1}, chains {:.1}",
+        dim as f64 / n,
+        chains as f64 / n
+    );
     println!("{:10} {:>12} {:>12}", "component", "baseline", "frob_roots");
     for (i, nm) in NAMES.iter().enumerate() {
         println!("{nm:10} {:12.0} {:12.0}", tot[0][i] / n, tot[1][i] / n);

@@ -3180,6 +3180,7 @@ mod ecbench_tests {
     }
 
     #[test]
+    #[allow(clippy::result_large_err)] // the closure returns solve_d4_bin's Result
     fn frob_roots_changes_nothing_but_the_multiplications() {
         let c = generate_instance(5, 7);
         let mut rng = StdRng::seed_from_u64(7);
