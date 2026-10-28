@@ -146,6 +146,39 @@ const K4_PARAMS: &[ParamDecl] = &[
     },
 ];
 
+const THREE_LEADS_RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
+    name: "trial_cap",
+    default: None,
+    help: "deterministic maximum collision-search iterations; exhaustion is retained",
+}];
+const THREE_LEADS_GENUS2_PARAMS:&[ParamDecl]=&[
+    ParamDecl{name:"trial_cap",default:None,help:"deterministic maximum processed divisors"},
+    ParamDecl{name:"independent",default:None,help:"0: Jacobian walk; 1: independent source scalar combinations followed by tau"},
+    ParamDecl{name:"unique_relations",default:None,help:"1 discards repeated divisors up to sign and charges walk restarts; 0 is the duplicate-permitting diagnostic"},
+];
+const THREE_LEADS_DECOMPOSITION_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "trial_cap",
+        default: None,
+        help: "maximum relation trials",
+    },
+    ParamDecl {
+        name: "oracle",
+        default: None,
+        help: "linearized (binary subfield only), semaev (odd short models) or subtract",
+    },
+    ParamDecl {
+        name: "random_base",
+        default: None,
+        help: "0 structured base; 1 same-size random sign-orbit control",
+    },
+    ParamDecl {
+        name: "base_seed",
+        default: None,
+        help: "fixed factor-base seed independent of target and algorithm seed",
+    },
+];
+
 const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "factor_base",
@@ -326,6 +359,16 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl{id:"ic.three_leads_genus2_choice2_v1",family:"ic",summary:"Two-choice component-directed genus2 relation walk; both candidate additions, roots and valid relation insertions charged",entry:"three_leads_followup::solve_genus2_choice2",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_projective_chart_v1",family:"ic",summary:"Two-choice genus2 collector with charged projective CRT numerator chart, one normalization and complete exceptional Cantor fallback",entry:"three_leads_followup::solve_genus2_projective",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_target_rank_v1",family:"ic",summary:"Projective two-choice genus2 collector choosing continuation by charged signed target-coefficient rank preview; both valid relations inserted",entry:"three_leads_followup::solve_genus2_target_rank",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_plain_v1",family:"rho",summary:"Fully counted memoized r-adding rho on frozen finite-extension study inputs; collision-table memory reported",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_negation_v1",family:"rho",summary:"Fully counted memoized negation rho with fruitless-two-cycle look-ahead and charged escape/restarts",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_jacobian_v1",family:"rho",summary:"Explicit Scholten transfer followed by the matched generic Jacobian negation rho, every primitive counted",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v2",family:"ic",summary:"Signed double-large-prime IC with charged restart on every repeated walk divisor, including unsplit states",entry:"three_leads::solve_genus2_v2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v1",family:"ic",summary:"Complete Scholten transfer and signed double-large-prime elimination; independent and duplicate-relation controls are explicit parameters",entry:"three_leads::solve_genus2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v2",family:"ic",summary:"Complete subfield or PKM IC including initial and restarted relation targets, charged cofactor offsets, actual roots and elimination",entry:"three_leads::solve_subfield_or_pkm_v2",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v1",family:"ic",summary:"Complete subfield or PKM IC with actual S3 roots, unknown projected base logarithms and incremental elimination",entry:"three_leads::solve_subfield_or_pkm",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
         MethodDecl {
             id: "rho.plus_model_v1",
             family: "rho",
@@ -987,9 +1030,29 @@ pub fn decl(id: &str) -> Option<&'static MethodDecl> {
     registry().iter().find(|m| m.id == id)
 }
 
+// Keep the historical genus-2 configuration identity distinct from the
+// explicitly named thread implementation, including when refusing workloads.
+const HYPER_GENUS2_ID: &str = "ic.hyperelliptic";
+const HYPER_THREAD_ENTRY: &str = "ecbench::hyper_ic::solve";
+const HYPER_GENUS2_ENTRY: &str = "hyperelliptic_index_calculus::hec_index_calculus_dlp";
+
 /// Fill defaults, refuse unknown and missing parameters, hash.
 pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
-    let d = decl(&spec.id).ok_or_else(|| {
+    // The genus-2 and thread Jacobian implementations retain one historical
+    // method name, but have different parameter contracts. Choose the thread
+    // declaration when its distinguishing parameters are present.
+    let thread_hyper = spec.id == "ic.hyperelliptic"
+        && (spec.params.contains_key("branches")
+            || spec.params.contains_key("d_step_in")
+            || spec.params.get("fb_size").is_some_and(|s| s == "all"));
+    let d = (if thread_hyper {
+        registry()
+            .iter()
+            .find(|m| m.id == spec.id && m.entry == "ecbench::hyper_ic::solve")
+    } else {
+        decl(&spec.id)
+    })
+    .ok_or_else(|| {
         let ids: Vec<&str> = registry().iter().map(|m| m.id).collect();
         format!("unknown method `{}`; known: {}", spec.id, ids.join(", "))
     })?;
@@ -1654,6 +1717,7 @@ fn parse_hex(s: &str) -> Result<u64, String> {
 /// records that `compare` then reports as incomplete.
 pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Result<(), String> {
     let id = full_price::base_of(&m.id).unwrap_or(m.id.as_str());
+    hyper_ic_variant_guard(m, inst, curve)?;
     if id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -1780,7 +1844,11 @@ pub fn solve(
     target: &[String; 2],
     seed: u64,
 ) -> Result<SolveReport, String> {
+    hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
+    if m.id.contains(".three_leads_") && !matches!(inst, Instance::ThreeLeads(_)) {
+        return Err("three-leads methods require a frozen three_leads curve fixture".into());
+    }
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -1855,6 +1923,14 @@ fn solve_inner(
     ty: u64,
     seed: u64,
 ) -> Result<SolveReport, String> {
+    if let Instance::ThreeLeads(i) = inst {
+        return super::three_leads::solve(
+            m,
+            i,
+            crate::cryptanalysis::three_leads::Point::affine(tx, ty),
+            seed,
+        );
+    }
     if let Instance::Wide(_) = inst {
         return Err("a wide instance goes through solve_wide".into());
     }
@@ -2073,6 +2149,7 @@ fn solve_inner(
         }
         (Instance::Wide(_), _)
         | (Instance::Fp4(_), _)
+        | (Instance::ThreeLeads(_), _)
         | (Instance::Ext(_), _)
         | (Instance::Genus2(_), _)
         | (Instance::Quartic(_), _)
@@ -2614,9 +2691,28 @@ fn hyper_refusal(id: &str, h: &HyperInstance) -> String {
 /// The index calculus that runs on a hyperelliptic Jacobian, and only there.
 const HYPER_IC: &str = "ic.hyperelliptic_thread";
 
+fn hyper_ic_variant_guard(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+) -> Result<(), String> {
+    let (expected, workload_matches) = match m.id.as_str() {
+        HYPER_GENUS2_ID => (HYPER_GENUS2_ENTRY, matches!(inst, Instance::Genus2(_))),
+        HYPER_IC => (HYPER_THREAD_ENTRY, matches!(inst, Instance::Hyper(_))),
+        _ => return Ok(()),
+    };
+    if !workload_matches || m.entry != expected {
+        return Err(format!(
+            "`{}` requires its matching Jacobian workload and `{expected}`; {} uses `{}`",
+            m.id, curve.family, m.entry
+        ));
+    }
+    Ok(())
+}
+
 fn hyper_ic_refusal(curve: &CurveFacts) -> String {
     format!(
-        "`{HYPER_IC}` runs on hyperelliptic Jacobians (hyperelliptic_thread, hyperelliptic_explicit) only; {} is {}",
+        "`{HYPER_IC}` runs on genus2_* or hyperelliptic_* Jacobians only; {} is {}",
         curve.slug, curve.family
     )
 }
@@ -4919,6 +5015,7 @@ pub fn dump_factor_base(
         | Instance::Fp4(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
+        | Instance::ThreeLeads(_)
         | Instance::Ext(_)
         | Instance::Genus2(_)
         | Instance::Quartic(_)
@@ -4983,6 +5080,93 @@ mod tests {
         .unwrap();
         assert_eq!(a.method_id, b.method_id);
         assert!(a.method_id.starts_with("ECM1h"));
+    }
+
+    #[test]
+    fn historical_genus2_method_id_survives_thread_parameter_resolution() {
+        let historical = resolve(&MethodSpec {
+            id: HYPER_GENUS2_ID.into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        // Committed in research/ecbench_jacobians_transfers_20261025/sessions/genus2/plan.json.
+        assert_eq!(historical.method_id, "ECM1ha6ff9c61b9eb");
+        assert_eq!(historical.entry, HYPER_GENUS2_ENTRY);
+
+        let thread = resolve(&MethodSpec {
+            id: HYPER_IC.into(),
+            params: [
+                ("fb_size", "all"),
+                ("large_primes", "0"),
+                ("extra_relations", "8"),
+                ("branches", "64"),
+                ("d_step_in", "4"),
+            ]
+            .into_iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect(),
+        })
+        .unwrap();
+        assert_eq!(thread.entry, HYPER_THREAD_ENTRY);
+        assert_ne!(thread.method_id, historical.method_id);
+    }
+
+    #[test]
+    fn hyperelliptic_variants_refuse_other_workloads_and_mismatched_entries() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+        let genus2 = resolve(&MethodSpec {
+            id: HYPER_GENUS2_ID.into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        let thread = resolve(&MethodSpec {
+            id: HYPER_IC.into(),
+            params: [
+                ("fb_size", "all"),
+                ("large_primes", "0"),
+                ("extra_relations", "8"),
+                ("branches", "64"),
+                ("d_step_in", "4"),
+            ]
+            .into_iter()
+            .map(|(k, v)| (k.into(), v.into()))
+            .collect(),
+        })
+        .unwrap();
+        let cases = [
+            CurveSpec::Genus2Search {
+                p_bits: 8,
+                seed: 3,
+                max_cofactor: 16,
+            },
+            CurveSpec::HyperellipticThread { p: 23, genus: 3 },
+            CurveSpec::PrimeSearch { bits: 12, seed: 3 },
+        ];
+        for spec in cases {
+            let (w, inst) = Workload::build(&spec, 7, 0, TargetKind::Planted).unwrap();
+            for method in [&genus2, &thread] {
+                let matches = match method.id.as_str() {
+                    HYPER_GENUS2_ID => matches!(inst, Instance::Genus2(_)),
+                    HYPER_IC => matches!(inst, Instance::Hyper(_)),
+                    _ => unreachable!(),
+                };
+                if matches {
+                    assert!(applicable(method, &inst, &w.curve).is_ok());
+                    let mut wrong_entry = method.clone();
+                    wrong_entry.entry = "different implementation".into();
+                    assert!(applicable(&wrong_entry, &inst, &w.curve).is_err());
+                    assert!(solve(&wrong_entry, &inst, &w.curve, &w.target, 1).is_err());
+                } else {
+                    assert!(applicable(method, &inst, &w.curve).is_err());
+                    assert!(solve(method, &inst, &w.curve, &w.target, 1).is_err());
+                }
+            }
+        }
+        assert!(resolve(&MethodSpec {
+            id: HYPER_IC.into(),
+            params: BTreeMap::new()
+        })
+        .is_err());
     }
 
     #[test]
