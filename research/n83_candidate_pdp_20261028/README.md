@@ -166,3 +166,7 @@ tar -xJf research/n83_candidate_pdp_20261028/top-archives/runs.tar.xz -C /tmp/n8
 The two-page report is `reports/run-20261028T1540Z/report.pdf` with editable
 plot data/source. Producer replay is not independent review. Exact finite
 regularity, larger-m/prime LFD and an elite-base improvement remain open.
+
+`top-publication/FORMAT.json` indexes the separately retained drafting, report
+and metrics helpers and diagnostic output archive. All312 new metric fields
+match committed native records; unknown values remain absent.

@@ -18,15 +18,29 @@ Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 # problem, unit, better (higher|lower|neutral), kind (gauge|event), label, source.
 # Reads committed state at --ref via `git show`; never the working tree. stdlib only.
 import argparse
+import atexit
 import datetime as dt
 import json
 import os
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 from pathlib import Path
 
 REPO = Path(os.environ.get("PM_REPO_PATH") or Path(__file__).resolve().parents[1])
 TODAY = dt.date.today().isoformat()
+_BLOB_READER = None
+
+
+def _close_blob_reader():
+    if _BLOB_READER is not None:
+        _BLOB_READER.stdin.close()
+        _BLOB_READER.stdout.close()
+        _BLOB_READER.wait(timeout=5)
+
+
+atexit.register(_close_blob_reader)
 
 
 def _git(*args, check=True):
@@ -37,8 +51,26 @@ def _git(*args, check=True):
 
 
 def show(ref, path):
-    p = subprocess.run(["git", "-C", str(REPO), "show", f"{ref}:{path}"], capture_output=True, text=True)
-    return p.stdout if p.returncode == 0 else None
+    # Reuse Git's object/tree cache across historical snapshots on remote filesystems.
+    global _BLOB_READER
+    if "\n" in ref or "\n" in path:
+        raise ValueError("Git blob specifications must be single-line")
+    if _BLOB_READER is None:
+        _BLOB_READER = subprocess.Popen(
+            ["git", "-C", str(REPO), "cat-file", "--batch"],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    _BLOB_READER.stdin.write(f"{ref}:{path}\n".encode())
+    _BLOB_READER.stdin.flush()
+    header = _BLOB_READER.stdout.readline().split()
+    if header and header[-1] == b"missing":
+        return None
+    if len(header) != 3 or header[1] != b"blob":
+        raise RuntimeError(f"Expected committed blob: {ref}:{path}")
+    size = int(header[2])
+    data = _BLOB_READER.stdout.read(size)
+    if len(data) != size or _BLOB_READER.stdout.read(1) != b"\n":
+        raise RuntimeError(f"Incomplete committed blob: {ref}:{path}")
+    return data.decode()
 
 
 def show_many(ref, paths):
@@ -68,9 +100,31 @@ def ls(ref, path=""):
     return [l for l in _git("ls-tree", "-r", "--name-only", ref, "--", path, check=False).splitlines() if l]
 
 
+@lru_cache(maxsize=None)
+def _history_log(ref, path, since):
+    return _git("log", "--first-parent", ref, f"--since={since}",
+                "--format=%H %cs", "--", path, check=False)
+
+
+def _prefetch_histories(ref, since):
+    # Independent read-only history walks; output is still emitted in source order.
+    paths = [
+        "docs/ic/leaderboard.json", "benchmarks/README.md",
+        "research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json",
+        "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json",
+        "research/n83_fixed_fall_catalog_20261028/evidence/summary.json",
+        "research/n83_top_quotient_20261028/evidence/summary.json",
+        "research/n83_fixed_factor_base_20261028/data/index.json",
+    ] + ["research/n83_candidate_pdp_20261028/" + path for path in (
+        "data/index.json", "evidence/pdp/paired-summary.json",
+        "evidence/degree3/summary.json", "evidence/top/verified-summary.json")]
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        list(pool.map(lambda path: _history_log(ref, path, since), paths))
+
+
 def file_history(ref, path, since):
     """Yield (date, commit, text) for the newest commit per day touching `path`, newest first."""
-    out = _git("log", "--first-parent", ref, f"--since={since}", "--format=%H %cs", "--", path, check=False)
+    out = _history_log(ref, path, since)
     seen = set()
     for line in out.splitlines():
         h, d = line.split()
@@ -410,6 +464,7 @@ def n83_candidate_datasets(ref, since):
 
 def main():
     a = args()
+    _prefetch_histories(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
     perf_history(a.since)

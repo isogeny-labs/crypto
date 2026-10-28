@@ -335,3 +335,17 @@ Downloaded the240963688-byte archive from S3, verified its SHA-256, extracted
 it into a fresh retained directory and checked all402 original file hashes.
 Both report pages are rendered and inspected. All64 binary certificates expose
 the recorded27-selector plus83(m-2)-intermediate successful map.
+
+
+### Final publication validation
+
+Data commita537bb41621 was pushed before the report. All312 new metrics equal
+the committed native certificates. Full metrics export initially took136.66s;
+a persistent Git blob reader took75.95s; four independent read-only history
+walks in parallel plus that reader took14.08s. Outputs are byte-for-byte equal.
+All three outputs and diagnostic timings are retained; no research timing claim.
+The two-page report's S3 download matches SHA-256
+d407c26a8a75bcac15229f705efacf245481250741fc0926f6a65c48fe609805.
+The complete native402-file reconstruction is verified. Publication helpers
+and all metric output bytes are archived separately. Exact finite regularity,
+larger-m/prime LFD, held-out comparisons and elite-base selection remain open.
