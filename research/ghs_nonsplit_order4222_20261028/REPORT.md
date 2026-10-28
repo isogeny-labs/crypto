@@ -199,3 +199,12 @@ python3 research/ghs_nonsplit_order4222_20261028/rho_magma_4222.py
 python3 research/ghs_nonsplit_order4222_20261028/cost_4222.py
 lean research/ghs_nonsplit_order4222_20261028/Order4222Gate.lean
 ```
+
+## Q16 direct-screen isogeny frontier
+
+The companion [Q16_FRONTIER.md](Q16_FRONTIER.md) exhausts all 8,190
+normalized ordinary source models. The three established direct genus-three
+V4 screens cover 6,158 models and their full source-field isogeny closure
+covers 8,124, leaving 66 models in three exact source-order classes. Those
+classes have catalogued genus-three Jacobians, but their subgroup-preserving
+isogenies are not yet evaluated and their complete attack costs are unknown.
