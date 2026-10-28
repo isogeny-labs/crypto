@@ -50,11 +50,21 @@ Build the binary from a committed source snapshot with
 The generator refuses missing or dirty provenance. An output directory is
 bound to the exact binary, plan, source, resource limits and shard.
 
+S3 publication and restore also require a preallocated cumulative byte/request
+envelope and a durable mounted authority. Follow
+[partial snapshots and quotas](PARTIAL-SNAPSHOTS.md) to prepare the policy,
+allocation and journal; the example paths below must identify those actual
+records. They are not optional when the remote is S3. The authority mount and
+worker S3 access still require deployment verification before a cloud launch.
+
 ```sh
 crypto dataset generate --plan pilot-plan.json --protocol protocol.json \
   --out /work/dataset --max-cases 36 --shard-index 0 --shard-count 19 \
   --seconds-per-case 30 --memory-mib 2048 --trace-mib 64 --publish \
-  --remote s3://setec-astronomy-artifacts/store
+  --remote s3://setec-astronomy-artifacts/ml-dataset/20261028/store \
+  --budget-policy /durable/campaign/policy.json \
+  --budget-allocation /durable/campaign/worker-allocation.json \
+  --budget-journal /durable/campaign/worker-journal
 crypto dataset verify --out /work/dataset
 crypto dataset status --out /work/dataset
 ```
@@ -106,21 +116,23 @@ to the data remote's prefix. Use the catalog key returned by publication; a
 completion marker, catalog locator, status summary or enclosing lab receipt is
 not itself the full receipt accepted by `restore`.
 
-For the scoped pilot remote, download the exact catalog object to a local
-ordinary file, then restore one cell at a time:
+Use the full portable receipt retained by the publisher, then restore one cell
+at a time with a separately affordable restore allocation. The receipt is also
+discoverable at the exact catalog key returned by publication. Retrieving it
+outside the native CLI is a separate operator S3 operation and is not covered
+by the CLI's reservation journal.
 
 ```sh
-aws s3 cp \
-  s3://setec-astronomy-artifacts/ml-dataset/20261028/store/ml-dataset/catalog/NAMESPACE/MANIFEST_SHA256.json \
-  /work/receipts/cell-publication.json --region us-east-2
 crypto dataset restore --receipt /work/receipts/cell-publication.json \
-  --out /work/restored-dataset
+  --out /work/restored-dataset \
+  --budget-policy /durable/campaign/policy.json \
+  --budget-allocation /durable/campaign/restore-allocation.json \
+  --budget-journal /durable/campaign/restore-journal
 crypto dataset verify --out /work/restored-dataset
 crypto dataset status --out /work/restored-dataset
 ```
 
-Create the local receipt directory before the download and replace the uppercase
-components with the returned namespace and manifest digest. Restore uses the
+The receipt must be an ordinary local file. Restore uses the
 remote recorded in the receipt. Its optional `--remote` argument must identify
 the same remote; it cannot redirect proof to a mirror. The supported S3 bucket
 is `setec-astronomy-artifacts`; `file://` remotes are also supported for local
