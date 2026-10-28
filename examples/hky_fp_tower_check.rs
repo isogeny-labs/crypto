@@ -82,8 +82,20 @@ fn isogeny_rule_rewrites_without_raising_degree() {
     // y0^2 = y0*y1 - 2*y1 + 2*y0 - 5 (a=1, b=-2, c=2, d=-5), y1^2 = 4 mod 101.
     let p = 101;
     let rules = vec![
-        SquareRule { next: Some(1), a: 1, b: p - 2, c: 2, d: p - 5 },
-        SquareRule { next: None, a: 0, b: 0, c: 0, d: 4 },
+        SquareRule {
+            next: Some(1),
+            a: 1,
+            b: p - 2,
+            c: 2,
+            d: p - 5,
+        },
+        SquareRule {
+            next: None,
+            a: 0,
+            b: 0,
+            c: 0,
+            d: 4,
+        },
     ];
     let ring = HkyRing::new(p, rules, 0);
     let sq = ring.from_raw(&[(vec![2, 0], 1)]);

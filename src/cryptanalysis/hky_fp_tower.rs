@@ -100,8 +100,14 @@ pub type NfPoly = Vec<(u64, [u8; MAX_FREE], u64)>;
 impl HkyRing {
     pub fn new(p: u64, rules: Vec<SquareRule>, n_free: usize) -> Self {
         assert!(p < 1 << 32, "hky_fp_tower: p must be below 2^32");
-        assert!(rules.len() <= MAX_TOWER, "hky_fp_tower: at most {MAX_TOWER} tower variables");
-        assert!(n_free <= MAX_FREE, "hky_fp_tower: at most {MAX_FREE} free variables");
+        assert!(
+            rules.len() <= MAX_TOWER,
+            "hky_fp_tower: at most {MAX_TOWER} tower variables"
+        );
+        assert!(
+            n_free <= MAX_FREE,
+            "hky_fp_tower: at most {MAX_FREE} free variables"
+        );
         for (j, r) in rules.iter().enumerate() {
             if let Some(nx) = r.next {
                 assert!((nx as usize) > j && (nx as usize) < rules.len());
@@ -209,7 +215,10 @@ impl HkyRing {
 
     /// The degree of a normal form.
     pub fn degree(f: &NfPoly) -> u32 {
-        f.iter().map(|(m, e, _)| key_degree(key(*m, e))).max().unwrap_or(0)
+        f.iter()
+            .map(|(m, e, _)| key_degree(key(*m, e)))
+            .max()
+            .unwrap_or(0)
     }
 
     /// Evaluate a normal form at a point (one value per variable).
@@ -279,7 +288,14 @@ impl Columns {
         let mut keys = Vec::new();
         // tower masks by popcount
         let mut masks: Vec<Vec<u64>> = vec![Vec::new(); c as usize + 1];
-        fn rec_mask(start: usize, nt: usize, left: u32, cur: u64, out: &mut Vec<Vec<u64>>, depth: u32) {
+        fn rec_mask(
+            start: usize,
+            nt: usize,
+            left: u32,
+            cur: u64,
+            out: &mut Vec<Vec<u64>>,
+            depth: u32,
+        ) {
             out[depth as usize].push(cur);
             if left == 0 {
                 return;
@@ -290,7 +306,14 @@ impl Columns {
         }
         rec_mask(0, nt, c, 0, &mut masks, 0);
         let mut frees: Vec<Vec<[u8; MAX_FREE]>> = vec![Vec::new(); c as usize + 1];
-        fn rec_free(i: usize, nf: usize, left: u32, cur: &mut [u8; MAX_FREE], deg: u32, out: &mut Vec<Vec<[u8; MAX_FREE]>>) {
+        fn rec_free(
+            i: usize,
+            nf: usize,
+            left: u32,
+            cur: &mut [u8; MAX_FREE],
+            deg: u32,
+            out: &mut Vec<Vec<[u8; MAX_FREE]>>,
+        ) {
             if i == nf {
                 out[deg as usize].push(*cur);
                 return;
@@ -315,7 +338,11 @@ impl Columns {
             }
         }
         keys.sort_unstable_by_key(|&k| Reverse(k));
-        let index = keys.iter().enumerate().map(|(i, &k)| (k, i as u32)).collect();
+        let index = keys
+            .iter()
+            .enumerate()
+            .map(|(i, &k)| (k, i as u32))
+            .collect();
         let deg = keys.iter().map(|&k| key_degree(k) as u8).collect();
         Columns { keys, index, deg }
     }
@@ -467,7 +494,11 @@ pub fn closure(ring: &HkyRing, gens: &[NfPoly], c: u32, limits: &HkyLimits) -> C
         return censored("max_cols", 0, 0, 0);
     }
     let cols = Columns::build(ring, c);
-    assert_eq!(cols.keys.len() as u128, n_cols, "hky_fp_tower: column count");
+    assert_eq!(
+        cols.keys.len() as u128,
+        n_cols,
+        "hky_fp_tower: column count"
+    );
     let one_col = (cols.keys.len() - 1) as u32;
     let to_row = |f: &[(u64, [u8; MAX_FREE], u64)]| -> Row {
         let mut r: Row = f
@@ -553,7 +584,9 @@ pub fn closure(ring: &HkyRing, gens: &[NfPoly], c: u32, limits: &HkyLimits) -> C
             // Against the pivots this batch has added.
             let (r, ops) = ech.reduce(&r, &mut acc, &mut touched);
             muladds += ops;
-            let Some(&(lead, _)) = r.first() else { continue };
+            let Some(&(lead, _)) = r.first() else {
+                continue;
+            };
             let d = cols.deg[lead as usize] as u32;
             if d < c {
                 for v in 0..nv {
@@ -623,7 +656,13 @@ pub struct FallDegrees {
     pub falls: Vec<u32>,
 }
 
-pub fn fall_degrees(ring: &HkyRing, gens: &[NfPoly], c_min: u32, c_max: u32, limits: &HkyLimits) -> FallDegrees {
+pub fn fall_degrees(
+    ring: &HkyRing,
+    gens: &[NfPoly],
+    c_min: u32,
+    c_max: u32,
+    limits: &HkyLimits,
+) -> FallDegrees {
     let mut closures: Vec<Closure> = Vec::new();
     let mut falls = Vec::new();
     let mut last_fall = None;
@@ -631,13 +670,21 @@ pub fn fall_degrees(ring: &HkyRing, gens: &[NfPoly], c_min: u32, c_max: u32, lim
         let cl = closure(ring, gens, c, limits);
         let stop = cl.contains_one || cl.censored.is_some();
         if let Some(prev) = closures.last() {
-            if cl.censored.is_none() && prev.censored.is_none() && cl.dims[c as usize - 1] > prev.dim() {
+            if cl.censored.is_none()
+                && prev.censored.is_none()
+                && cl.dims[c as usize - 1] > prev.dim()
+            {
                 falls.push(c);
             }
         } else if cl.censored.is_none() && c > 0 && cl.dims[c as usize - 1] > 0 && c == c_min {
             // No V_{F,c−1} computed: a fall at c_min is recorded only when
             // c_min − 1 is below every generator's degree, so V_{F,c−1} = 0.
-            let min_deg = gens.iter().filter(|g| !g.is_empty()).map(HkyRing::degree).min().unwrap_or(0);
+            let min_deg = gens
+                .iter()
+                .filter(|g| !g.is_empty())
+                .map(HkyRing::degree)
+                .min()
+                .unwrap_or(0);
             if c_min - 1 < min_deg {
                 falls.push(c);
             }

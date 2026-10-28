@@ -171,7 +171,10 @@ fn score(dir: &Path) {
         .into_iter()
         .filter(|r| r["engine"] == "hky_fp_tower")
         .collect();
-    let f4: HashMap<Key, Value> = rows(dir, &["D"]).into_iter().map(|r| (key(&r), r)).collect();
+    let f4: HashMap<Key, Value> = rows(dir, &["D"])
+        .into_iter()
+        .map(|r| (key(&r), r))
+        .collect();
     // One row per system; repeats (C repeating A/B) must agree (Amendment 2).
     let mut seen: BTreeMap<Key, Value> = BTreeMap::new();
     let (mut repeats, mut mismatches) = (0, 0);
@@ -262,12 +265,36 @@ fn score(dir: &Path) {
         let max_cols = c
             .rows
             .iter()
-            .flat_map(|r| r["closures"].as_array().unwrap().iter().map(|x| u(x, "cols")))
+            .flat_map(|r| {
+                r["closures"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|x| u(x, "cols"))
+            })
             .max()
             .unwrap_or(0);
-        let ms: Vec<u64> = c.rows.iter().map(|r| r["ms"].as_f64().unwrap_or(0.0) as u64).collect();
-        let ops = |v: &[u64]| if v.is_empty() { "—".to_string() } else { v.iter().map(|x| format!("{:.2e}", *x as f64)).collect::<Vec<_>>().join(" ") };
-        let fl = |v: &[(u64, &str)]| v.iter().map(|&(x, s)| format!("{s}{x}")).collect::<Vec<_>>().join(" ");
+        let ms: Vec<u64> = c
+            .rows
+            .iter()
+            .map(|r| r["ms"].as_f64().unwrap_or(0.0) as u64)
+            .collect();
+        let ops = |v: &[u64]| {
+            if v.is_empty() {
+                "—".to_string()
+            } else {
+                v.iter()
+                    .map(|x| format!("{:.2e}", *x as f64))
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            }
+        };
+        let fl = |v: &[(u64, &str)]| {
+            v.iter()
+                .map(|&(x, s)| format!("{s}{x}"))
+                .collect::<Vec<_>>()
+                .join(" ")
+        };
         md.push(format!(
             "| {} | {} | {} | {}{} | {} | {} | {:.2e} | {} | {} | {} | {} | {} | {} | {} |",
             c.p,
@@ -280,7 +307,11 @@ fn score(dir: &Path) {
             lambda(c.p, c.t, c.m),
             fl(&c.d_f),
             fl(&c.ffd),
-            if c.d.is_empty() { "—".into() } else { fl(&c.d) },
+            if c.d.is_empty() {
+                "—".into()
+            } else {
+                fl(&c.d)
+            },
             serde_json::to_string(&falls).unwrap(),
             max_cols,
             ops(&c.hky_ops),
@@ -303,7 +334,9 @@ fn score(dir: &Path) {
     ]);
     let mut lad: BTreeMap<(u64, String, u64, String), Vec<&Cell>> = BTreeMap::new();
     for c in cells.values() {
-        lad.entry((c.p, c.kind.clone(), c.m, c.control.clone())).or_default().push(c);
+        lad.entry((c.p, c.kind.clone(), c.m, c.control.clone()))
+            .or_default()
+            .push(c);
     }
     let mut ladders_json = Vec::new();
     for ((p, kind, m, control), cs) in &lad {
@@ -314,7 +347,13 @@ fn score(dir: &Path) {
         let fmed: Vec<_> = cs.iter().map(|c| lower_median(&c.ffd)).collect();
         let Dmed: Vec<_> = cs
             .iter()
-            .map(|c| if c.d.len() == c.d_f.len() { lower_median(&c.d) } else { None })
+            .map(|c| {
+                if c.d.len() == c.d_f.len() {
+                    lower_median(&c.d)
+                } else {
+                    None
+                }
+            })
             .collect();
         let gaps: Vec<i64> = Dmed
             .iter()
@@ -385,15 +424,22 @@ fn score(dir: &Path) {
         let rd = reading(&dmed);
         let ms: Vec<String> = cs.iter().map(|c| c.m.to_string()).collect();
         let j = |v: &[Option<(u64, &str)>]| v.iter().map(|x| fmt(*x)).collect::<Vec<_>>().join(" ");
-        md.push(format!("| {p} | {kind} | {t} | {} | {} | {} | {rd} |", ms.join(" "), j(&dmed), j(&fmed)));
+        md.push(format!(
+            "| {p} | {kind} | {t} | {} | {} | {} | {rd} |",
+            ms.join(" "),
+            j(&dmed),
+            j(&fmed)
+        ));
         hm_json.push(json!({"p": p, "kind": kind, "t": t, "m": ms, "d_F_median": j(&dmed), "ffd_median": j(&fmed), "H-m": rd}));
     }
     fs::write(dir.join("TABLE.md"), md.join("\n") + "\n").unwrap();
     fs::write(
         dir.join("score.json"),
-        serde_json::to_string_pretty(&json!({"gate_G2": {"checked": g2_checked, "violations": g2_bad},
+        serde_json::to_string_pretty(
+            &json!({"gate_G2": {"checked": g2_checked, "violations": g2_bad},
             "repeats": repeats, "repeat_mismatches": mismatches, "planted_violations": planted_bad,
-            "cells": cells_json, "ladders": ladders_json, "H-m": hm_json}))
+            "cells": cells_json, "ladders": ladders_json, "H-m": hm_json}),
+        )
         .unwrap(),
     )
     .unwrap();
@@ -535,7 +581,11 @@ fn ntt(a: &mut [u64], w: u64, p: u64) {
     let k = a.len();
     let bits = k.trailing_zeros();
     for i in 0..k {
-        let j = if bits == 0 { 0 } else { i.reverse_bits() >> (usize::BITS - bits) };
+        let j = if bits == 0 {
+            0
+        } else {
+            i.reverse_bits() >> (usize::BITS - bits)
+        };
         if i < j {
             a.swap(i, j);
         }
@@ -606,7 +656,11 @@ fn ns_degree(dir: &Path, t_max: u64) {
     ];
     let mut seen = std::collections::BTreeSet::new();
     for r in rows(dir, &["A-", "C-"]) {
-        if r["engine"] != "hky_fp_tower" || r["kind"] != "kummer" || u(&r, "m") != 2 || r["control"] != "tower" {
+        if r["engine"] != "hky_fp_tower"
+            || r["kind"] != "kummer"
+            || u(&r, "m") != 2
+            || r["control"] != "tower"
+        {
             continue;
         }
         let t = u(&r, "t");
@@ -618,7 +672,9 @@ fn ns_degree(dir: &Path, t_max: u64) {
         let (a, b) = (u(&r["curve"], "a"), u(&r["curve"], "b"));
         let (g, zeta) = (u(&r["tower"], "g"), u(&r["tower"], "zeta"));
         let xr = u(&r, "x_r");
-        let xs: Vec<u64> = (0..kk).map(|j| mulm(g, powm(zeta, j as u64, p), p)).collect();
+        let xs: Vec<u64> = (0..kk)
+            .map(|j| mulm(g, powm(zeta, j as u64, p), p))
+            .collect();
         let mut grid = vec![0u64; kk * kk];
         for j1 in 0..kk {
             for j2 in 0..kk {
@@ -734,7 +790,11 @@ fn raw_s3(x1: &Raw, x2: &Raw, x3: &Raw, a: u64, b: u64, p: u64, n: usize) -> Raw
     let t1 = raw_mul(&raw_mul(&raw_mul(&d, &d, p), x3, p), x3, p);
     let s = raw_add(x1, x2, p);
     let pr = raw_mul(x1, x2, p);
-    let inner = raw_add(&raw_mul(&s, &raw_add(&pr, &raw_const(n, a, p), p), p), &raw_const(n, mulm(2, b, p), p), p);
+    let inner = raw_add(
+        &raw_mul(&s, &raw_add(&pr, &raw_const(n, a, p), p), p),
+        &raw_const(n, mulm(2, b, p), p),
+        p,
+    );
     let t2 = raw_scale(&raw_mul(&inner, x3, p), p - 2, p);
     let q = raw_add(&pr, &raw_const(n, p - a % p, p), p);
     let t3 = raw_add(&raw_mul(&q, &q, p), &raw_scale(&s, p - mulm(4, b, p), p), p);
@@ -744,7 +804,15 @@ fn raw_s3(x1: &Raw, x2: &Raw, x3: &Raw, a: u64, b: u64, p: u64, n: usize) -> Raw
 /// `d_F(φF)` of the `S₃` chain with constant summands `xs` and target
 /// `xr`: `(value, censoring)` as [`d_f`].
 #[allow(clippy::too_many_arguments)]
-fn spec_value(xs: &[u64], xr: u64, a: u64, b: u64, p: u64, cmax: u64, budget: u64) -> ((u64, &'static str), f64, u128) {
+fn spec_value(
+    xs: &[u64],
+    xr: u64,
+    a: u64,
+    b: u64,
+    p: u64,
+    cmax: u64,
+    budget: u64,
+) -> ((u64, &'static str), f64, u128) {
     let m = xs.len();
     let n = m - 2;
     let ring = HkyRing::new(p, Vec::new(), n);
@@ -760,7 +828,10 @@ fn spec_value(xs: &[u64], xr: u64, a: u64, b: u64, p: u64, cmax: u64, budget: u6
         .map(|e| ring.from_raw(&e.iter().map(|(k, v)| (k.clone(), *v)).collect::<Vec<_>>()))
         .filter(|g| !g.is_empty())
         .collect();
-    let lim = HkyLimits { budget: std::time::Duration::from_secs(budget), ..HkyLimits::default() };
+    let lim = HkyLimits {
+        budget: std::time::Duration::from_secs(budget),
+        ..HkyLimits::default()
+    };
     let fd = hky_fp_tower::fall_degrees(&ring, &gens, 1, cmax as u32, &lim);
     let last = fd.closures.last().unwrap();
     let ms = fd.closures.iter().map(|c| c.ms).sum();
@@ -792,14 +863,24 @@ fn grid_point(m: usize, t: u64, g: u64, zeta: u64, p: u64, seed: u64) -> Vec<u64
 fn spec_synthetic(dir: &Path, cmax: u64, points: u64, m_max: u64, budget: u64) {
     let r = rows(dir, &["A-"])
         .into_iter()
-        .find(|r| r["engine"] == "hky_fp_tower" && r["kind"] == "kummer" && r["control"] == "tower" && u(r, "m") == 2 && u(r, "t") >= 2 && u(r, "p") == 2013265921)
+        .find(|r| {
+            r["engine"] == "hky_fp_tower"
+                && r["kind"] == "kummer"
+                && r["control"] == "tower"
+                && u(r, "m") == 2
+                && u(r, "t") >= 2
+                && u(r, "p") == 2013265921
+        })
         .expect("an A row");
     let p = u(&r, "p");
     let (a, b) = (u(&r["curve"], "a"), u(&r["curve"], "b"));
     let (g, zeta) = (u(&r["tower"], "g"), u(&r["tower"], "zeta"));
     let (t, xr) = (u(&r, "t"), u(&r, "x_r"));
     let mut md = vec![
-        format!("Specialised chains on the base of `{}` (p = {p}, t = {t}, x_R = {xr}).", r["_file"].as_str().unwrap()),
+        format!(
+            "Specialised chains on the base of `{}` (p = {p}, t = {t}, x_R = {xr}).",
+            r["_file"].as_str().unwrap()
+        ),
         String::new(),
         "| m | free unknowns | d_F(φF) per grid point | max | cols at last c | ms |".to_string(),
         "|--:|--:|:--|:--|--:|:--|".into(),
@@ -818,7 +899,11 @@ fn spec_synthetic(dir: &Path, cmax: u64, points: u64, m_max: u64, budget: u64) {
         }
         let mx = vals.iter().map(|v| v.0).max().unwrap();
         let vs: Vec<String> = vals.iter().map(|(v, c)| format!("{c}{v}")).collect();
-        md.push(format!("| {m} | {} | {} | {mx} | {cols} | {mss:?} |", m - 2, vs.join(" ")));
+        md.push(format!(
+            "| {m} | {} | {} | {mx} | {cols} | {mss:?} |",
+            m - 2,
+            vs.join(" ")
+        ));
         out.push(json!({"p": p, "t": t, "x_r": xr, "m": m, "spec": vs, "max": mx, "cols": cols as u64, "ms": mss}));
         eprintln!("m={m} {:?}", vs);
     }
@@ -827,7 +912,11 @@ fn spec_synthetic(dir: &Path, cmax: u64, points: u64, m_max: u64, budget: u64) {
     for v in &out {
         writeln!(f, "{v}").unwrap();
     }
-    fs::write(dir.join("derived/spec_chain_synthetic.md"), md.join("\n") + "\n").unwrap();
+    fs::write(
+        dir.join("derived/spec_chain_synthetic.md"),
+        md.join("\n") + "\n",
+    )
+    .unwrap();
     println!("{}", md.join("\n"));
 }
 
@@ -840,7 +929,11 @@ fn spec_chain(dir: &Path, cmax: u64, points: u64, m_max: u64) {
     let mut seen = std::collections::BTreeSet::new();
     let mut bad = 0;
     for r in rows(dir, &["A-", "B-", "C-"]) {
-        if r["engine"] != "hky_fp_tower" || r["kind"] != "kummer" || r["control"] != "tower" || r["target"] != "random" {
+        if r["engine"] != "hky_fp_tower"
+            || r["kind"] != "kummer"
+            || r["control"] != "tower"
+            || r["target"] != "random"
+        {
             continue;
         }
         let m = u(&r, "m") as usize;
@@ -863,7 +956,12 @@ fn spec_chain(dir: &Path, cmax: u64, points: u64, m_max: u64) {
         let bound_cens = vals.iter().any(|v| v.0 == bound && !v.1.is_empty());
         let (dfv, dfc) = d_f(&r);
         // check: an exact closure d_F must be ≥ every exact specialised value.
-        let exact_max = vals.iter().filter(|v| v.1.is_empty()).map(|v| v.0).max().unwrap_or(0);
+        let exact_max = vals
+            .iter()
+            .filter(|v| v.1.is_empty())
+            .map(|v| v.0)
+            .max()
+            .unwrap_or(0);
         let ok = !(dfc.is_empty() && dfv < exact_max);
         if !ok {
             bad += 1;
@@ -899,7 +997,13 @@ fn kummer_rules(t: usize) -> Vec<crypto_lib::cryptanalysis::f4_fp_tower::SquareR
     (0..t)
         .map(|j| {
             let top = j + 1 == t;
-            SquareRule { next: (!top).then_some((j + 1) as u8), a: 0, b: if top { 0 } else { 1 }, c: 0, d: if top { 1 } else { 0 } }
+            SquareRule {
+                next: (!top).then_some((j + 1) as u8),
+                a: 0,
+                b: if top { 0 } else { 1 },
+                c: 0,
+                d: if top { 1 } else { 0 },
+            }
         })
         .collect()
 }
@@ -907,13 +1011,26 @@ fn kummer_rules(t: usize) -> Vec<crypto_lib::cryptanalysis::f4_fp_tower::SquareR
 /// `d_F` of `q(z) = S₃(g·z, x2, x_R)` on one Kummer tower of height `t`
 /// (`y_0 = z`, `y_{j+1} = y_j²`, `y_{t−1}² = 1`), with the closure dims.
 #[allow(clippy::too_many_arguments)]
-fn one_d(t: usize, g: u64, x2: u64, xr: u64, a: u64, b: u64, p: u64, cmax: u64, budget: u64) -> ((u64, &'static str), Option<u32>, Vec<u32>, f64, u128) {
+fn one_d(
+    t: usize,
+    g: u64,
+    x2: u64,
+    xr: u64,
+    a: u64,
+    b: u64,
+    p: u64,
+    cmax: u64,
+    budget: u64,
+) -> ((u64, &'static str), Option<u32>, Vec<u32>, f64, u128) {
     let ring = HkyRing::new(p, kummer_rules(t), 0);
     let n = t;
     let x1 = raw_scale(&raw_var(n, 0), g, p);
     let q = raw_s3(&x1, &raw_const(n, x2, p), &raw_const(n, xr, p), a, b, p, n);
     let gen = ring.from_raw(&q.iter().map(|(k, v)| (k.clone(), *v)).collect::<Vec<_>>());
-    let lim = HkyLimits { budget: std::time::Duration::from_secs(budget), ..HkyLimits::default() };
+    let lim = HkyLimits {
+        budget: std::time::Duration::from_secs(budget),
+        ..HkyLimits::default()
+    };
     let fd = hky_fp_tower::fall_degrees(&ring, &[gen], 1, cmax as u32, &lim);
     let last = fd.closures.last().unwrap();
     let ms = fd.closures.iter().map(|c| c.ms).sum();
@@ -944,7 +1061,12 @@ fn spec_1d(dir: &Path, t_max: u64, draws: u64, cmax: u64) {
     let mut seen = std::collections::BTreeSet::new();
     let mut bad = 0;
     for r in rows(dir, &["A-", "C-"]) {
-        if r["engine"] != "hky_fp_tower" || r["kind"] != "kummer" || u(&r, "m") != 2 || r["control"] != "tower" || r["target"] != "random" {
+        if r["engine"] != "hky_fp_tower"
+            || r["kind"] != "kummer"
+            || u(&r, "m") != 2
+            || r["control"] != "tower"
+            || r["target"] != "random"
+        {
             continue;
         }
         let t = u(&r, "t") as usize;
@@ -962,13 +1084,23 @@ fn spec_1d(dir: &Path, t_max: u64, draws: u64, cmax: u64) {
             vals.push(one_d(t, g, x2, xr, a, b, p, cmax, 900).0);
         }
         let (dfv, dfc) = d_f(&r);
-        let exact_max = vals.iter().filter(|v| v.1.is_empty()).map(|v| v.0).max().unwrap_or(0);
+        let exact_max = vals
+            .iter()
+            .filter(|v| v.1.is_empty())
+            .map(|v| v.0)
+            .max()
+            .unwrap_or(0);
         let ok = !(dfc.is_empty() && dfv < exact_max);
         if !ok {
             bad += 1;
         }
         let vs: Vec<String> = vals.iter().map(|(v, c)| format!("{c}{v}")).collect();
-        md.push(format!("| {p} | {t} | {} | {dfc}{dfv} | {} | {} |", r["target_index"], vs.join(" "), if ok { "ok" } else { "VIOLATION" }));
+        md.push(format!(
+            "| {p} | {t} | {} | {dfc}{dfv} | {} | {} |",
+            r["target_index"],
+            vs.join(" "),
+            if ok { "ok" } else { "VIOLATION" }
+        ));
         out.push(json!({"p": p, "t": t, "target_index": r["target_index"], "x_r": xr, "d_F": format!("{dfc}{dfv}"), "spec_1d": vs, "ok": ok}));
     }
     let mut f = fs::File::create(dir.join("derived/spec_1d_rows.jsonl")).unwrap();
@@ -1033,11 +1165,21 @@ fn spec_1d(dir: &Path, t_max: u64, draws: u64, cmax: u64) {
         }
         let med = lower_median(&vals);
         let vs: Vec<String> = vals.iter().map(|(v, c)| format!("{c}{v}")).collect();
-        let fs_: Vec<String> = ffds.iter().map(|x| x.map_or("—".into(), |y| y.to_string())).collect();
-        md2.push(format!("| {t} | {} | {} | {} | {falls0:?} | {cols} | {mss:?} |", vs.join(" "), fmt(med), fs_.join(" ")));
+        let fs_: Vec<String> = ffds
+            .iter()
+            .map(|x| x.map_or("—".into(), |y| y.to_string()))
+            .collect();
+        md2.push(format!(
+            "| {t} | {} | {} | {} | {falls0:?} | {cols} | {mss:?} |",
+            vs.join(" "),
+            fmt(med),
+            fs_.join(" ")
+        ));
         eprintln!("t={t} {:?}", vs);
         if vals.iter().all(|v| v.1 == ">=") {
-            md2.push(format!("| (stopped: every draw at t = {t} hit a closure limit) | | | | | | |"));
+            md2.push(format!(
+                "| (stopped: every draw at t = {t} hit a closure limit) | | | | | | |"
+            ));
             break;
         }
     }
@@ -1058,11 +1200,33 @@ fn main() {
     };
     match a.first().map(String::as_str) {
         Some("score") => score(Path::new(&a[1])),
-        Some("gate3") => gate3(Path::new(&a[1]), &a[2], opt("--max-n", 24), opt("--jobs", 2) as usize, opt("--budget", 900)),
+        Some("gate3") => gate3(
+            Path::new(&a[1]),
+            &a[2],
+            opt("--max-n", 24),
+            opt("--jobs", 2) as usize,
+            opt("--budget", 900),
+        ),
         Some("ns-degree") => ns_degree(Path::new(&a[1]), opt("--t-max", 12)),
-        Some("spec-synthetic") => spec_synthetic(Path::new(&a[1]), opt("--cmax", 16), opt("--points", 3), opt("--m-max", 10), opt("--budget", 900)),
-        Some("spec-1d") => spec_1d(Path::new(&a[1]), opt("--t-max", 24), opt("--draws", 4), opt("--cmax", 12)),
-        Some("spec-chain") => spec_chain(Path::new(&a[1]), opt("--cmax", 12), opt("--points", 4), opt("--m-max", 10)),
+        Some("spec-synthetic") => spec_synthetic(
+            Path::new(&a[1]),
+            opt("--cmax", 16),
+            opt("--points", 3),
+            opt("--m-max", 10),
+            opt("--budget", 900),
+        ),
+        Some("spec-1d") => spec_1d(
+            Path::new(&a[1]),
+            opt("--t-max", 24),
+            opt("--draws", 4),
+            opt("--cmax", 12),
+        ),
+        Some("spec-chain") => spec_chain(
+            Path::new(&a[1]),
+            opt("--cmax", 12),
+            opt("--points", 4),
+            opt("--m-max", 10),
+        ),
         _ => {
             eprintln!("usage: prime_fall_degree_tools score DIR | gate3 DIR PILOT [--max-n N] [--jobs J] [--budget S] | ns-degree DIR [--t-max T]");
             std::process::exit(2);
