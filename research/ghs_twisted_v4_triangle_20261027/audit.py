@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Independent bit-field replay of the four triangle-cover certificates."""
 import json
+import hashlib
 import sys
 from pathlib import Path
 
@@ -13,6 +14,13 @@ from census import inverse, mul, power, trace
 
 def divide(a, b):
     return mul(a, inverse(b))
+
+
+def evaluate(coeffs, x):
+    out = 0
+    for c in reversed(coeffs):
+        out = mul(out,x) ^ c
+    return out
 
 
 def one(cert):
@@ -87,6 +95,42 @@ def one(cert):
         assert cert["pullback_fibers"][key] == {
             "x":x,"y0":y0,"f1":f1,"split_y1":lifts,
             "pushforward_twice":list(doubled)}
+
+    path = HERE/f"descent_{N}.json"
+    model = json.loads(path.read_text())
+    assert model["source_order"] == N
+    assert model["source_certificate_sha256"] == hashlib.sha256(
+        (HERE/f"certificate_{N}.json").read_bytes()).hexdigest()
+    alpha = model["alpha"]
+    p = alpha ^ power(alpha,256)
+    v = power(alpha,16) ^ power(alpha,256)
+    assert (p,v) == (model["p"],model["v"])
+    l = model["additive_quartic_coefficients_low_to_high"]
+    assert l[0] == l[3] == 0 and l[4] == 1
+    assert {x for x in range(4096) if evaluate(l,x)==0} == {0,p,v,p^v}
+    assert all(power(z,16)==z for z in l)
+    num = model["rhs_numerator_coefficients_low_to_high"]
+    den = model["rhs_denominator_coefficients_low_to_high"]
+    assert all(power(z,16)==z for z in num+den)
+    for x in range(4096):
+        if x in (t0,t1,t2):
+            continue
+        f0,f1 = f(x,0),f(x,1)
+        p2,v2 = mul(p,p),mul(v,v)
+        p4,v4 = mul(p2,p2),mul(v2,v2)
+        expected = mul(p4,f0^mul(f0,f0)) ^ mul(v4,f1^mul(f1,f1)) ^ \
+                   mul(l[2],mul(p2,f0)^mul(v2,f1))
+        assert evaluate(den,x) != 0
+        assert divide(evaluate(num,x),evaluate(den,x)) == expected
+    k = [x for x in range(4096) if power(x,16)==x]
+    model_lifts = {}
+    for x in k:
+        rhs = divide(evaluate(num,x),evaluate(den,x))
+        ys = [u for u in k if evaluate(l,u)==rhs]
+        assert len(ys)==1
+        model_lifts[str(x)] = ys[0]
+    assert model["F16_affine_lifts"] == model_lifts
+    assert model["F16_total_count"] == 17
     print("PASS",N,"b",b,"r",cert["subgroup_prime"],"#C(F4096)",unramified+poles+4)
 
 

@@ -24,19 +24,47 @@
       "finding": "Primary abstract explicitly reports complete even-characteristic classification for genus-one through genus-three sources under g(C)=d*g(E); full case table not in abstract."
     },
     {
+      "title": "Elliptic curves with weak coverings over cubic extensions of finite fields with even characteristic I and II",
+      "authors": "Mahoro Shimura, Fumiyuki Momose, and Jinhui Chao",
+      "year": "2010-2011",
+      "url": "https://eprint.iacr.org/2013/487.pdf",
+      "finding": "The primary 2013 paper's reference list identifies two earlier SCIS papers directly on even-characteristic cubic weak elliptic covers; their full texts were not obtained, so exact overlap with this trace gate is unresolved."
+    },
+    {
       "title": "A Classification of Elliptic and Hyperelliptic Curves over Finite Fields of Even Characteristic Subjected to the Cover Attack",
       "authors": "Kousuke Murai",
       "year": 2021,
       "url": "https://chuo-u.repo.nii.ac.jp/records/17759",
       "finding": "Thesis repository metadata confirms complete-classification claim; full text marked access restricted."
+    },
+    {
+      "title": "On the discrete logarithm problem for plane curves",
+      "authors": "Claus Diem",
+      "year": 2012,
+      "url": "https://www.numdam.org/item/10.5802/jtnb.815.pdf",
+      "finding": "Theorem 1 gives expected soft-O(q) for non-hyperelliptic genus-three Jacobian DLP, an asymptotic bound for this quartic cover family after transfer."
+    },
+    {
+      "title": "Cover and Decomposition Index Calculus on Elliptic Curves made practical",
+      "authors": "Antoine Joux and Vanessa Vitse",
+      "year": 2012,
+      "url": "https://www.iacr.org/archive/eurocrypt2012/72370010/72370010.pdf",
+      "finding": "Appendix A.2 describes the characteristic-two genus-three hyperelliptic direct-cover condition Tr_K/k(b)=0; this is a narrower geometric route than the present non-hyperelliptic triangle cover."
+    },
+    {
+      "title": "Cover attacks for elliptic curves with prime order",
+      "authors": "Song Tian",
+      "year": 2020,
+      "url": "https://arxiv.org/pdf/2012.07173",
+      "finding": "Cubic-extension transfer through a non-hyperelliptic genus-three Jacobian with soft-O(q) DLP cost is prior art. Its homomorphism uses an (ell,ell,ell)-isogeny rather than a cover pullback and trace; the paper targets prime-order source curves, unlike the even-order ordinary binary examples here."
     }
   ],
   "lmfdb_query": "SELECT label, q, poly, has_jacobian, is_simple FROM av_fq_isog WHERE label IN ('3.16.a_a_aev','3.16.a_a_ev','3.16.a_a_adn','3.16.a_a_dx') ORDER BY label",
   "lmfdb_status_semantics": {"-1": "negative", "0": "unknown", "1": "positive"},
   "candidates": [
-    {"source_order":3972,"source_b":51,"label":"3.16.a_a_aev","poly":[1,0,0,-125,0,0,4096],"catalog_has_jacobian":0,"prior_work_status":"potential exact catalog witness; equivalent published equation not ruled out","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_aev"},
+    {"source_order":3972,"source_b":51,"label":"3.16.a_a_aev","poly":[1,0,0,-125,0,0,4096],"catalog_has_jacobian":0,"prior_work_status":"verified positive Jacobian witness absent from current LMFDB curve list; equivalent published equation not ruled out","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_aev"},
     {"source_order":4006,"source_b":198,"label":"3.16.a_a_adn","poly":[1,0,0,-91,0,0,4096],"catalog_has_jacobian":1,"prior_work_status":"rediscovery at isogeny-class level","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_adn"},
     {"source_order":4198,"source_b":116,"label":"3.16.a_a_dx","poly":[1,0,0,101,0,0,4096],"catalog_has_jacobian":1,"prior_work_status":"rediscovery at isogeny-class level","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_dx"},
-    {"source_order":4222,"source_b":853,"label":"3.16.a_a_ev","poly":[1,0,0,125,0,0,4096],"catalog_has_jacobian":0,"prior_work_status":"potential exact catalog witness; equivalent published equation not ruled out","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_ev"}
+    {"source_order":4222,"source_b":853,"label":"3.16.a_a_ev","poly":[1,0,0,125,0,0,4096],"catalog_has_jacobian":0,"prior_work_status":"verified positive Jacobian witness absent from current LMFDB curve list; equivalent published equation not ruled out","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_ev"}
   ]
 }

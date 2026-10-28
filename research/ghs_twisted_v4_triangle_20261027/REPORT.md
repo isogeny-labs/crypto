@@ -11,6 +11,10 @@ genus-three curves with three involutions in characteristic two. Momose and
 Chao (2006) classify `(2,...,2)` Weil-restriction covers; the SCIS 2022
 abstract by Murai, Shimura, Iijima, and Chao explicitly reports a complete
 even-characteristic classification under the isogeny condition `g(C)=d*g(E)`.
+Earlier SCIS 2010 and 2011 papers by Shimura, Momose, and Chao specifically
+study elliptic curves with weak coverings over cubic extensions in even
+characteristic; their titles are recorded in the primary references of
+Iijima, Momose, and Chao (2013).
 The available abstract does not expose the full case table, and the related
 thesis is access restricted. Therefore this report does **not** claim that
 the triangle type, the trace gate, or its density is new in the literature.
@@ -21,8 +25,20 @@ Primary references:
 * Nart–Ritzenthaler, https://arxiv.org/abs/0905.0546
 * Murai–Shimura–Iijima–Chao, SCIS 2022 abstract,
   https://www.iwsec.org/scis/2022/_abst/1A3-2.pdf
+* Iijima–Momose–Chao, *Classification of Elliptic/Hyperelliptic Curves with
+  Weak Coverings against the GHS Attack under an Isogeny Condition* (2013),
+  reference list for the SCIS 2010 and 2011 even-characteristic cubic papers,
+  https://eprint.iacr.org/2013/487.pdf
 * Murai thesis repository entry (full text access restricted),
   https://chuo-u.repo.nii.ac.jp/records/17759
+* Diem, *On the discrete logarithm problem for plane curves* (2012),
+  https://www.numdam.org/item/10.5802/jtnb.815.pdf
+* Joux–Vitse, *Cover and Decomposition Index Calculus on Elliptic Curves made practical*
+  (EUROCRYPT 2012), https://www.iacr.org/archive/eurocrypt2012/72370010/72370010.pdf
+* Tian, *Cover attacks for elliptic curves with prime order* (2020),
+  https://arxiv.org/pdf/2012.07173
+* Magma handbook, canonical images and plane-curve index calculus,
+  https://magma.maths.usyd.edu.au/magma/handbook/text/1473
 
 The exact equations and independently replayed point counts below give
 **local, explicit Jacobian witnesses** for two isogeny classes whose LMFDB
@@ -30,6 +46,11 @@ The exact equations and independently replayed point counts below give
 `-1` denotes a negative status and `1` a positive one. These witnesses are
 potentially new as exact equations or catalog additions; prior publication
 of equivalent curves has not been excluded.
+Tian's cubic-extension transfer through a genus-three Jacobian is also
+relevant prior art for the attack complexity, though its map uses an
+`(ell,ell,ell)`-isogeny rather than the pullback/trace correspondence here.
+The present ordinary binary source curves all have even group order and
+therefore do not instantiate Tian's prime-order setting.
 
 ## Family theorem and exact lower bound
 
@@ -77,6 +98,16 @@ four at each pole, so Riemann–Hurwitz gives
 `2g(C)-2 = 4*(-2)+3*4 = 4`, hence `g(C)=3`. The coefficient Frobenius
 cycles `(f0,f1,f2)`; the order-three semilinear action
 `sigma(x)=x, sigma(y0)=y1, sigma(y1)=y0+y1` supplies descent to `k`.
+
+The curve is **geometrically non-hyperelliptic**. Each of the three branch
+poles has a different nontrivial inertia subgroup of V4, and all three
+nontrivial V4 quotients have genus one. If a hyperelliptic involution existed,
+it would be central and could not lie in V4. It would induce an automorphism
+of the quotient projective line commuting with V4 and therefore fixing each
+of the three individually labeled branch poles. An automorphism of the
+projective line fixing three distinct points is the identity, placing the
+involution in V4, a contradiction. Thus the canonical model is a smooth
+plane quartic over `k`.
 
 Here is the explicit first quotient. Put `Delta=t0+t1=delta`,
 `beta=A/Delta`, `gamma=A^q/Delta`, `s=beta*gamma`, `c=beta+gamma`.
@@ -127,6 +158,78 @@ the trivial kernel of doubling on each named prime-order source group.
 It does not formalize the function-field geometry or compute Jacobian divisor
 arithmetic.
 
+## Explicit base-field model and evaluated Jacobian map
+
+The invariant
+`u=(alpha+alpha^(q^2))*y0+(alpha^q+alpha^(q^2))*y1`, with `alpha=t0`,
+generates the whole degree-four extension over `k(x)`. Indeed the V4 deck
+translations send `u` to `u`, `u+p`, `u+v`, and `u+p+v`, where
+`p=alpha+alpha^(q^2)` and `v=alpha^q+alpha^(q^2)` are distinct nonzero
+elements. Thus `L(U)=U(U+p)(U+v)(U+p+v)` is a separable additive quartic
+over `k`, and reducing `L(u)` by the two Artin–Schreier equations gives a
+rational function `N(x)/D(x)` with coefficients in `k`. The executable
+`descent_model.py` constructs this exact `k(x,u)` equation for each case.
+
+For order 4222, the common field coefficient codes give the explicit model
+
+```
+(u^4 + 2622*u^2 + 3158*u) *
+  (x^6 + 3362*x^4 + 2623*x^2 + 2623)
+ = 3159*x^5 + 3158*x^4 + 2891*x^3 + 1641*x^2 + 1821*x.
+```
+
+All displayed coefficients lie in `k=F16` embedded in `K` under the bitmask
+convention above. The affine equation is singular as a plane model; its
+smooth projective normalization is `C`. The four generated `descent_*.json`
+files give the analogous exact equations and one `F16` affine lift per
+`x in F16`. `audit.py` rechecks the rational identities at every unramified
+`x in K` with independent bit-level field arithmetic.
+
+Magma 2.30-1 independently computes each normalization's geometric genus
+as three, obtains a non-hyperelliptic smooth canonical plane quartic, and
+returns the predicted L-polynomial. The exact calculator input, full
+response, coefficient vectors, and canonical maps are retained in
+`canonical_*.magma`, `canonical_*_receipt.json`, and `canonical_data_*.json`.
+For an immediately readable exact plane equation, put
+
+```
+(M0,...,M12) = (X^4, X^2 Y^2, X Y^3, Y^4, X^2 Y Z, X Y^2 Z,
+               Y^3 Z, X^2 Z^2, X Y Z^2, Y^2 Z^2, X Z^3, Y Z^3, Z^4)
+F_N(X,Y,Z) = sum_(i=0)^12 c_i M_i.
+```
+
+The following rows give `c_0,...,c_12` as the same embedded-field bitmasks.
+Magma checks `F_N=0` smooth over `F16`, and the Sage map evaluator checks
+the named source fibers lie on it.
+
+| Source order | Exact canonical quartic coefficient vector |
+|---:|---|
+| 3972 | `[1,1641,2890,3362,2623,2890,372,372,3362,3159,3363,3158,373]` |
+| 4006 | `[1,1641,2890,3362,2623,2890,1821,372,3362,2622,3363,1640,373]` |
+| 4198 | `[1,1641,2890,1641,2623,2890,2891,372,3362,1640,3363,2890,373]` |
+| 4222 | `[1,1641,2890,3159,2623,2890,2890,372,3362,1,3363,2622,373]` |
+
+Finally, `subgroup_map.py` evaluates both source points in the actual Sage
+Jacobian group of each canonical quartic after base change to `K`. It chooses a known multiple
+`R=[n]G` whose fibers, and those of `R+G` and `R+Q`, all split over `K`.
+Because `[(R+P)]-[R]` represents `P` on an elliptic curve, the difference of
+their degree-two pullbacks represents `pi_0^*P`. Summing its three Frobenius
+conjugates gives `Phi(P)` without needing a rational fiber above the identity.
+Each run checks that `Phi(G)` is nonzero, `[r]Phi(G)=0`, `Phi(Q)=[7]Phi(G)`,
+and `[r]Phi(Q)=0`. This is an evaluated subgroup-preserving map, not just
+the push-pull existence proof.
+
+| Source order | Translated base `n` | `r` | Jacobian setup (s) | Two map evaluations (s) | Group checks |
+|---:|---:|---:|---:|---:|---|
+| 3972 | 17 | 331 | 14.68 | 5.06 | all pass |
+| 4006 | 36 | 2003 | 14.12 | 5.56 | all pass |
+| 4198 | 7 | 2099 | 14.76 | 5.95 | all pass |
+| 4222 | 10 | 2111 | 14.93 | 5.65 | all pass |
+
+These are observed stage times on a shared host, with process setup and
+field construction outside the timed region. They are retained only as map
+operation evidence and do not measure a complete discrete-logarithm attack.
+
 ## Exact q=16 witnesses
 
 `K=F_2[w]/(w^12+w^7+w^6+w^5+w^3+w+1)`; integer codes are coefficient
@@ -157,14 +260,36 @@ of newly discovered attacks.
 
 ## Attack-cost and novelty limits
 
-The cover equations and correspondence establish **transfer eligibility**
-for the named odd-prime subgroups. A working genus-three Jacobian divisor
-implementation, relation collection, linear algebra, target recovery, and
-same-source-subgroup rho measurements are still needed for a full attack
+The cover equations, canonical quartics, and evaluated correspondence
+establish **transfer eligibility** for the named odd-prime subgroups.
+Relation collection, linear algebra, target recovery through the quartic,
+and same-source-subgroup rho measurements are still needed for a full attack
 cost. There is no measured GHS-over-rho advantage for these candidates.
 The exact equations for the two catalog-unknown classes remain potential
 new curve witnesses; their cryptanalytic vulnerability and publication
 novelty remain open.
+Magma's built-in plane-curve `IndexCalculus` rejects the `q=16` quartics:
+its documented line-relation implementation requires at least `q >= 4! = 24`.
+An order-4222 call returned “Field too small with respect to degree.” A
+custom small-field relation implementation or a `q>=32` member of the
+family is required for that specific engine. This software limit does not
+alter Diem's asymptotic theorem.
+
+There is also a theorem-level asymptotic comparison. Diem's Theorem 1 gives
+expected `O~(q)` for the DLP in the Jacobian of a non-hyperelliptic genus-three
+curve over `F_q`; the explicit quotient correspondence takes each source
+odd-prime DLP into that Jacobian, and the fixed-genus canonical quartic is
+effective from the function-field equations. For a sequence of eligible
+source instances with prime subgroup order `r=Theta(q^3)`, generic rho has
+expected `Theta(sqrt(r))=Theta(q^(3/2))` group operations. This is an
+**asymptotic algorithmic bound**, with the condition on `r` stated explicitly.
+It does not prove that such large-prime instances occur infinitely often,
+give a concrete crossover, or replace the missing full attack measurements.
+Joux–Vitse's characteristic-two genus-three **hyperelliptic** direct-cover
+condition `Tr_(K/k)(b)=0` selects `Theta(q^2)` curves; the present quartic
+construction selects `q^3-1` normalized models and has a different geometric
+target. The 2022 classification remains relevant prior art, so this density
+comparison is not a global novelty claim.
 
 Reproduce in this directory from the repository root:
 
@@ -173,4 +298,7 @@ sage -python research/ghs_twisted_v4_triangle_20261027/triangle.py
 python3 research/ghs_twisted_v4_triangle_20261027/census.py
 python3 research/ghs_twisted_v4_triangle_20261027/audit.py
 lean research/ghs_twisted_v4_triangle_20261027/TriangleGate.lean
+sage -python research/ghs_twisted_v4_triangle_20261027/descent_model.py
+python3 research/ghs_twisted_v4_triangle_20261027/magma_canonical.py
+sage -python research/ghs_twisted_v4_triangle_20261027/subgroup_map.py
 ```
