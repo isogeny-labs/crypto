@@ -24,7 +24,7 @@
   },
   "progress_timeline": {
    "path": "docs/ic/progress-timeline.json",
-   "sha256": "56c31e8fafbad00abcd71be11e05b7c81d62edd3eea3cf04110a43d3854c79d2"
+   "sha256": "4785113221559d9c011d2e3141197b882e08604e03da10d99ceaa9f452106d4a"
   },
   "koblitz_s20": {
    "path": "research/ic_exponent_20260926/analysis.json",
@@ -117,6 +117,22 @@
   "postgb_linear_stage": {
    "path": "research/postgb_linear_stage_20261026/analysis/summary.json",
    "sha256": "ef9aae284eceddb7424b65833f5d469084fcb9a428f648691a5e4bc02feb60fc"
+  },
+  "d4_char2_m12": {
+   "path": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
+   "sha256": "ddce0fe79f6693a5ee3d42c290052a55742e473c98b0d2a80af9996b0715d967"
+  },
+  "d4_char2_m14": {
+   "path": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
+   "sha256": "5c8e0a776a8d99a85e7b66416ae2c1823a716286a63ca524209df1862c89e9e0"
+  },
+  "d4_char2_cmp_m12": {
+   "path": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
+   "sha256": "b17171b59d16d34fa504a59c71b784b84ceebabd37dfbfb6ba917f9b97313e3b"
+  },
+  "d4_char2_cmp_m14": {
+   "path": "research/ic_d4_char2_lever_20261023/results/cmp-m14-ic-base__ic-lever.json",
+   "sha256": "f0a9ddb6f02528e6221a0922d6f06a894890464e6e2c308650a03e173ca25165"
   },
   "ic_m2_linear_ladder": {
    "path": "research/ic_m2_linear_ladder_20261024/fit.json",
@@ -300,7 +316,7 @@
   },
   "registry": {
    "path": "docs/curves/registry.json",
-   "sha256": "e7e8cd2ce2570e6e6931674ff653fbaf0cd513b447738364dbb5440a0974a420"
+   "sha256": "dd2e0fa237241c2fa23c138aa0e3f56ef86cc01e434d3d3cd8a9779ffdc3cf52"
   },
   "curves_schema": {
    "path": "docs/curves/ic/curves.schema.json",
@@ -864,17 +880,6 @@
     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
    },
    {
-    "date": "2026-10-20",
-    "value": 1236267.0,
-    "reference": "matched",
-    "unit": "F_p multiplications",
-    "label": "k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)",
-    "detail": "Native complete DLPs paired with rho on the same target: 1.24e6x (p = 61), 1.94e6x (p = 41), 3.39e6x and 5.77e6x (p = 31), 5.2e6x (p = 71), all verified; a sixth arm (p = 41, six-point base) stopped at its 10-hour cap at >= 1.5e7x. Rho's unpriced walk work priced at 0, 0.1, 1 GAE: rho ahead at every weight (4.1e5x best at 1 GAE). Trace replay cuts the test 1.74-1.77x (5.85e7 to 3.3e7). Extrapolated parity n = 2^227 (2^233 without replay). Engineering; no ecbench session (no F_{p^k} instance on main).",
-    "class": "engineering",
-    "anchor": "#rho-parity-ledger",
-    "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
-   },
-   {
     "date": "2026-10-16",
     "value": 55.3677736032,
     "reference": "matched",
@@ -948,6 +953,17 @@
     "class": "engineering",
     "anchor": "#n83-tier1-finalist-20261017",
     "source": "https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md"
+   },
+   {
+    "date": "2026-10-20",
+    "value": 1236267.0,
+    "reference": "matched",
+    "unit": "F_p multiplications",
+    "label": "k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)",
+    "detail": "Native complete DLPs paired with rho on the same target: 1.24e6x (p = 61), 1.94e6x (p = 41), 3.39e6x and 5.77e6x (p = 31), 5.2e6x (p = 71), all verified; a sixth arm (p = 41, six-point base) stopped at its 10-hour cap at >= 1.5e7x. Rho's unpriced walk work priced at 0, 0.1, 1 GAE: rho ahead at every weight (4.1e5x best at 1 GAE). Trace replay cuts the test 1.74-1.77x (5.85e7 to 3.3e7). Extrapolated parity n = 2^227 (2^233 without replay). Engineering; no ecbench session (no F_{p^k} instance on main).",
+    "class": "engineering",
+    "anchor": "#rho-parity-ledger",
+    "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
    }
   ]
  },
@@ -283820,6 +283836,76 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp3k2-t4-1f351b3a",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 8, b = 9",
+   "order_bits": 5,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp3k2-t4-e66e5b7b",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 7, b = 8",
+   "order_bits": 5,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp3k2-t10-59db7832",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 11, b = 12",
+   "order_bits": 6,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp3k2-t6-26d77299",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 10, b = 11",
+   "order_bits": 6,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp3k2-t6-c4f55f01",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 9, b = 10",
+   "order_bits": 6,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp3k6-t146-44573698",
    "family": "extension",
    "field": "GF(2^None)",
@@ -289020,6 +289106,48 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp9k2-t18-5fd473c6",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 72941, b = 95583",
+   "order_bits": 17,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp9k2-tm638-b41fe4ec",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 115749, b = 90626",
+   "order_bits": 18,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp9k2-tm342-02fbacd7",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 131927, b = 111912",
+   "order_bits": 18,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp9k6-t155480538-beddab05",
    "family": "extension",
    "field": "GF(2^None)",
@@ -289058,6 +289186,62 @@
     "EC1Q523D3Cfpkhfb90ff16ed62"
    ],
    "ec1_unresolved": null,
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp10k2-tm230-7cd9e337",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 493102, b = 193650",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp10k2-tm1230-ab5ca884",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 133947, b = 289745",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp10k2-tm390-03d776d9",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 47422, b = 173198",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp10k2-t298-ebedf684",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 582462, b = 270708",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
    "on_board": false,
    "curves_yaml_key": null,
@@ -289180,6 +289364,34 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp11k2-t34-9dc2fcd3",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 1004627, b = 306850",
+   "order_bits": 21,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp11k2-t106-ac357d3e",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 1057042, b = 1047437",
+   "order_bits": 21,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp11k6-tm12317097734-42413d51",
    "family": "extension",
    "field": "GF(2^None)",
@@ -289224,6 +289436,90 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp12k2-t1402-eb752c26",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 5643905, b = 8195428",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp12k2-tm1710-8151e7a6",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 6391076, b = 2210803",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp12k2-tm1062-9363711e",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 1869394, b = 2355220",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp12k2-tm1974-3cf61b4f",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 9527263, b = 3530983",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp12k2-t322-cc3a55a5",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 2233623, b = 3116489",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp12k2-t6250-cb231bf8",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 6140486, b = 986453",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp13k6-t179999003714-c92fd219",
    "family": "extension",
    "field": "GF(2^None)",
@@ -289243,6 +289539,90 @@
    "field": "GF(2^None)",
    "coefficients": "a = ['2038', '3881', '3438', '4542', '1418', '7707'], b = ['1608', '96', '2829', '453', '6371', '3408']",
    "order_bits": 78,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp14k2-tm18470-00de9234",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 88375897, b = 93456675",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp14k2-tm19118-cdfdaf0b",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 50634121, b = 90455453",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp14k2-tm3086-c51472f2",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 110180958, b = 11200876",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp14k2-tm8854-f2ad133e",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 133463270, b = 2290425",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp14k2-tm5438-ff2b3238",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 123274306, b = 105296150",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp14k2-tm11166-ebe59758",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 55750308, b = 111427435",
+   "order_bits": 28,
    "standard": [],
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
@@ -290078,6 +290458,90 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp16k2-t18802-6b7d1b86",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 1188265641, b = 886362972",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16k2-tm63998-be86c7c6",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 1859678294, b = 795088787",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16k2-tm90334-db55e223",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 497488301, b = 1351038934",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16k2-t60610-b90e0233",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 1687274424, b = 1582832229",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16k2-tm5790-e1607778",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 1619443312, b = 983161189",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16k2-t9930-c210898f",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 2050048520, b = 1120869215",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp17k10-tm631075689354270536704190-2a3ca5dd",
    "family": "extension",
    "field": "GF(2^None)",
@@ -290153,6 +290617,90 @@
    "field": "GF(2^None)",
    "coefficients": "a = ['43339', '30722', '54716', '37143', '6368', '29072'], b = ['13993', '51978', '37446', '49688', '24384', '37867']",
    "order_bits": 97,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp18k2-t131626-0a6ae316",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 32257112622, b = 13592517110",
+   "order_bits": 36,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp18k2-t212314-3a8dbd87",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 25220622765, b = 28947617854",
+   "order_bits": 36,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp18k2-t107074-f9400722",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 4676670217, b = 28464813565",
+   "order_bits": 36,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp18k2-t75978-0be4ecc9",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 12881175837, b = 38414194965",
+   "order_bits": 36,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp18k2-tm318726-d0e0a37a",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 21822298847, b = 11856001764",
+   "order_bits": 36,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp18k2-t167922-d9e11c84",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 24280851789, b = 30476125920",
+   "order_bits": 36,
    "standard": [],
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
@@ -291842,6 +292390,90 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp20k2-tm431534-38b24311",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 369280607796, b = 474707581906",
+   "order_bits": 40,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20k2-t466114-7376e805",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 279748012072, b = 278150231147",
+   "order_bits": 40,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20k2-t349210-2d99d616",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 185078984544, b = 302213975281",
+   "order_bits": 40,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20k2-tm310310-14f0e297",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 306003387410, b = 314970649156",
+   "order_bits": 40,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20k2-tm135974-99614523",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 489774797476, b = 94147862137",
+   "order_bits": 40,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20k2-t400970-f305d893",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 55737748173, b = 357384527602",
+   "order_bits": 40,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp21k6-tm927079723928371550-0fec2c4a",
    "family": "extension",
    "field": "GF(2^None)",
@@ -291861,6 +292493,48 @@
    "field": "GF(2^None)",
    "coefficients": "a = ['161186', '873608', '286809', '52404', '41645', '679270'], b = ['190690', '60789', '956815', '418410', '159827', '252735']",
    "order_bits": 121,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp22k2-t257842-22b4afd4",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 4255430436932, b = 1351106155619",
+   "order_bits": 44,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp22k2-tm2679918-af2f93a5",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 6216410651083, b = 105219825096",
+   "order_bits": 44,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp22k2-tm2285270-ec08dabc",
+   "family": "extension",
+   "field": "GF(2^None)",
+   "coefficients": "a = 8234028488351, b = 345840987380",
+   "order_bits": 44,
    "standard": [],
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
@@ -304354,6 +305028,103 @@
   "report": "research/postgb_linear_stage_20261026/REPORT.pdf",
   "source": "research/postgb_linear_stage_20261026/analysis/summary.json",
   "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (research/postgb_linear_stage_20261026/validation/VALIDATION.json)",
+  "validated": true
+ },
+ "d4_char2_frob_roots_component": {
+  "rows": [
+   {
+    "m": 12,
+    "target": 0,
+    "base": 44.0338071586,
+    "lever": 37.6181988912,
+    "ratio": 0.854302666943,
+    "base_over_rho": [
+     47.2333729676,
+     42.9397677659,
+     23.6177083507
+    ],
+    "lever_over_rho": [
+     40.3515964949,
+     36.6835581203,
+     20.1766712311
+    ]
+   },
+   {
+    "m": 12,
+    "target": 1,
+    "base": 42.5916166108,
+    "lever": 36.385813154,
+    "ratio": 0.854295188806,
+    "base_over_rho": [
+     50.2949002185,
+     45.7230602911,
+     25.1487319424
+    ],
+    "lever_over_rho": [
+     42.9666912781,
+     39.0609904242,
+     21.4844407029
+    ]
+   },
+   {
+    "m": 12,
+    "target": 2,
+    "base": 41.4671913386,
+    "lever": 35.4261486254,
+    "ratio": 0.854317533497,
+    "base_over_rho": [
+     39.8839629278,
+     36.2584122428,
+     19.9427804731
+    ],
+    "lever_over_rho": [
+     34.0735688346,
+     30.9761973158,
+     17.0374670248
+    ]
+   },
+   {
+    "m": 14,
+    "target": 0,
+    "base": 5.37011348377,
+    "lever": 4.37864554447,
+    "ratio": 0.815373000533,
+    "base_over_rho": [
+     4.26844358013,
+     3.88040396669,
+     2.13422394393
+    ],
+    "lever_over_rho": [
+     3.48037364954,
+     3.1639766256,
+     1.74018858097
+    ]
+   }
+  ],
+  "paired": {
+   "12": {
+    "ratio": 0.854304993137,
+    "ci95": [
+     0.854295188806,
+     0.854317533497
+    ],
+    "pairs": 3
+   },
+   "14": {
+    "ratio": 0.815373000533,
+    "ci95": [
+     0.815373000533,
+     0.815373000533
+    ],
+    "pairs": 1
+   }
+  },
+  "class": "engineering",
+  "unit": "S = counted cost in GAE per sqrt(r), ecbench",
+  "study": "research/ic_d4_char2_lever_20261023/",
+  "report": "research/ic_d4_char2_lever_20261023/REPORT.pdf",
+  "source": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
+  "validation": "validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_d4_char2_lever_20261023/VALIDATION.json)",
   "validated": true
  },
  "algebraic_ladder": {
