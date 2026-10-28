@@ -476,6 +476,12 @@ remaining DVR/Pic⁰/runtime gates. The later [nonbranch DVR packet](NONBRANCH_D
 proves that the actual weighted-Proj point stalk is a DVR when the quintic is
 separable, `y²=f(a)`, and `2*y≠0`. Its [PDF](NONBRANCH_DVR.pdf),
 [dependency graph](nonbranch-dvr.svg), and [gate CSV](nonbranch-dvr.csv)
-retain the alternative `f'(a)≠0` case, formula-specific norm transport,
-global Pic⁰ equation, and compiled Rust semantics as open gates. These
-packets do not change a target or cost row.
+retain formula-specific norm transport, the global Pic⁰ equation, and
+compiled Rust semantics as open gates. The complementary
+[derivative-point DVR packet](DERIVATIVE_POINT_DVR.md) proves the actual
+stalk is a DVR under separability, `y²=f(a)`, and `f'(a)≠0`, including in
+characteristic two. It identifies `y-y₀` as a local parameter and supplies
+a [PDF](DERIVATIVE_POINT_DVR.pdf), [dependency graph](derivative-point-dvr.svg),
+and [gate CSV](derivative-point-dvr.csv). A combined theorem and the norm,
+Pic⁰, and compiled-runtime gates remain open. These packets do not change a
+target or cost row.
