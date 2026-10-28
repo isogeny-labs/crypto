@@ -1089,16 +1089,30 @@ fn render_markdown_v2(f: &Frontier, records_dir: &str) -> String {
         FIELD_AXES
             .iter()
             .copied()
+            .chain([ORACLE_AXIS])
             .filter(|a| d.entries.iter().any(|e| e.axes.contains_key(*a)))
             .collect()
     };
+    if f.domains.iter().any(|d| d.domain.envelope.oracle.is_some()) {
+        out.push_str("A domain with an `oracle` is the DLP with that auxiliary-input oracle, not the plain ECDLP, and its `oracle queries` column (static-DH queries per `√r`, zero for a method that queries nothing) is an axis of dominance there: a method whose `ops` are lower only because it was handed the oracle's answers does not displace one that was not.\n\n");
+    }
     if f.domains.iter().any(|d| !field_cols(d).is_empty()) {
         out.push_str("`field muls`, `field sqrs` and `field invs` are the modular multiplications, squarings and inversions behind the group operations, per `√r`. A row showing `unknown` there did not count them; unknown is not zero.\n\n");
     }
     for d in &f.domains {
         out.push_str(&format!(
-            "## {} · {} · {} targets · {} · tier {}\n\n",
-            d.domain.problem, d.domain.family, d.domain.target_kind, d.domain.unit, d.domain.tier
+            "## {} · {} · {} targets · {} · tier {}{}\n\n",
+            d.domain.problem,
+            d.domain.family,
+            d.domain.target_kind,
+            d.domain.unit,
+            d.domain.tier,
+            d.domain
+                .envelope
+                .oracle
+                .as_ref()
+                .map(|o| format!(" · oracle {o}"))
+                .unwrap_or_default()
         ));
         out.push_str(&format!(
             "Domain `{}`. Floor: {}. {}; {}.\n\n",
