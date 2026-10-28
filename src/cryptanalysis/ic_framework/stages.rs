@@ -597,10 +597,18 @@ pub enum Targets {
     WalkPrimeSerial4,
     WalkPrimeSerial8,
     WalkPrimeSerial16,
+    /// Wide lane counts (lead ICP-prime-ic-constant-engineering): the same
+    /// schedule at 64, 256 and 1024 synchronized walks.
+    WalkPrimeSerial64,
+    WalkPrimeSerial256,
+    WalkPrimeSerial1024,
     /// The same lane schedule with Montgomery batch inversion.
     WalkPrimeBatch4,
     WalkPrimeBatch8,
     WalkPrimeBatch16,
+    WalkPrimeBatch64,
+    WalkPrimeBatch256,
+    WalkPrimeBatch1024,
     /// Residual matching (lead L3): the walk subtracts a base point at
     /// every step and relations come from collisions of the residuals;
     /// the oracle is not consulted.  See `ic_framework::residual`.
@@ -625,6 +633,12 @@ impl Targets {
             Targets::WalkPrimeBatch4 => "walk-prime-batch-4",
             Targets::WalkPrimeBatch8 => "walk-prime-batch-8",
             Targets::WalkPrimeBatch16 => "walk-prime-batch-16",
+            Targets::WalkPrimeSerial64 => "walk-prime-serial-64",
+            Targets::WalkPrimeSerial256 => "walk-prime-serial-256",
+            Targets::WalkPrimeSerial1024 => "walk-prime-serial-1024",
+            Targets::WalkPrimeBatch64 => "walk-prime-batch-64",
+            Targets::WalkPrimeBatch256 => "walk-prime-batch-256",
+            Targets::WalkPrimeBatch1024 => "walk-prime-batch-1024",
             Targets::Residual => "residual",
             Targets::Stride => "stride",
             Targets::StrideRenew => "stride-renew",
@@ -642,11 +656,17 @@ impl Targets {
             "walk-prime-batch-4" => Ok(Targets::WalkPrimeBatch4),
             "walk-prime-batch-8" => Ok(Targets::WalkPrimeBatch8),
             "walk-prime-batch-16" => Ok(Targets::WalkPrimeBatch16),
+            "walk-prime-serial-64" => Ok(Targets::WalkPrimeSerial64),
+            "walk-prime-serial-256" => Ok(Targets::WalkPrimeSerial256),
+            "walk-prime-serial-1024" => Ok(Targets::WalkPrimeSerial1024),
+            "walk-prime-batch-64" => Ok(Targets::WalkPrimeBatch64),
+            "walk-prime-batch-256" => Ok(Targets::WalkPrimeBatch256),
+            "walk-prime-batch-1024" => Ok(Targets::WalkPrimeBatch1024),
             "residual" => Ok(Targets::Residual),
             "stride" => Ok(Targets::Stride),
             "stride-renew" => Ok(Targets::StrideRenew),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, stride or stride-renew"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16/64/256/1024, walk-prime-batch-4/8/16/64/256/1024, residual, stride or stride-renew"
             )),
         }
     }

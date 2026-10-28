@@ -7182,7 +7182,7 @@ pub enum TargetSource {
     WalkPrimeFast,
     /// Synchronized independent prime walks; `batched` controls only the
     /// field inversion schedule, not the generated lane requests.
-    WalkPrimeLanes { lanes: u8, batched: bool },
+    WalkPrimeLanes { lanes: u16, batched: bool },
     /// The walk as the Round-2 ladder first ran it: one jump table for
     /// every segment and no guard, so segments merge as rho's walks do.
     /// For the diagnostic of §10.2 only.
@@ -13414,7 +13414,7 @@ mod generator_coupling_tests {
         lines
     }
 
-    const SOURCES: [TargetSource; 6] = [
+    const SOURCES: [TargetSource; 8] = [
         TargetSource::Random,
         TargetSource::Walk,
         TargetSource::Stride,
@@ -13423,6 +13423,14 @@ mod generator_coupling_tests {
         TargetSource::WalkPrimeLanes {
             lanes: 4,
             batched: true,
+        },
+        TargetSource::WalkPrimeLanes {
+            lanes: 64,
+            batched: true,
+        },
+        TargetSource::WalkPrimeLanes {
+            lanes: 1024,
+            batched: false,
         },
     ];
 

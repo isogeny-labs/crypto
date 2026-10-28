@@ -3981,6 +3981,8 @@ fn solve_ic_prime(
     let mut mitm = MitmOracle::new(ms);
     let mut prime_batch = PrimeBatchMitmOracle::new();
     let mut prime_blocked = PrimeBatchMitmOracle::blocked();
+    let mut residual_sweep =
+        crate::cryptanalysis::ic_framework::plugins::ResidualSweepOracle::new();
     let mut mitm_fiber = FiberMitmOracle::new(ms);
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
@@ -4011,6 +4013,7 @@ fn solve_ic_prime(
         "mitm" => &mut mitm,
         "mitm-prime-batch" => &mut prime_batch,
         "mitm-prime-blocked" => &mut prime_blocked,
+        "residual-sweep" => &mut residual_sweep,
         "mitm-fiber" => &mut mitm_fiber,
         "rootfind-mitm" => &mut rootfind_mitm,
         "rootfind-pairs" => &mut rootfind_pairs,
