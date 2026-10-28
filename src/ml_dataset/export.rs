@@ -289,7 +289,10 @@ fn large_prime_feature_projection(
             projected["large_prime_action"] = json!({"kind":"frobenius-with-signed-negation",
                 "lambda":actual["lambda"],"frobenius_power":1});
         }
-        Some("ml-ecdlp-generic-large-prime-transcript/v1") => {
+        Some(
+            "ml-ecdlp-generic-large-prime-transcript/v1"
+            | "ml-ecdlp-generic-large-prime-transcript/v2",
+        ) => {
             if domain["orbit_action"] != "identity-with-signed-negation" {
                 return Err("invalid generic large-prime orbit action".into());
             }
@@ -370,7 +373,10 @@ fn large_prime_cell_projection(
     }
     let domain: Value = super::read_json(&directory.join(&domain.path))?;
     let transcript: Value = super::read_json(&directory.join(&transcript.path))?;
-    if generic != (transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1") {
+    if generic
+        != (transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1"
+            || transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v2")
+    {
         return Err("large-prime transcript path/schema mismatch".into());
     }
     let inputs = large_prime_feature_projection(public, base, &domain, &transcript)?;
@@ -955,6 +961,7 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
                         "restricted-independent-scalar-label",
                         "prime-root-certificates/v1",
                         "binary-root-certificates/v1",
+                        "large-prime-filter-certificates/v1",
                     ]
                     .contains(&a.role.as_str())
                 })
@@ -1900,6 +1907,182 @@ mod tests {
         }
     }
 
+    fn convert_generic_fixture_to_v1(dir: &Path, manifest: &mut CellManifest) {
+        let artifact = manifest
+            .artifacts
+            .iter_mut()
+            .find(|a| a.role == LARGE_PRIME_TRANSCRIPT_ROLE)
+            .unwrap();
+        let v2: Value = crate::ml_dataset::read_json(&dir.join(&artifact.path)).unwrap();
+        assert_eq!(v2["schema"], "ml-ecdlp-generic-large-prime-transcript/v2");
+        let mut v1 = json!({"schema":"ml-ecdlp-generic-large-prime-transcript/v1"});
+        for key in [
+            "public_instance",
+            "orbit_action",
+            "m",
+            "requested_work",
+            "limits",
+            "small",
+            "residual",
+            "pairs",
+            "attempts",
+            "terminal",
+            "recovered_scalar",
+            "recovered_column_logs",
+        ] {
+            v1[key] = v2[key].clone();
+        }
+        v1["batches"] = Value::Array(
+            v2["batches"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|b| {
+                    assert_eq!(b["terminal"]["status"], "completed");
+                    b["terminal"]["legacy_batch"].clone()
+                })
+                .collect(),
+        );
+        fs::write(dir.join(&artifact.path), serde_json::to_vec(&v1).unwrap()).unwrap();
+        (artifact.sha256, artifact.bytes) =
+            crate::store::hash_file(&dir.join(&artifact.path)).unwrap();
+        manifest
+            .artifacts
+            .retain(|a| a.role != "large-prime-filter-certificates/v1");
+        for key in [
+            "filter_trace_policy",
+            "filter_trace_censored",
+            "filter_trace_stop",
+            "recorded_row_transitions_verified",
+            "execution_trace_complete_verified",
+            "total_operation_count_verified",
+            "dependency_basis_complete_verified",
+        ] {
+            manifest.outcome.as_object_mut().unwrap().remove(key);
+        }
+        let public: Value = crate::ml_dataset::read_json(&dir.join("public.json")).unwrap();
+        let base: Value = crate::ml_dataset::read_json(&dir.join("factor-base.json")).unwrap();
+        crate::ml_dataset::relations::verify_transcript(&public, &base, &v1).unwrap();
+    }
+
+    #[test]
+    fn sealed_generic_v2_filter_payloads_and_outcome_cannot_be_rebound_by_rehashing() {
+        let f = Fixture::new();
+        let source = f.source_with_method("prime", "double-large-prime", true);
+        let dir = source.join("cells/000000000125");
+        let original: CellManifest =
+            crate::ml_dataset::read_json(&dir.join("manifest.json")).unwrap();
+        crate::ml_dataset::verify_cell(&dir, true).unwrap();
+        let batch = original
+            .artifacts
+            .iter()
+            .find(|a| a.role == "large-prime-filter-certificates/v1")
+            .unwrap();
+        let batch_bytes = fs::read(dir.join(&batch.path)).unwrap();
+        let t = original
+            .artifacts
+            .iter()
+            .find(|a| a.role == LARGE_PRIME_TRANSCRIPT_ROLE)
+            .unwrap();
+        let t_bytes = fs::read(dir.join(&t.path)).unwrap();
+        for mutation in 0..7 {
+            let mut manifest: CellManifest =
+                serde_json::from_slice(&serde_json::to_vec(&original).unwrap()).unwrap();
+            match mutation {
+                0 => manifest.outcome["trace_complete"] = json!(true),
+                1 => {
+                    manifest.artifacts.retain(|a| a.path != batch.path);
+                }
+                2 => {
+                    manifest
+                        .artifacts
+                        .iter_mut()
+                        .find(|a| a.path == batch.path)
+                        .unwrap()
+                        .role = "unrelated-certificate".into();
+                }
+                3 => {
+                    let mut payload: Value = serde_json::from_slice(&batch_bytes).unwrap();
+                    payload["binding"]["source_count"] = json!(999);
+                    fs::write(dir.join(&batch.path), serde_json::to_vec(&payload).unwrap())
+                        .unwrap();
+                    let a = manifest
+                        .artifacts
+                        .iter_mut()
+                        .find(|a| a.path == batch.path)
+                        .unwrap();
+                    (a.sha256, a.bytes) = crate::store::hash_file(&dir.join(&a.path)).unwrap();
+                }
+                4 => {
+                    let mut transcript: Value = serde_json::from_slice(&t_bytes).unwrap();
+                    transcript["config"]["seed"] = json!(12345);
+                    fs::write(dir.join(&t.path), serde_json::to_vec(&transcript).unwrap()).unwrap();
+                    let a = manifest
+                        .artifacts
+                        .iter_mut()
+                        .find(|a| a.path == t.path)
+                        .unwrap();
+                    (a.sha256, a.bytes) = crate::store::hash_file(&dir.join(&a.path)).unwrap();
+                }
+                5 => {
+                    manifest.artifacts.retain(|a| a.path != t.path);
+                }
+                6 => {
+                    manifest.outcome["counters"]["native_filter_trace"]["computed_work"] = json!(0)
+                }
+                _ => unreachable!(),
+            }
+            fs::write(
+                dir.join("manifest.json"),
+                serde_json::to_vec(&manifest).unwrap(),
+            )
+            .unwrap();
+            for replay in [false, true] {
+                assert!(
+                    crate::ml_dataset::verify_cell(&dir, replay).is_err(),
+                    "mutation {mutation}"
+                );
+            }
+            fs::write(dir.join(&batch.path), &batch_bytes).unwrap();
+            fs::write(dir.join(&t.path), &t_bytes).unwrap();
+        }
+        fs::write(
+            dir.join("manifest.json"),
+            serde_json::to_vec(&original).unwrap(),
+        )
+        .unwrap();
+        let public: Value = crate::ml_dataset::read_json(&dir.join("public.json")).unwrap();
+        let base: Value = crate::ml_dataset::read_json(&dir.join("factor-base.json")).unwrap();
+        let domain: Value =
+            crate::ml_dataset::read_json(&dir.join("generic-large-prime-domains.json")).unwrap();
+        let v2: Value = serde_json::from_slice(&t_bytes).unwrap();
+        let v2_features = large_prime_feature_projection(&public, &base, &domain, &v2).unwrap();
+        let exported = export(&source, &f.0.join("v2-training")).unwrap();
+        assert_eq!(exported["export"]["unique_feature_rows"], 2);
+        let restricted =
+            fs::read_to_string(f.0.join("v2-training/restricted/targets.jsonl")).unwrap();
+        assert!(restricted.contains("large-prime-filter-certificates/v1"));
+        let features = fs::read_to_string(f.0.join("v2-training/features.jsonl")).unwrap();
+        for forbidden in [
+            "native_filter_trace",
+            "ordered_sources_sha256",
+            "pivot_selected",
+            "computed_work",
+            "config_sha256",
+            "filter_trace_stop",
+        ] {
+            assert!(!features.contains(forbidden), "leaked {forbidden}");
+        }
+        let mut v1_manifest = original;
+        convert_generic_fixture_to_v1(&dir, &mut v1_manifest);
+        let v1: Value =
+            crate::ml_dataset::read_json(&dir.join("generic-large-prime-transcript.json")).unwrap();
+        assert_eq!(
+            v2_features,
+            large_prime_feature_projection(&public, &base, &domain, &v1).unwrap()
+        );
+    }
+
     #[test]
     fn missing_large_prime_domain_or_transcript_excludes_features_and_retains_provenance() {
         for missing_role in [LARGE_PRIME_DOMAIN_ROLE, LARGE_PRIME_TRANSCRIPT_ROLE] {
@@ -1908,6 +2091,9 @@ mod tests {
             let dir = source.join("cells/000000000125");
             let mut manifest: CellManifest =
                 crate::ml_dataset::read_json(&dir.join("manifest.json")).unwrap();
+            // Exercise the preserved v1 missing-provenance contract. New v2
+            // verified-trace labels require their transcript and are tested below.
+            convert_generic_fixture_to_v1(&dir, &mut manifest);
             let missing = manifest
                 .artifacts
                 .iter()
