@@ -6,6 +6,38 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { classify, embeddedInputs, materializeInputs, pathDependencyDirs, scopes, select } from './ci-scope.mjs';
 
+test('a cold root checkout resolves path crates and their embedded inputs', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-path-crates-'));
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  const write = (file, text) => { mkdirSync(path.dirname(path.join(cwd, file)), { recursive: true }); writeFileSync(path.join(cwd, file), text); };
+  try {
+    git('init', '-q'); git('config', 'user.email', 'ci@example.invalid'); git('config', 'user.name', 'CI scope test');
+    write('Cargo.toml', '[package]\nname = "checkout-control"\nversion = "0.1.0"\nedition = "2021"\n[dependencies]\nfactor-base = { path = "tools/factor-base" }\nvolcano-cli = { path = "tools/volcano-cli" }\n');
+    write('src/lib.rs', 'pub fn control() {}\n');
+    write('tools/factor-base/Cargo.toml', '[package]\nname = "factor-base"\nversion = "0.1.0"\nedition = "2021"\n');
+    write('tools/factor-base/src/lib.rs', 'pub const DATA: &str = include_str!("../fixture.json");\n');
+    write('tools/factor-base/fixture.json', '{}\n');
+    write('tools/volcano-cli/Cargo.toml', '[package]\nname = "volcano-cli"\nversion = "0.1.0"\nedition = "2021"\n[dependencies]\nisogeny_algos = { path = "../../isogeny_algos" }\n');
+    write('tools/volcano-cli/src/lib.rs', 'pub fn control() {}\n');
+    write('isogeny_algos/Cargo.toml', '[package]\nname = "isogeny_algos"\nversion = "0.1.0"\nedition = "2021"\n');
+    write('isogeny_algos/src/lib.rs', 'pub fn control() {}\n');
+    write('tools/factor-base/archive/raw.jsonl', '{"unrelated": true}\n');
+    git('add', '.'); git('commit', '-qm', 'path crate control');
+    git('sparse-checkout', 'set', '--no-cone', '/Cargo.toml', '/src/');
+    const metadata = () => execFileSync('cargo', ['metadata', '--offline', '--format-version', '1'], { cwd, encoding: 'utf8', stdio: 'pipe' });
+    assert.throws(metadata, /factor-base/);
+    materializeInputs(cwd);
+    for (const file of ['tools/factor-base/Cargo.toml', 'tools/factor-base/src/lib.rs',
+      'tools/factor-base/fixture.json', 'tools/volcano-cli/Cargo.toml',
+      'tools/volcano-cli/src/lib.rs', 'isogeny_algos/Cargo.toml', 'isogeny_algos/src/lib.rs']) {
+      assert.equal(existsSync(path.join(cwd, file)), true, file);
+    }
+    const root = JSON.parse(metadata()).packages.find(pkg => pkg.name === 'checkout-control');
+    assert.equal(root.dependencies.find(dep => dep.name === 'factor-base').path, path.join(cwd, 'tools/factor-base'));
+    assert.equal(existsSync(path.join(cwd, 'tools/factor-base/archive/raw.jsonl')), false);
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
 test('prose does not run compilers, profiling or CodeQL', () => {
   for (const file of ['AGENTS.md', 'docs/ecbench/README.md',
     'examples/README.md', 'research/ecbench_example/REPORT.md']) {
@@ -55,6 +87,14 @@ test('dependencies, workflow edits and frozen evidence remain applicable', () =>
   assert.equal(classify(['research/pkm_example_ecbench_20261016/sessions/one/session.json']).ecbench_replay, true);
   assert.equal(classify(['research/isogeny_example/interrupted/run1/records.jsonl']).ecbench_replay, true);
   assert.equal(classify(['research/isogeny_example/README.md']).ecbench_replay, false);
+  // Sessions outside research/ (SHF-20261028-0f3f64, PPN-6).
+  for (const file of ['taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026/n20/session/session.json',
+    'taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026/n20/session/records.jsonl',
+    'experiments/example/session/records.jsonl.gz', 'experiments/example/session/ecbench_records.jsonl.gz']) {
+    assert.equal(classify([file]).ecbench_replay, true, file);
+  }
+  assert.equal(classify(['taskq/deploy/eks-karpenter/validation/README.md']).ecbench_replay, false);
+  assert.equal(classify(['taskq/deploy/example/session.json.bak']).ecbench_replay, false);
   for (const file of ['analysis/src/coverage.rs', 'analysis/Cargo.toml',
     'analysis/Cargo.lock', 'runs.tar.xz', 'observations.json', 'exact-coverage.json']) {
     assert.equal(classify([`research/factor_base_shape_leads_20261018/${file}`]).ecbench_replay, true, file);

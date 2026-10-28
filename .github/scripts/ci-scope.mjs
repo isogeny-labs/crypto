@@ -72,8 +72,10 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
       || /^research\/(ecbench_[^/]+|ghs_curve_comparison_20261009)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
       || /^research\/notes\/ecc2k130\/(cold_compact_orbit_ic_20261003|full_rank_compact_orbit_ic_20261003)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
       // ecbench.yml audits every committed session by schema, wherever it
-      // lives; a session directory always holds these two files.
-      || /(^|\/)(session\.json|records\.jsonl)$/.test(file) && /^research\//.test(file);
+      // lives (research/, taskq/deploy/, ...), so its files select the audit
+      // anywhere in the tree (sheriff SHF-20261028-0f3f64, PPN-6). Large
+      // sessions commit their records gzip-compressed.
+      || /(^|\/)(session\.json|(ecbench_)?records\.jsonl(\.gz)?)$/.test(file);
     result.actions ||= /^\.github\/(workflows|actions)\//.test(file);
     result.c_cpp ||= /\.(c|cc|cpp|cxx|h|hh|hpp|hxx|cu|cuh)$/.test(file)
       || /(^|\/)(Makefile|CMakeLists\.txt)$|\.cmake$/.test(file);
@@ -150,7 +152,8 @@ export function sourceFiles(cwd) {
   const tracked = trackedFiles(cwd);
   const trackedSet = new Set(tracked);
   const sources = new Set(tracked.filter(file => /\.rs$/.test(file)
-    && (maintained.test(file) || frozenExamples.test(file) || file === 'build.rs')));
+    && (maintained.test(file) || frozenExamples.test(file) || rootPathCrateRust.test(file)
+      || isogenyAlgosInputs.test(file) || file === 'build.rs')));
   for (const source of cargoSourceFiles(cwd, tracked)) sources.add(source);
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
@@ -237,7 +240,9 @@ export function materializeInputs(cwd = process.cwd()) {
   const crates = [...pathDependencyDirs(cwd)].filter(dir => !existsSync(path.join(cwd, dir, 'Cargo.toml')));
   if (crates.length) git(['sparse-checkout', 'add', ...crates.map(dir => `/${dir}/`)], cwd);
   const sources = sourceFiles(cwd);
-  materializeSources(cwd, sources);
+  const manifests = trackedFiles(cwd).filter(file => file.endsWith('/Cargo.toml')
+    && (rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)));
+  materializeSources(cwd, new Set([...sources, ...manifests]));
   const inputs = [...embeddedInputs(cwd, sources)];
   if (inputs.some(input => input.startsWith('../') || path.posix.isAbsolute(input))) {
     throw new Error('compile-time input escapes the checkout');
