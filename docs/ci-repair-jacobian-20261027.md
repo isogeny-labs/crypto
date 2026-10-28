@@ -67,3 +67,31 @@ retained separately from the final 28-test pass. Fresh hosted validation with
 the workflow's pinned Rust 1.98, current-head merge checks and review remain
 required. No Sage experiment, solver benchmark or new performance claim is
 created by this repair.
+
+
+## Main integration after the catalog parent merged
+
+Parent #2717 merged as ab87330fe6e569ffe92a8c5095f45e7bf84e050d. The
+Copilot-first request at 2026-10-27 23:31 UTC had no response or resolution
+after about 50 minutes, so the documented fallback was used for a normal main
+merge. The only conflict was the PDF's artifact pointer. Every Markdown, figure
+and rendering input in the report directory remained byte-identical to this
+branch's verified native version, so its exact 664,925-byte PDF remains current
+at SHA-256 5e88b8192420e1f416597965647413f03f9190276f62b549c15179ea0ac0d6ec.
+All other manifest entries are unioned. Main's prior 664,303-byte PDF object,
+SHA-256 32d0e029241cea0765e2cc3be00872acbf061e46259e10013b1f6e7bd97e4f94,
+remains in the normal merge history and content-addressed store.
+
+Regeneration produces the same complete ledger, and all 17 non-provenance
+assessment sections remain identical. Deterministic currentness, the independent
+verifier and schema validation with jsonschema 4.23.0 pass. The initial local
+refresh lacked two source files removed by sparse checkout/storage migration;
+they were restored from exact indexed bytes or their original hash-checked Git
+content matching the current artifact pointer. That failed attempt is retained.
+The registry and native Jacobian source files are unchanged by this main merge.
+
+Hosted manual run 40601077711 on exact native head 44b462fe6615cc3810f00a0ee461e81466fb5b69
+passed all 28 module tests, native catalog and table currentness, queries and
+the altered-file refusal control. The full job output is retained; this is
+evidence for that exact pre-integration head. Final-head required checks remain
+separate and must complete.
