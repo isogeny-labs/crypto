@@ -1,5 +1,11 @@
 # Results: fall-degree experiments E1, E1b, E2 (`m = 2`)
 
+**Latest E12c preservation update (2026-10-28):** the additional `4:28:7`,
+`N=84` Spot attempt retained **one of four requested completed draw records**
+before reclaim (exit 143). Its window is uncertified, with null degree-result
+fields: this is **inconclusive**, not a `d_F >= 5` measurement. See the appended
+interrupted-continuation section and [report](e12/interrupted-c-20261028/README.md).
+
 **Latest continuation (2026-10-28):** E12b cell `3:24:7` completed four draws,
 `≥5, 4, ≥5, 4`. Amendment 15's frozen lower-median rule gives **4**, hence
 the registered reading **“mixed.”** See the appended completed-continuation
@@ -494,3 +500,34 @@ Lean proof or independent implementation validation is claimed.
 The [PDF](e12/completed-20261028/report.pdf) and censoring-aware
 [graph](e12/completed-20261028/draws.svg) describe this completed attempt. E12a
 and E12c remain separate ongoing attempts; this section adds no results for them.
+
+## E12c interrupted additional attempt, 2026-10-28
+
+The Amendment-13 attempt at `(m,n,ell)=(4,28,7)`, `N=84`, retained **one of four
+requested completed draw records** before Spot reclaim. Draw 0 records zero
+solutions, `window.w1x.certified=false`, `d_f_window=null` and `d_f_le3=null`.
+These are producer-reported labels. A failed restricted window is inconclusive
+and cannot establish `d_F >= 5`; there is no exact degree or lower-bound claim.
+The frozen E12c positive reading requires at least two completed degree-4
+certifications; this attempt has none and supplies **no reading**.
+
+Job `20261028-021036-fd-e12c-20261028-r3-914d46` records a Spot notice at
+07:21:44 UTC, exit **143**, final output upload, then shutdown. The terminal
+receipt reports `interrupted`; output status remains `gate_passed`, without the
+wrapper's final `done`. Three requested completed records are missing. This is
+not an overall completion or a resumable solver-memory checkpoint.
+
+The original and canonical S3 archives passed download/hash verification. The
+archive contains 24 regular `out/` files plus `host.txt` and `rusage.txt`; all
+24 separately downloaded final outputs match the archive. Archive SHA-256:
+`fa4edf72399ec45b293b783d8582d9a26406c1670a3612a75b6110dd1e824f09`.
+The raw 775-byte row, original terminal/snapshot receipts, canonical PUT/GET
+readback, full identities, [report](e12/interrupted-c-20261028/README.md),
+[completion diagram](e12/interrupted-c-20261028/flow.svg) and
+[PDF](e12/interrupted-c-20261028/report.pdf) are preserved together.
+
+Gate logs were inspected; no solution recount, closure replay, formal independent
+experiment review or Lean proof was performed. Earlier reports remain historical
+records. Existing degree plots and unrestricted `fall_degree.*` metrics exclude
+this null window result because it is not a censored unrestricted degree. E12a
+and the general first-/last-fall-degree questions remain separate unfinished work.
