@@ -150,7 +150,8 @@ export function sourceFiles(cwd) {
   const tracked = trackedFiles(cwd);
   const trackedSet = new Set(tracked);
   const sources = new Set(tracked.filter(file => /\.rs$/.test(file)
-    && (maintained.test(file) || frozenExamples.test(file) || file === 'build.rs')));
+    && (maintained.test(file) || frozenExamples.test(file) || rootPathCrateRust.test(file)
+      || isogenyAlgosInputs.test(file) || file === 'build.rs')));
   for (const source of cargoSourceFiles(cwd, tracked)) sources.add(source);
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
@@ -209,7 +210,9 @@ export function embeddedInputs(cwd, sources = sourceFiles(cwd)) {
 
 export function materializeInputs(cwd = process.cwd()) {
   const sources = sourceFiles(cwd);
-  materializeSources(cwd, sources);
+  const manifests = trackedFiles(cwd).filter(file => file.endsWith('/Cargo.toml')
+    && (rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)));
+  materializeSources(cwd, new Set([...sources, ...manifests]));
   const inputs = [...embeddedInputs(cwd, sources)];
   if (inputs.some(input => input.startsWith('../') || path.posix.isAbsolute(input))) {
     throw new Error('compile-time input escapes the checkout');

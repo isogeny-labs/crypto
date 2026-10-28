@@ -80,6 +80,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /build.rs
             /rustfmt.toml
@@ -117,6 +118,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /Cargo.toml
             /Cargo.lock
             /.cargo/
@@ -192,6 +194,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /Cargo.toml
             /tools/volcano-cli/
             /isogeny_algos/
@@ -214,6 +217,8 @@ jobs:
             /research/ghs_curve_comparison_20261009/
             /research/notes/ecc2k130/cold_compact_orbit_ic_20261003/
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
+            /tools/artifacts/
+            /.artifacts/
       # Sessions are found by schema, wherever they live: check out every
       # directory holding a session.json (tree only, no blobs needed to
       # list them), then keep those whose session.json is an ecbench
@@ -233,6 +238,28 @@ jobs:
           done
           test -s "$list" || { echo '::error::no committed ecbench sessions found'; exit 1; }
           echo "$(wc -l < "$list") committed ecbench sessions (by schema)" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Pull every discovered committed session from the artifact store
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
+          test "${#artifact_sessions[@]}" -gt 0
+          python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
       - name: Materialize compile-time inputs without unrelated archives
         run: node .github/scripts/ci-scope.mjs --materialize
       - name: Committed sessions are evidence and are never edited
@@ -559,6 +586,8 @@ jobs:
             /research/ghs_curve_comparison_20261009/
             /research/notes/ecc2k130/cold_compact_orbit_ic_20261003/
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
+            /tools/artifacts/
+            /.artifacts/
       - name: Check out and list every committed ecbench session
         run: |
           list="$RUNNER_TEMP/ecbench-sessions.txt"
@@ -574,6 +603,28 @@ jobs:
           done
           test -s "$list" || { echo '::error::no committed ecbench sessions found'; exit 1; }
           echo "$(wc -l < "$list") committed ecbench sessions (by schema)" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Pull every discovered committed session from the artifact store
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
+          test "${#artifact_sessions[@]}" -gt 0
+          python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
       - uses: actions/download-artifact@v4
         with:
           name: ecbench-pr-audit-bin
