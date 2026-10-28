@@ -512,3 +512,12 @@ element and its finite principal divisor on all closed points of the actual
 curve. Its [PDF](GLOBAL_PIC0_GAP.pdf), [dependency graph](global-pic0-gap.svg),
 and [gate CSV](global-pic0-gap.csv) distinguish nine previously checked
 declarations from four open construction gates. It adds no theorem or cost row.
+
+The [function-field gate packet](FUNCTION_FIELD_GATE.md) records the missing
+whole-curve integrality and closed-point valuation bridge. Its exact F3
+[diagnostic script](global-divisor-counterexample.py) checks valid common 2+2
+data whose two quadratic supports have no F3-rational points. The
+[PDF](FUNCTION_FIELD_GATE.pdf), [dependency graph](function-field-gate.svg),
+and [gate CSV](function-field-gate.csv) mark the closed-point interpretation,
+global divisor, and Pic⁰ result as open. No new Lean theorem or cost row is
+claimed.
