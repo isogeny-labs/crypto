@@ -1,0 +1,53 @@
+{
+  "schema": "four-followups-spot-migration-recheck/v1",
+  "observed_utc": "2026-10-27T05:05:00Z",
+  "handoff": {
+    "path": "/srv/experiments/agent-migration/handoff-receipt.json",
+    "sha256": "a16037f61139810dcb13bea313349a2f9d4f1a43471c7ffc04ea3e1828dac0c1"
+  },
+  "diem": {
+    "receipt_path": "/run/spot-legacy/diem.json",
+    "state": "deadline-expired",
+    "durable_records": 50,
+    "expected_records": 52,
+    "launcher_pid": null,
+    "pending": false,
+    "decision": "no_duplicate_generator"
+  },
+  "source_freeze_followup": {
+    "snapshot_worktree": "/srv/experiments/agent-migration/home/crypto-pr2304-external",
+    "runner_sha256": "cdea2612d60ff8941a8fff14fdc147b1abbfdaca0cad0aa53c75fc618a492199",
+    "replay_runner_sha256": "a372011575fac00ce70843d217a457ef166eb38458d3787332804a57ea8bb0bc",
+    "preserved_status_sha256": "9a373732f9f7ce61ab78abba3b9bce65a92142321bce87a70a0d50cb2fd1b3cd",
+    "preserved_jsonl_sha256": "1a1e59e22ea23c1824f57bcf626c7270c685039732ad31d164e6f576df616873",
+    "p": 186379,
+    "target_index": 0,
+    "failure": "sparse_matrix_cap",
+    "candidate_verified": false,
+    "rho_verified": true,
+    "decision": "preserve_without_repeat"
+  },
+  "eks": {
+    "namespace": "isolab",
+    "listed_jobs": 5,
+    "succeeded": 5,
+    "active": 0,
+    "names": [
+      "ic-criu-n32-20261026-v3-epoch-1",
+      "ic-sweep-n20-20261026-v1",
+      "ic-sweep-n24-20261026-v1",
+      "ic-sweep-n28-20261026-v1",
+      "ic-sweep-n32-20261026-v1"
+    ],
+    "decision": "no_resubmission"
+  },
+  "pr": {
+    "number": 2304,
+    "head": "e1b00aa484d3458619efb6302c4f0a09ee1b8b2a",
+    "state": "OPEN",
+    "merge_state": "BLOCKED",
+    "auto_merge_enabled": true,
+    "check_failure_reason": "GitHub account payments or spending limit; jobs did not start"
+  },
+  "repeated_external_work": false
+}

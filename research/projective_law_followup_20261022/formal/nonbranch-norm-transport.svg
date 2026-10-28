@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="480" viewBox="0 0 1100 480" role="img" aria-labelledby="title desc">
+  <title id="title">Common 2+2 norm transport to the actual point stalk</title>
+  <desc id="desc">Blue nodes are checked implications. Gray nodes are open gates. Amber marks characteristic-two conjugate overlap.</desc>
+  <style>
+    text { font-family: DejaVu Sans, Arial, sans-serif; fill:#182436; }
+    .title { font-size:22px; font-weight:700; }
+    .sub { font-size:13px; fill:#536075; }
+    .label { font-size:16px; font-weight:600; }
+    .detail { font-size:12px; }
+    .checked { fill:#e8f3ff; stroke:#2372b8; stroke-width:2; }
+    .open { fill:#f1f3f6; stroke:#788596; stroke-width:2; }
+    .limit { fill:#fff1d6; stroke:#b87912; stroke-width:2; }
+    .line { fill:none; stroke:#596579; stroke-width:2; }
+    .tip { fill:#596579; }
+  </style>
+  <rect width="1100" height="480" fill="white"/>
+  <text x="30" y="38" class="title">Source-style common 2+2 norm in the actual point stalk</text>
+  <text x="30" y="60" class="sub">Lean 4.34.1 · source SHA-256 601f8714b191f015d76d477cb1eb590014097281de538abe56d693f19288d52d · no measurements</text>
+  <rect x="35" y="90" width="310" height="70" rx="8" class="checked"/>
+  <text x="55" y="118" class="label">Actual quintic equals Y^2</text><text x="55" y="141" class="detail">in weighted-Proj point stalk</text>
+  <rect x="395" y="90" width="310" height="70" rx="8" class="checked"/>
+  <text x="415" y="118" class="label">Source-style polynomial norm</text><text x="415" y="141" class="detail">valid inputs; determinant b != 0</text>
+  <rect x="755" y="90" width="310" height="70" rx="8" class="checked"/>
+  <text x="775" y="118" class="label">Actual-stalk norm identity</text><text x="775" y="141" class="detail">(n-bY)(n+bY)=u1*u2*U</text>
+  <path d="M345 125 H755 M705 125 H755" class="line"/><path d="M755 125 L745 120 L745 130 Z" class="tip"/>
+  <rect x="35" y="223" width="310" height="70" rx="8" class="checked"/>
+  <text x="55" y="251" class="label">Actual nonbranch DVR</text><text x="55" y="274" class="detail">separable; point; 2y != 0</text>
+  <rect x="395" y="223" width="310" height="70" rx="8" class="checked"/>
+  <text x="415" y="251" class="label">Chosen-factor order</text><text x="415" y="274" class="detail">also b != 0 and n-bY nonunit</text>
+  <rect x="755" y="223" width="310" height="70" rx="8" class="open"/>
+  <text x="775" y="251" class="label">Source-style order wrapper</text><text x="775" y="274" class="detail">single composed theorem still open</text>
+  <path d="M910 160 V193 H550 V223 M345 258 H395 M705 258 H755" class="line"/>
+  <path d="M550 223 L545 213 L555 213 Z M395 258 L385 253 L385 263 Z M755 258 L745 253 L745 263 Z" class="tip"/>
+  <rect x="35" y="356" width="310" height="72" rx="8" class="limit"/>
+  <text x="55" y="384" class="label">Characteristic-two overlap</text><text x="55" y="407" class="detail">n-bY = n+bY; allocation differs</text>
+  <rect x="395" y="356" width="310" height="72" rx="8" class="open"/>
+  <text x="415" y="384" class="label">Global divisor and Pic0</text><text x="415" y="407" class="detail">all local multiplicities needed</text>
+  <rect x="755" y="356" width="310" height="72" rx="8" class="open"/>
+  <text x="775" y="384" class="label">Compiled Rust semantics</text><text x="775" y="407" class="detail">link branches to proof hypotheses</text>
+  <path d="M910 293 V325 H550 V356 M705 392 H755" class="line"/>
+  <path d="M550 356 L545 346 L555 346 Z M755 392 L745 387 L745 397 Z" class="tip"/>
+  <text x="35" y="458" class="sub">Blue: checked implications · amber: exceptional overlap · gray: open · arrows: proof dependencies</text>
+</svg>
