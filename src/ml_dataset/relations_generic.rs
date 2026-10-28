@@ -1701,6 +1701,28 @@ mod trace_integration_tests {
     fn value(t: &TranscriptV2) -> Value {
         serde_json::to_value(t).unwrap()
     }
+    fn exact_prefix_byte_policy(run: &FilterRun, acknowledged_events: usize) -> FilterTraceLimits {
+        // Begin contains the limit itself. Solve the small decimal-width fixed
+        // point using independently encoded events, not the old run's counter.
+        let mut policy = run.limits;
+        for _ in 0..8 {
+            let mut events = run.events.clone();
+            let trace::Transition::Begin { limits, .. } = &mut events[0].transition else {
+                panic!("fixture lacks Begin")
+            };
+            *limits = policy;
+            let bytes: u64 = events
+                .iter()
+                .take(acknowledged_events)
+                .map(|e| serde_json::to_vec(e).unwrap().len() as u64)
+                .sum();
+            if policy.bytes == bytes {
+                return policy;
+            }
+            policy.bytes = bytes;
+        }
+        panic!("byte fixture decimal-width fixed point did not converge")
+    }
     #[test]
     fn generic_v2_native_certificates_preserve_legacy_recovery_and_cover_domains() {
         for (family, n, m) in [
@@ -1767,10 +1789,7 @@ mod trace_integration_tests {
                 FilterStop::EventLimit,
             ),
             (
-                FilterTraceLimits {
-                    bytes: first.acknowledged_bytes - 1,
-                    ..defaults
-                },
+                exact_prefix_byte_policy(first, first.events.len() - 1),
                 FilterStop::ByteLimit,
             ),
             (
@@ -1846,10 +1865,7 @@ mod trace_integration_tests {
                 events: first.native.events.len() as u64,
                 ..FilterTraceLimits::default()
             },
-            FilterTraceLimits {
-                bytes: first.native.acknowledged_bytes,
-                ..FilterTraceLimits::default()
-            },
+            exact_prefix_byte_policy(&first.native, first.native.events.len()),
             FilterTraceLimits {
                 work: first.native.computed_work,
                 ..FilterTraceLimits::default()

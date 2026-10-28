@@ -21,3 +21,12 @@ Recorded preparation errors: initial design git-add needed --sparse; initial
 lookups for rust-toolchain.toml, build.rs and live_capture.rs were absent and
 corrected using the actual inherited toolchain/capture.rs layout. Those lookup
 errors are not validation results. No Cargo execution preceded the design.
+
+Initial source-bound dataset run at 2bcaf449fe9 compiled successfully and reported
+162 passed, 2 failed, 1 ignored. Both failures were new software-fixture byte
+assumptions: native Begin serializes the trace policy, so reducing the byte
+allowance changes decimal-width bytes. Corrected fixtures independently encode
+the changed Begin and solve its small decimal-width fixed point. One retains
+exactly the pre-Finish prefix; the cumulative-byte fixture exhausts exactly one
+full batch. Production admission behavior was unchanged. Original failure log
+is retained externally in generic-filter-trace-validation/dataset-first.log.
