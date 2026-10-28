@@ -13,8 +13,8 @@ to this audit; global publication novelty remains unverified.
 
 This curve belongs to the previously identified nonsplit quadratic-pole
 family. The construction is neither a newly established geometric family nor
-a new attack method. The completed Magma attack core was 241 times the mean
-cost of a matched source-group rho solve, before source-map work. Thus this
+a new attack method. The completed dynamic Magma transfer and attack took
+about 271 times the mean cost of a matched source-group rho solve. Thus this
 particular curve is **not** a measured GHS speedup.
 
 ## Exact source and cover
@@ -111,15 +111,30 @@ extra principal-divisor assertions. The separately timed job used the same
 mapped divisors and complete target recovery, taking 0.200 CPU seconds for
 setup and 0.210 CPU seconds for index calculus (0.490 server seconds total).
 
+For a stricter same-backend comparison, `full_attack_4222.magma` starts with
+the exact source points, rebuilds the quotient and split fibers, evaluates
+their canonical-quartic images, forms the traced divisors, lifts them to
+`F_256`, and runs the line sieve. Its checked job verified the 2111-order and
+`7` relation both before and after lifting. The separate timed job omitted
+the expensive principal-divisor assertions, while recovering and verifying
+`7` through the same dynamic path. It measured 0.190 CPU seconds through
+source mapping, 0.250 CPU seconds through all pre-index work, 0.210 CPU
+seconds in index calculus, and 0.460 CPU seconds from start to verified
+source answer (0.550 server seconds). The canonical quartic equation is
+reusable curve setup supplied as an exact input to both jobs.
+
 An explicit Floyd-rho implementation on the same `E,G,Q,2111` in Magma 2.30-1
 completed 100/100 seeded runs, with median 207 group-step calls and 0.170 CPU
-seconds for all 100, or 0.00170 CPU seconds per solve. The 0.410-second
-Magma attack core was about 241 times that matched rho mean. Local Sage
+seconds for all 100, or 0.00170 CPU seconds per solve. The 0.460-second
+dynamic Magma attack was about 271 times that matched rho mean. The older
+precomputed-divisor attack core took 0.410 CPU seconds, 241 times rho. Local Sage
 Jacobian setup took 13.65 wall seconds and two map evaluations took 5.33 wall
 seconds; these are separate-machine measurements and are excluded from the
-Magma CPU ratio. Their inclusion can only worsen this small-source
-comparison. The exact inputs and receipts are in this folder and summarized
-in `cost_4222.json`.
+Magma CPU ratio. The full dynamic Magma run supersedes them for the main
+same-backend comparison. The two failed preliminary dynamic jobs are retained
+with `failed_syntax` and `failed_verbose` names; neither is counted as a
+completed solve. The exact inputs and receipts are summarized in
+`cost_4222.json`.
 
 ## Bounds and prior work
 
@@ -172,6 +187,8 @@ python3 research/ghs_nonsplit_order4222_20261028/parse_quotient_4222.py
 sage -python research/ghs_nonsplit_order4222_20261028/subgroup_map_4222.py
 sage -python research/ghs_nonsplit_order4222_20261028/index_4222_q256.py --factor-base 200 --relations 260
 sage -python research/ghs_nonsplit_order4222_20261028/index_4222_q256.py --factor-base 200 --relations 260 --benchmark
+python3 research/ghs_nonsplit_order4222_20261028/full_attack_magma_4222.py
+python3 research/ghs_nonsplit_order4222_20261028/full_attack_magma_4222.py --benchmark
 python3 research/ghs_nonsplit_order4222_20261028/rho_magma_4222.py
 python3 research/ghs_nonsplit_order4222_20261028/cost_4222.py
 lean research/ghs_nonsplit_order4222_20261028/Order4222Gate.lean

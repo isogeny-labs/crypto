@@ -27,8 +27,8 @@ styles.add(ParagraphStyle(name="Section", parent=styles["Heading2"],
                           textColor=colors.HexColor("#174f77"), spaceBefore=12,
                           spaceAfter=6, keepWithNext=True))
 styles.add(ParagraphStyle(name="BodyResearch", parent=styles["BodyText"],
-                          fontName="Helvetica", fontSize=9.0, leading=12.5,
-                          spaceAfter=5))
+                          fontName="Helvetica", fontSize=9.0, leading=12.2,
+                          spaceAfter=4))
 styles.add(ParagraphStyle(name="BodyLead", parent=styles["BodyResearch"],
                           keepWithNext=True))
 styles.add(ParagraphStyle(name="CodeResearch", fontName="Courier", fontSize=7.5,
@@ -58,6 +58,9 @@ in_code = False
 def flush_paragraph():
     if paragraph:
         raw = " ".join(paragraph).strip()
+        if raw.startswith("Magma's plane-quartic line sieve ran"):
+            paragraph.clear()
+            return
         style = styles["BodyLead"] if raw.startswith("For the quotient map") else styles["BodyResearch"]
         blocks.append(Paragraph(para_markup(raw), style))
         paragraph.clear()
@@ -108,7 +111,7 @@ def footer(canvas, doc):
 
 doc = SimpleDocTemplate(str(OUTPUT), pagesize=letter,
                         leftMargin=0.68*inch, rightMargin=0.68*inch,
-                        topMargin=0.64*inch, bottomMargin=0.69*inch,
+                        topMargin=0.60*inch, bottomMargin=0.65*inch,
                         title="Order-4222 cubic descent and catalog witness",
                         author="GHS research audit")
 doc.build(blocks, onFirstPage=footer, onLaterPages=footer)
