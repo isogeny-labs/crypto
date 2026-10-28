@@ -93,3 +93,30 @@ clearu^28, take its exact elliptic-base quadratic norm and factor it with an
 exact product check. No residual degree guessed from a scalar model.
 Negative Laurent control rejected original3/fifthlambda despite native0/late
 marker, as required. Its full diagnostics retained.
+
+## Prospective LAMBDA14 and complete RR search, before affected data
+NORM01 accepts all actual norm/collector identities and exact degree sums.
+The residual lambda base norm factor is the irreducible degree14 polynomial
+q14=u14+u13+u9+u5+u4+u3+1, exponent1, other factorsu22(u+1)16.
+LAMBDA14 checks the unique base residue using (E,mu) overF(2^14), recovers
+original b,c,lambda0,nu and all5source residuals/all8registeredunits. Require
+u=(b+c)/c²,nonzero nu, nonzero lambda derivative and no exceptional denominator.
+A simple degree14source zero plus50cuspzeros exhausts64 under the DVR bridge.
+
+RR27 fixed candidate families K=8,12,16, stop on jet-rank68 or afterK16;
+all at same4GiB/1200s native invocation cap. Candidates
+lambda^i nu^j v^e u^k/(u+1)^K with0<=i,j<=3,e=0,1,-K<=k<=K.
+Regenerate certified20charts as input, retain their full series. Impose all
+negative coefficients below -7e atA,-e atB,0elsewhere. Fixed coefficient row
+range[-512,-1]; reject any candidate below-512 or with uncertainty at/below0.
+Require129known coefficients at the chosen unramified O point. All additions
+in the Gaussian reducer are F2 vector XOR; polynomials encode finite bits,
+NOT polynomial-module syzygies. Track original-candidate combinations and
+independently recombine every accepted vector's constraints and evaluation
+jet from original columns. Distinct jet pivots certify independence. Candidate
+family independence is not assumed. Under complete pole and genus bridge,
+nonzero valid section cannot vanish to129 sincepoledegree128. Thus rank68
+certifies a complete basis. Lower rank only records this family's deficiency;
+rank>68 forces bridge/implementation audit. No map search until completeness.
+Keep exact candidate index,coefficient bitsets,constraint columns and jets.
+All branch/source and precision controls remain in the same native call.

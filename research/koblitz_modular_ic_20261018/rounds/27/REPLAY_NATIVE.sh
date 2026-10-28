@@ -4,7 +4,7 @@ here=$(cd "$(dirname "$0")" && pwd);repo=$(git -C "$here" rev-parse --show-tople
 mode=${1:?positive or corrupt};attempt=${2:?fresh attempt};base="$here/runs/$attempt"
 [ ! -e "$base" ];mkdir -p "$base"
 "$repo/scripts/checkpoint.sh" gate > "$base/gate.log" 2>&1
-if [ "$mode" = norm ];then cp "$here/NORM27.sing" "$base/input.sing";marker=NORM27_ALL_CHECKS_PASS;else cp "$here/input-template.sing" "$base/input.sing";marker=LAURENT27_ALL_CHECKS_PASS;fi
+if [ "$mode" = rr ];then cp "$here/rr-input-template.sing" "$base/input.sing";marker=RR27_ALL_CHECKS_PASS;elif [ "$mode" = lambda14 ];then cp "$here/LAMBDA14.sing" "$base/input.sing";marker=LAMBDA14_ALL_CHECKS_PASS;elif [ "$mode" = norm ];then cp "$here/NORM27.sing" "$base/input.sing";marker=NORM27_ALL_CHECKS_PASS;else cp "$here/input-template.sing" "$base/input.sing";marker=LAURENT27_ALL_CHECKS_PASS;fi
 if [ "$mode" = corrupt ];then sed -i 's/nl=lm(la(ol,osl),li(osc));/nl=la(lm(la(ol,osl),li(osc)),lc(1));/' "$base/input.sing";fi
 sha256sum "$base/input.sing" > "$base/source.sha256"
 git -C "$repo" rev-parse HEAD > "$base/source-revision.txt"
