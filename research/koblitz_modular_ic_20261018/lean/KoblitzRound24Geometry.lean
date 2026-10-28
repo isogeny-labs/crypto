@@ -64,7 +64,7 @@ theorem two_lambda_residues [CharP K 2] (l : K) :
     · exact Or.inr (sub_eq_zero.mp hh)
   · rintro (rfl | rfl)
     · ring
-    · simpa using h2
+    · convert h2 using 1 <;> norm_num
 
 -- Multiplicativity of orders in the actual smooth chart supplies these
 -- equations. This proves their consequence, not existence of those DVRs.
@@ -81,7 +81,10 @@ theorem constant_degree_candidates (d : ℕ) (h16 : d∣16) (h10 : d∣10) :
     d=1 ∨ d=2 := by
   have hd : d∣2 := by simpa using Nat.dvd_gcd h16 h10
   have hb : d≤2 := Nat.le_of_dvd (by decide) hd
-  interval_cases d <;> norm_num at *
+  have hp : d≠0 := by
+    rintro rfl
+    norm_num at hd
+  omega
 
 theorem constant_degree_one (d : ℕ) (h16 : d∣16) (h10 : d∣10)
     (hnot : d≠2) : d=1 := by
