@@ -151,9 +151,11 @@ function materializeSources(cwd, sources) {
 export function sourceFiles(cwd) {
   const tracked = trackedFiles(cwd);
   const trackedSet = new Set(tracked);
+  const pathCrates = [...pathDependencyDirs(cwd)];
   const sources = new Set(tracked.filter(file => /\.rs$/.test(file)
     && (maintained.test(file) || frozenExamples.test(file) || rootPathCrateRust.test(file)
-      || isogenyAlgosInputs.test(file) || file === 'build.rs')));
+      || isogenyAlgosInputs.test(file) || file === 'build.rs'
+      || pathCrates.some(dir => file.startsWith(`${dir}/src/`) || file === `${dir}/build.rs`))));
   for (const source of cargoSourceFiles(cwd, tracked)) sources.add(source);
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
@@ -238,7 +240,9 @@ export function pathDependencyDirs(cwd) {
 
 export function materializeInputs(cwd = process.cwd()) {
   const crates = [...pathDependencyDirs(cwd)].filter(dir => !existsSync(path.join(cwd, dir, 'Cargo.toml')));
-  if (crates.length) git(['sparse-checkout', 'add', ...crates.map(dir => `/${dir}/`)], cwd);
+  // Cargo needs each manifest to resolve path dependencies. Fetching the
+  // whole crate directory also hydrates unrelated archived run evidence.
+  if (crates.length) git(['sparse-checkout', 'add', ...crates.map(dir => `/${dir}/Cargo.toml`)], cwd);
   const sources = sourceFiles(cwd);
   const manifests = trackedFiles(cwd).filter(file => file.endsWith('/Cargo.toml')
     && (rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)));
