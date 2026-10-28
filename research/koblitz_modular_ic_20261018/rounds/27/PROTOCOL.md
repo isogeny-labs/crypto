@@ -345,3 +345,21 @@ combinedwith18previousnamed results; no full curve/rank formalization claim.
 QUADRICS01 rejected before multiplication: kernel is a Singular reserved identifier. Actual-source positive/corrupt controls returned0/1; neither target rank accepted. Rename local list quadraticRelations; same inputs, cap and acceptance tests for retry02. Lean04 stopped at checkpoint credential discovery before compilation; retain gate error and use frozen inherited credential wrapper for Lean05.
 
 Lean05 exited1 before elaboration: failed to create thread, Resource temporarily unavailable. Freeze single CPU0 affinity in addition to existing -j1 and4GiB/1200s caps for retry06. This changes execution resources only, not theorem bytes. Interrupted checkpoint-quadrics02 before native launch to regenerate the assembled input with the corrected identifier; no quadrics02 run directory exists.
+
+## Prospective actual node187 proper-chart certificate
+Bind all4 original Q41 graphs,4 actual degree19 Miller functions each,5
+coefficient conjugates:80actual functions. Native hex decoding in original
+F2[beta]/(beta360+beta5+beta3+beta2+1), verified Rabin gcds and final square.
+Check every successive coefficient conjugate by actual Frobenius squaring,
+all monic S8 and degP9. AtO t=x/y,z=1/y=t3q verify
+ t19 q9 F(x,y)=U(t,q), U(0,q)=1,
+via the exact toric ideal (xt2q+1,yt3q+1), not a scalar model.
+For BOTH ordinary group laws, complete local line-intersection/Vieta and
+inverse-unit blocks give a lifted identity tSum in (tP,tQ) modulo chart
+relations. Independently multiply the full lift. Its32nd power proves
+nilpotence transfer. Retain geometric-series explicit unit certificate for
+1+tSum*w when tSum32=0. Combine with the actual node187 boundary ratios,
+all coefficient components and proper descent P2=P0+sigmaP1.
+This is a proper-chart polynomial separator for the actualsource boundary,
+not yet global h^k f membership in the original affine homogeneous ideal.
+Do not silently discharge global saturation from it. Caps4GiB/1200 unchanged.
