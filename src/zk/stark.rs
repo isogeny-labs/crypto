@@ -495,7 +495,44 @@ pub fn query_positions(transcript: &mut Vec<u8>, count: usize, domain_size: usiz
     positions
 }
 
-/// FRI verify: replay the Fiat-Shamir challenges, check every Merkle
+/// Why [`fri_check`] rejected a FRI proof (tests assert which gate
+/// fired).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum FriReject {
+    /// No layer, a non-power-of-two domain, more folds than the domain
+    /// allows, a query with the wrong opening count or position.
+    Shape,
+    /// A non-canonical final constant.
+    FinalValue,
+    /// The last layer root is not `domain_len >> folds` copies of the
+    /// final constant.
+    FinalLayer,
+    /// A Merkle opening fails or sits at the wrong position.
+    Opening,
+    /// A zero domain point (no inverse).
+    Domain,
+    /// Fold consistency: the folded pair differs from the next layer's
+    /// opened value, or the last fold from the final constant.
+    Fold,
+}
+
+/// FRI verify: [`fri_check`] accepts.
+pub fn fri_verify(
+    commitment: &FriCommitment,
+    initial_domain: &[BigUint],
+    queries: &[(usize, FriQueryOpening)],
+    transcript_state_initial: &[u8],
+) -> bool {
+    fri_check(
+        commitment,
+        initial_domain,
+        queries,
+        transcript_state_initial,
+    )
+    .is_ok()
+}
+
+/// FRI check: replay the Fiat-Shamir challenges, check every Merkle
 /// path at the position the folding dictates, and verify the folding
 /// is consistent down to the final layer, which must be constant: the
 /// last layer root must commit to `initial_len / 2^folds` copies of
@@ -503,28 +540,28 @@ pub fn query_positions(transcript: &mut Vec<u8>, count: usize, domain_size: usiz
 /// caller fixes the number of folds (by checking
 /// `commitment.layer_roots.len()`), how many queries it requires and
 /// at which positions; this checks only the openings it is given.
-/// Returns `false`, never panics, on malformed input.
-pub fn fri_verify(
+/// Returns an error, never panics, on malformed input.
+pub fn fri_check(
     commitment: &FriCommitment,
     initial_domain: &[BigUint],
     queries: &[(usize, FriQueryOpening)],
     transcript_state_initial: &[u8],
-) -> bool {
+) -> Result<(), FriReject> {
     let domain_len = initial_domain.len();
     if commitment.layer_roots.is_empty() || !domain_len.is_power_of_two() {
-        return false;
+        return Err(FriReject::Shape);
     }
     let folds = commitment.layer_roots.len() - 1;
     let log_len = domain_len.trailing_zeros() as usize;
     if folds > log_len {
-        return false;
+        return Err(FriReject::Shape);
     }
     // The final layer: `domain_len >> folds` copies of the constant.
     let Some(final_bytes) = canonical_bytes(&commitment.final_constant) else {
-        return false;
+        return Err(FriReject::FinalValue);
     };
     if commitment.layer_roots[folds] != constant_layer_root(&final_bytes, domain_len >> folds) {
-        return false;
+        return Err(FriReject::FinalLayer);
     }
     // Recompute the α challenges.
     let mut transcript = transcript_state_initial.to_vec();
@@ -538,7 +575,7 @@ pub fn fri_verify(
     for (init_position, opening) in queries {
         // One opening per folding step: no layer may be skipped.
         if opening.openings.len() != folds || *init_position >= domain_len {
-            return false;
+            return Err(FriReject::Shape);
         }
         // Track the current domain size and position.
         let mut layer_size = domain_len;
@@ -561,14 +598,14 @@ pub fn fri_verify(
             if !leaf_ok(eval_main, proof_main, cur_pos, depth, root)
                 || !leaf_ok(eval_sibling, proof_sibling, sibling_pos, depth, root)
             {
-                return false;
+                return Err(FriReject::Opening);
             }
             // Verify the folding step produces the next layer's
             // value at the corresponding position.
             let alpha = &alphas[layer_idx];
             // x⁻¹ where x is the queried domain value at this layer.
             let Some(x_inv) = super::polynomial::fr_inv(&cur_x) else {
-                return false;
+                return Err(FriReject::Domain);
             };
             // eval_main is always f(cur_x); eval_sibling is always
             // f(-cur_x) — regardless of whether cur_pos is in the
@@ -583,13 +620,13 @@ pub fn fri_verify(
                 // Next layer's claimed eval_main.
                 let next_eval = &opening.openings[layer_idx + 1].0;
                 if next_eval != &folded_expected {
-                    return false;
+                    return Err(FriReject::Fold);
                 }
             } else {
                 // Last layer: check folded equals the FRI commitment's
                 // final_constant.
                 if folded_expected != commitment.final_constant {
-                    return false;
+                    return Err(FriReject::Fold);
                 }
             }
             // Advance: domain squares, layer size halves.
@@ -600,7 +637,7 @@ pub fn fri_verify(
             layer_size = half;
         }
     }
-    true
+    Ok(())
 }
 
 // ── STARK end-to-end (toy: 1-column trace) ─────────────────────────

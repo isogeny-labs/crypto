@@ -1,0 +1,49 @@
+{
+    "Command": {
+        "CommandId": "97767f60-934f-4d6e-bc56-1afbe883d888",
+        "DocumentName": "AWS-RunShellScript",
+        "DocumentVersion": "$DEFAULT",
+        "Comment": "Retain seven existing E12a gate JSONLs; no solver rerun or job alteration",
+        "ExpiresAfter": "2026-10-28T10:20:21.110000+00:00",
+        "Parameters": {
+            "commands": [
+                "#!/bin/sh\nset -eu\njq -e '.id == \"20261028-021829-fd-e12a-r6a-20261028-r3-0c1d7f\" and .deadline == 1793326711' /work/job.json >/dev/null\ncd /work/fall-degree-source/research/fall_degree_bounds_20261008/e7/validate\nset -- A_m3_13-5.jsonl inputs_m4_9-3.jsonl m3_5-2.jsonl m3_7-3.jsonl x_m3_11-4.jsonl x_m3_13-4.jsonl x_m4_9-3.jsonl\nfor path do\n  [ -f \"$path\" ] && [ ! -L \"$path\" ]\n  [ \"$(stat -c %s \"$path\")\" -le 2048 ]\ndone\nscratch=$(mktemp -d /var/tmp/e12a-gate-rescue.XXXXXX)\ntrap 'rm -rf \"$scratch\"' EXIT\nsha256sum \"$@\" > \"$scratch/files.sha256\"\ntar -czf \"$scratch/gates.tar.gz\" -- \"$@\"\nsha256sum -c \"$scratch/files.sha256\" >/dev/null\n[ \"$(stat -c %s \"$scratch/gates.tar.gz\")\" -le 12000 ]\nsha256sum \"$scratch/gates.tar.gz\" | cut -d ' ' -f 1\nbase64 -w0 \"$scratch/gates.tar.gz\"\nprintf '\\n'\n"
+            ],
+            "executionTimeout": [
+                "60"
+            ]
+        },
+        "InstanceIds": [
+            "i-0f1e979a30bc4f52b"
+        ],
+        "Targets": [],
+        "RequestedDateTime": "2026-10-28T10:18:21.110000+00:00",
+        "Status": "Pending",
+        "StatusDetails": "Pending",
+        "OutputS3Region": "us-east-1",
+        "OutputS3BucketName": "",
+        "OutputS3KeyPrefix": "",
+        "MaxConcurrency": "50",
+        "MaxErrors": "0",
+        "TargetCount": 1,
+        "CompletedCount": 0,
+        "ErrorCount": 0,
+        "DeliveryTimedOutCount": 0,
+        "ServiceRole": "",
+        "NotificationConfig": {
+            "NotificationArn": "",
+            "NotificationEvents": [],
+            "NotificationType": ""
+        },
+        "CloudWatchOutputConfig": {
+            "CloudWatchLogGroupName": "",
+            "CloudWatchOutputEnabled": false
+        },
+        "TimeoutSeconds": 60,
+        "AlarmConfiguration": {
+            "IgnorePollAlarmFailure": false,
+            "Alarms": []
+        },
+        "TriggeredAlarms": []
+    }
+}
