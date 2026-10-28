@@ -254,3 +254,15 @@ and task-local source/output compiles andaudits exit0:18named/18audited,
 0failures,0trusted-native. Lean01proof errors andLean02import runtime failure
 remain retained. Standard foundational axioms only; no geometric theorem is
 silently promoted. Future proof extensions require new source freeze.
+
+Before ACTION27data, additionally export individually all68O-jets through
+order388,34invariant basis vectors and129jets, and exact representations of
+1,b,c,lambda in the full basis. Require the actual propagated precision for
+all requested389coefficients. This enables later complete degree-two equation
+construction; it does not yet claim those equations or whole ideal saturation.
+Very ample degree bounds and finite-field quadratic generation checked in
+Duursma-Pellikaan, Unique representation of VSAG codes,Proposition11:
+https://ruudp.win.tue.nl/paper/65.pdf. It explicitly includes finite fields.
+A future quadratic-relation experiment needs its own source freeze. These
+are new proper curve models; old coupled-quotient saturation/polarized abelian
+embedding are separate, not discharged by changing coordinate models.

@@ -42,7 +42,7 @@ poly acBits;poly acPoly;poly acVector;poly acCombination;poly acRebuilt;
 list acGroups;list acSingleGroups;list acBasisAt;list acAt;
 list acUPowers;list acGroupFactors;list acChart;list acCoords;
 list acValue;list acSum;list acDen;list acSolved;
-list acOJets;list acSigmaJets;list acSigma;list acTraceColumns;
+list acOJets;list acOJets389;list acSigmaJets;list acSigma;list acTraceColumns;
 for(acI=1;acI<=68;acI++){
  acSingleGroups=list();for(acJ=1;acJ<=32;acJ++){acSingleGroups=insert(acSingleGroups,poly(0),size(acSingleGroups));}
  acBits=basisCoefficients[acI];acRebuilt=0;acFunctionLine="basisNumerators["+string(acI)+"]=0";
@@ -96,6 +96,7 @@ for(acI=1;acI<=68;acI++){
  for(acTerm=1;acTerm<=size(acBits);acTerm++){acRebuilt=acRebuilt+sourceJets[deg(acBits[acTerm])+1];}
  if(acPoly!=acRebuilt){ERROR("independent original-column/O-jet agreement failed");}
  acOJets=insert(acOJets,acPoly,size(acOJets));
+ acOJets389=insert(acOJets389,acJet(acAt[acI],0,389),size(acOJets389));
 }
 list acJPivots;list acJCoords;
 for(acJ=1;acJ<=129;acJ++){acJPivots=insert(acJPivots,poly(0),size(acJPivots));acJCoords=insert(acJCoords,poly(0),size(acJCoords));}
@@ -115,12 +116,13 @@ for(acI=1;acI<=68;acI++){
  if(acApply(acSigma[acI],acSigma)!=w^(acI-1)){ERROR("actual sigma matrix does not square to identity");}
  acTraceColumns=insert(acTraceColumns,acSigma[acI]+w^(acI-1),size(acTraceColumns));
 }
-list acTPivots;list acTCoords;
+list acTPivots;list acTCoords;list acInvariants;
 for(acJ=1;acJ<=68;acJ++){acTPivots=insert(acTPivots,poly(0),size(acTPivots));acTCoords=insert(acTCoords,poly(0),size(acTCoords));}
 acSrank=0;
 for(acI=1;acI<=68;acI++){
  acSolved=acSolve(acTraceColumns[acI],acTPivots,acTCoords);acPoly=acSolved[1];acBits=acSolved[2]+w^(acI-1);
  if(acPoly!=0){acPivot=deg(acPoly)+1;acTPivots[acPivot]=acPoly;acTCoords[acPivot]=acBits;acSrank=acSrank+1;}
+ else{acInvariants=insert(acInvariants,acBits,size(acInvariants));}
 }
 print("ACTION27_SIGMA_PLUS_ID_RANK");acSrank;
 if(acSrank!=34){ERROR("trace rank does not match etale quotient RR dimension");}
@@ -140,6 +142,26 @@ for(acC=1;acC<=20;acC++){
 }
 print("ACTION27_TRACE_ONE_POLE_DEGREE");acTracePoleDegree;
 acExport("sigma-matrix.sing","sigmaColumns",acSigma);
+acExport("basis-jets389.sing","basisJets389",acOJets389);
+if(size(acInvariants)!=34){ERROR("invariant basis count");}
+list acInvariantJets;
+for(acI=1;acI<=34;acI++){
+ if(acApply(acInvariants[acI],acTraceColumns)!=0){ERROR("invariant basis trace certificate");}
+ acInvariantJets=insert(acInvariantJets,acApply(acInvariants[acI],acOJets),size(acInvariantJets));
+}
+acExport("invariant-coefficients.sing","invariantCoefficients",acInvariants);
+acExport("invariant-jets129.sing","invariantJets129",acInvariantJets);
+// Explicit birational coordinates recovered in the complete source basis.
+acChart=charts[1];acCoords=acChart[1];
+list acOriginalSections=list(lc(1),acCoords[3],acCoords[4],acCoords[2]);
+list acCoordinateCoefficients;
+for(acI=1;acI<=4;acI++){
+ acSolved=acSolve(acJet(acOriginalSections[acI],0,129),acJPivots,acJCoords);
+ if(acSolved[1]!=0){ERROR("original coordinate not represented by RR basis");}
+ acCoordinateCoefficients=insert(acCoordinateCoefficients,acSolved[2],size(acCoordinateCoefficients));
+}
+acExport("original-coordinate-coefficients.sing","coordinateCoefficients",acCoordinateCoefficients);
+
 // Actual degree14 point constraints via the nondegenerate field trace.
 number acPointU=alpha27;
 number acPointV=alpha27^12+alpha27^11+alpha27^8+alpha27^7+alpha27^3+alpha27+1;
