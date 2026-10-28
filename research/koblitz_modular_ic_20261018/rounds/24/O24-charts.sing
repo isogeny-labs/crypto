@@ -31,11 +31,12 @@ poly L0=l^2+A*l+t^3*y+b;
 poly tower0=(t^3*y)^8+Delta*(t^3*y)^2+A^2*Delta*(t^3*y)+C;
 if(tower0!=t^14*H0){ERROR("unramified tower identity failed");}
 matrix J0[3][3]=diff(E0,q),diff(E0,y),diff(E0,l),diff(H0,q),diff(H0,y),diff(H0,l),diff(L0,q),diff(L0,y),diff(L0,l);
+poly jac0=det(J0);
 int j;
 for(j=0;j<=1;j++){
  map p=o,1,1,j,0;
- print("O24_E1_RESIDUE_"+string(j));p(E0);p(H0);p(L0);p(det(J0));
- if(p(E0)!=0 || p(H0)!=0 || p(L0)!=0 || p(det(J0))!=1){ERROR("unramified source chart not regular at asserted point");}
+ print("O24_E1_RESIDUE_"+string(j));p(E0);p(H0);p(L0);p(jac0);
+ if(p(E0)!=0 || p(H0)!=0 || p(L0)!=0 || p(jac0)!=1){ERROR("unramified source chart not regular at asserted point");}
 }
 ring s=2,(q,x,l,w),dp;
 map tr=o,q,0,l,w^7*x^2;
@@ -50,9 +51,10 @@ if(towers!=w^88*x^24*Hs){ERROR("tame source tower identity failed");}
 print("O24_TORIC_INVERSE_CLEARED_RESIDUALS");zs^2-w*ts^3;ts^11-x*zs^7;
 if(zs^2!=w*ts^3 || ts^11!=x*zs^7){ERROR("tame chart rational inverse failed");}
 matrix Js[3][3]=diff(Es,q),diff(Es,x),diff(Es,l),diff(Hs,q),diff(Hs,x),diff(Hs,l),diff(Ls,q),diff(Ls,x),diff(Ls,l);
+poly jacs=det(Js);
 for(j=0;j<=1;j++){
  map p=s,1,1,j,0;
- print("O24_E7_RESIDUE_"+string(j));p(Es);p(Hs);p(Ls);p(det(Js));
- if(p(Es)!=0 || p(Hs)!=0 || p(Ls)!=0 || p(det(Js))!=1){ERROR("tame source chart not regular at asserted point");}
+ print("O24_E7_RESIDUE_"+string(j));p(Es);p(Hs);p(Ls);p(jacs);
+ if(p(Es)!=0 || p(Hs)!=0 || p(Ls)!=0 || p(jacs)!=1){ERROR("tame source chart not regular at asserted point");}
 }
 print("O24_CHARTS_ALL_CHECKS_PASS");quit;

@@ -99,7 +99,8 @@ in (q,y,lambda) is a unit at t=0,q=y=1,lambda=0 and 1.
 Tame chart: t=w^7*x^2, Z=w^11*x^3, with q=x=1 at w=0. Check
 H(Z)=w^88*x^24*(1+A^2*d*x+w^11*d*x^4+w^10*e*x^4),
 the same lambda equation and unit Jacobian in (q,x,lambda). Retain rational
-inverses w=Z^2/t^3 and x=t^11/Z^7. Source-bound generic identification,+regular local rings and proper degree exhaustion must precede any claim of
+inverses w=Z^2/t^3 and x=t^11/Z^7. Source-bound generic identification,
+regular local rings and proper degree exhaustion must precede any claim of
 four normalized points with weighted sum 1+1+7+7=16.
 
 Only after these chart checks pass, freeze the finite-precision coefficient
