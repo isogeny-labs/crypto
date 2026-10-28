@@ -2243,7 +2243,7 @@ mod tests {
             .iter()
             .filter(|curve| matches!(&curve.model, Model::Extension { .. }))
             .collect();
-        assert_eq!(extensions.len(), 1324);
+        assert_eq!(extensions.len(), 1371); // 1324 existing + 47 frozen three-leads models.
         for curve in extensions {
             let Model::Extension {
                 p,
