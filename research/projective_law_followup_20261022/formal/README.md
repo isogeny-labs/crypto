@@ -547,3 +547,13 @@ denominator nonzero. Its [PDF](SOURCE_FUNCTION_FIELD.pdf),
 record the hypotheses and open gates. All-closed-point orders, a finite
 principal divisor, Pic⁰ equality, and compiled runtime correspondence remain
 open; no target or cost row changes.
+
+The [local Noetherianity packet](LOCAL_NOETHERIAN.md) proves that both actual
+weighted-Proj chart rings are Noetherian and that their two-basic-open cover
+makes the whole curve locally Noetherian over any field, without a separability
+hypothesis. Its [PDF](LOCAL_NOETHERIAN.pdf),
+[dependency graph](local-noetherian.svg), and
+[10-row status CSV](local-noetherian.csv) distinguish this checked prerequisite
+from the open coheight-one identification, all-closed-point source-function
+orders, principal divisor, Pic⁰ equality, and compiled Rust correspondence.
+No target or cost row changes.
