@@ -13,8 +13,6 @@
 //! (`canonical::derive_u64`), never from an RNG stream, and no solver is
 //! handed it: the runner verifies the solver's answer afterwards.
 
-use std::sync::OnceLock;
-
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
