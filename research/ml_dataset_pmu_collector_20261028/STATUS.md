@@ -44,3 +44,7 @@ failures, mismatched-context drop and one-time control/read unwind. Total author
 test functions:25; still awaiting compilation. The private backend's identity
 and close functions must not unwind. Native implementations return OS errors;
 cleanup itself panicking, process abort and SIGKILL are outside the RAII promise.
+
+The native ABI guard also explicitly requires64-bit pointers. An x86_64
+architecture label alone does not exclude the x32 ABI, whose event-ID ioctl
+pointer-size encoding differs. Other ABIs take the unsupported backend.

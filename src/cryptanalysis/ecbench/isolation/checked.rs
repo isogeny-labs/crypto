@@ -113,6 +113,7 @@ pub struct CallError {
 impl CallError {
     #[cfg(all(
         target_os = "linux",
+        target_pointer_width = "64",
         any(target_arch = "x86_64", target_arch = "aarch64")
     ))]
     fn last() -> Self {
@@ -125,12 +126,13 @@ impl CallError {
 
     #[cfg(not(all(
         target_os = "linux",
+        target_pointer_width = "64",
         any(target_arch = "x86_64", target_arch = "aarch64")
     )))]
     fn unsupported() -> Self {
         Self {
             errno: None,
-            message: "native perf ABI supported only on Linux x86_64/aarch64".into(),
+            message: "native perf ABI supported only on 64-bit Linux x86_64/aarch64".into(),
         }
     }
 }
@@ -329,6 +331,7 @@ struct NativeCalls;
 // size for PERF_EVENT_IOC_ID. Other ABIs fail explicitly instead of guessing.
 #[cfg(all(
     target_os = "linux",
+    target_pointer_width = "64",
     any(target_arch = "x86_64", target_arch = "aarch64")
 ))]
 impl Calls for NativeCalls {
@@ -412,6 +415,7 @@ impl Calls for NativeCalls {
 
 #[cfg(not(all(
     target_os = "linux",
+    target_pointer_width = "64",
     any(target_arch = "x86_64", target_arch = "aarch64")
 )))]
 impl Calls for NativeCalls {
