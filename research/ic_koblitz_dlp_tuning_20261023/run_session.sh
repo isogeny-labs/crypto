@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 name=$1; spec=$2
-E=$(pwd)/../../target/release/ecbench
+E=${ECBENCH:-$(pwd)/../../target/release/ecbench}
 export RAYON_NUM_THREADS=1
 mkdir -p sessions audits bands
 start=$(date +%s)
