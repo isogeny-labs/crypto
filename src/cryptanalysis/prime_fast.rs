@@ -266,6 +266,13 @@ impl Fp64 {
 /// extended Euclidean algorithm (HAC 14.61): no divisions.
 pub fn inv_mod_u64(a: u64, p: u64) -> u64 {
     debug_assert!(a != 0 && a < p && p & 1 == 1);
+    // A modulus below 2^32 takes the extended Euclid on 32-bit words, whose
+    // division is the shorter instruction and whose step count beats the
+    // binary algorithm's (the plain walk's `ic_boundary::invmod` does the
+    // same).  The inverse is unique, so the value is the one below.
+    if let Ok(p32) = u32::try_from(p) {
+        return u64::from(inv_mod_u32(a as u32, p32));
+    }
     let (mut u, mut v) = (a, p);
     // Invariants: x1·a ≡ u, x2·a ≡ v (mod p).
     let (mut x1, mut x2) = (1u64, 0u64);
@@ -298,6 +305,27 @@ pub fn inv_mod_u64(a: u64, p: u64) -> u64 {
         x1
     } else {
         x2
+    }
+}
+
+/// `a⁻¹ mod p` for odd `p < 2^32` and `0 < a < p`: the extended Euclid on
+/// 32-bit words.  Remainders and the Bézout magnitude stay at most `p`, so
+/// nothing overflows; the coefficient's sign alternates and is tracked apart.
+fn inv_mod_u32(a: u32, p: u32) -> u32 {
+    let (mut r0, mut r1) = (p, a);
+    let (mut t0, mut t1) = (0u32, 1u32);
+    let mut neg0 = true;
+    while r1 != 0 {
+        let q = r0 / r1;
+        (r0, r1) = (r1, r0 - q * r1);
+        (t0, t1) = (t1, t0 + q * t1);
+        neg0 = !neg0;
+    }
+    debug_assert!(r0 == 1);
+    if neg0 {
+        p - t0
+    } else {
+        t0
     }
 }
 
@@ -1626,6 +1654,71 @@ pub fn find_a3_curve(bits: u32, residue_mod_4: u64) -> Option<(FastCurve, Pt)> {
 
 #[cfg(test)]
 mod tests {
+
+    /// The 32-bit word-Euclid path gives the inverse the binary algorithm gives,
+    /// for every residue of small moduli and a spread of larger ones.
+    #[test]
+    fn inv_mod_u32_path_agrees_with_the_binary_inverse() {
+        fn binary(a: u64, p: u64) -> u64 {
+            let (mut u, mut v) = (a, p);
+            let (mut x1, mut x2) = (1u64, 0u64);
+            let halve = |x: u64| {
+                if x & 1 == 0 {
+                    x >> 1
+                } else {
+                    ((x as u128 + p as u128) >> 1) as u64
+                }
+            };
+            while u != 1 && v != 1 {
+                while u & 1 == 0 {
+                    u >>= 1;
+                    x1 = halve(x1);
+                }
+                while v & 1 == 0 {
+                    v >>= 1;
+                    x2 = halve(x2);
+                }
+                if u >= v {
+                    u -= v;
+                    x1 = if x1 >= x2 { x1 - x2 } else { x1 + p - x2 };
+                } else {
+                    v -= u;
+                    x2 = if x2 >= x1 { x2 - x1 } else { x2 + p - x1 };
+                }
+            }
+            if u == 1 {
+                x1
+            } else {
+                x2
+            }
+        }
+        for p in [3u64, 5, 7, 101, 1009, 65_537, 1_000_003] {
+            for a in 1..p.min(5000) {
+                assert_eq!(inv_mod_u64(a, p), binary(a, p), "a = {a}, p = {p}");
+                assert_eq!(a * inv_mod_u64(a, p) % p, 1);
+            }
+        }
+        for p in [4_294_967_291u64, 2_147_483_647, 4_294_967_279, 268_435_399] {
+            let mut x = 0x9E37_79B9_7F4A_7C15u64;
+            for _ in 0..20_000 {
+                x ^= x << 13;
+                x ^= x >> 7;
+                x ^= x << 17;
+                let a = 1 + x % (p - 1);
+                let inv = inv_mod_u64(a, p);
+                assert_eq!(inv, binary(a, p), "a = {a}, p = {p}");
+                assert_eq!(a * inv % p, 1);
+            }
+        }
+        // Above 2^32 the binary algorithm is still the one used.
+        let p = 4_611_686_018_427_387_847u64; // below 2^62
+        for a in [1u64, 2, 3, 12345, p - 1, p - 2, p / 2] {
+            assert_eq!(
+                (a as u128 * inv_mod_u64(a, p) as u128 % p as u128) as u64,
+                1
+            );
+        }
+    }
     use super::*;
     use crate::cryptanalysis::research_bench::bench_curves_a_minus_3;
 

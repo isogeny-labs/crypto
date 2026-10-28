@@ -609,6 +609,11 @@ pub enum Targets {
     WalkPrimeBatch64,
     WalkPrimeBatch256,
     WalkPrimeBatch1024,
+    WalkPrimeBatch24,
+    WalkPrimeBatch32,
+    WalkPrimeBatch48,
+    WalkPrimeBatch128,
+    WalkPrimeBatch512,
     /// Residual matching (lead L3): the walk subtracts a base point at
     /// every step and relations come from collisions of the residuals;
     /// the oracle is not consulted.  See `ic_framework::residual`.
@@ -639,6 +644,11 @@ impl Targets {
             Targets::WalkPrimeBatch64 => "walk-prime-batch-64",
             Targets::WalkPrimeBatch256 => "walk-prime-batch-256",
             Targets::WalkPrimeBatch1024 => "walk-prime-batch-1024",
+            Targets::WalkPrimeBatch24 => "walk-prime-batch-24",
+            Targets::WalkPrimeBatch32 => "walk-prime-batch-32",
+            Targets::WalkPrimeBatch48 => "walk-prime-batch-48",
+            Targets::WalkPrimeBatch128 => "walk-prime-batch-128",
+            Targets::WalkPrimeBatch512 => "walk-prime-batch-512",
             Targets::Residual => "residual",
             Targets::Stride => "stride",
             Targets::StrideRenew => "stride-renew",
@@ -662,11 +672,16 @@ impl Targets {
             "walk-prime-batch-64" => Ok(Targets::WalkPrimeBatch64),
             "walk-prime-batch-256" => Ok(Targets::WalkPrimeBatch256),
             "walk-prime-batch-1024" => Ok(Targets::WalkPrimeBatch1024),
+            "walk-prime-batch-24" => Ok(Targets::WalkPrimeBatch24),
+            "walk-prime-batch-32" => Ok(Targets::WalkPrimeBatch32),
+            "walk-prime-batch-48" => Ok(Targets::WalkPrimeBatch48),
+            "walk-prime-batch-128" => Ok(Targets::WalkPrimeBatch128),
+            "walk-prime-batch-512" => Ok(Targets::WalkPrimeBatch512),
             "residual" => Ok(Targets::Residual),
             "stride" => Ok(Targets::Stride),
             "stride-renew" => Ok(Targets::StrideRenew),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16/64/256/1024, walk-prime-batch-4/8/16/64/256/1024, residual, stride or stride-renew"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16/64/256/1024, walk-prime-batch-4/8/16/24/32/48/64/128/256/512/1024, residual, stride or stride-renew"
             )),
         }
     }

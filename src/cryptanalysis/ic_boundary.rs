@@ -7705,6 +7705,14 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
     let mut lane_requests = Vec::with_capacity(lanes.len());
     let mut lane_outputs = Vec::with_capacity(lanes.len());
     let (mut lane_rounds, mut lane_prepared) = (0u64, 0u64);
+    // Lane-phase timers for the width study: while the file `/dev/shm/lane_diag.on`
+    // exists, the four stages of a lane round are timed and reported as
+    // `diag_*_ns` counters (a measured child does not inherit the environment).
+    // Absent, nothing is timed and no counter is added.
+    let lane_diag =
+        lane_config.is_some() && std::path::Path::new("/dev/shm/lane_diag.on").exists();
+    let (mut diag_prep_ns, mut diag_add_ns, mut diag_queue_ns, mut diag_touch_ns) =
+        (0u64, 0u64, 0u64, 0u64);
     // `bitop/v1`-only bookkeeping (`PhaseCost::work`): the coefficient
     // updates modulo `r`, the step hashes, and the random draws of the
     // target stream, none of which the group-operation ledger sees.
@@ -7779,6 +7787,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
 
     while trials < max_trials {
         if lane_config.is_some() && lane_queue.is_empty() {
+            let diag_t0 = lane_diag.then(Instant::now);
             lane_requests.clear();
             for (index, lane) in lanes.iter_mut().enumerate() {
                 if lane.fresh || lane.segment_steps >= segment_cap {
@@ -7832,6 +7841,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                     walk_steps += 1;
                 }
             }
+            let diag_t1 = lane_diag.then(Instant::now);
             if !lane_requests.is_empty() {
                 lane_adder.as_mut().expect("prime lanes required")(
                     &mut rel.group_ops,
@@ -7843,6 +7853,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                     lanes[*index].point = *point;
                 }
             }
+            let diag_t2 = lane_diag.then(Instant::now);
             for (index, lane) in lanes.iter_mut().enumerate() {
                 if g.is_identity(&lane.point) {
                     lane.fresh = true;
@@ -7852,6 +7863,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                     lane_prepared += 1;
                 }
             }
+            let diag_t3 = lane_diag.then(Instant::now);
             lane_rounds += 1;
             // Touch the guard's and the oracle's slots for the whole round
             // before taking its first target: the reads are independent,
@@ -7862,6 +7874,13 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                     std::hint::black_box(seen.contains_key(&g.key(&point)));
                 }
                 touch(&point);
+            }
+            if let (Some(t0), Some(t1), Some(t2), Some(t3)) = (diag_t0, diag_t1, diag_t2, diag_t3) {
+                let t4 = Instant::now();
+                diag_prep_ns += (t1 - t0).as_nanos() as u64;
+                diag_add_ns += (t2 - t1).as_nanos() as u64;
+                diag_queue_ns += (t3 - t2).as_nanos() as u64;
+                diag_touch_ns += (t4 - t3).as_nanos() as u64;
             }
         }
         // Exclusive phase marks (no-ops without an `ic_measurement`
@@ -8161,6 +8180,12 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
             rel.count("lane_rounds", lane_rounds);
             rel.count("lane_prepared", lane_prepared);
             rel.count("lane_unused_prepared", lane_queue.len() as u64);
+            if lane_diag {
+                rel.count("diag_prep_ns", diag_prep_ns);
+                rel.count("diag_add_ns", diag_add_ns);
+                rel.count("diag_queue_ns", diag_queue_ns);
+                rel.count("diag_touch_ns", diag_touch_ns);
+            }
             let reductions = rel.group_ops.montgomery_reductions;
             rel.count("montgomery_reductions", reductions);
             rel.count(

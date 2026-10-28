@@ -540,6 +540,26 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             lanes: 1024,
             batched: true,
         },
+        Targets::WalkPrimeBatch24 => TargetSource::WalkPrimeLanes {
+            lanes: 24,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch32 => TargetSource::WalkPrimeLanes {
+            lanes: 32,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch48 => TargetSource::WalkPrimeLanes {
+            lanes: 48,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch128 => TargetSource::WalkPrimeLanes {
+            lanes: 128,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch512 => TargetSource::WalkPrimeLanes {
+            lanes: 512,
+            batched: true,
+        },
     };
     if matches!(spec.targets, Targets::WalkPrimeFast) && ctx.group.native_walk_adder().is_none() {
         return Err("walk-prime-fast requires a prime curve with p < 2^62".into());
