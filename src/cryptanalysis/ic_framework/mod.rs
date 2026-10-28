@@ -436,7 +436,11 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     let known = fb.known_logs.is_some();
     let linalg_name = {
         let prior = linalg_name;
-        if known { "known-logs" } else { prior }
+        if known {
+            "known-logs"
+        } else {
+            prior
+        }
     };
     // The loop's unknowns are the logs of `[h]P_v` (its rows read
     // `Σ c·x − h·b·d = h·a`), so on a cofactor-`h` curve a known column
@@ -567,8 +571,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     // verified full-rank solution solely from the target-point check.
     if checked_full_rank && outcome.verified {
         measurement::mark(measurement::Phase::RecoveryCheck);
-        outcome.verified =
-            check_full_rank_base_columns(ctx, &fb, matrix, &mut outcome.verify);
+        outcome.verified = check_full_rank_base_columns(ctx, &fb, matrix, &mut outcome.verify);
         // The check's `pinned` scans: the matrix's totals replace the
         // ones the relation loop recorded.
         outcome
@@ -738,7 +741,9 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             total_gae,
             s,
             rho_s,
-            s_over_rho: rho_s.filter(|_| cost_qualification.is_none()).map(|rho| s / rho),
+            s_over_rho: rho_s
+                .filter(|_| cost_qualification.is_none())
+                .map(|rho| s / rho),
             wall_seconds: started.elapsed().as_secs_f64(),
             exhausted: outcome.recovered.is_none(),
         },
