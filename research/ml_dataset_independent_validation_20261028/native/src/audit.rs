@@ -958,6 +958,25 @@ mod tests {
     }
 
     #[test]
+    fn complete_cycles_do_not_make_incomplete_instruction_timing_exact() {
+        let mut incomplete = metrics();
+        validate_metrics(&incomplete).unwrap();
+
+        // The cycle tuple remains complete and unmultiplexed. It cannot
+        // establish instruction exactness when that event's enabled time is
+        // missing, even if the raw instruction label and running time exist.
+        incomplete["hardware"]["instructions_time_enabled_ns"] = Value::Null;
+        incomplete["hardware"]["instructions_scaled"] = Value::Null;
+        let error = validate_metrics(&incomplete).unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("incomplete instructions counter tuple"),
+            "{error}"
+        );
+    }
+
+    #[test]
     fn zero_running_missing_counters_and_saturating_scaling() {
         let mut m = metrics();
         m["hardware"] = json!({"instructions":null,"error":"denied"});

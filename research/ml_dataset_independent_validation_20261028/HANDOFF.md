@@ -150,3 +150,63 @@ The receipt SHA-256 is bb4afa59b8e2b68b9e5f59ff547db60b6c7688bac6ae5c4c6ab79449d
 reports, raw native test output and the durable receipt. This used the controller
 role and a software fixture; it does not validate worker permissions or replace
 the first real native dataset replay.
+
+## PR #2757 delivery follow-up — 2026-10-28 08:31 UTC
+
+### What was done (commands, files, features)
+
+Conductor T-715 owns this companion-directory follow-up. T-706 was ready at
+fencing epoch 5; a fresh task avoids consuming further attempts on that work.
+Merged main `189ac727fcc4475b42755d4f1c15f97a4a102070` into the published
+branch at `af10d1bf7da2a7b70b3a674766d97b0523127ba5`, without rebasing or
+conflicts. Added the native regression
+`complete_cycles_do_not_make_incomplete_instruction_timing_exact`.
+Native release validation passed: 73 library tests, 7 integration tests,
+strict Clippy with all targets, formatting, and the release binary build.
+Separate source hashes and raw logs are in `evidence/review-followup-20261028/`.
+
+### Decisions made (and why)
+
+The [P1 native-language review](https://github.com/isogeny-labs/crypto/pull/2757#discussion_r4397379036)
+is addressed by `native/` and `NATIVE_MIGRATION.md`: the supported audit,
+phase validation, export, transport, certificate checks and tests are Rust.
+Historical Python files and receipts remain preserved and superseded.
+
+The [P2 incomplete-counter review](https://github.com/isogeny-labs/crypto/pull/2757#discussion_r4397379039)
+is addressed by `native/src/audit.rs::validate_metrics`, which accepts each
+counter's raw/enabled/running fields only as a complete tuple or an entirely
+missing tuple. The new regression retains valid unmultiplexed cycles, sets
+instruction enabled time and scaled count to null, leaves the raw/exact
+instruction labels at 100, and requires rejection of the incomplete instruction
+tuple. No runtime change was needed. A cycle tuple cannot supply missing
+instruction scheduling information.
+
+### Open threads (unfinished, pick up next time)
+
+Both GitHub review threads were unresolved at inspection; this follow-up
+records the current fixes without claiming review approval. The previous
+head `6f1406e22a8c728aaea5b14298d627bded7e6654` had successful `gate`, `size`
+and `artifacts` checks. Those results do not validate the follow-up head.
+Remote Rust lint excludes research crates; the native test evidence is the
+separate local validation retained here. The real native producer-to-S3-to-
+independent-consumer replay remains outside this software-only follow-up.
+
+### Errors (what went wrong, how it was handled)
+
+The Conductor project slug `crypto` returned 404 for task creation/check APIs;
+the existing project's UUID resolved the same authority and ownership records.
+No IAM change, new compute worker, scientific replay, or review-thread
+resolution was performed. The shared daily session log remains separately
+owned; this scoped handoff records the work without editing that file.
+
+At 08:34 UTC the follow-up source/log archive (48,949 bytes, SHA-256
+`dc16a425b9147ea10b4896d84dc3a8b0e4b2b1f4d0f3c7ff7db473e0368e49b7`)
+and release binary (1,337,016 bytes, SHA-256
+`185cf7b5d907bf885fc74513bd7d467eba3a7bc38f6c853389f8144fbe597af4`)
+were uploaded with conditional writes to canonical validation prefixes.
+ETag-bound downloads matched local bytes and both SHA-256 digests. Exact S3
+URIs and raw PUT/GET receipts are in the new `durability.json` and adjacent
+files. This verifies persistence through the controller role only. An initial
+archive attempt rejected null source paths caused by a manifest-formatting
+mistake; the manifest was corrected and all eleven hashes checked before
+any upload. No incomplete archive was published.

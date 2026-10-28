@@ -134,3 +134,12 @@ fixture restored 13 artifact references (11 unique objects, 4,153 declared
 bytes), verified all hashes, and independently checked one positive certificate.
 The receipt, source hashes and raw test outputs are preserved beside the report.
 This establishes the controller storage path and software checks only.
+
+The PR #2757 delivery follow-up adds a regression for missing instruction
+enabled time alongside a complete cycle tuple. The native validator rejects
+that incomplete instruction tuple before accepting any exact label. After
+merging main `189ac727fcc4475b42755d4f1c15f97a4a102070`, 80 native release
+tests (73 library and 7 integration), strict Clippy, formatting and the release
+build passed. The new source hashes and logs are separate in
+`evidence/review-followup-20261028/`; the earlier receipts remain unchanged.
+These local checks do not establish current-head remote CI or review approval.
