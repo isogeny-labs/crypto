@@ -39,6 +39,11 @@ term visits. Inversions are separately informational. Hashing, validation,
 source replay, coefficient arithmetic internals, map comparisons, allocation,
 serialization, snapshots, queue scanning, outer control and group/rank work
 are excluded. These are software admission units, not total field or CPU cost.
+Initial incidence construction is also excluded. The input digest binds compact
+JSON of the ordered typed input before coefficient normalization, rather than
+original JSON whitespace. A raw input-admission stop deliberately has no digest
+or emitted event: only size admission is checked, and no mathematical input
+binding or row identity is claimed for that rejected input.
 Computed work on a byte- or sink-refused transition remains separately visible;
 its row/report changes are not committed. Callback failure stops immediately.
 
