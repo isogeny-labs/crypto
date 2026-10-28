@@ -538,3 +538,12 @@ Its [PDF](PROJECTIVE_IS_INTEGRAL.pdf),
 separate this checked geometric result from the still-open function-field
 element, all-closed-point principal divisor, Pic⁰ equality, and compiled
 runtime link. None of these packets changes a target or cost row.
+
+The [source function-field packet](SOURCE_FUNCTION_FIELD.md) maps the actual
+affine chart injectively into the integral curve's function field and defines
+the source-shaped `N/B-y` expression there. It checks that `B ≠ 0` keeps the
+denominator nonzero. Its [PDF](SOURCE_FUNCTION_FIELD.pdf),
+[graph](source-function-field.svg), and [11-row CSV](source-function-field.csv)
+record the hypotheses and open gates. All-closed-point orders, a finite
+principal divisor, Pic⁰ equality, and compiled runtime correspondence remain
+open; no target or cost row changes.
