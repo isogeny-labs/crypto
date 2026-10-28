@@ -1,0 +1,548 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-FIXED-DEGREE-E27-20261028",
+  "version": 1,
+  "created": "2026-10-28",
+  "repository": "crypto",
+  "study_dir": "research/n83_fixed_degree_sweep_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "PROTOCOL.md"
+  },
+  "question": "What top-form regularity and final affine basis degrees complete for all original n83 curves at m2..9 using fixed ell27 factor bases?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Completed top-form regularity is computed from an exact Hilbert series; all incomplete values are missing.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Full ECDLP speed, mathematical impossibility and cross-family statistical effects are not established.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "koblitz",
+      "role": "reference",
+      "description": "koblitz public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "05d5a84ac7f90d8d8b82b5f151ed9d758b14e7cc",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_fixed_degree_sweep_20261028/Cargo.toml",
+            "--bin",
+            "n83-fixed-degree-sweep"
+          ]
+        ],
+        "binary_sha256": "166a22a8b2bb611d180ce93a3e990c11a97e7861629e7a4c5f79e314c2234415",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "top",
+          "affine"
+        ],
+        "seconds": 40,
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      }
+    },
+    {
+      "id": "binary",
+      "role": "candidate",
+      "description": "binary public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "05d5a84ac7f90d8d8b82b5f151ed9d758b14e7cc",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_fixed_degree_sweep_20261028/Cargo.toml",
+            "--bin",
+            "n83-fixed-degree-sweep"
+          ]
+        ],
+        "binary_sha256": "166a22a8b2bb611d180ce93a3e990c11a97e7861629e7a4c5f79e314c2234415",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "top",
+          "affine"
+        ],
+        "seconds": 40,
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      }
+    },
+    {
+      "id": "prime",
+      "role": "candidate",
+      "description": "prime public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "05d5a84ac7f90d8d8b82b5f151ed9d758b14e7cc",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_fixed_degree_sweep_20261028/Cargo.toml",
+            "--bin",
+            "n83-fixed-degree-sweep"
+          ]
+        ],
+        "binary_sha256": "166a22a8b2bb611d180ce93a3e990c11a97e7861629e7a4c5f79e314c2234415",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "top",
+          "affine"
+        ],
+        "seconds": 40,
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every cell has a planted group-law witness checked on input and basis. Same-driver two-variable controls return exact top degree 3."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No null-population claim. Same-driver inconsistent affine fixtures return the unit ideal while their top degree is 2."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary",
+          "prime"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "2f1f4e616c9231053c371117651dc90a9a9382930be5134d8085099adaca7bd4",
+        "how": "Committed native source mounted read-only into digest-pinned Singular runtime"
+      },
+      {
+        "name": "seed",
+        "treatment": "fixed",
+        "value": 20261027,
+        "how": "SplitMix64 family and m seed rule in PROTOCOL.md"
+      },
+      {
+        "name": "factor_base",
+        "treatment": "fixed",
+        "how": "Same ell27 per-curve manifest for m2..9; every planted point checked against stored shard"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "One Singular thread per process, four independent shards"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing Spot workspace with Docker limits; no timing comparison"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Ascending m and family order, planted then natural, top then affine"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen parsing; no discretionary exclusion"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "40 seconds plus 5-second grace; 3GiB per worker; interruption retained"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Final degree admitted only after solver COMPLETE and verification checks"
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computations",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Counted exact outputs; no timed comparison. Stable sharding makes reproduction explicit.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "SplitMix64: seed xor m<<32 xor family tag; source defines all draws."
+    },
+    "instance_sampling": {
+      "rule": "One public planted sum and one independently rejection-lifted point per cell",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 16,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "16 inputs per family, two modes per input: 3*16*2=96 bounded computations. No statistical test; modes are not independent replicates."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.06,
+      "per_sample_seconds": 45,
+      "threads": 4,
+      "estimated_total_seconds": 1080,
+      "measured_on": "Small development controls ~0.006s; 45s is target timeout+grace budget, not a measured n83 pilot."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "degree_of_regularity_top",
+        "name": "Top-form degree of regularity",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "One plus last nonzero graded degree of the zero-dimensional top-form quotient; otherwise null",
+        "source": "result.json degree_of_regularity_top",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "basis_max_degree",
+        "name": "Maximum final affine basis degree",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "Maximum degree in completed Singular std basis; not solving degree",
+        "source": "result.json basis_max_degree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "degree_of_regularity_top",
+      "basis_max_degree",
+      "top_dimension",
+      "basis_size"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 4,
+      "memory": "16Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 1800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "48 systems times top and affine; all 96 attempts, then stop",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "40 seconds per solver plus 5 seconds kill grace; 3GiB virtual memory per worker; no retries",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Solver error, failed witness, failed reduction, or missing COMPLETE marker prevents reporting a final value",
+    "A timeout is not a mathematical lower bound",
+    "All elapsed times are diagnostic and wall_valid=false"
+  ],
+  "decision_rule": {
+    "text": "Report exact completed quantities and all unresolved/failed attempts. No scientific hypothesis promotion.",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Per-attempt exact value or missing",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "complete",
+      "resource_limit",
+      "solver_error",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/main.rs",
+      "sha256": "2f1f4e616c9231053c371117651dc90a9a9382930be5134d8085099adaca7bd4"
+    },
+    "inputs": [
+      "inputs/*/{top,affine}/result.json"
+    ],
+    "outputs": [
+      "results.json",
+      "report table"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "24-cell completion and degree grid"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1503.08001",
+      "provenance": "retrieved",
+      "claim": "Summation polynomial formulas and distinction between first fall and regularity",
+      "verified_by": "Read primary HTML and checked formulas with controls"
+    },
+    {
+      "ref": "https://www.singular.uni-kl.de/index.php/singular.pdf",
+      "provenance": "internal",
+      "claim": "Standard bases and Hilbert functions; installed-version behavior checked by controls",
+      "verified_by": "Previously checked manual and installed4.3.1 controls; current manual fetch failed"
+    }
+  ],
+  "amendments": [],
+  "extensions": {
+    "detailed_design": "PROTOCOL.md",
+    "fixed_factor_base_index": {
+      "candidate_x_count_per_curve": 134217728,
+      "complete": true,
+      "ell": 27,
+      "families": [
+        {
+          "compressed_bytes": 1329389614,
+          "family": "koblitz",
+          "liftable_x": 67110393,
+          "manifest": "koblitz/manifest.json",
+          "manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+          "point_count": 134220785,
+          "same_base_for_m": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "compressed_bytes": 1329453079,
+          "family": "binary",
+          "liftable_x": 67113567,
+          "manifest": "binary/manifest.json",
+          "manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+          "point_count": 134227133,
+          "same_base_for_m": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "compressed_bytes": 1849491803,
+          "family": "prime",
+          "liftable_x": 67106828,
+          "manifest": "prime/manifest.json",
+          "manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5",
+          "point_count": 134213656,
+          "same_base_for_m": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        }
+      ],
+      "schema": "n83.shared-factor-bases/v1"
+    },
+    "backend_reason": "EKS shared-bucket access denied in prior run; existing-host fallback retains native solver and limits",
+    "runtime_image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0f591bb57d9c2c0a694d0fec1b83ef822453df0a10632f2ad4ffff731f51b2ab",
+    "factor_base_encoding": "Fixed candidate x-domain; saved point membership checked for planted target, candidate roots require lift/sign verification"
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "ddca4082af75dc77b990577cc09b4d4751f5407e6adb751abe8bff3526fe1db7",
+    "commit": "05d5a84ac7f90d8d8b82b5f151ed9d758b14e7cc",
+    "frozen_at": "2026-10-28T03:25:07Z",
+    "filed_before_affected_data": true
+  }
+}
