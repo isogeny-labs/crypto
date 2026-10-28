@@ -1,5 +1,19 @@
 # Standalone binary root module handoff
 
+## Completed integrated validation, 2026-10-28 15:31 UTC
+
+The integrated runtime `d79f658f7a0a83e2f75f4cb6f0d1f7542d0e6b83` now passes
+the full library suite (5183 passed, 0 failed, 123 ignored), native root9,
+dataset158, CLI8 and strict integrated Clippy. The independent consumer's
+51 retained software fixture cells include30 checked completed root sets.
+The [final validation record](VALIDATION.md) gives the precise source, scope,
+limitations, binary identities, retained failures and freshly verified S3
+archives. All pending-test statements below are historical. Hosted delivery,
+actual cloud publication and broad corpus coverage remain separate obligations.
+
+No new campaign worker or experiment retry was launched. The original total
+USD200 ceiling and existing approvals, owners and deadlines are unchanged.
+
 ## Integration update, 2026-10-28
 
 The original standalone snapshot below is retained as history. The parent
