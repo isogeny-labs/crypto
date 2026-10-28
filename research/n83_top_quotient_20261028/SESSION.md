@@ -24,3 +24,28 @@ required for the full elite-base goal. No universal FFD/LFD conclusion yet.
 
 No target-data errors before freeze. EKS shared-bucket access failure from earlier
 stages remains recorded; use existing host without IAM changes or duplicate jobs.
+
+## What was done — certificate batch complete
+
+All48 certificates and fresh replays passed. Obtained34 finite intervals and14
+positive-dimensional top-ideal certificates; all source hashes match prior
+FFD/LFD systems. Raw60-file archive uploaded, downloaded, hash-checked and its
+manifest compared. Export validates with zero findings. Source snapshot retained.
+
+## Decisions made
+
+Binary/Koblitz m2 now separates FFD=LFD2 from original top-form regularity>=28.
+Prime m3..9 has no finite graded vanishing degree in this convention; this is
+not a claim about affine dimension or Castelnuovo–Mumford regularity. Preserve
+all old timeouts and failed projection candidates. Added committed progress
+metrics only after a clear Conductor scope check.
+
+## Open threads
+
+Independent review, matched candidate-base generation and held-out comparisons
+remain open. Do not rank base quality by unqualified original-generator regularity
+or silently count preprocessing as a base improvement. Goal remains active.
+
+## Errors
+
+No failed producer/replay, source mismatch or export finding. No retries.

@@ -301,6 +301,21 @@ def n83_fixed_fall(ref, since):
                      source=f"{path}@{commit}")
 
 
+def n83_top_quotient(ref, since):
+    """Forward certified top-form bounds; never turn an interval into a value."""
+    path = "research/n83_top_quotient_20261028/evidence/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        for row in json.loads(text).get("rows", []):
+            if row.get("status") not in ("finite_interval", "positive_dimensional_top_ideal"):
+                continue
+            for field in ("dreg_lower_bound", "dreg_upper_bound", "top_quotient_dimension_lower_bound"):
+                emit(f"n83.fixed_top_ell27.{row['id']}.{field}", row.get(field),
+                     date=date, problem="n83-fixed-factor-base-top-regularity",
+                     unit="dimension" if field == "top_quotient_dimension_lower_bound" else "degree",
+                     label=f"Fixed ell27 {row['id']}: {field}; producer certificate, review pending",
+                     source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -315,6 +330,7 @@ def main():
     ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
     n83_fixed_fall(a.ref, a.since)
+    n83_top_quotient(a.ref, a.since)
 
 
 if __name__ == "__main__":
