@@ -141,3 +141,25 @@ Toy primes (`< 2³²`), `t ≤ 14`, `m ≤ 10`. No exponent, no security claim, 
 in the binary program, not a subexponential algorithm. The memory and cost of a
 degree-`d_F` elimination are reported per row, so a flat degree is never
 mistaken for a cheap one.
+
+## Amendment 1 (2026-10-28, before any isogeny row and before any random-target row)
+
+The first gate run (G4, planted, Kummer `m = 2`, `t ≤ 6` at `P1`) finished.
+Its isogeny part stalled on the builder: `PrimeCurve::point_count` is a
+naive `O(p)` loop, and the isogeny tower needs a curve with `2^t | #E`, which
+at `P1 ≈ 2·10⁹` takes many counts. Every recorded isogeny cell of the PKM
+rounds ran at `P0 = 786433 = 3·2^18 + 1`. Changes:
+
+- **The isogeny arm runs at `P0 = 786433`.** Kummer, null and naive stay at
+  `P1`. A Kummer–isogeny difference is therefore also a prime difference.
+  The Kummer `D` is the same at `P0` and `P1` on every recorded cell (note
+  §10.2), and Kummer at `P0` is added as a control where the isogeny arm runs.
+- **The isogeny (and Kummer-at-`P0`) cells run only where
+  `λ = |V|^m·2^{m−1}/(m!·p) < 0.1`**, so random targets stay inconsistent
+  with high probability: `m = 2, t ≤ 8`; `m = 3, t ≤ 5`; `m = 4, t ≤ 4`;
+  `m = 5, t ≤ 3`; `m = 6 … 10, t ≤ 2` (where `λ < 0.1`; computed per cell
+  and recorded).
+- **G4 runs with `--hky-cmax 5`.** A consistent closure never contains `1`, so
+  it runs to `cmax`. The gate needs only that `1` never enters.
+
+No rule of §6 changes.
