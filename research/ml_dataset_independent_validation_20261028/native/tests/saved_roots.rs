@@ -120,12 +120,20 @@ fn sealed_roots_bind_and_rehashed_substitutions_fail() {
                 let q = &mut bad["queries"][0];
                 match mutation {
                     "roots" => {
-                        q["report"]["roots"] = json!([u64::MAX]);
+                        // Keep every element canonical: omit a genuine root,
+                        // or falsely add zero when the correct list is empty.
+                        let mut altered = q["report"]["roots"].as_array().unwrap().clone();
+                        if altered.is_empty() {
+                            altered.push(json!(0));
+                        } else {
+                            altered.pop();
+                        }
+                        q["report"]["roots"] = json!(altered);
                         q["report"]["events"]
                             .as_array_mut()
                             .unwrap()
                             .last_mut()
-                            .unwrap()["roots"] = json!([u64::MAX]);
+                            .unwrap()["roots"] = json!(altered);
                     }
                     "polynomial" => {
                         q["report"]["polynomial"] = json!([1]);
