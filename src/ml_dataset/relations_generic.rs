@@ -1805,12 +1805,14 @@ mod trace_integration_tests {
         assert_eq!(read, large);
         let too_large = format!("{large}x");
         assert!(bounded_json_payload("oversized.json", FILTER_ROLE, &too_large, ceiling).is_err());
-        // Serialization rejection cannot alter an already acknowledged prefix.
-        std::fs::write(dir.join("prefix.jsonl"), b"{\"acknowledged\":true}\n").unwrap();
-        assert!(bounded_json_payload("oversized.json", FILTER_ROLE, &too_large, ceiling).is_err());
-        assert_eq!(
-            std::fs::read(dir.join("prefix.jsonl")).unwrap(),
-            b"{\"acknowledged\":true}\n"
+        let mut oversized = serde_json::to_vec(&too_large).unwrap();
+        oversized.push(b'\n');
+        assert_eq!(oversized.len() as u64, ceiling + 1);
+        std::fs::write(dir.join("oversized.json"), oversized).unwrap();
+        assert!(
+            crate::ml_dataset::read_json::<String>(&dir.join("oversized.json"))
+                .unwrap_err()
+                .contains("exceeds32MiB")
         );
         std::fs::remove_dir_all(dir).unwrap();
     }
@@ -2136,13 +2138,46 @@ mod trace_integration_tests {
         let cutoff = cutoff.expect("native events were durably emitted");
         assert!(max_line <= cutoff);
         let failed = root.join("callback-failed");
-        let mut cap = limits;
+        let mut cap = limits.clone();
         cap.max_stream_bytes = cutoff as u64;
         cap.max_event_bytes = max_line as u64;
-        assert!(solve_with_bound_event_sink(&cfg, &case, &failed, binding, cap).is_err());
+        assert!(solve_with_bound_event_sink(&cfg, &case, &failed, binding.clone(), cap).is_err());
         let retained = fs::read(failed.join("events.jsonl")).unwrap();
         assert_eq!(retained, &bytes[..cutoff]);
         assert!(!failed
+            .join("payloads/generic-large-prime-transcript.json")
+            .exists());
+        // Refuse the first native batch payload after its events were acknowledged.
+        // This exercises the real worker/capture boundary, not an unrelated file.
+        let size_failed = root.join("payload-size-failed");
+        let first = result
+            .artifacts
+            .iter()
+            .find(|a| a.role == FILTER_ROLE)
+            .unwrap();
+        let setup_bytes: u64 = result
+            .artifacts
+            .iter()
+            .filter(|a| {
+                matches!(
+                    a.role.as_str(),
+                    "exact-large-prime-discovery-domains"
+                        | "complete-large-prime-pair-table"
+                        | "restricted-large-prime-membership-provenance"
+                )
+            })
+            .map(|a| a.bytes.len() as u64)
+            .sum();
+        let mut size_cap = limits;
+        size_cap.max_payload_bytes = setup_bytes + first.bytes.len() as u64 - 1;
+        assert!(solve_with_bound_event_sink(&cfg, &case, &size_failed, binding, size_cap).is_err());
+        let retained = fs::read(size_failed.join("events.jsonl")).unwrap();
+        assert!(bytes.starts_with(&retained));
+        let retained_text = std::str::from_utf8(&retained).unwrap();
+        assert!(retained_text.contains("generic_large_prime_native_filter_event"));
+        assert!(retained_text.contains("\"kind\":\"finish\""));
+        assert!(!size_failed.join("payloads").join(&first.path).exists());
+        assert!(!size_failed
             .join("payloads/generic-large-prime-transcript.json")
             .exists());
         let payload_failed = root.join("payload-failed");
