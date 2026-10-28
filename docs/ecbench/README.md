@@ -1116,7 +1116,7 @@ holds the named profiles of the past; a replay that does not reproduce
 under the current accounting is tried under each in turn and accepted
 only if the **whole** record then reproduces (answer, totals, phases,
 counters, native counters, factor base, unpriced list). The receipt's
-replay detail names the profile (`pre-2043`, `pre-2043-priced`). New
+replay detail names the profile (`pre-2043`, `pre-2043-priced`, `pre-1646`, `pre-A1 endomorphism counters`). New
 sessions are recorded and replayed under the current accounting only.
 The changes: #1774 (`c8b1594f6`) priced the qualified F4 word-XOR unit
 by count (before, a wall-priced solver term was taken back out and the
@@ -1125,7 +1125,7 @@ run was a lower bound); linear harvest on by default (`d1d034d94`,
 F4/F6-IC search and word count; #2043 (`d72e8b04d`) made every aarch64
 host charge the eager rewrite that x86-64 already charged, where before
 it rewrote lazily and charged only the rows read (the Apple-silicon
-records of 2026-10-13/14). The `oracle_setup` descriptors
+records of 2026-10-13/14); #1646 (`e49afb98f`, 2026-10-11) sent the root's echelon form through the Four Russians kernel and had a child ask the node oracle before specialising (the F6-IC ladder of 2026-10-05, the yield sweep); #1640 (`31dd89b67`) added the `koblitz/K_0 / GF(2^23)` row to `docs/ic/calibration.json`, so native units of that curve were unpriced before; amendment A1 of `research/ext_endo_rho_20261023` changed the uncharged endomorphism counters of `rho.gls` and `rho.frobenius_orbit` in place (no `endomorphism_field_muls_uncharged`, three applications per GLS step), reproduced from the replay by `legacy::pre_endomorphism_a1`. The `oracle_setup` descriptors
 `pair_table_kind`, `pair_table_points` and `window_div` were added to
 `pdp3-koblitz`'s set-up counters later; a record without one is compared
 without it. `engine=rootfind-window-negfold` without `window_div` is the
