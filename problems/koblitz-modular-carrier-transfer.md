@@ -1032,10 +1032,15 @@ normalized points of indices1,1,7,7, exhausting the degree16 fiber. This also
 forces the full constant field to be F2. The unchanged plane polynomial
 independently remains irreducible over F4 with product and field controls.
 
-The remaining rational polar supports are A0,B0,C0,D0. Original-coordinate
-nu and all registered denominator orders require separate accepted coefficient
-evaluation; a rejected initial series helper supplies no valuations or pole
-claim. Additional zero supports and complete global divisors/RR/F2 factor
-map remain open, as do all node187/quotient/reverse obligations above.
-No IC performance or new relation rank is claimed. The shared problem index
-was reserved by another task and was left unchanged pending a clear scope.
+The accepted O24-series-02 evaluates the original nu equation and all8 actual
+registered polynomial entries on all4 branches. The e1 branches have nu
+order0 and S,N orders0,0. The e7 branches have nu orders32,21 and S,N
+orders44,66 at both; the generic nu numerator/denominator pairs are109/77
+and98/77. All five original residuals vanish modulo w100, within the
+certified implicit lifts. The first incorrect series helper is rejected.
+
+The remaining rational polar supports are A0,B0,C0,D0. Additional zero
+supports and complete global divisors/RR/F2 factor map remain open, as do
+all node187/quotient/reverse obligations above. No IC performance or new
+relation rank is claimed. The shared index was initially reserved; a later
+clear scope check permits its existing Koblitz row to reflect this result.

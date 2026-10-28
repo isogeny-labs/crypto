@@ -26,6 +26,13 @@
   the next checkpoint; verify its inclusion. The final immutable run archive
   is separately sealed and published. Earlier checkpoints are not claimed to
   contain those ignored raw bytes.
+- cf24-corrupt-01 is an expected rejection, not a failed search. Adding1 to
+  the actual source factor product gives residual1 and the exact source
+  product error. Singular still exits0 and prints the final marker; the
+  wrapper rejects it with exit1. This records the detector's required behavior.
+- The first downloaded-checkpoint member query omitted the leading ./ in
+  ./untracked.tar.gz. The corrected exact-member query confirms that the
+  checkpoint contains the temporary raw archive. No missing upload is inferred.
 
 All R01-23 failures, capped normalizations, validation limitations and missing
 first-host raw logs remain as previously recorded. No failed computation is
