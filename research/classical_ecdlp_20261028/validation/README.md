@@ -37,6 +37,11 @@ tracked files. Thus all 4,994 non-ignored library tests pass across those
 checks; the original full invocation itself failed, and no clean full-suite
 invocation is claimed. No assertion or ignore list was changed.
 
+Those full-library counts belong to `tested_base_revision` in the development
+receipt. Later base updates and their archive regression checks are recorded
+under `landing_followups`; they do not turn the earlier run into a current-head
+full-suite pass.
+
 The PDF was compiled with Typst 0.15.0 and both pages visually inspected.
 Its final render was compared byte for byte with the inspected page renders.
 Matplotlib 3.10.8 reads frozen counts only; `reports/render_visuals.py` performs

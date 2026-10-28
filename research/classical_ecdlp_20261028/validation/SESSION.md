@@ -51,3 +51,27 @@
 
 - Seven additional missing CryptoPro-fixture failures appeared when the full suite finished. Restoring the committed constants made all seven exact reruns pass.
 - Auto-merge could not be enabled through the connector because it selected the disallowed squash method. No check or repository rule was weakened.
+
+## 2026-10-28T18:48:36Z — merge check-in and upstream integration
+
+### What was done (commands, files, features)
+
+- Read current `AGENTS.md`, latest daily log, PR head and applicable rules. Codex review of the original code commit completed without findings; no unresolved review threads were present.
+- On head `08db2b60`, required `gate` and `size` passed. Required `artifacts` was cancelled during repository checkout, before artifact assertions ran; its job is [122993102314](https://github.com/isogeny-labs/crypto/actions/runs/40738229477/job/122993102314).
+- Merged `main` at `a988ff46a9346f6a128e75fd23c0a50a9e619a24` without conflicts. Reviewed the upstream curve-trait changes; the archive engine, label arithmetic, Cargo files and 19 historical files are unchanged.
+- Rebuilt and ran `cargo test --release --locked --example classical_ecdlp_archive -- --test-threads=2` against the updated library: 14 passed, 0 failed, 0 ignored, exit 0. Historical SHA-256 checks pass for all 19 files; scoped rustfmt and artifact-policy planning pass.
+
+### Decisions made (and why)
+
+- Keep the earlier full-library counts attached to their original revision. Record this integration regression separately; claim no new full-suite invocation or performance result.
+- Retry the required gates through a real base-update commit. Do not treat the cancelled artifact job as a pass or alter unrelated workflow controls.
+- Continue using only this task-specific log; do not republish the rejected shared daily log.
+
+### Open threads (unfinished, pick up next time)
+
+- Publish the reviewed merge and updated receipts; check required `gate`, `size` and `artifacts` on the resulting PR head before a guarded merge commit into `main`.
+
+### Errors (what went wrong, how it was handled)
+
+- The required artifact job stopped during checkout, before it could validate the package. The new head must obtain its own successful check.
+- Conductor remains unavailable: its local control-plane connection is refused. No task lease is claimed.
