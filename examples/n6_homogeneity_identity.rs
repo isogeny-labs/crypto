@@ -140,8 +140,8 @@ fn main() {
                 assert_eq!(certificate.statement, statement(index));
                 assert_eq!(certificate.proof, Some(proof()));
                 match check_with_extra(certificate, Some((0x1025_2026_0006, 32))).unwrap() {
-                    Verdict::Accept { .. } => println!("CHECKED\t{}", certificate.id),
-                    other => panic!("certificate rejected: {other:?}"),
+                    Verdict::Accept { .. } => println!("CHECKED"),
+                    _ => panic!("certificate rejected"),
                 }
             }
         }

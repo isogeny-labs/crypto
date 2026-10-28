@@ -93,8 +93,8 @@ fn main() {
             assert_eq!(certificate.statement, statement());
             assert_eq!(certificate.proof, Some(proof()));
             match check_with_extra(&certificate, Some((0x2026_1025_2305, 64))).unwrap() {
-                Verdict::Accept { .. } => println!("CHECKED\t{}", certificate.id),
-                other => panic!("certificate rejected: {other:?}"),
+                Verdict::Accept { .. } => println!("CHECKED"),
+                _ => panic!("certificate rejected"),
             }
         }
         _ => panic!("usage: weighted_proj_cover_identity issue | check CERTIFICATE.json"),
