@@ -230,3 +230,15 @@ endomorphism action on the eight7-kernels. Complete cold solving costs remain
 in the existing partial kernel card. Library validation has its own
 [explicit blocker](twist-root-validation-gap.md), separate from the verified
 scientific connection and the still-open solving-cost requirement.
+
+### 2026-10-28: the seven-torsion symmetry is independently verified
+
+[V11](../research/twist_routes_1_3_20261021/reports/kernel-symmetry-20261028/RESULTS.md)
+certifies the filed48-point/8-line prediction on the unchanged p827 module.
+Actual matrix[[3,1],[5,5]] mod7, eighth power3I, all49 images/2401 additions/
+eight kernel-root matches and full cycles pass independent native/PARI checks.
+Four finite companion-module Lean theorems pass; the concrete curve bridge
+remains open. Source scalar353 still has order274 in the separate823 group.
+The symmetry card's mathematical diagnostic is executed; its PR landing is
+pending. Explicit quotient-to-quotient maps and complete charged solver costs
+are separate follow-ups. No direct mixed-twist relation or IC/NIST speedup.

@@ -7,17 +7,18 @@
     "twist research continuation"
   ],
   "status": "blocked",
-  "status_note": "New proposed exact symmetry diagnostic, unimplemented/unrun/unfunded. The candidate cycles are predictions from the characteristic polynomial modulo7, not recorded outcomes. Need native/GP instruments, source/spec freeze and bounded sizing.",
+  "status_note": "Exact fixed diagnostic executed and independently verified in v11; PR2380 landing pending. Actual48/8 cycles confirmed; four finite-module Lean proofs pass. Concrete curve bridge and all induced-map/cost questions remain separate. No lease/funding.",
   "blocked_on": [
-    "problem:problems/twist-trace-constraint-and-solver-gap.md",
-    "note:Implement independent native/CAS instruments, freeze protocol/source/input and measure bounded sizing before execution."
+    "pr:2380 exact diagnostic result awaiting reviewed landing"
   ],
   "links": {
     "lead": "research/twist_routes_1_3_20261021/reports/endomorphism-20261027/RESULTS.md",
     "notes": [
       "research/twist_routes_1_3_20261021/execution-v8/ADMISSION.json",
       "research/twist_routes_1_3_20261021/execution-v9/ADMISSION.json",
-      "research/twist_routes_1_3_20261021/execution-v10/PROTOCOL.md"
+      "research/twist_routes_1_3_20261021/execution-v10/PROTOCOL.md",
+      "research/twist_routes_1_3_20261021/execution-v11/ADMISSION.json",
+      "research/twist_routes_1_3_20261021/execution-v11/PROTOCOL.md"
     ],
     "prs": [
       2380
@@ -31,7 +32,7 @@
   },
   "code": {
     "repo": "isogeny-labs/crypto",
-    "commit": null,
+    "commit": "ee305333dfb7c7acc19169794de12e6c6538a3be",
     "branch": "codex/twist-ic-routes-1-3-20261021",
     "build": []
   },
@@ -64,7 +65,7 @@
   "outputs": {
     "result_schema": "All49 point images, full nonzero orbit partition and eight-kernel permutation independently verified, with controls and conditional formal matrix lemmas when feasible. Report cycles as exact finite symmetry only. Any induced map/solver claim needs explicit maps and separately charged costs; no NIST transfer or whole-IC claim.",
     "verify": [],
-    "land": "research/twist_routes_1_3_20261021/future/XP-20261027-twist-endo-kernel-symmetry"
+    "land": "research/twist_routes_1_3_20261021/execution-v11"
   },
   "cairn": {
     "mode": "lab-task",

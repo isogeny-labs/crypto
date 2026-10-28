@@ -1,6 +1,14 @@
 # Test the endomorphism action on twist7-torsion and all eight kernels
 
-Status: **proposed, blocked, unimplemented and unrun**. No lease or funding.
+Status: **exact diagnostic executed and independently verified; PR landing
+pending**. The original proposal below is retained. No lease or funding.
+
+[Executed v11 report](../../research/twist_routes_1_3_20261021/reports/kernel-symmetry-20261028/RESULTS.md):
+matrix[[3,1],[5,5]] mod7, point order48/projective8, complete49-point action,
+2401 additions and all8 kernel-root matches pass native/PARI. Four finite
+companion-module Lean theorems pass fresh audit; concrete curve bridge open.
+The mathematical diagnostic is complete within the fixed toy module; induced
+quotient maps and all cost claims are separate unfinished work.
 
 Does the verified degree17 endomorphism induce the predicted48-point torsion cycle and8-line projective cycle on the same p827 fixture?
 

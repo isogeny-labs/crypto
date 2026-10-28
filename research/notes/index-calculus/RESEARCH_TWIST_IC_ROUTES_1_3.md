@@ -233,3 +233,15 @@ it has kernel17/image49. Its source scalar-action order is274. This is an
 explicit twist-derived generator connection by known endomorphism theory,
 with no claimed unknown-log, cheap folding, novelty or IC/NIST speed advantage.
 Three conditional Lean lemmas pass; concrete formal bridges and costs stay open.
+
+### 2026-10-28 — exact action cycles through all eight kernels
+
+[Executed v11](../../twist_routes_1_3_20261021/reports/kernel-symmetry-20261028/RESULTS.md)
+independently recovers matrix[[3,1],[5,5]] overF7 from actual degree17 map
+evaluations on the unchanged archived twist seven-torsion basis. All49 images,
+2401 sums and eight direct kernel-root matches agree in native Rust/PARI.
+The48 nonzero points form one cycle; the eight lines form the cycle
+0→4→7→5→2→3→1→6→0. The eighth power is scalar3 on this module.
+Four finite companion-module Lean theorems pass fresh audit; concrete curve
+bridges remain open. This is exact finite symmetry; induced quotient maps
+and charged relation-solving benefit remain unmeasured. No performance row moves.
