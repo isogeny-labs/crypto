@@ -1,5 +1,14 @@
 # Original-scope coverage and remaining work
 
+Source `0f55f1c333449d4c85f04448da16fbfec15249cb` adds the merged upstream
+library, exact large-prime feature-domain binding and final lab-receipt
+publication fallback. It passed **5,067 full-library tests, zero failures,
+123 ignored**, including 74 dataset tests. Its separate 360-endpoint check,
+strict Rust 1.98 maintained Clippy, scoped formatting, release build, all eleven
+CLI help paths, host preflight and non-root read-only container preflight passed.
+Validation is retained separately in `validation-0f55f1c`; this is software
+evidence, with zero verified cloud dataset cells.
+
 This is an implementation handoff, not a completed-corpus certificate. Read the
 committed validation manifests, frozen campaign plan, per-cell outcomes and S3
 receipts for executed coverage. Source `f0863aefd6e1a416929f8acc02283d46f9c69936`
