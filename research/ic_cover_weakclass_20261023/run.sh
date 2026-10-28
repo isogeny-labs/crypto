@@ -13,7 +13,7 @@ RAW=$OUT/raw
 now() { date +%s; }
 spent() { awk '{s+=$NF} END{print s+0}' "$RAW/walls.txt" 2>/dev/null; }
 cell() { # p seed arm rho_runs
-  local p=$1 s=$2 arm=$3 rr=$4 f="$RAW/p${p}_s${s}_${3}"
+  local p=$1 s=$2 arm=$3 rr=$4; local f="$RAW/p${p}_s${s}_${arm}"
   [ -s "$f.json" ] && return 0
   if [ "$(spent)" -ge "$CAP" ]; then echo "CAP reached before p=$p seed=$s arm=$arm" >> "$RAW/notrun.txt"; return 1; fi
   local stop=() envs=(RAYON_NUM_THREADS=1)
