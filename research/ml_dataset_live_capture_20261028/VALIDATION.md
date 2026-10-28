@@ -2,12 +2,13 @@
 
 The tested runtime source is `ae0683c2edeee9066d696af9d0ca3e41ad9c4a24`.
 Rust 1.98.0 release compilation, strict Clippy, scoped formatting and the
-affected library/CLI tests pass. The broad library run and its retry are
-recorded separately below; this record does not claim a clean full-suite run.
+library/CLI tests pass. The final full library run passed **5,122 tests with
+zero failures and 123 ignored**. Earlier failures remain recorded below.
 
 | Check on ae0683c | Result |
 |---|---|
 | Release library, crypto binary and two integration-test builds | Pass |
+| Full library on a fixed copy of the ae0683c test executable | 5,122 passed, 0 failed, 123 ignored |
 | Dataset library | 116 passed, 0 failed, 1 ignored |
 | Store library | 46 passed, 0 failed |
 | Dataset CLI processes | 7 passed, 0 failed |
@@ -32,9 +33,19 @@ The first complete release library run, on implementation source
 `cryptanalysis::wdsat_oracle::tests::mock_child_exit_and_empty_output_are_not_refutations`
 test exceeded its 2,000 ms child timeout on the shared host. An immediate
 isolated rerun of the same binary passed in 0.06 s. No unrelated test was changed
-or disabled. A full retry with `RAYON_NUM_THREADS=4` and `--test-threads=1` is
-still running at this record's publication; its completion is not inferred
-from the isolated pass.
+or disabled. A full retry with `RAYON_NUM_THREADS=4` and `--test-threads=1`
+finished with 5,119 passed, 3 failed and 123 ignored. The three failures were
+ENOENT errors when existing tests spawned `std::env::current_exe()` after a
+concurrent Cargo build replaced the running executable. The WDSAT test passed
+in that retry.
+
+The final ae0683c test executable was copied to a fixed path outside Cargo's
+output directory, with SHA-256
+`a8aa98c49fdac3d42a24e0a0ddfb38b413ababda23744897b6249289d34823b6`.
+All three subprocess tests passed individually against that copy. Its full
+run, with `RAYON_NUM_THREADS=16` and `--test-threads=1`, then passed all 5,122
+non-ignored tests in 1,346.07 seconds. This is validation duration on a shared
+host, not a performance measurement. No test was removed or weakened.
 
 Since c87174c, runtime source changed only by expressing the snapshot-chain
 predecessor check as a guarded match for Clippy. The additional changes are CLI
@@ -59,6 +70,19 @@ check and byte comparison at **2026-10-28T10:47:37Z**. Its SHA-256 is
 `c484c30d6dae5ce391321deaf29c77c8d3743a9779ebc1664a4063ed60d05b30`.
 This software transfer used the controller's existing credentials; it does not
 prove the dataset worker's S3 permission or cloud interruption recovery.
+
+The separate final validation archive preserves all three broad-run logs,
+the isolated reruns, final focused checks and source/binary hashes:
+
+```text
+s3://setec-astronomy-artifacts/ml-dataset/20261028/software/live-artifacts/93cc8928f1eece8106c8db993a56ca1580d446213b0ecc0a7b5667c32e29fc51/final-validation.tar.gz
+```
+
+Its SHA-256 is
+`93cc8928f1eece8106c8db993a56ca1580d446213b0ecc0a7b5667c32e29fc51`.
+The earlier software archive retains its original, accurately timestamped
+pending-run status. See `validation-final-ae0683c.json` and
+`validation-final-archive.json` for the terminal result and readback receipt.
 
 ## Integration and deployment limits
 
