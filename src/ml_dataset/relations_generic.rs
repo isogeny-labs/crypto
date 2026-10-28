@@ -1025,7 +1025,7 @@ struct BatchBinding {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "status", rename_all = "snake_case", deny_unknown_fields)]
 enum BatchTerminal {
-    Completed { legacy_batch: Batch },
+    Completed { legacy_batch: Box<Batch> },
     Censored { stop: FilterStop },
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -1044,8 +1044,56 @@ impl TracedBatch {
         }
     }
     fn payload(&self) -> Result<ArtifactPayload, String> {
-        ArtifactPayload::json(&filter_path(self.binding.batch_index), FILTER_ROLE, self)
+        bounded_json_payload(
+            &filter_path(self.binding.batch_index),
+            FILTER_ROLE,
+            self,
+            super::super::JSON_INPUT_MAX_BYTES,
+        )
     }
+}
+fn bounded_json_payload<T: Serialize>(
+    path: &str,
+    role: &str,
+    value: &T,
+    max_bytes: u64,
+) -> Result<ArtifactPayload, String> {
+    use std::io::{self, Write};
+    struct Limited {
+        bytes: Vec<u8>,
+        limit: usize,
+    }
+    impl Write for Limited {
+        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+            if bytes.len() > self.limit.saturating_sub(self.bytes.len()) {
+                return Err(io::Error::other(
+                    "generic filter payload exceeds existing JSON reader limit",
+                ));
+            }
+            self.bytes.extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+    let limit = usize::try_from(max_bytes)
+        .map_err(|_| "generic filter payload cap exceeds usize")?
+        .checked_sub(1)
+        .ok_or("generic filter payload cap omits newline")?;
+    let mut output = Limited {
+        bytes: Vec::new(),
+        limit,
+    };
+    serde_json::to_writer(&mut output, value)
+        .map_err(|e| format!("serialize bounded generic filter payload: {e}"))?;
+    output.bytes.push(b'\n');
+    Ok(ArtifactPayload {
+        path: path.into(),
+        role: role.into(),
+        encoding: "json".into(),
+        bytes: output.bytes,
+    })
 }
 fn filter_path(index: usize) -> String {
     format!("generic-large-prime-filter-batch-{index:04}.json")
@@ -1160,7 +1208,9 @@ fn traced_batch(
         if legacy_batch.completed != run.rows || legacy_batch.report != run.report {
             return Err("complete traced filter differs from legacy result/report".into());
         }
-        BatchTerminal::Completed { legacy_batch }
+        BatchTerminal::Completed {
+            legacy_batch: Box::new(legacy_batch),
+        }
     } else {
         BatchTerminal::Censored { stop: run.stop }
     };
@@ -1395,10 +1445,11 @@ fn solve_v2(
         &transcript,
         policy,
     )?;
-    let artifact = ArtifactPayload::json(
+    let artifact = bounded_json_payload(
         "generic-large-prime-transcript.json",
         "large-prime-elimination-transcript",
         &transcript,
+        super::super::JSON_INPUT_MAX_BYTES,
     )?;
     super::super::solvers::live_payload(&artifact)?;
     let outcome = outcome_v2(&transcript);
@@ -1521,7 +1572,7 @@ fn verify_v2(
                         r,
                         &t.limits,
                     )?;
-                    if *legacy_batch != expected
+                    if **legacy_batch != expected
                         || b.native.rows != expected.completed
                         || b.native.report != expected.report
                     {
@@ -1722,6 +1773,46 @@ mod trace_integration_tests {
             policy.bytes = bytes;
         }
         panic!("byte fixture decimal-width fixed point did not converge")
+    }
+    #[test]
+    fn new_trace_payloads_fit_the_existing_reader_and_reject_oversized_output() {
+        let payload = json!({"native":{"row":[1,2,3],"source":"x".repeat(128)}});
+        let mut expected = serde_json::to_vec(&payload).unwrap();
+        expected.push(b'\n');
+        let cap = expected.len() as u64;
+        assert!(bounded_json_payload("batch.json", FILTER_ROLE, &payload, cap - 1).is_err());
+        let actual = bounded_json_payload("batch.json", FILTER_ROLE, &payload, cap).unwrap();
+        assert_eq!(actual.bytes, expected);
+        assert_eq!(actual.encoding, "json");
+        assert_eq!(
+            serde_json::from_slice::<Value>(&actual.bytes).unwrap(),
+            payload
+        );
+        assert!(bounded_json_payload("batch.json", FILTER_ROLE, &payload, 0).is_err());
+        // Exactly the shared reader ceiling, including quotes and newline.
+        let ceiling = crate::ml_dataset::JSON_INPUT_MAX_BYTES;
+        let large = "x".repeat(ceiling as usize - 3);
+        let exact = bounded_json_payload("exact.json", FILTER_ROLE, &large, ceiling).unwrap();
+        assert_eq!(exact.bytes.len() as u64, ceiling);
+        let dir = std::env::temp_dir().join(format!(
+            "generic-filter-reader-{}-{}",
+            std::process::id(),
+            crate::ml_dataset::unix_nanos().unwrap()
+        ));
+        std::fs::create_dir(&dir).unwrap();
+        std::fs::write(dir.join("exact.json"), &exact.bytes).unwrap();
+        let read: String = crate::ml_dataset::read_json(&dir.join("exact.json")).unwrap();
+        assert_eq!(read, large);
+        let too_large = format!("{large}x");
+        assert!(bounded_json_payload("oversized.json", FILTER_ROLE, &too_large, ceiling).is_err());
+        // Serialization rejection cannot alter an already acknowledged prefix.
+        std::fs::write(dir.join("prefix.jsonl"), b"{\"acknowledged\":true}\n").unwrap();
+        assert!(bounded_json_payload("oversized.json", FILTER_ROLE, &too_large, ceiling).is_err());
+        assert_eq!(
+            std::fs::read(dir.join("prefix.jsonl")).unwrap(),
+            b"{\"acknowledged\":true}\n"
+        );
+        std::fs::remove_dir_all(dir).unwrap();
     }
     #[test]
     fn generic_v2_native_certificates_preserve_legacy_recovery_and_cover_domains() {

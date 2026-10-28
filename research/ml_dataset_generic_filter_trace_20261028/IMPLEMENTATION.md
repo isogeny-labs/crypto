@@ -30,3 +30,12 @@ the changed Begin and solve its small decimal-width fixed point. One retains
 exactly the pre-Finish prefix; the cumulative-byte fixture exhausts exactly one
 full batch. Production admission behavior was unchanged. Original failure log
 is retained externally in generic-filter-trace-validation/dataset-first.log.
+
+First strict lint at 89f0ed80647 reported only large_enum_variant for completed
+batch storage (240 bytes vs one-byte stop). Boxed the completed batch field;
+JSON schema and values stay unchanged. Also addressed the statically identified
+32MiB reader limit using bounded compact serialization for new v2 transcript
+and batch payloads, with exact/one-byte-below/zero-cap software tests and an
+actual 32MiB read_json boundary check. This prevents a producer-success artifact
+that the unchanged reader cannot admit. Initial lint diagnostics remain in
+clippy-first.log. Final rebuild pending.

@@ -143,3 +143,14 @@ Design commit precedes implementation. No Cargo invocation until root grants
 the centralized slot. Native 52ded7 full gate remains root-owned and may still
 be running; this work does not modify it. Original USD100–200 total, maximum
 USD200, existing jobs/owners and original deadlines remain unchanged.
+
+## Existing-reader ceiling clarification (before final validation)
+
+The first source review confirmed the shared JSON reader ceiling is 32MiB.
+Pretty JSON can exceed that ceiling even when compact native events respect
+16MiB. New v2 transcript and batch payloads therefore serialize compactly through
+a writer bounded by the existing 32MiB ceiling, including the final newline.
+Exceeding that outer serialization ceiling returns a worker error and retains
+already acknowledged live prefixes; it does not create a successful seal,
+raise any capture/reader cap, or assert a native mathematical stop. The separate
+native trace caps still produce typed censored batches as designed above.
