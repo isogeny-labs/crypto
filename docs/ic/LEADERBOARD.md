@@ -15,6 +15,7 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-09-23 | [Control: rho given the IC arm's orbit naming](https://github.com/aburan28/crypto/blob/main/research/ic_triple_counted_20260923/RESULTS.md) | 1.19× | matched | source-specific; see result |
 | 2026-09-28 | [Tournament round 0024, matched rho, best cell n17a1](https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md) | 0.609× | matched | source-specific; see result |
 | 2026-09-29 | [Tournament round 0025, lean rho, best cell n19a0](https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md) | 1.36× | matched | source-specific; see result |
+| 2026-10-28 | [Native tournament round 0026, batch16, best cell icv1-f2m19-t797-b6cf2467](https://github.com/isogeny-labs/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0026/REPORT.md) | 10.7× | matched | Valgrind Ir |
 | 2026-10-01 | [Koblitz descent, one target cold, best size 2^38.0](https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#koblitz-descent-20260930) | 2× | matched | source-specific; see result |
 | 2026-10-01 | [Orbit-disjoint cold CPU panel, closest cell n41/L1,024](https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#disjoint-cold-v2-outcome-20261001) | 1.31× | matched | isolated CPU time |
 | 2026-10-03 | [ecbench baseline, every candidate: best cell icv1-f2m17-tm101-00378d4e (r = 2^16)](https://github.com/aburan28/crypto/blob/main/research/ecbench_all_candidates_20261003/README.md) | 4.3× | matched | S |
@@ -23,7 +24,6 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-07 | [Rule v3: the Koblitz descent at baseline v3, one target cold, closest size 2^36.6](https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v3/README.md) | 5.23× | matched | source-specific; see result |
 | 2026-10-15 | [Frobenius-orbit IC, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)](https://github.com/aburan28/crypto/blob/main/research/ecbench_frobenius_orbit_vs_rho_20261014/README.md) | 1.57× | matched | S |
 | 2026-10-15 | [Joux-Vitse (n - 1)-decomposition at n = 5, E(F_{p^5}), complete DLP at p = 31 (ell = 2^24.8), F4 trace replay](https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md) | 68,183,174× | matched | F_p multiplications |
-| 2026-10-20 | [k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)](https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md) | 1,236,267× | matched | F_p multiplications |
 | 2026-10-16 | [n83 K1120 five-point cold factor-base holdout, selected ID null](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_holdout_20261016/RESULT.md) | 55.4× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
 | 2026-10-17 | [Volcano projected-base control/pilot; best bounded IC cell](https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json) | 19.2× | matched | quotient of incomplete cold GAE lower bounds; diagnostic |
 | 2026-10-18 | [Lazy orbit-member index, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)](https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf) | 1.27× | matched | S |
@@ -31,6 +31,56 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-21 | [Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md) | 14.4× | matched | source-specific; see result |
 | 2026-10-27 | [Residual collector res2 vs rho.negation, one target cold, best cell icv1-fp36-t454193-44a20818 (r = 2^36.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_exhaustive_20261026/README.md) | 2.59× | matched | S |
 | 2026-10-17 | [n83 K1107/root11 sixteen-point cold factor-base frontier](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md) | 47.1× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
+| 2026-10-20 | [k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)](https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md) | 1,236,267× | matched | F_p multiplications |
+
+## Native candidate tournament, round 0026 (separate Ir unit)
+
+[Frozen per-cell data](../../research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json) and [full result](../../research/ic_candidate_tournament_20260915/runs/round-0026/REPORT.md) retain all arms and the exact ICV1 curve identities. One target is charged cold per job. The selected `batch16` configuration improves the incumbent, but its matched worker rho is still cheaper on every curve; this rho is not qualified as globally strongest. The factor base was fixed within each paired arm, so this panel does not choose a new base. `2^x Ir` is guest instructions, with no measured curve-addition conversion. The rank floor is the deliberately weak `Ir >= K`; no scaling exponent was promoted.
+
+| ICV1 curve | Signed base B | Was: incumbent | batch16 | S (Ir/√r) | IC/incumbent | IC/rho (1.0× parity) |
+|:--|--:|--:|--:|--:|--:|--:|
+| `icv1-f2m13-t181-515ee569` | 182 | 2^24.80 Ir | 2^23.89 Ir | 346,476 | 0.532× | 10.990× |
+| `icv1-f2m17-tm101-00378d4e` | 272 | 2^25.24 Ir | 2^24.55 Ir | 95,974 | 0.620× | 14.577× |
+| `icv1-f2m19-t797-b6cf2467` | 304 | 2^25.46 Ir | 2^24.86 Ir | 83,887 | 0.658× | 10.658× |
+| `icv1-f2m19-tm797-9c54981b` | 304 | 2^25.46 Ir | 2^24.85 Ir | 59,029 | 0.657× | 10.967× |
+| `icv1-f2m23-t5197-69e76b73` | 368 | 2^25.73 Ir | 2^25.21 Ir | 26,803 | 0.696× | 10.853× |
+
+All smoke recipes in the same Ir unit, each with 12 verified jobs; the ratios below are descriptive ratios of per-cell mean Ir:
+
+| ICV1 curve | Arm | 2^x Ir | IC/incumbent | IC/rho |
+|:--|:--|--:|--:|--:|
+| `icv1-f2m13-t181-515ee569` | `batch128` | 2^25.47 Ir | 1.589× | 33.196× |
+| `icv1-f2m13-t181-515ee569` | `batch16` | 2^23.89 Ir | 0.532× | 11.113× |
+| `icv1-f2m13-t181-515ee569` | `batch32` | 2^24.27 Ir | 0.693× | 14.468× |
+| `icv1-f2m13-t181-515ee569` | `dense` | 2^24.78 Ir | 0.980× | 20.475× |
+| `icv1-f2m13-t181-515ee569` | `excess8` | 2^24.80 Ir | 0.995× | 20.788× |
+| `icv1-f2m13-t181-515ee569` | `incumbent` | 2^24.80 Ir | 1.000× | 20.892× |
+| `icv1-f2m13-t181-515ee569` | `rho` | 2^20.42 Ir | 0.048× | 1.000× |
+| `icv1-f2m13-t181-515ee569` | `window8` | 2^24.69 Ir | 0.921× | 19.249× |
+| `icv1-f2m17-tm101-00378d4e` | `batch128` | 2^25.82 Ir | 1.498× | 34.782× |
+| `icv1-f2m17-tm101-00378d4e` | `batch16` | 2^24.55 Ir | 0.621× | 14.423× |
+| `icv1-f2m17-tm101-00378d4e` | `batch32` | 2^24.81 Ir | 0.747× | 17.341× |
+| `icv1-f2m17-tm101-00378d4e` | `dense` | 2^25.21 Ir | 0.984× | 22.848× |
+| `icv1-f2m17-tm101-00378d4e` | `excess8` | 2^25.23 Ir | 0.996× | 23.120× |
+| `icv1-f2m17-tm101-00378d4e` | `incumbent` | 2^25.23 Ir | 1.000× | 23.217× |
+| `icv1-f2m17-tm101-00378d4e` | `rho` | 2^20.70 Ir | 0.043× | 1.000× |
+| `icv1-f2m17-tm101-00378d4e` | `window8` | 2^25.14 Ir | 0.939× | 21.809× |
+| `icv1-f2m19-t797-b6cf2467` | `batch128` | 2^26.01 Ir | 1.464× | 22.752× |
+| `icv1-f2m19-t797-b6cf2467` | `batch16` | 2^24.83 Ir | 0.647× | 10.050× |
+| `icv1-f2m19-t797-b6cf2467` | `batch32` | 2^25.07 Ir | 0.762× | 11.845× |
+| `icv1-f2m19-t797-b6cf2467` | `dense` | 2^25.44 Ir | 0.987× | 15.339× |
+| `icv1-f2m19-t797-b6cf2467` | `excess8` | 2^25.45 Ir | 0.996× | 15.484× |
+| `icv1-f2m19-t797-b6cf2467` | `incumbent` | 2^25.46 Ir | 1.000× | 15.543× |
+| `icv1-f2m19-t797-b6cf2467` | `rho` | 2^21.50 Ir | 0.064× | 1.000× |
+| `icv1-f2m19-t797-b6cf2467` | `window8` | 2^25.31 Ir | 0.901× | 14.009× |
+| `icv1-f2m23-t5197-69e76b73` | `batch128` | 2^26.20 Ir | 1.384× | 22.485× |
+| `icv1-f2m23-t5197-69e76b73` | `batch16` | 2^25.21 Ir | 0.695× | 11.296× |
+| `icv1-f2m23-t5197-69e76b73` | `batch32` | 2^25.41 Ir | 0.799× | 12.971× |
+| `icv1-f2m23-t5197-69e76b73` | `dense` | 2^25.71 Ir | 0.985× | 15.996× |
+| `icv1-f2m23-t5197-69e76b73` | `excess8` | 2^25.72 Ir | 0.993× | 16.124× |
+| `icv1-f2m23-t5197-69e76b73` | `incumbent` | 2^25.73 Ir | 1.000× | 16.243× |
+| `icv1-f2m23-t5197-69e76b73` | `rho` | 2^21.71 Ir | 0.062× | 1.000× |
+| `icv1-f2m23-t5197-69e76b73` | `window8` | 2^25.19 Ir | 0.688× | 11.182× |
 
 ## Frontier audit and subsequent corrections (implementation result 2026-10-14)
 
@@ -684,7 +734,8 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `56c31e8fafbad00a…`
+- `docs/ic/progress-timeline.json` — sha256 `e9b7c4bd525481e9…`
+- `research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json` — sha256 `0a2b51a5051bd518…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
@@ -753,7 +804,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `e7e8cd2ce2570e6e…`
+- `docs/curves/registry.json` — sha256 `dd2e0fa237241c2f…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
