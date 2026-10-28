@@ -27,6 +27,6 @@ rc=$?
 set -e
 printf '%s\n' "$rc" > "$base/exit.txt"
 date -u +%FT%TZ > "$base/finished-utc.txt"
-tar -cJf "$here/checkpoint-evidence.tar.xz" -C "$here" runs
+tar -cJf "$here/checkpoint-live.tar.xz" -C "$here" runs
 if [ "$rc" != 0 ] || rg -q '^ *\?' "$base/native.log" || ! rg -qx "$marker" "$base/native.log";then echo "FAIL $attempt native=$rc";exit 1;fi
 echo "PASS $attempt"

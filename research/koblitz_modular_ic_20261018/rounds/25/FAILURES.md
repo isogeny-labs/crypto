@@ -12,3 +12,8 @@ residuals are n^2+n,l^2+l, not composed images. Source residual/unit/kernel
 invariance, the generic nu equation and both quotient coordinate certificates
 all give zero, but this run is not accepted. Correct to distinct image/twice
 names before the fresh positive attempt. Preserve the failed script/log.
+
+The first6.3KiB checkpoint transport snapshot was accidentally staged with
+source. Preserve its exact committed bytes and history. Subsequent mutable
+transport uses checkpoint-live.tar.xz, untracked and explicitly unignored for
+the checkpoint helper; never overwrite the committed initial snapshot.
