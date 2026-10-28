@@ -1,5 +1,12 @@
 # E12 continuation launch record
 
+**E12b update, October 27 Pacific:** the user selected one new Spot attempt.
+Amendment 15 permits `launch.sh b-spot`: cell `3:24:7`, four draws, cap 4,
+`m7i.4xlarge` (16 vCPU / 64 GiB), 24-hour lifetime. Source and gates remain
+frozen. The post-run checker requires four complete draws and exact draw-0
+agreement with the r2 reference after removing only `secs` fields. One attempt
+only; no automatic relaunch. Receipts will be under `receipts/b-spot/`.
+
 [Live-launch snapshot and handoff](STATUS.md): E12a and E12c were admitted on
 2026-10-28 UTC, with startup source checks verified. E12b remains unlaunched.
 These are launch observations, not completed scientific results.
