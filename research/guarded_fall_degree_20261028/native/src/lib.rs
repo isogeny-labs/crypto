@@ -5,6 +5,9 @@
 //! polynomials. A successful replay proves an ideal identity over Z/pZ. A field
 //! last-fall-degree interpretation additionally requires that p is prime.
 
+pub mod bigprime;
+pub mod large_curves;
+
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
