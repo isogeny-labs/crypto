@@ -505,3 +505,10 @@ separable quintic the actual weighted-Proj point stalk is a DVR. Its
 [gate CSV](smooth-point-dvr.csv) leave the scheme-theoretic `Smooth`
 equivalence, global Pic⁰ transport, characteristic-two norm-order allocation,
 and compiled Rust semantics open. No target or cost row changes.
+
+The [global divisor/Pic⁰ gap inventory](GLOBAL_PIC0_GAP.md) identifies the
+first missing construction after these local results: a function-field
+element and its finite principal divisor on all closed points of the actual
+curve. Its [PDF](GLOBAL_PIC0_GAP.pdf), [dependency graph](global-pic0-gap.svg),
+and [gate CSV](global-pic0-gap.csv) distinguish nine previously checked
+declarations from four open construction gates. It adds no theorem or cost row.
