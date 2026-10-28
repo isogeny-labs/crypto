@@ -374,6 +374,71 @@ fn endo_export() -> Result<()> {
     e["producer"]["session"] = json!("twist-endo-symmetry-20261027");
     write(v.join("experiment.export.json"), &e)
 }
+fn symmetry_export() -> Result<()> {
+    let v = Path::new(S).join("execution-v11");
+    let p = read(v.join("protocol.json"))?;
+    let f = read(v.join("FROZEN.json"))?;
+    let a = read(v.join("ADMISSION.json"))?;
+    assert_eq!(
+        a["status"],
+        "native-and-independent-PARI-kernel-symmetry-verified"
+    );
+    let h = read(v.join("HOST.json"))?;
+    let transport = read(v.join("runs/producer-transport.json"))?;
+    assert_eq!(transport["exit_code"], 0);
+    assert_eq!(transport["binary_sha256"], f["binary"]["sha256"]);
+    let mut e = read(Path::new(S).join("execution-v10/experiment.export.json"))?;
+    e["export_id"] = json!("twist-kernel-symmetry-20261028-v1");
+    e["created"] = transport["finished"].clone();
+    e["protocol"] = json!({"path":"protocol.json","sha256":p["freeze"]["protocol_sha256"],"protocol_id":p["protocol_id"],"version":p["version"]});
+    e["source"]["commit"] = f["source_revision"].clone();
+    e["host"] = json!({"path":"HOST.json","sha256":sha(v.join("HOST.json"))?,"class_id":null,"summary":h["summary"]});
+    e["arms"]=json!(p["arms"].as_array().unwrap().iter().map(|a|json!({"id":a["id"],"role":a["role"],"binary_sha256":a["instrument"]["binary_sha256"],"commit":a["instrument"]["commit"]})).collect::<Vec<_>>());
+    let artifacts = vec![
+        file(&v.join("runs.tar.xz"), &v, "raw")?,
+        file(&v.join("RAW_MEMBERS.json"), &v, "receipt")?,
+        file(&v.join("ADMISSION.json"), &v, "receipt")?,
+        file(&v.join("runs/pari-v1/RECEIPT.json"), &v, "receipt")?,
+    ];
+    let mut runs = e["runs"].as_array().unwrap().clone();
+    assert_eq!(runs.len(), 2);
+    for (i, r) in runs.iter_mut().enumerate() {
+        r["run_id"] = json!(format!(
+            "symmetry-{}-000",
+            if i == 0 { "native" } else { "pari" }
+        ));
+        r["instance_id"] = json!("p827-archived-twist-seven-torsion");
+        r["worker"] = p["arms"][i]["instrument"]["binary_sha256"].clone();
+        r["artifacts"] = json!(artifacts);
+        r["measurements"]["counted"] = json!({"point_checks":a["point_checks"]});
+        r["measurements"]["counters"] = json!({"addition_checks":a["addition_checks"],"kernel_checks":a["kernel_checks"],"point_order":a["point_order"],"projective_order":a["projective_order"],"corrupt_matrix_rejections":a["corrupt_matrix_rejections"],"corrupt_line_rejections":a["corrupt_line_rejections"]});
+        r["verification"] = json!({"status":"verified","verifier":"Native direct map and independent PARI ellisogeny/group/matrix/orbit/root-set replay"});
+        r["backend_ref"] = json!(if i == 0 {
+            "runs/symmetry-v1"
+        } else {
+            "runs/pari-v1"
+        });
+        r["started_at"] = if i == 0 {
+            transport["started"].clone()
+        } else {
+            Value::Null
+        };
+        r["finished_at"] = if i == 0 {
+            transport["finished"].clone()
+        } else {
+            Value::Null
+        };
+    }
+    e["runs"] = json!(runs);
+    e["analysis"] = json!({"script":file(&Path::new(S).join("runner/src/kernel_symmetry_20261028.rs"),&v,"analysis")?,"blinded":false,"blinding_key_sha256":null,"outputs":[file(&v.join("ADMISSION.json"),&v,"analysis")?],"unmasked_at":null});
+    e["files"] = json!([
+        file(&v.join("FROZEN.json"), &v, "receipt")?,
+        file(&v.join("protocol.json"), &v, "protocol")?
+    ]);
+    e["notes"] = json!([{"kind":"observation","text":"Exact fixed archived seven-torsion module and eight kernels; complete action/cycles and controls. No performance, novelty, unknown-log or NIST claim. Shared author/host independent CAS implementation, no separate-runner review.","by":"native publication tool"}]);
+    e["producer"]["session"] = json!("twist-kernel-symmetry-20261028");
+    write(v.join("experiment.export.json"), &e)
+}
 fn main() -> Result<()> {
     let a: Vec<_> = std::env::args().skip(1).collect();
     match a.first().map(String::as_str) {
@@ -383,6 +448,7 @@ fn main() -> Result<()> {
         Some("models") => models(),
         Some("endo-models") => endo_models(),
         Some("endo-export") => endo_export(),
+        Some("symmetry-export") => symmetry_export(),
         _ => Err("admit|export-original|export|models".into()),
     }
 }

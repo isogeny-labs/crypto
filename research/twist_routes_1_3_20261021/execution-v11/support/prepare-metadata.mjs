@@ -1,0 +1,66 @@
+// Operational source/protocol/host metadata only. No research calculation.
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import {spawn} from 'node:child_process';
+const s='research/twist_routes_1_3_20261021',v=s+'/execution-v11';
+const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+const put=(p,x)=>fs.writeFileSync(p,JSON.stringify(x,null,2)+'\n',{flag:'wx'});
+async function run(cmd,args){const c=spawn(cmd,args);let out='',err='';c.stdout.on('data',x=>out+=x);c.stderr.on('data',x=>err+=x);const n=await new Promise((r,j)=>{c.on('error',j);c.on('close',r)});if(n)throw Error(err);return out.trim();}
+const mode=process.argv[2];
+if(mode==='draft'){
+ const p=JSON.parse(fs.readFileSync(s+'/execution-v10/protocol.json'));
+ p.protocol_id='twist-kernel-symmetry-v1';p.created='2026-10-28';p.study_dir=v;p.freeze={status:'draft',protocol_sha256:null,commit:null,frozen_at:null,filed_before_affected_data:false};
+ p.question='What is the exact certified endomorphism action on all49 archived twist7-torsion points and eight kernel lines?';
+ p.claims=[{id:'finite-action',text:'Exact matrix, complete point/line permutations and direct kernel-root matches are independently verified.',class:'exact_computation',decided_by:['exact-check']},{id:'prediction',text:'Filed predictions are point order48 and projective order8; mismatches remain valid outcomes.',class:'heuristic_estimate',decided_by:[]},{id:'scope',text:'No novelty, degree1 automorphism, unknown-log, performance or NIST claim.',class:'out_of_scope',decided_by:[]}];
+ p.arms[0].description='Native embedded-map evaluation, complete finite module/kernels and corrupt controls.';
+ p.arms[0].instrument.commit='0'.repeat(40);p.arms[0].instrument.binary_sha256='0'.repeat(64);p.arms[0].instrument.build[0][p.arms[0].instrument.build[0].length-1]='twist-kernel-symmetry';
+ p.arms[1].description='Independent GP ellisogeny, rational twist evaluation, group labeling and complete cycles.';p.arms[1].instrument.commit='0'.repeat(40);
+ p.controls.positive.not_applicable_reason='Embedded identity,scalar2I and companion matrices through the same finite-order/orbit instrument; no separate statistical arm.';
+ p.controls.negative.not_applicable_reason='Embedded corrupt actual matrix and swapped kernel-image controls; no separate measured null population.';
+ p.variable_ledger.independent=[{name:'finite input group',levels:['complete twist seven-torsion','eight archived kernel lines']}];
+ p.variable_ledger.factors.find(x=>x.name==='inputs').value='Unchanged v8 basis/all49 torsion points/eight kernels and v10 degree17 map; frozen byte hashes.';
+ p.variable_ledger.factors.find(x=>x.name==='inputs').how='Complete direct point/kernel comparisons; no selected inputs or source-group scalar logs.';
+ p.variable_ledger.factors.find(x=>x.name==='instrument').value='Native byte-preserved v8 core and new finite module checker, independent GP ellisogeny.';
+ p.variable_ledger.comparisons[0].threshold='All49 direct point images,2401 sums,eight root-set matches and full point/line permutations agree; all controls detected.';
+ p.randomization.seed_derivation.note='Deterministic complete finite sets; zero seed is metadata only.';
+ p.randomization.instance_sampling.rule='Exactly the archived basis and kernels; hypothesis motivated by v10 before this wave.';
+ p.sample_size.preflight_runtime.estimated_total_seconds=900;
+ p.sample_size.preflight_runtime.measured_on='Two unmeasured prospective300s exact runs plus300s metadata allowance; known finite controls are development tests. No observed cost or timing claim.';
+ p.metrics.primary=[{id:'torsion-points',name:'Direct seven-torsion image checks',unit:'points',kind:'exact',definition:'All49 points including identity evaluated directly and compared with recovered matrix.',source:'ADMISSION.json point_checks',aggregation:'per_row',uncertainty:'none_exact'}];
+ p.measurement.counters=['point checks','addition checks','kernel checks','point order','projective order','corrupt controls'];
+ p.execution.timeout_seconds=900;
+ p.stopping_rules[0].rule='One fixed archived module/map; complete point/kernel census and controls. Preserve failures/caps and any48/8 prediction mismatch.';
+ p.decision_rule.text='Certify the actual finite action and record whether the filed prediction holds; no performance inference.';
+ p.decision_rule.statistic='Exact finite matrix/point/root-set equality and cycle enumeration.';
+ p.decision_rule.effect_size_measure='Exact finite action only.';
+ p.analysis_plan.script={path:s+'/runner/src/kernel_symmetry_20261028.rs',sha256:sha(s+'/runner/src/kernel_symmetry_20261028.rs')};
+ p.analysis_plan.inputs=['archived v8 torsion basis/points/eight kernels','v10 admitted degree17 map','actual native/GP outputs and receipt hashes'];
+ p.reporting.graphs=['Recorded point/projective orders and complete eight-kernel cycle.'];p.reporting.report_dir=s+'/reports/kernel-symmetry-20261028';
+ p.literature=[{ref:v+'/PROTOCOL.md',provenance:'internal',claim:'Primary MIT18.783 Lecture5/13 and repository known-isogeny-loop/GLV atlas reviewed before implementation.',verified_by:'Both primary PDFs accessed and relevant theorem passages read on2026-10-28.'}];
+ put(v+'/protocol.json',p);
+ const cpu=await run('lscpu',[]),kernel=await run('uname',['-a']);
+ const model=cpu.match(/^Model name:\s+(.+)$/m)?.[1];
+ put(v+'/HOST.json',{schema:'twist.host/v1',created:new Date().toISOString(),summary:{cpu_model:model,logical_cpus:Number(cpu.match(/^CPU\(s\):\s+(\d+)/m)?.[1]),kernel,hypervisor:cpu.match(/^Hypervisor vendor:\s+(.+)/m)?.[1],isolation_tier_max:'L0'},lscpu:cpu,kernel,isolation:'L0',wall_time_admitted:false});
+ const old=fs.readFileSync(s+'/runner/src/bin/twist-kernel-relations.rs','utf8').split('fn produce(')[0];
+ const actual=fs.readFileSync(s+'/runner/src/bin/twist-kernel-symmetry.rs','utf8');
+ if(!actual.startsWith(old))throw Error('snapshot prefix mismatch');
+ put(v+'/CORE_SNAPSHOT.json',{schema:'twist.core-snapshot/v1',source:s+'/runner/src/bin/twist-kernel-relations.rs',target:s+'/runner/src/bin/twist-kernel-symmetry.rs',prefix_bytes:Buffer.byteLength(old),prefix_sha256:crypto.createHash('sha256').update(old).digest('hex'),byte_equal:true});
+}else if(mode==='pin'){
+ const rev=(await run('git',['rev-parse','HEAD']));
+ const worker='/workspace/shared/twist-kernel-symmetry-native-20261028/'+rev+'/worker';
+ fs.mkdirSync(worker.slice(0,worker.lastIndexOf('/')),{recursive:true});
+ fs.copyFileSync(s+'/runner/target/release/twist-kernel-symmetry',worker,fs.constants.COPYFILE_EXCL);fs.chmodSync(worker,0o755);
+ const p=JSON.parse(fs.readFileSync(v+'/protocol.json'));
+ for(const a of p.arms)a.instrument.commit=rev;
+ p.arms[0].instrument.binary_sha256=sha(worker);p.analysis_plan.script.sha256=sha(p.analysis_plan.script.path);
+ fs.writeFileSync(v+'/protocol.json',JSON.stringify(p,null,2)+'\n');
+ put(v+'/BINARY_PIN.json',{source_revision:rev,binary:{path:worker,sha256:sha(worker)}});
+}else if(mode==='seal'){
+ const p=JSON.parse(fs.readFileSync(v+'/protocol.json')),pin=JSON.parse(fs.readFileSync(v+'/BINARY_PIN.json'));
+ if(p.freeze.status!=='frozen'||p.freeze.commit!==pin.source_revision)throw Error('protocol not frozen');
+ const source_hashes={};
+ for(const x of ['runner/src/bin/twist-kernel-symmetry.rs','runner/src/kernel_symmetry_20261028.rs','runner/src/registry.rs','runner/Cargo.toml','runner/Cargo.lock','execution-v11/run-producer.mjs','execution-v11/PROTOCOL.md','lean-v7/TwistKernelSymmetry.lean'])source_hashes[s+'/'+x]=sha(s+'/'+x);
+ for(const x of ['src/cryptanalysis/twist_ic_field.rs','src/hash/sha256.rs'])source_hashes[x]=sha(x);
+ const input_hashes={};for(const x of ['execution-v8/runs/kernel-v1/RESULTS.json','execution-v10/ADMISSION.json'])input_hashes[s+'/'+x]=sha(s+'/'+x);
+ put(v+'/FROZEN.json',{schema:'twist.kernel-symmetry-freeze/v1',created:new Date().toISOString(),...pin,source_hashes,input_hashes,protocol_file_sha256:sha(v+'/protocol.json'),scientific_panel_started:false,wall_time_admitted:false});
+}else throw Error('draft|pin|seal');

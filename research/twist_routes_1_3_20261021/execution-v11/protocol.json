@@ -1,0 +1,327 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-kernel-symmetry-v1",
+  "version": 1,
+  "created": "2026-10-28",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v11",
+  "question": "What is the exact certified endomorphism action on all49 archived twist7-torsion points and eight kernel lines?",
+  "claims": [
+    {
+      "id": "finite-action",
+      "text": "Exact matrix, complete point/line permutations and direct kernel-root matches are independently verified.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "prediction",
+      "text": "Filed predictions are point order48 and projective order8; mismatches remain valid outcomes.",
+      "class": "heuristic_estimate",
+      "decided_by": []
+    },
+    {
+      "id": "scope",
+      "text": "No novelty, degree1 automorphism, unknown-log, performance or NIST claim.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "description": "Native embedded-map evaluation, complete finite module/kernels and corrupt controls.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0000000000000000000000000000000000000000",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-kernel-symmetry"
+          ]
+        ],
+        "binary_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "threads": 1
+      }
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "description": "Independent GP ellisogeny, rational twist evaluation, group labeling and complete cycles.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0000000000000000000000000000000000000000",
+        "build": [
+          [
+            "gp",
+            "-f",
+            "-q",
+            "verify.gp"
+          ]
+        ],
+        "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact complete finite count, no performance or sampling inference."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Embedded identity,scalar2I and companion matrices through the same finite-order/orbit instrument; no separate statistical arm."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Embedded corrupt actual matrix and swapped kernel-image controls; no separate measured null population."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "finite input group",
+        "levels": [
+          "complete twist seven-torsion",
+          "eight archived kernel lines"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "Native byte-preserved v8 core and new finite module checker, independent GP ellisogeny.",
+        "how": "Record source/binary hashes before data; reopen raw hashes."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Unchanged v8 basis/all49 torsion points/eight kernels and v10 degree17 map; frozen byte hashes.",
+        "how": "Complete direct point/kernel comparisons; no selected inputs or source-group scalar logs."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Same local L0 managed host; no native clock or cost admitted.",
+        "how": "Record CPU/kernel/hypervisor; no time comparison."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Shared author and host, deterministic exact equality only.",
+        "how": "Shared author/host; independent CAS map/group/linear algebra, exact native replay and conditional Lean group implication."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-check",
+        "arms": [
+          "native",
+          "pari"
+        ],
+        "differs_in": [
+          "instrument"
+        ],
+        "design": "absolute",
+        "threshold": "All49 direct point images,2401 sums,eight root-set matches and full point/line permutations agree; all controls detected."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Native producer then independent CAS exact verification; no performance comparison.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Deterministic complete finite sets; zero seed is metadata only."
+    },
+    "instance_sampling": {
+      "rule": "Exactly the archived basis and kernels; hypothesis motivated by v10 before this wave.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact finite verification only; no statistical or comparative claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact complete finite counts and necessary-factor checks, not statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 900,
+      "measured_on": "Two unmeasured prospective300s exact runs plus300s metadata allowance; known finite controls are development tests. No observed cost or timing claim."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "torsion-points",
+        "name": "Direct seven-torsion image checks",
+        "unit": "points",
+        "kind": "exact",
+        "definition": "All49 points including identity evaluated directly and compared with recovered matrix.",
+        "source": "ADMISSION.json point_checks",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "point checks",
+      "addition checks",
+      "kernel checks",
+      "point order",
+      "projective order",
+      "corrupt controls"
+    ],
+    "record": [
+      "source commit",
+      "binary SHA256",
+      "argv",
+      "input/output hashes",
+      "actual exit/signal",
+      "resource caps",
+      "host metadata"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_GiB": 4,
+      "paid_resources_created": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 900,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 1,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "One fixed archived module/map; complete point/kernel census and controls. Preserve failures/caps and any48/8 prediction mismatch.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Certify the actual finite action and record whether the filed prediction holds; no performance inference.",
+    "comparison_ids": [
+      "exact-check"
+    ],
+    "statistic": "Exact finite matrix/point/root-set equality and cycle enumeration.",
+    "interval": "None: complete finite exhaustion.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact finite action only.",
+    "verdict_vocabulary": [
+      "verified finite equality",
+      "mismatch",
+      "not completed"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/twist_routes_1_3_20261021/runner/src/kernel_symmetry_20261028.rs",
+      "sha256": "2223c029702bc7ca873e03346a1b9feaa00565b6ef78bdcef79cdff2132cbbc4"
+    },
+    "inputs": [
+      "archived v8 torsion basis/points/eight kernels",
+      "v10 admitted degree17 map",
+      "actual native/GP outputs and receipt hashes"
+    ],
+    "outputs": [
+      "RESULTS.json",
+      "verify.gp",
+      "ADMISSION.json",
+      "experiment.export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Recorded point/projective orders and complete eight-kernel cycle."
+    ],
+    "report_dir": "research/twist_routes_1_3_20261021/reports/kernel-symmetry-20261028"
+  },
+  "inadmissible": [
+    "Calling standard isogeny theory novel",
+    "Calling same-base transported rows new independent information",
+    "Claiming a solver speedup without charged costs and strongest matched controls",
+    "Inferring a NIST route from this public p827 example",
+    "Closing original full-campaign criteria"
+  ],
+  "literature": [
+    {
+      "ref": "research/twist_routes_1_3_20261021/execution-v11/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Primary MIT18.783 Lecture5/13 and repository known-isogeny-loop/GLV atlas reviewed before implementation.",
+      "verified_by": "Both primary PDFs accessed and relevant theorem passages read on2026-10-28."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
+  },
+  "extensions": {
+    "scientific_panel_started": false,
+    "original_full_campaign_discharged": false,
+    "embedded_controls_are_not_separate_arms": true,
+    "backend_authority": "Standing authorization and documented EKS access/image fallback; bounded local L0 only, no paid resource."
+  }
+}
