@@ -2091,6 +2091,11 @@ fn snapshot_build(source: &Path, destination: &Path, prebuilt: Option<&Path>) ->
     }
     if prebuilt.is_none() {
         copytree(&source.join("src"), &snap.join("src"))?;
+        // The root Cargo manifest names local crates. A registered worker
+        // must build from their sealed source too, with no checkout fallback.
+        for rel in ["tools/factor-base", "tools/volcano-cli", "isogeny_algos"] {
+            copytree(&source.join(rel), &snap.join(rel))?;
+        }
         let st = Store::Dir(source.join("src"));
         for rel in st.files_under("") {
             if !rel.ends_with(".rs") {
