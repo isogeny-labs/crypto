@@ -35,7 +35,7 @@ jobs:
             /docs/ecbench/BACKEND_REPRODUCTION.md
             /tools/artifacts/
             /.artifacts/
-      - name: Pull manifest and frozen evidence inputs
+      - name: Pull store data this workflow reads (tools/artifacts)
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -60,7 +60,7 @@ jobs:
           jq -r '.sessions[] | "/" + .dir + "/", (select(.replay_receipt != null) | "/" + .replay_receipt)' docs/backend-leaderboard/manifest.json > /tmp/backend-sources.txt
           jq -r '.files | keys[] | "/" + .' docs/backend-leaderboard/reproduction.lock.json >> /tmp/backend-sources.txt
           git sparse-checkout add --stdin < /tmp/backend-sources.txt
-      - name: Pull store data this workflow reads (tools/artifacts)
+      - name: Pull manifest and frozen evidence inputs
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
