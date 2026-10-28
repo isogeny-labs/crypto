@@ -17,7 +17,7 @@ SEEDS = {20: 59291, 24: 59293, 28: 59297, 32: 59297}
 def spec(bits):
     arms = [{"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
             {"name": "rho-lanes16", "role": "candidate",
-             "method": {"id": "rho.negation_lanes", "params": {"lanes": 16}}},
+             "method": {"id": "rho.negation_lanes", "params": {"lanes": "16"}}},
             {"name": f"pair-table-b{INCUMBENT_BASE[bits]}", "role": "candidate",
              "method": {"id": "ic.pipeline",
                         "params": {"factor_base": f"prime-abscissa:size={INCUMBENT_BASE[bits]}",
