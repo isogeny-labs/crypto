@@ -50,7 +50,7 @@ def fig_ratio():
         if n == NS[0]:
             ax.set_ylabel("paired ratio of summed S (<1: candidate cheaper)")
         ax.legend(fontsize=6, loc="best")
-    fig.suptitle("Holdout: paired S ratio to the frozen baseline, 95% cluster-bootstrap CI (counts, L0)")
+    fig.suptitle("Holdout: paired S ratio to the frozen baseline, 95% cluster-bootstrap CI (counts, L0)", y=1.05)
     save(fig, "fig_holdout_ratio")
 
 
@@ -76,7 +76,7 @@ def fig_rho():
         ax.axhline(1.0, color="k", lw=0.8)
         if n == NS[0]: ax.set_ylabel("S(arm) / S(rho-frob), same weight")
         ax.legend(fontsize=6)
-    fig.suptitle("Distance remaining to the matched rho (rho = 1), holdout means, priced at w = 0, 0.1, 1")
+    fig.suptitle("Distance remaining to the matched rho (rho = 1), holdout means, priced at w = 0, 0.1, 1", y=1.05)
     save(fig, "fig_distance_to_rho")
 
 
@@ -101,7 +101,7 @@ def fig_grid():
         ax.set_yticks(range(len(Ks))); ax.set_yticklabels(Ks, fontsize=7)
         ax.set_xlabel("c = |D|/|F|"); ax.set_ylabel("K columns")
     fig.colorbar(im, ax=axes, label="log10 minimax ratio to base (stage 1, 8 targets)", shrink=0.8)
-    fig.suptitle("Stage 1 (prune): worst band ratio of each double-LP cell to the frozen baseline (0 = parity)")
+    fig.suptitle("Stage 1 (prune): worst band ratio of each double-LP cell to the frozen baseline (0 = parity)", y=1.05)
     save(fig, "fig_stage1_grid")
 
 
