@@ -1,8 +1,18 @@
-# q16 genus-three subcover probe
+# q16 genus-three subcover and nonzero-trace degree-three probe
 
 ## Result and scope
 
-The search found **15 exact q16 source equations outside the earlier
+The new degree-three screen found **two Frobenius orbits of exact
+nonzero-trace source equations** in class `3.16.a_a_ah`. Representatives
+have explicit degree-three covers, nonzero subgroup maps, and complete
+relation solves. Their full transfer is 1,236–1,430 times slower than
+matched rho in this q16 run. These are potentially new **exact cover
+instances** outside the published trace-zero genus-three locus, not a
+demonstrated new vulnerable family or measured speedup. General cover and
+decomposition methods were already published. Exact-equation publication
+status remains unverified.
+
+The earlier search found **15 exact q16 source equations outside the earlier
 66-equation frontier** with explicit genus-three covers over `F16`. For all
 15, an exact nonzero map carries the largest prime-order source subgroup
 into the base-field Jacobian, and a complete relation solve recovers the
@@ -31,6 +41,112 @@ prime-to-subgroup-order isogeny to a genus-three Jacobian **exists
 abstractly** for all 66 older source equations. The isogeny has not been
 evaluated on source points, so these results remain bounds and feasibility
 certificates rather than an additional measured attack.
+
+## New branch-supported degree-three cover locus
+
+Let `k=F16`, `K=F4096`, with the exact polynomial bases below. For an
+ordinary genus-three curve `C: y^2+h(x)y=f(x)` with separable quartic
+`h`, put `z=y/h`. Let the four roots of `h` in `K` be `r_i`, and choose
+one of the 24 permutations of `(2,1,-2,-1)`. Set
+
+`U(x)=product_i (x-r_i)^(e_i)`, `X=lambda*U`,
+`beta=lambda*mu`, `b=beta^2`.
+
+If there is `H in K(x)` and `u in K` with
+
+`f/h^2 + X + beta/X = H^2+H+u`,                               (1)
+
+then the rational formulas
+
+`X=lambda*U(x)`, `Y=X*(y/h+H(x))+beta`
+
+give an exact degree-three map `C_K -> E`, where
+`E: Y^2+X*Y=X^3+u*X^2+b`. A four-branch ordinary genus-three model
+with nonzero reduced residues cannot have a branch-supported degree-three
+map of this form with any other zero/pole exponent multiset: the only
+remaining possibilities contain an order-three pole, which cannot reduce
+to the source's simple Artin–Schreier poles. For a fixed model and exponent
+pattern, matching the four reduced residues is an `F2`-linear system in
+`lambda,mu`. In this q16 census every such system has full column rank
+24, so each model-pattern pair gives **at most one** parameter pair.
+After matching, the script checks the complete identity (1); residue
+matching alone is not used as a cover certificate. This is an exact
+criterion and cardinality bound for the stated branch-supported ansatz,
+not a global classification of all GHS covers or correspondences.
+
+The frozen [LMFDB catalog slice](catalog_all_q16_weil_classes.jsonl)
+contains 126 ordinary genus-three Weil-restriction-shaped classes and
+10,664 listed curve models. The [full scan](degree3_all_q16_scan_receipt.json)
+tested 255,936 model-pattern pairs and found 60 exact cover descriptions
+across six classes, representing 30 distinct `(u,b)` equations. The
+[per-hit prior-family gate](prior_work_degree3_receipt.json) records every
+candidate. Twenty-four descriptions have trace-zero `b` and fall in the
+published Joux–Vitse locus. Twelve have `b=1`, so the source coefficient
+lies in the base field. The remaining 24 descriptions occur in classes
+`3.16.a_a_ah` and `3.16.a_a_h`; they have nonzero relative trace and
+form four Frobenius orbits of source equations. The `ah` class has group
+order 4090 and a 409-order prime subgroup. The `h` class has group order
+4104 and largest prime subgroup 19. These are exhaustive counts for this
+catalog slice and cover ansatz only.
+
+### Two 409-order nonzero-trace representatives
+
+The table gives exact source curves using polynomial-basis masks for `u,b`
+in `E: Y^2+X*Y=X^3+u*X^2+b`. Both cataloged base curves have equation
+`y^2+h(x)y=f(x)` as displayed. In both rows the ordered branch exponents
+are `(-1,-2,1,2)`, `lambda` and `mu` are the listed masks, and `H` is
+given exactly by the rational numerator and denominator arrays in the
+map receipts. Each Frobenius orbit contains three source equations;
+Frobenius conjugation carries the displayed cover identity to the other
+two equations.
+
+| LMFDB model | `h(x)` | `f(x)` | `(u,b)` | `Tr_(K/k)(b)` | `(lambda,mu)` |
+|---:|---|---|---:|---:|---:|
+| `3.16.a_a_ah`, 5 | `a^2*x^4+a*x` | `x^8+(a+1)*x^3+(a^3+a^2+1)*x^2+x+a^3` | `(1571,1614)` | 3363 | `(2925,280)` |
+| `3.16.a_a_ah`, 12 | `a^3*x^4+a*x` | `x^8+a*x^3+(a^3+a^2+a)*x^2+a^3*x+a^3+1` | `(3100,2952)` | 3362 | `(1706,3295)` |
+
+The [model-5 map receipt](degree3_nonzero_trace_receipt.json) and
+[model-12 map receipt](degree3_nonzero_trace_receipt_12.json) record the
+field, branch roots, exact `X,H`, source generator, target `Q=7G`,
+Mumford image, and Frobenius-fixed subgroup checks. The map is the
+pullback of `P-2P` through the cover followed by the `K/k` Jacobian trace.
+For model 5, `G=(3802,3009)`, `Q=(952,2216)`, and the nonzero image of
+`G` has Mumford masks `u=[2622,1]`, `v=[1641]`. For model 12,
+`G=(3047,101)`, `Q=(2425,3200)`, and the image has
+`u=[3363,1641,3158,1]`, `v=[1641,1641,372]`. Both images have order
+409, lie over `k`, and satisfy `image(Q)=7*image(G)`.
+
+| Model | Complete transfer, s | Relations / walk steps | Matched rho mean, ms | Full/rho |
+|---:|---:|---:|---:|---:|
+| 5 | 0.709 | 12 / 100 | 0.496 | 1430 |
+| 12 | 0.828 | 10 / 92 | 0.669 | 1236 |
+
+Each [attack receipt](attack_degree3_receipt.json) and
+[second attack receipt](attack_degree3_receipt_12.json) includes the
+relation matrix and 1,000 same-target rho trials; both recover the target
+logarithm `7` and verify it on the source and Jacobian. Complete transfer
+time includes construction, map, factor-base setup, relation collection,
+and linear solve. The times are local single-run measurements for the
+transfer and means of 1,000 rho runs, so they are cost evidence for these
+small instances, not an asymptotic claim.
+
+Prior-work boundary: [Joux–Vitse Appendix A.2](https://eprint.iacr.org/2011/020.pdf)
+describes the characteristic-two trace-zero genus-three cover locus.
+[Magma's GHS documentation](https://www.math.uzh.ch/sepp/magma-2.25.2-ds/HandbookVolume10.pdf)
+documents the general trace-conorm construction, and
+[Iijima et al.](https://globals.ieice.org/en_transactions/fundamentals/10.1093/ietfec/e88-a.1.97/_p)
+give a broader extension framework. The displayed nonzero-trace covers
+are outside the **specific** Joux–Vitse trace-zero locus, but the
+literature check does not establish a globally new cover family or an
+unpublished exact equation. The new finding is an explicit, reproducible
+nonzero-trace cover and subgroup-transfer instance in a previously
+unsearched local branch-supported degree-three locus.
+
+The checked Lean additions in `PatternAccounting.lean` verify finite
+search accounting and the 409-order factorization. They do not formalize
+the function-field identity, branch-divisor classification, Sage
+finite-field enumeration, or benchmark. Those obligations are checked
+by the runnable Sage scripts and the retained receipts.
 
 ## Fifteen exact eligible equations and measured costs
 

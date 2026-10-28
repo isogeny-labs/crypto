@@ -15,6 +15,12 @@ theorem exponent_pattern_accounting :
 theorem degree_three_pattern_accounting :
     24 + 4 + 4 = 32 ∧ 60 * 24 = 1440 := by decide
 
+theorem degree_three_full_catalog_accounting :
+    10664 * 24 = 255936 ∧ 60 ≤ 255936 ∧ 36 + 24 = 60 := by decide
+
+theorem nonzero_trace_source_subgroup_order :
+    4090 = 10 * 409 ∧ 409 > 1 := by decide
+
 theorem branch_symmetry_accounting :
     4 * 3 = 12 ∧ 3 * 12 = 36 := by decide
 

@@ -234,7 +234,56 @@ def main():
     assert representative_attack["verified_on_source_and_jacobian"]
     audit_attack({**representative_attack,
                   "recovered_log": representative_attack["source_target_log_recovered"]})
-    print("PASS: six descent ranks; 1,440 degree-three exclusion ranks; 66 isogeny arithmetic gates; 16 relation systems; 15 maps and attacks; hashes")
+
+    all_catalog_path = HERE/"catalog_all_q16_weil_classes.jsonl"
+    all_catalog = [json.loads(s) for s in all_catalog_path.read_text().splitlines()]
+    assert len(all_catalog) == 126
+    assert sum(len(row["curves"]) for row in all_catalog) == 10664
+    full_scan_path = HERE/"degree3_all_q16_scan_receipt.json"
+    full_scan = json.loads(full_scan_path.read_text())
+    assert full_scan["catalog_sha256"] == sha(all_catalog_path)
+    assert full_scan["script_sha256"] == sha(HERE/"degree3_all_q16_scan.py")
+    assert full_scan["catalog_classes"] == len(all_catalog)
+    assert full_scan["models_scanned"] == 10664
+    assert full_scan["branch_polynomials"] == 7
+    assert full_scan["patterns_per_model"] == 24
+    assert full_scan["counts"] == {"models":10664,"exact_hits":60}
+    assert len(full_scan["hits"]) == 60
+    labels = {row["label"]:row for row in all_catalog}
+    assert {hit["class"] for hit in full_scan["hits"]} == {
+        "3.16.a_a_abv","3.16.a_a_adt","3.16.a_a_ah",
+        "3.16.a_a_bv","3.16.a_a_dt","3.16.a_a_h"}
+    for hit in full_scan["hits"]:
+        assert labels[hit["class"]]["curves"][hit["model_index"]] == hit["equation"]
+        assert sum(labels[hit["class"]]["poly"]) == hit["expected_order"]
+        assert relative_trace(hit["b_mask"]) == hit["trace_b_mask"]
+        assert sorted(hit["exponents"]) == [-2,-1,1,2]
+    prior3 = json.loads((HERE/"prior_work_degree3_receipt.json").read_text())
+    assert prior3["scan_sha256"] == sha(full_scan_path)
+    assert prior3["script_sha256"] == sha(HERE/"prior_work_degree3.py")
+    assert len(prior3["rows"]) == 60
+    assert sum(hit["trace_b_mask"] != 0 for hit in full_scan["hits"]) == 36
+    assert len({(hit["u_mask"],hit["b_mask"]) for hit in full_scan["hits"]}) == 30
+    for index in (5,12):
+        suffix = "" if index == 5 else "_12"
+        cover_path = HERE/f"degree3_nonzero_trace_receipt{suffix}.json"
+        cover = json.loads(cover_path.read_text())
+        assert cover["scan_receipt_sha256"] == sha(full_scan_path)
+        assert cover["script_sha256"] == sha(HERE/"degree3_nonzero_trace.py")
+        assert cover["catalog_model_index"] == index
+        assert cover["source_order"] == 4090 and cover["subgroup_prime"] == 409
+        assert cover["relative_trace_b_mask"] == relative_trace(cover["b_mask"]) != 0
+        assert cover["verified_exact_cover"] and cover["verified_subgroup_transfer"]
+        attack = json.loads((HERE/f"attack_degree3_receipt{suffix}.json").read_text())
+        assert attack["map_receipt_sha256"] == sha(cover_path)
+        assert attack["search_sha256"] == sha(HERE/"attack_degree3.py")
+        row = attack["rows"][0]
+        assert row["b_mask"] == cover["b_mask"]
+        assert row["status"] == "SOLVED" and row["recovered_log"] == 7
+        assert row["full_transfer_over_mean_rho_wall_ratio"] > 1
+        assert row["verified_on_source_and_jacobian"]
+        audit_attack(row)
+    print("PASS: old 15 maps and attacks; 10,664-model degree-three scan; 60 prior gates; two nonzero-trace maps and full attacks; hashes")
 
 
 if __name__ == "__main__":
