@@ -1,0 +1,42 @@
+{
+  "checked_utc_date": "2026-10-27",
+  "claim_boundary": "Published even-characteristic degree-three cover classifications prevent a global new-family claim; exact equations in two catalog-unknown isogeny classes are potential new catalog witnesses only.",
+  "family_sources": [
+    {
+      "title": "Classification of Weil Restrictions Obtained by (2,...,2) Coverings of P^1",
+      "authors": "Fumiyuki Momose and Jinhui Chao",
+      "year": 2006,
+      "url": "https://eprint.iacr.org/2006/347",
+      "finding": "Abstract states general (2,...,2) Weil-restriction classification and explicit equations; full PDF fetch failed with HTTP 403."
+    },
+    {
+      "title": "Genus 3 curves with many involutions and application to maximal curves in characteristic 2",
+      "authors": "Enric Nart and Christophe Ritzenthaler",
+      "year": 2009,
+      "url": "https://arxiv.org/abs/0905.0546",
+      "finding": "Characteristic-two genus-three V4 curves with three elliptic quotients and product Jacobian isogeny are prior art."
+    },
+    {
+      "title": "A classification of elliptic and hyperelliptic curves over finite fields of even characteristic subjected to the cover attack under the isogeny condition",
+      "authors": "Kousuke Murai, Mahoro Shimura, Tsutomu Iijima, and Jinhui Chao",
+      "year": 2022,
+      "url": "https://www.iwsec.org/scis/2022/_abst/1A3-2.pdf",
+      "finding": "Primary abstract explicitly reports complete even-characteristic classification for genus-one through genus-three sources under g(C)=d*g(E); full case table not in abstract."
+    },
+    {
+      "title": "A Classification of Elliptic and Hyperelliptic Curves over Finite Fields of Even Characteristic Subjected to the Cover Attack",
+      "authors": "Kousuke Murai",
+      "year": 2021,
+      "url": "https://chuo-u.repo.nii.ac.jp/records/17759",
+      "finding": "Thesis repository metadata confirms complete-classification claim; full text marked access restricted."
+    }
+  ],
+  "lmfdb_query": "SELECT label, q, poly, has_jacobian, is_simple FROM av_fq_isog WHERE label IN ('3.16.a_a_aev','3.16.a_a_ev','3.16.a_a_adn','3.16.a_a_dx') ORDER BY label",
+  "lmfdb_status_semantics": {"-1": "negative", "0": "unknown", "1": "positive"},
+  "candidates": [
+    {"source_order":3972,"source_b":51,"label":"3.16.a_a_aev","poly":[1,0,0,-125,0,0,4096],"catalog_has_jacobian":0,"prior_work_status":"potential exact catalog witness; equivalent published equation not ruled out","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_aev"},
+    {"source_order":4006,"source_b":198,"label":"3.16.a_a_adn","poly":[1,0,0,-91,0,0,4096],"catalog_has_jacobian":1,"prior_work_status":"rediscovery at isogeny-class level","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_adn"},
+    {"source_order":4198,"source_b":116,"label":"3.16.a_a_dx","poly":[1,0,0,101,0,0,4096],"catalog_has_jacobian":1,"prior_work_status":"rediscovery at isogeny-class level","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_dx"},
+    {"source_order":4222,"source_b":853,"label":"3.16.a_a_ev","poly":[1,0,0,125,0,0,4096],"catalog_has_jacobian":0,"prior_work_status":"potential exact catalog witness; equivalent published equation not ruled out","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_ev"}
+  ]
+}
