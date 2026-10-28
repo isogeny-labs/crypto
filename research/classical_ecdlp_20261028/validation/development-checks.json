@@ -1,0 +1,128 @@
+{
+  "schema": "archive-development-checks/v1",
+  "tested_base_revision": "6187036c049b6de2b1521b014f575952e4f1705c",
+  "publication_parent_revision": "7be0960b07b222b54b32c5a7813e649d9563071a",
+  "upstream_update": "Fast-forwarded before publication; library, Cargo, reused solver, crates and tools are byte-identical to the tested base. Upstream changes concern separate study records and src/bin/icprog.",
+  "native_source": {
+    "path": "examples/classical_ecdlp_archive.rs",
+    "sha256": "1f3932e79d612a69186eb6603f9947a7398357cdbcdfbb2e2ad9f01ba49638d8"
+  },
+  "cargo_lock_sha256": "849c5ba217dc935f808028833d146d2487af1756c311e026e287c01413a69c83",
+  "toolchain": {
+    "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+    "host": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 6.18.55",
+    "visible_cpus": 5,
+    "scope": "development correctness checks; not historical timing metadata"
+  },
+  "checks": [
+    {
+      "name": "example-tests",
+      "command": "cargo test --release --locked --example classical_ecdlp_archive -- --test-threads=2",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "name": "clippy",
+      "command": "cargo clippy --release --locked --example classical_ecdlp_archive -- -D warnings",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "format",
+      "command": "rustfmt --check --edition 2021 --config skip_children=true examples/classical_ecdlp_archive.rs",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "native-cli-receipts",
+      "commands": [
+        "cargo run --quiet --release --locked --example classical_ecdlp_archive -- check",
+        "cargo run --quiet --release --locked --example classical_ecdlp_archive -- summary",
+        "cargo run --quiet --release --locked --example classical_ecdlp_archive -- solve"
+      ],
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "library-suite",
+      "command": "cargo test --release --lib --locked -- --test-threads=4",
+      "status": "in_progress",
+      "remaining_test": "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies",
+      "missing_runtime_fixture_failures": 19,
+      "all_missing_fixture_failures_passed_after_restoration": true,
+      "note": "Do not interpret this record as a clean full-suite pass. One unchanged library test was still active when this receipt was prepared; PR follow-up records its eventual outcome."
+    },
+    {
+      "name": "restored-runtime-fixture-tests",
+      "status": "passed",
+      "tests": [
+        "cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar",
+        "cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures",
+        "cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic",
+        "cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver",
+        "cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed",
+        "cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means",
+        "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+        "cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible",
+        "cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too",
+        "cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples",
+        "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version",
+        "cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band",
+        "cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2",
+        "cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload",
+        "cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup",
+        "cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files",
+        "cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks",
+        "cryptanalysis::ic_framework::planner::tests::every_cited_file_exists",
+        "cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42"
+      ],
+      "passed": 19,
+      "failed": 0,
+      "note": "Each missing-input failure was rerun with the same compiled library-test binary after materializing the original tracked inputs. No source or test assertion was changed."
+    },
+    {
+      "name": "historical-integrity",
+      "command": "sha256sum -c HISTORICAL.sha256",
+      "status": "passed",
+      "files": 19,
+      "byte_equal_to_original_bundles": true
+    },
+    {
+      "name": "remote-historical-blob-integrity",
+      "status": "passed",
+      "blobs": 20,
+      "note": "GitHub blob IDs match local git hash-object for 19 historical files and their manifest."
+    },
+    {
+      "name": "report-inspection",
+      "status": "passed",
+      "pages": 2,
+      "renderer": "Typst 0.15.0",
+      "plotter": "Matplotlib 3.10.8",
+      "all_pages_visually_inspected": true,
+      "final_page_renders_match_inspected_bytes": true
+    },
+    {
+      "name": "artifact-policy",
+      "command": "python3 tools/artifacts/artifacts.py plan research/classical_ecdlp_20261028",
+      "status": "passed",
+      "files_requiring_store": 0,
+      "note": "Administrative file-policy check; no cryptographic research computation."
+    }
+  ],
+  "initial_build_preconditions": {
+    "status": "resolved",
+    "reason": "Sparse checkout initially omitted path dependency isogeny_algos and tracked compile-time fixture inputs. Materialized tracked files and reran the original command."
+  },
+  "conductor": {
+    "status": "unavailable",
+    "reason": "Local control plane connection refused at localhost:8080; no lease claimed."
+  },
+  "original_engine_and_cargo_unchanged": true,
+  "new_performance_experiments": 0,
+  "historical_timings_remeasured": false,
+  "benchmark_admission": false
+}
