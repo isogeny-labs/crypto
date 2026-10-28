@@ -5,8 +5,8 @@ SQLite allocation, bound worker journals, charged native S3/STS attempts and
 budget CLI commands. It passed 5,105 full-library tests, zero failures and123 ignored, with exit0
 observed. Strict lint, formatting, release build,19 CLI checks,7 synthetic
 admission cases and non-root container preflight also passed.
-A small canonical plan-digest metadata correction is awaiting an active file
-reservation. The [launch adapter contract](LAUNCH-ADAPTER.md) records additional
+The subsequent additive canonical plan-digest metadata correction is implemented
+and awaiting its own validation; historical23b3 results do not validate it. The [launch adapter contract](LAUNCH-ADAPTER.md) records additional
 actual-UID startup gating and finite resource-lifetime integration still needed.
 No budget grant or new cloud generation wave has been issued by this milestone.
 

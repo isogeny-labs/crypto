@@ -25,14 +25,13 @@ Its `source_commit` and `binary_sha256` identify the executor; the request's
 `protocol_sha256` must use `protocol_file_sha256`, the complete protocol file
 digest, rather than `freeze.protocol_sha256`.
 
-**Current operator limitation:** the request's `plan_sha256` is the SHA-256 of
-the native compact serialization of the parsed `DatasetPlan`. It differs from
-preflight's `plan_file_sha256` and the planning command's existing `sha256`
-output, which hash the saved file. The current CLI does not expose the required
-native plan digest. Do not substitute a file digest or issue a grant from these
-outputs alone; the additive preflight digest output is still pending. The
-request's shard index/count must also match the intended invocation. Retain the
-preflight receipt and exact binding derivation before issuing the grant.
+Use preflight's `plan_sha256` for the request's plan binding. It hashes the
+native compact serialization of the parsed `DatasetPlan`, in the same field
+order used by generation and replay. `dataset plan` also reports this field.
+Keep `plan_file_sha256` (and the planning command's legacy `sha256`) as the
+separate saved-file identity: formatting or key order can change that file hash
+without changing the native plan binding. The request's shard index/count must
+match the intended invocation. Retain the preflight receipt before issuance.
 
 ```sh
 crypto dataset budget admit --dry-run \

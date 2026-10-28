@@ -279,6 +279,14 @@ pub struct DatasetPlan {
 }
 
 impl DatasetPlan {
+    /// Existing run/grant identity: compact serialization of this typed plan
+    /// in struct field order, not generic canonical JSON or the saved file bytes.
+    fn binding_sha256(&self) -> Result<String, String> {
+        Ok(digest(
+            &serde_json::to_vec(self).map_err(|e| e.to_string())?,
+        ))
+    }
+
     pub fn validate(&self) -> Result<(), String> {
         if self.schema != "crypto.ml-dataset.plan/v1" || !self.twists {
             return Err("expected plan/v1 with paired twists".into());
@@ -835,7 +843,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
             let artifact = storage::write_json(parent, name, "frozen-plan", &plan)?;
             println!(
                 "{}",
-                json!({"plan":a.out,"sha256":artifact.sha256,"planned_cells":plan.cell_count()?,
+                json!({"plan":a.out,"sha256":artifact.sha256,"plan_sha256":plan.binding_sha256()?,"planned_cells":plan.cell_count()?,
                 "generated_cells":0,"twists_included":true})
             );
         }
@@ -858,6 +866,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
                 "source_commit":source,"source_dirty":false,
                 "binary_sha256":crate::store::hash_file(&std::env::current_exe().map_err(|e|e.to_string())?)?.0,
                 "plan_file_sha256":crate::store::hash_file(plan)?.0,
+                "plan_sha256":parsed.binding_sha256()?,
                 "protocol_file_sha256":digest(&protocol_bytes),
                 "planned_cells":parsed.cell_count()?,"generated_cells":0,
                 "lab_receipt_uri":receipt_uri,"cloud_permissions_checked":false,
@@ -1245,8 +1254,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
     let _lease = Lease::acquire(&a.out)?;
     let out = checked_directory(&a.out, false)?;
     assert_no_workers(&out)?;
-    let canonical = serde_json::to_vec(&plan).map_err(|e| e.to_string())?;
-    let plan_sha = digest(&canonical);
+    let plan_sha = plan.binding_sha256()?;
     if let Some(session) = &session {
         session.validate_binding(&RunBinding {
             source_commit: source.into(),
@@ -1793,7 +1801,7 @@ fn bound_run(root: &Path) -> Result<(DatasetPlan, Value, String), String> {
     let plan: DatasetPlan = read_json(&root.join("plan.json"))?;
     plan.validate()?;
     verify_protocol(&plan, &read_json_bytes(&root.join("protocol.json"))?)?;
-    let hash = digest(&serde_json::to_vec(&plan).map_err(|e| e.to_string())?);
+    let hash = plan.binding_sha256()?;
     let binding: Value = read_json(&root.join("run.json"))?;
     if binding["schema"] != "crypto.ml-dataset.run/v1" || binding["plan_sha256"] != hash {
         return Err("run/plan digest mismatch".into());
@@ -2896,6 +2904,58 @@ mod tests {
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.0);
         }
+    }
+
+    #[test]
+    fn native_plan_binding_ignores_file_format_and_key_order_but_preserves_content() {
+        let fixture = TempRun::new();
+        let (plan, binding, _) = fixture.bound();
+        // Freeze the pre-existing generation contract independently of the
+        // helper now shared by Plan, Preflight, generation and reader replay.
+        let compact = serde_json::to_vec(&plan).unwrap();
+        let expected = digest(&compact);
+        assert_eq!(binding["plan_sha256"], expected);
+        let pretty = fs::read(fixture.0.join("plan.json")).unwrap();
+        let object = serde_json::to_value(&plan).unwrap();
+        let reversed_members: Vec<String> = object
+            .as_object()
+            .unwrap()
+            .iter()
+            .rev()
+            .map(|(key, value)| {
+                format!(
+                    "{}:{}",
+                    serde_json::to_string(key).unwrap(),
+                    serde_json::to_string(value).unwrap()
+                )
+            })
+            .collect();
+        let reordered = format!("{{{}}}\n", reversed_members.join(",")).into_bytes();
+        let mut file_hashes = BTreeSet::new();
+        for bytes in [pretty, compact, reordered] {
+            let path = fixture.0.join("plan.json");
+            fs::write(&path, &bytes).unwrap();
+            let parsed: DatasetPlan = read_json(&path).unwrap();
+            parsed.validate().unwrap();
+            file_hashes.insert(crate::store::hash_file(&path).unwrap().0);
+            assert_eq!(parsed.binding_sha256().unwrap(), expected);
+            // Existing run records retain the original generation binding;
+            // all equivalent file presentations must still verify against it.
+            let (_, saved_binding, replayed_hash) = bound_run(&fixture.0).unwrap();
+            assert_eq!(saved_binding, binding);
+            assert_eq!(replayed_hash, expected);
+        }
+        assert_eq!(file_hashes.len(), 3);
+        let mut changed = plan;
+        changed.keys += 1;
+        changed.validate().unwrap();
+        assert_ne!(changed.binding_sha256().unwrap(), expected);
+        fs::write(
+            fixture.0.join("plan.json"),
+            serde_json::to_vec(&changed).unwrap(),
+        )
+        .unwrap();
+        assert!(bound_run(&fixture.0).is_err());
     }
 
     #[test]

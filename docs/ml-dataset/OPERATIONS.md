@@ -65,9 +65,9 @@ crypto dataset status --out /work/dataset
 S3 execution requires the activated, source-bound budget session described in
 [BUDGET-CLI.md](BUDGET-CLI.md). The example assumes that finite grant has already
 been issued and activated; it does not create spending authority. Grant issuance
-also requires the native parsed-plan digest. The current CLI exposes only the
-plan file digest, so the missing canonical digest output remains an explicit
-[operator limitation](BUDGET-CLI.md#prepare-one-authoritative-campaign).
+uses preflight's `plan_sha256` for the native parsed-plan binding and
+`protocol_file_sha256` for the protocol binding. Preserve the separate file
+hashes as described in [BUDGET-CLI.md](BUDGET-CLI.md#prepare-one-authoritative-campaign).
 
 Use a digest-pinned image on the repository's EKS Spot lab. Assign disjoint
 shards before submission, record every Job identity, and inspect the existing
