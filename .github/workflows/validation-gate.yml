@@ -66,7 +66,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ecbench_overhead_review_20261022 research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/matched research/four_followups_20261021/results/pencil-pilot research/ic_residual_sweep_20261028 research/ic_wide_batching_20261028 research/ic_wide_ext_20261028 research/kummer_coordinates_20261022/results research/kummer_differential_collector_20261022/results research/pencil_sparse_20261022/results research/postgb_linear_stage_20261026 research/projective_law_followup_20261022/results
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ecbench_overhead_review_20261022 research/ecbench_perf_round2_20261022 research/ecbench_rho_lanes_20261023 research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/matched research/four_followups_20261021/results/pencil-pilot research/ic_residual_sweep_20261028 research/ic_wide_batching_20261028 research/ic_wide_ext_20261028 research/kummer_coordinates_20261022/results research/kummer_differential_collector_20261022/results research/pencil_sparse_20261022/results research/postgb_linear_stage_20261026 research/projective_law_followup_20261022/results
       - name: Fetch the base tip
         if: github.event_name == 'pull_request'
         env:
@@ -89,7 +89,9 @@ jobs:
             research/ic_wide_batching_20261028 \
             research/ic_residual_sweep_20261028 \
             research/ic_wide_ext_20261028 \
-            research/ecbench_overhead_review_20261022
+            research/ecbench_overhead_review_20261022 \
+            research/ecbench_perf_round2_20261022 \
+            research/ecbench_rho_lanes_20261023
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Reject stale native curve catalog bindings
