@@ -48,14 +48,54 @@ establish that cloud corpus.
   cumulative per-command S3 reservations, and bounded partial artifact
   snapshots. Failed requests stay charged; terminal snapshots have a reserved
   allowance. The [source checkpoint](../research/ml_dataset_live_capture_20261028/source-checkpoint.json)
-  passed fresh S3 readback and Git bundle verification. Final software validation
-  is still in progress; no actual worker has run this source.
+  passed fresh S3 readback and Git bundle verification. Later persistence runtime
+  `7d2aad8baa5fa5851e3f2ac16b6024cd3999210a` passed 5,130 full-library tests,
+  zero failures and 123 ignored, including the controller-lock contention fix.
+  Policy runtime `d71ec2ef5ab9b7f2a038f61c941af10297a775ad` passed 5,169
+  full-library tests, zero failures and 123 ignored. Their source-bound
+  [validation archives](../research/ml_dataset_policies_20261028/VALIDATION.md)
+  were freshly downloaded and verified. No actual worker publication is
+  established by these software tests.
 - **Missing deployment capability:** that quota authority requires durable
   mounted storage shared with replacement hosts and protected from rollback
   with worker snapshots. Ordinary lab `/work` storage is temporary. This change
   installs no mount and does not provide an S3 conditional-update authority.
   The proposed 20 GiB/100,000 PUT/200,000 GET campaign limits have not been
   deployed. Object-body/request caps are not account-wide dollar accounting.
+- **Observed after migration, 14:40–14:42 UTC:** the registered MCP kubeconfig
+  still provides the existing job-submitter route. Permitted reads found zero
+  current Pods and five retained Jobs, all with `emptyDir` volumes. Pilot002
+  remains failed with UID `641ed2d6-ce1b-4e86-a113-3874ccf176c7`. Storage reads
+  for PVCs, PVs, StorageClasses and CSI drivers are explicitly unauthorized.
+  No eligible existing mount was identified; this does not establish that none
+  exists. The separate stale kubeconfig's denied launcher-role assumption does
+  not invalidate the working scoped route. No role or access was changed.
+- **Observed source boundary:** ordinary submission exposes temporary storage;
+  the recovery controller's gp3 `/work` is restored with the worker snapshot
+  and cannot be its independent quota authority. Workspace EFS alone is not
+  proof of an EKS mount. A mounted filesystem is the current implementation's
+  dependency; the user requirement is durable cumulative admission. Any new
+  backend must first preserve that contract under duplicates, ambiguous
+  requests, interruption and stale restoration. An S3 create-once claim alone
+  does not bound failed claim requests from duplicate worker starts.
+- **Durable operational evidence:** the filtered EKS receipts, authorization
+  responses, source assessment and parent checkout-failure diagnosis are at
+  `s3://setec-astronomy-artifacts/ml-dataset/20261028/operations/6c410d7c724bab6d13668fa1506707b0eb4bc4b36b57fd53e268ada2707fe312/operations.tar.gz`,
+  19,567 bytes, SHA-256
+  `6c410d7c724bab6d13668fa1506707b0eb4bc4b36b57fd53e268ada2707fe312`.
+  Conditional PUT, fresh ETag-bound GET, byte comparison and contained hashes
+  passed at `2026-10-28T14:51:12Z`. This archive records an operational
+  assessment, not a successful cloud dataset.
+- **Unimplemented alternative:** a reviewed one-lifetime worker broker could
+  forfeit its fully precharged allocation after failure and admit a replacement
+  only against a fresh allocation. However, a direct S3 claim does not bound
+  bootstrap traffic: D duplicate starts can issue D claim PUTs even when one
+  succeeds. A durable authenticated admission service must reject duplicate
+  sessions before S3 and meter claim/verification traffic. No such EKS-facing
+  service is verified here. The design, failure cases and finite envelope
+  formulas are preserved in a [verified design archive](../research/ml_dataset_policies_20261028/single-use-quota-design-archive.json).
+  It neither replaces v1 admission nor authorizes a launch, and opaque process
+  snapshot recovery remains outside its guarantee.
 - **Not established:** exact worker failure cause from HTTP 403 alone, actual
   billed campaign spend, successful native publication/restoration, full solver
   coverage, trained-model efficacy or a first/last-fall-degree result. No
@@ -110,6 +150,11 @@ an unfinished attempt into a completed cell.
 ## Resolution and history
 
 Unresolved. Recorded 2026-10-28 after both failed pilots and the merged-source
-software review. The publication code has scoped fixes and regression tests in
-progress; neither fixes nor this record grant worker access. Preserve the failed
-attempts and their original source/image identities.
+software review; updated after migration, completed source validation and
+read-only EKS reconciliation. The publication code's scoped fixes and regression
+tests passed locally; neither those passes nor this record grant worker access.
+The separate consumer companion audited 72 sealed software fixtures and checked
+22 positive certificates, with its own non-equivalent static training view;
+it has not validated an actual restored worker dataset. Preserve failed attempts
+and their original source/image identities. No new job, E12 retry, administrative
+grant, budget increase or deadline extension was made.

@@ -1,5 +1,82 @@
 # Implementation handoff
 
+## 2026-10-28 15:09 UTC — publication and deployment evidence preserved
+
+### What was done (commands, files, features)
+
+Published regular policy PR2777 on persistence PR2769. Runtime remains exactly
+the validated d71ec2e source; subsequent commits update evidence and coverage.
+Consumer companion PR2776 is regular and stacked on owner PR2757, with its root
+gate4987/0/122ignored and standalone87/72-fixture validation archived. E12a
+terminal PR2774 merged as 6f6bce15a8432e784a70611222aa8eeb57021c67 at14:40:23Z;
+its final head15a52ae7 has nine successful hosted workflows and no unresolved
+review thread. Its terminal packet is unchanged from the verified artifact
+migration head, and its new delivery receipt passed fresh S3 readback.
+
+### Decisions made (and why)
+
+Keep the original quota contract: the read-only EKS assessment identified no
+eligible mount through permitted reads. The separately recorded one-use grant
+design requires a durable admission service before any S3 bootstrap request;
+it is not implemented or ready to launch. Its full design and the operational
+assessment are preserved in verified S3 archives with adjacent Git receipts.
+No additional job, policy grant, spending allowance or deadline was authorized.
+
+### Open threads (unfinished, pick up next time)
+
+Parent PR2769's checkout-failure retry has not yet been inspected; next check
+is no earlier than15:21Z. ConsumerPR2776 next check is no earlier than15:26Z;
+policyPR2777 follows the50-minute cadence from its latest evidence push. Keep
+feature-branch stacks until their parents land. Binary-root runtime d79f658f
+has9 core,158 dataset and8 CLI tests plus strict combined Clippy passing; its
+fixed-executable full suite93422 is still running. The independent consumer
+root-set increment and sealed fixture replay remain separate pending work.
+The extensive corpus and worker IAM/quota deployment requirements stay open.
+
+### Errors (what went wrong, how it was handled)
+
+App PR attachment calls hung without a completion response; they were
+terminated without retry and attachment remains unconfirmed. PRs themselves
+are published and linked. E12a still has zero completed target draws and exit143;
+its merged evidence does not establish a new degree or justify a retry.
+
+## 2026-10-28 14:34 UTC — corrected source passes publication gate
+
+### What was done (commands, files, features)
+
+Validated source `d71ec2ef5ab9b7f2a038f61c941af10297a775ad`: full release
+library 5169 passed, zero failed, 123 ignored; binary-field 19, prime-root 8,
+dataset 153 and CLI integration 8 passed. Strict scoped Clippy and formatting
+passed. The binary-field batched-squaring counter correction is included.
+The source-bound CLI also produced 72 sealed consumer fixtures; 22 positive
+PDP certificates were independently checked. Preserved the final logs, CLI,
+patch and hashes in canonical S3 and verified a fresh download and all contained
+hashes. Exact receipts and limits are in VALIDATION.md and validation-d71ec2e.json.
+
+### Decisions made (and why)
+
+Deliver a regular PR stacked on persistence PR2769. Keep local software gates,
+hosted review, real worker publication and scientific corpus completion
+separate. Root scope now covers only policy research documentation and the
+shared log; T743 owns the subsequent binary-root adapter integration. T739 owns
+the separate consumer publication. USD200 total and original deadlines stand.
+
+### Open threads (unfinished, pick up next time)
+
+Deliver the dependent PR and inspect current-head CI/review on the registered
+cadence. The parent validation job encountered a checkout transport failure
+before tests; one failed-job retry is pending. Resolve the producer/main
+lineage and verify that integrated source before landing. Worker IAM and the
+durable mounted quota authority are unresolved. Broad corpus production,
+complete solver coverage and operation/intermediate capture remain unfinished.
+
+### Errors (what went wrong, how it was handled)
+
+Retained the original validation and preflight failures. The source packaging
+step initially encountered a tracked file omitted by sparse checkout; switched
+to hashing source-commit Git objects, then completed the archive roundtrip.
+No data or test was discarded, and no additional research job was launched.
+
 ## 2026-10-28 12:15 UTC — implementation ready for native checks
 
 ### What was done (commands, files, features)
