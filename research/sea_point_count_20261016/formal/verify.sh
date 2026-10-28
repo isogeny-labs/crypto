@@ -9,7 +9,7 @@ if [ ! -f "$jar" ]; then
   curl --proto '=https' --tlsv1.2 -fsSL \
     https://github.com/tlaplus/tlaplus/releases/download/v1.8.0/tla2tools.jar -o "$jar"
 fi
-printf '15d103b7e5617780bcc904c0af12f1ad242e2b345c0301136c5be4588f17edac  %s\n' "$jar" | sha256sum -c -
+printf '5bd7b64db99ae4c6c35f290de5e809c0ee41af43f8699cf696099ffb6452b1e2  %s\n' "$jar" | sha256sum -c -
 cd "$study/formal"
 check() {
   local model=$1 config=$2 expected=$3 invariant=${4:-}

@@ -28,11 +28,11 @@ use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
     bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, kangaroo, GenericOutcome,
 };
+use crate::cryptanalysis::ecbench::hyper::HyperInstance;
+use crate::cryptanalysis::ecbench::hyper_ic::{self, HyperIcParams};
 use crate::cryptanalysis::ecbench::koblitz_descent::{
     self as koblitz_descent, DescentParams as KoblitzDescentParams,
 };
-use crate::cryptanalysis::ecbench::hyper::HyperInstance;
-use crate::cryptanalysis::ecbench::hyper_ic::{self, HyperIcParams};
 use crate::cryptanalysis::ecbench::wordram_price;
 use crate::cryptanalysis::ecbench::workload::{CurveFacts, Instance, WideInstance};
 use crate::cryptanalysis::ecbench_large_prime::{
@@ -332,8 +332,47 @@ const HYPER_IC_PARAMS: &[ParamDecl] = &[
 
 /// Every method `ecbench` knows.  Adding one is an entry here and an arm
 /// in [`solve`]; nothing else changes.
+const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "jumps",
+        default: None,
+        help: "jump table size, 1..256",
+    },
+    ParamDecl {
+        name: "walks",
+        default: None,
+        help: "parallel model lanes, 1..64",
+    },
+    ParamDecl {
+        name: "dp_bits",
+        default: None,
+        help: "hashed distinguished-point bits, 0..24",
+    },
+    ParamDecl {
+        name: "cap_multiple",
+        default: None,
+        help: "physical-step budget / sqrt(r)",
+    },
+];
+
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl {
+            id: "rho.plus_model_v1",
+            family: "rho",
+            summary: "counted seeded selection-walk control; hashed predicates, not the CUDA kernel",
+            entry: "ecbench::best2_model::solve(best2=false)",
+            applies: Applies::PrimeOnly,
+            params: BEST2_MODEL_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.best2_model_v1",
+            family: "rho",
+            summary: "counted P+M/P-M model with two full additions, cycle seeks and DP restarts; not GPU cost",
+            entry: "ecbench::best2_model::solve(best2=true)",
+            applies: Applies::PrimeOnly,
+            params: BEST2_MODEL_PARAMS,
+        },
         MethodDecl {
             id: "rho.frozen_reference",
             family: "rho",
@@ -646,7 +685,7 @@ pub fn registry() -> &'static [MethodDecl] {
             ],
         },
         MethodDecl {
-            id: "ic.hyperelliptic",
+            id: "ic.hyperelliptic_thread",
             family: "ic",
             summary: "the hyperelliptic thread's index calculus (ADH/Gaudry) on a genus 2-4 Jacobian (hyperelliptic_thread / hyperelliptic_explicit only): degree-1 places folded by ±, the factor-base walk (start D₁ + D₂, then one Cantor addition a trial), u split by gcd(u, x^p − x) and Cantor–Zassenhaus, Markowitz sparse elimination mod r, up to 4 solve rounds; expected ≈ (m + 1 + extra)·g! trials, so S ≈ (p/2)·g!/√r with the full base, plus uncharged F_p work O(g² log p) a trial and the elimination's mulmods mod r",
             entry: "ecbench::hyper_ic::solve",
@@ -718,6 +757,20 @@ pub fn registry() -> &'static [MethodDecl] {
             params: IC_COUNTED_PARAMS,
         },
         MethodDecl {
+            id: "ic.known_log_mitm2_v1",
+            family: "ic",
+            summary: "target-blind seeded known-log signed base, folded two-sum table, injective Q+[a]H queries and immediate scalar recovery; cold construction charged, native work unpriced",
+            entry: "ecbench::known_log::{prepare,recover}",
+            applies: Applies::Any,
+            params: &[
+                ParamDecl { name: "size", default: None, help: "unsigned base pairs; signed point count is twice this" },
+                ParamDecl { name: "base_seed", default: None, help: "target-independent base seed" },
+                ParamDecl { name: "base_multiplier", default: Some("1"), help: "H=[u]G; use c^-1 when transporting a base to generator [c]G" },
+                ParamDecl { name: "max_pair_work", default: None, help: "hard bound on size*(size+1) pair-construction attempts" },
+                ParamDecl { name: "max_trials", default: None, help: "maximum target-dependent queries; at most one subgroup cycle" },
+            ],
+        },
+        MethodDecl {
             id: "ic.large_prime",
             family: "ic",
             summary: "bounded exact m-summand binary index calculus with zero, single, or double large primes and exact modular elimination",
@@ -754,6 +807,21 @@ pub fn registry() -> &'static [MethodDecl] {
                     default: None,
                     help: "hard cap on exact meet-in-the-middle combination states",
                 },
+            ],
+        },
+        MethodDecl {
+            id: "ic.trace_line_2lp",
+            family: "ic",
+            summary: "bounded exact four-summand binary 2LP correctness reference on standard or trace-selected subfield lines; MITM work and native setup are explicit, unpriced; not the algebraic C1 trial-cost measurement",
+            entry: "ecbench_large_prime::trace_line + solve_candidate_with_basis",
+            applies: Applies::BinaryOnly,
+            params: &[
+                ParamDecl { name: "line", default: None, help: "standard or trace; n must equal 4d" },
+                ParamDecl { name: "d", default: None, help: "subfield dimension, positive with n=4d<=62" },
+                ParamDecl { name: "small_dimension", default: None, help: "nested small-base dimension <= d, same policy in both arms" },
+                ParamDecl { name: "max_u", default: None, help: "inclusive deterministic multiplier scan limit; no fallback" },
+                ParamDecl { name: "max_trials", default: None, help: "relation trial cap" },
+                ParamDecl { name: "max_states", default: None, help: "exact MITM state cap" },
             ],
         },
         MethodDecl {
@@ -1479,6 +1547,27 @@ fn solve_generic<G: CountedGroup>(
         generic_report(o, wall, a, f)
     };
     let rep = match m.id.as_str() {
+        "rho.plus_model_v1" | "rho.best2_model_v1" => {
+            let jumps = param_u64(m, "jumps")?;
+            let walks = param_u64(m, "walks")?;
+            let dp_bits = param_u64(m, "dp_bits")?;
+            if !(1..=256).contains(&jumps) || !(1..=64).contains(&walks) || dp_bits > 24 {
+                return Err("model requires jumps=1..256, walks=1..64, dp_bits=0..24".into());
+            }
+            let o = super::best2_model::solve(
+                g,
+                gen,
+                target,
+                r,
+                seed,
+                cap()?,
+                jumps as usize,
+                walks as usize,
+                dp_bits as u32,
+                m.id == "rho.best2_model_v1",
+            );
+            generic(o, t.elapsed().as_nanos() as u64, 2)
+        }
         "rho.frozen_reference" => {
             let res = rho_reference(g, gen, target, r, seed, cap()?);
             rho(res, t.elapsed().as_nanos() as u64)
@@ -1811,7 +1900,25 @@ fn solve_inner(
         ));
     }
     match (inst, d.family) {
-        (Instance::Binary(i), _) if m.id == "ic.large_prime" => {
+        (Instance::Prime(i), _) if m.id == "ic.known_log_mitm2_v1" => solve_known_log(
+            m,
+            &i.curve,
+            i.generator_point(),
+            PrimePoint::affine(tx, ty),
+            i.r,
+            curve,
+            seed,
+        ),
+        (Instance::Binary(i), _) if m.id == "ic.known_log_mitm2_v1" => solve_known_log(
+            m,
+            &BinaryGroup(&i.fast),
+            i.generator,
+            FastPoint::affine(tx, ty),
+            i.r,
+            curve,
+            seed,
+        ),
+        (Instance::Binary(i), _) if m.id == "ic.large_prime" || m.id == "ic.trace_line_2lp" => {
             solve_large_prime(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
         (Instance::Binary(i), _) if m.id == "ic.shared_rank" => {
@@ -2516,13 +2623,13 @@ fn is_hyper_generic(id: &str) -> bool {
 
 fn hyper_refusal(id: &str, h: &HyperInstance) -> String {
     format!(
-        "`{id}` has no hyperelliptic-Jacobian implementation; on a genus-{} Jacobian over F_{} only rho.plain, rho.negation, rho.frozen_reference, bsgs.*, kangaroo.vow and ic.hyperelliptic run",
+        "`{id}` has no hyperelliptic-Jacobian implementation; on a genus-{} Jacobian over F_{} only rho.plain, rho.negation, rho.frozen_reference, bsgs.*, kangaroo.vow and ic.hyperelliptic_thread run",
         h.genus, h.p
     )
 }
 
 /// The index calculus that runs on a hyperelliptic Jacobian, and only there.
-const HYPER_IC: &str = "ic.hyperelliptic";
+const HYPER_IC: &str = "ic.hyperelliptic_thread";
 
 fn hyper_ic_refusal(curve: &CurveFacts) -> String {
     format!(
@@ -2572,7 +2679,7 @@ fn hyper_ic_params(m: &ResolvedMethod) -> Result<HyperIcParams, String> {
     let branches = param_u64(m, "branches")?;
     let d_step_in = param_u64(m, "d_step_in")?;
     if branches == 0 || d_step_in < 2 {
-        return Err("`ic.hyperelliptic` needs branches ≥ 1 and d_step_in ≥ 2".into());
+        return Err("`ic.hyperelliptic_thread` needs branches ≥ 1 and d_step_in ≥ 2".into());
     }
     Ok(HyperIcParams {
         fb_size,
@@ -2587,7 +2694,7 @@ fn hyper_ic_params(m: &ResolvedMethod) -> Result<HyperIcParams, String> {
 
 /// A hyperelliptic Jacobian (`ecbench::hyper`): a generic method on the
 /// Cantor group, one composition-and-reduction per group operation, or
-/// the thread's index calculus (`ic.hyperelliptic`).
+/// the thread's index calculus (`ic.hyperelliptic_thread`).
 fn solve_hyper(
     m: &ResolvedMethod,
     i: &HyperInstance,
@@ -2607,7 +2714,7 @@ fn solve_hyper(
     solve_generic(m, &i.curve, i.generator, target, i.r, seed)
 }
 
-/// `ic.hyperelliptic`: phases `factor_base`, `walk_setup`, `relations`,
+/// `ic.hyperelliptic_thread`: phases `factor_base`, `walk_setup`, `relations`,
 /// `linear_algebra`, each with its group ledger (Cantor additions, the
 /// only charged work) and its exact native counts, all `*_uncharged`.
 fn solve_hyper_ic(
@@ -2883,27 +2990,55 @@ fn solve_large_prime(
     target: FastPoint,
     seed: u64,
 ) -> Result<SolveReport, String> {
-    let summands = match m.params["summands"].as_str() {
-        "n-1" => inst.n.checked_sub(1).ok_or("field degree has no n-1")?,
-        value => value
-            .parse::<u32>()
-            .map_err(|_| format!("parameter `summands` is not an integer or n-1: `{value}`"))?,
+    let start = Instant::now();
+    let line = if m.id == "ic.trace_line_2lp" {
+        let d = u32::try_from(param_u64(m, "d")?).map_err(|_| "d does not fit u32")?;
+        Some(large_prime::trace_line::construct(
+            inst,
+            d,
+            &m.params["line"],
+            param_u64(m, "max_u")?,
+        )?)
+    } else {
+        None
+    };
+    let summands = if line.is_some() {
+        4
+    } else {
+        match m.params["summands"].as_str() {
+            "n-1" => inst.n.checked_sub(1).ok_or("field degree has no n-1")?,
+            value => value
+                .parse::<u32>()
+                .map_err(|_| format!("parameter `summands` is not an integer or n-1: `{value}`"))?,
+        }
     };
     let config = LargePrimeConfig {
         small_dimension: u32::try_from(param_u64(m, "small_dimension")?)
             .map_err(|_| "small_dimension does not fit u32")?,
-        envelope_dimension: u32::try_from(param_u64(m, "envelope_dimension")?)
-            .map_err(|_| "envelope_dimension does not fit u32")?,
+        envelope_dimension: if let Some(line) = &line {
+            line.d
+        } else {
+            u32::try_from(param_u64(m, "envelope_dimension")?)
+                .map_err(|_| "envelope_dimension does not fit u32")?
+        },
         summands,
-        max_large_primes: u8::try_from(param_u64(m, "large_primes")?)
-            .map_err(|_| "large_primes does not fit u8")?,
+        max_large_primes: if line.is_some() {
+            2
+        } else {
+            u8::try_from(param_u64(m, "large_primes")?)
+                .map_err(|_| "large_primes does not fit u8")?
+        },
         max_trials: param_u64(m, "max_trials")?,
         max_states: param_u64(m, "max_states")?,
         seed,
         large_prime_graph: Default::default(),
     };
     // The method returns an algebraic candidate; ecbench's runner verifies it.
-    let report = large_prime::solve_candidate(inst, target, config)?;
+    let report = if let Some(line) = &line {
+        large_prime::solve_candidate_with_basis(inst, target, config, line.basis.clone())?
+    } else {
+        large_prime::solve_candidate(inst, target, config)?
+    };
     let mut phases = Vec::new();
     for name in ["factor_base", "oracle_setup", "relations", "verification"] {
         let mut phase = ops_phase(
@@ -2941,6 +3076,14 @@ fn solve_large_prime(
     }
     let total_gae = phases.iter().map(|p| p.gae).sum();
     let mut counters = BTreeMap::new();
+    if let Some(line) = &line {
+        counters.extend(line.native.clone());
+        phases.push(PhaseRecord {
+            name: "line_construction".into(),
+            native: line.native.clone(),
+            ..Default::default()
+        });
+    }
     for (name, value) in [
         ("trials", report.counters.trials),
         ("decompositions", report.counters.decompositions),
@@ -2975,12 +3118,17 @@ fn solve_large_prime(
         point_bytes.extend_from_slice(&key.to_be_bytes());
     }
     let points_sha256 = sha256_hex(&point_bytes);
+    let family = if line.is_some() {
+        "binary-shifted-subfield-2lp"
+    } else {
+        "binary-nested-large-prime"
+    };
     let (fb_id, fb_sha256) = short_id(
         "FB1",
         &json!({
             "schema": "ecbench.factor_base/v1",
             "curve": curve.slug,
-            "family": "binary-nested-large-prime",
+            "family": family,
             "params": m.params,
             "columns": report.factor_base.columns,
             "signed_points": report.factor_base.raw_points,
@@ -2990,20 +3138,39 @@ fn solve_large_prime(
     let factor_base = FactorBaseFacts {
         fb_id,
         fb_sha256,
-        family: "binary-nested-large-prime".into(),
+        family: family.into(),
         params: m.params.clone(),
-        description: format!(
-            "x < 2^{} nested at x < 2^{}, projected by cofactor and folded by negation",
-            report.config.envelope_dimension, report.config.small_dimension
-        ),
+        description: if let Some(line) = &line {
+            format!(
+            "x in u*F_(2^{}) with u={}, nested small F2 dimension {}; cofactor projection and negation fold; exact MITM reference",
+            line.d, line.multiplier, report.config.small_dimension
+        )
+        } else {
+            format!(
+                "x < 2^{} nested at x < 2^{}, projected by cofactor and folded by negation",
+                report.config.envelope_dimension, report.config.small_dimension
+            )
+        },
         signed_points: report.factor_base.raw_points as u64,
         abscissae: 1u64 << report.config.envelope_dimension,
         columns: report.factor_base.columns as u64,
         dimension: Some(report.config.envelope_dimension),
         points_sha256,
     };
-    let detail =
+    let mut detail =
         serde_json::to_value(&report).map_err(|e| format!("serialise large-prime report: {e}"))?;
+    if let Some(line) = &line {
+        detail["trace_line"] = serde_json::to_value(line).map_err(|e| e.to_string())?;
+    }
+    let mut unpriced = vec![
+        "combination_states_uncharged".into(),
+        "mitm_lookups_uncharged".into(),
+        "lp_merge_ops_uncharged".into(),
+        "row_ops_uncharged".into(),
+    ];
+    if let Some(line) = &line {
+        unpriced.extend(line.native.keys().cloned());
+    }
     Ok(SolveReport {
         recovered: report.recovered.map(u128::from),
         exhausted: report.exhausted,
@@ -3011,15 +3178,14 @@ fn solve_large_prime(
         total_gae,
         automorphisms_used: 2,
         counters,
-        unpriced: vec![
-            "combination_states_uncharged".into(),
-            "mitm_lookups_uncharged".into(),
-            "lp_merge_ops_uncharged".into(),
-            "row_ops_uncharged".into(),
-        ],
+        unpriced,
         deterministic: true,
         nondeterminism: vec![],
-        solve_wall_ns: report.solve_wall_ns,
+        solve_wall_ns: if line.is_some() {
+            start.elapsed().as_nanos() as u64
+        } else {
+            report.solve_wall_ns
+        },
         factor_base: Some(factor_base),
         detail,
         online: None,
@@ -3092,6 +3258,10 @@ fn online_window(family: &str, id: &str, snap: &Snapshot) -> Option<OnlineWindow
             ],
         };
         w.mapping = format!("{family}: the whole target-dependent solve, one exclusive phase");
+    }
+    if id == "ic.known_log_mitm2_v1" {
+        w.start_event = "first target-dependent Q+[a]H query after the target-blind base and pair table are complete".into();
+        w.mapping = "known-log two-sum recovery: query generation, pair-table PDP, full-point witness check, direct scalar combination (no matrix), and final [d]G=Q verification".into();
     }
     Some(w)
 }
@@ -3545,6 +3715,100 @@ fn factor_base_facts<E: Copy>(
         columns: fb.columns as u64,
         dimension: fb.dimension,
         points_sha256,
+    })
+}
+
+fn solve_known_log<G: CountedGroup>(
+    m: &ResolvedMethod,
+    group: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    curve: &CurveFacts,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let max_trials = param_u64(m, "max_trials")?;
+    if max_trials == 0 {
+        return Err("known-log max_trials must be positive".into());
+    }
+    let params = super::known_log::Parameters {
+        size: usize::try_from(param_u64(m, "size")?).map_err(|_| "base size exceeds usize")?,
+        base_seed: param_u64(m, "base_seed")?,
+        base_multiplier: param_u64(m, "base_multiplier")?,
+        max_pair_work: param_u64(m, "max_pair_work")?,
+    };
+    let started = Instant::now();
+    let prepared = super::known_log::prepare(group, generator, r, params)?;
+    let recovered = super::known_log::recover(group, &prepared, target, seed, max_trials)?;
+    let wall = started.elapsed().as_nanos() as u64;
+    let mut counters = prepared.counters.clone();
+    for (name, count) in &recovered.counters {
+        *counters.entry(name.clone()).or_default() += count;
+    }
+    // No matrix was built: the base logarithms are all known and the
+    // coefficient of Q in every query is 1. The useful target equation
+    // and its rank are reported separately from a nonexistent base matrix.
+    counters.insert("matrix_rows".into(), 0);
+    counters.insert("matrix_rank".into(), 0);
+    counters.insert("matrix_dependent".into(), 0);
+    counters.insert("matrix_work".into(), 0);
+    let ledgers = [
+        prepared.base_ops,
+        prepared.table_ops,
+        recovered.query_ops,
+        recovered.decomposition_ops,
+        recovered.relation_ops,
+        recovered.recovery_ops,
+        recovered.verify_ops,
+    ];
+    let mut phases: Vec<_> = [
+        "factor_base",
+        "oracle_setup",
+        "target_query",
+        "target_PDP",
+        "target_relation_check",
+        "target_descent",
+        "target_recovery_check",
+    ]
+    .iter()
+    .zip(ledgers)
+    .map(|(name, ops)| ops_phase(name, ops))
+    .collect();
+    phases[0].wall_ns = Some(prepared.base_wall_ns);
+    phases[1].wall_ns = Some(prepared.table_wall_ns);
+    phases.push(ops_phase("linear_algebra", GroupOps::default()));
+    let mut fb_params = Params::default();
+    for key in ["size", "base_seed", "base_multiplier"] {
+        fb_params.set(key, m.params[key].clone());
+    }
+    let facts = factor_base_facts(
+        &curve.slug,
+        "known-log-seeded",
+        &fb_params,
+        &prepared.base,
+        |p| group.key(p),
+    )?;
+    Ok(SolveReport {
+        recovered: recovered.recovered.map(u128::from),
+        exhausted: recovered.recovered.is_none(),
+        total_gae: phases.iter().map(|p| p.gae).sum(),
+        phases,
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&counters),
+        counters,
+        deterministic: true,
+        solve_wall_ns: wall,
+        factor_base: Some(facts),
+        detail: json!({
+            "factor_base_log_status": "all known; constructed without a target",
+            "query_law": "Q+[a+t]H; a seeded uniformly, no repeats before r queries; H=[u]G",
+            "recovery_law": "log_G(Q)=u*(log_H(F_i)+log_H(F_j)-a-t) mod r",
+            "linear_algebra": {"name":"none", "reason":"no unknown factor-base logarithms"},
+            "table_memory": "negation-folded pair table, one witness per distinct signed sum class; peak RSS recorded by runner",
+            "cost_scope": "cold, one target, all group operations plus explicitly unpriced native work",
+        }),
+        field_ops: field_ops_of(group, &ledgers),
+        ..Default::default()
     })
 }
 
@@ -4722,6 +4986,42 @@ mod tests {
     }
 
     use super::*;
+
+    #[test]
+    fn best2_model_registry_prime_recovery_and_replay() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+        let spec = CurveSpec::PrimeSearch {
+            bits: 14,
+            seed: 59297,
+        };
+        for id in ["rho.plus_model_v1", "rho.best2_model_v1"] {
+            let params = [
+                ("jumps", "16"),
+                ("walks", "8"),
+                ("dp_bits", "2"),
+                ("cap_multiple", "10000"),
+            ]
+            .into_iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect();
+            let m = resolve(&MethodSpec {
+                id: id.into(),
+                params,
+            })
+            .unwrap();
+            for index in 0..4 {
+                let (w, inst) =
+                    Workload::build(&spec, 20261027, index, TargetKind::Planted).unwrap();
+                let a = solve(&m, &inst, &w.curve, &w.target, index + 1).unwrap();
+                let b = solve(&m, &inst, &w.curve, &w.target, index + 1).unwrap();
+                assert_eq!(a.recovered, w.planted);
+                assert_eq!(a.recovered, b.recovered);
+                assert_eq!(a.counters, b.counters);
+                assert_eq!(a.total_gae, b.total_gae);
+                assert!(a.counters["physical_steps"] > 0);
+            }
+        }
+    }
 
     #[test]
     fn defaults_are_written_before_hashing() {
