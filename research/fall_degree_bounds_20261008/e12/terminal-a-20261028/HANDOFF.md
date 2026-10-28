@@ -74,3 +74,55 @@ and JSON files pass the whitespace check. A proposed Node-based link checker
 could not run because `node` is unavailable; native `rg`, `sed`, `test`, `stat`
 and `jq` checks verified every local Markdown target and all 38 manifest lengths
 instead. No failed check is represented as a successful one.
+
+## Migration reconciliation — 2026-10-28T13:03Z
+
+### What was done
+
+The approved migration receipt at
+`/srv/experiments/agent-migration/handoff-receipt.json` was read through the
+documented scoped `sudo -n cat` path after an ordinary read was denied. The
+restored worktree is now `/home/ec2-user/crypto-e12a-terminal-20261028`, on the
+same branch at pre-edit commit `7c05a9a16cdcf4e6fd35504ff5d89a54d6307642`.
+The old `/var/tmp/` worktree path above is historical. The working tree was
+clean before resuming this delivery.
+
+The migrated local Conductor service retained existing T-735, which was claimed
+for `research/fall_degree_bounds_20261008/RESULTS.md`, and T-733, which was
+reclaimed for this packet directory. No duplicate coordination task was filed.
+The mutable study summary now marks its earlier E12a/E12c ongoing statement as
+historical and links the terminal E12a observation. The packet's original
+terminal receipts, data files, manifest and archives are unchanged. Only this
+derived handoff and its checksum were updated inside the packet.
+
+Post-migration checks verified all 42 entries in `evidence.sha256`, all seven
+original source hashes, and all 38 manifest hashes and byte lengths. The target
+JSONL still parses as zero objects; the terminal receipt still reports exit 143.
+Both archive digests and their 9/28 member counts match the saved record. The
+changed derived Markdown and checksum pass `git diff --check`.
+
+### Decisions made
+
+The existing job's terminal receipt and zero-byte target file determine the
+status: interruption with zero completed target records. The saved S3 durability
+receipt establishes the earlier fresh GET and byte comparison; this migration
+follow-up makes no new cloud request. The frozen Amendments 13/14, final receipt,
+and persistence contract remain the sources for the terminal-state pointer.
+No new scientific result, trial, retry, deadline or compute allocation is added.
+
+### Open threads
+
+Publication remains delegated to the parent: run the required exact-source
+release library check, inspect the resulting commit and existing PR state,
+then push and open or update the regular PR with applicable checks and auto-merge.
+No build, push or PR creation was performed by this migration follow-up. The
+USD 200 total campaign ceiling and all original completion criteria are retained.
+
+### Errors
+
+The first ordinary read of the root-owned migration receipt returned permission
+denied; the documented narrowly scoped noninteractive sudo read succeeded. The
+initial Conductor check reported T-735's existing reservation; inspecting and
+claiming that same ready task resolved ownership without bypassing the scope.
+No protected source, old evidence, cloud resource or unrelated managed generator
+was modified.
