@@ -246,6 +246,34 @@ def koblitz_modular_augmentation(ref, since):
              label="Exact equivariant recovery scalar on the n=5 augmentation targets; no cost claim",
              source=f"{path}@{commit}")
 
+
+def koblitz_modular_geometry(ref, since):
+    """Export exact recorded certificate counts, never cost or subgroup rank."""
+    base = "research/koblitz_modular_ic_20261018/rounds/"
+    for round_id in (24, 25):
+        path = f"{base}{round_id}/results.json"
+        for date, commit, text in file_history(ref, path, since):
+            record = json.loads(text)
+            if round_id == 24:
+                geometry = record.get("written_geometric_consequences", {})
+                if not geometry.get("proper_infinity_fiber_complete"):
+                    continue
+                value = len(record.get("points", []))
+                metric = "koblitz_modular.infinity_source_points"
+                label = "Original infinity fiber points under the written normalization bridge; no cost claim"
+                unit = "closed points"
+            else:
+                quotient = record.get("registered_quotient", {})
+                if not (quotient.get("accepted") and quotient.get("all_pullback_residuals_zero")):
+                    continue
+                value = quotient.get("pullback_certificates")
+                metric = "koblitz_modular.registered_quotient_pullbacks"
+                label = "Exact original-source pullback identities on the registered b-unit quotient; no rank claim"
+                unit = "identities"
+            emit(metric, value, date=date, problem=P_IC, unit=unit,
+                 better="neutral", label=label, source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -309,6 +337,7 @@ def main():
     fall_degree(a.ref)
 
     koblitz_modular_augmentation(a.ref, a.since)
+    koblitz_modular_geometry(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

@@ -41,3 +41,15 @@ without concurrent repository mutations until input.sing has been copied.
 Q25-registered03 passes the gate and begins native execution, then rejects
 reserved polynomial name numerator. Rename it qrNumerator before04. No
 thirteen-generator conclusion is accepted from this partial run.
+Q25-registered04 is also refused before native launch. The preceding commit
+had not finished when checkpoint hashing began; the timestamp/head in the
+upload does not prove its earlier fingerprint saw the final HEAD. Preserve
+this second gate-only directory. Wait for the completed commit, then sequence
+checkpoint push and fresh registered05 in one shell, with no concurrent
+repository mutation. Native equation source is unchanged from8db5f5c0b.
+
+The checkpoint before the corrupt control fails before any runner launch:
+/tmp has1048576/1048576 inodes used. Persistent research files are intact;
+no native call is counted. Retain the error log and set the checkpoint's
+TMPDIR to the task-owned /var/tmp/koblitz-r25-checkpoint. Do not delete or
+change other jobs' temporary files. Native limits remain4GiB/1200s.

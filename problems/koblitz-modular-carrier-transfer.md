@@ -1044,3 +1044,25 @@ supports and complete global divisors/RR/F2 factor map remain open, as do
 all node187/quotient/reverse obligations above. No IC performance or new
 relation rank is claimed. The shared index was initially reserved; a later
 clear scope check permits its existing Koblitz row to reflect this result.
+
+## Round25: original involution and registered affine quotient
+
+[Round25](../research/koblitz_modular_ic_20261018/rounds/25/CM.md) certifies
+sigma(lambda,nu)=(lambda+1+c,nu+b) on all five original equations and eight
+registered entries. With U=(1+c)*nu+b*lambda and V=nu^2+b*nu, thirteen exact
+polynomial pullbacks produce a complete registered-open quotient presentation
+B[nu]/(nu^2+b*nu+V), b*lambda=U+(1+c)*nu. Its derivative b is a registered
+unit; no division by1+c is needed, including at SS5. This written affine
+scheme/invariant-ring argument preserves the whole original registered
+source algebra; it does not supply the missing proper boundary equations,
+full coupled quotient saturation or proper polarized embedding.
+
+The fixed field is the retained degree8 intermediate field. Generic U,V
+numerators have Z-degree7; actual trace/norm identities and14 audited Lean
+algebra proofs are retained. The desired order11 action remains untested:
+pullback after norm is1+sigma and can annihilate that factor. Determine its
+actual subgroup/matrix action before using this cover for direct relations.
+No arbitrary collected-divisor reverse evaluator or new relation rank is
+established. The remaining four polar supports, additional zero supports,
+complete global divisors/RR/F2 map, node187 membership and460/367 images
+remain open. Every failed native/Lean/gate/storage attempt is retained.

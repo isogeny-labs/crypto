@@ -42,3 +42,27 @@ were skipped. Those outcomes apply to that head only. Auto-merge had been
 enabled externally and was disabled to preserve this task's no-merge rule.
 Remote history will be merged without force-pushing; final software/check
 status is recorded in the publication receipt, not inferred from math success.
+
+## Integrated-base local run, 2026-10-28 UTC
+
+The new run is bound to integrated source7fcc0e26b64593e3372cc2751efe0511588b89af.
+Root01 fails before tests (exit101):38 missing include diagnostics,31 exact
+HEAD blobs restored after scope checks. Root02 runs5077 tests under the
+original1200s cap and exits124 without a whole-suite summary. Its log has27
+observed FAILED test lines.81 exact known runtime blobs were restored after
+the tests had started; this explains why those inputs cannot make that
+capped run green retrospectively. No root implementation or expectation changes.
+
+Targeted diagnostic01 selects precisely those27 names from the same test
+binary:21 pass,6 fail. Five fail on absent emulator source; the sixth is the
+inherited ic.hyperelliptic registry contract. After clear scope and exact
+Git-blob verification of emulator.cpp/arithmetic.h/wire.hpp, diagnostic02
+replays the same27:26 pass,1 fail. The remaining test is
+cryptanalysis::ecbench::methods::tests::legacy_numeric_hec_contract_stays_distinct_from_thread_controls;
+resolve reports unknown method ic.hyperelliptic. This research package does
+not patch the unrelated registry. No further whole-suite run is performed.
+
+Raw software receipts are sealed separately as validation.tar.xz with
+validation.sha256/validation.files and validation.json. They do not alter
+R24's immutable70-member scientific archive or source19b8ef5e8. Targeted
+passes are diagnostics only; the final integrated root suite is not green.

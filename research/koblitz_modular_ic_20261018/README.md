@@ -1,6 +1,21 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [22](rounds/22/README.md), with its
+The current round is [25](rounds/25/README.md): the original quadratic
+source involution, thirteen exact pullback equations for its registered
+b-unit affine quotient, direct norms and fourteen audited Lean identities.
+See the [geometry](rounds/25/CM.md), [PDF](rounds/25/report.pdf),
+[proof scope](rounds/25/PROOF_MAP.md) and [next checks](rounds/25/NEXT.md).
+The quotient's action on the desired order11 factor is untested.
+
+[Round24](rounds/24/README.md) records the complete rational infinity fiber
+e1,1,7,7, original coordinate/denominator orders and constant field F2 under
+the written source-normalization bridge. [Round23](rounds/23/README.md)
+records SS5/Z5 exceptional geometry. Four rational polar supports, additional
+zero supports, complete global divisors/RR and the actual F2 factor map
+remain open. Whole quotient saturation/proper polarized embedding and
+arbitrary-divisor reverse evaluation are separate outstanding requirements.
+
+The exact norm-zero recovery remains in [Round22](rounds/22/README.md), with its
 [report](rounds/22/REPORT.md),[PDF](rounds/22/report.pdf),
 [exact recovery](rounds/22/RECOVERY.md),[coupled divisors](rounds/22/SATURATION.md),
 [proper geometry](rounds/22/CM.md),[proof map](rounds/22/PROOF_MAP.md),
