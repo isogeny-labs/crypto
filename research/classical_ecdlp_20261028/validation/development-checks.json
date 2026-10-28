@@ -215,7 +215,7 @@
         "passed": 14,
         "failed": 0,
         "ignored": 0,
-        "stdout_sha256": "e5e791c3e3a6596ca34cd4e74670510cf5191eabb1d823babb0e125daff268b5"
+        "combined_output_sha256": "e5e791c3e3a6596ca34cd4e74670510cf5191eabb1d823babb0e125daff268b5"
       },
       "historical_files_sha256_verified": 19,
       "scoped_rustfmt": "passed",
@@ -238,6 +238,44 @@
       "resulting_head_required_checks": "not yet observed",
       "conductor": "unavailable; local control plane connection refused",
       "note": "Upstream adds separate APS solver encodings, streaming domains and rational-root extraction. This integration check does not rerun the full library suite, execute historical Python paths or add a performance experiment. The earlier library counts remain tied to base 6187036."
+    },
+    {
+      "checked_at": "2026-10-28T20:09:27Z",
+      "previous_pr_head": "f2912961cd16ed12bc914fbb0cd0ccbd8694b82c",
+      "merged_main": "0d839d5b7780148439b1d6929b7fc440fda2dcbe",
+      "merge_conflicts": false,
+      "upstream_library_changes": [
+        "src/cryptanalysis/mod.rs",
+        "src/cryptanalysis/hky_fp_tower.rs"
+      ],
+      "upstream_change_scope": "One new module declaration and a separate additive HKY tower module, examples and study. No existing arithmetic implementation changes.",
+      "archive_engine_label_arithmetic_and_cargo_unchanged": true,
+      "native_source_unchanged_since_review": true,
+      "example_regression": {
+        "tested_main": "8177cd083ed4b07e76a1ddba5df175b01fa34451",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "note": "The completed invocation is the previous follow-up's regression. The archive and its dependencies are unchanged by this additive module integration; no new 14-test invocation is claimed here."
+      },
+      "compile_check": {
+        "command": "cargo check --release --locked --example classical_ecdlp_archive",
+        "status": "passed",
+        "completed_observed_at": "2026-10-28T20:11:27Z",
+        "exit_code": 0,
+        "combined_output_sha256": "e7d8f6510444bf2f6de435eedc1a4ad89ac5f494b7ccc215a2fc1201a3dc9111"
+      },
+      "historical_files_sha256_verified": 19,
+      "scoped_rustfmt": "passed",
+      "artifact_policy_files_requiring_store": 0,
+      "previous_head_required_checks": {
+        "gate": "in_progress",
+        "size": "in_progress",
+        "artifacts": "in_progress"
+      },
+      "resulting_head_required_checks": "not yet observed",
+      "conductor": "unavailable; local control plane connection refused",
+      "note": "Main advanced again during the preceding build/publication. Integrate the current base, preserve the completed test's actual revision, and obtain fresh required checks. No full-suite invocation, historical Python execution or performance experiment was added."
     }
   ]
 }

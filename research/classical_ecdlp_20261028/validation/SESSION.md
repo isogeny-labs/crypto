@@ -117,3 +117,24 @@
 ### Errors (what went wrong, how it was handled)
 
 - The archive regression has no failures. The separately reported optional checkout cancellation and unavailable Conductor service remain external limitations; neither was bypassed.
+
+## 2026-10-28T20:11:27Z — integrate additive HKY module and verify compilation
+
+### What was done (commands, files, features)
+
+- `main` advanced during the preceding build/publication to `0d839d5b7780148439b1d6929b7fc440fda2dcbe` (PR #2793). Merged it without conflicts. The only existing library-file change is one `pub mod hky_fp_tower` declaration; the new module and separate examples/study do not alter the archive's engine, arithmetic, Cargo files or fixtures.
+- `cargo check --release --locked --example classical_ecdlp_archive` against the completed merge exited 0. Rechecked all 19 historical SHA-256 hashes and scoped formatting successfully. The native source is still identical to reviewed commit `4cfcece`.
+- Before this second base merge, required `gate`, `size` and `artifacts` on `f2912961` were running without failures. The resulting head requires fresh successful checks. Rechecked the remote feature head and base before publication.
+
+### Decisions made (and why)
+
+- Preserve the completed 14-test run's exact tested base (`8177cd08`). This additive module integration changes none of the archive's execution dependencies; verify its compilation and retain the existing regression record rather than claim another test invocation.
+- Keep the PR at 33 files, with only task-specific validation updates beyond the frozen archive. No full-suite run, performance experiment or historical Python execution was added.
+
+### Open threads (unfinished, pick up next time)
+
+- Publish the reviewed second base merge, check its required CI and protections, then merge using the authorized merge-commit method with the expected-head-SHA guard. Verify GitHub reports merged and record the merge SHA and validation outcome on the PR.
+
+### Errors (what went wrong, how it was handled)
+
+- No archive build or integrity failure occurred. Conductor remains unavailable; no lease or protection bypass is claimed. The rejected full shared daily-log upload was not retried.
