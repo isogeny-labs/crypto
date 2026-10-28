@@ -124,3 +124,18 @@ All branch/source and precision controls remain in the same native call.
 RR01 rejected collision of seed poly ee with coefficient int ee; operator
 stopped this already-failed invocation, native reported0. Rename the new
 integer rrExponent only beforeRR02; no candidate/constraint change.
+
+Prospective CUSP27: exact divisor ofnu/sigma(nu) has degree34 and ramified
+cusp anti-pair vector(11,0,7,11,5), orderedO,A,C,D,B. Transport byT gives
+negacyclic moduleT5=-1, sinceT5=sigma. Compute resultant of this actual
+relation andt5+1 overZ, and mod11 the full ideal/lift. Test gcd=t-6 and
+allfour primitive values2,6,7,8, not a sampled/coefficient-box search.
+This bounds the rational ramified cusp module; it does NOT certify a nonzero
+Jacobian class or its inclusion into the intended factor. The value6 matches
+R26's retained rational diamond character but that agreement is not a map.
+
+Lean01 failed map_div (group rather than group-with-zero lemma),additive
+order in a denominator proof,and incomplete denominator simplification.
+It finished exit1 after a migrated-NFS RPC wait. Source/log retained; replace
+map_div bymap_div0 and explicit div_eq_iff denominator reasoning before02.
+No theorem statement or geometric bridge is strengthened by the correction.

@@ -18,7 +18,7 @@ theorem ratio_norm {K : Type*} [Field K] (s : K ≃+* K)
     (hss : ∀ x, s (s x) = x) (f : K) (hf : f ≠ 0) :
     (f / s f) * s (f / s f) = 1 := by
   have hsf : s f ≠ 0 := by simpa using hf
-  simp only [map_div, hss]
+  simp only [map_div₀, hss]
   field_simp
 
 theorem ratio_nontrivial {K : Type*} [Field K] (f g : K)
@@ -34,9 +34,9 @@ theorem hilbert90_explicit {K : Type*} [Field K] (g : K)
     intro h
     apply hplus
     have hh := congrArg (fun x : K => x * g) h
-    simpa [add_mul, hg] using hh
-  field_simp
-  <;> ring
+    simpa [add_mul, hg, add_comm] using hh
+  apply (div_eq_iff hden).2
+  simp [mul_add, hg, add_comm]
 
 theorem translation_not_fixed {K : Type*} [AddGroup K] (x b : K)
     (hb : b ≠ 0) : x + b ≠ x := by
