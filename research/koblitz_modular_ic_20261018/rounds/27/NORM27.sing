@@ -23,7 +23,8 @@ print("HILBERT90_RATIOS_PASS");
 ring free27=2,(b,ib,aa),dp;
 ideal fixedIdeal=b,aa,b*ib+1;
 matrix witness[1][3]=ib,0,1;
-if((matrix(fixedIdeal)*transpose(witness))[1,1]!=1){ERROR("b-unit fixed locus certificate failed");}
+matrix fixedCert=matrix(fixedIdeal)*transpose(witness);
+if(fixedCert[1,1]!=1){ERROR("b-unit fixed locus certificate failed");}
 print("B_UNIT_FIXED_LOCUS_IDEAL_CERTIFICATE");witness;
 // Exact degree accounting, literal accepted LAURENT02 rows; no Python math.
 int lambdaPoles=4+3+28+21+1+7;
@@ -46,7 +47,7 @@ poly rn=(u+1)*v+1;poly cn=rn+u^3;
 poly bn=rn*cn;poly an=u^4+cn;
 poly mn=reduce(bn^4+bn*cn*an^3*u^5+cn^2*an^4*u^4,ei);
 poly mnorm=reduce(mn*subst(mn,v,v+1),ei);
-if(deg(mnorm,v)>0){ERROR("base norm still depends on v");}
+if(subst(mnorm,v,0)!=mnorm){ERROR("base norm still depends on v");}
 print("LAMBDA_MU_NORM_NUMERATOR");mnorm;
 list factors=factorize(mnorm);print("LAMBDA_MU_NORM_FACTORIZATION");factors;
 poly product=1;int fi;

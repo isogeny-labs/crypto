@@ -1,7 +1,7 @@
 import Mathlib.Algebra.CharP.Basic
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Ring
-import Mathlib.Tactic.Omega
+import Lean.Elab.Tactic.Omega
 
 /-! Universal collector identities. Geometric divisor and quotient bridges
 remain written; no actual modular factor inclusion is assumed as an axiom. -/
