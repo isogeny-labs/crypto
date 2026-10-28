@@ -4,7 +4,7 @@
 - **Kind:** implementation gap; low-genus existence question; partial formalization
 - **Affected work:** [investigation](../research/koblitz_modular_ic_20261018/REPORT.md), [original construction](../research/notes/ecc2k130/RESEARCH_ECC2K130_CURVE_CONSTRUCTION.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-27
+- **Last updated:** 2026-10-28
 
 ## Problem
 
@@ -1020,3 +1020,22 @@ Round23 scope clarification:the five rational polar charts do not by themselves
 complete every zero divisor. Additional zero supports of the original functions
 must be enumerated by exact norms and source fibers;see
 [DIVISOR_SCOPE_ADDENDUM.md](../research/koblitz_modular_ic_20261018/rounds/23/DIVISOR_SCOPE_ADDENDUM.md).
+
+## Round24: explicit infinity charts and constant field
+
+[Round24 geometry](../research/koblitz_modular_ic_20261018/rounds/24/CM.md)
+constructs source-bound charts above the rational base point at infinity.
+The exact substitutions t=w^7*x^2,Z=w^11*x^3 and their rational inverses,
+together with the two unramified charts Z=t^3*y, have four unit Jacobian
+residues. Under the written proper/source bridge they give four rational
+normalized points of indices1,1,7,7, exhausting the degree16 fiber. This also
+forces the full constant field to be F2. The unchanged plane polynomial
+independently remains irreducible over F4 with product and field controls.
+
+The remaining rational polar supports are A0,B0,C0,D0. Original-coordinate
+nu and all registered denominator orders require separate accepted coefficient
+evaluation; a rejected initial series helper supplies no valuations or pole
+claim. Additional zero supports and complete global divisors/RR/F2 factor
+map remain open, as do all node187/quotient/reverse obligations above.
+No IC performance or new relation rank is claimed. The shared problem index
+was reserved by another task and was left unchanged pending a clear scope.

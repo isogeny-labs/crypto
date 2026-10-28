@@ -20,6 +20,12 @@
   Those numbers are not valuations or a nu-pole result. Replace the helper
   by the degree of the last term in this univariate global ordering and add
   explicit unit/order-1/order-7 controls before evaluating any chart.
+- The initial Round24 wildcard archive ignore also excluded the temporary
+  checkpoint-evidence archive from source checkpoints. No migration occurred
+  and the native raw files remain present. Add an explicit unignore before
+  the next checkpoint; verify its inclusion. The final immutable run archive
+  is separately sealed and published. Earlier checkpoints are not claimed to
+  contain those ignored raw bytes.
 
 All R01-23 failures, capped normalizations, validation limitations and missing
 first-host raw logs remain as previously recorded. No failed computation is
