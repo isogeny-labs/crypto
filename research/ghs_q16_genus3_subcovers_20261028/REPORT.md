@@ -25,6 +25,13 @@ curve in the same isogeny class. The direct-cover negative search covers the
 12 order-3974 source equations; the automorphism check covers one
 genus-three representative in each of three source-order classes.
 
+A later degree-three branch-supported check excludes 1,440 residue systems
+across all 60 cataloged models in those three classes. Separately, a
+prime-to-subgroup-order isogeny to a genus-three Jacobian **exists
+abstractly** for all 66 older source equations. The isogeny has not been
+evaluated on source points, so these results remain bounds and feasibility
+certificates rather than an additional measured attack.
+
 ## Fifteen exact eligible equations and measured costs
 
 Every source has the common form
@@ -34,8 +41,8 @@ field embeddings, map checks, and individual receipts are in
 [`map15_receipt.json`](map15_receipt.json) and
 [`attack15_receipt.json`](attack15_receipt.json). The
 [`prior-work receipt`](prior_work_receipt.json) gives each exact equation's
-cataloged isogeny class and marks its exact-publication status as
-unverified. The measured "full" cost
+cataloged isogeny class, checks the published trace-zero cover criterion,
+and marks its exact-equation publication status as unverified. The measured "full" cost
 includes curve construction, point counting, source-to-Jacobian map,
 factor-base setup, relation collection, and linear solve. Rho is the mean
 wall time of 1,000 independent solves of that *same* source target using
@@ -61,7 +68,7 @@ larger than rho for every row (31.1–241 times in this run).
 | 3816 | 3970 | 397 | 0.978 | 0.48 | 2039 |
 
 All 15 full runs returned a verified logarithm. Timing is a local single-run
-measurement for the transfer and a 100-run mean for rho; compiler/runtime
+measurement for the transfer and a 1,000-run mean for rho; compiler/runtime
 choices and setup accounting are recorded in the scripts and receipts. The
 rows with `#E=4098`, `4162`, and `3970` lie in already cataloged
 [LMFDB classes 3.16.a_a_b](https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_b),
@@ -101,11 +108,14 @@ for all 15. The Lean theorem `iterated_square_injective` checks the
 abstract injectivity step.
 
 This is a bound on the displayed construction, not on every curve exposed
-to transfer attacks. The `V4` genus-three cover structure is already
-studied in [Nart–Ritzenthaler](https://arxiv.org/abs/0905.0546), and
-the published even-characteristic isogeny-condition classification also
-applies. The closed formula generates and excludes exact cases, but it
-does not establish a new family type or a speedup.
+to transfer attacks. Every listed `b` satisfies
+`Tr_(K/k)(b)=b+b^16+b^256=0`. The characteristic-two genus-three
+hyperelliptic construction under precisely this condition appears in
+[Joux–Vitse, Appendix A.2](https://www.iacr.org/archive/eurocrypt2012/72370010/72370010.pdf).
+The `V4` genus-three cover structure is also studied in
+[Nart–Ritzenthaler](https://arxiv.org/abs/0905.0546). The closed formula
+parameterizes 15 exact cases **inside a published family** and does not
+establish a new family type or a speedup.
 
 ### Explicit transfer for `b=1384`
 
@@ -234,6 +244,11 @@ three representative equations are already in
 [LMFDB](https://www.lmfdb.org/Variety/Abelian/Fq/3/16/).
 The [original GHS/Weil-descent work](https://www.kantmath.de/publications/papers/weil_descent.pdf)
 describes the cover-to-Jacobian transfer framework. Earlier
+[Joux–Vitse characteristic-two genus-three work](https://www.iacr.org/archive/eurocrypt2012/72370010/72370010.pdf)
+already covers every one of the 15 new local `b` masks through its
+relative-trace-zero condition. The exact-equation publication status remains
+unverified, but the cover-family classification is settled as prior work.
+Other
 [degree-four genus-three elliptic-subcover work](https://www.researchgate.net/publication/290858033_Some_Elliptic_Subcovers_of_Genus_3_Hyperelliptic_Curves)
 explicitly treats characteristic other than two, and
 [characteristic-two genus-three curves with many involutions](https://arxiv.org/abs/0905.0546)
@@ -242,7 +257,7 @@ already give elliptic quotients in a different configuration. A
 explicitly covers the setting `genus(C)=3*genus(E)`; our 15 exact
 examples satisfy this condition by their Weil polynomials. The accessible
 abstract does not identify which classification row contains the equations
-here, so a new family claim is not justified. The local order-three-pole
+here. The local order-three-pole
 criterion may be useful as a sharper exclusion for this characteristic-two
 cover form, but its publication novelty has not been established.
 Relative to the 66-source frontier, the 15 `b` equations are newly
@@ -250,6 +265,47 @@ identified **exact eligible equations**. Their isogeny classes and the
 general cover-attack setting are known; their measured full costs are
 above rho. There is no newly demonstrated vulnerable family or new attack
 method in this result.
+
+## Non-trace-zero genus-three transfer gate
+
+The earlier 66 exact q16 source equations have `Tr_(K/k)(b) != 0`, verified
+per equation in [`isogeny_feasibility_receipt.json`](isogeny_feasibility_receipt.json).
+They lie outside the Joux–Vitse trace-zero construction above. Their Weil
+restrictions nevertheless share a Frobenius polynomial with a cataloged
+genus-three Jacobian over `k`, as checked against the frozen
+[LMFDB model and polynomial snapshot](catalog_models.json):
+
+| Source order | Trace `t=4097-#E` | Prime `r` | Jacobian class | `disc(f) mod r` |
+|---:|---:|---:|---|---:|
+| 3974 | 123 | 1987 | [3.16.a_a_aet](https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_aet) | 587 |
+| 3978 | 119 | 17 | [3.16.a_a_aep](https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_aep) | 8 |
+| 4178 | -81 | 2089 | [3.16.a_a_dd](https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_dd) | 1702 |
+
+Here `f(T)=T^6-t*T^3+16^3`, and resultant arithmetic gives
+`disc(f)=3^6*16^6*(t^2-4*16^3)^3`. Since `r` does not divide the
+discriminant, `f mod r` is squarefree. The r-adic Tate modules of the Weil
+restriction and the Jacobian are free rank-one modules over the same finite
+etale algebra `Z_r[T]/(f)`; hence they are Frobenius-equivariantly
+isomorphic. [Tate's homomorphism theorem](https://doi.org/10.1007/BF01404549)
+then supplies an isogeny of degree prime to `r`, injective on the selected
+prime subgroup. This is an **existence theorem**; the point map and its cost
+are still missing. [`IsogenyGate.lean`](IsogenyGate.lean) checks the finite
+count and three modular discriminant values. It does not formalize Tate's
+theorem or the geometric isogeny.
+
+The [`degree-three branch-supported certificate`](degree3_branch_supported_receipt.json)
+tests a different direct-cover route on all 60 cataloged genus-three models
+in these classes. For each model and each of the 24 permutations of the
+branch-root divisor `(2,1,-2,-1)`, it forms the `48 x 24` binary
+residue-matching matrix for `X=lambda*product(x-r_i)^e_i`, with arbitrary
+independent `lambda,mu`, where `mu=sqrt(b)/lambda`. Every matrix has rank
+24 and its augmentation by the required residues has rank 25:
+**1,440 bounded cases excluded**. The remaining branch-supported
+degree-three divisors have an order-three pole, which an Artin–Schreier
+coboundary cannot remove. This excludes the specified degree-three ansatz
+for those 60 exact target models, regardless of source `b`. It does not
+exclude maps with other zeros or poles, another model, a higher-degree
+cover, or an isogeny correspondence.
 
 ## Replay and proof scope
 
@@ -262,10 +318,13 @@ TMPDIR=/Volumes/SSD990/llm/tmp /Volumes/SSD990/cryptanalysis/third_party/sage-bi
 TMPDIR=/Volumes/SSD990/llm/tmp /Volumes/SSD990/cryptanalysis/third_party/sage-binary/sage -python research/ghs_q16_genus3_subcovers_20261028/map4162.py
 TMPDIR=/Volumes/SSD990/llm/tmp /Volumes/SSD990/cryptanalysis/third_party/sage-binary/sage -python research/ghs_q16_genus3_subcovers_20261028/attack4162.py
 python3 research/ghs_q16_genus3_subcovers_20261028/prior_work.py
+python3 research/ghs_q16_genus3_subcovers_20261028/isogeny_feasibility.py
+TMPDIR=/Volumes/SSD990/llm/tmp /Volumes/SSD990/cryptanalysis/third_party/sage-binary/sage -python research/ghs_q16_genus3_subcovers_20261028/degree3_branch_supported.py
 TMPDIR=/Volumes/SSD990/llm/tmp /Volumes/SSD990/cryptanalysis/third_party/sage-binary/sage -python research/ghs_q16_genus3_subcovers_20261028/family_formula.py
 python3 research/ghs_q16_genus3_subcovers_20261028/audit.py
 lean research/ghs_q16_genus3_subcovers_20261028/PatternAccounting.lean
 lean research/ghs_q16_genus3_subcovers_20261028/BranchPole.lean
+lean research/ghs_q16_genus3_subcovers_20261028/IsogenyGate.lean
 ```
 
 `PatternAccounting.lean` checks the exact search cardinalities and subgroup

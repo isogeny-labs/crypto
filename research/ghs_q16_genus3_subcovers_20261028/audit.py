@@ -28,6 +28,20 @@ def gf_mul(x, y):
     return result
 
 
+def gf_pow(x, exponent):
+    out = 1
+    while exponent:
+        if exponent & 1:
+            out = gf_mul(out, x)
+        x = gf_mul(x, x)
+        exponent >>= 1
+    return out
+
+
+def relative_trace(x):
+    return x ^ gf_pow(x, 16) ^ gf_pow(x, 256)
+
+
 def rank(vectors):
     pivots = {}
     for vector in vectors:
@@ -154,8 +168,54 @@ def main():
     assert {r["b_mask"] for r in prior["rows"]} == set(descent["eligible_b_masks"])
     assert all(r["prior_lmfdb_isogeny_class"] and
                r["exact_equation_publication_status"] == "unverified" and
+               r["published_family_match"] and
+               r["relative_trace_b_mask"] == relative_trace(r["b_mask"]) == 0 and
                r["verified_eligible_transfer"] and
                not r["measured_full_cost_below_rho"] for r in prior["rows"])
+    assert all(r["published_trace_zero_genus3_cover"] ==
+               "https://www.iacr.org/archive/eurocrypt2012/72370010/72370010.pdf"
+               for r in prior["rows"])
+
+    catalog_path = HERE/"catalog_models.json"
+    catalog = json.loads(catalog_path.read_text())
+    assert sum(len(row["curves"]) for row in catalog["rows"]) == 60
+    degree3 = json.loads((HERE/"degree3_branch_supported_receipt.json").read_text())
+    assert degree3["script_sha256"] == sha(HERE/"degree3_branch_supported.py")
+    assert degree3["catalog_sha256"] == sha(catalog_path)
+    assert len(degree3["models"]) == 60
+    assert ({row["class"] for row in degree3["models"]} ==
+            {row["label"] for row in catalog["rows"]})
+    for model in degree3["models"]:
+        assert len(model["branch_roots_masks"]) == len(model["reduced_residue_masks"]) == 4
+        assert len(model["cases"]) == 24
+        rhs = model["rhs_bitmask"]
+        for case in model["cases"]:
+            columns = case["matrix_column_bitmasks"]
+            assert len(columns) == 24
+            assert rank(columns) == case["rank"] == 24
+            assert rank(columns + [rhs]) == case["augmented_rank"] == 25
+
+    frontier_path = HERE.parent/"ghs_q16_genus4_frontier_20261028"/"summary.json"
+    frontier = json.loads(frontier_path.read_text())
+    isogeny = json.loads((HERE/"isogeny_feasibility_receipt.json").read_text())
+    assert isogeny["script_sha256"] == sha(HERE/"isogeny_feasibility.py")
+    assert isogeny["frontier_sha256"] == sha(frontier_path)
+    assert isogeny["catalog_sha256"] == sha(catalog_path)
+    assert len(isogeny["classes"]) == 3
+    assert sum(len(row["models"]) for row in isogeny["classes"]) == 66
+    for row, source_class in zip(isogeny["classes"], frontier["classes"]):
+        n, r, t = row["source_order"], row["subgroup_prime"], row["source_trace_t"]
+        assert n == source_class["source_order"] and r == source_class["subgroup_prime"]
+        assert t == 4097-n
+        assert row["frobenius_polynomial_coefficients"] == [1,0,0,-t,0,0,4096]
+        assert (row["discriminant_mod_r"] ==
+                (3**6*16**6*(t*t-4*16**3)**3) % r != 0)
+        assert row["f_squarefree_mod_r"] and row["prime_to_r_isogeny_exists_by_tate"]
+        assert not row["explicit_isogeny_evaluated"]
+        assert ({x["b_mask"] for x in row["models"]} ==
+                {x["b_mask"] for x in source_class["models"]})
+        assert all(x["relative_trace_b_mask"] == relative_trace(x["b_mask"]) != 0
+                   for x in row["models"])
     family = json.loads((HERE/"family_formula_receipt.json").read_text())
     assert family["search_sha256"] == sha(HERE/"family_formula.py")
     assert family["map_receipt_sha256"] == sha(map_path)
@@ -173,7 +233,7 @@ def main():
     assert representative_attack["verified_on_source_and_jacobian"]
     audit_attack({**representative_attack,
                   "recovered_log": representative_attack["source_target_log_recovered"]})
-    print("PASS: six binary ranks; 16 modular relation systems; 15 maps, attacks, prior gates; hashes")
+    print("PASS: six descent ranks; 1,440 degree-three exclusion ranks; 66 isogeny arithmetic gates; 16 relation systems; 15 maps and attacks; hashes")
 
 
 if __name__ == "__main__":
