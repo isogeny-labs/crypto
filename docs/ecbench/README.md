@@ -1107,6 +1107,76 @@ who rewrites every observation and reseals every hash could forge a
 quieter run. Git history and the replay on another host are the
 witnesses against that, as with ICMS.
 
+**Legacy accounting.** The rule was broken before it was enforced: after
+sessions were recorded, several merges changed what the same
+`ic.pipeline` / `pdp3-koblitz` ids count, and sessions of both
+generations are committed under identical ids and parameters, so the id
+cannot say which accounting a record has. `src/cryptanalysis/ecbench/legacy.rs`
+holds the named profiles of the past; a replay that does not reproduce
+under the current accounting is tried under each in turn and accepted
+only if the **whole** record then reproduces (answer, totals, phases,
+counters, native counters, factor base, unpriced list). The receipt's
+replay detail names the profile (`pre-2043`, `pre-2043-priced`, `pre-1646`, `pre-A1 endomorphism counters`). New
+sessions are recorded and replayed under the current accounting only.
+The changes: #1774 (`c8b1594f6`) priced the qualified F4 word-XOR unit
+by count (before, a wall-priced solver term was taken back out and the
+run was a lower bound); linear harvest on by default (`d1d034d94`,
+`9e69f57ef`) and F6-IC gate-first on by default (`d72e8b04d`) changed the
+F4/F6-IC search and word count; #2043 (`d72e8b04d`) made every aarch64
+host charge the eager rewrite that x86-64 already charged, where before
+it rewrote lazily and charged only the rows read (the Apple-silicon
+records of 2026-10-13/14); #1646 (`e49afb98f`, 2026-10-11) sent the root's echelon form through the Four Russians kernel and had a child ask the node oracle before specialising (the F6-IC ladder of 2026-10-05, the yield sweep); #1640 (`31dd89b67`) added the `koblitz/K_0 / GF(2^23)` row to `docs/ic/calibration.json`, so native units of that curve were unpriced before; amendment A1 of `research/ext_endo_rho_20261023` changed the uncharged endomorphism counters of `rho.gls` and `rho.frobenius_orbit` in place (no `endomorphism_field_muls_uncharged`, three applications per GLS step), reproduced from the replay by `legacy::pre_endomorphism_a1`. The `oracle_setup` descriptors
+`pair_table_kind`, `pair_table_points` and `window_div` were added to
+`pdp3-koblitz`'s set-up counters later; a record without one is compared
+without it. `engine=rootfind-window-negfold` without `window_div` is the
+`⌈|F|/3⌉` window it was before the divisor became a parameter.
+A change of accounting still needs a new id: do not add a profile to
+excuse one.
+
+*Who may use a profile.* A legacy accounting excuses a difference, so it
+is offered only to a record whose `binary_sha256` is on that profile's
+closed list in `legacy.rs` (the same pattern as `PRE_CLASS_SETUP_BINARIES`),
+and only to an index-calculus record (`ic.*`) carrying no `bitop/v1` work
+counters (every binary since 2026-10-16 writes them). A record from any
+other binary, including everything the current harness writes, replays
+exactly; the lists were found by scanning the committed sessions that
+needed each profile, and each entry names its binary SHA-256, the
+`git_commit` its session names (informational: matching is by binary hash)
+and its sessions:
+
+- `pre-2043`: `1e972df4…fe531` (rootfind_engine claim-n13, claim-n19,
+  smoke-koblitz, abandoned/claim-n13-interrupted); `394e0c1b…ec973`
+  (rootfind_improve claim-n13, select, window-d4); `1622e3fa…372dc`
+  (rootfind_parity claim-n13, claim-n13-v2, cycle2, cycle4, cycle4b, cycle5);
+  `de2e66bc…20c` (rootfind_parity cycle1); `b978f0e4…cccdf` (yield_sweep
+  koblitz, da-f4 arms); `712a58bb…ebad` (f6 ladder n7, exhausted runs);
+  `9bb9a1a6…b8b68` (factor_bases koblitz17-algebraic, exhausted runs).
+- `pre-2043-priced`: `27fd2653…b76c` (rootfind_faster claim-n13-v3, cycle1,
+  cycle3).
+- `pre-1646`: `712a58bb…ebad` (f6 ladder n13, n19); `b2596e9d…d3845`
+  (all_candidates koblitz); `b978f0e4…cccdf` (yield_sweep koblitz).
+- set-up descriptors and `window_div` absent: `1e972df4…fe531`,
+  `394e0c1b…ec973`, `de2e66bc…20c`.
+- pre-A1 endomorphism counters: `87bac344…148f` (ext_endo_rho
+  `sessions/{gls-fp2,subfield-fp3}`; `sessions-a1/` replays exactly).
+
+The full digests and commits are in `legacy.rs`; a test checks they are 64-
+and 40-hex, and that the same committed record with an unlisted binary is
+not excused, for every profile.
+
+*Still failing.* `research/f6_ic_ecbench_ladder_20261005/sessions/n23` does
+not replay: its `ic-f6` records (4 of 6 sampled replays; the rho records
+reproduce) fail under every profile above. The nearest accounting,
+`pre-1646`, gives `solver_ops` 9,189,627,347 against 9,189,892,368
+recorded (0.003 % apart), but the search is not the same one: recorded
+`splits` 72,409 against 71,936, `reductions` 169,304 against 163,371,
+`infeasible_branches` 71,890 against 66,430 and `geometric_refutations`
+0 against 4,987, while the gate's other counters (support checks 133,842,
+witnesses 100, residual lookups 235, group additions 914) match. Another
+change to the F6 node oracle between 2026-10-05 and 2026-10-11, or an
+uncommitted recording binary, is the likely cause; it has not been found,
+and no profile that only nearly matches is offered for it.
+
 **Independent runner (isolab).** `ecbench isolab-job` writes an
 `isolab.job/v1` that runs a spec on a lab worker:
 
