@@ -43,3 +43,28 @@ The final archive was stored through the content-addressed shared-bucket tool.
 The export checker reports zero findings. Both PDF pages were rendered and
 visually inspected. Report rendering initially used the reserved Typst word
 show as a function name; renamed the presentation helper and rendered successfully.
+
+## Data publication and report delivery
+
+### What was done
+
+Data/evidence commit79d719fdba4 was pushed before the derived report. The
+346484264-byte archive was downloaded in full and its SHA-256 matched; the
+archived manifest matches the verified541-file manifest. The artifact remote
+checker reports one hydrated archive and zero problems. The export passes file
+verification with zero findings. Both final PDF pages were inspected.
+
+### Decisions made
+
+Retain raw Singular version output byte-for-byte, including its whitespace,
+using a scoped Git whitespace attribute. Keep the regularity problem open.
+
+### Open threads
+
+Exact-head CI and review remain separate from the completed bounded rerun.
+Finite regularity values are still unresolved under the recorded limits.
+
+### Errors
+
+No unresolved delivery or archive verification error. Earlier main CI failures
+reported a missing factor-base package in the workflow's sparse checkout.
